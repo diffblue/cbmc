@@ -99,6 +99,7 @@ $(document).ready(function(){initNavTree('classconstant__exprt.html',''); initRe
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="classconstant__exprt-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">constant_exprt Class Reference</div></div>
 </div><!--header-->
@@ -131,8 +132,6 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a0f5b844cb19b99d4d7c1f06741382235"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa9b05b27f4092103a8a74d3d6845b77d" id="r_aa9b05b27f4092103a8a74d3d6845b77d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classconstant__exprt.html#aa9b05b27f4092103a8a74d3d6845b77d">set_value</a> (<a class="el" href="classait.html">const</a> <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;value)</td></tr>
 <tr class="separator:aa9b05b27f4092103a8a74d3d6845b77d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a382dfcad97288ce8abf7055759dfc081" id="r_a382dfcad97288ce8abf7055759dfc081"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classconstant__exprt.html#a382dfcad97288ce8abf7055759dfc081">value_is_zero_string</a> () <a class="el" href="classait.html">const</a></td></tr>
-<tr class="separator:a382dfcad97288ce8abf7055759dfc081"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aef8d0d103ec2d5be179cb2ca87eaba6a" id="r_aef8d0d103ec2d5be179cb2ca87eaba6a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classconstant__exprt.html#aef8d0d103ec2d5be179cb2ca87eaba6a">is_null_pointer</a> () <a class="el" href="classait.html">const</a></td></tr>
 <tr class="memdesc:aef8d0d103ec2d5be179cb2ca87eaba6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if <code>expr</code> has a pointer type and a value NULL; it also returns true when <code>expr</code> has value zero and NULL_is_zero is true; returns false in all other cases.  <br /></td></tr>
 <tr class="separator:aef8d0d103ec2d5be179cb2ca87eaba6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -437,24 +436,10 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memdesc:a020b9255f97bb469057dabf7fff6b32e inherit pub_static_methods_classirept"><td class="mdescLeft">&#160;</td><td class="mdescRight">count the number of named_sub elements that are not comments  <br /></td></tr>
 <tr class="separator:a020b9255f97bb469057dabf7fff6b32e inherit pub_static_methods_classirept"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="inherited" name="inherited"></a>
-Additional Inherited Members</h2></td></tr>
-<tr class="inherit_header pub_types_classexprt"><td colspan="2" onclick="javascript:toggleInherit('pub_types_classexprt')"><img src="closed.png" alt="-"/>&#160;Public Types inherited from <a class="el" href="classexprt.html">exprt</a></td></tr>
-<tr class="memitem:a10c073e5cdd14b181d56cf53def8b378 inherit pub_types_classexprt" id="r_a10c073e5cdd14b181d56cf53def8b378"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">typedef</a> std::vector&lt; <a class="el" href="classexprt.html">exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">operandst</a></td></tr>
-<tr class="separator:a10c073e5cdd14b181d56cf53def8b378 inherit pub_types_classexprt"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pub_types_classirept"><td colspan="2" onclick="javascript:toggleInherit('pub_types_classirept')"><img src="closed.png" alt="-"/>&#160;Public Types inherited from <a class="el" href="classirept.html">irept</a></td></tr>
-<tr class="memitem:a3fb8176c81e826cddf8604017b6d625c inherit pub_types_classirept" id="r_a3fb8176c81e826cddf8604017b6d625c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">using</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classirept.html#a3fb8176c81e826cddf8604017b6d625c">baset</a> = <a class="el" href="classsharing__treet.html#a606b2c61af325af3821b9aac512ccad1">tree_implementationt</a></td></tr>
-<tr class="separator:a3fb8176c81e826cddf8604017b6d625c inherit pub_types_classirept"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pub_types_classsharing__treet"><td colspan="2" onclick="javascript:toggleInherit('pub_types_classsharing__treet')"><img src="closed.png" alt="-"/>&#160;Public Types inherited from <a class="el" href="classsharing__treet.html">sharing_treet&lt; irept, forward_list_as_mapt&lt; irep_idt, irept &gt; &gt;</a></td></tr>
-<tr class="memitem:a6089e570eff13366a0d5adbc22bb3bea inherit pub_types_classsharing__treet" id="r_a6089e570eff13366a0d5adbc22bb3bea"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">using</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsharing__treet.html#a6089e570eff13366a0d5adbc22bb3bea">dt</a> = <a class="el" href="classtree__nodet.html">tree_nodet</a>&lt; <a class="el" href="classirept.html">irept</a>, <a class="el" href="classforward__list__as__mapt.html">forward_list_as_mapt</a>&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="classirept.html">irept</a> &gt;, <a class="el" href="classait.html">true</a> &gt;</td></tr>
-<tr class="separator:a6089e570eff13366a0d5adbc22bb3bea inherit pub_types_classsharing__treet"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a53ba0d77826781a16fdb953969a0dbe8 inherit pub_types_classsharing__treet" id="r_a53ba0d77826781a16fdb953969a0dbe8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">using</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsharing__treet.html#a53ba0d77826781a16fdb953969a0dbe8">subt</a> = <a class="el" href="classait.html">typename</a> <a class="el" href="classtree__nodet.html#a75f3a250aed1603df756b5ce32aa3e53">dt::subt</a></td></tr>
-<tr class="separator:a53ba0d77826781a16fdb953969a0dbe8 inherit pub_types_classsharing__treet"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4cd98f4a26caf1e2aa355af54fa38a26 inherit pub_types_classsharing__treet" id="r_a4cd98f4a26caf1e2aa355af54fa38a26"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">using</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsharing__treet.html#a4cd98f4a26caf1e2aa355af54fa38a26">named_subt</a> = <a class="el" href="classait.html">typename</a> <a class="el" href="classtree__nodet.html#a2a5dfabe21290780458ffb8e438ded57">dt::named_subt</a></td></tr>
-<tr class="separator:a4cd98f4a26caf1e2aa355af54fa38a26 inherit pub_types_classsharing__treet"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a606b2c61af325af3821b9aac512ccad1 inherit pub_types_classsharing__treet" id="r_a606b2c61af325af3821b9aac512ccad1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">using</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsharing__treet.html#a606b2c61af325af3821b9aac512ccad1">tree_implementationt</a> = <a class="el" href="classsharing__treet.html">sharing_treet</a></td></tr>
-<tr class="memdesc:a606b2c61af325af3821b9aac512ccad1 inherit pub_types_classsharing__treet"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used to refer to this class from derived classes.  <br /></td></tr>
-<tr class="separator:a606b2c61af325af3821b9aac512ccad1 inherit pub_types_classsharing__treet"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
+<tr class="memitem:a382dfcad97288ce8abf7055759dfc081" id="r_a382dfcad97288ce8abf7055759dfc081"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classconstant__exprt.html#a382dfcad97288ce8abf7055759dfc081">value_is_zero_string</a> () <a class="el" href="classait.html">const</a></td></tr>
+<tr class="separator:a382dfcad97288ce8abf7055759dfc081"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_methods_classexpr__protectedt"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classexpr__protectedt')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classexpr__protectedt.html">expr_protectedt</a></td></tr>
 <tr class="memitem:a56da53393788c8d0f92982bfbef05fbb inherit pro_methods_classexpr__protectedt" id="r_a56da53393788c8d0f92982bfbef05fbb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classexpr__protectedt.html#a56da53393788c8d0f92982bfbef05fbb">expr_protectedt</a> (<a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> <a class="el" href="classait.html">_id</a>, <a class="el" href="classtypet.html">typet</a> _type)</td></tr>
 <tr class="separator:a56da53393788c8d0f92982bfbef05fbb inherit pro_methods_classexpr__protectedt"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -500,6 +485,25 @@ Additional Inherited Members</h2></td></tr>
 <tr class="inherit_header pro_methods_classsharing__treet"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classsharing__treet')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classsharing__treet.html">sharing_treet&lt; irept, forward_list_as_mapt&lt; irep_idt, irept &gt; &gt;</a></td></tr>
 <tr class="memitem:af17f533a5b1dd1f5879bee372977f916 inherit pro_methods_classsharing__treet" id="r_af17f533a5b1dd1f5879bee372977f916"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsharing__treet.html#af17f533a5b1dd1f5879bee372977f916">detach</a> ()</td></tr>
 <tr class="separator:af17f533a5b1dd1f5879bee372977f916 inherit pro_methods_classsharing__treet"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="inherited" name="inherited"></a>
+Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pub_types_classexprt"><td colspan="2" onclick="javascript:toggleInherit('pub_types_classexprt')"><img src="closed.png" alt="-"/>&#160;Public Types inherited from <a class="el" href="classexprt.html">exprt</a></td></tr>
+<tr class="memitem:a10c073e5cdd14b181d56cf53def8b378 inherit pub_types_classexprt" id="r_a10c073e5cdd14b181d56cf53def8b378"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">typedef</a> std::vector&lt; <a class="el" href="classexprt.html">exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classexprt.html#a10c073e5cdd14b181d56cf53def8b378">operandst</a></td></tr>
+<tr class="separator:a10c073e5cdd14b181d56cf53def8b378 inherit pub_types_classexprt"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_types_classirept"><td colspan="2" onclick="javascript:toggleInherit('pub_types_classirept')"><img src="closed.png" alt="-"/>&#160;Public Types inherited from <a class="el" href="classirept.html">irept</a></td></tr>
+<tr class="memitem:a3fb8176c81e826cddf8604017b6d625c inherit pub_types_classirept" id="r_a3fb8176c81e826cddf8604017b6d625c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">using</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classirept.html#a3fb8176c81e826cddf8604017b6d625c">baset</a> = <a class="el" href="classsharing__treet.html#a606b2c61af325af3821b9aac512ccad1">tree_implementationt</a></td></tr>
+<tr class="separator:a3fb8176c81e826cddf8604017b6d625c inherit pub_types_classirept"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_types_classsharing__treet"><td colspan="2" onclick="javascript:toggleInherit('pub_types_classsharing__treet')"><img src="closed.png" alt="-"/>&#160;Public Types inherited from <a class="el" href="classsharing__treet.html">sharing_treet&lt; irept, forward_list_as_mapt&lt; irep_idt, irept &gt; &gt;</a></td></tr>
+<tr class="memitem:a6089e570eff13366a0d5adbc22bb3bea inherit pub_types_classsharing__treet" id="r_a6089e570eff13366a0d5adbc22bb3bea"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">using</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsharing__treet.html#a6089e570eff13366a0d5adbc22bb3bea">dt</a> = <a class="el" href="classtree__nodet.html">tree_nodet</a>&lt; <a class="el" href="classirept.html">irept</a>, <a class="el" href="classforward__list__as__mapt.html">forward_list_as_mapt</a>&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="classirept.html">irept</a> &gt;, <a class="el" href="classait.html">true</a> &gt;</td></tr>
+<tr class="separator:a6089e570eff13366a0d5adbc22bb3bea inherit pub_types_classsharing__treet"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a53ba0d77826781a16fdb953969a0dbe8 inherit pub_types_classsharing__treet" id="r_a53ba0d77826781a16fdb953969a0dbe8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">using</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsharing__treet.html#a53ba0d77826781a16fdb953969a0dbe8">subt</a> = <a class="el" href="classait.html">typename</a> <a class="el" href="classtree__nodet.html#a75f3a250aed1603df756b5ce32aa3e53">dt::subt</a></td></tr>
+<tr class="separator:a53ba0d77826781a16fdb953969a0dbe8 inherit pub_types_classsharing__treet"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4cd98f4a26caf1e2aa355af54fa38a26 inherit pub_types_classsharing__treet" id="r_a4cd98f4a26caf1e2aa355af54fa38a26"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">using</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsharing__treet.html#a4cd98f4a26caf1e2aa355af54fa38a26">named_subt</a> = <a class="el" href="classait.html">typename</a> <a class="el" href="classtree__nodet.html#a2a5dfabe21290780458ffb8e438ded57">dt::named_subt</a></td></tr>
+<tr class="separator:a4cd98f4a26caf1e2aa355af54fa38a26 inherit pub_types_classsharing__treet"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a606b2c61af325af3821b9aac512ccad1 inherit pub_types_classsharing__treet" id="r_a606b2c61af325af3821b9aac512ccad1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">using</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsharing__treet.html#a606b2c61af325af3821b9aac512ccad1">tree_implementationt</a> = <a class="el" href="classsharing__treet.html">sharing_treet</a></td></tr>
+<tr class="memdesc:a606b2c61af325af3821b9aac512ccad1 inherit pub_types_classsharing__treet"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used to refer to this class from derived classes.  <br /></td></tr>
+<tr class="separator:a606b2c61af325af3821b9aac512ccad1 inherit pub_types_classsharing__treet"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_static_methods_classsharing__treet"><td colspan="2" onclick="javascript:toggleInherit('pro_static_methods_classsharing__treet')"><img src="closed.png" alt="-"/>&#160;Static Protected Member Functions inherited from <a class="el" href="classsharing__treet.html">sharing_treet&lt; irept, forward_list_as_mapt&lt; irep_idt, irept &gt; &gt;</a></td></tr>
 <tr class="memitem:a4806a7935557715fb2fee0e169f61d0d inherit pro_static_methods_classsharing__treet" id="r_a4806a7935557715fb2fee0e169f61d0d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">static</a> <a class="el" href="classait.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsharing__treet.html#a4806a7935557715fb2fee0e169f61d0d">remove_ref</a> (<a class="el" href="classsharing__treet.html#a6089e570eff13366a0d5adbc22bb3bea">dt</a> *<a class="el" href="classait.html">old_data</a>)</td></tr>
 <tr class="separator:a4806a7935557715fb2fee0e169f61d0d inherit pro_static_methods_classsharing__treet"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -891,7 +895,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03162">3162</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03160">3160</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
 
 </div>
 </div>
@@ -900,6 +904,9 @@ Additional Inherited Members</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classait.html">bool</a> constant_exprt::value_is_zero_string </td>
@@ -908,6 +915,11 @@ Additional Inherited Members</h2></td></tr>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="std__expr_8cpp_source.html#l00026">26</a> of file <a class="el" href="std__expr_8cpp_source.html">std_expr.cpp</a>.</p>
