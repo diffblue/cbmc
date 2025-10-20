@@ -89,7 +89,7 @@ void cone_of_influencet::get_succs(
 
   if(rit->is_goto())
   {
-    if(!rit->condition().is_false())
+    if(rit->condition() != false)
     {
       // Branch can be taken.
       for(goto_programt::targetst::const_iterator t=rit->targets.begin();
@@ -102,14 +102,14 @@ void cone_of_influencet::get_succs(
       }
     }
 
-    if(rit->condition().is_true())
+    if(rit->condition() == true)
     {
       return;
     }
   }
   else if(rit->is_assume() || rit->is_assert())
   {
-    if(rit->condition().is_false())
+    if(rit->condition() == false)
     {
       return;
     }

@@ -175,9 +175,9 @@ static std::ostream &format_rec(std::ostream &os, const constant_exprt &src)
 
   if(type == ID_bool)
   {
-    if(src.is_true())
+    if(src == true)
       return os << "true";
-    else if(src.is_false())
+    else if(src == false)
       return os << "false";
     else
       return os << src.pretty();

@@ -46,7 +46,7 @@ void pointer_arithmetict::read(const exprt &src)
     {
       const index_exprt &index_expr = to_index_expr(address_of_src.op());
 
-      if(index_expr.index().is_zero())
+      if(index_expr.index() == 0)
         make_pointer(address_of_src);
       else
       {

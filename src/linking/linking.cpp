@@ -523,15 +523,13 @@ bool linkingt::adjust_object_type_rec(
     const exprt &old_size=to_array_type(t1).size();
     const exprt &new_size=to_array_type(t2).size();
 
-    if((old_size.is_nil() && new_size.is_not_nil()) ||
-       (old_size.is_zero() && new_size.is_not_nil()) ||
-       info.old_symbol.is_weak)
+    if(
+      (old_size.is_nil() && new_size.is_not_nil()) ||
+      (old_size == 0 && new_size.is_not_nil()) || info.old_symbol.is_weak)
     {
       info.set_to_new=true; // store new type
     }
-    else if(new_size.is_nil() ||
-            new_size.is_zero() ||
-            info.new_symbol.is_weak)
+    else if(new_size.is_nil() || new_size == 0 || info.new_symbol.is_weak)
     {
       // ok, we will use the old type
     }
@@ -551,7 +549,7 @@ bool linkingt::adjust_object_type_rec(
 
       equal_exprt eq(old_size, new_size);
 
-      if(!simplify_expr(eq, ns).is_true())
+      if(simplify_expr(eq, ns) != true)
       {
         linking_diagnosticst diag{message_handler, ns};
         diag.error(

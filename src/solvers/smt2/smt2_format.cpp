@@ -60,9 +60,9 @@ std::ostream &smt2_format_rec(std::ostream &out, const exprt &expr)
     }
     else if(expr_type.id() == ID_bool)
     {
-      if(expr.is_true())
+      if(expr == true)
         out << "true";
-      else if(expr.is_false())
+      else if(expr == false)
         out << "false";
       else
         DATA_INVARIANT(false, "unknown Boolean constant");

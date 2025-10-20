@@ -119,9 +119,9 @@ std::string expr2cppt::convert_constant(
   if(src.type().id() == ID_c_bool)
   {
     // C++ has built-in Boolean constants, in contrast to C
-    if(src.is_true())
+    if(src == true)
       return "true";
-    else if(src.is_false())
+    else if(src == false)
       return "false";
   }
 

@@ -1286,7 +1286,7 @@ std::string expr2ct::convert_complex(
   unsigned precedence)
 {
   if(
-    src.operands().size() == 2 && to_binary_expr(src).op0().is_zero() &&
+    src.operands().size() == 2 && to_binary_expr(src).op0() == 0 &&
     to_binary_expr(src).op1().is_constant())
   {
     // This is believed to be gcc only; check if this is sensible
@@ -1860,7 +1860,7 @@ std::string expr2ct::convert_constant(
   }
   else if(type.id()==ID_bool)
   {
-    dest=convert_constant_bool(src.is_true());
+    dest = convert_constant_bool(src == true);
   }
   else if(type.id()==ID_unsignedbv ||
           type.id()==ID_signedbv ||
@@ -3563,7 +3563,7 @@ std::string expr2ct::convert_conditional_target_group(const exprt &src)
   std::string dest;
   unsigned p;
   const auto &cond = src.operands().front();
-  if(!cond.is_true())
+  if(cond != true)
   {
     dest += convert_with_precedence(cond, p);
     dest += ": ";
@@ -3783,7 +3783,7 @@ std::string expr2ct::convert_with_precedence(
 
     if(object.id() == ID_label)
       return "&&" + object.get_string(ID_identifier);
-    else if(object.id() == ID_index && to_index_expr(object).index().is_zero())
+    else if(object.id() == ID_index && to_index_expr(object).index() == 0)
       return convert(to_index_expr(object).array());
     else if(to_pointer_type(src.type()).base_type().id() == ID_code)
       return convert_unary(to_unary_expr(src), "", precedence = 15);

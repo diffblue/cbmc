@@ -689,7 +689,7 @@ exprt constant_interval_exprt::generate_division_expression(
 
   PRECONDITION(!is_zero(rhs));
 
-  if(rhs.is_one())
+  if(rhs == 1)
   {
     return lhs;
   }
@@ -744,7 +744,7 @@ exprt constant_interval_exprt::generate_modulo_expression(
 
   PRECONDITION(!is_zero(rhs));
 
-  if(rhs.is_one())
+  if(rhs == 1)
   {
     return lhs;
   }
@@ -998,7 +998,7 @@ constant_exprt constant_interval_exprt::zero(const typet &type)
 {
   constant_exprt zero = from_integer(mp_integer(0), type);
   INVARIANT(
-    zero.is_zero() || (type.id() == ID_bool && zero.is_false()),
+    zero == 0 || (type.id() == ID_bool && zero == false),
     "The value created from 0 should be zero or false");
   return zero;
 }
@@ -1269,7 +1269,7 @@ bool constant_interval_exprt::is_zero(const exprt &expr)
 
   INVARIANT(!is_max(expr) && !is_min(expr), "We excluded those cases");
 
-  if(expr.is_zero())
+  if(expr == 0)
   {
     return true;
   }
@@ -1351,7 +1351,7 @@ bool constant_interval_exprt::equal(const exprt &a, const exprt &b)
 
   INVARIANT(!is_extreme(l, r), "We've excluded this before");
 
-  return simplified_expr(equal_exprt(l, r)).is_true();
+  return simplified_expr(equal_exprt(l, r)) == true;
 }
 
 // TODO: Signed/unsigned comparisons.
@@ -1399,7 +1399,7 @@ bool constant_interval_exprt::less_than(const exprt &a, const exprt &b)
     !is_extreme(l) && !is_extreme(r),
     "We have excluded all of these cases in the code above");
 
-  return simplified_expr(binary_relation_exprt(l, ID_lt, r)).is_true();
+  return simplified_expr(binary_relation_exprt(l, ID_lt, r)) == true;
 }
 
 bool constant_interval_exprt::greater_than(const exprt &a, const exprt &b)
@@ -1628,8 +1628,8 @@ constant_interval_exprt::typecast(const typet &type) const
 {
   if(is_boolean() && is_int(type))
   {
-    bool lower = !has_no_lower_bound() && get_lower().is_true();
-    bool upper = has_no_upper_bound() || get_upper().is_true();
+    bool lower = !has_no_lower_bound() && get_lower() == true;
+    bool upper = has_no_upper_bound() || get_upper() == true;
 
     INVARIANT(!lower || upper, "");
 
@@ -1875,7 +1875,7 @@ bool constant_interval_exprt::contains_zero() const
     return false;
   }
 
-  if(get_lower().is_zero() || get_upper().is_zero())
+  if(get_lower() == 0 || get_upper() == 0)
   {
     return true;
   }

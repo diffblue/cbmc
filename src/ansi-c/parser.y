@@ -1606,8 +1606,10 @@ pragma_packed:
         {
           init($$);
           if(!PARSER.pragma_pack.empty() &&
-             PARSER.pragma_pack.back().is_one())
+             PARSER.pragma_pack.back() == 1)
+          {
             set($$, ID_packed);
+          }
         }
         ;
 
@@ -1810,7 +1812,7 @@ member_declaring_list:
           if(parser_stack($2).id() != ID_struct &&
              parser_stack($2).id() != ID_union &&
              !PARSER.pragma_pack.empty() &&
-             !PARSER.pragma_pack.back().is_zero())
+             PARSER.pragma_pack.back() != 0)
           {
             // communicate #pragma pack(n) alignment constraints by
             // by both setting packing AND alignment for individual struct/union

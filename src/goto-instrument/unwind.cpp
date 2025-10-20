@@ -140,7 +140,7 @@ void goto_unwindt::unwind(
 
     exprt exit_cond = false_exprt(); // default is false
 
-    if(!t->condition().is_true()) // cond in backedge
+    if(t->condition() != true) // cond in backedge
     {
       exit_cond = boolean_negate(t->condition());
     }
@@ -190,7 +190,7 @@ void goto_unwindt::unwind(
     goto_programt::const_targett t_before=loop_exit;
     t_before--;
 
-    if(!t_before->is_goto() || !t_before->condition().is_true())
+    if(!t_before->is_goto() || t_before->condition() != true)
     {
       goto_programt::targett t_goto = goto_program.insert_before(
         loop_exit,

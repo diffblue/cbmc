@@ -151,7 +151,7 @@ void havoc_assigns_targetst::append_havoc_code_for_expr(
     {
       const auto &ptr = funcall.arguments().at(0);
       const auto &size = funcall.arguments().at(1);
-      if(funcall.arguments().at(2).is_true())
+      if(funcall.arguments().at(2) == true)
       {
         append_havoc_pointer_code(expr.source_location(), ptr, dest);
       }
@@ -263,7 +263,7 @@ void simplify_gotos(goto_programt &goto_program, const namespacet &ns)
   {
     if(
       instruction.is_goto() &&
-      simplify_expr(instruction.condition(), ns).is_false())
+      simplify_expr(instruction.condition(), ns) == false)
       instruction.turn_into_skip();
   }
 }

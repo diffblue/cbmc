@@ -394,11 +394,11 @@ void invariant_sett::strengthen_rec(const exprt &expr)
     return;
   }
 
-  if(expr.is_true())
+  if(expr == true)
   {
     // do nothing, it's useless
   }
-  else if(expr.is_false())
+  else if(expr == false)
   {
     // wow, that's strong
     make_false();
@@ -596,7 +596,7 @@ tvt invariant_sett::implies_rec(const exprt &expr) const
   if(is_false) // can't get any stronger
     return tvt(true);
 
-  if(expr.is_true())
+  if(expr == true)
     return tvt(true);
   else if(expr.id()==ID_not)
   {
@@ -701,12 +701,12 @@ void invariant_sett::nnf(exprt &expr, bool negate)
   if(!expr.is_boolean())
     throw "nnf: non-Boolean expression";
 
-  if(expr.is_true())
+  if(expr == true)
   {
     if(negate)
       expr=false_exprt();
   }
-  else if(expr.is_false())
+  else if(expr == false)
   {
     if(negate)
       expr=true_exprt();

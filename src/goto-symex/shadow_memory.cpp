@@ -39,7 +39,7 @@ void shadow_memoryt::initialize_shadow_memory(
 
     if(
       field_pair.second.id() == ID_typecast &&
-      to_typecast_expr(field_pair.second).op().is_zero())
+      to_typecast_expr(field_pair.second).op() == 0)
     {
       const auto zero_value =
         zero_initializer(type, expr.source_location(), ns);

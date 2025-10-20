@@ -183,8 +183,8 @@ void constant_propagator_domaint::transform(
     else
       g = not_exprt(from->condition());
     partial_evaluate(values, g, ns);
-    if(g.is_false())
-     values.set_to_bottom();
+    if(g == false)
+      values.set_to_bottom();
     else
       two_way_propagate_rec(g, ns, cp);
   }
@@ -376,7 +376,7 @@ bool constant_propagator_domaint::two_way_propagate_rec(
 
     // x != FALSE ==> x == TRUE
 
-    if(rhs.is_zero() || rhs.is_false())
+    if(rhs == 0 || rhs == false)
       rhs = from_integer(1, rhs.type());
     else
       rhs = from_integer(0, rhs.type());

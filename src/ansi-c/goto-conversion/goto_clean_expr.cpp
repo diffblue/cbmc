@@ -215,7 +215,7 @@ static exprt convert_statement_expression(
     {
       exprt condition = current_it->condition();
       replace_expr(value_map, condition);
-      if(!condition.is_true())
+      if(condition != true)
       {
         auto next_it = current_it->targets.front();
         exprt copy_path_condition = path_condition;

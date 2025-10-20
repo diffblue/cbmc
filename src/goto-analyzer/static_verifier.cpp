@@ -92,11 +92,11 @@ check_assertion(const ai_domain_baset &domain, exprt e, const namespacet &ns)
   }
 
   domain.ai_simplify(e, ns);
-  if(e.is_true())
+  if(e == true)
   {
     return ai_verifier_statust::TRUE;
   }
-  else if(e.is_false())
+  else if(e == false)
   {
     return ai_verifier_statust::FALSE_IF_REACHABLE;
   }

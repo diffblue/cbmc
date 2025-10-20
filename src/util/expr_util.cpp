@@ -99,9 +99,9 @@ exprt boolean_negate(const exprt &src)
 {
   if(src.id() == ID_not)
     return to_not_expr(src).op();
-  else if(src.is_true())
+  else if(src == true)
     return false_exprt();
-  else if(src.is_false())
+  else if(src == false)
     return true_exprt();
   else
     return not_exprt(src);

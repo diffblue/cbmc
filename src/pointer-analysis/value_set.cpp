@@ -658,7 +658,7 @@ void value_sett::get_value_set_rec(
     {
       // integer-to-something
 
-      if(op.is_zero())
+      if(op == 0)
       {
         insert(
           dest,
@@ -1407,7 +1407,7 @@ void value_sett::get_reference_set_rec(
 
         offsett o = a_it->second;
 
-        if(!index.is_zero() && o.has_value())
+        if(index != 0 && o.has_value())
         {
           auto size = pointer_offset_size(array_type.element_type(), ns);
 

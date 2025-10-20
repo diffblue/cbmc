@@ -34,7 +34,7 @@ static void ASSUME_TRUE(
 
   REQUIRE(assumption.id() != ID_nil);
   REQUIRE(assumption.is_boolean());
-  REQUIRE(assumption.is_true());
+  REQUIRE(assumption == true);
 }
 
 static void EXPECT_RESULT(

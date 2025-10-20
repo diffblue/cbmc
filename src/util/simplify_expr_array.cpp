@@ -93,11 +93,11 @@ simplify_exprt::simplify_index(const index_exprt &expr)
       exprt new_index_expr = simplify_index(
         index_exprt(with_expr.old(), index, new_expr.type())); // recursive call
 
-      if(equality_expr.is_true())
+      if(equality_expr == true)
       {
         return with_expr.new_value();
       }
-      else if(equality_expr.is_false())
+      else if(equality_expr == false)
       {
         return new_index_expr;
       }

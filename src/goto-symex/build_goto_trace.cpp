@@ -84,9 +84,9 @@ static exprt build_full_lhs_rec(
 
     exprt tmp = decision_procedure.get(to_if_expr(src_ssa).cond());
 
-    if(tmp.is_true())
+    if(tmp == true)
       return tmp2.true_case();
-    else if(tmp.is_false())
+    else if(tmp == false)
       return tmp2.false_case();
     else
       return std::move(tmp2);
@@ -241,7 +241,7 @@ void build_goto_trace(
 
     const SSA_stept &SSA_step = *it;
 
-    if(!decision_procedure.get(SSA_step.guard_handle).is_true())
+    if(decision_procedure.get(SSA_step.guard_handle) != true)
       continue;
 
     if(it->is_constraint() ||
@@ -410,7 +410,7 @@ void build_goto_trace(
         goto_trace_step.cond_expr = SSA_step.cond_expr;
 
         goto_trace_step.cond_value =
-          decision_procedure.get(SSA_step.cond_handle).is_true();
+          decision_procedure.get(SSA_step.cond_handle) == true;
       }
 
       if(SSA_step.source.pc->is_assert() || SSA_step.source.pc->is_assume())
@@ -446,7 +446,7 @@ static bool is_failed_assertion_step(
   const decision_proceduret &decision_procedure)
 {
   return step->is_assert() &&
-         decision_procedure.get(step->cond_handle).is_false();
+         decision_procedure.get(step->cond_handle) == false;
 }
 
 void build_goto_trace(

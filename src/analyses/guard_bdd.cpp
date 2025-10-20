@@ -44,7 +44,7 @@ exprt guard_bddt::guard_expr(exprt expr) const
   }
   else
   {
-    if(expr.is_false())
+    if(expr == false)
     {
       return boolean_negate(as_expr());
     }

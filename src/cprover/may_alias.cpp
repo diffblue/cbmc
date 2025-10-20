@@ -179,7 +179,7 @@ same_address(const exprt &a, const exprt &b, const namespacet &ns)
 
       CHECK_RETURN(base_same_address.has_value());
 
-      if(base_same_address->is_false())
+      if(*base_same_address == false)
         return false_expr;
       else
       {

@@ -231,7 +231,7 @@ void check_call_sequencet::operator()()
     {
       goto_programt::const_targett t=e.pc->get_target();
 
-      if(e.pc->condition().is_true())
+      if(e.pc->condition() == true)
         e.pc=t;
       else
       {

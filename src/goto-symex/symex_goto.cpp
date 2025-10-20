@@ -80,7 +80,7 @@ void goto_symext::symex_goto(statet &state)
   }
   new_guard = renamed_guard.get();
 
-  if(new_guard.is_false())
+  if(new_guard == false)
   {
     target.location(state.guard.as_expr(), state.source);
 
@@ -113,7 +113,7 @@ void goto_symext::symex_goto(statet &state)
        // while(cond);
        (instruction.incoming_edges.size() == 1 &&
         *instruction.incoming_edges.begin() == goto_target &&
-        goto_target->is_goto() && new_guard.is_true())))
+        goto_target->is_goto() && new_guard == true)))
     {
       // generate assume(false) or a suitable negation if this
       // instruction is a conditional goto
@@ -152,7 +152,7 @@ void goto_symext::symex_goto(statet &state)
       return;
     }
 
-    if(new_guard.is_true())
+    if(new_guard == true)
     {
       // we continue executing the loop
       if(check_break(loop_id, unwind))
@@ -166,7 +166,7 @@ void goto_symext::symex_goto(statet &state)
 
   // No point executing both branches of an unconditional goto.
   if(
-    new_guard.is_true() && // We have an unconditional goto, AND
+    new_guard == true && // We have an unconditional goto, AND
     // either there are no reachable blocks between us and the target in the
     // surrounding scope (because state.guard == true implies there is no path
     // around this GOTO instruction)
@@ -193,7 +193,7 @@ void goto_symext::symex_goto(statet &state)
     state_pc++;
 
     // skip dead instructions
-    if(new_guard.is_true())
+    if(new_guard == true)
       while(state_pc!=goto_target && !state_pc->is_target())
         ++state_pc;
 
@@ -280,7 +280,7 @@ void goto_symext::symex_goto(statet &state)
   // On an unconditional GOTO we don't need our state, as it will be overwritten
   // by merge_goto. Therefore we move it onto goto_state_list instead of copying
   // as usual.
-  if(new_guard.is_true())
+  if(new_guard == true)
   {
     // The move here only moves goto_statet, the base class of goto_symex_statet
     // and not the entire thing.
@@ -410,7 +410,7 @@ void goto_symext::symex_unreachable_goto(statet &state)
     goto_state_list.emplace_back(state.source, std::move(new_state));
   };
 
-  if(instruction.condition().is_true())
+  if(instruction.condition() == true)
   {
     if(instruction.is_backwards_goto())
     {

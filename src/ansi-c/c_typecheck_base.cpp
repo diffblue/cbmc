@@ -312,7 +312,7 @@ static bool is_instantiation_of_flexible_array(
   return old_array_type.element_type() == new_array_type.element_type() &&
          old_array_type.get_bool(ID_C_flexible_array_member) &&
          new_array_type.get_bool(ID_C_flexible_array_member) &&
-         (old_array_type.size().is_nil() || old_array_type.size().is_zero());
+         (old_array_type.size().is_nil() || old_array_type.size() == 0);
 }
 
 void c_typecheck_baset::typecheck_redefinition_non_type(

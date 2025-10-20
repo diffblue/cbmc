@@ -171,7 +171,7 @@ void local_may_aliast::get_rec(
 {
   if(rhs.is_constant())
   {
-    if(rhs.is_zero())
+    if(rhs == 0)
       dest.insert(objects.number(exprt(ID_null_object)));
     else
       dest.insert(objects.number(exprt(ID_integer_address_object)));

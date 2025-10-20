@@ -664,8 +664,8 @@ private:
     for(const auto &v : condition)
     {
       auto expr = v->to_constant();
-      all_true = all_true && expr.is_true();
-      all_false = all_false && expr.is_false();
+      all_true = all_true && expr == true;
+      all_false = all_false && expr == false;
     }
     auto indeterminate = !all_true && !all_false;
 

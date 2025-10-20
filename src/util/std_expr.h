@@ -3140,6 +3140,21 @@ public:
   /// false in all other cases.
   bool is_null_pointer() const;
 
+  using irept::operator==;
+  using irept::operator!=;
+  /// \copydoc operator==(const exprt &, bool)
+  bool operator==(bool rhs) const;
+  /// \copydoc operator!=(const exprt &, bool)
+  bool operator!=(bool rhs) const;
+  /// \copydoc operator==(const exprt &, int)
+  bool operator==(int rhs) const;
+  /// \copydoc operator!=(const exprt &, int)
+  bool operator!=(int rhs) const;
+  /// \copydoc operator==(const exprt &, std::nullptr_t)
+  bool operator==(std::nullptr_t) const;
+  /// \copydoc operator!=(const exprt &, std::nullptr_t)
+  bool operator!=(std::nullptr_t) const;
+
   static void check(
     const exprt &expr,
     const validation_modet vm = validation_modet::INVARIANT);
@@ -3185,6 +3200,36 @@ inline constant_exprt &to_constant_expr(exprt &expr)
   return static_cast<constant_exprt &>(expr);
 }
 
+/// Return whether the expression \p lhs is a constant of Boolean type that is
+/// representing the Boolean value \p rhs.
+bool operator==(const exprt &lhs, bool rhs);
+
+/// Return whether the expression \p lhs is not a constant of Boolean type or is
+/// not representing the Boolean value \p rhs.
+bool operator!=(const exprt &lhs, bool rhs);
+
+/// Return whether the expression \p lhs is a constant representing the numeric
+/// value \p rhs; only values 0 and 1 are supported for \p rhs.
+/// For value 0 we consider the following types: ID_integer, ID_natural,
+/// ID_rational, ID_unsignedbv, ID_signedbv, ID_c_bool, ID_c_bit_field,
+/// ID_fixedbv, ID_floatbv, ID_pointer.<br>
+/// For ID_pointer, returns true iff the value is a zero string or a null
+/// pointer.<br>
+/// For value 1 we consider the following types: ID_integer, ID_natural,
+/// ID_rational, ID_unsignedbv, ID_signedbv, ID_c_bool, ID_c_bit_field,
+/// ID_fixedbv, ID_floatbv.<br>
+/// For all other types, return false.
+bool operator==(const exprt &lhs, int rhs);
+
+/// Returns the negation of \ref operator==(const exprt &, int).
+bool operator!=(const exprt &lhs, int rhs);
+
+/// Return whether the expression \p lhs is a constant representing the NULL
+/// pointer.
+bool operator==(const exprt &lhs, std::nullptr_t);
+
+/// Returns the negation of \ref operator==(const exprt &, std::nullptr_t).
+bool operator!=(const exprt &lhs, std::nullptr_t);
 
 /// \brief The Boolean constant true
 class true_exprt:public constant_exprt

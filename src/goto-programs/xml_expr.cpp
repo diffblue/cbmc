@@ -226,8 +226,8 @@ xmlt xml(const exprt &expr, const namespacet &ns)
     else if(type.id() == ID_bool)
     {
       result.name = "boolean";
-      result.set_attribute("binary", constant_expr.is_true() ? "1" : "0");
-      result.data = constant_expr.is_true() ? "TRUE" : "FALSE";
+      result.set_attribute("binary", constant_expr == true ? "1" : "0");
+      result.data = constant_expr == true ? "TRUE" : "FALSE";
     }
     else
     {

@@ -79,7 +79,7 @@ std::ostream &goto_programt::instructiont::output(std::ostream &out) const
 
   case GOTO:
   case INCOMPLETE_GOTO:
-    if(!condition().is_true())
+    if(condition() != true)
     {
       out << "IF " << format(condition()) << " THEN ";
     }
@@ -525,7 +525,7 @@ std::string as_string(
     return "(NO INSTRUCTION TYPE)";
 
   case GOTO:
-    if(!i.condition().is_true())
+    if(i.condition() != true)
     {
       result += "IF " + from_expr(ns, function, i.condition()) + " THEN ";
     }
@@ -742,7 +742,7 @@ void goto_programt::copy_from(const goto_programt &src)
 bool goto_programt::has_assertion() const
 {
   for(const auto &i : instructions)
-    if(i.is_assert() && !i.condition().is_true())
+    if(i.is_assert() && i.condition() != true)
       return true;
 
   return false;

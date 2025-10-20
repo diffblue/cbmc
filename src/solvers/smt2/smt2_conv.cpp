@@ -367,9 +367,9 @@ exprt smt2_convt::get(const exprt &expr) const
   else if(expr.id() == ID_not)
   {
     auto op = get(to_not_expr(expr).op());
-    if(op.is_true())
+    if(op == true)
       return false_exprt();
-    else if(op.is_false())
+    else if(op == false)
       return true_exprt();
   }
   else if(
@@ -897,7 +897,7 @@ void smt2_convt::convert_address_of_rec(
     const exprt &array = index_expr.array();
     const exprt &index = index_expr.index();
 
-    if(index.is_zero())
+    if(index == 0)
     {
       if(array.type().id()==ID_pointer)
         convert_expr(array);
@@ -985,9 +985,9 @@ literalt smt2_convt::convert(const exprt &expr)
 
   // Three cases where no new handle is needed.
 
-  if(expr.is_true())
+  if(expr == true)
     return const_literal(true);
-  else if(expr.is_false())
+  else if(expr == false)
     return const_literal(false);
   else if(expr.id()==ID_literal)
     return to_literal_expr(expr).get_literal();
@@ -3664,9 +3664,9 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
   }
   else if(expr_type.id()==ID_bool)
   {
-    if(expr.is_true())
+    if(expr == true)
       out << "true";
-    else if(expr.is_false())
+    else if(expr == false)
       out << "false";
     else
       UNEXPECTEDCASE("unknown Boolean constant");

@@ -91,13 +91,13 @@ static std::optional<exprt> try_evaluate_pointer_comparison(
           typecast_exprt::conditional_cast(value.pointer, other_operand.type()),
           other_operand},
         ns);
-      if(test_equal.is_true())
+      if(test_equal == true)
       {
         constant_found = true;
         // We can't break because we have to make sure we find any instances of
         // ID_unknown or ID_invalid
       }
-      else if(!test_equal.is_false())
+      else if(test_equal != false)
       {
         // We can't conclude anything about the value-set
         return {};

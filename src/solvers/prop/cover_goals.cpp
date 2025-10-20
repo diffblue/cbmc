@@ -28,7 +28,7 @@ void cover_goalst::mark()
   for(auto &g : goals)
     if(
       g.status == goalt::statust::UNKNOWN &&
-      decision_procedure.get(g.condition).is_true())
+      decision_procedure.get(g.condition) == true)
     {
       g.status=goalt::statust::COVERED;
       _number_covered++;
@@ -47,7 +47,7 @@ void cover_goalst::constraint()
   // cover at least one unknown goal
 
   for(const auto &g : goals)
-    if(g.status == goalt::statust::UNKNOWN && !g.condition.is_false())
+    if(g.status == goalt::statust::UNKNOWN && g.condition != false)
       disjuncts.push_back(g.condition);
 
   // this is 'false' if there are no disjuncts

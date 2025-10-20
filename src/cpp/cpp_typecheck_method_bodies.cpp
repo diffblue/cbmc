@@ -41,7 +41,7 @@ void cpp_typecheckt::typecheck_method_bodies()
     std::cout << "  is_not_nil: " << body.is_not_nil() << '\n';
     std::cout << "  !is_zero: " << (!body.is_zero()) << '\n';
 #endif
-    if(body.is_not_nil() && !body.is_zero())
+    if(body.is_not_nil() && body != 0)
       convert_function(method_symbol);
   }
 

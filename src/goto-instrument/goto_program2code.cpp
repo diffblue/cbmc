@@ -550,7 +550,7 @@ goto_programt::const_targett goto_program2codet::convert_goto(
       (upper_bound==goto_program.instructions.end() ||
        upper_bound->location_number > loop_entry->second->location_number))
     return convert_goto_while(target, loop_entry->second, dest);
-  else if(!target->condition().is_true())
+  else if(target->condition() != true)
     return convert_goto_switch(target, upper_bound, dest);
   else if(!loop_last_stack.empty())
     return convert_goto_break_continue(target, upper_bound, dest);
@@ -580,7 +580,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
     w.cond() = not_exprt(target->condition());
     simplify(w.cond(), ns);
   }
-  else if(target->condition().is_true())
+  else if(target->condition() == true)
   {
     target = convert_goto_goto(target, to_code_block(w.body()));
   }
@@ -597,11 +597,11 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
   loop_last_stack.pop_back();
 
   convert_labels(loop_end, to_code_block(w.body()));
-  if(loop_end->condition().is_false())
+  if(loop_end->condition() == false)
   {
     to_code_block(w.body()).add(code_breakt());
   }
-  else if(!loop_end->condition().is_true())
+  else if(loop_end->condition() != true)
   {
     code_ifthenelset i(not_exprt(loop_end->condition()), code_breakt());
     simplify(i.cond(), ns);
@@ -624,15 +624,15 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
 
     f.swap(w);
   }
-  else if(w.body().has_operands() &&
-          w.cond().is_true())
+  else if(w.body().has_operands() && w.cond() == true)
   {
     const codet &back=to_code(w.body().operands().back());
 
-    if(back.get_statement()==ID_break ||
-       (back.get_statement()==ID_ifthenelse &&
-        to_code_ifthenelse(back).cond().is_true() &&
-        to_code_ifthenelse(back).then_case().get_statement()==ID_break))
+    if(
+      back.get_statement() == ID_break ||
+      (back.get_statement() == ID_ifthenelse &&
+       to_code_ifthenelse(back).cond() == true &&
+       to_code_ifthenelse(back).then_case().get_statement() == ID_break))
     {
       w.body().operands().pop_back();
       code_dowhilet d(false_exprt(), w.body());
@@ -667,7 +667,7 @@ goto_programt::const_targett goto_program2codet::get_cases(
   {
     if(
       cases_it->is_goto() && !cases_it->is_backwards_goto() &&
-      cases_it->condition().is_true())
+      cases_it->condition() == true)
     {
       default_target=cases_it->get_target();
 
@@ -834,7 +834,7 @@ bool goto_program2codet::remove_default(
         next_case != goto_program.instructions.end() &&
         next_case == default_target &&
         (!it->case_last->is_goto() ||
-         (it->case_last->condition().is_true() &&
+         (it->case_last->condition() == true &&
           it->case_last->get_target() == default_target)))
       {
         // if there is no goto here, yet we got here, all others would
@@ -845,7 +845,7 @@ bool goto_program2codet::remove_default(
 
     // jumps to default are ok
     if(
-      it->case_last->is_goto() && it->case_last->condition().is_true() &&
+      it->case_last->is_goto() && it->case_last->condition() == true &&
       it->case_last->get_target() == default_target)
       continue;
 
@@ -1059,7 +1059,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
     has_else =
       before_else->is_goto() &&
       before_else->get_target()->location_number > end_if->location_number &&
-      before_else->condition().is_true() &&
+      before_else->condition() == true &&
       (upper_bound == goto_program.instructions.end() ||
        upper_bound->location_number >=
          before_else->get_target()->location_number);
@@ -1145,7 +1145,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
 
     copy_source_location(target, i);
 
-    if(i.cond().is_true())
+    if(i.cond() == true)
       dest.add(std::move(i.then_case()));
     else
       dest.add(std::move(i));
@@ -1169,7 +1169,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
 
     copy_source_location(target, i);
 
-    if(i.cond().is_true())
+    if(i.cond() == true)
       dest.add(std::move(i.then_case()));
     else
       dest.add(std::move(i));
@@ -1227,7 +1227,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_goto(
 
   copy_source_location(target, i);
 
-  if(i.cond().is_true())
+  if(i.cond() == true)
     dest.add(std::move(i.then_case()));
   else
     dest.add(std::move(i));
@@ -1292,7 +1292,7 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
   // 2: code in existing thread
   /* check the structure and compute the iterators */
   DATA_INVARIANT(
-    next->is_goto() && next->condition().is_true(), "START THREAD pattern");
+    next->is_goto() && next->condition() == true, "START THREAD pattern");
   DATA_INVARIANT(!next->is_backwards_goto(), "START THREAD pattern");
   DATA_INVARIANT(
     thread_start->location_number < next->get_target()->location_number,
@@ -1508,8 +1508,8 @@ void goto_program2codet::cleanup_code(
     if(do_while.body().get_statement()==ID_skip)
       do_while.set_statement(ID_while);
     // do stmt while(false) is just stmt
-    else if(do_while.cond().is_false() &&
-            do_while.body().get_statement()!=ID_block)
+    else if(
+      do_while.cond() == false && do_while.body().get_statement() != ID_block)
       code=do_while.body();
   }
 }
@@ -1692,13 +1692,13 @@ void goto_program2codet::cleanup_code_ifthenelse(
   // assert(false) expands to if(true) assert(false), simplify again (and also
   // simplify other cases)
   if(
-    cond.is_true() &&
+    cond == true &&
     (i_t_e.else_case().is_nil() || !has_labels(i_t_e.else_case())))
   {
     codet tmp = i_t_e.then_case();
     code.swap(tmp);
   }
-  else if(cond.is_false() && !has_labels(i_t_e.then_case()))
+  else if(cond == false && !has_labels(i_t_e.then_case()))
   {
     if(i_t_e.else_case().is_nil())
       code=code_skipt();

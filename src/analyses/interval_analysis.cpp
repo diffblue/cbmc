@@ -46,7 +46,7 @@ void instrument_intervals(
     {
       goto_programt::const_targett previous = std::prev(i_it);
 
-      if(previous->is_goto() && !previous->condition().is_true())
+      if(previous->is_goto() && previous->condition() != true)
       {
         // we follow a branch, instrument
       }
@@ -69,7 +69,7 @@ void instrument_intervals(
     for(const auto &symbol_expr : symbols)
     {
       exprt tmp=d.make_expression(symbol_expr);
-      if(!tmp.is_true())
+      if(tmp != true)
         assertion.push_back(tmp);
     }
 

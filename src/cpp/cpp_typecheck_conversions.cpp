@@ -465,8 +465,7 @@ bool cpp_typecheckt::standard_conversion_pointer(
     return false;
 
   // integer 0 to NULL pointer conversion?
-  if(simplify_expr(expr, *this).is_zero() &&
-     expr.type().id()!=ID_pointer)
+  if(simplify_expr(expr, *this) == 0 && expr.type().id() != ID_pointer)
   {
     new_expr=expr;
     new_expr.set(ID_value, ID_NULL);
@@ -1857,7 +1856,7 @@ bool cpp_typecheckt::reinterpret_typecast(
     type.id() == ID_pointer && !is_reference(type))
   {
     // integer to pointer
-    if(simplify_expr(e, *this).is_zero())
+    if(simplify_expr(e, *this) == 0)
     {
       // NULL
       new_expr=e;
