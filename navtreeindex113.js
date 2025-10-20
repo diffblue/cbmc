@@ -1,5 +1,6 @@
 var NAVTREEINDEX113 =
 {
+"goto__verifier_8cpp.html":[8,0,2,11,20],
 "goto__verifier_8cpp_source.html":[8,0,2,11,20],
 "goto__verifier_8h.html":[8,0,2,11,21],
 "goto__verifier_8h_source.html":[8,0,2,11,21],
@@ -248,6 +249,5 @@ var NAVTREEINDEX113 =
 "instrument__spec__assigns_8h_source.html":[8,0,2,15,1,12],
 "instrumenter__pensieve_8h.html":[8,0,2,15,2,11],
 "instrumenter__pensieve_8h_source.html":[8,0,2,15,2,11],
-"instrumenter__strategies_8cpp.html":[8,0,2,15,2,12],
-"instrumenter__strategies_8cpp_source.html":[8,0,2,15,2,12]
+"instrumenter__strategies_8cpp.html":[8,0,2,15,2,12]
 };

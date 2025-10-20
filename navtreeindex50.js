@@ -1,5 +1,6 @@
 var NAVTREEINDEX50 =
 {
+"classmulti__namespacet.html":[7,0,851],
 "classmulti__namespacet.html#a055958ac7cb0cb5b5fbde5e8765fd94c":[7,0,851,3],
 "classmulti__namespacet.html#a0ef987674384133f6f310c439133d3e0":[7,0,851,6],
 "classmulti__namespacet.html#a339a3aff16c15e50c3b93500879d44f9":[7,0,851,4],
@@ -248,6 +249,5 @@ var NAVTREEINDEX50 =
 "classnullptr__exceptiont.html#a70306f99fd0eb8ebab8c854026dfc146":[7,0,886,0],
 "classnumberingt.html":[7,0,887],
 "classnumberingt.html#a0b3e23f8c47a8314dce5b34ed20c4280":[7,0,887,3],
-"classnumberingt.html#a0e1fb469b2514c49951812546c14d386":[7,0,887,15],
-"classnumberingt.html#a42560eca1080375d6f9fdcbd0660315a":[7,0,887,14]
+"classnumberingt.html#a0e1fb469b2514c49951812546c14d386":[7,0,887,15]
 };

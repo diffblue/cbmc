@@ -1,5 +1,6 @@
 var NAVTREEINDEX79 =
 {
+"equation__symbol__mapping_8cpp.html":[8,0,2,27,10,2],
 "equation__symbol__mapping_8cpp_source.html":[8,0,2,27,10,2],
 "equation__symbol__mapping_8h.html":[8,0,2,27,10,3],
 "equation__symbol__mapping_8h_source.html":[8,0,2,27,10,3],
@@ -248,6 +249,5 @@ var NAVTREEINDEX79 =
 "fence_8h.html#a92b1dbb3be0ed21ace2a54ab45694d23":[8,0,2,15,2,8,1],
 "fence_8h_source.html":[8,0,2,15,2,8],
 "fenv_8c.html":[8,0,2,1,2,8],
-"fenv_8c.html#a5729c4728ebe75d4975bb7250a2d8f4a":[8,0,2,1,2,8,2],
-"fenv_8c.html#a94175070111cb2d4b3ba0c2a2742a016":[8,0,2,1,2,8,3]
+"fenv_8c.html#a5729c4728ebe75d4975bb7250a2d8f4a":[8,0,2,1,2,8,2]
 };

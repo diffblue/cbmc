@@ -1,5 +1,6 @@
 var NAVTREEINDEX31 =
 {
+"classfloat__approximationt.html":[7,0,488],
 "classfloat__approximationt.html#a1714edcebeb6c32adee115c261c65c03":[7,0,488,4],
 "classfloat__approximationt.html#a21bf6c01a1323e4f889452273a67315d":[7,0,488,3],
 "classfloat__approximationt.html#a3da588fecfd3ca12d3c7060f3db6a5d4":[7,0,488,5],
@@ -248,6 +249,5 @@ var NAVTREEINDEX31 =
 "classformat__specifiert.html#a73038ac830838420e6bb6d70ce030f61":[7,0,504,10],
 "classformat__specifiert.html#a7994352555422b6d6aa73672e6f39c22":[7,0,504,3],
 "classformat__specifiert.html#a84ee23f3f2ed75b383abbd174420c465":[7,0,504,14],
-"classformat__specifiert.html#a85b5f09e1cf6039e18842af992f704c4":[7,0,504,11],
-"classformat__specifiert.html#a890e9b4cfc0b22b335dd6e1abb5c35c5":[7,0,504,12]
+"classformat__specifiert.html#a85b5f09e1cf6039e18842af992f704c4":[7,0,504,11]
 };
