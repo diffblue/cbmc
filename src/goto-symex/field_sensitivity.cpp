@@ -31,6 +31,97 @@ exprt field_sensitivityt::apply(
     return get_fields(ns, state, ssa_expr, true);
 }
 
+exprt field_sensitivityt::apply_byte_extract(
+  const namespacet &ns,
+  goto_symex_statet &state,
+  const byte_extract_exprt &be,
+  bool write) const
+{
+  if(
+    (be.op().type().id() != ID_union && be.op().type().id() != ID_union_tag) ||
+    !is_ssa_expr(be.op()) || !be.offset().is_constant())
+  {
+    return be;
+  }
+
+  const union_typet &type = be.op().type().id() == ID_union_tag
+                              ? ns.follow_tag(to_union_tag_type(be.op().type()))
+                              : to_union_type(be.op().type());
+  for(const auto &comp : type.components())
+  {
+    ssa_exprt tmp = to_ssa_expr(be.op());
+    bool was_l2 = !tmp.get_level_2().empty();
+    tmp.remove_level_2();
+    const member_exprt member{tmp.get_original_expr(), comp};
+    auto recursive_member =
+      get_subexpression_at_offset(member, be.offset(), be.type(), ns);
+    if(!recursive_member.has_value())
+      continue;
+
+    // We need to inspect the access path as the resulting expression may
+    // involve index expressions. When array field sensitivity is disabled
+    // or the size of the array that is indexed into is larger than
+    // max_field_sensitivity_array_size then only the expression up to (but
+    // excluding) said index expression can be turned into an ssa_exprt.
+    exprt full_exprt = *recursive_member;
+    exprt *for_ssa = &full_exprt;
+    exprt *parent = for_ssa;
+    while(parent->id() == ID_typecast)
+      parent = &to_typecast_expr(*parent).op();
+    while(parent->id() == ID_member || parent->id() == ID_index)
+    {
+      if(parent->id() == ID_member)
+      {
+        parent = &to_member_expr(*parent).compound();
+      }
+      else
+      {
+        parent = &to_index_expr(*parent).array();
+#ifdef ENABLE_ARRAY_FIELD_SENSITIVITY
+        if(
+          !to_array_type(parent->type()).size().is_constant() ||
+          numeric_cast_v<mp_integer>(
+            to_constant_expr(to_array_type(parent->type()).size())) >
+            max_field_sensitivity_array_size)
+        {
+          for_ssa = parent;
+        }
+#else
+        for_ssa = parent;
+#endif // ENABLE_ARRAY_FIELD_SENSITIVITY
+      }
+    }
+
+    if(for_ssa->id() == ID_index || for_ssa->id() == ID_member)
+    {
+      tmp.type() = for_ssa->type();
+      tmp.set_expression(*for_ssa);
+      if(was_l2)
+      {
+        *for_ssa =
+          apply(ns, state, state.rename(std::move(tmp), ns).get(), write);
+      }
+      else
+        *for_ssa = apply(ns, state, std::move(tmp), write);
+
+      return full_exprt;
+    }
+    else if(for_ssa->id() == ID_typecast)
+    {
+      if(was_l2)
+      {
+        *for_ssa = apply(ns, state, state.rename(*for_ssa, ns).get(), write);
+      }
+      else
+        *for_ssa = apply(ns, state, std::move(*for_ssa), write);
+
+      return full_exprt;
+    }
+  }
+
+  return be;
+}
+
 exprt field_sensitivityt::apply(
   const namespacet &ns,
   goto_symex_statet &state,
@@ -93,55 +184,7 @@ exprt field_sensitivityt::apply(
     !write && (expr.id() == ID_byte_extract_little_endian ||
                expr.id() == ID_byte_extract_big_endian))
   {
-    const byte_extract_exprt &be = to_byte_extract_expr(expr);
-    if(
-      (be.op().type().id() == ID_union ||
-       be.op().type().id() == ID_union_tag) &&
-      is_ssa_expr(be.op()) && be.offset().is_constant())
-    {
-      const union_typet &type =
-        be.op().type().id() == ID_union_tag
-          ? ns.follow_tag(to_union_tag_type(be.op().type()))
-          : to_union_type(be.op().type());
-      for(const auto &comp : type.components())
-      {
-        ssa_exprt tmp = to_ssa_expr(be.op());
-        bool was_l2 = !tmp.get_level_2().empty();
-        tmp.remove_level_2();
-        const member_exprt member{tmp.get_original_expr(), comp};
-        auto recursive_member =
-          get_subexpression_at_offset(member, be.offset(), be.type(), ns);
-        if(
-          recursive_member.has_value() &&
-          (recursive_member->id() == ID_member ||
-           recursive_member->id() == ID_index))
-        {
-          tmp.type() = be.type();
-          tmp.set_expression(*recursive_member);
-          if(was_l2)
-          {
-            return apply(
-              ns, state, state.rename(std::move(tmp), ns).get(), write);
-          }
-          else
-            return apply(ns, state, std::move(tmp), write);
-        }
-        else if(
-          recursive_member.has_value() && recursive_member->id() == ID_typecast)
-        {
-          if(was_l2)
-          {
-            return apply(
-              ns,
-              state,
-              state.rename(std::move(*recursive_member), ns).get(),
-              write);
-          }
-          else
-            return apply(ns, state, std::move(*recursive_member), write);
-        }
-      }
-    }
+    return apply_byte_extract(ns, state, to_byte_extract_expr(expr), write);
   }
 #ifdef ENABLE_ARRAY_FIELD_SENSITIVITY
   else if(expr.id() == ID_index)

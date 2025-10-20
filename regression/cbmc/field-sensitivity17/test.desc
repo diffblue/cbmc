@@ -1,0 +1,12 @@
+CORE
+main.c
+--max-field-sensitivity-array-size 1
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+The test is a minimized version of code generated using Kani. It should pass
+irrespective of whether field sensitivity is applied to the array or not. (The
+original example was unexpectedly failing with an array size of 65, but passed
+with an array size of 64 or less.)

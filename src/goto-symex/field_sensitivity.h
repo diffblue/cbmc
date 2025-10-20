@@ -11,6 +11,7 @@ Author: Michael Tautschnig
 
 #include <util/ssa_expr.h>
 
+class byte_extract_exprt;
 class namespacet;
 class goto_symex_statet;
 class symex_targett;
@@ -221,6 +222,13 @@ private:
     exprt e,
     const value_sett &value_set,
     const namespacet &ns) const;
+
+  /// \copydoc apply(const namespacet&,goto_symex_statet&,exprt,bool) const
+  [[nodiscard]] exprt apply_byte_extract(
+    const namespacet &ns,
+    goto_symex_statet &state,
+    const byte_extract_exprt &expr,
+    bool write) const;
 };
 
 #endif // CPROVER_GOTO_SYMEX_FIELD_SENSITIVITY_H
