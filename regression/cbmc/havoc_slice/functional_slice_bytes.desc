@@ -1,10 +1,12 @@
 CORE
 functional.c
 -DN=4 -DSLICE_BYTES --program-only
+WITH \[.*i!0@1#2:=\{ \.coeffs=byte_extract
 ^EXIT=0$
 ^SIGNAL=0$
 --
 byte_update
+WITH \[.*i!0@1#2:=\{ \{ \.coeffs=\{
 --
 We want these tests not to produce any byte_update expressions, but instead want
 updates at specific array indices.

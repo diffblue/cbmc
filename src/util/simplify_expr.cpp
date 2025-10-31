@@ -1470,14 +1470,14 @@ simplify_exprt::resultt<> simplify_exprt::simplify_with(const with_exprt &expr)
     expr.old().type().id() == ID_struct ||
     expr.old().type().id() == ID_struct_tag)
   {
+    const struct_typet &old_type_followed =
+      expr.old().type().id() == ID_struct_tag
+        ? ns.follow_tag(to_struct_tag_type(expr.old().type()))
+        : to_struct_type(expr.old().type());
+    const irep_idt &component_name = expr.where().get(ID_component_name);
+
     if(expr.old().id() == ID_struct || expr.old().is_constant())
     {
-      const irep_idt &component_name = expr.where().get(ID_component_name);
-
-      const struct_typet &old_type_followed =
-        expr.old().type().id() == ID_struct_tag
-          ? ns.follow_tag(to_struct_tag_type(expr.old().type()))
-          : to_struct_type(expr.old().type());
       if(!old_type_followed.has_component(component_name))
         return unchanged(expr);
 
@@ -1489,6 +1489,12 @@ simplify_exprt::resultt<> simplify_exprt::simplify_with(const with_exprt &expr)
       exprt result = expr.old();
       result.operands()[number] = expr.new_value();
       return result;
+    }
+    else if(
+      old_type_followed.components().size() == 1 &&
+      old_type_followed.has_component(component_name))
+    {
+      return struct_exprt{{expr.new_value()}, expr.type()};
     }
   }
   else if(
