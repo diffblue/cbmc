@@ -642,8 +642,8 @@ jobs:
         run: cd build; ctest . -V -L THOROUGH -j${{env.linux-vcpus}}
 
   # This job takes approximately 39 to 69 minutes
-  check-macos-13-make-clang:
-    runs-on: macos-13
+  check-macos-15-intel-make-clang:
+    runs-on: macos-15-intel
     steps:
       - uses: actions/checkout@v5
         with:
