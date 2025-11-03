@@ -74,7 +74,7 @@ public:
       symex(mh, symbol_table, equation, options, path_storage, guard_manager),
       satcheck(std::make_unique<satcheckt>(mh)),
       satchecker(ns, *satcheck, mh),
-      z3(ns, "accelerate", "", "", smt2_dect::solvert::Z3, mh),
+      z3(ns, "accelerate", "", "", smt2_dect::solvert::Z3, "", mh),
       checker(&z3) // checker(&satchecker)
   {
   }

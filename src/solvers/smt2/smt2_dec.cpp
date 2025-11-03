@@ -65,60 +65,72 @@ decision_proceduret::resultt smt2_dect::dec_solve(const exprt &assumption)
   std::vector<std::string> argv;
   std::string stdin_filename;
 
+  auto solver_binary_name = [this](const std::string &solver_name)
+  {
+    if(solver_binary_or_empty.empty())
+      return solver_name;
+    else
+      return solver_binary_or_empty;
+  };
+
   switch(solver)
   {
   case solvert::BITWUZLA:
-    argv = {"bitwuzla", temp_file_problem()};
+    argv = {solver_binary_name("bitwuzla"), temp_file_problem()};
     break;
 
   case solvert::BOOLECTOR:
-    argv = {"boolector", "--smt2", temp_file_problem(), "-m"};
+    argv = {
+      solver_binary_name("boolector"), "--smt2", temp_file_problem(), "-m"};
     break;
 
   case solvert::CPROVER_SMT2:
-    argv = {"smt2_solver"};
+    argv = {solver_binary_name("smt2_solver")};
     stdin_filename = temp_file_problem();
     break;
 
   case solvert::CVC3:
-    argv = {"cvc3",
-            "+model",
-            "-lang",
-            "smtlib",
-            "-output-lang",
-            "smtlib",
-            temp_file_problem()};
+    argv = {
+      solver_binary_name("cvc3"),
+      "+model",
+      "-lang",
+      "smtlib",
+      "-output-lang",
+      "smtlib",
+      temp_file_problem()};
     break;
 
   case solvert::CVC4:
     // The flags --bitblast=eager --bv-div-zero-const help but only
     // work for pure bit-vector formulas.
-    argv = {"cvc4", "-L", "smt2", temp_file_problem()};
+    argv = {solver_binary_name("cvc4"), "-L", "smt2", temp_file_problem()};
     break;
 
   case solvert::CVC5:
-    argv = {"cvc5", "--lang", "smtlib", temp_file_problem()};
+    argv = {
+      solver_binary_name("cvc5"), "--lang", "smtlib", temp_file_problem()};
     break;
 
   case solvert::MATHSAT:
     // The options below were recommended by Alberto Griggio
     // on 10 July 2013
 
-    argv = {"mathsat",
-            "-input=smt2",
-            "-preprocessor.toplevel_propagation=true",
-            "-preprocessor.simplification=7",
-            "-dpll.branching_random_frequency=0.01",
-            "-dpll.branching_random_invalidate_phase_cache=true",
-            "-dpll.restart_strategy=3",
-            "-dpll.glucose_var_activity=true",
-            "-dpll.glucose_learnt_minimization=true",
-            "-theory.bv.eager=true",
-            "-theory.bv.bit_blast_mode=1",
-            "-theory.bv.delay_propagated_eqs=true",
-            "-theory.fp.mode=1",
-            "-theory.fp.bit_blast_mode=2",
-            "-theory.arr.mode=1"};
+    argv = {
+      solver_binary_name("mathsat"),
+      "-input=smt2",
+      "-preprocessor.toplevel_propagation=true",
+      "-preprocessor.simplification=7",
+      "-dpll.branching_random_frequency=0.01",
+      "-dpll.branching_random_invalidate_phase_cache=true",
+      "-dpll.restart_strategy=3",
+      "-dpll.glucose_var_activity=true",
+      "-dpll.glucose_learnt_minimization=true",
+      "-theory.bv.eager=true",
+      "-theory.bv.bit_blast_mode=1",
+      "-theory.bv.delay_propagated_eqs=true",
+      "-theory.fp.mode=1",
+      "-theory.fp.bit_blast_mode=2",
+      "-theory.arr.mode=1"};
 
     stdin_filename = temp_file_problem();
     break;
@@ -126,15 +138,17 @@ decision_proceduret::resultt smt2_dect::dec_solve(const exprt &assumption)
   case solvert::YICES:
     //    command = "yices -smt -e "   // Calling convention for older versions
     // Convention for 2.2.1
-    argv = {"yices-smt2", temp_file_problem()};
+    argv = {solver_binary_name("yices-smt2"), temp_file_problem()};
     break;
 
   case solvert::Z3:
-    argv = {"z3", "-smt2", temp_file_problem()};
+    argv = {solver_binary_name("z3"), "-smt2", temp_file_problem()};
     break;
 
   case solvert::GENERIC:
-    UNREACHABLE;
+    PRECONDITION(!solver_binary_or_empty.empty());
+    argv = {solver_binary_or_empty, temp_file_problem()};
+    break;
   }
 
   int res =

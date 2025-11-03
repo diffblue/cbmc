@@ -31,8 +31,10 @@ public:
     const std::string &_notes,
     const std::string &_logic,
     solvert _solver,
+    const std::string &_solver_binary_or_empty,
     message_handlert &_message_handler)
     : smt2_convt(_ns, _benchmark, _notes, _logic, _solver, stringstream),
+      solver_binary_or_empty(_solver_binary_or_empty),
       message_handler(_message_handler)
   {
   }
@@ -40,6 +42,7 @@ public:
   std::string decision_procedure_text() const override;
 
 protected:
+  std::string solver_binary_or_empty;
   message_handlert &message_handler;
   resultt dec_solve(const exprt &) override;
 
