@@ -104,6 +104,7 @@ void parse_solver_options(const cmdlinet &cmdline, optionst &options);
   "(mathsat)"                                                                  \
   "(cprover-smt2)"                                                             \
   "(incremental-smt2-solver):"                                                 \
+  "(external-smt2-solver):"                                                    \
   "(sat-solver):"                                                              \
   "(external-sat-solver):"                                                     \
   "(no-sat-preprocessor)"                                                      \
@@ -135,6 +136,8 @@ void parse_solver_options(const cmdlinet &cmdline, optionst &options);
   " {y--yices} \t use Yices\n"                                                 \
   " {y--z3} \t use Z3\n"                                                       \
   " {y--fpa} \t use theory of floating-point arithmetic\n"                     \
+  " {y--external-smt2-solver} {ucmd} \t command to invoke SMT2 solver "        \
+  "(combine with one of the solver choices for solver-specific constraints)\n" \
   " {y--refine} \t use refinement procedure (experimental)\n"                  \
   " {y--refine-arrays} \t use refinement for arrays only\n"                    \
   " {y--refine-arithmetic} \t refinement of arithmetic expressions only\n"     \

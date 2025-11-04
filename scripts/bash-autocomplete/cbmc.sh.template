@@ -40,7 +40,7 @@ _cbmc_autocomplete()
      _filedir -d
      return 0
      ;;
-   --external-sat-solver|--incremental-smt2-solver)
+   --external-sat-solver|--incremental-smt2-solver|--external-smt2-solver)
      #a switch that takes a file parameter of which we don't know an extension
      _filedir -f
      return 0
