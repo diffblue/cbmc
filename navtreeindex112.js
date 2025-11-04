@@ -1,5 +1,6 @@
 var NAVTREEINDEX112 =
 {
+"goto__diff__parse__options_8h_source.html":[8,0,2,12,7],
 "goto__function_8cpp.html":[8,0,2,16,16],
 "goto__function_8cpp.html#afddd68b9cdf786f0dc15beac7eb393a4":[8,0,2,16,16,0],
 "goto__function_8cpp_source.html":[8,0,2,16,16],
@@ -248,6 +249,5 @@ var NAVTREEINDEX112 =
 "goto__trace__provider_8h_source.html":[8,0,2,11,17],
 "goto__trace__storage_8cpp.html":[8,0,2,11,18],
 "goto__trace__storage_8cpp_source.html":[8,0,2,11,18],
-"goto__trace__storage_8h.html":[8,0,2,11,19],
-"goto__trace__storage_8h_source.html":[8,0,2,11,19]
+"goto__trace__storage_8h.html":[8,0,2,11,19]
 };

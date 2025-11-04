@@ -1,5 +1,6 @@
 var NAVTREEINDEX72 =
 {
+"classxor__exprt.html#af2c7b1ae3cdaf03c6ad6faf54d7c415d":[7,0,1388,1],
 "classzero__extend__exprt.html":[7,0,1389],
 "classzero__extend__exprt.html#a30e214292bd167b2f27d9d8544677ce5":[7,0,1389,1],
 "classzero__extend__exprt.html#ae1f6c0c4276f8eda870af69677abd352":[7,0,1389,0],
@@ -248,6 +249,5 @@ var NAVTREEINDEX72 =
 "contracts-frees.html#autotoc_md86":[1,0,4,0,3],
 "contracts-function-pointer-predicates.html":[1,0,8],
 "contracts-function-pointer-predicates.html#autotoc_md87":[1,0,8,0],
-"contracts-function-pointer-predicates.html#autotoc_md88":[1,0,8,0,0],
-"contracts-function-pointer-predicates.html#autotoc_md89":[1,0,8,0,1]
+"contracts-function-pointer-predicates.html#autotoc_md88":[1,0,8,0,0]
 };

@@ -1,9 +1,10 @@
 var classsmt2__dect =
 [
-    [ "smt2_dect", "classsmt2__dect.html#a1583400ed6e3c83a140b092e39132461", null ],
+    [ "smt2_dect", "classsmt2__dect.html#a430f408d8b75eb99b01dfcc3c6c4dbfc", null ],
     [ "dec_solve", "classsmt2__dect.html#a59a3b753948ddb672a68a0b59ba97598", null ],
     [ "decision_procedure_text", "classsmt2__dect.html#a2c3188640326faa66df2f6d571696af2", null ],
     [ "read_result", "classsmt2__dect.html#ab9c841fcf12f1a6e6315faa652d7c5ea", null ],
     [ "cached_output", "classsmt2__dect.html#ae49fa23afe3eb63ef032412b6a8364d5", null ],
-    [ "message_handler", "classsmt2__dect.html#a16d954196a71250a0dda6f168bb37e7e", null ]
+    [ "message_handler", "classsmt2__dect.html#a16d954196a71250a0dda6f168bb37e7e", null ],
+    [ "solver_binary_or_empty", "classsmt2__dect.html#a37149e0e3feb77a06a5a9941da44e0b6", null ]
 ];
