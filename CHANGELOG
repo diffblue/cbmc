@@ -1,3 +1,45 @@
+# CBMC 6.8.0
+
+This release extends the JSON interface to reading full GOTO functions (and not
+just symbol tables) (via #8713). Also included are various usability
+improvements around contracts instrumentation (see #8697, #8694).
+
+## What's Changed
+* Add support for reading GOTO functions from JSON by @tautschnig in https://github.com/diffblue/cbmc/pull/8713
+* Add --external-smt2-solver for custom solver path or custom options by @tautschnig in https://github.com/diffblue/cbmc/pull/8726
+
+## Bug Fixes
+* Switch macos-13 CI jobs to macos-15-intel by @tautschnig in https://github.com/diffblue/cbmc/pull/8725
+* goto-harness: use __CPROVER_(de)?allocate, not malloc/free by @tautschnig in https://github.com/diffblue/cbmc/pull/8684
+* SMT2 back-end: flatten with_exprt operands by @tautschnig in https://github.com/diffblue/cbmc/pull/8670
+* Simplifier: do not create extractbits with pointer type by @tautschnig in https://github.com/diffblue/cbmc/pull/8678
+* C library: remove explicit zero initialisers by @tautschnig in https://github.com/diffblue/cbmc/pull/8698
+* Contracts instrumentation: cleanup unnecessary includes by @tautschnig in https://github.com/diffblue/cbmc/pull/8696
+* Extend cbmc-incr-oneloop timeout with CMake by @tautschnig in https://github.com/diffblue/cbmc/pull/8701
+* C front-end: tolerate type differences with asm renaming by @tautschnig in https://github.com/diffblue/cbmc/pull/7584
+* Bump actions/checkout from 4 to 5 by @dependabot[bot] in https://github.com/diffblue/cbmc/pull/8709
+* Contracts instrumentation: hide unhelpful "no body" warnings by @tautschnig in https://github.com/diffblue/cbmc/pull/8697
+* DFCC: do not surface confusing warning by @tautschnig in https://github.com/diffblue/cbmc/pull/8694
+* Flow-insensitive value set: don't create index expressions over non-array objects by @tautschnig in https://github.com/diffblue/cbmc/pull/8651
+* Value set: remove array-of-array special case by @tautschnig in https://github.com/diffblue/cbmc/pull/8653
+* unwindsett: goto_model is only needed for options processing by @tautschnig in https://github.com/diffblue/cbmc/pull/8643
+* MacOS CI job: do not re-install CMake by @tautschnig in https://github.com/diffblue/cbmc/pull/8711
+* Add remove-function-body-regex command line option by @tautschnig in https://github.com/diffblue/cbmc/pull/8712
+* Make goto_symext::language_mode protected by @tautschnig in https://github.com/diffblue/cbmc/pull/8646
+* Fix support for mathematical types by @tautschnig in https://github.com/diffblue/cbmc/pull/8324
+* Bump github/codeql-action from 3 to 4 by @dependabot[bot] in https://github.com/diffblue/cbmc/pull/8715
+* Use bv_utilst::sign_bit by @tautschnig in https://github.com/diffblue/cbmc/pull/8716
+* Improve bv_utilst less-than-or-less-or-equals by @tautschnig in https://github.com/diffblue/cbmc/pull/8718
+* Implement popcount in flattening back-end by @tautschnig in https://github.com/diffblue/cbmc/pull/8717
+* operator== for exprt and bool, int, nullptr_t by @tautschnig in https://github.com/diffblue/cbmc/pull/8675
+* Update *BSD CI actions to the latest OS versions by @tautschnig in https://github.com/diffblue/cbmc/pull/8719
+* Mark constant_exprt::value_is_zero_string protected [depends-on: 8675] by @tautschnig in https://github.com/diffblue/cbmc/pull/8455
+* Field sensitivity: account for array size in all index expressions by @tautschnig in https://github.com/diffblue/cbmc/pull/8579
+* Bump actions/upload-artifact from 4 to 5 by @dependabot[bot] in https://github.com/diffblue/cbmc/pull/8721
+* Simplify WITH expression over structs with a single component by @tautschnig in https://github.com/diffblue/cbmc/pull/8724
+
+**Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-6.7.1...cbmc-6.8.0
+
 # CBMC 6.7.1
 
 This release addresses bugs in our handling of array-update ("with")
