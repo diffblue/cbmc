@@ -182,6 +182,8 @@ extension_for_type(const typet &type)
     return smt_bit_vector_theoryt::zero_extend;
   if(can_cast_type<pointer_typet>(type))
     return smt_bit_vector_theoryt::zero_extend;
+  if(can_cast_type<c_bool_typet>(type))
+    return smt_bit_vector_theoryt::zero_extend;
   UNREACHABLE;
 }
 
