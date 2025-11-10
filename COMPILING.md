@@ -90,11 +90,12 @@ files.
    ```
 
    On macOS >10.14, the build will fail unless you explicitly specify
-   the full path to the compiler. This issue is being tracked
-   [here](https://github.com/diffblue/cbmc/issues/4956). The invocation thus
+   both the C and C++ compilers to avoid C++ standard library not found
+   errors. This issue is being tracked
+   [here](https://github.com/diffblue/cbmc/issues/8683). The invocation thus
    looks like this:
    ```
-   cmake -S. -Bbuild -DCMAKE_C_COMPILER=/usr/bin/clang
+   cmake -S. -Bbuild -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
    ```
 
    Generally it is not necessary to manually specify individual compiler or
