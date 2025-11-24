@@ -44,6 +44,11 @@ public:
   }
   bool is_in_conflict(literalt a) const override;
 
+#if 0
+  literalt new_variable() override;
+  bvt new_variables(std::size_t width) override;
+#endif
+
 protected:
   resultt do_prop_solve(const bvt &assumptions) override;
 

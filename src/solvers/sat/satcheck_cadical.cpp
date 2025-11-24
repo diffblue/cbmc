@@ -27,11 +27,11 @@ tvt satcheck_cadical_baset::l_get(literalt a) const
   if(a.var_no() > narrow<unsigned>(solver->vars()))
     return tvt(tvt::tv_enumt::TV_UNKNOWN);
 
-  const int val = solver->val(a.dimacs());
+  const int val = solver->val(a.var_no(), true);
   if(val>0)
-    result = tvt(true);
+    result = tvt(!a.sign());
   else if(val<0)
-    result = tvt(false);
+    result = tvt(a.sign());
   else
     return tvt(tvt::tv_enumt::TV_UNKNOWN);
 
@@ -140,6 +140,35 @@ void satcheck_cadical_baset::set_assignment(literalt a, bool value)
   INVARIANT(false, "method not supported");
 }
 
+#  if 0
+/// Generate a new variable and return it as a literal
+/// \return New variable as literal
+literalt satcheck_cadical_baset::new_variable()
+{
+  int new_var_index = solver->declare_more_variables(1);
+  CHECK_RETURN(new_var_index >= 0);
+  set_no_variables(new_var_index + 1);
+  return literalt{static_cast<literalt::var_not>(new_var_index), false};
+}
+
+/// Generate a vector of new variables.
+/// \return Vector of new variables.
+bvt satcheck_cadical_baset::new_variables(std::size_t width)
+{
+  bvt result;
+  result.reserve(width);
+
+  for(std::size_t i = _no_variables; i < _no_variables + width; ++i)
+    result.emplace_back(i, false);
+
+  int new_max_var_index = solver->declare_more_variables(width);
+  CHECK_RETURN(new_max_var_index >= 0);
+  set_no_variables(new_max_var_index + 1);
+
+  return result;
+}
+#  endif
+
 satcheck_cadical_baset::satcheck_cadical_baset(
   int _preprocessing_limit,
   int _localsearch_limit,
@@ -150,6 +179,12 @@ satcheck_cadical_baset::satcheck_cadical_baset(
     localsearch_limit(_localsearch_limit)
 {
   solver->set("quiet", 1);
+  // Explicitly disable bounded variable addition; this is disabled by default
+  // in version 2.2.0, but will be enabled in the next major release. Early
+  // experiments, however, suggest that this results in degraded performance. If
+  // we ever choose to enable it then the above overrides of `new_variable` and
+  // `new_variables` need to be enabled.
+  solver->set("factor", 0);
 }
 
 satcheck_cadical_baset::~satcheck_cadical_baset()

@@ -1,4 +1,4 @@
-file(GLOB sources "src/*.cpp" "src/*.hpp" "src/*.h")
+file(GLOB sources "src/*.cpp" "src/*.c" "src/*.hpp" "src/*.h")
 # Remove "app" sources from list
 list(REMOVE_ITEM sources
     "${CMAKE_CURRENT_SOURCE_DIR}/src/cadical.cpp"
@@ -9,7 +9,33 @@ add_library(cadical ${sources})
 
 # Pass -DNBUILD to disable including the version information, which is not
 # needed since cbmc doesn't run the cadical binary
-target_compile_options(cadical PRIVATE -DNBUILD -DNFLEXIBLE -DNDEBUG)
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    target_compile_options(
+        cadical
+        PRIVATE
+        -DNBUILD -DNFLEXIBLE -DNDEBUG
+        -Wno-error=switch-enum
+    )
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
+       "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
+    if (CMAKE_HOST_SYSTEM_NAME STREQUAL Darwin)
+        target_compile_options(
+            cadical
+            PRIVATE
+            -DNBUILD -DNFLEXIBLE -DNDEBUG -DNCLOSEFROM
+            -Wno-error=switch-enum
+        )
+    else()
+        target_compile_options(
+            cadical
+            PRIVATE
+            -DNBUILD -DNFLEXIBLE -DNDEBUG
+            -Wno-error=switch-enum
+        )
+    endif()
+else()
+    target_compile_options(cadical PRIVATE -DNBUILD -DNFLEXIBLE -DNDEBUG)
+endif()
 
 set_target_properties(
     cadical

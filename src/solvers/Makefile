@@ -282,7 +282,8 @@ solvers$(LIBEXT): $(OBJ) $(SOLVER_LIB)
 	$(LINKLIB)
 
 ../../cadical/build/libcadical$(LIBEXT):
-	$(MAKE) $(MAKEARGS) -C $(CADICAL)/build libcadical.a CXX="$(CXX)" CXXFLAGS="$(CP_CXXFLAGS) -DNFLEXIBLE -DNDEBUG"
+	$(MAKE) $(MAKEARGS) -C $(CADICAL)/build libcadical.a CXX="$(CXX)" \
+		CXXFLAGS="$(filter-out -Wswitch-enum, $(CP_CXXFLAGS)) -DNFLEXIBLE -DNDEBUG -DNCLOSEFROM"
 
 -include smt2/smt2_solver$(DEPEXT)
 
