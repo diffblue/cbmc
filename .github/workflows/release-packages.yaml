@@ -57,16 +57,12 @@ jobs:
           deb_package_name="$(ls *.deb)"
           echo "deb_package=./build/$deb_package_name" >> $GITHUB_OUTPUT
           echo "deb_package_name=ubuntu-24.04-$deb_package_name" >> $GITHUB_OUTPUT
-      - name: Get release info
-        id: get_release_info
-        uses: bruceadams/get-release@v1.3.2
+      - name: Rename package for release
+        run: cp ${{ steps.create_packages.outputs.deb_package }} ${{ steps.create_packages.outputs.deb_package_name }}
       - name: Upload binary packages
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v2
         with:
-          upload_url: ${{ steps.get_release_info.outputs.upload_url }}
-          asset_path: ${{ steps.create_packages.outputs.deb_package }}
-          asset_name: ${{ steps.create_packages.outputs.deb_package_name }}
-          asset_content_type: application/x-deb
+          files: ${{ steps.create_packages.outputs.deb_package_name }}
       - name: Slack notification of CI status
         uses: rtCamp/action-slack-notify@v2
         if: success() || failure()
@@ -128,16 +124,12 @@ jobs:
           deb_package_name="$(ls *.deb)"
           echo "deb_package=./build/$deb_package_name" >> $GITHUB_OUTPUT
           echo "deb_package_name=ubuntu-24.04-arm64-$deb_package_name" >> $GITHUB_OUTPUT
-      - name: Get release info
-        id: get_release_info
-        uses: bruceadams/get-release@v1.3.2
+      - name: Rename package for release
+        run: cp ${{ steps.create_packages.outputs.deb_package }} ${{ steps.create_packages.outputs.deb_package_name }}
       - name: Upload binary packages
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v2
         with:
-          upload_url: ${{ steps.get_release_info.outputs.upload_url }}
-          asset_path: ${{ steps.create_packages.outputs.deb_package }}
-          asset_name: ${{ steps.create_packages.outputs.deb_package_name }}
-          asset_content_type: application/x-deb
+          files: ${{ steps.create_packages.outputs.deb_package_name }}
       - name: Slack notification of CI status
         uses: rtCamp/action-slack-notify@v2
         if: success() || failure()
@@ -199,16 +191,12 @@ jobs:
           deb_package_name="$(ls *.deb)"
           echo "deb_package=./build/$deb_package_name" >> $GITHUB_OUTPUT
           echo "deb_package_name=ubuntu-22.04-$deb_package_name" >> $GITHUB_OUTPUT
-      - name: Get release info
-        id: get_release_info
-        uses: bruceadams/get-release@v1.3.2
+      - name: Rename package for release
+        run: cp ${{ steps.create_packages.outputs.deb_package }} ${{ steps.create_packages.outputs.deb_package_name }}
       - name: Upload binary packages
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v2
         with:
-          upload_url: ${{ steps.get_release_info.outputs.upload_url }}
-          asset_path: ${{ steps.create_packages.outputs.deb_package }}
-          asset_name: ${{ steps.create_packages.outputs.deb_package_name }}
-          asset_content_type: application/x-deb
+          files: ${{ steps.create_packages.outputs.deb_package_name }}
       - name: Slack notification of CI status
         uses: rtCamp/action-slack-notify@v2
         if: success() || failure()
@@ -351,16 +339,10 @@ jobs:
         id: verify_codesign
         run: |
           & signtool.exe verify /pa ${{ steps.create_packages.outputs.msi_installer }}
-      - name: Get release info
-        id: get_release_info
-        uses: bruceadams/get-release@v1.3.2
       - name: Upload binary packages
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v2
         with:
-          upload_url: ${{ steps.get_release_info.outputs.upload_url }}
-          asset_path: ${{ steps.create_packages.outputs.msi_installer }}
-          asset_name: ${{ steps.create_packages.outputs.msi_name }}
-          asset_content_type: application/x-msi
+          files: ${{ steps.create_packages.outputs.msi_installer }}
       - name: Slack notification of CI status
         if: success() || failure()
         env:
