@@ -6,7 +6,7 @@ void bar() __CPROVER_assigns(*z)
 {
 }
 
-void foo() __CPROVER_assigns()
+void foo() __CPROVER_ensures(1) __CPROVER_assigns()
 {
   bar();
 }

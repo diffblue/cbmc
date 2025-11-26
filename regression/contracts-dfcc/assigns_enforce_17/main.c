@@ -2,7 +2,7 @@
 
 int x;
 
-void pure() __CPROVER_assigns()
+void pure() __CPROVER_ensures(1) __CPROVER_assigns()
 {
   int x;
   x++;

@@ -13,7 +13,7 @@ __CPROVER_ensures(out ==> *out == 1)
 
 int nondet_int();
 
-void bar()
+void bar() __CPROVER_ensures(1)
 {
   int i = 0;
   int *out = nondet_int() ? &i : NULL;

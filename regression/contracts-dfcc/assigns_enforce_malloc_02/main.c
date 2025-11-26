@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-int f(int n, int *ptr) __CPROVER_assigns()
+int f(int n, int *ptr) __CPROVER_ensures(1) __CPROVER_assigns()
 {
   while(n > 0)
   {

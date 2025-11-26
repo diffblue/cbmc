@@ -9,6 +9,8 @@ Date: August 2022
 
 #include "dfcc_contract_handler.h"
 
+#include <util/exception_utils.h>
+
 #include <goto-programs/goto_model.h>
 #include <goto-programs/remove_function_pointers.h>
 
@@ -118,38 +120,23 @@ const symbolt &dfcc_contract_handlert::get_pure_contract_symbol(
   {
     // The contract symbol might not have been created if the function had
     // no contract or a contract with all empty clauses (which is equivalent).
-    // in that case we create a fresh symbol again with empty clauses.
+    // This is a soundness issue when using --replace-call-with-contract
+    // because we should not assume a trivial contract.
     PRECONDITION_WITH_DIAGNOSTICS(
       function_id_opt.has_value(),
       "Contract '" + pure_contract_id +
         "' not found, the identifier of an existing function must be provided "
         "to derive a default contract");
 
-    auto function_id = function_id_opt.value();
-    const auto &function_symbol =
-      dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id);
-
-    log.warning() << "Contract '" << contract_id
-                  << "' not found, deriving empty pure contract '"
-                  << pure_contract_id << "' from function '" << function_id
-                  << "'" << messaget::eom;
-
-    symbolt new_symbol{
-      pure_contract_id, function_symbol.type, function_symbol.mode};
-    new_symbol.base_name = pure_contract_id;
-    new_symbol.pretty_name = pure_contract_id;
-    new_symbol.is_property = true;
-    new_symbol.module = function_symbol.module;
-    new_symbol.location = function_symbol.location;
-    auto entry = goto_model.symbol_table.insert(std::move(new_symbol));
-    INVARIANT(
-      entry.second,
-      "contract '" + id2string(function_symbol.display_name()) +
-        "' already set at " + id2string(entry.first.location.as_string()));
-    // this lookup will work and set the pointer
-    // no need to check for signature compatibility
-    ns.lookup(pure_contract_id, pure_contract_symbol);
-    return *pure_contract_symbol;
+    // Produce a hard error instead of assuming a trivial contract
+    // to address soundness risk
+    throw invalid_input_exceptiont(
+      "Function '" + id2string(*function_id_opt) +
+      "' does not have a contract. " +
+      "A contract must be explicitly provided. If you need a trivial " +
+      "contract, please add explicit " +
+      CPROVER_PREFIX "requires and " CPROVER_PREFIX
+                     "ensures clauses to the function.");
   }
 }
 

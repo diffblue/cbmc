@@ -40,7 +40,7 @@ struct taggedt {
 };
 // clang-format on
 
-int foo(int i) __CPROVER_assigns()
+int foo(int i) __CPROVER_ensures(1) __CPROVER_assigns()
 {
   // all accesses to locals should pass
   int arr[10];

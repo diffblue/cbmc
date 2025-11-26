@@ -1,0 +1,11 @@
+CORE
+main.c
+--replace-call-with-contract foo
+^Function 'foo' does not have a contract\. A contract must be explicitly provided\. If you need a trivial contract, please add explicit __CPROVER_requires and __CPROVER_ensures clauses to the function\.$
+^EXIT=6$
+^SIGNAL=0$
+--
+--
+Checks that attempting to replace a function call without a contract produces
+an error instead of assuming a trivial contract. This addresses the soundness
+risk identified in issue https://github.com/diffblue/cbmc/issues/8728.

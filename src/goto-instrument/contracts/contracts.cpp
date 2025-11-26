@@ -14,6 +14,7 @@ Date: February 2016
 #include "contracts.h"
 
 #include <util/c_types.h>
+#include <util/exception_utils.h>
 #include <util/format_expr.h>
 #include <util/fresh_symbol.h>
 #include <util/mathematical_expr.h>
@@ -612,6 +613,20 @@ void code_contractst::apply_function_contract(
     to_symbol_expr(const_target->call_function()).get_identifier();
   const symbolt &function_symbol = ns.lookup(target_function);
   const code_typet &function_type = to_code_type(function_symbol.type);
+
+  // Check if the function actually has a contract before attempting to use it.
+  // If not, produce a hard error for soundness.
+  const symbolt *contract_sym;
+  if(ns.lookup("contract::" + id2string(target_function), contract_sym))
+  {
+    throw invalid_input_exceptiont(
+      "Function '" + id2string(target_function) +
+      "' does not have a contract. " +
+      "A contract must be explicitly provided. If you need a trivial " +
+      "contract, please add explicit " +
+      CPROVER_PREFIX "requires and " CPROVER_PREFIX
+                     "ensures clauses to the function.");
+  }
 
   // Isolate each component of the contract.
   const auto &type = get_contract(target_function, ns);

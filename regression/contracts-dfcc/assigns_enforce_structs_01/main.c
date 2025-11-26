@@ -6,7 +6,7 @@ struct pair
   int y;
 };
 
-int f(int *a) __CPROVER_assigns()
+int f(int *a) __CPROVER_ensures(1) __CPROVER_assigns()
 {
   struct pair *p = (struct pair *)malloc(sizeof(struct pair));
   a = &(p->y);

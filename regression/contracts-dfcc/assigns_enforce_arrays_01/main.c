@@ -1,4 +1,4 @@
-void f1(int a[], int len) __CPROVER_assigns()
+void f1(int a[], int len) __CPROVER_ensures(1) __CPROVER_assigns()
 {
   int b[10];
   a = b;

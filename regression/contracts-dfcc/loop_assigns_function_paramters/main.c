@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-void decr(size_t n)
+void decr(size_t n) __CPROVER_ensures(1)
 {
   for(; n--;)
     // clang-format off

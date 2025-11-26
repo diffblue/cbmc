@@ -14,12 +14,12 @@ struct buf
   struct blob aux;
 };
 
-void foo1(int a) __CPROVER_assigns()
+void foo1(int a) __CPROVER_ensures(1) __CPROVER_assigns()
 {
   a = 0;
 }
 
-void foo2(int *b) __CPROVER_assigns()
+void foo2(int *b) __CPROVER_ensures(1) __CPROVER_assigns()
 {
   b = NULL;
 }
@@ -39,7 +39,7 @@ void foo4(int a, int *b, int *c) __CPROVER_requires(c != NULL)
   *x = 0;
 }
 
-void foo5(struct buf buffer) __CPROVER_assigns()
+void foo5(struct buf buffer) __CPROVER_ensures(1) __CPROVER_assigns()
 {
   // these are assignments to the function parameter which is a local symbol
   // and should not generate checks
@@ -75,7 +75,7 @@ void foo8(int array[]) __CPROVER_assigns(__CPROVER_object_whole(array))
   array[9] = 1;
 }
 
-void foo9(int array[]) __CPROVER_assigns()
+void foo9(int array[]) __CPROVER_ensures(1) __CPROVER_assigns()
 {
   int *new_array = NULL;
   array = new_array;
