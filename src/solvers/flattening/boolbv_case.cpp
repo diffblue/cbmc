@@ -6,14 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <util/invariant.h>
+#include <util/std_expr.h>
+
 #include "boolbv.h"
 
-#include <util/invariant.h>
-
-bvt boolbvt::convert_case(const exprt &expr)
+bvt boolbvt::convert_case(const case_exprt &expr)
 {
-  PRECONDITION(expr.id() == ID_case);
-
   const std::vector<exprt> &operands=expr.operands();
 
   std::size_t width=boolbv_width(expr.type());
