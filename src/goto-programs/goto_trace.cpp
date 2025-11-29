@@ -21,6 +21,7 @@ Author: Daniel Kroening
 #include <util/merge_irep.h>
 #include <util/namespace.h>
 #include <util/range.h>
+#include <util/ssa_expr.h>
 #include <util/string_utils.h>
 #include <util/symbol.h>
 
@@ -50,6 +51,34 @@ static std::optional<symbol_exprt> get_object_rec(const exprt &src)
 std::optional<symbol_exprt> goto_trace_stept::get_lhs_object() const
 {
   return get_object_rec(full_lhs);
+}
+
+/// Remove SSA index suffixes (like !0, @1, etc.) from symbol identifiers
+/// in the expression tree. This is used to clean up expressions before
+/// displaying them in traces.
+static void remove_l0_l1(exprt &expr)
+{
+  if(expr.id() == ID_symbol)
+  {
+    if(is_ssa_expr(expr))
+      expr = to_ssa_expr(expr).get_original_expr();
+    else
+    {
+      std::string identifier = id2string(to_symbol_expr(expr).get_identifier());
+
+      std::string::size_type l0_l1 = identifier.find_first_of("!@");
+      if(l0_l1 != std::string::npos)
+      {
+        identifier.resize(l0_l1);
+        to_symbol_expr(expr).set_identifier(identifier);
+      }
+    }
+
+    return;
+  }
+
+  Forall_operands(it, expr)
+    remove_l0_l1(*it);
 }
 
 void goto_tracet::output(
@@ -106,9 +135,11 @@ void goto_trace_stept::output(
 
   if(is_assignment())
   {
-    out << "  " << format(full_lhs)
-        << " = " << format(full_lhs_value)
-        << '\n';
+    exprt clean_lhs = full_lhs;
+    exprt clean_value = full_lhs_value;
+    remove_l0_l1(clean_lhs);
+    remove_l0_l1(clean_value);
+    out << "  " << format(clean_lhs) << " = " << format(clean_value) << '\n';
   }
 
   if(!pc->source_location().is_nil())
@@ -127,7 +158,9 @@ void goto_trace_stept::output(
       if(!comment.empty())
         out << "  " << comment << '\n';
 
-      out << "  " << format(original_condition) << '\n';
+      exprt clean_condition = original_condition;
+      remove_l0_l1(clean_condition);
+      out << "  " << format(clean_condition) << '\n';
       out << '\n';
     }
   }
@@ -299,13 +332,20 @@ static void trace_value(
   if(lhs_object.has_value())
     identifier=lhs_object->get_identifier();
 
-  out << from_expr(ns, identifier, full_lhs) << '=';
+  // Create copies to clean up SSA suffixes
+  exprt clean_lhs = full_lhs;
+  remove_l0_l1(clean_lhs);
+
+  out << from_expr(ns, identifier, clean_lhs) << '=';
 
   if(value.is_nil())
     out << "(assignment removed)";
   else
   {
-    out << from_expr(ns, identifier, value);
+    exprt clean_value = value;
+    remove_l0_l1(clean_value);
+
+    out << from_expr(ns, identifier, clean_value);
 
     // the binary representation
     out << ' ' << messaget::faint << '('
@@ -414,8 +454,9 @@ void show_compact_goto_trace(
 
         if(step.pc->is_assert())
         {
-          out << "  "
-              << from_expr(ns, step.function_id, step.original_condition)
+          exprt clean_condition = step.original_condition;
+          remove_l0_l1(clean_condition);
+          out << "  " << from_expr(ns, step.function_id, clean_condition)
               << '\n';
         }
 
@@ -471,10 +512,13 @@ void show_compact_goto_trace(
       }
 
       {
-        auto arg_strings = make_range(step.function_arguments)
-                             .map([&ns, &step](const exprt &arg) {
-                               return from_expr(ns, step.function_id, arg);
-                             });
+        auto arg_strings =
+          make_range(step.function_arguments)
+            .map([&ns, &step](const exprt &arg) {
+              exprt clean_arg = arg;
+              remove_l0_l1(clean_arg);
+              return from_expr(ns, step.function_id, clean_arg);
+            });
 
         out << '(';
         join_strings(out, arg_strings.begin(), arg_strings.end(), ", ");
@@ -542,8 +586,9 @@ void show_full_goto_trace(
 
         if(step.pc->is_assert())
         {
-          out << "  "
-              << from_expr(ns, step.function_id, step.original_condition)
+          exprt clean_condition = step.original_condition;
+          remove_l0_l1(clean_condition);
+          out << "  " << from_expr(ns, step.function_id, clean_condition)
               << '\n';
         }
 
@@ -560,8 +605,9 @@ void show_full_goto_trace(
         if(!step.pc->source_location().is_nil())
           out << "  " << step.pc->source_location() << '\n';
 
-        out << "  " << from_expr(ns, step.function_id, step.original_condition)
-            << '\n';
+        exprt clean_condition = step.original_condition;
+        remove_l0_l1(clean_condition);
+        out << "  " << from_expr(ns, step.function_id, clean_condition) << '\n';
       }
       break;
 
@@ -630,7 +676,9 @@ void show_full_goto_trace(
           if(l_it!=step.io_args.begin())
             out << ';';
 
-          out << ' ' << from_expr(ns, step.function_id, *l_it);
+          exprt clean_arg = *l_it;
+          remove_l0_l1(clean_arg);
+          out << ' ' << from_expr(ns, step.function_id, clean_arg);
 
           // the binary representation
           out << " (" << trace_numeric_value(*l_it, ns, options) << ')';
@@ -652,7 +700,9 @@ void show_full_goto_trace(
         if(l_it!=step.io_args.begin())
           out << ';';
 
-        out << ' ' << from_expr(ns, step.function_id, *l_it);
+        exprt clean_arg = *l_it;
+        remove_l0_l1(clean_arg);
+        out << ' ' << from_expr(ns, step.function_id, clean_arg);
 
         // the binary representation
         out << " (" << trace_numeric_value(*l_it, ns, options) << ')';
@@ -676,7 +726,9 @@ void show_full_goto_trace(
           else
             out << ", ";
 
-          out << from_expr(ns, step.function_id, arg);
+          exprt clean_arg = arg;
+          remove_l0_l1(clean_arg);
+          out << from_expr(ns, step.function_id, clean_arg);
         }
 
         out << ") (depth " << function_depth << ") ####\n";
@@ -770,7 +822,9 @@ static void show_goto_stack_trace(
         else
           out << ", ";
 
-        out << from_expr(ns, step.function_id, arg);
+        exprt clean_arg = arg;
+        remove_l0_l1(clean_arg);
+        out << from_expr(ns, step.function_id, clean_arg);
       }
 
       out << ')';
