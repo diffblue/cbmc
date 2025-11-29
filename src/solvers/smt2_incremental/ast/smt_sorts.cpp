@@ -83,6 +83,10 @@ const smt_sortt &smt_array_sortt::element_sort() const
   return static_cast<const smt_sortt &>(find(ID_value));
 }
 
+smt_int_sortt::smt_int_sortt() : smt_sortt{ID_smt_int_sort}
+{
+}
+
 template <typename visitort>
 void accept(const smt_sortt &sort, const irep_idt &id, visitort &&visitor)
 {

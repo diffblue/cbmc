@@ -239,6 +239,18 @@ public:
       unexpected_term_visited = true;
     }
   }
+
+  void visit(const smt_int_constant_termt &) override
+  {
+    if(std::is_same<expected_termt, smt_int_constant_termt>::value)
+    {
+      expected_term_visited = true;
+    }
+    else
+    {
+      unexpected_term_visited = true;
+    }
+  }
 };
 
 template <typename term_typet>
@@ -284,12 +296,19 @@ smt_exists_termt make_test_term<smt_exists_termt>()
     {identifier}, smt_core_theoryt::equal(identifier, identifier)};
 }
 
+template <>
+smt_int_constant_termt make_test_term<smt_int_constant_termt>()
+{
+  return smt_int_constant_termt{42};
+}
+
 TEMPLATE_TEST_CASE(
   "smt_termt::accept(visitor)",
   "[core][smt2_incremental]",
   smt_bool_literal_termt,
   smt_identifier_termt,
   smt_bit_vector_constant_termt,
+  smt_int_constant_termt,
   smt_function_application_termt,
   smt_forall_termt,
   smt_exists_termt)
