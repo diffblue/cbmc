@@ -24,9 +24,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/string_utils.h>
 
-#include <analyses/does_remove_const.h>
-
 #include "compute_called_functions.h"
+#include "does_remove_const.h"
 #include "goto_model.h"
 #include "remove_const_function_pointers.h"
 #include "remove_skip.h"

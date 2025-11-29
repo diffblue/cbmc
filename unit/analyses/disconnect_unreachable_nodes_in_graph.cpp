@@ -8,9 +8,9 @@ Author:
 
 #include <util/symbol_table.h>
 
+#include <goto-programs/call_graph_helpers.h>
 #include <goto-programs/goto_model.h>
 
-#include <analyses/call_graph_helpers.h>
 #include <ansi-c/goto-conversion/goto_convert_functions.h>
 #include <testing-utils/call_graph_test_utils.h>
 #include <testing-utils/use_catch.h>
