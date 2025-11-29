@@ -216,39 +216,6 @@ int __isnormalf(float f)
   return __CPROVER_isnormalf(f);
 }
 
-/* FUNCTION: __builtin_inff */
-
-float __builtin_inff(void)
-{
-#pragma CPROVER check push
-#pragma CPROVER check disable "float-div-by-zero"
-#pragma CPROVER check disable "float-overflow"
-  return 1.0f / 0.0f;
-#pragma CPROVER check pop
-}
-
-/* FUNCTION: __builtin_inf */
-
-double __builtin_inf(void)
-{
-#pragma CPROVER check push
-#pragma CPROVER check disable "float-div-by-zero"
-#pragma CPROVER check disable "float-overflow"
-  return 1.0 / 0.0;
-#pragma CPROVER check pop
-}
-
-/* FUNCTION: __builtin_infl */
-
-long double __builtin_infl(void)
-{
-#pragma CPROVER check push
-#pragma CPROVER check disable "float-div-by-zero"
-#pragma CPROVER check disable "float-overflow"
-  return 1.0l / 0.0l;
-#pragma CPROVER check pop
-}
-
 /* FUNCTION: __builtin_isinf */
 
 int __builtin_isinf(double d)
