@@ -518,13 +518,12 @@ void get_virtual_calleest::get_child_functions_rec(
   for(const auto &child : findit->second.children)
   {
     // Skip if we have already visited this and we found a function call that
-    // did not resolve to non java.lang.Object.
+    // resolved to a non-Object implementation (i.e., we don't need to revisit).
     auto it = entry_map.find(child);
     if(
-      it != entry_map.end() &&
-      (!it->second.symbol_expr.has_value() ||
-       !it->second.symbol_expr->get_identifier().starts_with(
-         "java::java.lang.Object")))
+      it != entry_map.end() && it->second.symbol_expr.has_value() &&
+      !it->second.symbol_expr->get_identifier().starts_with(
+        "java::java.lang.Object"))
     {
       continue;
     }
