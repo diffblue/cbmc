@@ -677,7 +677,11 @@ void java_bytecode_convert_classt::convert(
     }
   }
   else
-    field_type = *java_type_from_string(f.descriptor);
+  {
+    auto type_opt = java_type_from_string(f.descriptor);
+    CHECK_RETURN(type_opt.has_value());
+    field_type = *type_opt;
+  }
 
   // determine access
   irep_idt access;
