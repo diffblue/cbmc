@@ -13,6 +13,8 @@ Date: September 2021
 
 #include <ansi-c/goto-conversion/goto_convert_class.h>
 
+#include <util/cprover_prefix.h>
+
 #include <goto-programs/loop_ids.h>
 
 #include <goto-instrument/havoc_utils.h>
@@ -24,6 +26,23 @@ Date: September 2021
 #define ENTERED_LOOP "__entered_loop"
 #define IN_LOOP_HAVOC_BLOCK "__in_loop_havoc_block"
 #define INIT_INVARIANT "__init_invariant"
+
+/// Name of the marker symbol that flags a goto model as DFCC-instrumented.
+/// This symbol is an unbounded map of booleans indexed by function pointer
+/// ID; its mere presence in the symbol table indicates that DFCC
+/// instrumentation has already been applied. It is created on demand by
+/// `dfcc_libraryt::get_instrumented_functions_map_symbol`. The constant and
+/// the `is_dfcc_instrumented` helper live here (in the `contracts` module)
+/// rather than in `dynamic-frames` so that the non-DFCC enforcement path in
+/// `contracts.cpp` can consult them without depending on `dynamic-frames`
+/// (which itself depends on `contracts`).
+#define INSTRUMENTED_FUNCTIONS_MAP_NAME                                        \
+  CPROVER_PREFIX "dfcc_instrumented_functions"
+
+/// Returns true iff \p goto_model already carries DFCC instrumentation,
+/// detected via the presence of the \ref INSTRUMENTED_FUNCTIONS_MAP_NAME
+/// marker symbol.
+bool is_dfcc_instrumented(const goto_modelt &goto_model);
 
 template <class T, typename C>
 class loop_templatet;
