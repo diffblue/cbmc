@@ -286,7 +286,8 @@ int yyansi_cerror(const std::string &error);
 
 %start grammar
 
-%expect 2 /* the famous "dangling `else'" ambiguity */
+%expect 8 /* the famous "dangling `else'" ambiguity, and ambiguities from allowing
+              GCC attributes before contract clauses (resolved by preferring shift) */
           /* results in one shift/reduce conflict   */
           /* that we don't want to be reported      */
 
@@ -3515,6 +3516,22 @@ cprover_function_contract_sequence:
 cprover_function_contract_sequence_opt:
           /* nothing */
           { init($$); }
+        | post_declarator_attributes cprover_function_contract_sequence
+        {
+          // Function contracts should either be attached to a
+          // top-level function declaration or top-level function
+          // definition.  Any embedded function pointer scopes should
+          // be disallowed.
+          int contract_in_global_scope = (PARSER.scopes.size() == 1);
+          int contract_in_top_level_function_scope = (PARSER.scopes.size() == 2);
+          if(!contract_in_global_scope && !contract_in_top_level_function_scope)
+          {
+            yyansi_cerror("Function contracts allowed only at top-level declarations.");
+            YYABORT;
+          }
+          // Merge attributes with contracts
+          $$ = merge($1, $2);
+        }
         | cprover_function_contract_sequence
         {
           // Function contracts should either be attached to a
