@@ -1,4 +1,5 @@
 SRC = casting_replace_symbol.cpp \
+      function_priority_order.cpp \
       linking.cpp \
       linking_diagnostics.cpp \
       remove_internal_symbols.cpp \
