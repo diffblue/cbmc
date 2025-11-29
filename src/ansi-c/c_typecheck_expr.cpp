@@ -94,6 +94,44 @@ void c_typecheck_baset::add_rounding_mode(exprt &expr)
   }
 }
 
+/// \return \p type without its top-level const, volatile, restrict and
+///   _Atomic qualifiers.
+static typet unqualified_type(const typet &type)
+{
+  typet result = type;
+  result.remove(ID_C_constant);
+  result.remove(ID_C_volatile);
+  result.remove(ID_C_restricted);
+  result.remove(ID_C_atomic);
+  return result;
+}
+
+/// In C, `wchar_t`, `char16_t` and `char32_t` are typedefs for integer types,
+/// but CBMC gives wide character and string literals a distinct
+/// `ID_C_c_type`. Map those to the C type of the integer type with the same
+/// representation so that type compatibility treats them alike.
+/// \return The `ID_C_c_type` to use for compatibility checks.
+static irep_idt c_type_for_compatibility(const typet &type)
+{
+  const irep_idt &c_type = type.get(ID_C_c_type);
+  if(c_type != ID_wchar_t && c_type != ID_char16_t && c_type != ID_char32_t)
+    return c_type;
+
+  for(const typet &candidate : std::initializer_list<typet>{
+        signed_int_type(),
+        unsigned_int_type(),
+        signed_short_int_type(),
+        unsigned_short_int_type(),
+        signed_long_int_type(),
+        unsigned_long_int_type()})
+  {
+    if(candidate == type)
+      return candidate.get(ID_C_c_type);
+  }
+
+  return c_type;
+}
+
 bool c_typecheck_baset::gcc_types_compatible_p(
   const typet &type1,
   const typet &type2)
@@ -101,8 +139,13 @@ bool c_typecheck_baset::gcc_types_compatible_p(
   // read
   // http://gcc.gnu.org/onlinedocs/gcc-3.3.6/gcc/Other-Builtins.html
 
-  // check qualifiers first
-  if(c_qualifierst(type1)!=c_qualifierst(type2))
+  // check qualifiers first; _Noreturn is a function specifier (C11 6.7.4)
+  // and nodiscard an attribute, neither is part of the type
+  c_qualifierst qualifiers1{type1};
+  c_qualifierst qualifiers2{type2};
+  qualifiers1.is_noreturn = qualifiers2.is_noreturn = false;
+  qualifiers1.is_nodiscard = qualifiers2.is_nodiscard = false;
+  if(qualifiers1 != qualifiers2)
     return false;
 
   if(type1.id()==ID_c_enum_tag)
@@ -131,9 +174,21 @@ bool c_typecheck_baset::gcc_types_compatible_p(
   else if(type1.id()==ID_array &&
           type2.id()==ID_array)
   {
-    return gcc_types_compatible_p(
-      to_array_type(type1).element_type(),
-      to_array_type(type2).element_type()); // ignore size
+    // C11 6.2.7 and 6.7.6.2p6: array types are compatible if their element
+    // types are compatible and, when both sizes are integer constant
+    // expressions, those sizes are equal.
+    const array_typet &a_type1 = to_array_type(type1);
+    const array_typet &a_type2 = to_array_type(type2);
+
+    if(!gcc_types_compatible_p(a_type1.element_type(), a_type2.element_type()))
+      return false;
+
+    // An absent size (incomplete array) or a non-constant size (VLA) is
+    // compatible with any size.
+    if(!a_type1.size().is_constant() || !a_type2.size().is_constant())
+      return true;
+
+    return a_type1.size() == a_type2.size();
   }
   else if(type1.id()==ID_code &&
           type2.id()==ID_code)
@@ -146,13 +201,31 @@ bool c_typecheck_baset::gcc_types_compatible_p(
         c_type2.return_type()))
       return false;
 
+    // The C front end represents `T f()` (no prototype) as a variadic
+    // function without parameters. C11 6.7.6.3p15: such a type is compatible
+    // with any prototype that has no ellipsis (modulo default argument
+    // promotions, which are not checked here).
+    const bool no_prototype1 =
+      c_type1.has_ellipsis() && c_type1.parameters().empty();
+    const bool no_prototype2 =
+      c_type2.has_ellipsis() && c_type2.parameters().empty();
+    if(no_prototype1 || no_prototype2)
+    {
+      return (no_prototype1 && no_prototype2) ||
+             !(no_prototype1 ? c_type2 : c_type1).has_ellipsis();
+    }
+
+    if(c_type1.has_ellipsis() != c_type2.has_ellipsis())
+      return false;
+
     if(c_type1.parameters().size()!=c_type2.parameters().size())
       return false;
 
+    // C11 6.7.6.3p15: compare the unqualified parameter types
     for(std::size_t i=0; i<c_type1.parameters().size(); i++)
       if(!gcc_types_compatible_p(
-          c_type1.parameters()[i].type(),
-          c_type2.parameters()[i].type()))
+           unqualified_type(c_type1.parameters()[i].type()),
+           unqualified_type(c_type2.parameters()[i].type())))
         return false;
 
     return true;
@@ -165,7 +238,12 @@ bool c_typecheck_baset::gcc_types_compatible_p(
       // long long int from long int.
       // The rules appear to match those of C++.
 
-      if(type1.get(ID_C_c_type)==type2.get(ID_C_c_type))
+      if(mode == ID_C)
+      {
+        if(c_type_for_compatibility(type1) == c_type_for_compatibility(type2))
+          return true;
+      }
+      else if(type1.get(ID_C_c_type) == type2.get(ID_C_c_type))
         return true;
     }
   }
@@ -468,19 +546,64 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
       }
     }
 
-    // first try non-default match
-    exprt default_match=nil_exprt();
-    exprt assoc_match=nil_exprt();
+    // C11 6.5.1.1p2: no two generic associations shall specify compatible
+    // types, and there is at most one default association.
+    exprt default_match = nil_exprt();
+    for(auto it = generic_associations.begin();
+        it != generic_associations.end();
+        ++it)
+    {
+      if(it->get(ID_type_arg) == ID_default)
+      {
+        if(default_match.is_not_nil())
+        {
+          throw errort().with_location(expr.source_location())
+            << "generic selection has more than one default association";
+        }
+        default_match = static_cast<const exprt &>(it->find(ID_value));
+        continue;
+      }
 
+      const typet &type = static_cast<const typet &>(it->find(ID_type_arg));
+      for(auto it2 = std::next(it); it2 != generic_associations.end(); ++it2)
+      {
+        if(it2->get(ID_type_arg) == ID_default)
+          continue;
+        const typet &type2 = static_cast<const typet &>(it2->find(ID_type_arg));
+        if(gcc_types_compatible_p(type, type2))
+        {
+          throw errort().with_location(expr.source_location())
+            << "generic association type '" << to_string(type2)
+            << "' is compatible with previous association type '"
+            << to_string(type) << "'";
+        }
+      }
+    }
+
+    // C11 6.5.1.1p2: the controlling expression undergoes lvalue conversion
+    // (6.3.2.1p2-4), in the type domain only: array-to-pointer and
+    // function-to-pointer conversion and removal of qualifiers.
     const typet &op_type = op.type();
+    typet adjusted_op_type;
+    if(op_type.id() == ID_array)
+      adjusted_op_type = pointer_type(to_array_type(op_type).element_type());
+    else if(op_type.id() == ID_code)
+      adjusted_op_type = pointer_type(op_type);
+    else
+      adjusted_op_type = unqualified_type(op_type);
 
+    // C11 6.5.1.1p3: select the (unique) association whose type is
+    // compatible with the controlling type
+    exprt assoc_match = nil_exprt();
     for(const auto &irep : generic_associations)
     {
-      if(irep.get(ID_type_arg) == ID_default)
-        default_match = static_cast<const exprt &>(irep.find(ID_value));
-      else if(op_type == static_cast<const typet &>(irep.find(ID_type_arg)))
+      if(
+        irep.get(ID_type_arg) != ID_default &&
+        gcc_types_compatible_p(
+          adjusted_op_type, static_cast<const typet &>(irep.find(ID_type_arg))))
       {
         assoc_match = static_cast<const exprt &>(irep.find(ID_value));
+        break;
       }
     }
 
@@ -491,8 +614,8 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
       else
       {
         error().source_location = expr.source_location();
-        error() << "unmatched generic selection: " << to_string(op.type())
-                << eom;
+        error() << "unmatched generic selection: "
+                << to_string(adjusted_op_type) << eom;
         throw 0;
       }
     }
