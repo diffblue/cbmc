@@ -17,10 +17,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_functions.h>
 
+#include <linking/function_priority_order.h>
 #include <linking/static_lifetime_init.h>
 
 #include "c_nondet_symbol_factory.h"
 #include "expr2c.h"
+
+#include <algorithm>
 
 exprt::operandst build_function_environment(
   const code_typet::parameterst &parameters,
@@ -511,7 +514,10 @@ bool generate_ansi_c_start_function(
 
   record_function_outputs(symbol, init_code, symbol_table);
 
-  // now call destructor functions (a GCC extension)
+  // now call destructor functions (a GCC extension), in the order given by
+  // their priorities; sort them by name first, as static_lifetime_init does
+  // for constructors, so that the order of equal priorities is reproducible
+  std::vector<std::reference_wrapper<const symbolt>> destructors;
 
   for(const auto &symbol_table_entry : symbol_table.symbols)
   {
@@ -525,10 +531,22 @@ bool generate_ansi_c_start_function(
       code_type.return_type().id() == ID_destructor &&
       code_type.parameters().empty())
     {
-      code_function_callt destructor_call(symbol.symbol_expr());
-      destructor_call.add_source_location() = symbol.location;
-      init_code.add(std::move(destructor_call));
+      destructors.push_back(symbol);
     }
+  }
+
+  std::sort(
+    destructors.begin(),
+    destructors.end(),
+    [](const symbolt &a, const symbolt &b)
+    { return id2string(a.name) < id2string(b.name); });
+
+  for(const auto &sym_ref : order_functions_by_priority(
+        destructors, function_priority_ordert::DESCENDING))
+  {
+    code_function_callt destructor_call{sym_ref.get().symbol_expr()};
+    destructor_call.add_source_location() = sym_ref.get().location;
+    init_code.add(std::move(destructor_call));
   }
 
   // add the entry point symbol

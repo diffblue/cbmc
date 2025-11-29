@@ -1,0 +1,11 @@
+CORE gcc-only
+priority_range.c
+
+^EXIT=(1|6|64)$
+^SIGNAL=0$
+constructor priorities must be integers from 0 to 65535 inclusive
+^CONVERSION ERROR$
+--
+^warning: ignoring
+--
+As GCC, reject priorities outside 0 to 65535.

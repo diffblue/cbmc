@@ -121,6 +121,12 @@ void c_typecheck_baset::typecheck_type(typet &type)
   {
     typecheck_bitint_type(type);
   }
+  else if(
+    (type.id() == ID_constructor || type.id() == ID_destructor) &&
+    type.find(ID_priority).is_not_nil())
+  {
+    typecheck_constructor_priority(type);
+  }
   else if(type.id()==ID_gcc_attribute_mode)
   {
     // get that mode
@@ -476,6 +482,39 @@ void c_typecheck_baset::typecheck_bitint_type(typet &type)
   // We remember the original number of bits before padding,
   // since these determine semantics
   type.set(ID_C_c_bitint_width, integer2string(width_int));
+}
+
+/// Type check the priority of a constructor or destructor function, given as
+/// `__attribute__((constructor(P)))` or `__attribute__((destructor(P)))`: like
+/// GCC, require an integer constant expression from 0 to 65535 and warn about
+/// priorities from 0 to 100, which are reserved for the implementation.  The
+/// priority is replaced by its value.
+void c_typecheck_baset::typecheck_constructor_priority(typet &type)
+{
+  exprt &priority = static_cast<exprt &>(type.add(ID_priority));
+  const source_locationt source_location = priority.find_source_location();
+  const std::string kind = id2string(type.id());
+
+  typecheck_expr(priority);
+  make_constant(priority);
+
+  const auto value = numeric_cast<mp_integer>(priority);
+  if(!value.has_value() || *value < 0 || *value > 65535)
+  {
+    throw errort().with_location(source_location)
+      << kind << " priorities must be integers from 0 to 65535 inclusive";
+  }
+
+  if(*value <= 100)
+  {
+    warning().source_location = source_location;
+    warning() << kind
+              << " priorities from 0 to 100 are reserved for the "
+                 "implementation"
+              << eom;
+  }
+
+  priority = from_integer(*value, unsigned_int_type());
 }
 
 void c_typecheck_baset::typecheck_code_type(code_typet &type)
