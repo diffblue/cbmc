@@ -443,44 +443,56 @@ void prop_conv_solvert::finish_eager_conversion()
 decision_proceduret::resultt
 prop_conv_solvert::dec_solve(const exprt &assumption)
 {
-  // post-processing isn't incremental yet
-  if(!post_processing_done)
+  try
   {
-    const auto post_process_start = std::chrono::steady_clock::now();
+    // post-processing isn't incremental yet
+    if(!post_processing_done)
+    {
+      const auto post_process_start = std::chrono::steady_clock::now();
 
-    log.progress() << "Post-processing" << messaget::eom;
-    finish_eager_conversion();
-    post_processing_done = true;
+      log.progress() << "Post-processing" << messaget::eom;
+      finish_eager_conversion();
+      post_processing_done = true;
 
-    const auto post_process_stop = std::chrono::steady_clock::now();
-    std::chrono::duration<double> post_process_runtime =
-      std::chrono::duration<double>(post_process_stop - post_process_start);
-    log.statistics() << "Runtime Post-process: " << post_process_runtime.count()
-                     << "s" << messaget::eom;
+      const auto post_process_stop = std::chrono::steady_clock::now();
+      std::chrono::duration<double> post_process_runtime =
+        std::chrono::duration<double>(post_process_stop - post_process_start);
+      log.statistics() << "Runtime Post-process: "
+                       << post_process_runtime.count() << "s" << messaget::eom;
+    }
+
+    log.progress() << "Solving with " << prop.solver_text() << messaget::eom;
+
+    if(assumption.is_nil())
+      push();
+    else
+      push({assumption});
+
+    auto prop_result = prop.prop_solve(assumption_stack);
+
+    pop();
+
+    switch(prop_result)
+    {
+    case propt::resultt::P_SATISFIABLE:
+      return resultt::D_SATISFIABLE;
+    case propt::resultt::P_UNSATISFIABLE:
+      return resultt::D_UNSATISFIABLE;
+    case propt::resultt::P_ERROR:
+      return resultt::D_ERROR;
+    }
+
+    UNREACHABLE;
   }
-
-  log.progress() << "Solving with " << prop.solver_text() << messaget::eom;
-
-  if(assumption.is_nil())
-    push();
-  else
-    push({assumption});
-
-  auto prop_result = prop.prop_solve(assumption_stack);
-
-  pop();
-
-  switch(prop_result)
+  catch(const std::bad_alloc &)
   {
-  case propt::resultt::P_SATISFIABLE:
-    return resultt::D_SATISFIABLE;
-  case propt::resultt::P_UNSATISFIABLE:
-    return resultt::D_UNSATISFIABLE;
-  case propt::resultt::P_ERROR:
+    log.error() << "Solver ran out of memory during propositional reduction."
+                << messaget::eom;
+    log.error()
+      << "Try reducing the problem size or increasing available memory."
+      << messaget::eom;
     return resultt::D_ERROR;
   }
-
-  UNREACHABLE;
 }
 
 exprt prop_conv_solvert::get(const exprt &expr) const
