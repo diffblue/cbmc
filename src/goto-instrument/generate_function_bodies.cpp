@@ -510,30 +510,46 @@ void generate_function_bodies(
   messaget messages(message_handler);
   const std::regex cprover_prefix = std::regex("__CPROVER.*");
   bool did_generate_body = false;
+  bool matched_function_with_body = false;
   for(auto &function : model.goto_functions.function_map)
   {
-    if(
-      !function.second.body_available() &&
-      std::regex_match(id2string(function.first), functions_regex))
+    if(std::regex_match(id2string(function.first), functions_regex))
     {
-      if(std::regex_match(id2string(function.first), cprover_prefix))
+      if(!function.second.body_available())
       {
-        messages.warning() << "generate function bodies: matched function '"
-                           << id2string(function.first)
-                           << "' begins with __CPROVER "
-                           << "the generated body for this function "
-                           << "may interfere with analysis" << messaget::eom;
+        if(std::regex_match(id2string(function.first), cprover_prefix))
+        {
+          messages.warning()
+            << "generate function bodies: matched function '"
+            << id2string(function.first) << "' begins with __CPROVER "
+            << "the generated body for this function "
+            << "may interfere with analysis" << messaget::eom;
+        }
+        did_generate_body = true;
+        generate_function_body.generate_function_body(
+          function.second, model.symbol_table, function.first);
       }
-      did_generate_body = true;
-      generate_function_body.generate_function_body(
-        function.second, model.symbol_table, function.first);
+      else
+      {
+        matched_function_with_body = true;
+      }
     }
   }
   if(!did_generate_body && !ignore_no_match)
   {
-    messages.warning()
-      << "generate function bodies: No function name matched regex"
-      << messaget::eom;
+    if(matched_function_with_body)
+    {
+      messages.warning()
+        << "generate function bodies: Function(s) matched but already have "
+        << "bodies (body generation is only performed for functions without "
+        << "existing bodies)" << messaget::eom;
+    }
+    else
+    {
+      messages.warning()
+        << "generate function bodies: No function name matched regex"
+        << messaget::eom;
+    }
   }
 }
 

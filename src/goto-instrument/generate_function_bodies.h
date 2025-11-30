@@ -92,7 +92,8 @@ void generate_function_bodies(
 
 #define HELP_REPLACE_FUNCTION_BODY                                             \
   " {y--generate-function-body} {uregex} \t "                                  \
-  "generate bodies for functions matching {uregex}\n"                          \
+  "generate bodies for functions matching {uregex} that do not already "       \
+  "have bodies\n"                                                              \
   " {y--generate-havocing-body} <option> "                                     \
   "{ufun_name},{yparams}:{up1};{up2};.. \t "                                   \
   "generate havocing body\n"                                                   \
