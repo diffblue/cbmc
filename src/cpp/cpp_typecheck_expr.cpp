@@ -243,11 +243,24 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
     {
       expr.type()=e1.type();
       expr.op1().swap(e1);
+      // implicit_conversion_sequence may have stripped a c_bit_field
+      // wrapper from op2's type when computing the common type, so
+      // re-align op2 explicitly. The outer if has already proved the
+      // conversion is legal, so a typecast is sufficient (and safer
+      // than a second implicit_conversion_sequence call whose
+      // failure mode would silently corrupt the expression tree).
+      if(expr.type() != expr.op2().type())
+        expr.op2() = typecast_exprt{expr.op2(), expr.type()};
     }
     else if(implicit_conversion_sequence(expr.op2(), expr.op1().type(), e2))
     {
       expr.type()=e2.type();
       expr.op2().swap(e2);
+      // Mirror of the above for the symmetric case where op2 -> op1's
+      // type succeeded; align op1 to the (possibly bit-field-stripped)
+      // common type.
+      if(expr.type() != expr.op1().type())
+        expr.op1() = typecast_exprt{expr.op1(), expr.type()};
     }
     else if(
       expr.op1().type().id() == ID_array &&
@@ -277,6 +290,17 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
               << type2cpp(expr.op2().type(), *this) << "'." << eom;
       throw 0;
     }
+
+    // Post-condition: by the time we fall through this else block,
+    // expr.type() and the two operand types must agree. The branches
+    // above either align them explicitly (via swap or typecast),
+    // return early (the array-to-pointer case), or throw. A future
+    // branch that forgets to align the operands trips this invariant
+    // at typecheck time rather than producing a malformed expression
+    // tree that surfaces much later.
+    INVARIANT(
+      expr.type() == expr.op1().type() && expr.type() == expr.op2().type(),
+      "ternary operands' types must match the result type");
   }
 
   if(expr.op1().get_bool(ID_C_lvalue) &&
