@@ -1,0 +1,11 @@
+KNOWNBUG pthread
+main.c
+-DNO_DEREF
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Simplification with value sets causes unsound results despite the absence of
+dereferencing.
