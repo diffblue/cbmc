@@ -22,6 +22,4 @@ void list_undefined_functions(
   const goto_modelt &,
   std::ostream &);
 
-void undefined_function_abort_path(goto_modelt &);
-
 #endif
