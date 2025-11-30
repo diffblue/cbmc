@@ -170,6 +170,9 @@ public:
 
   bool is_less_than_eq(const interval_templatet &i)
   {
+    // Empty intervals are less than or equal to any interval
+    if(empty() || i.empty())
+      return true;
     if(i.lower_set && upper_set && upper <= i.lower)
       return true;
     else
@@ -178,6 +181,9 @@ public:
 
   bool is_less_than(const interval_templatet &i)
   {
+    // Empty intervals are less than any interval
+    if(empty() || i.empty())
+      return true;
     if(i.lower_set && upper_set && upper < i.lower)
       return true;
     else
@@ -186,6 +192,17 @@ public:
 
   void approx_union_with(const interval_templatet &i)
   {
+    // If i is empty, union is just this interval
+    if(i.empty())
+      return;
+
+    // If this interval is empty, union is just i
+    if(empty())
+    {
+      *this = i;
+      return;
+    }
+
     if(i.lower_set && lower_set)
       lower=std::min(lower, i.lower);
     else if(!i.lower_set && lower_set)
@@ -201,6 +218,9 @@ public:
 template<class T>
 tvt operator<=(const interval_templatet<T> &a, const interval_templatet<T> &b)
 {
+  // Empty sets compare as less than or equal
+  if(a.empty() || b.empty())
+    return tvt(true);
   if(a.upper_set && b.lower_set && a.upper<=b.lower)
     return tvt(true);
   if(a.lower_set && b.upper_set && a.lower>b.upper)
@@ -230,6 +250,10 @@ tvt operator>(const interval_templatet<T> &a, const interval_templatet<T> &b)
 template<class T>
 bool operator==(const interval_templatet<T> &a, const interval_templatet<T> &b)
 {
+  // Empty sets are always equal
+  if(a.empty() && b.empty())
+    return true;
+
   if(a.lower_set!=b.lower_set)
     return false;
   if(a.upper_set!=b.upper_set)
