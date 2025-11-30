@@ -25,8 +25,13 @@ void cover_location_instrumentert::instrument(
     i_it->turn_into_skip();
 
   const std::size_t block_nr = basic_blocks.block_of(i_it);
+
+  // The representative instruction is the last instruction in the block,
+  // ensuring all instructions (including any ASSUME statements) can be
+  // executed.
   const auto representative_instruction = basic_blocks.instruction_of(block_nr);
-  // we only instrument the selected instruction
+
+  // we only instrument the selected instruction (last in block)
   if(representative_instruction && *representative_instruction == i_it)
   {
     const std::string b = std::to_string(block_nr + 1); // start with 1

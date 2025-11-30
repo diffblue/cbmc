@@ -63,6 +63,7 @@ cover_basic_blockst::cover_basic_blockst(const goto_programt &goto_program)
       else
       {
         block_infos.emplace_back();
+        // representative_inst will be updated to the last instruction
         block_infos.back().representative_inst = it;
         block_infos.back().source_location = source_locationt::nil();
         current_block = block_infos.size() - 1;
@@ -77,7 +78,11 @@ cover_basic_blockst::cover_basic_blockst(const goto_programt &goto_program)
 
     add_block_lines(block_info, *it);
 
-    // set representative program location to instrument
+    // Update representative instruction to always be the last instruction
+    block_info.representative_inst = it;
+
+    // set source location for reporting (from first instruction with valid
+    // location)
     if(
       !it->source_location().is_nil() &&
       !it->source_location().get_file().empty() &&
@@ -85,7 +90,6 @@ cover_basic_blockst::cover_basic_blockst(const goto_programt &goto_program)
       !it->source_location().is_built_in() &&
       block_info.source_location.is_nil())
     {
-      block_info.representative_inst = it; // update
       block_info.source_location = it->source_location();
     }
 

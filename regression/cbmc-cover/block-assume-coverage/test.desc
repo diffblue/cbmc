@@ -1,0 +1,10 @@
+CORE
+main.c
+--cover location
+^EXIT=0$
+^SIGNAL=0$
+block 1 \(lines main.c:main:\d+\): SATISFIED
+block 2 \(lines main.c:main:\d+\): SATISFIED
+block 3 \(lines main.c:main:\d+\): FAILED
+block 4 \(lines main.c:main:\d+\): SATISFIED
+--

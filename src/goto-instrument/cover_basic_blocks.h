@@ -74,7 +74,7 @@ public:
 
   /// \param block_nr: a block number
   /// \return the instruction selected for
-  ///   instrumentation representative of the given block
+  ///   instrumentation representative of the given block (last instruction)
   std::optional<goto_programt::const_targett>
   instruction_of(std::size_t block_nr) const override;
 
@@ -109,7 +109,7 @@ private:
 
   struct block_infot
   {
-    /// the program location to instrument for this block
+    /// the program location to instrument for this block (last instruction)
     std::optional<goto_programt::const_targett> representative_inst;
 
     /// the source location representative for this block
