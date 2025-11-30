@@ -49,7 +49,7 @@ jobs:
         run: git clone -b path-addition https://github.com/awslabs/one-line-scan.git
 
       - name: Get Xen 4.13
-        run: git clone git://xenbits.xen.org/xen.git xen_4_13 && cd xen_4_13 && git reset --hard RELEASE-4.13.0 && pwd
+        run: git clone --branch RELEASE-4.13.0 --depth=1 https://github.com/xen-project/xen xen_4_13
 
       - name: Prepare compile Xen with CBMC via one-line-scan
         run: |
