@@ -33,7 +33,7 @@ class symbol_tablet;
   " {y--cover} {uCC} \t "                                                      \
   "create test-suite with coverage criterion {uCC}, where {uCC} is one of "    \
   "{yassertion}[{ys}], {yassume}[{ys}], {ybranch}[{yes}], "                    \
-  "{ycondition}[{ys}], {ycover}, {decision}[{ys}], {ylocation}[{ys}], "        \
+  "{ycondition}[{ys}], {ycover}, {ydecision}[{ys}], {ylocation}[{ys}], "       \
   "or {ymcdc}\n"                                                               \
   " {y--cover-failed-assertions} \t "                                          \
   "do not stop coverage checking at failed assertions (this is the default "   \
