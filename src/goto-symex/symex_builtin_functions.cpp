@@ -293,7 +293,7 @@ void goto_symext::symex_va_start(
 
   array = clean_expr(std::move(array), state, false);
   array = state.rename(std::move(array), ns).get();
-  do_simplify(array, state.value_set);
+  do_simplify(array, state);
   symex_assign(state, va_array.symbol_expr(), std::move(array));
 
   exprt rhs = address_of_exprt{index_exprt{
@@ -388,7 +388,7 @@ void goto_symext::symex_printf(
   exprt tmp_rhs = rhs;
   clean_expr(tmp_rhs, state, false);
   tmp_rhs = state.rename(std::move(tmp_rhs), ns).get();
-  do_simplify(tmp_rhs, state.value_set);
+  do_simplify(tmp_rhs, state);
 
   const exprt::operandst &operands=tmp_rhs.operands();
   std::list<exprt> args;
@@ -426,7 +426,7 @@ void goto_symext::symex_printf(
         parameter = to_address_of_expr(parameter).object();
       clean_expr(parameter, state, false);
       parameter = state.rename(std::move(parameter), ns).get();
-      do_simplify(parameter, state.value_set);
+      do_simplify(parameter, state);
 
       args.push_back(std::move(parameter));
     }
@@ -454,7 +454,7 @@ void goto_symext::symex_input(
   for(std::size_t i=1; i<code.operands().size(); i++)
   {
     exprt l2_arg = state.rename(code.operands()[i], ns).get();
-    do_simplify(l2_arg, state.value_set);
+    do_simplify(l2_arg, state);
     args.emplace_back(std::move(l2_arg));
   }
 
