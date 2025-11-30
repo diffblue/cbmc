@@ -1,0 +1,8 @@
+CORE smt-backend
+main.c
+--cprover-smt2
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring

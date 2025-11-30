@@ -3144,6 +3144,59 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
 
       out << "))"; // concat, let
     }
+    else if(src_type.id() == ID_floatbv) // floatbv to fixedbv
+    {
+      // Convert float to fixed-point
+      // Strategy: multiply float by 2^fraction_bits, then convert to signed integer
+      const fixedbv_typet &dest_fixedbv_type = to_fixedbv_type(dest_type);
+      std::size_t dest_fraction_bits = dest_fixedbv_type.get_fraction_bits();
+      std::size_t dest_width = dest_fixedbv_type.get_width();
+
+      if(use_FPA_theory)
+      {
+        const floatbv_typet &src_floatbv_type = to_floatbv_type(src_type);
+
+        // Create scaling factor 2^fraction_bits as a float
+        mp_integer scale_factor =
+          power(mp_integer(2), mp_integer(dest_fraction_bits));
+        ieee_floatt scale_float(src_floatbv_type, ieee_floatt::ROUND_TO_EVEN);
+        scale_float.from_integer(scale_factor);
+
+        // Multiply by scaling factor
+        out << "(let ((scaled_val (fp.mul RNE ";
+        convert_expr(src);
+        out << " ";
+        convert_constant(scale_float.to_expr());
+        out << "))) ";
+
+        // Convert to signed bitvector
+        out << "(fp.to_sbv " << dest_width << " RNE scaled_val))";
+      }
+      else
+      {
+        // Without FPA theory, we work with the bit-level representation
+        // This is more complex and requires manual handling
+        // For now, we'll use a simplified approach treating it as bit manipulation
+
+        // Get the float as bitvector
+        out << "(let ((float_bv ";
+        convert_expr(src);
+        out << ")) ";
+
+        // Create scale factor as bitvector representation of float
+        mp_integer scale_factor =
+          power(mp_integer(2), mp_integer(dest_fraction_bits));
+        ieee_floatt scale_float(
+          to_floatbv_type(src_type), ieee_floatt::ROUND_TO_EVEN);
+        scale_float.from_integer(scale_factor);
+
+        // This is a placeholder - proper implementation would need float arithmetic
+        // For bit-level representation without FPA, we'd need to implement
+        // float multiplication and conversion manually
+        SMT2_TODO("floatbv to fixedbv conversion without FPA theory");
+        out << "(_ bv0 " << dest_width << "))"; // Close let
+      }
+    }
     else
       UNEXPECTEDCASE("unexpected typecast to fixedbv");
   }
@@ -3257,6 +3310,49 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       }
       else
         convert_expr(src);
+    }
+    else if(src_type.id() == ID_fixedbv) // fixedbv to floatbv
+    {
+      // Convert fixed-point to floating-point
+      // Strategy: treat fixedbv as signed integer, convert to float, then
+      // divide by 2^fraction_bits
+      const fixedbv_typet &src_fixedbv_type = to_fixedbv_type(src_type);
+      std::size_t src_fraction_bits = src_fixedbv_type.get_fraction_bits();
+
+      if(use_FPA_theory)
+      {
+        // Convert the fixedbv (as signed integer) to float
+        out << "(let ((fixed_as_int ";
+        convert_expr(src);
+        out << ")) ";
+
+        // Convert signed integer to float
+        out << "(fp.div RNE ";
+        out << "((_ to_fp " << dest_floatbv_type.get_e() << " "
+            << dest_floatbv_type.get_f() + 1 << ") RNE ";
+        out << "fixed_as_int)";
+
+        // Create divisor: 2^fraction_bits as a float
+        mp_integer divisor =
+          power(mp_integer(2), mp_integer(src_fraction_bits));
+        ieee_floatt divisor_float(
+          dest_floatbv_type, ieee_floatt::ROUND_TO_EVEN);
+        divisor_float.from_integer(divisor);
+
+        out << " ";
+        convert_constant(divisor_float.to_expr());
+        out << "))"; // Close fp.div and let
+      }
+      else
+      {
+        // Without FPA theory, use bit-level representation
+        // This is complex - would need manual float construction
+        // For now, provide a placeholder
+        SMT2_TODO("fixedbv to floatbv conversion without FPA theory");
+
+        // At minimum, output something valid
+        out << "(_ bv0 " << dest_floatbv_type.get_width() << ")";
+      }
     }
     else
       UNEXPECTEDCASE("Unknown typecast "+src_type.id_string()+" -> float");
