@@ -1615,6 +1615,7 @@ var hierarchy =
               [ "bitor_exprt", "classbitor__exprt.html", null ],
               [ "bitxnor_exprt", "classbitxnor__exprt.html", null ],
               [ "bitxor_exprt", "classbitxor__exprt.html", null ],
+              [ "case_exprt", "classcase__exprt.html", null ],
               [ "concatenation_exprt", "classconcatenation__exprt.html", null ],
               [ "cond_exprt", "classcond__exprt.html", null ],
               [ "mult_exprt", "classmult__exprt.html", null ],

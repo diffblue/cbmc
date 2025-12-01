@@ -190,6 +190,7 @@ var annotated_dup =
     [ "call_validatet", "structcall__validatet.html", "structcall__validatet" ],
     [ "can_forward_propagatet", "classcan__forward__propagatet.html", "classcan__forward__propagatet" ],
     [ "car_exprt", "classcar__exprt.html", "classcar__exprt" ],
+    [ "case_exprt", "classcase__exprt.html", "classcase__exprt" ],
     [ "casting_replace_symbolt", "classcasting__replace__symbolt.html", "classcasting__replace__symbolt" ],
     [ "cbmc_invariants_should_throwt", "structcbmc__invariants__should__throwt.html", "structcbmc__invariants__should__throwt" ],
     [ "cbmc_parse_optionst", "classcbmc__parse__optionst.html", "classcbmc__parse__optionst" ],

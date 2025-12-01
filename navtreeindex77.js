@@ -1,5 +1,17 @@
 var NAVTREEINDEX77 =
 {
+"deprecate_8h.html#ad034ea058031ed95e52d3bac1743640a":[8,0,2,30,34,0],
+"deprecate_8h_source.html":[8,0,2,30,34],
+"deprecated.html":[5],
+"dereference__callback_8h.html":[8,0,2,26,2],
+"dereference__callback_8h_source.html":[8,0,2,26,2],
+"designator_8cpp.html":[8,0,2,1,56],
+"designator_8cpp_source.html":[8,0,2,1,56],
+"designator_8h.html":[8,0,2,1,57],
+"designator_8h.html#ab24e0f16e330fa563ca5a36e6ff6f23a":[8,0,2,1,57,2],
+"designator_8h_source.html":[8,0,2,1,57],
+"destructor_8cpp.html":[8,0,2,1,1,1],
+"destructor_8cpp.html#a5926579c8aae217b2d45fe5a419c34f7":[8,0,2,1,1,1,1],
 "destructor_8cpp.html#a769e21f7375354db97cbb83489e5430f":[8,0,2,1,1,1,0],
 "destructor_8cpp_source.html":[8,0,2,1,1,1],
 "destructor_8h.html":[8,0,2,1,1,2],
@@ -237,17 +249,5 @@ var NAVTREEINDEX77 =
 "dfcc__pointer__equals_8h_source.html":[8,0,2,15,1,1,37],
 "dfcc__pointer__in__range_8cpp.html":[8,0,2,15,1,1,38],
 "dfcc__pointer__in__range_8cpp_source.html":[8,0,2,15,1,1,38],
-"dfcc__pointer__in__range_8h.html":[8,0,2,15,1,1,39],
-"dfcc__pointer__in__range_8h_source.html":[8,0,2,15,1,1,39],
-"dfcc__root__object_8cpp.html":[8,0,2,15,1,1,40],
-"dfcc__root__object_8cpp.html#ae9777cdc4f38853e4561a27ca0d8f873":[8,0,2,15,1,1,40,2],
-"dfcc__root__object_8cpp.html#aef107f308db900fd88239b07a892c05b":[8,0,2,15,1,1,40,0],
-"dfcc__root__object_8cpp.html#af99228fb555aa40f48cf9d734487a500":[8,0,2,15,1,1,40,1],
-"dfcc__root__object_8cpp_source.html":[8,0,2,15,1,1,40],
-"dfcc__root__object_8h.html":[8,0,2,15,1,1,41],
-"dfcc__root__object_8h.html#aef107f308db900fd88239b07a892c05b":[8,0,2,15,1,1,41,0],
-"dfcc__root__object_8h_source.html":[8,0,2,15,1,1,41],
-"dfcc__spec__functions_8cpp.html":[8,0,2,15,1,1,42],
-"dfcc__spec__functions_8cpp_source.html":[8,0,2,15,1,1,42],
-"dfcc__spec__functions_8h.html":[8,0,2,15,1,1,43]
+"dfcc__pointer__in__range_8h.html":[8,0,2,15,1,1,39]
 };

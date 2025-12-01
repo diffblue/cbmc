@@ -36,7 +36,7 @@ var classboolbvt =
     [ "convert_bv_typecast", "classboolbvt.html#ae9254234f1bfefb4139204c689e407ee", null ],
     [ "convert_byte_extract", "classboolbvt.html#a2efdca0ab81e8c4d53c8343b31bb748d", null ],
     [ "convert_byte_update", "classboolbvt.html#a7e29eaada26edd6b5f2ead47e4ecac00", null ],
-    [ "convert_case", "classboolbvt.html#ace6fcd133a00b1816b28f8196ee19d08", null ],
+    [ "convert_case", "classboolbvt.html#a73cccff810cdad960ff1d663747b03bb", null ],
     [ "convert_complex", "classboolbvt.html#a2c4a658f486316b812c5bfb5cdc3cddf", null ],
     [ "convert_complex_imag", "classboolbvt.html#a2148226783fd3301dc1147f3b1410347", null ],
     [ "convert_complex_real", "classboolbvt.html#a2b73696145edbb3315c2fd6599020340", null ],

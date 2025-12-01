@@ -310,6 +310,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcond__exprt.html">cond_exprt</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">this is a parametric version of an if-expression: it returns the value of the first case (using the ordering of the operands) whose condition evaluates to true.  <a href="classcond__exprt.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcase__exprt.html">case_exprt</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Case expression: evaluates to the value corresponding to the first matching case.  <a href="classcase__exprt.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classarray__comprehension__exprt.html">array_comprehension_exprt</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expression to define a mapping from an argument (index) to elements.  <a href="classarray__comprehension__exprt.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -890,6 +893,15 @@ Functions</h2></td></tr>
 <tr class="memitem:a44bd6f8e805c16c2978ff0acead997fb" id="r_a44bd6f8e805c16c2978ff0acead997fb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcond__exprt.html">cond_exprt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="std__expr_8h.html#a44bd6f8e805c16c2978ff0acead997fb">to_cond_expr</a> (<a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
 <tr class="memdesc:a44bd6f8e805c16c2978ff0acead997fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cast an exprt to a <a class="el" href="classcond__exprt.html">cond_exprt</a>.    <br /></td></tr>
 <tr class="separator:a44bd6f8e805c16c2978ff0acead997fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a834feaf65014ffdf8a051c999d706e6f" id="r_a834feaf65014ffdf8a051c999d706e6f"><td class="memItemLeft" align="right" valign="top">template&lt;&gt; </td></tr>
+<tr class="memitem:a834feaf65014ffdf8a051c999d706e6f"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classait.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="std__expr_8h.html#a834feaf65014ffdf8a051c999d706e6f">can_cast_expr&lt; case_exprt &gt;</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;base)</td></tr>
+<tr class="separator:a834feaf65014ffdf8a051c999d706e6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab11ebb0bdaf874bf4d0a41e2b16a3867" id="r_ab11ebb0bdaf874bf4d0a41e2b16a3867"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">const</a> <a class="el" href="classcase__exprt.html">case_exprt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="std__expr_8h.html#ab11ebb0bdaf874bf4d0a41e2b16a3867">to_case_expr</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
+<tr class="memdesc:ab11ebb0bdaf874bf4d0a41e2b16a3867"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cast an exprt to a <a class="el" href="classcase__exprt.html">case_exprt</a>.  <br /></td></tr>
+<tr class="separator:ab11ebb0bdaf874bf4d0a41e2b16a3867"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afc338e072ae30ccc3da81922a9b009d4" id="r_afc338e072ae30ccc3da81922a9b009d4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcase__exprt.html">case_exprt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="std__expr_8h.html#afc338e072ae30ccc3da81922a9b009d4">to_case_expr</a> (<a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
+<tr class="memdesc:afc338e072ae30ccc3da81922a9b009d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cast an exprt to a <a class="el" href="classcase__exprt.html">case_exprt</a>.    <br /></td></tr>
+<tr class="separator:afc338e072ae30ccc3da81922a9b009d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3eec676701b1a654234507ad6b25923c" id="r_a3eec676701b1a654234507ad6b25923c"><td class="memItemLeft" align="right" valign="top">template&lt;&gt; </td></tr>
 <tr class="memitem:a3eec676701b1a654234507ad6b25923c"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classait.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="std__expr_8h.html#a3eec676701b1a654234507ad6b25923c">can_cast_expr&lt; array_comprehension_exprt &gt;</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;base)</td></tr>
 <tr class="separator:a3eec676701b1a654234507ad6b25923c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1012,7 +1024,7 @@ template&lt;&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03640">3640</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03758">3758</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
 
 </div>
 </div>
@@ -1196,6 +1208,36 @@ template&lt;&gt; </div>
 
 </div>
 </div>
+<a id="a834feaf65014ffdf8a051c999d706e6f" name="a834feaf65014ffdf8a051c999d706e6f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a834feaf65014ffdf8a051c999d706e6f">&#9670;&#160;</a></span>can_cast_expr&lt; case_exprt &gt;()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">bool</a> <a class="el" href="expr__cast_8h.html#a42363d1890db7dd905e72b2db8e336e7">can_cast_expr</a>&lt; <a class="el" href="classcase__exprt.html">case_exprt</a> &gt; </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>base</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03671">3671</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
+
+</div>
+</div>
 <a id="a5bf216386bc6a3c7df3d6b9d1bd41f8c" name="a5bf216386bc6a3c7df3d6b9d1bd41f8c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5bf216386bc6a3c7df3d6b9d1bd41f8c">&#9670;&#160;</a></span>can_cast_expr&lt; class_method_descriptor_exprt &gt;()</h2>
 
@@ -1222,7 +1264,7 @@ template&lt;&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03778">3778</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03896">3896</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
 
 </div>
 </div>
@@ -1942,7 +1984,7 @@ template&lt;&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03823">3823</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03941">3941</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
 
 </div>
 </div>
@@ -3005,7 +3047,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classarray__comprehension__exprt.html">array_comprehension_exprt</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03657">3657</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03775">3775</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
 
 </div>
 </div>
@@ -3043,7 +3085,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classarray__comprehension__exprt.html">array_comprehension_exprt</a>   </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03667">3667</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03785">3785</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
 
 </div>
 </div>
@@ -3483,6 +3525,82 @@ template&lt;&gt; </div>
 
 </div>
 </div>
+<a id="ab11ebb0bdaf874bf4d0a41e2b16a3867" name="ab11ebb0bdaf874bf4d0a41e2b16a3867"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab11ebb0bdaf874bf4d0a41e2b16a3867">&#9670;&#160;</a></span>to_case_expr() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">const</a> <a class="el" href="classcase__exprt.html">case_exprt</a> &amp; to_case_expr </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Cast an exprt to a <a class="el" href="classcase__exprt.html">case_exprt</a>. </p>
+<p><em>expr</em> must be known to be <a class="el" href="classcase__exprt.html">case_exprt</a>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">expr</td><td>Source expression </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classcase__exprt.html">case_exprt</a> </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03682">3682</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
+
+</div>
+</div>
+<a id="afc338e072ae30ccc3da81922a9b009d4" name="afc338e072ae30ccc3da81922a9b009d4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afc338e072ae30ccc3da81922a9b009d4">&#9670;&#160;</a></span>to_case_expr() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcase__exprt.html">case_exprt</a> &amp; to_case_expr </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Cast an exprt to a <a class="el" href="classcase__exprt.html">case_exprt</a>.   </p>
+<p><em>expr</em> must be known to be <a class="el" href="classcase__exprt.html">case_exprt</a>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">expr</td><td>Source expression </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classcase__exprt.html">case_exprt</a>   </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03691">3691</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
+
+</div>
+</div>
 <a id="a2282aac28bd5b7d8d58e4791df3eaa1b" name="a2282aac28bd5b7d8d58e4791df3eaa1b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2282aac28bd5b7d8d58e4791df3eaa1b">&#9670;&#160;</a></span>to_class_method_descriptor_expr()</h2>
 
@@ -3517,7 +3635,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classclass__method__descriptor__exprt.html">class_method_descriptor_exprt</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03770">3770</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03888">3888</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
 
 </div>
 </div>
@@ -5075,7 +5193,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classnamed__term__exprt.html">named_term_exprt</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03839">3839</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03957">3957</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
 
 </div>
 </div>
@@ -5113,7 +5231,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classarray__comprehension__exprt.html">array_comprehension_exprt</a>   </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03848">3848</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03966">3966</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
 
 </div>
 </div>
@@ -6841,7 +6959,7 @@ template&lt;&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03645">3645</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03763">3763</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
 
 </div>
 </div>
@@ -7009,7 +7127,7 @@ template&lt;&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03746">3746</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03864">3864</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
 
 </div>
 </div>
@@ -7681,7 +7799,7 @@ template&lt;&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03828">3828</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__expr_8h_source.html#l03946">3946</a> of file <a class="el" href="std__expr_8h_source.html">std_expr.h</a>.</p>
 
 </div>
 </div>

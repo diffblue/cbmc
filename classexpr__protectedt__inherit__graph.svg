@@ -126,201 +126,201 @@
 </a>
 </g>
 </g>
-<!-- Node105 -->
-<g id="Node000105" class="node">
-<title>Node105</title>
-<g id="a_Node000105"><a xlink:href="classnondet__padding__exprt.html" target="_top" xlink:title="This expression serves as a placeholder for the bits which have non deterministic value in a larger b...">
+<!-- Node106 -->
+<g id="Node000106" class="node">
+<title>Node106</title>
+<g id="a_Node000106"><a xlink:href="classnondet__padding__exprt.html" target="_top" xlink:title="This expression serves as a placeholder for the bits which have non deterministic value in a larger b...">
 <polygon fill="white" stroke="#666666" points="892,-572.5 767,-572.5 767,-553.5 892,-553.5 892,-572.5"/>
 <text text-anchor="middle" x="829.5" y="-560.5" font-family="Helvetica,sans-Serif" font-size="10.00">nondet_padding_exprt</text>
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node105 -->
-<g id="edge49_Node000001_Node000105" class="edge">
-<title>Node1&#45;&gt;Node105</title>
-<g id="a_edge49_Node000001_Node000105"><a xlink:title=" ">
+<!-- Node1&#45;&gt;Node106 -->
+<g id="edge49_Node000001_Node000106" class="edge">
+<title>Node1&#45;&gt;Node106</title>
+<g id="a_edge49_Node000001_Node000106"><a xlink:title=" ">
 <path fill="none" stroke="#63b8ff" d="M731.11,-538.06C750.58,-543.05 772.84,-548.75 791.16,-553.44"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="731.77,-534.62 721.21,-535.53 730.03,-541.4 731.77,-534.62"/>
 </a>
 </g>
 </g>
-<!-- Node106 -->
-<g id="Node000106" class="node">
-<title>Node106</title>
-<g id="a_Node000106"><a xlink:href="classnullary__exprt.html" target="_top" xlink:title="An expression without operands.">
+<!-- Node107 -->
+<g id="Node000107" class="node">
+<title>Node107</title>
+<g id="a_Node000107"><a xlink:href="classnullary__exprt.html" target="_top" xlink:title="An expression without operands.">
 <polygon fill="#fff0f0" stroke="red" points="870,-535.5 789,-535.5 789,-516.5 870,-516.5 870,-535.5"/>
 <text text-anchor="middle" x="829.5" y="-523.5" font-family="Helvetica,sans-Serif" font-size="10.00">nullary_exprt</text>
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node106 -->
-<g id="edge50_Node000001_Node000106" class="edge">
-<title>Node1&#45;&gt;Node106</title>
-<g id="a_edge50_Node000001_Node000106"><a xlink:title=" ">
+<!-- Node1&#45;&gt;Node107 -->
+<g id="edge50_Node000001_Node000107" class="edge">
+<title>Node1&#45;&gt;Node107</title>
+<g id="a_edge50_Node000001_Node000107"><a xlink:title=" ">
 <path fill="none" stroke="#63b8ff" d="M740.5,-526C756.59,-526 773.78,-526 788.65,-526"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="740.12,-522.5 730.12,-526 740.12,-529.5 740.12,-522.5"/>
-</a>
-</g>
-</g>
-<!-- Node127 -->
-<g id="Node000127" class="node">
-<title>Node127</title>
-<g id="a_Node000127"><a xlink:href="classoverflow__result__exprt.html" target="_top" xlink:title="An expression returning both the result of the arithmetic operation under wrap&#45;around semantics as we...">
-<polygon fill="white" stroke="#666666" points="890.5,-498.5 768.5,-498.5 768.5,-479.5 890.5,-479.5 890.5,-498.5"/>
-<text text-anchor="middle" x="829.5" y="-486.5" font-family="Helvetica,sans-Serif" font-size="10.00">overflow_result_exprt</text>
-</a>
-</g>
-</g>
-<!-- Node1&#45;&gt;Node127 -->
-<g id="edge51_Node000001_Node000127" class="edge">
-<title>Node1&#45;&gt;Node127</title>
-<g id="a_edge51_Node000001_Node000127"><a xlink:title=" ">
-<path fill="none" stroke="#63b8ff" d="M731.11,-513.94C750.58,-508.95 772.84,-503.25 791.16,-498.56"/>
-<polygon fill="#63b8ff" stroke="#63b8ff" points="730.03,-510.6 721.21,-516.47 731.77,-517.38 730.03,-510.6"/>
 </a>
 </g>
 </g>
 <!-- Node128 -->
 <g id="Node000128" class="node">
 <title>Node128</title>
-<g id="a_Node000128"><a xlink:href="classpredicate__exprt.html" target="_top" xlink:title="A base class for expressions that are predicates, i.e., Boolean&#45;typed.">
+<g id="a_Node000128"><a xlink:href="classoverflow__result__exprt.html" target="_top" xlink:title="An expression returning both the result of the arithmetic operation under wrap&#45;around semantics as we...">
+<polygon fill="white" stroke="#666666" points="890.5,-498.5 768.5,-498.5 768.5,-479.5 890.5,-479.5 890.5,-498.5"/>
+<text text-anchor="middle" x="829.5" y="-486.5" font-family="Helvetica,sans-Serif" font-size="10.00">overflow_result_exprt</text>
+</a>
+</g>
+</g>
+<!-- Node1&#45;&gt;Node128 -->
+<g id="edge51_Node000001_Node000128" class="edge">
+<title>Node1&#45;&gt;Node128</title>
+<g id="a_edge51_Node000001_Node000128"><a xlink:title=" ">
+<path fill="none" stroke="#63b8ff" d="M731.11,-513.94C750.58,-508.95 772.84,-503.25 791.16,-498.56"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="730.03,-510.6 721.21,-516.47 731.77,-517.38 730.03,-510.6"/>
+</a>
+</g>
+</g>
+<!-- Node129 -->
+<g id="Node000129" class="node">
+<title>Node129</title>
+<g id="a_Node000129"><a xlink:href="classpredicate__exprt.html" target="_top" xlink:title="A base class for expressions that are predicates, i.e., Boolean&#45;typed.">
 <polygon fill="#fff0f0" stroke="red" points="876,-461.5 783,-461.5 783,-442.5 876,-442.5 876,-461.5"/>
 <text text-anchor="middle" x="829.5" y="-449.5" font-family="Helvetica,sans-Serif" font-size="10.00">predicate_exprt</text>
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node128 -->
-<g id="edge52_Node000001_Node000128" class="edge">
-<title>Node1&#45;&gt;Node128</title>
-<g id="a_edge52_Node000001_Node000128"><a xlink:title=" ">
+<!-- Node1&#45;&gt;Node129 -->
+<g id="edge52_Node000001_Node000129" class="edge">
+<title>Node1&#45;&gt;Node129</title>
+<g id="a_edge52_Node000001_Node000129"><a xlink:title=" ">
 <path fill="none" stroke="#63b8ff" d="M703.81,-510.05C720,-497.67 743.9,-480.85 767,-470 773.95,-466.74 781.62,-463.92 789.12,-461.56"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="701.4,-507.49 695.67,-516.4 705.7,-513.01 701.4,-507.49"/>
-</a>
-</g>
-</g>
-<!-- Node130 -->
-<g id="Node000130" class="node">
-<title>Node130</title>
-<g id="a_Node000130"><a xlink:href="classprophecy__pointer__in__range__exprt.html" target="_top" xlink:title="pointer_in_range (see pointer_in_range_exprt) with prophecy expressions to encode whether a pointer r...">
-<polygon fill="white" stroke="#666666" points="887.5,-424 771.5,-424 771.5,-394 887.5,-394 887.5,-424"/>
-<text text-anchor="start" x="779.5" y="-412" font-family="Helvetica,sans-Serif" font-size="10.00">prophecy_pointer_in</text>
-<text text-anchor="middle" x="829.5" y="-401" font-family="Helvetica,sans-Serif" font-size="10.00">_range_exprt</text>
-</a>
-</g>
-</g>
-<!-- Node1&#45;&gt;Node130 -->
-<g id="edge53_Node000001_Node000130" class="edge">
-<title>Node1&#45;&gt;Node130</title>
-<g id="a_edge53_Node000001_Node000130"><a xlink:title=" ">
-<path fill="none" stroke="#63b8ff" d="M696.03,-508.03C710.65,-487.41 737.1,-453.77 767,-433 771.8,-429.67 777.13,-426.71 782.59,-424.11"/>
-<polygon fill="#63b8ff" stroke="#63b8ff" points="692.99,-506.28 690.18,-516.49 698.75,-510.26 692.99,-506.28"/>
 </a>
 </g>
 </g>
 <!-- Node131 -->
 <g id="Node000131" class="node">
 <title>Node131</title>
-<g id="a_Node000131"><a xlink:href="classprophecy__r__or__w__ok__exprt.html" target="_top" xlink:title="A base class for a predicate that indicates that an address range is ok to read or write or both.">
+<g id="a_Node000131"><a xlink:href="classprophecy__pointer__in__range__exprt.html" target="_top" xlink:title="pointer_in_range (see pointer_in_range_exprt) with prophecy expressions to encode whether a pointer r...">
+<polygon fill="white" stroke="#666666" points="887.5,-424 771.5,-424 771.5,-394 887.5,-394 887.5,-424"/>
+<text text-anchor="start" x="779.5" y="-412" font-family="Helvetica,sans-Serif" font-size="10.00">prophecy_pointer_in</text>
+<text text-anchor="middle" x="829.5" y="-401" font-family="Helvetica,sans-Serif" font-size="10.00">_range_exprt</text>
+</a>
+</g>
+</g>
+<!-- Node1&#45;&gt;Node131 -->
+<g id="edge53_Node000001_Node000131" class="edge">
+<title>Node1&#45;&gt;Node131</title>
+<g id="a_edge53_Node000001_Node000131"><a xlink:title=" ">
+<path fill="none" stroke="#63b8ff" d="M696.03,-508.03C710.65,-487.41 737.1,-453.77 767,-433 771.8,-429.67 777.13,-426.71 782.59,-424.11"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="692.99,-506.28 690.18,-516.49 698.75,-510.26 692.99,-506.28"/>
+</a>
+</g>
+</g>
+<!-- Node132 -->
+<g id="Node000132" class="node">
+<title>Node132</title>
+<g id="a_Node000132"><a xlink:href="classprophecy__r__or__w__ok__exprt.html" target="_top" xlink:title="A base class for a predicate that indicates that an address range is ok to read or write or both.">
 <polygon fill="#fff0f0" stroke="red" points="887.5,-376 771.5,-376 771.5,-346 887.5,-346 887.5,-376"/>
 <text text-anchor="start" x="779.5" y="-364" font-family="Helvetica,sans-Serif" font-size="10.00">prophecy_r_or_w_ok</text>
 <text text-anchor="middle" x="829.5" y="-353" font-family="Helvetica,sans-Serif" font-size="10.00">_exprt</text>
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node131 -->
-<g id="edge54_Node000001_Node000131" class="edge">
-<title>Node1&#45;&gt;Node131</title>
-<g id="a_edge54_Node000001_Node000131"><a xlink:title=" ">
+<!-- Node1&#45;&gt;Node132 -->
+<g id="edge54_Node000001_Node000132" class="edge">
+<title>Node1&#45;&gt;Node132</title>
+<g id="a_edge54_Node000001_Node000132"><a xlink:title=" ">
 <path fill="none" stroke="#63b8ff" d="M690.66,-506.6C701.89,-476.57 727.32,-418.79 767,-385 771.01,-381.58 775.57,-378.62 780.35,-376.05"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="687.26,-505.71 687.16,-516.31 693.84,-508.08 687.26,-505.71"/>
 </a>
 </g>
 </g>
-<!-- Node134 -->
-<g id="Node000134" class="node">
-<title>Node134</title>
-<g id="a_Node000134"><a xlink:href="classternary__exprt.html" target="_top" xlink:title="An expression with three operands.">
+<!-- Node135 -->
+<g id="Node000135" class="node">
+<title>Node135</title>
+<g id="a_Node000135"><a xlink:href="classternary__exprt.html" target="_top" xlink:title="An expression with three operands.">
 <polygon fill="#fff0f0" stroke="red" points="871,-794.5 788,-794.5 788,-775.5 871,-775.5 871,-794.5"/>
 <text text-anchor="middle" x="829.5" y="-782.5" font-family="Helvetica,sans-Serif" font-size="10.00">ternary_exprt</text>
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node134 -->
-<g id="edge55_Node000001_Node000134" class="edge">
-<title>Node1&#45;&gt;Node134</title>
-<g id="a_edge55_Node000001_Node000134"><a xlink:title=" ">
+<!-- Node1&#45;&gt;Node135 -->
+<g id="edge55_Node000001_Node000135" class="edge">
+<title>Node1&#45;&gt;Node135</title>
+<g id="a_edge55_Node000001_Node000135"><a xlink:title=" ">
 <path fill="none" stroke="#63b8ff" d="M684.55,-545.86C686.98,-592.22 699.82,-708.11 767,-767 772.94,-772.21 780.32,-775.91 787.87,-778.54"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="688.04,-545.49 684.13,-535.64 681.05,-545.78 688.04,-545.49"/>
 </a>
 </g>
 </g>
-<!-- Node145 -->
-<g id="Node000145" class="node">
-<title>Node145</title>
-<g id="a_Node000145"><a xlink:href="classunary__exprt.html" target="_top" xlink:title="Generic base class for unary expressions.">
+<!-- Node146 -->
+<g id="Node000146" class="node">
+<title>Node146</title>
+<g id="a_Node000146"><a xlink:href="classunary__exprt.html" target="_top" xlink:title="Generic base class for unary expressions.">
 <polygon fill="#fff0f0" stroke="red" points="867,-327.5 792,-327.5 792,-308.5 867,-308.5 867,-327.5"/>
 <text text-anchor="middle" x="829.5" y="-315.5" font-family="Helvetica,sans-Serif" font-size="10.00">unary_exprt</text>
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node145 -->
-<g id="edge57_Node000001_Node000145" class="edge">
-<title>Node1&#45;&gt;Node145</title>
-<g id="a_edge57_Node000001_Node000145"><a xlink:title=" ">
+<!-- Node1&#45;&gt;Node146 -->
+<g id="edge57_Node000001_Node000146" class="edge">
+<title>Node1&#45;&gt;Node146</title>
+<g id="a_edge57_Node000001_Node000146"><a xlink:title=" ">
 <path fill="none" stroke="#63b8ff" d="M687.13,-506.17C694.23,-467.83 715.15,-383.24 767,-337 773.92,-330.83 782.82,-326.66 791.69,-323.85"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="683.67,-505.64 685.42,-516.09 690.57,-506.84 683.67,-505.64"/>
-</a>
-</g>
-</g>
-<!-- Node191 -->
-<g id="Node000191" class="node">
-<title>Node191</title>
-<g id="a_Node000191"><a xlink:href="classupdate__bit__exprt.html" target="_top" xlink:title="Replaces a sub&#45;range of a bit&#45;vector operand.">
-<polygon fill="white" stroke="#666666" points="879,-290.5 780,-290.5 780,-271.5 879,-271.5 879,-290.5"/>
-<text text-anchor="middle" x="829.5" y="-278.5" font-family="Helvetica,sans-Serif" font-size="10.00">update_bit_exprt</text>
-</a>
-</g>
-</g>
-<!-- Node1&#45;&gt;Node191 -->
-<g id="edge58_Node000001_Node000191" class="edge">
-<title>Node1&#45;&gt;Node191</title>
-<g id="a_edge58_Node000001_Node000191"><a xlink:title=" ">
-<path fill="none" stroke="#63b8ff" d="M685.41,-506.15C689.6,-462.24 705.85,-356.25 767,-299 770.74,-295.5 775.11,-292.68 779.78,-290.4"/>
-<polygon fill="#63b8ff" stroke="#63b8ff" points="681.92,-505.87 684.56,-516.13 688.89,-506.46 681.92,-505.87"/>
 </a>
 </g>
 </g>
 <!-- Node192 -->
 <g id="Node000192" class="node">
 <title>Node192</title>
-<g id="a_Node000192"><a xlink:href="classupdate__bits__exprt.html" target="_top" xlink:title="Replaces a sub&#45;range of a bit&#45;vector operand.">
-<polygon fill="white" stroke="#666666" points="881.5,-253.5 777.5,-253.5 777.5,-234.5 881.5,-234.5 881.5,-253.5"/>
-<text text-anchor="middle" x="829.5" y="-241.5" font-family="Helvetica,sans-Serif" font-size="10.00">update_bits_exprt</text>
+<g id="a_Node000192"><a xlink:href="classupdate__bit__exprt.html" target="_top" xlink:title="Replaces a sub&#45;range of a bit&#45;vector operand.">
+<polygon fill="white" stroke="#666666" points="879,-290.5 780,-290.5 780,-271.5 879,-271.5 879,-290.5"/>
+<text text-anchor="middle" x="829.5" y="-278.5" font-family="Helvetica,sans-Serif" font-size="10.00">update_bit_exprt</text>
 </a>
 </g>
 </g>
 <!-- Node1&#45;&gt;Node192 -->
-<g id="edge59_Node000001_Node000192" class="edge">
+<g id="edge58_Node000001_Node000192" class="edge">
 <title>Node1&#45;&gt;Node192</title>
-<g id="a_edge59_Node000001_Node000192"><a xlink:title=" ">
-<path fill="none" stroke="#63b8ff" d="M684.07,-506.19C685.38,-457.2 695.82,-329.47 767,-262 770.63,-258.56 774.89,-255.77 779.44,-253.51"/>
-<polygon fill="#63b8ff" stroke="#63b8ff" points="680.57,-506.33 683.91,-516.38 687.57,-506.44 680.57,-506.33"/>
+<g id="a_edge58_Node000001_Node000192"><a xlink:title=" ">
+<path fill="none" stroke="#63b8ff" d="M685.41,-506.15C689.6,-462.24 705.85,-356.25 767,-299 770.74,-295.5 775.11,-292.68 779.78,-290.4"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="681.92,-505.87 684.56,-516.13 688.89,-506.46 681.92,-505.87"/>
 </a>
 </g>
 </g>
 <!-- Node193 -->
 <g id="Node000193" class="node">
 <title>Node193</title>
-<g id="a_Node000193"><a xlink:href="classwith__exprt.html" target="_top" xlink:title="Operator to update elements in structs and arrays.">
+<g id="a_Node000193"><a xlink:href="classupdate__bits__exprt.html" target="_top" xlink:title="Replaces a sub&#45;range of a bit&#45;vector operand.">
+<polygon fill="white" stroke="#666666" points="881.5,-253.5 777.5,-253.5 777.5,-234.5 881.5,-234.5 881.5,-253.5"/>
+<text text-anchor="middle" x="829.5" y="-241.5" font-family="Helvetica,sans-Serif" font-size="10.00">update_bits_exprt</text>
+</a>
+</g>
+</g>
+<!-- Node1&#45;&gt;Node193 -->
+<g id="edge59_Node000001_Node000193" class="edge">
+<title>Node1&#45;&gt;Node193</title>
+<g id="a_edge59_Node000001_Node000193"><a xlink:title=" ">
+<path fill="none" stroke="#63b8ff" d="M684.07,-506.19C685.38,-457.2 695.82,-329.47 767,-262 770.63,-258.56 774.89,-255.77 779.44,-253.51"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="680.57,-506.33 683.91,-516.38 687.57,-506.44 680.57,-506.33"/>
+</a>
+</g>
+</g>
+<!-- Node194 -->
+<g id="Node000194" class="node">
+<title>Node194</title>
+<g id="a_Node000194"><a xlink:href="classwith__exprt.html" target="_top" xlink:title="Operator to update elements in structs and arrays.">
 <polygon fill="white" stroke="#666666" points="863.5,-216.5 795.5,-216.5 795.5,-197.5 863.5,-197.5 863.5,-216.5"/>
 <text text-anchor="middle" x="829.5" y="-204.5" font-family="Helvetica,sans-Serif" font-size="10.00">with_exprt</text>
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node193 -->
-<g id="edge60_Node000001_Node000193" class="edge">
-<title>Node1&#45;&gt;Node193</title>
-<g id="a_edge60_Node000001_Node000193"><a xlink:title=" ">
+<!-- Node1&#45;&gt;Node194 -->
+<g id="edge60_Node000001_Node000194" class="edge">
+<title>Node1&#45;&gt;Node194</title>
+<g id="a_edge60_Node000001_Node000194"><a xlink:title=" ">
 <path fill="none" stroke="#63b8ff" d="M686.78,-506.16C695.66,-445.55 725.23,-264.59 767,-225 774.67,-217.73 785.12,-213.38 795.22,-210.78"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="683.28,-505.91 685.32,-516.3 690.21,-506.9 683.28,-505.91"/>
 </a>
@@ -1081,10 +1081,10 @@
 </a>
 </g>
 </g>
-<!-- Node134&#45;&gt;Node8 -->
-<g id="edge56_Node000134_Node000008" class="edge">
-<title>Node134&#45;&gt;Node8</title>
-<g id="a_edge56_Node000134_Node000008"><a xlink:title=" ">
+<!-- Node135&#45;&gt;Node8 -->
+<g id="edge56_Node000135_Node000008" class="edge">
+<title>Node135&#45;&gt;Node8</title>
+<g id="a_edge56_Node000135_Node000008"><a xlink:title=" ">
 <path fill="none" stroke="#63b8ff" d="M880.2,-793.98C884.74,-796.55 888.82,-799.83 892,-804 929.69,-853.41 868.88,-1316.41 910,-1363 921.42,-1375.95 939.58,-1380.3 956.48,-1381.07"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="881.56,-790.75 871,-789.84 878.69,-797.14 881.56,-790.75"/>
 </a>
