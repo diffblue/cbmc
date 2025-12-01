@@ -3578,6 +3578,124 @@ inline cond_exprt &to_cond_expr(exprt &expr)
   return ret;
 }
 
+/// \brief Case expression: evaluates to the value corresponding to the first
+/// matching case. The first operand is the value to compare against. Subsequent
+/// operands alternate between compare values and result values.  The syntax is:
+/// case(select_value, case1_value, result1, case2_value, result2, ...)
+class case_exprt : public multi_ary_exprt
+{
+public:
+  case_exprt(operandst _operands, typet _type)
+    : multi_ary_exprt(ID_case, std::move(_operands), std::move(_type))
+  {
+  }
+
+  /// Constructor with select value
+  case_exprt(exprt _select_value, typet _type)
+    : multi_ary_exprt(ID_case, {std::move(_select_value)}, std::move(_type))
+  {
+  }
+
+  /// Get the value that is being compared against
+  const exprt &select_value() const
+  {
+    PRECONDITION(!operands().empty());
+    return operands()[0];
+  }
+
+  /// Get the value that is being compared against
+  exprt &select_value()
+  {
+    PRECONDITION(!operands().empty());
+    return operands()[0];
+  }
+
+  /// Add a case: value to compare and corresponding result
+  /// \param case_value: the value to compare against select_value
+  /// \param result_value: the value to return if case_value matches
+  ///   select_value
+  void add_case(const exprt &case_value, const exprt &result_value)
+  {
+    operands().reserve(operands().size() + 2);
+    operands().push_back(case_value);
+    operands().push_back(result_value);
+  }
+
+  /// Get the number of cases (excluding the select value)
+  std::size_t number_of_cases() const
+  {
+    PRECONDITION(operands().size() >= 1);
+    return (operands().size() - 1) / 2;
+  }
+
+  /// Get the case value for the i-th case
+  const exprt &case_value(std::size_t i) const
+  {
+    PRECONDITION(i < number_of_cases());
+    return operands()[1 + 2 * i];
+  }
+
+  /// Get the case value for the i-th case
+  exprt &case_value(std::size_t i)
+  {
+    PRECONDITION(i < number_of_cases());
+    return operands()[1 + 2 * i];
+  }
+
+  /// Get the result value for the i-th case
+  const exprt &result_value(std::size_t i) const
+  {
+    PRECONDITION(i < number_of_cases());
+    return operands()[1 + 2 * i + 1];
+  }
+
+  /// Get the result value for the i-th case
+  exprt &result_value(std::size_t i)
+  {
+    PRECONDITION(i < number_of_cases());
+    return operands()[1 + 2 * i + 1];
+  }
+
+  static void validate_expr(const case_exprt &value)
+  {
+    DATA_INVARIANT(
+      value.operands().size() >= 1,
+      "case expression must have at least one operand");
+    DATA_INVARIANT(
+      value.operands().size() % 2 == 1,
+      "case expression must have odd number of operands");
+  }
+};
+
+template <>
+inline bool can_cast_expr<case_exprt>(const exprt &base)
+{
+  return base.id() == ID_case;
+}
+
+/// \brief Cast an exprt to a \ref case_exprt
+///
+/// \a expr must be known to be \ref case_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref case_exprt
+inline const case_exprt &to_case_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_case);
+  const case_exprt &ret = static_cast<const case_exprt &>(expr);
+  case_exprt::validate_expr(ret);
+  return ret;
+}
+
+/// \copydoc to_case_expr(const exprt &)
+inline case_exprt &to_case_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_case);
+  case_exprt &ret = static_cast<case_exprt &>(expr);
+  case_exprt::validate_expr(ret);
+  return ret;
+}
+
 /// \brief Expression to define a mapping from an argument (index) to elements.
 /// This enables constructing an array via an anonymous function.
 /// Not all kinds of array comprehension can be expressed, only those of the

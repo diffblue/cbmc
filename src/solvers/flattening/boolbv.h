@@ -185,7 +185,7 @@ protected:
   virtual bvt convert_update(const update_exprt &);
   virtual bvt convert_update_bit(const update_bit_exprt &);
   virtual bvt convert_update_bits(const update_bits_exprt &);
-  virtual bvt convert_case(const exprt &expr);
+  virtual bvt convert_case(const case_exprt &);
   virtual bvt convert_cond(const cond_exprt &);
   virtual bvt convert_shift(const binary_exprt &expr);
   virtual bvt convert_bitwise(const exprt &expr);
