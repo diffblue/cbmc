@@ -68,7 +68,7 @@ public:
 
   // Manager is required to be able to resize the thread vector
   guard_managert &guard_manager;
-  symex_target_equationt *symex_target;
+  symex_target_equationt *symex_target = nullptr;
 
   symex_level1t level1;
 
@@ -217,14 +217,14 @@ public:
   goto_programt::const_targett saved_target;
 
   /// \brief This state is saved, with the PC pointing to the target of a GOTO
-  bool has_saved_jump_target;
+  bool has_saved_jump_target = false;
 
   /// \brief This state is saved, with the PC pointing to the next instruction
   /// of a GOTO
-  bool has_saved_next_instruction;
+  bool has_saved_next_instruction = false;
 
   /// \brief Should the additional validation checks be run?
-  bool run_validation_checks;
+  bool run_validation_checks = false;
 
   unsigned total_vccs = 0;
   unsigned remaining_vccs = 0;
