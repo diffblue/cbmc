@@ -3265,8 +3265,9 @@ exprt c_typecheck_baset::do_special_functions(
 
     return typecast_exprt::conditional_cast(isfinite_expr, expr.type());
   }
-  else if(identifier==CPROVER_PREFIX "inf" ||
-          identifier=="__builtin_inf")
+  else if(
+    identifier == CPROVER_PREFIX "inf" || identifier == "__builtin_inf" ||
+    identifier == "__builtin_huge_val")
   {
     constant_exprt inf_expr=
       ieee_floatt::plus_infinity(
@@ -3275,7 +3276,9 @@ exprt c_typecheck_baset::do_special_functions(
 
     return std::move(inf_expr);
   }
-  else if(identifier==CPROVER_PREFIX "inff")
+  else if(
+    identifier == CPROVER_PREFIX "inff" || identifier == "__builtin_inff" ||
+    identifier == "__builtin_huge_valf")
   {
     constant_exprt inff_expr=
       ieee_floatt::plus_infinity(
@@ -3284,7 +3287,9 @@ exprt c_typecheck_baset::do_special_functions(
 
     return std::move(inff_expr);
   }
-  else if(identifier==CPROVER_PREFIX "infl")
+  else if(
+    identifier == CPROVER_PREFIX "infl" || identifier == "__builtin_infl" ||
+    identifier == "__builtin_huge_vall")
   {
     floatbv_typet type=to_floatbv_type(long_double_type());
     constant_exprt infl_expr=
