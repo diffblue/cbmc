@@ -103,6 +103,7 @@ $(document).ready(function(){initNavTree('time_8c.html',''); initResizable(); })
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;time.h&gt;</code><br />
+<code>#include &lt;errno.h&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for time.c:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
@@ -117,6 +118,8 @@ $(document).ready(function(){initNavTree('time_8c.html',''); initResizable(); })
 Macros</h2></td></tr>
 <tr class="memitem:adebaf8632e9832a927e701626da8b2c2" id="r_adebaf8632e9832a927e701626da8b2c2"><td class="memItemLeft" align="right" valign="top">#<a class="el" href="classait.html">define</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="time_8c.html#adebaf8632e9832a927e701626da8b2c2">__CPROVER_TIME_H_INCLUDED</a></td></tr>
 <tr class="separator:adebaf8632e9832a927e701626da8b2c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a40c164fa2b2bf09a2ec154c97be511cc" id="r_a40c164fa2b2bf09a2ec154c97be511cc"><td class="memItemLeft" align="right" valign="top">#<a class="el" href="classait.html">define</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="time_8c.html#a40c164fa2b2bf09a2ec154c97be511cc">__CPROVER_ERRNO_H_INCLUDED</a></td></tr>
+<tr class="separator:a40c164fa2b2bf09a2ec154c97be511cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -148,8 +151,30 @@ Functions</h2></td></tr>
 <tr class="separator:a799a7d1f07bd22d9426dbf526bb2605a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adb76906b468e8401a3c78d3e1b0d2fdb" id="r_adb76906b468e8401a3c78d3e1b0d2fdb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">__CPROVER_size_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="time_8c.html#adb76906b468e8401a3c78d3e1b0d2fdb">_strftime</a> (<a class="el" href="classait.html">char</a> *s, <a class="el" href="classait.html">__CPROVER_size_t</a> max, <a class="el" href="classait.html">const</a> <a class="el" href="classait.html">char</a> *<a class="el" href="format_8h.html#a4a6445d805fb99794bce4eb73280fbe2">format</a>, <a class="el" href="classait.html">const</a> <a class="el" href="classait.html">struct</a> <a class="el" href="classait.html">tm</a> *<a class="el" href="classait.html">tm</a>)</td></tr>
 <tr class="separator:adb76906b468e8401a3c78d3e1b0d2fdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a04daf060736c4b84b8132b745409c7cf" id="r_a04daf060736c4b84b8132b745409c7cf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="time_8c.html#a04daf060736c4b84b8132b745409c7cf">__VERIFIER_nondet_int</a> (<a class="el" href="classait.html">void</a>)</td></tr>
+<tr class="separator:a04daf060736c4b84b8132b745409c7cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afdcc836c0043b83bdf4f5fa3005fc649" id="r_afdcc836c0043b83bdf4f5fa3005fc649"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">long</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="time_8c.html#afdcc836c0043b83bdf4f5fa3005fc649">__VERIFIER_nondet_long</a> (<a class="el" href="classait.html">void</a>)</td></tr>
+<tr class="separator:afdcc836c0043b83bdf4f5fa3005fc649"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac686a89baec3a10f53c1565f4d451fce" id="r_ac686a89baec3a10f53c1565f4d451fce"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="time_8c.html#ac686a89baec3a10f53c1565f4d451fce">clock_gettime</a> (<a class="el" href="classait.html">clockid_t</a> <a class="el" href="classait.html">clockid</a>, <a class="el" href="classait.html">struct</a> <a class="el" href="classait.html">timespec</a> *<a class="el" href="classait.html">tp</a>)</td></tr>
+<tr class="separator:ac686a89baec3a10f53c1565f4d451fce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="a40c164fa2b2bf09a2ec154c97be511cc" name="a40c164fa2b2bf09a2ec154c97be511cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a40c164fa2b2bf09a2ec154c97be511cc">&#9670;&#160;</a></span>__CPROVER_ERRNO_H_INCLUDED</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#<a class="el" href="classait.html">define</a> __CPROVER_ERRNO_H_INCLUDED</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="time_8c_source.html#l00293">293</a> of file <a class="el" href="time_8c_source.html">time.c</a>.</p>
+
+</div>
+</div>
 <a id="adebaf8632e9832a927e701626da8b2c2" name="adebaf8632e9832a927e701626da8b2c2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#adebaf8632e9832a927e701626da8b2c2">&#9670;&#160;</a></span>__CPROVER_TIME_H_INCLUDED</h2>
 
@@ -184,6 +209,42 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="time_8c_source.html#l00027">27</a> of file <a class="el" href="time_8c_source.html">time.c</a>.</p>
+
+</div>
+</div>
+<a id="a04daf060736c4b84b8132b745409c7cf" name="a04daf060736c4b84b8132b745409c7cf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a04daf060736c4b84b8132b745409c7cf">&#9670;&#160;</a></span>__VERIFIER_nondet_int()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">int</a> __VERIFIER_nondet_int </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classait.html">void</a>&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afdcc836c0043b83bdf4f5fa3005fc649" name="afdcc836c0043b83bdf4f5fa3005fc649"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afdcc836c0043b83bdf4f5fa3005fc649">&#9670;&#160;</a></span>__VERIFIER_nondet_long()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">long</a> __VERIFIER_nondet_long </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classait.html">void</a>&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -282,6 +343,36 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="time_8c_source.html#l00202">202</a> of file <a class="el" href="time_8c_source.html">time.c</a>.</p>
+
+</div>
+</div>
+<a id="ac686a89baec3a10f53c1565f4d451fce" name="ac686a89baec3a10f53c1565f4d451fce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac686a89baec3a10f53c1565f4d451fce">&#9670;&#160;</a></span>clock_gettime()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">int</a> clock_gettime </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classait.html">clockid_t</a>&#160;</td>
+          <td class="paramname"><em>clockid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classait.html">struct</a> <a class="el" href="classait.html">timespec</a> *&#160;</td>
+          <td class="paramname"><em>tp</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="time_8c_source.html#l00304">304</a> of file <a class="el" href="time_8c_source.html">time.c</a>.</p>
 
 </div>
 </div>

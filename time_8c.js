@@ -1,11 +1,15 @@
 var time_8c =
 [
+    [ "__CPROVER_ERRNO_H_INCLUDED", "time_8c.html#a40c164fa2b2bf09a2ec154c97be511cc", null ],
     [ "__CPROVER_TIME_H_INCLUDED", "time_8c.html#adebaf8632e9832a927e701626da8b2c2", null ],
     [ "__time64", "time_8c.html#ac40082accb2b6bbee27214b71cf3e5e1", null ],
+    [ "__VERIFIER_nondet_int", "time_8c.html#a04daf060736c4b84b8132b745409c7cf", null ],
+    [ "__VERIFIER_nondet_long", "time_8c.html#afdcc836c0043b83bdf4f5fa3005fc649", null ],
     [ "__VERIFIER_nondet_size_t", "time_8c.html#a9dccb3de4f5f2356ce92c1113b9b07e7", null ],
     [ "__VERIFIER_nondet_time_t", "time_8c.html#a1de3ee87d6aca904fcc300736bc4814f", null ],
     [ "_strftime", "time_8c.html#adb76906b468e8401a3c78d3e1b0d2fdb", null ],
     [ "asctime", "time_8c.html#a068d11e0d50eab73920a3162d2ac9202", null ],
+    [ "clock_gettime", "time_8c.html#ac686a89baec3a10f53c1565f4d451fce", null ],
     [ "ctime", "time_8c.html#a185521f2c273b9697eb1e536a37912fb", null ],
     [ "gmtime", "time_8c.html#a45947c1111353d6fd6efbda8a527854c", null ],
     [ "gmtime_r", "time_8c.html#a4c28ac7a000b8c261267a589f728a1b3", null ],
