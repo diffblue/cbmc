@@ -877,21 +877,23 @@ static smt_termt convert_expr_to_smt(
     "Objects should be tracked before converting their address to SMT terms");
   const std::size_t object_id = object->second.unique_id;
   const std::size_t object_bits = config.bv_encoding.object_bits;
-  const std::size_t max_objects = std::size_t(1) << object_bits;
+  const mp_integer max_objects = power(2, object_bits);
   if(object_id >= max_objects)
   {
     throw analysis_exceptiont{
       "too many addressed objects: maximum number of objects is set to 2^n=" +
-      std::to_string(max_objects) + " (with n=" + std::to_string(object_bits) +
+      integer2string(max_objects) + " (with n=" + std::to_string(object_bits) +
       "); " +
       "use the `--object-bits n` option to increase the maximum number"};
   }
   const smt_termt object_bit_vector =
     smt_bit_vector_constant_termt{object_id, object_bits};
-  INVARIANT(
-    type->get_width() > object_bits,
-    "Pointer should be wider than object_bits in order to allow for offset "
-    "encoding.");
+  if(type->get_width() <= object_bits)
+  {
+    throw analysis_exceptiont{
+      "pointer should be wider than object_bits in order to allow for offset "
+      "encoding"};
+  }
   const size_t offset_bits = type->get_width() - object_bits;
   if(expr_try_dynamic_cast<symbol_exprt>(address_of.object()))
   {
