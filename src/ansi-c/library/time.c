@@ -280,3 +280,72 @@ __CPROVER_size_t _strftime(
   s[length] = '\0';
   return length;
 }
+
+/* FUNCTION: clock_gettime */
+
+#ifndef __CPROVER_TIME_H_INCLUDED
+#  include <time.h>
+#  define __CPROVER_TIME_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+int __VERIFIER_nondet_int(void);
+time_t __VERIFIER_nondet_time_t(void);
+long __VERIFIER_nondet_long(void);
+
+#ifdef _WIN32
+typedef int clockid_t;
+#endif
+
+int clock_gettime(clockid_t clockid, struct timespec *tp)
+{
+__CPROVER_HIDE:;
+
+  // Use the clockid parameter (all clock types are modeled the same way)
+  (void)clockid;
+
+  // Check for null pointer - should set errno to EFAULT
+  // Some systems have C headers where `tp` is annotated to be nonnull
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnonnull-compare"
+  if(!tp)
+  {
+    errno = EFAULT;
+    return -1;
+  }
+#pragma GCC diagnostic pop
+
+  // Non-deterministically choose success or failure
+  int result = __VERIFIER_nondet_int();
+
+  if(result == 0)
+  {
+    // Success case: fill in the timespec structure with non-deterministic but valid values
+    time_t sec = __VERIFIER_nondet_time_t();
+    // Assume reasonable time values (non-negative for typical use cases)
+    __CPROVER_assume(sec >= 0);
+    tp->tv_sec = sec;
+
+    // Nanoseconds should be between 0 and 999,999,999
+    long nanosec = __VERIFIER_nondet_long();
+    __CPROVER_assume(nanosec >= 0 && nanosec <= 999999999L);
+    tp->tv_nsec = nanosec;
+
+    return 0;
+  }
+  else
+  {
+    // Failure case: set errno and return -1
+    int error_code = __VERIFIER_nondet_int();
+    // Most common error codes for clock_gettime
+    __CPROVER_assume(
+      error_code == EINVAL || error_code == EACCES || error_code == ENODEV ||
+      error_code == ENOTSUP || error_code == EOVERFLOW || error_code == EPERM);
+    errno = error_code;
+    return -1;
+  }
+}
