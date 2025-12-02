@@ -72,8 +72,8 @@ void goto_symext::symex_allocate(
   {
     // to allow constant propagation
     exprt tmp_size = state.rename(size, ns).get();
-    simplify_expr_with_value_sett{state.value_set, language_mode, ns}.simplify(
-      tmp_size);
+    simplify_expr_with_value_sett{state.value_set, state.language_mode, ns}
+      .simplify(tmp_size);
 
     // special treatment for sizeof(T)*x
     {
@@ -167,8 +167,8 @@ void goto_symext::symex_allocate(
 
   // to allow constant propagation
   exprt zero_init = state.rename(to_binary_expr(code).op1(), ns).get();
-  simplify_expr_with_value_sett{state.value_set, language_mode, ns}.simplify(
-    zero_init);
+  simplify_expr_with_value_sett{state.value_set, state.language_mode, ns}
+    .simplify(zero_init);
 
   INVARIANT(
     zero_init.is_constant(), "allocate expects constant as second argument");
@@ -433,7 +433,7 @@ void goto_symext::symex_printf(
   }
 
   const irep_idt format_string =
-    get_string_argument(operands[0], state.value_set, language_mode, ns);
+    get_string_argument(operands[0], state.value_set, state.language_mode, ns);
 
   if(!format_string.empty())
     target.output_fmt(
@@ -459,7 +459,7 @@ void goto_symext::symex_input(
   }
 
   const irep_idt input_id =
-    get_string_argument(id_arg, state.value_set, language_mode, ns);
+    get_string_argument(id_arg, state.value_set, state.language_mode, ns);
 
   target.input(state.guard.as_expr(), state.source, input_id, args);
 }
@@ -478,14 +478,15 @@ void goto_symext::symex_output(
     renamedt<exprt, L2> l2_arg = state.rename(code.operands()[i], ns);
     if(symex_config.simplify_opt)
     {
-      simplify_expr_with_value_sett simp{state.value_set, language_mode, ns};
+      simplify_expr_with_value_sett simp{
+        state.value_set, state.language_mode, ns};
       l2_arg.simplify(simp);
     }
     args.emplace_back(l2_arg);
   }
 
   const irep_idt output_id =
-    get_string_argument(id_arg, state.value_set, language_mode, ns);
+    get_string_argument(id_arg, state.value_set, state.language_mode, ns);
 
   target.output(state.guard.as_expr(), state.source, output_id, args);
 }

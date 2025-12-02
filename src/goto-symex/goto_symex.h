@@ -235,10 +235,6 @@ protected:
   messaget::mstreamt &
   print_callstack_entry(const symex_targett::sourcet &target);
 
-  /// language_mode: ID_java, ID_C or another language identifier
-  /// if we know the source language in use, irep_idt() otherwise.
-  irep_idt language_mode;
-
   /// The symbol table associated with the goto-program being executed.
   /// This symbol table will not have objects that are dynamically created as
   /// part of symbolic execution added to it; those object are stored in the

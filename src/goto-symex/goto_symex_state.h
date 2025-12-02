@@ -258,8 +258,11 @@ public:
            lvalue.id() == ID_array;
   }
 
-private:
+  /// language_mode: ID_java, ID_C or another language identifier
+  /// if we know the source language in use, irep_idt() otherwise.
   const irep_idt &language_mode;
+
+private:
   std::function<std::size_t(const irep_idt &)> fresh_l2_name_provider;
 
   /// \brief Dangerous, do not use

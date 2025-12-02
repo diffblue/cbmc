@@ -220,7 +220,7 @@ goto_symext::cache_dereference(exprt &dereference_result, statet &state)
                              "symex",
                              "dereference_cache",
                              dereference_result.source_location(),
-                             language_mode,
+                             state.language_mode,
                              ns,
                              state.symbol_table)
                              .symbol_expr();
@@ -236,7 +236,6 @@ goto_symext::cache_dereference(exprt &dereference_result, statet &state)
     symex_targett::assignment_typet::STATE,
     ns,
     symex_config,
-    language_mode,
     target};
 
   assign.assign_symbol(
@@ -328,7 +327,7 @@ void goto_symext::dereference_rec(
       ns,
       state.symbol_table,
       symex_dereference_state,
-      language_mode,
+      state.language_mode,
       expr_is_not_null,
       log.get_message_handler());
 

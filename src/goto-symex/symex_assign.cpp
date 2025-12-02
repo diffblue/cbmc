@@ -207,8 +207,8 @@ void symex_assignt::assign_non_struct_symbol(
 
   if(symex_config.simplify_opt)
   {
-    simplify_expr_with_value_sett{state.value_set, language_mode, ns}.simplify(
-      assignment.rhs);
+    simplify_expr_with_value_sett{state.value_set, state.language_mode, ns}
+      .simplify(assignment.rhs);
   }
 
   const ssa_exprt l2_lhs = state

@@ -418,7 +418,7 @@ std::unique_ptr<goto_symext::statet> goto_symext::initialize_entry_point_state(
     symex_targett::sourcet(entry_point_id, start_function->body),
     symex_config.max_field_sensitivity_array_size,
     symex_config.simplify_opt,
-    language_mode,
+    ns.lookup(entry_point_id).mode,
     guard_manager,
     [storage](const irep_idt &id) { return storage->get_unique_l2_index(id); });
 
@@ -821,7 +821,7 @@ void goto_symext::try_filter_value_sets(
 
     const bool exclude_null_derefs = false;
     if(value_set_dereferencet::should_ignore_value(
-         value_set_element, exclude_null_derefs, language_mode))
+         value_set_element, exclude_null_derefs, state.language_mode))
     {
       continue;
     }
