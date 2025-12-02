@@ -170,6 +170,7 @@ SRC += analyses/ai/ai.cpp \
        util/interval/subtract.cpp \
        util/interval/to_string.cpp \
        util/interval_constraint.cpp \
+       util/interval_template.cpp \
        util/interval_union.cpp \
        util/irep.cpp \
        util/irep_sharing.cpp \
