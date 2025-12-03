@@ -20,7 +20,7 @@
 <!-- Node7 -->
 <g id="Node000007" class="node">
 <title>Node7</title>
-<g id="a_Node000007"><a xlink:href="classand__exprt.html" target="_top" xlink:title="Boolean AND.">
+<g id="a_Node000007"><a xlink:href="classand__exprt.html" target="_top" xlink:title="Boolean AND All operands must be boolean, and the result is always boolean.">
 <polygon fill="white" stroke="#666666" points="988.5,-919 923.5,-919 923.5,-900 988.5,-900 988.5,-919"/>
 <text text-anchor="middle" x="956" y="-907" font-family="Helvetica,sans-Serif" font-size="10.00">and_exprt</text>
 </a>
@@ -74,7 +74,7 @@
 <!-- Node10 -->
 <g id="Node000010" class="node">
 <title>Node10</title>
-<g id="a_Node000010"><a xlink:href="classbitand__exprt.html" target="_top" xlink:title="Bit&#45;wise AND.">
+<g id="a_Node000010"><a xlink:href="classbitand__exprt.html" target="_top" xlink:title="Bit&#45;wise AND Any number of operands that is greater or equal one.">
 <polygon fill="white" stroke="#666666" points="995,-808 917,-808 917,-789 995,-789 995,-808"/>
 <text text-anchor="middle" x="956" y="-796" font-family="Helvetica,sans-Serif" font-size="10.00">bitand_exprt</text>
 </a>
@@ -128,7 +128,7 @@
 <!-- Node13 -->
 <g id="Node000013" class="node">
 <title>Node13</title>
-<g id="a_Node000013"><a xlink:href="classbitor__exprt.html" target="_top" xlink:title="Bit&#45;wise OR.">
+<g id="a_Node000013"><a xlink:href="classbitor__exprt.html" target="_top" xlink:title="Bit&#45;wise OR Any number of operands that is greater or equal one.">
 <polygon fill="white" stroke="#666666" points="991,-697 921,-697 921,-678 991,-678 991,-697"/>
 <text text-anchor="middle" x="956" y="-685" font-family="Helvetica,sans-Serif" font-size="10.00">bitor_exprt</text>
 </a>
@@ -164,7 +164,7 @@
 <!-- Node15 -->
 <g id="Node000015" class="node">
 <title>Node15</title>
-<g id="a_Node000015"><a xlink:href="classbitxor__exprt.html" target="_top" xlink:title="Bit&#45;wise XOR.">
+<g id="a_Node000015"><a xlink:href="classbitxor__exprt.html" target="_top" xlink:title="Bit&#45;wise XOR Any number of operands that is greater or equal one.">
 <polygon fill="white" stroke="#666666" points="993.5,-623 918.5,-623 918.5,-604 993.5,-604 993.5,-623"/>
 <text text-anchor="middle" x="956" y="-611" font-family="Helvetica,sans-Serif" font-size="10.00">bitxor_exprt</text>
 </a>
@@ -290,7 +290,7 @@
 <!-- Node22 -->
 <g id="Node000022" class="node">
 <title>Node22</title>
-<g id="a_Node000022"><a xlink:href="classor__exprt.html" target="_top" xlink:title="Boolean OR.">
+<g id="a_Node000022"><a xlink:href="classor__exprt.html" target="_top" xlink:title="Boolean OR All operands must be boolean, and the result is always boolean.">
 <polygon fill="white" stroke="#666666" points="984.5,-364 927.5,-364 927.5,-345 984.5,-345 984.5,-364"/>
 <text text-anchor="middle" x="956" y="-352" font-family="Helvetica,sans-Serif" font-size="10.00">or_exprt</text>
 </a>
@@ -453,7 +453,7 @@
 <!-- Node32 -->
 <g id="Node000032" class="node">
 <title>Node32</title>
-<g id="a_Node000032"><a xlink:href="classxor__exprt.html" target="_top" xlink:title="Boolean XOR.">
+<g id="a_Node000032"><a xlink:href="classxor__exprt.html" target="_top" xlink:title="Boolean XOR All operands must be boolean, and the result is always boolean.">
 <polygon fill="white" stroke="#666666" points="987,-19 925,-19 925,0 987,0 987,-19"/>
 <text text-anchor="middle" x="956" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">xor_exprt</text>
 </a>
