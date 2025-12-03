@@ -2119,8 +2119,9 @@ inline typecast_exprt &to_typecast_expr(exprt &expr)
   return static_cast<typecast_exprt &>(expr);
 }
 
-
 /// \brief Boolean AND
+/// All operands must be boolean, and the result is always boolean.
+/// Any number of operands that is greater or equal one.
 class and_exprt:public multi_ary_exprt
 {
 public:
@@ -2189,6 +2190,8 @@ inline and_exprt &to_and_expr(exprt &expr)
 
 /// \brief Boolean NAND
 ///
+/// All operands must be boolean, and the result is always boolean.
+/// Any number of operands that is greater or equal one.
 /// When given one operand, this is equivalent to the negation.
 /// When given three or more operands, this is equivalent to the negation
 /// of the and expression with the same operands.
@@ -2269,8 +2272,9 @@ inline implies_exprt &to_implies_expr(exprt &expr)
   return ret;
 }
 
-
 /// \brief Boolean OR
+/// All operands must be boolean, and the result is always boolean.
+/// Any number of operands that is greater or equal one.
 class or_exprt:public multi_ary_exprt
 {
 public:
@@ -2334,6 +2338,8 @@ inline or_exprt &to_or_expr(exprt &expr)
 
 /// \brief Boolean NOR
 ///
+/// All operands must be boolean, and the result is always boolean.
+/// Any number of operands that is greater or equal one.
 /// When given one operand, this is equivalent to the negation.
 /// When given three or more operands, this is equivalent to the negation
 /// of the and expression with the same operands.
@@ -2371,6 +2377,8 @@ inline nor_exprt &to_nor_expr(exprt &expr)
 }
 
 /// \brief Boolean XOR
+/// All operands must be boolean, and the result is always boolean.
+/// Any number of operands that is greater or equal one.
 class xor_exprt:public multi_ary_exprt
 {
 public:
