@@ -121,6 +121,8 @@ inline bitnot_exprt &to_bitnot_expr(exprt &expr)
 }
 
 /// \brief Bit-wise OR
+/// Any number of operands that is greater or equal one.
+/// The type of all operands must be the same.
 class bitor_exprt : public multi_ary_exprt
 {
 public:
@@ -162,6 +164,8 @@ inline bitor_exprt &to_bitor_expr(exprt &expr)
 
 /// \brief Bit-wise NOR
 ///
+/// Any number of operands that is greater or equal one.
+/// The type of all operands must be the same.
 /// When given one operand, this is equivalent to the bit-wise negation.
 /// When given three or more operands, this is equivalent to the bit-wise
 /// negation of the bitand expression with the same operands.
@@ -205,6 +209,8 @@ inline bitnor_exprt &to_bitnor_expr(exprt &expr)
 }
 
 /// \brief Bit-wise XOR
+/// Any number of operands that is greater or equal one.
+/// The type of all operands must be the same.
 class bitxor_exprt : public multi_ary_exprt
 {
 public:
@@ -246,6 +252,8 @@ inline bitxor_exprt &to_bitxor_expr(exprt &expr)
 
 /// \brief Bit-wise XNOR
 ///
+/// Any number of operands that is greater or equal one.
+/// The type of all operands must be the same.
 /// When given one operand, this is equivalent to the bit-wise negation.
 /// When given three or more operands, this is equivalent to the bit-wise
 /// negation of the bitxor expression with the same operands.
@@ -291,6 +299,8 @@ inline bitxnor_exprt &to_bitxnor_expr(exprt &expr)
 }
 
 /// \brief Bit-wise AND
+/// Any number of operands that is greater or equal one.
+/// The type of all operands must be the same.
 class bitand_exprt : public multi_ary_exprt
 {
 public:
@@ -332,6 +342,8 @@ inline bitand_exprt &to_bitand_expr(exprt &expr)
 
 /// \brief Bit-wise NAND
 ///
+/// Any number of operands that is greater or equal one.
+/// The type of all operands must be the same.
 /// When given one operand, this is equivalent to the bit-wise negation.
 /// When given three or more operands, this is equivalent to the bit-wise
 /// negation of the bitand expression with the same operands.
