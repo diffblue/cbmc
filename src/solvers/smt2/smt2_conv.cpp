@@ -1301,46 +1301,40 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     convert_constant(to_constant_expr(expr));
   }
-  else if(expr.id() == ID_concatenation && expr.operands().size() == 1)
-  {
-    DATA_INVARIANT_WITH_DIAGNOSTICS(
-      expr.type() == expr.operands().front().type(),
-      "concatenation over a single operand should have matching types",
-      expr.pretty());
-
-    convert_expr(expr.operands().front());
-  }
   else if(
     expr.id() == ID_concatenation || expr.id() == ID_bitand ||
     expr.id() == ID_bitor || expr.id() == ID_bitxor)
   {
     DATA_INVARIANT_WITH_DIAGNOSTICS(
-      expr.operands().size() >= 2,
-      "given expression should have at least two operands",
+      !expr.operands().empty(),
+      "given expression should have at least one operand",
       expr.id_string());
 
-    out << "(";
-
-    if(expr.id()==ID_concatenation)
-      out << "concat";
-    else if(expr.id()==ID_bitand)
-      out << "bvand";
-    else if(expr.id()==ID_bitor)
-      out << "bvor";
-    else if(expr.id()==ID_bitxor)
-      out << "bvxor";
-    else if(expr.id()==ID_bitnand)
-      out << "bvnand";
-    else if(expr.id()==ID_bitnor)
-      out << "bvnor";
-
-    for(const auto &op : expr.operands())
+    if(expr.operands().size() == 1)
     {
-      out << " ";
-      flatten2bv(op);
+      flatten2bv(expr.operands().front());
     }
+    else // >= 2
+    {
+      out << '(';
 
-    out << ")";
+      if(expr.id() == ID_concatenation)
+        out << "concat";
+      else if(expr.id() == ID_bitand)
+        out << "bvand";
+      else if(expr.id() == ID_bitor)
+        out << "bvor";
+      else if(expr.id() == ID_bitxor)
+        out << "bvxor";
+
+      for(const auto &op : expr.operands())
+      {
+        out << ' ';
+        flatten2bv(op);
+      }
+
+      out << ')';
+    }
   }
   else if(
     expr.id() == ID_bitxnor || expr.id() == ID_bitnand ||
