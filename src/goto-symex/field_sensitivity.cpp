@@ -215,15 +215,6 @@ exprt field_sensitivityt::apply(
       bool was_l2 = !tmp.get_level_2().empty();
       exprt l2_size =
         state.rename(to_array_type(index.array().type()).size(), ns).get();
-      if(l2_size.is_nil() && index.array().id() == ID_symbol)
-      {
-        // In case the array type was incomplete, attempt to retrieve it from
-        // the symbol table.
-        const symbolt *array_from_symbol_table = ns.get_symbol_table().lookup(
-          to_symbol_expr(index.array()).get_identifier());
-        if(array_from_symbol_table != nullptr)
-          l2_size = to_array_type(array_from_symbol_table->type).size();
-      }
 
       if(
         l2_size.is_constant() &&

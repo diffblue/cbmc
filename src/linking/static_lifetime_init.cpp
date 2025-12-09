@@ -160,6 +160,36 @@ void static_lifetime_init(
         symbol.symbol_expr(), {}, code_type.return_type(), source_location}});
     }
   }
+
+  // C standard 6.9.2: static_lifetime_init may have completed array types
+  // (setting size from nil to a concrete value). Propagate these type updates
+  // into function bodies in the symbol table so that goto_convert produces
+  // goto programs with consistent types.
+  for(const std::string &id : symbols)
+  {
+    symbolt &symbol = symbol_table.get_writeable_ref(id);
+    if(symbol.type.id() != ID_code || symbol.value.is_nil())
+      continue;
+
+    symbol.value.visit_pre(
+      [&symbol_table](exprt &expr)
+      {
+        if(expr.id() != ID_symbol)
+          return;
+        if(expr.type().id() != ID_array)
+          return;
+        if(!to_array_type(expr.type()).size().is_nil())
+          return;
+        const auto *sym =
+          symbol_table.lookup(to_symbol_expr(expr).get_identifier());
+        if(
+          sym != nullptr && sym->type.id() == ID_array &&
+          !to_array_type(sym->type).size().is_nil())
+        {
+          expr.type() = sym->type;
+        }
+      });
+  }
 }
 
 void recreate_initialize_function(
