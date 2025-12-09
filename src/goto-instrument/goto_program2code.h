@@ -12,10 +12,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_INSTRUMENT_GOTO_PROGRAM2CODE_H
 #define CPROVER_GOTO_INSTRUMENT_GOTO_PROGRAM2CODE_H
 
-#include <list>
-#include <unordered_set>
-
 #include <analyses/natural_loops.h>
+
+#include <list>
+#include <unordered_map>
+#include <unordered_set>
 
 class code_blockt;
 
@@ -81,7 +82,7 @@ public:
   void operator()();
 
 protected:
-  const irep_idt &func_name;
+  const irep_idt func_name;
   const goto_programt &goto_program;
   symbol_tablet &symbol_table;
   const namespacet ns;
@@ -100,11 +101,18 @@ protected:
   std::unordered_set<irep_idt> local_static_set;
   std::unordered_set<irep_idt> type_names_set;
   std::unordered_set<irep_idt> const_removed;
+  std::unordered_set<irep_idt> param_names;
+  std::unordered_set<irep_idt> used_local_names;
+  // maps the identifier of a renamed local variable (one that collided with a
+  // parameter or another local) to its fresh identifier; applied to the
+  // produced code once conversion is complete
+  std::unordered_map<irep_idt, irep_idt> local_renames;
 
   void copy_source_location(goto_programt::const_targett, codet &dst);
 
   void build_loop_map();
   void build_dead_map();
+  void build_param_names();
   void scan_for_varargs();
 
   void cleanup_code(codet &code, const irep_idt parent_stmt);
