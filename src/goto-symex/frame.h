@@ -37,7 +37,15 @@ struct framet
   goto_programt::const_targett end_of_function;
   exprt call_lhs = nil_exprt();                // cleaned, but not renamed
   std::optional<symbol_exprt> return_value_symbol; // not renamed
+  // Whether the steps executed inside this function body are hidden in traces.
+  // Driven by goto_functiont::is_hidden() (i.e. a CPROVER_HIDE label), it hides
+  // declarations and assignments within the function.
   bool hidden_function = false;
+  // Whether the function-call and matching function-return events for this
+  // frame are hidden in traces. Kept separate from hidden_function so that a
+  // hidden function's body stays hidden while its call/return boundary carries
+  // the (consistent) visibility of the call site.
+  bool hidden_function_call = false;
 
   symex_level1t old_level1;
 
