@@ -124,40 +124,47 @@ bool boolbvt::type_conversion(
   {
   case bvtypet::IS_RANGE:
     if(
-      src_bvtype == bvtypet::IS_UNSIGNED || src_bvtype == bvtypet::IS_SIGNED ||
-      src_bvtype == bvtypet::IS_C_BOOL)
+      src_bvtype == bvtypet::IS_UNSIGNED ||
+      src_bvtype == bvtypet::IS_C_BOOL) // unsigned to range
     {
-      mp_integer dest_from = to_range_type(dest_type).get_from();
+      // need to do arithmetic: add -dest_from
+      mp_integer offset = -to_range_type(dest_type).get_from();
+      dest = bv_utils.add(
+        bv_utils.zero_extension(src, dest_width),
+        bv_utils.build_constant(offset, dest_width));
 
-      if(dest_from == 0)
-      {
-        // do zero extension
-        dest.resize(dest_width);
-        for(std::size_t i = 0; i < dest.size(); i++)
-          dest[i] = (i < src.size() ? src[i] : const_literal(false));
+      return false;
+    }
+    else if(src_bvtype == bvtypet::IS_SIGNED) // signed to range
+    {
+      // need to do arithmetic: add -dest_from
+      mp_integer offset = -to_range_type(dest_type).get_from();
+      dest = bv_utils.add(
+        bv_utils.sign_extension(src, dest_width),
+        bv_utils.build_constant(offset, dest_width));
 
-        return false;
-      }
+      return false;
     }
     else if(src_bvtype == bvtypet::IS_RANGE) // range to range
     {
       mp_integer src_from = to_range_type(src_type).get_from();
       mp_integer dest_from = to_range_type(dest_type).get_from();
 
-      if(dest_from == src_from)
-      {
-        // do zero extension, if needed
-        dest = bv_utils.zero_extension(src, dest_width);
-        return false;
-      }
-      else
-      {
-        // need to do arithmetic: add src_from-dest_from
-        mp_integer offset = src_from - dest_from;
-        dest = bv_utils.add(
-          bv_utils.zero_extension(src, dest_width),
-          bv_utils.build_constant(offset, dest_width));
-      }
+      // need to do arithmetic: add src_from-dest_from
+      mp_integer offset = src_from - dest_from;
+      dest = bv_utils.add(
+        bv_utils.zero_extension(src, dest_width),
+        bv_utils.build_constant(offset, dest_width));
+
+      return false;
+    }
+    else if(src_type.id() == ID_bool) // bool to range
+    {
+      // need to do arithmetic: add -dest_from
+      mp_integer offset = -to_range_type(dest_type).get_from();
+      dest = bv_utils.add(
+        bv_utils.zero_extension(src, dest_width),
+        bv_utils.build_constant(offset, dest_width));
 
       return false;
     }
