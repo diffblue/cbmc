@@ -131,6 +131,11 @@ public:
   {
   }
 
+  explicit bitor_exprt(exprt::operandst _operands)
+    : multi_ary_exprt(ID_bitor, std::move(_operands))
+  {
+  }
+
   bitor_exprt(exprt::operandst _operands, typet _type)
     : multi_ary_exprt(ID_bitor, std::move(_operands), std::move(_type))
   {
@@ -177,6 +182,11 @@ public:
   {
   }
 
+  explicit bitnor_exprt(exprt::operandst _operands)
+    : multi_ary_exprt(ID_bitnor, std::move(_operands))
+  {
+  }
+
   bitnor_exprt(exprt::operandst _operands, typet _type)
     : multi_ary_exprt(ID_bitnor, std::move(_operands), std::move(_type))
   {
@@ -216,6 +226,11 @@ class bitxor_exprt : public multi_ary_exprt
 public:
   bitxor_exprt(exprt _op0, exprt _op1)
     : multi_ary_exprt(std::move(_op0), ID_bitxor, std::move(_op1))
+  {
+  }
+
+  explicit bitxor_exprt(exprt::operandst _operands)
+    : multi_ary_exprt(ID_bitxor, std::move(_operands))
   {
   }
 
@@ -265,6 +280,11 @@ public:
   {
   }
 
+  explicit bitxnor_exprt(exprt::operandst _operands)
+    : multi_ary_exprt(ID_bitxnor, std::move(_operands))
+  {
+  }
+
   bitxnor_exprt(exprt::operandst _operands, typet _type)
     : multi_ary_exprt(ID_bitxnor, std::move(_operands), std::move(_type))
   {
@@ -306,6 +326,11 @@ class bitand_exprt : public multi_ary_exprt
 public:
   bitand_exprt(const exprt &_op0, exprt _op1)
     : multi_ary_exprt(_op0, ID_bitand, std::move(_op1), _op0.type())
+  {
+  }
+
+  explicit bitand_exprt(exprt::operandst _operands)
+    : multi_ary_exprt(ID_bitand, std::move(_operands))
   {
   }
 
@@ -352,6 +377,11 @@ class bitnand_exprt : public multi_ary_exprt
 public:
   bitnand_exprt(exprt _op0, exprt _op1)
     : multi_ary_exprt(std::move(_op0), ID_bitnand, std::move(_op1))
+  {
+  }
+
+  explicit bitnand_exprt(exprt::operandst _operands)
+    : multi_ary_exprt(ID_bitnand, std::move(_operands))
   {
   }
 
