@@ -1,6 +1,7 @@
 var classmulti__ary__exprt =
 [
     [ "multi_ary_exprt", "classmulti__ary__exprt.html#a96e7f2b89904f23ddd904339e5a9ec05", null ],
+    [ "multi_ary_exprt", "classmulti__ary__exprt.html#ae8ba1bb3aa0838c4df34d86f17db73ba", null ],
     [ "multi_ary_exprt", "classmulti__ary__exprt.html#a965d58fe9ed7162f8b3465c372fc4d51", null ],
     [ "multi_ary_exprt", "classmulti__ary__exprt.html#a3a226ec967ec57e7cbb72d1d75d233c9", null ],
     [ "op0", "classmulti__ary__exprt.html#a5d4edb885e10e752620bee419aa7b45e", null ],

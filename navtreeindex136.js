@@ -1,5 +1,14 @@
 var NAVTREEINDEX136 =
 {
+"string__instrumentation_8cpp.html#af8a85415b1d76b6892eea8e86f92ef95":[8,0,2,1,1,21,6],
+"string__instrumentation_8cpp_source.html":[8,0,2,1,1,21],
+"string__instrumentation_8h.html":[8,0,2,1,1,22],
+"string__instrumentation_8h.html#a5bb2d583972281b195f855d4d61d9734":[8,0,2,1,1,22,0],
+"string__instrumentation_8h.html#a5f57b8d1ae38fae26ed679ebf46f7aa6":[8,0,2,1,1,22,3],
+"string__instrumentation_8h.html#a64a24742fe3e050a0056534d8a452bbd":[8,0,2,1,1,22,2],
+"string__instrumentation_8h.html#aa65dffaf781f21edce980dabb01d5433":[8,0,2,1,1,22,5],
+"string__instrumentation_8h.html#ab66a9d53717f617fc87b77bf50560010":[8,0,2,1,1,22,1],
+"string__instrumentation_8h.html#ade5f51774c6ac2f1e0743e9084c11827":[8,0,2,1,1,22,4],
 "string__instrumentation_8h_source.html":[8,0,2,1,1,22],
 "string__refinement_8cpp.html":[8,0,2,27,10,30],
 "string__refinement_8cpp.html#a01af496995e4473ade1505ec78db6fc1":[8,0,2,27,10,30,18],
@@ -240,14 +249,5 @@ var NAVTREEINDEX136 =
 "structabstract__hashert.html#a6e2cb6812d3901797a6a01178a9f9838":[7,0,25,1],
 "structabstract__hashert.html#aacc58884c3d0e6a5b864b3d05fb49f66":[7,0,25,2],
 "structabstract__object__statisticst.html":[7,0,27],
-"structabstract__object__statisticst.html#a04f1873cf5c4deec98673149dbce932d":[7,0,27,6],
-"structabstract__object__statisticst.html#a33a800cefed7460fd306e8be45b646cf":[7,0,27,2],
-"structabstract__object__statisticst.html#a86fbb666da639798ab0bca177840097d":[7,0,27,4],
-"structabstract__object__statisticst.html#ac7932888b6793224d83521014d013722":[7,0,27,1],
-"structabstract__object__statisticst.html#aca8dc5aa4ab2418e9b8513869852cefc":[7,0,27,0],
-"structabstract__object__statisticst.html#ad740586f25bfe7f88fd60abbc8679c25":[7,0,27,7],
-"structabstract__object__statisticst.html#ae33014307e2687422fafbf52daf56a9f":[7,0,27,5],
-"structabstract__object__statisticst.html#ae40dc60ba4545c13c9142418fb5573ec":[7,0,27,3],
-"structabstract__objectt_1_1abstract__object__visitort.html":[7,0,28,0],
-"structabstract__objectt_1_1abstract__object__visitort.html#a4205d30d931cec63a5527ca7c7625c5e":[7,0,28,0,0]
+"structabstract__object__statisticst.html#a04f1873cf5c4deec98673149dbce932d":[7,0,27,6]
 };

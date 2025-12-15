@@ -1,5 +1,14 @@
 var NAVTREEINDEX57 =
 {
+"classsatcheck__lingelingt.html#a7dc4aad5eedaeba237611f31be55752b":[7,0,1041,6],
+"classsatcheck__lingelingt.html#a88874b780773106a2f92a6d0b171c3cf":[7,0,1041,2],
+"classsatcheck__lingelingt.html#a90ec8a8196b7e32450d80a9589b3eb8f":[7,0,1041,3],
+"classsatcheck__lingelingt.html#a9854bb7a34f016849dabee1a550d842b":[7,0,1041,1],
+"classsatcheck__lingelingt.html#aa20d8b6d5f869f60dc08e03b00fc497b":[7,0,1041,8],
+"classsatcheck__lingelingt.html#abcd221bc04a701004aea4b49859dba5e":[7,0,1041,10],
+"classsatcheck__lingelingt.html#ac35d3530e2238b6c54f2d25316d8cc7d":[7,0,1041,9],
+"classsatcheck__lingelingt.html#ae7d2c4e88d2fc5e247c895ee541a864d":[7,0,1041,5],
+"classsatcheck__lingelingt.html#aec38b620eca334ee157fcbea20adb81b":[7,0,1041,11],
 "classsatcheck__lingelingt.html#aff10efb32ca7b9fe39553b457bd5645b":[7,0,1041,0],
 "classsatcheck__minisat1__baset.html":[7,0,1042],
 "classsatcheck__minisat1__baset.html#a071669fcd18e122316b5adce03e78926":[7,0,1042,4],
@@ -240,14 +249,5 @@ var NAVTREEINDEX57 =
 "classshared__bufferst_1_1varst.html#a4e130faeed692a301fbdda3a7a88e320":[7,0,1065,1,10],
 "classshared__bufferst_1_1varst.html#a5f86b133876175990855c74f372be46b":[7,0,1065,1,6],
 "classshared__bufferst_1_1varst.html#a70cf37bfc75cb527e2ddc9d969c2b6a4":[7,0,1065,1,0],
-"classshared__bufferst_1_1varst.html#a7547b366580e429b22d7f91908fdd137":[7,0,1065,1,5],
-"classshared__bufferst_1_1varst.html#a7e31ae0e51ededb2d7ae150ebd06a3da":[7,0,1065,1,9],
-"classshared__bufferst_1_1varst.html#ab4defa3e250c74876bab7a705aa1ae3c":[7,0,1065,1,3],
-"classshared__bufferst_1_1varst.html#af84a82a67bc25f2392274790d4e2eac6":[7,0,1065,1,7],
-"classsharing__mapt.html":[7,0,1066],
-"classsharing__mapt.html#a015fb2c3447b64953ad9e2f78eb46354":[7,0,1066,21],
-"classsharing__mapt.html#a01d2aae8a659021413504f0aa941e49a":[7,0,1066,32],
-"classsharing__mapt.html#a08b085f3abf6e3968807bbb190d07460":[7,0,1066,12],
-"classsharing__mapt.html#a0dd89426f0d9dda2d4eee5da4e950284":[7,0,1066,23],
-"classsharing__mapt.html#a11006d29ce0c2c028e68a99b546bf7e1":[7,0,1066,26]
+"classshared__bufferst_1_1varst.html#a7547b366580e429b22d7f91908fdd137":[7,0,1065,1,5]
 };
