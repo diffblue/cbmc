@@ -917,6 +917,14 @@ public:
     operands() = std::move(_operands);
   }
 
+  multi_ary_exprt(const irep_idt &_id, operandst _operands)
+    : expr_protectedt(_id, typet{})
+  {
+    PRECONDITION(!_operands.empty());
+    type() = _operands.front().type();
+    operands() = std::move(_operands);
+  }
+
   multi_ary_exprt(const exprt &_lhs, const irep_idt &_id, exprt _rhs)
     : expr_protectedt(_id, _lhs.type(), {_lhs, std::move(_rhs)})
   {
@@ -1015,6 +1023,11 @@ public:
   {
   }
 
+  explicit plus_exprt(operandst _operands)
+    : multi_ary_exprt(ID_plus, std::move(_operands))
+  {
+  }
+
   plus_exprt(operandst _operands, typet _type)
     : multi_ary_exprt(ID_plus, std::move(_operands), std::move(_type))
   {
@@ -1108,6 +1121,11 @@ class mult_exprt:public multi_ary_exprt
 public:
   mult_exprt(exprt _lhs, exprt _rhs)
     : multi_ary_exprt(std::move(_lhs), ID_mult, std::move(_rhs))
+  {
+  }
+
+  explicit mult_exprt(exprt::operandst factors)
+    : multi_ary_exprt(ID_mult, std::move(factors))
   {
   }
 
