@@ -48,7 +48,7 @@ jobs:
           sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ maven flex bison ccache
 
       - name: Prepare ccache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: .ccache
           key: ${{ runner.os }}-24.04-Release-${{ github.ref }}-${{ github.sha }}-PR
