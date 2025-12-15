@@ -49,7 +49,7 @@ jobs:
       - name: Run (Docker Based) Linux Build test
         run: integration/linux/compile_linux.sh
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: CPROVER-faultyInput
           path: CPROVER/faultyInput/*
