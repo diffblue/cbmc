@@ -1,8 +1,0 @@
-CORE
-main.c
---no-standard-checks --verbosity 8
-^Generated 1\d* VCC\(s\), 0 remaining after simplification$
-^EXIT=0$
-^SIGNAL=0$
---
-^warning: ignoring
