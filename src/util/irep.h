@@ -452,6 +452,12 @@ public:
 
   std::size_t hash() const;
   std::size_t full_hash() const;
+  /// Compute hash value while hashing the actual string content instead of
+  /// string indices. These hash values remain stable even when the string
+  /// container is built in a different order. Note that this can be much slower
+  /// than using `hash()` as string lookups are required, strings need to be
+  /// iterated over, and the results are not cached.
+  std::size_t string_hash() const;
 
   bool full_eq(const irept &other) const;
 
