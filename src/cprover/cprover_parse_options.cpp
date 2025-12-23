@@ -198,6 +198,8 @@ int cprover_parse_optionst::main()
     // show loop ids?
     if(cmdline.isset("show-loops"))
     {
+      goto_model.goto_functions.compute_loop_numbers();
+      goto_model.goto_functions.compute_loop_hashes();
       show_loop_ids(ui_message_handlert::uit::PLAIN, goto_model);
       return CPROVER_EXIT_SUCCESS;
     }

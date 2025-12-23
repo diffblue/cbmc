@@ -560,6 +560,9 @@ public:
     /// Number unique per function to identify loops
     unsigned loop_number = 0;
 
+    /// Hash-based identifier for loops, stable across unrelated code changes
+    std::size_t loop_hash = 0;
+
     /// A number to identify branch targets.
     /// This is \ref nil_target if it's not a target.
     unsigned target_number = nil_target;
@@ -783,6 +786,13 @@ public:
   /// Compute loop numbers
   void compute_loop_numbers();
 
+  /// Compute hash-based loop identifiers
+  void compute_loop_hashes();
+
+  /// Compute the hash for a single backwards-goto instruction without
+  /// modifying the program.
+  std::size_t compute_loop_hash(instructionst::const_iterator it) const;
+
   /// Update all indices
   void update();
 
@@ -792,6 +802,19 @@ public:
   {
     return id2string(function_id) + "." +
            std::to_string(instruction.loop_number);
+  }
+
+  /// Hash-based loop name, stable across unrelated code changes.
+  /// Returns the ordinal loop_id if no hash has been computed.
+  static irep_idt
+  loop_hash_id(const irep_idt &function_id, const instructiont &instruction)
+  {
+    if(instruction.loop_hash != 0)
+    {
+      return id2string(function_id) + ".hash_" +
+             std::to_string(instruction.loop_hash);
+    }
+    return loop_id(function_id, instruction);
   }
 
   /// Is the program empty?
