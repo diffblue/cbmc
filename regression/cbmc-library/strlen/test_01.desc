@@ -1,0 +1,8 @@
+KNOWNBUG
+main_01.c
+--pointer-check --bounds-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring

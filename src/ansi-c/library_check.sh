@@ -70,14 +70,14 @@ perl -p -i -e 's/^fopen64\n//' __functions # fopen
 perl -p -i -e 's/^freopen64\n//' __functions # freopen
 perl -p -i -e 's/^mmap64\n//' __functions # mmap
 perl -p -i -e 's/^munmap\n//' __functions # mmap-01
-perl -p -i -e 's/^__fgets_chk\n//' __functions # fgets-01/__fgets_chk.desc
-perl -p -i -e 's/^__fprintf_chk\n//' __functions # fprintf-01/__fprintf_chk.desc
-perl -p -i -e 's/^__fread_chk\n//' __functions # fread-01/__fread_chk.desc
-perl -p -i -e 's/^__printf_chk\n//' __functions # printf-01/__printf_chk.desc
-perl -p -i -e 's/^__syslog_chk\n//' __functions # syslog-01/__syslog_chk.desc
-perl -p -i -e 's/^_syslog\$DARWIN_EXTSN\n//' __functions # syslog-01/test.desc
+perl -p -i -e 's/^__fgets_chk\n//' __functions # fgets/__fgets_chk.desc
+perl -p -i -e 's/^__fprintf_chk\n//' __functions # fprintf/__fprintf_chk.desc
+perl -p -i -e 's/^__fread_chk\n//' __functions # fread/__fread_chk.desc
+perl -p -i -e 's/^__printf_chk\n//' __functions # printf/__printf_chk.desc
+perl -p -i -e 's/^__syslog_chk\n//' __functions # syslog/__syslog_chk.desc
+perl -p -i -e 's/^_syslog\$DARWIN_EXTSN\n//' __functions # syslog/test.desc
 perl -p -i -e 's/^__time64\n//' __functions # time
-perl -p -i -e 's/^__vfprintf_chk\n//' __functions # vfprintf-01/__vfprintf_chk.desc
+perl -p -i -e 's/^__vfprintf_chk\n//' __functions # vfprintf/__vfprintf_chk.desc
 
 # Some functions are covered by tests in other folders:
 perl -p -i -e 's/^__spawned_thread\n//' __functions # any pthread_create tests
@@ -101,7 +101,7 @@ perl -p -i -e 's/^_mm_setr_epi(16|32)\n//' __functions # cbmc/SIMD1
 perl -p -i -e 's/^_mm_setr_pi16\n//' __functions # cbmc/SIMD1
 perl -p -i -e 's/^_mm_subs_ep[iu]16\n//' __functions # cbmc/SIMD1
 
-ls ../../regression/cbmc-library/ | grep -- - | cut -f1 -d- | sort -u > __tests
+ls ../../regression/cbmc-library/ | egrep -v '(Makefile|CMakeLists.txt)' | sort -u > __tests
 diff -u __tests __functions
 ec="${?}"
 rm __functions __tests

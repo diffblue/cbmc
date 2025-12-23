@@ -1,8 +1,0 @@
-CORE
-main.c
---pointer-check --bounds-check --malloc-may-fail --malloc-fail-null
-VERIFICATION SUCCESSFUL
-^EXIT=0$
-^SIGNAL=0$
---
-^warning: ignoring

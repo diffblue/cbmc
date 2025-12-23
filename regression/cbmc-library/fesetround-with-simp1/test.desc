@@ -1,8 +1,0 @@
-CORE
-main.c
---no-div-by-zero-check --floatbv
-^EXIT=0$
-^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
---
-^warning: ignoring
