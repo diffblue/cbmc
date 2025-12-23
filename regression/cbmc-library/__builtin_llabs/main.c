@@ -1,5 +1,4 @@
 #include <assert.h>
-
 #include <limits.h>
 
 #ifndef __GNUC__

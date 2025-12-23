@@ -9,30 +9,30 @@ int main()
 
 #else
 
-#include <assert.h>
-#include <fenv.h>
+#  include <assert.h>
+#  include <fenv.h>
 
 int main()
 {
-#ifdef FE_DOWNWARD
+#  ifdef FE_DOWNWARD
   fesetround(FE_DOWNWARD);
   assert(fegetround() == FE_DOWNWARD);
-#endif
+#  endif
 
-#ifdef FE_TONEAREST
+#  ifdef FE_TONEAREST
   fesetround(FE_TONEAREST);
   assert(fegetround() == FE_TONEAREST);
-#endif
+#  endif
 
-#ifdef FE_TOWARDZERO
+#  ifdef FE_TOWARDZERO
   fesetround(FE_TOWARDZERO);
   assert(fegetround() == FE_TOWARDZERO);
-#endif
+#  endif
 
-#ifdef FE_UPWARD
+#  ifdef FE_UPWARD
   fesetround(FE_UPWARD);
   assert(fegetround() == FE_UPWARD);
-#endif
+#  endif
 }
 
 #endif

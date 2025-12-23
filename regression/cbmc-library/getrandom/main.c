@@ -1,4 +1,4 @@
-#  include <assert.h>
+#include <assert.h>
 
 #if defined(__GLIBC__) &&                                                      \
   (__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 25))

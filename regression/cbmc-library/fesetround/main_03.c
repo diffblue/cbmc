@@ -3,9 +3,9 @@
 
 #ifdef __clang__
 
-#include <assert.h>
-#include <fenv.h>
-#include <float.h>
+#  include <assert.h>
+#  include <fenv.h>
+#  include <float.h>
 
 int main()
 {

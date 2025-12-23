@@ -1,8 +1,8 @@
 #ifdef _WIN32
-#include <fcntl.h>
-#include <io.h>
+#  include <fcntl.h>
+#  include <io.h>
 #else
-#include <unistd.h>
+#  include <unistd.h>
 #endif
 
 #include <assert.h>

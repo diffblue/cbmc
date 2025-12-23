@@ -1,7 +1,6 @@
 #include <assert.h>
-#include <stdlib.h>
-
 #include <limits.h>
+#include <stdlib.h>
 
 int main()
 {

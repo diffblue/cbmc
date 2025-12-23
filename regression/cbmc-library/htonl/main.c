@@ -1,6 +1,7 @@
 #ifndef _WIN32
-#include <arpa/inet.h>
-#include <assert.h>
+#  include <arpa/inet.h>
+
+#  include <assert.h>
 
 int main()
 {
