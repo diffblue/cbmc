@@ -903,7 +903,7 @@ const code_function_callt dfcc_libraryt::ptr_pred_ctx_reset_call(
   const source_locationt &source_location)
 {
   code_function_callt call(
-    dfcc_fun_symbol[dfcc_funt::PTR_PRED_CTX_INIT].symbol_expr(),
+    dfcc_fun_symbol[dfcc_funt::PTR_PRED_CTX_RESET].symbol_expr(),
     {ptr_pred_ctx_ptr});
   call.add_source_location() = source_location;
   return call;
