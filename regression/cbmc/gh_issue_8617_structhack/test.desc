@@ -1,0 +1,30 @@
+CORE
+main.c
+--no-malloc-may-fail
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Regression test for GitHub issue #8617.
+Exact reproduction of the struct hack bug reported for CBMC 5.12.
+
+In the original bug report, when a struct with a flexible array member
+(char data[1]) was allocated with extra space via
+malloc(sizeof(struct Foo) + sizeof(char)*2), CBMC would incorrectly fail
+the assertion assert(foo->data[1]=='b') after setting foo->data[2]='c'.
+
+This was caused by incorrect handling of byte_extract operations for
+flexible array members. Array operations may fall back to byte_extract
+expressions, and without proper simplification, accesses to dynamically
+allocated extra memory beyond the declared struct size would fail.
+
+Fixed in CBMC 6.7.0 by commit 78839a978c which improved simplification
+of byte_extract operations to handle multiple-of-element size accesses
+to arrays correctly, converting them to index expressions when the offset
+is known to be a multiple of the array-element size.
+
+Note: C90 did not have flexible arrays, and using arrays of size 1 was
+common practice (the "struct hack"). While this is technically undefined
+behavior in C99+, CBMC now handles this pattern correctly.
