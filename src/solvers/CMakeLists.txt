@@ -125,7 +125,7 @@ foreach(SOLVER ${sat_impl})
             PATCH_COMMAND patch -p1 -i ${CBMC_SOURCE_DIR}/scripts/cadical-3.0.0-patch
             COMMAND cmake -E copy ${CBMC_SOURCE_DIR}/scripts/cadical_CMakeLists.txt CMakeLists.txt
             COMMAND ./configure
-            URL_MD5 97a8d18b499fd70821f09ecabd5a8246
+            URL_HASH SHA256=282b1c9422fde8631cb721b86450ae94df4e8de0545c17a69a301aaa4bf92fcf
         )
 
         add_subdirectory(${cadical_SOURCE_DIR} ${cadical_BINARY_DIR})
@@ -147,7 +147,7 @@ foreach(SOLVER ${sat_impl})
             URL https://github.com/arminbiere/cadical/archive/rel-3.0.0.tar.gz
             PATCH_COMMAND patch -p1 -i ${CBMC_SOURCE_DIR}/scripts/cadical-3.0.0-patch
             COMMAND ./configure
-            URL_MD5 97a8d18b499fd70821f09ecabd5a8246
+            URL_HASH SHA256=282b1c9422fde8631cb721b86450ae94df4e8de0545c17a69a301aaa4bf92fcf
         )
 
         message(STATUS "Building CaDiCaL")

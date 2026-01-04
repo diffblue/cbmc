@@ -190,6 +190,8 @@ cadical_release = rel-3.0.0
 cadical-download:
 	@echo "Downloading CaDiCaL $(cadical_release)"
 	@$(DOWNLOADER) https://github.com/arminbiere/cadical/archive/$(cadical_release).tar.gz
+	@echo "282b1c9422fde8631cb721b86450ae94df4e8de0545c17a69a301aaa4bf92fcf $(cadical_release).tar.gz" | \
+		sha256sum -c -
 	@$(TAR) xfz $(cadical_release).tar.gz
 	@rm -Rf ../cadical
 	@mv cadical-$(cadical_release) ../cadical
