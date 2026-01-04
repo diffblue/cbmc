@@ -179,11 +179,10 @@ satcheck_cadical_baset::satcheck_cadical_baset(
     localsearch_limit(_localsearch_limit)
 {
   solver->set("quiet", 1);
-  // Explicitly disable bounded variable addition; this is disabled by default
-  // in version 2.2.0, but will be enabled in the next major release. Early
-  // experiments, however, suggest that this results in degraded performance. If
-  // we ever choose to enable it then the above overrides of `new_variable` and
-  // `new_variables` need to be enabled.
+  // Explicitly disable bounded variable addition as initial experiments suggest
+  // that this results in degraded performance. If we ever choose to enable it
+  // then the above overrides of `new_variable` and `new_variables` need to be
+  // enabled.
   solver->set("factor", 0);
 }
 
