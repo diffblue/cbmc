@@ -758,9 +758,9 @@ static std::optional<symbol_exprt>
 find_unique_pointer_typed_symbol(const exprt &expr)
 {
   std::optional<symbol_exprt> return_value;
-  for(auto it = expr.depth_cbegin(); it != expr.depth_cend(); ++it)
+  for(auto &node : pre_traversal(expr))
   {
-    const symbol_exprt *symbol_expr = expr_try_dynamic_cast<symbol_exprt>(*it);
+    const symbol_exprt *symbol_expr = expr_try_dynamic_cast<symbol_exprt>(node);
     if(symbol_expr && can_cast_type<pointer_typet>(symbol_expr->type()))
     {
       // If we already have a potential return value, check if it is the same
