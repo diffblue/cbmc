@@ -305,4 +305,33 @@ private:
   std::set<exprt> m_traversed;
 };
 
+/// An adapter to yield a range (expected to satisfy C++20 std::ranges::range)
+/// of const_depth_iteratort.
+class const_depth_iterator_range_adaptert
+{
+public:
+  explicit const_depth_iterator_range_adaptert(const exprt &_root) : root{_root}
+  {
+  }
+
+  const_depth_iteratort begin() const
+  {
+    return root.depth_cbegin();
+  }
+
+  const_depth_iteratort end() const
+  {
+    return root.depth_cend();
+  }
+
+protected:
+  const exprt &root;
+};
+
+static inline const_depth_iterator_range_adaptert
+pre_traversal(const exprt &root)
+{
+  return const_depth_iterator_range_adaptert{root};
+}
+
 #endif
