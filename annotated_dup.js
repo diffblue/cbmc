@@ -284,6 +284,7 @@ var annotated_dup =
     [ "conflict_providert", "classconflict__providert.html", "classconflict__providert" ],
     [ "console_message_handlert", "classconsole__message__handlert.html", "classconsole__message__handlert" ],
     [ "consolet", "classconsolet.html", "classconsolet" ],
+    [ "const_depth_iterator_range_adaptert", "classconst__depth__iterator__range__adaptert.html", "classconst__depth__iterator__range__adaptert" ],
     [ "const_depth_iteratort", "classconst__depth__iteratort.html", "classconst__depth__iteratort" ],
     [ "const_expr_visitort", "classconst__expr__visitort.html", "classconst__expr__visitort" ],
     [ "const_target_hash", "structconst__target__hash.html", "structconst__target__hash" ],

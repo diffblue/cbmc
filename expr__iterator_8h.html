@@ -124,7 +124,7 @@ $(document).ready(function(){initNavTree('expr__iterator_8h.html',''); initResiz
 <div id="dynsection-1-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-1-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="expr__iterator_8h__dep__incl.svg" width="5258" height="168"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="expr__iterator_8h__dep__incl.svg" width="5480" height="168"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div>
 <p><a href="expr__iterator_8h_source.html">Go to the source code of this file.</a></p>
@@ -143,11 +143,16 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classconst__unique__depth__iteratort.html">const_unique_depth_iteratort</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classconst__depth__iterator__range__adaptert.html">const_depth_iterator_range_adaptert</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An adapter to yield a range (expected to satisfy C++20 std::ranges::range) of <a class="el" href="classconst__depth__iteratort.html">const_depth_iteratort</a>.  <a href="classconst__depth__iterator__range__adaptert.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:addfbeeaadc665ad599c8ea568433f6c2" id="r_addfbeeaadc665ad599c8ea568433f6c2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="expr__iterator_8h.html#addfbeeaadc665ad599c8ea568433f6c2">operator==</a> (<a class="el" href="classait.html">const</a> <a class="el" href="structdepth__iterator__expr__statet.html">depth_iterator_expr_statet</a> &amp;left, <a class="el" href="classait.html">const</a> <a class="el" href="structdepth__iterator__expr__statet.html">depth_iterator_expr_statet</a> &amp;right)</td></tr>
 <tr class="separator:addfbeeaadc665ad599c8ea568433f6c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a03ac580896b907ad358b8945e95086" id="r_a3a03ac580896b907ad358b8945e95086"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">static</a> <a class="el" href="classconst__depth__iterator__range__adaptert.html">const_depth_iterator_range_adaptert</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="expr__iterator_8h.html#a3a03ac580896b907ad358b8945e95086">pre_traversal</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;root)</td></tr>
+<tr class="separator:a3a03ac580896b907ad358b8945e95086"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Forward depth-first search iterators These iterators' copy operations are expensive, so use auto&amp;, and avoid std::next(), std::prev() and post-increment iterator. </p>
@@ -190,6 +195,34 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="expr__iterator_8h_source.html#l00052">52</a> of file <a class="el" href="expr__iterator_8h_source.html">expr_iterator.h</a>.</p>
+
+</div>
+</div>
+<a id="a3a03ac580896b907ad358b8945e95086" name="a3a03ac580896b907ad358b8945e95086"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3a03ac580896b907ad358b8945e95086">&#9670;&#160;</a></span>pre_traversal()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">static</a> <a class="el" href="classconst__depth__iterator__range__adaptert.html">const_depth_iterator_range_adaptert</a> pre_traversal </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>root</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="expr__iterator_8h_source.html#l00332">332</a> of file <a class="el" href="expr__iterator_8h_source.html">expr_iterator.h</a>.</p>
 
 </div>
 </div>

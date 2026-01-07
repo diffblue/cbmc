@@ -5,5 +5,7 @@ var expr__iterator_8h =
     [ "const_depth_iteratort", "classconst__depth__iteratort.html", "classconst__depth__iteratort" ],
     [ "depth_iteratort", "classdepth__iteratort.html", "classdepth__iteratort" ],
     [ "const_unique_depth_iteratort", "classconst__unique__depth__iteratort.html", "classconst__unique__depth__iteratort" ],
-    [ "operator==", "expr__iterator_8h.html#addfbeeaadc665ad599c8ea568433f6c2", null ]
+    [ "const_depth_iterator_range_adaptert", "classconst__depth__iterator__range__adaptert.html", "classconst__depth__iterator__range__adaptert" ],
+    [ "operator==", "expr__iterator_8h.html#addfbeeaadc665ad599c8ea568433f6c2", null ],
+    [ "pre_traversal", "expr__iterator_8h.html#a3a03ac580896b907ad358b8945e95086", null ]
 ];
