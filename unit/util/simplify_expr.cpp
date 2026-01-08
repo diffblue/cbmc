@@ -769,3 +769,142 @@ TEST_CASE("Simplify complementary pair in nested OR", "[core][util]")
   const or_exprt expr{a, inner};
   REQUIRE(simplify_expr(expr, ns) == true_exprt{});
 }
+
+TEST_CASE("Simplify lshr of concatenation", "[core][util]")
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+
+  const unsignedbv_typet u4{4};
+  const unsignedbv_typet u8{8};
+  const unsignedbv_typet u12{12};
+  const unsignedbv_typet u16{16};
+  const symbol_exprt a{"a", u8};
+  const symbol_exprt b{"b", u8};
+
+  SECTION("aligned 8-bit shift on a 16-bit two-operand concat")
+  {
+    // (concat(a, b)) >> 8 -> concat(0x00, a)
+    const concatenation_exprt cat{{a, b}, u16};
+    const lshr_exprt lshr{cat, from_integer(8, u16)};
+    const concatenation_exprt expected{{from_integer(0, bv_typet{8}), a}, u16};
+    REQUIRE(simplify_expr(lshr, ns) == expected);
+  }
+
+  SECTION("3-operand concat with the boundary in the middle")
+  {
+    // (concat(a4, b4, c8)) >> 8 -> concat(0x00, a4, b4)
+    const symbol_exprt a4{"a4", u4};
+    const symbol_exprt b4{"b4", u4};
+    const symbol_exprt c8{"c8", u8};
+    const concatenation_exprt cat{{a4, b4, c8}, u16};
+    const lshr_exprt lshr{cat, from_integer(8, u16)};
+    const concatenation_exprt expected{
+      {from_integer(0, bv_typet{8}), a4, b4}, u16};
+    REQUIRE(simplify_expr(lshr, ns) == expected);
+  }
+
+  SECTION("asymmetric operand widths")
+  {
+    // (concat(a4, b12)) >> 12 -> concat(0_12, a4)
+    const symbol_exprt a4{"a4", u4};
+    const symbol_exprt b12{"b12", u12};
+    const concatenation_exprt cat{{a4, b12}, u16};
+    const lshr_exprt lshr{cat, from_integer(12, u16)};
+    const concatenation_exprt expected{
+      {from_integer(0, bv_typet{12}), a4}, u16};
+    REQUIRE(simplify_expr(lshr, ns) == expected);
+  }
+
+  SECTION("mis-aligned distance must not fire")
+  {
+    // (concat(a, b)) >> 4 must not be rewritten by this rule.
+    const concatenation_exprt cat{{a, b}, u16};
+    const lshr_exprt lshr{cat, from_integer(4, u16)};
+    const exprt result = simplify_expr(lshr, ns);
+    // It must NOT be a concat whose first (leftmost) operand is the
+    // 4-bit zero pad we'd have introduced on a successful rewrite.
+    if(result.id() == ID_concatenation)
+    {
+      REQUIRE(
+        to_concatenation_expr(result).op0() != from_integer(0, bv_typet{4}));
+    }
+  }
+
+  SECTION("ashr of a concatenation must not fire (sign-bit semantics)")
+  {
+    // ashr(concat(a, b), 8) must not be rewritten by this code.
+    const concatenation_exprt cat{{a, b}, u16};
+    const ashr_exprt ashr{cat, from_integer(8, u16)};
+    const exprt result = simplify_expr(ashr, ns);
+    const concatenation_exprt forbidden{{from_integer(0, bv_typet{8}), a}, u16};
+    REQUIRE(result != forbidden);
+  }
+
+  SECTION("full-width and over-width shifts collapse to zero")
+  {
+    const concatenation_exprt cat{{a, b}, u16};
+    const lshr_exprt lshr_full{cat, from_integer(16, u16)};
+    REQUIRE(simplify_expr(lshr_full, ns) == from_integer(0, u16));
+    const lshr_exprt lshr_over{cat, from_integer(20, u16)};
+    REQUIRE(simplify_expr(lshr_over, ns) == from_integer(0, u16));
+  }
+}
+
+TEST_CASE("Simplify shl of concatenation", "[core][util]")
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+
+  const unsignedbv_typet u4{4};
+  const unsignedbv_typet u8{8};
+  const unsignedbv_typet u16{16};
+  const symbol_exprt a{"a", u8};
+  const symbol_exprt b{"b", u8};
+
+  SECTION("aligned 8-bit shift on a 16-bit two-operand concat")
+  {
+    // (concat(a, b)) << 8 -> concat(b, 0x00)
+    const concatenation_exprt cat{{a, b}, u16};
+    const shl_exprt shl{cat, from_integer(8, u16)};
+    const concatenation_exprt expected{{b, from_integer(0, bv_typet{8})}, u16};
+    REQUIRE(simplify_expr(shl, ns) == expected);
+  }
+
+  SECTION("3-operand concat with the boundary in the middle")
+  {
+    // (concat(a4, b4, c8)) << 8 -> concat(c8, 0_8)
+    const symbol_exprt a4{"a4", u4};
+    const symbol_exprt b4{"b4", u4};
+    const symbol_exprt c8{"c8", u8};
+    const concatenation_exprt cat{{a4, b4, c8}, u16};
+    const shl_exprt shl{cat, from_integer(8, u16)};
+    const concatenation_exprt expected{{c8, from_integer(0, bv_typet{8})}, u16};
+    REQUIRE(simplify_expr(shl, ns) == expected);
+  }
+
+  SECTION("mis-aligned distance must not fire")
+  {
+    // (concat(a, b)) << 4 must not be rewritten by this rule.
+    const concatenation_exprt cat{{a, b}, u16};
+    const shl_exprt shl{cat, from_integer(4, u16)};
+    const exprt result = simplify_expr(shl, ns);
+    // It must NOT be a concat whose last (rightmost) operand is the
+    // 4-bit zero pad we'd have introduced on a successful rewrite.
+    if(result.id() == ID_concatenation)
+    {
+      REQUIRE(
+        to_concatenation_expr(result).operands().back() !=
+        from_integer(0, bv_typet{4}));
+    }
+  }
+
+  SECTION("full-width and over-width shifts collapse to zero")
+  {
+    const concatenation_exprt cat{{a, b}, u16};
+    const shl_exprt shl_full{cat, from_integer(16, u16)};
+    REQUIRE(simplify_expr(shl_full, ns) == from_integer(0, u16));
+    const shl_exprt shl_over{cat, from_integer(20, u16)};
+    REQUIRE(simplify_expr(shl_over, ns) == from_integer(0, u16));
+  }
+}
