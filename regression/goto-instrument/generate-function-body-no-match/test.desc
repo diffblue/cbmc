@@ -1,0 +1,6 @@
+CORE
+main.c
+--generate-function-body nonexistent_function --generate-function-body-options assert-false
+^generate function bodies: No function name matched regex
+^EXIT=0$
+^SIGNAL=0$

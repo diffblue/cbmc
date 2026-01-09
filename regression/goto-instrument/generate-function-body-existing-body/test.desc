@@ -1,0 +1,6 @@
+CORE
+main.c
+--generate-function-body replace_my_body --generate-function-body-options assert-false
+^generate function bodies: Function\(s\) matched but already have bodies
+^EXIT=10$
+^SIGNAL=0$
