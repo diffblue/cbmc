@@ -347,11 +347,23 @@ std::chrono::duration<double> prepare_property_decider(
     << property_decider.get_decision_procedure().decision_procedure_text()
     << messaget::eom;
 
-  convert_symex_target_equation(
-    equation, property_decider.get_decision_procedure(), ui_message_handler);
-  property_decider.update_properties_goals_from_symex_target_equation(
-    properties);
-  property_decider.convert_goals();
+  try
+  {
+    convert_symex_target_equation(
+      equation, property_decider.get_decision_procedure(), ui_message_handler);
+    property_decider.update_properties_goals_from_symex_target_equation(
+      properties);
+    property_decider.convert_goals();
+  }
+  catch(const std::bad_alloc &)
+  {
+    log.error() << "Solver ran out of memory during propositional reduction."
+                << messaget::eom;
+    log.error()
+      << "Try reducing the problem size or increasing available memory."
+      << messaget::eom;
+    throw;
+  }
 
   auto solver_stop = std::chrono::steady_clock::now();
   return std::chrono::duration<double>(solver_stop - solver_start);
