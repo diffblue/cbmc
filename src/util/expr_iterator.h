@@ -37,6 +37,8 @@ class const_depth_iteratort;
 /// duplicates, shows only first encountered child)
 /// Slower iteration than naive version. Very expensive copy.
 class const_unique_depth_iteratort;
+/// Post-order depth-first-search iterator (children visited before parent)
+class const_post_depth_iteratort;
 
 /// Helper class for depth_iterator_baset
 struct depth_iterator_expr_statet final
@@ -332,6 +334,135 @@ static inline const_depth_iterator_range_adaptert
 pre_traversal(const exprt &root)
 {
   return const_depth_iterator_range_adaptert{root};
+}
+
+/// Post-order depth-first-search iterator.
+/// Visits all children before visiting the parent node.
+/// For expression (a + (b * c)), visits: a, b, c, *, +
+class const_post_depth_iteratort final
+{
+public:
+  typedef void difference_type;                        // NOLINT Required by STL
+  typedef exprt value_type;                            // NOLINT
+  typedef const exprt *pointer;                        // NOLINT
+  typedef const exprt &reference;                      // NOLINT
+  typedef std::forward_iterator_tag iterator_category; // NOLINT
+
+  /// Create iterator starting at the supplied node (root).
+  /// Immediately descends to the leftmost leaf.
+  explicit const_post_depth_iteratort(const exprt &expr)
+  {
+    descend_to_leftmost_leaf(expr);
+  }
+
+  /// Create an end iterator
+  const_post_depth_iteratort() = default;
+
+  bool operator==(const const_post_depth_iteratort &other) const
+  {
+    return m_stack == other.m_stack;
+  }
+
+  bool operator!=(const const_post_depth_iteratort &other) const
+  {
+    return !(*this == other);
+  }
+
+  /// Preincrement operator
+  /// Do not call on the end() iterator
+  const_post_depth_iteratort &operator++()
+  {
+    PRECONDITION(!m_stack.empty());
+
+    // Pop the current node (we've just visited it)
+    m_stack.pop_back();
+
+    if(m_stack.empty())
+      return *this;
+
+    // Move to next sibling
+    ++m_stack.back().op_idx;
+
+    // If there's a next sibling, descend to its leftmost leaf
+    if(m_stack.back().op_idx < m_stack.back().expr.get().operands().size())
+    {
+      descend_to_leftmost_leaf(
+        m_stack.back().expr.get().operands()[m_stack.back().op_idx]);
+    }
+    // Otherwise, the parent is the next node to visit (already on stack)
+
+    return *this;
+  }
+
+  /// Post-increment operator
+  /// Expensive copy. Avoid if possible
+  const_post_depth_iteratort operator++(int)
+  {
+    const_post_depth_iteratort tmp(*this);
+    ++(*this);
+    return tmp;
+  }
+
+  /// Dereference operator
+  /// Dereferencing end() iterator is undefined behaviour
+  const exprt &operator*() const
+  {
+    PRECONDITION(!m_stack.empty());
+    return m_stack.back().expr.get();
+  }
+
+  /// Dereference operator (member access)
+  /// Dereferencing end() iterator is undefined behaviour
+  const exprt *operator->() const
+  {
+    return &**this;
+  }
+
+private:
+  /// Descend from the given expression to its leftmost leaf,
+  /// pushing all nodes along the path onto the stack.
+  void descend_to_leftmost_leaf(const exprt &expr)
+  {
+    const exprt *current = &expr;
+    while(true)
+    {
+      m_stack.emplace_back(*current);
+      if(current->operands().empty())
+        break;
+      current = &current->operands().front();
+    }
+  }
+
+  std::deque<depth_iterator_expr_statet> m_stack;
+};
+
+/// An adapter to yield a range of const_post_depth_iteratort.
+class const_post_depth_iterator_range_adaptert
+{
+public:
+  explicit const_post_depth_iterator_range_adaptert(const exprt &_root)
+    : root{_root}
+  {
+  }
+
+  const_post_depth_iteratort begin() const
+  {
+    return const_post_depth_iteratort{root};
+  }
+
+  const_post_depth_iteratort end() const
+  {
+    return const_post_depth_iteratort{};
+  }
+
+protected:
+  const exprt &root;
+};
+
+static inline const_post_depth_iterator_range_adaptert
+post_traversal(const exprt &root)
+{
+  return const_post_depth_iterator_range_adaptert{root};
 }
 
 #endif

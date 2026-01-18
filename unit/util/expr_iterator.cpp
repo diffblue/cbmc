@@ -99,5 +99,51 @@ SCENARIO("expr_iterator", "[core][utils][expr_iterator]")
                    ID_implies, ID_not, ID_equal, ID_symbol, ID_symbol});
       }
     }
+
+    WHEN("Visiting the expressions with a post-order depth iterator")
+    {
+      std::vector<irep_idt> ids;
+      for(auto it = const_post_depth_iteratort(top);
+          it != const_post_depth_iteratort();
+          ++it)
+      {
+        ids.push_back(it->id());
+      }
+
+      THEN("We expect to see children before parents")
+      {
+        REQUIRE(
+          ids == std::vector<irep_idt>{
+                   ID_symbol,
+                   ID_symbol,
+                   ID_notequal,
+                   ID_symbol,
+                   ID_symbol,
+                   ID_equal,
+                   ID_implies});
+      }
+    }
+
+    WHEN("Visiting the expressions using post_traversal range adapter")
+    {
+      std::vector<irep_idt> ids;
+      for(const auto &expr : post_traversal(top))
+      {
+        ids.push_back(expr.id());
+      }
+
+      THEN("We expect to see children before parents")
+      {
+        REQUIRE(
+          ids == std::vector<irep_idt>{
+                   ID_symbol,
+                   ID_symbol,
+                   ID_notequal,
+                   ID_symbol,
+                   ID_symbol,
+                   ID_equal,
+                   ID_implies});
+      }
+    }
   }
 }
