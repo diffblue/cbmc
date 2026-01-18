@@ -287,6 +287,8 @@ var annotated_dup =
     [ "const_depth_iterator_range_adaptert", "classconst__depth__iterator__range__adaptert.html", "classconst__depth__iterator__range__adaptert" ],
     [ "const_depth_iteratort", "classconst__depth__iteratort.html", "classconst__depth__iteratort" ],
     [ "const_expr_visitort", "classconst__expr__visitort.html", "classconst__expr__visitort" ],
+    [ "const_post_depth_iterator_range_adaptert", "classconst__post__depth__iterator__range__adaptert.html", "classconst__post__depth__iterator__range__adaptert" ],
+    [ "const_post_depth_iteratort", "classconst__post__depth__iteratort.html", "classconst__post__depth__iteratort" ],
     [ "const_target_hash", "structconst__target__hash.html", "structconst__target__hash" ],
     [ "const_unique_depth_iteratort", "classconst__unique__depth__iteratort.html", "classconst__unique__depth__iteratort" ],
     [ "constant_abstract_valuet", "classconstant__abstract__valuet.html", "classconstant__abstract__valuet" ],

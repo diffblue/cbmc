@@ -328,6 +328,8 @@ var hierarchy =
       [ "function_binding_visitort", "classfunction__binding__visitort.html", null ]
     ] ],
     [ "small_mapt< T, Ind, Num >::const_iterator", "classsmall__mapt_1_1const__iterator.html", null ],
+    [ "const_post_depth_iterator_range_adaptert", "classconst__post__depth__iterator__range__adaptert.html", null ],
+    [ "const_post_depth_iteratort", "classconst__post__depth__iteratort.html", null ],
     [ "const_target_hash", "structconst__target__hash.html", null ],
     [ "small_mapt< T, Ind, Num >::const_value_iterator", "classsmall__mapt_1_1const__value__iterator.html", null ],
     [ "constants_evaluator", "classconstants__evaluator.html", null ],
