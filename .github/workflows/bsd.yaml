@@ -161,11 +161,11 @@ jobs:
             # apparently fail-on-error isn't the default here
             set -e -x
             echo "Fetch dependencies"
-            pkg_add -v gmake git python311 patch flex bison ccache parallel z3 gcc10
+            pkg_add -u -v gmake git python311 patch flex bison ccache parallel z3 gcc10
             ln -s $(which python3.11) /usr/pkg/bin/python3
             export PATH=/usr/pkg/gcc10/bin:$PATH
             echo "Fetch JBMC dependencies"
-            pkg_add -v openjdk8 wget apache-maven
+            pkg_add -u -v openjdk8 wget apache-maven
             echo "Zero ccache stats and limit in size"
             export CCACHE_BASEDIR=$PWD
             export CCACHE_DIR=$PWD/.ccache
