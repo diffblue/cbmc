@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file util/std_expr.h
 /// API to expression classes
 
+#include "deprecate.h"
 #include "expr_cast.h"
 #include "invariant.h"
 #include "std_types.h"
@@ -3608,7 +3609,10 @@ inline cond_exprt &to_cond_expr(exprt &expr)
 /// matching case. The first operand is the value to compare against. Subsequent
 /// operands alternate between compare values and result values.  The syntax is:
 /// case(select_value, case1_value, result1, case2_value, result2, ...)
-class case_exprt : public multi_ary_exprt
+/// \deprecated This expression is SMV-specific and has no other use.
+// NOLINTNEXTLINE(readability/identifiers)
+class DEPRECATED(SINCE(2026, 1, 18, "SMV-specific, has no other use"))
+  case_exprt : public multi_ary_exprt
 {
 public:
   case_exprt(operandst _operands, typet _type)
