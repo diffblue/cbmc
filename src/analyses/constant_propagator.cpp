@@ -200,7 +200,7 @@ void constant_propagator_domaint::transform(
     {
       // called function identifier
       const symbol_exprt &symbol_expr=to_symbol_expr(function);
-      const irep_idt id=symbol_expr.get_identifier();
+      const irep_idt id = symbol_expr.identifier();
 
       // Functions with no body
       if(function_from == function_to)
@@ -435,7 +435,7 @@ protected:
   bool is_constant(const exprt &expr) const override
   {
     if(expr.id() == ID_symbol)
-      return is_constant(to_symbol_expr(expr).get_identifier());
+      return is_constant(to_symbol_expr(expr).identifier());
 
     return can_forward_propagatet::is_constant(expr);
   }
@@ -462,7 +462,7 @@ bool constant_propagator_domaint::valuest::is_constant(
 bool constant_propagator_domaint::valuest::set_to_top(
   const symbol_exprt &symbol_expr)
 {
-  const auto n_erased = replace_const.erase(symbol_expr.get_identifier());
+  const auto n_erased = replace_const.erase(symbol_expr.identifier());
 
   INVARIANT(n_erased==0 || !is_bottom, "bottom should have no elements at all");
 

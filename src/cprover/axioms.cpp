@@ -329,7 +329,7 @@ void axiomst::initial_state()
     for(const auto &object : address_taken)
     {
       const symbolt *symbol;
-      if(ns.lookup(object.get_identifier(), symbol))
+      if(ns.lookup(object.identifier(), symbol))
         continue;
 
       if(symbol->is_static_lifetime || !symbol->is_lvalue)

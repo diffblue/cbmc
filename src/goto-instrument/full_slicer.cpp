@@ -248,7 +248,7 @@ static bool implicit(goto_programt::const_targett target)
 
   const symbol_exprt &s = to_symbol_expr(a_lhs);
 
-  return s.get_identifier() == rounding_mode_identifier();
+  return s.identifier() == rounding_mode_identifier();
 }
 
 void full_slicert::operator()(
@@ -287,12 +287,12 @@ void full_slicert::operator()(
     else if(instruction->is_decl())
     {
       const auto &s = instruction->decl_symbol();
-      decl_dead[s.get_identifier()].push(instruction_node_index);
+      decl_dead[s.identifier()].push(instruction_node_index);
     }
     else if(instruction->is_dead())
     {
       const auto &s = instruction->dead_symbol();
-      decl_dead[s.get_identifier()].push(instruction_node_index);
+      decl_dead[s.identifier()].push(instruction_node_index);
     }
   }
 

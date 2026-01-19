@@ -34,7 +34,7 @@ codet lift_clinit_calls(codet input)
           const auto callee = expr_try_dynamic_cast<symbol_exprt>(
             to_code_function_call(*code).function()))
         {
-          if(is_clinit_wrapper_function(callee->get_identifier()))
+          if(is_clinit_wrapper_function(callee->identifier()))
           {
             clinit_wrappers_called.push_back(*callee);
             // Replace call with skip:

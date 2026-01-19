@@ -511,8 +511,7 @@ bool boolbvt::boolbv_set_equality_to_true(const equal_exprt &expr)
 
     const bvt &bv1=convert_bv(expr.rhs());
 
-    const irep_idt &identifier=
-      to_symbol_expr(expr.lhs()).get_identifier();
+    const irep_idt &identifier = to_symbol_expr(expr.lhs()).identifier();
 
     map.set_literals(identifier, type, bv1);
 
@@ -564,7 +563,7 @@ binding_exprt::variablest boolbvt::fresh_binding(const binding_exprt &binding)
 
   for(const auto &binding : binding.variables())
   {
-    const auto &old_identifier = binding.get_identifier();
+    const auto &old_identifier = binding.identifier();
 
     // produce a new identifier
     const irep_idt new_identifier =

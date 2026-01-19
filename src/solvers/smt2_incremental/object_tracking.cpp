@@ -92,7 +92,7 @@ static bool is_dynamic(const exprt &object)
     return true;
   const auto symbol = expr_try_dynamic_cast<symbol_exprt>(object);
   bool symbol_is_dynamic =
-    symbol && symbol->get_identifier().starts_with(SYMEX_DYNAMIC_PREFIX);
+    symbol && symbol->identifier().starts_with(SYMEX_DYNAMIC_PREFIX);
   return symbol_is_dynamic;
 }
 

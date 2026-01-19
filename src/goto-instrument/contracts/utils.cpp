@@ -121,7 +121,7 @@ void havoc_assigns_targetst::append_havoc_code_for_expr(
   {
     const auto &funcall = to_side_effect_expr_function_call(expr);
     // type-checking ensures the function expression is necessarily a symbol
-    const auto &ident = to_symbol_expr(funcall.function()).get_identifier();
+    const auto &ident = to_symbol_expr(funcall.function()).identifier();
     if(ident == CPROVER_PREFIX "object_whole")
     {
       append_object_havoc_code_for_expr(
@@ -351,7 +351,7 @@ void infer_loop_assigns(
     if(e.id() == ID_symbol)
     {
       const auto &s = expr_try_dynamic_cast<symbol_exprt>(e);
-      return !has_prefix(id2string(s->get_identifier()), CPROVER_PREFIX);
+      return !has_prefix(id2string(s->identifier()), CPROVER_PREFIX);
     }
     return true;
   });
@@ -536,7 +536,7 @@ bool is_assignment_to_instrumented_variable(
   if(can_cast_expr<symbol_exprt>(target->assign_lhs()))
   {
     const auto &lhs = to_symbol_expr(target->assign_lhs());
-    return id2string(lhs.get_identifier()).find("::" + var_name) !=
+    return id2string(lhs.identifier()).find("::" + var_name) !=
            std::string::npos;
   }
 

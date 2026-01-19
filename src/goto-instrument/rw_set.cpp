@@ -87,7 +87,7 @@ void _rw_set_loct::read_write_rec(
   {
     const symbol_exprt &symbol_expr=to_symbol_expr(expr);
 
-    irep_idt object=id2string(symbol_expr.get_identifier())+suffix;
+    irep_idt object = id2string(symbol_expr.identifier()) + suffix;
 
     if(r)
     {
@@ -194,7 +194,7 @@ void rw_set_functiont::compute_rec(const exprt &function)
 {
   if(function.id()==ID_symbol)
   {
-    const irep_idt &function_id = to_symbol_expr(function).get_identifier();
+    const irep_idt &function_id = to_symbol_expr(function).identifier();
 
     goto_functionst::function_mapt::const_iterator f_it =
       goto_functions.function_map.find(function_id);

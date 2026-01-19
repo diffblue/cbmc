@@ -54,11 +54,11 @@ TEST_CASE("Goto program inline", "[core][goto-programs][goto_program_inline]")
         const auto &lhs = it->assign_lhs();
         if(assign_count == 0)
         {
-          REQUIRE(to_symbol_expr(lhs).get_identifier() == "x");
+          REQUIRE(to_symbol_expr(lhs).identifier() == "x");
         }
         else if(assign_count == 1)
         {
-          REQUIRE(to_symbol_expr(lhs).get_identifier() == "y");
+          REQUIRE(to_symbol_expr(lhs).identifier() == "y");
         }
         assign_count++;
       }

@@ -39,7 +39,7 @@ public:
   {
     if(assign.lhs().id()!=ID_symbol)
       return false;
-    const irep_idt &id=to_symbol_expr(assign.lhs()).get_identifier();
+    const irep_idt &id = to_symbol_expr(assign.lhs()).identifier();
     return id2string(id).find("ignored")!=std::string::npos;
   }
 
@@ -67,7 +67,7 @@ public:
     // Disregard writes against variables containing 'no_write':
     if(lhs.id()==ID_symbol)
     {
-      const irep_idt &id=to_symbol_expr(lhs).get_identifier();
+      const irep_idt &id = to_symbol_expr(lhs).identifier();
       if(id2string(id).find("no_write")!=std::string::npos)
         return;
     }
@@ -106,7 +106,7 @@ public:
     exprt read_sym = skip_typecast(expr);
     if(read_sym.id()==ID_symbol)
     {
-      const irep_idt &id=to_symbol_expr(read_sym).get_identifier();
+      const irep_idt &id = to_symbol_expr(read_sym).identifier();
       if(id2string(id).find("maybe_unknown")!=std::string::npos)
         insert(dest, exprt(ID_unknown, read_sym.type()));
     }
@@ -121,7 +121,7 @@ public:
     // variable "effect":
     if(lhs.id()==ID_symbol)
     {
-      const irep_idt &id=to_symbol_expr(lhs).get_identifier();
+      const irep_idt &id = to_symbol_expr(lhs).identifier();
       const auto &id_str=id2string(id);
       auto find_idx=id_str.find("cause");
       if(find_idx!=std::string::npos)

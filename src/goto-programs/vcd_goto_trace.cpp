@@ -93,7 +93,7 @@ void output_vcd(
       auto lhs_object=step.get_lhs_object();
       if(lhs_object.has_value())
       {
-        irep_idt identifier=lhs_object->get_identifier();
+        irep_idt identifier = lhs_object->identifier();
         const typet &type=lhs_object->type();
 
         const auto number=n.number(identifier);
@@ -120,7 +120,7 @@ void output_vcd(
       auto lhs_object = step.get_lhs_object();
       if(lhs_object.has_value())
       {
-        irep_idt identifier = lhs_object->get_identifier();
+        irep_idt identifier = lhs_object->identifier();
         const typet &type = lhs_object->type();
 
         out << '#' << timestamp << "\n";

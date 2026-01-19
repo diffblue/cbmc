@@ -206,7 +206,7 @@ void string_instrumentationt::do_function_call(
 
   if(function.id() == ID_symbol)
   {
-    const irep_idt &identifier = to_symbol_expr(function).get_identifier();
+    const irep_idt &identifier = to_symbol_expr(function).identifier();
 
     if(identifier == "strcoll")
     {

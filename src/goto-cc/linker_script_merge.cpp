@@ -232,7 +232,7 @@ int linker_script_merget::pointerize_linker_defined_symbols(
     ret=1;
     for(const auto &sym : to_pointerize)
     {
-      log.error() << " Could not pointerize '" << sym.get_identifier()
+      log.error() << " Could not pointerize '" << sym.identifier()
                   << "' in symbol table entry " << it->first << ". Pretty:\n"
                   << sym.pretty() << "\n";
     }
@@ -263,7 +263,7 @@ int linker_script_merget::pointerize_linker_defined_symbols(
         ret=1;
         for(const auto &sym : to_pointerize)
         {
-          log.error() << " Could not pointerize '" << sym.get_identifier()
+          log.error() << " Could not pointerize '" << sym.identifier()
                       << "' in function " << gf.first << ". Pretty:\n"
                       << sym.pretty() << "\n";
           log.error().source_location = instruction.source_location();
@@ -310,7 +310,7 @@ int linker_script_merget::pointerize_subexprs_of(
         continue;
       // take a copy, expr will be changed below
       const symbol_exprt inner_symbol=pattern.inner_symbol(expr);
-      if(pair.first!=inner_symbol.get_identifier())
+      if(pair.first != inner_symbol.identifier())
         continue;
       tmp=replace_expr(expr, linker_values, inner_symbol, pair.first,
           pattern.description());
@@ -320,7 +320,7 @@ int linker_script_merget::pointerize_subexprs_of(
       if(result==to_pointerize.end())
       {
         fail=1;
-        log.error() << "Too many removals of '" << inner_symbol.get_identifier()
+        log.error() << "Too many removals of '" << inner_symbol.identifier()
                     << "'" << messaget::eom;
       }
       else
@@ -350,7 +350,7 @@ void linker_script_merget::symbols_to_pointerize(
     if(op.id()!=ID_symbol)
       continue;
     const symbol_exprt &sym_exp=to_symbol_expr(op);
-    const auto &pair=linker_values.find(sym_exp.get_identifier());
+    const auto &pair = linker_values.find(sym_exp.identifier());
     if(pair!=linker_values.end())
         to_pointerize.push_back(sym_exp);
   }

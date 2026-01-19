@@ -51,7 +51,7 @@ void dfcc_is_fresht::rewrite_calls(
 
       if(function.id() == ID_symbol)
       {
-        const irep_idt &fun_name = to_symbol_expr(function).get_identifier();
+        const irep_idt &fun_name = to_symbol_expr(function).identifier();
         if(has_prefix(id2string(fun_name), CPROVER_PREFIX "is_fresh"))
         {
           // add address on first operand
@@ -60,7 +60,7 @@ void dfcc_is_fresht::rewrite_calls(
 
           // fix the function name.
           to_symbol_expr(target->call_function())
-            .set_identifier(library.dfcc_fun_symbol[dfcc_funt::IS_FRESH].name);
+            .identifier(library.dfcc_fun_symbol[dfcc_funt::IS_FRESH].name);
 
           // pass the may_fail flag
           if(function.source_location().get_bool("no_fail"))

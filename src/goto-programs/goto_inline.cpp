@@ -199,7 +199,7 @@ void goto_partial_inline(
         continue;
 
       const symbol_exprt &symbol_expr=to_symbol_expr(function_expr);
-      const irep_idt id=symbol_expr.get_identifier();
+      const irep_idt id = symbol_expr.identifier();
 
       goto_functionst::function_mapt::const_iterator called_it =
         goto_functions.function_map.find(id);

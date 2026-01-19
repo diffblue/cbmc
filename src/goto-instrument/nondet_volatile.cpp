@@ -115,7 +115,7 @@ void nondet_volatilet::handle_volatile_expression(
   if(
     all_nondet ||
     (expr.id() == ID_symbol &&
-     nondet_variables.count(to_symbol_expr(expr).get_identifier()) != 0))
+     nondet_variables.count(to_symbol_expr(expr).identifier()) != 0))
   {
     typet t = expr.type();
     t.remove(ID_C_volatile);
@@ -133,7 +133,7 @@ void nondet_volatilet::handle_volatile_expression(
     return;
   }
 
-  const irep_idt &id = to_symbol_expr(expr).get_identifier();
+  const irep_idt &id = to_symbol_expr(expr).identifier();
   const auto &it = variable_models.find(id);
 
   if(it == variable_models.end())

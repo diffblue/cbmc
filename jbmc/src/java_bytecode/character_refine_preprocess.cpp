@@ -1292,8 +1292,7 @@ codet character_refine_preprocesst::replace_character_call(
 {
   if(code.function().id()==ID_symbol)
   {
-    const irep_idt &function_id=
-      to_symbol_expr(code.function()).get_identifier();
+    const irep_idt &function_id = to_symbol_expr(code.function()).identifier();
     auto it=conversion_table.find(function_id);
     if(it!=conversion_table.end())
       return (it->second)(code);

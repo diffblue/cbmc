@@ -74,7 +74,7 @@ void dirtyt::find_dirty_address_of(const exprt &expr)
 {
   if(expr.id() == ID_symbol)
   {
-    const irep_idt &identifier = to_symbol_expr(expr).get_identifier();
+    const irep_idt &identifier = to_symbol_expr(expr).identifier();
 
     dirty.insert(identifier);
   }

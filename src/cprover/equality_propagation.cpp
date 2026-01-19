@@ -40,7 +40,7 @@ void equality_propagation(std::vector<exprt> &constraints)
         const auto &symbol_expr = to_symbol_expr(equal_expr.lhs());
         // this is a (deliberate) no-op when the symbol is already in the map
         auto insert_result =
-          values.insert({symbol_expr.get_identifier(), equal_expr.rhs()});
+          values.insert({symbol_expr.identifier(), equal_expr.rhs()});
         if(insert_result.second)
         {
           // insertion has happened

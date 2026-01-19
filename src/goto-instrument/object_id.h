@@ -26,7 +26,7 @@ public:
 
   explicit object_idt(const symbol_exprt &symbol_expr)
   {
-    id=symbol_expr.get_identifier();
+    id = symbol_expr.identifier();
   }
 
   explicit object_idt(const irep_idt &identifier)

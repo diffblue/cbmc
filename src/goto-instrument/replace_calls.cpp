@@ -74,7 +74,7 @@ void replace_callst::operator()(
     PRECONDITION(function.id() == ID_symbol);
 
     const symbol_exprt &se = to_symbol_expr(function);
-    const irep_idt &id = se.get_identifier();
+    const irep_idt &id = se.identifier();
 
     auto f_it1 = goto_functions.function_map.find(id);
 
@@ -108,7 +108,7 @@ void replace_callst::operator()(
 
     // Finally modify the call
     ins.call_function().type() = ns.lookup(f_it2->first).type;
-    to_symbol_expr(ins.call_function()).set_identifier(new_id);
+    to_symbol_expr(ins.call_function()).identifier(new_id);
   }
 }
 

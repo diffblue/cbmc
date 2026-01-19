@@ -226,7 +226,7 @@ void statement_list_typecheckt::typecheck_tag_list()
 {
   for(const symbol_exprt &tag : parse_tree.tags)
   {
-    symbolt tag_sym{tag.get_identifier(), tag.type(), ID_statement_list};
+    symbolt tag_sym{tag.identifier(), tag.type(), ID_statement_list};
     tag_sym.is_static_lifetime = true;
     tag_sym.module = module;
     tag_sym.base_name = tag_sym.name;
@@ -269,7 +269,7 @@ void statement_list_typecheckt::typecheck_function_block_var_decls(
   for(const statement_list_parse_treet::var_declarationt &declaration :
       var_decls)
   {
-    const irep_idt &var_name{declaration.variable.get_identifier()};
+    const irep_idt &var_name{declaration.variable.identifier()};
     const typet &var_type{declaration.variable.type()};
     struct_union_typet::componentt component{var_name, var_type};
     component.set(ID_statement_list_type, var_property);
@@ -290,15 +290,15 @@ void statement_list_typecheckt::typecheck_function_var_decls(
     param_sym.module = module;
     param_sym.type = declaration.variable.type();
     param_sym.name = id2string(function_name) +
-                     "::" + id2string(declaration.variable.get_identifier());
-    param_sym.base_name = declaration.variable.get_identifier();
+                     "::" + id2string(declaration.variable.identifier());
+    param_sym.base_name = declaration.variable.identifier();
     param_sym.pretty_name = param_sym.base_name;
     param_sym.mode = ID_statement_list;
     symbol_table.add(param_sym);
 
     code_typet::parametert param{declaration.variable.type()};
     param.set_identifier(param_sym.name);
-    param.set_base_name(declaration.variable.get_identifier());
+    param.set_base_name(declaration.variable.identifier());
     param.set(ID_statement_list_type, var_property);
     params.push_back(param);
   }
@@ -313,10 +313,10 @@ void statement_list_typecheckt::typecheck_temp_var_decls(
   {
     symbolt temp_sym{
       id2string(tia_symbol.name) +
-        "::" + id2string(declaration.variable.get_identifier()),
+        "::" + id2string(declaration.variable.identifier()),
       declaration.variable.type(),
       ID_statement_list};
-    temp_sym.base_name = declaration.variable.get_identifier();
+    temp_sym.base_name = declaration.variable.identifier();
     temp_sym.pretty_name = temp_sym.base_name;
     temp_sym.module = module;
     symbol_table.add(temp_sym);
@@ -631,7 +631,7 @@ void statement_list_typecheckt::typecheck_statement_list_load(
     expr_try_dynamic_cast<symbol_exprt>(op_code.op0());
   if(symbol)
   {
-    const irep_idt &identifier{symbol->get_identifier()};
+    const irep_idt &identifier{symbol->identifier()};
     const exprt val{typecheck_identifier(tia_element, identifier)};
     accumulator.push_back(val);
   }
@@ -649,7 +649,7 @@ void statement_list_typecheckt::typecheck_statement_list_transfer(
   symbolt &tia_element)
 {
   const symbol_exprt &op{typecheck_instruction_with_non_const_operand(op_code)};
-  const exprt lhs{typecheck_identifier(tia_element, op.get_identifier())};
+  const exprt lhs{typecheck_identifier(tia_element, op.identifier())};
   if(lhs.type() != accumulator.back().type())
   {
     error() << "Types of transfer assignment do not match" << eom;
@@ -1004,7 +1004,7 @@ void statement_list_typecheckt::typecheck_statement_list_or(
   }
   const symbol_exprt &sym{
     typecheck_instruction_with_non_const_operand(op_code)};
-  const exprt op{typecheck_identifier(tia_element, sym.get_identifier())};
+  const exprt op{typecheck_identifier(tia_element, sym.identifier())};
 
   // If inside of a bit string, create an 'or' expression with the operand and
   // the current contents of the rlo bit.
@@ -1024,7 +1024,7 @@ void statement_list_typecheckt::typecheck_statement_list_or_not(
 {
   const symbol_exprt &sym{
     typecheck_instruction_with_non_const_operand(op_code)};
-  const exprt op{typecheck_identifier(tia_element, sym.get_identifier())};
+  const exprt op{typecheck_identifier(tia_element, sym.identifier())};
   const not_exprt not_op{op};
 
   // If inside of a bit string, create an 'or' expression with the operand and
@@ -1045,7 +1045,7 @@ void statement_list_typecheckt::typecheck_statement_list_xor(
 {
   const symbol_exprt &sym{
     typecheck_instruction_with_non_const_operand(op_code)};
-  const exprt op{typecheck_identifier(tia_element, sym.get_identifier())};
+  const exprt op{typecheck_identifier(tia_element, sym.identifier())};
 
   // If inside of a bit string, create an 'xor' expression with the operand and
   // the current contents of the rlo bit.
@@ -1065,7 +1065,7 @@ void statement_list_typecheckt::typecheck_statement_list_xor_not(
 {
   const symbol_exprt &sym{
     typecheck_instruction_with_non_const_operand(op_code)};
-  const exprt op{typecheck_identifier(tia_element, sym.get_identifier())};
+  const exprt op{typecheck_identifier(tia_element, sym.identifier())};
   const not_exprt not_op{op};
 
   // If inside of a bit string, create an 'xor not' expression with the
@@ -1203,7 +1203,7 @@ void statement_list_typecheckt::typecheck_statement_list_assign(
   symbolt &tia_element)
 {
   const symbol_exprt &op{typecheck_instruction_with_non_const_operand(op_code)};
-  const exprt lhs{typecheck_identifier(tia_element, op.get_identifier())};
+  const exprt lhs{typecheck_identifier(tia_element, op.identifier())};
 
   if(lhs.type() != rlo_bit.type())
   {
@@ -1242,7 +1242,7 @@ void statement_list_typecheckt::typecheck_statement_list_set(
   symbolt &tia_element)
 {
   const symbol_exprt &op{typecheck_instruction_with_non_const_operand(op_code)};
-  const irep_idt &identifier{op.get_identifier()};
+  const irep_idt &identifier{op.identifier()};
 
   save_rlo_state(tia_element);
 
@@ -1259,7 +1259,7 @@ void statement_list_typecheckt::typecheck_statement_list_reset(
   symbolt &tia_element)
 {
   const symbol_exprt &op{typecheck_instruction_with_non_const_operand(op_code)};
-  const irep_idt &identifier{op.get_identifier()};
+  const irep_idt &identifier{op.identifier()};
 
   save_rlo_state(tia_element);
 
@@ -1276,7 +1276,7 @@ void statement_list_typecheckt::typecheck_statement_list_call(
   symbolt &tia_element)
 {
   const symbol_exprt &op{typecheck_instruction_with_non_const_operand(op_code)};
-  const irep_idt &identifier{op.get_identifier()};
+  const irep_idt &identifier{op.identifier()};
   if(symbol_table.has_symbol(identifier))
     typecheck_called_tia_element(op_code, tia_element);
   else if(identifier == CPROVER_ASSUME)
@@ -1298,10 +1298,10 @@ void statement_list_typecheckt::typecheck_statement_list_jump_unconditional(
 {
   const symbol_exprt &label{
     typecheck_instruction_with_non_const_operand(op_code)};
-  typecheck_label_reference(label.get_identifier(), false);
+  typecheck_label_reference(label.identifier(), false);
 
   save_rlo_state(tia_element);
-  code_gotot unconditional{label.get_identifier()};
+  code_gotot unconditional{label.identifier()};
   tia_element.value.add_to_operands(unconditional);
 }
 
@@ -1311,10 +1311,10 @@ void statement_list_typecheckt::typecheck_statement_list_jump_conditional(
 {
   const symbol_exprt &label{
     typecheck_instruction_with_non_const_operand(op_code)};
-  typecheck_label_reference(label.get_identifier(), true);
+  typecheck_label_reference(label.identifier(), true);
 
   save_rlo_state(tia_element);
-  code_gotot jump{label.get_identifier()};
+  code_gotot jump{label.identifier()};
   code_ifthenelset conditional{rlo_bit, jump};
   tia_element.value.add_to_operands(conditional);
 
@@ -1329,10 +1329,10 @@ void statement_list_typecheckt::typecheck_statement_list_jump_conditional_not(
 {
   const symbol_exprt &label{
     typecheck_instruction_with_non_const_operand(op_code)};
-  typecheck_label_reference(label.get_identifier(), true);
+  typecheck_label_reference(label.identifier(), true);
 
   save_rlo_state(tia_element);
-  code_gotot jump{label.get_identifier()};
+  code_gotot jump{label.identifier()};
   code_ifthenelset not_conditional{not_exprt{rlo_bit}, jump};
   tia_element.value.add_to_operands(not_conditional);
 
@@ -1513,7 +1513,7 @@ exprt statement_list_typecheckt::typecheck_simple_boolean_instruction_operand(
 {
   const symbol_exprt &sym{
     typecheck_instruction_with_non_const_operand(op_code)};
-  const exprt op{typecheck_identifier(tia_element, sym.get_identifier())};
+  const exprt op{typecheck_identifier(tia_element, sym.identifier())};
   const not_exprt not_op{op};
   return negate ? not_op : op;
 }
@@ -1624,7 +1624,7 @@ void statement_list_typecheckt::typecheck_called_tia_element(
 {
   const symbol_exprt &call_operand{to_symbol_expr(op_code.op0())};
   const symbolt &called_function{
-    symbol_table.lookup_ref(call_operand.get_identifier())};
+    symbol_table.lookup_ref(call_operand.identifier())};
   const code_typet &called_type{to_code_type(called_function.type)};
   // Is it a STL function or STL function block?
   if(
@@ -1646,7 +1646,7 @@ void statement_list_typecheckt::typecheck_called_function(
 {
   const symbol_exprt call_operand{to_symbol_expr(op_code.op0())};
   const symbolt &called_function_sym{
-    symbol_table.lookup_ref(call_operand.get_identifier())};
+    symbol_table.lookup_ref(call_operand.identifier())};
   const symbol_exprt called_function_expr{called_function_sym.symbol_expr()};
   const code_typet &called_type{to_code_type(called_function_sym.type)};
 
@@ -1706,7 +1706,7 @@ exprt statement_list_typecheckt::typecheck_function_call_arguments(
   for(const auto &assignment : assignments)
   {
     const symbol_exprt &lhs{to_symbol_expr(assignment.lhs())};
-    if(param_name == lhs.get_identifier())
+    if(param_name == lhs.identifier())
     {
       exprt assigned_variable{
         typecheck_function_call_argument_rhs(tia_element, assignment.rhs())};
@@ -1736,7 +1736,7 @@ exprt statement_list_typecheckt::typecheck_function_call_argument_rhs(
     expr_try_dynamic_cast<symbol_exprt>(rhs);
   if(symbol_rhs)
     assigned_operand =
-      typecheck_identifier(tia_element, symbol_rhs->get_identifier());
+      typecheck_identifier(tia_element, symbol_rhs->identifier());
   else // constant_exprt.
     assigned_operand = rhs;
   return assigned_operand;
@@ -1750,11 +1750,11 @@ exprt statement_list_typecheckt::typecheck_return_value_assignment(
   for(const auto &assignment : assignments)
   {
     const symbol_exprt &lhs{to_symbol_expr(assignment.lhs())};
-    if(ID_statement_list_return_value_id == lhs.get_identifier())
+    if(ID_statement_list_return_value_id == lhs.identifier())
     {
       const symbol_exprt &rhs{to_symbol_expr(assignment.rhs())};
       const exprt assigned_variable{
-        typecheck_identifier(tia_element, rhs.get_identifier())};
+        typecheck_identifier(tia_element, rhs.identifier())};
       if(return_type == assigned_variable.type())
         return assigned_variable;
       else

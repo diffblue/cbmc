@@ -66,7 +66,7 @@ void thread_exit_instrumentation(goto_modelt &goto_model)
         {
           const exprt &function = instruction.call_function();
           if(function.id()==ID_symbol)
-            thread_fkts.insert(to_symbol_expr(function).get_identifier());
+            thread_fkts.insert(to_symbol_expr(function).identifier());
         }
     }
   }

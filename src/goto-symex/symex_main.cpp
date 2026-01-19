@@ -868,14 +868,14 @@ void goto_symext::try_filter_value_sets(
   if(jump_taken_value_set && !erase_from_jump_taken_value_set.empty())
   {
     auto entry_index = jump_taken_value_set->get_index_of_symbol(
-      symbol_expr->get_identifier(), symbol_type, "", ns);
+      symbol_expr->identifier(), symbol_type, "", ns);
     jump_taken_value_set->erase_values_from_entry(
       *entry_index, erase_from_jump_taken_value_set);
   }
   if(jump_not_taken_value_set && !erase_from_jump_not_taken_value_set.empty())
   {
     auto entry_index = jump_not_taken_value_set->get_index_of_symbol(
-      symbol_expr->get_identifier(), symbol_type, "", ns);
+      symbol_expr->identifier(), symbol_type, "", ns);
     jump_not_taken_value_set->erase_values_from_entry(
       *entry_index, erase_from_jump_not_taken_value_set);
   }

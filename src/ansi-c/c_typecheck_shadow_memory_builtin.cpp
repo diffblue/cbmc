@@ -230,7 +230,7 @@ std::optional<symbol_exprt> c_typecheck_baset::typecheck_shadow_memory_builtin(
   INVARIANT(
     can_cast_expr<symbol_exprt>(f_op),
     "expr.function() has to be a symbol_expr");
-  const irep_idt &identifier = to_symbol_expr(f_op).get_identifier();
+  const irep_idt &identifier = to_symbol_expr(f_op).identifier();
 
   if(
     identifier == CPROVER_PREFIX "field_decl_global" ||

@@ -27,45 +27,53 @@ SCENARIO("Level 0 renaming", "[core][goto-symex][symex-level0]")
 
     const symbol_exprt symbol_nonshared{"nonShared", int_type};
     const ssa_exprt ssa_nonshared{symbol_nonshared};
-    symbol_table.insert([&] {
-      symbolt symbol{
-        symbol_nonshared.get_identifier(), symbol_nonshared.type(), irep_idt{}};
-      symbol.value = symbol_nonshared;
-      symbol.is_thread_local = true;
-      return symbol;
-    }());
+    symbol_table.insert(
+      [&]
+      {
+        symbolt symbol{
+          symbol_nonshared.identifier(), symbol_nonshared.type(), irep_idt{}};
+        symbol.value = symbol_nonshared;
+        symbol.is_thread_local = true;
+        return symbol;
+      }());
 
     const symbol_exprt symbol_shared{"shared", int_type};
     const ssa_exprt ssa_shared{symbol_shared};
-    symbol_table.insert([&] {
-      symbolt symbol{
-        symbol_shared.get_identifier(), symbol_shared.type(), irep_idt{}};
-      symbol.value = symbol_shared;
-      symbol.is_thread_local = false;
-      return symbol;
-    }());
+    symbol_table.insert(
+      [&]
+      {
+        symbolt symbol{
+          symbol_shared.identifier(), symbol_shared.type(), irep_idt{}};
+        symbol.value = symbol_shared;
+        symbol.is_thread_local = false;
+        return symbol;
+      }());
 
     const symbol_exprt symbol_guard{goto_symex_statet::guard_identifier(),
                                     bool_typet{}};
     const ssa_exprt ssa_guard{symbol_guard};
-    symbol_table.insert([&] {
-      symbolt symbol{
-        symbol_guard.get_identifier(), symbol_guard.type(), irep_idt{}};
-      symbol.value = symbol_guard;
-      symbol.is_thread_local = false;
-      return symbol;
-    }());
+    symbol_table.insert(
+      [&]
+      {
+        symbolt symbol{
+          symbol_guard.identifier(), symbol_guard.type(), irep_idt{}};
+        symbol.value = symbol_guard;
+        symbol.is_thread_local = false;
+        return symbol;
+      }());
 
     const code_typet code_type({}, int_type);
     const symbol_exprt symbol_fun{"fun", code_type};
     const ssa_exprt ssa_fun{symbol_fun};
-    symbol_table.insert([&] {
-      symbolt fun_symbol{
-        symbol_fun.get_identifier(), symbol_fun.type(), irep_idt{}};
-      fun_symbol.value = symbol_fun;
-      fun_symbol.is_thread_local = true;
-      return fun_symbol;
-    }());
+    symbol_table.insert(
+      [&]
+      {
+        symbolt fun_symbol{
+          symbol_fun.identifier(), symbol_fun.type(), irep_idt{}};
+        fun_symbol.value = symbol_fun;
+        fun_symbol.is_thread_local = true;
+        return fun_symbol;
+      }());
 
     WHEN("The non-shared symbol is renamed")
     {
@@ -73,7 +81,7 @@ SCENARIO("Level 0 renaming", "[core][goto-symex][symex-level0]")
 
       THEN("Its L0 tag is set to the thread index")
       {
-        REQUIRE(renamed.get().get_identifier() == "nonShared!423");
+        REQUIRE(renamed.get().identifier() == "nonShared!423");
       }
     }
 
@@ -83,7 +91,7 @@ SCENARIO("Level 0 renaming", "[core][goto-symex][symex-level0]")
 
       THEN("Its L0 tag is unchanged")
       {
-        REQUIRE(renamed.get().get_identifier() == "shared");
+        REQUIRE(renamed.get().identifier() == "shared");
       }
     }
 
@@ -94,8 +102,7 @@ SCENARIO("Level 0 renaming", "[core][goto-symex][symex-level0]")
       THEN("Its L0 tag is unchanged")
       {
         REQUIRE(
-          renamed.get().get_identifier() ==
-          goto_symex_statet::guard_identifier());
+          renamed.get().identifier() == goto_symex_statet::guard_identifier());
       }
     }
 
@@ -105,7 +112,7 @@ SCENARIO("Level 0 renaming", "[core][goto-symex][symex-level0]")
 
       THEN("Its L0 tag is unchanged")
       {
-        REQUIRE(renamed.get().get_identifier() == "fun");
+        REQUIRE(renamed.get().identifier() == "fun");
       }
     }
   }

@@ -1239,7 +1239,7 @@ code_blockt c_typecheck_baset::instantiate_gcc_polymorphic_builtin(
   const irep_idt &identifier,
   const symbol_exprt &function_symbol)
 {
-  const irep_idt &identifier_with_type = function_symbol.get_identifier();
+  const irep_idt &identifier_with_type = function_symbol.identifier();
   const code_typet &code_type = to_code_type(function_symbol.type());
   const source_locationt &source_location = function_symbol.source_location();
 
@@ -1405,7 +1405,7 @@ exprt c_typecheck_baset::typecheck_shuffle_vector(
 {
   const exprt &f_op = expr.function();
   const source_locationt &source_location = expr.source_location();
-  const irep_idt &identifier = to_symbol_expr(f_op).get_identifier();
+  const irep_idt &identifier = to_symbol_expr(f_op).identifier();
 
   exprt::operandst arguments = expr.arguments();
 

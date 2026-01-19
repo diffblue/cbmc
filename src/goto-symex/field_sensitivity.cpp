@@ -220,7 +220,7 @@ exprt field_sensitivityt::apply(
         // In case the array type was incomplete, attempt to retrieve it from
         // the symbol table.
         const symbolt *array_from_symbol_table = ns.get_symbol_table().lookup(
-          to_symbol_expr(index.array()).get_identifier());
+          to_symbol_expr(index.array()).identifier());
         if(array_from_symbol_table != nullptr)
           l2_size = to_array_type(array_from_symbol_table->type).size();
       }
@@ -373,7 +373,7 @@ void field_sensitivityt::field_assignments(
     // assignments, thus we cannot skip putting it in there above.
     if(is_divisible(lhs, true))
     {
-      state.propagation.erase_if_exists(lhs.get_identifier());
+      state.propagation.erase_if_exists(lhs.identifier());
       state.value_set.erase_symbol(lhs, ns);
     }
   }
@@ -419,7 +419,7 @@ void field_sensitivityt::field_assignments_rec(
     // assignments, thus we cannot skip putting it in there above.
     if(is_divisible(l1_lhs, true))
     {
-      state.propagation.erase_if_exists(l1_lhs.get_identifier());
+      state.propagation.erase_if_exists(l1_lhs.identifier());
       state.value_set.erase_symbol(l1_lhs, ns);
     }
   }

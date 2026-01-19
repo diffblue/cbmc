@@ -1765,7 +1765,7 @@ TEST_CASE(
       test.object_size_function.make_application,
       test.is_dynamic_object_function.make_application);
     const smt_termt expected = smt_core_theoryt::equal(
-      smt_identifier_termt(symbol.get_identifier(), smt_bit_vector_sortt{64}),
+      smt_identifier_termt(symbol.identifier(), smt_bit_vector_sortt{64}),
       smt_bit_vector_theoryt::add(
         smt_bit_vector_theoryt::concat(
           smt_bit_vector_constant_termt{2, 8},

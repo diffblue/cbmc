@@ -435,7 +435,7 @@ exprt binding_exprt::instantiate(const operandst &values) const
   std::map<irep_idt, exprt> substitutions;
 
   for(std::size_t i = 0; i < variables.size(); i++)
-    substitutions[variables[i].get_identifier()] = values[i];
+    substitutions[variables[i].identifier()] = values[i];
 
   // now recurse downwards and substitute in 'where'
   auto substitute_result = substitute_symbols(substitutions, where());

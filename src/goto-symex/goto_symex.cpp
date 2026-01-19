@@ -91,7 +91,7 @@ void goto_symext::symex_assign(
     // Let's hide return value assignments.
     if(
       lhs.id() == ID_symbol &&
-      id2string(to_symbol_expr(lhs).get_identifier()).find("#return_value!") !=
+      id2string(to_symbol_expr(lhs).identifier()).find("#return_value!") !=
         std::string::npos)
     {
       assignment_type = symex_targett::assignment_typet::HIDDEN;
@@ -207,8 +207,7 @@ bool goto_symext::constant_propagate_assignment_with_side_effects(
 
     if(f_l1.function().id() == ID_symbol)
     {
-      const irep_idt &func_id =
-        to_symbol_expr(f_l1.function()).get_identifier();
+      const irep_idt &func_id = to_symbol_expr(f_l1.function()).identifier();
 
       if(func_id == ID_cprover_string_concat_func)
       {
@@ -389,7 +388,7 @@ goto_symext::try_evaluate_constant_string(
   }
 
   const auto s_pointer_opt =
-    state.propagation.find(to_symbol_expr(content).get_identifier());
+    state.propagation.find(to_symbol_expr(content).identifier());
 
   if(!s_pointer_opt)
   {
@@ -408,7 +407,7 @@ goto_symext::try_evaluate_constant(const statet &state, const exprt &expr)
   }
 
   const auto constant_expr_opt =
-    state.propagation.find(to_symbol_expr(expr).get_identifier());
+    state.propagation.find(to_symbol_expr(expr).identifier());
 
   if(!constant_expr_opt || !constant_expr_opt->get().is_constant())
   {

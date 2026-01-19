@@ -139,7 +139,7 @@ void rd_range_domaint::transform_dead(
   const namespacet &,
   locationt from)
 {
-  const irep_idt &identifier = from->dead_symbol().get_identifier();
+  const irep_idt &identifier = from->dead_symbol().identifier();
 
   valuest::iterator entry=values.find(identifier);
 
@@ -184,7 +184,7 @@ void rd_range_domaint::transform_function_call(
 {
   // only if there is an actual call, i.e., we have a body
   const symbol_exprt &fn_symbol_expr = to_symbol_expr(from->call_function());
-  if(function_to == fn_symbol_expr.get_identifier())
+  if(function_to == fn_symbol_expr.identifier())
   {
     for(valuest::iterator it=values.begin();
         it!=values.end();
@@ -209,8 +209,8 @@ void rd_range_domaint::transform_function_call(
         ++it;
     }
 
-    const code_typet &code_type=
-      to_code_type(ns.lookup(fn_symbol_expr.get_identifier()).type);
+    const code_typet &code_type =
+      to_code_type(ns.lookup(fn_symbol_expr.identifier()).type);
 
     for(const auto &param : code_type.parameters())
     {

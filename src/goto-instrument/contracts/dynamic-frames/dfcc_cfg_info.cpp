@@ -235,8 +235,7 @@ static bool is_assigned(dirtyt &dirty, const irep_idt &ident, assignst assigns)
     {
       if(
         root_object.id() == ID_symbol &&
-        expr_try_dynamic_cast<symbol_exprt>(root_object)->get_identifier() ==
-          ident)
+        expr_try_dynamic_cast<symbol_exprt>(root_object)->identifier() == ident)
       {
         return true;
       }
@@ -596,7 +595,7 @@ dfcc_cfg_infot::dfcc_cfg_infot(
       target++)
   {
     if(target->is_decl() && dfcc_is_loop_top_level(target))
-      top_level_local.insert(target->decl_symbol().get_identifier());
+      top_level_local.insert(target->decl_symbol().identifier());
   }
 
   top_level_tracked =
@@ -773,8 +772,8 @@ bool dfcc_cfg_infot::must_track_decl_or_dead(
   goto_programt::const_targett target) const
 {
   PRECONDITION(target->is_decl() || target->is_dead());
-  auto &ident = target->is_decl() ? target->decl_symbol().get_identifier()
-                                  : target->dead_symbol().get_identifier();
+  auto &ident = target->is_decl() ? target->decl_symbol().identifier()
+                                  : target->dead_symbol().identifier();
   auto &tracked = get_tracked_set(target);
   return tracked.find(ident) != tracked.end();
 }
@@ -805,7 +804,7 @@ static bool must_check_lhs_from_local_and_tracked(
       // non-tracked identifiers the check will fail but this is sound anyway.
       return true;
     }
-    const auto &id = to_symbol_expr(expr).get_identifier();
+    const auto &id = to_symbol_expr(expr).identifier();
     if(dfcc_is_cprover_static_symbol(id))
     {
       // Skip the check if we have a single cprover symbol as root object

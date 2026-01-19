@@ -282,7 +282,7 @@ bool flow_insensitive_analysis_baset::do_function_call_rec(
 
   if(function.id()==ID_symbol)
   {
-    const irep_idt &identifier = to_symbol_expr(function).get_identifier();
+    const irep_idt &identifier = to_symbol_expr(function).identifier();
 
     if(recursion_set.find(identifier)!=recursion_set.end())
     {

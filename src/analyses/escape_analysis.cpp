@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bool escape_domaint::is_tracked(const symbol_exprt &symbol)
 {
-  const irep_idt &identifier=symbol.get_identifier();
+  const irep_idt &identifier = symbol.identifier();
   if(
     identifier == CPROVER_PREFIX "memory_leak" ||
     identifier == CPROVER_PREFIX "dead_object" ||
@@ -36,7 +36,7 @@ irep_idt escape_domaint::get_function(const exprt &lhs)
     return get_function(to_typecast_expr(lhs).op());
   else if(lhs.id()==ID_symbol)
   {
-    irep_idt identifier=to_symbol_expr(lhs).get_identifier();
+    irep_idt identifier = to_symbol_expr(lhs).identifier();
     return identifier;
   }
 
@@ -52,7 +52,7 @@ void escape_domaint::assign_lhs_cleanup(
     const symbol_exprt &symbol_expr=to_symbol_expr(lhs);
     if(is_tracked(symbol_expr))
     {
-      irep_idt identifier=symbol_expr.get_identifier();
+      irep_idt identifier = symbol_expr.identifier();
 
       if(cleanup_functions.empty())
         cleanup_map.erase(identifier);
@@ -71,7 +71,7 @@ void escape_domaint::assign_lhs_aliases(
     const symbol_exprt &symbol_expr=to_symbol_expr(lhs);
     if(is_tracked(symbol_expr))
     {
-      irep_idt identifier=symbol_expr.get_identifier();
+      irep_idt identifier = symbol_expr.identifier();
 
       aliases.isolate(identifier);
 
@@ -92,7 +92,7 @@ void escape_domaint::get_rhs_cleanup(
     const symbol_exprt &symbol_expr=to_symbol_expr(rhs);
     if(is_tracked(symbol_expr))
     {
-      irep_idt identifier=symbol_expr.get_identifier();
+      irep_idt identifier = symbol_expr.identifier();
 
       const escape_domaint::cleanup_mapt::const_iterator m_it=
         cleanup_map.find(identifier);
@@ -122,7 +122,7 @@ void escape_domaint::get_rhs_aliases(
     const symbol_exprt &symbol_expr=to_symbol_expr(rhs);
     if(is_tracked(symbol_expr))
     {
-      irep_idt identifier=symbol_expr.get_identifier();
+      irep_idt identifier = symbol_expr.identifier();
       alias_set.insert(identifier);
 
       for(const auto &alias : aliases)
@@ -151,7 +151,7 @@ void escape_domaint::get_rhs_aliases_address_of(
 {
   if(rhs.id()==ID_symbol)
   {
-    irep_idt identifier=to_symbol_expr(rhs).get_identifier();
+    irep_idt identifier = to_symbol_expr(rhs).identifier();
     alias_set.insert("&"+id2string(identifier));
   }
   else if(rhs.id()==ID_if)
@@ -201,14 +201,14 @@ void escape_domaint::transform(
     break;
 
   case DECL:
-    aliases.isolate(instruction.decl_symbol().get_identifier());
-    assign_lhs_cleanup(instruction.decl_symbol(), std::set<irep_idt>());
-    break;
+      aliases.isolate(instruction.decl_symbol().identifier());
+      assign_lhs_cleanup(instruction.decl_symbol(), std::set<irep_idt>());
+      break;
 
   case DEAD:
-    aliases.isolate(instruction.dead_symbol().get_identifier());
-    assign_lhs_cleanup(instruction.dead_symbol(), std::set<irep_idt>());
-    break;
+      aliases.isolate(instruction.dead_symbol().identifier());
+      assign_lhs_cleanup(instruction.dead_symbol(), std::set<irep_idt>());
+      break;
 
   case FUNCTION_CALL:
     {
@@ -216,29 +216,29 @@ void escape_domaint::transform(
 
       if(function.id()==ID_symbol)
       {
-        const irep_idt &identifier=to_symbol_expr(function).get_identifier();
-        if(identifier == CPROVER_PREFIX "cleanup")
+      const irep_idt &identifier = to_symbol_expr(function).identifier();
+      if(identifier == CPROVER_PREFIX "cleanup")
+      {
+        if(instruction.call_arguments().size() == 2)
         {
-          if(instruction.call_arguments().size() == 2)
+          exprt lhs = instruction.call_arguments()[0];
+
+          irep_idt cleanup_function =
+            get_function(instruction.call_arguments()[1]);
+
+          if(!cleanup_function.empty())
           {
-            exprt lhs = instruction.call_arguments()[0];
+            // may alias other stuff
+            std::set<irep_idt> lhs_set;
+            get_rhs_aliases(lhs, lhs_set);
 
-            irep_idt cleanup_function =
-              get_function(instruction.call_arguments()[1]);
-
-            if(!cleanup_function.empty())
+            for(const auto &l : lhs_set)
             {
-              // may alias other stuff
-              std::set<irep_idt> lhs_set;
-              get_rhs_aliases(lhs, lhs_set);
-
-              for(const auto &l : lhs_set)
-              {
-                cleanup_map[l].cleanup_functions.insert(cleanup_function);
-              }
+              cleanup_map[l].cleanup_functions.insert(cleanup_function);
             }
           }
         }
+      }
       }
     }
     break;
@@ -382,7 +382,7 @@ void escape_domaint::check_lhs(
 {
   if(lhs.id()==ID_symbol)
   {
-    const irep_idt &identifier=to_symbol_expr(lhs).get_identifier();
+    const irep_idt &identifier = to_symbol_expr(lhs).identifier();
 
     // pointer with cleanup function?
     const escape_domaint::cleanup_mapt::const_iterator m_it=
@@ -477,7 +477,7 @@ void escape_analysist::instrument(
         const escape_domaint &d = operator[](i_it);
 
         const escape_domaint::cleanup_mapt::const_iterator m_it =
-          d.cleanup_map.find("&" + id2string(dead_symbol.get_identifier()));
+          d.cleanup_map.find("&" + id2string(dead_symbol.identifier()));
 
         // does it have a cleanup function for the object?
         if(m_it != d.cleanup_map.end())

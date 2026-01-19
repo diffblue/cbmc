@@ -77,8 +77,7 @@ void find_used_functions(
         {
           const auto &function = instruction.call_function();
 
-          const irep_idt &identifier =
-            to_symbol_expr(function).get_identifier();
+          const irep_idt &identifier = to_symbol_expr(function).identifier();
 
           find_used_functions(identifier, functions, seen);
         }

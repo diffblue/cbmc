@@ -47,7 +47,7 @@ void parameter_assignmentst::do_function_calls(
       PRECONDITION(as_const(*i_it).call_function().id() == ID_symbol);
 
       const irep_idt &identifier =
-        to_symbol_expr(as_const(*i_it).call_function()).get_identifier();
+        to_symbol_expr(as_const(*i_it).call_function()).identifier();
 
       // see if we have it
       const namespacet ns(symbol_table);

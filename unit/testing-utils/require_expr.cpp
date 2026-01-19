@@ -70,7 +70,7 @@ symbol_exprt require_expr::require_symbol(
   const exprt &expr, const irep_idt &symbol_name)
 {
   const symbol_exprt &symbol_expr = require_symbol(expr);
-  REQUIRE(symbol_expr.get_identifier()==symbol_name);
+  REQUIRE(symbol_expr.identifier() == symbol_name);
   return symbol_expr;
 }
 

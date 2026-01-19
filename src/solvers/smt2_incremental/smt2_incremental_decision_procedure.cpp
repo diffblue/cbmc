@@ -211,7 +211,7 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
     {
       send_function_definition(
         *symbol_expr,
-        symbol_expr->get_identifier(),
+        symbol_expr->identifier(),
         solver_process,
         expression_identifiers,
         identifier_table);

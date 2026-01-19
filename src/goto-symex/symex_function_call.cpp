@@ -214,7 +214,7 @@ void goto_symext::symex_function_call_symbol(
   target.location(state.guard.as_expr(), state.source);
 
   PRECONDITION(function.id() == ID_symbol);
-  const irep_idt &identifier = to_symbol_expr(function).get_identifier();
+  const irep_idt &identifier = to_symbol_expr(function).identifier();
 
   if(identifier == CPROVER_PREFIX SHADOW_MEMORY_GET_FIELD)
   {
@@ -240,7 +240,7 @@ void goto_symext::symex_function_call_post_clean(
   const symbol_exprt &function,
   const exprt::operandst &cleaned_arguments)
 {
-  const irep_idt &identifier = function.get_identifier();
+  const irep_idt &identifier = function.identifier();
 
   const goto_functionst::goto_functiont &goto_function =
     get_goto_function(identifier);

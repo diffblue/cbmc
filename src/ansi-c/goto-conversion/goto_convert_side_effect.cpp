@@ -380,8 +380,7 @@ goto_convertt::clean_expr_resultt goto_convertt::remove_function_call(
 
   if(expr.function().id() == ID_symbol)
   {
-    const irep_idt &identifier =
-      to_symbol_expr(expr.function()).get_identifier();
+    const irep_idt &identifier = to_symbol_expr(expr.function()).identifier();
     const symbolt &symbol = ns.lookup(identifier);
 
     new_base_name += '_';
@@ -411,7 +410,7 @@ goto_convertt::clean_expr_resultt goto_convertt::remove_function_call(
 
   static_cast<exprt &>(expr) = new_symbol.symbol_expr();
 
-  side_effects.add_temporary(to_symbol_expr(expr).get_identifier());
+  side_effects.add_temporary(to_symbol_expr(expr).identifier());
 
   return side_effects;
 }
@@ -449,7 +448,7 @@ goto_convertt::remove_cpp_new(side_effect_exprt &expr, bool result_is_used)
   if(result_is_used)
   {
     static_cast<exprt &>(expr) = new_symbol.symbol_expr();
-    side_effects.add_temporary(to_symbol_expr(expr).get_identifier());
+    side_effects.add_temporary(to_symbol_expr(expr).identifier());
   }
   else
     expr.make_nil();
@@ -503,7 +502,7 @@ goto_convertt::clean_expr_resultt goto_convertt::remove_malloc(
 
     convert(call, side_effects.side_effects, mode);
 
-    side_effects.add_temporary(to_symbol_expr(expr).get_identifier());
+    side_effects.add_temporary(to_symbol_expr(expr).identifier());
   }
   else
     convert(code_expressiont(std::move(expr)), side_effects.side_effects, mode);
@@ -551,7 +550,7 @@ goto_convertt::remove_temporary_object(side_effect_exprt &expr)
 
   static_cast<exprt &>(expr) = new_symbol.symbol_expr();
 
-  side_effects.add_temporary(to_symbol_expr(expr).get_identifier());
+  side_effects.add_temporary(to_symbol_expr(expr).identifier());
 
   return side_effects;
 }
@@ -625,7 +624,7 @@ goto_convertt::clean_expr_resultt goto_convertt::remove_statement_expression(
 
   static_cast<exprt &>(expr) = tmp_symbol_expr;
 
-  side_effects.add_temporary(to_symbol_expr(expr).get_identifier());
+  side_effects.add_temporary(to_symbol_expr(expr).identifier());
 
   return side_effects;
 }

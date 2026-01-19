@@ -577,7 +577,7 @@ goto_convertt::clean_expr_resultt goto_convertt::clean_expr(
     side_effects.temporaries.clear();
 
     if(expr.is_not_nil())
-      side_effects.add_temporary(to_symbol_expr(expr).get_identifier());
+      side_effects.add_temporary(to_symbol_expr(expr).identifier());
 
     return side_effects;
   }

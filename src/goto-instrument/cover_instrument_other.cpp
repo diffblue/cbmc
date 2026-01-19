@@ -61,7 +61,7 @@ void cover_cover_instrumentert::instrument(
     const auto &function = i_it->call_function();
     if(
       function.id() == ID_symbol &&
-      to_symbol_expr(function).get_identifier() == CPROVER_PREFIX "cover" &&
+      to_symbol_expr(function).identifier() == CPROVER_PREFIX "cover" &&
       i_it->call_arguments().size() == 1)
     {
       const exprt c = i_it->call_arguments()[0];

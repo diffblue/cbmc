@@ -63,7 +63,7 @@ void for_each_function_call(GotoFunctionT &&goto_function, Handler handler)
   PRECONDITION(can_cast_expr<symbol_exprt>(called_function_pointer));
   auto const &pointer_symbol = to_symbol_expr(called_function_pointer);
   auto const restriction_iterator =
-    restrictions.restrictions.find(pointer_symbol.get_identifier());
+    restrictions.restrictions.find(pointer_symbol.identifier());
 
   if(restriction_iterator == restrictions.restrictions.end())
     return false;
@@ -348,7 +348,7 @@ static std::string resolve_pointer_name(
         auto const &called_function_pointer =
           to_dereference_expr(instruction.call_function()).pointer();
         pointer_name =
-          id2string(to_symbol_expr(called_function_pointer).get_identifier());
+          id2string(to_symbol_expr(called_function_pointer).identifier());
         found = true;
         break;
       }
@@ -450,8 +450,8 @@ function_pointer_restrictionst::get_by_name_restriction(
   const goto_programt::const_targett it = std::prev(location);
 
   INVARIANT(
-    to_symbol_expr(it->assign_lhs()).get_identifier() ==
-      function_pointer_call_site.get_identifier(),
+    to_symbol_expr(it->assign_lhs()).identifier() ==
+      function_pointer_call_site.identifier(),
     "called function pointer must have been assigned at the previous location");
 
   if(!can_cast_expr<symbol_exprt>(it->assign_rhs()))
@@ -459,13 +459,13 @@ function_pointer_restrictionst::get_by_name_restriction(
 
   const auto &rhs = to_symbol_expr(it->assign_rhs());
 
-  const auto restriction = by_name_restrictions.find(rhs.get_identifier());
+  const auto restriction = by_name_restrictions.find(rhs.identifier());
 
   if(restriction != by_name_restrictions.end())
   {
     return std::optional<function_pointer_restrictionst::restrictiont>(
       std::make_pair(
-        function_pointer_call_site.get_identifier(), restriction->second));
+        function_pointer_call_site.identifier(), restriction->second));
   }
 
   return {};

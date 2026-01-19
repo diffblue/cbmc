@@ -115,8 +115,8 @@ smt_sortt convert_type_to_smt_sort(const typet &type)
 
 static smt_termt convert_expr_to_smt(const symbol_exprt &symbol_expr)
 {
-  return smt_identifier_termt{symbol_expr.get_identifier(),
-                              convert_type_to_smt_sort(symbol_expr.type())};
+  return smt_identifier_termt{
+    symbol_expr.identifier(), convert_type_to_smt_sort(symbol_expr.type())};
 }
 
 static smt_termt convert_expr_to_smt(

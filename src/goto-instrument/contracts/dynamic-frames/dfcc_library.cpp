@@ -485,12 +485,12 @@ void dfcc_libraryt::fix_malloc_free_calls()
 
         if(function.id() == ID_symbol)
         {
-          const irep_idt &fun_name = to_symbol_expr(function).get_identifier();
+          const irep_idt &fun_name = to_symbol_expr(function).identifier();
 
           if(fun_name == (CONTRACTS_PREFIX "malloc"))
-            to_symbol_expr(ins->call_function()).set_identifier("malloc");
+            to_symbol_expr(ins->call_function()).identifier("malloc");
           else if(fun_name == (CONTRACTS_PREFIX "free"))
-            to_symbol_expr(ins->call_function()).set_identifier("free");
+            to_symbol_expr(ins->call_function()).identifier("free");
         }
       }
     }

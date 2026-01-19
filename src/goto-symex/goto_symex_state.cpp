@@ -85,7 +85,7 @@ renamedt<ssa_exprt, L2> goto_symex_statet::assignment(
 {
   // identifier should be l0 or l1, make sure it's l1
   lhs = rename_ssa<L1>(std::move(lhs), ns).get();
-  irep_idt l1_identifier=lhs.get_identifier();
+  irep_idt l1_identifier = lhs.identifier();
 
   // the type might need renaming
   rename<L2>(lhs.type(), l1_identifier, ns);
@@ -147,7 +147,7 @@ goto_symex_statet::rename_ssa(ssa_exprt ssa, const namespacet &ns)
     level == L0 || level == L1,
     "rename_ssa can only be used for levels L0 and L1");
   ssa = set_indices<level>(std::move(ssa), ns).get();
-  rename<level>(ssa.type(), ssa.get_identifier(), ns);
+  rename<level>(ssa.type(), ssa.identifier(), ns);
   ssa.update_type();
   return renamedt<ssa_exprt, level>{ssa};
 }
@@ -187,7 +187,7 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
     else
     {
       ssa = set_indices<L1>(std::move(ssa), ns).get();
-      rename<level>(expr.type(), ssa.get_identifier(), ns);
+      rename<level>(expr.type(), ssa.identifier(), ns);
       ssa.update_type();
 
       // renaming taken care of by l2_thread_encoding, or already at L2
@@ -206,7 +206,7 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
       {
         // We also consider propagation if we go up to L2.
         // L1 identifiers are used for propagation!
-        auto p_it = propagation.find(ssa.get_identifier());
+        auto p_it = propagation.find(ssa.identifier());
 
         if(p_it.has_value())
         {
@@ -228,7 +228,7 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
     // we never rename function symbols
     if(type.id() == ID_code || type.id() == ID_mathematical_function)
     {
-      rename<level>(expr.type(), to_symbol_expr(expr).get_identifier(), ns);
+      rename<level>(expr.type(), to_symbol_expr(expr).identifier(), ns);
       return renamedt<exprt, level>{std::move(expr)};
     }
     else
@@ -396,7 +396,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
     return false;
 
   const ssa_exprt ssa_l1 = remove_level_2(expr);
-  const irep_idt &l1_identifier=ssa_l1.get_identifier();
+  const irep_idt &l1_identifier = ssa_l1.identifier();
   const exprt guard_as_expr = guard.as_expr();
 
   // see whether we are within an atomic section
@@ -449,7 +449,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
     // written this object within the atomic section. We must actually do this,
     // because goto_state::apply_condition may have placed the latest value in
     // the propagation map without recording an assignment.
-    auto p_it = propagation.find(ssa_l1.get_identifier());
+    auto p_it = propagation.find(ssa_l1.identifier());
     const exprt l2_true_case =
       p_it.has_value() ? *p_it : set_indices<L2>(ssa_l1, ns).get();
 
@@ -577,7 +577,7 @@ void goto_symex_statet::rename_address(exprt &expr, const namespacet &ns)
     // only do L1!
     ssa = set_indices<L1>(std::move(ssa), ns).get();
 
-    rename<level>(expr.type(), ssa.get_identifier(), ns);
+    rename<level>(expr.type(), ssa.identifier(), ns);
     ssa.update_type();
   }
   else if(expr.id()==ID_symbol)
@@ -809,7 +809,7 @@ ssa_exprt goto_symex_statet::add_object(
   framet &frame = call_stack().top();
 
   const renamedt<ssa_exprt, L0> renamed = rename_ssa<L0>(ssa_exprt{expr}, ns);
-  const irep_idt l0_name = renamed.get_identifier();
+  const irep_idt l0_name = renamed.identifier();
   const std::size_t l1_index = index_generator(l0_name);
 
   if(const auto old_value = level1.insert_or_replace(renamed, l1_index))
@@ -820,7 +820,7 @@ ssa_exprt goto_symex_statet::add_object(
   }
 
   const ssa_exprt ssa = rename_ssa<L1>(renamed.get(), ns).get();
-  const bool inserted = frame.local_objects.insert(ssa.get_identifier()).second;
+  const bool inserted = frame.local_objects.insert(ssa.identifier()).second;
   INVARIANT(inserted, "l1_name expected to be unique by construction");
 
   return ssa;
@@ -828,7 +828,7 @@ ssa_exprt goto_symex_statet::add_object(
 
 ssa_exprt goto_symex_statet::declare(ssa_exprt ssa, const namespacet &ns)
 {
-  const irep_idt &l1_identifier = ssa.get_identifier();
+  const irep_idt &l1_identifier = ssa.identifier();
 
   // rename type to L2
   rename(ssa.type(), l1_identifier, ns);
@@ -858,14 +858,14 @@ ssa_exprt goto_symex_statet::declare(ssa_exprt ssa, const namespacet &ns)
     {
       const ssa_exprt &field_ssa = to_ssa_expr(*l1_symbol);
       const std::size_t field_generation = level2.increase_generation(
-        l1_symbol->get_identifier(), field_ssa, fresh_l2_name_provider);
+        l1_symbol->identifier(), field_ssa, fresh_l2_name_provider);
       CHECK_RETURN(field_generation == 1);
     }
     else if(auto fs_ssa = expr_try_dynamic_cast<field_sensitive_ssa_exprt>(e))
     {
       const ssa_exprt &ssa = fs_ssa->get_object_ssa();
       const std::size_t field_generation = level2.increase_generation(
-        ssa.get_identifier(), ssa, fresh_l2_name_provider);
+        ssa.identifier(), ssa, fresh_l2_name_provider);
       CHECK_RETURN(field_generation == 1);
     }
   };

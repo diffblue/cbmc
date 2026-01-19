@@ -489,7 +489,7 @@ std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_is_valid_int(
   const function_application_exprt &f)
 {
-  irep_idt called_function = to_symbol_expr(f.function()).get_identifier();
+  irep_idt called_function = to_symbol_expr(f.function()).identifier();
   PRECONDITION(
     called_function == ID_cprover_string_is_valid_int_func ||
     called_function == ID_cprover_string_is_valid_long_func);

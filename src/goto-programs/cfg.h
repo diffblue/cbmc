@@ -396,8 +396,7 @@ void cfg_baset<T, P, I>::compute_edges_function_call(
   if(function.id()!=ID_symbol)
     return;
 
-  const irep_idt &identifier=
-    to_symbol_expr(function).get_identifier();
+  const irep_idt &identifier = to_symbol_expr(function).identifier();
 
   goto_functionst::function_mapt::const_iterator f_it=
     goto_functions.function_map.find(identifier);

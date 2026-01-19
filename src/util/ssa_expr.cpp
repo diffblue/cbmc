@@ -32,7 +32,7 @@ initialize_ssa_identifier(std::ostream &os, const exprt &expr)
     return initialize_ssa_identifier(os, index->array()) << "[[" << idx << "]]";
   }
   if(auto symbol = expr_try_dynamic_cast<symbol_exprt>(expr))
-    return os << symbol->get_identifier();
+    return os << symbol->identifier();
 
   UNREACHABLE;
 }
@@ -45,7 +45,7 @@ ssa_exprt::ssa_exprt(const exprt &expr) : symbol_exprt(expr.type())
   std::ostringstream os;
   initialize_ssa_identifier(os, expr);
   const std::string id = os.str();
-  set_identifier(id);
+  identifier(id);
   set(ID_L1_object_identifier, id);
 }
 
@@ -82,7 +82,7 @@ static void build_ssa_identifier_rec(
   }
   else if(expr.id()==ID_symbol)
   {
-    auto symid=to_symbol_expr(expr).get_identifier();
+    auto symid = to_symbol_expr(expr).identifier();
     os << symid;
     l1_object_os << symid;
 
@@ -131,7 +131,7 @@ static void update_identifier(ssa_exprt &ssa)
   const irep_idt &l2 = ssa.get_level_2();
 
   auto idpair = build_identifier(ssa.get_original_expr(), l0, l1, l2);
-  ssa.set_identifier(idpair.first);
+  ssa.identifier(idpair.first);
   ssa.set(ID_L1_object_identifier, idpair.second);
 }
 
@@ -147,10 +147,10 @@ irep_idt ssa_exprt::get_object_name() const
   const exprt &original_expr = get_original_expr();
 
   if(original_expr.id() == ID_symbol)
-    return to_symbol_expr(original_expr).get_identifier();
+    return to_symbol_expr(original_expr).identifier();
 
   return to_symbol_expr(object_descriptor_exprt::root_object(original_expr))
-    .get_identifier();
+    .identifier();
 }
 
 const ssa_exprt ssa_exprt::get_l1_object() const
@@ -199,7 +199,7 @@ void ssa_exprt::set_level_2(std::size_t i)
 void ssa_exprt::remove_level_2()
 {
   remove(ID_L2);
-  set_identifier(get_l1_object_identifier());
+  identifier(get_l1_object_identifier());
 }
 
 /* Used to determine whether or not an identifier can be built

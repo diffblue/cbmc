@@ -36,7 +36,7 @@ void goto_convertt::do_prob_uniform(
   const exprt::operandst &arguments,
   goto_programt &dest)
 {
-  const irep_idt &identifier = function.get_identifier();
+  const irep_idt &identifier = function.identifier();
 
   // make it a side effect if there is an LHS
   if(arguments.size() != 2)
@@ -113,7 +113,7 @@ void goto_convertt::do_prob_coin(
   const exprt::operandst &arguments,
   goto_programt &dest)
 {
-  const irep_idt &identifier = function.get_identifier();
+  const irep_idt &identifier = function.identifier();
 
   // make it a side effect if there is an LHS
   if(arguments.size() != 2)
@@ -196,7 +196,7 @@ void goto_convertt::do_printf(
   const exprt::operandst &arguments,
   goto_programt &dest)
 {
-  const irep_idt &f_id = function.get_identifier();
+  const irep_idt &f_id = function.identifier();
 
   PRECONDITION(f_id == CPROVER_PREFIX "printf");
 
@@ -210,7 +210,7 @@ void goto_convertt::do_scanf(
   const exprt::operandst &arguments,
   goto_programt &dest)
 {
-  const irep_idt &f_id = function.get_identifier();
+  const irep_idt &f_id = function.identifier();
 
   if(f_id == CPROVER_PREFIX "scanf")
   {
@@ -496,7 +496,7 @@ void goto_convertt::do_cpp_new(
     typecast_exprt(tmp_symbol_expr, lhs.type()),
     rhs.find_source_location()));
 
-  side_effects.add_temporary(to_symbol_expr(tmp_symbol_expr).get_identifier());
+  side_effects.add_temporary(to_symbol_expr(tmp_symbol_expr).identifier());
   destruct_locals(side_effects.temporaries, dest, ns);
 
   // grab initializer
@@ -794,7 +794,7 @@ void goto_convertt::do_alloca(
     this_alloca_ptr, std::move(rhs), source_location));
 
   if(lhs.is_nil())
-    destruct_locals({to_symbol_expr(new_lhs).get_identifier()}, dest, ns);
+    destruct_locals({to_symbol_expr(new_lhs).identifier()}, dest, ns);
 
   // mark pointer to alloca result as dead, unless the alloca result (in
   // this_alloca_ptr)  is still NULL
@@ -829,7 +829,7 @@ void goto_convertt::do_function_call_symbol(
     return; // ignore
 
   // lookup symbol
-  const irep_idt &identifier = function.get_identifier();
+  const irep_idt &identifier = function.identifier();
 
   const symbolt *symbol;
   if(ns.lookup(identifier, symbol))
@@ -1134,7 +1134,7 @@ void goto_convertt::do_function_call_symbol(
     mathematical_function_typet function_type{
       domain, function_call_type.return_type()};
     const function_application_exprt rhs(
-      symbol_exprt{function.get_identifier(), function_type}, arguments);
+      symbol_exprt{function.identifier(), function_type}, arguments);
 
     code_assignt assignment(lhs, rhs);
     assignment.add_source_location() = function.source_location();
@@ -1486,7 +1486,7 @@ void goto_convertt::do_function_call_symbol(
       "builtin declaration should match constructed type");
 
     symbol_exprt new_function = function;
-    new_function.set_identifier(name);
+    new_function.identifier(name);
     new_function.type() = f_type;
 
     code_function_callt function_call(lhs, new_function, new_arguments);

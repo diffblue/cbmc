@@ -60,7 +60,7 @@ irep_idt custom_bitvector_domaint::object2id(const exprt &src)
 {
   if(src.id()==ID_symbol)
   {
-    return to_symbol_expr(src).get_identifier();
+    return to_symbol_expr(src).identifier();
   }
   else if(src.id()==ID_dereference)
   {
@@ -317,72 +317,72 @@ void custom_bitvector_domaint::transform(
 
       if(function.id()==ID_symbol)
       {
-        const irep_idt &identifier=to_symbol_expr(function).get_identifier();
+      const irep_idt &identifier = to_symbol_expr(function).identifier();
 
-        if(
-          identifier == CPROVER_PREFIX "set_must" ||
-          identifier == CPROVER_PREFIX "clear_must" ||
-          identifier == CPROVER_PREFIX "set_may" ||
-          identifier == CPROVER_PREFIX "clear_may")
+      if(
+        identifier == CPROVER_PREFIX "set_must" ||
+        identifier == CPROVER_PREFIX "clear_must" ||
+        identifier == CPROVER_PREFIX "set_may" ||
+        identifier == CPROVER_PREFIX "clear_may")
+      {
+        if(instruction.call_arguments().size() == 2)
         {
-          if(instruction.call_arguments().size() == 2)
+          unsigned bit_nr = cba.get_bit_nr(instruction.call_arguments()[1]);
+
+          // initialize to make Visual Studio happy
+          modet mode = modet::SET_MUST;
+
+          if(identifier == CPROVER_PREFIX "set_must")
+            mode = modet::SET_MUST;
+          else if(identifier == CPROVER_PREFIX "clear_must")
+            mode = modet::CLEAR_MUST;
+          else if(identifier == CPROVER_PREFIX "set_may")
+            mode = modet::SET_MAY;
+          else if(identifier == CPROVER_PREFIX "clear_may")
+            mode = modet::CLEAR_MAY;
+          else
+            UNREACHABLE;
+
+          exprt lhs = instruction.call_arguments()[0];
+
+          if(lhs.type().id() == ID_pointer)
           {
-            unsigned bit_nr = cba.get_bit_nr(instruction.call_arguments()[1]);
-
-            // initialize to make Visual Studio happy
-            modet mode = modet::SET_MUST;
-
-            if(identifier == CPROVER_PREFIX "set_must")
-              mode=modet::SET_MUST;
-            else if(identifier == CPROVER_PREFIX "clear_must")
-              mode=modet::CLEAR_MUST;
-            else if(identifier == CPROVER_PREFIX "set_may")
-              mode=modet::SET_MAY;
-            else if(identifier == CPROVER_PREFIX "clear_may")
-              mode=modet::CLEAR_MAY;
-            else
-              UNREACHABLE;
-
-            exprt lhs = instruction.call_arguments()[0];
-
-            if(lhs.type().id()==ID_pointer)
+            if(
+              lhs.is_constant() &&
+              to_constant_expr(lhs).is_null_pointer()) // NULL means all
             {
-              if(
-                lhs.is_constant() &&
-                to_constant_expr(lhs).is_null_pointer()) // NULL means all
+              if(mode == modet::CLEAR_MAY)
               {
-                if(mode==modet::CLEAR_MAY)
-                {
-                  for(auto &bit : may_bits)
-                    clear_bit(bit.second, bit_nr);
+                for(auto &bit : may_bits)
+                  clear_bit(bit.second, bit_nr);
 
-                  // erase blank ones
-                  erase_blank_vectors(may_bits);
-                }
-                else if(mode==modet::CLEAR_MUST)
-                {
-                  for(auto &bit : must_bits)
-                    clear_bit(bit.second, bit_nr);
-
-                  // erase blank ones
-                  erase_blank_vectors(must_bits);
-                }
+                // erase blank ones
+                erase_blank_vectors(may_bits);
               }
-              else
+              else if(mode == modet::CLEAR_MUST)
               {
-                dereference_exprt deref(lhs);
+                for(auto &bit : must_bits)
+                  clear_bit(bit.second, bit_nr);
 
-                // may alias other stuff
-                std::set<exprt> lhs_set=cba.aliases(deref, from);
+                // erase blank ones
+                erase_blank_vectors(must_bits);
+              }
+            }
+            else
+            {
+              dereference_exprt deref(lhs);
 
-                for(const auto &l : lhs_set)
-                {
-                  set_bit(l, bit_nr, mode);
-                }
+              // may alias other stuff
+              std::set<exprt> lhs_set = cba.aliases(deref, from);
+
+              for(const auto &l : lhs_set)
+              {
+                set_bit(l, bit_nr, mode);
               }
             }
           }
         }
+      }
         else if(identifier=="memcpy" ||
                 identifier=="memmove")
         {

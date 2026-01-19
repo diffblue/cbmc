@@ -74,12 +74,12 @@ std::unordered_set<irep_idt> gen_loop_locals_set(
     // All variables declared in loops are loop locals.
     if(i_it->is_decl() && loop.contains(i_it))
     {
-      loop_locals.insert(i_it->decl_symbol().get_identifier());
+      loop_locals.insert(i_it->decl_symbol().identifier());
     }
     // Record all other declared variables and their ranges.
     else if(i_it->is_decl())
     {
-      non_loop_decls.insert(i_it->decl_symbol().get_identifier());
+      non_loop_decls.insert(i_it->decl_symbol().identifier());
     }
     // Record all writing/reading outside the loop.
     else if(
@@ -288,7 +288,7 @@ static void remove_dead_object_assignment(goto_functiont &goto_function)
 
       if(
         lhs.id() == ID_symbol &&
-        to_symbol_expr(lhs).get_identifier() == CPROVER_PREFIX "dead_object")
+        to_symbol_expr(lhs).identifier() == CPROVER_PREFIX "dead_object")
       {
         i_it->turn_into_skip();
       }

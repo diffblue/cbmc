@@ -200,8 +200,8 @@ bool remove_exceptionst::function_or_callees_may_throw(
       DATA_INVARIANT(
         function_expr.id()==ID_symbol,
         "identifier expected to be a symbol");
-      const irep_idt &function_name=
-        to_symbol_expr(function_expr).get_identifier();
+      const irep_idt &function_name =
+        to_symbol_expr(function_expr).identifier();
       if(function_may_throw(function_name))
         return true;
     }
@@ -441,7 +441,7 @@ remove_exceptionst::instrument_function_call(
 
   DATA_INVARIANT(
     function.id() == ID_symbol, "function call expected to be a symbol");
-  const irep_idt &callee_id = to_symbol_expr(function).get_identifier();
+  const irep_idt &callee_id = to_symbol_expr(function).identifier();
 
   if(function_may_throw(callee_id))
   {

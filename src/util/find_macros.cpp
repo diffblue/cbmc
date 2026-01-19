@@ -31,7 +31,7 @@ void find_macros(
 
     if(e.id() == ID_symbol)
     {
-      const irep_idt &identifier = to_symbol_expr(e).get_identifier();
+      const irep_idt &identifier = to_symbol_expr(e).identifier();
 
       const symbolt &symbol = ns.lookup(identifier);
 

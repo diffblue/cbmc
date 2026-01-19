@@ -1084,9 +1084,9 @@ void dump_ct::cleanup_harness(code_blockt &b)
       if(func.id()==ID_symbol)
       {
         symbol_exprt &s=to_symbol_expr(func);
-        if(s.get_identifier()==ID_main)
-          s.set_identifier(CPROVER_PREFIX+id2string(ID_main));
-        else if(s.get_identifier() == INITIALIZE_FUNCTION)
+        if(s.identifier() == ID_main)
+          s.identifier(CPROVER_PREFIX + id2string(ID_main));
+        else if(s.identifier() == INITIALIZE_FUNCTION)
           continue;
       }
     }
@@ -1435,9 +1435,9 @@ void dump_ct::cleanup_expr(exprt &expr)
 
     // don't edit function calls we might have introduced
     const symbolt *s;
-    if(!ns.lookup(fn.get_identifier(), s))
+    if(!ns.lookup(fn.identifier(), s))
     {
-      const symbolt &fn_sym=ns.lookup(fn.get_identifier());
+      const symbolt &fn_sym = ns.lookup(fn.identifier());
       const code_typet &code_type=to_code_type(fn_sym.type);
       const code_typet::parameterst &parameters=code_type.parameters();
 

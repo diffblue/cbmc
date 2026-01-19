@@ -48,13 +48,13 @@ void dfcc_is_freeablet::rewrite_calls(
 
       if(function.id() == ID_symbol)
       {
-        const irep_idt &fun_name = to_symbol_expr(function).get_identifier();
+        const irep_idt &fun_name = to_symbol_expr(function).identifier();
 
         if(fun_name == CPROVER_PREFIX "is_freeable")
         {
           // redirect call to library implementation
           to_symbol_expr(target->call_function())
-            .set_identifier(library.get_dfcc_fun_name(dfcc_funt::IS_FREEABLE));
+            .identifier(library.get_dfcc_fun_name(dfcc_funt::IS_FREEABLE));
           target->call_arguments().push_back(cfg_info.get_write_set(target));
         }
         else if(fun_name == CPROVER_PREFIX "was_freed")
@@ -71,7 +71,7 @@ void dfcc_is_freeablet::rewrite_calls(
 
           // redirect call to library implementation
           to_symbol_expr(target->call_function())
-            .set_identifier(library.get_dfcc_fun_name(dfcc_funt::WAS_FREED));
+            .identifier(library.get_dfcc_fun_name(dfcc_funt::WAS_FREED));
           target->call_arguments().push_back(cfg_info.get_write_set(target));
         }
       }

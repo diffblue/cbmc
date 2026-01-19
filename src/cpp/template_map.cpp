@@ -77,7 +77,7 @@ void template_mapt::apply(exprt &expr) const
   if(expr.id()==ID_symbol)
   {
     expr_mapt::const_iterator m_it =
-      expr_map.find(to_symbol_expr(expr).get_identifier());
+      expr_map.find(to_symbol_expr(expr).identifier());
 
     if(m_it!=expr_map.end())
     {

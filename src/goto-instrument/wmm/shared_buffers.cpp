@@ -937,7 +937,7 @@ bool shared_bufferst::is_buffered(
   // the source_location in the code (true)
 )
 {
-  const irep_idt &identifier=symbol_expr.get_identifier();
+  const irep_idt &identifier = symbol_expr.identifier();
 
   if(
     identifier == CPROVER_PREFIX "alloc" ||
@@ -971,7 +971,7 @@ bool shared_bufferst::is_buffered_in_general(
   if(cav11)
     return true;
 
-  const irep_idt &identifier=symbol_expr.get_identifier();
+  const irep_idt &identifier = symbol_expr.identifier();
   const source_locationt &source_location=symbol_expr.source_location();
 
   if(cycles.find(identifier)==cycles.end())
@@ -1322,7 +1322,7 @@ void shared_bufferst::cfg_visitort::weak_memory(
     else if(instruction.is_function_call())
     {
       const exprt &fun = instruction.call_function();
-      weak_memory(value_sets, to_symbol_expr(fun).get_identifier(), model);
+      weak_memory(value_sets, to_symbol_expr(fun).identifier(), model);
     }
   }
 }

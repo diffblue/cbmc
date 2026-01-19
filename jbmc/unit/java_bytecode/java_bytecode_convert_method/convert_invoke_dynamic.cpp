@@ -55,7 +55,7 @@ void validate_lambda_assignment(
 
   const symbol_exprt &rhs_symbol = require_expr::require_symbol(rhs_value.op());
 
-  const irep_idt &tmp_object_symbol = rhs_symbol.get_identifier();
+  const irep_idt &tmp_object_symbol = rhs_symbol.identifier();
 
   const auto tmp_object_assignments =
     require_goto_statements::find_pointer_assignments(
@@ -135,8 +135,8 @@ void validate_lambda_assignment(
         if(it->id() == ID_symbol)
         {
           symbol_exprt &symbol_expr = to_symbol_expr(it.mutate());
-          const irep_idt simple_id = symbol_expr.get_identifier();
-          symbol_expr.set_identifier(variable_prefix + id2string(simple_id));
+          const irep_idt simple_id = symbol_expr.identifier();
+          symbol_expr.identifier(variable_prefix + id2string(simple_id));
         }
       }
     }

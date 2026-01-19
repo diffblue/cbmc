@@ -169,7 +169,7 @@ void dfcc_spec_functionst::generate_havoc_instructions(
       }
 
       const irep_idt &callee_id =
-        to_symbol_expr(ins_it->call_function()).get_identifier();
+        to_symbol_expr(ins_it->call_function()).identifier();
 
       // Only process built-in functions that represent assigns clause targets,
       // and error-out on any other function call
@@ -327,7 +327,7 @@ void dfcc_spec_functionst::to_spec_assigns_instructions(
       }
 
       const irep_idt &callee_id =
-        to_symbol_expr(ins_it->call_function()).get_identifier();
+        to_symbol_expr(ins_it->call_function()).identifier();
 
       // Only process built-in functions that specify assignable targets
       // and error-out on any other function call
@@ -407,7 +407,7 @@ void dfcc_spec_functionst::to_spec_frees_instructions(
       }
 
       const irep_idt &callee_id =
-        to_symbol_expr(ins_it->call_function()).get_identifier();
+        to_symbol_expr(ins_it->call_function()).identifier();
 
       // only process the built-in `freeable` function
       // error out on any other function call

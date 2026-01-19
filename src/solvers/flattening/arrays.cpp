@@ -94,7 +94,7 @@ void arrayst::collect_indices(const exprt &expr)
   {
     if(expr.id() == ID_array_comprehension)
       array_comprehension_args.insert(
-        to_array_comprehension_expr(expr).arg().get_identifier());
+        to_array_comprehension_expr(expr).arg().identifier());
 
     for(const auto &op : expr.operands())
       collect_indices(op);
@@ -105,8 +105,8 @@ void arrayst::collect_indices(const exprt &expr)
 
     if(
       e.index().id() == ID_symbol &&
-      array_comprehension_args.count(
-        to_symbol_expr(e.index()).get_identifier()) != 0)
+      array_comprehension_args.count(to_symbol_expr(e.index()).identifier()) !=
+        0)
     {
       return;
     }

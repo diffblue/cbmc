@@ -221,7 +221,7 @@ static void fix_return_type(
 
   const namespacet ns(symbol_table);
   const symbolt &function_symbol =
-    ns.lookup(to_symbol_expr(function_call.function()).get_identifier());
+    ns.lookup(to_symbol_expr(function_call.function()).identifier());
 
   symbolt &tmp_symbol = get_fresh_aux_symbol(
     code_type.return_type(),
@@ -353,7 +353,7 @@ static std::string function_pointer_assertion_comment(
 
   if(candidates.size() == 1)
   {
-    comment << candidates.begin()->get_identifier();
+    comment << candidates.begin()->identifier();
   }
   else if(candidates.empty())
   {
@@ -368,7 +368,7 @@ static std::string function_pointer_assertion_comment(
       candidates.begin(),
       candidates.end(),
       ", ",
-      [](const symbol_exprt &s) { return s.get_identifier(); });
+      [](const symbol_exprt &s) { return s.identifier(); });
 
     comment << ']';
   }
@@ -474,7 +474,7 @@ void remove_function_pointer(
         if(!first)
           mstream << ", ";
 
-        mstream << function.get_identifier();
+        mstream << function.identifier();
         first = false;
       }
 

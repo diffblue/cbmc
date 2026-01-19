@@ -1000,7 +1000,7 @@ mp_integer interpretert::evaluate_address(
   {
     const irep_idt &identifier = is_ssa_expr(expr)
                                    ? to_ssa_expr(expr).get_original_name()
-                                   : to_symbol_expr(expr).get_identifier();
+                                   : to_symbol_expr(expr).identifier();
 
     interpretert::memory_mapt::const_iterator m_it1=
       memory_map.find(identifier);
