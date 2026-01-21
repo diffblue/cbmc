@@ -39,7 +39,8 @@ std::unique_ptr<ai_baset> build_analyzer(
   // These support all of the option categories
   if(
     options.get_bool_option("recursive-interprocedural") ||
-    options.get_bool_option("three-way-merge"))
+    options.get_bool_option("three-way-merge") ||
+    options.get_bool_option("local") ||)
   {
     // Build the history factory
     std::unique_ptr<ai_history_factory_baset> hf = nullptr;
@@ -110,6 +111,11 @@ std::unique_ptr<ai_baset> build_analyzer(
           return std::make_unique<ai_three_way_merget>(
             std::move(hf), std::move(df), std::move(st), mh);
         }
+      }
+      else if(options.get_bool_option("local"))
+      {
+        return util_make_unique<ai_localt>(
+          std::move(hf), std::move(df), std::move(st), mh);
       }
     }
   }
