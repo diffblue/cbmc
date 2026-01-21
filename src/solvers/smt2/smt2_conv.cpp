@@ -2711,6 +2711,13 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
   const exprt &src = expr.op();
 
   typet dest_type = expr.type();
+
+  if(dest_type == src.type()) // identity
+  {
+    convert_expr(src);
+    return;
+  }
+
   if(dest_type.id()==ID_c_enum_tag)
     dest_type=ns.follow_tag(to_c_enum_tag_type(dest_type));
 
