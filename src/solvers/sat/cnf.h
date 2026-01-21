@@ -43,7 +43,6 @@ public:
   virtual void set_no_variables(size_t no) { _no_variables=no; }
   virtual size_t no_clauses() const=0;
 
-protected:
   void gate_and(literalt a, literalt b, literalt o);
   void gate_or(literalt a, literalt b, literalt o);
   void gate_xor(literalt a, literalt b, literalt o);
@@ -52,6 +51,7 @@ protected:
   void gate_equal(literalt a, literalt b, literalt o);
   void gate_implies(literalt a, literalt b, literalt o);
 
+protected:
   static bvt eliminate_duplicates(const bvt &);
 
   size_t _no_variables;
