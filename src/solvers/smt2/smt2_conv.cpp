@@ -1301,9 +1301,36 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     convert_constant(to_constant_expr(expr));
   }
+  else if(expr.id() == ID_concatenation)
+  {
+    DATA_INVARIANT_WITH_DIAGNOSTICS(
+      !expr.operands().empty(),
+      "concatenation expression should have at least one operand",
+      expr.id_string());
+
+    if(expr.operands().size() == 1)
+    {
+      flatten2bv(expr.operands().front());
+    }
+    else // >= 2
+    {
+      out << "(concat";
+
+      for(const auto &op : expr.operands())
+      {
+        // drop zero-width operands, which are not allowed by SMT-LIB
+        if(!is_zero_width(op.type(), ns))
+        {
+          out << ' ';
+          flatten2bv(op);
+        }
+      }
+
+      out << ')';
+    }
+  }
   else if(
-    expr.id() == ID_concatenation || expr.id() == ID_bitand ||
-    expr.id() == ID_bitor || expr.id() == ID_bitxor)
+    expr.id() == ID_bitand || expr.id() == ID_bitor || expr.id() == ID_bitxor)
   {
     DATA_INVARIANT_WITH_DIAGNOSTICS(
       !expr.operands().empty(),
@@ -2078,6 +2105,10 @@ void smt2_convt::convert_expr(const exprt &expr)
     const replication_exprt &replication_expr = to_replication_expr(expr);
 
     mp_integer times = numeric_cast_v<mp_integer>(replication_expr.times());
+
+    // SMT-LIB requires that repeat is given a number of repetitions that is at
+    // least 1.
+    PRECONDITION(times >= 1);
 
     out << "((_ repeat " << times << ") ";
     flatten2bv(replication_expr.op());
