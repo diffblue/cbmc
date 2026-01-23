@@ -1,0 +1,11 @@
+CORE
+main.c
+--smt2 --outfile -
+activate-multi-line-match
+\(declare-fun \|main::1::x!0@1#1\| \(\) \(_ BitVec 32\)\)(?s:.)*\(declare-fun \|main::1::y!0@1#1\| \(\) \(_ BitVec 32\)\)
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Tests that x is always declared before y, i.e., in lexicographic order.
