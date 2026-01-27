@@ -1,6 +1,3 @@
-#include <assert.h>
-#include <stdio.h>
-
 struct Vec2
 {
   int x;

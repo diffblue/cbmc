@@ -3,7 +3,7 @@ main.c
 --no-standard-checks --variable-sensitivity --vsd-arrays every-element --vsd-values intervals --vsd-liveness --show
 ^EXIT=0$
 ^SIGNAL=0$
-^main::1::x .* TOP @ \[1\]
-^main::1::x .* \{\[0\] = \[0, 0\] @ \[2\]
-^main::1::x .* \{\[0\] = \[2, 3\] @ \[7\]
+^main::1::x .* TOP @ \[15\]
+^main::1::x .* \{\[0\] = \[0, 0\] @ \[16\]
+^main::1::x .* \{\[0\] = \[2, 3\] @ \[21\]
 --

@@ -3,7 +3,7 @@ main.c
 --variable-sensitivity --vsd-values intervals --show
 ^EXIT=0$
 ^SIGNAL=0$
-main::1::b1 \(\) -> \[1, 1\] @ \[2\]
-main::1::b2 \(\) -> \[0, 0\] @ \[3\]
-main::1::i \(\) -> \[A\, 14\] @ \[11\]
+main::1::b1 \(\) -> \[1, 1\] @ \[17\]
+main::1::b2 \(\) -> \[0, 0\] @ \[18\]
+main::1::i \(\) -> \[A\, 14\] @ \[26\]
 --

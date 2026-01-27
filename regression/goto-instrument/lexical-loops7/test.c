@@ -1,15 +1,16 @@
-
-int main(int argc, char **argv)
+int main()
 {
   int i = 0;
+  int count;
+  __CPROVER_assume(count > 10);
 
 head:
-  argc--;
+  count--;
   ++i;
   if(i < 10 && i % 2)
     goto head;
   else if(i < 10)
     goto head;
 
-  return argc;
+  return count;
 }

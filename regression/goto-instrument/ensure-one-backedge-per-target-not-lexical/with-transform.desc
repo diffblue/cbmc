@@ -1,7 +1,7 @@
 CORE
 main.c
 --ensure-one-backedge-per-target --show-lexical-loops
-^3 is head of \{ 3, 4, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26 \(backedge\) \}$
-^17 is head of \{ 17, 18, 22, 23, 24, 25 \(backedge\) \}$
+^15 is head of \{ 15, 16, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38 \(backedge\) \}$
+^29 is head of \{ 29, 30, 34, 35, 36, 37 \(backedge\) \}$
 ^EXIT=0$
 ^SIGNAL=0$

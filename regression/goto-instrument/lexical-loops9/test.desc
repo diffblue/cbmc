@@ -1,7 +1,7 @@
 CORE
 test.c
 --show-lexical-loops
-^2 is head of \{ 2, 3, 4, 7, 8, 9 \(backedge\) \}$
+^16 is head of \{ 16, 17, 18, 21, 22, 23 \(backedge\) \}$
 ^EXIT=0$
 ^SIGNAL=0$
 --

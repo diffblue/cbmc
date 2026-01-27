@@ -3,7 +3,7 @@ main.c
 --variable-sensitivity --vsd-values set-of-constants --show
 ^EXIT=0$
 ^SIGNAL=0$
-^main::1::x .* TOP @ \[1\]
-^main::1::x .* value-set-begin: 0 :value-set-end @ \[2\]
-^main::1::x .* value-set-begin: 2, 3 :value-set-end @ \[4, 6\]
+^main::1::x .* TOP @ \[15\]
+^main::1::x .* value-set-begin: 0 :value-set-end @ \[16\]
+^main::1::x .* value-set-begin: 2, 3 :value-set-end @ \[18, 20\]
 --
