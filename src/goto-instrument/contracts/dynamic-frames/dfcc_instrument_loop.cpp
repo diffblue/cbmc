@@ -138,6 +138,7 @@ void dfcc_instrument_loopt::operator()(
   exprt invariant(loop.invariant);
   const auto history_var_map = add_prehead_instructions(
     loop_id,
+    function_id,
     goto_function,
     symbol_table,
     head,
@@ -172,6 +173,7 @@ void dfcc_instrument_loopt::operator()(
   add_body_instructions(
     loop_id,
     cbmc_loop_id,
+    function_id,
     goto_function,
     symbol_table,
     head,
@@ -205,6 +207,7 @@ void dfcc_instrument_loopt::operator()(
 std::unordered_map<exprt, symbol_exprt, irep_hash>
 dfcc_instrument_loopt::add_prehead_instructions(
   const std::size_t loop_id,
+  const irep_idt &function_id,
   goto_functionst::goto_functiont &goto_function,
   symbol_table_baset &symbol_table,
   goto_programt::targett loop_head,
@@ -266,6 +269,7 @@ dfcc_instrument_loopt::add_prehead_instructions(
     code_frontend_assignt initial_invariant_assignment{
       initial_invariant, invariant, loop_head_location};
     goto_convertt converter(symbol_table, log.get_message_handler());
+    converter.set_prefix(id2string(function_id) + "::$tmp");
     converter.goto_convert(
       initial_invariant_assignment, pre_loop_head_instrs, language_mode);
   }
@@ -425,6 +429,7 @@ dfcc_instrument_loopt::add_step_instructions(
   }
 
   goto_convertt converter(symbol_table, log.get_message_handler());
+  converter.set_prefix(id2string(function_id) + "::$tmp");
   const irep_idt &language_mode =
     dfcc_utilst::get_function_symbol(symbol_table, function_id).mode;
   {
@@ -468,6 +473,7 @@ dfcc_instrument_loopt::add_step_instructions(
 void dfcc_instrument_loopt::add_body_instructions(
   const std::size_t loop_id,
   const std::size_t cbmc_loop_id,
+  const irep_idt &function_id,
   goto_functionst::goto_functiont &goto_function,
   symbol_table_baset &symbol_table,
   goto_programt::targett loop_head,
@@ -513,6 +519,7 @@ void dfcc_instrument_loopt::add_body_instructions(
   }
 
   goto_convertt converter(symbol_table, log.get_message_handler());
+  converter.set_prefix(id2string(function_id) + "::$tmp");
   {
     // Because of the unconditional jump above the following code is only
     // reachable in the step case. Generate the inductive invariant check
