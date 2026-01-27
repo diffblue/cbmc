@@ -548,7 +548,11 @@ void dfcc_libraryt::add_instrumented_functions_map_init_instructions(
   auto instrumented_functions_map =
     get_instrumented_functions_map_symbol().symbol_expr();
 
-  for(auto &function_id : instrumented_functions)
+  std::map<std::string, irep_idt> sorted_instrumented_functions;
+  for(const auto &function_id : instrumented_functions)
+    sorted_instrumented_functions.insert({id2string(function_id), function_id});
+
+  for(const auto &[_, function_id] : sorted_instrumented_functions)
   {
     auto object_id = pointer_object(address_of_exprt(
       dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id)
