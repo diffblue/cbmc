@@ -63,7 +63,7 @@ void goto_symex_property_decidert::
       {
         // it's going to be checked, but we don't know the status yet
         property_pair_it->second.status |= property_statust::UNKNOWN;
-        goal_map[property_id].instances.push_back(it);
+        goal_map[id2string(property_id)].instances.push_back(it);
       }
     }
   }
