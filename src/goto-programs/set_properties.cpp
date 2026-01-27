@@ -131,9 +131,7 @@ void label_properties(goto_functionst &goto_functions)
 {
   std::map<irep_idt, std::size_t> property_counters;
 
-  for(goto_functionst::function_mapt::iterator
-      it=goto_functions.function_map.begin();
-      it!=goto_functions.function_map.end();
-      it++)
+  auto sorted = goto_functions.sorted();
+  for(auto &it : sorted)
     label_properties(it->first, it->second.body, property_counters);
 }
