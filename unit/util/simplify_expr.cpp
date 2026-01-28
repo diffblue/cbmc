@@ -587,6 +587,48 @@ TEST_CASE("Simplify power", "[core][util]")
   }
 }
 
+TEST_CASE("Simplify pointer cast of pointer arithmetic", "[core][util]")
+{
+  config.set_arch("none");
+
+  symbol_tablet symbol_table;
+  namespacet ns(symbol_table);
+
+  SECTION("Same element size: (char*)(unsigned_char_ptr + 1)")
+  {
+    // (char*)(ptr + 1) where ptr is unsigned char* should push the cast inside
+    auto uchar_ptr_type = pointer_type(unsigned_char_type());
+    auto char_ptr_type = pointer_type(signed_char_type());
+    symbol_exprt ptr{"ptr", uchar_ptr_type};
+    plus_exprt ptr_plus_1{ptr, from_integer(1, pointer_diff_type())};
+    typecast_exprt cast{ptr_plus_1, char_ptr_type};
+
+    exprt result = simplify_expr(cast, ns);
+
+    // Expected: (char*)ptr + 1
+    plus_exprt expected{
+      typecast_exprt{ptr, char_ptr_type}, from_integer(1, pointer_diff_type())};
+    REQUIRE(result == expected);
+  }
+
+  SECTION("Element size ratio 4: (char*)(int_ptr + 1)")
+  {
+    // (char*)(ptr + 1) where ptr is int* should scale offset by 4
+    auto int_ptr_type = pointer_type(signed_int_type());
+    auto char_ptr_type = pointer_type(signed_char_type());
+    symbol_exprt ptr{"ptr", int_ptr_type};
+    plus_exprt ptr_plus_1{ptr, from_integer(1, pointer_diff_type())};
+    typecast_exprt cast{ptr_plus_1, char_ptr_type};
+
+    exprt result = simplify_expr(cast, ns);
+
+    // Expected: (char*)ptr + 4
+    plus_exprt expected{
+      typecast_exprt{ptr, char_ptr_type}, from_integer(4, pointer_diff_type())};
+    REQUIRE(result == expected);
+  }
+}
+
 TEST_CASE("Simplify quantifier", "[core][util]")
 {
   const symbol_tablet symbol_table;
