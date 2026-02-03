@@ -256,7 +256,8 @@ public:
   ///
   /// The validation mode indicates whether well-formedness check failures are
   /// reported via DATA_INVARIANT violations or exceptions.
-  static void check(const exprt &, const validation_modet)
+  static void
+  check(const exprt &, const validation_modet = validation_modet::INVARIANT)
   {
   }
 

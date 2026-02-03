@@ -196,6 +196,33 @@ public:
   }
 };
 
+template <>
+inline bool can_cast_expr<symbol_exprt>(const exprt &base)
+{
+  return base.id() == ID_symbol;
+}
+
+/// \brief Cast an exprt to a \ref symbol_exprt
+///
+/// \a expr must be known to be \ref symbol_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref symbol_exprt
+inline const symbol_exprt &to_symbol_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_symbol);
+  symbol_exprt::check(expr);
+  return static_cast<const symbol_exprt &>(expr);
+}
+
+/// \copydoc to_symbol_expr(const exprt &)
+inline symbol_exprt &to_symbol_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_symbol);
+  symbol_exprt::check(expr);
+  return static_cast<symbol_exprt &>(expr);
+}
+
 // NOLINTNEXTLINE(readability/namespace)
 namespace std
 {
@@ -252,41 +279,6 @@ public:
     remove(ID_C_thread_local);
   }
 };
-
-template <>
-inline bool can_cast_expr<symbol_exprt>(const exprt &base)
-{
-  return base.id() == ID_symbol;
-}
-
-inline void validate_expr(const symbol_exprt &value)
-{
-  validate_operands(value, 0, "Symbols must not have operands");
-}
-
-/// \brief Cast an exprt to a \ref symbol_exprt
-///
-/// \a expr must be known to be \ref symbol_exprt.
-///
-/// \param expr: Source expression
-/// \return Object of type \ref symbol_exprt
-inline const symbol_exprt &to_symbol_expr(const exprt &expr)
-{
-  PRECONDITION(expr.id()==ID_symbol);
-  const symbol_exprt &ret = static_cast<const symbol_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
-}
-
-/// \copydoc to_symbol_expr(const exprt &)
-inline symbol_exprt &to_symbol_expr(exprt &expr)
-{
-  PRECONDITION(expr.id()==ID_symbol);
-  symbol_exprt &ret = static_cast<symbol_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
-}
-
 
 /// \brief Expression to hold a nondeterministic choice
 class nondet_symbol_exprt : public nullary_exprt
@@ -413,11 +405,6 @@ inline bool can_cast_expr<unary_exprt>(const exprt &base)
   return base.operands().size() == 1;
 }
 
-inline void validate_expr(const unary_exprt &value)
-{
-  unary_exprt::check(value);
-}
-
 /// \brief Cast an exprt to a \ref unary_exprt
 ///
 /// \a expr must be known to be \ref unary_exprt.
@@ -451,11 +438,6 @@ template <>
 inline bool can_cast_expr<abs_exprt>(const exprt &base)
 {
   return base.id() == ID_abs;
-}
-
-inline void validate_expr(const abs_exprt &value)
-{
-  validate_operands(value, 1, "Absolute value must have one operand");
 }
 
 /// \brief Cast an exprt to a \ref abs_exprt
@@ -501,11 +483,6 @@ inline bool can_cast_expr<unary_minus_exprt>(const exprt &base)
   return base.id() == ID_unary_minus;
 }
 
-inline void validate_expr(const unary_minus_exprt &value)
-{
-  validate_operands(value, 1, "Unary minus must have one operand");
-}
-
 /// \brief Cast an exprt to a \ref unary_minus_exprt
 ///
 /// \a expr must be known to be \ref unary_minus_exprt.
@@ -543,11 +520,6 @@ inline bool can_cast_expr<unary_plus_exprt>(const exprt &base)
   return base.id() == ID_unary_plus;
 }
 
-inline void validate_expr(const unary_plus_exprt &value)
-{
-  validate_operands(value, 1, "unary plus must have one operand");
-}
-
 /// \brief Cast an exprt to a \ref unary_plus_exprt
 ///
 /// \a expr must be known to be \ref unary_plus_exprt.
@@ -561,7 +533,7 @@ inline const unary_plus_exprt &to_unary_plus_expr(const exprt &expr)
   return static_cast<const unary_plus_exprt &>(expr);
 }
 
-/// \copydoc to_unary_minus_expr(const exprt &)
+/// \copydoc to_unary_plus_expr(const exprt &)
 inline unary_plus_exprt &to_unary_plus_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_unary_plus);
@@ -578,6 +550,12 @@ public:
     : expr_protectedt(_id, bool_typet())
   {
   }
+
+  static void check(
+    const exprt &expr,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+  }
 };
 
 /// \brief A base class for expressions that are predicates,
@@ -589,7 +567,34 @@ public:
     : unary_exprt(_id, std::move(_op), bool_typet())
   {
   }
+
+  static void check(
+    const exprt &expr,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    unary_exprt::check(expr);
+    predicate_exprt::check(expr);
+  }
 };
+
+/// \brief Cast an exprt to a \ref unary_predicate_exprt
+///
+/// \a expr must be known to be \ref unary_predicate_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref unary_predicate_exprt
+inline const unary_predicate_exprt &to_unary_predicate_expr(const exprt &expr)
+{
+  unary_predicate_exprt::check(expr);
+  return static_cast<const unary_predicate_exprt &>(expr);
+}
+
+/// \copydoc to_unary_predicate_expr(const exprt &)
+inline unary_predicate_exprt &to_unary_predicate_expr(exprt &expr)
+{
+  unary_predicate_exprt::check(expr);
+  return static_cast<unary_predicate_exprt &>(expr);
+}
 
 /// \brief Sign of an expression
 /// Predicate is true if \a _op is negative, false otherwise.
@@ -606,11 +611,6 @@ template <>
 inline bool can_cast_expr<sign_exprt>(const exprt &base)
 {
   return base.id() == ID_sign;
-}
-
-inline void validate_expr(const sign_exprt &expr)
-{
-  validate_operands(expr, 1, "sign expression must have one operand");
 }
 
 /// \brief Cast an exprt to a \ref sign_exprt
@@ -702,11 +702,6 @@ inline bool can_cast_expr<binary_exprt>(const exprt &base)
   return base.operands().size() == 2;
 }
 
-inline void validate_expr(const binary_exprt &value)
-{
-  binary_exprt::check(value);
-}
-
 /// \brief Cast an exprt to a \ref binary_exprt
 ///
 /// \a expr must be known to be \ref binary_exprt.
@@ -741,6 +736,7 @@ public:
     const validation_modet vm = validation_modet::INVARIANT)
   {
     binary_exprt::check(expr, vm);
+    predicate_exprt::check(expr, vm);
   }
 
   static void validate(
@@ -749,13 +745,28 @@ public:
     const validation_modet vm = validation_modet::INVARIANT)
   {
     binary_exprt::validate(expr, ns, vm);
-
-    DATA_CHECK(
-      vm,
-      expr.is_boolean(),
-      "result of binary predicate expression should be of type bool");
+    predicate_exprt::validate(expr, ns, vm);
   }
 };
+
+/// \brief Cast an exprt to a \ref binary_predicate_exprt
+///
+/// \a expr must be known to be \ref binary_predicate_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref binary_predicate_exprt
+inline const binary_predicate_exprt &to_binary_predicate_expr(const exprt &expr)
+{
+  binary_predicate_exprt::check(expr);
+  return static_cast<const binary_predicate_exprt &>(expr);
+}
+
+/// \copydoc to_binary_predicate_expr(const exprt &)
+inline binary_predicate_exprt &to_binary_predicate_expr(exprt &expr)
+{
+  binary_predicate_exprt::check(expr);
+  return static_cast<binary_predicate_exprt &>(expr);
+}
 
 /// \brief A base class for relations, i.e., binary predicates whose
 /// two operands have the same type
@@ -798,95 +809,6 @@ inline bool can_cast_expr<binary_relation_exprt>(const exprt &base)
   return can_cast_expr<binary_exprt>(base);
 }
 
-inline void validate_expr(const binary_relation_exprt &value)
-{
-  binary_relation_exprt::check(value);
-}
-
-/// \brief Binary greater than operator expression.
-class greater_than_exprt : public binary_relation_exprt
-{
-public:
-  greater_than_exprt(exprt _lhs, exprt _rhs)
-    : binary_relation_exprt{std::move(_lhs), ID_gt, std::move(_rhs)}
-  {
-  }
-};
-
-template <>
-inline bool can_cast_expr<greater_than_exprt>(const exprt &base)
-{
-  return base.id() == ID_gt;
-}
-
-inline void validate_expr(const greater_than_exprt &value)
-{
-  binary_relation_exprt::check(value);
-}
-
-/// \brief Binary greater than or equal operator expression.
-class greater_than_or_equal_exprt : public binary_relation_exprt
-{
-public:
-  greater_than_or_equal_exprt(exprt _lhs, exprt _rhs)
-    : binary_relation_exprt{std::move(_lhs), ID_ge, std::move(_rhs)}
-  {
-  }
-};
-
-template <>
-inline bool can_cast_expr<greater_than_or_equal_exprt>(const exprt &base)
-{
-  return base.id() == ID_ge;
-}
-
-inline void validate_expr(const greater_than_or_equal_exprt &value)
-{
-  binary_relation_exprt::check(value);
-}
-
-/// \brief Binary less than operator expression.
-class less_than_exprt : public binary_relation_exprt
-{
-public:
-  less_than_exprt(exprt _lhs, exprt _rhs)
-    : binary_relation_exprt{std::move(_lhs), ID_lt, std::move(_rhs)}
-  {
-  }
-};
-
-template <>
-inline bool can_cast_expr<less_than_exprt>(const exprt &base)
-{
-  return base.id() == ID_lt;
-}
-
-inline void validate_expr(const less_than_exprt &value)
-{
-  binary_relation_exprt::check(value);
-}
-
-/// \brief Binary less than or equal operator expression.
-class less_than_or_equal_exprt : public binary_relation_exprt
-{
-public:
-  less_than_or_equal_exprt(exprt _lhs, exprt _rhs)
-    : binary_relation_exprt{std::move(_lhs), ID_le, std::move(_rhs)}
-  {
-  }
-};
-
-template <>
-inline bool can_cast_expr<less_than_or_equal_exprt>(const exprt &base)
-{
-  return base.id() == ID_le;
-}
-
-inline void validate_expr(const less_than_or_equal_exprt &value)
-{
-  binary_relation_exprt::check(value);
-}
-
 /// \brief Cast an exprt to a \ref binary_relation_exprt
 ///
 /// \a expr must be known to be \ref binary_relation_exprt.
@@ -906,6 +828,69 @@ inline binary_relation_exprt &to_binary_relation_expr(exprt &expr)
   return static_cast<binary_relation_exprt &>(expr);
 }
 
+/// \brief Binary greater than operator expression.
+class greater_than_exprt : public binary_relation_exprt
+{
+public:
+  greater_than_exprt(exprt _lhs, exprt _rhs)
+    : binary_relation_exprt{std::move(_lhs), ID_gt, std::move(_rhs)}
+  {
+  }
+};
+
+template <>
+inline bool can_cast_expr<greater_than_exprt>(const exprt &base)
+{
+  return base.id() == ID_gt;
+}
+
+/// \brief Binary greater than or equal operator expression.
+class greater_than_or_equal_exprt : public binary_relation_exprt
+{
+public:
+  greater_than_or_equal_exprt(exprt _lhs, exprt _rhs)
+    : binary_relation_exprt{std::move(_lhs), ID_ge, std::move(_rhs)}
+  {
+  }
+};
+
+template <>
+inline bool can_cast_expr<greater_than_or_equal_exprt>(const exprt &base)
+{
+  return base.id() == ID_ge;
+}
+
+/// \brief Binary less than operator expression.
+class less_than_exprt : public binary_relation_exprt
+{
+public:
+  less_than_exprt(exprt _lhs, exprt _rhs)
+    : binary_relation_exprt{std::move(_lhs), ID_lt, std::move(_rhs)}
+  {
+  }
+};
+
+template <>
+inline bool can_cast_expr<less_than_exprt>(const exprt &base)
+{
+  return base.id() == ID_lt;
+}
+
+/// \brief Binary less than or equal operator expression.
+class less_than_or_equal_exprt : public binary_relation_exprt
+{
+public:
+  less_than_or_equal_exprt(exprt _lhs, exprt _rhs)
+    : binary_relation_exprt{std::move(_lhs), ID_le, std::move(_rhs)}
+  {
+  }
+};
+
+template <>
+inline bool can_cast_expr<less_than_or_equal_exprt>(const exprt &base)
+{
+  return base.id() == ID_le;
+}
 
 /// \brief A base class for multi-ary expressions
 /// Associativity is not specified.
@@ -1041,11 +1026,6 @@ inline bool can_cast_expr<plus_exprt>(const exprt &base)
   return base.id() == ID_plus;
 }
 
-inline void validate_expr(const plus_exprt &value)
-{
-  validate_operands(value, 2, "Plus must have two or more operands", true);
-}
-
 /// \brief Cast an exprt to a \ref plus_exprt
 ///
 /// \a expr must be known to be \ref plus_exprt.
@@ -1086,11 +1066,6 @@ inline bool can_cast_expr<minus_exprt>(const exprt &base)
   return base.id() == ID_minus;
 }
 
-inline void validate_expr(const minus_exprt &value)
-{
-  validate_operands(value, 2, "Minus must have two or more operands", true);
-}
-
 /// \brief Cast an exprt to a \ref minus_exprt
 ///
 /// \a expr must be known to be \ref minus_exprt.
@@ -1100,18 +1075,16 @@ inline void validate_expr(const minus_exprt &value)
 inline const minus_exprt &to_minus_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_minus);
-  const minus_exprt &ret = static_cast<const minus_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  minus_exprt::check(expr);
+  return static_cast<const minus_exprt &>(expr);
 }
 
 /// \copydoc to_minus_expr(const exprt &)
 inline minus_exprt &to_minus_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_minus);
-  minus_exprt &ret = static_cast<minus_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  minus_exprt::check(expr);
+  return static_cast<minus_exprt &>(expr);
 }
 
 
@@ -1142,11 +1115,6 @@ inline bool can_cast_expr<mult_exprt>(const exprt &base)
   return base.id() == ID_mult;
 }
 
-inline void validate_expr(const mult_exprt &value)
-{
-  validate_operands(value, 2, "Multiply must have two or more operands", true);
-}
-
 /// \brief Cast an exprt to a \ref mult_exprt
 ///
 /// \a expr must be known to be \ref mult_exprt.
@@ -1156,18 +1124,16 @@ inline void validate_expr(const mult_exprt &value)
 inline const mult_exprt &to_mult_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_mult);
-  const mult_exprt &ret = static_cast<const mult_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  mult_exprt::check(expr);
+  return static_cast<const mult_exprt &>(expr);
 }
 
 /// \copydoc to_mult_expr(const exprt &)
 inline mult_exprt &to_mult_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_mult);
-  mult_exprt &ret = static_cast<mult_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  mult_exprt::check(expr);
+  return static_cast<mult_exprt &>(expr);
 }
 
 
@@ -1211,11 +1177,6 @@ inline bool can_cast_expr<div_exprt>(const exprt &base)
   return base.id() == ID_div;
 }
 
-inline void validate_expr(const div_exprt &value)
-{
-  validate_operands(value, 2, "Divide must have two operands");
-}
-
 /// \brief Cast an exprt to a \ref div_exprt
 ///
 /// \a expr must be known to be \ref div_exprt.
@@ -1225,18 +1186,16 @@ inline void validate_expr(const div_exprt &value)
 inline const div_exprt &to_div_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_div);
-  const div_exprt &ret = static_cast<const div_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  div_exprt::check(expr);
+  return static_cast<const div_exprt &>(expr);
 }
 
 /// \copydoc to_div_expr(const exprt &)
 inline div_exprt &to_div_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_div);
-  div_exprt &ret = static_cast<div_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  div_exprt::check(expr);
+  return static_cast<div_exprt &>(expr);
 }
 
 /// \brief Modulo defined as lhs-(rhs * truncate(lhs/rhs)).
@@ -1282,11 +1241,6 @@ inline bool can_cast_expr<mod_exprt>(const exprt &base)
   return base.id() == ID_mod;
 }
 
-inline void validate_expr(const mod_exprt &value)
-{
-  validate_operands(value, 2, "Modulo must have two operands");
-}
-
 /// \brief Cast an exprt to a \ref mod_exprt
 ///
 /// \a expr must be known to be \ref mod_exprt.
@@ -1296,18 +1250,16 @@ inline void validate_expr(const mod_exprt &value)
 inline const mod_exprt &to_mod_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_mod);
-  const mod_exprt &ret = static_cast<const mod_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  mod_exprt::check(expr);
+  return static_cast<const mod_exprt &>(expr);
 }
 
 /// \copydoc to_mod_expr(const exprt &)
 inline mod_exprt &to_mod_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_mod);
-  mod_exprt &ret = static_cast<mod_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  mod_exprt::check(expr);
+  return static_cast<mod_exprt &>(expr);
 }
 
 /// \brief Boute's Euclidean definition of Modulo -- to match SMT-LIB2
@@ -1350,11 +1302,6 @@ inline bool can_cast_expr<euclidean_mod_exprt>(const exprt &base)
   return base.id() == ID_euclidean_mod;
 }
 
-inline void validate_expr(const euclidean_mod_exprt &value)
-{
-  validate_operands(value, 2, "Modulo must have two operands");
-}
-
 /// \brief Cast an exprt to a \ref euclidean_mod_exprt
 ///
 /// \a expr must be known to be \ref euclidean_mod_exprt.
@@ -1364,19 +1311,16 @@ inline void validate_expr(const euclidean_mod_exprt &value)
 inline const euclidean_mod_exprt &to_euclidean_mod_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_euclidean_mod);
-  const euclidean_mod_exprt &ret =
-    static_cast<const euclidean_mod_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  euclidean_mod_exprt::check(expr);
+  return static_cast<const euclidean_mod_exprt &>(expr);
 }
 
 /// \copydoc to_euclidean_mod_expr(const exprt &)
 inline euclidean_mod_exprt &to_euclidean_mod_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_euclidean_mod);
-  euclidean_mod_exprt &ret = static_cast<euclidean_mod_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  euclidean_mod_exprt::check(expr);
+  return static_cast<euclidean_mod_exprt &>(expr);
 }
 
 
@@ -1410,11 +1354,6 @@ template <>
 inline bool can_cast_expr<equal_exprt>(const exprt &base)
 {
   return base.id() == ID_equal;
-}
-
-inline void validate_expr(const equal_exprt &value)
-{
-  equal_exprt::check(value);
 }
 
 /// \brief Cast an exprt to an \ref equal_exprt
@@ -1455,11 +1394,6 @@ inline bool can_cast_expr<notequal_exprt>(const exprt &base)
   return base.id() == ID_notequal;
 }
 
-inline void validate_expr(const notequal_exprt &value)
-{
-  validate_operands(value, 2, "Inequality must have two operands");
-}
-
 /// \brief Cast an exprt to an \ref notequal_exprt
 ///
 /// \a expr must be known to be \ref notequal_exprt.
@@ -1469,18 +1403,16 @@ inline void validate_expr(const notequal_exprt &value)
 inline const notequal_exprt &to_notequal_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_notequal);
-  const notequal_exprt &ret = static_cast<const notequal_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  notequal_exprt::check(expr);
+  return static_cast<const notequal_exprt &>(expr);
 }
 
 /// \copydoc to_notequal_expr(const exprt &)
 inline notequal_exprt &to_notequal_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_notequal);
-  notequal_exprt &ret = static_cast<notequal_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  notequal_exprt::check(expr);
+  return static_cast<notequal_exprt &>(expr);
 }
 
 
@@ -1543,11 +1475,6 @@ inline bool can_cast_expr<index_exprt>(const exprt &base)
   return base.id() == ID_index;
 }
 
-inline void validate_expr(const index_exprt &value)
-{
-  validate_operands(value, 2, "Array index must have two operands");
-}
-
 /// \brief Cast an exprt to an \ref index_exprt
 ///
 /// \a expr must be known to be \ref index_exprt.
@@ -1557,18 +1484,16 @@ inline void validate_expr(const index_exprt &value)
 inline const index_exprt &to_index_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_index);
-  const index_exprt &ret = static_cast<const index_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  index_exprt::check(expr);
+  return static_cast<const index_exprt &>(expr);
 }
 
 /// \copydoc to_index_expr(const exprt &)
 inline index_exprt &to_index_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_index);
-  index_exprt &ret = static_cast<index_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  index_exprt::check(expr);
+  return static_cast<index_exprt &>(expr);
 }
 
 
@@ -1606,11 +1531,6 @@ template <>
 inline bool can_cast_expr<array_of_exprt>(const exprt &base)
 {
   return base.id() == ID_array_of;
-}
-
-inline void validate_expr(const array_of_exprt &value)
-{
-  validate_operands(value, 1, "'Array of' must have one operand");
 }
 
 /// \brief Cast an exprt to an \ref array_of_exprt
@@ -1684,6 +1604,7 @@ inline bool can_cast_expr<array_exprt>(const exprt &base)
 inline const array_exprt &to_array_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_array);
+  array_exprt::check(expr);
   return static_cast<const array_exprt &>(expr);
 }
 
@@ -1691,6 +1612,7 @@ inline const array_exprt &to_array_expr(const exprt &expr)
 inline array_exprt &to_array_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_array);
+  array_exprt::check(expr);
   return static_cast<array_exprt &>(expr);
 }
 
@@ -1719,6 +1641,14 @@ public:
   {
     add_to_operands(std::move(index), std::move(value));
   }
+
+  static void check(
+    const exprt &expr,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    DATA_CHECK(
+      vm, expr.operands().size() % 2 == 0, "number of operands must be even");
+  }
 };
 
 template <>
@@ -1727,25 +1657,18 @@ inline bool can_cast_expr<array_list_exprt>(const exprt &base)
   return base.id() == ID_array_list;
 }
 
-inline void validate_expr(const array_list_exprt &value)
-{
-  PRECONDITION(value.operands().size() % 2 == 0);
-}
-
 inline const array_list_exprt &to_array_list_expr(const exprt &expr)
 {
-  PRECONDITION(can_cast_expr<array_list_exprt>(expr));
-  auto &ret = static_cast<const array_list_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  PRECONDITION(expr.id() == ID_array_list);
+  array_list_exprt::check(expr);
+  return static_cast<const array_list_exprt &>(expr);
 }
 
 inline array_list_exprt &to_array_list_expr(exprt &expr)
 {
-  PRECONDITION(can_cast_expr<array_list_exprt>(expr));
-  auto &ret = static_cast<array_list_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  PRECONDITION(expr.id() == ID_array_list);
+  array_list_exprt::check(expr);
+  return static_cast<array_list_exprt &>(expr);
 }
 
 /// \brief Vector constructor from list of elements
@@ -1773,6 +1696,7 @@ inline bool can_cast_expr<vector_exprt>(const exprt &base)
 inline const vector_exprt &to_vector_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_vector);
+  vector_exprt::check(expr);
   return static_cast<const vector_exprt &>(expr);
 }
 
@@ -1780,6 +1704,7 @@ inline const vector_exprt &to_vector_expr(const exprt &expr)
 inline vector_exprt &to_vector_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_vector);
+  vector_exprt::check(expr);
   return static_cast<vector_exprt &>(expr);
 }
 
@@ -1821,11 +1746,6 @@ inline bool can_cast_expr<union_exprt>(const exprt &base)
   return base.id() == ID_union;
 }
 
-inline void validate_expr(const union_exprt &value)
-{
-  validate_operands(value, 1, "Union constructor must have one operand");
-}
-
 /// \brief Cast an exprt to a \ref union_exprt
 ///
 /// \a expr must be known to be \ref union_exprt.
@@ -1862,12 +1782,6 @@ template <>
 inline bool can_cast_expr<empty_union_exprt>(const exprt &base)
 {
   return base.id() == ID_empty_union;
-}
-
-inline void validate_expr(const empty_union_exprt &value)
-{
-  validate_operands(
-    value, 0, "Empty-union constructor must not have any operand");
 }
 
 /// \brief Cast an exprt to an \ref empty_union_exprt
@@ -1970,11 +1884,6 @@ inline bool can_cast_expr<complex_exprt>(const exprt &base)
   return base.id() == ID_complex;
 }
 
-inline void validate_expr(const complex_exprt &value)
-{
-  validate_operands(value, 2, "Complex constructor must have two operands");
-}
-
 /// \brief Cast an exprt to a \ref complex_exprt
 ///
 /// \a expr must be known to be \ref complex_exprt.
@@ -1984,18 +1893,16 @@ inline void validate_expr(const complex_exprt &value)
 inline const complex_exprt &to_complex_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_complex);
-  const complex_exprt &ret = static_cast<const complex_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  complex_exprt::check(expr);
+  return static_cast<const complex_exprt &>(expr);
 }
 
 /// \copydoc to_complex_expr(const exprt &)
 inline complex_exprt &to_complex_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_complex);
-  complex_exprt &ret = static_cast<complex_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  complex_exprt::check(expr);
+  return static_cast<complex_exprt &>(expr);
 }
 
 /// \brief Real part of the expression describing a complex number.
@@ -2012,12 +1919,6 @@ template <>
 inline bool can_cast_expr<complex_real_exprt>(const exprt &base)
 {
   return base.id() == ID_complex_real;
-}
-
-inline void validate_expr(const complex_real_exprt &expr)
-{
-  validate_operands(
-    expr, 1, "real part retrieval operation must have one operand");
 }
 
 /// \brief Cast an exprt to a \ref complex_real_exprt
@@ -2057,12 +1958,6 @@ inline bool can_cast_expr<complex_imag_exprt>(const exprt &base)
   return base.id() == ID_complex_imag;
 }
 
-inline void validate_expr(const complex_imag_exprt &expr)
-{
-  validate_operands(
-    expr, 1, "imaginary part retrieval operation must have one operand");
-}
-
 /// \brief Cast an exprt to a \ref complex_imag_exprt
 ///
 /// \a expr must be known to be a \ref complex_imag_exprt.
@@ -2072,18 +1967,16 @@ inline void validate_expr(const complex_imag_exprt &expr)
 inline const complex_imag_exprt &to_complex_imag_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_complex_imag);
-  const complex_imag_exprt &ret = static_cast<const complex_imag_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  complex_imag_exprt::check(expr);
+  return static_cast<const complex_imag_exprt &>(expr);
 }
 
 /// \copydoc to_complex_imag_expr(const exprt &)
 inline complex_imag_exprt &to_complex_imag_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_complex_imag);
-  complex_imag_exprt &ret = static_cast<complex_imag_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  complex_imag_exprt::check(expr);
+  return static_cast<complex_imag_exprt &>(expr);
 }
 
 
@@ -2110,11 +2003,6 @@ template <>
 inline bool can_cast_expr<typecast_exprt>(const exprt &base)
 {
   return base.id() == ID_typecast;
-}
-
-inline void validate_expr(const typecast_exprt &value)
-{
-  validate_operands(value, 1, "Typecast must have one operand");
 }
 
 /// \brief Cast an exprt to a \ref typecast_exprt
@@ -2197,6 +2085,7 @@ inline bool can_cast_expr<and_exprt>(const exprt &base)
 inline const and_exprt &to_and_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_and);
+  and_exprt::check(expr);
   return static_cast<const and_exprt &>(expr);
 }
 
@@ -2204,6 +2093,7 @@ inline const and_exprt &to_and_expr(const exprt &expr)
 inline and_exprt &to_and_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_and);
+  and_exprt::check(expr);
   return static_cast<and_exprt &>(expr);
 }
 
@@ -2237,6 +2127,7 @@ public:
 inline const nand_exprt &to_nand_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_nand);
+  nand_exprt::check(expr);
   return static_cast<const nand_exprt &>(expr);
 }
 
@@ -2244,6 +2135,7 @@ inline const nand_exprt &to_nand_expr(const exprt &expr)
 inline nand_exprt &to_nand_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_nand);
+  nand_exprt::check(expr);
   return static_cast<nand_exprt &>(expr);
 }
 
@@ -2263,11 +2155,6 @@ inline bool can_cast_expr<implies_exprt>(const exprt &base)
   return base.id() == ID_implies;
 }
 
-inline void validate_expr(const implies_exprt &value)
-{
-  validate_operands(value, 2, "Implies must have two operands");
-}
-
 /// \brief Cast an exprt to a \ref implies_exprt
 ///
 /// \a expr must be known to be \ref implies_exprt.
@@ -2277,18 +2164,16 @@ inline void validate_expr(const implies_exprt &value)
 inline const implies_exprt &to_implies_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_implies);
-  const implies_exprt &ret = static_cast<const implies_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  implies_exprt::check(expr);
+  return static_cast<const implies_exprt &>(expr);
 }
 
 /// \copydoc to_implies_expr(const exprt &)
 inline implies_exprt &to_implies_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_implies);
-  implies_exprt &ret = static_cast<implies_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  implies_exprt::check(expr);
+  return static_cast<implies_exprt &>(expr);
 }
 
 /// \brief Boolean OR
@@ -2345,6 +2230,7 @@ inline bool can_cast_expr<or_exprt>(const exprt &base)
 inline const or_exprt &to_or_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_or);
+  or_exprt::check(expr);
   return static_cast<const or_exprt &>(expr);
 }
 
@@ -2352,6 +2238,7 @@ inline const or_exprt &to_or_expr(const exprt &expr)
 inline or_exprt &to_or_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_or);
+  or_exprt::check(expr);
   return static_cast<or_exprt &>(expr);
 }
 
@@ -2385,6 +2272,7 @@ public:
 inline const nor_exprt &to_nor_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_nor);
+  nor_exprt::check(expr);
   return static_cast<const nor_exprt &>(expr);
 }
 
@@ -2427,6 +2315,7 @@ inline bool can_cast_expr<xor_exprt>(const exprt &base)
 inline const xor_exprt &to_xor_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_xor);
+  xor_exprt::check(expr);
   return static_cast<const xor_exprt &>(expr);
 }
 
@@ -2434,6 +2323,7 @@ inline const xor_exprt &to_xor_expr(const exprt &expr)
 inline xor_exprt &to_xor_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_xor);
+  xor_exprt::check(expr);
   return static_cast<xor_exprt &>(expr);
 }
 
@@ -2471,6 +2361,7 @@ inline bool can_cast_expr<xnor_exprt>(const exprt &base)
 inline const xnor_exprt &to_xnor_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_xnor);
+  xnor_exprt::check(expr);
   return static_cast<const xnor_exprt &>(expr);
 }
 
@@ -2478,6 +2369,7 @@ inline const xnor_exprt &to_xnor_expr(const exprt &expr)
 inline xnor_exprt &to_xnor_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_xnor);
+  xnor_exprt::check(expr);
   return static_cast<xnor_exprt &>(expr);
 }
 
@@ -2495,11 +2387,6 @@ template <>
 inline bool can_cast_expr<not_exprt>(const exprt &base)
 {
   return base.id() == ID_not;
-}
-
-inline void validate_expr(const not_exprt &value)
-{
-  validate_operands(value, 1, "Not must have one operand");
 }
 
 /// \brief Cast an exprt to an \ref not_exprt
@@ -2595,11 +2482,6 @@ inline bool can_cast_expr<if_exprt>(const exprt &base)
   return base.id() == ID_if;
 }
 
-inline void validate_expr(const if_exprt &value)
-{
-  validate_operands(value, 3, "If-then-else must have three operands");
-}
-
 /// \brief Cast an exprt to an \ref if_exprt
 ///
 /// \a expr must be known to be \ref if_exprt.
@@ -2609,18 +2491,16 @@ inline void validate_expr(const if_exprt &value)
 inline const if_exprt &to_if_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_if);
-  const if_exprt &ret = static_cast<const if_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  if_exprt::check(expr);
+  return static_cast<const if_exprt &>(expr);
 }
 
 /// \copydoc to_if_expr(const exprt &)
 inline if_exprt &to_if_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_if);
-  if_exprt &ret = static_cast<if_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  if_exprt::check(expr);
+  return static_cast<if_exprt &>(expr);
 }
 
 /// \brief Operator to update elements in structs and arrays
@@ -2674,11 +2554,6 @@ inline bool can_cast_expr<with_exprt>(const exprt &base)
   return base.id() == ID_with;
 }
 
-inline void validate_expr(const with_exprt &value)
-{
-  validate_operands(value, 3, "array/structure update must have 3 operands");
-}
-
 /// \brief Cast an exprt to a \ref with_exprt
 ///
 /// \a expr must be known to be \ref with_exprt.
@@ -2688,18 +2563,16 @@ inline void validate_expr(const with_exprt &value)
 inline const with_exprt &to_with_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_with);
-  const with_exprt &ret = static_cast<const with_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  with_exprt::check(expr);
+  return static_cast<const with_exprt &>(expr);
 }
 
 /// \copydoc to_with_expr(const exprt &)
 inline with_exprt &to_with_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_with);
-  with_exprt &ret = static_cast<with_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  with_exprt::check(expr);
+  return static_cast<with_exprt &>(expr);
 }
 
 class index_designatort : public expr_protectedt
@@ -2727,11 +2600,6 @@ inline bool can_cast_expr<index_designatort>(const exprt &base)
   return base.id() == ID_index_designator;
 }
 
-inline void validate_expr(const index_designatort &value)
-{
-  validate_operands(value, 1, "Index designator must have one operand");
-}
-
 /// \brief Cast an exprt to an \ref index_designatort
 ///
 /// \a expr must be known to be \ref index_designatort.
@@ -2741,18 +2609,16 @@ inline void validate_expr(const index_designatort &value)
 inline const index_designatort &to_index_designator(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_index_designator);
-  const index_designatort &ret = static_cast<const index_designatort &>(expr);
-  validate_expr(ret);
-  return ret;
+  index_designatort::check(expr);
+  return static_cast<const index_designatort &>(expr);
 }
 
 /// \copydoc to_index_designator(const exprt &)
 inline index_designatort &to_index_designator(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_index_designator);
-  index_designatort &ret = static_cast<index_designatort &>(expr);
-  validate_expr(ret);
-  return ret;
+  index_designatort::check(expr);
+  return static_cast<index_designatort &>(expr);
 }
 
 class member_designatort : public expr_protectedt
@@ -2776,11 +2642,6 @@ inline bool can_cast_expr<member_designatort>(const exprt &base)
   return base.id() == ID_member_designator;
 }
 
-inline void validate_expr(const member_designatort &value)
-{
-  validate_operands(value, 0, "Member designator must not have operands");
-}
-
 /// \brief Cast an exprt to an \ref member_designatort
 ///
 /// \a expr must be known to be \ref member_designatort.
@@ -2790,18 +2651,16 @@ inline void validate_expr(const member_designatort &value)
 inline const member_designatort &to_member_designator(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_member_designator);
-  const member_designatort &ret = static_cast<const member_designatort &>(expr);
-  validate_expr(ret);
-  return ret;
+  member_designatort::check(expr);
+  return static_cast<const member_designatort &>(expr);
 }
 
 /// \copydoc to_member_designator(const exprt &)
 inline member_designatort &to_member_designator(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_member_designator);
-  member_designatort &ret = static_cast<member_designatort &>(expr);
-  validate_expr(ret);
-  return ret;
+  member_designatort::check(expr);
+  return static_cast<member_designatort &>(expr);
 }
 
 
@@ -2893,18 +2752,16 @@ inline void validate_expr(const update_exprt &value)
 inline const update_exprt &to_update_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_update);
-  const update_exprt &ret = static_cast<const update_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  update_exprt::check(expr);
+  return static_cast<const update_exprt &>(expr);
 }
 
 /// \copydoc to_update_expr(const exprt &)
 inline update_exprt &to_update_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_update);
-  update_exprt &ret = static_cast<update_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  update_exprt::check(expr);
+  return static_cast<update_exprt &>(expr);
 }
 
 
@@ -3075,11 +2932,6 @@ template <>
 inline bool can_cast_expr<member_exprt>(const exprt &base)
 {
   return base.id() == ID_member;
-}
-
-inline void validate_expr(const member_exprt &value)
-{
-  validate_operands(value, 1, "Extract member must have one operand");
 }
 
 /// \brief Cast an exprt to a \ref member_exprt
@@ -3362,12 +3214,6 @@ inline bool can_cast_expr<binding_exprt>(const exprt &base)
          base.id() == ID_lambda || base.id() == ID_array_comprehension;
 }
 
-inline void validate_expr(const binding_exprt &binding_expr)
-{
-  validate_operands(
-    binding_expr, 2, "Binding expressions must have two operands");
-}
-
 /// \brief Cast an exprt to a \ref binding_exprt
 ///
 /// \a expr must be known to be \ref binding_exprt.
@@ -3379,9 +3225,8 @@ inline const binding_exprt &to_binding_expr(const exprt &expr)
   PRECONDITION(
     expr.id() == ID_forall || expr.id() == ID_exists ||
     expr.id() == ID_lambda || expr.id() == ID_array_comprehension);
-  const binding_exprt &ret = static_cast<const binding_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  binding_exprt::check(expr);
+  return static_cast<const binding_exprt &>(expr);
 }
 
 /// \brief Cast an exprt to a \ref binding_exprt
@@ -3395,9 +3240,8 @@ inline binding_exprt &to_binding_expr(exprt &expr)
   PRECONDITION(
     expr.id() == ID_forall || expr.id() == ID_exists ||
     expr.id() == ID_lambda || expr.id() == ID_array_comprehension);
-  binding_exprt &ret = static_cast<binding_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  binding_exprt::check(expr);
+  return static_cast<binding_exprt &>(expr);
 }
 
 /// \brief A let expression
@@ -3529,18 +3373,16 @@ inline void validate_expr(const let_exprt &let_expr)
 inline const let_exprt &to_let_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_let);
-  const let_exprt &ret = static_cast<const let_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  let_exprt::check(expr);
+  return static_cast<const let_exprt &>(expr);
 }
 
 /// \copydoc to_let_expr(const exprt &)
 inline let_exprt &to_let_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_let);
-  let_exprt &ret = static_cast<let_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  let_exprt::check(expr);
+  return static_cast<let_exprt &>(expr);
 }
 
 
@@ -3591,18 +3433,16 @@ inline void validate_expr(const cond_exprt &value)
 inline const cond_exprt &to_cond_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_cond);
-  const cond_exprt &ret = static_cast<const cond_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  cond_exprt::check(expr);
+  return static_cast<const cond_exprt &>(expr);
 }
 
 /// \copydoc to_cond_expr(const exprt &)
 inline cond_exprt &to_cond_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_cond);
-  cond_exprt &ret = static_cast<cond_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  cond_exprt::check(expr);
+  return static_cast<cond_exprt &>(expr);
 }
 
 /// \brief Case expression: evaluates to the value corresponding to the first
@@ -3686,13 +3526,13 @@ public:
     return operands()[1 + 2 * i + 1];
   }
 
-  static void validate_expr(const case_exprt &value)
+  static void check(const exprt &expr)
   {
     DATA_INVARIANT(
-      value.operands().size() >= 1,
+      expr.operands().size() >= 1,
       "case expression must have at least one operand");
     DATA_INVARIANT(
-      value.operands().size() % 2 == 1,
+      expr.operands().size() % 2 == 1,
       "case expression must have odd number of operands");
   }
 };
@@ -3712,18 +3552,16 @@ inline bool can_cast_expr<case_exprt>(const exprt &base)
 inline const case_exprt &to_case_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_case);
-  const case_exprt &ret = static_cast<const case_exprt &>(expr);
-  case_exprt::validate_expr(ret);
-  return ret;
+  case_exprt::check(expr);
+  return static_cast<const case_exprt &>(expr);
 }
 
 /// \copydoc to_case_expr(const exprt &)
 inline case_exprt &to_case_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_case);
-  case_exprt &ret = static_cast<case_exprt &>(expr);
-  case_exprt::validate_expr(ret);
-  return ret;
+  case_exprt::check(expr);
+  return static_cast<case_exprt &>(expr);
 }
 
 /// \brief Expression to define a mapping from an argument (index) to elements.
@@ -3790,11 +3628,6 @@ inline bool can_cast_expr<array_comprehension_exprt>(const exprt &base)
   return base.id() == ID_array_comprehension;
 }
 
-inline void validate_expr(const array_comprehension_exprt &value)
-{
-  validate_operands(value, 2, "'Array comprehension' must have two operands");
-}
-
 /// \brief Cast an exprt to a \ref array_comprehension_exprt
 ///
 /// \a expr must be known to be \ref array_comprehension_exprt.
@@ -3805,20 +3638,16 @@ inline const array_comprehension_exprt &
 to_array_comprehension_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_array_comprehension);
-  const array_comprehension_exprt &ret =
-    static_cast<const array_comprehension_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  array_comprehension_exprt::check(expr);
+  return static_cast<const array_comprehension_exprt &>(expr);
 }
 
 /// \copydoc to_array_comprehension_expr(const exprt &)
 inline array_comprehension_exprt &to_array_comprehension_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_array_comprehension);
-  array_comprehension_exprt &ret =
-    static_cast<array_comprehension_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  array_comprehension_exprt::check(expr);
+  return static_cast<array_comprehension_exprt &>(expr);
 }
 
 inline void validate_expr(const class class_method_descriptor_exprt &value);
@@ -3973,11 +3802,6 @@ inline bool can_cast_expr<named_term_exprt>(const exprt &base)
   return base.id() == ID_named_term;
 }
 
-inline void validate_expr(const named_term_exprt &value)
-{
-  validate_operands(value, 2, "'named term' must have two operands");
-}
-
 /// \brief Cast an exprt to a \ref named_term_exprt
 ///
 /// \a expr must be known to be \ref named_term_exprt.
@@ -3987,18 +3811,16 @@ inline void validate_expr(const named_term_exprt &value)
 inline const named_term_exprt &to_named_term_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_named_term);
-  const named_term_exprt &ret = static_cast<const named_term_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  named_term_exprt::check(expr);
+  return static_cast<const named_term_exprt &>(expr);
 }
 
 /// \copydoc to_array_comprehension_expr(const exprt &)
 inline named_term_exprt &to_named_term_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_named_term);
-  named_term_exprt &ret = static_cast<named_term_exprt &>(expr);
-  validate_expr(ret);
-  return ret;
+  named_term_exprt::check(expr);
+  return static_cast<named_term_exprt &>(expr);
 }
 
 #endif // CPROVER_UTIL_STD_EXPR_H
