@@ -1,5 +1,7 @@
 var NAVTREEINDEX57 =
 {
+"classsatcheck__glucose__baset.html#a8e54c79b98b1d423ac8d6e4596f5259c":[7,0,1040,0],
+"classsatcheck__glucose__baset.html#ac68a3cf923610d8b36c426a919683df8":[7,0,1040,7],
 "classsatcheck__glucose__baset.html#ad4fc2eb01498411a3cd93acb34fa833b":[7,0,1040,5],
 "classsatcheck__glucose__baset.html#ad734da641c6f6333f9fcbcdc20cbde3e":[7,0,1040,3],
 "classsatcheck__glucose__baset.html#ae66fd39f562b9ecc7c63386a147796fb":[7,0,1040,9],
@@ -247,7 +249,5 @@ var NAVTREEINDEX57 =
 "classshared__bufferst.html#aade2d01f1153512165cadcd1b5ae9fd0":[7,0,1068,27],
 "classshared__bufferst.html#abc6c6c08ad71dd1f6feb1569c82b0b3e":[7,0,1068,13],
 "classshared__bufferst.html#abd53670657172a1f904e4f755d6d0a4c":[7,0,1068,15],
-"classshared__bufferst.html#ac38b8ae196b2304bb41cd0acaf55d532":[7,0,1068,29],
-"classshared__bufferst.html#ac4c9e6fd739013824656e8128e4563c4":[7,0,1068,31],
-"classshared__bufferst.html#ac62e97e9130920ca0d984abf28c88561":[7,0,1068,2]
+"classshared__bufferst.html#ac38b8ae196b2304bb41cd0acaf55d532":[7,0,1068,29]
 };

@@ -1,5 +1,8 @@
 var NAVTREEINDEX79 =
 {
+"elf__reader_8h.html#af1e0490cf6a22696762e8ff939f5e9f0":[8,0,2,16,11,8],
+"elf__reader_8h.html#af39230dfed109d1212e52f4c1417dd7b":[8,0,2,16,11,12],
+"elf__reader_8h_source.html":[8,0,2,16,11],
 "endianness__map_8cpp.html":[8,0,2,30,39],
 "endianness__map_8cpp_source.html":[8,0,2,30,39],
 "endianness__map_8h.html":[8,0,2,30,40],
@@ -246,8 +249,5 @@ var NAVTREEINDEX79 =
 "expr__util_8h.html#a80bd924f50789ca2bce77ee33c66f399":[8,0,2,30,52,11],
 "expr__util_8h.html#a870e353a1e33df2b8e51889648b5fa56":[8,0,2,30,52,3],
 "expr__util_8h.html#ab0e243cb7f5bdeaa340a9bb90bbdfc66":[8,0,2,30,52,10],
-"expr__util_8h.html#aba6e40c1f306df3049670f6783b7a95c":[8,0,2,30,52,8],
-"expr__util_8h.html#accb87fde942b9096e968063f1c78f73b":[8,0,2,30,52,7],
-"expr__util_8h.html#ad711fee0d815a935c677223fd60c818a":[8,0,2,30,52,9],
-"expr__util_8h.html#af4c4f4155fe7b0abb9827738a868b32b":[8,0,2,30,52,6]
+"expr__util_8h.html#aba6e40c1f306df3049670f6783b7a95c":[8,0,2,30,52,8]
 };

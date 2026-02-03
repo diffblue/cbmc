@@ -1,5 +1,7 @@
 var NAVTREEINDEX54 =
 {
+"classqbf__qubet.html#a392e222ab47cdc8891391f98b8970652":[7,0,967,2],
+"classqbf__qubet.html#a931f401b4f421f8bb109b56f4984210b":[7,0,967,3],
 "classqbf__qubet.html#abfbfa2bca0ef3f1fe8bcc48c8ddd7d4f":[7,0,967,1],
 "classqbf__skizzo__coret.html":[7,0,968],
 "classqbf__skizzo__coret.html#a2bf222612a4a4bbaea7bbc9466492f34":[7,0,968,0],
@@ -247,7 +249,5 @@ var NAVTREEINDEX54 =
 "classreaching__definitions__analysist.html#a95e405651c3e62d0bb06fcd46c0a3204":[7,0,987,6],
 "classreaching__definitions__analysist.html#abeef78bc00ec8a6587bf004d3db5addc":[7,0,987,9],
 "classreaching__definitions__analysist.html#acb3c7d00e96109008d3bf02a85d82670":[7,0,987,8],
-"classreaching__definitions__analysist.html#ad09adbea16ba0d80fe555d222851f4c6":[7,0,987,0],
-"classreaching__definitions__analysist.html#ae25e5c3a9f3d26c74077173dac54cec3":[7,0,987,5],
-"classreal__typet.html":[7,0,989]
+"classreaching__definitions__analysist.html#ad09adbea16ba0d80fe555d222851f4c6":[7,0,987,0]
 };
