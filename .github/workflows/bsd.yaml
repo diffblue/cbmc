@@ -35,7 +35,7 @@ jobs:
             # apparently fail-on-error isn't the default here
             set -e -x
             echo "Fetch dependencies"
-            pkg install -y bash gmake git www/p5-libwww python python3 patch flex bison ccache parallel cvc5 z3
+            pkg install -y bash gmake git www/p5-libwww python python3 patch flex bison ccache cvc5 z3
             echo "Fetch JBMC dependencies"
             pkg install -y openjdk8 wget maven
             echo "Zero ccache stats and limit in size"
