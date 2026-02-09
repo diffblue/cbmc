@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/floatbv_expr.h>
 #include <util/magic.h>
+#include <util/mathematical_expr.h>
 #include <util/mp_arith.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
@@ -233,7 +234,7 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
   else if(expr.id()==ID_not)
     return convert_not(to_not_expr(expr));
   else if(expr.id()==ID_power)
-     return convert_power(to_binary_expr(expr));
+    return convert_power(to_power_expr(expr));
   else if(expr.id() == ID_popcount)
      return convert_popcount(to_popcount_expr(expr));
   else if(expr.id() == ID_count_leading_zeros)
