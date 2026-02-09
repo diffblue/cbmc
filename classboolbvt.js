@@ -66,7 +66,7 @@ var classboolbvt =
     [ "convert_onehot", "classboolbvt.html#a11f0c46f4a25d8a9bac179d174d653c7", null ],
     [ "convert_overflow_result", "classboolbvt.html#aaef195404ec3205cc7a1540abc41db7f", null ],
     [ "convert_popcount", "classboolbvt.html#a23d58a6dd617e2ad06a79168bca962bf", null ],
-    [ "convert_power", "classboolbvt.html#adfa0415d6f5f44eba8ee0afc8c9cbe69", null ],
+    [ "convert_power", "classboolbvt.html#a20c3c23733edc0bbae2adec35960bc10", null ],
     [ "convert_quantifier", "classboolbvt.html#a5df3a1617336f6f1773b4aafb71fcece", null ],
     [ "convert_reduction", "classboolbvt.html#a2304cbe2c38973cac28b7ac4bfb9e4e9", null ],
     [ "convert_replication", "classboolbvt.html#af6d9881dca0528fc7f2edf69b01025fe", null ],

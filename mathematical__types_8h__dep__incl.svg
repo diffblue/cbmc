@@ -483,10 +483,10 @@
 <g id="Node000211" class="node">
 <title>Node211</title>
 <g id="a_Node000211"><a xlink:href="simplify__expr__int_8cpp.html" target="_top" xlink:title=" ">
-<polygon fill="white" stroke="#666666" points="6254,-123.5 6116,-123.5 6116,-82.5 6254,-82.5 6254,-123.5"/>
-<text text-anchor="start" x="6124" y="-111.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text text-anchor="start" x="6124" y="-100.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/util/simplify</text>
-<text text-anchor="middle" x="6185" y="-89.5" font-family="Helvetica,sans-Serif" font-size="10.00">_expr_int.cpp</text>
+<polygon fill="white" stroke="#666666" points="6248,-123.5 6110,-123.5 6110,-82.5 6248,-82.5 6248,-123.5"/>
+<text text-anchor="start" x="6118" y="-111.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
+<text text-anchor="start" x="6118" y="-100.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/util/simplify</text>
+<text text-anchor="middle" x="6179" y="-89.5" font-family="Helvetica,sans-Serif" font-size="10.00">_expr_int.cpp</text>
 </a>
 </g>
 </g>
@@ -494,7 +494,7 @@
 <g id="edge68_Node000001_Node000211" class="edge">
 <title>Node1&#45;&gt;Node211</title>
 <g id="a_edge68_Node000001_Node000211"><a xlink:title=" ">
-<path fill="none" stroke="#63b8ff" d="M4259.25,-273.18C4057.96,-273.86 3572.47,-269.92 3523,-217 3507.22,-200.12 3506.77,-181.46 3523,-165 3573.4,-113.89 6036.16,-140.58 6107,-129 6114.86,-127.72 6123.01,-125.8 6130.95,-123.58"/>
+<path fill="none" stroke="#63b8ff" d="M4259.25,-273.18C4057.96,-273.86 3572.47,-269.92 3523,-217 3507.22,-200.12 3506.77,-181.46 3523,-165 3573.29,-114.01 6030.32,-140.56 6101,-129 6108.86,-127.72 6117.01,-125.8 6124.95,-123.58"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="4259.5,-276.68 4269.49,-273.14 4259.48,-269.68 4259.5,-276.68"/>
 </a>
 </g>
@@ -879,9 +879,9 @@
 </g>
 </g>
 <!-- Node39&#45;&gt;Node33 -->
-<g id="edge59_Node000039_Node000033" class="edge">
+<g id="edge61_Node000039_Node000033" class="edge">
 <title>Node39&#45;&gt;Node33</title>
-<g id="a_edge59_Node000039_Node000033"><a xlink:title=" ">
+<g id="a_edge61_Node000039_Node000033"><a xlink:title=" ">
 <path fill="none" stroke="#63b8ff" d="M3310.74,-189.24C3045.44,-186.44 2251.09,-174.41 1997,-129 1989.44,-127.65 1981.6,-125.76 1973.93,-123.61"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="3311.05,-192.74 3321.09,-189.35 3311.12,-185.74 3311.05,-192.74"/>
 </a>
@@ -1163,11 +1163,11 @@
 <!-- Node83 -->
 <g id="Node000083" class="node">
 <title>Node83</title>
-<g id="a_Node000083"><a xlink:href="functions_8h.html" target="_top" xlink:title="Uninterpreted Functions.">
-<polygon fill="#fff0f0" stroke="red" points="5276,-123.5 5130,-123.5 5130,-82.5 5276,-82.5 5276,-123.5"/>
-<text text-anchor="start" x="5138" y="-111.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text text-anchor="start" x="5138" y="-100.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/lowering</text>
-<text text-anchor="middle" x="5203" y="-89.5" font-family="Helvetica,sans-Serif" font-size="10.00">/functions.h</text>
+<g id="a_Node000083"><a xlink:href="boolbv_8cpp.html" target="_top" xlink:title=" ">
+<polygon fill="white" stroke="#666666" points="5280.5,-123.5 5129.5,-123.5 5129.5,-82.5 5280.5,-82.5 5280.5,-123.5"/>
+<text text-anchor="start" x="5137.5" y="-111.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
+<text text-anchor="start" x="5137.5" y="-100.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/flattening</text>
+<text text-anchor="middle" x="5205" y="-89.5" font-family="Helvetica,sans-Serif" font-size="10.00">/boolbv.cpp</text>
 </a>
 </g>
 </g>
@@ -1175,8 +1175,48 @@
 <g id="edge57_Node000039_Node000083" class="edge">
 <title>Node39&#45;&gt;Node83</title>
 <g id="a_edge57_Node000039_Node000083"><a xlink:title=" ">
-<path fill="none" stroke="#63b8ff" d="M3471.24,-168.22C3477.21,-166.95 3483.18,-165.85 3489,-165 3847.94,-112.55 4762.82,-186.43 5121,-129 5129.23,-127.68 5137.78,-125.74 5146.12,-123.52"/>
+<path fill="none" stroke="#63b8ff" d="M3471.24,-168.22C3477.21,-166.95 3483.18,-165.85 3489,-165 3847.94,-112.55 4762.63,-185.24 5121,-129 5129.42,-127.68 5138.17,-125.74 5146.71,-123.52"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="3470.2,-164.87 3461.22,-170.49 3471.74,-171.69 3470.2,-164.87"/>
+</a>
+</g>
+</g>
+<!-- Node84 -->
+<g id="Node000084" class="node">
+<title>Node84</title>
+<g id="a_Node000084"><a xlink:href="boolbv__power_8cpp.html" target="_top" xlink:title=" ">
+<polygon fill="white" stroke="#666666" points="5449.5,-123.5 5298.5,-123.5 5298.5,-82.5 5449.5,-82.5 5449.5,-123.5"/>
+<text text-anchor="start" x="5306.5" y="-111.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
+<text text-anchor="start" x="5306.5" y="-100.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/flattening</text>
+<text text-anchor="middle" x="5374" y="-89.5" font-family="Helvetica,sans-Serif" font-size="10.00">/boolbv_power.cpp</text>
+</a>
+</g>
+</g>
+<!-- Node39&#45;&gt;Node84 -->
+<g id="edge58_Node000039_Node000084" class="edge">
+<title>Node39&#45;&gt;Node84</title>
+<g id="a_edge58_Node000039_Node000084"><a xlink:title=" ">
+<path fill="none" stroke="#63b8ff" d="M3471.24,-168.21C3477.21,-166.94 3483.18,-165.84 3489,-165 3885.16,-107.54 4894.47,-190.65 5290,-129 5298.42,-127.69 5307.17,-125.75 5315.72,-123.53"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="3470.2,-164.85 3461.22,-170.48 3471.74,-171.68 3470.2,-164.85"/>
+</a>
+</g>
+</g>
+<!-- Node85 -->
+<g id="Node000085" class="node">
+<title>Node85</title>
+<g id="a_Node000085"><a xlink:href="functions_8h.html" target="_top" xlink:title="Uninterpreted Functions.">
+<polygon fill="#fff0f0" stroke="red" points="5614,-123.5 5468,-123.5 5468,-82.5 5614,-82.5 5614,-123.5"/>
+<text text-anchor="start" x="5476" y="-111.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
+<text text-anchor="start" x="5476" y="-100.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/lowering</text>
+<text text-anchor="middle" x="5541" y="-89.5" font-family="Helvetica,sans-Serif" font-size="10.00">/functions.h</text>
+</a>
+</g>
+</g>
+<!-- Node39&#45;&gt;Node85 -->
+<g id="edge59_Node000039_Node000085" class="edge">
+<title>Node39&#45;&gt;Node85</title>
+<g id="a_edge59_Node000039_Node000085"><a xlink:title=" ">
+<path fill="none" stroke="#63b8ff" d="M3471.24,-168.2C3477.21,-166.93 3483.18,-165.84 3489,-165 3922.37,-102.52 5026.54,-197.5 5459,-129 5467.23,-127.7 5475.79,-125.77 5484.13,-123.55"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="3470.19,-164.84 3461.21,-170.46 3471.74,-171.67 3470.19,-164.84"/>
 </a>
 </g>
 </g>
@@ -1184,19 +1224,19 @@
 <g id="Node000187" class="node">
 <title>Node187</title>
 <g id="a_Node000187"><a xlink:href="smt2__conv_8cpp.html" target="_top" xlink:title="SMT Backend.">
-<polygon fill="white" stroke="#666666" points="5432,-123.5 5294,-123.5 5294,-82.5 5432,-82.5 5432,-123.5"/>
-<text text-anchor="start" x="5302" y="-111.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text text-anchor="start" x="5302" y="-100.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/smt2</text>
-<text text-anchor="middle" x="5363" y="-89.5" font-family="Helvetica,sans-Serif" font-size="10.00">/smt2_conv.cpp</text>
+<polygon fill="white" stroke="#666666" points="5770,-123.5 5632,-123.5 5632,-82.5 5770,-82.5 5770,-123.5"/>
+<text text-anchor="start" x="5640" y="-111.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
+<text text-anchor="start" x="5640" y="-100.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/smt2</text>
+<text text-anchor="middle" x="5701" y="-89.5" font-family="Helvetica,sans-Serif" font-size="10.00">/smt2_conv.cpp</text>
 </a>
 </g>
 </g>
 <!-- Node39&#45;&gt;Node187 -->
-<g id="edge58_Node000039_Node000187" class="edge">
+<g id="edge60_Node000039_Node000187" class="edge">
 <title>Node39&#45;&gt;Node187</title>
-<g id="a_edge58_Node000039_Node000187"><a xlink:title=" ">
-<path fill="none" stroke="#63b8ff" d="M3471.24,-168.21C3477.21,-166.94 3483.18,-165.84 3489,-165 3884.06,-107.68 4891.24,-194.61 5285,-129 5292.86,-127.69 5301.01,-125.76 5308.95,-123.54"/>
-<polygon fill="#63b8ff" stroke="#63b8ff" points="3470.2,-164.85 3461.22,-170.48 3471.74,-171.68 3470.2,-164.85"/>
+<g id="a_edge60_Node000039_Node000187"><a xlink:title=" ">
+<path fill="none" stroke="#63b8ff" d="M3471.23,-168.19C3477.21,-166.93 3483.18,-165.83 3489,-165 3958.48,-97.65 5155.04,-206.21 5623,-129 5630.86,-127.7 5639.01,-125.78 5646.95,-123.56"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="3470.19,-164.83 3461.21,-170.45 3471.74,-171.66 3470.19,-164.83"/>
 </a>
 </g>
 </g>
@@ -1204,20 +1244,20 @@
 <g id="Node000188" class="node">
 <title>Node188</title>
 <g id="a_Node000188"><a xlink:href="convert__expr__to__smt_8cpp.html" target="_top" xlink:title=" ">
-<polygon fill="white" stroke="#666666" points="5597.5,-129 5450.5,-129 5450.5,-77 5597.5,-77 5597.5,-129"/>
-<text text-anchor="start" x="5458.5" y="-117" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text text-anchor="start" x="5458.5" y="-106" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/smt2</text>
-<text text-anchor="start" x="5458.5" y="-95" font-family="Helvetica,sans-Serif" font-size="10.00">_incremental/convert_expr</text>
-<text text-anchor="middle" x="5524" y="-84" font-family="Helvetica,sans-Serif" font-size="10.00">_to_smt.cpp</text>
+<polygon fill="white" stroke="#666666" points="5935.5,-129 5788.5,-129 5788.5,-77 5935.5,-77 5935.5,-129"/>
+<text text-anchor="start" x="5796.5" y="-117" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
+<text text-anchor="start" x="5796.5" y="-106" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/smt2</text>
+<text text-anchor="start" x="5796.5" y="-95" font-family="Helvetica,sans-Serif" font-size="10.00">_incremental/convert_expr</text>
+<text text-anchor="middle" x="5862" y="-84" font-family="Helvetica,sans-Serif" font-size="10.00">_to_smt.cpp</text>
 </a>
 </g>
 </g>
 <!-- Node39&#45;&gt;Node188 -->
-<g id="edge60_Node000039_Node000188" class="edge">
+<g id="edge62_Node000039_Node000188" class="edge">
 <title>Node39&#45;&gt;Node188</title>
-<g id="a_edge60_Node000039_Node000188"><a xlink:title=" ">
-<path fill="none" stroke="#63b8ff" d="M3471.24,-168.2C3477.21,-166.93 3483.18,-165.84 3489,-165 3918.41,-103.05 5012.38,-196.19 5441,-129 5444.12,-128.51 5447.29,-127.93 5450.48,-127.29"/>
-<polygon fill="#63b8ff" stroke="#63b8ff" points="3470.19,-164.84 3461.21,-170.46 3471.74,-171.67 3470.19,-164.84"/>
+<g id="a_edge62_Node000039_Node000188"><a xlink:title=" ">
+<path fill="none" stroke="#63b8ff" d="M3471.23,-168.18C3477.21,-166.92 3483.18,-165.83 3489,-165 3992.84,-93.01 5276.08,-207.14 5779,-129 5782.12,-128.51 5785.29,-127.94 5788.48,-127.3"/>
+<polygon fill="#63b8ff" stroke="#63b8ff" points="3470.19,-164.83 3461.21,-170.44 3471.74,-171.65 3470.19,-164.83"/>
 </a>
 </g>
 </g>
@@ -1225,60 +1265,18 @@
 <g id="Node000189" class="node">
 <title>Node189</title>
 <g id="a_Node000189"><a xlink:href="string__builtin__function_8h.html" target="_top" xlink:title=" ">
-<polygon fill="#fff0f0" stroke="red" points="5754,-123.5 5616,-123.5 5616,-82.5 5754,-82.5 5754,-123.5"/>
-<text text-anchor="start" x="5624" y="-111.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text text-anchor="start" x="5624" y="-100.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/strings</text>
-<text text-anchor="middle" x="5685" y="-89.5" font-family="Helvetica,sans-Serif" font-size="10.00">/string_builtin_function.h</text>
+<polygon fill="#fff0f0" stroke="red" points="6092,-123.5 5954,-123.5 5954,-82.5 6092,-82.5 6092,-123.5"/>
+<text text-anchor="start" x="5962" y="-111.5" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
+<text text-anchor="start" x="5962" y="-100.5" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/strings</text>
+<text text-anchor="middle" x="6023" y="-89.5" font-family="Helvetica,sans-Serif" font-size="10.00">/string_builtin_function.h</text>
 </a>
 </g>
 </g>
 <!-- Node39&#45;&gt;Node189 -->
-<g id="edge61_Node000039_Node000189" class="edge">
+<g id="edge63_Node000039_Node000189" class="edge">
 <title>Node39&#45;&gt;Node189</title>
-<g id="a_edge61_Node000039_Node000189"><a xlink:title=" ">
-<path fill="none" stroke="#63b8ff" d="M3471.23,-168.19C3477.21,-166.93 3483.18,-165.84 3489,-165 3954.96,-98.12 5142.55,-205.66 5607,-129 5614.86,-127.7 5623.01,-125.78 5630.95,-123.56"/>
-<polygon fill="#63b8ff" stroke="#63b8ff" points="3470.19,-164.83 3461.21,-170.45 3471.74,-171.66 3470.19,-164.83"/>
-</a>
-</g>
-</g>
-<!-- Node199 -->
-<g id="Node000199" class="node">
-<title>Node199</title>
-<g id="a_Node000199"><a xlink:href="string__constraint__generator__code__points_8cpp.html" target="_top" xlink:title="Generates string constraints for Java functions dealing with code points.">
-<polygon fill="white" stroke="#666666" points="5926,-129 5772,-129 5772,-77 5926,-77 5926,-129"/>
-<text text-anchor="start" x="5780" y="-117" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text text-anchor="start" x="5780" y="-106" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/strings</text>
-<text text-anchor="start" x="5780" y="-95" font-family="Helvetica,sans-Serif" font-size="10.00">/string_constraint_generator</text>
-<text text-anchor="middle" x="5849" y="-84" font-family="Helvetica,sans-Serif" font-size="10.00">_code_points.cpp</text>
-</a>
-</g>
-</g>
-<!-- Node39&#45;&gt;Node199 -->
-<g id="edge62_Node000039_Node000199" class="edge">
-<title>Node39&#45;&gt;Node199</title>
-<g id="a_edge62_Node000039_Node000199"><a xlink:title=" ">
-<path fill="none" stroke="#63b8ff" d="M3471.23,-168.18C3477.21,-166.92 3483.18,-165.83 3489,-165 3989.31,-93.49 5263.23,-204.21 5763,-129 5765.92,-128.56 5768.88,-128.05 5771.86,-127.48"/>
-<polygon fill="#63b8ff" stroke="#63b8ff" points="3470.19,-164.83 3461.21,-170.44 3471.74,-171.65 3470.19,-164.83"/>
-</a>
-</g>
-</g>
-<!-- Node200 -->
-<g id="Node000200" class="node">
-<title>Node200</title>
-<g id="a_Node000200"><a xlink:href="string__constraint__generator__comparison_8cpp.html" target="_top" xlink:title="Generates string constraints for function comparing strings, such as: equals, equalsIgnoreCase,...">
-<polygon fill="white" stroke="#666666" points="6098,-129 5944,-129 5944,-77 6098,-77 6098,-129"/>
-<text text-anchor="start" x="5952" y="-117" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
-<text text-anchor="start" x="5952" y="-106" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/strings</text>
-<text text-anchor="start" x="5952" y="-95" font-family="Helvetica,sans-Serif" font-size="10.00">/string_constraint_generator</text>
-<text text-anchor="middle" x="6021" y="-84" font-family="Helvetica,sans-Serif" font-size="10.00">_comparison.cpp</text>
-</a>
-</g>
-</g>
-<!-- Node39&#45;&gt;Node200 -->
-<g id="edge63_Node000039_Node000200" class="edge">
-<title>Node39&#45;&gt;Node200</title>
-<g id="a_edge63_Node000039_Node000200"><a xlink:title=" ">
-<path fill="none" stroke="#63b8ff" d="M3471.23,-168.17C3477.21,-166.92 3483.18,-165.83 3489,-165 4027.19,-88.38 5397.39,-209.6 5935,-129 5937.92,-128.56 5940.88,-128.05 5943.86,-127.48"/>
+<g id="a_edge63_Node000039_Node000189"><a xlink:title=" ">
+<path fill="none" stroke="#63b8ff" d="M3471.23,-168.17C3477.21,-166.92 3483.18,-165.83 3489,-165 4029.39,-88.08 5406.35,-217.26 5945,-129 5952.86,-127.71 5961.01,-125.79 5968.95,-123.58"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="3470.19,-164.82 3461.21,-170.43 3471.73,-171.65 3470.19,-164.82"/>
 </a>
 </g>
@@ -1287,7 +1285,7 @@
 <g id="edge65_Node000039_Node000211" class="edge">
 <title>Node39&#45;&gt;Node211</title>
 <g id="a_edge65_Node000039_Node000211"><a xlink:title=" ">
-<path fill="none" stroke="#63b8ff" d="M3471.23,-168.17C3477.21,-166.91 3483.18,-165.83 3489,-165 4065.06,-83.27 5532.78,-222.82 6107,-129 6114.86,-127.72 6123.01,-125.8 6130.95,-123.58"/>
+<path fill="none" stroke="#63b8ff" d="M3471.23,-168.17C3477.21,-166.91 3483.18,-165.83 3489,-165 4063.74,-83.45 5528.1,-222.62 6101,-129 6108.86,-127.72 6117.01,-125.8 6124.95,-123.58"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="3470.19,-164.81 3461.21,-170.43 3471.73,-171.64 3470.19,-164.81"/>
 </a>
 </g>

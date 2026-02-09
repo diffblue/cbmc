@@ -1682,7 +1682,7 @@ var searchData=
   ['convert_5fpointer_5ftype_1679',['convert_pointer_type',['../classselect__pointer__typet.html#adc9bd66f2da912fc57705ef0b8b34fe0',1,'select_pointer_typet::convert_pointer_type()'],['../classbv__pointerst.html#af7a0d2775487740c970ef0bbacc68e7a',1,'bv_pointerst::convert_pointer_type()'],['../classbv__pointers__widet.html#a201791de3eabba312c28fbeeeadfa0f9',1,'bv_pointers_widet::convert_pointer_type()']]],
   ['convert_5fpop_1680',['convert_pop',['../classjava__bytecode__convert__methodt.html#a5c7be1f5ab0bb42c637393d50edaed17',1,'java_bytecode_convert_methodt']]],
   ['convert_5fpopcount_1681',['convert_popcount',['../classboolbvt.html#a23d58a6dd617e2ad06a79168bca962bf',1,'boolbvt']]],
-  ['convert_5fpower_1682',['convert_power',['../classboolbvt.html#adfa0415d6f5f44eba8ee0afc8c9cbe69',1,'boolbvt']]],
+  ['convert_5fpower_1682',['convert_power',['../classboolbvt.html#a20c3c23733edc0bbae2adec35960bc10',1,'boolbvt']]],
   ['convert_5fpredicate_5fnext_5fsymbol_1683',['convert_predicate_next_symbol',['../classexpr2ct.html#ae0d5e0ea622208b8bfc8b83b01fe9cf0',1,'expr2ct']]],
   ['convert_5fpredicate_5fpassive_5fsymbol_1684',['convert_predicate_passive_symbol',['../classexpr2ct.html#aca797c5e529110fa58351e0697bec24b',1,'expr2ct']]],
   ['convert_5fpredicate_5fsymbol_1685',['convert_predicate_symbol',['../classexpr2ct.html#af1f5d74229e5c27462a36da427f756b5',1,'expr2ct']]],
