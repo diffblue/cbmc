@@ -38,6 +38,7 @@ class floatbv_typecast_exprt;
 class ieee_float_op_exprt;
 class overflow_result_exprt;
 class popcount_exprt;
+class power_exprt;
 class replication_exprt;
 class unary_overflow_exprt;
 class union_typet;
@@ -198,7 +199,7 @@ protected:
   virtual bvt convert_symbol(const exprt &expr);
   virtual bvt convert_bv_reduction(const unary_exprt &expr);
   virtual bvt convert_not(const not_exprt &expr);
-  virtual bvt convert_power(const binary_exprt &expr);
+  virtual bvt convert_power(const power_exprt &expr);
   virtual bvt convert_function_application(
     const function_application_exprt &expr);
   virtual bvt convert_bitreverse(const bitreverse_exprt &expr);
