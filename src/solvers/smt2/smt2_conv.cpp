@@ -1801,20 +1801,20 @@ void smt2_convt::convert_expr(const exprt &expr)
        type.id()==ID_signedbv ||
        type.id()==ID_bv)
     {
-      if(shift_expr.id() == ID_ashr)
-        out << "(bvashr ";
-      else if(shift_expr.id() == ID_lshr)
-        out << "(bvlshr ";
-      else if(shift_expr.id() == ID_shl)
-        out << "(bvshl ";
-      else
-        UNREACHABLE;
-
-      convert_expr(shift_expr.op());
-      out << " ";
-
       // SMT2 requires the shift distance to have the same width as
       // the value that is shifted -- odd!
+
+      auto emit_operator = [this](const exprt &shift_expr)
+      {
+        if(shift_expr.id() == ID_ashr)
+          out << "(bvashr ";
+        else if(shift_expr.id() == ID_lshr)
+          out << "(bvlshr ";
+        else if(shift_expr.id() == ID_shl)
+          out << "(bvshl ";
+        else
+          UNREACHABLE;
+      };
 
       const auto &distance_type = shift_expr.distance().type();
       if(distance_type.id() == ID_integer || distance_type.id() == ID_natural)
@@ -1825,29 +1825,73 @@ void smt2_convt::convert_expr(const exprt &expr)
         // shift distance must be bit vector
         std::size_t width_op0 = boolbv_width(shift_expr.op().type());
         exprt tmp=from_integer(i, unsignedbv_typet(width_op0));
+
+        emit_operator(shift_expr);
+        convert_expr(shift_expr.op());
+        out << ' ';
         convert_expr(tmp);
+        out << ')'; // bv*sh
       }
       else if(
         distance_type.id() == ID_signedbv ||
         distance_type.id() == ID_unsignedbv ||
         distance_type.id() == ID_c_enum || distance_type.id() == ID_c_bool)
       {
-        std::size_t width_op0 = boolbv_width(shift_expr.op().type());
-        std::size_t width_op1 = boolbv_width(distance_type);
+        // No attempt is made to handle negative shift distances.
+        // The shift distance is always interpreted as binary value,
+        // irrespectively of its type.
+        std::size_t width_op = boolbv_width(shift_expr.op().type());
+        std::size_t width_distance = boolbv_width(distance_type);
+        std::size_t width_result = boolbv_width(shift_expr.type());
 
-        if(width_op0==width_op1)
-          convert_expr(shift_expr.distance());
-        else if(width_op0>width_op1)
+        if(width_result != width_op)
+          UNEXPECTEDCASE(
+            "unsupported result width for " + shift_expr.id_string());
+
+        // we use the larger of the two widths
+        if(width_op == width_distance)
         {
-          out << "((_ zero_extend " << width_op0-width_op1 << ") ";
+          emit_operator(shift_expr);
+          convert_expr(shift_expr.op());
+          out << ' ';
           convert_expr(shift_expr.distance());
-          out << ")"; // zero_extend
+          out << ')'; // bv*sh
         }
-        else // width_op0<width_op1
+        else if(width_op > width_distance)
         {
-          out << "((_ extract " << width_op0-1 << " 0) ";
+          emit_operator(shift_expr);
+          convert_expr(shift_expr.op());
+          out << ' ';
+          out << "((_ zero_extend " << width_op - width_distance << ") ";
           convert_expr(shift_expr.distance());
-          out << ")"; // extract
+          out << ')'; // zero_extend
+          out << ')'; // bv*sh
+        }
+        else // width_op<width_distance -- distance is wider
+        {
+          // enlarge the shift to match the distance operand,
+          // then extract again
+          out << "((_ extract " << width_op - 1 << " 0) ";
+          emit_operator(shift_expr);
+
+          // use sign extension when needed
+          if(shift_expr.op().type().id() == ID_signedbv)
+          {
+            out << "((_ sign_extend " << width_distance - width_op << ") ";
+            convert_expr(shift_expr.op());
+            out << ')'; // sign_extend
+          }
+          else
+          {
+            out << "((_ zero_extend " << width_distance - width_op << ") ";
+            convert_expr(shift_expr.op());
+            out << ')'; // zero_extend
+          }
+
+          out << ' ';
+          convert_expr(shift_expr.distance());
+          out << ')'; // bv*sh
+          out << ')'; // extract
         }
       }
       else
@@ -1856,8 +1900,6 @@ void smt2_convt::convert_expr(const exprt &expr)
           "unsupported distance type for " + shift_expr.id_string() + ": " +
           distance_type.id_string());
       }
-
-      out << ")"; // bv*sh
     }
     else
       UNEXPECTEDCASE(
