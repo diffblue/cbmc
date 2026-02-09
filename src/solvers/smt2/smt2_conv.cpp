@@ -1578,7 +1578,7 @@ void smt2_convt::convert_expr(const exprt &expr)
       if(expr.id() == ID_nand)
         out << "(and";
       else if(expr.id() == ID_nor)
-        out << "(and";
+        out << "(or";
       else if(expr.id() == ID_xnor)
         out << "(xor";
       else
