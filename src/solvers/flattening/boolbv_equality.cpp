@@ -29,8 +29,10 @@ literalt boolbvt::convert_equality(const equal_exprt &expr)
 
     if(has_byte_operator(expr))
     {
-      return record_array_equality(
-        to_equal_expr(simplify_expr(lower_byte_operators(expr, ns), ns)));
+      exprt simplified = simplify_expr(lower_byte_operators(expr, ns), ns);
+      if(simplified.id() != ID_equal)
+        return convert_bool(simplified);
+      return record_array_equality(to_equal_expr(simplified));
     }
 
     return record_array_equality(expr);
