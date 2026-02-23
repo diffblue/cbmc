@@ -1,0 +1,12 @@
+CORE broken-cprover-smt-backend no-new-smt
+main.c
+--no-standard-checks
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Tests the complete instantiation fixed-point computation. The property
+arr[2] > 0 requires chaining: instantiate j=0 to get arr[1]>0, then
+instantiate j=1 to get arr[2]>0.
