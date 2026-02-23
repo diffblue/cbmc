@@ -3829,8 +3829,6 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
     {
       if(c == '"')
         out << "\"\"";
-      else if(c == '\\')
-        out << "\\\\";
       else
         out << c;
     }
