@@ -335,6 +335,25 @@ void arrayst::add_array_Ackermann_constraints()
   // iterate over arrays
   for(std::size_t i=0; i<arrays.size(); i++)
   {
+    // Skip arrays that are derived from other arrays via with, if, etc.
+    // Their Ackermann constraints are implied by the combination of:
+    // (1) the with/if/array_of/etc. constraints already generated, and
+    // (2) the Ackermann constraints on the underlying base arrays.
+    // This is the "weak equivalence" optimisation: arrays connected by
+    // store chains are weakly equivalent, and read-over-weakeq follows
+    // from the read-over-write constraints plus Ackermann on base arrays.
+    const exprt &arr = arrays[i];
+    if(
+      arr.id() == ID_with || arr.id() == ID_update || arr.id() == ID_if ||
+      arr.id() == ID_array_of || arr.id() == ID_array ||
+      arr.id() == ID_array_comprehension || arr.id() == ID_typecast ||
+      arr.id() == ID_string_constant || arr.is_constant())
+    {
+      continue;
+    }
+    if(expr_try_dynamic_cast<let_exprt>(arr))
+      continue;
+
     const index_sett &index_set=index_map[arrays.find_number(i)];
 
 #ifdef DEBUG
