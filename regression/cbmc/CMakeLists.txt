@@ -32,6 +32,13 @@ add_test_pl_profile(
   "CORE"
 )
 
+add_test_pl_profile(
+    "cbmc-arrays-uf-always"
+    "$<TARGET_FILE:cbmc> --arrays-uf-always"
+    "-C;-X;broken-arrays-uf-always;-X;thorough-arrays-uf-always;-X;smt-backend;${gcc_only_string}-s;arrays-uf-always"
+    "CORE"
+)
+
 # solver appears on the PATH in Windows already
 if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
   set_property(
