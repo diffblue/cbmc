@@ -2707,8 +2707,24 @@ void smt2_convt::convert_expr(const exprt &expr)
   else if(expr.id() == ID_function_application)
   {
     const auto &function_application_expr = to_function_application_expr(expr);
+
+    // Check for string operations by looking at the function symbol name
+    std::string fn_name;
+    if(function_application_expr.function().id() == ID_symbol)
+      fn_name = id2string(
+        to_symbol_expr(function_application_expr.function()).get_identifier());
+
+    if(fn_name == "Str.Concat" &&
+       function_application_expr.arguments().size() == 2)
+    {
+      out << "(str.++ ";
+      convert_expr(function_application_expr.arguments()[0]);
+      out << ' ';
+      convert_expr(function_application_expr.arguments()[1]);
+      out << ')';
+    }
     // do not use parentheses if there function is a constant
-    if(function_application_expr.arguments().empty())
+    else if(function_application_expr.arguments().empty())
     {
       convert_expr(function_application_expr.function());
     }
@@ -3762,6 +3778,21 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
     const auto value_int = numeric_cast_v<mp_integer>(expr);
     out << "(_ bv" << (value_int - range_type.get_from()) << " " << width
         << ")";
+  }
+  else if(expr_type.id()==ID_string)
+  {
+    const std::string &value = id2string(expr.get_value());
+    out << "\"";
+    for(char c : value)
+    {
+      if(c == '"')
+        out << "\"\"";
+      else if(c == '\\')
+        out << "\\\\";
+      else
+        out << c;
+    }
+    out << "\"";
   }
   else
     UNEXPECTEDCASE("unknown constant: "+expr_type.id_string());
@@ -5991,6 +6022,8 @@ void smt2_convt::convert_type(const typet &type)
       UNEXPECTEDCASE("unsuppored range type");
     out << "(_ BitVec " << address_bits(size) << ")";
   }
+  else if(type.id()==ID_string)
+    out << "String";
   else
   {
     UNEXPECTEDCASE("unsupported type: "+type.id_string());
