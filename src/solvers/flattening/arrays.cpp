@@ -216,7 +216,15 @@ void arrayst::collect_arrays(const exprt &a)
       typecast_op.type().id() == ID_array,
       "unexpected array type cast from " + typecast_op.type().id_string());
 
-    arrays.make_union(a, typecast_op);
+    // Only unify when element types match; casts between different
+    // element sizes (e.g., SIMD reinterpretation) are handled at the
+    // bitvector level.
+    if(
+      to_array_type(a.type()).element_type() ==
+      to_array_type(typecast_op.type()).element_type())
+    {
+      arrays.make_union(a, typecast_op);
+    }
     collect_arrays(typecast_op);
   }
   else if(a.id()==ID_index)
@@ -520,22 +528,32 @@ void arrayst::add_array_constraints(
     // we got a=(type[])b
     const auto &expr_typecast_op = to_typecast_expr(expr).op();
 
-    // add a[i]=b[i]
-    for(const auto &index : index_set)
+    const typet &dest_element_type = to_array_type(expr.type()).element_type();
+    const typet &src_element_type =
+      to_array_type(expr_typecast_op.type()).element_type();
+
+    // When element types differ in size (e.g., SIMD vector reinterpretation
+    // casts like int32[4] <-> int64[2]), the element-wise constraint
+    // a[i]=b[i] is incorrect. The bitvector-level conversion handles
+    // these as bitwise copies, so skip the array-level constraint.
+    if(dest_element_type == src_element_type)
     {
-      const typet &element_type = to_array_type(expr.type()).element_type();
-      index_exprt index_expr1(expr, index, element_type);
-      index_exprt index_expr2(expr_typecast_op, index, element_type);
+      // add a[i]=b[i]
+      for(const auto &index : index_set)
+      {
+        index_exprt index_expr1(expr, index, dest_element_type);
+        index_exprt index_expr2(expr_typecast_op, index, dest_element_type);
 
-      DATA_INVARIANT(
-        index_expr1.type()==index_expr2.type(),
-        "array elements should all have same type");
+        DATA_INVARIANT(
+          index_expr1.type() == index_expr2.type(),
+          "array elements should all have same type");
 
-      // add constraint
-      lazy_constraintt lazy(lazy_typet::ARRAY_TYPECAST,
-        equal_exprt(index_expr1, index_expr2));
-      add_array_constraint(lazy, false); // added immediately
-      array_constraint_count[constraint_typet::ARRAY_TYPECAST]++;
+        // add constraint
+        lazy_constraintt lazy(
+          lazy_typet::ARRAY_TYPECAST, equal_exprt(index_expr1, index_expr2));
+        add_array_constraint(lazy, false); // added immediately
+        array_constraint_count[constraint_typet::ARRAY_TYPECAST]++;
+      }
     }
   }
   else if(expr.id()==ID_index)

@@ -6,17 +6,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "boolbv.h"
-
-#include <algorithm>
-
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
+#include <util/config.h>
 #include <util/cprover_prefix.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
+
+#include "boolbv.h"
+
+#include <algorithm>
 
 bvt boolbvt::convert_index(const index_exprt &expr)
 {
@@ -37,6 +38,32 @@ bvt boolbvt::convert_index(const index_exprt &expr)
     if(is_unbounded_array(array_type))
     {
       // use array decision procedure
+
+      // Typecast between array types with different element sizes
+      // (e.g., SIMD reinterpretation int32[4] <-> int64[2]) cannot be
+      // handled by the array theory's element-wise constraints.
+      // Lower to byte_extract which the bitvector solver handles.
+      if(
+        array.id() == ID_typecast &&
+        to_typecast_expr(array).op().type().id() == ID_array &&
+        to_array_type(array.type()).element_type() !=
+          to_array_type(to_typecast_expr(array).op().type()).element_type())
+      {
+        const auto &src = to_typecast_expr(array).op();
+        const auto elem_size = boolbv_width(array_type.element_type()) / 8;
+        return convert_bv(lower_byte_operators(
+          byte_extract_exprt(
+            ID_byte_extract_little_endian,
+            src,
+            mult_exprt(
+              typecast_exprt::conditional_cast(
+                index, signedbv_typet(config.ansi_c.pointer_width)),
+              from_integer(
+                elem_size, signedbv_typet(config.ansi_c.pointer_width))),
+            config.ansi_c.char_width,
+            array_type.element_type()),
+          ns));
+      }
 
       if(has_byte_operator(expr))
       {
