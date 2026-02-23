@@ -111,6 +111,7 @@ void bv_refinementt::freeze_lazy_constraints()
 
   for(const auto &constraint : lazy_array_constraints)
   {
+    // Freeze all symbols in the constraint
     for(const auto &symbol : find_symbols(constraint.lazy))
     {
       if(!bv_width.get_width_opt(symbol.type()).has_value())
@@ -120,5 +121,12 @@ void bv_refinementt::freeze_lazy_constraints()
         if(!literal.is_constant())
           prop.set_frozen(literal);
     }
+
+    // Also freeze the full constraint literal and its sub-expressions
+    // so that convert() during refinement does not hit eliminated
+    // variables.
+    literalt constraint_lit = convert(constraint.lazy);
+    if(!constraint_lit.is_constant())
+      prop.set_frozen(constraint_lit);
   }
 }

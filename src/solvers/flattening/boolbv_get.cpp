@@ -46,6 +46,18 @@ exprt boolbvt::get(const exprt &expr) const
     }
   }
 
+  // If the expression was converted to bitvectors, return the actual
+  // model value rather than symbolically evaluating sub-expressions.
+  // This is important for array index expressions during refinement,
+  // where symbolic evaluation of with-expressions can mask
+  // inconsistencies in the SAT model.
+  if(!expr.is_boolean())
+  {
+    auto cache_it = bv_cache.find(expr);
+    if(cache_it != bv_cache.end())
+      return bv_get(cache_it->second, expr.type());
+  }
+
   return SUB::get(expr);
 }
 
