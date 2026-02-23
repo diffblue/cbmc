@@ -1,4 +1,4 @@
-CORE broken-smt-backend no-new-smt
+CORE broken-smt-backend no-new-smt broken-refine-arrays
 main.c
 --no-malloc-may-fail --smt2 --outfile -
 \(= \(select array_of\.0 i\) \(ite false #b1 #b0\)\)
