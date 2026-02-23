@@ -1,0 +1,12 @@
+CORE broken-cprover-smt-backend no-new-smt
+main.c
+--no-standard-checks
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Tests the complete instantiation approach for quantifiers with index offsets.
+The quantifier body uses arr[j+1] and arr[j], requiring the set constraint
+fixed-point computation to generate the right instantiation terms.
