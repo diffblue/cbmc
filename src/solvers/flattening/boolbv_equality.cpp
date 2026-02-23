@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/byte_operators.h>
 #include <util/invariant.h>
+#include <util/simplify_expr.h>
 #include <util/std_expr.h>
 
 #include "boolbv.h"
@@ -29,7 +30,7 @@ literalt boolbvt::convert_equality(const equal_exprt &expr)
     if(has_byte_operator(expr))
     {
       return record_array_equality(
-        to_equal_expr(lower_byte_operators(expr, ns)));
+        to_equal_expr(simplify_expr(lower_byte_operators(expr, ns), ns)));
     }
 
     return record_array_equality(expr);

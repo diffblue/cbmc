@@ -40,25 +40,34 @@ bvt boolbvt::convert_index(const index_exprt &expr)
 
       if(has_byte_operator(expr))
       {
-        const index_exprt final_expr =
-          to_index_expr(lower_byte_operators(expr, ns));
-        CHECK_RETURN(final_expr != expr);
-        bv = convert_bv(final_expr);
+        exprt lowered = simplify_expr(lower_byte_operators(expr, ns), ns);
+        CHECK_RETURN(lowered != expr);
 
-        // record type if array is a symbol
-        const exprt &final_array = final_expr.array();
-        if(
-          final_array.id() == ID_symbol || final_array.id() == ID_nondet_symbol)
+        if(lowered.id() == ID_index)
         {
-          const auto &array_width_opt = bv_width.get_width_opt(array_type);
-          (void)map.get_literals(
-            final_array.get(ID_identifier),
-            array_type,
-            array_width_opt.value_or(0));
-        }
+          const index_exprt &final_expr = to_index_expr(lowered);
+          bv = convert_bv(final_expr);
 
-        // make sure we have the index in the cache
-        convert_bv(final_expr.index());
+          // record type if array is a symbol
+          const exprt &final_array = final_expr.array();
+          if(
+            final_array.id() == ID_symbol ||
+            final_array.id() == ID_nondet_symbol)
+          {
+            const auto &array_width_opt = bv_width.get_width_opt(array_type);
+            (void)map.get_literals(
+              final_array.get(ID_identifier),
+              array_type,
+              array_width_opt.value_or(0));
+          }
+
+          // make sure we have the index in the cache
+          convert_bv(final_expr.index());
+        }
+        else
+        {
+          bv = convert_bv(lowered);
+        }
       }
       else
       {
