@@ -193,12 +193,6 @@ void arrayst::collect_arrays(const exprt &a)
   }
   else if(a.id()==ID_member)
   {
-    const auto &struct_op = to_member_expr(a).struct_op();
-
-    DATA_INVARIANT(
-      struct_op.id() == ID_symbol || struct_op.id() == ID_nondet_symbol,
-      "unexpected array expression: member with '" + struct_op.id_string() +
-        "'");
   }
   else if(a.is_constant() || a.id() == ID_array || a.id() == ID_string_constant)
   {
@@ -513,10 +507,7 @@ void arrayst::add_array_constraints(
     expr.id() == ID_string_constant)
   {
   }
-  else if(
-    expr.id() == ID_member &&
-    (to_member_expr(expr).struct_op().id() == ID_symbol ||
-     to_member_expr(expr).struct_op().id() == ID_nondet_symbol))
+  else if(expr.id() == ID_member)
   {
   }
   else if(expr.id()==ID_byte_update_little_endian ||
