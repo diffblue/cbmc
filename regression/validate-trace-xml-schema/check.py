@@ -72,6 +72,7 @@ ExcludedTests = list(map(lambda s: os.path.join(test_base_dir, s[0], s[1]), [
     ['Bool', 'bool3.desc'],
     ['Empty_struct3', 'test.desc'],
     # uses show-goto-functions
+    ['bounds_check_integer_index1', 'test.desc'],
     ['reachability-slice', 'test.desc'],
     ['reachability-slice', 'test2.desc'],
     ['reachability-slice', 'test3.desc'],

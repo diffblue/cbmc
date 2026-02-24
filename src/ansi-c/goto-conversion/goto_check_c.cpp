@@ -1596,63 +1596,141 @@ void goto_check_ct::bounds_check_index(
   std::string name = array_name(expr.array());
 
   const exprt &index = expr.index();
-  object_descriptor_exprt ode;
-  ode.build(expr, ns);
 
-  if(index.type().id() != ID_unsignedbv)
+  // When the array element type has no byte size (e.g., __CPROVER_integer or
+  // arrays of unbounded arrays used in heap models),
+  // object_descriptor_exprt::build cannot compute byte offsets and produces an
+  // ID_unknown offset. Fall back to a simple index-based lower-bound check. We
+  // strip typecasts from integer/natural types to bitvector types so that the
+  // resulting assertions stay in the integer domain and can be handled by SMT
+  // solvers.
+  std::optional<object_descriptor_exprt> ode;
+  // effective_index is only used in the non-byte-sized path; it strips
+  // bitvector casts from integer/natural types to keep assertions in the
+  // integer domain.
+  exprt effective_index = index;
+  if(!size_of_expr(expr.type(), ns).has_value())
   {
-    // we undo typecasts to signedbv
-    if(
-      index.id() == ID_typecast &&
-      to_typecast_expr(index).op().type().id() == ID_unsignedbv)
+    // Arrays with non-byte-sized element types arise from internal modeling
+    // constructs and should not be accessed via pointer dereference. Walk
+    // through member/index/typecast to find the root object.
+    const exprt *root = &expr.array();
+    while(root->id() == ID_member || root->id() == ID_index ||
+          root->id() == ID_typecast)
     {
-      // ok
+      if(root->id() == ID_member)
+        root = &to_member_expr(*root).compound();
+      else if(root->id() == ID_index)
+        root = &to_index_expr(*root).array();
+      else
+        root = &to_typecast_expr(*root).op();
     }
-    else
+    DATA_INVARIANT(
+      root->id() != ID_dereference,
+      "arrays with non-byte-sized element types should not be accessed via "
+      "pointer dereference");
+    if(
+      effective_index.id() == ID_typecast &&
+      (to_typecast_expr(effective_index).op().type().id() == ID_integer ||
+       to_typecast_expr(effective_index).op().type().id() == ID_natural))
     {
-      const auto i = numeric_cast<mp_integer>(index);
+      effective_index = to_typecast_expr(effective_index).op();
+    }
 
-      if(!i.has_value() || *i < 0)
+    if(
+      effective_index.type().id() != ID_unsignedbv &&
+      effective_index.type().id() != ID_natural)
+    {
+      // we undo typecasts to signedbv
+      if(
+        effective_index.id() == ID_typecast &&
+        to_typecast_expr(effective_index).op().type().id() == ID_unsignedbv)
       {
-        exprt effective_offset = ode.offset();
+        // ok
+      }
+      else
+      {
+        const auto i = numeric_cast<mp_integer>(effective_index);
 
-        if(ode.root_object().id() == ID_dereference)
+        if(!i.has_value() || *i < 0)
         {
-          exprt p_offset =
-            pointer_offset(to_dereference_expr(ode.root_object()).pointer());
+          exprt zero = from_integer(0, effective_index.type());
 
-          effective_offset = plus_exprt{
-            p_offset,
-            typecast_exprt::conditional_cast(
-              effective_offset, p_offset.type())};
+          binary_relation_exprt inequality(
+            effective_index, ID_ge, std::move(zero));
+
+          add_guarded_property(
+            inequality,
+            name + " lower bound",
+            "array bounds",
+            true, // fatal
+            expr.find_source_location(),
+            expr,
+            guard);
         }
+      }
+    }
+  }
+  else
+  {
+    ode.emplace();
+    ode->build(expr, ns);
 
-        exprt zero = from_integer(0, effective_offset.type());
+    if(index.type().id() != ID_unsignedbv)
+    {
+      // we undo typecasts to signedbv
+      if(
+        index.id() == ID_typecast &&
+        to_typecast_expr(index).op().type().id() == ID_unsignedbv)
+      {
+        // ok
+      }
+      else
+      {
+        const auto i = numeric_cast<mp_integer>(index);
 
-        // the final offset must not be negative
-        binary_relation_exprt inequality(
-          effective_offset, ID_ge, std::move(zero));
+        if(!i.has_value() || *i < 0)
+        {
+          exprt effective_offset = ode->offset();
 
-        add_guarded_property(
-          inequality,
-          name + " lower bound",
-          "array bounds",
-          true, // fatal
-          expr.find_source_location(),
-          expr,
-          guard);
+          if(ode->root_object().id() == ID_dereference)
+          {
+            exprt p_offset =
+              pointer_offset(to_dereference_expr(ode->root_object()).pointer());
+
+            effective_offset = plus_exprt{
+              p_offset,
+              typecast_exprt::conditional_cast(
+                effective_offset, p_offset.type())};
+          }
+
+          exprt zero = from_integer(0, effective_offset.type());
+
+          // the final offset must not be negative
+          binary_relation_exprt inequality(
+            effective_offset, ID_ge, std::move(zero));
+
+          add_guarded_property(
+            inequality,
+            name + " lower bound",
+            "array bounds",
+            true, // fatal
+            expr.find_source_location(),
+            expr,
+            guard);
+        }
       }
     }
   }
 
-  if(ode.root_object().id() == ID_dereference)
+  if(ode && ode->root_object().id() == ID_dereference)
   {
-    const exprt &pointer = to_dereference_expr(ode.root_object()).pointer();
+    const exprt &pointer = to_dereference_expr(ode->root_object()).pointer();
 
     const plus_exprt effective_offset{
-      ode.offset(),
+      ode->offset(),
       typecast_exprt::conditional_cast(
-        pointer_offset(pointer), ode.offset().type())};
+        pointer_offset(pointer), ode->offset().type())};
 
     binary_relation_exprt inequality{
       effective_offset,
@@ -1663,7 +1741,7 @@ void goto_check_ct::bounds_check_index(
     exprt in_bounds_of_some_explicit_allocation =
       is_in_bounds_of_some_explicit_allocation(
         pointer,
-        plus_exprt{ode.offset(), from_integer(1, ode.offset().type())});
+        plus_exprt{ode->offset(), from_integer(1, ode->offset().type())});
 
     or_exprt precond(
       std::move(in_bounds_of_some_explicit_allocation), inequality);
@@ -1693,7 +1771,7 @@ void goto_check_ct::bounds_check_index(
   {
   }
   else if(
-    expr.array().id() == ID_member &&
+    ode && expr.array().id() == ID_member &&
     (size == 0 || array_type.get_bool(ID_C_flexible_array_member)))
   {
     // a variable sized struct member
@@ -1705,13 +1783,32 @@ void goto_check_ct::bounds_check_index(
     // array (with the same element type) that would not make the structure
     // larger than the object being accessed; [...]
     const auto type_size_opt =
-      pointer_offset_size(ode.root_object().type(), ns);
+      pointer_offset_size(ode->root_object().type(), ns);
     CHECK_RETURN(type_size_opt.has_value());
 
     binary_relation_exprt inequality(
-      ode.offset(),
+      ode->offset(),
       ID_lt,
-      from_integer(type_size_opt.value(), ode.offset().type()));
+      from_integer(type_size_opt.value(), ode->offset().type()));
+
+    add_guarded_property(
+      inequality,
+      name + " upper bound",
+      "array bounds",
+      true, // fatal
+      expr.find_source_location(),
+      expr,
+      guard);
+  }
+  else if(!ode.has_value())
+  {
+    // non-byte-sized element type: use effective_index (which has bitvector
+    // casts stripped) and cast the size to match
+    PRECONDITION(size.is_not_nil());
+    binary_relation_exprt inequality{
+      effective_index,
+      ID_lt,
+      typecast_exprt::conditional_cast(size, effective_index.type())};
 
     add_guarded_property(
       inequality,
