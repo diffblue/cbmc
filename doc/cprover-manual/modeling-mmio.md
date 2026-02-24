@@ -28,17 +28,26 @@ as an out-of-bounds memory reference. This is an example of
 implementation-defined behavior that must be modeled to avoid reporting false
 positives.
 
-CBMC uses the built-in function `__CPROVER_allocated_memory(address, size)` to
-mark ranges of memory as valid. Accesses within this region are exempt from the
-out-of-bounds assertion checking that CBMC would normally do. The function
-declares the half-open interval [address, address + size) as valid memory that
-can be read and written.
+CBMC provides two mechanisms for declaring memory-mapped I/O regions:
 
-This function can be used anywhere in the source code, but is most commonly used
-in the verification harness. Note that there is no flow sensitivity or scope
-restriction: CBMC considers accesses to memory regions marked as above valid for
-read or write access even before the call to the built-in function is
-encountered.
+1. **`--mmio-region address:size` (recommended):** Declare regions on the
+   command line. Each region becomes a byte-array object in the symbol table.
+   Reads and writes to addresses within a declared region are redirected to the
+   corresponding array element. See the
+   [per-region object model](#per-region-object-model-recommended) section below.
+
+2. **`__CPROVER_allocated_memory(address, size)` (deprecated):** A built-in
+   function that marks the half-open interval [address, address + size) as valid
+   memory. Accesses within this region are exempt from out-of-bounds assertion
+   checking. This function can be used anywhere in the source code, but is most
+   commonly used in the verification harness. Note that there is no flow
+   sensitivity or scope restriction: CBMC considers accesses to memory regions
+   marked as above valid for read or write access even before the call to the
+   built-in function is encountered.
+
+> **Deprecation notice:** `__CPROVER_allocated_memory` is deprecated. Use
+> `--mmio-region` instead, which provides better scalability and does not
+> require source-code changes.
 
 ### Device behavior
 
