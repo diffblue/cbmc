@@ -1597,6 +1597,48 @@ void goto_check_ct::bounds_check_index(
   std::string name = array_name(expr.array());
 
   const exprt &index = expr.index();
+  const exprt &array_size = array_type.id() == ID_array
+                              ? to_array_type(array_type).size()
+                              : to_vector_type(array_type).size();
+
+  // Mathematical types (integer, natural) are used for unbounded arrays (e.g.,
+  // heap models). Also, arrays with no known size (nil) cannot be meaningfully
+  // bounds-checked via byte offsets. In either case, for arrays accessed via a
+  // symbol or nested index, just check that the index is non-negative.
+  if(
+    index.type().id() == ID_integer ||
+    index.type().id() == ID_natural ||
+    array_size.is_nil())
+  {
+    if(
+      index.type().id() != ID_unsignedbv &&
+      index.type().id() != ID_natural &&
+      (index.type().id() == ID_integer ||
+       index.type().id() == ID_signedbv) &&
+      (expr.array().id() == ID_symbol || expr.array().id() == ID_index))
+    {
+      const auto i = numeric_cast<mp_integer>(index);
+
+      if(!i.has_value() || *i < 0)
+      {
+        exprt zero = from_integer(0, index.type());
+
+        binary_relation_exprt inequality(index, ID_ge, std::move(zero));
+
+        add_guarded_property(
+          inequality,
+          name + " lower bound",
+          "array bounds",
+          true, // fatal
+          expr.find_source_location(),
+          expr,
+          guard);
+      }
+    }
+
+    return;
+  }
+
   object_descriptor_exprt ode;
   ode.build(expr, ns);
 
