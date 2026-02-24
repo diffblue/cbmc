@@ -1525,11 +1525,10 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
   // some analyses require function pointer removal and partial inlining
 
-  if(cmdline.isset("remove-pointers") ||
-     cmdline.isset("race-check") ||
-     cmdline.isset("mm") ||
-     cmdline.isset("isr") ||
-     cmdline.isset("concurrency"))
+  if(
+    cmdline.isset("remove-pointers") || cmdline.isset("race-check") ||
+    cmdline.isset("mm") || cmdline.isset("isr") || cmdline.isset("mmio") ||
+    cmdline.isset("mmio-region") || cmdline.isset("concurrency"))
   {
     do_indirect_call_and_rtti_removal();
 
@@ -1650,10 +1649,96 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     }
 
     // Memory-mapped I/O
-    if(cmdline.isset("mmio"))
+    if(cmdline.isset("mmio") || cmdline.isset("mmio-region"))
     {
       log.status() << "Instrumenting memory-mapped I/O" << messaget::eom;
-      mmio(value_set_analysis, goto_model, ui_message_handler);
+
+      // Per-region instrumentation runs first so that declared regions
+      // get precise array-backed modeling.
+      if(cmdline.isset("mmio-region"))
+      {
+        // Parse MMIO region specifications
+        std::vector<mmio_regiont> regions;
+
+        for(const auto &region_spec : cmdline.get_values("mmio-region"))
+        {
+          // Parse format: address:size (e.g., "0x1000:256")
+          std::size_t colon_pos = region_spec.find(':');
+          if(colon_pos == std::string::npos)
+          {
+            throw invalid_command_line_argument_exceptiont(
+              "Invalid MMIO region format: " + region_spec +
+                " (expected address:size)",
+              "--mmio-region");
+          }
+
+          std::string addr_str = region_spec.substr(0, colon_pos);
+          std::string size_str = region_spec.substr(colon_pos + 1);
+
+          mp_integer start_address;
+          mp_integer size;
+
+          // Parse address (supports hex with 0x prefix)
+          if(addr_str.find("0x") == 0 || addr_str.find("0X") == 0)
+          {
+            start_address = string2integer(addr_str.substr(2), 16);
+          }
+          else
+          {
+            start_address = string2integer(addr_str);
+          }
+
+          // Parse size
+          if(size_str.find("0x") == 0 || size_str.find("0X") == 0)
+          {
+            size = string2integer(size_str.substr(2), 16);
+          }
+          else
+          {
+            size = string2integer(size_str);
+          }
+
+          // Create object name including address
+          std::string object_name =
+            CPROVER_PREFIX "mmio_region_0x" + integer2string(start_address, 16);
+
+          regions.emplace_back(start_address, size, object_name);
+
+          log.status() << "Registered MMIO region at 0x"
+                       << integer2string(start_address, 16) << " size " << size
+                       << " bytes" << messaget::eom;
+        }
+
+        // Check for overlapping regions
+        for(std::size_t i = 0; i < regions.size(); i++)
+        {
+          for(std::size_t j = i + 1; j < regions.size(); j++)
+          {
+            const auto &a = regions[i];
+            const auto &b = regions[j];
+            if(
+              a.start_address < b.start_address + b.size &&
+              b.start_address < a.start_address + a.size)
+            {
+              throw invalid_command_line_argument_exceptiont(
+                "MMIO regions overlap: 0x" +
+                  integer2string(a.start_address, 16) + ":" +
+                  integer2string(a.size) + " and 0x" +
+                  integer2string(b.start_address, 16) + ":" +
+                  integer2string(b.size),
+                "--mmio-region");
+            }
+          }
+        }
+
+        mm_io(goto_model, regions, ui_message_handler);
+      }
+
+      // Concurrency shared-buffer instrumentation (--mmio).
+      // Runs after per-region so that callbacks can handle remaining
+      // dereferences not covered by declared regions.
+      if(cmdline.isset("mmio"))
+        mmio(value_set_analysis, goto_model, ui_message_handler);
     }
 
     if(cmdline.isset("concurrency"))
@@ -1946,6 +2031,8 @@ void goto_instrument_parse_optionst::help()
     HELP_NONDET_VOLATILE
     " {y--isr} {ufunction} \t instruments an interrupt service routine\n"
     " {y--mmio} \t instruments memory-mapped I/O\n"
+    " {y--mmio-region} {uaddr:size} \t define MMIO region as individual object"
+    " (can be combined with --mmio)\n"
     " {y--nondet-static} \t add nondeterministic initialization of variables"
     " with static lifetime\n"
     " {y--nondet-static-exclude} {ue} \t same as nondet-static except for the"

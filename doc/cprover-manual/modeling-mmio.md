@@ -71,7 +71,44 @@ the methods in the API.
 
 *If the device has no API,* meaning that the code refers directly to the address
 in the memory-mapped I/O region for the device without reference to accessor
-functions, use
+functions, there are two approaches available.
+
+#### Per-region object model (recommended)
+
+Use `--mmio-region <address>:<size>` (with `goto-instrument` or `cbmc`) to
+declare each contiguous MMIO region as an individual object. Each region becomes
+a byte array in the symbol table, named `__CPROVER_mmio_region_0x<address>`.
+Reads and writes to addresses within a declared region are redirected to the
+corresponding array element.
+
+This approach avoids the scalability problems of the single-array callback model:
+each write only updates the targeted region object rather than the entire memory
+array.
+
+For example, given firmware that accesses a UART at `0x40000000` (256 bytes) and
+a GPIO controller at `0x40001000` (64 bytes):
+
+```sh
+goto-cc -o firmware.gb firmware.c
+goto-instrument --mmio-region 0x40000000:256 \
+  --mmio-region 0x40001000:64 \
+  firmware.gb firmware-mod.gb
+cbmc --no-pointer-check --no-bounds-check firmware-mod.gb
+```
+
+The `--no-pointer-check` and `--no-bounds-check` flags are needed because
+integer addresses used for MMIO are not valid pointers from CBMC's perspective.
+
+Constant addresses are mapped directly to a specific array element at
+instrumentation time. Symbolic addresses (e.g., a pointer that could refer to
+either region) are handled via a conditional dispatch over all declared regions.
+
+Regions must not overlap; `goto-instrument` will report an error if overlapping
+regions are specified.
+
+#### Callback model
+
+Alternatively, use
 ```C
 __CPROVER_mm_io_r(address, size)
 __CPROVER_mm_io_w(address, size, value)
@@ -89,3 +126,13 @@ char __CPROVER_mm_io_r(void *a, unsigned s) {
 ```
 will return the value 2 upon any access at address 0x1000, and return a
 non-deterministic value in all other cases.
+
+The callback model can be combined with `--mmio-region`: per-region
+instrumentation runs first to give declared regions precise array-backed
+modeling, and the callbacks then handle any remaining dereferences. This is
+useful when some regions need custom read/write behaviour beyond simple
+nondeterministic access.
+
+Note that the callback model uses a single unbounded `__CPROVER_memory` array,
+which means every write implies an update of the entire array. For programs with
+many MMIO regions, the per-region object model described above is preferred.
