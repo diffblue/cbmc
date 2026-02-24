@@ -20,6 +20,7 @@ macro(add_test_pl_profile name cmdline flag profile)
     )
     set_tests_properties("${name}-${profile}" PROPERTIES
         LABELS "${profile};CBMC"
+        TIMEOUT 1200
     )
 endmacro(add_test_pl_profile)
 
