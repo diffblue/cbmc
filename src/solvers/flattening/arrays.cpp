@@ -613,7 +613,7 @@ void arrayst::add_array_constraints_with(
 
   lazy_constraintt lazy(
     lazy_typet::ARRAY_WITH, equal_exprt(index_expr, expr.new_value()));
-  add_array_constraint(lazy, true); // added lazily when refining
+  add_array_constraint(lazy, false); // always eager
   array_constraint_count[constraint_typet::ARRAY_WITH]++;
 
   updated_indices.insert(expr.where());
@@ -648,7 +648,7 @@ void arrayst::add_array_constraints_with(
         lazy_constraintt lazy(lazy_typet::ARRAY_WITH, or_exprt(equality_expr,
                                 literal_exprt(guard_lit)));
 
-        add_array_constraint(lazy, true); // added lazily when refining
+        add_array_constraint(lazy, false); // always eager
         array_constraint_count[constraint_typet::ARRAY_WITH]++;
 
 #if 0 // old code for adding, not significantly faster
@@ -877,7 +877,7 @@ void arrayst::add_array_constraints_if(
     lazy_constraintt lazy(lazy_typet::ARRAY_IF,
                             or_exprt(literal_exprt(!cond_lit),
                               equal_exprt(index_expr1, index_expr2)));
-    add_array_constraint(lazy, true); // added lazily when refining
+    add_array_constraint(lazy, false); // always eager
     array_constraint_count[constraint_typet::ARRAY_IF]++;
 
 #if 0 // old code for adding, not significantly faster
@@ -897,7 +897,7 @@ void arrayst::add_array_constraints_if(
       lazy_typet::ARRAY_IF,
       or_exprt(literal_exprt(cond_lit),
       equal_exprt(index_expr1, index_expr2)));
-    add_array_constraint(lazy, true); // added lazily when refining
+    add_array_constraint(lazy, false); // always eager
     array_constraint_count[constraint_typet::ARRAY_IF]++;
 
 #if 0 // old code for adding, not significantly faster
