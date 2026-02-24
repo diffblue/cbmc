@@ -20,7 +20,53 @@
 #include <util/string_constant.h>
 #include <util/symbol_table.h>
 
+#include <util/magic.h>
+
 #include <testing-utils/use_catch.h>
+
+TEST_CASE(
+  "byte update with large array value",
+  "[core][util][lowering][byte_update]")
+{
+  // this test does require a proper architecture to be set so that byte update
+  // uses adequate endianness
+  cmdlinet cmdline;
+  config.set(cmdline);
+
+  const symbol_tablet symbol_table;
+  const namespacet ns(symbol_table);
+
+  // Target: a char array larger than the update value
+  const std::size_t update_size = MAX_FLATTENED_ARRAY_SIZE + 1;
+  const std::size_t target_size = 2 * update_size;
+  const array_typet target_type{
+    unsignedbv_typet{config.ansi_c.char_width},
+    from_integer(target_size, size_type())};
+  const symbol_exprt target{"target", target_type};
+
+  // Update value: a char array with more than MAX_FLATTENED_ARRAY_SIZE elements
+  // so that lower_byte_extract produces an array_comprehension_exprt
+  const array_typet update_type{
+    unsignedbv_typet{config.ansi_c.char_width},
+    from_integer(update_size, size_type())};
+  const symbol_exprt update_value{"update_value", update_type};
+
+  // Constant offset
+  const byte_update_exprt bu{
+    ID_byte_update_little_endian,
+    target,
+    from_integer(0, c_index_type()),
+    update_value,
+    config.ansi_c.char_width};
+
+  // This must not crash (previously triggered an invariant violation because
+  // lower_byte_extract produces an array_comprehension_exprt for large arrays,
+  // which was not handled by lower_byte_update).
+  const exprt result = lower_byte_update(bu, ns);
+  REQUIRE(result.type() == target_type);
+  REQUIRE(!has_subexpr(result, ID_byte_update_little_endian));
+  REQUIRE(!has_subexpr(result, ID_byte_update_big_endian));
+}
 
 TEST_CASE("byte extract and bits", "[core][util][lowering][byte_extract]")
 {
