@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_types.h"
 #include "endianness_map.h"
 #include "expr_util.h"
+#include "magic.h"
 #include "namespace.h"
 #include "narrow.h"
 #include "pointer_offset_size.h"
@@ -1112,7 +1113,13 @@ static exprt lower_byte_extract_array_vector(
   else
     num_elements = numeric_cast<std::size_t>(to_vector_type(src.type()).size());
 
-  if(num_elements.has_value())
+  // For large arrays, element-by-element expansion creates N expressions
+  // that are each recursively lowered and simplified, resulting in O(N^2)
+  // behaviour. Use array_comprehension_exprt (below) instead, which
+  // represents the same semantics with a single symbolic expression.
+  if(
+    num_elements.has_value() &&
+    !(src.type().id() == ID_array && *num_elements > MAX_FLATTENED_ARRAY_SIZE))
   {
     exprt::operandst operands;
     operands.reserve(*num_elements);
