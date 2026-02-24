@@ -35,6 +35,7 @@ Date:   April 2017
 /// a conditional GOTO dispatch that directs the store to the matching region
 /// object. Constant addresses are resolved at instrumentation time; symbolic
 /// addresses produce a chain of conditionals over all declared regions.
+/// This option is supported by both `cbmc` and `goto-instrument`.
 ///
 /// For details on usage see the "Modeling Memory-mapped I/O" section of the
 /// CProver manual (doc/cprover-manual/modeling-mmio.md).
@@ -45,6 +46,7 @@ Date:   April 2017
 #include <util/irep.h>
 #include <util/mp_arith.h>
 
+#include <list>
 #include <string>
 #include <vector>
 
@@ -81,14 +83,25 @@ void mm_io(symbol_tablet &, goto_functionst &, message_handlert &);
 void mm_io(goto_modelt &, message_handlert &);
 
 /// Instrument MMIO using the per-region object model.
-/// Each region in \p regions must have been previously registered via
-/// `--mmio-region`. The regions must not overlap.
+/// Each region in \p regions specifies an address range to be backed by a
+/// byte-array symbol. The regions must not overlap.
 /// \param [in,out] model: the goto model to instrument
 /// \param regions: MMIO region specifications
 /// \param message_handler: message handler for status and diagnostics
 void mm_io(
   goto_modelt &model,
   const std::vector<mmio_regiont> &regions,
+  message_handlert &message_handler);
+
+/// Parse `--mmio-region` command-line values into region specifications.
+/// Each string must have the format `address:size` (e.g. `0x1000:256`).
+/// Hex addresses with `0x`/`0X` prefix are supported.
+/// \param region_specs: raw command-line values
+/// \param message_handler: for status messages
+/// \return parsed and validated regions (checked for overlaps)
+/// \throws invalid_command_line_argument_exceptiont on bad format or overlap
+std::vector<mmio_regiont> parse_mmio_regions(
+  const std::list<std::string> &region_specs,
   message_handlert &message_handler);
 
 #endif // CPROVER_GOTO_PROGRAMS_MM_IO_H

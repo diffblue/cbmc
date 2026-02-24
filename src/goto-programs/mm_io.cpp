@@ -17,6 +17,7 @@ Date:   April 2017
 #include <util/bitvector_types.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/exception_utils.h>
 #include <util/fresh_symbol.h>
 #include <util/message.h>
 #include <util/pointer_expr.h>
@@ -29,6 +30,8 @@ Date:   April 2017
 
 #include "goto_model.h"
 
+#include <algorithm>
+#include <cctype>
 #include <set>
 
 /// Implements MMIO instrumentation for a single function.
@@ -418,6 +421,129 @@ void mm_io(
 void mm_io(goto_modelt &model, message_handlert &message_handler)
 {
   mm_io(model.symbol_table, model.goto_functions, message_handler);
+}
+
+/// Parse a single `--mmio-region` numeric field (an address or a size). A
+/// leading `0x`/`0X` selects hexadecimal, otherwise decimal is used. Every
+/// remaining character must be a valid digit for the chosen base; a single
+/// leading `-` is permitted so that negative values are reported by the
+/// dedicated non-negativity check rather than as a parse error. Throws
+/// invalid_command_line_argument_exceptiont for empty or non-numeric input
+/// (e.g. `xyz` or `0xZZ`).
+static mp_integer
+parse_mmio_field(const std::string &field, const std::string &spec)
+{
+  std::string digits = field;
+  std::string sign;
+  if(!digits.empty() && digits[0] == '-')
+  {
+    sign = "-";
+    digits = digits.substr(1);
+  }
+
+  unsigned base = 10;
+  if(
+    digits.size() >= 2 && digits[0] == '0' &&
+    (digits[1] == 'x' || digits[1] == 'X'))
+  {
+    base = 16;
+    digits = digits.substr(2);
+  }
+
+  const bool valid =
+    !digits.empty() &&
+    std::all_of(
+      digits.begin(),
+      digits.end(),
+      [base](char c)
+      {
+        const unsigned char uc = static_cast<unsigned char>(c);
+        return base == 16 ? std::isxdigit(uc) != 0 : std::isdigit(uc) != 0;
+      });
+
+  if(!valid)
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "invalid number '" + field + "' in MMIO region: " + spec,
+      "--mmio-region");
+  }
+
+  return string2integer(sign + digits, base);
+}
+
+std::vector<mmio_regiont> parse_mmio_regions(
+  const std::list<std::string> &region_specs,
+  message_handlert &message_handler)
+{
+  messaget log{message_handler};
+  std::vector<mmio_regiont> regions;
+
+  for(const auto &spec : region_specs)
+  {
+    const std::size_t colon_pos = spec.find(':');
+    if(colon_pos == std::string::npos)
+    {
+      throw invalid_command_line_argument_exceptiont(
+        "Invalid MMIO region format: " + spec + " (expected address:size)",
+        "--mmio-region");
+    }
+
+    const std::string addr_str = spec.substr(0, colon_pos);
+    const std::string size_str = spec.substr(colon_pos + 1);
+
+    mp_integer start_address = parse_mmio_field(addr_str, spec);
+    mp_integer size = parse_mmio_field(size_str, spec);
+
+    if(start_address < 0)
+    {
+      throw invalid_command_line_argument_exceptiont(
+        "MMIO region address must be non-negative: " + spec, "--mmio-region");
+    }
+
+    if(size <= 0)
+    {
+      throw invalid_command_line_argument_exceptiont(
+        "MMIO region size must be positive: " + spec, "--mmio-region");
+    }
+
+    // Ensure the region does not wrap around the 64-bit address space
+    if(start_address + size > power(2, 64))
+    {
+      throw invalid_command_line_argument_exceptiont(
+        "MMIO region exceeds 64-bit address space: " + spec, "--mmio-region");
+    }
+
+    std::string object_name =
+      CPROVER_PREFIX "mmio_region_0x" + integer2string(start_address, 16);
+
+    regions.emplace_back(start_address, size, object_name);
+
+    log.status() << "Registered MMIO region at 0x"
+                 << integer2string(start_address, 16) << " size " << size
+                 << " bytes" << messaget::eom;
+  }
+
+  // Check for overlapping regions
+  for(std::size_t i = 0; i < regions.size(); i++)
+  {
+    for(std::size_t j = i + 1; j < regions.size(); j++)
+    {
+      const auto &a = regions[i];
+      const auto &b = regions[j];
+      if(
+        a.start_address < b.start_address + b.size &&
+        b.start_address < a.start_address + a.size)
+      {
+        throw invalid_command_line_argument_exceptiont(
+          "MMIO regions overlap: 0x" + integer2string(a.start_address, 16) +
+            ":" + integer2string(a.size) + " and 0x" +
+            integer2string(b.start_address, 16) + ":" + integer2string(b.size),
+          "--mmio-region");
+      }
+    }
+  }
+
+  return regions;
 }
 
 /// Create byte-array symbols in \p symbol_table for each MMIO region.

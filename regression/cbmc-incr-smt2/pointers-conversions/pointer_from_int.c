@@ -1,7 +1,9 @@
 int main()
 {
   int *p = (int *)4;
+#ifndef CMDLINE
   __CPROVER_allocated_memory(4, sizeof(int));
+#endif
 
   __CPROVER_assert(p == 4, "p == 4: expected success");
   __CPROVER_assert(p != 0, "p != 0: expected success");

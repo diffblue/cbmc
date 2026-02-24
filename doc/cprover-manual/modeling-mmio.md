@@ -75,11 +75,16 @@ functions, there are two approaches available.
 
 #### Per-region object model (recommended)
 
-Use `--mmio-region <address>:<size>` (with `goto-instrument` or `cbmc`) to
-declare each contiguous MMIO region as an individual object. Each region becomes
-a byte array in the symbol table, named `__CPROVER_mmio_region_0x<address>`.
-Reads and writes to addresses within a declared region are redirected to the
-corresponding array element.
+Use `--mmio-region <address>:<size>` to declare each
+contiguous MMIO region as an individual object. Each region becomes a byte array
+in the symbol table, named `__CPROVER_mmio_region_0x<address>`. Reads and writes
+to addresses within a declared region are redirected to the corresponding bytes
+of that array. An access wider than a single byte spans the appropriate number
+of consecutive bytes (`ceil(width / 8)`), honouring the endianness configured
+for the program, so multi-byte loads and stores are modelled faithfully (a
+32-bit store updates four bytes rather than truncating to one).
+
+This option is supported by both `cbmc` and `goto-instrument`.
 
 This approach avoids the scalability problems of the single-array callback model:
 each write only updates the targeted region object rather than the entire memory
@@ -89,6 +94,12 @@ For example, given firmware that accesses a UART at `0x40000000` (256 bytes) and
 a GPIO controller at `0x40001000` (64 bytes):
 
 ```sh
+# Directly with cbmc:
+cbmc --mmio-region 0x40000000:256 \
+  --mmio-region 0x40001000:64 \
+  --no-pointer-check --no-bounds-check firmware.c
+
+# Or via goto-instrument:
 goto-cc -o firmware.gb firmware.c
 goto-instrument --mmio-region 0x40000000:256 \
   --mmio-region 0x40001000:64 \
@@ -99,12 +110,17 @@ cbmc --no-pointer-check --no-bounds-check firmware-mod.gb
 The `--no-pointer-check` and `--no-bounds-check` flags are needed because
 integer addresses used for MMIO are not valid pointers from CBMC's perspective.
 
-Constant addresses are mapped directly to a specific array element at
-instrumentation time. Symbolic addresses (e.g., a pointer that could refer to
+Constant addresses are resolved at instrumentation time to a byte offset within
+the region's array. Symbolic addresses (e.g., a pointer that could refer to
 either region) are handled via a conditional dispatch over all declared regions.
 
-Regions must not overlap; `goto-instrument` will report an error if overlapping
-regions are specified.
+Regions must not overlap; both `cbmc` and `goto-instrument` will report an
+error if overlapping regions are specified.
+
+Storing and loading C pointer values through an MMIO region is not fully
+supported: a pointer written to a region is serialised to its bytes, and
+reading it back does not reconstruct the original pointer's object identity.
+Such accesses may therefore be modelled imprecisely.
 
 #### Callback model
 

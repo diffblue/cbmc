@@ -1,0 +1,14 @@
+CORE
+main.c
+--mmio-region 0x1000:256 --little-endian --no-pointer-check --no-bounds-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+Replaced MMIO operations
+--
+--
+A 32-bit MMIO store must update all four region bytes (little-endian) and a
+32-bit load must read them all back. Without the byte_extract/byte_update
+multi-byte modelling the store would truncate to a single byte and the
+`*w == 0x12345678` assertion would fail. This guards the per-region multi-byte
+access soundness.
