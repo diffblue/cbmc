@@ -1,5 +1,6 @@
 var NAVTREEINDEX72 =
 {
+"classxml__parse__treet.html":[7,0,1388],
 "classxml__parse__treet.html#a0da20e9bab4193e945bedcd289090c7f":[7,0,1388,0],
 "classxml__parse__treet.html#a51085ecca507566dc7f8fa816f73aa05":[7,0,1388,1],
 "classxml__parse__treet.html#ae0588b71e82c38fd9b3363abc6b6e828":[7,0,1388,2],
@@ -248,6 +249,5 @@ var NAVTREEINDEX72 =
 "contracts-dev-spec-codegen.html":[1,1,0,2],
 "contracts-dev-spec-codegen.html#contracts-dev-spec-codegen-assigns":[1,1,0,2,0],
 "contracts-dev-spec-codegen.html#contracts-dev-spec-codegen-frees":[1,1,0,2,1],
-"contracts-dev-spec-contract-checking-rec.html":[1,1,0,8],
-"contracts-dev-spec-contract-checking.html":[1,1,0,7]
+"contracts-dev-spec-contract-checking-rec.html":[1,1,0,8]
 };
