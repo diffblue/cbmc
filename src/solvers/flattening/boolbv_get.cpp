@@ -49,6 +49,39 @@ exprt boolbvt::get(const exprt &expr) const
   return SUB::get(expr);
 }
 
+exprt boolbvt::get_value(const exprt &expr) const
+{
+  // For non-boolean expressions that were converted to SAT variables,
+  // read the value directly from the SAT model.
+  if(!expr.is_boolean())
+  {
+    auto cache_it = bv_cache.find(expr);
+    if(cache_it != bv_cache.end())
+      return bv_get(cache_it->second, expr.type());
+  }
+
+  // For symbols, get() already reads from the SAT model.
+  if(expr.id() == ID_symbol || expr.id() == ID_nondet_symbol)
+    return get(expr);
+
+  // For booleans, read the propositional value.
+  if(expr.is_boolean())
+  {
+    auto value = get_bool(expr);
+    if(value.has_value())
+      return *value ? static_cast<exprt>(true_exprt()) : false_exprt();
+  }
+
+  // Recursively evaluate operands.
+  exprt tmp = expr;
+  for(auto &op : tmp.operands())
+  {
+    exprt tmp_op = get_value(op);
+    op.swap(tmp_op);
+  }
+  return tmp;
+}
+
 exprt boolbvt::bv_get_rec(const exprt &expr, const bvt &bv, std::size_t offset)
   const
 {

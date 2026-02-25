@@ -258,6 +258,12 @@ protected:
   exprt bv_get(const bvt &bv, const typet &type) const;
   exprt bv_get_cache(const exprt &expr) const;
 
+  /// Return the model value for \p expr. Unlike get(), this checks the
+  /// bitvector cache first so that expressions that were converted to SAT
+  /// variables are read from the SAT model rather than symbolically
+  /// evaluated. Intended for use by the refinement loop.
+  exprt get_value(const exprt &expr) const;
+
   // unbounded arrays
   bool is_unbounded_array(const typet &type) const override;
 

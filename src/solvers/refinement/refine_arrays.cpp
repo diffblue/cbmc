@@ -54,7 +54,7 @@ void bv_refinementt::arrays_overapproximated()
     if(current.id()==ID_implies)
     {
       implies_exprt imp=to_implies_expr(current);
-      exprt implies_simplified=get(imp.op0());
+      exprt implies_simplified = get_value(imp.op0());
       if(implies_simplified==false_exprt())
       {
         ++it;
@@ -67,8 +67,8 @@ void bv_refinementt::arrays_overapproximated()
       or_exprt orexp=to_or_expr(current);
       INVARIANT(
         orexp.operands().size() == 2, "only treats the case of a binary or");
-      exprt o1=get(orexp.op0());
-      exprt o2=get(orexp.op1());
+      exprt o1 = get_value(orexp.op0());
+      exprt o2 = get_value(orexp.op1());
       if(o1==true_exprt() || o2 == true_exprt())
       {
         ++it;
@@ -76,7 +76,7 @@ void bv_refinementt::arrays_overapproximated()
       }
     }
 
-    exprt simplified=get(current);
+    exprt simplified = get_value(current);
     solver << simplified;
 
     switch(static_cast<decision_proceduret::resultt>(sat_check.prop_solve()))
@@ -111,6 +111,7 @@ void bv_refinementt::freeze_lazy_constraints()
 
   for(const auto &constraint : lazy_array_constraints)
   {
+    // Freeze all symbols in the constraint
     for(const auto &symbol : find_symbols(constraint.lazy))
     {
       if(!bv_width.get_width_opt(symbol.type()).has_value())
@@ -120,5 +121,12 @@ void bv_refinementt::freeze_lazy_constraints()
         if(!literal.is_constant())
           prop.set_frozen(literal);
     }
+
+    // Also freeze the full constraint literal and its sub-expressions
+    // so that convert() during refinement does not hit eliminated
+    // variables.
+    literalt constraint_lit = convert(constraint.lazy);
+    if(!constraint_lit.is_constant())
+      prop.set_frozen(constraint_lit);
   }
 }
