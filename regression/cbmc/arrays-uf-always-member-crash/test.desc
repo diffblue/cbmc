@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.c
 --arrays-uf-always --no-standard-checks
 ^EXIT=10$
@@ -7,7 +7,7 @@ main.c
 --
 ^warning: ignoring
 --
-CBMC crashes (SIGABRT) with an invariant violation in arrays.cpp when using
+CBMC previously crashed with an invariant violation in arrays.cpp when using
 --arrays-uf-always on code with array-of-structs containing array members
-accessed through a nondet index. The arrays theory does not handle member
-expressions where the struct operand is an index expression.
+accessed through a nondet index. Fixed by accepting member expressions with
+arbitrary struct operands in the array solver.
