@@ -158,6 +158,12 @@ if [[ "$INSTALL_DEPS" == true ]]; then
   echo ""
 fi
 
+# Always add tools/bin to PATH if it exists (from a previous --install-deps run)
+if [[ -d "${WORK_DIR}/tools/bin" ]]; then
+  export PATH="${WORK_DIR}/tools/bin:${PATH}"
+  export LD_LIBRARY_PATH="${WORK_DIR}/tools/bin:${LD_LIBRARY_PATH:-}"
+fi
+
 [[ -x "$CBMC" ]]             || fail "cbmc not found at $CBMC"
 [[ -x "$GOTO_CC" ]]          || fail "goto-cc not found at $GOTO_CC"
 [[ -x "$GOTO_INSTRUMENT" ]]  || fail "goto-instrument not found at $GOTO_INSTRUMENT"
