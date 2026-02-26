@@ -528,6 +528,27 @@ static std::unordered_set<exprt, irep_hash> collect_ground_indices(
   const namespacet &ns)
 {
   std::unordered_set<exprt, irep_hash> ground_indices;
+
+  // When the array in a context is an array literal (array_exprt),
+  // the SSA encoding has expanded the array symbol into its elements.
+  // No cache entry will match this literal, so we add indices 0..size-1
+  // directly. This is sound: these are exactly the valid indices for
+  // the array, and instantiating with all of them is complete.
+  for(const auto &ctx : contexts)
+  {
+    if(ctx.array.id() == ID_array)
+    {
+      const auto &array_type = to_array_type(ctx.array.type());
+      const auto size = numeric_cast<mp_integer>(array_type.size());
+      if(size.has_value() && *size > 0 && *size <= 256)
+      {
+        const auto &index_type = array_type.index_type();
+        for(mp_integer i = 0; i < *size; ++i)
+          ground_indices.insert(from_integer(i, index_type));
+      }
+    }
+  }
+
   for(const auto &cache_entry : context_map)
   {
     // Match array reads: index_exprt(array, index)
