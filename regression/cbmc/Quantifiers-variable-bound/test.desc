@@ -1,0 +1,13 @@
+CORE broken-cprover-smt-backend no-new-smt
+main.c
+--no-standard-checks
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Tests that forall with a variable (non-constant) upper bound is correctly
+instantiated. The assume constrains t[0] < 10 when k == 1, and the
+assertion checks this. Requires the complete instantiation to handle
+array expressions that appear as array literals in the SSA.
