@@ -2714,14 +2714,56 @@ void smt2_convt::convert_expr(const exprt &expr)
       fn_name = id2string(
         to_symbol_expr(function_application_expr.function()).get_identifier());
 
-    if(fn_name == "Str.Concat" &&
-       function_application_expr.arguments().size() == 2)
+    // Map Strata function names to SMT-LIB names for string/regex ops
+    std::string smt_name;
+    if(fn_name == "Str.Concat")
+      smt_name = "str.++";
+    else if(fn_name == "Str.Length")
+      smt_name = "str.len";
+    else if(fn_name == "Str.Substr")
+      smt_name = "str.substr";
+    else if(fn_name == "Str.ToRegEx")
+      smt_name = "str.to_re";
+    else if(fn_name == "Str.InRegEx")
+      smt_name = "str.in_re";
+    else if(fn_name == "Re.AllChar")
+      smt_name = "re.allchar";
+    else if(fn_name == "Re.All")
+      smt_name = "re.all";
+    else if(fn_name == "Re.Range")
+      smt_name = "re.range";
+    else if(fn_name == "Re.Concat")
+      smt_name = "re.concat";
+    else if(fn_name == "Re.Star")
+      smt_name = "re.*";
+    else if(fn_name == "Re.Plus")
+      smt_name = "re.+";
+    else if(fn_name == "Re.Loop")
+      smt_name = "re.loop";
+    else if(fn_name == "Re.Union")
+      smt_name = "re.union";
+    else if(fn_name == "Re.Inter")
+      smt_name = "re.inter";
+    else if(fn_name == "Re.Comp")
+      smt_name = "re.comp";
+    else if(fn_name == "Re.None")
+      smt_name = "re.none";
+
+    if(!smt_name.empty())
     {
-      out << "(str.++ ";
-      convert_expr(function_application_expr.arguments()[0]);
-      out << ' ';
-      convert_expr(function_application_expr.arguments()[1]);
-      out << ')';
+      const auto &args = function_application_expr.arguments();
+      if(args.empty())
+        out << smt_name;
+      else
+      {
+        out << '(' << smt_name;
+        for(const auto &arg : args)
+        {
+          out << ' ';
+          convert_expr(arg);
+        }
+        out << ')';
+      }
     }
     // do not use parentheses if there function is a constant
     else if(function_application_expr.arguments().empty())
@@ -6024,6 +6066,8 @@ void smt2_convt::convert_type(const typet &type)
   }
   else if(type.id()==ID_string)
     out << "String";
+  else if(type.id()==ID_regex)
+    out << "RegLan";
   else
   {
     UNEXPECTEDCASE("unsupported type: "+type.id_string());
