@@ -137,6 +137,21 @@ get_quantifier_bounds(const quantifier_exprt &q, const namespacet &ns)
   return std::make_pair(*lb, *ub);
 }
 
+/// Check whether an expression is a well-formed quantifier with
+/// symbol-typed bound variables that we can safely cast and analyze.
+static bool is_refinable_quantifier(const exprt &e)
+{
+  if(!can_cast_expr<quantifier_exprt>(e))
+    return false;
+  const auto &q = static_cast<const quantifier_exprt &>(e);
+  for(const auto &v : q.variables())
+  {
+    if(v.id() != ID_symbol)
+      return false;
+  }
+  return true;
+}
+
 // ===== Class methods =====
 
 /// Partition quantifiers into lazy (constant bounds) and eager
@@ -155,6 +170,11 @@ void bv_refinementt::finish_eager_conversion_quantifiers()
 
   for(auto &q : quantifier_list)
   {
+    if(!is_refinable_quantifier(q.expr))
+    {
+      eager_quantifiers.push_back(std::move(q));
+      continue;
+    }
     auto bounds = get_quantifier_bounds(to_quantifier_expr(q.expr), ns);
     if(bounds.has_value())
       lazy_quantifiers.push_back(std::move(q));
@@ -210,10 +230,21 @@ void bv_refinementt::quantifiers_overapproximated()
   if(!config_.refine_quantifiers)
     return;
 
-  unsigned nb_refined = 0;
+  // Collect violated instances first, then add clauses at the end.
+  // We must not call convert() during evaluation because it adds
+  // clauses that invalidate the SAT solver's satisfied state,
+  // preventing further l_get() / get() calls.
+  struct violationt
+  {
+    literalt q_lit;
+    exprt instance;
+  };
+  std::vector<violationt> violations;
 
   for(const auto &q : quantifier_list)
   {
+    if(!is_refinable_quantifier(q.expr))
+      continue;
     const auto &qexpr = to_quantifier_expr(q.expr);
 
     auto bounds = get_quantifier_bounds(qexpr, ns);
@@ -229,37 +260,41 @@ void bv_refinementt::quantifiers_overapproximated()
       exprt val = from_integer(i, qexpr.symbol().type());
       exprt instance = qexpr.instantiate({val});
 
-      exprt evaluated = simplify_expr(get(instance), ns);
-
-      bool is_false = (evaluated == false_exprt());
-      bool is_true = (evaluated == true_exprt());
-
-      if(!is_false && !is_true)
+      exprt got = get(instance);
+      // Only simplify if get() returned a concrete expression.
+      // Avoid simplify_expr() on expressions containing quantifiers
+      // with non-symbol variables, which triggers an invariant.
+      bool is_true = (got == true_exprt());
+      if(!is_true && got != false_exprt())
       {
-        // Simplification inconclusive; fall back to SAT evaluation
-        literalt inst_lit = convert(instance);
-        is_true = prop.l_get(inst_lit).is_true();
-        is_false = !is_true;
-
-        if(qexpr.id() == ID_forall && is_false)
+        // Check if the expression contains any quantifiers before
+        // calling simplify_expr, which would crash on malformed ones.
+        bool has_quantifier = false;
+        got.visit_pre([&has_quantifier](const exprt &e) {
+          if(e.id() == ID_forall || e.id() == ID_exists)
+            has_quantifier = true;
+        });
+        if(!has_quantifier)
         {
-          prop.l_set_to_true(prop.limplies(q.l, inst_lit));
-          nb_refined++;
+          exprt simplified = simplify_expr(std::move(got), ns);
+          is_true = (simplified == true_exprt());
         }
-        continue;
       }
 
-      if(qexpr.id() == ID_forall && is_false)
-      {
-        literalt inst_lit = convert(instance);
-        prop.l_set_to_true(prop.limplies(q.l, inst_lit));
-        nb_refined++;
-      }
+      if(qexpr.id() == ID_forall && !is_true)
+        violations.push_back({q.l, std::move(instance)});
     }
   }
 
-  log.debug() << "BV-Refinement: " << nb_refined
+  // Now add all implications (this invalidates the SAT state)
+  for(const auto &v : violations)
+  {
+    literalt inst_lit = convert(v.instance);
+    prop.l_set_to_true(prop.limplies(v.q_lit, inst_lit));
+  }
+
+  log.debug() << "BV-Refinement: " << violations.size()
               << " quantifier instances refined" << messaget::eom;
-  if(nb_refined > 0)
+  if(!violations.empty())
     progress = true;
 }

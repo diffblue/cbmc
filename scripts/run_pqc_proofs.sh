@@ -498,8 +498,8 @@ process_proof() {
   if echo "$PROOF_EXTRA_FLAGS" | grep -q -- '--no-array-field-sensitivity'; then
     has_nafs=true
   fi
-  local n_runs=3
-  $has_nafs && n_runs=5
+  local n_runs=4
+  $has_nafs && n_runs=6
 
   # Run 1: Original SMT backend
   local skip_smt=false
@@ -530,17 +530,22 @@ SKIP_EOF
   run_cbmc_backend "$goto_file" "--sat-solver minisat2" "$PROOF_EXTRA_FLAGS" \
     "$PROOF_OBJECT_BITS" "$TIMEOUT" "${result_base}/sat_minisat"
 
-  # Runs 4-5: If the proof uses --no-array-field-sensitivity, re-run SMT and
+  # Run 4: SAT with CaDiCaL + --refine-quantifiers (lazy quantifier instantiation)
+  echo "  [4/${n_runs}] Running with CaDiCaL SAT + --refine-quantifiers..."
+  run_cbmc_backend "$goto_file" "--sat-solver cadical --refine-quantifiers" "$PROOF_EXTRA_FLAGS" \
+    "$PROOF_OBJECT_BITS" "$TIMEOUT" "${result_base}/sat_cadical_refine"
+
+  # Runs 5-6: If the proof uses --no-array-field-sensitivity, re-run SMT and
   # SAT (CaDiCaL) without it to compare the effect of field sensitivity.
   if $has_nafs; then
     local extra_with_afs
     extra_with_afs="$(echo "$PROOF_EXTRA_FLAGS" | sed 's/--no-array-field-sensitivity//')"
 
-    echo "  [4/${n_runs}] Running SMT with array field sensitivity..."
+    echo "  [5/${n_runs}] Running SMT with array field sensitivity..."
     run_cbmc_backend "$goto_file" "$original_backend_args" "$extra_with_afs" \
       "$PROOF_OBJECT_BITS" "$TIMEOUT" "${result_base}/smt_afs"
 
-    echo "  [5/${n_runs}] Running CaDiCaL SAT with array field sensitivity..."
+    echo "  [6/${n_runs}] Running CaDiCaL SAT with array field sensitivity..."
     run_cbmc_backend "$goto_file" "--sat-solver cadical" "$extra_with_afs" \
       "$PROOF_OBJECT_BITS" "$TIMEOUT" "${result_base}/sat_cadical_afs"
   fi
@@ -558,6 +563,7 @@ SKIP_EOF
   print_meta "SMT:" "${result_base}/smt.meta"
   print_meta "CaDiCaL:" "${result_base}/sat_cadical.meta"
   print_meta "MiniSat:" "${result_base}/sat_minisat.meta"
+  print_meta "CaDiCaL+RQ:" "${result_base}/sat_cadical_refine.meta"
   if $has_nafs; then
     print_meta "SMT+AFS:" "${result_base}/smt_afs.meta"
     print_meta "CaDiCaL+AFS:" "${result_base}/sat_cadical_afs.meta"
@@ -590,7 +596,7 @@ generate_report() {
         fi
       fi
 
-      for backend in smt sat_cadical sat_minisat smt_afs sat_cadical_afs; do
+      for backend in smt sat_cadical sat_minisat sat_cadical_refine smt_afs sat_cadical_afs; do
         local meta="${proof_dir}/${backend}.meta"
         [[ -f "$meta" ]] || continue
         local result exit_code wall_time_s max_rss_kb
@@ -615,7 +621,7 @@ generate_report() {
       proof_name="$(basename "$proof_dir")"
 
       printf "%-20s %-40s" "$repo_name" "$proof_name"
-      for backend in smt sat_cadical sat_minisat smt_afs sat_cadical_afs; do
+      for backend in smt sat_cadical sat_minisat sat_cadical_refine smt_afs sat_cadical_afs; do
         local meta="${proof_dir}/${backend}.meta"
         [[ -f "$meta" ]] || continue
         local result="N/A" wall_time_s="N/A" max_rss_kb="N/A"
@@ -625,6 +631,7 @@ generate_report() {
           smt)              label="smt";;
           sat_cadical)      label="cadical";;
           sat_minisat)      label="minisat";;
+          sat_cadical_refine) label="cad+rq";;
           smt_afs)          label="smt+afs";;
           sat_cadical_afs)  label="cad+afs";;
         esac
@@ -638,12 +645,13 @@ generate_report() {
   # Print aggregate stats
   echo ""
   echo "=== Aggregate ==="
-  for backend in smt sat_cadical sat_minisat smt_afs sat_cadical_afs; do
+  for backend in smt sat_cadical sat_minisat sat_cadical_refine smt_afs sat_cadical_afs; do
     local label
     case $backend in
       smt)              label="SMT (original)";;
       sat_cadical)      label="SAT (CaDiCaL)";;
       sat_minisat)      label="SAT (MiniSat)";;
+      sat_cadical_refine) label="SAT CaDiCaL (+RQ)";;
       smt_afs)          label="SMT (+AFS)";;
       sat_cadical_afs)  label="SAT CaDiCaL (+AFS)";;
     esac
@@ -682,7 +690,7 @@ generate_report() {
       [[ "$smt_r" == "SKIPPED" ]] && continue
 
       local mismatch_line=""
-      for backend in sat_cadical sat_minisat smt_afs sat_cadical_afs; do
+      for backend in sat_cadical sat_minisat sat_cadical_refine smt_afs sat_cadical_afs; do
         local meta="${proof_dir}/${backend}.meta"
         [[ -f "$meta" ]] || continue
         local r

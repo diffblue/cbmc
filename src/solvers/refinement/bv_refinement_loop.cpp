@@ -126,8 +126,12 @@ void bv_refinementt::check_SAT()
 {
   progress=false;
 
-  arrays_overapproximated();
+  // Quantifier refinement runs first: it uses get() to evaluate
+  // instances (which requires SAT state), then defers convert()
+  // calls to the end.  Running it before arrays_overapproximated()
+  // ensures the SAT state is still valid for get() calls.
   quantifiers_overapproximated();
+  arrays_overapproximated();
 
   // get values before modifying the formula
   for(approximationt &approximation : this->approximations)
