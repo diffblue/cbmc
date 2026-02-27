@@ -268,6 +268,20 @@ The incremental SAT solving with frozen variables is slower than
 non-incremental solving. CaDiCaL's preprocessing is less effective
 with frozen variables. This is a known limitation of CEGAR approaches.
 
+### When to use `--refine-quantifiers`
+The option is beneficial when the eager formula causes OOM or timeout
+due to quantifier instantiation blowup. For proofs that already
+succeed with eager instantiation, it adds overhead.
+
+| Proof | Eager CaDiCaL | Refine MiniSat | Verdict |
+|-------|--------------|----------------|---------|
+| poly_reduce | 4.8GB, 131s | 2.2GB, ~500s | Refine saves memory |
+| poly_power2round | 531MB, fast | 700MB, slower | Eager is better |
+| poly_decompose | 196MB, fast | 1.5GB, slower | Eager is better |
+
+Recommendation: use `--refine-quantifiers` only for proofs that
+OOM or timeout with the default eager approach.
+
 ## Implementation Plan
 
 1. Add `--refine-quantifiers` option and wire through `solver_factory.cpp`
