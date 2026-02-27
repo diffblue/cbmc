@@ -1,0 +1,8 @@
+CORE
+main.c
+--refine-quantifiers --no-standard-checks
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+Basic forall in assume with concrete index in assert.

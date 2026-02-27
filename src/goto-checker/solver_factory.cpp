@@ -390,6 +390,7 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_bv_refinement()
 
   info.refine_arrays = options.get_bool_option("refine-arrays");
   info.refine_arithmetic = options.get_bool_option("refine-arithmetic");
+  info.refine_quantifiers = options.get_bool_option("refine-quantifiers");
   info.message_handler = &message_handler;
 
   std::unique_ptr<boolbvt> decision_procedure =
@@ -416,6 +417,7 @@ solver_factoryt::get_string_refinement()
       options.get_unsigned_int_option("max-node-refinement");
   info.refine_arrays = options.get_bool_option("refine-arrays");
   info.refine_arithmetic = options.get_bool_option("refine-arithmetic");
+  info.refine_quantifiers = options.get_bool_option("refine-quantifiers");
   info.message_handler = &message_handler;
 
   std::unique_ptr<boolbvt> decision_procedure =
@@ -727,6 +729,12 @@ void parse_solver_options(const cmdlinet &cmdline, optionst &options)
   {
     options.set_option("refine", true);
     options.set_option("refine-arithmetic", true);
+  }
+
+  if(cmdline.isset("refine-quantifiers"))
+  {
+    options.set_option("refine", true);
+    options.set_option("refine-quantifiers", true);
   }
 
   if(cmdline.isset("refine"))

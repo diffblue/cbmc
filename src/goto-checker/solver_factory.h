@@ -114,6 +114,7 @@ void parse_solver_options(const cmdlinet &cmdline, optionst &options);
   "(max-node-refinement):"                                                     \
   "(refine-arrays)"                                                            \
   "(refine-arithmetic)"                                                        \
+  "(refine-quantifiers)"                                                       \
   "(outfile):"                                                                 \
   "(dump-smt-formula):"                                                        \
   "(write-solver-stats-to):"
@@ -141,6 +142,7 @@ void parse_solver_options(const cmdlinet &cmdline, optionst &options);
   " {y--refine} \t use refinement procedure (experimental)\n"                  \
   " {y--refine-arrays} \t use refinement for arrays only\n"                    \
   " {y--refine-arithmetic} \t refinement of arithmetic expressions only\n"     \
+  " {y--refine-quantifiers} \t lazy refinement of quantified formulas\n"       \
   " {y--max-node-refinement} \t "                                              \
   "maximum refinement iterations for arithmetic expressions\n"                 \
   " {y--incremental-smt2-solver} {ucmd} \t "                                   \

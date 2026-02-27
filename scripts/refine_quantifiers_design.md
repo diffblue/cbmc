@@ -235,6 +235,39 @@ For the 41 quantifier-heavy PQC proofs that currently timeout/OOM:
 - **Worst case**: All instances needed → same as eager, plus incremental
   solving overhead (~10-20% slower).
 
+## Measured Impact (prototype)
+
+### Memory reduction
+| Proof | Eager vars | Eager clauses | Eager MB | Refine vars | Refine MB | Reduction |
+|-------|-----------|---------------|----------|-------------|-----------|-----------|
+| poly_chknorm | 115K | 243K | 133 | 66K | 45 | 3.0× |
+| poly_reduce | 2.4M | 11.4M | 4,817 | 174K | 206 | 23× |
+
+### Key finding: all quantifiers are in assumptions
+For DFCC contract proofs, ALL quantified formulas appear in VCC
+assumptions (preconditions, loop invariant base cases, frame conditions).
+ZERO appear in goals. This means:
+
+1. The solver needs all instances to constrain the input — lazy
+   instantiation converges to eager in the worst case.
+2. The benefit comes from the SAT solver finding UNSAT proofs that
+   don't need all quantifier implications, even though the bitvector
+   encoding exists.
+3. Memory savings are real (23× for poly_reduce) because the SAT
+   solver's clause database is smaller without the implication clauses.
+
+### Convergence
+- Batch refinement: all violated instances are added per iteration.
+- For field-sensitive arrays (≤64 elements): `get()` + `simplify_expr()`
+  detects all violations in 1 iteration → 2 total iterations.
+- For array-theory arrays (>64 elements): falls back to `convert()` +
+  `l_get()` which adds the encoding but gives reliable evaluation.
+
+### Solving time
+The incremental SAT solving with frozen variables is slower than
+non-incremental solving. CaDiCaL's preprocessing is less effective
+with frozen variables. This is a known limitation of CEGAR approaches.
+
 ## Implementation Plan
 
 1. Add `--refine-quantifiers` option and wire through `solver_factory.cpp`

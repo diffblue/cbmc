@@ -19,6 +19,11 @@ bv_refinementt::bv_refinementt(const infot &info)
   PRECONDITION(prop.has_assumptions());
   PRECONDITION(prop.has_set_to());
   PRECONDITION(prop.has_is_in_conflict());
+
+  // Skip eager quantifier instantiation during conversion;
+  // quantifiers will be lazily refined in the CEGAR loop.
+  if(config_.refine_quantifiers)
+    lazy_quantifiers = true;
 }
 
 decision_proceduret::resultt bv_refinementt::dec_solve(const exprt &assumption)
@@ -122,6 +127,7 @@ void bv_refinementt::check_SAT()
   progress=false;
 
   arrays_overapproximated();
+  quantifiers_overapproximated();
 
   // get values before modifying the formula
   for(approximationt &approximation : this->approximations)

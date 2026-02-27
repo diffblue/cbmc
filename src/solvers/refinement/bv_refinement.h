@@ -28,6 +28,8 @@ private:
     bool refine_arrays=true;
     /// Enable arithmetic refinement
     bool refine_arithmetic=true;
+    /// Enable quantifier refinement
+    bool refine_quantifiers=false;
   };
 public:
   struct infot:public configt
@@ -50,6 +52,9 @@ protected:
 
   // Refine array
   void finish_eager_conversion_arrays() override;
+
+  /// Refine quantifiers: skip eager instantiation, use CEGAR loop
+  void finish_eager_conversion_quantifiers() override;
 
   // Refine arithmetic
   bvt convert_mult(const mult_exprt &expr) override;
@@ -100,6 +105,8 @@ private:
   void check_SAT();
   void check_UNSAT();
   void arrays_overapproximated();
+  /// Check quantifiers against SAT model, add violated instances
+  void quantifiers_overapproximated();
   void freeze_lazy_constraints();
 
   // MEMBERS

@@ -276,8 +276,9 @@ protected:
 
   typedef std::list<quantifiert> quantifier_listt;
   quantifier_listt quantifier_list;
+  bool lazy_quantifiers = false;
 
-  void finish_eager_conversion_quantifiers();
+  virtual void finish_eager_conversion_quantifiers();
 
   typedef std::vector<std::size_t> offset_mapt;
   offset_mapt build_offset_map(const struct_typet &src);
