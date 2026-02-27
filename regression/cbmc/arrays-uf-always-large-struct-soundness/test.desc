@@ -1,0 +1,16 @@
+KNOWNBUG
+main.c
+--arrays-uf-always --no-standard-checks
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+With --arrays-uf-always, indexing an array of structs containing array members
+with 65+ elements through a nondeterministic index produces a spurious
+counterexample. The array theory handles the outer array-of-structs access but
+fails to properly constrain the struct bitvector for large structs. The fix in
+boolbv_index.cpp only addresses the inner array access (member of non-symbol
+struct operand) but the outer access still goes through the array theory.
+Structs with array members of 64 or fewer elements work correctly.
