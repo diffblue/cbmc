@@ -1,0 +1,13 @@
+KNOWNBUG
+main.c
+--arrays-uf-always --no-standard-checks
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+With --arrays-uf-always, indexing an array of structs that contain array members
+through a nondeterministic index produces a spurious counterexample on the SAT
+backend. The same program verifies successfully without --arrays-uf-always and
+with SMT + --arrays-uf-always.

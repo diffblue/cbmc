@@ -150,10 +150,75 @@ A simpler workaround: when `collect_ground_indices` returns an empty set,
 fall back to instantiating with all indices `0..size-1` for fixed-size
 arrays. This would be sound (though potentially expensive for large arrays).
 
-## Scope
+## Status: FIXED (commit 2ac1dee90c)
 
-This bug is specific to the `features/quantifiers-elimination` branch. On
-`develop`, the fallback for uninstantiated quantifiers is `conversion_failed`,
-which would cause CBMC to report an error rather than silently produce wrong
-results. The complete instantiation code introduced by this branch is the
-source of the unsoundness.
+The fix adds ground indices 0..size-1 for array literals in quantifier bodies
+in `collect_ground_indices()` in `boolbv_quantifier.cpp`. All 16 previously
+failing proofs now pass on SAT.
+
+---
+
+# `--arrays-uf-always` SAT Soundness Issue
+
+- **Date:** 2026-02-27
+- **CBMC:** 6.8.0 (`e1e84df8c1`, branch `features/quantifiers-elimination`)
+- **Status:** Open (KNOWNBUG)
+
+## Summary
+
+With `--arrays-uf-always`, indexing an array of structs that contain array
+members through a nondeterministic index produces a spurious counterexample
+on the SAT backend. The same program verifies successfully without
+`--arrays-uf-always` and with SMT + `--arrays-uf-always`.
+
+This is a separate issue from the quantifier instantiation bug above.
+
+## Standalone Minimal Reproducer (9 lines)
+
+```c
+// File: arrays_uf_soundness.c
+// Fails:  cbmc --arrays-uf-always --no-standard-checks main.c
+// Passes: cbmc --no-standard-checks main.c
+// Passes: cbmc --smt2 --arrays-uf-always --no-standard-checks main.c
+struct S { int d[1]; };
+int nondet_int(void);
+int main() {
+  struct S a[2];
+  a[0].d[0] = 1;
+  a[1].d[0] = 1;
+  int i = nondet_int();
+  __CPROVER_assume(i == 0 || i == 1);
+  __CPROVER_assert(a[i].d[0] == 1, "");
+}
+```
+
+**Expected:** Both elements are set to 1, so `a[i].d[0] == 1` for any valid
+`i`. VERIFICATION SUCCESSFUL.
+
+**Actual (SAT + --arrays-uf-always):** Spurious counterexample with `i=0`,
+`a[0].d[0]=1`, but the assertion `a[i].d[0] == 1` is reported as FAILURE.
+
+## Trigger Conditions
+
+All three are required:
+1. `--arrays-uf-always` flag
+2. Array of structs where the struct contains an array member
+3. Nondeterministic index into the outer array (constant index does not trigger)
+
+A plain `int` member (no inner array) does not trigger the bug. The inner
+array member is essential.
+
+## Affected Proofs
+
+Two mldsa-native proofs fail on both CaDiCaL and MiniSat while SMT succeeds:
+
+| Proof | Object-bits | SMT | CaDiCaL | MiniSat |
+|-------|-------------|-----|---------|---------|
+| polyveck_add | 8 | SUCCESS | FAILURE | FAILURE |
+| polyvec_matrix_pointwise_montgomery | 10 | SUCCESS | FAILURE | FAILURE |
+
+Both use `--arrays-uf-always --slice-formula` in their proof Makefiles.
+
+## Regression Test
+
+`regression/cbmc/arrays-uf-always-member-soundness/` (KNOWNBUG)
