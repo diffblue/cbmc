@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.c
 --arrays-uf-always --no-standard-checks
 ^EXIT=0$
@@ -8,6 +8,6 @@ main.c
 ^warning: ignoring
 --
 With --arrays-uf-always, indexing an array of structs that contain array members
-through a nondeterministic index produces a spurious counterexample on the SAT
-backend. The same program verifies successfully without --arrays-uf-always and
-with SMT + --arrays-uf-always.
+through a nondeterministic index must produce correct results. The bitvector
+solver handles member expressions with non-symbol struct operands (e.g.,
+member(index(outer_array, i), field)) directly, bypassing the array theory.

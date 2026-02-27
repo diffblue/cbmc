@@ -221,4 +221,24 @@ Both use `--arrays-uf-always --slice-formula` in their proof Makefiles.
 
 ## Regression Test
 
-`regression/cbmc/arrays-uf-always-member-soundness/` (KNOWNBUG)
+`regression/cbmc/arrays-uf-always-member-soundness/` (CORE — fixed by arrays2.patch)
+
+## Remaining Issue: Large Structs
+
+The arrays2.patch fix in `boolbv_index.cpp` only addresses the inner array
+access (member of non-symbol struct operand). The outer array-of-structs
+access (`a[i]` where `a` is a symbol) still goes through the array theory.
+For structs with array members of 65+ elements (2080+ bits), the array
+theory fails to properly constrain the struct bitvector, producing spurious
+counterexamples.
+
+Threshold: structs with array members of ≤64 elements work correctly;
+≥65 elements fail. This corresponds to a struct bitvector width of 2080 bits.
+
+This is the root cause of the remaining 4 SAT failures on the mldsa-native
+proofs (`polyveck_add` and `polyvec_matrix_pointwise_montgomery`), which use
+`coeffs[256]`.
+
+### Regression Test
+
+`regression/cbmc/arrays-uf-always-large-struct-soundness/` (KNOWNBUG)

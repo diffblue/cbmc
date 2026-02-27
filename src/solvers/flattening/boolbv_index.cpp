@@ -33,8 +33,19 @@ bvt boolbvt::convert_index(const index_exprt &expr)
       to_array_type(array_op_type);
 
     // see if the array size is constant
+    // Member expressions with non-symbol struct operands (e.g.,
+    // member(index(outer_array, i), field)) cannot be properly
+    // constrained by the array theory, which treats them as opaque
+    // base arrays. Fall through to the bounded-array encoding when
+    // the array has a known finite size so that the bitvector solver
+    // directly connects the element to the struct field bits.
+    const bool member_with_non_symbol_struct =
+      array.id() == ID_member &&
+      to_member_expr(array).compound().id() != ID_symbol &&
+      to_member_expr(array).compound().id() != ID_nondet_symbol &&
+      array_type.size().is_constant();
 
-    if(is_unbounded_array(array_type))
+    if(is_unbounded_array(array_type) && !member_with_non_symbol_struct)
     {
       // use array decision procedure
 
