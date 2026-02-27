@@ -24,6 +24,11 @@ Author: Kiro (autonomous agent)
 ///   - UNSAT with fewer constraints implies UNSAT with all constraints
 ///   - SAT is only reported when all instances are satisfied
 ///
+/// Only quantifiers with constant bounds are lazily instantiated.
+/// Quantifiers with variable bounds (e.g., loop invariants with
+/// `k < i` where `i` is symbolic) are eagerly instantiated since
+/// the refinement loop cannot enumerate their instances.
+///
 /// The approach is analogous to `--refine-arrays` (see refine_arrays.cpp).
 
 #include "bv_refinement.h"
@@ -35,48 +40,7 @@ Author: Kiro (autonomous agent)
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 
-/// Pre-compute instance literals for all quantifiers during
-/// post-processing. The literals are stored but the implications
-/// (quantifier_literal => instance_literal) are NOT added yet.
-/// This allows the SAT solver to find proofs that don't need
-/// all instances, while ensuring the bitvector encoding exists
-/// for instances we add later.
-void bv_refinementt::finish_eager_conversion_quantifiers()
-{
-  if(!config_.refine_quantifiers)
-  {
-    boolbvt::finish_eager_conversion_quantifiers();
-    return;
-  }
-
-  log.progress() << "BV-Refinement: deferring " << quantifier_list.size()
-                 << " quantifier instantiations" << messaget::eom;
-
-  for(auto &q : quantifier_list)
-  {
-    const auto &qexpr = to_quantifier_expr(q.expr);
-
-    // Set placeholder: forall => TRUE, exists => FALSE
-    if(qexpr.id() == ID_forall)
-      prop.l_set_to_true(q.l);
-    else
-      prop.l_set_to_false(q.l);
-
-    if(!q.l.is_constant())
-      prop.set_frozen(q.l);
-
-    // Freeze symbols in the quantifier body for incremental solving
-    for(const auto &sym : find_symbols(qexpr.where()))
-    {
-      if(!bv_width.get_width_opt(sym.type()).has_value())
-        continue;
-      const bvt bv = convert_bv(sym);
-      for(const auto &lit : bv)
-        if(!lit.is_constant())
-          prop.set_frozen(lit);
-    }
-  }
-}
+// ===== Static helpers (must precede class methods that use them) =====
 
 /// Extract constant lower and upper bounds from a quantifier body.
 ///
@@ -89,6 +53,9 @@ void bv_refinementt::finish_eager_conversion_quantifiers()
 /// 2. Conjunctive (exists): `k >= LB && !(k >= UB) && body(k)`
 ///    where `k >= LB` gives lower bound LB, and `!(k >= UB)` gives
 ///    upper bound UB-1.
+///
+/// Returns nullopt for quantifiers with variable bounds (e.g.,
+/// `k >= i` where `i` is not a constant).
 ///
 /// \param q: the quantifier expression
 /// \param ns: namespace for simplification
@@ -106,7 +73,6 @@ get_quantifier_bounds(const quantifier_exprt &q, const namespacet &ns)
 
   if(body.id() == ID_or)
   {
-    // Disjunctive pattern: !(k >= LB) || k >= UB || body(k)
     for(const auto &op : body.operands())
     {
       if(op.id() == ID_not)
@@ -133,7 +99,6 @@ get_quantifier_bounds(const quantifier_exprt &q, const namespacet &ns)
   }
   else if(body.id() == ID_and)
   {
-    // Conjunctive pattern: k >= LB && !(k >= UB) && body(k)
     for(const auto &op : body.operands())
     {
       if(op.id() == ID_not)
@@ -172,13 +137,69 @@ get_quantifier_bounds(const quantifier_exprt &q, const namespacet &ns)
   return std::make_pair(*lb, *ub);
 }
 
+// ===== Class methods =====
+
+/// Partition quantifiers into lazy (constant bounds) and eager
+/// (variable/unknown bounds). Eagerly instantiate the latter via
+/// the base class, defer the former for CEGAR refinement.
+void bv_refinementt::finish_eager_conversion_quantifiers()
+{
+  if(!config_.refine_quantifiers)
+  {
+    boolbvt::finish_eager_conversion_quantifiers();
+    return;
+  }
+
+  quantifier_listt lazy_quantifiers;
+  quantifier_listt eager_quantifiers;
+
+  for(auto &q : quantifier_list)
+  {
+    auto bounds = get_quantifier_bounds(to_quantifier_expr(q.expr), ns);
+    if(bounds.has_value())
+      lazy_quantifiers.push_back(std::move(q));
+    else
+      eager_quantifiers.push_back(std::move(q));
+  }
+
+  log.progress() << "BV-Refinement: deferring " << lazy_quantifiers.size()
+                 << " quantifier instantiations, eagerly instantiating "
+                 << eager_quantifiers.size() << messaget::eom;
+
+  // Eagerly instantiate quantifiers with variable/unknown bounds
+  quantifier_list = std::move(eager_quantifiers);
+  boolbvt::finish_eager_conversion_quantifiers();
+
+  // Set up lazy quantifiers for refinement
+  quantifier_list = std::move(lazy_quantifiers);
+  for(const auto &q : quantifier_list)
+  {
+    const auto &qexpr = to_quantifier_expr(q.expr);
+
+    if(qexpr.id() == ID_forall)
+      prop.l_set_to_true(q.l);
+    else
+      prop.l_set_to_false(q.l);
+
+    if(!q.l.is_constant())
+      prop.set_frozen(q.l);
+
+    for(const auto &sym : find_symbols(qexpr.where()))
+    {
+      if(!bv_width.get_width_opt(sym.type()).has_value())
+        continue;
+      const bvt bv = convert_bv(sym);
+      for(const auto &lit : bv)
+        if(!lit.is_constant())
+          prop.set_frozen(lit);
+    }
+  }
+}
+
 /// Check whether the current SAT model satisfies all deferred
 /// quantifiers. For each violated quantifier, convert the violated
 /// instance to a SAT literal and add the implication
 /// `quantifier_literal => instance_literal`.
-///
-/// All violated instances across all quantifiers are added in a
-/// single refinement step (batch mode) to minimize iterations.
 ///
 /// Evaluation strategy: first try `get()` + `simplify_expr()` which
 /// is cheap and doesn't add SAT clauses. If the result is
@@ -197,11 +218,7 @@ void bv_refinementt::quantifiers_overapproximated()
 
     auto bounds = get_quantifier_bounds(qexpr, ns);
     if(!bounds.has_value())
-    {
-      log.debug() << "BV-Refinement: no bounds for quantifier"
-                  << messaget::eom;
       continue;
-    }
 
     const auto &[lb, ub] = *bounds;
     if(ub - lb > 10000)
@@ -212,9 +229,6 @@ void bv_refinementt::quantifiers_overapproximated()
       exprt val = from_integer(i, qexpr.symbol().type());
       exprt instance = qexpr.instantiate({val});
 
-      // Try cheap evaluation first: get model values and simplify.
-      // This works when the array is field-sensitive (small arrays)
-      // and produces concrete true/false.
       exprt evaluated = simplify_expr(get(instance), ns);
 
       bool is_false = (evaluated == false_exprt());
@@ -222,8 +236,7 @@ void bv_refinementt::quantifiers_overapproximated()
 
       if(!is_false && !is_true)
       {
-        // Simplification was inconclusive (large array with array theory).
-        // Fall back to converting and checking the SAT assignment.
+        // Simplification inconclusive; fall back to SAT evaluation
         literalt inst_lit = convert(instance);
         is_true = prop.l_get(inst_lit).is_true();
         is_false = !is_true;
@@ -238,8 +251,6 @@ void bv_refinementt::quantifiers_overapproximated()
 
       if(qexpr.id() == ID_forall && is_false)
       {
-        log.debug() << "BV-Refinement: forall violated at index " << i
-                    << messaget::eom;
         literalt inst_lit = convert(instance);
         prop.l_set_to_true(prop.limplies(q.l, inst_lit));
         nb_refined++;
