@@ -230,17 +230,15 @@ static std::optional<exprt> eager_quantifier_instantiation(
   mp_integer ub = numeric_cast_v<mp_integer>(max_i.value());
 
   // When the range is large and the bound variable is used as an array
-  // index, skip eager full-range instantiation. The post-processing
-  // complete instantiation (Ye & de Moura, CAV 2009) will instantiate
-  // only with the ground index terms actually present in the formula,
-  // which is typically much smaller than the full range.
-  // Only skip when ALL indexed arrays are large enough to not be field-
-  // sensitive (> 64 elements), since field-sensitive arrays don't have
-  // index_exprt entries in the bv_cache and the Ye/de Moura approach
-  // would find no ground terms for them.
+  // index into large (non-field-sensitive) arrays, skip eager full-range
+  // instantiation. The post-processing complete instantiation (Ye & de
+  // Moura, CAV 2009) will instantiate only with the ground index terms
+  // actually present in the formula, which is typically much smaller
+  // than the full range.
   if(ub - lb >= 16)
   {
-    auto contexts = find_index_contexts(where_simplified, var_expr.get_identifier());
+    auto contexts =
+      find_index_contexts(where_simplified, var_expr.get_identifier());
     if(!contexts.empty())
     {
       bool all_large_arrays = true;
@@ -251,8 +249,8 @@ static std::optional<exprt> eager_quantifier_instantiation(
           all_large_arrays = false;
           break;
         }
-        const auto &arr_type = to_array_type(ctx.array.type());
-        auto arr_size = numeric_cast<mp_integer>(arr_type.size());
+        auto arr_size = numeric_cast<mp_integer>(
+          to_array_type(ctx.array.type()).size());
         if(!arr_size.has_value() || *arr_size <= 64)
         {
           all_large_arrays = false;
@@ -326,7 +324,6 @@ literalt boolbvt::convert_quantifier(const quantifier_exprt &src)
   if(!lazy_quantifiers)
   {
     const auto res = eager_quantifier_instantiation(src, ns);
-
     if(res)
       return convert_bool(*res);
   }
@@ -336,8 +333,6 @@ literalt boolbvt::convert_quantifier(const quantifier_exprt &src)
 
   return quantifier_list.back().l;
 }
-
-/// \file
 /// Complete instantiation for quantified formulas.
 ///
 /// This file implements quantifier elimination for CBMC's bitvector
@@ -616,30 +611,6 @@ static std::unordered_set<exprt, irep_hash> collect_ground_indices(
   // symbols (a[0], a[1], ...) rather than index_exprt entries. If the
   // cache scan found no ground terms for a context whose array has a
   // known constant size, add all indices 0..size-1 to ensure completeness.
-  if(ground_indices.empty())
-  {
-    for(const auto &ctx : contexts)
-    {
-      if(ctx.array.type().id() == ID_array)
-      {
-        const auto &array_type = to_array_type(ctx.array.type());
-        const auto size = numeric_cast<mp_integer>(array_type.size());
-        if(size.has_value() && *size > 0 && *size <= 256)
-        {
-          const auto &index_type = array_type.index_type();
-          for(mp_integer i = 0; i < *size; ++i)
-            ground_indices.insert(from_integer(i, index_type));
-        }
-      }
-    }
-  }
-
-  // For field-sensitive arrays, the bv_cache contains individual element
-  // symbols (a[0], a[1], ...) rather than index_exprt entries. If the
-  // cache scan found no ground terms for a context whose array has a
-  // known constant size, add all indices 0..size-1 to ensure completeness.
-  // This path is only reached when eager_quantifier_instantiation
-  // incorrectly deferred a quantifier that indexes field-sensitive arrays.
   if(ground_indices.empty())
   {
     for(const auto &ctx : contexts)
@@ -985,8 +956,8 @@ void boolbvt::finish_eager_conversion_quantifiers()
 
     for(const auto &q : remaining_quantifiers)
     {
-      instantiations.push_back(
-        instantiate_one_quantifier(to_quantifier_expr(q.expr), bv_cache, ns));
+      instantiations.push_back(instantiate_one_quantifier(
+        to_quantifier_expr(q.expr), bv_cache, ns));
     }
 
     auto instantiations_it = instantiations.begin();
@@ -994,8 +965,7 @@ void boolbvt::finish_eager_conversion_quantifiers()
     {
       if(!instantiations_it->has_value())
       {
-        // Complete instantiation found no ground terms (e.g., field-
-        // sensitive arrays have no index_exprt in the cache). Fall back
+        // Complete instantiation found no ground terms. Fall back
         // to eager full-range instantiation.
         auto eager = eager_quantifier_instantiation(
           to_quantifier_expr(q.expr), ns);
