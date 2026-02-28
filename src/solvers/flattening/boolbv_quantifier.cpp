@@ -151,6 +151,17 @@ get_quantifier_var_max(const exprt &var_expr, const exprt &quantifier_expr)
   return {};
 }
 
+/// Represents how a bound variable is used as an array index, possibly with
+/// an arithmetic offset.
+struct index_contextt
+{
+  exprt array;
+  exprt offset;
+};
+
+static std::vector<index_contextt>
+find_index_contexts(const exprt &expr, const irep_idt &bound_var_id);
+
 static std::optional<exprt> eager_quantifier_instantiation(
   const quantifier_exprt &expr,
   const namespacet &ns)
@@ -217,6 +228,41 @@ static std::optional<exprt> eager_quantifier_instantiation(
 
   mp_integer lb = numeric_cast_v<mp_integer>(min_i.value());
   mp_integer ub = numeric_cast_v<mp_integer>(max_i.value());
+
+  // When the range is large and the bound variable is used as an array
+  // index, skip eager full-range instantiation. The post-processing
+  // complete instantiation (Ye & de Moura, CAV 2009) will instantiate
+  // only with the ground index terms actually present in the formula,
+  // which is typically much smaller than the full range.
+  // Only skip when ALL indexed arrays are large enough to not be field-
+  // sensitive (> 64 elements), since field-sensitive arrays don't have
+  // index_exprt entries in the bv_cache and the Ye/de Moura approach
+  // would find no ground terms for them.
+  if(ub - lb >= 16)
+  {
+    auto contexts = find_index_contexts(where_simplified, var_expr.get_identifier());
+    if(!contexts.empty())
+    {
+      bool all_large_arrays = true;
+      for(const auto &ctx : contexts)
+      {
+        if(ctx.array.type().id() != ID_array)
+        {
+          all_large_arrays = false;
+          break;
+        }
+        const auto &arr_type = to_array_type(ctx.array.type());
+        auto arr_size = numeric_cast<mp_integer>(arr_type.size());
+        if(!arr_size.has_value() || *arr_size <= 64)
+        {
+          all_large_arrays = false;
+          break;
+        }
+      }
+      if(all_large_arrays)
+        return {};
+    }
+  }
 
   auto expr_simplified =
     quantifier_exprt(expr.id(), expr.variables(), where_simplified);
@@ -331,21 +377,6 @@ literalt boolbvt::convert_quantifier(const quantifier_exprt &src)
 ///    This is implemented by `instantiate_one_quantifier` and its helpers,
 ///    called from `finish_eager_conversion_quantifiers` as a post-processing
 ///    step after the main bitvector conversion.
-
-/// Represents how a bound variable is used as an array index, possibly with
-/// an arithmetic offset. In the paper's terminology, this captures one
-/// occurrence of an uninterpreted function application f(... x_i + r ...)
-/// where f is an array access, x_i is the bound variable, and r is the
-/// offset.
-///
-/// For `arr[j + r]`: \p array is `arr`, \p offset is `r`.
-/// For `arr[j]`: \p array is `arr`, \p offset is zero.
-/// For `arr[j - r]`: \p array is `arr`, \p offset is `-r`.
-struct index_contextt
-{
-  exprt array;
-  exprt offset;
-};
 
 /// Check whether two array expressions refer to the same underlying
 /// Check whether \p pattern and \p candidate refer to the same
@@ -580,6 +611,53 @@ static std::unordered_set<exprt, irep_hash> collect_ground_indices(
       }
     }
   }
+
+  // For field-sensitive arrays, the bv_cache contains individual element
+  // symbols (a[0], a[1], ...) rather than index_exprt entries. If the
+  // cache scan found no ground terms for a context whose array has a
+  // known constant size, add all indices 0..size-1 to ensure completeness.
+  if(ground_indices.empty())
+  {
+    for(const auto &ctx : contexts)
+    {
+      if(ctx.array.type().id() == ID_array)
+      {
+        const auto &array_type = to_array_type(ctx.array.type());
+        const auto size = numeric_cast<mp_integer>(array_type.size());
+        if(size.has_value() && *size > 0 && *size <= 256)
+        {
+          const auto &index_type = array_type.index_type();
+          for(mp_integer i = 0; i < *size; ++i)
+            ground_indices.insert(from_integer(i, index_type));
+        }
+      }
+    }
+  }
+
+  // For field-sensitive arrays, the bv_cache contains individual element
+  // symbols (a[0], a[1], ...) rather than index_exprt entries. If the
+  // cache scan found no ground terms for a context whose array has a
+  // known constant size, add all indices 0..size-1 to ensure completeness.
+  // This path is only reached when eager_quantifier_instantiation
+  // incorrectly deferred a quantifier that indexes field-sensitive arrays.
+  if(ground_indices.empty())
+  {
+    for(const auto &ctx : contexts)
+    {
+      if(ctx.array.type().id() == ID_array)
+      {
+        const auto &array_type = to_array_type(ctx.array.type());
+        const auto size = numeric_cast<mp_integer>(array_type.size());
+        if(size.has_value() && *size > 0 && *size <= 256)
+        {
+          const auto &index_type = array_type.index_type();
+          for(mp_integer i = 0; i < *size; ++i)
+            ground_indices.insert(from_integer(i, index_type));
+        }
+      }
+    }
+  }
+
   return ground_indices;
 }
 
@@ -916,7 +994,18 @@ void boolbvt::finish_eager_conversion_quantifiers()
     {
       if(!instantiations_it->has_value())
       {
-        conversion_failed(q.expr);
+        // Complete instantiation found no ground terms (e.g., field-
+        // sensitive arrays have no index_exprt in the cache). Fall back
+        // to eager full-range instantiation.
+        auto eager = eager_quantifier_instantiation(
+          to_quantifier_expr(q.expr), ns);
+        if(eager.has_value())
+        {
+          literalt result_lit = convert(*eager);
+          prop.l_set_to_true(prop.lequal(q.l, result_lit));
+        }
+        else
+          conversion_failed(q.expr);
         ++instantiations_it;
         continue;
       }
