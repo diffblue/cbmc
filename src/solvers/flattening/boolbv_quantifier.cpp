@@ -542,6 +542,24 @@ find_index_contexts(const exprt &expr, const irep_idt &bound_var_id)
   return contexts;
 }
 
+/// Check whether \p expr contains any boolbvt::scope:: fresh binding symbol.
+/// These symbols are created by fresh_binding() during quantifier body
+/// conversion and represent bound variables — they are not ground terms.
+static bool contains_fresh_binding(const exprt &expr)
+{
+  if(auto sym = expr_try_dynamic_cast<symbol_exprt>(expr))
+  {
+    const auto &id = id2string(sym->get_identifier());
+    return id.compare(0, 16, "boolbvt::scope::") == 0;
+  }
+  for(const auto &op : expr.operands())
+  {
+    if(contains_fresh_binding(op))
+      return true;
+  }
+  return false;
+}
+
 /// Collect all ground index terms from \p context_map for arrays
 /// that match any of the given \p contexts.
 ///
@@ -583,6 +601,11 @@ static std::unordered_set<exprt, irep_hash> collect_ground_indices(
     // Match array reads: index_exprt(array, index)
     if(auto index_expr = expr_try_dynamic_cast<index_exprt>(cache_entry.first))
     {
+      // Skip index terms containing fresh binding symbols (non-ground).
+      if(contains_fresh_binding(index_expr->index()))
+      {
+        continue;
+      }
       for(const auto &ctx : contexts)
       {
         if(arrays_match(ctx.array, index_expr->array(), ns))
@@ -596,6 +619,8 @@ static std::unordered_set<exprt, irep_hash> collect_ground_indices(
     else if(
       auto with_expr = expr_try_dynamic_cast<with_exprt>(cache_entry.first))
     {
+      if(contains_fresh_binding(with_expr->where()))
+        continue;
       for(const auto &ctx : contexts)
       {
         if(arrays_match(ctx.array, with_expr->old(), ns))
@@ -607,25 +632,25 @@ static std::unordered_set<exprt, irep_hash> collect_ground_indices(
     }
   }
 
-  // For field-sensitive arrays, the bv_cache contains individual element
-  // symbols (a[0], a[1], ...) rather than index_exprt entries. If the
-  // cache scan found no ground terms for a context whose array has a
-  // known constant size, add all indices 0..size-1 to ensure completeness.
-  if(ground_indices.empty())
+  // The cache may contain non-ground symbolic index terms (e.g., from
+  // rewrite_quantifiers free variables) that cause incomplete
+  // instantiation. For each non-literal bounded-array context, always
+  // add constant indices 0..size-1 to ensure completeness. This may
+  // add redundant terms when the cache already has good ground terms,
+  // but correctness takes priority over performance.
+  for(const auto &ctx : contexts)
   {
-    for(const auto &ctx : contexts)
+    if(ctx.array.id() == ID_array)
+      continue; // already handled above
+    if(ctx.array.type().id() != ID_array)
+      continue;
+    const auto &array_type = to_array_type(ctx.array.type());
+    const auto size = numeric_cast<mp_integer>(array_type.size());
+    if(size.has_value() && *size > 0 && *size <= 256)
     {
-      if(ctx.array.type().id() == ID_array)
-      {
-        const auto &array_type = to_array_type(ctx.array.type());
-        const auto size = numeric_cast<mp_integer>(array_type.size());
-        if(size.has_value() && *size > 0 && *size <= 256)
-        {
-          const auto &index_type = array_type.index_type();
-          for(mp_integer i = 0; i < *size; ++i)
-            ground_indices.insert(from_integer(i, index_type));
-        }
-      }
+      const auto &index_type = array_type.index_type();
+      for(mp_integer i = 0; i < *size; ++i)
+        ground_indices.insert(from_integer(i, index_type));
     }
   }
 
@@ -900,7 +925,8 @@ static std::optional<exprt> instantiate_one_quantifier(
     return {};
 
   // Collect ground index terms from the cache
-  auto ground_indices = collect_ground_indices(contexts, context_map, ns);
+  auto ground_indices =
+    collect_ground_indices(contexts, context_map, ns);
   if(ground_indices.empty())
     return {};
 
