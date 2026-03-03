@@ -257,6 +257,7 @@ static void race_check(
         source_locationt annotated_location =
           original_instruction.source_location();
         annotated_location.set_comment(comment(r_entry.second, false));
+        annotated_location.set_property_class("race-check");
         goto_program.insert_before(
           i_it,
           goto_programt::make_assertion(
@@ -271,6 +272,7 @@ static void race_check(
         source_locationt annotated_location =
           original_instruction.source_location();
         annotated_location.set_comment(comment(w_entry.second, true));
+        annotated_location.set_property_class("race-check");
         goto_program.insert_before(
           i_it,
           goto_programt::make_assertion(
