@@ -149,7 +149,7 @@ static bool is_shared(const namespacet &ns, const symbol_exprt &symbol_expr)
     return false; // no race check
 
   const symbolt &symbol=ns.lookup(identifier);
-  return symbol.is_shared();
+  return !symbol.is_function() && symbol.is_shared();
 }
 
 /// Check whether any entry in the read/write set refers to a shared variable.
@@ -195,7 +195,7 @@ static void race_check(
   {
     goto_programt::instructiont &instruction=*i_it;
 
-    if(instruction.is_assign())
+    if(instruction.is_assign() || instruction.is_function_call())
     {
       rw_set_loct rw_set(
         ns,
@@ -280,6 +280,35 @@ static void race_check(
       }
 
       i_it--; // the for loop already counts us up
+    }
+    else if(
+      instruction.is_goto() || instruction.is_assume() ||
+      instruction.is_assert() || instruction.is_set_return_value())
+    {
+      rw_set_loct rw_set(
+        ns,
+        value_sets,
+        function_id,
+        i_it L_M_LAST_ARG(local_may),
+        message_handler);
+
+      if(!has_shared_entries(ns, rw_set))
+        continue;
+
+      // add R/W assertions for shared reads before the instruction
+      for(const auto &r_entry : rw_set.r_entries)
+      {
+        if(!is_shared(ns, r_entry.second.symbol_expr))
+          continue;
+
+        source_locationt annotated_location = instruction.source_location();
+        annotated_location.set_comment(comment(r_entry.second, false));
+        annotated_location.set_property_class("race-check");
+        goto_program.insert_before(
+          i_it,
+          goto_programt::make_assertion(
+            w_guards.get_assertion(r_entry.second), annotated_location));
+      }
     }
   }
 

@@ -25,15 +25,20 @@ Date: February 2006
 /// - R/W races: one thread reads a variable while another writes it.
 /// - W/W races: two threads write the same variable concurrently.
 ///
-/// For each assignment that accesses shared variables, the instrumentation
-/// replaces the original instruction with the following sequence:
+/// For each assignment or function call that accesses shared variables, the
+/// instrumentation replaces the original instruction with the following
+/// sequence:
 ///
 /// 1. For each shared variable `x` written: set `x$w_guard` to the guard
 ///    condition under which the write occurs.
-/// 2. Execute the original assignment.
+/// 2. Execute the original instruction.
 /// 3. For each shared variable `x` written: reset `x$w_guard` to false.
 /// 4. For each shared variable `y` read: assert `!y$w_guard` (R/W check).
 /// 5. For each shared variable `x` written: assert `!x$w_guard` (W/W check).
+///
+/// For instructions that only read shared variables (GOTO/ASSUME/ASSERT
+/// guards, SET_RETURN_VALUE), only R/W assertions (step 4) are added before
+/// the instruction.
 ///
 /// During symbolic execution of concurrent programs, CBMC explores thread
 /// interleavings. If another thread's write guard is set (step 1) when the
