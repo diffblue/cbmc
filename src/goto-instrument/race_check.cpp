@@ -19,6 +19,7 @@ Date: February 2006
 
 #include <goto-programs/remove_skip.h>
 
+#include <analyses/dirty.h>
 #include <linking/static_lifetime_init.h>
 
 #include "rw_set.h"
@@ -162,7 +163,13 @@ static void add_race_assertion(
 
 /// Check whether a symbol refers to a shared (non-thread-local) variable,
 /// excluding internal CPROVER symbols that should not be race-checked.
-static bool is_shared(const namespacet &ns, const symbol_exprt &symbol_expr)
+/// A variable is considered shared if it is globally shared or if it is a
+/// "dirty" local (its address has been taken, so it may be accessible from
+/// other threads).
+static bool is_shared(
+  const namespacet &ns,
+  const symbol_exprt &symbol_expr,
+  const dirtyt &dirty)
 {
   const irep_idt &identifier = symbol_expr.identifier();
 
@@ -176,24 +183,27 @@ static bool is_shared(const namespacet &ns, const symbol_exprt &symbol_expr)
     return false; // no race check
 
   const symbolt &symbol=ns.lookup(identifier);
-  return !symbol.is_function() && symbol.is_shared();
+  return !symbol.is_function() && (symbol.is_shared() || dirty(identifier));
 }
 
 /// Check whether any entry in the read/write set refers to a shared variable.
-static bool has_shared_entries(const namespacet &ns, const rw_set_baset &rw_set)
+static bool has_shared_entries(
+  const namespacet &ns,
+  const rw_set_baset &rw_set,
+  const dirtyt &dirty)
 {
   for(rw_set_baset::entriest::const_iterator
       it=rw_set.r_entries.begin();
       it!=rw_set.r_entries.end();
       it++)
-    if(is_shared(ns, it->second.symbol_expr))
+    if(is_shared(ns, it->second.symbol_expr, dirty))
       return true;
 
   for(rw_set_baset::entriest::const_iterator
       it=rw_set.w_entries.begin();
       it!=rw_set.w_entries.end();
       it++)
-    if(is_shared(ns, it->second.symbol_expr))
+    if(is_shared(ns, it->second.symbol_expr, dirty))
       return true;
 
   return false;
@@ -209,6 +219,7 @@ static void race_check(
   L_M_ARG(const goto_functionst::goto_functiont &goto_function)
   goto_programt &goto_program,
   w_guardst &w_guards,
+  const dirtyt &dirty,
   message_handlert &message_handler)
 // clang-format on
 {
@@ -239,7 +250,7 @@ static void race_check(
         i_it L_M_LAST_ARG(local_may),
         message_handler);
 
-      if(!has_shared_entries(ns, rw_set))
+      if(!has_shared_entries(ns, rw_set, dirty))
         continue;
 
       goto_programt::instructiont original_instruction;
@@ -252,7 +263,7 @@ static void race_check(
       // now add assignments for what is written -- set
       for(const auto &w_entry : rw_set.w_entries)
       {
-        if(!is_shared(ns, w_entry.second.symbol_expr))
+        if(!is_shared(ns, w_entry.second.symbol_expr, dirty))
           continue;
 
         goto_program.insert_before(
@@ -272,7 +283,7 @@ static void race_check(
       // now add assignments for what is written -- reset
       for(const auto &w_entry : rw_set.w_entries)
       {
-        if(!is_shared(ns, w_entry.second.symbol_expr))
+        if(!is_shared(ns, w_entry.second.symbol_expr, dirty))
           continue;
 
         goto_program.insert_before(
@@ -286,7 +297,7 @@ static void race_check(
       // now add assertions for what is read and written
       for(const auto &r_entry : rw_set.r_entries)
       {
-        if(!is_shared(ns, r_entry.second.symbol_expr))
+        if(!is_shared(ns, r_entry.second.symbol_expr, dirty))
           continue;
 
         add_race_assertion(
@@ -300,7 +311,7 @@ static void race_check(
 
       for(const auto &w_entry : rw_set.w_entries)
       {
-        if(!is_shared(ns, w_entry.second.symbol_expr))
+        if(!is_shared(ns, w_entry.second.symbol_expr, dirty))
           continue;
 
         add_race_assertion(
@@ -325,13 +336,13 @@ static void race_check(
         i_it L_M_LAST_ARG(local_may),
         message_handler);
 
-      if(!has_shared_entries(ns, rw_set))
+      if(!has_shared_entries(ns, rw_set, dirty))
         continue;
 
       // add R/W assertions for shared reads before the instruction
       for(const auto &r_entry : rw_set.r_entries)
       {
-        if(!is_shared(ns, r_entry.second.symbol_expr))
+        if(!is_shared(ns, r_entry.second.symbol_expr, dirty))
           continue;
 
         add_race_assertion(
@@ -359,6 +370,10 @@ void race_check(
   message_handlert &message_handler)
 {
   w_guardst w_guards(symbol_table);
+  // When called for a single function we don't have the full goto_functions
+  // to build a complete dirtyt, so we use an empty one. The goto_modelt
+  // overload below computes a proper whole-program dirty analysis.
+  dirtyt dirty{goto_functionst{}};
 
   race_check(
     value_sets,
@@ -366,6 +381,7 @@ void race_check(
     function_id,
     L_M_ARG(goto_function) goto_program,
     w_guards,
+    dirty,
     message_handler);
 
   w_guards.add_initialization(goto_program);
@@ -378,6 +394,7 @@ void race_check(
   message_handlert &message_handler)
 {
   w_guardst w_guards(goto_model.symbol_table);
+  dirtyt dirty(goto_model.goto_functions);
 
   for(auto &gf_entry : goto_model.goto_functions.function_map)
   {
@@ -391,6 +408,7 @@ void race_check(
         gf_entry.first,
         L_M_ARG(gf_entry.second) gf_entry.second.body,
         w_guards,
+        dirty,
         message_handler);
     }
   }
