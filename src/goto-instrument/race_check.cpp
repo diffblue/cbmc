@@ -10,6 +10,8 @@ Date: February 2006
 
 /// \file
 /// Race Detection for Threaded Goto Programs
+///
+/// \see race_check.h for an overview of the instrumentation scheme.
 
 #include "race_check.h"
 
@@ -30,6 +32,10 @@ Date: February 2006
 #define L_M_LAST_ARG(x)
 #endif
 
+/// Manages boolean "write guard" variables used to detect concurrent writes.
+/// For each shared variable `x`, a boolean symbol `x$w_guard` is created.
+/// These guards are set to true around write accesses and checked by
+/// assertions in other threads.
 class w_guardst
 {
 public:
@@ -63,6 +69,9 @@ protected:
   symbol_table_baset &symbol_table;
 };
 
+/// Get or create the boolean guard symbol for a shared variable.
+/// \param object: the identifier of the shared variable
+/// \return the guard symbol `<object>$w_guard`
 const symbolt &w_guardst::get_guard_symbol(const irep_idt &object)
 {
   const irep_idt identifier=id2string(object)+"$w_guard";
@@ -86,6 +95,8 @@ const symbolt &w_guardst::get_guard_symbol(const irep_idt &object)
   return *symbol_ptr;
 }
 
+/// Insert assignments to initialize all write guard variables to false
+/// at the beginning of the given program.
 void w_guardst::add_initialization(goto_programt &goto_program) const
 {
   goto_programt::targett t=goto_program.instructions.begin();
@@ -105,6 +116,10 @@ void w_guardst::add_initialization(goto_programt &goto_program) const
   }
 }
 
+/// Build a human-readable comment for a race-check assertion.
+/// \param entry: the read/write set entry describing the access
+/// \param write: true if this is a W/W race check, false for R/W
+/// \return a string like "R/W data race on x" or "W/W data race on x"
 static std::string comment(const rw_set_baset::entryt &entry, bool write)
 {
   std::string result;
@@ -118,6 +133,8 @@ static std::string comment(const rw_set_baset::entryt &entry, bool write)
   return result;
 }
 
+/// Check whether a symbol refers to a shared (non-thread-local) variable,
+/// excluding internal CPROVER symbols that should not be race-checked.
 static bool is_shared(const namespacet &ns, const symbol_exprt &symbol_expr)
 {
   const irep_idt &identifier=symbol_expr.get_identifier();
@@ -135,6 +152,7 @@ static bool is_shared(const namespacet &ns, const symbol_exprt &symbol_expr)
   return symbol.is_shared();
 }
 
+/// Check whether any entry in the read/write set refers to a shared variable.
 static bool has_shared_entries(const namespacet &ns, const rw_set_baset &rw_set)
 {
   for(rw_set_baset::entriest::const_iterator
