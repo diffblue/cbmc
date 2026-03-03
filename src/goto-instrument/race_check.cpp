@@ -133,6 +133,33 @@ static std::string comment(const rw_set_baset::entryt &entry, bool write)
   return result;
 }
 
+/// Emit a race-check assertion for a single read/write-set \p entry,
+/// inserted immediately before \p i_it in \p goto_program. Centralises the
+/// comment text and the `race-check` property class so that every emission
+/// site stays consistent.
+/// \param goto_program: program to instrument
+/// \param i_it: instruction before which to insert the assertion
+/// \param w_guards: write-guard bookkeeping providing the assertion expression
+/// \param entry: the read/write-set entry being checked
+/// \param is_write: true for a W/W check, false for an R/W check
+/// \param source_location: source location to annotate the assertion with
+static void add_race_assertion(
+  goto_programt &goto_program,
+  goto_programt::targett i_it,
+  w_guardst &w_guards,
+  const rw_set_baset::entryt &entry,
+  bool is_write,
+  const source_locationt &source_location)
+{
+  source_locationt annotated_location = source_location;
+  annotated_location.set_comment(comment(entry, is_write));
+  annotated_location.set_property_class("race-check");
+  goto_program.insert_before(
+    i_it,
+    goto_programt::make_assertion(
+      w_guards.get_assertion(entry), annotated_location));
+}
+
 /// Check whether a symbol refers to a shared (non-thread-local) variable,
 /// excluding internal CPROVER symbols that should not be race-checked.
 static bool is_shared(const namespacet &ns, const symbol_exprt &symbol_expr)
@@ -149,7 +176,7 @@ static bool is_shared(const namespacet &ns, const symbol_exprt &symbol_expr)
     return false; // no race check
 
   const symbolt &symbol=ns.lookup(identifier);
-  return symbol.is_shared();
+  return !symbol.is_function() && symbol.is_shared();
 }
 
 /// Check whether any entry in the read/write set refers to a shared variable.
@@ -195,8 +222,16 @@ static void race_check(
   {
     goto_programt::instructiont &instruction=*i_it;
 
-    if(instruction.is_assign())
+    if(instruction.is_assign() || instruction.is_function_call())
     {
+      // For a FUNCTION_CALL we reuse the ASSIGN set/reset sequence: the write
+      // guard for the call's lhs is set before the call and reset only after
+      // it returns, so the modelled write window spans the whole callee
+      // execution rather than just the return-value assignment. This is an
+      // intentional over-approximation -- it is sound for race finding (it
+      // cannot miss a race) but may over-report a W/W race if the callee
+      // itself sequentially touches the lhs. It is consistent with how ASSIGN
+      // is modelled.
       rw_set_loct rw_set(
         ns,
         value_sets,
@@ -254,14 +289,13 @@ static void race_check(
         if(!is_shared(ns, r_entry.second.symbol_expr))
           continue;
 
-        source_locationt annotated_location =
-          original_instruction.source_location();
-        annotated_location.set_comment(comment(r_entry.second, false));
-        annotated_location.set_property_class("race-check");
-        goto_program.insert_before(
+        add_race_assertion(
+          goto_program,
           i_it,
-          goto_programt::make_assertion(
-            w_guards.get_assertion(r_entry.second), annotated_location));
+          w_guards,
+          r_entry.second,
+          false,
+          original_instruction.source_location());
       }
 
       for(const auto &w_entry : rw_set.w_entries)
@@ -269,17 +303,45 @@ static void race_check(
         if(!is_shared(ns, w_entry.second.symbol_expr))
           continue;
 
-        source_locationt annotated_location =
-          original_instruction.source_location();
-        annotated_location.set_comment(comment(w_entry.second, true));
-        annotated_location.set_property_class("race-check");
-        goto_program.insert_before(
+        add_race_assertion(
+          goto_program,
           i_it,
-          goto_programt::make_assertion(
-            w_guards.get_assertion(w_entry.second), annotated_location));
+          w_guards,
+          w_entry.second,
+          true,
+          original_instruction.source_location());
       }
 
       i_it--; // the for loop already counts us up
+    }
+    else if(
+      instruction.is_goto() || instruction.is_assume() ||
+      instruction.is_assert() || instruction.is_set_return_value())
+    {
+      rw_set_loct rw_set(
+        ns,
+        value_sets,
+        function_id,
+        i_it L_M_LAST_ARG(local_may),
+        message_handler);
+
+      if(!has_shared_entries(ns, rw_set))
+        continue;
+
+      // add R/W assertions for shared reads before the instruction
+      for(const auto &r_entry : rw_set.r_entries)
+      {
+        if(!is_shared(ns, r_entry.second.symbol_expr))
+          continue;
+
+        add_race_assertion(
+          goto_program,
+          i_it,
+          w_guards,
+          r_entry.second,
+          false,
+          instruction.source_location());
+      }
     }
   }
 
