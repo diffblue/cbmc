@@ -1012,6 +1012,44 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
     }
   }
 
+  // Push a pointer typecast into pointer arithmetic
+  // (T)(ptr + int) ---> (T)ptr + sizeof(inner-st)/sizeof(outer-st)*int
+  // when the inner subtype's size is a multiple of the outer subtype's size
+  if(
+    expr_type.id() == ID_pointer && op_type.id() == ID_pointer &&
+    expr.op().id() == ID_plus)
+  {
+    const auto step =
+      pointer_offset_size(to_pointer_type(op_type).base_type(), ns);
+    const auto new_step =
+      pointer_offset_size(to_pointer_type(expr_type).base_type(), ns);
+
+    if(
+      step.has_value() && *step != 0 && new_step.has_value() &&
+      *new_step != 0 && *step >= *new_step && *step % *new_step == 0)
+    {
+      auto new_expr = expr.op();
+      new_expr.type() = expr.type();
+
+      for(auto &op : new_expr.operands())
+      {
+        if(op.type().id() == ID_pointer)
+        {
+          exprt new_op = simplify_typecast(typecast_exprt{op, expr.type()});
+          op = std::move(new_op);
+        }
+        else if(*step > *new_step)
+        {
+          exprt new_op = simplify_mult(
+            mult_exprt{from_integer(*step / *new_step, op.type()), op});
+          op = std::move(new_op);
+        }
+      }
+
+      return changed(simplify_plus(to_plus_expr(new_expr)));
+    }
+  }
+
   const irep_idt &expr_type_id=expr_type.id();
   const exprt &operand = expr.op();
   const irep_idt &op_type_id=op_type.id();
