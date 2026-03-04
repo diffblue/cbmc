@@ -270,6 +270,7 @@ sources: Makefile
 # endif
 
 D_FILES1 = $(SRC:.c=$(DEPEXT))
-D_FILES = $(D_FILES1:.cpp=$(DEPEXT))
+D_FILES2 = $(D_FILES1:.cc=$(DEPEXT))
+D_FILES = $(D_FILES2:.cpp=$(DEPEXT))
 
 -include $(D_FILES)
