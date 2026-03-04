@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/invariant.h>
 #include <util/simplify_expr.h>
+#include <util/ssa_expr.h>
 
 #include "boolbv.h"
 
@@ -217,9 +218,6 @@ static std::optional<exprt> eager_quantifier_instantiation(
   mp_integer lb = numeric_cast_v<mp_integer>(min_i.value());
   mp_integer ub = numeric_cast_v<mp_integer>(max_i.value());
 
-  if(lb > ub)
-    return {};
-
   auto expr_simplified =
     quantifier_exprt(expr.id(), expr.variables(), where_simplified);
 
@@ -290,12 +288,618 @@ literalt boolbvt::convert_quantifier(const quantifier_exprt &src)
   return quantifier_list.back().l;
 }
 
+/// \file
+/// Complete instantiation for quantified formulas.
+///
+/// This file implements quantifier elimination for CBMC's bitvector
+/// solver. Two strategies are used:
+///
+/// 1. **Eager instantiation** (bounded ranges): When the quantifier body
+///    contains explicit bounds on the variable (e.g., `!(j >= lb) || body`),
+///    the quantifier is expanded into a conjunction/disjunction over all
+///    values in [lb, ub]. This is handled by `eager_quantifier_instantiation`.
+///
+/// 2. **Complete instantiation** (unbounded/symbolic ranges): When no
+///    explicit bounds are available, we use an approach based on:
+///
+///      Yeting Ge and Leonardo de Moura, "Complete instantiation for
+///      quantified formulas in Satisfiability Modulo Theories", CAV 2009.
+///
+///    The key idea is that for *essentially uninterpreted* formulas (where
+///    quantified variables only appear as arguments of uninterpreted
+///    functions), the quantifier can be eliminated by instantiating with
+///    a finite set of ground terms. In CBMC's context, "uninterpreted
+///    functions" correspond to array accesses (index_exprt).
+///
+///    The paper defines a system of set constraints ΔF that captures which
+///    ground terms are relevant for each function argument position. The
+///    least fixed point of ΔF gives the complete set of instantiation
+///    terms. For the *almost uninterpreted* fragment (Section 4 of the
+///    paper), variables may also appear with arithmetic offsets, e.g.,
+///    `arr[j + 1]`. The offset extension adds constraints:
+///      S_{k,i} + r ⊆ A_{f,j}  and  A_{f,j} + (-r) ⊆ S_{k,i}
+///    ensuring that the fixed point accounts for shifted indices.
+///
+///    The formula F is in the *finite essentially uninterpreted* (FEU)
+///    fragment when ΔF is stratified (i.e., the fixed point is finite).
+///    For non-stratified cases (e.g., offsets that create infinite chains),
+///    we bound the computation to ensure termination.
+///
+///    This is implemented by `instantiate_one_quantifier` and its helpers,
+///    called from `finish_eager_conversion_quantifiers` as a post-processing
+///    step after the main bitvector conversion.
+
+/// Represents how a bound variable is used as an array index, possibly with
+/// an arithmetic offset. In the paper's terminology, this captures one
+/// occurrence of an uninterpreted function application f(... x_i + r ...)
+/// where f is an array access, x_i is the bound variable, and r is the
+/// offset.
+///
+/// For `arr[j + r]`: \p array is `arr`, \p offset is `r`.
+/// For `arr[j]`: \p array is `arr`, \p offset is zero.
+/// For `arr[j - r]`: \p array is `arr`, \p offset is `-r`.
+struct index_contextt
+{
+  exprt array;
+  exprt offset;
+};
+
+/// Check whether two array expressions refer to the same underlying
+/// Check whether \p pattern and \p candidate refer to the same
+/// array, accounting for SSA renaming. After symbolic execution, the
+/// same source-level array may appear with different SSA version
+/// numbers (e.g., `arr#1` vs `arr#2`). We compare L1 object
+/// identifiers to match across versions. For nested array accesses
+/// (e.g., `a[0]` as a sub-array), we recursively match the base
+/// array and compare the simplified indices.
+static bool
+arrays_match(const exprt &pattern, const exprt &candidate, const namespacet &ns)
+{
+  if(auto ssa_pattern = expr_try_dynamic_cast<ssa_exprt>(pattern))
+  {
+    if(auto ssa_candidate = expr_try_dynamic_cast<ssa_exprt>(candidate))
+    {
+      return ssa_pattern->get_l1_object_identifier() ==
+             ssa_candidate->get_l1_object_identifier();
+    }
+    return false;
+  }
+  // For nested array accesses like a[0][j], the "array" operand
+  // is itself an index_exprt (a[0]). Match recursively on the
+  // base array and compare simplified indices (the pattern may
+  // contain unsimplified arithmetic like cast(0 % 2) that equals
+  // a constant in the candidate).
+  if(auto idx_pattern = expr_try_dynamic_cast<index_exprt>(pattern))
+  {
+    if(auto idx_candidate = expr_try_dynamic_cast<index_exprt>(candidate))
+    {
+      return arrays_match(idx_pattern->array(), idx_candidate->array(), ns) &&
+             simplify_expr(idx_pattern->index(), ns) ==
+               simplify_expr(idx_candidate->index(), ns);
+    }
+    return false;
+  }
+  return pattern == candidate;
+}
+
+/// Find all index_exprt nodes in \p expr whose index sub-expression
+/// contains the symbol \p bound_var_id. For each such node, decompose
+/// the index into `bound_var + offset` (where offset may be zero).
+///
+/// This corresponds to identifying the uninterpreted function
+/// applications in the paper's terminology. In CBMC, array accesses
+/// (`index_exprt`) play the role of uninterpreted functions: the
+/// array is the function symbol, and the index is the argument.
+///
+/// The offset decomposition implements the extension from Section 4
+/// of the paper ("Offsets"): for terms of the form `f(x_i + r)`,
+/// we extract the offset `r` to generate the additional set
+/// constraints `S_{k,i} + r ⊆ A_{f,j}` and
+/// `A_{f,j} + (-r) ⊆ S_{k,i}`.
+///
+/// Recognised patterns:
+///   - `var` or `cast(var)` → offset = 0
+///   - `var + r` or `r + var` → offset = r
+///   - `var - r` → offset = -r
+///   - complex expressions containing var → offset = 0 (fallback)
+static std::vector<index_contextt>
+find_index_contexts(const exprt &expr, const irep_idt &bound_var_id)
+{
+  std::vector<index_contextt> contexts;
+  expr.visit_pre(
+    [&bound_var_id, &contexts](const exprt &e)
+    {
+      auto index_expr = expr_try_dynamic_cast<index_exprt>(e);
+      if(!index_expr)
+        return;
+
+      // Check whether the index sub-expression mentions the bound variable.
+      bool has_bound_var = false;
+      index_expr->index().visit_pre(
+        [&bound_var_id, &has_bound_var](const exprt &sub)
+        {
+          if(auto sym = expr_try_dynamic_cast<symbol_exprt>(sub))
+            has_bound_var |= sym->get_identifier() == bound_var_id;
+        });
+      if(!has_bound_var)
+        return;
+
+      // Decompose index into bound_var + offset.
+      // We recognise: var, var + const, const + var, var - const.
+      const exprt &idx = index_expr->index();
+      auto zero = from_integer(0, idx.type());
+
+      if(auto sym = expr_try_dynamic_cast<symbol_exprt>(idx))
+      {
+        if(sym->get_identifier() == bound_var_id)
+        {
+          contexts.push_back({index_expr->array(), std::move(zero)});
+          return;
+        }
+      }
+
+      if(auto tc = expr_try_dynamic_cast<typecast_exprt>(idx))
+      {
+        if(auto sym = expr_try_dynamic_cast<symbol_exprt>(tc->op()))
+        {
+          if(sym->get_identifier() == bound_var_id)
+          {
+            contexts.push_back(
+              {index_expr->array(), from_integer(0, idx.type())});
+            return;
+          }
+        }
+      }
+
+      if(idx.id() == ID_plus && idx.operands().size() == 2)
+      {
+        const auto &lhs = idx.operands()[0];
+        const auto &rhs = idx.operands()[1];
+
+        auto is_bound_var = [&bound_var_id](const exprt &e) -> bool
+        {
+          if(auto sym = expr_try_dynamic_cast<symbol_exprt>(e))
+            return sym->get_identifier() == bound_var_id;
+          if(auto tc = expr_try_dynamic_cast<typecast_exprt>(e))
+          {
+            if(auto sym = expr_try_dynamic_cast<symbol_exprt>(tc->op()))
+              return sym->get_identifier() == bound_var_id;
+          }
+          return false;
+        };
+
+        // Check for patterns: bound_var + offset, offset + bound_var
+        if(is_bound_var(lhs))
+        {
+          contexts.push_back({index_expr->array(), rhs});
+          return;
+        }
+        if(is_bound_var(rhs))
+        {
+          contexts.push_back({index_expr->array(), lhs});
+          return;
+        }
+      }
+
+      if(idx.id() == ID_minus && idx.operands().size() == 2)
+      {
+        const auto &lhs = idx.operands()[0];
+        const auto &rhs = idx.operands()[1];
+
+        auto is_bound_var = [&bound_var_id](const exprt &e) -> bool
+        {
+          if(auto sym = expr_try_dynamic_cast<symbol_exprt>(e))
+            return sym->get_identifier() == bound_var_id;
+          if(auto tc = expr_try_dynamic_cast<typecast_exprt>(e))
+          {
+            if(auto sym = expr_try_dynamic_cast<symbol_exprt>(tc->op()))
+              return sym->get_identifier() == bound_var_id;
+          }
+          return false;
+        };
+
+        // bound_var - offset => offset is negated
+        if(is_bound_var(lhs))
+        {
+          contexts.push_back({index_expr->array(), unary_minus_exprt(rhs)});
+          return;
+        }
+      }
+
+      // Fallback: treat the whole index as a context with zero offset
+      // (the variable is buried in a complex expression we don't decompose)
+      contexts.push_back({index_expr->array(), std::move(zero)});
+    });
+  return contexts;
+}
+
+/// Collect all ground index terms from \p context_map for arrays
+/// that match any of the given \p contexts.
+///
+/// In the paper's terminology, this builds the initial content of
+/// the sets A_{f,j}: the ground terms that appear as the j-th
+/// argument of uninterpreted function f in the ground clauses of F.
+/// We scan the bitvector cache for:
+///   - index_exprt (array reads): the index is a ground term
+///   - with_exprt (array writes): the update index is a ground term
+static std::unordered_set<exprt, irep_hash> collect_ground_indices(
+  const std::vector<index_contextt> &contexts,
+  const std::unordered_map<const exprt, bvt, irep_hash> &context_map,
+  const namespacet &ns)
+{
+  std::unordered_set<exprt, irep_hash> ground_indices;
+  for(const auto &cache_entry : context_map)
+  {
+    // Match array reads: index_exprt(array, index)
+    if(auto index_expr = expr_try_dynamic_cast<index_exprt>(cache_entry.first))
+    {
+      for(const auto &ctx : contexts)
+      {
+        if(arrays_match(ctx.array, index_expr->array(), ns))
+        {
+          ground_indices.insert(index_expr->index());
+          break;
+        }
+      }
+    }
+    // Match array writes: with_exprt(array, index, value)
+    else if(
+      auto with_expr = expr_try_dynamic_cast<with_exprt>(cache_entry.first))
+    {
+      for(const auto &ctx : contexts)
+      {
+        if(arrays_match(ctx.array, with_expr->old(), ns))
+        {
+          ground_indices.insert(with_expr->where());
+          break;
+        }
+      }
+    }
+  }
+  return ground_indices;
+}
+
+/// Compute the complete set of instantiation terms for a bound
+/// variable, implementing the set constraint fixed-point from
+/// Section 3 and the offset extension from Section 4 of:
+///
+///   Ge & de Moura, "Complete instantiation for quantified formulas
+///   in Satisfiability Modulo Theories", CAV 2009.
+///
+/// The paper defines a system of set constraints ΔF induced by the
+/// formula F. For each clause C_k containing a variable x_i that
+/// appears as the j-th argument of uninterpreted function f:
+///
+///   - If x_i appears directly: S_{k,i} = A_{f,j}
+///   - If a ground term t appears: t ∈ A_{f,j}
+///   - If x_i + r appears (offset): S_{k,i} + r ⊆ A_{f,j}
+///     and A_{f,j} + (-r) ⊆ S_{k,i}
+///
+/// The least fixed point of ΔF gives the sets S_{k,i} of ground
+/// terms to use for instantiating x_i. The formula F* obtained by
+/// instantiating each clause C_k[x] with terms from S_{k,i} is
+/// equisatisfiable with F (Theorem 1 and Theorem 2 in the paper).
+///
+/// When ΔF is stratified (the FEU fragment), the fixed point is
+/// finite. For non-stratified cases (e.g., offsets that create
+/// infinite chains as in Example 4 of the paper), we bound the
+/// computation with max_iterations and max_terms.
+///
+/// Two computation paths are provided:
+///   1. **Numeric path**: When all offsets and ground indices are
+///      constants, we use integer arithmetic for efficiency.
+///   2. **Symbolic path**: For non-constant terms, we build
+///      expressions and use simplify_expr to normalize them.
+///
+/// \param contexts: the index contexts (array, offset) pairs
+/// \param initial_ground_indices: ground terms from the bv_cache
+/// \param var_type: the type of the bound variable
+/// \param ns: namespace for expression simplification
+/// \return the set of terms to substitute for the bound variable
+static std::unordered_set<exprt, irep_hash> compute_instantiation_set(
+  const std::vector<index_contextt> &contexts,
+  const std::unordered_set<exprt, irep_hash> &initial_ground_indices,
+  const typet &var_type,
+  const namespacet &ns)
+{
+  std::unordered_set<exprt, irep_hash> all_ground = initial_ground_indices;
+  std::unordered_set<exprt, irep_hash> var_terms;
+
+  // Collect all distinct offsets
+  std::vector<exprt> offsets;
+  for(const auto &ctx : contexts)
+    offsets.push_back(ctx.offset);
+
+  // Check if all offsets are zero (no offset case) - skip fixed-point
+  bool has_nonzero_offset = false;
+  for(const auto &r : offsets)
+  {
+    if(!r.is_zero())
+    {
+      has_nonzero_offset = true;
+      break;
+    }
+  }
+
+  if(!has_nonzero_offset)
+  {
+    for(const auto &g : all_ground)
+      var_terms.insert(typecast_exprt::conditional_cast(g, var_type));
+    return var_terms;
+  }
+
+  // Try to extract numeric offset values for efficient fixed-point computation
+  std::vector<std::optional<mp_integer>> numeric_offsets;
+  bool all_numeric_offsets = true;
+  for(const auto &r : offsets)
+  {
+    if(r.is_zero())
+    {
+      numeric_offsets.push_back(mp_integer(0));
+    }
+    else
+    {
+      auto val = numeric_cast<mp_integer>(r);
+      numeric_offsets.push_back(val);
+      if(!val.has_value())
+        all_numeric_offsets = false;
+    }
+  }
+
+  // Try to extract numeric ground indices
+  std::set<mp_integer> numeric_ground;
+  bool all_numeric_ground = true;
+  for(const auto &g : all_ground)
+  {
+    auto val = numeric_cast<mp_integer>(g);
+    if(val.has_value())
+      numeric_ground.insert(*val);
+    else
+      all_numeric_ground = false;
+  }
+
+  // If we have numeric offsets and ground indices, compute the fixed point
+  // using integer arithmetic (much more efficient)
+  if(all_numeric_offsets && all_numeric_ground && !numeric_ground.empty())
+  {
+    std::set<mp_integer> var_values;
+    bool changed = true;
+    const std::size_t max_iterations = 5;
+    const std::size_t max_terms = 50;
+    std::size_t iteration = 0;
+    while(changed && iteration < max_iterations)
+    {
+      changed = false;
+      ++iteration;
+
+      std::set<mp_integer> new_var_values;
+      for(const auto &g : numeric_ground)
+      {
+        for(const auto &r : numeric_offsets)
+        {
+          mp_integer v = g - *r;
+          if(var_values.find(v) == var_values.end())
+            new_var_values.insert(v);
+        }
+      }
+      for(const auto &v : new_var_values)
+      {
+        if(var_values.insert(v).second)
+          changed = true;
+      }
+      if(var_values.size() > max_terms)
+        break;
+
+      std::set<mp_integer> new_ground;
+      for(const auto &v : var_values)
+      {
+        for(const auto &r : numeric_offsets)
+        {
+          mp_integer g = v + *r;
+          if(numeric_ground.find(g) == numeric_ground.end())
+            new_ground.insert(g);
+        }
+      }
+      for(const auto &g : new_ground)
+      {
+        if(numeric_ground.insert(g).second)
+          changed = true;
+      }
+      if(numeric_ground.size() > max_terms)
+        break;
+    }
+
+    for(const auto &v : var_values)
+      var_terms.insert(from_integer(v, var_type));
+    return var_terms;
+  }
+
+  // Fallback: symbolic fixed-point with simplification
+  bool changed = true;
+  const std::size_t max_iterations = 3;
+  const std::size_t max_terms = 30;
+  std::size_t iteration = 0;
+  while(changed && iteration < max_iterations)
+  {
+    changed = false;
+    ++iteration;
+
+    std::unordered_set<exprt, irep_hash> new_var_terms;
+    for(const auto &g : all_ground)
+    {
+      for(const auto &r : offsets)
+      {
+        exprt var_term;
+        if(r.is_zero())
+          var_term = typecast_exprt::conditional_cast(g, var_type);
+        else
+        {
+          var_term = simplify_expr(
+            typecast_exprt::conditional_cast(minus_exprt(g, r), var_type), ns);
+        }
+        if(var_terms.find(var_term) == var_terms.end())
+          new_var_terms.insert(var_term);
+      }
+    }
+    for(auto &v : new_var_terms)
+    {
+      if(var_terms.insert(std::move(v)).second)
+        changed = true;
+    }
+    if(var_terms.size() > max_terms)
+      break;
+
+    std::unordered_set<exprt, irep_hash> new_ground;
+    for(const auto &v : var_terms)
+    {
+      for(const auto &r : offsets)
+      {
+        exprt ground_term;
+        if(r.is_zero())
+          ground_term = typecast_exprt::conditional_cast(v, r.type());
+        else
+        {
+          ground_term = simplify_expr(
+            plus_exprt(typecast_exprt::conditional_cast(v, r.type()), r), ns);
+        }
+        if(all_ground.find(ground_term) == all_ground.end())
+          new_ground.insert(ground_term);
+      }
+    }
+    for(auto &g : new_ground)
+    {
+      if(all_ground.insert(std::move(g)).second)
+        changed = true;
+    }
+    if(all_ground.size() > max_terms)
+      break;
+  }
+
+  return var_terms;
+}
+
+/// Eliminate the quantifier in \p q_expr via complete instantiation
+/// using ground terms from \p context_map.
+///
+/// Implements the approach from Ge & de Moura, "Complete
+/// instantiation for quantified formulas in SMT" (CAV 2009).
+/// The procedure:
+///   1. Identifies how the bound variable is used as an array index
+///      (find_index_contexts), corresponding to the paper's
+///      identification of uninterpreted function applications.
+///   2. Collects ground index terms from the bitvector cache
+///      (collect_ground_indices), seeding the sets A_{f,j}.
+///   3. Computes the fixed point of the set constraint system ΔF
+///      (compute_instantiation_set), yielding the instantiation
+///      terms S_{k,i}.
+///   4. Instantiates the quantifier body with each term and
+///      combines: conjunction for forall, disjunction for exists.
+///
+/// \param q_expr: the quantifier expression to eliminate
+/// \param context_map: the bitvector cache (bv_cache) mapping
+///   expressions to their bitvector encodings
+/// \param ns: namespace for expression simplification
+/// \return quantifier-free expression, or nullopt if instantiation
+///   was not possible (e.g., no array index contexts found)
+static std::optional<exprt> instantiate_one_quantifier(
+  const quantifier_exprt &q_expr,
+  const std::unordered_map<const exprt, bvt, irep_hash> &context_map,
+  const namespacet &ns)
+{
+  if(q_expr.variables().size() > 1)
+  {
+    // Rewrite Qx,y.P(x,y) as Qy.Qx.P(x,y), just like
+    // eager_quantifier_instantiation does.
+    auto new_variables = q_expr.variables();
+    new_variables.pop_back();
+    quantifier_exprt new_expression{
+      q_expr.id(),
+      q_expr.variables().back(),
+      quantifier_exprt{q_expr.id(), new_variables, q_expr.where()}};
+    return instantiate_one_quantifier(new_expression, context_map, ns);
+  }
+
+  const irep_idt &bound_variable_id = q_expr.symbol().get_identifier();
+
+  // Find all array index contexts where the bound variable appears
+  auto contexts = find_index_contexts(q_expr.where(), bound_variable_id);
+  if(contexts.empty())
+    return {};
+
+  // Collect ground index terms from the cache
+  auto ground_indices = collect_ground_indices(contexts, context_map, ns);
+  if(ground_indices.empty())
+    return {};
+
+  // Compute the complete instantiation set using the paper's set constraint
+  // fixed-point approach
+  auto instantiation_terms = compute_instantiation_set(
+    contexts, ground_indices, q_expr.symbol().type(), ns);
+
+  if(instantiation_terms.empty())
+    return {};
+
+  // Sort instantiation terms for deterministic clause ordering
+  // in the SAT solver. Without sorting, the unordered_set iteration
+  // order depends on expression hashes, which incorporate source
+  // locations (including file paths). This causes MiniSat to see
+  // different clause orderings for the same formula depending on
+  // how the input file is specified, with performance varying from
+  // sub-second to minutes on the same UNSAT instance.
+  std::vector<exprt> sorted_terms(
+    instantiation_terms.begin(), instantiation_terms.end());
+  std::sort(
+    sorted_terms.begin(),
+    sorted_terms.end(),
+    [](const exprt &a, const exprt &b) { return a < b; });
+
+  exprt::operandst instantiations;
+  instantiations.reserve(sorted_terms.size());
+  for(const auto &e : sorted_terms)
+  {
+    exprt::operandst values{
+      {typecast_exprt::conditional_cast(e, q_expr.symbol().type())}};
+    instantiations.push_back(q_expr.instantiate(values));
+  }
+
+  if(q_expr.id() == ID_exists)
+    return disjunction(instantiations);
+  else
+  {
+    PRECONDITION(q_expr.id() == ID_forall);
+    return conjunction(instantiations);
+  }
+}
+
 void boolbvt::finish_eager_conversion_quantifiers()
 {
-  if(quantifier_list.empty())
-    return;
+  // Nested quantifiers may yield additional entries in quantifier_list via
+  // convert.
+  while(!quantifier_list.empty())
+  {
+    std::list<quantifiert> remaining_quantifiers;
+    std::swap(quantifier_list, remaining_quantifiers);
+    std::list<std::optional<exprt>> instantiations;
 
-  // we do not yet have any elaborate post-processing
-  for(const auto &q : quantifier_list)
-    conversion_failed(q.expr);
+    for(const auto &q : remaining_quantifiers)
+    {
+      instantiations.push_back(
+        instantiate_one_quantifier(to_quantifier_expr(q.expr), bv_cache, ns));
+    }
+
+    auto instantiations_it = instantiations.begin();
+    for(const auto &q : remaining_quantifiers)
+    {
+      if(!instantiations_it->has_value())
+      {
+        conversion_failed(q.expr);
+        ++instantiations_it;
+        continue;
+      }
+
+      literalt result_lit = convert(**instantiations_it);
+      prop.l_set_to_true(prop.lequal(q.l, result_lit));
+      ++instantiations_it;
+    }
+  }
 }

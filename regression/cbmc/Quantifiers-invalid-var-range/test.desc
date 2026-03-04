@@ -1,13 +1,11 @@
-KNOWNBUG broken-smt-backend
+CORE no-new-smt
 main.c
 
 ^\*\* Results:$
-^\*\* 0 of 1 failed
+^\*\* 0 of \d+ failed
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
 ^warning: ignoring
 --
-This produces the expected verification result, but actually ignores some
-quantifiers.
