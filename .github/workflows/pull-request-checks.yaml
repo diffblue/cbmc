@@ -753,6 +753,18 @@ jobs:
           submodules: recursive
       - name: Setup Visual Studio environment
         uses: microsoft/setup-msbuild@v2
+      - name: Get current month for cache key
+        id: cache-key
+        run: echo "month=$(Get-Date -Format 'yyyy-MM')" >> $env:GITHUB_OUTPUT
+      - name: Cache Chocolatey packages
+        uses: actions/cache@v5
+        with:
+          path: |
+            C:\ProgramData\chocolatey\lib
+            C:\ProgramData\chocolatey\bin
+          key: ${{ runner.os }}-choco-${{ steps.cache-key.outputs.month }}-winflexbison3
+          restore-keys: |
+            ${{ runner.os }}-choco-${{ steps.cache-key.outputs.month }}
       - name: Fetch dependencies
         run: |
           function Require-Tool($Name) {
@@ -823,6 +835,18 @@ jobs:
           submodules: recursive
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
+      - name: Get current month for cache key
+        id: cache-key
+        run: echo "month=$(Get-Date -Format 'yyyy-MM')" >> $env:GITHUB_OUTPUT
+      - name: Cache Chocolatey packages
+        uses: actions/cache@v5
+        with:
+          path: |
+            C:\ProgramData\chocolatey\lib
+            C:\ProgramData\chocolatey\bin
+          key: ${{ runner.os }}-choco-${{ steps.cache-key.outputs.month }}-winflexbison3-strawberryperl-wget
+          restore-keys: |
+            ${{ runner.os }}-choco-${{ steps.cache-key.outputs.month }}
       - name: Fetch dependencies
         run: |
           function Require-Tool($Name) {
@@ -910,6 +934,18 @@ jobs:
           submodules: recursive
       - name: Setup Visual Studio environment
         uses: microsoft/setup-msbuild@v2
+      - name: Get current month for cache key
+        id: cache-key
+        run: echo "month=$(Get-Date -Format 'yyyy-MM')" >> $env:GITHUB_OUTPUT
+      - name: Cache Chocolatey packages
+        uses: actions/cache@v5
+        with:
+          path: |
+            C:\ProgramData\chocolatey\lib
+            C:\ProgramData\chocolatey\bin
+          key: ${{ runner.os }}-choco-${{ steps.cache-key.outputs.month }}-winflexbison3
+          restore-keys: |
+            ${{ runner.os }}-choco-${{ steps.cache-key.outputs.month }}
       - name: Fetch dependencies
         run: |
           function Require-Tool($Name) {
