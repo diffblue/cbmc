@@ -261,9 +261,34 @@ jobs:
           submodules: recursive
       - name: Setup Visual Studio environment
         uses: microsoft/setup-msbuild@v2
+      - name: Get current month for cache key
+        id: cache-key
+        run: echo "month=$(Get-Date -Format 'yyyy-MM')" >> $env:GITHUB_OUTPUT
+      - name: Cache Chocolatey packages
+        uses: actions/cache@v5
+        with:
+          path: |
+            C:\ProgramData\chocolatey\lib
+            C:\ProgramData\chocolatey\bin
+          key: ${{ runner.os }}-choco-${{ steps.cache-key.outputs.month }}-winflexbison3
+          restore-keys: |
+            ${{ runner.os }}-choco-${{ steps.cache-key.outputs.month }}
       - name: Fetch dependencies
         run: |
+          function Require-Tool($Name) {
+            if (-not (Get-Command $Name -ErrorAction SilentlyContinue)) {
+              Write-Output "::error ::Required tool '$Name' not found in PATH after Chocolatey installation."
+              exit 1
+            }
+          }
           choco install winflexbison3
+          if($LastExitCode -ne 0)
+          {
+            Write-Output "::error ::Dependency installation via Chocolatey failed."
+            exit $LastExitCode
+          }
+          Require-Tool win_flex
+          Require-Tool win_bison
           nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
           echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
       - name: Setup code sign environment
