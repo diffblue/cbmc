@@ -110,13 +110,30 @@ foreach my $f (keys(%edits))
 {
   my $f_edit="$dir/$f";
 
+  # collect line numbers to prefix
+  my %prefixes=();
   foreach my $l (keys(%{$edits{$f}}))
   {
     if($edits{$f}{$l} =~ /^[CDcd]$/)
     {
-      `sed -i '${l}s/^/$edits{$f}{$l}#/' $f_edit`;
+      $prefixes{$l}=$edits{$f}{$l};
     }
   }
+
+  next unless %prefixes;
+
+  open(my $fh, '<', $f_edit) or die "Cannot read $f_edit: $!\n";
+  my @lines=<$fh>;
+  close($fh);
+
+  foreach my $l (keys(%prefixes))
+  {
+    $lines[$l - 1]="$prefixes{$l}#$lines[$l - 1]" if $l <= scalar(@lines);
+  }
+
+  open($fh, '>', $f_edit) or die "Cannot write $f_edit: $!\n";
+  print $fh @lines;
+  close($fh);
 }
 
 my @diff_to_clean=split('\n', `cd $dir && diff -urN $old $new`);
