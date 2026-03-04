@@ -152,9 +152,9 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    ```
    Note that you need g++ version 7.0 or newer.
 
-   On Amazon Linux and similar distributions, do as root:
+   On Amazon Linux 2023 and similar distributions, do as root:
    ```
-   yum install gcc72-c++ flex bison curl patch tar
+   yum install gcc-c++ flex bison patch tar
    ```
 
    To compile JBMC, you additionally need the JDK and Maven 3. You also
