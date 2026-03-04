@@ -755,12 +755,20 @@ jobs:
         uses: microsoft/setup-msbuild@v2
       - name: Fetch dependencies
         run: |
+          function Require-Tool($Name) {
+            if (-not (Get-Command $Name -ErrorAction SilentlyContinue)) {
+              Write-Output "::error ::Required tool '$Name' not found in PATH after Chocolatey installation."
+              exit 1
+            }
+          }
           choco install winflexbison3
           if($LastExitCode -ne 0)
           {
             Write-Output "::error ::Dependency installation via Chocolatey failed."
             exit $LastExitCode
           }
+          Require-Tool win_flex
+          Require-Tool win_bison
           nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
           echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
           Invoke-WebRequest -Uri https://github.com/Z3Prover/z3/releases/download/z3-4.8.10/z3-4.8.10-x64-win.zip -OutFile .\z3.zip
@@ -817,12 +825,22 @@ jobs:
         uses: microsoft/setup-msbuild@v2
       - name: Fetch dependencies
         run: |
+          function Require-Tool($Name) {
+            if (-not (Get-Command $Name -ErrorAction SilentlyContinue)) {
+              Write-Output "::error ::Required tool '$Name' not found in PATH after Chocolatey installation."
+              exit 1
+            }
+          }
           choco install -y winflexbison3 strawberryperl wget
           if($LastExitCode -ne 0)
           {
             Write-Output "::error ::Dependency installation via Chocolatey failed."
             exit $LastExitCode
           }
+          Require-Tool win_flex
+          Require-Tool win_bison
+          Require-Tool perl
+          Require-Tool wget.exe
           nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
           echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
           echo "c:\Strawberry\" >> $env:GITHUB_PATH
@@ -894,12 +912,20 @@ jobs:
         uses: microsoft/setup-msbuild@v2
       - name: Fetch dependencies
         run: |
+          function Require-Tool($Name) {
+            if (-not (Get-Command $Name -ErrorAction SilentlyContinue)) {
+              Write-Output "::error ::Required tool '$Name' not found in PATH after Chocolatey installation."
+              exit 1
+            }
+          }
           choco install winflexbison3
           if($LastExitCode -ne 0)
           {
             Write-Output "::error ::Dependency installation via Chocolatey failed."
             exit $LastExitCode
           }
+          Require-Tool win_flex
+          Require-Tool win_bison
           nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
           echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
       - name: Prepare ccache
