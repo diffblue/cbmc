@@ -1,5 +1,6 @@
 var NAVTREEINDEX73 =
 {
+"contracts-dev-spec-contract-checking-rec.html":[1,1,0,8],
 "contracts-dev-spec-contract-checking.html":[1,1,0,7],
 "contracts-dev-spec-contract-checking.html#autotoc_md32":[1,1,0,7,0],
 "contracts-dev-spec-contract-checking.html#autotoc_md33":[1,1,0,7,1],
@@ -248,6 +249,5 @@ var NAVTREEINDEX73 =
 "convert__expr__to__smt_8cpp.html#ae91c6da17c1454d962ae2e0c85206e93":[8,0,2,27,9,5,72],
 "convert__expr__to__smt_8cpp.html#ae9a89823fefa38a0ed46657c39c9280c":[8,0,2,27,9,5,13],
 "convert__expr__to__smt_8cpp.html#ae9f426fff2f1bcb763885cb5638f9931":[8,0,2,27,9,5,64],
-"convert__expr__to__smt_8cpp.html#aef9ab9138e4406314e39cacc34102bc1":[8,0,2,27,9,5,12],
-"convert__expr__to__smt_8cpp.html#af2cd9de42fe30a811ea1695ca9281d1c":[8,0,2,27,9,5,8]
+"convert__expr__to__smt_8cpp.html#aef9ab9138e4406314e39cacc34102bc1":[8,0,2,27,9,5,12]
 };

@@ -114,7 +114,7 @@ $(document).ready(function(){initNavTree('classgoto__symex__property__decidert.h
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classgoto__symex__property__decidert__coll__graph.svg" width="3410" height="1703"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classgoto__symex__property__decidert__coll__graph.svg" width="3404" height="1750"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
@@ -161,9 +161,9 @@ Protected Attributes</h2></td></tr>
 <tr class="separator:acabc0f04cd07017a618f28b689070d77"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab93eb0db64eb5833dceb5aaeb0e2fda6" id="r_ab93eb0db64eb5833dceb5aaeb0e2fda6"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classsolver__factoryt_1_1solvert.html">solver_factoryt::solvert</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symex__property__decidert.html#ab93eb0db64eb5833dceb5aaeb0e2fda6">solver</a></td></tr>
 <tr class="separator:ab93eb0db64eb5833dceb5aaeb0e2fda6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af7e02c601dd405cd5573035cb0506df9" id="r_af7e02c601dd405cd5573035cb0506df9"><td class="memItemLeft" align="right" valign="top">std::map&lt; <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="structgoto__symex__property__decidert_1_1goalt.html">goalt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symex__property__decidert.html#af7e02c601dd405cd5573035cb0506df9">goal_map</a></td></tr>
-<tr class="memdesc:af7e02c601dd405cd5573035cb0506df9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maintains the relation between a property ID and the corresponding goal variable that encodes the negation of the conjunction of the instances of the property.  <br /></td></tr>
-<tr class="separator:af7e02c601dd405cd5573035cb0506df9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad35352b3f7e143bb5d07022bcf508fab" id="r_ad35352b3f7e143bb5d07022bcf508fab"><td class="memItemLeft" align="right" valign="top">std::map&lt; std::string, <a class="el" href="structgoto__symex__property__decidert_1_1goalt.html">goalt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgoto__symex__property__decidert.html#ad35352b3f7e143bb5d07022bcf508fab">goal_map</a></td></tr>
+<tr class="memdesc:ad35352b3f7e143bb5d07022bcf508fab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maintains the relation between a property ID and the corresponding goal variable that encodes the negation of the conjunction of the instances of the property.  <br /></td></tr>
+<tr class="separator:ad35352b3f7e143bb5d07022bcf508fab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Provides management of goal variables that encode properties. </p>
@@ -440,8 +440,8 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="af7e02c601dd405cd5573035cb0506df9" name="af7e02c601dd405cd5573035cb0506df9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af7e02c601dd405cd5573035cb0506df9">&#9670;&#160;</a></span>goal_map</h2>
+<a id="ad35352b3f7e143bb5d07022bcf508fab" name="ad35352b3f7e143bb5d07022bcf508fab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad35352b3f7e143bb5d07022bcf508fab">&#9670;&#160;</a></span>goal_map</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -450,7 +450,7 @@ Protected Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::map&lt;<a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>, <a class="el" href="structgoto__symex__property__decidert_1_1goalt.html">goalt</a>&gt; goto_symex_property_decidert::goal_map</td>
+          <td class="memname">std::map&lt;std::string, <a class="el" href="structgoto__symex__property__decidert_1_1goalt.html">goalt</a>&gt; goto_symex_property_decidert::goal_map</td>
         </tr>
       </table>
   </td>
@@ -461,8 +461,9 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Maintains the relation between a property ID and the corresponding goal variable that encodes the negation of the conjunction of the instances of the property. </p>
+<p>Uses <code>std::string</code> to maintain consistent (lexicographic) ordering as we iterate over this map to produce constraints. </p>
 
-<p class="definition">Definition at line <a class="el" href="goto__symex__property__decider_8h_source.html#l00088">88</a> of file <a class="el" href="goto__symex__property__decider_8h_source.html">goto_symex_property_decider.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="goto__symex__property__decider_8h_source.html#l00089">89</a> of file <a class="el" href="goto__symex__property__decider_8h_source.html">goto_symex_property_decider.h</a>.</p>
 
 </div>
 </div>

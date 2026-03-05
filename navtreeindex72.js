@@ -1,5 +1,6 @@
 var NAVTREEINDEX72 =
 {
+"classwriteable__object__exprt.html#ae627aa1d90a428967969e30d0afa0a58":[7,0,1385,2],
 "classxml__parse__treet.html":[7,0,1388],
 "classxml__parse__treet.html#a0da20e9bab4193e945bedcd289090c7f":[7,0,1388,0],
 "classxml__parse__treet.html#a51085ecca507566dc7f8fa816f73aa05":[7,0,1388,1],
@@ -248,6 +249,5 @@ var NAVTREEINDEX72 =
 "contracts-dev-arch.html#autotoc_md29":[1,1,1,0],
 "contracts-dev-spec-codegen.html":[1,1,0,2],
 "contracts-dev-spec-codegen.html#contracts-dev-spec-codegen-assigns":[1,1,0,2,0],
-"contracts-dev-spec-codegen.html#contracts-dev-spec-codegen-frees":[1,1,0,2,1],
-"contracts-dev-spec-contract-checking-rec.html":[1,1,0,8]
+"contracts-dev-spec-codegen.html#contracts-dev-spec-codegen-frees":[1,1,0,2,1]
 };

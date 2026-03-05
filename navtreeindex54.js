@@ -1,5 +1,6 @@
 var NAVTREEINDEX54 =
 {
+"classqbf__qubet.html#a07807ab41f06e40930799e33072b734d":[7,0,967,0],
 "classqbf__qubet.html#a3548f89f0e5326dbc3f63eb0516c9728":[7,0,967,4],
 "classqbf__qubet.html#a392e222ab47cdc8891391f98b8970652":[7,0,967,2],
 "classqbf__qubet.html#a931f401b4f421f8bb109b56f4984210b":[7,0,967,3],
@@ -248,6 +249,5 @@ var NAVTREEINDEX54 =
 "classreaching__definitions__analysist.html#a72b09ee17779bbf29fa3d767058463ff":[7,0,987,2],
 "classreaching__definitions__analysist.html#a764b1e5c4f57af02b24a2367fbbeb850":[7,0,987,3],
 "classreaching__definitions__analysist.html#a95e405651c3e62d0bb06fcd46c0a3204":[7,0,987,6],
-"classreaching__definitions__analysist.html#abeef78bc00ec8a6587bf004d3db5addc":[7,0,987,9],
-"classreaching__definitions__analysist.html#acb3c7d00e96109008d3bf02a85d82670":[7,0,987,8]
+"classreaching__definitions__analysist.html#abeef78bc00ec8a6587bf004d3db5addc":[7,0,987,9]
 };

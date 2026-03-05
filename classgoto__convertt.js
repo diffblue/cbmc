@@ -114,6 +114,7 @@ var classgoto__convertt =
     [ "remove_temporary_object", "classgoto__convertt.html#ac749ccda89c31497bc6b407c5f0ace78", null ],
     [ "replace_new_object", "classgoto__convertt.html#adc85536cf4c396f6b85a6869fb298637", null ],
     [ "rewrite_boolean", "classgoto__convertt.html#afa99932c96acb29be2fd44adb4e664a7", null ],
+    [ "set_prefix", "classgoto__convertt.html#a0dd39af7e76b8c5c5b5b0cac86e81540", null ],
     [ "unwind_destructor_stack", "classgoto__convertt.html#a3f3664ce39f89245c6b5d22184c372a5", null ],
     [ "lifetime", "classgoto__convertt.html#a7e735af91539dd6b11e8525e335fee22", null ],
     [ "ns", "classgoto__convertt.html#ab7612c51c84b125e43d2002c64112fc6", null ],
