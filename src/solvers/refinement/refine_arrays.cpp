@@ -40,14 +40,25 @@ void bv_refinementt::arrays_overapproximated()
 
   unsigned nb_active=0;
 
-  std::list<lazy_constraintt>::iterator it=lazy_array_constraints.begin();
-  while(it!=lazy_array_constraints.end())
+  // Evaluate all lazy constraints while the solver is still in SAT state.
+  // We must not interleave get_value() calls with modifications to the
+  // main solver (prop) because some SAT solvers (e.g., CaDiCaL) only
+  // permit reading model values while in the satisfied state, and adding
+  // clauses invalidates that state.
+  struct evaluated_constraintt
   {
-    satcheck_no_simplifiert sat_check{log.get_message_handler()};
-    bv_pointerst solver{ns, sat_check, log.get_message_handler()};
-    solver.unbounded_array=bv_pointerst::unbounded_arrayt::U_ALL;
+    exprt constraint;
+    exprt simplified;
+    std::list<lazy_constraintt>::iterator list_it;
+  };
+  std::vector<evaluated_constraintt> to_check;
+  to_check.reserve(lazy_array_constraints.size());
 
-    exprt current=(*it).lazy;
+  for(auto it = lazy_array_constraints.begin();
+      it != lazy_array_constraints.end();
+      ++it)
+  {
+    const exprt &current = it->lazy;
 
     // some minor simplifications
     // check if they are worth having
@@ -57,7 +68,6 @@ void bv_refinementt::arrays_overapproximated()
       exprt implies_simplified = get_value(imp.op0());
       if(implies_simplified==false_exprt())
       {
-        ++it;
         continue;
       }
     }
@@ -71,23 +81,31 @@ void bv_refinementt::arrays_overapproximated()
       exprt o2 = get_value(orexp.op1());
       if(o1==true_exprt() || o2 == true_exprt())
       {
-        ++it;
         continue;
       }
     }
 
-    exprt simplified = get_value(current);
-    solver << simplified;
+    to_check.push_back({current, get_value(current), it});
+  }
+
+  // Now check each evaluated constraint using a local solver and activate
+  // violated ones. This phase may modify the main solver (prop).
+  for(auto &entry : to_check)
+  {
+    satcheck_no_simplifiert sat_check{log.get_message_handler()};
+    bv_pointerst solver{ns, sat_check, log.get_message_handler()};
+    solver.unbounded_array = bv_pointerst::unbounded_arrayt::U_ALL;
+
+    solver << entry.simplified;
 
     switch(static_cast<decision_proceduret::resultt>(sat_check.prop_solve()))
     {
     case decision_proceduret::resultt::D_SATISFIABLE:
-      ++it;
       break;
     case decision_proceduret::resultt::D_UNSATISFIABLE:
-      prop.l_set_to_true(convert(current));
+      prop.l_set_to_true(convert(entry.constraint));
       nb_active++;
-      lazy_array_constraints.erase(it++);
+      lazy_array_constraints.erase(entry.list_it);
       break;
     case decision_proceduret::resultt::D_ERROR:
       INVARIANT(false, "error in array over approximation check");
