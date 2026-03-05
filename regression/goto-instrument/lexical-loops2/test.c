@@ -1,13 +1,14 @@
-
-int main(int argc, char **argv)
+int main()
 {
   int i = 0;
+  int count;
+  __CPROVER_assume(count > 10);
 
   while(i < 10)
   {
     ++i;
-    argc--;
+    count--;
   }
 
-  return argc;
+  return count;
 }

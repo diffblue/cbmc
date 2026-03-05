@@ -1,10 +1,12 @@
-int main(int argc, char **argv)
+int main()
 {
+  int count;
+  __CPROVER_assume(count > 0);
 loop_header:
-  --argc;
-  if(argc == 1)
+  --count;
+  if(count == 1)
     goto loop_header;
-  else if(argc == 2)
+  else if(count == 2)
     goto loop_header;
-  return argc;
+  return count;
 }

@@ -1,17 +1,17 @@
-
-int main(int argc, char **argv)
+int main()
 {
   int i = 0;
+  int count;
 
   while(i < 10)
   {
-    if(argc == 5)
+    if(count == 5)
       break;
     ++i;
-    if(argc % 7)
+    if(count % 7)
       continue;
-    argc--;
+    count--;
   }
 
-  return argc;
+  return count;
 }

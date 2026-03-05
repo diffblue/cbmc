@@ -82,10 +82,11 @@ protected:
     exprt as_expr() const;
   };
 
-  /// Maintains the relation between a property ID and
-  /// the corresponding goal variable that encodes
-  /// the negation of the conjunction of the instances of the property
-  std::map<irep_idt, goalt> goal_map;
+  /// Maintains the relation between a property ID and the corresponding goal
+  /// variable that encodes the negation of the conjunction of the instances of
+  /// the property. Uses `std::string` to maintain consistent (lexicographic)
+  /// ordering as we iterate over this map to produce constraints.
+  std::map<std::string, goalt> goal_map;
 };
 
 #endif // CPROVER_GOTO_CHECKER_GOTO_SYMEX_PROPERTY_DECIDER_H

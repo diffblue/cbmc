@@ -1,7 +1,7 @@
 CORE
 test.c
 --show-lexical-loops _ --no-standard-checks
-2 is head of \{ 2, 3, 4, 5 \(backedge\) \}
+15 is head of \{ 15, 16, 17, 18 \(backedge\) \}
 ^EXIT=0$
 ^SIGNAL=0$
 --

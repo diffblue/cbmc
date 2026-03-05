@@ -209,7 +209,9 @@ void smt2_convt::write_footer()
 {
   out << "\n";
 
-  // fix up the object sizes
+  // Output object size definitions
+  // Note: object_sizes is std::map, so iteration is deterministic (sorted by
+  // key)
   for(const auto &object : object_sizes)
     define_object_size(object.second, object.first);
 
@@ -243,6 +245,9 @@ void smt2_convt::write_footer()
 
   if(solver!=solvert::BOOLECTOR)
   {
+    // Output get-value commands for all identifiers
+    // Note: smt2_identifiers is std::set, so iteration is deterministic
+    // (sorted)
     for(const auto &id : smt2_identifiers)
       out << "(get-value (" << id << "))"
           << "\n";
@@ -5281,6 +5286,15 @@ exprt smt2_convt::prepare_for_convert_expr(const exprt &expr)
   return lowered_expr;
 }
 
+/// Find and declare symbols used in an expression
+/// This function traverses the expression tree and creates SMT2 declarations
+/// for all symbols (variables) found. Symbols are added to identifier_map to
+/// avoid duplication declarations.
+///
+/// Determinism: The traversal of expression trees is deterministic, and solely
+/// depends on syntactic expression structure, not expression hash codes.
+///
+/// \param expr: expression to scan for symbols
 void smt2_convt::find_symbols(const exprt &expr)
 {
   if(is_zero_width(expr.type(), ns))

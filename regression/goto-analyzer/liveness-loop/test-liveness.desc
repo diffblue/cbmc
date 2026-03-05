@@ -3,8 +3,8 @@ main.c
 --no-standard-checks --variable-sensitivity --vsd-values set-of-constants --vsd-liveness --show
 ^EXIT=0$
 ^SIGNAL=0$
-^main::1::x .* TOP @ \[1\]
-^main::1::x .* value-set-begin: 0 :value-set-end @ \[2\]
-^main::1::x .* value-set-begin: 1, 2, 3, 4, 5 :value-set-end @ \[9\]
-^main::1::x .* value-set-begin: 0, 1, 2, 3, 4, 5 :value-set-end @ \[5\]
+^main::1::x .* TOP @ \[15\]
+^main::1::x .* value-set-begin: 0 :value-set-end @ \[16\]
+^main::1::x .* value-set-begin: 1, 2, 3, 4, 5 :value-set-end @ \[23\]
+^main::1::x .* value-set-begin: 0, 1, 2, 3, 4, 5 :value-set-end @ \[19\]
 --

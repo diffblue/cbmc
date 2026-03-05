@@ -3,5 +3,5 @@ main.c
 --no-standard-checks --variable-sensitivity --vsd-values intervals --show
 ^EXIT=0$
 ^SIGNAL=0$
-main::1::z \(\) -> \[3, 3\] @ \[5\]
+main::1::z \(\) -> \[3, 3\] @ \[19\]
 --

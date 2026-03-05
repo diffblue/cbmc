@@ -203,6 +203,8 @@ dfcc_wrapper_programt::dfcc_wrapper_programt(
     ns(goto_model.symbol_table),
     converter(goto_model.symbol_table, log.get_message_handler())
 {
+  converter.set_prefix(id2string(wrapper_symbol.name) + "::$tmp");
+
   // generate a return value symbol (needed to instantiate all contract lambdas)
   if(contract_code_type.return_type().id() != ID_empty)
   {

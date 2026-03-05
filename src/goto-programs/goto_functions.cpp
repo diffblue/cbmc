@@ -21,10 +21,11 @@ Date: June 2003
 void goto_functionst::compute_location_numbers()
 {
   unused_location_number = 0;
-  for(auto &func : function_map)
+  auto sorted_funcs = sorted();
+  for(auto &it : sorted_funcs)
   {
     // Side-effect: bumps unused_location_number.
-    func.second.body.compute_location_numbers(unused_location_number);
+    it->second.body.compute_location_numbers(unused_location_number);
   }
 }
 

@@ -50,6 +50,11 @@ public:
   {
   }
 
+  void set_prefix(const std::string &prefix)
+  {
+    tmp_symbol_prefix = prefix;
+  }
+
 protected:
   symbol_table_baset &symbol_table;
   namespacet ns;

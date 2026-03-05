@@ -178,6 +178,7 @@ protected:
   /// ```
   ///
   /// \param[in] loop_id Id of the loop to transform.
+  /// \param[in] function_id Id of the function.
   /// \param[inout] goto_function The function containing the loop.
   /// \param[inout] symbol_table Symbol table of the model.
   /// \param[inout] loop_head Head node of the loop.
@@ -195,6 +196,7 @@ protected:
   /// \return `history_var_map` that maps variables to loop_entry variables.
   std::unordered_map<exprt, symbol_exprt, irep_hash> add_prehead_instructions(
     const std::size_t loop_id,
+    const irep_idt &function_id,
     goto_functionst::goto_functiont &goto_function,
     symbol_table_baset &symbol_table,
     goto_programt::targett loop_head,
@@ -277,6 +279,7 @@ protected:
   ///
   /// \param[in] loop_id Id assigned to the loop by the `cfg_info` numbering.
   /// \param[in] cbmc_loop_id Id assigned to the loop by CBMC's numbering.
+  /// \param[in] function_id Id of the function.
   /// \param[inout] goto_function The function containing the loop.
   /// \param[inout] symbol_table Symbol table of the model.
   /// \param[in] loop_head Head node of the loop.
@@ -292,6 +295,7 @@ protected:
   void add_body_instructions(
     const std::size_t loop_id,
     const std::size_t cbmc_loop_id,
+    const irep_idt &function_id,
     goto_functionst::goto_functiont &goto_function,
     symbol_table_baset &symbol_table,
     goto_programt::targett loop_head,

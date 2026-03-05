@@ -1,11 +1,11 @@
 CORE
 main.c
 --show-natural-loops
-0 is head of \{ 0, 1, 2 \(backedge\), 4 \(backedge\) \}
+14 is head of \{ 14, 15, 16 \(backedge\), 18 \(backedge\) \}
 ^EXIT=0$
 ^SIGNAL=0$
 --
 ^warning: ignoring
 --
-In the line beginning "0 is head of" we expect to get 0, 1, 2 and 4 in some
-order
+In the line beginning "14 is head of" we expect to get 14, 15, 16 and 18 in some
+order.

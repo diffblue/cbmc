@@ -1,6 +1,6 @@
 CORE
 test.c
 --ensure-one-backedge-per-target --show-natural-loops
-^2 is head of \{ 2, 3, 4, 5, 6, 10, 11, 12 \(backedge\) \}$
+^14 is head of \{ 14, 15, 16, 17, 18, 22, 23, 24 \(backedge\) \}$
 ^EXIT=0$
 ^SIGNAL=0$

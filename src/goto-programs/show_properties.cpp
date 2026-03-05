@@ -180,8 +180,10 @@ void show_properties_json(
   messaget msg(message_handler);
   json_arrayt json_properties;
 
-  for(const auto &fct : goto_functions.function_map)
-    convert_properties_json(json_properties, ns, fct.first, fct.second.body);
+  // sort alphabetically
+  const auto sorted = goto_functions.sorted();
+  for(const auto &it : sorted)
+    convert_properties_json(json_properties, ns, it->first, it->second.body);
 
   json_objectt json_result{{"properties", json_properties}};
   msg.result() << json_result;
@@ -196,8 +198,12 @@ void show_properties(
   if(ui == ui_message_handlert::uit::JSON_UI)
     show_properties_json(ns, ui_message_handler, goto_functions);
   else
-    for(const auto &fct : goto_functions.function_map)
-      show_properties(ns, fct.first, ui_message_handler, ui, fct.second.body);
+  {
+    // sort alphabetically
+    const auto sorted = goto_functions.sorted();
+    for(const auto &it : sorted)
+      show_properties(ns, it->first, ui_message_handler, ui, it->second.body);
+  }
 }
 
 void show_properties(
