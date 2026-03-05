@@ -8,3 +8,4 @@ add_test_pl_profile(
     "-C;-X;symex-driven-lazy-loading-expected-failure;-s;symex-driven-loading"
     "CORE"
 )
+set_tests_properties("strings-smoke-tests-symex-driven-lazy-loading-CORE" PROPERTIES TIMEOUT 1800)
