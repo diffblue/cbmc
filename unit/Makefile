@@ -54,6 +54,7 @@ SRC += analyses/ai/ai.cpp \
        ansi-c/c_typecheck_base.cpp \
        big-int/big-int.cpp \
        cpp/cpp_parser.cpp \
+       cpp/cpp_scanner.cpp \
        compound_block_locations.cpp \
        empty_namespace_test.cpp \
        get_goto_model_from_c_test.cpp \
