@@ -19,6 +19,7 @@ Author: Michael Tautschnig
 
 tvt satcheck_cadical_baset::l_get(literalt a) const
 {
+  PRECONDITION(solver_state == propt::statust::SAT);
   if(a.is_constant())
     return tvt(a.sign());
 
@@ -195,6 +196,8 @@ satcheck_cadical_baset::~satcheck_cadical_baset()
 
 bool satcheck_cadical_baset::is_in_conflict(literalt a) const
 {
+  PRECONDITION(solver_state == propt::statust::UNSAT);
+  PRECONDITION(!a.is_constant());
   return solver->failed(a.dimacs());
 }
 
