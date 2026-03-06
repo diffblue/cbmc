@@ -106,7 +106,7 @@ Applying loop and/or function contracts transformations (without the dynamic fra
 </div><!-- fragment --><p>Where:</p><ul>
 <li><code>--apply-loop-contracts</code> is optional and specifies to apply loop contracts globally;</li>
 <li><code>--enforce-contract &lt;function&gt;</code> is optional and specifies that <code>function</code> must be checked against its contract.</li>
-<li><code>--replace-call-with-contract &lt;function&gt;</code> is optional and specifies that all calls to <code>function</code> must be replaced with its contract;</li>
+<li><code>--replace-call-with-contract &lt;function&gt;</code> is optional and specifies that all calls to <code>function</code> must be replaced with its contract. It is an error if no applicable contract can be found.</li>
 </ul>
 <h1><a class="anchor" id="autotoc_md75"></a>
 Applying the function contracts transformation (with the dynamic frames method)</h1>
@@ -115,7 +115,7 @@ Applying the function contracts transformation (with the dynamic frames method)<
 </div><!-- fragment --><p>Where:</p><ul>
 <li><code>--dfcc harness</code> specifies the proof harness (i.e. the entry point of the analysis);</li>
 <li><code>--enforce-contract &lt;function&gt;[/&lt;contract&gt;]</code> is optional and specifies that <code>function</code> must be checked against <code>contract</code>. When <code>contract</code> is not specfied, the contract is assumed to be carried by the <code>function</code> itself.</li>
-<li><code>--replace-call-with-contract &lt;function&gt;[/&lt;contract&gt;]</code> is optional and specifies that all calls to <code>function</code> must be replaced with <code>contract</code>. When <code>contract</code> is not specfied, the contract is assumed to be carried by the <code>function</code> itself. </li>
+<li><code>--replace-call-with-contract &lt;function&gt;[/&lt;contract&gt;]</code> is optional and specifies that all calls to <code>function</code> must be replaced with <code>contract</code>. When <code>contract</code> is not specfied, the contract is assumed to be carried by the <code>function</code> itself. It is an error if no applicable contract can be found (either because <code>contract</code> is specified but cannot be found, or because <code>contract</code> is not specified and <code>function</code> does not have an attached contract). </li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
