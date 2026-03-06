@@ -39,8 +39,7 @@ public:
       __float128_is_keyword(false),
       float16_type(false),
       bf16_type(false),
-      fp16_type(false),
-      last_input_ended_with_newline(false)
+      fp16_type(false)
   {
     // set up global scope
     scopes.clear();
@@ -74,11 +73,6 @@ public:
   bool float16_type;
   bool bf16_type;
   bool fp16_type;
-
-  // tracks whether the last YY_INPUT call ended with a newline, used to
-  // defer line number increments so that lines exceeding the flex input
-  // buffer size are counted correctly
-  bool last_input_ended_with_newline;
 
   typedef ansi_c_identifiert identifiert;
   typedef ansi_c_scopet scopet;

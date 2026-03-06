@@ -50,46 +50,6 @@ static int isatty(int) { return 0; }
 extern int yyansi_cdebug;
 #endif
 
-// Override YY_INPUT from parser.h to defer line-number increments.
-// The default YY_INPUT increments line_no when reading '\n' and then
-// breaks, which means the increment happens at the END of a line.
-// For lines that fit in the flex input buffer this works because the
-// entire line (including '\n') is read before flex matches tokens.
-// For lines exceeding the buffer, the '\n' is read in a later call,
-// so tokens are matched with a line_no that is one too low.
-// This version sets a flag when '\n' is read and defers the increment
-// to the start of the next YY_INPUT call, ensuring line_no is correct
-// regardless of line length.
-#undef YY_INPUT
-#define YY_INPUT(buf, result, max_size) \
-    do { \
-        if(PARSER.last_input_ended_with_newline) \
-        { \
-          PARSER.inc_line_no(); \
-          PARSER.last_input_ended_with_newline=false; \
-        } \
-        for(result=0; result<max_size;) \
-        { \
-          char ch; \
-          if(!PARSER.read(ch)) /* NOLINT(readability/braces) */ \
-          { \
-            if(result==0) \
-              result=YY_NULL; \
-            break; \
-          } \
-          \
-          if(ch!='\r') /* NOLINT(readability/braces) */ \
-          { \
-            buf[result++]=ch; \
-            if(ch=='\n') /* NOLINT(readability/braces) */ \
-            { \
-              PARSER.last_input_ended_with_newline=true; \
-              break; \
-            } \
-          } \
-        } \
-    } while(0)
-
 static ansi_c_parsert *ansi_c_parser;
 void ansi_c_scanner_init(ansi_c_parsert &_ansi_c_parser)
 {
