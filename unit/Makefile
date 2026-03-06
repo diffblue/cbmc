@@ -64,6 +64,7 @@ SRC += analyses/ai/ai.cpp \
        goto-instrument/cover_instrument.cpp \
        goto-instrument/cover/cover_only.cpp \
        goto-synthesizer/expr_enumerator/expr_enumerator.cpp \
+       goto-programs/elf_reader.cpp \
        goto-programs/goto_program_assume.cpp \
        goto-programs/goto_program_dead.cpp \
        goto-programs/goto_program_declaration.cpp \
