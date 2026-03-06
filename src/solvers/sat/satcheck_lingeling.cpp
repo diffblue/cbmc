@@ -50,6 +50,7 @@ std::string satcheck_lingelingt::solver_text() const
 
 void satcheck_lingelingt::lcnf(const bvt &bv)
 {
+  clear_status();
   bvt new_bv;
 
   if(process_clause(bv, new_bv))

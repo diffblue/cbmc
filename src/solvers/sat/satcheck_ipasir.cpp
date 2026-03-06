@@ -66,6 +66,7 @@ std::string satcheck_ipasirt::solver_text() const
 
 void satcheck_ipasirt::lcnf(const bvt &bv)
 {
+  clear_status();
   for(const auto &literal : bv)
   {
     if(literal.is_true())

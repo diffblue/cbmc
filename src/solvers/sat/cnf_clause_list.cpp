@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void cnf_clause_listt::lcnf(const bvt &bv)
 {
+  clear_status();
   bvt new_bv;
 
   if(process_clause(bv, new_bv))

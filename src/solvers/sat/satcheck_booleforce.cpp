@@ -65,6 +65,7 @@ std::string satcheck_booleforce_baset::solver_text() const
 
 void satcheck_booleforce_baset::lcnf(const bvt &bv)
 {
+  clear_status();
   bvt tmp;
 
   if(process_clause(bv, tmp))

@@ -384,6 +384,7 @@ literalt cnft::lselect(literalt a, literalt b, literalt c)
 /// \return New variable as literal
 literalt cnft::new_variable()
 {
+  clear_status();
   literalt l(_no_variables, false);
 
   set_no_variables(_no_variables+1);
@@ -395,6 +396,7 @@ literalt cnft::new_variable()
 /// \return Vector of new variables.
 bvt cnft::new_variables(std::size_t width)
 {
+  clear_status();
   bvt result;
   result.reserve(width);
 

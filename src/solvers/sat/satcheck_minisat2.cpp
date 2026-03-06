@@ -137,6 +137,7 @@ void satcheck_minisat2_baset<T>::add_variables()
 template<typename T>
 void satcheck_minisat2_baset<T>::lcnf(const bvt &bv)
 {
+  clear_status();
   try
   {
     add_variables();
