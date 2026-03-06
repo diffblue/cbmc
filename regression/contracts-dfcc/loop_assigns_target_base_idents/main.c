@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
 #define SIZE 32
-int foo() __CPROVER_assigns()
+int foo() __CPROVER_ensures(1) __CPROVER_assigns()
 {
   char buf1[SIZE];
   char buf2[SIZE];

@@ -1,7 +1,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-void foo(int a, int b)
+void foo(int a, int b) __CPROVER_ensures(1)
 {
   char arr1[10];
   char arr2[10];

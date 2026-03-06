@@ -3,7 +3,7 @@
 
 int x = 0;
 
-void foo(int *y) __CPROVER_assigns()
+void foo(int *y) __CPROVER_ensures(1) __CPROVER_assigns()
 {
   __CPROVER_havoc_object(y);
   x = 2;

@@ -13,7 +13,7 @@ void bar(int *x, int y)
   return;
 }
 
-void foo(int *x) __CPROVER_assigns()
+void foo(int *x) __CPROVER_ensures(1) __CPROVER_assigns()
 {
   // not allowed, failed check in baz
   bar(x, 2);

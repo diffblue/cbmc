@@ -12,7 +12,7 @@ struct pair_of_pairs
   struct pair p2;
 };
 
-int f(struct pair *a) __CPROVER_assigns()
+int f(struct pair *a) __CPROVER_ensures(1) __CPROVER_assigns()
 {
   struct pair_of_pairs *pop =
     (struct pair_of_pairs *)malloc(sizeof(struct pair_of_pairs));

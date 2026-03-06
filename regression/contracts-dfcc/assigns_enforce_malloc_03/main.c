@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-void foo() __CPROVER_assigns()
+void foo() __CPROVER_ensures(1) __CPROVER_assigns()
 {
   char *loc1 = malloc(1);
   char *loc2 = malloc(1);

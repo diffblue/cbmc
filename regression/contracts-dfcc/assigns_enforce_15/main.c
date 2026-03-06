@@ -20,7 +20,7 @@ int baz() __CPROVER_ensures(__CPROVER_return_value == global)
   return global;
 }
 
-void qux(void) __CPROVER_assigns()
+void qux(void) __CPROVER_ensures(1) __CPROVER_assigns()
 {
   global = global + 1;
 }

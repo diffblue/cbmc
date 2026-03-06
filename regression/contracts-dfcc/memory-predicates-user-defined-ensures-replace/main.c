@@ -92,7 +92,7 @@ __CPROVER_ensures(is_double_buffer(*b))
   *b = create_double_buffer(1, 10);
 }
 
-void bar()
+void bar() __CPROVER_ensures(1)
 {
   list_t *l = NULL;
   double_buffer_t *b = NULL;

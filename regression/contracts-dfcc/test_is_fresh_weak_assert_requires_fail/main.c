@@ -12,7 +12,7 @@ __CPROVER_ensures(a[2] == b[2])
 
 int nondet_int();
 
-void bar()
+void bar() __CPROVER_ensures(1)
 {
   int a[6];
   int b[3];
