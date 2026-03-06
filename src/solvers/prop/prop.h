@@ -19,7 +19,22 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cstdint>
 
-/// \brief TO_BE_DOCUMENTED
+/// \brief Abstract interface for propositional logic solvers.
+///
+/// Provides the common API for constructing propositional formulas and solving
+/// them. Formulas are built from \ref literalt variables obtained via
+/// \ref new_variable, combined using Boolean operators (\ref land, \ref lor,
+/// etc.), and constrained via clauses (\ref lcnf) or unit constraints
+/// (\ref l_set_to). Calling \ref prop_solve checks satisfiability; the
+/// satisfying assignment can then be read via \ref l_get, or, in the
+/// unsatisfiable case, the conflict queried via \ref is_in_conflict.
+///
+/// Concrete implementations include SAT solvers (MiniSat, CaDiCaL, etc.)
+/// and structural representations (DIMACS file output, AIG).
+///
+/// The solver supports incremental use: after solving, new constraints or
+/// variables may be added and the solver invoked again. The state machine
+/// below describes which operations are valid in each state.
 ///
 /// A propositional solver follows a state machine:
 ///
