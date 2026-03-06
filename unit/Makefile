@@ -184,6 +184,7 @@ SRC += analyses/ai/ai.cpp \
        util/irep.cpp \
        util/irep_sharing.cpp \
        util/invariant.cpp \
+       util/json.cpp \
        util/json_array.cpp \
        util/json_object.cpp \
        util/lazy.cpp \

@@ -50,7 +50,6 @@ endif()
 list(REMOVE_ITEM sources
     # Don't build
     ${CMAKE_CURRENT_SOURCE_DIR}/smt2_parser.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/json.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/osx_fat_reader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ieee_float.cpp
 
