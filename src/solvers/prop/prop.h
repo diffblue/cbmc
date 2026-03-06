@@ -19,8 +19,24 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cstdint>
 
-/*! \brief TO_BE_DOCUMENTED
-*/
+/// \brief TO_BE_DOCUMENTED
+///
+/// A propositional solver follows a state machine:
+///
+///   UNKNOWN ──prop_solve()──► SAT ──lcnf()/new_variable()──► UNKNOWN
+///      ▲                      │
+///      │                      └──l_get() valid
+///      │
+///   UNKNOWN ──prop_solve()──► UNSAT ──lcnf()/new_variable()──► UNKNOWN
+///                              │
+///                              └──is_in_conflict() valid
+///
+/// After construction, the solver is in the UNKNOWN state. Calling
+/// \ref prop_solve transitions to SAT, UNSAT, or ERROR. Reading the
+/// satisfying assignment via \ref l_get is only valid in the SAT state.
+/// Querying \ref is_in_conflict is only valid in the UNSAT state.
+/// Adding new constraints (\ref lcnf, \ref l_set_to) or variables
+/// (\ref new_variable) transitions back to UNKNOWN.
 class propt
 {
 public:
@@ -46,6 +62,7 @@ public:
 
   virtual void l_set_to(literalt a, bool value)
   {
+    clear_status();
     set_equal(a, const_literal(value));
   }
 
@@ -56,10 +73,17 @@ public:
 
   // constraints
   void lcnf(literalt l0, literalt l1)
-  { lcnf_bv.resize(2); lcnf_bv[0]=l0; lcnf_bv[1]=l1; lcnf(lcnf_bv); }
+  {
+    clear_status();
+    lcnf_bv.resize(2);
+    lcnf_bv[0] = l0;
+    lcnf_bv[1] = l1;
+    lcnf(lcnf_bv);
+  }
 
   void lcnf(literalt l0, literalt l1, literalt l2)
   {
+    clear_status();
     lcnf_bv.resize(3);
     lcnf_bv[0]=l0;
     lcnf_bv[1]=l1;
@@ -69,6 +93,7 @@ public:
 
   void lcnf(literalt l0, literalt l1, literalt l2, literalt l3)
   {
+    clear_status();
     lcnf_bv.resize(4);
     lcnf_bv[0]=l0;
     lcnf_bv[1]=l1;
@@ -102,6 +127,21 @@ public:
   resultt prop_solve();
   resultt prop_solve(const bvt &assumptions);
 
+  /// Solver state: tracks whether the model or conflict can be queried.
+  enum class statust
+  {
+    UNKNOWN,
+    SAT,
+    UNSAT,
+    ERROR
+  };
+
+  /// Return the current solver state.
+  statust get_status() const
+  {
+    return solver_state;
+  }
+
   // satisfying assignment
   virtual tvt l_get(literalt a) const=0;
   virtual void set_assignment(literalt a, bool value) = 0;
@@ -128,11 +168,21 @@ protected:
   // solve under the given assumption
   virtual resultt do_prop_solve(const bvt &assumptions) = 0;
 
+  /// Transition to UNKNOWN state when the solver is mutated.
+  /// The ERROR state is intentionally sticky: once the solver has encountered
+  /// an error, adding new constraints does not clear it.
+  void clear_status()
+  {
+    if(solver_state == statust::SAT || solver_state == statust::UNSAT)
+      solver_state = statust::UNKNOWN;
+  }
+
   // to avoid a temporary for lcnf(...)
   bvt lcnf_bv;
 
   messaget log;
   std::size_t number_of_solver_calls = 0;
+  statust solver_state = statust::UNKNOWN;
 };
 
 #endif // CPROVER_SOLVERS_PROP_PROP_H

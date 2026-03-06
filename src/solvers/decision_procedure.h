@@ -18,6 +18,21 @@ Author: Daniel Kroening, kroening@kroening.com
 class exprt;
 
 /// An interface for a decision procedure for satisfiability problems.
+///
+/// A decision procedure follows a state machine:
+///
+///   D_ERROR ──operator()──► D_SATISFIABLE ──set_to()──► D_ERROR
+///     ▲                        │
+///     │                        └──get() valid
+///     │
+///   D_ERROR ──operator()──► D_UNSATISFIABLE ──set_to()──► D_ERROR
+///
+/// After construction, the procedure's status (\ref latest_result) is
+/// initialised to D_ERROR, representing "not yet solved". Calling
+/// \ref operator()() transitions to D_SATISFIABLE, D_UNSATISFIABLE, or D_ERROR.
+/// Reading the satisfying assignment via \ref get is only valid in the
+/// D_SATISFIABLE state. Adding new constraints (\ref set_to, \ref handle)
+/// resets the status to D_ERROR.
 class decision_proceduret
 {
 public:
@@ -59,7 +74,8 @@ public:
 
   /// Return \p expr with variables replaced by values from satisfying
   /// assignment if available.
-  /// Return `nil` if not available
+  /// Return `nil` if not available.
+  /// \pre The last call to \ref operator()() returned D_SATISFIABLE.
   virtual exprt get(const exprt &) const = 0;
 
   /// Print satisfying assignment to \p out
@@ -73,9 +89,18 @@ public:
 
   virtual ~decision_proceduret();
 
+  /// Return the result of the last call to \ref operator()().
+  /// \return The most recent result, or D_ERROR if not yet called.
+  resultt get_status() const
+  {
+    return latest_result;
+  }
+
 protected:
   /// Implementation of the decision procedure.
   virtual resultt dec_solve(const exprt &assumption) = 0;
+
+  resultt latest_result = resultt::D_ERROR;
 };
 
 /// Add Boolean constraint \p src to decision procedure \p dest

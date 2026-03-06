@@ -83,6 +83,8 @@ public:
   }
 
 protected:
+  // Legacy status tracking in do_prop_solve implementations.
+  // The canonical state is now propt::solver_state, updated by prop_solve().
   enum class statust { INIT, SAT, UNSAT, ERROR };
   statust status;
   size_t clause_counter;

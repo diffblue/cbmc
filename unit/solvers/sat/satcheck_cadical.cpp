@@ -83,4 +83,94 @@ SCENARIO("satcheck_cadical", "[core][solvers][sat][satcheck_cadical]")
   }
 }
 
+SCENARIO(
+  "propt state machine",
+  "[core][solvers][sat][satcheck_cadical][prop_state]")
+{
+  console_message_handlert message_handler;
+
+  GIVEN("A fresh solver")
+  {
+    satcheck_cadical_no_preprocessingt satcheck(message_handler);
+
+    THEN("initial state is UNKNOWN")
+    {
+      REQUIRE(satcheck.get_status() == propt::statust::UNKNOWN);
+    }
+  }
+
+  GIVEN("A satisfiable formula")
+  {
+    satcheck_cadical_no_preprocessingt satcheck(message_handler);
+    literalt f = satcheck.new_variable();
+    satcheck.l_set_to_true(f);
+
+    WHEN("solved")
+    {
+      auto result = satcheck.prop_solve();
+      THEN("state is SAT")
+      {
+        REQUIRE(result == propt::resultt::P_SATISFIABLE);
+        REQUIRE(satcheck.get_status() == propt::statust::SAT);
+      }
+      THEN("l_get returns a definite value")
+      {
+        REQUIRE(satcheck.l_get(f).is_true());
+      }
+    }
+  }
+
+  GIVEN("An unsatisfiable formula")
+  {
+    satcheck_cadical_no_preprocessingt satcheck(message_handler);
+    literalt f = satcheck.new_variable();
+    satcheck.l_set_to_true(satcheck.land(f, !f));
+
+    WHEN("solved")
+    {
+      auto result = satcheck.prop_solve();
+      THEN("state is UNSAT")
+      {
+        REQUIRE(result == propt::resultt::P_UNSATISFIABLE);
+        REQUIRE(satcheck.get_status() == propt::statust::UNSAT);
+      }
+    }
+  }
+
+  GIVEN("A satisfiable formula that becomes unsatisfiable incrementally")
+  {
+    satcheck_cadical_no_preprocessingt satcheck(message_handler);
+    literalt a = satcheck.new_variable();
+    satcheck.set_frozen(a);
+    satcheck.l_set_to_true(a);
+
+    WHEN("first solve is SAT, then add contradicting clause")
+    {
+      REQUIRE(satcheck.prop_solve() == propt::resultt::P_SATISFIABLE);
+      REQUIRE(satcheck.get_status() == propt::statust::SAT);
+      REQUIRE(satcheck.l_get(a).is_true());
+
+      // Adding a new clause transitions state back to UNKNOWN
+      satcheck.l_set_to_false(a);
+      REQUIRE(satcheck.get_status() == propt::statust::UNKNOWN);
+
+      THEN("re-solving yields UNSAT")
+      {
+        REQUIRE(satcheck.prop_solve() == propt::resultt::P_UNSATISFIABLE);
+        REQUIRE(satcheck.get_status() == propt::statust::UNSAT);
+      }
+    }
+
+    WHEN("first solve is SAT, then add a new variable")
+    {
+      REQUIRE(satcheck.prop_solve() == propt::resultt::P_SATISFIABLE);
+      REQUIRE(satcheck.get_status() == propt::statust::SAT);
+
+      // Adding a new variable transitions state back to UNKNOWN
+      satcheck.new_variable();
+      REQUIRE(satcheck.get_status() == propt::statust::UNKNOWN);
+    }
+  }
+}
+
 #endif

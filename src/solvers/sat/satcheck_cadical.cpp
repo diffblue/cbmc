@@ -45,6 +45,8 @@ std::string satcheck_cadical_baset::solver_text() const
 
 void satcheck_cadical_baset::lcnf(const bvt &bv)
 {
+  clear_status();
+
   for(const auto &lit : bv)
   {
     if(lit.is_true())
