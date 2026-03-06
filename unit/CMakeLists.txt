@@ -52,7 +52,6 @@ list(REMOVE_ITEM sources
     ${CMAKE_CURRENT_SOURCE_DIR}/smt2_parser.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/json.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/osx_fat_reader.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/wp.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ieee_float.cpp
 
     # Will be built into a separate library and linked
