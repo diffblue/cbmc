@@ -409,4 +409,14 @@ private:
 
 extern configt config;
 
+/// Throw an analysis_exceptiont when more objects have been addressed than can
+/// be represented in \p object_bits bits, i.e. when
+/// \p object_id `>= 2^object_bits`. The number of object bits is governed by
+/// the analysis *target* and may exceed the analysis-execution platform's
+/// integer width, so the bound is computed using mp_integer to avoid an
+/// invalid shift.
+void check_object_bits_bound(
+  const mp_integer &object_id,
+  std::size_t object_bits);
+
 #endif // CPROVER_UTIL_CONFIG_H
