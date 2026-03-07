@@ -48,11 +48,12 @@ SCENARIO(
   auto fresh_name = [&fresh_name_count](const irep_idt &) {
     return fresh_name_count++;
   };
+  const irep_idt empty_language_mode;
   goto_symex_statet state{
     source,
     DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE,
     true,
-    irep_idt{},
+    empty_language_mode,
     manager,
     fresh_name};
 
@@ -234,7 +235,7 @@ SCENARIO(
         symex_targett::assignment_typet::STATE,
         ns,
         symex_config,
-        irep_idt{},
+        empty_language_mode,
         target_equation}
         .assign_symbol(struct1_ssa, skeleton, rhs, guard);
       THEN("Two equations are added to the target")
