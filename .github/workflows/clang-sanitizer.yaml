@@ -1,0 +1,255 @@
+# Clang Sanitizer CI Pipeline
+#
+# Builds CBMC and JBMC with Clang's AddressSanitizer and
+# UndefinedBehaviorSanitizer, then runs the full test suites to detect
+# memory errors (buffer overflows, use-after-free, double-free) and
+# undefined behavior (invalid shifts, signed integer overflow, etc.).
+#
+# Pipeline structure (build then parallel test):
+#
+#                    ┌── unit-tests (CBMC + JBMC unit tests)
+#                    │
+#   build-asan ──────┼── cbmc-regression (main regression suite)
+#                    │
+#                    ├── cbmc-special-regression (paths-lifo, cprover-smt2)
+#                    │
+#                    └── jbmc-regression (JBMC regression suite)
+#
+# The build job compiles all binaries with sanitizer flags and uploads
+# them as a tarball artifact. The four test jobs download the artifact
+# and run their respective test suites in parallel.
+#
+# Sanitizer configuration:
+#   - AddressSanitizer: detects buffer overflows, use-after-free,
+#     use-after-return, double-free, stack-buffer-overflow
+#   - UndefinedBehaviorSanitizer: detects undefined behavior including
+#     invalid shifts, signed integer overflow, null pointer dereference
+#   - LeakSanitizer: disabled (detect_leaks=0) — too many reports to
+#     address at once
+#   - Compiled with -O1 for reasonable performance with sanitizers
+#   - -fno-sanitize-recover=all: abort on first error for clear diagnostics
+#
+# Unit test configuration:
+#   - Tests tagged [!shouldfail] (expected failures) are run separately
+#   - Tests tagged [not_ubsan] are excluded from the main sanitizer run
+#
+# Dependencies per job:
+#   - build-asan: clang, flex, bison, ccache
+#   - unit-tests: clang (runtime libs only), gdb, z3
+#   - cbmc-regression: clang, gdb, parallel, z3, cvc5, libxml2-utils
+#   - cbmc-special-regression: clang, gdb, z3, cvc5, libxml2-utils
+#   - jbmc-regression: clang, gdb, maven, jq, parallel
+
+name: Clang Sanitizer
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+env:
+  cvc5-version: "1.2.1"
+  linux-vcpus: 4
+
+jobs:
+  # Build all CBMC/JBMC binaries and unit test runners with sanitizers.
+  # Produces a tarball artifact consumed by the parallel test jobs below.
+  build-asan:
+    runs-on: ubuntu-24.04
+    env:
+      CC: "ccache /usr/bin/clang"
+      CXX: "ccache /usr/bin/clang++"
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq clang-19 clang++-19 flex bison ccache
+          make -C src minisat2-download
+      - name: Prepare ccache
+        uses: actions/cache@v4
+        with:
+          save-always: true
+          path: .ccache
+          key: ${{ runner.os }}-24.04-make-clang-asan-${{ github.ref }}-${{ github.sha }}-PR
+          restore-keys: |
+            ${{ runner.os }}-24.04-make-clang-asan-${{ github.ref }}
+            ${{ runner.os }}-24.04-make-clang-asan
+      - name: ccache environment
+        run: |
+          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
+          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
+      - name: Zero ccache stats and limit in size
+        run: ccache -z --max-size=500M
+      - name: Build with sanitizers
+        run: |
+          export SANITIZER_FLAGS="-fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -g -O1"
+          make -C src -j${{env.linux-vcpus}} \
+            CXXFLAGS="$SANITIZER_FLAGS" \
+            LINKFLAGS="$SANITIZER_FLAGS" \
+            MINISAT2=../../minisat-2.2.1
+          make -C unit -j${{env.linux-vcpus}} \
+            CXXFLAGS="$SANITIZER_FLAGS" \
+            LINKFLAGS="$SANITIZER_FLAGS"
+          make -C jbmc/src -j${{env.linux-vcpus}} \
+            CXXFLAGS="$SANITIZER_FLAGS" \
+            LINKFLAGS="$SANITIZER_FLAGS" \
+            MINISAT2=../../minisat-2.2.1
+          make -C jbmc/unit -j${{env.linux-vcpus}} \
+            CXXFLAGS="$SANITIZER_FLAGS" \
+            LINKFLAGS="$SANITIZER_FLAGS"
+      - name: Print ccache stats
+        run: ccache -s
+      - name: Package build artifacts
+        run: |
+          tar czf build-artifacts.tar.gz \
+            --exclude='*.o' --exclude='*.d' \
+            src/ unit/unit_tests jbmc/src/ jbmc/unit/unit_tests \
+            jbmc/lib/java-models-library/target/ \
+            minisat-2.2.1/
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: asan-build
+          path: build-artifacts.tar.gz
+          retention-days: 1
+
+  # Run CBMC and JBMC unit tests (Catch2-based).
+  # Excludes [!shouldfail] and [not_ubsan] in the main run, then runs
+  # expected-failure tests separately.
+  unit-tests:
+    runs-on: ubuntu-24.04
+    needs: build-asan
+    env:
+      ASAN_OPTIONS: "abort_on_error=1:fast_unwind_on_malloc=0:detect_odr_violation=0:detect_leaks=0"
+      UBSAN_OPTIONS: "print_stacktrace=1:halt_on_error=1"
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq clang-19 clang++-19 flex bison gdb z3
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: asan-build
+      - name: Extract build artifacts
+        run: tar xzf build-artifacts.tar.gz
+      - name: Run CBMC unit tests
+        run: |
+          make TAGS="-d yes' '~[!shouldfail]' '~[not_ubsan]" -C unit test
+          echo "Running expected failure tests"
+          make TAGS="-d yes' '[!shouldfail]" -C unit test
+      - name: Run JBMC unit tests
+        run: |
+          make TAGS="-d yes" -C jbmc/unit test
+          echo "Running expected failure tests"
+          make TAGS="-d yes' '[!shouldfail]" -C jbmc/unit test
+
+  # Run the main CBMC regression test suite (all directories under regression/).
+  cbmc-regression:
+    runs-on: ubuntu-24.04
+    needs: build-asan
+    env:
+      ASAN_OPTIONS: "abort_on_error=1:fast_unwind_on_malloc=0:detect_odr_violation=0:detect_leaks=0"
+      UBSAN_OPTIONS: "print_stacktrace=1:halt_on_error=1"
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq clang-19 clang++-19 gdb parallel flex bison libxml2-utils z3
+      - name: Confirm z3 solver is available and log the version installed
+        run: z3 --version
+      - name: Download cvc-5 from the releases page and make sure it can be deployed
+        run: |
+          wget -q https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux-x86_64-static.zip
+          unzip -j -d /usr/local/bin cvc5-Linux-x86_64-static.zip cvc5-Linux-x86_64-static/bin/cvc5
+          rm cvc5-Linux-x86_64-static.zip
+          cvc5 --version
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: asan-build
+      - name: Extract build artifacts
+        run: tar xzf build-artifacts.tar.gz
+      - name: Run CBMC regression tests
+        run: |
+          export PATH=$PATH:$PWD/src/solvers
+          export SANITIZER_FLAGS="-fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -g -O1"
+          make -C regression test-parallel JOBS=${{env.linux-vcpus}} \
+            CXXFLAGS="$SANITIZER_FLAGS" \
+            LINKFLAGS="$SANITIZER_FLAGS"
+
+  # Run CBMC's alternative-backend regression tests (paths-lifo, cprover-smt2).
+  cbmc-special-regression:
+    runs-on: ubuntu-24.04
+    needs: build-asan
+    env:
+      ASAN_OPTIONS: "abort_on_error=1:fast_unwind_on_malloc=0:detect_odr_violation=0:detect_leaks=0"
+      UBSAN_OPTIONS: "print_stacktrace=1:halt_on_error=1"
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq clang-19 clang++-19 gdb flex bison libxml2-utils z3
+      - name: Confirm z3 solver is available and log the version installed
+        run: z3 --version
+      - name: Download cvc-5 from the releases page and make sure it can be deployed
+        run: |
+          wget -q https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux-x86_64-static.zip
+          unzip -j -d /usr/local/bin cvc5-Linux-x86_64-static.zip cvc5-Linux-x86_64-static/bin/cvc5
+          rm cvc5-Linux-x86_64-static.zip
+          cvc5 --version
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: asan-build
+      - name: Extract build artifacts
+        run: tar xzf build-artifacts.tar.gz
+      - name: Run paths-lifo tests
+        run: make -C regression/cbmc test-paths-lifo
+      - name: Run cprover-smt2 tests
+        run: make -C regression/cbmc test-cprover-smt2
+
+  # Run the JBMC regression test suite (all directories under jbmc/regression/).
+  jbmc-regression:
+    runs-on: ubuntu-24.04
+    needs: build-asan
+    env:
+      ASAN_OPTIONS: "abort_on_error=1:fast_unwind_on_malloc=0:detect_odr_violation=0:detect_leaks=0"
+      UBSAN_OPTIONS: "print_stacktrace=1:halt_on_error=1"
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq clang-19 clang++-19 gdb maven jq parallel flex bison
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: asan-build
+      - name: Extract build artifacts
+        run: tar xzf build-artifacts.tar.gz
+      - name: Run JBMC regression tests
+        run: make -C jbmc/regression test-parallel JOBS=${{env.linux-vcpus}}
