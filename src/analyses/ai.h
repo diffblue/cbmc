@@ -145,12 +145,11 @@ public:
     const goto_programt &goto_program,
     const namespacet &ns)
   {
-    if(goto_program.empty())
-      return;
     goto_functionst goto_functions;
     initialize(function_id, goto_program);
     trace_ptrt p = entry_state(goto_program);
-    fixedpoint(p, function_id, goto_program, goto_functions, ns);
+    if(p != nullptr)
+      fixedpoint(p, function_id, goto_program, goto_functions, ns);
     finalize();
   }
 
@@ -161,7 +160,8 @@ public:
   {
     initialize(goto_functions);
     trace_ptrt p = entry_state(goto_functions);
-    fixedpoint(p, goto_functions, ns);
+    if(p != nullptr)
+      fixedpoint(p, goto_functions, ns);
     finalize();
   }
 
@@ -171,7 +171,8 @@ public:
     const namespacet ns(goto_model.get_symbol_table());
     initialize(goto_model.get_goto_functions());
     trace_ptrt p = entry_state(goto_model.get_goto_functions());
-    fixedpoint(p, goto_model.get_goto_functions(), ns);
+    if(p != nullptr)
+      fixedpoint(p, goto_model.get_goto_functions(), ns);
     finalize();
   }
 
@@ -184,7 +185,8 @@ public:
     goto_functionst goto_functions;
     initialize(function_id, goto_function);
     trace_ptrt p = entry_state(goto_function.body);
-    fixedpoint(p, function_id, goto_function.body, goto_functions, ns);
+    if(p != nullptr)
+      fixedpoint(p, function_id, goto_function.body, goto_functions, ns);
     finalize();
   }
 
