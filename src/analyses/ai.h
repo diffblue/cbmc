@@ -145,6 +145,8 @@ public:
     const goto_programt &goto_program,
     const namespacet &ns)
   {
+    if(goto_program.empty())
+      return;
     goto_functionst goto_functions;
     initialize(function_id, goto_program);
     trace_ptrt p = entry_state(goto_program);
