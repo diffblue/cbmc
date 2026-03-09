@@ -178,6 +178,9 @@ ai_baset::entry_state(const goto_functionst &goto_functions)
 
 ai_baset::trace_ptrt ai_baset::entry_state(const goto_programt &goto_program)
 {
+  if(goto_program.empty())
+    return nullptr;
+
   // The first instruction of 'goto_program' is the entry point
   trace_ptrt p = history_factory->epoch(goto_program.instructions.begin());
   get_state(p).make_entry();

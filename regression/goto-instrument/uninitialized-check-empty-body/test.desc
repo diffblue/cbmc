@@ -1,0 +1,10 @@
+CORE
+main.c
+--uninitialized-check
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Regression test for heap-use-after-free when running uninitialized variable
+analysis on a program with an external function that has no body (empty
+goto_programt).
