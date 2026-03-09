@@ -17,3 +17,4 @@ else()
             "CORE"
     )
 endif()
+set_tests_properties("jbmc-symex-driven-lazy-loading-CORE" PROPERTIES TIMEOUT 4800)

@@ -31,8 +31,8 @@ sub with_color {
   }
 }
 
-sub run($$$$$) {
-  my ($name, $input, $cmd, $options, $output) = @_;
+sub run($$$$$$) {
+  my ($name, $input, $cmd, $options, $output, $timeout) = @_;
   my $cmdline;
   if(length($input)) {
     $cmdline = "$cmd $options '$input' >'$output' 2>&1";
@@ -41,12 +41,59 @@ sub run($$$$$) {
   }
 
   print LOG "Running $cmdline\n";
-  # see https://github.com/git-for-windows/msys2-runtime/pull/11/files
-  system("bash", "-c", "cd '$name' ; MSYS_NO_PATHCONV=1 $cmdline");
-  my $exit_value = $? >> 8;
-  my $signal_num = $? & 127;
-  my $dumped_core = $? & 128;
+  my $exit_value;
+  my $signal_num;
+  my $dumped_core;
+  my $timed_out = 0;
+
+  if($timeout && $^O ne 'MSWin32' && $^O ne 'msys') {
+    # Fork so we can enforce a timeout via kill on the child process group.
+    my $pid = fork();
+    die "fork failed: $!" unless defined $pid;
+
+    if($pid == 0) {
+      # Child: start a new process group so we can kill the whole group on
+      # timeout, then exec the test command.
+      setpgrp(0, 0);
+      # see https://github.com/git-for-windows/msys2-runtime/pull/11/files
+      exec("bash", "-c", "cd '$name' ; MSYS_NO_PATHCONV=1 $cmdline");
+      die "exec failed: $!";
+    }
+
+    # Parent: wait for the child, with a timeout.
+    eval {
+      local $SIG{ALRM} = sub { die "alarm\n" };
+      alarm($timeout);
+      waitpid($pid, 0);
+      alarm(0);
+    };
+    if($@ && $@ eq "alarm\n") {
+      $timed_out = 1;
+      # Kill the entire process group of the child.
+      kill(9, -$pid);
+      waitpid($pid, 0);
+    } elsif($@) {
+      die $@;
+    }
+  } else {
+    # Windows or no timeout: use simple system() call.
+    # see https://github.com/git-for-windows/msys2-runtime/pull/11/files
+    system("bash", "-c", "cd '$name' ; MSYS_NO_PATHCONV=1 $cmdline");
+  }
+
+  $exit_value = $? >> 8;
+  $signal_num = $? & 127;
+  $dumped_core = $? & 128;
   my $failed = 0;
+
+  if($timed_out) {
+    print LOG "  Timed out after $timeout seconds\n";
+    print " [TIMEOUT]";
+    $failed = 1;
+    # Write output so that pattern matching does not crash on missing file.
+    system("bash", "-c", "cd '$name' ; echo '\nTIMEOUT=1\nEXIT=137\nSIGNAL=9\n' >> '$output'");
+    return $failed;
+  }
 
   print LOG "  Exit: $exit_value\n";
   print LOG "  Signal: $signal_num\n";
@@ -84,8 +131,8 @@ sub load($$) {
   return @data;
 }
 
-sub test($$$$$$$$$$$) {
-  my ($name, $test, $t_level, $cmd, $ign, $dry_run, $defines, $include_tags, $exclude_tags, $output_suffix, $exit_signal_checks) = @_;
+sub test($$$$$$$$$$$$) {
+  my ($name, $test, $t_level, $cmd, $ign, $dry_run, $defines, $include_tags, $exclude_tags, $output_suffix, $exit_signal_checks, $timeout) = @_;
   my ($level_and_tags, $input, $options, $grep_options, @results) = load("$test", $exit_signal_checks);
   my @keys = keys %{$defines};
   foreach my $key (@keys) {
@@ -179,7 +226,7 @@ sub test($$$$$$$$$$$) {
       return 0;
     }
 
-    $failed = run($name, $input, $cmd, $options, $output);
+    $failed = run($name, $input, $cmd, $options, $output, $timeout);
 
     if(!$failed) {
       print LOG "Execution [OK]\n";
@@ -302,6 +349,8 @@ Usage: test.pl -c CMD [OPTIONS] [DIRECTORIES ...]
              as runs with different suffixes will operate independently and keep
              independent logs.
   -f         forward the test name to CMD
+  -t <secs>  timeout per test in seconds (kills test if exceeded)
+             default is \$TESTPL_TIMEOUT if set; overridden by -t <secs>
 
   --[no]color enable/disable color output; enabled by default unless
               TESTPL_COLOR_OUTPUT is set to 0, in which case it is
@@ -341,7 +390,7 @@ use Getopt::Std;
 use Getopt::Long qw(:config pass_through bundling);
 $main::VERSION = 0.1;
 $Getopt::Std::STANDARD_HELP_VERSION = 1;
-our ($opt_c, $opt_e, $opt_f, $opt_i, $opt_j, $opt_n, $opt_p, $opt_h, $opt_C, $opt_T, $opt_F, $opt_K, $opt_s, $opt_S, %defines, @include_tags, @exclude_tags); # the variables for getopt
+our ($opt_c, $opt_e, $opt_f, $opt_i, $opt_j, $opt_n, $opt_p, $opt_h, $opt_C, $opt_T, $opt_F, $opt_K, $opt_s, $opt_S, $opt_t, %defines, @include_tags, @exclude_tags); # the variables for getopt
 
 # this needs to come before GetOptions to ensure the
 # default -> environment -> flag override priority
@@ -351,7 +400,7 @@ if (exists $ENV{'TESTPL_COLOR_OUTPUT'}) {
 }
 
 GetOptions("D=s" => \%defines, "X=s" => \@exclude_tags, "I=s" => \@include_tags, 'color!' => \$color_output_enabled);
-getopts('c:efi:j:nphCTFKs:S:') or &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
+getopts('c:efi:j:nphCTFKs:S:t:') or &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
 $opt_c or &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
 $opt_j = $opt_j || $ENV{'TESTPL_JOBS'} || 0;
 if($opt_j && $opt_j != 1 && !$has_thread_pool) {
@@ -369,6 +418,7 @@ $t_level += 1 if($opt_C || 0 == $t_level);
 my $dry_run = $opt_n;
 my $log_suffix = $opt_s;
 my $exit_signal_checks = defined($opt_e);
+my $timeout = $opt_t || $ENV{'TESTPL_TIMEOUT'} || 0;
 
 my $logfile_name = "tests";
 if($log_suffix) {
@@ -403,7 +453,7 @@ sub do_test($)
     defined($pool) or print "  Running $files[$_]";
     my $start_time = time();
     $failed_skipped = test(
-      $test, $files[$_], $t_level, $opt_c, $opt_i, $dry_run, \%defines, \@include_tags, \@exclude_tags, $log_suffix, $exit_signal_checks);
+      $test, $files[$_], $t_level, $opt_c, $opt_i, $dry_run, \%defines, \@include_tags, \@exclude_tags, $log_suffix, $exit_signal_checks, $timeout);
     my $runtime = time() - $start_time;
 
     lock($skips);

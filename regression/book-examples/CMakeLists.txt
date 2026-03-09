@@ -40,3 +40,4 @@ if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
       "PATH=$ENV{PATH}:$<TARGET_FILE_DIR:smt2_solver>"
   )
 endif()
+set_tests_properties("book-examples-cprover-smt2-CORE" PROPERTIES TIMEOUT 2400)
