@@ -109,7 +109,7 @@ $(document).ready(function(){initNavTree('memory-bounds-checking.html',''); init
 <div class="line">  <span class="keywordflow">return</span> <a class="code hl_class" href="classait.html">malloc_res</a>;</div>
 <div class="line">}</div>
 <div class="ttc" id="aansi-c_2library_2cprover_8h_html_a39d7421bc1364fd1101bef751362f9d6"><div class="ttname"><a href="ansi-c_2library_2cprover_8h.html#a39d7421bc1364fd1101bef751362f9d6">__CPROVER_allocate</a></div><div class="ttdeci">void * __CPROVER_allocate(__CPROVER_size_t size, __CPROVER_bool zero)</div></div>
-<div class="ttc" id="aclassait_html"><div class="ttname"><a href="classait.html">ait</a></div><div class="ttdoc">ait supplies three of the four components needed: an abstract interpreter (in this case handling func...</div><div class="ttdef"><b>Definition</b> <a href="ai_8h_source.html#l00561">ai.h:562</a></div></div>
+<div class="ttc" id="aclassait_html"><div class="ttname"><a href="classait.html">ait</a></div><div class="ttdoc">ait supplies three of the four components needed: an abstract interpreter (in this case handling func...</div><div class="ttdef"><b>Definition</b> <a href="ai_8h_source.html#l00565">ai.h:566</a></div></div>
 <div class="ttc" id="astdlib_8c_html_a53a0f3908528e9d382f76b87e2b8a76b"><div class="ttname"><a href="stdlib_8c.html#a53a0f3908528e9d382f76b87e2b8a76b">malloc</a></div><div class="ttdeci">void * malloc(__CPROVER_size_t malloc_size)</div><div class="ttdef"><b>Definition</b> <a href="stdlib_8c_source.html#l00212">stdlib.c:212</a></div></div>
 </div><!-- fragment --><p>When the option <code>--pointer-check</code> is used, cbmc generates the following verification condition for each pointer dereference expression (e.g., <code>*pointer</code>):</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="cprover__builtin__headers_8h.html#a829ee4b8c4cdf4a7a3f6f19156aa7bbb">__CPROVER_POINTER_OFFSET</a>(pointer) &gt;= 0 &amp;&amp;</div>
@@ -128,7 +128,7 @@ $(document).ready(function(){initNavTree('memory-bounds-checking.html',''); init
 <div class="line">}</div>
 <div class="ttc" id="aexample_8cpp_html_ae66f6b31b5ad750f1fe042a706a4e3d4"><div class="ttname"><a href="example_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4">main</a></div><div class="ttdeci">int main()</div><div class="ttdef"><b>Definition</b> <a href="example_8cpp_source.html#l00018">example.cpp:18</a></div></div>
 </div><!-- fragment --><p>Here the verification condition generated for the pointer dereference should fail: for <code>p1</code> in <code>*p1</code>, <code>__CPROVER_POINTER_OFFSET</code> will evaluate to 1 (owing to the increment <code>p1++</code>, and <code>__CPROVER_OBJECT_SIZE</code> will also evaluate to 1. Consequently, the less-than comparison in the verification condition evaluates to false.</p>
-<p>Last modified: 2026-03-09 16:47:34 +0100 </p>
+<p>Last modified: 2026-03-09 16:47:54 +0100 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

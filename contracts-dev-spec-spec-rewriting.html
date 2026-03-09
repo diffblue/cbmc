@@ -112,7 +112,7 @@ $(document).ready(function(){initNavTree('contracts-dev-spec-spec-rewriting.html
 Rewriting Assigns Clause Functions</h1>
 <p>GOTO functions which specify assignable locations have the following type signature:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> <a class="code hl_class" href="classait.html">foo</a>(<a class="code hl_class" href="classait.html">parameter</a>-list);</div>
-<div class="ttc" id="aclassait_html"><div class="ttname"><a href="classait.html">ait</a></div><div class="ttdoc">ait supplies three of the four components needed: an abstract interpreter (in this case handling func...</div><div class="ttdef"><b>Definition</b> <a href="ai_8h_source.html#l00561">ai.h:562</a></div></div>
+<div class="ttc" id="aclassait_html"><div class="ttname"><a href="classait.html">ait</a></div><div class="ttdoc">ait supplies three of the four components needed: an abstract interpreter (in this case handling func...</div><div class="ttdef"><b>Definition</b> <a href="ai_8h_source.html#l00565">ai.h:566</a></div></div>
 </div><!-- fragment --><p>They can be generated from an assigns clause or written by the user.</p>
 <p>To convert them to active functions, the first step is to inline their body and remove all function calls, the result of which must be loop-free.</p>
 <p>Then, a second pass adds the write set to be filled as new parameter to the function:</p>

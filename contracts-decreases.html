@@ -120,7 +120,7 @@ Syntax</h1>
 <div class="line"><a class="code hl_class" href="classait.html">__CPROVER_loop_invariant</a>(0 &lt;= i &amp;&amp; i &lt;= <a class="code hl_class" href="classait.html">n</a>)</div>
 <div class="line"><a class="code hl_class" href="classait.html">__CPROVER_decreases</a>(<a class="code hl_class" href="classait.html">n</a> - i)</div>
 <div class="line">{ ... }</div>
-<div class="ttc" id="aclassait_html"><div class="ttname"><a href="classait.html">ait</a></div><div class="ttdoc">ait supplies three of the four components needed: an abstract interpreter (in this case handling func...</div><div class="ttdef"><b>Definition</b> <a href="ai_8h_source.html#l00561">ai.h:562</a></div></div>
+<div class="ttc" id="aclassait_html"><div class="ttname"><a href="classait.html">ait</a></div><div class="ttdoc">ait supplies three of the four components needed: an abstract interpreter (in this case handling func...</div><div class="ttdef"><b>Definition</b> <a href="ai_8h_source.html#l00565">ai.h:566</a></div></div>
 </div><!-- fragment --><p>Please see the <a class="el" href="contracts-loop-invariants.html">loop invariant clauses</a> page for more examples on <code>for</code> and <code>do...while</code> loops.</p>
 <p>To help prove termination of more complex loops, CBMC also supports multi-dimensional decreases clauses. A multi-dimensional decreases clause is an <a href="https://en.wikipedia.org/wiki/Tuple">ordered tuple</a> of arithmetic expressions, specified as <code>__CPROVER_decreases(e_1, e_2, ..., e_n)</code>. An example of a multi-dimensional decreases clause is given below.</p>
 <div class="fragment"><div class="line"><span class="keywordflow">while</span>(i &lt; <a class="code hl_class" href="classait.html">n</a>)</div>

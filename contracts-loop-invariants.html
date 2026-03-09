@@ -111,7 +111,7 @@ $(document).ready(function(){initNavTree('contracts-loop-invariants.html',''); i
 Syntax</h1>
 <p>An <em>invariant</em> clause accepts a valid Boolean expression over the variables visible at the same scope as the loop. Additionally, [history variables] are also allowed within invariant clauses.</p>
 <div class="fragment"><div class="line"><a class="code hl_class" href="classait.html">__CPROVER_loop_invariant</a>(<span class="keywordtype">bool</span> cond)</div>
-<div class="ttc" id="aclassait_html"><div class="ttname"><a href="classait.html">ait</a></div><div class="ttdoc">ait supplies three of the four components needed: an abstract interpreter (in this case handling func...</div><div class="ttdef"><b>Definition</b> <a href="ai_8h_source.html#l00561">ai.h:562</a></div></div>
+<div class="ttc" id="aclassait_html"><div class="ttname"><a href="classait.html">ait</a></div><div class="ttdoc">ait supplies three of the four components needed: an abstract interpreter (in this case handling func...</div><div class="ttdef"><b>Definition</b> <a href="ai_8h_source.html#l00565">ai.h:566</a></div></div>
 </div><!-- fragment --><p>Invariant clauses may be specified just after the loop guard. Multiple invariant clauses on the same loop are allowed, and is equivalent to a single invariant clause that is a conjunction of those clauses. A few examples are shown below.</p>
 <div class="fragment"><div class="line"><span class="keywordflow">while</span>(i &lt; <a class="code hl_class" href="classait.html">n</a>)</div>
 <div class="line"><a class="code hl_class" href="classait.html">__CPROVER_loop_invariant</a>(0 &lt;= i &amp;&amp; i &lt;= <a class="code hl_class" href="classait.html">n</a>)</div>
