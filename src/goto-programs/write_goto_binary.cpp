@@ -160,13 +160,6 @@ bool write_goto_binary(
   const goto_functionst &goto_functions,
   int version)
 {
-  // header
-  out << char(0x7f) << "GBF";
-  write_gb_word(out, version);
-
-  irep_serializationt::ireps_containert irepc;
-  irep_serializationt irepconverter(irepc);
-
   if(version < GOTO_BINARY_VERSION)
   {
     throw invalid_command_line_argument_exceptiont(
@@ -179,6 +172,14 @@ bool write_goto_binary(
       "unknown goto binary version " + std::to_string(version),
       "supported version = " + std::to_string(GOTO_BINARY_VERSION));
   }
+
+  // header
+  out << char(0x7f) << "GBF";
+  write_gb_word(out, version);
+
+  irep_serializationt::ireps_containert irepc;
+  irep_serializationt irepconverter(irepc);
+
   write_goto_binary(out, symbol_table, goto_functions, irepconverter);
   return false;
 }
