@@ -425,11 +425,12 @@ bool eval_expr(const std::map<exprt, signed> &atomic_exprs, const exprt &src)
   }
   else // if(is_condition(src))
   {
+    auto it = atomic_exprs.find(src);
     // ''src'' should be guaranteed to be consistent
     // with ''atomic_exprs''
-    if(atomic_exprs.find(src)->second == +1)
+    if(it != atomic_exprs.end() && it->second == +1)
       return true;
-    else // if(atomic_exprs.find(src)->second==-1)
+    else // if not found or second==-1
       return false;
   }
 }
