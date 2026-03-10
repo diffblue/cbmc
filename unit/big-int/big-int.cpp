@@ -6,11 +6,11 @@ Author: Daniel Kroening
 
 \*******************************************************************/
 
+#include <big-int/bigint.hh>
 #include <testing-utils/use_catch.h>
 
+#include <limits>
 #include <string>
-
-#include <big-int/bigint.hh>
 
 // =====================================================================
 // Printing and reading bignums.
@@ -252,5 +252,86 @@ TEST_CASE("arbitrary precision integers", "[core][big-int][bigint]")
 
     N += 2; // 2
     REQUIRE(N.floorPow2() == 1U);
+  }
+
+  // =====================================================================
+  // Signed/unsigned boundary, including the most-negative value (the point
+  // of the signed-negation-overflow fix).
+  // =====================================================================
+  SECTION("signed/unsigned boundary")
+  {
+    const long long llong_min = std::numeric_limits<long long>::min();
+    const long long llong_max = std::numeric_limits<long long>::max();
+    const unsigned long long ullong_max =
+      std::numeric_limits<unsigned long long>::max();
+
+    // The most-negative value must round-trip without negating a signed value.
+    const BigInt min_value(llong_min);
+    REQUIRE(min_value.is_long());
+    REQUIRE(min_value.to_long() == llong_min);
+    REQUIRE(to_string(min_value) == std::to_string(llong_min));
+
+    // Boundary values for is_long/to_long/to_ulong.
+    REQUIRE(BigInt(llong_max).is_long());
+    REQUIRE(BigInt(llong_max).to_long() == llong_max);
+    REQUIRE(BigInt(ullong_max).to_ulong() == ullong_max);
+    // 2^64-1 and 2^63 do not fit into a signed long long.
+    REQUIRE_FALSE(BigInt(ullong_max).is_long());
+    REQUIRE_FALSE((BigInt(llong_max) + 1).is_long());
+
+    // The most-negative value through each llong_t operator and compare().
+    {
+      BigInt n(0);
+      n += llong_min;
+      REQUIRE(n.to_long() == llong_min);
+      REQUIRE(n.compare(llong_min) == 0);
+    }
+    {
+      BigInt n(0);
+      n -= llong_min; // 0 - LLONG_MIN == 2^63
+      REQUIRE(to_string(n) == "9223372036854775808");
+    }
+    {
+      BigInt n(1);
+      n *= llong_min;
+      REQUIRE(n.to_long() == llong_min);
+    }
+    {
+      BigInt n(llong_min);
+      n /= llong_min; // LLONG_MIN / LLONG_MIN == 1
+      REQUIRE(n.to_long() == 1);
+    }
+    {
+      BigInt n(llong_min);
+      n %= llong_min; // LLONG_MIN % LLONG_MIN == 0
+      REQUIRE(n.to_long() == 0);
+    }
+  }
+
+  // =====================================================================
+  // dump()/load() round-trip (their index arithmetic is otherwise untested).
+  // =====================================================================
+  SECTION("dump/load round-trip")
+  {
+    // dump() writes the magnitude as big-endian bytes; load() reads it back.
+    const BigInt values[] = {
+      BigInt(0),
+      BigInt(1),
+      BigInt(255),
+      BigInt(256),
+      BigInt(0x12345678u),
+      BigInt("123456789012345678901234567890")};
+    for(BigInt v : values)
+    {
+      unsigned char buf[64];
+      REQUIRE(v.dump(buf, sizeof(buf)));
+      BigInt w;
+      w.load(buf, sizeof(buf));
+      REQUIRE(w == v);
+    }
+
+    // dump() reports overflow (returns false) when the value does not fit.
+    unsigned char small_buf[1];
+    REQUIRE_FALSE(BigInt(256).dump(small_buf, sizeof(small_buf)));
   }
 }

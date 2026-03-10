@@ -373,16 +373,13 @@ BigInt::assign (ullong_t ul)
 void
 BigInt::assign (llong_t l)
 {
-  if (l >= 0)
-    {
-      digit_set (ullong_t (l), digit, length);
-      positive = true;
-    }
-  else
-    {
-      digit_set (ullong_t (-l), digit, length);
-      positive = false;
-    }
+  // Compute the magnitude in unsigned arithmetic to avoid signed-negation
+  // overflow for the most-negative value.
+  positive = l >= 0;
+  digit_set(
+    positive ? static_cast<ullong_t>(l) : -static_cast<ullong_t>(l),
+    digit,
+    length);
 }
 
 
@@ -696,8 +693,8 @@ ullong_t BigInt::to_ulong() const
 
 llong_t BigInt::to_long() const
 {
-  llong_t l = llong_t(to_ulong());
-  return positive ? l : -l;
+  const ullong_t ul = to_ulong();
+  return positive ? static_cast<llong_t>(ul) : static_cast<llong_t>(-ul);
 }
 
 
@@ -747,7 +744,7 @@ BigInt::compare (llong_t b) const
 
   onedig_t dig[small];
   std::size_t len;
-  digit_set(ullong_t(-b), dig, len);
+  digit_set(-static_cast<ullong_t>(b), dig, len);
   if (length < len)
     return 1;
   if (length > len)
@@ -892,15 +889,24 @@ void BigInt::mul(onedig_t const *dig, std::size_t len, bool pos)
   }
 }
 
+// Split a signed value into its sign and unsigned-magnitude digits.  The
+// magnitude is computed in unsigned arithmetic so that the most-negative value
+// does not trigger signed-negation overflow.
+static void
+digit_set_signed(llong_t y, onedig_t d[small], std::size_t &len, bool &positive)
+{
+  positive = y >= 0;
+  digit_set(
+    positive ? static_cast<ullong_t>(y) : -static_cast<ullong_t>(y), d, len);
+}
 
 BigInt &
 BigInt::operator+= (llong_t y)
 {
-  bool pos = y > 0;
-  ullong_t uy = pos ? ullong_t(y) : ullong_t(-y);
   onedig_t yb[small];
   std::size_t yl;
-  digit_set (uy, yb, yl);
+  bool pos;
+  digit_set_signed(y, yb, yl, pos);
   add (yb, yl, pos);
   return *this;
 }
@@ -908,11 +914,10 @@ BigInt::operator+= (llong_t y)
 BigInt &
 BigInt::operator-= (llong_t y)
 {
-  bool pos = y > 0;
-  ullong_t uy = pos ? ullong_t(y) : ullong_t(-y);
   onedig_t yb[small];
   std::size_t yl;
-  digit_set (uy, yb, yl);
+  bool pos;
+  digit_set_signed(y, yb, yl, pos);
   add (yb, yl, !pos);
   return *this;
 }
@@ -920,11 +925,10 @@ BigInt::operator-= (llong_t y)
 BigInt &
 BigInt::operator*= (llong_t y)
 {
-  bool pos = y > 0;
-  ullong_t uy = pos ? ullong_t(y) : ullong_t(-y);
   onedig_t yb[small];
   std::size_t yl;
-  digit_set (uy, yb, yl);
+  bool pos;
+  digit_set_signed(y, yb, yl, pos);
   mul (yb, yl, pos);
   return *this;
 }
@@ -932,25 +936,22 @@ BigInt::operator*= (llong_t y)
 BigInt &
 BigInt::operator/= (llong_t y)
 {
-  bool pos = y > 0;
-  ullong_t uy = pos ? ullong_t(y) : ullong_t(-y);
   onedig_t yb[small];
   std::size_t yl;
-  digit_set (uy, yb, yl);
+  bool pos;
+  digit_set_signed(y, yb, yl, pos);
   return *this /= BigInt (yb, yl, pos);
 }
 
 BigInt &
 BigInt::operator%= (llong_t y)
 {
-  bool pos = y > 0;
-  ullong_t uy = pos ? ullong_t(y) : ullong_t(-y);
   onedig_t yb[small];
   std::size_t yl;
-  digit_set (uy, yb, yl);
+  bool pos;
+  digit_set_signed(y, yb, yl, pos);
   return *this %= BigInt (yb, yl, pos);
 }
-
 
 BigInt &
 BigInt::operator+= (ullong_t uy)
