@@ -118,43 +118,44 @@ $(document).ready(function(){initNavTree('bv__dimacs_8h_source.html',''); initRe
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &quot;<a class="code" href="bv__pointers_8h.html">bv_pointers.h</a>&quot;</span></div>
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="keyword">class </span><a class="code hl_class" href="classdimacs__cnft.html">dimacs_cnft</a>;</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="preprocessor">#include &lt;iosfwd&gt;</span></div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
-<div class="foldopen" id="foldopen00019" data-start="{" data-end="};">
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="classbv__dimacst.html">   19</a></span><span class="keyword">class </span><a class="code hl_class" href="classbv__dimacst.html">bv_dimacst</a> : <span class="keyword">public</span> <a class="code hl_class" href="classbv__pointerst.html">bv_pointerst</a></div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>{</div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>  <a class="code hl_class" href="classbv__dimacst.html">bv_dimacst</a>(</div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>    <span class="keyword">const</span> <a class="code hl_class" href="classnamespacet.html">namespacet</a> &amp;<a class="code hl_class" href="classait.html">_ns</a>,</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    <a class="code hl_class" href="classdimacs__cnft.html">dimacs_cnft</a> &amp;<a class="code hl_class" href="classait.html">_prop</a>,</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    <a class="code hl_class" href="classmessage__handlert.html">message_handlert</a> &amp;<a class="code hl_variable" href="classarrayst.html#a46d27a50c532a8da69accc765628b2a1">message_handler</a>,</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    <span class="keyword">const</span> std::string &amp;<a class="code hl_class" href="classait.html">_filename</a>);</div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
-<div class="foldopen" id="foldopen00028" data-start="{" data-end="}">
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="classbv__dimacst.html#aeb59cf74d0bbae2a13586229e00984e9">   28</a></span>  <span class="keyword">virtual</span> <a class="code hl_function" href="classbv__dimacst.html#aeb59cf74d0bbae2a13586229e00984e9">~bv_dimacst</a>()</div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>  {</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    <a class="code hl_function" href="classbv__dimacst.html#aadb073d4290f86f7e1067a585efc687d">write_dimacs</a>();</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>  }</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="keyword">class </span><a class="code hl_class" href="classdimacs__cnft.html">dimacs_cnft</a>;</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
+<div class="foldopen" id="foldopen00021" data-start="{" data-end="};">
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno"><a class="line" href="classbv__dimacst.html">   21</a></span><span class="keyword">class </span><a class="code hl_class" href="classbv__dimacst.html">bv_dimacst</a> : <span class="keyword">public</span> <a class="code hl_class" href="classbv__pointerst.html">bv_pointerst</a></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>{</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>  <a class="code hl_class" href="classbv__dimacst.html">bv_dimacst</a>(</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    <span class="keyword">const</span> <a class="code hl_class" href="classnamespacet.html">namespacet</a> &amp;<a class="code hl_class" href="classait.html">_ns</a>,</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    <a class="code hl_class" href="classdimacs__cnft.html">dimacs_cnft</a> &amp;<a class="code hl_class" href="classait.html">_prop</a>,</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    <a class="code hl_class" href="classmessage__handlert.html">message_handlert</a> &amp;<a class="code hl_variable" href="classarrayst.html#a46d27a50c532a8da69accc765628b2a1">message_handler</a>,</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    std::ostream &amp;_out);</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span> </div>
+<div class="foldopen" id="foldopen00030" data-start="{" data-end="}">
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno"><a class="line" href="classbv__dimacst.html#aeb59cf74d0bbae2a13586229e00984e9">   30</a></span>  <span class="keyword">virtual</span> <a class="code hl_function" href="classbv__dimacst.html#aeb59cf74d0bbae2a13586229e00984e9">~bv_dimacst</a>()</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>  {</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    <a class="code hl_function" href="classbv__dimacst.html#a75e53c2bbc01bdc05fa9ec5c4a6f527a">write_dimacs</a>();</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>  }</div>
 </div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span> </div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="keyword">protected</span>:</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno"><a class="line" href="classbv__dimacst.html#ad51e83dfeb3c9e34ab07111e7e5f0e88">   34</a></span>  <span class="keyword">const</span> std::string <a class="code hl_variable" href="classbv__dimacst.html#ad51e83dfeb3c9e34ab07111e7e5f0e88">filename</a>;</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno"><a class="line" href="classbv__dimacst.html#a0f92825fda7880beab61ff796de2f66e">   35</a></span>  <span class="keyword">const</span> <a class="code hl_class" href="classdimacs__cnft.html">dimacs_cnft</a> &amp;<a class="code hl_variable" href="classbv__dimacst.html#a0f92825fda7880beab61ff796de2f66e">dimacs_cnf_prop</a>;</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span> </div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>  <span class="keywordtype">bool</span> <a class="code hl_function" href="classbv__dimacst.html#aadb073d4290f86f7e1067a585efc687d">write_dimacs</a>();</div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>  <span class="keywordtype">bool</span> <a class="code hl_function" href="classbv__dimacst.html#aadb073d4290f86f7e1067a585efc687d">write_dimacs</a>(std::ostream &amp;);</div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>};</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span> </div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span><span class="keyword">protected</span>:</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno"><a class="line" href="classbv__dimacst.html#a87e953e13a2f3a5ee42a2cdda59afc19">   36</a></span>  std::ostream &amp;<a class="code hl_variable" href="classbv__dimacst.html#a87e953e13a2f3a5ee42a2cdda59afc19">out</a>;</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno"><a class="line" href="classbv__dimacst.html#a0f92825fda7880beab61ff796de2f66e">   37</a></span>  <span class="keyword">const</span> <a class="code hl_class" href="classdimacs__cnft.html">dimacs_cnft</a> &amp;<a class="code hl_variable" href="classbv__dimacst.html#a0f92825fda7880beab61ff796de2f66e">dimacs_cnf_prop</a>;</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span> </div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classbv__dimacst.html#a75e53c2bbc01bdc05fa9ec5c4a6f527a">write_dimacs</a>();</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>};</div>
 </div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span> </div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="preprocessor">#endif </span><span class="comment">// CPROVER_SOLVERS_FLATTENING_BV_DIMACS_H</span></div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span> </div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="preprocessor">#endif </span><span class="comment">// CPROVER_SOLVERS_FLATTENING_BV_DIMACS_H</span></div>
 <div class="ttc" id="abv__pointers_8h_html"><div class="ttname"><a href="bv__pointers_8h.html">bv_pointers.h</a></div></div>
 <div class="ttc" id="aclassait_html"><div class="ttname"><a href="classait.html">ait</a></div><div class="ttdoc">ait supplies three of the four components needed: an abstract interpreter (in this case handling func...</div><div class="ttdef"><b>Definition</b> <a href="ai_8h_source.html#l00565">ai.h:566</a></div></div>
 <div class="ttc" id="aclassarrayst_html_a46d27a50c532a8da69accc765628b2a1"><div class="ttname"><a href="classarrayst.html#a46d27a50c532a8da69accc765628b2a1">arrayst::message_handler</a></div><div class="ttdeci">message_handlert &amp; message_handler</div><div class="ttdef"><b>Definition</b> <a href="arrays_8h_source.html#l00058">arrays.h:58</a></div></div>
-<div class="ttc" id="aclassbv__dimacst_html"><div class="ttname"><a href="classbv__dimacst.html">bv_dimacst</a></div><div class="ttdef"><b>Definition</b> <a href="bv__dimacs_8h_source.html#l00019">bv_dimacs.h:20</a></div></div>
-<div class="ttc" id="aclassbv__dimacst_html_a0f92825fda7880beab61ff796de2f66e"><div class="ttname"><a href="classbv__dimacst.html#a0f92825fda7880beab61ff796de2f66e">bv_dimacst::dimacs_cnf_prop</a></div><div class="ttdeci">const dimacs_cnft &amp; dimacs_cnf_prop</div><div class="ttdef"><b>Definition</b> <a href="bv__dimacs_8h_source.html#l00035">bv_dimacs.h:35</a></div></div>
-<div class="ttc" id="aclassbv__dimacst_html_aadb073d4290f86f7e1067a585efc687d"><div class="ttname"><a href="classbv__dimacst.html#aadb073d4290f86f7e1067a585efc687d">bv_dimacst::write_dimacs</a></div><div class="ttdeci">bool write_dimacs()</div><div class="ttdef"><b>Definition</b> <a href="bv__dimacs_8cpp_source.html#l00030">bv_dimacs.cpp:30</a></div></div>
-<div class="ttc" id="aclassbv__dimacst_html_ad51e83dfeb3c9e34ab07111e7e5f0e88"><div class="ttname"><a href="classbv__dimacst.html#ad51e83dfeb3c9e34ab07111e7e5f0e88">bv_dimacst::filename</a></div><div class="ttdeci">const std::string filename</div><div class="ttdef"><b>Definition</b> <a href="bv__dimacs_8h_source.html#l00034">bv_dimacs.h:34</a></div></div>
-<div class="ttc" id="aclassbv__dimacst_html_aeb59cf74d0bbae2a13586229e00984e9"><div class="ttname"><a href="classbv__dimacst.html#aeb59cf74d0bbae2a13586229e00984e9">bv_dimacst::~bv_dimacst</a></div><div class="ttdeci">virtual ~bv_dimacst()</div><div class="ttdef"><b>Definition</b> <a href="bv__dimacs_8h_source.html#l00028">bv_dimacs.h:28</a></div></div>
+<div class="ttc" id="aclassbv__dimacst_html"><div class="ttname"><a href="classbv__dimacst.html">bv_dimacst</a></div><div class="ttdef"><b>Definition</b> <a href="bv__dimacs_8h_source.html#l00021">bv_dimacs.h:22</a></div></div>
+<div class="ttc" id="aclassbv__dimacst_html_a0f92825fda7880beab61ff796de2f66e"><div class="ttname"><a href="classbv__dimacst.html#a0f92825fda7880beab61ff796de2f66e">bv_dimacst::dimacs_cnf_prop</a></div><div class="ttdeci">const dimacs_cnft &amp; dimacs_cnf_prop</div><div class="ttdef"><b>Definition</b> <a href="bv__dimacs_8h_source.html#l00037">bv_dimacs.h:37</a></div></div>
+<div class="ttc" id="aclassbv__dimacst_html_a75e53c2bbc01bdc05fa9ec5c4a6f527a"><div class="ttname"><a href="classbv__dimacst.html#a75e53c2bbc01bdc05fa9ec5c4a6f527a">bv_dimacst::write_dimacs</a></div><div class="ttdeci">void write_dimacs()</div><div class="ttdef"><b>Definition</b> <a href="bv__dimacs_8cpp_source.html#l00025">bv_dimacs.cpp:25</a></div></div>
+<div class="ttc" id="aclassbv__dimacst_html_a87e953e13a2f3a5ee42a2cdda59afc19"><div class="ttname"><a href="classbv__dimacst.html#a87e953e13a2f3a5ee42a2cdda59afc19">bv_dimacst::out</a></div><div class="ttdeci">std::ostream &amp; out</div><div class="ttdef"><b>Definition</b> <a href="bv__dimacs_8h_source.html#l00036">bv_dimacs.h:36</a></div></div>
+<div class="ttc" id="aclassbv__dimacst_html_aeb59cf74d0bbae2a13586229e00984e9"><div class="ttname"><a href="classbv__dimacst.html#aeb59cf74d0bbae2a13586229e00984e9">bv_dimacst::~bv_dimacst</a></div><div class="ttdeci">virtual ~bv_dimacst()</div><div class="ttdef"><b>Definition</b> <a href="bv__dimacs_8h_source.html#l00030">bv_dimacs.h:30</a></div></div>
 <div class="ttc" id="aclassbv__pointerst_html"><div class="ttname"><a href="classbv__pointerst.html">bv_pointerst</a></div><div class="ttdef"><b>Definition</b> <a href="bv__pointers_8h_source.html#l00016">bv_pointers.h:17</a></div></div>
 <div class="ttc" id="aclassdimacs__cnft_html"><div class="ttname"><a href="classdimacs__cnft.html">dimacs_cnft</a></div><div class="ttdef"><b>Definition</b> <a href="dimacs__cnf_8h_source.html#l00017">dimacs_cnf.h:18</a></div></div>
 <div class="ttc" id="aclassmessage__handlert_html"><div class="ttname"><a href="classmessage__handlert.html">message_handlert</a></div><div class="ttdef"><b>Definition</b> <a href="src_2util_2message_8h_source.html#l00026">message.h:27</a></div></div>

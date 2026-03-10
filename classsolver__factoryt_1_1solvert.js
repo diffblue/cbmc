@@ -4,6 +4,7 @@ var classsolver__factoryt_1_1solvert =
     [ "solvert", "classsolver__factoryt_1_1solvert.html#a901d08ef52b9c4a94cb00639cbb5b169", null ],
     [ "solvert", "classsolver__factoryt_1_1solvert.html#a7d1727fbc5e5a2ecb0d3ebe8b79ccd74", null ],
     [ "solvert", "classsolver__factoryt_1_1solvert.html#a7dea30153b864da5eea4a935e7ff0ac7", null ],
+    [ "solvert", "classsolver__factoryt_1_1solvert.html#a6285f0443186c6ff8b3f38c86cf4703f", null ],
     [ "boolbv_decision_procedure", "classsolver__factoryt_1_1solvert.html#a6a55cf9a2ffae295688b4174ed0a4f17", null ],
     [ "decision_procedure", "classsolver__factoryt_1_1solvert.html#adac569aa0eca6f8341795981aeff1c6a", null ],
     [ "decision_procedure_is_boolbvt_ptr", "classsolver__factoryt_1_1solvert.html#af4d82b2bcbba1dc904075280baf0fd6f", null ],

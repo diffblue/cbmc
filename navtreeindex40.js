@@ -1,6 +1,5 @@
 var NAVTREEINDEX40 =
 {
-"classinductiveness__resultt.html#a853c4941b38b029533ff742684f4cf48":[7,0,637,6],
 "classinductiveness__resultt.html#ab57e012a8ed0420789527c0aadb8a5b6":[7,0,637,1],
 "classinductiveness__resultt.html#abd26501e9772b16418bb854b69c540a2":[7,0,637,5],
 "classinfinity__exprt.html":[7,0,638],
@@ -249,5 +248,6 @@ var NAVTREEINDEX40 =
 "classinterpretert.html#a2c8759475b136cfd500901bb0f207b5a":[7,0,650,58],
 "classinterpretert.html#a305d3161466588687366324fa060d526":[7,0,650,23],
 "classinterpretert.html#a3741af964753910f238e1423e9908105":[7,0,650,39],
-"classinterpretert.html#a37ffdef85bc750855b5784a50933c47b":[7,0,650,35]
+"classinterpretert.html#a37ffdef85bc750855b5784a50933c47b":[7,0,650,35],
+"classinterpretert.html#a3b8e7c8c13c6f943e3bf4bf35dea606b":[7,0,650,33]
 };

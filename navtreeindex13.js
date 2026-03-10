@@ -123,11 +123,10 @@ var NAVTREEINDEX13 =
 "classbv__arithmetict.html#afc883bff42fc5e96e8405f90217a6987":[7,0,138,22],
 "classbv__arithmetict.html#afe09a0462e80890bb4fb23f14152265e":[7,0,138,24],
 "classbv__dimacst.html":[7,0,139],
-"classbv__dimacst.html#a0f92825fda7880beab61ff796de2f66e":[7,0,139,4],
-"classbv__dimacst.html#a3bd7f1cb125de24e94c794fedb01a21b":[7,0,139,3],
-"classbv__dimacst.html#aadb073d4290f86f7e1067a585efc687d":[7,0,139,2],
-"classbv__dimacst.html#ad51e83dfeb3c9e34ab07111e7e5f0e88":[7,0,139,5],
-"classbv__dimacst.html#ae9d7b6486278d9ce0dc43cae9ef7b77c":[7,0,139,0],
+"classbv__dimacst.html#a064081e9d49321167c6fecc35abc4b41":[7,0,139,0],
+"classbv__dimacst.html#a0f92825fda7880beab61ff796de2f66e":[7,0,139,3],
+"classbv__dimacst.html#a75e53c2bbc01bdc05fa9ec5c4a6f527a":[7,0,139,2],
+"classbv__dimacst.html#a87e953e13a2f3a5ee42a2cdda59afc19":[7,0,139,4],
 "classbv__dimacst.html#aeb59cf74d0bbae2a13586229e00984e9":[7,0,139,1],
 "classbv__endianness__mapt.html":[7,0,140],
 "classbv__endianness__mapt.html#a79bcec4a0e1cc70489af81d5c03e9c80":[7,0,140,2],
@@ -249,5 +248,6 @@ var NAVTREEINDEX13 =
 "classbv__utilst.html#a497a012c25e4ad503a7440bfcac16cc5":[7,0,148,34],
 "classbv__utilst.html#a4bebcc118758252242c0e85cdec8e2ef":[7,0,148,65],
 "classbv__utilst.html#a523d9681b564b19c36efac0ed81db56c":[7,0,148,33],
-"classbv__utilst.html#a5959de18f70e78a14d5ecd8df7fe7816":[7,0,148,25]
+"classbv__utilst.html#a5959de18f70e78a14d5ecd8df7fe7816":[7,0,148,25],
+"classbv__utilst.html#a5c272b6108723f636c107d6ed9c83557":[7,0,148,50]
 };

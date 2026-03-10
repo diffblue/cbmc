@@ -1,6 +1,5 @@
 var NAVTREEINDEX39 =
 {
-"classhelp__formattert.html#a2b5ec122e483c7563f0c9acbe9d21b89":[7,0,612,4],
 "classhelp__formattert.html#a9ffc846f282121096f61609082e1253f":[7,0,612,3],
 "classhelp__formattert.html#ac53f1d03c67cd394f78e956a4c43ce02":[7,0,612,1],
 "classhelp__formattert.html#ad72bdc2e80e1b60ccd985c820d846d11":[7,0,612,2],
@@ -249,5 +248,6 @@ var NAVTREEINDEX39 =
 "classinductiveness__resultt.html#a62b92ff7f00bf2a867f4eb8f4ad40343":[7,0,637,0],
 "classinductiveness__resultt.html#a62b92ff7f00bf2a867f4eb8f4ad40343a2e64fe59ce45ba3ad76888aa572b282e":[7,0,637,0,2],
 "classinductiveness__resultt.html#a62b92ff7f00bf2a867f4eb8f4ad40343a561491a33592bc406c5186dd6fa66b71":[7,0,637,0,0],
-"classinductiveness__resultt.html#a62b92ff7f00bf2a867f4eb8f4ad40343aa67802c2fa23edd5e093d78b1efe4b2c":[7,0,637,0,1]
+"classinductiveness__resultt.html#a62b92ff7f00bf2a867f4eb8f4ad40343aa67802c2fa23edd5e093d78b1efe4b2c":[7,0,637,0,1],
+"classinductiveness__resultt.html#a853c4941b38b029533ff742684f4cf48":[7,0,637,6]
 };
