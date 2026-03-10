@@ -1103,8 +1103,35 @@ jobs:
         run: |
           sudo apt update
           sudo apt install openjdk-11-jdk-headless
+      - name: Set up Docker Buildx
+        id: setup-buildx
+        uses: docker/setup-buildx-action@v4
+      - name: Cache Docker build mounts (apt downloads + ccache)
+        uses: actions/cache@v5
+        id: docker-cache-mount
+        with:
+          path: docker-cache-mount
+          key: docker-cache-mount-${{ github.sha }}
+          restore-keys: |
+            docker-cache-mount-
+      - name: Inject build mounts into BuildKit
+        # Docker layer caching cannot speed up the build on a source-changing
+        # PR, because `COPY . /tmp/cbmc` invalidates the build layer.  Instead
+        # we persist the Dockerfile's apt and ccache `--mount=type=cache`
+        # contents across runs: this step restores them into the buildx builder
+        # before the build and extracts them again afterwards (saved by the
+        # actions/cache step above).  ccache then reuses objects across source
+        # changes.  Note: on pull requests from forks the actions/cache write is
+        # restricted, so the cache is read-only there and this gracefully
+        # degrades to an uncached build.
+        uses: reproducible-containers/buildkit-cache-dance@v3
+        with:
+          builder: ${{ steps.setup-buildx.outputs.name }}
+          cache-dir: docker-cache-mount
+          dockerfile: Dockerfile
+          skip-extraction: ${{ steps.docker-cache-mount.outputs.cache-hit }}
       - name: Build docker image
-        run: docker build -t cbmc .
+        run: docker buildx build --load -t cbmc .
       - name: Smoke test goto-cc
         run: docker run -v ${PWD}/.github/workflows/smoke_test_assets:/mnt/smoke -t cbmc goto-cc -o /mnt/smoke/test.goto /mnt/smoke/test.c
       - name: Smoke test cbmc
