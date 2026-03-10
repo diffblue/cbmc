@@ -183,6 +183,7 @@ SRC += analyses/ai/ai.cpp \
        util/memory_info.cpp \
        util/message.cpp \
        util/optional_utils.cpp \
+       util/output_file.cpp \
        util/parse_options.cpp \
        util/piped_process.cpp \
        util/pointer_expr.cpp \

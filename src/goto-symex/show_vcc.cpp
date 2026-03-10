@@ -11,15 +11,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "show_vcc.h"
 
-#include <util/exception_utils.h>
 #include <util/format_expr.h>
 #include <util/json_irep.h>
+#include <util/output_file.h>
 #include <util/ui_message.h>
 
 #include "symex_target_equation.h"
-
-#include <fstream> // IWYU pragma: keep
-#include <iostream>
 
 /// Output equations from \p equation in plain text format to the given output
 /// stream \p out.
@@ -173,19 +170,11 @@ void show_vcc(
   messaget msg(ui_message_handler);
 
   const std::string &filename = options.get_option("outfile");
-  bool have_file = !filename.empty() && filename != "-";
 
-  std::ofstream of;
+  output_filet output_file{filename.empty() ? "-" : filename};
+  bool have_file = output_file.is_file();
 
-  if(have_file)
-  {
-    of.open(filename);
-    if(!of)
-      throw invalid_command_line_argument_exceptiont(
-        "failed to open output file: " + filename, "--outfile");
-  }
-
-  std::ostream &out = have_file ? of : std::cout;
+  std::ostream &out = output_file.stream();
 
   switch(ui_message_handler.get_ui())
   {
@@ -213,7 +202,4 @@ void show_vcc(
     }
     break;
   }
-
-  if(have_file)
-    of.close();
 }
