@@ -1,4 +1,4 @@
-CORE
+THOROUGH
 main.c
 --no-malloc-may-fail --dfcc main --enforce-contract foo _ --no-standard-checks
 ^EXIT=0$

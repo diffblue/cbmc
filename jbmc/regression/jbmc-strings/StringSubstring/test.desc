@@ -1,4 +1,4 @@
-CORE
+THOROUGH
 Test
 --unwind 10 --max-nondet-string-length 6  --function Test.testSuccess --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
 ^EXIT=0$
