@@ -921,7 +921,7 @@ jobs:
           make CXX=clcache BUILD_ENV=MSVC -C unit test TAGS="[z3]"
           make CXX=clcache BUILD_ENV=MSVC -C jbmc/unit test
       - name: Run CBMC regression tests
-        run: make CXX=clcache BUILD_ENV=MSVC -C regression test
+        run: make CXX=clcache BUILD_ENV=MSVC -j${{env.windows-vcpus}} -C regression test-parallel-jobs
 
   # This job takes approximately 7 to 32 minutes
   windows-msi-package:

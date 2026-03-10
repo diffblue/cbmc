@@ -112,6 +112,17 @@ test-parallel:
 		$(MAKE) "{}" \
 		::: $(DIRS)
 
+# Run all test directories in parallel when invoked with make -j<N>
+# (no GNU Parallel needed).
+# Example: make -j8 test-parallel-jobs
+# Without -j, the directories will run sequentially.
+PARALLEL_DIRS = $(addprefix parallel__,$(DIRS))
+.PHONY: test-parallel-jobs $(PARALLEL_DIRS)
+test-parallel-jobs: $(PARALLEL_DIRS)
+$(PARALLEL_DIRS): parallel__%:
+	@echo "Running $*..."
+	$(MAKE) -C "$*" test
+
 
 .PHONY: clean
 clean:
