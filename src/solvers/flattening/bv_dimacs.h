@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "bv_pointers.h"
 
+#include <iosfwd>
+
 class dimacs_cnft;
 
 class bv_dimacst : public bv_pointerst
@@ -23,7 +25,7 @@ public:
     const namespacet &_ns,
     dimacs_cnft &_prop,
     message_handlert &message_handler,
-    const std::string &_filename);
+    std::ostream &_out);
 
   virtual ~bv_dimacst()
   {
@@ -31,11 +33,10 @@ public:
   }
 
 protected:
-  const std::string filename;
+  std::ostream &out;
   const dimacs_cnft &dimacs_cnf_prop;
 
-  bool write_dimacs();
-  bool write_dimacs(std::ostream &);
+  void write_dimacs();
 };
 
 #endif // CPROVER_SOLVERS_FLATTENING_BV_DIMACS_H

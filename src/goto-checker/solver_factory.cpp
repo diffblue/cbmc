@@ -71,6 +71,16 @@ solver_factoryt::solvert::solvert(
 {
 }
 
+solver_factoryt::solvert::solvert(
+  std::unique_ptr<boolbvt> p1,
+  std::unique_ptr<propt> p2,
+  std::unique_ptr<std::ofstream> p3)
+  : ofstream_ptr(std::move(p3)),
+    prop_ptr(std::move(p2)),
+    decision_procedure_is_boolbvt_ptr(std::move(p1))
+{
+}
+
 stack_decision_proceduret &solver_factoryt::solvert::decision_procedure() const
 {
   PRECONDITION(
@@ -324,6 +334,27 @@ get_sat_solver(message_handlert &message_handler, const optionst &options)
   }
 }
 
+static std::unique_ptr<std::ofstream> open_outfile_and_check(
+  const std::string &filename,
+  message_handlert &message_handler,
+  const std::string &arg_name)
+{
+  if(filename.empty())
+    return nullptr;
+
+  auto out = std::make_unique<std::ofstream>(widen_if_needed(filename));
+
+  if(!*out)
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "failed to open file: " + filename, arg_name);
+  }
+
+  messaget log(message_handler);
+  log.status() << "Outputting formula to file: " << filename << messaget::eom;
+  return out;
+}
+
 std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
 {
   auto sat_solver = get_sat_solver(message_handler, options);
@@ -353,10 +384,21 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_dimacs()
 
   std::string filename = options.get_option("outfile");
 
-  std::unique_ptr<boolbvt> bv_dimacs =
-    std::make_unique<bv_dimacst>(ns, *prop, message_handler, filename);
+  if(filename.empty() || filename == "-")
+  {
+    std::unique_ptr<boolbvt> bv_dimacs =
+      std::make_unique<bv_dimacst>(ns, *prop, message_handler, std::cout);
 
-  return std::make_unique<solvert>(std::move(bv_dimacs), std::move(prop));
+    return std::make_unique<solvert>(std::move(bv_dimacs), std::move(prop));
+  }
+
+  auto outfile = open_outfile_and_check(filename, message_handler, "--outfile");
+
+  std::unique_ptr<boolbvt> bv_dimacs =
+    std::make_unique<bv_dimacst>(ns, *prop, message_handler, *outfile);
+
+  return std::make_unique<solvert>(
+    std::move(bv_dimacs), std::move(prop), std::move(outfile));
 }
 
 std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_external_sat()
@@ -423,28 +465,6 @@ solver_factoryt::get_string_refinement()
   set_decision_procedure_time_limit(*decision_procedure);
   return std::make_unique<solvert>(
     std::move(decision_procedure), std::move(prop));
-}
-
-std::unique_ptr<std::ofstream> open_outfile_and_check(
-  const std::string &filename,
-  message_handlert &message_handler,
-  const std::string &arg_name)
-{
-  if(filename.empty())
-    return nullptr;
-
-  auto out = std::make_unique<std::ofstream>(widen_if_needed(filename));
-
-  if(!*out)
-  {
-    throw invalid_command_line_argument_exceptiont(
-      "failed to open file: " + filename, arg_name);
-  }
-
-  messaget log(message_handler);
-  log.status() << "Outputting SMTLib formula to file: " << filename
-               << messaget::eom;
-  return out;
 }
 
 std::unique_ptr<solver_factoryt::solvert>
