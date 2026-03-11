@@ -356,3 +356,76 @@ larger than all the SSA identifier optimizations combined.
 
 On the array-heavy benchmark, the combined effect is even larger:
 3.13s → 1.91s (**39% faster**).
+
+## Final Combined Results (2026-03-11)
+
+All optimizations combined on `experiment/hash-optimization` branch:
+- SSA identifier string concat (replace ostringstream)
+- SSA set_level_0/1/2 suffix appending (avoid full rebuild)
+- field_sensitivity array loop caching
+- irept union optimization (from issue #7960)
+- tcmalloc linked via CMake
+
+### Performance vs baseline (develop, glibc malloc)
+
+| Benchmark | Baseline | Optimized | Speedup |
+|-----------|----------|-----------|---------|
+| linked_list | 1.49s | 1.08s | **27.5%** |
+| array_ops | 3.08s | 1.89s | **38.6%** |
+| csmith_42 | 8.83s | 6.26s | **29.1%** |
+| csmith_1111111111 | 16.81s | 12.44s | **26.0%** |
+
+### New profile (csmith_42, all optimizations + tcmalloc)
+
+| Rank | Function | % | Change vs original |
+|------|----------|---|-------------------|
+| 1 | `string_containert` hash lookup | 13.2% | Was 10.0% — now larger share because other costs reduced |
+| 2 | `sharing_treet::remove_ref` | 6.1% | Was 9.9% — irept union helped |
+| 3 | tcmalloc new/delete | 7.8% | Was 18% glibc — 2.3x reduction |
+| 4 | `irept::find` | 4.7% | Was 5.4% |
+| 5 | `memcmp` | 4.5% | Was 3.5% — larger share |
+| 6 | `irept::get` | 3.4% | Was 4.8% |
+| 7 | `sharing_treet::detach` | 3.0% | Was 4.6% |
+| 8 | `symbol_tablet::find` | 3.0% | Was 4.9% |
+| 9 | `irept::operator==` | 2.1% | Unchanged |
+| 10 | `hash_string` | 1.9% | Was 1.7% |
+
+### Remaining avenues to explore
+
+1. **String interning volume** (13.2%): Still the #1 hotspot. The remaining
+   `set_expression` calls in `field_sensitivity.cpp` (member expressions,
+   not just arrays) still trigger full identifier rebuilds. Also,
+   `build_ssa_identifier_rec` is called from the constructor for every new
+   `ssa_exprt`. Caching the base identifier per-symbol could help.
+
+2. **`memcmp` in string interning** (4.5%): The `string_ptrt::operator==`
+   does `memcmp` on every hash table probe. If we stored a pre-computed
+   hash alongside the string pointer, we could skip `memcmp` when hashes
+   differ. However, `std::unordered_map` already does this internally.
+   The cost is from hash collisions in the same bucket.
+
+3. **`irept::find` / `irept::get`** (8.1% combined): These do linear scans
+   through `forward_list_as_mapt`. Replacing this with a flat hash map or
+   small sorted array for named sub-trees could help, but is a major
+   structural change to irept.
+
+4. **`merge_irept::merged`** (1.8%): Expression merging during symex.
+   Could benefit from better hash caching.
+
+5. **`sharing_mapt::get_leaf_node`** (1.3%): The SSA renaming map uses a
+   hash-array-mapped trie. A flat hash map might be faster for the typical
+   map sizes in symex.
+
+### Assessment
+
+The low-hanging fruit has been picked. The remaining hotspots are either:
+- **Fundamental data structure costs** (irept find/get, sharing_tree) that
+  require structural changes to improve
+- **Algorithmic** (string interning volume) that require deeper changes to
+  how SSA identifiers are managed
+- **Already well-optimized** by tcmalloc (allocation is now 7.8% vs 18%)
+
+The most promising remaining avenue is reducing string interning volume
+further — specifically, avoiding `string_containert::get` calls for strings
+that are already `dstringt` values. This would require changes to how
+`ssa_exprt` stores and updates its identifier.
