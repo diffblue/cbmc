@@ -204,13 +204,27 @@ const irep_idt ssa_exprt::get_l1_object_identifier() const
 void ssa_exprt::set_level_0(std::size_t i)
 {
   set(ID_L0, i);
-  ::update_identifier(*this);
+  // Optimized: L0 is only set when it was previously empty (the caller
+  // guards against re-setting). The current identifier is "base" and
+  // we need "base!l0". Append directly instead of rebuilding.
+  const std::string &cur_id = id2string(get_identifier());
+  std::string suffix = "!" + std::to_string(i);
+  std::string new_id = cur_id + suffix;
+  set_identifier(new_id);
+  set(ID_L1_object_identifier, new_id);
 }
 
 void ssa_exprt::set_level_1(std::size_t i)
 {
   set(ID_L1, i);
-  ::update_identifier(*this);
+  // Optimized: L1 is only set when it was previously empty (the caller
+  // guards against re-setting). The current identifier is "base!l0" and
+  // we need "base!l0@l1". Append directly instead of rebuilding.
+  const std::string &cur_id = id2string(get_identifier());
+  std::string suffix = "@" + std::to_string(i);
+  std::string new_id = cur_id + suffix;
+  set_identifier(new_id);
+  set(ID_L1_object_identifier, new_id);
 }
 
 void ssa_exprt::set_level_2(std::size_t i)
