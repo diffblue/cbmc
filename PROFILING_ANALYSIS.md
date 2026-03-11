@@ -224,6 +224,78 @@ P2 is the highest-impact target: the hashing investigation confirmed that
 the 11.7% cost is from redundant `update_identifier` calls, not from hash
 table configuration. P1 remains the best bang-for-buck at low effort.
 
+## Post-Optimization Investigation (2026-03-11)
+
+After implementing the SSA identifier optimizations (P2), re-profiled to
+assess remaining targets.
+
+### Updated profile (csmith_42, post-optimization)
+
+| Rank | Function | % | Notes |
+|------|----------|---|-------|
+| 1 | `string_containert` hash lookup | 11.1% | Volume of calls, not hash quality |
+| 2 | `sharing_treet::remove_ref` | 7.2% | 63% self-recursive |
+| 3 | `symbol_tablet::find` | 6.0% | `next_unused_suffix` now only 0.56% |
+| 4 | malloc/free combined | ~18% | Consequence of irept allocation |
+| 5 | `memcmp` | 3.5% | From `string_ptrt::operator==` |
+| 6 | `irept::find` | 3.4% | Scattered callers |
+| 7 | `irept::get` | 3.2% | Scattered callers |
+| 8 | `sharing_treet::detach` | 2.7% | From `irept::add`/`remove` |
+| 9 | `hash_string` | 2.1% | String interning hash function |
+| 10 | `irept::operator==` | 2.1% | 57% self-recursive, 32% from `merge_irept` |
+
+### Investigation results for remaining targets
+
+**P1: `next_unused_suffix`** — Now only 0.56% (was 4.9% in original profile).
+The original measurement was inflated by the `string_containert::get` cost
+that dominated the `symbol_tablet::find` samples. After the SSA identifier
+optimization reduced interning calls, `next_unused_suffix` is no longer a
+significant bottleneck. `symbol_table_buildert` already provides a suffix
+cache for the cases that need it.
+
+**P3: `sharing_treet::remove_ref`** — Tested the existing
+`nonrecursive_destructor` (already implemented but disabled via `#if 0`).
+Result: **15% SLOWER** (9.74s vs 8.44s on csmith_42). The explicit
+`std::vector` stack with `reserve` and iteration is more expensive than
+the recursive version, which benefits from the CPU call stack being in
+L1 cache. The nonrecursive version is only useful for avoiding stack
+overflow on extremely deep trees, not for performance.
+
+**P4: `symex_dead.cpp` detach** — The source locations from addr2line
+(`symex_dead.cpp:65,72`) were inlining artifacts. The actual `detach`
+cost is spread across many callers (45.9% from `irept::add`, 17% from
+`field_sensitivityt::apply`, 10.8% from `irept::remove`). No single
+call site dominates enough for a targeted fix.
+
+**P5: `constant_exprt::check`** — Only 0.32% of time is in `check`
+itself. The 19.7% of `irept::find` attributed to `check` is because
+`check` calls `find(ID_value)`. The `check` functions are validation
+that runs on every `to_constant_expr` cast even in Release builds
+(INVARIANT is not compiled out by default). Disabling checks would
+require `CPROVER_INVARIANT_DO_NOT_CHECK` which is not recommended.
+
+### Conclusion
+
+The remaining hotspots are dominated by fundamental irept operations
+(`find`, `get`, `add`, `remove_ref`, `detach`, `operator==`) that are
+called millions of times from many different sites. These are inherent
+to the sharing tree data structure and cannot be optimized by targeting
+individual call sites. Significant further improvement would require
+either:
+
+1. **Reducing the number of irept operations** — e.g., by caching
+   intermediate results, avoiding unnecessary copies, or restructuring
+   algorithms to batch mutations.
+
+2. **Changing the irept data structure** — e.g., using a flat hash map
+   instead of `forward_list_as_mapt` for named sub-trees, or using
+   a different representation for frequently-accessed fields.
+
+3. **Reducing string interning volume** — the 11.1% in
+   `string_containert::get` is from the remaining `set_expression`
+   calls (37% of `update_identifier`) in `field_sensitivity.cpp`'s
+   array element loop. Caching per-index identifiers there could help.
+
 ## Raw Data
 
 Full results in `profile-results/results.json` and per-benchmark flamegraphs
