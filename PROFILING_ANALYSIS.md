@@ -48,17 +48,39 @@ The `_Hashtable::_M_find_before_node` (10.0%) and `_Hashtable::find` (1.6%)
 functions are called almost exclusively from `string_containert::get`.
 Additionally, `hash_string` accounts for 1.7%.
 
-- **Root cause**: Every `irep_idt` creation goes through string interning.
-  During symex, `build_ssa_identifier_rec` and `update_identifier` construct
-  SSA identifier strings via `std::ostringstream`, then intern them.
-- **Call sites**: 99.8% from `string_containert::get` → hashtable lookup
-- **Dominated by**: CSmith benchmarks (1000+ samples each)
-- **Source**: `src/util/string_container.h`, `src/util/dstring.h`
-- **Possible improvements**:
-  - Better hash function (current `hash_string` is a simple loop)
-  - Pre-sized hash table to reduce rehashing
-  - Avoid re-interning strings that are already interned
-  - Cache SSA identifier strings instead of rebuilding from ostringstream
+- **Root cause**: NOT the hash function or table configuration (see
+  investigation below), but the **volume of redundant interning calls**.
+  `update_identifier(ssa_exprt&)` is called 11.5M times on csmith_42
+  with a 98.6% hit rate — almost all calls find an already-interned string.
+- **Call chain**: `field_sensitivityt::get_fields` / `rename` / `set_indices`
+  → `update_identifier` → `build_identifier` (creates two `ostringstream`,
+  builds string char-by-char) → `irep_idt(oss.str())` → `string_containert::get`
+  → `hash_string` → `hash_table.find`
+- **Source**: `src/util/ssa_expr.cpp` (`update_identifier`, `build_identifier`)
+
+#### Investigation: hash function and table tuning
+
+Tested three approaches on csmith_42 (11.5M get() calls, 156K unique strings):
+
+| Change | Result | Reason |
+|--------|--------|--------|
+| FNV-1a hash (replace h*31+c) | **3.6% slower** | Multiply costlier than shift-subtract; chain lengths already short |
+| Pre-reserve 10K buckets | No effect | `unordered_map` handles growth fine |
+| Max load factor 0.5 | **1.3-1.8% faster** | Shorter chains, but modest (doubles memory) |
+
+Hash distribution quality is similar for both hash functions (~37% empty
+buckets at load factor 1.0). `dstringt::hash() = no` (sequential index)
+is actually perfect for `std::unordered_map<dstringt, ...>`.
+
+#### Recommended optimization
+
+Avoid redundant `get()` calls rather than tuning the hash table:
+- **Cache SSA identifiers**: skip `build_identifier` when l0/l1/l2 and
+  the original expression haven't changed
+- **Avoid ostringstream**: use direct string concatenation with `id2string()`
+- **Reduce `update_identifier` calls**: audit callers for unnecessary rebuilds
+
+Estimated impact: 6-9% overall speedup (50-80% reduction of the 11.7% cost).
 
 ### 2. Sharing tree destruction: `sharing_treet::remove_ref` — 9.9%
 
@@ -175,15 +197,15 @@ Based on impact and feasibility:
 | Priority | Target | Impact | Effort | Approach |
 |----------|--------|--------|--------|----------|
 | **P1** | `next_unused_suffix` | 4.9% | Low | Per-prefix counter instead of probing |
-| **P2** | `sharing_treet::remove_ref` | 9.9% | Medium | Iterative destruction with explicit stack |
-| **P3** | `string_containert` hash | 11.7% | Medium | Better hash function, pre-sized table |
+| **P2** | SSA identifier rebuilding | 11.7% | Medium | Cache identifiers / avoid ostringstream |
+| **P3** | `sharing_treet::remove_ref` | 9.9% | Medium | Iterative destruction with explicit stack |
 | **P4** | `symex_dead.cpp` detach | 4.6% | Low | Batch add/remove to avoid double detach |
 | **P5** | `constant_exprt::check` in simplifier | ~2% | Low | Short-circuit common cases |
 | **P6** | `requires_renaming` caching | ~1% | Low | Cache result per type |
 
-P1 is the best bang-for-buck: clear algorithmic improvement, low risk, ~5% of
-total runtime. P2 and P3 are higher impact but require more careful
-implementation. P4 is a targeted fix in a specific file.
+P2 is the highest-impact target: the hashing investigation confirmed that
+the 11.7% cost is from redundant `update_identifier` calls, not from hash
+table configuration. P1 remains the best bang-for-buck at low effort.
 
 ## Raw Data
 
