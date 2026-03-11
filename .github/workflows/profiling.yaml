@@ -55,6 +55,7 @@ jobs:
           fi
           echo "$(dirname "$PERF_REAL")" >> "$GITHUB_PATH"
           "$PERF_REAL" --version
+          # perf requires perf_event_paranoid=-1 for call graph recording
           sudo sysctl kernel.perf_event_paranoid=-1
 
       - name: Restore ccache
