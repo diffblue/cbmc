@@ -95,9 +95,50 @@ Replaced `std::ostringstream` with direct `std::string` concatenation
 | csmith_42 | 8.89s | 8.58s | 3.5% |
 | csmith_1111111111 | 16.91s | 15.92s | **5.9%** |
 
-Further optimization potential remains: caching SSA identifiers when
-levels haven't changed, and reducing the number of `update_identifier`
-calls (currently called 3 times per L0→L1→L2 rename chain).
+#### Implemented: avoid full rebuild in set_level_0/1/2
+
+When `set_level_0`, `set_level_1`, or `set_level_2` is called, the
+identifier can be derived from the existing one by appending a suffix
+(`!l0`, `@l1`, `#l2`) instead of rebuilding from the expression tree.
+This is safe because each level is only set when previously empty
+(callers guard against re-setting). Commits `4564ca2163`, `2c09b3ef20`.
+
+Instrumentation showed `update_identifier` is called 504,737 times on
+csmith_42: 24% from `set_level_0`, 22% from `set_level_1`, 16% from
+`set_level_2`, 37% from `set_expression`.
+
+Combined with the ostringstream optimization:
+
+| Benchmark | Baseline | After all SSA opts | Speedup |
+|-----------|----------|--------------------|---------|
+| linked_list | 1.49s | 1.44s | 3.4% |
+| array_ops | 3.13s | 2.69s | 14.1% |
+| csmith_42 | 8.89s | 8.44s | 5.1% |
+| csmith_1111111111 | 16.91s | 15.75s | 6.9% |
+
+#### Implemented: cache array identifier prefix in field_sensitivity
+
+In `field_sensitivityt::get_fields` for array types, pre-compute the
+base identifier and level suffixes once before the loop, then construct
+each element's identifier by concatenating `base[[i]]` + suffixes
+directly. This avoids calling `set_expression` (which triggers a full
+identifier rebuild) for each array index. Commit `3a95db52b3`.
+
+Additional speedup on array-heavy benchmark: array_ops 2.69s → 2.56s
+(4.8%). Minimal impact on CSmith benchmarks.
+
+#### Investigated and ruled out: member expression caching
+
+Attempted the same prefix-caching approach for member expressions
+(`base..component!l0@l1`). No measurable improvement — the member case
+is not in a hot loop (called once per struct field access, not iterated).
+
+Further optimization potential remains: the remaining `set_expression`
+calls (37% of `update_identifier` on CSmith) still do full rebuilds.
+Reducing these would require restructuring how `dstringt` is constructed
+to avoid intermediate `std::string` allocation — `dstringt` doesn't
+support concatenation, so every new identifier must go through
+`string_containert::get()`.
 
 ### 2. Sharing tree destruction: `sharing_treet::remove_ref` — 9.9%
 
@@ -261,6 +302,23 @@ the recursive version, which benefits from the CPU call stack being in
 L1 cache. The nonrecursive version is only useful for avoiding stack
 overflow on extremely deep trees, not for performance.
 
+#### Implemented: irept union optimization (issue #7960)
+
+Cherry-picked thomasspriggs' branch (`tas/irep_optimisation1_unions`)
+which makes `irept` hold a union of a pointer or an id, reducing memory
+usage for leaf nodes. Commits `81005555c6`, `92464ad78a` (originally
+`ccd06c39f8`, `4a1b67f8bc`). Cherry-picked cleanly onto current develop.
+
+| Benchmark | Without union | With union | Speedup |
+|-----------|-------------|------------|---------|
+| linked_list | 1.44s | 1.37s | **4.9%** |
+| array_ops | 2.56s | 2.49s | **2.7%** |
+| csmith_42 | 8.49s | 8.12s | **4.4%** |
+| csmith_1111111111 | 15.75s | 15.37s | **2.4%** |
+
+Consistent 2.4-4.9% improvement from reduced memory footprint and
+fewer allocations for leaf nodes.
+
 **P4: `symex_dead.cpp` detach** — The source locations from addr2line
 (`symex_dead.cpp:65,72`) were inlining artifacts. The actual `detach`
 cost is spread across many callers (45.9% from `irept::add`, 17% from
@@ -341,6 +399,47 @@ apt-get install libtcmalloc-minimal4  # or libjemalloc2
 Add a CMake option to link against tcmalloc or jemalloc. This is the
 single largest performance improvement found in this investigation —
 larger than all the SSA identifier optimizations combined.
+
+#### Implemented: CMake allocator auto-detection
+
+Added `-Dallocator=auto|tcmalloc|jemalloc|system` CMake option. When
+set to `auto` (the default), CMake searches for tcmalloc then jemalloc
+and links the first one found. Commit `0da7f8ff4b`.
+
+Install: `apt-get install libgoogle-perftools-dev` (or `libjemalloc-dev`)
+
+#### tcmalloc vs jemalloc comparison
+
+Both give 18-25% speedup. Key differences:
+- **tcmalloc**: More consistent (no warmup outliers), slightly faster on
+  array-heavy workloads. Known issue: memory footprint can grow over time
+  in long-running processes — not a concern for CBMC which runs and exits.
+- **jemalloc**: Better memory efficiency for long-running servers. Has a
+  warmup cost visible in the first run.
+- **mimalloc** (Microsoft): Only ~1% improvement — its advantages are for
+  multi-threaded workloads.
+- **glibc tuning** (`MALLOC_ARENA_MAX`, `MALLOC_TRIM_THRESHOLD`): 1-3%.
+- **macOS**: System allocator already uses magazine-based allocation
+  similar to tcmalloc; improvement would be smaller.
+- **Windows**: Default heap allocator with LFH is reasonably fast.
+
+Recommendation: tcmalloc for CBMC (single-threaded, short-lived).
+
+#### Implemented: CI tcmalloc installation
+
+Added `libgoogle-perftools-dev` to all Linux CI workflows that build
+CBMC with CMake. Commit `28824f9f07`. Workflows updated:
+build-and-test-Linux, pull-request-checks, performance, coverage,
+profiling.
+
+#### Perf event selection: cycles vs cpu-clock
+
+Tested both events at 997 Hz sampling. Results are nearly identical for
+function-level profiling (same ranking, same percentages within noise).
+`cycles` uses hardware PMU counters (more precise for instruction-level
+analysis); `cpu-clock` is a software timer (always available, works in
+CI containers/VMs). The profiling tool uses `cycles` as default with
+automatic `cpu-clock` fallback.
 
 ## Combined Optimization Summary
 
@@ -443,12 +542,17 @@ which calls `update_identifier` → `build_identifier` → constructs
 a `std::string` and interning it, build the identifier from existing
 `irep_idt` parts using a concatenation that produces an `irep_idt` directly.
 
-**Specific change**: Add an `irep_idt` concatenation function that checks
-if the result is already interned before calling `get()`. Or: cache the
-last identifier per `ssa_exprt` and skip rebuild when inputs haven't changed.
+**Investigation outcome**: Attempted caching for member expressions
+(appending `..component` before level suffixes). No measurable improvement
+because the member case is not in a hot loop. The remaining `set_expression`
+calls (37% of `update_identifier`) are from diverse call sites without a
+single dominant pattern. Further reduction would require adding concatenation
+support to `dstringt` itself (which currently only supports construction
+from `std::string` via `string_containert::get()`).
 
 **Estimated impact**: 3-5% (reducing 13.2% by ~30-40%)
-**Risk**: Medium — touches core identifier infrastructure
+**Risk**: High — requires changes to core `dstringt`/`string_containert`
+**Status**: Partially explored, diminishing returns
 
 ### Plan B: Replace `forward_list_as_mapt` in irept (8.1%)
 
