@@ -29,6 +29,7 @@ add_if_library(goto-instrument-lib glpk)
 # Executable
 add_executable(goto-instrument goto_instrument_main.cpp)
 target_link_libraries(goto-instrument goto-instrument-lib)
+target_link_libraries(goto-instrument cprover_allocator)
 install(TARGETS goto-instrument DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 # Man page

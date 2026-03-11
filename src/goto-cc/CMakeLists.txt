@@ -24,6 +24,7 @@ target_link_libraries(goto-cc-lib
 add_executable(goto-cc goto_cc_main.cpp)
 target_link_libraries(goto-cc goto-cc-lib)
 
+target_link_libraries(goto-cc cprover_allocator)
 install(TARGETS goto-cc DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 if(WIN32)

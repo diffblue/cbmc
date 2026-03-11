@@ -26,6 +26,7 @@ target_link_libraries(goto-diff-lib
 # Executable
 add_executable(goto-diff goto_diff_main.cpp)
 target_link_libraries(goto-diff goto-diff-lib)
+target_link_libraries(goto-diff cprover_allocator)
 install(TARGETS goto-diff DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 # Man page
