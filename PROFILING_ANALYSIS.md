@@ -300,3 +300,59 @@ either:
 
 Full results in `profile-results/results.json` and per-benchmark flamegraphs
 in `profile-results/<name>/flamegraph.svg`.
+
+## Alternative Allocator Investigation (2026-03-11)
+
+Tested drop-in replacement allocators via `LD_PRELOAD` to address the
+~18% of samples in malloc/free/new.
+
+### Results
+
+| Benchmark | glibc | tcmalloc | jemalloc | tcmalloc Δ | jemalloc Δ |
+|-----------|-------|----------|----------|-----------|-----------|
+| linked_list | 1.44s | 1.18s | 1.15s | **-18%** | **-20%** |
+| array_ops | 2.56s | 1.91s | 2.09s | **-25%** | **-18%** |
+| csmith_42 | 8.50s | 6.41s | 6.50s | **-25%** | **-24%** |
+| csmith_1111111111 | 15.71s | 12.73s | 12.01s | **-19%** | **-24%** |
+
+Both allocators give **18-25% speedup** with zero code changes.
+
+### Why it helps
+
+CBMC's irept sharing tree creates and destroys millions of small objects
+(tree_nodet, ~64-128 bytes each). glibc's malloc uses per-thread arenas
+with bins, but the consolidation and free-list management overhead is
+significant for this pattern. tcmalloc and jemalloc use thread-local
+caches and size-class segregation that are much faster for small objects.
+
+### Usage
+
+```bash
+# Via LD_PRELOAD (no rebuild needed)
+LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libtcmalloc_minimal.so.4 cbmc ...
+LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.2 cbmc ...
+
+# Install
+apt-get install libtcmalloc-minimal4  # or libjemalloc2
+```
+
+### Recommendation
+
+Add a CMake option to link against tcmalloc or jemalloc. This is the
+single largest performance improvement found in this investigation —
+larger than all the SSA identifier optimizations combined.
+
+## Combined Optimization Summary
+
+| Optimization | Speedup (csmith_42) | Cumulative |
+|-------------|--------------------:|----------:|
+| Baseline | — | 8.89s |
+| SSA string concat | 3.5% | 8.58s |
+| set_level_2 opt | 0.4% | 8.55s |
+| set_level_0/1 opt | 1.3% | 8.44s |
+| field_sensitivity cache | ~0% (array: 4.8%) | 8.49s |
+| **tcmalloc** | **24.6%** | **6.41s** |
+| **Total** | **27.9%** | **6.41s** |
+
+On the array-heavy benchmark, the combined effect is even larger:
+3.13s → 1.91s (**39% faster**).
