@@ -966,3 +966,47 @@ to get a realistic profile of the full pipeline.
 
 **field_sensitivity is no longer a bottleneck** at 1.6%. The loop
 invariant hoisting was effective.
+
+### Hash function comparison (2026-03-11)
+
+Tested all three irep hash functions from `src/util/irep_hash.h`:
+BASIC (rotate-7 XOR), MURMURHASH2A, and MURMURHASH3.
+
+| Benchmark    | BASIC  | MURMUR2A | MURMUR3 | 2A vs B | 3 vs B |
+|-------------|--------|----------|---------|---------|--------|
+| array_ops   | 1.923s | 1.930s   | 1.928s  | -0.4%   | -0.3%  |
+| matrix      | 1.001s | 1.001s   | 1.007s  | +0.0%   | -0.6%  |
+| tree        | 1.846s | 1.863s   | 1.864s  | -0.9%   | -1.0%  |
+| heavy_array | 1.356s | 1.358s   | 1.358s  | -0.1%   | -0.1%  |
+| linked_list | 0.421s | 0.424s   | 0.423s  | -0.7%   | -0.5%  |
+| dlinked_list| 0.730s | 0.733s   | 0.731s  | -0.4%   | -0.1%  |
+| **TOTAL**   | 7.277s | 7.309s   | 7.311s  | **-0.4%** | **-0.5%** |
+
+**Conclusion**: No meaningful difference. BASIC is marginally fastest
+(0.4-0.5%) but within noise. The hash function is not a bottleneck —
+the cost is in the number of hash operations and the deep equality
+comparisons that follow hash collisions, not in the hash computation
+itself. This is consistent with the earlier finding that `irept::hash`
+is only 1.2% of total time.
+
+Instrumented with `IREP_HASH_STATS` to count actual operator== calls:
+
+| Benchmark    | hash calls | BASIC cmp  | MURMUR2A cmp | MURMUR3 cmp | Δ |
+|-------------|-----------|------------|-------------|-------------|---|
+| array_ops   | 760,484   | 2,712,855  | 2,712,855   | 2,712,855   | 0 |
+| tree        | 1,103,385 | 5,274,971  | 5,272,397   | 5,272,397   | -2,574 |
+| heavy_array | 172,870   | 1,061,894  | 1,061,894   | 1,061,894   | 0 |
+| linked_list | 192,219   | 5,268,225  | 5,268,165   | 5,268,165   | -60 |
+| **TOTAL**   | 2,228,958 | 14,317,945 | 14,315,311  | 14,315,311  | **-2,634 (-0.018%)** |
+
+The Murmur variants produce 2,634 fewer operator== calls out of 14.3M
+(0.018% reduction). This is negligible and explains why the runtime
+difference is within noise.
+
+Notable: the ratio of comparisons to hashes is 6.4:1, meaning
+`merge_irept::merged` does ~6 equality checks per hash lookup on
+average. This suggests the hash table has significant collision chains
+or many structurally similar expressions. However, since the Murmur
+hashes don't reduce this ratio, the collisions are likely from
+genuinely equal expressions (sharing the same hash bucket), not from
+poor hash distribution.
