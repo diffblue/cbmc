@@ -130,6 +130,30 @@ public:
       sub(std::move(_sub))
   {
   }
+
+  // Pool allocator for tree_nodet: maintains a free list of previously
+  // deallocated nodes to avoid malloc/free overhead. CBMC allocates and
+  // frees millions of tree_nodet objects (14M+ on typical workloads);
+  // reusing memory from a free list is significantly faster.
+  static void *operator new(std::size_t size)
+  {
+    if(free_list_head)
+    {
+      void *p = free_list_head;
+      free_list_head = *static_cast<void **>(p);
+      return p;
+    }
+    return ::operator new(size);
+  }
+
+  static void operator delete(void *p, std::size_t /*size*/)
+  {
+    *static_cast<void **>(p) = free_list_head;
+    free_list_head = p;
+  }
+
+private:
+  static inline thread_local void *free_list_head = nullptr;
 };
 
 /// Base class for tree-like data structures with sharing
