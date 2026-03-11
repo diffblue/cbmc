@@ -895,3 +895,74 @@ chain.
 | **TOTAL**   | 7.776s   | 7.482s    | **+3.8%** |
 
 Correctness verified: all 7 benchmarks produce identical step counts.
+
+## Post-Optimization Profile: After get_fields Hoisting (2026-03-11)
+
+Configuration: HEAD (all SSA opts + irept union + get_fields hoisting + tcmalloc)
+Benchmarks: 6 heavy benchmarks × 5 runs each under single perf session
+Total samples: ~38K (997 Hz, filtered to cbmc process)
+
+### Profile by Category
+
+| Category | % | Key functions |
+|----------|---|---------------|
+| ostream I/O | 20.9% | xsputn, ostream_insert, num_put, sentry |
+| irept operations | 19.2% | operator==, find, get, add, hash, compare, detach, remove_ref, merged |
+| tcmalloc | 10.5% | new[], delete[], internal |
+| DIMACS I/O + CNF | 6.2% | write_dimacs_clause, process_clause, lcnf |
+| memmove | 1.9% | memcpy/memmove |
+| field_sensitivity | **1.6%** | apply, ssa_check, requires_renaming, string intern |
+| other CBMC | 0.8% | convert_bv, simplify_node |
+
+### Key Changes vs Previous Profile
+
+1. **field_sensitivity dropped from ~14% to 1.6%** — the loop invariant
+   hoisting and SSA identifier optimizations were effective.
+
+2. **irept::operator== is now #1 CBMC function at 7.5%** (was ~1%).
+   Called from `merge_irept::merged` → `symex_target_equationt::merge_ireps`.
+   This is expression deduplication during symex. 56% of samples are
+   self-recursive (deep tree comparison).
+
+3. **ostream I/O is 21%** — this is a benchmarking artifact from
+   `--dimacs --outfile /dev/null` which still formats all clauses as text.
+   In real usage with a SAT solver, this cost would be replaced by solver
+   time. Future profiling should use `--stop-on-fail` with actual solving
+   to get a realistic profile.
+
+4. **DIMACS CNF generation is 6.2%** — `process_clause`, `write_dimacs_clause`,
+   `lcnf`. This is real work that would also happen with a SAT solver
+   (clause generation), though the text formatting part is artificial.
+
+### Top CBMC Functions
+
+| Rank | Function | % | Caller |
+|------|----------|---|--------|
+| 1 | irept::operator== | 7.50% | merge_irept::merged (expression dedup) |
+| 2 | sharing_treet::remove_ref | 2.59% | Scattered (destruction) |
+| 3 | cnft::process_clause | 2.35% | CNF clause generation |
+| 4 | irept::get | 2.22% | Scattered |
+| 5 | dimacs_cnft::write_dimacs_clause | 2.19% | DIMACS output (artifact) |
+| 6 | irept::find | 1.86% | Scattered |
+| 7 | sharing_treet::detach | 1.28% | Copy-on-write |
+| 8 | merge_irept::merged | 1.26% | Expression dedup |
+| 9 | irept::hash | 1.18% | merge_irept hash table |
+| 10 | cnf_clause_listt::lcnf | 1.13% | CNF clause list |
+
+### Actionable Observations
+
+**merge_irept is the new dominant CBMC hotspot** (operator== 7.5% +
+merged 1.3% + hash 1.2% = ~10%). It deduplicates expressions by
+hashing and deep comparison. Potential optimizations:
+- Cache hash values in irept nodes (HASH_CODE is already enabled but
+  `hash_code` is only set lazily and cleared on mutation)
+- Use hash comparison as a fast-reject before deep operator==
+- Consider whether merge_ireps is called too frequently
+
+**The --dimacs benchmark methodology inflates I/O costs.** The 27%
+in ostream + DIMACS I/O is an artifact. For future profiling, use
+actual SAT solving (e.g., `--sat-solver cadical --stop-on-fail`)
+to get a realistic profile of the full pipeline.
+
+**field_sensitivity is no longer a bottleneck** at 1.6%. The loop
+invariant hoisting was effective.
