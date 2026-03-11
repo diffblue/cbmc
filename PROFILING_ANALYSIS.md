@@ -1010,3 +1010,82 @@ or many structurally similar expressions. However, since the Murmur
 hashes don't reduce this ratio, the collisions are likely from
 genuinely equal expressions (sharing the same hash bucket), not from
 poor hash distribution.
+
+### Investigation: reducing operator== calls (2026-03-11)
+
+**Context**: `irept::operator==` accounts for 7.5% of total time, called
+14.3M times across 4 benchmarks. 67.9% are sharing hits (free), 27.7%
+are deep comparisons returning true, 3.5% are deep comparisons returning
+false, 0.9% are hash rejects.
+
+**Detailed breakdown** (with IREP_HASH_STATS instrumentation):
+
+| Category | Count | % | Cost |
+|----------|-------|---|------|
+| Sharing hit (ptr ==) | 9,648,072 | 67.9% | Free |
+| Hash reject (new) | 133,543 | 0.9% | Cheap |
+| Deep compare (equal) | 3,932,670 | 27.7% | **Expensive** |
+| Deep compare (not eq) | 501,226 | 3.5% | Expensive |
+
+**merge_irept statistics**:
+- 744,362 calls to `merged()`, 82% cache hits
+- 19.2 operator== calls per merge call (recursive sub-tree comparison)
+- `linked_list` has 65:1 ratio (deep expression trees)
+
+#### Attempted: hash-based fast reject in operator==
+
+Added check: if both ireps have cached hash_code and they differ,
+return false immediately. Result: **0.0% runtime impact**. The
+`std::unordered_set` already filters by hash before calling operator==,
+so the hash reject only fires for non-merge callers (133K out of 14.3M).
+
+#### Attempted: opportunistic sharing in operator==
+
+After a successful deep comparison (result == true), make both ireps
+share the same data pointer. This would convert future comparisons
+between the same pair into instant pointer checks.
+
+**Result: UNSAFE.** Changing the data pointer in operator== alters
+copy-on-write semantics. An irep that was the sole owner of its data
+(ref_count == 1, mutations are in-place) becomes a shared owner
+(ref_count > 1, mutations trigger detach/copy). This changed the
+generated formula: `dlinked_list` went from 8,242 to 19,552 steps.
+
+#### Attempted: pointer-based fast lookup in merge_irept
+
+Added `unordered_set<const void*> known_pointers` to skip the
+hash+equality check when an irep's data pointer is already known
+to be in the store.
+
+**Result: 1.3% SLOWER.** The overhead of maintaining the pointer set
+(hashing pointers, inserting, looking up) outweighs the savings.
+
+#### Analysis: why 3.9M deep-equal comparisons exist
+
+The deep-equal comparisons happen because:
+1. `merge_irept::merged` is called on every SSA step (744K calls)
+2. 82% of calls find the irep already in the store (cache hit)
+3. But `unordered_set::insert` must call operator== to verify the match
+4. operator== recurses into sub-trees (19 recursive calls on average)
+5. The sub-trees of the incoming irep may not share data pointers with
+   the store entries, even though they're structurally equal
+
+The fundamental issue is that `std::unordered_set` has no way to skip
+the equality check — it must verify that the hash match is not a
+collision. The only way to avoid this is to ensure the incoming irep
+shares data pointers with the store entry at every level, which would
+require the irep to have been constructed from previously-merged
+components.
+
+#### Conclusion
+
+The 7.5% cost of operator== in merge_irept is inherent to the
+hash-set-based deduplication approach. The only viable optimizations
+would be:
+1. **Reduce merge frequency**: Call merge_ireps less often (e.g., every
+   N steps instead of every step)
+2. **Structural change**: Replace the unordered_set with a data structure
+   that can verify membership without deep comparison (e.g., a trie
+   indexed by irep structure)
+3. **Ensure sharing**: Make the SSA step construction reuse previously-
+   merged ireps so that sub-tree pointers match store entries
