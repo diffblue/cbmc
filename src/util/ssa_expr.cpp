@@ -216,7 +216,16 @@ void ssa_exprt::set_level_1(std::size_t i)
 void ssa_exprt::set_level_2(std::size_t i)
 {
   set(ID_L2, i);
-  ::update_identifier(*this);
+  // Optimized: the L1 object identifier doesn't change when only L2 changes,
+  // and the main identifier just needs the #N suffix updated. Derive from
+  // the cached L1 object identifier instead of rebuilding from scratch.
+  const std::string &l1_id = id2string(get(ID_L1_object_identifier));
+  std::string new_id;
+  new_id.reserve(l1_id.size() + 8);
+  new_id = l1_id;
+  new_id += '#';
+  new_id += std::to_string(i);
+  set_identifier(new_id);
 }
 
 void ssa_exprt::remove_level_2()
