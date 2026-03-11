@@ -867,3 +867,31 @@ requires either:
 
 These are all high-risk, high-effort changes that go beyond the scope
 of incremental optimization.
+
+### Implemented: hoist loop invariants in get_fields (2026-03-11)
+
+Hoisted loop-invariant work out of both the struct and array loops:
+- Prepare a template `ssa_exprt` with L2 already removed before the loop
+- Cache `was_l2` flag (identical for all elements)
+- For arrays: cache identifier prefix/suffix from first element's
+  canonical `set_expression`, derive subsequent identifiers by replacing
+  only the index portion (using bvrep values for correctness)
+
+This eliminates per-iteration: 1 `ssa_exprt` copy from the original
+(now copies from the lighter template), 1 `get_level_2()` call,
+1 `remove_level_2()` call, and for array elements i>0: 1 full
+`update_identifier` → `build_ssa_identifier_rec` → `string_containert::get`
+chain.
+
+| Benchmark    | Baseline | Optimized | Speedup |
+|-------------|----------|-----------|---------|
+| linked_list | 0.421s   | 0.421s    | +0.0%   |
+| array_ops   | 1.972s   | 1.924s    | **+2.4%** |
+| dlinked_list| 0.729s   | 0.728s    | +0.1%   |
+| string_ops  | 0.204s   | 0.203s    | +0.5%   |
+| matrix      | 1.062s   | 1.002s    | **+5.6%** |
+| tree        | 1.851s   | 1.848s    | +0.2%   |
+| heavy_array | 1.537s   | 1.356s    | **+11.8%** |
+| **TOTAL**   | 7.776s   | 7.482s    | **+3.8%** |
+
+Correctness verified: all 7 benchmarks produce identical step counts.
