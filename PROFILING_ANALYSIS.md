@@ -429,3 +429,60 @@ The most promising remaining avenue is reducing string interning volume
 further — specifically, avoiding `string_containert::get` calls for strings
 that are already `dstringt` values. This would require changes to how
 `ssa_exprt` stores and updates its identifier.
+
+## Remaining Optimization Plans
+
+### Plan A: Reduce string interning volume (13.2%)
+
+**Goal**: Avoid calling `string_containert::get()` for strings that are
+already interned (i.e., already `dstringt` values).
+
+**Approach**: The hot path is `set_expression` in `field_sensitivity.cpp`
+which calls `update_identifier` → `build_identifier` → constructs
+`irep_idt(std::string)` → `string_containert::get()`. Instead of building
+a `std::string` and interning it, build the identifier from existing
+`irep_idt` parts using a concatenation that produces an `irep_idt` directly.
+
+**Specific change**: Add an `irep_idt` concatenation function that checks
+if the result is already interned before calling `get()`. Or: cache the
+last identifier per `ssa_exprt` and skip rebuild when inputs haven't changed.
+
+**Estimated impact**: 3-5% (reducing 13.2% by ~30-40%)
+**Risk**: Medium — touches core identifier infrastructure
+
+### Plan B: Replace `forward_list_as_mapt` in irept (8.1%)
+
+**Goal**: Speed up `irept::find()` and `irept::get()` which do linear
+scans through a linked list of named sub-trees.
+
+**Approach**: Replace `forward_list_as_mapt<dstringt, irept>` with a
+small flat sorted array or a small hash map. Most irept nodes have
+0-5 named sub-trees, so a linear scan of a contiguous array would be
+faster than a linked list due to cache locality.
+
+**Estimated impact**: 3-5% (reducing 8.1% by ~40-60%)
+**Risk**: High — `forward_list_as_mapt` is used throughout irept
+
+### Plan C: Improve `merge_irept::merged` (1.8%)
+
+**Goal**: Speed up expression merging during symex.
+
+**Approach**: `merge_irept::merged` uses `irept::operator==` (which is
+56% self-recursive) to check if an expression is already in the merge
+set. Pre-computing and caching hash values for irept nodes would allow
+skipping the deep equality check when hashes differ.
+
+**Estimated impact**: 1-2%
+**Risk**: Low — isolated change in merge_irept
+
+### Plan D: Optimize `sharing_mapt::get_leaf_node` (1.3%)
+
+**Goal**: Speed up SSA renaming map lookups.
+
+**Approach**: The sharing_map is a hash-array-mapped trie optimized for
+persistent/shared maps. For the L2 renaming use case where maps are
+typically small and not heavily shared, a flat `std::unordered_map`
+might be faster. Profile to confirm.
+
+**Estimated impact**: 0.5-1%
+**Risk**: Medium — sharing_map is used for path merging
