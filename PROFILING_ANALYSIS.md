@@ -82,6 +82,23 @@ Avoid redundant `get()` calls rather than tuning the hash table:
 
 Estimated impact: 6-9% overall speedup (50-80% reduction of the 11.7% cost).
 
+#### Implemented: replace ostringstream with string concatenation
+
+Replaced `std::ostringstream` with direct `std::string` concatenation
+(using `reserve(64)` + `append`) in `build_ssa_identifier_rec` and
+`initialize_ssa_identifier`. Commit `f8057bea69`.
+
+| Benchmark | Baseline | Optimized | Speedup |
+|-----------|----------|-----------|---------|
+| linked_list | 1.49s | 1.46s | 2.0% |
+| array_ops | 3.13s | 2.78s | **11.2%** |
+| csmith_42 | 8.89s | 8.58s | 3.5% |
+| csmith_1111111111 | 16.91s | 15.92s | **5.9%** |
+
+Further optimization potential remains: caching SSA identifiers when
+levels haven't changed, and reducing the number of `update_identifier`
+calls (currently called 3 times per L0→L1→L2 rename chain).
+
 ### 2. Sharing tree destruction: `sharing_treet::remove_ref` — 9.9%
 
 Recursive reference-count decrement and deallocation of irept tree nodes.
