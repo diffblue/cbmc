@@ -112,6 +112,26 @@ files.
    Development Kit and Maven is difficult, you can avoid needing these
    dependencies by not building JBMC. Just pass `-DWITH_JBMC=OFF` to `cmake`.
 
+   **Memory allocator**: CBMC allocates large numbers of small objects, so it
+   benefits from a faster `malloc`. The CMake build accepts
+   `-DCBMC_ALLOCATOR=<value>`:
+
+   - `auto` (the default): link [tcmalloc](https://github.com/gperftools/gperftools)
+     if found, otherwise [jemalloc](https://github.com/jemalloc/jemalloc),
+     otherwise the system allocator;
+   - `tcmalloc` or `jemalloc`: require that allocator (configuration fails with a
+     fatal error if it is not found);
+   - `system`: always use the system allocator.
+
+   The selected allocator is linked into every executable (CBMC, JBMC, the
+   unit-test binary, ...). On Linux, install tcmalloc with
+   `apt-get install libgoogle-perftools-dev` (or jemalloc with
+   `apt-get install libjemalloc-dev`) before configuring. On macOS and Windows
+   the system allocator is already competitive, so `auto` typically resolves to
+   `system`. Note that CMake caches the library lookup: if you install tcmalloc
+   or jemalloc *after* a first `cmake` run, delete `CMakeCache.txt` (or pass
+   `-DCBMC_TCMALLOC_LIB=<path>`) so the new library is picked up.
+
    Finally, to enable building universal binaries on macOS, you can pass the
    flag `-DCMAKE_OSX_ARCHITECTURES=i386;x86_64`. If you don't supply this flag,
    the built binaries will only work on the architecture of the machine being
@@ -181,6 +201,14 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    ```
    See doc/architectural/compilation-and-development.md for instructions on how
    to use a SAT solver other than MiniSat 2.
+
+   Unlike the CMake build (see "Building using CMake"), the Makefile build does
+   not auto-detect tcmalloc/jemalloc. To link tcmalloc, install it
+   (`apt-get install libgoogle-perftools-dev`) and pass it via `LIBS`, which is
+   appended to the link command:
+   ```
+   make -C src LIBS="-ltcmalloc_minimal"
+   ```
 
 4. To compile JBMC, do
    ```
