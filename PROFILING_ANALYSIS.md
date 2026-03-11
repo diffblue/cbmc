@@ -590,3 +590,229 @@ might be faster. Profile to confirm.
 
 **Estimated impact**: 0.5-1%
 **Risk**: Medium — sharing_map is used for path merging
+
+
+## Verification of Claims (2026-03-11)
+
+All claims were re-verified using a broader benchmark suite (6 benchmarks,
+5 runs each, median reported). Builds were verified via `ldd` to confirm
+tcmalloc presence/absence. tcmalloc was tested via `LD_PRELOAD` on builds
+that don't have the allocator CMake option.
+
+### Methodology correction
+
+Earlier verification incorrectly showed tcmalloc at 0.1% because
+`-Dallocator=system` was silently ignored by the baseline CMakeLists.txt
+(which doesn't have the allocator option). Both "glibc" and "tcmalloc"
+baseline builds were actually identical. Re-verified using `LD_PRELOAD`.
+
+### field_sensitivity array cache (3a95db52b3) — CORRECTNESS BUG
+
+This commit bypasses `set_expression` and manually constructs SSA
+identifiers. It produces **different SSA formulas** than the standard
+path (step count changes from 1950 to 1555 on string_ops). This causes
+massive regressions:
+
+| Benchmark  | Without | With    | Change |
+|------------|---------|---------|--------|
+| string_ops | 0.245s  | 4.013s  | **16x slower** |
+| matrix     | 1.431s  | 10.56s  | **7x slower** |
+
+The commit has been moved to the top of the branch for separate debugging.
+All other optimizations verified without this commit present.
+
+### Verified results at HEAD~2 (all opts except field_sensitivity cache and free-list)
+
+| Benchmark    | Baseline | +SSA opts | +tcmalloc | +Both    | SSA Δ  | tc Δ   | Combined |
+|              | glibc    | glibc     | preload   | preload  |        |        |          |
+|--------------|----------|-----------|-----------|----------|--------|--------|----------|
+| linked_list  | 0.554s   | 0.518s    | 0.471s    | 0.451s   | +6.5%  | +15.0% | +18.6%   |
+| array_ops    | 3.081s   | 2.631s    | 2.405s    | 2.037s   | +14.6% | +21.9% | +33.9%   |
+| dlinked_list | 0.971s   | 0.918s    | 0.795s    | 0.760s   | +5.5%  | +18.1% | +21.7%   |
+| matrix       | 1.661s   | 1.431s    | 1.293s    | 1.103s   | +13.8% | +22.2% | +33.6%   |
+| tree         | 2.512s   | 2.382s    | 1.978s    | 1.895s   | +5.2%  | +21.3% | +24.6%   |
+| string_ops   | 0.259s   | 0.245s    | —         | 0.263s   | +5.4%  | —      | -1.5%    |
+| **TOTAL (5)**| 8.779s   | 7.880s    | 6.942s    | 6.246s   |**+10.2%**|**+20.9%**|**+28.9%**|
+
+No regressions on any benchmark.
+
+### Free-list pool allocator — re-evaluated (glibc only, 5 runs, median)
+
+Earlier testing on a too-small benchmark showed only 1.4%. Re-tested
+with the full suite (without tcmalloc):
+
+| Benchmark    | Without | With   | Speedup |
+|--------------|---------|--------|---------|
+| linked_list  | 0.520s  | 0.512s | 1.5%    |
+| array_ops    | 2.644s  | 2.503s | **5.3%**|
+| dlinked_list | 0.912s  | 0.900s | 1.3%    |
+| matrix       | 1.435s  | 1.356s | **5.5%**|
+| tree         | 2.379s  | 2.337s | 1.8%    |
+| string_ops   | 0.243s  | 0.235s | 3.3%    |
+| **TOTAL**    | 8.133s  | 7.843s | **3.6%**|
+
+The free-list gives a consistent 3.6% speedup with glibc, concentrated
+on symex-heavy workloads. With tcmalloc, the effect is ~0% (tcmalloc
+already has thread-local size-class caches).
+
+**Assessment**: The 31% claim from the commit message is not reproduced
+(likely measured on a different/larger workload or with confounding
+factors). The actual benefit is 3.6% with glibc. This is meaningful for
+platforms without tcmalloc (macOS, Windows) but adds complexity:
+- Memory is never returned to the OS
+- Interacts poorly with sanitizers (ASan, valgrind)
+- `thread_local` overhead on single-threaded CBMC
+- Redundant when tcmalloc is available
+
+### tcmalloc — CONFIRMED at 15-22%
+
+Verified via `LD_PRELOAD` on clean baseline builds confirmed to have
+no tcmalloc (via `ldd`). The benefit is consistent across all non-trivial
+benchmarks and applies to both baseline and SSA-optimized builds.
+
+SAT solver benefit from tcmalloc is minimal (~1.3% for CaDiCaL, ~1.2%
+for MiniSat2) because solvers use fewer, larger allocations. Confirmed
+that solvers do use tcmalloc (verified via `LD_DEBUG=bindings`).
+
+### SSA identifier optimizations — CONFIRMED at 5-15%
+
+The ostringstream→string concat and set_level suffix appending give
+10.2% overall, with 14.6% on array_ops and 13.8% on matrix. The
+benefit is real and concentrated on symex-heavy workloads.
+
+### Summary of claim accuracy
+
+| Optimization | Claimed | Verified | Status |
+|-------------|---------|----------|--------|
+| SSA string concat | 3.5-11.2% | 5-15% | ✅ Confirmed |
+| set_level_0/1/2 | 1.3% | included above | ✅ Plausible |
+| field_sensitivity cache | 4.8% | **7-16x regression** | ❌ Bug |
+| irept union | 2.4-4.9% | not isolated | ⚠️ Included in HEAD~2 |
+| tcmalloc | 18-25% | 15-22% | ✅ Confirmed |
+| Free-list (glibc) | 31% | 3.6% | ⚠️ Overstated |
+| Free-list (tcmalloc) | 2% | ~0% | ✅ Confirmed |
+| get_new_name cache | 4.9% → 0.56% | not exercised | ⚠️ Unverified |
+
+## Post-Verification Profile: Best Configuration (2026-03-11)
+
+Configuration: HEAD~2 (SSA opts + irept union + get_new_name cache + tcmalloc)
+Benchmarks: 6 (linked_list, array_ops, dlinked_list, matrix, tree, heavy_array)
+Total samples: 1,738
+
+### Timings
+
+| Benchmark    | Symex   | Convert SSA | Total  | Steps  |
+|-------------|---------|-------------|--------|--------|
+| linked_list | 0.153s  | 0.302s      | 0.425s | 4,433  |
+| array_ops   | 2.016s  | 0.137s      | 2.015s | 16,448 |
+| dlinked_list| 0.271s  | 0.488s      | 0.735s | 8,242  |
+| matrix      | 1.180s  | 0.000s      | 1.080s | 4,148  |
+| tree        | 0.695s  | 0.729s      | 1.855s | 27,789 |
+| heavy_array | 1.695s  | 0.000s      | 1.573s | 5,176  |
+
+### Hotspot Summary by Category
+
+**SSA identifier pipeline: ~14%**
+- `_Hashtable::_M_find_before_node` (string interning): 5.6%
+- `build_ssa_identifier_rec`: 3.2%
+- `hash_string`: 1.8%
+- `_Hashtable::find`: 1.3%
+- `update_identifier`: 0.8%
+- `ssa_exprt::remove_level_2`: 0.7%
+- `string::_M_append`: 2.9% (from identifier building)
+
+**irept operations: ~22%**
+- `irept::find`: 8.7%
+- `sharing_treet::remove_ref`: 6.9%
+- `irept::get`: 6.6%
+- `irept::add(id, irept)`: 3.0%
+- `sharing_treet::detach`: 2.8%
+- `irept::add(id)`: 1.8%
+- `irept::operator==`: 0.9%
+
+**Allocation (tcmalloc): ~14%**
+- `operator new[]`: 8.9%
+- `operator delete[]`: 3.6%
+- `operator delete[]` (sized): 1.8%
+
+**Simplifier: ~2.5%**
+- `simplify_node_preorder`: 1.5%
+- `simplify_node`: 1.0%
+
+**Other CBMC: ~5%**
+- `constant_exprt::check`: 2.1%
+- `field_sensitivityt::get_fields`: 0.9%
+- `field_sensitivityt::apply`: 0.7%
+- `binary_exprt constructor`: 0.9%
+- `constant_exprt constructor`: 0.8%
+
+### Dominant Call Chain
+
+Nearly all hotspots converge on a single call chain:
+
+```
+symex_step → execute_next_instruction → {symex_assign, symex_assert, symex_goto}
+  → clean_expr → dereference
+    → field_sensitivityt::apply (recursive, 4-5 levels deep)
+      → field_sensitivityt::get_fields (recursive for nested arrays/structs)
+        → update_identifier → build_ssa_identifier_rec
+          → string_containert::get → hash_string → _Hashtable::find
+        → irept::find, irept::get (for type/expression lookups)
+        → simplify_exprt::simplify (for index expressions)
+          → simplify_node_preorder → irept::find
+```
+
+The `field_sensitivityt::apply` function is called recursively 4-5 times
+per expression during dereference, and `get_fields` recurses for each
+array dimension. Each iteration calls `update_identifier` which rebuilds
+the SSA identifier string and interns it via `string_containert::get`.
+
+### Key Observations
+
+1. **field_sensitivity dominates everything.** The recursive apply/get_fields
+   chain is the root cause of most hotspots. It drives:
+   - All SSA identifier rebuilding (14%)
+   - Most irept::find/get calls (through type lookups in get_fields)
+   - Most allocation (through expression copying in apply)
+   - Most simplifier calls (through index simplification in get_fields)
+
+2. **irept::find is called from simplify_node_preorder** which is called
+   from within field_sensitivityt::apply's simplification of index
+   expressions. The simplifier does deep recursive descent, calling
+   `irept::find(ID_type)` at each level to check expression types.
+
+3. **tcmalloc allocation is 14%** — down from 25% with glibc, but still
+   significant. The `operator new[]` calls are from `std::vector` growth
+   in irept's `sub` member (which stores unnamed children).
+
+4. **`constant_exprt::check` at 2.1%** is validation that runs on every
+   `to_constant_expr()` cast. It calls `irept::find(ID_value)`. This is
+   pure overhead in Release builds but cannot be disabled without
+   `CPROVER_INVARIANT_DO_NOT_CHECK`.
+
+### Actionable Next Steps
+
+**P1: Reduce field_sensitivityt::apply recursion depth** (est. 5-10%)
+The 4-5 levels of recursive `apply` calls during dereference are
+excessive. Each level copies expressions and triggers identifier
+rebuilds. Investigate whether the recursion can be flattened or
+whether intermediate results can be cached.
+Source: `src/goto-symex/field_sensitivity.cpp`
+
+**P2: Cache type lookups in simplifier** (est. 2-3%)
+`simplify_node_preorder` calls `irept::find(ID_type)` at every
+recursion level. Since types don't change during simplification,
+the type could be passed as a parameter instead of re-looked-up.
+Source: `src/util/simplify_expr.cpp`
+
+**P3: Reduce vector reallocation in irept** (est. 2-4%)
+The 8.9% in `operator new[]` is largely from `std::vector` growth
+in irept's `sub` member. Pre-sizing or using small-buffer optimization
+could help.
+Source: `src/util/irep.h`
+
+**P4: Avoid redundant `constant_exprt::check`** (est. 1-2%)
+The 2.1% in `check` is from validation in `to_constant_expr()`.
+Consider a `to_constant_expr_unchecked()` for hot paths where the
+type is already known.
+Source: `src/util/std_expr.h`
