@@ -1,0 +1,283 @@
+# CBMC Profiling Workflow
+#
+# Two modes:
+#
+# 1. On PRs: builds both the base branch and the PR branch, profiles each,
+#    and posts a differential comparison plus the PR's hotspot analysis to
+#    the GitHub step summary.  Flamegraph SVGs are uploaded as artifacts.
+#
+# 2. On pushes to develop: profiles the current develop tip and publishes
+#    the flamegraphs to GitHub Pages at /profiling/ so they are always
+#    available at https://diffblue.github.io/cbmc/profiling/
+#
+# The benchmarks exercise different CBMC subsystems:
+#   - linked_list: pointer analysis + symbolic execution
+#   - array_ops:   array flattening + propositional encoding
+#   - structs:     type checking + goto conversion
+#
+# Solver time is excluded (--dimacs --outfile /dev/null) so that results
+# reflect only CBMC's own code, not the SAT solver.
+#
+# To run locally:
+#   scripts/profile_cbmc.py --auto --runs 3
+
+name: Profiling
+on:
+  pull_request:
+    branches: [ develop ]
+  push:
+    branches: [ develop ]
+
+jobs:
+  # ── PR job: differential profiling (base vs PR) ──────────────────────
+  profile-pr:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Install dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq \
+            cmake ninja-build gcc g++ flex bison ccache libgoogle-perftools-dev \
+            linux-tools-common linux-tools-generic
+          PERF_REAL=$(find /usr/lib/linux-tools-*/perf -maxdepth 0 2>/dev/null | head -1)
+          if [ -z "$PERF_REAL" ]; then
+            echo "::error::No perf binary found under /usr/lib/linux-tools-*"
+            exit 1
+          fi
+          echo "$(dirname "$PERF_REAL")" >> "$GITHUB_PATH"
+          "$PERF_REAL" --version
+          sudo sysctl kernel.perf_event_paranoid=-1
+
+      - name: Restore ccache
+        uses: actions/cache/restore@v5
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-24.04-Release-profile-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-24.04-Release-profile
+            ${{ runner.os }}-24.04-Release
+      - run: echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
+
+      # Build the base branch first in a worktree.  Building base before
+      # the PR branch means the PR build gets good ccache hit rates (most
+      # object files are shared).
+      - name: Build and profile base branch
+        run: |
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          git worktree add --detach ../base-worktree "$BASE_SHA"
+          (cd ../base-worktree && git submodule update --init)
+          cmake -S ../base-worktree -B../base-worktree/build -G Ninja \
+            -DWITH_JBMC=OFF -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_C_COMPILER=/usr/bin/gcc \
+            -DCMAKE_CXX_COMPILER=/usr/bin/g++
+          touch ../base-worktree/build/src/{ansi-c,cpp}/library-check.stamp
+          ninja -C ../base-worktree/build cbmc -j$(nproc)
+          python3 scripts/profile_cbmc.py --auto --runs 3 --timeout 120 \
+            --build-dir ../base-worktree/build --output-dir base-results
+
+      - name: Build PR branch (Release)
+        run: |
+          cmake -S . -Bbuild -G Ninja -DWITH_JBMC=OFF \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_C_COMPILER=/usr/bin/gcc \
+            -DCMAKE_CXX_COMPILER=/usr/bin/g++
+          touch build/src/{ansi-c,cpp}/library-check.stamp
+          ninja -C build cbmc -j$(nproc)
+
+      - name: Profile PR branch (3 runs per benchmark)
+        run: |
+          python3 scripts/profile_cbmc.py --auto --runs 3 --timeout 120 \
+            --output-dir profile-results
+
+      - name: Generate differential summary
+        if: always()
+        run: |
+          if [ -f base-results/results.json ] && [ -f profile-results/results.json ]; then
+            python3 scripts/profile_cbmc.py \
+              --compare base-results profile-results \
+              --compare-labels \
+                "${{ github.event.pull_request.base.ref }}" \
+                "${{ github.event.pull_request.head.ref }}" \
+              --output-dir diff-results
+          fi
+
+      - name: Post summary
+        if: always()
+        run: |
+          if [ -f diff-results/diff_summary.txt ]; then
+            echo '### Differential Profile (base → PR)' >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            cat diff-results/diff_summary.txt >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            echo '' >> "$GITHUB_STEP_SUMMARY"
+          fi
+          if [ -f profile-results/summary.txt ]; then
+            echo '### PR Branch Profile' >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            cat profile-results/summary.txt >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo '---' >> "$GITHUB_STEP_SUMMARY"
+          echo "📊 **[Download flamegraph SVGs](${RUN_URL}#artifacts)** — open in a browser for interactive exploration." >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "🔥 **[Latest develop flamegraphs](https://diffblue.github.io/cbmc/profiling/)**" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Clean up worktree
+        if: always()
+        run: git worktree remove --force ../base-worktree 2>/dev/null || true
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: profile-results
+          path: |
+            profile-results/**/flamegraph.svg
+            profile-results/aggregated.svg
+            profile-results/summary.txt
+            profile-results/results.json
+            base-results/results.json
+            diff-results/diff_summary.txt
+          retention-days: 14
+
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v5
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-24.04-Release-profile-${{ github.sha }}
+
+  # ── Develop job: profile and publish flamegraphs to GitHub Pages ─────
+  profile-develop:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq \
+            cmake ninja-build gcc g++ flex bison ccache libgoogle-perftools-dev \
+            linux-tools-common linux-tools-generic
+          PERF_REAL=$(find /usr/lib/linux-tools-*/perf -maxdepth 0 2>/dev/null | head -1)
+          if [ -z "$PERF_REAL" ]; then
+            echo "::error::No perf binary found under /usr/lib/linux-tools-*"
+            exit 1
+          fi
+          echo "$(dirname "$PERF_REAL")" >> "$GITHUB_PATH"
+          "$PERF_REAL" --version
+          sudo sysctl kernel.perf_event_paranoid=-1
+
+      - name: Restore ccache
+        uses: actions/cache/restore@v5
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-24.04-Release-profile-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-24.04-Release-profile
+            ${{ runner.os }}-24.04-Release
+      - run: echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
+
+      - name: Build CBMC (Release)
+        run: |
+          cmake -S . -Bbuild -G Ninja -DWITH_JBMC=OFF \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_C_COMPILER=/usr/bin/gcc \
+            -DCMAKE_CXX_COMPILER=/usr/bin/g++
+          touch build/src/{ansi-c,cpp}/library-check.stamp
+          ninja -C build cbmc -j$(nproc)
+
+      - name: Profile develop (3 runs per benchmark)
+        run: |
+          python3 scripts/profile_cbmc.py --auto --runs 3 --timeout 120 \
+            --output-dir profile-results
+
+      - name: Post summary
+        if: always()
+        run: |
+          if [ -f profile-results/summary.txt ]; then
+            echo '### develop Profile' >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            cat profile-results/summary.txt >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            echo '' >> "$GITHUB_STEP_SUMMARY"
+            echo '---' >> "$GITHUB_STEP_SUMMARY"
+            echo '🔥 **[Interactive flamegraphs on GitHub Pages](https://diffblue.github.io/cbmc/profiling/)**' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Prepare pages content
+        if: always()
+        run: |
+          mkdir -p pages-out
+          # Copy all flamegraph SVGs
+          find profile-results -name 'flamegraph.svg' | while read f; do
+            bench=$(basename "$(dirname "$f")")
+            cp "$f" "pages-out/${bench}.svg"
+          done
+          [ -f profile-results/aggregated.svg ] && cp profile-results/aggregated.svg pages-out/
+          [ -f profile-results/summary.txt ] && cp profile-results/summary.txt pages-out/
+          [ -f profile-results/results.json ] && cp profile-results/results.json pages-out/
+          # Generate a simple index page
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-8)
+          cat > pages-out/index.html <<'HEADER'
+          <!DOCTYPE html>
+          <html><head><meta charset="utf-8">
+          <title>CBMC Profiling — develop</title>
+          <style>
+            body { font-family: system-ui, sans-serif; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+            h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; }
+            a { color: #0366d6; }
+            .meta { color: #666; font-size: 0.9em; }
+            ul { line-height: 1.8; }
+            pre { background: #f6f8fa; padding: 1em; overflow-x: auto; font-size: 0.85em; }
+          </style>
+          </head><body>
+          HEADER
+          echo "<h1>CBMC Profiling — develop</h1>" >> pages-out/index.html
+          echo "<p class='meta'>Commit: <code>${SHORT_SHA}</code> — $(date -u '+%Y-%m-%d %H:%M UTC')</p>" >> pages-out/index.html
+          echo "<h2>Flamegraphs</h2><p>Click to open interactive SVG (searchable, zoomable):</p><ul>" >> pages-out/index.html
+          for svg in pages-out/*.svg; do
+            name=$(basename "$svg")
+            echo "<li><a href=\"${name}\">${name%.svg}</a></li>" >> pages-out/index.html
+          done
+          echo "</ul>" >> pages-out/index.html
+          if [ -f pages-out/summary.txt ]; then
+            echo "<h2>Summary</h2><pre>" >> pages-out/index.html
+            cat pages-out/summary.txt >> pages-out/index.html
+            echo "</pre>" >> pages-out/index.html
+          fi
+          echo "<p><a href=\"https://github.com/${{ github.repository }}\">← Back to repository</a></p>" >> pages-out/index.html
+          echo "</body></html>" >> pages-out/index.html
+
+      - name: Publish to GitHub Pages
+        if: always()
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: pages-out
+          target-folder: profiling
+          clean: true
+
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v5
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-24.04-Release-profile-${{ github.sha }}

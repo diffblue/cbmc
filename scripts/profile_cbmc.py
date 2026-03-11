@@ -9,6 +9,7 @@ Usage:
   scripts/profile_cbmc.py [options] <input.c> [-- <cbmc-args>]
   scripts/profile_cbmc.py [options] --auto [-- <cbmc-args>]
   scripts/profile_cbmc.py --diff <ref-a> <ref-b> [-- <cbmc-args>]
+  scripts/profile_cbmc.py --compare <dir-a> <dir-b> [--compare-labels A B]
 
 Options:
   --build-dir DIR      CMake build directory (default: build)
@@ -22,6 +23,8 @@ Options:
   --auto-csmith        Generate benchmarks using CSmith with fixed seeds
   --debug-binary PATH  CBMC binary with debug info for source-level detail
   --diff REF_A REF_B   Differential profiling: compare two git refs
+  --compare DIR_A DIR_B Compare two existing result directories
+  --compare-labels A B  Labels for --compare (default: directory names)
   --runs N             Run each benchmark N times for statistical significance
   --help               Show this help
 
@@ -72,6 +75,10 @@ Examples:
   # Compare two branches
   scripts/profile_cbmc.py --diff develop my-optimization-branch
 
+  # Compare two existing result directories
+  scripts/profile_cbmc.py --compare base-results pr-results \
+    --compare-labels develop my-branch --output-dir diff-results
+
   # Multiple runs for statistical significance
   scripts/profile_cbmc.py --auto --runs 3
 
@@ -92,9 +99,9 @@ Future improvements:
   - CSmith seed curation: systematically select seeds that produce
     programs exercising specific CBMC features (heavy pointer use, deep
     nesting, many globals, etc.) rather than arbitrary fixed seeds.
-  - CI differential mode: extend the CI workflow to compare the PR branch
-    against the base branch using --diff, posting regression warnings as
-    PR comments.
+  - CI differential mode: the CI workflow compares the PR branch against
+    the base branch using --compare, posting regression warnings in the
+    GitHub step summary. Could be extended to post PR comments.
 """
 
 import argparse
@@ -188,6 +195,12 @@ def parse_args():
                    help="Generate benchmarks using CSmith with fixed seeds")
     p.add_argument("--diff", nargs=2, metavar=("REF_A", "REF_B"),
                    help="Differential profiling: compare two git refs")
+    p.add_argument("--compare", nargs=2, metavar=("DIR_A", "DIR_B"),
+                   help="Compare two existing result directories (each must "
+                        "contain results.json)")
+    p.add_argument("--compare-labels", nargs=2, metavar=("LABEL_A", "LABEL_B"),
+                   default=None,
+                   help="Labels for --compare (default: directory names)")
     p.add_argument("--runs", type=int, default=1,
                    help="Run each benchmark N times for statistical significance")
     args = p.parse_args(argv)
@@ -251,11 +264,25 @@ def main():
                 pass
         return
 
+    # Compare mode: diff two existing result directories
+    if args.compare:
+        import json as _json
+        dir_a, dir_b = Path(args.compare[0]), Path(args.compare[1])
+        for d in (dir_a, dir_b):
+            if not (d / "results.json").is_file():
+                die(f"results.json not found in {d}")
+        results_a = _json.loads((dir_a / "results.json").read_text())
+        results_b = _json.loads((dir_b / "results.json").read_text())
+        labels = args.compare_labels or [dir_a.name, dir_b.name]
+        output_dir.mkdir(parents=True, exist_ok=True)
+        print_diff_summary(results_a, results_b, labels[0], labels[1], output_dir)
+        return
+
     # Normal mode
     has_auto = args.auto or args.auto_large or args.auto_csmith
     if not has_auto and not args.inputs:
         die("No input files specified. Use --auto, --auto-large, --auto-csmith, "
-            "or --diff for built-in modes. Run with --help for usage.")
+            "--diff, or --compare for built-in modes. Run with --help for usage.")
 
     check_prerequisites()
     cbmc = ensure_cbmc(build_dir)
