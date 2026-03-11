@@ -816,3 +816,54 @@ The 2.1% in `check` is from validation in `to_constant_expr()`.
 Consider a `to_constant_expr_unchecked()` for hot paths where the
 type is already known.
 Source: `src/util/std_expr.h`
+
+### Investigation: field_sensitivityt::apply optimization (2026-03-11)
+
+**Attempted**: Cache array identifier prefix in `get_fields` array loop.
+For each array element, the SSA identifier has the form
+`prefix[[bvrep_of_i]]suffix` where prefix and suffix are identical.
+The first element uses canonical `set_expression` to establish the
+format, then subsequent elements derive identifiers by string replacement.
+
+**Correctness**: Verified — all 7 benchmarks produce identical step
+counts to baseline. No invariant violations. (The previous attempt in
+commit `3a95db52b3` was buggy because it used decimal `std::to_string(i)`
+instead of the bvrep value, and bypassed `set_expression` entirely.)
+
+**Performance** (5 runs, median, with tcmalloc):
+
+| Benchmark    | Without | With   | Δ      |
+|-------------|---------|--------|--------|
+| linked_list | 0.421s  | 0.422s | -0.2%  |
+| array_ops   | 1.972s  | 2.005s | -1.7%  |
+| dlinked_list| 0.729s  | 0.726s | +0.4%  |
+| string_ops  | 0.204s  | 0.204s | +0.0%  |
+| matrix      | 1.062s  | 1.052s | +0.9%  |
+| tree        | 1.851s  | 1.846s | +0.3%  |
+| heavy_array | 1.537s  | 1.468s | **+4.5%** |
+| **TOTAL**   | 7.776s  | 7.723s | **+0.7%** |
+
+**Assessment**: Only 0.7% total improvement. The identifier string
+building is not the dominant cost in the array loop — the `from_integer`
+call (which creates a `constant_exprt` and interns its bvrep value),
+the `ssa_exprt` copy, and the recursive `get_fields` call dominate.
+The optimization only helps on `heavy_array` (4.5%) which has large
+arrays. **Not worth the added complexity.**
+
+**Root cause analysis**: The profiling shows that the cost is spread
+across many small irept operations (find, get, add, detach, remove_ref)
+that are fundamental to how CBMC represents and manipulates expressions.
+There is no single bottleneck to eliminate — it's the cumulative cost
+of millions of small operations on the sharing tree data structure.
+
+**Conclusion**: Further optimization of `field_sensitivityt::apply`
+requires either:
+1. Structural changes to reduce the number of `apply` calls (e.g.,
+   caching results, lazy evaluation)
+2. Changes to the irept data structure itself (e.g., replacing
+   `forward_list_as_mapt` with a flat hash map for named sub-trees)
+3. Reducing the depth of `field_sensitivityt::apply` recursion in
+   `symex_dereference.cpp` (currently 4-5 levels deep)
+
+These are all high-risk, high-effort changes that go beyond the scope
+of incremental optimization.
