@@ -652,7 +652,7 @@ with the full suite (without tcmalloc):
 | **TOTAL**    | 8.133s  | 7.843s | **3.6%**|
 
 The free-list gives a consistent 3.6% speedup with glibc, concentrated
-on symex-heavy workloads. With tcmalloc, the effect is ~0% (tcmalloc
+on symex-heavy workloads. With tcmalloc, the effect is 0.7% (tcmalloc
 already has thread-local size-class caches).
 
 **Assessment**: The 31% claim from the commit message is not reproduced
@@ -689,8 +689,8 @@ benefit is real and concentrated on symex-heavy workloads.
 | field_sensitivity cache | 4.8% | **7-16x regression** | ❌ Bug |
 | irept union | 2.4-4.9% | not isolated | ⚠️ Included in HEAD~2 |
 | tcmalloc | 18-25% | 15-22% | ✅ Confirmed |
-| Free-list (glibc) | 31% | 3.6% | ⚠️ Overstated |
-| Free-list (tcmalloc) | 2% | ~0% | ✅ Confirmed |
+| Free-list (glibc) | 31% | 3.2% | ⚠️ Overstated |
+| Free-list (tcmalloc) | 2% | 0.7% | ⚠️ See definitive analysis |
 | get_new_name cache | 4.9% → 0.56% | not exercised | ⚠️ Unverified |
 
 ## Post-Verification Profile: Best Configuration (2026-03-11)
@@ -1233,25 +1233,15 @@ hoisting), glibc malloc
 
 Correctness verified: DIMACS output matches exactly for all benchmarks.
 
-### tcmalloc re-evaluation: pool allocator subsumes its benefit
+### tcmalloc re-evaluation — RETRACTED
 
-| Configuration | linked_list | array_ops | matrix | tree | heavy_array |
-|--------------|-------------|-----------|--------|------|-------------|
-| Baseline + glibc | 0.522s | 3.063s | 1.654s | 2.493s | 2.533s |
-| Baseline + tcmalloc | 0.441s | 2.380s | 1.267s | 1.943s | 1.938s |
-| Baseline tcmalloc Δ | **15.5%** | **22.3%** | **23.4%** | **22.1%** | **23.5%** |
-| HEAD + glibc | 0.400s | 1.900s | 0.989s | 1.826s | 1.316s |
-| HEAD + tcmalloc | 0.399s | 1.903s | 0.987s | 1.822s | 1.320s |
-| HEAD tcmalloc Δ | **0.3%** | **-0.2%** | **0.2%** | **0.2%** | **-0.3%** |
+**The measurements in this section were incorrect.** The HEAD binary had
+tcmalloc linked via CMake (`-Dallocator=auto`), so the LD_PRELOAD test
+was comparing tcmalloc vs tcmalloc, not tcmalloc vs glibc. The "0%
+tcmalloc benefit on HEAD" was an artifact of this error.
 
-**tcmalloc gives 15-23% on baseline but 0% on HEAD.** The pool allocator
-in `tree_nodet` completely eliminates the allocation hotspot that tcmalloc
-was addressing. The pool allocator reuses freed nodes directly (zero
-overhead), while tcmalloc uses thread-local size-class caches (small but
-nonzero overhead). This means:
-- The CMake tcmalloc integration is now redundant for performance
-- The pool allocator is a pure code optimization with no external dependency
-- tcmalloc still doesn't hurt (0% difference, not negative)
+See the "Definitive Allocator Analysis (2026-03-12)" section below for
+correct measurements using binaries built with `-Dallocator=system`.
 
 ### Current profile (HEAD, all optimizations)
 
