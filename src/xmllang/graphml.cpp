@@ -531,9 +531,13 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
       val.set_attribute("key", "invariant");
       val.data=n.invariant;
 
-      xmlt &val_s=node.new_element("data");
-      val_s.set_attribute("key", "invariant.scope");
-      val_s.data=n.invariant_scope;
+      // Only add invariant.scope if it's not empty
+      if(!n.invariant_scope.empty())
+      {
+        xmlt &val_s = node.new_element("data");
+        val_s.set_attribute("key", "invariant.scope");
+        val_s.data = n.invariant_scope;
+      }
     }
 
     for(graphmlt::edgest::const_iterator
