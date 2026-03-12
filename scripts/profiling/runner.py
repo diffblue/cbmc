@@ -57,6 +57,26 @@ def compile_to_goto_binary(cbmc, source_file, output_dir):
         return None
 
 
+def compile_to_goto_binary(cbmc, source_file, output_dir):
+    """Compile a C/C++ source file to a goto binary using goto-cc.
+
+    Returns the path to the goto binary, or None if goto-cc is not available
+    or compilation fails (in which case CBMC will parse the source directly).
+    """
+    goto_cc = Path(cbmc).parent / "goto-cc"
+    if not goto_cc.is_file():
+        return None
+
+    gb_path = output_dir / (Path(source_file).stem + ".gb")
+    try:
+        subprocess.run(
+            [str(goto_cc), "-o", str(gb_path), source_file],
+            capture_output=True, check=True, timeout=60)
+        return gb_path
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
+        return None
+
+
 def run_benchmark(cbmc, bench, output_dir, timeout, memory_mb, skip_solver):
     """Run perf on a single benchmark. Returns parsed results dict."""
     name = bench["name"]
