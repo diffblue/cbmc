@@ -926,6 +926,7 @@ var annotated_dup =
     [ "or_exprt", "classor__exprt.html", "classor__exprt" ],
     [ "osx_fat_readert", "classosx__fat__readert.html", "classosx__fat__readert" ],
     [ "osx_mach_o_readert", "classosx__mach__o__readert.html", "classosx__mach__o__readert" ],
+    [ "output_filet", "classoutput__filet.html", "classoutput__filet" ],
     [ "overflow_instrumentert", "classoverflow__instrumentert.html", "classoverflow__instrumentert" ],
     [ "overflow_result_exprt", "classoverflow__result__exprt.html", "classoverflow__result__exprt" ],
     [ "parameter_assignmentst", "classparameter__assignmentst.html", "classparameter__assignmentst" ],

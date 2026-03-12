@@ -149,6 +149,8 @@ var dir_b7878ad5ecbf2506f4125b9d34c97e45 =
     [ "optional_utils.h", "optional__utils_8h.html", "optional__utils_8h" ],
     [ "options.cpp", "options_8cpp.html", null ],
     [ "options.h", "options_8h.html", "options_8h" ],
+    [ "output_file.cpp", "output__file_8cpp.html", null ],
+    [ "output_file.h", "output__file_8h.html", "output__file_8h" ],
     [ "parse_options.cpp", "parse__options_8cpp.html", "parse__options_8cpp" ],
     [ "parse_options.h", "parse__options_8h.html", "parse__options_8h" ],
     [ "parser.cpp", "parser_8cpp.html", "parser_8cpp" ],
