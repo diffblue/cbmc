@@ -100,6 +100,7 @@ SRC = \
       symbol.cpp \
       symbol_table_base.cpp \
       symbol_table.cpp \
+      output_file.cpp \
       tempdir.cpp \
       tempfile.cpp \
       threeval.cpp \

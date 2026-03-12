@@ -13,12 +13,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/byte_operators.h> // IWYU pragma: keep
 #include <util/json_irep.h>
+#include <util/output_file.h>
 #include <util/ui_message.h>
 
 #include <goto-symex/symex_target_equation.h>
 #include <langapi/language_util.h>
 
-#include <fstream> // IWYU pragma: keep
 #include <iostream>
 
 /// Output a single SSA step
@@ -257,12 +257,6 @@ std::string json_get_key_byte_op_stats()
     UNREACHABLE;
 }
 
-bool is_outfile_specified(const optionst &options)
-{
-  const std::string &filename = options.get_option("outfile");
-  return (!filename.empty() && filename != "-");
-}
-
 void show_byte_ops_plain(
   ui_message_handlert &ui_message_handler,
   std::ostream &out,
@@ -326,19 +320,11 @@ void show_byte_ops(
   const symex_target_equationt &equation)
 {
   const std::string &filename = options.get_option("outfile");
-  const bool outfile_given = is_outfile_specified(options);
 
-  std::ofstream of;
+  output_filet output_file{filename.empty() ? "-" : filename};
+  const bool outfile_given = output_file.is_file();
 
-  if(outfile_given)
-  {
-    of.open(filename, std::fstream::out);
-    if(!of)
-      throw invalid_command_line_argument_exceptiont(
-        "failed to open output file: " + filename, "--outfile");
-  }
-
-  std::ostream &out = outfile_given ? of : std::cout;
+  std::ostream &out = output_file.stream();
 
   switch(ui_message_handler.get_ui())
   {
