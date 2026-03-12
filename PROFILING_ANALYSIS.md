@@ -1199,3 +1199,81 @@ ensure that ireps entering merge already have sub-tree pointers that
 match the store. This would require changes to how SSA expressions
 are constructed — e.g., caching and reusing the merged type/guard
 components when building new SSA steps.
+
+
+## Re-Profiling and Re-Verification (2026-03-12)
+
+### Methodology improvement: goto-cc pre-compilation
+
+Switched to compiling benchmarks to goto binaries via `goto-cc` before
+profiling. This eliminates C preprocessing variability:
+- Range: ±0.007-0.017s (.gb) vs ±0.285-0.811s (.c)
+- Speedup: 2.2% from skipping in-process C parsing
+- Profile content is identical (cc1 runs as subprocess)
+
+Updated `scripts/profiling/runner.py` to auto-compile .c to .gb.
+
+### Corrected benchmark results (median of 5, goto binaries)
+
+Baseline: develop `b191cc1dac`, glibc malloc
+HEAD: all code optimizations (SSA string concat, set_level_0/1/2,
+irept union, pool allocator, get_new_name cache, field_sensitivity
+hoisting), glibc malloc
+
+| Benchmark    | Baseline | HEAD   | Speedup |
+|-------------|----------|--------|---------|
+| linked_list | 0.522s   | 0.400s | 23.4%   |
+| array_ops   | 3.063s   | 1.900s | 38.0%   |
+| dlinked_list| 0.943s   | 0.705s | 25.2%   |
+| string_ops  | 0.242s   | 0.193s | 20.2%   |
+| matrix      | 1.654s   | 0.989s | 40.2%   |
+| tree        | 2.493s   | 1.826s | 26.8%   |
+| heavy_array | 2.533s   | 1.316s | 48.0%   |
+| **TOTAL**   |**11.450s**|**7.329s**|**36.0%**|
+
+Correctness verified: DIMACS output matches exactly for all benchmarks.
+
+### tcmalloc re-evaluation: pool allocator subsumes its benefit
+
+| Configuration | linked_list | array_ops | matrix | tree | heavy_array |
+|--------------|-------------|-----------|--------|------|-------------|
+| Baseline + glibc | 0.522s | 3.063s | 1.654s | 2.493s | 2.533s |
+| Baseline + tcmalloc | 0.441s | 2.380s | 1.267s | 1.943s | 1.938s |
+| Baseline tcmalloc Δ | **15.5%** | **22.3%** | **23.4%** | **22.1%** | **23.5%** |
+| HEAD + glibc | 0.400s | 1.900s | 0.989s | 1.826s | 1.316s |
+| HEAD + tcmalloc | 0.399s | 1.903s | 0.987s | 1.822s | 1.320s |
+| HEAD tcmalloc Δ | **0.3%** | **-0.2%** | **0.2%** | **0.2%** | **-0.3%** |
+
+**tcmalloc gives 15-23% on baseline but 0% on HEAD.** The pool allocator
+in `tree_nodet` completely eliminates the allocation hotspot that tcmalloc
+was addressing. The pool allocator reuses freed nodes directly (zero
+overhead), while tcmalloc uses thread-local size-class caches (small but
+nonzero overhead). This means:
+- The CMake tcmalloc integration is now redundant for performance
+- The pool allocator is a pure code optimization with no external dependency
+- tcmalloc still doesn't hurt (0% difference, not negative)
+
+### Current profile (HEAD, all optimizations)
+
+| Rank | Function | % |
+|------|----------|---|
+| 1 | irept::operator== | 8.4% |
+| 2 | sharing_treet::remove_ref | 2.7% |
+| 3 | cnft::process_clause | 2.3% |
+| 4 | dimacs_cnft::write_dimacs_clause | 2.0% |
+| 5 | irept::find | 1.7% |
+| 6 | irept::get | 1.7% |
+| 7 | sharing_treet::detach | 1.4% |
+| 8 | merge_irept::merged | 1.3% |
+| 9 | irept::hash | 1.2% |
+| 10 | cnf_clause_listt::lcnf | 1.1% |
+
+Library overhead: iostream 23.1%, tcmalloc 12.6%, libc 2.7%.
+The iostream cost is a `--dimacs` profiling artifact.
+
+### Assessment
+
+The profile is now flat — no single function dominates. The remaining
+hotspots are either inherent to the algorithm (operator==, merge),
+architectural (COW refcounting), or artifacts of the profiling method
+(iostream). We are in diminishing-returns territory for easy wins.
