@@ -255,16 +255,10 @@ exprt value_sett::to_expr(const object_map_dt::value_type &it) const
      object.id()==ID_unknown)
     return object;
 
-  object_descriptor_exprt od;
-
-  od.object()=object;
-
   if(it.second)
-    od.offset() = *it.second;
-
-  od.type()=od.object().type();
-
-  return std::move(od);
+    return object_descriptor_exprt{object, *it.second};
+  else
+    return object_descriptor_exprt{object};
 }
 
 bool value_sett::make_union(const value_sett::valuest &new_values)

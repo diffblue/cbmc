@@ -198,6 +198,15 @@ public:
   {
   }
 
+  object_descriptor_exprt(exprt _object, exprt _offset)
+    : binary_exprt(
+        std::move(_object),
+        ID_object_descriptor,
+        std::move(_offset),
+        typet())
+  {
+  }
+
   /// Given an expression \p expr, attempt to find the underlying object it
   /// represents by skipping over type casts and removing balanced
   /// dereference/address_of operations; that object will then be available
