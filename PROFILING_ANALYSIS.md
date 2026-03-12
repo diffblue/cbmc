@@ -1089,3 +1089,113 @@ would be:
    indexed by irep structure)
 3. **Ensure sharing**: Make the SSA step construction reuse previously-
    merged ireps so that sub-tree pointers match store entries
+
+### Sketch: reducing merge frequency (2026-03-12)
+
+#### Current behavior
+
+Every SSA step method in `symex_target_equationt` (19 call sites) calls
+`merge_ireps(SSA_step)` at the end. This merges 6-8 top-level ireps per
+step (guard, ssa_lhs, ssa_full_lhs, original_full_lhs, ssa_rhs,
+cond_expr, plus io_args and function_arguments), each of which recurses
+into all sub-ireps.
+
+The `merge_irept::merged()` function works bottom-up:
+1. Try to insert the irep into `irep_store` (an `unordered_set<irept>`)
+2. If already present → return the existing entry (sharing hit)
+3. If new → recursively merge all sub-ireps, then update the store entry
+
+The cost: 82% of `merged()` calls are cache hits, but each hit requires
+`unordered_set::insert` → hash computation + `operator==` verification.
+The `operator==` recurses into sub-trees, averaging 19 recursive calls
+per top-level merge.
+
+#### Why batching could help
+
+The key insight: when merging step N, many of its sub-ireps are
+identical to sub-ireps from step N-1 (same variable names, same types,
+same guards). If step N-1 was already merged, its sub-ireps already
+share data pointers with the store. But the sub-ireps of step N were
+constructed independently — they have the same *content* but different
+*pointers*.
+
+If we skip merging for K steps and then merge all K steps at once, the
+merge store processes K×(6-8) top-level ireps. The first step's ireps
+populate the store; subsequent steps' ireps find sharing hits. The total
+number of `operator==` calls is the same, but:
+
+**The benefit is NOT from batching itself** — it's from the fact that
+after merging step N, the *next* step N+1 is constructed using the
+already-merged components from the symbol table and SSA state. If the
+SSA construction reuses ireps that were previously merged, their
+sub-tree pointers already match the store, making `operator==` a cheap
+pointer comparison instead of a deep structural comparison.
+
+#### The real opportunity: ensure sub-tree sharing
+
+The actual optimization is not "merge less often" but "ensure that
+ireps entering merge already share sub-tree pointers with the store."
+
+This happens naturally for some components:
+- **Types**: The same `typet` objects are reused across steps (e.g.,
+  `signedbv_typet(32)` for all `int` variables). Once merged, the
+  type's data pointer matches the store entry.
+- **Variable names**: `irep_idt` values are interned strings — they
+  already have pointer equality.
+
+But it does NOT happen for:
+- **SSA indices**: Each `ssa_exprt` has a unique L2 index suffix that
+  changes every step. The SSA expression is constructed fresh, so its
+  sub-tree pointers don't match the store.
+- **Guards**: Guards accumulate conditions and are rebuilt each step.
+
+#### Concrete approach: deferred merge with sharing propagation
+
+```
+// Instead of merging every step:
+void symex_target_equationt::merge_ireps(SSA_stept &step)
+{
+  merge_irep(step.guard);
+  merge_irep(step.ssa_lhs);
+  // ... etc
+}
+
+// Merge every N steps, but propagate sharing:
+void symex_target_equationt::maybe_merge_ireps(SSA_stept &step)
+{
+  ++steps_since_merge;
+  if(steps_since_merge < MERGE_INTERVAL)
+    return;
+  steps_since_merge = 0;
+
+  // Merge all unmerged steps
+  for(auto it = last_merged_step; it != SSA_steps.end(); ++it)
+    merge_ireps(*it);
+  last_merged_step = SSA_steps.end();
+}
+```
+
+**Expected impact**: Minimal. The batching itself doesn't reduce the
+number of `operator==` calls — it just delays them. The sub-ireps of
+each step are still constructed independently, so they still won't
+share pointers with the store.
+
+The only way batching helps is if it reduces *peak memory* by allowing
+the store to grow more slowly. But the store's purpose IS to reduce
+memory, so delaying merges increases memory usage.
+
+#### Verdict
+
+Reducing merge frequency is unlikely to yield significant speedup
+because:
+1. The `operator==` cost is per-irep, not per-batch — batching doesn't
+   reduce the total number of comparisons
+2. The sub-ireps entering merge are constructed fresh regardless of
+   batch size — they won't share pointers with the store
+3. Delaying merges increases peak memory (the opposite of merge's goal)
+
+The only viable path to reducing `operator==` cost in merge is to
+ensure that ireps entering merge already have sub-tree pointers that
+match the store. This would require changes to how SSA expressions
+are constructed — e.g., caching and reusing the merged type/guard
+components when building new SSA steps.
