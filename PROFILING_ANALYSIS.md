@@ -1277,3 +1277,133 @@ The profile is now flat — no single function dominates. The remaining
 hotspots are either inherent to the algorithm (operator==, merge),
 architectural (COW refcounting), or artifacts of the profiling method
 (iostream). We are in diminishing-returns territory for easy wins.
+
+
+## Definitive Allocator Analysis (2026-03-12)
+
+### Methodology
+
+Built 3 binaries from the same codebase, varying only the pool allocator:
+- **Baseline**: develop `b191cc1dac` (no pool, no other optimizations)
+- **HEAD-nopool**: all optimizations except pool allocator (reverted `ae34043bd1`)
+- **HEAD-pool**: all optimizations including pool allocator
+
+All 3 binaries compiled with `-Dallocator=system` (glibc malloc only).
+tcmalloc and jemalloc tested via `LD_PRELOAD` on each binary.
+
+Allocator linkage verified via `ldd` for all binaries (no tcmalloc/jemalloc
+linked). LD_PRELOAD verified via `LD_DEBUG=libs`. DIMACS output verified
+identical across all 3 builds.
+
+9 benchmarks × 3 builds × 3 allocators × 7 runs = 567 data points.
+Measurement stability: 96% of configurations have IQR < 2% of median.
+
+### Benchmarks
+
+| Benchmark | Args |
+|-----------|------|
+| linked_list | --bounds-check --pointer-check --unwind 200 |
+| array_ops | --bounds-check --unwind 55 |
+| dlinked_list | --bounds-check --pointer-check --unwind 150 |
+| string_ops | --bounds-check --unwind 30 |
+| matrix | --bounds-check --unwind 12 |
+| tree | --bounds-check --pointer-check --unwind 8 |
+| heavy_array | --bounds-check --unwind 25 |
+| csmith_42 | --unwind 257 --no-unwinding-assertions --object-bits 13 |
+| csmith_1111111111 | --unwind 257 --no-unwinding-assertions --object-bits 13 |
+
+All benchmarks pre-compiled to goto binaries via `goto-cc`.
+
+### Full results (median of 7 runs, seconds)
+
+| Benchmark | Base/glibc | Base/tc | Base/je | Head/glibc | Head/tc | Head/je | Pool/glibc | Pool/tc | Pool/je |
+|-----------|-----------|---------|---------|-----------|---------|---------|-----------|---------|---------|
+| linked_list | 0.523 | 0.441 | 0.431 | 0.491 | 0.418 | 0.408 | 0.485 | 0.419 | 0.409 |
+| array_ops | 3.076 | 2.377 | 2.570 | 2.497 | 1.918 | 2.062 | 2.410 | 1.904 | 2.052 |
+| dlinked_list | 0.942 | 0.766 | 0.762 | 0.883 | 0.724 | 0.717 | 0.873 | 0.723 | 0.717 |
+| string_ops | 0.243 | 0.249 | 0.219 | 0.226 | 0.237 | 0.208 | 0.222 | 0.234 | 0.206 |
+| matrix | 1.662 | 1.277 | 1.377 | 1.333 | 0.999 | 1.081 | 1.274 | 0.995 | 1.066 |
+| tree | 2.488 | 1.948 | 1.962 | 2.345 | 1.842 | 1.854 | 2.307 | 1.840 | 1.854 |
+| heavy_array | 2.539 | 1.943 | 2.071 | 1.831 | 1.333 | 1.429 | 1.742 | 1.316 | 1.397 |
+| csmith_42 | 1.732 | 1.338 | 1.375 | 1.552 | 1.221 | 1.247 | 1.511 | 1.212 | 1.241 |
+| csmith_1111 | 12.737 | 10.066 | 10.072 | 11.723 | 9.286 | 9.351 | 11.334 | 9.214 | 9.251 |
+| **TOTAL** | **25.942** | **20.405** | **20.839** | **22.881** | **17.978** | **18.357** | **22.158** | **17.857** | **18.193** |
+
+### Effect of allocator (% speedup vs glibc, same binary)
+
+| Benchmark | Base→tc | Base→je | Head→tc | Head→je | Pool→tc | Pool→je |
+|-----------|---------|---------|---------|---------|---------|---------|
+| linked_list | +15.7% | +17.6% | +14.9% | +16.9% | +13.6% | +15.7% |
+| array_ops | +22.7% | +16.4% | +23.2% | +17.4% | +21.0% | +14.9% |
+| dlinked_list | +18.7% | +19.1% | +18.0% | +18.8% | +17.2% | +17.9% |
+| string_ops | -2.5% | +9.9% | -4.9% | +8.0% | -5.4% | +7.2% |
+| matrix | +23.2% | +17.1% | +25.1% | +18.9% | +21.9% | +16.3% |
+| tree | +21.7% | +21.1% | +21.4% | +20.9% | +20.2% | +19.6% |
+| heavy_array | +23.5% | +18.4% | +27.2% | +22.0% | +24.5% | +19.8% |
+| csmith_42 | +22.7% | +20.6% | +21.3% | +19.7% | +19.8% | +17.9% |
+| csmith_1111 | +21.0% | +20.9% | +20.8% | +20.2% | +18.7% | +18.4% |
+| **TOTAL** | **+21.3%** | **+19.7%** | **+21.4%** | **+19.8%** | **+19.4%** | **+17.9%** |
+
+### Effect of pool allocator (Head-nopool → Head-pool)
+
+| Benchmark | glibc | tcmalloc | jemalloc |
+|-----------|-------|----------|----------|
+| linked_list | +1.2% | -0.2% | -0.2% |
+| array_ops | +3.5% | +0.7% | +0.5% |
+| dlinked_list | +1.1% | +0.1% | +0.0% |
+| string_ops | +1.8% | +1.3% | +1.0% |
+| matrix | +4.4% | +0.4% | +1.4% |
+| tree | +1.6% | +0.1% | +0.0% |
+| heavy_array | +4.9% | +1.3% | +2.2% |
+| csmith_42 | +2.6% | +0.7% | +0.5% |
+| csmith_1111 | +3.3% | +0.8% | +1.1% |
+| **TOTAL** | **+3.2%** | **+0.7%** | **+0.9%** |
+
+### 2×2 summary (HEAD code, total across 9 benchmarks)
+
+| | glibc | tcmalloc | jemalloc |
+|---|---|---|---|
+| **No pool** | 22.881s (ref) | 17.978s (+21.4%) | 18.357s (+19.8%) |
+| **Pool** | 22.158s (+3.2%) | 17.857s (+22.0%) | 18.193s (+20.5%) |
+
+### Conclusions
+
+1. **tcmalloc gives 21% speedup** consistently across all builds (baseline,
+   HEAD-nopool, HEAD-pool) and all benchmarks except string_ops (which is
+   too small at 0.2s for the benefit to outweigh initialization overhead).
+   This effect is independent of code optimizations.
+
+2. **jemalloc gives 20% speedup**, slightly less than tcmalloc on most
+   benchmarks. Both are effective; tcmalloc has a slight edge on
+   array-heavy workloads.
+
+3. **The pool allocator gives 3.2% speedup with glibc**, concentrated on
+   symex-heavy workloads (heavy_array +4.9%, matrix +4.4%, array_ops +3.5%).
+
+4. **The pool allocator adds only 0.7% on top of tcmalloc** and 0.9% on
+   top of jemalloc. Both tcmalloc and the pool allocator address the same
+   bottleneck (small object allocation/deallocation), and tcmalloc is much
+   more effective.
+
+5. **The pool allocator does NOT subsume tcmalloc** (correcting the earlier
+   claim from the 2026-03-12 re-profiling). The earlier measurement showing
+   0% tcmalloc benefit on HEAD was incorrect because the HEAD binary had
+   tcmalloc linked via CMake — the LD_PRELOAD test was comparing tcmalloc
+   vs tcmalloc, not tcmalloc vs glibc. This re-analysis uses binaries
+   built with `-Dallocator=system` to ensure clean glibc baselines.
+
+6. **The 31% pool allocator claim in commit `ae34043bd1` is not reproduced.**
+   The verified benefit is 3.2% with glibc. The original measurement likely
+   had confounding factors (different benchmark, different baseline, or
+   tcmalloc already present).
+
+### Recommendation
+
+- **tcmalloc should be the primary allocator strategy** (21% speedup, zero
+  code complexity, well-tested library)
+- **The pool allocator provides marginal additional benefit** (+0.7% with
+  tcmalloc) but adds complexity (memory never returned to OS, interacts
+  poorly with sanitizers, thread_local overhead). Consider whether the
+  complexity is worth 0.7%.
+- **jemalloc is a good alternative** where tcmalloc is unavailable (20%
+  speedup, widely available)
