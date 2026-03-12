@@ -1,8 +1,8 @@
 # CBMC Performance Profiling Analysis
 
-Date: 2026-03-11
-Branch: `profiling-tool`
-Build: Release (`-O3 -DNDEBUG`), commit `b191cc1dac` (develop)
+Date: 2026-03-11 — 2026-03-12
+Branch: `experiment/hash-optimization`
+Baseline: Release (`-O3 -DNDEBUG`), commit `b191cc1dac` (develop)
 System: Linux x86_64
 
 ## Methodology
@@ -443,6 +443,11 @@ automatic `cpu-clock` fallback.
 
 ## Combined Optimization Summary
 
+**Note:** This section reflects early results (2026-03-11) before the
+field_sensitivity cache was found to have a correctness bug and before
+the pool allocator and get_fields hoisting were added. See
+"Comprehensive 13-Benchmark Results (2026-03-12)" for final numbers.
+
 | Optimization | Speedup (csmith_42) | Cumulative |
 |-------------|--------------------:|----------:|
 | Baseline | — | 8.89s |
@@ -457,6 +462,12 @@ On the array-heavy benchmark, the combined effect is even larger:
 3.13s → 1.91s (**39% faster**).
 
 ## Final Combined Results (2026-03-11)
+
+**Note:** This section reflects early results before the pool allocator,
+get_fields hoisting, and get_new_name cache were added. The
+field_sensitivity cache listed below was later found to have a
+correctness bug and was removed. See "Comprehensive 13-Benchmark Results
+(2026-03-12)" for final numbers.
 
 All optimizations combined on `experiment/hash-optimization` branch:
 - SSA identifier string concat (replace ostringstream)
@@ -1233,6 +1244,10 @@ hoisting), glibc malloc
 
 Correctness verified: DIMACS output matches exactly for all benchmarks.
 
+**Note:** This table measures code optimizations only (glibc malloc).
+With tcmalloc added, the total speedup is ~31% — see "Comprehensive
+13-Benchmark Results (2026-03-12)" for the full picture.
+
 ### tcmalloc re-evaluation — RETRACTED
 
 **The measurements in this section were incorrect.** The HEAD binary had
@@ -1244,6 +1259,10 @@ See the "Definitive Allocator Analysis (2026-03-12)" section below for
 correct measurements using binaries built with `-Dallocator=system`.
 
 ### Current profile (HEAD, all optimizations)
+
+**Note:** This profile was taken before changes 1 and 2 (unordered_set,
+value_sett::to_expr) and was dominated by csmith_1111111111. See
+"Updated Profile: Post-Changes 1 and 2 (2026-03-12)" for the latest.
 
 | Rank | Function | % |
 |------|----------|---|
@@ -1382,7 +1401,7 @@ All benchmarks pre-compiled to goto binaries via `goto-cc`.
    vs tcmalloc, not tcmalloc vs glibc. This re-analysis uses binaries
    built with `-Dallocator=system` to ensure clean glibc baselines.
 
-6. **The 31% pool allocator claim in commit `ae34043bd1` is not reproduced.**
+6. **The 31% pool allocator claim in commit `7d15280901` is not reproduced.**
    The verified benefit is 3.2% with glibc. The original measurement likely
    had confounding factors (different benchmark, different baseline, or
    tcmalloc already present).
@@ -1397,3 +1416,263 @@ All benchmarks pre-compiled to goto binaries via `goto-cc`.
   complexity is worth 0.7%.
 - **jemalloc is a good alternative** where tcmalloc is unavailable (20%
   speedup, widely available)
+
+## Comprehensive 13-Benchmark Results (2026-03-12)
+
+Extended the benchmark suite from 7 hand-written benchmarks to 13 total
+by adding 6 CSmith-generated benchmarks (seeds: 42, 1111111111,
+1234567890, 2718281828, 314159265, 99999). CSmith benchmarks use
+`--unwind 257 --no-unwinding-assertions --object-bits 13` and require
+`-I/usr/include/csmith`.
+
+All benchmarks pre-compiled to goto binaries via `goto-cc` for
+measurement stability. 7 runs each, median reported. IQR < 2.1% for
+all configurations.
+
+### Baseline vs HEAD (before changes 1 and 2)
+
+Baseline: develop `b191cc1dac`, glibc malloc.
+HEAD: all code optimizations (SSA string concat, set_level_0/1/2,
+irept union, pool allocator, get_new_name cache, field_sensitivity
+hoisting) + tcmalloc via CMake.
+
+| Benchmark | Baseline | HEAD | Speedup |
+|-----------|----------|------|---------|
+| linked_list | 0.520s | 0.398s | +23.5% |
+| array_ops | 3.056s | 1.908s | +37.6% |
+| dlinked_list | 0.939s | 0.703s | +25.1% |
+| string_ops | 0.241s | 0.192s | +20.3% |
+| matrix | 1.652s | 0.985s | +40.4% |
+| tree | 2.485s | 1.817s | +26.9% |
+| heavy_array | 2.510s | 1.312s | +47.7% |
+| csmith_42 | 1.718s | 1.204s | +29.9% |
+| csmith_1111111111 | 12.819s | 9.255s | +27.8% |
+| csmith_1234567890 | 2.371s | 1.653s | +30.3% |
+| csmith_2718281828 | 5.947s | 4.173s | +29.8% |
+| csmith_314159265 | 1.862s | 1.316s | +29.3% |
+| csmith_99999 | 1.707s | 1.196s | +29.9% |
+| **TOTAL** | **37.827s** | **26.112s** | **+31.0%** |
+
+DIMACS output verified identical for all 13 benchmarks.
+
+The CSmith benchmarks show remarkably consistent speedup (27.8–30.3%),
+confirming the optimizations are general-purpose. The hand-written
+benchmarks show more variation (20–48%) because they exercise different
+code paths with different optimization sensitivity.
+
+**Note:** The goto binaries used for this table were compiled during
+this session. Later in the session, the baseline worktree was recreated,
+which rebuilt the goto binaries. The linked_list and dlinked_list
+benchmarks became much faster (~0.06s and ~0.07s) with the new goto
+binaries, likely due to a different `goto-cc` version producing simpler
+goto programs. All subsequent A/B comparisons use the same goto binaries
+for both sides, so relative speedups remain valid.
+
+## Optimization: unordered_set in simplify_inequality_pointer_object (2026-03-12)
+
+Commit: `a656a98492`
+
+### Problem
+
+`simplify_expr_with_value_sett::simplify_inequality_pointer_object` used
+`std::set<exprt>` to collect pointed-to objects. `std::set` requires
+`operator<`, which calls `irept::compare` — a deep recursive tree
+comparison. On pointer-heavy code (csmith_1111111111), this function was
+25.5% inclusive cost, with 17.7% spent in `irept::compare` via
+`std::set::insert`.
+
+### Change
+
+- Replaced `std::set<exprt>` with `std::unordered_set<exprt, irep_hash>`.
+  This uses `irept::hash()` (cached after first computation) and
+  `operator==` (can short-circuit on pointer equality from sharing)
+  instead of `irept::compare`.
+- Replaced `std::set_intersection` (requires sorted ranges) with a
+  simple loop checking membership via `count()`.
+
+### Benchmark (A/B, same goto binaries, 7 runs, median)
+
+| Benchmark | Before | After | Speedup |
+|-----------|--------|-------|---------|
+| csmith_1111111111 | 9.286s | 7.600s | **+18.2%** |
+| array_ops | 1.900s | 1.901s | 0.0% |
+| tree | 1.816s | 1.811s | +0.3% |
+| heavy_array | 1.310s | 1.310s | 0.0% |
+| csmith_2718281828 | 4.159s | 4.157s | 0.0% |
+| All others | — | — | < ±0.6% |
+| **TOTAL (13)** | **25.115s** | **23.401s** | **+6.8%** |
+
+The speedup is concentrated on csmith_1111111111 because it is
+pointer-heavy and triggers many pointer-object inequality comparisons.
+Other benchmarks are unaffected because they rarely enter this code path.
+
+DIMACS output verified identical for all 13 benchmarks.
+
+## Optimization: direct construction in value_sett::to_expr (2026-03-12)
+
+Commit: `e5afe5eac7`
+
+### Problem
+
+`value_sett::to_expr` default-constructed an `object_descriptor_exprt`
+then mutated it via `od.object()=...`, `od.offset()=...`, and
+`od.type()=...`. Each mutation triggers a COW detach operation on the
+irept sharing tree. The call chain
+`value_sett::get_value_set` → `to_expr` → `irept::add` → `detach`
+accounted for ~4–5% of total cost on pointer-heavy benchmarks.
+
+### Change
+
+- Added `object_descriptor_exprt(exprt _object, exprt _offset)`
+  constructor that passes both operands directly to `binary_exprt`,
+  avoiding all post-construction mutations.
+- Simplified `to_expr` to use direct construction.
+- The `type()` field was previously set to `object.type()` but is never
+  read by any consumer (verified by grep). The existing single-argument
+  constructor already left it as `typet()`.
+
+### Benchmark (A/B vs change 1 only, same goto binaries, 7 runs, median)
+
+| Benchmark | Change 1 | Change 1+2 | Speedup |
+|-----------|----------|------------|---------|
+| csmith_1111111111 | 7.633s | 7.250s | **+5.0%** |
+| tree | 1.810s | 1.823s | -0.7% |
+| All others | — | — | < ±0.6% |
+| **TOTAL (13)** | **23.434s** | **23.102s** | **+1.4%** |
+
+The speedup is again concentrated on csmith_1111111111 (pointer-heavy).
+The -0.7% on tree is within noise (IQR ~1%).
+
+DIMACS output verified identical for all 13 benchmarks.
+
+## Updated Profile: Post-Changes 1 and 2 (2026-03-12)
+
+Configuration: HEAD with both changes, tcmalloc via CMake.
+Benchmarks: 9 (all except csmith_1111111111, which was excluded to avoid
+biasing the aggregated profile — it is 3–7× heavier than other benchmarks
+and would dominate sample counts).
+Method: `perf record` at 997 Hz with 3 iterations per benchmark.
+
+### Self-cost by category
+
+| Category | Self % | Key functions |
+|----------|--------|---------------|
+| irept access (find+get+add) | 16.2% | Linear scan of `forward_list_as_mapt` per property access |
+| irept COW (remove_ref+detach) | 13.5% | Triggered by mutations during rename, simplify, field_sensitivity |
+| simplifier | 5.8% | 30% inclusive; `simplify_node_preorder` 2.0%, `simplify_node` 1.3%, `simplify_rec` 1.1% |
+| string interning | 3.9% | `hash_string` 0.7%, hashtable lookups 2.6%, `get_dstring_number` 0.3% |
+| BigInt/bvrep | 3.8% | `BigInt::compare` 0.5%, `BigInt::~BigInt` 0.3%, `get_bvrep_bit` 0.9%, `integer2string` 0.6% |
+| sharing_mapt | 2.8% | SSA rename state lookups via `get_leaf_node` |
+| irept compare (==, hash) | 2.8% | Down from 5.7% pre-change-1 |
+| field_sensitivity | 2.6% | Recursive `apply` calls |
+| validation checks | 2.2% | `constant_exprt::check` 1.4%, `ssa_exprt::check` 1.1% |
+| SSA identifiers | 2.0% | `update_identifier`, `build_ssa_identifier_rec` |
+| merge_irept | 1.7% | Expression deduplication |
+| rename | 1.0% | `rename<L1>`, `rename<L3>` |
+| tcmalloc | 13.2% | Irreducible allocator overhead |
+| libc | 2.6% | memcpy, memmove |
+| libstdc++ | 1.4% | |
+| other CBMC | 9.5% | Long tail of small functions |
+
+### Top 15 CBMC functions (self cost)
+
+| Rank | Function | Self % |
+|------|----------|--------|
+| 1 | irept::find | 7.5% |
+| 2 | sharing_treet::remove_ref | 7.3% |
+| 3 | sharing_treet::detach | 5.2% |
+| 4 | irept::get | 4.7% |
+| 5 | irept::add(id) | 2.9% |
+| 6 | field_sensitivityt::apply | 2.3% |
+| 7 | string_containert hashtable find | 2.1% |
+| 8 | simplify_node_preorder | 2.0% |
+| 9 | irept::operator== | 1.8% |
+| 10 | merge_irept::merged | 1.7% |
+| 11 | sharing_mapt::get_leaf_node | 1.6% |
+| 12 | constant_exprt::check | 1.4% |
+| 13 | simplify_node | 1.3% |
+| 14 | ssa_exprt::check | 1.1% |
+| 15 | simplify_rec | 1.1% |
+
+### Per-benchmark variation
+
+| Benchmark | COW | Access | Cmp | Simplify | String | BigInt |
+|-----------|-----|--------|-----|----------|--------|--------|
+| array_ops | 12% | 16% | 3% | 3% | 5% | 4% |
+| heavy_array | 13% | 15% | 1% | 4% | **10%** | **6%** |
+| tree | 5% | 6% | 4% | 1% | 2% | 0% |
+| csmith_2718281828 | 14% | 14% | 6% | 6% | 5% | 4% |
+| csmith_42 | 13% | 15% | 4% | 6% | 4% | 4% |
+
+heavy_array stands out with 10% string interning and 6% BigInt — this
+is from `field_sensitivityt::get_fields` creating `dstringt` values for
+array element field names, and constant index expressions using BigInt.
+The tree benchmark has low COW/access (5–6%) because it spends more time
+in CNF/DIMACS output (it produces the largest formula: 966K vars, 3.3M
+clauses).
+
+### Inclusive cost (top-level call chain)
+
+```
+execute_next_instruction                89%
+├── symex_function_call_symbol          37%  (parameter_assignments, clean_expr)
+├── symex_assign                        33%  (assign_non_struct_symbol → rename<L3>)
+│   └── simplify_rec                    30%  (simplify_node_preorder → simplify_node)
+├── clean_expr → dereference            32%
+│   └── field_sensitivityt::apply       21%  (recursive, 4-5 levels)
+└── symex_assert                         ~5%
+```
+
+### Dominant call chains for top functions
+
+**irept::find (7.5%)**: Called from simplify (via type checks), rename
+(via field_sensitivity::apply), and parameter_assignments. Spread across
+many call sites — no single dominant caller.
+
+**remove_ref (7.3%)**: Triggered by irept destruction when temporary
+expressions go out of scope. Recursive (deep trees cause deep
+remove_ref chains). Spread across symex_assign, symex_function_call,
+and simplify.
+
+**detach (5.2%)**: Triggered by irept mutations (add, set, operand
+assignment). Largest single caller is rename<L3> → field_sensitivity::apply
+chain, which mutates expressions during SSA renaming.
+
+### Assessment
+
+The profile is now genuinely flat. No single CBMC function exceeds 7.5%
+self cost. The top two categories — irept access (16.2%) and irept COW
+(13.5%) — are fundamental to how CBMC's data structures work and are
+spread across many call sites rather than concentrated in one hot path.
+
+### Remaining optimization opportunities
+
+1. **irept access (16.2%)** — `forward_list_as_mapt` does a linear scan
+   for every `find`/`get`/`add` call. Replacing it with a flat hash map
+   or small sorted array would help, but is a major architectural change
+   affecting the entire codebase.
+
+2. **irept COW (13.5%)** — inherent to the sharing tree design. The
+   remaining mutations are mostly in the rename/simplify core loop where
+   they are necessary. Could be reduced by batching mutations or using
+   move semantics more aggressively.
+
+3. **String interning (3.9%, up to 10% on heavy_array)** — caching
+   `dstringt` values for predictable field names in
+   `field_sensitivityt::get_fields` could help on array-heavy benchmarks.
+
+4. **BigInt (3.8%, up to 6% on heavy_array)** — constant expression
+   construction overhead. `BigInt` uses heap allocation; a small-buffer
+   optimization or replacing with fixed-width integers where possible
+   could help.
+
+5. **Validation checks (2.2%)** — `constant_exprt::check` and
+   `ssa_exprt::check` run on every `to_constant_expr()` /
+   `to_ssa_expr()` cast. These could be compiled out in Release builds
+   via `CPROVER_INVARIANT_DO_NOT_CHECK`, but that flag also disables
+   other useful invariant checks.
+
+6. **tcmalloc (13.2%)** — irreducible allocator overhead. Already using
+   the fastest general-purpose allocator. Further gains would require
+   reducing allocation volume (fewer temporary expressions, arena
+   allocation for symex state).
