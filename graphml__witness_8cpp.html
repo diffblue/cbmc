@@ -109,6 +109,7 @@ $(document).ready(function(){initNavTree('graphml__witness_8cpp.html',''); initR
 <code>#include &lt;<a class="el" href="byte__operators_8h_source.html">util/byte_operators.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="c__types_8h_source.html">util/c_types.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="cprover__prefix_8h_source.html">util/cprover_prefix.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="find__symbols_8h_source.html">util/find_symbols.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="namespace_8h_source.html">util/namespace.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="pointer__predicates_8h_source.html">util/pointer_predicates.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="prefix_8h_source.html">util/prefix.h</a>&gt;</code><br />
@@ -126,7 +127,7 @@ $(document).ready(function(){initNavTree('graphml__witness_8cpp.html',''); initR
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="graphml__witness_8cpp__incl.svg" width="3002" height="1283"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="graphml__witness_8cpp__incl.svg" width="3007" height="1283"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div>
 <p><a href="graphml__witness_8cpp_source.html">Go to the source code of this file.</a></p>
@@ -139,12 +140,59 @@ Functions</h2></td></tr>
 <tr class="separator:ad9a44526c11e35e881865a69c794ee60"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abe3669dc1b4262461e79eecee174470a" id="r_abe3669dc1b4262461e79eecee174470a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">static</a> <a class="el" href="classait.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="graphml__witness_8cpp.html#abe3669dc1b4262461e79eecee174470a">contains_symbol_prefix</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;expr, <a class="el" href="classait.html">const</a> std::string &amp;prefix)</td></tr>
 <tr class="separator:abe3669dc1b4262461e79eecee174470a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa4f6cdf435638442d6dee26a39910923" id="r_aa4f6cdf435638442d6dee26a39910923"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">static</a> <a class="el" href="classait.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="graphml__witness_8cpp.html#aa4f6cdf435638442d6dee26a39910923">is_function_built_in_or_extern</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classnamespacet.html">namespacet</a> &amp;ns, <a class="el" href="classait.html">const</a> <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id)</td></tr>
+<tr class="memdesc:aa4f6cdf435638442d6dee26a39910923"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if a function is built-in (CPROVER library), has no body, or does not exist in the symbol table.  <br /></td></tr>
+<tr class="separator:aa4f6cdf435638442d6dee26a39910923"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0c362caea9cbde9625ed2eec3ff242ba" id="r_a0c362caea9cbde9625ed2eec3ff242ba"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">static</a> <a class="el" href="classait.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="graphml__witness_8cpp.html#a0c362caea9cbde9625ed2eec3ff242ba">all_symbols_in_scope</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;expr, <a class="el" href="classait.html">const</a> <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;function_id)</td></tr>
+<tr class="memdesc:a0c362caea9cbde9625ed2eec3ff242ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if all symbols in an expression are in scope.  <br /></td></tr>
+<tr class="separator:a0c362caea9cbde9625ed2eec3ff242ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Witnesses for Traces and Proofs. </p>
 
 <p class="definition">Definition in file <a class="el" href="graphml__witness_8cpp_source.html">graphml_witness.cpp</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="a0c362caea9cbde9625ed2eec3ff242ba" name="a0c362caea9cbde9625ed2eec3ff242ba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0c362caea9cbde9625ed2eec3ff242ba">&#9670;&#160;</a></span>all_symbols_in_scope()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">static</a> <a class="el" href="classait.html">bool</a> all_symbols_in_scope </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramname"><em>function_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Check if all symbols in an expression are in scope. </p>
+<p>Note: scope is determined by the prefix before the first "::". This is correct for CBMC's C front-end where locals are named "function::N::var" and function_id is "function". JBMC does not use graphml witnesses. </p>
+
+<p class="definition">Definition at line <a class="el" href="graphml__witness_8cpp_source.html#l00304">304</a> of file <a class="el" href="graphml__witness_8cpp_source.html">graphml_witness.cpp</a>.</p>
+
+</div>
+</div>
 <a id="abe3669dc1b4262461e79eecee174470a" name="abe3669dc1b4262461e79eecee174470a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abe3669dc1b4262461e79eecee174470a">&#9670;&#160;</a></span>contains_symbol_prefix()</h2>
 
@@ -179,7 +227,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="graphml__witness_8cpp_source.html#l00260">260</a> of file <a class="el" href="graphml__witness_8cpp_source.html">graphml_witness.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="graphml__witness_8cpp_source.html#l00261">261</a> of file <a class="el" href="graphml__witness_8cpp_source.html">graphml_witness.cpp</a>.</p>
 
 </div>
 </div>
@@ -223,7 +271,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="graphml__witness_8cpp_source.html#l00034">34</a> of file <a class="el" href="graphml__witness_8cpp_source.html">graphml_witness.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="graphml__witness_8cpp_source.html#l00035">35</a> of file <a class="el" href="graphml__witness_8cpp_source.html">graphml_witness.cpp</a>.</p>
 
 </div>
 </div>
@@ -267,7 +315,47 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="graphml__witness_8cpp_source.html#l00217">217</a> of file <a class="el" href="graphml__witness_8cpp_source.html">graphml_witness.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="graphml__witness_8cpp_source.html#l00218">218</a> of file <a class="el" href="graphml__witness_8cpp_source.html">graphml_witness.cpp</a>.</p>
+
+</div>
+</div>
+<a id="aa4f6cdf435638442d6dee26a39910923" name="aa4f6cdf435638442d6dee26a39910923"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa4f6cdf435638442d6dee26a39910923">&#9670;&#160;</a></span>is_function_built_in_or_extern()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">static</a> <a class="el" href="classait.html">bool</a> is_function_built_in_or_extern </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classnamespacet.html">namespacet</a> &amp;&#160;</td>
+          <td class="paramname"><em>ns</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;&#160;</td>
+          <td class="paramname"><em>function_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Check if a function is built-in (CPROVER library), has no body, or does not exist in the symbol table. </p>
+
+<p class="definition">Definition at line <a class="el" href="graphml__witness_8cpp_source.html#l00280">280</a> of file <a class="el" href="graphml__witness_8cpp_source.html">graphml_witness.cpp</a>.</p>
 
 </div>
 </div>
