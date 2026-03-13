@@ -106,7 +106,7 @@ jobs:
       - name: Package build artifacts
         run: |
           tar czf build-artifacts.tar.gz \
-            --exclude='*.o' --exclude='*.d' \
+            --exclude='*.d' \
             src/ unit/unit_tests jbmc/src/ jbmc/unit/unit_tests \
             jbmc/lib/java-models-library/target/ \
             minisat-2.2.1/
@@ -144,14 +144,16 @@ jobs:
         run: tar xzf build-artifacts.tar.gz
       - name: Run CBMC unit tests
         run: |
-          make TAGS="-d yes' '~[!shouldfail]' '~[not_ubsan]" -C unit test
+          cd unit
+          ./unit_tests '-d yes' '~[!shouldfail]' '~[not_ubsan]'
           echo "Running expected failure tests"
-          make TAGS="-d yes' '[!shouldfail]" -C unit test
+          ./unit_tests '-d yes' '[!shouldfail]'
       - name: Run JBMC unit tests
         run: |
-          make TAGS="-d yes" -C jbmc/unit test
+          cd jbmc/unit
+          ./unit_tests '-d yes'
           echo "Running expected failure tests"
-          make TAGS="-d yes' '[!shouldfail]" -C jbmc/unit test
+          ./unit_tests '-d yes' '[!shouldfail]'
 
   # Run the main CBMC regression test suite (all directories under regression/).
   cbmc-regression:
@@ -185,6 +187,8 @@ jobs:
       - name: Extract build artifacts
         run: tar xzf build-artifacts.tar.gz
       - name: Run CBMC regression tests
+        env:
+          TESTPL_TIMEOUT: "1800"
         run: |
           export PATH=$PATH:$PWD/src/solvers
           export SANITIZER_FLAGS="-fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -g -O1"
@@ -224,14 +228,19 @@ jobs:
       - name: Extract build artifacts
         run: tar xzf build-artifacts.tar.gz
       - name: Run paths-lifo tests
-        run: make -C regression/cbmc test-paths-lifo
+        run: |
+          export PATH=$PATH:$PWD/src/solvers
+          make -C regression/cbmc test-paths-lifo
       - name: Run cprover-smt2 tests
-        run: make -C regression/cbmc test-cprover-smt2
+        run: |
+          export PATH=$PATH:$PWD/src/solvers
+          make -C regression/cbmc test-cprover-smt2
 
   # Run the JBMC regression test suite (all directories under jbmc/regression/).
   jbmc-regression:
     runs-on: ubuntu-24.04
     needs: build-asan
+    timeout-minutes: 360
     env:
       ASAN_OPTIONS: "abort_on_error=1:fast_unwind_on_malloc=0:detect_odr_violation=0:detect_leaks=0"
       UBSAN_OPTIONS: "print_stacktrace=1:halt_on_error=1"
@@ -252,4 +261,6 @@ jobs:
       - name: Extract build artifacts
         run: tar xzf build-artifacts.tar.gz
       - name: Run JBMC regression tests
+        env:
+          TESTPL_TIMEOUT: "1800"
         run: make -C jbmc/regression test-parallel JOBS=${{env.linux-vcpus}}
