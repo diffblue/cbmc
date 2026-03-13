@@ -26,7 +26,7 @@ test-z3:
 
 test-paths-lifo:
 	@../test.pl -e -p -c "../../../src/cbmc/cbmc --paths lifo" \
-					  -X thorough-paths -X smt-backend -X paths-lifo-expected-failure \
+					  -X thorough-paths -X smt-backend \
 					  -s paths-lifo $(GCC_ONLY)
 
 test-new-smt-backend:

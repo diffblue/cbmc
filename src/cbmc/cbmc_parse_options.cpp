@@ -12,9 +12,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "cbmc_parse_options.h"
 
 #include <util/config.h>
+#include <util/exception_utils.h>
 #include <util/exit_codes.h>
 #include <util/help_formatter.h>
 #include <util/invariant.h>
+#include <util/output_file.h>
 #include <util/unicode.h>
 #include <util/version.h>
 
@@ -124,6 +126,16 @@ void cbmc_parse_optionst::set_default_analysis_flags(
   if(!options.is_set("unwinding-assertions"))
   {
     options.set_option("unwinding-assertions", enabled);
+    // Keep paths-symex-explore-all in lock-step with unwinding-assertions, as
+    // the explicit --[no-]unwinding-assertions handling does too. In --paths
+    // mode, has_finished_exploration may report completion before any path is
+    // explored when no property remains in the initial properties map. The
+    // only verification conditions generated during symex that are absent from
+    // that initial map -- loop and recursion unwinding assertions and the "no
+    // body for callee" assertion -- are all themselves gated on
+    // unwinding-assertions, so exploring all paths is required exactly when
+    // unwinding-assertions is enabled.
+    options.set_option("paths-symex-explore-all", enabled);
   }
 
   if(enabled)
@@ -682,6 +694,26 @@ int cbmc_parse_optionst::doit()
   if(
     options.get_bool_option("dimacs") || !options.get_option("outfile").empty())
   {
+    // Validate outfile path early so that errors are reported even when
+    // single-path symex simplifies away all VCCs (and thus never creates the
+    // solver, where solver_factoryt::open_outfile_and_check would otherwise
+    // report this same error). This intentionally opens (and truncates) the
+    // file purely for validation; it is opened again later for the actual
+    // write, so an empty file may be left behind if a later stage fails first.
+    const std::string outfile = options.get_option("outfile");
+    if(!outfile.empty() && outfile != "-")
+    {
+      try
+      {
+        output_filet{outfile};
+      }
+      catch(const system_exceptiont &)
+      {
+        throw invalid_command_line_argument_exceptiont(
+          "failed to open file: " + outfile, "--outfile");
+      }
+    }
+
     if(options.get_bool_option("paths"))
     {
       stop_on_fail_verifiert<single_path_symex_checkert> verifier(
