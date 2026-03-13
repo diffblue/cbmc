@@ -528,7 +528,7 @@ __CPROVER_HIDE:;
 char __VERIFIER_nondet_char(void);
 size_t __VERIFIER_nondet_size_t(void);
 
-size_t fread(void *ptr, size_t size, size_t nitems, FILE *stream)
+size_t __CPROVER_fread(void *ptr, size_t size, size_t nitems, FILE *stream)
 {
 __CPROVER_HIDE:;
   size_t bytes_read = __VERIFIER_nondet_size_t();
@@ -545,8 +545,8 @@ __CPROVER_HIDE:;
   }
 
 #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
-  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
-                   "fread file must be open");
+  __CPROVER_assert(
+    __CPROVER_get_must(stream, "open"), "fread file must be open");
 #endif
 
   for(size_t i = 0; i < bytes_read && i < upper_bound; i++)
@@ -555,6 +555,23 @@ __CPROVER_HIDE:;
   }
 
   return bytes_read / size;
+}
+
+#ifdef __FreeBSD__
+// FreeBSD asm-renames fread to __ssp_protected_fread, which then invokes fread;
+// to make this work, a symbol __ssp_real_fread is introduced that in turn is
+// asm-renamed to fread.
+size_t __ssp_real_fread(void *ptr, size_t size, size_t nitems, FILE *stream)
+{
+__CPROVER_HIDE:;
+  return __CPROVER_fread(ptr, size, nitems, stream);
+}
+#endif
+
+size_t fread(void *ptr, size_t size, size_t nitems, FILE *stream)
+{
+__CPROVER_HIDE:;
+  return __CPROVER_fread(ptr, size, nitems, stream);
 }
 
 /* FUNCTION: __fread_chk */
