@@ -3547,12 +3547,13 @@ exprt c_typecheck_baset::do_special_functions(
 
     return typecast_exprt::conditional_cast(isnormal_expr, expr.type());
   }
-  else if(identifier==CPROVER_PREFIX "signf" ||
-          identifier==CPROVER_PREFIX "signd" ||
-          identifier==CPROVER_PREFIX "signld" ||
-          identifier=="__builtin_signbit" ||
-          identifier=="__builtin_signbitf" ||
-          identifier=="__builtin_signbitl")
+  else if(
+    identifier == CPROVER_PREFIX "signf" ||
+    identifier == CPROVER_PREFIX "signd" ||
+    identifier == CPROVER_PREFIX "signld" ||
+    identifier == "__builtin_signbit" || identifier == "__builtin_signbitf" ||
+    identifier == "__builtin_signbitl" || identifier == "__inline_signbitf" ||
+    identifier == "__inline_signbitd" || identifier == "__inline_signbitl")
   {
     if(expr.arguments().size()!=1)
     {
