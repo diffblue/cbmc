@@ -69,6 +69,7 @@ cbmc/
 │   │   ├── syntax-checks.yaml           # Code style and linting
 │   │   ├── codeql-analysis.yml          # Security analysis
 │   │   ├── performance.yaml             # Performance benchmarking
+│   │   ├── profiling.yaml               # Pre-solver profiling on PRs
 │   │   └── release-packages.yaml        # Release automation
 │   └── dependabot.yml      # Dependency update automation
 ├── CODING_STANDARD.md      # Coding conventions
@@ -214,6 +215,8 @@ Unit tests using the Catch framework:
 
 - Build helpers and utilities
 - `cpplint.py` - Style checker
+- `profile_cbmc.py` - Performance profiling tool (see [Profiling CBMC](#6-profiling-cbmc))
+- `profiling/` - Profiling package (analysis, benchmarks, runner, utils)
 - `test.pl` - Regression test runner (in `regression/`)
 - CI/CD related scripts
 
@@ -764,6 +767,46 @@ cd regression/cbmc
 make test
 ```
 
+### 6. Profiling CBMC
+
+The profiling tool (`scripts/profile_cbmc.py`) profiles CBMC's pre-solver
+stages using `perf` and generates flamegraphs. Solver time is excluded by
+default so results reflect only CBMC's own code.
+
+**Prerequisites:** Linux with `perf` installed.
+
+```bash
+# Profile a single file
+scripts/profile_cbmc.py test.c -- --bounds-check --unwind 100
+
+# Run 3 built-in benchmarks (linked_list, array_ops, structs)
+scripts/profile_cbmc.py --auto
+
+# Extended suite (10 benchmarks) plus CSmith-generated tests
+scripts/profile_cbmc.py --auto-large --auto-csmith
+
+# Multiple runs for statistical significance (reports mean ± stddev)
+scripts/profile_cbmc.py --auto --runs 3
+
+# Source-level call site resolution (build a debug binary first)
+cmake -S . -Bbuild-debug -DCMAKE_BUILD_TYPE=RelWithDebInfo -DWITH_JBMC=OFF
+cmake --build build-debug --target cbmc -j$(nproc)
+scripts/profile_cbmc.py --auto --debug-binary build-debug/bin/cbmc
+
+# Differential profiling: compare two git refs
+scripts/profile_cbmc.py --diff develop my-optimization-branch
+```
+
+**Outputs** (in `profile-results/` by default):
+- `flamegraph.svg` per benchmark - Interactive flamegraph
+- `aggregated.svg` - Combined flamegraph across all benchmarks
+- `summary.txt` - Text summary with hotspot analysis and optimization suggestions
+- `results.json` - Machine-readable results
+
+**CI integration:** The `profiling.yaml` workflow runs `--auto --runs 3` on
+every PR, posts the summary to the GitHub step summary, and uploads
+flamegraph SVGs as downloadable artifacts.
+
 ---
 
 ## Navigation Tips
@@ -894,6 +937,7 @@ To understand how data flows through CBMC:
 | Create GOTO binary | `goto-cc -o out.gb input.c` |
 | View GOTO program | `goto-instrument --show-goto-functions prog.gb` |
 | Run CBMC | `cbmc program.gb` or `cbmc program.c` |
+| Profile CBMC | `scripts/profile_cbmc.py --auto --runs 3` |
 
 ### Key Files to Know
 
