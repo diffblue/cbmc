@@ -13,7 +13,9 @@
 #                    │
 #                    ├── cbmc-special-regression (paths-lifo, cprover-smt2)
 #                    │
-#                    └── jbmc-regression (JBMC regression suite)
+#                    ├── jbmc-regression (JBMC, no lazy loading)
+#                    │
+#                    └── jbmc-regression-symex-lazy-loading (subset)
 #
 # The build job compiles all binaries with sanitizer flags and uploads
 # them as a tarball artifact. The four test jobs download the artifact
@@ -237,6 +239,8 @@ jobs:
           make -C regression/cbmc test-cprover-smt2
 
   # Run the JBMC regression test suite (all directories under jbmc/regression/).
+  # The symex-driven-lazy-loading pass is skipped because it roughly doubles
+  # the runtime, pushing the job past GitHub's 6-hour timeout under sanitizers.
   jbmc-regression:
     runs-on: ubuntu-24.04
     needs: build-asan
@@ -260,7 +264,48 @@ jobs:
           name: asan-build
       - name: Extract build artifacts
         run: tar xzf build-artifacts.tar.gz
-      - name: Run JBMC regression tests
+      - name: Run JBMC regression tests (without lazy loading)
         env:
           TESTPL_TIMEOUT: "1800"
-        run: make -C jbmc/regression test-parallel JOBS=${{env.linux-vcpus}}
+        run: make -C jbmc/regression test-parallel JOBS=${{env.linux-vcpus}} SKIP_SYMEX_DRIVEN_LAZY_LOADING=1
+
+  # Run the symex-driven-lazy-loading pass for a subset of JBMC directories.
+  # The full lazy-loading pass exceeds GitHub's 6-hour timeout under
+  # sanitizers, so we only run the smaller directories (jbmc-generics,
+  # book-examples, strings-smoke-tests) to still exercise that code path.
+  jbmc-regression-symex-lazy-loading:
+    runs-on: ubuntu-24.04
+    needs: build-asan
+    timeout-minutes: 360
+    env:
+      ASAN_OPTIONS: "abort_on_error=1:fast_unwind_on_malloc=0:detect_odr_violation=0:detect_leaks=0"
+      UBSAN_OPTIONS: "print_stacktrace=1:halt_on_error=1"
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq clang-19 clang++-19 gdb maven jq parallel flex bison
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: asan-build
+      - name: Extract build artifacts
+        run: tar xzf build-artifacts.tar.gz
+      - name: Run JBMC symex-driven-lazy-loading tests (subset)
+        env:
+          TESTPL_TIMEOUT: "1800"
+        run: |
+          cd jbmc/regression
+          mvn --quiet clean package -T1C
+          parallel \
+            --halt soon,fail=1 \
+            --tag --tagstring '{#}:' \
+            --linebuffer \
+            --jobs ${{env.linux-vcpus}} \
+            make -C "{}" test ONLY_SYMEX_DRIVEN_LAZY_LOADING=1 \
+            ::: strings-smoke-tests jbmc-generics book-examples
