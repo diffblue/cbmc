@@ -72,8 +72,8 @@ void goto_symext::symex_allocate(
   {
     // to allow constant propagation
     exprt tmp_size = state.rename(size, ns).get();
-    simplify_expr_with_value_sett{state.value_set, language_mode, ns}.simplify(
-      tmp_size);
+    simplify_expr_with_value_sett{state.value_set, state.language_mode, ns}
+      .simplify(tmp_size);
 
     // special treatment for sizeof(T)*x
     {
@@ -167,8 +167,8 @@ void goto_symext::symex_allocate(
 
   // to allow constant propagation
   exprt zero_init = state.rename(to_binary_expr(code).op1(), ns).get();
-  simplify_expr_with_value_sett{state.value_set, language_mode, ns}.simplify(
-    zero_init);
+  simplify_expr_with_value_sett{state.value_set, state.language_mode, ns}
+    .simplify(zero_init);
 
   INVARIANT(
     zero_init.is_constant(), "allocate expects constant as second argument");
@@ -293,7 +293,7 @@ void goto_symext::symex_va_start(
 
   array = clean_expr(std::move(array), state, false);
   array = state.rename(std::move(array), ns).get();
-  do_simplify(array, state.value_set);
+  do_simplify(array, state);
   symex_assign(state, va_array.symbol_expr(), std::move(array));
 
   exprt rhs = address_of_exprt{index_exprt{
@@ -388,7 +388,7 @@ void goto_symext::symex_printf(
   exprt tmp_rhs = rhs;
   clean_expr(tmp_rhs, state, false);
   tmp_rhs = state.rename(std::move(tmp_rhs), ns).get();
-  do_simplify(tmp_rhs, state.value_set);
+  do_simplify(tmp_rhs, state);
 
   const exprt::operandst &operands=tmp_rhs.operands();
   std::list<exprt> args;
@@ -426,14 +426,14 @@ void goto_symext::symex_printf(
         parameter = to_address_of_expr(parameter).object();
       clean_expr(parameter, state, false);
       parameter = state.rename(std::move(parameter), ns).get();
-      do_simplify(parameter, state.value_set);
+      do_simplify(parameter, state);
 
       args.push_back(std::move(parameter));
     }
   }
 
   const irep_idt format_string =
-    get_string_argument(operands[0], state.value_set, language_mode, ns);
+    get_string_argument(operands[0], state.value_set, state.language_mode, ns);
 
   if(!format_string.empty())
     target.output_fmt(
@@ -454,12 +454,12 @@ void goto_symext::symex_input(
   for(std::size_t i=1; i<code.operands().size(); i++)
   {
     exprt l2_arg = state.rename(code.operands()[i], ns).get();
-    do_simplify(l2_arg, state.value_set);
+    do_simplify(l2_arg, state);
     args.emplace_back(std::move(l2_arg));
   }
 
   const irep_idt input_id =
-    get_string_argument(id_arg, state.value_set, language_mode, ns);
+    get_string_argument(id_arg, state.value_set, state.language_mode, ns);
 
   target.input(state.guard.as_expr(), state.source, input_id, args);
 }
@@ -478,14 +478,15 @@ void goto_symext::symex_output(
     renamedt<exprt, L2> l2_arg = state.rename(code.operands()[i], ns);
     if(symex_config.simplify_opt)
     {
-      simplify_expr_with_value_sett simp{state.value_set, language_mode, ns};
+      simplify_expr_with_value_sett simp{
+        state.value_set, state.language_mode, ns};
       l2_arg.simplify(simp);
     }
     args.emplace_back(l2_arg);
   }
 
   const irep_idt output_id =
-    get_string_argument(id_arg, state.value_set, language_mode, ns);
+    get_string_argument(id_arg, state.value_set, state.language_mode, ns);
 
   target.output(state.guard.as_expr(), state.source, output_id, args);
 }

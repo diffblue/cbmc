@@ -3,19 +3,27 @@ default: tests.log
 include ../../src/config.inc
 
 test:
+ifndef ONLY_SYMEX_DRIVEN_LAZY_LOADING
 	@../$(CPROVER_DIR)/regression/test.pl -e -p -c "../../../src/jbmc/jbmc --validate-goto-model --validate-ssa-equation"
+endif
+ifndef SKIP_SYMEX_DRIVEN_LAZY_LOADING
 ifeq ($(filter %DBDD_GUARDS, $(CXXFLAGS)),)
 	@../$(CPROVER_DIR)/regression/test.pl -e -p -c "../../../src/jbmc/jbmc --validate-goto-model --validate-ssa-equation --symex-driven-lazy-loading" -X symex-driven-lazy-loading-expected-failure -s symex-driven-loading
 else
 	@../$(CPROVER_DIR)/regression/test.pl -e -p -c "../../../src/jbmc/jbmc --validate-goto-model --validate-ssa-equation --symex-driven-lazy-loading" -X symex-driven-lazy-loading-expected-failure -X bdd-expected-timeout -s symex-driven-loading
 endif
+endif
 
 tests.log: ../$(CPROVER_DIR)/regression/test.pl
+ifndef ONLY_SYMEX_DRIVEN_LAZY_LOADING
 	@../$(CPROVER_DIR)/regression/test.pl -e -p -c "../../../src/jbmc/jbmc --validate-goto-model --validate-ssa-equation"
+endif
+ifndef SKIP_SYMEX_DRIVEN_LAZY_LOADING
 ifeq ($(filter %DBDD_GUARDS, $(CXXFLAGS)),)
 	@../$(CPROVER_DIR)/regression/test.pl -e -p -c "../../../src/jbmc/jbmc --validate-goto-model --validate-ssa-equation --symex-driven-lazy-loading" -X symex-driven-lazy-loading-expected-failure -s symex-driven-loading
 else
 	@../$(CPROVER_DIR)/regression/test.pl -e -p -c "../../../src/jbmc/jbmc --validate-goto-model --validate-ssa-equation --symex-driven-lazy-loading" -X symex-driven-lazy-loading-expected-failure -X bdd-expected-timeout -s symex-driven-loading
+endif
 endif
 
 show:

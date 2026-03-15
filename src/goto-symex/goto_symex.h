@@ -235,10 +235,6 @@ protected:
   messaget::mstreamt &
   print_callstack_entry(const symex_targett::sourcet &target);
 
-  /// language_mode: ID_java, ID_C or another language identifier
-  /// if we know the source language in use, irep_idt() otherwise.
-  irep_idt language_mode;
-
   /// The symbol table associated with the goto-program being executed.
   /// This symbol table will not have objects that are dynamically created as
   /// part of symbolic execution added to it; those object are stored in the
@@ -526,7 +522,7 @@ protected:
   /// \param state: Symbolic execution state for current instruction
   void symex_catch(statet &state);
 
-  virtual void do_simplify(exprt &expr, const value_sett &value_set);
+  virtual void do_simplify(exprt &expr, const statet &state);
 
   /// Symbolically execute an ASSIGN instruction or simulate such an execution
   /// for a synthetic assignment

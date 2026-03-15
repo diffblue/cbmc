@@ -16,8 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/unwindset.h>
 
-#include <linking/static_lifetime_init.h>
-
 #include <limits>
 
 symex_bmct::symex_bmct(
@@ -40,10 +38,6 @@ symex_bmct::symex_bmct(
     unwindset(unwindset),
     symex_coverage(ns)
 {
-  const symbolt *init_symbol = outer_symbol_table.lookup(INITIALIZE_FUNCTION);
-  if(init_symbol)
-    language_mode = init_symbol->mode;
-
   messaget msg{mh};
   msg.status() << "Starting Bounded Model Checking" << messaget::eom;
 }

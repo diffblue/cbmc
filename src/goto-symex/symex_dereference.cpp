@@ -101,7 +101,7 @@ exprt goto_symext::address_arithmetic(
     // recursive call
     result = address_arithmetic(be, state, keep_array);
 
-    do_simplify(result, state.value_set);
+    do_simplify(result, state);
   }
   else if(expr.id()==ID_dereference)
   {
@@ -158,7 +158,7 @@ exprt goto_symext::address_arithmetic(
 
       result = address_arithmetic(be, state, keep_array);
 
-      do_simplify(result, state.value_set);
+      do_simplify(result, state);
     }
     else
       result=address_of_exprt(result);
@@ -220,7 +220,7 @@ goto_symext::cache_dereference(exprt &dereference_result, statet &state)
                              "symex",
                              "dereference_cache",
                              dereference_result.source_location(),
-                             language_mode,
+                             state.language_mode,
                              ns,
                              state.symbol_table)
                              .symbol_expr();
@@ -236,7 +236,6 @@ goto_symext::cache_dereference(exprt &dereference_result, statet &state)
     symex_targett::assignment_typet::STATE,
     ns,
     symex_config,
-    language_mode,
     target};
 
   assign.assign_symbol(
@@ -308,7 +307,7 @@ void goto_symext::dereference_rec(
 
     tmp1 = state.rename<L1_WITH_CONSTANT_PROPAGATION>(tmp1, ns).get();
 
-    do_simplify(tmp1, state.value_set);
+    do_simplify(tmp1, state);
 
     if(symex_config.run_validation_checks)
     {
@@ -328,7 +327,7 @@ void goto_symext::dereference_rec(
       ns,
       state.symbol_table,
       symex_dereference_state,
-      language_mode,
+      state.language_mode,
       expr_is_not_null,
       log.get_message_handler());
 
@@ -515,7 +514,7 @@ void goto_symext::dereference(exprt &expr, statet &state, bool write)
   // when all we need is
   // s1 := s1 with (member := X) [and guard b]
   // s2 := s2 with (member := X) [and guard !b]
-  do_simplify(expr, state.value_set);
+  do_simplify(expr, state);
 
   if(symex_config.run_validation_checks)
   {

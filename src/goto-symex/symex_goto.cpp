@@ -76,7 +76,8 @@ void goto_symext::symex_goto(statet &state)
   renamedt<exprt, L2> renamed_guard = state.rename(std::move(new_guard), ns);
   if(symex_config.simplify_opt)
   {
-    simplify_expr_with_value_sett simp{state.value_set, language_mode, ns};
+    simplify_expr_with_value_sett simp{
+      state.value_set, state.language_mode, ns};
     renamed_guard.simplify(simp);
   }
   new_guard = renamed_guard.get();
@@ -119,7 +120,7 @@ void goto_symext::symex_goto(statet &state)
       // generate assume(false) or a suitable negation if this
       // instruction is a conditional goto
       exprt negated_guard = boolean_negate(new_guard);
-      do_simplify(negated_guard, state.value_set);
+      do_simplify(negated_guard, state);
       log.statistics() << "replacing self-loop at "
                        << state.source.pc->source_location() << " by assume("
                        << from_expr(ns, state.source.function_id, negated_guard)

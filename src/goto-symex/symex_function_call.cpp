@@ -131,13 +131,7 @@ void goto_symext::parameter_assignments(
 
       exprt::operandst lhs_conditions;
       symex_assignt{
-        shadow_memory,
-        state,
-        assignment_type,
-        ns,
-        symex_config,
-        language_mode,
-        target}
+        shadow_memory, state, assignment_type, ns, symex_config, target}
         .assign_rec(lhs, expr_skeletont{}, rhs, lhs_conditions);
     }
 

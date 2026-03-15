@@ -31,7 +31,7 @@ SCENARIO("shell_quote() escaping", "[core][util][run]")
 #endif
 }
 
-SCENARIO("run() error reporting", "[core][util][run]")
+SCENARIO("run() error reporting", "[core][util][run][not_ubsan]")
 {
   GIVEN("A command invoking a non-existent executable")
   {

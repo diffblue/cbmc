@@ -850,14 +850,16 @@ bvt bv_pointers_widet::add_addr(const exprt &expr)
 
   const pointer_typet type = pointer_type(expr.type());
   const std::size_t object_bits = get_object_width(type);
-  const std::size_t max_objects = std::size_t(1) << object_bits;
+  const mp_integer max_objects = power(2, object_bits);
 
-  if(a == max_objects)
+  if(a >= max_objects)
+  {
     throw analysis_exceptiont(
       "too many addressed objects: maximum number of objects is set to 2^n=" +
-      std::to_string(max_objects) + " (with n=" + std::to_string(object_bits) +
+      integer2string(max_objects) + " (with n=" + std::to_string(object_bits) +
       "); " +
       "use the `--object-bits n` option to increase the maximum number");
+  }
 
   return encode(a, type);
 }
