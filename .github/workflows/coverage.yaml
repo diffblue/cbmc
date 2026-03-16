@@ -74,6 +74,11 @@ jobs:
           files: build/html/coverage.info
           fail_ci_if_error: true
           verbose: true
+      - name: Coverage gap report
+        if: ${{ !cancelled() && hashFiles('build/html/coverage.info') != '' }}
+        run: |
+          python3 scripts/coverage_report.py --markdown \
+            build/html/coverage.info >> "$GITHUB_STEP_SUMMARY"
       - name: Save ccache
         if: always()
         uses: actions/cache/save@v6
