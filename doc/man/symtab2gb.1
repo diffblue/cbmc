@@ -10,11 +10,9 @@ show help
 compile symbol tables in JSON format
 to a single GOTO binary
 .SH DESCRIPTION
-This utility is to compile a \fBcbmc\fR(1) symbols table (in JSON format) into a
-GOTO binary.
-This is to support integration of external language frontends, such as Ada
-(using GNAT2GOTO: https://github.com/diffblue/gnat2goto) or Rust (using Kani:
-https://github.com/model-checking/kani).
+\fBsymtab2gb\fR compiles one or more CProver symbol tables (in JSON format)
+into a single GOTO binary.  This supports integration of external language
+front-ends such as Ada (via GNAT2GOTO) or Rust (via Kani).
 .SH OPTIONS
 .TP
 \fB\-\-out\fR \fIoutfile\fR
@@ -26,8 +24,10 @@ Specify a file containing JSON-encoded goto functions
 \fB\-\-verbosity\fR #
 verbosity level
 .SH ENVIRONMENT
-All tools honor the TMPDIR environment variable when generating temporary
-files and directories.
+.TP
+.B TMPDIR
+All CProver tools honor this variable when creating temporary files and
+directories.
 .SH BUGS
 If you encounter a problem please create an issue at
 .B https://github.com/diffblue/cbmc/issues

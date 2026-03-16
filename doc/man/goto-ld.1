@@ -102,8 +102,10 @@ Copy failing (preprocessed) source to \fIfile\fR.
 will warn and ignore the use of \fB\-\-object\-bits\fR, which previous versions
 processed. This option now instead needs to be passed to \fBcbmc\fR(1).
 .SH ENVIRONMENT
-All tools honor the TMPDIR environment variable when generating temporary
-files and directories.
+.TP
+.B TMPDIR
+All CProver tools honor this variable when creating temporary files and
+directories.
 .B goto\-cc
 aims to accept all environment variables that \fBgcc\fR(1) does.
 .SH BUGS

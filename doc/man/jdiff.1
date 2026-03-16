@@ -2,12 +2,9 @@
 .SH NAME
 jdiff \- Syntactic diff of goto programs obtained from Java bytecode
 .SH SYNOPSIS
-.TP
-.B jdiff [\-?] [\-h] [\-\-help]
-show help
-.TP
-.B jdiff old new
-jars to be compared
+.B jdiff
+.RI [ options ]
+.I old new
 .SH DESCRIPTION
 \fBjdiff\fR compares two Java programs (given as JAR files, class files, or
 GOTO binaries) and reports syntactic differences in their GOTO program
@@ -17,16 +14,16 @@ change-impact analyses.
 .SS "Diff options:"
 .TP
 \fB\-\-show\-goto\-functions\fR
-show loaded goto program
+Display the GOTO program instructions for all methods.
 .TP
 \fB\-\-list\-goto\-functions\fR
-list loaded goto functions
+List the names of all methods without showing their bodies.
 .TP
 \fB\-\-show\-properties\fR
-show the properties, but don't run analysis
+List all properties without running analysis.
 .TP
 \fB\-\-show\-loops\fR
-show the loops in the programs
+List all loops in both programs.
 .TP
 \fB\-u\fR | \fB\-\-unified\fR
 output unified diff
@@ -74,13 +71,16 @@ verbosity level
 Print microsecond\-precision timestamps.  \fBmonotonic\fR: stamps increase
 monotonically.  \fBwall\fR: ISO\-8601 wall clock timestamps.
 .SH ENVIRONMENT
-All tools honor the TMPDIR environment variable when generating temporary
-files and directories.
+.TP
+.B TMPDIR
+All CProver tools honor this variable when creating temporary files and
+directories.
 .SH BUGS
 If you encounter a problem please create an issue at
 .B https://github.com/diffblue/cbmc/issues
 .SH SEE ALSO
+.BR goto\-diff (1),
 .BR jbmc (1),
-.BR goto-analyzer (1)
+.BR janalyzer (1)
 .SH COPYRIGHT
 2016\-2026, Daniel Kroening, Peter Schrammel

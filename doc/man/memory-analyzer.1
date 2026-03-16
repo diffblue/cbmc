@@ -111,8 +111,10 @@ Write snapshot to \fIfile_name\fR.
 \fB\-\-json\-ui\fR
 Output snapshot in JSON format.
 .SH ENVIRONMENT
-All tools honor the TMPDIR environment variable when generating temporary
-files and directories.
+.TP
+.B TMPDIR
+All CProver tools honor this variable when creating temporary files and
+directories.
 .SH BUGS
 If you encounter a problem please create an issue at
 .B https://github.com/diffblue/cbmc/issues
