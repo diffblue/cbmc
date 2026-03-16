@@ -72,3 +72,8 @@ jobs:
           files: build/html/coverage.info
           fail_ci_if_error: true
           verbose: true
+      - name: Coverage gap report
+        if: always()
+        run: |
+          python3 scripts/coverage_report.py --markdown \
+            build/html/coverage.info >> "$GITHUB_STEP_SUMMARY"
