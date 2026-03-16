@@ -1,38 +1,22 @@
 .TH JBMC "1" "March 1, 2026" "jbmc-6.10.0" "User Commands"
 .SH NAME
-jbmc \- Bounded model checking for Java bytecode
+jbmc \- Bounded model checker for Java bytecode
 .SH SYNOPSIS
-.TP
-.B jbmc [\-?] [\-h] [\-\-help]
-show help
-.TP
-.B jbmc \fImethod\-name\fR
-Use the fully qualified name of a method as entry point, e.g.,
-\fI'mypackage.Myclass.foo:(I)Z'\fR
-.TP
-.B jbmc \fIclass\-name\fR
-The entry point is the method specified by
-\fB\-\-function\fR, or otherwise, the
-.B public static void main(String[])
-method of the given class \fIclass\-name\fR.
-.TP
-.B jbmc \-jar \fIjarfile\fR
-JAR file to be checked.
-The entry point is the method specified by
-\fB\-\-function\fR or otherwise, the
-.B public static void main(String[])
-method
-of the class specified by \fB\-\-main\-class\fR or the main
-class specified in the JAR manifest
-(checked in this order).
-.TP
-jbmc \-\-gb \fIgoto\-binary\fR
-GOTO binary file to be checked.
-The entry point is the method specified by
-\fB\-\-function\fR, or otherwise, the
-.B public static void main(String[])
-of the class specified by \fB\-\-main\-class\fR
-(checked in this order).
+.B jbmc
+.RI [ options ]
+.I method-name
+.br
+.B jbmc
+.RI [ options ]
+.I class-name
+.br
+.B jbmc
+.RI [ options ]
+.BI \-jar " jarfile"
+.br
+.B jbmc
+.RI [ options ]
+.BI \-\-gb " goto-binary"
 .SH DESCRIPTION
 \fBjbmc\fR is a bounded model checker for Java programs.  It verifies Java
 bytecode by converting it into an intermediate GOTO representation and then
@@ -45,40 +29,45 @@ binaries.  It shares the same verification back-end as \fBcbmc\fR(1) but
 uses a Java bytecode front-end.
 .SH OPTIONS
 .TP
-\fB\-classpath\fR dirs/jars, \fB\-cp\fR dirs/jars, \fB\-\-classpath\fR dirs/jars
-Set class search path of directories and jar files using a colon-separated list
-of directories and JAR archives to search for class files.
+\fB\-classpath\fR \fIdirs/jars\fR, \fB\-cp\fR \fIdirs/jars\fR,
+\fB\-\-classpath\fR \fIdirs/jars\fR
+Set the class search path using a colon-separated list of directories and
+JAR archives to search for class files.
 .TP
-\fB\-\-main\-class\fR class\-name
-Set the name of the main class.
+\fB\-\-main\-class\fR \fIclass\-name\fR
+Set the name of the main class.  When loading a JAR file, this overrides
+the Main-Class entry in the JAR manifest.
 .TP
-\fB\-\-function\fR name
-Set entry point function name.
+\fB\-\-function\fR \fIname\fR
+Use the method \fIname\fR as the entry point instead of
+\fBpublic static void main(String[])\fR.  The name should be a fully
+qualified method descriptor, e.g., \fI'mypackage.Myclass.foo:(I)Z'\fR.
 .SS "Analysis options:"
 .TP
 \fB\-\-show\-properties\fR
-show the properties, but don't run analysis
+List all properties in the program without running the analysis.
 .TP
-\fB\-\-symex\-coverage\-report\fR f
-generate a Cobertura XML coverage report in f
+\fB\-\-symex\-coverage\-report\fR \fIfile\fR
+Generate a Cobertura XML coverage report in \fIfile\fR.
 .TP
-\fB\-\-property\fR id
-only check one specific property
+\fB\-\-property\fR \fIid\fR
+Only check the property with the given \fIid\fR.  Use
+\fB\-\-show\-properties\fR to list available identifiers.
 .TP
 \fB\-\-trace\fR
-give a counterexample trace for failed properties
+Print a counterexample trace for each failed property.
 .TP
 \fB\-\-stop\-on\-fail\fR
-stop analysis once a failed property is detected
-(implies \fB\-\-trace\fR)
+Stop the analysis as soon as the first property violation is found.
+Implies \fB\-\-trace\fR.
 .TP
 \fB\-\-localize\-faults\fR
-localize faults (experimental)
+Attempt to identify the most likely source of a property violation
+(experimental).
 .TP
 \fB\-\-validate\-trace\fR
-throw an error if the structure of the counterexample
-trace does not match certain assumptions
-(experimental, currently java only)
+Verify that the structure of the counterexample trace matches expected
+invariants (experimental, Java only).
 .SS "Platform options:"
 .TP
 \fB\-\-arch\fR \fIarch\fR
@@ -121,47 +110,46 @@ use GCC as preprocessor
 .SS "Program representations:"
 .TP
 \fB\-\-show\-parse\-tree\fR
-show parse tree
+Display the parse tree of the loaded bytecode.
 .TP
 \fB\-\-show\-symbol\-table\fR
-show loaded symbol table
+Display the symbol table, listing all variables, methods, and types.
 .TP
 \fB\-\-list\-symbols\fR
-list symbols with type information
+List symbols with their type information.
 .TP
 \fB\-\-show\-goto\-functions\fR
-show loaded goto program
+Display the GOTO program instructions for all loaded methods.
 .TP
 \fB\-\-list\-goto\-functions\fR
-list loaded goto functions
+List the names of all loaded methods without showing their bodies.
 .TP
 \fB\-\-drop\-unused\-functions\fR
-drop functions trivially unreachable
-from main function
+Remove methods that are trivially unreachable from the entry point.
 .TP
 \fB\-\-show\-class\-hierarchy\fR
-show the class hierarchy
+Display the Java class inheritance hierarchy.
 .SS "Program instrumentation options:"
 .TP
 \fB\-\-no\-assertions\fR
-ignore user assertions
+Ignore all user-written assertions.
 .TP
 \fB\-\-no\-assumptions\fR
-ignore user assumptions
+Ignore all assumptions.
 .TP
-\fB\-\-mm\fR MM
-memory consistency model for concurrent programs
+\fB\-\-mm\fR \fIMM\fR
+Set the memory consistency model for concurrent programs.
 .TP
 \fB\-\-reachability\-slice\fR
-remove instructions that cannot appear on a trace
-from entry point to a property
+Remove instructions that cannot appear on any trace from the entry
+point to a property.
 .TP
 \fB\-\-reachability\-slice\-fb\fR
-remove instructions that cannot appear on a trace
-from entry point through a property
+Remove instructions that cannot appear on any trace from the entry
+point \fIthrough\fR a property (forward-backward slicing).
 .TP
 \fB\-\-full\-slice\fR
-run full slicer (experimental)
+Remove all instructions that do not affect any assertion (experimental).
 .SS "Java Bytecode frontend options:"
 .TP
 \fB\-\-disable\-uncaught\-exception\-check\fR
@@ -290,25 +278,26 @@ and only output after the symex phase.
 add nondeterministic initialization of variables with static lifetime
 .SS "BMC options:"
 .TP
-\fB\-\-paths\fR [strategy]
-explore paths one at a time
+\fB\-\-paths\fR [\fIstrategy\fR]
+Explore execution paths one at a time instead of merging them.
+Use \fB\-\-show\-symex\-strategies\fR to list available strategies.
 .TP
 \fB\-\-show\-symex\-strategies\fR
-list strategies for use with \fB\-\-paths\fR
+List available path exploration strategies for use with \fB\-\-paths\fR.
 .TP
 \fB\-\-show\-goto\-symex\-steps\fR
-show which steps symex travels, includes
-diagnostic information
+Print each step that symbolic execution takes, including diagnostic
+information about the call stack and guard size.
 .TP
 \fB\-\-show\-points\-to\-sets\fR
-show points\-to sets for
-pointer dereference. Requires \fB\-\-json\-ui\fR.
+Print points-to sets computed during pointer dereference resolution.
+Requires \fB\-\-json\-ui\fR.
 .TP
 \fB\-\-program\-only\fR
-only show program expression
+Print the program expression (SSA equations) without solving.
 .TP
 \fB\-\-show\-byte\-ops\fR
-show all byte extracts and updates
+Print all byte-extract and byte-update operations in the formula.
 .TP
 \fB\-\-depth\fR nr
 limit search depth
@@ -324,240 +313,245 @@ equivalent to setting the maximum field
 sensitivity size for arrays to 0
 .TP
 \fB\-\-show\-loops\fR
-show the loops in the program
+List all loops in the program with their identifiers.
 .TP
-\fB\-\-unwind\fR nr
-unwind all loops at most nr times
+\fB\-\-unwind\fR \fInr\fR
+Unwind all loops at most \fInr\fR times.
 .TP
 \fB\-\-unwindset\fR [\fIT\fR:]\fIL\fR:\fIB\fR,...
-unwind loop \fIL\fR with a bound of \fIB\fR, optionally restricted to thread
-\fIT\fR, and overriding what may be set as default unwinding via
-\fB\-\-unwind\fR (use \fB\-\-show\-loops\fR to get the loop IDs)
+Set a per-loop unwinding bound: unwind loop \fIL\fR at most \fIB\fR times,
+optionally restricted to thread \fIT\fR.  Use \fB\-\-show\-loops\fR to obtain
+loop IDs.
 .TP
-\fB\-\-incremental\-loop\fR L
-check properties after each unwinding
-of loop L
-(use \fB\-\-show\-loops\fR to get the loop IDs)
+\fB\-\-incremental\-loop\fR \fIL\fR
+Check properties after each unwinding of loop \fIL\fR.
 .TP
-\fB\-\-unwind\-min\fR nr
-start incremental\-loop after nr unwindings
-but before solving that iteration. If for
-example it is 1, then the loop will be
-unwound once, and immediately checked.
-Note: this means for min\-unwind 1 or
-0 all properties are checked.
+\fB\-\-unwind\-min\fR \fInr\fR
+When using \fB\-\-incremental\-loop\fR, start checking after \fInr\fR
+unwindings.
 .TP
-\fB\-\-unwind\-max\fR nr
-stop incremental\-loop after nr unwindings
+\fB\-\-unwind\-max\fR \fInr\fR
+When using \fB\-\-incremental\-loop\fR, stop after \fInr\fR unwindings.
 .TP
 \fB\-\-ignore\-properties\-before\-unwind\-min\fR
-do not check properties before unwind\-min
-when using incremental\-loop
+Do not check properties before \fB\-\-unwind\-min\fR is reached.
 .TP
 \fB\-\-show\-vcc\fR
-show the verification conditions
+Print the verification conditions without solving them.
 .TP
 \fB\-\-slice\-formula\fR
-remove assignments unrelated to property
+Remove assignments from the formula that do not affect any property.
 .TP
 \fB\-\-unwinding\-assertions\fR
-generate unwinding assertions (which are enabled by default; overrides
-\fB\-\-no\-unwinding\-assertions\fR when both of these are given); cannot be
-used with \fB\-\-cover\fR
+Generate assertions that check whether the loop unwinding bound is
+sufficient.  Enabled by default.  Overrides \fB\-\-no\-unwinding\-assertions\fR
+when both are given.  Cannot be used with \fB\-\-cover\fR.
 .TP
 \fB\-\-no\-unwinding\-assertions\fR
-do not generate unwinding assertions
+Do not generate unwinding assertions.
 .TP
 \fB\-\-partial\-loops\fR
-permit paths that execute loops only partially (up to the given unwinding bound)
-and then continue beyond the loop even when the loop condition would still hold
-(such paths may be spurious, resulting in false alarms)
+Permit execution paths that exit a loop before the loop condition
+becomes false.  Such paths may be spurious, resulting in false alarms.
 .TP
 \fB\-\-no\-self\-loops\-to\-assumptions\fR
-do not simplify while(1){} to assume(0)
+Do not simplify self-loops such as \fBwhile(1){}\fR to
+\fBassume(false)\fR.
 .TP
 \fB\-\-symex\-complexity\-limit\fR \fIN\fR
-how complex (\fIN\fR) a path can become before
-symex abandons it. Currently uses guard
-size to calculate complexity.
+Abandon execution paths whose complexity exceeds \fIN\fR.
 .TP
 \fB\-\-symex\-complexity\-failed\-child\-loops\-limit\fR \fIN\fR
-how many child branches (\fIN\fR) in an
-iteration are allowed to fail due to
-complexity violations before the loop
-gets blacklisted
+Blacklist a loop after \fIN\fR of its child branches have been abandoned
+due to complexity violations.
 .TP
 \fB\-\-graphml\-witness\fR \fIfilename\fR
-write the witness in GraphML format to filename
+Write a verification witness in GraphML format to \fIfilename\fR.
 .TP
 \fB\-\-symex\-cache\-dereferences\fR
-enable caching of repeated dereferences
+Cache the results of repeated pointer dereferences during symbolic
+execution.
 .SS "Backend options:"
 .TP
-\fB\-\-object\-bits\fR n
-number of bits used for object addresses
+\fB\-\-object\-bits\fR \fIn\fR
+Set the number of bits used for object addresses in the pointer model.
 .TP
-\fB\-\-sat\-solver\fR solver
-use specified SAT solver
+\fB\-\-sat\-solver\fR \fIsolver\fR
+Use the specified SAT solver.
 .TP
 \fB\-\-external\-sat\-solver\fR \fIcmd\fR
-command to invoke SAT solver process
+Invoke \fIcmd\fR as an external SAT solver process.
 .TP
 \fB\-\-no\-sat\-preprocessor\fR
-disable the SAT solver's simplifier
+Disable the SAT solver's built-in simplifier.
 .TP
 \fB\-\-dimacs\fR
-generate CNF in DIMACS format
+Output the formula in DIMACS CNF format instead of solving it.
 .TP
 \fB\-\-beautify\fR
-beautify the counterexample
-(greedy heuristic)
-.TP
-\fB\-\-smt1\fR
-use default SMT1 solver (obsolete)
+Attempt to produce a more readable counterexample using a greedy
+heuristic.
 .TP
 \fB\-\-smt2\fR
-use default SMT2 solver (Z3)
+Use the default SMT2 solver (Z3).
+.TP
+\fB\-\-smt1\fR
+Use the default SMT1 solver (obsolete).
 .TP
 \fB\-\-bitwuzla\fR
-use Bitwuzla
+Use Bitwuzla as the SMT solver.
 .TP
 \fB\-\-boolector\fR
-use Boolector
+Use Boolector as the SMT solver.
 .TP
 \fB\-\-cprover\-smt2\fR
-use CPROVER SMT2 solver
+Use the CProver built-in SMT2 solver.
 .TP
 \fB\-\-cvc5\fR
-use CVC5
+Use CVC5 as the SMT solver.
 .TP
 \fB\-\-mathsat\fR
-use MathSAT
+Use MathSAT as the SMT solver.
 .TP
 \fB\-\-yices\fR
-use Yices
+Use Yices as the SMT solver.
 .TP
 \fB\-\-z3\fR
-use Z3
+Use Z3 as the SMT solver.
 .TP
 \fB\-\-fpa\fR
-use theory of floating\-point arithmetic
+Use the theory of floating-point arithmetic in the SMT encoding.
 .TP
 \fB\-\-external\-smt2\-solver\fR \fIcmd\fR
-Use \fIcmd\fR to invoke the SMT2 solver. Combine with one of the solver choices
-for solver-specific constraints.
+Invoke \fIcmd\fR as an external SMT2 solver process.
 .TP
 \fB\-\-refine\fR
-use refinement procedure (experimental)
+Use counterexample-guided abstraction refinement (experimental).
 .TP
 \fB\-\-refine\-arrays\fR
-use refinement for arrays only
+Use abstraction refinement for arrays only.
 .TP
 \fB\-\-refine\-arithmetic\fR
-refinement of arithmetic expressions only
+Use abstraction refinement for arithmetic expressions only.
 .TP
-\fB\-\-max\-node\-refinement\fR
-maximum refinement iterations for
-arithmetic expressions
+\fB\-\-max\-node\-refinement\fR \fIN\fR
+Limit the number of refinement iterations for arithmetic expressions.
 .TP
 \fB\-\-incremental\-smt2\-solver\fR \fIcmd\fR
-command to invoke external SMT solver for
-incremental solving (experimental)
+Use the incremental SMT backend, invoking \fIcmd\fR as the solver.
+The solver must accept incremental SMTlib v2.6 input on standard input
+and support the QF_AUFBV logic.
 .TP
-\fB\-\-outfile\fR filename
-output formula to given file
+\fB\-\-outfile\fR \fIfilename\fR
+Write the generated formula to \fIfilename\fR instead of solving it.
 .TP
-\fB\-\-dump\-smt\-formula\fR filename
-output smt incremental formula to the given file
+\fB\-\-dump\-smt\-formula\fR \fIfilename\fR
+Write the SMT formula to \fIfilename\fR.
 .TP
 \fB\-\-write\-solver\-stats\-to\fR \fIjson\-file\fR
-collect the solver query complexity
+Write solver query complexity statistics to \fIjson\-file\fR.
 .TP
 \fB\-\-no\-refine\-strings\fR
-turn off string refinement
+Disable string refinement.
 .TP
 \fB\-\-string\-printable\fR
-restrict to printable strings and characters
+Restrict non-deterministic strings to printable characters.
 .TP
 \fB\-\-string\-non\-empty\fR
-restrict to non\-empty strings (experimental)
+Restrict non-deterministic strings to be non-empty (experimental).
 .TP
-\fB\-\-string\-input\-value\fR st
-restrict non\-null strings to a fixed value st;
-the switch can be used multiple times to give
-several strings
+\fB\-\-string\-input\-value\fR \fIst\fR
+Restrict non-null strings to the fixed value \fIst\fR.  May be given
+multiple times to specify several possible values.
 .TP
-\fB\-\-max\-nondet\-string\-length\fR n bound the length of nondet (e.g. input)
-strings.
-Default is 67108863; note that
-setting the value higher than this does not work
-with \fB\-\-trace\fR or \fB\-\-validate\-trace\fR.
+\fB\-\-max\-nondet\-string\-length\fR \fIn\fR
+Limit the length of non-deterministic strings to \fIn\fR.  The default
+is 67108863.  Values higher than this do not work with \fB\-\-trace\fR or
+\fB\-\-validate\-trace\fR.
 .TP
 \fB\-\-arrays\-uf\-never\fR
-never turn arrays into uninterpreted functions
+Never encode arrays as uninterpreted functions.
 .TP
 \fB\-\-arrays\-uf\-always\fR
-always turn arrays into uninterpreted functions
+Always encode arrays as uninterpreted functions.
 .SS "Other options:"
 .TP
 \fB\-\-version\fR
-show version and exit
+Print version information and exit.
 .TP
 \fB\-\-xml\-ui\fR
-use XML\-formatted output
+Produce output in XML format.
 .TP
 \fB\-\-xml\-interface\fR
-bi\-directional XML interface
+Enable the bi-directional XML interface.
 .TP
 \fB\-\-json\-ui\fR
-use JSON\-formatted output
+Produce output in JSON format.
 .TP
 \fB\-\-json\-interface\fR
-bi\-directional JSON interface
+Enable the bi-directional JSON interface.
 .TP
 \fB\-\-validate\-goto\-model\fR
-enable additional well\-formedness checks on the
-goto program
+Run additional well-formedness checks on the GOTO program.
 .TP
 \fB\-\-validate\-ssa\-equation\fR
-enable additional well\-formedness checks on the
-SSA representation
+Run additional well-formedness checks on the SSA representation.
 .TP
 \fB\-\-trace\-json\-extended\fR
-add rawLhs property to trace
+Include the \fBrawLhs\fR property in JSON trace output.
 .TP
 \fB\-\-trace\-show\-function\-calls\fR
-show function calls in plain trace
+Include function call and return events in plain-text traces.
 .TP
 \fB\-\-trace\-show\-code\fR
-show original code in plain trace
+Include the original source code in plain-text traces.
 .TP
 \fB\-\-trace\-hex\fR
-represent plain trace values in hex
+Display values in hexadecimal in plain-text traces.
 .TP
 \fB\-\-compact\-trace\fR
-give a compact trace
+Produce a compact counterexample trace.
 .TP
 \fB\-\-stack\-trace\fR
-give a stack trace only
+Produce only a stack trace for counterexamples.
 .TP
 \fB\-\-flush\fR
-flush every line of output
+Flush every line of output immediately.
 .TP
-\fB\-\-verbosity\fR #
-verbosity level
+\fB\-\-verbosity\fR \fIN\fR
+Set the verbosity level to \fIN\fR (default: 6).
 .TP
 \fB\-\-timestamp\fR [\fBmonotonic\fR|\fBwall\fR]
-Print microsecond\-precision timestamps.  \fBmonotonic\fR: stamps increase
-monotonically.  \fBwall\fR: ISO\-8601 wall clock timestamps.
+Print microsecond-precision timestamps.
+\fBmonotonic\fR: timestamps increase monotonically.
+\fBwall\fR: ISO\-8601 wall-clock timestamps.
+.SH EXIT STATUS
+.TP
+.B 0
+All properties verified successfully.
+.TP
+.B 1
+Usage error: invalid or conflicting command line options.
+.TP
+.B 2
+Parse error: an input file could not be parsed.
+.TP
+.B 6
+An internal error or unhandled exception occurred.
+.TP
+.B 10
+One or more properties were violated.
 .SH ENVIRONMENT
-All tools honor the TMPDIR environment variable when generating temporary
-files and directories.
+.TP
+.B TMPDIR
+All CProver tools honor this variable when creating temporary files and
+directories.
 .SH BUGS
 If you encounter a problem please create an issue at
 .B https://github.com/diffblue/cbmc/issues
 .SH SEE ALSO
 .BR cbmc (1),
+.BR goto\-cc (1),
 .BR janalyzer (1),
 .BR jdiff (1)
 .SH COPYRIGHT
