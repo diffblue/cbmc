@@ -51,6 +51,23 @@ of the control flow of the program determines the number of points of execution.
 The
 .I storage
 that links points of execution and domains.
+.SH EXAMPLES
+Verify all properties using abstract interpretation:
+.IP
+.B goto\-analyzer \-\-verify file.c
+.PP
+Show the abstract state at every program point using the Variable
+Sensitivity Domain:
+.IP
+.B goto\-analyzer \-\-show \-\-vsd file.c
+.PP
+Simplify a GOTO binary using constant propagation:
+.IP
+.B goto\-analyzer \-\-simplify simplified.gb program.gb
+.PP
+List unreachable functions:
+.IP
+.B goto\-analyzer \-\-unreachable\-functions file.c
 .SH OPTIONS
 .SS "Task options:"
 .B goto-analyzer

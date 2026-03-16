@@ -26,6 +26,18 @@ executions (at the cost of potential false alarms).
 .PP
 See \fBgoto\-analyzer\fR(1) for the C/C++ equivalent and a more detailed
 description of the abstract interpretation framework.
+.SH EXAMPLES
+Verify all properties using abstract interpretation:
+.IP
+.B janalyzer \-\-verify MyClass
+.PP
+Show the abstract state at every program point:
+.IP
+.B janalyzer \-\-show MyClass
+.PP
+List unreachable methods:
+.IP
+.B janalyzer \-\-unreachable\-functions \-jar app.jar
 .SH OPTIONS
 .TP
 \fB\-classpath\fR dirs/jars, \fB\-cp\fR dirs/jars, \fB\-\-classpath\fR dirs/jars
