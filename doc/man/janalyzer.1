@@ -304,46 +304,46 @@ Equivalent to \fB\-\-LP32\fR, \fB\-\-ILP32\fR, \fB\-\-LP64\fR (on Windows:
 \fB\-\-LLP64\fR).
 .TP
 \fB\-\-little\-endian\fR
-allow little\-endian word\-byte conversions
+Assume little-endian byte order for word-byte conversions.
 .TP
 \fB\-\-big\-endian\fR
-allow big\-endian word\-byte conversions
+Assume big-endian byte order for word-byte conversions.
 .TP
 \fB\-\-gcc\fR
-use GCC as preprocessor
+Use GCC as the C preprocessor.
 .SS "Program representations:"
 .TP
 \fB\-\-show\-parse\-tree\fR
-show parse tree
+Display the parse tree of the loaded bytecode.
 .TP
 \fB\-\-show\-symbol\-table\fR
-show loaded symbol table
+Display the symbol table, listing all variables, methods, and types.
 .TP
 \fB\-\-show\-goto\-functions\fR
-show loaded goto program
+Display the GOTO program instructions for all loaded methods.
 .TP
 \fB\-\-list\-goto\-functions\fR
-list loaded goto functions
+List the names of all loaded methods without showing their bodies.
 .TP
 \fB\-\-show\-properties\fR
-show the properties, but don't run analysis
+List all properties without running analysis.
 .SS "Program instrumentation options:"
 .TP
 \fB\-\-no\-assertions\fR
-ignore user assertions
+Ignore all user-written assertions.
 .TP
 \fB\-\-no\-assumptions\fR
-ignore user assumptions
+Ignore all assumptions.
 .TP
 \fB\-\-property\fR \fIid\fR
-enable selected properties only
+Only check the property with the given \fIid\fR.
 .SS "Other options:"
 .TP
 \fB\-\-version\fR
-show version and exit
+Print version information and exit.
 .TP
 \fB\-\-verbosity\fR \fIn\fR
-verbosity level
+Set the verbosity level to \fIn\fR (default: 6).
 .TP
 \fB\-\-timestamp\fR [\fBmonotonic\fR|\fBwall\fR]
 Print microsecond\-precision timestamps.  \fBmonotonic\fR: stamps increase
