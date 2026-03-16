@@ -32,7 +32,8 @@ Full verification pipeline:
 .RS
 .nf
 goto\-cc \-o program.gb program.c
-goto\-instrument \-\-bounds\-check \-\-pointer\-check program.gb program\-instr.gb
+goto\-instrument \-\-bounds\-check \-\-pointer\-check program.gb
+program\-instr.gb
 cbmc program\-instr.gb
 .fi
 .RE
