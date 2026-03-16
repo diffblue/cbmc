@@ -34,6 +34,15 @@ The entry point is the method specified by
 of the class specified by \fB\-\-main\-class\fR
 (checked in this order).
 .SH DESCRIPTION
+\fBjbmc\fR is a bounded model checker for Java programs.  It verifies Java
+bytecode by converting it into an intermediate GOTO representation and then
+performing symbolic execution up to a given bound.  It can check
+user-specified assertions, uncaught exceptions, and a range of runtime
+properties such as array bounds and null pointer dereferences.
+.PP
+\fBjbmc\fR can read Java class files, JAR archives, or pre-compiled GOTO
+binaries.  It shares the same verification back-end as \fBcbmc\fR(1) but
+uses a Java bytecode front-end.
 .SH OPTIONS
 .TP
 \fB\-classpath\fR dirs/jars, \fB\-cp\fR dirs/jars, \fB\-\-classpath\fR dirs/jars

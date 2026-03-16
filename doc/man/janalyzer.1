@@ -34,6 +34,14 @@ The entry point is the method specified by
 of the class specified by \fB\-\-main\-class\fR
 (checked in this order).
 .SH DESCRIPTION
+\fBjanalyzer\fR is an abstract interpreter for Java bytecode.  It uses the
+same front-end as \fBjbmc\fR(1) but performs over-approximate analysis
+rather than bounded model checking.  Where \fBjbmc\fR can find concrete
+counterexamples, \fBjanalyzer\fR can prove properties for all possible
+executions (at the cost of potential false alarms).
+.PP
+See \fBgoto\-analyzer\fR(1) for the C/C++ equivalent and a more detailed
+description of the abstract interpretation framework.
 .SH OPTIONS
 .TP
 \fB\-classpath\fR dirs/jars, \fB\-cp\fR dirs/jars, \fB\-\-classpath\fR dirs/jars
