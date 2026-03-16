@@ -413,39 +413,42 @@ cbmc --function get_message_test get_message_test-mod.gb
 Now the final invocation of \fBcbmc\fR(1) reports verification success.
 .TP
 \fB\-\-isr\fR \fIfunction\fR
-instruments an interrupt service routine
+Instrument an interrupt service routine: insert calls to \fIfunction\fR
+at context-switch points.
 .TP
 \fB\-\-mmio\fR
-instruments memory\-mapped I/O
+Instrument memory-mapped I/O accesses as non-deterministic reads.
 .TP
 \fB\-\-nondet\-static\fR
-add nondeterministic initialization of variables with static lifetime
+Initialize all variables with static lifetime to non-deterministic
+values instead of their declared initializers.
 .TP
 \fB\-\-nondet\-static\-exclude\fR \fIe\fR
-same as nondet\-static except for the variable \fIe\fR
-(use multiple times if required)
+Same as \fB\-\-nondet\-static\fR except for the variable \fIe\fR.  May be
+given multiple times.
 .TP
 \fB\-\-nondet\-static\-matching\fR \fIr\fR
-add nondeterministic initialization of variables
-with static lifetime matching regex \fIr\fR
+Initialize variables with static lifetime matching the regular
+expression \fIr\fR to non-deterministic values.
 .TP
 \fB\-\-function\-enter\fR \fIf\fR
 .TQ
 \fB\-\-function\-exit\fR \fIf\fR
 .TQ
 \fB\-\-branch\fR \fIf\fR
-instruments a call to \fIf\fR at the beginning,
-the exit, or a branch point, respectively
+Insert a call to function \fIf\fR at the entry, exit, or branch points
+of every function, respectively.  Useful for instrumentation-based
+profiling or tracing.
 .TP
 \fB\-\-splice\-call\fR \fIcaller\fR,\fIcallee\fR
-prepends a call to \fIcallee\fR in the body of \fIcaller\fR
+Prepend a call to \fIcallee\fR at the beginning of \fIcaller\fR's body.
 .TP
 \fB\-\-check\-call\-sequence\fR \fIseq\fR
-instruments checks to assert that all call
-sequences match \fIseq\fR
+Insert assertions that all function call sequences match \fIseq\fR.
 .TP
 \fB\-\-undefined\-function\-is\-assume\-false\fR
-convert each call to an undefined function to assume(false)
+Replace each call to an undefined function with \fBassume(false)\fR,
+effectively making paths through undefined functions unreachable.
 .TP
 \fB\-\-insert\-final\-assert\-false\fR \fIfunction\fR
 generate assert(false) at end of \fIfunction\fR
@@ -721,32 +724,32 @@ Restrict a function pointer where \fIsymbol_name\fR is the unmangled name,
 before labeling function pointers.
 .TP
 \fB\-\-remove\-calls\-no\-body\fR
-remove calls to functions without a body
+Remove calls to functions that have no body (declaration only).
 .TP
 \fB\-\-add\-library\fR
-add models of C library functions
+Add models of C library functions to the GOTO binary.
 .TP
 \fB\-\-malloc\-may\-fail\fR
-allow malloc calls to return a null pointer
+Model \fBmalloc\fR as potentially returning a null pointer.
 .TP
 \fB\-\-malloc\-fail\-assert\fR
-set malloc failure mode to assert\-then\-assume
+When \fBmalloc\fR fails, assert false then assume false.
 .TP
 \fB\-\-malloc\-fail\-null\fR
-set malloc failure mode to return null
+When \fBmalloc\fR fails, return null.
 .TP
 \fB\-\-no\-malloc\-may\-fail\fR
-do not allow malloc calls to fail by default
+Do not allow \fBmalloc\fR calls to fail by default.
 .TP
 \fB\-\-string\-abstraction\fR
-track C string lengths and zero\-termination
+Track C string lengths and zero-termination (experimental).
 .TP
 \fB\-\-dfcc\-debug\-lib\fR
-enable debug assertions in the cprover contracts library
+Enable debug assertions in the CProver contracts library.
 .TP
 \fB\-\-dfcc\-simple\-invalid\-pointer\-model\fR
-use simplified invalid pointer model in the cprover contracts library
-(faster, unsound)
+Use a simplified invalid pointer model in the CProver contracts library.
+Faster but potentially unsound.
 .TP
 \fB\-\-model\-argc\-argv\fR \fIn\fR
 Create up to \fIn\fR non-deterministic C strings as entries to \fIargv\fR and
@@ -799,33 +802,34 @@ NULL in a recursively nondet initialized struct
 .SS "Semantics-preserving transformations:"
 .TP
 \fB\-\-ensure\-one\-backedge\-per\-target\fR
-transform loop bodies such that there is a
-single edge back to the loop head
+Transform loop bodies so that there is a single back-edge to each loop
+head.
 .TP
 \fB\-\-drop\-unused\-functions\fR
-drop functions trivially unreachable from main function
+Remove functions that are trivially unreachable from the entry point.
 .TP
 \fB\-\-remove\-pointers\fR
-converts pointer arithmetic to base+offset expressions
+Convert pointer arithmetic to base+offset expressions.
 .TP
 \fB\-\-constant\-propagator\fR
-propagate constants and simplify expressions
+Propagate constants and simplify expressions.
 .TP
 \fB\-\-inline\fR
-perform full inlining
+Perform full inlining of all function calls.
 .TP
 \fB\-\-partial\-inline\fR
-perform partial inlining
+Perform partial inlining (inline small functions only).
 .TP
 \fB\-\-function\-inline\fR \fIfunction\fR
-transitively inline all calls \fIfunction\fR makes
+Transitively inline all calls that \fIfunction\fR makes.
 .TP
 \fB\-\-no\-caching\fR
-disable caching of intermediate results during transitive function inlining
+Disable caching of intermediate results during transitive function
+inlining.
 .TP
 \fB\-\-log\fR \fIfile\fR
-log in JSON format which code segments were inlined, use with
-\fB\-\-function\-inline\fR
+Log in JSON format which code segments were inlined.  Use with
+\fB\-\-function\-inline\fR.
 .TP
 \fB\-\-remove\-function\-pointers\fR
 Resolve calls via function pointers to direct function calls. Candidate
