@@ -430,41 +430,41 @@ perform procedure\-local bitvector analysis
 perform procedure\-local may alias analysis
 .SS "C/C++ frontend options:"
 .TP
-\fB\-I\fR path
-set include path (C/C++)
+\fB\-I\fR \fIpath\fR
+Add \fIpath\fR to the include search path (C/C++).
 .TP
-\fB\-\-include\fR file
-set include file (C/C++)
+\fB\-\-include\fR \fIfile\fR
+Force inclusion of \fIfile\fR at the start of each translation unit (C/C++).
 .TP
-\fB\-D\fR macro
-define preprocessor macro (C/C++)
+\fB\-D\fR \fImacro\fR[=\fIvalue\fR]
+Define preprocessor macro \fImacro\fR, optionally with \fIvalue\fR (C/C++).
 .TP
 \fB\-\-c89\fR, \fB\-\-c99\fR, \fB\-\-c11\fR, \fB\-\-c17\fR, \fB\-\-c23\fR
-set C language standard (default: c11)
+Select the C language standard.  The default is \fBc11\fR.
 .TP
 \fB\-\-cpp98\fR, \fB\-\-cpp03\fR, \fB\-\-cpp11\fR
-set C++ language standard (default: cpp98)
+Select the C++ language standard.  The default is \fBcpp98\fR.
 .TP
 \fB\-\-unsigned\-char\fR
-make "char" unsigned by default
+Treat plain \fBchar\fR as unsigned by default.
 .TP
 \fB\-\-round\-to\-nearest\fR, \fB\-\-round\-to\-even\fR
-rounding towards nearest even (default)
+Use round-to-nearest-even for floating-point arithmetic (default).
 .TP
 \fB\-\-round\-to\-plus\-inf\fR
-rounding towards plus infinity
+Use round-towards-positive-infinity for floating-point arithmetic.
 .TP
 \fB\-\-round\-to\-minus\-inf\fR
-rounding towards minus infinity
+Use round-towards-negative-infinity for floating-point arithmetic.
 .TP
 \fB\-\-round\-to\-zero\fR
-rounding towards zero
+Use round-towards-zero (truncation) for floating-point arithmetic.
 .TP
 \fB\-\-no\-library\fR
-disable built\-in abstract C library
+Do not link the built-in abstract C library models.
 .TP
-\fB\-\-function\fR name
-set main function name
+\fB\-\-function\fR \fIname\fR
+Use \fIname\fR as the program entry point instead of \fBmain\fR.
 .SS "Platform options:"
 .TP
 \fB\-\-arch\fR \fIarch\fR
@@ -497,120 +497,124 @@ Equivalent to \fB\-\-LP32\fR, \fB\-\-ILP32\fR, \fB\-\-LP64\fR (on Windows:
 \fB\-\-LLP64\fR).
 .TP
 \fB\-\-little\-endian\fR
-allow little\-endian word\-byte conversions
+Assume little-endian byte order for word-byte conversions.
 .TP
 \fB\-\-big\-endian\fR
-allow big\-endian word\-byte conversions
+Assume big-endian byte order for word-byte conversions.
 .TP
 \fB\-\-gcc\fR
-use GCC as preprocessor
+Use GCC as the C preprocessor.
 .SS "Program representations:"
 .TP
 \fB\-\-show\-parse\-tree\fR
-show parse tree
+Display the parse tree of the input source code.
 .TP
 \fB\-\-show\-symbol\-table\fR
-show loaded symbol table
+Display the symbol table, listing all variables, functions, and types.
 .TP
 \fB\-\-show\-goto\-functions\fR
-show loaded goto program
+Display the GOTO program instructions for all functions.
 .TP
 \fB\-\-list\-goto\-functions\fR
-list loaded goto functions
+List the names of all functions without showing their bodies.
 .TP
 \fB\-\-show\-properties\fR
-show the properties, but don't run analysis
+List all properties without running analysis.
 .SS "Program instrumentation options:"
 .TP
 \fB\-\-no\-standard\-checks\fR
-disable the standard (default) checks applied to a C/GOTO program
-(see below for more information)
+Disable all standard (default) checks.
 .TP
-\fB\-\-property\fR id
-enable selected properties only
+\fB\-\-property\fR \fIid\fR
+Only check the property with the given \fIid\fR.
 .TP
 \fB\-\-bounds\-check\fR
-enable array bounds checks
+Insert assertions that array and buffer accesses are within bounds.
 .TP
 \fB\-\-pointer\-check\fR
-enable pointer checks
+Insert assertions that pointers are valid when dereferenced.
 .TP
 \fB\-\-memory\-leak\-check\fR
-enable memory leak checks
+Insert assertions that all dynamically allocated memory is freed before
+program termination.
 .TP
 \fB\-\-memory\-cleanup\-check\fR
-Enable memory cleanup checks: assert that all dynamically allocated memory is
-explicitly freed before terminating the program.
+Insert assertions that all dynamically allocated memory is explicitly
+freed before program termination.
 .TP
 \fB\-\-div\-by\-zero\-check\fR
-enable division by zero checks for integer division
+Insert assertions that integer division and modulo do not divide by zero.
 .TP
 \fB\-\-float\-div\-by\-zero\-check\fR
-enable division by zero checks for floating-point division
+Insert assertions that floating-point division does not divide by zero.
 .TP
 \fB\-\-signed\-overflow\-check\fR
-enable signed arithmetic over\- and underflow checks
+Insert assertions that signed integer arithmetic does not overflow.
 .TP
 \fB\-\-unsigned\-overflow\-check\fR
-enable arithmetic over\- and underflow checks
+Insert assertions that unsigned integer arithmetic does not wrap around.
 .TP
 \fB\-\-pointer\-overflow\-check\fR
-enable pointer arithmetic over\- and underflow checks
+Insert assertions that pointer arithmetic does not overflow.
 .TP
 \fB\-\-conversion\-check\fR
-check whether values can be represented after type cast
+Insert assertions that values can be faithfully represented after a
+type cast.
 .TP
 \fB\-\-undefined\-shift\-check\fR
-check shift greater than bit\-width
+Insert assertions that shift amounts are non-negative and less than the
+bit-width of the shifted type.
 .TP
 \fB\-\-float\-overflow\-check\fR
-check floating\-point for +/\-Inf
+Insert assertions that floating-point operations do not produce infinity.
 .TP
 \fB\-\-nan\-check\fR
-check floating\-point for NaN
+Insert assertions that floating-point operations do not produce NaN.
 .TP
 \fB\-\-enum\-range\-check\fR
-checks that all enum type expressions have values in the enum range
+Insert assertions that enum-typed expressions hold values within the
+defined range.
 .TP
 \fB\-\-pointer\-primitive\-check\fR
-checks that all pointers in pointer primitives are valid or null
+Insert assertions that all pointers passed to pointer primitives are
+valid or null.
 .TP
 \fB\-\-retain\-trivial\-checks\fR
-include checks that are trivially true
+Keep checks that are trivially true.
 .TP
-\fB\-\-error\-label\fR label
-check that label is unreachable
+\fB\-\-error\-label\fR \fIlabel\fR
+Insert an assertion that the given \fIlabel\fR is unreachable.
 .TP
 \fB\-\-no\-built\-in\-assertions\fR
-ignore assertions in built\-in library
+Ignore assertions in the built-in C library models.
 .TP
 \fB\-\-no\-assertions\fR
-ignore user assertions
+Ignore all user-written assertions.
 .TP
 \fB\-\-no\-assumptions\fR
-ignore user assumptions
+Ignore all assumptions.
 .TP
 \fB\-\-assert\-to\-assume\fR
-convert user assertions to assumptions
+Convert all user assertions to assumptions.
 .TP
 \fB\-\-malloc\-may\-fail\fR
-allow malloc calls to return a null pointer
+Model \fBmalloc\fR as potentially returning a null pointer.
 .TP
 \fB\-\-malloc\-fail\-assert\fR
-set malloc failure mode to assert\-then\-assume
+When \fBmalloc\fR fails, assert false then assume false.
 .TP
 \fB\-\-malloc\-fail\-null\fR
-set malloc failure mode to return null
+When \fBmalloc\fR fails, return null.
 .TP
 \fB\-\-string\-abstraction\fR
-track C string lengths and zero\-termination
+Track C string lengths and zero-termination (experimental).
 .TP
 \fB\-\-dfcc\-debug\-lib\fR
-enable debug assertions in the cprover contracts library
+Enable debug assertions in the CProver contracts library.
 .TP
 \fB\-\-dfcc\-simple\-invalid\-pointer\-model\fR
-use simplified invalid pointer model in the cprover contracts library
-(faster, unsound)
+Use a simplified invalid pointer model in the CProver contracts library.
+Faster but potentially unsound.
 .SS "Standard Checks"
 Since version \fB6.0\fR, \fBgoto\-analyzer\fR enables a set of checks by
 default (the "standard checks").  These are the same as in \fBcbmc\fR(1),
@@ -660,21 +664,19 @@ Disable modelling of malloc failure.
 Print usage information and exit.
 .TP
 \fB\-\-validate\-goto\-model\fR
-enable additional well\-formedness checks on the
-goto program
+Run additional well-formedness checks on the GOTO program.
 .TP
 \fB\-\-validate\-ssa\-equation\fR
-enable additional well\-formedness checks on the
-SSA representation
+Run additional well-formedness checks on the SSA representation.
 .TP
 \fB\-\-version\fR
-show version and exit
+Print version information and exit.
 .TP
 \fB\-\-flush\fR
-flush every line of output
+Flush every line of output immediately.
 .TP
-\fB\-\-verbosity\fR #
-verbosity level
+\fB\-\-verbosity\fR \fIN\fR
+Set the verbosity level to \fIN\fR (default: 6).
 .TP
 \fB\-\-timestamp\fR [\fBmonotonic\fR|\fBwall\fR]
 Print microsecond\-precision timestamps.  \fBmonotonic\fR: stamps increase
