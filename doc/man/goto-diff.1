@@ -41,68 +41,73 @@ output dependencies in compact mode
 .SS "Program instrumentation options:"
 .TP
 \fB\-\-bounds\-check\fR
-enable array bounds checks
+Insert assertions that array and buffer accesses are within bounds.
 .TP
 \fB\-\-pointer\-check\fR
-enable pointer checks
+Insert assertions that pointers are valid when dereferenced.
 .TP
 \fB\-\-memory\-leak\-check\fR
-enable memory leak checks
+Insert assertions that all dynamically allocated memory is freed before
+program termination.
 .TP
 \fB\-\-memory\-cleanup\-check\fR
-Enable memory cleanup checks: assert that all dynamically allocated memory is
-explicitly freed before terminating the program.
+Insert assertions that all dynamically allocated memory is explicitly
+freed before program termination.
 .TP
 \fB\-\-div\-by\-zero\-check\fR
-enable division by zero checks for integer division
+Insert assertions that integer division and modulo do not divide by zero.
 .TP
 \fB\-\-float\-div\-by\-zero\-check\fR
-enable division by zero checks for floating-point division
+Insert assertions that floating-point division does not divide by zero.
 .TP
 \fB\-\-signed\-overflow\-check\fR
-enable signed arithmetic over\- and underflow checks
+Insert assertions that signed integer arithmetic does not overflow.
 .TP
 \fB\-\-unsigned\-overflow\-check\fR
-enable arithmetic over\- and underflow checks
+Insert assertions that unsigned integer arithmetic does not wrap around.
 .TP
 \fB\-\-pointer\-overflow\-check\fR
-enable pointer arithmetic over\- and underflow checks
+Insert assertions that pointer arithmetic does not overflow.
 .TP
 \fB\-\-conversion\-check\fR
-check whether values can be represented after type cast
+Insert assertions that values can be faithfully represented after a
+type cast.
 .TP
 \fB\-\-undefined\-shift\-check\fR
-check shift greater than bit\-width
+Insert assertions that shift amounts are non-negative and less than the
+bit-width of the shifted type.
 .TP
 \fB\-\-float\-overflow\-check\fR
-check floating\-point for +/\-Inf
+Insert assertions that floating-point operations do not produce infinity.
 .TP
 \fB\-\-nan\-check\fR
-check floating\-point for NaN
+Insert assertions that floating-point operations do not produce NaN.
 .TP
 \fB\-\-enum\-range\-check\fR
-checks that all enum type expressions have values in the enum range
+Insert assertions that enum-typed expressions hold values within the
+defined range.
 .TP
 \fB\-\-pointer\-primitive\-check\fR
-checks that all pointers in pointer primitives are valid or null
+Insert assertions that all pointers passed to pointer primitives are
+valid or null.
 .TP
 \fB\-\-retain\-trivial\-checks\fR
-include checks that are trivially true
+Keep checks that are trivially true.
 .TP
-\fB\-\-error\-label\fR label
-check that label is unreachable
+\fB\-\-error\-label\fR \fIlabel\fR
+Insert an assertion that the given \fIlabel\fR is unreachable.
 .TP
 \fB\-\-no\-built\-in\-assertions\fR
-ignore assertions in built\-in library
+Ignore assertions in the built-in C library models.
 .TP
 \fB\-\-no\-assertions\fR
-ignore user assertions
+Ignore all user-written assertions.
 .TP
 \fB\-\-no\-assumptions\fR
-ignore user assumptions
+Ignore all assumptions.
 .TP
 \fB\-\-assert\-to\-assume\fR
-convert user assertions to assumptions
+Convert all user assertions to assumptions.
 .TP
 \fB\-\-cover\fR CC
 create test\-suite with coverage criterion CC,
