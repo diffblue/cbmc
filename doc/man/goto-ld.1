@@ -12,6 +12,14 @@ phase.  It produces an \fBelf\fR(5) object file with an additional
 .PP
 \fBgoto\-ld\fR accepts all options that \fBgoto\-cc\fR(1) and \fBld\fR(1)
 accept.  See \fBgoto\-cc\fR(1) for full documentation.
+.SH ENVIRONMENT
+.TP
+.B TMPDIR
+All CProver tools honor this variable when creating temporary files and
+directories.
+.SH BUGS
+If you encounter a problem please create an issue at
+.B https://github.com/diffblue/cbmc/issues
 .SH SEE ALSO
 .BR cbmc (1),
 .BR goto\-cc (1),
