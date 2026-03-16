@@ -11,6 +11,31 @@ goto\-instrument \- Perform analysis or instrumentation of goto binaries
 performs program transformations or analyses, and optionally writes the
 resulting program as a new GOTO binary.  When no output file is given,
 the tool performs analysis only and prints results to standard output.
+.SH EXAMPLES
+Display the GOTO program instructions:
+.IP
+.B goto\-instrument \-\-show\-goto\-functions program.gb
+.PP
+Add bounds checks and write the result to a new binary:
+.IP
+.B goto\-instrument \-\-bounds\-check program.gb program\-checked.gb
+.PP
+Decompile a GOTO binary back to C source:
+.IP
+.B goto\-instrument \-\-dump\-c program.gb
+.PP
+Unwind all loops 10 times with unwinding assertions:
+.IP
+.B goto\-instrument \-\-unwind 10 \-\-unwinding\-assertions prog.gb prog\-unwound.gb
+.PP
+Full verification pipeline:
+.RS
+.nf
+goto\-cc \-o program.gb program.c
+goto\-instrument \-\-bounds\-check \-\-pointer\-check program.gb program\-instr.gb
+cbmc program\-instr.gb
+.fi
+.RE
 .SH OPTIONS
 .SS "Dump Source:"
 .TP
