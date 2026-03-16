@@ -3,7 +3,7 @@ on:
   push:
     branches: [ develop ]
   pull_request:
-    branches: [ develop ]
+    branches: [ disabled-for-investigation ]
 env:
   default_build_dir: "build/"
   default_solver: "minisat2"

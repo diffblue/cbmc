@@ -1,7 +1,7 @@
 name: Build Doxygen Documentation
 on:
   pull_request:
-    branches: [ develop ]
+    branches: [ disabled-for-investigation ]
 
 jobs:
   # This job takes approximately 2 minutes

@@ -2,7 +2,7 @@ name: Build Xen with CPROVER tools
 
 on:
   pull_request:
-    branches: [ develop ]
+    branches: [ disabled-for-investigation ]
 
 jobs:
   # This job takes approximately 33 minutes

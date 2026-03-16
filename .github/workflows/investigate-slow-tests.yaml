@@ -1,0 +1,216 @@
+# Temporary workflow to investigate why 4 tests are extremely slow on
+# certain platforms. Tests OS vs solver to determine root cause.
+#
+# Round 1 (completed): normal pass — {Linux, macOS} × {minisat2, cadical}
+#   Result: No OS difference. CaDiCaL ~5x slower for pid/C11. All times <20s.
+#   The extreme slowness (1950s StringSubstring, 1069s pid/C11) was NOT in
+#   the normal pass.
+#
+# Round 2: investigate the actual slow configurations:
+#   - StringSubstring & pid/C11 with --symex-driven-lazy-loading
+#   - assigns-local-composite with --cprover-smt2 backend
+#   - pid/C11 with --cprover-smt2 backend
+#   All across {Linux, macOS} × {minisat2, cadical}
+#
+# Round 1 also confirmed: large_array_of_struct_nondet_index is a Windows
+# platform issue (473s vs 3s), not solver-related. No further investigation.
+
+name: Investigate slow tests
+on:
+  pull_request:
+    branches: [ develop ]
+
+env:
+  cvc5-version: "1.2.1"
+
+jobs:
+  linux-minisat2:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ flex bison maven ccache
+      - name: Build with minisat2
+        run: |
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -Dsat_impl=minisat2
+          cmake --build build -j$(nproc)
+      - name: Test StringSubstring
+        run: cd jbmc/regression/jbmc-strings && time ../../../regression/test.pl -e -p -c "../../../../build/bin/jbmc --validate-goto-model --validate-ssa-equation" -C StringSubstring
+      - name: Test pid/C11
+        run: cd regression/book-examples && time ../test.pl -e -p -c "../../../build/bin/cbmc --validate-goto-model --validate-ssa-equation" -C pid
+      - name: Test assigns-local-composite
+        run: cd regression/contracts-dfcc && time ../test.pl -e -p -c '../chain.sh ../../../build/bin/goto-cc ../../../build/bin/goto-instrument ../../../build/bin/cbmc false true' -C assigns-local-composite
+      - name: Test StringSubstring (symex-driven-lazy-loading)
+        run: cd jbmc/regression/jbmc-strings && time ../../../regression/test.pl -e -p -c "../../../../build/bin/jbmc --validate-goto-model --validate-ssa-equation --symex-driven-lazy-loading" -C StringSubstring
+      - name: Test pid/C11 (cprover-smt2)
+        run: |
+          export PATH=$PATH:$PWD/build/bin
+          cd regression/book-examples && time ../test.pl -e -p -c "../../../build/bin/cbmc --cprover-smt2" -C pid
+      - name: Test assigns-local-composite (cprover-smt2)
+        run: |
+          export PATH=$PATH:$PWD/build/bin
+          cd regression/contracts-dfcc && time ../test.pl -e -p -c '../chain.sh ../../../build/bin/goto-cc ../../../build/bin/goto-instrument "../../../build/bin/cbmc --cprover-smt2" false true' -C assigns-local-composite
+
+  linux-cadical:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ flex bison maven ccache
+      - name: Build with cadical
+        run: |
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -Dsat_impl=cadical
+          cmake --build build -j$(nproc)
+      - name: Test StringSubstring
+        run: cd jbmc/regression/jbmc-strings && time ../../../regression/test.pl -e -p -c "../../../../build/bin/jbmc --validate-goto-model --validate-ssa-equation" -C StringSubstring
+      - name: Test pid/C11
+        run: cd regression/book-examples && time ../test.pl -e -p -c "../../../build/bin/cbmc --validate-goto-model --validate-ssa-equation" -C pid
+      - name: Test assigns-local-composite
+        run: cd regression/contracts-dfcc && time ../test.pl -e -p -c '../chain.sh ../../../build/bin/goto-cc ../../../build/bin/goto-instrument ../../../build/bin/cbmc false true' -C assigns-local-composite
+      - name: Test StringSubstring (symex-driven-lazy-loading)
+        run: cd jbmc/regression/jbmc-strings && time ../../../regression/test.pl -e -p -c "../../../../build/bin/jbmc --validate-goto-model --validate-ssa-equation --symex-driven-lazy-loading" -C StringSubstring
+      - name: Test pid/C11 (cprover-smt2)
+        run: |
+          export PATH=$PATH:$PWD/build/bin
+          cd regression/book-examples && time ../test.pl -e -p -c "../../../build/bin/cbmc --cprover-smt2" -C pid
+      - name: Test assigns-local-composite (cprover-smt2)
+        run: |
+          export PATH=$PATH:$PWD/build/bin
+          cd regression/contracts-dfcc && time ../test.pl -e -p -c '../chain.sh ../../../build/bin/goto-cc ../../../build/bin/goto-instrument "../../../build/bin/cbmc --cprover-smt2" false true' -C assigns-local-composite
+
+  macos-minisat2:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        run: brew install ninja maven flex bison ccache
+      - name: Build with minisat2
+        run: |
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_C_COMPILER=/usr/bin/clang \
+            -DCMAKE_CXX_COMPILER=/usr/bin/clang++ \
+            -Dsat_impl=minisat2
+          cmake --build build -j3
+      - name: Test StringSubstring
+        run: cd jbmc/regression/jbmc-strings && time ../../../regression/test.pl -e -p -c "../../../../build/bin/jbmc --validate-goto-model --validate-ssa-equation" -C StringSubstring
+      - name: Test pid/C11
+        run: cd regression/book-examples && time ../test.pl -e -p -c "../../../build/bin/cbmc --validate-goto-model --validate-ssa-equation" -C pid
+      - name: Test assigns-local-composite
+        run: cd regression/contracts-dfcc && time ../test.pl -e -p -c '../chain.sh ../../../build/bin/goto-cc ../../../build/bin/goto-instrument ../../../build/bin/cbmc false true' -C assigns-local-composite
+      - name: Test StringSubstring (symex-driven-lazy-loading)
+        run: cd jbmc/regression/jbmc-strings && time ../../../regression/test.pl -e -p -c "../../../../build/bin/jbmc --validate-goto-model --validate-ssa-equation --symex-driven-lazy-loading" -C StringSubstring
+      - name: Test pid/C11 (cprover-smt2)
+        run: |
+          export PATH=$PATH:$PWD/build/bin
+          cd regression/book-examples && time ../test.pl -e -p -c "../../../build/bin/cbmc --cprover-smt2" -C pid
+      - name: Test assigns-local-composite (cprover-smt2)
+        run: |
+          export PATH=$PATH:$PWD/build/bin
+          cd regression/contracts-dfcc && time ../test.pl -e -p -c '../chain.sh ../../../build/bin/goto-cc ../../../build/bin/goto-instrument "../../../build/bin/cbmc --cprover-smt2" false true' -C assigns-local-composite
+
+  macos-cadical:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        run: brew install ninja maven flex bison ccache
+      - name: Build with cadical
+        run: |
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_C_COMPILER=/usr/bin/clang \
+            -DCMAKE_CXX_COMPILER=/usr/bin/clang++ \
+            -Dsat_impl=cadical
+          cmake --build build -j3
+      - name: Test StringSubstring
+        run: cd jbmc/regression/jbmc-strings && time ../../../regression/test.pl -e -p -c "../../../../build/bin/jbmc --validate-goto-model --validate-ssa-equation" -C StringSubstring
+      - name: Test pid/C11
+        run: cd regression/book-examples && time ../test.pl -e -p -c "../../../build/bin/cbmc --validate-goto-model --validate-ssa-equation" -C pid
+      - name: Test assigns-local-composite
+        run: cd regression/contracts-dfcc && time ../test.pl -e -p -c '../chain.sh ../../../build/bin/goto-cc ../../../build/bin/goto-instrument ../../../build/bin/cbmc false true' -C assigns-local-composite
+      - name: Test StringSubstring (symex-driven-lazy-loading)
+        run: cd jbmc/regression/jbmc-strings && time ../../../regression/test.pl -e -p -c "../../../../build/bin/jbmc --validate-goto-model --validate-ssa-equation --symex-driven-lazy-loading" -C StringSubstring
+      - name: Test pid/C11 (cprover-smt2)
+        run: |
+          export PATH=$PATH:$PWD/build/bin
+          cd regression/book-examples && time ../test.pl -e -p -c "../../../build/bin/cbmc --cprover-smt2" -C pid
+      - name: Test assigns-local-composite (cprover-smt2)
+        run: |
+          export PATH=$PATH:$PWD/build/bin
+          cd regression/contracts-dfcc && time ../test.pl -e -p -c '../chain.sh ../../../build/bin/goto-cc ../../../build/bin/goto-instrument "../../../build/bin/cbmc --cprover-smt2" false true' -C assigns-local-composite
+
+  linux-incr-smt2:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ flex bison ccache z3
+          wget -q https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux-x86_64-static.zip
+          unzip -j -d /usr/local/bin cvc5-Linux-x86_64-static.zip cvc5-Linux-x86_64-static/bin/cvc5
+          rm cvc5-Linux-x86_64-static.zip
+      - name: Build
+        run: |
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -Dsat_impl="minisat2;cadical"
+          cmake --build build -j$(nproc)
+      - name: Test large_array_of_struct_nondet_index
+        run: cd regression/cbmc-incr-smt2 && time ../test.pl -e -p -c "../../../build/bin/cbmc --incremental-smt2-solver 'z3 --smt2 -in'" -C structs
+      - name: Test large_array_of_struct_nondet_index (cvc5)
+        run: cd regression/cbmc-incr-smt2 && time ../test.pl -e -p -c "../../../build/bin/cbmc --incremental-smt2-solver 'cvc5 --lang smt2 --incremental'" -C structs
+
+  windows-incr-smt2:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+      - uses: microsoft/setup-msbuild@v2
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Fetch dependencies
+        run: |
+          choco install winflexbison3 strawberryperl -y
+          nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
+          echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
+          Invoke-WebRequest -Uri https://github.com/Z3Prover/z3/releases/download/z3-4.8.10/z3-4.8.10-x64-win.zip -OutFile .\z3.zip
+          Expand-Archive -LiteralPath '.\z3.Zip' -DestinationPath C:\tools
+          echo "c:\tools\z3-4.8.10-x64-win\bin;" >> $env:GITHUB_PATH
+          New-Item -ItemType directory "C:\tools\cvc5"
+          Invoke-WebRequest -Uri https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Win64-x86_64-static.zip -OutFile .\cvc5.zip
+          Expand-Archive -LiteralPath '.\cvc5.zip'
+          Move-Item -Path .\cvc5\cvc5-Win64-x86_64-static\bin\cvc5.exe c:\tools\cvc5\cvc5.exe
+          echo "c:\tools\cvc5;" >> $env:GITHUB_PATH
+          echo "c:\Strawberry\" >> $env:GITHUB_PATH
+      - name: Configure and build
+        run: |
+          cmake -S . -B build
+          cmake --build build --config Release
+      - name: Test large_array_of_struct_nondet_index (z3)
+        shell: bash
+        run: |
+          cd regression/cbmc-incr-smt2
+          time perl ../test.pl -e -p -c "../../../build/bin/Release/cbmc --incremental-smt2-solver 'z3 --smt2 -in'" -C structs
+      - name: Test large_array_of_struct_nondet_index (cvc5)
+        shell: bash
+        run: |
+          cd regression/cbmc-incr-smt2
+          time perl ../test.pl -e -p -c "../../../build/bin/Release/cbmc --incremental-smt2-solver 'cvc5 --lang smt2 --incremental'" -C structs

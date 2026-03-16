@@ -1,4 +1,4 @@
-THOROUGH no-new-smt
+CORE no-new-smt
 pid.c
 --cover mcdc --unwind 6
 ^EXIT=0$

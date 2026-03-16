@@ -3,7 +3,7 @@ on:
   push:
     branches: [ develop ]
   pull_request:
-    branches: [ develop ]
+    branches: [ disabled-for-investigation ]
 
 jobs:
   # This job takes approximately 6 to 26 minutes

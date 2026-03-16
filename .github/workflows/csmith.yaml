@@ -2,7 +2,7 @@ name: Run CSmith
 
 on:
   pull_request:
-    branches: [ develop ]
+    branches: [ disabled-for-investigation ]
 
 jobs:
   # This job takes approximately 18 minutes

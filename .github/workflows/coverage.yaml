@@ -3,7 +3,7 @@ on:
   push:
     branches: [ develop ]
   pull_request:
-    branches: [ develop ]
+    branches: [ disabled-for-investigation ]
 env:
   cvc5-version: "1.2.1"
   linux-vcpus: 4
