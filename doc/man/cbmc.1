@@ -657,6 +657,48 @@ directories.
 The C preprocessor invoked by \fBcbmc\fR will use its standard environment
 variables (such as \fBCPATH\fR and \fBC_INCLUDE_PATH\fR) to locate header
 files.
+.SH EXAMPLES
+Verify a C source file with all default checks enabled:
+.IP
+.B cbmc file.c
+.PP
+Verify with a loop unwinding bound of 10 (unwinding assertions, which are
+enabled by default, will flag if the bound is insufficient):
+.IP
+.B cbmc \-\-unwind 10 file.c
+.PP
+Check only a specific property and print a counterexample trace on failure:
+.IP
+.B cbmc \-\-property main.assertion.1 \-\-trace file.c
+.PP
+List all properties in a program without running the analysis:
+.IP
+.B cbmc \-\-show\-properties file.c
+.PP
+Use a pre-compiled GOTO binary (useful for larger projects):
+.RS
+.nf
+goto\-cc \-o program.gb program.c
+cbmc program.gb
+.fi
+.RE
+.PP
+Full pipeline with instrumentation:
+.RS
+.nf
+goto\-cc \-o program.gb program.c
+goto\-instrument \-\-bounds\-check program.gb program\-instr.gb
+cbmc program\-instr.gb
+.fi
+.RE
+.PP
+Use an SMT solver instead of the default SAT solver:
+.IP
+.B cbmc \-\-z3 file.c
+.PP
+Generate coverage goals:
+.IP
+.B cbmc \-\-cover branch \-\-no\-standard\-checks file.c
 .SH EXIT STATUS
 .TP
 .B 0
