@@ -72,6 +72,14 @@ verbosity level
 \fB\-\-timestamp\fR [\fBmonotonic\fR|\fBwall\fR]
 Print microsecond\-precision timestamps.  \fBmonotonic\fR: stamps increase
 monotonically.  \fBwall\fR: ISO\-8601 wall clock timestamps.
+.SH EXAMPLES
+Compare two JAR files and show a unified diff:
+.IP
+.B jdiff \-\-unified old.jar new.jar
+.PP
+Show change impact analysis:
+.IP
+.B jdiff \-\-change\-impact old.jar new.jar
 .SH ENVIRONMENT
 .TP
 .B TMPDIR

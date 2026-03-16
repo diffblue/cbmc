@@ -138,6 +138,14 @@ verbosity level
 \fB\-\-timestamp\fR [\fBmonotonic\fR|\fBwall\fR]
 Print microsecond\-precision timestamps.  \fBmonotonic\fR: stamps increase
 monotonically.  \fBwall\fR: ISO\-8601 wall clock timestamps.
+.SH EXAMPLES
+Compare two GOTO binaries and show a unified diff:
+.IP
+.B goto\-diff \-\-unified old.gb new.gb
+.PP
+Show change impact analysis:
+.IP
+.B goto\-diff \-\-change\-impact old.gb new.gb
 .SH ENVIRONMENT
 .TP
 .B TMPDIR
