@@ -2,17 +2,9 @@
 .SH NAME
 goto-analyzer \- Data-flow analysis for C programs and goto binaries
 .SH SYNOPSIS
-.B goto\-analyzer [\-?|\-h|\-\-help]
-
-.B goto\-analyzer \-\-version
-
-.B goto\-analyzer [options] file.c|file.gb
-
-.B goto\-analyzer [--no-standard-checks] \fIfile.c\fB ...
-
-.B goto\-analyzer [--no-standard-checks] [--pointer-check] \fIfile.c\fB ...
-
-.B goto\-analyzer [--no-bounds-check] \fIfile.c\fB ...
+.B goto\-analyzer
+.RI [ options ]
+.IR file.c | file.gb
 
 .SH DESCRIPTION
 .B goto-analyzer
@@ -703,6 +695,8 @@ If you encounter a problem please create an issue at
 .B https://github.com/diffblue/cbmc/issues
 .SH SEE ALSO
 .BR cbmc (1),
-.BR goto-cc (1)
+.BR goto\-cc (1),
+.BR goto\-instrument (1),
+.BR janalyzer (1)
 .SH COPYRIGHT
 2017\-2026, Daniel Kroening, Diffblue

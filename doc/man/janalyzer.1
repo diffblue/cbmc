@@ -2,37 +2,21 @@
 .SH NAME
 janalyzer \- Data-flow analysis for Java bytecode
 .SH SYNOPSIS
-.TP
-.B janalyzer [\-?] [\-h] [\-\-help]
-show help
-.TP
-.B janalyzer \fImethod\-name\fR
-Use the fully qualified name of a method as entry point, e.g.,
-\fI'mypackage.Myclass.foo:(I)Z'\fR
-.TP
-.B janalyzer \fIclass\-name\fR
-The entry point is the method specified by
-\fB\-\-function\fR, or otherwise, the
-.B public static void main(String[])
-method of the given class \fIclass\-name\fR.
-.TP
-.B janalyzer \-jar \fIjarfile\fR
-JAR file to be checked.
-The entry point is the method specified by
-\fB\-\-function\fR or otherwise, the
-.B public static void main(String[])
-method
-of the class specified by \fB\-\-main\-class\fR or the main
-class specified in the JAR manifest
-(checked in this order).
-.TP
-.B janalyzer \-\-gb \fIgoto\-binary\fR
-GOTO binary file to be checked.
-The entry point is the method specified by
-\fB\-\-function\fR, or otherwise, the
-.B public static void main(String[])
-of the class specified by \fB\-\-main\-class\fR
-(checked in this order).
+.B janalyzer
+.RI [ options ]
+.I method-name
+.br
+.B janalyzer
+.RI [ options ]
+.I class-name
+.br
+.B janalyzer
+.RI [ options ]
+.BI \-jar " jarfile"
+.br
+.B janalyzer
+.RI [ options ]
+.BI \-\-gb " goto-binary"
 .SH DESCRIPTION
 \fBjanalyzer\fR is an abstract interpreter for Java bytecode.  It uses the
 same front-end as \fBjbmc\fR(1) but performs over-approximate analysis
@@ -361,7 +345,8 @@ directories.
 If you encounter a problem please create an issue at
 .B https://github.com/diffblue/cbmc/issues
 .SH SEE ALSO
+.BR goto\-analyzer (1),
 .BR jbmc (1),
-.BR goto-analyzer (1)
+.BR jdiff (1)
 .SH COPYRIGHT
 2016\-2026, Daniel Kroening, Diffblue
