@@ -2,115 +2,112 @@
 .SH NAME
 goto\-instrument \- Perform analysis or instrumentation of goto binaries
 .SH SYNOPSIS
-.TP
-.B goto\-instrument [\-?] [\-h] [\-\-help]
-show help
-.TP
-.B goto\-instrument \-\-version
-show version and exit
-.TP
-.B goto\-instrument [options] \fIin\fR [\fIout\fR]
-perform analysis or instrumentation
+.B goto\-instrument
+.RI [ options ]
+.I in
+.RI [ out ]
 .SH DESCRIPTION
-\fBgoto-instrument\fR reads a GOTO binary, performs a given program
-transformation, and then writes the resulting program as GOTO binary on
-disk.
+\fBgoto\-instrument\fR reads a GOTO binary (as produced by \fBgoto\-cc\fR(1)),
+performs program transformations or analyses, and optionally writes the
+resulting program as a new GOTO binary.  When no output file is given,
+the tool performs analysis only and prints results to standard output.
 .SH OPTIONS
 .SS "Dump Source:"
 .TP
 \fB\-\-dump\-c\fR
-generate C source
+Decompile the GOTO binary back to C source code and print it to
+standard output.
 .TP
-\fB\-\-dump\-c\-type\-header\fR \fIm\fR
-generate a C header for types local in \fIm\fR
+\fB\-\-dump\-c\-type\-header\fR \fImodule\fR
+Generate a C header file containing type declarations local to
+\fImodule\fR.
 .TP
 \fB\-\-dump\-cpp\fR
-generate C++ source
+Decompile the GOTO binary back to C++ source code.
 .TP
 \fB\-\-no\-system\-headers\fR
-generate C source expanding libc includes
+When dumping C source, expand libc includes inline instead of
+emitting \fB#include\fR directives.
 .TP
 \fB\-\-use\-all\-headers\fR
-generate C source with all includes
+When dumping C source, emit \fB#include\fR directives for all headers.
 .TP
 \fB\-\-harness\fR
-include input generator in output
+Include an input generator (test harness) in the dumped source.
 .TP
 \fB\-\-horn\fR
-print program as constrained horn clauses
+Print the program as constrained Horn clauses.
 .SS "Diagnosis:"
 .TP
 \fB\-\-show\-properties\fR
-show the properties, but don't run analysis
+List all properties without running analysis.
 .TP
 \fB\-\-document\-properties\-html\fR
-generate HTML property documentation
+Generate HTML documentation of all properties.
 .TP
 \fB\-\-document\-properties\-latex\fR
-generate Latex property documentation
+Generate LaTeX documentation of all properties.
 .TP
 \fB\-\-show\-symbol\-table\fR
-show loaded symbol table
+Display the symbol table.
 .TP
 \fB\-\-list\-symbols\fR
-list symbols with type information
+List symbols with their type information.
 .TP
 \fB\-\-show\-goto\-functions\fR
-show loaded goto program
+Display the GOTO program instructions for all functions.
 .TP
 \fB\-\-list\-goto\-functions\fR
-list loaded goto functions
+List the names of all functions without showing their bodies.
 .TP
 \fB\-\-count\-eloc\fR
-count effective lines of code
+Count effective lines of code.
 .TP
 \fB\-\-list\-eloc\fR
-list full path names of lines containing code
+List full path names of lines containing code.
 .TP
 \fB\-\-print\-global\-state\-size\fR
-count the total number of bits of global objects
+Print the total number of bits of global objects.
 .TP
 \fB\-\-print\-path\-lengths\fR
-print statistics about control\-flow graph paths
+Print statistics about control-flow graph paths.
 .TP
 \fB\-\-show\-locations\fR
-show all source locations
+Display all source locations in the program.
 .TP
 \fB\-\-dot\fR
-generate CFG graph in DOT format
+Generate a control-flow graph in DOT format.
 .TP
 \fB\-\-print\-internal\-representation\fR
-show verbose internal representation of the program
+Display the verbose internal representation of the program.
 .TP
 \fB\-\-list\-undefined\-functions\fR
-list functions without body
+List functions that are declared but have no body.
 .TP
 \fB\-\-list\-calls\-args\fR
-list all function calls with their arguments
+List all function calls with their arguments.
 .TP
 \fB\-\-call\-graph\fR
-show graph of function calls
+Display the function call graph.
 .TP
 \fB\-\-reachable\-call\-graph\fR
-show graph of function calls potentially reachable from main function
+Display the function call graph restricted to functions potentially
+reachable from the entry point.
 .TP
 \fB\-\-show\-class\-hierarchy\fR
-show the class hierarchy
+Display the class inheritance hierarchy.
 .TP
 \fB\-\-validate\-goto\-model\fR
-enable additional well\-formedness checks on the
-goto program
+Run additional well-formedness checks on the GOTO program.
 .TP
 \fB\-\-validate\-ssa\-equation\fR
-enable additional well\-formedness checks on the
-SSA representation
+Run additional well-formedness checks on the SSA representation.
 .TP
 \fB\-\-validate\-goto\-binary\fR
-check the well\-formedness of the passed in GOTO
-binary and then exit
+Check the well-formedness of the input GOTO binary and exit.
 .TP
 \fB\-\-interpreter\fR
-do concrete execution
+Perform concrete execution of the program (interpreter mode).
 .SS "Data-flow analyses:"
 .TP
 \fB\-\-show\-struct\-alignment\fR
@@ -863,10 +860,10 @@ empty the function pointer is removed using the standard
 .SS "Loop information and transformations:"
 .TP
 \fB\-\-show\-loops\fR
-show the loops in the program
+List all loops in the program with their identifiers.
 .TP
 \fB\-\-unwind\fR \fInr\fR
-unwind all loops \fInr\fR times
+Unwind all loops \fInr\fR times.
 .TP
 \fB\-\-unwindset\fR [\fIT\fR:]\fIL\fR:\fIB\fR,...
 unwind loop \fIL\fR with a bound of \fIB\fR
@@ -1089,6 +1086,8 @@ If you encounter a problem please create an issue at
 .B https://github.com/diffblue/cbmc/issues
 .SH SEE ALSO
 .BR cbmc (1),
-.BR goto-cc (1)
+.BR goto\-analyzer (1),
+.BR goto\-cc (1),
+.BR goto\-diff (1)
 .SH COPYRIGHT
 2008\-2026, Daniel Kroening
