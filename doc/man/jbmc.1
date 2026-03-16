@@ -525,6 +525,26 @@ Set the verbosity level to \fIN\fR (default: 6).
 Print microsecond-precision timestamps.
 \fBmonotonic\fR: timestamps increase monotonically.
 \fBwall\fR: ISO\-8601 wall-clock timestamps.
+.SH EXAMPLES
+Verify a Java class (entry point is \fBmain\fR):
+.IP
+.B jbmc MyClass
+.PP
+Verify a JAR file:
+.IP
+.B jbmc \-jar app.jar
+.PP
+Verify a specific method by its fully qualified descriptor:
+.IP
+.B jbmc \(aqcom.example.Foo.bar:(I)Z\(aq
+.PP
+Verify with a loop unwinding bound:
+.IP
+.B jbmc \-\-unwind 10 MyClass
+.PP
+Set the classpath and main class for a JAR:
+.IP
+.B jbmc \-jar app.jar \-\-main\-class com.example.Main \-\-classpath lib/
 .SH EXIT STATUS
 .TP
 .B 0
