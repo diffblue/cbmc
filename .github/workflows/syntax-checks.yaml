@@ -61,6 +61,8 @@ jobs:
           sudo apt-get install --no-install-recommends -yq mandoc
       - name: Check man pages for formatting errors
         run: mandoc -Tlint -W warning doc/man/*.1
+      - name: Check man pages are consistent with implementation
+        run: ./scripts/check_man_page_consistency.sh
 
   # This job should take about a minute (est)
   check-rustfmt:
