@@ -43,4 +43,4 @@ add_test(
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-set_tests_properties(java-unit PROPERTIES LABELS "CORE;CBMC")
+set_tests_properties(java-unit java-unit-xfail PROPERTIES LABELS "CORE;CBMC")

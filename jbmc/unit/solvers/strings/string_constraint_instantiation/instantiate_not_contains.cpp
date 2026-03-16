@@ -171,6 +171,7 @@ decision_proceduret::resultt check_sat(const exprt &expr, const namespacet &ns)
   bv_refinementt::infot info;
   info.ns = &ns;
   info.prop = &sat_check;
+  info.message_handler = &null_message_handler;
   info.output_xml = false;
   bv_refinementt solver(info);
   solver << expr;
