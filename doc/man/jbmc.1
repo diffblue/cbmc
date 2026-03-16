@@ -275,7 +275,8 @@ and only output after the symex phase.
 .SS "Semantic transformations:"
 .TP
 \fB\-\-nondet\-static\fR
-add nondeterministic initialization of variables with static lifetime
+Initialize all variables with static lifetime to non-deterministic
+values instead of their declared initializers.
 .SS "BMC options:"
 .TP
 \fB\-\-paths\fR [\fIstrategy\fR]
@@ -302,15 +303,13 @@ Print all byte-extract and byte-update operations in the formula.
 \fB\-\-depth\fR nr
 limit search depth
 .TP
-\fB\-\-max\-field\-sensitivity\-array\-size\fR M
-maximum size M of arrays for which field
-sensitivity will be applied to array,
-the default is 64
+\fB\-\-max\-field\-sensitivity\-array\-size\fR \fIM\fR
+Apply field sensitivity (tracking individual elements) to arrays of at
+most \fIM\fR elements.  The default is 64.
 .TP
 \fB\-\-no\-array\-field\-sensitivity\fR
-deactivate field sensitivity for arrays, this is
-equivalent to setting the maximum field
-sensitivity size for arrays to 0
+Disable field sensitivity for arrays entirely.  Equivalent to
+\fB\-\-max\-field\-sensitivity\-array\-size\fR \fI0\fR.
 .TP
 \fB\-\-show\-loops\fR
 List all loops in the program with their identifiers.
