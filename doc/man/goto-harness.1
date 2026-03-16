@@ -2,17 +2,13 @@
 .SH NAME
 goto-harness \- Generate environments for symbolic analysis
 .SH SYNOPSIS
-.TP
-.B goto\-harness [\-?] [\-h] [\-\-help]
-show help
-.TP
-.B goto\-harness \fB\-\-version\fR
-show version
-.TP
-.B goto\-harness \fIin\fB \fIout\fB \-\-harness\-function\-name\ \fIname\fB \-\-harness\-type \fIharness\-type\fR [\fBharness-options\fR]
-build harness for \fIin\fR and write harness to \fIout\fR; the harness is
-printed as C code, if \fIout\fR has a .c suffix, else a GOTO binary including
-the harness is generated
+.B goto\-harness
+.RI [ options ]
+.B \-\-harness\-function\-name
+.I name
+.B \-\-harness\-type
+.I type
+.I in out
 .SH DESCRIPTION
 \fBgoto\-harness\fR constructs functions that set up an appropriate environment
 before calling functions under analysis. This is most useful when trying to
