@@ -97,6 +97,24 @@ files.
 .TP
 \fB\-\-print\-rejected\-preprocessed\-source\fR \fIfile\fR
 Copy failing (preprocessed) source to \fIfile\fR.
+.SH EXAMPLES
+Compile a C source file to a GOTO binary:
+.IP
+.B goto\-cc file.c \-o file.gb
+.PP
+Compile and link separately (as with \fBgcc\fR(1)):
+.RS
+.nf
+goto\-cc \-c file1.c \-o file1.o
+goto\-cc \-c file2.c \-o file2.o
+goto\-cc file1.o file2.o \-o program.gb
+.fi
+.RE
+.PP
+Build an ELF binary with an embedded GOTO section (for use with
+\fBmemory\-analyzer\fR(1)):
+.IP
+.B goto\-gcc \-g \-o program program.c
 .SH BACKWARD COMPATIBILITY
 .B goto\-cc
 will warn and ignore the use of \fB\-\-object\-bits\fR, which previous versions
