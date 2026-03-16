@@ -300,8 +300,9 @@ Print the program expression (SSA equations) without solving.
 \fB\-\-show\-byte\-ops\fR
 Print all byte-extract and byte-update operations in the formula.
 .TP
-\fB\-\-depth\fR nr
-limit search depth
+\fB\-\-depth\fR \fInr\fR
+Limit search depth to \fInr\fR instructions on any single execution path.
+When the depth limit is reached, any remaining paths are cut short.
 .TP
 \fB\-\-max\-field\-sensitivity\-array\-size\fR \fIM\fR
 Apply field sensitivity (tracking individual elements) to arrays of at
