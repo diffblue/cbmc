@@ -217,13 +217,13 @@ Equivalent to \fB\-\-LP32\fR, \fB\-\-ILP32\fR, \fB\-\-LP64\fR (on Windows:
 \fB\-\-LLP64\fR).
 .TP
 \fB\-\-little\-endian\fR
-allow little\-endian word\-byte conversions
+Assume little-endian byte order for word-byte conversions.
 .TP
 \fB\-\-big\-endian\fR
-allow big\-endian word\-byte conversions
+Assume big-endian byte order for word-byte conversions.
 .TP
 \fB\-\-gcc\fR
-use GCC as preprocessor
+Use GCC as the C preprocessor.
 .SS "Program representations:"
 .TP
 \fB\-\-show\-parse\-tree\fR
@@ -272,6 +272,9 @@ freed before program termination (stricter than \fB\-\-memory\-leak\-check\fR).
 \fB\-\-div\-by\-zero\-check\fR
 Insert assertions that integer division and modulo operations do not
 divide by zero.
+.TP
+\fB\-\-float\-div\-by\-zero\-check\fR
+Insert assertions that floating-point division does not divide by zero.
 .TP
 \fB\-\-signed\-overflow\-check\fR
 Insert assertions that signed integer arithmetic does not overflow or
@@ -387,7 +390,10 @@ Remove functions that are trivially unreachable from the entry point.
 .SS "Semantic transformations:"
 .TP
 \fB\-\-nondet\-static\fR
-add nondeterministic initialization of variables with static lifetime
+Initialize all variables with static lifetime (global and static local
+variables) to non-deterministic values instead of their declared
+initializers.  This is useful for verifying code in isolation without
+relying on specific initialization.
 .SS "BMC options:"
 .TP
 \fB\-\-paths\fR [\fIstrategy\fR]
