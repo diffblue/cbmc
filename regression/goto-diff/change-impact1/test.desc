@@ -1,0 +1,8 @@
+CORE
+a.c
+b.c --change-impact
+^EXIT=0$
+^SIGNAL=0$
+\*\* helper \*\*
+--
+^warning: ignoring
