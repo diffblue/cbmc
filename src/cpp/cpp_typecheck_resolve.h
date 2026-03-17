@@ -150,6 +150,7 @@ protected:
   {
     std::size_t cost;
     std::size_t constrained_args;
+    std::size_t repeated_params;
     cpp_template_args_tct specialization_args;
     cpp_template_args_tct full_args;
     irep_idt id;
@@ -157,9 +158,11 @@ protected:
       cpp_template_args_tct _s_args,
       cpp_template_args_tct _f_args,
       irep_idt _id,
-      std::size_t _constrained = 0)
+      std::size_t _constrained = 0,
+      std::size_t _repeated = 0)
       : cost(_s_args.arguments().size()),
         constrained_args(_constrained),
+        repeated_params(_repeated),
         specialization_args(_s_args),
         full_args(_f_args),
         id(_id)
@@ -172,7 +175,11 @@ protected:
         return cost < other.cost;
       // Prefer more constrained specializations (more non-trivial
       // patterns in the partial specialization arguments).
-      return constrained_args > other.constrained_args;
+      if(constrained_args != other.constrained_args)
+        return constrained_args > other.constrained_args;
+      // Prefer specializations with repeated parameters (equality
+      // constraints like <T, T>) over concrete arguments (<T, int>).
+      return repeated_params > other.repeated_params;
     }
   };
 };

@@ -126,6 +126,14 @@ bool cpp_typecheck_fargst::match(
     {
       distance += rank;
     }
+    else if(
+      operand.id() == ID_initializer_list && type.id() == ID_struct_tag &&
+      id2string(to_struct_tag_type(type).get_identifier())
+          .find("tag-initializer_list<") != std::string::npos)
+    {
+      // Brace-init-list to std::initializer_list<T> conversion
+      distance += 1;
+    }
     else
     {
       return false; // no conversion possible
