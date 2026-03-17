@@ -223,6 +223,8 @@ protected:
   new_scopet &add_id(const irep_idt &, new_scopet::kindt);
   void make_sub_scope(const irept &name, new_scopet::kindt);
   void make_sub_scope(const irep_idt &, new_scopet::kindt);
+  new_scopet *lookup_id(const irep_idt &id);
+  bool in_template_scope() const;
 
   enum DeclKind { kDeclarator, kArgDeclarator, kCastDeclarator };
   enum TemplateDeclKind { tdk_unknown, tdk_decl, tdk_instantiation,
@@ -460,6 +462,29 @@ void Parser::make_sub_scope(const irep_idt &id, new_scopet::kindt kind)
   current_scope=&s;
 }
 
+new_scopet *Parser::lookup_id(const irep_idt &id)
+{
+  for(new_scopet *scope = current_scope; scope != nullptr;
+      scope = scope->parent)
+  {
+    auto it = scope->id_map.find(id);
+    if(it != scope->id_map.end())
+      return &(it->second);
+  }
+  return nullptr;
+}
+
+bool Parser::in_template_scope() const
+{
+  for(new_scopet *scope = current_scope; scope != nullptr;
+      scope = scope->parent)
+  {
+    if(scope->kind == new_scopet::kindt::TEMPLATE)
+      return true;
+  }
+  return false;
+}
+
 bool Parser::rString(cpp_tokent &tk)
 {
   if(lex.get_token(tk)!=TOK_STRING)
@@ -549,15 +574,27 @@ bool Parser::rProgram(cpp_itemt &item)
 }
 
 /*
-  definition
-  : null.declaration
-  | typedef
-  | template.decl
-  | linkage.spec
-  | namespace.spec
+  declaration                                         [gram.dcl]
+  : block.declaration
+  | function.definition
+  | template.declaration
+  | explicit.instantiation
+  | explicit.specialization
+  | linkage.specification
+  | namespace.definition
+  | empty.declaration
+  | attribute.declaration
+
+  block.declaration
+  : simple.declaration
+  | asm.definition
+  | namespace.alias.definition
   | using.declaration
-  | extern.template.decl
-  | declaration
+  | using.directive
+  | static_assert.declaration
+  | alias.declaration
+
+  C++11 [dcl.dcl] (A.6)
 */
 bool Parser::rDefinition(cpp_itemt &item)
 {
@@ -587,6 +624,15 @@ bool Parser::rDefinition(cpp_itemt &item)
     return rUsingOrTypedef(item);
   else if(t==TOK_STATIC_ASSERT)
     return rStaticAssert(item.make_static_assert());
+  else if(t == TOK_GCC_ASM)
+  {
+    // top-level asm declaration
+    auto statement = rGCCAsmStatement();
+    if(!statement.has_value())
+      return false;
+    item.make_declaration();
+    return true;
+  }
   else
     return rDeclaration(item.make_declaration());
 }
@@ -604,8 +650,10 @@ bool Parser::rNullDeclaration(cpp_declarationt &decl)
 }
 
 /*
-  typedef
+  typedef.declaration                                 [dcl.typedef]
   : TYPEDEF type.specifier declarators ';'
+
+  C++11 [dcl.typedef] (A.6)
 */
 bool Parser::rTypedef(cpp_declarationt &declaration)
 {
@@ -629,11 +677,20 @@ bool Parser::rTypedef(cpp_declarationt &declaration)
   if(!rDeclarators(declaration.declarators(), true))
     return false;
 
+  for(const auto &declarator : declaration.declarators())
+  {
+    if(!declarator.name().is_nil())
+      add_id(declarator.name(), new_scopet::kindt::TYPEDEF);
+  }
+
   return true;
 }
 
 /*
-  USING Identifier '=' type.specifier ';'
+  alias.declaration                                   [dcl.typedef]
+  : USING identifier attribute.specifier.seq? '=' type.id ';'
+
+  C++11 [dcl.typedef] (A.6)
 */
 bool Parser::rTypedefUsing(cpp_declarationt &declaration)
 {
@@ -680,6 +737,10 @@ bool Parser::rTypedefUsing(cpp_declarationt &declaration)
   if(lex.get_token(tk)!=';')
     return false;
 
+  // Register typedef name in the scope
+  if(!name.name().is_nil())
+    add_id(name.name(), new_scopet::kindt::TYPEDEF);
+
 #ifdef DEBUG
   std::cout << std::string(__indent, ' ') << "Parser::rTypedefUsing 3\n";
 #endif
@@ -698,8 +759,18 @@ std::optional<codet> Parser::rTypedefStatement()
 }
 
 /*
-  type.specifier
-  : {cv.qualify} (integral.or.class.spec | name) {cv.qualify}
+  type.specifier                                      [dcl.type]
+  : {cv.qualifier} (simple.type.specifier | class.specifier
+    | enum.specifier) {cv.qualifier}
+
+  simple.type.specifier                               [dcl.type.simple]
+  : nested.name.specifier? type.name
+  | nested.name.specifier TEMPLATE simple.template.id
+  | CHAR | CHAR16_T | CHAR32_T | WCHAR_T | BOOL | SHORT | INT | LONG
+  | SIGNED | UNSIGNED | FLOAT | DOUBLE | VOID | AUTO
+  | decltype.specifier
+
+  C++11 [dcl.type] (A.6)
 */
 bool Parser::rTypeSpecifier(typet &tspec, bool check)
 {
@@ -781,9 +852,11 @@ bool Parser::isTypeSpecifier()
 }
 
 /*
-  linkage.spec
-  : EXTERN String definition
-  |  EXTERN String linkage.body
+  linkage.specification                               [dcl.link]
+  : EXTERN string.literal declaration
+  | EXTERN string.literal '{' declaration.seq? '}'
+
+  C++11 [dcl.link] (A.6)
 */
 bool Parser::rLinkageSpec(cpp_linkage_spect &linkage_spec)
 {
@@ -819,10 +892,11 @@ bool Parser::rLinkageSpec(cpp_linkage_spect &linkage_spec)
 }
 
 /*
-  namespace.spec
-  : { INLINE } NAMESPACE Identifier definition
-  | { INLINE } NAMESPACE Identifier = name
-  | { INLINE } NAMESPACE { Identifier } linkage.body
+  namespace.definition                                [namespace.def]
+  : INLINE? NAMESPACE identifier? '{' namespace.body '}'
+  | NAMESPACE identifier '=' qualified.namespace.specifier ';'
+
+  C++11 [namespace.def] (A.6)
 */
 
 bool Parser::rNamespaceSpec(cpp_namespace_spect &namespace_spec)
@@ -879,7 +953,15 @@ bool Parser::rNamespaceSpec(cpp_namespace_spect &namespace_spec)
 }
 
 /*
-  using.declaration : USING { NAMESPACE } name ';'
+  using.declaration                                   [namespace.udecl]
+  : USING TYPENAME? nested.name.specifier unqualified.id ';'
+  | USING '::' unqualified.id ';'
+
+  using.directive                                     [namespace.udir]
+  : attribute.specifier.seq? USING NAMESPACE nested.name.specifier?
+    namespace.name ';'
+
+  C++11 [namespace.udecl], [namespace.udir] (A.6)
 */
 bool Parser::rUsing(cpp_usingt &cpp_using)
 {
@@ -913,8 +995,11 @@ bool Parser::rUsing(cpp_usingt &cpp_using)
 }
 
 /*
-  USING Identifier '=' type.specifier ';'
+  alias.declaration | using.declaration               [dcl.typedef]
+  : USING identifier attribute.specifier.seq? '=' type.id ';'
   | using.declaration
+
+  C++11 [dcl.typedef], [namespace.udecl] (A.6)
 */
 bool Parser::rUsingOrTypedef(cpp_itemt &item)
 {
@@ -938,7 +1023,10 @@ bool Parser::rUsingOrTypedef(cpp_itemt &item)
 }
 
 /*
-  static_assert.declaration : STATIC_ASSERT ( expression , expression ) ';'
+  static_assert.declaration                           [dcl.dcl]
+  : STATIC_ASSERT '(' constant.expression ',' string.literal ')' ';'
+
+  C++11 [dcl.dcl] (A.6)
 */
 bool Parser::rStaticAssert(cpp_static_assertt &cpp_static_assert)
 {
@@ -977,9 +1065,11 @@ bool Parser::rStaticAssert(cpp_static_assertt &cpp_static_assert)
 }
 
 /*
-  linkage.body : '{' (definition)* '}'
+  linkage.body : '{' declaration.seq? '}'             [dcl.link]
 
-  Note: this is also used to construct namespace.spec
+  Also used for namespace.body.
+
+  C++11 [dcl.link] (A.6)
 */
 bool Parser::rLinkageBody(cpp_linkage_spect::itemst &items)
 {
@@ -1012,22 +1102,12 @@ bool Parser::rLinkageBody(cpp_linkage_spect::itemst &items)
 }
 
 /*
-  template.decl
-  : TEMPLATE '<' temp.arg.list '>' declaration
-  | TEMPLATE declaration
-  | TEMPLATE '<' '>' declaration
+  template.declaration                                [temp]
+  : TEMPLATE '<' template.parameter.list '>' declaration
+  | TEMPLATE declaration                              (explicit instantiation)
+  | TEMPLATE '<' '>' declaration                      (explicit specialization)
 
-  The second case is an explicit template instantiation.  declaration must
-  be a class declaration.  For example,
-
-      template class Foo<int, char>;
-
-  explicitly instantiates the template Foo with int and char.
-
-  The third case is a specialization of a function template.  declaration
-  must be a function template.  For example,
-
-      template <> int count(String x) { return x.length; }
+  C++11 [temp] (A.12)
 */
 bool Parser::rTemplateDecl(cpp_declarationt &decl)
 {
@@ -1140,9 +1220,11 @@ bool Parser::rTemplateDecl2(typet &decl, TemplateDeclKind &kind)
 }
 
 /*
-  temp.arg.list
-  : empty
-  | temp.arg.declaration (',' temp.arg.declaration)*
+  template.parameter.list                             [temp.param]
+  : template.parameter
+  | template.parameter.list ',' template.parameter
+
+  C++11 [temp.param] (A.12)
 */
 bool Parser::rTempArgList(irept &args)
 {
@@ -1172,14 +1254,19 @@ bool Parser::rTempArgList(irept &args)
 }
 
 /*
-  temp.arg.declaration
-  : CLASS {'...'} {Identifier} {'=' type.name}
-  | TYPENAME {'...'} {Identifier} {'=' type.name}
-  | type.specifier {'...'} arg.declarator {'=' conditional.expr}
-  | template.decl2 CLASS {'...'} {Identifier} {'=' type.name}
+  template.parameter                                  [temp.param]
+  : type.parameter
+  | parameter.declaration
 
-  C++11 [temp.param] (A.12): template parameter packs use '...' before
-  the optional identifier.
+  type.parameter
+  : CLASS '...'? identifier?
+  | CLASS identifier? '=' type.id
+  | TYPENAME '...'? identifier?
+  | TYPENAME identifier? '=' type.id
+  | TEMPLATE '<' template.parameter.list '>' CLASS '...'? identifier?
+  | TEMPLATE '<' template.parameter.list '>' CLASS identifier? '=' id.expression
+
+  C++11 [temp.param] (A.12)
 */
 bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
 {
@@ -1380,8 +1467,10 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
 }
 
 /*
-   extern.template.decl
-   : EXTERN TEMPLATE declaration
+  explicit.instantiation                              [temp.explicit]
+  : EXTERN TEMPLATE declaration
+
+  C++11 [temp.explicit] (A.12)
 */
 bool Parser::rExternTemplateDecl(cpp_declarationt &decl)
 {
@@ -1402,33 +1491,25 @@ bool Parser::rExternTemplateDecl(cpp_declarationt &decl)
 }
 
 /*
-  declaration
-  : integral.declaration
-  | const.declaration
-  | other.declaration
+  simple.declaration                                  [dcl.dcl]
+  : decl.specifier.seq? init.declarator.list? ';'
+  | attribute.specifier.seq decl.specifier.seq? init.declarator.list ';'
 
-  decl.head
-  : {member.spec} {storage.spec} {member.spec} {cv.qualify}
+  function.definition                                 [dcl.fct.def]
+  : attribute.specifier.seq? decl.specifier.seq? declarator
+    virt.specifier.seq? function.body
 
-  integral.declaration
-  : integral.decl.head declarators (';' | function.body)
-  | integral.decl.head ';'
-  | integral.decl.head ':' expression ';'
-
-  integral.decl.head
-  : decl.head integral.or.class.spec {cv.qualify}
-
-  other.declaration
-  : decl.head name {cv.qualify} declarators (';' | function.body)
-  | decl.head name constructor.decl (';' | function.body)
-  | FRIEND name ';'
-
-  const.declaration
-  : cv.qualify {'*'} Identifier '=' expression {',' declarators} ';'
+  The parser splits declarations into three cases:
+  - integral.declaration: decl-specifier-seq starts with an integral type
+    or class/enum specifier
+  - const.declaration: starts with cv-qualifier followed by '*' or identifier
+  - other.declaration: decl-specifier-seq starts with a name (user-defined type)
 
   Note: if you modify this function, look at declaration.statement, too.
   Note: this regards a statement like "T (a);" as a constructor
         declaration.  See isConstructorDecl().
+
+  C++11 [dcl.dcl], [dcl.fct.def] (A.6, A.7)
 */
 
 bool Parser::rDeclaration(cpp_declarationt &declaration)
@@ -1947,8 +2028,10 @@ bool Parser::isConstructorDecl()
 }
 
 /*
-  ptr.to.member
-  : {'::'} (identifier {'<' any* '>'} '::')+ '*'
+  ptr.to.member (lookahead check)                     [dcl.mptr]
+  : '::'? (identifier template.args? '::')+ '*'
+
+  C++11 [dcl.mptr] (A.7)
 */
 bool Parser::isPtrToMember(int i)
 {
@@ -2004,13 +2087,15 @@ bool Parser::isPtrToMember(int i)
 }
 
 /*
-  member.spec
-  : (FRIEND | INLINE | VIRTUAL | EXPLICIT)+
+  function.specifier                                  [dcl.fct.spec]
+  : INLINE | VIRTUAL | EXPLICIT
+
+  Also handles FRIEND, which is a decl-specifier.
+
+  C++11 [dcl.fct.spec] (A.6)
 */
 bool Parser::optMemberSpec(cpp_member_spect &member_spec)
 {
-  member_spec.clear();
-
   int t=lex.LookAhead(0);
 
   while(
@@ -2039,10 +2124,12 @@ bool Parser::optMemberSpec(cpp_member_spect &member_spec)
 }
 
 /*
-  storage.spec : STATIC | EXTERN | AUTO | REGISTER | MUTABLE | ASM |
-                 THREAD_LOCAL | CONSTEXPR
+  storage.class.specifier                             [dcl.stc]
+  : REGISTER | STATIC | THREAD_LOCAL | EXTERN | MUTABLE
 
-  C++11 [dcl.spec] (A.6): constexpr is a decl-specifier, not a cv-qualifier.
+  Also handles CONSTEXPR, which is a decl-specifier per C++11 [dcl.spec].
+
+  C++11 [dcl.stc] (A.6)
 */
 bool Parser::optStorageSpec(cpp_storage_spect &storage_spec)
 {
@@ -2078,9 +2165,12 @@ bool Parser::optStorageSpec(cpp_storage_spect &storage_spec)
 }
 
 /*
-  cv.qualify : (CONST | VOLATILE | RESTRICT)+
+  cv.qualifier.seq                                    [dcl.type.cv]
+  : (CONST | VOLATILE)+
 
-  C++11 [dcl.spec] (A.6): constexpr is a decl-specifier, handled by
+  Also accepts RESTRICT as a GCC extension.
+
+  C++11 [dcl.type.cv] (A.6): constexpr is a decl-specifier, handled by
   optStorageSpec.
 */
 bool Parser::optCvQualify(typet &cv)
@@ -2159,9 +2249,11 @@ bool Parser::optCvQualify(typet &cv)
 }
 
 /*
-  dcl.align
-  : ALIGNAS unary.expr
-  | ALIGNAS '(' type.name ')'
+  alignment.specifier                                 [dcl.align]
+  : ALIGNAS '(' type.id '...'? ')'
+  | ALIGNAS '(' assignment.expression '...'? ')'
+
+  C++11 [dcl.align] (A.6)
 */
 bool Parser::optAlignas(typet &cv)
 {
@@ -2421,7 +2513,9 @@ bool Parser::rGCCAttribute(typet &t)
 
 bool Parser::optAttribute(typet &t)
 {
-  if(lex.LookAhead(0) == TOK_GCC_ATTRIBUTE)
+  // C++11 [dcl.attr] (A.6): attribute-specifier-seq is zero or more
+  // attribute-specifiers.
+  while(lex.LookAhead(0) == TOK_GCC_ATTRIBUTE)
   {
     lex.get_token();
 
@@ -2466,23 +2560,30 @@ bool Parser::optAttribute(typet &t)
       }
 
     default:
-      // TODO: way may wish to change this: GCC, Clang, Visual Studio merely
-      // warn when they see an attribute that they don't recognize
-      return false;
+        // TODO: we may wish to change this: GCC, Clang, Visual Studio merely
+        // warn when they see an attribute that they don't recognize
+        if(is_identifier(tk.kind) && lex.LookAhead(0) == TOK_SCOPE)
+        {
+        // scoped attribute like clang::something
+        exprt discarded;
+        if(!rExpression(discarded, false))
+          return false;
+        }
+        else
+        return false;
     }
   }
 }
 
 /*
+  simple.type.specifier (integral types)              [dcl.type.simple]
+  : (CHAR | CHAR16_T | CHAR32_T | WCHAR_T | INT | SHORT | LONG
+     | SIGNED | UNSIGNED | FLOAT | DOUBLE | VOID | BOOL | COMPLEX)+
+  | class.specifier
+  | enum.specifier
 
-  integral.or.class.spec
-  : (CHAR | CHAR16_T | CHAR32_T | WCHAR_T
-     | INT | SHORT | LONG | SIGNED | UNSIGNED | FLOAT | DOUBLE
-     | VOID | BOOLEAN | COMPLEX)+
-  | class.spec
-  | enum.spec
-
-  Note: if editing this, see also isTypeSpecifier().
+  C++11 [dcl.type.simple] (A.6).  Note: if editing this, see also
+  isTypeSpecifier().
 */
 bool Parser::optIntegralTypeOrClassSpec(typet &p)
 {
@@ -2708,9 +2809,19 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
 }
 
 /*
-  constructor.decl
-  : '(' {arg.decl.list} ')' {cv.qualify} {throw.decl}
-  {member.initializers} {'=' Constant}
+  parameters.and.qualifiers                           [dcl.fct]
+  : '(' parameter.declaration.clause ')' cv.qualifier.seq?
+    ref.qualifier? exception.specification? attribute.specifier.seq?
+
+  Also handles member.initializers and trailing.return.type.
+
+  function.body                                       [dcl.fct.def]
+  : ctor.initializer? compound.statement
+  | function.try.block
+  | '=' DEFAULT ';'
+  | '=' DELETE ';'
+
+  C++11 [dcl.fct], [dcl.fct.def] (A.7)
 */
 bool Parser::rConstructorDecl(
   cpp_declaratort &constructor,
@@ -2838,9 +2949,22 @@ bool Parser::rConstructorDecl(
 }
 
 /*
-  throw.decl : THROW '(' (name {','})* {name} ')'
-             | THROW '(' '...' ')'
-             | NOEXCEPT
+  exception.specification                             [except.spec]
+  : dynamic.exception.specification
+  | noexcept.specification
+
+  dynamic.exception.specification
+  : THROW '(' type.id.list? ')'
+
+  type.id.list
+  : type.id '...'?
+  | type.id.list ',' type.id '...'?
+
+  noexcept.specification
+  : NOEXCEPT '(' constant.expression ')'
+  | NOEXCEPT
+
+  C++11 [except.spec] (A.13)
 */
 bool Parser::optThrowDecl(irept &throw_decl)
 {
@@ -2906,9 +3030,13 @@ bool Parser::optThrowDecl(irept &throw_decl)
 }
 
 /*
-  declarators : declarator.with.init (',' declarator.with.init)*
+  init.declarator.list                                [dcl.decl]
+  : init.declarator
+  | init.declarator.list ',' init.declarator
 
   is_statement changes the behavior of rArgDeclListOrInit().
+
+  C++11 [dcl.decl] (A.7)
 */
 bool Parser::rDeclarators(
   cpp_declarationt::declaratorst &declarators,
@@ -2933,11 +3061,20 @@ bool Parser::rDeclarators(
 }
 
 /*
-  declarator.with.init
-  : ':' expression
-  | declarator
-    {'=' initialize.expr |
-     ':' expression}
+  init.declarator                                     [dcl.decl]
+  : declarator initializer?
+
+  initializer                                         [dcl.init]
+  : brace.or.equal.initializer
+  | '(' expression.list ')'
+
+  brace.or.equal.initializer
+  : '=' initializer.clause
+  | braced.init.list
+
+  Also handles bit-field declarations: ':' constant.expression
+
+  C++11 [dcl.decl], [dcl.init] (A.7)
 */
 bool Parser::rDeclaratorWithInit(
   cpp_declaratort &dw,
@@ -3065,13 +3202,19 @@ bool Parser::rDeclaratorQualifier()
 }
 
 /*
-  declarator
-  : (ptr.operator)* (name | '(' declarator ')')
-        ('[' comma.expression ']')* {func.args.or.init}
+  declarator                                          [dcl.decl]
+  : ptr.declarator
+  | noptr.declarator parameters.and.qualifiers trailing.return.type
 
-  func.args.or.init
-  : '(' arg.decl.list.or.init ')' {cv.qualify} {throw.decl}
-  {member.initializers}
+  ptr.declarator
+  : noptr.declarator
+  | ptr.operator ptr.declarator
+
+  noptr.declarator
+  : declarator.id attribute.specifier.seq?
+  | noptr.declarator parameters.and.qualifiers
+  | noptr.declarator '[' expression? ']' attribute.specifier.seq?
+  | '(' ptr.declarator ')'
 
   Note: We assume that '(' declarator ')' is followed by '(' or '['.
         This is to avoid accepting a function call F(x) as a pair of
@@ -3079,6 +3222,8 @@ bool Parser::rDeclaratorQualifier()
         if should_be_declarator is true.
 
   Note: is_statement changes the behavior of rArgDeclListOrInit().
+
+  C++11 [dcl.decl] (A.7)
 */
 
 bool Parser::rDeclarator(
@@ -3343,8 +3488,15 @@ bool Parser::rDeclarator(
 }
 
 /*
-  ptr.operator
-  : (('*' | ptr.to.member)['&'] {cv.qualify})+
+  ptr.operator                                        [dcl.decl]
+  : '*' attribute.specifier.seq? cv.qualifier.seq?
+  | '&' attribute.specifier.seq?
+  | '&&' attribute.specifier.seq?
+  | nested.name.specifier '*' attribute.specifier.seq? cv.qualifier.seq?
+
+  Also handles Apple's block pointer extension ('^').
+
+  C++11 [dcl.decl] (A.7)
 */
 bool Parser::optPtrOperator(typet &ptrs)
 {
@@ -3462,8 +3614,14 @@ bool Parser::optPtrOperator(typet &ptrs)
 }
 
 /*
-  member.initializers
-  : ':' member.init (',' member.init)*
+  ctor.initializer                                    [class.base.init]
+  : ':' mem.initializer.list
+
+  mem.initializer.list
+  : mem.initializer '...'?
+  | mem.initializer ',' mem.initializer.list '...'?
+
+  C++11 [class.base.init] (A.10)
 */
 bool Parser::rMemberInitializers(irept &init)
 {
@@ -3494,9 +3652,15 @@ bool Parser::rMemberInitializers(irept &init)
 }
 
 /*
-  member.init
-  : name '(' function.arguments ')'
-  : name '(' '{' initialize.expr ... '}' ')'
+  mem.initializer                                     [class.base.init]
+  : mem.initializer.id '(' expression.list? ')'
+  | mem.initializer.id braced.init.list
+
+  mem.initializer.id
+  : class.or.decltype
+  | identifier
+
+  C++11 [class.base.init] (A.10)
 */
 bool Parser::rMemberInit(exprt &init)
 {
@@ -3570,15 +3734,26 @@ bool Parser::rMemberInit(exprt &init)
 }
 
 /*
-  name : {'::'} name2 ('::' name2)*
+  qualified.id                                        [expr.prim]
+  : nested.name.specifier TEMPLATE? unqualified.id
 
-  name2
-  : Identifier {template.args}
-  | '~' Identifier
-  | OPERATOR operator.name {template.args}
+  nested.name.specifier
+  : '::'
+  | type.name '::'
+  | namespace.name '::'
+  | decltype.specifier '::'
+  | nested.name.specifier identifier '::'
+  | nested.name.specifier TEMPLATE? simple.template.id '::'
 
-  Don't use this function for parsing an expression
+  unqualified.id
+  : identifier template.args?
+  | '~' identifier
+  | OPERATOR operator.name template.args?
+
+  This function is used for declarator names (not expressions).
   It always regards '<' as the beginning of template arguments.
+
+  C++11 [expr.prim] (A.4)
 */
 bool Parser::rName(irept &name)
 {
@@ -3633,6 +3808,24 @@ bool Parser::rName(irept &name)
       std::cout << std::string(__indent, ' ') << "Parser::rName 4\n";
 #endif
       {
+        // Check if the previous identifier could be a template
+        if(!components.empty())
+        {
+          const irept &last = components.back();
+          if(last.id() == ID_name)
+          {
+            irep_idt id = last.get(ID_identifier);
+            if(!id.empty())
+            {
+                new_scopet *found = lookup_id(id);
+                if(
+                  found != nullptr && !found->is_type() &&
+                  !found->is_template())
+                  return true;
+            }
+          }
+        }
+
         irept args;
         if(!rTemplateArgs(args))
           return false;
@@ -3706,6 +3899,30 @@ bool Parser::rName(irept &name)
         return true;
       break;
 
+    case TOK_DECLTYPE:
+      // C++11: decltype(expr)::member
+      lex.get_token(tk);
+      {
+        components.push_back(typet{ID_decltype});
+        set_location(components.back(), tk);
+
+        if(lex.get_token(tk) != '(')
+          return false;
+
+        exprt expr;
+        if(!rCommaExpression(expr))
+          return false;
+
+        if(lex.get_token(tk) != ')')
+          return false;
+
+        components.back().add(ID_expr_arg).swap(expr);
+
+        if(lex.LookAhead(0) != TOK_SCOPE)
+          return true;
+      }
+      break;
+
     default:
       return false;
     }
@@ -3713,15 +3930,20 @@ bool Parser::rName(irept &name)
 }
 
 /*
-  operator.name
-  : '+' | '-' | '*' | '/' | '%' | '^' | '&' | '|' | '~'
-  | '!' | '=' | '<' | '>' | AssignOp | ShiftOp | EqualOp
-  | RelOp | LogAndOp | LogOrOp | IncOp | ',' | DOTPM | ARROWPM | ArrowOp
-  | NEW {'[' ']'}
-  | DELETE {'[' ']'}
-  | '(' ')'
-  | '[' ']'
-  | cast.operator.name
+  operator.function.id                                [over.oper]
+  : OPERATOR operator
+
+  operator: one of
+    new  delete  new[]  delete[]
+    +  -  *  /  %  ^  &  |  ~
+    !  =  <  >  +=  -=  *=  /=  %=
+    ^=  &=  |=  <<  >>  >>=  <<=  ==  !=
+    <=  >=  &&  ||  ++  --  ,  ->*  ->
+    ()  []
+
+  Also handles conversion-function-id (cast operator).
+
+  C++11 [over.oper] (A.11)
 */
 
 bool Parser::rOperatorName(irept &name)
@@ -3823,9 +4045,16 @@ bool Parser::rOperatorName(irept &name)
 }
 
 /*
-  cast.operator.name
-  : {cv.qualify} (integral.or.class.spec | name) {cv.qualify}
-    {(ptr.operator)*}
+  conversion.function.id                              [class.conv.fct]
+  : OPERATOR conversion.type.id
+
+  conversion.type.id
+  : type.specifier.seq conversion.declarator?
+
+  conversion.declarator
+  : ptr.operator conversion.declarator?
+
+  C++11 [class.conv.fct] (A.10)
 */
 
 bool Parser::rCastOperatorName(irept &name)
@@ -3865,8 +4094,10 @@ bool Parser::rCastOperatorName(irept &name)
 }
 
 /*
-  ptr.to.member
-  : {'::'} (identifier {template.args} '::')+ '*'
+  ptr.to.member (nested.name.specifier '*')           [dcl.mptr]
+  : '::'? (identifier template.args? '::')+ '*'
+
+  C++11 [dcl.mptr] (A.7)
 */
 bool Parser::rPtrToMember(irept &ptr_to_mem)
 {
@@ -3960,13 +4191,16 @@ bool Parser::rPtrToMember(irept &ptr_to_mem)
 }
 
 /*
-  template.args
-  : '<' '>'
-  | '<' template.argument {',' template.argument} '>'
+  template.argument.list                              [temp.names]
+  : template.argument '...'?
+  | template.argument.list ',' template.argument '...'?
 
   template.argument
-  : type.name
-  | logical.or.expr
+  : type.id
+  | constant.expression
+  | id.expression
+
+  C++11 [temp.names] (A.12)
 */
 bool Parser::rTemplateArgs(irept &template_args)
 {
@@ -3991,6 +4225,23 @@ bool Parser::rTemplateArgs(irept &template_args)
   {
     cpp_tokent tk2;
     lex.get_token(tk2);
+    return true;
+  }
+
+  // C++11: Foo<> where >> is scanned as shift-right
+  if(lex.LookAhead(0) == TOK_SHIFTRIGHT)
+  {
+    cpp_token_buffert::post pos = lex.Save();
+    cpp_tokent tk2;
+    lex.get_token(tk2);
+    // split >> into > >
+    lex.Restore(pos);
+    tk2.kind = '>';
+    tk2.text = '>';
+    lex.Replace(tk2);
+    lex.Insert(tk2);
+    lex.get_token();
+    DATA_INVARIANT(lex.LookAhead(0) == '>', "should be >");
     return true;
   }
 
@@ -4149,9 +4400,15 @@ bool Parser::rArgDeclListOrInit(
 }
 
 /*
-  arg.decl.list
-    : empty
-    | arg.declaration ( ',' arg.declaration )* {{ ',' } Ellipses}
+  parameter.declaration.clause                        [dcl.fct]
+  : parameter.declaration.list? '...'?
+  | parameter.declaration.list ',' '...'
+
+  parameter.declaration.list
+  : parameter.declaration
+  | parameter.declaration.list ',' parameter.declaration
+
+  C++11 [dcl.fct] (A.7)
 */
 bool Parser::rArgDeclList(irept &arglist)
 {
@@ -4203,9 +4460,14 @@ bool Parser::rArgDeclList(irept &arglist)
 }
 
 /*
-  arg.declaration
-    : {userdef.keyword | REGISTER} type.specifier arg.declarator
-      {'=' expression}
+  parameter.declaration                               [dcl.fct]
+  : attribute.specifier.seq? decl.specifier.seq declarator
+  | attribute.specifier.seq? decl.specifier.seq declarator '=' initializer.clause
+  | attribute.specifier.seq? decl.specifier.seq abstract.declarator?
+  | attribute.specifier.seq? decl.specifier.seq abstract.declarator?
+    '=' initializer.clause
+
+  C++11 [dcl.fct] (A.7)
 */
 bool Parser::rArgDeclaration(cpp_declarationt &declaration)
 {
@@ -4248,9 +4510,19 @@ bool Parser::rArgDeclaration(cpp_declarationt &declaration)
 }
 
 /*
-  initialize.expr
-  : expression
-  | '{' initialize.expr (',' initialize.expr)* {','} '}'
+  initializer.clause                                  [dcl.init]
+  : assignment.expression
+  | braced.init.list
+
+  initializer.list
+  : initializer.clause '...'?
+  | initializer.list ',' initializer.clause '...'?
+
+  braced.init.list
+  : '{' initializer.list ','? '}'
+  | '{' '}'
+
+  C++11 [dcl.init] (A.7)
 */
 bool Parser::rInitializeExpr(exprt &expr)
 {
@@ -4334,13 +4606,12 @@ bool Parser::rInitializeExpr(exprt &expr)
 }
 
 /*
-  function.arguments
-  : empty
-  | initializer.expr (',' initializer.expr)*
+  expression.list                                     [expr.post]
+  : initializer.list
 
-  C++11 [expr.post] (A.4): function arguments can be
-  initializer-clauses, which include braced-init-lists.
-  This assumes that the next token following function.arguments is ')'.
+  C++11 [expr.post] (A.4): expression-list is an initializer-list,
+  which includes braced-init-lists.
+  This assumes that the next token following the list is ')'.
 */
 bool Parser::rFunctionArguments(exprt &args)
 {
@@ -4376,11 +4647,23 @@ bool Parser::rFunctionArguments(exprt &args)
 }
 
 /*
-  enum.spec
-  : ENUM Identifier
-  | ENUM {Identifier} '{' {enum.body} '}'
-  | ENUM CLASS Identifier '{' {enum.body} '}'
-  | ENUM CLASS Identifier ':' Type '{' {enum.body} '}'
+  enum.specifier                                      [dcl.enum]
+  : enum.head '{' enumerator.list? '}'
+  | enum.head '{' enumerator.list ',' '}'
+
+  enum.head
+  : enum.key attribute.specifier.seq? identifier? enum.base?
+  | enum.key attribute.specifier.seq? nested.name.specifier identifier
+    enum.base?
+
+  enum.key : ENUM | ENUM CLASS | ENUM STRUCT
+
+  enum.base : ':' type.specifier.seq
+
+  opaque.enum.declaration
+  : enum.key attribute.specifier.seq? identifier enum.base? ';'
+
+  C++11 [dcl.enum] (A.6)
 */
 bool Parser::rEnumSpec(typet &spec)
 {
@@ -4405,6 +4688,10 @@ bool Parser::rEnumSpec(typet &spec)
     lex.get_token(tk);
     spec.set(ID_C_class, true);
   }
+
+  // C++11 [dcl.enum] (A.6): attribute-specifier-seq after enum-key
+  if(!optAttribute(spec))
+    return false;
 
   if(lex.LookAhead(0)!='{' &&
      lex.LookAhead(0)!=':')
@@ -4462,8 +4749,17 @@ bool Parser::rEnumSpec(typet &spec)
 }
 
 /*
-  enum.body
-  : Identifier {'=' expression} (',' Identifier {'=' expression})* {','}
+  enumerator.list                                     [dcl.enum]
+  : enumerator.definition
+  | enumerator.list ',' enumerator.definition
+
+  enumerator.definition
+  : enumerator
+  | enumerator '=' constant.expression
+
+  enumerator : identifier
+
+  C++11 [dcl.enum] (A.6)
 */
 bool Parser::rEnumBody(irept &body)
 {
@@ -4483,6 +4779,11 @@ bool Parser::rEnumBody(irept &body)
     irept &n=body.get_sub().back();
     set_location(n, tk);
     n.set(ID_name, tk.data.get(ID_C_base_name));
+
+    // skip any attributes on enumerators
+    typet discarded_attribute;
+    if(!optAttribute(discarded_attribute))
+      return false;
 
     if(lex.LookAhead(0, tk2)=='=') // set the constant
     {
@@ -4513,13 +4814,17 @@ bool Parser::rEnumBody(irept &body)
 }
 
 /*
-  class.spec
-  : {userdef.keyword} class.key class.body
-  | {userdef.keyword} class.key name {class.body}
-  | {userdef.keyword} class.key name ':' base.specifiers class.body
+  class.specifier                                     [class]
+  : class.head '{' member.specification? '}'
 
-  class.key
-  : CLASS | STRUCT | UNION | INTERFACE
+  class.head
+  : class.key attribute.specifier.seq? class.head.name class.virt.specifier?
+    base.clause?
+  | class.key attribute.specifier.seq? base.clause?
+
+  class.key : CLASS | STRUCT | UNION
+
+  C++11 [class] (A.8).  Also handles INTERFACE (MS extension).
 */
 bool Parser::rClassSpec(typet &spec)
 {
@@ -4568,12 +4873,18 @@ bool Parser::rClassSpec(typet &spec)
   if(!optAttribute(spec))
     return false;
 
-  if(lex.LookAhead(0)=='{')
+  if(lex.LookAhead(0) == '{' || lex.LookAhead(0) == ':')
   {
     // no tag
 #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rClassSpec 4\n";
 #endif
+
+    if(lex.LookAhead(0) == ':')
+    {
+      if(!rBaseSpecifiers(spec.add(ID_bases)))
+        return false;
+    }
   }
   else
   {
@@ -4600,6 +4911,11 @@ bool Parser::rClassSpec(typet &spec)
     }
     else
     {
+      // Forward declaration - register the tag in the scope
+      new_scopet::kindt kind = in_template_scope()
+                                 ? new_scopet::kindt::CLASS_TEMPLATE
+                                 : new_scopet::kindt::TAG;
+      add_id(spec.find(ID_tag), kind);
       return true;
     }
   }
@@ -4609,7 +4925,12 @@ bool Parser::rClassSpec(typet &spec)
 #endif
 
   save_scopet saved_scope(current_scope);
-  make_sub_scope(spec.find(ID_tag), new_scopet::kindt::TAG);
+  {
+    new_scopet::kindt kind = in_template_scope()
+                               ? new_scopet::kindt::CLASS_TEMPLATE
+                               : new_scopet::kindt::TAG;
+    make_sub_scope(spec.find(ID_tag), kind);
+  }
 
   exprt body;
 
@@ -4625,11 +4946,19 @@ bool Parser::rClassSpec(typet &spec)
 }
 
 /*
-  base.specifiers
-  : ':' base.specifier (',' base.specifier)*
+  base.clause                                         [class.derived]
+  : ':' base.specifier.list
+
+  base.specifier.list
+  : base.specifier '...'?
+  | base.specifier.list ',' base.specifier '...'?
 
   base.specifier
-  : {{VIRTUAL} (PUBLIC | PROTECTED | PRIVATE) {VIRTUAL}} name
+  : attribute.specifier.seq? base.type.specifier
+  | attribute.specifier.seq? VIRTUAL access.specifier? base.type.specifier
+  | attribute.specifier.seq? access.specifier VIRTUAL? base.type.specifier
+
+  C++11 [class.derived] (A.9)
 */
 bool Parser::rBaseSpecifiers(irept &bases)
 {
@@ -4700,7 +5029,19 @@ bool Parser::rBaseSpecifiers(irept &bases)
 }
 
 /*
-  class.body : '{' (class.members)* '}'
+  member.specification                                [class.mem]
+  : member.declaration member.specification?
+  | access.specifier ':' member.specification?
+
+  member.declaration
+  : attribute.specifier.seq? decl.specifier.seq? member.declarator.list? ';'
+  | function.definition ';'?
+  | using.declaration
+  | static_assert.declaration
+  | template.declaration
+  | alias.declaration
+
+  C++11 [class.mem] (A.8)
 */
 bool Parser::rClassBody(exprt &body)
 {
@@ -4747,20 +5088,18 @@ bool Parser::rClassBody(exprt &body)
 }
 
 /*
-  class.member
-  : (PUBLIC | PROTECTED | PRIVATE) ':'
-  | user.access.spec
+  class.member (see member.declaration above)         [class.mem]
+  : access.specifier ':'
   | ';'
-  | type.def
-  | template.decl
+  | typedef.declaration
+  | template.declaration
   | using.declaration
-  | metaclass.decl
+  | alias.declaration
+  | static_assert.declaration
   | declaration
   | access.decl
-  | static_assert
 
-  Note: if you modify this function, see ClassWalker::TranslateClassSpec()
-  as well.
+  C++11 [class.mem] (A.8)
 */
 bool Parser::rClassMember(cpp_itemt &member)
 {
@@ -4823,8 +5162,12 @@ bool Parser::rClassMember(cpp_itemt &member)
 }
 
 /*
-  access.decl
-  : name ';'                e.g. <qualified class>::<member name>;
+  access.declaration                                  [class.access.dcl]
+  : qualified.id ';'
+
+  e.g. Base::member;
+
+  C++11 [class.access.dcl] (deprecated, prefer using-declaration)
 */
 bool Parser::rAccessDecl(cpp_declarationt &mem)
 {
@@ -4847,9 +5190,11 @@ bool Parser::rAccessDecl(cpp_declarationt &mem)
 }
 
 /*
-  comma.expression
-  : expression
-  | comma.expression ',' expression        (left-to-right)
+  expression                                          [gram.expr]
+  : assignment.expression
+  | expression ',' assignment.expression              (left-to-right)
+
+  C++11 [expr.comma] (A.4)
 */
 bool Parser::rCommaExpression(exprt &exp)
 {
@@ -4891,11 +5236,17 @@ bool Parser::rCommaExpression(exprt &exp)
 }
 
 /*
-  expression
-  : conditional.expr {(AssignOp | '=') initializer.expr}   right-to-left
+  assignment.expression                               [expr.ass]
+  : conditional.expression
+  | logical.or.expression assignment.operator initializer.clause
+  | throw.expression
 
-  C++11 [expr.ass] (A.4): the RHS of an assignment can be a
-  braced-init-list (via initializer-clause).
+  assignment.operator: one of
+    = *= /= %= += -= >>= <<= &= ^= |=
+
+  C++11 [expr.ass] (A.4): the RHS of an assignment is an
+  initializer-clause, which includes braced-init-lists.
+  throw-expression is an assignment-expression.
 */
 bool Parser::rExpression(exprt &exp, bool template_args)
 {
@@ -4905,6 +5256,9 @@ bool Parser::rExpression(exprt &exp, bool template_args)
   indenter _i;
   std::cout << std::string(__indent, ' ') << "Parser::rExpression 0\n";
 #endif
+
+  if(lex.LookAhead(0) == TOK_THROW)
+    return rThrowExpr(exp);
 
   if(!rConditionalExpr(exp, template_args))
     return false;
@@ -4975,8 +5329,11 @@ bool Parser::rExpression(exprt &exp, bool template_args)
 }
 
 /*
-  conditional.expr
-  : logical.or.expr {'?' comma.expression ':' conditional.expr}  right-to-left
+  conditional.expression                              [expr.cond]
+  : logical.or.expression
+  | logical.or.expression '?' expression ':' assignment.expression
+
+  C++11 [expr.cond] (A.4): right-to-left associativity.
 */
 bool Parser::rConditionalExpr(exprt &exp, bool template_args)
 {
@@ -5023,9 +5380,11 @@ bool Parser::rConditionalExpr(exprt &exp, bool template_args)
 }
 
 /*
-  logical.or.expr
-  : logical.and.expr
-  | logical.or.expr LogOrOp logical.and.expr                left-to-right
+  logical.or.expression                               [expr.log.or]
+  : logical.and.expression
+  | logical.or.expression '||' logical.and.expression (left-to-right)
+
+  C++11 [expr.log.or] (A.4)
 */
 bool Parser::rLogicalOrExpr(exprt &exp, bool template_args)
 {
@@ -5062,9 +5421,11 @@ bool Parser::rLogicalOrExpr(exprt &exp, bool template_args)
 }
 
 /*
-  logical.and.expr
-  : inclusive.or.expr
-  | logical.and.expr LogAndOp inclusive.or.expr
+  logical.and.expression                              [expr.log.and]
+  : inclusive.or.expression
+  | logical.and.expression '&&' inclusive.or.expression
+
+  C++11 [expr.log.and] (A.4)
 */
 bool Parser::rLogicalAndExpr(exprt &exp, bool template_args)
 {
@@ -5101,9 +5462,11 @@ bool Parser::rLogicalAndExpr(exprt &exp, bool template_args)
 }
 
 /*
-  inclusive.or.expr
-  : exclusive.or.expr
-  | inclusive.or.expr '|' exclusive.or.expr
+  inclusive.or.expression                             [expr.or]
+  : exclusive.or.expression
+  | inclusive.or.expression '|' exclusive.or.expression
+
+  C++11 [expr.or] (A.4)
 */
 bool Parser::rInclusiveOrExpr(exprt &exp, bool template_args)
 {
@@ -5140,9 +5503,11 @@ bool Parser::rInclusiveOrExpr(exprt &exp, bool template_args)
 }
 
 /*
-  exclusive.or.expr
-  : and.expr
-  | exclusive.or.expr '^' and.expr
+  exclusive.or.expression                             [expr.xor]
+  : and.expression
+  | exclusive.or.expression '^' and.expression
+
+  C++11 [expr.xor] (A.4)
 */
 bool Parser::rExclusiveOrExpr(exprt &exp, bool template_args)
 {
@@ -5179,9 +5544,11 @@ bool Parser::rExclusiveOrExpr(exprt &exp, bool template_args)
 }
 
 /*
-  and.expr
-  : equality.expr
-  | and.expr '&' equality.expr
+  and.expression                                      [expr.bit.and]
+  : equality.expression
+  | and.expression '&' equality.expression
+
+  C++11 [expr.bit.and] (A.4)
 */
 bool Parser::rAndExpr(exprt &exp, bool template_args)
 {
@@ -5218,9 +5585,12 @@ bool Parser::rAndExpr(exprt &exp, bool template_args)
 }
 
 /*
-  equality.expr
-  : relational.expr
-  | equality.expr EqualOp relational.expr
+  equality.expression                                 [expr.eq]
+  : relational.expression
+  | equality.expression '==' relational.expression
+  | equality.expression '!=' relational.expression
+
+  C++11 [expr.eq] (A.4)
 */
 bool Parser::rEqualityExpr(exprt &exp, bool template_args)
 {
@@ -5258,9 +5628,14 @@ bool Parser::rEqualityExpr(exprt &exp, bool template_args)
 }
 
 /*
-  relational.expr
-  : shift.expr
-  | relational.expr (RelOp | '<' | '>') shift.expr
+  relational.expression                               [expr.rel]
+  : shift.expression
+  | relational.expression '<' shift.expression
+  | relational.expression '>' shift.expression
+  | relational.expression '<=' shift.expression
+  | relational.expression '>=' shift.expression
+
+  C++11 [expr.rel] (A.4)
 */
 bool Parser::rRelationalExpr(exprt &exp, bool template_args)
 {
@@ -5310,9 +5685,12 @@ bool Parser::rRelationalExpr(exprt &exp, bool template_args)
 }
 
 /*
-  shift.expr
-  : additive.expr
-  | shift.expr ShiftOp additive.expr
+  shift.expression                                    [expr.shift]
+  : additive.expression
+  | shift.expression '<<' additive.expression
+  | shift.expression '>>' additive.expression
+
+  C++11 [expr.shift] (A.4)
 */
 bool Parser::rShiftExpr(exprt &exp, bool template_args)
 {
@@ -5350,9 +5728,12 @@ bool Parser::rShiftExpr(exprt &exp, bool template_args)
 }
 
 /*
-  additive.expr
-  : multiply.expr
-  | additive.expr ('+' | '-') multiply.expr
+  additive.expression                                 [expr.add]
+  : multiplicative.expression
+  | additive.expression '+' multiplicative.expression
+  | additive.expression '-' multiplicative.expression
+
+  C++11 [expr.add] (A.4)
 */
 bool Parser::rAdditiveExpr(exprt &exp)
 {
@@ -5397,9 +5778,13 @@ bool Parser::rAdditiveExpr(exprt &exp)
 }
 
 /*
-  multiply.expr
-  : pm.expr
-  | multiply.expr ('*' | '/' | '%') pm.expr
+  multiplicative.expression                           [expr.mul]
+  : pm.expression
+  | multiplicative.expression '*' pm.expression
+  | multiplicative.expression '/' pm.expression
+  | multiplicative.expression '%' pm.expression
+
+  C++11 [expr.mul] (A.4)
 */
 bool Parser::rMultiplyExpr(exprt &exp)
 {
@@ -5449,10 +5834,12 @@ bool Parser::rMultiplyExpr(exprt &exp)
 }
 
 /*
-  pm.expr        (pointer to member .*, ->*)
-  : cast.expr
-  | pm.expr DOTPM cast.expr
-  | pm.expr ARROWPM cast.expr
+  pm.expression                                       [expr.mptr.oper]
+  : cast.expression
+  | pm.expression '.*' cast.expression
+  | pm.expression '->*' cast.expression
+
+  C++11 [expr.mptr.oper] (A.4)
 */
 bool Parser::rPmExpr(exprt &exp)
 {
@@ -5494,10 +5881,13 @@ bool Parser::rPmExpr(exprt &exp)
 }
 
 /*
-  cast.expr
-  : unary.expr
-  | '(' type.name ')' cast.expr
-  | '(' type.name ')' initializer.expr  -- GCC/Clang extension
+  cast.expression                                     [expr.cast]
+  : unary.expression
+  | '(' type.id ')' cast.expression
+
+  Extension: '(' type.id ')' braced.init.list (GCC/Clang compound literal)
+
+  C++11 [expr.cast] (A.4)
 */
 bool Parser::rCastExpr(exprt &exp)
 {
@@ -5570,8 +5960,10 @@ bool Parser::rCastExpr(exprt &exp)
 }
 
 /*
-  type.name
-  : type.specifier cast.declarator
+  type.id                                             [dcl.name]
+  : type.specifier.seq abstract.declarator?
+
+  C++11 [dcl.name] (A.7)
 */
 bool Parser::rTypeName(typet &tname)
 {
@@ -5791,13 +6183,23 @@ bool Parser::rTypeNameOrFunctionType(typet &tname)
 }
 
 /*
-  unary.expr
-  : postfix.expr
-  | ('*' | '&' | '+' | '-' | '!' | '~' | IncOp) cast.expr
-  | sizeof.expr
-  | allocate.expr
-  | throw.expression
-  | noexcept.expr
+  unary.expression                                    [expr.unary]
+  : postfix.expression
+  | '++' cast.expression
+  | '--' cast.expression
+  | unary.operator cast.expression
+  | SIZEOF unary.expression
+  | SIZEOF '(' type.id ')'
+  | SIZEOF '...' '(' identifier ')'
+  | ALIGNOF '(' type.id ')'
+  | noexcept.expression
+  | new.expression
+  | delete.expression
+
+  unary.operator: one of  * & + - ! ~
+
+  C++11 [expr.unary] (A.4): throw-expression is handled in rExpression
+  as it is an assignment-expression.
 */
 
 bool Parser::rUnaryExpr(exprt &exp)
@@ -5877,8 +6279,6 @@ bool Parser::rUnaryExpr(exprt &exp)
     return rSizeofExpr(exp);
   else if(t==TOK_ALIGNOF)
     return rAlignofExpr(exp);
-  else if(t==TOK_THROW)
-    return rThrowExpr(exp);
   else if(t==TOK_NOEXCEPT)
     return rNoexceptExpr(exp);
   else if(t==TOK_REAL || t==TOK_IMAG)
@@ -5904,8 +6304,10 @@ bool Parser::rUnaryExpr(exprt &exp)
 }
 
 /*
-  throw.expression
-  : THROW {expression}
+  throw.expression                                    [except.throw]
+  : THROW {assignment.expression}
+
+  C++11 [except] (A.13)
 */
 bool Parser::rThrowExpr(exprt &exp)
 {
@@ -5942,9 +6344,11 @@ bool Parser::rThrowExpr(exprt &exp)
 }
 
 /*
-  typeid.expr
+  typeid.expression                                   [expr.typeid]
   : TYPEID '(' expression ')'
-  | TYPEID '(' type.name ')'
+  | TYPEID '(' type.id ')'
+
+  C++11 [expr.typeid] (A.4)
 */
 bool Parser::rTypeidExpr(exprt &exp)
 {
@@ -6006,10 +6410,12 @@ bool Parser::rTypeidExpr(exprt &exp)
 }
 
 /*
-  sizeof.expr
-  : SIZEOF unary.expr
-  | SIZEOF '(' type.name ')'
-  | SIZEOF Ellipsis '(' Identifier ')'
+  sizeof.expression                                   [expr.sizeof]
+  : SIZEOF unary.expression
+  | SIZEOF '(' type.id ')'
+  | SIZEOF '...' '(' identifier ')'
+
+  C++11 [expr.sizeof] (A.4)
 */
 
 bool Parser::rSizeofExpr(exprt &exp)
@@ -6080,8 +6486,10 @@ bool Parser::rSizeofExpr(exprt &exp)
 }
 
 /*
-  alignof.expr
-  | ALIGNOF '(' type.name ')'
+  alignof.expression                                  [expr.alignof]
+  : ALIGNOF '(' type.id ')'
+
+  C++11 [expr.alignof] (A.4)
 */
 
 bool Parser::rAlignofExpr(exprt &exp)
@@ -6110,7 +6518,9 @@ bool Parser::rAlignofExpr(exprt &exp)
 
 /*
   noexcept.expr
-  : NOEXCEPT '(' expression ')'
+  : NOEXCEPT '(' comma.expression ')'
+
+  C++11 [expr.unary.noexcept] (A.4)
 */
 bool Parser::rNoexceptExpr(exprt &exp)
 {
@@ -6124,27 +6534,24 @@ bool Parser::rNoexceptExpr(exprt &exp)
   if(lex.get_token(tk)!=TOK_NOEXCEPT)
     return false;
 
-  if(lex.LookAhead(0)=='(')
-  {
-    exprt subexp;
-    cpp_tokent op, cp;
+  if(lex.LookAhead(0) != '(')
+    return false;
 
-    lex.get_token(op);
+  exprt subexp;
+  cpp_tokent op, cp;
 
-    if(rExpression(subexp, false))
-    {
-      if(lex.get_token(cp)==')')
-      {
-        // TODO
-        exp=exprt(ID_noexcept);
-        exp.add_to_operands(std::move(subexp));
-        set_location(exp, tk);
-        return true;
-      }
-    }
-  }
-  else
-    return true;
+  lex.get_token(op);
+
+  if(!rCommaExpression(subexp))
+    return false;
+
+  if(lex.get_token(cp) != ')')
+    return false;
+
+  exp = exprt(ID_noexcept);
+  exp.add_to_operands(std::move(subexp));
+  set_location(exp, tk);
+  return true;
 
   return false;
 }
@@ -6158,9 +6565,15 @@ bool Parser::isAllocateExpr(int t)
 }
 
 /*
-  allocate.expr
-  : {Scope | userdef.keyword} NEW allocate.type
-  | {Scope} DELETE {'[' ']'} cast.expr
+  new.expression                                      [expr.new]
+  : '::'? NEW new.placement? new.type.id new.initializer?
+  | '::'? NEW new.placement? '(' type.id ')' new.initializer?
+
+  delete.expression                                   [expr.delete]
+  : '::'? DELETE cast.expression
+  | '::'? DELETE '[' ']' cast.expression
+
+  C++11 [expr.new], [expr.delete] (A.4)
 */
 bool Parser::rAllocateExpr(exprt &exp)
 {
@@ -6247,9 +6660,17 @@ bool Parser::rAllocateExpr(exprt &exp)
 
 /*
   allocate.type
-  : {'(' function.arguments ')'} type.specifier new.declarator
-    {allocate.initializer}
-  | {'(' function.arguments ')'} '(' type.name ')' {allocate.initializer}
+  : new.placement? type.specifier new.declarator? new.initializer?
+  | new.placement? '(' type.id ')' new.initializer?
+
+  new.placement                                       [expr.new]
+  : '(' expression.list ')'
+
+  new.initializer
+  : '(' expression.list? ')'
+  | braced.init.list
+
+  C++11 [expr.new] (A.4)
 */
 
 bool Parser::rAllocateType(
@@ -6343,10 +6764,15 @@ bool Parser::rAllocateType(
 }
 
 /*
-  new.declarator
-  : empty
-  | ptr.operator
-  | {ptr.operator} ('[' comma.expression ']')+
+  new.declarator                                      [expr.new]
+  : ptr.operator new.declarator?
+  | noptr.new.declarator
+
+  noptr.new.declarator
+  : '[' expression ']' attribute.specifier.seq?
+  | noptr.new.declarator '[' constant.expression ']' attribute.specifier.seq?
+
+  C++11 [expr.new] (A.4)
 */
 bool Parser::rNewDeclarator(typet &decl)
 {
@@ -6376,8 +6802,11 @@ bool Parser::rNewDeclarator(typet &decl)
 }
 
 /*
-  allocate.initializer
-  : '(' {initialize.expr (',' initialize.expr)* } ')'
+  new.initializer                                     [expr.new]
+  : '(' expression.list? ')'
+  | braced.init.list
+
+  C++11 [expr.new] (A.4)
 */
 bool Parser::rAllocateInitializer(exprt &init)
 {
@@ -6421,19 +6850,27 @@ bool Parser::rAllocateInitializer(exprt &init)
 }
 
 /*
-  postfix.expr
-  : primary.expr
-  | postfix.expr '[' comma.expression ']'
-  | postfix.expr '[' initializer.expr ']'
-  | postfix.expr '(' function.arguments ')'
-  | postfix.expr '.' var.name
-  | postfix.expr ArrowOp var.name
-  | postfix.expr IncOp
-  | c++cast.expr
-  | typeid.expr
+  postfix.expression                                  [expr.post]
+  : primary.expression
+  | postfix.expression '[' expression ']'
+  | postfix.expression '[' braced.init.list ']'
+  | postfix.expression '(' expression.list? ')'
+  | simple.type.specifier '(' expression.list? ')'
+  | typename.specifier '(' expression.list? ')'
+  | simple.type.specifier braced.init.list
+  | typename.specifier braced.init.list
+  | postfix.expression '.' TEMPLATE? id.expression
+  | postfix.expression '->' TEMPLATE? id.expression
+  | postfix.expression '++'
+  | postfix.expression '--'
+  | DYNAMIC_CAST '<' type.id '>' '(' expression ')'
+  | STATIC_CAST '<' type.id '>' '(' expression ')'
+  | REINTERPRET_CAST '<' type.id '>' '(' expression ')'
+  | CONST_CAST '<' type.id '>' '(' expression ')'
+  | TYPEID '(' expression ')'
+  | TYPEID '(' type.id ')'
 
-  C++11 [expr.post] (A.4): C++ cast expressions and typeid are
-  postfix-expressions.
+  C++11 [expr.post] (A.4)
 */
 bool Parser::rPostfixExpr(exprt &exp)
 {
@@ -6814,10 +7251,24 @@ bool Parser::rTypePredicate(exprt &expr)
       return false;
     if(!rTypeName(tname1))
       return false;
+    if(lex.LookAhead(0) == TOK_ELLIPSIS)
+      lex.get_token(tk);
     if(lex.get_token(tk)!=',')
       return false;
     if(!rTypeName(tname2))
       return false;
+    if(lex.LookAhead(0) == TOK_ELLIPSIS)
+      lex.get_token(tk);
+    // consume any additional type arguments (variadic traits)
+    while(lex.LookAhead(0) == ',')
+    {
+      lex.get_token(tk);
+      typet extra;
+      if(!rTypeName(extra))
+        return false;
+      if(lex.LookAhead(0) == TOK_ELLIPSIS)
+        lex.get_token(tk);
+    }
     if(lex.get_token(tk)!=')')
       return false;
     expr.add("type_arg1").swap(tname1);
@@ -6832,20 +7283,18 @@ bool Parser::rTypePredicate(exprt &expr)
 }
 
 /*
-  primary.exp
-  : Constant
-  | CharConst
-  | WideCharConst
-  | String
-  | WideStringL
+  primary.expression                                  [expr.prim]
+  : literal
   | THIS
-  | var.name
-  | '(' comma.expression ')'
-  | integral.or.class.spec '(' function.arguments ')'
-  | integral.or.class.spec braced.init.list
-  | true
-  | false
-  | nullptr
+  | '(' expression ')'
+  | id.expression
+  | lambda.expression                                 (not yet supported)
+
+  literal: integer | character | floating | string | boolean | pointer
+
+  C++11 [expr.prim.general] (A.4).  The simple-type-specifier and
+  typename-specifier forms of postfix-expression are also handled here
+  when the type is followed by '(' or '{'.
 */
 bool Parser::rPrimaryExpr(exprt &exp)
 {
@@ -7080,14 +7529,15 @@ bool Parser::rPrimaryExpr(exprt &exp)
 }
 
 /*
-  var.name : {'::'} name2 ('::' name2)*
+  id.expression (in expression context)               [expr.prim]
+  : unqualified.id
+  | qualified.id
 
-  name2
-  : Identifier {template.args}
-  | '~' Identifier
-  | OPERATOR operator.name
+  Uses maybeTemplateArgs() to disambiguate '<' as template arguments
+  vs. less-than operator.  If the name ends with a template type,
+  the next token must be '(' or '{'.
 
-  if var.name ends with a template type, the next token must be '('
+  C++11 [expr.prim] (A.4)
 */
 bool Parser::rVarName(exprt &name)
 {
@@ -7162,8 +7612,9 @@ bool Parser::rVarNameCore(exprt &name)
       components.push_back(cpp_namet::namet(tk.data.get(ID_C_base_name)));
       set_location(components.back(), tk);
 
-      // may be followed by template arguments
-      if(maybeTemplateArgs())
+      // may be followed by template arguments, but only if the
+      // identifier could be a type or template name
+      if(maybeTemplateArgs() && MaybeTypeNameOrClassTemplate(tk))
       {
         cpp_token_buffert::post pos=lex.Save();
 
@@ -7229,6 +7680,30 @@ bool Parser::rVarNameCore(exprt &name)
       }
       return true;
 
+    case TOK_DECLTYPE:
+      // C++11: decltype(expr)::member
+      lex.get_token(tk);
+      {
+        components.push_back(typet{ID_decltype});
+        set_location(components.back(), tk);
+
+        if(lex.get_token(tk) != '(')
+          return false;
+
+        exprt expr;
+        if(!rCommaExpression(expr))
+          return false;
+
+        if(lex.get_token(tk) != ')')
+          return false;
+
+        components.back().add(ID_expr_arg).swap(expr);
+
+        if(lex.LookAhead(0) != TOK_SCOPE)
+          return false;
+      }
+      break;
+
     default:
       return false;
     }
@@ -7248,9 +7723,14 @@ bool Parser::moreVarName()
 }
 
 /*
-  template.args : '<' any* '>'
+  template.args (in expression context)               [temp.names]
+  : '<' template.argument.list? '>'
 
-  template.args must be followed by '(' or '::'
+  Nesting-aware: tracks '<>' depth and parenthesized sub-expressions.
+  Returns true only when a matching '>' is found and followed by a
+  valid follow token ('::', '(', ')', '{', ',', ';').
+
+  C++11 [temp.names] (A.12)
 */
 bool Parser::maybeTemplateArgs()
 {
@@ -7264,35 +7744,13 @@ bool Parser::maybeTemplateArgs()
 
   if(t=='<')
   {
-#if 1
+    int n = 1;
     for(;;)
     {
       int u=lex.LookAhead(i++);
       if(u=='\0' || u==';' || u=='}')
         return false;
-      else if((u=='>' || u==TOK_SHIFTRIGHT) &&
-              (lex.LookAhead(i)==TOK_SCOPE || lex.LookAhead(i)=='(' ||
-               lex.LookAhead(i)==')'))
-        return true;
-    }
-#else
-    int n=1;
-
-    while(n>0)
-    {
-#ifdef DEBUG
-      std::cout << std::string(__indent, ' ')
-                << "Parser::maybeTemplateArgs 1\n";
-#endif
-
-      int u=lex.LookAhead(i++);
-
-#ifdef DEBUG
-      std::cout << std::string(__indent, ' ')
-                << "Parser::maybeTemplateArgs 2\n";
-#endif
-
-      if(u=='<')
+      else if(u == '<')
         ++n;
       else if(u=='>')
         --n;
@@ -7301,13 +7759,7 @@ bool Parser::maybeTemplateArgs()
         int m=1;
         while(m>0)
         {
-          int v=lex.LookAhead(i++);
-
-#ifdef DEBUG
-          std::cout << std::string(__indent, ' ')
-                    << "Parser::maybeTemplateArgs 3\n";
-#endif
-
+          int v = lex.LookAhead(i++);
           if(v=='(')
             ++m;
           else if(v==')')
@@ -7316,29 +7768,15 @@ bool Parser::maybeTemplateArgs()
             return false;
         }
       }
-      else if(u=='\0' || u==';' || u=='}')
-        return false;
       else if(u==TOK_SHIFTRIGHT && n>=2)
         n-=2;
 
-#ifdef DEBUG
-      std::cout << std::string(__indent, ' ')
-                << "Parser::maybeTemplateArgs 4\n";
-#endif
+      if(n == 0)
+        break;
     }
 
-#ifdef DEBUG
-    std::cout << std::string(__indent, ' ') << "Parser::maybeTemplateArgs 5\n";
-#endif
-
     t=lex.LookAhead(i);
-
-#ifdef DEBUG
-    std::cout << std::string(__indent, ' ') << "Parser::maybeTemplateArgs 6\n";
-#endif
-
-    return t==TOK_SCOPE || t=='(';
-#endif
+    return t == TOK_SCOPE || t == '(' || t == ')' || t == '{';
   }
 
 #ifdef DEBUG
@@ -7349,8 +7787,13 @@ bool Parser::maybeTemplateArgs()
 }
 
 /*
-  function.body  : compound.statement
-                 | { asm }
+  function.body                                       [dcl.fct.def]
+  : ctor.initializer? compound.statement
+  | function.try.block
+  | '=' DEFAULT ';'
+  | '=' DELETE ';'
+
+  C++11 [dcl.fct.def] (A.7)
 */
 
 bool Parser::rFunctionBody(cpp_declaratort &declarator)
@@ -7397,8 +7840,10 @@ bool Parser::rFunctionBody(cpp_declaratort &declarator)
 }
 
 /*
-  compound.statement
-  : '{' (statement)* '}'
+  compound.statement                                  [stmt.block]
+  : '{' statement.seq? '}'
+
+  C++11 [stmt.block] (A.5)
 */
 std::optional<codet> Parser::rCompoundStatement()
 {
@@ -7441,25 +7886,30 @@ std::optional<codet> Parser::rCompoundStatement()
 }
 
 /*
-  statement
-  : compound.statement
-  | typedef
-  | if.statement
-  | switch.statement
-  | while.statement
-  | do.statement
-  | for.statement
-  | try.statement
-  | BREAK ';'
+  statement                                           [gram.stmt]
+  : labeled.statement
+  | attribute.specifier.seq? expression.statement
+  | attribute.specifier.seq? compound.statement
+  | attribute.specifier.seq? selection.statement
+  | attribute.specifier.seq? iteration.statement
+  | attribute.specifier.seq? jump.statement
+  | declaration.statement
+  | attribute.specifier.seq? try.block
+
+  labeled.statement
+  : attribute.specifier.seq? identifier ':' statement
+  | attribute.specifier.seq? CASE constant.expression ':' statement
+  | attribute.specifier.seq? DEFAULT ':' statement
+
+  jump.statement
+  : BREAK ';'
   | CONTINUE ';'
-  | RETURN { comma.expression } ';'
-  | GOTO Identifier ';'
-  | CASE expression ':' statement
-  | DEFAULT ':' statement
-  | Identifier ':' statement
-  | expr.statement
-  | USING { NAMESPACE } identifier ';'
-  | STATIC_ASSERT ( expression ',' expression ) ';'
+  | RETURN expression? ';'
+  | RETURN braced.init.list ';'
+  | GOTO identifier ';'
+
+  C++11 [stmt.stmt] (A.5).  Also handles USING declarations and
+  STATIC_ASSERT in statement context.
 */
 std::optional<codet> Parser::rStatement()
 {
@@ -7692,7 +8142,8 @@ std::optional<codet> Parser::rStatement()
       if(!rUsing(cpp_using))
         return {};
 
-      UNIMPLEMENTED;
+      // using declarations in statement context are silently skipped
+      return code_skipt();
     }
 
   case TOK_STATIC_ASSERT:
@@ -7709,14 +8160,29 @@ std::optional<codet> Parser::rStatement()
       return std::move(statement);
     }
 
+    case TOK_GCC_ATTRIBUTE:
+    {
+      // __attribute__((...)) as a statement (e.g., __attribute__((__assume__(...))))
+      typet discard;
+      lex.get_token();
+      if(!rGCCAttribute(discard))
+        return {};
+      if(lex.LookAhead(0) == ';')
+        lex.get_token();
+      return code_skipt();
+    }
+
   default:
     return rExprStatement();
   }
 }
 
 /*
-  if.statement
-  : IF '(' comma.expression ')' statement { ELSE statement }
+  selection.statement: if                             [stmt.if]
+  : IF '(' condition ')' statement
+  | IF '(' condition ')' statement ELSE statement
+
+  C++11 [stmt.select] (A.5)
 */
 std::optional<codet> Parser::rIfStatement()
 {
@@ -7762,8 +8228,10 @@ std::optional<codet> Parser::rIfStatement()
 }
 
 /*
-  switch.statement
-  : SWITCH '(' comma.expression ')' statement
+  selection.statement: switch                         [stmt.switch]
+  : SWITCH '(' condition ')' statement
+
+  C++11 [stmt.select] (A.5)
 */
 std::optional<codet> Parser::rSwitchStatement()
 {
@@ -7793,8 +8261,10 @@ std::optional<codet> Parser::rSwitchStatement()
 }
 
 /*
-  while.statement
-  : WHILE '(' comma.expression ')' statement
+  iteration.statement: while                          [stmt.while]
+  : WHILE '(' condition ')' statement
+
+  C++11 [stmt.iter] (A.5)
 */
 std::optional<codet> Parser::rWhileStatement()
 {
@@ -7824,8 +8294,10 @@ std::optional<codet> Parser::rWhileStatement()
 }
 
 /*
-  do.statement
-  : DO statement WHILE '(' comma.expression ')' ';'
+  iteration.statement: do                             [stmt.do]
+  : DO statement WHILE '(' expression ')' ';'
+
+  C++11 [stmt.iter] (A.5)
 */
 std::optional<codet> Parser::rDoStatement()
 {
@@ -7860,9 +8332,15 @@ std::optional<codet> Parser::rDoStatement()
 }
 
 /*
-  for.statement
-  : FOR '(' expr.statement {comma.expression} ';' {comma.expression} ')'
-    statement
+  iteration.statement: for                            [stmt.for]
+  : FOR '(' for.init.statement condition? ';' expression? ')' statement
+  | FOR '(' for.range.declaration ':' for.range.initializer ')' statement
+
+  for.init.statement
+  : expression.statement
+  | simple.declaration
+
+  C++11 [stmt.iter] (A.5).  Range-based for is not yet supported.
 */
 std::optional<codet> Parser::rForStatement()
 {
@@ -7915,11 +8393,21 @@ std::optional<codet> Parser::rForStatement()
 }
 
 /*
-  try.statement
-  : TRY compound.statement (exception.handler)+ ';'
+  try.block                                           [except.handle]
+  : TRY compound.statement handler.seq
 
-  exception.handler
-  : CATCH '(' (arg.declaration | Ellipsis) ')' compound.statement
+  handler.seq
+  : handler handler.seq?
+
+  handler
+  : CATCH '(' exception.declaration ')' compound.statement
+
+  exception.declaration
+  : attribute.specifier.seq? type.specifier.seq declarator
+  | attribute.specifier.seq? type.specifier.seq abstract.declarator?
+  | '...'
+
+  C++11 [except] (A.13)
 */
 std::optional<codet> Parser::rTryStatement()
 {
@@ -8243,12 +8731,13 @@ std::optional<codet> Parser::rMSCAsmStatement()
 }
 
 /*
-  expr.statement
-  : ';'
-  | declaration.statement
-  | comma.expression ';'
-  | openc++.postfix.expr
-  | openc++.primary.exp
+  expression.statement                                [stmt.expr]
+  : expression? ';'
+
+  Also handles declaration.statement when the expression turns out to
+  be a declaration.
+
+  C++11 [stmt.expr] (A.5)
 */
 std::optional<codet> Parser::rExprStatement()
 {
@@ -8348,18 +8837,21 @@ bool Parser::rCondition(exprt &statement)
 }
 
 /*
-  declaration.statement
-  : decl.head integral.or.class.spec {cv.qualify} {declarators} ';'
-  | decl.head name {cv.qualify} declarators ';'
-  | const.declaration
+  declaration.statement                               [stmt.dcl]
+  : block.declaration
 
-  decl.head
-  : {storage.spec} {cv.qualify}
-
-  const.declaration
-  : cv.qualify {'*'} Identifier '=' expression {',' declarators} ';'
+  block.declaration                                   [dcl.dcl]
+  : simple.declaration
+  | asm.definition
+  | namespace.alias.definition
+  | using.declaration
+  | using.directive
+  | static_assert.declaration
+  | alias.declaration
 
   Note: if you modify this function, take a look at rDeclaration(), too.
+
+  C++11 [stmt.dcl], [dcl.dcl] (A.5, A.6)
 */
 std::optional<codet> Parser::rDeclarationStatement()
 {
@@ -8521,9 +9013,22 @@ Parser::rOtherDeclStatement(cpp_storage_spect &storage_spec, typet &cv_q)
   return std::move(statement);
 }
 
-bool Parser::MaybeTypeNameOrClassTemplate(cpp_tokent &)
+bool Parser::MaybeTypeNameOrClassTemplate(cpp_tokent &tk)
 {
-  return true;
+  if(!is_identifier(tk.kind))
+    return true;
+
+  irep_idt id = tk.data.get(ID_C_base_name);
+  if(id.empty())
+    return true;
+
+  new_scopet *found = lookup_id(id);
+
+  // Unknown identifier: assume it could be a type
+  if(found == nullptr)
+    return true;
+
+  return found->is_type() || found->is_template();
 }
 
 void Parser::SkipTo(int token)
