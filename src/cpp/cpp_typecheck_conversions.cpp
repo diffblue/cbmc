@@ -1061,6 +1061,35 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
         }
         if(found)
           return true;
+
+        // No non-template converting constructor found. Try template
+        // constructors via the full constructor resolution path, but
+        // only if there are non-explicit template constructors.
+        if(
+          !in_template_conversion &&
+          struct_type_to.get_bool("has_template_constructor"))
+        {
+          in_template_conversion = true;
+          null_message_handlert null_handler;
+          message_handlert &old_handler = get_message_handler();
+          set_message_handler(null_handler);
+          try
+          {
+            exprt tmp_expr;
+            exprt::operandst ops;
+            ops.push_back(expr);
+            new_temporary(expr.source_location(), to, ops, tmp_expr);
+            set_message_handler(old_handler);
+            in_template_conversion = false;
+            new_expr.swap(tmp_expr);
+            return true;
+          }
+          catch(...)
+          {
+            set_message_handler(old_handler);
+            in_template_conversion = false;
+          }
+        }
       }
   }
 
@@ -1270,6 +1299,32 @@ bool cpp_typecheckt::reference_binding(
     else
       return false;
   }
+
+  // C++11: rvalue references cannot bind to lvalues.
+  // Temporaries are internally marked as lvalues but are rvalues in C++.
+  // Also, implicit dereferences of rvalue references are xvalues, not lvalues.
+  if(
+    is_rvalue_reference(reference_type) && expr.get_bool(ID_C_lvalue) &&
+    expr.get(ID_statement) != ID_temporary_object &&
+    !(expr.id() == ID_dereference && expr.get_bool(ID_C_implicit) &&
+      (is_rvalue_reference(to_dereference_expr(expr).pointer().type()) ||
+       (to_dereference_expr(expr).pointer().id() == ID_address_of &&
+        to_address_of_expr(to_dereference_expr(expr).pointer())
+            .object()
+            .get(ID_statement) == ID_temporary_object))))
+    return false;
+
+  // C++11: xvalues (implicit dereferences of rvalue references) cannot
+  // bind to non-const lvalue references. Named rvalue reference variables
+  // are lvalues, so only reject unnamed rvalue references (e.g., from
+  // static_cast or function return values).
+  if(
+    !is_rvalue_reference(reference_type) &&
+    !reference_type.base_type().get_bool(ID_C_constant) &&
+    expr.id() == ID_dereference && expr.get_bool(ID_C_implicit) &&
+    is_rvalue_reference(to_dereference_expr(expr).pointer().type()) &&
+    to_dereference_expr(expr).pointer().id() != ID_symbol)
+    return false;
 
   if(
     expr.get_bool(ID_C_lvalue) ||
@@ -1930,6 +1985,21 @@ bool cpp_typecheckt::static_typecast(
 
   add_implicit_dereference(e);
 
+  // rvalue reference: static_cast<T&&>(expr)
+  // Must be checked before lvalue reference since rvalue references
+  // also have C_reference set.
+  if(type.get_bool(ID_C_rvalue_reference))
+  {
+    typet subto = to_pointer_type(type).base_type();
+    if(e.type() == subto)
+    {
+      new_expr = address_of_exprt(e, to_pointer_type(type));
+      new_expr.add_source_location() = e.source_location();
+      return true;
+    }
+    return false;
+  }
+
   if(type.get_bool(ID_C_reference))
   {
     const reference_typet &reference_type = to_reference_type(type);
@@ -1971,19 +2041,6 @@ bool cpp_typecheckt::static_typecast(
         new_expr.swap(address_of);
         return true;
       }
-    }
-    return false;
-  }
-
-  // rvalue reference: static_cast<T&&>(expr)
-  if(type.get_bool(ID_C_rvalue_reference))
-  {
-    typet subto = to_pointer_type(type).base_type();
-    if(e.type() == subto)
-    {
-      new_expr = address_of_exprt(e, to_pointer_type(type));
-      new_expr.add_source_location() = e.source_location();
-      return true;
     }
     return false;
   }

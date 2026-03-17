@@ -1753,7 +1753,13 @@ exprt cpp_typecheck_resolvet::resolve(
       guess_function_template_args(new_identifiers, fargs);
 
       if(new_identifiers.empty())
+      {
         new_identifiers=identifiers;
+        // Template deduction failed for all templates, so remove them
+        // to prevent raw template declarations from entering
+        // disambiguate_functions.
+        remove_templates(new_identifiers);
+      }
     }
 
     disambiguate_functions(new_identifiers, fargs);
@@ -2313,7 +2319,21 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
       // sorts of trouble.
       cpp_convert_plain_type(arg_type, cpp_typecheck.get_message_handler());
 
-      guess_template_args(arg_type, it->type());
+      // C++11 forwarding reference: if the parameter is T&& where T is
+      // a template parameter, and the argument is an lvalue, deduce T
+      // as the argument type with an added lvalue reference.
+      if(
+        is_rvalue_reference(arg_type) && it->get_bool(ID_C_lvalue) &&
+        to_pointer_type(arg_type).base_type().id() == ID_cpp_name)
+      {
+        typet lvalue_ref_type = ::reference_type(it->type());
+        guess_template_args(
+          to_pointer_type(arg_type).base_type(), lvalue_ref_type);
+      }
+      else
+      {
+        guess_template_args(arg_type, it->type());
+      }
     }
 
     ++it;
@@ -2658,36 +2678,44 @@ bool cpp_typecheck_resolvet::disambiguate_functions(
     // we add one
     if(!fargs.has_object)
     {
-      const code_typet::parameterst &parameters=type.parameters();
-      const code_typet::parametert &parameter=parameters.front();
+      const code_typet::parameterst &parameters = type.parameters();
 
-      INVARIANT(parameter.get_this(), "first parameter should be `this'");
-
-      if(type.return_type().id() == ID_constructor)
+      if(!parameters.empty() && parameters.front().get_this())
       {
-        // it's a constructor
-        const typet &object_type =
-          to_pointer_type(parameter.type()).base_type();
-        symbol_exprt object(irep_idt(), object_type);
-        object.set(ID_C_lvalue, true);
+        const code_typet::parametert &parameter = parameters.front();
 
-        cpp_typecheck_fargst new_fargs(fargs);
-        new_fargs.add_object(object);
-        return new_fargs.match(type, args_distance, cpp_typecheck);
+        if(type.return_type().id() == ID_constructor)
+        {
+          // it's a constructor
+          const typet &object_type =
+            to_pointer_type(parameter.type()).base_type();
+          symbol_exprt object(irep_idt(), object_type);
+          object.set(ID_C_lvalue, true);
+
+          cpp_typecheck_fargst new_fargs(fargs);
+          new_fargs.add_object(object);
+          return new_fargs.match(type, args_distance, cpp_typecheck);
+        }
+        else
+        {
+          if(
+            expr.type().get_bool(ID_C_is_operator) &&
+            fargs.operands.size() == parameters.size())
+          {
+            return fargs.match(type, args_distance, cpp_typecheck);
+          }
+
+          cpp_typecheck_fargst new_fargs(fargs);
+          new_fargs.add_object(to_member_expr(expr).compound());
+
+          return new_fargs.match(type, args_distance, cpp_typecheck);
+        }
       }
       else
       {
-        if(
-          expr.type().get_bool(ID_C_is_operator) &&
-          fargs.operands.size() == parameters.size())
-        {
-          return fargs.match(type, args_distance, cpp_typecheck);
-        }
-
-        cpp_typecheck_fargst new_fargs(fargs);
-        new_fargs.add_object(to_member_expr(expr).compound());
-
-        return new_fargs.match(type, args_distance, cpp_typecheck);
+        // Template function instance without this parameter yet;
+        // match directly against the parameters.
+        return fargs.match(type, args_distance, cpp_typecheck);
       }
     }
   }

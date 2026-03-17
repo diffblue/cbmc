@@ -99,6 +99,22 @@ void cpp_typecheckt::typecheck_type(typet &type)
     // but do subtype first
     typecheck_type(to_pointer_type(type).base_type());
 
+    // C++11 reference collapsing: if this is a reference/rvalue reference
+    // and the base type is also a reference, collapse them.
+    if(
+      type.get_bool(ID_C_reference) &&
+      to_pointer_type(type).base_type().id() == ID_pointer &&
+      to_pointer_type(type).base_type().get_bool(ID_C_reference))
+    {
+      // The result is an lvalue reference unless both are rvalue references
+      bool both_rvalue =
+        type.get_bool(ID_C_rvalue_reference) &&
+        to_pointer_type(type).base_type().get_bool(ID_C_rvalue_reference);
+      type = to_pointer_type(type).base_type();
+      if(!both_rvalue)
+        type.remove(ID_C_rvalue_reference);
+    }
+
     // Check if it is a pointer-to-member
     if(type.find(ID_to_member).is_not_nil())
     {

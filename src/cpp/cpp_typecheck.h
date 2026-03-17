@@ -580,6 +580,7 @@ private:
   typedef std::list<irep_idt> dynamic_initializationst;
   dynamic_initializationst dynamic_initializations;
   bool disable_access_control;           // Disable protect and private
+  bool in_template_conversion = false;   // Prevent recursion in conversion
   std::unordered_set<irep_idt> deferred_typechecking;
   bool support_float16_type;
 };
