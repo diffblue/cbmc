@@ -11,11 +11,12 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_type2name.h"
 
-#include <string>
-
 #include <util/cprover_prefix.h>
 #include <util/pointer_expr.h>
+#include <util/std_types.h>
 #include <util/type.h>
+
+#include <string>
 
 static std::string do_prefix(const std::string &s)
 {
@@ -180,6 +181,10 @@ std::string cpp_type2name(const typet &type)
       result += "_lref";
     else if(ref_qualifier == "&&")
       result += "_rref";
+  }
+  else if(type.id() == ID_complex)
+  {
+    result += "complex_" + cpp_type2name(to_complex_type(type).subtype());
   }
   else
   {
