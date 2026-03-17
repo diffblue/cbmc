@@ -279,8 +279,12 @@ void goto_symext::dereference_rec(
         const dereference_exprt to_check =
           to_dereference_expr(get_original_name(expr));
 
-        expr_is_not_null = path_storage.safe_pointers.at(expr_function)
-                             .is_safe_dereference(to_check, state.source.pc);
+        auto sp_it = path_storage.safe_pointers.find(expr_function);
+        if(sp_it != path_storage.safe_pointers.end())
+        {
+          expr_is_not_null =
+            sp_it->second.is_safe_dereference(to_check, state.source.pc);
+        }
       }
     }
 

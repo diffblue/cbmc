@@ -5,6 +5,7 @@
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 #include <util/c_types.h>
+#include <util/expr_util.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
@@ -380,6 +381,57 @@ void cpp_typecheckt::provide_stdlib_bodies()
         symbol.value = std::move(body);
         symbol.value.type() = symbol.type;
         deferred_typechecking.erase(symbol.name);
+      }
+    }
+    else if(
+      base == "base" && name.find("__normal_iterator") != std::string::npos &&
+      (symbol.value.is_nil() || is_deferred ||
+       has_subexpr(symbol.value, ID_cpp_name) ||
+       has_subexpr(symbol.value, irep_idt("cpp-this"))))
+    {
+      // __normal_iterator::base() — return _M_current member
+      const code_typet &fn_type = to_code_type(symbol.type);
+      const auto &params = fn_type.parameters();
+      if(!params.empty())
+      {
+        ensure_parameter_symbols(symbol, symbol_table);
+        // this->_M_current
+        const irep_idt &this_id = params[0].get_identifier();
+        if(!this_id.empty())
+        {
+          const typet &this_type = params[0].type();
+          // this is a pointer to the struct
+          if(this_type.id() == ID_pointer)
+          {
+            const typet &struct_type = to_pointer_type(this_type).base_type();
+            // Look up _M_current component
+            if(struct_type.id() == ID_struct_tag)
+            {
+              const auto &st = ns.follow_tag(to_struct_tag_type(struct_type));
+              for(const auto &comp : st.components())
+              {
+                if(id2string(comp.get_base_name()) == "_M_current")
+                {
+                  // return (*this)._M_current
+                  symbol_exprt this_expr(this_id, this_type);
+                  dereference_exprt deref(this_expr);
+                  member_exprt mem(deref, comp.get_name(), comp.type());
+                  // base() returns a reference — return address
+                  typet ret = fn_type.return_type();
+                  exprt result = mem;
+                  if(is_reference(ret))
+                    result = address_of_exprt(mem);
+                  code_blockt block;
+                  block.add(code_frontend_returnt(std::move(result)));
+                  symbol.value = std::move(block);
+                  symbol.value.type() = symbol.type;
+                  deferred_typechecking.erase(symbol.name);
+                  break;
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
