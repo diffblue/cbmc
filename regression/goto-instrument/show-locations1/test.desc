@@ -1,0 +1,9 @@
+CORE
+main.c
+--show-locations
+^EXIT=0$
+^SIGNAL=0$
+main.*file main.c line
+foo.*file main.c line
+--
+^warning: ignoring
