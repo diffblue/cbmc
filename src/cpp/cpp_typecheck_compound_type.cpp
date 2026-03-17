@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_declarator_converter.h"
 #include "cpp_name.h"
 #include "cpp_type2name.h"
+#include "cpp_using.h"
 #include "cpp_util.h"
 
 #include <algorithm>
@@ -365,9 +366,9 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
   if(is_inline && !is_method)
   {
-    error().source_location = cpp_name.source_location();
-    error() << "only methods can be inlined" << eom;
-    throw 0;
+    // C++17 allows inline variables (static inline data members).
+    // Just ignore the inline specifier for non-methods.
+    is_inline = false;
   }
 
   if(is_virtual && is_static)
@@ -1096,6 +1097,24 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
       access = ID_private;
     else if(it->id() == "cpp-protected")
       access = ID_protected;
+    else if(it->id() == ID_cpp_using)
+    {
+      cpp_usingt &cpp_using =
+        static_cast<cpp_usingt &>(static_cast<irept &>(*it));
+      // Skip using declarations for conversion operators (e.g.,
+      // using Base::operator T;) as these are not yet supported.
+      bool has_operator = false;
+      for(const auto &sub : cpp_using.name().get_sub())
+      {
+        if(sub.id() == ID_operator)
+        {
+          has_operator = true;
+          break;
+        }
+      }
+      if(!has_operator)
+        convert(cpp_using);
+    }
     else
     {
     }

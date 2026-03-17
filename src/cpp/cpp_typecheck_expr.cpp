@@ -135,7 +135,8 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   }
   else if(
     expr.id() == "__is_constructible" || expr.id() == "__is_assignable" ||
-    expr.id() == "__is_convertible_to" || expr.id() == "__is_same")
+    expr.id() == "__is_convertible_to" || expr.id() == "__is_convertible" ||
+    expr.id() == "__is_same")
   {
     // GCC/Clang built-in type traits
     typet t1 = static_cast<const typet &>(expr.find("type_arg1"));
@@ -149,6 +150,60 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
         expr = true_exprt();
       else
         expr = false_exprt();
+    }
+    else if(
+      expr.id() == "__is_convertible_to" || expr.id() == "__is_convertible")
+    {
+      // Check if t1 is implicitly convertible to t2.
+      if(t1.id() == ID_empty && t2.id() == ID_empty)
+      {
+        // void -> void is convertible
+        expr = true_exprt();
+      }
+      else if(t1.id() == ID_empty || t2.id() == ID_empty)
+      {
+        expr = false_exprt();
+      }
+      else
+      {
+        exprt tmp;
+        symbol_exprt from(irep_idt(), t1);
+        if(implicit_conversion_sequence(from, t2, tmp))
+          expr = true_exprt();
+        else
+          expr = false_exprt();
+      }
+    }
+    else if(expr.id() == "__is_assignable")
+    {
+      // __is_assignable(T, U) is true if the expression
+      // declval<T>() = declval<U>() is well-formed.
+      // For references: T must be an lvalue reference for assignment.
+      if(is_reference(t1))
+      {
+        typet dest = to_reference_type(t1).base_type();
+        // Cannot assign to const
+        if(dest.get_bool(ID_C_constant))
+        {
+          expr = false_exprt();
+        }
+        else
+        {
+          exprt tmp;
+          symbol_exprt from(irep_idt(), t2);
+          if(implicit_conversion_sequence(from, dest, tmp))
+            expr = true_exprt();
+          else
+            expr = false_exprt();
+        }
+      }
+      else
+      {
+        // Non-reference T: assignment to rvalue is not valid for
+        // scalar types, but may be valid for class types with
+        // operator=. Conservatively return false.
+        expr = false_exprt();
+      }
     }
     else
       // conservatively return false for traits we cannot evaluate

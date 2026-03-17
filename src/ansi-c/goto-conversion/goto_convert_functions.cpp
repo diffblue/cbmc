@@ -10,6 +10,7 @@ Date: June 2003
 
 #include "goto_convert_functions.h"
 
+#include <util/expr_util.h>
 #include <util/std_code.h>
 #include <util/symbol_table_builder.h>
 
@@ -157,6 +158,14 @@ void goto_convert_functionst::convert_function(
     symbol.value.is_nil() || symbol.value.id() != ID_code ||
     symbol.is_compiled()) /* goto_inline may have removed the body */
     return;
+
+  // Skip functions whose bodies contain unresolved C++ names, which
+  // indicates incomplete template instantiation.
+  if(has_subexpr(symbol.value, ID_cpp_name))
+  {
+    symbol_table.get_writeable_ref(identifier).value.make_nil();
+    return;
+  }
 
   // we have a body, make sure all parameter names are valid
   for(const auto &p : f.parameter_identifiers)

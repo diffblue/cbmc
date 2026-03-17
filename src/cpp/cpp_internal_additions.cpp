@@ -196,6 +196,10 @@ void cpp_internal_additions(std::ostream &out)
 
   out << '}' << '\n'; // end extern "C"
 
+  // GCC __builtin_addressof
+  out << "template<typename _Tp> _Tp* __builtin_addressof(_Tp& __r)"
+         " { return &__r; }\n";
+
   // Microsoft stuff
   if(config.ansi_c.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
   {

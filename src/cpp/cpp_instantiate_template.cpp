@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/simplify_expr.h>
 #include <util/symbol_table_base.h>
 
+#include "cpp_convert_type.h"
 #include "cpp_type2name.h"
 #include "cpp_typecheck_resolve.h"
 
@@ -413,6 +414,22 @@ void cpp_typecheckt::elaborate_class_template(
           if(sfinae_failed)
             continue;
 
+          // Strip ellipsis flags from cpp_declaration declarators in
+          // code type arguments (variadic pack residue).
+          for(auto &arg : partial_specialization_args_tc.arguments())
+          {
+            if(arg.id() != ID_type || arg.type().id() != ID_code)
+              continue;
+            for(auto &param : arg.type().add(ID_parameters).get_sub())
+            {
+              if(param.id() != ID_cpp_declaration)
+                continue;
+              for(auto &decl :
+                  static_cast<cpp_declarationt &>(param).declarators())
+                decl.remove(ID_ellipsis);
+            }
+          }
+
           if(partial_specialization_args_tc == full_args_tc)
           {
             // Check if this specialization is more specialized than
@@ -764,13 +781,68 @@ const symbolt &cpp_typecheckt::instantiate_template(
       // template<T> template<U> void S<T>::f(U x) {}).
       // Skip it during class instantiation — it will be instantiated
       // when actually called.
+      // Also skip methods with fewer template parameters — these belong
+      // to a partial specialization (e.g., vector<bool, _Alloc> has 1
+      // parameter vs the primary vector<T, _Alloc> with 2).
       const std::size_t n_class_params =
         specialization_template_args.arguments().size();
       const std::size_t n_method_params =
         method_type.template_parameters().size();
 
-      if(n_method_params > n_class_params)
+      if(n_method_params != n_class_params)
         continue;
+
+      // Skip methods whose class qualifier contains concrete template
+      // arguments that don't match the current instantiation. This
+      // filters out methods of partial specializations (e.g.,
+      // vector<bool, _Alloc>::_M_insert_range) when instantiating the
+      // primary template (e.g., vector<unsigned int, allocator<...>>).
+      if(!method_decl.declarators().empty())
+      {
+        const auto &name = method_decl.declarators().front().name();
+        bool skip = false;
+        for(const auto &sub : name.get_sub())
+        {
+          if(sub.id() != ID_template_args)
+            continue;
+          const auto &targs = sub.find(ID_arguments).get_sub();
+          for(std::size_t i = 0;
+              i < targs.size() && i < full_template_args.arguments().size();
+              i++)
+          {
+            // Template arguments that are template parameter names
+            // (cpp_name) are not concrete — skip those.
+            const irept *t = &targs[i];
+            if(t->id() == ID_type)
+              t = &t->find(ID_type);
+            if(t->id() == ID_ambiguous)
+              t = &t->find(ID_type);
+            if(t->id() == ID_cpp_name || t->id() == ID_nil || t->id().empty())
+              continue;
+            // This is a concrete type. Convert and compare.
+            const auto &full_arg = full_template_args.arguments()[i];
+            if(full_arg.id() != ID_type)
+              continue;
+            typet concrete = static_cast<const typet &>(*t);
+            try
+            {
+              cpp_convert_plain_type(concrete, get_message_handler());
+            }
+            catch(...)
+            {
+              continue;
+            }
+            if(concrete != full_arg.type())
+            {
+              skip = true;
+              break;
+            }
+          }
+          break;
+        }
+        if(skip)
+          continue;
+      }
 
       // do template parameters
       // this also sets up the template scope of the method

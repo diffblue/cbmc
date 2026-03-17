@@ -977,6 +977,10 @@ void goto_convertt::convert_assign(
 
 void goto_convertt::convert_cpp_delete(const codet &code, goto_programt &dest)
 {
+  // C++11 deleted function marker (= delete) has no operands
+  if(code.operands().empty())
+    return;
+
   INVARIANT_WITH_DIAGNOSTICS(
     code.operands().size() == 1,
     "cpp_delete statement takes one operand",
