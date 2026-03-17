@@ -497,7 +497,9 @@ bool cpp_typecheckt::standard_conversion_pointer(
   {
     const struct_typet &from_struct = follow_tag(to_struct_tag_type(sub_from));
     const struct_typet &to_struct = follow_tag(to_struct_tag_type(sub_to));
-    if(subtype_typecast(from_struct, to_struct))
+    if(
+      subtype_typecast(from_struct, to_struct) &&
+      base_publicly_accessible(from_struct, to_struct))
     {
       c_qualifierst qual_from;
       qual_from.read(to_pointer_type(expr.type()).base_type());
@@ -1180,8 +1182,10 @@ bool cpp_typecheckt::reference_related(
 
   if(from.id() == ID_struct_tag && to.id() == ID_struct_tag)
   {
-    return subtype_typecast(
-      to_struct_type(from_followed), to_struct_type(to_followed));
+    const auto &from_s = to_struct_type(from_followed);
+    const auto &to_s = to_struct_type(to_followed);
+    return subtype_typecast(from_s, to_s) &&
+           base_publicly_accessible(from_s, to_s);
   }
 
   if(

@@ -125,6 +125,7 @@ exprt goto_symext::address_arithmetic(
     if_expr.false_case() =
       address_arithmetic(if_expr.false_case(), state, keep_array);
 
+    if_expr.type() = if_expr.true_case().type();
     result=if_expr;
   }
   else if(expr.id()==ID_symbol ||

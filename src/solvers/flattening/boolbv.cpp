@@ -353,6 +353,19 @@ literalt boolbvt::convert_rest(const exprt &expr)
   else if(expr.id()==ID_notequal)
   {
     const auto &notequal_expr = to_notequal_expr(expr);
+    if(notequal_expr.lhs().type() != notequal_expr.rhs().type())
+    {
+      // Pointer-to-member types may have a to_member attribute that
+      // gets lost during symbolic execution. Strip it for comparison.
+      if(
+        notequal_expr.lhs().type().id() == ID_pointer &&
+        notequal_expr.rhs().type().id() == ID_pointer)
+      {
+        typet common_type = notequal_expr.lhs().type();
+        exprt rhs = typecast_exprt(notequal_expr.rhs(), common_type);
+        return !convert_equality(equal_exprt(notequal_expr.lhs(), rhs));
+      }
+    }
     return !convert_equality(
       equal_exprt(notequal_expr.lhs(), notequal_expr.rhs()));
   }

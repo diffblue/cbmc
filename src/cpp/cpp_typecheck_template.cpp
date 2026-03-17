@@ -93,30 +93,39 @@ void cpp_typecheckt::typecheck_class_template(
     class_template_identifier(
       base_name, template_type, partial_specialization_args);
 
-  #if 0
   // Check if the name is already used by a different template
-  // in the same scope.
+  // in the same scope (only for primary templates, not partial or full
+  // specializations).
+  if(
+    partial_specialization_args.arguments().empty() &&
+    !template_type.template_parameters().empty())
   {
-    const auto id_set=
-      cpp_scopes.current_scope().lookup(
-        base_name,
-        cpp_scopet::SCOPE_ONLY,
-        cpp_scopet::TEMPLATE);
+    const auto id_set = cpp_scopes.current_scope().lookup(
+      base_name, cpp_scopet::SCOPE_ONLY, cpp_idt::id_classt::TEMPLATE);
 
     if(!id_set.empty())
     {
-      const symbolt &previous=lookup((*id_set.begin())->identifier);
-      if(previous.name!=symbol_name || id_set.size()>1)
+      bool found_match = false;
+      for(const auto *id_ptr : id_set)
       {
-        error().source_location=cpp_name.source_location();
-        str << "template declaration of '" << base_name.c_str()
-            << " does not match previous declaration\n";
-        str << "location of previous definition: " << previous.location;
+        if(lookup(id_ptr->identifier).name == symbol_name)
+        {
+          found_match = true;
+          break;
+        }
+      }
+
+      if(!found_match)
+      {
+        error().source_location = cpp_name.source_location();
+        error() << "template declaration of '" << base_name
+                << "' does not match previous declaration\n"
+                << "location of previous definition: "
+                << lookup((*id_set.begin())->identifier).location << eom;
         throw 0;
       }
     }
   }
-  #endif
 
   // check if we have it already
 
@@ -1264,7 +1273,33 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       {
         exprt e;
         e.swap(arg.type());
-        arg.swap(e);
+        // The parser stores the type interpretation for ambiguous
+        // template arguments. When the parameter is an expression,
+        // a function-type parse like "f()" should become a function
+        // call expression "f()".
+        if(e.id() == ID_code)
+        {
+          const irept &return_type = e.find(ID_return_type);
+          const irept &params = e.find(ID_parameters);
+          if(return_type.id() == ID_cpp_name && params.get_sub().empty())
+          {
+            exprt func_name = static_cast<const exprt &>(
+              static_cast<const irept &>(return_type));
+            side_effect_exprt call(
+              ID_function_call, uninitialized_typet{}, arg.source_location());
+            call.add_to_operands(std::move(func_name));
+            call.add_to_operands(exprt(ID_arguments));
+            arg.swap(call);
+          }
+          else
+          {
+            arg.swap(e);
+          }
+        }
+        else
+        {
+          arg.swap(e);
+        }
       }
 
       typet type=parameter.type();

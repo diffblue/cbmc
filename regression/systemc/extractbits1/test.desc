@@ -1,6 +1,6 @@
-CORE
-test_link1.cpp
-test_link2.c
+KNOWNBUG
+main.cpp
+
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

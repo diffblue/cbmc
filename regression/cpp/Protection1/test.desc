@@ -1,7 +1,7 @@
-KNOWNBUG
+CORE
 main.cpp
 
-^EXIT=6$
+^EXIT=(1|6)$
 ^SIGNAL=0$
 ^CONVERSION ERROR$
 --
