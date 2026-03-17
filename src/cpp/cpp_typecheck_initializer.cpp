@@ -112,14 +112,30 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
         cpp_typecheck_resolvet::wantt::BOTH,
         fargs);
 
-      DATA_INVARIANT(
-        to_pointer_type(symbol.type).base_type() == resolved_expr.type(),
-        "symbol type must match");
+      // For pointer-to-member-function, the symbol type includes a
+      // to_member attribute and the resolved expression may have a
+      // different representation. Skip the strict type check when
+      // pointer-to-member is involved.
+      if(
+        symbol.type.find(ID_to_member).is_nil() &&
+        to_pointer_type(symbol.type).base_type() != resolved_expr.type())
+      {
+        DATA_INVARIANT_WITH_DIAGNOSTICS(
+          false,
+          "symbol type must match",
+          symbol.type.pretty(),
+          resolved_expr.type().pretty(),
+          symbol.location);
+      }
 
       if(resolved_expr.id()==ID_symbol)
       {
         symbol.value=
           address_of_exprt(resolved_expr);
+
+        if(symbol.type.find(ID_to_member).is_not_nil())
+          symbol.value.type().add(ID_to_member) =
+            symbol.type.find(ID_to_member);
       }
       else if(resolved_expr.id()==ID_member)
       {

@@ -1043,8 +1043,20 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
 
       if(
         declaration.storage_spec().is_extern() ||
-        declaration.storage_spec().is_auto() ||
         declaration.storage_spec().is_register())
+      {
+        error().source_location = declaration.storage_spec().location();
+        error() << "invalid storage class specified for field" << eom;
+        throw 0;
+      }
+
+      // In C++11, 'auto' in a class member declaration indicates a
+      // trailing return type (auto f() -> T). The parser stores this
+      // in the storage spec. Only reject 'auto' when there are no
+      // declarators (i.e., it's not a function declaration).
+      if(
+        declaration.storage_spec().is_auto() &&
+        declaration.declarators().empty())
       {
         error().source_location = declaration.storage_spec().location();
         error() << "invalid storage class specified for field" << eom;
@@ -1725,7 +1737,17 @@ bool cpp_typecheckt::check_component_access(
         to_struct_type(lookup(pscope->identifier).type);
 
       if(subtype_typecast(scope_struct, to_struct_type(struct_union_type)))
-        return false; // ok
+      {
+        // Derived classes can access protected members but not private.
+        // Exception: compiler-generated members (e.g., vtable pointers)
+        // whose names contain '@' are always accessible.
+        if(access == ID_protected)
+          return false; // ok
+        const std::string comp_name = id2string(component.get_name());
+        if(comp_name.find('@') != std::string::npos)
+          return false; // ok — compiler-generated
+        // private members are not accessible from derived classes
+      }
 
       // C++11 (DR 45): nested classes have access to the enclosing
       // class's private and protected members.
@@ -1838,6 +1860,52 @@ bool cpp_typecheckt::subtype_typecast(
   get_bases(from, bases);
 
   return bases.find(to.get(ID_name)) != bases.end();
+}
+
+bool cpp_typecheckt::base_publicly_accessible(
+  const struct_typet &from,
+  const struct_typet &to) const
+{
+  if(from.get(ID_name) == to.get(ID_name))
+    return true;
+
+  if(disable_access_control)
+    return true;
+
+  // Check if we're inside the derived class or any of its bases — if so,
+  // all bases are accessible regardless of access specifier.
+  const irep_idt &from_name = from.get(ID_name);
+  for(cpp_scopet *scope = cpp_scopes.current_scope_ptr; !scope->is_root_scope();
+      scope = &scope->get_parent())
+  {
+    if(scope->is_class())
+    {
+      if(scope->identifier == from_name)
+        return true;
+      // Also allow if from derives from the scope class (e.g., when
+      // resolving a qualified name like ::Base::method() from within
+      // a derived class member function).
+      if(subtype_typecast(from, to_struct_type(lookup(scope->identifier).type)))
+        return true;
+    }
+  }
+
+  // Walk the inheritance chain checking that all bases are public.
+  for(const auto &b : from.bases())
+  {
+    if(b.type().id() != ID_struct_tag)
+      continue;
+
+    const struct_typet &base_struct = follow_tag(to_struct_tag_type(b.type()));
+
+    if(base_struct.get(ID_name) == to.get(ID_name))
+      return b.get(ID_access) == ID_public;
+
+    if(base_publicly_accessible(base_struct, to))
+      return b.get(ID_access) == ID_public;
+  }
+
+  return false;
 }
 
 void cpp_typecheckt::make_ptr_typecast(

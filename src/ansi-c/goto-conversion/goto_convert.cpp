@@ -815,6 +815,8 @@ void goto_convertt::convert_frontend_decl(
   if(symbol.is_static_lifetime || symbol.type.id() == ID_code)
     return; // this is a SKIP!
 
+  std::list<irep_idt> ref_bound_temporaries;
+
   const goto_programt::targett declaration_iterator = [&]() {
     if(code.operands().size() == 1)
     {
@@ -846,7 +848,14 @@ void goto_convertt::convert_frontend_decl(
       convert_assign(assign, dest, mode);
     }
 
-    destruct_locals(side_effects.temporaries, dest, ns);
+    // For reference variables (pointer type with C_reference in GOTO),
+    // temporaries created during initialization should live as long as
+    // the reference (C++ temporary lifetime extension). Defer their
+    // destruction to the scope stack instead of killing them here.
+    if(is_reference(symbol.type))
+      ref_bound_temporaries = std::move(side_effects.temporaries);
+    else
+      destruct_locals(side_effects.temporaries, dest, ns);
 
     return declaration_iterator;
   }();
@@ -855,6 +864,15 @@ void goto_convertt::convert_frontend_decl(
   // destructor created below as unwind_destructor_stack pops off the
   // top of the destructor stack
   const symbol_exprt symbol_expr(symbol.name, symbol.type);
+
+  // Add 'dead' instructions for temporaries bound to references,
+  // deferred to the scope stack so they live as long as the reference.
+  for(const auto &id : ref_bound_temporaries)
+  {
+    const symbolt &tmp_sym = ns.lookup(id);
+    targets.scope_stack.add(
+      code_deadt(tmp_sym.symbol_expr()), {declaration_iterator});
+  }
 
   {
     code_deadt code_dead(symbol_expr);

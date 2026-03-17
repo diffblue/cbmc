@@ -499,11 +499,19 @@ exprt cpp_typecheck_resolvet::convert_identifier(
     {
       bool constant = symbol.type.get_bool(ID_C_constant);
 
-      if(
-        constant && symbol.value.is_not_nil() && is_number(symbol.type) &&
-        symbol.value.is_constant())
+      if(constant && symbol.value.is_not_nil() && is_number(symbol.type))
       {
-        e = symbol.value;
+        exprt val = symbol.value;
+        if(!val.is_constant())
+          simplify(val, cpp_typecheck);
+        if(val.is_constant())
+        {
+          e = val;
+        }
+        else
+        {
+          e = cpp_symbol_expr(symbol);
+        }
       }
       else
       {
@@ -1923,11 +1931,15 @@ exprt cpp_typecheck_resolvet::resolve(
     bool have_classes = false, have_methods = false;
     bool have_aliases = false;
 
-    for(const auto &id_ptr : id_set)
+    for(auto it = id_set.begin(); it != id_set.end();)
     {
-      const irep_idt id = id_ptr->identifier;
+      const irep_idt id = (*it)->identifier;
       const symbolt &s = cpp_typecheck.lookup(id);
-      CHECK_RETURN(s.type.get_bool(ID_is_template));
+      if(!s.type.get_bool(ID_is_template))
+      {
+        it = id_set.erase(it);
+        continue;
+      }
       const cpp_declarationt &cpp_declaration = to_cpp_declaration(s.type);
       if(cpp_declaration.is_template_alias())
         have_aliases = true;
@@ -1935,6 +1947,7 @@ exprt cpp_typecheck_resolvet::resolve(
         have_classes = true;
       else
         have_methods = true;
+      ++it;
     }
 
     if(want == wantt::BOTH && have_classes && have_methods)

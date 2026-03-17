@@ -249,6 +249,9 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     const irep_idt typedef_identifier=type.get(ID_C_typedef);
     if(!typedef_identifier.empty())
       tmp.set(ID_C_typedef, typedef_identifier);
+    // Preserve pointer-to-member attribute (C++)
+    if(type.find(ID_to_member).is_not_nil())
+      tmp.add(ID_to_member, type.find(ID_to_member));
     other.push_back(tmp);
   }
   else if(type.id()==ID_pointer)
