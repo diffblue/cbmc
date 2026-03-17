@@ -4,3 +4,8 @@ Test
 ^EXIT=0$
 ^SIGNAL=0$
 assertion at file Test.java line 21.*: SUCCESS
+// Marked THOROUGH because CaDiCaL is extremely slow on this test when
+// combined with --symex-driven-lazy-loading: 223s on macOS ARM (cadical)
+// vs 2s (minisat2). The macOS CI uses CaDiCaL exclusively. On Linux with
+// cadical the test takes 81s. With minisat2 it completes in 2s on all
+// platforms. See PR #8868 for the full investigation.
