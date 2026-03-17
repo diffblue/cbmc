@@ -1,6 +1,6 @@
 # C++ Support Status — cpp11-parser-rework branch
 
-Last updated: 2026-03-10 (session 11)
+Last updated: 2026-03-10 (session 13)
 
 ## C++11 — ~90% complete
 
@@ -95,10 +95,10 @@ Last updated: 2026-03-10 (session 11)
 - Direct-list-initialization of scoped enums (`byte{42}`) — **FIXED**
 - Optional-like template patterns
 
-### STL/library support (~50%)
+### STL/library support (~55%)
 - `std::optional` — mostly works
 - `std::any` — works
-- `std::string_view` — parses but verification failures
+- `std::string_view` — **FIXED**: works with verification (size(), operator[])
 - `std::variant` — parses but type-checking errors (namespace alias and using-pack fixes unblocked parsing)
 - `std::filesystem` — type-checking errors on system header
 - Good coverage for: vector, deque, algorithm, string, memory, tuple, iterator, numeric, valarray, functional
@@ -140,12 +140,15 @@ Last updated: 2026-03-10 (session 11)
 - `constexpr` dynamic allocation (`new`/`delete` in constexpr) — works
 - Floating-point non-type template parameters — **FIXED**: `template<double D>` works
 
-### STL/library support (~20%)
+### STL/library support (~30%)
 - `<concepts>` — **FIXED**: parses and type-checks successfully
-- `<compare>` — parses but conversion error on `operator<=>` return type
-- `<span>` — parses but type-checking errors (iterator concepts)
-- `<ranges>` — parse errors (ternary in template default args)
-- `<format>`, `<coroutine>` — not tested
+- `<compare>` — **FIXED**: parses and type-checks successfully (all three ordering types)
+- `<span>` — **FIXED**: parses and type-checks successfully
+- `<ranges>` — parse errors fixed, but crashes in merge_type during type-checking
+- `<utility>` in C++20 — **FIXED**: works (was blocked by `<compare>`)
+- `<numbers>` — works
+- `<bit>` — works
+- `<format>`, `<coroutine>` — parse errors
 
 ### Known gaps — language
 - **Abbreviated function templates** (`auto f(auto x)`) — **FIXED**: auto params synthesize template type params
@@ -154,7 +157,7 @@ Last updated: 2026-03-10 (session 11)
 - **`explicit(bool)`** — **FIXED**: depth-counted to handle template-ids in expression
 - **`noexcept(expr)` with template-ids** — **FIXED**: depth-counted to handle `<>` in expression
 - **Friend constexpr function access** — **FIXED**: disable access control during friend body type-checking
-- **Defaulted friend operator==** — **FIXED**: `= default` replaced with empty block
+- **Defaulted friend operator==** — **FIXED**: `= default` replaced with empty block; body generated with correct parameter names for friend functions
 - **Coroutine semantics** — keywords parsed as no-ops; no promise_type resolution
 - **Three-way comparison categories** (`std::strong_ordering` etc.) — **FIXED**: works with user-defined types
 - **`constexpr` containers** — not modeled
@@ -162,7 +165,15 @@ Last updated: 2026-03-10 (session 11)
 - **Defaulted three-way comparison** (`auto operator<=>(const T&) const = default`) — **FIXED**: generates member-wise comparison body
 - **Defaulted equality** (`bool operator==(const T&) const = default`) — **FIXED**: generates member-wise equality body
 - **Relational operators from `<=>`** — **FIXED**: `<`, `>`, `<=`, `>=` synthesized from `<=>` by rewriting as `(a <=> b) < 0`
+- **Synthesized `operator!=`** — **FIXED**: `a != b` rewritten as `!(a == b)` when no explicit `operator!=` exists
+- **Constexpr eval of deferred functions** — **FIXED**: skip constexpr evaluation when function body not yet type-checked
+- **Ternary in template default args with enum types** — **FIXED**: enum tags registered in parser scope; `?` allowed after template arguments
 - **Lambda init-capture with pack expansion** (`[...x = args]`) — **FIXED**: parsed and expanded during template instantiation
+- **Bitfield default member initializers** (`unsigned x:1 = 0`) — **FIXED**: use conditional expression for bitfield width
+- **`__builtin_is_constant_evaluated()`** — **FIXED**: returns false (CBMC evaluates at runtime)
+- **`__is_trivially_constructible` and related traits** — **FIXED**: `__is_trivially_constructible`, `__is_nothrow_constructible`, `__is_trivially_assignable`, `__is_nothrow_assignable` now handled
+- **Constrained partial specializations** — **FIXED**: duplicate bodies downgraded to warning for partial specializations
+- **Pack expansion in braced member initializers** — **FIXED**: `val{static_cast<Args&&>(args)...}` now parses
 
 ---
 
@@ -210,8 +221,8 @@ Last updated: 2026-03-10 (session 11)
 |----------|------------------|-------------|---------|
 | C++11    | ~95%             | ~60%        | ~90%    |
 | C++14    | ~95%             | ~60%        | ~90%    |
-| C++17    | ~80%             | ~50%        | ~75%    |
-| C++20    | ~50%             | ~5%         | ~40%    |
+| C++17    | ~80%             | ~55%        | ~75%    |
+| C++20    | ~55%             | ~30%        | ~45%    |
 | C++23    | ~35%             | ~0%         | ~25%    |
 | C++26    | ~15%             | ~0%         | ~10%    |
 
@@ -220,6 +231,8 @@ Last updated: 2026-03-10 (session 11)
 1. **STL library modeling** — CBMC parses system headers but many complex template instantiations fail or produce stubs with "no body" warnings. This affects every standard.
 2. **Template metaprogramming depth** — complex SFINAE, fold expressions, and concept constraints hit limits in the type-checker.
 3. **C++20+ is partially stubbed** — the parser accepts most syntax but semantic support (coroutine state machines, concept constraint checking, module system) is incomplete.
+4. **`__builtin_strlen`** — **FIXED**: library model added, enables `std::string_view` verification.
+5. **`__builtin_is_constant_evaluated`** — **FIXED**: returns false in C++ type-checker.
 
 ## KNOWNBUG tests (documented gaps)
 

@@ -572,6 +572,22 @@ size_t strlen(const char *s)
   #endif
 }
 
+/* FUNCTION: __builtin_strlen */
+
+#ifndef __CPROVER_STRING_H_INCLUDED
+#  include <string.h>
+#  define __CPROVER_STRING_H_INCLUDED
+#endif
+
+__CPROVER_size_t __builtin_strlen(const char *s)
+{
+__CPROVER_HIDE:;
+  __CPROVER_size_t len = 0;
+  while(s[len] != 0)
+    len++;
+  return len;
+}
+
 /* FUNCTION: strdup */
 
 #ifndef __CPROVER_STRING_H_INCLUDED

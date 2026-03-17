@@ -1,0 +1,8 @@
+CORE
+main.cpp
+--cpp20
+^EXIT=(0|10)$
+^SIGNAL=0$
+^VERIFICATION
+--
+^CONVERSION ERROR$

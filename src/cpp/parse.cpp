@@ -3599,11 +3599,11 @@ bool Parser::rConstructorDecl(
             {
                 int t = lex.get_token(req_tk);
                 if(t == '(')
-                  ++depth;
+                ++depth;
                 else if(t == ')')
-                  --depth;
+                --depth;
                 else if(t == 0)
-                  return false;
+                return false;
             }
           }
         }
@@ -3939,7 +3939,7 @@ bool Parser::rDeclaratorWithInit(
       lex.get_token(tk); // get :
 
       exprt e;
-      if(!rExpression(e, false))
+      if(!rConditionalExpr(e, false))
         return false;
 
       typet bit_field_type(ID_c_bit_field);
@@ -3948,6 +3948,14 @@ bool Parser::rDeclaratorWithInit(
       set_location(bit_field_type, tk);
 
       merge_types(bit_field_type, declarator.type());
+
+      // C++20: bitfield with default member initializer
+      if(lex.LookAhead(0) == '=')
+      {
+        lex.get_token(tk);
+        if(!rInitializeExpr(declarator.value()))
+          return false;
+      }
     }
 
     dw.swap(declarator);
@@ -4300,11 +4308,11 @@ bool Parser::rDeclarator(
             {
                 int t = lex.get_token(req_tk);
                 if(t == '(')
-                  ++depth;
+                ++depth;
                 else if(t == ')')
-                  --depth;
+                --depth;
                 else if(t == 0)
-                  return false;
+                return false;
             }
           }
           else if(lex.LookAhead(0) == TOK_REQUIRES)
@@ -4317,13 +4325,13 @@ bool Parser::rDeclarator(
                 int depth = 1;
                 while(depth > 0)
                 {
-                  int t = lex.get_token(req_tk);
-                  if(t == '(')
-                    ++depth;
-                  else if(t == ')')
-                    --depth;
-                  else if(t == 0)
-                    return false;
+                int t = lex.get_token(req_tk);
+                if(t == '(')
+                  ++depth;
+                else if(t == ')')
+                  --depth;
+                else if(t == 0)
+                  return false;
                 }
             }
             if(lex.LookAhead(0) == '{')
@@ -4332,13 +4340,13 @@ bool Parser::rDeclarator(
                 int depth = 1;
                 while(depth > 0)
                 {
-                  int t = lex.get_token(req_tk);
-                  if(t == '{')
-                    ++depth;
-                  else if(t == '}')
-                    --depth;
-                  else if(t == 0)
-                    return false;
+                int t = lex.get_token(req_tk);
+                if(t == '{')
+                  ++depth;
+                else if(t == '}')
+                  --depth;
+                else if(t == 0)
+                  return false;
                 }
             }
           }
@@ -4348,25 +4356,25 @@ bool Parser::rDeclarator(
             {
                 irept discard;
                 if(!rName(discard))
-                  return false;
+                return false;
             }
             else
             {
                 lex.get_token(req_tk);
                 if(lex.LookAhead(0) == '(')
                 {
-                  lex.get_token(req_tk);
-                  int depth = 1;
-                  while(depth > 0)
-                  {
-                    int t = lex.get_token(req_tk);
-                    if(t == '(')
-                      ++depth;
-                    else if(t == ')')
-                      --depth;
-                    else if(t == 0)
-                      return false;
-                  }
+                lex.get_token(req_tk);
+                int depth = 1;
+                while(depth > 0)
+                {
+                  int t = lex.get_token(req_tk);
+                  if(t == '(')
+                    ++depth;
+                  else if(t == ')')
+                    --depth;
+                  else if(t == 0)
+                    return false;
+                }
                 }
             }
           }
@@ -4677,6 +4685,14 @@ bool Parser::rMemberInit(exprt &init)
         exprt exp;
         if(!rInitializeExpr(exp))
           return false;
+
+        // C++11: pack expansion in braced member initializer
+        if(lex.LookAhead(0) == TOK_ELLIPSIS)
+        {
+          lex.get_token(tk2);
+          exp.set(ID_ellipsis, true);
+        }
+
         init.add_to_operands(std::move(exp));
         if(lex.LookAhead(0) == ',')
         {
@@ -4832,73 +4848,73 @@ bool Parser::rName(irept &name)
                 if(
                   found != nullptr && !found->is_type() &&
                   !found->is_template())
-                  return true;
+                return true;
 
                 // For qualified names (A::B<), check whether the
                 // qualifier is dependent.  Only then treat '<' as
                 // less-than per [temp.names]/4.
                 if(found == nullptr)
                 {
-                  for(std::size_t i = components.size(); i >= 2; --i)
-                  {
-                    if(components[i - 1].id() != "::")
-                      continue;
+                for(std::size_t i = components.size(); i >= 2; --i)
+                {
+                  if(components[i - 1].id() != "::")
+                    continue;
 
-                    // Qualifier is a template-id (e.g., Wrapper<T>::)
-                    // — likely dependent on template parameters.
-                    // Only treat as dependent if the template args
-                    // contain template parameters; concrete
-                    // instantiations like Outer<int>:: are not
-                    // dependent.
-                    if(i >= 2 && components[i - 2].id() == ID_template_args)
+                  // Qualifier is a template-id (e.g., Wrapper<T>::)
+                  // — likely dependent on template parameters.
+                  // Only treat as dependent if the template args
+                  // contain template parameters; concrete
+                  // instantiations like Outer<int>:: are not
+                  // dependent.
+                  if(i >= 2 && components[i - 2].id() == ID_template_args)
+                  {
+                    const irept &targs = components[i - 2].find(ID_arguments);
+                    bool has_dependent_arg = false;
+                    for(const auto &arg : targs.get_sub())
                     {
-                      const irept &targs = components[i - 2].find(ID_arguments);
-                      bool has_dependent_arg = false;
-                      for(const auto &arg : targs.get_sub())
+                      if(arg.id() == ID_name || arg.id() == ID_cpp_name)
                       {
-                        if(arg.id() == ID_name || arg.id() == ID_cpp_name)
+                        irep_idt aid;
+                        if(arg.id() == ID_name)
+                          aid = arg.get(ID_identifier);
+                        else if(!arg.get_sub().empty())
+                          aid = arg.get_sub().front().get(ID_identifier);
+                        if(!aid.empty())
                         {
-                          irep_idt aid;
-                          if(arg.id() == ID_name)
-                            aid = arg.get(ID_identifier);
-                          else if(!arg.get_sub().empty())
-                            aid = arg.get_sub().front().get(ID_identifier);
-                          if(!aid.empty())
+                          new_scopet *afound = lookup_id(aid);
+                          if(
+                            afound != nullptr &&
+                            afound->kind ==
+                              new_scopet::kindt::TYPE_TEMPLATE_PARAMETER)
                           {
-                            new_scopet *afound = lookup_id(aid);
-                            if(
-                              afound != nullptr &&
-                              afound->kind ==
-                                new_scopet::kindt::TYPE_TEMPLATE_PARAMETER)
-                            {
-                              has_dependent_arg = true;
-                              break;
-                            }
+                            has_dependent_arg = true;
+                            break;
                           }
                         }
                       }
-                      if(has_dependent_arg)
-                        return true;
-                      // Concrete instantiation — fall through to
-                      // try parsing '<' as template args.
-                      break;
                     }
-
-                    // Qualifier is a simple name
-                    if(components[i - 2].id() == ID_name)
-                    {
-                      irep_idt qid = components[i - 2].get(ID_identifier);
-                      new_scopet *qfound = lookup_id(qid);
-                      if(
-                        qfound != nullptr &&
-                        qfound->kind ==
-                          new_scopet::kindt::TYPE_TEMPLATE_PARAMETER)
-                      {
-                        return true;
-                      }
-                    }
+                    if(has_dependent_arg)
+                      return true;
+                    // Concrete instantiation — fall through to
+                    // try parsing '<' as template args.
                     break;
                   }
+
+                  // Qualifier is a simple name
+                  if(components[i - 2].id() == ID_name)
+                  {
+                    irep_idt qid = components[i - 2].get(ID_identifier);
+                    new_scopet *qfound = lookup_id(qid);
+                    if(
+                      qfound != nullptr &&
+                      qfound->kind ==
+                        new_scopet::kindt::TYPE_TEMPLATE_PARAMETER)
+                    {
+                      return true;
+                    }
+                  }
+                  break;
+                }
                 }
             }
           }
@@ -5849,6 +5865,16 @@ bool Parser::rEnumSpec(typet &spec)
       return false;
 
     spec.add(ID_tag).swap(name);
+
+    // Register enum tag so the parser can distinguish it from
+    // concept names in template parameter lists.
+    const irept &tag = spec.find(ID_tag);
+    if(!tag.get_sub().empty())
+    {
+      irep_idt base = tag.get_sub().front().get(ID_identifier);
+      if(!base.empty() && lookup_id(base) == nullptr)
+        add_id(tag, new_scopet::kindt::TAG);
+    }
   }
 
 #ifdef DEBUG
@@ -8690,7 +8716,8 @@ bool Parser::rTypePredicate(exprt &expr)
   expr.id(irep_idt(tk.text));
   set_location(expr, tk);
 
-  typet tname1, tname2;
+  typet tname1;
+  typet tname2(ID_nil);
 
   switch(tk.kind)
   {
@@ -9496,28 +9523,27 @@ bool Parser::rVarNameCore(exprt &name)
             {
                 for(std::size_t i = components.size(); i >= 2; --i)
                 {
-                  if(components[i - 1].id() != "::")
-                    continue;
+                if(components[i - 1].id() != "::")
+                  continue;
 
-                  if(i >= 2 && components[i - 2].id() == ID_template_args)
+                if(i >= 2 && components[i - 2].id() == ID_template_args)
+                {
+                  is_dependent_member = true;
+                  break;
+                }
+
+                if(components[i - 2].id() == ID_name)
+                {
+                  irep_idt qid = components[i - 2].get(ID_identifier);
+                  new_scopet *qfound = lookup_id(qid);
+                  if(
+                    qfound != nullptr &&
+                    qfound->kind == new_scopet::kindt::TYPE_TEMPLATE_PARAMETER)
                   {
                     is_dependent_member = true;
-                    break;
                   }
-
-                  if(components[i - 2].id() == ID_name)
-                  {
-                    irep_idt qid = components[i - 2].get(ID_identifier);
-                    new_scopet *qfound = lookup_id(qid);
-                    if(
-                      qfound != nullptr &&
-                      qfound->kind ==
-                        new_scopet::kindt::TYPE_TEMPLATE_PARAMETER)
-                    {
-                      is_dependent_member = true;
-                    }
-                  }
-                  break;
+                }
+                break;
                 }
             }
           }
@@ -9700,7 +9726,7 @@ bool Parser::maybeTemplateArgs()
 
     t=lex.LookAhead(i);
     return t == TOK_SCOPE || t == '(' || t == ')' || t == '{' || t == ';' ||
-           t == ',';
+           t == ',' || t == '?';
   }
 
 #ifdef DEBUG
@@ -10335,14 +10361,14 @@ std::optional<codet> Parser::rIfStatement()
             {
             if(lex.LookAhead(0) == ',')
             {
-                  lex.get_token(tk3);
-                  continue;
+                lex.get_token(tk3);
+                continue;
             }
             cpp_tokent name_tk;
             if(!is_identifier(lex.get_token(name_tk)))
             {
-                  ok = false;
-                  break;
+                ok = false;
+                break;
             }
             irept binding(name_tk.data.get(ID_C_base_name));
             set_location(binding, name_tk);
@@ -10353,19 +10379,19 @@ std::optional<codet> Parser::rIfStatement()
             lex.get_token(tk3); // ]
             if(lex.LookAhead(0) == '=')
             {
-                  lex.get_token(tk3);
-                  exprt init;
-                  if(rExpression(init, false) && lex.LookAhead(0) == ';')
-                  {
-                    lex.get_token(tk3); // ;
-                    codet sb(irep_idt("structured_binding"), {std::move(init)});
-                    sb.add(irep_idt("bindings")) = std::move(bindings);
-                    if(is_ref)
-                      sb.set(ID_C_reference, true);
-                    set_location(sb, tk3);
-                    init_stmt = std::move(sb);
-                    sb_parsed = true;
-                  }
+                lex.get_token(tk3);
+                exprt init;
+                if(rExpression(init, false) && lex.LookAhead(0) == ';')
+                {
+                  lex.get_token(tk3); // ;
+                  codet sb(irep_idt("structured_binding"), {std::move(init)});
+                  sb.add(irep_idt("bindings")) = std::move(bindings);
+                  if(is_ref)
+                    sb.set(ID_C_reference, true);
+                  set_location(sb, tk3);
+                  init_stmt = std::move(sb);
+                  sb_parsed = true;
+                }
             }
             }
           }

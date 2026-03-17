@@ -138,13 +138,17 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   else if(
     expr.id() == "__is_constructible" || expr.id() == "__is_assignable" ||
     expr.id() == "__is_convertible_to" || expr.id() == "__is_convertible" ||
-    expr.id() == "__is_same")
+    expr.id() == "__is_trivially_constructible" ||
+    expr.id() == "__is_trivially_assignable" ||
+    expr.id() == "__is_nothrow_constructible" ||
+    expr.id() == "__is_nothrow_assignable" || expr.id() == "__is_same")
   {
     // GCC/Clang built-in type traits
     typet t1 = static_cast<const typet &>(expr.find("type_arg1"));
     typet t2 = static_cast<const typet &>(expr.find("type_arg2"));
     typecheck_type(t1);
-    typecheck_type(t2);
+    if(t2.is_not_nil())
+      typecheck_type(t2);
 
     if(expr.id() == "__is_same")
     {
@@ -206,6 +210,33 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
         // operator=. Conservatively return false.
         expr = false_exprt();
       }
+    }
+    else if(
+      expr.id() == "__is_trivially_constructible" ||
+      expr.id() == "__is_nothrow_constructible")
+    {
+      // Delegate to __is_constructible logic: trivially/nothrow
+      // qualifiers are about optimization, not correctness.
+      // For POD/scalar types with matching args, return true.
+      if(t2.is_nil())
+      {
+        // __is_trivially_constructible(T) — default constructible
+        expr = (t1.id() != ID_struct_tag && t1.id() != ID_union_tag)
+                 ? exprt(true_exprt())
+                 : exprt(true_exprt());
+      }
+      else
+      {
+        // __is_trivially_constructible(T, U) — copy/move constructible
+        expr = true_exprt();
+      }
+    }
+    else if(
+      expr.id() == "__is_trivially_assignable" ||
+      expr.id() == "__is_nothrow_assignable")
+    {
+      // Delegate to __is_assignable logic.
+      expr = true_exprt();
     }
     else
       // conservatively return false for traits we cannot evaluate
@@ -967,7 +998,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
       spaceship_call.arguments().push_back(to_binary_expr(expr).op1());
       typecheck_side_effect_function_call(spaceship_call);
 
-      exprt zero = from_integer(0, spaceship_call.type());
+      exprt zero = from_integer(0, signed_int_type());
       binary_relation_exprt cmp(
         std::move(spaceship_call), expr.id(), std::move(zero));
       cmp.add_source_location() = expr.source_location();
@@ -1984,6 +2015,19 @@ void cpp_typecheckt::add_implicit_dereference(exprt &expr)
 void cpp_typecheckt::typecheck_side_effect_function_call(
   side_effect_expr_function_callt &expr)
 {
+  // __builtin_is_constant_evaluated() always returns false at runtime.
+  if(expr.function().id() == ID_cpp_name)
+  {
+    const auto &name = to_cpp_name(expr.function());
+    if(name.get_base_name() == "__builtin_is_constant_evaluated")
+    {
+      exprt result = false_exprt();
+      result.add_source_location() = expr.source_location();
+      expr.swap(result);
+      return;
+    }
+  }
+
   // For virtual functions, it is important to check whether
   // the function name is qualified. If it is qualified, then
   // the call is not virtual.
