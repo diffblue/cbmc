@@ -67,6 +67,7 @@ Author: Daniel Kroening, kroening@kroening.com
   OPT_SHOW_CLASS_HIERARCHY \
   "(isr):" \
   "(mmio)" \
+  "(concurrency)" \
   "(stack-depth):(nondet-static)" \
   "(nondet-static-exclude):" \
   "(nondet-static-matching):" \
