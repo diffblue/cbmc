@@ -3,6 +3,7 @@
 /// in headers but defined in libstdc++.so / libc++.so.
 
 #include <util/arith_tools.h>
+#include <util/bitvector_types.h>
 #include <util/c_types.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
@@ -140,9 +141,118 @@ ensure_parameter_symbols(symbolt &fn_symbol, symbol_table_baset &symbol_table)
   }
 }
 
+/// Provide constant values for __gnu_cxx::__numeric_traits_integer<T>
+/// static members. The C++ front-end leaves these as symbolic expressions
+/// that reference other members, but static_lifetime_init initializes
+/// symbols in alphabetical order, which breaks the dependency chain
+/// (__digits depends on __is_signed, but 'd' < 'i' alphabetically).
+static void fold_numeric_traits_integer(symbol_table_baset &symbol_table)
+{
+  const std::string prefix = "__gnu_cxx::__numeric_traits_integer<";
+
+  for(auto it = symbol_table.begin(); it != symbol_table.end(); ++it)
+  {
+    symbolt &symbol = it.get_writeable_symbol();
+    const std::string name = id2string(symbol.name);
+
+    if(name.find(prefix) == std::string::npos)
+      continue;
+
+    const std::string base = id2string(symbol.base_name);
+
+    // Get the underlying type from __max/__min (which has the _Value type),
+    // or handle __is_signed and __digits specially.
+    typet value_type = symbol.type;
+    value_type.remove(ID_C_constant);
+
+    if(base == "__is_signed")
+    {
+      // bool: true if the value type is signed
+      // The symbol for __max has the actual _Value type; but we can
+      // look up the companion __max symbol to determine signedness.
+      // Alternatively, check the __max symbol's type.
+      irep_idt max_name =
+        id2string(symbol.name).substr(0, name.size() - base.size()) + "__max";
+      const symbolt *max_sym = symbol_table.lookup(max_name);
+      if(max_sym == nullptr)
+        continue;
+      typet max_type = max_sym->type;
+      max_type.remove(ID_C_constant);
+      bool is_signed = max_type.id() == ID_signedbv;
+      symbol.value = from_integer(is_signed ? 1 : 0, value_type);
+    }
+    else if(base == "__digits")
+    {
+      // int: width - is_signed
+      irep_idt max_name =
+        id2string(symbol.name).substr(0, name.size() - base.size()) + "__max";
+      const symbolt *max_sym = symbol_table.lookup(max_name);
+      if(max_sym == nullptr)
+        continue;
+      typet max_type = max_sym->type;
+      max_type.remove(ID_C_constant);
+      if(!can_cast_type<bitvector_typet>(max_type))
+        continue;
+      std::size_t width = to_bitvector_type(max_type).get_width();
+      bool is_signed = max_type.id() == ID_signedbv;
+      mp_integer digits = mp_integer(width) - (is_signed ? 1 : 0);
+      symbol.value = from_integer(digits, value_type);
+    }
+    else if(base == "__max")
+    {
+      if(!can_cast_type<bitvector_typet>(value_type))
+        continue;
+      std::size_t width = to_bitvector_type(value_type).get_width();
+      mp_integer max_val;
+      if(value_type.id() == ID_signedbv)
+        max_val = power(2, width - 1) - 1;
+      else
+        max_val = power(2, width) - 1;
+      symbol.value = from_integer(max_val, value_type);
+    }
+    else if(base == "__min")
+    {
+      if(!can_cast_type<bitvector_typet>(value_type))
+        continue;
+      std::size_t width = to_bitvector_type(value_type).get_width();
+      mp_integer min_val;
+      if(value_type.id() == ID_signedbv)
+        min_val = -power(2, width - 1);
+      else
+        min_val = 0;
+      symbol.value = from_integer(min_val, value_type);
+    }
+  }
+}
+
+/// Create a no-op body for an I/O function that returns a reference
+/// to its first parameter (e.g., std::endl returns its ostream& argument,
+/// ostream::_M_insert returns *this).
+static code_blockt make_return_first_param_body(const symbolt &symbol)
+{
+  const code_typet &fn_type = to_code_type(symbol.type);
+  const auto &params = fn_type.parameters();
+  if(params.empty())
+    return code_blockt();
+
+  const auto &first_param = params[0];
+  symbol_exprt param_expr(first_param.get_identifier(), first_param.type());
+
+  // Cast to the return type if needed (e.g., pointer vs reference).
+  exprt ret_expr = typecast_exprt(param_expr, fn_type.return_type());
+
+  code_blockt block;
+  block.add(code_frontend_returnt(std::move(ret_expr)));
+  return block;
+}
+
 void cpp_typecheckt::provide_stdlib_bodies()
 {
   namespacet ns(symbol_table);
+
+  // Constant-fold __numeric_traits_integer static members to avoid
+  // spurious overflow/shift failures from alphabetical init ordering.
+  fold_numeric_traits_integer(symbol_table);
 
   // Fix parameter symbols that are missing is_parameter flag.
   for(auto it = symbol_table.begin(); it != symbol_table.end(); ++it)
@@ -244,6 +354,33 @@ void cpp_typecheckt::provide_stdlib_bodies()
       symbol.value = std::move(block);
       symbol.value.type() = symbol.type;
       deferred_typechecking.erase(symbol.name);
+    }
+    else if(
+      base == "endl" && name.find("std::") != std::string::npos &&
+      name.find("basic_ostream") != std::string::npos)
+    {
+      // std::endl — model as identity (return the stream argument)
+      ensure_parameter_symbols(symbol, symbol_table);
+      auto body = make_return_first_param_body(symbol);
+      if(!body.statements().empty())
+      {
+        symbol.value = std::move(body);
+        symbol.value.type() = symbol.type;
+        deferred_typechecking.erase(symbol.name);
+      }
+    }
+    else if(
+      base == "_M_insert" && name.find("basic_ostream") != std::string::npos)
+    {
+      // basic_ostream::_M_insert — model as returning *this
+      ensure_parameter_symbols(symbol, symbol_table);
+      auto body = make_return_first_param_body(symbol);
+      if(!body.statements().empty())
+      {
+        symbol.value = std::move(body);
+        symbol.value.type() = symbol.type;
+        deferred_typechecking.erase(symbol.name);
+      }
     }
   }
 }

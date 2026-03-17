@@ -84,6 +84,9 @@ void cpp_internal_additions(std::ostream &out)
   out << "void __delete(void *);" << '\n';
   out << "void __delete_array(void *);" << '\n';
 
+  // assert (needed for legacy tests that use assert without #include)
+  out << "int assert(int);" << '\n';
+
   // float
   // TODO: should be thread_local
   out << "int " << rounding_mode_identifier() << " = "

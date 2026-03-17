@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^VERIFICATION SUCCESSFUL$
@@ -6,4 +6,4 @@ main.cpp
 ^SIGNAL=0$
 --
 ^PARSING ERROR$
-Structured bindings parse but variables are not created yet
+Structured bindings.

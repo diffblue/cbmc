@@ -1,0 +1,9 @@
+CORE
+main.cpp
+
+^CONVERSION ERROR$
+^EXIT=6$
+^SIGNAL=0$
+--
+^Invariant check failed$
+Catch clause with unknown type name should produce a type-checking error.
