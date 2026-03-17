@@ -1553,11 +1553,30 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
   // Treat as typename T (ignore the constraint for verification).
   // Only match if the first identifier is NOT a known template parameter
   // (to avoid misinterpreting template<typename Ty, Ty V>).
+  // When followed by ::, try non-type parameter parsing first (for
+  // qualified types like std::size_t), falling back to concept path.
   if(
     cpp20 && is_identifier(t0) &&
     (is_identifier(lex.LookAhead(1)) || lex.LookAhead(1) == TOK_ELLIPSIS ||
      lex.LookAhead(1) == '<' || lex.LookAhead(1) == TOK_SCOPE))
   {
+    // For qualified names (id::), try non-type parameter first
+    if(lex.LookAhead(1) == TOK_SCOPE)
+    {
+      cpp_token_buffert::post nttp_pos = lex.Save();
+      cpp_declarationt nttp_decl;
+      if(rArgDeclaration(nttp_decl))
+      {
+        int next = lex.LookAhead(0);
+        if(next == ',' || next == '>' || next == TOK_SHIFTRIGHT)
+        {
+          nttp_decl.set(ID_is_type, false);
+          declaration.swap(nttp_decl);
+          return true;
+        }
+      }
+      lex.Restore(nttp_pos);
+    }
     cpp_token_buffert::post pos = lex.Save();
 
     cpp_tokent concept_tk;
@@ -1570,7 +1589,8 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
       (id_entry->kind == new_scopet::kindt::TYPE_TEMPLATE_PARAMETER ||
        id_entry->kind == new_scopet::kindt::TYPEDEF ||
        id_entry->kind == new_scopet::kindt::TAG ||
-       id_entry->kind == new_scopet::kindt::CLASS_TEMPLATE);
+       id_entry->kind == new_scopet::kindt::CLASS_TEMPLATE ||
+       id_entry->kind == new_scopet::kindt::NAMESPACE);
 
     if(!is_known_type)
     {
@@ -9076,11 +9096,24 @@ bool Parser::rPrimaryExpr(exprt &exp)
     set_location(exp, tk);
 
     // C++11 user-defined literals: 4_kb becomes operator""_kb(4)
+    // Also handle standard library UDL suffixes (chrono: s, h, min, ms,
+    // us, ns, d, y; complex: i, il, if).
     if(is_identifier(lex.LookAhead(0)))
     {
       cpp_tokent suffix_tk;
       lex.LookAhead(0, suffix_tk);
-      if(!suffix_tk.text.empty() && suffix_tk.text[0] == '_')
+      bool is_udl = !suffix_tk.text.empty() && suffix_tk.text[0] == '_';
+      if(
+        !is_udl && (suffix_tk.text == "s" || suffix_tk.text == "h" ||
+                    suffix_tk.text == "min" || suffix_tk.text == "ms" ||
+                    suffix_tk.text == "us" || suffix_tk.text == "ns" ||
+                    suffix_tk.text == "d" || suffix_tk.text == "y" ||
+                    suffix_tk.text == "i" || suffix_tk.text == "il" ||
+                    suffix_tk.text == "if"))
+      {
+        is_udl = true;
+      }
+      if(is_udl)
       {
         lex.get_token(suffix_tk);
         // Build cpp_name: operator + ""_suffix
@@ -9112,11 +9145,16 @@ bool Parser::rPrimaryExpr(exprt &exp)
     set_location(exp, tk);
 
     // C++11 user-defined string literal: "abc"_suffix
+    // Also handle standard library UDL suffixes (s for string, sv for
+    // string_view).
     if(is_identifier(lex.LookAhead(0)))
     {
       cpp_tokent suffix_tk;
       lex.LookAhead(0, suffix_tk);
-      if(!suffix_tk.text.empty() && suffix_tk.text[0] == '_')
+      bool is_udl = !suffix_tk.text.empty() && suffix_tk.text[0] == '_';
+      if(!is_udl && (suffix_tk.text == "s" || suffix_tk.text == "sv"))
+        is_udl = true;
+      if(is_udl)
       {
         lex.get_token(suffix_tk);
         irept op_node(ID_operator);
@@ -9552,6 +9590,26 @@ bool Parser::rVarNameCore(exprt &name)
             new_scopet *s = lookup_id(id);
             if(s != nullptr && s->is_template())
                 try_template_args = true;
+          }
+          // Speculatively try template args for unknown identifiers
+          // inside class/template scope (forward-referenced member
+          // variable templates like __ptr_to_nonvolatile<T>).
+          if(!try_template_args)
+          {
+            cpp_token_buffert::post spec_pos = lex.Save();
+            irept spec_args;
+            if(rTemplateArgs(spec_args))
+            {
+                int next = lex.LookAhead(0);
+                if(
+                  next == TOK_ANDAND || next == TOK_OROR || next == ')' ||
+                  next == ';' || next == ',' || next == ':' || next == '?' ||
+                  next == TOK_SHIFTRIGHT || next == TOK_EQ || next == TOK_NE)
+                {
+                try_template_args = true;
+                }
+            }
+            lex.Restore(spec_pos);
           }
         }
         if(try_template_args)
@@ -11355,6 +11413,10 @@ std::optional<codet> Parser::rIntegralDeclStatement(
   cpp_tokent tk;
 
   if(!optCvQualify(cv_q))
+    return {};
+
+  // Handle late storage specifiers: auto constexpr x = 42;
+  if(!optStorageSpec(storage_spec))
     return {};
 
   merge_types(cv_q, integral);

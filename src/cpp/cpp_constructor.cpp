@@ -149,6 +149,11 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
           if(default_val.is_not_nil())
           {
             exprt val = static_cast<const exprt &>(default_val);
+            // Type-check in the class scope so that using-declarations
+            // (e.g., using enum) are visible.
+            cpp_save_scopet save_scope(cpp_scopes);
+            cpp_scopes.set_scope(
+              to_struct_tag_type(object_tc.type()).get_identifier());
             typecheck_expr(val);
             if(val.type() != comp.type())
               val = typecast_exprt(val, comp.type());
