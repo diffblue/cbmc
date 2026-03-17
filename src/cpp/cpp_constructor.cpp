@@ -148,6 +148,35 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
     }
     else
     {
+      // C++20 aggregate parenthesized initialization
+      if(object_tc.type().id() == ID_struct_tag)
+      {
+        const struct_typet &struct_type =
+          follow_tag(to_struct_tag_type(object_tc.type()));
+        const auto &components = struct_type.components();
+        code_blockt block;
+        std::size_t idx = 0;
+        for(const auto &comp : components)
+        {
+          if(
+            comp.get_bool(ID_from_base) || comp.get_bool(ID_is_type) ||
+            comp.get_bool(ID_is_static) || comp.type().id() == ID_code)
+            continue;
+          if(idx < operands_tc.size())
+          {
+            member_exprt member(object_tc, comp.get_name(), comp.type());
+            member.set(ID_C_lvalue, true);
+            exprt val =
+              typecast_exprt::conditional_cast(operands_tc[idx], comp.type());
+            side_effect_expr_assignt assign(
+              std::move(member), std::move(val), typet(), source_location);
+            typecheck_side_effect_assignment(assign);
+            block.add(code_expressiont(std::move(assign)));
+          }
+          ++idx;
+        }
+        return std::move(block);
+      }
       error().source_location = source_location;
       error() << "initialization of POD requires one argument, "
                  "but got "

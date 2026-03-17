@@ -563,6 +563,47 @@ bool c_preprocess_gcc_clang(
       argv.push_back("-D_PSTL_GLUE_ALGORITHM_DEFS_H=1");
       argv.push_back("-D_PSTL_GLUE_NUMERIC_DEFS_H=1");
       break;
+
+    case configt::cppt::cpp_standardt::CPP20:
+#if defined(__OpenBSD__)
+      if(preprocessor == configt::ansi_ct::preprocessort::CLANG)
+        argv.push_back("-std=c++20");
+      else
+#endif
+        argv.push_back("-std=gnu++20");
+      argv.push_back("-U__cpp_deduction_guides");
+      argv.push_back("-D_PSTL_GLUE_MEMORY_DEFS_H=1");
+      argv.push_back("-D_PSTL_GLUE_ALGORITHM_DEFS_H=1");
+      argv.push_back("-D_PSTL_GLUE_NUMERIC_DEFS_H=1");
+      break;
+
+    case configt::cppt::cpp_standardt::CPP23:
+#if defined(__OpenBSD__)
+      if(preprocessor == configt::ansi_ct::preprocessort::CLANG)
+        argv.push_back("-std=c++23");
+      else
+#endif
+        argv.push_back("-std=gnu++23");
+      argv.push_back("-U__cpp_deduction_guides");
+      argv.push_back("-D_PSTL_GLUE_MEMORY_DEFS_H=1");
+      argv.push_back("-D_PSTL_GLUE_ALGORITHM_DEFS_H=1");
+      argv.push_back("-D_PSTL_GLUE_NUMERIC_DEFS_H=1");
+      break;
+
+    case configt::cppt::cpp_standardt::CPP26:
+      // C++26 is not yet widely supported by preprocessors; use C++23
+      // for preprocessing and rely on CBMC's own parser for C++26 features.
+#if defined(__OpenBSD__)
+      if(preprocessor == configt::ansi_ct::preprocessort::CLANG)
+        argv.push_back("-std=c++23");
+      else
+#endif
+        argv.push_back("-std=gnu++23");
+      argv.push_back("-U__cpp_deduction_guides");
+      argv.push_back("-D_PSTL_GLUE_MEMORY_DEFS_H=1");
+      argv.push_back("-D_PSTL_GLUE_ALGORITHM_DEFS_H=1");
+      argv.push_back("-D_PSTL_GLUE_NUMERIC_DEFS_H=1");
+      break;
     }
   }
   else

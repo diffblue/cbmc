@@ -35,9 +35,9 @@ bool cpp_parsert::parse()
   // We use the ANSI-C scanner
   token_buffer.ansi_c_parser.cpp98 = true;
   token_buffer.ansi_c_parser.cpp11 =
-    config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP11 ||
-    config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP14 ||
-    config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP17;
+    config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP11;
+  token_buffer.ansi_c_parser.cpp20 =
+    config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP20;
   token_buffer.ansi_c_parser.ts_18661_3_Floatn_types =
     config.ansi_c.ts_18661_3_Floatn_types;
   token_buffer.ansi_c_parser.__float128_is_keyword = false;

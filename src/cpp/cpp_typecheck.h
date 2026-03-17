@@ -381,6 +381,7 @@ protected:
   }
   void typecheck_enum_body(symbolt &symbol);
   void typecheck_method_bodies();
+  void typecheck_contracts();
   void typecheck_compound_bases(struct_typet &type);
   void add_anonymous_members_to_scope(const symbolt &struct_union_symbol);
 
@@ -597,6 +598,8 @@ private:
   bool in_template_conversion = false;   // Prevent recursion in conversion
   bool skip_typechecking_elaborate = false;
   std::unordered_set<irep_idt> deferred_typechecking;
+  std::unordered_set<irep_idt> functions_being_typechecked;
+  std::map<irep_idt, exprt> generic_lambda_map;
   bool support_float16_type;
 };
 

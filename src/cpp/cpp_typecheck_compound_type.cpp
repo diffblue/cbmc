@@ -86,6 +86,10 @@ bool cpp_typecheckt::has_auto(const typet &type)
 
     return false;
   }
+  else if(type.id() == ID_code)
+  {
+    return has_auto(to_code_type(type).return_type());
+  }
   else
     return false;
 }
@@ -770,6 +774,12 @@ void cpp_typecheckt::typecheck_compound_declarator(
   // array members must have fixed size
   check_fixed_size_array(component.type());
 
+  // C++11: store default member initializer on the component
+  if(!is_method && !is_static && value.is_not_nil() && value.id() != ID_code)
+  {
+    component.add(ID_C_default_value, value);
+  }
+
   put_compound_into_scope(component);
 
   components.push_back(component);
@@ -1388,7 +1398,9 @@ void cpp_typecheckt::typecheck_member_function(
   }
   else
   {
-    add_this_to_method_type(compound_symbol, type, method_qualifier);
+    // C++23 deducing this: don't add implicit this
+    if(!type.get_bool("explicit_this"))
+      add_this_to_method_type(compound_symbol, type, method_qualifier);
   }
 
   if(value.id() == ID_cpp_not_typechecked && value.has_operands())
@@ -1460,7 +1472,7 @@ void cpp_typecheckt::typecheck_member_function(
   // If so, we defer typechecking until used.
   if(cpp_scopes.current_scope().get_parent().is_template_scope())
     deferred_typechecking.insert(new_symbol->name);
-  else // remember for later typechecking of body
+  else
     add_method_body(new_symbol);
 }
 
@@ -1750,10 +1762,7 @@ bool cpp_typecheckt::check_component_access(
 
       // C++11 (DR 45): nested classes have access to the enclosing
       // class's private and protected members.
-      if(
-        config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP11 ||
-        config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP14 ||
-        config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP17)
+      if(config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP11)
       {
         continue;
       }
@@ -1796,10 +1805,7 @@ bool cpp_typecheckt::check_component_access(
 
         // C++11 (DR 45): nested classes have access to the enclosing
         // class's friends.
-        if(
-          config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP11 ||
-          config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP14 ||
-          config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP17)
+        if(config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP11)
         {
           continue;
         }
