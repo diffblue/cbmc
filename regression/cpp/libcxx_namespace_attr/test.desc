@@ -1,0 +1,10 @@
+CORE
+main.cpp
+-std=c++11
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Test libc++ namespace attribute pattern and inline variables

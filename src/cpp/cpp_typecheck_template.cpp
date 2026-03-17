@@ -875,6 +875,10 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
     {
       parameter = type_exprt(template_parameter_symbol_typet(identifier));
       parameter.type().add_source_location()=declaration.find_source_location();
+      // Mark template template parameters so that argument typechecking
+      // can resolve the argument as a template name rather than a type.
+      if(declaration.type().id() == ID_template)
+        parameter.set(ID_is_template, true);
     }
     else
     {
@@ -1020,6 +1024,36 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
 
     if(parameter.id()==ID_type)
     {
+      // Template template parameter: resolve argument as a template name
+      // and store the template symbol identifier.
+      if(parameter.get_bool(ID_is_template))
+      {
+        irep_idt template_name;
+        if(arg.id() == ID_ambiguous && arg.type().id() == ID_cpp_name)
+          template_name = to_cpp_name(arg.type()).get_base_name();
+        else if(arg.id() == ID_type && arg.type().id() == ID_cpp_name)
+          template_name = to_cpp_name(arg.type()).get_base_name();
+
+        if(!template_name.empty())
+        {
+          const auto id_set = cpp_scopes.current_scope().lookup(
+            template_name, cpp_scopet::RECURSIVE, cpp_idt::id_classt::TEMPLATE);
+          if(!id_set.empty())
+          {
+            const cpp_idt &cpp_id = **id_set.begin();
+            arg =
+              type_exprt(template_parameter_symbol_typet(cpp_id.identifier));
+            arg.type().add_source_location() = parameter.source_location();
+            template_map.set(parameter, arg);
+            continue;
+          }
+        }
+        error().source_location = arg.source_location();
+        error() << "expected template name for template template parameter"
+                << eom;
+        throw 0;
+      }
+
       if(arg.id()==ID_type)
       {
         typecheck_type(arg.type());

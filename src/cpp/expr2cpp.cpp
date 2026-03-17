@@ -63,8 +63,17 @@ std::string expr2cppt::convert_struct(
   const struct_typet::componentst &components=
     struct_type.components();
 
+  // C++ struct types may include method members (code-type components)
+  // that are not present in struct expressions; count only data members.
+  std::size_t data_components = 0;
+  for(const auto &c : components)
+  {
+    if(c.type().id() != ID_code)
+      ++data_components;
+  }
+
   DATA_INVARIANT(
-    components.size() == src.operands().size(), "component count mismatch");
+    data_components == src.operands().size(), "component count mismatch");
 
   exprt::operandst::const_iterator o_it=src.operands().begin();
 
@@ -104,7 +113,8 @@ std::string expr2cppt::convert_struct(
       dest+=tmp;
     }
 
-    o_it++;
+    if(c.type().id() != ID_code)
+      o_it++;
   }
 
   dest+=" }";
