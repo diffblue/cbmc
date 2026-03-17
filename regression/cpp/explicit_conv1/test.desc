@@ -1,0 +1,11 @@
+KNOWNBUG
+main.cpp
+-std=c++11
+^EXIT=0$
+^SIGNAL=0$
+--
+^error
+^PARSING ERROR
+--
+Explicit conversion operators parse correctly but type-checking of
+explicit conversions in boolean contexts is not yet implemented.

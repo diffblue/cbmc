@@ -996,6 +996,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       typecheck_expr(arg);
       simplify(arg, *this);
       implicit_typecast(arg, type);
+      simplify(arg, *this);
     }
 
     // Set right away -- this is for the benefit of default
