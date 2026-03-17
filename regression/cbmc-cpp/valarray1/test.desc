@@ -1,0 +1,8 @@
+CORE
+main.cpp
+--cpp11 --show-goto-functions
+^Generating GOTO Program$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$

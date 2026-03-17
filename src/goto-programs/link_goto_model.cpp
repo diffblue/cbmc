@@ -181,7 +181,10 @@ void finalize_linking(
     {
       const symbolt &symbol = symbol_pair.second;
 
-      INVARIANT(symbol.value.id() == ID_symbol, "must have symbol");
+      // C++ constexpr functions may be marked as macros but have
+      // code bodies rather than symbol aliases — skip those.
+      if(symbol.value.id() != ID_symbol)
+        continue;
       const irep_idt &id = to_symbol_expr(symbol.value).get_identifier();
 
       #if 0

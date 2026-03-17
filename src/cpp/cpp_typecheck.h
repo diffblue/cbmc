@@ -134,6 +134,8 @@ protected:
   void typecheck_class_template(cpp_declarationt &declaration);
 
   void typecheck_function_template(cpp_declarationt &declaration);
+  void typecheck_variable_template(cpp_declarationt &declaration);
+  void convert_variable_template_specialization(cpp_declarationt &declaration);
 
   void typecheck_template_alias(cpp_declarationt &declaration);
 

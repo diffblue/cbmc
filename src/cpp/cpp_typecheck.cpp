@@ -327,11 +327,18 @@ void cpp_typecheckt::clean_up()
     const symbolt &symbol=cur_it->second;
 
     // erase templates and all member functions that have not been converted
-    if(
-      symbol.type.get_bool(ID_is_template) ||
-      deferred_typechecking.find(symbol.name) != deferred_typechecking.end())
+    if(symbol.type.get_bool(ID_is_template))
     {
       symbol_table.erase(cur_it);
+      continue;
+    }
+    else if(
+      deferred_typechecking.find(symbol.name) != deferred_typechecking.end())
+    {
+      // Member functions in template scopes that were never instantiated.
+      // Clear the un-typechecked body but keep the symbol so that
+      // goto conversion can create a no-body stub if it's referenced.
+      symbol_table.get_writeable_ref(symbol.name).value.make_nil();
       continue;
     }
     else if(symbol.type.id()==ID_struct ||

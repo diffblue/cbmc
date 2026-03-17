@@ -63,6 +63,7 @@ public:
     CLASS_TEMPLATE,
     MEMBER_TEMPLATE,
     FUNCTION_TEMPLATE,
+    VARIABLE_TEMPLATE,
     BLOCK,
     NON_TYPE_TEMPLATE_PARAMETER,
     TYPE_TEMPLATE_PARAMETER,
@@ -82,9 +83,8 @@ public:
 
   bool is_template() const
   {
-    return kind==kindt::FUNCTION_TEMPLATE ||
-           kind==kindt::CLASS_TEMPLATE ||
-           kind==kindt::MEMBER_TEMPLATE;
+    return kind == kindt::FUNCTION_TEMPLATE || kind == kindt::CLASS_TEMPLATE ||
+           kind == kindt::MEMBER_TEMPLATE || kind == kindt::VARIABLE_TEMPLATE;
   }
 
   bool is_named_scope() const
@@ -120,6 +120,8 @@ public:
       return "MEMBER_TEMPLATE";
     case kindt::FUNCTION_TEMPLATE:
       return "FUNCTION_TEMPLATE";
+    case kindt::VARIABLE_TEMPLATE:
+      return "VARIABLE_TEMPLATE";
     case kindt::BLOCK:
       return "BLOCK";
     case kindt::NON_TYPE_TEMPLATE_PARAMETER:
@@ -854,7 +856,7 @@ bool Parser::isTypeSpecifier()
          t == TOK_TYPENAME || t == TOK_TYPEOF || t == TOK_DECLTYPE ||
          t == TOK_UNDERLYING_TYPE || t == TOK_GCC_BUILTIN_REMOVE_CV ||
          t == TOK_GCC_BUILTIN_REMOVE_REFERENCE ||
-         t == TOK_GCC_BUILTIN_REMOVE_CVREF;
+         t == TOK_GCC_BUILTIN_REMOVE_CVREF || t == TOK_ATOMIC_TYPE_SPECIFIER;
 }
 
 /*
@@ -1052,13 +1054,20 @@ bool Parser::rStaticAssert(cpp_static_assertt &cpp_static_assert)
   if(!rExpression(cond, false))
     return false;
 
-  if(lex.get_token(tk)!=',')
-    return false;
-
   exprt description;
 
-  if(!rExpression(description, false))
-    return false;
+  // C++17: message is optional
+  if(lex.LookAhead(0) == ',')
+  {
+    lex.get_token(tk);
+    if(!rExpression(description, false))
+      return false;
+  }
+  else
+  {
+    description = exprt(ID_string_constant);
+    description.set(ID_value, "");
+  }
 
   if(lex.get_token(tk)!=')')
     return false;
@@ -1169,6 +1178,27 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
   case tdk_unknown:
     UNREACHABLE;
     break;
+  }
+
+  // Register variable template names so the parser can disambiguate
+  // name<args> as template arguments rather than less-than comparison.
+  // Skip class templates, function templates, and qualified names
+  // (out-of-class static member definitions).
+  if(
+    (kind == tdk_decl || kind == tdk_specialization) &&
+    !decl.is_class_template() && !decl.declarators().empty() &&
+    decl.declarators().front().type().id() != ID_function_type &&
+    !decl.declarators().front().name().is_qualified())
+  {
+    const auto &dname = decl.declarators().front().name();
+    irep_idt base = dname.get_base_name();
+    if(
+      base != irep_idt() && lookup_id(base) == nullptr &&
+      current_scope->parent != nullptr)
+    {
+      auto &entry = current_scope->parent->id_map[base];
+      entry.kind = new_scopet::kindt::VARIABLE_TEMPLATE;
+    }
   }
 
   return true;
@@ -2131,8 +2161,29 @@ bool Parser::optMemberSpec(cpp_member_spect &member_spec)
       break;
     case TOK_VIRTUAL:  member_spec.set_virtual(true); break;
     case TOK_FRIEND:   member_spec.set_friend(true); break;
-    case TOK_EXPLICIT: member_spec.set_explicit(true); break;
+    case TOK_EXPLICIT:
+      member_spec.set_explicit(true);
+      // C++20 explicit(expr): skip the condition
+      if(lex.LookAhead(0) == '(')
+      {
+        cpp_tokent op;
+        lex.get_token(op);
+        exprt discarded;
+        if(!rExpression(discarded, false))
+          return false;
+        if(lex.get_token(op) != ')')
+          return false;
+      }
+      break;
     default: UNREACHABLE;
+    }
+
+    // Skip __attribute__((...)) between member specifiers
+    {
+      typet discard;
+      discard.make_nil();
+      if(!optAttribute(discard))
+        return false;
     }
 
     t=lex.LookAhead(0);
@@ -2199,7 +2250,7 @@ bool Parser::optCvQualify(typet &cv)
     if(
       t == TOK_CONST || t == TOK_VOLATILE || t == TOK_RESTRICT ||
       t == TOK_PTR32 || t == TOK_PTR64 || t == TOK_GCC_ATTRIBUTE ||
-      t == TOK_GCC_ASM)
+      t == TOK_GCC_ASM || t == TOK_ATOMIC_TYPE_QUALIFIER)
     {
       cpp_tokent tk;
       lex.get_token(tk);
@@ -2252,6 +2303,10 @@ bool Parser::optCvQualify(typet &cv)
           return false;
         if(lex.get_token(tk)!=')')
           return false;
+        break;
+
+      case TOK_ATOMIC_TYPE_QUALIFIER:
+        // C11 _Atomic qualifier — ignore in C++ mode
         break;
 
       default:
@@ -2861,6 +2916,31 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
 
     return true;
   }
+  else if(
+    t == TOK_ATOMIC_TYPE_SPECIFIER ||
+    (is_identifier(t) && lex.LookAhead(1) == '(' &&
+     [&]
+     {
+       cpp_tokent peek;
+       lex.LookAhead(0, peek);
+       return peek.data.get(ID_C_base_name) == "_Atomic";
+     }()))
+  {
+    // C11 _Atomic(T) — parse and treat as T in C++ mode
+    cpp_tokent tk;
+    lex.get_token(tk);
+
+    if(lex.get_token(tk) != '(')
+      return false;
+
+    if(!rTypeName(p))
+      return false;
+
+    if(lex.get_token(tk) != ')')
+      return false;
+
+    return true;
+  }
   else
   {
     p.make_nil();
@@ -2951,6 +3031,19 @@ bool Parser::rConstructorDecl(
 
     if(!rTypeName(trailing_return_type))
       return false;
+  }
+
+  // C++11 virt-specifier-seq: override, final
+  for(;;)
+  {
+    cpp_tokent virt_tk;
+    if(!is_identifier(lex.LookAhead(0)))
+      break;
+    lex.LookAhead(0, virt_tk);
+    if(virt_tk.text == "override" || virt_tk.text == "final")
+      lex.get_token(virt_tk);
+    else
+      break;
   }
 
 #ifdef DEBUG
@@ -5622,6 +5715,13 @@ bool Parser::rLogicalOrExpr(exprt &exp, bool template_args)
     cpp_tokent tk;
     lex.get_token(tk);
 
+    // C++17 fold expression: (expr || ...)
+    if(lex.LookAhead(0) == TOK_ELLIPSIS)
+    {
+      lex.get_token(tk);
+      break;
+    }
+
     exprt right;
     if(!rLogicalAndExpr(right, template_args))
       return false;
@@ -5662,6 +5762,13 @@ bool Parser::rLogicalAndExpr(exprt &exp, bool template_args)
   {
     cpp_tokent tk;
     lex.get_token(tk);
+
+    // C++17 fold expression: (expr && ...)
+    if(lex.LookAhead(0) == TOK_ELLIPSIS)
+    {
+      lex.get_token(tk);
+      break;
+    }
 
     exprt right;
     if(!rInclusiveOrExpr(right, template_args))
@@ -5971,6 +6078,13 @@ bool Parser::rAdditiveExpr(exprt &exp)
   {
     cpp_tokent tk;
     lex.get_token(tk);
+
+    // C++17 fold expression: (expr + ...)
+    if(lex.LookAhead(0) == TOK_ELLIPSIS)
+    {
+      lex.get_token(tk);
+      break;
+    }
 
     exprt right;
     if(!rMultiplyExpr(right))
@@ -6510,8 +6624,69 @@ bool Parser::rUnaryExpr(exprt &exp)
     return rSizeofExpr(exp);
   else if(t==TOK_ALIGNOF)
     return rAlignofExpr(exp);
+  else if(t == TOK_OFFSETOF)
+  {
+    // __builtin_offsetof(type, member)
+    cpp_tokent tk;
+    lex.get_token(tk);
+    if(lex.get_token(tk) != '(')
+      return false;
+    typet tname;
+    if(!rTypeName(tname))
+      return false;
+    if(lex.get_token(tk) != ',')
+      return false;
+    // parse member designator as identifier(s) with . separators
+    exp = exprt(ID_builtin_offsetof);
+    exp.type() = typet(ID_size_t);
+    exp.add(ID_type_arg).swap(tname);
+    {
+      exprt member(ID_designated_initializer);
+      for(;;)
+      {
+        cpp_tokent mtk;
+        if(!is_identifier(lex.LookAhead(0)))
+          return false;
+        lex.get_token(mtk);
+        exprt desig(ID_member);
+        desig.set(ID_component_name, mtk.data.get(ID_C_base_name));
+        member.add_to_operands(std::move(desig));
+        if(lex.LookAhead(0) != '.')
+          break;
+        lex.get_token(mtk);
+      }
+      exp.add(ID_designator).swap(member);
+    }
+    if(lex.get_token(tk) != ')')
+      return false;
+    set_location(exp, tk);
+    return true;
+  }
   else if(t==TOK_NOEXCEPT)
     return rNoexceptExpr(exp);
+  else if(t == TOK_BIT_CAST)
+  {
+    // __builtin_bit_cast(type, expr)
+    cpp_tokent tk;
+    lex.get_token(tk);
+    if(lex.get_token(tk) != '(')
+      return false;
+    typet tname;
+    if(!rTypeName(tname))
+      return false;
+    if(lex.get_token(tk) != ',')
+      return false;
+    exprt val;
+    if(!rExpression(val, false))
+      return false;
+    if(lex.get_token(tk) != ')')
+      return false;
+    exp = exprt(ID_typecast);
+    exp.type() = tname;
+    exp.add_to_operands(std::move(val));
+    set_location(exp, tk);
+    return true;
+  }
   else if(t==TOK_REAL || t==TOK_IMAG)
   {
     // a GCC extension for complex floating-point arithmetic
@@ -7663,7 +7838,7 @@ bool Parser::rLambdaExpr(exprt &exp)
     {
       lex.get_token(tk);
       typet return_type;
-      if(!rTypeSpecifier(return_type, false))
+      if(!rTypeName(return_type))
         return false;
       exp.add("return_type", return_type);
     }
@@ -8015,53 +8190,76 @@ bool Parser::rVarNameCore(exprt &name)
       components.push_back(cpp_namet::namet(tk.data.get(ID_C_base_name)));
       set_location(components.back(), tk);
 
-      // may be followed by template arguments, but only if the
-      // identifier could be a type or template name
-      if(maybeTemplateArgs() && MaybeTypeNameOrClassTemplate(tk))
       {
-        // For qualified names where the member is not found by
-        // lookup, treat '<' as less-than per [temp.names]/4
-        // only when the qualifier is dependent.
-        bool is_dependent_member = false;
-        if(!template_keyword_seen && components.size() >= 2)
+        // may be followed by template arguments, but only if the
+        // identifier could be a type or template name.
+        // When the identifier is a known template but maybeTemplateArgs()
+        // fails (e.g., non-type args containing '<' that confuse the
+        // balanced-bracket heuristic), we still attempt rTemplateArgs
+        // with save/restore.  In expression context, an identifier
+        // immediately after '>' indicates a declaration (e.g.,
+        // unique_lock<T> var), not a template-id expression, so we
+        // reject that case to avoid stealing tokens from the
+        // declaration parser.
+        bool try_template_args =
+          (maybeTemplateArgs() && MaybeTypeNameOrClassTemplate(tk));
+        if(!try_template_args && lex.LookAhead(0) == '<')
         {
-          irep_idt mid = tk.data.get(ID_C_base_name);
-          new_scopet *mfound = lookup_id(mid);
-          if(mfound == nullptr)
+          irep_idt id = tk.data.get(ID_C_base_name);
+          if(!id.empty())
           {
-            for(std::size_t i = components.size(); i >= 2; --i)
-            {
-                if(components[i - 1].id() != "::")
-                  continue;
-
-                if(i >= 2 && components[i - 2].id() == ID_template_args)
-                {
-                  is_dependent_member = true;
-                  break;
-                }
-
-                if(components[i - 2].id() == ID_name)
-                {
-                  irep_idt qid = components[i - 2].get(ID_identifier);
-                  new_scopet *qfound = lookup_id(qid);
-                  if(
-                    qfound != nullptr &&
-                    qfound->kind == new_scopet::kindt::TYPE_TEMPLATE_PARAMETER)
-                  {
-                    is_dependent_member = true;
-                  }
-                }
-                break;
-            }
+            new_scopet *s = lookup_id(id);
+            if(s != nullptr && s->is_template())
+                try_template_args = true;
           }
         }
-
-        if(!is_dependent_member)
+        if(try_template_args)
         {
-          cpp_token_buffert::post pos = lex.Save();
+          // For qualified names where the member is not found by
+          // lookup, treat '<' as less-than per [temp.names]/4
+          // only when the qualifier is dependent.
+          bool is_dependent_member = false;
+          if(!template_keyword_seen && components.size() >= 2)
+          {
+            irep_idt mid = tk.data.get(ID_C_base_name);
+            new_scopet *mfound = lookup_id(mid);
+            if(mfound == nullptr)
+            {
+                for(std::size_t i = components.size(); i >= 2; --i)
+                {
+                  if(components[i - 1].id() != "::")
+                    continue;
+
+                  if(i >= 2 && components[i - 2].id() == ID_template_args)
+                  {
+                    is_dependent_member = true;
+                    break;
+                  }
+
+                  if(components[i - 2].id() == ID_name)
+                  {
+                    irep_idt qid = components[i - 2].get(ID_identifier);
+                    new_scopet *qfound = lookup_id(qid);
+                    if(
+                      qfound != nullptr &&
+                      qfound->kind ==
+                        new_scopet::kindt::TYPE_TEMPLATE_PARAMETER)
+                    {
+                      is_dependent_member = true;
+                    }
+                  }
+                  break;
+                }
+            }
+          }
+
+          if(!is_dependent_member)
+          {
+            cpp_token_buffert::post pos = lex.Save();
 
 #ifdef DEBUG
-          std::cout << std::string(__indent, ' ') << "Parser::rVarNameCore 4\n";
+            std::cout << std::string(__indent, ' ')
+                      << "Parser::rVarNameCore 4\n";
 #endif
 
           irept args;
@@ -8071,11 +8269,23 @@ bool Parser::rVarNameCore(exprt &name)
             return true;
           }
 
+          // In expression context, a plain identifier after '>'
+          // means this is really a declaration (e.g.,
+          // unique_lock<T> var{...}), not a template-id expression.
+          // Restore and let the declaration parser handle it.
+          if(
+            is_identifier(lex.LookAhead(0)) && lex.LookAhead(0) != TOK_OPERATOR)
+          {
+            lex.Restore(pos);
+            return true;
+          }
+
           components.push_back(irept(ID_template_args));
           components.back().add(ID_arguments).swap(args);
-        }
+          }
         template_keyword_seen = false;
-      }
+        }
+      } // end of template-args block
 
       if(!moreVarName())
         return true;
@@ -8220,7 +8430,8 @@ bool Parser::maybeTemplateArgs()
     }
 
     t=lex.LookAhead(i);
-    return t == TOK_SCOPE || t == '(' || t == ')' || t == '{';
+    return t == TOK_SCOPE || t == '(' || t == ')' || t == '{' || t == ';' ||
+           t == ',';
   }
 
 #ifdef DEBUG
@@ -8634,6 +8845,10 @@ std::optional<codet> Parser::rIfStatement()
 
   if(lex.get_token(tk1)!=TOK_IF)
     return {};
+
+  // C++17 if constexpr
+  if(lex.LookAhead(0) == TOK_CONSTEXPR)
+    lex.get_token(tk2);
 
   if(lex.get_token(tk2)!='(')
     return {};

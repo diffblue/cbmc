@@ -195,20 +195,26 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   // do we have args?
   if(full_template_args.arguments().empty())
   {
-    // Empty args are valid for variadic templates with zero arguments.
+    // Empty args are valid for:
+    // 1. Variadic templates with zero arguments (e.g., tuple<>)
+    // 2. Explicit specializations with zero parameters
     const template_typet &template_type =
       to_cpp_declaration(template_symbol.type).template_type();
     const auto &params = template_type.template_parameters();
-    bool all_variadic = !params.empty();
-    for(const auto &p : params)
+    bool valid_empty = params.empty();
+    if(!valid_empty)
     {
-      if(!p.get_bool(ID_ellipsis))
+      valid_empty = true;
+      for(const auto &p : params)
       {
-        all_variadic = false;
-        break;
+        if(!p.get_bool(ID_ellipsis))
+        {
+          valid_empty = false;
+          break;
+        }
       }
     }
-    if(!all_variadic)
+    if(!valid_empty)
     {
       error().source_location = source_location;
       error() << "'" << template_symbol.base_name
@@ -284,6 +290,16 @@ void cpp_typecheckt::elaborate_class_template(
   if(t_type.id() == ID_struct && t_type.get_bool(ID_template_class_instance))
   {
     const symbolt &primary_template = lookup(t_type.get(ID_identifier));
+
+    // If this class template is already being instantiated (on the
+    // instantiation stack), skip elaboration to break infinite
+    // recursion.
+    for(const auto &entry : instantiation_stack)
+    {
+      if(entry.identifier == primary_template.name)
+        return;
+    }
+
     const cpp_template_args_tct &specialization_args =
       static_cast<const cpp_template_args_tct &>(
         t_type.find(ID_specialization_template_args));
@@ -432,6 +448,30 @@ void cpp_typecheckt::elaborate_class_template(
 
           if(partial_specialization_args_tc == full_args_tc)
           {
+            // operator== on irept ignores #-prefixed attributes like
+            // C_constant and C_volatile. Check them explicitly.
+            bool qualifiers_match = true;
+            for(std::size_t j = 0;
+                j < partial_specialization_args_tc.arguments().size();
+                j++)
+            {
+              const exprt &p = partial_specialization_args_tc.arguments()[j];
+              const exprt &f = full_args_tc.arguments()[j];
+              if(p.id() == ID_type)
+              {
+                if(
+                  p.type().get_bool(ID_C_constant) !=
+                    f.type().get_bool(ID_C_constant) ||
+                  p.type().get_bool(ID_C_volatile) !=
+                    f.type().get_bool(ID_C_volatile))
+                {
+                  qualifiers_match = false;
+                  break;
+                }
+              }
+            }
+            if(!qualifiers_match)
+              continue;
             // Check if this specialization is more specialized than
             // the current best match. A specialization is more
             // specialized if its pattern has more constrained
@@ -515,6 +555,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
   if(instantiation_stack.size()==MAX_DEPTH)
   {
+    show_instantiation_stack(error());
     error().source_location=source_location;
     error() << "reached maximum template recursion depth ("
             << MAX_DEPTH << ")" << eom;
@@ -563,20 +604,26 @@ const symbolt &cpp_typecheckt::instantiate_template(
   // do we have arguments?
   if(full_template_args.arguments().empty())
   {
-    // Empty args are valid for variadic templates with zero arguments.
+    // Empty args are valid for:
+    // 1. Variadic templates with zero arguments (e.g., tuple<>)
+    // 2. Explicit specializations with zero parameters
     const template_typet &template_type =
       to_cpp_declaration(template_symbol.type).template_type();
     const auto &params = template_type.template_parameters();
-    bool all_variadic = !params.empty();
-    for(const auto &p : params)
+    bool valid_empty = params.empty();
+    if(!valid_empty)
     {
-      if(!p.get_bool(ID_ellipsis))
+      valid_empty = true;
+      for(const auto &p : params)
       {
-        all_variadic = false;
-        break;
+        if(!p.get_bool(ID_ellipsis))
+        {
+          valid_empty = false;
+          break;
+        }
       }
     }
-    if(!all_variadic)
+    if(!valid_empty)
     {
       error().source_location = source_location;
       error() << "'" << template_symbol.base_name
@@ -757,8 +804,17 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
   if(new_decl.type().id()==ID_struct)
   {
+    // Switch to the sub-scope so that typecheck_compound_type creates
+    // the class symbol with an identifier that includes the template
+    // suffix, matching the identifier used by class_template_symbol.
+    cpp_scopes.go_to(sub_scope);
+
     // a class template
     convert_non_template_declaration(new_decl);
+
+    // Restore the template scope for template method processing.
+    saved_scope.restore();
+    cpp_scopes.go_to(*template_scope);
 
     // also instantiate all the template methods
     const exprt &template_methods = static_cast<const exprt &>(
@@ -861,6 +917,19 @@ const symbolt &cpp_typecheckt::instantiate_template(
       method_decl.remove(ID_template_type);
       method_decl.remove(ID_is_template);
 
+      // Apply the template map to substitute template parameters
+      // (e.g. _Dom, _Tp) with the actual types in the method
+      // declaration before converting it.
+      // First, type-check the declaration type in the method's
+      // template scope so that template parameter names (cpp_name)
+      // are resolved to template_parameter_symbol_type, then apply
+      // the template map to replace them with actual types.
+      if(method_decl.type().id() == ID_cpp_name)
+      {
+        typecheck_type(method_decl.type());
+        template_map.apply(method_decl.type());
+      }
+
       convert(method_decl);
     }
 
@@ -921,13 +990,177 @@ const symbolt &cpp_typecheckt::instantiate_template(
       false,
       false);
 
-    return lookup(to_struct_type(symb.type).components().back().get_name());
+    const symbolt &method_sym =
+      lookup(to_struct_type(symb.type).components().back().get_name());
+
+    // The method was added to deferred_typechecking by
+    // typecheck_compound_declarator (because the parent scope is a template
+    // scope). Since we are actually instantiating this method, move it
+    // from deferred_typechecking to method_bodies so the body gets
+    // type-checked and is not erased during clean_up.
+    if(deferred_typechecking.erase(method_sym.name))
+      add_method_body(&symbol_table.get_writeable_ref(method_sym.name));
+
+    return method_sym;
   }
 
   // not a class template, not a class template method,
-  // it must be a function template or a template alias!
+  // it must be a function template, a template alias, or a variable template!
 
   PRECONDITION(new_decl.declarators().size() == 1);
+
+  // Variable template: the declarator type is not a function type.
+  // Instantiate by converting the declaration directly.
+  if(
+    !new_decl.declarators().empty() &&
+    new_decl.declarators()[0].type().id() != ID_function_type &&
+    new_decl.type().id() != ID_struct && !new_decl.is_typedef())
+  {
+    // Check for a better-matching partial specialization.
+    if(template_symbol.type.get(ID_specialization_of).empty())
+    {
+      // Resolve symbol references in full_template_args so that
+      // expressions like "x % y" (where x, y are const symbols)
+      // are simplified to constants for matching.
+      cpp_template_args_tct full_args_resolved = full_template_args;
+      for(auto &arg : full_args_resolved.arguments())
+      {
+        if(arg.id() == ID_type)
+          continue;
+        for(int pass = 0; pass < 10; ++pass)
+        {
+          bool changed = false;
+          arg.visit_pre(
+            [this, &changed](exprt &node)
+            {
+              if(node.id() == ID_symbol)
+              {
+                const symbolt &sym =
+                  lookup(to_symbol_expr(node).get_identifier());
+                if(sym.value.is_not_nil() && cpp_is_pod(sym.type))
+                {
+                  node = sym.value;
+                  changed = true;
+                }
+              }
+            });
+          if(!changed)
+            break;
+          simplify(arg, *this);
+          if(arg.is_constant())
+            break;
+        }
+      }
+
+      cpp_scopet *ts =
+        static_cast<cpp_scopet *>(cpp_scopes.id_map[template_symbol.name]);
+      if(ts != nullptr)
+      {
+        cpp_scopet &parent_scope = ts->get_parent();
+        cpp_scopet::id_sett id_set = parent_scope.lookup(
+          template_symbol.base_name, cpp_scopet::SCOPE_ONLY);
+
+        const symbolt *best_match = nullptr;
+        cpp_template_args_tct best_spec_args;
+
+        for(const auto *id_ptr : id_set)
+        {
+          const symbolt &s = lookup(id_ptr->identifier);
+          if(s.type.get(ID_specialization_of).empty())
+            continue;
+
+          const cpp_declarationt &spec_decl = to_cpp_declaration(s.type);
+          const cpp_template_args_non_tct &partial_args =
+            spec_decl.partial_specialization_args();
+
+          if(
+            partial_args.arguments().size() !=
+            full_args_resolved.arguments().size())
+            continue;
+
+          cpp_saved_template_mapt saved_map2(template_map);
+          cpp_save_scopet save_scope2(cpp_scopes);
+
+          template_map.build_unassigned(spec_decl.template_type());
+
+          cpp_scopet *spec_scope =
+            static_cast<cpp_scopet *>(cpp_scopes.id_map[s.name]);
+          if(spec_scope != nullptr)
+            cpp_scopes.go_to(*spec_scope);
+
+          cpp_typecheck_resolvet resolver(*this);
+
+          for(std::size_t i = 0; i < full_args_resolved.arguments().size(); i++)
+          {
+            if(full_args_resolved.arguments()[i].id() == ID_type)
+              resolver.guess_template_args(
+                partial_args.arguments()[i].type(),
+                full_args_resolved.arguments()[i].type());
+            else
+              resolver.guess_template_args(
+                partial_args.arguments()[i], full_args_resolved.arguments()[i]);
+          }
+
+          cpp_template_args_tct guessed =
+            template_map.build_template_args(spec_decl.template_type());
+
+          if(guessed.has_unassigned())
+            continue;
+
+          cpp_template_args_tct partial_tc;
+          bool sfinae_failed = false;
+          {
+            null_message_handlert null_handler;
+            message_handlert &old_handler = get_message_handler();
+            set_message_handler(null_handler);
+            try
+            {
+              partial_tc = typecheck_template_args(
+                source_location, template_symbol, partial_args);
+            }
+            catch(...)
+            {
+              sfinae_failed = true;
+            }
+            set_message_handler(old_handler);
+          }
+          if(sfinae_failed)
+            continue;
+
+          if(partial_tc == full_args_resolved)
+          {
+            best_match = &s;
+            best_spec_args = guessed;
+          }
+        }
+
+        if(best_match != nullptr)
+        {
+          return instantiate_template(
+            source_location, *best_match, best_spec_args, full_args_resolved);
+        }
+      }
+    }
+
+    // Append template suffix to the declarator name
+    {
+      cpp_namet &declarator_name = new_decl.declarators()[0].name();
+      for(auto &sub : declarator_name.get_sub())
+      {
+        if(sub.id() == ID_name)
+        {
+          sub.set(ID_identifier, id2string(sub.get(ID_identifier)) + suffix);
+          break;
+        }
+      }
+    }
+
+    convert_non_template_declaration(new_decl);
+
+    const symbolt &symb = lookup(new_decl.declarators()[0].get(ID_identifier));
+
+    return symb;
+  }
 
   // For template aliases (typedefs) and function templates where different
   // template arguments may produce the same parameter types (e.g., when a

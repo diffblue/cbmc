@@ -4815,7 +4815,43 @@ void c_typecheck_baset::make_constant(exprt &expr)
   adjust_float_expressions(expr, rounding_mode);
 
   simplify(expr, *this);
+
   expr.add_source_location() = location;
+
+  if(!is_compile_time_constantt(*this)(expr))
+  {
+    // Try harder: resolve constexpr/const symbol references to their
+    // values, then simplify again. Iterate since resolving one symbol
+    // may reveal further symbol references (e.g. recursive variable
+    // templates).
+    bool changed = true;
+    while(changed)
+    {
+      changed = false;
+      expr.visit_pre(
+        [&](exprt &e)
+        {
+          if(e.id() == ID_symbol)
+          {
+            const symbolt *s = nullptr;
+            if(
+              !lookup(to_symbol_expr(e).get_identifier(), s) &&
+              (s->is_macro || s->type.get_bool(ID_C_constant)))
+            {
+              exprt val = s->value;
+              simplify(val, *this);
+              e = val;
+              changed = true;
+            }
+          }
+        });
+      if(changed)
+      {
+        simplify(expr, *this);
+        expr.add_source_location() = location;
+      }
+    }
+  }
 
   if(!is_compile_time_constantt(*this)(expr))
   {

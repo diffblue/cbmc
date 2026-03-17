@@ -1409,6 +1409,24 @@ void cpp_typecheckt::typecheck_expr_member(
       }
       else
       {
+        // Check if this is an instantiated member function template
+        // (non-static, with a 'this' parameter).  In that case, we
+        // must not treat it as a static member — fall through to the
+        // member-expression path so that 'this' is added.
+        if(
+          symbol_expr.type().id() == ID_code &&
+          !to_code_type(symbol_expr.type()).parameters().empty() &&
+          to_code_type(symbol_expr.type()).parameters().front().get_this())
+        {
+          // Build a member expression so the caller adds 'this'.
+          irep_idt component_name =
+            to_symbol_expr(symbol_expr).get_identifier();
+          expr.remove(ID_component_cpp_name);
+          expr.set(ID_component_name, component_name);
+          expr.type() = symbol_expr.type();
+          return;
+        }
+
         // it must be a static component
         const struct_typet::componentt &pcomp =
           type.get_component(to_symbol_expr(symbol_expr).get_identifier());
