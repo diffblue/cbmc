@@ -528,6 +528,28 @@ void cpp_typecheckt::check_member_initializers(
 
     if(!ok)
     {
+      // Check if it matches a direct base class by name (e.g., for POD
+      // base classes that have no constructor component).
+      typet member_type = (typet &)initializer.find(ID_member);
+      typecheck_type(member_type);
+
+      if(member_type.id() == ID_struct_tag)
+      {
+        for(const auto &b : bases)
+        {
+          if(
+            to_struct_tag_type(member_type).get_identifier() ==
+            to_struct_tag_type(b.type()).get_identifier())
+          {
+            ok = true;
+            break;
+          }
+        }
+      }
+    }
+
+    if(!ok)
+    {
       error().source_location=member_name.source_location();
       error() << "invalid initializer '" << base_name << "'" << eom;
       throw 0;

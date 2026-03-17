@@ -398,10 +398,11 @@ void cpp_typecheckt::typecheck_compound_declarator(
     throw 0;
   }
 
-  if(!is_constructor && is_explicit)
+  if(!is_constructor && !is_cast_operator && is_explicit)
   {
     error().source_location=cpp_name.source_location();
-    error() << "only constructors can be explicit" << eom;
+    error() << "only constructors and conversion operators can be explicit"
+            << eom;
     throw 0;
   }
 
@@ -492,7 +493,10 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
     if(value.id() == ID_code && to_code(value).get_statement() == ID_default)
     {
-      value.make_nil();
+      // C++11 [dcl.fct.def.default]: treat = default as having an
+      // empty body so that member initialization is generated
+      value = codet(ID_block);
+      value.add_source_location() = declaration.source_location();
       initializers.make_nil();
     }
 
@@ -876,9 +880,9 @@ void cpp_typecheckt::typecheck_friend_declaration(
 
   if(declaration.is_template())
   {
-    error().source_location=declaration.type().source_location();
-    error() << "friend template not supported" << eom;
-    throw 0;
+    // Friend template declarations are not yet fully supported.
+    // Silently ignore them — they only grant access, not define symbols.
+    return;
   }
 
   // we distinguish these whether there is a declarator

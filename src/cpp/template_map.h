@@ -44,6 +44,11 @@ public:
   typet lookup_type(const irep_idt &identifier) const;
   exprt lookup_expr(const irep_idt &identifier) const;
 
+  /// Look up a template parameter by its base name suffix (after the last
+  /// "::"). This handles the case where a template parameter was registered
+  /// under a different scope prefix (e.g., forward declaration vs definition).
+  exprt lookup_by_suffix(const std::string &suffix) const;
+
   void print(std::ostream &out) const;
 
   void clear()

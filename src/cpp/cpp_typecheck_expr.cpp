@@ -118,6 +118,27 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     expr.type() = struct_tag_typet("tag-_GUID");
     expr.set(ID_C_lvalue, true);
   }
+  else if(
+    expr.id() == "__is_constructible" || expr.id() == "__is_assignable" ||
+    expr.id() == "__is_convertible_to" || expr.id() == "__is_same")
+  {
+    // GCC/Clang built-in type traits
+    typet t1 = static_cast<const typet &>(expr.find("type_arg1"));
+    typet t2 = static_cast<const typet &>(expr.find("type_arg2"));
+    typecheck_type(t1);
+    typecheck_type(t2);
+
+    if(expr.id() == "__is_same")
+    {
+      if(t1 == t2)
+        expr = true_exprt();
+      else
+        expr = false_exprt();
+    }
+    else
+      // conservatively return false for traits we cannot evaluate
+      expr = false_exprt();
+  }
   else if(expr.id()==ID_noexcept)
   {
     // TODO
@@ -1508,7 +1529,7 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
 
 void cpp_typecheckt::add_implicit_dereference(exprt &expr)
 {
-  if(is_reference(expr.type()))
+  if(is_reference(expr.type()) || is_rvalue_reference(expr.type()))
   {
     // add implicit dereference
     dereference_exprt tmp(expr);

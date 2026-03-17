@@ -17,6 +17,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/arith_tools.h>
 #include <util/base_exceptions.h> // IWYU pragma: keep
+#include <util/c_types.h>
+#include <util/simplify_expr.h>
 #include <util/symbol_table_base.h>
 
 #include "cpp_type2name.h"
@@ -53,13 +55,31 @@ std::string cpp_typecheckt::template_suffix(
     {
       exprt e=expr;
 
-      if(e.id() == ID_symbol)
+      // Recursively resolve constant symbols to their values, so that
+      // expressions like "1000000000000000000l * ::value" can be evaluated.
+      // Multiple passes may be needed for chains of symbol references.
+      for(int pass = 0; pass < 10; ++pass)
       {
-        const symbol_exprt &s = to_symbol_expr(e);
-        const symbolt &symbol = lookup(s.get_identifier());
-
-        if(cpp_is_pod(symbol.type) && symbol.type.get_bool(ID_C_constant))
-          e = symbol.value;
+        bool changed = false;
+        e.visit_pre(
+          [this, &changed](exprt &node)
+          {
+            if(node.id() == ID_symbol)
+            {
+              const symbolt &symbol =
+                lookup(to_symbol_expr(node).get_identifier());
+              if(symbol.value.is_not_nil() && cpp_is_pod(symbol.type))
+              {
+                node = symbol.value;
+                changed = true;
+              }
+            }
+          });
+        if(!changed)
+          break;
+        simplify(e, *this);
+        if(e.is_constant())
+          break;
       }
 
       make_constant(e);
@@ -71,12 +91,19 @@ std::string cpp_typecheckt::template_suffix(
         i=1;
       else if(e == false)
         i=0;
-      else if(to_integer(to_constant_expr(e), i))
+      else
       {
-        error().source_location = expr.find_source_location();
-        error() << "template argument expression expected to be "
-                << "scalar constant, but got '" << to_string(e) << "'" << eom;
-        throw 0;
+        // follow c_enum_tag to c_enum for to_integer
+        if(e.type().id() == ID_c_enum_tag)
+          e.type() = follow_tag(to_c_enum_tag_type(e.type()));
+
+        if(to_integer(to_constant_expr(e), i))
+        {
+          error().source_location = expr.find_source_location();
+          error() << "template argument expression expected to be "
+                  << "scalar constant, but got '" << to_string(e) << "'" << eom;
+          throw 0;
+        }
       }
 
       result+=integer2string(i);
@@ -367,8 +394,9 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
       DATA_INVARIANT(
         cpp_id.id_class == cpp_idt::id_classt::CLASS ||
+          cpp_id.id_class == cpp_idt::id_classt::TYPEDEF ||
           cpp_id.id_class == cpp_idt::id_classt::SYMBOL,
-        "id must be class or symbol");
+        "id must be class, typedef, or symbol");
 
       const symbolt &symb=lookup(cpp_id.identifier);
 
@@ -376,8 +404,63 @@ const symbolt &cpp_typecheckt::instantiate_template(
       if(cpp_id.id_class==cpp_idt::id_classt::CLASS &&
          symb.type.id()==ID_struct)
         return symb;
+      else if(cpp_id.id_class == cpp_idt::id_classt::TYPEDEF)
+        return symb;
       else if(symb.value.is_not_nil())
         return symb;
+    }
+    else if(new_decl.type().id() == ID_struct)
+    {
+      // The sub-scope lookup may fail when a template is forward-declared
+      // in one scope and defined in another (creating different template
+      // scopes). Check the symbol table directly for an existing
+      // instantiation.
+      const irep_idt identifier = id2string(sub_scope.prefix) + "tag-" +
+                                  id2string(template_symbol.base_name) + suffix;
+      auto s_it = symbol_table.symbols.find(identifier);
+      if(
+        s_it != symbol_table.symbols.end() &&
+        s_it->second.type.id() == ID_struct &&
+        !to_struct_type(s_it->second.type).is_incomplete())
+      {
+        return s_it->second;
+      }
+
+      // If the symbol exists but is incomplete, the class scope was
+      // created under a different (e.g., forward-declaration) template
+      // scope that may lack named template parameters. Copy template
+      // parameter entries from the current template scope into the
+      // class scope so they are visible during elaboration.
+      if(s_it != symbol_table.symbols.end())
+      {
+        auto class_scope_it = cpp_scopes.id_map.find(identifier);
+        if(class_scope_it != cpp_scopes.id_map.end())
+        {
+          cpp_scopet &class_scope =
+            static_cast<cpp_scopet &>(*class_scope_it->second);
+          for(const auto &param : template_type.template_parameters())
+          {
+            irep_idt param_base_name;
+            if(param.id() == ID_type)
+              param_base_name = param.type().get(ID_identifier);
+            else
+              param_base_name = param.get(ID_identifier);
+            if(param_base_name.empty())
+              continue;
+            const std::string pstr = id2string(param_base_name);
+            auto pos = pstr.rfind("::");
+            irep_idt base = pos != std::string::npos
+                              ? irep_idt(pstr.substr(pos + 2))
+                              : param_base_name;
+            auto tp_set = template_scope->lookup(
+              base,
+              cpp_scopet::SCOPE_ONLY,
+              cpp_idt::id_classt::TEMPLATE_PARAMETER);
+            for(auto *tp : tp_set)
+              class_scope.insert(*tp);
+          }
+        }
+      }
     }
 
     cpp_scopes.go_to(sub_scope);
@@ -529,9 +612,24 @@ const symbolt &cpp_typecheckt::instantiate_template(
   }
 
   // not a class template, not a class template method,
-  // it must be a function template!
+  // it must be a function template or a template alias!
 
   PRECONDITION(new_decl.declarators().size() == 1);
+
+  // For template aliases (typedefs), append the template suffix to the
+  // declarator name so that different instantiations produce different symbols.
+  if(new_decl.is_typedef())
+  {
+    cpp_namet &declarator_name = new_decl.declarators()[0].name();
+    for(auto &sub : declarator_name.get_sub())
+    {
+      if(sub.id() == ID_name)
+      {
+        sub.set(ID_identifier, id2string(sub.get(ID_identifier)) + suffix);
+        break;
+      }
+    }
+  }
 
   convert_non_template_declaration(new_decl);
 

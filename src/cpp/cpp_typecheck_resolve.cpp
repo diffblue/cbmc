@@ -197,6 +197,20 @@ exprt cpp_typecheck_resolvet::convert_template_parameter(
   // look up the parameter in the template map
   exprt e=cpp_typecheck.template_map.lookup(identifier.identifier);
 
+  // If not found, the parameter may have been registered under a different
+  // template scope (e.g., forward declaration vs definition). Try matching
+  // by base name.
+  if(e.is_nil() || (e.id() == ID_type && e.type().is_nil()))
+  {
+    const std::string id_str = id2string(identifier.identifier);
+    auto pos = id_str.rfind("::");
+    if(pos != std::string::npos)
+    {
+      const std::string base = id_str.substr(pos + 2);
+      e = cpp_typecheck.template_map.lookup_by_suffix(base);
+    }
+  }
+
   if(e.is_nil() ||
      (e.id()==ID_type && e.type().is_nil()))
   {
@@ -937,6 +951,30 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
           final_base_name,
           recursive ? cpp_scopet::RECURSIVE : cpp_scopet::QUALIFIED);
 
+        // If the name resolves to a template parameter, substitute it
+        // with the actual type from the template map and use that type's
+        // scope for the qualified lookup.
+        if(!id_set.empty())
+        {
+          const cpp_idt &first = **id_set.begin();
+          if(first.id_class == cpp_idt::id_classt::TEMPLATE_PARAMETER)
+          {
+            exprt e = convert_template_parameter(first);
+            if(e.id() == ID_type && e.type().id() == ID_struct_tag)
+            {
+              cpp_typecheck.elaborate_class_template(e.type());
+              const irep_idt &scope_id =
+                to_struct_tag_type(e.type()).get_identifier();
+              cpp_typecheck.cpp_scopes.go_to(
+                cpp_typecheck.cpp_scopes.get_scope(scope_id));
+              template_args.make_nil();
+              final_base_name.clear();
+              pos++;
+              continue;
+            }
+          }
+        }
+
         filter_for_named_scopes(id_set);
 
         if(id_set.empty())
@@ -1180,8 +1218,34 @@ struct_tag_typet cpp_typecheck_resolvet::disambiguate_template_classes(
       if(partial_specialization_args_tc==
          full_template_args_tc)
       {
-        matches.push_back(matcht(
-          guessed_template_args, full_template_args_tc, id));
+        // Also check that cv-qualifiers match, since operator== ignores
+        // #-prefixed attributes like C_constant and C_volatile.
+        bool qualifiers_match = true;
+        for(std::size_t j = 0;
+            j < partial_specialization_args_tc.arguments().size();
+            j++)
+        {
+          const exprt &p = partial_specialization_args_tc.arguments()[j];
+          const exprt &f = full_template_args_tc.arguments()[j];
+          if(p.id() == ID_type)
+          {
+            if(
+              p.type().get_bool(ID_C_constant) !=
+                f.type().get_bool(ID_C_constant) ||
+              p.type().get_bool(ID_C_volatile) !=
+                f.type().get_bool(ID_C_volatile))
+            {
+              qualifiers_match = false;
+              break;
+            }
+          }
+        }
+
+        if(qualifiers_match)
+        {
+          matches.push_back(
+            matcht(guessed_template_args, full_template_args_tc, id));
+        }
       }
     }
   }
@@ -1770,10 +1834,17 @@ void cpp_typecheck_resolvet::guess_template_args(
   const exprt &template_expr,
   const exprt &desired_expr)
 {
-  if(template_expr.id()==ID_cpp_name)
+  // An ambiguous node may contain a cpp_name that is a template parameter.
+  // Extract the name for matching.
+  const exprt &expr_to_match =
+    template_expr.id() == ID_ambiguous
+      ? static_cast<const exprt &>(
+          static_cast<const irept &>(template_expr.type()))
+      : template_expr;
+
+  if(expr_to_match.id() == ID_cpp_name)
   {
-    const cpp_namet &cpp_name=
-      to_cpp_name(template_expr);
+    const cpp_namet &cpp_name = to_cpp_name(expr_to_match);
 
     if(!cpp_name.is_qualified())
     {
@@ -1797,8 +1868,7 @@ void cpp_typecheck_resolvet::guess_template_args(
           exprt &e=cpp_typecheck.template_map.expr_map[id.identifier];
           if(e.id()==ID_unassigned)
           {
-            typet old_type=e.type();
-            e = typecast_exprt::conditional_cast(desired_expr, old_type);
+            e = desired_expr;
           }
         }
       }

@@ -1954,6 +1954,19 @@ bool cpp_typecheckt::static_typecast(
     return false;
   }
 
+  // rvalue reference: static_cast<T&&>(expr)
+  if(type.get_bool(ID_C_rvalue_reference))
+  {
+    typet subto = to_pointer_type(type).base_type();
+    if(e.type() == subto)
+    {
+      new_expr = address_of_exprt(e, to_pointer_type(type));
+      new_expr.add_source_location() = e.source_location();
+      return true;
+    }
+    return false;
+  }
+
   if(type.id()==ID_empty)
   {
     new_expr = typecast_exprt::conditional_cast(e, type);

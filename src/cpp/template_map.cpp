@@ -39,6 +39,14 @@ void template_mapt::apply(typet &type) const
       typet &subtype = c.type();
       apply(subtype);
     }
+
+    // also apply to base classes
+    if(type.id() == ID_struct)
+    {
+      irept::subt &bases = type.add(ID_bases).get_sub();
+      for(auto &base : bases)
+        apply(static_cast<typet &>(base.add(ID_type)));
+    }
   }
   else if(type.id() == ID_template_parameter_symbol_type)
   {
@@ -67,6 +75,20 @@ void template_mapt::apply(typet &type) const
   {
     for(typet &subtype : to_type_with_subtypes(type).subtypes())
       apply(subtype);
+  }
+  else if(type.id() == ID_cpp_name)
+  {
+    // apply to template arguments within cpp_name
+    irept::subt &sub = type.get_sub();
+    for(auto &s : sub)
+    {
+      if(s.id() == ID_template_args)
+      {
+        irept::subt &args = s.add(ID_arguments).get_sub();
+        for(auto &arg : args)
+          apply(static_cast<exprt &>(arg));
+      }
+    }
   }
 }
 
@@ -130,6 +152,34 @@ exprt template_mapt::lookup_expr(const irep_idt &identifier) const
   if(e_it!=expr_map.end())
     return e_it->second;
 
+  return static_cast<const exprt &>(get_nil_irep());
+}
+
+exprt template_mapt::lookup_by_suffix(const std::string &suffix) const
+{
+  const std::string match = "::" + suffix;
+  for(const auto &entry : type_map)
+  {
+    const std::string key = id2string(entry.first);
+    if(
+      key.size() >= match.size() &&
+      key.compare(key.size() - match.size(), match.size(), match) == 0)
+    {
+      exprt e(ID_type);
+      e.type() = entry.second;
+      return e;
+    }
+  }
+  for(const auto &entry : expr_map)
+  {
+    const std::string key = id2string(entry.first);
+    if(
+      key.size() >= match.size() &&
+      key.compare(key.size() - match.size(), match.size(), match) == 0)
+    {
+      return entry.second;
+    }
+  }
   return static_cast<const exprt &>(get_nil_irep());
 }
 
