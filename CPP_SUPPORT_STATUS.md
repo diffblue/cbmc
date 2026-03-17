@@ -273,6 +273,7 @@ Last updated: 2026-03-11 (session 25)
 19. **`auto constexpr` declaration order** — **FIXED**: `auto constexpr x = 42` works in local scope.
 20. **Out-of-class template member definitions** — **FIXED**: when a member (static data or function) is not found in the instantiated template scope, create a weak symbol instead of aborting. For functions, the body is cleared. Fixes npos/swap/size_type errors in basic_string.tcc.
 21. **Constexpr decl_block invariant** — **FIXED**: non-decl statements in decl_block no longer crash the constexpr evaluator. Fixes `<vector>` in C++20 mode.
+22. **Member function templates defined out-of-class** — NOT FIXED: when a member function template of a class template is defined in a `.tcc` file (e.g., `template<T> template<U> void S<T>::f(U)`), the body is stored in the class template's `template_methods` but is not associated with the instantiated member when the class is instantiated. This causes `_M_construct` (string) and `emplace_back` (vector) to have no body. Fixing this requires significant changes to the template instantiation machinery to register member function templates in the instantiated class scope.
 
 ## KNOWNBUG tests (documented gaps)
 

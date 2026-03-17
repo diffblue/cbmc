@@ -703,6 +703,245 @@ void cpp_typecheckt::typecheck_class_template_member(
     // parameters than the class template args.
     if(n_method_params > n_class_params)
     {
+      // Partially instantiate: substitute class template params,
+      // keep method-only params, register as function template
+      // in the instantiated class scope.
+      cpp_declarationt mcopy = decl_tmp;
+
+      // Build template map for class params
+      cpp_saved_template_mapt saved_map(template_map);
+      template_map.build(method_type, tc_template_args);
+
+      // Keep only method-own template params
+      template_typet method_only_tt;
+      for(std::size_t j = n_class_params; j < n_method_params; j++)
+        method_only_tt.template_parameters().push_back(
+          method_type.template_parameters()[j]);
+      mcopy.set(ID_template_type, method_only_tt);
+      mcopy.set(ID_is_template, true);
+      // Ensure access specifier is set (needed by instantiate_template)
+      if(mcopy.get(ID_C_access).empty())
+        mcopy.set(ID_C_access, ID_public);
+
+      // Simplify qualified name to base name
+      if(!mcopy.declarators().empty())
+      {
+        irep_idt base = mcopy.declarators().front().name().get_base_name();
+        if(!base.empty())
+          mcopy.declarators().front().name() = cpp_namet(base);
+      }
+
+      // Apply class template substitution to type and body
+      if(!mcopy.declarators().empty())
+      {
+        typet mtype = mcopy.declarators().front().merge_type(mcopy.type());
+        template_map.apply(mtype);
+        // Keep the function type on the declarator (not the declaration)
+        // because guess_function_template_args checks declarator.type().
+        mcopy.declarators().front().type() = mtype;
+        mcopy.type().make_nil();
+
+        if(mcopy.declarators().front().find(ID_value).is_not_nil())
+        {
+          exprt &body_val =
+            static_cast<exprt &>(mcopy.declarators().front().add(ID_value));
+          template_map.apply(body_val);
+
+          // Strip local struct definitions (e.g., _Guard RAII
+          // structs) and references to them. These contain
+          // cpp_name types that cannot be resolved during partial
+          // instantiation, and CBMC does not model exceptions.
+          if(
+            body_val.id() == ID_code &&
+            to_code(body_val).get_statement() == ID_block)
+          {
+            std::set<irep_idt> local_structs;
+            for(const auto &op : body_val.operands())
+            {
+              if(op.id() != ID_cpp_declaration)
+                continue;
+              const auto &cd = static_cast<const cpp_declarationt &>(
+                static_cast<const irept &>(op));
+              if(cd.type().id() != ID_struct)
+                continue;
+              const irept &tag = cd.type().find(ID_tag);
+              if(tag.is_nil())
+                continue;
+              const auto &tsub = tag.get_sub();
+              if(!tsub.empty() && tsub.front().id() == ID_name)
+                local_structs.insert(tsub.front().get(ID_identifier));
+            }
+            if(!local_structs.empty())
+            {
+              auto refs = [&](const exprt &e)
+              {
+                bool found = false;
+                e.visit_pre(
+                  [&](const exprt &sub)
+                  {
+                    auto chk = [&](const irept &n)
+                    {
+                      const auto &s = n.get_sub();
+                      if(
+                        !s.empty() && s.front().id() == ID_name &&
+                        local_structs.count(s.front().get(ID_identifier)))
+                        found = true;
+                    };
+                    if(sub.id() == ID_cpp_name)
+                      chk(sub);
+                    if(sub.type().id() == ID_cpp_name)
+                      chk(sub.type());
+                  });
+                return found;
+              };
+              auto &ops = body_val.operands();
+              ops.erase(
+                std::remove_if(
+                  ops.begin(),
+                  ops.end(),
+                  [&](const exprt &op)
+                  {
+                    if(op.id() == ID_cpp_declaration)
+                    {
+                      const auto &cd = static_cast<const cpp_declarationt &>(
+                        static_cast<const irept &>(op));
+                      if(cd.type().id() == ID_struct)
+                        return true;
+                    }
+                    return refs(op);
+                  }),
+                ops.end());
+            }
+          }
+        }
+      }
+
+      // Find the instantiated class scope
+      std::string inst_suffix = template_suffix(tc_template_args);
+      // Use the template symbol's scope (not the current scope) to
+      // construct the class identifier, since the class may be in a
+      // nested namespace (e.g., std::__cxx11::basic_string).
+      std::string tmpl_prefix;
+      {
+        const std::string tname = id2string(template_symbol.name);
+        auto tpos = tname.rfind("template.");
+        if(tpos != std::string::npos)
+          tmpl_prefix = tname.substr(0, tpos);
+      }
+      irep_idt inst_id = tmpl_prefix + "tag-" +
+                         id2string(template_symbol.base_name) + inst_suffix;
+      auto scope_it = cpp_scopes.id_map.find(inst_id);
+      if(scope_it != cpp_scopes.id_map.end())
+      {
+        cpp_save_scopet ss(cpp_scopes);
+        cpp_scopes.go_to(static_cast<cpp_scopet &>(*scope_it->second));
+
+        // Find existing function template and update its body.
+        // Do NOT create a new template (that would cause duplicates).
+        irep_idt mbase = mcopy.declarators().empty()
+                           ? irep_idt()
+                           : mcopy.declarators().front().name().get_base_name();
+        if(!mbase.empty())
+        {
+          auto ids = cpp_scopes.current_scope().lookup(
+            mbase, cpp_scopet::SCOPE_ONLY, cpp_idt::id_classt::TEMPLATE);
+          for(const auto *idp : ids)
+          {
+            auto *ts = symbol_table.get_writeable(idp->identifier);
+            if(!ts || !ts->type.get_bool(ID_is_template))
+              continue;
+            cpp_declarationt &td = to_cpp_declaration(ts->type);
+            if(
+              !td.declarators().empty() &&
+              td.declarators()[0].find(ID_value).is_nil() &&
+              !mcopy.declarators().empty() &&
+              mcopy.declarators()[0].find(ID_value).is_not_nil())
+            {
+              // Verify signature match: concrete type names in the
+              // .tcc definition must appear in the template symbol
+              // name to prevent swapping overload bodies.
+              {
+                std::set<std::string> tpnames;
+                for(const auto &tp :
+                    decl_tmp.template_type().template_parameters())
+                {
+                  irep_idt bn = tp.get(ID_base_name);
+                  if(!bn.empty())
+                    tpnames.insert(id2string(bn));
+                }
+                typet mc_ft =
+                  decl_tmp.declarators()[0].merge_type(decl_tmp.type());
+                std::string ts_name = id2string(ts->name);
+                bool sig_ok = true;
+                if(mc_ft.id() == ID_code || mc_ft.id() == ID_function_type)
+                {
+                  for(const auto &sub : mc_ft.find(ID_parameters).get_sub())
+                  {
+                    const typet &pt =
+                      static_cast<const typet &>(sub.find(ID_type));
+                    if(pt.id() != ID_cpp_name)
+                      continue;
+                    for(const auto &s : pt.get_sub())
+                    {
+                      if(s.id() != ID_name)
+                        continue;
+                      std::string nm = id2string(s.get(ID_identifier));
+                      if(tpnames.count(nm) || nm == "std")
+                        continue;
+                      // Skip names that look like template params
+                      // (_Uppercase convention in libstdc++)
+                      if(
+                        nm.size() > 1 && nm[0] == '_' &&
+                        std::isupper(static_cast<unsigned char>(nm[1])))
+                        continue;
+                      if(ts_name.find(nm) == std::string::npos)
+                      {
+                        sig_ok = false;
+                        break;
+                      }
+                    }
+                    if(!sig_ok)
+                      break;
+                  }
+                }
+                if(!sig_ok)
+                  continue;
+              }
+              td.declarators()[0].add(ID_value) =
+                mcopy.declarators()[0].find(ID_value);
+
+              // Update existing concrete symbols that have nil body
+              // with the now-available body from the .tcc definition.
+              irep_idt mbase2 = td.declarators()[0].name().get_base_name();
+              // Build class prefix from inst_id
+              std::string cls_pfx = id2string(inst_id);
+              {
+                auto p =
+                  cls_pfx.find("tag-" + id2string(template_symbol.base_name));
+                if(p != std::string::npos)
+                  cls_pfx.erase(p, 4);
+              }
+              cls_pfx += "::";
+              for(auto &sp : symbol_table)
+              {
+                if(
+                  sp.second.base_name == mbase2 &&
+                  sp.second.type.id() == ID_code && sp.second.value.is_nil() &&
+                  id2string(sp.first).find(cls_pfx) == 0)
+                {
+                  symbolt &csym = symbol_table.get_writeable_ref(sp.first);
+                  csym.value = static_cast<const exprt &>(
+                    mcopy.declarators()[0].find(ID_value));
+                  add_method_body(&csym);
+                }
+              }
+
+              break;
+            }
+          }
+        }
+      }
+
       cpp_saved_scope.restore();
       continue;
     }

@@ -1,0 +1,8 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+std::initializer_list: unexpected cpp type: initializer_list

@@ -4,8 +4,8 @@ main.cpp
 ^EXIT=(0|10)$
 ^SIGNAL=0$
 --
-^warning: ignoring
 ^CONVERSION ERROR$
 --
 Type-checking succeeds but --validate-goto-model fails due to
 constexpr (is_macro) functions not being in the goto function map.
+The warning about ignoring typecast comes from the emplace_back body.
