@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/bitvector_expr.h>
 #include <util/c_types.h>
 #include <util/pointer_expr.h>
+#include <util/simplify_expr.h>
 #include <util/source_location.h>
 #include <util/std_code.h>
 #include <util/string_constant.h>

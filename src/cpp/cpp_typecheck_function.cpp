@@ -103,6 +103,17 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   // fix the scope's prefix
   function_scope.prefix=id2string(symbol.name)+"::";
 
+  // For friend functions defined inside a class, add the class scope
+  // as a secondary scope so that class-scope names are visible.
+  const irep_idt &friend_class = symbol.type.get(ID_C_class);
+  if(!friend_class.empty())
+  {
+    auto it = cpp_scopes.id_map.find(friend_class);
+    if(it != cpp_scopes.id_map.end())
+      function_scope.add_secondary_scope(
+        static_cast<cpp_scopet &>(*it->second));
+  }
+
   // genuine function definition -- do the parameter declarations
   convert_parameters(symbol.mode, function_type);
 
