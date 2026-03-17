@@ -1,0 +1,8 @@
+CORE
+main.c
+--branch marker
+^EXIT=0$
+^SIGNAL=0$
+Branch instrumentation
+--
+^warning: ignoring
