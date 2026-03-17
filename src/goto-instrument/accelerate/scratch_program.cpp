@@ -11,6 +11,8 @@ Author: Matt Lewis
 
 #include "scratch_program.h"
 
+#include <limits>
+
 #include <solvers/decision_procedure.h>
 
 #include <goto-symex/slice.h>
@@ -220,5 +222,6 @@ optionst scratch_programt::get_default_options()
 {
   optionst ret;
   ret.set_option("simplify", true);
+  ret.set_option("depth", std::numeric_limits<unsigned>::max());
   return ret;
 }
