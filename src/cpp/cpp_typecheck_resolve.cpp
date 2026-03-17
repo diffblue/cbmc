@@ -1028,10 +1028,51 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
     {
       if(template_args.is_not_nil())
       {
-        const auto id_set = cpp_typecheck.cpp_scopes.current_scope().lookup(
+        auto id_set = cpp_typecheck.cpp_scopes.current_scope().lookup(
           final_base_name,
           recursive ? cpp_scopet::RECURSIVE : cpp_scopet::QUALIFIED,
           cpp_idt::id_classt::TEMPLATE);
+
+        // If no template was found, check if the name is a template
+        // template parameter and resolve it via the template map.
+        if(id_set.empty())
+        {
+          const auto param_set =
+            cpp_typecheck.cpp_scopes.current_scope().lookup(
+              final_base_name,
+              recursive ? cpp_scopet::RECURSIVE : cpp_scopet::QUALIFIED,
+              cpp_idt::id_classt::TEMPLATE_PARAMETER);
+          if(!param_set.empty())
+          {
+            const cpp_idt &param_id = **param_set.begin();
+            exprt e = cpp_typecheck.template_map.lookup(param_id.identifier);
+            if(e.is_nil() || (e.id() == ID_type && e.type().is_nil()))
+            {
+              const std::string id_str = id2string(param_id.identifier);
+              auto p = id_str.rfind("::");
+              if(p != std::string::npos)
+                e = cpp_typecheck.template_map.lookup_by_suffix(
+                  id_str.substr(p + 2));
+            }
+            if(
+              e.id() == ID_type &&
+              e.type().id() == ID_template_parameter_symbol_type)
+            {
+              const irep_idt &tmpl_id =
+                to_template_parameter_symbol_type(e.type()).get_identifier();
+              if(cpp_typecheck.symbol_table.has_symbol(tmpl_id))
+              {
+                const symbolt &tmpl_sym = cpp_typecheck.lookup(tmpl_id);
+                auto found = cpp_typecheck.cpp_scopes.get_root_scope().lookup(
+                  tmpl_sym.base_name,
+                  cpp_scopet::RECURSIVE,
+                  cpp_idt::id_classt::TEMPLATE);
+                for(const auto &f : found)
+                  id_set.insert(f);
+              }
+            }
+          }
+        }
 
 #ifdef DEBUG
         std::cout << "S: "
@@ -1040,16 +1081,54 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
         cpp_typecheck.cpp_scopes.current_scope().print(std::cout);
         std::cout << "X: " << id_set.size() << '\n';
 #endif
-        struct_tag_typet instance =
-          disambiguate_template_classes(final_base_name, id_set, template_args);
+        // Check if this is a template alias rather than a class template
+        bool is_alias = false;
+        for(const auto &id_ptr : id_set)
+        {
+          const symbolt &s = cpp_typecheck.lookup(id_ptr->identifier);
+          if(
+            s.type.get_bool(ID_is_template) &&
+            to_cpp_declaration(s.type).is_template_alias())
+          {
+            is_alias = true;
+            break;
+          }
+        }
 
-        instance.add_source_location() = source_location;
+        if(is_alias)
+        {
+          typet result =
+            resolve_template_alias(final_base_name, id_set, template_args);
+          if(result.id() == ID_struct_tag)
+          {
+            struct_tag_typet instance = to_struct_tag_type(result);
+            instance.add_source_location() = source_location;
+            cpp_typecheck.elaborate_class_template(instance);
+            cpp_typecheck.cpp_scopes.go_to(
+              cpp_typecheck.cpp_scopes.get_scope(instance.get_identifier()));
+          }
+          else
+          {
+            cpp_typecheck.error().source_location = source_location;
+            cpp_typecheck.error()
+              << "template alias '" << final_base_name
+              << "' does not resolve to a class type" << messaget::eom;
+            throw 0;
+          }
+        }
+        else
+        {
+          struct_tag_typet instance = disambiguate_template_classes(
+            final_base_name, id_set, template_args);
 
-        // the "::" triggers template elaboration
-        cpp_typecheck.elaborate_class_template(instance);
+          instance.add_source_location() = source_location;
 
-        cpp_typecheck.cpp_scopes.go_to(
-          cpp_typecheck.cpp_scopes.get_scope(instance.get_identifier()));
+          // the "::" triggers template elaboration
+          cpp_typecheck.elaborate_class_template(instance);
+
+          cpp_typecheck.cpp_scopes.go_to(
+            cpp_typecheck.cpp_scopes.get_scope(instance.get_identifier()));
+        }
 
         template_args.make_nil();
       }
@@ -1336,6 +1415,23 @@ struct_tag_typet cpp_typecheck_resolvet::disambiguate_template_classes(
         continue;
 
       // if these match the arguments, we have a match
+
+      // Strip ellipsis flags from cpp_declaration declarators in code
+      // type arguments. When a variadic pack parameter (Args...) is
+      // substituted with concrete types, the ellipsis flag remains on
+      // the declarator but is absent from the full template args.
+      for(auto &arg : partial_specialization_args_tc.arguments())
+      {
+        if(arg.id() != ID_type || arg.type().id() != ID_code)
+          continue;
+        for(auto &param : arg.type().add(ID_parameters).get_sub())
+        {
+          if(param.id() != ID_cpp_declaration)
+            continue;
+          for(auto &decl : static_cast<cpp_declarationt &>(param).declarators())
+            decl.remove(ID_ellipsis);
+        }
+      }
 
       DATA_INVARIANT(
         partial_specialization_args_tc.arguments().size() ==
@@ -1697,12 +1793,51 @@ exprt cpp_typecheck_resolvet::resolve(
     id_set = cpp_typecheck.cpp_scopes.current_scope().lookup(
       base_name, lookup_kind, cpp_idt::id_classt::TEMPLATE);
 
-// Argument-dependent name lookup
-#if 0
-  // not clear what this is good for
+  // If no template was found, check if the name is a template template
+  // parameter and resolve it via the template map.
+  if(id_set.empty() && template_args.is_not_nil())
+  {
+    const auto param_set = cpp_typecheck.cpp_scopes.current_scope().lookup(
+      base_name, lookup_kind, cpp_idt::id_classt::TEMPLATE_PARAMETER);
+    if(!param_set.empty())
+    {
+      const cpp_idt &param_id = **param_set.begin();
+      exprt e = cpp_typecheck.template_map.lookup(param_id.identifier);
+      if(e.is_nil() || (e.id() == ID_type && e.type().is_nil()))
+      {
+        const std::string id_str = id2string(param_id.identifier);
+        auto p = id_str.rfind("::");
+        if(p != std::string::npos)
+          e = cpp_typecheck.template_map.lookup_by_suffix(id_str.substr(p + 2));
+      }
+      if(
+        e.id() == ID_type && e.type().id() == ID_template_parameter_symbol_type)
+      {
+        const irep_idt &tmpl_id =
+          to_template_parameter_symbol_type(e.type()).get_identifier();
+        // The template identifier is like "template.MyVec<Type0>" or
+        // "std::template.MyVec<Type0>". Look up the template symbol
+        // in the symbol table and find its scope entry.
+        if(cpp_typecheck.symbol_table.has_symbol(tmpl_id))
+        {
+          const symbolt &tmpl_sym = cpp_typecheck.lookup(tmpl_id);
+          irep_idt tmpl_base = tmpl_sym.base_name;
+          // Search from root scope to find the template
+          auto found = cpp_typecheck.cpp_scopes.get_root_scope().lookup(
+            tmpl_base, cpp_scopet::RECURSIVE, cpp_idt::id_classt::TEMPLATE);
+          for(const auto &f : found)
+            id_set.insert(f);
+        }
+      }
+    }
+  }
+
+  // Argument-dependent name lookup (ADL / Koenig lookup):
+  // For unqualified calls, also search in the namespaces of the
+  // argument types. This is required for e.g. operator+(string, string)
+  // to be found when called from outside namespace std.
   if(!qualified && !fargs.has_object)
     resolve_with_arguments(id_set, base_name, fargs);
-#endif
 
   if(id_set.empty())
   {
@@ -2047,6 +2182,11 @@ void cpp_typecheck_resolvet::guess_template_args(
   // http://publib.boulder.ibm.com/infocenter/comphelp/v8v101/topic/
   //  com.ibm.xlcpp8a.doc/language/ref/template_argument_deduction.htm
 
+#ifdef DEBUG
+  std::cout << "guess_template_args: TT.id=" << template_type.id()
+            << " DT.id=" << desired_type.id() << '\n';
+#endif
+
   // T
   // const T
   // volatile T
@@ -2096,6 +2236,44 @@ void cpp_typecheck_resolvet::guess_template_args(
 
       const irept::subt &targs = name_args.find(ID_arguments).get_sub();
 
+      // Helper: when deduction for C<T> fails (desired type is not an
+      // instantiation of C), mark any template parameters in targs
+      // as deduction-failed. This uses ID_nil as a poison value that
+      // prevents later assignment from other parameters and causes
+      // has_unassigned() to fail (since ID_nil != any valid type).
+      auto mark_targs_conflicting = [&]()
+      {
+        for(const auto &targ : targs)
+        {
+          const irept &t =
+            targ.id() == ID_ambiguous ? targ.find(ID_type) : targ;
+          if(t.id() != ID_cpp_name)
+            continue;
+          const cpp_namet &tn = to_cpp_name(static_cast<const typet &>(t));
+          if(tn.is_qualified() || tn.has_template_args())
+            continue;
+          irep_idt bname = tn.get_base_name();
+          const auto ids = cpp_typecheck.cpp_scopes.current_scope().lookup(
+            bname, cpp_scopet::RECURSIVE);
+          for(const auto &id_ptr : ids)
+          {
+            if(id_ptr->id_class == cpp_idt::id_classt::TEMPLATE_PARAMETER)
+            {
+              auto it =
+                cpp_typecheck.template_map.type_map.find(id_ptr->identifier);
+              if(it != cpp_typecheck.template_map.type_map.end())
+              {
+                // Mark as deduction-failed using ID_nil.
+                // This prevents later assignment from other parameters
+                // (the simple T case checks for ID_unassigned, and
+                // ID_nil != ID_unassigned).
+                it->second = typet(ID_nil);
+              }
+            }
+          }
+        }
+      };
+
       // desired_type must be a struct/union tag that was instantiated
       // from a template
       irep_idt desired_id;
@@ -2104,16 +2282,25 @@ void cpp_typecheck_resolvet::guess_template_args(
       else if(desired_type.id() == ID_union_tag)
         desired_id = to_union_tag_type(desired_type).get_identifier();
       else
+      {
+        mark_targs_conflicting();
         return;
+      }
 
       const symbolt *desired_sym =
         cpp_typecheck.symbol_table.lookup(desired_id);
       if(desired_sym == nullptr)
+      {
+        mark_targs_conflicting();
         return;
+      }
 
       // Check if it was instantiated from a template
       if(desired_sym->type.find(ID_C_template).is_nil())
+      {
+        mark_targs_conflicting();
         return;
+      }
 
       // Verify that the template name in the cpp_name matches the
       // template the desired type was instantiated from. Without this
@@ -2123,12 +2310,18 @@ void cpp_typecheck_resolvet::guess_template_args(
       {
         irep_idt tmpl_base_name = cpp_name.get_base_name();
         if(!tmpl_base_name.empty() && tmpl_base_name != desired_sym->base_name)
+        {
+          mark_targs_conflicting();
           return;
+        }
       }
 
       const irept &inst_args = desired_sym->type.find(ID_C_template_arguments);
       if(inst_args.is_nil())
+      {
+        mark_targs_conflicting();
         return;
+      }
 
       const auto &inst_arguments =
         static_cast<const cpp_template_args_tct &>(inst_args).arguments();
@@ -2179,10 +2372,19 @@ void cpp_typecheck_resolvet::guess_template_args(
             if(t.id() == ID_unassigned)
             {
               t = desired_type;
-#if 0
-              std::cout << "ASSIGN " << id.identifier << " := "
-                        << cpp_typecheck.to_string(desired_type) << '\n';
-#endif
+            }
+            else
+            {
+              // Already assigned — check for conflict.
+              // Strip cv-qualifiers for comparison.
+              typet existing = t;
+              typet incoming = desired_type;
+              existing.remove(ID_C_constant);
+              existing.remove(ID_C_volatile);
+              incoming.remove(ID_C_constant);
+              incoming.remove(ID_C_volatile);
+              if(existing != incoming)
+                t.id(ID_unassigned); // mark as conflicting
             }
           }
         }
@@ -2191,10 +2393,18 @@ void cpp_typecheck_resolvet::guess_template_args(
   }
   else if(template_type.id() == ID_merged_type)
   {
-    // look at subtypes
+    // Strip cv-qualifiers from the desired type when the merged_type
+    // contains them, so that e.g. const T matched against const char
+    // deduces T=char rather than T=const char.
+    typet desired = desired_type;
     for(const auto &t : to_merged_type(template_type).subtypes())
     {
-      guess_template_args(t, desired_type);
+      if(t.id() == ID_const)
+        desired.remove(ID_C_constant);
+      else if(t.id() == ID_volatile)
+        desired.remove(ID_C_volatile);
+      else
+        guess_template_args(t, desired);
     }
   }
   else if(is_reference(template_type) || is_rvalue_reference(template_type))
@@ -2282,6 +2492,28 @@ void cpp_typecheck_resolvet::guess_template_args(
           }
         }
 
+        ++d_it;
+      }
+    }
+  }
+  else if(template_type.id() == ID_code)
+  {
+    // Both template and desired are already-converted code types.
+    if(desired_type.id() == ID_code)
+    {
+      const code_typet &tmpl_code = to_code_type(template_type);
+      const code_typet &desired_code = to_code_type(desired_type);
+
+      guess_template_args(tmpl_code.return_type(), desired_code.return_type());
+
+      const auto &tmpl_params = tmpl_code.parameters();
+      const auto &desired_params = desired_code.parameters();
+      auto d_it = desired_params.begin();
+      for(const auto &tp : tmpl_params)
+      {
+        if(d_it == desired_params.end())
+          break;
+        guess_template_args(tp.type(), d_it->type());
         ++d_it;
       }
     }
@@ -2455,11 +2687,15 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
         // For function template argument deduction, top-level
         // cv-qualifiers on the argument type are ignored when the
         // parameter type is just T (not T&, T*, etc.).
+        // Also, array types decay to pointer types (C++ [temp.deduct.call]).
         typet arg_actual_type = it->type();
         if(arg_type.id() == ID_cpp_name)
         {
           arg_actual_type.remove(ID_C_constant);
           arg_actual_type.remove(ID_C_volatile);
+          if(arg_actual_type.id() == ID_array)
+            arg_actual_type =
+              pointer_type(to_array_type(arg_actual_type).element_type());
         }
         guess_template_args(arg_type, arg_actual_type);
       }
@@ -2473,6 +2709,14 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   cpp_template_args_tct template_args =
     cpp_typecheck.template_map.build_template_args(
       cpp_declaration.template_type());
+
+  // Convert deduction-failed markers (ID_nil) to ID_unassigned so that
+  // has_unassigned() detects them and rejects the template.
+  for(auto &arg : template_args.arguments())
+  {
+    if(arg.type().id() == ID_nil)
+      arg.type().id(ID_unassigned);
+  }
 
   // Apply default template arguments for any remaining unassigned parameters.
   // For example, template<typename T, typename R = T, ...> where R is not
@@ -2530,9 +2774,9 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
           catch(...)
           {
             cpp_typecheck.set_message_handler(old_handler);
-            // If this is an anonymous type parameter (SFINAE constraint
-            // like typename = enable_if_t<...>), assume the constraint
-            // is satisfied and use void as the type.
+            // If this is an anonymous type parameter, the default
+            // argument is a SFINAE constraint (e.g.,
+            // typename = enable_if_t<...>).
             const irep_idt &param_id = param.type().get(ID_identifier);
             bool is_anonymous = param_id.empty();
             if(!is_anonymous)
@@ -2545,9 +2789,9 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
             }
             if(is_anonymous)
             {
-              args[i] = exprt(ID_type);
-              args[i].type() = void_type();
-              cpp_typecheck.template_map.set(param, args[i]);
+              // SFINAE constraint evaluation failed — reject the
+              // template (substitution failure is not an error).
+              return nil_exprt();
             }
           }
         }
@@ -2704,6 +2948,42 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   const irep_idt &class_tag = expr.get(ID_C_class);
   if(!class_tag.empty())
     function_type.set(ID_C_class, class_tag);
+
+  // Verify that the actual arguments are compatible with the deduced
+  // parameter types.  Template argument deduction may succeed even when
+  // the deduced types don't match (e.g., deducing T=int from the second
+  // parameter of operator-(const complex<T>&, const T&) when the first
+  // argument is an enum, not complex<int>).
+  if(function_type.id() == ID_code && fargs.in_use)
+  {
+    const auto &params = to_code_type(function_type).parameters();
+    auto arg_it = fargs.operands.begin();
+    // skip 'this' parameter
+    std::size_t start = (fargs.has_object && !params.empty()) ? 1 : 0;
+    for(std::size_t i = start;
+        i < params.size() && arg_it != fargs.operands.end();
+        ++i, ++arg_it)
+    {
+      const typet &param_type = params[i].type();
+      typet arg_type = arg_it->type();
+      typet target = param_type;
+      if(is_reference(target))
+        target = to_reference_type(target).base_type();
+      target.remove(ID_C_constant);
+      target.remove(ID_C_volatile);
+      arg_type.remove(ID_C_constant);
+      arg_type.remove(ID_C_volatile);
+      // If the parameter is a class/struct type and the argument is
+      // not, the template is not a valid match.
+      if(
+        (target.id() == ID_struct_tag || target.id() == ID_struct) &&
+        target != arg_type && arg_type.id() != ID_struct_tag &&
+        arg_type.id() != ID_struct)
+      {
+        return nil_exprt();
+      }
+    }
+  }
 
   // Seems we got an instance for all parameters. Let's return that.
 
@@ -3096,7 +3376,8 @@ void cpp_typecheck_resolvet::resolve_with_arguments(
   const irep_idt &base_name,
   const cpp_typecheck_fargst &fargs)
 {
-  // not clear what this is good for
+  // Argument-dependent lookup (ADL / Koenig lookup):
+  // Search in the namespaces associated with the argument types.
   for(const auto &arg : fargs.operands)
   {
     if(arg.type().id() != ID_struct_tag && arg.type().id() != ID_union_tag)
@@ -3109,9 +3390,22 @@ void cpp_typecheck_resolvet::resolve_with_arguments(
         : static_cast<const struct_union_typet &>(
             cpp_typecheck.follow_tag(to_union_tag_type(arg.type())));
 
+    // Search in the struct's own scope (for friend declarations)
     cpp_scopet &scope =
       cpp_typecheck.cpp_scopes.get_scope(final_type.get(ID_name));
-    const auto tmp_set = scope.lookup(base_name, cpp_scopet::SCOPE_ONLY);
+    auto tmp_set = scope.lookup(base_name, cpp_scopet::SCOPE_ONLY);
     id_set.insert(tmp_set.begin(), tmp_set.end());
+
+    // Search all enclosing namespaces (proper ADL, including
+    // inline namespaces like std::__cxx11)
+    for(cpp_scopet *ns = &scope; ns != nullptr && !ns->is_root_scope();
+        ns = &ns->get_parent())
+    {
+      if(ns->is_namespace())
+      {
+        tmp_set = ns->lookup(base_name, cpp_scopet::SCOPE_ONLY);
+        id_set.insert(tmp_set.begin(), tmp_set.end());
+      }
+    }
   }
 }

@@ -1,0 +1,8 @@
+CORE
+main.cpp
+-std=c++11
+^EXIT=0$
+^SIGNAL=0$
+--
+Test that template aliases inside class templates can be resolved
+when accessed via :: in template context.

@@ -800,15 +800,22 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
   }
 
   // eliminate casts to proper bool
-  if(expr_type.id()==ID_bool)
+  if(expr_type.id() == ID_bool)
   {
     // rewrite (bool)x to x!=0
-    binary_relation_exprt inequality(
-      expr.op(),
-      op_type.id() == ID_floatbv ? ID_ieee_float_notequal : ID_notequal,
-      from_integer(0, op_type));
-    inequality.add_source_location()=expr.source_location();
-    return changed(simplify_node(inequality));
+    if(
+      op_type.id() == ID_signedbv || op_type.id() == ID_unsignedbv ||
+      op_type.id() == ID_c_bool || op_type.id() == ID_c_bit_field ||
+      op_type.id() == ID_c_enum_tag || op_type.id() == ID_floatbv ||
+      op_type.id() == ID_fixedbv || op_type.id() == ID_pointer)
+    {
+      binary_relation_exprt inequality(
+        expr.op(),
+        op_type.id() == ID_floatbv ? ID_ieee_float_notequal : ID_notequal,
+        from_integer(0, op_type));
+      inequality.add_source_location() = expr.source_location();
+      return changed(simplify_node(inequality));
+    }
   }
 
   // eliminate casts from proper bool

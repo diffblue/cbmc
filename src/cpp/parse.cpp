@@ -921,6 +921,12 @@ bool Parser::rNamespaceSpec(cpp_namespace_spect &namespace_spec)
 
   irep_idt name;
 
+  // Tolerate __attribute__ before the namespace name, as used by libc++:
+  // namespace __attribute__((__type_visibility__("default"))) std { }
+  typet discard;
+  if(!optAttribute(discard))
+    return false;
+
   // namespace might be anonymous
   if(lex.LookAhead(0) != '{')
   {
@@ -935,11 +941,8 @@ bool Parser::rNamespaceSpec(cpp_namespace_spect &namespace_spec)
   namespace_spec.set_namespace(name);
   namespace_spec.set_is_inline(is_inline);
 
-  // Tolerate constructs such as:
+  // Tolerate __attribute__ after the namespace name, as used by glibc:
   // inline namespace __cxx11 __attribute__((__abi_tag__ ("cxx11"))) { }
-  // which occurs in glibc. Obviously we need to better than just throw attribs
-  // away like this in the future.
-  typet discard;
   if(!optAttribute(discard))
     return false;
 
@@ -7479,21 +7482,23 @@ bool Parser::rTypePredicate(exprt &expr)
       return false;
     if(lex.LookAhead(0) == TOK_ELLIPSIS)
       lex.get_token(tk);
-    if(lex.get_token(tk)!=',')
-      return false;
-    if(!rTypeName(tname2))
-      return false;
-    if(lex.LookAhead(0) == TOK_ELLIPSIS)
-      lex.get_token(tk);
-    // consume any additional type arguments (variadic traits)
-    while(lex.LookAhead(0) == ',')
+    if(lex.LookAhead(0) == ',')
     {
       lex.get_token(tk);
-      typet extra;
-      if(!rTypeName(extra))
+      if(!rTypeName(tname2))
         return false;
       if(lex.LookAhead(0) == TOK_ELLIPSIS)
         lex.get_token(tk);
+      // consume any additional type arguments (variadic traits)
+      while(lex.LookAhead(0) == ',')
+      {
+        lex.get_token(tk);
+        typet extra;
+        if(!rTypeName(extra))
+          return false;
+        if(lex.LookAhead(0) == TOK_ELLIPSIS)
+          lex.get_token(tk);
+      }
     }
     if(lex.get_token(tk)!=')')
       return false;
