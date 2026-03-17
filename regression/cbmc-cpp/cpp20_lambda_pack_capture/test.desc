@@ -1,8 +1,8 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-Lambda init-capture with pack expansion not parsed
+C++20 lambda init-capture with pack expansion

@@ -517,7 +517,9 @@ void cpp_typecheckt::elaborate_class_template(
             }
           }
 
-          if(partial_specialization_args_tc == full_args_tc)
+          if(
+            partial_specialization_args_tc.arguments() ==
+            full_args_tc.arguments())
           {
             // operator== on irept ignores #-prefixed attributes like
             // C_constant, C_volatile, and C_c_type. Check them
@@ -982,6 +984,60 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
   if(new_decl.type().id()==ID_struct)
   {
+    // Before instantiating from the primary template, check if there is
+    // a full specialization (template<>) that matches the template
+    // arguments. If so, use the specialization instead.
+    if(
+      !specialization_given &&
+      template_symbol.type.get(ID_specialization_of).empty())
+    {
+      cpp_scopet &parent_scope = template_scope->get_parent();
+      cpp_scopet::id_sett id_set =
+        parent_scope.lookup(template_symbol.base_name, cpp_scopet::SCOPE_ONLY);
+
+      for(const auto *id_ptr : id_set)
+      {
+        const symbolt &s = lookup(id_ptr->identifier);
+        if(s.type.get(ID_specialization_of).empty())
+          continue;
+
+        const cpp_declarationt &spec_decl = to_cpp_declaration(s.type);
+        // Only consider full specializations (zero template parameters)
+        if(!spec_decl.template_type().template_parameters().empty())
+          continue;
+
+        const cpp_template_args_non_tct &spec_args =
+          spec_decl.partial_specialization_args();
+        if(
+          spec_args.arguments().size() != full_template_args.arguments().size())
+        {
+          continue;
+        }
+
+        // Typecheck the specialization args and compare
+        cpp_saved_template_mapt saved_map2(template_map);
+        cpp_save_scopet save_scope2(cpp_scopes);
+        cpp_template_args_tct spec_args_tc;
+        bool match = false;
+        try
+        {
+          spec_args_tc = typecheck_template_args(
+            source_location, template_symbol, spec_args);
+          match = (spec_args_tc.arguments() == full_template_args.arguments());
+        }
+        catch(...)
+        {
+        }
+
+        if(match)
+        {
+          // Re-instantiate using the full specialization
+          return instantiate_template(
+            source_location, s, spec_args_tc, full_template_args);
+        }
+      }
+    }
+
     // Switch to the sub-scope so that typecheck_compound_type creates
     // the class symbol with an identifier that includes the template
     // suffix, matching the identifier used by class_template_symbol.
@@ -1786,6 +1842,152 @@ const symbolt &cpp_typecheckt::instantiate_template(
               break;
             }
           }
+
+          // Expand lambda pack init-captures: [...x = args]
+          if(node.id() == irep_idt("lambda"))
+          {
+            irept &cap_list = node.add("lambda_capture");
+            irept::subt new_caps;
+            irep_idt cap_pack_name;
+            std::vector<irep_idt> cap_expanded_names;
+            for(auto &cap : cap_list.get_sub())
+            {
+              if(
+                cap.get_bool("is_pack") && contains_pack_name(cap.find("init")))
+              {
+                cap_pack_name = cap.get(ID_identifier);
+                for(std::size_t i = 0; i < expanded_names.size(); ++i)
+                {
+                  irept new_cap = cap;
+                  new_cap.remove("is_pack");
+                  irep_idt ename =
+                    id2string(cap_pack_name) + "_" + std::to_string(i);
+                  new_cap.set(ID_identifier, ename);
+                  new_cap.add("init") =
+                    substitute_pack(cap.find("init"), expanded_names[i]);
+                  new_caps.push_back(new_cap);
+                  cap_expanded_names.push_back(ename);
+                }
+              }
+              else
+              {
+                new_caps.push_back(cap);
+              }
+            }
+            cap_list.get_sub() = new_caps;
+
+            // Expand fold expressions in the lambda body that reference
+            // the captured pack name.
+            if(!cap_pack_name.empty())
+            {
+              auto is_cap_name = [&cap_pack_name](const irept &n) -> bool
+              {
+                if(n.id() != ID_cpp_name)
+                  return false;
+                for(const auto &s : n.get_sub())
+                  if(s.id() == ID_name && s.get(ID_identifier) == cap_pack_name)
+                    return true;
+                return false;
+              };
+              auto make_cap_name = [](const irept &orig, const irep_idt &name)
+              {
+                irept copy = orig;
+                for(auto &s : copy.get_sub())
+                  if(s.id() == ID_name)
+                  {
+                    s.set(ID_identifier, name);
+                    break;
+                  }
+                return copy;
+              };
+              auto sub_cap =
+                [&is_cap_name, &make_cap_name](
+                  const irept &n, const irep_idt &name, auto &self) -> irept
+              {
+                if(is_cap_name(n))
+                  return make_cap_name(n, name);
+                irept result = n;
+                for(auto &s : result.get_sub())
+                  s = self(s, name, self);
+                return result;
+              };
+              auto contains_cap =
+                [&is_cap_name](const irept &n, auto &self) -> bool
+              {
+                if(is_cap_name(n))
+                  return true;
+                for(const auto &s : n.get_sub())
+                  if(self(s, self))
+                    return true;
+                for(const auto &ns : n.get_named_sub())
+                  if(self(ns.second, self))
+                    return true;
+                return false;
+              };
+
+              std::function<void(irept &)> expand_cap_fold;
+              expand_cap_fold = [&](irept &n)
+              {
+                if(
+                  (n.id() == irep_idt("cpp_right_fold") ||
+                   n.id() == irep_idt("cpp_left_fold")) &&
+                  !n.get_sub().empty() &&
+                  contains_cap(n.get_sub().front(), contains_cap))
+                {
+                  const irep_idt fold_op = n.get(irep_idt("fold_op"));
+                  const irept &pe = n.get_sub().front();
+                  bool is_left = (n.id() == irep_idt("cpp_left_fold"));
+                  if(cap_expanded_names.size() == 1)
+                  {
+                    n = sub_cap(pe, cap_expanded_names[0], sub_cap);
+                    return;
+                  }
+                  if(is_left)
+                  {
+                    irept r = sub_cap(pe, cap_expanded_names[0], sub_cap);
+                    for(std::size_t i = 1; i < cap_expanded_names.size(); ++i)
+                    {
+                      irept bin(fold_op);
+                      bin.get_sub().push_back(r);
+                      bin.get_sub().push_back(
+                        sub_cap(pe, cap_expanded_names[i], sub_cap));
+                      r = bin;
+                    }
+                    n = r;
+                  }
+                  else
+                  {
+                    irept r = sub_cap(
+                      pe,
+                      cap_expanded_names[cap_expanded_names.size() - 1],
+                      sub_cap);
+                    for(int i = static_cast<int>(cap_expanded_names.size()) - 2;
+                        i >= 0;
+                        --i)
+                    {
+                      irept bin(fold_op);
+                      bin.get_sub().push_back(
+                        sub_cap(pe, cap_expanded_names[i], sub_cap));
+                      bin.get_sub().push_back(r);
+                      r = bin;
+                    }
+                    n = r;
+                  }
+                  return;
+                }
+                for(auto &s : n.get_sub())
+                  expand_cap_fold(s);
+                for(auto &ns : n.get_named_sub())
+                  expand_cap_fold(ns.second);
+              };
+              // The lambda body is a named sub-tree
+              for(auto &ns : node.get_named_sub())
+                expand_cap_fold(ns.second);
+              for(auto &s : node.get_sub())
+                expand_cap_fold(s);
+            }
+          }
+
           for(auto &sub : node.get_sub())
             expand_pack(sub);
           for(auto &named : node.get_named_sub())

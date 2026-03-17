@@ -91,6 +91,12 @@ public:
 protected:
   cpp_scopest cpp_scopes;
 
+  // SFINAE alternative declarations: when two function templates differ
+  // only in their SFINAE constraints, the second is stored here (keyed
+  // by the primary's symbol name) rather than in the symbol table, to
+  // avoid triggering extra instantiations during symbol table iteration.
+  std::map<irep_idt, symbolt> sfinae_alternatives;
+
   cpp_parse_treet &cpp_parse_tree;
   irep_idt current_linkage_spec;
 
@@ -467,6 +473,8 @@ protected:
 
   void
   typecheck_function_call_arguments(side_effect_expr_function_callt &) override;
+
+  void instantiate_generic_lambda(side_effect_expr_function_callt &);
 
   bool operator_is_overloaded(exprt &);
   bool overloadable(const exprt &);

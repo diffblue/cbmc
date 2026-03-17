@@ -1,8 +1,8 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-Template alias not expanded during function template argument deduction
+Template alias expanded during function template argument deduction

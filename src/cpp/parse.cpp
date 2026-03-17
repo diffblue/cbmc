@@ -1460,7 +1460,8 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
       id_entry != nullptr &&
       (id_entry->kind == new_scopet::kindt::TYPE_TEMPLATE_PARAMETER ||
        id_entry->kind == new_scopet::kindt::TYPEDEF ||
-       id_entry->kind == new_scopet::kindt::TAG);
+       id_entry->kind == new_scopet::kindt::TAG ||
+       id_entry->kind == new_scopet::kindt::CLASS_TEMPLATE);
 
     if(!is_known_type)
     {
@@ -8365,6 +8366,14 @@ bool Parser::rLambdaExpr(exprt &exp)
         by_ref = true;
       }
 
+      // C++20 pack init-capture: [...x = args] or [&...x = args]
+      bool is_pack = false;
+      if(lex.LookAhead(0) == TOK_ELLIPSIS)
+      {
+        lex.get_token(tk);
+        is_pack = true;
+      }
+
       if(lex.LookAhead(0) == TOK_THIS)
       {
         lex.get_token(tk);
@@ -8387,6 +8396,9 @@ bool Parser::rLambdaExpr(exprt &exp)
       }
       else
         return false;
+
+      if(is_pack)
+        cap.set("is_pack", true);
 
       if(by_ref)
         cap.set("by_ref", true);
@@ -9715,6 +9727,22 @@ std::optional<codet> Parser::rStatement()
       codet code("cpp-using");
       code.add("cpp_using", cpp_using);
       return std::move(code);
+    }
+
+    case TOK_NAMESPACE:
+    {
+      // namespace alias in block scope: namespace X = Y::Z;
+      cpp_namespace_spect namespace_spec;
+      if(!rNamespaceSpec(namespace_spec))
+        return {};
+
+      if(lex.get_token(tk1) != ';')
+        return {};
+
+      codet statement(ID_cpp_namespace_spec);
+      statement.add(ID_namespace, namespace_spec);
+      set_location(statement, tk1);
+      return std::move(statement);
     }
 
   case TOK_STATIC_ASSERT:
