@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/symbol_table_base.h>
 
 #include "cpp_type2name.h"
+#include "cpp_typecheck_resolve.h"
 
 std::string cpp_typecheckt::template_suffix(
   const cpp_template_args_tct &template_args)
@@ -254,13 +255,130 @@ void cpp_typecheckt::elaborate_class_template(
 
   if(t_type.id() == ID_struct && t_type.get_bool(ID_template_class_instance))
   {
+    const symbolt &primary_template = lookup(t_type.get(ID_identifier));
+    const cpp_template_args_tct &specialization_args =
+      static_cast<const cpp_template_args_tct &>(
+        t_type.find(ID_specialization_template_args));
+    const cpp_template_args_tct &full_args =
+      static_cast<const cpp_template_args_tct &>(
+        t_type.find(ID_full_template_args));
+
+    // Resolve symbol references in full_args, mirroring the logic
+    // in template_suffix.
+    cpp_template_args_tct full_args_tc = full_args;
+    for(auto &arg : full_args_tc.arguments())
+    {
+      if(arg.id() == ID_type)
+        continue;
+      for(int pass = 0; pass < 10; ++pass)
+      {
+        bool changed = false;
+        arg.visit_pre(
+          [this, &changed](exprt &node)
+          {
+            if(node.id() == ID_symbol)
+            {
+              const symbolt &sym =
+                lookup(to_symbol_expr(node).get_identifier());
+              if(sym.value.is_not_nil() && cpp_is_pod(sym.type))
+              {
+                node = sym.value;
+                changed = true;
+              }
+            }
+          });
+        if(!changed)
+          break;
+        simplify(arg, *this);
+        if(arg.is_constant())
+          break;
+      }
+    }
+
+    // Search for a better-matching partial specialization only if
+    // the symbol was created with the primary template (not already
+    // matched to a partial specialization).
+    const symbolt *best_match = &primary_template;
+    cpp_template_args_tct best_spec_args = specialization_args;
+
+    if(primary_template.type.get(ID_specialization_of).empty())
+    {
+      cpp_scopet *template_scope =
+        static_cast<cpp_scopet *>(cpp_scopes.id_map[primary_template.name]);
+
+      if(template_scope != nullptr)
+      {
+        cpp_scopet &scope = template_scope->get_parent();
+        cpp_scopet::id_sett id_set =
+          scope.lookup(primary_template.base_name, cpp_scopet::SCOPE_ONLY);
+
+        for(const auto *id_ptr : id_set)
+        {
+          const symbolt &s = lookup(id_ptr->identifier);
+          if(s.type.get(ID_specialization_of).empty())
+            continue;
+
+          const cpp_declarationt &cpp_declaration = to_cpp_declaration(s.type);
+          const cpp_template_args_non_tct &partial_specialization_args =
+            cpp_declaration.partial_specialization_args();
+
+          if(
+            partial_specialization_args.arguments().size() !=
+            full_args_tc.arguments().size())
+          {
+            continue;
+          }
+
+          cpp_saved_template_mapt saved_map(template_map);
+          cpp_save_scopet save_scope(cpp_scopes);
+
+          template_map.build_unassigned(cpp_declaration.template_type());
+
+          cpp_scopet *spec_scope =
+            static_cast<cpp_scopet *>(cpp_scopes.id_map[s.name]);
+          if(spec_scope != nullptr)
+            cpp_scopes.go_to(*spec_scope);
+
+          cpp_typecheck_resolvet resolver(*this);
+
+          for(std::size_t i = 0; i < full_args_tc.arguments().size(); i++)
+          {
+            if(full_args_tc.arguments()[i].id() == ID_type)
+              resolver.guess_template_args(
+                partial_specialization_args.arguments()[i].type(),
+                full_args_tc.arguments()[i].type());
+            else
+              resolver.guess_template_args(
+                partial_specialization_args.arguments()[i],
+                full_args_tc.arguments()[i]);
+          }
+
+          cpp_template_args_tct guessed_args =
+            template_map.build_template_args(cpp_declaration.template_type());
+
+          if(guessed_args.has_unassigned())
+            continue;
+
+          // Typecheck the partial specialization args with the guessed
+          // values, using the primary template for type context.
+          cpp_template_args_tct partial_specialization_args_tc =
+            typecheck_template_args(
+              type.source_location(),
+              primary_template,
+              partial_specialization_args);
+
+          if(partial_specialization_args_tc == full_args_tc)
+          {
+            best_match = &s;
+            best_spec_args = guessed_args;
+            break;
+          }
+        }
+      }
+    }
+
     instantiate_template(
-      type.source_location(),
-      lookup(t_type.get(ID_identifier)),
-      static_cast<const cpp_template_args_tct &>(
-        t_type.find(ID_specialization_template_args)),
-      static_cast<const cpp_template_args_tct &>(
-        t_type.find(ID_full_template_args)));
+      type.source_location(), *best_match, best_spec_args, full_args);
   }
 }
 
@@ -560,7 +678,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
     return new_symb;
   }
 
-  if(is_template_method)
+  if(is_template_method && !new_decl.is_typedef())
   {
     symbolt &symb = symbol_table.get_writeable_ref(class_name);
 
@@ -571,13 +689,6 @@ const symbolt &cpp_typecheckt::instantiate_template(
       error().source_location=new_decl.source_location();
       error() << "invalid use of `virtual' in template declaration"
               << eom;
-      throw 0;
-    }
-
-    if(new_decl.is_typedef())
-    {
-      error().source_location=new_decl.source_location();
-      error() << "template declaration for typedef" << eom;
       throw 0;
     }
 

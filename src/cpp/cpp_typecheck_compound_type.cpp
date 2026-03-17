@@ -323,7 +323,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
   typecheck_type(final_type);
 
-  if(final_type.id() == ID_empty)
+  if(final_type.id() == ID_empty && !declaration.is_typedef())
   {
     error().source_location = declaration.type().source_location();
     error() << "void-typed member not permitted" << eom;
