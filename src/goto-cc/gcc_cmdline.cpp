@@ -29,6 +29,7 @@ const char *goto_cc_options_with_separated_argument[]=
   "--native-linker",
   "--print-rejected-preprocessed-source",
   "--mangle-suffix",
+  "-stdlib",
   nullptr
 };
 

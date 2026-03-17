@@ -128,18 +128,19 @@ void template_mapt::apply(typet &type) const
   }
   else if(type.id() == ID_cpp_name)
   {
-    // Check if the cpp_name is a template template parameter usage like C<T>.
-    // If the base name matches a template template parameter in the type_map,
-    // replace the entire cpp_name with the assigned type.
+    // Check if the cpp_name is a simple template type parameter
     irept::subt &sub = type.get_sub();
-    bool has_targs = false;
-    for(const auto &s : sub)
-      if(s.id() == ID_template_args)
-        has_targs = true;
-
-    if(has_targs && !sub.empty() && sub.front().id() == ID_name)
+    if(!sub.empty() && sub.front().id() == ID_name)
     {
       irep_idt base = sub.front().get(ID_identifier);
+
+      // Check for template template parameter usage like C<T>
+      bool has_targs = false;
+      for(const auto &s : sub)
+        if(s.id() == ID_template_args)
+          has_targs = true;
+
+      // Try to match against type_map entries
       for(const auto &entry : type_map)
       {
         const std::string &key = id2string(entry.first);
@@ -148,8 +149,11 @@ void template_mapt::apply(typet &type) const
           pos != std::string::npos ? key.substr(pos + 2) : key;
         if(suffix == id2string(base) && entry.second.id() != ID_unassigned)
         {
-          type = entry.second;
-          return;
+          if(has_targs || sub.size() == 1)
+          {
+            type = entry.second;
+            return;
+          }
         }
       }
     }

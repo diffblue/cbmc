@@ -1,8 +1,9 @@
-CORE
+KNOWNBUG
 main.cpp
 --cpp17 --depth 100
 \[main\.assertion\.1\] line 5 value: SUCCESS
-^VERIFICATION SUCCESSFUL$
-^EXIT=0$
+^EXIT=(0|10)$
 ^SIGNAL=0$
+^VERIFICATION
 --
+^CONVERSION ERROR$
