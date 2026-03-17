@@ -1266,6 +1266,25 @@ const symbolt &cpp_typecheckt::instantiate_template(
     // a class template
     convert_non_template_declaration(new_decl);
 
+    // Propagate template info to the class symbol so that member
+    // function template bodies can find the class template parameters.
+    {
+      std::string inst_suffix = template_suffix(full_template_args);
+      irep_idt class_sym_id = id2string(sub_scope.prefix) + "tag-" +
+                              id2string(template_symbol.base_name) +
+                              inst_suffix;
+      if(auto *cs = symbol_table.get_writeable(class_sym_id))
+      {
+        if(cs->type.find(ID_C_template).is_nil())
+        {
+          cs->type.set(
+            ID_C_template,
+            to_cpp_declaration(template_symbol.type).template_type());
+          cs->type.set(ID_C_template_arguments, specialization_template_args);
+        }
+      }
+    }
+
     // Restore the template scope for template method processing.
     saved_scope.restore();
     cpp_scopes.go_to(*template_scope);
@@ -1410,6 +1429,105 @@ const symbolt &cpp_typecheckt::instantiate_template(
     }
 
     const irep_idt& new_symb_id = new_decl.type().get(ID_identifier);
+
+    // Move deferred methods of this class to method_bodies.
+    // Methods are added to deferred_typechecking during class body
+    // processing because the parent scope is a template scope.
+    {
+      std::string class_name = id2string(new_symb_id);
+      if(class_name.substr(0, 4) == "tag-")
+        class_name = class_name.substr(4);
+      class_name += "::";
+      std::vector<irep_idt> to_move;
+      for(const auto &d : deferred_typechecking)
+      {
+        if(id2string(d).find(class_name) != std::string::npos)
+          to_move.push_back(d);
+      }
+      for(const auto &d : to_move)
+      {
+        deferred_typechecking.erase(d);
+        auto *sym = symbol_table.get_writeable(d);
+        if(!sym)
+          continue;
+
+        // If the method has nil body, check if a body is available
+        // from template_methods (out-of-class definitions in .tcc).
+        // Search ALL template symbols, not just the current one.
+        if(sym->value.is_nil() && sym->type.id() == ID_code)
+        {
+          for(const auto &tsp : symbol_table)
+          {
+            if(!tsp.second.type.get_bool(ID_is_template))
+              continue;
+            if(tsp.second.value.is_nil())
+              continue;
+            const exprt &tms = static_cast<const exprt &>(
+              tsp.second.value.find(ID_template_methods));
+            for(const auto &tm : tms.operands())
+            {
+              const cpp_declarationt &md =
+                static_cast<const cpp_declarationt &>(
+                  static_cast<const irept &>(tm));
+              if(md.declarators().empty())
+                continue;
+              if(md.declarators()[0].name().get_base_name() != sym->base_name)
+                continue;
+              if(md.declarators()[0].find(ID_value).is_nil())
+                continue;
+              // Found body. Apply class template substitution.
+              const template_typet &md_tt = md.template_type();
+              std::size_t n_md = md_tt.template_parameters().size();
+              std::size_t n_cls =
+                specialization_template_args.arguments().size();
+              if(n_md <= n_cls)
+              {
+                // Regular method: substitute all params
+                exprt body = static_cast<const exprt &>(
+                  md.declarators()[0].find(ID_value));
+                cpp_saved_template_mapt sm(template_map);
+                template_map.build(md_tt, specialization_template_args);
+                template_map.apply(body);
+                sym->value = body;
+              }
+              else
+              {
+                // Member function template: substitute class params,
+                // deduce method params from concrete function sig.
+                exprt body = static_cast<const exprt &>(
+                  md.declarators()[0].find(ID_value));
+                // Build full args: class args + deduced method args
+                cpp_template_args_tct full;
+                for(const auto &a : specialization_template_args.arguments())
+                  full.arguments().push_back(a);
+                // Deduce method params from function signature
+                const code_typet &cft = to_code_type(sym->type);
+                const auto &cps = cft.parameters();
+                std::size_t off = (!cps.empty() && cps[0].get_this()) ? 1 : 0;
+                for(std::size_t i = n_cls; i < n_md; i++)
+                {
+                  exprt a(ID_type);
+                  if(off < cps.size())
+                    a.type() = cps[off].type();
+                  else
+                    a.type() = typet(ID_empty);
+                  full.arguments().push_back(a);
+                }
+                cpp_saved_template_mapt sm(template_map);
+                template_map.build(md_tt, full);
+                template_map.apply(body);
+                sym->value = body;
+              }
+              goto body_found;
+            }
+          }
+        body_found:;
+        }
+
+        add_method_body(sym);
+      }
+    }
+
     symbolt &new_symb = symbol_table.get_writeable_ref(new_symb_id);
 
     // add template arguments to type in order to retrieve template map when
@@ -1464,6 +1582,57 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
     CHECK_RETURN(!access.empty());
     PRECONDITION(symb.type.id() == ID_struct || symb.type.id() == ID_union);
+
+    // If the method declaration has no body, check if the body was
+    // provided by an out-of-class definition (stored in template_methods
+    // of the class template).
+    if(new_decl.declarators()[0].find(ID_value).is_nil())
+    {
+      // Find the class template symbol
+      for(const auto &sp : symbol_table)
+      {
+        if(
+          sp.second.type.get_bool(ID_is_template) &&
+          sp.second.value.is_not_nil())
+        {
+          // Match by base name OR by checking if this template's
+          // instantiated_with includes the current class.
+          if(sp.second.base_name != symb.base_name)
+            continue;
+          const exprt &tmethods = static_cast<const exprt &>(
+            sp.second.value.find(ID_template_methods));
+          if(tmethods.operands().empty())
+            continue;
+          irep_idt method_base =
+            new_decl.declarators()[0].name().get_base_name();
+          for(const auto &tm : tmethods.operands())
+          {
+            const cpp_declarationt &md = static_cast<const cpp_declarationt &>(
+              static_cast<const irept &>(tm));
+            if(md.declarators().empty())
+              continue;
+            if(md.declarators()[0].name().get_base_name() != method_base)
+              continue;
+            if(md.declarators()[0].find(ID_value).is_nil())
+              continue;
+            // Verify this is a member function template
+            const template_typet &md_tt = md.template_type();
+            if(
+              md_tt.template_parameters().size() <=
+              specialization_template_args.arguments().size())
+              continue;
+            // Copy the body. The body is in parsed (not type-checked)
+            // form. It will be type-checked by typecheck_method_bodies
+            // with the proper template map.
+            new_decl.declarators()[0].add(ID_value) =
+              md.declarators()[0].find(ID_value);
+            goto body_found_is_tm;
+          }
+          continue;
+        }
+      }
+    body_found_is_tm:;
+    }
 
     typecheck_compound_declarator(
       symb,

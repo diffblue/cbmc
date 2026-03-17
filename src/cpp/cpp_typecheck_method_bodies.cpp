@@ -150,7 +150,6 @@ void cpp_typecheckt::add_method_body(symbolt *_method_symbol)
     // parameters. Build them from the class symbol so that names like
     // _Alloc inside the method body resolve correctly.
     template_mapt method_map = template_map;
-    if(deferred_typechecking.count(_method_symbol->name))
     {
       const irep_idt &class_id = _method_symbol->type.get(ID_C_member_name);
       if(!class_id.empty())

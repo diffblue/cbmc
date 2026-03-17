@@ -1,8 +1,9 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
-^VERIFICATION SUCCESSFUL$
-^EXIT=0$
+\[main\.assertion\.1\] line 7 string size: SUCCESS
+^EXIT=10$
 ^SIGNAL=0$
 --
-std::string: _M_construct has no body
+The string size assertion passes. VERIFICATION FAILED due to
+_S_copy_chars having no body (a separate issue).
