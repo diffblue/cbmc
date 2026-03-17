@@ -1,0 +1,11 @@
+CORE
+a.c
+b.c --unified
+^EXIT=0$
+^SIGNAL=0$
+\*\* main \*\*
+ASSIGN main::1::x := 42
+\*\* bar \*\*
+\*\* foo \*\*
+--
+^warning: ignoring
