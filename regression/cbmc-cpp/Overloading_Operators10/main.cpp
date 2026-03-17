@@ -1,3 +1,4 @@
+#include <cassert>
 struct A
 {
   bool True()

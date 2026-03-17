@@ -931,7 +931,8 @@ void goto_convertt::convert_assign(
      rhs.get(ID_statement) == ID_postincrement ||
      rhs.get(ID_statement) == ID_preincrement ||
      rhs.get(ID_statement) == ID_statement_expression ||
-     rhs.get(ID_statement) == ID_gcc_conditional_expression))
+     rhs.get(ID_statement) == ID_gcc_conditional_expression ||
+     rhs.get(ID_statement) == ID_temporary_object))
   {
     // handle above side effects
     side_effects.add(clean_expr(rhs, mode));

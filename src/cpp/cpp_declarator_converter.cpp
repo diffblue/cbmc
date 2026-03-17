@@ -43,7 +43,13 @@ symbolt &cpp_declarator_convertert::convert(
 {
   PRECONDITION(declaration_type.is_not_nil());
 
-  if(declaration_type.id() == "cpp-cast-operator")
+  const bool is_cast_operator =
+    declaration_type.id() == "cpp-cast-operator" ||
+    (declaration_type.id() == ID_already_typechecked &&
+     to_type_with_subtype(declaration_type).subtype().id() ==
+       "cpp-cast-operator");
+
+  if(is_cast_operator)
   {
     typet type;
     type.swap(declarator.name().get_sub().back());
