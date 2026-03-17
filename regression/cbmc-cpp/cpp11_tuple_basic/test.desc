@@ -1,0 +1,9 @@
+KNOWNBUG
+main.cpp
+--cpp11 --unwind 5
+^EXIT=(0|10)$
+^SIGNAL=0$
+^VERIFICATION
+--
+^CONVERSION ERROR$
+std::tuple basic operations in C++11 mode.

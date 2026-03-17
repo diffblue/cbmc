@@ -132,10 +132,22 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
 
     if(has_body)
     {
-      error().source_location=type.source_location();
-      error() << "enum symbol '" << base_name << "' declared previously\n"
-              << "location of previous definition: " << symbol.location << eom;
-      throw 0;
+      // Allow defining an enum that was previously forward-declared
+      if(
+        symbol.type.id() == ID_c_enum_tag ||
+        symbol.type.get(ID_C_incomplete) == "1" ||
+        !symbol.type.find(ID_body).is_not_nil())
+      {
+        // This is a definition replacing a forward declaration — OK
+      }
+      else
+      {
+        error().source_location = type.source_location();
+        error() << "enum symbol '" << base_name << "' declared previously\n"
+                << "location of previous definition: " << symbol.location
+                << eom;
+        throw 0;
+      }
     }
   }
   else if(
