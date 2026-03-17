@@ -24,6 +24,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_type2name.h"
 #include "cpp_typecheck_resolve.h"
 
+#include <algorithm>
+
 std::string cpp_typecheckt::template_suffix(
   const cpp_template_args_tct &template_args)
 {
@@ -178,7 +180,16 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   const cpp_template_args_tct &specialization_template_args,
   const cpp_template_args_tct &full_template_args)
 {
-  PRECONDITION(!full_template_args.has_unassigned());
+  if(full_template_args.has_unassigned())
+  {
+    // Some template arguments could not be resolved (e.g., default
+    // arguments that depend on unresolved types). Treat as an error
+    // rather than crashing.
+    error().source_location = source_location;
+    error() << "template '" << template_symbol.base_name
+            << "' has unresolved template arguments" << eom;
+    throw 0;
+  }
 
   // do we have args?
   if(full_template_args.arguments().empty())
@@ -693,6 +704,19 @@ const symbolt &cpp_typecheckt::instantiate_template(
       template_typet method_type=
         method_decl.template_type();
 
+      // If this method has more template parameters than the class
+      // template, it is a member function template (e.g.,
+      // template<T> template<U> void S<T>::f(U x) {}).
+      // Skip it during class instantiation — it will be instantiated
+      // when actually called.
+      const std::size_t n_class_params =
+        specialization_template_args.arguments().size();
+      const std::size_t n_method_params =
+        method_type.template_parameters().size();
+
+      if(n_method_params > n_class_params)
+        continue;
+
       // do template parameters
       // this also sets up the template scope of the method
       cpp_scopet &method_scope=
@@ -778,9 +802,11 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
   PRECONDITION(new_decl.declarators().size() == 1);
 
-  // For template aliases (typedefs), append the template suffix to the
-  // declarator name so that different instantiations produce different symbols.
-  if(new_decl.is_typedef())
+  // For template aliases (typedefs) and function templates where different
+  // template arguments may produce the same parameter types (e.g., when a
+  // template parameter only affects the return type), append the template
+  // suffix to the declarator name so that different instantiations produce
+  // different symbols.
   {
     cpp_namet &declarator_name = new_decl.declarators()[0].name();
     for(auto &sub : declarator_name.get_sub())
@@ -790,6 +816,157 @@ const symbolt &cpp_typecheckt::instantiate_template(
         sub.set(ID_identifier, id2string(sub.get(ID_identifier)) + suffix);
         break;
       }
+    }
+  }
+
+  // When a variadic template parameter pack has zero arguments (the args
+  // list is shorter than the parameter list), remove pack-expanded
+  // parameters from the function declaration and its nested types.
+  if(
+    full_template_args.arguments().size() <
+      template_type.template_parameters().size() &&
+    !template_type.template_parameters().empty() &&
+    template_type.template_parameters().back().get_bool(ID_ellipsis))
+  {
+    // Get the pack parameter's short name
+    const auto &pack_param = template_type.template_parameters().back();
+    const std::string full_id = id2string(pack_param.type().get(ID_identifier));
+    auto pos = full_id.rfind("::");
+    const std::string pack_name =
+      pos != std::string::npos ? full_id.substr(pos + 2) : full_id;
+
+    // Helper: check if a parameter references the pack
+    auto refs_pack = [&pack_name](const irept &p) -> bool
+    {
+      if(p.id() == ID_ellipsis)
+        return true;
+      if(p.id() == ID_cpp_declaration)
+      {
+        const auto &d = to_cpp_declaration(p);
+        if(
+          !d.declarators().empty() &&
+          d.declarators().front().type().get_bool(ID_ellipsis))
+          return true;
+        if(d.type().id() == ID_cpp_name)
+        {
+          for(const auto &sub : d.type().get_sub())
+          {
+            if(
+              sub.id() == ID_name &&
+              id2string(sub.get(ID_identifier)) == pack_name)
+              return true;
+          }
+        }
+      }
+      return false;
+    };
+
+    // Strip from the function's own parameters
+    auto &func_decl = new_decl.declarators()[0];
+    irept &func_params = func_decl.type().add(ID_parameters);
+    irept::subt &fp_sub = func_params.get_sub();
+
+    // Get the pack variable name before removing (e.g. "base" from
+    // "Base... base")
+    irep_idt pack_var_name;
+    for(const auto &fp : fp_sub)
+    {
+      if(fp.id() == ID_cpp_declaration)
+      {
+        const auto &d = to_cpp_declaration(fp);
+        if(
+          !d.declarators().empty() &&
+          d.declarators().front().type().get_bool(ID_ellipsis))
+        {
+          const auto &dname = d.declarators().front().name();
+          for(const auto &sub : dname.get_sub())
+          {
+            if(sub.id() == ID_name)
+            {
+              pack_var_name = sub.get(ID_identifier);
+              break;
+            }
+          }
+          break;
+        }
+      }
+    }
+
+    fp_sub.erase(
+      std::remove_if(fp_sub.begin(), fp_sub.end(), refs_pack), fp_sub.end());
+
+    // Strip from nested function pointer parameter types
+    for(auto &fp : fp_sub)
+    {
+      if(fp.id() == ID_cpp_declaration)
+      {
+        auto &inner_decl = to_cpp_declaration(fp);
+        if(!inner_decl.declarators().empty())
+        {
+          irept &dtype = inner_decl.declarators().front().type();
+          if(
+            dtype.id() == ID_frontend_pointer && !dtype.get_sub().empty() &&
+            dtype.get_sub().front().id() == ID_function_type)
+          {
+            irept::subt &inner_params =
+              dtype.get_sub().front().add(ID_parameters).get_sub();
+            inner_params.erase(
+              std::remove_if(
+                inner_params.begin(), inner_params.end(), refs_pack),
+              inner_params.end());
+          }
+        }
+      }
+    }
+    // Strip pack variable references from function call arguments in body
+    if(!pack_var_name.empty() && func_decl.value().is_not_nil())
+    {
+      // Recursively remove pack variable from function call arguments
+      std::function<void(irept &)> strip_pack_var;
+      strip_pack_var = [&pack_var_name, &strip_pack_var](irept &node)
+      {
+        // If this is a function_call side_effect, strip pack var from args
+        if(
+          node.id() == ID_side_effect &&
+          node.get(ID_statement) == ID_function_call)
+        {
+          // Arguments are stored as a positional sub-node with id=arguments
+          for(auto &sub : node.get_sub())
+          {
+            if(sub.id() == ID_arguments)
+            {
+              irept::subt &arg_sub = sub.get_sub();
+              arg_sub.erase(
+                std::remove_if(
+                  arg_sub.begin(),
+                  arg_sub.end(),
+                  [&pack_var_name](const irept &a)
+                  {
+                    if(a.id() == ID_cpp_name)
+                    {
+                      for(const auto &s : a.get_sub())
+                      {
+                        if(
+                          s.id() == ID_name &&
+                          s.get(ID_identifier) == pack_var_name)
+                          return true;
+                      }
+                    }
+                    return false;
+                  }),
+                arg_sub.end());
+              break;
+            }
+          }
+        }
+        // Recurse into sub-nodes
+        for(auto &sub : node.get_sub())
+          strip_pack_var(sub);
+        // Also recurse into named sub-nodes
+        for(auto &named : node.get_named_sub())
+          strip_pack_var(named.second);
+      };
+      strip_pack_var(func_decl.value());
     }
   }
 

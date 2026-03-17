@@ -44,14 +44,7 @@ void cpp_typecheckt::salvage_default_arguments(
 void cpp_typecheckt::typecheck_class_template(
   cpp_declarationt &declaration)
 {
-  // Do template parameters. This also sets up the template scope.
-  cpp_scopet &template_scope=
-    typecheck_template_parameters(declaration.template_type());
-
-  typet &type=declaration.type();
-  template_typet &template_type=declaration.template_type();
-
-  bool has_body=type.find(ID_body).is_not_nil();
+  typet &type = declaration.type();
 
   const cpp_namet &cpp_name=
     static_cast<const cpp_namet &>(type.find(ID_tag));
@@ -63,14 +56,35 @@ void cpp_typecheckt::typecheck_class_template(
     throw 0;
   }
 
+  irep_idt base_name;
+
+  // For qualified names (e.g., __cxx11::collate), resolve the scope prefix
+  // and enter it BEFORE creating the template scope, so that the template
+  // scope becomes a child of the correct namespace scope.
   if(!cpp_name.is_simple_name())
   {
-    error().source_location=cpp_name.source_location();
-    error() << "simple name expected as class template tag" << eom;
-    throw 0;
+    cpp_typecheck_resolvet resolver(*this);
+    cpp_template_args_non_tct t_args;
+    resolver.resolve_scope(cpp_name, base_name, t_args);
+
+    // Replace the qualified tag with a simple name so that when the
+    // template is instantiated, typecheck_compound_type uses the
+    // current scope (the template sub-scope) rather than re-resolving
+    // the qualifier and placing the class in the wrong scope.
+    cpp_namet simple_name(base_name, cpp_name.source_location());
+    type.add(ID_tag) = simple_name;
   }
 
-  irep_idt base_name=cpp_name.get_base_name();
+  // Do template parameters. This also sets up the template scope.
+  cpp_scopet &template_scope =
+    typecheck_template_parameters(declaration.template_type());
+
+  template_typet &template_type = declaration.template_type();
+
+  bool has_body = type.find(ID_body).is_not_nil();
+
+  if(cpp_name.is_simple_name())
+    base_name = cpp_name.get_base_name();
 
   const cpp_template_args_non_tct &partial_specialization_args=
     declaration.partial_specialization_args();
@@ -476,8 +490,22 @@ void cpp_typecheckt::typecheck_class_template_member(
 
     cpp_declarationt decl_tmp=declaration;
 
+    template_typet method_type = decl_tmp.template_type();
+    const std::size_t n_class_params = tc_template_args.arguments().size();
+    const std::size_t n_method_params =
+      method_type.template_parameters().size();
+
+    // Skip member function templates — they have more template
+    // parameters than the class template args.
+    if(n_method_params > n_class_params)
+    {
+      cpp_saved_scope.restore();
+      continue;
+    }
+
     // do template arguments
     // this also sets up the template scope of the method
+    cpp_saved_template_mapt saved_map(template_map);
     cpp_scopet &method_scope=
       typecheck_template_parameters(decl_tmp.template_type());
 

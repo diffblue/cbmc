@@ -1273,7 +1273,8 @@ bool cpp_typecheckt::reference_binding(
 
   if(
     expr.get_bool(ID_C_lvalue) ||
-    reference_type.base_type().get_bool(ID_C_constant))
+    reference_type.base_type().get_bool(ID_C_constant) ||
+    is_rvalue_reference(reference_type))
   {
     if(reference_compatible(expr, reference_type, rank))
     {

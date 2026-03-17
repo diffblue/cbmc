@@ -27,6 +27,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <ansi-c/merged_type.h>
 
 #include "cpp_convert_type.h"
+#include "cpp_template_parameter.h"
 #include "cpp_type2name.h"
 #include "cpp_typecheck.h"
 #include "cpp_typecheck_fargs.h"
@@ -125,8 +126,44 @@ void cpp_typecheck_resolvet::guess_function_template_args(
         template_args);
 
     identifiers.clear();
-    identifiers.push_back(
-      symbol_exprt(new_symbol.name, new_symbol.type));
+
+    // The instantiated function may have function pointer parameters
+    // with spurious ellipsis from variadic template pack expansion.
+    // Check and fix the type before returning.
+    typet inst_type = new_symbol.type;
+    if(inst_type.id() == ID_code)
+    {
+      bool has_variadic_pack = false;
+      const cpp_declarationt &tmpl_decl =
+        to_cpp_declaration(template_symbol.type);
+      for(const auto &p : tmpl_decl.template_type().template_parameters())
+      {
+        if(p.get_bool(ID_ellipsis))
+        {
+          has_variadic_pack = true;
+          break;
+        }
+      }
+
+      if(has_variadic_pack)
+      {
+        for(auto &param : to_code_type(inst_type).parameters())
+        {
+          if(param.type().id() == ID_pointer)
+          {
+            typet &base = to_pointer_type(param.type()).base_type();
+            if(base.id() == ID_code)
+            {
+              code_typet &ct = to_code_type(base);
+              if(ct.has_ellipsis())
+                ct.remove_ellipsis();
+            }
+          }
+        }
+      }
+    }
+
+    identifiers.push_back(symbol_exprt(new_symbol.name, inst_type));
   }
 }
 
@@ -2085,6 +2122,59 @@ void cpp_typecheck_resolvet::guess_template_args(
         to_array_type(desired_type).size());
     }
   }
+  else if(template_type.id() == ID_function_type)
+  {
+    // function_type is the pre-conversion form of code type.
+    // Match return type and parameter types.
+    if(desired_type.id() == ID_code)
+    {
+      const code_typet &desired_code = to_code_type(desired_type);
+
+      // Match return type (stored as subtype in function_type)
+      if(template_type.has_subtype())
+      {
+        guess_template_args(
+          to_type_with_subtype(template_type).subtype(),
+          desired_code.return_type());
+      }
+
+      // Match parameter types
+      const irept::subt &tmpl_params =
+        template_type.find(ID_parameters).get_sub();
+      const code_typet::parameterst &desired_params = desired_code.parameters();
+
+      auto d_it = desired_params.begin();
+      for(const auto &tp : tmpl_params)
+      {
+        if(tp.id() == ID_ellipsis)
+          break;
+        if(d_it == desired_params.end())
+          break;
+
+        if(tp.id() == ID_cpp_declaration)
+        {
+          const cpp_declarationt &decl = to_cpp_declaration(tp);
+          if(!decl.declarators().empty())
+          {
+            try
+            {
+              typet param_type =
+                decl.declarators().front().merge_type(decl.type());
+              cpp_convert_plain_type(
+                param_type, cpp_typecheck.get_message_handler());
+              guess_template_args(param_type, d_it->type());
+            }
+            catch(...)
+            {
+              // ignore conversion errors
+            }
+          }
+        }
+
+        ++d_it;
+      }
+    }
+  }
 }
 
 /// Guess template arguments for function templates
@@ -2235,6 +2325,68 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
     cpp_typecheck.template_map.build_template_args(
       cpp_declaration.template_type());
 
+  // Apply default template arguments for any remaining unassigned parameters.
+  // For example, template<typename T, typename R = T, ...> where R is not
+  // deducible from function parameters but has a default value.
+  // Also handle variadic packs with zero arguments.
+  bool variadic_pack_empty = false;
+  irep_idt pack_param_name;
+  if(template_args.has_unassigned())
+  {
+    const auto &params = cpp_declaration.template_type().template_parameters();
+    auto &args = template_args.arguments();
+
+    for(std::size_t i = 0; i < args.size() && i < params.size(); i++)
+    {
+      if(args[i].id() == ID_unassigned || args[i].type().id() == ID_unassigned)
+      {
+        const template_parametert &param =
+          static_cast<const template_parametert &>(params[i]);
+
+        // Variadic pack with zero arguments: truncate args here.
+        if(param.get_bool(ID_ellipsis))
+        {
+          const std::string full_id =
+            id2string(param.type().get(ID_identifier));
+          auto pos = full_id.rfind("::");
+          pack_param_name =
+            pos != std::string::npos ? full_id.substr(pos + 2) : full_id;
+          args.resize(i);
+          variadic_pack_empty = true;
+          break;
+        }
+
+        if(param.has_default_argument() && param.id() == ID_type)
+        {
+          typet default_type = param.default_argument().type();
+          // Evaluate the default argument in a SFINAE context: suppress
+          // error messages and treat failure as deduction failure.
+          null_message_handlert null_handler;
+          message_handlert &old_handler = cpp_typecheck.get_message_handler();
+          cpp_typecheck.set_message_handler(null_handler);
+          try
+          {
+            cpp_save_scopet saved_scope(cpp_typecheck.cpp_scopes);
+            cpp_idt *tscope =
+              cpp_typecheck.cpp_scopes.id_map[template_symbol.name];
+            if(tscope != nullptr)
+              cpp_typecheck.cpp_scopes.go_to(*tscope);
+            cpp_typecheck.typecheck_type(default_type);
+            cpp_typecheck.template_map.apply(default_type);
+            args[i] = exprt(ID_type);
+            args[i].type() = default_type;
+            cpp_typecheck.template_map.set(param, args[i]);
+            cpp_typecheck.set_message_handler(old_handler);
+          }
+          catch(...)
+          {
+            cpp_typecheck.set_message_handler(old_handler);
+          }
+        }
+      }
+    }
+  }
+
   if(template_args.has_unassigned())
     return nil_exprt(); // give up
 
@@ -2243,7 +2395,124 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   typet function_type=
     function_declarator.merge_type(cpp_declaration.type());
 
-  cpp_typecheck.typecheck_type(function_type);
+  // When a variadic pack is empty, remove pack-expanded parameters from
+  // the function type before typechecking, since the pack type name
+  // (e.g. Base) has no mapping in the template map.
+  if(variadic_pack_empty && function_type.id() == ID_function_type)
+  {
+    irept::subt &params = function_type.add(ID_parameters).get_sub();
+    // Remove parameters whose declarator has ellipsis (the pack parameter)
+    params.erase(
+      std::remove_if(
+        params.begin(),
+        params.end(),
+        [](const irept &p)
+        {
+          if(p.id() == ID_cpp_declaration)
+          {
+            const auto &decl = to_cpp_declaration(p);
+            if(!decl.declarators().empty())
+            {
+              const auto &d = decl.declarators().front();
+              return d.get_bool(ID_ellipsis) || d.type().get_bool(ID_ellipsis);
+            }
+          }
+          return p.id() == ID_ellipsis;
+        }),
+      params.end());
+    // Also strip ellipsis and pack parameter from nested function pointer types
+    for(auto &p : params)
+    {
+      if(p.id() == ID_cpp_declaration)
+      {
+        auto &decl = to_cpp_declaration(p);
+        if(!decl.declarators().empty())
+        {
+          irept &dtype = decl.declarators().front().type();
+          if(dtype.id() == ID_frontend_pointer)
+          {
+            if(
+              !dtype.get_sub().empty() &&
+              dtype.get_sub().front().id() == ID_function_type)
+            {
+              irept::subt &inner_params =
+                dtype.get_sub().front().add(ID_parameters).get_sub();
+              inner_params.erase(
+                std::remove_if(
+                  inner_params.begin(),
+                  inner_params.end(),
+                  [&pack_param_name](const irept &ip)
+                  {
+                    if(ip.id() == ID_ellipsis)
+                      return true;
+                    if(ip.id() == ID_cpp_declaration)
+                    {
+                      const auto &d = to_cpp_declaration(ip);
+                      if(d.type().id() == ID_cpp_name)
+                      {
+                        for(const auto &sub : d.type().get_sub())
+                        {
+                          if(
+                            sub.id() == ID_name &&
+                            sub.get(ID_identifier) == pack_param_name)
+                            return true;
+                        }
+                      }
+                    }
+                    return false;
+                  }),
+                inner_params.end());
+            }
+          }
+        }
+      }
+    }
+  }
+
+  try
+  {
+    cpp_typecheck.typecheck_type(function_type);
+  }
+  catch(...)
+  {
+    return nil_exprt();
+  }
+
+  // When a variadic template parameter pack (e.g., Base...) appears in a
+  // function pointer parameter type like T(*)(const C*, C**, Base...),
+  // the pack expansion produces an ellipsis node that gets converted to
+  // a C-style ellipsis by read_function_type. After template substitution,
+  // the pack is expanded to concrete types, so the ellipsis must be removed
+  // from nested function pointer types.
+  if(function_type.id() == ID_code)
+  {
+    bool has_variadic_pack = false;
+    for(const auto &p : cpp_declaration.template_type().template_parameters())
+    {
+      if(p.get_bool(ID_ellipsis))
+      {
+        has_variadic_pack = true;
+        break;
+      }
+    }
+
+    if(has_variadic_pack)
+    {
+      for(auto &param : to_code_type(function_type).parameters())
+      {
+        if(param.type().id() == ID_pointer)
+        {
+          typet &base = to_pointer_type(param.type()).base_type();
+          if(base.id() == ID_code)
+          {
+            code_typet &ct = to_code_type(base);
+            if(ct.has_ellipsis())
+              ct.remove_ellipsis();
+          }
+        }
+      }
+    }
+  }
 
   // Remember that this was a template
 

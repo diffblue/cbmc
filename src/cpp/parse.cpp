@@ -1199,7 +1199,7 @@ bool Parser::rTemplateDecl2(typet &decl, TemplateDeclKind &kind)
   if(lex.get_token(tk)!='>')
     return false;
 
-  // ignore nested TEMPLATE
+  // merge nested template parameters (e.g., template<T> template<U>)
   while(lex.LookAhead(0)==TOK_TEMPLATE)
   {
     lex.get_token(tk);
@@ -1207,12 +1207,15 @@ bool Parser::rTemplateDecl2(typet &decl, TemplateDeclKind &kind)
       break;
 
     lex.get_token(tk);
-    irept dummy_args;
-    if(!rTempArgList(dummy_args))
+    irept inner_args;
+    if(!rTempArgList(inner_args))
       return false;
 
     if(lex.get_token(tk)!='>')
       return false;
+
+    for(auto &sub : inner_args.get_sub())
+      template_parameters.get_sub().push_back(sub);
   }
 
   if(template_parameters.get_sub().empty())
@@ -3705,6 +3708,7 @@ bool Parser::optPtrOperator(typet &ptrs)
       cpp_tokent tk;
       lex.get_token(tk);
       typet op(ID_frontend_pointer); // width gets set during conversion
+      op.set(ID_C_reference, true);
       op.set(ID_C_rvalue_reference, true);
       set_location(op, tk);
       t_list.push_front(op);
