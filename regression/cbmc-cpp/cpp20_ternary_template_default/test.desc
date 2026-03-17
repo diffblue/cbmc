@@ -1,0 +1,10 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Ternary expression in template default argument with enum class type
+crashes during type-checking (invariant violation in merge_type)

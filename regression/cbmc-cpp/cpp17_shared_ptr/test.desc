@@ -1,0 +1,9 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+std::shared_ptr crashes with invariant violation in cpp_constructor.cpp:369
