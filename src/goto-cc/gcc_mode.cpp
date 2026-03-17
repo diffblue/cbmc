@@ -717,6 +717,14 @@ int gcc_modet::doit()
   if(cmdline.isset("nostdinc"))
     config.ansi_c.preprocessor_options.push_back("-nostdinc");
 
+  if(cmdline.isset("-stdlib"))
+  {
+    const std::string stdlib = cmdline.get_value("-stdlib");
+    config.ansi_c.preprocessor_options.push_back("-stdlib=" + stdlib);
+    if(stdlib == "libc++")
+      config.ansi_c.preprocessor = configt::ansi_ct::preprocessort::CLANG;
+  }
+
   if(cmdline.isset('L'))
     compiler.library_paths=cmdline.get_values('L');
     // Don't add the system paths!

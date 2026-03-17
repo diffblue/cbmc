@@ -6,5 +6,3 @@ main.cpp
 ^VERIFICATION FAILED$
 --
 ^CONVERSION ERROR$
---
-The warning about ignoring typecast comes from the emplace_back body.

@@ -91,7 +91,10 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
     for(auto &item : namespace_spec.items())
     {
       const auto &loc = item.source_location();
-      const std::string file = id2string(loc.get_file());
+      std::string file = id2string(loc.get_file());
+      // Fall back to namespace location when item has no source location
+      if(file.empty())
+        file = id2string(namespace_spec.source_location().get_file());
       bool is_system =
         file.find("/usr/include/") == 0 || file.find("/usr/lib/") == 0;
 

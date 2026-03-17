@@ -1177,6 +1177,14 @@ bool configt::set(const cmdlinet &cmdline)
   if(cmdline.isset("no-library"))
     ansi_c.lib=configt::ansi_ct::libt::LIB_NONE;
 
+  if(cmdline.isset("stdlib"))
+  {
+    const std::string stdlib = cmdline.get_value("stdlib");
+    ansi_c.preprocessor_options.push_back("-stdlib=" + stdlib);
+    if(stdlib == "libc++")
+      ansi_c.preprocessor = ansi_ct::preprocessort::CLANG;
+  }
+
   if(cmdline.isset("little-endian"))
     ansi_c.endianness=configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN;
 
