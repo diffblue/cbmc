@@ -943,6 +943,47 @@ bool Parser::rNamespaceSpec(cpp_namespace_spect &namespace_spec)
   namespace_spec.set_namespace(name);
   namespace_spec.set_is_inline(is_inline);
 
+  // C++17: nested namespace definition (namespace A::B::C { })
+  // Build nested namespace_spec nodes for each component.
+  if(lex.LookAhead(0) == TOK_SCOPE)
+  {
+    // Parse the rest of the nested name
+    std::vector<irep_idt> names;
+    names.push_back(name);
+    while(lex.LookAhead(0) == TOK_SCOPE)
+    {
+      lex.get_token(tk2); // eat ::
+
+      // Check for inline nested namespace (C++20, but tolerate)
+      if(lex.LookAhead(0) == TOK_INLINE)
+        lex.get_token(tk2);
+
+      if(!is_identifier(lex.LookAhead(0)))
+        return false;
+      lex.get_token(tk2);
+      names.push_back(tk2.data.get(ID_C_base_name));
+    }
+
+    // Build nested structure from inside out
+    // namespace A::B::C { body } becomes
+    // namespace A { namespace B { namespace C { body } } }
+    cpp_namespace_spect *current = &namespace_spec;
+    for(std::size_t i = 1; i < names.size(); i++)
+    {
+      current->items().push_back(cpp_itemt());
+      cpp_namespace_spect &inner =
+        current->items().back().make_namespace_spec();
+      inner = cpp_namespace_spect();
+      set_location(inner, tk1);
+      inner.set_namespace(names[i]);
+      current = &inner;
+    }
+
+    if(lex.LookAhead(0) != '{')
+      return false;
+    return rLinkageBody(current->items());
+  }
+
   // Tolerate __attribute__ after the namespace name, as used by glibc:
   // inline namespace __cxx11 __attribute__((__abi_tag__ ("cxx11"))) { }
   if(!optAttribute(discard))
@@ -1099,6 +1140,9 @@ bool Parser::rLinkageBody(cpp_linkage_spect::itemst &items)
   items.clear();
   while(lex.LookAhead(0)!='}')
   {
+    if(lex.LookAhead(0) == '\0')
+      return false;
+
     cpp_itemt item;
 
     if(!rDefinition(item))
@@ -2845,6 +2889,16 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
     if(lex.get_token(tk)!='(')
       return false;
 
+    // C++14: decltype(auto)
+    if(lex.LookAhead(0) == TOK_AUTO)
+    {
+      lex.get_token(tk);
+      if(lex.get_token(tk) != ')')
+        return false;
+      p.set("#auto", true);
+      return true;
+    }
+
     // the argument is always an expression
 
     exprt expr;
@@ -3017,6 +3071,29 @@ bool Parser::rConstructorDecl(
   }
 
   optThrowDecl(constructor.throw_decl());
+
+  // GCC __attribute__ after noexcept
+  if(lex.LookAhead(0) == TOK_GCC_ATTRIBUTE)
+  {
+    cpp_tokent tk;
+    lex.get_token(tk);
+    // consume (( ... ))
+    if(lex.LookAhead(0) == '(')
+    {
+      lex.get_token(tk);
+      int depth = 1;
+      while(depth > 0)
+      {
+        lex.get_token(tk);
+        if(tk.kind == '(')
+          ++depth;
+        else if(tk.kind == ')')
+          --depth;
+        else if(tk.kind == '\0')
+          return false;
+      }
+    }
+  }
 
   if(lex.LookAhead(0)==TOK_ARROW)
   {
@@ -3583,6 +3660,28 @@ bool Parser::rDeclarator(
 
       irept throw_decl;
       optThrowDecl(throw_decl); // ignore in this version
+
+      // GCC __attribute__ after noexcept
+      if(lex.LookAhead(0) == TOK_GCC_ATTRIBUTE)
+      {
+        cpp_tokent tk;
+        lex.get_token(tk);
+        if(lex.LookAhead(0) == '(')
+        {
+          lex.get_token(tk);
+          int depth = 1;
+          while(depth > 0)
+          {
+            lex.get_token(tk);
+            if(tk.kind == '(')
+                ++depth;
+            else if(tk.kind == ')')
+                --depth;
+            else if(tk.kind == '\0')
+                return false;
+          }
+        }
+      }
 
       if(lex.LookAhead(0)==TOK_ARROW)
       {
@@ -4323,6 +4422,21 @@ bool Parser::rOperatorName(irept &name)
     return lex.get_token(tk)==']';
 
   default:
+    // C++11: user-defined literal operator: operator "" suffix
+    if(t == TOK_STRING)
+    {
+        lex.get_token(tk);
+        // The suffix identifier follows the empty string literal
+        if(is_identifier(lex.LookAhead(0)))
+        {
+          cpp_tokent suffix_tk;
+          lex.get_token(suffix_tk);
+          name = irept("\"\"" + suffix_tk.data.get_string(ID_C_base_name));
+          set_location(name, tk);
+          return true;
+        }
+        return false;
+    }
     return rCastOperatorName(name);
   }
 
@@ -6508,6 +6622,31 @@ bool Parser::rTypeNameOrFunctionType(typet &tname)
     type.set(ID_C_ref_qualifier, "&&");
   }
 
+  // C++17: noexcept as part of the function type
+  if(lex.LookAhead(0) == TOK_NOEXCEPT)
+  {
+    cpp_tokent ne;
+    lex.get_token(ne);
+    if(lex.LookAhead(0) == '(')
+    {
+      // noexcept(expression) — consume the expression
+      lex.get_token(ne);
+      int depth = 1;
+      while(depth > 0)
+      {
+        lex.get_token(ne);
+        if(ne.kind == '(')
+          ++depth;
+        else if(ne.kind == ')')
+          --depth;
+        else if(ne.kind == '\0')
+          return false;
+      }
+    }
+    // Store noexcept on the function type
+    type.set(ID_noexcept, true);
+  }
+
 #ifdef DEBUG
   std::cout << std::string(__indent, ' ')
             << "Parser::rTypeNameOrFunctionType 7\n";
@@ -6862,6 +7001,7 @@ bool Parser::rSizeofExpr(exprt &exp)
     typet tname;
     cpp_tokent ell, op, cp;
 
+    cpp_token_buffert::post pos2 = lex.Save();
     lex.get_token(ell);
 
     lex.get_token(op);
@@ -6874,6 +7014,25 @@ bool Parser::rSizeofExpr(exprt &exp)
         exp.add(ID_type_arg).swap(tname);
         set_location(exp, tk);
         return true;
+      }
+    }
+
+    // C++11: sizeof...(pack) where pack is a non-type parameter pack
+    lex.Restore(pos2);
+    lex.get_token(ell); // re-consume ...
+    lex.get_token(op);  // re-consume (
+
+    {
+      exprt pack_expr;
+      if(rName(pack_expr))
+      {
+        if(lex.get_token(cp) == ')')
+        {
+          exp = exprt(ID_sizeof);
+          exp.add_to_operands(std::move(pack_expr));
+          set_location(exp, tk);
+          return true;
+        }
       }
     }
 
@@ -7886,6 +8045,33 @@ bool Parser::rPrimaryExpr(exprt &exp)
     lex.get_token(tk);
     exp.swap(tk.data);
     set_location(exp, tk);
+
+    // C++11 user-defined literals: 4_kb becomes operator""_kb(4)
+    if(is_identifier(lex.LookAhead(0)))
+    {
+      cpp_tokent suffix_tk;
+      lex.LookAhead(0, suffix_tk);
+      if(!suffix_tk.text.empty() && suffix_tk.text[0] == '_')
+      {
+        lex.get_token(suffix_tk);
+        // Build cpp_name: operator + ""_suffix
+        irept op_node(ID_operator);
+        set_location(op_node, tk);
+        irept suffix_node("\"\"" + suffix_tk.text);
+        set_location(suffix_node, tk);
+
+        exprt name_expr(ID_cpp_name);
+        name_expr.get_sub().push_back(op_node);
+        name_expr.get_sub().push_back(suffix_node);
+        set_location(name_expr, tk);
+
+        side_effect_expr_function_callt fc(
+          std::move(name_expr), {std::move(exp)}, typet{}, source_locationt{});
+        set_location(fc, tk);
+        exp.swap(fc);
+      }
+    }
+
 #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 1\n";
 #endif
@@ -8283,7 +8469,7 @@ bool Parser::rVarNameCore(exprt &name)
           components.push_back(irept(ID_template_args));
           components.back().add(ID_arguments).swap(args);
           }
-        template_keyword_seen = false;
+          template_keyword_seen = false;
         }
       } // end of template-args block
 
@@ -9648,6 +9834,65 @@ std::optional<codet> Parser::rIntegralDeclStatement(
   }
   else
   {
+    // C++17 structured bindings: auto [a, b] = expr;
+    // Also auto& [a, b] = expr; and auto&& [a, b] = expr;
+    int t0 = lex.LookAhead(0);
+    if(
+      t0 == '[' || (t0 == '&' && lex.LookAhead(1) == '[') ||
+      (t0 == TOK_ANDAND && lex.LookAhead(1) == '[') ||
+      (t0 == '&' && lex.LookAhead(1) == '&' && lex.LookAhead(2) == '[') ||
+      (t0 == '*' && lex.LookAhead(1) == '['))
+    {
+      // Parse ref qualifiers
+      bool is_ref = false;
+      while(lex.LookAhead(0) == '&' || lex.LookAhead(0) == '*' ||
+            lex.LookAhead(0) == TOK_ANDAND)
+      {
+        lex.get_token(tk);
+        is_ref = true;
+      }
+
+      // Consume [ identifier-list ]
+      if(lex.get_token(tk) != '[')
+        return {};
+
+      // Collect binding names
+      irept bindings(ID_nil);
+      while(lex.LookAhead(0) != ']')
+      {
+        if(lex.LookAhead(0) == ',')
+        {
+          lex.get_token(tk);
+          continue;
+        }
+        cpp_tokent name_tk;
+        if(!is_identifier(lex.get_token(name_tk)))
+          return {};
+        irept binding(name_tk.data.get(ID_C_base_name));
+        set_location(binding, name_tk);
+        bindings.get_sub().push_back(std::move(binding));
+      }
+      lex.get_token(tk); // ]
+
+      // Consume = initializer ;
+      exprt init = nil_exprt();
+      if(lex.LookAhead(0) == '=')
+      {
+        lex.get_token(tk);
+        if(!rExpression(init, false))
+          return {};
+      }
+      if(lex.get_token(tk) != ';')
+        return {};
+
+      codet sb(irep_idt("structured_binding"), {std::move(init)});
+      sb.add(irep_idt("bindings")) = std::move(bindings);
+      if(is_ref)
+        sb.set(ID_C_reference, true);
+      set_location(sb, tk);
+      return std::move(sb);
+    }
+
     if(!rDeclarators(declaration.declarators(), false, true))
       return {};
 

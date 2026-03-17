@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/simplify_expr.h>
 #include <util/source_location.h>
 #include <util/std_code.h>
+#include <util/std_types.h>
 #include <util/string_constant.h>
 #include <util/symbol_table_base.h>
 
@@ -233,6 +234,123 @@ void cpp_typecheckt::typecheck_code(codet &code)
     for_code.add_source_location() = loc;
 
     code = std::move(for_code);
+  }
+  else if(statement == "structured_binding")
+  {
+    // C++17 structured bindings: auto [a, b] = expr;
+    // Lower to assignments from struct members.
+    code.type() = empty_typet();
+    source_locationt loc = code.source_location();
+
+    PRECONDITION(code.operands().size() == 1);
+    exprt init = code.op0();
+    typecheck_expr(init);
+
+    const irept &bindings = code.find(irep_idt("bindings"));
+    const auto &binding_list = bindings.get_sub();
+
+    // Get the struct type
+    typet init_type = init.type();
+    if(init_type.id() == ID_struct_tag)
+      init_type = follow_tag(to_struct_tag_type(init_type));
+
+    if(init_type.id() != ID_struct)
+    {
+      error().source_location = loc;
+      error() << "structured bindings require a struct/class type" << eom;
+      throw 0;
+    }
+
+    const struct_typet &struct_type = to_struct_type(init_type);
+    const auto &components = struct_type.components();
+
+    // Collect non-static data members
+    std::vector<const struct_typet::componentt *> data_members;
+    for(const auto &comp : components)
+    {
+      if(
+        !comp.get_bool(ID_is_static) && !comp.get_bool(ID_is_type) &&
+        !comp.get_bool(ID_C_is_padding) && comp.type().id() != ID_code)
+        data_members.push_back(&comp);
+    }
+
+    if(binding_list.size() != data_members.size())
+    {
+      error().source_location = loc;
+      error() << "structured binding count (" << binding_list.size()
+              << ") does not match member count (" << data_members.size() << ")"
+              << eom;
+      throw 0;
+    }
+
+    const std::string scope_prefix =
+      id2string(cpp_scopes.current_scope().prefix);
+
+    // Hidden variable for the source object
+    const std::string sb_id = scope_prefix + "__sb";
+    {
+      auxiliary_symbolt sym;
+      sym.name = sb_id;
+      sym.base_name = "__sb";
+      sym.type = init.type();
+      sym.mode = ID_cpp;
+      sym.module = module;
+      sym.location = loc;
+      sym.is_file_local = true;
+      sym.is_thread_local = true;
+      sym.is_lvalue = true;
+      sym.value = init;
+      symbol_table.insert(std::move(sym));
+    }
+    symbol_exprt sb_expr(sb_id, init.type());
+
+    code_blockt block;
+    block.add_source_location() = loc;
+
+    // Assign __sb = init
+    codet sb_assign(ID_assign);
+    sb_assign.copy_to_operands(sb_expr);
+    sb_assign.copy_to_operands(init);
+    sb_assign.add_source_location() = loc;
+    block.add(std::move(sb_assign));
+
+    // Create binding variables as copies of members
+    for(std::size_t i = 0; i < binding_list.size(); ++i)
+    {
+      const irep_idt &name = binding_list[i].id();
+      const auto &comp = *data_members[i];
+
+      const std::string var_id = scope_prefix + id2string(name);
+      {
+        auxiliary_symbolt sym;
+        sym.name = var_id;
+        sym.base_name = name;
+        sym.type = comp.type();
+        sym.mode = ID_cpp;
+        sym.module = module;
+        sym.location = loc;
+        sym.is_file_local = true;
+        sym.is_thread_local = true;
+        sym.is_lvalue = true;
+        member_exprt member(sb_expr, comp.get_name(), comp.type());
+        sym.value = member;
+        symbol_table.insert(std::move(sym));
+
+        cpp_idt &scope_id =
+          cpp_scopes.put_into_scope(symbol_table.lookup_ref(var_id));
+        scope_id.id_class = cpp_idt::id_classt::SYMBOL;
+      }
+
+      symbol_exprt var_expr(var_id, comp.type());
+      member_exprt member(sb_expr, comp.get_name(), comp.type());
+      codet assign(ID_assign);
+      assign.copy_to_operands(var_expr);
+      assign.copy_to_operands(member);
+      assign.add_source_location() = loc;
+      block.add(std::move(assign));
+    }
+
+    code = std::move(block);
   }
   else
     c_typecheck_baset::typecheck_code(code);

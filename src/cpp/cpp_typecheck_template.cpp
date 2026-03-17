@@ -512,6 +512,7 @@ void cpp_typecheckt::typecheck_class_template_member(
 
   // must be of the form: name1<template_args>::name2
   // or:                  name1<template_args>::operator X
+  // or:                  name1<template_args>::~name2
   if(cpp_name.get_sub().size()==4 &&
      cpp_name.get_sub()[0].id()==ID_name &&
      cpp_name.get_sub()[1].id()==ID_template_args &&
@@ -524,6 +525,13 @@ void cpp_typecheckt::typecheck_class_template_member(
           cpp_name.get_sub()[1].id()==ID_template_args &&
           cpp_name.get_sub()[2].id()=="::" &&
           cpp_name.get_sub()[3].id()==ID_operator)
+  {
+  }
+  else if(
+    cpp_name.get_sub().size() == 5 && cpp_name.get_sub()[0].id() == ID_name &&
+    cpp_name.get_sub()[1].id() == ID_template_args &&
+    cpp_name.get_sub()[2].id() == "::" && cpp_name.get_sub()[3].id() == "~" &&
+    cpp_name.get_sub()[4].id() == ID_name)
   {
   }
   else

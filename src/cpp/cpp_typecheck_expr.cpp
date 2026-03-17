@@ -472,6 +472,27 @@ void cpp_typecheckt::typecheck_expr_sizeof(exprt &expr)
 
     if(type.id()==ID_cpp_name)
     {
+      // Check for sizeof...(Pack) — a parameter pack size query
+      const cpp_namet &cpp_name = to_cpp_name(static_cast<const irept &>(type));
+      if(!cpp_name.get_sub().empty())
+      {
+        const irep_idt &base_name =
+          cpp_name.get_sub().front().get(ID_identifier);
+        // Look up pack size by suffix match
+        for(const auto &entry : template_map.pack_size_map)
+        {
+          const std::string &id = id2string(entry.first);
+          std::string suffix = "::" + id2string(base_name);
+          if(
+            id.size() >= suffix.size() &&
+            id.compare(id.size() - suffix.size(), suffix.size(), suffix) == 0)
+          {
+            expr = from_integer(entry.second, size_type());
+            return;
+          }
+        }
+      }
+
       // sizeof(X) may be ambiguous -- X can be either a type or
       // an expression.
 
@@ -2091,9 +2112,12 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
           typecast_exprt::conditional_cast(arg, param_it->type()));
         ++param_it;
       }
+      bool can_evaluate = true;
       const auto &block = to_code_block(to_code(symbol_ptr->value));
       for(const auto &stmt : block.statements())
       {
+        if(!can_evaluate)
+          break;
         if(
           auto return_stmt = expr_try_dynamic_cast<code_frontend_returnt>(stmt))
         {
@@ -2115,8 +2139,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
             value_map.set(to_symbol_expr(assign->lhs()), rhs);
           }
           else
-            UNIMPLEMENTED_FEATURE(
-              "constexpr with " + expr_stmt->expression().pretty());
+            can_evaluate = false;
         }
         else if(stmt.get_statement() == ID_decl_block)
         {
@@ -2138,8 +2161,18 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
         }
         else
         {
-          UNIMPLEMENTED_FEATURE("constexpr with " + stmt.pretty());
+          // C++14 relaxed constexpr: loops, if-else, etc.
+          // Fall back to treating as a regular function call.
+          can_evaluate = false;
         }
+      }
+
+      // If we couldn't evaluate at compile time, treat as a regular
+      // function call by clearing the is_macro flag.
+      if(!can_evaluate)
+      {
+        symbol_table.get_writeable_ref(sym_expr->get_identifier()).is_macro =
+          false;
       }
     }
   }

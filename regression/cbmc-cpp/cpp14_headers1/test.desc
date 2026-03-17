@@ -1,7 +1,7 @@
 KNOWNBUG
 main.cpp
---cpp11 --show-goto-functions
-^Generating GOTO Program$
+--cpp14
+^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --

@@ -28,8 +28,10 @@ public:
   // this maps template parameters to their instantiated value
   typedef std::map<irep_idt, typet> type_mapt;
   typedef std::map<irep_idt, exprt> expr_mapt;
+  typedef std::map<irep_idt, std::size_t> pack_size_mapt;
   type_mapt type_map;
   expr_mapt expr_map;
+  pack_size_mapt pack_size_map;
 
   void apply(exprt &dest) const;
   void apply(typet &dest) const;
@@ -38,6 +40,7 @@ public:
   {
     type_map.swap(template_map.type_map);
     expr_map.swap(template_map.expr_map);
+    pack_size_map.swap(template_map.pack_size_map);
   }
 
   exprt lookup(const irep_idt &identifier) const;
@@ -55,6 +58,7 @@ public:
   {
     type_map.clear();
     expr_map.clear();
+    pack_size_map.clear();
   }
 
   void set(

@@ -140,7 +140,9 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
   }
   else if(
     has_body ||
-    config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
+    config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO ||
+    type.add_subtype()
+      .is_not_nil()) // forward-declared enum with underlying type
   {
     std::string pretty_name=
       cpp_scopes.current_scope().prefix+id2string(base_name);
