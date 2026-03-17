@@ -329,6 +329,12 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
   if(final_type.id() == ID_empty && !declaration.is_typedef())
   {
+    // During template instantiation, a member's type may resolve to void
+    // (e.g., __aligned_membuf<void> in variant). Skip such members
+    // instead of erroring — they are intentionally disabled by SFINAE
+    // or never used at runtime.
+    if(!instantiation_stack.empty())
+      return;
     error().source_location = declaration.type().source_location();
     error() << "void-typed member not permitted" << eom;
     throw 0;
@@ -1544,6 +1550,19 @@ void cpp_typecheckt::typecheck_member_function(
     // signature when different template arguments produce the same type.
     // Keep the existing symbol.
     if(new_symbol->type == symbol.type)
+    {
+      return;
+    }
+
+    // Different template instantiations of the same method template may
+    // produce different return types but identical parameter types (e.g.,
+    // template<typename T> static T test(int) instantiated with int and
+    // long). The function_identifier only encodes parameter types, so
+    // these collide. Keep the existing symbol.
+    if(
+      new_symbol->type.id() == ID_code && symbol.type.id() == ID_code &&
+      to_code_type(new_symbol->type).parameters() ==
+        to_code_type(symbol.type).parameters())
     {
       return;
     }

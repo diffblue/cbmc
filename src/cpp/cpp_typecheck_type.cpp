@@ -287,8 +287,26 @@ void cpp_typecheckt::typecheck_type(typet &type)
 
     if(e.type().id() == ID_c_bit_field)
       type = to_c_bit_field_type(e.type()).underlying_type();
+    else if(
+      e.id() == ID_dereference && e.get_bool(ID_C_implicit) &&
+      e.operands().size() == 1)
+    {
+      // The expression was implicitly dereferenced from a reference type.
+      // decltype preserves the reference: decltype(f()) is T& if f returns T&.
+      type = e.operands().front().type();
+    }
     else
       type = e.type();
+
+    // If the expression is a lambda (address_of a function symbol),
+    // store the lambda address so that default-initialization of
+    // variables of this type can point to the lambda function.
+    if(
+      e.id() == ID_address_of &&
+      to_address_of_expr(e).object().id() == ID_symbol)
+    {
+      type.set("#lambda_initializer", e);
+    }
   }
   else if(type.id()==ID_unassigned)
   {

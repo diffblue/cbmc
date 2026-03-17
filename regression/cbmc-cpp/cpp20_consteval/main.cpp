@@ -1,11 +1,10 @@
-// C++20 consteval
-consteval int square(int x)
+consteval int square(int n)
 {
-  return x * x;
+  return n * n;
 }
+
 int main()
 {
-  int r = square(5);
-  __CPROVER_assert(r == 25, "consteval");
-  return 0;
+  int x = square(5);
+  __CPROVER_assert(x == 25, "consteval square");
 }

@@ -448,7 +448,31 @@ void cpp_typecheckt::elaborate_class_template(
             partial_specialization_args.arguments().size() !=
             full_args_tc.arguments().size())
           {
-            continue;
+            // Allow partial specialization to have more args than full
+            // args when the extra args are variadic pack expansions
+            // (which can match zero elements).
+            bool size_ok = false;
+            if(
+              partial_specialization_args.arguments().size() >
+              full_args_tc.arguments().size())
+            {
+              size_ok = true;
+              for(std::size_t i = full_args_tc.arguments().size();
+                  i < partial_specialization_args.arguments().size();
+                  i++)
+              {
+                const auto &arg = partial_specialization_args.arguments()[i];
+                if(
+                  !arg.get_bool(ID_ellipsis) &&
+                  !arg.type().get_bool(ID_ellipsis))
+                {
+                  size_ok = false;
+                  break;
+                }
+              }
+            }
+            if(!size_ok)
+              continue;
           }
 
           cpp_saved_template_mapt saved_map(template_map);
@@ -477,6 +501,25 @@ void cpp_typecheckt::elaborate_class_template(
 
           cpp_template_args_tct guessed_args =
             template_map.build_template_args(cpp_declaration.template_type());
+
+          // Variadic pack parameters that matched zero elements
+          // remain unassigned. Set them to empty type arguments.
+          if(guessed_args.has_unassigned())
+          {
+            const auto &tparams =
+              cpp_declaration.template_type().template_parameters();
+            for(std::size_t i = 0; i < tparams.size(); i++)
+            {
+              if(
+                i < guessed_args.arguments().size() &&
+                tparams[i].get_bool(ID_ellipsis) &&
+                (guessed_args.arguments()[i].id() == ID_unassigned ||
+                 guessed_args.arguments()[i].type().id() == ID_unassigned))
+              {
+                guessed_args.arguments()[i] = exprt(ID_type, empty_typet());
+              }
+            }
+          }
 
           if(guessed_args.has_unassigned())
             continue;
@@ -521,6 +564,27 @@ void cpp_typecheckt::elaborate_class_template(
               for(auto &decl :
                   static_cast<cpp_declarationt &>(param).declarators())
                 decl.remove(ID_ellipsis);
+            }
+          }
+
+          // Remove trailing pack expansion args from the type-checked
+          // partial specialization args that correspond to empty packs
+          // in the original (non-type-checked) partial specialization.
+          {
+            const auto &orig_args = partial_specialization_args.arguments();
+            auto &tc_args = partial_specialization_args_tc.arguments();
+            while(tc_args.size() > full_args_tc.arguments().size() &&
+                  !tc_args.empty() && tc_args.size() <= orig_args.size())
+            {
+              std::size_t idx = tc_args.size() - 1;
+              const auto &orig = orig_args[idx];
+              if(
+                orig.get_bool(ID_ellipsis) || orig.type().get_bool(ID_ellipsis))
+              {
+                tc_args.pop_back();
+              }
+              else
+                break;
             }
           }
 
@@ -604,6 +668,17 @@ void cpp_typecheckt::elaborate_class_template(
               if(
                 count_constrained(partial_specialization_args) >
                 count_constrained(best_partial_args))
+              {
+                best_match = &s;
+                best_spec_args = guessed_args;
+              }
+              // Prefer specialization with fewer args (more specific)
+              // when constraint counts are equal.
+              else if(
+                count_constrained(partial_specialization_args) ==
+                  count_constrained(best_partial_args) &&
+                partial_specialization_args.arguments().size() <
+                  best_partial_args.arguments().size())
               {
                 best_match = &s;
                 best_spec_args = guessed_args;
@@ -913,6 +988,141 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
     template_map.apply(declaration_type);
     new_decl.type().swap(declaration_type);
+
+    // Expand fold expressions in the class body.
+    // Fold expressions like (Bs && ...) reference pack parameters.
+    // We expand them into binary expression trees using the actual
+    // template arguments.
+    if(
+      (new_decl.type().id() == ID_struct || new_decl.type().id() == ID_union) &&
+      !template_type.template_parameters().empty() &&
+      template_type.template_parameters().back().get_bool(ID_ellipsis))
+    {
+      const auto &pack_param = template_type.template_parameters().back();
+      irep_idt pack_base_name;
+      if(pack_param.id() == ID_type)
+        pack_base_name = pack_param.type().get(ID_identifier);
+      else
+        pack_base_name = pack_param.get(ID_identifier);
+
+      const std::string pstr = id2string(pack_base_name);
+      auto pos = pstr.rfind("::");
+      const std::string short_name =
+        pos != std::string::npos ? pstr.substr(pos + 2) : pstr;
+
+      const std::size_t non_pack =
+        template_type.template_parameters().size() - 1;
+      std::vector<exprt> pack_args;
+      for(std::size_t k = non_pack; k < full_template_args.arguments().size();
+          ++k)
+        pack_args.push_back(full_template_args.arguments()[k]);
+
+      auto is_pack_ref = [&short_name](const irept &n) -> bool
+      {
+        if(n.id() == ID_name)
+          return id2string(n.get(ID_identifier)) == short_name;
+        if(n.id() == ID_cpp_name && !n.get_sub().empty())
+        {
+          const auto &front = n.get_sub().front();
+          if(front.id() == ID_name)
+            return id2string(front.get(ID_identifier)) == short_name;
+        }
+        return false;
+      };
+
+      std::function<bool(const irept &)> contains_pack_ref;
+      contains_pack_ref = [&is_pack_ref,
+                           &contains_pack_ref](const irept &n) -> bool
+      {
+        if(is_pack_ref(n))
+          return true;
+        for(const auto &s : n.get_sub())
+          if(contains_pack_ref(s))
+            return true;
+        for(const auto &ns : n.get_named_sub())
+          if(contains_pack_ref(ns.second))
+            return true;
+        return false;
+      };
+
+      std::function<irept(const irept &, const exprt &)> substitute_arg;
+      substitute_arg = [&is_pack_ref, &substitute_arg](
+                         const irept &n, const exprt &arg) -> irept
+      {
+        if(is_pack_ref(n))
+          return arg;
+        irept result = n;
+        for(auto &s : result.get_sub())
+          s = substitute_arg(s, arg);
+        return result;
+      };
+
+      std::function<void(irept &)> expand_folds;
+      expand_folds = [&](irept &node)
+      {
+        if(
+          (node.id() == irep_idt("cpp_right_fold") ||
+           node.id() == irep_idt("cpp_left_fold")) &&
+          !node.get_sub().empty() && contains_pack_ref(node.get_sub().front()))
+        {
+          const irep_idt fold_op = node.get(irep_idt("fold_op"));
+          const irept &pack_expr = node.get_sub().front();
+          bool is_left = (node.id() == irep_idt("cpp_left_fold"));
+
+          if(pack_args.empty())
+          {
+            if(fold_op == ID_and)
+              node = true_exprt();
+            else if(fold_op == ID_or)
+              node = false_exprt();
+            else
+              node = from_integer(0, signed_int_type());
+            return;
+          }
+
+          if(pack_args.size() == 1)
+          {
+            node = substitute_arg(pack_expr, pack_args[0]);
+            return;
+          }
+
+          if(is_left)
+          {
+            irept result = substitute_arg(pack_expr, pack_args[0]);
+            for(std::size_t i = 1; i < pack_args.size(); ++i)
+            {
+              irept bin(fold_op);
+              bin.get_sub().push_back(result);
+              bin.get_sub().push_back(substitute_arg(pack_expr, pack_args[i]));
+              result = bin;
+            }
+            node = result;
+          }
+          else
+          {
+            irept result =
+              substitute_arg(pack_expr, pack_args[pack_args.size() - 1]);
+            for(int i = static_cast<int>(pack_args.size()) - 2; i >= 0; --i)
+            {
+              irept bin(fold_op);
+              bin.get_sub().push_back(substitute_arg(pack_expr, pack_args[i]));
+              bin.get_sub().push_back(result);
+              result = bin;
+            }
+            node = result;
+          }
+          return;
+        }
+
+        for(auto &s : node.get_sub())
+          expand_folds(s);
+        for(auto &ns : node.get_named_sub())
+          expand_folds(ns.second);
+      };
+
+      irept &body = new_decl.type().add(ID_body);
+      expand_folds(body);
+    }
 
     // Expand variadic base classes: Bases... → Base0, Base1, ...
     if(

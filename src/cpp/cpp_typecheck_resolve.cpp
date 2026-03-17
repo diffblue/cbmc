@@ -3051,7 +3051,24 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   // pre-populate the template map with the class template arguments so that
   // class template parameters (e.g., Alloc) are resolved.
   {
-    const irep_idt &class_tag = expr.get(ID_C_class);
+    irep_idt class_tag = expr.get(ID_C_class);
+
+    // If ID_C_class is not set, try to derive it from the template
+    // identifier for template constructors. Template constructors
+    // inside class templates have identifiers like
+    // "ClassName::template.CtorName<...>()->(constructor)".
+    // Only do this for constructors — member function templates have
+    // their own independent template parameters.
+    if(class_tag.empty() && cpp_declaration.is_constructor())
+    {
+      const std::string &tid = id2string(template_identifier);
+      auto pos = tid.find("::template.");
+      if(pos != std::string::npos)
+      {
+        class_tag = "tag-" + tid.substr(0, pos);
+      }
+    }
+
     if(!class_tag.empty())
     {
       const symbolt *class_sym = cpp_typecheck.symbol_table.lookup(class_tag);

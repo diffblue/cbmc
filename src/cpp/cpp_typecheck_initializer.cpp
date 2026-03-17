@@ -55,6 +55,16 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
       throw 0;
     }
 
+    // C++20: lambda in unevaluated context (decltype).
+    // The type carries the lambda function address so that
+    // default-initialization produces a valid function pointer.
+    const irept &lambda_init = symbol.type.find("#lambda_initializer");
+    if(lambda_init.is_not_nil())
+    {
+      symbol.value = static_cast<const exprt &>(lambda_init);
+      return;
+    }
+
     // done
     return;
   }
