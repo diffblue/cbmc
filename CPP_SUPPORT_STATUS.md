@@ -1,6 +1,6 @@
 # C++ Support Status — cpp11-parser-rework branch
 
-Last updated: 2026-03-10 (session 20)
+Last updated: 2026-03-11 (session 22, continued)
 
 ## C++11 — ~90% complete
 
@@ -28,11 +28,11 @@ Last updated: 2026-03-10 (session 20)
 
 ### STL/library support (~60%)
 - `std::vector`, `std::map`, `std::string`, `std::list`, `std::set`, `std::deque` — basic operations work but many member functions produce "no body" stubs
-- `std::array`, `std::tuple` — basic usage works (but `std::array` aggregate init loses main() body)
+- `std::array`, `std::tuple` — basic usage works; `std::array` aggregate init **FIXED** (designator bounds check now accounts for type-alias components)
 - `std::thread`, `std::mutex`, `std::chrono` — headers parse
-- `std::unique_ptr` — no body for main() due to template constructor failure
-- `std::shared_ptr` — invariant violation in cpp_constructor.cpp
-- `std::function` — no body for main() due to template constructor failure
+- `std::unique_ptr` — basic usage works (template constructor partially fails but main body preserved)
+- `std::shared_ptr` — type mismatch error in make_shared constructor instantiation
+- `std::function` — basic usage works (template constructor partially fails but main body preserved)
 - `std::regex` — times out during type-checking
 - `std::initializer_list` — **FIXED**: brace-init-list `{1,2,3}` converts to `std::initializer_list<T>` for function arguments and constructors
 - `std::string` — basic operations work but `_M_construct` (iterator version) has no body
@@ -100,10 +100,10 @@ Last updated: 2026-03-10 (session 20)
 - Optional-like template patterns
 
 ### STL/library support (~55%)
-- `std::optional` — mostly works
+- `std::optional` — **FIXED**: basic usage works (has_value, operator*)
 - `std::any` — works
 - `std::string_view` — **FIXED**: works with verification (size(), operator[])
-- `std::variant` — parses but type-checking errors (namespace alias and using-pack fixes unblocked parsing; `_Nth_type` fixed by partial specialization empty pack matching; fold expression in `_Traits` **FIXED** by class body fold expansion; void-typed member **FIXED** by skipping during instantiation; remaining: type mismatch in symex_assign)
+- `std::variant` — **FIXED**: basic usage works (get, holds_alternative)
 - `std::filesystem` — type-checking errors on system header
 - Good coverage for: vector, deque, algorithm, string, memory, tuple, iterator, numeric, valarray, functional
 
@@ -152,7 +152,7 @@ Last updated: 2026-03-10 (session 20)
 - `<utility>` in C++20 — **FIXED**: works (was blocked by `<compare>`)
 - `<numbers>` — works
 - `<bit>` — works
-- `<format>`, `<coroutine>` — parse errors / type-checking errors (KNOWNBUG tests added)
+- `<format>`, `<coroutine>` — `<coroutine>` **FIXED**; `<format>` has parse errors (KNOWNBUG)
 
 ### Known gaps — language
 - **Abbreviated function templates** (`auto f(auto x)`) — **FIXED**: auto params synthesize template type params
@@ -198,7 +198,8 @@ Last updated: 2026-03-10 (session 20)
 ### Known gaps — language
 - **Lambda in unevaluated contexts** — **FIXED**: `decltype([]{})` works; lambda address stored as type annotation for default-initialization
 - **Explicit object parameters in lambdas** — **FIXED**: `[](this auto self, int a, int b)` works
-- **`std::expected`**, **`std::mdspan`**, **`std::print`**, **`std::stacktrace`** — no library modeling
+- **`std::expected`** — **FIXED**: basic usage works (value, has_value)
+- **`std::mdspan`**, **`std::print`**, **`std::stacktrace`** — no library modeling
 - **`constexpr` for `<cmath>`/`<cstdlib>`** — not modeled
 
 ---
@@ -244,6 +245,10 @@ Last updated: 2026-03-10 (session 20)
 9. **Precondition instrumentation crash** — **FIXED**: skip `actuals_replace_map` when no preconditions, avoiding namespace lookup crash for missing destructor symbols.
 10. **Partial specialization with empty variadic packs** — **FIXED**: partial specialization matching now allows trailing pack expansion args to match zero elements; pack expansion ellipsis preserved in `rTypeName`.
 11. **Missing GCC built-in type predicates** — **FIXED**: added `__is_layout_compatible`, `__is_nothrow_convertible`, `__is_pointer_interconvertible_base_of` to scanner and type-checker. These are used in libstdc++ headers when `__has_builtin` evaluates to true on GCC 13.
+12. **"No body for main()" from template instantiation failures** — **FIXED**: goto conversion now strips only unresolved statements from user function bodies instead of clearing the entire body. This preserves type-checked code when template instantiation partially fails.
+13. **c_bool vs bool type mismatch in symex** — **FIXED**: symex_assign now reconciles C `_Bool` (c_bool) and C++ `bool` types via typecast.
+14. **Invariant violations in constructor, constexpr eval, and designated initializer** — **FIXED**: converted hard invariants to graceful errors for constructor resolution failure, non-symbol LHS in constexpr evaluator, and out-of-bounds designator index.
+15. **Auto return type deduction for template methods at call site** — **FIXED**: when a template method with `auto` return type is called, the method body is immediately type-checked to deduce the return type before the call expression is built.
 
 ## KNOWNBUG tests (documented gaps)
 
@@ -267,22 +272,23 @@ Last updated: 2026-03-10 (session 20)
 | `cpp17_fold_comma` | C++17 | **FIXED**: comma operator in fold expressions |
 | `cpp17_variadic_bases` | C++17 | **FIXED**: variadic base classes expanded during class template instantiation |
 | `cpp20_lambda_unevaluated` | C++20 | **FIXED**: Lambda in unevaluated context (decltype) |
-| `cpp20_nttp_string` | C++20 | Class type as non-type template parameter |
+| `cpp20_nttp_string` | C++20 | **FIXED**: Class type as non-type template parameter |
 | `cpp20_ternary_template_default` | C++20 | **FIXED**: merge_type crash with empty type |
-| `cpp20_coroutine_header` | C++20 | `<coroutine>` header: auto return type deduction in operator<=> |
+| `cpp20_coroutine_header` | C++20 | **FIXED**: `<coroutine>` header works (auto return type deduction for template methods) |
 | `cpp20_format_header` | C++20 | `<format>` header: parse errors |
-| `cpp17_optional_has_value` | C++17 | std::optional has_value(): no body for main() |
+| `cpp17_optional_has_value` | C++17 | **FIXED**: std::optional has_value() works |
 | `cpp11_temp_operator_call` | C++11 | **FIXED**: operator() on temporary object |
-| `cpp17_variant_basic` | C++17 | std::variant: _Nth_type fixed, but no body for main() |
+| `cpp17_variant_basic` | C++17 | **FIXED**: std::variant basic usage works |
 | `cpp20_lambda_pack_capture` | C++20 | **FIXED**: Lambda init-capture with pack expansion |
 | `cpp26_pack_indexing` | C++26 | **FIXED**: Pack indexing instantiation |
-| `cpp11_array_init` | C++11 | std::array: no body for main() |
-| `cpp11_function_basic` | C++11 | std::function: no body for main() |
+| `cpp11_array_init` | C++11 | **FIXED**: std::array aggregate init (designator bounds check) |
+| `cpp11_function_basic` | C++11 | **FIXED**: std::function basic usage works |
 | `cpp11_string_basic` | C++11 | std::string: _M_construct has no body |
 | `cpp11_vector_push_back` | C++11 | std::vector: emplace_back has no body |
-| `cpp14_unique_ptr_basic` | C++14 | std::unique_ptr: no body for main() |
-| `cpp20_ranges_basic` | C++20 | `<ranges>`: template struct defined previously |
-| `cpp23_expected_basic` | C++23 | `<expected>`: template struct defined previously |
+| `cpp14_unique_ptr_basic` | C++14 | **FIXED**: std::unique_ptr basic usage works |
+| `cpp17_make_tuple` | C++17 | **FIXED**: std::make_tuple basic usage works |
+| `cpp20_ranges_basic` | C++20 | `<ranges>`: conversion error in views::take |
+| `cpp23_expected_basic` | C++23 | **FIXED**: std::expected basic usage works |
 
 ## Key file locations
 

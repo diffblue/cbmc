@@ -1,8 +1,7 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp14
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-std::unique_ptr: no body for callee main() due to template constructor failure

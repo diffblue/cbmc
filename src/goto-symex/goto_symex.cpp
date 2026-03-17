@@ -60,6 +60,18 @@ void goto_symext::symex_assign(
       rhs.type() = lhs.type();
   }
 
+  // C/C++ bool type mismatch: c_bool (C _Bool) vs bool (C++ bool)
+  // have the same width but different type IDs.
+  if(lhs.type() != rhs.type())
+  {
+    if(
+      (lhs.type().id() == ID_c_bool && rhs.type().id() == ID_bool) ||
+      (lhs.type().id() == ID_bool && rhs.type().id() == ID_c_bool))
+    {
+      rhs = typecast_exprt(rhs, lhs.type());
+    }
+  }
+
   DATA_INVARIANT_WITH_DIAGNOSTICS(
     lhs.type() == rhs.type(),
     "assignments must be type consistent, got",

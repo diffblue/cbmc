@@ -1,8 +1,7 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp23
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-<expected>: template struct defined previously errors from iterator_concepts.h

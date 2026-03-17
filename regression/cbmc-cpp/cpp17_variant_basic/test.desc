@@ -1,10 +1,7 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
---
-std::variant basic usage. _Nth_type fixed but still fails due to
-template constructor failure causing no body for main().

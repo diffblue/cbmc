@@ -368,6 +368,13 @@ void cpp_typecheckt::typecheck_function_template(
 
         // Register the alternative in its own template scope.
         cpp_scopes.id_map[alt_name] = &template_scope;
+
+        // Add the template scope as a secondary scope of the
+        // current (class) scope so the second pass of
+        // typecheck_compound_body can resolve the template
+        // parameters (e.g. _Up) during constructor processing.
+        cpp_scopes.current_scope().add_secondary_scope(template_scope);
+
         return;
       }
 
