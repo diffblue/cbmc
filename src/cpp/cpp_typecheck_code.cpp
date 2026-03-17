@@ -461,13 +461,25 @@ void cpp_typecheckt::typecheck_code(codet &code)
     const std::string scope_prefix =
       id2string(cpp_scopes.current_scope().prefix);
 
+    const bool is_ref = code.get_bool(ID_C_reference);
+
     // Hidden variable for the source object
     const std::string sb_id = scope_prefix + "__sb";
     {
       auxiliary_symbolt sym;
       sym.name = sb_id;
       sym.base_name = "__sb";
-      sym.type = init.type();
+      if(is_ref)
+      {
+        // For auto& bindings, __sb is a reference to the source
+        typet ref_type = pointer_type(init.type());
+        ref_type.set(ID_C_reference, true);
+        sym.type = ref_type;
+      }
+      else
+      {
+        sym.type = init.type();
+      }
       sym.mode = ID_cpp;
       sym.module = module;
       sym.location = loc;
@@ -477,10 +489,65 @@ void cpp_typecheckt::typecheck_code(codet &code)
       sym.value = init;
       symbol_table.insert(std::move(sym));
     }
-    symbol_exprt sb_expr(sb_id, init.type());
 
     code_blockt block;
     block.add_source_location() = loc;
+
+    if(is_ref)
+    {
+      // For auto& [a,b] = obj; make bindings be references to obj's members
+      symbol_exprt sb_expr(sb_id, pointer_type(init.type()));
+      sb_expr.type().set(ID_C_reference, true);
+
+      codet sb_assign(ID_assign);
+      sb_assign.copy_to_operands(sb_expr);
+      sb_assign.copy_to_operands(address_of_exprt(init));
+      sb_assign.add_source_location() = loc;
+      block.add(std::move(sb_assign));
+
+      dereference_exprt deref_sb(sb_expr, init.type());
+
+      for(std::size_t i = 0; i < binding_list.size(); ++i)
+      {
+        const irep_idt &name = binding_list[i].id();
+        const auto &comp = *data_members[i];
+
+        typet ref_type = pointer_type(comp.type());
+        ref_type.set(ID_C_reference, true);
+
+        const std::string var_id = scope_prefix + id2string(name);
+        {
+          auxiliary_symbolt sym;
+          sym.name = var_id;
+          sym.base_name = name;
+          sym.type = ref_type;
+          sym.mode = ID_cpp;
+          sym.module = module;
+          sym.location = loc;
+          sym.is_file_local = true;
+          sym.is_thread_local = true;
+          sym.is_lvalue = true;
+          symbol_table.insert(std::move(sym));
+
+          cpp_idt &scope_id =
+            cpp_scopes.put_into_scope(symbol_table.lookup_ref(var_id));
+          scope_id.id_class = cpp_idt::id_classt::SYMBOL;
+        }
+
+        symbol_exprt var_expr(var_id, ref_type);
+        member_exprt member(deref_sb, comp.get_name(), comp.type());
+        codet assign(ID_assign);
+        assign.copy_to_operands(var_expr);
+        assign.copy_to_operands(address_of_exprt(member));
+        assign.add_source_location() = loc;
+        block.add(std::move(assign));
+      }
+
+      code = std::move(block);
+      return;
+    }
+
+    symbol_exprt sb_expr(sb_id, init.type());
 
     // Assign __sb = init
     codet sb_assign(ID_assign);

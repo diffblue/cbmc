@@ -9698,18 +9698,91 @@ std::optional<codet> Parser::rIfStatement()
     else
     {
         lex.Restore(saved_pos);
-        // Try: expression ';' condition
-        exprt init_expr;
-        if(rExpression(init_expr, false) && lex.LookAhead(0) == ';')
+
+        // Try: structured binding ';' condition
+        // auto [a, b] = expr ;
+        // auto& [a, b] = expr ;
+        bool sb_parsed = false;
+        if(lex.LookAhead(0) == TOK_AUTO)
         {
+          auto sb_pos = lex.Save();
+          lex.get_token(tk3); // consume 'auto'
+
+          bool is_ref = false;
+          int t0 = lex.LookAhead(0);
+          if(
+            t0 == '[' || (t0 == '&' && lex.LookAhead(1) == '[') ||
+            (t0 == TOK_ANDAND && lex.LookAhead(1) == '['))
+          {
+          while(lex.LookAhead(0) == '&' || lex.LookAhead(0) == TOK_ANDAND)
+          {
+            lex.get_token(tk3);
+            is_ref = true;
+          }
+
+          if(lex.get_token(tk3) == '[')
+          {
+            irept bindings(ID_nil);
+            bool ok = true;
+            while(lex.LookAhead(0) != ']')
+            {
+            if(lex.LookAhead(0) == ',')
+            {
+                  lex.get_token(tk3);
+                  continue;
+            }
+            cpp_tokent name_tk;
+            if(!is_identifier(lex.get_token(name_tk)))
+            {
+                  ok = false;
+                  break;
+            }
+            irept binding(name_tk.data.get(ID_C_base_name));
+            set_location(binding, name_tk);
+            bindings.get_sub().push_back(std::move(binding));
+            }
+            if(ok)
+            {
+            lex.get_token(tk3); // ]
+            if(lex.LookAhead(0) == '=')
+            {
+                  lex.get_token(tk3);
+                  exprt init;
+                  if(rExpression(init, false) && lex.LookAhead(0) == ';')
+                  {
+                    lex.get_token(tk3); // ;
+                    codet sb(irep_idt("structured_binding"), {std::move(init)});
+                    sb.add(irep_idt("bindings")) = std::move(bindings);
+                    if(is_ref)
+                      sb.set(ID_C_reference, true);
+                    set_location(sb, tk3);
+                    init_stmt = std::move(sb);
+                    sb_parsed = true;
+                  }
+            }
+            }
+          }
+          }
+
+          if(!sb_parsed)
+          lex.Restore(sb_pos);
+        }
+
+        if(!sb_parsed)
+        {
+          // Try: expression ';' condition
+          exprt init_expr;
+          if(rExpression(init_expr, false) && lex.LookAhead(0) == ';')
+          {
           lex.get_token(tk3); // consume ';'
           init_stmt = codet(ID_expression);
           init_stmt.add_to_operands(std::move(init_expr));
           set_location(init_stmt, tk2);
-        }
-        else
-        {
+          }
+          else
+          {
           lex.Restore(saved_pos);
+          }
         }
     }
   }
@@ -9957,6 +10030,49 @@ std::optional<codet> Parser::rForStatement()
 
   if(!exp1.has_value())
     return {};
+
+  // C++20: try for(init; decl : range) after parsing init-statement
+  {
+    cpp_token_buffert::post pos = lex.Save();
+
+    cpp_declarationt declaration;
+    if(rTypeSpecifier(declaration.type(), true))
+    {
+      cpp_declaratort declarator;
+      if(
+        rDeclarator(declarator, kArgDeclarator, true, false) &&
+        lex.LookAhead(0) == ':')
+      {
+          lex.get_token(tk3); // consume ':'
+
+          exprt range;
+          if(rInitializeExpr(range) && lex.get_token(tk4) == ')')
+          {
+          if(auto body = rStatement())
+          {
+            declaration.declarators().push_back(declarator);
+
+            // Wrap init + range-for into a block
+            code_blockt block;
+            block.add(std::move(*exp1));
+
+            codet range_for("for_range");
+            range_for.add_to_operands(
+              static_cast<exprt &>(static_cast<irept &>(declaration)));
+            range_for.add_to_operands(std::move(range));
+            range_for.add_to_operands(std::move(*body));
+            set_location(range_for, tk1);
+            block.add(std::move(range_for));
+            set_location(block, tk1);
+            return std::move(block);
+          }
+          return {};
+          }
+      }
+    }
+
+    lex.Restore(pos);
+  }
 
   exprt exp2;
 

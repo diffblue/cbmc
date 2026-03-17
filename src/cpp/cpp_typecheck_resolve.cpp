@@ -2851,7 +2851,21 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
 
   // we need function arguments for guessing
   if(fargs.operands.empty() && expr.find(ID_C_template_arguments).is_nil())
-    return nil_exprt(); // give up
+  {
+    // C++11: check if all template parameters have default values
+    const auto &params = cpp_declaration.template_type().template_parameters();
+    bool all_have_defaults = !params.empty();
+    for(const auto &p : params)
+    {
+      if(p.find(ID_C_default_value).is_nil())
+      {
+        all_have_defaults = false;
+        break;
+      }
+    }
+    if(!all_have_defaults)
+      return nil_exprt(); // give up
+  }
 
   // We need to guess in the case of function templates!
 
