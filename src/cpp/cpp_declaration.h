@@ -60,6 +60,11 @@ public:
     return is_template() && t->id() == ID_struct && declarators().empty();
   }
 
+  bool is_template_alias() const
+  {
+    return is_template() && is_typedef();
+  }
+
   const declaratorst &declarators() const
   {
     return (const declaratorst &)operands();

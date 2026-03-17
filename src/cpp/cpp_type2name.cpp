@@ -72,7 +72,8 @@ static std::string irep2name(const irept &irep)
   {
     if(
       named_sub.first == ID_C_constant || named_sub.first == ID_C_volatile ||
-      named_sub.first == ID_C_restricted)
+      named_sub.first == ID_C_restricted ||
+      named_sub.first == ID_C_ref_qualifier)
     {
       if(first)
         first=false;
@@ -163,13 +164,22 @@ std::string cpp_type2name(const typet &type)
     {
       if(arg_it!=parameters.begin())
         result+=',';
-      result+=cpp_type2name(arg_it->type());
+      result += irep2name(*arg_it);
     }
 
     result+=')';
     result+="->(";
     result+=cpp_type2name(return_type);
     result+=')';
+
+    if(to_code_type(type).has_ellipsis())
+      result += "_ellipsis";
+
+    const irep_idt &ref_qualifier = type.get(ID_C_ref_qualifier);
+    if(ref_qualifier == "&")
+      result += "_lref";
+    else if(ref_qualifier == "&&")
+      result += "_rref";
   }
   else
   {
