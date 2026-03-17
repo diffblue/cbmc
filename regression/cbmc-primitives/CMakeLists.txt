@@ -1,6 +1,6 @@
 find_program(Z3_EXISTS "z3")
-message(${Z3_EXISTS})
 if(Z3_EXISTS)
+    message(STATUS "z3 found: ${Z3_EXISTS}")
     add_test_pl_tests(
         "$<TARGET_FILE:cbmc>"
     )
@@ -13,6 +13,7 @@ if(Z3_EXISTS)
             "CORE"
     )
 else()
+    message(STATUS "z3 not found, skipping smt-backend tests in cbmc-primitives")
     add_test_pl_tests(
         "$<TARGET_FILE:cbmc>" -X smt-backend
     )
