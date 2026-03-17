@@ -852,6 +852,10 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
     template_map.apply(declaration_type);
     new_decl.type().swap(declaration_type);
+
+    // Also apply template map to declarator types (function parameters)
+    for(auto &d : new_decl.declarators())
+      template_map.apply(d.type());
   }
 
   if(new_decl.type().id()==ID_struct)

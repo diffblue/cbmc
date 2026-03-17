@@ -29,6 +29,20 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 void cpp_typecheckt::typecheck_return(code_frontend_returnt &code)
 {
+  // Lambda return type deduction: when return_type is auto, just typecheck
+  // the return expression without implicit conversion, then set return_type.
+  if(return_type.id() == ID_auto)
+  {
+    if(code.has_return_value())
+    {
+      typecheck_expr(code.return_value());
+      return_type = code.return_value().type();
+    }
+    else
+      return_type = void_type();
+    return;
+  }
+
   c_typecheck_baset::typecheck_return(code);
 
   // For non-POD class-type return values, insert a copy constructor call.
@@ -707,6 +721,33 @@ void cpp_typecheckt::typecheck_ifthenelse(code_ifthenelset &code)
   {
     typecheck_code(to_code(code.cond()));
   }
+  else if(code.get_bool(ID_constexpr))
+  {
+    // C++17 if constexpr: evaluate condition at compile time and
+    // discard the branch not taken so that ill-formed code in the
+    // discarded branch does not cause errors.
+    typecheck_expr(code.cond());
+    implicit_typecast_bool(code.cond());
+    simplify(code.cond(), *this);
+
+    if(code.cond().is_true())
+    {
+      typecheck_code(code.then_case());
+      if(code.has_else_case())
+        code.else_case() = code_skipt();
+    }
+    else if(code.cond().is_false())
+    {
+      code.then_case() = code_skipt();
+      if(code.has_else_case())
+        typecheck_code(code.else_case());
+    }
+    else
+    {
+      // Condition not constant — fall back to normal handling
+      c_typecheck_baset::typecheck_ifthenelse(code);
+    }
+  }
   else
     c_typecheck_baset::typecheck_ifthenelse(code);
 }
@@ -1092,14 +1133,55 @@ void cpp_typecheckt::typecheck_decl(codet &code)
         }
         if(is_template)
         {
+          // Determine the number of template type parameters
+          std::size_t n_type_params = 0;
+          {
+            const auto id_set2 = cpp_scopes.current_scope().lookup(
+              cpp_name.get_base_name(), cpp_scopet::RECURSIVE);
+            for(const auto *id : id_set2)
+            {
+              if(id->id_class == cpp_idt::id_classt::TEMPLATE)
+              {
+                const auto &sym = lookup(id->identifier);
+                const auto &tmpl_type = static_cast<const template_typet &>(
+                  sym.type.find(ID_template_type));
+                for(const auto &p : tmpl_type.template_parameters())
+                {
+                  if(p.id() == ID_type)
+                    ++n_type_params;
+                }
+                break;
+              }
+            }
+          }
+
           irept template_args(ID_template_args);
           irept &args_sub = template_args.add(ID_arguments);
+          std::vector<typet> unique_types;
           for(const auto &a : args_source->get_sub())
           {
             exprt arg = static_cast<const exprt &>(a);
             typecheck_expr(arg);
+            bool already_seen = false;
+            for(const auto &t : unique_types)
+            {
+              if(t == arg.type())
+              {
+                already_seen = true;
+                break;
+              }
+            }
+            if(
+              !already_seen &&
+              (n_type_params == 0 || unique_types.size() < n_type_params))
+            {
+              unique_types.push_back(arg.type());
+            }
+          }
+          for(const auto &t : unique_types)
+          {
             exprt type_arg(ID_type);
-            type_arg.type() = arg.type();
+            type_arg.type() = t;
             args_sub.get_sub().push_back(type_arg);
           }
           cpp_namet new_name = cpp_name;

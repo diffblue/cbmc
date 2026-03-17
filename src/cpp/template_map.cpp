@@ -73,6 +73,22 @@ void template_mapt::apply(typet &type) const
         apply(static_cast<typet &>(parameter.add(ID_type)));
     }
   }
+  else if(type.id() == ID_function_type)
+  {
+    // Pre-conversion function type: apply to return type subtype
+    // and to parameter declaration types.
+    if(type.has_subtypes())
+    {
+      for(auto &st : to_type_with_subtypes(type).subtypes())
+        apply(st);
+    }
+    irept::subt &parameters = type.add(ID_parameters).get_sub();
+    for(auto &parameter : parameters)
+    {
+      if(parameter.id() == ID_cpp_declaration)
+        apply(static_cast<typet &>(parameter.add(ID_type)));
+    }
+  }
   else if(type.id()==ID_merged_type)
   {
     for(typet &subtype : to_type_with_subtypes(type).subtypes())
@@ -80,8 +96,33 @@ void template_mapt::apply(typet &type) const
   }
   else if(type.id() == ID_cpp_name)
   {
-    // apply to template arguments within cpp_name
+    // Check if the cpp_name is a template template parameter usage like C<T>.
+    // If the base name matches a template template parameter in the type_map,
+    // replace the entire cpp_name with the assigned type.
     irept::subt &sub = type.get_sub();
+    bool has_targs = false;
+    for(const auto &s : sub)
+      if(s.id() == ID_template_args)
+        has_targs = true;
+
+    if(has_targs && !sub.empty() && sub.front().id() == ID_name)
+    {
+      irep_idt base = sub.front().get(ID_identifier);
+      for(const auto &entry : type_map)
+      {
+        const std::string &key = id2string(entry.first);
+        auto pos = key.rfind("::");
+        std::string suffix =
+          pos != std::string::npos ? key.substr(pos + 2) : key;
+        if(suffix == id2string(base) && entry.second.id() != ID_unassigned)
+        {
+          type = entry.second;
+          return;
+        }
+      }
+    }
+
+    // apply to template arguments within cpp_name
     for(auto &s : sub)
     {
       if(s.id() == ID_template_args)

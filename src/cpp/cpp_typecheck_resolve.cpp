@@ -34,6 +34,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_util.h"
 
 #include <algorithm>
+#include <set>
 
 cpp_typecheck_resolvet::cpp_typecheck_resolvet(cpp_typecheckt &_cpp_typecheck)
   : cpp_typecheck(_cpp_typecheck),
@@ -1624,7 +1625,11 @@ struct_tag_typet cpp_typecheck_resolvet::disambiguate_template_classes(
           // Count constrained arguments: arguments in the partial
           // specialization pattern that are not just a plain template
           // parameter name. More constrained = more specialized.
+          // Also count repeated parameter names as constraints
+          // (e.g., <T, T> constrains both args to be equal).
           std::size_t constrained = 0;
+          std::size_t repeated_params = 0;
+          std::set<irep_idt> seen_params;
           for(const auto &arg : partial_specialization_args.arguments())
           {
             // Get the actual node, unwrapping ambiguous and type
@@ -1642,16 +1647,35 @@ struct_tag_typet cpp_typecheck_resolvet::disambiguate_template_classes(
             {
               // A cpp_name with template arguments (e.g., pack<Rp...>)
               // is more constrained than a plain name.
+              bool has_tmpl_args = false;
+              irep_idt param_name;
               for(const auto &sub : a->get_sub())
+              {
                 if(sub.id() == ID_template_args)
                 {
-                  constrained++;
+                  has_tmpl_args = true;
                   break;
                 }
+                if(sub.id() == ID_name)
+                  param_name = sub.get(ID_identifier);
+              }
+              if(has_tmpl_args)
+                constrained++;
+              else if(
+                !param_name.empty() && !seen_params.insert(param_name).second)
+              {
+                // Same parameter used again — equality constraint
+                constrained++;
+                repeated_params++;
+              }
             }
           }
           matches.push_back(matcht(
-            guessed_template_args, full_template_args_tc, id, constrained));
+            guessed_template_args,
+            full_template_args_tc,
+            id,
+            constrained,
+            repeated_params));
         }
       }
     }
@@ -2617,11 +2641,35 @@ void cpp_typecheck_resolvet::guess_template_args(
         irep_idt tmpl_base_name = cpp_name.get_base_name();
         if(!tmpl_base_name.empty() && tmpl_base_name != desired_sym->base_name)
         {
-          mark_targs_conflicting();
-          return;
+          // Check if the template name is a template template parameter.
+          // If so, assign it to the desired type's template.
+          bool is_tt_param = false;
+          const auto ids = cpp_typecheck.cpp_scopes.current_scope().lookup(
+            tmpl_base_name, cpp_scopet::RECURSIVE);
+          for(const auto &id_ptr : ids)
+          {
+            if(id_ptr->id_class == cpp_idt::id_classt::TEMPLATE_PARAMETER)
+            {
+              auto it =
+                cpp_typecheck.template_map.type_map.find(id_ptr->identifier);
+              if(
+                it != cpp_typecheck.template_map.type_map.end() &&
+                it->second.id() == ID_unassigned)
+              {
+                // Assign the template template parameter to the
+                // template that the desired type was instantiated from.
+                it->second = desired_type;
+                is_tt_param = true;
+              }
+            }
+          }
+          if(!is_tt_param)
+          {
+            mark_targs_conflicting();
+            return;
+          }
         }
       }
-
       const irept &inst_args = desired_sym->type.find(ID_C_template_arguments);
       if(inst_args.is_nil())
       {
@@ -3327,6 +3375,23 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   try
   {
     cpp_typecheck.set_message_handler(null_handler);
+    // Apply template map to the function type before typechecking.
+    // This handles template template parameters where C<T> in the
+    // function type needs to be replaced with the actual instantiated type.
+    cpp_typecheck.template_map.apply(function_type);
+    // Also apply to parameters stored as cpp_declarations
+    if(function_type.id() == ID_function_type)
+    {
+      irept::subt &params = function_type.add(ID_parameters).get_sub();
+      for(auto &p : params)
+      {
+        if(p.id() == ID_cpp_declaration)
+        {
+          auto &decl = static_cast<cpp_declarationt &>(p);
+          cpp_typecheck.template_map.apply(decl.type());
+        }
+      }
+    }
     cpp_typecheck.typecheck_type(function_type);
     cpp_typecheck.set_message_handler(old_handler);
   }

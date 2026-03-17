@@ -5661,6 +5661,28 @@ bool Parser::rClassSpec(typet &spec)
   if(!optAlignas(spec))
     return false;
 
+  // If alignas turned the struct/union into a merged_type, unwrap it:
+  // store the alignment directly on the struct/union type.
+  if(spec.id() == ID_merged_type)
+  {
+    typet unwrapped;
+    irept alignment;
+    for(auto &sub : to_type_with_subtypes(spec).subtypes())
+    {
+      if(sub.id() == ID_struct || sub.id() == ID_union)
+        unwrapped = sub;
+      else if(sub.id() == ID_aligned)
+        alignment = sub.find(ID_size);
+    }
+    if(unwrapped.is_not_nil())
+    {
+      unwrapped.add_source_location() = spec.source_location();
+      if(alignment.is_not_nil())
+        unwrapped.set(ID_C_alignment, alignment);
+      spec = unwrapped;
+    }
+  }
+
   if(!optAttribute(spec))
     return false;
 
@@ -9684,8 +9706,12 @@ std::optional<codet> Parser::rIfStatement()
     return {};
 
   // C++17 if constexpr
+  bool is_constexpr_if = false;
   if(lex.LookAhead(0) == TOK_CONSTEXPR)
+  {
     lex.get_token(tk2);
+    is_constexpr_if = true;
+  }
 
   // C++23 if consteval: CBMC evaluates constexpr functions at compile
   // time, so always take the consteval (true) branch.
@@ -9842,6 +9868,9 @@ std::optional<codet> Parser::rIfStatement()
          }())
       : code_ifthenelset{std::move(exp), std::move(*then)};
   set_location(if_stmt, tk1);
+
+  if(is_constexpr_if)
+    if_stmt.set(ID_constexpr, true);
 
   if(init_stmt.get_statement() != ID_skip)
   {

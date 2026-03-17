@@ -301,10 +301,24 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
 
     exprt::operandst ops;
 
-    // For braced-init-list, use the list elements as constructor arguments
-    // rather than passing the initializer_list as a single argument.
+    // For braced-init-list, first try passing as a single
+    // std::initializer_list argument (C++11 [over.match.list]).
+    // If that fails, fall back to unpacking the elements as
+    // individual constructor arguments.
     if(symbol.value.id() == ID_initializer_list)
+    {
+      // Try as single initializer_list argument first
+      ops.push_back(symbol.value);
+      auto constructor =
+        cpp_constructor(symbol.value.source_location(), expr_symbol, ops);
+      if(constructor.has_value())
+      {
+        symbol.value = constructor.value();
+        return;
+      }
+      // Fall back to unpacking
       ops = symbol.value.operands();
+    }
     else
       ops.push_back(symbol.value);
 
