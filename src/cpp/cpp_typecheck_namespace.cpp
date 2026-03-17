@@ -18,6 +18,7 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
 {
   // save the scope
   cpp_save_scopet saved_scope(cpp_scopes);
+  cpp_scopet &parent_scope = cpp_scopes.current_scope();
 
   const irep_idt &name=namespace_spec.get_namespace();
 
@@ -89,5 +90,9 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
     // do the declarations
     for(auto &item : namespace_spec.items())
       convert(item);
+
+    // C++11: inline namespaces make their names visible in the parent
+    if(namespace_spec.get_is_inline())
+      parent_scope.add_using_scope(cpp_scopes.current_scope());
   }
 }
