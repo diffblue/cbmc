@@ -1,0 +1,9 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+std::make_shared: expected pointer error in _Sp_alloc_shared_tag
+constructor. std::shared_ptr with new works fine.

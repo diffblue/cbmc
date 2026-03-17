@@ -154,6 +154,81 @@ void goto_convert_functionst::convert_function(
   const code_typet &code_type = to_code_type(symbol.type);
   f.set_parameter_identifiers(code_type);
 
+  // Provide bodies for operator new/delete by generating goto
+  // programs that delegate to __new/__delete.
+  if(symbol.value.is_nil() && symbol.type.id() == ID_code)
+  {
+    const std::string sname = id2string(identifier);
+    irep_idt impl;
+    if(sname == "operatorcpp_new(unsigned_long_int)")
+      impl = "__new";
+    else if(sname == "operatorcpp_new[](unsigned_long_int)")
+      impl = "__new_array";
+    else if(sname == "operatorcpp_delete(ptr_void)")
+      impl = "__delete";
+    else if(sname == "operatorcpp_delete[](ptr_void)")
+      impl = "__delete_array";
+    if(!impl.empty() && symbol_table.has_symbol(impl))
+    {
+      const symbolt &impl_sym = symbol_table.lookup_ref(impl);
+      const code_typet &impl_type = to_code_type(impl_sym.type);
+      const auto &params = code_type.parameters();
+      // Ensure parameter symbol exists
+      irep_idt param_id =
+        params.empty() ? irep_idt() : params[0].get_identifier();
+      if(!params.empty() && param_id.empty())
+      {
+        param_id = id2string(identifier) + "::size";
+        symbolt param_sym;
+        param_sym.name = param_id;
+        param_sym.base_name = "size";
+        param_sym.type = params[0].type();
+        param_sym.mode = symbol.mode;
+        param_sym.is_lvalue = true;
+        param_sym.is_parameter = true;
+        param_sym.is_thread_local = true;
+        param_sym.is_file_local = true;
+        symbol_table.get_writeable_ref(identifier)
+          .type.add(ID_parameters)
+          .get_sub()[0]
+          .set(ID_C_identifier, param_id);
+        symbol_table.insert(std::move(param_sym));
+        // Re-read code_type after modification
+        f.set_parameter_identifiers(
+          to_code_type(symbol_table.lookup_ref(identifier).type));
+      }
+      // Build goto program: call __new(param0) and return result
+      if(impl_type.return_type().id() != ID_empty && !params.empty())
+      {
+        // tmp = __new(param0)
+        const symbolt &tmp = new_tmp_symbol(
+          code_type.return_type(), "rv", f.body, symbol.location, symbol.mode);
+        exprt arg = symbol_exprt(param_id, params[0].type());
+        arg = typecast_exprt::conditional_cast(
+          arg, impl_type.parameters()[0].type());
+        code_function_callt call(
+          tmp.symbol_expr(), impl_sym.symbol_expr(), {std::move(arg)});
+        goto_programt::targett t1 =
+          f.body.add(goto_programt::make_function_call(call, symbol.location));
+        (void)t1;
+        // return tmp
+        f.body.add(goto_programt::make_set_return_value(
+          tmp.symbol_expr(), symbol.location));
+        f.body.add(goto_programt::make_end_function(symbol.location));
+      }
+      else if(!params.empty())
+      {
+        // void function (delete): call __delete(param0)
+        exprt arg = symbol_exprt(param_id, params[0].type());
+        code_function_callt call(impl_sym.symbol_expr(), {std::move(arg)});
+        f.body.add(goto_programt::make_function_call(call, symbol.location));
+        f.body.add(goto_programt::make_end_function(symbol.location));
+      }
+      if(!f.body.empty())
+        return;
+    }
+  }
+
   if(
     symbol.value.is_nil() || symbol.value.id() != ID_code ||
     symbol.is_compiled()) /* goto_inline may have removed the body */
@@ -173,8 +248,8 @@ void goto_convert_functionst::convert_function(
       file.find("/usr/include/") == 0 || file.find("/usr/lib/") == 0;
     if(is_system)
     {
-      symbol_table.get_writeable_ref(identifier).value.make_nil();
-      return;
+      // Strip offending statements instead of clearing the entire body.
+      // This preserves the parts of the body that are type-checked.
     }
     // For user functions, remove statements with unresolved names.
     std::function<void(exprt &)> strip_unresolved = [&](exprt &expr)
