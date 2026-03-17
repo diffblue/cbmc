@@ -1348,7 +1348,16 @@ bool cpp_typecheckt::reference_binding(
       {
         c_qualifierst qual_from;
         qual_from.read(expr.type());
-        new_expr = typecast_exprt::conditional_cast(new_expr, reference_type);
+        if(
+          expr.type().id() == ID_struct_tag &&
+          reference_type.base_type().id() == ID_struct_tag)
+        {
+          make_ptr_typecast(new_expr, reference_type);
+        }
+        else
+        {
+          new_expr = typecast_exprt::conditional_cast(new_expr, reference_type);
+        }
         qual_from.write(to_reference_type(new_expr.type()).base_type());
       }
 

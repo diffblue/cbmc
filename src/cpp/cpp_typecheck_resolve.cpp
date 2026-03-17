@@ -396,6 +396,48 @@ exprt cpp_typecheck_resolvet::convert_identifier(
         cpp_typecheck.typecheck_expr_member(e);
         cpp_typecheck.disable_access_control = old_value;
       }
+      else if(
+        compound_symbol.type.id() == ID_union &&
+        compound_symbol.type.find(ID_C_unnamed_object).is_not_nil())
+      {
+        // Anonymous union member: access through the unnamed object
+        // variable rather than through 'this'.
+        const irep_idt &unnamed_obj =
+          compound_symbol.type.get(ID_C_unnamed_object);
+        const symbolt *anon_sym =
+          cpp_typecheck.symbol_table.lookup(unnamed_obj);
+        if(anon_sym == nullptr)
+        {
+          // Try with scope prefix
+          for(cpp_scopet *s = &cpp_typecheck.cpp_scopes.current_scope();
+              !s->is_root_scope();
+              s = &s->get_parent())
+          {
+            anon_sym = cpp_typecheck.symbol_table.lookup(
+              id2string(s->prefix) + id2string(unnamed_obj));
+            if(anon_sym != nullptr)
+              break;
+          }
+        }
+        if(anon_sym != nullptr)
+        {
+          exprt anon_obj = anon_sym->symbol_expr();
+          anon_obj.set(ID_C_lvalue, true);
+          e.add_to_operands(std::move(anon_obj));
+          e.type() = type;
+          bool old_value = cpp_typecheck.disable_access_control;
+          cpp_typecheck.disable_access_control = true;
+          cpp_typecheck.typecheck_expr_member(e);
+          cpp_typecheck.disable_access_control = old_value;
+        }
+        else
+        {
+          e.id(ID_ptrmember);
+          tag_typet class_tag_type{ID_union_tag, identifier.class_identifier};
+          e.copy_to_operands(exprt("cpp-this", pointer_type(class_tag_type)));
+          e.type() = type;
+        }
+      }
       else
       {
         // this has to be a method or form a pointer-to-member expression
@@ -578,87 +620,87 @@ void cpp_typecheck_resolvet::disambiguate_functions(
 
   if(old_identifiers.size() > 1 && fargs.in_use)
   {
-    // try to further disambiguate functions
+    // Try to further disambiguate by partial ordering: a candidate is
+    // "dominated" if another candidate has at least as specific
+    // parameter types (via derived-to-base subtyping) for every
+    // parameter and strictly more specific for at least one.
+    std::vector<bool> dominated(old_identifiers.size(), false);
 
-    for(resolve_identifierst::const_iterator old_it = old_identifiers.begin();
-        old_it != old_identifiers.end();
-        ++old_it)
+    for(std::size_t i = 0; i < old_identifiers.size(); ++i)
     {
-#if 0
-      std::cout << "I1: " << old_it->get(ID_identifier) << '\n';
-#endif
-
-      if(old_it->type().id() != ID_code)
-      {
-        identifiers.push_back(*old_it);
+      if(old_identifiers[i].type().id() != ID_code)
         continue;
-      }
 
-      const code_typet &f1 = to_code_type(old_it->type());
+      const code_typet &f1 = to_code_type(old_identifiers[i].type());
 
-      for(resolve_identifierst::const_iterator resolve_it = old_it + 1;
-          resolve_it != old_identifiers.end();
-          ++resolve_it)
+      for(std::size_t j = 0; j < old_identifiers.size(); ++j)
       {
-        if(resolve_it->type().id() != ID_code)
+        if(i == j || dominated[j])
           continue;
 
-        const code_typet &f2 = to_code_type(resolve_it->type());
+        if(old_identifiers[j].type().id() != ID_code)
+          continue;
 
-        // Skip candidates with different parameter counts
+        const code_typet &f2 = to_code_type(old_identifiers[j].type());
+
         if(f1.parameters().size() != f2.parameters().size())
           continue;
 
-        bool f1_better = true;
-        bool f2_better = true;
+        // Check if f2 is at least as specific as f1 (i.e., f2
+        // dominates f1): for each parameter, f2's type must be the
+        // same as or a subtype (more derived) of f1's type.
+        bool f2_at_least_as_specific = true;
+        bool f2_strictly_more_specific = false;
 
-        for(std::size_t i = 0;
-            i < f1.parameters().size() && (f1_better || f2_better);
-            i++)
+        for(std::size_t p = 0;
+            p < f1.parameters().size() && f2_at_least_as_specific;
+            ++p)
         {
-          typet type1 = f1.parameters()[i].type();
-          typet type2 = f2.parameters()[i].type();
+          typet type1 = f1.parameters()[p].type();
+          typet type2 = f2.parameters()[p].type();
 
           if(type1 == type2)
             continue;
 
           if(is_reference(type1) != is_reference(type2))
+          {
+            f2_at_least_as_specific = false;
             continue;
+          }
 
           if(type1.id() == ID_pointer)
-          {
-            typet tmp = to_pointer_type(type1).base_type();
-            type1 = tmp;
-          }
-
+            type1 = to_pointer_type(type1).base_type();
           if(type2.id() == ID_pointer)
-          {
-            typet tmp = to_pointer_type(type2).base_type();
-            type2 = tmp;
-          }
+            type2 = to_pointer_type(type2).base_type();
 
           if(type1.id() != ID_struct_tag || type2.id() != ID_struct_tag)
+          {
+            f2_at_least_as_specific = false;
             continue;
-
-          if(
-            f1_better && cpp_typecheck.subtype_typecast(
-                           cpp_typecheck.follow_tag(to_struct_tag_type(type1)),
-                           cpp_typecheck.follow_tag(to_struct_tag_type(type2))))
-          {
-            f2_better = false;
           }
-          else if(
-            f2_better && cpp_typecheck.subtype_typecast(
-                           cpp_typecheck.follow_tag(to_struct_tag_type(type2)),
-                           cpp_typecheck.follow_tag(to_struct_tag_type(type1))))
+
+          // f2's param type is a subtype (more derived) of f1's
+          if(cpp_typecheck.subtype_typecast(
+               cpp_typecheck.follow_tag(to_struct_tag_type(type2)),
+               cpp_typecheck.follow_tag(to_struct_tag_type(type1))))
           {
-            f1_better = false;
+            f2_strictly_more_specific = true;
+          }
+          else
+          {
+            f2_at_least_as_specific = false;
           }
         }
 
-        if(!f1_better || f2_better)
-          identifiers.push_back(*resolve_it);
+        if(f2_at_least_as_specific && f2_strictly_more_specific)
+          dominated[i] = true;
       }
+    }
+
+    for(std::size_t i = 0; i < old_identifiers.size(); ++i)
+    {
+      if(!dominated[i])
+        identifiers.push_back(old_identifiers[i]);
     }
   }
   else
@@ -1440,8 +1482,10 @@ struct_tag_typet cpp_typecheck_resolvet::disambiguate_template_classes(
 
       if(partial_specialization_args_tc == full_template_args_tc)
       {
-        // Also check that cv-qualifiers match, since operator== ignores
-        // #-prefixed attributes like C_constant and C_volatile.
+        // Also check that cv-qualifiers and #c_type match, since
+        // operator== ignores #-prefixed attributes like C_constant,
+        // C_volatile, and C_c_type (needed to distinguish char from
+        // signed char).
         bool qualifiers_match = true;
         for(std::size_t j = 0;
             j < partial_specialization_args_tc.arguments().size();
@@ -1455,7 +1499,8 @@ struct_tag_typet cpp_typecheck_resolvet::disambiguate_template_classes(
               p.type().get_bool(ID_C_constant) !=
                 f.type().get_bool(ID_C_constant) ||
               p.type().get_bool(ID_C_volatile) !=
-                f.type().get_bool(ID_C_volatile))
+                f.type().get_bool(ID_C_volatile) ||
+              p.type().get(ID_C_c_type) != f.type().get(ID_C_c_type))
             {
               qualifiers_match = false;
               break;
@@ -2119,17 +2164,116 @@ exprt cpp_typecheck_resolvet::resolve(
   }
 
   // we do some checks before we return
+
+  // Access control check for class members resolved via qualified names.
+  // The get_component path sets ID_C_not_accessible, but qualified name
+  // resolution bypasses get_component, so we check here.
+  // resolve_scope() changed the current scope to the target class, so we
+  // must temporarily restore the original scope for check_component_access.
+  if(
+    !result.get_bool(ID_C_not_accessible) &&
+    !cpp_typecheck.disable_access_control && original_scope != nullptr)
+  {
+    irep_idt result_id = result.get(ID_identifier);
+    if(result_id.empty() && result.id() == ID_symbol)
+      result_id = to_symbol_expr(result).get_identifier();
+
+    if(!result_id.empty())
+    {
+      const std::string id_str = id2string(result_id);
+      auto pos = id_str.rfind("::");
+      if(pos != std::string::npos)
+      {
+        const std::string class_name = "tag-" + id_str.substr(0, pos);
+        const symbolt *class_sym =
+          cpp_typecheck.symbol_table.lookup(class_name);
+        if(class_sym != nullptr && class_sym->type.id() == ID_struct)
+        {
+          const struct_typet &struct_type = to_struct_type(class_sym->type);
+          for(const auto &comp : struct_type.components())
+          {
+            if(comp.get_name() == result_id)
+            {
+              // Temporarily restore the caller's scope for access check.
+              cpp_scopet *saved = cpp_typecheck.cpp_scopes.current_scope_ptr;
+              cpp_typecheck.cpp_scopes.current_scope_ptr = original_scope;
+              bool not_ok =
+                cpp_typecheck.check_component_access(comp, struct_type);
+              cpp_typecheck.cpp_scopes.current_scope_ptr = saved;
+
+              if(not_ok)
+              {
+                if(!fail_with_exception)
+                  return nil_exprt();
+
+                cpp_typecheck.error().source_location = source_location;
+                cpp_typecheck.error() << "member '" << base_name
+                                      << "' is not accessible" << messaget::eom;
+                throw 0;
+              }
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+
   if(result.get_bool(ID_C_not_accessible))
   {
-#if 0
-    if(!fail_with_exception)
-      return nil_exprt();
+    // Re-check access from the original (caller's) scope, since
+    // resolve_scope() may have changed the current scope to the target
+    // class, causing check_component_access to give a false positive.
+    bool still_not_accessible = true;
+    if(original_scope != nullptr)
+    {
+      irep_idt comp_name = result.get(ID_component_name);
+      if(comp_name.empty())
+      {
+        comp_name = result.get(ID_identifier);
+        if(comp_name.empty() && result.id() == ID_symbol)
+          comp_name = to_symbol_expr(result).get_identifier();
+      }
 
-    cpp_typecheck.error().source_location=result.source_location());
-    cpp_typecheck.error() << "member '" << result.get(ID_component_name)
-                          << "' is not accessible" << messaget::eom;
-    throw 0;
-#endif
+      if(!comp_name.empty())
+      {
+        const std::string id_str = id2string(comp_name);
+        auto pos = id_str.rfind("::");
+        if(pos != std::string::npos)
+        {
+          const std::string class_name = "tag-" + id_str.substr(0, pos);
+          const symbolt *class_sym =
+            cpp_typecheck.symbol_table.lookup(class_name);
+          if(class_sym != nullptr && class_sym->type.id() == ID_struct)
+          {
+            const struct_typet &struct_type = to_struct_type(class_sym->type);
+            for(const auto &comp : struct_type.components())
+            {
+              if(comp.get_name() == comp_name)
+              {
+                cpp_scopet *saved = cpp_typecheck.cpp_scopes.current_scope_ptr;
+                cpp_typecheck.cpp_scopes.current_scope_ptr = original_scope;
+                still_not_accessible =
+                  cpp_typecheck.check_component_access(comp, struct_type);
+                cpp_typecheck.cpp_scopes.current_scope_ptr = saved;
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    if(still_not_accessible)
+    {
+      if(!fail_with_exception)
+        return nil_exprt();
+
+      cpp_typecheck.error().source_location = result.source_location();
+      cpp_typecheck.error() << "member '" << result.get(ID_component_name)
+                            << "' is not accessible" << messaget::eom;
+      throw 0;
+    }
   }
 
   switch(want)

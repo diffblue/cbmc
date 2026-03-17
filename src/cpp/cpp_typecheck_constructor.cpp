@@ -184,10 +184,6 @@ void cpp_typecheckt::default_cpctor(
   irept &initializers=decl0.add(ID_member_initializers);
   initializers.id(ID_member_initializers);
 
-  cpp_declaratort &declarator =
-    static_cast<cpp_declaratort &>(to_multi_ary_expr(cpctor).op0());
-  exprt &block=declarator.value();
-
   // First, we need to call the parent copy constructors
   for(const auto &b : to_struct_type(symbol.type).bases())
   {
@@ -196,7 +192,27 @@ void cpp_typecheckt::default_cpctor(
     const symbolt &parsymb = lookup(b.type());
 
     if(cpp_is_pod(parsymb.type))
-      copy_parent(source_location, parsymb.base_name, param_identifier, block);
+    {
+      // For POD bases, generate a direct assignment as an initializer
+      // so it runs before member copies (correct C++ init order).
+      exprt op0(
+        "explicit-typecast",
+        pointer_type(cpp_namet(parsymb.base_name, source_location).as_type()));
+      op0.copy_to_operands(exprt("cpp-this"));
+      op0.add_source_location() = source_location;
+
+      exprt op1(
+        "explicit-typecast",
+        pointer_type(cpp_namet(parsymb.base_name, source_location).as_type()));
+      op1.type().set(ID_C_reference, true);
+      to_pointer_type(op1.type()).base_type().set(ID_C_constant, true);
+      op1.get_sub().push_back(cpp_namet(param_identifier, source_location));
+      op1.add_source_location() = source_location;
+
+      code_frontend_assignt assign_code(dereference_exprt(op0), op1);
+      assign_code.add_source_location() = source_location;
+      initializers.move_to_sub(assign_code);
+    }
     else
     {
       irep_idt ctor_name=parsymb.base_name;

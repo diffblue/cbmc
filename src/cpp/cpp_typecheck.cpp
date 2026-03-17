@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/pointer_expr.h>
 #include <util/source_location.h>
+#include <util/std_code.h>
 #include <util/symbol_table.h>
 
 #include <ansi-c/builtin_factory.h>
@@ -217,9 +218,26 @@ void cpp_typecheckt::static_and_dynamic_initialization()
     if(symbol.is_extern)
       continue;
 
-    // PODs are always statically initialized
+    // PODs with constant initializers are statically initialized.
+    // PODs with non-constant initializers (e.g., function calls)
+    // need dynamic initialization in declaration order.
     if(cpp_is_pod(symbol.type))
-      continue;
+    {
+      // Check if the initializer contains side effects (function
+      // calls, etc.) that require dynamic initialization.
+      bool has_side_effect = false;
+      if(symbol.value.is_not_nil())
+      {
+        symbol.value.visit_pre(
+          [&has_side_effect](const exprt &e)
+          {
+            if(e.id() == ID_side_effect)
+              has_side_effect = true;
+          });
+      }
+      if(!has_side_effect)
+        continue;
+    }
 
     DATA_INVARIANT(symbol.is_static_lifetime, "should be static");
     DATA_INVARIANT(!symbol.is_type, "should not be a type");
@@ -230,9 +248,17 @@ void cpp_typecheckt::static_and_dynamic_initialization()
     // initializer given?
     if(symbol.value.is_not_nil())
     {
-      // This will be a constructor call,
-      // which we execute.
-      init_block.add(to_code(symbol.value));
+      if(symbol.value.id() == ID_code)
+      {
+        // This will be a constructor call,
+        // which we execute.
+        init_block.add(to_code(symbol.value));
+      }
+      else
+      {
+        // POD with non-constant initializer: create assignment
+        init_block.add(code_frontend_assignt(symbol_expr, symbol.value));
+      }
 
       // Make it nil to get zero initialization by
       // __CPROVER_initialize

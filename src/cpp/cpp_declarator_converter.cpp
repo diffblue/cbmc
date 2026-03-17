@@ -748,8 +748,38 @@ irep_idt cpp_declarator_convertert::get_pretty_name()
   return scope->prefix + id2string(base_name);
 }
 
-void cpp_declarator_convertert::operator_overloading_rules(const symbolt &)
+void cpp_declarator_convertert::operator_overloading_rules(
+  const symbolt &symbol)
 {
+  if(symbol.type.id() != ID_code)
+    return;
+
+  const irep_idt &base = symbol.base_name;
+
+  // C++ [over.oper]: operator=, operator[], operator(), and operator->
+  // must be non-static member functions.
+  if(
+    base == "operator=" || base == "operator[]" || base == "operator()" ||
+    base == "operator->")
+  {
+    // Member functions have a 'this' parameter.
+    const code_typet &code_type = to_code_type(symbol.type);
+    bool is_member = false;
+    if(!code_type.parameters().empty())
+    {
+      const auto &first_param = code_type.parameters().front();
+      if(first_param.get_this())
+        is_member = true;
+    }
+    if(!is_member)
+    {
+      cpp_typecheck.error().source_location = symbol.location;
+      cpp_typecheck.error()
+        << "'" << base << "' must be a non-static member function"
+        << messaget::eom;
+      throw 0;
+    }
+  }
 }
 
 void cpp_declarator_convertert::main_function_rules(const symbolt &symbol)
