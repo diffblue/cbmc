@@ -1,0 +1,11 @@
+KNOWNBUG
+main.cpp
+--cpp11 --unwind 2
+^EXIT=(0|10)$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Type-checking succeeds but --validate-goto-model fails due to
+constexpr (is_macro) functions not being in the goto function map.

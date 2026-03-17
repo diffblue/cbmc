@@ -387,6 +387,118 @@ void cpp_typecheckt::typecheck_function_template(
     template_scope.is_template_scope(), "symbol should be in template scope");
 }
 
+void cpp_typecheckt::convert_variable_template_specialization(
+  cpp_declarationt &declaration)
+{
+  PRECONDITION(declaration.declarators().size() == 1);
+
+  cpp_declaratort &declarator = declaration.declarators()[0];
+  cpp_namet &cpp_name = declarator.name();
+
+  PRECONDITION(cpp_name.has_template_args());
+
+  // Extract base name and template args from the declarator name.
+  // Name has the form: name<template_args>
+  irep_idt base_name;
+  cpp_template_args_non_tct template_args_non_tc;
+
+  for(const auto &sub : cpp_name.get_sub())
+  {
+    if(sub.id() == ID_name)
+      base_name = sub.get(ID_identifier);
+    else if(sub.id() == ID_template_args)
+      template_args_non_tc = to_cpp_template_args_non_tc(sub);
+  }
+
+  // Remove template args from the declarator name so it becomes simple.
+  auto &subs = cpp_name.get_sub();
+  subs.erase(
+    std::remove_if(
+      subs.begin(),
+      subs.end(),
+      [](const irept &s) { return s.id() == ID_template_args; }),
+    subs.end());
+
+  // Find the primary variable template.
+  auto id_set = cpp_scopes.current_scope().lookup(
+    base_name, cpp_scopet::SCOPE_ONLY, cpp_idt::id_classt::TEMPLATE);
+
+  for(auto it = id_set.begin(); it != id_set.end();)
+  {
+    auto next = std::next(it);
+    if(lookup((*it)->identifier).type.find(ID_specialization_of).is_not_nil())
+      id_set.erase(it);
+    it = next;
+  }
+
+  if(id_set.empty())
+  {
+    error().source_location = declaration.source_location();
+    error() << "variable template '" << base_name << "' not found" << eom;
+    throw 0;
+  }
+
+  const symbolt &template_symbol = lookup((*id_set.begin())->identifier);
+
+  // Register as partial specialization.
+  declaration.partial_specialization_args() = template_args_non_tc;
+  declaration.set_specialization_of(template_symbol.name);
+
+  typecheck_variable_template(declaration);
+}
+
+void cpp_typecheckt::typecheck_variable_template(cpp_declarationt &declaration)
+{
+  PRECONDITION(declaration.declarators().size() == 1);
+
+  cpp_declaratort &declarator = declaration.declarators()[0];
+  const cpp_namet &cpp_name = declarator.name();
+
+  cpp_scopet &template_scope =
+    typecheck_template_parameters(declaration.template_type());
+
+  if(!cpp_name.is_simple_name())
+  {
+    error().source_location = declaration.source_location();
+    error() << "variable template must have simple name" << eom;
+    throw 0;
+  }
+
+  irep_idt base_name = cpp_name.get_base_name();
+
+  const cpp_template_args_non_tct &partial_specialization_args =
+    declaration.partial_specialization_args();
+  std::string symbol_name = class_template_identifier(
+    base_name, declaration.template_type(), partial_specialization_args);
+
+  // check if we have it already
+  if(symbol_table.has_symbol(symbol_name))
+    return;
+
+  symbolt symbol{symbol_name, typet{}, ID_cpp};
+  symbol.base_name = base_name;
+  symbol.location = cpp_name.source_location();
+  symbol.module = module;
+  symbol.type.swap(declaration);
+  symbol.pretty_name =
+    cpp_scopes.current_scope().prefix + id2string(symbol.base_name);
+
+  symbolt *new_symbol;
+  if(symbol_table.move(symbol, new_symbol))
+  {
+    error().source_location = symbol.location;
+    error() << "typecheck_variable_template: symbol_table.move() failed" << eom;
+    throw 0;
+  }
+
+  cpp_idt &id = cpp_scopes.put_into_scope(*new_symbol);
+  id.id_class = cpp_idt::id_classt::TEMPLATE;
+  id.prefix =
+    cpp_scopes.current_scope().prefix + id2string(new_symbol->base_name);
+
+  cpp_scopes.id_map[symbol_name] = &template_scope;
+}
+
 /// typecheck class template members; these can be methods or static members
 void cpp_typecheckt::typecheck_class_template_member(
   cpp_declarationt &declaration)
@@ -724,6 +836,67 @@ void cpp_typecheckt::convert_template_function_or_member_specialization(
   if(declaration.declarators().size()!=1 ||
      declaration.declarators().front().type().id()!=ID_function_type)
   {
+    // Variable template full specialization (template<> const int v<0,0> = 1)
+    if(
+      declaration.declarators().size() == 1 &&
+      declaration.declarators().front().type().id() != ID_function_type &&
+      declaration.declarators().front().name().has_template_args())
+    {
+      cpp_declaratort &declarator = declaration.declarators().front();
+      cpp_namet &cpp_name = declarator.name();
+
+      irep_idt base_name;
+      cpp_template_args_non_tct template_args_non_tc;
+      for(const auto &sub : cpp_name.get_sub())
+      {
+        if(sub.id() == ID_name)
+          base_name = sub.get(ID_identifier);
+        else if(sub.id() == ID_template_args)
+          template_args_non_tc = to_cpp_template_args_non_tc(sub);
+      }
+
+      // Remove template args from name.
+      auto &subs = cpp_name.get_sub();
+      subs.erase(
+        std::remove_if(
+          subs.begin(),
+          subs.end(),
+          [](const irept &s) { return s.id() == ID_template_args; }),
+        subs.end());
+
+      auto id_set = cpp_scopes.current_scope().lookup(
+        base_name, cpp_scopet::SCOPE_ONLY, cpp_idt::id_classt::TEMPLATE);
+
+      for(auto it = id_set.begin(); it != id_set.end();)
+      {
+        auto next = std::next(it);
+        if(lookup((*it)->identifier)
+             .type.find(ID_specialization_of)
+             .is_not_nil())
+          id_set.erase(it);
+        it = next;
+      }
+
+      if(!id_set.empty())
+      {
+        const symbolt &template_symbol = lookup((*id_set.begin())->identifier);
+
+        cpp_template_args_tct template_args = typecheck_template_args(
+          declaration.source_location(), template_symbol, template_args_non_tc);
+
+        typet specialization;
+        specialization.swap(declarator);
+
+        instantiate_template(
+          cpp_name.source_location(),
+          template_symbol,
+          template_args,
+          template_args,
+          specialization);
+      }
+      return;
+    }
+
     // Not a function template specialization — could be a static data
     // member specialization (e.g., template<> const char*
     // Cache<char>::data[14]). Silently skip for now.
@@ -1111,9 +1284,20 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
 
     // Set right away -- this is for the benefit of default
     // arguments and later parameters whose type might
-    // depend on an earlier parameter.
+    // depend on an earlier parameter. Only set type parameters
+    // eagerly; defer expression parameters to avoid overwriting
+    // outer template map entries for recursive templates where
+    // inner and outer parameters share the same identifiers.
 
-    template_map.set(parameter, arg);
+    if(parameter.id() == ID_type)
+      template_map.set(parameter, arg);
+  }
+
+  // Now set expression parameters.
+  for(std::size_t i = 0; i < parameters.size() && i < args.size(); i++)
+  {
+    if(parameters[i].id() != ID_type)
+      template_map.set(parameters[i], args[i]);
   }
 
   // Typecheck any extra arguments for variadic parameter packs
@@ -1255,7 +1439,27 @@ void cpp_typecheckt::convert_template_declaration(
 
     if(cpp_name.is_qualified() ||
        cpp_name.has_template_args())
+    {
+      // Variable template partial specialization: unqualified name
+      // with template args and non-function declarator type.
+      if(
+        !cpp_name.is_qualified() && cpp_name.has_template_args() &&
+        declarator.type().id() != ID_function_type)
+      {
+        convert_variable_template_specialization(declaration);
+        return;
+      }
       return typecheck_class_template_member(declaration);
+    }
+
+    // Check if this is a variable template (C++14) rather than a
+    // function template. Variable templates have non-function-type
+    // declarators.
+    if(declarator.type().id() != ID_function_type)
+    {
+      typecheck_variable_template(declaration);
+      return;
+    }
 
     // must be function template
     typecheck_function_template(declaration);

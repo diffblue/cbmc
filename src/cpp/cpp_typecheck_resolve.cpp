@@ -164,7 +164,6 @@ void cpp_typecheck_resolvet::guess_function_template_args(
       source_location, template_symbol, template_args, template_args);
 
     identifiers.clear();
-
     // The instantiated function may have function pointer parameters
     // with spurious ellipsis from variadic template pack expansion.
     // Check and fix the type before returning.
@@ -1906,9 +1905,20 @@ exprt cpp_typecheck_resolvet::resolve(
 
     if(have_aliases)
     {
-      // template alias — instantiate and return the aliased type
-      typet result = resolve_template_alias(base_name, id_set, template_args);
-      identifiers.push_back(exprt(ID_type, result));
+      // template alias — instantiate and return the aliased type.
+      // Substitution may fail (e.g., enable_if with false condition);
+      // treat as SFINAE when fail_with_exception is false.
+      try
+      {
+        typet result = resolve_template_alias(base_name, id_set, template_args);
+        identifiers.push_back(exprt(ID_type, result));
+      }
+      catch(int)
+      {
+        if(fail_with_exception)
+          throw;
+        return nil_exprt();
+      }
     }
     else if(want == wantt::TYPE || have_classes)
     {
@@ -2649,6 +2659,10 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
 
   exprt::operandst::const_iterator it = fargs.operands.begin();
 
+  // Skip the implicit 'this' object argument for member functions.
+  if(fargs.has_object && it != fargs.operands.end())
+    ++it;
+
   for(const auto &parameter : parameters)
   {
     if(it == fargs.operands.end())
@@ -2674,8 +2688,20 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
       // C++11 forwarding reference: if the parameter is T&& where T is
       // a template parameter, and the argument is an lvalue, deduce T
       // as the argument type with an added lvalue reference.
+      // Exception: a dereference of an rvalue reference (e.g., the
+      // result of std::move) is an xvalue, not an lvalue.
+      // Named rvalue reference variables are lvalues, not xvalues.
+      bool is_lvalue = it->get_bool(ID_C_lvalue);
       if(
-        is_rvalue_reference(arg_type) && it->get_bool(ID_C_lvalue) &&
+        is_lvalue && it->id() == ID_dereference && it->operands().size() == 1 &&
+        it->operands().front().type().id() == ID_pointer &&
+        it->operands().front().type().get_bool(ID_C_rvalue_reference) &&
+        it->operands().front().id() != ID_symbol)
+      {
+        is_lvalue = false;
+      }
+      if(
+        is_rvalue_reference(arg_type) && is_lvalue &&
         to_pointer_type(arg_type).base_type().id() == ID_cpp_name)
       {
         typet lvalue_ref_type = ::reference_type(it->type());
@@ -2880,12 +2906,20 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
     }
   }
 
+  // Type-check the function type in a SFINAE context: suppress error
+  // messages so that substitution failures (e.g., enable_if with false
+  // condition in the return type) are silently discarded.
+  null_message_handlert null_handler;
+  message_handlert &old_handler = cpp_typecheck.get_message_handler();
   try
   {
+    cpp_typecheck.set_message_handler(null_handler);
     cpp_typecheck.typecheck_type(function_type);
+    cpp_typecheck.set_message_handler(old_handler);
   }
   catch(...)
   {
+    cpp_typecheck.set_message_handler(old_handler);
     return nil_exprt();
   }
 
@@ -3007,6 +3041,14 @@ void cpp_typecheck_resolvet::apply_template_args(
   if(!template_symbol.type.get_bool(ID_is_template))
     return;
 
+  // Skip partial specializations — they are considered during
+  // instantiation of the primary template, not during lookup.
+  if(template_symbol.type.find(ID_specialization_of).is_not_nil())
+  {
+    expr.make_nil();
+    return;
+  }
+
 #if 0
   if(template_args_non_tc.is_nil())
   {
@@ -3053,41 +3095,69 @@ void cpp_typecheck_resolvet::apply_template_args(
   }
   else
   {
-    // must be a function, maybe method
-    const symbolt &new_symbol = cpp_typecheck.instantiate_template(
-      source_location, template_symbol, template_args_tc, template_args_tc);
-
-    // check if it is a method
-    const code_typet &code_type = to_code_type(new_symbol.type);
-
-    if(
-      !code_type.parameters().empty() &&
-      code_type.parameters().front().get_this())
+    // function template, method template, or variable template.
+    // Instantiation may fail due to SFINAE (e.g., enable_if in the
+    // return type).  Suppress errors and treat failure as deduction
+    // failure so that other overloads can be considered.
+    null_message_handlert null_handler;
+    message_handlert &old_handler = cpp_typecheck.get_message_handler();
+    const symbolt *new_sym_ptr = nullptr;
+    try
     {
-      // do we have an object?
-      if(fargs.has_object)
-      {
-        const symbolt &type_symb = cpp_typecheck.lookup(
-          fargs.operands.begin()->type().get(ID_identifier));
-
-        CHECK_RETURN(type_symb.type.id() == ID_struct);
-
-        const struct_typet &struct_type = to_struct_type(type_symb.type);
-
-        DATA_INVARIANT(
-          struct_type.has_component(new_symbol.name),
-          "method should exist in struct");
-
-        member_exprt member(
-          *fargs.operands.begin(), new_symbol.name, code_type);
-        member.add_source_location() = source_location;
-        expr.swap(member);
-        return;
-      }
+      cpp_typecheck.set_message_handler(null_handler);
+      const symbolt &new_symbol = cpp_typecheck.instantiate_template(
+        source_location, template_symbol, template_args_tc, template_args_tc);
+      new_sym_ptr = &new_symbol;
     }
+    catch(...)
+    {
+      cpp_typecheck.set_message_handler(old_handler);
+      expr.make_nil();
+      return;
+    }
+    cpp_typecheck.set_message_handler(old_handler);
+    const symbolt &new_symbol = *new_sym_ptr;
 
-    expr = cpp_symbol_expr(new_symbol);
-    expr.add_source_location() = source_location;
+    // Variable template: the type is not a function type
+    if(new_symbol.type.id() != ID_code)
+    {
+      expr = symbol_exprt(new_symbol.name, new_symbol.type);
+      expr.add_source_location() = source_location;
+    }
+    else
+    {
+      // check if it is a method
+      const code_typet &code_type = to_code_type(new_symbol.type);
+
+      if(
+        !code_type.parameters().empty() &&
+        code_type.parameters().front().get_this())
+      {
+        // do we have an object?
+        if(fargs.has_object)
+        {
+          const symbolt &type_symb = cpp_typecheck.lookup(
+            fargs.operands.begin()->type().get(ID_identifier));
+
+          CHECK_RETURN(type_symb.type.id() == ID_struct);
+
+          const struct_typet &struct_type = to_struct_type(type_symb.type);
+
+          DATA_INVARIANT(
+            struct_type.has_component(new_symbol.name),
+            "method should exist in struct");
+
+          member_exprt member(
+            *fargs.operands.begin(), new_symbol.name, code_type);
+          member.add_source_location() = source_location;
+          expr.swap(member);
+          return;
+        }
+      }
+
+      expr = cpp_symbol_expr(new_symbol);
+      expr.add_source_location() = source_location;
+    }
   }
 }
 
@@ -3152,11 +3222,31 @@ bool cpp_typecheck_resolvet::disambiguate_functions(
   }
   else if(fargs.has_object)
   {
-    // if it's not a member then we shall remove the object
+    // If the function type already has a 'this' parameter (e.g., an
+    // instantiated member function template), match directly — fargs
+    // already includes the object and the type already includes 'this'.
+    if(!type.parameters().empty() && type.parameters().front().get_this())
+    {
+      return fargs.match(type, args_distance, cpp_typecheck);
+    }
+
+    // For template function instances (pre-instantiation), the function
+    // type doesn't include 'this' yet.  Remove the object and try to
+    // match; if that fails, still accept the candidate with a high
+    // distance so it can be instantiated and checked properly later.
     cpp_typecheck_fargst new_fargs(fargs);
     new_fargs.remove_object();
 
-    return new_fargs.match(type, args_distance, cpp_typecheck);
+    if(new_fargs.match(type, args_distance, cpp_typecheck))
+      return true;
+
+    if(expr.id() == ID_template_function_instance)
+    {
+      args_distance = 10000;
+      return true;
+    }
+
+    return false;
   }
   else if(
     expr.id() == ID_symbol && !fargs.operands.empty() &&
