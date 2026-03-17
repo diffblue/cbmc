@@ -181,7 +181,13 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
     already_typechecked_exprt::make_already_typechecked(expr_symbol);
 
     exprt::operandst ops;
-    ops.push_back(symbol.value);
+
+    // For braced-init-list, use the list elements as constructor arguments
+    // rather than passing the initializer_list as a single argument.
+    if(symbol.value.id() == ID_initializer_list)
+      ops = symbol.value.operands();
+    else
+      ops.push_back(symbol.value);
 
     auto constructor =
       cpp_constructor(symbol.value.source_location(), expr_symbol, ops);

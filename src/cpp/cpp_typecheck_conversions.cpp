@@ -1898,6 +1898,14 @@ bool cpp_typecheckt::reinterpret_typecast(
     return true;
   }
 
+  // reinterpret_cast to reference from an array type (arrays are always
+  // lvalues, even when constexpr has replaced the symbol with a constant)
+  if(is_reference(type) && e.type().id() == ID_array)
+  {
+    new_expr = typecast_exprt::conditional_cast(address_of_exprt(e), type);
+    return true;
+  }
+
   return false;
 }
 

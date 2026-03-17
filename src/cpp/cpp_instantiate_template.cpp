@@ -183,10 +183,26 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   // do we have args?
   if(full_template_args.arguments().empty())
   {
-    error().source_location=source_location;
-    error() << "'" << template_symbol.base_name
-            << "' is a template; thus, expected template arguments" << eom;
-    throw 0;
+    // Empty args are valid for variadic templates with zero arguments.
+    const template_typet &template_type =
+      to_cpp_declaration(template_symbol.type).template_type();
+    const auto &params = template_type.template_parameters();
+    bool all_variadic = !params.empty();
+    for(const auto &p : params)
+    {
+      if(!p.get_bool(ID_ellipsis))
+      {
+        all_variadic = false;
+        break;
+      }
+    }
+    if(!all_variadic)
+    {
+      error().source_location = source_location;
+      error() << "'" << template_symbol.base_name
+              << "' is a template; thus, expected template arguments" << eom;
+      throw 0;
+    }
   }
 
   // produce new symbol name
@@ -361,11 +377,30 @@ void cpp_typecheckt::elaborate_class_template(
 
           // Typecheck the partial specialization args with the guessed
           // values, using the primary template for type context.
-          cpp_template_args_tct partial_specialization_args_tc =
-            typecheck_template_args(
-              type.source_location(),
-              primary_template,
-              partial_specialization_args);
+          // If typechecking fails (e.g., accessing a member of a
+          // non-class type), treat it as a substitution failure
+          // (SFINAE) and skip this specialization.
+          cpp_template_args_tct partial_specialization_args_tc;
+          bool sfinae_failed = false;
+          {
+            null_message_handlert null_handler;
+            message_handlert &old_handler = get_message_handler();
+            set_message_handler(null_handler);
+            try
+            {
+              partial_specialization_args_tc = typecheck_template_args(
+                type.source_location(),
+                primary_template,
+                partial_specialization_args);
+            }
+            catch(...)
+            {
+              sfinae_failed = true;
+            }
+            set_message_handler(old_handler);
+          }
+          if(sfinae_failed)
+            continue;
 
           if(partial_specialization_args_tc == full_args_tc)
           {
@@ -445,10 +480,26 @@ const symbolt &cpp_typecheckt::instantiate_template(
   // do we have arguments?
   if(full_template_args.arguments().empty())
   {
-    error().source_location=source_location;
-    error() << "'" << template_symbol.base_name
-            << "' is a template; thus, expected template arguments" << eom;
-    throw 0;
+    // Empty args are valid for variadic templates with zero arguments.
+    const template_typet &template_type =
+      to_cpp_declaration(template_symbol.type).template_type();
+    const auto &params = template_type.template_parameters();
+    bool all_variadic = !params.empty();
+    for(const auto &p : params)
+    {
+      if(!p.get_bool(ID_ellipsis))
+      {
+        all_variadic = false;
+        break;
+      }
+    }
+    if(!all_variadic)
+    {
+      error().source_location = source_location;
+      error() << "'" << template_symbol.base_name
+              << "' is a template; thus, expected template arguments" << eom;
+      throw 0;
+    }
   }
 
   // produce new symbol name

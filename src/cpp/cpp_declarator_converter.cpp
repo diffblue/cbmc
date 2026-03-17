@@ -22,14 +22,15 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck_fargs.h"
 
 cpp_declarator_convertert::cpp_declarator_convertert(
-  class cpp_typecheckt &_cpp_typecheck):
-  is_typedef(false),
-  is_template(false),
-  is_template_parameter(false),
-  is_friend(false),
-  linkage_spec(_cpp_typecheck.current_linkage_spec),
-  cpp_typecheck(_cpp_typecheck),
-  is_code(false)
+  class cpp_typecheckt &_cpp_typecheck)
+  : is_typedef(false),
+    is_template(false),
+    is_template_parameter(false),
+    is_friend(false),
+    friend_class_scope(nullptr),
+    linkage_spec(_cpp_typecheck.current_linkage_spec),
+    cpp_typecheck(_cpp_typecheck),
+    is_code(false)
 {
 }
 
@@ -74,6 +75,24 @@ symbolt &cpp_declarator_convertert::convert(
     if(is_friend)
     {
       friend_scope = &cpp_typecheck.cpp_scopes.current_scope();
+      // Remember the class scope for adding as secondary scope later
+      if(friend_scope->id_class == cpp_idt::id_classt::CLASS)
+        friend_class_scope = friend_scope;
+      // For unqualified friend functions, navigate up past
+      // class/block/template scopes to the enclosing namespace so that
+      // the friend is visible via ADL and unqualified lookup.
+      // For qualified friend functions (e.g., friend ... C::f(...)),
+      // resolve_scope already set the scope to the target class, so we
+      // must keep it.
+      if(!declarator.name().is_qualified())
+      {
+        while(friend_scope->id_class == cpp_idt::id_classt::CLASS ||
+              friend_scope->id_class == cpp_idt::id_classt::BLOCK_SCOPE ||
+              friend_scope->id_class == cpp_idt::id_classt::TEMPLATE_SCOPE)
+        {
+          friend_scope = &friend_scope->get_parent();
+        }
+      }
       save_scope.restore();
     }
 
@@ -122,7 +141,10 @@ symbolt &cpp_declarator_convertert::convert(
     if(!maybe_symbol)
     {
       // adjust type if it's a non-static member function
-      if(final_type.id()==ID_code)
+      // (but not for unqualified friend functions, which are free functions)
+      if(
+        final_type.id() == ID_code &&
+        (!is_friend || declarator.name().is_qualified()))
       {
         cpp_save_scopet save_scope(cpp_typecheck.cpp_scopes);
         cpp_typecheck.cpp_scopes.go_to(*scope);
@@ -507,6 +529,11 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
 
   // move early, it must be visible before doing any value
   symbolt *new_symbol;
+
+  // For friend functions defined inside a class, record the enclosing
+  // class so that the class scope is visible during body type-checking.
+  if(is_friend && friend_class_scope != nullptr)
+    symbol.type.set(ID_C_class, friend_class_scope->identifier);
 
   if(cpp_typecheck.symbol_table.move(symbol, new_symbol))
   {

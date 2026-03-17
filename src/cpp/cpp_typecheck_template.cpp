@@ -310,6 +310,20 @@ void cpp_typecheckt::typecheck_function_template(
 
     if(has_value && previous_has_value)
     {
+      // When two function templates differ only in their SFINAE constraints
+      // (e.g., enable_if default template arguments), they get the same
+      // identifier. Since CBMC does not implement SFINAE, silently keep
+      // the first declaration.
+      if(
+        template_type.template_parameters().size() ==
+        to_cpp_declaration(previous_symbol->type)
+          .template_type()
+          .template_parameters()
+          .size())
+      {
+        return;
+      }
+
       error().source_location=cpp_name.source_location();
       error() << "function template symbol '" << base_name
               << "' declared previously\n"
@@ -400,7 +414,7 @@ void cpp_typecheckt::typecheck_class_template_member(
   // let's find the class template this function template belongs to.
   auto id_set = cpp_scopes.current_scope().lookup(
     cpp_name.get_sub().front().get(ID_identifier),
-    cpp_scopet::SCOPE_ONLY,           // look only in current scope
+    cpp_scopet::QUALIFIED,            // search using-scopes (inline namespaces)
     cpp_scopet::id_classt::TEMPLATE); // must be template
 
   // remove any specializations
@@ -942,6 +956,18 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       // These may depend on previous arguments.
       if(!parameter.has_default_argument())
       {
+        // For function templates, remaining parameters can be deduced
+        // from the function call arguments, so partial explicit
+        // template arguments are allowed.
+        const cpp_declarationt &cpp_declaration =
+          to_cpp_declaration(template_symbol.type);
+        if(
+          !cpp_declaration.is_class_template() &&
+          !cpp_declaration.is_template_alias())
+        {
+          break;
+        }
+
         error().source_location=source_location;
         error() << "not enough template arguments (expected "
                 << parameters.size() << ", but got " << args.size()
@@ -1054,6 +1080,24 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
 
   // restore template map
   template_map.swap(old_template_map);
+
+  // For function templates with partial explicit arguments, pad with
+  // unassigned markers for the remaining parameters.
+  if(args.size() < parameters.size())
+  {
+    const cpp_declarationt &tmpl_decl =
+      to_cpp_declaration(template_symbol.type);
+    if(!tmpl_decl.is_class_template() && !tmpl_decl.is_template_alias())
+    {
+      for(std::size_t i = args.size(); i < parameters.size(); i++)
+      {
+        if(parameters[i].id() == ID_type)
+          args.push_back(exprt(ID_type, typet(ID_unassigned)));
+        else
+          args.push_back(exprt(ID_unassigned));
+      }
+    }
+  }
 
   // now the numbers should match (or we have a variadic pack)
   DATA_INVARIANT(
