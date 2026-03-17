@@ -1,8 +1,9 @@
 CORE
 main.cpp
---cpp20
+--cpp23
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-C++20 constinit variables.
+--
+C++23 #warning preprocessor directive.

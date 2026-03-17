@@ -989,7 +989,10 @@ enable_or_disable ("enable"|"disable")
 "__is_enum"         { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
 "__is_final"        { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
 "__is_interface_class" { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__is_layout_compatible" { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
+"__is_nothrow_convertible" { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
 "__is_pod"          { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__is_pointer_interconvertible_base_of" { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
 "__is_polymorphic"  { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
 "__is_ref_array"    { return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
 "__is_ref_class"    { return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }

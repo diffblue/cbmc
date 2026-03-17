@@ -1,14 +1,14 @@
-// C++20 designated initializers
-struct S
+struct Point
 {
   int x;
   int y;
+  int z;
 };
 
 int main()
 {
-  S s = {.x = 1, .y = 2};
-  __CPROVER_assert(s.x == 1, "x==1");
-  __CPROVER_assert(s.y == 2, "y==2");
-  return 0;
+  Point p = {.x = 1, .y = 2, .z = 3};
+  __CPROVER_assert(p.x == 1, "x");
+  __CPROVER_assert(p.y == 2, "y");
+  __CPROVER_assert(p.z == 3, "z");
 }

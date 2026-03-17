@@ -1,8 +1,8 @@
 CORE
 main.cpp
---cpp20
+--cpp26
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-C++20 constinit variables.
+C++26 function contracts (pre/post).

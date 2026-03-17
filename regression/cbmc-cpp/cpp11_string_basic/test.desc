@@ -1,8 +1,8 @@
-CORE
+KNOWNBUG
 main.cpp
---cpp20
+--cpp11
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-C++20 constinit variables.
+std::string: _M_construct has no body
