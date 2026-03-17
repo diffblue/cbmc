@@ -1494,8 +1494,9 @@ bool Parser::rExternTemplateDecl(cpp_declarationt &decl)
   if(!rDeclaration(decl))
     return false;
 
-  // decl=new PtreeExternTemplate(new Leaf(tk1),
-  //                               Ptree::List(new Leaf(tk2), body));
+  // Mark as extern so the type-checker can skip it.
+  decl.storage_spec().set_extern();
+
   return true;
 }
 

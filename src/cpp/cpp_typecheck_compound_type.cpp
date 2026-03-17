@@ -1347,6 +1347,18 @@ void cpp_typecheckt::typecheck_member_function(
   }
   else if(symbol_exists)
   {
+    // A template constructor instantiation may produce the same signature
+    // as an existing non-template constructor (e.g., template<typename U>
+    // allocator(const allocator<U>&) instantiated with U matching T
+    // collides with the copy constructor). In that case, keep the existing
+    // symbol.
+    if(
+      new_symbol->type.id() == ID_code &&
+      to_code_type(new_symbol->type).return_type().id() == ID_constructor)
+    {
+      return;
+    }
+
     error().source_location=symbol.location;
     error() << "failed to insert new method symbol: " << symbol.name << '\n'
             << "name of previous symbol: " << new_symbol->name << '\n'

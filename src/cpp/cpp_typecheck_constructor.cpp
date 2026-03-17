@@ -465,6 +465,26 @@ void cpp_typecheckt::check_member_initializers(
     irep_idt base_name=member_name.get_base_name();
     bool ok=false;
 
+    // First check if it matches a direct base class by name.
+    // This handles the case where the base class name is not in scope
+    // during template instantiation (e.g., out-of-class constructor
+    // definition for a template class with a nested base class).
+    for(const auto &b : bases)
+    {
+      if(b.type().id() != ID_struct_tag)
+        continue;
+      const irep_idt &base_id = to_struct_tag_type(b.type()).get_identifier();
+      const symbolt &base_sym = lookup(base_id);
+      if(base_sym.base_name == base_name)
+      {
+        ok = true;
+        break;
+      }
+    }
+
+    if(ok)
+      continue;
+
     for(const auto &c : components)
     {
       if(c.get_base_name() != base_name)
@@ -539,10 +559,16 @@ void cpp_typecheckt::check_member_initializers(
 
     if(!ok)
     {
-      // Check if it matches a direct base class by name (e.g., for POD
-      // base classes that have no constructor component).
+      // Try resolving as a type name
       typet member_type = (typet &)initializer.find(ID_member);
-      typecheck_type(member_type);
+      try
+      {
+        typecheck_type(member_type);
+      }
+      catch(...)
+      {
+        member_type.make_nil();
+      }
 
       if(member_type.id() == ID_struct_tag)
       {
@@ -664,6 +690,20 @@ void cpp_typecheckt::full_member_initialization(
 
         typet member_type=
           static_cast<const typet&>(initializer.find(ID_member));
+
+        // First try matching by base class name directly — this
+        // avoids type resolution failures during template instantiation
+        // when the base class name is not in scope.
+        {
+          irep_idt init_base_name =
+            to_cpp_name(initializer.find(ID_member)).get_base_name();
+          if(ctorsymb.base_name == init_base_name)
+          {
+            final_initializers.move_to_sub(initializer);
+            found = true;
+            break;
+          }
+        }
 
         typecheck_type(member_type);
 
