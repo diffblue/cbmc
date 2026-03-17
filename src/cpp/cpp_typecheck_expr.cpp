@@ -410,11 +410,17 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
     {
       expr.type()=e1.type();
       expr.op1().swap(e1);
+      // Ensure op2 matches the result type (e.g., c_bit_field may
+      // differ from the converted type).
+      if(expr.op2().type() != expr.type())
+        expr.op2() = typecast_exprt::conditional_cast(expr.op2(), expr.type());
     }
     else if(implicit_conversion_sequence(expr.op2(), expr.op1().type(), e2))
     {
       expr.type()=e2.type();
       expr.op2().swap(e2);
+      if(expr.op1().type() != expr.type())
+        expr.op1() = typecast_exprt::conditional_cast(expr.op1(), expr.type());
     }
     else if(
       expr.op1().type().id() == ID_array &&
@@ -561,21 +567,22 @@ void cpp_typecheckt::typecheck_function_expr(
     // is operator-> overloaded?
     if(to_unary_expr(expr).op().type().id() != ID_pointer)
     {
-      std::string op_name="operator->";
+      std::string op_name = "operator->";
 
-      // turn this into a function call
-      // first do function/operator
       const cpp_namet cpp_name(op_name, expr.source_location());
 
+      // Build as a member function call: obj.operator->()
+      exprt member(ID_member);
+      member.add(ID_component_cpp_name) = cpp_name;
+      member.copy_to_operands(
+        already_typechecked_exprt{to_unary_expr(expr).op()});
+
       side_effect_expr_function_callt function_call(
-        cpp_name.as_expr(),
-        {to_unary_expr(expr).op()},
-        uninitialized_typet{},
-        expr.source_location());
-      function_call.arguments().reserve(expr.operands().size());
+        std::move(member), {}, uninitialized_typet{}, expr.source_location());
 
       typecheck_side_effect_function_call(function_call);
 
+      add_implicit_dereference(function_call);
       already_typechecked_exprt::make_already_typechecked(function_call);
 
       to_unary_expr(expr).op().swap(function_call);
@@ -797,6 +804,15 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
           }
 
           typecheck_side_effect_function_call(function_call);
+
+          if(expr.id() == ID_ptrmember)
+          {
+            add_implicit_dereference(function_call);
+            already_typechecked_exprt::make_already_typechecked(function_call);
+            to_multi_ary_expr(expr).op0().swap(function_call);
+            typecheck_expr(expr);
+            return true;
+          }
 
           expr=function_call;
 
@@ -1311,9 +1327,10 @@ void cpp_typecheckt::typecheck_expr_delete(exprt &expr)
   new_object.add_source_location()=expr.source_location();
   new_object.set(ID_C_lvalue, true);
 
-  already_typechecked_exprt::make_already_typechecked(new_object);
+  auto destructor_code =
+    cpp_destructor(expr.source_location(), new_object, false);
 
-  auto destructor_code = cpp_destructor(expr.source_location(), new_object);
+  already_typechecked_exprt::make_already_typechecked(new_object);
 
   if(destructor_code.has_value())
   {
@@ -1542,13 +1559,26 @@ void cpp_typecheckt::typecheck_expr_ptrmember(
 
   add_implicit_dereference(op);
 
+  // is operator-> overloaded?
   if(op.type().id() != ID_pointer)
   {
-    error().source_location=expr.find_source_location();
-    error() << "ptrmember operator requires pointer type "
-            << "on left hand side, but got '" << to_string(op.type()) << "'"
-            << eom;
-    throw 0;
+    std::string op_name = "operator->";
+
+    const cpp_namet cpp_name(op_name, expr.source_location());
+
+    side_effect_expr_function_callt function_call(
+      cpp_name.as_expr(), {op}, uninitialized_typet{}, expr.source_location());
+
+    typecheck_side_effect_function_call(function_call);
+
+    already_typechecked_exprt::make_already_typechecked(function_call);
+
+    op.swap(function_call);
+
+    // Re-enter to handle the result (which may be a pointer or
+    // another class with operator->).
+    typecheck_expr_ptrmember(expr, fargs);
+    return;
   }
 
   exprt tmp;
@@ -1918,16 +1948,25 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       // get the virtual table
       auto this_type = to_pointer_type(
         to_code_type(expr.function().type()).parameters().front().type());
-      irep_idt vtable_name =
-        this_type.base_type().get_string(ID_identifier) + "::@vtable_pointer";
 
       const struct_typet &vt_struct =
         follow_tag(to_struct_tag_type(this_type.base_type()));
 
-      const struct_typet::componentt &vt_compo=
-        vt_struct.get_component(vtable_name);
-
-      CHECK_RETURN(vt_compo.is_not_nil());
+      // Find the vtable pointer component — it may be inherited from a
+      // base class, so search by the ID_is_vtptr flag rather than by name.
+      irep_idt vtable_name;
+      const struct_typet::componentt *vt_compo_ptr = nullptr;
+      for(const auto &c : vt_struct.components())
+      {
+        if(c.get_bool(ID_is_vtptr))
+        {
+          vt_compo_ptr = &c;
+          vtable_name = c.get_name();
+          break;
+        }
+      }
+      CHECK_RETURN(vt_compo_ptr != nullptr);
+      const struct_typet::componentt &vt_compo = *vt_compo_ptr;
 
       vtptr_member.set(ID_component_name, vtable_name);
 
@@ -1955,7 +1994,8 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       expr.type()=
         to_code_type(expr.function().type()).return_type();
 
-      typecheck_method_application(expr);
+      if(expr.function().id() == ID_member)
+        typecheck_method_application(expr);
 
       // Let's make the call virtual
       expr.function().swap(vtentry_member);
@@ -2357,6 +2397,35 @@ void cpp_typecheckt::typecheck_method_application(
     {
       exprt this_arg = to_member_expr(member_expr).compound();
       implicit_typecast(this_arg, this_type);
+      // For multiple inheritance, the implicit_typecast may produce a
+      // simple typecast from derived* to base* without adjusting the
+      // pointer offset. Re-do the pointer cast using make_ptr_typecast
+      // which handles non-first base class offsets.
+      if(
+        this_arg.id() == ID_typecast && this_arg.type().id() == ID_pointer &&
+        to_typecast_expr(this_arg).op().type().id() == ID_pointer &&
+        to_pointer_type(this_arg.type()).base_type().id() == ID_struct_tag &&
+        to_pointer_type(to_typecast_expr(this_arg).op().type())
+            .base_type()
+            .id() == ID_struct_tag)
+      {
+        // Only adjust for upcasts (derived* -> base*).
+        const struct_typet &src_s = follow_tag(to_struct_tag_type(
+          to_pointer_type(to_typecast_expr(this_arg).op().type()).base_type()));
+        const struct_typet &dest_s = follow_tag(
+          to_struct_tag_type(to_pointer_type(this_arg.type()).base_type()));
+        if(subtype_typecast(src_s, dest_s))
+        {
+          exprt inner = to_typecast_expr(this_arg).op();
+          pointer_typet dest_ptr_type(
+            to_pointer_type(this_arg.type()).base_type(),
+            to_pointer_type(this_arg.type()).get_width());
+          make_ptr_typecast(inner, dest_ptr_type);
+          inner.type().set(ID_C_reference, true);
+          inner.type().set(ID_C_this, true);
+          this_arg = inner;
+        }
+      }
       DATA_INVARIANT(
         is_reference(this_arg.type()), "argument should be reference");
       this_arg.type().remove(ID_C_reference);
@@ -2618,6 +2687,16 @@ void cpp_typecheckt::typecheck_expr_function_identifier(exprt &expr)
 
     if(function_symbol.value.id() == ID_cpp_not_typechecked)
       function_symbol.value.set(ID_is_used, true);
+
+    // For functions in deferred_typechecking (e.g., static member
+    // functions of class templates), ensure the body gets typechecked
+    // by adding it to method_bodies.
+    if(
+      function_symbol.value.is_not_nil() &&
+      deferred_typechecking.count(function_symbol.name))
+    {
+      add_method_body(&function_symbol);
+    }
   }
 
   c_typecheck_baset::typecheck_expr_function_identifier(expr);

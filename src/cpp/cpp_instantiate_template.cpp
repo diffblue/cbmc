@@ -449,7 +449,9 @@ void cpp_typecheckt::elaborate_class_template(
           if(partial_specialization_args_tc == full_args_tc)
           {
             // operator== on irept ignores #-prefixed attributes like
-            // C_constant and C_volatile. Check them explicitly.
+            // C_constant, C_volatile, and C_c_type. Check them
+            // explicitly so that e.g. char vs signed char are
+            // distinguished in template specialization matching.
             bool qualifiers_match = true;
             for(std::size_t j = 0;
                 j < partial_specialization_args_tc.arguments().size();
@@ -463,7 +465,8 @@ void cpp_typecheckt::elaborate_class_template(
                   p.type().get_bool(ID_C_constant) !=
                     f.type().get_bool(ID_C_constant) ||
                   p.type().get_bool(ID_C_volatile) !=
-                    f.type().get_bool(ID_C_volatile))
+                    f.type().get_bool(ID_C_volatile) ||
+                  p.type().get(ID_C_c_type) != f.type().get(ID_C_c_type))
                 {
                   qualifiers_match = false;
                   break;
@@ -1129,6 +1132,23 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
           if(partial_tc == full_args_resolved)
           {
+            // Also check #c_type to distinguish e.g. char from
+            // signed char.
+            bool c_type_match = true;
+            for(std::size_t j = 0; j < partial_tc.arguments().size(); j++)
+            {
+              const exprt &p = partial_tc.arguments()[j];
+              const exprt &f = full_args_resolved.arguments()[j];
+              if(
+                p.id() == ID_type &&
+                p.type().get(ID_C_c_type) != f.type().get(ID_C_c_type))
+              {
+                c_type_match = false;
+                break;
+              }
+            }
+            if(!c_type_match)
+              continue;
             best_match = &s;
             best_spec_args = guessed;
           }

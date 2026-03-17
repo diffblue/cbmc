@@ -1,8 +1,9 @@
-KNOWNBUG
+CORE
 main.cpp
 
 ^EXIT=0$
 ^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
-^CONVERSION ERROR$
+no body for callee

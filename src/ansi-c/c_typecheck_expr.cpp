@@ -3642,6 +3642,31 @@ exprt c_typecheck_baset::do_special_functions(
 
     return std::move(ffs);
   }
+  else if(identifier == "__builtin_FILE")
+  {
+    // GCC built-in that returns the file name of the call site.
+    string_constantt s(source_location.get_file());
+    s.add_source_location() = source_location;
+    return typecast_exprt(
+      address_of_exprt(index_exprt(s, from_integer(0, c_index_type()))),
+      expr.type());
+  }
+  else if(identifier == "__builtin_FUNCTION")
+  {
+    // GCC built-in that returns the function name of the call site.
+    string_constantt s(source_location.get_function());
+    s.add_source_location() = source_location;
+    return typecast_exprt(
+      address_of_exprt(index_exprt(s, from_integer(0, c_index_type()))),
+      expr.type());
+  }
+  else if(identifier == "__builtin_LINE")
+  {
+    // GCC built-in that returns the line number of the call site.
+    const auto line_str = source_location.get_line();
+    const auto line_no = line_str.empty() ? 0 : std::stoi(id2string(line_str));
+    return from_integer(line_no, expr.type());
+  }
   else if(identifier=="__builtin_expect")
   {
     // This is a gcc extension to provide branch prediction.
