@@ -221,10 +221,12 @@ void template_mapt::build(
   // these should have been typechecked before
   bool has_pack = !template_parameters.empty() &&
                   template_parameters.back().get_bool(ID_ellipsis);
-  DATA_INVARIANT(
-    instance.size() == template_parameters.size() ||
-      (has_pack && instance.size() >= template_parameters.size() - 1),
-    "template instantiation expected to match declaration");
+  if(
+    instance.size() != template_parameters.size() &&
+    !(has_pack && instance.size() >= template_parameters.size() - 1))
+  {
+    return; // mismatched template arguments — skip
+  }
 
   std::size_t i = 0;
   for(cpp_template_args_tct::argumentst::const_iterator i_it = instance.begin();

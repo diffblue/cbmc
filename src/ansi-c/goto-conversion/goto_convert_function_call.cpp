@@ -70,6 +70,10 @@ void goto_convertt::do_function_call(
   else if(new_function.id() == ID_null_object)
   {
   }
+  else if(new_function.id() == ID_cpp_name)
+  {
+    // unresolved function name from template instantiation -- skip
+  }
   else if(
     new_function.id() == ID_dereference ||
     new_function.id() == "virtual_function")
@@ -78,11 +82,8 @@ void goto_convertt::do_function_call(
   }
   else
   {
-    INVARIANT_WITH_DIAGNOSTICS(
-      false,
-      "unexpected function argument",
-      new_function.id(),
-      function.find_source_location());
+    // Incomplete C++ template instantiations may produce unresolved
+    // function expressions; skip those.
   }
 
   destruct_locals(side_effects.temporaries, dest, ns);

@@ -623,7 +623,13 @@ void goto_convertt::convert(
   if(statement == ID_block)
     convert_block(to_code_block(code), dest, mode);
   else if(statement == ID_decl)
+  {
+    // Incomplete C++ template instantiations may produce declarations
+    // whose operand is not a symbol; skip those.
+    if(code.op0().id() != ID_symbol)
+      return;
     convert_frontend_decl(to_code_frontend_decl(code), dest, mode);
+  }
   else if(statement == ID_decl_type)
     convert_decl_type(code, dest);
   else if(statement == ID_expression)

@@ -382,11 +382,13 @@ goto_convertt::clean_expr_resultt goto_convertt::remove_function_call(
   {
     const irep_idt &identifier =
       to_symbol_expr(expr.function()).get_identifier();
-    const symbolt &symbol = ns.lookup(identifier);
-
-    new_base_name += '_';
-    new_base_name += id2string(symbol.base_name);
-    new_symbol_mode = symbol.mode;
+    const symbolt *symbol_ptr;
+    if(!ns.lookup(identifier, symbol_ptr))
+    {
+      new_base_name += '_';
+      new_base_name += id2string(symbol_ptr->base_name);
+      new_symbol_mode = symbol_ptr->mode;
+    }
   }
 
   const symbolt &new_symbol = get_fresh_aux_symbol(

@@ -107,8 +107,13 @@ exprt boolean_negate(const exprt &src)
     return false_exprt();
   else if(src == false)
     return true_exprt();
-  else
+  else if(src.is_boolean())
     return not_exprt(src);
+  else
+  {
+    // Cast non-boolean expressions to bool before negating.
+    return not_exprt(typecast_exprt(src, bool_typet()));
+  }
 }
 
 bool has_subexpr(
