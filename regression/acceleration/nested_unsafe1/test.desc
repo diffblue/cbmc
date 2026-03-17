@@ -5,4 +5,8 @@ main.c
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
 --
-The result spuriously is VERIFICATION SUCCESSFUL.
+The loop accelerator only handles innermost loops. The outer loop
+(while x < 0x0fffffff) contains a nested inner loop (while y < 10),
+so it is skipped by the contains_nested_loops check in accelerate_loop.
+Only the inner loop is accelerated, which is insufficient to reach the
+assertion after the outer loop within the --unwind bound.
