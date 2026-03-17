@@ -1,0 +1,8 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^VERIFICATION
+^EXIT=0$
+^SIGNAL=0$
+--
+Modules (import/export) not supported by parser.

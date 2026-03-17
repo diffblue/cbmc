@@ -38,12 +38,16 @@ bool cpp_parsert::parse()
     config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP11;
   token_buffer.ansi_c_parser.cpp20 =
     config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP20;
+  // In C++ mode with clang preprocessor, _Float32 etc. come as typedefs
+  // from system headers, not as built-in types. Don't treat them as keywords.
+  bool is_clang =
+    config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG;
   token_buffer.ansi_c_parser.ts_18661_3_Floatn_types =
-    config.ansi_c.ts_18661_3_Floatn_types;
+    is_clang ? false : config.ansi_c.ts_18661_3_Floatn_types;
   token_buffer.ansi_c_parser.__float128_is_keyword = false;
-  token_buffer.ansi_c_parser.float16_type = *support_float16;
-  token_buffer.ansi_c_parser.bf16_type = *support_float16;
-  token_buffer.ansi_c_parser.fp16_type = *support_float16;
+  token_buffer.ansi_c_parser.float16_type = is_clang ? false : *support_float16;
+  token_buffer.ansi_c_parser.bf16_type = is_clang ? false : *support_float16;
+  token_buffer.ansi_c_parser.fp16_type = is_clang ? false : *support_float16;
   token_buffer.ansi_c_parser.in = in;
   token_buffer.ansi_c_parser.mode = mode;
   token_buffer.ansi_c_parser.set_file(get_file());
