@@ -973,7 +973,17 @@ void cpp_typecheckt::typecheck_friend_declaration(
 #endif
 
     if(sub_it.value().is_not_nil())
+    {
+      // Handle = default on friend functions (e.g., friend operator==)
+      if(
+        sub_it.value().id() == ID_code &&
+        to_code(sub_it.value()).get_statement() == ID_default)
+      {
+        sub_it.value() = codet(ID_block);
+        sub_it.value().add_source_location() = declaration.source_location();
+      }
       declaration.member_spec().set_inline(true);
+    }
 
     cpp_declarator_convertert cpp_declarator_converter(*this);
     cpp_declarator_converter.is_friend = true;
