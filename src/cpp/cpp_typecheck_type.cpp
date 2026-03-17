@@ -277,6 +277,11 @@ void cpp_typecheckt::typecheck_type(typet &type)
   }
   else if(type.id()==ID_decltype)
   {
+    // C++14: decltype(auto) — deduced from initializer, handled
+    // during declarator conversion (like auto).
+    if(type.get_bool("#auto"))
+      return;
+
     exprt e=static_cast<const exprt &>(type.find(ID_expr_arg));
     typecheck_expr(e);
 

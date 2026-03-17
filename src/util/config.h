@@ -23,7 +23,7 @@ class symbol_table_baset;
 
 #define OPT_CONFIG_C_CPP                                                       \
   "D:I:(include)(function)"                                                    \
-  "(c89)(c99)(c11)(c17)(c23)(cpp98)(cpp03)(cpp11)"                             \
+  "(c89)(c99)(c11)(c17)(c23)(cpp98)(cpp03)(cpp11)(cpp14)(cpp17)"               \
   "(unsigned-char)"                                                            \
   "(round-to-even)(round-to-nearest)"                                          \
   "(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)"                     \
@@ -53,7 +53,8 @@ class symbol_table_baset;
         ? "c23"                                                                \
         : "") +                                                                \
     ")\n"                                                                      \
-    " {y--cpp98}, {y--cpp03}, {y--cpp11} \t "                                  \
+    " {y--cpp98}, {y--cpp03}, {y--cpp11},\n"                                   \
+    " {y--cpp14}, {y--cpp17} \t "                                              \
     "set C++ language standard (default: " +                                   \
     std::string(                                                               \
       configt::cppt::default_cpp_standard() ==                                 \
@@ -65,6 +66,12 @@ class symbol_table_baset;
       : configt::cppt::default_cpp_standard() ==                               \
           configt::cppt::cpp_standardt::CPP11                                  \
         ? "cpp11"                                                              \
+      : configt::cppt::default_cpp_standard() ==                               \
+          configt::cppt::cpp_standardt::CPP14                                  \
+        ? "cpp14"                                                              \
+      : configt::cppt::default_cpp_standard() ==                               \
+          configt::cppt::cpp_standardt::CPP17                                  \
+        ? "cpp17"                                                              \
         : "") +                                                                \
     ")\n"                                                                      \
     " {y--unsigned-char} \t make \"char\" unsigned by default\n"               \

@@ -1,0 +1,8 @@
+CORE
+main.cpp
+--cpp14 --unwind 7 --no-unwinding-assertions
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$

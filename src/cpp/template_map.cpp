@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "template_map.h"
 
+#include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/invariant.h>
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
@@ -95,6 +97,14 @@ void template_mapt::apply(typet &type) const
 void template_mapt::apply(exprt &expr) const
 {
   apply(expr.type());
+
+  // Handle sizeof...(Pack) — replace with pack size constant
+  if(expr.id() == ID_sizeof)
+  {
+    irept &type_arg = expr.add(ID_type_arg);
+    if(type_arg.is_not_nil())
+      apply(static_cast<typet &>(type_arg));
+  }
 
   if(expr.id()==ID_symbol)
   {
@@ -239,6 +249,19 @@ void template_mapt::build(
     }
     // Extra arguments for variadic packs are not mapped to individual
     // parameters; they are passed through in the template args.
+  }
+
+  // Record pack sizes for sizeof...(Pack)
+  if(has_pack)
+  {
+    const auto &pack_param = template_parameters.back();
+    irep_idt pack_id = pack_param.id() == ID_type
+                         ? pack_param.type().get(ID_identifier)
+                         : pack_param.get(ID_identifier);
+    std::size_t non_pack = template_parameters.size() - 1;
+    std::size_t pack_sz =
+      instance.size() >= non_pack ? instance.size() - non_pack : 0;
+    pack_size_map[pack_id] = pack_sz;
   }
 }
 
