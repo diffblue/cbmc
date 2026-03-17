@@ -398,10 +398,20 @@ void cpp_typecheckt::typecheck_class_template_member(
   }
 
   // let's find the class template this function template belongs to.
-  const auto id_set = cpp_scopes.current_scope().lookup(
+  auto id_set = cpp_scopes.current_scope().lookup(
     cpp_name.get_sub().front().get(ID_identifier),
     cpp_scopet::SCOPE_ONLY,           // look only in current scope
     cpp_scopet::id_classt::TEMPLATE); // must be template
+
+  // remove any specializations
+  for(auto it = id_set.begin(); it != id_set.end();)
+  {
+    auto next = it;
+    ++next;
+    if(lookup((*it)->identifier).type.find(ID_specialization_of).is_not_nil())
+      id_set.erase(it);
+    it = next;
+  }
 
   if(id_set.empty())
   {
@@ -836,7 +846,11 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
     if(declarator.value().is_not_nil())
       parameter.add(ID_C_default_value)=declarator.value();
 
-    #else
+    // Preserve parameter pack (ellipsis) information
+    if(declarator.get_has_ellipsis())
+      parameter.set(ID_ellipsis, true);
+
+#else
     // is it a type or not?
     cpp_declarator_converter.is_typedef=declaration.get_bool(ID_is_type);
 
@@ -865,7 +879,7 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
       parameter.add(ID_C_default_value)=default_value;
 
     parameter.add_source_location()=declaration.find_location();
-    #endif
+#endif
   }
 
   return template_scope;
@@ -898,11 +912,14 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
 
   if(parameters.size()<args.size())
   {
-    error().source_location=source_location;
-    error() << "too many template arguments (expected "
-            << parameters.size() << ", but got "
-            << args.size() << ")" << eom;
-    throw 0;
+    // Check if the last parameter is a parameter pack (ellipsis)
+    if(parameters.empty() || !parameters.back().get_bool(ID_ellipsis))
+    {
+      error().source_location = source_location;
+      error() << "too many template arguments (expected " << parameters.size()
+              << ", but got " << args.size() << ")" << eom;
+      throw 0;
+    }
   }
 
   // we will modify the template map
@@ -917,6 +934,10 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
 
     if(i>=args.size())
     {
+      // A variadic parameter pack can accept zero arguments.
+      if(parameter.get_bool(ID_ellipsis))
+        break;
+
       // Check for default argument for the parameter.
       // These may depend on previous arguments.
       if(!parameter.has_default_argument())
@@ -1006,13 +1027,39 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
     template_map.set(parameter, arg);
   }
 
+  // Typecheck any extra arguments for variadic parameter packs
+  if(
+    args.size() > parameters.size() && !parameters.empty() &&
+    parameters.back().get_bool(ID_ellipsis))
+  {
+    for(std::size_t i = parameters.size(); i < args.size(); i++)
+    {
+      exprt &arg = args[i];
+      if(arg.id() == ID_type || arg.id() == ID_ambiguous)
+      {
+        if(arg.id() == ID_ambiguous)
+        {
+          typet t = arg.type();
+          arg = exprt(ID_type, t);
+        }
+        typecheck_type(arg.type());
+      }
+      else
+      {
+        typecheck_expr(arg);
+        simplify(arg, *this);
+      }
+    }
+  }
+
   // restore template map
   template_map.swap(old_template_map);
 
-  // now the numbers should match
+  // now the numbers should match (or we have a variadic pack)
   DATA_INVARIANT(
-    args.size() == parameters.size(),
-    "argument and parameter numbers must match");
+    args.size() >= parameters.size() ||
+      (!parameters.empty() && parameters.back().get_bool(ID_ellipsis)),
+    "argument numbers must be at least parameter numbers");
 
   return result;
 }

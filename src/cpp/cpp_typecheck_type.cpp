@@ -269,6 +269,32 @@ void cpp_typecheckt::typecheck_type(typet &type)
   {
     // ignore, for template parameter guessing
   }
+  else if(
+    type.id() == ID_remove_cv || type.id() == ID_remove_reference ||
+    type.id() == ID_remove_cvref)
+  {
+    typet tmp_type = static_cast<const typet &>(type.find(ID_type_arg));
+    typecheck_type(tmp_type);
+
+    if(type.id() == ID_remove_cv || type.id() == ID_remove_cvref)
+    {
+      tmp_type.remove(ID_C_constant);
+      tmp_type.remove(ID_C_volatile);
+    }
+
+    if(type.id() == ID_remove_reference || type.id() == ID_remove_cvref)
+    {
+      if(
+        tmp_type.id() == ID_pointer &&
+        (tmp_type.get_bool(ID_C_reference) ||
+         tmp_type.get_bool(ID_C_rvalue_reference)))
+      {
+        tmp_type = to_pointer_type(tmp_type).base_type();
+      }
+    }
+
+    type = tmp_type;
+  }
   else if(type.id()==ID_template_class_instance)
   {
     // ok (internally generated)

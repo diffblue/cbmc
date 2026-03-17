@@ -804,7 +804,19 @@ bool cpp_typecheckt::standard_conversion_sequence(
     }
     else if(type.id() == ID_bool)
     {
-      new_expr = is_not_zero(curr_expr, *this);
+      if(
+        curr_expr.type().id() == ID_signedbv ||
+        curr_expr.type().id() == ID_unsignedbv ||
+        curr_expr.type().id() == ID_floatbv ||
+        curr_expr.type().id() == ID_fixedbv ||
+        curr_expr.type().id() == ID_pointer ||
+        curr_expr.type().id() == ID_c_bool ||
+        curr_expr.type().id() == ID_c_enum_tag)
+      {
+        new_expr = is_not_zero(curr_expr, *this);
+      }
+      else
+        return false;
 
       rank += 3;
     }

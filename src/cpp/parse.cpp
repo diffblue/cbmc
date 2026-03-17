@@ -852,7 +852,9 @@ bool Parser::isTypeSpecifier()
          t == TOK_CPROVER_BOOL || t == TOK_CLASS || t == TOK_STRUCT ||
          t == TOK_UNION || t == TOK_ENUM || t == TOK_INTERFACE ||
          t == TOK_TYPENAME || t == TOK_TYPEOF || t == TOK_DECLTYPE ||
-         t == TOK_UNDERLYING_TYPE;
+         t == TOK_UNDERLYING_TYPE || t == TOK_GCC_BUILTIN_REMOVE_CV ||
+         t == TOK_GCC_BUILTIN_REMOVE_REFERENCE ||
+         t == TOK_GCC_BUILTIN_REMOVE_CVREF;
 }
 
 /*
@@ -2816,6 +2818,36 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
       return false;
 
     if(lex.get_token(tk)!=')')
+      return false;
+
+    p.add(ID_type_arg).swap(tname);
+
+    return true;
+  }
+  else if(
+    t == TOK_GCC_BUILTIN_REMOVE_CV || t == TOK_GCC_BUILTIN_REMOVE_REFERENCE ||
+    t == TOK_GCC_BUILTIN_REMOVE_CVREF)
+  {
+    cpp_tokent tk;
+    lex.get_token(tk);
+
+    if(t == TOK_GCC_BUILTIN_REMOVE_CV)
+      p = typet(ID_remove_cv);
+    else if(t == TOK_GCC_BUILTIN_REMOVE_REFERENCE)
+      p = typet(ID_remove_reference);
+    else
+      p = typet(ID_remove_cvref);
+
+    set_location(p, tk);
+
+    if(lex.get_token(tk) != '(')
+      return false;
+
+    typet tname;
+    if(!rTypeName(tname))
+      return false;
+
+    if(lex.get_token(tk) != ')')
       return false;
 
     p.add(ID_type_arg).swap(tname);

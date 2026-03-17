@@ -85,7 +85,11 @@ exprt is_not_zero(
   irep_idt id=
     src_type.id()==ID_floatbv?ID_ieee_float_notequal:ID_notequal;
 
-  exprt zero=from_integer(0, src_type);
+  exprt zero;
+  if(src_type.id() == ID_pointer)
+    zero = null_pointer_exprt(to_pointer_type(src_type));
+  else
+    zero = from_integer(0, src_type);
   // Use tag type if applicable:
   zero.type() = src.type();
 
