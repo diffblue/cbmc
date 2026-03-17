@@ -452,11 +452,15 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
 
       if(index >= components.size())
       {
-        error().source_location = value.source_location();
-        error() << "member designator index " << index
-                << " out of bounds (struct has " << components.size()
-                << " components)" << eom;
-        throw 0;
+        // This can happen when brace-initialization of a non-aggregate
+        // class type (e.g., std::string{ptr, len}) is incorrectly
+        // treated as aggregate initialization.  Downgrade to warning
+        // and stop processing this initializer.
+        warning().source_location = value.source_location();
+        warning() << "member designator index " << index
+                  << " out of bounds (struct has " << components.size()
+                  << " components)" << eom;
+        return ++init_it;
       }
       DATA_INVARIANT(
         components[index].type().id() != ID_code,

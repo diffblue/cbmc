@@ -1,0 +1,10 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+std::suspend_never not found: types in inline namespaces not eagerly
+registered in symbol table.

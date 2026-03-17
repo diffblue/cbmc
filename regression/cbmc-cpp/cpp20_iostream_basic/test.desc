@@ -1,0 +1,11 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+C++20 <iostream>: random_access_iterator concept not found during
+reverse_iterator instantiation, size_type not found in string_view
+template scope. Works in C++17 mode.
