@@ -63,8 +63,6 @@ void cpp_convert_typet::read_rec(const typet &type)
     ++char16_t_count;
   else if(type.id()==ID_char32_t)
     ++char32_t_count;
-  else if(type.id()==ID_constexpr)
-    c_qualifiers.is_constant = true;
   else if(type.id()==ID_function_type)
   {
     read_function_type(type);

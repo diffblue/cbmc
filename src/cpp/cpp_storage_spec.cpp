@@ -33,4 +33,6 @@ void cpp_storage_spect::read(const typet &type)
     set_asm();
   else if(type.id() == ID_weak)
     set_weak();
+  else if(type.id() == ID_constexpr)
+    set_constexpr();
 }
