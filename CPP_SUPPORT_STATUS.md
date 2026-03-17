@@ -1,6 +1,6 @@
 # C++ Support Status — cpp11-parser-rework branch
 
-Last updated: 2026-03-09
+Last updated: 2026-03-10 (session 11)
 
 ## C++11 — ~90% complete
 
@@ -24,6 +24,7 @@ Last updated: 2026-03-09
 - Default member initializers (NSDMI) — **FIXED**: applied during both POD default construction and non-POD constructor initialization
 - Range-for over braced initializer lists (`for(int x : {1,2,3})`) — **FIXED**
 - Raw string literals (`R"delim(content)delim"`) — **FIXED**: all encoding prefixes supported
+- Namespace alias in block scope (`namespace X = Y::Z;` inside functions) — **FIXED**
 
 ### STL/library support (~60%)
 - `std::vector`, `std::map`, `std::string`, `std::list`, `std::set`, `std::deque` — basic operations work but many member functions produce "no body" stubs
@@ -31,7 +32,7 @@ Last updated: 2026-03-09
 - `std::thread`, `std::mutex`, `std::chrono` — headers parse
 - `std::unique_ptr` — partial (verification failures)
 - `std::shared_ptr` — crashes
-- `std::function` — crashes
+- `std::function` — **FIXED**: works with `--no-standard-checks`
 - `std::regex` — times out during type-checking
 - `std::initializer_list` — **FIXED**: brace-init-list `{1,2,3}` converts to `std::initializer_list<T>` for function arguments and constructors
 
@@ -77,6 +78,7 @@ Last updated: 2026-03-09
 
 ### Working language features (~80%)
 - `if constexpr` (in templates and non-templates) — **FIXED**: discarded branch not typechecked, enabling type-dependent code in branches
+- `if constexpr` with `auto` return type — **FIXED**: deferred return type deduction when discarded branch has ill-formed code
 - Structured bindings (`auto [x,y] = s`) — including tuple-like protocol
 - Structured bindings with references (`auto& [a,b] = s`) — **FIXED**: modifications through bindings affect original
 - Nested namespaces (`namespace A::B {}`)
@@ -97,13 +99,15 @@ Last updated: 2026-03-09
 - `std::optional` — mostly works
 - `std::any` — works
 - `std::string_view` — parses but verification failures
-- `std::variant` — PARSING ERROR on system header
+- `std::variant` — parses but type-checking errors (namespace alias and using-pack fixes unblocked parsing)
 - `std::filesystem` — type-checking errors on system header
 - Good coverage for: vector, deque, algorithm, string, memory, tuple, iterator, numeric, valarray, functional
 
 ### Known gaps — language
-- **Fold expressions** (`(args + ...)` and `(... && args)`) — **FIXED**: right and left folds properly expanded during template instantiation; comma operator and compound expressions supported
+- **Fold expressions** (`(args + ...)` and `(... && args)`) — **FIXED**: right, left, and binary folds for all binary operators (+, -, *, /, %, |, ^, &, &&, ||, comma)
 - **Deduction guides** — **FIXED**: silently skipped, CTAD handles deduction
+- **Using-declaration pack expansion** (`using Base::member...;`) — **FIXED**: parsed and skipped
+- **C-style variadic lambda parameters** (`[](int x, ...) {}`) — **FIXED**
 - **CTAD with aggregates and deduction guides** — **FIXED**: brace-init CTAD now works
 - **Variadic template bases** (`struct D : Bases...`) — **FIXED**: base classes expanded during class template instantiation
 
@@ -120,8 +124,8 @@ Last updated: 2026-03-09
 - `<=>` spaceship operator — **FIXED**: both user-defined and built-in on primitives
 - Three-way comparison with `std::strong_ordering` — **FIXED**: self-referential static member crash resolved
 - `concept` declarations (`template<T> concept Name = expr`)
-- Concept-constrained template parameters (`template<Integral T>`)
-- `requires` clauses — **FIXED**: both leading and trailing, with concept names (`requires Addable<T>`)
+- Concept-constrained template parameters (`template<Integral T>`) — **FIXED**: also supports `Concept<Args> T` and qualified `ns::Concept T`
+- `requires` clauses — **FIXED**: leading and trailing (including on constructors), parenthesized and unparenthesized, compound expressions with `&&`/`||`, `requires requires(...)` pattern, built-in type traits
 - `requires` expressions — **FIXED**: `requires(T a, T b) { a + b; }` parsed as `true`
 - Constrained `auto` — **FIXED**: `Concept auto x = 42` works
 - `co_return`/`co_await`/`co_yield` (parsed as stubs — no coroutine semantics)
@@ -136,14 +140,21 @@ Last updated: 2026-03-09
 - `constexpr` dynamic allocation (`new`/`delete` in constexpr) — works
 - Floating-point non-type template parameters — **FIXED**: `template<double D>` works
 
-### STL/library support (~5%)
-- Most C++20 library features not modeled
-- `<ranges>`, `<span>`, `<format>`, `<coroutine>` — system headers fail to parse
+### STL/library support (~20%)
+- `<concepts>` — **FIXED**: parses and type-checks successfully
+- `<compare>` — parses but conversion error on `operator<=>` return type
+- `<span>` — parses but type-checking errors (iterator concepts)
+- `<ranges>` — parse errors (ternary in template default args)
+- `<format>`, `<coroutine>` — not tested
 
 ### Known gaps — language
 - **Abbreviated function templates** (`auto f(auto x)`) — **FIXED**: auto params synthesize template type params
 - **Template lambda instantiation** — **FIXED**: template lambda params treated like generic lambda auto params
 - **Modules** — no `import`/`export` parsing at all
+- **`explicit(bool)`** — **FIXED**: depth-counted to handle template-ids in expression
+- **`noexcept(expr)` with template-ids** — **FIXED**: depth-counted to handle `<>` in expression
+- **Friend constexpr function access** — **FIXED**: disable access control during friend body type-checking
+- **Defaulted friend operator==** — **FIXED**: `= default` replaced with empty block
 - **Coroutine semantics** — keywords parsed as no-ops; no promise_type resolution
 - **Three-way comparison categories** (`std::strong_ordering` etc.) — **FIXED**: works with user-defined types
 - **`constexpr` containers** — not modeled
@@ -231,6 +242,7 @@ Last updated: 2026-03-09
 | `cpp17_fold_expr` | C++17 | **FIXED**: fold expressions expanded during template instantiation |
 | `cpp17_fold_comma` | C++17 | **FIXED**: comma operator in fold expressions |
 | `cpp17_variadic_bases` | C++17 | **FIXED**: variadic base classes expanded during class template instantiation |
+| `cpp20_lambda_unevaluated` | C++20 | Lambda in unevaluated context (decltype) |
 | `cpp20_nttp_string` | C++20 | Class type as non-type template parameter |
 | `cpp20_lambda_pack_capture` | C++20 | **FIXED**: Lambda init-capture with pack expansion |
 | `cpp26_pack_indexing` | C++26 | **FIXED**: Pack indexing instantiation |
@@ -251,6 +263,6 @@ Last updated: 2026-03-09
 ## Test locations
 
 - `regression/cbmc-cpp/` — 340+ tests (main C++ regression suite)
-- `regression/cpp/` — 243 tests (parser/type-checker focused)
+- `regression/cpp/` — 243 tests (parser/type-checker focused, all CORE pass with goto-cc)
 - `regression/systemc/` — 27 tests
 - Tests prefixed `cpp11_`, `cpp14_`, `cpp17_`, `cpp20_`, `cpp23_`, `cpp26_`

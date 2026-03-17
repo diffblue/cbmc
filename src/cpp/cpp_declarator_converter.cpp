@@ -706,7 +706,13 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
   {
     if(is_code)
     {
-      if(new_symbol->is_macro)
+      if(is_friend)
+      {
+        // Friend function bodies are deferred because the enclosing
+        // class may not be fully type-checked yet.
+        cpp_typecheck.add_method_body(new_symbol);
+      }
+      else if(new_symbol->is_macro)
         cpp_typecheck.convert_function(*new_symbol);
       else if(declarator.type().id() != ID_template)
       {

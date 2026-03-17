@@ -1814,6 +1814,29 @@ const symbolt &cpp_typecheckt::instantiate_template(
             return;
           }
 
+          // Expand binary fold expressions: (init op ... op pack)
+          if(
+            node.id() == irep_idt("cpp_binary_fold") &&
+            node.get_sub().size() >= 2 && contains_pack_name(node.get_sub()[1]))
+          {
+            const irep_idt fold_op = node.get(irep_idt("fold_op"));
+            const irept &init_expr = node.get_sub()[0];
+            const irept &pack_expr = node.get_sub()[1];
+
+            // Binary left fold: ((init op pack[0]) op pack[1]) op ...
+            irept result = init_expr;
+            for(std::size_t i = 0; i < expanded_names.size(); ++i)
+            {
+              irept bin(fold_op);
+              bin.get_sub().push_back(result);
+              bin.get_sub().push_back(
+                substitute_pack(pack_expr, expanded_names[i]));
+              result = bin;
+            }
+            node = result;
+            return;
+          }
+
           // Look for function call arguments containing pack_var...
           if(
             node.id() == ID_side_effect &&
@@ -1973,6 +1996,27 @@ const symbolt &cpp_typecheckt::instantiate_template(
                     }
                     n = r;
                   }
+                  return;
+                }
+                // Binary fold: (init op ... op pack)
+                if(
+                  n.id() == irep_idt("cpp_binary_fold") &&
+                  n.get_sub().size() >= 2 &&
+                  contains_cap(n.get_sub()[1], contains_cap))
+                {
+                  const irep_idt fold_op = n.get(irep_idt("fold_op"));
+                  const irept &init_e = n.get_sub()[0];
+                  const irept &pe = n.get_sub()[1];
+                  irept r = init_e;
+                  for(std::size_t i = 0; i < cap_expanded_names.size(); ++i)
+                  {
+                    irept bin(fold_op);
+                    bin.get_sub().push_back(r);
+                    bin.get_sub().push_back(
+                      sub_cap(pe, cap_expanded_names[i], sub_cap));
+                    r = bin;
+                  }
+                  n = r;
                   return;
                 }
                 for(auto &s : n.get_sub())
