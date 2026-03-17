@@ -415,9 +415,60 @@ void cpp_typecheckt::elaborate_class_template(
 
           if(partial_specialization_args_tc == full_args_tc)
           {
-            best_match = &s;
-            best_spec_args = guessed_args;
-            break;
+            // Check if this specialization is more specialized than
+            // the current best match. A specialization is more
+            // specialized if its pattern has more constrained
+            // arguments (e.g., pack<Rp...> vs plain Rp).
+            if(best_match == &primary_template)
+            {
+              best_match = &s;
+              best_spec_args = guessed_args;
+            }
+            else
+            {
+              const cpp_declarationt &best_decl =
+                to_cpp_declaration(best_match->type);
+              const cpp_template_args_non_tct &best_partial_args =
+                best_decl.partial_specialization_args();
+
+              // Count non-trivial arguments. A cpp_name with template
+              // args (e.g., pack<Rp...>) counts as constrained.
+              auto count_constrained = [](const cpp_template_args_non_tct &args)
+              {
+                std::size_t count = 0;
+                for(const auto &arg : args.arguments())
+                {
+                  const irept *a = &arg;
+                  if(a->id() == ID_type)
+                    a = &arg.type();
+                  if(a->id() == ID_ambiguous)
+                    a = &a->find(ID_type);
+
+                  if(a->id() != ID_cpp_name)
+                  {
+                    count++;
+                  }
+                  else
+                  {
+                    for(const auto &sub : a->get_sub())
+                      if(sub.id() == ID_template_args)
+                      {
+                        count++;
+                        break;
+                      }
+                  }
+                }
+                return count;
+              };
+
+              if(
+                count_constrained(partial_specialization_args) >
+                count_constrained(best_partial_args))
+              {
+                best_match = &s;
+                best_spec_args = guessed_args;
+              }
+            }
           }
         }
       }
@@ -468,9 +519,13 @@ const symbolt &cpp_typecheckt::instantiate_template(
   bool specialization_given=specialization.is_not_nil();
 
   // we should never get 'unassigned' here
-  DATA_INVARIANT(
-    !specialization_template_args.has_unassigned(),
-    "should never get 'unassigned' here");
+  if(specialization_template_args.has_unassigned())
+  {
+    error().source_location = source_location;
+    error() << "internal error: template parameter without instance:\n"
+            << template_symbol.name << eom;
+    throw 0;
+  }
   DATA_INVARIANT(
     !full_template_args.has_unassigned(), "should never get 'unassigned' here");
 

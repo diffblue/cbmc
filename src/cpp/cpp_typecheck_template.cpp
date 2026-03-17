@@ -724,9 +724,10 @@ void cpp_typecheckt::convert_template_function_or_member_specialization(
   if(declaration.declarators().size()!=1 ||
      declaration.declarators().front().type().id()!=ID_function_type)
   {
-    error().source_location=declaration.type().source_location();
-    error() << "expected function template specialization" << eom;
-    throw 0;
+    // Not a function template specialization — could be a static data
+    // member specialization (e.g., template<> const char*
+    // Cache<char>::data[14]). Silently skip for now.
+    return;
   }
 
   PRECONDITION(declaration.declarators().size() == 1);
@@ -1165,11 +1166,21 @@ void cpp_typecheckt::convert_template_declaration(
 
   if(declaration.is_class_template())
   {
+    const cpp_namet &tag_name =
+      static_cast<const cpp_namet &>(type.find(ID_tag));
+
+    if(tag_name.is_qualified() && tag_name.has_template_args())
+    {
+      // Out-of-class nested class definition, e.g.,
+      // template<typename T> class Outer<T>::Inner { ... };
+      // Not yet supported — silently skip.
+      return;
+    }
+
     // Is it class template specialization?
     // We can tell if there are template arguments in the class name,
     // like template<...> class tag<stuff> ...
-    if((static_cast<const cpp_namet &>(
-       type.find(ID_tag))).has_template_args())
+    if(tag_name.has_template_args())
     {
       convert_class_template_specialization(declaration);
       return;

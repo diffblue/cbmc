@@ -96,6 +96,13 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     throw 0;
   }
 
+  // C++11 deleted functions: = delete
+  if(to_code(symbol.value).get_statement() == ID_cpp_delete)
+  {
+    symbol.value.make_nil();
+    return;
+  }
+
   // enter appropriate scope
   cpp_save_scopet saved_scope(cpp_scopes);
   cpp_scopet &function_scope=cpp_scopes.set_scope(symbol.name);
