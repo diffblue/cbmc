@@ -242,8 +242,13 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   cpp_scopet *template_scope=
     static_cast<cpp_scopet *>(cpp_scopes.id_map[template_symbol.name]);
 
-  INVARIANT_STRUCTURED(
-    template_scope!=nullptr, nullptr_exceptiont, "template_scope is null");
+  if(template_scope == nullptr)
+  {
+    error().source_location = source_location;
+    error() << "template scope '" << template_symbol.base_name << "' not found"
+            << eom;
+    throw 0;
+  }
 
   irep_idt identifier = id2string(template_scope->get_parent().prefix) +
                         "tag-" + id2string(template_symbol.base_name) +
@@ -800,8 +805,8 @@ const symbolt &cpp_typecheckt::instantiate_template(
   if(template_scope==nullptr)
   {
     error().source_location=source_location;
-    error() << "identifier: " << template_symbol.name << '\n'
-            << "template instantiation error: scope not found" << eom;
+    error() << "template scope '" << template_symbol.base_name << "' not found"
+            << eom;
     throw 0;
   }
 

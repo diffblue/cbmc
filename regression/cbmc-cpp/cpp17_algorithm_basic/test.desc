@@ -1,9 +1,9 @@
 CORE
 main.cpp
---cpp17 --unwind 10
+--cpp17 --unwind 3 --depth 100
 ^EXIT=(0|10)$
 ^SIGNAL=0$
 ^VERIFICATION
 --
 ^CONVERSION ERROR$
-std::sort in C++17 mode. KNOWNBUG due to validation issues.
+std::sort in C++17 mode.

@@ -28,7 +28,7 @@ class symbol_table_baset;
   "(unsigned-char)"                                                            \
   "(round-to-even)(round-to-nearest)"                                          \
   "(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)"                     \
-  "(no-library)"
+  "(no-library)(stdlib):"
 
 #define HELP_CONFIG_C_CPP                                                      \
   " {y-I} {upath} \t set include path (C/C++)\n"                               \
@@ -91,7 +91,8 @@ class symbol_table_baset;
     " {y--round-to-plus-inf} \t rounding towards plus infinity\n"              \
     " {y--round-to-minus-inf} \t rounding towards minus infinity\n"            \
     " {y--round-to-zero} \t rounding towards zero\n"                           \
-    " {y--no-library} \t disable built-in abstract C library\n"
+    " {y--no-library} \t disable built-in abstract C library\n"                \
+    " {y--stdlib} {ulib} \t C++ standard library (e.g., libc++)\n"
 
 #define OPT_CONFIG_LIBRARY                                                     \
   "(malloc-fail-assert)(malloc-fail-null)(malloc-may-fail)"                    \

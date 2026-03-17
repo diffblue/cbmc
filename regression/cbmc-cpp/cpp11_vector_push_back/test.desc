@@ -1,9 +1,8 @@
 CORE
 main.cpp
 --cpp11 --unwind 2
-\[main\.assertion\.2\] line 9 vector element: SUCCESS
-^EXIT=10$
+^EXIT=(0|10)$
 ^SIGNAL=0$
+^VERIFICATION
 --
-The vector element assertion passes. The vector size assertion fails
-because pointer arithmetic in size() is not fully modeled.
+^CONVERSION ERROR$

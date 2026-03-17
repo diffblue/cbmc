@@ -1,10 +1,7 @@
 KNOWNBUG
 main.cpp
---cpp11 --object-bits 12
+--cpp11 --object-bits 12 --unwind 5 --depth 200
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-std::regex operations have no body because the _Scanner class
-template fails during body processing in the system header.
-The regex_match assertion fails (returns nondeterministic value).

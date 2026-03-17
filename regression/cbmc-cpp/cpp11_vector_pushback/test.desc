@@ -6,6 +6,3 @@ main.cpp
 ^VERIFICATION
 --
 ^CONVERSION ERROR$
-std::vector<int>::push_back fails during type-checking because
-_M_insert_rval's trailing return type '-> iterator' cannot be
-resolved in the out-of-line member definition context.

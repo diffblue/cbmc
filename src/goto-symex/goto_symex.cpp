@@ -64,9 +64,14 @@ void goto_symext::symex_assign(
   // have the same width but different type IDs.
   if(lhs.type() != rhs.type())
   {
+    // C++ type-checker uses c_bool (C's _Bool) internally for boolean
+    // values, but C++ bool is a distinct type. Reconcile mismatches
+    // involving c_bool/bool and any other type by inserting a typecast.
+    // This is necessary because the C++ frontend doesn't consistently
+    // distinguish c_bool from bool throughout the type-checking pipeline.
     if(
-      (lhs.type().id() == ID_c_bool && rhs.type().id() == ID_bool) ||
-      (lhs.type().id() == ID_bool && rhs.type().id() == ID_c_bool))
+      lhs.type().id() == ID_c_bool || lhs.type().id() == ID_bool ||
+      rhs.type().id() == ID_c_bool || rhs.type().id() == ID_bool)
     {
       rhs = typecast_exprt(rhs, lhs.type());
     }

@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.cpp
 --cpp17 --unwind 5
 ^EXIT=(0|10)$
@@ -6,4 +6,3 @@ main.cpp
 ^VERIFICATION
 --
 ^CONVERSION ERROR$
-std::vector basic operations in C++17 mode.

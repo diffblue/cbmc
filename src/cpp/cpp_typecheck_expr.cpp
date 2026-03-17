@@ -65,6 +65,12 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   }
   else if(expr.id()=="explicit-typecast")
     typecheck_expr_explicit_typecast(expr);
+  else if(expr.id() == ID_typecast && expr.type().id() == ID_cpp_name)
+  {
+    // __builtin_bit_cast(Type, expr) produces a typecast with cpp_name type
+    typecheck_type(expr.type());
+    c_typecheck_baset::typecheck_expr_main(expr);
+  }
   else if(expr.id()=="explicit-constructor-call")
     typecheck_expr_explicit_constructor_call(expr);
   else if(expr.id()==ID_code)
