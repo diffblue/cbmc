@@ -125,13 +125,17 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
 
   // For friend functions defined inside a class, add the class scope
   // as a secondary scope so that class-scope names are visible.
+  // Also disable access control since friend functions can access
+  // private/protected members of the befriending class.
   const irep_idt &friend_class = symbol.type.get(ID_C_class);
+  bool saved_access_control = disable_access_control;
   if(!friend_class.empty())
   {
     auto it = cpp_scopes.id_map.find(friend_class);
     if(it != cpp_scopes.id_map.end())
       function_scope.add_secondary_scope(
         static_cast<cpp_scopet &>(*it->second));
+    disable_access_control = true;
   }
 
   // genuine function definition -- do the parameter declarations
@@ -343,16 +347,29 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     to_code(symbol.value).get_statement() == ID_block &&
     !to_code_block(to_code(symbol.value)).has_operands())
   {
-    const irep_idt &class_id = symbol.type.get(ID_C_member_name);
+    irep_idt class_id = symbol.type.get(ID_C_member_name);
+    // For friend operator==, use the friend class instead
+    if(class_id.empty())
+      class_id = symbol.type.get(ID_C_class);
     if(!class_id.empty())
     {
       const symbolt &class_sym = lookup(class_id);
       const auto &fn_params = to_code_type(symbol.type).parameters();
-      irep_idt arg_name;
-      if(fn_params.size() >= 2)
-        arg_name = fn_params[1].get_base_name();
-      if(arg_name.empty())
-        arg_name = "#anon_arg0";
+      bool is_friend_op = symbol.type.get(ID_C_member_name).empty();
+      irep_idt lhs_name, rhs_name;
+      if(is_friend_op && fn_params.size() >= 2)
+      {
+        lhs_name = fn_params[0].get_base_name();
+        rhs_name = fn_params[1].get_base_name();
+      }
+      else if(fn_params.size() >= 2)
+      {
+        rhs_name = fn_params[1].get_base_name();
+      }
+      if(is_friend_op && lhs_name.empty())
+        lhs_name = "#anon_arg0";
+      if(rhs_name.empty())
+        rhs_name = "#anon_arg1";
 
       source_locationt loc = symbol.location;
 
@@ -368,13 +385,24 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
           continue;
 
         const irep_idt &mem = c.get_base_name();
-        cpp_namet lhs(mem, loc);
-        exprt rhs(ID_member);
-        rhs.add(ID_component_cpp_name, cpp_namet(mem, loc));
-        rhs.copy_to_operands(cpp_namet(arg_name, loc).as_expr());
-        rhs.add_source_location() = loc;
+        exprt lhs_expr;
+        if(is_friend_op)
+        {
+          lhs_expr = exprt(ID_member);
+          lhs_expr.add(ID_component_cpp_name, cpp_namet(mem, loc));
+          lhs_expr.copy_to_operands(cpp_namet(lhs_name, loc).as_expr());
+          lhs_expr.add_source_location() = loc;
+        }
+        else
+        {
+          lhs_expr = cpp_namet(mem, loc).as_expr();
+        }
+        exprt rhs_expr(ID_member);
+        rhs_expr.add(ID_component_cpp_name, cpp_namet(mem, loc));
+        rhs_expr.copy_to_operands(cpp_namet(rhs_name, loc).as_expr());
+        rhs_expr.add_source_location() = loc;
 
-        equal_exprt eq(lhs.as_expr(), rhs);
+        equal_exprt eq(std::move(lhs_expr), std::move(rhs_expr));
         eq.add_source_location() = loc;
 
         if(result.is_true())
@@ -506,6 +534,7 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   break_is_allowed = old_break_is_allowed;
   continue_is_allowed = old_continue_is_allowed;
   case_is_allowed = old_case_is_allowed;
+  disable_access_control = saved_access_control;
 
   deferred_typechecking.erase(symbol.name);
   functions_being_typechecked.erase(symbol.name);

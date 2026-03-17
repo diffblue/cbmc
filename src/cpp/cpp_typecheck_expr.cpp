@@ -976,6 +976,38 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
     }
   }
 
+  // C++20: synthesize operator!= from operator==
+  if(
+    expr.id() == ID_notequal && expr.operands().size() == 2 &&
+    (to_binary_expr(expr).op0().type().id() == ID_struct_tag ||
+     to_binary_expr(expr).op0().type().id() == ID_struct))
+  {
+    const cpp_namet eq_name("operator==", expr.source_location());
+    cpp_typecheck_fargst fargs;
+    fargs.operands = expr.operands();
+    fargs.has_object = false;
+    fargs.in_use = true;
+
+    exprt eq_result =
+      resolve(eq_name, cpp_typecheck_resolvet::wantt::VAR, fargs, false);
+
+    if(eq_result.is_not_nil())
+    {
+      // Rewrite a != b  as  !(a == b)
+      side_effect_expr_function_callt eq_call(
+        eq_name.as_expr(), {}, uninitialized_typet{}, expr.source_location());
+      for(const auto &op : as_const(expr).operands())
+        eq_call.arguments().push_back(op);
+      typecheck_side_effect_function_call(eq_call);
+
+      not_exprt neg(
+        typecast_exprt::conditional_cast(std::move(eq_call), bool_typet()));
+      neg.add_source_location() = expr.source_location();
+      expr.swap(neg);
+      return true;
+    }
+  }
+
   return false;
 }
 
@@ -2344,7 +2376,9 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     const auto *symbol_ptr = symbol_table.lookup(sym_expr->get_identifier());
     if(
       symbol_ptr != nullptr && symbol_ptr->is_macro &&
-      !functions_being_typechecked.count(sym_expr->get_identifier()))
+      !functions_being_typechecked.count(sym_expr->get_identifier()) &&
+      !deferred_typechecking.count(sym_expr->get_identifier()) &&
+      symbol_ptr->value.type().id() == ID_code)
     {
       const auto &code_type = to_code_type(symbol_ptr->type);
       PRECONDITION(expr.arguments().size() == code_type.parameters().size());

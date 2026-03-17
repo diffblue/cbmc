@@ -572,6 +572,9 @@ bool c_preprocess_gcc_clang(
 #endif
         argv.push_back("-std=gnu++20");
       argv.push_back("-U__cpp_deduction_guides");
+      // CBMC treats char8_t as unsigned char, causing duplicate template
+      // specializations; undefine the feature macro to avoid this.
+      argv.push_back("-U__cpp_char8_t");
       argv.push_back("-D_PSTL_GLUE_MEMORY_DEFS_H=1");
       argv.push_back("-D_PSTL_GLUE_ALGORITHM_DEFS_H=1");
       argv.push_back("-D_PSTL_GLUE_NUMERIC_DEFS_H=1");
@@ -585,6 +588,7 @@ bool c_preprocess_gcc_clang(
 #endif
         argv.push_back("-std=gnu++23");
       argv.push_back("-U__cpp_deduction_guides");
+      argv.push_back("-U__cpp_char8_t");
       argv.push_back("-D_PSTL_GLUE_MEMORY_DEFS_H=1");
       argv.push_back("-D_PSTL_GLUE_ALGORITHM_DEFS_H=1");
       argv.push_back("-D_PSTL_GLUE_NUMERIC_DEFS_H=1");
@@ -600,6 +604,7 @@ bool c_preprocess_gcc_clang(
 #endif
         argv.push_back("-std=gnu++23");
       argv.push_back("-U__cpp_deduction_guides");
+      argv.push_back("-U__cpp_char8_t");
       argv.push_back("-D_PSTL_GLUE_MEMORY_DEFS_H=1");
       argv.push_back("-D_PSTL_GLUE_ALGORITHM_DEFS_H=1");
       argv.push_back("-D_PSTL_GLUE_NUMERIC_DEFS_H=1");

@@ -1057,6 +1057,10 @@ bool Parser::rUsing(cpp_usingt &cpp_using)
   if(!rName(cpp_using.name()))
     return false;
 
+  // C++17: pack expansion in using-declarations
+  if(lex.LookAhead(0) == TOK_ELLIPSIS)
+    lex.get_token(tk);
+
   // We will eventually need to record this attribute as Clang's
   // __using_if_exists__ affects type checking.
   typet discard;
@@ -1248,24 +1252,105 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
     {
       cpp_tokent req_tk;
       lex.get_token(req_tk);
-      if(lex.LookAhead(0) == '(')
+      // requires-clause: skip all constraint expressions
+      for(;;)
       {
-        lex.get_token(req_tk);
-        int depth = 1;
-        while(depth > 0)
+        if(lex.LookAhead(0) == '!')
+          lex.get_token(req_tk);
+        if(lex.LookAhead(0) == '(')
         {
-          int t = lex.get_token(req_tk);
-          if(t == '(')
-            ++depth;
-          else if(t == ')')
-            --depth;
-          else if(t == 0)
-            return false;
+          // Parenthesized sub-expression: depth-count
+          lex.get_token(req_tk);
+          int depth = 1;
+          while(depth > 0)
+          {
+            int t = lex.get_token(req_tk);
+            if(t == '(')
+              ++depth;
+            else if(t == ')')
+              --depth;
+            else if(t == 0)
+              return false;
+          }
         }
+        else if(lex.LookAhead(0) == TOK_REQUIRES)
+        {
+          // requires-expression: requires(...) { ... }
+          lex.get_token(req_tk);
+          if(lex.LookAhead(0) == '(')
+          {
+            lex.get_token(req_tk);
+            int depth = 1;
+            while(depth > 0)
+            {
+              int t = lex.get_token(req_tk);
+              if(t == '(')
+                ++depth;
+              else if(t == ')')
+                --depth;
+              else if(t == 0)
+                return false;
+            }
+          }
+          if(lex.LookAhead(0) == '{')
+          {
+            lex.get_token(req_tk);
+            int depth = 1;
+            while(depth > 0)
+            {
+              int t = lex.get_token(req_tk);
+              if(t == '{')
+                ++depth;
+              else if(t == '}')
+                --depth;
+              else if(t == 0)
+                return false;
+            }
+          }
+        }
+        else
+        {
+          if(is_identifier(lex.LookAhead(0)))
+          {
+            irept discard;
+            if(!rName(discard))
+              return false;
+          }
+          else
+          {
+            // Built-in type trait or other keyword (e.g.,
+            // __is_trivially_copyable(T)): consume token and args
+            lex.get_token(req_tk);
+            if(lex.LookAhead(0) == '(')
+            {
+              lex.get_token(req_tk);
+              int depth = 1;
+              while(depth > 0)
+              {
+                int t = lex.get_token(req_tk);
+                if(t == '(')
+                  ++depth;
+                else if(t == ')')
+                  --depth;
+                else if(t == 0)
+                  return false;
+              }
+            }
+          }
+        }
+        if(lex.LookAhead(0) == TOK_ANDAND || lex.LookAhead(0) == TOK_OROR)
+          lex.get_token(req_tk);
+        else
+          break;
       }
     }
 
-    if(!rDeclaration(body))
+    if(lex.LookAhead(0) == TOK_USING)
+    {
+      if(!rTypedefUsing(body))
+        return false;
+    }
+    else if(!rDeclaration(body))
       return false;
   }
 
@@ -1447,7 +1532,8 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
   // (to avoid misinterpreting template<typename Ty, Ty V>).
   if(
     cpp20 && is_identifier(t0) &&
-    (is_identifier(lex.LookAhead(1)) || lex.LookAhead(1) == TOK_ELLIPSIS))
+    (is_identifier(lex.LookAhead(1)) || lex.LookAhead(1) == TOK_ELLIPSIS ||
+     lex.LookAhead(1) == '<' || lex.LookAhead(1) == TOK_SCOPE))
   {
     cpp_token_buffert::post pos = lex.Save();
 
@@ -1465,63 +1551,119 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
 
     if(!is_known_type)
     {
-      declaration = cpp_declarationt();
-      set_location(declaration, concept_tk);
-      declaration.set(ID_is_type, true);
-      declaration.type() = typet("cpp-template-type");
-
-      declaration.declarators().resize(1);
-      cpp_declaratort &declarator = declaration.declarators().front();
-      declarator = cpp_declaratort();
-      declarator.name().make_nil();
-      declarator.type().make_nil();
-      set_location(declarator, concept_tk);
-
-      if(lex.LookAhead(0) == TOK_ELLIPSIS)
+      // Skip qualified name: ns::Concept or ns::Concept<Args...>
+      bool qual_ok = true;
+      while(lex.LookAhead(0) == TOK_SCOPE)
       {
-        cpp_tokent ellipsis_tk;
-        lex.get_token(ellipsis_tk);
-        declarator.set_has_ellipsis();
-      }
-
-      if(is_identifier(lex.LookAhead(0)))
-      {
-        cpp_tokent name_tk;
-        lex.get_token(name_tk);
-        declarator.name() = cpp_namet(name_tk.data.get(ID_C_base_name));
-        set_location(declarator.name(), name_tk);
-        add_id(declarator.name(), new_scopet::kindt::TYPE_TEMPLATE_PARAMETER);
-      }
-
-      if(
-        lex.LookAhead(0) == '=' || lex.LookAhead(0) == ',' ||
-        lex.LookAhead(0) == '>')
-      {
-        if(lex.LookAhead(0) == '=')
-        {
-          cpp_tokent eq_tk;
-          lex.get_token(eq_tk);
-          typet default_type;
-          if(!rTypeName(default_type))
-          {
-            lex.Restore(pos);
-            t0 = lex.LookAhead(0);
-          }
-          else
-          {
-            declarator.value() = exprt(ID_type);
-            declarator.value().type().swap(default_type);
-            return true;
-          }
-        }
+        cpp_tokent tmp_tk;
+        lex.get_token(tmp_tk); // consume ::
+        if(is_identifier(lex.LookAhead(0)))
+          lex.get_token(tmp_tk); // consume next identifier
         else
-          return true;
+        {
+          qual_ok = false;
+          break;
+        }
       }
-      else
+
+      if(!qual_ok)
       {
         lex.Restore(pos);
         t0 = lex.LookAhead(0);
       }
+      else
+      {
+        // Skip template arguments if present: Concept<Args...>
+        bool skip_ok = true;
+        if(lex.LookAhead(0) == '<')
+        {
+          cpp_tokent tmp_tk;
+          lex.get_token(tmp_tk); // consume <
+          int depth = 1;
+          while(depth > 0)
+          {
+            int t = lex.get_token(tmp_tk);
+            if(t == '<')
+              ++depth;
+            else if(t == '>')
+              --depth;
+            else if(t == TOK_SHIFTRIGHT && depth >= 2)
+              depth -= 2;
+            else if(t == 0)
+            {
+              skip_ok = false;
+              break;
+            }
+          }
+          if(!skip_ok)
+          {
+            lex.Restore(pos);
+            t0 = lex.LookAhead(0);
+          }
+        }
+
+        if(skip_ok)
+        {
+          declaration = cpp_declarationt();
+          set_location(declaration, concept_tk);
+          declaration.set(ID_is_type, true);
+          declaration.type() = typet("cpp-template-type");
+
+          declaration.declarators().resize(1);
+          cpp_declaratort &declarator = declaration.declarators().front();
+          declarator = cpp_declaratort();
+          declarator.name().make_nil();
+          declarator.type().make_nil();
+          set_location(declarator, concept_tk);
+
+          if(lex.LookAhead(0) == TOK_ELLIPSIS)
+          {
+            cpp_tokent ellipsis_tk;
+            lex.get_token(ellipsis_tk);
+            declarator.set_has_ellipsis();
+          }
+
+          if(is_identifier(lex.LookAhead(0)))
+          {
+            cpp_tokent name_tk;
+            lex.get_token(name_tk);
+            declarator.name() = cpp_namet(name_tk.data.get(ID_C_base_name));
+            set_location(declarator.name(), name_tk);
+            add_id(
+              declarator.name(), new_scopet::kindt::TYPE_TEMPLATE_PARAMETER);
+          }
+
+          if(
+            lex.LookAhead(0) == '=' || lex.LookAhead(0) == ',' ||
+            lex.LookAhead(0) == '>')
+          {
+            if(lex.LookAhead(0) == '=')
+            {
+              cpp_tokent eq_tk;
+              lex.get_token(eq_tk);
+              typet default_type;
+              if(!rTypeName(default_type))
+              {
+                lex.Restore(pos);
+                t0 = lex.LookAhead(0);
+              }
+              else
+              {
+                declarator.value() = exprt(ID_type);
+                declarator.value().type().swap(default_type);
+                return true;
+              }
+            }
+            else
+              return true;
+          }
+          else
+          {
+            lex.Restore(pos);
+            t0 = lex.LookAhead(0);
+          }
+        }
+      } // end else(qual_ok)
     }
     else
     {
@@ -2008,6 +2150,36 @@ bool Parser::rIntegralDeclaration(
               << lex.LookAhead(0) << '\n';
 #endif
 
+    // Handle late storage/member specifiers after class body:
+    // struct S { ... } inline constexpr s{};
+    {
+      int la = lex.LookAhead(0);
+      while(la == TOK_INLINE || la == TOK_CONSTEXPR || la == TOK_CONSTEVAL ||
+            la == TOK_STATIC || la == TOK_EXTERN)
+      {
+        cpp_tokent spec_tk;
+        lex.get_token(spec_tk);
+        switch(la)
+        {
+        case TOK_INLINE:
+          declaration.member_spec().set_inline(true);
+          break;
+        case TOK_CONSTEXPR:
+          declaration.storage_spec().set_constexpr();
+          break;
+        case TOK_STATIC:
+          declaration.storage_spec().set_static();
+          break;
+        case TOK_EXTERN:
+          declaration.storage_spec().set_extern();
+          break;
+        default:
+          break;
+        }
+        la = lex.LookAhead(0);
+      }
+    }
+
     if(!rDeclarators(declaration.declarators(), true))
       return false;
 
@@ -2413,11 +2585,17 @@ bool Parser::optMemberSpec(cpp_member_spect &member_spec)
       {
         cpp_tokent op;
         lex.get_token(op);
-        exprt discarded;
-        if(!rExpression(discarded, false))
-          return false;
-        if(lex.get_token(op) != ')')
-          return false;
+        int depth = 1;
+        while(depth > 0)
+        {
+          int t = lex.get_token(op);
+          if(t == '(')
+            ++depth;
+          else if(t == ')')
+            --depth;
+          else if(t == 0)
+            return false;
+        }
       }
       break;
     default: UNREACHABLE;
@@ -3344,6 +3522,99 @@ bool Parser::rConstructorDecl(
       break;
   }
 
+  // C++20 trailing requires clause: skip
+  if(lex.LookAhead(0) == TOK_REQUIRES)
+  {
+    cpp_tokent req_tk;
+    lex.get_token(req_tk);
+    for(;;)
+    {
+      if(lex.LookAhead(0) == '!')
+        lex.get_token(req_tk);
+      if(lex.LookAhead(0) == '(')
+      {
+        lex.get_token(req_tk);
+        int depth = 1;
+        while(depth > 0)
+        {
+          int t = lex.get_token(req_tk);
+          if(t == '(')
+            ++depth;
+          else if(t == ')')
+            --depth;
+          else if(t == 0)
+            return false;
+        }
+      }
+      else if(lex.LookAhead(0) == TOK_REQUIRES)
+      {
+        lex.get_token(req_tk);
+        if(lex.LookAhead(0) == '(')
+        {
+          lex.get_token(req_tk);
+          int depth = 1;
+          while(depth > 0)
+          {
+            int t = lex.get_token(req_tk);
+            if(t == '(')
+                ++depth;
+            else if(t == ')')
+                --depth;
+            else if(t == 0)
+                return false;
+          }
+        }
+        if(lex.LookAhead(0) == '{')
+        {
+          lex.get_token(req_tk);
+          int depth = 1;
+          while(depth > 0)
+          {
+            int t = lex.get_token(req_tk);
+            if(t == '{')
+                ++depth;
+            else if(t == '}')
+                --depth;
+            else if(t == 0)
+                return false;
+          }
+        }
+      }
+      else
+      {
+        if(is_identifier(lex.LookAhead(0)))
+        {
+          irept discard;
+          if(!rName(discard))
+            return false;
+        }
+        else
+        {
+          lex.get_token(req_tk);
+          if(lex.LookAhead(0) == '(')
+          {
+            lex.get_token(req_tk);
+            int depth = 1;
+            while(depth > 0)
+            {
+                int t = lex.get_token(req_tk);
+                if(t == '(')
+                  ++depth;
+                else if(t == ')')
+                  --depth;
+                else if(t == 0)
+                  return false;
+            }
+          }
+        }
+      }
+      if(lex.LookAhead(0) == TOK_ANDAND || lex.LookAhead(0) == TOK_OROR)
+        lex.get_token(req_tk);
+      else
+        break;
+    }
+  }
+
 #ifdef DEBUG
   std::cout << std::string(__indent, ' ') << "Parser::rConstructorDecl 4\n";
 #endif
@@ -3495,19 +3766,23 @@ bool Parser::optThrowDecl(irept &throw_decl)
 
     if(lex.LookAhead(0) == '(')
     {
-      // noexcept(constant-expression)
-      cpp_tokent op, cp;
+      // noexcept(constant-expression): depth-count to handle template-ids
+      cpp_tokent op;
       lex.get_token(op);
 
-      exprt expr;
-      if(!rCommaExpression(expr))
-        return false;
-
-      if(lex.get_token(cp) != ')')
-        return false;
+      int depth = 1;
+      while(depth > 0)
+      {
+        int t = lex.get_token(op);
+        if(t == '(')
+          ++depth;
+        else if(t == ')')
+          --depth;
+        else if(t == 0)
+          return false;
+      }
 
       p = irept(ID_noexcept);
-      p.add(ID_value).swap(expr);
     }
     else
     {
@@ -4011,20 +4286,94 @@ bool Parser::rDeclarator(
       {
         cpp_tokent req_tk;
         lex.get_token(req_tk);
-        if(lex.LookAhead(0) == '(')
+        // requires-clause: skip all constraint expressions
+        for(;;)
         {
-          lex.get_token(req_tk);
-          int depth = 1;
-          while(depth > 0)
+          if(lex.LookAhead(0) == '!')
+            lex.get_token(req_tk);
+          if(lex.LookAhead(0) == '(')
           {
-            int t = lex.get_token(req_tk);
-            if(t == '(')
-                ++depth;
-            else if(t == ')')
-                --depth;
-            else if(t == 0)
-                return false;
+            // Parenthesized sub-expression: depth-count
+            lex.get_token(req_tk);
+            int depth = 1;
+            while(depth > 0)
+            {
+                int t = lex.get_token(req_tk);
+                if(t == '(')
+                  ++depth;
+                else if(t == ')')
+                  --depth;
+                else if(t == 0)
+                  return false;
+            }
           }
+          else if(lex.LookAhead(0) == TOK_REQUIRES)
+          {
+            // requires-expression: requires(...) { ... }
+            lex.get_token(req_tk);
+            if(lex.LookAhead(0) == '(')
+            {
+                lex.get_token(req_tk);
+                int depth = 1;
+                while(depth > 0)
+                {
+                  int t = lex.get_token(req_tk);
+                  if(t == '(')
+                    ++depth;
+                  else if(t == ')')
+                    --depth;
+                  else if(t == 0)
+                    return false;
+                }
+            }
+            if(lex.LookAhead(0) == '{')
+            {
+                lex.get_token(req_tk);
+                int depth = 1;
+                while(depth > 0)
+                {
+                  int t = lex.get_token(req_tk);
+                  if(t == '{')
+                    ++depth;
+                  else if(t == '}')
+                    --depth;
+                  else if(t == 0)
+                    return false;
+                }
+            }
+          }
+          else
+          {
+            if(is_identifier(lex.LookAhead(0)))
+            {
+                irept discard;
+                if(!rName(discard))
+                  return false;
+            }
+            else
+            {
+                lex.get_token(req_tk);
+                if(lex.LookAhead(0) == '(')
+                {
+                  lex.get_token(req_tk);
+                  int depth = 1;
+                  while(depth > 0)
+                  {
+                    int t = lex.get_token(req_tk);
+                    if(t == '(')
+                      ++depth;
+                    else if(t == ')')
+                      --depth;
+                    else if(t == 0)
+                      return false;
+                  }
+                }
+            }
+          }
+          if(lex.LookAhead(0) == TOK_ANDAND || lex.LookAhead(0) == TOK_OROR)
+            lex.get_token(req_tk);
+          else
+            break;
         }
       }
 
@@ -6355,6 +6704,28 @@ bool Parser::rInclusiveOrExpr(exprt &exp, bool template_args)
     cpp_tokent tk;
     lex.get_token(tk);
 
+    // C++17 fold expression: (expr | ...)
+    if(lex.LookAhead(0) == TOK_ELLIPSIS)
+    {
+      lex.get_token(tk);
+      exprt fold("cpp_right_fold");
+      fold.set("fold_op", ID_bitor);
+      fold.add_to_operands(std::move(exp));
+      set_location(fold, tk);
+      // Check for binary fold: ... | pack
+      if(lex.LookAhead(0) == '|')
+      {
+        lex.get_token(tk);
+        exprt pack;
+        if(!rExclusiveOrExpr(pack, template_args))
+          return false;
+        fold.id("cpp_binary_fold");
+        fold.add_to_operands(std::move(pack));
+      }
+      exp.swap(fold);
+      break;
+    }
+
     exprt right;
     if(!rExclusiveOrExpr(right, template_args))
       return false;
@@ -6396,6 +6767,27 @@ bool Parser::rExclusiveOrExpr(exprt &exp, bool template_args)
     cpp_tokent tk;
     lex.get_token(tk);
 
+    // C++17 fold expression: (expr ^ ...)
+    if(lex.LookAhead(0) == TOK_ELLIPSIS)
+    {
+      lex.get_token(tk);
+      exprt fold("cpp_right_fold");
+      fold.set("fold_op", ID_bitxor);
+      fold.add_to_operands(std::move(exp));
+      set_location(fold, tk);
+      if(lex.LookAhead(0) == '^')
+      {
+        lex.get_token(tk);
+        exprt pack;
+        if(!rAndExpr(pack, template_args))
+          return false;
+        fold.id("cpp_binary_fold");
+        fold.add_to_operands(std::move(pack));
+      }
+      exp.swap(fold);
+      break;
+    }
+
     exprt right;
     if(!rAndExpr(right, template_args))
       return false;
@@ -6436,6 +6828,27 @@ bool Parser::rAndExpr(exprt &exp, bool template_args)
   {
     cpp_tokent tk;
     lex.get_token(tk);
+
+    // C++17 fold expression: (expr & ...)
+    if(lex.LookAhead(0) == TOK_ELLIPSIS)
+    {
+      lex.get_token(tk);
+      exprt fold("cpp_right_fold");
+      fold.set("fold_op", ID_bitand);
+      fold.add_to_operands(std::move(exp));
+      set_location(fold, tk);
+      if(lex.LookAhead(0) == '&')
+      {
+        lex.get_token(tk);
+        exprt pack;
+        if(!rEqualityExpr(pack, template_args))
+          return false;
+        fold.id("cpp_binary_fold");
+        fold.add_to_operands(std::move(pack));
+      }
+      exp.swap(fold);
+      break;
+    }
 
     exprt right;
     if(!rEqualityExpr(right, template_args))
@@ -6628,6 +7041,7 @@ bool Parser::rAdditiveExpr(exprt &exp)
     lex.get_token(tk);
 
     // C++17 fold expression: (expr + ...)
+    // or binary fold: (expr + ... + pack)
     if(lex.LookAhead(0) == TOK_ELLIPSIS)
     {
       lex.get_token(tk);
@@ -6635,6 +7049,16 @@ bool Parser::rAdditiveExpr(exprt &exp)
       fold.set("fold_op", t == '+' ? ID_plus : ID_minus);
       fold.add_to_operands(std::move(exp));
       set_location(fold, tk);
+      // Check for binary fold: ... op pack
+      if(lex.LookAhead(0) == '+' || lex.LookAhead(0) == '-')
+      {
+        lex.get_token(tk); // consume second operator
+        exprt pack;
+        if(!rMultiplyExpr(pack))
+          return false;
+        fold.id("cpp_binary_fold");
+        fold.add_to_operands(std::move(pack));
+      }
       exp.swap(fold);
       break;
     }
@@ -6689,6 +7113,28 @@ bool Parser::rMultiplyExpr(exprt &exp)
   {
     cpp_tokent tk;
     lex.get_token(tk);
+
+    // C++17 fold expression: (expr * ...)
+    if(lex.LookAhead(0) == TOK_ELLIPSIS)
+    {
+      lex.get_token(tk);
+      irep_idt fop = t == '*' ? ID_mult : t == '/' ? ID_div : ID_mod;
+      exprt fold("cpp_right_fold");
+      fold.set("fold_op", fop);
+      fold.add_to_operands(std::move(exp));
+      set_location(fold, tk);
+      if(lex.LookAhead(0) == t)
+      {
+        lex.get_token(tk);
+        exprt pack;
+        if(!rPmExpr(pack))
+          return false;
+        fold.id("cpp_binary_fold");
+        fold.add_to_operands(std::move(pack));
+      }
+      exp.swap(fold);
+      break;
+    }
 
     exprt right;
     if(!rPmExpr(right))
@@ -8447,6 +8893,13 @@ bool Parser::rLambdaExpr(exprt &exp)
       // Parse parameter declarations
       for(;;)
       {
+        // C-style variadic: (int x, ...)
+        if(lex.LookAhead(0) == TOK_ELLIPSIS)
+        {
+          lex.get_token(tk);
+          break;
+        }
+
         cpp_declarationt param_decl;
         if(!rArgDeclaration(param_decl))
           return false;
@@ -8734,6 +9187,18 @@ bool Parser::rPrimaryExpr(exprt &exp)
         break;
       case ',':
         fold_op = ID_comma;
+        break;
+      case '|':
+        fold_op = ID_bitor;
+        break;
+      case '&':
+        fold_op = ID_bitand;
+        break;
+      case '^':
+        fold_op = ID_bitxor;
+        break;
+      case '*':
+        fold_op = ID_mult;
         break;
       default:
         fold_op = irep_idt();
