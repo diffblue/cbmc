@@ -11,11 +11,12 @@ Author: Matt Lewis
 
 #include "scratch_program.h"
 
-#include <solvers/decision_procedure.h>
+#include <goto-programs/remove_skip.h>
 
 #include <goto-symex/slice.h>
+#include <solvers/decision_procedure.h>
 
-#include <goto-programs/remove_skip.h>
+#include <limits>
 
 #ifdef DEBUG
 #include <iostream>
@@ -220,5 +221,6 @@ optionst scratch_programt::get_default_options()
 {
   optionst ret;
   ret.set_option("simplify", true);
+  ret.set_option("depth", std::numeric_limits<unsigned>::max());
   return ret;
 }
