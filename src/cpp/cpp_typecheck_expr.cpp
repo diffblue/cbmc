@@ -2402,7 +2402,13 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   PRECONDITION(expr.operands().size() == 2);
 
   if(expr.function().id()==ID_member)
+  {
     typecheck_method_application(expr);
+    // Update return type after method application — the method's auto
+    // return type may have been deduced during convert_function.
+    if(has_auto(expr.type()))
+      expr.type() = to_code_type(expr.function().type()).return_type();
+  }
   else
   {
     // for the object of a method call,
@@ -2488,10 +2494,14 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
             auto assign = expr_try_dynamic_cast<side_effect_expr_assignt>(
               expr_stmt->expression()))
           {
-            PRECONDITION(assign->lhs().id() == ID_symbol);
-            exprt rhs = assign->rhs();
-            value_map.replace(rhs);
-            value_map.set(to_symbol_expr(assign->lhs()), rhs);
+            if(assign->lhs().id() == ID_symbol)
+            {
+              exprt rhs = assign->rhs();
+              value_map.replace(rhs);
+              value_map.set(to_symbol_expr(assign->lhs()), rhs);
+            }
+            else
+              can_evaluate = false;
           }
           else
             can_evaluate = false;
@@ -3076,6 +3086,16 @@ void cpp_typecheckt::typecheck_method_application(
   }
   else
     add_method_body(&method_symbol);
+
+  // If the method has an auto return type, force immediate type-checking
+  // of the body so the return type is deduced before the call site uses it.
+  if(
+    method_symbol.type.id() == ID_code &&
+    has_auto(to_code_type(method_symbol.type).return_type()) &&
+    method_symbol.value.is_not_nil())
+  {
+    convert_function(method_symbol);
+  }
 
   // build new function expression
   exprt new_function(cpp_symbol_expr(method_symbol));

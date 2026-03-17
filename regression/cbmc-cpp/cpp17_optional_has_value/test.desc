@@ -1,11 +1,7 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
---
-std::optional<int> with has_value() fails with "no body for callee main()"
-because template constructor type-checking triggers an error that propagates
-up and loses the main() function body.
