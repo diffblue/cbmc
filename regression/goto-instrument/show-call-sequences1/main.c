@@ -1,12 +1,9 @@
-int foo(int x){
-  if (x==3){
-    return 0;
-  }
-  else{
-    return 3;
-  }
-}
-
-int main() {
-   foo(0);
+int g;
+void foo(int x) { g = x; }
+int main()
+{
+  int i;
+  for(i = 0; i < 10; i++)
+    foo(i);
+  return g;
 }
