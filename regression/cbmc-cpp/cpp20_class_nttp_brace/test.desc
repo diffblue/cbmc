@@ -1,0 +1,10 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Brace initialization in template arguments (Fixed{42}) not parsed.
+Parenthesized form (Fixed(42)) works.

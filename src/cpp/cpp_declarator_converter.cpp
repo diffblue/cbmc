@@ -291,12 +291,20 @@ symbolt &cpp_declarator_convertert::convert(
           return new_symbol;
         }
 
-        cpp_typecheck.error().source_location =
-          declarator.name().source_location();
-        cpp_typecheck.error()
-          << "member '" << base_name << "' not found in scope '"
-          << scope->identifier << "'" << messaget::eom;
-        throw 0;
+        // Out-of-class definition of a member not found in the
+        // instantiated template scope (e.g., basic_string::npos,
+        // basic_string::swap, basic_string_view::find in .tcc files).
+        // Create a weak symbol to allow type-checking to continue.
+        // For functions, clear the body since it can't be type-checked
+        // without the class scope.
+        {
+          if(final_type.id() == ID_code)
+            declarator.value().make_nil();
+          symbolt &weak_sym =
+            convert_new_symbol(final_storage_spec, member_spec, declarator);
+          weak_sym.is_weak = true;
+          return weak_sym;
+        }
       }
     }
 

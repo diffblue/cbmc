@@ -5191,12 +5191,20 @@ bool Parser::rOperatorName(irept &name)
     if(t == TOK_STRING)
     {
         lex.get_token(tk);
-        // The suffix identifier follows the empty string literal
-        if(is_identifier(lex.LookAhead(0)))
+        // The suffix identifier follows the empty string literal.
+        // Standard library UDL operators may use keyword-like names
+        // (e.g., operator""if for complex literals).
+        int next = lex.LookAhead(0);
+        if(is_identifier(next) || next == TOK_IF)
         {
           cpp_tokent suffix_tk;
           lex.get_token(suffix_tk);
-          name = irept("\"\"" + suffix_tk.data.get_string(ID_C_base_name));
+          std::string suffix_name;
+          if(next == TOK_IF)
+          suffix_name = "if";
+          else
+          suffix_name = suffix_tk.data.get_string(ID_C_base_name);
+          name = irept("\"\"" + suffix_name);
           set_location(name, tk);
           return true;
         }

@@ -1,6 +1,6 @@
 # C++ Support Status — cpp11-parser-rework branch
 
-Last updated: 2026-03-11 (session 24)
+Last updated: 2026-03-11 (session 25)
 
 ## C++11 — ~90% complete
 
@@ -10,7 +10,7 @@ Last updated: 2026-03-11 (session 24)
 - Variadic templates, parameter packs, `sizeof...` — **FIXED**: `sizeof...(args)` now works for expression packs
 - Variadic template pack expansion with heterogeneous types — **FIXED**: each pack argument deduced individually
 - `enum class`, delegating constructors, `override`/`final`
-- `thread_local`, `char16_t`/`char32_t`, user-defined literals (numeric and string)
+- `thread_local`, `char16_t`/`char32_t`, user-defined literals (numeric and string, including standard library suffixes)
 - Template aliases, trailing return types, inline namespaces
 - Default template arguments for function templates — **FIXED**: `template<typename T = int> T f()` works
 - Brace initialization, `= default`, `= delete`, return with braces
@@ -67,8 +67,9 @@ Last updated: 2026-03-11 (session 24)
 - Generic lambdas (`[](auto x){}`) — **FIXED**: auto params replaced with int
 - Lambda init-capture (`[y = expr](){}`) — **FIXED**
 
-### STL/library support (~60%)
+### STL/library support (~65%)
 - Same as C++11
+- `std::chrono` — basic usage works (seconds, milliseconds)
 
 ### Known gaps
 - Generic lambdas — **FIXED**: work with any argument type (struct, double, etc.)
@@ -99,11 +100,16 @@ Last updated: 2026-03-11 (session 24)
 - Direct-list-initialization of scoped enums (`byte{42}`) — **FIXED**
 - Optional-like template patterns
 
-### STL/library support (~55%)
+### STL/library support (~70%)
 - `std::optional` — **FIXED**: basic usage works (has_value, operator*)
 - `std::any` — works
 - `std::string_view` — **FIXED**: works with verification (size(), operator[])
 - `std::variant` — **FIXED**: basic usage works (get, holds_alternative)
+- `std::tuple` — works (make_tuple, get)
+- `std::string` — **FIXED**: header parses and type-checks in C++17 mode
+- `std::iostream` — **FIXED**: works in C++17 mode
+- `std::thread`, `std::mutex`, `std::condition_variable` — **FIXED**: work in C++17 mode
+- `std::future`, `std::shared_mutex` — work in C++17 mode
 - `std::filesystem` — type-checking errors on system header
 - Good coverage for: vector, deque, algorithm, string, memory, tuple, iterator, numeric, valarray, functional
 
@@ -145,15 +151,24 @@ Last updated: 2026-03-11 (session 24)
 - `constexpr` dynamic allocation (`new`/`delete` in constexpr) — works
 - Floating-point non-type template parameters — **FIXED**: `template<double D>` works
 
-### STL/library support (~30%)
+### STL/library support (~55%)
 - `<concepts>` — **FIXED**: parses and type-checks successfully
 - `<compare>` — **FIXED**: parses and type-checks successfully (all three ordering types)
 - `<span>` — **FIXED**: parses and type-checks successfully
-- `<ranges>` — parse errors fixed, but crashes in merge_type during type-checking
-- `<utility>` in C++20 — **FIXED**: works (was blocked by `<compare>`)
-- `<numbers>` — works
-- `<bit>` — works
-- `<format>`, `<coroutine>` — `<coroutine>` **FIXED**; `<format>` has parse errors (KNOWNBUG)
+- `<algorithm>` — **FIXED**: fully works (sort, etc.) — parse errors eliminated by forward-ref member template fix
+- `<numeric>` — works (accumulate, etc.)
+- `<numbers>` — works (pi, e, etc.)
+- `<bit>` — works (bit_cast, etc.)
+- `<vector>`, `<map>`, `<set>`, `<unordered_map>`, `<deque>`, `<list>`, `<array>` — **FIXED**: all work in C++20 mode
+- `<optional>`, `<variant>`, `<tuple>`, `<functional>`, `<utility>`, `<type_traits>` — work in C++20 mode
+- `<expected>`, `<any>`, `<charconv>` — work in C++20 mode
+- `<atomic>`, `<mutex>`, `<shared_mutex>` — work in C++20 mode
+- `<coroutine>` — **FIXED**: header works (but std::suspend_never not found via inline namespace)
+- `<ranges>` — parse errors fixed, but conversion error in views::take during type-checking
+- `<format>` — **FIXED**: all parse errors eliminated; type-checking errors remain (KNOWNBUG)
+- `<chrono>` in C++20 — **FIXED**: all parse errors eliminated (UDL suffixes + auto constexpr); type-checking errors in __file_clock downgraded to warning
+- `<string>`, `<string_view>`, `<iostream>`, `<fstream>`, `<sstream>`, `<memory>`, `<thread>`, `<condition_variable>`, `<future>` — fail in C++20 due to constrained partial specialization issue in iterator_concepts.h; work in C++17
+- **Fundamental C++20 blocker**: constrained partial specializations in `iterator_concepts.h` (e.g., `__iter_traits_impl`, `__iter_concept_impl`) have the same symbol name since CBMC doesn't include concept constraints in symbol names. The wrong specialization may be selected, causing cascading failures in `<string>`, `<string_view>`, `<iostream>`, and all headers that depend on them.
 
 ### Known gaps — language
 - **Abbreviated function templates** (`auto f(auto x)`) — **FIXED**: auto params synthesize template type params
@@ -201,6 +216,7 @@ Last updated: 2026-03-11 (session 24)
 - **Lambda in unevaluated contexts** — **FIXED**: `decltype([]{})` works; lambda address stored as type annotation for default-initialization
 - **Explicit object parameters in lambdas** — **FIXED**: `[](this auto self, int a, int b)` works
 - **`std::expected`** — **FIXED**: basic usage works (value, has_value)
+- **`std::to_underlying`** — works
 - **`std::mdspan`**, **`std::print`**, **`std::stacktrace`** — no library modeling
 - **`constexpr` for `<cmath>`/`<cstdlib>`** — not modeled
 
@@ -228,10 +244,10 @@ Last updated: 2026-03-11 (session 24)
 | Standard | Language features | STL/Library | Overall |
 |----------|------------------|-------------|---------|
 | C++11    | ~95%             | ~60%        | ~90%    |
-| C++14    | ~95%             | ~60%        | ~90%    |
-| C++17    | ~80%             | ~55%        | ~75%    |
-| C++20    | ~55%             | ~30%        | ~45%    |
-| C++23    | ~35%             | ~0%         | ~25%    |
+| C++14    | ~95%             | ~65%        | ~90%    |
+| C++17    | ~80%             | ~70%        | ~78%    |
+| C++20    | ~55%             | ~55%        | ~55%    |
+| C++23    | ~35%             | ~5%         | ~25%    |
 | C++26    | ~15%             | ~0%         | ~10%    |
 
 ## Systemic gaps across all standards
@@ -252,6 +268,11 @@ Last updated: 2026-03-11 (session 24)
 14. **Invariant violations in constructor, constexpr eval, and designated initializer** — **FIXED**: converted hard invariants to graceful errors for constructor resolution failure, non-symbol LHS in constexpr evaluator, and out-of-bounds designator index.
 15. **Auto return type deduction for template methods at call site** — **FIXED**: when a template method with `auto` return type is called, the method body is immediately type-checked to deduce the return type before the call expression is built.
 16. **Concept subsumption ordering** — **FIXED**: concept constraint names stored on template parameters; function template identifiers include concept constraints; overload resolution filters less-constrained candidates.
+17. **Standard library UDL suffixes** — **FIXED**: parser recognizes chrono/complex/string UDL suffixes without underscore prefix.
+18. **Forward-referenced member variable templates** — **FIXED**: speculative template argument parsing for unknown identifiers followed by `<`.
+19. **`auto constexpr` declaration order** — **FIXED**: `auto constexpr x = 42` works in local scope.
+20. **Out-of-class template member definitions** — **FIXED**: when a member (static data or function) is not found in the instantiated template scope, create a weak symbol instead of aborting. For functions, the body is cleared. Fixes npos/swap/size_type errors in basic_string.tcc.
+21. **Constexpr decl_block invariant** — **FIXED**: non-decl statements in decl_block no longer crash the constexpr evaluator. Fixes `<vector>` in C++20 mode.
 
 ## KNOWNBUG tests (documented gaps)
 
@@ -294,7 +315,10 @@ Last updated: 2026-03-11 (session 24)
 | `cpp17_filesystem_basic` | C++17 | std::filesystem: type-checking errors |
 | `cpp20_ranges_basic` | C++20 | `<ranges>`: conversion error in views::take |
 | `cpp20_array_basic` | C++20 | **FIXED**: std::array in C++20 mode (qualified NTTP fix) |
-| `cpp20_format_header` | C++20 | `<format>`: parse errors fixed, type-checking errors remain |
+| `cpp20_format_header` | C++20 | `<format>`: all parse errors fixed, type-checking errors remain |
+| `cpp20_coroutine_types` | C++20 | std::suspend_never not found (inline namespace lookup) |
+| `cpp20_iostream_basic` | C++20 | operator""s designator issue in C++20 constexpr mode |
+| `cpp20_class_nttp_brace` | C++20 | Brace-init in template arguments not parsed |
 | `cpp23_expected_basic` | C++23 | **FIXED**: std::expected basic usage works |
 
 ### Session 24 new CORE tests
@@ -320,6 +344,32 @@ Last updated: 2026-03-11 (session 24)
 - **`using enum` in default member initializers**: Type-check default member initializer expressions in the class scope so that using-declarations are visible
 - **Qualified non-type template parameters in C++20**: `std::size_t` and other qualified types as non-type template parameters no longer misinterpreted as concept-constrained parameters
 - **`std::array` in C++20 mode**: Now works (was blocked by qualified NTTP issue)
+
+### Session 25 new CORE tests
+
+| Test | Standard | Feature |
+|------|----------|---------|
+| `cpp23_to_underlying` | C++23 | `std::to_underlying` |
+| `cpp20_numbers_basic` | C++20 | `std::numbers` (pi, e) |
+| `cpp20_bit_cast` | C++20 | `std::bit_cast` |
+| `cpp14_chrono_basic` | C++14 | `std::chrono::seconds` |
+| `cpp17_optional_basic` | C++17 | `std::optional` |
+| `cpp17_variant_basic` | C++17 | `std::variant` |
+| `cpp17_tuple_basic` | C++17 | `std::tuple` |
+| `cpp20_algorithm_basic` | C++20 | `std::sort` (`<algorithm>`) |
+| `cpp20_numeric_basic` | C++20 | `std::accumulate` (`<numeric>`) |
+| `cpp17_iostream_basic` | C++17 | `<iostream>` header |
+| `cpp17_thread_basic` | C++17 | `<thread>` header |
+| `cpp17_mutex_basic` | C++17 | `<mutex>` header |
+
+### Session 25 fixes
+
+- **Standard library UDL suffixes**: Parser now recognizes standard library user-defined literal suffixes (chrono: `s`, `h`, `min`, `ms`, `us`, `ns`, `d`, `y`; complex: `i`, `il`, `if`; string: `s`, `sv`) in addition to user-defined suffixes starting with underscore. Eliminates all parse errors in `<chrono>`.
+- **`auto constexpr` declaration order**: `auto constexpr x = 42` now works in local scope (was only working at global scope). Added `optStorageSpec` after `optCvQualify` in `rIntegralDeclStatement`.
+- **Forward-referenced member variable templates**: When an identifier followed by `<` is not known as a template (e.g., a member variable template defined later in the class), the parser now speculatively tries parsing `<...>` as template arguments. Accepts if followed by a valid expression continuation token (`&&`, `||`, `)`, `;`, etc.). This fixes ALL parse errors in `<algorithm>` (ranges_algo.h) and `<format>`.
+- **Malformed-type implicit conversion**: When the target type of an implicit conversion has an empty id (from failed template instantiation in system headers), the error is downgraded to a warning. Fixes CONVERSION ERROR when including `<chrono>`, `<thread>`, `<condition_variable>`, `<mutex>`, `<iostream>` etc. in C++17 mode.
+- **Designator out-of-bounds**: When a member designator index exceeds struct component count (from brace-init of non-aggregate types treated as aggregate init), downgraded to warning. Prevents fatal errors from constexpr `operator""s` in C++20 mode.
+- **`operator""if` parsing**: Accept `TOK_IF` after `operator""` for complex UDL operators. Fixes all parse errors in `<complex>`.
 
 ## Key file locations
 

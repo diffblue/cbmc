@@ -2510,7 +2510,11 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
         {
           for(const auto &expect_decl : stmt.operands())
           {
-            PRECONDITION(to_code(expect_decl).get_statement() == ID_decl);
+            if(to_code(expect_decl).get_statement() != ID_decl)
+            {
+              can_evaluate = false;
+              break;
+            }
             const auto &decl = to_code_frontend_decl(to_code(expect_decl));
             if(decl.initial_value().has_value())
             {

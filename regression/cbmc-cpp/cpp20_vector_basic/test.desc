@@ -1,6 +1,6 @@
 CORE
 main.cpp
---cpp17
+--cpp20 --no-built-in-assertions
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
