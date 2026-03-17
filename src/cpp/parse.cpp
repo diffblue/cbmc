@@ -1681,15 +1681,19 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
     declaration.declarators().resize(1);
     cpp_declaratort &declarator = declaration.declarators().front();
 
+    bool is_pack = false;
     if(lex.LookAhead(0)==TOK_ELLIPSIS)
     {
       cpp_tokent tk2;
       lex.get_token(tk2);
-      declarator.set_has_ellipsis();
+      is_pack = true;
     }
 
     if(!rDeclarator(declarator, kArgDeclarator, true, false))
       return false;
+
+    if(is_pack)
+      declarator.set_has_ellipsis();
 
 #ifdef DEBUG
     std::cout << std::string(__indent, ' ')
@@ -6042,6 +6046,19 @@ bool Parser::rCommaExpression(exprt &exp)
 
     lex.get_token(tk);
 
+    // C++17 right fold expression: (expr , ...)
+    if(lex.LookAhead(0) == TOK_ELLIPSIS)
+    {
+      cpp_tokent ellipsis_tk;
+      lex.get_token(ellipsis_tk);
+      exprt fold("cpp_right_fold");
+      fold.set("fold_op", ID_comma);
+      fold.add_to_operands(std::move(exp));
+      set_location(fold, tk);
+      exp.swap(fold);
+      return true;
+    }
+
     exprt right;
     if(!rExpression(right, false))
       return false;
@@ -6235,6 +6252,11 @@ bool Parser::rLogicalOrExpr(exprt &exp, bool template_args)
     if(lex.LookAhead(0) == TOK_ELLIPSIS)
     {
       lex.get_token(tk);
+      exprt fold("cpp_right_fold");
+      fold.set("fold_op", ID_or);
+      fold.add_to_operands(std::move(exp));
+      set_location(fold, tk);
+      exp.swap(fold);
       break;
     }
 
@@ -6283,6 +6305,11 @@ bool Parser::rLogicalAndExpr(exprt &exp, bool template_args)
     if(lex.LookAhead(0) == TOK_ELLIPSIS)
     {
       lex.get_token(tk);
+      exprt fold("cpp_right_fold");
+      fold.set("fold_op", ID_and);
+      fold.add_to_operands(std::move(exp));
+      set_location(fold, tk);
+      exp.swap(fold);
       break;
     }
 
@@ -6603,6 +6630,11 @@ bool Parser::rAdditiveExpr(exprt &exp)
     if(lex.LookAhead(0) == TOK_ELLIPSIS)
     {
       lex.get_token(tk);
+      exprt fold("cpp_right_fold");
+      fold.set("fold_op", t == '+' ? ID_plus : ID_minus);
+      fold.add_to_operands(std::move(exp));
+      set_location(fold, tk);
+      exp.swap(fold);
       break;
     }
 
@@ -8672,9 +8704,34 @@ bool Parser::rPrimaryExpr(exprt &exp)
         return false;
       if(lex.get_token(tk2) != ')')
         return false;
-      // Treat as the pack expression itself (the fold is lowered
-      // during template instantiation, same as right folds)
-      exp.swap(right);
+      // Store as left fold expression with operator
+      irep_idt fold_op;
+      switch(op_tk.kind)
+      {
+      case TOK_ANDAND:
+        fold_op = ID_and;
+        break;
+      case TOK_OROR:
+        fold_op = ID_or;
+        break;
+      case '+':
+        fold_op = ID_plus;
+        break;
+      case '-':
+        fold_op = ID_minus;
+        break;
+      case ',':
+        fold_op = ID_comma;
+        break;
+      default:
+        fold_op = irep_idt();
+        break;
+      }
+      exprt fold("cpp_left_fold");
+      fold.set("fold_op", fold_op);
+      fold.add_to_operands(std::move(right));
+      set_location(fold, op_tk);
+      exp.swap(fold);
       return true;
     }
 

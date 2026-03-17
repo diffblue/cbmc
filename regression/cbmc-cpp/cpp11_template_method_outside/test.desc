@@ -1,8 +1,8 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-template method defined outside class has no body when instantiated
+template method defined outside non-template class

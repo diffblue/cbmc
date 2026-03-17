@@ -79,6 +79,22 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
     // auto type deduction for non-reference types (e.g.,
     // static constexpr auto value = 42)
     typecheck_expr(symbol.value);
+
+    // decltype(auto): if initializer is a function call returning a
+    // reference, deduce the reference type
+    if(
+      symbol.type.id() == ID_decltype && symbol.type.get_bool("#auto") &&
+      symbol.value.id() == ID_dereference &&
+      is_reference(to_dereference_expr(symbol.value).pointer().type()))
+    {
+      const typet &ref_type =
+        to_dereference_expr(symbol.value).pointer().type();
+      cpp_convert_auto(symbol.type, ref_type, get_message_handler());
+      typecheck_type(symbol.type);
+      reference_initializer(symbol.value, to_reference_type(symbol.type));
+      return;
+    }
+
     cpp_convert_auto(symbol.type, symbol.value.type(), get_message_handler());
     typecheck_type(symbol.type);
     implicit_typecast(symbol.value, symbol.type);

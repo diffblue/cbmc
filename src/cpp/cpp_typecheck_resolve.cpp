@@ -226,7 +226,13 @@ void cpp_typecheck_resolvet::guess_function_template_args(
           if(!params.empty() && params.front().get_this())
             param_offset = 1;
 
-          if(non_pack_count + param_offset < params.size())
+          // Only expand if the parameter count doesn't already match
+          // (instantiate_template may have already expanded the pack).
+          std::size_t expected_params =
+            non_pack_count + pack_size + param_offset;
+          if(
+            params.size() < expected_params &&
+            non_pack_count + param_offset < params.size())
           {
             std::size_t pack_idx = non_pack_count + param_offset;
             code_typet::parametert pack_param = params[pack_idx];
@@ -3024,6 +3030,7 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   // Track pack expansion size for non-empty packs
   std::size_t pack_expansion_size = 0;
   bool has_non_empty_pack = false;
+  std::vector<typet> pack_deduced_types;
 
   for(const auto &parameter : parameters)
   {
@@ -3058,6 +3065,7 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
         pack_expansion_size =
           static_cast<std::size_t>(fargs.operands.end() - it);
         has_non_empty_pack = pack_expansion_size > 0;
+        // Collect each argument's type for heterogeneous packs
         for(; it != fargs.operands.end(); ++it)
         {
           typet arg_actual_type = it->type();
@@ -3069,6 +3077,7 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
               arg_actual_type =
                 pointer_type(to_array_type(arg_actual_type).element_type());
           }
+          pack_deduced_types.push_back(arg_actual_type);
           guess_template_args(arg_type, arg_actual_type);
         }
         continue;
@@ -3137,10 +3146,27 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
     {
       if(params[i].get_bool(ID_ellipsis))
       {
-        // Duplicate the deduced type for the remaining pack elements
-        exprt pack_arg = args[i];
-        for(std::size_t j = 1; j < pack_expansion_size; ++j)
-          args.insert(args.begin() + i + j, pack_arg);
+        // Use individually deduced types for heterogeneous packs
+        if(pack_deduced_types.size() == pack_expansion_size)
+        {
+          // Replace the single deduced type with the first, then
+          // insert the rest
+          args[i] = exprt(ID_type);
+          args[i].type() = pack_deduced_types[0];
+          for(std::size_t j = 1; j < pack_expansion_size; ++j)
+          {
+            exprt arg(ID_type);
+            arg.type() = pack_deduced_types[j];
+            args.insert(args.begin() + i + j, arg);
+          }
+        }
+        else
+        {
+          // Fallback: duplicate the single deduced type
+          exprt pack_arg = args[i];
+          for(std::size_t j = 1; j < pack_expansion_size; ++j)
+            args.insert(args.begin() + i + j, pack_arg);
+        }
         break;
       }
     }
@@ -3229,6 +3255,39 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
               // template (substitution failure is not an error).
               return nil_exprt();
             }
+          }
+        }
+        else if(param.has_default_argument() && param.id() != ID_type)
+        {
+          // Non-type parameter with default value (e.g.,
+          // typename enable_if<...>::type = 0).
+          // Evaluate the parameter type in a SFINAE context.
+          null_message_handlert null_handler;
+          message_handlert &old_handler = cpp_typecheck.get_message_handler();
+          cpp_typecheck.set_message_handler(null_handler);
+          try
+          {
+            cpp_save_scopet saved_scope(cpp_typecheck.cpp_scopes);
+            cpp_idt *tscope =
+              cpp_typecheck.cpp_scopes.id_map[template_symbol.name];
+            if(tscope != nullptr)
+              cpp_typecheck.cpp_scopes.go_to(*tscope);
+            typet param_type = param.type();
+            cpp_typecheck.template_map.apply(param_type);
+            cpp_typecheck.typecheck_type(param_type);
+            // Use the default value
+            exprt default_val = param.default_argument();
+            cpp_typecheck.template_map.apply(default_val);
+            cpp_typecheck.typecheck_expr(default_val);
+            args[i] = default_val;
+            cpp_typecheck.template_map.set(param, args[i]);
+            cpp_typecheck.set_message_handler(old_handler);
+          }
+          catch(...)
+          {
+            cpp_typecheck.set_message_handler(old_handler);
+            // SFINAE: substitution failure in parameter type
+            return nil_exprt();
           }
         }
       }
@@ -3355,6 +3414,10 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
               d.set(ID_ellipsis, false);
               d.type().set(ID_ellipsis, false);
             }
+            // For heterogeneous packs, set the type from the
+            // individually deduced types
+            if(i < pack_deduced_types.size())
+              decl.type() = pack_deduced_types[i];
             expanded.push_back(std::move(copy));
           }
         }
@@ -3389,6 +3452,47 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
         {
           auto &decl = static_cast<cpp_declarationt &>(p);
           cpp_typecheck.template_map.apply(decl.type());
+        }
+      }
+
+      // For trailing return types with decltype referencing parameters,
+      // put function parameters temporarily into scope.
+      if(
+        function_type.has_subtype() &&
+        to_type_with_subtype(function_type).subtype().id() == ID_decltype)
+      {
+        for(const auto &p : params)
+        {
+          if(p.id() != ID_cpp_declaration)
+            continue;
+          const auto &pdecl = static_cast<const cpp_declarationt &>(p);
+          if(pdecl.declarators().empty())
+            continue;
+          typet ptype = pdecl.type();
+          cpp_typecheck.typecheck_type(ptype);
+          const auto &pname_sub = pdecl.declarators().front().name().get_sub();
+          if(pname_sub.empty())
+            continue;
+          const irep_idt &pname = pname_sub.front().get(ID_identifier);
+          if(pname.empty())
+            continue;
+          const std::string sym_name =
+            id2string(cpp_typecheck.cpp_scopes.current_scope().prefix) +
+            id2string(pname);
+          if(!cpp_typecheck.symbol_table.has_symbol(sym_name))
+          {
+            auxiliary_symbolt psym;
+            psym.name = sym_name;
+            psym.base_name = pname;
+            psym.type = ptype;
+            psym.mode = ID_cpp;
+            psym.is_parameter = true;
+            cpp_typecheck.symbol_table.insert(std::move(psym));
+            const symbolt &inserted =
+              cpp_typecheck.symbol_table.lookup_ref(sym_name);
+            cpp_idt &id = cpp_typecheck.cpp_scopes.put_into_scope(inserted);
+            id.id_class = cpp_idt::id_classt::SYMBOL;
+          }
         }
       }
     }

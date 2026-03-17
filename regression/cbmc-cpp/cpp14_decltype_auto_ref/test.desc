@@ -1,8 +1,8 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-decltype(auto) with parenthesized return does not deduce reference type
+decltype(auto) with function returning reference deduces reference type
