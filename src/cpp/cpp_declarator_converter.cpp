@@ -627,9 +627,7 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
   }
   else
   {
-    symbol.is_lvalue = !is_reference(symbol.type) &&
-                       !(symbol.type.get_bool(ID_C_constant) &&
-                         is_number(symbol.type) && symbol.value.is_constant());
+    symbol.is_lvalue = !is_reference(symbol.type);
 
     symbol.is_static_lifetime =
       !symbol.is_macro && !symbol.is_type &&

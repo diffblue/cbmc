@@ -10,6 +10,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// C++ Language Type Checking
 
 #include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
+#include <util/bitvector_types.h>
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/expr_initializer.h>
@@ -1132,6 +1134,20 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
       return;
     }
 
+    // Reject casts of non-static member functions — they require an
+    // object and cannot be used as values.
+    if(
+      op.id() == ID_address_of && op.get_bool(ID_C_implicit) &&
+      to_address_of_expr(op).object().type().id() == ID_code &&
+      !to_code_type(to_address_of_expr(op).object().type())
+         .get(ID_C_member_name)
+         .empty())
+    {
+      error().source_location = expr.find_source_location();
+      error() << "invalid use of non-static member function" << eom;
+      throw 0;
+    }
+
     exprt new_expr;
 
     if(
@@ -1843,6 +1859,42 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   }
 
   // now do the function -- this has been postponed
+  // SystemC extension: a.range(upper, lower) on bitvector types
+  if(
+    expr.function().id() == ID_member &&
+    expr.function().find(ID_component_cpp_name).is_not_nil() &&
+    expr.arguments().size() == 2)
+  {
+    const cpp_namet &member_name =
+      to_cpp_name(expr.function().find(ID_component_cpp_name));
+    const irep_idt &base = member_name.get_base_name();
+    if(base == "range")
+    {
+      exprt &obj = to_unary_expr(expr.function()).op();
+      typecheck_expr(obj);
+      add_implicit_dereference(obj);
+      if(obj.type().id() == ID_unsignedbv)
+      {
+        typecheck_expr(expr.arguments()[0]);
+        typecheck_expr(expr.arguments()[1]);
+        const auto upper = numeric_cast<mp_integer>(expr.arguments()[0]);
+        const auto lower = numeric_cast<mp_integer>(expr.arguments()[1]);
+        if(upper.has_value() && lower.has_value() && *upper >= *lower)
+        {
+          const std::size_t width =
+            numeric_cast_v<std::size_t>(*upper - *lower + 1);
+          extractbits_exprt result(
+            obj,
+            from_integer(*lower, unsignedbv_typet(32)),
+            unsignedbv_typet(width));
+          result.add_source_location() = expr.source_location();
+          expr.swap(result);
+          return;
+        }
+      }
+    }
+  }
+
   typecheck_function_expr(expr.function(), cpp_typecheck_fargst(expr));
 
   if(expr.function().id() == ID_pod_constructor)
@@ -2273,6 +2325,40 @@ void cpp_typecheckt::typecheck_function_call_arguments(
         new_temporary(
           arg_it->source_location(),
           to_reference_type(parameter.type()).base_type(),
+          already_typechecked_exprt{*arg_it},
+          temporary);
+        arg_it->swap(temporary);
+      }
+    }
+    else if(
+      !is_reference(parameter.type()) && !cpp_is_pod(parameter.type()) &&
+      (parameter.type().id() == ID_struct_tag ||
+       parameter.type().id() == ID_union_tag) &&
+      arg_it->id() != ID_temporary_object && arg_it->id() != ID_side_effect)
+    {
+      // Non-POD class-type pass-by-value: call copy constructor.
+      // Check that the destructor symbol exists (needed for the
+      // temporary) to avoid crashes during goto conversion.
+      const struct_typet &struct_type =
+        follow_tag(to_struct_tag_type(parameter.type()));
+      bool has_dtor = false;
+      for(const auto &c : struct_type.components())
+      {
+        if(
+          c.type().id() == ID_code &&
+          to_code_type(c.type()).return_type().id() == ID_destructor)
+        {
+          const symbolt *dtor_sym;
+          has_dtor = !lookup(c.get_name(), dtor_sym);
+          break;
+        }
+      }
+      if(has_dtor)
+      {
+        exprt temporary;
+        new_temporary(
+          arg_it->source_location(),
+          parameter.type(),
           already_typechecked_exprt{*arg_it},
           temporary);
         arg_it->swap(temporary);

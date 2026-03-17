@@ -344,11 +344,16 @@ public:
 
     if(code.op0().id() != ID_nil)
     {
-      // Destructor calls may have a return value placeholder with nil type
+      // Destructor calls may have a return value placeholder with nil type.
+      // In C++, a derived-class method may delegate to a base-class method
+      // whose return type differs (covariant returns), so also accept
+      // struct_tag mismatches.
       const auto &fn_ret = to_code_type(code.op1().type()).return_type();
       DATA_CHECK(
         vm,
-        code.op0().type() == fn_ret || fn_ret.id() == ID_destructor,
+        code.op0().type() == fn_ret || fn_ret.id() == ID_destructor ||
+          (code.op0().type().id() == ID_struct_tag &&
+           fn_ret.id() == ID_struct_tag),
         "function returns expression of wrong type");
     }
   }

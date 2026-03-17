@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
+#include <util/bitvector_types.h>
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/cprover_prefix.h>
@@ -496,6 +497,10 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
           expr.id()==ID_assign_lshr || expr.id()==ID_assign_ashr)
   {
     // already type checked
+  }
+  else if(expr.id() == ID_extractbits)
+  {
+    // already type checked (SystemC extension)
   }
   else if(
     expr.id() == ID_C_spec_assigns || expr.id() == ID_C_spec_frees ||
@@ -1374,6 +1379,19 @@ void c_typecheck_baset::typecheck_expr_index(exprt &expr)
     expr.id(ID_dereference);
     expr.set(ID_C_lvalue, true);
     expr.type() = to_pointer_type(final_array_type).base_type();
+  }
+  else if(
+    final_array_type.id() == ID_unsignedbv ||
+    final_array_type.id() == ID_signedbv)
+  {
+    // SystemC extension: bit indexing on bitvector types
+    // a[i] extracts bit i as a single-bit value
+    extractbits_exprt eb(
+      array_expr,
+      typecast_exprt::conditional_cast(index_expr, unsignedbv_typet(32)),
+      unsignedbv_typet(1));
+    eb.add_source_location() = expr.source_location();
+    expr.swap(eb);
   }
   else
   {
@@ -4534,6 +4552,40 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
 
     if(!op0.get_bool(ID_C_lvalue))
     {
+      // SystemC extension: assignment to extractbits (a.range(h,l) = v)
+      // is converted to a read-modify-write on the source variable.
+      if(op0.id() == ID_extractbits)
+      {
+        const auto &eb = to_extractbits_expr(op0);
+        const auto width = to_bitvector_type(eb.type()).get_width();
+        const auto src_width = to_bitvector_type(eb.src().type()).get_width();
+        const auto src_type = eb.src().type();
+        exprt rhs = typecast_exprt::conditional_cast(
+          expr.operands()[1], unsignedbv_typet(width));
+        // mask = (1 << width) - 1
+        mp_integer mask_val = power(2, width) - 1;
+        exprt mask = from_integer(mask_val, unsignedbv_typet(src_width));
+        // shifted_mask = mask << index
+        exprt shifted_mask = shl_exprt(
+          mask,
+          typecast_exprt::conditional_cast(
+            eb.index(), unsignedbv_typet(src_width)));
+        // cleared = src & ~shifted_mask
+        exprt cleared = bitand_exprt(eb.src(), bitnot_exprt(shifted_mask));
+        // shifted_rhs = (rhs cast to src_width) << index
+        exprt shifted_rhs = shl_exprt(
+          typecast_exprt::conditional_cast(rhs, unsignedbv_typet(src_width)),
+          typecast_exprt::conditional_cast(
+            eb.index(), unsignedbv_typet(src_width)));
+        // new_val = cleared | shifted_rhs
+        exprt new_val = bitor_exprt(cleared, shifted_rhs);
+        new_val.type() = src_type;
+        // Replace: lhs = rhs becomes src = new_val
+        expr.operands()[0] = eb.src();
+        expr.operands()[1] = new_val;
+        expr.type() = src_type;
+        return;
+      }
       error().source_location = expr.source_location();
       error() << "assignment error: '" << to_string(op0) << "' not an lvalue"
               << eom;
