@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/std_types.h>
 #include <util/symbol_table_base.h>
 
@@ -1150,7 +1151,9 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           declarator.name().get_base_name();
         #endif
 
-        if(declarator.value().is_not_nil()) // body?
+        if(
+          declarator.value().is_not_nil() &&
+          to_code(declarator.value()).get_statement() != ID_cpp_delete)
         {
           if(declarator.find(ID_member_initializers).is_nil())
             declarator.set(ID_member_initializers, ID_member_initializers);
@@ -1165,7 +1168,8 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
             check_member_initializers(
               to_struct_type(type).bases(),
               type.components(),
-              declarator.member_initializers());
+              declarator.member_initializers(),
+              type.get(ID_name));
           }
 
           full_member_initialization(
@@ -1355,6 +1359,14 @@ void cpp_typecheckt::typecheck_member_function(
     if(
       new_symbol->type.id() == ID_code &&
       to_code_type(new_symbol->type).return_type().id() == ID_constructor)
+    {
+      return;
+    }
+
+    // A template method may be instantiated multiple times with the same
+    // signature when different template arguments produce the same type.
+    // Keep the existing symbol.
+    if(new_symbol->type == symbol.type)
     {
       return;
     }
@@ -1653,7 +1665,17 @@ bool cpp_typecheckt::check_component_access(
         to_struct_type(struct_union_type), scope_struct))
         return false; // ok
 
-      else break;
+      // C++11 (DR 45): nested classes have access to the enclosing
+      // class's private and protected members.
+      if(
+        config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP11 ||
+        config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP14 ||
+        config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP17)
+      {
+        continue;
+      }
+
+      break;
     }
   }
 

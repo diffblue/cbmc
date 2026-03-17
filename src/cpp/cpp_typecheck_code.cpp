@@ -27,23 +27,22 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 void cpp_typecheckt::typecheck_code(codet &code)
 {
-  const irep_idt &statement=code.get_statement();
+  const irep_idt &statement = code.get_statement();
 
-  if(statement==ID_try_catch)
+  if(statement == ID_try_catch)
   {
     code.type() = empty_typet();
     typecheck_try_catch(code);
   }
-  else if(statement==ID_member_initializer)
+  else if(statement == ID_member_initializer)
   {
     code.type() = empty_typet();
     typecheck_member_initializer(code);
   }
-  else if(statement==ID_msc_if_exists ||
-          statement==ID_msc_if_not_exists)
+  else if(statement == ID_msc_if_exists || statement == ID_msc_if_not_exists)
   {
   }
-  else if(statement==ID_decl_block)
+  else if(statement == ID_decl_block)
   {
     // type checked already
   }
@@ -74,8 +73,9 @@ void cpp_typecheckt::typecheck_code(codet &code)
           array.type().id() == ID_signedbv ||
           array.type().id() == ID_unsignedbv)
         {
-          shl_exprt shl{from_integer(1, array.type()),
-                        to_index_expr(binary_expr.op0()).index()};
+          shl_exprt shl{
+            from_integer(1, array.type()),
+            to_index_expr(binary_expr.op0()).index()};
           exprt rhs = if_exprt{
             equal_exprt{
               binary_expr.op1(), from_integer(0, binary_expr.op1().type())},
@@ -274,7 +274,7 @@ void cpp_typecheckt::typecheck_try_catch(codet &code)
           cpp_declarationt &cpp_declaration = to_cpp_declaration(decl.symbol());
 
           PRECONDITION(cpp_declaration.declarators().size() == 1);
-          cpp_declaratort &declarator=cpp_declaration.declarators().front();
+          cpp_declaratort &declarator = cpp_declaration.declarators().front();
 
           if(is_reference(declarator.type()))
             declarator.type() =
@@ -309,7 +309,7 @@ void cpp_typecheckt::typecheck_ifthenelse(code_ifthenelset &code)
   // as condition. E.g.,
   // if(void *p=...) ...
 
-  if(code.cond().id()==ID_code)
+  if(code.cond().id() == ID_code)
   {
     typecheck_code(to_code(code.cond()));
   }
@@ -323,9 +323,39 @@ void cpp_typecheckt::typecheck_while(code_whilet &code)
   // as condition. E.g.,
   // while(void *p=...) ...
 
-  if(code.cond().id()==ID_code)
+  if(code.cond().id() == ID_code)
   {
-    typecheck_code(to_code(code.cond()));
+    // Rewrite into: while(true) { decl; if(!var) break; body; }
+    codet decl = to_code(code.cond());
+    typecheck_code(decl);
+
+    // The typechecked declaration may be wrapped in a decl_block.
+    codet actual_decl = decl;
+    if(actual_decl.get_statement() == ID_decl_block)
+    {
+      PRECONDITION(actual_decl.operands().size() == 1);
+      actual_decl = to_code(actual_decl.op0());
+    }
+
+    // Extract the declared variable from the declaration
+    const auto &decl_symbol = to_code_frontend_decl(actual_decl).symbol();
+
+    // Build: if(!var) break;
+    exprt cond_expr = decl_symbol;
+    implicit_typecast_bool(cond_expr);
+    code_breakt break_stmt;
+    break_stmt.add_source_location() = code.source_location();
+    code_ifthenelset if_break(not_exprt(cond_expr), std::move(break_stmt));
+
+    // Build the new body: { decl; if(!var) break; old_body; }
+    code_blockt new_body({std::move(decl), std::move(if_break), code.body()});
+    new_body.add_source_location() = code.source_location();
+
+    code.cond() = true_exprt();
+    code.body() = std::move(new_body);
+
+    // Delegate to C typecheck_while for body typechecking and flags
+    c_typecheck_baset::typecheck_while(code);
   }
   else
     c_typecheck_baset::typecheck_while(code);
@@ -363,8 +393,7 @@ void cpp_typecheckt::typecheck_switch(codet &code)
 
 void cpp_typecheckt::typecheck_member_initializer(codet &code)
 {
-  const cpp_namet &member=
-    to_cpp_name(code.find(ID_member));
+  const cpp_namet &member = to_cpp_name(code.find(ID_member));
 
   // Let's first typecheck the operands.
   Forall_operands(it, code)
@@ -380,19 +409,19 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
   // We ask for VAR only, as we get the parent classes via their
   // constructor!
   cpp_typecheck_fargst fargs;
-  fargs.in_use=true;
-  fargs.operands=code.operands();
+  fargs.in_use = true;
+  fargs.operands = code.operands();
 
   // We should only really resolve in qualified mode,
   // no need to look into the parent.
   // Plus, this should happen in class scope, not the scope of
   // the constructor because of the constructor arguments.
-  exprt symbol_expr=
+  exprt symbol_expr =
     resolve(member, cpp_typecheck_resolvet::wantt::VAR, fargs);
 
-  if(symbol_expr.type().id()==ID_code)
+  if(symbol_expr.type().id() == ID_code)
   {
-    const code_typet &code_type=to_code_type(symbol_expr.type());
+    const code_typet &code_type = to_code_type(symbol_expr.type());
 
     DATA_INVARIANT(
       code_type.parameters().size() >= 1, "at least one parameter");
@@ -400,7 +429,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
     // It's a parent. Call the constructor that we got.
     side_effect_expr_function_callt function_call(
       symbol_expr, {}, uninitialized_typet{}, code.source_location());
-    function_call.arguments().reserve(code.operands().size()+1);
+    function_call.arguments().reserve(code.operands().size() + 1);
 
     // we have to add 'this'
     exprt this_expr = cpp_scopes.current_scope().this_expr;
@@ -426,13 +455,13 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
 
       if(access == ID_private || access == ID_noaccess)
       {
-        #if 0
+#if 0
         error().source_location=code.find_source_location();
         error() << "constructor of '"
                 << to_string(symbol_expr)
                 << "' is not accessible" << eom;
         throw 0;
-        #endif
+#endif
       }
     }
 
@@ -453,8 +482,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
       symbol_expr.swap(tmp);
     }
 
-    if(symbol_expr.id() == ID_symbol &&
-       symbol_expr.type().id()!=ID_code)
+    if(symbol_expr.id() == ID_symbol && symbol_expr.type().id() != ID_code)
     {
       // maybe the name of the member collides with a parameter of the
       // constructor
@@ -494,9 +522,9 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
       if(is_reference(symbol_expr.type()))
       {
         // it's a reference member
-        if(code.operands().size()!= 1)
+        if(code.operands().size() != 1)
         {
-          error().source_location=code.find_source_location();
+          error().source_location = code.find_source_location();
           error() << " reference '" << to_string(symbol_expr)
                   << "' expects one initializer" << eom;
           throw 0;
@@ -553,7 +581,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
     }
     else
     {
-      error().source_location=code.find_source_location();
+      error().source_location = code.find_source_location();
       error() << "invalid member initializer '" << to_string(symbol_expr) << "'"
               << eom;
       throw 0;
@@ -563,21 +591,20 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
 
 void cpp_typecheckt::typecheck_decl(codet &code)
 {
-  if(code.operands().size()!=1)
+  if(code.operands().size() != 1)
   {
-    error().source_location=code.find_source_location();
+    error().source_location = code.find_source_location();
     error() << "declaration expected to have one operand" << eom;
     throw 0;
   }
 
   PRECONDITION(code.op0().id() == ID_cpp_declaration);
 
-  cpp_declarationt &declaration=
-    to_cpp_declaration(code.op0());
+  cpp_declarationt &declaration = to_cpp_declaration(code.op0());
 
-  typet &type=declaration.type();
+  typet &type = declaration.type();
 
-  bool is_typedef=declaration.is_typedef();
+  bool is_typedef = declaration.is_typedef();
 
   if(declaration.declarators().empty() || !has_auto(type))
     typecheck_type(type);
@@ -594,9 +621,8 @@ void cpp_typecheckt::typecheck_decl(codet &code)
   {
     if(type.id() != ID_union_tag)
     {
-      error().source_location=code.find_source_location();
-      error() << "declaration statement does not declare anything"
-              << eom;
+      error().source_location = code.find_source_location();
+      error() << "declaration statement does not declare anything" << eom;
       throw 0;
     }
 
@@ -614,9 +640,9 @@ void cpp_typecheckt::typecheck_decl(codet &code)
   for(auto &declarator : declaration.declarators())
   {
     cpp_declarator_convertert cpp_declarator_converter(*this);
-    cpp_declarator_converter.is_typedef=is_typedef;
+    cpp_declarator_converter.is_typedef = is_typedef;
 
-    const symbolt &symbol=
+    const symbolt &symbol =
       cpp_declarator_converter.convert(declaration, declarator);
 
     if(is_typedef)
@@ -630,11 +656,10 @@ void cpp_typecheckt::typecheck_decl(codet &code)
     }
 
     code_frontend_declt decl_statement(cpp_symbol_expr(symbol));
-    decl_statement.add_source_location()=symbol.location;
+    decl_statement.add_source_location() = symbol.location;
 
     // Do we have an initializer that's not code?
-    if(symbol.value.is_not_nil() &&
-       symbol.value.id()!=ID_code)
+    if(symbol.value.is_not_nil() && symbol.value.id() != ID_code)
     {
       decl_statement.copy_to_operands(symbol.value);
       // The value type should match the symbol type. For array types,
@@ -656,12 +681,12 @@ void cpp_typecheckt::typecheck_decl(codet &code)
       DATA_INVARIANT(
         declarator.find(ID_init_args).is_nil(),
         "declarator should not have init_args");
-      if(symbol.value.id()==ID_code)
+      if(symbol.value.id() == ID_code)
         new_code.copy_to_operands(symbol.value);
     }
     else
     {
-      exprt object_expr=cpp_symbol_expr(symbol);
+      exprt object_expr = cpp_symbol_expr(symbol);
 
       already_typechecked_exprt::make_already_typechecked(object_expr);
 

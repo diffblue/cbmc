@@ -1902,6 +1902,15 @@ exprt cpp_typecheck_resolvet::resolve(
   if(new_identifiers.size()==1)
   {
     result=*new_identifiers.begin();
+
+    if(result.id() == ID_template_function_instance)
+    {
+      // template_function_instance should have been instantiated
+      // by guess_function_template_args; if it wasn't, return nil
+      // so the caller can try other resolution paths.
+      if(!fail_with_exception)
+        return nil_exprt();
+    }
   }
   else
   {
@@ -2133,8 +2142,19 @@ void cpp_typecheck_resolvet::guess_template_args(
         return;
 
       // Check if it was instantiated from a template
-      if(desired_sym->type.get(ID_C_template).empty())
+      if(desired_sym->type.find(ID_C_template).is_nil())
         return;
+
+      // Verify that the template name in the cpp_name matches the
+      // template the desired type was instantiated from. Without this
+      // check, template argument deduction would incorrectly match
+      // unrelated template instantiations (e.g., deducing I=char from
+      // move_iterator<I> when the argument is basic_string<char>).
+      {
+        irep_idt tmpl_base_name = cpp_name.get_base_name();
+        if(!tmpl_base_name.empty() && tmpl_base_name != desired_sym->base_name)
+          return;
+      }
 
       const irept &inst_args = desired_sym->type.find(ID_C_template_arguments);
       if(inst_args.is_nil())

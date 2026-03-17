@@ -420,7 +420,8 @@ void cpp_typecheckt::default_assignop_value(
 void cpp_typecheckt::check_member_initializers(
   const struct_typet::basest &bases,
   const struct_typet::componentst &components,
-  const irept &initializers)
+  const irept &initializers,
+  const irep_idt &class_identifier)
 {
   PRECONDITION(initializers.id() == ID_member_initializers);
 
@@ -572,6 +573,15 @@ void cpp_typecheckt::check_member_initializers(
 
       if(member_type.id() == ID_struct_tag)
       {
+        // Delegating constructor (C++11): the initializer names the
+        // class's own type.
+        if(
+          !class_identifier.empty() &&
+          to_struct_tag_type(member_type).get_identifier() == class_identifier)
+        {
+          ok = true;
+        }
+
         for(const auto &b : bases)
         {
           if(
@@ -609,6 +619,32 @@ void cpp_typecheckt::full_member_initialization(
     struct_union_type.components();
 
   PRECONDITION(initializers.id() == ID_member_initializers);
+
+  // Delegating constructors (C++11) delegate to another constructor of the
+  // same class. No base class or member initialization should be added.
+  if(struct_union_type.id() == ID_struct)
+  {
+    for(const auto &initializer : initializers.get_sub())
+    {
+      const cpp_namet &member_name = to_cpp_name(initializer.find(ID_member));
+      if(!member_name.has_template_args())
+      {
+        irep_idt base_name = member_name.get_base_name();
+        for(const auto &c : to_struct_type(struct_union_type).components())
+        {
+          if(
+            c.get_base_name() == base_name && !c.get_bool(ID_from_base) &&
+            !c.get_bool(ID_is_type) && !c.get_bool(ID_is_static) &&
+            c.type().id() == ID_code &&
+            to_code_type(c.type()).return_type().id() == ID_constructor)
+          {
+            // The initializer names the class's own constructor.
+            return;
+          }
+        }
+      }
+    }
+  }
 
   irept final_initializers(ID_member_initializers);
 

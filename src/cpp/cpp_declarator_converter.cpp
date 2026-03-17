@@ -257,7 +257,10 @@ symbolt &cpp_declarator_convertert::convert(
         declarator.set(ID_member_initializers, ID_member_initializers);
 
       cpp_typecheck.check_member_initializers(
-        type.bases(), type.components(), declarator.member_initializers());
+        type.bases(),
+        type.components(),
+        declarator.member_initializers(),
+        symb.name);
 
       cpp_typecheck.full_member_initialization(
         type, declarator.member_initializers());

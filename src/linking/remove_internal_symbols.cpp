@@ -51,7 +51,11 @@ static void get_symbols(
     find_type_and_expr_symbols(symbol.value, new_symbols, loop_contracts_subs);
 
     for(const auto &s : new_symbols)
-      working_set.push_back(&ns.lookup(s));
+    {
+      const symbolt *sp;
+      if(!ns.lookup(s, sp))
+        working_set.push_back(sp);
+    }
 
     if(symbol.type.id() == ID_code)
     {
@@ -169,32 +173,33 @@ void remove_internal_symbols(
       it++)
   {
     // already marked?
-    if(exported.find(it->first)!=exported.end())
+    if(exported.find(it->first) != exported.end())
       continue;
 
     // not marked yet
-    const symbolt &symbol=it->second;
+    const symbolt &symbol = it->second;
 
-    if(special.find(symbol.name)!=special.end())
+    if(special.find(symbol.name) != special.end())
     {
       get_symbols(ns, symbol, exported);
       continue;
     }
 
-    bool is_function=symbol.type.id()==ID_code;
-    bool is_file_local=symbol.is_file_local;
-    bool is_type=symbol.is_type;
-    bool has_body=symbol.value.is_not_nil();
+    bool is_function = symbol.type.id() == ID_code;
+    bool is_file_local = symbol.is_file_local;
+    bool is_type = symbol.is_type;
+    bool has_body = symbol.value.is_not_nil();
     bool has_initializer = symbol.value.is_not_nil();
     bool is_contract = is_function && symbol.is_property;
 
     // __attribute__((constructor)), __attribute__((destructor))
-    if(symbol.mode==ID_C && is_function && is_file_local)
+    if(symbol.mode == ID_C && is_function && is_file_local)
     {
-      const code_typet &code_type=to_code_type(symbol.type);
-      if(code_type.return_type().id()==ID_constructor ||
-         code_type.return_type().id()==ID_destructor)
-        is_file_local=false;
+      const code_typet &code_type = to_code_type(symbol.type);
+      if(
+        code_type.return_type().id() == ID_constructor ||
+        code_type.return_type().id() == ID_destructor)
+        is_file_local = false;
     }
 
     if(is_type || symbol.is_macro)
@@ -222,8 +227,7 @@ void remove_internal_symbols(
     {
       // 'extern' symbols are only exported if there
       // is an initializer.
-      if((has_initializer || !symbol.is_extern) &&
-         !is_file_local)
+      if((has_initializer || !symbol.is_extern) && !is_file_local)
       {
         get_symbols(ns, symbol, exported);
       }
@@ -235,12 +239,12 @@ void remove_internal_symbols(
         symbol_table.symbols.begin();
       it != symbol_table.symbols.end();) // no it++
   {
-    if(exported.find(it->first)==exported.end())
+    if(exported.find(it->first) == exported.end())
     {
       symbol_table_baset::symbolst::const_iterator next = std::next(it);
       log.debug() << "Removing unused symbol " << it->first << messaget::eom;
       symbol_table.erase(it);
-      it=next;
+      it = next;
     }
     else
     {

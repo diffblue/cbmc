@@ -1982,10 +1982,18 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
           for(const auto &expect_decl : stmt.operands())
           {
             PRECONDITION(to_code(expect_decl).get_statement() == ID_decl);
-            PRECONDITION(!to_code_frontend_decl(to_code(expect_decl))
-                            .initial_value()
-                            .has_value());
+            const auto &decl = to_code_frontend_decl(to_code(expect_decl));
+            if(decl.initial_value().has_value())
+            {
+              exprt init = decl.initial_value().value();
+              value_map.replace(init);
+              value_map.set(decl.symbol(), init);
+            }
           }
+        }
+        else if(stmt.get_statement() == ID_skip)
+        {
+          // no-op, just continue
         }
         else
         {
