@@ -2132,13 +2132,17 @@ bool Parser::rDeclaration(cpp_declarationt &declaration)
   std::cout << std::string(__indent, ' ') << "Parser::rDeclaration 4\n";
 #endif
 
+  // Skip __attribute__ before integral type (libc++ pattern:
+  // inline __attribute__(...) bool friend operator==)
+  if(!optAttribute(declaration.type()))
+    return false;
+
   if(!optIntegralTypeOrClassSpec(integral))
     return false;
 
-  // added this one to do "void inline foo();"
-  if(member_spec.is_empty())
-    if(!optMemberSpec(member_spec))
-      return false;
+  // Handle member specifiers after type (e.g., bool friend operator==)
+  if(!optMemberSpec(member_spec))
+    return false;
 
   if(integral.is_not_nil())
   {
@@ -4989,7 +4993,7 @@ bool Parser::rName(irept &name)
       lex.get_token(tk);
       template_keyword_seen = true;
       // Skip template token, next will be identifier
-      if(!is_identifier(lex.LookAhead(0)))
+      if(!is_identifier(lex.LookAhead(0)) && lex.LookAhead(0) != TOK_OPERATOR)
         return false;
       break;
 
@@ -5417,8 +5421,8 @@ bool Parser::rPtrToMember(irept &ptr_to_mem)
     case TOK_TEMPLATE:
       lex.get_token(tk);
       // Skip template token, next will be identifier
-      if(!is_identifier(lex.LookAhead(0)))
-        return false;
+      if(!is_identifier(lex.LookAhead(0)) && lex.LookAhead(0) != TOK_OPERATOR)
+          return false;
       break;
 
     case '<':
@@ -5634,6 +5638,13 @@ bool Parser::rTemplateArgs(irept &template_args)
 #ifdef DEBUG
     std::cout << std::string(__indent, ' ') <<  "Parser::rTemplateArgs 6\n";
 #endif
+
+    // Pack expansion ellipsis after template argument
+    if(lex.LookAhead(0) == TOK_ELLIPSIS)
+    {
+      lex.get_token(tk1);
+      exp.set(ID_ellipsis, true);
+    }
 
     template_args.get_sub().push_back(irept(irep_idt()));
     template_args.get_sub().back().swap(exp);
@@ -6557,6 +6568,16 @@ bool Parser::rClassMember(cpp_itemt &member)
     return rStaticAssert(member.make_static_assert());
   else
   {
+    // Handle __attribute__(...) typedef in class body
+    if(t == TOK_GCC_ATTRIBUTE)
+    {
+      cpp_token_buffert::post attr_pos = lex.Save();
+      typet discard;
+      if(optAttribute(discard) && lex.LookAhead(0) == TOK_TYPEDEF)
+        return rTypedef(member.make_declaration());
+      lex.Restore(attr_pos);
+    }
+
     cpp_token_buffert::post pos=lex.Save();
     if(rDeclaration(member.make_declaration()))
       return true;
@@ -9718,7 +9739,7 @@ bool Parser::rVarNameCore(exprt &name)
       lex.get_token(tk);
       template_keyword_seen = true;
       // Skip template token, next will be identifier
-      if(!is_identifier(lex.LookAhead(0)))
+      if(!is_identifier(lex.LookAhead(0)) && lex.LookAhead(0) != TOK_OPERATOR)
         return false;
       break;
 
@@ -9893,6 +9914,18 @@ bool Parser::rVarNameCore(exprt &name)
 
         components.push_back(op);
       }
+
+      // Check for template arguments after operator name
+      // (e.g., .template operator()<Args>())
+      if(template_keyword_seen && lex.LookAhead(0) == '<')
+      {
+        irept args;
+        cpp_token_buffert::post pos = lex.Save();
+        if(rTemplateArgs(args))
+          components.push_back(args);
+        else
+          lex.Restore(pos);
+      }
       return true;
 
     case TOK_DECLTYPE:
@@ -10001,6 +10034,21 @@ bool Parser::maybeTemplateArgs()
             ++m;
           else if(v==')')
             --m;
+          else if(v == '{')
+          {
+            // Brace-init inside parens (e.g., Type{val})
+            int b = 1;
+            while(b > 0)
+            {
+            int w = lex.LookAhead(i++);
+            if(w == '{')
+                ++b;
+            else if(w == '}')
+                --b;
+            else if(w == '\0' || w == ';')
+                return false;
+            }
+          }
           else if(v=='\0' || v==';' || v=='}')
             return false;
         }

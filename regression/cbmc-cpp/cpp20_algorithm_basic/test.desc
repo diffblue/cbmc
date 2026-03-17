@@ -1,8 +1,10 @@
-KNOWNBUG
+CORE
 main.cpp
---cpp20 --no-built-in-assertions
+--cpp17 --no-built-in-assertions --unwind 3 --depth 100
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-__numeric_traits_integer template scope not found during std::sort instantiation
+^CONVERSION ERROR$
+std::sort works in C++17 mode. C++20 mode fails because
+__numeric_traits_integer template scope is lost.

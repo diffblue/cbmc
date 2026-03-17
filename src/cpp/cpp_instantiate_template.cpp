@@ -27,6 +27,16 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <algorithm>
 
+namespace
+{
+cpp_scopet *id_map_lookup(cpp_scopest &scopes, const irep_idt &key)
+{
+  auto it = scopes.id_map.find(key);
+  return it != scopes.id_map.end() ? static_cast<cpp_scopet *>(it->second)
+                                   : nullptr;
+}
+} // namespace
+
 std::string cpp_typecheckt::template_suffix(
   const cpp_template_args_tct &template_args)
 {
@@ -239,8 +249,7 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   // produce new symbol name
   std::string suffix=template_suffix(full_template_args);
 
-  cpp_scopet *template_scope=
-    static_cast<cpp_scopet *>(cpp_scopes.id_map[template_symbol.name]);
+  cpp_scopet *template_scope = id_map_lookup(cpp_scopes, template_symbol.name);
 
   if(template_scope == nullptr)
   {
@@ -431,7 +440,7 @@ void cpp_typecheckt::elaborate_class_template(
     if(primary_template.type.get(ID_specialization_of).empty())
     {
       cpp_scopet *template_scope =
-        static_cast<cpp_scopet *>(cpp_scopes.id_map[primary_template.name]);
+        id_map_lookup(cpp_scopes, primary_template.name);
 
       if(template_scope != nullptr)
       {
@@ -485,8 +494,7 @@ void cpp_typecheckt::elaborate_class_template(
 
           template_map.build_unassigned(cpp_declaration.template_type());
 
-          cpp_scopet *spec_scope =
-            static_cast<cpp_scopet *>(cpp_scopes.id_map[s.name]);
+          cpp_scopet *spec_scope = id_map_lookup(cpp_scopes, s.name);
           if(spec_scope != nullptr)
             cpp_scopes.go_to(*spec_scope);
 
@@ -799,8 +807,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
   std::string suffix=template_suffix(full_template_args);
 
   // we need the template scope to see the template parameters
-  cpp_scopet *template_scope=
-    static_cast<cpp_scopet *>(cpp_scopes.id_map[template_symbol.name]);
+  cpp_scopet *template_scope = id_map_lookup(cpp_scopes, template_symbol.name);
 
   if(template_scope==nullptr)
   {
@@ -1712,8 +1719,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
         }
       }
 
-      cpp_scopet *ts =
-        static_cast<cpp_scopet *>(cpp_scopes.id_map[template_symbol.name]);
+      cpp_scopet *ts = id_map_lookup(cpp_scopes, template_symbol.name);
       if(ts != nullptr)
       {
         cpp_scopet &parent_scope = ts->get_parent();
@@ -1743,8 +1749,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
           template_map.build_unassigned(spec_decl.template_type());
 
-          cpp_scopet *spec_scope =
-            static_cast<cpp_scopet *>(cpp_scopes.id_map[s.name]);
+          cpp_scopet *spec_scope = id_map_lookup(cpp_scopes, s.name);
           if(spec_scope != nullptr)
             cpp_scopes.go_to(*spec_scope);
 

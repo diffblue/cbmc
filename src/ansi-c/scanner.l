@@ -1644,7 +1644,8 @@ enable_or_disable ("enable"|"disable")
 "^="            { loc(); return TOK_XORASSIGN; }
 "|="            { loc(); return TOK_ORASSIGN; }
 
-  /* digraphs */
+  /* digraphs — C++11 2.5/3: <:: is < :: when not followed by : or > */
+"<::"/[^:>]     { loc(); yyless(1); return '<'; }
 "<:"            { loc(); return '['; }
 ":>"            { loc(); return ']'; }
 "<%"            { loc(); return '{'; }
