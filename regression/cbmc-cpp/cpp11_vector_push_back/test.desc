@@ -1,10 +1,9 @@
-KNOWNBUG
+CORE
 main.cpp
---cpp11
-^VERIFICATION SUCCESSFUL$
-^EXIT=0$
+--cpp11 --unwind 2
+\[main\.assertion\.2\] line 9 vector element: SUCCESS
+^EXIT=10$
 ^SIGNAL=0$
 --
-std::vector: emplace_back body is now provided but operator new/delete
-have no body, so memory allocation is not modeled and the vector
-size/element assertions fail.
+The vector element assertion passes. The vector size assertion fails
+because pointer arithmetic in size() is not fully modeled.

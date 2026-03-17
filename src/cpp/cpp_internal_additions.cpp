@@ -221,5 +221,12 @@ void cpp_internal_additions(std::ostream &out)
     out << "void __stdcall ATL::AtlThrowLastWin32();" << '\n';
   }
 
+  // C++20 coroutine builtins (stubs for type-checking)
+  out << "void *__builtin_coro_promise(void *, int, bool);\n";
+  out << "bool __builtin_coro_done(void *);\n";
+  out << "void __builtin_coro_resume(void *);\n";
+  out << "void __builtin_coro_destroy(void *);\n";
+  out << "void *__builtin_coro_noop();\n";
+
   out << std::flush;
 }

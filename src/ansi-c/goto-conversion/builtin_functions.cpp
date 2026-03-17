@@ -886,6 +886,19 @@ void goto_convertt::do_function_call_symbol(
       function_call.lhs().make_nil();
     }
 
+    // For constructor calls used as values (e.g., return Foo(args)),
+    // the lhs is the temporary object. Transform to:
+    // constructor(address_of(lhs), args) with nil lhs.
+    if(
+      lhs.is_not_nil() &&
+      to_code_type(symbol->type).return_type().id() == ID_constructor)
+    {
+      exprt this_arg = address_of_exprt(function_call.lhs());
+      function_call.arguments().insert(
+        function_call.arguments().begin(), std::move(this_arg));
+      function_call.lhs().make_nil();
+    }
+
     copy(function_call, FUNCTION_CALL, dest);
 
     return;

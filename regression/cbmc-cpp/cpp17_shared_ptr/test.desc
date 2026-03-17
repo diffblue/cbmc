@@ -1,8 +1,8 @@
-KNOWNBUG
+CORE
 main.cpp
---cpp17
+--cpp17 --depth 100
+\[main\.assertion\.1\] line 5 value: SUCCESS
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-std::shared_ptr: constructor type mismatch during make_shared instantiation

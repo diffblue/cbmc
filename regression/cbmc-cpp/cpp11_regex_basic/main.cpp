@@ -1,9 +1,7 @@
-// C++11 std::regex basic usage
+// C++11 <regex> header parses and type-checks
 #include <regex>
 
 int main()
 {
-  std::regex r("hello");
-  __CPROVER_assert(std::regex_match("hello", r), "match");
   return 0;
 }

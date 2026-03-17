@@ -1,9 +1,8 @@
-KNOWNBUG
+CORE
 main.cpp
---cpp11
+--cpp11 --depth 100
+\[main\.assertion\.1\] line 7 make_shared value: SUCCESS
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-std::make_shared: expected pointer error in _Sp_alloc_shared_tag
-constructor. std::shared_ptr with new works fine.

@@ -1331,6 +1331,23 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
 
         if(id_set.empty())
         {
+          // Fallback: search the global id_map for the namespace.
+          // This handles cases where the current scope (e.g., a
+          // template instantiation scope) doesn't have the target
+          // namespace in its parent chain.
+          for(auto &entry : cpp_typecheck.cpp_scopes.id_map)
+          {
+            if(
+              entry.second->base_name == final_base_name &&
+              entry.second->is_namespace())
+            {
+              id_set.insert(entry.second);
+            }
+          }
+        }
+
+        if(id_set.empty())
+        {
           cpp_typecheck.show_instantiation_stack(cpp_typecheck.error());
           cpp_typecheck.error().source_location = source_location;
           cpp_typecheck.error()
