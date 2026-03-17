@@ -89,11 +89,9 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       expr = typecast_exprt(cast_arg, cast_target);
       return;
     }
-#ifdef DEBUG
-    std::cerr << "E: " << expr.pretty() << '\n';
-    std::cerr << "cpp_typecheckt::typecheck_expr_main got code\n";
-#endif
-    UNREACHABLE;
+    error().source_location = expr.source_location();
+    error() << "unexpected ID_code expression" << eom;
+    throw 0;
   }
   else if(expr.id()==ID_symbol)
   {
@@ -1544,6 +1542,34 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
         }
       }
     }
+  }
+  else if(
+    fargs.in_use && symbol_expr.id() == ID_symbol &&
+    symbol_expr.type().id() == ID_code &&
+    to_code_type(symbol_expr.type()).return_type().id() != ID_constructor &&
+    !to_code_type(symbol_expr.type()).parameters().empty() &&
+    to_code_type(symbol_expr.type()).parameters().front().get_this() &&
+    cpp_scopes.current_scope().this_expr.is_not_nil())
+  {
+    // Instantiated template member function returned as symbol_exprt
+    // when called from within a class method body. Build a member
+    // expression with dereferenced 'this' as the object so that
+    // typecheck_method_application adds the this argument.
+    const exprt &this_expr = cpp_scopes.current_scope().this_expr;
+    exprt object(ID_dereference, to_pointer_type(this_expr.type()).base_type());
+    object.copy_to_operands(this_expr);
+    object.type().set(
+      ID_C_constant,
+      to_pointer_type(this_expr.type()).base_type().get_bool(ID_C_constant));
+    object.set(ID_C_lvalue, true);
+    object.add_source_location() = source_location;
+
+    exprt member(ID_member);
+    member.set(ID_component_name, to_symbol_expr(symbol_expr).get_identifier());
+    member.add_to_operands(std::move(object));
+    member.type() = symbol_expr.type();
+    member.add_source_location() = source_location;
+    symbol_expr.swap(member);
   }
 
   symbol_expr.add_source_location()=source_location;

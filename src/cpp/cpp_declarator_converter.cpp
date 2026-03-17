@@ -202,6 +202,18 @@ symbolt &cpp_declarator_convertert::convert(
       }
       else if(!maybe_symbol)
       {
+        if(final_storage_spec.is_extern())
+        {
+          // extern template instantiation declaration for a member
+          // that hasn't been instantiated yet — silently skip by
+          // creating a weak extern symbol.
+          symbolt &new_symbol =
+            convert_new_symbol(final_storage_spec, member_spec, declarator);
+          new_symbol.is_extern = true;
+          new_symbol.is_weak = true;
+          return new_symbol;
+        }
+
         cpp_typecheck.error().source_location=
           declarator.name().source_location();
         cpp_typecheck.error()

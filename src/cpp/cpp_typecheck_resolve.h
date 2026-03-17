@@ -149,23 +149,30 @@ protected:
   struct matcht
   {
     std::size_t cost;
+    std::size_t constrained_args;
     cpp_template_args_tct specialization_args;
     cpp_template_args_tct full_args;
     irep_idt id;
     matcht(
       cpp_template_args_tct _s_args,
       cpp_template_args_tct _f_args,
-      irep_idt _id):
-      cost(_s_args.arguments().size()),
-      specialization_args(_s_args),
-      full_args(_f_args),
-      id(_id)
+      irep_idt _id,
+      std::size_t _constrained = 0)
+      : cost(_s_args.arguments().size()),
+        constrained_args(_constrained),
+        specialization_args(_s_args),
+        full_args(_f_args),
+        id(_id)
     {
     }
 
     bool operator<(const matcht &other) const
     {
-      return cost<other.cost;
+      if(cost != other.cost)
+        return cost < other.cost;
+      // Prefer more constrained specializations (more non-trivial
+      // patterns in the partial specialization arguments).
+      return constrained_args > other.constrained_args;
     }
   };
 };

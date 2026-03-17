@@ -524,8 +524,22 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
         // it's a data member
         already_typechecked_exprt::make_already_typechecked(symbol_expr);
 
+        // Operands were already typechecked above; wrap them to prevent
+        // cpp_constructor from typechecking them again.  Don't wrap
+        // array-ini operands: they are used directly (not re-typechecked)
+        // and the wrapper would break array indexing.
+        exprt::operandst wrapped_ops;
+        wrapped_ops.reserve(code.operands().size());
+        for(const auto &op : code.operands())
+        {
+          if(op.get_bool(ID_C_array_ini))
+            wrapped_ops.push_back(op);
+          else
+            wrapped_ops.push_back(already_typechecked_exprt{op});
+        }
+
         auto call =
-          cpp_constructor(code.source_location(), symbol_expr, code.operands());
+          cpp_constructor(code.source_location(), symbol_expr, wrapped_ops);
 
         if(call.has_value())
           code.swap(call.value());
