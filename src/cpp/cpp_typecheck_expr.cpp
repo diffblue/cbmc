@@ -3028,6 +3028,8 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
     for(const auto &p : check_params.get_sub())
     {
       const cpp_declarationt &pdecl = static_cast<const cpp_declarationt &>(p);
+      if(pdecl.get_bool("explicit_this"))
+        continue;
       if(pdecl.type().id() == ID_auto || pdecl.type().id() == ID_cpp_name)
       {
         has_auto_param = true;
@@ -3044,6 +3046,8 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
       for(auto &p : default_params.get_sub())
       {
         cpp_declarationt &pdecl = static_cast<cpp_declarationt &>(p);
+        if(pdecl.get_bool("explicit_this"))
+          continue;
         if(pdecl.type().id() == ID_auto || pdecl.type().id() == ID_cpp_name)
           pdecl.type() = signed_int_type();
       }
@@ -3089,6 +3093,9 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
   for(const auto &p : params_irep.get_sub())
   {
     const cpp_declarationt &pdecl = static_cast<const cpp_declarationt &>(p);
+    // C++23 deducing this: skip explicit object parameter
+    if(pdecl.get_bool("explicit_this"))
+      continue;
     typet ptype = pdecl.type();
     typecheck_type(ptype);
     irep_idt pname;

@@ -1,24 +1,27 @@
 // C++11 move semantics
-struct S
+struct Buffer
 {
   int *data;
-  S() : data(new int(42))
+  int size;
+  Buffer(int n) : data(new int[n]), size(n)
   {
+    data[0] = 42;
   }
-  S(S &&other) : data(other.data)
+  Buffer(Buffer &&other) : data(other.data), size(other.size)
   {
-    other.data = nullptr;
+    other.data = 0;
+    other.size = 0;
   }
-  ~S()
+  ~Buffer()
   {
-    delete data;
+    delete[] data;
   }
 };
 int main()
 {
-  S a;
-  S b(static_cast<S &&>(a));
-  __CPROVER_assert(b.data != nullptr, "moved data");
-  __CPROVER_assert(a.data == nullptr, "source nulled");
+  Buffer a(1);
+  Buffer b(static_cast<Buffer &&>(a));
+  __CPROVER_assert(b.size == 1, "moved size");
+  __CPROVER_assert(a.data == 0, "source nulled");
   return 0;
 }

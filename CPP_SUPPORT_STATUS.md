@@ -6,18 +6,19 @@ Last updated: 2026-03-07
 
 ### Working language features (~95%)
 - `nullptr`, `auto`, `decltype`, `constexpr`, `static_assert`, `noexcept`
-- Lambdas (capture by value/reference), range-for, rvalue references, move semantics
+- Lambdas (capture by value/reference/init-capture), range-for, rvalue references, move semantics
 - Variadic templates, parameter packs, `sizeof...` — **FIXED**: `sizeof...(args)` now works for expression packs
 - `enum class`, delegating constructors, `override`/`final`
-- `thread_local`, `char16_t`/`char32_t`, user-defined literals
+- `thread_local`, `char16_t`/`char32_t`, user-defined literals (numeric and string)
 - Template aliases, trailing return types, inline namespaces
-- Brace initialization, `= default`, `= delete`
+- Brace initialization, `= default`, `= delete`, return with braces
 - `noexcept` operator (`noexcept(expr)`)
 - `alignof` operator
 - Explicit conversion operators (`explicit operator bool()`)
 - Perfect forwarding with rvalue references
 - SFINAE with `enable_if`
 - Range-for over braced initializer lists (`for(int x : {1,2,3})`) — **FIXED**
+- Raw string literals (`R"delim(content)delim"`) — **FIXED**: all encoding prefixes supported
 
 ### STL/library support (~60%)
 - `std::vector`, `std::map`, `std::string`, `std::list`, `std::set`, `std::deque` — basic operations work but many member functions produce "no body" stubs
@@ -33,7 +34,6 @@ Last updated: 2026-03-07
 - Complex STL template instantiations often fail or produce stubs
 - `std::initializer_list` as function argument (`sum({1,2,3})`) produces "no body for main" (KNOWNBUG test: `cpp11_initializer_list_arg`)
 - Inheriting constructors (`using Base::Base`) — conversion error
-- Raw string literals (`R"(...)"`) — not parsed
 - Variadic template pack expansion in recursive functions — only last arg passed
 
 ---
@@ -43,7 +43,7 @@ Last updated: 2026-03-07
 ### Working language features (~95%)
 - Binary literals (`0b1010`)
 - Digit separators (`1'000'000`) — **FIXED**: apostrophes stripped from integer literals
-- `decltype(auto)` — value case works; reference case (parenthesized return) is KNOWNBUG
+- `decltype(auto)` — value case works; reference case (parenthesized return) — **FIXED**: deduces `int&` for `return (x)`
 - Variable templates — **FIXED**: constexpr value now correctly substituted
 - Relaxed `constexpr` (loops, local variables)
 - Recursive `constexpr` functions with ternary operator — **FIXED**
@@ -89,9 +89,9 @@ Last updated: 2026-03-07
 - Good coverage for: vector, deque, algorithm, string, memory, tuple, iterator, numeric, valarray, functional
 
 ### Known gaps — language
-- **Fold expressions** (`(args + ...)`) — parse but "no body" errors; incomplete template instantiation (KNOWNBUG: `cpp17_fold_expr`)
+- **Fold expressions** (`(args + ...)` and `(... && args)`) — right and left folds parse; incomplete template instantiation for multi-arg packs (KNOWNBUG: `cpp17_fold_expr`)
 - **Deduction guides** — **FIXED**: silently skipped, CTAD handles deduction
-- **CTAD with aggregates and deduction guides** — KNOWNBUG: multi-param template deduction
+- **CTAD with aggregates and deduction guides** — **FIXED**: brace-init CTAD now works
 - **Variadic template bases** (`struct D : Bases...`) — KNOWNBUG
 
 ---
@@ -150,7 +150,7 @@ Last updated: 2026-03-07
 
 ### Known gaps — language
 - **Lambda in unevaluated contexts** — `decltype([]{})` works for simple cases
-- **Explicit object parameters in lambdas** — KNOWNBUG: wrong number of arguments
+- **Explicit object parameters in lambdas** — **FIXED**: `[](this auto self, int a, int b)` works
 - **`std::expected`**, **`std::mdspan`**, **`std::print`**, **`std::stacktrace`** — no library modeling
 - **`constexpr` for `<cmath>`/`<cstdlib>`** — not modeled
 
@@ -199,14 +199,12 @@ Last updated: 2026-03-07
 | `cpp11_template_template_deduction` | C++11 | Template template parameter deduction fails |
 | `cpp11_variadic_expansion` | C++11 | Variadic pack expansion only passes last arg |
 | `cpp11_inheriting_ctor` | C++11 | Inheriting constructors → conversion error |
-| `cpp11_raw_string_literal` | C++11 | Raw string literals not parsed |
-| `cpp14_decltype_auto_ref` | C++14 | `decltype(auto)` returning reference → not an lvalue |
 | `cpp14_index_sequence` | C++14 | Non-type variadic template parameters |
 | `cpp17_fold_expr` | C++17 | Fold expressions need variadic pack expansion |
-| `cpp17_ctad_aggregate` | C++17 | CTAD with aggregate + deduction guide |
 | `cpp17_variadic_bases` | C++17 | Variadic template base classes |
+| `cpp17_structured_binding_array` | C++17 | Structured bindings with array → no body |
 | `cpp20_nttp_string` | C++20 | Class type as non-type template parameter |
-| `cpp23_deducing_this_lambda` | C++23 | Explicit object parameter in lambda |
+| `cpp20_aggregate_base` | C++20 | Aggregate init with base class → no body |
 | `cpp26_pack_indexing` | C++26 | Pack indexing instantiation |
 
 ## Key file locations

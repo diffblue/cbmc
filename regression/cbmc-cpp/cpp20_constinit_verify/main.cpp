@@ -1,7 +1,7 @@
 // C++20 constinit
-constinit int global = 42;
+constinit int x = 42;
 int main()
 {
-  __CPROVER_assert(global == 42, "constinit");
+  __CPROVER_assert(x == 42, "constinit");
   return 0;
 }
