@@ -1,3 +1,4 @@
+#include <cassert>
 // Note: systemc builtin extension
 // require the cpp frontend to be compiled with the CPP_SYSTEMC_EXTENSION flag
 int main()
