@@ -1159,10 +1159,12 @@ struct_tag_typet cpp_typecheck_resolvet::disambiguate_template_classes(
       cpp_declaration.template_type());
 
     // iterate over template instance
-    DATA_INVARIANT(
-      full_template_args_tc.arguments().size() ==
-        partial_specialization_args.arguments().size(),
-      "number of arguments should match");
+    if(
+      full_template_args_tc.arguments().size() !=
+      partial_specialization_args.arguments().size())
+    {
+      continue;
+    }
 
     // we need to do this in the right scope
 

@@ -202,9 +202,6 @@ void template_mapt::build(
   cpp_template_args_tct::argumentst instance=
     template_args.arguments();
 
-  template_typet::template_parameterst::const_iterator t_it=
-    template_parameters.begin();
-
   if(instance.size()<template_parameters.size())
   {
     // check for default parameters
@@ -222,16 +219,24 @@ void template_mapt::build(
   }
 
   // these should have been typechecked before
+  bool has_pack = !template_parameters.empty() &&
+                  template_parameters.back().get_bool(ID_ellipsis);
   DATA_INVARIANT(
-    instance.size() == template_parameters.size(),
+    instance.size() == template_parameters.size() ||
+      (has_pack && instance.size() >= template_parameters.size() - 1),
     "template instantiation expected to match declaration");
 
-  for(cpp_template_args_tct::argumentst::const_iterator
-      i_it=instance.begin();
-      i_it!=instance.end();
-      i_it++, t_it++)
+  std::size_t i = 0;
+  for(cpp_template_args_tct::argumentst::const_iterator i_it = instance.begin();
+      i_it != instance.end();
+      i_it++, i++)
   {
-    set(*t_it, *i_it);
+    if(i < template_parameters.size())
+    {
+      set(template_parameters[i], *i_it);
+    }
+    // Extra arguments for variadic packs are not mapped to individual
+    // parameters; they are passed through in the template args.
   }
 }
 

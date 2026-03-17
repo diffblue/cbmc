@@ -43,6 +43,14 @@ public:
 
   cpp_scopet &resolve_namespace(const cpp_namet &cpp_name);
 
+  void guess_template_args(
+    const typet &template_parameter,
+    const typet &desired_type);
+
+  void guess_template_args(
+    const exprt &template_parameter,
+    const exprt &desired_expr);
+
 protected:
   cpp_typecheckt &cpp_typecheck;
   source_locationt source_location;
@@ -110,14 +118,6 @@ protected:
   exprt guess_function_template_args(
     const exprt &expr,
     const cpp_typecheck_fargst &fargs);
-
-  void guess_template_args(
-    const typet &template_parameter,
-    const typet &desired_type);
-
-  void guess_template_args(
-    const exprt &template_parameter,
-    const exprt &desired_expr);
 
   bool disambiguate_functions(
     const exprt &expr,
