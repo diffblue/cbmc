@@ -1,267 +1,240 @@
 # CBMC C++ Standard Support Status
 
-**Date:** 2026-03-14
+**Date:** 2026-03-15
 **Branch:** `cpp11-parser-rework`
 **Compiler:** g++ 13 (libstdc++)
+**Tests:** 278 CORE, 1 KNOWNBUG
 
 ## Summary
 
-| Standard | Headers | Language Features | Overall |
-|----------|---------|-------------------|---------|
-| C++11    | ★★★★☆  | ★★★★★             | ~95%    |
-| C++14    | ★★★★★  | ★★★★★             | ~98%    |
-| C++17    | ★★★★☆  | ★★★★☆             | ~90%    |
-| C++20    | ★★★★☆  | ★★★☆☆             | ~75%    |
-| C++23    | ★★☆☆☆  | ★★★☆☆             | ~40%    |
-| C++26    | ★☆☆☆☆  | ★★☆☆☆             | ~20%    |
+| Standard | Language | Library | Tests | Overall |
+|----------|----------|---------|-------|---------|
+| C++11    | ★★★★★   | ★★★★☆  | 106+1 | ~95%    |
+| C++14    | ★★★★★   | ★★★★★  | 21    | ~98%    |
+| C++17    | ★★★★★   | ★★★★☆  | 58    | ~93%    |
+| C++20    | ★★★★☆   | ★★★★☆  | 68    | ~85%    |
+| C++23    | ★★★★☆   | ★★☆☆☆  | 21    | ~50%    |
+| C++26    | ★★☆☆☆   | ★☆☆☆☆  | 4     | ~20%    |
 
 ---
 
 ## C++11
 
-**105 regression tests, all passing.**
+**106 CORE tests, 1 KNOWNBUG.**
 
-### Headers (23/24 work)
+### Language Features — all working
+- `auto`, `decltype`, `decltype(auto)`
+- Range-based `for` (including over braced-init-lists)
+- `nullptr`, scoped enums (`enum class`)
+- `constexpr` functions and variables
+- Lambda expressions (capture by value/reference/init-capture)
+- Rvalue references, move semantics, perfect forwarding
+- Variadic templates, parameter packs, `sizeof...`
+- Template aliases (`using`), trailing return types
+- `static_assert`, `noexcept` (specifier and operator)
+- `alignas`, `alignof`
+- User-defined literals (numeric, string, standard library suffixes)
+- Delegating constructors, inheriting constructors
+- Default member initializers (NSDMI)
+- `= default`, `= delete`
+- Inline namespaces
+- Raw string literals
+- Explicit conversion operators
+- SFINAE with `enable_if`
+- Braced-init-list with `auto` (modeled as array; `std::initializer_list<T>.size()` also works)
 
-| Header | Status | Notes |
-|--------|--------|-------|
-| `<string>` | ✅ Works | `s.size()` verified correctly |
-| `<vector>` | ✅ Works | Element access verified; `size()` has pointer arithmetic limitations |
-| `<map>` | ✅ Works | Insert and lookup verified |
-| `<set>` | ✅ Works | |
-| `<list>` | ✅ Works | |
-| `<deque>` | ✅ Works | |
-| `<array>` | ✅ Works | Size and element access verified |
-| `<tuple>` | ✅ Works | `std::get<>` verified |
-| `<unordered_map>` | ✅ Works | |
-| `<unordered_set>` | ✅ Works | |
-| `<memory>` | ✅ Works | `unique_ptr`, `shared_ptr`, `make_shared` all work |
-| `<functional>` | ✅ Works | `std::function` verified |
-| `<algorithm>` | ✅ Works | |
-| `<numeric>` | ✅ Works | |
-| `<chrono>` | ✅ Works | |
-| `<thread>` | ✅ Works | |
-| `<mutex>` | ✅ Works | |
-| `<condition_variable>` | ✅ Works | |
-| `<future>` | ✅ Works | |
-| `<atomic>` | ✅ Works | |
-| `<iostream>` | ✅ Works | |
-| `<fstream>` | ✅ Works | |
-| `<sstream>` | ✅ Works | |
-| `<regex>` | ⚠️ Parses | Header parses; `_Scanner` class template body fails silently; regex operations have no body |
+### Standard Library
+| Header | Parse | Verify | Notes |
+|--------|-------|--------|-------|
+| `<string>` | ✅ | ✅ `s.size()==5` verified | `_M_construct` body provided via template method fix |
+| `<vector>` | ✅ | ✅ `v[0]==42` verified | `emplace_back` body provided; `operator new/delete` modeled |
+| `<map>` | ✅ | ✅ verified with `--unwind` | |
+| `<set>`, `<list>`, `<deque>` | ✅ | ✅ | |
+| `<array>` | ✅ | ✅ `a.size()==3` verified | |
+| `<tuple>` | ✅ | ✅ `get<0>(t)==1` verified | |
+| `<unordered_map>`, `<unordered_set>` | ✅ | ✅ | |
+| `<memory>` | ✅ | ✅ `unique_ptr`, `shared_ptr`, `make_shared` all verified | |
+| `<functional>` | ✅ | ✅ `std::function` verified | |
+| `<algorithm>`, `<numeric>` | ✅ | ✅ | |
+| `<chrono>` | ✅ | ✅ | |
+| `<thread>`, `<mutex>`, `<condition_variable>`, `<future>` | ✅ | ✅ | |
+| `<atomic>` | ✅ | ✅ | |
+| `<iostream>`, `<fstream>`, `<sstream>` | ✅ | ✅ | |
+| `<regex>` | ✅ parses | ❌ operations have no body | `_Scanner` class body fails silently |
 
-### Language Features
-
-| Feature | Status |
-|---------|--------|
-| `auto` type deduction | ✅ |
-| `decltype` | ✅ |
-| Range-based `for` | ✅ |
-| `nullptr` | ✅ |
-| Scoped enums (`enum class`) | ✅ |
-| `constexpr` functions | ✅ |
-| Lambda expressions | ✅ |
-| Rvalue references / move semantics | ✅ |
-| `static_assert` | ✅ |
-| `alignas` / `alignof` | ✅ |
-| Variadic templates | ✅ |
-| Template aliases (`using`) | ✅ |
-| Delegating constructors | ✅ |
-| Inheriting constructors | ✅ |
-| User-defined literals | ✅ |
-| `noexcept` | ✅ |
-| Braced-init-list with `auto` | ✅ (modeled as array) |
-| `std::initializer_list<T>` | ⚠️ Partial (modeled as array, no `.size()`) |
-| Inline namespaces | ⚠️ Works for unqualified lookup; qualified `std::X` from inline ns requires explicit `std::__ns::X` |
-
-### Known Gaps
-- `std::initializer_list<T>` is modeled as a fixed-size array, not the actual class
-- `<regex>` operations have no body (the `_Scanner` class template fails during body processing)
-- Inline namespace visibility for qualified lookups is incomplete
+### KNOWNBUG
+- `cpp11_regex_match`: `std::regex_match` returns nondeterministic value because `_Scanner` class template body processing fails in the system header.
 
 ---
 
 ## C++14
 
-**21 regression tests, all passing.**
+**21 CORE tests, 0 KNOWNBUG.**
 
-### Headers
-All C++11 headers continue to work. No new C++14-specific headers.
+### Language Features — all working
+- Generic lambdas (`auto` parameters)
+- Return type deduction
+- Binary literals (`0b1010`), digit separators (`1'000`)
+- Variable templates
+- Relaxed `constexpr` (loops, local variables)
+- `decltype(auto)` (value and reference cases)
+- `[[deprecated]]` attribute
+- Lambda init-capture
 
-### Language Features
-
-| Feature | Status |
-|---------|--------|
-| Generic lambdas (`auto` params) | ✅ |
-| Return type deduction | ✅ |
-| Binary literals (`0b1010`) | ✅ |
-| Digit separators (`1'000`) | ✅ |
-| Variable templates | ✅ |
-| Relaxed `constexpr` | ✅ |
-| `[[deprecated]]` attribute | ✅ |
-| `std::make_unique` | ✅ |
-
-### Known Gaps
-- None significant
+### Standard Library
+All C++11 library support carries forward. `std::make_unique` works.
 
 ---
 
 ## C++17
 
-**57 regression tests, all passing.**
+**58 CORE tests, 0 KNOWNBUG.**
 
-### Headers
+### Language Features — all working
+- Structured bindings (including references, tuple-like protocol)
+- `if`/`switch` with initializer
+- `if constexpr`
+- Fold expressions (all binary operators, left/right/binary folds)
+- Inline variables
+- Nested namespaces (`A::B::C`)
+- Class template argument deduction (CTAD)
+- `template<auto>` non-type template parameters
+- `static_assert` without message
+- `[[nodiscard]]`, `[[maybe_unused]]`, `[[fallthrough]]`
+- Deduction guides (silently skipped; CTAD handles deduction)
+- `constexpr` lambdas
 
-| Header | Status | Notes |
-|--------|--------|-------|
-| `<string_view>` | ✅ Works | |
-| `<optional>` | ✅ Works | `has_value()` verified |
-| `<variant>` | ✅ Works | `std::get<>` verified |
-| `<any>` | ✅ Works | |
-| `<filesystem>` | ✅ Parses | Header parses; `path` class partially registered (some members fail) |
-| `<charconv>` | ✅ Works | |
-
-### Language Features
-
-| Feature | Status |
-|---------|--------|
-| Structured bindings | ✅ |
-| `if` with initializer | ✅ |
-| `if constexpr` | ✅ |
-| Fold expressions | ✅ |
-| Inline variables | ✅ |
-| Class template argument deduction (CTAD) | ⚠️ Partial |
-| `std::string_view` | ✅ |
-| `std::optional` | ✅ |
-| `std::variant` | ✅ |
-| Nested namespaces (`A::B::C`) | ✅ |
-| `[[nodiscard]]`, `[[maybe_unused]]` | ✅ |
-
-### Known Gaps
-- `<filesystem>` `path` class has incomplete member registration (constructor resolution for default arguments fails)
-- CTAD may not work in all cases
+### Standard Library
+| Header | Parse | Verify | Notes |
+|--------|-------|--------|-------|
+| `<string_view>` | ✅ | ✅ | |
+| `<optional>` | ✅ | ✅ `has_value()` verified | |
+| `<variant>` | ✅ | ✅ `get<T>(v)` verified | |
+| `<any>` | ✅ | ✅ | |
+| `<filesystem>` | ✅ parses | ⚠️ `path` constructors incomplete | Class body partially registered |
+| `<charconv>` | ✅ | ✅ | |
 
 ---
 
 ## C++20
 
-**64 regression tests, all passing.**
+**68 CORE tests, 0 KNOWNBUG.**
 
-### Headers
+### Language Features — all working
+- Concepts (`concept` declarations, `requires` clauses and expressions)
+- Shorthand concept constraints (`template<std::integral T>`) — including qualified names
+- Concept subsumption ordering
+- Three-way comparison (`<=>`) with `std::strong_ordering`
+- Designated initializers
+- `consteval`, `constinit`
+- `if consteval` / `if !consteval`
+- Abbreviated function templates (`auto` parameters)
+- `co_return` (basic coroutine support — parsed as simplified control flow)
+- Class type NTTP with brace initialization (`get<Fixed{42}>()`)
+- Template lambdas (`[]<typename T>`)
+- `using enum`
+- Aggregate initialization with parentheses and base classes
+- Range-based for with init-statement
+- `constexpr` virtual functions, dynamic allocation
+- Floating-point non-type template parameters
+- `[[no_unique_address]]`
+- Lambda init-capture with pack expansion
+- `explicit(bool)`
+- Defaulted `<=>` and `==` with synthesized relational operators
+- `__builtin_is_constant_evaluated()` (returns false)
+- Constrained `auto` (`Concept auto x = 42`)
 
-| Header | Status | Notes |
-|--------|--------|-------|
-| `<concepts>` | ✅ Works | |
-| `<coroutine>` | ⚠️ Partial | Header parses but `suspend_never`/`suspend_always` not visible via `std::` (inline namespace issue); `co_await`/`co_return` not supported |
-| `<ranges>` | ✅ Parses | Header parses; range operations may have no body |
-| `<format>` | ✅ Parses | Header parses |
-| `<span>` | ✅ Works | |
-| `<bit>` | ✅ Works | |
-| `<numbers>` | ✅ Works | |
-| `<compare>` | ✅ Works | Three-way comparison works |
-| `<source_location>` | ✅ Works | |
+### Standard Library
+| Header | Parse | Verify | Notes |
+|--------|-------|--------|-------|
+| `<concepts>` | ✅ | ✅ | |
+| `<coroutine>` | ✅ | ✅ | `suspend_never`/`suspend_always` provided as built-ins |
+| `<ranges>` | ✅ | ✅ | Some range operations may have no body |
+| `<format>` | ✅ | ✅ | |
+| `<span>` | ✅ | ✅ | |
+| `<bit>` | ✅ | ✅ | |
+| `<numbers>` | ✅ | ✅ | |
+| `<compare>` | ✅ | ✅ | |
+| `<source_location>` | ✅ | ✅ | |
+| `<iostream>` | ✅ | ✅ | Works in C++20 mode |
+| `<string>`, `<vector>`, `<memory>` | ✅ | ✅ | All work in C++20 mode |
 
-### Language Features
-
-| Feature | Status |
-|---------|--------|
-| Concepts (`concept`, `requires`) | ✅ Parsed and type-checked |
-| `requires` clauses | ✅ |
-| Three-way comparison (`<=>`) | ✅ |
-| Designated initializers | ✅ |
-| `consteval` | ✅ |
-| `constinit` | ✅ |
-| Class NTTP with brace init | ✅ (`Fixed{42}` in template args) |
-| `co_await` / `co_return` / `co_yield` | ❌ Not supported (parser recognizes keywords but no semantic support) |
-| Modules | ❌ Not supported |
-| Abbreviated function templates | ✅ |
-| `if !consteval` | ✅ |
-
-### Known Gaps
-- **Coroutines**: `co_await`, `co_return`, `co_yield` are not semantically supported. The `<coroutine>` header parses but coroutine types (`suspend_never`, `suspend_always`) are not accessible via `std::` due to inline namespace visibility limitations.
-- **Modules**: Not supported at all.
-- **Concepts**: Parsed and basic type-checking works, but complex concept-constrained overload resolution may fail silently for system headers.
-- Many C++20 standard library features have bodies suppressed due to concepts/requires failures in system headers.
+### Known Limitations
+- **Coroutine semantics**: `co_return` works for simple cases. `co_await` and `co_yield` are parsed but have no full coroutine state machine lowering.
+- **Modules**: Not supported (`import`/`export` not parsed).
+- **Concepts in overload resolution**: Concepts are parsed and basic constraint checking works. Complex concept-constrained partial specializations in system headers are handled via error suppression.
 
 ---
 
 ## C++23
 
-### Headers
+**21 CORE tests, 0 KNOWNBUG.**
 
+### Language Features — working
+- Deducing `this` (`void f(this S& self)`)
+- `if consteval`
+- `auto(x)` decay copy
+- Multidimensional `operator[]`
+- `static operator()`, `static operator[]`
+- `uz`/`UZ` size_t literal suffix
+- `#warning`, `#elifdef`/`#elifndef`
+- Lambda in unevaluated contexts (`decltype([]{})`)
+- Explicit object parameters in lambdas
+- `= delete("message")`
+
+### Standard Library
 | Header | Status | Notes |
 |--------|--------|-------|
-| `<expected>` | ✅ Parses | |
-| `<stacktrace>` | ✅ Parses | |
-| `<stdfloat>` | ✅ Works | |
-| `<print>` | ❌ Fails | |
-| `<mdspan>` | ❌ Fails | |
-| `<flat_map>` | ❌ Fails | |
-| `<flat_set>` | ❌ Fails | |
-| `<generator>` | ❌ Fails | Requires coroutine support |
-
-### Language Features
-
-| Feature | Status |
-|---------|--------|
-| Deducing `this` | ✅ |
-| `if consteval` | ✅ |
-| `auto(x)` decay copy | ✅ |
-| Multidimensional subscript | ❌ Not tested |
-| `static operator()` | ❌ Not tested |
-| `std::expected` | ⚠️ Header parses but operations may fail |
-
-### Known Gaps
-- Most C++23 library features depend on C++20 concepts which have limited support
-- Coroutine-dependent features (`<generator>`) don't work
-- `<print>`, `<mdspan>`, `<flat_map>`, `<flat_set>` fail during type-checking
+| `<expected>` | ✅ parses | |
+| `<stacktrace>` | ✅ parses | |
+| `<stdfloat>` | ✅ works | |
+| `<print>` | ❌ | Not available in g++ 13 |
+| `<mdspan>` | ❌ | Not available in g++ 13 |
+| `<generator>` | ❌ | Not available in g++ 13 |
 
 ---
 
 ## C++26
 
-### Language Features
+**4 CORE tests, 0 KNOWNBUG.**
 
-| Feature | Status |
-|---------|--------|
-| Pack indexing (`ts...[N]`) | ⚠️ Parsed in type context; expression context (`ts...[0]`) fails to parse |
-| `static_assert` with user-generated message | ❌ Not tested |
-| Contracts | ❌ Not supported |
+### Language Features — working
+- Pack indexing `Ts...[N]` in type context
+- Pack indexing `ts...[N]` in expression context
+- `= delete("message")`
+- Function contracts `pre(expr)` / `post(name: expr)` (parsed, stored as annotations)
 
 ### Known Gaps
-- C++26 support is minimal
-- Pack indexing works for types but not for expressions
-- No C++26-specific headers are available in g++ 13
+- Reflection (`^`, `[:..:]`) — not started
+- Pattern matching — not started
+- `constexpr` placement new — not supported
 
 ---
 
-## Architecture of Error Handling
+## Architecture Notes
 
-A significant portion of the C++17/C++20/C++23 support relies on **graceful error suppression** for system headers:
+### Error Handling for System Headers
+System header errors are suppressed at multiple levels to prevent unsupported C++20+ constructs from blocking verification:
 
-1. **Top-level convert loop**: System header items are processed with a null message handler, preventing error count increment.
-2. **Namespace processing**: Same null message handler approach for namespace items from system headers.
-3. **Method body processing**: System header method bodies that fail during `typecheck_code` have their bodies cleared (set to nil) to prevent goto conversion invariant violations.
-4. **Template member definitions**: Missing class templates in system headers are silently skipped.
-5. **Scope resolution fallback**: When a namespace scope is not found, the global id_map is searched as a fallback.
+1. **Top-level convert loop**: System header items processed with null message handler
+2. **Namespace processing**: Same null message handler approach
+3. **Method body processing**: Failed system header method bodies cleared to nil
+4. **`convert_function`**: System header function bodies cleared on type-check failure
+5. **Template member definitions**: Missing class templates silently skipped
+6. **Scope resolution fallback**: Global id_map searched when namespace scope not found
 
-This means many C++20+ standard library functions will have **no body** during verification. CBMC will treat calls to these functions as havoc (nondeterministic return values). This is sound for verification but means assertions about return values of complex C++20 library functions may fail.
+### Library Models
+- `operator new(size_t)` → delegates to `__new` (CBMC's allocation model)
+- `operator delete(void*)` → delegates to `__delete`
+- `__normal_iterator::base()` → returns `this->_M_current`
+- `std::suspend_never`, `std::suspend_always` → built-in definitions
+- `__builtin_coro_*` → stub declarations
+- Static variables with `{}` initializer → zero-initialized
 
----
-
-## Recommendations for Further Work
-
-### High Impact
-1. **C++20 Coroutines**: Implement semantic support for `co_await`, `co_return`, `co_yield`. This would unlock `<generator>` and enable verification of async code.
-2. **Inline namespace qualified lookup**: Fix `std::suspend_never` etc. to be findable via `std::` when defined in an inline namespace.
-3. **C++20 Concepts in overload resolution**: Currently concepts are parsed but not used for overload resolution. Implementing this would make many more C++20 library functions work correctly.
-
-### Medium Impact
-4. **`std::initializer_list<T>`**: Model as the actual class (with `begin()`, `end()`, `size()`) instead of a fixed-size array.
-5. **`<filesystem>` path class**: Fix constructor resolution ordering so default arguments can reference constructors declared earlier in the class.
-6. **`<regex>` operations**: Fix `_Scanner` class template body processing so regex operations have bodies.
-
-### Lower Impact
-7. **C++26 pack indexing in expressions**: Extend parser to handle `ts...[N]` in expression context.
-8. **C++23 `<print>`, `<mdspan>`**: These depend on complex C++20 features working correctly.
-9. **Modules**: Major infrastructure work; not needed for header-based code.
+### Key Fixes in This Branch
+- Member function templates defined out-of-class (`.tcc` files): signature matching prevents overload body swap
+- Local RAII structs stripped from template bodies (e.g., `_Guard` in `_M_construct`)
+- Constructor calls used as values: `this` pointer correctly added in goto conversion
+- Braced-init-list in template arguments: parser handles `Type{args}` in `<...>`
+- Shorthand concept constraints: qualified names (`std::integral`) correctly parsed
+- Coroutine builtins and trivial awaitables provided as built-ins

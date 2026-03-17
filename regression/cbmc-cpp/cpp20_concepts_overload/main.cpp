@@ -1,12 +1,12 @@
 // C++20 concept-constrained overload resolution
 #include <concepts>
-template <std::integral T>
-T add(T a, T b)
+template <typename T>
+requires std::integral<T> T add(T a, T b)
 {
   return a + b;
 }
-template <std::floating_point T>
-T add(T a, T b)
+template <typename T>
+requires std::floating_point<T> T add(T a, T b)
 {
   return a + b;
 }

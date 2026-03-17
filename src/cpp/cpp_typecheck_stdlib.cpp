@@ -5,6 +5,7 @@
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 #include <util/c_types.h>
+#include <util/expr_initializer.h>
 #include <util/expr_util.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
@@ -270,6 +271,23 @@ void cpp_typecheckt::provide_stdlib_bodies()
       symbolt *psym = symbol_table.get_writeable(pid);
       if(psym != nullptr && !psym->is_parameter)
         psym->is_parameter = true;
+    }
+  }
+
+  // Fix static variables with initializer_list values — convert
+  // empty {} to zero-initialized struct values.
+  for(auto it = symbol_table.begin(); it != symbol_table.end(); ++it)
+  {
+    symbolt &symbol = it.get_writeable_symbol();
+    if(
+      symbol.is_static_lifetime && symbol.type.id() != ID_code &&
+      symbol.value.id() == ID_initializer_list &&
+      symbol.value.operands().empty())
+    {
+      // Replace {} with zero_initializer
+      auto zero = ::zero_initializer(symbol.type, symbol.location, ns);
+      if(zero.has_value())
+        symbol.value = *zero;
     }
   }
 
