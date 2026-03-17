@@ -9,13 +9,16 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
+#include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
+#include <util/std_expr.h>
 #include <util/symbol_table_base.h>
 
 #include "cpp_convert_type.h"
+#include "cpp_name.h"
 #include "cpp_template_type.h"
 #include "cpp_type2name.h"
 #include "cpp_typecheck.h"
@@ -242,6 +245,73 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
       // No return statement — deduce void
       function_type.return_type() = void_type();
       return_type = void_type();
+    }
+  }
+
+  // C++20: generate body for defaulted operator<=>
+  if(
+    symbol.base_name == "operator<=>" && symbol.value.id() == ID_code &&
+    to_code(symbol.value).get_statement() == ID_block &&
+    !to_code_block(to_code(symbol.value)).has_operands())
+  {
+    const irep_idt &class_id = symbol.type.get(ID_C_member_name);
+    if(!class_id.empty())
+    {
+      const symbolt &class_sym = lookup(class_id);
+      const auto &fn_params = to_code_type(symbol.type).parameters();
+      // Find the parameter name (second param after this)
+      irep_idt arg_name;
+      if(fn_params.size() >= 2)
+        arg_name = fn_params[1].get_base_name();
+      if(arg_name.empty())
+        arg_name = "#anon_arg0";
+
+      source_locationt loc = symbol.location;
+      code_blockt body;
+      body.add_source_location() = loc;
+
+      for(const auto &c : to_struct_type(class_sym.type).components())
+      {
+        if(
+          c.get_bool(ID_from_base) || c.get_bool(ID_is_type) ||
+          c.get_bool(ID_is_static) || c.type().id() == ID_code)
+          continue;
+        if(c.get_base_name() == "@most_derived")
+          continue;
+
+        const irep_idt &mem = c.get_base_name();
+        cpp_namet lhs(mem, loc);
+        exprt rhs(ID_member);
+        rhs.add(ID_component_cpp_name, cpp_namet(mem, loc));
+        rhs.copy_to_operands(cpp_namet(arg_name, loc).as_expr());
+        rhs.add_source_location() = loc;
+
+        typet int_type = signed_int_type();
+        binary_relation_exprt lt(lhs.as_expr(), ID_lt, rhs);
+        lt.add_source_location() = loc;
+        binary_relation_exprt gt(lhs.as_expr(), ID_gt, rhs);
+        gt.add_source_location() = loc;
+        if_exprt inner(
+          std::move(gt), from_integer(1, int_type), from_integer(0, int_type));
+        inner.add_source_location() = loc;
+        if_exprt cmp(
+          std::move(lt), from_integer(-1, int_type), std::move(inner));
+        cmp.add_source_location() = loc;
+
+        notequal_exprt ne(cmp, from_integer(0, int_type));
+        ne.add_source_location() = loc;
+        code_frontend_returnt ret(cmp);
+        ret.add_source_location() = loc;
+        code_ifthenelset ifs(std::move(ne), std::move(ret));
+        ifs.add_source_location() = loc;
+        body.add(std::move(ifs));
+      }
+
+      code_frontend_returnt ret0(from_integer(0, signed_int_type()));
+      ret0.add_source_location() = loc;
+      body.add(std::move(ret0));
+
+      symbol.value = std::move(body);
     }
   }
 

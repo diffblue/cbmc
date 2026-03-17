@@ -4492,9 +4492,42 @@ bool Parser::rName(irept &name)
 
                     // Qualifier is a template-id (e.g., Wrapper<T>::)
                     // — likely dependent on template parameters.
+                    // Only treat as dependent if the template args
+                    // contain template parameters; concrete
+                    // instantiations like Outer<int>:: are not
+                    // dependent.
                     if(i >= 2 && components[i - 2].id() == ID_template_args)
                     {
-                      return true;
+                      const irept &targs = components[i - 2].find(ID_arguments);
+                      bool has_dependent_arg = false;
+                      for(const auto &arg : targs.get_sub())
+                      {
+                        if(arg.id() == ID_name || arg.id() == ID_cpp_name)
+                        {
+                          irep_idt aid;
+                          if(arg.id() == ID_name)
+                            aid = arg.get(ID_identifier);
+                          else if(!arg.get_sub().empty())
+                            aid = arg.get_sub().front().get(ID_identifier);
+                          if(!aid.empty())
+                          {
+                            new_scopet *afound = lookup_id(aid);
+                            if(
+                              afound != nullptr &&
+                              afound->kind ==
+                                new_scopet::kindt::TYPE_TEMPLATE_PARAMETER)
+                            {
+                              has_dependent_arg = true;
+                              break;
+                            }
+                          }
+                        }
+                      }
+                      if(has_dependent_arg)
+                        return true;
+                      // Concrete instantiation — fall through to
+                      // try parsing '<' as template args.
+                      break;
                     }
 
                     // Qualifier is a simple name
@@ -9654,28 +9687,26 @@ std::optional<codet> Parser::rIfStatement()
   if(lex.LookAhead(0) == TOK_CONSTEXPR)
     lex.get_token(tk2);
 
-  // C++23 if consteval: always false at runtime verification
+  // C++23 if consteval: CBMC evaluates constexpr functions at compile
+  // time, so always take the consteval (true) branch.
   if(lex.LookAhead(0) == TOK_CONSTEVAL)
   {
     lex.get_token(tk2);
 
-    // Parse the true branch (consteval path) and discard it
     auto consteval_body = rCompoundStatement();
     if(!consteval_body.has_value())
         return {};
 
-    // Check for else branch (runtime path)
+    // Discard else branch if present
     if(lex.LookAhead(0) == TOK_ELSE)
     {
         lex.get_token(tk2);
         auto else_body = rStatement();
         if(!else_body.has_value())
           return {};
-        return else_body;
     }
 
-    // No else: if consteval with no runtime path is a no-op
-    return codet(ID_skip);
+    return consteval_body;
   }
 
   if(lex.get_token(tk2)!='(')

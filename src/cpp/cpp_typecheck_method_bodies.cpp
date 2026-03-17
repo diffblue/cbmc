@@ -55,7 +55,10 @@ void cpp_typecheckt::typecheck_method_bodies()
       {
         const auto &loc = method_symbol.location;
         const std::string file = id2string(loc.get_file());
-        suppress = !file.empty() && file[0] == '/';
+        // Only suppress for system headers (paths under /usr/include,
+        // /usr/lib, etc.), not for all absolute paths.
+        suppress =
+          file.find("/usr/include/") == 0 || file.find("/usr/lib/") == 0;
       }
       if(suppress)
       {
