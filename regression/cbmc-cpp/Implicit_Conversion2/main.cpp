@@ -1,3 +1,4 @@
+#include <cassert>
 char func1(const char &c)
 {
   return c;

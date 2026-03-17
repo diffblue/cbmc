@@ -392,7 +392,7 @@ void cpp_typecheckt::default_assignop_value(
       }
 
       const auto size = numeric_cast<mp_integer>(size_expr);
-      CHECK_RETURN(!size.has_value());
+      CHECK_RETURN(size.has_value());
       CHECK_RETURN(*size >= 0);
 
       for(mp_integer i = 0; i < *size; ++i)

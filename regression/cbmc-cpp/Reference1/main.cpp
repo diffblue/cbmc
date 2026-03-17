@@ -1,3 +1,4 @@
+#include <cassert>
 int g;
 
 void function(int &ref)

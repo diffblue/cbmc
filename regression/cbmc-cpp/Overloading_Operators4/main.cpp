@@ -1,3 +1,4 @@
+#include <cassert>
 struct X
 {
   X() : i(1), j(2)

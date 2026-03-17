@@ -1205,8 +1205,9 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
 
       if(
         next->id() == ID_cpp_name || next->id() == ID_pointer ||
-        next->id() == ID_int || next->id() == ID_char ||
-        next->id() == ID_c_bool || next->id() == ID_merged_type)
+        next->id() == ID_frontend_pointer || next->id() == ID_int ||
+        next->id() == ID_char || next->id() == ID_c_bool ||
+        next->id() == ID_merged_type)
       {
         // it's a cast operator
         irept next_ir = *next;

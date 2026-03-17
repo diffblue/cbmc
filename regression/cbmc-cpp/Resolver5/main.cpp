@@ -1,3 +1,4 @@
+#include <cassert>
 namespace n1
 {
 struct A

@@ -1,3 +1,4 @@
+#include <cassert>
 #include <list>
 #include <set>
 #include <vector>

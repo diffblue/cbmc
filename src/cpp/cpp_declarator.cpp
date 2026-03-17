@@ -28,8 +28,14 @@ typet cpp_declaratort::merge_type(const typet &declaration_type) const
 {
   typet dest_type=type();
 
-  if(declaration_type.id()=="cpp-cast-operator")
+  if(
+    declaration_type.id() == "cpp-cast-operator" ||
+    (declaration_type.id() == ID_already_typechecked &&
+     to_type_with_subtype(declaration_type).subtype().id() ==
+       "cpp-cast-operator"))
+  {
     return dest_type;
+  }
 
   typet *p=&dest_type;
 

@@ -1,3 +1,4 @@
+#include <cassert>
 extern "C" int g;
 
 int main()
