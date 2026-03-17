@@ -361,6 +361,13 @@ void cpp_convert_auto(
     return;
   }
 
+  // C++14: decltype(auto) — replace the entire type with src
+  if(dest.id() == ID_decltype && dest.get_bool("#auto"))
+  {
+    dest = src;
+    return;
+  }
+
   cpp_convert_typet cpp_convert_type(message_handler, dest);
   for(auto &t : cpp_convert_type.other)
     if(t.id() == ID_auto)

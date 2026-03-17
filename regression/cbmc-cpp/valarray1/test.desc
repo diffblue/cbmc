@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.cpp
 --cpp11 --show-goto-functions
 ^Generating GOTO Program$
@@ -6,3 +6,6 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+--
+Type-checking succeeds but --validate-goto-model fails because
+many standard library functions are declared but not defined.

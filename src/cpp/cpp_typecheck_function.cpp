@@ -10,8 +10,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// C++ Language Type Checking
 
 #include <util/c_types.h>
+#include <util/std_code.h>
 #include <util/symbol_table_base.h>
 
+#include "cpp_convert_type.h"
 #include "cpp_template_type.h"
 #include "cpp_type2name.h"
 #include "cpp_typecheck.h"
@@ -157,6 +159,13 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   }
 
   // do the function body
+  // Save and restore break/continue/case flags, because convert_function
+  // may be called recursively (e.g., during constexpr evaluation or
+  // template instantiation triggered by type-checking an expression
+  // inside another function body).
+  bool old_break_is_allowed = break_is_allowed;
+  bool old_continue_is_allowed = continue_is_allowed;
+  bool old_case_is_allowed = case_is_allowed;
   start_typecheck_code();
 
   // save current return type
@@ -168,11 +177,57 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   if(return_type.id() == ID_constructor || return_type.id() == ID_destructor)
     return_type = void_type();
 
+  // C++14: auto return type deduction
+  if(has_auto(return_type))
+  {
+    // Find the first return statement and deduce the type
+    std::function<const exprt *(const codet &)> find_return =
+      [&](const codet &code) -> const exprt *
+    {
+      if(code.get_statement() == ID_return)
+      {
+        const auto &ret = to_code_frontend_return(code);
+        if(ret.has_return_value())
+          return &ret.return_value();
+      }
+      for(const auto &op : code.operands())
+      {
+        if(op.id() == ID_code)
+        {
+          const exprt *r = find_return(to_code(op));
+          if(r != nullptr)
+            return r;
+        }
+      }
+      return nullptr;
+    };
+
+    const exprt *ret_expr = find_return(to_code(symbol.value));
+    if(ret_expr != nullptr)
+    {
+      exprt tmp = *ret_expr;
+      typecheck_expr(tmp);
+      cpp_convert_auto(
+        function_type.return_type(), tmp.type(), get_message_handler());
+      typecheck_type(function_type.return_type());
+      return_type = function_type.return_type();
+    }
+    else
+    {
+      // No return statement — deduce void
+      function_type.return_type() = void_type();
+      return_type = void_type();
+    }
+  }
+
   typecheck_code(to_code(symbol.value));
 
   symbol.value.type()=symbol.type;
 
   return_type = old_return_type;
+  break_is_allowed = old_break_is_allowed;
+  continue_is_allowed = old_continue_is_allowed;
+  case_is_allowed = old_case_is_allowed;
 
   deferred_typechecking.erase(symbol.name);
 }
