@@ -142,13 +142,13 @@ std::string expr2cppt::convert_rec(
   const std::string q=
     new_qualifiers.as_string();
 
-  if(is_reference(src))
-  {
-    return q + convert(to_reference_type(src).base_type()) + " &" + d;
-  }
-  else if(is_rvalue_reference(src))
+  if(is_rvalue_reference(src))
   {
     return q + convert(to_pointer_type(src).base_type()) + " &&" + d;
+  }
+  else if(is_reference(src))
+  {
+    return q + convert(to_reference_type(src).base_type()) + " &" + d;
   }
   else if(!src.get(ID_C_c_type).empty())
   {

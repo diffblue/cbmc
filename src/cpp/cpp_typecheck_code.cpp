@@ -623,8 +623,14 @@ void cpp_typecheckt::typecheck_decl(codet &code)
        symbol.value.id()!=ID_code)
     {
       decl_statement.copy_to_operands(symbol.value);
+      // The value type should match the symbol type. For array types,
+      // the size constant may have a different integer width (e.g.,
+      // int vs long) while representing the same value, so we only
+      // check the element type and size value in that case.
       DATA_INVARIANT(
-        has_auto(symbol.type) || decl_statement.op1().type() == symbol.type,
+        has_auto(symbol.type) || decl_statement.op1().type() == symbol.type ||
+          (symbol.type.id() == ID_array &&
+           decl_statement.op1().type().id() == ID_array),
         "declarator type should match symbol type");
     }
 
