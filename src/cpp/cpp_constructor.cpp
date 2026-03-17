@@ -133,6 +133,33 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
 
     if(operands_tc.empty())
     {
+      // C++11: apply default member initializers for POD types
+      if(object_tc.type().id() == ID_struct_tag)
+      {
+        const struct_typet &struct_type =
+          follow_tag(to_struct_tag_type(object_tc.type()));
+        code_blockt block;
+        for(const auto &comp : struct_type.components())
+        {
+          if(
+            comp.get_bool(ID_is_type) || comp.get_bool(ID_is_static) ||
+            comp.type().id() == ID_code)
+            continue;
+          const irept &default_val = comp.find(ID_C_default_value);
+          if(default_val.is_not_nil())
+          {
+            exprt val = static_cast<const exprt &>(default_val);
+            typecheck_expr(val);
+            if(val.type() != comp.type())
+              val = typecast_exprt(val, comp.type());
+            member_exprt member(object_tc, comp.get_name(), comp.type());
+            member.set(ID_C_lvalue, true);
+            block.add(code_frontend_assignt(std::move(member), std::move(val)));
+          }
+        }
+        if(!block.statements().empty())
+          return std::move(block);
+      }
       // a POD is NOT initialized
       return {};
     }
@@ -200,6 +227,89 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
 
     const struct_typet &struct_type =
       follow_tag(to_struct_tag_type(object_tc.type()));
+
+    // C++17 aggregate initialization with base classes:
+    // If the struct has bases but no user-declared constructors and
+    // multiple operands are provided, do aggregate initialization.
+    if(!struct_type.bases().empty() && operands_tc.size() >= 2)
+    {
+      bool has_user_ctor = false;
+      for(const auto &c : struct_type.components())
+      {
+        if(c.type().id() != ID_code || c.get_bool(ID_from_base))
+          continue;
+        const code_typet &ct = to_code_type(c.type());
+        if(ct.return_type().id() != ID_constructor)
+          continue;
+        // Skip default ctor (this only) and copy/move ctor
+        if(ct.parameters().size() <= 1)
+          continue;
+        if(
+          ct.parameters().size() == 2 &&
+          is_reference(ct.parameters()[1].type()))
+          continue;
+        has_user_ctor = true;
+        break;
+      }
+      if(!has_user_ctor)
+      {
+        code_blockt block;
+        std::size_t idx = 0;
+        // Initialize base class subobjects: for each base, the
+        // corresponding operand initializes the from_base data members.
+        for(std::size_t b = 0; b < struct_type.bases().size(); ++b)
+        {
+          if(idx >= operands_tc.size())
+            break;
+          // Collect from_base data members belonging to this base
+          exprt::operandst base_ops;
+          if(operands_tc[idx].id() == ID_initializer_list)
+            base_ops = operands_tc[idx].operands();
+          else
+            base_ops.push_back(operands_tc[idx]);
+          std::size_t bidx = 0;
+          for(const auto &comp : struct_type.components())
+          {
+            if(
+              !comp.get_bool(ID_from_base) || comp.get_bool(ID_is_type) ||
+              comp.get_bool(ID_is_static) || comp.type().id() == ID_code)
+              continue;
+            if(bidx >= base_ops.size())
+              break;
+            member_exprt member(object_tc, comp.get_name(), comp.type());
+            member.set(ID_C_lvalue, true);
+            exprt val =
+              typecast_exprt::conditional_cast(base_ops[bidx], comp.type());
+            side_effect_expr_assignt assign(
+              std::move(member), std::move(val), typet(), source_location);
+            typecheck_side_effect_assignment(assign);
+            block.add(code_expressiont(std::move(assign)));
+            ++bidx;
+          }
+          ++idx;
+        }
+        // Initialize non-static data members
+        for(const auto &comp : struct_type.components())
+        {
+          if(
+            comp.get_bool(ID_from_base) || comp.get_bool(ID_is_type) ||
+            comp.get_bool(ID_is_static) || comp.type().id() == ID_code)
+            continue;
+          if(idx >= operands_tc.size())
+            break;
+          member_exprt member(object_tc, comp.get_name(), comp.type());
+          member.set(ID_C_lvalue, true);
+          exprt val =
+            typecast_exprt::conditional_cast(operands_tc[idx], comp.type());
+          side_effect_expr_assignt assign(
+            std::move(member), std::move(val), typet(), source_location);
+          typecheck_side_effect_assignment(assign);
+          block.add(code_expressiont(std::move(assign)));
+          ++idx;
+        }
+        return std::move(block);
+      }
+    }
 
     // set most-derived bits
     code_blockt block;

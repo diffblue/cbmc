@@ -1198,18 +1198,33 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
     // sugar for a (possibly local) declaration.
     if(op.id() == ID_initializer_list)
     {
-      // just do a normal initialization
-      do_initializer(op, expr.type(), false);
+      // C++17: direct-list-initialization of scalar/enum types
+      // e.g., byte{42} where byte is a scoped enum
+      if(
+        op.operands().size() == 1 &&
+        (expr.type().id() == ID_c_enum_tag || expr.type().id() == ID_signedbv ||
+         expr.type().id() == ID_unsignedbv || expr.type().id() == ID_c_bool ||
+         expr.type().id() == ID_bool || expr.type().id() == ID_floatbv ||
+         expr.type().id() == ID_pointer))
+      {
+        op = to_unary_expr(op).op();
+        // fall through to the typecast path below
+      }
+      else
+      {
+        // just do a normal initialization
+        do_initializer(op, expr.type(), false);
 
-      // This produces a struct-expression,
-      // union-expression, array-expression,
-      // or an expression for a pointer or scalar.
-      // We produce a compound_literal expression.
-      exprt tmp(ID_compound_literal, expr.type());
-      tmp.add_to_operands(std::move(op));
-      expr=tmp;
-      expr.set(ID_C_lvalue, true); // these are l-values
-      return;
+        // This produces a struct-expression,
+        // union-expression, array-expression,
+        // or an expression for a pointer or scalar.
+        // We produce a compound_literal expression.
+        exprt tmp(ID_compound_literal, expr.type());
+        tmp.add_to_operands(std::move(op));
+        expr = tmp;
+        expr.set(ID_C_lvalue, true); // these are l-values
+        return;
+      }
     }
 
     // Reject casts of non-static member functions — they require an
