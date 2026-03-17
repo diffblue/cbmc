@@ -450,17 +450,14 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
       const struct_typet::componentst &components =
         follow_tag(*struct_tag_type).components();
 
-      if(index>=dest->operands().size())
+      if(index >= components.size())
       {
         error().source_location = value.source_location();
-        error() << "structure member designator " << index
-                << " out of bounds (" << dest->operands().size()
-                << ")" << eom;
+        error() << "member designator index " << index
+                << " out of bounds (struct has " << components.size()
+                << " components)" << eom;
         throw 0;
       }
-
-      DATA_INVARIANT(index<components.size(),
-                     "member designator is bounded by components size");
       DATA_INVARIANT(
         components[index].type().id() != ID_code,
         "struct member must not be of code type");

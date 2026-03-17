@@ -161,12 +161,53 @@ void goto_convert_functionst::convert_function(
 
   // Skip functions whose bodies contain unresolved C++ names, which
   // indicates incomplete template instantiation.
+  // For user functions (non-system headers), strip only the offending
+  // statements rather than discarding the entire body, so that
+  // assertions and other verified code survive.
   if(
     has_subexpr(symbol.value, ID_cpp_name) ||
     has_subexpr(symbol.value, irep_idt("cpp-this")))
   {
-    symbol_table.get_writeable_ref(identifier).value.make_nil();
-    return;
+    const std::string file = id2string(symbol.location.get_file());
+    bool is_system =
+      file.find("/usr/include/") == 0 || file.find("/usr/lib/") == 0;
+    if(is_system)
+    {
+      symbol_table.get_writeable_ref(identifier).value.make_nil();
+      return;
+    }
+    // For user functions, remove statements with unresolved names.
+    std::function<void(exprt &)> strip_unresolved = [&](exprt &expr)
+    {
+      if(expr.id() == ID_code && to_code(expr).get_statement() == ID_block)
+      {
+        auto &block = to_code_block(to_code(expr));
+        auto &stmts = block.statements();
+        stmts.erase(
+          std::remove_if(
+            stmts.begin(),
+            stmts.end(),
+            [](const codet &s)
+            {
+              return has_subexpr(static_cast<const exprt &>(s), ID_cpp_name) ||
+                     has_subexpr(
+                       static_cast<const exprt &>(s), irep_idt("cpp-this"));
+            }),
+          stmts.end());
+        for(auto &s : stmts)
+          strip_unresolved(static_cast<exprt &>(s));
+      }
+    };
+    strip_unresolved(symbol_table.get_writeable_ref(identifier).value);
+    // If the body is now empty or still has unresolved names, clear it.
+    if(
+      has_subexpr(symbol_table.lookup_ref(identifier).value, ID_cpp_name) ||
+      has_subexpr(
+        symbol_table.lookup_ref(identifier).value, irep_idt("cpp-this")))
+    {
+      symbol_table.get_writeable_ref(identifier).value.make_nil();
+      return;
+    }
   }
 
   // we have a body, make sure all parameter names are valid

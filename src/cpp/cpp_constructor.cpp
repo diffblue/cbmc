@@ -366,7 +366,13 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
       source_location);
 
     typecheck_side_effect_function_call(function_call);
-    CHECK_RETURN(function_call.get(ID_statement) == ID_temporary_object);
+
+    if(function_call.get(ID_statement) != ID_temporary_object)
+    {
+      error().source_location = source_location;
+      error() << "constructor call did not resolve to temporary object" << eom;
+      throw 0;
+    }
 
     exprt &initializer =
       static_cast<exprt &>(function_call.add(ID_initializer));
