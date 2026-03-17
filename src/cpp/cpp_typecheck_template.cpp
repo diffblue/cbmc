@@ -1405,9 +1405,55 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
     }
     else
     {
-      // The type is not checked, as it might depend
-      // on earlier parameters.
-      parameter = symbol_exprt(identifier, declaration.type());
+      // C++20: check if this non-type parameter's type is actually
+      // a concept (parsed as constexpr bool). If so, convert to a
+      // type parameter with concept constraint.
+      bool converted_to_concept = false;
+      if(declaration.type().id() == ID_cpp_name)
+      {
+        // Check if the name resolves to a concept (constexpr bool)
+        // by looking it up in the symbol table.
+        std::string cname;
+        for(const auto &s : declaration.type().get_sub())
+        {
+          if(s.id() == ID_name)
+          {
+            if(!cname.empty())
+              cname += "::";
+            cname += id2string(s.get(ID_identifier));
+          }
+        }
+        // Search symbol table for a matching constexpr bool
+        for(const auto &sym : symbol_table)
+        {
+          if(
+            id2string(sym.first).find(cname) != std::string::npos &&
+            sym.second.type.id() == ID_bool &&
+            sym.second.type.get_bool(ID_C_constant))
+          {
+            // It's a concept — convert to type parameter
+            parameter = type_exprt(template_parameter_symbol_typet(identifier));
+            parameter.type().add_source_location() =
+              declaration.find_source_location();
+            // Sanitize :: for identifier generation
+            {
+              std::string s = cname;
+              std::string::size_type p;
+              while((p = s.find("::")) != std::string::npos)
+                s.replace(p, 2, "__");
+              parameter.set("#C_concept_constraint", s);
+            }
+            converted_to_concept = true;
+            break;
+          }
+        }
+      }
+      if(!converted_to_concept)
+      {
+        // The type is not checked, as it might depend
+        // on earlier parameters.
+        parameter = symbol_exprt(identifier, declaration.type());
+      }
     }
 
     // There might be a default type or default value.

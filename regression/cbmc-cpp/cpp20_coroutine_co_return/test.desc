@@ -1,9 +1,7 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-co_return is not semantically supported. The parser recognizes the
-keyword but there is no goto conversion for coroutine operations.
