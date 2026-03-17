@@ -10,6 +10,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// C++ Language Type Checking
 
 #include <util/c_types.h>
+#include <util/config.h>
+#include <util/pointer_expr.h>
 #include <util/std_code.h>
 #include <util/symbol_table_base.h>
 
@@ -221,8 +223,17 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     {
       exprt tmp = *ret_expr;
       typecheck_expr(tmp);
+      typet deduced = tmp.type();
+      // C++14 decltype(auto): if the return expression is a
+      // parenthesized lvalue, deduce a reference type
+      if(
+        return_type.id() == ID_decltype && return_type.get_bool("#auto") &&
+        tmp.get_bool(ID_C_lvalue))
+      {
+        deduced = reference_typet(deduced, config.ansi_c.pointer_width);
+      }
       cpp_convert_auto(
-        function_type.return_type(), tmp.type(), get_message_handler());
+        function_type.return_type(), deduced, get_message_handler());
       typecheck_type(function_type.return_type());
       return_type = function_type.return_type();
     }

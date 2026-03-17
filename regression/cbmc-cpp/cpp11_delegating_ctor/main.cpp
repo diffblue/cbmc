@@ -1,18 +1,17 @@
-#include <cassert>
+// C++11 delegating constructor
 struct S
 {
-  int x, y;
-  S(int a) : x(a), y(0)
+  int x;
+  S(int v) : x(v)
   {
   }
-  S(int a, int b) : S(a)
+  S() : S(42)
   {
-    y = b;
   }
 };
 int main()
 {
-  S s(1, 2);
-  assert(s.x == 1 && s.y == 2);
+  S s;
+  __CPROVER_assert(s.x == 42, "delegating ctor");
   return 0;
 }

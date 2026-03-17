@@ -1,11 +1,11 @@
-// C++11 user-defined literals
-constexpr long long operator""_km(unsigned long long v)
+// C++11 user-defined literal
+constexpr long long operator""_kb(unsigned long long v)
 {
-  return v * 1000;
+  return v * 1024;
 }
 int main()
 {
-  long long d = 5_km;
-  __CPROVER_assert(d == 5000, "user-defined literal");
+  long long r = 4_kb;
+  __CPROVER_assert(r == 4096, "user defined literal");
   return 0;
 }

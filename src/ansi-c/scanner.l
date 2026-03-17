@@ -259,6 +259,8 @@ enable_or_disable ("enable"|"disable")
 %x COMMENT2
 %x STRING_LITERAL
 %x STRING_LITERAL_COMMENT
+%x RAW_STRING_DELIMITER
+%x RAW_STRING_CONTENT
 %x ASM_BLOCK
 %x MSC_ASM
 %x IGNORE_PARENS
@@ -317,6 +319,26 @@ enable_or_disable ("enable"|"disable")
                   return TOK_CHARACTER;
                 }
 
+<GRAMMAR,GCC_ATTRIBUTE3>("L"|"u"|"U"|"u8")?"R\"" {
+                  // C++11 raw string literal: R"delimiter(content)delimiter"
+                  // Store the prefix for later
+                  std::string prefix(yytext);
+                  std::string encoding;
+                  for(std::size_t i = 0; i < prefix.size(); i++)
+                  {
+                    if(prefix[i] == 'R')
+                      break;
+                    encoding += prefix[i];
+                  }
+                  PARSER.string_literal.clear();
+                  PARSER.string_literal = encoding;
+                  // Store encoding in string_literal, delimiter in a temp
+                  PARSER.raw_string_delimiter.clear();
+                  loc();
+                  yy_push_state(RAW_STRING_DELIMITER);
+                  (void)yy_top_state();
+                }
+
 <GRAMMAR,GCC_ATTRIBUTE3>{string_lit} {
                   PARSER.string_literal.clear();
                   PARSER.string_literal.append(yytext);
@@ -345,6 +367,75 @@ enable_or_disable ("enable"|"disable")
                   yy_pop_state(); // back to normal
                   yyless(0); // put back
                   return TOK_STRING;
+                }
+
+<RAW_STRING_DELIMITER>"(" {
+                  // End of delimiter, start reading content
+                  // string_literal has the encoding prefix so far
+                  PARSER.string_literal += "\"";
+                  yy_pop_state();
+                  yy_push_state(RAW_STRING_CONTENT);
+                }
+<RAW_STRING_DELIMITER>. {
+                  PARSER.raw_string_delimiter += yytext[0];
+                }
+
+<RAW_STRING_CONTENT>(.|\n) {
+                  char ch = yytext[0];
+                  // Check if we've hit )delimiter"
+                  if(ch == ')' || !PARSER.raw_string_pending_close.empty())
+                  {
+                    PARSER.raw_string_pending_close += ch;
+                    std::string end_seq =
+                      ")" + PARSER.raw_string_delimiter + "\"";
+                    if(PARSER.raw_string_pending_close == end_seq)
+                    {
+                      // End of raw string
+                      PARSER.raw_string_pending_close.clear();
+                      PARSER.string_literal += "\"";
+                      yy_pop_state();
+                      yy_push_state(STRING_LITERAL);
+                    }
+                    else if(end_seq.substr(
+                              0,
+                              PARSER.raw_string_pending_close.size()) !=
+                            PARSER.raw_string_pending_close)
+                    {
+                      // Not a prefix of end_seq, flush pending chars
+                      for(char pc : PARSER.raw_string_pending_close)
+                      {
+                        if(pc == '\\')
+                          PARSER.string_literal += "\\\\";
+                        else if(pc == '"')
+                          PARSER.string_literal += "\\\"";
+                        else if(pc == '\n')
+                          PARSER.string_literal += "\\n";
+                        else if(pc == '\r')
+                          PARSER.string_literal += "\\r";
+                        else if(pc == '\t')
+                          PARSER.string_literal += "\\t";
+                        else
+                          PARSER.string_literal += pc;
+                      }
+                      PARSER.raw_string_pending_close.clear();
+                    }
+                    // else: still a prefix, keep accumulating
+                  }
+                  else
+                  {
+                    if(ch == '\\')
+                      PARSER.string_literal += "\\\\";
+                    else if(ch == '"')
+                      PARSER.string_literal += "\\\"";
+                    else if(ch == '\n')
+                      PARSER.string_literal += "\\n";
+                    else if(ch == '\r')
+                      PARSER.string_literal += "\\r";
+                    else if(ch == '\t')
+                      PARSER.string_literal += "\\t";
+                    else
+                      PARSER.string_literal += ch;
+                  }
                 }
 
 <GRAMMAR>{newline} { } /* skipped */
