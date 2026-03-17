@@ -142,6 +142,16 @@ void cpp_typecheckt::typecheck_class_template(
     // check if we have 2 bodies
     if(has_body && previous_has_body)
     {
+      // C++20: constrained partial specializations with different
+      // requires clauses have the same symbol name. Since CBMC
+      // doesn't evaluate constraints, keep the first definition.
+      if(!partial_specialization_args.arguments().empty())
+      {
+        warning().source_location = cpp_name.source_location();
+        warning() << "template struct '" << base_name << "' defined previously"
+                  << eom;
+        return;
+      }
       error().source_location=cpp_name.source_location();
       error() << "template struct '" << base_name << "' defined previously\n"
               << "location of previous definition: " << previous_symbol.location
