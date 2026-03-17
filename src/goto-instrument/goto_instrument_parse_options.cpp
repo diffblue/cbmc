@@ -1525,11 +1525,10 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
   // some analyses require function pointer removal and partial inlining
 
-  if(cmdline.isset("remove-pointers") ||
-     cmdline.isset("race-check") ||
-     cmdline.isset("mm") ||
-     cmdline.isset("isr") ||
-     cmdline.isset("concurrency"))
+  if(
+    cmdline.isset("remove-pointers") || cmdline.isset("race-check") ||
+    cmdline.isset("mm") || cmdline.isset("isr") || cmdline.isset("mmio") ||
+    cmdline.isset("concurrency"))
   {
     do_indirect_call_and_rtti_removal();
 
