@@ -1,7 +1,7 @@
 #include <assert.h>
 
-extern int x;
-extern int f(void);
+extern "C" int x;
+extern "C" int f(void);
 
 int main()
 {

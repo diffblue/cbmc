@@ -550,7 +550,9 @@ public:
   void get_virtual_bases(const struct_typet &type,
      std::list<irep_idt> &vbases) const;
 
-  bool subtype_typecast(
+  bool subtype_typecast(const struct_typet &from, const struct_typet &to) const;
+
+  bool base_publicly_accessible(
     const struct_typet &from,
     const struct_typet &to) const;
 

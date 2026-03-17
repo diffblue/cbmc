@@ -45,6 +45,21 @@ void goto_symext::symex_assign(
   exprt lhs = clean_expr(o_lhs, state, true);
   exprt rhs = clean_expr(o_rhs, state, false);
 
+  // Pointer-to-member types carry a to_member attribute that may
+  // differ between LHS and RHS. Reconcile by copying the attribute.
+  if(
+    lhs.type().id() == ID_pointer && rhs.type().id() == ID_pointer &&
+    lhs.type() != rhs.type())
+  {
+    typet rhs_type = rhs.type();
+    if(lhs.type().find(ID_to_member).is_not_nil())
+      rhs_type.add(ID_to_member) = lhs.type().find(ID_to_member);
+    else
+      rhs_type.remove(ID_to_member);
+    if(lhs.type() == rhs_type)
+      rhs.type() = lhs.type();
+  }
+
   DATA_INVARIANT_WITH_DIAGNOSTICS(
     lhs.type() == rhs.type(),
     "assignments must be type consistent, got",

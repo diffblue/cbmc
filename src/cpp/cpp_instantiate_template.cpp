@@ -291,21 +291,29 @@ void cpp_typecheckt::elaborate_class_template(
   {
     const symbolt &primary_template = lookup(t_type.get(ID_identifier));
 
-    // If this class template is already being instantiated (on the
-    // instantiation stack), skip elaboration to break infinite
-    // recursion.
+    // If this class template is already being instantiated with the
+    // same arguments (on the instantiation stack), skip elaboration
+    // to break infinite recursion. Also limit recursion depth for
+    // the same primary template to prevent non-terminating chains.
+    const cpp_template_args_tct &full_args =
+      static_cast<const cpp_template_args_tct &>(
+        t_type.find(ID_full_template_args));
+    unsigned same_template_depth = 0;
     for(const auto &entry : instantiation_stack)
     {
       if(entry.identifier == primary_template.name)
-        return;
+      {
+        if(entry.full_template_args == full_args)
+          return;
+        ++same_template_depth;
+      }
     }
+    if(same_template_depth >= 2)
+      return;
 
     const cpp_template_args_tct &specialization_args =
       static_cast<const cpp_template_args_tct &>(
         t_type.find(ID_specialization_template_args));
-    const cpp_template_args_tct &full_args =
-      static_cast<const cpp_template_args_tct &>(
-        t_type.find(ID_full_template_args));
 
     // Resolve symbol references in full_args, mirroring the logic
     // in template_suffix.
@@ -927,8 +935,17 @@ const symbolt &cpp_typecheckt::instantiate_template(
       // template scope so that template parameter names (cpp_name)
       // are resolved to template_parameter_symbol_type, then apply
       // the template map to replace them with actual types.
+      // Add the class scope as a using scope so that class-scoped
+      // names (e.g., typedefs like 'iterator' in trailing return
+      // types) can also be resolved.
       if(method_decl.type().id() == ID_cpp_name)
       {
+        const irep_idt &inst_class_name = new_decl.type().get(ID_identifier);
+        if(!inst_class_name.empty())
+        {
+          cpp_scopet &class_scope = cpp_scopes.get_scope(inst_class_name);
+          method_scope.add_using_scope(class_scope);
+        }
         typecheck_type(method_decl.type());
         template_map.apply(method_decl.type());
       }
@@ -966,14 +983,23 @@ const symbolt &cpp_typecheckt::instantiate_template(
       throw 0;
     }
 
-    if(new_decl.storage_spec().is_extern() ||
-       new_decl.storage_spec().is_auto() ||
-       new_decl.storage_spec().is_register() ||
-       new_decl.storage_spec().is_mutable())
+    if(
+      new_decl.storage_spec().is_extern() ||
+      new_decl.storage_spec().is_register() ||
+      new_decl.storage_spec().is_mutable())
     {
       error().source_location=new_decl.source_location();
       error() << "invalid storage class specified for template field"
               << eom;
+      throw 0;
+    }
+
+    // In C++11, 'auto' in a template member declaration indicates a
+    // trailing return type. Only reject it when there are no declarators.
+    if(new_decl.storage_spec().is_auto() && new_decl.declarators().empty())
+    {
+      error().source_location = new_decl.source_location();
+      error() << "invalid storage class specified for template field" << eom;
       throw 0;
     }
 

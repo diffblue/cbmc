@@ -379,6 +379,30 @@ void cpp_typecheckt::default_assignop_value(
 
     const symbolt &symb = lookup(b.type());
 
+    // Check that the base class's copy assignment operator is accessible
+    // from the derived class.
+    const struct_typet &base_struct = to_struct_type(symb.type);
+    cpp_scopet *saved_scope = cpp_scopes.current_scope_ptr;
+    cpp_scopes.current_scope_ptr = &cpp_scopes.get_scope(symbol.name);
+    for(const auto &comp : base_struct.components())
+    {
+      if(
+        comp.get_base_name() == "operator=" && !comp.get_bool(ID_is_static) &&
+        !comp.get_bool(ID_from_base) && comp.type().id() == ID_code)
+      {
+        if(check_component_access(comp, base_struct))
+        {
+          cpp_scopes.current_scope_ptr = saved_scope;
+          error().source_location = source_location;
+          error() << "base class '" << symb.base_name
+                  << "' has inaccessible copy assignment operator" << eom;
+          throw 0;
+        }
+        break;
+      }
+    }
+    cpp_scopes.current_scope_ptr = saved_scope;
+
     copy_parent(source_location, symb.base_name, arg_name, block);
   }
 

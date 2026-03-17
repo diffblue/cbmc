@@ -421,6 +421,16 @@ void cpp_typecheckt::typecheck_try_catch(codet &code)
             declarator.type() =
               to_reference_type(declarator.type()).base_type();
           }
+
+          // Give the catch variable a nondet initializer to prevent
+          // the type-checker from trying to call a constructor.
+          // The actual value comes from the exception at runtime.
+          if(declarator.value().is_nil())
+          {
+            exprt zero = from_integer(0, signed_int_type());
+            already_typechecked_exprt::make_already_typechecked(zero);
+            declarator.value() = std::move(zero);
+          }
         }
 
         // typecheck the body
