@@ -1,11 +1,10 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp14
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
+^PARSING ERROR$
 ^CONVERSION ERROR$
---
-Type-checking succeeds but --validate-goto-model fails because
-many standard library functions are declared but not defined.
+C++14 standard library headers type-check and verify successfully.

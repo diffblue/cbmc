@@ -74,7 +74,7 @@ static std::string irep2name(const irept &irep)
     if(
       named_sub.first == ID_C_constant || named_sub.first == ID_C_volatile ||
       named_sub.first == ID_C_restricted ||
-      named_sub.first == ID_C_ref_qualifier)
+      named_sub.first == ID_C_ref_qualifier || named_sub.first == "#C_noexcept")
     {
       if(first)
         first=false;
@@ -181,6 +181,9 @@ std::string cpp_type2name(const typet &type)
       result += "_lref";
     else if(ref_qualifier == "&&")
       result += "_rref";
+
+    if(type.get_bool(ID_noexcept) || type.get_bool("#C_noexcept"))
+      result += "_noexcept";
   }
   else if(type.id() == ID_complex)
   {

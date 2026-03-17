@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11 --unwind 2
 ^EXIT=(0|10)$
@@ -6,7 +6,4 @@ main.cpp
 ^VERIFICATION
 --
 ^CONVERSION ERROR$
-std::list<int>::push_back type-checks and runs BMC, but
---validate-goto-model fails because allocator_traits::allocate,
-allocator_traits::deallocate, and _List_node_base::_M_hook have
-no bodies in the GOTO model.
+std::list<int>::push_back runs BMC with --validate-goto-model.

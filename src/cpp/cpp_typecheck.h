@@ -292,6 +292,7 @@ protected:
   void static_and_dynamic_initialization();
   void do_not_typechecked();
   void clean_up();
+  void provide_stdlib_bodies();
 
   void add_base_components(
         const struct_typet &from,

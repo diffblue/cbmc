@@ -3659,7 +3659,20 @@ bool Parser::rDeclarator(
 #endif
 
       irept throw_decl;
-      optThrowDecl(throw_decl); // ignore in this version
+      optThrowDecl(throw_decl);
+
+      // C++17: store noexcept as annotation on the function type.
+      // Uses #C_noexcept (comment prefix) so it doesn't affect type
+      // equality but is used by cpp_type2name for template specialization
+      // naming.
+      if(throw_decl.id() == ID_noexcept)
+      {
+        typet *p = &d_outer;
+        while(p->is_not_nil() && p->id() != ID_function_type)
+          p = &p->add_subtype();
+        if(p->id() == ID_function_type)
+          p->set("#C_noexcept", true);
+      }
 
       // GCC __attribute__ after noexcept
       if(lex.LookAhead(0) == TOK_GCC_ATTRIBUTE)

@@ -196,6 +196,15 @@ void goto_convert_functionst::convert_function(
         }
       }
     }
+    else
+    {
+      // Ensure existing parameter symbols have is_parameter set.
+      // C++ destructor code generation may create parameter symbols
+      // (e.g., base class 'this' pointers) without this flag.
+      symbolt &existing = symbol_table.get_writeable_ref(p);
+      if(!existing.is_parameter)
+        existing.is_parameter = true;
+    }
   }
 
   lifetimet parent_lifetime = lifetime;

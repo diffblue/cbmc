@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^VERIFICATION SUCCESSFUL$
@@ -6,5 +6,4 @@ main.cpp
 ^SIGNAL=0$
 --
 ^PARSING ERROR$
-Type-checking succeeds but --validate-goto-model fails because
-standard library functions are declared but not defined.
+All 29 C++17 standard library headers type-check and verify successfully.
