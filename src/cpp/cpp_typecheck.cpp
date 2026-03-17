@@ -105,15 +105,36 @@ void cpp_typecheckt::typecheck()
 
   for(auto &item : cpp_parse_tree.items)
   {
-    try
+    const auto &loc = item.source_location();
+    const std::string file = id2string(loc.get_file());
+    bool is_system =
+      file.find("/usr/include/") == 0 || file.find("/usr/lib/") == 0;
+
+    if(is_system)
     {
-      convert(item);
+      // Suppress error messages from system headers so that
+      // unsupported constructs don't increment the error count.
+      null_message_handlert null_mh;
+      message_handlert &old_mh = get_message_handler();
+      set_message_handler(null_mh);
+      try
+      {
+        convert(item);
+      }
+      catch(int)
+      {
+      }
+      set_message_handler(old_mh);
     }
-    catch(int)
+    else
     {
-      // Continue processing remaining declarations so that errors
-      // in system headers do not prevent user code from being
-      // type-checked.
+      try
+      {
+        convert(item);
+      }
+      catch(int)
+      {
+      }
     }
   }
 

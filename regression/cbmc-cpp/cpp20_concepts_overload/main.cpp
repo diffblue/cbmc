@@ -1,0 +1,17 @@
+// C++20 concept-constrained overload resolution
+#include <concepts>
+template <std::integral T>
+T add(T a, T b)
+{
+  return a + b;
+}
+template <std::floating_point T>
+T add(T a, T b)
+{
+  return a + b;
+}
+int main()
+{
+  __CPROVER_assert(add(1, 2) == 3, "integral add");
+  __CPROVER_assert(add(1.0, 2.0) == 3.0, "floating add");
+}

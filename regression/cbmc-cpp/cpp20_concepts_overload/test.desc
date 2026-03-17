@@ -1,0 +1,9 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+Concept-constrained overload resolution is not fully implemented.
+Concepts are parsed but not used to disambiguate overloads.

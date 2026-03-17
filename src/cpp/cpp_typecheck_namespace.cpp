@@ -90,19 +90,28 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
     // do the declarations
     for(auto &item : namespace_spec.items())
     {
-      try
+      const auto &loc = item.source_location();
+      const std::string file = id2string(loc.get_file());
+      bool is_system =
+        file.find("/usr/include/") == 0 || file.find("/usr/lib/") == 0;
+
+      if(is_system)
+      {
+        null_message_handlert null_mh;
+        message_handlert &old_mh = get_message_handler();
+        set_message_handler(null_mh);
+        try
+        {
+          convert(item);
+        }
+        catch(int)
+        {
+        }
+        set_message_handler(old_mh);
+      }
+      else
       {
         convert(item);
-      }
-      catch(int)
-      {
-        // Suppress errors from system headers so that unsupported
-        // constructs don't prevent subsequent declarations from
-        // being processed.
-        const auto &loc = item.source_location();
-        const std::string file = id2string(loc.get_file());
-        if(file.find("/usr/include/") != 0 && file.find("/usr/lib/") != 0)
-          throw;
       }
     }
 

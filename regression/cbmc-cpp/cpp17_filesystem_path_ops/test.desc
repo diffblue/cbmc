@@ -1,0 +1,10 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+std::filesystem::path class has incomplete member registration.
+Constructor resolution fails for default arguments, and some
+template members fail during class body processing.

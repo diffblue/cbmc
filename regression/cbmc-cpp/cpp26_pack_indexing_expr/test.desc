@@ -1,0 +1,9 @@
+KNOWNBUG
+main.cpp
+--cpp26
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+Pack indexing (ts...[N]) works in type context but fails to parse
+in expression context.

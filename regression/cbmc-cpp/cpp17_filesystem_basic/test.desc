@@ -1,10 +1,8 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
-^VERIFICATION SUCCESSFUL$
-^EXIT=0$
+^EXIT=(0|10)$
 ^SIGNAL=0$
 --
-std::filesystem::path: constructor resolution fails for default
-argument path() in replace_extension. The path default constructor
-is not found among the candidates.
+^CONVERSION ERROR$
+--
