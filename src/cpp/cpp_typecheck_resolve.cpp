@@ -525,6 +525,13 @@ exprt cpp_typecheck_resolvet::convert_identifier(
         // constexpr function
         e = cpp_symbol_expr(symbol);
       }
+      else if(
+        symbol.type.id() == ID_struct || symbol.type.id() == ID_struct_tag)
+      {
+        // constexpr struct variable: keep as symbol so it remains an
+        // lvalue for member function calls (this pointer formation)
+        e = cpp_symbol_expr(symbol);
+      }
       else
       {
         e = symbol.value;

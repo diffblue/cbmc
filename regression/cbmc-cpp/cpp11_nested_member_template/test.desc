@@ -1,8 +1,8 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-C++11 nested member template — Outer<int>::Inner<double> parse error
+C++11 nested member template — type-checking fails for Outer<int>::Inner<double>

@@ -24,6 +24,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <ansi-c/c_qualifiers.h>
 
+#include "cpp_convert_type.h"
 #include "cpp_declarator_converter.h"
 #include "cpp_name.h"
 #include "cpp_type2name.h"
@@ -491,6 +492,14 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
     if(value.id() == ID_code && to_code(value).get_statement() == ID_default)
     {
+      if(base_name == "operator<=>")
+      {
+        // C++20: fix return type from auto to signed int.
+        // Body will be generated in do_not_typechecked.
+        code_typet &fn_type = to_code_type(component.type());
+        fn_type.return_type() = signed_int_type();
+      }
+
       // C++11 [dcl.fct.def.default]: treat = default as having an
       // empty body so that member initialization is generated
       value = codet(ID_block);
@@ -752,7 +761,19 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
     if(value.is_not_nil())
     {
-      if(cpp_is_pod(new_symbol->type))
+      // auto type deduction for static constexpr auto members
+      if(has_auto(new_symbol->type))
+      {
+        new_symbol->value.swap(value);
+        typecheck_expr(new_symbol->value);
+        cpp_convert_auto(
+          new_symbol->type, new_symbol->value.type(), get_message_handler());
+        typecheck_type(new_symbol->type);
+        implicit_typecast(new_symbol->value, new_symbol->type);
+        // Update the component type to match
+        component.type() = new_symbol->type;
+      }
+      else if(cpp_is_pod(new_symbol->type))
       {
         new_symbol->value.swap(value);
         c_typecheck_baset::do_initializer(*new_symbol);

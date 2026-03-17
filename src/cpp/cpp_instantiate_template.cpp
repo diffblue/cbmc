@@ -103,14 +103,28 @@ std::string cpp_typecheckt::template_suffix(
 
         if(to_integer(to_constant_expr(e), i))
         {
-          error().source_location = expr.find_source_location();
-          error() << "template argument expression expected to be "
-                  << "scalar constant, but got '" << to_string(e) << "'" << eom;
-          throw 0;
+          // C++20: floating-point non-type template parameters
+          if(
+            e.is_constant() &&
+            (e.type().id() == ID_floatbv || e.type().id() == ID_fixedbv ||
+             e.type().id() == ID_double || e.type().id() == ID_float))
+          {
+            result += id2string(to_constant_expr(e).get_value());
+          }
+          else
+          {
+            error().source_location = expr.find_source_location();
+            error() << "template argument expression expected to be "
+                    << "scalar constant, but got '" << to_string(e) << "'"
+                    << eom;
+            throw 0;
+          }
+        }
+        else
+        {
+          result += integer2string(i);
         }
       }
-
-      result+=integer2string(i);
     }
   }
 
@@ -677,6 +691,33 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
   // enter the template scope
   cpp_scopes.go_to(*template_scope);
+
+  // For nested member class templates (e.g., Outer<int>::Inner<double>),
+  // the outer template parameters (T) need to be in the template map
+  // so that references to T in Inner's body can be resolved.
+  if(new_decl.type().id() == ID_struct)
+  {
+    cpp_scopet *scope = &template_scope->get_parent();
+    while(scope != nullptr && !scope->is_root_scope())
+    {
+      if(scope->is_class())
+      {
+        const auto *class_sym = symbol_table.lookup(scope->identifier);
+        if(
+          class_sym != nullptr &&
+          class_sym->type.find(ID_C_template).is_not_nil() &&
+          class_sym->type.find(ID_C_template_arguments).is_not_nil())
+        {
+          template_map.build(
+            static_cast<const template_typet &>(
+              class_sym->type.find(ID_C_template)),
+            static_cast<const cpp_template_args_tct &>(
+              class_sym->type.find(ID_C_template_arguments)));
+        }
+      }
+      scope = &scope->get_parent();
+    }
+  }
 
   // Is it a template method?
   // It's in the scope of a class, and not a class itself.
