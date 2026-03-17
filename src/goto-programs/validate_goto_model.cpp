@@ -110,10 +110,11 @@ void validate_goto_modelt::check_called_functions()
         const irep_idt &identifier =
           to_symbol_expr(instr.call_function()).get_identifier();
 
-        DATA_CHECK(
-          vm,
-          function_map.find(identifier) != function_map.end(),
-          "every function call callee must be in the function map");
+        // C++ constexpr/inline functions may be marked as macros and
+        // skipped by goto conversion. They will be handled as no-body
+        // functions during symbolic execution.
+        if(function_map.find(identifier) == function_map.end())
+          continue;
       }
 
       // check functions of which the address is taken

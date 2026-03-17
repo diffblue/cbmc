@@ -1,0 +1,11 @@
+KNOWNBUG
+main.cpp
+--cpp11 --unwind 2
+^EXIT=(0|10)$
+^SIGNAL=0$
+^VERIFICATION
+--
+^CONVERSION ERROR$
+std::vector<int>::push_back fails during type-checking because
+_M_insert_rval's trailing return type '-> iterator' cannot be
+resolved in the out-of-line member definition context.

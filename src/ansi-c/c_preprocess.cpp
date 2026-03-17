@@ -554,6 +554,14 @@ bool c_preprocess_gcc_clang(
       else
 #endif
         argv.push_back("-std=gnu++17");
+      // CBMC doesn't support deduction guides; undefine the feature macro
+      // so that standard library headers don't use them.
+      argv.push_back("-U__cpp_deduction_guides");
+      // Prevent PSTL (Parallel STL) execution policy headers from being
+      // included; they cause infinite template recursion in CBMC.
+      argv.push_back("-D_PSTL_GLUE_MEMORY_DEFS_H=1");
+      argv.push_back("-D_PSTL_GLUE_ALGORITHM_DEFS_H=1");
+      argv.push_back("-D_PSTL_GLUE_NUMERIC_DEFS_H=1");
       break;
     }
   }

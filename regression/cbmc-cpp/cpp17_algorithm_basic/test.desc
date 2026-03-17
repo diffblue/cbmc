@@ -1,0 +1,9 @@
+KNOWNBUG
+main.cpp
+--cpp17 --unwind 10
+^EXIT=(0|10)$
+^SIGNAL=0$
+^VERIFICATION
+--
+^CONVERSION ERROR$
+std::sort in C++17 mode. KNOWNBUG due to validation issues.

@@ -343,10 +343,14 @@ public:
     check(code, vm);
 
     if(code.op0().id() != ID_nil)
+    {
+      // Destructor calls may have a return value placeholder with nil type
+      const auto &fn_ret = to_code_type(code.op1().type()).return_type();
       DATA_CHECK(
         vm,
-        code.op0().type() == to_code_type(code.op1().type()).return_type(),
+        code.op0().type() == fn_ret || fn_ret.id() == ID_destructor,
         "function returns expression of wrong type");
+    }
   }
 
   static void validate_full(

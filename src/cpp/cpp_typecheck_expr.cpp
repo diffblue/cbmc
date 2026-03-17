@@ -1234,6 +1234,17 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
       e.operands().clear();
     }
 
+    // Direct-list-initialization: TYPE{a, b, c} should try to match
+    // constructors with the individual elements of the braced-init-list.
+    if(
+      e.operands().size() == 1 &&
+      e.operands().front().id() == ID_initializer_list &&
+      !e.operands().front().operands().empty())
+    {
+      exprt::operandst expanded = std::move(e.operands().front().operands());
+      e.operands() = std::move(expanded);
+    }
+
     new_temporary(e.source_location(), e.type(), e.operands(), expr);
   }
 }

@@ -108,6 +108,8 @@ void cpp_typecheckt::typecheck()
 
   do_not_typechecked();
 
+  provide_stdlib_bodies();
+
   clean_up();
 }
 

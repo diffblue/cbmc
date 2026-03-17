@@ -264,8 +264,12 @@ void c_typecheck_baset::designator_enter(
 
     for(const auto &c : struct_type.components())
     {
-      DATA_INVARIANT(
-        c.type().id() != ID_code, "struct member must not be of code type");
+      // C++ structs may have methods as components; skip them.
+      if(c.type().id() == ID_code)
+      {
+        ++entry.index;
+        continue;
+      }
 
       if(
         !c.get_is_padding() &&
@@ -460,7 +464,24 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
         !components[index].get_is_padding(),
         "member designator points at non-padding member");
 
-      dest=&(dest->operands()[index]);
+      // Convert component index to operand index by subtracting
+      // the number of code-type members before this index.
+      std::size_t op_index = index;
+      for(std::size_t i = 0; i < index; ++i)
+      {
+        if(components[i].type().id() == ID_code)
+          --op_index;
+      }
+
+      if(op_index >= dest->operands().size())
+      {
+        error().source_location = value.source_location();
+        error() << "structure member designator " << index << " out of bounds"
+                << eom;
+        throw 0;
+      }
+
+      dest = &(dest->operands()[op_index]);
     }
     else if(auto union_tag_type = type_try_dynamic_cast<union_tag_typet>(type))
     {
@@ -728,8 +749,10 @@ void c_typecheck_baset::increment_designator(designatort &designator)
 
       // we skip over any padding
       // we also skip over anonymous members that are bit fields
+      // we also skip over code-type members (C++ methods)
       while(entry.index < entry.size &&
             (components[entry.index].get_is_padding() ||
+             components[entry.index].type().id() == ID_code ||
              (components[entry.index].get_anonymous() &&
               components[entry.index].type().id() == ID_c_bit_field)))
       {
@@ -1030,7 +1053,14 @@ exprt c_typecheck_baset::do_initializer_list(
     const struct_typet &full_struct_type = follow_tag(*struct_tag_type);
     const struct_typet::componentst &components = full_struct_type.components();
     // make sure we didn't mess up index computation
-    CHECK_RETURN(result.operands().size() == components.size());
+    // C++ structs may have code-type members that are not in operands
+    std::size_t data_components = 0;
+    for(const auto &c : components)
+    {
+      if(c.type().id() != ID_code)
+        ++data_components;
+    }
+    CHECK_RETURN(result.operands().size() == data_components);
 
     if(
       !components.empty() &&

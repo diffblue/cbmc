@@ -202,8 +202,10 @@ std::optional<exprt> expr_initializert::expr_initializer_rec(
 
     for(const auto &c : components)
     {
-      DATA_INVARIANT(
-        c.type().id() != ID_code, "struct member must not be of code type");
+      // C++ structs may have methods as components; skip them
+      // as struct_exprt values only contain data member operands.
+      if(c.type().id() == ID_code)
+        continue;
 
       const auto member =
         expr_initializer_rec(c.type(), source_location, init_expr);
