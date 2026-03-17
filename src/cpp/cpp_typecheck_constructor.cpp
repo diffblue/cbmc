@@ -524,6 +524,17 @@ void cpp_typecheckt::check_member_initializers(
         }
         break;
       }
+
+      // Delegating constructor (C++11): the initializer names the
+      // class's own constructor
+      if(
+        !c.get_bool(ID_from_base) && !c.get_bool(ID_is_type) &&
+        !c.get_bool(ID_is_static) && c.type().id() == ID_code &&
+        to_code_type(c.type()).return_type().id() == ID_constructor)
+      {
+        ok = true;
+        break;
+      }
     }
 
     if(!ok)

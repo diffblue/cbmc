@@ -1567,6 +1567,24 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   // Backup of the original operand
   exprt op0=expr.function();
 
+  // Pre-typecheck arguments to get their types for template argument
+  // deduction. This is needed for function templates with partial
+  // explicit template arguments (e.g., duration_cast<seconds>(d)).
+  for(auto &arg : expr.arguments())
+  {
+    if(arg.type().id().empty() || arg.type().is_nil())
+    {
+      try
+      {
+        typecheck_expr(arg);
+      }
+      catch(...)
+      {
+        // ignore errors — argument may depend on template resolution
+      }
+    }
+  }
+
   // now do the function -- this has been postponed
   typecheck_function_expr(expr.function(), cpp_typecheck_fargst(expr));
 
@@ -1864,10 +1882,10 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   // constexpr function evaluation
   if(auto sym_expr = expr_try_dynamic_cast<symbol_exprt>(expr.function()))
   {
-    const auto &symbol = lookup(sym_expr->get_identifier());
-    if(symbol.is_macro)
+    const auto *symbol_ptr = symbol_table.lookup(sym_expr->get_identifier());
+    if(symbol_ptr != nullptr && symbol_ptr->is_macro)
     {
-      const auto &code_type = to_code_type(symbol.type);
+      const auto &code_type = to_code_type(symbol_ptr->type);
       PRECONDITION(expr.arguments().size() == code_type.parameters().size());
       replace_symbolt value_map;
       auto param_it = code_type.parameters().begin();
@@ -1878,7 +1896,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
           typecast_exprt::conditional_cast(arg, param_it->type()));
         ++param_it;
       }
-      const auto &block = to_code_block(to_code(symbol.value));
+      const auto &block = to_code_block(to_code(symbol_ptr->value));
       for(const auto &stmt : block.statements())
       {
         if(

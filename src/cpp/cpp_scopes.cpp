@@ -45,17 +45,13 @@ cpp_idt &cpp_scopest::put_into_scope(
     }
   }
 
-  // should go away, and be replaced by the 'tag only declaration' rule
   if(is_friend)
   {
-    cpp_save_scopet saved_scope(*this);
-    go_to(scope);
-
-    cpp_idt &id=current_scope().insert(symbol.base_name);
-    id.identifier=symbol.name;
+    cpp_idt &id = scope.insert(symbol.base_name);
+    id.identifier = symbol.name;
     id.id_class = cpp_idt::id_classt::SYMBOL;
-    if(id_map.find(symbol.name)==id_map.end())
-      id_map[symbol.name]=&id;
+    if(id_map.find(symbol.name) == id_map.end())
+      id_map[symbol.name] = &id;
     return id;
   }
   else

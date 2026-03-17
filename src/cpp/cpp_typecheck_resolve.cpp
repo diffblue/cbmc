@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/string_constant.h>
+#include <util/symbol_table_base.h>
 
 #include <ansi-c/anonymous_member.h>
 #include <ansi-c/merged_type.h>
@@ -1203,12 +1204,31 @@ struct_tag_typet cpp_typecheck_resolvet::disambiguate_template_classes(
     if(!guessed_template_args.has_unassigned())
     {
       // check: we can now typecheck the partial_specialization_args
-
-      cpp_template_args_tct partial_specialization_args_tc=
-        cpp_typecheck.typecheck_template_args(
-          source_location,
-          primary_template_symbol,
-          partial_specialization_args);
+      // If typechecking fails (e.g., accessing a member of a non-class
+      // type), treat it as a substitution failure (SFINAE) and skip
+      // this specialization.
+      cpp_template_args_tct partial_specialization_args_tc;
+      bool sfinae_failed = false;
+      {
+        null_message_handlert null_handler;
+        message_handlert &old_handler = cpp_typecheck.get_message_handler();
+        cpp_typecheck.set_message_handler(null_handler);
+        try
+        {
+          partial_specialization_args_tc =
+            cpp_typecheck.typecheck_template_args(
+              source_location,
+              primary_template_symbol,
+              partial_specialization_args);
+        }
+        catch(...)
+        {
+          sfinae_failed = true;
+        }
+        cpp_typecheck.set_message_handler(old_handler);
+      }
+      if(sfinae_failed)
+        continue;
 
       // if these match the arguments, we have a match
 
@@ -1692,7 +1712,6 @@ exprt cpp_typecheck_resolvet::resolve(
   {
     new_identifiers=identifiers;
 
-    if(template_args.is_nil())
     {
       guess_function_template_args(new_identifiers, fargs);
 
@@ -1926,10 +1945,61 @@ void cpp_typecheck_resolvet::guess_template_args(
 
     if(cpp_name.has_template_args())
     {
-      // this could be something like my_template<T>, and we need
+      // This could be something like my_template<T>, and we need
       // to match 'T'. Then 'desired_type' has to be a template instance.
 
-      // TODO
+      const auto &name_args = cpp_name.get_sub().back();
+      if(name_args.id() != ID_template_args)
+        return;
+
+      const irept::subt &targs = name_args.find(ID_arguments).get_sub();
+
+      // desired_type must be a struct/union tag that was instantiated
+      // from a template
+      irep_idt desired_id;
+      if(desired_type.id() == ID_struct_tag)
+        desired_id = to_struct_tag_type(desired_type).get_identifier();
+      else if(desired_type.id() == ID_union_tag)
+        desired_id = to_union_tag_type(desired_type).get_identifier();
+      else
+        return;
+
+      const symbolt *desired_sym =
+        cpp_typecheck.symbol_table.lookup(desired_id);
+      if(desired_sym == nullptr)
+        return;
+
+      // Check if it was instantiated from a template
+      if(desired_sym->type.get(ID_C_template).empty())
+        return;
+
+      const irept &inst_args = desired_sym->type.find(ID_C_template_arguments);
+      if(inst_args.is_nil())
+        return;
+
+      const auto &inst_arguments =
+        static_cast<const cpp_template_args_tct &>(inst_args).arguments();
+
+      // Match each template arg from the cpp_name against the
+      // corresponding instantiation arg
+      for(std::size_t i = 0; i < targs.size() && i < inst_arguments.size(); i++)
+      {
+        if(inst_arguments[i].id() == ID_type)
+        {
+          // The targ might be an "ambiguous" node with a type sub
+          const typet &targ_type =
+            targs[i].id() == ID_ambiguous
+              ? static_cast<const typet &>(targs[i].find(ID_type))
+              : static_cast<const typet &>(
+                  static_cast<const irept &>(targs[i]));
+          guess_template_args(targ_type, inst_arguments[i].type());
+        }
+        else
+        {
+          guess_template_args(
+            static_cast<const exprt &>(targs[i]), inst_arguments[i]);
+        }
+      }
     }
     else
     {
@@ -1981,14 +2051,23 @@ void cpp_typecheck_resolvet::guess_template_args(
   else if(is_reference(template_type) ||
           is_rvalue_reference(template_type))
   {
-    guess_template_args(
-      to_reference_type(template_type).base_type(), desired_type);
+    typet desired = desired_type;
+    if(is_reference(desired) || is_rvalue_reference(desired))
+      desired = to_reference_type(desired).base_type();
+    guess_template_args(to_reference_type(template_type).base_type(), desired);
   }
   else if(template_type.id()==ID_pointer)
   {
     if(desired_type.id() == ID_pointer)
       guess_template_args(
         to_pointer_type(template_type).base_type(),
+        to_pointer_type(desired_type).base_type());
+  }
+  else if(template_type.id() == ID_frontend_pointer)
+  {
+    if(desired_type.id() == ID_pointer)
+      guess_template_args(
+        to_type_with_subtype(template_type).subtype(),
         to_pointer_type(desired_type).base_type());
   }
   else if(template_type.id()==ID_array)
@@ -2057,6 +2136,27 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
 
   cpp_typecheck.template_map.build_unassigned(
     cpp_declaration.template_type());
+
+  // If explicit template arguments were provided (partial explicit args),
+  // pre-populate the template map with them before deduction.
+  const irept &stored_args = expr.find(ID_C_template_arguments);
+  if(stored_args.is_not_nil())
+  {
+    const cpp_template_args_tct &explicit_args =
+      to_cpp_template_args_tc(stored_args);
+    const auto &params = cpp_declaration.template_type().template_parameters();
+    for(std::size_t i = 0;
+        i < explicit_args.arguments().size() && i < params.size();
+        i++)
+    {
+      if(
+        explicit_args.arguments()[i].id() != ID_unassigned &&
+        explicit_args.arguments()[i].type().id() != ID_unassigned)
+      {
+        cpp_typecheck.template_map.set(params[i], explicit_args.arguments()[i]);
+      }
+    }
+  }
 
   // there should be exactly one declarator
   PRECONDITION(cpp_declaration.declarators().size() == 1);
@@ -2198,9 +2298,13 @@ void cpp_typecheck_resolvet::apply_template_args(
     // go back to where we used to be
   }
 
-  // We never try 'unassigned' template arguments.
+  // For function templates with unassigned (partial) args, skip
+  // instantiation. Store the explicit args for later deduction.
   if(template_args_tc.has_unassigned())
-    UNREACHABLE;
+  {
+    expr.add(ID_C_template_arguments) = template_args_tc;
+    return;
+  }
 
   // a template is always a declaration
   const cpp_declarationt &cpp_declaration=
@@ -2350,11 +2454,45 @@ void cpp_typecheck_resolvet::filter_for_named_scopes(
     }
     else if(id.is_typedef())
     {
-      // std::cout << "X2\n";
       irep_idt identifier=id.identifier;
 
       if(id.is_member)
+      {
+        // Member typedefs are stored as struct components, not as
+        // standalone symbols. Look up the typedef's type through the
+        // class scope and follow it to the underlying struct type.
+        // The identifier for a member typedef component is the
+        // class identifier + "::" + base_name, but the symbol table
+        // stores it under the class tag. Look up the parent class
+        // and find the component.
+        const cpp_idt &parent = id.get_parent();
+        const auto *class_sym =
+          cpp_typecheck.symbol_table.lookup(parent.identifier);
+        if(class_sym != nullptr && class_sym->type.id() == ID_struct)
+        {
+          for(const auto &comp : to_struct_type(class_sym->type).components())
+          {
+            if(
+              comp.get_base_name() == id.base_name && comp.get_bool(ID_is_type))
+            {
+              typet t = comp.type();
+              if(t.id() == ID_struct_tag)
+              {
+                const irep_idt &tag_id = to_struct_tag_type(t).get_identifier();
+                auto it = cpp_typecheck.cpp_scopes.id_map.find(tag_id);
+                if(it != cpp_typecheck.cpp_scopes.id_map.end())
+                {
+                  cpp_idt &class_id = *it->second;
+                  if(class_id.is_scope)
+                    new_set.insert(&class_id);
+                }
+              }
+              break;
+            }
+          }
+        }
         continue;
+      }
 
       while(true)
       {
