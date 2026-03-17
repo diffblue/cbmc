@@ -799,6 +799,15 @@ std::string cpp_typecheckt::function_template_identifier(
   // we must also add the signature of the function to the identifier
   identifier+=cpp_type2name(function_type);
 
+  // C++20: include concept constraints in the identifier so that
+  // overloads differing only in concept constraints get distinct symbols.
+  for(const auto &p : template_type.template_parameters())
+  {
+    const irep_idt &constraint = p.get("#C_concept_constraint");
+    if(!constraint.empty())
+      identifier += "#" + id2string(constraint);
+  }
+
   return identifier;
 }
 
@@ -1144,6 +1153,10 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
       // can resolve the argument as a template name rather than a type.
       if(declaration.type().id() == ID_template)
         parameter.set(ID_is_template, true);
+      // Preserve concept constraint for C++20 concept subsumption
+      const irep_idt &constraint = declaration.get("#C_concept_constraint");
+      if(!constraint.empty())
+        parameter.set("#C_concept_constraint", constraint);
     }
     else
     {

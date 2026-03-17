@@ -1202,6 +1202,8 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
 {
   TemplateDeclKind kind=tdk_unknown;
 
+  new_scopet *outer_scope = current_scope;
+
   make_sub_scope("#template", new_scopet::kindt::TEMPLATE);
   current_scope->id_map.clear();
 
@@ -1408,6 +1410,27 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
     }
   }
 
+  // Restore scope to before the template parameter scope so that
+  // template parameter names (e.g., _Align from aligned_storage)
+  // don't leak into subsequent declarations.  Copy non-parameter
+  // names (class/function templates, tags) to the outer scope so
+  // they remain visible.
+  {
+    new_scopet *template_scope = current_scope;
+    current_scope = outer_scope;
+    for(auto &entry : template_scope->id_map)
+    {
+      if(
+        entry.second.kind != new_scopet::kindt::NON_TYPE_TEMPLATE_PARAMETER &&
+        entry.second.kind != new_scopet::kindt::TYPE_TEMPLATE_PARAMETER &&
+        entry.second.kind != new_scopet::kindt::TEMPLATE_TEMPLATE_PARAMETER &&
+        entry.second.kind != new_scopet::kindt::TEMPLATE)
+      {
+        outer_scope->id_map.insert(entry);
+      }
+    }
+  }
+
   return true;
 }
 
@@ -1608,6 +1631,9 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
           set_location(declaration, concept_tk);
           declaration.set(ID_is_type, true);
           declaration.type() = typet("cpp-template-type");
+          // Store the concept constraint name for subsumption ordering
+          declaration.set(
+            "#C_concept_constraint", concept_tk.data.get(ID_C_base_name));
 
           declaration.declarators().resize(1);
           cpp_declaratort &declarator = declaration.declarators().front();
@@ -3279,6 +3305,7 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
   else if(t==TOK_DECLTYPE)
   {
     cpp_tokent decltype_tk;
+    cpp_token_buffert::post pos = lex.Save();
     lex.get_token(decltype_tk);
 
     p=typet(ID_decltype);
@@ -3306,6 +3333,14 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
 
     if(lex.get_token(tk)!=')')
       return false;
+
+    // decltype(expr)::member — let rName handle qualified access
+    if(lex.LookAhead(0) == TOK_SCOPE)
+    {
+      lex.Restore(pos);
+      p.make_nil();
+      return true;
+    }
 
     p.add(ID_expr_arg).swap(expr);
 
@@ -10318,6 +10353,30 @@ std::optional<codet> Parser::rIfStatement()
     }
 
     return codet(ID_skip);
+  }
+
+  // C++23 if !consteval: the negated form — take the if-body (runtime)
+  // and discard the else-body (consteval).
+  if(lex.LookAhead(0) == '!' && lex.LookAhead(1) == TOK_CONSTEVAL)
+  {
+    lex.get_token(tk2); // consume '!'
+    lex.get_token(tk2); // consume 'consteval'
+
+    // Take the if-body (runtime branch)
+    auto runtime_body = rCompoundStatement();
+    if(!runtime_body.has_value())
+        return {};
+
+    // Discard the else-body (consteval branch) if present
+    if(lex.LookAhead(0) == TOK_ELSE)
+    {
+        lex.get_token(tk2);
+        auto consteval_body = rCompoundStatement();
+        if(!consteval_body.has_value())
+          return {};
+    }
+
+    return std::move(runtime_body.value());
   }
 
   if(lex.get_token(tk2)!='(')

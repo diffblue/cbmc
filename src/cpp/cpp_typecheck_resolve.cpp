@@ -93,6 +93,69 @@ void cpp_typecheck_resolvet::guess_function_template_args(
 
   resolve_identifierst non_templates;
 
+  // C++20 concept subsumption: when multiple templates with concept
+  // constraints match, prefer the more constrained one. Filter before
+  // instantiation so only the best candidate is instantiated.
+  if(old_identifiers.size() > 1)
+  {
+    // Extract concept constraint from template parameters
+    auto get_constraint = [&](const exprt &id) -> irep_idt
+    {
+      const typet &t =
+        id.type().id() == ID_struct_tag
+          ? static_cast<const typet &>(
+              cpp_typecheck.follow_tag(to_struct_tag_type(id.type())))
+        : id.type().id() == ID_union_tag
+          ? static_cast<const typet &>(
+              cpp_typecheck.follow_tag(to_union_tag_type(id.type())))
+          : id.type();
+      if(!t.get_bool(ID_is_template))
+        return irep_idt();
+      const cpp_declarationt &decl = to_cpp_declaration(t);
+      for(const auto &p : decl.template_type().template_parameters())
+      {
+        const irep_idt &c = p.get("#C_concept_constraint");
+        if(!c.empty())
+          return c;
+      }
+      return irep_idt();
+    };
+
+    std::vector<bool> subsumed(old_identifiers.size(), false);
+    for(std::size_t i = 0; i < old_identifiers.size(); ++i)
+    {
+      irep_idt ci = get_constraint(old_identifiers[i]);
+      if(ci.empty())
+        continue;
+      for(std::size_t j = 0; j < old_identifiers.size(); ++j)
+      {
+        if(i == j)
+          continue;
+        irep_idt cj = get_constraint(old_identifiers[j]);
+        if(cj.empty())
+          continue;
+        if(id2string(cj).find(id2string(ci)) != std::string::npos && ci != cj)
+        {
+          subsumed[i] = true;
+        }
+      }
+    }
+
+    bool any_subsumed = false;
+    for(bool s : subsumed)
+      if(s)
+        any_subsumed = true;
+
+    if(any_subsumed)
+    {
+      resolve_identifierst filtered;
+      for(std::size_t i = 0; i < old_identifiers.size(); ++i)
+        if(!subsumed[i])
+          filtered.push_back(old_identifiers[i]);
+      old_identifiers.swap(filtered);
+    }
+  }
+
   for(const auto &old_id : old_identifiers)
   {
     exprt e = guess_function_template_args(old_id, fargs);

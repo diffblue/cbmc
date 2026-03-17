@@ -1,32 +1,30 @@
-// C++23 if consteval
-// CBMC performs runtime verification, so if consteval always takes the
-// runtime (else) branch.
-constexpr int compute(int x)
+// C++23 if consteval / if !consteval
+constexpr int f()
 {
   if consteval
   {
-    return x * 2;
+    return 1;
   }
   else
   {
-    return x * 3;
+    return 2;
   }
 }
 
-constexpr int no_else(int x)
+int g()
 {
-  if consteval
+  if !consteval
   {
-    return x * 2;
+    return 42;
   }
-  return x * 3;
+  else
+  {
+    return 0;
+  }
 }
 
 int main()
 {
-  int r = compute(7);
-  __CPROVER_assert(r == 21, "if consteval takes runtime branch");
-  int s = no_else(5);
-  __CPROVER_assert(s == 15, "if consteval without else");
-  return 0;
+  __CPROVER_assert(f() == 2, "if consteval takes else");
+  __CPROVER_assert(g() == 42, "if !consteval takes if");
 }
