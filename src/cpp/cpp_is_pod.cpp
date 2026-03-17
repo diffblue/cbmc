@@ -19,10 +19,13 @@ bool cpp_typecheckt::cpp_is_pod(const typet &type) const
   {
     // Not allowed in PODs:
     // * Non-PODs
-    // * Constructors/Destructors
+    // * Constructors/Destructors (including template constructors)
     // * virtuals
     // * private/protected, unless static
     // * overloading assignment operator
+
+    if(type.get_bool("has_template_constructor"))
+      return false;
     // * Base classes
 
     const struct_typet &struct_type=to_struct_type(type);

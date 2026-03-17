@@ -9,12 +9,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
-#include "cpp_typecheck.h"
-
-#ifdef DEBUG
-#include <iostream>
-#endif
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
@@ -29,6 +23,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_exception_id.h"
 #include "cpp_type2name.h"
+#include "cpp_typecheck.h"
 #include "cpp_typecheck_fargs.h"
 #include "cpp_util.h"
 #include "expr2cpp.h"
@@ -72,6 +67,28 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     typecheck_expr_explicit_constructor_call(expr);
   else if(expr.id()==ID_code)
   {
+    // The parser may produce ID_code for expressions like bool(x)
+    // when it cannot distinguish a functional cast from a function type.
+    // Check if this looks like a functional cast: return type is a
+    // primitive type and there is exactly one parameter.
+    const irept &return_type = expr.find(ID_return_type);
+    const irept &parameters = expr.find(ID_parameters);
+    if(
+      return_type.is_not_nil() && parameters.get_sub().size() == 1 &&
+      parameters.get_sub()[0].id() == ID_cpp_declaration)
+    {
+      typet cast_target = static_cast<const typet &>(return_type);
+      typecheck_type(cast_target);
+
+      // Extract the parameter declaration's type as an expression
+      const auto &param_decl =
+        static_cast<const cpp_declarationt &>(parameters.get_sub()[0]);
+      exprt cast_arg = static_cast<const exprt &>(
+        static_cast<const irept &>(param_decl.type()));
+      typecheck_expr(cast_arg);
+      expr = typecast_exprt(cast_arg, cast_target);
+      return;
+    }
 #ifdef DEBUG
     std::cerr << "E: " << expr.pretty() << '\n';
     std::cerr << "cpp_typecheckt::typecheck_expr_main got code\n";
@@ -1064,6 +1081,17 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
   else
   {
     exprt e=expr;
+
+    // An empty braced-init-list {} means value-initialization,
+    // which for class types calls the default constructor.
+    if(
+      e.operands().size() == 1 &&
+      e.operands().front().id() == ID_initializer_list &&
+      e.operands().front().operands().empty())
+    {
+      e.operands().clear();
+    }
+
     new_temporary(e.source_location(), e.type(), e.operands(), expr);
   }
 }

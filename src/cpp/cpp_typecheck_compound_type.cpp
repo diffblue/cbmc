@@ -996,6 +996,14 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
 
       if(declaration.is_template())
       {
+        if(declaration.is_constructor())
+        {
+          found_ctor = true;
+          // Mark the struct as having a constructor so cpp_is_pod
+          // returns false even though the constructor is a template
+          // and not stored as a regular component.
+          symbol.type.set("has_template_constructor", true);
+        }
         // remember access mode
         declaration.set(ID_C_access, access);
         convert_template_declaration(declaration);

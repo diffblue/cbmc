@@ -114,6 +114,39 @@ symbolt &cpp_declarator_convertert::convert(
 
   get_final_identifier();
 
+  // For explicit template instantiations (e.g., extern template
+  // __try_use_facet<collate<char>>), include the template arguments
+  // in the identifier to distinguish different instantiations.
+  if(template_args.is_not_nil() && !template_args.arguments().empty())
+  {
+    cpp_template_args_tct tc_args;
+    try
+    {
+      for(const auto &arg : template_args.arguments())
+      {
+        if(arg.id() == ID_type || arg.id() == ID_ambiguous)
+        {
+          typet t = arg.type();
+          cpp_typecheck.typecheck_type(t);
+          exprt e(ID_type);
+          e.type() = t;
+          tc_args.arguments().push_back(e);
+        }
+        else
+        {
+          exprt e = arg;
+          cpp_typecheck.typecheck_expr(e);
+          tc_args.arguments().push_back(e);
+        }
+      }
+      final_identifier =
+        id2string(final_identifier) + cpp_typecheck.template_suffix(tc_args);
+    }
+    catch(...)
+    {
+    }
+  }
+
   if(is_typedef)
     final_type.set(ID_C_typedef, final_identifier);
 
