@@ -421,8 +421,10 @@ protected:
 
   const struct_typet &this_struct_type();
 
-  std::optional<codet>
-  cpp_destructor(const source_locationt &source_location, const exprt &object);
+  std::optional<codet> cpp_destructor(
+    const source_locationt &source_location,
+    const exprt &object,
+    bool force_direct = true);
 
   // expressions
   void explicit_typecast_ambiguity(exprt &);

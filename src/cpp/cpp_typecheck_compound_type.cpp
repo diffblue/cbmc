@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/pointer_offset_size.h>
 #include <util/std_types.h>
 #include <util/symbol_table_base.h>
 
@@ -665,8 +666,13 @@ void cpp_typecheckt::typecheck_compound_declarator(
           lookup(args[0].get_identifier()).symbol_expr(),
           to_code_type(component.type()).parameters()[0].type());
 
+        // Thunk calls must be direct (non-virtual) to avoid infinite
+        // recursion through the vtable.
+        typet direct_type = component.type();
+        direct_type.remove(ID_C_is_virtual);
+
         side_effect_expr_function_callt expr_call(
-          symbol_exprt(component.get_name(), component.type()),
+          symbol_exprt(component.get_name(), direct_type),
           {late_cast},
           uninitialized_typet{},
           source_locationt{});
@@ -686,15 +692,13 @@ void cpp_typecheckt::typecheck_compound_declarator(
         {
           expr_call.type() = to_code_type(component.type()).return_type();
 
-          already_typechecked_exprt ate{std::move(expr_call)};
-          ate.type() = to_code_type(component.type()).return_type();
           func_symb.value =
-            code_blockt{{code_frontend_returnt(std::move(ate))}};
+            code_blockt{{code_frontend_returnt(std::move(expr_call))}};
         }
         else
         {
-          func_symb.value = code_blockt{{code_expressiont(
-            already_typechecked_exprt{std::move(expr_call)})}};
+          func_symb.value =
+            code_blockt{{code_expressiont(std::move(expr_call))}};
         }
 
         // add this new function to the list of components
@@ -1720,7 +1724,7 @@ bool cpp_typecheckt::check_component_access(
       const struct_typet &scope_struct =
         to_struct_type(lookup(pscope->identifier).type);
 
-      if(subtype_typecast(to_struct_type(struct_union_type), scope_struct))
+      if(subtype_typecast(scope_struct, to_struct_type(struct_union_type)))
         return false; // ok
 
       // C++11 (DR 45): nested classes have access to the enclosing
@@ -1853,6 +1857,121 @@ void cpp_typecheckt::make_ptr_typecast(
   PRECONDITION(
     subtype_typecast(src_struct, dest_struct) ||
     subtype_typecast(dest_struct, src_struct));
+
+  // For upcasts (derived* -> base*) and downcasts (base* -> derived*),
+  // adjust the pointer offset when the base class is not the first base
+  // (i.e., its members don't start at offset 0 in the derived class's
+  // flat struct layout).
+  const struct_typet *derived = nullptr;
+  const struct_typet *base = nullptr;
+  bool is_upcast = false;
+  if(subtype_typecast(src_struct, dest_struct))
+  {
+    derived = &src_struct;
+    base = &dest_struct;
+    is_upcast = true;
+  }
+  else
+  {
+    derived = &dest_struct;
+    base = &src_struct;
+    is_upcast = false;
+  }
+
+  {
+    const irep_idt &base_name = base->get(ID_name);
+
+    // Skip offset adjustment for virtual inheritance — the layout
+    // involves virtual base pointers that member_offset cannot handle.
+    std::list<irep_idt> virtual_bases;
+    get_virtual_bases(*derived, virtual_bases);
+    if(!virtual_bases.empty())
+    {
+      expr = typecast_exprt(expr, dest_type);
+      return;
+    }
+
+    // Walk the inheritance chain from derived to base. At each level,
+    // check if the target base is reachable through the first direct
+    // base. If not, compute the offset of the non-first base's first
+    // component.
+    bool needs_offset = false;
+    const struct_typet *current = derived;
+    irep_idt offset_base_name;
+    while(current->get(ID_name) != base_name)
+    {
+      const auto &bases = current->bases();
+      if(bases.empty())
+        break;
+
+      const struct_typet &first_base =
+        to_struct_type(lookup(bases.front().type()).type);
+      std::set<irep_idt> first_base_set;
+      first_base_set.insert(first_base.get(ID_name));
+      get_bases(first_base, first_base_set);
+
+      if(
+        first_base.get(ID_name) == base_name || first_base_set.count(base_name))
+      {
+        current = &first_base;
+        continue;
+      }
+
+      // base is reachable through a non-first base.
+      for(std::size_t i = 1; i < bases.size(); ++i)
+      {
+        const struct_typet &nth_base =
+          to_struct_type(lookup(bases[i].type()).type);
+        std::set<irep_idt> nth_base_set;
+        nth_base_set.insert(nth_base.get(ID_name));
+        get_bases(nth_base, nth_base_set);
+
+        if(nth_base.get(ID_name) == base_name || nth_base_set.count(base_name))
+        {
+          offset_base_name = nth_base.get(ID_name);
+          needs_offset = true;
+          break;
+        }
+      }
+      break;
+    }
+
+    if(needs_offset)
+    {
+      // Find the first component of the non-first base in derived.
+      const std::string bn = id2string(offset_base_name);
+      std::string base_prefix;
+      if(bn.size() > 4 && bn.substr(0, 4) == "tag-")
+        base_prefix = bn.substr(4) + "::";
+      else
+        base_prefix = bn + "::";
+      const std::string tag_prefix = bn + "::";
+
+      for(const auto &comp : derived->components())
+      {
+        const std::string cn = id2string(comp.get_name());
+        if(
+          (cn.size() > base_prefix.size() &&
+           cn.compare(0, base_prefix.size(), base_prefix) == 0) ||
+          (cn.size() > tag_prefix.size() &&
+           cn.compare(0, tag_prefix.size(), tag_prefix) == 0))
+        {
+          auto offset = member_offset(*derived, comp.get_name(), *this);
+          if(offset.has_value() && *offset != 0)
+          {
+            exprt char_ptr =
+              typecast_exprt(expr, pointer_type(unsigned_char_type()));
+            exprt offset_expr =
+              from_integer(is_upcast ? *offset : -*offset, pointer_diff_type());
+            exprt adjusted = plus_exprt(char_ptr, offset_expr);
+            expr = typecast_exprt(adjusted, dest_type);
+            return;
+          }
+          break;
+        }
+      }
+    }
+  }
 
   expr = typecast_exprt(expr, dest_type);
 }

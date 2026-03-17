@@ -597,17 +597,25 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
 
       if(access == ID_private || access == ID_noaccess)
       {
-#if 0
-        error().source_location=code.find_source_location();
-        error() << "constructor of '"
-                << to_string(symbol_expr)
+        error().source_location = code.find_source_location();
+        error() << "constructor of '" << to_string(symbol_expr)
                 << "' is not accessible" << eom;
         throw 0;
-#endif
       }
     }
 
     code_expressiont code_expression(function_call);
+
+    // Mark the callee as used so that do_not_typechecked processes
+    // its body (e.g., base class copy constructors called from a
+    // derived class copy constructor's member initializer list).
+    if(symbol_expr.id() == ID_symbol)
+    {
+      symbolt &callee = symbol_table.get_writeable_ref(
+        to_symbol_expr(symbol_expr).get_identifier());
+      if(callee.value.id() == ID_cpp_not_typechecked)
+        callee.value.set(ID_is_used, true);
+    }
 
     code.swap(code_expression);
   }

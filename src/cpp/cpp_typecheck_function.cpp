@@ -147,11 +147,19 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     PRECONDITION(symbol.value.id() == ID_code);
     PRECONDITION(symbol.value.get(ID_statement) == ID_block);
 
+    // Skip adding destructor code for virtual function thunks — the
+    // thunk just calls the real destructor which already has the code.
+    const auto &this_param_type =
+      to_pointer_type(function_type.parameters().front().type());
+    bool is_thunk =
+      this_param_type.base_type().get(ID_identifier) != msymb.name;
+
     if(
-      !symbol.value.has_operands() ||
-      !to_multi_ary_expr(symbol.value).op0().has_operands() ||
-      to_multi_ary_expr(to_multi_ary_expr(symbol.value).op0()).op0().id() !=
-        ID_already_typechecked)
+      !is_thunk &&
+      (!symbol.value.has_operands() ||
+       !to_multi_ary_expr(symbol.value).op0().has_operands() ||
+       to_multi_ary_expr(to_multi_ary_expr(symbol.value).op0()).op0().id() !=
+         ID_already_typechecked))
     {
       symbol.value.copy_to_operands(
         dtor(msymb, to_symbol_expr(function_scope.this_expr)));
@@ -281,6 +289,10 @@ irep_idt cpp_typecheckt::function_identifier(const typet &type)
     // is the same regardless of declaration style.
     if(tmp_type.id() == ID_code)
       tmp_type = pointer_type(tmp_type);
+    // Top-level const/volatile on parameters does not affect the
+    // function signature per [dcl.fct]/5.
+    tmp_type.remove(ID_C_constant);
+    tmp_type.remove(ID_C_volatile);
     result += cpp_type2name(tmp_type);
   }
 

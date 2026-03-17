@@ -18,7 +18,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \return typechecked code
 std::optional<codet> cpp_typecheckt::cpp_destructor(
   const source_locationt &source_location,
-  const exprt &object)
+  const exprt &object,
+  bool force_direct)
 {
   elaborate_class_template(object.type());
 
@@ -109,12 +110,13 @@ std::optional<codet> cpp_typecheckt::cpp_destructor(
 
     typecheck_side_effect_function_call(function_call);
 
-    // Destructor calls from within a destructor body must be direct
-    // (non-virtual). If typecheck_side_effect_function_call generated
-    // a virtual dispatch through the vtable, replace it with a direct
-    // call to the resolved destructor symbol.
+    // When force_direct is set (destructor calls from within a
+    // destructor body), replace any virtual dispatch (dereference
+    // through the vtable) with a direct call to the resolved
+    // destructor symbol. This prevents infinite recursion through
+    // the vtable @dtor entry.
     if(
-      function_call.function().id() == ID_dereference &&
+      force_direct && function_call.function().id() == ID_dereference &&
       !dtor_symbol_name.empty())
     {
       const symbolt *dtor_sym = symbol_table.lookup(dtor_symbol_name);
