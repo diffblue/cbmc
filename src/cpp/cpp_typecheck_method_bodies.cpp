@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <iostream>
 #endif
 
+#include <util/symbol_table_base.h>
+
 #include "cpp_typecheck.h"
 
 void cpp_typecheckt::typecheck_method_bodies()
@@ -58,8 +60,33 @@ void cpp_typecheckt::add_method_body(symbolt *_method_symbol)
   // symbol prefixes, therefore we have to keep track.
   if(methods_seen.insert(_method_symbol->name).second)
   {
+    // If this method was deferred (its class is a template instance and
+    // the method body wasn't type-checked during class instantiation),
+    // the current template_map may not contain the class template
+    // parameters. Build them from the class symbol so that names like
+    // _Alloc inside the method body resolve correctly.
+    template_mapt method_map = template_map;
+    if(deferred_typechecking.count(_method_symbol->name))
+    {
+      const irep_idt &class_id = _method_symbol->type.get(ID_C_member_name);
+      if(!class_id.empty())
+      {
+        const symbolt *class_sym = symbol_table.lookup(class_id);
+        if(
+          class_sym != nullptr &&
+          class_sym->type.find(ID_C_template).is_not_nil() &&
+          class_sym->type.find(ID_C_template_arguments).is_not_nil())
+        {
+          method_map.build(
+            static_cast<const template_typet &>(
+              class_sym->type.find(ID_C_template)),
+            static_cast<const cpp_template_args_tct &>(
+              class_sym->type.find(ID_C_template_arguments)));
+        }
+      }
+    }
     method_bodies.push_back(
-      method_bodyt(_method_symbol, template_map, instantiation_stack));
+      method_bodyt(_method_symbol, method_map, instantiation_stack));
   }
 #ifdef DEBUG
   else

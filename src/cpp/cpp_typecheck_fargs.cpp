@@ -128,9 +128,6 @@ bool cpp_typecheck_fargst::match(
     }
     else
     {
-      #if 0
-      std::cout << "NOT OK\n";
-      #endif
       return false; // no conversion possible
     }
 

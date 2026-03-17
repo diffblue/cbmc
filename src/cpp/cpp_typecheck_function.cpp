@@ -221,7 +221,12 @@ irep_idt cpp_typecheckt::function_identifier(const typet &type)
     else
       result+=',';
     typet tmp_type=it->type();
-    result+=cpp_type2name(it->type());
+    // C/C++ function parameters of function type decay to
+    // pointer-to-function.  Normalise here so that the identifier
+    // is the same regardless of declaration style.
+    if(tmp_type.id() == ID_code)
+      tmp_type = pointer_type(tmp_type);
+    result += cpp_type2name(tmp_type);
   }
 
   result+=')';

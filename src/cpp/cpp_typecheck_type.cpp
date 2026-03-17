@@ -191,6 +191,10 @@ void cpp_typecheckt::typecheck_type(typet &type)
     {
       typecheck_type(param.type());
 
+      // C/C++ function parameters of function or array type decay to
+      // pointer type (C99 6.7.5.3, C++11 [dcl.fct] p5).
+      adjust_function_parameter(param.type());
+
       // see if there is a default value
       if(param.has_default_value())
       {
@@ -344,6 +348,20 @@ void cpp_typecheckt::typecheck_type(typet &type)
   else if(type.id() == ID_complex)
   {
     // already done
+  }
+  else if(type.id() == ID_msc_underlying_type)
+  {
+    typet &type_arg = static_cast<typet &>(type.add(ID_type_arg));
+    typecheck_type(type_arg);
+    if(type_arg.id() == ID_c_enum_tag)
+    {
+      type = follow_tag(to_c_enum_tag_type(type_arg)).underlying_type();
+    }
+    else
+    {
+      // conservatively return int
+      type = signed_int_type();
+    }
   }
   else
   {

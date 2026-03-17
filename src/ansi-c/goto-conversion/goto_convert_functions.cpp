@@ -161,7 +161,9 @@ void goto_convert_functionst::convert_function(
 
   // Skip functions whose bodies contain unresolved C++ names, which
   // indicates incomplete template instantiation.
-  if(has_subexpr(symbol.value, ID_cpp_name))
+  if(
+    has_subexpr(symbol.value, ID_cpp_name) ||
+    has_subexpr(symbol.value, irep_idt("cpp-this")))
   {
     symbol_table.get_writeable_ref(identifier).value.make_nil();
     return;

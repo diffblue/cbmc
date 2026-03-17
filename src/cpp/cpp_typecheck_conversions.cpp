@@ -1292,12 +1292,15 @@ bool cpp_typecheckt::reference_binding(
 
   // C++11: rvalue references cannot bind to lvalues.
   // Temporaries are internally marked as lvalues but are rvalues in C++.
-  // Also, implicit dereferences of rvalue references are xvalues, not lvalues.
+  // Also, implicit dereferences of rvalue references are xvalues, not lvalues,
+  // but only when the rvalue reference is unnamed (e.g., from static_cast or
+  // function return). Named rvalue reference variables are lvalues.
   if(
     is_rvalue_reference(reference_type) && expr.get_bool(ID_C_lvalue) &&
     expr.get(ID_statement) != ID_temporary_object &&
     !(expr.id() == ID_dereference && expr.get_bool(ID_C_implicit) &&
-      (is_rvalue_reference(to_dereference_expr(expr).pointer().type()) ||
+      ((is_rvalue_reference(to_dereference_expr(expr).pointer().type()) &&
+        to_dereference_expr(expr).pointer().id() != ID_symbol) ||
        (to_dereference_expr(expr).pointer().id() == ID_address_of &&
         to_address_of_expr(to_dereference_expr(expr).pointer())
             .object()
@@ -1722,6 +1725,20 @@ void cpp_typecheckt::reference_initializer(
 bool cpp_typecheckt::cast_away_constness(const typet &t1, const typet &t2) const
 {
   PRECONDITION(t1.id() == ID_pointer && t2.id() == ID_pointer);
+
+  // When casting to void* or const void*, only the top-level const
+  // qualifier of the source pointer's base type matters.  The generic
+  // subtype-chain comparison below breaks when the chains have
+  // different depths (e.g., pointer-to-array vs pointer-to-void).
+  if(to_pointer_type(t2).base_type().id() == ID_empty)
+  {
+    c_qualifierst q_from;
+    q_from.read(to_pointer_type(t1).base_type());
+    c_qualifierst q_to;
+    q_to.read(to_pointer_type(t2).base_type());
+    return q_from.is_constant && !q_to.is_constant;
+  }
+
   typet nt1 = t1;
   typet nt2 = t2;
 
@@ -2133,6 +2150,12 @@ bool cpp_typecheckt::static_typecast(
       typet from = to_pointer_type(e.type()).base_type();
 
       if(from.id() == ID_empty)
+      {
+        new_expr = typecast_exprt::conditional_cast(e, type);
+        return true;
+      }
+
+      if(to.id() == ID_empty)
       {
         new_expr = typecast_exprt::conditional_cast(e, type);
         return true;
