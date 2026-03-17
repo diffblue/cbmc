@@ -200,6 +200,65 @@ void cpp_typecheckt::typecheck_class_template(
     "symbol should be in template scope");
 }
 
+/// typecheck template alias declarations (C++11 [temp.alias])
+void cpp_typecheckt::typecheck_template_alias(cpp_declarationt &declaration)
+{
+  PRECONDITION(declaration.declarators().size() == 1);
+
+  cpp_declaratort &declarator = declaration.declarators()[0];
+  const cpp_namet &cpp_name = declarator.name();
+
+  // do template parameters — also sets up the template scope
+  cpp_scopet &template_scope =
+    typecheck_template_parameters(declaration.template_type());
+
+  if(!cpp_name.is_simple_name())
+  {
+    error().source_location = declaration.source_location();
+    error() << "template alias must have simple name" << eom;
+    throw 0;
+  }
+
+  irep_idt base_name = cpp_name.get_base_name();
+
+  template_typet &template_type = declaration.template_type();
+
+  typet alias_type = declarator.merge_type(declaration.type());
+  cpp_convert_plain_type(alias_type, get_message_handler());
+
+  irep_idt symbol_name =
+    function_template_identifier(base_name, template_type, alias_type);
+
+  // check if we have it already
+  if(symbol_table.has_symbol(symbol_name))
+    return;
+
+  symbolt symbol{symbol_name, typet{}, ID_cpp};
+  symbol.base_name = base_name;
+  symbol.location = cpp_name.source_location();
+  symbol.module = module;
+  symbol.type.swap(declaration);
+  symbol.pretty_name =
+    cpp_scopes.current_scope().prefix + id2string(symbol.base_name);
+
+  symbolt *new_symbol;
+  if(symbol_table.move(symbol, new_symbol))
+  {
+    error().source_location = symbol.location;
+    error() << "typecheck_template_alias: symbol_table.move() failed" << eom;
+    throw 0;
+  }
+
+  // put into scope
+  cpp_idt &id = cpp_scopes.put_into_scope(*new_symbol);
+  id.id_class = cpp_idt::id_classt::TEMPLATE;
+  id.prefix =
+    cpp_scopes.current_scope().prefix + id2string(new_symbol->base_name);
+
+  // link the template symbol with the template scope
+  cpp_scopes.id_map[symbol_name] = &template_scope;
+}
+
 /// typecheck function templates
 void cpp_typecheckt::typecheck_function_template(
   cpp_declarationt &declaration)
@@ -972,9 +1031,8 @@ void cpp_typecheckt::convert_template_declaration(
 
   if(declaration.is_typedef())
   {
-    error().source_location=declaration.source_location();
-    error() << "template declaration for typedef" << eom;
-    throw 0;
+    typecheck_template_alias(declaration);
+    return;
   }
 
   typet &type=declaration.type();

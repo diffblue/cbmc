@@ -1246,6 +1246,42 @@ struct_tag_typet cpp_typecheck_resolvet::disambiguate_template_classes(
   #endif
 }
 
+typet cpp_typecheck_resolvet::resolve_template_alias(
+  const irep_idt &base_name,
+  const cpp_scopest::id_sett &id_set,
+  const cpp_template_args_non_tct &full_template_args)
+{
+  // find the template alias symbol
+  const symbolt *template_sym = nullptr;
+  for(const auto &id_ptr : id_set)
+  {
+    const symbolt &s = cpp_typecheck.lookup(id_ptr->identifier);
+    if(!s.type.get_bool(ID_is_template))
+      continue;
+    if(to_cpp_declaration(s.type).is_template_alias())
+    {
+      template_sym = &s;
+      break;
+    }
+  }
+
+  INVARIANT(template_sym != nullptr, "template alias symbol must exist");
+
+  // typecheck template arguments
+  cpp_template_args_tct template_args_tc;
+  {
+    cpp_save_scopet save_scope(cpp_typecheck.cpp_scopes);
+    cpp_typecheck.cpp_scopes.go_to(*original_scope);
+    template_args_tc = cpp_typecheck.typecheck_template_args(
+      source_location, *template_sym, full_template_args);
+  }
+
+  const symbolt &instance = cpp_typecheck.instantiate_template(
+    source_location, *template_sym, template_args_tc, template_args_tc);
+
+  return instance.type;
+}
+
 cpp_scopet &cpp_typecheck_resolvet::resolve_namespace(
   const cpp_namet &cpp_name)
 {
@@ -1492,13 +1528,17 @@ exprt cpp_typecheck_resolvet::resolve(
     // first figure out if we are doing functions/methods or
     // classes
     bool have_classes=false, have_methods=false;
+    bool have_aliases = false;
 
     for(const auto &id_ptr : id_set)
     {
       const irep_idt id = id_ptr->identifier;
       const symbolt &s=cpp_typecheck.lookup(id);
       CHECK_RETURN(s.type.get_bool(ID_is_template));
-      if(to_cpp_declaration(s.type).is_class_template())
+      const cpp_declarationt &cpp_declaration = to_cpp_declaration(s.type);
+      if(cpp_declaration.is_template_alias())
+        have_aliases = true;
+      else if(cpp_declaration.is_class_template())
         have_classes=true;
       else
         have_methods=true;
@@ -1516,7 +1556,13 @@ exprt cpp_typecheck_resolvet::resolve(
       throw 0;
     }
 
-    if(want==wantt::TYPE || have_classes)
+    if(have_aliases)
+    {
+      // template alias — instantiate and return the aliased type
+      typet result = resolve_template_alias(base_name, id_set, template_args);
+      identifiers.push_back(exprt(ID_type, result));
+    }
+    else if(want == wantt::TYPE || have_classes)
     {
       typet instance=
         disambiguate_template_classes(base_name, id_set, template_args);
