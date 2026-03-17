@@ -1,0 +1,9 @@
+KNOWNBUG
+main.cpp
+--cpp20 --stdlib libc++
+^VERIFICATION
+^EXIT=(0|10)$
+^SIGNAL=0$
+--
+libc++ span uses C++20 ranges with complex constexpr patterns
+that cause parse errors in __bit_reference and char_traits.

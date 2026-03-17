@@ -1,0 +1,9 @@
+KNOWNBUG
+main.cpp
+--cpp17 --stdlib libc++
+^VERIFICATION
+^EXIT=(0|10)$
+^SIGNAL=0$
+--
+libc++ optional includes variant which causes a segfault during
+type-checking of complex template code. Parse errors are fixed.
