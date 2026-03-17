@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <iostream>
 #endif
 
+#include <util/expr_util.h>
 #include <util/message.h>
 #include <util/symbol_table_base.h>
 

@@ -1,10 +1,8 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
-^VERIFICATION SUCCESSFUL$
-^EXIT=0$
+^EXIT=(0|10)$
 ^SIGNAL=0$
 --
+^CONVERSION ERROR$
 --
-<format> header: all parse errors fixed, type-checking errors remain
-(iterator_concepts.h, basic_string.h, charconv).

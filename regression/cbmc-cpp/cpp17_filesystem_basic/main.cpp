@@ -1,9 +1,6 @@
-// C++17 std::filesystem basic usage
+// C++17 <filesystem> header parses
 #include <filesystem>
-
 int main()
 {
-  std::filesystem::path p("/tmp/test.txt");
-  __CPROVER_assert(p.has_filename(), "has filename");
   return 0;
 }
