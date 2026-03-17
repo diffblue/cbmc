@@ -1751,14 +1751,24 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
       }
     }
 
+    // Downgrade to non-fatal when the target type is malformed (e.g.,
+    // from failed template instantiation in system headers).  A valid
+    // type has a recognized id like signedbv, unsignedbv, struct_tag, etc.
+    // An empty or unrecognized id indicates a broken type from template
+    // instantiation failure.
+    if(id2string(type.id()).empty() || type.is_nil())
+    {
+      warning().source_location = e.find_source_location();
+      warning() << "invalid implicit conversion from '" << to_string(e.type())
+                << "' to '" << to_string(type) << "'" << eom;
+      e = typecast_exprt(e, type);
+      return;
+    }
+
     show_instantiation_stack(error());
     error().source_location = e.find_source_location();
     error() << "invalid implicit conversion from '" << to_string(e.type())
             << "' to '" << to_string(type) << "'" << eom;
-#if 0
-    str << "\n " << e.type().pretty() << '\n';
-    str << "\n " << type.pretty() << '\n';
-#endif
     throw 0;
   }
 }
