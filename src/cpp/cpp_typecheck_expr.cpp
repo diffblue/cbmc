@@ -211,10 +211,41 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       // conservatively return false for traits we cannot evaluate
       expr = false_exprt();
   }
-  else if(expr.id()==ID_noexcept)
+  else if(expr.id() == ID_noexcept)
   {
-    // TODO
-    expr=false_exprt();
+    // C++11 noexcept operator
+    auto &op = to_unary_expr(expr).op();
+    bool result = false;
+    try
+    {
+      typecheck_expr(op);
+      if(op.id() == ID_side_effect && op.get(ID_statement) == ID_function_call)
+      {
+        const auto &fn = to_side_effect_expr_function_call(op).function();
+        if(fn.id() == ID_symbol)
+        {
+          const auto *sym =
+            symbol_table.lookup(to_symbol_expr(fn).get_identifier());
+          if(sym != nullptr && sym->type.id() == ID_code)
+          {
+            const auto &code_type = to_code_type(sym->type);
+            if(
+              code_type.get_bool("#C_noexcept") ||
+              code_type.get_bool(ID_noexcept))
+            {
+              result = true;
+            }
+          }
+        }
+      }
+    }
+    catch(...)
+    {
+    }
+    if(result)
+      expr = true_exprt();
+    else
+      expr = false_exprt();
   }
   else if(expr.id()==ID_initializer_list)
   {
@@ -294,6 +325,54 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   else if(expr.id() == "lambda")
   {
     typecheck_expr_lambda(expr);
+  }
+  else if(expr.id() == ID_index)
+  {
+    // C++23 multidimensional subscript: struct[args] → operator[](args)
+    auto &index_expr = to_binary_expr(expr);
+    typecheck_expr_main(index_expr.op0());
+    const typet &t = index_expr.op0().type();
+    if(t.id() == ID_struct_tag || t.id() == ID_struct)
+    {
+      // Build operator[] call
+      exprt op_name(ID_cpp_name);
+      irept op_node(ID_operator);
+      op_name.get_sub().push_back(op_node);
+      irept bracket_node("[]");
+      op_name.get_sub().push_back(bracket_node);
+
+      exprt member(ID_member);
+      member.add_to_operands(index_expr.op0());
+      member.add(ID_component_cpp_name, op_name);
+
+      // Collect arguments: if the index is a comma expression, split it
+      exprt::operandst args;
+      exprt &idx = index_expr.op1();
+      if(idx.id() == ID_comma)
+      {
+        // Flatten comma expression into argument list
+        std::function<void(exprt &)> flatten = [&](exprt &e)
+        {
+          if(e.id() == ID_comma)
+          {
+            flatten(to_binary_expr(e).op0());
+            flatten(to_binary_expr(e).op1());
+          }
+          else
+            args.push_back(e);
+        };
+        flatten(idx);
+      }
+      else
+        args.push_back(idx);
+
+      side_effect_expr_function_callt call(
+        std::move(member), std::move(args), typet{}, expr.source_location());
+      typecheck_side_effect_function_call(call);
+      expr.swap(call);
+    }
+    else
+      c_typecheck_baset::typecheck_expr_main(expr);
   }
   else
     c_typecheck_baset::typecheck_expr_main(expr);
@@ -499,6 +578,13 @@ void cpp_typecheckt::typecheck_expr_sizeof(exprt &expr)
             return;
           }
         }
+        // Fallback: if there's exactly one pack, use it
+        if(template_map.pack_size_map.size() == 1)
+        {
+          expr = from_integer(
+            template_map.pack_size_map.begin()->second, size_type());
+          return;
+        }
       }
 
       // sizeof(X) may be ambiguous -- X can be either a type or
@@ -625,34 +711,16 @@ struct operator_entryt
 {
   const irep_idt id;
   const char *op_name;
-} const operators[] =
-{
-  { ID_plus, "+" },
-  { ID_minus, "-" },
-  { ID_mult, "*" },
-  { ID_div, "/" },
-  { ID_bitnot, "~" },
-  { ID_bitand, "&" },
-  { ID_bitor, "|" },
-  { ID_bitxor, "^" },
-  { ID_not, "!" },
-  { ID_unary_minus, "-" },
-  { ID_and, "&&" },
-  { ID_or, "||" },
-  { ID_not, "!" },
-  { ID_index, "[]" },
-  { ID_equal, "==" },
-  { ID_lt, "<"},
-  { ID_le, "<="},
-  { ID_gt, ">"},
-  { ID_ge, ">="},
-  { ID_shl, "<<"},
-  { ID_shr, ">>"},
-  { ID_notequal, "!=" },
-  { ID_dereference, "*" },
-  { ID_ptrmember, "->" },
-  { irep_idt(), nullptr }
-};
+} const operators[] = {
+  {ID_plus, "+"},        {ID_minus, "-"},       {ID_mult, "*"},
+  {ID_div, "/"},         {ID_bitnot, "~"},      {ID_bitand, "&"},
+  {ID_bitor, "|"},       {ID_bitxor, "^"},      {ID_not, "!"},
+  {ID_unary_minus, "-"}, {ID_and, "&&"},        {ID_or, "||"},
+  {ID_not, "!"},         {ID_index, "[]"},      {ID_equal, "=="},
+  {ID_lt, "<"},          {ID_le, "<="},         {ID_gt, ">"},
+  {ID_ge, ">="},         {ID_spaceship, "<=>"}, {ID_shl, "<<"},
+  {ID_shr, ">>"},        {ID_notequal, "!="},   {ID_dereference, "*"},
+  {ID_ptrmember, "->"},  {irep_idt(), nullptr}};
 
 bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
 {
@@ -1054,6 +1122,16 @@ static exprt collect_comma_expression(const exprt &src)
 
 void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
 {
+  // C++23 auto(x) decay copy: replace with the operand
+  if(expr.type().id() == ID_auto && expr.operands().size() == 1)
+  {
+    auto &op = to_unary_expr(expr).op();
+    typecheck_expr(op);
+    exprt result = op;
+    expr.swap(result);
+    return;
+  }
+
   // these can have 0 or 1 arguments
 
   if(expr.operands().empty())
@@ -2202,7 +2280,9 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   if(auto sym_expr = expr_try_dynamic_cast<symbol_exprt>(expr.function()))
   {
     const auto *symbol_ptr = symbol_table.lookup(sym_expr->get_identifier());
-    if(symbol_ptr != nullptr && symbol_ptr->is_macro)
+    if(
+      symbol_ptr != nullptr && symbol_ptr->is_macro &&
+      !functions_being_typechecked.count(sym_expr->get_identifier()))
     {
       const auto &code_type = to_code_type(symbol_ptr->type);
       PRECONDITION(expr.arguments().size() == code_type.parameters().size());
@@ -2458,65 +2538,80 @@ void cpp_typecheckt::typecheck_method_application(
   if(!expr.function().type().get_bool(ID_C_is_static))
   {
     const code_typet &func_type = to_code_type(method_symbol.type);
-    typet this_type=func_type.parameters().front().type();
+    typet this_type = func_type.parameters().front().type();
 
-    // Special case. Make it a reference.
-    DATA_INVARIANT(this_type.id() == ID_pointer, "this should be pointer");
-    this_type.set(ID_C_reference, true);
-    this_type.set(ID_C_this, true);
-
-    if(expr.arguments().size()==func_type.parameters().size())
+    // C++23 deducing this: first parameter is the object by value,
+    // not a pointer.
+    if(func_type.get_bool("explicit_this"))
     {
-      // this might be set up for base-class initialisation
-      if(
-        expr.arguments().front().type() !=
-        func_type.parameters().front().type())
+      if(expr.arguments().size() < func_type.parameters().size())
       {
-        implicit_typecast(expr.arguments().front(), this_type);
-        DATA_INVARIANT(
-          is_reference(expr.arguments().front().type()),
-          "argument should be reference");
-        expr.arguments().front().type().remove(ID_C_reference);
+        exprt this_arg = to_member_expr(member_expr).compound();
+        implicit_typecast(this_arg, this_type);
+        expr.arguments().insert(expr.arguments().begin(), this_arg);
       }
     }
     else
     {
-      exprt this_arg = to_member_expr(member_expr).compound();
-      implicit_typecast(this_arg, this_type);
-      // For multiple inheritance, the implicit_typecast may produce a
-      // simple typecast from derived* to base* without adjusting the
-      // pointer offset. Re-do the pointer cast using make_ptr_typecast
-      // which handles non-first base class offsets.
-      if(
-        this_arg.id() == ID_typecast && this_arg.type().id() == ID_pointer &&
-        to_typecast_expr(this_arg).op().type().id() == ID_pointer &&
-        to_pointer_type(this_arg.type()).base_type().id() == ID_struct_tag &&
-        to_pointer_type(to_typecast_expr(this_arg).op().type())
-            .base_type()
-            .id() == ID_struct_tag)
+      // Special case. Make it a reference.
+      DATA_INVARIANT(this_type.id() == ID_pointer, "this should be pointer");
+      this_type.set(ID_C_reference, true);
+      this_type.set(ID_C_this, true);
+
+      if(expr.arguments().size() == func_type.parameters().size())
       {
-        // Only adjust for upcasts (derived* -> base*).
-        const struct_typet &src_s = follow_tag(to_struct_tag_type(
-          to_pointer_type(to_typecast_expr(this_arg).op().type()).base_type()));
-        const struct_typet &dest_s = follow_tag(
-          to_struct_tag_type(to_pointer_type(this_arg.type()).base_type()));
-        if(subtype_typecast(src_s, dest_s))
+        // this might be set up for base-class initialisation
+        if(
+          expr.arguments().front().type() !=
+          func_type.parameters().front().type())
         {
-          exprt inner = to_typecast_expr(this_arg).op();
-          pointer_typet dest_ptr_type(
-            to_pointer_type(this_arg.type()).base_type(),
-            to_pointer_type(this_arg.type()).get_width());
-          make_ptr_typecast(inner, dest_ptr_type);
-          inner.type().set(ID_C_reference, true);
-          inner.type().set(ID_C_this, true);
-          this_arg = inner;
+          implicit_typecast(expr.arguments().front(), this_type);
+          DATA_INVARIANT(
+            is_reference(expr.arguments().front().type()),
+            "argument should be reference");
+          expr.arguments().front().type().remove(ID_C_reference);
         }
       }
-      DATA_INVARIANT(
-        is_reference(this_arg.type()), "argument should be reference");
-      this_arg.type().remove(ID_C_reference);
-      expr.arguments().insert(expr.arguments().begin(), this_arg);
-    }
+      else
+      {
+        exprt this_arg = to_member_expr(member_expr).compound();
+        implicit_typecast(this_arg, this_type);
+        // For multiple inheritance, the implicit_typecast may produce a
+        // simple typecast from derived* to base* without adjusting the
+        // pointer offset. Re-do the pointer cast using make_ptr_typecast
+        // which handles non-first base class offsets.
+        if(
+          this_arg.id() == ID_typecast && this_arg.type().id() == ID_pointer &&
+          to_typecast_expr(this_arg).op().type().id() == ID_pointer &&
+          to_pointer_type(this_arg.type()).base_type().id() == ID_struct_tag &&
+          to_pointer_type(to_typecast_expr(this_arg).op().type())
+              .base_type()
+              .id() == ID_struct_tag)
+        {
+          // Only adjust for upcasts (derived* -> base*).
+          const struct_typet &src_s = follow_tag(to_struct_tag_type(
+            to_pointer_type(to_typecast_expr(this_arg).op().type())
+              .base_type()));
+          const struct_typet &dest_s = follow_tag(
+            to_struct_tag_type(to_pointer_type(this_arg.type()).base_type()));
+          if(subtype_typecast(src_s, dest_s))
+          {
+            exprt inner = to_typecast_expr(this_arg).op();
+            pointer_typet dest_ptr_type(
+              to_pointer_type(this_arg.type()).base_type(),
+              to_pointer_type(this_arg.type()).get_width());
+            make_ptr_typecast(inner, dest_ptr_type);
+            inner.type().set(ID_C_reference, true);
+            inner.type().set(ID_C_this, true);
+            this_arg = inner;
+          }
+        }
+        DATA_INVARIANT(
+          is_reference(this_arg.type()), "argument should be reference");
+        this_arg.type().remove(ID_C_reference);
+        expr.arguments().insert(expr.arguments().begin(), this_arg);
+      }
+    } // end else (non-deducing-this)
   }
 
   if(
@@ -2924,21 +3019,67 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
   const std::string func_sym_name =
     id2string(cpp_scopes.current_scope().prefix) + lambda_id;
 
+  // Check for C++14 generic lambda (auto parameters) or
+  // C++20 template lambda (unresolved type name parameters)
+  {
+    const irept &check_params = expr.find(ID_parameters);
+    bool has_auto_param = false;
+    for(const auto &p : check_params.get_sub())
+    {
+      const cpp_declarationt &pdecl = static_cast<const cpp_declarationt &>(p);
+      if(pdecl.type().id() == ID_auto || pdecl.type().id() == ID_cpp_name)
+      {
+        has_auto_param = true;
+        break;
+      }
+    }
+
+    if(has_auto_param)
+    {
+      generic_lambda_map[func_sym_name] = expr;
+
+      // Replace auto/template parameters with signed int
+      irept &default_params = expr.add(ID_parameters);
+      for(auto &p : default_params.get_sub())
+      {
+        cpp_declarationt &pdecl = static_cast<cpp_declarationt &>(p);
+        if(pdecl.type().id() == ID_auto || pdecl.type().id() == ID_cpp_name)
+          pdecl.type() = signed_int_type();
+      }
+    }
+  }
+
   // Collect captures
   const irept &capture_list = expr.find("lambda_capture");
   std::map<irep_idt, exprt> capture_values;
+  std::set<irep_idt> by_ref_captures;
   for(const auto &cap : capture_list.get_sub())
   {
     irep_idt cap_name = cap.get(ID_identifier);
     if(cap_name.empty())
       continue;
-    exprt cap_expr(ID_cpp_name);
-    irept name_node(ID_name);
-    name_node.set(ID_identifier, cap_name);
-    cap_expr.get_sub().push_back(name_node);
-    cap_expr.add_source_location() = loc;
-    typecheck_expr(cap_expr);
-    capture_values[cap_name] = cap_expr;
+
+    if(cap.get_bool("by_ref"))
+      by_ref_captures.insert(cap_name);
+
+    // C++14 init-capture: [y = expr]
+    const exprt &init = static_cast<const exprt &>(cap.find("init"));
+    if(init.is_not_nil())
+    {
+      exprt init_copy = init;
+      typecheck_expr(init_copy);
+      capture_values[cap_name] = init_copy;
+    }
+    else
+    {
+      exprt cap_expr(ID_cpp_name);
+      irept name_node(ID_name);
+      name_node.set(ID_identifier, cap_name);
+      cap_expr.get_sub().push_back(name_node);
+      cap_expr.add_source_location() = loc;
+      typecheck_expr(cap_expr);
+      capture_values[cap_name] = cap_expr;
+    }
   }
 
   // Collect parameters
@@ -2995,6 +3136,19 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
 
     for(const auto &cap : capture_values)
     {
+      // By-ref captures: put the outer symbol directly into scope
+      if(by_ref_captures.count(cap.first))
+      {
+        if(cap.second.id() == ID_symbol)
+        {
+          const symbolt &outer_sym = symbol_table.lookup_ref(
+            to_symbol_expr(cap.second).get_identifier());
+          cpp_idt &cid = cpp_scopes.put_into_scope(outer_sym);
+          cid.id_class = cpp_idt::id_classt::SYMBOL;
+          continue;
+        }
+      }
+
       auxiliary_symbolt csym;
       csym.name = func_sym_name + "::" + id2string(cap.first);
       csym.base_name = cap.first;
@@ -3024,6 +3178,8 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
       code_blockt block;
       for(const auto &cap : capture_values)
       {
+        if(by_ref_captures.count(cap.first))
+          continue;
         symbol_exprt cap_sym(
           func_sym_name + "::" + id2string(cap.first), cap.second.type());
         codet assign(ID_assign);

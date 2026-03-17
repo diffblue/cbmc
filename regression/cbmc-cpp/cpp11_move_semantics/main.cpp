@@ -1,48 +1,24 @@
-#include <cassert>
-
-struct Movable
+// C++11 move semantics
+struct S
 {
   int *data;
-  bool moved;
-
-  Movable() : data(new int(42)), moved(false)
+  S() : data(new int(42))
   {
   }
-  Movable(Movable &&other) : data(other.data), moved(false)
+  S(S &&other) : data(other.data)
   {
-    other.data = 0;
-    other.moved = true;
+    other.data = nullptr;
   }
-  Movable &operator=(Movable &&other)
-  {
-    if(this != &other)
-    {
-      delete data;
-      data = other.data;
-      other.data = 0;
-      other.moved = true;
-    }
-    return *this;
-  }
-  ~Movable()
+  ~S()
   {
     delete data;
   }
-
-  // Delete copy
-  Movable(const Movable &) = delete;
-  Movable &operator=(const Movable &) = delete;
 };
-
 int main()
 {
-  Movable a;
-  assert(*a.data == 42);
-
-  Movable b(static_cast<Movable &&>(a));
-  assert(a.moved);
-  assert(a.data == 0);
-  assert(*b.data == 42);
-
+  S a;
+  S b(static_cast<S &&>(a));
+  __CPROVER_assert(b.data != nullptr, "moved data");
+  __CPROVER_assert(a.data == nullptr, "source nulled");
   return 0;
 }

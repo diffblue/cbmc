@@ -34,6 +34,7 @@ public:
       mode(modet::NONE),
       cpp98(false),
       cpp11(false),
+      cpp20(false),
       for_has_scope(false),
       ts_18661_3_Floatn_types(false),
       __float128_is_keyword(false),
@@ -61,8 +62,8 @@ public:
   typedef configt::ansi_ct::flavourt modet;
   modet mode;
 
-  // recognize C++98, C++11, C17, C23 keywords
-  bool cpp98, cpp11, c17, c23;
+  // recognize C++98, C++11, C++20, C17, C23 keywords
+  bool cpp98, cpp11, cpp20, c17, c23;
 
   // in C99 and upwards, for(;;) has a scope
   bool for_has_scope;

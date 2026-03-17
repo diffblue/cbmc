@@ -368,6 +368,11 @@ void cpp_typecheckt::typecheck_type(typet &type)
       type = signed_int_type();
     }
   }
+  else if(type.id() == ID_auto)
+  {
+    // C++11/14 auto type: leave as-is for deduction later.
+    // For non-type template parameters, default to signed int.
+  }
   else
   {
     error().source_location=type.source_location();

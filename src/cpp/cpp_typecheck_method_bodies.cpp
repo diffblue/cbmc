@@ -80,6 +80,36 @@ void cpp_typecheckt::typecheck_method_bodies()
         try
         {
           convert_function(method_symbol);
+
+          // C++14: update struct component type after auto return type
+          // deduction.
+          if(
+            method_symbol.type.id() == ID_code &&
+            has_auto(to_code_type(method_symbol.type).return_type()) == false)
+          {
+            const irep_idt &class_id = method_symbol.type.get(ID_C_member_name);
+            if(!class_id.empty())
+            {
+              symbolt *class_sym = symbol_table.get_writeable(class_id);
+              if(class_sym != nullptr)
+              {
+                struct_union_typet &struct_type =
+                  to_struct_union_type(class_sym->type);
+                for(auto &comp : struct_type.components())
+                {
+                  if(
+                    comp.get_name() == method_symbol.name &&
+                    comp.type().id() == ID_code &&
+                    has_auto(to_code_type(comp.type()).return_type()))
+                  {
+                    to_code_type(comp.type()).return_type() =
+                      to_code_type(method_symbol.type).return_type();
+                    break;
+                  }
+                }
+              }
+            }
+          }
         }
         catch(int)
         {

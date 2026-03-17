@@ -1321,6 +1321,9 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       // Now check the argument to match that.
       typecheck_expr(arg);
       simplify(arg, *this);
+      // C++17 template<auto>: deduce type from argument
+      if(type.id() == ID_auto)
+        type = arg.type();
       implicit_typecast(arg, type);
       simplify(arg, *this);
     }

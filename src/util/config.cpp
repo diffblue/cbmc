@@ -1259,6 +1259,15 @@ bool configt::set(const cmdlinet &cmdline)
   if(cmdline.isset("cpp17"))
     cpp.set_cpp17();
 
+  if(cmdline.isset("cpp20"))
+    cpp.set_cpp20();
+
+  if(cmdline.isset("cpp23"))
+    cpp.set_cpp23();
+
+  if(cmdline.isset("cpp26"))
+    cpp.set_cpp26();
+
   // set the upper bound for argc
   if(os == "windows")
   {

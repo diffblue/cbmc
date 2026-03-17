@@ -846,12 +846,38 @@ designatort c_typecheck_baset::make_designator(
 
       const irep_idt &component_name=d_op.get(ID_component_name);
 
-      if(struct_union_type.has_component(component_name))
+      // In C++, struct components have qualified names (e.g., S::x).
+      // Try the unqualified name against base names if direct lookup fails.
+      bool direct_match = struct_union_type.has_component(component_name);
+      if(!direct_match)
       {
-        // a direct member
-        entry.index=struct_union_type.component_number(component_name);
-        entry.size=struct_union_type.components().size();
-        entry.subtype=struct_union_type.components()[entry.index].type();
+        for(const auto &c : struct_union_type.components())
+        {
+          if(c.get_base_name() == component_name)
+          {
+            direct_match = true;
+            break;
+          }
+        }
+      }
+
+      if(direct_match)
+      {
+        // a direct member — find by name or base name
+        std::size_t idx = 0;
+        for(const auto &c : struct_union_type.components())
+        {
+          if(
+            c.get_name() == component_name ||
+            c.get_base_name() == component_name)
+          {
+            entry.index = idx;
+            entry.size = struct_union_type.components().size();
+            entry.subtype = c.type();
+            break;
+          }
+          ++idx;
+        }
       }
       else
       {
@@ -871,7 +897,9 @@ designatort c_typecheck_baset::make_designator(
 
           for(const auto &c : components)
           {
-            if(c.get_name() == component_name)
+            if(
+              c.get_name() == component_name ||
+              c.get_base_name() == component_name)
             {
               // done!
               entry.index=number;
@@ -1055,6 +1083,32 @@ exprt c_typecheck_baset::do_initializer_list(
   {
     const struct_typet &full_struct_type = follow_tag(*struct_tag_type);
     const struct_typet::componentst &components = full_struct_type.components();
+
+    // C++ default member initializers: replace zero-initialized members
+    // with their default values for members not explicitly initialized.
+    std::size_t op_idx = 0;
+    std::size_t init_count = operands.size();
+    std::size_t data_idx = 0;
+    for(const auto &c : components)
+    {
+      if(c.type().id() == ID_code)
+        continue;
+      if(data_idx >= init_count && op_idx < result.operands().size())
+      {
+        const irept &default_val = c.find(ID_C_default_value);
+        if(default_val.is_not_nil())
+        {
+          exprt val = static_cast<const exprt &>(default_val);
+          typecheck_expr(val);
+          if(val.type() != c.type())
+            val = typecast_exprt(val, c.type());
+          result.operands()[op_idx] = val;
+        }
+      }
+      ++op_idx;
+      ++data_idx;
+    }
+
     // make sure we didn't mess up index computation
     // C++ structs may have code-type members that are not in operands
     std::size_t data_components = 0;

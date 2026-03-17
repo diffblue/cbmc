@@ -66,8 +66,13 @@ bool cpp_typecheckt::cpp_is_pod(const typet &type) const
       else if(c.get(ID_access) != ID_public && !c.get_bool(ID_is_static))
         return false;
 
-      if(!cpp_is_pod(sub_type))
+      // Only check non-static data members for POD-ness
+      if(
+        sub_type.id() != ID_code && !c.get_bool(ID_is_static) &&
+        !cpp_is_pod(sub_type))
+      {
         return false;
+      }
     }
 
     return true;

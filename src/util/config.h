@@ -24,6 +24,7 @@ class symbol_table_baset;
 #define OPT_CONFIG_C_CPP                                                       \
   "D:I:(include)(function)"                                                    \
   "(c89)(c99)(c11)(c17)(c23)(cpp98)(cpp03)(cpp11)(cpp14)(cpp17)"               \
+  "(cpp20)(cpp23)(cpp26)"                                                      \
   "(unsigned-char)"                                                            \
   "(round-to-even)(round-to-nearest)"                                          \
   "(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)"                     \
@@ -54,7 +55,8 @@ class symbol_table_baset;
         : "") +                                                                \
     ")\n"                                                                      \
     " {y--cpp98}, {y--cpp03}, {y--cpp11},\n"                                   \
-    " {y--cpp14}, {y--cpp17} \t "                                              \
+    " {y--cpp14}, {y--cpp17}, {y--cpp20},\n"                                   \
+    " {y--cpp23}, {y--cpp26} \t "                                              \
     "set C++ language standard (default: " +                                   \
     std::string(                                                               \
       configt::cppt::default_cpp_standard() ==                                 \
@@ -72,6 +74,15 @@ class symbol_table_baset;
       : configt::cppt::default_cpp_standard() ==                               \
           configt::cppt::cpp_standardt::CPP17                                  \
         ? "cpp17"                                                              \
+      : configt::cppt::default_cpp_standard() ==                               \
+          configt::cppt::cpp_standardt::CPP20                                  \
+        ? "cpp20"                                                              \
+      : configt::cppt::default_cpp_standard() ==                               \
+          configt::cppt::cpp_standardt::CPP23                                  \
+        ? "cpp23"                                                              \
+      : configt::cppt::default_cpp_standard() ==                               \
+          configt::cppt::cpp_standardt::CPP26                                  \
+        ? "cpp26"                                                              \
         : "") +                                                                \
     ")\n"                                                                      \
     " {y--unsigned-char} \t make \"char\" unsigned by default\n"               \
@@ -344,7 +355,10 @@ public:
       CPP03,
       CPP11,
       CPP14,
-      CPP17
+      CPP17,
+      CPP20,
+      CPP23,
+      CPP26
     } cpp_standard;
     static cpp_standardt default_cpp_standard();
 
@@ -367,6 +381,18 @@ public:
     void set_cpp17()
     {
       cpp_standard = cpp_standardt::CPP17;
+    }
+    void set_cpp20()
+    {
+      cpp_standard = cpp_standardt::CPP20;
+    }
+    void set_cpp23()
+    {
+      cpp_standard = cpp_standardt::CPP23;
+    }
+    void set_cpp26()
+    {
+      cpp_standard = cpp_standardt::CPP26;
     }
 
     static const std::size_t default_object_bits = 8;

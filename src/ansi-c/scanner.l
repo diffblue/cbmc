@@ -211,7 +211,7 @@ identifier      (({letter}|"_"|"$"|{utf8letter}|{universal_character})({letter}|
 integer         {digit}+
 binary          {bindigit}+
 msiw_suffix     ([iI]("8"|"16"|"32"|"64"|"128"))
-int_suffix      [uUlLiIjJ]*|[uU]?{msiw_suffix}
+int_suffix      [uUlLiIjJzZ]*|[uU]?{msiw_suffix}
 bininteger      "0"[bB]({bindigit}|"'")+{int_suffix}
 decinteger      [1-9]({digit}|"'")*{int_suffix}
 octinteger      "0"({octdigit}|"'")*{int_suffix}
@@ -241,7 +241,7 @@ escape_sequence [\\][^\n]
 c_char [^'\\\n]|{escape_sequence}
 s_char [^"\\\n]|{escape_sequence}
 
-char_lit        ("L"|"u"|"U")?[']{c_char}+[']
+char_lit        ("L"|"u"|"U"|"u8")?[']{c_char}+[']
 string_lit      ("L"|"u"|"U"|"u8")?["]{s_char}*["]
 
 CPROVER_PREFIX  "__CPROVER_"
@@ -790,9 +790,17 @@ enable_or_disable ("enable"|"disable")
                         PARSER.mode != configt::ansi_ct::flavourt::VISUAL_STUDIO,
                         TOK_CHAR32_T);
                     }
+"char8_t"           { return conditional_keyword(PARSER.cpp20, TOK_CHAR8_T); }
 "class"             { return conditional_keyword(PARSER.cpp98, TOK_CLASS); }
 "compl"             { return conditional_keyword(PARSER.cpp98, '~'); }
+"concept"           { return conditional_keyword(PARSER.cpp20, TOK_CONCEPT); }
+"requires"          { return conditional_keyword(PARSER.cpp20, TOK_REQUIRES); }
 "constexpr"         { return conditional_keyword(PARSER.cpp11 || PARSER.c23, TOK_CONSTEXPR); }
+"consteval"         { return conditional_keyword(PARSER.cpp20, TOK_CONSTEVAL); }
+"constinit"         { return conditional_keyword(PARSER.cpp20, TOK_CONSTINIT); }
+"co_await"          { return conditional_keyword(PARSER.cpp20, TOK_CO_AWAIT); }
+"co_return"         { return conditional_keyword(PARSER.cpp20, TOK_CO_RETURN); }
+"co_yield"          { return conditional_keyword(PARSER.cpp20, TOK_CO_YIELD); }
 "delete"            { return conditional_keyword(PARSER.cpp98, TOK_DELETE); }
 "decltype"          { return conditional_keyword(PARSER.cpp11, TOK_DECLTYPE); } // C++11
 "explicit"          { return conditional_keyword(PARSER.cpp98, TOK_EXPLICIT); }
@@ -1522,6 +1530,7 @@ enable_or_disable ("enable"|"disable")
 "--"            { loc(); return TOK_DECR; }
 "<<"            { loc(); return TOK_SHIFTLEFT; }
 ">>"            { loc(); return TOK_SHIFTRIGHT; }
+"<=>"           { loc(); return TOK_SPACESHIP; }
 "<="            { loc(); return TOK_LE; }
 ">="            { loc(); return TOK_GE; }
 "=="            { loc(); return TOK_EQ; }
