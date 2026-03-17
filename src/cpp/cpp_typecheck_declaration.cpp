@@ -264,6 +264,19 @@ void cpp_typecheckt::convert_non_template_declaration(
                 args_sub.get_sub().push_back(type_arg);
               }
             }
+            else if(
+              init.is_not_nil() && init.id() == ID_initializer_list &&
+              !init.operands().empty())
+            {
+              for(const auto &a : init.operands())
+              {
+                exprt arg = a;
+                typecheck_expr(arg);
+                exprt type_arg(ID_type);
+                type_arg.type() = arg.type();
+                args_sub.get_sub().push_back(type_arg);
+              }
+            }
             else if(init.is_not_nil())
             {
               exprt arg = init;

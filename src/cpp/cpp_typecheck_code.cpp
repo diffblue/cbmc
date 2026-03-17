@@ -361,11 +361,79 @@ void cpp_typecheckt::typecheck_code(codet &code)
     if(init_type.id() == ID_struct_tag)
       init_type = follow_tag(to_struct_tag_type(init_type));
 
-    if(init_type.id() != ID_struct)
+    if(init_type.id() != ID_struct && init_type.id() != ID_array)
     {
       error().source_location = loc;
-      error() << "structured bindings require a struct/class type" << eom;
+      error() << "structured bindings require a struct/class or array type"
+              << eom;
       throw 0;
+    }
+
+    if(init_type.id() == ID_array)
+    {
+      // Array structured binding: auto [a, b, c] = arr;
+      const array_typet &arr_type = to_array_type(init_type);
+      const typet &elem_type = arr_type.element_type();
+
+      const std::string scope_prefix =
+        id2string(cpp_scopes.current_scope().prefix);
+      const std::string sb_id = scope_prefix + "__sb";
+      {
+        auxiliary_symbolt sym;
+        sym.name = sb_id;
+        sym.base_name = "__sb";
+        sym.type = init.type();
+        sym.mode = ID_cpp;
+        sym.module = module;
+        sym.location = loc;
+        sym.is_file_local = true;
+        sym.is_thread_local = true;
+        sym.is_lvalue = true;
+        sym.value = init;
+        symbol_table.insert(std::move(sym));
+      }
+      symbol_exprt sb_expr(sb_id, init.type());
+
+      code_blockt block;
+      block.add_source_location() = loc;
+
+      codet sb_assign(ID_assign);
+      sb_assign.copy_to_operands(sb_expr);
+      sb_assign.copy_to_operands(init);
+      sb_assign.add_source_location() = loc;
+      block.add(std::move(sb_assign));
+
+      for(std::size_t i = 0; i < binding_list.size(); ++i)
+      {
+        const irep_idt &name = binding_list[i].id();
+        const std::string var_id = scope_prefix + id2string(name);
+        {
+          auxiliary_symbolt sym;
+          sym.name = var_id;
+          sym.base_name = name;
+          sym.type = elem_type;
+          sym.mode = ID_cpp;
+          sym.module = module;
+          sym.location = loc;
+          sym.is_file_local = true;
+          sym.is_thread_local = true;
+          sym.is_lvalue = true;
+          symbol_table.insert(std::move(sym));
+          const symbolt &inserted = symbol_table.lookup_ref(var_id);
+          cpp_idt &id = cpp_scopes.put_into_scope(inserted);
+          id.id_class = cpp_idt::id_classt::SYMBOL;
+        }
+        symbol_exprt var_expr(var_id, elem_type);
+        index_exprt member(sb_expr, from_integer(i, c_index_type()), elem_type);
+        codet assign(ID_assign);
+        assign.copy_to_operands(var_expr);
+        assign.copy_to_operands(member);
+        assign.add_source_location() = loc;
+        block.add(std::move(assign));
+      }
+
+      code.swap(block);
+      return;
     }
 
     const struct_typet &struct_type = to_struct_type(init_type);
@@ -912,8 +980,21 @@ void cpp_typecheckt::typecheck_decl(codet &code)
     if(type.id() == ID_cpp_name && !declaration.declarators().empty())
     {
       const auto &declarator = declaration.declarators().front();
+      // Collect init arguments from either init_args (parenthesized)
+      // or initializer_list value (brace init)
       const irept &init_args = declarator.find("init_args");
+      const exprt &value =
+        static_cast<const exprt &>(declarator.find(ID_value));
+      const irept *args_source = nullptr;
       if(init_args.get_sub().size() > 0)
+        args_source = &init_args;
+      else if(
+        value.is_not_nil() && value.id() == ID_initializer_list &&
+        !value.operands().empty())
+      {
+        args_source = &value;
+      }
+      if(args_source != nullptr)
       {
         // Check if the name resolves to a class template without
         // explicit template arguments (CTAD candidate).
@@ -946,7 +1027,7 @@ void cpp_typecheckt::typecheck_decl(codet &code)
         {
           irept template_args(ID_template_args);
           irept &args_sub = template_args.add(ID_arguments);
-          for(const auto &a : init_args.get_sub())
+          for(const auto &a : args_source->get_sub())
           {
             exprt arg = static_cast<const exprt &>(a);
             typecheck_expr(arg);

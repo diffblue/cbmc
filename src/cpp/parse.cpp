@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Parsing
 
+#include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/cprover_prefix.h>
 #include <util/std_code.h>
@@ -8485,6 +8486,38 @@ bool Parser::rPrimaryExpr(exprt &exp)
     rString(tk);
     exp.swap(tk.data);
     set_location(exp, tk);
+
+    // C++11 user-defined string literal: "abc"_suffix
+    if(is_identifier(lex.LookAhead(0)))
+    {
+      cpp_tokent suffix_tk;
+      lex.LookAhead(0, suffix_tk);
+      if(!suffix_tk.text.empty() && suffix_tk.text[0] == '_')
+      {
+        lex.get_token(suffix_tk);
+        irept op_node(ID_operator);
+        set_location(op_node, tk);
+        irept suffix_node("\"\"" + suffix_tk.text);
+        set_location(suffix_node, tk);
+
+        exprt name_expr(ID_cpp_name);
+        name_expr.get_sub().push_back(op_node);
+        name_expr.get_sub().push_back(suffix_node);
+        set_location(name_expr, tk);
+
+        // String UDL: operator""_suffix(str, len)
+        exprt len = from_integer(exp.get(ID_value).size(), signed_int_type());
+        set_location(len, tk);
+        side_effect_expr_function_callt fc(
+          std::move(name_expr),
+          {std::move(exp), std::move(len)},
+          typet{},
+          source_locationt{});
+        set_location(fc, tk);
+        exp.swap(fc);
+      }
+    }
+
 #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 2\n";
 #endif
@@ -8571,6 +8604,24 @@ bool Parser::rPrimaryExpr(exprt &exp)
     std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 7\n";
 #endif
     lex.get_token(tk);
+
+    // C++17 left fold expression: (... op expr)
+    if(lex.LookAhead(0) == TOK_ELLIPSIS)
+    {
+      lex.get_token(tk2); // consume ...
+      // The next token must be a binary operator
+      cpp_tokent op_tk;
+      lex.get_token(op_tk);
+      exprt right;
+      if(!rCastExpr(right))
+        return false;
+      if(lex.get_token(tk2) != ')')
+        return false;
+      // Treat as the pack expression itself (the fold is lowered
+      // during template instantiation, same as right folds)
+      exp.swap(right);
+      return true;
+    }
 
     if(lex.LookAhead(0)=='{') // GCC extension
     {

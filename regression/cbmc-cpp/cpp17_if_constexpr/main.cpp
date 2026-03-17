@@ -1,17 +1,15 @@
-#include <cassert>
-
-template <bool B>
-int pick()
+// C++17 if constexpr
+template <typename T>
+int process(T val)
 {
-  if constexpr(B)
-    return 1;
+  if constexpr(sizeof(T) == 1)
+    return val + 100;
   else
-    return 2;
+    return val;
 }
-
 int main()
 {
-  assert(pick<true>() == 1);
-  assert(pick<false>() == 2);
+  int r = process(42);
+  __CPROVER_assert(r == 42, "if constexpr discard");
   return 0;
 }

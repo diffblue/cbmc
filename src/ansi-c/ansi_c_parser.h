@@ -57,6 +57,8 @@ public:
   bool asm_block_following;
   unsigned parenthesis_counter;
   std::string string_literal;
+  std::string raw_string_delimiter;
+  std::string raw_string_pending_close;
   std::list<exprt> pragma_pack;
 
   typedef configt::ansi_ct::flavourt modet;
