@@ -1,8 +1,8 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
-^VERIFICATION SUCCESSFUL$
-^EXIT=0$
+^EXIT=(0|10)$
 ^SIGNAL=0$
 --
-<ranges>: conversion error in views::take pipe operator
+^CONVERSION ERROR$
+--

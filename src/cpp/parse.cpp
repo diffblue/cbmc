@@ -5437,6 +5437,27 @@ bool Parser::rTemplateArgs(irept &template_args)
 
     typet a;
 
+    // C++20: Type{args} in template arguments (class NTTP brace init)
+    {
+      cpp_token_buffert::post brace_pos = lex.Save();
+      if(rTypeNameOrFunctionType(a) && lex.LookAhead(0) == '{')
+      {
+        cpp_tokent brace_tk;
+        lex.LookAhead(0, brace_tk);
+        exprt init;
+        if(rInitializeExpr(init))
+        {
+          exp = exprt("explicit-constructor-call");
+          exp.type().swap(a);
+          exp.add_to_operands(std::move(init));
+          set_location(exp, brace_tk);
+          goto template_arg_done;
+        }
+      }
+      lex.Restore(brace_pos);
+      a.make_nil();
+    }
+
     // try type name first
     if(rTypeNameOrFunctionType(a) &&
        ((lex.LookAhead(0) == '>' || lex.LookAhead(0) == ',' ||
@@ -5494,6 +5515,8 @@ bool Parser::rTemplateArgs(irept &template_args)
         exp.set(ID_ellipsis, true);
       }
     }
+
+  template_arg_done:
 
 #ifdef DEBUG
     std::cout << std::string(__indent, ' ') <<  "Parser::rTemplateArgs 6\n";
@@ -9810,6 +9833,28 @@ bool Parser::maybeTemplateArgs()
       int u=lex.LookAhead(i++);
       if(u=='\0' || u==';' || u=='}')
         return false;
+      else if(u == '{')
+      {
+        // C++20: brace-init-list in template args (e.g., Type{val})
+        // Balance braces only if preceded by an identifier (type name)
+        int prev = lex.LookAhead(i - 2);
+        if(is_identifier(prev) || prev == '>')
+        {
+          int m = 1;
+          while(m > 0)
+          {
+          int v = lex.LookAhead(i++);
+          if(v == '{')
+            ++m;
+          else if(v == '}')
+            --m;
+          else if(v == '\0' || v == ';')
+            return false;
+          }
+        }
+        else
+          return false;
+      }
       else if(u == '<')
         ++n;
       else if(u=='>')

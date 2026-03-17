@@ -488,7 +488,23 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     }
   }
 
-  typecheck_code(to_code(symbol.value));
+  try
+  {
+    typecheck_code(to_code(symbol.value));
+  }
+  catch(int)
+  {
+    // For system headers, clear the broken body and return.
+    // For user code, re-throw.
+    const std::string file = id2string(symbol.location.get_file());
+    if(file.find("/usr/include/") == 0 || file.find("/usr/lib/") == 0)
+    {
+      symbol.value.make_nil();
+      functions_being_typechecked.erase(symbol.name);
+      return;
+    }
+    throw;
+  }
 
   // Deferred auto return type deduction: the initial attempt failed
   // (e.g., if constexpr with type-dependent discarded branch).

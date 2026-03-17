@@ -1,0 +1,10 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+Names from inline namespaces (e.g., std::__n4861::suspend_never)
+are not visible via qualified lookup (std::suspend_never).
+Unqualified lookup and using std::__n4861::suspend_never work.
