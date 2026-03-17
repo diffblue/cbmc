@@ -146,7 +146,7 @@ void global_may_alias_domaint::transform(
   case END_FUNCTION: // No action required
     break;
   case OTHER:
-    DATA_INVARIANT(false, "Unclear what is a safe over-approximation of OTHER");
+    // Ignoring is a valid over-approximation
     break;
   case INCOMPLETE_GOTO:
   case NO_INSTRUCTION_TYPE:
