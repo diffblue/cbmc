@@ -486,7 +486,14 @@ void cpp_typecheckt::typecheck_compound_declarator(
       to_code(value).get_statement() == ID_cpp_delete)
     {
       value.make_nil();
+      initializers.make_nil();
       component.set(ID_access, ID_noaccess);
+    }
+
+    if(value.id() == ID_code && to_code(value).get_statement() == ID_default)
+    {
+      value.make_nil();
+      initializers.make_nil();
     }
 
     component.set(ID_is_inline, declaration.member_spec().is_inline());
