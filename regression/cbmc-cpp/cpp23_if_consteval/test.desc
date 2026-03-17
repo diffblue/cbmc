@@ -5,4 +5,4 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
-C++23 if consteval: consteval branch not taken during constant evaluation
+C++23 if consteval: CBMC takes the runtime (else) branch

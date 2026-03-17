@@ -10289,26 +10289,25 @@ std::optional<codet> Parser::rIfStatement()
     is_constexpr_if = true;
   }
 
-  // C++23 if consteval: CBMC evaluates constexpr functions at compile
-  // time, so always take the consteval (true) branch.
+  // C++23 if consteval: CBMC performs runtime verification via symbolic
+  // execution, so always take the runtime (else) branch.
   if(lex.LookAhead(0) == TOK_CONSTEVAL)
   {
     lex.get_token(tk2);
 
+    // Parse and discard the consteval branch
     auto consteval_body = rCompoundStatement();
     if(!consteval_body.has_value())
         return {};
 
-    // Discard else branch if present
+    // Take the else (runtime) branch if present, otherwise skip
     if(lex.LookAhead(0) == TOK_ELSE)
     {
         lex.get_token(tk2);
-        auto else_body = rStatement();
-        if(!else_body.has_value())
-          return {};
+        return rStatement();
     }
 
-    return consteval_body;
+    return codet(ID_skip);
   }
 
   if(lex.get_token(tk2)!='(')

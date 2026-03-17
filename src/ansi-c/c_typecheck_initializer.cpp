@@ -267,8 +267,9 @@ void c_typecheck_baset::designator_enter(
 
     for(const auto &c : struct_type.components())
     {
-      // C++ structs may have methods as components; skip them.
-      if(c.type().id() == ID_code)
+      // C++ structs may have methods or type aliases as components;
+      // skip them.
+      if(c.type().id() == ID_code || c.get_bool(ID_is_type))
       {
         ++entry.index;
         continue;
@@ -472,8 +473,12 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
       std::size_t op_index = index;
       for(std::size_t i = 0; i < index; ++i)
       {
-        if(components[i].type().id() == ID_code)
+        if(
+          components[i].type().id() == ID_code ||
+          components[i].get_bool(ID_is_type))
+        {
           --op_index;
+        }
       }
 
       if(op_index >= dest->operands().size())
@@ -756,6 +761,7 @@ void c_typecheck_baset::increment_designator(designatort &designator)
       while(entry.index < entry.size &&
             (components[entry.index].get_is_padding() ||
              components[entry.index].type().id() == ID_code ||
+             components[entry.index].get_bool(ID_is_type) ||
              (components[entry.index].get_anonymous() &&
               components[entry.index].type().id() == ID_c_bit_field)))
       {
@@ -1091,7 +1097,7 @@ exprt c_typecheck_baset::do_initializer_list(
     std::size_t data_idx = 0;
     for(const auto &c : components)
     {
-      if(c.type().id() == ID_code)
+      if(c.type().id() == ID_code || c.get_bool(ID_is_type))
         continue;
       if(data_idx >= init_count && op_idx < result.operands().size())
       {
@@ -1114,7 +1120,7 @@ exprt c_typecheck_baset::do_initializer_list(
     std::size_t data_components = 0;
     for(const auto &c : components)
     {
-      if(c.type().id() != ID_code)
+      if(c.type().id() != ID_code && !c.get_bool(ID_is_type))
         ++data_components;
     }
     CHECK_RETURN(result.operands().size() == data_components);

@@ -197,13 +197,12 @@ const symbolt &cpp_typecheckt::class_template_symbol(
 {
   if(full_template_args.has_unassigned())
   {
-    // Some template arguments could not be resolved (e.g., default
-    // arguments that depend on unresolved types). Treat as an error
-    // rather than crashing.
-    error().source_location = source_location;
-    error() << "template '" << template_symbol.base_name
-            << "' has unresolved template arguments" << eom;
-    throw 0;
+    // Template arguments contain unresolved parameters (e.g., from a
+    // template constructor like optional(const optional<_Up>&) where
+    // _Up is the constructor's own template parameter). Return the
+    // original template symbol — the constructor will be properly
+    // instantiated when actually called with concrete types.
+    return template_symbol;
   }
 
   // do we have args?
@@ -256,12 +255,18 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   if(s_it!=symbol_table.symbols.end())
     return s_it->second;
 
-  // Create as incomplete struct, but mark as
+  // Create as incomplete struct/union, but mark as
   // "template_class_instance", to be elaborated later.
-  type_symbolt new_symbol{identifier, struct_typet(), template_symbol.mode};
+  const cpp_declarationt &template_decl =
+    to_cpp_declaration(template_symbol.type);
+  const bool is_union = template_decl.type().id() == ID_union;
+  type_symbolt new_symbol{
+    identifier,
+    is_union ? static_cast<typet>(union_typet()) : struct_typet(),
+    template_symbol.mode};
   new_symbol.pretty_name=template_symbol.pretty_name;
   new_symbol.location=template_symbol.location;
-  to_struct_type(new_symbol.type).make_incomplete();
+  to_struct_union_type(new_symbol.type).make_incomplete();
   new_symbol.type.set(ID_tag, template_symbol.type.find(ID_tag));
   if(template_symbol.type.get_bool(ID_C_class))
     new_symbol.type.set(ID_C_class, true);
@@ -293,15 +298,17 @@ const symbolt &cpp_typecheckt::class_template_symbol(
 void cpp_typecheckt::elaborate_class_template(
   const typet &type)
 {
-  if(type.id() != ID_struct_tag)
+  if(type.id() != ID_struct_tag && type.id() != ID_union_tag)
     return;
 
-  const symbolt &symbol = lookup(to_struct_tag_type(type));
+  const symbolt &symbol = lookup(to_tag_type(type));
 
   // Make a copy, as instantiate will destroy the symbol type!
   const typet t_type=symbol.type;
 
-  if(t_type.id() == ID_struct && t_type.get_bool(ID_template_class_instance))
+  if(
+    (t_type.id() == ID_struct || t_type.id() == ID_union) &&
+    t_type.get_bool(ID_template_class_instance))
   {
     const symbolt &primary_template = lookup(t_type.get(ID_identifier));
 
@@ -746,7 +753,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
   // For nested member class templates (e.g., Outer<int>::Inner<double>),
   // the outer template parameters (T) need to be in the template map
   // so that references to T in Inner's body can be resolved.
-  if(new_decl.type().id() == ID_struct)
+  if(new_decl.type().id() == ID_struct || new_decl.type().id() == ID_union)
   {
     cpp_scopet *scope = &template_scope->get_parent();
     while(scope != nullptr && !scope->is_root_scope())
@@ -772,9 +779,9 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
   // Is it a template method?
   // It's in the scope of a class, and not a class itself.
-  bool is_template_method=
+  bool is_template_method =
     cpp_scopes.current_scope().get_parent().is_class() &&
-    new_decl.type().id()!=ID_struct;
+    new_decl.type().id() != ID_struct && new_decl.type().id() != ID_union;
 
   irep_idt class_name;
 
@@ -803,15 +810,17 @@ const symbolt &cpp_typecheckt::instantiate_template(
       const symbolt &symb=lookup(cpp_id.identifier);
 
       // continue if the type is incomplete only
-      if(cpp_id.id_class==cpp_idt::id_classt::CLASS &&
-         symb.type.id()==ID_struct)
+      if(
+        cpp_id.id_class == cpp_idt::id_classt::CLASS &&
+        (symb.type.id() == ID_struct || symb.type.id() == ID_union))
         return symb;
       else if(cpp_id.id_class == cpp_idt::id_classt::TYPEDEF)
         return symb;
       else if(symb.value.is_not_nil())
         return symb;
     }
-    else if(new_decl.type().id() == ID_struct)
+    else if(
+      new_decl.type().id() == ID_struct || new_decl.type().id() == ID_union)
     {
       // The sub-scope lookup may fail when a template is forward-declared
       // in one scope and defined in another (creating different template
@@ -822,8 +831,9 @@ const symbolt &cpp_typecheckt::instantiate_template(
       auto s_it = symbol_table.symbols.find(identifier);
       if(
         s_it != symbol_table.symbols.end() &&
-        s_it->second.type.id() == ID_struct &&
-        !to_struct_type(s_it->second.type).is_incomplete())
+        (s_it->second.type.id() == ID_struct ||
+         s_it->second.type.id() == ID_union) &&
+        !to_struct_union_type(s_it->second.type).is_incomplete())
       {
         return s_it->second;
       }
@@ -982,7 +992,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
       template_map.apply(d.type());
   }
 
-  if(new_decl.type().id()==ID_struct)
+  if(new_decl.type().id() == ID_struct || new_decl.type().id() == ID_union)
   {
     // Before instantiating from the primary template, check if there is
     // a full specialization (template<>) that matches the template
@@ -1061,6 +1071,19 @@ const symbolt &cpp_typecheckt::instantiate_template(
       cpp_declarationt method_decl=
         static_cast<const cpp_declarationt &>(
           static_cast<const irept &>(tm));
+
+      // Member class/union templates are already instantiated as part
+      // of the class body by convert_non_template_declaration above.
+      if(method_decl.is_class_template())
+        continue;
+
+      // Member template aliases (e.g., template<typename U> using X = ...)
+      // are already handled during class body conversion. Skip them here
+      // to avoid resolving their template parameters in the wrong scope.
+      if(method_decl.is_template_alias())
+      {
+        continue;
+      }
 
       // copy the type of the template method
       template_typet method_type=
@@ -1230,13 +1253,13 @@ const symbolt &cpp_typecheckt::instantiate_template(
     irep_idt access = new_decl.get(ID_C_access);
 
     CHECK_RETURN(!access.empty());
-    PRECONDITION(symb.type.id() == ID_struct);
+    PRECONDITION(symb.type.id() == ID_struct || symb.type.id() == ID_union);
 
     typecheck_compound_declarator(
       symb,
       new_decl,
       new_decl.declarators()[0],
-      to_struct_type(symb.type).components(),
+      to_struct_union_type(symb.type).components(),
       access,
       is_static,
       false,
@@ -1266,7 +1289,8 @@ const symbolt &cpp_typecheckt::instantiate_template(
   if(
     !new_decl.declarators().empty() &&
     new_decl.declarators()[0].type().id() != ID_function_type &&
-    new_decl.type().id() != ID_struct && !new_decl.is_typedef())
+    new_decl.type().id() != ID_struct && new_decl.type().id() != ID_union &&
+    !new_decl.is_typedef())
   {
     // Check for a better-matching partial specialization.
     if(template_symbol.type.get(ID_specialization_of).empty())
