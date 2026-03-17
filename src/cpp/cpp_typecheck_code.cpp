@@ -117,6 +117,15 @@ void cpp_typecheckt::typecheck_code(codet &code)
     convert(cpp_using);
     code = codet(ID_skip);
   }
+  else if(statement == ID_cpp_namespace_spec)
+  {
+    // namespace alias in block scope: namespace X = Y::Z;
+    cpp_namespace_spect ns_spec;
+    ns_spec.swap(static_cast<cpp_namespace_spect &>(
+      static_cast<irept &>(code.add(ID_namespace))));
+    convert(ns_spec);
+    code = codet(ID_skip);
+  }
   else if(statement == ID_expression)
   {
     if(

@@ -2328,6 +2328,10 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 
   CHECK_RETURN(expr.operands().size() == 2);
 
+  // Generic lambda instantiation: if the call target is a generic lambda,
+  // instantiate a new version with the actual argument types.
+  instantiate_generic_lambda(expr);
+
   typecheck_function_call_arguments(expr);
 
   CHECK_RETURN(expr.operands().size() == 2);
@@ -2521,6 +2525,367 @@ void cpp_typecheckt::typecheck_function_call_arguments(
   }
 
   c_typecheck_baset::typecheck_function_call_arguments(expr);
+}
+
+/// Replace `auto` (or `cpp_name`) in a type tree with the given replacement.
+/// Handles `const auto &`, `auto *`, etc.
+static void replace_auto_in_type(typet &type, const typet &replacement)
+{
+  if(type.id() == ID_auto || type.id() == ID_cpp_name)
+  {
+    type = replacement;
+    return;
+  }
+
+  if(
+    type.id() == ID_merged_type || type.id() == ID_frontend_pointer ||
+    type.id() == ID_pointer)
+  {
+    for(auto &sub : to_type_with_subtypes(type).subtypes())
+      replace_auto_in_type(sub, replacement);
+  }
+}
+
+void cpp_typecheckt::instantiate_generic_lambda(
+  side_effect_expr_function_callt &expr)
+{
+  // Resolve the lambda function name from the call target.
+  // The function expression is either:
+  //   dereference(symbol("var")) — indirect call through variable
+  //   symbol("lambda_func") — direct call
+  irep_idt lambda_name;
+
+  if(expr.function().id() == ID_dereference)
+  {
+    const exprt &inner = to_dereference_expr(expr.function()).pointer();
+    if(inner.id() == ID_symbol)
+    {
+      const symbolt &var_sym =
+        symbol_table.lookup_ref(to_symbol_expr(inner).get_identifier());
+      // The variable's value should be address_of(symbol(lambda_func))
+      if(
+        var_sym.value.id() == ID_address_of &&
+        to_address_of_expr(var_sym.value).object().id() == ID_symbol)
+      {
+        lambda_name = to_symbol_expr(to_address_of_expr(var_sym.value).object())
+                        .get_identifier();
+      }
+    }
+  }
+  else if(expr.function().id() == ID_symbol)
+  {
+    lambda_name = to_symbol_expr(expr.function()).get_identifier();
+  }
+
+  if(lambda_name.empty())
+    return;
+
+  auto it = generic_lambda_map.find(lambda_name);
+  if(it == generic_lambda_map.end())
+    return;
+
+  // Build the list of actual argument types
+  std::vector<typet> arg_types;
+  for(auto &arg : expr.arguments())
+  {
+    if(arg.type().is_nil() || arg.type().id().empty())
+      typecheck_expr(arg);
+    arg_types.push_back(arg.type());
+  }
+
+  // Build a mangled name for this instantiation
+  std::string inst_name = id2string(lambda_name);
+  for(const auto &t : arg_types)
+    inst_name += "#" + cpp_type2name(t);
+
+  // Check if we already instantiated this specialization
+  if(symbol_table.has_symbol(inst_name))
+  {
+    // Redirect the call to the existing instantiation
+    const symbolt &inst_sym = symbol_table.lookup_ref(inst_name);
+    const code_typet &inst_type = to_code_type(inst_sym.type);
+    if(expr.function().id() == ID_dereference)
+    {
+      expr.function() = symbol_exprt(inst_name, inst_type);
+      expr.type() = inst_type.return_type();
+    }
+    return;
+  }
+
+  // Create a fresh copy of the original lambda expression
+  exprt lambda_expr = it->second;
+
+  // Replace auto/template parameters with actual argument types.
+  // Build a mapping from template parameter names to actual types
+  // (for C++20 template lambdas where params use named types like T).
+  std::map<irep_idt, typet> type_map;
+  irept &params = lambda_expr.add(ID_parameters);
+  std::size_t arg_idx = 0;
+  for(auto &p : params.get_sub())
+  {
+    cpp_declarationt &pdecl = static_cast<cpp_declarationt &>(p);
+    if(pdecl.get_bool("explicit_this"))
+      continue;
+    if(arg_idx < arg_types.size())
+    {
+      if(has_auto(pdecl.type()) || pdecl.type().id() == ID_auto)
+      {
+        replace_auto_in_type(pdecl.type(), arg_types[arg_idx]);
+      }
+      else if(pdecl.type().id() == ID_cpp_name)
+      {
+        // Template lambda: map the type name to the actual type
+        irep_idt tname = pdecl.type().get_sub().front().get(ID_identifier);
+        type_map[tname] = arg_types[arg_idx];
+        pdecl.type() = arg_types[arg_idx];
+      }
+    }
+    arg_idx++;
+  }
+
+  // Replace template type names in the return type
+  {
+    irept &ret_type = lambda_expr.add(ID_return_type);
+    if(ret_type.is_not_nil() && ret_type.id() == ID_cpp_name)
+    {
+      irep_idt rname = ret_type.get_sub().front().get(ID_identifier);
+      auto tm = type_map.find(rname);
+      if(tm != type_map.end())
+        ret_type = static_cast<const irept &>(tm->second);
+    }
+  }
+
+  // Now type-check this lambda as a non-generic lambda with the inst_name
+  // We do this by calling typecheck_expr_lambda with the modified expression.
+  // But since typecheck_expr_lambda uses a counter for naming, we need to
+  // set up the name manually.
+
+  // Extract the scope prefix from the original lambda name
+  // e.g., "main::1::__lambda_0" -> scope prefix is "main::1::"
+  std::string orig = id2string(lambda_name);
+  auto last_sep = orig.rfind("::");
+  std::string scope_prefix =
+    (last_sep != std::string::npos) ? orig.substr(0, last_sep + 2) : "";
+
+  // Use inst_name as the function symbol name
+  const source_locationt &loc = lambda_expr.source_location();
+
+  // Collect parameters
+  code_typet::parameterst func_params;
+  for(const auto &p : params.get_sub())
+  {
+    const cpp_declarationt &pdecl = static_cast<const cpp_declarationt &>(p);
+    if(pdecl.get_bool("explicit_this"))
+      continue;
+    typet ptype = pdecl.type();
+    if(!ptype.id().empty())
+      typecheck_type(ptype);
+    irep_idt pname;
+    if(!pdecl.declarators().empty())
+      pname =
+        pdecl.declarators().front().name().get_sub().front().get(ID_identifier);
+    code_typet::parametert param(ptype);
+    param.set_identifier(inst_name + "::" + id2string(pname));
+    param.set_base_name(pname);
+    func_params.push_back(param);
+  }
+
+  // Create parameter symbols
+  for(const auto &p : func_params)
+  {
+    if(symbol_table.has_symbol(p.get_identifier()))
+      continue;
+    auxiliary_symbolt psym;
+    psym.name = p.get_identifier();
+    psym.base_name = p.get_base_name();
+    psym.type = p.type();
+    psym.mode = ID_cpp;
+    psym.module = module;
+    psym.location = loc;
+    psym.is_file_local = true;
+    psym.is_thread_local = true;
+    psym.is_lvalue = true;
+    psym.is_parameter = true;
+    symbol_table.insert(std::move(psym));
+  }
+
+  // Collect captures from the original lambda
+  const irept &capture_list = lambda_expr.find("lambda_capture");
+  std::map<irep_idt, exprt> capture_values;
+  std::set<irep_idt> by_ref_captures;
+  for(const auto &cap : capture_list.get_sub())
+  {
+    irep_idt cap_name = cap.get(ID_identifier);
+    if(cap_name.empty())
+      continue;
+    if(cap.get_bool("by_ref"))
+      by_ref_captures.insert(cap_name);
+    const exprt &init = static_cast<const exprt &>(cap.find("init"));
+    if(init.is_not_nil())
+    {
+      exprt init_copy = init;
+      typecheck_expr(init_copy);
+      capture_values[cap_name] = init_copy;
+    }
+    else
+    {
+      exprt cap_expr(ID_cpp_name);
+      irept name_node(ID_name);
+      name_node.set(ID_identifier, cap_name);
+      cap_expr.get_sub().push_back(name_node);
+      cap_expr.add_source_location() = loc;
+      typecheck_expr(cap_expr);
+      capture_values[cap_name] = cap_expr;
+    }
+  }
+
+  // Type-check the body
+  typet lambda_return_type = signed_int_type();
+  bool deduce_return = true;
+  {
+    const irept &explicit_ret = lambda_expr.find(ID_return_type);
+    if(explicit_ret.is_not_nil() && !explicit_ret.id().empty())
+    {
+      lambda_return_type = static_cast<const typet &>(explicit_ret);
+      typecheck_type(lambda_return_type);
+      deduce_return = false;
+    }
+  }
+
+  code_typet func_type(func_params, lambda_return_type);
+
+  codet body_code(ID_nil);
+  {
+    cpp_save_scopet save_scope(cpp_scopes);
+
+    // Find or create the lambda scope
+    std::string lambda_base = inst_name.substr(scope_prefix.size());
+    cpp_scopet &lambda_scope =
+      cpp_scopes.current_scope().new_scope(lambda_base);
+    lambda_scope.prefix = inst_name + "::";
+    cpp_scopes.go_to(lambda_scope);
+
+    for(const auto &p : func_params)
+    {
+      const symbolt &psym = symbol_table.lookup_ref(p.get_identifier());
+      cpp_idt &id = cpp_scopes.put_into_scope(psym);
+      id.id_class = cpp_idt::id_classt::SYMBOL;
+    }
+
+    for(const auto &cap : capture_values)
+    {
+      if(by_ref_captures.count(cap.first))
+      {
+        if(cap.second.id() == ID_symbol)
+        {
+          const symbolt &outer_sym = symbol_table.lookup_ref(
+            to_symbol_expr(cap.second).get_identifier());
+          cpp_idt &cid = cpp_scopes.put_into_scope(outer_sym);
+          cid.id_class = cpp_idt::id_classt::SYMBOL;
+          continue;
+        }
+      }
+
+      std::string csym_name = inst_name + "::" + id2string(cap.first);
+      if(!symbol_table.has_symbol(csym_name))
+      {
+        auxiliary_symbolt csym;
+        csym.name = csym_name;
+        csym.base_name = cap.first;
+        csym.type = cap.second.type();
+        csym.value = cap.second;
+        csym.mode = ID_cpp;
+        csym.module = module;
+        csym.location = loc;
+        csym.is_file_local = true;
+        csym.is_thread_local = true;
+        csym.is_lvalue = true;
+        csym.is_state_var = true;
+        symbol_table.insert(std::move(csym));
+      }
+
+      const symbolt &inserted = symbol_table.lookup_ref(csym_name);
+      cpp_idt &cid = cpp_scopes.put_into_scope(inserted);
+      cid.id_class = cpp_idt::id_classt::SYMBOL;
+    }
+
+    body_code = to_code(static_cast<exprt &>(lambda_expr.add("body")));
+
+    typet old_return_type = return_type;
+    if(deduce_return)
+      return_type = typet(ID_auto);
+    else
+      return_type = func_type.return_type();
+
+    typecheck_code(body_code);
+
+    if(deduce_return)
+    {
+      std::function<const exprt *(const codet &)> find_return =
+        [&](const codet &code) -> const exprt *
+      {
+        if(code.get_statement() == ID_return && code.has_operands())
+          return &code.op0();
+        for(const auto &op : code.operands())
+          if(op.id() == ID_code)
+          {
+            const exprt *r = find_return(to_code(op));
+            if(r != nullptr)
+              return r;
+          }
+        return nullptr;
+      };
+      const exprt *ret = find_return(body_code);
+      if(ret != nullptr)
+        func_type.return_type() = ret->type();
+      else
+        func_type.return_type() = void_type();
+    }
+
+    return_type = old_return_type;
+
+    // Prepend capture initializations
+    if(!capture_values.empty())
+    {
+      code_blockt block;
+      for(const auto &cap : capture_values)
+      {
+        if(by_ref_captures.count(cap.first))
+          continue;
+        symbol_exprt cap_sym(
+          inst_name + "::" + id2string(cap.first), cap.second.type());
+        codet assign(ID_assign);
+        assign.copy_to_operands(cap_sym);
+        assign.copy_to_operands(cap.second);
+        assign.add_source_location() = loc;
+        block.add(std::move(assign));
+      }
+      if(body_code.get_statement() == ID_block)
+      {
+        for(auto &stmt : to_code_block(body_code).statements())
+          block.add(std::move(stmt));
+      }
+      else
+        block.add(std::move(body_code));
+      body_code = std::move(block);
+    }
+  }
+
+  // Create the function symbol
+  symbolt func_sym;
+  func_sym.name = inst_name;
+  func_sym.base_name = inst_name.substr(scope_prefix.size());
+  func_sym.type = func_type;
+  func_sym.value = body_code;
+  func_sym.mode = ID_cpp;
+  func_sym.module = module;
+  func_sym.location = loc;
+  func_sym.is_file_local = true;
+  symbol_table.insert(std::move(func_sym));
+
+  // Redirect the call to the new instantiation
+  expr.function() = symbol_exprt(inst_name, func_type);
+  expr.type() = func_type.return_type();
 }
 
 void cpp_typecheckt::typecheck_expr_side_effect(
@@ -3101,7 +3466,9 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
       const cpp_declarationt &pdecl = static_cast<const cpp_declarationt &>(p);
       if(pdecl.get_bool("explicit_this"))
         continue;
-      if(pdecl.type().id() == ID_auto || pdecl.type().id() == ID_cpp_name)
+      if(
+        has_auto(pdecl.type()) || pdecl.type().id() == ID_cpp_name ||
+        pdecl.type().id() == ID_auto)
       {
         is_generic_lambda = true;
         break;
@@ -3119,8 +3486,8 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
         cpp_declarationt &pdecl = static_cast<cpp_declarationt &>(p);
         if(pdecl.get_bool("explicit_this"))
           continue;
-        if(pdecl.type().id() == ID_auto || pdecl.type().id() == ID_cpp_name)
-          pdecl.type() = signed_int_type();
+        if(has_auto(pdecl.type()) || pdecl.type().id() == ID_cpp_name)
+          replace_auto_in_type(pdecl.type(), signed_int_type());
       }
     }
   }
@@ -3211,6 +3578,182 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
     psym.is_lvalue = true;
     psym.is_parameter = true;
     symbol_table.insert(std::move(psym));
+  }
+
+  // For generic lambdas, try to type-check the body with the default int
+  // parameters. If it succeeds, the lambda can be used as a function pointer.
+  // If it fails (e.g., body uses struct members), defer to call-site
+  // instantiation.
+  if(is_generic_lambda)
+  {
+    codet default_body(ID_nil);
+    bool body_ok = false;
+
+    // Save error count so we can restore it if body type-checking fails
+    const std::size_t saved_errors =
+      get_message_handler().get_message_count(messaget::M_ERROR);
+    const unsigned saved_verbosity = get_message_handler().get_verbosity();
+
+    // Suppress error messages during the try
+    get_message_handler().set_verbosity(0);
+
+    // Try type-checking with int parameters
+    try
+    {
+      cpp_save_scopet save_scope(cpp_scopes);
+      cpp_scopet &lambda_scope =
+        cpp_scopes.current_scope().new_scope(lambda_id + "_try");
+      lambda_scope.prefix = func_sym_name + "::";
+      cpp_scopes.go_to(lambda_scope);
+
+      for(const auto &p : func_type.parameters())
+      {
+        if(!symbol_table.has_symbol(p.get_identifier()))
+        {
+          auxiliary_symbolt psym;
+          psym.name = p.get_identifier();
+          psym.base_name = p.get_base_name();
+          psym.type = p.type();
+          psym.mode = ID_cpp;
+          psym.module = module;
+          psym.location = loc;
+          psym.is_file_local = true;
+          psym.is_thread_local = true;
+          psym.is_lvalue = true;
+          psym.is_parameter = true;
+          symbol_table.insert(std::move(psym));
+        }
+        const symbolt &psym = symbol_table.lookup_ref(p.get_identifier());
+        cpp_idt &id = cpp_scopes.put_into_scope(psym);
+        id.id_class = cpp_idt::id_classt::SYMBOL;
+      }
+
+      // Put captures in scope
+      for(const auto &cap : capture_values)
+      {
+        if(by_ref_captures.count(cap.first))
+        {
+          if(cap.second.id() == ID_symbol)
+          {
+            const symbolt &outer_sym = symbol_table.lookup_ref(
+              to_symbol_expr(cap.second).get_identifier());
+            cpp_idt &cid = cpp_scopes.put_into_scope(outer_sym);
+            cid.id_class = cpp_idt::id_classt::SYMBOL;
+            continue;
+          }
+        }
+
+        std::string csym_name = func_sym_name + "::" + id2string(cap.first);
+        if(!symbol_table.has_symbol(csym_name))
+        {
+          auxiliary_symbolt csym;
+          csym.name = csym_name;
+          csym.base_name = cap.first;
+          csym.type = cap.second.type();
+          csym.value = cap.second;
+          csym.mode = ID_cpp;
+          csym.module = module;
+          csym.location = loc;
+          csym.is_file_local = true;
+          csym.is_thread_local = true;
+          csym.is_lvalue = true;
+          csym.is_state_var = true;
+          symbol_table.insert(std::move(csym));
+        }
+
+        const symbolt &inserted = symbol_table.lookup_ref(csym_name);
+        cpp_idt &cid = cpp_scopes.put_into_scope(inserted);
+        cid.id_class = cpp_idt::id_classt::SYMBOL;
+      }
+
+      default_body = to_code(static_cast<exprt &>(expr.add("body")));
+
+      typet old_return_type = return_type;
+      return_type = typet(ID_auto);
+      typecheck_code(default_body);
+
+      // Deduce return type
+      std::function<const exprt *(const codet &)> find_return =
+        [&](const codet &code) -> const exprt *
+      {
+        if(code.get_statement() == ID_return && code.has_operands())
+          return &code.op0();
+        for(const auto &op : code.operands())
+          if(op.id() == ID_code)
+          {
+            const exprt *r = find_return(to_code(op));
+            if(r != nullptr)
+              return r;
+          }
+        return nullptr;
+      };
+      const exprt *ret = find_return(default_body);
+      if(ret != nullptr)
+        func_type.return_type() = ret->type();
+      else
+        func_type.return_type() = void_type();
+
+      return_type = old_return_type;
+
+      // Prepend capture initializations
+      if(!capture_values.empty())
+      {
+        code_blockt block;
+        for(const auto &cap : capture_values)
+        {
+          if(by_ref_captures.count(cap.first))
+            continue;
+          symbol_exprt cap_sym(
+            func_sym_name + "::" + id2string(cap.first), cap.second.type());
+          codet assign(ID_assign);
+          assign.copy_to_operands(cap_sym);
+          assign.copy_to_operands(cap.second);
+          assign.add_source_location() = loc;
+          block.add(std::move(assign));
+        }
+        if(default_body.get_statement() == ID_block)
+        {
+          for(auto &stmt : to_code_block(default_body).statements())
+            block.add(std::move(stmt));
+        }
+        else
+          block.add(std::move(default_body));
+        default_body = std::move(block);
+      }
+
+      body_ok = true;
+    }
+    catch(...)
+    {
+      // Body type-checking failed with int params — leave body as nil
+      // Restore error count so this doesn't cause overall failure
+      get_message_handler().set_message_count(messaget::M_ERROR, saved_errors);
+    }
+
+    // Restore verbosity
+    get_message_handler().set_verbosity(saved_verbosity);
+
+    symbolt func_sym;
+    func_sym.name = func_sym_name;
+    func_sym.base_name = lambda_id;
+    func_sym.type = func_type;
+    func_sym.value = body_ok ? static_cast<exprt>(default_body) : nil_exprt();
+    func_sym.mode = ID_cpp;
+    func_sym.module = module;
+    func_sym.location = loc;
+    func_sym.is_file_local = true;
+    symbol_table.insert(std::move(func_sym));
+
+    {
+      const symbolt &fsym = symbol_table.lookup_ref(func_sym_name);
+      cpp_idt &fid = cpp_scopes.put_into_scope(fsym);
+      fid.id_class = cpp_idt::id_classt::SYMBOL;
+    }
+
+    expr = address_of_exprt(symbol_exprt(func_sym_name, func_type));
+    expr.type() = pointer_typet(func_type, config.ansi_c.pointer_width);
+    expr.add_source_location() = loc;
+    return;
   }
 
   // Type-check the body with captures and params in scope

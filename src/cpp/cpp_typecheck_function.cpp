@@ -197,9 +197,13 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     return_type = void_type();
 
   // C++14: auto return type deduction
+  bool defer_auto_return = false;
   if(has_auto(return_type))
   {
-    // Find the first return statement and deduce the type
+    // Find the first return statement and deduce the type.
+    // If the body contains if constexpr, the return expression may be
+    // in a discarded branch and fail to type-check. In that case,
+    // defer deduction to after body type-checking.
     std::function<const exprt *(const codet &)> find_return =
       [&](const codet &code) -> const exprt *
     {
@@ -224,21 +228,39 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     const exprt *ret_expr = find_return(to_code(symbol.value));
     if(ret_expr != nullptr)
     {
-      exprt tmp = *ret_expr;
-      typecheck_expr(tmp);
-      typet deduced = tmp.type();
-      // C++14 decltype(auto): if the return expression is a
-      // parenthesized lvalue, deduce a reference type
-      if(
-        return_type.id() == ID_decltype && return_type.get_bool("#auto") &&
-        tmp.get_bool(ID_C_lvalue))
+      const std::size_t saved_errors =
+        get_message_handler().get_message_count(messaget::M_ERROR);
+      const unsigned saved_verbosity = get_message_handler().get_verbosity();
+      get_message_handler().set_verbosity(0);
+
+      try
       {
-        deduced = reference_typet(deduced, config.ansi_c.pointer_width);
+        exprt tmp = *ret_expr;
+        typecheck_expr(tmp);
+        typet deduced = tmp.type();
+        // C++14 decltype(auto): if the return expression is a
+        // parenthesized lvalue, deduce a reference type
+        if(
+          return_type.id() == ID_decltype && return_type.get_bool("#auto") &&
+          tmp.get_bool(ID_C_lvalue))
+        {
+          deduced = reference_typet(deduced, config.ansi_c.pointer_width);
+        }
+        cpp_convert_auto(
+          function_type.return_type(), deduced, get_message_handler());
+        typecheck_type(function_type.return_type());
+        return_type = function_type.return_type();
       }
-      cpp_convert_auto(
-        function_type.return_type(), deduced, get_message_handler());
-      typecheck_type(function_type.return_type());
-      return_type = function_type.return_type();
+      catch(...)
+      {
+        // Return expression failed to type-check (likely in a discarded
+        // if constexpr branch). Defer deduction to after body type-checking.
+        get_message_handler().set_message_count(
+          messaget::M_ERROR, saved_errors);
+        defer_auto_return = true;
+      }
+
+      get_message_handler().set_verbosity(saved_verbosity);
     }
     else
     {
@@ -315,7 +337,168 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     }
   }
 
+  // C++20: generate body for defaulted operator==
+  if(
+    symbol.base_name == "operator==" && symbol.value.id() == ID_code &&
+    to_code(symbol.value).get_statement() == ID_block &&
+    !to_code_block(to_code(symbol.value)).has_operands())
+  {
+    const irep_idt &class_id = symbol.type.get(ID_C_member_name);
+    if(!class_id.empty())
+    {
+      const symbolt &class_sym = lookup(class_id);
+      const auto &fn_params = to_code_type(symbol.type).parameters();
+      irep_idt arg_name;
+      if(fn_params.size() >= 2)
+        arg_name = fn_params[1].get_base_name();
+      if(arg_name.empty())
+        arg_name = "#anon_arg0";
+
+      source_locationt loc = symbol.location;
+
+      // Build conjunction: m1==rhs.m1 && m2==rhs.m2 && ...
+      exprt result = true_exprt();
+      for(const auto &c : to_struct_type(class_sym.type).components())
+      {
+        if(
+          c.get_bool(ID_from_base) || c.get_bool(ID_is_type) ||
+          c.get_bool(ID_is_static) || c.type().id() == ID_code)
+          continue;
+        if(c.get_base_name() == "@most_derived")
+          continue;
+
+        const irep_idt &mem = c.get_base_name();
+        cpp_namet lhs(mem, loc);
+        exprt rhs(ID_member);
+        rhs.add(ID_component_cpp_name, cpp_namet(mem, loc));
+        rhs.copy_to_operands(cpp_namet(arg_name, loc).as_expr());
+        rhs.add_source_location() = loc;
+
+        equal_exprt eq(lhs.as_expr(), rhs);
+        eq.add_source_location() = loc;
+
+        if(result.is_true())
+          result = std::move(eq);
+        else
+        {
+          and_exprt conj(std::move(result), std::move(eq));
+          conj.add_source_location() = loc;
+          result = std::move(conj);
+        }
+      }
+
+      code_blockt body;
+      body.add_source_location() = loc;
+      code_frontend_returnt ret(std::move(result));
+      ret.add_source_location() = loc;
+      body.add(std::move(ret));
+
+      symbol.value = std::move(body);
+    }
+  }
+
+  // C++20: generate body for defaulted operator!=
+  if(
+    symbol.base_name == "operator!=" && symbol.value.id() == ID_code &&
+    to_code(symbol.value).get_statement() == ID_block &&
+    !to_code_block(to_code(symbol.value)).has_operands())
+  {
+    const irep_idt &class_id = symbol.type.get(ID_C_member_name);
+    if(!class_id.empty())
+    {
+      const symbolt &class_sym = lookup(class_id);
+      const auto &fn_params = to_code_type(symbol.type).parameters();
+      irep_idt arg_name;
+      if(fn_params.size() >= 2)
+        arg_name = fn_params[1].get_base_name();
+      if(arg_name.empty())
+        arg_name = "#anon_arg0";
+
+      source_locationt loc = symbol.location;
+
+      // Build: !(m1==rhs.m1 && m2==rhs.m2 && ...)
+      exprt eq_result = true_exprt();
+      for(const auto &c : to_struct_type(class_sym.type).components())
+      {
+        if(
+          c.get_bool(ID_from_base) || c.get_bool(ID_is_type) ||
+          c.get_bool(ID_is_static) || c.type().id() == ID_code)
+          continue;
+        if(c.get_base_name() == "@most_derived")
+          continue;
+
+        const irep_idt &mem = c.get_base_name();
+        cpp_namet lhs(mem, loc);
+        exprt rhs(ID_member);
+        rhs.add(ID_component_cpp_name, cpp_namet(mem, loc));
+        rhs.copy_to_operands(cpp_namet(arg_name, loc).as_expr());
+        rhs.add_source_location() = loc;
+
+        equal_exprt eq(lhs.as_expr(), rhs);
+        eq.add_source_location() = loc;
+
+        if(eq_result.is_true())
+          eq_result = std::move(eq);
+        else
+        {
+          and_exprt conj(std::move(eq_result), std::move(eq));
+          conj.add_source_location() = loc;
+          eq_result = std::move(conj);
+        }
+      }
+
+      not_exprt neg(std::move(eq_result));
+      neg.add_source_location() = loc;
+
+      code_blockt body;
+      body.add_source_location() = loc;
+      code_frontend_returnt ret(std::move(neg));
+      ret.add_source_location() = loc;
+      body.add(std::move(ret));
+
+      symbol.value = std::move(body);
+    }
+  }
+
   typecheck_code(to_code(symbol.value));
+
+  // Deferred auto return type deduction: the initial attempt failed
+  // (e.g., if constexpr with type-dependent discarded branch).
+  // Now that the body is type-checked, find a return statement in the
+  // surviving branches.
+  if(defer_auto_return)
+  {
+    std::function<const typet *(const codet &)> find_return_type =
+      [&](const codet &code) -> const typet *
+    {
+      if(code.get_statement() == ID_return && code.operands().size() == 1)
+      {
+        return &code.op0().type();
+      }
+      for(const auto &op : code.operands())
+      {
+        if(op.id() == ID_code)
+        {
+          const typet *r = find_return_type(to_code(op));
+          if(r != nullptr)
+            return r;
+        }
+      }
+      return nullptr;
+    };
+
+    const typet *deduced = find_return_type(to_code(symbol.value));
+    if(deduced != nullptr)
+    {
+      function_type.return_type() = *deduced;
+      return_type = *deduced;
+    }
+    else
+    {
+      function_type.return_type() = void_type();
+      return_type = void_type();
+    }
+  }
 
   symbol.value.type()=symbol.type;
 

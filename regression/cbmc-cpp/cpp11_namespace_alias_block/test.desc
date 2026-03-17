@@ -1,8 +1,7 @@
 CORE
 main.cpp
---cpp20
+--cpp11
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-C++20 lambda init-capture with pack expansion
