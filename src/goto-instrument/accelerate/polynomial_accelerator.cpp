@@ -589,7 +589,8 @@ void polynomial_acceleratort::assert_for_values(
   exprt overflow_expr;
   overflow.overflow_expr(rhs, overflow_expr);
 
-  program.add(goto_programt::make_assumption(not_exprt(overflow_expr)));
+  if(target.type().id() != ID_unsignedbv)
+    program.add(goto_programt::make_assumption(not_exprt(overflow_expr)));
 
   rhs=typecast_exprt(rhs, target.type());
 
