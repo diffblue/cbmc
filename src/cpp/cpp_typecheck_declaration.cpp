@@ -118,8 +118,29 @@ void cpp_typecheckt::convert_non_template_declaration(
   declaration.name_anon_struct_union();
 
   // do the type of the declaration
-  if(declaration.declarators().empty() || !has_auto(declaration_type))
+  // For out-of-class member definitions with trailing return types
+  // (e.g., auto S::f() -> iterator), the return type name must be
+  // resolved in the class scope. Defer type resolution when the
+  // declaration type is an unresolved name and a declarator is qualified.
+  bool defer_type = false;
+  if(!declaration.declarators().empty() && declaration_type.id() == ID_cpp_name)
+  {
+    for(const auto &d : declaration.declarators())
+    {
+      if(to_cpp_name(d.name()).is_qualified())
+      {
+        defer_type = true;
+        break;
+      }
+    }
+  }
+
+  if(
+    !defer_type &&
+    (declaration.declarators().empty() || !has_auto(declaration_type)))
+  {
     typecheck_type(declaration_type);
+  }
 
   // Elaborate any class template instance _unless_ we do a typedef.
   // These are only elaborated on usage!
@@ -127,7 +148,7 @@ void cpp_typecheckt::convert_non_template_declaration(
     elaborate_class_template(declaration_type);
 
   // mark as 'already typechecked'
-  if(!declaration.declarators().empty())
+  if(!declaration.declarators().empty() && !defer_type)
     already_typechecked_typet::make_already_typechecked(declaration_type);
 
   // Special treatment for anonymous unions

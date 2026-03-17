@@ -1078,6 +1078,74 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
   }
   else
   {
+    // Aggregate initialization from braced-init-list for non-POD
+    // aggregates (e.g., structs with reference members).
+    if(
+      expr.operands().size() == 1 &&
+      expr.operands().front().id() == ID_initializer_list &&
+      !expr.operands().front().operands().empty() &&
+      expr.type().id() == ID_struct_tag)
+    {
+      const struct_typet &struct_type =
+        follow_tag(to_struct_tag_type(expr.type()));
+
+      // Check whether the struct has any non-copy constructor.
+      bool has_non_copy_ctor = false;
+      for(const auto &c : struct_type.components())
+      {
+        if(c.type().id() != ID_code || c.get_bool(ID_from_base))
+          continue;
+        const code_typet &code_type = to_code_type(c.type());
+        if(code_type.return_type().id() != ID_constructor)
+          continue;
+        const auto &params = code_type.parameters();
+        if(params.size() == 2 && is_reference(params[1].type()))
+          continue;
+        has_non_copy_ctor = true;
+        break;
+      }
+
+      if(!has_non_copy_ctor)
+      {
+        const auto &ops = expr.operands().front().operands();
+        struct_exprt result({}, expr.type());
+        std::size_t idx = 0;
+        bool aggregate = true;
+        for(const auto &c : struct_type.components())
+        {
+          if(
+            c.get_bool(ID_from_base) || c.get_bool(ID_is_type) ||
+            c.get_bool(ID_is_static) || c.type().id() == ID_code)
+          {
+            continue;
+          }
+          if(c.get_base_name() == "@most_derived")
+            continue;
+          if(idx < ops.size())
+          {
+            exprt val = ops[idx++];
+            typecheck_expr(val);
+            if(is_reference(c.type()))
+              reference_initializer(val, to_reference_type(c.type()));
+            else
+              implicit_typecast(val, c.type());
+            result.add_to_operands(std::move(val));
+          }
+          else
+          {
+            aggregate = false;
+            break;
+          }
+        }
+        if(aggregate)
+        {
+          result.add_source_location() = expr.source_location();
+          expr = std::move(result);
+          return;
+        }
+      }
+    }
+
     exprt e=expr;
 
     // An empty braced-init-list {} means value-initialization,

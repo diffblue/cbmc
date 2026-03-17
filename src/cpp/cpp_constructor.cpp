@@ -9,11 +9,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
-#include "cpp_typecheck.h"
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/pointer_expr.h>
+
+#include "cpp_typecheck.h"
 
 /// \param source_location: source location for generated code
 /// \param object: non-typechecked object
@@ -24,7 +24,7 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
   const exprt &object,
   const exprt::operandst &operands)
 {
-  exprt object_tc=object;
+  exprt object_tc = object;
 
   typecheck_expr(object_tc);
 
@@ -43,9 +43,13 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
 
     if(!operands.empty() && !operands.front().get_bool(ID_C_array_ini))
     {
-      error().source_location=source_location;
-      error() << "bad array initializer" << eom;
-      throw 0;
+      // C++11 brace-enclosed initialization: build an array expression
+      // from the individual operands and assign it.
+      const auto &array_type = to_array_type(object_tc.type());
+      array_exprt array_val(operands, array_type);
+      array_val.add_source_location() = source_location;
+      array_val.set(ID_C_array_ini, true);
+      return cpp_constructor(source_location, object, {std::move(array_val)});
     }
 
     DATA_INVARIANT(
@@ -60,13 +64,13 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
     if(size_expr.id() == ID_infinity)
       return {}; // don't initialize
 
-    exprt tmp_size=size_expr;
+    exprt tmp_size = size_expr;
     make_constant_index(tmp_size);
 
     mp_integer s;
     if(to_integer(to_constant_expr(tmp_size), s))
     {
-      error().source_location=source_location;
+      error().source_location = source_location;
       error() << "array size '" << to_string(size_expr) << "' is not a constant"
               << eom;
       throw 0;
@@ -92,20 +96,20 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
       code_blockt new_code;
 
       // for each element of the array, call the default constructor
-      for(mp_integer i=0; i < s; ++i)
+      for(mp_integer i = 0; i < s; ++i)
       {
         exprt::operandst tmp_operands;
 
         exprt constant = from_integer(i, c_index_type());
-        constant.add_source_location()=source_location;
+        constant.add_source_location() = source_location;
 
         index_exprt index = index_exprt(object_tc, constant);
-        index.add_source_location()=source_location;
+        index.add_source_location() = source_location;
 
         if(!operands.empty())
         {
           index_exprt operand(operands.front(), constant);
-          operand.add_source_location()=source_location;
+          operand.add_source_location() = source_location;
           tmp_operands.push_back(operand);
         }
 
@@ -119,7 +123,7 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
   }
   else if(cpp_is_pod(object_tc.type()))
   {
-    exprt::operandst operands_tc=operands;
+    exprt::operandst operands_tc = operands;
 
     for(auto &op : operands_tc)
     {
@@ -132,7 +136,7 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
       // a POD is NOT initialized
       return {};
     }
-    else if(operands_tc.size()==1)
+    else if(operands_tc.size() == 1)
     {
       // Override constantness
       object_tc.type().set(ID_C_constant, false);
@@ -144,9 +148,10 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
     }
     else
     {
-      error().source_location=source_location;
+      error().source_location = source_location;
       error() << "initialization of POD requires one argument, "
-                 "but got " << operands.size() << eom;
+                 "but got "
+              << operands.size() << eom;
       throw 0;
     }
   }
@@ -156,7 +161,7 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
   }
   else if(object_tc.type().id() == ID_struct_tag)
   {
-    exprt::operandst operands_tc=operands;
+    exprt::operandst operands_tc = operands;
 
     for(auto &op : operands_tc)
     {
@@ -175,13 +180,13 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
         continue;
 
       member_exprt member(object_tc, component.get_name(), bool_typet());
-      member.add_source_location()=source_location;
+      member.add_source_location() = source_location;
       member.set(ID_C_lvalue, object_tc.get_bool(ID_C_lvalue));
 
-      exprt val=false_exprt();
+      exprt val = false_exprt();
 
       if(!component.get_bool(ID_from_base))
-        val=true_exprt();
+        val = true_exprt();
 
       side_effect_expr_assignt assign(
         std::move(member), std::move(val), typet(), source_location);
@@ -196,8 +201,7 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
     cpp_scopes.set_scope(struct_type.get(ID_name));
 
     // find name of constructor
-    const struct_typet::componentst &components=
-      struct_type.components();
+    const struct_typet::componentst &components = struct_type.components();
 
     irep_idt constructor_name;
 
@@ -238,14 +242,14 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
     side_effect_expr_function_callt &func_ini =
       to_side_effect_expr_function_call(statement_expr.expression());
 
-    exprt &tmp_this=func_ini.arguments().front();
+    exprt &tmp_this = func_ini.arguments().front();
     DATA_INVARIANT(
       to_address_of_expr(tmp_this).object().id() == ID_new_object,
       "expected new_object operand in address_of expression");
 
-    tmp_this=address_of_exprt(object_tc);
+    tmp_this = address_of_exprt(object_tc);
 
-    const auto &initializer_code=to_code(initializer);
+    const auto &initializer_code = to_code(initializer);
 
     if(block.statements().empty())
       return initializer_code;
@@ -272,9 +276,9 @@ void cpp_typecheckt::new_temporary(
   tmp_object_expr.set(ID_mode, ID_cpp);
 
   exprt new_object(ID_new_object);
-  new_object.add_source_location()=tmp_object_expr.source_location();
+  new_object.add_source_location() = tmp_object_expr.source_location();
   new_object.set(ID_C_lvalue, true);
-  new_object.type()=tmp_object_expr.type();
+  new_object.type() = tmp_object_expr.type();
 
   already_typechecked_exprt::make_already_typechecked(new_object);
 
