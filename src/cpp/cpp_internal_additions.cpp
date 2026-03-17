@@ -228,5 +228,21 @@ void cpp_internal_additions(std::ostream &out)
   out << "void __builtin_coro_destroy(void *);\n";
   out << "void *__builtin_coro_noop();\n";
 
+  // C++20 coroutine trivial awaitables — provide in std namespace
+  // so they're available even if <coroutine> header processing
+  // fails to register them.
+  out << "namespace std {\n";
+  out << "  struct suspend_never {\n";
+  out << "    bool await_ready() const { return true; }\n";
+  out << "    void await_suspend(void *) const {}\n";
+  out << "    void await_resume() const {}\n";
+  out << "  };\n";
+  out << "  struct suspend_always {\n";
+  out << "    bool await_ready() const { return false; }\n";
+  out << "    void await_suspend(void *) const {}\n";
+  out << "    void await_resume() const {}\n";
+  out << "  };\n";
+  out << "}\n";
+
   out << std::flush;
 }

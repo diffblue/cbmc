@@ -8,11 +8,11 @@ struct Task
     {
       return {};
     }
-    std::__n4861::suspend_never initial_suspend()
+    std::suspend_never initial_suspend()
     {
       return {};
     }
-    std::__n4861::suspend_never final_suspend() noexcept
+    std::suspend_never final_suspend() noexcept
     {
       return {};
     }

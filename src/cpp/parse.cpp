@@ -1570,13 +1570,126 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
         int next = lex.LookAhead(0);
         if(next == ',' || next == '>' || next == TOK_SHIFTRIGHT)
         {
+          // Heuristic: if after '>' the parameter name appears as
+          // a type (e.g., "T f(T x)"), this is a concept-constrained
+          // type parameter, not a non-type parameter.
+          if(next == '>' && !nttp_decl.declarators().empty())
+          {
+            const auto &dname = nttp_decl.declarators()[0].name();
+            if(
+              dname.get_sub().size() == 1 && dname.get_sub()[0].id() == ID_name)
+            {
+              irep_idt pname = dname.get_sub()[0].get(ID_identifier);
+              cpp_token_buffert::post peek = lex.Save();
+              cpp_tokent tmp;
+              lex.get_token(tmp); // consume >
+              if(is_identifier(lex.LookAhead(0)))
+              {
+                lex.LookAhead(0, tmp);
+                if(tmp.data.get(ID_C_base_name) == pname)
+                {
+                  // Parameter name used as return type — concept!
+                  lex.Restore(nttp_pos);
+                  goto try_concept_qualified;
+                }
+              }
+              lex.Restore(peek);
+            }
+          }
           nttp_decl.set(ID_is_type, false);
           declaration.swap(nttp_decl);
           return true;
         }
       }
       lex.Restore(nttp_pos);
+    try_concept_qualified:
+      // NTTP parsing failed for qualified name — might be a
+      // concept-constrained parameter (e.g., std::integral T).
+      // Skip the is_known_type check and go directly to concept path.
+      {
+        // Consume the qualified name
+        cpp_tokent concept_tk;
+        lex.get_token(concept_tk);
+        std::string cname = id2string(concept_tk.data.get(ID_C_base_name));
+        while(lex.LookAhead(0) == TOK_SCOPE)
+        {
+          cpp_tokent tmp;
+          lex.get_token(tmp); // ::
+          if(is_identifier(lex.LookAhead(0)))
+          {
+            lex.get_token(tmp);
+            cname += "::" + id2string(tmp.data.get(ID_C_base_name));
+          }
+          else
+            break;
+        }
+        // Skip template args if present
+        if(lex.LookAhead(0) == '<')
+        {
+          cpp_tokent tmp;
+          lex.get_token(tmp);
+          int depth = 1;
+          while(depth > 0)
+          {
+            int t = lex.get_token(tmp);
+            if(t == '<')
+              ++depth;
+            else if(t == '>')
+              --depth;
+            else if(t == TOK_SHIFTRIGHT && depth >= 2)
+              depth -= 2;
+            else if(t == 0)
+              break;
+          }
+        }
+        // Check if followed by identifier (parameter name)
+        if(is_identifier(lex.LookAhead(0)))
+        {
+          declaration = cpp_declarationt();
+          set_location(declaration, concept_tk);
+          declaration.set(ID_is_type, true);
+          declaration.type() = typet("cpp-template-type");
+          // Sanitize concept name for use in identifiers
+          {
+            std::string sanitized = cname;
+            std::string::size_type p;
+            while((p = sanitized.find("::")) != std::string::npos)
+              sanitized.replace(p, 2, "__");
+            declaration.set("#C_concept_constraint", sanitized);
+          }
+          declaration.declarators().resize(1);
+          auto &declarator = declaration.declarators().front();
+          declarator = cpp_declaratort();
+          cpp_tokent name_tk;
+          lex.get_token(name_tk);
+          declarator.name() = cpp_namet(name_tk.data.get(ID_C_base_name));
+          set_location(declarator.name(), name_tk);
+          add_id(
+            name_tk.data.get(ID_C_base_name),
+            new_scopet::kindt::TYPE_TEMPLATE_PARAMETER);
+          if(
+            lex.LookAhead(0) == '=' || lex.LookAhead(0) == ',' ||
+            lex.LookAhead(0) == '>')
+          {
+            if(lex.LookAhead(0) == '=')
+            {
+              cpp_tokent eq;
+              lex.get_token(eq);
+              typet def;
+              if(!rTypeName(def))
+              {
+                lex.Restore(nttp_pos);
+                goto try_default_param;
+              }
+              declarator.value() = type_exprt(def);
+            }
+            return true;
+          }
+        }
+        lex.Restore(nttp_pos);
+      }
     }
+  try_default_param:
     cpp_token_buffert::post pos = lex.Save();
 
     cpp_tokent concept_tk;
@@ -8486,6 +8599,25 @@ bool Parser::rPostfixExpr(exprt &exp)
 
   for(;;)
   {
+    // C++26 pack indexing: expr...[N]
+    if(lex.LookAhead(0) == TOK_ELLIPSIS && lex.LookAhead(1) == '[')
+    {
+      lex.get_token(op); // consume ...
+      lex.get_token(op); // consume [
+      if(!rExpression(e, false))
+        return false;
+      if(lex.get_token(cp) != ']')
+        return false;
+      // Model as array subscript on the pack
+      exprt left;
+      left.swap(exp);
+      exp = exprt(ID_index);
+      exp.add_to_operands(std::move(left), std::move(e));
+      exp.set(ID_ellipsis, true); // mark as pack indexing
+      set_location(exp, op);
+      continue;
+    }
+
     switch(lex.LookAhead(0))
     {
     case '[':
