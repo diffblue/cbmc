@@ -1600,6 +1600,7 @@ bool cpp_typecheckt::implicit_conversion_sequence(
 
 void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
 {
+  const exprt orig_expr = expr;
   exprt e=expr;
 
   if(
@@ -1611,6 +1612,52 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
 
   if(!implicit_conversion_sequence(e, type, expr))
   {
+    // Aggregate initialization from braced-init-list (C++11):
+    // { args... } can initialize a POD struct by assigning each element
+    // to the corresponding data member.
+    if(
+      orig_expr.id() == ID_initializer_list && cpp_is_pod(type) &&
+      type.id() == ID_struct_tag)
+    {
+      const struct_typet &struct_type = follow_tag(to_struct_tag_type(type));
+      const auto &ops = orig_expr.operands();
+      struct_exprt result({}, type);
+      std::size_t idx = 0;
+      bool ok = true;
+      for(const auto &c : struct_type.components())
+      {
+        if(
+          c.get_bool(ID_from_base) || c.get_bool(ID_is_type) ||
+          c.get_bool(ID_is_static) || c.type().id() == ID_code)
+        {
+          continue;
+        }
+        if(idx < ops.size())
+        {
+          exprt val = ops[idx++];
+          try
+          {
+            implicit_typecast(val, c.type());
+          }
+          catch(...)
+          {
+            ok = false;
+            break;
+          }
+          result.add_to_operands(std::move(val));
+        }
+        else
+        {
+          result.add_to_operands(constant_exprt(irep_idt(), c.type()));
+        }
+      }
+      if(ok)
+      {
+        expr = std::move(result);
+        return;
+      }
+    }
+
     show_instantiation_stack(error());
     error().source_location=e.find_source_location();
     error() << "invalid implicit conversion from '" << to_string(e.type())

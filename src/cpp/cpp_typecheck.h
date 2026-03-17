@@ -251,7 +251,8 @@ protected:
   void check_member_initializers(
     const struct_typet::basest &bases,
     const struct_typet::componentst &components,
-    const irept &initializers);
+    const irept &initializers,
+    const irep_idt &class_identifier = irep_idt());
 
   bool check_component_access(
     const struct_union_typet::componentt &component,

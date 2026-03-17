@@ -1,0 +1,10 @@
+CORE
+main.cpp
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+Test that self-referential struct types do not cause infinite recursion
+in size_of_expr.
