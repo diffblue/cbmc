@@ -26,6 +26,38 @@ void template_mapt::apply(typet &type) const
 {
   if(type.id()==ID_array)
   {
+    // C++26 pack indexing: Ts...[N] is parsed as array[N](Ts).
+    // Before applying substitution, check if the element type is a
+    // cpp_name matching a pack parameter and the size is a constant.
+    if(
+      to_array_type(type).element_type().id() == ID_cpp_name &&
+      to_array_type(type).size().id() == ID_constant)
+    {
+      const auto &elem = to_array_type(type).element_type();
+      const auto &sub = elem.get_sub();
+      if(!sub.empty() && sub.front().id() == ID_name)
+      {
+        irep_idt base = sub.front().get(ID_identifier);
+        for(const auto &entry : pack_args_map)
+        {
+          const std::string &key = id2string(entry.first);
+          auto pos = key.rfind("::");
+          std::string suffix =
+            pos != std::string::npos ? key.substr(pos + 2) : key;
+          if(suffix == id2string(base))
+          {
+            const auto &pack_types = entry.second;
+            auto idx = numeric_cast_v<mp_integer>(
+              to_constant_expr(to_array_type(type).size()));
+            if(idx >= 0 && idx < pack_types.size())
+            {
+              type = pack_types[numeric_cast_v<std::size_t>(idx)];
+              return;
+            }
+          }
+        }
+      }
+    }
     apply(to_array_type(type).element_type());
     apply(to_array_type(type).size());
   }
@@ -303,6 +335,16 @@ void template_mapt::build(
     std::size_t pack_sz =
       instance.size() >= non_pack ? instance.size() - non_pack : 0;
     pack_size_map[pack_id] = pack_sz;
+
+    // Store all pack argument types for pack indexing (C++26)
+    std::vector<typet> pack_types;
+    for(std::size_t j = non_pack; j < instance.size(); ++j)
+    {
+      if(instance[j].id() == ID_type)
+        pack_types.push_back(instance[j].type());
+    }
+    if(!pack_types.empty())
+      pack_args_map[pack_id] = std::move(pack_types);
   }
 }
 

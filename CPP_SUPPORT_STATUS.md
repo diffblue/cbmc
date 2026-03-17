@@ -1,6 +1,6 @@
 # C++ Support Status — cpp11-parser-rework branch
 
-Last updated: 2026-03-10
+Last updated: 2026-03-09
 
 ## C++11 — ~90% complete
 
@@ -20,7 +20,7 @@ Last updated: 2026-03-10
 - Explicit conversion operators (`explicit operator bool()`)
 - `static constexpr auto` member type deduction — **FIXED**: auto deduced from initializer
 - Perfect forwarding with rvalue references
-- SFINAE with `enable_if`
+- SFINAE with `enable_if` — **FIXED**: alternative overloads stored in side map, tried on primary SFINAE failure
 - Default member initializers (NSDMI) — **FIXED**: applied during both POD default construction and non-POD constructor initialization
 - Range-for over braced initializer lists (`for(int x : {1,2,3})`) — **FIXED**
 - Raw string literals (`R"delim(content)delim"`) — **FIXED**: all encoding prefixes supported
@@ -66,10 +66,10 @@ Last updated: 2026-03-10
 - Same as C++11
 
 ### Known gaps
-- Generic lambdas only work when called with `int` arguments (auto→int approximation)
+- Generic lambdas — **FIXED**: work with any argument type (struct, double, etc.)
 - `decltype(auto)` returning reference via function call — **FIXED**
 - Non-type variadic template parameters (`template<int... Is>`) — **FIXED**: ellipsis flag preserved after rDeclarator
-- Template alias not expanded during function template argument deduction (KNOWNBUG: `cpp11_template_alias_deduction`)
+- Template alias not expanded during function template argument deduction — **FIXED**: aliases expanded before deduction
 
 ---
 
@@ -125,7 +125,7 @@ Last updated: 2026-03-10
 - `requires` expressions — **FIXED**: `requires(T a, T b) { a + b; }` parsed as `true`
 - Constrained `auto` — **FIXED**: `Concept auto x = 42` works
 - `co_return`/`co_await`/`co_yield` (parsed as stubs — no coroutine semantics)
-- Template lambdas `[]<typename T>` (template params skipped, not instantiated)
+- Template lambdas `[]<typename T>` — **FIXED**: instantiated at call site with actual types
 - `using enum` — **FIXED**: enumerators imported into scope
 - Aggregate initialization with parentheses — **FIXED**: `S s(1, 2)` for aggregates
 - Aggregate initialization with base classes — **FIXED**: `Derived d{{10}, 20}` for structs with bases
@@ -149,8 +149,9 @@ Last updated: 2026-03-10
 - **`constexpr` containers** — not modeled
 - **Class type NTTP** (`template<Fixed F>`) — KNOWNBUG: "expected type, but got expression"
 - **Defaulted three-way comparison** (`auto operator<=>(const T&) const = default`) — **FIXED**: generates member-wise comparison body
+- **Defaulted equality** (`bool operator==(const T&) const = default`) — **FIXED**: generates member-wise equality body
 - **Relational operators from `<=>`** — **FIXED**: `<`, `>`, `<=`, `>=` synthesized from `<=>` by rewriting as `(a <=> b) < 0`
-- **Lambda init-capture with pack expansion** (`[...x = args]`) — KNOWNBUG: not parsed
+- **Lambda init-capture with pack expansion** (`[...x = args]`) — **FIXED**: parsed and expanded during template instantiation
 
 ---
 
@@ -175,15 +176,14 @@ Last updated: 2026-03-10
 
 ---
 
-## C++26 — ~5% complete
+## C++26 — ~10% complete
 
 ### Working language features (~10%)
 - `= delete("message")` — parses and discards the message string
-- Pack indexing `Ts...[0]` — parses but doesn't instantiate the indexed type
+- Pack indexing `Ts...[0]` — **FIXED**: resolves during template argument substitution
 - Function contracts `pre(expr)` / `post(name: expr)` — parsed and stored
 
 ### Known gaps — language
-- **Pack indexing instantiation** — `Ts...[0]` doesn't resolve during template argument substitution
 - **Reflection** (`^`, `[:..:]`) — not started
 - **Pattern matching** — not started
 - **`std::execution`** (sender/receiver) — not started
@@ -202,7 +202,7 @@ Last updated: 2026-03-10
 | C++17    | ~80%             | ~50%        | ~75%    |
 | C++20    | ~50%             | ~5%         | ~40%    |
 | C++23    | ~35%             | ~0%         | ~25%    |
-| C++26    | ~10%             | ~0%         | ~5%     |
+| C++26    | ~15%             | ~0%         | ~10%    |
 
 ## Systemic gaps across all standards
 
@@ -221,19 +221,19 @@ Last updated: 2026-03-10
 | `cpp11_variadic_mixed_types` | C++11 | **FIXED**: variadic pack with heterogeneous types deduced individually |
 | `cpp11_lambda_returning_lambda` | C++11 | **FIXED**: lambda returning lambda |
 | `cpp11_partial_ordering` | C++11 | **FIXED**: partial ordering of template specializations |
-| `cpp11_sfinae_default_arg` | C++11 | SFINAE with `enable_if` as default template argument — both overloads get same identifier |
+| `cpp11_sfinae_default_arg` | C++11 | **FIXED**: SFINAE with `enable_if` as default template argument |
 | `cpp11_recursive_template_depth` | C++11 | **FIXED**: converging integer args allow deeper recursion |
 | `cpp11_template_method_outside` | C++11 | **FIXED**: template method defined outside non-template class |
 | `cpp11_trailing_decltype_template` | C++11 | **FIXED**: trailing `decltype(a+b)` in function templates |
-| `cpp11_template_alias_deduction` | C++11 | Template alias not expanded during function template argument deduction |
+| `cpp11_template_alias_deduction` | C++11 | **FIXED**: Template alias expanded during function template argument deduction |
 | `cpp14_index_sequence` | C++14 | **FIXED**: non-type variadic template parameter packs |
 | `cpp14_decltype_auto_ref` | C++14 | **FIXED**: `decltype(auto)` deduces reference from function returning ref |
 | `cpp17_fold_expr` | C++17 | **FIXED**: fold expressions expanded during template instantiation |
 | `cpp17_fold_comma` | C++17 | **FIXED**: comma operator in fold expressions |
 | `cpp17_variadic_bases` | C++17 | **FIXED**: variadic base classes expanded during class template instantiation |
 | `cpp20_nttp_string` | C++20 | Class type as non-type template parameter |
-| `cpp20_lambda_pack_capture` | C++20 | Lambda init-capture with pack expansion not parsed |
-| `cpp26_pack_indexing` | C++26 | Pack indexing instantiation |
+| `cpp20_lambda_pack_capture` | C++20 | **FIXED**: Lambda init-capture with pack expansion |
+| `cpp26_pack_indexing` | C++26 | **FIXED**: Pack indexing instantiation |
 
 ## Key file locations
 

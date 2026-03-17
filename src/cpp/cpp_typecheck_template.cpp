@@ -335,8 +335,9 @@ void cpp_typecheckt::typecheck_function_template(
     {
       // When two function templates differ only in their SFINAE constraints
       // (e.g., enable_if default template arguments), they get the same
-      // identifier. Since CBMC does not implement SFINAE, silently keep
-      // the first declaration.
+      // identifier. Store the alternative as a separate symbol (not in
+      // scope) and record its name on the primary so it can be tried
+      // when the primary fails SFINAE.
       if(
         template_type.template_parameters().size() ==
         to_cpp_declaration(previous_symbol->type)
@@ -344,6 +345,19 @@ void cpp_typecheckt::typecheck_function_template(
           .template_parameters()
           .size())
       {
+        const irep_idt alt_name = id2string(symbol_name) + "#sfinae_alt";
+        symbolt alt_symbol;
+        alt_symbol.name = alt_name;
+        alt_symbol.base_name = previous_symbol->base_name;
+        static_cast<irept &>(alt_symbol.type) =
+          static_cast<const irept &>(declaration);
+        alt_symbol.mode = previous_symbol->mode;
+        alt_symbol.module = previous_symbol->module;
+        alt_symbol.location = declarator.source_location();
+        sfinae_alternatives[symbol_name] = std::move(alt_symbol);
+
+        // Register the alternative in its own template scope.
+        cpp_scopes.id_map[alt_name] = &template_scope;
         return;
       }
 

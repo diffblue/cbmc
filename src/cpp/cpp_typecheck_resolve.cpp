@@ -102,9 +102,30 @@ void cpp_typecheck_resolvet::guess_function_template_args(
       CHECK_RETURN(e.id() != ID_type);
       identifiers.push_back(e);
     }
-    else if(old_id.id() == ID_symbol && !old_id.type().get_bool(ID_is_template))
+    else if(old_id.id() == ID_symbol)
     {
-      non_templates.push_back(old_id);
+      const irep_idt &sym_name = to_symbol_expr(old_id).get_identifier();
+      auto alt_it = cpp_typecheck.sfinae_alternatives.find(sym_name);
+      if(alt_it != cpp_typecheck.sfinae_alternatives.end())
+      {
+        // Primary overload failed SFINAE — try the alternative.
+        const irep_idt &alt_name = id2string(sym_name) + "#sfinae_alt";
+        if(!cpp_typecheck.symbol_table.has_symbol(alt_name))
+          cpp_typecheck.symbol_table.insert(alt_it->second);
+        exprt alt_id = old_id;
+        alt_id.type() = alt_it->second.type;
+        to_symbol_expr(alt_id).set_identifier(alt_name);
+        exprt alt_e = guess_function_template_args(alt_id, fargs);
+        if(alt_e.is_not_nil())
+        {
+          CHECK_RETURN(alt_e.id() != ID_type);
+          identifiers.push_back(alt_e);
+        }
+      }
+      else if(!old_id.type().get_bool(ID_is_template))
+      {
+        non_templates.push_back(old_id);
+      }
     }
   }
 
@@ -2563,6 +2584,88 @@ void cpp_typecheck_resolvet::guess_template_args(
 
     if(cpp_name.has_template_args())
     {
+      // Check if this is a template alias — if so, expand it and
+      // re-try deduction with the underlying type pattern.
+      {
+        irep_idt base_name = cpp_name.get_base_name();
+        const auto id_set = cpp_typecheck.cpp_scopes.current_scope().lookup(
+          base_name, cpp_scopet::RECURSIVE);
+        for(const auto &id_ptr : id_set)
+        {
+          if(id_ptr->id_class == cpp_idt::id_classt::TEMPLATE)
+          {
+            const symbolt *sym =
+              cpp_typecheck.symbol_table.lookup(id_ptr->identifier);
+            if(
+              sym != nullptr && sym->type.get_bool(ID_is_template) &&
+              to_cpp_declaration(sym->type).is_template_alias())
+            {
+              // Get the alias's underlying type pattern
+              const cpp_declarationt &alias_decl =
+                to_cpp_declaration(sym->type);
+              const cpp_declaratort &alias_declarator =
+                alias_decl.declarators().front();
+              typet alias_type = alias_declarator.merge_type(alias_decl.type());
+              cpp_convert_plain_type(
+                alias_type, cpp_typecheck.get_message_handler());
+
+              // The alias template parameters map to the template
+              // arguments in the cpp_name. Substitute them.
+              const auto &alias_params =
+                alias_decl.template_type().template_parameters();
+              const auto &name_args = cpp_name.get_sub().back();
+              const irept::subt &targs = name_args.find(ID_arguments).get_sub();
+
+              // Build a substitution from alias params to the
+              // template arguments (which are themselves template
+              // parameters of the enclosing function template).
+              // For each alias param, find the corresponding targ
+              // and substitute in alias_type.
+              for(std::size_t i = 0;
+                  i < alias_params.size() && i < targs.size();
+                  ++i)
+              {
+                // The targ is a cpp_name referencing the function
+                // template's parameter. We need to substitute the
+                // alias param name in alias_type with this cpp_name.
+                const irept &targ = targs[i];
+                const irept &targ_type =
+                  targ.id() == ID_ambiguous ? targ.find(ID_type) : targ;
+                if(targ_type.id() != ID_cpp_name)
+                  continue;
+
+                // Find the alias param name in alias_type and replace
+                std::function<void(irept &)> subst;
+                subst = [&](irept &t)
+                {
+                  if(t.id() == ID_cpp_name)
+                  {
+                    const cpp_namet &n =
+                      to_cpp_name(static_cast<const typet &>(t));
+                    if(
+                      !n.is_qualified() && !n.has_template_args() &&
+                      n.get_base_name() == alias_params[i].get(ID_C_base_name))
+                    {
+                      t = targ_type;
+                      return;
+                    }
+                  }
+                  for(auto &sub : t.get_sub())
+                    subst(sub);
+                  for(auto &ns : t.get_named_sub())
+                    subst(ns.second);
+                };
+                subst(static_cast<irept &>(alias_type));
+              }
+
+              // Now deduce with the expanded alias type
+              guess_template_args(alias_type, desired_type);
+              return;
+            }
+          }
+        }
+      }
+
       // This could be something like my_template<T>, and we need
       // to match 'T'. Then 'desired_type' has to be a template instance.
 
