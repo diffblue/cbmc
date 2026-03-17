@@ -671,10 +671,12 @@ void cpp_typecheckt::typecheck_compound_declarator(
           source_locationt{});
         expr_call.arguments().reserve(args.size());
 
-        for(const auto &arg : args)
+        // Skip the first parameter (this) — it was already added as
+        // late_cast above.
+        for(std::size_t j = 1; j < args.size(); ++j)
         {
           expr_call.arguments().push_back(
-            lookup(arg.get_identifier()).symbol_expr());
+            lookup(args[j].get_identifier()).symbol_expr());
         }
 
         if(
@@ -683,8 +685,10 @@ void cpp_typecheckt::typecheck_compound_declarator(
         {
           expr_call.type() = to_code_type(component.type()).return_type();
 
-          func_symb.value = code_blockt{{code_frontend_returnt(
-            already_typechecked_exprt{std::move(expr_call)})}};
+          already_typechecked_exprt ate{std::move(expr_call)};
+          ate.type() = to_code_type(component.type()).return_type();
+          func_symb.value =
+            code_blockt{{code_frontend_returnt(std::move(ate))}};
         }
         else
         {

@@ -115,12 +115,10 @@ exprt c_typecheck_baset::do_initializer_rec(
       {
         // cut off long strings. gcc does a warning for this
         tmp.operands().resize(numeric_cast_v<std::size_t>(*array_size));
-        tmp.type()=type;
       }
       else if(mp_integer(tmp.operands().size()) < *array_size)
       {
         // fill up
-        tmp.type()=type;
         const auto zero = zero_initializer(
           array_type.element_type(), value.source_location(), *this);
         if(!zero.has_value())
@@ -132,6 +130,10 @@ exprt c_typecheck_baset::do_initializer_rec(
         }
         tmp.operands().resize(numeric_cast_v<std::size_t>(*array_size), *zero);
       }
+
+      // Ensure the result type matches the declared type (the value may
+      // have a different array-size index type, e.g. 64-bit vs 32-bit).
+      tmp.type() = type;
     }
 
     return tmp;
@@ -177,12 +179,10 @@ exprt c_typecheck_baset::do_initializer_rec(
       {
         // cut off long strings. gcc does a warning for this
         tmp2.operands().resize(numeric_cast_v<std::size_t>(*array_size));
-        tmp2.type()=type;
       }
       else if(mp_integer(tmp2.operands().size()) < *array_size)
       {
         // fill up
-        tmp2.type()=type;
         const auto zero = zero_initializer(
           to_array_type(type).element_type(), value.source_location(), *this);
         if(!zero.has_value())
@@ -195,6 +195,9 @@ exprt c_typecheck_baset::do_initializer_rec(
         }
         tmp2.operands().resize(numeric_cast_v<std::size_t>(*array_size), *zero);
       }
+
+      // Ensure the result type matches the declared type.
+      tmp2.type() = type;
     }
 
     return tmp2;

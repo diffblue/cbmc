@@ -94,8 +94,6 @@ symbolt &cpp_declarator_convertert::convert(
           friend_scope = &friend_scope->get_parent();
         }
       }
-    }
-  }
       save_scope.restore();
     }
 
@@ -112,66 +110,66 @@ symbolt &cpp_declarator_convertert::convert(
         final_type.id() == ID_function_type && declarator.value().is_nil() &&
         final_type.find(ID_parameters).is_not_nil())
       {
-    const auto &params = final_type.find(ID_parameters).get_sub();
-    bool reinterpret = !params.empty();
-    exprt::operandst init_args;
-    for(const auto &p_irep : params)
-    {
-      if(p_irep.id() != ID_cpp_declaration)
-      {
-        reinterpret = false;
-        break;
-      }
-      const auto &p_decl =
-        to_cpp_declaration(static_cast<const exprt &>(p_irep));
-      // Must have exactly one unnamed declarator
-      if(
-        p_decl.declarators().size() != 1 ||
-        !p_decl.declarators().front().name().is_nil())
-      {
-        reinterpret = false;
-        break;
-      }
-      // The type must be a cpp_name
-      if(p_decl.type().id() != ID_cpp_name)
-      {
-        reinterpret = false;
-        break;
-      }
-      // Try to resolve the name as a type
-      cpp_typecheck_resolvet resolver(cpp_typecheck);
-      exprt result = resolver.resolve(
-        to_cpp_name(p_decl.type()),
-        cpp_typecheck_resolvet::wantt::TYPE,
-        cpp_typecheck_fargst(),
-        false); // fail_with_exception=false
-      if(result.is_not_nil())
-      {
-        reinterpret = false;
-        break;
-      }
-      // Save the cpp_name as an expression argument
-      init_args.push_back(
-        static_cast<const exprt &>(static_cast<const irept &>(p_decl.type())));
-    }
+        const auto &params = final_type.find(ID_parameters).get_sub();
+        bool reinterpret = !params.empty();
+        exprt::operandst init_args;
+        for(const auto &p_irep : params)
+        {
+          if(p_irep.id() != ID_cpp_declaration)
+          {
+            reinterpret = false;
+            break;
+          }
+          const auto &p_decl =
+            to_cpp_declaration(static_cast<const exprt &>(p_irep));
+          // Must have exactly one unnamed declarator
+          if(
+            p_decl.declarators().size() != 1 ||
+            !p_decl.declarators().front().name().is_nil())
+          {
+            reinterpret = false;
+            break;
+          }
+          // The type must be a cpp_name
+          if(p_decl.type().id() != ID_cpp_name)
+          {
+            reinterpret = false;
+            break;
+          }
+          // Try to resolve the name as a type
+          cpp_typecheck_resolvet resolver(cpp_typecheck);
+          exprt result = resolver.resolve(
+            to_cpp_name(p_decl.type()),
+            cpp_typecheck_resolvet::wantt::TYPE,
+            cpp_typecheck_fargst(),
+            false); // fail_with_exception=false
+          if(result.is_not_nil())
+          {
+            reinterpret = false;
+            break;
+          }
+          // Save the cpp_name as an expression argument
+          init_args.push_back(static_cast<const exprt &>(
+            static_cast<const irept &>(p_decl.type())));
+        }
 
-    if(reinterpret)
-    {
-      // Reinterpret as variable with direct initialization
-      final_type = declaration_type;
-      cpp_typecheck.typecheck_type(final_type);
-      declarator.type() = typet(ID_nil);
-      declarator.value() = exprt(ID_initializer_list);
-      declarator.value().operands() = std::move(init_args);
-    }
-    else
-    {
-      cpp_typecheck.typecheck_type(final_type);
-    }
+        if(reinterpret)
+        {
+          // Reinterpret as variable with direct initialization
+          final_type = declaration_type;
+          cpp_typecheck.typecheck_type(final_type);
+          declarator.type() = typet(ID_nil);
+          declarator.value() = exprt(ID_initializer_list);
+          declarator.value().operands() = std::move(init_args);
+        }
+        else
+        {
+          cpp_typecheck.typecheck_type(final_type);
+        }
       }
       else
       {
-    cpp_typecheck.typecheck_type(final_type);
+        cpp_typecheck.typecheck_type(final_type);
       }
     }
 
@@ -401,31 +399,31 @@ void cpp_declarator_convertert::combine_types(
   const typet &decl_type,
   symbolt &symbol)
 {
-    if(symbol.type.id() == decl_type.id() && decl_type.id() == ID_code)
+  if(symbol.type.id() == decl_type.id() && decl_type.id() == ID_code)
+  {
+    // functions need special treatment due
+    // to argument names, default values, and inlined-ness
+    const code_typet &decl_code_type = to_code_type(decl_type);
+    code_typet &symbol_code_type = to_code_type(symbol.type);
+
+    if(decl_code_type.get_inlined())
+      symbol_code_type.set_inlined(true);
+
+    if(
+      decl_code_type.return_type() == symbol_code_type.return_type() &&
+      decl_code_type.parameters().size() ==
+        symbol_code_type.parameters().size())
     {
-      // functions need special treatment due
-      // to argument names, default values, and inlined-ness
-      const code_typet &decl_code_type = to_code_type(decl_type);
-      code_typet &symbol_code_type = to_code_type(symbol.type);
-
-      if(decl_code_type.get_inlined())
-        symbol_code_type.set_inlined(true);
-
-      if(
-        decl_code_type.return_type() == symbol_code_type.return_type() &&
-        decl_code_type.parameters().size() ==
-          symbol_code_type.parameters().size())
+      for(std::size_t i = 0; i < decl_code_type.parameters().size(); i++)
       {
-        for(std::size_t i = 0; i < decl_code_type.parameters().size(); i++)
-        {
-          const code_typet::parametert &decl_parameter =
-            decl_code_type.parameters()[i];
-          code_typet::parametert &symbol_parameter =
-            symbol_code_type.parameters()[i];
+        const code_typet::parametert &decl_parameter =
+          decl_code_type.parameters()[i];
+        code_typet::parametert &symbol_parameter =
+          symbol_code_type.parameters()[i];
 
-          // first check type
-          if(decl_parameter.type() != symbol_parameter.type())
-          {
+        // first check type
+        if(decl_parameter.type() != symbol_parameter.type())
+        {
           // The 'this' parameter of virtual functions mismatches
           if(i != 0 || !symbol_code_type.get_bool(ID_C_is_virtual))
           {
@@ -440,7 +438,7 @@ void cpp_declarator_convertert::combine_types(
               << messaget::eom;
             throw 0;
           }
-          }
+        }
 
         if(symbol.value.is_nil())
         {
@@ -455,8 +453,8 @@ void cpp_declarator_convertert::combine_types(
       // ok
       return;
     }
-    }
-    else if(symbol.type == decl_type)
+  }
+  else if(symbol.type == decl_type)
     return; // ok
   else if(
     symbol.type.id() == ID_array &&

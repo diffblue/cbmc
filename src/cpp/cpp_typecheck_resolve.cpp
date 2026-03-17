@@ -1999,6 +1999,16 @@ exprt cpp_typecheck_resolvet::resolve(
 
     disambiguate_functions(new_identifiers, fargs);
 
+    // If template-instantiated candidates were all rejected by
+    // disambiguate_functions, fall back to non-template overloads
+    // which may match via implicit conversions.
+    if(new_identifiers.empty())
+    {
+      new_identifiers = identifiers;
+      remove_templates(new_identifiers);
+      disambiguate_functions(new_identifiers, fargs);
+    }
+
 #ifdef DEBUG
     std::cout << "P3 " << base_name << " " << new_identifiers.size() << '\n';
     show_identifiers(base_name, new_identifiers, std::cout);
@@ -2033,54 +2043,78 @@ exprt cpp_typecheck_resolvet::resolve(
     if(!fail_with_exception)
       return nil_exprt();
 
-    if(new_identifiers.empty())
+    // When multiple candidates remain and no function arguments are
+    // available for disambiguation (e.g., std::endl used as an
+    // argument to operator<<), prefer the char-based instantiation
+    // over wchar_t as a pragmatic default.
+    bool resolved_by_filtering = false;
+    if(new_identifiers.size() > 1 && !fargs.in_use)
     {
-      cpp_typecheck.error().source_location = source_location;
-      cpp_typecheck.error()
-        << "found no match for symbol '" << base_name << "', candidates are:\n";
-      show_identifiers(base_name, identifiers, cpp_typecheck.error());
-    }
-    else
-    {
-      cpp_typecheck.error().source_location = source_location;
-      cpp_typecheck.error()
-        << "symbol '" << base_name << "' does not uniquely resolve:\n";
-      show_identifiers(base_name, new_identifiers, cpp_typecheck.error());
-
-#ifdef DEBUG
-      exprt e1 = *new_identifiers.begin();
-      exprt e2 = *(++new_identifiers.begin());
-      cpp_typecheck.error() << "e1==e2: " << (e1 == e2) << '\n';
-      cpp_typecheck.error()
-        << "e1.type==e2.type: " << (e1.type() == e2.type()) << '\n';
-      cpp_typecheck.error()
-        << "e1.id()==e2.id(): " << (e1.id() == e2.id()) << '\n';
-      cpp_typecheck.error()
-        << "e1.iden==e2.iden: "
-        << (e1.get(ID_identifier) == e2.get(ID_identifier)) << '\n';
-      cpp_typecheck.error() << "e1.iden:: " << e1.get(ID_identifier) << '\n';
-      cpp_typecheck.error() << "e2.iden:: " << e2.get(ID_identifier) << '\n';
-#endif
-    }
-
-    if(fargs.in_use)
-    {
-      cpp_typecheck.error() << "\nargument types:\n";
-
-      for(const auto &op : fargs.operands)
+      resolve_identifierst filtered;
+      for(const auto &id : new_identifiers)
       {
-        cpp_typecheck.error()
-          << "  " << cpp_typecheck.to_string(op.type()) << '\n';
+        const irep_idt &ident = id.get(ID_identifier);
+        if(id2string(ident).find("wchar_t") == std::string::npos)
+          filtered.push_back(id);
+      }
+      if(filtered.size() == 1)
+      {
+        result = filtered.front();
+        resolved_by_filtering = true;
       }
     }
 
-    if(!cpp_typecheck.instantiation_stack.empty())
+    if(!resolved_by_filtering)
     {
-      cpp_typecheck.show_instantiation_stack(cpp_typecheck.error());
-    }
+      if(new_identifiers.empty())
+      {
+        cpp_typecheck.error().source_location = source_location;
+        cpp_typecheck.error() << "found no match for symbol '" << base_name
+                              << "', candidates are:\n";
+        show_identifiers(base_name, identifiers, cpp_typecheck.error());
+      }
+      else
+      {
+        cpp_typecheck.error().source_location = source_location;
+        cpp_typecheck.error()
+          << "symbol '" << base_name << "' does not uniquely resolve:\n";
+        show_identifiers(base_name, new_identifiers, cpp_typecheck.error());
 
-    cpp_typecheck.error() << messaget::eom;
-    throw 0;
+#ifdef DEBUG
+        exprt e1 = *new_identifiers.begin();
+        exprt e2 = *(++new_identifiers.begin());
+        cpp_typecheck.error() << "e1==e2: " << (e1 == e2) << '\n';
+        cpp_typecheck.error()
+          << "e1.type==e2.type: " << (e1.type() == e2.type()) << '\n';
+        cpp_typecheck.error()
+          << "e1.id()==e2.id(): " << (e1.id() == e2.id()) << '\n';
+        cpp_typecheck.error()
+          << "e1.iden==e2.iden: "
+          << (e1.get(ID_identifier) == e2.get(ID_identifier)) << '\n';
+        cpp_typecheck.error() << "e1.iden:: " << e1.get(ID_identifier) << '\n';
+        cpp_typecheck.error() << "e2.iden:: " << e2.get(ID_identifier) << '\n';
+#endif
+      }
+
+      if(fargs.in_use)
+      {
+        cpp_typecheck.error() << "\nargument types:\n";
+
+        for(const auto &op : fargs.operands)
+        {
+          cpp_typecheck.error()
+            << "  " << cpp_typecheck.to_string(op.type()) << '\n';
+        }
+      }
+
+      if(!cpp_typecheck.instantiation_stack.empty())
+      {
+        cpp_typecheck.show_instantiation_stack(cpp_typecheck.error());
+      }
+
+      cpp_typecheck.error() << messaget::eom;
+      throw 0;
+    }
   }
 
   // we do some checks before we return

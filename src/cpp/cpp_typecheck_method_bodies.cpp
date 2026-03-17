@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <iostream>
 #endif
 
+#include <util/message.h>
 #include <util/symbol_table_base.h>
 
 #include "cpp_typecheck.h"
@@ -44,7 +45,28 @@ void cpp_typecheckt::typecheck_method_bodies()
     std::cout << "  !is_zero: " << (!body.is_zero()) << '\n';
 #endif
     if(body.is_not_nil() && body != 0)
-      convert_function(method_symbol);
+    {
+      // For template-instantiated methods, suppress error messages
+      // so that failures (e.g., unsupported standard library
+      // constructs) do not increment the error count.
+      if(!instantiation_stack.empty())
+      {
+        null_message_handlert null_handler;
+        message_handlert &old_handler = get_message_handler();
+        set_message_handler(null_handler);
+        try
+        {
+          convert_function(method_symbol);
+          set_message_handler(old_handler);
+        }
+        catch(int)
+        {
+          set_message_handler(old_handler);
+        }
+      }
+      else
+        convert_function(method_symbol);
+    }
   }
 
   old_instantiation_stack.swap(instantiation_stack);
