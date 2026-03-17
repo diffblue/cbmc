@@ -25,12 +25,15 @@ add_test_pl_profile(
 )
 
 # If `-X` (exclude flag) is passed, test.pl will exclude the tests matching the label following it.
-add_test_pl_profile(
-  "cbmc-new-smt-backend"
-  "$<TARGET_FILE:cbmc> --incremental-smt2-solver 'z3 --smt2 -in'"
-  "${gcc_only_string}-X;no-new-smt;-s;new-smt-backend"
-  "CORE"
-)
+find_program(Z3_SOLVER z3)
+if(Z3_SOLVER)
+  add_test_pl_profile(
+    "cbmc-new-smt-backend"
+    "$<TARGET_FILE:cbmc> --incremental-smt2-solver 'z3 --smt2 -in'"
+    "${gcc_only_string}-X;no-new-smt;-s;new-smt-backend"
+    "CORE"
+  )
+endif()
 
 # solver appears on the PATH in Windows already
 if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")

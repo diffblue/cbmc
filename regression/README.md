@@ -17,6 +17,10 @@ This folder contains the CProver regression test-suite.
 
 ### Solver
 
+- `z3`:
+  These tests _require_ z3 to be available on the PATH.
+- `cvc5`:
+  These tests _require_ cvc5 to be available on the PATH.
 - `broken-cprover-smt-backend`:
   These tests are known to not work with CPROVER SMT2.
 - `thorough-cprover-smt-backend`:
