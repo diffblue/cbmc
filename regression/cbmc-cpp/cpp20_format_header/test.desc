@@ -6,4 +6,5 @@ main.cpp
 ^SIGNAL=0$
 --
 --
-<format> header parses but has type-checking errors in system headers.
+<format> header: all parse errors fixed, type-checking errors remain
+(iterator_concepts.h, basic_string.h, charconv).

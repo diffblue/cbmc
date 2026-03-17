@@ -1,8 +1,7 @@
-#include <cassert>
+// C++17 std::tuple
 #include <tuple>
 int main()
 {
-  std::tuple<int, int> t(1, 2);
-  assert(std::get<0>(t) == 1);
-  return 0;
+  auto t = std::make_tuple(1, 2.0, 'a');
+  __CPROVER_assert(std::get<0>(t) == 1, "get<0>");
 }

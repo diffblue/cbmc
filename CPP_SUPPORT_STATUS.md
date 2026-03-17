@@ -293,7 +293,8 @@ Last updated: 2026-03-11 (session 24)
 | `cpp17_make_tuple` | C++17 | **FIXED**: std::make_tuple basic usage works |
 | `cpp17_filesystem_basic` | C++17 | std::filesystem: type-checking errors |
 | `cpp20_ranges_basic` | C++20 | `<ranges>`: conversion error in views::take |
-| `cpp20_format_header` | C++20 | `<format>`: parse errors (partially fixed — line 611 fixed, line 3026+ remain) |
+| `cpp20_array_basic` | C++20 | **FIXED**: std::array in C++20 mode (qualified NTTP fix) |
+| `cpp20_format_header` | C++20 | `<format>`: parse errors fixed, type-checking errors remain |
 | `cpp23_expected_basic` | C++23 | **FIXED**: std::expected basic usage works |
 
 ### Session 24 new CORE tests
@@ -315,6 +316,10 @@ Last updated: 2026-03-11 (session 24)
 
 - **`if !consteval`**: Parser now handles the negated form, taking the runtime (if) branch
 - **Template parameter scope leak**: Fixed scope leak where template parameter names (e.g., `_Align` from `aligned_storage`) leaked into subsequent declarations, causing parse errors with enum/class types whose names collided with template parameters from system headers
+- **`decltype(expr)::member`**: Parser now handles qualified names starting with `decltype`
+- **`using enum` in default member initializers**: Type-check default member initializer expressions in the class scope so that using-declarations are visible
+- **Qualified non-type template parameters in C++20**: `std::size_t` and other qualified types as non-type template parameters no longer misinterpreted as concept-constrained parameters
+- **`std::array` in C++20 mode**: Now works (was blocked by qualified NTTP issue)
 
 ## Key file locations
 
