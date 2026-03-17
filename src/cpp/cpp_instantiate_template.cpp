@@ -313,6 +313,7 @@ void cpp_typecheckt::elaborate_class_template(
       static_cast<const cpp_template_args_tct &>(
         t_type.find(ID_full_template_args));
     unsigned same_template_depth = 0;
+    bool has_converging_int_args = false;
     for(const auto &entry : instantiation_stack)
     {
       if(entry.identifier == primary_template.name)
@@ -322,8 +323,56 @@ void cpp_typecheckt::elaborate_class_template(
         ++same_template_depth;
       }
     }
+
+    // For templates with non-type integer arguments that are strictly
+    // smaller than all parent instances of the same template, allow
+    // deeper recursion (convergent recursion like Fibonacci).
+    // For type-only arguments, keep the conservative limit.
     if(same_template_depth >= 2)
-      return;
+    {
+      // Check if current args have a non-type integer constant that
+      // is strictly less than the corresponding arg in every parent.
+      for(const auto &arg : full_args.arguments())
+      {
+        if(arg.id() == ID_type || !arg.is_constant())
+          continue;
+        mp_integer current_val;
+        if(to_integer(to_constant_expr(arg), current_val))
+          continue;
+        bool all_parents_larger = true;
+        for(const auto &entry : instantiation_stack)
+        {
+          if(entry.identifier != primary_template.name)
+            continue;
+          bool found_larger = false;
+          for(const auto &parg : entry.full_template_args.arguments())
+          {
+            if(parg.id() == ID_type || !parg.is_constant())
+              continue;
+            mp_integer parent_val;
+            if(to_integer(to_constant_expr(parg), parent_val))
+              continue;
+            if(parent_val > current_val)
+            {
+              found_larger = true;
+              break;
+            }
+          }
+          if(!found_larger)
+          {
+            all_parents_larger = false;
+            break;
+          }
+        }
+        if(all_parents_larger)
+        {
+          has_converging_int_args = true;
+          break;
+        }
+      }
+      if(!has_converging_int_args)
+        return;
+    }
 
     const cpp_template_args_tct &specialization_args =
       static_cast<const cpp_template_args_tct &>(
@@ -852,6 +901,79 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
     template_map.apply(declaration_type);
     new_decl.type().swap(declaration_type);
+
+    // Expand variadic base classes: Bases... → Base0, Base1, ...
+    if(
+      new_decl.type().id() == ID_struct &&
+      !template_type.template_parameters().empty() &&
+      template_type.template_parameters().back().get_bool(ID_ellipsis))
+    {
+      irept &bases_irep = new_decl.type().add(ID_bases);
+      irept::subt &bases_sub = bases_irep.get_sub();
+      irept::subt expanded_bases;
+      const std::size_t non_pack =
+        template_type.template_parameters().size() - 1;
+
+      for(auto &base : bases_sub)
+      {
+        // Check if this base references the pack parameter
+        const irept &base_name = base.find(ID_name);
+        bool is_pack_base = false;
+        if(base_name.id() == ID_cpp_name)
+        {
+          for(const auto &sub : base_name.get_sub())
+          {
+            if(sub.id() == ID_name)
+            {
+              // Check if this name matches the pack parameter
+              const auto &pack_param =
+                template_type.template_parameters().back();
+              const std::string full_id =
+                id2string(pack_param.type().get(ID_identifier));
+              auto pos = full_id.rfind("::");
+              const std::string pack_name =
+                pos != std::string::npos ? full_id.substr(pos + 2) : full_id;
+              if(id2string(sub.get(ID_identifier)) == pack_name)
+                is_pack_base = true;
+              break;
+            }
+          }
+        }
+
+        if(is_pack_base)
+        {
+          // Expand: create one base for each pack argument
+          for(std::size_t k = non_pack;
+              k < full_template_args.arguments().size();
+              ++k)
+          {
+            const exprt &arg = full_template_args.arguments()[k];
+            if(arg.id() == ID_type)
+            {
+              irept new_base = base;
+              // Replace the name with the concrete type
+              const std::string tag_id =
+                id2string(arg.type().get(ID_identifier));
+              // Strip "tag-" prefix to get the class name
+              std::string class_name = tag_id;
+              if(class_name.substr(0, 4) == "tag-")
+                class_name = class_name.substr(4);
+              irept new_name(ID_cpp_name);
+              irept name_sub(ID_name);
+              name_sub.set(ID_identifier, class_name);
+              new_name.get_sub().push_back(name_sub);
+              new_base.add(ID_name) = new_name;
+              expanded_bases.push_back(new_base);
+            }
+          }
+        }
+        else
+        {
+          expanded_bases.push_back(base);
+        }
+      }
+      bases_sub = expanded_bases;
+    }
 
     // Also apply template map to declarator types (function parameters)
     for(auto &d : new_decl.declarators())
@@ -1418,6 +1540,259 @@ const symbolt &cpp_typecheckt::instantiate_template(
           strip_pack_var(named.second);
       };
       strip_pack_var(func_decl.value());
+    }
+  }
+
+  // When a variadic template parameter pack has N>0 arguments, expand
+  // the pack parameter into N individual function parameters and expand
+  // pack references in the function body.
+  if(
+    full_template_args.arguments().size() >
+      template_type.template_parameters().size() &&
+    !template_type.template_parameters().empty() &&
+    template_type.template_parameters().back().get_bool(ID_ellipsis))
+  {
+    const std::size_t non_pack = template_type.template_parameters().size() - 1;
+    const std::size_t pack_sz =
+      full_template_args.arguments().size() - non_pack;
+
+    auto &func_decl = new_decl.declarators()[0];
+    irept &func_params = func_decl.type().add(ID_parameters);
+    irept::subt &fp_sub = func_params.get_sub();
+
+    // Find the pack parameter (last param with ellipsis on declarator)
+    int pack_idx = -1;
+    irep_idt pack_var_name;
+    for(int i = static_cast<int>(fp_sub.size()) - 1; i >= 0; --i)
+    {
+      if(fp_sub[i].id() == ID_cpp_declaration)
+      {
+        const auto &d = to_cpp_declaration(fp_sub[i]);
+        if(
+          !d.declarators().empty() &&
+          d.declarators().front().type().get_bool(ID_ellipsis))
+        {
+          pack_idx = i;
+          const auto &dname = d.declarators().front().name();
+          for(const auto &sub : dname.get_sub())
+          {
+            if(sub.id() == ID_name)
+            {
+              pack_var_name = sub.get(ID_identifier);
+              break;
+            }
+          }
+          break;
+        }
+      }
+    }
+
+    if(pack_idx >= 0 && !pack_var_name.empty())
+    {
+      // Build expanded parameters
+      irept pack_param_template = fp_sub[pack_idx];
+      // Remove ellipsis from template
+      {
+        auto &d = static_cast<cpp_declarationt &>(pack_param_template);
+        d.declarators().front().type().remove(ID_ellipsis);
+      }
+
+      std::vector<irep_idt> expanded_names;
+      std::vector<irept> expanded_params;
+      for(std::size_t k = 0; k < pack_sz; ++k)
+      {
+        irept param_copy = pack_param_template;
+        const std::string new_name =
+          id2string(pack_var_name) + "$" + std::to_string(k);
+        expanded_names.push_back(irep_idt(new_name));
+
+        // Set the parameter type from the k-th pack argument
+        const exprt &pack_arg = full_template_args.arguments()[non_pack + k];
+        if(pack_arg.id() == ID_type)
+        {
+          auto &d = static_cast<cpp_declarationt &>(param_copy);
+          d.type() = pack_arg.type();
+        }
+
+        // Rename the parameter
+        auto &d = static_cast<cpp_declarationt &>(param_copy);
+        if(!d.declarators().empty())
+        {
+          auto &dname = d.declarators().front().name();
+          for(auto &sub : dname.get_sub())
+          {
+            if(sub.id() == ID_name)
+            {
+              sub.set(ID_identifier, new_name);
+              break;
+            }
+          }
+        }
+        expanded_params.push_back(param_copy);
+      }
+
+      // Replace the pack parameter with expanded parameters
+      fp_sub.erase(fp_sub.begin() + pack_idx);
+      fp_sub.insert(
+        fp_sub.begin() + pack_idx,
+        expanded_params.begin(),
+        expanded_params.end());
+
+      // Expand pack references in the function body
+      if(func_decl.value().is_not_nil())
+      {
+        // Helper: check if an irept is a cpp_name referencing pack_var
+        auto is_pack_name = [&pack_var_name](const irept &n) -> bool
+        {
+          if(n.id() != ID_cpp_name)
+            return false;
+          for(const auto &s : n.get_sub())
+          {
+            if(s.id() == ID_name && s.get(ID_identifier) == pack_var_name)
+              return true;
+          }
+          return false;
+        };
+
+        // Helper: make a cpp_name for an expanded parameter
+        auto make_name = [](const irept &orig, const irep_idt &name)
+        {
+          irept copy = orig;
+          for(auto &s : copy.get_sub())
+          {
+            if(s.id() == ID_name)
+            {
+              s.set(ID_identifier, name);
+              break;
+            }
+          }
+          return copy;
+        };
+
+        // Helper: check if an irept contains a pack_name anywhere
+        std::function<bool(const irept &)> contains_pack_name;
+        contains_pack_name = [&is_pack_name,
+                              &contains_pack_name](const irept &n) -> bool
+        {
+          if(is_pack_name(n))
+            return true;
+          for(const auto &s : n.get_sub())
+            if(contains_pack_name(s))
+              return true;
+          for(const auto &ns : n.get_named_sub())
+            if(contains_pack_name(ns.second))
+              return true;
+          return false;
+        };
+
+        // Helper: substitute pack_name within an expression
+        std::function<irept(const irept &, const irep_idt &)> substitute_pack;
+        substitute_pack = [&is_pack_name, &make_name, &substitute_pack](
+                            const irept &n, const irep_idt &name) -> irept
+        {
+          if(is_pack_name(n))
+            return make_name(n, name);
+          irept result = n;
+          for(auto &s : result.get_sub())
+            s = substitute_pack(s, name);
+          return result;
+        };
+
+        std::function<void(irept &)> expand_pack;
+        expand_pack = [&pack_var_name,
+                       &expanded_names,
+                       &expand_pack,
+                       &is_pack_name,
+                       &contains_pack_name,
+                       &substitute_pack,
+                       &make_name](irept &node)
+        {
+          // Expand fold expressions
+          if(
+            (node.id() == irep_idt("cpp_right_fold") ||
+             node.id() == irep_idt("cpp_left_fold")) &&
+            !node.get_sub().empty() &&
+            contains_pack_name(node.get_sub().front()))
+          {
+            const irep_idt fold_op = node.get(irep_idt("fold_op"));
+            const irept &pack_expr = node.get_sub().front();
+            bool is_left = (node.id() == irep_idt("cpp_left_fold"));
+
+            if(expanded_names.size() == 1)
+            {
+              node = substitute_pack(pack_expr, expanded_names[0]);
+              return;
+            }
+
+            // Build binary expression tree
+            if(is_left)
+            {
+              // Left fold: ((a op b) op c)
+              irept result = substitute_pack(pack_expr, expanded_names[0]);
+              for(std::size_t i = 1; i < expanded_names.size(); ++i)
+              {
+                irept bin(fold_op);
+                bin.get_sub().push_back(result);
+                bin.get_sub().push_back(
+                  substitute_pack(pack_expr, expanded_names[i]));
+                result = bin;
+              }
+              node = result;
+            }
+            else
+            {
+              // Right fold: (a op (b op c))
+              irept result = substitute_pack(
+                pack_expr, expanded_names[expanded_names.size() - 1]);
+              for(int i = static_cast<int>(expanded_names.size()) - 2; i >= 0;
+                  --i)
+              {
+                irept bin(fold_op);
+                bin.get_sub().push_back(
+                  substitute_pack(pack_expr, expanded_names[i]));
+                bin.get_sub().push_back(result);
+                result = bin;
+              }
+              node = result;
+            }
+            return;
+          }
+
+          // Look for function call arguments containing pack_var...
+          if(
+            node.id() == ID_side_effect &&
+            node.get(ID_statement) == ID_function_call)
+          {
+            for(auto &sub : node.get_sub())
+            {
+              if(sub.id() != ID_arguments)
+                continue;
+              irept::subt &arg_sub = sub.get_sub();
+              irept::subt new_args;
+              for(auto &a : arg_sub)
+              {
+                if(is_pack_name(a))
+                {
+                  // Expand into individual arguments
+                  for(const auto &ename : expanded_names)
+                    new_args.push_back(make_name(a, ename));
+                }
+                else
+                {
+                  new_args.push_back(a);
+                }
+              }
+              arg_sub = new_args;
+              break;
+            }
+          }
+          for(auto &sub : node.get_sub())
+            expand_pack(sub);
+          for(auto &named : node.get_named_sub())
+            expand_pack(named.second);
+        };
+        expand_pack(func_decl.value());
+      }
     }
   }
 

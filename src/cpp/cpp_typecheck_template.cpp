@@ -522,6 +522,7 @@ void cpp_typecheckt::typecheck_class_template_member(
   // must be of the form: name1<template_args>::name2
   // or:                  name1<template_args>::operator X
   // or:                  name1<template_args>::~name2
+  // or:                  name1::name2 (non-template class)
   if(cpp_name.get_sub().size()==4 &&
      cpp_name.get_sub()[0].id()==ID_name &&
      cpp_name.get_sub()[1].id()==ID_template_args &&
@@ -542,6 +543,49 @@ void cpp_typecheckt::typecheck_class_template_member(
     cpp_name.get_sub()[2].id() == "::" && cpp_name.get_sub()[3].id() == "~" &&
     cpp_name.get_sub()[4].id() == ID_name)
   {
+  }
+  else if(
+    cpp_name.get_sub().size() == 3 && cpp_name.get_sub()[0].id() == ID_name &&
+    cpp_name.get_sub()[1].id() == "::" && cpp_name.get_sub()[2].id() == ID_name)
+  {
+    // Non-template class with a member function template defined
+    // outside the class body: name1::name2
+    const irep_idt &class_name = cpp_name.get_sub()[0].get(ID_identifier);
+    const irep_idt &method_name = cpp_name.get_sub()[2].get(ID_identifier);
+
+    // Look up the class scope
+    auto class_ids = cpp_scopes.current_scope().lookup(
+      class_name, cpp_scopet::QUALIFIED, cpp_scopet::id_classt::CLASS);
+
+    if(!class_ids.empty())
+    {
+      cpp_scopet &class_scope =
+        cpp_scopes.get_scope((*class_ids.begin())->identifier);
+
+      // Find the function template in the class scope
+      auto tmpl_ids = class_scope.lookup(
+        method_name, cpp_scopet::QUALIFIED, cpp_scopet::id_classt::TEMPLATE);
+
+      for(const auto *tmpl_id : tmpl_ids)
+      {
+        symbolt *tmpl_sym = symbol_table.get_writeable(tmpl_id->identifier);
+        if(tmpl_sym == nullptr)
+          continue;
+
+        // Update the template symbol with the body from the
+        // out-of-line definition.
+        cpp_declarationt &tmpl_decl = to_cpp_declaration(tmpl_sym->type);
+        if(
+          !tmpl_decl.declarators().empty() &&
+          tmpl_decl.declarators()[0].find(ID_value).is_nil() &&
+          declarator.find(ID_value).is_not_nil())
+        {
+          tmpl_decl.declarators()[0].add(ID_value) = declarator.find(ID_value);
+          return;
+        }
+      }
+    }
+    return;
   }
   else
   {
