@@ -197,6 +197,42 @@ void cpp_typecheck_resolvet::guess_function_template_args(
             }
           }
         }
+
+        // Expand pack parameter: the instantiated function has a single
+        // parameter for the pack, but it should have N copies where N
+        // is the pack size (extra template args beyond non-pack params).
+        const auto &tmpl_params =
+          tmpl_decl.template_type().template_parameters();
+        std::size_t non_pack_count = 0;
+        for(const auto &tp : tmpl_params)
+        {
+          if(!tp.get_bool(ID_ellipsis))
+            ++non_pack_count;
+        }
+        std::size_t pack_size =
+          template_args.arguments().size() > non_pack_count
+            ? template_args.arguments().size() - non_pack_count
+            : 0;
+
+        if(pack_size > 1)
+        {
+          auto &params = to_code_type(inst_type).parameters();
+          // Find the pack parameter (last one that was the pack)
+          // and duplicate it to match the pack size.
+          // The pack parameter is at position non_pack_count in the
+          // function parameters (after 'this' if present).
+          std::size_t param_offset = 0;
+          if(!params.empty() && params.front().get_this())
+            param_offset = 1;
+
+          if(non_pack_count + param_offset < params.size())
+          {
+            std::size_t pack_idx = non_pack_count + param_offset;
+            code_typet::parametert pack_param = params[pack_idx];
+            for(std::size_t i = 1; i < pack_size; ++i)
+              params.insert(params.begin() + pack_idx + i, pack_param);
+          }
+        }
       }
     }
 
@@ -497,26 +533,7 @@ exprt cpp_typecheck_resolvet::convert_identifier(
     }
     else
     {
-      bool constant = symbol.type.get_bool(ID_C_constant);
-
-      if(constant && symbol.value.is_not_nil() && is_number(symbol.type))
-      {
-        exprt val = symbol.value;
-        if(!val.is_constant())
-          simplify(val, cpp_typecheck);
-        if(val.is_constant())
-        {
-          e = val;
-        }
-        else
-        {
-          e = cpp_symbol_expr(symbol);
-        }
-      }
-      else
-      {
-        e = cpp_symbol_expr(symbol);
-      }
+      e = cpp_symbol_expr(symbol);
     }
   }
 
@@ -1285,7 +1302,41 @@ struct_tag_typet cpp_typecheck_resolvet::disambiguate_template_classes(
   const cpp_scopest::id_sett &id_set,
   const cpp_template_args_non_tct &full_template_args)
 {
-  if(id_set.empty())
+  cpp_scopest::id_sett effective_id_set = id_set;
+
+  if(effective_id_set.empty())
+  {
+    // The template may not be visible in the current scope (e.g.,
+    // during template instantiation). Search from the root scope.
+    effective_id_set = cpp_typecheck.cpp_scopes.get_root_scope().lookup(
+      base_name, cpp_scopet::RECURSIVE, cpp_idt::id_classt::TEMPLATE);
+  }
+
+  // If still not found, search the symbol table for class templates
+  // with the matching base name. This handles cases where the class
+  // template was not added to the scope tree (e.g., templates from
+  // system headers that were parsed but not fully registered).
+  if(effective_id_set.empty())
+  {
+    for(const auto &sym_pair : cpp_typecheck.symbol_table)
+    {
+      const symbolt &sym = sym_pair.second;
+      if(
+        sym.base_name == base_name && sym.type.get_bool(ID_is_template) &&
+        to_cpp_declaration(sym.type).is_class_template())
+      {
+        auto it = cpp_typecheck.cpp_scopes.id_map.find(sym.name);
+        if(
+          it != cpp_typecheck.cpp_scopes.id_map.end() &&
+          it->second->id_class == cpp_idt::id_classt::TEMPLATE)
+        {
+          effective_id_set.insert(it->second);
+        }
+      }
+    }
+  }
+
+  if(effective_id_set.empty())
   {
     cpp_typecheck.show_instantiation_stack(cpp_typecheck.error());
     cpp_typecheck.error().source_location = source_location;
@@ -1296,7 +1347,7 @@ struct_tag_typet cpp_typecheck_resolvet::disambiguate_template_classes(
 
   std::set<irep_idt> primary_templates;
 
-  for(const auto &id_ptr : id_set)
+  for(const auto &id_ptr : effective_id_set)
   {
     const irep_idt id = id_ptr->identifier;
     const symbolt &s = cpp_typecheck.lookup(id);
@@ -1312,7 +1363,51 @@ struct_tag_typet cpp_typecheck_resolvet::disambiguate_template_classes(
       primary_templates.insert(id);
   }
 
-  CHECK_RETURN(!primary_templates.empty());
+  if(primary_templates.empty())
+  {
+    // The id_set may contain non-class templates (e.g., constructor
+    // templates of an instantiated class) that shadow the class
+    // template with the same base name. Walk up from each candidate's
+    // parent scope to find the actual class template.
+    for(const auto &id_ptr : effective_id_set)
+    {
+      auto it = cpp_typecheck.cpp_scopes.id_map.find(id_ptr->identifier);
+      if(it == cpp_typecheck.cpp_scopes.id_map.end())
+        continue;
+      cpp_scopet *scope = &static_cast<cpp_scopet &>(*it->second);
+      while(!scope->is_root_scope())
+      {
+        scope = &scope->get_parent();
+        auto found = scope->lookup(
+          base_name, cpp_scopet::SCOPE_ONLY, cpp_idt::id_classt::TEMPLATE);
+        for(const auto &fid : found)
+        {
+          if(!cpp_typecheck.symbol_table.has_symbol(fid->identifier))
+            continue;
+          const symbolt &fs = cpp_typecheck.lookup(fid->identifier);
+          if(!fs.type.get_bool(ID_is_template))
+            continue;
+          const cpp_declarationt &fd = to_cpp_declaration(fs.type);
+          if(!fd.is_class_template())
+            continue;
+          irep_idt spec = fd.get_specialization_of();
+          primary_templates.insert(spec.empty() ? fid->identifier : spec);
+        }
+        if(!primary_templates.empty())
+          break;
+      }
+      if(!primary_templates.empty())
+        break;
+    }
+  }
+
+  if(primary_templates.empty())
+  {
+    cpp_typecheck.error().source_location = source_location;
+    cpp_typecheck.error() << "template '" << base_name << "' not found"
+                          << messaget::eom;
+    throw 0;
+  }
 
   if(primary_templates.size() >= 2)
   {
@@ -1984,7 +2079,8 @@ exprt cpp_typecheck_resolvet::resolve(
       typet instance =
         disambiguate_template_classes(base_name, id_set, template_args);
 
-      cpp_typecheck.elaborate_class_template(instance);
+      if(!cpp_typecheck.skip_typechecking_elaborate)
+        cpp_typecheck.elaborate_class_template(instance);
 
       identifiers.push_back(exprt(ID_type, instance));
     }
@@ -2855,6 +2951,10 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   if(fargs.has_object && it != fargs.operands.end())
     ++it;
 
+  // Track pack expansion size for non-empty packs
+  std::size_t pack_expansion_size = 0;
+  bool has_non_empty_pack = false;
+
   for(const auto &parameter : parameters)
   {
     if(it == fargs.operands.end())
@@ -2868,14 +2968,41 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
       DATA_INVARIANT(
         arg_declaration.declarators().size() == 1, "exactly one declarator");
 
+      const cpp_declaratort &declarator = arg_declaration.declarators().front();
+
+      // Check if this is a parameter pack (e.g., Args... args)
+      bool is_pack = declarator.get_bool(ID_ellipsis) ||
+                     declarator.type().get_bool(ID_ellipsis);
+
       // turn into type
-      typet arg_type = arg_declaration.declarators().front().merge_type(
-        arg_declaration.type());
+      typet arg_type = declarator.merge_type(arg_declaration.type());
 
       // We only convert the arg_type,
       // and don't typecheck it -- that could cause all
       // sorts of trouble.
       cpp_convert_plain_type(arg_type, cpp_typecheck.get_message_handler());
+
+      // For pack parameters, deduce from all remaining arguments
+      if(is_pack)
+      {
+        pack_expansion_size =
+          static_cast<std::size_t>(fargs.operands.end() - it);
+        has_non_empty_pack = pack_expansion_size > 0;
+        for(; it != fargs.operands.end(); ++it)
+        {
+          typet arg_actual_type = it->type();
+          if(arg_type.id() == ID_cpp_name)
+          {
+            arg_actual_type.remove(ID_C_constant);
+            arg_actual_type.remove(ID_C_volatile);
+            if(arg_actual_type.id() == ID_array)
+              arg_actual_type =
+                pointer_type(to_array_type(arg_actual_type).element_type());
+          }
+          guess_template_args(arg_type, arg_actual_type);
+        }
+        continue;
+      }
 
       // C++11 forwarding reference: if the parameter is T&& where T is
       // a template parameter, and the argument is an lvalue, deduce T
@@ -2927,6 +3054,27 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   cpp_template_args_tct template_args =
     cpp_typecheck.template_map.build_template_args(
       cpp_declaration.template_type());
+
+  // For non-empty variadic packs, expand the single deduced pack type
+  // to N copies in the template args so that template instantiation
+  // sees the correct number of arguments.
+  if(has_non_empty_pack && pack_expansion_size > 1)
+  {
+    const auto &params = cpp_declaration.template_type().template_parameters();
+    auto &args = template_args.arguments();
+    // Find the pack parameter (last one with ellipsis)
+    for(std::size_t i = 0; i < params.size() && i < args.size(); ++i)
+    {
+      if(params[i].get_bool(ID_ellipsis))
+      {
+        // Duplicate the deduced type for the remaining pack elements
+        exprt pack_arg = args[i];
+        for(std::size_t j = 1; j < pack_expansion_size; ++j)
+          args.insert(args.begin() + i + j, pack_arg);
+        break;
+      }
+    }
+  }
 
   // Convert deduction-failed markers (ID_nil) to ID_unassigned so that
   // has_unassigned() detects them and rejects the template.
@@ -3096,6 +3244,57 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
         }
       }
     }
+  }
+
+  // When a variadic pack is non-empty, expand the pack parameter to
+  // N copies in the function type so that it matches the argument count.
+  if(has_non_empty_pack && function_type.id() == ID_function_type)
+  {
+    irept::subt &fparams = function_type.add(ID_parameters).get_sub();
+    irept::subt expanded;
+    for(const auto &p : fparams)
+    {
+      bool is_pack_param = false;
+      if(p.id() == ID_cpp_declaration)
+      {
+        const auto &decl = to_cpp_declaration(p);
+        if(!decl.declarators().empty())
+        {
+          const auto &d = decl.declarators().front();
+          is_pack_param =
+            d.get_bool(ID_ellipsis) || d.type().get_bool(ID_ellipsis);
+        }
+      }
+      else if(p.id() == ID_ellipsis)
+      {
+        is_pack_param = true;
+      }
+
+      if(is_pack_param)
+      {
+        // Create N copies of the pack parameter without the ellipsis flag
+        for(std::size_t i = 0; i < pack_expansion_size; ++i)
+        {
+          if(p.id() == ID_cpp_declaration)
+          {
+            irept copy = p;
+            auto &decl = static_cast<cpp_declarationt &>(copy);
+            if(!decl.declarators().empty())
+            {
+              auto &d = decl.declarators().front();
+              d.set(ID_ellipsis, false);
+              d.type().set(ID_ellipsis, false);
+            }
+            expanded.push_back(std::move(copy));
+          }
+        }
+      }
+      else
+      {
+        expanded.push_back(p);
+      }
+    }
+    fparams = std::move(expanded);
   }
 
   // Type-check the function type in a SFINAE context: suppress error

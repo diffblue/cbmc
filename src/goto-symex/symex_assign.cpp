@@ -11,7 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "symex_assign.h"
 
+#include <util/arith_tools.h>
 #include <util/byte_operators.h>
+#include <util/c_types.h>
 #include <util/pointer_expr.h>
 #include <util/range.h>
 
@@ -283,6 +285,32 @@ void symex_assignt::assign_typecast(
   exprt::operandst &guard)
 {
   // these may come from dereferencing on the lhs
+
+  const typet &lhs_type = lhs.type();
+  const typet &inner_type = lhs.op().type();
+
+  // When the typecast narrows a struct (e.g., writing to a base-class
+  // subobject through a cast pointer), use byte_update to preserve the
+  // remaining members of the larger struct.
+  if(
+    lhs_type.id() == ID_struct_tag && inner_type.id() == ID_struct_tag &&
+    lhs_type != inner_type)
+  {
+    const struct_typet &lhs_struct =
+      ns.follow_tag(to_struct_tag_type(lhs_type));
+    const struct_typet &inner_struct =
+      ns.follow_tag(to_struct_tag_type(inner_type));
+    if(lhs_struct.is_prefix_of(inner_struct))
+    {
+      const byte_update_exprt new_rhs =
+        make_byte_update(lhs.op(), from_integer(0, signed_size_type()), rhs);
+      expr_skeletont new_skeleton =
+        full_lhs.compose(expr_skeletont::remove_op0(lhs));
+      assign_rec(lhs.op(), new_skeleton, new_rhs, guard);
+      return;
+    }
+  }
+
   exprt rhs_typecasted = typecast_exprt::conditional_cast(rhs, lhs.op().type());
   expr_skeletont new_skeleton =
     full_lhs.compose(expr_skeletont::remove_op0(lhs));

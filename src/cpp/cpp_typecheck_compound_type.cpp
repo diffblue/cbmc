@@ -491,7 +491,6 @@ void cpp_typecheckt::typecheck_compound_declarator(
       // empty body so that member initialization is generated
       value = codet(ID_block);
       value.add_source_location() = declaration.source_location();
-      initializers.make_nil();
     }
 
     component.set(ID_is_inline, declaration.member_spec().is_inline());

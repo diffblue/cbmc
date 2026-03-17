@@ -101,7 +101,23 @@ void cpp_typecheckt::typecheck()
   current_linkage_spec=ID_auto;
 
   for(auto &item : cpp_parse_tree.items)
-    convert(item);
+  {
+    try
+    {
+      convert(item);
+    }
+    catch(int)
+    {
+      // Continue processing remaining declarations so that errors
+      // in system headers do not prevent user code from being
+      // type-checked.
+    }
+  }
+
+  // If errors occurred during the convert loop but we still have
+  // declarations to process, the error count may have been
+  // incremented. We don't re-throw here; errors will be detected
+  // by typecheck_main via the error count.
 
   static_and_dynamic_initialization();
 

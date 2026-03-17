@@ -1,11 +1,8 @@
-KNOWNBUG
+CORE
 main.cpp
---cpp11
+-std=c++11
 ^EXIT=0$
 ^SIGNAL=0$
 --
 ^error
 ^PARSING ERROR
---
-Pack expansion in initializer lists parses correctly but type-checking
-of pack expansion is not yet implemented.

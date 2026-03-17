@@ -100,8 +100,8 @@ static void copy_array(
   member.copy_to_operands(cpp_namet(arg_name, source_location).as_expr());
 
   side_effect_expr_assignt assign(
-    index_exprt(array.as_expr(), constant),
-    index_exprt(member, constant),
+    binary_exprt(array.as_expr(), ID_index, constant, typet()),
+    binary_exprt(member, ID_index, constant, typet()),
     typet(),
     source_location);
 

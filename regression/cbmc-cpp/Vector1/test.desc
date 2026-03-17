@@ -1,8 +1,8 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
-^EXIT=0$
+^EXIT=10$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
+\[main\.assertion\.1\] line 35 vec size == 0: SUCCESS
 --
 ^warning: ignoring

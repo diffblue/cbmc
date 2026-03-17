@@ -167,6 +167,7 @@ protected:
 
   typedef std::list<instantiationt> instantiation_stackt;
   instantiation_stackt instantiation_stack;
+  bool had_template_instantiation = false;
 
   void show_instantiation_stack(std::ostream &);
 
@@ -174,10 +175,13 @@ protected:
   {
   public:
     instantiation_levelt(
-      instantiation_stackt &_instantiation_stack):
-      instantiation_stack(_instantiation_stack)
+      instantiation_stackt &_instantiation_stack,
+      bool &_had_template_instantiation)
+      : instantiation_stack(_instantiation_stack),
+        had_template_instantiation(_had_template_instantiation)
     {
       instantiation_stack.push_back(instantiationt());
+      had_template_instantiation = true;
     }
 
     ~instantiation_levelt()
@@ -187,6 +191,7 @@ protected:
 
   private:
     instantiation_stackt &instantiation_stack;
+    bool &had_template_instantiation;
   };
 
   const symbolt &class_template_symbol(
@@ -411,6 +416,7 @@ protected:
 
   // code conversion
   void typecheck_code(codet &) override;
+  void typecheck_return(code_frontend_returnt &) override;
   void typecheck_try_catch(codet &);
   void typecheck_member_initializer(codet &);
   void typecheck_decl(codet &) override;
@@ -589,6 +595,7 @@ private:
   dynamic_initializationst dynamic_initializations;
   bool disable_access_control;           // Disable protect and private
   bool in_template_conversion = false;   // Prevent recursion in conversion
+  bool skip_typechecking_elaborate = false;
   std::unordered_set<irep_idt> deferred_typechecking;
   bool support_float16_type;
 };

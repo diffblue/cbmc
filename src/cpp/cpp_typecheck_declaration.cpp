@@ -139,7 +139,17 @@ void cpp_typecheckt::convert_non_template_declaration(
     !defer_type &&
     (declaration.declarators().empty() || !has_auto(declaration_type)))
   {
-    typecheck_type(declaration_type);
+    // For typedefs, skip elaborate_class_template inside the resolver.
+    // Elaboration of typedef'd template instances is deferred to usage,
+    // as indicated by the !is_typedef check below.
+    if(is_typedef)
+    {
+      skip_typechecking_elaborate = true;
+      typecheck_type(declaration_type);
+      skip_typechecking_elaborate = false;
+    }
+    else
+      typecheck_type(declaration_type);
   }
 
   // Elaborate any class template instance _unless_ we do a typedef.
