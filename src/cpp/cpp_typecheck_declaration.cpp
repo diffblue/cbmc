@@ -13,7 +13,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/symbol_table_base.h>
 
 #include "cpp_declarator_converter.h"
+#include "cpp_template_type.h"
 #include "cpp_typecheck.h"
+#include "cpp_typecheck_fargs.h"
 #include "cpp_util.h"
 
 void cpp_typecheckt::convert(cpp_declarationt &declaration)
@@ -21,6 +23,66 @@ void cpp_typecheckt::convert(cpp_declarationt &declaration)
   // see if the declaration is empty
   if(declaration.is_empty())
     return;
+
+  // C++20 abbreviated function templates: if a non-template function
+  // has 'auto' parameters, synthesize template type parameters.
+  if(!declaration.is_template())
+  {
+    for(auto &d : declaration.declarators())
+    {
+      irept &func_type = d.type();
+      if(func_type.id() != ID_function_type)
+        continue;
+
+      irept &params = func_type.add(ID_parameters);
+      unsigned auto_count = 0;
+
+      for(auto &p : params.get_sub())
+      {
+        irept &param_type = p.add(ID_type);
+        if(param_type.id() == ID_auto)
+          ++auto_count;
+      }
+
+      if(auto_count == 0)
+        continue;
+
+      // Synthesize template type parameters
+      template_typet tmpl;
+      auto &tparams = tmpl.template_parameters();
+      unsigned idx = 0;
+
+      for(auto &p : params.get_sub())
+      {
+        irept &param_type = p.add(ID_type);
+        if(param_type.id() != ID_auto)
+          continue;
+
+        std::string name = "_auto_T" + std::to_string(idx++);
+        source_locationt loc =
+          static_cast<const exprt &>(param_type).source_location();
+
+        // Create template parameter declaration
+        cpp_declarationt tparam_decl;
+        tparam_decl.type() = typet("cpp-template-type");
+        tparam_decl.set(ID_is_type, true);
+        cpp_declaratort tparam_declarator;
+        tparam_declarator.name() = cpp_namet(name, loc);
+        tparam_decl.add_to_operands(std::move(tparam_declarator));
+        tparams.push_back(static_cast<const template_parametert &>(
+          static_cast<const exprt &>(tparam_decl)));
+
+        // Replace auto with the synthesized type name
+        cpp_namet type_name(name, loc);
+        param_type =
+          static_cast<const typet &>(static_cast<const irept &>(type_name));
+      }
+
+      declaration.set(ID_is_template, true);
+      declaration.add(ID_template_type) = std::move(tmpl);
+      break;
+    }
+  }
 
   // The function bodies must not be checked here,
   // but only at the very end when all declarations have been
@@ -149,7 +211,79 @@ void cpp_typecheckt::convert_non_template_declaration(
       skip_typechecking_elaborate = false;
     }
     else
-      typecheck_type(declaration_type);
+    {
+      // C++17 CTAD: if the type is a class template name without
+      // template arguments, try to deduce from constructor arguments.
+      bool ctad_done = false;
+      if(
+        declaration_type.id() == ID_cpp_name &&
+        !declaration.declarators().empty())
+      {
+        const auto &declarator = declaration.declarators().front();
+        const irept &init_args = declarator.find("init_args");
+        const exprt &init = declarator.value();
+        if(init_args.get_sub().size() > 0 || init.is_not_nil())
+        {
+          const cpp_namet &cpp_name =
+            to_cpp_name(static_cast<const irept &>(declaration_type));
+          bool has_tmpl_args = false;
+          for(const auto &sub : cpp_name.get_sub())
+          {
+            if(sub.id() == ID_template_args)
+            {
+              has_tmpl_args = true;
+              break;
+            }
+          }
+          bool is_template = false;
+          if(!has_tmpl_args)
+          {
+            const auto id_set = cpp_scopes.current_scope().lookup(
+              cpp_name.get_base_name(), cpp_scopet::RECURSIVE);
+            for(const auto *id : id_set)
+            {
+              if(id->id_class == cpp_idt::id_classt::TEMPLATE)
+              {
+                is_template = true;
+                break;
+              }
+            }
+          }
+          if(is_template)
+          {
+            irept template_args(ID_template_args);
+            irept &args_sub = template_args.add(ID_arguments);
+            if(init_args.get_sub().size() > 0)
+            {
+              for(const auto &a : init_args.get_sub())
+              {
+                exprt arg = static_cast<const exprt &>(a);
+                typecheck_expr(arg);
+                exprt type_arg(ID_type);
+                type_arg.type() = arg.type();
+                args_sub.get_sub().push_back(type_arg);
+              }
+            }
+            else if(init.is_not_nil())
+            {
+              exprt arg = init;
+              typecheck_expr(arg);
+              exprt type_arg(ID_type);
+              type_arg.type() = arg.type();
+              args_sub.get_sub().push_back(type_arg);
+            }
+            cpp_namet new_name = cpp_name;
+            new_name.get_sub().push_back(template_args);
+            declaration_type =
+              static_cast<typet &>(static_cast<irept &>(new_name));
+            typecheck_type(declaration_type);
+            ctad_done = true;
+          }
+        }
+      }
+      if(!ctad_done)
+        typecheck_type(declaration_type);
+    }
   }
 
   // Elaborate any class template instance _unless_ we do a typedef.

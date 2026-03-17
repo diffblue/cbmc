@@ -210,6 +210,27 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
           expr.id()==ID_gt  ||
           expr.id()==ID_ge)
     typecheck_expr_rel(to_binary_relation_expr(expr));
+  else if(expr.id() == ID_spaceship)
+  {
+    // C++20 <=>: lower to (a < b) ? -1 : ((a > b) ? 1 : 0)
+    auto &binary = to_binary_expr(expr);
+    typecheck_expr_main(binary.op0());
+    typecheck_expr_main(binary.op1());
+    typet result_type = signed_int_type();
+    exprt a = binary.op0();
+    exprt b = binary.op1();
+    binary_relation_exprt lt(a, ID_lt, b);
+    lt.type() = bool_typet();
+    binary_relation_exprt gt(a, ID_gt, b);
+    gt.type() = bool_typet();
+    if_exprt inner(
+      std::move(gt),
+      from_integer(1, result_type),
+      from_integer(0, result_type));
+    if_exprt outer(
+      std::move(lt), from_integer(-1, result_type), std::move(inner));
+    expr.swap(outer);
+  }
   else if(expr.id()==ID_index)
     typecheck_expr_index(expr);
   else if(expr.id()==ID_typecast)

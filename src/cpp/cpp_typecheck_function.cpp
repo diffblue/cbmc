@@ -83,6 +83,12 @@ void cpp_typecheckt::convert_parameters(
 
 void cpp_typecheckt::convert_function(symbolt &symbol)
 {
+  // Guard against recursive type-checking (e.g., constexpr functions
+  // that call themselves).
+  if(functions_being_typechecked.count(symbol.name))
+    return;
+  functions_being_typechecked.insert(symbol.name);
+
   code_typet &function_type=
     to_code_type(template_subtype(symbol.type));
 
@@ -238,6 +244,7 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   case_is_allowed = old_case_is_allowed;
 
   deferred_typechecking.erase(symbol.name);
+  functions_being_typechecked.erase(symbol.name);
 }
 
 /// for function overloading

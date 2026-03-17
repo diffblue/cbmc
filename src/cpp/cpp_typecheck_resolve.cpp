@@ -528,7 +528,8 @@ exprt cpp_typecheck_resolvet::convert_identifier(
       else
       {
         e = symbol.value;
-        PRECONDITION(e.is_not_nil());
+        if(e.is_nil())
+          e = cpp_symbol_expr(symbol);
       }
     }
     else
@@ -3512,7 +3513,10 @@ void cpp_typecheck_resolvet::apply_template_args(
     // Variable template: the type is not a function type
     if(new_symbol.type.id() != ID_code)
     {
-      expr = symbol_exprt(new_symbol.name, new_symbol.type);
+      if(new_symbol.is_macro && new_symbol.value.is_not_nil())
+        expr = new_symbol.value;
+      else
+        expr = symbol_exprt(new_symbol.name, new_symbol.type);
       expr.add_source_location() = source_location;
     }
     else

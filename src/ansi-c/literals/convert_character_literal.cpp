@@ -29,6 +29,21 @@ exprt convert_character_literal(
 
   if(src[0]=='L' || src[0]=='u' || src[0]=='U')
   {
+    // u8 prefix: char8_t (unsigned char) in C++20
+    if(src[0] == 'u' && src.size() >= 3 && src[1] == '8')
+    {
+      PRECONDITION(src[2] == '\'');
+      PRECONDITION(src[src.size() - 1] == '\'');
+
+      std::basic_string<char32_t> value =
+        unescape_wide_string(std::string(src, 3, src.size() - 4));
+      CHECK_RETURN(!value.empty());
+
+      result = from_integer(value[0], unsigned_char_type());
+      result.add_source_location() = source_location;
+      return result;
+    }
+
     PRECONDITION(src[1] == '\'');
     PRECONDITION(src[src.size() - 1] == '\'');
 

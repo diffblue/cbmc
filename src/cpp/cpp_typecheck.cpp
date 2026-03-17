@@ -11,6 +11,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_typecheck.h"
 
+#include <util/c_types.h>
+#include <util/cprover_prefix.h>
+#include <util/mathematical_expr.h>
 #include <util/pointer_expr.h>
 #include <util/source_location.h>
 #include <util/std_code.h>
@@ -123,6 +126,8 @@ void cpp_typecheckt::typecheck()
 
   typecheck_method_bodies();
 
+  typecheck_contracts();
+
   do_not_typechecked();
 
   provide_stdlib_bodies();
@@ -151,6 +156,104 @@ std::string cpp_typecheckt::to_string(const exprt &expr)
 std::string cpp_typecheckt::to_string(const typet &type)
 {
   return type2cpp(type, *this);
+}
+
+void cpp_typecheckt::typecheck_contracts()
+{
+  // Collect symbols to process (avoid modifying symbol table while iterating)
+  std::vector<irep_idt> symbols_with_contracts;
+  for(const auto &entry : symbol_table.symbols)
+  {
+    if(
+      entry.second.type.id() == ID_code &&
+      to_code_with_contract_type(entry.second.type).has_contract())
+    {
+      symbols_with_contracts.push_back(entry.first);
+    }
+  }
+
+  for(const auto &id : symbols_with_contracts)
+  {
+    symbolt &symbol = symbol_table.get_writeable_ref(id);
+    code_with_contract_typet code_type =
+      to_code_with_contract_type(symbol.type);
+
+    // Enter the function's scope so that parameter names resolve
+    cpp_save_scopet saved_scope(cpp_scopes);
+    cpp_scopes.set_scope(symbol.name);
+
+    binding_exprt::variablest parameter_symbols;
+
+    const auto &return_type = code_type.return_type();
+    bool added_return_value = false;
+    if(return_type.id() != ID_empty)
+    {
+      parameter_symbols.emplace_back(
+        CPROVER_PREFIX "return_value", return_type);
+
+      // Add __CPROVER_return_value to the symbol table and scope
+      // so that type-checking of ensures clauses can resolve it.
+      symbolt rv_symbol{};
+      rv_symbol.name = CPROVER_PREFIX "return_value";
+      rv_symbol.base_name = CPROVER_PREFIX "return_value";
+      rv_symbol.type = return_type;
+      rv_symbol.mode = symbol.mode;
+      rv_symbol.is_lvalue = true;
+      auto result = symbol_table.insert(std::move(rv_symbol));
+      if(result.second)
+      {
+        added_return_value = true;
+        cpp_scopes.put_into_scope(result.first);
+      }
+    }
+
+    for(const auto &p : code_type.parameters())
+    {
+      if(!p.get_identifier().empty())
+        parameter_symbols.emplace_back(p.get_identifier(), p.type());
+    }
+
+    for(auto &req : code_type.c_requires())
+    {
+      typecheck_expr(req);
+      implicit_typecast_bool(req);
+      lambda_exprt lambda{parameter_symbols, req};
+      lambda.add_source_location() = req.source_location();
+      req.swap(lambda);
+    }
+
+    for(auto &ens : code_type.c_ensures())
+    {
+      typecheck_expr(ens);
+      implicit_typecast_bool(ens);
+      lambda_exprt lambda{parameter_symbols, ens};
+      lambda.add_source_location() = ens.source_location();
+      ens.swap(lambda);
+    }
+
+    // Create a dedicated contract symbol
+    symbolt contract_sym;
+    contract_sym.name = "contract::" + id2string(symbol.name);
+    contract_sym.base_name = symbol.base_name;
+    contract_sym.pretty_name = symbol.pretty_name;
+    contract_sym.is_property = true;
+    contract_sym.type = code_type;
+    contract_sym.mode = symbol.mode;
+    contract_sym.module = module;
+    contract_sym.location = symbol.location;
+
+    symbol_table.insert(std::move(contract_sym));
+
+    // Remove contracts from the original symbol
+    symbol.type.remove(ID_C_spec_requires);
+    symbol.type.remove(ID_C_spec_ensures);
+    symbol.type.remove(ID_C_spec_assigns);
+    symbol.type.remove(ID_C_spec_frees);
+
+    // Clean up temporary __CPROVER_return_value symbol
+    if(added_return_value)
+      symbol_table.remove(CPROVER_PREFIX "return_value");
+  }
 }
 
 bool cpp_typecheck(

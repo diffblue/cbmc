@@ -709,7 +709,14 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
       if(new_symbol->is_macro)
         cpp_typecheck.convert_function(*new_symbol);
       else if(declarator.type().id() != ID_template)
-        cpp_typecheck.add_method_body(new_symbol);
+      {
+        // If the function has auto return type, type-check immediately
+        // so the return type is deduced before any call sites.
+        if(cpp_typecheck.has_auto(new_symbol->type))
+          cpp_typecheck.convert_function(*new_symbol);
+        else
+          cpp_typecheck.add_method_body(new_symbol);
+      }
     }
     else
       cpp_typecheck.convert_initializer(*new_symbol);

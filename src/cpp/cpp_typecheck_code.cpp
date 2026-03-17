@@ -94,6 +94,15 @@ void cpp_typecheckt::typecheck_code(codet &code)
   {
     // type checked already
   }
+  else if(statement == "cpp-using")
+  {
+    // using declaration in function body
+    cpp_usingt cpp_using;
+    cpp_using.swap(
+      static_cast<cpp_usingt &>(static_cast<irept &>(code.add("cpp_using"))));
+    convert(cpp_using);
+    code = codet(ID_skip);
+  }
   else if(statement == ID_expression)
   {
     if(
@@ -176,6 +185,45 @@ void cpp_typecheckt::typecheck_code(codet &code)
     typecheck_expr(range_op);
 
     typet range_type = range_op.type();
+
+    // Convert initializer_list to array for range-based for
+    std::optional<codet> arr_init;
+    if(
+      range_type.id() != ID_array && range_op.id() == ID_initializer_list &&
+      !range_op.operands().empty())
+    {
+      const typet &elem_type = range_op.operands().front().type();
+      range_type = array_typet(
+        elem_type, from_integer(range_op.operands().size(), size_type()));
+      range_op.type() = range_type;
+      // Convert initializer_list to array expression for symex
+      range_op.id(ID_array);
+
+      // Materialize into a temporary array variable
+      const std::string scope_prefix =
+        id2string(cpp_scopes.current_scope().prefix);
+      const std::string arr_id = scope_prefix + "__range_arr";
+      {
+        auxiliary_symbolt sym;
+        sym.name = arr_id;
+        sym.base_name = "__range_arr";
+        sym.type = range_type;
+        sym.mode = ID_cpp;
+        sym.module = module;
+        sym.location = loc;
+        sym.is_file_local = true;
+        sym.is_thread_local = true;
+        sym.is_lvalue = true;
+        symbol_table.insert(std::move(sym));
+      }
+      symbol_exprt arr_sym(arr_id, range_type);
+      codet assign_arr(ID_assign);
+      assign_arr.copy_to_operands(arr_sym);
+      assign_arr.copy_to_operands(range_op);
+      assign_arr.add_source_location() = loc;
+      arr_init = std::move(assign_arr);
+      range_op = std::move(arr_sym);
+    }
 
     if(range_type.id() != ID_array)
     {
@@ -281,7 +329,18 @@ void cpp_typecheckt::typecheck_code(codet &code)
       std::move(loop_body));
     for_code.add_source_location() = loc;
 
-    code = std::move(for_code);
+    if(arr_init.has_value())
+    {
+      code_blockt block;
+      block.add(std::move(*arr_init));
+      block.add(std::move(for_code));
+      block.add_source_location() = loc;
+      code = std::move(block);
+    }
+    else
+    {
+      code = std::move(for_code);
+    }
   }
   else if(statement == "structured_binding")
   {
@@ -846,7 +905,66 @@ void cpp_typecheckt::typecheck_decl(codet &code)
   bool is_typedef = declaration.is_typedef();
 
   if(declaration.declarators().empty() || !has_auto(type))
-    typecheck_type(type);
+  {
+    // C++17 CTAD: if the type is a class template name without
+    // template arguments, try to deduce from constructor arguments.
+    bool ctad_done = false;
+    if(type.id() == ID_cpp_name && !declaration.declarators().empty())
+    {
+      const auto &declarator = declaration.declarators().front();
+      const irept &init_args = declarator.find("init_args");
+      if(init_args.get_sub().size() > 0)
+      {
+        // Check if the name resolves to a class template without
+        // explicit template arguments (CTAD candidate).
+        const cpp_namet &cpp_name =
+          to_cpp_name(static_cast<const irept &>(type));
+        bool has_tmpl_args = false;
+        for(const auto &sub : cpp_name.get_sub())
+        {
+          if(sub.id() == ID_template_args)
+          {
+            has_tmpl_args = true;
+            break;
+          }
+        }
+        bool is_template = false;
+        if(!has_tmpl_args)
+        {
+          const auto id_set = cpp_scopes.current_scope().lookup(
+            cpp_name.get_base_name(), cpp_scopet::RECURSIVE);
+          for(const auto *id : id_set)
+          {
+            if(id->id_class == cpp_idt::id_classt::TEMPLATE)
+            {
+              is_template = true;
+              break;
+            }
+          }
+        }
+        if(is_template)
+        {
+          irept template_args(ID_template_args);
+          irept &args_sub = template_args.add(ID_arguments);
+          for(const auto &a : init_args.get_sub())
+          {
+            exprt arg = static_cast<const exprt &>(a);
+            typecheck_expr(arg);
+            exprt type_arg(ID_type);
+            type_arg.type() = arg.type();
+            args_sub.get_sub().push_back(type_arg);
+          }
+          cpp_namet new_name = cpp_name;
+          new_name.get_sub().push_back(template_args);
+          type = static_cast<typet &>(static_cast<irept &>(new_name));
+          typecheck_type(type);
+          ctad_done = true;
+        }
+      }
+    }
+    if(!ctad_done)
+      typecheck_type(type);
+  }
 
   CHECK_RETURN(type.is_not_nil());
 
