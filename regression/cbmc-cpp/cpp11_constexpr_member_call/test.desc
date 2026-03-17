@@ -1,0 +1,8 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+C++11 constexpr member function call on constexpr variable — main body lost

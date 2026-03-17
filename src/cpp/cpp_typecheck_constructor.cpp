@@ -901,6 +901,19 @@ void cpp_typecheckt::full_member_initialization(
       mem_init.set(ID_member, cppname);
       final_initializers.move_to_sub(mem_init);
     }
+
+    // C++11: apply default member initializer if not explicitly initialized
+    if(!found && c.find(ID_C_default_value).is_not_nil())
+    {
+      const exprt &default_val =
+        static_cast<const exprt &>(c.find(ID_C_default_value));
+      cpp_namet cppname(mem_name);
+
+      codet mem_init(ID_member_initializer);
+      mem_init.set(ID_member, cppname);
+      mem_init.add_to_operands(default_val);
+      final_initializers.move_to_sub(mem_init);
+    }
   }
 
   initializers.swap(final_initializers);

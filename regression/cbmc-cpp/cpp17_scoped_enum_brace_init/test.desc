@@ -1,8 +1,8 @@
 CORE
 main.cpp
---cpp11
+--cpp17
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-C++11 inheriting constructors
+C++17 direct-list-initialization of scoped enum

@@ -215,7 +215,10 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
         if(code_type.return_type().id() != ID_constructor)
           continue;
         // Copy constructor: this + const T& (2 parameters)
+        // Default constructor: this only (1 parameter)
         const auto &params = code_type.parameters();
+        if(params.size() <= 1)
+          continue;
         if(params.size() == 2 && is_reference(params[1].type()))
           continue;
         has_non_copy_ctor = true;
@@ -225,9 +228,31 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
       if(!has_non_copy_ctor)
       {
         const auto &ops = symbol.value.operands();
-        struct_exprt result({}, symbol.type);
         std::size_t idx = 0;
         bool aggregate = true;
+
+        // C++17: check if we have base class initializers
+        bool has_base_init = struct_type.id() == ID_struct &&
+                             !to_struct_type(struct_type).bases().empty();
+
+        if(has_base_init)
+        {
+          // Convert to constructor-style code that initializes
+          // base subobjects and members individually.
+          // Copy operands since cpp_constructor may modify symbol.value.
+          exprt::operandst ops_copy = symbol.value.operands();
+          symbol_exprt sym_expr(symbol.name, symbol.type);
+          already_typechecked_exprt::make_already_typechecked(sym_expr);
+          auto init =
+            cpp_constructor(symbol.value.source_location(), sym_expr, ops_copy);
+          if(init.has_value())
+          {
+            symbol.value = std::move(*init);
+            return;
+          }
+        }
+
+        struct_exprt result({}, symbol.type);
         for(const auto &c : struct_type.components())
         {
           if(

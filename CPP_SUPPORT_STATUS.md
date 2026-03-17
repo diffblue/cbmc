@@ -11,12 +11,14 @@ Last updated: 2026-03-07
 - `enum class`, delegating constructors, `override`/`final`
 - `thread_local`, `char16_t`/`char32_t`, user-defined literals (numeric and string)
 - Template aliases, trailing return types, inline namespaces
+- Default template arguments for function templates — **FIXED**: `template<typename T = int> T f()` works
 - Brace initialization, `= default`, `= delete`, return with braces
 - `noexcept` operator (`noexcept(expr)`)
 - `alignof` operator
 - Explicit conversion operators (`explicit operator bool()`)
 - Perfect forwarding with rvalue references
 - SFINAE with `enable_if`
+- Default member initializers (NSDMI) — **FIXED**: applied during both POD default construction and non-POD constructor initialization
 - Range-for over braced initializer lists (`for(int x : {1,2,3})`) — **FIXED**
 - Raw string literals (`R"delim(content)delim"`) — **FIXED**: all encoding prefixes supported
 
@@ -33,8 +35,11 @@ Last updated: 2026-03-07
 ### Known gaps
 - Complex STL template instantiations often fail or produce stubs
 - `std::initializer_list` as function argument (`sum({1,2,3})`) produces "no body for main" (KNOWNBUG test: `cpp11_initializer_list_arg`)
-- Inheriting constructors (`using Base::Base`) — conversion error
+- Inheriting constructors (`using Base::Base`) — **FIXED**: base class constructors imported into derived class
 - Variadic template pack expansion in recursive functions — only last arg passed
+- Lambda returning a lambda — inner lambda symbol removed as unused (KNOWNBUG: `cpp11_lambda_returning_lambda`)
+- Calling constexpr member function on constexpr variable — main body lost (KNOWNBUG: `cpp11_constexpr_member_call`)
+- Nested member template instantiation (`Outer<int>::Inner<double>`) — parse error (KNOWNBUG: `cpp11_nested_member_template`)
 
 ---
 
@@ -68,16 +73,19 @@ Last updated: 2026-03-07
 ### Working language features (~80%)
 - `if constexpr` (in templates and non-templates)
 - Structured bindings (`auto [x,y] = s`) — including tuple-like protocol
+- Structured bindings with references (`auto& [a,b] = s`) — **FIXED**: modifications through bindings affect original
 - Nested namespaces (`namespace A::B {}`)
 - Inline variables (`static inline int x = 42`)
 - `noexcept` as part of the type system
 - Constexpr lambdas — **FIXED**: `constexpr`/`consteval` after parameter list
 - `[[nodiscard]]`, `[[maybe_unused]]`, `[[fallthrough]]`
 - `if`/`switch` with initializer (`if(int x=42; x>0)`)
+- `if` with initializer and structured bindings (`if(auto [a,b] = expr; cond)`) — **FIXED**
 - Class template argument deduction (CTAD) — **FIXED**: basic cases work
 - `template<auto>` — **FIXED**: non-type template parameter with auto type
 - `static_assert` without message
 - Scoped enum with underlying type (`enum class byte : unsigned char {}`)
+- Direct-list-initialization of scoped enums (`byte{42}`) — **FIXED**
 - Optional-like template patterns
 
 ### STL/library support (~50%)
@@ -115,8 +123,10 @@ Last updated: 2026-03-07
 - Template lambdas `[]<typename T>` (template params skipped, not instantiated)
 - `using enum` — **FIXED**: enumerators imported into scope
 - Aggregate initialization with parentheses — **FIXED**: `S s(1, 2)` for aggregates
+- Aggregate initialization with base classes — **FIXED**: `Derived d{{10}, 20}` for structs with bases
 - Function contracts `pre(expr)` / `post(name: expr)` (stored as CPROVER annotations)
 - `[[no_unique_address]]` — works (attribute ignored, which is correct for verification)
+- Range-based for with init-statement (`for(init; decl : range)`) — **FIXED**
 - `constexpr` virtual functions — works (virtual dispatch at runtime)
 - `constexpr` dynamic allocation (`new`/`delete` in constexpr) — works
 
@@ -132,6 +142,7 @@ Last updated: 2026-03-07
 - **Three-way comparison categories** (`std::strong_ordering` etc.) — **FIXED**: works with user-defined types
 - **`constexpr` containers** — not modeled
 - **Class type NTTP** (`template<Fixed F>`) — KNOWNBUG: "expected type, but got expression"
+- **Defaulted three-way comparison** (`auto operator<=>(const T&) const = default`) — no body generated (KNOWNBUG: `cpp20_defaulted_spaceship`)
 
 ---
 
@@ -198,13 +209,18 @@ Last updated: 2026-03-07
 | `cpp11_initializer_list_arg` | C++11 | `{1,2,3}` as function arg → no body for main |
 | `cpp11_template_template_deduction` | C++11 | Template template parameter deduction fails |
 | `cpp11_variadic_expansion` | C++11 | Variadic pack expansion only passes last arg |
-| `cpp11_inheriting_ctor` | C++11 | Inheriting constructors → conversion error |
+| `cpp11_inheriting_ctor` | C++11 | ~~Inheriting constructors~~ → **FIXED** |
+| `cpp11_lambda_returning_lambda` | C++11 | Lambda returning lambda — inner lambda removed |
+| `cpp11_constexpr_member_call` | C++11 | Constexpr member fn call on constexpr var — main body lost |
+| `cpp11_nested_member_template` | C++11 | Nested member template `Outer<int>::Inner<double>` parse error |
 | `cpp14_index_sequence` | C++14 | Non-type variadic template parameters |
 | `cpp17_fold_expr` | C++17 | Fold expressions need variadic pack expansion |
 | `cpp17_variadic_bases` | C++17 | Variadic template base classes |
 | `cpp17_structured_binding_array` | C++17 | Structured bindings with array → no body |
+| `cpp17_scoped_enum_brace_init` | C++17 | ~~Direct-list-init of scoped enum~~ → **FIXED** |
 | `cpp20_nttp_string` | C++20 | Class type as non-type template parameter |
-| `cpp20_aggregate_base` | C++20 | Aggregate init with base class → no body |
+| `cpp20_aggregate_base` | C++20 | ~~Aggregate init with base class~~ → **FIXED** |
+| `cpp20_defaulted_spaceship` | C++20 | Defaulted `<=>` operator — no body generated |
 | `cpp26_pack_indexing` | C++26 | Pack indexing instantiation |
 
 ## Key file locations

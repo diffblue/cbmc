@@ -1145,7 +1145,64 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
         }
       }
       if(!has_operator)
-        convert(cpp_using);
+      {
+        // C++11 inheriting constructors: using Base::Base;
+        // Detect if this refers to a base class constructor and skip
+        // the normal convert() path which fails on constructor lookup.
+        bool is_inheriting_ctor = false;
+        const auto &name_sub = cpp_using.name().get_sub();
+        if(name_sub.size() >= 3)
+        {
+          const irep_idt &last_name = name_sub.back().get(ID_identifier);
+          for(const auto &base : to_struct_type(symbol.type).bases())
+          {
+            const symbolt &base_sym = lookup(to_struct_tag_type(base.type()));
+            if(base_sym.base_name == last_name)
+            {
+              is_inheriting_ctor = true;
+              break;
+            }
+          }
+        }
+        if(!is_inheriting_ctor)
+          convert(cpp_using);
+        else
+        {
+          // Import base class constructors as derived class constructors
+          const irep_idt &last_name = name_sub.back().get(ID_identifier);
+          found_ctor = true;
+          for(const auto &base : to_struct_type(symbol.type).bases())
+          {
+            const symbolt &base_sym = lookup(to_struct_tag_type(base.type()));
+            if(base_sym.base_name != last_name)
+              continue;
+            for(const auto &comp : to_struct_type(base_sym.type).components())
+            {
+              if(comp.type().id() != ID_code)
+                continue;
+              const code_typet &ctor_type = to_code_type(comp.type());
+              if(ctor_type.return_type().id() != ID_constructor)
+                continue;
+              // Skip default and copy/move constructors
+              if(ctor_type.parameters().size() <= 1)
+                continue;
+              if(
+                ctor_type.parameters().size() == 2 &&
+                ctor_type.parameters()[1].type().id() == ID_pointer &&
+                is_reference(ctor_type.parameters()[1].type()))
+                continue;
+              // Create a derived-class constructor component that
+              // mirrors the base constructor
+              struct_typet::componentt new_comp = comp;
+              new_comp.set(ID_from_base, false);
+              new_comp.set(ID_access, access);
+              new_comp.set_base_name(symbol.base_name);
+              components.push_back(new_comp);
+            }
+            break;
+          }
+        }
+      }
     }
     else
     {
