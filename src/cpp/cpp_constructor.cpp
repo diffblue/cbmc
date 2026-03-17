@@ -357,7 +357,12 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
       }
     }
 
-    INVARIANT(!constructor_name.empty(), "non-PODs should have a constructor");
+    if(constructor_name.empty())
+    {
+      error().source_location = source_location;
+      error() << "non-POD type has no constructor" << eom;
+      throw 0;
+    }
 
     side_effect_expr_function_callt function_call(
       cpp_namet(constructor_name, source_location).as_expr(),

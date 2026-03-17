@@ -1,6 +1,6 @@
 # C++ Support Status — cpp11-parser-rework branch
 
-Last updated: 2026-03-11 (session 22, continued)
+Last updated: 2026-03-11 (session 24)
 
 ## C++11 — ~90% complete
 
@@ -33,7 +33,7 @@ Last updated: 2026-03-11 (session 22, continued)
 - `std::unique_ptr` — basic usage works (template constructor partially fails but main body preserved)
 - `std::shared_ptr` — type mismatch error in make_shared constructor instantiation
 - `std::function` — basic usage works (template constructor partially fails but main body preserved)
-- `std::regex` — times out during type-checking
+- `std::regex` — scope 'regex_constants' not found during type-checking
 - `std::initializer_list` — **FIXED**: brace-init-list `{1,2,3}` converts to `std::initializer_list<T>` for function arguments and constructors
 - `std::string` — basic operations work but `_M_construct` (iterator version) has no body
 - `std::vector` — basic operations work but `emplace_back` and `_Destroy_aux::__destroy` have no body
@@ -124,6 +124,7 @@ Last updated: 2026-03-11 (session 22, continued)
 - `constinit` (treated as constexpr)
 - `consteval` (treated as constexpr)
 - `if consteval` — **FIXED**: takes runtime (else) branch since CBMC performs runtime verification via symbolic execution
+- `if !consteval` — **FIXED**: takes runtime (if) branch
 - Designated initializers (`{.x=1, .y=2}`)
 - `<=>` spaceship operator — **FIXED**: both user-defined and built-in on primitives
 - Three-way comparison with `std::strong_ordering` — **FIXED**: self-referential static member crash resolved
@@ -173,6 +174,7 @@ Last updated: 2026-03-11 (session 22, continued)
 - **Constexpr eval of deferred functions** — **FIXED**: skip constexpr evaluation when function body not yet type-checked
 - **Ternary in template default args with enum types** — **FIXED**: enum tags registered in parser scope; `?` allowed after template arguments
 - **Concept expressions** — **FIXED**: concepts can be used as boolean expressions (e.g., `bool b = C<int>;`, `if constexpr(C<T>)`)
+- **Concept subsumption ordering** — **FIXED**: when multiple concept-constrained overloads match, the more constrained one is preferred (e.g., `SignedIntegral` over `Integral`)
 - **Lambda init-capture with pack expansion** (`[...x = args]`) — **FIXED**: parsed and expanded during template instantiation
 - **Bitfield default member initializers** (`unsigned x:1 = 0`) — **FIXED**: use conditional expression for bitfield width
 - **`__builtin_is_constant_evaluated()`** — **FIXED**: returns false (CBMC evaluates at runtime)
@@ -249,6 +251,7 @@ Last updated: 2026-03-11 (session 22, continued)
 13. **c_bool vs bool type mismatch in symex** — **FIXED**: symex_assign now reconciles C `_Bool` (c_bool) and C++ `bool` types via typecast.
 14. **Invariant violations in constructor, constexpr eval, and designated initializer** — **FIXED**: converted hard invariants to graceful errors for constructor resolution failure, non-symbol LHS in constexpr evaluator, and out-of-bounds designator index.
 15. **Auto return type deduction for template methods at call site** — **FIXED**: when a template method with `auto` return type is called, the method body is immediately type-checked to deduce the return type before the call expression is built.
+16. **Concept subsumption ordering** — **FIXED**: concept constraint names stored on template parameters; function template identifiers include concept constraints; overload resolution filters less-constrained candidates.
 
 ## KNOWNBUG tests (documented gaps)
 
@@ -285,10 +288,33 @@ Last updated: 2026-03-11 (session 22, continued)
 | `cpp11_function_basic` | C++11 | **FIXED**: std::function basic usage works |
 | `cpp11_string_basic` | C++11 | std::string: _M_construct has no body |
 | `cpp11_vector_push_back` | C++11 | std::vector: emplace_back has no body |
+| `cpp11_regex_basic` | C++11 | std::regex: scope 'regex_constants' not found |
 | `cpp14_unique_ptr_basic` | C++14 | **FIXED**: std::unique_ptr basic usage works |
 | `cpp17_make_tuple` | C++17 | **FIXED**: std::make_tuple basic usage works |
+| `cpp17_filesystem_basic` | C++17 | std::filesystem: type-checking errors |
 | `cpp20_ranges_basic` | C++20 | `<ranges>`: conversion error in views::take |
+| `cpp20_format_header` | C++20 | `<format>`: parse errors (partially fixed — line 611 fixed, line 3026+ remain) |
 | `cpp23_expected_basic` | C++23 | **FIXED**: std::expected basic usage works |
+
+### Session 24 new CORE tests
+
+| Test | Standard | Feature |
+|------|----------|---------|
+| `cpp20_designated_init` | C++20 | Designated initializers |
+| `cpp20_three_way_comparison` | C++20 | Spaceship operator with defaulted `<=>` |
+| `cpp20_constexpr_virtual` | C++20 | Constexpr virtual functions |
+| `cpp20_lambda_template` | C++20 | Template lambda expressions |
+| `cpp23_deducing_this` | C++23 | Explicit object parameter |
+| `cpp23_multidim_subscript` | C++23 | Multidimensional `operator[]` |
+| `cpp23_static_operator` | C++23 | Static `operator()` |
+| `cpp23_size_literal` | C++23 | `uz`/`UZ` size_t literal suffix |
+| `cpp23_if_consteval` | C++23 | `if consteval` and `if !consteval` |
+| `cpp23_if_not_consteval` | C++23 | `if !consteval` (negated form) |
+
+### Session 24 fixes
+
+- **`if !consteval`**: Parser now handles the negated form, taking the runtime (if) branch
+- **Template parameter scope leak**: Fixed scope leak where template parameter names (e.g., `_Align` from `aligned_storage`) leaked into subsequent declarations, causing parse errors with enum/class types whose names collided with template parameters from system headers
 
 ## Key file locations
 

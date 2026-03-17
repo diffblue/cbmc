@@ -1,0 +1,8 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+std::regex: scope 'regex_constants' not found during type-checking

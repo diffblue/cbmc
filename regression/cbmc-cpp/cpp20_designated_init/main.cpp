@@ -1,3 +1,4 @@
+// C++20 designated initializers
 struct Point
 {
   int x;
@@ -7,8 +8,8 @@ struct Point
 
 int main()
 {
-  Point p = {.x = 1, .y = 2, .z = 3};
+  Point p = {.x = 1, .z = 3};
   __CPROVER_assert(p.x == 1, "x");
-  __CPROVER_assert(p.y == 2, "y");
+  __CPROVER_assert(p.y == 0, "y");
   __CPROVER_assert(p.z == 3, "z");
 }

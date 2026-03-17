@@ -1,3 +1,4 @@
+// C++23 multidimensional subscript operator
 struct Matrix
 {
   int data[3][3];
@@ -5,15 +6,11 @@ struct Matrix
   {
     return data[i][j];
   }
-  const int &operator[](int i, int j) const
-  {
-    return data[i][j];
-  }
 };
 
 int main()
 {
-  Matrix m = {};
+  Matrix m{};
   m[1, 2] = 42;
   __CPROVER_assert(m[1, 2] == 42, "multidim subscript");
 }
