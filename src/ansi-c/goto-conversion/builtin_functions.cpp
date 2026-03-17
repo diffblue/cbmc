@@ -528,7 +528,8 @@ void goto_convertt::cpp_new_initializer(
         lhs, to_pointer_type(rhs.type()).base_type());
 
       replace_new_object(deref_lhs, initializer);
-      convert(to_code(initializer), dest, ID_cpp);
+      if(initializer.id() == ID_code)
+        convert(to_code(initializer), dest, ID_cpp);
     }
     else
       UNREACHABLE;

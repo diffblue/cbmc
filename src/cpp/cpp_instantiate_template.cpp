@@ -573,7 +573,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
     throw 0;
   }
 
-  instantiation_levelt i_level(instantiation_stack);
+  instantiation_levelt i_level(instantiation_stack, had_template_instantiation);
   instantiation_stack.back().source_location=source_location;
   instantiation_stack.back().identifier=template_symbol.name;
   instantiation_stack.back().full_template_args=full_template_args;

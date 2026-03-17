@@ -68,6 +68,10 @@ void cpp_internal_additions(std::ostream &out)
   out << "typedef void " CPROVER_PREFIX "integer;" << '\n';
   out << "typedef void " CPROVER_PREFIX "rational;" << '\n';
 
+  // memory model
+  out << "extern unsigned char " CPROVER_PREFIX
+      << "memory[__CPROVER::constant_infinity_uint];" << '\n';
+
   // malloc
   out << "const void *" CPROVER_PREFIX "deallocated = 0;" << '\n';
   out << "const void *" CPROVER_PREFIX "dead_object = 0;" << '\n';

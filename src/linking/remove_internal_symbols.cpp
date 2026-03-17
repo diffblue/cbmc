@@ -45,7 +45,7 @@ static void get_symbols(
 
     // ID of named subs of loop contracts
     std::vector<irep_idt> loop_contracts_subs{
-      ID_C_spec_loop_invariant, ID_C_spec_decreases};
+      ID_C_spec_loop_invariant, ID_C_spec_decreases, ID_initializer};
 
     find_type_and_expr_symbols(symbol.type, new_symbols, loop_contracts_subs);
     find_type_and_expr_symbols(symbol.value, new_symbols, loop_contracts_subs);

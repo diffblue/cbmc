@@ -1,6 +1,6 @@
-KNOWNBUG
+CORE
 main.cpp
--DNO_IO -DNO_STRING
+-DNO_IO -DNO_STRING --no-unwinding-assertions --unwind 5
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

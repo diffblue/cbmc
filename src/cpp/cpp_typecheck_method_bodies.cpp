@@ -46,10 +46,18 @@ void cpp_typecheckt::typecheck_method_bodies()
 #endif
     if(body.is_not_nil() && body != 0)
     {
-      // For template-instantiated methods, suppress error messages
-      // so that failures (e.g., unsupported standard library
-      // constructs) do not increment the error count.
-      if(!instantiation_stack.empty())
+      // For template-instantiated methods and methods from system
+      // headers, suppress error messages so that failures (e.g.,
+      // unsupported standard library constructs) do not increment
+      // the error count.
+      bool suppress = !instantiation_stack.empty();
+      if(!suppress)
+      {
+        const auto &loc = method_symbol.location;
+        const std::string file = id2string(loc.get_file());
+        suppress = !file.empty() && file[0] == '/';
+      }
+      if(suppress)
       {
         null_message_handlert null_handler;
         message_handlert &old_handler = get_message_handler();
@@ -65,7 +73,28 @@ void cpp_typecheckt::typecheck_method_bodies()
         }
       }
       else
-        convert_function(method_symbol);
+      {
+        had_template_instantiation = false;
+        const std::size_t errors_before =
+          get_message_handler().get_message_count(messaget::M_ERROR);
+        try
+        {
+          convert_function(method_symbol);
+        }
+        catch(int)
+        {
+          // If the error originated from template instantiation
+          // (e.g., unsupported STL constructs), suppress it rather
+          // than failing the entire translation unit.
+          if(had_template_instantiation)
+          {
+            get_message_handler().set_message_count(
+              messaget::M_ERROR, errors_before);
+            continue;
+          }
+          throw;
+        }
+      }
     }
   }
 

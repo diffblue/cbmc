@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/c_types.h>
+#include <util/expr_initializer.h>
 #include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
 #include <util/source_location.h>
@@ -25,6 +26,52 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck.h"
 #include "cpp_typecheck_fargs.h"
 #include "cpp_util.h"
+
+void cpp_typecheckt::typecheck_return(code_frontend_returnt &code)
+{
+  c_typecheck_baset::typecheck_return(code);
+
+  // For non-POD class-type return values, insert a copy constructor call.
+  if(
+    code.has_return_value() && !is_reference(return_type) &&
+    !cpp_is_pod(return_type) &&
+    (return_type.id() == ID_struct_tag || return_type.id() == ID_union_tag) &&
+    code.return_value().id() != ID_temporary_object &&
+    code.return_value().id() != ID_side_effect)
+  {
+    // Check that the destructor symbol exists for the return type.
+    const struct_typet &struct_type =
+      follow_tag(to_struct_tag_type(return_type));
+    bool has_dtor = false;
+    for(const auto &c : struct_type.components())
+    {
+      if(
+        c.type().id() == ID_code &&
+        to_code_type(c.type()).return_type().id() == ID_destructor)
+      {
+        const symbolt *dtor_sym;
+        has_dtor = !lookup(c.get_name(), dtor_sym);
+        break;
+      }
+    }
+    if(has_dtor)
+    {
+      // Skip types from the std namespace to avoid crashes from
+      // incomplete destructor chains in STL types.
+      const irep_idt &tag_id = to_struct_tag_type(return_type).get_identifier();
+      if(id2string(tag_id).find("std::") != std::string::npos)
+        return;
+
+      exprt temporary;
+      new_temporary(
+        code.return_value().source_location(),
+        return_type,
+        already_typechecked_exprt{code.return_value()},
+        temporary);
+      code.return_value().swap(temporary);
+    }
+  }
+}
 
 void cpp_typecheckt::typecheck_code(codet &code)
 {
@@ -74,6 +121,7 @@ void cpp_typecheckt::typecheck_code(codet &code)
           array.type().id() == ID_signedbv ||
           array.type().id() == ID_unsignedbv)
         {
+          typecheck_expr(binary_expr.op1());
           shl_exprt shl{
             from_integer(1, array.type()),
             to_index_expr(binary_expr.op0()).index()};
@@ -625,6 +673,10 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
         to_symbol_expr(symbol_expr).get_identifier());
       if(callee.value.id() == ID_cpp_not_typechecked)
         callee.value.set(ID_is_used, true);
+      if(callee.value.is_not_nil() && deferred_typechecking.count(callee.name))
+      {
+        add_method_body(&callee);
+      }
     }
 
     code.swap(code_expression);
@@ -731,6 +783,33 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
 
         if(call.has_value())
           code.swap(call.value());
+        else if(wrapped_ops.empty())
+        {
+          // Value-initialization of a POD member: zero-initialize.
+          // symbol_expr is wrapped in already_typechecked_exprt, so
+          // get the inner expression for the actual type.
+          exprt &inner = symbol_expr.id() == ID_already_typechecked
+                           ? to_already_typechecked_expr(symbol_expr).get_expr()
+                           : symbol_expr;
+          auto zero =
+            ::zero_initializer(inner.type(), code.source_location(), *this);
+          if(zero.has_value())
+          {
+            inner.type().set(ID_C_constant, false);
+            inner.set(ID_C_lvalue, true);
+            side_effect_expr_assignt assign(
+              inner, *zero, typet(), code.source_location());
+            typecheck_side_effect_assignment(assign);
+            code_expressiont new_code(std::move(assign));
+            code.swap(new_code);
+          }
+          else
+          {
+            auto source_location = code.source_location();
+            code = code_skipt();
+            code.add_source_location() = source_location;
+          }
+        }
         else
         {
           auto source_location = code.source_location();
