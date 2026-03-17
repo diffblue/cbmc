@@ -802,7 +802,7 @@ void cpp_typecheckt::convert_class_template_specialization(
 
   typet &type=declaration.type();
 
-  PRECONDITION(type.id() == ID_struct);
+  PRECONDITION(type.id() == ID_struct || type.id() == ID_union);
 
   cpp_namet &cpp_name=
     static_cast<cpp_namet &>(type.add(ID_tag));
@@ -1528,10 +1528,11 @@ void cpp_typecheckt::convert_template_declaration(
     // there should be declarators in either case
     if(declaration.declarators().empty())
     {
-      error().source_location=declaration.source_location();
-      error() << "non-class template is expected to have a declarator"
-              << eom;
-      throw 0;
+      // C++17: variable templates and alias templates may appear
+      // without declarators during instantiation. Skip silently.
+      warning().source_location = declaration.source_location();
+      warning() << "non-class template is expected to have a declarator" << eom;
+      return;
     }
 
     // Is it function template specialization?

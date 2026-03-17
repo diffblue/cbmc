@@ -1,0 +1,9 @@
+CORE
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Calling operator() on a temporary object (e.g. F()(42)).

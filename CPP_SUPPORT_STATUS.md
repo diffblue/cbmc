@@ -1,6 +1,6 @@
 # C++ Support Status — cpp11-parser-rework branch
 
-Last updated: 2026-03-10 (session 13)
+Last updated: 2026-03-10 (session 16)
 
 ## C++11 — ~90% complete
 
@@ -148,7 +148,7 @@ Last updated: 2026-03-10 (session 13)
 - `<utility>` in C++20 — **FIXED**: works (was blocked by `<compare>`)
 - `<numbers>` — works
 - `<bit>` — works
-- `<format>`, `<coroutine>` — parse errors
+- `<format>`, `<coroutine>` — parse errors / type-checking errors (KNOWNBUG tests added)
 
 ### Known gaps — language
 - **Abbreviated function templates** (`auto f(auto x)`) — **FIXED**: auto params synthesize template type params
@@ -168,6 +168,7 @@ Last updated: 2026-03-10 (session 13)
 - **Synthesized `operator!=`** — **FIXED**: `a != b` rewritten as `!(a == b)` when no explicit `operator!=` exists
 - **Constexpr eval of deferred functions** — **FIXED**: skip constexpr evaluation when function body not yet type-checked
 - **Ternary in template default args with enum types** — **FIXED**: enum tags registered in parser scope; `?` allowed after template arguments
+- **Concept expressions** — **FIXED**: concepts can be used as boolean expressions (e.g., `bool b = C<int>;`, `if constexpr(C<T>)`)
 - **Lambda init-capture with pack expansion** (`[...x = args]`) — **FIXED**: parsed and expanded during template instantiation
 - **Bitfield default member initializers** (`unsigned x:1 = 0`) — **FIXED**: use conditional expression for bitfield width
 - **`__builtin_is_constant_evaluated()`** — **FIXED**: returns false (CBMC evaluates at runtime)
@@ -233,6 +234,10 @@ Last updated: 2026-03-10 (session 13)
 3. **C++20+ is partially stubbed** — the parser accepts most syntax but semantic support (coroutine state machines, concept constraint checking, module system) is incomplete.
 4. **`__builtin_strlen`** — **FIXED**: library model added, enables `std::string_view` verification.
 5. **`__builtin_is_constant_evaluated`** — **FIXED**: returns false in C++ type-checker.
+6. **Struct zero-initialization with type aliases** — **FIXED**: type alias components (e.g., `using is_transparent = void;`) now skipped during zero-init.
+7. **Template instantiation with unresolved args** — **FIXED**: `class_template_symbol` returns template symbol instead of crashing.
+8. **`operator()` on temporary objects** — **FIXED**: temporary wrapped in `temporary_object` side effect for this-pointer formation.
+9. **Precondition instrumentation crash** — **FIXED**: skip `actuals_replace_map` when no preconditions, avoiding namespace lookup crash for missing destructor symbols.
 
 ## KNOWNBUG tests (documented gaps)
 
@@ -257,6 +262,12 @@ Last updated: 2026-03-10 (session 13)
 | `cpp17_variadic_bases` | C++17 | **FIXED**: variadic base classes expanded during class template instantiation |
 | `cpp20_lambda_unevaluated` | C++20 | Lambda in unevaluated context (decltype) |
 | `cpp20_nttp_string` | C++20 | Class type as non-type template parameter |
+| `cpp20_ternary_template_default` | C++20 | **FIXED**: merge_type crash with empty type |
+| `cpp20_coroutine_header` | C++20 | `<coroutine>` header: auto return type deduction in operator<=> |
+| `cpp20_format_header` | C++20 | `<format>` header: parse errors |
+| `cpp17_optional_has_value` | C++17 | std::optional has_value(): no body for main() |
+| `cpp11_temp_operator_call` | C++11 | **FIXED**: operator() on temporary object |
+| `cpp17_variant_basic` | C++17 | std::variant: _Nth_type not found |
 | `cpp20_lambda_pack_capture` | C++20 | **FIXED**: Lambda init-capture with pack expansion |
 | `cpp26_pack_indexing` | C++26 | **FIXED**: Pack indexing instantiation |
 

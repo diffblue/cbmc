@@ -202,9 +202,9 @@ std::optional<exprt> expr_initializert::expr_initializer_rec(
 
     for(const auto &c : components)
     {
-      // C++ structs may have methods as components; skip them
-      // as struct_exprt values only contain data member operands.
-      if(c.type().id() == ID_code)
+      // C++ structs may have methods or type aliases as components;
+      // skip them as struct_exprt values only contain data member operands.
+      if(c.type().id() == ID_code || c.get_bool(ID_is_type))
         continue;
 
       const auto member =

@@ -1,8 +1,6 @@
-// C++23 auto(x) decay copy
 int main()
 {
-  int a = 5;
-  auto b = auto(a);
-  __CPROVER_assert(b == 5, "auto decay");
-  return 0;
+  int arr[] = {1, 2, 3};
+  auto p = auto(arr); // decays to int*
+  __CPROVER_assert(*p == 1, "decay copy");
 }

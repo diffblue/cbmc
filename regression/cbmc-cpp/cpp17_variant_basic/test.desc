@@ -1,0 +1,10 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+std::variant basic usage. Fails because _Nth_type<0,int>::type
+is not found during template instantiation.
