@@ -350,7 +350,7 @@ void cpp_declarator_convertert::handle_initializer(
   exprt &value=declarator.value();
 
   // moves member initializers into 'value' - only methods have these
-  if(symbol.type.id() == ID_code)
+  if(symbol.type.id() == ID_code && value.is_not_nil())
     cpp_typecheck.move_member_initializers(
       declarator.member_initializers(), to_code_type(symbol.type), value);
 

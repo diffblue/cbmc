@@ -14,6 +14,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/c_types.h>
 #include <util/pointer_expr.h>
 #include <util/source_location.h>
+#include <util/std_code.h>
+#include <util/string_constant.h>
+#include <util/symbol_table_base.h>
 
 #include "cpp_declarator_converter.h"
 #include "cpp_exception_id.h"
@@ -84,6 +87,151 @@ void cpp_typecheckt::typecheck_code(codet &code)
     }
 
     c_typecheck_baset::typecheck_code(code);
+  }
+  else if(statement == ID_static_assert)
+  {
+    PRECONDITION(code.operands().size() == 1 || code.operands().size() == 2);
+
+    typecheck_expr(code.op0());
+    if(code.operands().size() == 2)
+      typecheck_expr(code.op1());
+
+    implicit_typecast_bool(code.op0());
+    simplify(code.op0(), *this);
+
+    if(code.op0().is_constant() && code.op0() == false_exprt())
+    {
+      error().source_location = code.find_source_location();
+      error() << "static assertion failed";
+      if(code.operands().size() == 2 && code.op1().id() == ID_string_constant)
+        error() << ": " << to_string_constant(code.op1()).value();
+      error() << eom;
+      throw 0;
+    }
+  }
+  else if(statement == "for_range")
+  {
+    // Lower range-based for to a regular for loop.
+    // for(decl : range) body  →
+    // { type var; for(size_t __i=0; __i<N; ++__i) { var=range[__i]; body } }
+    code.type() = empty_typet();
+    source_locationt loc = code.source_location();
+
+    PRECONDITION(code.operands().size() == 3);
+    exprt decl_op = code.op0();
+    exprt range_op = code.op1();
+    codet body = to_code(code.op2());
+
+    // Type-check the range expression
+    typecheck_expr(range_op);
+
+    typet range_type = range_op.type();
+
+    if(range_type.id() != ID_array)
+    {
+      error().source_location = loc;
+      error() << "range-based for requires an array type" << eom;
+      throw 0;
+    }
+
+    const exprt array_size =
+      typecast_exprt(to_array_type(range_type).size(), size_type());
+    const typet &elem_type = to_array_type(range_type).element_type();
+
+    // Extract variable name from the declaration
+    cpp_declarationt &cpp_decl = static_cast<cpp_declarationt &>(decl_op);
+    PRECONDITION(!cpp_decl.declarators().empty());
+    cpp_declaratort &declarator = cpp_decl.declarators().front();
+    const irep_idt &var_base_name =
+      declarator.name().get_sub().front().get(ID_identifier);
+
+    // Resolve auto type
+    typet var_type = cpp_decl.type();
+    if(var_type.id() == ID_auto)
+      var_type = elem_type;
+    else
+      typecheck_type(var_type);
+
+    // Create the loop variable via a normal declaration
+    const std::string scope_prefix =
+      id2string(cpp_scopes.current_scope().prefix);
+
+    // Index variable: __CPROVER_size_t __range_i
+    const std::string idx_id = scope_prefix + "__range_i";
+    {
+      auxiliary_symbolt sym;
+      sym.name = idx_id;
+      sym.base_name = "__range_i";
+      sym.type = size_type();
+      sym.mode = ID_cpp;
+      sym.module = module;
+      sym.location = loc;
+      sym.is_file_local = true;
+      sym.is_thread_local = true;
+      sym.is_lvalue = true;
+      symbol_table.insert(std::move(sym));
+    }
+    symbol_exprt idx_expr(idx_id, size_type());
+
+    // Loop variable
+    const std::string var_id = scope_prefix + id2string(var_base_name);
+    {
+      auxiliary_symbolt sym;
+      sym.name = var_id;
+      sym.base_name = var_base_name;
+      sym.type = var_type;
+      sym.mode = ID_cpp;
+      sym.module = module;
+      sym.location = loc;
+      sym.is_file_local = true;
+      sym.is_thread_local = true;
+      sym.is_lvalue = true;
+      symbol_table.insert(std::move(sym));
+
+      cpp_idt &scope_id =
+        cpp_scopes.put_into_scope(symbol_table.lookup_ref(var_id));
+      scope_id.id_class = cpp_idt::id_classt::SYMBOL;
+    }
+    symbol_exprt var_expr(var_id, var_type);
+
+    // init: __range_i = 0
+    codet init_code(ID_assign);
+    init_code.copy_to_operands(idx_expr);
+    init_code.copy_to_operands(from_integer(0, size_type()));
+    init_code.add_source_location() = loc;
+
+    // cond: __range_i < N
+    binary_relation_exprt cond(idx_expr, ID_lt, array_size);
+    cond.add_source_location() = loc;
+
+    // iter: ++__range_i
+    side_effect_exprt iter(ID_preincrement, size_type(), loc);
+    iter.copy_to_operands(idx_expr);
+
+    // var = range[__range_i]
+    index_exprt elem(range_op, idx_expr);
+    codet assign_elem(ID_assign);
+    assign_elem.copy_to_operands(var_expr);
+    assign_elem.copy_to_operands(elem);
+    assign_elem.add_source_location() = loc;
+
+    // Type-check the body
+    typecheck_code(body);
+
+    // Build: { var = range[__i]; body; }
+    code_blockt loop_body;
+    loop_body.add(std::move(assign_elem));
+    loop_body.add(std::move(body));
+    loop_body.add_source_location() = loc;
+
+    code_fort for_code(
+      std::move(init_code),
+      std::move(cond),
+      std::move(iter),
+      std::move(loop_body));
+    for_code.add_source_location() = loc;
+
+    code = std::move(for_code);
   }
   else
     c_typecheck_baset::typecheck_code(code);

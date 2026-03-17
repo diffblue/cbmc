@@ -1029,8 +1029,8 @@ enable_or_disable ("enable"|"disable")
                     return make_identifier();
                 }
 
-"__aligned"     { /* ignore */ }
-"__aligned__"   { /* ignore */ }
+"__aligned"     { return make_identifier(); }
+"__aligned__"   { return make_identifier(); }
 
 "__extension__" { /* ignore */ }
 

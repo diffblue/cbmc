@@ -133,6 +133,75 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   {
     typecheck_cast_expr(expr);
   }
+  else if(expr.id() == "__is_abstract")
+  {
+    typet t = static_cast<const typet &>(expr.find(ID_type_arg));
+    typecheck_type(t);
+    // A class is abstract if it has at least one pure virtual function.
+    if(t.id() == ID_struct_tag)
+    {
+      const struct_typet &st =
+        to_struct_type(follow_tag(to_struct_tag_type(t)));
+      bool is_abstract = false;
+      for(const auto &c : st.components())
+      {
+        if(c.get_bool(ID_is_pure_virtual))
+        {
+          is_abstract = true;
+          break;
+        }
+      }
+      expr = is_abstract ? exprt(true_exprt()) : exprt(false_exprt());
+    }
+    else
+      expr = false_exprt();
+  }
+  else if(
+    expr.id() == "__is_class" || expr.id() == "__is_empty" ||
+    expr.id() == "__is_enum" || expr.id() == "__is_final" ||
+    expr.id() == "__is_aggregate" || expr.id() == "__is_pod" ||
+    expr.id() == "__is_polymorphic" || expr.id() == "__is_union" ||
+    expr.id() == "__is_trivial" || expr.id() == "__is_trivially_copyable" ||
+    expr.id() == "__is_standard_layout" || expr.id() == "__is_literal_type" ||
+    expr.id() == "__has_trivial_constructor" ||
+    expr.id() == "__has_trivial_copy" ||
+    expr.id() == "__has_trivial_destructor" ||
+    expr.id() == "__has_trivial_assign" ||
+    expr.id() == "__has_nothrow_assign" ||
+    expr.id() == "__has_nothrow_constructor" ||
+    expr.id() == "__has_nothrow_copy" ||
+    expr.id() == "__has_virtual_destructor" ||
+    expr.id() == "__has_unique_object_representations")
+  {
+    // Unary type predicates — conservatively return false for now.
+    typet t = static_cast<const typet &>(expr.find(ID_type_arg));
+    typecheck_type(t);
+    if(expr.id() == "__is_class")
+      expr =
+        (t.id() == ID_struct_tag) ? exprt(true_exprt()) : exprt(false_exprt());
+    else if(expr.id() == "__is_union")
+      expr =
+        (t.id() == ID_union_tag) ? exprt(true_exprt()) : exprt(false_exprt());
+    else if(expr.id() == "__is_enum")
+      expr =
+        (t.id() == ID_c_enum_tag) ? exprt(true_exprt()) : exprt(false_exprt());
+    else if(expr.id() == "__is_final")
+    {
+      bool is_final = false;
+      if(t.id() == ID_struct_tag)
+      {
+        const auto &struct_type = follow_tag(to_struct_tag_type(t));
+        is_final = struct_type.get_bool(ID_final);
+      }
+      expr = is_final ? exprt(true_exprt()) : exprt(false_exprt());
+    }
+    else
+      expr = false_exprt();
+  }
+  else if(expr.id() == "lambda")
+  {
+    typecheck_expr_lambda(expr);
+  }
   else
     c_typecheck_baset::typecheck_expr_main(expr);
 }
@@ -2270,6 +2339,8 @@ void cpp_typecheckt::typecheck_expr(exprt &expr)
   // cpp_name uses get_sub, which can get confused with expressions.
   if(expr.id()==ID_cpp_name)
     typecheck_expr_cpp_name(expr, cpp_typecheck_fargst());
+  else if(expr.id() == "lambda")
+    typecheck_expr_lambda(expr);
   else
   {
     // This does the operands, and then calls typecheck_expr_main.
@@ -2379,4 +2450,159 @@ void cpp_typecheckt::typecheck_expr_comma(exprt &expr)
 void cpp_typecheckt::typecheck_expr_rel(binary_relation_exprt &expr)
 {
   c_typecheck_baset::typecheck_expr_rel(expr);
+}
+
+void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
+{
+  // Lower C++11 lambda by creating a function where captured variables
+  // become local constants initialized to their capture-point values.
+  // The lambda becomes a function pointer.
+
+  static unsigned lambda_count = 0;
+  const std::string lambda_id = "__lambda_" + std::to_string(lambda_count++);
+  const source_locationt &loc = expr.source_location();
+  const std::string func_sym_name =
+    id2string(cpp_scopes.current_scope().prefix) + lambda_id;
+
+  // Collect captures
+  const irept &capture_list = expr.find("lambda_capture");
+  std::map<irep_idt, exprt> capture_values;
+  for(const auto &cap : capture_list.get_sub())
+  {
+    irep_idt cap_name = cap.get(ID_identifier);
+    if(cap_name.empty())
+      continue;
+    exprt cap_expr(ID_cpp_name);
+    irept name_node(ID_name);
+    name_node.set(ID_identifier, cap_name);
+    cap_expr.get_sub().push_back(name_node);
+    cap_expr.add_source_location() = loc;
+    typecheck_expr(cap_expr);
+    capture_values[cap_name] = cap_expr;
+  }
+
+  // Collect parameters
+  const irept &params_irep = expr.find(ID_parameters);
+  code_typet::parameterst func_params;
+  for(const auto &p : params_irep.get_sub())
+  {
+    const cpp_declarationt &pdecl = static_cast<const cpp_declarationt &>(p);
+    typet ptype = pdecl.type();
+    typecheck_type(ptype);
+    irep_idt pname;
+    if(!pdecl.declarators().empty())
+      pname =
+        pdecl.declarators().front().name().get_sub().front().get(ID_identifier);
+    code_typet::parametert param(ptype);
+    param.set_identifier(func_sym_name + "::" + id2string(pname));
+    param.set_base_name(pname);
+    func_params.push_back(param);
+  }
+
+  code_typet func_type(std::move(func_params), signed_int_type());
+
+  // Create parameter symbols
+  for(const auto &p : func_type.parameters())
+  {
+    auxiliary_symbolt psym;
+    psym.name = p.get_identifier();
+    psym.base_name = p.get_base_name();
+    psym.type = p.type();
+    psym.mode = ID_cpp;
+    psym.module = module;
+    psym.location = loc;
+    psym.is_file_local = true;
+    psym.is_thread_local = true;
+    psym.is_lvalue = true;
+    psym.is_parameter = true;
+    symbol_table.insert(std::move(psym));
+  }
+
+  // Type-check the body with captures and params in scope
+  codet body_code(ID_nil);
+  {
+    cpp_save_scopet save_scope(cpp_scopes);
+    cpp_scopet &lambda_scope = cpp_scopes.current_scope().new_scope(lambda_id);
+    lambda_scope.prefix = func_sym_name + "::";
+    cpp_scopes.go_to(lambda_scope);
+
+    for(const auto &p : func_type.parameters())
+    {
+      const symbolt &psym = symbol_table.lookup_ref(p.get_identifier());
+      cpp_idt &id = cpp_scopes.put_into_scope(psym);
+      id.id_class = cpp_idt::id_classt::SYMBOL;
+    }
+
+    for(const auto &cap : capture_values)
+    {
+      auxiliary_symbolt csym;
+      csym.name = func_sym_name + "::" + id2string(cap.first);
+      csym.base_name = cap.first;
+      csym.type = cap.second.type();
+      csym.value = cap.second;
+      csym.mode = ID_cpp;
+      csym.module = module;
+      csym.location = loc;
+      csym.is_file_local = true;
+      csym.is_thread_local = true;
+      csym.is_lvalue = true;
+      csym.is_state_var = true;
+      symbol_table.insert(std::move(csym));
+
+      const symbolt &inserted =
+        symbol_table.lookup_ref(func_sym_name + "::" + id2string(cap.first));
+      cpp_idt &cid = cpp_scopes.put_into_scope(inserted);
+      cid.id_class = cpp_idt::id_classt::SYMBOL;
+    }
+
+    body_code = to_code(static_cast<exprt &>(expr.add("body")));
+    typecheck_code(body_code);
+
+    // Prepend capture initializations to the body
+    if(!capture_values.empty())
+    {
+      code_blockt block;
+      for(const auto &cap : capture_values)
+      {
+        symbol_exprt cap_sym(
+          func_sym_name + "::" + id2string(cap.first), cap.second.type());
+        codet assign(ID_assign);
+        assign.copy_to_operands(cap_sym);
+        assign.copy_to_operands(cap.second);
+        assign.add_source_location() = loc;
+        block.add(std::move(assign));
+      }
+      if(body_code.get_statement() == ID_block)
+      {
+        for(auto &stmt : to_code_block(body_code).statements())
+          block.add(std::move(stmt));
+      }
+      else
+        block.add(std::move(body_code));
+      body_code = std::move(block);
+    }
+  }
+
+  // Create the function symbol
+  symbolt func_sym;
+  func_sym.name = func_sym_name;
+  func_sym.base_name = lambda_id;
+  func_sym.type = func_type;
+  func_sym.value = body_code;
+  func_sym.mode = ID_cpp;
+  func_sym.module = module;
+  func_sym.location = loc;
+  func_sym.is_file_local = true;
+  symbol_table.insert(std::move(func_sym));
+
+  {
+    const symbolt &fsym = symbol_table.lookup_ref(func_sym_name);
+    cpp_idt &fid = cpp_scopes.put_into_scope(fsym);
+    fid.id_class = cpp_idt::id_classt::SYMBOL;
+  }
+
+  // Replace the lambda with a function pointer
+  expr = address_of_exprt(symbol_exprt(func_sym_name, func_type));
+  expr.type() = pointer_typet(func_type, config.ansi_c.pointer_width);
+  expr.add_source_location() = loc;
 }
