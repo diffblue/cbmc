@@ -1,6 +1,6 @@
 # C++ Support Status — cpp11-parser-rework branch
 
-Last updated: 2026-03-07
+Last updated: 2026-03-08
 
 ## C++11 — ~90% complete
 
@@ -15,6 +15,7 @@ Last updated: 2026-03-07
 - Brace initialization, `= default`, `= delete`, return with braces
 - `noexcept` operator (`noexcept(expr)`)
 - `alignof` operator
+- `alignas` specifier on struct/class/union — **FIXED**: `struct alignas(16) S` works
 - Explicit conversion operators (`explicit operator bool()`)
 - `static constexpr auto` member type deduction — **FIXED**: auto deduced from initializer
 - Perfect forwarding with rvalue references
@@ -31,16 +32,17 @@ Last updated: 2026-03-07
 - `std::shared_ptr` — crashes
 - `std::function` — crashes
 - `std::regex` — times out during type-checking
-- `std::initializer_list` — parses but goto-conversion issues with brace-init arguments
+- `std::initializer_list` — **FIXED**: brace-init-list `{1,2,3}` converts to `std::initializer_list<T>` for function arguments and constructors
 
 ### Known gaps
 - Complex STL template instantiations often fail or produce stubs
-- `std::initializer_list` as function argument (`sum({1,2,3})`) produces "no body for main" (KNOWNBUG test: `cpp11_initializer_list_arg`)
+- `std::initializer_list` as function argument (`sum({1,2,3})`) — **FIXED**: brace-init-list to `std::initializer_list<T>` conversion
 - Inheriting constructors (`using Base::Base`) — **FIXED**: base class constructors imported into derived class
 - Variadic template pack expansion in recursive functions — only last arg passed
 - Lambda returning a lambda — inner lambda symbol removed as unused (KNOWNBUG: `cpp11_lambda_returning_lambda`)
 - Constexpr member function call on constexpr variable — **FIXED**: constexpr struct variables kept as symbols for this-pointer formation
-- Nested member template instantiation (`Outer<int>::Inner<double>`) — parse error (KNOWNBUG: `cpp11_nested_member_template`)
+- Nested member template instantiation (`Outer<int>::Inner<double>`) — **FIXED**: outer template parameters now available during inner template instantiation
+- Trailing return type with `decltype(a+b)` — parameters not in scope (KNOWNBUG: `cpp11_trailing_decltype`)
 
 ---
 
@@ -72,7 +74,7 @@ Last updated: 2026-03-07
 ## C++17 — ~75% complete
 
 ### Working language features (~80%)
-- `if constexpr` (in templates and non-templates)
+- `if constexpr` (in templates and non-templates) — **FIXED**: discarded branch not typechecked, enabling type-dependent code in branches
 - Structured bindings (`auto [x,y] = s`) — including tuple-like protocol
 - Structured bindings with references (`auto& [a,b] = s`) — **FIXED**: modifications through bindings affect original
 - Nested namespaces (`namespace A::B {}`)
@@ -82,7 +84,7 @@ Last updated: 2026-03-07
 - `[[nodiscard]]`, `[[maybe_unused]]`, `[[fallthrough]]`
 - `if`/`switch` with initializer (`if(int x=42; x>0)`)
 - `if` with initializer and structured bindings (`if(auto [a,b] = expr; cond)`) — **FIXED**
-- Class template argument deduction (CTAD) — **FIXED**: basic cases work
+- Class template argument deduction (CTAD) — **FIXED**: basic and multi-argument cases work
 - `template<auto>` — **FIXED**: non-type template parameter with auto type
 - `static_assert` without message
 - Scoped enum with underlying type (`enum class byte : unsigned char {}`)
@@ -111,7 +113,7 @@ Last updated: 2026-03-07
 - `char8_t` (as unsigned char), `u8` character literals
 - `constinit` (treated as constexpr)
 - `consteval` (treated as constexpr)
-- `if consteval` (always takes runtime/else branch)
+- `if consteval` — **FIXED**: always takes consteval (true) branch since CBMC evaluates at compile time
 - Designated initializers (`{.x=1, .y=2}`)
 - `<=>` spaceship operator — **FIXED**: both user-defined and built-in on primitives
 - Three-way comparison with `std::strong_ordering` — **FIXED**: self-referential static member crash resolved
@@ -130,6 +132,7 @@ Last updated: 2026-03-07
 - Range-based for with init-statement (`for(init; decl : range)`) — **FIXED**
 - `constexpr` virtual functions — works (virtual dispatch at runtime)
 - `constexpr` dynamic allocation (`new`/`delete` in constexpr) — works
+- Floating-point non-type template parameters — **FIXED**: `template<double D>` works
 
 ### STL/library support (~5%)
 - Most C++20 library features not modeled
@@ -144,6 +147,7 @@ Last updated: 2026-03-07
 - **`constexpr` containers** — not modeled
 - **Class type NTTP** (`template<Fixed F>`) — KNOWNBUG: "expected type, but got expression"
 - **Defaulted three-way comparison** (`auto operator<=>(const T&) const = default`) — **FIXED**: generates member-wise comparison body
+- **Relational operators from `<=>`** — **FIXED**: `<`, `>`, `<=`, `>=` synthesized from `<=>` by rewriting as `(a <=> b) < 0`
 
 ---
 
@@ -151,7 +155,7 @@ Last updated: 2026-03-07
 
 ### Working language features (~35%)
 - `uz`/`UZ` size_t literal suffix
-- `if consteval` (same as C++20 support)
+- `if consteval` — **FIXED**: takes consteval branch (see C++20)
 - Deducing this — **FIXED**: `s.get()` dispatches to `int get(this S self)`
 - Multidimensional `operator[]` — **FIXED**: `m[i,j]` syntax works in C++23 mode
 - `static operator()` — works
@@ -207,21 +211,19 @@ Last updated: 2026-03-07
 
 | Test | Standard | Issue |
 |------|----------|-------|
-| `cpp11_initializer_list_arg` | C++11 | `{1,2,3}` as function arg → no body for main |
-| `cpp11_template_template_deduction` | C++11 | Template template parameter deduction fails |
+| `cpp11_initializer_list_arg` | C++11 | **FIXED**: brace-init-list to `std::initializer_list<T>` conversion |
+| `cpp11_template_template_deduction` | C++11 | **FIXED**: template template parameter deduction |
+| `cpp11_trailing_decltype` | C++11 | **FIXED**: trailing return `decltype(a+b)` — params in scope |
 | `cpp11_variadic_expansion` | C++11 | Variadic pack expansion only passes last arg |
-| `cpp11_inheriting_ctor` | C++11 | ~~Inheriting constructors~~ → **FIXED** |
-| `cpp11_lambda_returning_lambda` | C++11 | Lambda returning lambda — inner lambda removed |
-| `cpp11_constexpr_member_call` | C++11 | Constexpr member fn call on constexpr var — main body lost |
-| `cpp11_nested_member_template` | C++11 | Nested member template `Outer<int>::Inner<double>` parse error |
+| `cpp11_lambda_returning_lambda` | C++11 | **FIXED**: lambda returning lambda |
+| `cpp11_partial_ordering` | C++11 | **FIXED**: partial ordering of template specializations |
+| `cpp11_sfinae_default_arg` | C++11 | SFINAE with `enable_if` as default template argument |
+| `cpp11_template_method_outside` | C++11 | Template method defined outside class has no body |
 | `cpp14_index_sequence` | C++14 | Non-type variadic template parameters |
+| `cpp14_decltype_auto_ref` | C++14 | `decltype(auto)` with parenthesized return not reference |
 | `cpp17_fold_expr` | C++17 | Fold expressions need variadic pack expansion |
 | `cpp17_variadic_bases` | C++17 | Variadic template base classes |
-| `cpp17_structured_binding_array` | C++17 | Structured bindings with array → no body |
-| `cpp17_scoped_enum_brace_init` | C++17 | ~~Direct-list-init of scoped enum~~ → **FIXED** |
 | `cpp20_nttp_string` | C++20 | Class type as non-type template parameter |
-| `cpp20_aggregate_base` | C++20 | ~~Aggregate init with base class~~ → **FIXED** |
-| `cpp20_defaulted_spaceship` | C++20 | Defaulted `<=>` operator — no body generated |
 | `cpp26_pack_indexing` | C++26 | Pack indexing instantiation |
 
 ## Key file locations

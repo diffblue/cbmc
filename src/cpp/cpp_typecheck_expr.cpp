@@ -933,6 +933,49 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
     }
   }
 
+  // C++20: synthesize relational operators from <=>
+  if(
+    (expr.id() == ID_lt || expr.id() == ID_gt || expr.id() == ID_le ||
+     expr.id() == ID_ge) &&
+    expr.operands().size() == 2 &&
+    to_binary_expr(expr).op0().type().id() == ID_struct_tag)
+  {
+    const irep_idt &struct_id =
+      to_binary_expr(expr).op0().type().get(ID_identifier);
+    cpp_save_scopet save_scope(cpp_scopes);
+    cpp_scopes.set_scope(struct_id);
+
+    const cpp_namet spaceship_name("operator<=>", expr.source_location());
+    cpp_typecheck_fargst fargs;
+    fargs.operands = expr.operands();
+    fargs.has_object = true;
+    fargs.in_use = true;
+
+    exprt spaceship_result =
+      resolve(spaceship_name, cpp_typecheck_resolvet::wantt::VAR, fargs, false);
+
+    if(spaceship_result.is_not_nil())
+    {
+      // Rewrite a < b  as  (a <=> b) < 0  (and similarly for >, <=, >=)
+      exprt member(ID_member);
+      member.add(ID_component_cpp_name) = spaceship_name;
+      member.copy_to_operands(
+        already_typechecked_exprt{to_binary_expr(expr).op0()});
+
+      side_effect_expr_function_callt spaceship_call(
+        std::move(member), {}, uninitialized_typet{}, expr.source_location());
+      spaceship_call.arguments().push_back(to_binary_expr(expr).op1());
+      typecheck_side_effect_function_call(spaceship_call);
+
+      exprt zero = from_integer(0, spaceship_call.type());
+      binary_relation_exprt cmp(
+        std::move(spaceship_call), expr.id(), std::move(zero));
+      cmp.add_source_location() = expr.source_location();
+      expr.swap(cmp);
+      return true;
+    }
+  }
+
   return false;
 }
 
@@ -2431,6 +2474,20 @@ void cpp_typecheckt::typecheck_function_call_arguments(
        parameter.type().id() == ID_union_tag) &&
       arg_it->id() != ID_temporary_object && arg_it->id() != ID_side_effect)
     {
+      // Brace-init-list to std::initializer_list<T>: convert before
+      // the copy-constructor path so that new_temporary sees a struct,
+      // not a raw brace-init-list.
+      if(
+        arg_it->id() == ID_initializer_list &&
+        parameter.type().id() == ID_struct_tag &&
+        id2string(to_struct_tag_type(parameter.type()).get_identifier())
+            .find("tag-initializer_list<") != std::string::npos)
+      {
+        implicit_typecast(*arg_it, parameter.type());
+        ++arg_it;
+        continue;
+      }
+
       // Non-POD class-type pass-by-value: call copy constructor.
       // Check that the destructor symbol exists (needed for the
       // temporary) to avoid crashes during goto conversion.
@@ -3036,9 +3093,9 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
 
   // Check for C++14 generic lambda (auto parameters) or
   // C++20 template lambda (unresolved type name parameters)
+  bool is_generic_lambda = false;
   {
     const irept &check_params = expr.find(ID_parameters);
-    bool has_auto_param = false;
     for(const auto &p : check_params.get_sub())
     {
       const cpp_declarationt &pdecl = static_cast<const cpp_declarationt &>(p);
@@ -3046,12 +3103,12 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
         continue;
       if(pdecl.type().id() == ID_auto || pdecl.type().id() == ID_cpp_name)
       {
-        has_auto_param = true;
+        is_generic_lambda = true;
         break;
       }
     }
 
-    if(has_auto_param)
+    if(is_generic_lambda)
     {
       generic_lambda_map[func_sym_name] = expr;
 
@@ -3122,7 +3179,22 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
     func_params.push_back(param);
   }
 
-  code_typet func_type(std::move(func_params), signed_int_type());
+  // Determine return type: use explicit trailing return type if present
+  // (and not a generic lambda where the type may reference template params),
+  // otherwise deduce from body.
+  typet lambda_return_type = signed_int_type();
+  bool deduce_return = true;
+  {
+    const irept &explicit_ret = expr.find(ID_return_type);
+    if(explicit_ret.is_not_nil() && !is_generic_lambda)
+    {
+      lambda_return_type = static_cast<const typet &>(explicit_ret);
+      typecheck_type(lambda_return_type);
+      deduce_return = false;
+    }
+  }
+
+  code_typet func_type(std::move(func_params), lambda_return_type);
 
   // Create parameter symbols
   for(const auto &p : func_type.parameters())
@@ -3192,7 +3264,41 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
     }
 
     body_code = to_code(static_cast<exprt &>(expr.add("body")));
+
+    // Save/restore return_type so the lambda body uses its own return type
+    typet old_return_type = return_type;
+    if(deduce_return)
+      return_type = typet(ID_auto);
+    else
+      return_type = func_type.return_type();
+
     typecheck_code(body_code);
+
+    // Deduce return type from body if not explicitly specified
+    if(deduce_return)
+    {
+      std::function<const exprt *(const codet &)> find_return =
+        [&](const codet &code) -> const exprt *
+      {
+        if(code.get_statement() == ID_return && code.has_operands())
+          return &code.op0();
+        for(const auto &op : code.operands())
+          if(op.id() == ID_code)
+          {
+            const exprt *r = find_return(to_code(op));
+            if(r != nullptr)
+              return r;
+          }
+        return nullptr;
+      };
+      const exprt *ret = find_return(body_code);
+      if(ret != nullptr)
+        func_type.return_type() = ret->type();
+      else
+        func_type.return_type() = void_type();
+    }
+
+    return_type = old_return_type;
 
     // Prepend capture initializations to the body
     if(!capture_values.empty())

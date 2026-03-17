@@ -16,6 +16,8 @@ Author:
 #include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
+#include <util/symbol.h>
+#include <util/symbol_table_base.h>
 
 #include <ansi-c/c_qualifiers.h>
 
@@ -1616,6 +1618,93 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
 
   if(!implicit_conversion_sequence(e, type, expr))
   {
+    // Brace-init-list to std::initializer_list<T> conversion (C++11):
+    // {a, b, c} creates a backing array and constructs the
+    // initializer_list with _begin and _size.
+    if(
+      orig_expr.id() == ID_initializer_list && type.id() == ID_struct_tag &&
+      id2string(to_struct_tag_type(type).get_identifier())
+          .find("tag-initializer_list<") != std::string::npos)
+    {
+      const struct_typet &struct_type = follow_tag(to_struct_tag_type(type));
+      const auto &components = struct_type.components();
+
+      // Find the element type from the _begin pointer member
+      typet elem_type;
+      bool found = false;
+      for(const auto &c : components)
+      {
+        if(c.get_base_name() == "_begin" && c.type().id() == ID_pointer)
+        {
+          elem_type = to_pointer_type(c.type()).base_type();
+          elem_type.remove(ID_C_constant);
+          found = true;
+          break;
+        }
+      }
+
+      if(found)
+      {
+        const auto &ops = orig_expr.operands();
+        const std::size_t n = ops.size();
+
+        // Typecheck each element against T
+        exprt::operandst typed_elems;
+        bool ok = true;
+        for(const auto &op : ops)
+        {
+          exprt val = op;
+          try
+          {
+            implicit_typecast(val, elem_type);
+          }
+          catch(...)
+          {
+            ok = false;
+            break;
+          }
+          typed_elems.push_back(std::move(val));
+        }
+
+        if(ok)
+        {
+          // Create backing array type: T[n]
+          const auto arr_type =
+            array_typet(elem_type, from_integer(n, size_type()));
+
+          // Create a symbol for the backing array
+          const auto arr_id =
+            "__init_list_arr$" + std::to_string(anon_counter++);
+          auxiliary_symbolt arr_sym;
+          arr_sym.name = arr_id;
+          arr_sym.base_name = arr_id;
+          arr_sym.type = arr_type;
+          arr_sym.type.set(ID_C_constant, true);
+          arr_sym.mode = ID_cpp;
+          arr_sym.is_static_lifetime = true;
+          arr_sym.is_lvalue = true;
+          arr_sym.location = orig_expr.source_location();
+          arr_sym.value = array_exprt(std::move(typed_elems), arr_type);
+          symbol_table.add(arr_sym);
+
+          symbol_exprt arr_ref(arr_id, arr_type);
+          arr_ref.add_source_location() = orig_expr.source_location();
+
+          // Build struct { &arr[0], n }
+          struct_exprt result({}, type);
+          index_exprt first_elem(
+            arr_ref, from_integer(0, c_index_type()), elem_type);
+          address_of_exprt addr(first_elem);
+          addr.type() = components[0].type();
+          result.add_to_operands(std::move(addr));
+          result.add_to_operands(from_integer(n, components[1].type()));
+          result.add_source_location() = orig_expr.source_location();
+          expr = std::move(result);
+          return;
+        }
+      }
+    }
+
     // Aggregate initialization from braced-init-list (C++11):
     // { args... } can initialize a POD struct by assigning each element
     // to the corresponding data member.

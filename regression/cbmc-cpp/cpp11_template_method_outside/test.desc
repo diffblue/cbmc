@@ -5,4 +5,4 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
-decltype(auto) with parenthesized return does not deduce reference type
+template method defined outside class has no body when instantiated
