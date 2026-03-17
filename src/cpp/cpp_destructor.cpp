@@ -9,11 +9,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
-#include "cpp_typecheck.h"
-
 #include <util/arith_tools.h>
-
 #include <util/c_types.h>
+#include <util/symbol_table_base.h>
+
+#include "cpp_typecheck.h"
 
 /// \return typechecked code
 std::optional<codet> cpp_typecheckt::cpp_destructor(
@@ -80,6 +80,7 @@ std::optional<codet> cpp_typecheckt::cpp_destructor(
       struct_type.components();
 
     irep_idt dtor_name;
+    irep_idt dtor_symbol_name;
 
     for(const auto &c : components)
     {
@@ -90,6 +91,7 @@ std::optional<codet> cpp_typecheckt::cpp_destructor(
         to_code_type(type).return_type().id() == ID_destructor)
       {
         dtor_name = c.get_base_name();
+        dtor_symbol_name = c.get_name();
         break;
       }
     }
@@ -106,6 +108,21 @@ std::optional<codet> cpp_typecheckt::cpp_destructor(
       std::move(member), {}, uninitialized_typet{}, source_location);
 
     typecheck_side_effect_function_call(function_call);
+
+    // Destructor calls from within a destructor body must be direct
+    // (non-virtual). If typecheck_side_effect_function_call generated
+    // a virtual dispatch through the vtable, replace it with a direct
+    // call to the resolved destructor symbol.
+    if(
+      function_call.function().id() == ID_dereference &&
+      !dtor_symbol_name.empty())
+    {
+      const symbolt *dtor_sym = symbol_table.lookup(dtor_symbol_name);
+      if(dtor_sym != nullptr)
+        function_call.function() =
+          symbol_exprt(dtor_symbol_name, dtor_sym->type);
+    }
+
     already_typechecked_exprt::make_already_typechecked(function_call);
 
     code_expressiont new_code(function_call);

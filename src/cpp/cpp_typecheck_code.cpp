@@ -388,15 +388,39 @@ void cpp_typecheckt::typecheck_try_catch(codet &code)
       {
         // turn references into non-references
         {
-          code_frontend_declt &decl = to_code_frontend_decl(statements.front());
-          cpp_declarationt &cpp_declaration = to_cpp_declaration(decl.symbol());
+          codet &decl_stmt = to_code(statements.front());
+          if(
+            decl_stmt.get_statement() != ID_decl ||
+            decl_stmt.operands().size() != 1 ||
+            decl_stmt.op0().id() != ID_cpp_declaration)
+          {
+            error().source_location = catch_block.source_location();
+            error() << "expected type name in catch clause" << eom;
+            throw 0;
+          }
+          cpp_declarationt &cpp_declaration =
+            to_cpp_declaration(decl_stmt.op0());
 
-          PRECONDITION(cpp_declaration.declarators().size() == 1);
+          if(cpp_declaration.declarators().size() != 1)
+          {
+            error().source_location = catch_block.source_location();
+            error() << "expected single declarator in catch clause" << eom;
+            throw 0;
+          }
           cpp_declaratort &declarator = cpp_declaration.declarators().front();
 
-          if(is_reference(declarator.type()))
+          if(
+            declarator.type().id() == ID_frontend_pointer &&
+            declarator.type().get_bool(ID_C_reference))
+          {
+            declarator.type() =
+              to_type_with_subtype(declarator.type()).subtype();
+          }
+          else if(is_reference(declarator.type()))
+          {
             declarator.type() =
               to_reference_type(declarator.type()).base_type();
+          }
         }
 
         // typecheck the body

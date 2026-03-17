@@ -1,0 +1,9 @@
+CORE
+main.cpp
+
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+Catch clause with const reference parameter should typecheck.

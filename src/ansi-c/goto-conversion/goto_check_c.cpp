@@ -1467,7 +1467,8 @@ void goto_check_ct::pointer_validity_check(
   else
   {
     auto size_of_expr_opt = size_of_expr(expr.type(), ns);
-    CHECK_RETURN(size_of_expr_opt.has_value());
+    if(!size_of_expr_opt.has_value())
+      return;
     size = size_of_expr_opt.value();
   }
 

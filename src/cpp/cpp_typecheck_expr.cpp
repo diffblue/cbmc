@@ -2294,23 +2294,32 @@ void cpp_typecheckt::typecheck_method_application(
 
   symbolt &method_symbol =
     symbol_table.get_writeable_ref(member_expr.get(ID_component_name));
-  const symbolt &tag_symbol = lookup(method_symbol.type.get(ID_C_member_name));
 
-  // build the right template map
-  // if this is an instantiated template class method
-  if(tag_symbol.type.find(ID_C_template)!=irept())
+  const irep_idt &member_name = method_symbol.type.get(ID_C_member_name);
+
+  if(!member_name.empty())
   {
-    cpp_saved_template_mapt saved_map(template_map);
-    const irept &template_type = tag_symbol.type.find(ID_C_template);
-    const irept &template_args = tag_symbol.type.find(ID_C_template_arguments);
-    template_map.build(
-      static_cast<const template_typet &>(template_type),
-      static_cast<const cpp_template_args_tct &>(template_args));
-    add_method_body(&method_symbol);
+    const symbolt &tag_symbol = lookup(member_name);
+
+    // build the right template map
+    // if this is an instantiated template class method
+    if(tag_symbol.type.find(ID_C_template) != irept())
+    {
+      cpp_saved_template_mapt saved_map(template_map);
+      const irept &template_type = tag_symbol.type.find(ID_C_template);
+      const irept &template_args =
+        tag_symbol.type.find(ID_C_template_arguments);
+      template_map.build(
+        static_cast<const template_typet &>(template_type),
+        static_cast<const cpp_template_args_tct &>(template_args));
+      add_method_body(&method_symbol);
 #ifdef DEBUG
-    std::cout << "MAP for " << method_symbol << ":\n";
-    template_map.print(std::cout);
+      std::cout << "MAP for " << method_symbol << ":\n";
+      template_map.print(std::cout);
 #endif
+    }
+    else
+      add_method_body(&method_symbol);
   }
   else
     add_method_body(&method_symbol);
