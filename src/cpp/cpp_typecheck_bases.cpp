@@ -28,11 +28,19 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
   {
     const cpp_namet &name = to_cpp_name(base.find(ID_name));
 
-    exprt base_symbol_expr=
-      resolve(
-        name,
-        cpp_typecheck_resolvet::wantt::TYPE,
-        cpp_typecheck_fargst());
+    // C++11: decltype(expr) as base specifier
+    exprt base_symbol_expr;
+    if(name.get_sub().size() == 1 && name.get_sub().front().id() == ID_decltype)
+    {
+      typet t = static_cast<const typet &>(name.get_sub().front());
+      typecheck_type(t);
+      base_symbol_expr = type_exprt(t);
+    }
+    else
+    {
+      base_symbol_expr = resolve(
+        name, cpp_typecheck_resolvet::wantt::TYPE, cpp_typecheck_fargst());
+    }
 
     if(base_symbol_expr.id()!=ID_type)
     {

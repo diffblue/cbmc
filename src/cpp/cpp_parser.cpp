@@ -39,7 +39,7 @@ bool cpp_parsert::parse()
     config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP14 ||
     config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP17;
   token_buffer.ansi_c_parser.ts_18661_3_Floatn_types =
-    false; // these are still typedefs
+    config.ansi_c.ts_18661_3_Floatn_types;
   token_buffer.ansi_c_parser.__float128_is_keyword = false;
   token_buffer.ansi_c_parser.float16_type = *support_float16;
   token_buffer.ansi_c_parser.bf16_type = *support_float16;
