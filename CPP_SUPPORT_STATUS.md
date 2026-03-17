@@ -1,6 +1,6 @@
 # C++ Support Status — cpp11-parser-rework branch
 
-Last updated: 2026-03-08
+Last updated: 2026-03-10
 
 ## C++11 — ~90% complete
 
@@ -8,6 +8,7 @@ Last updated: 2026-03-08
 - `nullptr`, `auto`, `decltype`, `constexpr`, `static_assert`, `noexcept`
 - Lambdas (capture by value/reference/init-capture), range-for, rvalue references, move semantics
 - Variadic templates, parameter packs, `sizeof...` — **FIXED**: `sizeof...(args)` now works for expression packs
+- Variadic template pack expansion with heterogeneous types — **FIXED**: each pack argument deduced individually
 - `enum class`, delegating constructors, `override`/`final`
 - `thread_local`, `char16_t`/`char32_t`, user-defined literals (numeric and string)
 - Template aliases, trailing return types, inline namespaces
@@ -38,11 +39,11 @@ Last updated: 2026-03-08
 - Complex STL template instantiations often fail or produce stubs
 - `std::initializer_list` as function argument (`sum({1,2,3})`) — **FIXED**: brace-init-list to `std::initializer_list<T>` conversion
 - Inheriting constructors (`using Base::Base`) — **FIXED**: base class constructors imported into derived class
-- Variadic template pack expansion in recursive functions — only last arg passed
+- Variadic template pack expansion in recursive functions — **FIXED**: pack parameters expanded to N copies
 - Lambda returning a lambda — inner lambda symbol removed as unused (KNOWNBUG: `cpp11_lambda_returning_lambda`)
 - Constexpr member function call on constexpr variable — **FIXED**: constexpr struct variables kept as symbols for this-pointer formation
 - Nested member template instantiation (`Outer<int>::Inner<double>`) — **FIXED**: outer template parameters now available during inner template instantiation
-- Trailing return type with `decltype(a+b)` — parameters not in scope (KNOWNBUG: `cpp11_trailing_decltype`)
+- Trailing return type with `decltype(a+b)` — **FIXED**: parameters put in scope for both non-template and template functions
 
 ---
 
@@ -51,7 +52,7 @@ Last updated: 2026-03-08
 ### Working language features (~95%)
 - Binary literals (`0b1010`)
 - Digit separators (`1'000'000`) — **FIXED**: apostrophes stripped from integer literals
-- `decltype(auto)` — value case works; reference case (parenthesized return) — **FIXED**: deduces `int&` for `return (x)`
+- `decltype(auto)` — value case works; reference case (parenthesized return) — **FIXED**: deduces `int&` for `return (x)` and for function calls returning references
 - Variable templates — **FIXED**: constexpr value now correctly substituted
 - Relaxed `constexpr` (loops, local variables)
 - Recursive `constexpr` functions with ternary operator — **FIXED**
@@ -66,8 +67,9 @@ Last updated: 2026-03-08
 
 ### Known gaps
 - Generic lambdas only work when called with `int` arguments (auto→int approximation)
-- `decltype(auto)` returning reference via parenthesized expression — KNOWNBUG
-- Non-type variadic template parameters (`template<int... Is>`) — too many template args error
+- `decltype(auto)` returning reference via function call — **FIXED**
+- Non-type variadic template parameters (`template<int... Is>`) — **FIXED**: ellipsis flag preserved after rDeclarator
+- Template alias not expanded during function template argument deduction (KNOWNBUG: `cpp11_template_alias_deduction`)
 
 ---
 
@@ -100,10 +102,10 @@ Last updated: 2026-03-08
 - Good coverage for: vector, deque, algorithm, string, memory, tuple, iterator, numeric, valarray, functional
 
 ### Known gaps — language
-- **Fold expressions** (`(args + ...)` and `(... && args)`) — right and left folds parse; incomplete template instantiation for multi-arg packs (KNOWNBUG: `cpp17_fold_expr`)
+- **Fold expressions** (`(args + ...)` and `(... && args)`) — **FIXED**: right and left folds properly expanded during template instantiation; comma operator and compound expressions supported
 - **Deduction guides** — **FIXED**: silently skipped, CTAD handles deduction
 - **CTAD with aggregates and deduction guides** — **FIXED**: brace-init CTAD now works
-- **Variadic template bases** (`struct D : Bases...`) — KNOWNBUG
+- **Variadic template bases** (`struct D : Bases...`) — **FIXED**: base classes expanded during class template instantiation
 
 ---
 
@@ -148,6 +150,7 @@ Last updated: 2026-03-08
 - **Class type NTTP** (`template<Fixed F>`) — KNOWNBUG: "expected type, but got expression"
 - **Defaulted three-way comparison** (`auto operator<=>(const T&) const = default`) — **FIXED**: generates member-wise comparison body
 - **Relational operators from `<=>`** — **FIXED**: `<`, `>`, `<=`, `>=` synthesized from `<=>` by rewriting as `(a <=> b) < 0`
+- **Lambda init-capture with pack expansion** (`[...x = args]`) — KNOWNBUG: not parsed
 
 ---
 
@@ -214,16 +217,22 @@ Last updated: 2026-03-08
 | `cpp11_initializer_list_arg` | C++11 | **FIXED**: brace-init-list to `std::initializer_list<T>` conversion |
 | `cpp11_template_template_deduction` | C++11 | **FIXED**: template template parameter deduction |
 | `cpp11_trailing_decltype` | C++11 | **FIXED**: trailing return `decltype(a+b)` — params in scope |
-| `cpp11_variadic_expansion` | C++11 | Variadic pack expansion only passes last arg |
+| `cpp11_variadic_expansion` | C++11 | **FIXED**: variadic pack expansion in function body |
+| `cpp11_variadic_mixed_types` | C++11 | **FIXED**: variadic pack with heterogeneous types deduced individually |
 | `cpp11_lambda_returning_lambda` | C++11 | **FIXED**: lambda returning lambda |
 | `cpp11_partial_ordering` | C++11 | **FIXED**: partial ordering of template specializations |
-| `cpp11_sfinae_default_arg` | C++11 | SFINAE with `enable_if` as default template argument |
-| `cpp11_template_method_outside` | C++11 | Template method defined outside class has no body |
-| `cpp14_index_sequence` | C++14 | Non-type variadic template parameters |
-| `cpp14_decltype_auto_ref` | C++14 | `decltype(auto)` with parenthesized return not reference |
-| `cpp17_fold_expr` | C++17 | Fold expressions need variadic pack expansion |
-| `cpp17_variadic_bases` | C++17 | Variadic template base classes |
+| `cpp11_sfinae_default_arg` | C++11 | SFINAE with `enable_if` as default template argument — both overloads get same identifier |
+| `cpp11_recursive_template_depth` | C++11 | **FIXED**: converging integer args allow deeper recursion |
+| `cpp11_template_method_outside` | C++11 | **FIXED**: template method defined outside non-template class |
+| `cpp11_trailing_decltype_template` | C++11 | **FIXED**: trailing `decltype(a+b)` in function templates |
+| `cpp11_template_alias_deduction` | C++11 | Template alias not expanded during function template argument deduction |
+| `cpp14_index_sequence` | C++14 | **FIXED**: non-type variadic template parameter packs |
+| `cpp14_decltype_auto_ref` | C++14 | **FIXED**: `decltype(auto)` deduces reference from function returning ref |
+| `cpp17_fold_expr` | C++17 | **FIXED**: fold expressions expanded during template instantiation |
+| `cpp17_fold_comma` | C++17 | **FIXED**: comma operator in fold expressions |
+| `cpp17_variadic_bases` | C++17 | **FIXED**: variadic base classes expanded during class template instantiation |
 | `cpp20_nttp_string` | C++20 | Class type as non-type template parameter |
+| `cpp20_lambda_pack_capture` | C++20 | Lambda init-capture with pack expansion not parsed |
 | `cpp26_pack_indexing` | C++26 | Pack indexing instantiation |
 
 ## Key file locations

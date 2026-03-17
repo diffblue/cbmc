@@ -1,8 +1,8 @@
-KNOWNBUG
+CORE
 main.cpp
---cpp17
+--cpp11
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-C++17 variadic template bases
+C++17 variadic base classes (struct D : Bases...)
