@@ -1,0 +1,9 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Fold expressions in class template static constexpr member initializers.

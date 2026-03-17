@@ -7350,8 +7350,18 @@ bool Parser::rTypeName(typet &tname)
   else
     tname.swap(declarator.type());
 
+  // Preserve pack expansion ellipsis from the declarator.
+  // rDeclarator sets ellipsis on d_outer (which may be nil);
+  // make_subtype replaces nil with the type specifier, losing
+  // the flag. Only preserve when the declarator type was nil
+  // (i.e., just an ellipsis marker with no actual type).
+  bool has_ellipsis = tname.id() == ID_nil && tname.get_bool(ID_ellipsis);
+
   // make type_name subtype of arg
   make_subtype(type_name, tname);
+
+  if(has_ellipsis)
+    tname.set(ID_ellipsis, true);
 
 #ifdef DEBUG
   std::cout << std::string(__indent, ' ') << "Parser::rTypeName 2\n";

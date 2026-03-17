@@ -1,9 +1,9 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-Lambda in unevaluated context (decltype) not fully supported.
-The lambda body is not type-checked when it appears inside decltype.
+--
+Lambda in unevaluated context (decltype): using F = decltype([]{});

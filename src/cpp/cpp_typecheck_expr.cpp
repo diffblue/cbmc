@@ -141,7 +141,10 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     expr.id() == "__is_trivially_constructible" ||
     expr.id() == "__is_trivially_assignable" ||
     expr.id() == "__is_nothrow_constructible" ||
-    expr.id() == "__is_nothrow_assignable" || expr.id() == "__is_same")
+    expr.id() == "__is_nothrow_assignable" || expr.id() == "__is_same" ||
+    expr.id() == "__is_layout_compatible" ||
+    expr.id() == "__is_nothrow_convertible" ||
+    expr.id() == "__is_pointer_interconvertible_base_of")
   {
     // GCC/Clang built-in type traits
     typet t1 = static_cast<const typet &>(expr.find("type_arg1"));
@@ -237,6 +240,23 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     {
       // Delegate to __is_assignable logic.
       expr = true_exprt();
+    }
+    else if(expr.id() == "__is_nothrow_convertible")
+    {
+      // Same as __is_convertible — nothrow is about optimization.
+      if(t1.id() == ID_empty && t2.id() == ID_empty)
+        expr = true_exprt();
+      else if(t1.id() == ID_empty || t2.id() == ID_empty)
+        expr = false_exprt();
+      else
+      {
+        exprt tmp;
+        symbol_exprt from(irep_idt(), t1);
+        if(implicit_conversion_sequence(from, t2, tmp))
+          expr = true_exprt();
+        else
+          expr = false_exprt();
+      }
     }
     else
       // conservatively return false for traits we cannot evaluate

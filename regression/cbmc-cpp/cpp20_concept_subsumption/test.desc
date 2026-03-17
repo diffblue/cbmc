@@ -1,0 +1,8 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+C++20 concept subsumption: more constrained overload should be preferred.

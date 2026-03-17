@@ -1,0 +1,10 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Partial specialization matching with empty variadic packs.
+Tests common_type and _Nth_type patterns.
