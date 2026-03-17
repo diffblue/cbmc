@@ -16,6 +16,7 @@ Last updated: 2026-03-07
 - `noexcept` operator (`noexcept(expr)`)
 - `alignof` operator
 - Explicit conversion operators (`explicit operator bool()`)
+- `static constexpr auto` member type deduction — **FIXED**: auto deduced from initializer
 - Perfect forwarding with rvalue references
 - SFINAE with `enable_if`
 - Default member initializers (NSDMI) — **FIXED**: applied during both POD default construction and non-POD constructor initialization
@@ -38,7 +39,7 @@ Last updated: 2026-03-07
 - Inheriting constructors (`using Base::Base`) — **FIXED**: base class constructors imported into derived class
 - Variadic template pack expansion in recursive functions — only last arg passed
 - Lambda returning a lambda — inner lambda symbol removed as unused (KNOWNBUG: `cpp11_lambda_returning_lambda`)
-- Calling constexpr member function on constexpr variable — main body lost (KNOWNBUG: `cpp11_constexpr_member_call`)
+- Constexpr member function call on constexpr variable — **FIXED**: constexpr struct variables kept as symbols for this-pointer formation
 - Nested member template instantiation (`Outer<int>::Inner<double>`) — parse error (KNOWNBUG: `cpp11_nested_member_template`)
 
 ---
@@ -142,7 +143,7 @@ Last updated: 2026-03-07
 - **Three-way comparison categories** (`std::strong_ordering` etc.) — **FIXED**: works with user-defined types
 - **`constexpr` containers** — not modeled
 - **Class type NTTP** (`template<Fixed F>`) — KNOWNBUG: "expected type, but got expression"
-- **Defaulted three-way comparison** (`auto operator<=>(const T&) const = default`) — no body generated (KNOWNBUG: `cpp20_defaulted_spaceship`)
+- **Defaulted three-way comparison** (`auto operator<=>(const T&) const = default`) — **FIXED**: generates member-wise comparison body
 
 ---
 

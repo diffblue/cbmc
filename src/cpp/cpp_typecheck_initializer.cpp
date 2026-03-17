@@ -74,6 +74,15 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
 
     reference_initializer(symbol.value, to_reference_type(symbol.type));
   }
+  else if(has_auto(symbol.type) && !is_reference(symbol.type))
+  {
+    // auto type deduction for non-reference types (e.g.,
+    // static constexpr auto value = 42)
+    typecheck_expr(symbol.value);
+    cpp_convert_auto(symbol.type, symbol.value.type(), get_message_handler());
+    typecheck_type(symbol.type);
+    implicit_typecast(symbol.value, symbol.type);
+  }
   else if(cpp_is_pod(symbol.type))
   {
     if(
