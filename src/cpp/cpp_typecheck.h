@@ -135,6 +135,8 @@ protected:
 
   void typecheck_function_template(cpp_declarationt &declaration);
 
+  void typecheck_template_alias(cpp_declarationt &declaration);
+
   void typecheck_class_template_member(cpp_declarationt &declaration);
 
   std::string class_template_identifier(

@@ -708,6 +708,7 @@ bool Parser::rTypedefUsing(cpp_declarationt &declaration)
   declaration=cpp_declarationt();
   set_location(declaration, tk);
 
+  declaration.set_is_typedef();
   declaration.type()=typet(ID_typedef);
 
   if(!is_identifier(lex.get_token(tk)))
@@ -1521,6 +1522,11 @@ bool Parser::rDeclaration(cpp_declarationt &declaration)
 #endif
 
   if(!optAttribute(declaration.type()))
+    return false;
+
+  // C++11 [dcl.align]: alignas is an alignment-specifier, part of
+  // attribute-specifier-seq
+  if(!optAlignas(declaration.type()))
     return false;
 
   cpp_member_spect member_spec;
@@ -2864,6 +2870,18 @@ bool Parser::rConstructorDecl(
   cv.make_nil();
   optCvQualify(cv);
 
+  // C++11 [dcl.fct]: optional ref-qualifier (& or &&)
+  if(lex.LookAhead(0) == '&')
+  {
+    cpp_tokent tk;
+    lex.get_token(tk);
+  }
+  else if(lex.LookAhead(0) == TOK_ANDAND)
+  {
+    cpp_tokent tk;
+    lex.get_token(tk);
+  }
+
   optThrowDecl(constructor.throw_decl());
 
   if(lex.LookAhead(0)==TOK_ARROW)
@@ -2872,11 +2890,12 @@ bool Parser::rConstructorDecl(
     std::cout << std::string(__indent, ' ') << "Parser::rConstructorDecl 3\n";
 #endif
 
-    // C++11 trailing return type
+    // C++11 trailing return type: -> trailing-type-specifier-seq
+    //   abstract-declarator?
     cpp_tokent arrow;
     lex.get_token(arrow);
 
-    if(!rTypeSpecifier(trailing_return_type, false))
+    if(!rTypeName(trailing_return_type))
       return false;
   }
 
@@ -3017,12 +3036,29 @@ bool Parser::optThrowDecl(irept &throw_decl)
   }
   else if(lex.LookAhead(0)==TOK_NOEXCEPT)
   {
-    exprt expr;
+    lex.get_token(tk);
 
-    if(!rNoexceptExpr(expr))
-      return false;
+    if(lex.LookAhead(0) == '(')
+    {
+      // noexcept(constant-expression)
+      cpp_tokent op, cp;
+      lex.get_token(op);
 
-    // TODO
+      exprt expr;
+      if(!rCommaExpression(expr))
+        return false;
+
+      if(lex.get_token(cp) != ')')
+        return false;
+
+      p = irept(ID_noexcept);
+      p.add(ID_value).swap(expr);
+    }
+    else
+    {
+      // bare noexcept (equivalent to noexcept(true))
+      p = irept(ID_noexcept);
+    }
   }
 
   throw_decl=p;
@@ -3360,11 +3396,33 @@ bool Parser::rDeclarator(
         function_type.add_subtype().swap(d_outer);
         function_type.add(ID_parameters).swap(args);
 
+        // cv-qualifiers and ref-qualifier go on the function type
+        // before it's nested into the declarator
+        {
+          typet cv_tmp;
+          cv_tmp.make_nil();
+          optCvQualify(cv_tmp);
+          if(cv_tmp.is_not_nil())
+            merge_types(cv_tmp, method_qualifier);
+        }
+
+        // C++11 [dcl.fct]: optional ref-qualifier (& or &&)
+        if(lex.LookAhead(0) == '&')
+        {
+          cpp_tokent rq;
+          lex.get_token(rq);
+          function_type.set(ID_C_ref_qualifier, "&");
+        }
+        else if(lex.LookAhead(0) == TOK_ANDAND)
+        {
+          cpp_tokent rq;
+          lex.get_token(rq);
+          function_type.set(ID_C_ref_qualifier, "&&");
+        }
+
         // make this subtype of d_inner
         make_subtype(function_type, d_inner);
         d_outer.swap(d_inner);
-
-        optCvQualify(method_qualifier);
       }
       else
       {
@@ -3390,8 +3448,10 @@ bool Parser::rDeclarator(
         cpp_tokent arrow;
         lex.get_token(arrow);
 
+        // C++11 trailing return type: -> trailing-type-specifier-seq
+        //   abstract-declarator?
         typet return_type;
-        if(!rTypeSpecifier(return_type, false))
+        if(!rTypeName(return_type))
           return false;
 
         if(d_outer.add_subtype().is_not_nil())
@@ -3685,11 +3745,38 @@ bool Parser::rMemberInit(exprt &init)
   lex.get_token(tk1);
   set_location(init, tk1);
 
-  if(tk1.kind=='{' ||
-     (tk1.kind=='(' && lex.LookAhead(0)=='{'))
+  if(tk1.kind == '{')
   {
 #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rMemberInit 3\n";
+#endif
+    // braced-init-list: the '{' was already consumed
+    // parse initializer-clause (',' initializer-clause)* ','? '}'
+    if(lex.LookAhead(0) != '}')
+    {
+      for(;;)
+      {
+        exprt exp;
+        if(!rInitializeExpr(exp))
+          return false;
+        init.add_to_operands(std::move(exp));
+        if(lex.LookAhead(0) == ',')
+        {
+          lex.get_token(tk2);
+          if(lex.LookAhead(0) == '}')
+            break; // trailing comma
+        }
+        else
+          break;
+      }
+    }
+    if(lex.get_token(tk2) != '}')
+      return false;
+  }
+  else if(tk1.kind == '(' && lex.LookAhead(0) == '{')
+  {
+#ifdef DEBUG
+    std::cout << std::string(__indent, ' ') << "Parser::rMemberInit 3b\n";
 #endif
     exprt exp;
     if(!rInitializeExpr(exp))
@@ -3697,9 +3784,7 @@ bool Parser::rMemberInit(exprt &init)
 
     init.operands().push_back(exp);
 
-    // read closing parenthesis
-    lex.get_token(tk2);
-    if(tk2.kind!='}' && tk2.kind!=')')
+    if(lex.get_token(tk2) != ')')
       return false;
   }
   else
@@ -6163,6 +6248,20 @@ bool Parser::rTypeNameOrFunctionType(typet &tname)
   if(!optCvQualify(type))
     return false;
 
+  // C++11 [dcl.fct]: optional ref-qualifier (& or &&)
+  if(lex.LookAhead(0) == '&')
+  {
+    cpp_tokent rq;
+    lex.get_token(rq);
+    type.set(ID_C_ref_qualifier, "&");
+  }
+  else if(lex.LookAhead(0) == TOK_ANDAND)
+  {
+    cpp_tokent rq;
+    lex.get_token(rq);
+    type.set(ID_C_ref_qualifier, "&&");
+  }
+
 #ifdef DEBUG
   std::cout << std::string(__indent, ' ')
             << "Parser::rTypeNameOrFunctionType 7\n";
@@ -6552,8 +6651,6 @@ bool Parser::rNoexceptExpr(exprt &exp)
   exp.add_to_operands(std::move(subexp));
   set_location(exp, tk);
   return true;
-
-  return false;
 }
 
 bool Parser::isAllocateExpr(int t)
