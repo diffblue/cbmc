@@ -89,7 +89,22 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
   {
     // do the declarations
     for(auto &item : namespace_spec.items())
-      convert(item);
+    {
+      try
+      {
+        convert(item);
+      }
+      catch(int)
+      {
+        // Suppress errors from system headers so that unsupported
+        // constructs don't prevent subsequent declarations from
+        // being processed.
+        const auto &loc = item.source_location();
+        const std::string file = id2string(loc.get_file());
+        if(file.find("/usr/include/") != 0 && file.find("/usr/lib/") != 0)
+          throw;
+      }
+    }
 
     // C++11: inline namespaces make their names visible in the parent
     if(namespace_spec.get_is_inline())

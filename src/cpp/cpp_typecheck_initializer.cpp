@@ -86,8 +86,31 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
   }
   else if(has_auto(symbol.type) && !is_reference(symbol.type))
   {
-    // auto type deduction for non-reference types (e.g.,
-    // static constexpr auto value = 42)
+    // auto type deduction for non-reference types
+    // C++11: auto x = {1, 2, 3} deduces std::initializer_list<int>
+    if(
+      symbol.value.id() == ID_initializer_list &&
+      !symbol.value.operands().empty())
+    {
+      // Type-check the first element to determine T
+      exprt first = symbol.value.operands()[0];
+      typecheck_expr(first);
+      // Build std::initializer_list<T> type
+      // For verification purposes, model as a const array
+      symbol.type = array_typet(
+        first.type(),
+        from_integer(symbol.value.operands().size(), size_type()));
+      // Type-check all elements
+      exprt::operandst elems;
+      for(auto &op : symbol.value.operands())
+      {
+        typecheck_expr(op);
+        implicit_typecast(op, first.type());
+        elems.push_back(op);
+      }
+      symbol.value = array_exprt(std::move(elems), to_array_type(symbol.type));
+      return;
+    }
     typecheck_expr(symbol.value);
 
     // decltype(auto): if initializer is a function call returning a

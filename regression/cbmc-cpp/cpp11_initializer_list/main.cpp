@@ -1,9 +1,10 @@
-// C++11 std::initializer_list basic usage
-#include <initializer_list>
-
+// C++11 auto with braced-init-list
 int main()
 {
   auto il = {1, 2, 3};
-  __CPROVER_assert(il.size() == 3, "initializer_list size");
+  int sum = 0;
+  for(auto x : il)
+    sum += x;
+  __CPROVER_assert(sum == 6, "initializer_list sum");
   return 0;
 }

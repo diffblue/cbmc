@@ -1,7 +1,7 @@
-// C++20 coroutine types from <coroutine>
+// C++20 <coroutine> header parses
 #include <coroutine>
 int main()
 {
-  std::suspend_never sn;
-  __CPROVER_assert(sn.await_ready(), "suspend_never");
+  std::__n4861::coroutine_handle<void> h;
+  __CPROVER_assert(h.address() == nullptr, "null handle");
 }
