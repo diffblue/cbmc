@@ -1,0 +1,8 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+std::filesystem::path: type-checking errors in chrono/fs_path headers
