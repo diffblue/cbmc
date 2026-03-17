@@ -108,6 +108,12 @@ void cpp_convert_typet::read_rec(const typet &type)
   }
   else if(type.id() == ID_frontend_vector)
     vector_size = static_cast<const exprt &>(type.find(ID_size));
+  else if(type.id() == ID_auto)
+  {
+    // In C++11, auto is a type specifier (not a storage class).
+    // Add to other so that cpp_convert_auto can find and replace it.
+    other.push_back(type);
+  }
   else
   {
     ansi_c_convert_typet::read_rec(type);
