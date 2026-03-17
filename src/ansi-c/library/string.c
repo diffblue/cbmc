@@ -400,6 +400,29 @@ __CPROVER_HIDE:;
 #endif
 }
 
+/* FUNCTION: __builtin_strcmp */
+
+#ifndef __CPROVER_STRING_H_INCLUDED
+#  include <string.h>
+#  define __CPROVER_STRING_H_INCLUDED
+#endif
+
+int __builtin_strcmp(const char *s1, const char *s2)
+{
+__CPROVER_HIDE:;
+  __CPROVER_size_t i = 0;
+  unsigned char ch1, ch2;
+  do
+  {
+    ch1 = s1[i];
+    ch2 = s2[i];
+    if(ch1 != ch2)
+      return ch1 < ch2 ? -1 : 1;
+    i++;
+  } while(ch1 != 0 && ch2 != 0);
+  return 0;
+}
+
 /* FUNCTION: strcasecmp */
 
 #ifndef __CPROVER_STRING_H_INCLUDED
@@ -670,6 +693,36 @@ __CPROVER_HIDE:;
   return dst;
 }
 
+/* FUNCTION: __builtin_memcpy */
+
+#ifndef __CPROVER_STRING_H_INCLUDED
+#  include <string.h>
+#  define __CPROVER_STRING_H_INCLUDED
+#endif
+
+void *__builtin_memcpy(void *dst, const void *src, __CPROVER_size_t n)
+{
+__CPROVER_HIDE:;
+  __CPROVER_precondition(
+    __CPROVER_POINTER_OBJECT(dst) != __CPROVER_POINTER_OBJECT(src) ||
+      ((const char *)src >= (const char *)dst + n) ||
+      ((const char *)dst >= (const char *)src + n),
+    "memcpy src/dst overlap");
+  __CPROVER_precondition(
+    __CPROVER_r_ok(src, n), "memcpy source region readable");
+  __CPROVER_precondition(
+    __CPROVER_w_ok(dst, n), "memcpy destination region writeable");
+
+  if(n > 0)
+  {
+    char src_n[n];
+    __CPROVER_array_copy(src_n, (char *)src);
+    __CPROVER_array_replace((char *)dst, src_n);
+  }
+
+  return dst;
+}
+
 /* FUNCTION: __builtin___memcpy_chk */
 
 void *__builtin___memcpy_chk(void *dst, const void *src, __CPROVER_size_t n, __CPROVER_size_t size)
@@ -878,6 +931,31 @@ void *memmove(void *dest, const void *src, size_t n)
     __CPROVER_array_replace((char *)dest, src_n);
   }
   #endif
+  return dest;
+}
+
+/* FUNCTION: __builtin_memmove */
+
+#ifndef __CPROVER_STRING_H_INCLUDED
+#  include <string.h>
+#  define __CPROVER_STRING_H_INCLUDED
+#endif
+
+void *__builtin_memmove(void *dest, const void *src, __CPROVER_size_t n)
+{
+__CPROVER_HIDE:;
+  __CPROVER_precondition(
+    __CPROVER_r_ok(src, n), "memmove source region readable");
+  __CPROVER_precondition(
+    __CPROVER_w_ok(dest, n), "memmove destination region writeable");
+
+  if(n > 0)
+  {
+    char src_n[n];
+    __CPROVER_array_copy(src_n, (char *)src);
+    __CPROVER_array_replace((char *)dest, src_n);
+  }
+
   return dest;
 }
 

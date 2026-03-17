@@ -57,7 +57,8 @@ public:
     const typet *t = &type();
     while(t->id() == ID_merged_type)
       t = &to_type_with_subtypes(*t).subtypes().back();
-    return is_template() && t->id() == ID_struct && declarators().empty();
+    return is_template() && (t->id() == ID_struct || t->id() == ID_union) &&
+           declarators().empty();
   }
 
   bool is_template_alias() const

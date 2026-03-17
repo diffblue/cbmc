@@ -1,0 +1,10 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+<coroutine> header fails because compare_three_way::operator() cannot be
+resolved when called on a temporary object (e.g. compare_three_way()(a, b)).

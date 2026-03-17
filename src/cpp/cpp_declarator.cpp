@@ -43,7 +43,7 @@ typet cpp_declaratort::merge_type(const typet &declaration_type) const
   while(true)
   {
     typet &t=*p;
-    if(t.is_nil())
+    if(t.is_nil() || t.id().empty())
     {
       t=declaration_type;
       break;

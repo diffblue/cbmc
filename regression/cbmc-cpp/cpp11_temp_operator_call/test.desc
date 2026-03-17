@@ -1,9 +1,9 @@
 CORE
 main.cpp
---cpp23
+--cpp11
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
 --
-C++23 multidimensional subscript operator.
+Calling operator() on a temporary object (e.g. F()(42)).

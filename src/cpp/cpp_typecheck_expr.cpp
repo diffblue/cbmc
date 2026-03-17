@@ -2273,10 +2273,22 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   {
     const cpp_namet cppname("operator()", expr.source_location());
 
-    exprt member(ID_member);
-    member.add(ID_component_cpp_name)=cppname;
+    // The function expression evaluates to a struct value (e.g., F()).
+    // Wrap it in a temporary_object so the this pointer can be formed.
+    exprt obj = std::move(expr.function());
+    if(!obj.get_bool(ID_C_lvalue))
+    {
+      side_effect_exprt tmp(
+        ID_temporary_object, obj.type(), obj.source_location());
+      tmp.add_to_operands(std::move(obj));
+      tmp.set(ID_C_lvalue, true);
+      tmp.set(ID_mode, ID_cpp);
+      obj = std::move(tmp);
+    }
 
-    member.add_to_operands(std::move(op0));
+    exprt member(ID_member);
+    member.add(ID_component_cpp_name) = cppname;
+    member.add_to_operands(already_typechecked_exprt{std::move(obj)});
 
     expr.function().swap(member);
     typecheck_side_effect_function_call(expr);

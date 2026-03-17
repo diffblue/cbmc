@@ -1220,7 +1220,7 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
         }
         else
         {
-          struct_tag_typet instance = disambiguate_template_classes(
+          typet instance = disambiguate_template_classes(
             final_base_name, id_set, template_args);
 
           instance.add_source_location() = source_location;
@@ -1228,8 +1228,8 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
           // the "::" triggers template elaboration
           cpp_typecheck.elaborate_class_template(instance);
 
-          cpp_typecheck.cpp_scopes.go_to(
-            cpp_typecheck.cpp_scopes.get_scope(instance.get_identifier()));
+          cpp_typecheck.cpp_scopes.go_to(cpp_typecheck.cpp_scopes.get_scope(
+            to_tag_type(instance).get_identifier()));
         }
 
         template_args.make_nil();
@@ -1333,7 +1333,7 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
 }
 
 /// disambiguate partial specialization
-struct_tag_typet cpp_typecheck_resolvet::disambiguate_template_classes(
+typet cpp_typecheck_resolvet::disambiguate_template_classes(
   const irep_idt &base_name,
   const cpp_scopest::id_sett &id_set,
   const cpp_template_args_non_tct &full_template_args)
@@ -1756,7 +1756,11 @@ struct_tag_typet cpp_typecheck_resolvet::disambiguate_template_classes(
   const symbolt &instance = cpp_typecheck.class_template_symbol(
     source_location, choice, match.specialization_args, match.full_args);
 
-  struct_tag_typet result(instance.name);
+  typet result;
+  if(instance.type.id() == ID_union)
+    result = union_tag_typet(instance.name);
+  else
+    result = struct_tag_typet(instance.name);
   result.add_source_location() = source_location;
 
   return result;
