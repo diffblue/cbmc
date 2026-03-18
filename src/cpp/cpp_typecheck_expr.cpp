@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/expr_initializer.h>
+#include <util/floatbv_expr.h>
 #include <util/mathematical_types.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
@@ -67,8 +68,14 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     typecheck_expr_explicit_typecast(expr);
   else if(expr.id() == ID_typecast && expr.type().id() == ID_cpp_name)
   {
-    // __builtin_bit_cast(Type, expr) produces a typecast with cpp_name type
     typecheck_type(expr.type());
+    c_typecheck_baset::typecheck_expr_main(expr);
+  }
+  else if(expr.id() == ID_bit_cast)
+  {
+    // __builtin_bit_cast(Type, expr) — resolve cpp_name type
+    if(expr.type().id() == ID_cpp_name)
+      typecheck_type(expr.type());
     c_typecheck_baset::typecheck_expr_main(expr);
   }
   else if(expr.id()=="explicit-constructor-call")
@@ -2045,11 +2052,34 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   if(expr.function().id() == ID_cpp_name)
   {
     const auto &name = to_cpp_name(expr.function());
-    if(name.get_base_name() == "__builtin_is_constant_evaluated")
+    const irep_idt &bn = name.get_base_name();
+    if(bn == "__builtin_is_constant_evaluated")
     {
       exprt result = false_exprt();
       result.add_source_location() = expr.source_location();
       expr.swap(result);
+      return;
+    }
+    // GCC built-in floating-point classification
+    if(
+      (bn == "__builtin_isfinite" || bn == "__builtin_isinf" ||
+       bn == "__builtin_isnan" || bn == "__builtin_isnormal") &&
+      expr.arguments().size() == 1)
+    {
+      typecheck_expr(expr.arguments()[0]);
+      exprt arg = expr.arguments()[0];
+      exprt result;
+      if(bn == "__builtin_isfinite")
+        result = isfinite_exprt(arg);
+      else if(bn == "__builtin_isinf")
+        result = isinf_exprt(arg);
+      else if(bn == "__builtin_isnan")
+        result = isnan_exprt(arg);
+      else
+        result = isnormal_exprt(arg);
+      result.add_source_location() = expr.source_location();
+      exprt cast = typecast_exprt::conditional_cast(result, expr.type());
+      expr.swap(cast);
       return;
     }
   }
@@ -2057,7 +2087,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   // For virtual functions, it is important to check whether
   // the function name is qualified. If it is qualified, then
   // the call is not virtual.
-  bool is_qualified=false;
+  bool is_qualified = false;
 
   if(expr.function().id()==ID_member ||
      expr.function().id()==ID_ptrmember)
