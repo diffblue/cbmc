@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
-#include <util/mathematical_types.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/string_constant.h>
@@ -1444,7 +1443,8 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
         auto it = cpp_typecheck.cpp_scopes.id_map.find(sym.name);
         if(
           it != cpp_typecheck.cpp_scopes.id_map.end() &&
-          it->second->id_class == cpp_idt::id_classt::TEMPLATE)
+          (it->second->id_class == cpp_idt::id_classt::TEMPLATE ||
+           it->second->is_template_scope()))
         {
           effective_id_set.insert(it->second);
         }
@@ -1465,7 +1465,22 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
 
   for(const auto &id_ptr : effective_id_set)
   {
-    const irep_idt id = id_ptr->identifier;
+    irep_idt id = id_ptr->identifier;
+    // For template scopes found via id_map, the identifier might be
+    // empty. Look up the id_map key instead.
+    if(id.empty() || !cpp_typecheck.symbol_table.has_symbol(id))
+    {
+      for(const auto &entry : cpp_typecheck.cpp_scopes.id_map)
+      {
+        if(entry.second == id_ptr)
+        {
+          id = entry.first;
+          break;
+        }
+      }
+    }
+    if(!cpp_typecheck.symbol_table.has_symbol(id))
+      continue;
     const symbolt &s = cpp_typecheck.lookup(id);
     if(!s.type.get_bool(ID_is_template))
       continue;
@@ -1490,7 +1505,8 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
       auto it = cpp_typecheck.cpp_scopes.id_map.find(id_ptr->identifier);
       if(it == cpp_typecheck.cpp_scopes.id_map.end())
         continue;
-      cpp_scopet *scope = &static_cast<cpp_scopet &>(*it->second);
+      cpp_scopet &scope_ref = static_cast<cpp_scopet &>(*it->second);
+      cpp_scopet *scope = &scope_ref;
       while(!scope->is_root_scope())
       {
         scope = &scope->get_parent();

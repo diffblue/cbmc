@@ -12,8 +12,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_CPP_TYPECHECK_RESOLVE_H
 #define CPROVER_CPP_CPP_TYPECHECK_RESOLVE_H
 
-#include <util/std_types.h>
-
 #include "cpp_template_args.h"
 #include "cpp_scopes.h"
 
