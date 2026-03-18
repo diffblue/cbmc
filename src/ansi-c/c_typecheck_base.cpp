@@ -618,6 +618,16 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
 
   code_typet &code_type = to_code_type(symbol.type);
 
+  // Check for [*] in function definitions — only valid in prototypes
+  for(const auto &param : code_type.parameters())
+  {
+    if(param.type().get_bool(ID_C_array_vla_unspecified))
+    {
+      throw errort().with_location(param.source_location())
+        << "'[*]' not allowed in other than function prototype scope";
+    }
+  }
+
   // reset labels
   labels_used.clear();
   labels_defined.clear();
@@ -795,6 +805,32 @@ void c_typecheck_baset::typecheck_declaration(
     // Now do declarators, if any.
     for(auto &declarator : declaration.declarators())
     {
+      // Reject array declarator qualifiers (static, restrict, [*]) outside
+      // function parameter declarations (C99 6.7.5.2, 6.7.5.3).
+      if(!declaration.get_is_parameter())
+      {
+        const typet &decl_type = declarator.type();
+        std::function<bool(const typet &)> has_array_fpm =
+          [&](const typet &t) -> bool
+        {
+          if(t.id() == ID_array && t.get_bool(ID_C_array_fpm_qualifier))
+            return true;
+          if(t.id() == ID_merged_type)
+          {
+            for(const auto &sub : to_type_with_subtypes(t).subtypes())
+              if(has_array_fpm(sub))
+                return true;
+          }
+          if(t.has_subtype())
+            return has_array_fpm(to_type_with_subtype(t).subtype());
+          return false;
+        };
+        if(has_array_fpm(decl_type))
+        {
+          throw errort().with_location(declaration.source_location())
+            << "static or type qualifiers in non-parameter array declarator";
+        }
+      }
       c_storage_spect full_spec(declaration.full_type(declarator));
       full_spec|=c_storage_spec;
 
