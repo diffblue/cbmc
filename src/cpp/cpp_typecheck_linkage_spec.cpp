@@ -36,7 +36,10 @@ void cpp_typecheckt::convert(cpp_linkage_spect &linkage_spec)
     bool is_system =
       file.find("/usr/include/") == 0 || file.find("/usr/lib/") == 0;
 
-    if(is_system)
+    // Items inside extern "C"/"C++" linkage specs from system headers
+    // often have empty source locations. Treat all linkage spec items
+    // as system headers when the file cannot be determined.
+    if(is_system || file.empty())
     {
       null_message_handlert null_mh;
       message_handlert &old_mh = get_message_handler();
@@ -45,7 +48,7 @@ void cpp_typecheckt::convert(cpp_linkage_spect &linkage_spec)
       {
         convert(*it);
       }
-      catch(int)
+      catch(...)
       {
       }
       set_message_handler(old_mh);

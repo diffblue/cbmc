@@ -107,7 +107,7 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
         {
           convert(item);
         }
-        catch(int)
+        catch(...)
         {
         }
         set_message_handler(old_mh);
