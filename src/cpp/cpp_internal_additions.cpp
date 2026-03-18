@@ -228,5 +228,21 @@ void cpp_internal_additions(std::ostream &out)
   out << "void __builtin_coro_destroy(void *);\n";
   out << "void *__builtin_coro_noop();\n";
 
+  // C++20 std::dynamic_extent — provide as built-in so that
+  // <span> can use it as a default template argument without
+  // needing to evaluate numeric_limits<size_t>::max().
+  if(config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP20)
+  {
+    out << "namespace std {\n";
+    out << "  inline constexpr __CPROVER::size_t dynamic_extent = "
+           "(__CPROVER::size_t)-1;\n";
+    // Also in inline namespace __1 for libc++
+    out << "  inline namespace __1 {\n";
+    out << "    inline constexpr __CPROVER::size_t dynamic_extent = "
+           "(__CPROVER::size_t)-1;\n";
+    out << "  }\n";
+    out << "}\n";
+  }
+
   out << std::flush;
 }

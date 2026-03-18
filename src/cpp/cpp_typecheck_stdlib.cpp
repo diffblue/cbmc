@@ -2,17 +2,19 @@
 /// Provide bodies for standard library functions that are declared
 /// in headers but defined in libstdc++.so / libc++.so.
 
+/// Author: Michael Tautschnig
+
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
-#include <util/c_types.h>
 #include <util/expr_initializer.h>
 #include <util/expr_util.h>
+#include <util/floatbv_expr.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
-#include <util/symbol_table.h>
+#include <util/symbol_table_base.h>
 
 #include "cpp_typecheck.h"
 
@@ -313,8 +315,7 @@ void cpp_typecheckt::provide_stdlib_bodies()
         // Override: return true for verification
         ensure_parameter_symbols(symbol, symbol_table);
         code_blockt block;
-        const auto &ret_type = to_code_type(symbol.type).return_type();
-        block.add(code_frontend_returnt(from_integer(1, ret_type)));
+        block.add(code_frontend_returnt(true_exprt()));
         symbol.value = std::move(block);
         symbol.value.type() = symbol.type;
         deferred_typechecking.erase(symbol.name);
@@ -416,6 +417,17 @@ void cpp_typecheckt::provide_stdlib_bodies()
       deferred_typechecking.erase(symbol.name);
     }
     else if(
+      base == "__destroy" && name.find("_Destroy_aux") != std::string::npos)
+    {
+      // _Destroy_aux<false>::__destroy(first, last) — no-op for
+      // trivially destructible types
+      ensure_parameter_symbols(symbol, symbol_table);
+      code_blockt block;
+      symbol.value = std::move(block);
+      symbol.value.type() = symbol.type;
+      deferred_typechecking.erase(symbol.name);
+    }
+    else if(
       base == "construct" &&
       (name.find("allocator_traits") != std::string::npos ||
        name.find("__alloc_traits") != std::string::npos))
@@ -440,6 +452,35 @@ void cpp_typecheckt::provide_stdlib_bodies()
         dereference_exprt val_deref(val_sym, val_base);
         code_blockt block;
         block.add(code_frontend_assignt(deref, val_deref));
+        symbol.value = std::move(block);
+        symbol.value.type() = symbol.type;
+        deferred_typechecking.erase(symbol.name);
+      }
+    }
+    else if(
+      (base == "isfinite" || base == "isinf" || base == "isnan" ||
+       base == "isnormal") &&
+      name.find("std::") != std::string::npos)
+    {
+      // std::isfinite/isinf/isnan/isnormal → CPROVER built-in expressions
+      ensure_parameter_symbols(symbol, symbol_table);
+      const auto &params = to_code_type(symbol.type).parameters();
+      if(params.size() == 1)
+      {
+        symbol_exprt arg(params[0].get_identifier(), params[0].type());
+        exprt result;
+        if(base == "isfinite")
+          result = isfinite_exprt(arg);
+        else if(base == "isinf")
+          result = isinf_exprt(arg);
+        else if(base == "isnan")
+          result = isnan_exprt(arg);
+        else
+          result = isnormal_exprt(arg);
+        const auto &ret_type = to_code_type(symbol.type).return_type();
+        code_blockt block;
+        block.add(code_frontend_returnt(
+          typecast_exprt::conditional_cast(result, ret_type)));
         symbol.value = std::move(block);
         symbol.value.type() = symbol.type;
         deferred_typechecking.erase(symbol.name);
