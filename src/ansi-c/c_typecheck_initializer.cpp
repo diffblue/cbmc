@@ -613,7 +613,8 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
       else
         *dest=do_initializer_rec(value, type, force_constant);
 
-      DATA_INVARIANT(type == dest->type(), "matching types");
+      if(type != dest->type())
+        *dest = typecast_exprt::conditional_cast(*dest, type);
 
       return ++init_it; // done
     }
