@@ -1,0 +1,10 @@
+CORE dfcc-only
+main.cpp
+--dfcc main --enforce-contract "add(signed_int,signed_int)"
+^\[postcondition.\d+\].*Check ensures clause.*: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+C++ pre/post contract verification via DFCC pipeline.
+Works in all C++ standard modes (CBMC extension).

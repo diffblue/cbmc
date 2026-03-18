@@ -9,7 +9,9 @@ is_windows=$4
 use_dfcc=$5
 
 name=${*:$#}
+ext="${name##*.}"
 name=${name%.c}
+name=${name%.cpp}
 
 args=${*:6:$#-6}
 if [[ "$args" != *" _ "* ]]
@@ -38,9 +40,9 @@ else
 fi
 
 if [[ "${is_windows}" == "true" ]]; then
-  $goto_cc "${name}.c" "/Fe${name}${dfcc_suffix}.gb"
+  $goto_cc "${name}.${ext}" "/Fe${name}${dfcc_suffix}.gb"
 else
-  $goto_cc -o "${name}${dfcc_suffix}.gb" "${name}.c"
+  $goto_cc -o "${name}${dfcc_suffix}.gb" "${name}.${ext}"
 fi
 
 rm -f "${name}${dfcc_suffix}-mod.gb"
