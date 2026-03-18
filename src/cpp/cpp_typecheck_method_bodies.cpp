@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <iostream>
 #endif
 
-#include <util/expr_util.h>
 #include <util/message.h>
 #include <util/symbol_table_base.h>
 
@@ -69,12 +68,11 @@ void cpp_typecheckt::typecheck_method_bodies()
         try
         {
           convert_function(method_symbol);
-          set_message_handler(old_handler);
         }
-        catch(int)
+        catch(...)
         {
-          set_message_handler(old_handler);
         }
+        set_message_handler(old_handler);
       }
       else
       {
