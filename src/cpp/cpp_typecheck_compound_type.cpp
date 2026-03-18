@@ -361,6 +361,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
     throw 0;
   }
 
+  // NOLINTNEXTLINE(readability/identifiers)
   bool is_method = !is_typedef && final_type.id() == ID_code;
   bool is_constructor = declaration.is_constructor();
   bool is_destructor = declaration.is_destructor();

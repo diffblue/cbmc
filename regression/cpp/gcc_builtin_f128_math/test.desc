@@ -5,3 +5,4 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+__float128 is not available on all platforms (e.g., ARM).

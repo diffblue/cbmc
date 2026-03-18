@@ -457,6 +457,7 @@ void cpp_typecheckt::default_assignop_value(
 /// \param bases: the parents of the class
 /// \param components: the components of the class
 /// \param initializers: the constructor initializers
+/// \param class_identifier: the identifier of the class being constructed
 void cpp_typecheckt::check_member_initializers(
   const struct_typet::basest &bases,
   const struct_typet::componentst &components,

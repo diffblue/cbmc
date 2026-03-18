@@ -7,6 +7,9 @@ ifeq ($(BUILD_ENV_),MSVC)
 	excluded_tests = -X gcc-only
 endif
 
+# libc++ tests require clang and libc++ to be installed
+excluded_tests += -X libcxx
+
 test:
 	@../test.pl -e -p -c "../../../src/cbmc/cbmc --validate-goto-model --validate-ssa-equation" $(excluded_tests)
 

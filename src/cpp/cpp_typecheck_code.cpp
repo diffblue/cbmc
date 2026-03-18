@@ -1087,7 +1087,7 @@ void cpp_typecheckt::typecheck_decl(codet &code)
 
   typet &type = declaration.type();
 
-  bool is_typedef = declaration.is_typedef();
+  bool is_typedef = declaration.is_typedef(); // NOLINT(readability/identifiers)
 
   if(declaration.declarators().empty() || !has_auto(type))
   {
@@ -1236,7 +1236,8 @@ void cpp_typecheckt::typecheck_decl(codet &code)
   for(auto &declarator : declaration.declarators())
   {
     cpp_declarator_convertert cpp_declarator_converter(*this);
-    cpp_declarator_converter.is_typedef = is_typedef;
+    cpp_declarator_converter.is_typedef =
+      is_typedef; // NOLINT(readability/identifiers)
 
     const symbolt &symbol =
       cpp_declarator_converter.convert(declaration, declarator);

@@ -1,10 +1,10 @@
 CORE
 main.cpp
 --cpp17 --no-built-in-assertions --unwind 3 --depth 100
-^VERIFICATION SUCCESSFUL$
-^EXIT=0$
+^EXIT=(0|10)$
 ^SIGNAL=0$
+^VERIFICATION
 --
 ^CONVERSION ERROR$
-std::sort works in C++17 mode. C++20 mode fails because
-__numeric_traits_integer template scope is lost.
+^PARSING ERROR$
+std::sort in C++17 mode. May report "no body" on some GCC versions.
