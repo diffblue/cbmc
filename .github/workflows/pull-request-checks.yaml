@@ -24,7 +24,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq gcc gdb g++ maven jq flex bison libxml2-utils ccache cmake z3 libc++-dev libc++abi-dev
+          sudo apt-get install --no-install-recommends -yq gcc gdb g++ maven jq flex bison libxml2-utils ccache cmake z3 clang libc++-dev libc++abi-dev
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
       - name: Download cvc-5 from the releases page and make sure it can be deployed
@@ -109,7 +109,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq clang-19 clang++-19 gdb maven jq flex bison libxml2-utils cpanminus ccache z3
+          sudo apt-get install --no-install-recommends -yq clang-19 clang++-19 gdb maven jq flex bison libxml2-utils cpanminus ccache z3 libc++-dev libc++abi-dev
           make -C src minisat2-download cadical-download
           cpanm Thread::Pool::Simple
       - name: Confirm z3 solver is available and log the version installed
@@ -181,7 +181,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq clang-19 clang++-19 gdb maven jq flex bison libxml2-utils cpanminus ccache z3
+          sudo apt-get install --no-install-recommends -yq clang-19 clang++-19 gdb maven jq flex bison libxml2-utils cpanminus ccache z3 libc++-dev libc++abi-dev
           make -C src minisat2-download
           cpanm Thread::Pool::Simple
       - name: Confirm z3 solver is available and log the version installed
@@ -222,7 +222,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen graphviz z3
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen graphviz z3 clang libc++-dev libc++abi-dev
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
       - name: Download cvc-5 from the releases page and make sure it can be deployed
@@ -292,7 +292,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq clang clang-14 gdb maven jq flex bison libxml2-utils cpanminus ccache z3
+          sudo apt-get install --no-install-recommends -yq clang clang-14 gdb maven jq flex bison libxml2-utils cpanminus ccache z3 libc++-dev libc++abi-dev
           make -C src minisat2-download cadical-download
           cpanm Thread::Pool::Simple
       - name: Confirm z3 solver is available and log the version installed
@@ -361,7 +361,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen graphviz z3
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen graphviz z3 clang libc++-dev libc++abi-dev
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
       - name: Download cvc-5 from the releases page and make sure it can be deployed
@@ -415,7 +415,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc-14 gdb g++-14 maven flex bison libxml2-utils dpkg-dev ccache doxygen z3
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc-14 gdb g++-14 maven flex bison libxml2-utils dpkg-dev ccache doxygen z3 clang libc++-dev libc++abi-dev
           # Update symlinks so that any use of gcc (including our regression
           # tests) will use GCC 14.
           sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 110 \
@@ -468,7 +468,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen graphviz z3
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen graphviz z3 clang libc++-dev libc++abi-dev
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
       - name: Download cvc-5 from the releases page and make sure it can be deployed
@@ -522,7 +522,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils ccache doxygen z3 g++-multilib
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils ccache doxygen z3 g++-multilib clang libc++-dev libc++abi-dev
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
       - name: Download cvc-5 from the releases page and make sure it can be deployed
@@ -569,7 +569,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ maven flex bison libxml2-utils ccache z3
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ maven flex bison libxml2-utils ccache z3 clang libc++-dev libc++abi-dev
       - name: Prepare ccache
         uses: actions/cache@v5
         with:
@@ -616,7 +616,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ maven flex bison libxml2-utils ccache z3
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ maven flex bison libxml2-utils ccache z3 clang libc++-dev libc++abi-dev
       - name: Prepare ccache
         uses: actions/cache@v5
         with:
