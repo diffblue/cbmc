@@ -1,4 +1,4 @@
-CORE
+CORE gcc-13
 main.cpp
 --cpp20 --no-built-in-assertions --unwind 3 --depth 100
 ^VERIFICATION
