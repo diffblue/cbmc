@@ -38,6 +38,7 @@ SRC = cpp_constructor.cpp \
       cpp_typecheck_namespace.cpp \
       cpp_typecheck_resolve.cpp \
       cpp_typecheck_static_assert.cpp \
+      cpp_typecheck_stdlib.cpp \
       cpp_typecheck_template.cpp \
       cpp_typecheck_type.cpp \
       cpp_typecheck_using.cpp \

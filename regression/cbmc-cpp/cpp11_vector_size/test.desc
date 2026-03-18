@@ -1,7 +1,7 @@
 CORE
 main.cpp
 --cpp11 --unwind 2
-\[main\.assertion\.1\] line 6 size after push_back: SUCCESS
+\[main\.assertion\.1\] line 7 size after push_back: SUCCESS
 ^EXIT=(0|10)$
 ^SIGNAL=0$
 ^VERIFICATION

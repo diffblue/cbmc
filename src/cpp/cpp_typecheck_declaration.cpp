@@ -16,7 +16,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_declarator_converter.h"
 #include "cpp_template_type.h"
 #include "cpp_typecheck.h"
-#include "cpp_typecheck_fargs.h"
 #include "cpp_util.h"
 
 void cpp_typecheckt::convert(cpp_declarationt &declaration)

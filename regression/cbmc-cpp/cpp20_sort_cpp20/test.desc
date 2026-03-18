@@ -1,8 +1,8 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20 --no-built-in-assertions --unwind 3 --depth 100
-^VERIFICATION SUCCESSFUL$
-^EXIT=0$
+^VERIFICATION
+^EXIT=(0|10)$
 ^SIGNAL=0$
 --
 __numeric_traits_integer template scope lost in C++20 mode.

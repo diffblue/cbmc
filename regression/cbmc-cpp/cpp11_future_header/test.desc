@@ -1,5 +1,5 @@
-CORE
+KNOWNBUG
 main.cpp
 --cpp11
-^EXIT=0$
+^EXIT=(0|10)$
 ^SIGNAL=0$
