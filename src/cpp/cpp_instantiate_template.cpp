@@ -1533,7 +1533,9 @@ const symbolt &cpp_typecheckt::instantiate_template(
               goto body_found;
             }
           }
-        body_found:;
+        body_found:
+        {
+        }
         }
 
         add_method_body(sym);
@@ -1575,8 +1577,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
       new_decl.storage_spec().is_mutable())
     {
       error().source_location=new_decl.source_location();
-      error() << "invalid storage class specified for template field"
-              << eom;
+      error() << "invalid storage class specified for template field" << eom;
       throw 0;
     }
 
@@ -1643,7 +1644,9 @@ const symbolt &cpp_typecheckt::instantiate_template(
           continue;
         }
       }
-    body_found_is_tm:;
+    body_found_is_tm:
+    {
+    }
     }
 
     typecheck_compound_declarator(
@@ -2168,8 +2171,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
         };
 
         std::function<void(irept &)> expand_pack;
-        expand_pack = [&pack_var_name,
-                       &expanded_names,
+        expand_pack = [&expanded_names,
                        &expand_pack,
                        &is_pack_name,
                        &contains_pack_name,
