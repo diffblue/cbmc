@@ -1,6 +1,6 @@
-CORE
+CORE gcc-only
 main.cpp
-
+--gcc
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

@@ -10,6 +10,8 @@ int main()
 {
   Point a{1, 2};
   Point b{1, 3};
-  __CPROVER_assert((a <= > b) < 0, "defaulted spaceship");
+  // clang-format off
+  __CPROVER_assert((a <=> b) < 0, "defaulted spaceship");
+  // clang-format on
   return 0;
 }

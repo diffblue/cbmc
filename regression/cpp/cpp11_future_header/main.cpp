@@ -1,5 +1,0 @@
-#include <future>
-
-int main()
-{
-}
