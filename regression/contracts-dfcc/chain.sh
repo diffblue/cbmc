@@ -9,7 +9,9 @@ is_windows=$4
 use_dfcc=$5
 
 name=${*:$#}
+ext="${name##*.}"
 name=${name%.c}
+name=${name%.cpp}
 
 args=${*:6:$#-6}
 if [[ "$args" != *" _ "* ]]
@@ -59,13 +61,13 @@ else
 fi
 
 if [[ "${is_windows}" == "true" ]]; then
-  $goto_cc "${name}.c" "/Fe${name}${dfcc_suffix}.gb"
+  $goto_cc "${name}.${ext}" "/Fe${name}${dfcc_suffix}.gb"
 else
   signedness_flag=""
   if [[ "$check_char_signedness_stability" == "1" ]]; then
     signedness_flag="-fsigned-char"
   fi
-  $goto_cc ${signedness_flag} -o "${name}${dfcc_suffix}.gb" "${name}.c"
+  $goto_cc ${signedness_flag} -o "${name}${dfcc_suffix}.gb" "${name}.${ext}"
 fi
 
 if [[ -n "$args_pre" ]]; then
