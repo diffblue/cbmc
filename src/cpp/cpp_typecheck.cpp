@@ -121,7 +121,7 @@ void cpp_typecheckt::typecheck()
       {
         convert(item);
       }
-      catch(int)
+      catch(...)
       {
       }
       set_message_handler(old_mh);
