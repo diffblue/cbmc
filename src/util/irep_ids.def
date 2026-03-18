@@ -708,7 +708,6 @@ IREP_ID_TWO(C_virtual_name, #virtual_name)
 IREP_ID_TWO(C_unnamed_object, #unnamed_object)
 IREP_ID_TWO(C_temporary_avoided, #temporary_avoided)
 IREP_ID_TWO(C_qualifier, #qualifier)
-IREP_ID_TWO(C_ref_qualifier, #ref_qualifier)
 IREP_ID_TWO(C_array_ini, #array_ini)
 IREP_ID_ONE(r_ok)
 IREP_ID_ONE(w_ok)
@@ -739,6 +738,7 @@ IREP_ID_ONE(is_vtptr)
 IREP_ID_ONE(prefix)
 IREP_ID_ONE(cv)
 IREP_ID_ONE(cpp_dummy_destructor)
+IREP_ID_ONE(cast_expression)
 IREP_ID_ONE(pod_constructor)
 IREP_ID_ONE(template_decls)
 IREP_ID_ONE(throw_decl)
@@ -930,6 +930,7 @@ IREP_ID_ONE(remove_cv)
 IREP_ID_ONE(remove_reference)
 IREP_ID_ONE(remove_cvref)
 
+IREP_ID_TWO(C_ref_qualifier, #ref_qualifier)
 // Projects depending on this code base that wish to extend the list of
 // available ids should provide a file local_irep_ids.def in their source tree
 // and add -D'LOCAL_IREP_IDS=<project/local_irep_ids.def>' to their compiler

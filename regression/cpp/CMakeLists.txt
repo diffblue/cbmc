@@ -4,6 +4,13 @@ else()
   set(gcc_only "")
 endif()
 
+set(extra_excludes "")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "13")
+  list(APPEND extra_excludes -X gcc-13)
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+  list(APPEND extra_excludes -X gcc-13)
+endif()
+
 add_test_pl_tests(
-    "$<TARGET_FILE:goto-cc>" ${gcc_only}
+    "$<TARGET_FILE:goto-cc>" ${gcc_only} ${extra_excludes}
 )
