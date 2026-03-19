@@ -1013,16 +1013,16 @@ exprt float_bvt::rem(const exprt &x, const exprt &y) const
   exprt one = from_integer(1, type);
   exprt n_plus_1 =
     convert(ieee_float_op_exprt{n_float, ID_floatbv_plus, one, round_to_zero});
-  exprt n_minus_1 = convert(
-    ieee_float_op_exprt{n_float, ID_floatbv_minus, one, round_to_zero});
+  exprt n_minus_1 =
+    convert(ieee_float_op_exprt{n_float, ID_floatbv_minus, one, round_to_zero});
 
-  exprt r_plus_times_y = convert(
-    ieee_float_op_exprt{n_plus_1, ID_floatbv_mult, y, round_to_zero});
+  exprt r_plus_times_y =
+    convert(ieee_float_op_exprt{n_plus_1, ID_floatbv_mult, y, round_to_zero});
   exprt r_plus = convert(
     ieee_float_op_exprt{x, ID_floatbv_minus, r_plus_times_y, round_to_zero});
 
-  exprt r_minus_times_y = convert(
-    ieee_float_op_exprt{n_minus_1, ID_floatbv_mult, y, round_to_zero});
+  exprt r_minus_times_y =
+    convert(ieee_float_op_exprt{n_minus_1, ID_floatbv_mult, y, round_to_zero});
   exprt r_minus = convert(
     ieee_float_op_exprt{x, ID_floatbv_minus, r_minus_times_y, round_to_zero});
 
