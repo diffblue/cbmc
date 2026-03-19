@@ -9,12 +9,24 @@ endif()
 set(extra_excludes "")
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "13")
   list(APPEND extra_excludes -X gcc-13)
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+elseif(NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   list(APPEND extra_excludes -X gcc-13)
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
   list(APPEND extra_excludes -X libcxx)
 endif()
 
 add_test_pl_tests(
-    "$<TARGET_FILE:cbmc> --validate-goto-model --validate-ssa-equation" ${gcc_only} ${extra_excludes}
+    "$<TARGET_FILE:cbmc> --validate-goto-model --validate-ssa-equation" ${gcc_only} ${extra_excludes} -X libcxx
 )
+
+# libc++ tests run without --validate-goto-model because system header
+# processing may leave missing symbols in the goto model.
+if(NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  add_test_pl_profile(
+      "cbmc-cpp"
+      "$<TARGET_FILE:cbmc>"
+      -C CORE
+      -I libcxx -s libcxx
+      ${extra_excludes}
+  )
+endif()
