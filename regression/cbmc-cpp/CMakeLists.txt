@@ -19,7 +19,10 @@ add_test_pl_tests(
 
 # libc++ tests run without --validate-goto-model because system header
 # processing may leave missing symbols in the goto model.
-if(NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+# Only enable if clang and libc++ headers are available.
+find_program(CLANG_FOUND clang)
+find_path(LIBCXX_FOUND "vector" PATHS /usr/include/c++/v1 /usr/lib/llvm-18/include/c++/v1 NO_DEFAULT_PATH)
+if(CLANG_FOUND AND LIBCXX_FOUND)
   add_test_pl_profile(
       "cbmc-cpp-libcxx"
       "$<TARGET_FILE:cbmc>"
