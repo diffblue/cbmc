@@ -1736,6 +1736,10 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     convert_floatbv_rem(to_binary_expr(expr));
   }
+  else if(expr.id() == ID_floatbv_fma)
+  {
+    convert_floatbv_fma(to_floatbv_fma_expr(expr));
+  }
   else if(expr.id()==ID_address_of)
   {
     const address_of_exprt &address_of_expr = to_address_of_expr(expr);
@@ -4491,6 +4495,28 @@ void smt2_convt::convert_floatbv_rem(const binary_exprt &expr)
   }
 }
 
+void smt2_convt::convert_floatbv_fma(const floatbv_fma_exprt &expr)
+{
+  DATA_INVARIANT(
+    expr.type().id() == ID_floatbv,
+    "type of ieee floating point expression shall be floatbv");
+
+  if(use_FPA_theory)
+  {
+    out << "(fp.fma ";
+    convert_rounding_mode_FPA(expr.rounding_mode());
+    out << " ";
+    convert_expr(expr.op_multiply_lhs());
+    out << " ";
+    convert_expr(expr.op_multiply_rhs());
+    out << " ";
+    convert_expr(expr.op_add());
+    out << ")";
+  }
+  else
+    convert_floatbv(expr);
+}
+
 void smt2_convt::convert_with(const with_exprt &expr)
 {
   INVARIANT(
@@ -5563,6 +5589,7 @@ void smt2_convt::find_symbols(const exprt &expr)
            expr.id() == ID_floatbv_minus ||
            expr.id() == ID_floatbv_mult ||
            expr.id() == ID_floatbv_div ||
+           expr.id() == ID_floatbv_fma ||
            expr.id() == ID_floatbv_typecast ||
            expr.id() == ID_ieee_float_equal ||
            expr.id() == ID_ieee_float_notequal ||

@@ -1,5 +1,5 @@
 // fmaf should compute x*y+z with a single rounding.
-// The C library model does x*y then +z (two roundings).
+// The C library model used to do x*y then +z (two roundings).
 // Example: fmaf(1+eps, 1+eps, -(1+2*eps)) where eps = 2^-23
 // Exact result: eps^2 = 2^-46 > 0
 // Double rounding: (1+eps)*(1+eps) rounds to 1+2*eps, then +c = 0

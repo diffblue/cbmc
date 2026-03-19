@@ -3386,6 +3386,28 @@ exprt c_typecheck_baset::do_special_functions(
 
     return std::move(floatbv_rem_expr);
   }
+  else if(
+    identifier == CPROVER_PREFIX "fma" || identifier == CPROVER_PREFIX "fmaf" ||
+    identifier == CPROVER_PREFIX "fmal")
+  {
+    if(expr.arguments().size() != 3)
+    {
+      error().source_location = f_op.source_location();
+      error() << "fma-functions expect three operands" << eom;
+      throw 0;
+    }
+
+    typecheck_function_call_arguments(expr);
+
+    // Create with 3 operands; adjust_float_expressions adds rounding mode
+    typet result_type = expr.arguments()[0].type();
+    multi_ary_exprt fma_expr(
+      ID_floatbv_fma, expr.arguments(), std::move(result_type));
+
+    fma_expr.add_source_location() = source_location;
+
+    return std::move(fma_expr);
+  }
   else if(identifier==CPROVER_PREFIX "allocate")
   {
     if(expr.arguments().size()!=2)

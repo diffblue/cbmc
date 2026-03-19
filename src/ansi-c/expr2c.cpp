@@ -3734,6 +3734,16 @@ std::string expr2ct::convert_with_precedence(
       return convert_function(src, "SIGN");
   }
 
+  else if(src.id() == ID_floatbv_fma)
+  {
+    // Print only the 3 mathematical operands, omitting the rounding mode
+    // (4th operand) to produce valid C syntax: fma(a, b, c)
+    const auto &fma_expr = to_floatbv_fma_expr(src);
+    return "fma(" + convert(fma_expr.op_multiply_lhs()) + ", " +
+           convert(fma_expr.op_multiply_rhs()) + ", " +
+           convert(fma_expr.op_add()) + ")";
+  }
+
   else if(src.id()==ID_popcount)
   {
     if(config.ansi_c.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)

@@ -3486,44 +3486,19 @@ long double powl(long double x, long double y)
 #  define __CPROVER_FENV_H_INCLUDED
 #endif
 
-double __builtin_inf(void);
-
 double fma(double x, double y, double z)
 {
-  // see man fma (https://linux.die.net/man/3/fma)
-#pragma CPROVER check push
-#pragma CPROVER check disable "float-div-by-zero"
-  if(isnan(x) || isnan(y))
-    return 0.0 / 0.0;
-  else if(
-    (isinf(x) || isinf(y)) &&
-    (fpclassify(x) == FP_ZERO || fpclassify(y) == FP_ZERO))
+  // IEEE 754: raise FE_INVALID for 0*inf or inf+(-inf)
+  if((__CPROVER_isinfd(x) && y == 0.0) || (x == 0.0 && __CPROVER_isinfd(y)))
   {
     feraiseexcept(FE_INVALID);
-    return 0.0 / 0.0;
   }
-  else if(isnan(z))
-    return 0.0 / 0.0;
-
-#pragma CPROVER check disable "float-overflow"
-  double x_times_y = x * y;
-  if(
-    isinf(x_times_y) && isinf(z) &&
-    __CPROVER_signd(x_times_y) != __CPROVER_signd(z))
+  else if((__CPROVER_isinfd(x) || __CPROVER_isinfd(y)) && __CPROVER_isinfd(z))
   {
     feraiseexcept(FE_INVALID);
-    return 0.0 / 0.0;
   }
-#pragma CPROVER check pop
 
-  if(isinf(x_times_y))
-  {
-    feraiseexcept(FE_OVERFLOW);
-    return __CPROVER_signd(x_times_y) ? -__builtin_inf() : __builtin_inf();
-  }
-  // TODO: detect underflow (FE_UNDERFLOW), return +/- 0
-
-  return x_times_y + z;
+  return __CPROVER_fma(x, y, z);
 }
 
 /* FUNCTION: fmaf */
@@ -3538,44 +3513,18 @@ double fma(double x, double y, double z)
 #  define __CPROVER_FENV_H_INCLUDED
 #endif
 
-float __builtin_inff(void);
-
 float fmaf(float x, float y, float z)
 {
-  // see man fma (https://linux.die.net/man/3/fma)
-#pragma CPROVER check push
-#pragma CPROVER check disable "float-div-by-zero"
-  if(isnanf(x) || isnanf(y))
-    return 0.0f / 0.0f;
-  else if(
-    (isinff(x) || isinff(y)) &&
-    (fpclassify(x) == FP_ZERO || fpclassify(y) == FP_ZERO))
+  if((__CPROVER_isinff(x) && y == 0.0f) || (x == 0.0f && __CPROVER_isinff(y)))
   {
     feraiseexcept(FE_INVALID);
-    return 0.0f / 0.0f;
   }
-  else if(isnanf(z))
-    return 0.0f / 0.0f;
-
-#pragma CPROVER check disable "float-overflow"
-  float x_times_y = x * y;
-  if(
-    isinff(x_times_y) && isinff(z) &&
-    __CPROVER_signf(x_times_y) != __CPROVER_signf(z))
+  else if((__CPROVER_isinff(x) || __CPROVER_isinff(y)) && __CPROVER_isinff(z))
   {
     feraiseexcept(FE_INVALID);
-    return 0.0f / 0.0f;
   }
-#pragma CPROVER check pop
 
-  if(isinff(x_times_y))
-  {
-    feraiseexcept(FE_OVERFLOW);
-    return __CPROVER_signf(x_times_y) ? -__builtin_inff() : __builtin_inff();
-  }
-  // TODO: detect underflow (FE_UNDERFLOW), return +/- 0
-
-  return x_times_y + z;
+  return __CPROVER_fmaf(x, y, z);
 }
 
 /* FUNCTION: fmal */
@@ -3590,53 +3539,19 @@ float fmaf(float x, float y, float z)
 #  define __CPROVER_FENV_H_INCLUDED
 #endif
 
-#ifndef __CPROVER_FLOAT_H_INCLUDED
-#  include <float.h>
-#  define __CPROVER_FLOAT_H_INCLUDED
-#endif
-
-long double __builtin_infl(void);
-
 long double fmal(long double x, long double y, long double z)
 {
-  // see man fma (https://linux.die.net/man/3/fma)
-#pragma CPROVER check push
-#pragma CPROVER check disable "float-div-by-zero"
-  if(isnanl(x) || isnanl(y))
-    return 0.0l / 0.0l;
+  if((__CPROVER_isinfld(x) && y == 0.0l) || (x == 0.0l && __CPROVER_isinfld(y)))
+  {
+    feraiseexcept(FE_INVALID);
+  }
   else if(
-    (isinfl(x) || isinfl(y)) &&
-    (fpclassify(x) == FP_ZERO || fpclassify(y) == FP_ZERO))
+    (__CPROVER_isinfld(x) || __CPROVER_isinfld(y)) && __CPROVER_isinfld(z))
   {
     feraiseexcept(FE_INVALID);
-    return 0.0l / 0.0l;
   }
-  else if(isnanl(z))
-    return 0.0l / 0.0l;
 
-#pragma CPROVER check disable "float-overflow"
-  long double x_times_y = x * y;
-  if(
-    isinfl(x_times_y) && isinfl(z) &&
-    __CPROVER_signld(x_times_y) != __CPROVER_signld(z))
-  {
-    feraiseexcept(FE_INVALID);
-    return 0.0l / 0.0l;
-  }
-#pragma CPROVER check pop
-
-#if LDBL_MAX_EXP == DBL_MAX_EXP
-  return fma(x, y, z);
-#else
-  if(isinfl(x_times_y))
-  {
-    feraiseexcept(FE_OVERFLOW);
-    return __CPROVER_signld(x_times_y) ? -__builtin_infl() : __builtin_infl();
-  }
-  // TODO: detect underflow (FE_UNDERFLOW), return +/- 0
-
-  return x_times_y + z;
-#endif
+  return __CPROVER_fmal(x, y, z);
 }
 
 /* FUNCTION: __builtin_powi */
