@@ -1,8 +1,9 @@
-KNOWNBUG
+FUTURE
 z3-6553-rem.smt2
 
 ^EXIT=0$
 ^SIGNAL=0$
 ^sat$
 --
-Z3#6553: fp.rem bug (always returns +0)
+Z3#6553: fp.rem with Float64 operands times out due to the large
+integer-width encoding in the FMA-based remainder algorithm.
