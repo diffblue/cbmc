@@ -1,8 +1,8 @@
-KNOWNBUG
+CORE
 z3-7162-fma.smt2
 
 ^EXIT=0$
 ^SIGNAL=0$
 ^sat$
 --
-Z3#7162: fp.fma unsupported
+fp.fma now supported.

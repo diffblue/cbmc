@@ -53,6 +53,10 @@ static bool have_to_adjust_float_expressions(const exprt &expr)
       return true;
   }
 
+  // FMA needs rounding mode added (3 operands -> 4)
+  if(expr.id() == ID_floatbv_fma && expr.operands().size() == 3)
+    return true;
+
   if(expr.id()==ID_typecast)
   {
     const typecast_exprt &typecast_expr=to_typecast_expr(expr);
@@ -129,6 +133,13 @@ void adjust_float_expressions(exprt &expr, const exprt &rounding_mode)
       expr.operands().resize(3);
       to_ieee_float_op_expr(expr).rounding_mode() = rounding_mode;
     }
+  }
+
+  // Add rounding mode to FMA
+  if(expr.id() == ID_floatbv_fma && expr.operands().size() == 3)
+  {
+    expr.operands().resize(4);
+    to_floatbv_fma_expr(expr).rounding_mode() = rounding_mode;
   }
 
   if(expr.id()==ID_typecast)

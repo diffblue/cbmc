@@ -568,6 +568,77 @@ inline floatbv_rem_exprt &to_floatbv_rem_expr(exprt &expr)
   return static_cast<floatbv_rem_exprt &>(expr);
 }
 
+/// \brief Fused multiply-add expression: round(op0 * op1 + op2)
+/// with a single rounding. The rounding mode is stored as the 4th operand.
+class floatbv_fma_exprt : public expr_protectedt
+{
+public:
+  floatbv_fma_exprt(exprt _op0, exprt _op1, exprt _op2, exprt _rm)
+    : expr_protectedt(
+        ID_floatbv_fma,
+        _op0.type(),
+        {_op0, std::move(_op1), std::move(_op2), std::move(_rm)})
+  {
+  }
+
+  exprt &op_multiply_lhs()
+  {
+    return exprt::op0();
+  }
+  const exprt &op_multiply_lhs() const
+  {
+    return exprt::op0();
+  }
+
+  exprt &op_multiply_rhs()
+  {
+    return exprt::op1();
+  }
+  const exprt &op_multiply_rhs() const
+  {
+    return exprt::op1();
+  }
+
+  exprt &op_add()
+  {
+    return exprt::op2();
+  }
+  const exprt &op_add() const
+  {
+    return exprt::op2();
+  }
+
+  exprt &rounding_mode()
+  {
+    return exprt::op3();
+  }
+  const exprt &rounding_mode() const
+  {
+    return exprt::op3();
+  }
+};
+
+inline void validate_expr(const floatbv_fma_exprt &value)
+{
+  validate_operands(value, 4, "Fused multiply-add must have four operands");
+}
+
+inline const floatbv_fma_exprt &to_floatbv_fma_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_floatbv_fma);
+  const floatbv_fma_exprt &ret = static_cast<const floatbv_fma_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+inline floatbv_fma_exprt &to_floatbv_fma_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_floatbv_fma);
+  floatbv_fma_exprt &ret = static_cast<floatbv_fma_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
 /// \brief returns the a rounding mode expression for a given
 /// IEEE rounding mode, encoded using the recommendation in
 /// C11 5.2.4.2.2

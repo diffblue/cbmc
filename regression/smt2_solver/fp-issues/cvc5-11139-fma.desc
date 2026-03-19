@@ -1,8 +1,8 @@
-KNOWNBUG
+CORE
 cvc5-11139-fma.smt2
 
 ^EXIT=0$
 ^SIGNAL=0$
 ^sat$
 --
-CVC5#11139: fp.fma unsupported
+fp.fma now supported.

@@ -1,11 +1,8 @@
-KNOWNBUG
+CORE
 fp-fma1.smt2
 
 ^EXIT=0$
 ^SIGNAL=0$
 ^sat$
-unknown function symbol 'fp.fma'
 --
-Z3#7162, CVC5#11139: fp.fma is not supported by CBMC's SMT2 solver.
-The solver reports an error and ignores the assertion, leading to
-incorrect sat result. Should either support fp.fma or report unsupported.
+fp.fma now supported.

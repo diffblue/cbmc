@@ -48,6 +48,20 @@ public:
   div(const exprt &, const exprt &, const exprt &rm, const ieee_float_spect &)
     const;
 
+  /// Fused multiply-add: round(multiply_lhs * multiply_rhs + addend)
+  /// with a single rounding step.
+  /// \param multiply_lhs: left-hand side of the multiplication
+  /// \param multiply_rhs: right-hand side of the multiplication
+  /// \param addend: value added to the product
+  /// \param rm: IEEE 754 rounding mode
+  /// \param spec: floating-point format specification
+  exprt fma(
+    const exprt &multiply_lhs,
+    const exprt &multiply_rhs,
+    const exprt &addend,
+    const exprt &rm,
+    const ieee_float_spect &) const;
+
   // conversion
   exprt from_unsigned_integer(
     const exprt &,
