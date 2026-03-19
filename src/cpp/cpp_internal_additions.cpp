@@ -8,16 +8,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "cpp_internal_additions.h"
 
-#include <ostream>
-
 #include <util/c_types.h>
 #include <util/config.h>
 
+#include <goto-programs/adjust_float_expressions.h>
+#include <goto-programs/initialize_function.h>
+
 #include <ansi-c/ansi_c_internal_additions.h>
 
-#include <linking/static_lifetime_init.h>
-
-#include <goto-programs/adjust_float_expressions.h>
+#include <ostream>
 
 std::string c2cpp(const std::string &s)
 {

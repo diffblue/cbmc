@@ -23,8 +23,7 @@ Date: November 2011
 #include <util/std_code.h>
 
 #include <goto-programs/goto_model.h>
-
-#include <linking/static_lifetime_init.h>
+#include <goto-programs/initialize_function.h>
 
 #include <regex>
 

@@ -19,8 +19,7 @@ Date: December 2012
 
 #include <goto-programs/cfg.h>
 #include <goto-programs/goto_model.h>
-
-#include <linking/static_lifetime_init.h>
+#include <goto-programs/initialize_function.h>
 
 #include <filesystem>
 #include <iostream>

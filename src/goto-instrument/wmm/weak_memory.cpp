@@ -21,18 +21,17 @@ Date: September 2011
 
 #include "weak_memory.h"
 
-#include <set>
-
 #include <util/fresh_symbol.h>
 
+#include <goto-programs/initialize_function.h>
 #include <goto-programs/remove_skip.h>
-
-#include <linking/static_lifetime_init.h>
 
 #include <goto-instrument/rw_set.h>
 
-#include "shared_buffers.h"
 #include "goto2graph.h"
+#include "shared_buffers.h"
+
+#include <set>
 
 /// all access to shared variables is pushed into assignments
 void introduce_temporaries(
