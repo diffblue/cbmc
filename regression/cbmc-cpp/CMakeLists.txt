@@ -11,8 +11,6 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_L
   list(APPEND extra_excludes -X gcc-13)
 elseif(NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   list(APPEND extra_excludes -X gcc-13)
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-  list(APPEND extra_excludes -X libcxx)
 endif()
 
 add_test_pl_tests(
@@ -23,10 +21,10 @@ add_test_pl_tests(
 # processing may leave missing symbols in the goto model.
 if(NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   add_test_pl_profile(
-      "cbmc-cpp"
+      "cbmc-cpp-libcxx"
       "$<TARGET_FILE:cbmc>"
       -C CORE
-      -I libcxx -s libcxx
+      -I libcxx
       ${extra_excludes}
   )
 endif()
