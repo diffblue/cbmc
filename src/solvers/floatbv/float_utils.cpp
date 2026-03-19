@@ -494,6 +494,121 @@ bvt float_utilst::mul(const bvt &src1, const bvt &src2)
   return round_and_pack(result);
 }
 
+bvt float_utilst::fma(
+  const bvt &multiply_lhs,
+  const bvt &multiply_rhs,
+  const bvt &addend)
+{
+  // Fused multiply-add: round(src1 * src2 + src3) with a single rounding.
+  // The product src1 * src2 is computed exactly (double-width fraction),
+  // then src3 is added, and the result is rounded once.
+
+  const unbiased_floatt unpacked_lhs = unpack(multiply_lhs);
+  const unbiased_floatt unpacked_rhs = unpack(multiply_rhs);
+  const unbiased_floatt unpacked_add = unpack(addend);
+
+  // --- Exact product a*b ---
+  const std::size_t frac_size = unpacked_lhs.fraction.size(); // f+1
+
+  bvt prod_fraction = bv_utils.unsigned_multiplier(
+    bv_utils.zero_extension(unpacked_lhs.fraction, frac_size * 2),
+    bv_utils.zero_extension(unpacked_rhs.fraction, frac_size * 2));
+  // Product fraction has width 2*(f+1) bits (double-width fraction w.r.t.
+  // inputs).
+  // The value is prod_fraction * 2^(prod_exponent - (prod_fraction.size()-1)).
+  // Keep full width for exact intermediate result.
+
+  bvt prod_exponent = bv_utils.add(
+    bv_utils.sign_extension(
+      unpacked_lhs.exponent, unpacked_lhs.exponent.size() + 2),
+    bv_utils.sign_extension(
+      unpacked_rhs.exponent, unpacked_rhs.exponent.size() + 2));
+  prod_exponent = bv_utils.inc(prod_exponent);
+
+  literalt prod_sign = prop.lxor(unpacked_lhs.sign, unpacked_rhs.sign);
+
+  // --- Align c's fraction to the product's wider format ---
+  // Product fraction: prod_width bits, binary point after MSB.
+  // c fraction: (f+1) bits. Pad on the right to match width, then
+  // adjust exponent to compensate.
+  const std::size_t prod_width = prod_fraction.size();
+  const std::size_t c_pad = prod_width - frac_size;
+  bvt c_fraction =
+    bv_utils.concatenate(bv_utils.zeros(c_pad), unpacked_add.fraction);
+  bvt c_exponent =
+    bv_utils.sign_extension(unpacked_add.exponent, prod_exponent.size());
+
+  // --- Add product + c (same logic as add_sub) ---
+  bvt exp_diff = bv_utils.sub(prod_exponent, c_exponent);
+  literalt c_bigger = exp_diff.back();
+
+  bvt bigger_exp = bv_utils.select(c_bigger, c_exponent, prod_exponent);
+  bvt big_frac = bv_utils.select(c_bigger, c_fraction, prod_fraction);
+  bvt small_frac = bv_utils.select(c_bigger, prod_fraction, c_fraction);
+
+  bvt distance = bv_utils.absolute_value(exp_diff);
+  bvt limited_dist = limit_distance(distance, mp_integer(prod_width + 3));
+
+  bvt big_padded = bv_utils.concatenate(bv_utils.zeros(3), big_frac);
+  bvt small_padded = bv_utils.concatenate(bv_utils.zeros(3), small_frac);
+
+  literalt sticky_bit;
+  bvt small_shifted =
+    sticky_right_shift(small_padded, limited_dist, sticky_bit);
+  small_shifted[0] = prop.lor(small_shifted[0], sticky_bit);
+
+  bvt big_ext = bv_utils.zero_extension(big_padded, big_padded.size() + 2);
+  bvt small_ext =
+    bv_utils.zero_extension(small_shifted, small_shifted.size() + 2);
+
+  literalt subtract_lit = prop.lxor(prod_sign, unpacked_add.sign);
+  bvt sum = bv_utils.add_sub(big_ext, small_ext, subtract_lit);
+
+  literalt fraction_sign = sum.back();
+  sum = bv_utils.absolute_value(sum);
+
+  unbiased_floatt result;
+  result.fraction = sum;
+  result.exponent = bv_utils.add(
+    bv_utils.sign_extension(bigger_exp, bigger_exp.size() + 1),
+    bv_utils.build_constant(2, bigger_exp.size() + 1));
+
+  // Sign
+  literalt add_sub_sign = prop.lxor(
+    prop.lselect(c_bigger, unpacked_add.sign, prod_sign), fraction_sign);
+
+  // NaN: any input NaN, inf*0, or inf+(-inf) in the addition
+  literalt prod_inf = prop.lor(unpacked_lhs.infinity, unpacked_rhs.infinity);
+  result.NaN = prop.lor(
+    {is_NaN(multiply_lhs),
+     is_NaN(multiply_rhs),
+     is_NaN(addend),
+     prop.land(unpacked_lhs.zero, unpacked_rhs.infinity),
+     prop.land(unpacked_rhs.zero, unpacked_lhs.infinity),
+     prop.land(
+       prop.land(prod_inf, unpacked_add.infinity),
+       prop.lxor(prod_sign, unpacked_add.sign))});
+
+  result.infinity =
+    prop.land(!result.NaN, prop.lor(prod_inf, unpacked_add.infinity));
+
+  result.zero = prop.land(
+    !prop.lor(result.infinity, result.NaN), !prop.lor(result.fraction));
+
+  literalt infinity_sign = prop.lselect(prod_inf, prod_sign, unpacked_add.sign);
+  literalt zero_sign = prop.lselect(
+    rounding_mode_bits.round_to_minus_inf,
+    prop.lor(prod_sign, unpacked_add.sign),
+    prop.land(prod_sign, unpacked_add.sign));
+
+  result.sign = prop.lselect(
+    result.infinity,
+    infinity_sign,
+    prop.lselect(result.zero, zero_sign, add_sub_sign));
+
+  return round_and_pack(result);
+}
+
 bvt float_utilst::div(const bvt &src1, const bvt &src2)
 {
   // unpack

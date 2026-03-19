@@ -129,6 +129,9 @@ public:
   virtual bvt div(const bvt &src1, const bvt &src2);
   virtual bvt rem(const bvt &src1, const bvt &src2);
 
+  // fused multiply-add: round(src1 * src2 + src3) with a single rounding
+  bvt fma(const bvt &multiply_lhs, const bvt &multiply_rhs, const bvt &addend);
+
   bvt abs(const bvt &);
   bvt negate(const bvt &);
 
