@@ -3,10 +3,10 @@ test.json
 --dump-c
 ^EXIT=0$
 ^SIGNAL=0$
-void x\(unsigned int x\$\$1\$\$var_1\$\$x\);
-void x\(unsigned int x\$\$1\$\$var_1\$\$x\)
-int x\$\$1\$\$var_2\$\$x;
-int x\$\$1\$\$var_3\$\$x;
+void x\(unsigned int x(\$\$|::)1(\$\$|::)var_1\$\$x\);
+void x\(unsigned int x(\$\$|::)1(\$\$|::)var_1\$\$x\)
+int x(\$\$|::)1(\$\$|::)var_2(\$\$|::)x;
+int x(\$\$|::)1(\$\$|::)var_3(\$\$|::)x;
 --
 int x;
 --

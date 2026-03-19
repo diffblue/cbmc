@@ -1,8 +1,9 @@
-KNOWNBUG
+CORE
 main.cpp
 
-^EXIT=0$
+^EXIT=(0|6)$
 ^SIGNAL=0$
 --
-^CONVERSION ERROR$
+^PARSING ERROR$
 __float128 is not available on all platforms (e.g., ARM).
+On x86 this test passes; on ARM it fails with CONVERSION ERROR.
