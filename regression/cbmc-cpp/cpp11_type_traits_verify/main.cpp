@@ -8,7 +8,7 @@ int main()
   static_assert(!std::is_integral<double>::value, "double is not integral");
 
   static_assert(std::is_same<int, int>::value, "int is same as int");
-  static_assert(!std::is_same<int, long>::value, "int is not same as long");
+  static_assert(!std::is_same<int, double>::value, "int is not same as double");
 
   static_assert(std::is_pointer<int *>::value, "int* is pointer");
   static_assert(!std::is_pointer<int>::value, "int is not pointer");

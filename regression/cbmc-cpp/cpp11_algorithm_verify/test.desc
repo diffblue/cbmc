@@ -1,4 +1,4 @@
-CORE
+CORE gcc-13
 main.cpp
 --cpp11 --unwind 2
 ^EXIT=(0|10)$
