@@ -153,6 +153,7 @@ int yyansi_cerror(const std::string &error);
 %token TOK_GCC_BUILTIN_REMOVE_CV "__remove_cv"
 %token TOK_GCC_BUILTIN_REMOVE_REFERENCE "__remove_reference"
 %token TOK_GCC_BUILTIN_REMOVE_CVREF "__remove_cvref"
+%token TOK_GCC_BUILTIN_DECAY "__decay"
 %token TOK_GCC_FLOAT16 "_Float16"
 %token TOK_GCC_FLOAT32 "_Float32"
 %token TOK_GCC_FLOAT32X "_Float32x"
