@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE gcc-13
 main.cpp
 -std=c++11
 ^EXIT=0$
@@ -6,6 +6,3 @@ main.cpp
 --
 ^error
 ^PARSING ERROR
-_Float32/64/32x/64x types are disabled in C++ mode because system
-headers typedef them. Enabling them requires parser changes to handle
-both keyword and typedef forms.
