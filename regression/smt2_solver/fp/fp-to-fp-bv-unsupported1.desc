@@ -1,0 +1,9 @@
+KNOWNBUG
+fp-to-fp-bv-unsupported1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+--
+Z3#5769, Z3#6079: to_fp from bitvector (reinterpret cast) is not
+supported by CBMC's SMT2 solver.
