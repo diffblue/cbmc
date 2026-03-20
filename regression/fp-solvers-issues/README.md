@@ -19,15 +19,15 @@ verification pipeline are affected by similar problems.
 
 | # | Z3 Issue | Title | Z3 Status | Category | CBMC Status |
 |---|----------|-------|-----------|----------|-------------|
-| 1 | [Z3#6728](https://github.com/Z3Prover/z3/issues/6728) | Inconsistent answers on NaN and uninterpreted functions | Closed | Soundness (NaN equality vs UF) | Not Started |
-| 2 | [Z3#7162](https://github.com/Z3Prover/z3/issues/7162) | Invalid model on float formula | Open | Invalid model (fp.sub/fp.fma with RNA/RTN) | Not Started |
-| 3 | [Z3#7321](https://github.com/Z3Prover/z3/issues/7321) | Invalid model issue on floats | Open | Invalid model (fp.to_real + fp.eq) | Not Started |
+| 1 | [Z3#6728](https://github.com/Z3Prover/z3/issues/6728) | Inconsistent answers on NaN and uninterpreted functions | Closed | Soundness (NaN equality vs UF) | Test Added ✅ |
+| 2 | [Z3#7162](https://github.com/Z3Prover/z3/issues/7162) | Invalid model on float formula | Open | Invalid model (fp.sub/fp.fma with RNA/RTN) | Test Added ✅ (fp.sub only; fp.fma unsupported) |
+| 3 | [Z3#7321](https://github.com/Z3Prover/z3/issues/7321) | Invalid model issue on floats | Open | Invalid model (fp.to_real + fp.eq) | Analyzed — fp.to_real unsupported |
 | 4 | [Z3#7842](https://github.com/Z3Prover/z3/issues/7842) | Incorrect model (NaN + datatype) | Open | Invalid model (NaN distinct + datatype) | Not Started |
 | 5 | [Z3#8097](https://github.com/Z3Prover/z3/issues/8097) | Segfault with exists-quantified QF_FP + UF | Closed | Crash (segfault) | Not Started |
-| 6 | [Z3#8169](https://github.com/Z3Prover/z3/issues/8169) | Incorrect model with (_ FloatingPoint 2 24) and fp.to_real | Closed | Invalid model (non-standard FP sort + fp.to_real) | Not Started |
-| 7 | [Z3#8282](https://github.com/Z3Prover/z3/issues/8282) | Performance slowdown on equivalent SMT2 files | Closed | Performance | Not Started |
-| 8 | [Z3#8345](https://github.com/Z3Prover/z3/issues/8345) | Soundness issue converting bit repr to fp to Real | Closed | Soundness (int2bv + to_fp + fp.to_real + incremental) | Not Started |
-| 9 | [Z3#8414](https://github.com/Z3Prover/z3/issues/8414) | Assertion violation in mpf.cpp (fp.rem) | Closed | Crash (assertion violation in fp.rem) | Not Started |
+| 6 | [Z3#8169](https://github.com/Z3Prover/z3/issues/8169) | Incorrect model with (_ FloatingPoint 2 24) and fp.to_real | Closed | Invalid model (non-standard FP sort + fp.to_real) | Analyzed — fp.to_real unsupported |
+| 7 | [Z3#8282](https://github.com/Z3Prover/z3/issues/8282) | Performance slowdown on equivalent SMT2 files | Closed | Performance | N/A (performance only) |
+| 8 | [Z3#8345](https://github.com/Z3Prover/z3/issues/8345) | Soundness issue converting bit repr to fp to Real | Closed | Soundness (int2bv + to_fp + fp.to_real + incremental) | Analyzed — fp.to_real unsupported, no incremental |
+| 9 | [Z3#8414](https://github.com/Z3Prover/z3/issues/8414) | Assertion violation in mpf.cpp (fp.rem) | Closed | Crash (assertion violation in fp.rem) | Test Added ✅ (no crash) |
 
 ### Additional Z3 Floats-Labeled Issues
 
@@ -68,10 +68,10 @@ verification pipeline are affected by similar problems.
 | 42 | [Z3#4855](https://github.com/Z3Prover/z3/issues/4855) | Invalid model for QF_FP formula | Closed | Invalid model | Not Started |
 | 43 | [Z3#4843](https://github.com/Z3Prover/z3/issues/4843) | QF_FP invalid model | Closed | Invalid model | Not Started |
 | 44 | [Z3#4841](https://github.com/Z3Prover/z3/issues/4841) | Invalid model for QF_FP formula | Closed | Invalid model | Not Started |
-| 45 | [Z3#4673](https://github.com/Z3Prover/z3/issues/4673) | FP exponent saturates rather than becoming infinite | Closed | Soundness (overflow) | Not Started |
+| 45 | [Z3#4673](https://github.com/Z3Prover/z3/issues/4673) | FP exponent saturates rather than becoming infinite | Closed | Soundness (overflow) | Test Added ✅ |
 | 46 | [Z3#2631](https://github.com/Z3Prover/z3/issues/2631) | Quantified FPA formula incorrectly SAT with MBQI | Closed | Soundness (quantifiers) | Not Started |
 | 47 | [Z3#2596](https://github.com/Z3Prover/z3/issues/2596) | Quantified FPA formula incorrectly SAT | Closed | Soundness (quantifiers) | Not Started |
-| 48 | [Z3#2381](https://github.com/Z3Prover/z3/issues/2381) | fp.rem producing incorrect result | Closed | Soundness (fp.rem) | Not Started |
+| 48 | [Z3#2381](https://github.com/Z3Prover/z3/issues/2381) | fp.rem producing incorrect result | Closed | Soundness (fp.rem) | Test Added ⚠️ BUG FOUND |
 
 ---
 
@@ -79,12 +79,12 @@ verification pipeline are affected by similar problems.
 
 | # | CVC5 Issue | Title | CVC5 Status | Category | CBMC Status |
 |---|------------|-------|-------------|----------|-------------|
-| 49 | [CVC5#11139](https://github.com/cvc5/cvc5/issues/11139) | Fatal failure at symfpu traits (fp.div + fp.fma) | Open | Crash (symfpu postcondition) | Not Started |
+| 49 | [CVC5#11139](https://github.com/cvc5/cvc5/issues/11139) | Fatal failure at symfpu traits (fp.div + fp.fma) | Open | Crash (symfpu postcondition) | Test Added ✅ (fp.div only; fp.fma unsupported) |
 | 50 | [CVC5#12306](https://github.com/cvc5/cvc5/issues/12306) | OR operation does not commute in BF16 | Open | Soundness (BF16 non-commutativity) | Not Started |
 | 51 | [CVC5#12335](https://github.com/cvc5/cvc5/issues/12335) | Fatal failure at symfpu traits with FP logic | Open | Crash (symfpu postcondition) | Not Started |
-| 52 | [CVC5#12371](https://github.com/cvc5/cvc5/issues/12371) | Unsat core was satisfiable (to_fp from Real) | Open | Soundness (to_fp from Real + quantifiers) | Not Started |
-| 53 | [CVC5#12383](https://github.com/cvc5/cvc5/issues/12383) | Performance slowdown on equivalent SMT2 files | Open | Performance | Not Started |
-| 54 | [CVC5#12387](https://github.com/cvc5/cvc5/issues/12387) | Fatal failure in proof post-processor (FP + quantifiers) | Open | Crash (proof checking) | Not Started |
+| 52 | [CVC5#12371](https://github.com/cvc5/cvc5/issues/12371) | Unsat core was satisfiable (to_fp from Real) | Open | Soundness (to_fp from Real + quantifiers) | Analyzed — quantifiers + to_fp from Real N/A |
+| 53 | [CVC5#12383](https://github.com/cvc5/cvc5/issues/12383) | Performance slowdown on equivalent SMT2 files | Open | Performance | N/A (performance only) |
+| 54 | [CVC5#12387](https://github.com/cvc5/cvc5/issues/12387) | Fatal failure in proof post-processor (FP + quantifiers) | Open | Crash (proof checking) | N/A (proof checking not applicable) |
 
 ---
 
@@ -92,7 +92,7 @@ verification pipeline are affected by similar problems.
 
 | # | Bitwuzla Issue | Title | Bitwuzla Status | Category | CBMC Status |
 |---|----------------|-------|-----------------|----------|-------------|
-| 55 | [Bitwuzla#130](https://github.com/bitwuzla/bitwuzla/issues/130) | SymFPU issue on fp.div for non-standard format | Closed | Soundness (fp.div non-standard FP sort) | Not Started |
+| 55 | [Bitwuzla#130](https://github.com/bitwuzla/bitwuzla/issues/130) | SymFPU issue on fp.div for non-standard format | Closed | Soundness (fp.div non-standard FP sort) | Test Added ✅ |
 
 ---
 
@@ -371,3 +371,29 @@ Lower priority:
 - **2026-03-20**: Created initial tracking document. Fetched and catalogued all
   55 issues from Z3 (Floats label), CVC5, and Bitwuzla. Extracted SMT-LIB
   reproducers from issue bodies. Categorized by FP operation/feature.
+- **2026-03-20**: Created first batch of regression tests. Tested CBMC's SMT2
+  solver capabilities. Found the following bugs/gaps:
+  1. **fp.rem always returns +0.0** — CBMC's SMT2 solver `fp.rem` implementation
+     appears to be broken, always returning positive zero regardless of inputs.
+     Test: `regression/smt2_solver/fp-rem-nonstandard/fp-rem1.smt2` (KNOWNBUG)
+  2. **remainderf/remainder crashes CBMC** — The C front-end crashes with an
+     invariant violation in `numeric_cast_v` when processing `remainderf()` or
+     `remainder()`. The crash involves a 128-bit floatbv constant.
+     Test: `regression/cbmc/Float-rem1/` (KNOWNBUG)
+  3. **fp.fma not supported in SMT2 solver** — The solver reports "unknown
+     function symbol 'fp.fma'" and ignores the assertion, leading to incorrect
+     results. Test: `regression/smt2_solver/fp/fp-fma-unsupported1.smt2`
+  4. **fp.to_real not supported in SMT2 solver** — Same behavior as fp.fma.
+     Test: `regression/smt2_solver/fp/fp-to-real-unsupported1.smt2`
+
+  Tests passing correctly:
+  - NaN equality through UFs (Z3#6728)
+  - fp.sub with all rounding modes including RTN→-0 (Z3#7162)
+  - fp.div with RTN and non-standard sorts (CVC5#11139, Bitwuzla#130)
+  - fp.rem on non-standard sort doesn't crash (Z3#8414)
+  - Overflow to infinity (Z3#4673)
+  - NaN propagation in C (Z3#6728)
+  - x - x == +0 with RNE in C (Z3#7162)
+  - Float division edge cases in C (CVC5#11139, Bitwuzla#130)
+  - fmaf correctness in C (Z3#7162, CVC5#11139)
+  - Overflow to infinity in C (Z3#4673)
