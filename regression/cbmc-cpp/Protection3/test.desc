@@ -1,8 +1,10 @@
 CORE
 main.cpp
-
+--cpp98
 ^EXIT=6$
 ^SIGNAL=0$
 ^CONVERSION ERROR$
 --
 ^warning: ignoring
+In C++98, nested classes do not have access to the enclosing class's
+private members. C++11 DR 45 changed this.
