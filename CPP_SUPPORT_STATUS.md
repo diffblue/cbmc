@@ -1,8 +1,8 @@
 # CBMC C++ Standard Support Status
 
-**Date:** 2026-03-17
+**Date:** 2026-03-20
 **Branch:** `cpp11-parser-rework`
-**Test suite:** 536 CORE, 1 KNOWNBUG
+**Test suite:** 528 CORE, 10 KNOWNBUG (cbmc-cpp); 241 CORE, 2 KNOWNBUG (cpp)
 **Compilers tested:** g++ 13 (libstdc++), g++ 14 (libstdc++), clang++ 18 (libc++)
 
 ## Summary
@@ -11,8 +11,8 @@
 |----------|----------|---------------------|------------------|-------|------|
 | C++11    | ~98%     | ~95%                | ~85%             | 109   | Minor |
 | C++14    | ~98%     | ~95%                | ~80%             | 21    | Minor |
-| C++17    | ~95%     | ~90%                | ~80%             | 59    | Minor |
-| C++20    | ~85%     | ~80%                | ~70%             | 71    | Moderate |
+| C++17    | ~95%     | ~90%                | ~80%             | 61    | Minor |
+| C++20    | ~90%     | ~80%                | ~70%             | 71    | Moderate |
 | C++23    | ~60%     | ~10%                | ~5%              | 21    | Significant |
 | C++26    | ~15%     | ~0%                 | ~0%              | 4     | Major |
 
@@ -32,6 +32,7 @@
 - `= default`, `= delete`, explicit conversion operators
 - SFINAE with `enable_if`, braced-init-lists
 - `alignas`, `alignof`
+- `#pragma CPROVER check` (push/pop/disable/enable) in C++ mode
 
 ### Standard library — all headers parse and verify
 
@@ -67,7 +68,7 @@
 
 ---
 
-## C++17 (59 CORE tests)
+## C++17 (61 CORE tests)
 
 ### Language features — fully working
 - Structured bindings (including references, tuple-like)
@@ -91,7 +92,7 @@
 
 ---
 
-## C++20 (71 CORE, 1 KNOWNBUG)
+## C++20 (71 CORE tests)
 
 ### Language features — mostly working
 - Concepts (`concept`, `requires` clauses and expressions)
@@ -105,6 +106,7 @@
 - `explicit(bool)`, `__builtin_bit_cast`
 - Floating-point NTTP, `[[no_unique_address]]`
 - Bit-field brace-init defaults (`int x : 1 {0}`)
+- **Module syntax** (`export module`, `import`, `export { }`, `module :private`)
 
 ### Standard library
 
@@ -118,8 +120,19 @@
 | `<source_location>` | ✅ | — | ✅ |
 | `<algorithm>` | ✅ | — | `std::sort` ✅ (C++20 mode) |
 
+### Module support details
+CBMC supports C++20 module syntax at the parser level (Level 1):
+- `export module M;` — parsed, file treated as a normal translation unit
+- `import M;` / `import <header>;` — parsed with warning (no cross-module resolution)
+- `export declaration` — export keyword ignored, declaration parsed normally
+- `export { declarations }` — block parsed, all declarations processed
+- `module :private;` — parsed and ignored
+
+This allows CBMC to verify code that uses module syntax without requiring
+users to rewrite it. Actual cross-module import resolution (linking module
+interface units) is not implemented.
+
 ### Remaining gaps
-- **Modules** (`import`/`export`): not supported (KNOWNBUG)
 - **Coroutine semantics**: `co_return` works; `co_await`/`co_yield` parse but no state machine lowering
 - **Complex concept subsumption**: basic constraint checking works; partial ordering by constraints not implemented
 
@@ -155,7 +168,7 @@
 ## Compiler/Library Compatibility
 
 ### g++ 13 (default, libstdc++)
-Full support. All 536 tests pass. All standard library headers parse and verify.
+Full support. All CORE tests pass. All standard library headers parse and verify.
 
 ### g++ 14 (libstdc++)
 Compatible. Same tests pass as g++ 13.
@@ -182,6 +195,13 @@ System header errors are suppressed at four levels with `catch(...)`:
 3. Linkage spec item processing (with empty-file fallback)
 4. Method body processing
 
+### `#pragma CPROVER check` in C++ mode
+The C++ parser now propagates `#pragma CPROVER check` annotations from
+the scanner through the token buffer and parser to the AST. This enables
+selective check disable/enable in C++ code, matching the existing C support.
+Implemented by copying pragma annotations in `cpp_token_buffer::read_token()`
+and `Parser::set_location()`.
+
 ### Library models provided
 | Model | Implementation |
 |-------|---------------|
@@ -201,7 +221,35 @@ System header errors are suppressed at four levels with `catch(...)`:
 - **Parser flexibility**: post-type specifiers (`void constexpr f()`), `.template operator()<Args>()`, brace-init in parenthesized template args, bit-field brace-init defaults, designated initializer brace-init
 - **`_Float` types**: disabled as keywords in clang preprocessor mode
 - **Use-after-free fix**: `catch(...)` in all message handler swap patterns
+- **C++11 DR 45**: nested classes have access to enclosing class private/protected members
+- **C++23 preprocessor**: use `-std=c++2b` for clang (older Apple clang compatibility)
 
+
+---
+
+## Known Bugs (KNOWNBUG tests)
+
+### cbmc-cpp (10 KNOWNBUG)
+
+| Test | Issue |
+|------|-------|
+| `Address_of_Method1` | Pre-existing SSA validation invariant violation on macOS |
+| `cpp11_future_header` | `<future>` header — complex async types not modeled |
+| `cpp11_iostream_cerr` | `<iostream>` — conversion error |
+| `cpp11_regex_basic` | `<regex>` — invariant violation in `error_category` destructor |
+| `cpp11_regex_match` | `<regex>` — same invariant violation |
+| `cpp17_filesystem_basic` | `<filesystem>` — conversion error |
+| `cpp17_filesystem_path_ops` | `<filesystem>` — conversion error |
+| `cpp17_iostream_basic` | `<iostream>` — same `error_category` invariant violation |
+| `cpp17_iterator_basic` | `<iterator>` — conversion error |
+| `cpp17_variant_basic` | `<variant>` — type mismatch in assignment |
+
+### cpp (2 KNOWNBUG)
+
+| Test | Issue |
+|------|-------|
+| `dependent_lt1` | Parser issue with `<` in dependent template context |
+| `float32_1` | `_Float32` type handling |
 
 ---
 
@@ -234,8 +282,9 @@ System header errors are suppressed at four levels with `catch(...)`:
 
 ### C++20 gaps
 
-6. **C++20 modules** (`import`/`export`) — Not supported. Requires new
-   parser infrastructure. (KNOWNBUG: `cpp20_modules`)
+6. **Module import resolution** — Module syntax is parsed but `import M;`
+   does not resolve cross-module dependencies. Users must provide all
+   source files directly.
 
 7. **Coroutine state machine lowering** — `co_return` works. `co_await`
    and `co_yield` parse but have no state machine transformation.
