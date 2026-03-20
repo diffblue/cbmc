@@ -1009,8 +1009,9 @@ bool Parser::isTypeSpecifier()
          t == TOK_TYPENAME || t == TOK_TYPEOF || t == TOK_DECLTYPE ||
          t == TOK_UNDERLYING_TYPE || t == TOK_GCC_BUILTIN_REMOVE_CV ||
          t == TOK_GCC_BUILTIN_REMOVE_REFERENCE ||
-         t == TOK_GCC_BUILTIN_REMOVE_CVREF || t == TOK_GCC_BUILTIN_DECAY ||
-         t == TOK_ATOMIC_TYPE_SPECIFIER;
+         t == TOK_GCC_BUILTIN_REMOVE_CVREF || t == TOK_ATOMIC_TYPE_SPECIFIER ||
+         (is_identifier(t) && lex.LookAhead(1) == '(' &&
+          is_identifier_with_text(0, "__decay"));
 }
 
 /*
@@ -3660,7 +3661,9 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
   }
   else if(
     t == TOK_GCC_BUILTIN_REMOVE_CV || t == TOK_GCC_BUILTIN_REMOVE_REFERENCE ||
-    t == TOK_GCC_BUILTIN_REMOVE_CVREF || t == TOK_GCC_BUILTIN_DECAY)
+    t == TOK_GCC_BUILTIN_REMOVE_CVREF ||
+    (is_identifier(t) && lex.LookAhead(1) == '(' &&
+     is_identifier_with_text(0, "__decay")))
   {
     cpp_tokent tk;
     lex.get_token(tk);
@@ -3669,10 +3672,8 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
       p = typet(ID_remove_cv);
     else if(t == TOK_GCC_BUILTIN_REMOVE_REFERENCE)
       p = typet(ID_remove_reference);
-    else if(t == TOK_GCC_BUILTIN_REMOVE_CVREF)
-      p = typet(ID_remove_cvref);
     else
-      p = typet(ID_remove_cvref); // __decay = remove ref then remove cv
+      p = typet(ID_remove_cvref); // __remove_cvref or __decay
 
     set_location(p, tk);
 
