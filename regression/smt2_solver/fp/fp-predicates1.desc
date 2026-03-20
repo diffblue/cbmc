@@ -1,0 +1,14 @@
+CORE
+fp-predicates1.smt2
+
+activate-multi-line-match
+^EXIT=0$
+^SIGNAL=0$
+^sat$[\s\S]*?^unsat$[\s\S]*?^unsat$[\s\S]*?^unsat$
+--
+Test fp.isSubnormal, fp.isNegative, fp.isPositive predicates.
+The leading sat covers the under-approximation cases: each
+predicate must hold on a witness. The three trailing unsat
+results from check-sat-assuming cover over-approximation: -0
+must not be positive, +0 must not be negative, and 1.0 must not
+be subnormal.
