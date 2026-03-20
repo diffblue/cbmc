@@ -586,6 +586,9 @@ bool c_preprocess_gcc_clang(
         argv.push_back("-std=c++23");
       else
 #endif
+        if(preprocessor == configt::ansi_ct::preprocessort::CLANG)
+        argv.push_back("-std=c++2b");
+      else
         argv.push_back("-std=gnu++23");
       argv.push_back("-U__cpp_deduction_guides");
       argv.push_back("-U__cpp_char8_t");
@@ -602,6 +605,9 @@ bool c_preprocess_gcc_clang(
         argv.push_back("-std=c++23");
       else
 #endif
+        if(preprocessor == configt::ansi_ct::preprocessort::CLANG)
+        argv.push_back("-std=c++2b");
+      else
         argv.push_back("-std=gnu++23");
       argv.push_back("-U__cpp_deduction_guides");
       argv.push_back("-U__cpp_char8_t");

@@ -10,7 +10,13 @@ else
 endif
 
 ifeq ($(BUILD_ENV_),MSVC)
-	excluded_tests = -X gcc-only
+	excluded_tests = -X gcc-only -X gcc-13
+else
+ifeq ($(wildcard /usr/include/c++/13),)
+ifeq ($(wildcard /usr/include/c++/14),)
+  excluded_tests += -X gcc-13
+endif
+endif
 endif
 
 default: tests.log
