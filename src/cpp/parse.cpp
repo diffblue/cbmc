@@ -400,6 +400,11 @@ protected:
     source_location.set_line(token.line_no);
     if(!current_function.empty())
       source_location.set_function(current_function);
+    // Propagate #pragma CPROVER annotations
+    const irept &pragmas =
+      token.data.find(ID_C_source_location).find(ID_pragma);
+    if(pragmas.is_not_nil())
+      source_location.add(ID_pragma) = pragmas;
   }
 
   void make_subtype(const typet &src, typet &dest)

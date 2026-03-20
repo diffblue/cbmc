@@ -85,6 +85,15 @@ void cpp_token_buffert::read_token()
     tokens.back().filename=ansi_c_parser.get_file();
   }
 
+  // Propagate #pragma CPROVER annotations from the scanner's
+  // source location to the token, so that the C++ parser and
+  // goto conversion can see them.
+  {
+    const irept &pragmas = ansi_c_parser.source_location().find(ID_pragma);
+    if(pragmas.is_not_nil())
+      tokens.back().data.add_source_location().add(ID_pragma) = pragmas;
+  }
+
   // std::cout << "TOKEN: " << kind << " " << tokens.back().text << '\n';
 
   tokens.back().kind=kind;
