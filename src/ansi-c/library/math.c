@@ -822,261 +822,38 @@ __CPROVER_hide:;
 
 /* FUNCTION: sqrtf */
 
-/* This code is *WRONG* in some circumstances, specifically:
- *
- *   1. If run with a rounding mode other than RNE the
- *      answer will be out by one or two ULP.  This could be fixed
- *      with careful choice of round mode for the multiplications.
- *
- *   2. Subnormals have the unusual property that there are
- *      multiple numbers that square to give them.  I.E. if
- *      f is subnormal then there are multiple f1 != f2 such that
- *      f1 * f1 == f == f2 * f2.  This code will return *a*
- *      square root of a subnormal input but not necessarily *the*
- *      square root (i.e. the real value of the square root rounded).
- */
-
 #ifndef __CPROVER_MATH_H_INCLUDED
 #include <math.h>
 #define __CPROVER_MATH_H_INCLUDED
 #endif
-
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
-
-float nextUpf(float f);
-
-float __VERIFIER_nondet_float(void);
 
 float sqrtf(float f)
 {
- __CPROVER_hide:;
-
-  if ( f < 0.0f )
-#pragma CPROVER check push
-#pragma CPROVER check disable "float-div-by-zero"
-    return 0.0f/0.0f; // NaN
-#pragma CPROVER check pop
-  else if (__CPROVER_isinff(f) ||   // +Inf only
-           f == 0.0f          ||   // Includes -0
-           __CPROVER_isnanf(f))
-    return f;
-  else if (__CPROVER_isnormalf(f))
-  {
-    float lower=__VERIFIER_nondet_float();
-    __CPROVER_assume(lower > 0.0f);
-    __CPROVER_assume(__CPROVER_isnormalf(lower));
-    // Tighter bounds can be given but are dependent on the
-    // number of exponent and significand bits.  Thus they are
-    // given implicitly...
-
-#pragma CPROVER check push
-#pragma CPROVER check disable "float-overflow"
-    float lowerSquare = lower * lower;
-    __CPROVER_assume(__CPROVER_isnormalf(lowerSquare));
-
-    float upper = nextUpf(lower);
-    float upperSquare = upper * upper;  // Might be +Inf
-#pragma CPROVER check pop
-
-    // Restrict these to bound f and thus compute the possible
-    // values for the square root.  Note that the lower bound
-    // can be equal, this is important to catch edge cases such as
-    // 0x1.fffffep+127f and relies on the smallest normal number
-    // being a perfect square (which it will be for any sensible
-    // bit width).
-    __CPROVER_assume(lowerSquare <= f);
-    __CPROVER_assume(f < upperSquare);
-
-    // Select between them to work out which to return
-    switch(fegetround())
-    {
-    case FE_TONEAREST :
-      return (f - lowerSquare < upperSquare - f) ? lower : upper; break;
-    case FE_UPWARD :
-      return (f - lowerSquare == 0.0f) ? lower : upper; break;
-    case FE_DOWNWARD : // Fall through
-    case FE_TOWARDZERO :
-      return (f - lowerSquare == 0.0f) ? lower : upper; break;
-    default:;
-      return __VERIFIER_nondet_float();
-    }
-
-  }
-  else
-  {
-    //assert(fpclassify(f) == FP_SUBNORMAL);
-    //assert(f > 0.0f);
-
-    // With respect to the algebra of floating point number
-    // all subnormals seem to be perfect squares, thus ...
-
-    float root=__VERIFIER_nondet_float();
-    __CPROVER_assume(root >= 0.0f);
-
-    __CPROVER_assume(root * root == f);
-
-    return root;
-  }
+  return __CPROVER_sqrtf(f);
 }
 
-
-
-
 /* FUNCTION: sqrt */
-
-/* The same caveats as sqrtf apply */
 
 #ifndef __CPROVER_MATH_H_INCLUDED
 #include <math.h>
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
-
-double nextUp(double d);
-
-double __VERIFIER_nondet_double(void);
-
 double sqrt(double d)
 {
- __CPROVER_hide:;
-
-  if ( d < 0.0 )
-#pragma CPROVER check push
-#pragma CPROVER check disable "float-div-by-zero"
-    return 0.0/0.0; // NaN
-#pragma CPROVER check pop
-  else if (__CPROVER_isinfd(d) ||   // +Inf only
-           d == 0.0            ||   // Includes -0
-           __CPROVER_isnand(d))
-    return d;
-  else if (__CPROVER_isnormald(d))
-  {
-    double lower=__VERIFIER_nondet_double();
-    __CPROVER_assume(lower > 0.0);
-    __CPROVER_assume(__CPROVER_isnormald(lower));
-
-#pragma CPROVER check push
-#pragma CPROVER check disable "float-overflow"
-    double lowerSquare = lower * lower;
-    __CPROVER_assume(__CPROVER_isnormald(lowerSquare));
-
-    double upper = nextUp(lower);
-    double upperSquare = upper * upper;  // Might be +Inf
-#pragma CPROVER check pop
-
-    __CPROVER_assume(lowerSquare <= d);
-    __CPROVER_assume(d < upperSquare);
-
-    switch(fegetround())
-    {
-    case FE_TONEAREST:
-      return (d - lowerSquare < upperSquare - d) ? lower : upper; break;
-    case FE_UPWARD:
-      return (d - lowerSquare == 0.0f) ? lower : upper; break;
-    case FE_DOWNWARD: // Fall through
-    case FE_TOWARDZERO:
-      return (d - lowerSquare == 0.0) ? lower : upper; break;
-    default:;
-      return __VERIFIER_nondet_double();
-    }
-
-  }
-  else
-  {
-    //assert(fpclassify(d) == FP_SUBNORMAL);
-    //assert(d > 0.0);
-
-    double root=__VERIFIER_nondet_double();
-    __CPROVER_assume(root >= 0.0);
-
-    __CPROVER_assume(root * root == d);
-
-    return root;
-  }
+  return __CPROVER_sqrt(d);
 }
 
 /* FUNCTION: sqrtl */
 
-/* The same caveats as sqrtf apply */
-
 #ifndef __CPROVER_MATH_H_INCLUDED
 #include <math.h>
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
-
-long double nextUpl(long double d);
-
-long double __VERIFIER_nondet_long_double(void);
-
 long double sqrtl(long double d)
 {
- __CPROVER_hide:;
-
-  if(d < 0.0l)
-#pragma CPROVER check push
-#pragma CPROVER check disable "float-div-by-zero"
-    return 0.0l/0.0l; // NaN
-#pragma CPROVER check pop
-  else if (__CPROVER_isinfld(d) ||   // +Inf only
-           d == 0.0l            ||   // Includes -0
-           __CPROVER_isnanld(d))
-    return d;
-  else if (__CPROVER_isnormalld(d))
-  {
-    long double lower=__VERIFIER_nondet_long_double();
-    __CPROVER_assume(lower > 0.0l);
-    __CPROVER_assume(__CPROVER_isnormalld(lower));
-
-#pragma CPROVER check push
-#pragma CPROVER check disable "float-overflow"
-    long double lowerSquare = lower * lower;
-    __CPROVER_assume(__CPROVER_isnormalld(lowerSquare));
-
-    long double upper = nextUpl(lower);
-    long double upperSquare = upper * upper;  // Might be +Inf
-#pragma CPROVER check pop
-
-    __CPROVER_assume(lowerSquare <= d);
-    __CPROVER_assume(d < upperSquare);
-
-    switch(fegetround())
-    {
-    case FE_TONEAREST:
-      return (d - lowerSquare < upperSquare - d) ? lower : upper; break;
-    case FE_UPWARD:
-      return (d - lowerSquare == 0.0l) ? lower : upper; break;
-    case FE_DOWNWARD: // Fall through
-    case FE_TOWARDZERO:
-      return (d - lowerSquare == 0.0l) ? lower : upper; break;
-    default:;
-      return __VERIFIER_nondet_long_double();
-    }
-
-  }
-  else
-  {
-    //assert(fpclassify(d) == FP_SUBNORMAL);
-    //assert(d > 0.0l);
-
-    long double root=__VERIFIER_nondet_long_double();
-    __CPROVER_assume(root >= 0.0l);
-
-    __CPROVER_assume(root * root == d);
-
-    return root;
-  }
+  return __CPROVER_sqrtl(d);
 }
 
 

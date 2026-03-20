@@ -40,6 +40,12 @@ static bool have_to_adjust_float_expressions(const exprt &expr)
     return false;
   }
 
+  if(expr.id() == ID_floatbv_sqrt && expr.operands().size() == 3)
+    return false;
+
+  if(expr.id() == ID_floatbv_sqrt && expr.operands().size() == 2)
+    return true;
+
   const typet &type = expr.type();
 
   if(
@@ -130,6 +136,13 @@ void adjust_float_expressions(exprt &expr, const exprt &rounding_mode)
               expr.id()==ID_div?ID_floatbv_div:
                                 irep_idt());
 
+      expr.operands().resize(3);
+      to_ieee_float_op_expr(expr).rounding_mode() = rounding_mode;
+    }
+
+    if(expr.id() == ID_floatbv_sqrt && expr.operands().size() == 2)
+    {
+      // sqrt: add rounding mode as 3rd operand
       expr.operands().resize(3);
       to_ieee_float_op_expr(expr).rounding_mode() = rounding_mode;
     }

@@ -3406,6 +3406,29 @@ exprt c_typecheck_baset::do_special_functions(
     return std::move(fmax_expr);
   }
   else if(
+    identifier == CPROVER_PREFIX "sqrt" ||
+    identifier == CPROVER_PREFIX "sqrtf" ||
+    identifier == CPROVER_PREFIX "sqrtl")
+  {
+    if(expr.arguments().size() != 1)
+    {
+      error().source_location = f_op.source_location();
+      error() << "sqrt-functions expect one operand" << eom;
+      throw 0;
+    }
+
+    typecheck_function_call_arguments(expr);
+
+    // Create as binary_exprt; adjust_float_expressions will add
+    // the rounding mode as a third operand.
+    binary_exprt sqrt_expr(
+      expr.arguments()[0], ID_floatbv_sqrt, expr.arguments()[0]);
+
+    sqrt_expr.add_source_location() = source_location;
+
+    return std::move(sqrt_expr);
+  }
+  else if(
     identifier == CPROVER_PREFIX "remainder" ||
     identifier == CPROVER_PREFIX "remainderf" ||
     identifier == CPROVER_PREFIX "remainderl" ||

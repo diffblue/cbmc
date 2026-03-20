@@ -5,4 +5,4 @@ main.c
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
-fminf(+0, -0) returns -0 (sign bit set) per IEEE 754-2019.
+fminf zero sign: returns -0 per IEEE 754-2019.

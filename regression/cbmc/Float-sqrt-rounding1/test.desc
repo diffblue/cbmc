@@ -1,10 +1,9 @@
-KNOWNBUG
+CORE
 main.c
 --floatbv --no-built-in-assertions
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
-sqrtf with FE_TOWARDZERO rounding mode. The C library model has
-known issues with non-RNE rounding (documented in math.c comments).
-Needs __CPROVER_sqrtf built-in mapping to ID_floatbv_sqrt.
+sqrtf with FE_TOWARDZERO: result <= RNE result.
+Uses __CPROVER_sqrtf built-in mapping to ID_floatbv_sqrt.

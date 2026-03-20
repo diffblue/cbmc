@@ -1754,6 +1754,20 @@ void smt2_convt::convert_expr(const exprt &expr)
     else
       convert_floatbv(expr);
   }
+  else if(expr.id() == ID_floatbv_sqrt)
+  {
+    const auto &float_expr = to_ieee_float_op_expr(expr);
+    if(use_FPA_theory)
+    {
+      out << "(fp.sqrt ";
+      convert_rounding_mode_FPA(float_expr.rounding_mode());
+      out << " ";
+      convert_expr(float_expr.lhs());
+      out << ")";
+    }
+    else
+      convert_floatbv(expr);
+  }
   else if(expr.id()==ID_address_of)
   {
     const address_of_exprt &address_of_expr = to_address_of_expr(expr);
@@ -5642,6 +5656,7 @@ void smt2_convt::find_symbols(const exprt &expr)
            expr.id() == ID_floatbv_rem ||
            expr.id() == ID_floatbv_min ||
            expr.id() == ID_floatbv_max ||
+           expr.id() == ID_floatbv_sqrt ||
            expr.id() == ID_floatbv_typecast ||
            expr.id() == ID_ieee_float_equal ||
            expr.id() == ID_ieee_float_notequal ||
