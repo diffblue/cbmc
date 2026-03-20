@@ -1,8 +1,5 @@
-; CVC5#12371: large float constant should be infinity
-; Use bit pattern directly since to_fp from large Real may not work
+; CVC5#12371: to_fp from large constant Real overflows to infinity
 (set-logic QF_FP)
-; +inf is fp #b0 #b11111111 #b00000000000000000000000
-(assert (fp.isInfinite (_ +oo 8 24)))
-(assert (fp.isNegative (_ -oo 8 24)))
-(assert (fp.isInfinite (_ -oo 8 24)))
+(assert (fp.isInfinite ((_ to_fp 8 24) RNE 10000000000000000000000000000000000000000.0)))
+(assert (fp.isPositive ((_ to_fp 8 24) RNE 10000000000000000000000000000000000000000.0)))
 (check-sat)
