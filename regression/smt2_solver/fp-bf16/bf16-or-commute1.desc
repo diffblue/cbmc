@@ -1,0 +1,8 @@
+CORE
+bf16-or-commute1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+Based on CVC5#12306: OR commutativity with BF16 bound checks.
