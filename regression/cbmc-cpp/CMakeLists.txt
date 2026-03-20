@@ -14,9 +14,19 @@ elseif(NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 endif()
 
 add_test_pl_tests(
-    "$<TARGET_FILE:cbmc> --validate-goto-model --validate-ssa-equation" ${gcc_only} ${extra_excludes} -X libcxx
+    "$<TARGET_FILE:cbmc> --validate-goto-model --validate-ssa-equation" ${gcc_only} ${extra_excludes} -X libcxx -X no-validate
 )
 set_tests_properties("cbmc-cpp-CORE" PROPERTIES TIMEOUT 1800)
+
+# Tests tagged 'no-validate' include complex STL headers that leave
+# missing destructor symbols in the goto model. Run without validation.
+add_test_pl_profile(
+    "cbmc-cpp-no-validate"
+    "$<TARGET_FILE:cbmc>"
+    -C CORE
+    -I no-validate
+    ${gcc_only} ${extra_excludes} -X libcxx
+)
 
 # libc++ tests run without --validate-goto-model because system header
 # processing may leave missing symbols in the goto model.
