@@ -1,10 +1,8 @@
-KNOWNBUG
+CORE
 fp-sqrt-subnormal.smt2
 
 ^EXIT=0$
 ^SIGNAL=0$
 ^unsat$
 --
-fp.sqrt of subnormal input gives incorrect result. The constraint-based
-approach (r*r brackets x) does not correctly handle subnormals where
-multiple values can square to the same subnormal.
+fp.sqrt of subnormal input gives correct result.

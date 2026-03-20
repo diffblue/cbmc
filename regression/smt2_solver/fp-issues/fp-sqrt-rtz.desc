@@ -1,9 +1,8 @@
-KNOWNBUG
+CORE
 fp-sqrt-rtz.smt2
 
 ^EXIT=0$
 ^SIGNAL=0$
 ^unsat$
 --
-fp.sqrt with RTZ rounding mode: sqrt(2.0) should round down to
-0x3FB504F2 but returns 0x3FB504F3 (rounding mode ignored).
+fp.sqrt(2.0) with RTZ: floor of sqrt(2) is 0x3FB504F3.

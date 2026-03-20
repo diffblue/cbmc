@@ -892,63 +892,77 @@ bvt float_utilst::sqrt(const bvt &src)
   // r_high = r_low + 1 ulp (next positive FP value)
   bvt r_high = bv_utils.add(r_low, bv_utils.build_constant(1, spec.width()));
 
-  // Compute r_low^2 with RTZ and r_high^2 with RTP to bracket x
+  // Pre-compute predicates on original-width values before changing spec
+  literalt r_high_inf = is_infinity(r_high);
+
+  // Compute r_low^2 and r_high^2 exactly using a wider format.
+  // With double the significand bits, the product of two f-bit
+  // significands fits exactly (no rounding needed).
+  ieee_float_spect wide_spec(spec.f * 2 + 1, spec.e + 1);
+
+  auto saved_spec = spec;
   auto saved_rm = rounding_mode_bits;
 
-  rounding_mode_bits.round_to_even = const_literal(false);
+  // Convert r_low, r_high, src to wider format
+  INVARIANT(
+    r_low.size() == spec.width(), "r_low size matches spec before conversion");
+  INVARIANT(
+    r_low.size() == saved_spec.width(),
+    "r_low size matches saved_spec before conversion");
+  bvt r_low_wide = conversion(r_low, wide_spec);
+  // conversion() mutates spec as a side effect — restore it
+  spec = saved_spec;
+  INVARIANT(
+    r_low_wide.size() == wide_spec.width(), "r_low_wide has wide width");
+  bvt r_high_wide = conversion(r_high, wide_spec);
+  spec = saved_spec;
+  bvt x_wide = conversion(src, wide_spec);
+  spec = saved_spec;
+
+  // Switch to wide spec for squaring
+  spec = wide_spec;
+  rounding_mode_bits.round_to_even = const_literal(true);
   rounding_mode_bits.round_to_plus_inf = const_literal(false);
   rounding_mode_bits.round_to_minus_inf = const_literal(false);
-  rounding_mode_bits.round_to_zero = const_literal(true);
-  rounding_mode_bits.round_to_away = const_literal(false);
-  bvt r_low_sq_rtz = mul(r_low, r_low);
-
   rounding_mode_bits.round_to_zero = const_literal(false);
-  rounding_mode_bits.round_to_plus_inf = const_literal(true);
-  bvt r_high_sq_rtp = mul(r_high, r_high);
+  rounding_mode_bits.round_to_away = const_literal(false);
 
+  INVARIANT(r_low_wide.size() == spec.width(), "r_low_wide matches wide spec");
+  bvt r_low_sq = mul(r_low_wide, r_low_wide);
+  bvt r_high_sq = mul(r_high_wide, r_high_wide);
+
+  // Constraints in wide format (exact comparisons)
+  prop.l_set_to_true(
+    prop.limplies(is_normal_case, relation(r_low_sq, relt::LE, x_wide)));
+  prop.l_set_to_true(prop.limplies(
+    prop.land(is_normal_case, !r_high_inf),
+    relation(r_high_sq, relt::GT, x_wide)));
+
+  // Exact check and distance comparison
+  literalt r_low_exact = relation(r_low_sq, relt::EQ, x_wide);
+  bvt dist_low = sub(x_wide, r_low_sq);
+  bvt dist_high = sub(r_high_sq, x_wide);
+  literalt high_closer = relation(dist_high, relt::LT, dist_low);
+  literalt equal_dist = relation(dist_high, relt::EQ, dist_low);
+
+  // Restore original spec and rounding mode
+  spec = saved_spec;
   rounding_mode_bits = saved_rm;
 
-  // Constraints: r_low^2 (RTZ) <= x and r_high^2 (RTP) >= x
-  // For non-infinity r_high, also r_high^2 (RTZ) > x
-  prop.l_set_to_true(
-    prop.limplies(is_normal_case, relation(r_low_sq_rtz, relt::LE, src)));
-  prop.l_set_to_true(prop.limplies(
-    prop.land(is_normal_case, !is_infinity(r_high)),
-    relation(r_high_sq_rtp, relt::GE, src)));
+  // RNE tie-breaking: prefer even (r_high is even iff r_low is odd)
+  literalt r_high_is_even = !r_low[0];
 
-  // Also need: r_high^2 (RTZ) > x to ensure r_high is strictly too large
-  auto saved_rm2 = rounding_mode_bits;
-  rounding_mode_bits.round_to_even = const_literal(false);
-  rounding_mode_bits.round_to_plus_inf = const_literal(false);
-  rounding_mode_bits.round_to_minus_inf = const_literal(false);
-  rounding_mode_bits.round_to_zero = const_literal(true);
-  rounding_mode_bits.round_to_away = const_literal(false);
-  bvt r_high_sq_rtz = mul(r_high, r_high);
-  rounding_mode_bits = saved_rm2;
+  // Select based on rounding mode
+  literalt use_r_high_rtp =
+    prop.land(rounding_mode_bits.round_to_plus_inf, !r_low_exact);
+  literalt use_r_high_rne = prop.land(
+    rounding_mode_bits.round_to_even,
+    prop.lor(high_closer, prop.land(equal_dist, r_high_is_even)));
+  literalt use_r_high_rna = prop.land(
+    rounding_mode_bits.round_to_away, prop.lor(high_closer, equal_dist));
 
-  prop.l_set_to_true(prop.limplies(
-    prop.land(is_normal_case, !is_infinity(r_high)),
-    relation(r_high_sq_rtz, relt::GT, src)));
-
-  // r_low is exact iff r_low^2 (RTZ) == x
-  literalt r_low_exact = relation(r_low_sq_rtz, relt::EQ, src);
-
-  // Rounding mode selection:
-  // RTZ/RTN: always r_low (round toward zero for positive sqrt)
-  // RTP: r_high unless exact
-  // RNE: need distance comparison — use r_low^2 and r_high^2 to estimate
-  //   If r_low^2 == x: exact, use r_low
-  //   If r_high^2 == x: exact, use r_high (but this can't happen since
-  //     r_high^2 > x by constraint)
-  //   Otherwise: the SAT solver picks r_low, and for RNE this is
-  //     correct when r_low is closer. For the case where r_high is
-  //     closer, we'd need exact distance comparison.
-  //   Approximation: for RNE, use the same as RTZ (may be off by 1 ulp
-  //   in rare cases). TODO: use wider format for exact comparison.
-  // RNA: same approximation as RNE for now.
-
-  literalt use_r_high =
-    prop.land(!r_low_exact, rounding_mode_bits.round_to_plus_inf);
+  literalt use_r_high = prop.land(
+    !r_low_exact, prop.lor({use_r_high_rtp, use_r_high_rne, use_r_high_rna}));
 
   bvt result = bv_utils.select(use_r_high, r_high, r_low);
 
