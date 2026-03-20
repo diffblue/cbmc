@@ -209,10 +209,38 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   {
     // Template arguments contain unresolved parameters (e.g., from a
     // template constructor like optional(const optional<_Up>&) where
-    // _Up is the constructor's own template parameter). Return the
-    // original template symbol — the constructor will be properly
-    // instantiated when actually called with concrete types.
-    return template_symbol;
+    // _Up is the constructor's own template parameter). Create an
+    // incomplete type symbol so that callers get a proper type symbol
+    // (with "tag-" prefix) rather than the template declaration symbol.
+    std::string suffix = template_suffix(full_template_args);
+
+    cpp_scopet *template_scope =
+      id_map_lookup(cpp_scopes, template_symbol.name);
+    if(template_scope == nullptr)
+      return template_symbol;
+
+    irep_idt identifier = id2string(template_scope->get_parent().prefix) +
+                          "tag-" + id2string(template_symbol.base_name) +
+                          id2string(suffix);
+
+    auto s_it = symbol_table.symbols.find(identifier);
+    if(s_it != symbol_table.symbols.end())
+      return s_it->second;
+
+    const cpp_declarationt &template_decl =
+      to_cpp_declaration(template_symbol.type);
+    const bool is_union = template_decl.type().id() == ID_union;
+    type_symbolt new_symbol{
+      identifier,
+      is_union ? static_cast<typet>(union_typet()) : struct_typet(),
+      template_symbol.mode};
+    new_symbol.base_name = template_symbol.base_name;
+    new_symbol.location = template_symbol.location;
+    to_struct_union_type(new_symbol.type).make_incomplete();
+
+    symbolt *s_ptr;
+    symbol_table.move(new_symbol, s_ptr);
+    return *s_ptr;
   }
 
   // do we have args?

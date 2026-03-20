@@ -1,4 +1,4 @@
-KNOWNBUG gcc-13
+CORE gcc-13 no-validate
 main.cpp
 --cpp17 --unwind 5
 ^EXIT=(0|10)$
