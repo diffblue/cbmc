@@ -1,6 +1,6 @@
 CORE gcc-13
 main.cpp
---object-bits 10 --no-undefined-shift-check
+--object-bits 10
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

@@ -1,0 +1,12 @@
+CORE
+main.cpp
+
+\[main\.undefined-shift\.\d+\] line 11 shift distance too large in x << 32: FAILURE
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+line 8.*shift
+--
+Only the shift after pop should be checked, not the one inside the
+disabled region.
