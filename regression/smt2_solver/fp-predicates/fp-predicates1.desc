@@ -1,0 +1,8 @@
+CORE
+fp-predicates1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+--
+Test fp.isSubnormal, fp.isNegative, fp.isPositive predicates.

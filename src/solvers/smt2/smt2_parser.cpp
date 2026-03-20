@@ -1369,6 +1369,61 @@ void smt2_parsert::setup_expressions()
     return not_exprt(typecast_exprt(op[0], bool_typet()));
   };
 
+  expressions["fp.isSubnormal"] = [this] {
+    auto op = operands();
+
+    if(op.size() != 1)
+      throw error("fp.isSubnormal takes one operand");
+
+    if(op[0].type().id() != ID_floatbv)
+      throw error("fp.isSubnormal takes FloatingPoint operand");
+
+    // subnormal iff not NaN, not infinite, not zero, and not normal
+    auto not_nan = not_exprt(unary_predicate_exprt(ID_isnan, op[0]));
+    auto not_inf = not_exprt(unary_predicate_exprt(ID_isinf, op[0]));
+    auto not_zero = typecast_exprt(op[0], bool_typet());
+    auto not_normal = not_exprt(isnormal_exprt(op[0]));
+    return and_exprt(
+      and_exprt(std::move(not_nan), std::move(not_inf)),
+      and_exprt(std::move(not_zero), std::move(not_normal)));
+  };
+
+  expressions["fp.isNegative"] = [this] {
+    auto op = operands();
+
+    if(op.size() != 1)
+      throw error("fp.isNegative takes one operand");
+
+    if(op[0].type().id() != ID_floatbv)
+      throw error("fp.isNegative takes FloatingPoint operand");
+
+    // negative iff sign bit is 1 and not NaN
+    const auto &type = to_floatbv_type(op[0].type());
+    return and_exprt(
+      not_exprt(unary_predicate_exprt(ID_isnan, op[0])),
+      extractbit_exprt(
+        typecast_exprt(op[0], bv_typet(type.get_width())),
+        type.get_width() - 1));
+  };
+
+  expressions["fp.isPositive"] = [this] {
+    auto op = operands();
+
+    if(op.size() != 1)
+      throw error("fp.isPositive takes one operand");
+
+    if(op[0].type().id() != ID_floatbv)
+      throw error("fp.isPositive takes FloatingPoint operand");
+
+    // positive iff sign bit is 0 and not NaN
+    const auto &type = to_floatbv_type(op[0].type());
+    return and_exprt(
+      not_exprt(unary_predicate_exprt(ID_isnan, op[0])),
+      not_exprt(extractbit_exprt(
+        typecast_exprt(op[0], bv_typet(type.get_width())),
+        type.get_width() - 1)));
+  };
+
   expressions["fp"] = [this] { return function_application_fp(operands()); };
 
   expressions["fp.add"] = [this] {
