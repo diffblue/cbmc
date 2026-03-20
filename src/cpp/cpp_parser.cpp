@@ -38,10 +38,9 @@ bool cpp_parsert::parse()
     config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP11;
   token_buffer.ansi_c_parser.cpp20 =
     config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP20;
-  // _Float32/64/128 etc. are C11 TS 18661-3 types. In C++ mode they
-  // appear as typedefs in system headers, not as built-in types.
-  token_buffer.ansi_c_parser.ts_18661_3_Floatn_types =
-    false; // these are still typedefs
+  // _Float32/64/32x/64x are TS 18661-3 types. GCC 13+ supports them
+  // as built-in types in C++ mode; older GCC and clang do not.
+  token_buffer.ansi_c_parser.ts_18661_3_Floatn_types = *support_float16;
   token_buffer.ansi_c_parser.__float128_is_keyword = false;
   token_buffer.ansi_c_parser.float16_type = *support_float16;
   token_buffer.ansi_c_parser.bf16_type = *support_float16;
