@@ -1477,6 +1477,65 @@ void smt2_parsert::setup_expressions()
 
   expressions["fp"] = [this] { return function_application_fp(operands()); };
 
+  expressions["fp.min"] = [this]
+  {
+    auto op = operands();
+
+    if(op.size() != 2)
+      throw error("fp.min takes two operands");
+
+    if(op[0].type().id() != ID_floatbv || op[1].type().id() != ID_floatbv)
+      throw error("fp.min takes FloatingPoint operands");
+
+    // IEEE 754-2019 minimum:
+    // - if x is NaN, return y; if y is NaN, return x
+    // - if x < y, return x; if y < x, return y
+    // - if equal, return the one with sign bit 1 (negative)
+    auto x_nan = unary_predicate_exprt(ID_isnan, op[0]);
+    auto y_nan = unary_predicate_exprt(ID_isnan, op[1]);
+    auto x_lt_y = binary_relation_exprt(op[0], ID_lt, op[1]);
+    const auto &type = to_floatbv_type(op[0].type());
+    auto x_sign = extractbit_exprt(
+      typecast_exprt(op[0], bv_typet(type.get_width())), type.get_width() - 1);
+    // prefer x when x has sign bit (is negative or -0)
+    auto equal_case = if_exprt(x_sign, op[0], op[1]);
+    auto normal_case = if_exprt(x_lt_y, op[0], op[1]);
+    // fp.eq treats -0 == +0, use it to detect the tie case
+    auto x_eq_y = ieee_float_equal_exprt(op[0], op[1]);
+    auto non_nan = if_exprt(x_eq_y, equal_case, normal_case);
+    auto handle_y_nan = if_exprt(y_nan, op[0], non_nan);
+    return if_exprt(x_nan, op[1], handle_y_nan);
+  };
+
+  expressions["fp.max"] = [this]
+  {
+    auto op = operands();
+
+    if(op.size() != 2)
+      throw error("fp.max takes two operands");
+
+    if(op[0].type().id() != ID_floatbv || op[1].type().id() != ID_floatbv)
+      throw error("fp.max takes FloatingPoint operands");
+
+    // IEEE 754-2019 maximum:
+    // - if x is NaN, return y; if y is NaN, return x
+    // - if x > y, return x; if y > x, return y
+    // - if equal, return the one with sign bit 0 (positive)
+    auto x_nan = unary_predicate_exprt(ID_isnan, op[0]);
+    auto y_nan = unary_predicate_exprt(ID_isnan, op[1]);
+    auto x_gt_y = binary_relation_exprt(op[0], ID_gt, op[1]);
+    const auto &type = to_floatbv_type(op[0].type());
+    auto x_sign = extractbit_exprt(
+      typecast_exprt(op[0], bv_typet(type.get_width())), type.get_width() - 1);
+    // prefer x when x has no sign bit (is positive or +0)
+    auto equal_case = if_exprt(x_sign, op[1], op[0]);
+    auto normal_case = if_exprt(x_gt_y, op[0], op[1]);
+    auto x_eq_y = ieee_float_equal_exprt(op[0], op[1]);
+    auto non_nan = if_exprt(x_eq_y, equal_case, normal_case);
+    auto handle_y_nan = if_exprt(y_nan, op[0], non_nan);
+    return if_exprt(x_nan, op[1], handle_y_nan);
+  };
+
   expressions["fp.add"] = [this] {
     return function_application_ieee_float_op("fp.add", operands());
   };
