@@ -16,6 +16,7 @@ endif()
 add_test_pl_tests(
     "$<TARGET_FILE:cbmc> --validate-goto-model --validate-ssa-equation" ${gcc_only} ${extra_excludes} -X libcxx
 )
+set_tests_properties("cbmc-cpp-CORE" PROPERTIES TIMEOUT 1800)
 
 # libc++ tests run without --validate-goto-model because system header
 # processing may leave missing symbols in the goto model.
