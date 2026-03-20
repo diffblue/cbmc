@@ -1,5 +1,7 @@
 // GCC _Float128 math builtins used by libstdc++ headers
 
+#if defined(__GNUC__) && !defined(__clang__) && defined(__x86_64__)
+
 __float128 x = 1.0;
 
 __float128 test_fabs()
@@ -16,6 +18,8 @@ __float128 test_copysign()
 {
   return __builtin_copysignf128(x, x);
 }
+
+#endif
 
 int main()
 {
