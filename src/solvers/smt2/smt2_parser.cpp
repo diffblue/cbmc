@@ -889,13 +889,23 @@ exprt smt2_parsert::function_application()
           if(op[1].type().id() != ID_floatbv)
             throw error() << id << " takes a FloatingPoint operand";
 
+          // First round to integral with the given rounding mode,
+          // then convert to integer with RTZ. This avoids the
+          // precondition in float_utilst::to_integer() that requires
+          // round_to_zero.
+          auto rounded =
+            floatbv_round_to_integral_exprt(op[1], op[0]);
+          auto rtz = from_integer(
+            ieee_floatt::ROUND_TO_ZERO, unsignedbv_typet(32));
+
           if(id == "fp.to_sbv")
             return typecast_exprt(
-              floatbv_typecast_exprt(op[1], op[0], signedbv_typet(width)),
+              floatbv_typecast_exprt(
+                std::move(rounded), std::move(rtz), signedbv_typet(width)),
               unsignedbv_typet(width));
           else
             return floatbv_typecast_exprt(
-              op[1], op[0], unsignedbv_typet(width));
+              std::move(rounded), std::move(rtz), unsignedbv_typet(width));
         }
         else
         {
