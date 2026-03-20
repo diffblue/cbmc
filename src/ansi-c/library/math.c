@@ -1108,7 +1108,7 @@ long double sqrtl(long double d)
 #endif
 
 // TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB
-double fmax(double f, double g) { return ((f >= g) || isnan(g)) ? f : g; }
+double fmax(double f, double g) { return __CPROVER_fmax(f, g); }
 
 /* FUNCTION: fmaxf */
 
@@ -1118,7 +1118,7 @@ double fmax(double f, double g) { return ((f >= g) || isnan(g)) ? f : g; }
 #endif
 
 // TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB
-float fmaxf(float f, float g) { return ((f >= g) || isnan(g)) ? f : g; }
+float fmaxf(float f, float g) { return __CPROVER_fmaxf(f, g); }
 
 /* FUNCTION: fmaxl */
 
@@ -1128,7 +1128,7 @@ float fmaxf(float f, float g) { return ((f >= g) || isnan(g)) ? f : g; }
 #endif
 
 // TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB
-long double fmaxl(long double f, long double g) { return ((f >= g) || isnan(g)) ? f : g; }
+long double fmaxl(long double f, long double g) { return __CPROVER_fmaxl(f, g); }
 
 
 /* ISO 9899:2011
@@ -1151,7 +1151,7 @@ long double fmaxl(long double f, long double g) { return ((f >= g) || isnan(g)) 
 #endif
  
 // TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB
-double fmin(double f, double g) { return ((f <= g) || isnan(g)) ? f : g; }
+double fmin(double f, double g) { return __CPROVER_fmin(f, g); }
 
 /* FUNCTION: fminf */
 
@@ -1161,7 +1161,7 @@ double fmin(double f, double g) { return ((f <= g) || isnan(g)) ? f : g; }
 #endif
 
 // TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB 
-float fminf(float f, float g) { return ((f <= g) || isnan(g)) ? f : g; }
+float fminf(float f, float g) { return __CPROVER_fminf(f, g); }
 
 /* FUNCTION: fminl */
 
@@ -1171,7 +1171,7 @@ float fminf(float f, float g) { return ((f <= g) || isnan(g)) ? f : g; }
 #endif
 
 // TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB 
-long double fminl(long double f, long double g) { return ((f <= g) || isnan(g)) ? f : g; }
+long double fminl(long double f, long double g) { return __CPROVER_fminl(f, g); }
 
 
 /* ISO 9899:2011

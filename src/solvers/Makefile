@@ -105,6 +105,7 @@ SRC = $(BOOLEFORCE_SRC) \
       flattening/boolbv_extractbits.cpp \
       flattening/boolbv_floatbv_fma.cpp \
       flattening/boolbv_floatbv_mod_rem.cpp \
+      flattening/boolbv_floatbv_min_max.cpp \
       flattening/boolbv_floatbv_op.cpp \
       flattening/boolbv_get.cpp \
       flattening/boolbv_ieee_float_rel.cpp \

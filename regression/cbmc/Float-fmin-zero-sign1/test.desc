@@ -1,10 +1,8 @@
-KNOWNBUG
+CORE
 main.c
 --floatbv
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
-fminf(-0, +0) should return -0 (sign bit set). The C library model
-uses (f <= g) which treats -0 == +0, losing the sign distinction.
-Needs __CPROVER_fminf built-in mapping to ID_floatbv_min.
+fminf(+0, -0) returns -0 (sign bit set) per IEEE 754-2019.

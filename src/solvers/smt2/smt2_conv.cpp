@@ -1740,9 +1740,19 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     convert_floatbv_rem(to_binary_expr(expr));
   }
-  else if(expr.id() == ID_floatbv_fma)
+  else if(expr.id() == ID_floatbv_min || expr.id() == ID_floatbv_max)
   {
-    convert_floatbv_fma(to_floatbv_fma_expr(expr));
+    const auto &binary = to_binary_expr(expr);
+    if(use_FPA_theory)
+    {
+      out << (expr.id() == ID_floatbv_min ? "(fp.min " : "(fp.max ");
+      convert_expr(binary.lhs());
+      out << " ";
+      convert_expr(binary.rhs());
+      out << ")";
+    }
+    else
+      convert_floatbv(expr);
   }
   else if(expr.id()==ID_address_of)
   {
@@ -5630,6 +5640,8 @@ void smt2_convt::find_symbols(const exprt &expr)
            expr.id() == ID_floatbv_fma ||
            expr.id() == ID_floatbv_mod ||
            expr.id() == ID_floatbv_rem ||
+           expr.id() == ID_floatbv_min ||
+           expr.id() == ID_floatbv_max ||
            expr.id() == ID_floatbv_typecast ||
            expr.id() == ID_ieee_float_equal ||
            expr.id() == ID_ieee_float_notequal ||

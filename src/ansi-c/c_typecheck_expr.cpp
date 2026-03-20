@@ -3364,6 +3364,48 @@ exprt c_typecheck_baset::do_special_functions(
     return std::move(fmod_expr);
   }
   else if(
+    identifier == CPROVER_PREFIX "fmin" ||
+    identifier == CPROVER_PREFIX "fminf" ||
+    identifier == CPROVER_PREFIX "fminl")
+  {
+    if(expr.arguments().size() != 2)
+    {
+      error().source_location = f_op.source_location();
+      error() << "fmin-functions expect two operands" << eom;
+      throw 0;
+    }
+
+    typecheck_function_call_arguments(expr);
+
+    binary_exprt fmin_expr(
+      expr.arguments()[0], ID_floatbv_min, expr.arguments()[1]);
+
+    fmin_expr.add_source_location() = source_location;
+
+    return std::move(fmin_expr);
+  }
+  else if(
+    identifier == CPROVER_PREFIX "fmax" ||
+    identifier == CPROVER_PREFIX "fmaxf" ||
+    identifier == CPROVER_PREFIX "fmaxl")
+  {
+    if(expr.arguments().size() != 2)
+    {
+      error().source_location = f_op.source_location();
+      error() << "fmax-functions expect two operands" << eom;
+      throw 0;
+    }
+
+    typecheck_function_call_arguments(expr);
+
+    binary_exprt fmax_expr(
+      expr.arguments()[0], ID_floatbv_max, expr.arguments()[1]);
+
+    fmax_expr.add_source_location() = source_location;
+
+    return std::move(fmax_expr);
+  }
+  else if(
     identifier == CPROVER_PREFIX "remainder" ||
     identifier == CPROVER_PREFIX "remainderf" ||
     identifier == CPROVER_PREFIX "remainderl" ||
