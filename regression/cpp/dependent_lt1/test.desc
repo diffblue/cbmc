@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 -std=c++11
 ^EXIT=0$
@@ -6,6 +6,3 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
-Parse error on ::template type<T, U> syntax in template alias
-context. The parser does not handle the template keyword after
-:: in all contexts.
