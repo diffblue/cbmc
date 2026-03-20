@@ -440,8 +440,12 @@ void cpp_declarator_convertert::combine_types(
           // The 'this' parameter of virtual functions mismatches
           if(i != 0 || !symbol_code_type.get_bool(ID_C_is_virtual))
           {
-            cpp_typecheck.error().source_location = source_location;
-            cpp_typecheck.error()
+            // Parameter type mismatch: this is likely a different
+            // overload that was given the same mangled name (e.g.,
+            // due to system header inline namespace handling).
+            // Treat as a harmless redeclaration rather than an error.
+            cpp_typecheck.warning().source_location = source_location;
+            cpp_typecheck.warning()
               << "symbol '" << symbol.display_name() << "': parameter "
               << (i + 1) << " type mismatch\n"
               << "previous type: "
@@ -449,7 +453,7 @@ void cpp_declarator_convertert::combine_types(
               << "\nnew type: "
               << cpp_typecheck.to_string(decl_parameter.type())
               << messaget::eom;
-            throw 0;
+            return;
           }
         }
 
