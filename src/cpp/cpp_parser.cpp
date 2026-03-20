@@ -28,6 +28,18 @@ bool cpp_parsert::parse()
       support_float16 = gcc_version.flavor == gcc_versiont::flavort::GCC &&
                         gcc_version.is_at_least(13u);
     }
+    else if(
+      config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG)
+    {
+      // Apple Clang supports _Float16 natively. On macOS, system headers
+      // use _Float16 without typedefs. On Linux with clang, glibc headers
+      // typedef _Float32 etc., which conflicts with keyword mode.
+#ifdef __APPLE__
+      support_float16 = true;
+#else
+      support_float16 = false;
+#endif
+    }
     else
       support_float16 = false;
   }

@@ -1,25 +1,25 @@
 // C++23: #elifdef and #elifndef preprocessor directives
 // Supported in GCC 12+, Clang 13+
-#if(defined(__GNUC__) && __GNUC__ >= 12) || \
+#if(defined(__GNUC__) && __GNUC__ >= 12) ||                                    \
   (defined(__clang__) && __clang_major__ >= 13)
 
-#define FOO
+#  define FOO
 
-#ifdef BAR
+#  ifdef BAR
 int x = 1;
-#elifdef FOO
+#  elifdef FOO
 int x = 2;
-#else
+#  else
 int x = 3;
-#endif
+#  endif
 
-#ifdef BAR
+#  ifdef BAR
 int y = 10;
-#elifndef BAZ
+#  elifndef BAZ
 int y = 20;
-#else
+#  else
 int y = 30;
-#endif
+#  endif
 
 int main()
 {
