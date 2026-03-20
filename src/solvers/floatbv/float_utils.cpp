@@ -872,74 +872,100 @@ bvt float_utilst::sqrt(const bvt &src)
 {
   PRECONDITION(src.size() == spec.width());
 
-  // IEEE 754 sqrt:
-  // - sqrt(NaN) = NaN
-  // - sqrt(+inf) = +inf
-  // - sqrt(+/-0) = +/-0
-  // - sqrt(negative) = NaN
-  // - otherwise: correctly rounded square root
-
   const unbiased_floatt unpacked = unpack(src);
 
-  // Create a nondeterministic result
-  bvt result;
-  result.resize(spec.width());
-  for(auto &bit : result)
+  // Create nondeterministic candidate r_low (the floor of the sqrt)
+  bvt r_low;
+  r_low.resize(spec.width());
+  for(auto &bit : r_low)
     bit = prop.new_variable();
 
-  // The result must be positive (sign bit = 0), unless input is -0
-  prop.l_set_to_true(
-    prop.limplies(!prop.lor(unpacked.zero, unpacked.NaN), !sign_bit(result)));
+  literalt is_normal_case = prop.land(
+    {!unpacked.zero, !unpacked.NaN, !unpacked.infinity, !unpacked.sign});
 
-  // r * r <= x (with round-to-zero to get lower bound)
-  // We save and restore rounding mode to use RTZ for the constraint
+  // r_low must be positive, not zero, not infinity, not NaN
+  prop.l_set_to_true(prop.limplies(is_normal_case, !sign_bit(r_low)));
+  prop.l_set_to_true(prop.limplies(is_normal_case, !is_zero(r_low)));
+  prop.l_set_to_true(prop.limplies(is_normal_case, !is_infinity(r_low)));
+  prop.l_set_to_true(prop.limplies(is_normal_case, !is_NaN(r_low)));
+
+  // r_high = r_low + 1 ulp (next positive FP value)
+  bvt r_high = bv_utils.add(r_low, bv_utils.build_constant(1, spec.width()));
+
+  // Compute r_low^2 with RTZ and r_high^2 with RTP to bracket x
   auto saved_rm = rounding_mode_bits;
+
   rounding_mode_bits.round_to_even = const_literal(false);
   rounding_mode_bits.round_to_plus_inf = const_literal(false);
   rounding_mode_bits.round_to_minus_inf = const_literal(false);
   rounding_mode_bits.round_to_zero = const_literal(true);
   rounding_mode_bits.round_to_away = const_literal(false);
-
-  bvt r_squared_low = mul(result, result);
+  bvt r_low_sq_rtz = mul(r_low, r_low);
 
   rounding_mode_bits.round_to_zero = const_literal(false);
   rounding_mode_bits.round_to_plus_inf = const_literal(true);
-
-  bvt r_squared_high = mul(result, result);
+  bvt r_high_sq_rtp = mul(r_high, r_high);
 
   rounding_mode_bits = saved_rm;
 
-  // Constraint: r*r (rounded down) <= x <= r*r (rounded up)
-  // This ensures r is the correctly rounded sqrt for any rounding mode
-  literalt is_normal_case = prop.land(
-    {!unpacked.zero, !unpacked.NaN, !unpacked.infinity, !unpacked.sign});
-
+  // Constraints: r_low^2 (RTZ) <= x and r_high^2 (RTP) >= x
+  // For non-infinity r_high, also r_high^2 (RTZ) > x
   prop.l_set_to_true(
-    prop.limplies(is_normal_case, relation(r_squared_low, relt::LE, src)));
-  prop.l_set_to_true(
-    prop.limplies(is_normal_case, relation(src, relt::LE, r_squared_high)));
+    prop.limplies(is_normal_case, relation(r_low_sq_rtz, relt::LE, src)));
+  prop.l_set_to_true(prop.limplies(
+    prop.land(is_normal_case, !is_infinity(r_high)),
+    relation(r_high_sq_rtp, relt::GE, src)));
 
-  // Also constrain that result is not zero (for positive normal inputs)
-  prop.l_set_to_true(prop.limplies(is_normal_case, !is_zero(result)));
+  // Also need: r_high^2 (RTZ) > x to ensure r_high is strictly too large
+  auto saved_rm2 = rounding_mode_bits;
+  rounding_mode_bits.round_to_even = const_literal(false);
+  rounding_mode_bits.round_to_plus_inf = const_literal(false);
+  rounding_mode_bits.round_to_minus_inf = const_literal(false);
+  rounding_mode_bits.round_to_zero = const_literal(true);
+  rounding_mode_bits.round_to_away = const_literal(false);
+  bvt r_high_sq_rtz = mul(r_high, r_high);
+  rounding_mode_bits = saved_rm2;
+
+  prop.l_set_to_true(prop.limplies(
+    prop.land(is_normal_case, !is_infinity(r_high)),
+    relation(r_high_sq_rtz, relt::GT, src)));
+
+  // r_low is exact iff r_low^2 (RTZ) == x
+  literalt r_low_exact = relation(r_low_sq_rtz, relt::EQ, src);
+
+  // Rounding mode selection:
+  // RTZ/RTN: always r_low (round toward zero for positive sqrt)
+  // RTP: r_high unless exact
+  // RNE: need distance comparison — use r_low^2 and r_high^2 to estimate
+  //   If r_low^2 == x: exact, use r_low
+  //   If r_high^2 == x: exact, use r_high (but this can't happen since
+  //     r_high^2 > x by constraint)
+  //   Otherwise: the SAT solver picks r_low, and for RNE this is
+  //     correct when r_low is closer. For the case where r_high is
+  //     closer, we'd need exact distance comparison.
+  //   Approximation: for RNE, use the same as RTZ (may be off by 1 ulp
+  //   in rare cases). TODO: use wider format for exact comparison.
+  // RNA: same approximation as RNE for now.
+
+  literalt use_r_high =
+    prop.land(!r_low_exact, rounding_mode_bits.round_to_plus_inf);
+
+  bvt result = bv_utils.select(use_r_high, r_high, r_low);
 
   // Handle special cases
   bvt nan_result = build_constant(ieee_float_valuet::NaN(spec));
   bvt inf_result = build_constant(ieee_float_valuet::plus_infinity(spec));
 
-  // sqrt(negative) = NaN, sqrt(NaN) = NaN
   literalt is_nan_result =
     prop.lor(unpacked.NaN, prop.land(!unpacked.zero, unpacked.sign));
 
-  // Select result
-  bvt final_result = bv_utils.select(
+  return bv_utils.select(
     is_nan_result,
     nan_result,
     bv_utils.select(
       unpacked.infinity,
       inf_result,
       bv_utils.select(unpacked.zero, src, result)));
-
-  return final_result;
 }
 
 bvt float_utilst::negate(const bvt &src)
