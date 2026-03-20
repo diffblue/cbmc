@@ -1,0 +1,8 @@
+CORE
+fp-div-eq-zero1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+--
+Based on CVC5#12335: fp.div with fp.eq to zero (quantifier-free version).
