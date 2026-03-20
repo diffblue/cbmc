@@ -470,3 +470,9 @@ Lower priority:
   remainder crash, and FMA. Found additional bug: fp.to_sbv/fp.to_ubv
   crash with non-RTZ rounding modes. See IMPLEMENTATION_ANALYSIS.md for
   full effort estimates and design sketches for all remaining gaps.
+- **2026-03-20**: Implemented fixes for issues independent of the branch:
+  1. Added `fp.isSubnormal`, `fp.isNegative`, `fp.isPositive` to SMT2 parser
+  2. Added `to_fp` from BitVec (reinterpret cast) — KNOWNBUG→CORE
+  3. Fixed `fp.to_sbv`/`fp.to_ubv` crash with non-RTZ rounding modes
+  4. Fixed `fp.roundToIntegral` on non-standard FP sorts — KNOWNBUG→CORE
+     Root cause: magic number 2^f not representable; fix: widen format
