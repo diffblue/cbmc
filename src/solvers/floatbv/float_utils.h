@@ -132,6 +132,9 @@ public:
   // fused multiply-add: round(src1 * src2 + src3) with a single rounding
   bvt fma(const bvt &multiply_lhs, const bvt &multiply_rhs, const bvt &addend);
 
+  // sqrt
+  bvt sqrt(const bvt &src);
+
   bvt abs(const bvt &);
   bvt negate(const bvt &);
 

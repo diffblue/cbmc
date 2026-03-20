@@ -1573,22 +1573,20 @@ void smt2_parsert::setup_expressions()
     return binary_exprt(op[0], ID_floatbv_rem, op[1]);
   };
 
-  expressions["fp.fma"] = [this]
+  expressions["fp.sqrt"] = [this]
   {
     auto op = operands();
 
-    if(op.size() != 4)
-      throw error() << "fp.fma takes four operands";
+    if(op.size() != 2)
+      throw error() << "fp.sqrt takes two operands";
 
-    if(
-      op[1].type().id() != ID_floatbv || op[2].type().id() != ID_floatbv ||
-      op[3].type().id() != ID_floatbv)
-    {
-      throw error() << "fp.fma takes FloatingPoint operands";
-    }
+    if(op[1].type().id() != ID_floatbv)
+      throw error() << "fp.sqrt takes a FloatingPoint operand";
 
-    // op[0] = rounding mode, op[1..3] = FP operands
-    return floatbv_fma_exprt(op[1], op[2], op[3], op[0]);
+    // op[0] = rounding mode, op[1] = FP operand
+    // Reuse ieee_float_op_exprt with the operand as both lhs and rhs;
+    // the boolbv layer will dispatch to float_utils.sqrt().
+    return ieee_float_op_exprt(op[1], ID_floatbv_sqrt, op[1], op[0]);
   };
 
   expressions["fp.roundToIntegral"] = [this]

@@ -868,6 +868,80 @@ bvt float_utilst::rem(const bvt &src1, const bvt &src2)
   return result;
 }
 
+bvt float_utilst::sqrt(const bvt &src)
+{
+  PRECONDITION(src.size() == spec.width());
+
+  // IEEE 754 sqrt:
+  // - sqrt(NaN) = NaN
+  // - sqrt(+inf) = +inf
+  // - sqrt(+/-0) = +/-0
+  // - sqrt(negative) = NaN
+  // - otherwise: correctly rounded square root
+
+  const unbiased_floatt unpacked = unpack(src);
+
+  // Create a nondeterministic result
+  bvt result;
+  result.resize(spec.width());
+  for(auto &bit : result)
+    bit = prop.new_variable();
+
+  // The result must be positive (sign bit = 0), unless input is -0
+  prop.l_set_to_true(
+    prop.limplies(!prop.lor(unpacked.zero, unpacked.NaN), !sign_bit(result)));
+
+  // r * r <= x (with round-to-zero to get lower bound)
+  // We save and restore rounding mode to use RTZ for the constraint
+  auto saved_rm = rounding_mode_bits;
+  rounding_mode_bits.round_to_even = const_literal(false);
+  rounding_mode_bits.round_to_plus_inf = const_literal(false);
+  rounding_mode_bits.round_to_minus_inf = const_literal(false);
+  rounding_mode_bits.round_to_zero = const_literal(true);
+  rounding_mode_bits.round_to_away = const_literal(false);
+
+  bvt r_squared_low = mul(result, result);
+
+  rounding_mode_bits.round_to_zero = const_literal(false);
+  rounding_mode_bits.round_to_plus_inf = const_literal(true);
+
+  bvt r_squared_high = mul(result, result);
+
+  rounding_mode_bits = saved_rm;
+
+  // Constraint: r*r (rounded down) <= x <= r*r (rounded up)
+  // This ensures r is the correctly rounded sqrt for any rounding mode
+  literalt is_normal_case = prop.land(
+    {!unpacked.zero, !unpacked.NaN, !unpacked.infinity, !unpacked.sign});
+
+  prop.l_set_to_true(
+    prop.limplies(is_normal_case, relation(r_squared_low, relt::LE, src)));
+  prop.l_set_to_true(
+    prop.limplies(is_normal_case, relation(src, relt::LE, r_squared_high)));
+
+  // Also constrain that result is not zero (for positive normal inputs)
+  prop.l_set_to_true(prop.limplies(is_normal_case, !is_zero(result)));
+
+  // Handle special cases
+  bvt nan_result = build_constant(ieee_float_valuet::NaN(spec));
+  bvt inf_result = build_constant(ieee_float_valuet::plus_infinity(spec));
+
+  // sqrt(negative) = NaN, sqrt(NaN) = NaN
+  literalt is_nan_result =
+    prop.lor(unpacked.NaN, prop.land(!unpacked.zero, unpacked.sign));
+
+  // Select result
+  bvt final_result = bv_utils.select(
+    is_nan_result,
+    nan_result,
+    bv_utils.select(
+      unpacked.infinity,
+      inf_result,
+      bv_utils.select(unpacked.zero, src, result)));
+
+  return final_result;
+}
+
 bvt float_utilst::negate(const bvt &src)
 {
   PRECONDITION(!src.empty());

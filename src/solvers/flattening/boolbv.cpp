@@ -154,9 +154,9 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
   {
     return convert_floatbv_op(to_ieee_float_op_expr(expr));
   }
-  else if(expr.id() == ID_floatbv_fma)
+  else if(expr.id() == ID_floatbv_sqrt)
   {
-    return convert_floatbv_fma(to_floatbv_fma_expr(expr));
+    return convert_floatbv_op(to_ieee_float_op_expr(expr));
   }
   else if(expr.id() == ID_floatbv_mod)
     return convert_floatbv_mod_rem(to_binary_expr(expr));
