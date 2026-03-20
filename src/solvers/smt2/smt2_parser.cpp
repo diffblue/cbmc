@@ -1410,7 +1410,11 @@ void smt2_parsert::setup_expressions()
     if(op[0].type().id() != ID_floatbv)
       throw error("fp.isZero takes FloatingPoint operand");
 
-    return not_exprt(typecast_exprt(op[0], bool_typet()));
+    // fp.isZero is true for both +0 and -0.
+    // Use fp.eq with +0 (fp.eq treats -0 == +0).
+    const auto &type = to_floatbv_type(op[0].type());
+    return ieee_float_equal_exprt(
+      op[0], ieee_float_valuet::zero(type).to_expr());
   };
 
   expressions["fp.isSubnormal"] = [this]

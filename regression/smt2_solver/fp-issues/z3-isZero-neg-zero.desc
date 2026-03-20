@@ -1,10 +1,9 @@
-KNOWNBUG
+CORE
 z3-isZero-neg-zero.smt2
 
 ^EXIT=0$
 ^SIGNAL=0$
 ^unsat$
 --
-fp.isZero(-0) should be true. Currently returns false because
-the implementation checks bitvector non-zero instead of using
-float_utilst::is_zero() which handles both +0 and -0.
+fp.isZero(-0) is true. Fixed by using ieee_float_equal with +0
+instead of checking bitvector non-zero.
