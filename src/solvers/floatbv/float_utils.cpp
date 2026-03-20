@@ -175,12 +175,11 @@ bvt float_utilst::round_to_integral(const bvt &src)
     // works, round there, then convert back.
     // We need e' such that 2^f < 2^(2^(e'-1)-1), i.e., e' > log2(f)+2.
     std::size_t wider_e = spec.e;
-    while(
-      ieee_floatt{
-        ieee_float_spect(spec.f, wider_e),
-        ieee_floatt::rounding_modet::ROUND_TO_PLUS_INF,
-        power(2, spec.f)}
-        .is_infinity())
+    while(ieee_floatt{
+      ieee_float_spect(spec.f, wider_e),
+      ieee_floatt::rounding_modet::ROUND_TO_PLUS_INF,
+      power(2, spec.f)}
+            .is_infinity())
     {
       wider_e++;
     }

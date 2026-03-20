@@ -893,10 +893,9 @@ exprt smt2_parsert::function_application()
           // then convert to integer with RTZ. This avoids the
           // precondition in float_utilst::to_integer() that requires
           // round_to_zero.
-          auto rounded =
-            floatbv_round_to_integral_exprt(op[1], op[0]);
-          auto rtz = from_integer(
-            ieee_floatt::ROUND_TO_ZERO, unsignedbv_typet(32));
+          auto rounded = floatbv_round_to_integral_exprt(op[1], op[0]);
+          auto rtz =
+            from_integer(ieee_floatt::ROUND_TO_ZERO, unsignedbv_typet(32));
 
           if(id == "fp.to_sbv")
             return typecast_exprt(
@@ -1414,7 +1413,8 @@ void smt2_parsert::setup_expressions()
     return not_exprt(typecast_exprt(op[0], bool_typet()));
   };
 
-  expressions["fp.isSubnormal"] = [this] {
+  expressions["fp.isSubnormal"] = [this]
+  {
     auto op = operands();
 
     if(op.size() != 1)
@@ -1433,7 +1433,8 @@ void smt2_parsert::setup_expressions()
       and_exprt(std::move(not_zero), std::move(not_normal)));
   };
 
-  expressions["fp.isNegative"] = [this] {
+  expressions["fp.isNegative"] = [this]
+  {
     auto op = operands();
 
     if(op.size() != 1)
@@ -1451,7 +1452,8 @@ void smt2_parsert::setup_expressions()
         type.get_width() - 1));
   };
 
-  expressions["fp.isPositive"] = [this] {
+  expressions["fp.isPositive"] = [this]
+  {
     auto op = operands();
 
     if(op.size() != 1)
