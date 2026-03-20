@@ -1,9 +1,9 @@
 // Test that basic STL headers work with system libc++ (Apple or LLVM).
 // This exercises _Float16 handling, __decay builtin, and error recovery
 // for parameter type mismatches in libc++ internals.
-#include <vector>
-#include <string>
 #include <optional>
+#include <string>
+#include <vector>
 
 int main()
 {
