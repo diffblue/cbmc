@@ -237,6 +237,10 @@ protected:
   bool SyntaxError();
 
   bool rDefinition(cpp_itemt &);
+  bool rModuleDeclaration();
+  bool rImportDeclaration();
+  bool rExportDeclaration(cpp_itemt &);
+  bool is_identifier_with_text(unsigned offset, const irep_idt &text);
   bool rNullDeclaration(cpp_declarationt &);
   bool rTypedef(cpp_declarationt &);
   bool rTypedefUsing(cpp_declarationt &);
@@ -435,6 +439,15 @@ static bool is_identifier(int token)
   return token == TOK_GCC_IDENTIFIER || token == TOK_MSC_IDENTIFIER;
 }
 
+/// Check if the token at the given lookahead offset is an identifier
+/// with the given base name.
+bool Parser::is_identifier_with_text(unsigned offset, const irep_idt &text)
+{
+  cpp_tokent tk;
+  if(!is_identifier(lex.LookAhead(offset, tk)))
+    return false;
+  return tk.data.get(ID_C_base_name) == text;
+}
 new_scopet &Parser::add_id(const irept &cpp_name, new_scopet::kindt kind)
 {
   irep_idt id;
@@ -615,6 +628,33 @@ bool Parser::rDefinition(cpp_itemt &item)
             << '\n';
 #endif
 
+  // C++20 module declarations: module, import, export module/import
+  if(cpp20 && is_identifier(t))
+  {
+    if(is_identifier_with_text(0, "module"))
+    {
+      if(rModuleDeclaration())
+      {
+        item.make_declaration();
+        return true;
+      }
+      return false;
+    }
+    else if(is_identifier_with_text(0, "import"))
+    {
+      if(rImportDeclaration())
+      {
+        item.make_declaration();
+        return true;
+      }
+      return false;
+    }
+    else if(is_identifier_with_text(0, "export"))
+    {
+      return rExportDeclaration(item);
+    }
+  }
+
   if(t==';')
     return rNullDeclaration(item.make_declaration());
   else if(t==TOK_TYPEDEF)
@@ -644,6 +684,102 @@ bool Parser::rDefinition(cpp_itemt &item)
   }
   else
     return rDeclaration(item.make_declaration());
+}
+
+// C++20 module-declaration: [export] module module-name [module-partition] ;
+// Parsed and ignored — CBMC treats the file as a normal translation unit.
+bool Parser::rModuleDeclaration()
+{
+  cpp_tokent tk;
+  lex.get_token(tk); // consume 'module'
+
+  // Skip tokens until ';'
+  while(lex.LookAhead(0) != ';' && lex.LookAhead(0) != '\0')
+    lex.get_token(tk);
+
+  if(lex.LookAhead(0) == ';')
+    lex.get_token(tk);
+
+  return true;
+}
+
+// C++20 import-declaration: import module-name ; | import <header> ;
+// 'import <header>' is rewritten to #include during preprocessing (future).
+// For now, skip with a warning.
+bool Parser::rImportDeclaration()
+{
+  cpp_tokent tk;
+  lex.get_token(tk); // consume 'import'
+
+  cpp_tokent import_tk;
+  lex.LookAhead(0, import_tk);
+
+  // Skip tokens until ';'
+  while(lex.LookAhead(0) != ';' && lex.LookAhead(0) != '\0')
+    lex.get_token(tk);
+
+  if(lex.LookAhead(0) == ';')
+    lex.get_token(tk);
+
+  {
+    messaget log{message_handler};
+    log.warning() << "ignoring C++20 import declaration" << messaget::eom;
+  }
+
+  return true;
+}
+
+// C++20 export-declaration:
+//   export module-declaration
+//   export import-declaration
+//   export declaration
+//   export { declaration-seq }
+bool Parser::rExportDeclaration(cpp_itemt &item)
+{
+  cpp_tokent tk;
+  lex.get_token(tk); // consume 'export'
+
+  if(is_identifier_with_text(0, "module"))
+  {
+    if(!rModuleDeclaration())
+      return false;
+    item.make_declaration();
+    return true;
+  }
+  else if(is_identifier_with_text(0, "import"))
+  {
+    if(!rImportDeclaration())
+      return false;
+    item.make_declaration();
+    return true;
+  }
+  else if(lex.LookAhead(0) == '{')
+  {
+    // export { declaration-seq }
+    // Parse each declaration and add directly to the parse tree.
+    lex.get_token(tk); // consume '{'
+    while(lex.LookAhead(0) != '}' && lex.LookAhead(0) != '\0')
+    {
+      cpp_itemt block_item;
+      if(!rDefinition(block_item))
+      {
+        if(!SyntaxError())
+          return false;
+        SkipTo('}');
+        break;
+      }
+      parse_tree.items.push_back(block_item);
+    }
+    if(lex.LookAhead(0) == '}')
+      lex.get_token(tk);
+    item.make_declaration();
+    return true;
+  }
+  else
+  {
+    // export declaration — parse the declaration normally
+    return rDefinition(item);
+  }
 }
 
 bool Parser::rNullDeclaration(cpp_declarationt &decl)
@@ -1836,18 +1972,18 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
     }
   }
 
-  if((t0==TOK_CLASS || t0==TOK_TYPENAME))
+  if((t0 == TOK_CLASS || t0 == TOK_TYPENAME))
   {
-    cpp_token_buffert::post pos=lex.Save();
+    cpp_token_buffert::post pos = lex.Save();
 
     cpp_tokent tk1;
     lex.get_token(tk1);
 
-    declaration=cpp_declarationt();
+    declaration = cpp_declarationt();
     set_location(declaration, tk1);
 
     declaration.set(ID_is_type, true);
-    declaration.type()=typet("cpp-template-type");
+    declaration.type() = typet("cpp-template-type");
 
     declaration.declarators().resize(1);
     cpp_declaratort &declarator=declaration.declarators().front();
@@ -3676,7 +3812,7 @@ bool Parser::rConstructorDecl(
     }
   }
 
-  if(lex.LookAhead(0)==TOK_ARROW)
+  if(lex.LookAhead(0) == TOK_ARROW)
   {
 #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rConstructorDecl 3\n";
@@ -7976,7 +8112,7 @@ bool Parser::rUnaryExpr(exprt &exp)
     set_location(exp, tk);
     return true;
   }
-  else if(t==TOK_NOEXCEPT)
+  else if(t == TOK_NOEXCEPT)
     return rNoexceptExpr(exp);
   else if(t == TOK_BIT_CAST)
   {
@@ -8001,7 +8137,7 @@ bool Parser::rUnaryExpr(exprt &exp)
     set_location(exp, tk);
     return true;
   }
-  else if(t==TOK_REAL || t==TOK_IMAG)
+  else if(t == TOK_REAL || t == TOK_IMAG)
   {
     // a GCC extension for complex floating-point arithmetic
     cpp_tokent tk;
