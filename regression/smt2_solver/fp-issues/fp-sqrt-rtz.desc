@@ -1,0 +1,11 @@
+CORE
+fp-sqrt-rtz.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+^\(error
+--
+fp.sqrt(2.0) under RTZ, RNE and RTP: RTZ and RNE agree (0x3FB504F3, just
+below sqrt(2)), RTP yields the next float up (0x3FB504F4).
