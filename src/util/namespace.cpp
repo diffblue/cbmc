@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "symbol_table_base.h"
 
 #include <algorithm>
+#include <stdexcept>
 
 namespace_baset::~namespace_baset()
 {
@@ -61,8 +62,12 @@ const struct_typet &
 namespace_baset::follow_tag(const struct_tag_typet &src) const
 {
   const symbolt &symbol=lookup(src.get_identifier());
-  CHECK_RETURN(symbol.is_type);
-  CHECK_RETURN(symbol.type.id() == ID_struct);
+  if(!symbol.is_type || symbol.type.id() != ID_struct)
+  {
+    throw std::runtime_error(
+      "expected type symbol `" + id2string(src.get_identifier()) +
+      "' to be a struct");
+  }
   return to_struct_type(symbol.type);
 }
 
@@ -73,8 +78,12 @@ const c_enum_typet &
 namespace_baset::follow_tag(const c_enum_tag_typet &src) const
 {
   const symbolt &symbol=lookup(src.get_identifier());
-  CHECK_RETURN(symbol.is_type);
-  CHECK_RETURN(symbol.type.id() == ID_c_enum);
+  if(!symbol.is_type || symbol.type.id() != ID_c_enum)
+  {
+    throw std::runtime_error(
+      "expected type symbol `" + id2string(src.get_identifier()) +
+      "' to be an enum");
+  }
   return to_c_enum_type(symbol.type);
 }
 
@@ -83,8 +92,14 @@ const struct_union_typet &
 namespace_baset::follow_tag(const struct_or_union_tag_typet &src) const
 {
   const symbolt &symbol = lookup(src.get_identifier());
-  CHECK_RETURN(symbol.is_type);
-  CHECK_RETURN(symbol.type.id() == ID_struct || symbol.type.id() == ID_union);
+  if(
+    !symbol.is_type ||
+    (symbol.type.id() != ID_struct && symbol.type.id() != ID_union))
+  {
+    throw std::runtime_error(
+      "expected type symbol `" + id2string(src.get_identifier()) +
+      "' to be a struct or union");
+  }
   return to_struct_union_type(symbol.type);
 }
 

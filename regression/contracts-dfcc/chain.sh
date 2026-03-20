@@ -40,12 +40,15 @@ else
 fi
 
 if [[ "${is_windows}" == "true" ]]; then
+  echo "chain.sh: compiling ${name}.${ext} (windows)" >&2
   $goto_cc "${name}.${ext}" "/Fe${name}${dfcc_suffix}.gb"
 else
+  echo "chain.sh: compiling ${name}.${ext}" >&2
   $goto_cc -o "${name}${dfcc_suffix}.gb" "${name}.${ext}"
 fi
 
 rm -f "${name}${dfcc_suffix}-mod.gb"
+echo "chain.sh: instrumenting with args: ${args_inst}" >&2
 $goto_instrument ${args_inst} "${name}${dfcc_suffix}.gb" "${name}${dfcc_suffix}-mod.gb"
 if [ ! -e "${name}${dfcc_suffix}-mod.gb" ] ; then
   cp "${name}${dfcc_suffix}.gb" "${name}${dfcc_suffix}-mod.gb"
@@ -61,7 +64,8 @@ elif echo $args_inst | grep -q -- "--dump-c" ; then
   rm "${name}${dfcc_suffix}-mod.c"
 fi
 if ! echo "${args_cbmc}" | grep -q -- --function ; then
+  echo "chain.sh: dropping unused functions" >&2
   $goto_instrument --drop-unused-functions "${name}${dfcc_suffix}-mod.gb" "${name}${dfcc_suffix}-mod.gb"
 fi
-$goto_instrument --show-goto-functions "${name}${dfcc_suffix}-mod.gb"
+echo "chain.sh: running cbmc with args: ${args_cbmc}" >&2
 $cbmc --sat-solver cadical "${name}${dfcc_suffix}-mod.gb" ${args_cbmc}

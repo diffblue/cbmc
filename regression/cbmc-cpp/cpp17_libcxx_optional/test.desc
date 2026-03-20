@@ -1,4 +1,4 @@
-KNOWNBUG libcxx gcc-13
+CORE libcxx gcc-13
 main.cpp
 --cpp17 --stdlib libc++
 ^VERIFICATION
