@@ -724,8 +724,43 @@ exprt smt2_parsert::function_application()
           // width_f *includes* the hidden bit
           const ieee_float_spect spec(width_f - 1, width_e);
 
-          auto rounding_mode = expression();
+          auto first_operand = expression();
 
+          // Check if this is a 1-argument form (reinterpret cast from BV)
+          // or a 2-argument form (rounding_mode + source).
+          if(smt2_tokenizer.peek() == smt2_tokenizert::CLOSE)
+          {
+            // 1-argument form: ((_ to_fp eb sb) BitVec)
+            // This is a reinterpret cast from bitvector to FP.
+            next_token(); // consume the ')'
+
+            if(
+              first_operand.type().id() != ID_unsignedbv &&
+              first_operand.type().id() != ID_bv)
+            {
+              throw error()
+                << "to_fp with one operand requires a BitVec operand";
+            }
+
+            auto bv_width =
+              first_operand.type().id() == ID_unsignedbv
+                ? to_unsignedbv_type(first_operand.type()).get_width()
+                : to_bv_type(first_operand.type()).get_width();
+
+            if(bv_width != spec.width())
+            {
+              throw error()
+                << "to_fp BitVec width " << bv_width
+                << " does not match FloatingPoint width " << spec.width();
+            }
+
+            return typecast_exprt(
+              typecast_exprt(first_operand, bv_typet(bv_width)),
+              spec.to_type());
+          }
+
+          // 2-argument form: first_operand is the rounding mode
+          auto &rounding_mode = first_operand;
           auto source_op = expression();
 
           if(next_token() != smt2_tokenizert::CLOSE)
