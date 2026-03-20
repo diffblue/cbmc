@@ -1443,6 +1443,53 @@ void smt2_parsert::setup_expressions()
 
   expressions["fp"] = [this] { return function_application_fp(operands()); };
 
+  // SMT-LIB fp.min / fp.max as compound expressions, parameterised by
+  // comparison direction and tie-breaking preference. The semantics match
+  // SMT-LIB (equivalently IEEE 754-2008 minNum/maxNum, renamed
+  // minimumNumber/maximumNumber in 754-2019): when exactly one operand is
+  // NaN, the other is returned. This is *not* the 754-2019 minimum/maximum,
+  // which propagate NaN. SMT-LIB leaves fp.min(-0, +0) / fp.max(-0, +0)
+  // implementation-defined; we pin it deterministically (min prefers the
+  // negative zero, max the positive), matching Z3's post-#4880 behaviour.
+  auto make_fp_extremum =
+    [this](const irep_idt &relation_id, bool tie_to_negative, std::string name)
+  {
+    return [this, relation_id, tie_to_negative, name]()
+    {
+      auto op = operands();
+
+      if(op.size() != 2)
+        throw error() << name << " takes two operands";
+
+      if(op[0].type().id() != ID_floatbv || op[1].type().id() != ID_floatbv)
+        throw error() << name << " takes FloatingPoint operands";
+
+      if(op[0].type() != op[1].type())
+        throw error() << name << " takes FloatingPoint operands with matching "
+                      << "sort, but got " << smt2_format(op[0].type()) << " vs "
+                      << smt2_format(op[1].type());
+
+      // - if x is NaN, return y; if y is NaN, return x
+      // - compare using fp ordering; if equal, tie-break on sign bit
+      auto x_nan = isnan_exprt{op[0]};
+      auto y_nan = isnan_exprt{op[1]};
+      auto x_cmp_y = binary_relation_exprt{op[0], relation_id, op[1]};
+      auto x_sign = sign_exprt{op[0]};
+      auto equal_case = tie_to_negative ? if_exprt{x_sign, op[0], op[1]}
+                                        : if_exprt{x_sign, op[1], op[0]};
+      auto normal_case = if_exprt{x_cmp_y, op[0], op[1]};
+      // fp.eq treats -0 == +0, use it to detect the tie case
+      auto x_eq_y = ieee_float_equal_exprt{op[0], op[1]};
+      auto non_nan = if_exprt{x_eq_y, equal_case, normal_case};
+      auto handle_y_nan = if_exprt{y_nan, op[0], non_nan};
+      return if_exprt{x_nan, op[1], handle_y_nan};
+    };
+  };
+
+  expressions["fp.min"] = make_fp_extremum(ID_lt, true, "fp.min");
+
+  expressions["fp.max"] = make_fp_extremum(ID_gt, false, "fp.max");
+
   expressions["fp.add"] = [this] {
     return function_application_ieee_float_op("fp.add", operands());
   };
