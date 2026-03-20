@@ -481,3 +481,8 @@ Lower priority:
   tests + 9 C tests. 22 new CORE tests passing, 11 new KNOWNBUG tests
   documenting remaining gaps (fp.fma×3, fp.to_real×4, fp.rem×2,
   fp.isZero(-0)×1, to_fp overflow×1). Also found fp.isZero(-0) bug.
+- **2026-03-20**: Filled remaining test gaps. Added 15 more tests including
+  quantified versions of FPA issues. Final count: 48 tests in fp-issues/
+  (31 CORE, 17 KNOWNBUG) + 14 tests in other fp-* dirs + 9 C tests = 71
+  total. Only 6 issues intentionally without tests (Z3-specific features,
+  pure performance, incremental solving).
