@@ -476,3 +476,8 @@ Lower priority:
   3. Fixed `fp.to_sbv`/`fp.to_ubv` crash with non-RTZ rounding modes
   4. Fixed `fp.roundToIntegral` on non-standard FP sorts — KNOWNBUG→CORE
      Root cause: magic number 2^f not representable; fix: widen format
+- **2026-03-20**: Created comprehensive test suite: 33 additional SMT-LIB
+  tests in fp-issues/ covering all 55 catalogued issues. Total: 47 SMT-LIB
+  tests + 9 C tests. 22 new CORE tests passing, 11 new KNOWNBUG tests
+  documenting remaining gaps (fp.fma×3, fp.to_real×4, fp.rem×2,
+  fp.isZero(-0)×1, to_fp overflow×1). Also found fp.isZero(-0) bug.
