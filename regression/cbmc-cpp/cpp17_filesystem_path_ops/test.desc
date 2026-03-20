@@ -1,4 +1,4 @@
-CORE gcc-13 no-validate
+CORE gcc-13
 main.cpp
 --cpp17
 ^EXIT=(0|10)$
