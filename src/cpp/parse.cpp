@@ -1986,14 +1986,14 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
     declaration.type() = typet("cpp-template-type");
 
     declaration.declarators().resize(1);
-    cpp_declaratort &declarator=declaration.declarators().front();
+    cpp_declaratort &declarator = declaration.declarators().front();
 
-    declarator=cpp_declaratort();
+    declarator = cpp_declaratort();
     declarator.name().make_nil();
     declarator.type().make_nil();
     set_location(declarator, tk1);
 
-    if(lex.LookAhead(0)==TOK_ELLIPSIS)
+    if(lex.LookAhead(0) == TOK_ELLIPSIS)
     {
       cpp_tokent tk2;
       lex.get_token(tk2);
@@ -5197,24 +5197,41 @@ bool Parser::rName(irept &name)
                       bool has_dependent_arg = false;
                       for(const auto &arg : targs.get_sub())
                       {
-                        if(arg.id() == ID_name || arg.id() == ID_cpp_name)
+                        irep_idt aid;
+                        if(arg.id() == ID_name)
+                          aid = arg.get(ID_identifier);
+                        else if(arg.id() == ID_cpp_name)
                         {
-                          irep_idt aid;
-                          if(arg.id() == ID_name)
-                            aid = arg.get(ID_identifier);
-                          else if(!arg.get_sub().empty())
+                          if(!arg.get_sub().empty())
                             aid = arg.get_sub().front().get(ID_identifier);
-                          if(!aid.empty())
+                        }
+                        else if(arg.id() == ID_type || arg.id() == ID_ambiguous)
+                        {
+                          // Type template argument: check if the type
+                          // is a template parameter name.
+                          const irept &t = arg.find(ID_type);
+                          if(t.id() == ID_cpp_name && !t.get_sub().empty())
+                            aid = t.get_sub().front().get(ID_identifier);
+                          else if(
+                            t.id() == ID_merged_type && !t.get_sub().empty())
                           {
-                            new_scopet *afound = lookup_id(aid);
+                            const irept &first = t.get_sub().front();
                             if(
-                              afound != nullptr &&
-                              afound->kind ==
-                                new_scopet::kindt::TYPE_TEMPLATE_PARAMETER)
-                            {
-                              has_dependent_arg = true;
-                              break;
-                            }
+                              first.id() == ID_cpp_name &&
+                              !first.get_sub().empty())
+                              aid = first.get_sub().front().get(ID_identifier);
+                          }
+                        }
+                        if(!aid.empty())
+                        {
+                          new_scopet *afound = lookup_id(aid);
+                          if(
+                            afound != nullptr &&
+                            afound->kind ==
+                              new_scopet::kindt::TYPE_TEMPLATE_PARAMETER)
+                          {
+                            has_dependent_arg = true;
+                            break;
                           }
                         }
                       }
