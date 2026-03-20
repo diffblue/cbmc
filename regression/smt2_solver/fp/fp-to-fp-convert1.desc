@@ -1,0 +1,8 @@
+CORE
+fp-to-fp-convert1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+to_fp conversion from Float64 to Float32 preserves value of 1.0.
