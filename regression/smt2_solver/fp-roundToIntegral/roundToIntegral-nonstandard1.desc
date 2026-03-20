@@ -1,10 +1,10 @@
-KNOWNBUG
+CORE
 roundToIntegral-nonstandard1.smt2
 
 ^EXIT=0$
 ^SIGNAL=0$
 ^unsat$
 --
-Based on Z3#4841: roundToIntegral RTZ on non-standard FP sort
-(_ FloatingPoint 2 6) returns the input unchanged instead of
-truncating to integer. Works correctly for standard sorts (Float32).
+roundToIntegral RTZ on non-standard FP sort (_ FloatingPoint 2 6).
+Previously returned input unchanged; fixed by converting to wider
+format where the magic-number trick works.

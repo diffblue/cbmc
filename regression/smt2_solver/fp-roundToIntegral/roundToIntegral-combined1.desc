@@ -1,9 +1,9 @@
-KNOWNBUG
+CORE
 roundToIntegral-combined1.smt2
 
 ^EXIT=0$
 ^SIGNAL=0$
+^sat$
 --
 Based on Z3#4841: Combined constraints on non-standard FP sort.
-CBMC produces an invalid model due to roundToIntegral bug.
-The correct answer is likely unsat (no valid assignment exists).
+Satisfiable with NaN values (NaN + Z = NaN, NaN / Z = NaN, etc.).

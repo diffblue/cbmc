@@ -163,8 +163,49 @@ bvt float_utilst::round_to_integral(const bvt &src)
   // add 2^f, where f is the number of fraction bits,
   // by adding f to the exponent
   auto magic_number = ieee_floatt{
-    spec, ieee_floatt::rounding_modet::ROUND_TO_ZERO, power(2, spec.f)};
+    spec, ieee_floatt::rounding_modet::ROUND_TO_PLUS_INF, power(2, spec.f)};
 
+  // Check if the magic number is representable (not infinity).
+  // For non-standard sorts with small exponent range, 2^f may exceed
+  // the maximum representable value. We use ROUND_TO_PLUS_INF to ensure
+  // overflow produces infinity rather than clamping to max finite.
+  if(magic_number.is_infinity())
+  {
+    // Fall back: convert to a wider format where the magic number trick
+    // works, round there, then convert back.
+    // We need e' such that 2^f < 2^(2^(e'-1)-1), i.e., e' > log2(f)+2.
+    std::size_t wider_e = spec.e;
+    while(
+      ieee_floatt{
+        ieee_float_spect(spec.f, wider_e),
+        ieee_floatt::rounding_modet::ROUND_TO_PLUS_INF,
+        power(2, spec.f)}
+        .is_infinity())
+    {
+      wider_e++;
+    }
+
+    ieee_float_spect wider_spec(spec.f, wider_e);
+
+    // Save and restore spec around conversions
+    auto saved_spec = spec;
+
+    // Convert src to wider format
+    bvt wider = conversion(src, wider_spec);
+
+    // Round in wider format
+    spec = wider_spec;
+    bvt rounded = round_to_integral(wider);
+
+    // Convert back to original format
+    bvt result = conversion(rounded, saved_spec);
+
+    spec = saved_spec;
+    return result;
+  }
+
+  // The magic number is exactly representable, so rounding mode
+  // doesn't matter for build_constant.
   auto magic_number_bv = build_constant(magic_number);
 
   // abs(x) >= magic_number? If so, then there is no fractional part.
