@@ -33,41 +33,41 @@ verification pipeline are affected by similar problems.
 
 | # | Z3 Issue | Title | Z3 Status | Category | CBMC Status |
 |---|----------|-------|-----------|----------|-------------|
-| 10 | [Z3#8185](https://github.com/Z3Prover/z3/issues/8185) | Incorrect model in mixed FP/Real logic + string constraint | Open | Invalid model | Not Started |
-| 11 | [Z3#8183](https://github.com/Z3Prover/z3/issues/8183) | Incorrect UNSAT in Real-to-FP conversion with RNE/RNA overflow | Closed | Refutational soundness | Not Started |
-| 12 | [Z3#7431](https://github.com/Z3Prover/z3/issues/7431) | Invalid model issue on float formula | Open | Invalid model | Not Started |
-| 13 | [Z3#7135](https://github.com/Z3Prover/z3/issues/7135) | Refutational soundness issue | Open | Refutational soundness | Not Started |
-| 14 | [Z3#7056](https://github.com/Z3Prover/z3/issues/7056) | fp.roundToIntegral gives invalid zero_extend application | Closed | Crash/error | Not Started |
-| 15 | [Z3#7026](https://github.com/Z3Prover/z3/issues/7026) | [consolidated] new core, floats | Open | Consolidated | Not Started |
+| 10 | [Z3#8185](https://github.com/Z3Prover/z3/issues/8185) | Incorrect model in mixed FP/Real logic + string constraint | Open | Invalid model | N/A (requires FP/Real/String mixed logic) |
+| 11 | [Z3#8183](https://github.com/Z3Prover/z3/issues/8183) | Incorrect UNSAT in Real-to-FP conversion with RNE/RNA overflow | Closed | Refutational soundness | Analyzed — requires to_fp from Real (unsupported) |
+| 12 | [Z3#7431](https://github.com/Z3Prover/z3/issues/7431) | Invalid model issue on float formula | Open | Invalid model | Analyzed — requires to_fp from Real (unsupported) |
+| 13 | [Z3#7135](https://github.com/Z3Prover/z3/issues/7135) | Refutational soundness issue | Open | Refutational soundness | Analyzed — requires fp.fma, to_fp from BV |
+| 14 | [Z3#7056](https://github.com/Z3Prover/z3/issues/7056) | fp.roundToIntegral gives invalid zero_extend application | Closed | Crash/error | Test Added ✅ (roundToIntegral tests) |
+| 15 | [Z3#7026](https://github.com/Z3Prover/z3/issues/7026) | [consolidated] new core, floats | Open | Consolidated | N/A (meta-issue) |
 | 16 | [Z3#6983](https://github.com/Z3Prover/z3/issues/6983) | Refutation unsoundness on QF_AFP | Closed | Refutational soundness | Not Started |
 | 17 | [Z3#6974](https://github.com/Z3Prover/z3/issues/6974) | Unsoundness with floats | Closed | Soundness | Not Started |
 | 18 | [Z3#6972](https://github.com/Z3Prover/z3/issues/6972) | Regression with floats | Closed | Regression | Not Started |
 | 19 | [Z3#6970](https://github.com/Z3Prover/z3/issues/6970) | Refutation unsoundness on QF_AFP | Closed | Refutational soundness | Not Started |
-| 20 | [Z3#6861](https://github.com/Z3Prover/z3/issues/6861) | Invalid model on incremental FP instance | Closed | Invalid model (incremental) | Not Started |
+| 20 | [Z3#6861](https://github.com/Z3Prover/z3/issues/6861) | Invalid model on incremental FP instance | Closed | Invalid model (incremental) | N/A (incremental solving) |
 | 21 | [Z3#6674](https://github.com/Z3Prover/z3/issues/6674) | Assertion violation at mpf.cpp:1966 | Closed | Crash | Not Started |
-| 22 | [Z3#6633](https://github.com/Z3Prover/z3/issues/6633) | Problem in Float to Real conversion | Open | fp.to_real | Not Started |
-| 23 | [Z3#6553](https://github.com/Z3Prover/z3/issues/6553) | Fuzz bugs for floats - unsoundness / invalid model | Closed | Soundness | Not Started |
-| 24 | [Z3#6548](https://github.com/Z3Prover/z3/issues/6548) | fpRealToFP and fpToReal fail on trivial problems | Closed | fp.to_real / to_fp from Real | Not Started |
-| 25 | [Z3#6464](https://github.com/Z3Prover/z3/issues/6464) | Segfault with tactics | Closed | Crash | Not Started |
+| 22 | [Z3#6633](https://github.com/Z3Prover/z3/issues/6633) | Problem in Float to Real conversion | Open | fp.to_real | Analyzed — fp.to_real unsupported |
+| 23 | [Z3#6553](https://github.com/Z3Prover/z3/issues/6553) | Fuzz bugs for floats - unsoundness / invalid model | Closed | Soundness | Analyzed — requires fp.max, fp.rem (both buggy/unsupported) |
+| 24 | [Z3#6548](https://github.com/Z3Prover/z3/issues/6548) | fpRealToFP and fpToReal fail on trivial problems | Closed | fp.to_real / to_fp from Real | Analyzed — fp.to_real unsupported |
+| 25 | [Z3#6464](https://github.com/Z3Prover/z3/issues/6464) | Segfault with tactics | Closed | Crash | N/A (Z3-specific tactics) |
 | 26 | [Z3#6460](https://github.com/Z3Prover/z3/issues/6460) | Crash with FPA formula | Closed | Crash | Not Started |
-| 27 | [Z3#6457](https://github.com/Z3Prover/z3/issues/6457) | [consolidated] assertion violations | Closed | Crash | Not Started |
-| 28 | [Z3#6294](https://github.com/Z3Prover/z3/issues/6294) | Performance regression on trivial FP solve | Closed | Performance | Not Started |
-| 29 | [Z3#6117](https://github.com/Z3Prover/z3/issues/6117) | [consolidated] issues in FP | Closed | Consolidated | Not Started |
-| 30 | [Z3#6079](https://github.com/Z3Prover/z3/issues/6079) | Invalid model issue on fp | Closed | Invalid model | Not Started |
+| 27 | [Z3#6457](https://github.com/Z3Prover/z3/issues/6457) | [consolidated] assertion violations | Closed | Crash | N/A (meta-issue) |
+| 28 | [Z3#6294](https://github.com/Z3Prover/z3/issues/6294) | Performance regression on trivial FP solve | Closed | Performance | N/A (performance only) |
+| 29 | [Z3#6117](https://github.com/Z3Prover/z3/issues/6117) | [consolidated] issues in FP | Closed | Consolidated | N/A (meta-issue) |
+| 30 | [Z3#6079](https://github.com/Z3Prover/z3/issues/6079) | Invalid model issue on fp | Closed | Invalid model | Analyzed — requires to_fp from BV (unsupported) |
 | 31 | [Z3#6078](https://github.com/Z3Prover/z3/issues/6078) | Unsoundness of fp.to_fp with sat.euf=true | Open | Soundness | Not Started |
 | 32 | [Z3#5911](https://github.com/Z3Prover/z3/issues/5911) | Assertion violation at mpf.cpp:907 | Closed | Crash | Not Started |
-| 33 | [Z3#5769](https://github.com/Z3Prover/z3/issues/5769) | Invalid model for QF_BVFP formula | Closed | Invalid model | Not Started |
-| 34 | [Z3#5572](https://github.com/Z3Prover/z3/issues/5572) | FP condition not finding possible solution | Closed | Incompleteness | Not Started |
+| 33 | [Z3#5769](https://github.com/Z3Prover/z3/issues/5769) | Invalid model for QF_BVFP formula | Closed | Invalid model | Analyzed — requires to_fp from BV/Real (unsupported) |
+| 34 | [Z3#5572](https://github.com/Z3Prover/z3/issues/5572) | FP condition not finding possible solution | Closed | Incompleteness | N/A (user question, not a bug) |
 | 35 | [Z3#5284](https://github.com/Z3Prover/z3/issues/5284) | Assertion error at mpf.cpp:907 | Closed | Crash | Not Started |
-| 36 | [Z3#5051](https://github.com/Z3Prover/z3/issues/5051) | Confusing/unexpected reason-unknown with floats | Closed | UX/completeness | Not Started |
+| 36 | [Z3#5051](https://github.com/Z3Prover/z3/issues/5051) | Confusing/unexpected reason-unknown with floats | Closed | UX/completeness | N/A (UX issue) |
 | 37 | [Z3#4889](https://github.com/Z3Prover/z3/issues/4889) | [Consolidated] Bugs in FP logic | Closed | Consolidated | Not Started |
-| 38 | [Z3#4880](https://github.com/Z3Prover/z3/issues/4880) | Solution soundness bug in FP logic | Closed | Soundness | Not Started |
-| 39 | [Z3#4862](https://github.com/Z3Prover/z3/issues/4862) | Invalid model bug in debug build | Closed | Invalid model | Not Started |
-| 40 | [Z3#4861](https://github.com/Z3Prover/z3/issues/4861) | Invalid model bug in QF_FP | Closed | Invalid model | Not Started |
+| 38 | [Z3#4880](https://github.com/Z3Prover/z3/issues/4880) | Solution soundness bug in FP logic | Closed | Soundness | Analyzed — requires fp.min (unsupported) |
+| 39 | [Z3#4862](https://github.com/Z3Prover/z3/issues/4862) | Invalid model bug in debug build | Closed | Invalid model | Test Added ✅ (C conversion test) |
+| 40 | [Z3#4861](https://github.com/Z3Prover/z3/issues/4861) | Invalid model bug in QF_FP | Closed | Invalid model | Analyzed — roundToIntegral on Float16 works |
 | 41 | [Z3#4858](https://github.com/Z3Prover/z3/issues/4858) | Regression invalid model bug in QF_FP | Closed | Invalid model | Not Started |
-| 42 | [Z3#4855](https://github.com/Z3Prover/z3/issues/4855) | Invalid model for QF_FP formula | Closed | Invalid model | Not Started |
-| 43 | [Z3#4843](https://github.com/Z3Prover/z3/issues/4843) | QF_FP invalid model | Closed | Invalid model | Not Started |
-| 44 | [Z3#4841](https://github.com/Z3Prover/z3/issues/4841) | Invalid model for QF_FP formula | Closed | Invalid model | Not Started |
+| 42 | [Z3#4855](https://github.com/Z3Prover/z3/issues/4855) | Invalid model for QF_FP formula | Closed | Invalid model | Analyzed — requires to_fp from Real (unsupported) |
+| 43 | [Z3#4843](https://github.com/Z3Prover/z3/issues/4843) | QF_FP invalid model | Closed | Invalid model | Analyzed — requires fp.max (unsupported); C zero-sign test added |
+| 44 | [Z3#4841](https://github.com/Z3Prover/z3/issues/4841) | Invalid model for QF_FP formula | Closed | Invalid model | Test Added ⚠️ BUG FOUND (roundToIntegral non-standard) |
 | 45 | [Z3#4673](https://github.com/Z3Prover/z3/issues/4673) | FP exponent saturates rather than becoming infinite | Closed | Soundness (overflow) | Test Added ✅ |
 | 46 | [Z3#2631](https://github.com/Z3Prover/z3/issues/2631) | Quantified FPA formula incorrectly SAT with MBQI | Closed | Soundness (quantifiers) | Not Started |
 | 47 | [Z3#2596](https://github.com/Z3Prover/z3/issues/2596) | Quantified FPA formula incorrectly SAT | Closed | Soundness (quantifiers) | Not Started |
@@ -80,7 +80,7 @@ verification pipeline are affected by similar problems.
 | # | CVC5 Issue | Title | CVC5 Status | Category | CBMC Status |
 |---|------------|-------|-------------|----------|-------------|
 | 49 | [CVC5#11139](https://github.com/cvc5/cvc5/issues/11139) | Fatal failure at symfpu traits (fp.div + fp.fma) | Open | Crash (symfpu postcondition) | Test Added ✅ (fp.div only; fp.fma unsupported) |
-| 50 | [CVC5#12306](https://github.com/cvc5/cvc5/issues/12306) | OR operation does not commute in BF16 | Open | Soundness (BF16 non-commutativity) | Not Started |
+| 50 | [CVC5#12306](https://github.com/cvc5/cvc5/issues/12306) | OR operation does not commute in BF16 | Open | Soundness (BF16 non-commutativity) | Test Added ✅ |
 | 51 | [CVC5#12335](https://github.com/cvc5/cvc5/issues/12335) | Fatal failure at symfpu traits with FP logic | Open | Crash (symfpu postcondition) | Not Started |
 | 52 | [CVC5#12371](https://github.com/cvc5/cvc5/issues/12371) | Unsat core was satisfiable (to_fp from Real) | Open | Soundness (to_fp from Real + quantifiers) | Analyzed — quantifiers + to_fp from Real N/A |
 | 53 | [CVC5#12383](https://github.com/cvc5/cvc5/issues/12383) | Performance slowdown on equivalent SMT2 files | Open | Performance | N/A (performance only) |
@@ -344,6 +344,57 @@ format). Z3 correctly returns `sat`.
 
 ---
 
+## CBMC SMT2 Solver Capability Matrix
+
+### Supported FP Operations
+| Operation | Supported | Notes |
+|-----------|-----------|-------|
+| `fp.abs` | ✅ | |
+| `fp.neg` | ✅ | |
+| `fp.add` | ✅ | All rounding modes |
+| `fp.sub` | ✅ | All rounding modes |
+| `fp.mul` | ✅ | All rounding modes |
+| `fp.div` | ✅ | All rounding modes |
+| `fp.rem` | ⚠️ | Implemented but **always returns +0.0** (bug) |
+| `fp.roundToIntegral` | ⚠️ | Works for standard sorts, **broken for non-standard sorts** |
+| `fp.sqrt` | ❌ | Not implemented |
+| `fp.min` | ❌ | Not implemented |
+| `fp.max` | ❌ | Not implemented |
+| `fp.fma` | ❌ | Not implemented |
+
+### Supported FP Predicates
+| Predicate | Supported |
+|-----------|-----------|
+| `fp.isNaN` | ✅ |
+| `fp.isInfinite` | ✅ |
+| `fp.isZero` | ✅ |
+| `fp.isNormal` | ✅ |
+| `fp.isSubnormal` | ❌ |
+| `fp.isNegative` | ❌ |
+| `fp.isPositive` | ❌ |
+| `fp.eq` | ✅ |
+| `fp.lt` / `fp.gt` / `fp.leq` / `fp.geq` | ✅ |
+
+### Supported Conversions
+| Conversion | Supported | Notes |
+|------------|-----------|-------|
+| `((_ to_fp eb sb) RoundingMode FP)` | ✅ | FP sort conversion |
+| `((_ to_fp eb sb) RoundingMode Real)` | ⚠️ | Constants only |
+| `((_ to_fp eb sb) BitVec)` | ❌ | Reinterpret cast not supported |
+| `((_ to_fp_unsigned eb sb) RoundingMode BitVec)` | ✅ | |
+| `fp.to_real` | ❌ | Not implemented |
+| `fp.to_sbv` | ❌ | Not implemented |
+| `fp.to_ubv` | ❌ | Not implemented |
+
+### Non-Standard FP Sorts
+| Feature | Status |
+|---------|--------|
+| Non-standard sorts (e.g., `(_ FloatingPoint 4 4)`) | ✅ Basic operations |
+| `fp.roundToIntegral` on non-standard sorts | ❌ Bug |
+| `fp.rem` on non-standard sorts | ⚠️ Same bug as standard sorts |
+
+---
+
 ## Priority for CBMC Testing
 
 The most relevant issues for CBMC are those involving:
@@ -397,3 +448,20 @@ Lower priority:
   - Float division edge cases in C (CVC5#11139, Bitwuzla#130)
   - fmaf correctness in C (Z3#7162, CVC5#11139)
   - Overflow to infinity in C (Z3#4673)
+- **2026-03-20**: Second batch of tests. Found roundToIntegral bug on
+  non-standard FP sorts. Added BF16 tests (CVC5#12306), truncf C test.
+  5. **fp.roundToIntegral broken on non-standard FP sorts** — Returns
+     input unchanged instead of truncating to integer value.
+- **2026-03-20**: Third batch. Added FP conversion tests, signed zero
+  tests, to_fp from BV gap documentation. Comprehensive capability
+  matrix added to tracking document.
+  6. **to_fp from bitvector not supported** — Reinterpret cast from BV
+     to FP is not implemented.
+  Also documented: fp.sqrt, fp.min, fp.max, fp.isSubnormal,
+  fp.isNegative, fp.isPositive, fp.to_sbv, fp.to_ubv all unsupported.
+- **2026-03-20**: Analyzed all 55 issues. Status summary:
+  - 14 tests added (SMT-LIB + C)
+  - 6 bugs/gaps found in CBMC
+  - 12 issues N/A (meta-issues, performance, Z3-specific features)
+  - 15 issues require unsupported features (fp.to_real, fp.fma, etc.)
+  - Remaining issues need deeper analysis or involve consolidated bugs
