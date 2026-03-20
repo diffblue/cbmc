@@ -465,3 +465,8 @@ Lower priority:
   - 12 issues N/A (meta-issues, performance, Z3-specific features)
   - 15 issues require unsupported features (fp.to_real, fp.fma, etc.)
   - Remaining issues need deeper analysis or involve consolidated bugs
+- **2026-03-20**: Deep analysis of implementation effort. Reviewed branch
+  `tautschnig/cleanup/floatbv-mod-rem` which addresses fp.rem, fmod,
+  remainder crash, and FMA. Found additional bug: fp.to_sbv/fp.to_ubv
+  crash with non-RTZ rounding modes. See IMPLEMENTATION_ANALYSIS.md for
+  full effort estimates and design sketches for all remaining gaps.
