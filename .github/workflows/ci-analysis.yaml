@@ -1,0 +1,33 @@
+# CI Performance Analysis
+#
+# Analyses the most recent successful runs of the main build-and-test
+# workflow (pull-request-checks.yaml) and publishes a Markdown summary
+# of the slowest jobs, test suites, and individual tests.
+#
+# Results are visible in the GitHub Actions UI:
+#   1. Go to the "Actions" tab of the repository.
+#   2. Select the "CI Performance Analysis" workflow on the left.
+#   3. Click the most recent run, then the "analyse" job.
+#   4. Expand the "Summary" section at the top of the job page.
+#
+# The underlying script is scripts/ci_analysis.py.  Run it locally with
+# --help for additional options (e.g. --runs, --top, --log-dir).
+name: CI Performance Analysis
+on:
+  push:
+    branches: [develop]
+
+jobs:
+  analyse:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+    steps:
+      - uses: actions/checkout@v6
+      - name: Analyse recent CI runs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 scripts/ci_analysis.py \
+            --runs 5 --top 20 --markdown --quiet \
+            >> "$GITHUB_STEP_SUMMARY"
