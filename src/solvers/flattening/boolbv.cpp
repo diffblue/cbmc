@@ -164,6 +164,8 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
     return convert_floatbv_mod_rem(to_binary_expr(expr));
   else if(expr.id() == ID_floatbv_min || expr.id() == ID_floatbv_max)
     return convert_floatbv_min_max(to_binary_expr(expr));
+  else if(expr.id() == ID_floatbv_to_real)
+    return convert_floatbv_to_real(to_unary_expr(expr));
   else if(expr.id()==ID_floatbv_typecast)
     return convert_floatbv_typecast(to_floatbv_typecast_expr(expr));
   else if(expr.id() == ID_floatbv_round_to_integral)

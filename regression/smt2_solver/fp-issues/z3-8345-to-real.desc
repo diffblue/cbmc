@@ -1,8 +1,8 @@
-KNOWNBUG
+CORE
 z3-8345-to-real.smt2
 
 ^EXIT=0$
 ^SIGNAL=0$
 ^sat$
 --
-Z3#8345: fp.to_real unsupported
+fp.to_real: find FP value matching real constant.

@@ -374,12 +374,82 @@ exprt smt2_parsert::multi_ary(irep_idt id, const exprt::operandst &op)
 
 exprt smt2_parsert::binary_predicate(irep_idt id, const exprt::operandst &op)
 {
-  if(op.size()!=2)
+  if(op.size() != 2)
     throw error("expression must have two operands");
 
-  check_matching_operand_types(op);
+  // Handle fp.to_real comparisons with real constants:
+  // convert the real constant to the same scaled integer type.
+  auto adjusted = op;
+  for(int i = 0; i < 2; i++)
+  {
+    int other = 1 - i;
+    if(
+      adjusted[i].id() == ID_floatbv_to_real &&
+      (adjusted[other].type().id() == ID_real ||
+       adjusted[other].type().id() == ID_integer) &&
+      adjusted[other].is_constant())
+    {
+      const auto &target_type = adjusted[i].type();
+      const auto &fp_type =
+        to_floatbv_type(to_unary_expr(adjusted[i]).op().type());
+      const ieee_float_spect spec(fp_type);
+      std::size_t bias = (1u << (spec.e - 1)) - 1;
+      std::size_t scale = spec.f + bias;
+      std::size_t int_width = to_signedbv_type(target_type).get_width();
 
-  return binary_predicate_exprt(op[0], id, op[1]);
+      // Parse the real constant and scale it
+      const auto &val_str =
+        id2string(to_constant_expr(adjusted[other]).get_value());
+      auto dot_pos = val_str.find('.');
+      mp_integer significand;
+      mp_integer decimal_exp;
+      if(dot_pos == std::string::npos)
+      {
+        significand = string2integer(val_str);
+        decimal_exp = 0;
+      }
+      else
+      {
+        std::string s;
+        for(auto ch : val_str)
+          if(ch != '.')
+            s += ch;
+        significand = string2integer(s);
+        decimal_exp = mp_integer(dot_pos) - mp_integer(val_str.size()) + 1;
+      }
+
+      // Compute exact rational: significand * 10^decimal_exp
+      // Scale by 2^scale: result = significand * 10^decimal_exp * 2^scale
+      // = significand * 2^scale * 5^decimal_exp * 2^decimal_exp
+      // = significand * 2^(scale + decimal_exp) * 5^decimal_exp
+      // (when decimal_exp < 0, we have division by 5^|decimal_exp|)
+      mp_integer result;
+      if(decimal_exp >= 0)
+      {
+        result = significand * power(mp_integer(10), decimal_exp) *
+                 power(mp_integer(2), mp_integer(scale));
+      }
+      else
+      {
+        // significand * 2^scale / 10^|decimal_exp|
+        // = significand * 2^scale / (2^|de| * 5^|de|)
+        // = significand * 2^(scale - |de|) / 5^|de|
+        mp_integer abs_de = -decimal_exp;
+        mp_integer pow5 = power(mp_integer(5), abs_de);
+        mp_integer pow2_num = power(mp_integer(2), mp_integer(scale));
+        mp_integer pow2_den = power(mp_integer(2), abs_de);
+        result = (significand * pow2_num) / (pow5 * pow2_den);
+        // Note: this truncates. For exact representation, the real
+        // constant must be exactly representable as n/2^scale.
+      }
+
+      adjusted[other] = from_integer(result, signedbv_typet(int_width));
+    }
+  }
+
+  check_matching_operand_types(adjusted);
+
+  return binary_predicate_exprt(adjusted[0], id, adjusted[1]);
 }
 
 exprt smt2_parsert::unary(irep_idt id, const exprt::operandst &op)
@@ -1690,6 +1760,26 @@ void smt2_parsert::setup_expressions()
   expressions["fp.gt"] = [this] { return binary_predicate(ID_gt, operands()); };
 
   expressions["fp.neg"] = [this] { return unary(ID_unary_minus, operands()); };
+
+  expressions["fp.to_real"] = [this]
+  {
+    auto op = operands();
+
+    if(op.size() != 1)
+      throw error("fp.to_real takes one operand");
+
+    if(op[0].type().id() != ID_floatbv)
+      throw error("fp.to_real takes a FloatingPoint operand");
+
+    // Encode as a wide signed integer representing the exact real value
+    // scaled by 2^k, where k = f + bias.
+    // The width needs to cover the full range: sign + max_exponent + f + 1.
+    const auto &fp_type = to_floatbv_type(op[0].type());
+    const ieee_float_spect spec(fp_type);
+    std::size_t int_width = (1u << spec.e) + spec.f;
+
+    return unary_exprt(ID_floatbv_to_real, op[0], signedbv_typet(int_width));
+  };
 }
 
 typet smt2_parsert::function_sort()

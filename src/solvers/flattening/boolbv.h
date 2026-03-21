@@ -181,6 +181,7 @@ protected:
   virtual bvt convert_floatbv_mod_rem(const binary_exprt &);
   virtual bvt convert_floatbv_fma(const floatbv_fma_exprt &);
   virtual bvt convert_floatbv_min_max(const binary_exprt &);
+  virtual bvt convert_floatbv_to_real(const unary_exprt &);
   virtual bvt convert_floatbv_typecast(const floatbv_typecast_exprt &expr);
   virtual bvt
   convert_floatbv_round_to_integral(const floatbv_round_to_integral_exprt &);
