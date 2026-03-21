@@ -774,12 +774,12 @@ exprt smt2_parsert::function_application()
             source_op.type().id() == ID_real ||
             source_op.type().id() == ID_integer)
           {
-            // For now, we can only do this when
-            // the source operand is a constant.
+            // Handle constant reals and rational constants (/ p q)
+            mp_integer significand, exponent;
+            bool is_constant_real = false;
+
             if(source_op.is_constant())
             {
-              mp_integer significand, exponent;
-
               const auto &real_number =
                 id2string(to_constant_expr(source_op).get_value());
               auto dot_pos = real_number.find('.');
@@ -803,7 +803,77 @@ exprt smt2_parsert::function_application()
                   mp_integer(dot_pos) - mp_integer(real_number.size()) + 1;
                 significand = string2integer(significand_str);
               }
+              is_constant_real = true;
+            }
+            else if(
+              source_op.id() == ID_div &&
+              to_binary_expr(source_op).op0().is_constant() &&
+              to_binary_expr(source_op).op1().is_constant())
+            {
+              // Rational constant: (/ p q)
+              const auto &p_str = id2string(
+                to_constant_expr(to_binary_expr(source_op).op0()).get_value());
+              const auto &q_str = id2string(
+                to_constant_expr(to_binary_expr(source_op).op1()).get_value());
 
+              // Parse p
+              mp_integer p_sig, p_exp;
+              auto p_dot = p_str.find('.');
+              if(p_dot == std::string::npos)
+              {
+                p_exp = 0;
+                p_sig = string2integer(p_str);
+              }
+              else
+              {
+                std::string s;
+                for(auto ch : p_str)
+                  if(ch != '.')
+                    s += ch;
+                p_exp = mp_integer(p_dot) - mp_integer(p_str.size()) + 1;
+                p_sig = string2integer(s);
+              }
+
+              // Parse q
+              mp_integer q_sig, q_exp;
+              auto q_dot = q_str.find('.');
+              if(q_dot == std::string::npos)
+              {
+                q_exp = 0;
+                q_sig = string2integer(q_str);
+              }
+              else
+              {
+                std::string s;
+                for(auto ch : q_str)
+                  if(ch != '.')
+                    s += ch;
+                q_exp = mp_integer(q_dot) - mp_integer(q_str.size()) + 1;
+                q_sig = string2integer(s);
+              }
+
+              // p/q = (p_sig * 10^p_exp) / (q_sig * 10^q_exp)
+              //     = (p_sig / q_sig) * 10^(p_exp - q_exp)
+              // Use ieee_floatt to compute this via from_base10 on
+              // the numerator, then divide by the denominator.
+              ieee_floatt a(
+                spec,
+                static_cast<ieee_floatt::rounding_modet>(
+                  numeric_cast_v<int>(to_constant_expr(rounding_mode))));
+              a.from_base10(p_sig, p_exp);
+
+              ieee_floatt b(
+                spec,
+                static_cast<ieee_floatt::rounding_modet>(
+                  numeric_cast_v<int>(to_constant_expr(rounding_mode))));
+              b.from_base10(q_sig, q_exp);
+
+              a /= b;
+              return a.to_expr();
+            }
+
+            if(is_constant_real)
+            {
               ieee_floatt a(
                 spec,
                 static_cast<ieee_floatt::rounding_modet>(
@@ -811,9 +881,9 @@ exprt smt2_parsert::function_application()
               a.from_base10(significand, exponent);
               return a.to_expr();
             }
-            else
-              throw error()
-                << "to_fp for non-constant real expressions is not implemented";
+
+            throw error()
+              << "to_fp for non-constant real expressions is not implemented";
           }
           else if(source_op.type().id() == ID_unsignedbv)
           {
