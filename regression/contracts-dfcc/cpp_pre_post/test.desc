@@ -1,4 +1,4 @@
-CORE dfcc-only
+CORE dfcc-only gcc-only
 main.cpp
 --dfcc main --enforce-contract "add(signed_int,signed_int)"
 ^\[postcondition.\d+\].*Check ensures clause.*: SUCCESS$

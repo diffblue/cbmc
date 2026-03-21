@@ -67,5 +67,6 @@ if ! echo "${args_cbmc}" | grep -q -- --function ; then
   echo "chain.sh: dropping unused functions" >&2
   $goto_instrument --drop-unused-functions "${name}${dfcc_suffix}-mod.gb" "${name}${dfcc_suffix}-mod.gb"
 fi
+$goto_instrument --show-goto-functions "${name}${dfcc_suffix}-mod.gb"
 echo "chain.sh: running cbmc with args: ${args_cbmc}" >&2
 $cbmc --sat-solver cadical "${name}${dfcc_suffix}-mod.gb" ${args_cbmc}
