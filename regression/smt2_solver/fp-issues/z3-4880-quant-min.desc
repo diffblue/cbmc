@@ -1,8 +1,9 @@
-KNOWNBUG
+CORE
 z3-4880-quant-min.smt2
 
 ^EXIT=0$
 ^SIGNAL=0$
 ^unsat$
 --
-Z3#4880: quantified fp.min — should be unsat but quantifiers are ignored.
+Z3#4880: quantified fp.min — counterexample a=-0 found via FP
+boundary values in relevant value set.

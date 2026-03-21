@@ -1,8 +1,9 @@
-KNOWNBUG
+CORE
 z3-2631-quant-fpa.smt2
 
 ^EXIT=0$
 ^SIGNAL=0$
 ^unsat$
 --
-Z3#2631: quantified FPA negation (quantifiers ignored)
+Z3#2631: quantified FPA negation — counterexample x=c found via
+relevant value set instantiation.

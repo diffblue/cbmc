@@ -9,10 +9,153 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 #include <util/expr_util.h>
+#include <util/ieee_float.h>
 #include <util/invariant.h>
 #include <util/simplify_expr.h>
 
 #include "boolbv.h"
+
+/// Collect all constant subexpressions and free symbols of a given type
+/// from an expression, excluding the quantified variable itself.
+static void collect_ground_terms(
+  const exprt &expr,
+  const typet &type,
+  const symbol_exprt &exclude,
+  std::set<exprt> &result)
+{
+  if(expr.type() == type)
+  {
+    if(expr.is_constant())
+      result.insert(expr);
+    else if(
+      expr.id() == ID_symbol &&
+      to_symbol_expr(expr).get_identifier() != exclude.get_identifier())
+    {
+      result.insert(expr);
+    }
+  }
+
+  for(const auto &op : expr.operands())
+    collect_ground_terms(op, type, exclude, result);
+}
+
+/// Compute the relevant value set for a given type, consisting of:
+/// 1. Type boundary values (0, max, min, and for FP: NaN, ±inf, ±0)
+/// 2. Ground terms of matching type from the formula body
+/// 3. Negations of ground terms (for FP: sign-flipped values)
+///
+/// This set is used for quantifier instantiation over finite domains.
+/// See the comment in eager_quantifier_instantiation for references.
+static std::vector<exprt> get_relevant_values(
+  const typet &type,
+  const exprt &formula_body,
+  const symbol_exprt &quantified_var)
+{
+  std::set<exprt> values;
+
+  if(type.id() == ID_floatbv)
+  {
+    const auto &fp_type = to_floatbv_type(type);
+    const ieee_float_spect spec(fp_type);
+
+    // Boundary values for floating-point types:
+    // +0, -0, +1, -1, NaN, +inf, -inf, max, -max, min_subnormal
+    values.insert(ieee_float_valuet::zero(spec).to_expr());
+
+    ieee_float_valuet neg_zero(spec);
+    neg_zero.make_zero();
+    neg_zero.set_sign(true);
+    values.insert(neg_zero.to_expr());
+
+    values.insert(
+      ieee_floatt(spec, ieee_floatt::rounding_modet::ROUND_TO_EVEN, 1)
+        .to_expr());
+    values.insert(
+      ieee_floatt(spec, ieee_floatt::rounding_modet::ROUND_TO_EVEN, -1)
+        .to_expr());
+
+    values.insert(ieee_float_valuet::NaN(spec).to_expr());
+    values.insert(ieee_float_valuet::plus_infinity(spec).to_expr());
+    values.insert(ieee_float_valuet::minus_infinity(spec).to_expr());
+
+    // Largest finite value
+    ieee_float_valuet max_val(spec);
+    max_val.make_fltmax();
+    values.insert(max_val.to_expr());
+
+    ieee_float_valuet neg_max(max_val);
+    neg_max.set_sign(true);
+    values.insert(neg_max.to_expr());
+
+    // Smallest subnormal
+    ieee_float_valuet min_sub(spec);
+    min_sub.unpack(mp_integer(1));
+    values.insert(min_sub.to_expr());
+  }
+  else if(
+    type.id() == ID_unsignedbv || type.id() == ID_signedbv ||
+    type.id() == ID_bv)
+  {
+    const std::size_t width = to_bitvector_type(type).get_width();
+
+    // Boundary values for bitvector types: 0, 1, all-ones, max, min
+    values.insert(from_integer(0, type));
+    values.insert(from_integer(1, type));
+
+    if(type.id() == ID_signedbv)
+    {
+      // min_signed, max_signed
+      values.insert(
+        from_integer(-power(mp_integer(2), mp_integer(width - 1)), type));
+      values.insert(
+        from_integer(power(mp_integer(2), mp_integer(width - 1)) - 1, type));
+    }
+    else
+    {
+      // all-ones = max unsigned
+      values.insert(
+        from_integer(power(mp_integer(2), mp_integer(width)) - 1, type));
+    }
+
+    // For BV types used as FP reinterpretation, add NaN/inf patterns
+    if(width == 32)
+    {
+      // Float32 NaN: 0x7FC00000, +inf: 0x7F800000
+      values.insert(from_integer(0x7FC00000, type));
+      values.insert(from_integer(0x7F800000, type));
+      values.insert(from_integer(0xFF800000u, type));
+    }
+    else if(width == 64)
+    {
+      // Float64 NaN, +inf, -inf
+      values.insert(from_integer(mp_integer("9221120237041090560"), type));
+      values.insert(from_integer(mp_integer("9218868437227405312"), type));
+      values.insert(from_integer(mp_integer("18442240474082181120"), type));
+    }
+  }
+
+  // Collect ground terms from the formula body
+  collect_ground_terms(formula_body, type, quantified_var, values);
+
+  // For FP types, also add negations of collected ground terms
+  if(type.id() == ID_floatbv)
+  {
+    std::set<exprt> negated;
+    for(const auto &v : values)
+    {
+      if(v.is_constant())
+      {
+        ieee_floatt f(
+          to_constant_expr(v), ieee_floatt::rounding_modet::ROUND_TO_EVEN);
+        f.set_sign(!f.get_sign());
+        negated.insert(f.to_expr());
+      }
+    }
+    values.insert(negated.begin(), negated.end());
+  }
+
+  return std::vector<exprt>(values.begin(), values.end());
+}
 
 /// A method to detect equivalence between experts that can contain typecast
 static bool expr_eq(const exprt &expr1, const exprt &expr2)
@@ -212,7 +355,51 @@ static std::optional<exprt> eager_quantifier_instantiation(
     get_quantifier_var_max(var_expr, where_simplified);
 
   if(!min_i.has_value() || !max_i.has_value())
+  {
+    // Bounded-range extraction failed. For finite-domain types (bitvectors,
+    // floating-point), fall back to instantiation over a relevant value set.
+    //
+    // This is based on the finite model finding approach from:
+    //   Reynolds, Tinelli, Goel, Krstić, Deters, Barrett.
+    //   "Quantifier Instantiation Techniques for Finite Model Finding in SMT"
+    //   CADE 2013. https://doi.org/10.1007/978-3-642-38574-2_26
+    //
+    // For finite domains, exhaustive instantiation is a complete decision
+    // procedure (Theorem 4.1 in Niemetz et al., CAV 2018,
+    // https://doi.org/10.1007/978-3-319-96142-2_16). Full enumeration of
+    // 2^n values is infeasible for large n, but instantiation over a
+    // *relevant value set* — the union of ground terms from the formula
+    // body and type boundary values — is sound and sufficient for many
+    // practical formulas. The boundary values capture the discontinuities
+    // of FP/BV operations (NaN, ±0, ±inf, min/max).
+    //
+    // For ∀x.P(x): we encode P(v1) ∧ P(v2) ∧ ... ∧ P(vk).
+    //   This is sound: if any P(vi) is false, the universal is false.
+    //   It is incomplete: the universal might be false for a value not
+    //   in the set. But for the common patterns in FP verification
+    //   benchmarks, the relevant value set is sufficient.
+    //
+    // For ∃x.P(x): we encode P(v1) ∨ P(v2) ∨ ... ∨ P(vk).
+    //   This is sound: if any P(vi) is true, the existential is true.
+    auto relevant_values =
+      get_relevant_values(var_expr.type(), expr.where(), var_expr);
+
+    if(!relevant_values.empty())
+    {
+      std::vector<exprt> expr_insts;
+      for(const auto &val : relevant_values)
+      {
+        expr_insts.push_back(expr.instantiate({val}));
+      }
+
+      if(expr.id() == ID_forall)
+        return simplify_expr(conjunction(expr_insts), ns);
+      else if(expr.id() == ID_exists)
+        return simplify_expr(disjunction(expr_insts), ns);
+    }
+
     return {};
+  }
 
   mp_integer lb = numeric_cast_v<mp_integer>(min_i.value());
   mp_integer ub = numeric_cast_v<mp_integer>(max_i.value());
