@@ -61,7 +61,6 @@ else
 fi
 
 if [[ "${is_windows}" == "true" ]]; then
-  echo "chain.sh: compiling ${name}.${ext} (windows)" >&2
   $goto_cc "${name}.${ext}" "/Fe${name}${dfcc_suffix}.gb"
 else
   signedness_flag=""
@@ -78,7 +77,6 @@ if [[ -n "$args_pre" ]]; then
 fi
 
 rm -f "${name}${dfcc_suffix}-mod.gb"
-echo "chain.sh: instrumenting with args: ${args_inst}" >&2
 $goto_instrument ${args_inst} "${name}${dfcc_suffix}.gb" "${name}${dfcc_suffix}-mod.gb"
 if [ ! -e "${name}${dfcc_suffix}-mod.gb" ] ; then
   cp "${name}${dfcc_suffix}.gb" "${name}${dfcc_suffix}-mod.gb"
@@ -94,7 +92,6 @@ elif echo $args_inst | grep -q -- "--dump-c" ; then
   rm "${name}${dfcc_suffix}-mod.c"
 fi
 if ! echo "${args_cbmc}" | grep -q -- --function ; then
-  echo "chain.sh: dropping unused functions" >&2
   $goto_instrument --drop-unused-functions "${name}${dfcc_suffix}-mod.gb" "${name}${dfcc_suffix}-mod.gb"
 fi
 if [[ "$check_char_signedness_stability" == "1" ]]
