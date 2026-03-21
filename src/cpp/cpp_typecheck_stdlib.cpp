@@ -131,6 +131,28 @@ ensure_parameter_symbols(symbolt &fn_symbol, symbol_table_baset &symbol_table)
       id = id2string(fn_symbol.name) + "::" + std::to_string(i);
       params[i].set_identifier(id);
     }
+    else
+    {
+      // Ensure the identifier is fully qualified with the function name.
+      // Template instantiation may leave bare parameter names (e.g.,
+      // "__last" instead of "function_name::__last"), which collide
+      // across different instantiations.
+      const std::string id_str = id2string(id);
+      const std::string fn_prefix = id2string(fn_symbol.name) + "::";
+      if(id_str.find("::") == std::string::npos)
+      {
+        id = fn_prefix + id_str;
+        params[i].set_identifier(id);
+      }
+      else if(id_str.substr(0, fn_prefix.size()) != fn_prefix)
+      {
+        // Parameter has a qualified name from a different function
+        // (e.g., from a previous template instantiation). Requalify.
+        auto pos = id_str.rfind("::");
+        id = fn_prefix + id_str.substr(pos + 2);
+        params[i].set_identifier(id);
+      }
+    }
     if(symbol_table.has_symbol(id))
       continue;
     symbolt param_sym{id, params[i].type(), fn_symbol.mode};
@@ -179,7 +201,10 @@ static void fold_numeric_traits_integer(symbol_table_baset &symbol_table)
         id2string(symbol.name).substr(0, name.size() - base.size()) + "__max";
       const symbolt *max_sym = symbol_table.lookup(max_name);
       if(max_sym == nullptr)
+      {
+        symbol.value = from_integer(0, value_type);
         continue;
+      }
       typet max_type = max_sym->type;
       max_type.remove(ID_C_constant);
       bool is_signed = max_type.id() == ID_signedbv;
@@ -192,7 +217,10 @@ static void fold_numeric_traits_integer(symbol_table_baset &symbol_table)
         id2string(symbol.name).substr(0, name.size() - base.size()) + "__max";
       const symbolt *max_sym = symbol_table.lookup(max_name);
       if(max_sym == nullptr)
+      {
+        symbol.value = from_integer(0, value_type);
         continue;
+      }
       typet max_type = max_sym->type;
       max_type.remove(ID_C_constant);
       if(!can_cast_type<bitvector_typet>(max_type))
