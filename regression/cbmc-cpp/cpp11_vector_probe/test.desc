@@ -1,0 +1,12 @@
+CORE
+main.cpp
+--cpp11
+^VERIFICATION
+^EXIT=(0|10)$
+^SIGNAL=0$
+--
+^PARSING ERROR$
+^CONVERSION ERROR$
+Probe test: checks if <vector> works without gcc-13 tag on all
+platforms. If this fails on Ubuntu 22.04, the gcc-13 tags are
+needed for GCC 11 libstdc++ compatibility.

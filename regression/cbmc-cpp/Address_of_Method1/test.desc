@@ -1,11 +1,8 @@
-KNOWNBUG
+CORE
 main.cpp
---verbosity 8
-^EXIT=(0|6)$
+
+^EXIT=0$
 ^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
 --
-^PARSING ERROR$
-This test verifies pointer-to-member comparisons. On macOS it
-previously crashed with an SSA validation invariant violation
-(binary relation type mismatch). The verbose output helps diagnose
-any remaining issues.
+^warning: ignoring

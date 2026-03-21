@@ -3612,6 +3612,20 @@ void cpp_typecheckt::typecheck_expr_comma(exprt &expr)
 void cpp_typecheckt::typecheck_expr_rel(binary_relation_exprt &expr)
 {
   c_typecheck_baset::typecheck_expr_rel(expr);
+
+  // Ensure both operands of pointer comparisons have exactly the same
+  // type. The C type-checker creates null_pointer_exprt with the right
+  // base type, but pointer annotations (e.g., #to_member for
+  // pointer-to-member-function) may differ. Force the rhs type to
+  // match the lhs type when both are pointers.
+  if(
+    (expr.id() == ID_equal || expr.id() == ID_notequal) &&
+    expr.op0().type().id() == ID_pointer &&
+    expr.op1().type().id() == ID_pointer &&
+    expr.op0().type() != expr.op1().type())
+  {
+    expr.op1() = typecast_exprt(expr.op1(), expr.op0().type());
+  }
 }
 
 void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)

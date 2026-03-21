@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# Chain script for C++ contract tests. Same as contracts-dfcc/chain.sh
+# but without --show-goto-functions (which produces excessive output
+# for C++ files with STL headers, overwhelming test pattern matching).
+
 set -e
 
 goto_cc=$1
@@ -63,5 +67,4 @@ fi
 if ! echo "${args_cbmc}" | grep -q -- --function ; then
   $goto_instrument --drop-unused-functions "${name}${dfcc_suffix}-mod.gb" "${name}${dfcc_suffix}-mod.gb"
 fi
-$goto_instrument --show-goto-functions "${name}${dfcc_suffix}-mod.gb"
 $cbmc --sat-solver cadical "${name}${dfcc_suffix}-mod.gb" ${args_cbmc}
