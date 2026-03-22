@@ -696,6 +696,13 @@ bvt float_utilst::rem(const bvt &src1, const bvt &src2)
 
   // IEEE 754 fmod/remainder (see doc/proofs/ for Coq/HOL Light proofs).
   //
+  // Proved properties and corresponding _Float16 exhaustive tests:
+  //   remainder_format     → remainderf/_Float16.desc (|r| <= |y|/2)
+  //   fmod_then_remainder  → remainderf/fmod_bound.desc (|fmod| < |y|)
+  //   comparison_step      → remainderf/_Float16.desc (min-selection)
+  //   special cases        → remainderf/special_cases.desc
+  //   nearest_int_small    → remainderf/_Float16.desc (n ∈ {-1,0,1})
+  //
   // Step 1: Compute fmod(x, y) via integer significand arithmetic.
   //   Align significands, compute mx_aligned mod my_aligned.
   //   Result r_int < my_aligned, so r_int < 2^(f+1) and converts
