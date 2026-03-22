@@ -1,4 +1,4 @@
-CORE no-new-smt
+CORE no-new-smt gcc-only
 main.c
 --smt2 --outfile -
 float_bv\.floatbv_rem
@@ -8,4 +8,5 @@ float_bv\.floatbv_rem
 ^warning: ignoring
 --
 Verify that float_bvt generates valid SMT2 for remainder expressions
-(non-FPA bitvector encoding).
+(non-FPA bitvector encoding). Marked gcc-only because the large
+remainder formula causes EXIT=127 on Windows (pipe buffer overflow).
