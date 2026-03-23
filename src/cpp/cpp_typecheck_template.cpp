@@ -142,17 +142,25 @@ void cpp_typecheckt::typecheck_class_template(
     // check if we have 2 bodies
     if(has_body && previous_has_body)
     {
-      // C++20: constrained partial specializations with different
-      // requires clauses have the same symbol name. Since CBMC
-      // doesn't evaluate constraints, keep the first definition.
-      if(!partial_specialization_args.arguments().empty())
-      {
-        warning().source_location = cpp_name.source_location();
-        warning() << "template struct '" << base_name << "' defined previously"
-                  << eom;
+      // MSVC's STL headers contain partial specializations of templates
+      // like _Is_memfunptr that differ only in calling convention
+      // (__cdecl, __stdcall, __fastcall, __vectorcall). CBMC's scanner
+      // strips calling conventions (they are irrelevant for verification),
+      // which causes these distinct C++ specializations to produce
+      // identical types and thus the same mangled symbol name.
+      //
+      // It is safe to silently keep the first definition when the two
+      // declarations have structurally identical types: the only
+      // difference was in an attribute that CBMC already discarded
+      // during scanning, so both definitions would produce the same
+      // verification semantics.
+      //
+      // If the types actually differ, this is a genuine ODR violation
+      // or a bug in CBMC's name mangling, and we report an error.
+      if(previous_declaration.type() == declaration.type())
         return;
-      }
-      error().source_location=cpp_name.source_location();
+
+      error().source_location = cpp_name.source_location();
       error() << "template struct '" << base_name << "' defined previously\n"
               << "location of previous definition: " << previous_symbol.location
               << eom;
