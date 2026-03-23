@@ -248,7 +248,7 @@ jobs:
         with:
           submodules: recursive
       - name: Setup Visual Studio environment
-        uses: microsoft/setup-msbuild@v2
+        uses: microsoft/setup-msbuild@v3
       - name: Get current month for cache key
         id: cache-key
         run: echo "month=$(Get-Date -Format 'yyyy-MM')" >> $env:GITHUB_OUTPUT
