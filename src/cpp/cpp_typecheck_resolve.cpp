@@ -1186,6 +1186,33 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
   {
     if(pos->id() == ID_name)
       final_base_name += pos->get_string(ID_identifier);
+    else if(pos->id() == ID_decltype)
+    {
+      // C++11: decltype(expr)::member
+      // Evaluate the decltype expression to get the type, then
+      // navigate to that type's scope.
+      exprt expr = static_cast<const exprt &>(pos->find(ID_type_arg));
+      if(expr.is_nil())
+        expr = static_cast<const exprt &>(pos->find("expr"));
+      if(expr.is_not_nil())
+      {
+        cpp_typecheck.typecheck_expr(expr);
+        typet t = expr.type();
+        // Remove references
+        if(
+          t.id() == ID_pointer &&
+          (t.get_bool(ID_C_reference) || t.get_bool(ID_C_rvalue_reference)))
+          t = to_pointer_type(t).base_type();
+        if(t.id() == ID_struct_tag)
+        {
+          cpp_typecheck.elaborate_class_template(t);
+          const irep_idt &scope_id = to_struct_tag_type(t).get_identifier();
+          cpp_typecheck.cpp_scopes.go_to(
+            cpp_typecheck.cpp_scopes.get_scope(scope_id));
+        }
+      }
+      final_base_name.clear();
+    }
     else if(pos->id() == ID_template_args)
       template_args = to_cpp_template_args_non_tc(*pos);
     else if(pos->id() == "::")
