@@ -43,6 +43,7 @@ DIRS = cbmc-shadow-memory \
        systemc \
        contracts \
        contracts-dfcc \
+       contracts-cpp-dfcc \
        goto-synthesizer \
        acceleration \
        k-induction \
