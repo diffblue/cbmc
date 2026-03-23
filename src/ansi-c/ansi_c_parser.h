@@ -77,7 +77,8 @@ public:
   bool float16_type;
   bool bf16_type;
   bool fp16_type;
-  // GCC 13+ type trait builtins: __remove_cv, __remove_reference, __remove_cvref
+  // GCC 13+ type trait builtins: __remove_cv, __remove_reference,
+  // __remove_cvref
   bool gcc13_type_traits;
 
   typedef ansi_c_identifiert identifiert;
