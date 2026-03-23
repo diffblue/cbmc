@@ -1,0 +1,10 @@
+CORE dfcc-only
+main.cpp
+--dfcc main --enforce-contract "add(signed_int,signed_int)"
+^\[postcondition.\d+\].*Check ensures clause.*: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+C++ pre/post contract with mangled name in --enforce-contract.
+Tests that quoted C++ mangled names work on all platforms.

@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
-#include <util/std_code.h>
 #include <util/symbol.h>
 #include <util/symbol_table_base.h>
 
