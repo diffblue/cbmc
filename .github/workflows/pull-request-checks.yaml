@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: [ develop ]
 env:
-  cvc5-version: "1.2.1"
+  cvc5-version: "1.3.4"
   linux-vcpus: 4
   windows-vcpus: 4
 
