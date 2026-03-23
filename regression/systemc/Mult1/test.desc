@@ -1,4 +1,4 @@
-CORE gcc-13
+CORE gcc-only
 main.cpp
 --object-bits 10
 ^EXIT=0$

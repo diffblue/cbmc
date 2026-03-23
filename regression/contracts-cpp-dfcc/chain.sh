@@ -5,6 +5,7 @@
 # for C++ files with STL headers, overwhelming test pattern matching).
 
 set -e
+set -x
 
 goto_cc=$1
 goto_instrument=$2

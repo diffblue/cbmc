@@ -10,15 +10,7 @@ else
 endif
 
 ifeq ($(BUILD_ENV_),MSVC)
-	excluded_tests = -X gcc-only -X gcc-13
-else
-# gcc-13 tests require GCC 13+ libstdc++ headers
-# Check if GCC 13+ headers are available on the system
-ifeq ($(wildcard /usr/include/c++/13),)
-ifeq ($(wildcard /usr/include/c++/14),)
-  excluded_tests += -X gcc-13
-endif
-endif
+	excluded_tests = -X gcc-only
 endif
 
 test:

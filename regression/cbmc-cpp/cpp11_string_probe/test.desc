@@ -1,9 +1,10 @@
-CORE libcxx gcc-only
+CORE
 main.cpp
---cpp11 --stdlib libc++ --unwind 2
+--cpp11
 ^VERIFICATION
 ^EXIT=(0|10)$
 ^SIGNAL=0$
 --
 ^PARSING ERROR$
 ^CONVERSION ERROR$
+Probe: checks if <string> works on all platforms.
