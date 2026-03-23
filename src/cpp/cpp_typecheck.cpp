@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/c_types.h>
 #include <util/cprover_prefix.h>
+#include <util/find_symbols.h>
 #include <util/mathematical_expr.h>
 #include <util/pointer_expr.h>
 #include <util/source_location.h>
@@ -154,6 +155,39 @@ void cpp_typecheckt::typecheck()
   provide_stdlib_bodies();
 
   clean_up();
+
+  // Ensure all type symbols referenced in the symbol table exist.
+  // System header processing may fail partway through template
+  // instantiation (caught by catch(...) in linkage spec processing),
+  // leaving struct_tag_typet references to symbols that were never
+  // created. Create incomplete stubs for any missing type symbols
+  // so that goto program validation does not crash.
+  {
+    find_symbols_sett referenced;
+    for(const auto &entry : symbol_table.symbols)
+    {
+      find_type_and_expr_symbols(entry.second.type, referenced);
+      if(entry.second.value.is_not_nil())
+        find_type_and_expr_symbols(entry.second.value, referenced);
+    }
+    for(const auto &id : referenced)
+    {
+      if(!symbol_table.has_symbol(id))
+      {
+        const std::string id_str = id2string(id);
+        // Create stubs for missing tag types (struct/union/enum).
+        // These arise from failed template instantiations in system
+        // headers. The struct_tag_typet reference remains in other
+        // types but the type symbol was never created.
+        if(id_str.find("tag-") != std::string::npos)
+        {
+          type_symbolt stub{id, struct_typet(), ID_cpp};
+          to_struct_type(stub.type).make_incomplete();
+          symbol_table.insert(std::move(stub));
+        }
+      }
+    }
+  }
 }
 
 const struct_typet &cpp_typecheckt::this_struct_type()
