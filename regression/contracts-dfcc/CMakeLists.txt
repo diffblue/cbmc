@@ -12,25 +12,14 @@ else()
   set(gcc_only_string "")
 endif()
 
-set(extra_excludes "")
-set(extra_excludes_string "")
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "13")
-  list(APPEND extra_excludes -X gcc-13)
-  set(extra_excludes_string "-X;gcc-13;")
-elseif(NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  list(APPEND extra_excludes -X gcc-13)
-  set(extra_excludes_string "-X;gcc-13;")
-endif()
-
-
 add_test_pl_tests(
-    "${CMAKE_CURRENT_SOURCE_DIR}/chain.sh $<TARGET_FILE:goto-cc> $<TARGET_FILE:goto-instrument> $<TARGET_FILE:cbmc> ${is_windows} true" ${gcc_only} ${extra_excludes}
+    "${CMAKE_CURRENT_SOURCE_DIR}/chain.sh $<TARGET_FILE:goto-cc> $<TARGET_FILE:goto-instrument> $<TARGET_FILE:cbmc> ${is_windows} true" ${gcc_only}
 )
 
 add_test_pl_profile(
     "contracts-non-dfcc"
     "${CMAKE_CURRENT_SOURCE_DIR}/chain.sh $<TARGET_FILE:goto-cc> $<TARGET_FILE:goto-instrument> $<TARGET_FILE:cbmc> ${is_windows} false" ${gcc_only}
-    "-C;-X;dfcc-only;${extra_excludes_string}-s;non-dfcc"
+    "-C;-X;dfcc-only;-s;non-dfcc"
     "CORE"
 )
 

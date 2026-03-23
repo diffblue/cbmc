@@ -1,4 +1,4 @@
-CORE gcc-13
+CORE gcc-only
 main.cpp
 --cpp11 --depth 100
 \[main\.assertion\.1\] line 7 make_shared value: SUCCESS

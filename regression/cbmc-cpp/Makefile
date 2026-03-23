@@ -4,14 +4,7 @@ include ../../src/config.inc
 include ../../src/common
 
 ifeq ($(BUILD_ENV_),MSVC)
-	excluded_tests = -X gcc-only -X gcc-13
-else
-# gcc-13 tests require GCC 13+ libstdc++ headers
-ifeq ($(wildcard /usr/include/c++/13),)
-ifeq ($(wildcard /usr/include/c++/14),)
-  excluded_tests += -X gcc-13
-endif
-endif
+	excluded_tests = -X gcc-only
 endif
 
 test:

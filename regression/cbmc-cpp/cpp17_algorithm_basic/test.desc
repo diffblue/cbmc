@@ -1,4 +1,4 @@
-CORE gcc-13
+CORE gcc-only
 main.cpp
 --cpp17 --unwind 3 --depth 100
 ^EXIT=(0|10)$
