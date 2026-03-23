@@ -1,4 +1,4 @@
-CORE gcc-13
+CORE gcc-only
 main.cpp
 --cpp11 --object-bits 12 --unwind 5 --depth 200
 ^VERIFICATION

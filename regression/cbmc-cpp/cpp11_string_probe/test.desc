@@ -1,0 +1,10 @@
+CORE
+main.cpp
+--cpp11
+^VERIFICATION
+^EXIT=(0|10)$
+^SIGNAL=0$
+--
+^PARSING ERROR$
+^CONVERSION ERROR$
+Probe: checks if <string> works on all platforms.

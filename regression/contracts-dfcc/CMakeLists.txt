@@ -12,16 +12,6 @@ else()
   set(gcc_only_string "")
 endif()
 
-set(extra_excludes "")
-set(extra_excludes_string "")
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "13")
-  list(APPEND extra_excludes -X gcc-13)
-  set(extra_excludes_string "-X;gcc-13;")
-elseif(NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  list(APPEND extra_excludes -X gcc-13)
-  set(extra_excludes_string "-X;gcc-13;")
-endif()
-
 
 set(dfcc_cmd
     "${CMAKE_CURRENT_SOURCE_DIR}/chain.sh $<TARGET_FILE:goto-cc> $<TARGET_FILE:goto-instrument> $<TARGET_FILE:cbmc> ${is_windows} true")
@@ -31,12 +21,12 @@ set(dfcc_core_shards 4)
 # shard it (and keep its 30-minute per-shard timeout) so it runs as several
 # parallel ctest entries on the macOS runners. See add_sharded_test_pl_tests.
 add_sharded_test_pl_tests(
-    "${dfcc_cmd}" "dfcc-core" ${dfcc_core_shards} 1800 ${gcc_only} ${extra_excludes})
+    "${dfcc_cmd}" "dfcc-core" ${dfcc_core_shards} 1800 ${gcc_only})
 
 add_test_pl_profile(
     "contracts-non-dfcc"
     "${CMAKE_CURRENT_SOURCE_DIR}/chain.sh $<TARGET_FILE:goto-cc> $<TARGET_FILE:goto-instrument> $<TARGET_FILE:cbmc> ${is_windows} false" ${gcc_only}
-    "-C;-X;dfcc-only;${extra_excludes_string}-s;non-dfcc"
+    "-C;-X;dfcc-only;-s;non-dfcc"
     "CORE"
 )
 
