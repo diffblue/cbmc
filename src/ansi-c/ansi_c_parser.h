@@ -40,7 +40,8 @@ public:
       __float128_is_keyword(false),
       float16_type(false),
       bf16_type(false),
-      fp16_type(false)
+      fp16_type(false),
+      gcc13_type_traits(false)
   {
     // set up global scope
     scopes.clear();
@@ -76,6 +77,8 @@ public:
   bool float16_type;
   bool bf16_type;
   bool fp16_type;
+  // GCC 13+ type trait builtins: __remove_cv, __remove_reference, __remove_cvref
+  bool gcc13_type_traits;
 
   typedef ansi_c_identifiert identifiert;
   typedef ansi_c_scopet scopet;

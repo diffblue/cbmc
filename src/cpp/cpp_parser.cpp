@@ -57,6 +57,11 @@ bool cpp_parsert::parse()
   token_buffer.ansi_c_parser.float16_type = *support_float16;
   token_buffer.ansi_c_parser.bf16_type = *support_float16;
   token_buffer.ansi_c_parser.fp16_type = *support_float16;
+  // __remove_cv, __remove_reference, __remove_cvref are GCC 13+ builtins.
+  // Older libstdc++ uses these as regular identifiers (template aliases).
+  token_buffer.ansi_c_parser.gcc13_type_traits =
+    *support_float16 ||
+    config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG;
   token_buffer.ansi_c_parser.in = in;
   token_buffer.ansi_c_parser.mode = mode;
   token_buffer.ansi_c_parser.set_file(get_file());

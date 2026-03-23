@@ -1336,20 +1336,17 @@ enable_or_disable ("enable"|"disable")
 "__typeof__"    { loc(); return TOK_TYPEOF; }
 
 "__remove_cv"   { return conditional_keyword(
-                    PARSER.mode==configt::ansi_ct::flavourt::GCC ||
-                    PARSER.mode==configt::ansi_ct::flavourt::CLANG,
+                    PARSER.gcc13_type_traits,
                     TOK_GCC_BUILTIN_REMOVE_CV);
                 }
 
 "__remove_reference" { return conditional_keyword(
-                    PARSER.mode==configt::ansi_ct::flavourt::GCC ||
-                    PARSER.mode==configt::ansi_ct::flavourt::CLANG,
+                    PARSER.gcc13_type_traits,
                     TOK_GCC_BUILTIN_REMOVE_REFERENCE);
                 }
 
 "__remove_cvref" { return conditional_keyword(
-                    PARSER.mode==configt::ansi_ct::flavourt::GCC ||
-                    PARSER.mode==configt::ansi_ct::flavourt::CLANG,
+                    PARSER.gcc13_type_traits,
                     TOK_GCC_BUILTIN_REMOVE_CVREF);
                 }
 
