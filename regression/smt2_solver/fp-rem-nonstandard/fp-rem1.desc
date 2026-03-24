@@ -1,0 +1,9 @@
+KNOWNBUG
+fp-rem1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+Based on Z3#2381: fp.rem(3.0, 2.0) should be -1.0.
+CBMC's fp.rem appears to always return +0.0 (bug).

@@ -1,0 +1,8 @@
+KNOWNBUG
+z3-2381-rem-specific.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+Z3#2381: fp.rem bug (always returns +0)
