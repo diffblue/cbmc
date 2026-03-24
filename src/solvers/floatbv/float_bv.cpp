@@ -1026,13 +1026,22 @@ exprt float_bvt::rem(const exprt &x, const exprt &y) const
   exprt r_minus = convert(
     ieee_float_op_exprt{x, ID_floatbv_minus, r_minus_times_y, round_to_zero});
 
-  // Pick the alternative with smaller |result|
+  // Pick the alternative with smaller |result|.
+  // When |best_alt| == |result| (tie at |fmod| == |y/2|), pick the
+  // alternative if the truncated quotient n is odd (IEEE 754: even n).
+  // n is odd iff the LSB of n_float's integer representation is 1.
+  exprt n_int_bv =
+    to_signed_integer(n_float, type.get_width(), round_to_zero, spec);
+  exprt n_is_odd = extractbit_exprt(n_int_bv, 0);
   exprt best_alt = if_exprt{
     relation(abs(r_plus, spec), relt::LT, abs(r_minus, spec), spec),
     r_plus,
     r_minus};
-  exprt use_alt =
-    relation(abs(best_alt, spec), relt::LT, abs(result, spec), spec);
+  exprt use_alt = or_exprt(
+    relation(abs(best_alt, spec), relt::LT, abs(result, spec), spec),
+    and_exprt(
+      relation(abs(best_alt, spec), relt::EQ, abs(result, spec), spec),
+      n_is_odd));
   return if_exprt{use_alt, best_alt, result};
 }
 
