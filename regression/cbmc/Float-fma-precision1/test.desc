@@ -1,0 +1,9 @@
+KNOWNBUG
+main.c
+--floatbv --no-built-in-assertions
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+fmaf should use single rounding but C library model does x*y+z with
+two roundings. Needs __CPROVER_fmaf built-in (on floatbv-mod-rem branch).
