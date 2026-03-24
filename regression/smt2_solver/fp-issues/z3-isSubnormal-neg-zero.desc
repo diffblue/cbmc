@@ -1,0 +1,10 @@
+CORE
+z3-isSubnormal-neg-zero.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+fp.isSubnormal(-0) must be false: -0 equals +0, so the "non-zero" conjunct
+(a float -> bool cast) is false. The assertion is therefore unsatisfiable.
+This shares the float -> bool cast fix with the fp.isZero case.
