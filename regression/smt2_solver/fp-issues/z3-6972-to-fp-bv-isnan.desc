@@ -1,0 +1,8 @@
+CORE
+z3-6972-to-fp-bv-isnan.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+Z3#6972: to_fp from BV 0x7FC00000 is NaN

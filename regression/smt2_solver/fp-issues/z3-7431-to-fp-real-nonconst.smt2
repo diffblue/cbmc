@@ -1,0 +1,5 @@
+; Z3#7431: to_fp from non-constant Real on non-standard sort (unsupported)
+(set-logic QF_FP)
+(declare-fun v () Real)
+(assert (= ((_ to_fp 2 6) RTZ v) (fp #b1 #b00 #b00000)))
+(check-sat)

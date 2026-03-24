@@ -1,0 +1,8 @@
+KNOWNBUG
+z3-7431-to-fp-real-nonconst.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+--
+Z3#7431: to_fp from non-constant Real (unsupported)

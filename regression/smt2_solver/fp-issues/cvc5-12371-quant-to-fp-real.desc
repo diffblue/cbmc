@@ -1,0 +1,8 @@
+KNOWNBUG
+cvc5-12371-quant-to-fp-real.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+CVC5#12371: quantified to_fp from Real (quantifiers + non-const Real unsupported)

@@ -1,0 +1,8 @@
+CORE
+z3-2631-quant-neg-roundtrip.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+Z3#2631: negation is self-inverse
