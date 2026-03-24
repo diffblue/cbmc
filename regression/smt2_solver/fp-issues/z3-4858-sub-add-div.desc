@@ -1,0 +1,9 @@
+CORE
+z3-4858-sub-add-div.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+--
+Z3#4858: fp.sub/fp.add with RTZ and subnormals. Sat because large
+normal f absorbs subnormal h in f+h, so f-(f+h)=0 != -h.

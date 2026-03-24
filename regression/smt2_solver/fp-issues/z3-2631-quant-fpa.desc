@@ -1,0 +1,8 @@
+KNOWNBUG
+z3-2631-quant-fpa.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+Z3#2631: quantified FPA negation (quantifiers ignored)

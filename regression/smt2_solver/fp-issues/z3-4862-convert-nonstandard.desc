@@ -1,0 +1,8 @@
+CORE
+z3-4862-convert-nonstandard.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+--
+Z3#4862: conversion between non-standard FP sorts

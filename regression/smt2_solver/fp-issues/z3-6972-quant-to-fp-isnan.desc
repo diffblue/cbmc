@@ -1,0 +1,8 @@
+KNOWNBUG
+z3-6972-quant-to-fp-isnan.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+Z3#6972: quantified to_fp/isNaN (quantifiers ignored)
