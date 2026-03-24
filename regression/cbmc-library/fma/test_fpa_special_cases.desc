@@ -1,0 +1,11 @@
+CORE smt-backend
+special_cases.c
+--smt2 --fpa --no-built-in-assertions
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Run FMA special cases through an external SMT solver with FPA theory.
+Verifies NaN, infinity, and 0*inf handling end-to-end.
