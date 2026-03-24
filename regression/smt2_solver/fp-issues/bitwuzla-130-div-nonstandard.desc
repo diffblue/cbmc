@@ -1,0 +1,8 @@
+CORE
+bitwuzla-130-div-nonstandard.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+--
+Bitwuzla#130: fp.div RNA on non-standard sort

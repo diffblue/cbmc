@@ -1,0 +1,8 @@
+KNOWNBUG
+z3-7321-to-real.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+--
+Z3#7321: fp.to_real unsupported

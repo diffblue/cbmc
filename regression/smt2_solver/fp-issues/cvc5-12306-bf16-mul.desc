@@ -1,0 +1,8 @@
+CORE
+cvc5-12306-bf16-mul.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+--
+CVC5#12306: BF16 multiplication bound check

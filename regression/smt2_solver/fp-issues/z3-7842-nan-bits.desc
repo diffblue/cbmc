@@ -1,0 +1,8 @@
+CORE
+z3-7842-nan-bits.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+--
+Z3#7842: multiple NaN bit patterns exist
