@@ -1,0 +1,10 @@
+CORE smt-backend
+precision.c
+--smt2 --fpa --outfile -
+fp\.fma
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Verify that the SMT2 FPA backend emits fp.fma (not a bitvector encoding).
