@@ -1,0 +1,8 @@
+CORE
+main.c
+--floatbv
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+Based on Z3#4673: Overflow should produce infinity, not saturate.

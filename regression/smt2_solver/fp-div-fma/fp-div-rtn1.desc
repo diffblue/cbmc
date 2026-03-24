@@ -1,0 +1,8 @@
+CORE
+fp-div-rtn1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+--
+Based on CVC5#11139: fp.div with RTN rounding on Float64.
