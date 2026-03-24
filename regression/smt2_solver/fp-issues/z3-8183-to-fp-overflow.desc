@@ -1,0 +1,9 @@
+KNOWNBUG
+z3-8183-to-fp-overflow.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+Z3#8183: to_fp from large constant Real (1e40) should overflow
+to infinity in Float32. Currently errors on non-constant real.

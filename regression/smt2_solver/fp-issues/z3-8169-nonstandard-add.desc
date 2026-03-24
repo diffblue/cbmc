@@ -1,0 +1,8 @@
+CORE
+z3-8169-nonstandard-add.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+Z3#8169: adding +0 to x gives x

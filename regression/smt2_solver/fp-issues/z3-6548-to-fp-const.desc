@@ -1,0 +1,8 @@
+CORE
+z3-6548-to-fp-const.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+--
+Z3#6548: to_fp from constant real

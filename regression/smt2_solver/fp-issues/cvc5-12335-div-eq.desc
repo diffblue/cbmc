@@ -1,0 +1,8 @@
+CORE
+cvc5-12335-div-eq.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+--
+CVC5#12335: fp.div with fp.eq (sat via V=+inf)

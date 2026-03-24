@@ -1,0 +1,8 @@
+CORE
+z3-4855-div-rounding.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+--
+Z3#4855: fp.div with RTZ rounding
