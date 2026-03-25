@@ -29,7 +29,7 @@ jobs:
         with:
           path: .ccache
           key: ${{ runner.os }}-24.04-Release-${{ github.ref }}-${{ github.sha }}-RELEASEPKG
-          restore-keys:
+          restore-keys: |
             ${{ runner.os }}-24.04-Release-${{ github.ref }}
             ${{ runner.os }}-24.04-Release
       - name: ccache environment
@@ -99,7 +99,7 @@ jobs:
         with:
           path: .ccache
           key: ${{ runner.os }}-24.04-Arm-Release-${{ github.ref }}-${{ github.sha }}-RELEASEPKG
-          restore-keys:
+          restore-keys: |
             ${{ runner.os }}-24.04-Arm-Release-${{ github.ref }}
             ${{ runner.os }}-24.04-Arm-Release
       - name: ccache environment
@@ -169,7 +169,7 @@ jobs:
         with:
           path: .ccache
           key: ${{ runner.os }}-22.04-Release-${{ github.ref }}-${{ github.sha }}-RELEASEPKG
-          restore-keys:
+          restore-keys: |
             ${{ runner.os }}-22.04-Release-${{ github.ref }}
             ${{ runner.os }}-22.04-Release
       - name: ccache environment
