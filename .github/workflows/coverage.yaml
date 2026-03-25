@@ -38,10 +38,9 @@ jobs:
         uses: ./.github/actions/install-cvc5
         with:
           version: ${{ env.cvc5-version }}
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        uses: actions/cache/restore@v5
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-24.04-Coverage-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -70,3 +69,9 @@ jobs:
           files: build/html/coverage.info
           fail_ci_if_error: true
           verbose: true
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v5
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-24.04-Coverage-${{ github.ref }}-${{ github.sha }}-PR

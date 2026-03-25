@@ -23,10 +23,9 @@ jobs:
           sudo apt-get install --no-install-recommends -y bin86 gdb bcc liblzma-dev python3-dev gettext iasl uuid-dev libncurses5-dev libncursesw5-dev pkg-config
           sudo apt-get install --no-install-recommends -y libgtk2.0-dev libyajl-dev time ccache clang-19 clang++-19
 
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        uses: actions/cache/restore@v5
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-24.04-make-clang-${{ github.ref }}-${{ github.sha }}-XEN
           restore-keys: |
@@ -68,3 +67,9 @@ jobs:
 
       - name: Show some goto-cc functions
         run:  $(pwd)/src/cbmc/cbmc --list-goto-functions xen_4_13/xen/xen-syms | grep "arch"
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v5
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-24.04-make-clang-${{ github.ref }}-${{ github.sha }}-XEN
