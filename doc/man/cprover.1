@@ -1,0 +1,42 @@
+.TH CPROVER "1" "March 1, 2026" "cprover-6.10.0" "User Commands"
+.SH NAME
+cprover \- C program verification via state encoding
+.SH SYNOPSIS
+.B cprover
+.RI [ options ]
+.I source\-file.c
+.SH DESCRIPTION
+.B cprover
+reads a C source file, generates a GOTO program, and encodes it as a
+logical formula suitable for verification by an external solver.
+The output can be in SMT\-LIB2 or text format.
+.SH OPTIONS
+.TP
+\fB\-\-inline\fR
+Perform function call inlining before generating the formula.
+.TP
+\fB\-\-no\-safety\fR
+Disable safety checks.
+.TP
+\fB\-\-contract\fR \fIfunction\fR
+Check the contract of the given function.
+.TP
+\fB\-\-outfile\fR \fIfile\fR
+Write the output formula to \fIfile\fR instead of standard output.
+.TP
+\fB\-\-smt2\fR
+Output the formula in SMT\-LIB2 format.
+.TP
+\fB\-\-text\fR
+Output the formula in text format.
+.SH ENVIRONMENT
+All tools honor the TMPDIR environment variable when generating
+temporary files and directories.
+.SH BUGS
+If you encounter a problem please create an issue at
+.B https://github.com/diffblue/cbmc/issues
+.SH SEE ALSO
+.BR cbmc (1),
+.BR goto\-cc (1)
+.SH COPYRIGHT
+2022, Daniel Kroening
