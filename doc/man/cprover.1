@@ -1,42 +1,196 @@
 .TH CPROVER "1" "March 1, 2026" "cprover-6.10.0" "User Commands"
 .SH NAME
-cprover \- C program verification via state encoding
+cprover \- verify C programs using state\-based encoding
 .SH SYNOPSIS
 .B cprover
 .RI [ options ]
 .I source\-file.c
 .SH DESCRIPTION
 .B cprover
-reads a C source file, generates a GOTO program, and encodes it as a
-logical formula suitable for verification by an external solver.
-The output can be in SMT\-LIB2 or text format.
+is an experimental verification tool for C programs.
+It reads a C source file, constructs a GOTO program (the intermediate
+representation used by the CProver tool suite), and encodes the program
+into a set of logical constraints over program states.
+The built\-in solver then attempts to prove that all assertions in the
+program hold, using an iterative approach based on inductiveness
+checking and generalization.
+.PP
+Unlike
+.BR cbmc (1),
+which performs bounded model checking by unwinding loops to a fixed
+depth,
+.B cprover
+uses a state\-based encoding that models the program heap with custom
+operators for memory allocation, deallocation, and pointer
+dereferencing.
+The solver iteratively checks whether candidate invariants are
+inductive and generalizes them when they are too weak.
+.PP
+By default,
+.B cprover
+instruments the program with safety checks (array bounds, pointer
+validity) and then runs the built\-in solver.
+The formula can also be exported in SMT\-LIB2 or text format for
+inspection or use with external tools.
+.PP
+When
+.B \-\-contract
+is given,
+.B cprover
+checks the specified function against its contract (requires
+.B __CPROVER_requires
+and
+.B __CPROVER_ensures
+annotations in the source).
 .SH OPTIONS
+.SS "Verification"
+.TP
+\fB\-\-no\-safety\fR
+Disable the automatic safety checks (pointer safety, array bounds).
+Only user\-specified assertions will be checked.
+.TP
+\fB\-\-no\-assertions\fR
+Remove all assertions from the program.
+This is useful when only the encoding output is desired.
+.TP
+\fB\-\-contract\fR \fIfunction\fR
+Check the contract of the given \fIfunction\fR.
+The function must have
+.B __CPROVER_requires
+and
+.B __CPROVER_ensures
+annotations.
+.TP
+\fB\-\-unwind\fR \fIN\fR
+Set the loop unwinding limit to \fIN\fR (default is 1).
+.TP
+\fB\-\-trace\fR
+Print a counterexample trace when a property is refuted.
+.TP
+\fB\-\-solve\fR
+Run the built\-in solver even when formula output
+(\fB\-\-smt2\fR or \fB\-\-text\fR) is requested.
+By default, formula output suppresses solving.
+.SS "Formula Output"
+.TP
+\fB\-\-smt2\fR
+Output the state encoding as an SMT\-LIB2 formula.
+When this option is given, function call inlining is performed by
+default (use \fB\-\-no\-inline\fR to suppress).
+.TP
+\fB\-\-text\fR
+Output the state encoding in a human\-readable text format.
+.TP
+\fB\-\-outfile\fR \fIfile\fR
+Write the formula to \fIfile\fR instead of standard output.
+.TP
+\fB\-\-variables\fR
+Use variable\-based encoding instead of state\-based encoding.
+Implies inlining.
+.SS "Program Transformations"
 .TP
 \fB\-\-inline\fR
 Perform function call inlining before generating the formula.
 .TP
-\fB\-\-no\-safety\fR
-Disable safety checks.
+\fB\-\-no\-inline\fR
+Suppress the automatic inlining that \fB\-\-smt2\fR enables by default.
+.SS "Diagnostics"
 .TP
-\fB\-\-contract\fR \fIfunction\fR
-Check the contract of the given function.
+\fB\-\-show\-goto\-functions\fR
+Print the GOTO intermediate representation and exit.
 .TP
-\fB\-\-outfile\fR \fIfile\fR
-Write the output formula to \fIfile\fR instead of standard output.
+\fB\-\-show\-loops\fR
+Print loop identifiers and exit.
 .TP
-\fB\-\-smt2\fR
-Output the formula in SMT\-LIB2 format.
+\fB\-\-show\-functions\-with\-loops\fR
+Print the names of functions that contain loops and exit.
 .TP
-\fB\-\-text\fR
-Output the formula in text format.
+\fB\-\-show\-properties\fR
+Print the properties (assertions) found in the program and exit.
+.TP
+\fB\-\-validate\-goto\-model\fR
+Run internal consistency checks on the GOTO model.
+.TP
+\fB\-\-verbose\fR
+Enable verbose output, including solver progress and iteration
+details.
+.SS "Preprocessor"
+.TP
+\fB\-D\fR \fIname\fR[=\fIvalue\fR]
+Define a preprocessor macro.
+.TP
+\fB\-I\fR \fIpath\fR
+Add \fIpath\fR to the preprocessor include search path.
+.TP
+\fB\-\-32\fR
+Set the architecture to 32\-bit mode.
+.TP
+\fB\-\-64\fR
+Set the architecture to 64\-bit mode.
+.SS "General"
+.TP
+\fB\-h\fR, \fB\-?\fR, \fB\-\-help\fR
+Show the help message and exit.
+.TP
+\fB\-\-version\fR
+Print the version number and exit.
+.SH EXIT STATUS
+.TP
+.B 0
+All properties verified successfully (or \fB\-\-help\fR/\fB\-\-version\fR
+was given).
+.TP
+.B 1
+Usage error (invalid command line).
+.TP
+.B 2
+Parse error (source file could not be processed).
+.TP
+.B 6
+Internal error, incorrect task, or unexpected exception.
+.TP
+.B 10
+At least one property was refuted (verification unsafe).
+.SH EXAMPLES
+Verify a C source file with default safety checks:
+.PP
+.in +4n
+.EX
+cprover main.c
+.EE
+.in
+.PP
+Export the state encoding as an SMT\-LIB2 formula:
+.PP
+.in +4n
+.EX
+cprover \-\-smt2 \-\-outfile formula.smt2 main.c
+.EE
+.in
+.PP
+Check a function contract with a counterexample trace:
+.PP
+.in +4n
+.EX
+cprover \-\-contract my_function \-\-trace main.c
+.EE
+.in
 .SH ENVIRONMENT
 All tools honor the TMPDIR environment variable when generating
 temporary files and directories.
 .SH BUGS
+.B cprover
+is experimental.
+The built\-in solver uses custom operators for heap modeling that are
+not supported by standard SMT solvers, so the SMT\-LIB2 output is
+primarily useful for inspection rather than for feeding into external
+solvers.
+.PP
 If you encounter a problem please create an issue at
 .B https://github.com/diffblue/cbmc/issues
 .SH SEE ALSO
 .BR cbmc (1),
-.BR goto\-cc (1)
+.BR goto\-cc (1),
+.BR goto\-instrument (1)
 .SH COPYRIGHT
 2022, Daniel Kroening
