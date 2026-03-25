@@ -1,4 +1,4 @@
-.TH GOTO-INSTRUMENT "1" "June 2022" "goto-instrument-5.59.0" "User Commands"
+.TH GOTO-INSTRUMENT "1" "June 1, 2022" "goto-instrument-5.59.0" "User Commands"
 .SH NAME
 goto\-instrument \- Perform analysis or instrumentation of goto binaries
 .SH SYNOPSIS
@@ -270,9 +270,9 @@ for function \fIget_celsius\fR and with harness \fItest_get_celsius\fR:
 
 .EX
 .in +4n
-\fB#include\fP \fC<assert.h>\fP
-\fB#include\fP \fC<limits.h>\fP
-\fB#include\fP \fC<stdint.h>\fP
+\fB#include\fP \fB<assert.h>\fP
+\fB#include\fP \fB<limits.h>\fP
+\fB#include\fP \fB<stdint.h>\fP
 
 \fB// hardware sensor for temperature in kelvin\fP
 \fBextern\fP \fBvolatile\fP uint16_t temperature;
@@ -320,8 +320,8 @@ and with harness \fItest_get_message\fR:
 
 .EX
 .in +4n
-\fB#include\fP \fC<assert.h>\fP
-\fB#include\fP \fC<stdint.h>\fP
+\fB#include\fP \fB<assert.h>\fP
+\fB#include\fP \fB<stdint.h>\fP
 
 \fBextern\fP \fBvolatile\fP uint32_t clock;
 
@@ -349,7 +349,8 @@ void \fBtest_get_message\fP() {
 
 The harness verifies that \fIget_message\fR assigns non-decreasing time stamps
 to the returned messages. However, simply treating \fIclock\fR as
-non-deterministic would not suffice to prove this property. Thus, we can supply a
+non-deterministic would not suffice to prove this property. Thus, we can supply
+a
 model for reads from \fIclock\fR:
 
 .EX
@@ -492,9 +493,11 @@ associated with a non-pointer parameter. Requesting to havoc a parameter with a
 number higher than the number of parameters a given function takes will also
 results in an error report.
 .TP
-\fB\-\-generate\-havocing\-body\fR \fIoption\fR \fIfun_name\fR,\fBparams:\fR\fIp_n1\fR;\fIp_n2\fR;..
+\fB\-\-generate\-havocing\-body\fR \fIoption\fR
+\fIfun_name\fR,\fBparams:\fR\fIp_n1\fR;\fIp_n2\fR;..
 .TQ
-\fB\-\-generate\-havocing\-body\fR \fIoption\fR \fIfun_name\fR[,\fIcall\-site\-id\fR,\fBparams:\fR\fIp_n1\fR;\fIp_n2\fR;..>]+
+\fB\-\-generate\-havocing\-body\fR \fIoption\fR
+\fIfun_name\fR[,\fIcall\-site\-id\fR,\fBparams:\fR\fIp_n1\fR;\fIp_n2\fR;..>]+
 Request a different implementation for a number of
 call-sites of a single function. The option \fB\-\-generate\-havocing\-body\fR
 inserts new functions for selected call-sites and replaces the calls to the
@@ -535,7 +538,8 @@ int \fBfunction_1\fP(int *first, int *second, int *third) {
   *third = \fBnondet_int\fP();
 }
 
-int \fBfunction_2\fP(int *first, int *second, int *third) { *second = \fBnondet_int\fP(); }
+int \fBfunction_2\fP(int *first, int *second, int *third) { *second =
+\fBnondet_int\fP(); }
 
 int \fBmain\fP() {
   int a = 10;
@@ -614,7 +618,8 @@ int \fBfs_open\fP(filesystem_t *filesystem, \fBconst\fP char *file_name) {
   filesystem->\fBopen\fP(filesystem, file_name);
 }
 
-int \fBnullfs_open\fP(filesystem_t *filesystem, \fBconst\fP char *file_name) { \fBreturn\fP -1; }
+int \fBnullfs_open\fP(filesystem_t *filesystem, \fBconst\fP char *file_name) {
+\fBreturn\fP -1; }
 
 filesystem_t nullfs_val = {.open = nullfs_open};
 filesystem *\fBconst\fP nullfs = &nullfs_val;
@@ -630,7 +635,7 @@ filesystem_t *\fBget_fs_impl\fP() {
 }
 int \fBmain\fP(void) {
   filesystem_t *fs = \fBget_fs_impl\fP();
-  \fBassert\fP(\fBfs_open\fP(fs, \fC"hello.txt"\fP) != -1);
+  \fBassert\fP(\fBfs_open\fP(fs, \fB"hello.txt"\fP) != -1);
 }
 .in
 .EE
@@ -681,7 +686,8 @@ have the correct type), the error message will refer to the command line option
 \fB\-\-restrict\-function\-pointer\fR regardless of whether the restriction in
 question came from the command line or a file.
 .TP
-\fB\-\-restrict\-function\-pointer\-by\-name\fR \fIsymbol_name\fR/\fItarget\fR[,\fItargets\fR]*
+\fB\-\-restrict\-function\-pointer\-by\-name\fR
+\fIsymbol_name\fR/\fItarget\fR[,\fItargets\fR]*
 Restrict a function pointer where \fIsymbol_name\fR is the unmangled name,
 before labeling function pointers.
 .TP
@@ -722,7 +728,7 @@ following example:
 .EX
 .in +4n
 \fB// needs_argv.c\fP
-\fB#include\fP \fC<assert.h>\fP
+\fB#include\fP \fB<assert.h>\fP
 
 int \fBmain\fP(int argc, char *argv[]) {
   \fBif\fP (argc >= 2)
@@ -789,7 +795,8 @@ transitively inline all calls \fIfunction\fR makes
 disable caching of intermediate results during transitive function inlining
 .TP
 \fB\-\-log\fR \fIfile\fR
-log in JSON format which code segments were inlined, use with \fB\-\-function\-inline\fR
+log in JSON format which code segments were inlined, use with
+\fB\-\-function\-inline\fR
 .TP
 \fB\-\-remove\-function\-pointers\fR
 Resolve calls via function pointers to direct function calls. Candidate

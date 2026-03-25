@@ -1,4 +1,4 @@
-.TH GOTO-ANALYZER "1" "June 2022" "goto-analyzer-5.59.0" "User Commands"
+.TH GOTO-ANALYZER "1" "June 1, 2022" "goto-analyzer-5.59.0" "User Commands"
 .SH NAME
 goto-analyzer \- Data-flow analysis for C programs and goto binaries
 .SH SYNOPSIS
@@ -91,7 +91,8 @@ reach the same location, each will be checked and the answers
 combined, with unknown taking precedence.
 .TP
 \fB\-\-simplify\fR \fIfile_name\fR
-Writes a new version of the input program to \fIfile_name\fR in which the program has
+Writes a new version of the input program to \fIfile_name\fR in which the
+program has
 been simplified using information from the abstract interpreter.  The
 exact simplification will depend on the domain that is used but
 typically this might be replacing any expression that has a constant
@@ -131,7 +132,8 @@ the analysis is performed.  In principle this can significantly change
 the accuracy and performance of \fBgoto-analyzer\fR but the current
 options are reasonably similar.
 .PP
-If \fB\-\-verbosity\fR is set above \fB8\fR the abstract interpreter will log what
+If \fB\-\-verbosity\fR is set above \fB8\fR the abstract interpreter will log
+what
 it is doing.  This is intended to aid developers in understanding how
 the algorithms work, where time is being spent, etc.\ but can be
 generally quite instructive.
@@ -215,7 +217,8 @@ identify the termination conditions then the analysis will not terminate.
 .TP
 \fB\-\-branching\fR n
 This works in a similar way to \fB\-\-loop\-unwind\fR but tracking forwards
-jumps (\fBif\fR, \fBswitch\fR, \fBgoto\fR, etc.) rather than backwards ones.  This
+jumps (\fBif\fR, \fBswitch\fR, \fBgoto\fR, etc.) rather than backwards ones.
+This
 gives per-path analysis but limiting the number of times each location
 is visited.  There is not a direct form of program transformation that
 matches this but it is similar to the per-path analysis that symbolic
@@ -306,14 +309,16 @@ time and how many fields they have this may increase the amount of memory used
 by \fBgoto-analyzer\fR by a reasonable amount.  But this means that the analysis
 will be field-sensitive.
 .TP
-\fB\-\-vsd\-arrays\fR [\fBtop\-bottom\fR|\fBsmash\fR|\fBup\-to\-n\-elements\fR|\fBevery\-element\fR]
+\fB\-\-vsd\-arrays\fR
+[\fBtop\-bottom\fR|\fBsmash\fR|\fBup\-to\-n\-elements\fR|\fBevery\-element\fR]
 This controls how arrays are handled.  As with structures, the default is
 \fBtop-bottom\fR which effectively ignores writes to the array and returns top
 on a read.  More precise than this is \fBsmash\fR which stores one abstract
 element for all of the values.  This is relatively cheap but a lot more precise,
 particularly if used with \fBintervals\fR or \fBset-of-constants\fR.
 \fBup-to-n-elements\fR generalizes \fBsmash\fR by storing abstract objects for
-the first \fIn\fR elements of each array (\fIn\fR defaults to \fB10\fR and can be
+the first \fIn\fR elements of each array (\fIn\fR defaults to \fB10\fR and can
+be
 controlled by \fB\-\-vsd\-array\-max\-elements\fR) and then condensing all other
 elements down to a single abstract object.  This allows reasonably fine-grained
 control over the amount of memory used and can give much more precise results
@@ -455,10 +460,13 @@ set main function name
 .TP
 \fB\-\-arch\fR \fIarch\fR
 Set analysis architecture, which defaults to the host architecture. Use one of:
-\fBalpha\fR, \fBarm\fR, \fBarm64\fR, \fBarmel\fR, \fBarmhf\fR, \fBhppa\fR, \fBi386\fR, \fBia64\fR,
+\fBalpha\fR, \fBarm\fR, \fBarm64\fR, \fBarmel\fR, \fBarmhf\fR, \fBhppa\fR,
+\fBi386\fR, \fBia64\fR,
 \fBmips\fR, \fBmips64\fR, \fBmips64el\fR, \fBmipsel\fR, \fBmipsn32\fR,
-\fBmipsn32el\fR, \fBpowerpc\fR, \fBppc64\fR, \fBppc64le\fR, \fBriscv64\fR, \fBs390\fR,
-\fBs390x\fR, \fBsh4\fR, \fBsparc\fR, \fBsparc64\fR, \fBv850\fR, \fBx32\fR, \fBx86_64\fR, or
+\fBmipsn32el\fR, \fBpowerpc\fR, \fBppc64\fR, \fBppc64le\fR, \fBriscv64\fR,
+\fBs390\fR,
+\fBs390x\fR, \fBsh4\fR, \fBsparc\fR, \fBsparc64\fR, \fBv850\fR, \fBx32\fR,
+\fBx86_64\fR, or
 \fBnone\fR.
 .TP
 \fB\-\-os\fR \fIos\fR
@@ -466,10 +474,12 @@ Set analysis operating system, which defaults to the host operating system. Use
 one of: \fBfreebsd\fR, \fBlinux\fR, \fBmacos\fR, \fBnetbsd\fR, \fBopenbsd\fR,
 \fBsolaris\fR, \fBhurd\fR, or \fBwindows\fR.
 .TP
-\fB\-\-i386\-linux\fR, \fB\-\-i386\-win32\fR, \fB\-\-i386\-macos\fR, \fB\-\-ppc\-macos\fR, \fB\-\-win32\fR, \fB\-\-winx64\fR
+\fB\-\-i386\-linux\fR, \fB\-\-i386\-win32\fR, \fB\-\-i386\-macos\fR,
+\fB\-\-ppc\-macos\fR, \fB\-\-win32\fR, \fB\-\-winx64\fR
 Set analysis architecture and operating system.
 .TP
-\fB\-\-LP64\fR, \fB\-\-ILP64\fR, \fB\-\-LLP64\fR, \fB\-\-ILP32\fR, \fB\-\-LP32\fR
+\fB\-\-LP64\fR, \fB\-\-ILP64\fR, \fB\-\-LLP64\fR, \fB\-\-ILP32\fR,
+\fB\-\-LP32\fR
 Set width of int, long and pointers, but don't override default architecture and
 operating system.
 .TP
@@ -593,9 +603,12 @@ enable debug assertions in the cprover contracts library
 use simplified invalid pointer model in the cprover contracts library
 (faster, unsound)
 .SS "Standard Checks"
-From version \fB6.0\fR onwards, \fBcbmc\fR, \fBgoto-analyzer\fR and some other tools
-apply some checks to the program by default (called the "standard checks"), with the
-aim to provide a better user experience for a non-expert user of the tool. These checks are:
+From version \fB6.0\fR onwards, \fBcbmc\fR, \fBgoto-analyzer\fR and some other
+tools
+apply some checks to the program by default (called the "standard checks"), with
+the
+aim to provide a better user experience for a non-expert user of the tool. These
+checks are:
 .TP
 \fB\-\-pointer\-check\fR
 enable pointer checks
@@ -625,8 +638,10 @@ set malloc failure mode to return null
 generate unwinding assertions (cannot be
 used with \fB\-\-cover\fR)
 .PP
-These checks can all be deactivated at once by using the \fB\-\-no\-standard\-checks\fR flag
-like in the header example, or individually, by prepending a \fBno\-\fR before the flag, like
+These checks can all be deactivated at once by using the
+\fB\-\-no\-standard\-checks\fR flag
+like in the header example, or individually, by prepending a \fBno\-\fR before
+the flag, like
 so:
 .TP
 \fB\-\-no\-pointer\-check\fR

@@ -1,4 +1,4 @@
-.TH GOTO-SYNTHESIZER "1" "December 2022" "goto-synthesizer-5.59.0" "User Commands"
+.TH GOTO-SYNTHESIZER "1" "December 1, 2022" "goto-synthesizer-5.59.0" "User Commands"
 .SH NAME
 goto\-synthesizer \- Synthesize and apply loop contracts of goto binaries.
 .SH SYNOPSIS
@@ -96,18 +96,21 @@ arithmetic expressions
 \fB\-\-incremental\-smt2\-solver\fR \fIcmd\fR
 Use the incremental SMT backend where \fIcmd\fR is the command to invoke the SMT
 solver of choice.
-.br
+.sp
 Example invocations:
-.br
-  --incremental-smt2-solver 'z3 -smt2 -in' (use the Z3 solver).
-.br
-  --incremental-smt2-solver 'cvc5 --lang=smtlib2.6 --incremental' (use the CVC5 solver).
+.RS
+.IP \(bu 2
+\-\-incremental\-smt2\-solver 'z3 \-smt2 \-in' (use the Z3 solver).
+.IP \(bu 2
+\-\-incremental\-smt2\-solver 'cvc5 \-\-lang=smtlib2.6 \-\-incremental' (use the
+CVC5 solver).
+.RE
 .sp
 Note that:
-.br
+.sp
 The solver name must be in the "PATH" or be an executable with full path.
-.br
-The SMT solver should accept incremental SMTlib v2.6 formatted input from the stdin.
+The SMT solver should accept incremental SMTlib v2.6 formatted input from the
+stdin.
 .br
 The SMT solver should support the QF_AUFBV logic.
 .TP
@@ -143,7 +146,7 @@ If you encounter a problem please create an issue at
 .B https://github.com/diffblue/cbmc/issues
 .SH SEE ALSO
 .BR cbmc (1),
-.BR goto-cc (1)
-.BR goto-instrument (1)
+.BR goto\-cc (1),
+.BR goto\-instrument (1)
 .SH COPYRIGHT
 2022, Qinheping Hu

@@ -1,4 +1,4 @@
-.TH JANALYZER "1" "June 2022" "janalyzer-5.59.0" "User Commands"
+.TH JANALYZER "1" "June 1, 2022" "janalyzer-5.59.0" "User Commands"
 .SH NAME
 janalyzer \- Data-flow analysis for Java bytecode
 .SH SYNOPSIS
@@ -62,7 +62,8 @@ reach the same location, each will be checked and the answers
 combined, with unknown taking precedence.
 .TP
 \fB\-\-simplify\fR \fIfile_name\fR
-Writes a new version of the input program to \fIfile_name\fR in which the program has
+Writes a new version of the input program to \fIfile_name\fR in which the
+program has
 been simplified using information from the abstract interpreter.  The
 exact simplification will depend on the domain that is used but
 typically this might be replacing any expression that has a constant
@@ -186,7 +187,8 @@ at level \fIN\fR references are set to \fBnull\fR.
 Never initialize reference-typed parameter to the
 entry point with \fBnull\fR.
 .TP
-\fB\-\-java\-assume\-inputs\-interval\fR [\fIL\fR:\fIU\fR] or [\fIL\fR:] or [:\fIU\fR]
+\fB\-\-java\-assume\-inputs\-interval\fR [\fIL\fR:\fIU\fR] or [\fIL\fR:] or
+[:\fIU\fR]
 Force numerical primitive-typed inputs (\fBbyte\fR, \fBshort\fR, \fBint\fR,
 \fBlong\fR, \fBfloat\fR, \fBdouble\fR) to be initialized within the given range;
 lower bound \fIL\fR and upper bound \fIU\fR must be integers; does not work for
@@ -270,10 +272,13 @@ updating another class' static field.
 .TP
 \fB\-\-arch\fR \fIarch\fR
 Set analysis architecture, which defaults to the host architecture. Use one of:
-\fBalpha\fR, \fBarm\fR, \fBarm64\fR, \fBarmel\fR, \fBarmhf\fR, \fBhppa\fR, \fBi386\fR, \fBia64\fR,
+\fBalpha\fR, \fBarm\fR, \fBarm64\fR, \fBarmel\fR, \fBarmhf\fR, \fBhppa\fR,
+\fBi386\fR, \fBia64\fR,
 \fBmips\fR, \fBmips64\fR, \fBmips64el\fR, \fBmipsel\fR, \fBmipsn32\fR,
-\fBmipsn32el\fR, \fBpowerpc\fR, \fBppc64\fR, \fBppc64le\fR, \fBriscv64\fR, \fBs390\fR,
-\fBs390x\fR, \fBsh4\fR, \fBsparc\fR, \fBsparc64\fR, \fBv850\fR, \fBx32\fR, \fBx86_64\fR, or
+\fBmipsn32el\fR, \fBpowerpc\fR, \fBppc64\fR, \fBppc64le\fR, \fBriscv64\fR,
+\fBs390\fR,
+\fBs390x\fR, \fBsh4\fR, \fBsparc\fR, \fBsparc64\fR, \fBv850\fR, \fBx32\fR,
+\fBx86_64\fR, or
 \fBnone\fR.
 .TP
 \fB\-\-os\fR \fIos\fR
@@ -281,10 +286,12 @@ Set analysis operating system, which defaults to the host operating system. Use
 one of: \fBfreebsd\fR, \fBlinux\fR, \fBmacos\fR, \fBnetbsd\fR, \fBopenbsd\fR,
 \fBsolaris\fR, \fBhurd\fR, or \fBwindows\fR.
 .TP
-\fB\-\-i386\-linux\fR, \fB\-\-i386\-win32\fR, \fB\-\-i386\-macos\fR, \fB\-\-ppc\-macos\fR, \fB\-\-win32\fR, \fB\-\-winx64\fR
+\fB\-\-i386\-linux\fR, \fB\-\-i386\-win32\fR, \fB\-\-i386\-macos\fR,
+\fB\-\-ppc\-macos\fR, \fB\-\-win32\fR, \fB\-\-winx64\fR
 Set analysis architecture and operating system.
 .TP
-\fB\-\-LP64\fR, \fB\-\-ILP64\fR, \fB\-\-LLP64\fR, \fB\-\-ILP32\fR, \fB\-\-LP32\fR
+\fB\-\-LP64\fR, \fB\-\-ILP64\fR, \fB\-\-LLP64\fR, \fB\-\-ILP32\fR,
+\fB\-\-LP32\fR
 Set width of int, long and pointers, but don't override default architecture and
 operating system.
 .TP
