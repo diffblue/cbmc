@@ -1,0 +1,7 @@
+CORE broken-z3-smt-backend broken-cprover-smt-backend no-new-smt
+main.c
+--smt2 --external-sat-solver kissat
+^EXIT=1$
+^SIGNAL=0$
+conflicting solver options: --external-sat-solver and --smt2 must not be given together
+--

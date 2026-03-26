@@ -1,0 +1,7 @@
+CORE broken-z3-smt-backend broken-cprover-smt-backend no-new-smt
+main.c
+--dimacs --external-sat-solver kissat
+^EXIT=1$
+^SIGNAL=0$
+conflicting solver options: --dimacs and --external-sat-solver must not be given together
+--

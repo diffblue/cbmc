@@ -1,4 +1,4 @@
-CORE smt-backend
+CORE smt-backend no-new-smt
 short.c
 --smt2 --no-malloc-may-fail
 ^EXIT=0$

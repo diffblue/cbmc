@@ -1,0 +1,7 @@
+CORE broken-z3-smt-backend broken-cprover-smt-backend no-new-smt
+main.c
+--smt2 --incremental-smt2-solver z3
+^EXIT=1$
+^SIGNAL=0$
+conflicting solver options: --smt2 and --incremental-smt2-solver must not be given together
+--
