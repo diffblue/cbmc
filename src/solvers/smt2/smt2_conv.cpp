@@ -5022,6 +5022,34 @@ void smt2_convt::flatten2bv(const exprt &expr)
     convert_expr(expr);
 }
 
+std::string smt2_convt::declare_unflatten_base(const array_typet &array_type)
+{
+  auto it = unflatten_cache.find(array_type);
+  if(it != unflatten_cache.end())
+    return it->second;
+  std::string name = "unflatten_base_" + std::to_string(unflatten_counter++);
+  out << "(declare-fun " << name << " () ";
+  convert_type(array_type);
+  out << ")\n";
+  unflatten_cache[array_type] = name;
+  return name;
+}
+
+void smt2_convt::unflatten_store_pair(
+  const array_typet &array_type,
+  const mp_integer &i,
+  std::size_t offset,
+  std::size_t subtype_width,
+  unsigned nesting)
+{
+  convert_expr(from_integer(i, array_type.index_type()));
+  out << ' ';
+  unflatten(wheret::BEGIN, array_type.element_type(), nesting + 1);
+  out << "((_ extract " << offset + subtype_width - 1 << " " << offset
+      << ") ?ufop" << nesting << ")";
+  unflatten(wheret::END, array_type.element_type(), nesting + 1);
+}
+
 void smt2_convt::unflatten(
   wheret where,
   const typet &type,
@@ -5036,8 +5064,6 @@ void smt2_convt::unflatten(
   }
   else if(type.id() == ID_array)
   {
-    PRECONDITION(use_as_const || use_lambda_for_array);
-
     if(where == wheret::BEGIN)
       out << "(let ((?ufop" << nesting << " ";
     else
@@ -5054,49 +5080,76 @@ void smt2_convt::unflatten(
       mp_integer size =
         numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
 
-      for(mp_integer i = 1; i < size; ++i)
-        out << "(store ";
-
-      // Build a constant array filled with element 0 as the base, then
-      // overwrite indices 1..N-1 via (store ...).
-      if(use_as_const)
+      if(use_as_const || use_lambda_for_array)
       {
-        out << "((as const ";
-        convert_type(array_type);
+        // A constant-array base supplies element 0 as the default value;
+        // overwrite indices 1..N-1 via (store ...).
+        for(mp_integer i = 1; i < size; ++i)
+          out << "(store ";
+
+        if(use_as_const)
+        {
+          out << "((as const ";
+          convert_type(array_type);
+          out << ") ";
+        }
+        else
+        {
+          // Note: lambda is a Z3/Bitwuzla extension; not part of the
+          // SMT-LIB 2.6 standard. It is used in preference to `(as const
+          // ...)` for back-ends (e.g. Z3) where the latter is unavailable or
+          // unsound. The bound variable `?ufidx<n>` is intentionally unused
+          // -- the body returns the element-0 value regardless of its
+          // argument, making this semantically equivalent to `(as const ...)`.
+          out << "(lambda ((?ufidx" << nesting << " ";
+          convert_type(array_type.index_type());
+          out << ")) ";
+        }
+        // use element at index 0 as default value
+        unflatten(wheret::BEGIN, array_type.element_type(), nesting + 1);
+        out << "((_ extract " << subtype_width - 1 << " "
+            << "0) ?ufop" << nesting << ")";
+        unflatten(wheret::END, array_type.element_type(), nesting + 1);
         out << ") ";
+
+        std::size_t offset = subtype_width;
+        for(mp_integer i = 1; i < size; ++i, offset += subtype_width)
+        {
+          unflatten_store_pair(array_type, i, offset, subtype_width, nesting);
+          out << ")"; // store
+        }
       }
       else
       {
+        // Neither `(as const ...)` nor `(lambda ...)` is available; build the
+        // array by storing all in-range elements onto a pre-declared
+        // auxiliary base array (standard SMT-LIB, no extensions).
+        //
+        // NOTE: Unlike the arms above, indices outside [0, size) here are
+        // left unconstrained rather than equal to element 0. This is
+        // acceptable for CBMC's existing call sites because bounds checks
+        // guarantee no out-of-range select can be reached, but the two
+        // encodings are NOT semantically equivalent.
+        auto cache_it = unflatten_cache.find(array_type);
         INVARIANT(
-          use_lambda_for_array,
-          "unflatten relies on `(lambda ...)` for constant arrays "
-          "when `(as const ...)` is unavailable");
-        // Note: lambda is a Z3/Bitwuzla extension; not part of the
-        // SMT-LIB 2.6 standard.  The bound variable `?ufidx<n>` is
-        // intentionally unused -- the body returns the element-0 value
-        // regardless of its argument, making this semantically
-        // equivalent to `(as const ...)`.
-        out << "(lambda ((?ufidx" << nesting << " ";
-        convert_type(array_type.index_type());
-        out << ")) ";
-      }
-      // use element at index 0 as default value
-      unflatten(wheret::BEGIN, array_type.element_type(), nesting + 1);
-      out << "((_ extract " << subtype_width - 1 << " "
-          << "0) ?ufop" << nesting << ")";
-      unflatten(wheret::END, array_type.element_type(), nesting + 1);
-      out << ") ";
+          cache_it != unflatten_cache.end(),
+          "unflatten auxiliary must have been pre-declared by "
+          "find_symbols_rec; this site assumes find_symbols (directly or "
+          "via prepare_for_convert_expr) was invoked on the array type "
+          "before reaching unflatten");
 
-      std::size_t offset = subtype_width;
-      for(mp_integer i = 1; i < size; ++i, offset += subtype_width)
-      {
-        convert_expr(from_integer(i, array_type.index_type()));
-        out << ' ';
-        unflatten(wheret::BEGIN, array_type.element_type(), nesting + 1);
-        out << "((_ extract " << offset + subtype_width - 1 << " " << offset
-            << ") ?ufop" << nesting << ")";
-        unflatten(wheret::END, array_type.element_type(), nesting + 1);
-        out << ")"; // store
+        for(mp_integer i = 0; i < size; ++i)
+          out << "(store ";
+
+        out << cache_it->second;
+
+        std::size_t offset = 0;
+        for(mp_integer i = 0; i < size; ++i, offset += subtype_width)
+        {
+          out << ' ';
+          unflatten_store_pair(array_type, i, offset, subtype_width, nesting);
+          out << ")"; // store
+        }
       }
 
       out << ")"; // let
@@ -6198,6 +6251,14 @@ void smt2_convt::find_symbols_rec(
     const array_typet &array_type=to_array_type(type);
     find_symbols(array_type.size());
     find_symbols_rec(array_type.element_type(), recstack);
+
+    // Pre-declare auxiliary base arrays for unflatten when neither
+    // `(as const ...)` nor `(lambda ...)` is available. Any inconsistency
+    // about which array types are eligible (e.g. non-constant size) surfaces
+    // at the DATA_INVARIANT in unflatten with its targeted message, rather
+    // than silently skipping here.
+    if(!use_as_const && !use_lambda_for_array)
+      declare_unflatten_base(array_type);
   }
   else if(type.id()==ID_complex)
   {
