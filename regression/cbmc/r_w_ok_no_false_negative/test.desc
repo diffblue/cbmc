@@ -1,0 +1,13 @@
+CORE
+main.c
+--pointer-check --lift-nested-dereferences
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+dereference failure: pointer invalid in p->next->data: FAILURE
+--
+^warning: ignoring
+--
+Soundness check: nondet pointers without rw_ok must still fail pointer
+checks. The auto-object mechanism must not create valid objects for
+pointers that were not explicitly assumed valid.

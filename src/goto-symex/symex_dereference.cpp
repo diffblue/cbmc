@@ -340,6 +340,10 @@ void goto_symext::dereference_rec(
       dereference.dereference(tmp1, symex_config.show_points_to_sets);
     // std::cout << "**** " << format(tmp2) << '\n';
 
+    // After dereference, the resolved expression may contain auto-objects
+    // that need initialization (e.g., nodes in a linked list chain).
+    trigger_auto_object(tmp2, state);
+
     // Check various conditions for when we should try to cache the expression.
     // 1. Caching dereferences must be enabled.
     // 2. Do not cache inside LHS of writes.

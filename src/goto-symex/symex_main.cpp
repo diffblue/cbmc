@@ -9,14 +9,20 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution
 
+#include <util/arith_tools.h>
+#include <util/c_types.h>
+#include <util/cprover_prefix.h>
 #include <util/exception_utils.h>
 #include <util/expr_iterator.h>
 #include <util/expr_util.h>
 #include <util/format.h>
 #include <util/format_expr.h>
+#include <util/fresh_symbol.h>
 #include <util/invariant.h>
 #include <util/magic.h>
 #include <util/mathematical_expr.h>
+#include <util/pointer_expr.h>
+#include <util/pointer_offset_size.h>
 #include <util/replace_symbol.h>
 #include <util/std_expr.h>
 
@@ -42,12 +48,10 @@ symex_configt::symex_configt(const optionst &options)
     show_symex_steps(options.get_bool_option("show-goto-symex-steps")),
     show_points_to_sets(options.get_bool_option("show-points-to-sets")),
     max_field_sensitivity_array_size(
-      options.is_set("no-array-field-sensitivity")
-        ? 0
-        : options.is_set("max-field-sensitivity-array-size")
-            ? options.get_unsigned_int_option(
-                "max-field-sensitivity-array-size")
-            : DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE),
+      options.is_set("no-array-field-sensitivity") ? 0
+      : options.is_set("max-field-sensitivity-array-size")
+        ? options.get_unsigned_int_option("max-field-sensitivity-array-size")
+        : DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE),
     complexity_limits_active(
       options.get_signed_int_option("symex-complexity-limit") > 0),
     cache_dereferences{options.get_bool_option("symex-cache-dereferences")}
@@ -87,7 +91,7 @@ void symex_transition(
     // This is because the way we detect loops is pretty imprecise.
 
     framet &frame = state.call_stack().top();
-    const goto_programt::instructiont &instruction=*to;
+    const goto_programt::instructiont &instruction = *to;
     for(const auto &i_e : instruction.incoming_edges)
     {
       if(
@@ -138,7 +142,7 @@ void symex_transition(
     }
   }
 
-  state.source.pc=to;
+  state.source.pc = to;
 }
 
 void symex_transition(goto_symext::statet &state)
@@ -196,8 +200,143 @@ void goto_symext::vcc(
     state.guard.as_expr(), guarded_condition, property_id, msg, state.source);
 }
 
+/// Collect the top-level `r_ok`/`w_ok` conjuncts of \p cond, i.e. those that
+/// must hold for the assumption to hold. `&&` chains are flattened; we do not
+/// descend into negations, disjunctions or other operators, so an rw_ok that
+/// only holds conditionally is not collected.
+static void collect_top_level_rw_ok(
+  const exprt &cond,
+  std::vector<const prophecy_r_or_w_ok_exprt *> &rw_oks)
+{
+  if(cond.id() == ID_and)
+  {
+    for(const exprt &op : cond.operands())
+      collect_top_level_rw_ok(op, rw_oks);
+  }
+  else if(
+    const auto rw_ok = expr_try_dynamic_cast<prophecy_r_or_w_ok_exprt>(cond))
+  {
+    rw_oks.push_back(rw_ok);
+  }
+}
+
+void goto_symext::try_create_rw_ok_backing_object(
+  const prophecy_r_or_w_ok_exprt &rw_ok,
+  statet &state)
+{
+  const exprt &ptr = rw_ok.pointer();
+  if(ptr.id() != ID_symbol)
+    return;
+
+  // Only create backing objects for nondet/uninitialized pointers. If the
+  // pointer already has a concrete value (e.g. a cast from an integer
+  // constant), the rw_ok assumption will constrain the path naturally.
+  exprt renamed_ptr = state.rename(ptr, ns).get();
+  do_simplify(renamed_ptr, state.value_set);
+  if(!is_ssa_expr(renamed_ptr))
+    return;
+
+  const auto &ptr_type = to_pointer_type(ptr.type());
+  const typet &base_type = ptr_type.base_type();
+  if(base_type.id() == ID_empty || base_type.id() == ID_code)
+    return;
+
+  auto elem_size = pointer_offset_size(base_type, ns);
+  if(!elem_size.has_value() || *elem_size <= 0)
+    return;
+
+  // Rename and simplify the size to resolve variables.
+  exprt size = state.rename(rw_ok.size(), ns).get();
+  do_simplify(size, state.value_set);
+
+  auto alloc_size = numeric_cast<mp_integer>(size);
+  if(!alloc_size.has_value())
+    return;
+
+  if(*alloc_size < *elem_size)
+  {
+    // The assumed size is smaller than a single element, so we cannot create a
+    // typed backing object. Rather than silently dropping the assumption, warn
+    // the user: subsequent dereferences will still fail pointer checks as if no
+    // rw_ok had been written.
+    log.warning() << CPROVER_PREFIX "rw_ok assumption on '"
+                  << to_symbol_expr(ptr).get_identifier() << "' has size "
+                  << *alloc_size << " smaller than one element of size "
+                  << *elem_size
+                  << "; no backing object created and the assumption has no "
+                     "effect"
+                  << messaget::eom;
+    return;
+  }
+
+  // Record the failed symbol for this pointer so that trigger_auto_object can
+  // initialize its pointer members when the failed symbol is first
+  // dereferenced.
+  const auto &ptr_symbol = ns.lookup(to_symbol_expr(ptr).get_identifier());
+  const irep_idt &failed_id = ptr_symbol.type.get(ID_C_failed_symbol);
+  if(!failed_id.empty())
+    state.rw_ok_failed_symbols.insert(failed_id);
+
+  // Create a concrete backing object (an array for multi-element sizes).
+  typet obj_type = base_type;
+  if(*alloc_size > *elem_size)
+  {
+    mp_integer n_elements = (*alloc_size + *elem_size - 1) / *elem_size;
+    obj_type = array_typet(base_type, from_integer(n_elements, size.type()));
+  }
+
+  symbolt &obj_symbol = get_fresh_aux_symbol(
+    obj_type,
+    "symex",
+    "rw_ok_object",
+    state.source.pc->source_location(),
+    ID_C,
+    state.symbol_table);
+  obj_symbol.is_thread_local = false;
+  obj_symbol.is_file_local = false;
+
+  exprt obj_addr =
+    obj_type.id() == ID_array
+      ? address_of_exprt(
+          index_exprt(
+            obj_symbol.symbol_expr(), from_integer(0, c_index_type())),
+          ptr_type)
+      : address_of_exprt(obj_symbol.symbol_expr(), ptr_type);
+
+  // For multi-element sizes, strongly assign the pointer so that array writes
+  // and whole-array operations (e.g. __CPROVER_array_copy / array_equal)
+  // resolve to a single concrete target. For single-element sizes, use an
+  // assumption instead, which preserves pre-existing aliases (e.g. `b = a;`
+  // ahead of `assume(rw_ok(a, sizeof(*a)))`). This asymmetry is a known
+  // limitation, documented in doc/cprover-manual/memory-primitives.md.
+  if(*alloc_size > *elem_size)
+  {
+    symex_assign(state, ptr, obj_addr);
+  }
+  else
+  {
+    state.value_set.assign(renamed_ptr, obj_addr, ns, false, true);
+    symex_assume_l2(state, equal_exprt(state.rename(ptr, ns).get(), obj_addr));
+  }
+}
+
 void goto_symext::symex_assume(statet &state, const exprt &cond)
 {
+  // When an assumption contains prophecy_rw_ok(ptr, size) with a compile-time
+  // constant size, create a concrete backing object for ptr (see
+  // \ref try_create_rw_ok_backing_object). We only act on rw_ok expressions
+  // that are top-level conjuncts of the assumption: an rw_ok nested inside a
+  // negation, disjunction or conditional must not unconditionally create the
+  // object and constrain the pointer, as that would silently make e.g.
+  // `!rw_ok(p, ...)` unsatisfiable or knock out the other operands of a
+  // disjunction such as `p == &g || rw_ok(p, ...)`.
+  // This must happen before renaming cond below, because the helper may emit a
+  // symex_assume_l2 that advances SSA indices for the pointer variable.
+  std::vector<const prophecy_r_or_w_ok_exprt *> top_level_rw_oks;
+  collect_top_level_rw_ok(cond, top_level_rw_oks);
+  for(const auto *rw_ok : top_level_rw_oks)
+    try_create_rw_ok_backing_object(*rw_ok, state);
+
   exprt simplified_cond = clean_expr(cond, state, false);
   simplified_cond = state.rename(std::move(simplified_cond), ns).get();
   do_simplify(simplified_cond, state.value_set);
@@ -229,7 +368,7 @@ void goto_symext::symex_assume_l2(statet &state, const exprt &cond)
   if(has_subexpr(rewritten_cond, ID_exists))
     rewrite_quantifiers(rewritten_cond, state);
 
-  if(state.threads.size()==1)
+  if(state.threads.size() == 1)
   {
     exprt tmp = state.guard.guard_expr(rewritten_cond);
     target.assumption(state.guard.as_expr(), tmp, state.source);
@@ -243,8 +382,7 @@ void goto_symext::symex_assume_l2(statet &state, const exprt &cond)
   else
     state.guard.add(rewritten_cond);
 
-  if(state.atomic_section_id!=0 &&
-     state.guard.is_false())
+  if(state.atomic_section_id != 0 && state.guard.is_false())
     symex_atomic_end(state);
 }
 
@@ -297,7 +435,8 @@ switch_to_thread(goto_symex_statet &state, const unsigned int thread_nb)
 }
 
 void goto_symext::symex_threaded_step(
-  statet &state, const get_goto_functiont &get_goto_function)
+  statet &state,
+  const get_goto_functiont &get_goto_function)
 {
   symex_step(get_goto_function, state);
 
@@ -308,10 +447,11 @@ void goto_symext::symex_threaded_step(
     return;
 
   // is there another thread to execute?
-  if(state.call_stack().empty() &&
-     state.source.thread_nr+1<state.threads.size())
+  if(
+    state.call_stack().empty() &&
+    state.source.thread_nr + 1 < state.threads.size())
   {
-    unsigned t=state.source.thread_nr+1;
+    unsigned t = state.source.thread_nr + 1;
 #if 0
     std::cout << "********* Now executing thread " << t << '\n';
 #endif
@@ -492,10 +632,9 @@ void goto_symext::initialize_path_storage_from_entry_point_of(
 goto_symext::get_goto_functiont
 goto_symext::get_goto_function(abstract_goto_modelt &goto_model)
 {
-  return [&goto_model](
-           const irep_idt &id) -> const goto_functionst::goto_functiont & {
-    return goto_model.get_goto_function(id);
-  };
+  return
+    [&goto_model](const irep_idt &id) -> const goto_functionst::goto_functiont &
+  { return goto_model.get_goto_function(id); };
 }
 
 messaget::mstreamt &
@@ -606,7 +745,7 @@ void goto_symext::execute_next_instruction(
   PRECONDITION(!state.threads.empty());
   PRECONDITION(!state.call_stack().empty());
 
-  const goto_programt::instructiont &instruction=*state.source.pc;
+  const goto_programt::instructiont &instruction = *state.source.pc;
 
   if(!symex_config.doing_path_exploration)
     merge_gotos(state);

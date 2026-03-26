@@ -86,8 +86,9 @@ void goto_symext::trigger_auto_object(const exprt &expr, statet &state)
         const symbolt &symbol = ns.lookup(obj_identifier);
 
         if(
-          symbol.base_name.starts_with("symex::auto_object") ||
-          symbol.base_name.starts_with("auto_object"))
+          symbol.base_name.starts_with("auto_object") ||
+          (symbol.type.get_bool(ID_C_is_failed_symbol) &&
+           state.rw_ok_failed_symbols.count(obj_identifier)))
         {
           // done already?
           auto l2_index =
