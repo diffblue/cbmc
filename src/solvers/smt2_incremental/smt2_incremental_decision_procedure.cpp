@@ -126,17 +126,15 @@ void smt2_incremental_decision_proceduret::initialize_array_elements(
   const array_of_exprt &array,
   const smt_identifier_termt &array_identifier)
 {
-  const smt_sortt index_type =
-    convert_type_to_smt_sort(array.type().index_type());
-  const smt_identifier_termt array_index_identifier{
-    id2string(array_identifier.identifier()) + "_index", index_type};
+  identifier_table.emplace(array_identifier.identifier(), array_identifier);
   const smt_termt element_value = convert_expr_to_smt(array.what());
-
-  const smt_assert_commandt elements_definition{smt_forall_termt{
-    {array_index_identifier},
-    smt_core_theoryt::equal(
-      smt_array_theoryt::select(array_identifier, array_index_identifier),
-      element_value)}};
+  const auto *const array_sort =
+    array_identifier.get_sort().cast<smt_array_sortt>();
+  INVARIANT(
+    array_sort != nullptr,
+    "The identifier of an array_of term must have an array sort.");
+  const smt_assert_commandt elements_definition{smt_core_theoryt::equal(
+    array_identifier, smt_const_array_termt{*array_sort, element_value})};
   solver_process->send(elements_definition);
 }
 
@@ -187,11 +185,11 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
 {
   std::unordered_set<exprt, irep_hash> seen_expressions =
     make_range(expression_identifiers)
-      .map([](const std::pair<exprt, smt_identifier_termt> &expr_identifier) {
-        return expr_identifier.first;
-      });
+      .map([](const std::pair<exprt, smt_identifier_termt> &expr_identifier)
+           { return expr_identifier.first; });
   std::stack<exprt> to_be_defined;
-  const auto push_dependencies_needed = [&](const exprt &expr) {
+  const auto push_dependencies_needed = [&](const exprt &expr)
+  {
     bool result = false;
     for(const auto &dependency : gather_dependent_expressions(expr))
     {
@@ -251,13 +249,15 @@ static exprt substitute_identifiers(
   const std::unordered_map<exprt, smt_identifier_termt, irep_hash>
     &expression_identifiers)
 {
-  expr.visit_pre([&](exprt &node) -> void {
-    auto find_result = expression_identifiers.find(node);
-    if(find_result == expression_identifiers.cend())
-      return;
-    const auto type = find_result->first.type();
-    node = symbol_exprt{find_result->second.identifier(), type};
-  });
+  expr.visit_pre(
+    [&](exprt &node) -> void
+    {
+      auto find_result = expression_identifiers.find(node);
+      if(find_result == expression_identifiers.cend())
+        return;
+      const auto type = find_result->first.type();
+      node = symbol_exprt{find_result->second.identifier(), type};
+    });
   return expr;
 }
 
@@ -274,6 +274,11 @@ smt2_incremental_decision_proceduret::smt2_incremental_decision_proceduret(
 {
   solver_process->send(
     smt_set_option_commandt{smt_option_produce_modelst{true}});
+  // The `ALL` logic is required because `array_of` is encoded using the
+  // constant-array form `((as const (Array I E)) v)`, which is a solver
+  // extension not available under the standard quantifier-free logics. It is
+  // supported by Z3 and CVC5 under `ALL`; in particular Z3 rejects it (with
+  // "unknown constant const") under `QF_AUFBV`.
   solver_process->send(smt_set_logic_commandt{smt_logic_allt{}});
   solver_process->send(object_size_function.declaration);
   solver_process->send(is_dynamic_object_function.declaration);
@@ -281,31 +286,35 @@ smt2_incremental_decision_proceduret::smt2_incremental_decision_proceduret(
 
 static exprt lower_rw_ok_pointer_in_range(exprt expr, const namespacet &ns)
 {
-  expr.visit_pre([&ns](exprt &expr) {
-    if(
-      auto prophecy_r_or_w_ok =
-        expr_try_dynamic_cast<prophecy_r_or_w_ok_exprt>(expr))
+  expr.visit_pre(
+    [&ns](exprt &expr)
     {
-      expr = simplify_expr(prophecy_r_or_w_ok->lower(ns), ns);
-    }
-    else if(
-      auto prophecy_pointer_in_range =
-        expr_try_dynamic_cast<prophecy_pointer_in_range_exprt>(expr))
-    {
-      expr = simplify_expr(prophecy_pointer_in_range->lower(ns), ns);
-    }
-  });
+      if(
+        auto prophecy_r_or_w_ok =
+          expr_try_dynamic_cast<prophecy_r_or_w_ok_exprt>(expr))
+      {
+        expr = simplify_expr(prophecy_r_or_w_ok->lower(ns), ns);
+      }
+      else if(
+        auto prophecy_pointer_in_range =
+          expr_try_dynamic_cast<prophecy_pointer_in_range_exprt>(expr))
+      {
+        expr = simplify_expr(prophecy_pointer_in_range->lower(ns), ns);
+      }
+    });
   return expr;
 }
 
 static exprt lower_zero_extend(exprt expr, const namespacet &ns)
 {
-  expr.visit_pre([](exprt &expr) {
-    if(auto zero_extend = expr_try_dynamic_cast<zero_extend_exprt>(expr))
+  expr.visit_pre(
+    [](exprt &expr)
     {
-      expr = zero_extend->lower();
-    }
-  });
+      if(auto zero_extend = expr_try_dynamic_cast<zero_extend_exprt>(expr))
+      {
+        expr = zero_extend->lower();
+      }
+    });
   return expr;
 }
 
@@ -397,16 +406,18 @@ void smt2_incremental_decision_proceduret::define_index_identifiers(
 exprt smt2_incremental_decision_proceduret::substitute_defined_padding(
   exprt root_expr)
 {
-  root_expr.visit_pre([&](exprt &node) {
-    if(const auto pad = expr_try_dynamic_cast<nondet_padding_exprt>(node))
+  root_expr.visit_pre(
+    [&](exprt &node)
     {
-      const auto instance = "padding_" + std::to_string(padding_sequence());
-      const auto term =
-        smt_identifier_termt{instance, convert_type_to_smt_sort(pad->type())};
-      solver_process->send(smt_declare_function_commandt{term, {}});
-      node = symbol_exprt{instance, node.type()};
-    }
-  });
+      if(const auto pad = expr_try_dynamic_cast<nondet_padding_exprt>(node))
+      {
+        const auto instance = "padding_" + std::to_string(padding_sequence());
+        const auto term =
+          smt_identifier_termt{instance, convert_type_to_smt_sort(pad->type())};
+        solver_process->send(smt_declare_function_commandt{term, {}});
+        node = symbol_exprt{instance, node.type()};
+      }
+    });
   return root_expr;
 }
 
@@ -434,9 +445,10 @@ smt2_incremental_decision_proceduret::convert_expr_to_smt(const exprt &expr)
 
 exprt smt2_incremental_decision_proceduret::handle(const exprt &expr)
 {
-  log.conditional_output(log.debug(), [&](messaget::mstreamt &debug) {
-    debug << "`handle`  -\n  " << expr.pretty(2, 0) << messaget::eom;
-  });
+  log.conditional_output(
+    log.debug(),
+    [&](messaget::mstreamt &debug)
+    { debug << "`handle`  -\n  " << expr.pretty(2, 0) << messaget::eom; });
   ensure_handle_for_expr_defined(expr);
   return expr;
 }
@@ -581,10 +593,12 @@ static exprt build_expr_based_on_getting_operands(
 
 exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
 {
-  log.conditional_output(log.debug(), [&](messaget::mstreamt &debug) {
-    debug << "`get` - \n  " + expr.pretty(2, 0) << messaget::eom;
-  });
-  auto descriptor = [&]() -> std::optional<smt_termt> {
+  log.conditional_output(
+    log.debug(),
+    [&](messaget::mstreamt &debug)
+    { debug << "`get` - \n  " + expr.pretty(2, 0) << messaget::eom; });
+  auto descriptor = [&]() -> std::optional<smt_termt>
+  {
     if(const auto index_expr = expr_try_dynamic_cast<index_exprt>(expr))
     {
       const auto array = get_identifier(index_expr->array());
@@ -648,15 +662,19 @@ void smt2_incremental_decision_proceduret::set_to(
   const exprt &in_expr,
   bool value)
 {
-  log.conditional_output(log.debug(), [&](messaget::mstreamt &debug) {
-    debug << "`set_to` (" << std::string{value ? "true" : "false"} << ") -\n  "
-          << in_expr.pretty(2, 0) << messaget::eom;
-  });
+  log.conditional_output(
+    log.debug(),
+    [&](messaget::mstreamt &debug)
+    {
+      debug << "`set_to` (" << std::string{value ? "true" : "false"}
+            << ") -\n  " << in_expr.pretty(2, 0) << messaget::eom;
+    });
   const exprt lowered_expr = lower(in_expr);
   PRECONDITION(can_cast_type<bool_typet>(lowered_expr.type()));
 
   define_dependent_functions(lowered_expr);
-  auto converted_term = [&]() -> smt_termt {
+  auto converted_term = [&]() -> smt_termt
+  {
     const auto expression_handle_identifier =
       expression_handle_identifiers.find(lowered_expr);
     if(expression_handle_identifier != expression_handle_identifiers.cend())
@@ -729,10 +747,13 @@ exprt smt2_incremental_decision_proceduret::lower(exprt expression) const
         lower_floatbv(lower_rw_ok_pointer_in_range(expression, ns)), ns),
       ns),
     ns));
-  log.conditional_output(log.debug(), [&](messaget::mstreamt &debug) {
-    if(lowered != expression)
-      debug << "lowered to -\n  " << lowered.pretty(2, 0) << messaget::eom;
-  });
+  log.conditional_output(
+    log.debug(),
+    [&](messaget::mstreamt &debug)
+    {
+      if(lowered != expression)
+        debug << "lowered to -\n  " << lowered.pretty(2, 0) << messaget::eom;
+    });
   return lowered;
 }
 

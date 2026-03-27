@@ -7,7 +7,7 @@ add_test_pl_profile(
 
 add_test_pl_profile(
     "cbmc-incr-smt2-cvc5"
-    "$<TARGET_FILE:cbmc> --incremental-smt2-solver 'cvc5 --lang=smtlib2.6 --incremental' --validate-goto-model --validate-ssa-equation"
+    "$<TARGET_FILE:cbmc> --incremental-smt2-solver 'cvc5 --lang=smtlib2.6 --incremental --arrays-exp' --validate-goto-model --validate-ssa-equation"
     "-C;-s;new-smt-cvc5"
     "CORE"
 )
