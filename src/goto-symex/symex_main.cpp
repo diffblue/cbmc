@@ -623,6 +623,23 @@ void goto_symext::symex_step(
   }
 
   execute_next_instruction(get_goto_function, state);
+
+  // Track formula growth — warn when a single instruction adds many SSA steps
+  {
+    const std::size_t new_size = target.SSA_steps.size();
+    const std::size_t growth = new_size - last_equation_size;
+    if(growth > 100)
+    {
+      const auto &loc = state.source.pc->source_location();
+      log.statistics() << "Large SSA growth: +" << growth << " steps at "
+                       << id2string(state.source.function_id);
+      if(!loc.get_file().empty())
+        log.statistics() << " (" << id2string(loc.get_file()) << ":"
+                         << id2string(loc.get_line()) << ")";
+      log.statistics() << ", total " << new_size << messaget::eom;
+    }
+    last_equation_size = new_size;
+  }
   kill_instruction_local_symbols(state);
 }
 

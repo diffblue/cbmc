@@ -855,6 +855,7 @@ protected:
 
   /// Total symex steps and timestamp for periodic progress reporting.
   std::size_t total_symex_steps = 0;
+  std::size_t last_equation_size = 0;
   std::chrono::steady_clock::time_point last_progress_report =
     std::chrono::steady_clock::now();
 
