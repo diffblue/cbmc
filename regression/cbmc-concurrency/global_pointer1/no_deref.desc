@@ -1,4 +1,4 @@
-KNOWNBUG pthread
+CORE pthread
 main.c
 -DNO_DEREF
 ^EXIT=0$
@@ -6,6 +6,3 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
---
-Simplification with value sets causes unsound results despite the absence of
-dereferencing.
