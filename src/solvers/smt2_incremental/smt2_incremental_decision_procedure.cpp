@@ -26,6 +26,12 @@
 #include <stack>
 #include <unordered_set>
 
+/// Maximum number of array elements to retrieve from the solver during
+/// trace generation. Arrays larger than this threshold will not have
+/// their values retrieved element by element, as doing so would be
+/// prohibitively slow or cause out-of-memory issues.
+static const std::size_t MAX_TRACE_ARRAY_SIZE = 1000;
+
 /// Issues a command to the solving process which is expected to optionally
 /// return a success status followed by the actual response of interest.
 static smt_responset get_response_to_command(
@@ -438,6 +444,13 @@ std::optional<exprt> smt2_incremental_decision_proceduret::get_expr(
   INVARIANT(
     size,
     "Size of array must be convertible to std::size_t for getting array value");
+  if(*size > MAX_TRACE_ARRAY_SIZE)
+  {
+    log.warning() << "cannot retrieve array of size " << *size
+                  << " from SMT solver due to size limit of "
+                  << MAX_TRACE_ARRAY_SIZE << messaget::eom;
+    return {};
+  }
   std::vector<exprt> elements;
   const auto index_type = type.index_type();
   elements.reserve(*size);
