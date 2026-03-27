@@ -1,8 +1,9 @@
 CORE pthread
 main.c
 
-pointer handling for concurrency is unsound
-^EXIT=6$
+^VERIFICATION FAILED$
+^EXIT=10$
 ^SIGNAL=0$
 --
 ^warning: ignoring
+pointer handling for concurrency is unsound

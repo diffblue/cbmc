@@ -19,6 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/invariant.h>
 #include <util/pointer_offset_size.h>
 
+#include <optional>
+
 #include <pointer-analysis/value_set_dereference.h>
 
 #include "expr_skeleton.h"
@@ -249,16 +251,15 @@ goto_symext::cache_dereference(exprt &dereference_result, statet &state)
   return cache_symbol_expr;
 }
 
-/// Inspect \p expr to confirm that it can be safely dereferenced even in a
-/// concurrent setting. Uses \p ns and \p dirty to identify potentially-shared
-/// objects.
-static void check_concurrency_soundness(
+/// Check whether the pointer expression used for dereferencing involves
+/// shared state. If it does, return the first shared symbol found.
+/// Uses \p ns and \p dirty to identify potentially-shared objects.
+/// \return The shared symbol expression if found, empty optional otherwise.
+static std::optional<symbol_exprt> find_shared_pointer_in_dereference(
   const exprt &expr,
   const incremental_dirtyt &dirty,
   const namespacet &ns)
 {
-  // Make sure we are not trying to dereference a shared pointer, as this may be
-  // unsound: see #305 on GitHub for a simple example and possible discussion.
   for(auto it = expr.depth_cbegin(); it != expr.depth_cend(); /* no ++it */)
   {
     if(it->id() == ID_address_of)
@@ -275,13 +276,13 @@ static void check_concurrency_soundness(
         obj_name != goto_symex_statet::guard_identifier() &&
         (ns.lookup(obj_name).is_shared() || dirty(obj_name)))
       {
-        throw unsupported_operation_exceptiont(
-          "pointer handling for concurrency is unsound: " +
-          id2string(obj_name));
+        return *sym_expr;
       }
     }
     ++it;
   }
+
+  return {};
 }
 
 /// If \p expr is a \ref dereference_exprt, replace it with explicit references
@@ -356,8 +357,36 @@ void goto_symext::dereference_rec(
 
     tmp1 = state.field_sensitivity.apply(ns, state, std::move(tmp1), false);
 
+    // In multi-threaded mode, if the pointer expression involves shared state,
+    // bypass value-set dereference and create a fresh may-alias object instead.
     if(state.threads.size() > 1 && !symex_config.allow_pointer_unsoundness)
-      check_concurrency_soundness(tmp1, path_storage.dirty, ns);
+    {
+      auto shared_sym = find_shared_pointer_in_dereference(
+        tmp1, path_storage.dirty, ns);
+      if(shared_sym.has_value())
+      {
+        // Create a fresh symbol to represent what the shared pointer may
+        // point to. The type is the pointed-to type (i.e. the type of the
+        // dereference expression itself).
+        symbolt &may_alias_symbol = get_fresh_aux_symbol(
+          expr.type(),
+          "concurrency",
+          "may_alias",
+          state.source.pc->source_location(),
+          language_mode,
+          state.symbol_table);
+        may_alias_symbol.is_thread_local = false;
+        may_alias_symbol.is_file_local = false;
+
+        // Store the source pointer as an annotation on the symbol expression
+        // so the memory model can later create conditional aliasing constraints.
+        symbol_exprt result_expr = may_alias_symbol.symbol_expr();
+        result_expr.set(ID_C_class, tmp1);
+
+        expr = std::move(result_expr);
+        return;
+      }
+    }
 
     // we need to set up some elaborate call-backs
     symex_dereference_statet symex_dereference_state(state, ns);

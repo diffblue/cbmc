@@ -165,6 +165,16 @@ public:
   // for function calls
   std::vector<exprt> ssa_function_arguments, converted_function_arguments;
 
+  // For may-alias objects created during concurrent pointer dereferencing:
+  // records the pointer expression that this may-alias object was created for.
+  // Empty (nil) for regular events.
+  exprt may_alias_pointer;
+
+  bool is_may_alias() const
+  {
+    return may_alias_pointer.is_not_nil();
+  }
+
   // for SHARED_READ/SHARED_WRITE and ATOMIC_BEGIN/ATOMIC_END
   unsigned atomic_section_id = 0;
 
@@ -190,6 +200,7 @@ public:
       cond_expr(static_cast<const exprt &>(get_nil_irep())),
       cond_handle(false_exprt()),
       formatted(false),
+      may_alias_pointer(static_cast<const exprt &>(get_nil_irep())),
       atomic_section_id(0),
       ignore(false)
   {
