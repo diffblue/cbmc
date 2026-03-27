@@ -85,6 +85,9 @@
 #  include <poll.h>   // library for poll function
 #  include <signal.h> // library for kill function
 #  include <unistd.h> // library for read/write/sleep/etc. functions
+#  ifdef __linux__
+#    include <sys/prctl.h> // library for prctl function
+#  endif
 #endif
 
 #include "exception_utils.h"
@@ -264,6 +267,17 @@ piped_processt::piped_processt(
   if(child_process_id == 0)
   {
     // child process here
+
+#  ifdef __linux__
+    // Request the kernel to send SIGTERM to this (child) process
+    // when the parent process dies. This prevents orphan processes
+    // (e.g. z3) from persisting after CBMC is killed.
+    prctl(PR_SET_PDEATHSIG, SIGTERM);
+    // Handle the race where the parent died between fork() and
+    // prctl(): if we've been reparented, the parent is already gone.
+    if(getppid() == 1)
+      _exit(1);
+#  endif
 
     // Close pipes that will be used by the parent so we do
     // not have our own copies and conflicts.

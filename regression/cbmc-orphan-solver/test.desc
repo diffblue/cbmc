@@ -1,0 +1,10 @@
+CORE
+main.c
+
+^PASSED$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Verifies solver child processes are terminated when CBMC is killed
+(Linux PR_SET_PDEATHSIG).
