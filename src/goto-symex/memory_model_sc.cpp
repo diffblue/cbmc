@@ -13,8 +13,9 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 #include <util/std_expr.h>
 
-void memory_model_sct::
-operator()(symex_target_equationt &equation, message_handlert &message_handler)
+void memory_model_sct::operator()(
+  symex_target_equationt &equation,
+  message_handlert &message_handler)
 {
   messaget log{message_handler};
   log.statistics() << "Adding SC constraints" << messaget::eom;
@@ -30,8 +31,7 @@ operator()(symex_target_equationt &equation, message_handlert &message_handler)
 
 exprt memory_model_sct::before(event_it e1, event_it e2)
 {
-  return partial_order_concurrencyt::before(
-    e1, e2, AX_PROPAGATION);
+  return partial_order_concurrencyt::before(e1, e2, AX_PROPAGATION);
 }
 
 bool memory_model_sct::program_order_is_relaxed(
@@ -50,16 +50,15 @@ void memory_model_sct::build_per_thread_map(
 {
   // this orders the events within a thread
 
-  for(eventst::const_iterator
-      e_it=equation.SSA_steps.begin();
-      e_it!=equation.SSA_steps.end();
+  for(eventst::const_iterator e_it = equation.SSA_steps.begin();
+      e_it != equation.SSA_steps.end();
       e_it++)
   {
     // concurrency-related?
-    if(!e_it->is_shared_read() &&
-       !e_it->is_shared_write() &&
-       !e_it->is_spawn() &&
-       !e_it->is_memory_barrier()) continue;
+    if(
+      !e_it->is_shared_read() && !e_it->is_shared_write() &&
+      !e_it->is_spawn() && !e_it->is_memory_barrier())
+      continue;
 
     dest[e_it->source.thread_nr].push_back(e_it);
   }
@@ -72,32 +71,27 @@ void memory_model_sct::thread_spawn(
   // thread spawn: the spawn precedes the first
   // instruction of the new thread in program order
 
-  unsigned next_thread_id=0;
-  for(eventst::const_iterator
-      e_it=equation.SSA_steps.begin();
-      e_it!=equation.SSA_steps.end();
+  unsigned next_thread_id = 0;
+  for(eventst::const_iterator e_it = equation.SSA_steps.begin();
+      e_it != equation.SSA_steps.end();
       e_it++)
   {
     if(e_it->is_spawn())
     {
-      per_thread_mapt::const_iterator next_thread=
+      per_thread_mapt::const_iterator next_thread =
         per_thread_map.find(++next_thread_id);
-      if(next_thread==per_thread_map.end())
+      if(next_thread == per_thread_map.end())
         continue;
 
       // add a constraint for all events,
       // considering regression/cbmc-concurrency/pthread_create_tso1
-      for(event_listt::const_iterator
-          n_it=next_thread->second.begin();
-          n_it!=next_thread->second.end();
+      for(event_listt::const_iterator n_it = next_thread->second.begin();
+          n_it != next_thread->second.end();
           n_it++)
       {
         if(!(*n_it)->is_memory_barrier())
           add_constraint(
-            equation,
-            before(e_it, *n_it),
-            "thread-spawn",
-            e_it->source);
+            equation, before(e_it, *n_it), "thread-spawn", e_it->source);
       }
     }
   }
@@ -148,8 +142,7 @@ void memory_model_sct::thread_spawn(
 }
 #endif
 
-void memory_model_sct::program_order(
-  symex_target_equationt &equation)
+void memory_model_sct::program_order(symex_target_equationt &equation)
 {
   per_thread_mapt per_thread_map;
   build_per_thread_map(equation, per_thread_map);
@@ -158,39 +151,32 @@ void memory_model_sct::program_order(
 
   // iterate over threads
 
-  for(per_thread_mapt::const_iterator
-      t_it=per_thread_map.begin();
-      t_it!=per_thread_map.end();
+  for(per_thread_mapt::const_iterator t_it = per_thread_map.begin();
+      t_it != per_thread_map.end();
       t_it++)
   {
-    const event_listt &events=t_it->second;
+    const event_listt &events = t_it->second;
 
     // iterate over relevant events in the thread
 
-    event_it previous=equation.SSA_steps.end();
+    event_it previous = equation.SSA_steps.end();
 
-    for(event_listt::const_iterator
-        e_it=events.begin();
-        e_it!=events.end();
+    for(event_listt::const_iterator e_it = events.begin(); e_it != events.end();
         e_it++)
     {
       if((*e_it)->is_memory_barrier())
-         continue;
+        continue;
 
-      if(previous==equation.SSA_steps.end())
+      if(previous == equation.SSA_steps.end())
       {
         // first one?
-        previous=*e_it;
+        previous = *e_it;
         continue;
       }
 
-      add_constraint(
-        equation,
-        before(previous, *e_it),
-        "po",
-        (*e_it)->source);
+      add_constraint(equation, before(previous, *e_it), "po", (*e_it)->source);
 
-      previous=*e_it;
+      previous = *e_it;
     }
   }
 }
@@ -198,31 +184,27 @@ void memory_model_sct::program_order(
 void memory_model_sct::write_serialization_external(
   symex_target_equationt &equation)
 {
-  for(address_mapt::const_iterator
-      a_it=address_map.begin();
-      a_it!=address_map.end();
+  for(address_mapt::const_iterator a_it = address_map.begin();
+      a_it != address_map.end();
       a_it++)
   {
-    const a_rect &a_rec=a_it->second;
+    const a_rect &a_rec = a_it->second;
 
     // This is quadratic in the number of writes
     // per address. Perhaps some better encoding
     // based on 'places'?
-    for(event_listt::const_iterator
-        w_it1=a_rec.writes.begin();
-        w_it1!=a_rec.writes.end();
+    for(event_listt::const_iterator w_it1 = a_rec.writes.begin();
+        w_it1 != a_rec.writes.end();
         ++w_it1)
     {
-      event_listt::const_iterator next=w_it1;
+      event_listt::const_iterator next = w_it1;
       ++next;
 
-      for(event_listt::const_iterator w_it2=next;
-          w_it2!=a_rec.writes.end();
+      for(event_listt::const_iterator w_it2 = next; w_it2 != a_rec.writes.end();
           ++w_it2)
       {
         // external?
-        if((*w_it1)->source.thread_nr==
-           (*w_it2)->source.thread_nr)
+        if((*w_it1)->source.thread_nr == (*w_it2)->source.thread_nr)
           continue;
 
         // ws is a total order, no two elements have the same rank
@@ -233,7 +215,7 @@ void memory_model_sct::write_serialization_external(
         exprt alias2 = alias_condition(*w_it2, a_it->first);
         exprt alias_guard = conjunction({alias1, alias2});
 
-        symbol_exprt s=nondet_bool_symbol("ws-ext");
+        symbol_exprt s = nondet_bool_symbol("ws-ext");
 
         // write-to-write edge
         add_constraint(
@@ -257,60 +239,53 @@ void memory_model_sct::from_read(symex_target_equationt &equation)
 {
   // from-read: (w', w) in ws and (w', r) in rf -> (r, w) in fr
 
-  for(address_mapt::const_iterator
-      a_it=address_map.begin();
-      a_it!=address_map.end();
+  for(address_mapt::const_iterator a_it = address_map.begin();
+      a_it != address_map.end();
       a_it++)
   {
-    const a_rect &a_rec=a_it->second;
+    const a_rect &a_rec = a_it->second;
 
     // This is quadratic in the number of writes per address.
-    for(event_listt::const_iterator
-        w_prime=a_rec.writes.begin();
-        w_prime!=a_rec.writes.end();
+    for(event_listt::const_iterator w_prime = a_rec.writes.begin();
+        w_prime != a_rec.writes.end();
         ++w_prime)
     {
-      event_listt::const_iterator next=w_prime;
+      event_listt::const_iterator next = w_prime;
       ++next;
 
-      for(event_listt::const_iterator w=next;
-          w!=a_rec.writes.end();
-          ++w)
+      for(event_listt::const_iterator w = next; w != a_rec.writes.end(); ++w)
       {
         exprt ws1, ws2;
 
-        if(po(*w_prime, *w) &&
-           !program_order_is_relaxed(*w_prime, *w))
+        if(po(*w_prime, *w) && !program_order_is_relaxed(*w_prime, *w))
         {
-          ws1=true_exprt();
-          ws2=false_exprt();
+          ws1 = true_exprt();
+          ws2 = false_exprt();
         }
-        else if(po(*w, *w_prime) &&
-                !program_order_is_relaxed(*w, *w_prime))
+        else if(po(*w, *w_prime) && !program_order_is_relaxed(*w, *w_prime))
         {
-          ws1=false_exprt();
-          ws2=true_exprt();
+          ws1 = false_exprt();
+          ws2 = true_exprt();
         }
         else
         {
-          ws1=before(*w_prime, *w);
-          ws2=before(*w, *w_prime);
+          ws1 = before(*w_prime, *w);
+          ws2 = before(*w, *w_prime);
         }
 
         // smells like cubic
-        for(choice_symbolst::const_iterator
-            c_it=choice_symbols.begin();
-            c_it!=choice_symbols.end();
+        for(choice_symbolst::const_iterator c_it = choice_symbols.begin();
+            c_it != choice_symbols.end();
             c_it++)
         {
-          event_it r=c_it->first.first;
-          exprt rf=c_it->second;
+          event_it r = c_it->first.first;
+          exprt rf = c_it->second;
           exprt cond;
           cond.make_nil();
 
           if(c_it->first.second == *w_prime && ws1 != false)
           {
-            exprt fr=before(r, *w);
+            exprt fr = before(r, *w);
 
             // Alias conditions for the involved events
             exprt r_alias = alias_condition(r, a_it->first);
@@ -320,21 +295,20 @@ void memory_model_sct::from_read(symex_target_equationt &equation)
             // the guard of w_prime follows from rf; with rfi
             // optimisation such as the previous write_symbol_primed
             // it would even be wrong to add this guard
-            cond=
-              implies_exprt(
-                conjunction({
-                  r->guard,
-                  (*w)->guard,
-                  ws1,
-                  rf,
-                  r_alias,
-                  w_prime_alias,
-                  w_alias}),
-                fr);
+            cond = implies_exprt(
+              conjunction(
+                {r->guard,
+                 (*w)->guard,
+                 ws1,
+                 rf,
+                 r_alias,
+                 w_prime_alias,
+                 w_alias}),
+              fr);
           }
           else if(c_it->first.second == *w && ws2 != false)
           {
-            exprt fr=before(r, *w_prime);
+            exprt fr = before(r, *w_prime);
 
             // Alias conditions for the involved events
             exprt r_alias = alias_condition(r, a_it->first);
@@ -344,22 +318,20 @@ void memory_model_sct::from_read(symex_target_equationt &equation)
             // the guard of w follows from rf; with rfi
             // optimisation such as the previous write_symbol_primed
             // it would even be wrong to add this guard
-            cond=
-              implies_exprt(
-                conjunction({
-                  r->guard,
-                  (*w_prime)->guard,
-                  ws2,
-                  rf,
-                  r_alias,
-                  w_alias,
-                  w_prime_alias}),
-                fr);
+            cond = implies_exprt(
+              conjunction(
+                {r->guard,
+                 (*w_prime)->guard,
+                 ws2,
+                 rf,
+                 r_alias,
+                 w_alias,
+                 w_prime_alias}),
+              fr);
           }
 
           if(cond.is_not_nil())
-            add_constraint(equation,
-              cond, "fr", r->source);
+            add_constraint(equation, cond, "fr", r->source);
         }
       }
     }

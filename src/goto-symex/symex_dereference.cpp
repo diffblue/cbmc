@@ -19,8 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/invariant.h>
 #include <util/pointer_offset_size.h>
 
-#include <optional>
-
 #include <pointer-analysis/value_set_dereference.h>
 
 #include "expr_skeleton.h"
@@ -28,6 +26,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "path_storage.h"
 #include "symex_assign.h"
 #include "symex_dereference_state.h"
+
+#include <optional>
 
 /// Transforms an lvalue expression by replacing any dereference operations it
 /// contains with explicit references to the objects they may point to (using
@@ -49,20 +49,21 @@ exprt goto_symext::address_arithmetic(
 {
   exprt result;
 
-  if(expr.id()==ID_byte_extract_little_endian ||
-     expr.id()==ID_byte_extract_big_endian)
+  if(
+    expr.id() == ID_byte_extract_little_endian ||
+    expr.id() == ID_byte_extract_big_endian)
   {
     // address_of(byte_extract(op, offset, t)) is
     // address_of(op) + offset with adjustments for arrays
 
-    const byte_extract_exprt &be=to_byte_extract_expr(expr);
+    const byte_extract_exprt &be = to_byte_extract_expr(expr);
 
     // recursive call
     result = address_arithmetic(be.op(), state, keep_array);
 
     if(be.op().type().id() == ID_array && result.id() == ID_address_of)
     {
-      address_of_exprt &a=to_address_of_expr(result);
+      address_of_exprt &a = to_address_of_expr(result);
 
       // turn &a of type T[i][j] into &(a[0][0])
       for(const typet *t = &(to_type_with_subtype(a.type()).subtype());
@@ -72,27 +73,26 @@ exprt goto_symext::address_arithmetic(
     }
 
     // do (expr.type() *)(((char *)op)+offset)
-    result=typecast_exprt(result, pointer_type(char_type()));
+    result = typecast_exprt(result, pointer_type(char_type()));
 
     // there could be further dereferencing in the offset
-    exprt offset=be.offset();
+    exprt offset = be.offset();
     dereference_rec(offset, state, false, false);
 
-    result=plus_exprt(result, offset);
+    result = plus_exprt(result, offset);
 
     // treat &array as &array[0]
     const typet &expr_type = expr.type();
     typet dest_type_subtype;
 
-    if(expr_type.id()==ID_array && !keep_array)
+    if(expr_type.id() == ID_array && !keep_array)
       dest_type_subtype = to_array_type(expr_type).element_type();
     else
-      dest_type_subtype=expr_type;
+      dest_type_subtype = expr_type;
 
-    result=typecast_exprt(result, pointer_type(dest_type_subtype));
+    result = typecast_exprt(result, pointer_type(dest_type_subtype));
   }
-  else if(expr.id()==ID_index ||
-          expr.id()==ID_member)
+  else if(expr.id() == ID_index || expr.id() == ID_member)
   {
     object_descriptor_exprt ode;
     ode.build(expr, ns);
@@ -105,18 +105,18 @@ exprt goto_symext::address_arithmetic(
 
     do_simplify(result, state);
   }
-  else if(expr.id()==ID_dereference)
+  else if(expr.id() == ID_dereference)
   {
     // ANSI-C guarantees &*p == p no matter what p is,
     // even if it's complete garbage
     // just grab the pointer, but be wary of further dereferencing
     // in the pointer itself
-    result=to_dereference_expr(expr).pointer();
+    result = to_dereference_expr(expr).pointer();
     dereference_rec(result, state, false, false);
   }
-  else if(expr.id()==ID_if)
+  else if(expr.id() == ID_if)
   {
-    if_exprt if_expr=to_if_expr(expr);
+    if_exprt if_expr = to_if_expr(expr);
 
     // the condition is not an address
     dereference_rec(if_expr.cond(), state, false, false);
@@ -127,15 +127,14 @@ exprt goto_symext::address_arithmetic(
     if_expr.false_case() =
       address_arithmetic(if_expr.false_case(), state, keep_array);
 
-    result=if_expr;
+    result = if_expr;
   }
-  else if(expr.id()==ID_symbol ||
-          expr.id()==ID_string_constant ||
-          expr.id()==ID_label ||
-          expr.id()==ID_array)
+  else if(
+    expr.id() == ID_symbol || expr.id() == ID_string_constant ||
+    expr.id() == ID_label || expr.id() == ID_array)
   {
     // give up, just dereference
-    result=expr;
+    result = expr;
     dereference_rec(result, state, false, false);
 
     // turn &array into &array[0]
@@ -143,7 +142,7 @@ exprt goto_symext::address_arithmetic(
       result = index_exprt(result, from_integer(0, c_index_type()));
 
     // handle field-sensitive SSA symbol
-    mp_integer offset=0;
+    mp_integer offset = 0;
     if(is_ssa_expr(expr))
     {
       auto offset_opt = compute_pointer_offset(expr, ns);
@@ -151,7 +150,7 @@ exprt goto_symext::address_arithmetic(
       offset = *offset_opt;
     }
 
-    if(offset>0)
+    if(offset > 0)
     {
       const byte_extract_exprt be = make_byte_extract(
         to_ssa_expr(expr).get_l1_object(),
@@ -163,7 +162,7 @@ exprt goto_symext::address_arithmetic(
       do_simplify(result, state);
     }
     else
-      result=address_of_exprt(result);
+      result = address_of_exprt(result);
   }
   else if(expr.id() == ID_typecast)
   {
@@ -198,7 +197,8 @@ exprt goto_symext::address_arithmetic(
 symbol_exprt
 goto_symext::cache_dereference(exprt &dereference_result, statet &state)
 {
-  auto const cache_key = [&] {
+  auto const cache_key = [&]
+  {
     auto cache_key =
       state.field_sensitivity.apply(ns, state, dereference_result, false);
     if(auto let_expr = expr_try_dynamic_cast<let_exprt>(dereference_result))
@@ -302,7 +302,7 @@ void goto_symext::dereference_rec(
   bool write,
   bool is_in_binding_expression)
 {
-  if(expr.id()==ID_dereference)
+  if(expr.id() == ID_dereference)
   {
     bool expr_is_not_null = false;
 
@@ -361,8 +361,8 @@ void goto_symext::dereference_rec(
     // bypass value-set dereference and create a fresh may-alias object instead.
     if(state.threads.size() > 1 && !symex_config.allow_pointer_unsoundness)
     {
-      auto shared_sym = find_shared_pointer_in_dereference(
-        tmp1, path_storage.dirty, ns);
+      auto shared_sym =
+        find_shared_pointer_in_dereference(tmp1, path_storage.dirty, ns);
       if(shared_sym.has_value())
       {
         // Create a fresh symbol to represent what the shared pointer may
@@ -403,7 +403,6 @@ void goto_symext::dereference_rec(
       dereference.dereference(tmp1, symex_config.show_points_to_sets);
     // std::cout << "**** " << format(tmp2) << '\n';
 
-
     // this may yield a new auto-object
     trigger_auto_object(tmp2, state);
 
@@ -435,37 +434,38 @@ void goto_symext::dereference_rec(
     // where a is a zero-sized array. This gets
     // re-written into *(&x.a+i)
 
-    index_exprt index_expr=to_index_expr(expr);
+    index_exprt index_expr = to_index_expr(expr);
 
     address_of_exprt address_of_expr(index_expr.array());
-    address_of_expr.type()=pointer_type(expr.type());
+    address_of_expr.type() = pointer_type(expr.type());
 
     dereference_exprt tmp{plus_exprt{address_of_expr, index_expr.index()}};
-    tmp.add_source_location()=expr.source_location();
+    tmp.add_source_location() = expr.source_location();
 
     // recursive call
     dereference_rec(tmp, state, write, is_in_binding_expression);
 
     expr.swap(tmp);
   }
-  else if(expr.id()==ID_index &&
-          to_index_expr(expr).array().type().id()==ID_pointer)
+  else if(
+    expr.id() == ID_index &&
+    to_index_expr(expr).array().type().id() == ID_pointer)
   {
     // old stuff, will go away
     UNREACHABLE;
   }
-  else if(expr.id()==ID_address_of)
+  else if(expr.id() == ID_address_of)
   {
-    address_of_exprt &address_of_expr=to_address_of_expr(expr);
+    address_of_exprt &address_of_expr = to_address_of_expr(expr);
 
-    exprt &object=address_of_expr.object();
+    exprt &object = address_of_expr.object();
 
     expr = address_arithmetic(
       object, state, to_pointer_type(expr.type()).base_type().id() == ID_array);
   }
-  else if(expr.id()==ID_typecast)
+  else if(expr.id() == ID_typecast)
   {
-    exprt &tc_op=to_typecast_expr(expr).op();
+    exprt &tc_op = to_typecast_expr(expr).op();
 
     // turn &array into &array[0] when casting to pointer-to-element-type
     if(
@@ -555,10 +555,13 @@ void goto_symext::dereference(exprt &expr, statet &state, bool write)
   // Symbols whose address is taken need to be renamed to level 1
   // in order to distinguish addresses of local variables
   // from different frames.
-  expr = apply_to_objects_in_dereference(std::move(expr), [&](exprt e) {
-    return state.field_sensitivity.apply(
-      ns, state, state.rename<L1>(std::move(e), ns).get(), false);
-  });
+  expr = apply_to_objects_in_dereference(
+    std::move(expr),
+    [&](exprt e)
+    {
+      return state.field_sensitivity.apply(
+        ns, state, state.rename<L1>(std::move(e), ns).get(), false);
+    });
 
   // start the recursion!
   dereference_rec(expr, state, write, false);
