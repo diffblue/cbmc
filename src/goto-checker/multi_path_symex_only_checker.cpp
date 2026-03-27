@@ -11,6 +11,7 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include "multi_path_symex_only_checker.h"
 
+#include <util/memory_info.h>
 #include <util/ui_message.h>
 
 #include <goto-symex/shadow_memory.h>
@@ -18,6 +19,8 @@ Author: Daniel Kroening, Peter Schrammel
 #include <goto-symex/show_vcc.h>
 
 #include "bmc_util.h"
+
+#include <algorithm>
 
 multi_path_symex_only_checkert::multi_path_symex_only_checkert(
   const optionst &options,
@@ -41,8 +44,8 @@ multi_path_symex_only_checkert::multi_path_symex_only_checkert(
     options.get_list_option("unwindset"), goto_model, ui_message_handler);
 }
 
-incremental_goto_checkert::resultt multi_path_symex_only_checkert::
-operator()(propertiest &properties)
+incremental_goto_checkert::resultt
+multi_path_symex_only_checkert::operator()(propertiest &properties)
 {
   generate_equation();
 
@@ -88,6 +91,37 @@ void multi_path_symex_only_checkert::generate_equation()
     std::chrono::duration<double>(symex_stop - symex_start);
   log.statistics() << "Runtime Symex: " << symex_runtime.count() << "s"
                    << messaget::eom;
+
+  // Report per-function symex step counts (top contributors)
+  const auto &step_counts = symex.get_function_step_counts();
+  if(!step_counts.empty())
+  {
+    // Sort by step count descending
+    std::vector<std::pair<irep_idt, std::size_t>> sorted(
+      step_counts.begin(), step_counts.end());
+    std::sort(
+      sorted.begin(),
+      sorted.end(),
+      [](const auto &a, const auto &b) { return a.second > b.second; });
+
+    std::size_t total = 0;
+    for(const auto &entry : sorted)
+      total += entry.second;
+
+    log.statistics() << "Symex steps: " << total << " total" << messaget::eom;
+
+    const std::size_t max_entries = 10;
+    for(std::size_t i = 0; i < std::min(max_entries, sorted.size()); ++i)
+    {
+      log.statistics() << "  " << sorted[i].first << ": " << sorted[i].second
+                       << " steps ("
+                       << (100 * sorted[i].second + total / 2) / total << "%)"
+                       << messaget::eom;
+    }
+  }
+
+  log.statistics() << "Peak memory: " << peak_memory_bytes() / (1024 * 1024)
+                   << " MB" << messaget::eom;
 
   postprocess_equation(symex, equation, options, ns, ui_message_handler);
 }

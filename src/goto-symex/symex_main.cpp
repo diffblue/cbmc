@@ -595,6 +595,11 @@ void goto_symext::symex_step(
 {
   // Print debug statements if they've been enabled.
   print_symex_step(state);
+
+  // Track per-function step counts for resource monitoring
+  if(!state.source.function_id.empty())
+    ++function_step_counts[state.source.function_id];
+
   execute_next_instruction(get_goto_function, state);
   kill_instruction_local_symbols(state);
 }

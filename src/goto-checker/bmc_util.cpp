@@ -12,6 +12,7 @@ Author: Daniel Kroening, Peter Schrammel
 #include "bmc_util.h"
 
 #include <util/json_stream.h>
+#include <util/memory_info.h>
 #include <util/ui_message.h>
 
 #include <goto-programs/graphml_witness.h>
@@ -386,9 +387,8 @@ void run_property_decider(
     << messaget::eom;
 
   property_decider.add_constraint_from_goals(
-    [&properties](const irep_idt &property_id) {
-      return is_property_to_check(properties.at(property_id).status);
-    });
+    [&properties](const irep_idt &property_id)
+    { return is_property_to_check(properties.at(property_id).status); });
 
   auto const sat_solver_start = std::chrono::steady_clock::now();
 
@@ -407,6 +407,8 @@ void run_property_decider(
   solver_runtime += std::chrono::duration<double>(solver_stop - solver_start);
   log.statistics() << "Runtime decision procedure: " << solver_runtime.count()
                    << "s" << messaget::eom;
+  log.statistics() << "Peak memory: " << peak_memory_bytes() / (1024 * 1024)
+                   << " MB" << messaget::eom;
 
   if(dec_result == decision_proceduret::resultt::D_SATISFIABLE)
   {

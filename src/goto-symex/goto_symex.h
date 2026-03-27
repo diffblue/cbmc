@@ -19,6 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "symex_config.h"
 #include "symex_target_equation.h"
 
+#include <map>
+
 class address_of_exprt;
 class function_application_exprt;
 class goto_symex_statet;
@@ -89,8 +91,8 @@ public:
   /// \remarks
   /// This allows goto_symext to be divorced from the particular type of
   /// goto_modelt that provides the function bodies
-  typedef
-    std::function<const goto_functionst::goto_functiont &(const irep_idt &)>
+  typedef std::function<const goto_functionst::goto_functiont &(
+    const irep_idt &)>
     get_goto_functiont;
 
   /// Return a function to get/load a goto function from the given goto model
@@ -305,10 +307,7 @@ protected:
     statet &state,
     bool write,
     bool is_in_quantifier);
-  exprt address_arithmetic(
-    const exprt &,
-    statet &,
-    bool keep_array);
+  exprt address_arithmetic(const exprt &, statet &, bool keep_array);
 
   /// Symbolically execute a GOTO instruction
   /// \param state: Symbolic execution state for current instruction
@@ -831,6 +830,10 @@ protected:
   unsigned _total_vccs, _remaining_vccs;
   ///@}
 
+  /// Per-function symex step counts, populated when resource monitoring
+  /// is enabled. Maps function identifier to number of symex steps.
+  std::map<irep_idt, std::size_t> function_step_counts;
+
   complexity_limitert complexity_module;
 
   /// Shadow memory instrumentation API
@@ -853,6 +856,12 @@ public:
       "symex_threaded_step should have been executed at least once before "
       "attempting to read remaining_vccs");
     return _remaining_vccs;
+  }
+
+  /// Get per-function symex step counts for resource monitoring.
+  const std::map<irep_idt, std::size_t> &get_function_step_counts() const
+  {
+    return function_step_counts;
   }
 
   void validate(const validation_modet vm) const
