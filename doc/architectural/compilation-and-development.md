@@ -281,6 +281,42 @@ There are also instructions for adding this as a git pre-commit hook in
 
 \section compilation-and-development-section-time-profiling Time profiling
 
+\subsection compilation-and-development-subsection-perf-profiling Profiling with perf (recommended)
+
+The script `scripts/profile_cbmc.py` profiles CBMC's pre-solver stages using
+`perf` and generates interactive flamegraphs. Solver time is excluded by default
+so that results reflect only CBMC's own code. This requires Linux with `perf`
+installed.
+
+Quick start with built-in benchmarks:
+
+    scripts/profile_cbmc.py --auto
+
+For multiple runs (reports mean ± stddev):
+
+    scripts/profile_cbmc.py --auto --runs 3
+
+To profile a specific input file:
+
+    scripts/profile_cbmc.py test.c -- --bounds-check --unwind 100
+
+For source-level call site resolution, build a separate debug binary and pass it
+via `--debug-binary` (profiling still uses the fast Release build):
+
+    cmake -S . -Bbuild-debug -DCMAKE_BUILD_TYPE=RelWithDebInfo -DWITH_JBMC=OFF
+    cmake --build build-debug --target cbmc -j$(nproc)
+    scripts/profile_cbmc.py --auto --debug-binary build-debug/bin/cbmc
+
+To compare performance between two git refs:
+
+    scripts/profile_cbmc.py --diff develop my-optimization-branch
+
+Results are written to `profile-results/` by default and include flamegraph SVGs,
+a text summary with hotspot analysis, and machine-readable JSON. Run
+`scripts/profile_cbmc.py --help` for the full set of options.
+
+\subsection compilation-and-development-subsection-gprof-profiling Profiling with gprof
+
 To do time profiling with a tool like `gprof`, the flags `-g` (build with debug
 symbols) and `-pg` (enable profiling information) must be
 used when compiling, and `-pg` must be used when linking. If you are building
