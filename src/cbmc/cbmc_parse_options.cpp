@@ -457,6 +457,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("symex-callgrind", cmdline.get_value("symex-callgrind"));
   }
 
+  if(cmdline.isset("show-symex-progress"))
+    options.set_option("show-symex-progress", true);
+
   if(cmdline.isset("validate-ssa-equation"))
   {
     options.set_option("validate-ssa-equation", true);
@@ -1030,6 +1033,8 @@ void cbmc_parse_optionst::help()
     " report in {uf}\n"
     " {y--symex-callgrind} {uf} \t write symex step profile in callgrind"
     " format to {uf} (view with kcachegrind)\n"
+    " {y--show-symex-progress} \t show live call stack and loop nesting during"
+    " symbolic execution (terminal only)\n"
     " {y--property} {uid} \t only check one specific property\n"
     " {y--trace} \t give a counterexample trace for failed properties\n"
     " {y--stop-on-fail} \t stop analysis once a failed property is detected"

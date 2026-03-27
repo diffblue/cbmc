@@ -11,6 +11,7 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include "multi_path_symex_only_checker.h"
 
+#include <util/console.h>
 #include <util/memory_info.h>
 #include <util/ui_message.h>
 
@@ -99,8 +100,20 @@ void multi_path_symex_only_checkert::generate_equation()
 
   const auto symex_start = std::chrono::steady_clock::now();
 
+  symex.interactive_display_enabled =
+    options.get_bool_option("show-symex-progress");
+
   symex_symbol_table = symex.symex_from_entry_point_of(
     goto_symext::get_goto_function(goto_model), fields);
+
+  // Clear interactive display before printing final stats
+  if(symex.interactive_display_enabled && consolet::is_terminal())
+  {
+    auto &out = consolet::out();
+    for(std::size_t i = 0; i < symex.interactive_display_lines; ++i)
+      out << consolet::cursorup << consolet::cleareol;
+    symex.interactive_display_lines = 0;
+  }
 
   const auto symex_stop = std::chrono::steady_clock::now();
   std::chrono::duration<double> symex_runtime =
@@ -125,6 +138,13 @@ void multi_path_symex_only_checkert::generate_equation()
       total += entry.second;
 
     log.statistics() << "Symex steps: " << total << " total" << messaget::eom;
+
+    if(symex.interactive_display_enabled)
+    {
+      log.statistics() << "Max call depth: " << symex.max_call_depth_seen
+                       << ", max active loops: " << symex.max_active_loops_seen
+                       << messaget::eom;
+    }
 
     const std::size_t max_entries = 10;
     for(std::size_t i = 0; i < std::min(max_entries, sorted.size()); ++i)

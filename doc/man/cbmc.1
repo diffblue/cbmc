@@ -620,6 +620,24 @@ verbosity level
 \fB\-\-timestamp\fR [\fBmonotonic\fR|\fBwall\fR]
 Print microsecond\-precision timestamps.  \fBmonotonic\fR: stamps increase
 monotonically.  \fBwall\fR: ISO\-8601 wall clock timestamps.
+.TP
+\fB\-\-symex\-callgrind\fR \fIfile\fR
+Write per\-source\-location symbolic execution step counts in callgrind
+format to \fIfile\fR.  The output can be visualized with
+.BR kcachegrind (1)
+or
+.BR qcachegrind (1)
+to identify expensive code paths.
+.TP
+\fB\-\-show\-symex\-progress\fR
+Show a live display of the call stack and loop nesting during symbolic
+execution.  When output is a terminal, the display is redrawn in place
+every 2 seconds showing the current call stack with indentation, the
+active function highlighted, and loop iteration counts.  When output is
+not a terminal, a one\-line progress summary is printed periodically
+instead.  At the end of symbolic execution, the maximum call depth and
+loop nesting observed are reported.  Per\-function step counts and peak
+memory usage are always reported at verbosity level 9 (statistics).
 .SH ENVIRONMENT
 All tools honor the TMPDIR environment variable when generating temporary
 files and directories. Furthermore note that

@@ -859,6 +859,19 @@ protected:
   std::chrono::steady_clock::time_point last_progress_report =
     std::chrono::steady_clock::now();
 
+public:
+  /// When true, show live call stack and loop nesting on the terminal.
+  /// Enabled by --show-symex-progress.
+  bool interactive_display_enabled = false;
+
+  /// Maximum call stack depth and loop nesting observed during symex.
+  std::size_t max_call_depth_seen = 0;
+  std::size_t max_active_loops_seen = 0;
+
+  /// Number of lines drawn by the last interactive display, for redrawing.
+  std::size_t interactive_display_lines = 0;
+
+protected:
   complexity_limitert complexity_module;
 
   /// Shadow memory instrumentation API

@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution
 
+#include <util/console.h>
 #include <util/exception_utils.h>
 #include <util/expr_iterator.h>
 #include <util/expr_util.h>
@@ -611,15 +612,84 @@ void goto_symext::symex_step(
 
   // Periodic progress reporting (every 2 seconds)
   ++total_symex_steps;
+
+  // Track max call depth and loop nesting
+  if(interactive_display_enabled)
+  {
+    const auto depth = state.call_stack().size();
+    if(depth > max_call_depth_seen)
+      max_call_depth_seen = depth;
+
+    std::size_t active_loops = 0;
+    for(const auto &frame : state.call_stack())
+      for(const auto &loop : frame.loop_iterations)
+        if(loop.second.count > 0)
+          ++active_loops;
+    if(active_loops > max_active_loops_seen)
+      max_active_loops_seen = active_loops;
+  }
+
   const auto now = std::chrono::steady_clock::now();
   if(std::chrono::duration<double>(now - last_progress_report).count() >= 2.0)
   {
     last_progress_report = now;
-    log.statistics() << "Symex: " << total_symex_steps << " steps, in "
-                     << id2string(state.source.function_id) << ", SSA size "
-                     << target.SSA_steps.size() << ", peak memory "
-                     << peak_memory_bytes() / (1024 * 1024) << " MB"
-                     << messaget::eom;
+
+    if(interactive_display_enabled && consolet::is_terminal())
+    {
+      // Erase previous display
+      auto &out = consolet::out();
+      for(std::size_t i = 0; i < interactive_display_lines; ++i)
+        out << consolet::cursorup << consolet::cleareol;
+
+      std::size_t lines = 0;
+
+      // Header line
+      out << consolet::bold << "Symex: " << consolet::reset << total_symex_steps
+          << " steps, SSA " << target.SSA_steps.size() << ", "
+          << peak_memory_bytes() / (1024 * 1024) << " MB\n";
+      ++lines;
+
+      // Call stack
+      const auto &stack = state.call_stack();
+      for(std::size_t i = 0; i < stack.size(); ++i)
+      {
+        const auto &frame = stack[i];
+        const auto &fn = frame.function_identifier;
+        if(fn.empty())
+          continue;
+
+        out << std::string(2 * i, ' ');
+        if(i + 1 == stack.size())
+          out << consolet::orange;
+        out << id2string(fn);
+
+        // Show active loops in this frame
+        for(const auto &loop : frame.loop_iterations)
+        {
+          if(loop.second.count > 0)
+          {
+            out << consolet::cyan << " [" << id2string(loop.first) << " iter "
+                << loop.second.count << "]" << consolet::reset;
+          }
+        }
+
+        if(i + 1 == stack.size())
+          out << consolet::reset;
+        out << '\n';
+        ++lines;
+      }
+
+      interactive_display_lines = lines;
+      out << std::flush;
+    }
+    else
+    {
+      log.statistics() << "Symex: " << total_symex_steps << " steps, in "
+                       << id2string(state.source.function_id) << ", SSA size "
+                       << target.SSA_steps.size() << ", peak memory "
+                       << peak_memory_bytes() / (1024 * 1024) << " MB"
+                       << messaget::eom;
+    }
   }
 
   execute_next_instruction(get_goto_function, state);
