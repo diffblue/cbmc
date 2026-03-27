@@ -50,6 +50,8 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
   {
     for(const auto &read_event : address.second.reads)
     {
+      exprt read_alias = alias_condition(read_event, address.first);
+
       exprt::operandst rf_choice_symbols;
       rf_choice_symbols.reserve(address.second.writes.size());
 
@@ -59,8 +61,11 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
         // rf cannot contradict program order
         if(!po(read_event, write_event))
         {
+          exprt write_alias = alias_condition(write_event, address.first);
+          exprt alias_cond = conjunction({read_alias, write_alias});
+
           rf_choice_symbols.push_back(register_read_from_choice_symbol(
-            read_event, write_event, equation));
+            read_event, write_event, equation, alias_cond));
         }
       }
 
@@ -83,7 +88,8 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
 symbol_exprt memory_model_baset::register_read_from_choice_symbol(
   const event_it &r,
   const event_it &w,
-  symex_target_equationt &equation)
+  symex_target_equationt &equation,
+  const exprt &alias_cond)
 {
   symbol_exprt s = nondet_bool_symbol("rf");
 
@@ -97,7 +103,8 @@ symbol_exprt memory_model_baset::register_read_from_choice_symbol(
     equation,
     // We rely on the fact that there is at least
     // one write event that has guard 'true'.
-    implies_exprt{s, and_exprt{w->guard, equal_exprt{r->ssa_lhs, w->ssa_lhs}}},
+    implies_exprt{
+      s, and_exprt{alias_cond, w->guard, equal_exprt{r->ssa_lhs, w->ssa_lhs}}},
     is_rfi ? "rfi" : "rf",
     r->source);
 

@@ -228,18 +228,24 @@ void memory_model_sct::write_serialization_external(
         // ws is a total order, no two elements have the same rank
         // s -> w_evt1 before w_evt2; !s -> w_evt2 before w_evt1
 
+        // Guard with alias conditions for may-alias events
+        exprt alias1 = alias_condition(*w_it1, a_it->first);
+        exprt alias2 = alias_condition(*w_it2, a_it->first);
+        exprt alias_guard = conjunction({alias1, alias2});
+
         symbol_exprt s=nondet_bool_symbol("ws-ext");
 
         // write-to-write edge
         add_constraint(
           equation,
-          implies_exprt(s, before(*w_it1, *w_it2)),
+          implies_exprt(and_exprt(alias_guard, s), before(*w_it1, *w_it2)),
           "ws-ext",
           (*w_it1)->source);
 
         add_constraint(
           equation,
-          implies_exprt(not_exprt(s), before(*w_it2, *w_it1)),
+          implies_exprt(
+            and_exprt(alias_guard, not_exprt(s)), before(*w_it2, *w_it1)),
           "ws-ext",
           (*w_it1)->source);
       }
@@ -306,24 +312,48 @@ void memory_model_sct::from_read(symex_target_equationt &equation)
           {
             exprt fr=before(r, *w);
 
+            // Alias conditions for the involved events
+            exprt r_alias = alias_condition(r, a_it->first);
+            exprt w_prime_alias = alias_condition(*w_prime, a_it->first);
+            exprt w_alias = alias_condition(*w, a_it->first);
+
             // the guard of w_prime follows from rf; with rfi
             // optimisation such as the previous write_symbol_primed
             // it would even be wrong to add this guard
             cond=
               implies_exprt(
-                and_exprt(r->guard, (*w)->guard, ws1, rf),
+                conjunction({
+                  r->guard,
+                  (*w)->guard,
+                  ws1,
+                  rf,
+                  r_alias,
+                  w_prime_alias,
+                  w_alias}),
                 fr);
           }
           else if(c_it->first.second == *w && ws2 != false)
           {
             exprt fr=before(r, *w_prime);
 
+            // Alias conditions for the involved events
+            exprt r_alias = alias_condition(r, a_it->first);
+            exprt w_alias = alias_condition(*w, a_it->first);
+            exprt w_prime_alias = alias_condition(*w_prime, a_it->first);
+
             // the guard of w follows from rf; with rfi
             // optimisation such as the previous write_symbol_primed
             // it would even be wrong to add this guard
             cond=
               implies_exprt(
-                and_exprt(r->guard, (*w_prime)->guard, ws2, rf),
+                conjunction({
+                  r->guard,
+                  (*w_prime)->guard,
+                  ws2,
+                  rf,
+                  r_alias,
+                  w_alias,
+                  w_prime_alias}),
                 fr);
           }
 

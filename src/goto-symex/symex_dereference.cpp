@@ -378,12 +378,11 @@ void goto_symext::dereference_rec(
         may_alias_symbol.is_thread_local = false;
         may_alias_symbol.is_file_local = false;
 
-        // Store the source pointer as an annotation on the symbol expression
-        // so the memory model can later create conditional aliasing constraints.
-        symbol_exprt result_expr = may_alias_symbol.symbol_expr();
-        result_expr.set(ID_C_class, tmp1);
+        // Store the source pointer on the symbol's value field so the memory
+        // model can later look it up to create conditional aliasing constraints.
+        may_alias_symbol.value = tmp1;
 
-        expr = std::move(result_expr);
+        expr = may_alias_symbol.symbol_expr();
         return;
       }
     }

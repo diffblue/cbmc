@@ -50,11 +50,13 @@ protected:
   /// \param r: read event
   /// \param w: write event
   /// \param equation: symex equation where the new constraints should be added
+  /// \param alias_cond: additional alias condition guard (default: true)
   /// \return the new choice symbol
   symbol_exprt register_read_from_choice_symbol(
     const event_it &r,
     const event_it &w,
-    symex_target_equationt &equation);
+    symex_target_equationt &equation,
+    const exprt &alias_cond = true_exprt{});
 
   // maps thread numbers to an event list
   typedef std::map<unsigned, event_listt> per_thread_mapt;
