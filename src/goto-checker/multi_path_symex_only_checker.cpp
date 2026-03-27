@@ -21,6 +21,7 @@ Author: Daniel Kroening, Peter Schrammel
 #include "bmc_util.h"
 
 #include <algorithm>
+#include <fstream>
 
 multi_path_symex_only_checkert::multi_path_symex_only_checkert(
   const optionst &options,
@@ -54,6 +55,21 @@ multi_path_symex_only_checkert::operator()(propertiest &properties)
     goto_model,
     symex,
     ui_message_handler);
+
+  // Write callgrind-format symex profile if requested
+  {
+    const std::string callgrind_file = options.get_option("symex-callgrind");
+    if(!callgrind_file.empty())
+    {
+      std::ofstream out(callgrind_file);
+      if(out)
+      {
+        symex.write_callgrind(out);
+        log.status() << "Symex callgrind data written to " << callgrind_file
+                     << messaget::eom;
+      }
+    }
+  }
 
   if(options.get_bool_option("show-vcc"))
   {

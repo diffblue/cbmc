@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "symex_config.h"
 #include "symex_target_equation.h"
 
+#include <chrono>
 #include <map>
 
 class address_of_exprt;
@@ -834,6 +835,29 @@ protected:
   /// is enabled. Maps function identifier to number of symex steps.
   std::map<irep_idt, std::size_t> function_step_counts;
 
+  /// Per-source-location step counts for callgrind output.
+  /// Key is (file, function, line) tuple.
+  struct source_keyt
+  {
+    irep_idt file;
+    irep_idt function;
+    irep_idt line;
+    bool operator<(const source_keyt &o) const
+    {
+      if(file != o.file)
+        return file < o.file;
+      if(function != o.function)
+        return function < o.function;
+      return line < o.line;
+    }
+  };
+  std::map<source_keyt, std::size_t> source_location_step_counts;
+
+  /// Total symex steps and timestamp for periodic progress reporting.
+  std::size_t total_symex_steps = 0;
+  std::chrono::steady_clock::time_point last_progress_report =
+    std::chrono::steady_clock::now();
+
   complexity_limitert complexity_module;
 
   /// Shadow memory instrumentation API
@@ -863,6 +887,10 @@ public:
   {
     return function_step_counts;
   }
+
+  /// Write symex step counts in callgrind format for visualization
+  /// with KCachegrind/QCachegrind.
+  void write_callgrind(std::ostream &out) const;
 
   void validate(const validation_modet vm) const
   {

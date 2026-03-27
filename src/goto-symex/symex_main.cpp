@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/invariant.h>
 #include <util/magic.h>
 #include <util/mathematical_expr.h>
+#include <util/memory_info.h>
 #include <util/replace_symbol.h>
 #include <util/std_expr.h>
 
@@ -25,6 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_symex.h"
 #include "path_storage.h"
 
+#include <fstream>
 #include <memory>
 
 symex_configt::symex_configt(const optionst &options)
@@ -42,12 +44,10 @@ symex_configt::symex_configt(const optionst &options)
     show_symex_steps(options.get_bool_option("show-goto-symex-steps")),
     show_points_to_sets(options.get_bool_option("show-points-to-sets")),
     max_field_sensitivity_array_size(
-      options.is_set("no-array-field-sensitivity")
-        ? 0
-        : options.is_set("max-field-sensitivity-array-size")
-            ? options.get_unsigned_int_option(
-                "max-field-sensitivity-array-size")
-            : DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE),
+      options.is_set("no-array-field-sensitivity") ? 0
+      : options.is_set("max-field-sensitivity-array-size")
+        ? options.get_unsigned_int_option("max-field-sensitivity-array-size")
+        : DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE),
     complexity_limits_active(
       options.get_signed_int_option("symex-complexity-limit") > 0),
     cache_dereferences{options.get_bool_option("symex-cache-dereferences")}
@@ -87,7 +87,7 @@ void symex_transition(
     // This is because the way we detect loops is pretty imprecise.
 
     framet &frame = state.call_stack().top();
-    const goto_programt::instructiont &instruction=*to;
+    const goto_programt::instructiont &instruction = *to;
     for(const auto &i_e : instruction.incoming_edges)
     {
       if(
@@ -138,7 +138,7 @@ void symex_transition(
     }
   }
 
-  state.source.pc=to;
+  state.source.pc = to;
 }
 
 void symex_transition(goto_symext::statet &state)
@@ -229,7 +229,7 @@ void goto_symext::symex_assume_l2(statet &state, const exprt &cond)
   if(has_subexpr(rewritten_cond, ID_exists))
     rewrite_quantifiers(rewritten_cond, state);
 
-  if(state.threads.size()==1)
+  if(state.threads.size() == 1)
   {
     exprt tmp = state.guard.guard_expr(rewritten_cond);
     target.assumption(state.guard.as_expr(), tmp, state.source);
@@ -243,8 +243,7 @@ void goto_symext::symex_assume_l2(statet &state, const exprt &cond)
   else
     state.guard.add(rewritten_cond);
 
-  if(state.atomic_section_id!=0 &&
-     state.guard.is_false())
+  if(state.atomic_section_id != 0 && state.guard.is_false())
     symex_atomic_end(state);
 }
 
@@ -297,7 +296,8 @@ switch_to_thread(goto_symex_statet &state, const unsigned int thread_nb)
 }
 
 void goto_symext::symex_threaded_step(
-  statet &state, const get_goto_functiont &get_goto_function)
+  statet &state,
+  const get_goto_functiont &get_goto_function)
 {
   symex_step(get_goto_function, state);
 
@@ -308,10 +308,11 @@ void goto_symext::symex_threaded_step(
     return;
 
   // is there another thread to execute?
-  if(state.call_stack().empty() &&
-     state.source.thread_nr+1<state.threads.size())
+  if(
+    state.call_stack().empty() &&
+    state.source.thread_nr + 1 < state.threads.size())
   {
-    unsigned t=state.source.thread_nr+1;
+    unsigned t = state.source.thread_nr + 1;
 #if 0
     std::cout << "********* Now executing thread " << t << '\n';
 #endif
@@ -492,10 +493,9 @@ void goto_symext::initialize_path_storage_from_entry_point_of(
 goto_symext::get_goto_functiont
 goto_symext::get_goto_function(abstract_goto_modelt &goto_model)
 {
-  return [&goto_model](
-           const irep_idt &id) -> const goto_functionst::goto_functiont & {
-    return goto_model.get_goto_function(id);
-  };
+  return
+    [&goto_model](const irep_idt &id) -> const goto_functionst::goto_functiont &
+  { return goto_model.get_goto_function(id); };
 }
 
 messaget::mstreamt &
@@ -596,9 +596,31 @@ void goto_symext::symex_step(
   // Print debug statements if they've been enabled.
   print_symex_step(state);
 
-  // Track per-function step counts for resource monitoring
+  // Track per-function step counts
   if(!state.source.function_id.empty())
+  {
     ++function_step_counts[state.source.function_id];
+
+    const auto &loc = state.source.pc->source_location();
+    if(!loc.get_file().empty())
+    {
+      source_keyt key{loc.get_file(), state.source.function_id, loc.get_line()};
+      ++source_location_step_counts[key];
+    }
+  }
+
+  // Periodic progress reporting (every 2 seconds)
+  ++total_symex_steps;
+  const auto now = std::chrono::steady_clock::now();
+  if(std::chrono::duration<double>(now - last_progress_report).count() >= 2.0)
+  {
+    last_progress_report = now;
+    log.statistics() << "Symex: " << total_symex_steps << " steps, in "
+                     << id2string(state.source.function_id) << ", SSA size "
+                     << target.SSA_steps.size() << ", peak memory "
+                     << peak_memory_bytes() / (1024 * 1024) << " MB"
+                     << messaget::eom;
+  }
 
   execute_next_instruction(get_goto_function, state);
   kill_instruction_local_symbols(state);
@@ -611,7 +633,7 @@ void goto_symext::execute_next_instruction(
   PRECONDITION(!state.threads.empty());
   PRECONDITION(!state.call_stack().empty());
 
-  const goto_programt::instructiont &instruction=*state.source.pc;
+  const goto_programt::instructiont &instruction = *state.source.pc;
 
   if(!symex_config.doing_path_exploration)
     merge_gotos(state);
@@ -883,5 +905,31 @@ void goto_symext::try_filter_value_sets(
       symbol_expr->get_identifier(), symbol_type, "", ns);
     jump_not_taken_value_set->erase_values_from_entry(
       *entry_index, erase_from_jump_not_taken_value_set);
+  }
+}
+
+void goto_symext::write_callgrind(std::ostream &out) const
+{
+  out << "events: SymexSteps\n\n";
+
+  // Group by file, then function, then line
+  irep_idt current_file;
+  irep_idt current_function;
+
+  for(const auto &entry : source_location_step_counts)
+  {
+    if(entry.first.file != current_file)
+    {
+      current_file = entry.first.file;
+      out << "fl=" << id2string(current_file) << '\n';
+    }
+    if(entry.first.function != current_function)
+    {
+      current_function = entry.first.function;
+      out << "fn=" << id2string(current_function) << '\n';
+    }
+    const auto &line = entry.first.line;
+    out << (line.empty() ? "0" : id2string(line)) << ' ' << entry.second
+        << '\n';
   }
 }
