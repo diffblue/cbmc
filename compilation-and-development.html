@@ -183,13 +183,26 @@ Linting</h1>
 </pre><p> There are also instructions for adding this as a git pre-commit hook in <a href="https://github.com/diffblue/cbmc/blob/develop/CODING_STANDARD.md#pre-commit-hook-to-run-cpplint-locally">CODING_STANDARD.md</a>.</p>
 <h1><a class="anchor" id="compilation-and-development-section-time-profiling"></a>
 Time profiling</h1>
+<h2><a class="anchor" id="compilation-and-development-subsection-perf-profiling"></a>
+Profiling with perf (recommended)</h2>
+<p>The script <code><a class="el" href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">scripts/profile_cbmc.py</a></code> profiles CBMC's pre-solver stages using <code>perf</code> and generates interactive flamegraphs. Solver time is excluded by default so that results reflect only CBMC's own code. This requires Linux with <code>perf</code> installed.</p>
+<p>Quick start with built-in benchmarks: </p><pre class="fragment">scripts/profile_cbmc.py --auto
+</pre><p> For multiple runs (reports mean ± stddev): </p><pre class="fragment">scripts/profile_cbmc.py --auto --runs 3
+</pre><p> To profile a specific input file: </p><pre class="fragment">scripts/profile_cbmc.py test.c -- --bounds-check --unwind 100
+</pre><p> For source-level call site resolution, build a separate debug binary and pass it via <code>--debug-binary</code> (profiling still uses the fast Release build): </p><pre class="fragment">cmake -S . -Bbuild-debug -DCMAKE_BUILD_TYPE=RelWithDebInfo -DWITH_JBMC=OFF
+cmake --build build-debug --target cbmc -j$(nproc)
+scripts/profile_cbmc.py --auto --debug-binary build-debug/bin/cbmc
+</pre><p> To compare performance between two git refs: </p><pre class="fragment">scripts/profile_cbmc.py --diff develop my-optimization-branch
+</pre><p> Results are written to <code>profile-results/</code> by default and include flamegraph SVGs, a text summary with hotspot analysis, and machine-readable JSON. Run <code><a class="el" href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">scripts/profile_cbmc.py</a> --help</code> for the full set of options.</p>
+<h2><a class="anchor" id="compilation-and-development-subsection-gprof-profiling"></a>
+Profiling with gprof</h2>
 <p>To do time profiling with a tool like <code>gprof</code>, the flags <code>-g</code> (build with debug symbols) and <code>-pg</code> (enable profiling information) must be used when compiling, and <code>-pg</code> must be used when linking. If you are building with cmake you can just add "-Denable_profiling=1" to your cmake invocation, and reload cmake before building your desired binary. Note that these flags require everything to be rebuilt, so it will take a long time even if you are using ccache.</p>
 <p>Run your binary as normal. A file called gmon.out will be created in the working directory of the binary at the end of execution. In most instances this will be the same as the working directory at the beginning of execution. It is also possible to choose the output location by setting the environment variable GMON_OUT_PREFIX - the output file location is then whatever you set it to with the process id appended to the end.</p>
 <p>Make sure gprof is installed by running <code>gprof -v</code>. If it is not installed then run <code>sudo apt install binutils</code>.</p>
 <p>Run <code>gprof &lt;path-to-binary&gt; &lt;path-to-gmon.out&gt;</code> and redirect the output to a file. This will take a while to run - e.g. 12 minutes for test-gen run on a trivial function.</p>
 <p>The output file will now be a large text file. There are two sections: the "flat
 profile", which ignores context, and just tells you how much time was spent in each function; and the "call graph", which includes context, and tells you how much time was spent within each call stack. For more information see online tutorials, like <a href="https://ftp.gnu.org/old-gnu/Manuals/gprof-2.9.1/html_chapter/gprof_5.html">https://ftp.gnu.org/old-gnu/Manuals/gprof-2.9.1/html_chapter/gprof_5.html</a></p>
-<p>Last modified: 2026-03-24 11:18:50 -0700 </p>
+<p>Last modified: 2026-03-28 00:33:13 +0100 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

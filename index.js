@@ -63,7 +63,10 @@ var index =
         [ "Documentation", "compilation-and-development.html#compilation-and-development-section-documentation", null ],
         [ "Formatting", "compilation-and-development.html#compilation-and-development-section-formatting", null ],
         [ "Linting", "compilation-and-development.html#compilation-and-development-section-linting", null ],
-        [ "Time profiling", "compilation-and-development.html#compilation-and-development-section-time-profiling", null ]
+        [ "Time profiling", "compilation-and-development.html#compilation-and-development-section-time-profiling", [
+          [ "Profiling with perf (recommended)", "compilation-and-development.html#compilation-and-development-subsection-perf-profiling", null ],
+          [ "Profiling with gprof", "compilation-and-development.html#compilation-and-development-subsection-gprof-profiling", null ]
+        ] ]
       ] ],
       [ "Background Concepts", "background-concepts.html", [
         [ "Representations", "background-concepts.html#representations_section", [

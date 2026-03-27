@@ -118,7 +118,9 @@ var NAVTREEINDEX72 =
 "compilation-and-development.html#compilation-and-development-section-time-profiling":[0,4,7,5],
 "compilation-and-development.html#compilation-and-development-subsection-cmake-files":[0,4,7,0,1],
 "compilation-and-development.html#compilation-and-development-subsection-coverage":[0,4,7,1,2],
+"compilation-and-development.html#compilation-and-development-subsection-gprof-profiling":[0,4,7,5,1],
 "compilation-and-development.html#compilation-and-development-subsection-makefiles":[0,4,7,0,0],
+"compilation-and-development.html#compilation-and-development-subsection-perf-profiling":[0,4,7,5,0],
 "compilation-and-development.html#compilation-and-development-subsection-personal-configuration":[0,4,7,0,2],
 "compilation-and-development.html#compilation-and-development-subsection-regression-tests":[0,4,7,1,0],
 "compilation-and-development.html#compilation-and-development-subsection-sat-solver":[0,4,7,1,3],
@@ -247,7 +249,5 @@ var NAVTREEINDEX72 =
 "contracts-assigns.html#autotoc_md68":[1,0,3,1],
 "contracts-assigns.html#autotoc_md69":[1,0,3,1,0],
 "contracts-assigns.html#autotoc_md70":[1,0,3,1,1],
-"contracts-assigns.html#autotoc_md71":[1,0,3,2],
-"contracts-assigns.html#autotoc_md72":[1,0,3,2,0],
-"contracts-assigns.html#autotoc_md73":[1,0,3,3]
+"contracts-assigns.html#autotoc_md71":[1,0,3,2]
 };
