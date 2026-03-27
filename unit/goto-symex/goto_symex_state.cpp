@@ -65,8 +65,7 @@ SCENARIO(
     WHEN("Symbol `foo` is assigned constant integer `475`")
     {
       const exprt rhs1 = from_integer(475, int_type);
-      const auto result =
-        state.assignment(ssa_foo, rhs1, ns, true, true, false);
+      const auto result = state.assignment(ssa_foo, rhs1, ns, true, true);
       THEN("The result is `foo` renamed to L2")
       {
         REQUIRE(result.get().get_identifier() == "foo!0#1");
@@ -88,8 +87,7 @@ SCENARIO(
       THEN("Symbol `foo` is assigned another integer 1834")
       {
         const exprt rhs2 = from_integer(1834, int_type);
-        const auto result2 =
-          state.assignment(ssa_foo, rhs2, ns, true, true, false);
+        const auto result2 = state.assignment(ssa_foo, rhs2, ns, true, true);
 
         THEN("The level 2 index of `foo` is incremented")
         {
@@ -128,7 +126,7 @@ SCENARIO(
     {
       const null_pointer_exprt null_pointer{int_pointer_type};
       const auto result =
-        state.assignment(ssa_foo, null_pointer, ns, true, true, false);
+        state.assignment(ssa_foo, null_pointer, ns, true, true);
       THEN("The result is `foo` renamed to L2")
       {
         REQUIRE(result.get().get_identifier() == "foo!0#1");
@@ -155,7 +153,7 @@ SCENARIO(
         const address_of_exprt rhs2{int_value};
         const renamedt<exprt, L2> l2_rhs2 = state.rename(rhs2, ns);
         const auto result2 =
-          state.assignment(ssa_foo, l2_rhs2.get(), ns, true, true, false);
+          state.assignment(ssa_foo, l2_rhs2.get(), ns, true, true);
 
         THEN("The level 2 index of `foo` is incremented")
         {
