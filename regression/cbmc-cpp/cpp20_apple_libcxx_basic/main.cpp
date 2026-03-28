@@ -1,9 +1,11 @@
+// C++20 optional features require GCC 10+
+#if !defined(__GNUC__) || __GNUC__ >= 10
 // Test that basic STL headers work with system libc++ (Apple or LLVM).
 // This exercises _Float16 handling, __decay builtin, and error recovery
 // for parameter type mismatches in libc++ internals.
-#include <optional>
-#include <string>
-#include <vector>
+#  include <optional>
+#  include <string>
+#  include <vector>
 
 int main()
 {
@@ -17,3 +19,9 @@ int main()
   std::optional<int> o = 7;
   __CPROVER_assert(o.has_value(), "optional has value");
 }
+
+#else
+int main()
+{
+}
+#endif

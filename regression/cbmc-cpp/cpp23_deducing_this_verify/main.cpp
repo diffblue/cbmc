@@ -1,3 +1,5 @@
+// C++23 language features require GCC 11+
+#if !defined(__GNUC__) || __GNUC__ >= 11
 // C++23 deducing this
 struct S
 {
@@ -15,3 +17,9 @@ int main()
   __CPROVER_assert(r == 42, "deducing this");
   return 0;
 }
+
+#else
+int main()
+{
+}
+#endif

@@ -1,5 +1,6 @@
+#if __has_include(<compare>)
 // C++20 three-way comparison (spaceship operator)
-#include <compare>
+#  include <compare>
 
 struct Point
 {
@@ -13,3 +14,9 @@ int main()
   __CPROVER_assert(a < b, "less than");
   __CPROVER_assert(!(a > b), "not greater");
 }
+
+#else
+int main()
+{
+}
+#endif

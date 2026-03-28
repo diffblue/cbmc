@@ -1,5 +1,6 @@
+#if __has_include(<span>)
 // C++20 std::span
-#include <span>
+#  include <span>
 int main()
 {
   int arr[] = {1, 2, 3, 4, 5};
@@ -7,3 +8,9 @@ int main()
   __CPROVER_assert(s.size() == 5, "span size");
   __CPROVER_assert(s[0] == 1, "span element");
 }
+
+#else
+int main()
+{
+}
+#endif

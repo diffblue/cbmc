@@ -1,3 +1,5 @@
+// C++23 language features require GCC 11+
+#if !defined(__GNUC__) || __GNUC__ >= 11
 // C++23 lambdas in unevaluated contexts
 // Lambda in decltype creates a unique closure type
 int main()
@@ -9,3 +11,9 @@ int main()
   __CPROVER_assert(r == 42, "lambda in decltype");
   return 0;
 }
+
+#else
+int main()
+{
+}
+#endif

@@ -1,3 +1,5 @@
+// C++23 language features require GCC 11+
+#if !defined(__GNUC__) || __GNUC__ >= 11
 // C++23 multidimensional subscript operator
 struct Matrix
 {
@@ -14,3 +16,9 @@ int main()
   m[1, 2] = 42;
   __CPROVER_assert(m[1, 2] == 42, "multidim subscript");
 }
+
+#else
+int main()
+{
+}
+#endif
