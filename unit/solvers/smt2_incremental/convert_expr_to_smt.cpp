@@ -6,6 +6,7 @@
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/constructor_of.h>
+#include <util/mathematical_expr.h>
 #include <util/namespace.h>
 #include <util/pointer_predicates.h>
 #include <util/std_expr.h>
@@ -1775,4 +1776,34 @@ TEST_CASE(
           smt_bit_vector_constant_termt{1, 64})));
     CHECK(test.convert(assignment) == expected);
   }
+}
+
+TEST_CASE(
+  "expr to smt conversion for forall quantifier",
+  "[core][smt2_incremental]")
+{
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
+  const signedbv_typet int_type{32};
+  const symbol_exprt bound{"x", int_type};
+  const exprt predicate = equal_exprt{bound, from_integer(0, int_type)};
+  const forall_exprt forall{bound, predicate};
+  const smt_termt expected = smt_forall_termt{
+    {smt_identifier_termt{"x", smt_bit_vector_sortt{32}}},
+    test.convert(predicate)};
+  CHECK(test.convert(forall) == expected);
+}
+
+TEST_CASE(
+  "expr to smt conversion for exists quantifier",
+  "[core][smt2_incremental]")
+{
+  auto test = expr_to_smt_conversion_test_environmentt::make(test_archt::i386);
+  const signedbv_typet int_type{32};
+  const symbol_exprt bound{"x", int_type};
+  const exprt predicate = equal_exprt{bound, from_integer(0, int_type)};
+  const exists_exprt exists{bound, predicate};
+  const smt_termt expected = smt_exists_termt{
+    {smt_identifier_termt{"x", smt_bit_vector_sortt{32}}},
+    test.convert(predicate)};
+  CHECK(test.convert(exists) == expected);
 }
