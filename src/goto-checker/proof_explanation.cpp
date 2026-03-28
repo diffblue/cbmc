@@ -24,7 +24,7 @@ Author: CBMC Contributors
 #include <sstream>
 
 /// Return a human-readable string for an SSA step type
-static std::string step_type_string(const SSA_stept &step)
+std::string step_type_string(const SSA_stept &step)
 {
   if(step.is_assignment())
     return "assignment";
@@ -46,7 +46,7 @@ static std::string step_type_string(const SSA_stept &step)
 }
 
 /// Build a description string for an SSA step
-static std::string step_description(const SSA_stept &step, const namespacet &ns)
+std::string step_description(const SSA_stept &step, const namespacet &ns)
 {
   std::ostringstream oss;
 
@@ -94,7 +94,7 @@ static bool has_useful_source_location(const source_locationt &loc)
 /// Check whether an SSA step should be included in the proof explanation.
 /// This contains the common filtering logic used by both the basic and
 /// core-based approaches.
-static bool is_relevant_proof_step(const SSA_stept &step)
+bool is_relevant_proof_step(const SSA_stept &step)
 {
   // Skip steps that were sliced away
   if(step.ignore)

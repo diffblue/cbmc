@@ -56,6 +56,10 @@ public:
   /// \return a vector of proof explanation steps with core annotations
   std::vector<proof_explanation_stept> get_proof_explanation();
 
+  /// Get per-property proof explanations.
+  std::map<irep_idt, std::vector<proof_explanation_stept>>
+  get_per_property_proof_explanations();
+
   /// Get word-level invariants from the proof explanation.
   /// Groups core steps by the variables they constrain.
   /// Must be called after the solver returns UNSATISFIABLE.

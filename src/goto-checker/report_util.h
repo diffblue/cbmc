@@ -67,6 +67,10 @@ void output_proof_explanation(
   const std::vector<proof_explanation_stept> &,
   ui_message_handlert &);
 
+void output_per_property_proof_explanations(
+  const std::map<irep_idt, std::vector<proof_explanation_stept>> &,
+  ui_message_handlert &);
+
 void output_proof_invariants(
   const std::vector<proof_invariantt> &,
   ui_message_handlert &);

@@ -76,6 +76,13 @@ public:
   std::vector<proof_explanation_stept>
   get_proof_explanation(const namespacet &ns);
 
+  /// Get per-property proof explanations using assumption-based solving.
+  /// For each proved property, solves with the property's goal literal
+  /// as an assumption and extracts the unsat core. This gives a focused
+  /// explanation for each property individually.
+  std::map<irep_idt, std::vector<proof_explanation_stept>>
+  get_per_property_proof_explanations(const namespacet &ns);
+
   /// Get word-level invariants from the proof explanation.
   /// Groups core steps by the variables they constrain.
   /// Must be called after solve() returns D_UNSATISFIABLE.
@@ -87,6 +94,7 @@ protected:
   const optionst &options;
   ui_message_handlert &ui_message_handler;
   symex_target_equationt &equation;
+  const namespacet &ns;
   std::unique_ptr<solver_factoryt::solvert> solver;
 
   struct goalt
@@ -105,6 +113,11 @@ protected:
   /// the property. Uses `std::string` to maintain consistent (lexicographic)
   /// ordering as we iterate over this map to produce constraints.
   std::map<std::string, goalt> goal_map;
+
+public:
+  /// Cached per-property proof explanations.
+  mutable std::map<irep_idt, std::vector<proof_explanation_stept>>
+    per_property_explanations_cache;
 };
 
 #endif // CPROVER_GOTO_CHECKER_GOTO_SYMEX_PROPERTY_DECIDER_H

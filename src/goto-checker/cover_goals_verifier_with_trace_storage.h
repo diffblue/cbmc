@@ -64,15 +64,32 @@ public:
     {
       if(options.get_bool_option("proof-explanation"))
       {
-        // In coverage mode, PASS means the goal is unreachable
-        // (the reachability query was UNSAT). Provide proof
-        // explanations for these unreachable goals.
         bool has_unreachable =
           count_properties(properties, property_statust::PASS) > 0;
         if(has_unreachable)
         {
+          // Overall explanation
           auto explanation = incremental_goto_checker.get_proof_explanation();
           output_proof_explanation(explanation, ui_message_handler);
+
+          // Per-goal explanations (captured during incremental solving)
+          auto per_prop =
+            incremental_goto_checker.get_per_property_proof_explanations();
+          // Filter to only unreachable goals (PASS in coverage = unreachable)
+          std::map<irep_idt, std::vector<proof_explanation_stept>> unreachable;
+          for(const auto &entry : per_prop)
+          {
+            auto it = properties.find(entry.first);
+            if(
+              it != properties.end() &&
+              it->second.status == property_statust::PASS)
+            {
+              unreachable.insert(entry);
+            }
+          }
+          if(!unreachable.empty())
+            output_per_property_proof_explanations(
+              unreachable, ui_message_handler);
         }
       }
     }

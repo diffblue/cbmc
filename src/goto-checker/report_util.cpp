@@ -766,6 +766,31 @@ void output_proof_explanation(
   }
 }
 
+void output_per_property_proof_explanations(
+  const std::map<irep_idt, std::vector<proof_explanation_stept>> &per_property,
+  ui_message_handlert &ui_message_handler)
+{
+  messaget log(ui_message_handler);
+  if(per_property.empty())
+    return;
+  log.result() << "\nPer-property proof explanations:" << messaget::eom;
+  for(const auto &entry : per_property)
+  {
+    log.result() << "\n  Property " << entry.first << ":" << messaget::eom;
+    for(const auto &step : entry.second)
+    {
+      if(!step.in_core)
+        continue;
+      log.result() << "    [" << step.step_type << "] ";
+      if(!step.source_location.get_file().empty())
+        log.result() << step.source_location.get_file() << ":";
+      if(!step.source_location.get_line().empty())
+        log.result() << step.source_location.get_line() << " ";
+      log.result() << step.description << messaget::eom;
+    }
+  }
+}
+
 void output_proof_invariants(
   const std::vector<proof_invariantt> &invariants,
   ui_message_handlert &ui_message_handler)
