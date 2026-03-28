@@ -378,9 +378,13 @@ void goto_symext::dereference_rec(
         may_alias_symbol.is_thread_local = false;
         may_alias_symbol.is_file_local = false;
 
-        // Store the source pointer on the symbol's value field so the memory
-        // model can later look it up to create conditional aliasing constraints.
-        may_alias_symbol.value = tmp1;
+        // Store the L2-renamed source pointer so the memory model can
+        // build alias conditions using the correct SSA version. The L2
+        // version reflects the value of the pointer at this program point.
+        ssa_exprt l2_ptr = to_ssa_expr(
+          state.rename<L1_WITH_CONSTANT_PROPAGATION>(shared_sym.value(), ns)
+            .get());
+        may_alias_symbol.value = state.rename<L2>(l2_ptr, ns).get();
 
         expr = may_alias_symbol.symbol_expr();
         return;

@@ -19,6 +19,26 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 #include <util/simplify_expr.h>
 #include <util/symbol.h>
 
+/// Check whether an SSA step refers to a may-alias object created for
+/// concurrent shared pointer dereferences. May-alias symbols are created
+/// in symex_dereference.cpp and have their source pointer stored in
+/// symbolt::value. We detect them by checking for the "concurrency::may_alias"
+/// prefix in the object name.
+/// See issue #790 and Alglave/Kroening/Tautschnig CAV 2013 for background
+/// on the partial-order encoding that these objects participate in.
+static bool is_may_alias_step(const SSA_stept &step)
+{
+  return id2string(step.ssa_lhs.get_object_name())
+           .find("concurrency::may_alias") != std::string::npos;
+}
+
+/// Check whether an address in the address_map corresponds to a may-alias
+/// object.
+static bool is_may_alias_address(const irep_idt &address)
+{
+  return id2string(address).find("concurrency::may_alias") != std::string::npos;
+}
+
 partial_order_concurrencyt::partial_order_concurrencyt(const namespacet &_ns)
   : ns(_ns)
 {
@@ -55,8 +75,7 @@ void partial_order_concurrencyt::add_init_writes(
 
     // Skip may-alias addresses -- their initialization is handled through
     // the aliasing constraints in the memory model, not through init writes.
-    const irep_idt &obj_name = e_it->ssa_lhs.get_object_name();
-    if(id2string(obj_name).find("concurrency::may_alias") != std::string::npos)
+    if(is_may_alias_step(*e_it))
     {
       init_done.insert(a);
       continue;
@@ -108,10 +127,8 @@ void partial_order_concurrencyt::build_event_lists(
           a_rec.writes.push_back(e_it);
 
         // Record a representative L1 symbol for non-may-alias addresses
-        const irep_idt &obj_name = e_it->ssa_lhs.get_object_name();
         if(
-          id2string(obj_name).find("concurrency::may_alias") ==
-            std::string::npos &&
+          !is_may_alias_step(*e_it) &&
           address_representatives.find(addr) == address_representatives.end())
         {
           address_representatives.emplace(addr, remove_level_2(e_it->ssa_lhs));
@@ -134,8 +151,7 @@ void partial_order_concurrencyt::build_event_lists(
     if(!e_it->is_shared_read() && !e_it->is_shared_write())
       continue;
 
-    const irep_idt &obj_name = e_it->ssa_lhs.get_object_name();
-    if(id2string(obj_name).find("concurrency::may_alias") == std::string::npos)
+    if(!is_may_alias_step(*e_it))
       continue;
 
     const typet &may_alias_type = e_it->ssa_lhs.type();
@@ -148,9 +164,7 @@ void partial_order_concurrencyt::build_event_lists(
         continue;
 
       // Skip other may-alias addresses
-      if(
-        id2string(addr_entry.first).find("concurrency::may_alias") !=
-        std::string::npos)
+      if(is_may_alias_address(addr_entry.first))
         continue;
 
       // Only add to addresses with matching type to avoid type mismatches
@@ -269,7 +283,7 @@ exprt partial_order_concurrencyt::alias_condition(
   const irep_idt &target_address) const
 {
   const irep_idt &obj_name = event->ssa_lhs.get_object_name();
-  if(id2string(obj_name).find("concurrency::may_alias") == std::string::npos)
+  if(!is_may_alias_step(*event))
     return true_exprt{};
 
   // Look up the source pointer from the symbol table via the object name

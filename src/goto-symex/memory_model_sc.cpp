@@ -184,6 +184,17 @@ void memory_model_sct::program_order(symex_target_equationt &equation)
 void memory_model_sct::write_serialization_external(
   symex_target_equationt &equation)
 {
+  // Encode write serialisation (ws) as described in
+  // Alglave/Kroening/Tautschnig CAV 2013, Section 4.2.
+  //
+  // ws is a per-address total order on writes. For each pair of writes
+  // (w1, w2) to the same address, we introduce a Boolean s and add:
+  //   alias_guard ∧ s => before(w1, w2)
+  //   alias_guard ∧ ¬s => before(w2, w1)
+  //
+  // For may-alias writes, alias_guard is the conjunction of alias
+  // conditions for both writes. This ensures write serialisation only
+  // applies when both writes actually target this address.
   for(address_mapt::const_iterator a_it = address_map.begin();
       a_it != address_map.end();
       a_it++)
@@ -237,6 +248,16 @@ void memory_model_sct::write_serialization_external(
 
 void memory_model_sct::from_read(symex_target_equationt &equation)
 {
+  // Encode from-read (fr) as described in
+  // Alglave/Kroening/Tautschnig CAV 2013, Section 4.2.
+  //
+  // (r, w) ∈ fr iff ∃w'. (w', r) ∈ rf ∧ (w', w) ∈ ws
+  // Encoded as: s_{w',r} ∧ before(w', w) => before(r, w)
+  //
+  // For may-alias events, all three participants (r, w', w) are guarded
+  // by alias conditions. This ensures fr only applies when all events
+  // actually target this address.
+
   // from-read: (w', w) in ws and (w', r) in rf -> (r, w) in fr
 
   for(address_mapt::const_iterator a_it = address_map.begin();

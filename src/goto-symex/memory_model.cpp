@@ -42,9 +42,24 @@ bool memory_model_baset::po(event_it e1, event_it e2)
 
 void memory_model_baset::read_from(symex_target_equationt &equation)
 {
-  // We iterate over all the reads, and
-  // make them match at least one
-  // (internal or external) write.
+  // Encode the read-from relation (rf) as described in
+  // Alglave/Kroening/Tautschnig CAV 2013, Section 4.2.
+  //
+  // For each read r at address a, we introduce Boolean choice variables
+  // s_{w,r} for each candidate write w to address a. The constraints are:
+  //
+  //   rf-val:  s_{w,r} => alias(r,a) ∧ g(w) ∧ val(w) = val(r)
+  //   rf-some: alias(r,a) ∧ g(r) => ∨_w s_{w,r}
+  //   rf-order: s_{w,r} => before(w, r)  [for external rf]
+  //
+  // For may-alias reads (created for shared pointer dereferences in
+  // concurrent context), the alias condition alias(r,a) guards both
+  // rf-val and rf-some. This ensures that a may-alias read only needs
+  // to read from writes at address a when the source pointer actually
+  // points to a. Without this guard, a may-alias read distributed to
+  // multiple addresses would be forced to read from ALL of them
+  // simultaneously, making the constraints unsatisfiable.
+  // See may_alias_soundness.md for the formal soundness argument.
 
   for(const auto &address : address_map)
   {
@@ -74,10 +89,18 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
       if(!rf_choice_symbols.empty())
       {
         // Add the read's guard, each of the writes' guards is implied
-        // by each entry in rf_some
+        // by each entry in rf_some.
+        // For may-alias reads, the rf-some constraint is conditional on
+        // the pointer actually aliasing with this address. Without this
+        // guard, a may-alias read added to multiple addresses would be
+        // forced to read from ALL addresses simultaneously, which is
+        // unsatisfiable and makes assertions vacuously true.
+        // See Alglave/Kroening/Tautschnig CAV 2013 (Sec. 4.2, rf-some)
+        // for the standard rf-some encoding.
+        exprt guard = and_exprt{read_event->guard, read_alias};
         add_constraint(
           equation,
-          implies_exprt{read_event->guard, disjunction(rf_choice_symbols)},
+          implies_exprt{guard, disjunction(rf_choice_symbols)},
           "rf-some",
           read_event->source);
       }
