@@ -1,4 +1,5 @@
-#include <span>
+#if __has_include(<span>)
+#  include <span>
 
 int main()
 {
@@ -8,3 +9,9 @@ int main()
   __CPROVER_assert(s[0] == 10, "first");
   return 0;
 }
+
+#else
+int main()
+{
+}
+#endif

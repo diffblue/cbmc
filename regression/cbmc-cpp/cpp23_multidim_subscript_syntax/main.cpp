@@ -1,3 +1,5 @@
+// C++23 language features require GCC 11+
+#if !defined(__GNUC__) || __GNUC__ >= 11
 // C++23 multidimensional subscript with comma syntax
 struct Matrix
 {
@@ -19,3 +21,9 @@ int main()
   __CPROVER_assert(r == 3, "multidim subscript");
   return 0;
 }
+
+#else
+int main()
+{
+}
+#endif

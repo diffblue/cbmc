@@ -1,5 +1,7 @@
+// Requires GCC 12+ or Clang (older libstdc++ lacks support).
+#if !defined(__GNUC__) || defined(__clang__) || __GNUC__ >= 12
 // C++23 std::expected basic usage
-#include <expected>
+#  include <expected>
 
 int main()
 {
@@ -8,3 +10,8 @@ int main()
   __CPROVER_assert(*e == 42, "value");
   return 0;
 }
+#else
+int main()
+{
+}
+#endif

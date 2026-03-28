@@ -1,5 +1,7 @@
-// GCC built-in type transformations: __remove_cv, __remove_reference,
-// __remove_cvref.
+// __remove_cv, __remove_reference, __remove_cvref are GCC 13+ / Clang builtins.
+// On older GCC these identifiers are used as struct/alias names in libstdc++.
+#if(defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 13) ||             \
+  defined(__clang__)
 
 template <typename T>
 struct remove_cv
@@ -23,6 +25,8 @@ remove_cv<const volatile int>::type a = 1;
 remove_ref<int &>::type b = 2;
 remove_ref<int &&>::type c = 3;
 remove_cvref<const int &>::type d = 4;
+
+#endif
 
 int main()
 {
