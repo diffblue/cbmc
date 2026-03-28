@@ -160,9 +160,13 @@ void goto_convert_functionst::convert_function(
   {
     const std::string sname = id2string(identifier);
     irep_idt impl;
-    if(sname == "operatorcpp_new(unsigned_long_int)")
+    if(
+      sname == "operatorcpp_new(unsigned_long_int)" ||
+      sname == "operatorcpp_new(unsigned_int)")
       impl = "__new";
-    else if(sname == "operatorcpp_new[](unsigned_long_int)")
+    else if(
+      sname == "operatorcpp_new[](unsigned_long_int)" ||
+      sname == "operatorcpp_new[](unsigned_int)")
       impl = "__new_array";
     else if(sname == "operatorcpp_delete(ptr_void)")
       impl = "__delete";
