@@ -263,6 +263,17 @@ static smt_termt convert_expr_to_smt(
   const auto &from_term = converted.at(cast.op());
   const typet &from_type = cast.op().type();
   const typet &to_type = cast.type();
+  // Array-to-array typecasts are handled by the decision procedure
+  // (define_array_typecast_function) and the expression should have been
+  // substituted before reaching this point.
+  if(to_type.id() == ID_array && from_type.id() == ID_array)
+  {
+    INVARIANT(
+      false,
+      "array-to-array typecasts must be substituted by "
+      "smt2_incremental_decision_proceduret::define_array_typecast_function "
+      "before reaching convert_expr_to_smt");
+  }
   if(type_try_dynamic_cast<bool_typet>(to_type))
     return make_not_zero(from_term, cast.op().type());
   if(const auto c_bool_type = type_try_dynamic_cast<c_bool_typet>(to_type))
