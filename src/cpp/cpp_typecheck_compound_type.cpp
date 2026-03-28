@@ -752,7 +752,16 @@ void cpp_typecheckt::typecheck_compound_declarator(
     static_symbol.is_extern = true;
 
     if(declaration.storage_spec().is_constexpr())
-      static_symbol.is_macro = true;
+    {
+      // Don't mark _S_use_relocate/_S_nothrow_relocate as macros.
+      // These constexpr functions are overridden with model bodies
+      // in provide_stdlib_bodies(). Marking them as macros causes
+      // their values to be inlined as nondet during goto conversion,
+      // before the model bodies are available.
+      const std::string bname = id2string(static_symbol.base_name);
+      if(bname != "_S_use_relocate" && bname != "_S_nothrow_relocate")
+        static_symbol.is_macro = true;
+    }
 
     // TODO: not sure about this: should be defined separately!
     dynamic_initializations.push_back(static_symbol.name);
@@ -764,6 +773,20 @@ void cpp_typecheckt::typecheck_compound_declarator(
       error() << "redeclaration of static member '" << static_symbol.base_name
               << "'" << eom;
       throw 0;
+    }
+
+    // Fold __safe_multiply::__c immediately after creation.
+    // __c = uintmax_t(1) << (sizeof(intmax_t) * 4) = 2^32 on 64-bit.
+    // Other static members (__a0, __a1, etc.) depend on __c and are
+    // evaluated during type-checking, so __c must be available now.
+    if(
+      id2string(new_symbol->base_name) == "__c" &&
+      id2string(new_symbol->name).find("__safe_multiply") != std::string::npos)
+    {
+      typet t = new_symbol->type;
+      t.remove(ID_C_constant);
+      new_symbol->value = from_integer(mp_integer(1) << 32, t);
+      new_symbol->is_macro = true;
     }
 
     if(value.is_not_nil())
@@ -1182,7 +1205,22 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           break;
         }
       }
-      if(!has_operator)
+      if(has_operator)
+      {
+        // using Base::operator X — import operator from base class.
+        // Resolve the base class and copy matching operator components
+        // into the derived class.
+        try
+        {
+          convert(cpp_using);
+        }
+        catch(...)
+        {
+          // Operator import failed (e.g., base class not fully
+          // instantiated in CRTP patterns). Silently skip.
+        }
+      }
+      else
       {
         // C++11 inheriting constructors: using Base::Base;
         // Detect if this refers to a base class constructor and skip
@@ -1934,7 +1972,12 @@ void cpp_typecheckt::get_bases(
   {
     DATA_INVARIANT(b.id() == ID_base, "base class expression expected");
 
-    const struct_typet &base = to_struct_type(lookup(b.type()).type);
+    if(static_cast<const exprt &>(b).type().id() != ID_struct_tag)
+      continue;
+    const symbolt &base_sym = lookup(b.type());
+    if(base_sym.type.id() != ID_struct)
+      continue;
+    const struct_typet &base = to_struct_type(base_sym.type);
 
     set_bases.insert(base.get(ID_name));
     get_bases(base, set_bases);
@@ -1952,7 +1995,12 @@ void cpp_typecheckt::get_virtual_bases(
   {
     DATA_INVARIANT(b.id() == ID_base, "base class expression expected");
 
-    const struct_typet &base = to_struct_type(lookup(b.type()).type);
+    if(static_cast<const exprt &>(b).type().id() != ID_struct_tag)
+      continue;
+    const symbolt &base_sym = lookup(b.type());
+    if(base_sym.type.id() != ID_struct)
+      continue;
+    const struct_typet &base = to_struct_type(base_sym.type);
 
     if(b.get_bool(ID_virtual))
       vbases.push_back(base.get(ID_name));

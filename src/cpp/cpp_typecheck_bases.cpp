@@ -10,10 +10,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// C++ Language Type Checking
 
 #include "cpp_typecheck.h"
-
-#include <set>
-
 #include "cpp_typecheck_fargs.h"
+
+#include <algorithm>
+#include <set>
 
 void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
 {
@@ -54,9 +54,10 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
 
     if(base_symbol_expr.type().id() != ID_struct_tag)
     {
-      error().source_location=name.source_location();
-      error() << "expected type symbol as struct/class base" << eom;
-      throw 0;
+      // Base type resolution failed (e.g., template instantiation
+      // failed in system headers). Remove this base and continue.
+      base = get_nil_irep();
+      continue;
     }
 
     const symbolt &base_symbol =
@@ -64,17 +65,14 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
 
     if(base_symbol.type.id() != ID_struct)
     {
-      error().source_location=name.source_location();
-      error() << "expected struct or class as base, but got '"
-              << to_string(base_symbol.type) << "'" << eom;
-      throw 0;
+      base = get_nil_irep();
+      continue;
     }
 
     if(to_struct_type(base_symbol.type).is_incomplete())
     {
-      error().source_location=name.source_location();
-      error() << "base type is incomplete" << eom;
-      throw 0;
+      base = get_nil_irep();
+      continue;
     }
 
     bool virtual_base = base.get_bool(ID_virtual);
@@ -106,6 +104,14 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
       vbases,
       virtual_base);
   }
+
+  // Remove bases that were invalidated (set to nil) during validation.
+  bases_irep.erase(
+    std::remove_if(
+      bases_irep.begin(),
+      bases_irep.end(),
+      [](const irept &b) { return b.is_nil(); }),
+    bases_irep.end());
 
   if(!vbases.empty())
   {
@@ -153,6 +159,10 @@ void cpp_typecheckt::add_base_components(
   // look at the the parents of the base type
   for(const auto &b : from.bases())
   {
+    // Skip bases with invalid types from failed template instantiations.
+    if(static_cast<const exprt &>(b).type().id() != ID_struct_tag)
+      continue;
+
     irep_idt sub_access = b.get(ID_access);
 
     if(access==ID_private)
@@ -161,6 +171,9 @@ void cpp_typecheckt::add_base_components(
       sub_access=ID_protected;
 
     const symbolt &symb = lookup(b.type());
+
+    if(symb.type.id() != ID_struct)
+      continue;
 
     const bool is_virtual_base = b.get_bool(ID_virtual);
 

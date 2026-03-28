@@ -1210,6 +1210,11 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
           cpp_typecheck.cpp_scopes.go_to(
             cpp_typecheck.cpp_scopes.get_scope(scope_id));
         }
+        else
+        {
+          // decltype resolved to a non-class type; cannot scope into it.
+          throw 0; // decltype resolved to non-class type
+        }
       }
       final_base_name.clear();
     }
