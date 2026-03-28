@@ -41,7 +41,8 @@ public:
       float16_type(false),
       bf16_type(false),
       fp16_type(false),
-      gcc13_type_traits(false)
+      gcc13_type_traits(false),
+      gcc14_builtins(false)
   {
     // set up global scope
     scopes.clear();
@@ -80,6 +81,9 @@ public:
   // GCC 13+ type trait builtins: __remove_cv, __remove_reference,
   // __remove_cvref
   bool gcc13_type_traits;
+  // GCC 14+ type trait builtins: __is_array, __is_function,
+  // __is_reference, __is_member_pointer, etc.
+  bool gcc14_builtins;
 
   typedef ansi_c_identifiert identifiert;
   typedef ansi_c_scopet scopet;

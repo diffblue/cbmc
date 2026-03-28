@@ -1009,7 +1009,13 @@ bool Parser::isTypeSpecifier()
          t == TOK_TYPENAME || t == TOK_TYPEOF || t == TOK_DECLTYPE ||
          t == TOK_UNDERLYING_TYPE || t == TOK_GCC_BUILTIN_REMOVE_CV ||
          t == TOK_GCC_BUILTIN_REMOVE_REFERENCE ||
-         t == TOK_GCC_BUILTIN_REMOVE_CVREF || t == TOK_ATOMIC_TYPE_SPECIFIER ||
+         t == TOK_GCC_BUILTIN_REMOVE_CVREF ||
+         t == TOK_GCC_BUILTIN_REMOVE_POINTER ||
+         t == TOK_GCC_BUILTIN_REMOVE_EXTENT ||
+         t == TOK_GCC_BUILTIN_REMOVE_ALL_EXTENTS ||
+         t == TOK_GCC_BUILTIN_ADD_LVALUE_REFERENCE ||
+         t == TOK_GCC_BUILTIN_ADD_RVALUE_REFERENCE ||
+         t == TOK_GCC_BUILTIN_ADD_POINTER || t == TOK_ATOMIC_TYPE_SPECIFIER ||
          (is_identifier(t) && lex.LookAhead(1) == '(' &&
           is_identifier_with_text(0, "__decay"));
 }
@@ -2246,9 +2252,10 @@ bool Parser::rDeclaration(cpp_declarationt &declaration)
   std::cout << std::string(__indent, ' ') << "Parser::rDeclaration 1\n";
 #endif
 
-  if(member_spec.is_empty())
-    if(!optMemberSpec(member_spec))
-      return false;
+  // After storage spec (e.g., constexpr), there may be additional member
+  // specifiers like inline. GCC 16 libstdc++ uses "friend constexpr inline".
+  if(!optMemberSpec(member_spec))
+    return false;
 
 #ifdef DEBUG
   std::cout << std::string(__indent, ' ') << "Parser::rDeclaration 3\n";
@@ -3661,7 +3668,12 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
   }
   else if(
     t == TOK_GCC_BUILTIN_REMOVE_CV || t == TOK_GCC_BUILTIN_REMOVE_REFERENCE ||
-    t == TOK_GCC_BUILTIN_REMOVE_CVREF ||
+    t == TOK_GCC_BUILTIN_REMOVE_CVREF || t == TOK_GCC_BUILTIN_REMOVE_POINTER ||
+    t == TOK_GCC_BUILTIN_REMOVE_EXTENT ||
+    t == TOK_GCC_BUILTIN_REMOVE_ALL_EXTENTS ||
+    t == TOK_GCC_BUILTIN_ADD_LVALUE_REFERENCE ||
+    t == TOK_GCC_BUILTIN_ADD_RVALUE_REFERENCE ||
+    t == TOK_GCC_BUILTIN_ADD_POINTER ||
     (is_identifier(t) && lex.LookAhead(1) == '(' &&
      is_identifier_with_text(0, "__decay")))
   {
@@ -3672,6 +3684,18 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
       p = typet(ID_remove_cv);
     else if(t == TOK_GCC_BUILTIN_REMOVE_REFERENCE)
       p = typet(ID_remove_reference);
+    else if(t == TOK_GCC_BUILTIN_REMOVE_POINTER)
+      p = typet(ID_remove_pointer);
+    else if(t == TOK_GCC_BUILTIN_REMOVE_EXTENT)
+      p = typet(ID_remove_extent);
+    else if(t == TOK_GCC_BUILTIN_REMOVE_ALL_EXTENTS)
+      p = typet(ID_remove_all_extents);
+    else if(t == TOK_GCC_BUILTIN_ADD_LVALUE_REFERENCE)
+      p = typet(ID_add_lvalue_reference);
+    else if(t == TOK_GCC_BUILTIN_ADD_RVALUE_REFERENCE)
+      p = typet(ID_add_rvalue_reference);
+    else if(t == TOK_GCC_BUILTIN_ADD_POINTER)
+      p = typet(ID_add_pointer);
     else
       p = typet(ID_remove_cvref); // __remove_cvref or __decay
 

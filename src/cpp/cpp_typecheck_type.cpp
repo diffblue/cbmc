@@ -314,7 +314,10 @@ void cpp_typecheckt::typecheck_type(typet &type)
   }
   else if(
     type.id() == ID_remove_cv || type.id() == ID_remove_reference ||
-    type.id() == ID_remove_cvref)
+    type.id() == ID_remove_cvref || type.id() == ID_remove_pointer ||
+    type.id() == ID_remove_extent || type.id() == ID_remove_all_extents ||
+    type.id() == ID_add_lvalue_reference ||
+    type.id() == ID_add_rvalue_reference || type.id() == ID_add_pointer)
   {
     typet tmp_type = static_cast<const typet &>(type.find(ID_type_arg));
     typecheck_type(tmp_type);
@@ -334,6 +337,56 @@ void cpp_typecheckt::typecheck_type(typet &type)
       {
         tmp_type = to_pointer_type(tmp_type).base_type();
       }
+    }
+
+    if(type.id() == ID_remove_pointer)
+    {
+      if(
+        tmp_type.id() == ID_pointer && !tmp_type.get_bool(ID_C_reference) &&
+        !tmp_type.get_bool(ID_C_rvalue_reference))
+      {
+        tmp_type = to_pointer_type(tmp_type).base_type();
+      }
+    }
+
+    if(type.id() == ID_remove_extent || type.id() == ID_remove_all_extents)
+    {
+      if(tmp_type.id() == ID_array)
+      {
+        tmp_type = to_array_type(tmp_type).element_type();
+        // remove_all_extents: keep stripping array layers
+        if(type.id() == ID_remove_all_extents)
+        {
+          while(tmp_type.id() == ID_array)
+            tmp_type = to_array_type(tmp_type).element_type();
+        }
+      }
+    }
+
+    if(type.id() == ID_add_lvalue_reference)
+    {
+      // void stays void; otherwise add lvalue reference
+      if(tmp_type.id() != ID_empty)
+        tmp_type = ::reference_type(tmp_type);
+    }
+
+    if(type.id() == ID_add_rvalue_reference)
+    {
+      // void stays void; lvalue ref stays lvalue ref (ref collapsing)
+      if(tmp_type.id() != ID_empty && !is_reference(tmp_type))
+      {
+        pointer_typet rref = pointer_type(tmp_type);
+        rref.set(ID_C_rvalue_reference, true);
+        tmp_type = std::move(rref);
+      }
+    }
+
+    if(type.id() == ID_add_pointer)
+    {
+      // add_pointer<T&> = T*, add_pointer<T> = T*
+      if(is_reference(tmp_type) || is_rvalue_reference(tmp_type))
+        tmp_type = to_pointer_type(tmp_type).base_type();
+      tmp_type = pointer_type(tmp_type);
     }
 
     type = tmp_type;
