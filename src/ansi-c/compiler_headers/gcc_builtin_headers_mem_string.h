@@ -123,6 +123,7 @@ void* __builtin_memset(void*, int, __CPROVER_size_t);
 __CPROVER_size_t __builtin_object_size(const void*, int);
 __CPROVER_size_t __builtin_dynamic_object_size(const void*, int);
 int __builtin_popcount(unsigned);
+int __builtin_popcountl(unsigned long);
 int __builtin_popcountimax(uintmax_t);
 int __builtin_popcountll(unsigned long long int x);
 int __builtin_posix_memalign(void**, __CPROVER_size_t, __CPROVER_size_t);
