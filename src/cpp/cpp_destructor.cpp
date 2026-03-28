@@ -97,7 +97,11 @@ std::optional<codet> cpp_typecheckt::cpp_destructor(
       }
     }
 
-    INVARIANT(!dtor_name.empty(), "non-PODs should have a destructor");
+    // Some types from system headers (e.g., std::regex internals on GCC 15+)
+    // may be non-POD but lack a destructor in CBMC's symbol table due to
+    // failed template instantiation. Skip rather than crash.
+    if(dtor_name.empty())
+      return {};
 
     cpp_namet cpp_name(dtor_name, source_location);
 
