@@ -11,6 +11,7 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include "multi_path_symex_checker.h"
 
+#include <util/find_symbols.h>
 #include <util/ui_message.h>
 
 #include <goto-programs/remove_function_pointers.h>
@@ -22,6 +23,7 @@ Author: Daniel Kroening, Peter Schrammel
 #include "bmc_util.h"
 #include "counterexample_beautification.h"
 #include "goto_symex_fault_localizer.h"
+#include "proof_explanation.h"
 
 multi_path_symex_checkert::multi_path_symex_checkert(
   const optionst &options,
@@ -61,6 +63,89 @@ multi_path_symex_checkert::operator()(propertiest &properties)
       ui_message_handler);
 
     update_properties(properties, result.updated_properties);
+
+    // Capture proof explanations for properties proved unreachable
+    // by the equation structure (before solver invocation). This is
+    // needed for coverage mode where unreachable goals are removed
+    // from the equation during incremental solving.
+    if(options.get_bool_option("proof-explanation"))
+    {
+      auto explanation = ::get_proof_explanation(equation, ns);
+      for(const auto &prop : properties)
+      {
+        if(prop.second.status != property_statust::PASS)
+          continue;
+
+        // Find which symbols this property depends on
+        find_symbols_sett needed;
+        for(const auto &step : equation.SSA_steps)
+        {
+          if(step.is_assert() && step.property_id == prop.first)
+          {
+            find_symbols(step.cond_expr, needed);
+          }
+        }
+
+        // Expand data dependencies (not guard dependencies)
+        bool changed = true;
+        while(changed)
+        {
+          changed = false;
+          for(const auto &step : equation.SSA_steps)
+          {
+            if(!step.is_assignment() || step.ignore)
+              continue;
+            if(needed.count(step.ssa_lhs.get_identifier()))
+            {
+              find_symbols_sett rhs;
+              find_symbols(step.ssa_rhs, rhs);
+              for(const auto &s : rhs)
+                if(needed.insert(s).second)
+                  changed = true;
+            }
+          }
+        }
+
+        // Build filtered explanation directly from SSA steps
+        std::vector<proof_explanation_stept> filtered;
+        for(const auto &step : equation.SSA_steps)
+        {
+          if(step.ignore || !is_relevant_proof_step(step))
+            continue;
+          bool relevant = false;
+          if(
+            step.is_assignment() && needed.count(step.ssa_lhs.get_identifier()))
+          {
+            relevant = true;
+          }
+          else if(step.is_assume())
+          {
+            find_symbols_sett syms;
+            find_symbols(step.cond_expr, syms);
+            for(const auto &s : syms)
+              if(needed.count(s))
+              {
+                relevant = true;
+                break;
+              }
+          }
+          if(relevant)
+          {
+            proof_explanation_stept pstep;
+            pstep.source_location = step.source.pc->source_location();
+            pstep.step_type = step_type_string(step);
+            pstep.description = step_description(step, ns);
+            pstep.in_core = true;
+            filtered.push_back(std::move(pstep));
+          }
+        }
+
+        if(filtered.empty())
+          filtered = explanation; // fallback for coverage goals
+        property_decider.per_property_explanations_cache[prop.first] =
+          std::move(filtered);
+      }
+    }
 
     // Have we got anything to check? Otherwise we return DONE.
     if(!has_properties_to_check(properties))
@@ -151,6 +236,12 @@ std::vector<proof_explanation_stept>
 multi_path_symex_checkert::get_proof_explanation()
 {
   return property_decider.get_proof_explanation(ns);
+}
+
+std::map<irep_idt, std::vector<proof_explanation_stept>>
+multi_path_symex_checkert::get_per_property_proof_explanations()
+{
+  return property_decider.get_per_property_proof_explanations(ns);
 }
 
 std::vector<proof_invariantt> multi_path_symex_checkert::get_proof_invariants()

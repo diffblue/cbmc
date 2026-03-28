@@ -11,6 +11,7 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include "goto_symex_property_decider.h"
 
+#include <util/find_symbols.h>
 #include <util/ui_message.h>
 
 #include <goto-symex/solver_hardness.h>
@@ -23,7 +24,10 @@ goto_symex_property_decidert::goto_symex_property_decidert(
   ui_message_handlert &ui_message_handler,
   symex_target_equationt &equation,
   const namespacet &ns)
-  : options(options), ui_message_handler(ui_message_handler), equation(equation)
+  : options(options),
+    ui_message_handler(ui_message_handler),
+    equation(equation),
+    ns(ns)
 {
   solver_factoryt solvers(
     options,
@@ -158,12 +162,96 @@ void goto_symex_property_decidert::update_properties_status_from_goals(
     if(!set_pass)
       break;
 
-    for(auto &property_pair : properties)
     {
-      if(property_pair.second.status == property_statust::UNKNOWN)
+      // Capture proof explanation for properties being proved.
+      // This must happen now because assertion steps may be removed
+      // from the equation after this point (coverage mode).
+      std::vector<proof_explanation_stept> explanation;
+      explanation = ::get_proof_explanation_with_core(
+        equation, solver->decision_procedure(), ns);
+
+      for(auto &property_pair : properties)
       {
-        property_pair.second.status |= property_statust::PASS;
-        updated_properties.insert(property_pair.first);
+        if(property_pair.second.status == property_statust::UNKNOWN)
+        {
+          property_pair.second.status |= property_statust::PASS;
+          updated_properties.insert(property_pair.first);
+
+          // Per-property filtering via data dependency analysis
+          find_symbols_sett needed;
+          for(const auto &step : equation.SSA_steps)
+          {
+            if(step.is_assert() && step.property_id == property_pair.first)
+              find_symbols(step.cond_expr, needed);
+          }
+
+          if(!needed.empty())
+          {
+            // Expand data dependencies
+            bool changed = true;
+            while(changed)
+            {
+              changed = false;
+              for(const auto &step : equation.SSA_steps)
+              {
+                if(!step.is_assignment() || step.ignore)
+                  continue;
+                if(needed.count(step.ssa_lhs.get_identifier()))
+                {
+                  find_symbols_sett rhs;
+                  find_symbols(step.ssa_rhs, rhs);
+                  for(const auto &s : rhs)
+                    if(needed.insert(s).second)
+                      changed = true;
+                }
+              }
+            }
+
+            // Filter to relevant steps
+            std::vector<proof_explanation_stept> filtered;
+            for(const auto &e : explanation)
+            {
+              if(!e.in_core)
+                continue;
+              for(const auto &step : equation.SSA_steps)
+              {
+                if(step.ignore)
+                  continue;
+                if(step.source.pc->source_location() != e.source_location)
+                  continue;
+                if(
+                  step.is_assignment() &&
+                  needed.count(step.ssa_lhs.get_identifier()))
+                {
+                  filtered.push_back(e);
+                  break;
+                }
+                if(step.is_assume())
+                {
+                  find_symbols_sett syms;
+                  find_symbols(step.cond_expr, syms);
+                  for(const auto &s : syms)
+                    if(needed.count(s))
+                    {
+                      filtered.push_back(e);
+                      goto next_step;
+                    }
+                }
+              }
+            next_step:;
+            }
+            if(!filtered.empty())
+              per_property_explanations_cache[property_pair.first] =
+                std::move(filtered);
+            else
+              per_property_explanations_cache[property_pair.first] =
+                explanation;
+          }
+          else
+          {
+            per_property_explanations_cache[property_pair.first] = explanation;
+          }
+        }
       }
     }
     break;
@@ -185,6 +273,13 @@ goto_symex_property_decidert::get_proof_explanation(const namespacet &ns)
 {
   return ::get_proof_explanation_with_core(
     equation, solver->decision_procedure(), ns);
+}
+
+std::map<irep_idt, std::vector<proof_explanation_stept>>
+goto_symex_property_decidert::get_per_property_proof_explanations(
+  const namespacet &)
+{
+  return per_property_explanations_cache;
 }
 
 std::vector<proof_invariantt>
