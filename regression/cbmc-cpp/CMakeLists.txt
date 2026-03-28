@@ -16,7 +16,7 @@ else()
 endif()
 
 add_test_pl_tests(
-    "${cbmc_cmd}" ${gcc_only} -X libcxx -X no-validate
+    "${cbmc_cmd}" ${gcc_only} -X libcxx
 )
 set_tests_properties("cbmc-cpp-CORE" PROPERTIES TIMEOUT 1800)
 
