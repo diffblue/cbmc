@@ -1,0 +1,13 @@
+CORE
+test_isempty_nondet
+--max-nondet-string-length 100 --function test_isempty_nondet.checkIsEmpty
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Verifies String.isEmpty() == (String.length() == 0) for a nondet string.
+This forces the call into the string-refinement loop because the simplifier
+cannot fold isEmpty on a non-constant string, exercising
+string_constraint_generatort::add_axioms_for_is_empty under the cbmc-CORE
+profile.
