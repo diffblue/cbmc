@@ -1,5 +1,6 @@
+#if __has_include(<coroutine>)
 // C++20 coroutine with co_return
-#include <coroutine>
+#  include <coroutine>
 struct Task
 {
   struct promise_type
@@ -32,3 +33,9 @@ int main()
 {
   coro();
 }
+
+#else
+int main()
+{
+}
+#endif

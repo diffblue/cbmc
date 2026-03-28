@@ -1,3 +1,5 @@
+// C++23 language features require GCC 11+
+#if !defined(__GNUC__) || __GNUC__ >= 11
 // C++23 explicit object parameter in lambda
 int main()
 {
@@ -6,3 +8,9 @@ int main()
   __CPROVER_assert(r == 3, "deducing this lambda");
   return 0;
 }
+
+#else
+int main()
+{
+}
+#endif

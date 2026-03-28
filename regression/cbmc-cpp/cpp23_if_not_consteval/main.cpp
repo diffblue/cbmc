@@ -1,3 +1,5 @@
+// C++23 language features require GCC 11+
+#if !defined(__GNUC__) || __GNUC__ >= 11
 // C++23 if !consteval
 int f()
 {
@@ -15,3 +17,9 @@ int main()
 {
   __CPROVER_assert(f() == 42, "runtime branch taken");
 }
+
+#else
+int main()
+{
+}
+#endif

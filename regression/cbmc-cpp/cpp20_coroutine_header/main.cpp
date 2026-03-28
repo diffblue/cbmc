@@ -1,5 +1,12 @@
+#if __has_include(<coroutine>)
 // C++20: <coroutine> header parsing
-#include <coroutine>
+#  include <coroutine>
 int main()
 {
 }
+
+#else
+int main()
+{
+}
+#endif
