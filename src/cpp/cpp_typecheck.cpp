@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_typecheck.h"
 
+#include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/cprover_prefix.h>
 #include <util/find_symbols.h>
@@ -144,7 +145,42 @@ void cpp_typecheckt::typecheck()
   // incremented. We don't re-throw here; errors will be detected
   // by typecheck_main via the error count.
 
+  // Fold __safe_multiply::__c before static initialization.
+  // __c = uintmax_t(1) << (sizeof(intmax_t) * 4) = 2^32 on 64-bit.
+  // CBMC's constexpr evaluation may fail for this shift inside
+  // template classes on older GCC, causing division-by-zero in <ratio>.
+  for(auto &entry : symbol_table.symbols)
+  {
+    symbolt &sym = symbol_table.get_writeable_ref(entry.first);
+    if(
+      id2string(sym.base_name) == "__c" &&
+      id2string(sym.name).find("__safe_multiply") != std::string::npos)
+    {
+      typet t = sym.type;
+      t.remove(ID_C_constant);
+      sym.value = from_integer(mp_integer(1) << 32, t);
+      sym.is_macro = true;
+    }
+  }
+
   static_and_dynamic_initialization();
+
+  // Provide models for constexpr functions that are evaluated during
+  // method body type-checking. These must be set before
+  // typecheck_method_bodies() so that constexpr evaluation uses our
+  // models instead of producing nondet values.
+  for(auto &entry : symbol_table.symbols)
+  {
+    symbolt &sym = symbol_table.get_writeable_ref(entry.first);
+    const std::string name = id2string(sym.name);
+    const std::string base = id2string(sym.base_name);
+    if(
+      (base == "_S_nothrow_relocate" || base == "_S_use_relocate") &&
+      name.find("vector") != std::string::npos && sym.is_macro)
+    {
+      sym.value = true_exprt();
+    }
+  }
 
   typecheck_method_bodies();
 
