@@ -6,6 +6,7 @@
 
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
+#include <util/c_types.h>
 #include <util/expr_initializer.h>
 #include <util/expr_util.h>
 #include <util/floatbv_expr.h>
@@ -55,6 +56,12 @@ make_list_hook_body(const symbolt &symbol, const namespacet &ns)
   auto pos_prev = member_exprt(deref_pos, prev_name, ptr_type);
 
   code_blockt block;
+  // Assume the position pointer and its prev pointer are valid.
+  // In a properly constructed list, the sentinel node's pointers
+  // are always non-NULL (they point to itself for an empty list).
+  auto null_ptr = null_pointer_exprt(to_pointer_type(ptr_type));
+  block.add(code_assumet(notequal_exprt(pos_expr, null_ptr)));
+  block.add(code_assumet(notequal_exprt(pos_prev, null_ptr)));
   // this->_M_next = __position
   block.add(code_frontend_assignt(this_next, pos_expr));
   // this->_M_prev = __position->_M_prev
@@ -286,6 +293,23 @@ void cpp_typecheckt::provide_stdlib_bodies()
   // spurious overflow/shift failures from alphabetical init ordering.
   fold_numeric_traits_integer(symbol_table);
 
+  // Fold __safe_multiply::__c to avoid division-by-zero in <ratio>.
+  // __c = uintmax_t(1) << (sizeof(intmax_t) * 4) which is 2^32 on
+  // 64-bit systems. CBMC's constexpr evaluation may fail to compute
+  // this inside template classes on older GCC.
+  for(auto it = symbol_table.begin(); it != symbol_table.end(); ++it)
+  {
+    symbolt &sym = it.get_writeable_symbol();
+    const std::string sname = id2string(sym.name);
+    if(
+      id2string(sym.base_name) == "__c" &&
+      sname.find("__safe_multiply") != std::string::npos)
+    {
+      sym.value = from_integer(mp_integer(1) << 32, sym.type);
+      sym.is_macro = true;
+    }
+  }
+
   // Fix parameter symbols that are missing is_parameter flag.
   for(auto it = symbol_table.begin(); it != symbol_table.end(); ++it)
   {
@@ -338,24 +362,142 @@ void cpp_typecheckt::provide_stdlib_bodies()
     // (except for specific functions we need to override)
     if(symbol.value.is_not_nil() && !is_deferred)
     {
-      if(base == "_S_nothrow_relocate")
+      if(base == "_S_nothrow_relocate" || base == "_S_use_relocate")
       {
-        // Override: return true for verification
+        // Override: return true so the _S_relocate path is taken
+        // (which we model) instead of __uninitialized_move_if_noexcept_a.
+        // Clear is_macro so the function is called at runtime using
+        // our model body, not evaluated as constexpr (which may
+        // produce nondet on older GCC).
         ensure_parameter_symbols(symbol, symbol_table);
+        symbol.is_macro = false;
         code_blockt block;
         block.add(code_frontend_returnt(true_exprt()));
         symbol.value = std::move(block);
         symbol.value.type() = symbol.type;
         deferred_typechecking.erase(symbol.name);
       }
+      else if(
+        base == "__exchange_and_add_single" ||
+        base == "__exchange_and_add_dispatch")
+      {
+        // Override: add assume(__mem != NULL) before the body.
+        ensure_parameter_symbols(symbol, symbol_table);
+        const auto &params = to_code_type(symbol.type).parameters();
+        if(!params.empty())
+        {
+          symbol_exprt mem(params[0].get_identifier(), params[0].type());
+          auto null_ptr = null_pointer_exprt(to_pointer_type(mem.type()));
+          // Prepend assumes to existing body:
+          // 1. __mem is non-NULL (valid shared_ptr control block)
+          // 2. *__mem >= 0 (reference counts are non-negative)
+          if(symbol.value.id() == ID_code)
+          {
+            code_blockt block;
+            block.add(code_assumet(notequal_exprt(mem, null_ptr)));
+            auto deref = dereference_exprt(mem);
+            block.add(code_assumet(binary_relation_exprt(
+              deref, ID_ge, from_integer(0, deref.type()))));
+            block.add(to_code(symbol.value));
+            symbol.value = std::move(block);
+          }
+        }
+      }
+      else if(
+        name.find("std::_Destroy<") != std::string::npos &&
+        name.find("_Destroy_aux") == std::string::npos)
+      {
+        // Override: std::_Destroy(first, last) — no-op for scalars
+        ensure_parameter_symbols(symbol, symbol_table);
+        symbol.value = code_blockt();
+        symbol.value.type() = symbol.type;
+        deferred_typechecking.erase(symbol.name);
+      }
+      continue;
+    }
+
+    // Provide model for _S_use_relocate/_S_nothrow_relocate regardless
+    // of whether they already have a value.
+    if(
+      (base == "_S_nothrow_relocate" || base == "_S_use_relocate") &&
+      name.find("vector") != std::string::npos)
+    {
+      ensure_parameter_symbols(symbol, symbol_table);
+      symbol.is_macro = false;
+      code_blockt block;
+      block.add(code_frontend_returnt(true_exprt()));
+      symbol.value = std::move(block);
+      symbol.value.type() = symbol.type;
+      deferred_typechecking.erase(symbol.name);
+      continue;
+    }
+
+    if(base == "__do_upcast" && name.find("type_info") != std::string::npos)
+    {
+      // type_info::__do_upcast — RTTI helper, provide empty body
+      ensure_parameter_symbols(symbol, symbol_table);
+      symbol.value = code_blockt();
+      symbol.value.type() = symbol.type;
+      deferred_typechecking.erase(symbol.name);
+      continue;
+    }
+
+    if(name.find("std::any::any") != std::string::npos && symbol.value.is_nil())
+    {
+      // std::any constructor — deferred type-checking fails on GCC 12/15
+      // due to noexcept specifier with __is_nothrow_new_constructible.
+      // Provide empty body (any_cast will return nondet).
+      ensure_parameter_symbols(symbol, symbol_table);
+      symbol.value = code_blockt();
+      symbol.value.type() = symbol.type;
+      deferred_typechecking.erase(symbol.name);
+      continue;
+    }
+
+    // GCC 16+ system header functions that lack bodies.
+    if(
+      symbol.value.is_nil() &&
+      (name == "__glibcxx_assert_fail" || name == "std::__glibcxx_assert_fail"))
+    {
+      // libstdc++ assertion handler — provide empty body (assume no
+      // assertion failures in the standard library).
+      ensure_parameter_symbols(symbol, symbol_table);
+      symbol.value = code_blockt();
+      symbol.value.type() = symbol.type;
+      deferred_typechecking.erase(symbol.name);
+      continue;
+    }
+
+    if(base == "Init" && name.find("ios_base") != std::string::npos)
+    {
+      // ios_base::Init constructor — provide empty body.
+      ensure_parameter_symbols(symbol, symbol_table);
+      symbol.value = code_blockt();
+      symbol.value.type() = symbol.type;
+      deferred_typechecking.erase(symbol.name);
+      continue;
+    }
+    if(
+      base == "_S_copy_chars" && name.find("basic_string") != std::string::npos)
+    {
+      // _S_copy_chars(p, k1, k2) copies characters from [k1,k2) to p.
+      // For pointer iterators this is memcpy(p, k1, k2-k1).
+      // Provide an empty body — the copy is not needed for verification
+      // of string size/length properties.
+      ensure_parameter_symbols(symbol, symbol_table);
+      symbol.value = code_blockt();
+      symbol.value.type() = symbol.type;
+      deferred_typechecking.erase(symbol.name);
       continue;
     }
 
     if(base == "_S_relocate" && name.find("vector") != std::string::npos)
     {
-      // _S_relocate(first, last, result, alloc) → memcpy + return
+      // _S_relocate(first, last, result, alloc) → return
       // result + (last - first). For trivially copyable types this
-      // is the correct behavior.
+      // is the correct behavior. When first == last (empty range),
+      // return result directly to avoid pointer arithmetic on
+      // potentially NULL pointers from empty vectors.
       ensure_parameter_symbols(symbol, symbol_table);
       const auto &params = to_code_type(symbol.type).parameters();
       if(params.size() >= 3)
@@ -363,14 +505,19 @@ void cpp_typecheckt::provide_stdlib_bodies()
         symbol_exprt first(params[0].get_identifier(), params[0].type());
         symbol_exprt last(params[1].get_identifier(), params[1].type());
         symbol_exprt result(params[2].get_identifier(), params[2].type());
-        // return result + (last - first)
         const auto &ret_type = to_code_type(symbol.type).return_type();
         minus_exprt diff(last, first);
-        diff.type() = signedbv_typet(64);
+        diff.type() = pointer_diff_type();
         plus_exprt sum(result, diff);
         sum.type() = ret_type;
         code_blockt block;
-        block.add(code_frontend_returnt(sum));
+        // If first == last (empty range), return result directly.
+        // Otherwise compute result + (last - first).
+        code_ifthenelset if_empty(
+          equal_exprt(first, last),
+          code_frontend_returnt(result),
+          code_frontend_returnt(sum));
+        block.add(std::move(if_empty));
         symbol.value = std::move(block);
         symbol.value.type() = symbol.type;
         deferred_typechecking.erase(symbol.name);
@@ -445,6 +592,51 @@ void cpp_typecheckt::provide_stdlib_bodies()
       deferred_typechecking.erase(symbol.name);
     }
     else if(
+      base == "allocate" && name.find("__new_allocator") != std::string::npos)
+    {
+      // __new_allocator::allocate(n) — GCC 15+ calls this directly.
+      // Same model as allocator_traits::allocate.
+      const code_typet &fn_type = to_code_type(symbol.type);
+      const auto &ret_type = fn_type.return_type();
+      if(ret_type.id() == ID_pointer)
+      {
+        const auto &params = fn_type.parameters();
+        // params: this, n, [hint]
+        if(params.size() >= 2)
+        {
+          const symbol_exprt n_expr(
+            params[1].get_identifier(), params[1].type());
+          const auto &elem_type = to_pointer_type(ret_type).base_type();
+          auto elem_size = size_of_expr(elem_type, ns);
+          if(elem_size.has_value())
+          {
+            auto total = mult_exprt(
+              typecast_exprt::conditional_cast(n_expr, elem_size->type()),
+              *elem_size);
+            side_effect_exprt alloc{
+              ID_allocate, {total, false_exprt()}, ret_type, symbol.location};
+            code_blockt block;
+            block.add(code_frontend_returnt(alloc));
+            ensure_parameter_symbols(symbol, symbol_table);
+            symbol.value = std::move(block);
+            symbol.value.type() = symbol.type;
+            deferred_typechecking.erase(symbol.name);
+          }
+        }
+      }
+    }
+    else if(
+      base == "deallocate" && name.find("__new_allocator") != std::string::npos)
+    {
+      // __new_allocator::deallocate — no-op for verification
+      code_blockt block;
+      ensure_parameter_symbols(symbol, symbol_table);
+      symbol.value = std::move(block);
+      symbol.value.type() = symbol.type;
+      deferred_typechecking.erase(symbol.name);
+    }
+
+    else if(
       base == "__destroy" && name.find("_Destroy_aux") != std::string::npos)
     {
       // _Destroy_aux<false>::__destroy(first, last) — no-op for
@@ -458,7 +650,8 @@ void cpp_typecheckt::provide_stdlib_bodies()
     else if(
       base == "construct" &&
       (name.find("allocator_traits") != std::string::npos ||
-       name.find("__alloc_traits") != std::string::npos))
+       name.find("__alloc_traits") != std::string::npos ||
+       name.find("__new_allocator") != std::string::npos))
     {
       // construct(alloc&, ptr, args...) → *ptr = arg
       // For simple types, placement new is equivalent to assignment.
