@@ -154,8 +154,6 @@ public:
   std::pair<exprt, string_constraintst>
   add_axioms_for_copy(const function_application_exprt &f);
 
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_concat_code_point(const function_application_exprt &f);
   std::pair<exprt, string_constraintst> add_axioms_for_constant(
     const array_string_exprt &res,
     irep_idt sval,
@@ -263,9 +261,6 @@ public:
   std::pair<exprt, string_constraintst>
   add_axioms_for_trim(const function_application_exprt &f);
 
-  std::pair<exprt, string_constraintst> add_axioms_for_code_point(
-    const array_string_exprt &res,
-    const exprt &code_point);
   std::pair<exprt, string_constraintst>
   add_axioms_for_char_literal(const function_application_exprt &f);
 
