@@ -1,7 +1,7 @@
 CORE gcc-only
 main.cpp
---cpp11 --unwind 2
-^EXIT=(0|10)$
+--cpp11 --unwind 2 --no-unwinding-assertions --depth 50 --no-built-in-assertions
+^EXIT=0$
 ^SIGNAL=0$
 --
 ^warning: ignoring

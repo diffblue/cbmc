@@ -1,6 +1,6 @@
 CORE gcc-only
 main.cpp
---cpp14 --no-built-in-assertions
+--cpp14
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

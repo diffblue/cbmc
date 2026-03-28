@@ -1,7 +1,7 @@
 CORE
 main.cpp
---cpp11 --verbosity 8
-^EXIT=(0|6)$
+--cpp11
+^EXIT=0$
 ^SIGNAL=0$
 --
 ^PARSING ERROR$
