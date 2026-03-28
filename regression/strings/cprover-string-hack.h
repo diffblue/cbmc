@@ -68,8 +68,6 @@ typedef __CPROVER_refined_string_type __CPROVER_string;                  //NOLIN
 #define __CPROVER_char_set(s, p, c) \
   __CPROVER_uninterpreted_string_char_set_func(s, p, c)
 
-
-#define __CPROVER_string_copy(s) __CPROVER_uninterpreted_string_copy_func(s)
 #define __CPROVER_parse_int(s) __CPROVER_uninterpreted_string_parse_int_func(s)
 #define __CPROVER_string_of_int(i) __CPROVER_uninterpreted_string_of_int_func(i)
 
@@ -99,9 +97,9 @@ extern int __CPROVER_uninterpreted_string_index_of_func(
 extern int __CPROVER_uninterpreted_string_last_index_of_func(
   __CPROVER_string str, char c);
 extern __CPROVER_string __CPROVER_uninterpreted_string_char_set_func(
-  __CPROVER_string str, int pos, char c);
-extern __CPROVER_string __CPROVER_uninterpreted_string_copy_func(
-  __CPROVER_string str);
+  __CPROVER_string str,
+  int pos,
+  char c);
 extern int __CPROVER_uninterpreted_string_parse_int_func(__CPROVER_string str);
 extern __CPROVER_string __CPROVER_uninterpreted_string_of_int_func(int i);
 
