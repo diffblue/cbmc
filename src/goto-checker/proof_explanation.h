@@ -22,6 +22,7 @@ Author: CBMC Contributors
 class namespacet;
 class stack_decision_proceduret;
 class symex_target_equationt;
+class SSA_stept;
 
 /// A single step in a proof explanation, representing a program step
 /// that contributes to proving a property.
@@ -52,6 +53,12 @@ struct proof_explanation_stept
 std::vector<proof_explanation_stept> get_proof_explanation(
   const symex_target_equationt &equation,
   const namespacet &ns);
+
+// Helpers used by both proof_explanation.cpp and
+// goto_symex_property_decider.cpp
+std::string step_type_string(const SSA_stept &step);
+std::string step_description(const SSA_stept &step, const namespacet &ns);
+bool is_relevant_proof_step(const SSA_stept &step);
 
 /// Extract a word-level proof explanation with unsat core information.
 /// After the solver returns UNSATISFIABLE, this function iterates
@@ -121,6 +128,21 @@ template <typename T>
 struct has_get_proof_invariantst<
   T,
   std::void_t<decltype(std::declval<T>().get_proof_invariants())>>
+  : std::true_type
+{
+};
+
+/// Type trait for get_per_property_proof_explanations().
+template <typename T, typename = void>
+struct has_get_per_property_proof_explanationst : std::false_type
+{
+};
+
+template <typename T>
+struct has_get_per_property_proof_explanationst<
+  T,
+  std::void_t<
+    decltype(std::declval<T>().get_per_property_proof_explanations())>>
   : std::true_type
 {
 };

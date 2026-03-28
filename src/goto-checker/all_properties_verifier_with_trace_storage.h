@@ -102,6 +102,17 @@ public:
         output_proof_invariants(invariants, ui_message_handler);
       }
     }
+    if constexpr(has_get_proof_explanationt<incremental_goto_checkerT>::value)
+    {
+      if(
+        options.get_bool_option("proof-explanation") &&
+        determine_result(properties) == resultt::PASS)
+      {
+        auto per_prop =
+          incremental_goto_checker.get_per_property_proof_explanations();
+        output_per_property_proof_explanations(per_prop, ui_message_handler);
+      }
+    }
     output_overall_result(determine_result(properties), ui_message_handler);
     incremental_goto_checker.report();
   }
