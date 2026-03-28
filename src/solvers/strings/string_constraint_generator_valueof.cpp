@@ -54,57 +54,6 @@ string_constraint_generatort::add_axioms_from_long(
     return add_axioms_for_string_of_int(res, f.arguments()[2], 0);
 }
 
-/// Add axioms stating that the returned string equals "true" when the Boolean
-/// expression is true and "false" when it is false.
-/// \deprecated This is Java specific and should be implemented in Java instead
-/// \param res: string expression for the result
-/// \param b: Boolean expression
-/// \return code 0 on success
-DEPRECATED(SINCE(2017, 10, 5, "Java specific, should be implemented in Java"))
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_from_bool(
-  const array_string_exprt &res,
-  const exprt &b)
-{
-  const typet &char_type = to_type_with_subtype(res.content().type()).subtype();
-  PRECONDITION(b.type() == bool_typet() || b.type().id() == ID_c_bool);
-  string_constraintst constraints;
-  typecast_exprt eq(b, bool_typet());
-
-  // We add axioms:
-  // a1 : eq => res = |"true"|
-  // a2 : forall i < |"true"|. eq => res[i]="true"[i]
-  // a3 : !eq => res = |"false"|
-  // a4 : forall i < |"false"|. !eq => res[i]="false"[i]
-
-  std::string str_true = "true";
-  const implies_exprt a1(
-    eq, equal_to(array_pool.get_or_create_length(res), str_true.length()));
-  constraints.existential.push_back(a1);
-
-  for(std::size_t i = 0; i < str_true.length(); i++)
-  {
-    exprt chr = from_integer(str_true[i], char_type);
-    implies_exprt a2(eq, equal_exprt(res[i], chr));
-    constraints.existential.push_back(a2);
-  }
-
-  std::string str_false = "false";
-  const implies_exprt a3(
-    not_exprt(eq),
-    equal_to(array_pool.get_or_create_length(res), str_false.length()));
-  constraints.existential.push_back(a3);
-
-  for(std::size_t i = 0; i < str_false.length(); i++)
-  {
-    exprt chr = from_integer(str_false[i], char_type);
-    implies_exprt a4(not_exprt(eq), equal_exprt(res[i], chr));
-    constraints.existential.push_back(a4);
-  }
-
-  return {from_integer(0, get_return_code_type()), std::move(constraints)};
-}
-
 /// Add axioms enforcing that the string corresponds to the result
 /// of String.valueOf(I) or String.valueOf(J) Java functions applied
 /// on the integer expression.
