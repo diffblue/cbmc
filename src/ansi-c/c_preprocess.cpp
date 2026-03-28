@@ -17,6 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/tempfile.h>
 #include <util/unicode.h>
 
+#include "gcc_version.h"
+
 #include <fstream>
 
 static void error_parse_line(
@@ -568,9 +570,20 @@ bool c_preprocess_gcc_clang(
 #if defined(__OpenBSD__)
       if(preprocessor == configt::ansi_ct::preprocessort::CLANG)
         argv.push_back("-std=c++20");
-      else
+      else // NOLINT(readability/braces)
 #endif
-        argv.push_back("-std=gnu++20");
+      {
+        // Use -std=gnu++2a for GCC compatibility (GCC 9 doesn't accept
+        // -std=gnu++20, but all GCC versions accept -std=gnu++2a).
+        if(preprocessor == configt::ansi_ct::preprocessort::GCC)
+        {
+          argv.push_back("-std=gnu++2a");
+        }
+        else
+        {
+          argv.push_back("-std=gnu++20");
+        }
+      }
       argv.push_back("-U__cpp_deduction_guides");
       // CBMC treats char8_t as unsigned char, causing duplicate template
       // specializations; undefine the feature macro to avoid this.
@@ -584,13 +597,21 @@ bool c_preprocess_gcc_clang(
 #if defined(__OpenBSD__)
       if(preprocessor == configt::ansi_ct::preprocessort::CLANG)
         argv.push_back("-std=c++23");
-      else
+      else // NOLINT(readability/braces)
 #endif
       {
         if(preprocessor == configt::ansi_ct::preprocessort::CLANG)
           argv.push_back("-std=c++2b");
         else
-          argv.push_back("-std=gnu++23");
+        {
+          // GCC 11+ supports -std=gnu++2b; older GCC only has -std=gnu++2a.
+          gcc_versiont gcc_ver;
+          gcc_ver.get("gcc");
+          if(gcc_ver.is_at_least(11u))
+            argv.push_back("-std=gnu++2b");
+          else
+            argv.push_back("-std=gnu++2a");
+        }
       }
       argv.push_back("-U__cpp_deduction_guides");
       argv.push_back("-U__cpp_char8_t");
@@ -605,13 +626,20 @@ bool c_preprocess_gcc_clang(
 #if defined(__OpenBSD__)
       if(preprocessor == configt::ansi_ct::preprocessort::CLANG)
         argv.push_back("-std=c++23");
-      else
+      else // NOLINT(readability/braces)
 #endif
       {
         if(preprocessor == configt::ansi_ct::preprocessort::CLANG)
           argv.push_back("-std=c++2b");
         else
-          argv.push_back("-std=gnu++23");
+        {
+          gcc_versiont gcc_ver;
+          gcc_ver.get("gcc");
+          if(gcc_ver.is_at_least(11u))
+            argv.push_back("-std=gnu++2b");
+          else
+            argv.push_back("-std=gnu++2a");
+        }
       }
       argv.push_back("-U__cpp_deduction_guides");
       argv.push_back("-U__cpp_char8_t");
