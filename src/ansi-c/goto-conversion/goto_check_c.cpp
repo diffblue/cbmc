@@ -1365,17 +1365,24 @@ void goto_check_ct::pointer_rel_check(
       expr,
       guard);
 
+    // When both operands of a pointer subtraction are NULL,
+    // NULL - NULL = 0 is well-defined in practice (used by libstdc++
+    // vector::_M_realloc_insert for empty vectors). Guard each
+    // pointer check with "or both operands are NULL".
+    const auto both_null =
+      and_exprt(null_object(expr.op0()), null_object(expr.op1()));
+
     for(const auto &pointer : expr.operands())
     {
-      // just this particular byte must be within object bounds or one past the
-      // end
+      // just this particular byte must be within object bounds or one
+      // past the end
       const auto size = from_integer(0, size_type());
       auto conditions = get_pointer_dereferenceable_conditions(pointer, size);
 
       for(const auto &c : conditions)
       {
         add_guarded_property(
-          c.assertion,
+          or_exprt(c.assertion, both_null),
           "pointer relation: " + c.description,
           "pointer arithmetic",
           true, // fatal
