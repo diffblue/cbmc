@@ -1,6 +1,6 @@
 CORE gcc-only
 main.cpp
 --cpp11
-^EXIT=(0|10)$
+^EXIT=0$
 ^SIGNAL=0$
-^VERIFICATION
+^VERIFICATION SUCCESSFUL$

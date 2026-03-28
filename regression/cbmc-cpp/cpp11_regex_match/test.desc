@@ -1,8 +1,8 @@
 CORE gcc-only
 main.cpp
---cpp11 --object-bits 12 --unwind 5 --depth 200
-^VERIFICATION
-^EXIT=(0|10)$
+--cpp11 --object-bits 12 --unwind 5 --depth 200 --no-unwinding-assertions
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
 ^SIGNAL=0$
 --
 Invariant violation: std::less<std::_V2::error_category>::~less
