@@ -6,6 +6,8 @@
 #include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/expr_util.h>
+#include <util/mathematical_expr.h>
 #include <util/range.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
@@ -24,6 +26,7 @@
 #include <solvers/smt2_incremental/theories/smt_core_theory.h>
 #include <solvers/smt2_incremental/type_size_mapping.h>
 
+#include <forward_list>
 #include <stack>
 #include <unordered_set>
 #include <vector>
@@ -60,6 +63,68 @@ get_problem_messages(const smt_responset &response)
   return {};
 }
 
+/// Identifiers of variables bound by quantifiers.
+using bound_identifierst = std::unordered_set<irep_idt>;
+
+/// \return True iff \p expr contains a symbol whose identifier is in \p bound.
+static bool has_bound_symbol(const exprt &expr, const bound_identifierst &bound)
+{
+  if(bound.empty())
+    return false;
+  return has_subexpr(
+    expr,
+    [&bound](const exprt &e)
+    {
+      const auto symbol = expr_try_dynamic_cast<symbol_exprt>(e);
+      return symbol && bound.count(symbol->identifier()) != 0;
+    });
+}
+
+/// Pre-order traversal of \p root that tracks the identifiers bound by the
+/// quantifiers enclosing each node. A quantifier binds its variables within its
+/// body; the tuple of bound variables itself is not visited. \p visitor is
+/// called with each node and the identifiers bound at that node, and returns
+/// whether the operands of the (possibly modified) node are to be visited.
+/// All passes that need to know which symbols are bound use this traversal, so
+/// that they agree with `convert_expr_to_smt` (see `filtered_visit_post`).
+template <typename exprT, typename visitorT>
+static void visit_pre_with_bound_identifiers(exprT &root, visitorT visitor)
+{
+  const bound_identifierst nothing_bound;
+  // owns the bound sets referred to by stack entries
+  std::forward_list<bound_identifierst> bound_sets;
+  struct framet
+  {
+    exprT *node;
+    const bound_identifierst *bound;
+  };
+  std::stack<framet> stack;
+  stack.push({&root, &nothing_bound});
+
+  while(!stack.empty())
+  {
+    framet frame = std::move(stack.top());
+    stack.pop();
+    exprT &node = *frame.node;
+
+    if(!visitor(node, *frame.bound))
+      continue;
+
+    if(can_cast_expr<quantifier_exprt>(node))
+    {
+      bound_sets.push_front(*frame.bound);
+      for(const auto &variable : to_quantifier_expr(node).variables())
+        bound_sets.front().insert(variable.identifier());
+      // operand 0 is the tuple of bound variables, operand 1 is the body
+      stack.push({&node.operands()[1], &bound_sets.front()});
+      continue;
+    }
+
+    for(auto &operand : node.operands())
+      stack.push({&operand, frame.bound});
+  }
+}
+
 /// \brief Find all sub expressions of the given \p expr which need to be
 ///   expressed as separate smt commands.
 /// \return A collection of sub expressions, which need to be expressed as
@@ -71,38 +136,50 @@ get_problem_messages(const smt_responset &response)
 ///   `convert_expr_to_smt` translates into function applications, must also be
 ///   returned by this`gather_dependent_expressions` function.
 /// \details `symbol_exprt`, `array_exprt` and `nondet_symbol_exprt` add
-///   dependant expressions.
+///   dependant expressions. Symbols bound by an enclosing quantifier are not
+///   dependencies, as they are declared by the quantifier; this matches
+///   `convert_expr_to_smt`, which does not convert the tuple of bound
+///   variables.
 static std::vector<exprt> gather_dependent_expressions(const exprt &root_expr)
 {
   std::vector<exprt> dependent_expressions;
 
-  std::stack<const exprt *> stack;
-  stack.push(&root_expr);
-
-  while(!stack.empty())
-  {
-    const exprt &expr_node = *stack.top();
-    stack.pop();
-    if(
-      can_cast_expr<symbol_exprt>(expr_node) ||
-      can_cast_expr<array_exprt>(expr_node) ||
-      can_cast_expr<array_of_exprt>(expr_node) ||
-      can_cast_expr<nondet_symbol_exprt>(expr_node) ||
-      can_cast_expr<string_constantt>(expr_node))
+  visit_pre_with_bound_identifiers(
+    root_expr,
+    [&dependent_expressions](const exprt &node, const bound_identifierst &bound)
     {
-      dependent_expressions.push_back(expr_node);
-    }
-    // The decision procedure does not depend on the values inside address of
-    // code typed expressions. We can build the address without knowing the
-    // value at that memory location. In this case the hypothetical compiled
-    // machine instructions at the address are not relevant to solving, only
-    // representing *which* function a pointer points to is needed.
-    const auto address_of = expr_try_dynamic_cast<address_of_exprt>(expr_node);
-    if(address_of && can_cast_type<code_typet>(address_of->object().type()))
-      continue;
-    for(auto &operand : expr_node.operands())
-      stack.push(&operand);
-  }
+      if(const auto symbol = expr_try_dynamic_cast<symbol_exprt>(node))
+      {
+        if(bound.count(symbol->identifier()) == 0)
+          dependent_expressions.push_back(node);
+      }
+      else if(
+        can_cast_expr<array_exprt>(node) ||
+        can_cast_expr<array_of_exprt>(node) ||
+        can_cast_expr<nondet_symbol_exprt>(node) ||
+        can_cast_expr<string_constantt>(node))
+      {
+        // These are defined as separate functions, which must not refer to
+        // variables bound by an enclosing quantifier.
+        if(has_bound_symbol(node, bound))
+        {
+          UNIMPLEMENTED_FEATURE(
+            "Generation of SMT formula for array expression depending on a "
+            "quantified variable: " +
+            node.pretty());
+        }
+        dependent_expressions.push_back(node);
+      }
+      // The decision procedure does not depend on the values inside address of
+      // code typed expressions. We can build the address without knowing the
+      // value at that memory location. In this case the hypothetical compiled
+      // machine instructions at the address are not relevant to solving, only
+      // representing *which* function a pointer points to is needed.
+      const auto address_of = expr_try_dynamic_cast<address_of_exprt>(node);
+      return !(
+        address_of && can_cast_type<code_typet>(address_of->object().type()));
+    });
+
   return dependent_expressions;
 }
 
@@ -247,18 +324,28 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
 
 /// Replaces the sub expressions of \p expr which have been defined as separate
 /// functions in the smt solver, using the \p expression_identifiers map.
+/// Sub expressions referring to variables bound by an enclosing quantifier are
+/// not replaced, as the definitions are outside the scope of the quantifier.
 static exprt substitute_identifiers(
   exprt expr,
   const std::unordered_map<exprt, smt_identifier_termt, irep_hash>
     &expression_identifiers)
 {
-  expr.visit_pre([&](exprt &node) -> void {
-    auto find_result = expression_identifiers.find(node);
-    if(find_result == expression_identifiers.cend())
-      return;
-    const auto type = find_result->first.type();
-    node = symbol_exprt{find_result->second.identifier(), type};
-  });
+  visit_pre_with_bound_identifiers(
+    expr,
+    [&](exprt &node, const bound_identifierst &bound)
+    {
+      auto find_result = expression_identifiers.find(node);
+      if(
+        find_result == expression_identifiers.cend() ||
+        has_bound_symbol(node, bound))
+      {
+        return true;
+      }
+      const auto type = find_result->first.type();
+      node = symbol_exprt{find_result->second.identifier(), type};
+      return false;
+    });
   return expr;
 }
 
@@ -359,6 +446,7 @@ void smt2_incremental_decision_proceduret::ensure_handle_for_expr_defined(
   const exprt lowered_expr = lower(in_expr);
 
   define_dependent_functions(lowered_expr);
+  define_quantifier_identifiers(lowered_expr);
   smt_define_function_commandt function{
     "B" + std::to_string(handle_sequence()),
     {},
@@ -369,30 +457,75 @@ void smt2_incremental_decision_proceduret::ensure_handle_for_expr_defined(
   solver_process->send(function);
 }
 
+void smt2_incremental_decision_proceduret::define_quantifier_identifiers(
+  const exprt &expr)
+{
+  std::vector<exprt> quantifiers;
+  visit_pre_with_bound_identifiers(
+    expr,
+    [&quantifiers](const exprt &node, const bound_identifierst &)
+    {
+      if(!can_cast_expr<quantifier_exprt>(node))
+        return true;
+      // nested quantifiers may refer to variables bound by this one
+      quantifiers.push_back(node);
+      return false;
+    });
+
+  for(const exprt &quantifier : quantifiers)
+  {
+    if(expression_identifiers.find(quantifier) != expression_identifiers.end())
+      continue;
+
+    const smt_termt definition = convert_expr_to_smt(quantifier);
+    const smt_identifier_termt identifier{
+      "B" + std::to_string(handle_sequence()), smt_bool_sortt{}};
+    solver_process->send(smt_declare_function_commandt{identifier, {}});
+    // Z3 eliminates a Boolean constant B defined via (= B quantifier), and
+    // then returns the quantified formula rather than a value for B (see
+    // Z3Prover/z3#7743). Two implications avoid this.
+    solver_process->send(
+      smt_assert_commandt{smt_core_theoryt::implies(identifier, definition)});
+    solver_process->send(
+      smt_assert_commandt{smt_core_theoryt::implies(definition, identifier)});
+    expression_identifiers.emplace(quantifier, identifier);
+    identifier_table.emplace(identifier.identifier(), identifier);
+  }
+}
+
 void smt2_incremental_decision_proceduret::define_index_identifiers(
   const exprt &expr)
 {
-  expr.visit_post(
-    [&](const exprt &expr_node)
+  std::vector<exprt> indices;
+  visit_pre_with_bound_identifiers(
+    expr,
+    [&indices](const exprt &expr_node, const bound_identifierst &bound)
     {
-      if(!can_cast_type<array_typet>(expr_node.type()))
-        return;
-      if(const auto with_expr = expr_try_dynamic_cast<with_exprt>(expr_node))
+      // Indices referring to variables bound by an enclosing quantifier
+      // cannot be defined outside the quantifier.
+      const auto with_expr = expr_try_dynamic_cast<with_exprt>(expr_node);
+      if(
+        with_expr && can_cast_type<array_typet>(expr_node.type()) &&
+        !has_bound_symbol(with_expr->where(), bound))
       {
-        const auto index_expr = with_expr->where();
-        const auto index_term = convert_expr_to_smt(index_expr);
-        const auto index_identifier =
-          "index_" + std::to_string(index_sequence());
-        const auto index_definition =
-          smt_define_function_commandt{index_identifier, {}, index_term};
-        expression_identifiers.emplace(
-          index_expr, index_definition.identifier());
-        identifier_table.emplace(
-          index_identifier, index_definition.identifier());
-        solver_process->send(
-          smt_define_function_commandt{index_identifier, {}, index_term});
+        indices.push_back(with_expr->where());
       }
+      return true;
     });
+
+  // define in post order, as did the previous implementation using visit_post
+  for(auto it = indices.rbegin(); it != indices.rend(); ++it)
+  {
+    const exprt &index_expr = *it;
+    const auto index_term = convert_expr_to_smt(index_expr);
+    const auto index_identifier = "index_" + std::to_string(index_sequence());
+    const auto index_definition =
+      smt_define_function_commandt{index_identifier, {}, index_term};
+    expression_identifiers.emplace(index_expr, index_definition.identifier());
+    identifier_table.emplace(index_identifier, index_definition.identifier());
+    solver_process->send(
+      smt_define_function_commandt{index_identifier, {}, index_term});
+  }
 }
 
 exprt smt2_incremental_decision_proceduret::substitute_defined_padding(
@@ -657,6 +790,7 @@ void smt2_incremental_decision_proceduret::set_to(
   PRECONDITION(can_cast_type<bool_typet>(lowered_expr.type()));
 
   define_dependent_functions(lowered_expr);
+  define_quantifier_identifiers(lowered_expr);
   auto converted_term = [&]() -> smt_termt {
     const auto expression_handle_identifier =
       expression_handle_identifiers.find(lowered_expr);
