@@ -254,11 +254,17 @@ goto_symext::cache_dereference(exprt &dereference_result, statet &state)
 /// Check whether the pointer expression used for dereferencing involves
 /// shared state. If it does, return the first shared symbol found.
 /// Uses \p ns and \p dirty to identify potentially-shared objects.
+///
+/// In multi-threaded mode, a local pointer may have been assigned from
+/// a shared source (e.g., `int *local = shared_ptr`). To detect this,
+/// we also query the value set: if any of the pointer's possible targets
+/// are shared objects, the dereference is treated as shared.
 /// \return The shared symbol expression if found, empty optional otherwise.
 static std::optional<symbol_exprt> find_shared_pointer_in_dereference(
   const exprt &expr,
   const incremental_dirtyt &dirty,
-  const namespacet &ns)
+  const namespacet &ns,
+  const goto_symex_statet &state)
 {
   for(auto it = expr.depth_cbegin(); it != expr.depth_cend(); /* no ++it */)
   {
@@ -272,14 +278,59 @@ static std::optional<symbol_exprt> find_shared_pointer_in_dereference(
       const irep_idt obj_name = is_ssa_expr(*sym_expr)
                                   ? to_ssa_expr(*sym_expr).get_object_name()
                                   : sym_expr->get_identifier();
+      if(obj_name == goto_symex_statet::guard_identifier())
+      {
+        ++it;
+        continue;
+      }
+
+      // Direct check: is this symbol itself shared?
+      // Exclude __spawned_thread parameters — they are set by the parent
+      // thread before the child starts and are effectively thread-local
+      // copies of the pthread_create arguments.
       if(
-        obj_name != goto_symex_statet::guard_identifier() &&
-        (ns.lookup(obj_name).is_shared() || dirty(obj_name)))
+        (ns.lookup(obj_name).is_shared() || dirty(obj_name)) &&
+        id2string(obj_name).find("__spawned_thread::") == std::string::npos)
       {
         return *sym_expr;
       }
     }
     ++it;
+  }
+
+  // Indirect check: for simple pointer-typed symbol expressions (not
+  // member accesses or array indexing), query the value set to see if
+  // any target is a shared global variable. This catches cases like
+  // `int *local = shared_ptr` where the local pointer itself is not
+  // shared but its value derives from a shared source.
+  // We restrict to simple symbols to avoid false positives from struct
+  // member accesses through thread arguments (e.g., args->ptr).
+  if(
+    expr.type().id() == ID_pointer && is_ssa_expr(expr) &&
+    to_ssa_expr(expr).get_original_expr().id() == ID_symbol)
+  {
+    auto value_set_entries = state.value_set.get_value_set(expr, ns);
+    for(const auto &entry : value_set_entries)
+    {
+      for(auto vs_it = entry.depth_cbegin(); vs_it != entry.depth_cend();
+          ++vs_it)
+      {
+        if(auto sym = expr_try_dynamic_cast<symbol_exprt>(*vs_it))
+        {
+          const irep_idt name = is_ssa_expr(*sym)
+                                  ? to_ssa_expr(*sym).get_object_name()
+                                  : sym->get_identifier();
+          const symbolt *target_sym;
+          if(
+            !ns.lookup(name, target_sym) && target_sym->is_shared() &&
+            !target_sym->type.get_bool(ID_C_is_failed_symbol) &&
+            !target_sym->type.get_bool(ID_C_dynamic))
+          {
+            return to_symbol_expr(expr);
+          }
+        }
+      }
+    }
   }
 
   return {};
@@ -362,7 +413,7 @@ void goto_symext::dereference_rec(
     if(state.threads.size() > 1 && !symex_config.allow_pointer_unsoundness)
     {
       auto shared_sym =
-        find_shared_pointer_in_dereference(tmp1, path_storage.dirty, ns);
+        find_shared_pointer_in_dereference(tmp1, path_storage.dirty, ns, state);
       if(shared_sym.has_value())
       {
         // Create a fresh symbol to represent what the shared pointer may

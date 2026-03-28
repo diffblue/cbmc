@@ -16,6 +16,7 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 #include <util/config.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
+#include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 #include <util/symbol.h>
 

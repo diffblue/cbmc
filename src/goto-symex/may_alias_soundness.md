@@ -115,21 +115,21 @@
 ///
 /// 2. POINTER-OBJECT GRANULARITY: The alias condition uses
 ///    pointer_object equality, which checks object identity but not
-///    offset within the object. This is sound (over-approximates
-///    aliasing) but imprecise for byte-level pointer arithmetic.
-///    In practice, field sensitivity means struct members and array
-///    elements are separate addresses, so this rarely matters.
-///    Fix: Use full pointer equality (including offset) instead of
-///    pointer_object equality. Requires address_representatives to
-///    store full pointer expressions.
+///    offset within the object. This is the correct granularity for
+///    the may-alias mechanism: the may-alias object represents the
+///    entire pointed-to object, and offsets are handled by the
+///    byte_extract/byte_update operations in the SSA equation.
+///    Field sensitivity means struct members and array elements get
+///    separate addresses in the memory model, so this is precise
+///    for the common case. The only imprecision is for byte-level
+///    pointer arithmetic within a single field, which is rare in
+///    concurrent code.
 ///
 /// 3. TYPE COMPATIBILITY: May-alias events are only distributed to
-///    addresses with matching types. This prevents type-mismatch
-///    errors in value equality constraints but means aliasing through
-///    genuinely different types (e.g., int/float union punning) is
-///    not modelled. In practice, most concurrent pointer accesses
-///    use consistent types, so this rarely matters.
-///    Fix: Remove the type check and use byte_extract/byte_update
-///    for type mismatches (as the non-concurrent dereference does).
-///    This increases formula size quadratically in the number of
-///    addresses.
+///    addresses with exactly matching types. This prevents crashes
+///    from type-mismatched value equality constraints in the memory
+///    model. Relaxing to same-size types requires adding typecasts
+///    to the rf-val constraints (s_{w,r} ⇒ val(w) = val(r)), which
+///    is a deeper change to the memory model. In practice, concurrent
+///    code almost always uses consistent types for shared data, so
+///    this limitation rarely causes missed bugs.
