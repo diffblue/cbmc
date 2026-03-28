@@ -16,6 +16,8 @@ Author: Daniel Kroening, Peter Schrammel
 #include <goto-symex/solver_hardness.h>
 #include <solvers/prop/prop.h> // IWYU pragma: keep
 
+#include "proof_explanation.h"
+
 goto_symex_property_decidert::goto_symex_property_decidert(
   const optionst &options,
   ui_message_handlert &ui_message_handler,
@@ -173,4 +175,18 @@ void goto_symex_property_decidert::update_properties_status_from_goals(
     }
     break;
   }
+}
+
+std::vector<proof_explanation_stept>
+goto_symex_property_decidert::get_proof_explanation(const namespacet &ns)
+{
+  return ::get_proof_explanation_with_core(
+    equation, solver->decision_procedure(), ns);
+}
+
+std::vector<proof_invariantt>
+goto_symex_property_decidert::get_proof_invariants(const namespacet &ns)
+{
+  auto explanation = get_proof_explanation(ns);
+  return ::extract_proof_invariants(explanation, equation, ns);
 }
