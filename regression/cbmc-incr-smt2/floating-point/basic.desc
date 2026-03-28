@@ -1,0 +1,9 @@
+CORE
+basic.c
+
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Basic floating-point operations via bit-blasting in incremental SMT2.

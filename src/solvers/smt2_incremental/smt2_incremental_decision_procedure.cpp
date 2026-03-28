@@ -11,6 +11,7 @@
 #include <util/std_expr.h>
 #include <util/string_constant.h>
 
+#include <solvers/floatbv/float_bv.h>
 #include <solvers/smt2_incremental/ast/smt_commands.h>
 #include <solvers/smt2_incremental/ast/smt_responses.h>
 #include <solvers/smt2_incremental/ast/smt_terms.h>
@@ -305,6 +306,42 @@ static exprt lower_zero_extend(exprt expr, const namespacet &ns)
       expr = zero_extend->lower();
     }
   });
+  return expr;
+}
+
+/// \brief Check whether an expression or any of its immediate operands
+///   has floating-point bitvector type.
+static bool has_floatbv_type(const exprt &expr)
+{
+  if(expr.type().id() == ID_floatbv)
+    return true;
+  for(const auto &op : expr.operands())
+  {
+    if(op.type().id() == ID_floatbv)
+      return true;
+  }
+  return false;
+}
+
+/// \brief Lower floating-point operations to bitvector expressions.
+/// Traverses \p expr bottom-up and replaces float-specific sub-expressions
+/// (e.g., ieee_float_equal, floatbv_plus) with their bitvector equivalents
+/// using \ref float_bvt::convert.
+static exprt lower_floatbv(exprt expr)
+{
+  // Recurse into operands first (bottom-up)
+  for(auto &op : expr.operands())
+    op = lower_floatbv(op);
+
+  // Only attempt float_bv conversion on expressions involving floats
+  if(has_floatbv_type(expr))
+  {
+    const float_bvt float_bv;
+    const exprt converted = float_bv.convert(expr);
+    if(!converted.is_nil())
+      return converted;
+  }
+
   return expr;
 }
 
@@ -688,7 +725,8 @@ exprt smt2_incremental_decision_proceduret::lower(exprt expression) const
 {
   const exprt lowered = struct_encoding.encode(lower_zero_extend(
     lower_enum(
-      lower_byte_operators(lower_rw_ok_pointer_in_range(expression, ns), ns),
+      lower_byte_operators(
+        lower_floatbv(lower_rw_ok_pointer_in_range(expression, ns)), ns),
       ns),
     ns));
   log.conditional_output(log.debug(), [&](messaget::mstreamt &debug) {
