@@ -271,6 +271,42 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
           expr = false_exprt();
       }
     }
+    else if(expr.id() == "__is_constructible")
+    {
+      // __is_constructible(T, Args...) — check if T can be constructed
+      // from Args. For scalar types, construction from a compatible type
+      // (including references) is always possible.
+      if(t2.is_nil())
+      {
+        // Default constructible — scalars are always default constructible
+        expr = true_exprt();
+      }
+      else
+      {
+        // Strip references from the argument type
+        typet arg_type = t2;
+        if(is_reference(arg_type))
+          arg_type = to_reference_type(arg_type).base_type();
+        arg_type.remove(ID_C_constant);
+        arg_type.remove(ID_C_volatile);
+
+        typet target = t1;
+        target.remove(ID_C_constant);
+        target.remove(ID_C_volatile);
+
+        if(target == arg_type)
+          expr = true_exprt();
+        else
+        {
+          exprt tmp;
+          symbol_exprt from(irep_idt(), t2);
+          if(implicit_conversion_sequence(from, t1, tmp))
+            expr = true_exprt();
+          else
+            expr = false_exprt();
+        }
+      }
+    }
     else
       // conservatively return false for traits we cannot evaluate
       expr = false_exprt();
@@ -351,6 +387,18 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     expr.id() == "__is_polymorphic" || expr.id() == "__is_union" ||
     expr.id() == "__is_trivial" || expr.id() == "__is_trivially_copyable" ||
     expr.id() == "__is_standard_layout" || expr.id() == "__is_literal_type" ||
+    expr.id() == "__is_integral" || expr.id() == "__is_void" ||
+    expr.id() == "__is_floating_point" || expr.id() == "__is_arithmetic" ||
+    expr.id() == "__is_null_pointer" || expr.id() == "__is_pointer" ||
+    expr.id() == "__is_reference" || expr.id() == "__is_lvalue_reference" ||
+    expr.id() == "__is_rvalue_reference" || expr.id() == "__is_function" ||
+    expr.id() == "__is_array" || expr.id() == "__is_member_pointer" ||
+    expr.id() == "__is_member_function_pointer" ||
+    expr.id() == "__is_member_object_pointer" || expr.id() == "__is_signed" ||
+    expr.id() == "__is_unsigned" || expr.id() == "__is_const" ||
+    expr.id() == "__is_volatile" || expr.id() == "__is_scoped_enum" ||
+    expr.id() == "__is_object" || expr.id() == "__is_bounded_array" ||
+    expr.id() == "__is_unbounded_array" || expr.id() == "__is_referenceable" ||
     expr.id() == "__has_trivial_constructor" ||
     expr.id() == "__has_trivial_copy" ||
     expr.id() == "__has_trivial_destructor" ||
@@ -382,6 +430,132 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
         is_final = struct_type.get_bool(ID_final);
       }
       expr = is_final ? exprt(true_exprt()) : exprt(false_exprt());
+    }
+    else if(expr.id() == "__is_integral")
+    {
+      expr =
+        (t.id() == ID_signedbv || t.id() == ID_unsignedbv ||
+         t.id() == ID_c_bool || t.id() == ID_bool || t.id() == ID_c_enum_tag)
+          ? exprt(true_exprt())
+          : exprt(false_exprt());
+    }
+    else if(expr.id() == "__is_floating_point")
+    {
+      expr = (t.id() == ID_floatbv || t.id() == ID_fixedbv)
+               ? exprt(true_exprt())
+               : exprt(false_exprt());
+    }
+    else if(expr.id() == "__is_arithmetic")
+    {
+      expr =
+        (t.id() == ID_signedbv || t.id() == ID_unsignedbv ||
+         t.id() == ID_c_bool || t.id() == ID_bool || t.id() == ID_floatbv ||
+         t.id() == ID_fixedbv || t.id() == ID_c_enum_tag)
+          ? exprt(true_exprt())
+          : exprt(false_exprt());
+    }
+    else if(expr.id() == "__is_void")
+    {
+      expr = (t.id() == ID_empty) ? exprt(true_exprt()) : exprt(false_exprt());
+    }
+    else if(expr.id() == "__is_pointer")
+    {
+      expr = (t.id() == ID_pointer && !is_reference(t)) ? exprt(true_exprt())
+                                                        : exprt(false_exprt());
+    }
+    else if(expr.id() == "__is_reference")
+    {
+      expr = is_reference(t) ? exprt(true_exprt()) : exprt(false_exprt());
+    }
+    else if(expr.id() == "__is_lvalue_reference")
+    {
+      expr = (is_reference(t) && !is_rvalue_reference(t))
+               ? exprt(true_exprt())
+               : exprt(false_exprt());
+    }
+    else if(expr.id() == "__is_rvalue_reference")
+    {
+      expr =
+        is_rvalue_reference(t) ? exprt(true_exprt()) : exprt(false_exprt());
+    }
+    else if(expr.id() == "__is_array")
+    {
+      expr = (t.id() == ID_array) ? exprt(true_exprt()) : exprt(false_exprt());
+    }
+    else if(expr.id() == "__is_function")
+    {
+      expr = (t.id() == ID_code) ? exprt(true_exprt()) : exprt(false_exprt());
+    }
+    else if(
+      expr.id() == "__is_member_pointer" ||
+      expr.id() == "__is_member_function_pointer" ||
+      expr.id() == "__is_member_object_pointer")
+    {
+      bool is_memptr =
+        t.id() == ID_pointer && t.find(ID_to_member).is_not_nil();
+      if(is_memptr && expr.id() == "__is_member_function_pointer")
+        is_memptr = to_pointer_type(t).base_type().id() == ID_code;
+      else if(is_memptr && expr.id() == "__is_member_object_pointer")
+        is_memptr = to_pointer_type(t).base_type().id() != ID_code;
+      expr = is_memptr ? exprt(true_exprt()) : exprt(false_exprt());
+    }
+    else if(expr.id() == "__is_null_pointer")
+    {
+      expr = (t.id() == ID_pointer && t == pointer_type(empty_typet()))
+               ? exprt(true_exprt())
+               : exprt(false_exprt());
+    }
+    else if(expr.id() == "__is_signed")
+    {
+      expr =
+        (t.id() == ID_signedbv || t.id() == ID_fixedbv || t.id() == ID_floatbv)
+          ? exprt(true_exprt())
+          : exprt(false_exprt());
+    }
+    else if(expr.id() == "__is_unsigned")
+    {
+      expr =
+        (t.id() == ID_unsignedbv || t.id() == ID_c_bool || t.id() == ID_bool)
+          ? exprt(true_exprt())
+          : exprt(false_exprt());
+    }
+    else if(expr.id() == "__is_const")
+    {
+      expr =
+        t.get_bool(ID_C_constant) ? exprt(true_exprt()) : exprt(false_exprt());
+    }
+    else if(expr.id() == "__is_volatile")
+    {
+      expr =
+        t.get_bool(ID_C_volatile) ? exprt(true_exprt()) : exprt(false_exprt());
+    }
+    else if(expr.id() == "__is_scoped_enum")
+    {
+      bool result = false;
+      if(t.id() == ID_c_enum_tag)
+      {
+        const auto &enum_type =
+          to_c_enum_type(follow_tag(to_c_enum_tag_type(t)));
+        result = enum_type.get_bool(ID_C_class);
+      }
+      expr = result ? exprt(true_exprt()) : exprt(false_exprt());
+    }
+    else if(expr.id() == "__is_object")
+    {
+      // true for everything except functions, references, and void
+      bool result = t.id() != ID_code && t.id() != ID_empty &&
+                    !is_reference(t) && !is_rvalue_reference(t);
+      expr = result ? exprt(true_exprt()) : exprt(false_exprt());
+    }
+    else if(expr.id() == "__is_bounded_array")
+    {
+      bool result = t.id() == ID_array && to_array_type(t).size().is_not_nil();
+      expr = result ? exprt(true_exprt()) : exprt(false_exprt());
+    }
+    else if(expr.id() == "__is_unbounded_array")
+    {
+      bool result = t.id() == ID_array && to_array_type(t).size().is_nil();
+      expr = result ? exprt(true_exprt()) : exprt(false_exprt());
     }
     else
       expr = false_exprt();
@@ -1486,7 +1660,7 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
       }
     }
 
-    exprt e=expr;
+    exprt e = expr;
 
     // An empty braced-init-list {} means value-initialization,
     // which for class types calls the default constructor.
@@ -1517,7 +1691,7 @@ void cpp_typecheckt::typecheck_expr_this(exprt &expr)
 {
   if(cpp_scopes.current_scope().class_identifier.empty())
   {
-    error().source_location=expr.find_source_location();
+    error().source_location = expr.find_source_location();
     error() << "`this' is not allowed here" << eom;
     throw 0;
   }
@@ -1834,7 +2008,7 @@ void cpp_typecheckt::typecheck_expr_ptrmember(
 
   op.id(ID_dereference);
   op.add_to_operands(std::move(tmp));
-  op.add_source_location()=expr.source_location();
+  op.add_source_location() = expr.source_location();
   typecheck_expr_dereference(op);
 
   expr.id(ID_member);

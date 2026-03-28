@@ -990,9 +990,9 @@ enable_or_disable ("enable"|"disable")
 "__is_final"        { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
 "__is_interface_class" { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
 "__is_layout_compatible" { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
-"__is_nothrow_convertible" { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
+"__is_nothrow_convertible" { return conditional_keyword(PARSER.gcc13_type_traits, TOK_BINARY_TYPE_PREDICATE); }
 "__is_pod"          { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
-"__is_pointer_interconvertible_base_of" { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
+"__is_pointer_interconvertible_base_of" { return conditional_keyword(PARSER.gcc13_type_traits, TOK_BINARY_TYPE_PREDICATE); }
 "__is_polymorphic"  { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
 "__is_ref_array"    { return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
 "__is_ref_class"    { return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
@@ -1004,6 +1004,41 @@ enable_or_disable ("enable"|"disable")
 "__is_union"        { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
 "__is_value_class"  { return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
 "__is_literal_type" { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__is_integral"       { return conditional_keyword(PARSER.cpp98 && PARSER.mode==configt::ansi_ct::flavourt::CLANG, TOK_UNARY_TYPE_PREDICATE); }
+"__is_void"           { return conditional_keyword(PARSER.cpp98 && PARSER.mode==configt::ansi_ct::flavourt::CLANG, TOK_UNARY_TYPE_PREDICATE); }
+"__is_floating_point" { return conditional_keyword(PARSER.cpp98 && PARSER.mode==configt::ansi_ct::flavourt::CLANG, TOK_UNARY_TYPE_PREDICATE); }
+"__is_arithmetic"     { return conditional_keyword(PARSER.cpp98 && PARSER.mode==configt::ansi_ct::flavourt::CLANG, TOK_UNARY_TYPE_PREDICATE); }
+"__is_arithmetic"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && PARSER.gcc14_builtins, TOK_UNARY_TYPE_PREDICATE); }
+"__is_null_pointer"   { return conditional_keyword(PARSER.cpp98 && PARSER.mode==configt::ansi_ct::flavourt::CLANG, TOK_UNARY_TYPE_PREDICATE); }
+"__is_pointer"        { return conditional_keyword(PARSER.cpp98 && PARSER.mode==configt::ansi_ct::flavourt::CLANG, TOK_UNARY_TYPE_PREDICATE); }
+"__is_pointer"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && PARSER.gcc14_builtins, TOK_UNARY_TYPE_PREDICATE); }
+"__is_reference"      { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_UNARY_TYPE_PREDICATE); }
+"__is_lvalue_reference" { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_UNARY_TYPE_PREDICATE); }
+"__is_rvalue_reference" { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_UNARY_TYPE_PREDICATE); }
+"__is_function"       { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_UNARY_TYPE_PREDICATE); }
+"__is_array"          { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_UNARY_TYPE_PREDICATE); }
+"__is_member_pointer" { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_UNARY_TYPE_PREDICATE); }
+"__is_member_function_pointer" { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_UNARY_TYPE_PREDICATE); }
+"__is_member_object_pointer" { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_UNARY_TYPE_PREDICATE); }
+"__is_signed"         { return conditional_keyword(PARSER.cpp98 && PARSER.mode==configt::ansi_ct::flavourt::CLANG, TOK_UNARY_TYPE_PREDICATE); }
+"__is_signed"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && PARSER.gcc14_builtins, TOK_UNARY_TYPE_PREDICATE); }
+"__is_unsigned"       { return conditional_keyword(PARSER.cpp98 && PARSER.mode==configt::ansi_ct::flavourt::CLANG, TOK_UNARY_TYPE_PREDICATE); }
+"__is_unsigned"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && PARSER.gcc14_builtins, TOK_UNARY_TYPE_PREDICATE); }
+"__is_const"          { return conditional_keyword(PARSER.cpp98 && PARSER.mode==configt::ansi_ct::flavourt::CLANG, TOK_UNARY_TYPE_PREDICATE); }
+"__is_const"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && PARSER.gcc14_builtins, TOK_UNARY_TYPE_PREDICATE); }
+"__is_volatile"       { return conditional_keyword(PARSER.cpp98 && PARSER.mode==configt::ansi_ct::flavourt::CLANG, TOK_UNARY_TYPE_PREDICATE); }
+"__is_volatile"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && PARSER.gcc14_builtins, TOK_UNARY_TYPE_PREDICATE); }
+"__is_scoped_enum"    { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_UNARY_TYPE_PREDICATE); }
+"__is_object"         { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_UNARY_TYPE_PREDICATE); }
+"__is_bounded_array"  { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_UNARY_TYPE_PREDICATE); }
+"__is_unbounded_array" { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_UNARY_TYPE_PREDICATE); }
+"__remove_pointer"    { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_GCC_BUILTIN_REMOVE_POINTER); }
+"__remove_extent"     { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_GCC_BUILTIN_REMOVE_EXTENT); }
+"__remove_all_extents" { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_GCC_BUILTIN_REMOVE_ALL_EXTENTS); }
+"__add_lvalue_reference" { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_GCC_BUILTIN_ADD_LVALUE_REFERENCE); }
+"__add_rvalue_reference" { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_GCC_BUILTIN_ADD_RVALUE_REFERENCE); }
+"__add_pointer"       { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_GCC_BUILTIN_ADD_POINTER); }
+"__is_referenceable"  { return conditional_keyword(PARSER.cpp98 && PARSER.mode==configt::ansi_ct::flavourt::CLANG, TOK_UNARY_TYPE_PREDICATE); }
 "__is_same"         { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
 "__is_assignable"   { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
 "__is_constructible" { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
@@ -1323,6 +1358,11 @@ enable_or_disable ("enable"|"disable")
 
 "__remove_reference" { return conditional_keyword(
                     PARSER.gcc13_type_traits,
+                    TOK_GCC_BUILTIN_REMOVE_REFERENCE);
+                }
+
+"__remove_reference_t" { return conditional_keyword(
+                    PARSER.cpp98 && PARSER.mode==configt::ansi_ct::flavourt::CLANG,
                     TOK_GCC_BUILTIN_REMOVE_REFERENCE);
                 }
 

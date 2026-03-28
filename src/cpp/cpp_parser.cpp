@@ -62,6 +62,21 @@ bool cpp_parsert::parse()
   token_buffer.ansi_c_parser.gcc13_type_traits =
     *support_float16 ||
     config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG;
+  // GCC 14+ uses __is_array, __is_function, __is_reference, etc. as builtins
+  // in <type_traits>. Older GCC uses template specialization instead.
+  {
+    bool is_gcc14 = false;
+    if(config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::GCC)
+    {
+      gcc_versiont gcc_version;
+      gcc_version.get("gcc");
+      is_gcc14 = gcc_version.flavor == gcc_versiont::flavort::GCC &&
+                 gcc_version.is_at_least(14u);
+    }
+    token_buffer.ansi_c_parser.gcc14_builtins =
+      is_gcc14 ||
+      config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG;
+  }
   token_buffer.ansi_c_parser.in = in;
   token_buffer.ansi_c_parser.mode = mode;
   token_buffer.ansi_c_parser.set_file(get_file());
