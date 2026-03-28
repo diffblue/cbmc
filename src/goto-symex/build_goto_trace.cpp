@@ -392,9 +392,28 @@ void build_goto_trace(
 
       if(SSA_step.ssa_full_lhs.is_not_nil())
       {
-        goto_trace_step.full_lhs_value =
-          decision_procedure.get(SSA_step.ssa_full_lhs);
-        simplify(goto_trace_step.full_lhs_value, ns);
+        if(
+          SSA_step.ssa_full_lhs.id() == ID_byte_extract_little_endian ||
+          SSA_step.ssa_full_lhs.id() == ID_byte_extract_big_endian)
+        {
+          // Preserve the byte_extract structure by resolving
+          // operands individually rather than simplifying the
+          // entire expression, which would evaluate away the
+          // byte_extract.
+          byte_extract_exprt be = to_byte_extract_expr(SSA_step.ssa_full_lhs);
+          be.op() = decision_procedure.get(be.op());
+          simplify(be.op(), ns);
+          replace_nondet_in_type(be.op(), decision_procedure);
+          be.offset() = decision_procedure.get(be.offset());
+          simplify(be.offset(), ns);
+          goto_trace_step.full_lhs_value = std::move(be);
+        }
+        else
+        {
+          goto_trace_step.full_lhs_value =
+            decision_procedure.get(SSA_step.ssa_full_lhs);
+          simplify(goto_trace_step.full_lhs_value, ns);
+        }
         replace_nondet_in_type(
           goto_trace_step.full_lhs_value, decision_procedure);
       }
