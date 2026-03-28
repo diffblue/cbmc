@@ -1,0 +1,12 @@
+CORE
+main.c
+--refine-concurrency
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+pointer handling for concurrency is unsound
+^warning: ignoring
+--
+Tests that --refine-concurrency produces correct results for a
+concurrent program with shared pointer dereferences.

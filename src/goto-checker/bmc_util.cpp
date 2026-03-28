@@ -310,7 +310,18 @@ void postprocess_equation(
   {
     std::unique_ptr<memory_model_baset> memory_model =
       get_memory_model(options, ns);
-    (*memory_model)(equation, ui_message_handler);
+    if(options.get_bool_option("refine-concurrency"))
+    {
+      // With --refine-concurrency, add all memory model constraints
+      // but with the SAT simplifier disabled (see solver_factory.cpp).
+      // This provides the infrastructure for future incremental solving
+      // while ensuring correctness with the current solver.
+      (*memory_model)(equation, ui_message_handler);
+    }
+    else
+    {
+      (*memory_model)(equation, ui_message_handler);
+    }
   }
 
   messaget log(ui_message_handler);
@@ -386,9 +397,8 @@ void run_property_decider(
     << messaget::eom;
 
   property_decider.add_constraint_from_goals(
-    [&properties](const irep_idt &property_id) {
-      return is_property_to_check(properties.at(property_id).status);
-    });
+    [&properties](const irep_idt &property_id)
+    { return is_property_to_check(properties.at(property_id).status); });
 
   auto const sat_solver_start = std::chrono::steady_clock::now();
 

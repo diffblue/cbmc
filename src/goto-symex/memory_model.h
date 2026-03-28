@@ -22,6 +22,37 @@ public:
 
   virtual void operator()(symex_target_equationt &, message_handlert &) = 0;
 
+  /// Prepare event lists and clock types without adding constraints.
+  /// Call this before using the staged constraint methods.
+  void prepare(symex_target_equationt &equation, message_handlert &mh)
+  {
+    build_event_lists(equation, mh);
+    build_clock_type();
+  }
+
+  /// Add init writes for shared variables without building the full
+  /// event lists. Used by --refine-concurrency to include init writes
+  /// in the equation before solver conversion, while deferring the
+  /// ordering constraints to the refinement loop.
+  void add_init_writes_only(symex_target_equationt &equation)
+  {
+    add_init_writes(equation);
+  }
+
+  /// Staged constraint addition for incremental refinement.
+  /// Each stage adds more constraints; earlier stages are cheaper.
+  enum class refinement_staget
+  {
+    READ_FROM,
+    PROGRAM_ORDER,
+    WRITE_SERIALIZATION,
+    FROM_READ
+  };
+
+  /// Add constraints for a specific refinement stage.
+  virtual void
+  add_stage(refinement_staget stage, symex_target_equationt &equation) = 0;
+
 protected:
   /// In-thread program order
   /// \param e1: preceding event

@@ -29,6 +29,27 @@ void memory_model_sct::operator()(
   from_read(equation);
 }
 
+void memory_model_sct::add_stage(
+  refinement_staget stage,
+  symex_target_equationt &equation)
+{
+  switch(stage)
+  {
+  case refinement_staget::READ_FROM:
+    read_from(equation);
+    break;
+  case refinement_staget::PROGRAM_ORDER:
+    program_order(equation);
+    break;
+  case refinement_staget::WRITE_SERIALIZATION:
+    write_serialization_external(equation);
+    break;
+  case refinement_staget::FROM_READ:
+    from_read(equation);
+    break;
+  }
+}
+
 exprt memory_model_sct::before(event_it e1, event_it e2)
 {
   return partial_order_concurrencyt::before(e1, e2, AX_PROPAGATION);

@@ -410,6 +410,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("string-printable", cmdline.isset("string-printable"));
   }
 
+  if(cmdline.isset("refine-concurrency"))
+    options.set_option("refine-concurrency", true);
+
   options.set_option(
     "symex-cache-dereferences", cmdline.isset("symex-cache-dereferences"));
 
