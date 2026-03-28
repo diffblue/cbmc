@@ -88,7 +88,10 @@ reachable_fixpoint(const loc_sett &locs, const goto_functionst &goto_functions)
         auto &function_identifier = to_symbol_expr(function).get_identifier();
         auto function_iterator =
           goto_functions.function_map.find(function_identifier);
-        CHECK_RETURN(function_iterator != goto_functions.function_map.end());
+        // Function may be missing if template instantiation failed
+        // during system header processing.
+        if(function_iterator == goto_functions.function_map.end())
+          continue;
         working.emplace(
           function_iterator,
           function_iterator->second.body.instructions.begin());
