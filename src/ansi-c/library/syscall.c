@@ -1,3 +1,227 @@
+/* FUNCTION: dup */
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+int __VERIFIER_nondet_int(void);
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
+
+int dup(int oldfd)
+{
+  __CPROVER_HIDE:;
+  (void)oldfd; // Mark as used
+  
+  // Return non-deterministic file descriptor or error
+  int retval = __VERIFIER_nondet_int();
+  __CPROVER_assume(retval >= -1);
+  
+  if(retval == -1)
+  {
+    // Set errno to a valid error code for dup
+    __CPROVER_bool emfile = __VERIFIER_nondet___CPROVER_bool();
+    errno = emfile ? EMFILE : EBADF;
+  }
+  
+  return retval;
+}
+
+/* FUNCTION: dup2 */
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+int __VERIFIER_nondet_int(void);
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool(void);
+
+int dup2(int oldfd, int newfd)
+{
+  __CPROVER_HIDE:;
+  (void)oldfd; // Mark as used
+  (void)newfd; // Mark as used
+  
+  // Return non-deterministic result
+  int retval = __VERIFIER_nondet_int();
+  __CPROVER_assume(retval >= -1);
+  
+  if(retval == -1)
+  {
+    __CPROVER_bool emfile = __VERIFIER_nondet___CPROVER_bool();
+    errno = emfile ? EMFILE : EBADF;
+  }
+  
+  return retval;
+}
+
+/* FUNCTION: dup3 */
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+int __VERIFIER_nondet_int(void);
+
+int dup3(int oldfd, int newfd, int flags)
+{
+  __CPROVER_HIDE:;
+  (void)oldfd; // Mark as used
+  (void)newfd; // Mark as used
+  (void)flags; // Mark as used
+  
+  int retval = __VERIFIER_nondet_int();
+  __CPROVER_assume(retval >= -1);
+  
+  if(retval == -1)
+  {
+    errno = __VERIFIER_nondet_int();
+  }
+  
+  return retval;
+}
+
+/* FUNCTION: lseek */
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_SYS_TYPES_H_INCLUDED
+#  include <sys/types.h>
+#  define __CPROVER_SYS_TYPES_H_INCLUDED
+#endif
+
+long __VERIFIER_nondet_long(void);
+int __VERIFIER_nondet_int(void);
+
+off_t lseek(int fd, off_t offset, int whence)
+{
+  __CPROVER_HIDE:;
+  (void)fd;
+  (void)offset;
+  (void)whence;
+  
+  long retval = __VERIFIER_nondet_long();
+  // lseek can return -1 on error or the resulting offset
+  
+  if(retval == -1)
+  {
+    // Common errno values: EBADF, EINVAL, ESPIPE
+    errno = __VERIFIER_nondet_int();
+  }
+  
+  return retval;
+}
+
+/* FUNCTION: getpid */
+
+int __VERIFIER_nondet_int(void);
+
+int getpid(void)
+{
+  __CPROVER_HIDE:;
+  // getpid() returns the process ID
+  // Process IDs are positive integers
+  int pid = __VERIFIER_nondet_int();
+  __CPROVER_assume(pid > 0);
+  return pid;
+}
+
+/* FUNCTION: getuid */
+
+#ifndef __CPROVER_SYS_TYPES_H_INCLUDED
+#  include <sys/types.h>
+#  define __CPROVER_SYS_TYPES_H_INCLUDED
+#endif
+
+int __VERIFIER_nondet_int(void);
+
+uid_t getuid(void)
+{
+  __CPROVER_HIDE:;
+  // getuid() returns the user ID
+  // UIDs are non-negative
+  int uid = __VERIFIER_nondet_int();
+  __CPROVER_assume(uid >= 0);
+  return (uid_t)uid;
+}
+
+/* FUNCTION: getgid */
+
+#ifndef __CPROVER_SYS_TYPES_H_INCLUDED
+#  include <sys/types.h>
+#  define __CPROVER_SYS_TYPES_H_INCLUDED
+#endif
+
+int __VERIFIER_nondet_int(void);
+
+gid_t getgid(void)
+{
+  __CPROVER_HIDE:;
+  // getgid() returns the group ID
+  int gid = __VERIFIER_nondet_int();
+  __CPROVER_assume(gid >= 0);
+  return (gid_t)gid;
+}
+
+/* FUNCTION: geteuid */
+
+#ifndef __CPROVER_SYS_TYPES_H_INCLUDED
+#  include <sys/types.h>
+#  define __CPROVER_SYS_TYPES_H_INCLUDED
+#endif
+
+int __VERIFIER_nondet_int(void);
+
+uid_t geteuid(void)
+{
+  __CPROVER_HIDE:;
+  // geteuid() returns the effective user ID
+  int euid = __VERIFIER_nondet_int();
+  __CPROVER_assume(euid >= 0);
+  return (uid_t)euid;
+}
+
+/* FUNCTION: getegid */
+
+#ifndef __CPROVER_SYS_TYPES_H_INCLUDED
+#  include <sys/types.h>
+#  define __CPROVER_SYS_TYPES_H_INCLUDED
+#endif
+
+int __VERIFIER_nondet_int(void);
+
+gid_t getegid(void)
+{
+  __CPROVER_HIDE:;
+  // getegid() returns the effective group ID
+  int egid = __VERIFIER_nondet_int();
+  __CPROVER_assume(egid >= 0);
+  return (gid_t)egid;
+}
+
+/* FUNCTION: gettid */
+
+#ifndef __CPROVER_SYS_TYPES_H_INCLUDED
+#  include <sys/types.h>
+#  define __CPROVER_SYS_TYPES_H_INCLUDED
+#endif
+
+int __VERIFIER_nondet_int(void);
+
+pid_t gettid(void)
+{
+  __CPROVER_HIDE:;
+  // gettid() returns the thread ID
+  int tid = __VERIFIER_nondet_int();
+  __CPROVER_assume(tid > 0);
+  return (pid_t)tid;
+}
+
 /* FUNCTION: syscall */
 
 #ifndef __CPROVER_SYSCALL_H_INCLUDED
@@ -37,6 +261,26 @@ ssize_t read(int fildes, void *buf, size_t nbyte);
 ssize_t write(int fildes, const void *buf, size_t nbyte);
 int pipe(int fildes[2]);
 int unlink(const char *s);
+int dup(int oldfd);
+int dup2(int oldfd, int newfd);
+int dup3(int oldfd, int newfd, int flags);
+off_t lseek(int fd, off_t offset, int whence);
+pid_t getpid(void);
+uid_t getuid(void);
+gid_t getgid(void);
+uid_t geteuid(void);
+gid_t getegid(void);
+pid_t gettid(void);
+int dup(int oldfd);
+int dup2(int oldfd, int newfd);
+int dup3(int oldfd, int newfd, int flags);
+off_t lseek(int fd, off_t offset, int whence);
+pid_t getpid(void);
+uid_t getuid(void);
+gid_t getgid(void);
+uid_t geteuid(void);
+gid_t getegid(void);
+pid_t gettid(void);
 
 // Non-deterministic return values
 long __VERIFIER_nondet_long(void);
@@ -166,164 +410,100 @@ long syscall(long number, ...)
 #ifdef SYS_dup
   if(number == SYS_dup)
   {
-    // dup(oldfd) duplicates a file descriptor
     int oldfd = va_arg(ap, int);
-    (void)oldfd; // Mark as used
-    
-    // Return non-deterministic file descriptor or error
-    int retval = __VERIFIER_nondet_int();
-    __CPROVER_assume(retval >= -1);
-    
-    if(retval == -1)
-    {
-      // Set errno to a valid error code for dup
-      __CPROVER_bool emfile = __VERIFIER_nondet___CPROVER_bool();
-      errno = emfile ? EMFILE : EBADF;
-    }
-    
+    result = (long)dup(oldfd);
     va_end(ap);
-    return (long)retval;
+    return result;
   }
 #endif
 
 #ifdef SYS_dup2
   if(number == SYS_dup2)
   {
-    // dup2(oldfd, newfd) duplicates a file descriptor to a specific fd
     int oldfd = va_arg(ap, int);
     int newfd = va_arg(ap, int);
-    (void)oldfd; // Mark as used
-    (void)newfd; // Mark as used
-    
-    // Return non-deterministic result
-    int retval = __VERIFIER_nondet_int();
-    __CPROVER_assume(retval >= -1);
-    
-    if(retval == -1)
-    {
-      __CPROVER_bool emfile = __VERIFIER_nondet___CPROVER_bool();
-      errno = emfile ? EMFILE : EBADF;
-    }
-    
+    result = (long)dup2(oldfd, newfd);
     va_end(ap);
-    return (long)retval;
+    return result;
   }
 #endif
 
 #ifdef SYS_dup3
   if(number == SYS_dup3)
   {
-    // dup3(oldfd, newfd, flags) is like dup2 but with flags
     int oldfd = va_arg(ap, int);
     int newfd = va_arg(ap, int);
     int flags = va_arg(ap, int);
-    (void)oldfd; // Mark as used
-    (void)newfd; // Mark as used
-    (void)flags; // Mark as used
-    
-    int retval = __VERIFIER_nondet_int();
-    __CPROVER_assume(retval >= -1);
-    
-    if(retval == -1)
-    {
-      errno = __VERIFIER_nondet_int();
-    }
-    
+    result = (long)dup3(oldfd, newfd, flags);
     va_end(ap);
-    return (long)retval;
+    return result;
   }
 #endif
+
 
 #ifdef SYS_lseek
   if(number == SYS_lseek)
   {
-    // lseek(fd, offset, whence) repositions file offset
     int fd = va_arg(ap, int);
     off_t offset = va_arg(ap, off_t);
     int whence = va_arg(ap, int);
-    (void)fd;
-    (void)offset;
-    (void)whence;
-    
-    long retval = __VERIFIER_nondet_long();
-    // lseek can return -1 on error or the resulting offset
-    
-    if(retval == -1)
-    {
-      // Common errno values: EBADF, EINVAL, ESPIPE
-      errno = __VERIFIER_nondet_int();
-    }
-    
+    result = (long)lseek(fd, offset, whence);
     va_end(ap);
-    return retval;
+    return result;
   }
 #endif
 
 #ifdef SYS_getpid
   if(number == SYS_getpid)
   {
-    // getpid() returns the process ID
-    // Process IDs are positive integers
-    int pid = __VERIFIER_nondet_int();
-    __CPROVER_assume(pid > 0);
+    result = (long)getpid();
     va_end(ap);
-    return (long)pid;
+    return result;
   }
 #endif
 
 #ifdef SYS_getuid
   if(number == SYS_getuid)
   {
-    // getuid() returns the user ID
-    // UIDs are non-negative
-    int uid = __VERIFIER_nondet_int();
-    __CPROVER_assume(uid >= 0);
+    result = (long)getuid();
     va_end(ap);
-    return (long)uid;
+    return result;
   }
 #endif
 
 #ifdef SYS_getgid
   if(number == SYS_getgid)
   {
-    // getgid() returns the group ID
-    int gid = __VERIFIER_nondet_int();
-    __CPROVER_assume(gid >= 0);
+    result = (long)getgid();
     va_end(ap);
-    return (long)gid;
+    return result;
   }
 #endif
 
 #ifdef SYS_geteuid
   if(number == SYS_geteuid)
   {
-    // geteuid() returns the effective user ID
-    int euid = __VERIFIER_nondet_int();
-    __CPROVER_assume(euid >= 0);
+    result = (long)geteuid();
     va_end(ap);
-    return (long)euid;
+    return result;
   }
 #endif
 
 #ifdef SYS_getegid
   if(number == SYS_getegid)
   {
-    // getegid() returns the effective group ID
-    int egid = __VERIFIER_nondet_int();
-    __CPROVER_assume(egid >= 0);
+    result = (long)getegid();
     va_end(ap);
-    return (long)egid;
+    return result;
   }
 #endif
 
 #ifdef SYS_gettid
   if(number == SYS_gettid)
   {
-    // gettid() returns the thread ID
-    int tid = __VERIFIER_nondet_int();
-    __CPROVER_assume(tid > 0);
+    result = (long)gettid();
     va_end(ap);
-    return (long)tid;
+    return result;
   }
 #endif
 
