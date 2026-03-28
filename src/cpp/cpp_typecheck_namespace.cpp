@@ -24,10 +24,34 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
 
   if(name.empty())
   {
-    // "unique namespace"
-    error().source_location=namespace_spec.source_location();
-    error() << "unique namespace not supported yet" << eom;
-    throw 0;
+    // Anonymous (unique) namespace — generate a unique name.
+    // libc++ uses these in headers like <tuple>.
+    static unsigned anon_ns_counter = 0;
+    irep_idt anon_name("#anon_ns_" + std::to_string(anon_ns_counter++));
+
+    std::string identifier =
+      cpp_scopes.current_scope().prefix + id2string(anon_name);
+
+    if(symbol_table.symbols.find(identifier) == symbol_table.symbols.end())
+    {
+      symbolt symbol;
+      symbol.name = identifier;
+      symbol.base_name = anon_name;
+      symbol.value.make_nil();
+      symbol.type = typet(ID_namespace);
+      symbol.mode = ID_cpp;
+      symbol.module = module;
+      symbol.location = namespace_spec.source_location();
+      symbol_table.add(symbol);
+    }
+
+    cpp_scopet &ns_scope = cpp_scopes.new_namespace(anon_name);
+    ns_scope.prefix = identifier + "::";
+    cpp_scopes.go_to(ns_scope);
+    // Make the anonymous namespace visible in the parent scope
+    // (inline namespace semantics)
+    parent_scope.add_using_scope(ns_scope);
+    return;
   }
 
   irep_idt final_name(name);

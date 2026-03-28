@@ -37,7 +37,18 @@ void cpp_typecheckt::convert(cpp_usingt &cpp_using)
 
   if(id_set.empty())
   {
-    error().source_location=cpp_using.name().source_location();
+    // In system headers (e.g., libc++ <cstdlib>), using declarations may
+    // reference identifiers not available on all platforms (e.g.,
+    // at_quick_exit on macOS). Silently skip rather than fail.
+    const auto &loc = cpp_using.name().source_location();
+    const std::string file = id2string(loc.get_file());
+    if(
+      file.find("/usr/include/") == 0 || file.find("/usr/lib/") == 0 ||
+      file.find("/Applications/") == 0)
+    {
+      return;
+    }
+    error().source_location = loc;
     error() << "using " << (using_directive ? "namespace" : "identifier")
             << " '" << base_name << "' not found" << eom;
     throw 0;
