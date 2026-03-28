@@ -311,7 +311,11 @@ __CPROVER_HIDE:;
   // Check for null pointer - should set errno to EFAULT
   // Some systems have C headers where `tp` is annotated to be nonnull
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wnonnull-compare"
+#ifdef __clang__
+#  pragma GCC diagnostic ignored "-Wpointer-bool-conversion"
+#else
+#  pragma GCC diagnostic ignored "-Wnonnull-compare"
+#endif
   if(!tp)
   {
     errno = EFAULT;
