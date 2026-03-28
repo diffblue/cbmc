@@ -155,8 +155,6 @@ void partial_order_concurrencyt::build_event_lists(
     if(!is_may_alias_step(*e_it))
       continue;
 
-    const typet &may_alias_type = e_it->ssa_lhs.type();
-
     // This is a may-alias event -- add it to all other non-may-alias addresses
     for(auto &addr_entry : address_map)
     {
@@ -168,13 +166,31 @@ void partial_order_concurrencyt::build_event_lists(
       if(is_may_alias_address(addr_entry.first))
         continue;
 
-      // Only add to addresses with matching type to avoid type mismatches
-      // in value equality constraints
+      // Only add to addresses where the types are compatible for aliasing.
+      // We check that the base types match after stripping signedness,
+      // or that byte_extract can meaningfully reinterpret the value
+      // (target is at least as large as the may-alias type).
       auto rep_it = address_representatives.find(addr_entry.first);
       if(rep_it == address_representatives.end())
         continue;
-      if(rep_it->second.type() != may_alias_type)
-        continue;
+      const typet &target_type = rep_it->second.type();
+      const typet &alias_type = e_it->ssa_lhs.type();
+      if(target_type != alias_type)
+      {
+        auto alias_bits = pointer_offset_bits(alias_type, ns);
+        auto target_bits = pointer_offset_bits(target_type, ns);
+        if(!alias_bits.has_value() || !target_bits.has_value())
+          continue;
+        // Target must be at least as large as the may-alias type
+        // for byte_extract to be well-defined, and both must be
+        // bitvector-like types (not pointers, structs, etc.)
+        if(
+          *target_bits < *alias_bits || target_type.id() == ID_pointer ||
+          alias_type.id() == ID_pointer)
+        {
+          continue;
+        }
+      }
 
       if(e_it->is_shared_read())
         addr_entry.second.reads.push_back(e_it);

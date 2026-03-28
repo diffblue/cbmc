@@ -11,6 +11,9 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 #include "memory_model.h"
 
+#include <util/arith_tools.h>
+#include <util/byte_operators.h>
+#include <util/c_types.h>
 #include <util/std_expr.h>
 
 memory_model_baset::memory_model_baset(const namespacet &_ns)
@@ -126,8 +129,22 @@ symbol_exprt memory_model_baset::register_read_from_choice_symbol(
     equation,
     // We rely on the fact that there is at least
     // one write event that has guard 'true'.
-    implies_exprt{
-      s, and_exprt{alias_cond, w->guard, equal_exprt{r->ssa_lhs, w->ssa_lhs}}},
+    // When the read and write have different types (due to may-alias
+    // type compatibility), use byte_extract to reinterpret the write
+    // value as the read's type. The expression simplifier will reduce
+    // this to a typecast for same-width types or keep it as a proper
+    // byte extraction for different widths.
+    [&]()
+    {
+      exprt write_val = w->ssa_lhs;
+      if(w->ssa_lhs.type() != r->ssa_lhs.type())
+      {
+        write_val = make_byte_extract(
+          w->ssa_lhs, from_integer(0, c_index_type()), r->ssa_lhs.type());
+      }
+      return implies_exprt{
+        s, and_exprt{alias_cond, w->guard, equal_exprt{r->ssa_lhs, write_val}}};
+    }(),
     is_rfi ? "rfi" : "rf",
     r->source);
 

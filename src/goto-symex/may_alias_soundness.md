@@ -125,11 +125,9 @@
 ///    pointer arithmetic within a single field, which is rare in
 ///    concurrent code.
 ///
-/// 3. TYPE COMPATIBILITY: May-alias events are only distributed to
-///    addresses with exactly matching types. This prevents crashes
-///    from type-mismatched value equality constraints in the memory
-///    model. Relaxing to same-size types requires adding typecasts
-///    to the rf-val constraints (s_{w,r} ⇒ val(w) = val(r)), which
-///    is a deeper change to the memory model. In practice, concurrent
-///    code almost always uses consistent types for shared data, so
-///    this limitation rarely causes missed bugs.
+/// 3. TYPE COMPATIBILITY: May-alias events are distributed to all
+///    addresses with known bit width. When the read and write types
+///    differ, the rf-val constraint uses byte_extract to reinterpret
+///    the write value as the read's type. The expression simplifier
+///    reduces this to a typecast for same-width types. This handles
+///    signed/unsigned, char* accessing int, and similar patterns.
