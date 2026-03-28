@@ -1,7 +1,7 @@
 CORE gcc-only
 main.cpp
 --cpp14
-^VERIFICATION
-^EXIT=(0|10)$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
 ^SIGNAL=0$
 --

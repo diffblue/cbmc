@@ -1,7 +1,7 @@
 CORE gcc-only
 main.cpp
 --cpp20
-^EXIT=(0|10)$
+^EXIT=0$
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$

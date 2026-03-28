@@ -1,7 +1,7 @@
 CORE gcc-only
 main.cpp
 --cpp11
-^EXIT=10$
+^EXIT=0$
 ^SIGNAL=0$
 \[main\.assertion\.1\] line 35 vec size == 0: SUCCESS
 --

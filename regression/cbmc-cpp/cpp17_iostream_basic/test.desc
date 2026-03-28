@@ -1,8 +1,8 @@
 CORE gcc-only
 main.cpp
 --cpp17
-^VERIFICATION
-^EXIT=(0|10)$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
 ^SIGNAL=0$
 --
 Invariant violation: std::less<std::_V2::error_category>::~less
