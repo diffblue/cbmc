@@ -147,6 +147,17 @@ void multi_path_symex_checkert::output_proof()
   output_graphml(equation, ns, options);
 }
 
+std::vector<proof_explanation_stept>
+multi_path_symex_checkert::get_proof_explanation()
+{
+  return property_decider.get_proof_explanation(ns);
+}
+
+std::vector<proof_invariantt> multi_path_symex_checkert::get_proof_invariants()
+{
+  return property_decider.get_proof_invariants(ns);
+}
+
 void multi_path_symex_checkert::output_error_witness(
   const goto_tracet &error_trace)
 {

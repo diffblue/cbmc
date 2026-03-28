@@ -14,6 +14,8 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include "bmc_util.h"
 #include "goto_verifier.h"
+#include "proof_explanation.h"
+#include "report_util.h"
 
 /// Stops when the first failing property is found.
 /// Requires an incremental goto checker that is a
@@ -47,6 +49,22 @@ public:
       output_properties(properties, 1, ui_message_handler);
       report_success(ui_message_handler);
       incremental_goto_checker.output_proof();
+      if constexpr(has_get_proof_explanationt<incremental_goto_checkerT>::value)
+      {
+        if(options.get_bool_option("proof-explanation"))
+        {
+          auto explanation = incremental_goto_checker.get_proof_explanation();
+          output_proof_explanation(explanation, ui_message_handler);
+        }
+      }
+      if constexpr(has_get_proof_invariantst<incremental_goto_checkerT>::value)
+      {
+        if(options.get_bool_option("proof-explanation"))
+        {
+          auto invariants = incremental_goto_checker.get_proof_invariants();
+          output_proof_invariants(invariants, ui_message_handler);
+        }
+      }
       break;
 
     case resultt::FAIL:

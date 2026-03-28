@@ -14,6 +14,7 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <goto-symex/symex_target_equation.h>
 
+#include "proof_explanation.h"
 #include "properties.h"
 #include "solver_factory.h"
 
@@ -65,6 +66,23 @@ public:
     std::unordered_set<irep_idt> &updated_properties,
     decision_proceduret::resultt dec_result,
     bool set_pass = true) const;
+  /// Get a word-level proof explanation for proved properties
+  /// with unsat core annotations. Uses the solver's assumption-based
+  /// conflict analysis when available, falling back to the basic
+  /// approach otherwise.
+  /// Must be called after solve() returns D_UNSATISFIABLE.
+  /// \param ns: the namespace for expression pretty-printing
+  /// \return a vector of proof explanation steps with core annotations
+  std::vector<proof_explanation_stept>
+  get_proof_explanation(const namespacet &ns);
+
+  /// Get word-level invariants from the proof explanation.
+  /// Groups core steps by the variables they constrain.
+  /// Must be called after solve() returns D_UNSATISFIABLE.
+  /// \param ns: the namespace for expression pretty-printing
+  /// \return a vector of proof invariants
+  std::vector<proof_invariantt> get_proof_invariants(const namespacet &ns);
+
 protected:
   const optionst &options;
   ui_message_handlert &ui_message_handler;
