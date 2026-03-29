@@ -869,16 +869,14 @@ enable_or_disable ("enable"|"disable")
 "and_eq"            { return conditional_keyword(PARSER.cpp98, TOK_ANDASSIGN); }
 "bool"              { return conditional_keyword(PARSER.cpp98 || PARSER.c23, TOK_BOOL); }
 "catch"             { return conditional_keyword(PARSER.cpp98, TOK_CATCH); }
-"char16_t"          { // C++11, but Visual Studio uses typedefs
+"char16_t"          { // C++11 keyword (also in modern Visual Studio)
                       return conditional_keyword(
-                        PARSER.cpp11 &&
-                        PARSER.mode != configt::ansi_ct::flavourt::VISUAL_STUDIO,
+                        PARSER.cpp11,
                         TOK_CHAR16_T);
                     }
-"char32_t"          { // C++11, but Visual Studio uses typedefs
+"char32_t"          { // C++11 keyword (also in modern Visual Studio)
                       return conditional_keyword(
-                        PARSER.cpp11 &&
-                        PARSER.mode != configt::ansi_ct::flavourt::VISUAL_STUDIO,
+                        PARSER.cpp11,
                         TOK_CHAR32_T);
                     }
 "char8_t"           { return conditional_keyword(PARSER.cpp20, TOK_CHAR8_T); }
