@@ -122,6 +122,11 @@ public:
   propertiest properties;
   irep_idt target_violation_id;
 
+  /// Symbols identified as proof-relevant by the unsat core for properties
+  /// that passed verification. Used by the synthesizer to narrow the search
+  /// space for invariant candidates.
+  std::set<symbol_exprt> proof_relevant_symbols;
+
 protected:
   // Compute the cause loops of `violation`.
   // We say a loop is the cause loop if the violated predicate is dependent

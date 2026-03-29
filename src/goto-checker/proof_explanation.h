@@ -17,6 +17,7 @@ Author: CBMC Contributors
 
 #include <string>
 #include <type_traits>
+#include <unordered_set>
 #include <vector>
 
 class namespacet;
@@ -40,6 +41,11 @@ struct proof_explanation_stept
   /// Whether this step is in the unsat core (true by default
   /// for backward compatibility with the basic approach)
   bool in_core = true;
+
+  /// Symbols referenced by this step (LHS for assignments,
+  /// all symbols for assumptions). Used by the synthesizer
+  /// to identify proof-relevant variables.
+  std::unordered_set<irep_idt> symbols;
 };
 
 /// Extract a word-level proof explanation from an UNSAT result.

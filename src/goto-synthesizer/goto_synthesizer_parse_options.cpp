@@ -227,6 +227,10 @@ optionst goto_synthesizer_parse_optionst::get_options()
   // Generating trace for counterexamples.
   options.set_option("trace", true);
 
+  // Enable proof explanations for identifying proof-relevant variables.
+  // This helps narrow the search space during invariant synthesis.
+  options.set_option("proof-explanation", true);
+
   parse_solver_options(cmdline, options);
 
   return options;

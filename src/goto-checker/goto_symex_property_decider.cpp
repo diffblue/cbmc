@@ -213,6 +213,7 @@ void goto_symex_property_decidert::update_properties_status_from_goals(
             {
               if(!e.in_core)
                 continue;
+              bool found = false;
               for(const auto &step : equation.SSA_steps)
               {
                 if(step.ignore)
@@ -223,7 +224,7 @@ void goto_symex_property_decidert::update_properties_status_from_goals(
                   step.is_assignment() &&
                   needed.count(step.ssa_lhs.get_identifier()))
                 {
-                  filtered.push_back(e);
+                  found = true;
                   break;
                 }
                 if(step.is_assume())
@@ -233,12 +234,15 @@ void goto_symex_property_decidert::update_properties_status_from_goals(
                   for(const auto &s : syms)
                     if(needed.count(s))
                     {
-                      filtered.push_back(e);
-                      goto next_step;
+                      found = true;
+                      break;
                     }
+                  if(found)
+                    break;
                 }
               }
-            next_step:;
+              if(found)
+                filtered.push_back(e);
             }
             if(!filtered.empty())
               per_property_explanations_cache[property_pair.first] =

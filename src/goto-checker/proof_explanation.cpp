@@ -165,6 +165,14 @@ std::vector<proof_explanation_stept> get_proof_explanation(
     explanation_step.step_type = step_type_string(step);
     explanation_step.description = step_description(step, ns);
     explanation_step.in_core = true;
+    if(step.is_assignment())
+      explanation_step.symbols.insert(step.ssa_lhs.get_identifier());
+    else if(step.is_assume())
+    {
+      find_symbols_sett syms;
+      find_symbols(step.cond_expr, syms);
+      explanation_step.symbols = std::move(syms);
+    }
 
     result.push_back(std::move(explanation_step));
   }
@@ -268,6 +276,14 @@ std::vector<proof_explanation_stept> get_proof_explanation_with_core(
     explanation_step.step_type = step_type_string(step);
     explanation_step.description = step_description(step, ns);
     explanation_step.in_core = in_conflict[i];
+    if(step.is_assignment())
+      explanation_step.symbols.insert(step.ssa_lhs.get_identifier());
+    else if(step.is_assume())
+    {
+      find_symbols_sett syms;
+      find_symbols(step.cond_expr, syms);
+      explanation_step.symbols = std::move(syms);
+    }
 
     result.push_back(std::move(explanation_step));
   }

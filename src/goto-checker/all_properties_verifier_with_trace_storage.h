@@ -122,6 +122,17 @@ public:
     return traces;
   }
 
+  /// Get per-property proof explanations from the underlying checker.
+  /// Available after operator() returns, for properties proved PASS.
+  std::map<irep_idt, std::vector<proof_explanation_stept>>
+  get_per_property_proof_explanations()
+  {
+    if constexpr(has_get_proof_explanationt<incremental_goto_checkerT>::value)
+      return incremental_goto_checker.get_per_property_proof_explanations();
+    else
+      return {};
+  }
+
 protected:
   abstract_goto_modelt &goto_model;
   incremental_goto_checkerT incremental_goto_checker;

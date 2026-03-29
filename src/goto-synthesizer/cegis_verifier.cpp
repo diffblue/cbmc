@@ -32,6 +32,7 @@ Author: Qinheping Hu
 #include <cpp/cprover_library.h>
 #include <goto-checker/all_properties_verifier_with_trace_storage.h>
 #include <goto-checker/multi_path_symex_checker.h>
+#include <goto-checker/proof_explanation.h>
 #include <goto-instrument/contracts/contracts.h>
 #include <goto-instrument/contracts/instrument_spec_assigns.h>
 #include <goto-instrument/contracts/utils.h>
@@ -611,6 +612,34 @@ std::optional<cext> cegis_verifiert::verify()
 
   // Run the checker to get the result.
   const resultt result = (*checker)();
+
+  // Extract proof-relevant symbols from properties that passed.
+  // These symbols are in the unsat core and help narrow the search
+  // space for invariant synthesis.
+  proof_relevant_symbols.clear();
+  if(options.get_bool_option("proof-explanation"))
+  {
+    auto per_prop = checker->get_per_property_proof_explanations();
+    for(const auto &[prop_id, explanation] : per_prop)
+    {
+      for(const auto &step : explanation)
+      {
+        if(!step.in_core)
+          continue;
+        for(const auto &sym_id : step.symbols)
+        {
+          // Strip SSA suffixes (!N@M#L) to get the base symbol name
+          const std::string id_str = id2string(sym_id);
+          auto bang = id_str.find('!');
+          std::string base_name =
+            (bang != std::string::npos) ? id_str.substr(0, bang) : id_str;
+          const auto *sym = ns.get_symbol_table().lookup(base_name);
+          if(sym != nullptr)
+            proof_relevant_symbols.insert(sym->symbol_expr());
+        }
+      }
+    }
+  }
 
   if(original_verbosity >= messaget::M_DEBUG)
     checker->report();
