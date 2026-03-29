@@ -1,0 +1,12 @@
+CORE
+main.c
+--pointer-check _ --no-malloc-may-fail _ --no-standard-checks
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Tests that proof-guided synthesis can synthesize loop invariants.
+The proof explanation identifies x as proof-relevant, narrowing
+the search space for the invariant synthesizer.

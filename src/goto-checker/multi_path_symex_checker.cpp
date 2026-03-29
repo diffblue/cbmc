@@ -136,6 +136,14 @@ multi_path_symex_checkert::operator()(propertiest &properties)
             pstep.step_type = step_type_string(step);
             pstep.description = step_description(step, ns);
             pstep.in_core = true;
+            if(step.is_assignment())
+              pstep.symbols.insert(step.ssa_lhs.get_identifier());
+            else if(step.is_assume())
+            {
+              find_symbols_sett syms;
+              find_symbols(step.cond_expr, syms);
+              pstep.symbols = std::move(syms);
+            }
             filtered.push_back(std::move(pstep));
           }
         }

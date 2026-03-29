@@ -30,6 +30,8 @@ Author: Qinheping Hu
 #include "cegis_evaluator.h"
 #include "expr_enumerator.h"
 
+#include <algorithm>
+
 // substitute all tmp_post variables with their origins in `expr`
 void replace_tmp_post(
   exprt &dest,
@@ -262,7 +264,8 @@ enumerative_loop_contracts_synthesizert::compute_dependent_symbols(
   const std::set<exprt> &live_vars)
 {
   // We overapproximate dependent symbols as all symbols in live variables.
-  // TODO: using flow-dependency analysis to rule out not dependent symbols.
+  // The caller may narrow this set using proof-relevant variables from
+  // the unsat core (see synthesize_all).
 
   std::set<symbol_exprt> result;
   for(const auto &e : live_vars)
@@ -483,6 +486,28 @@ invariant_mapt enumerative_loop_contracts_synthesizert::synthesize_all()
         return_cex->cause_loop_ids.front(),
         new_invariant_clause,
         return_cex->live_variables);
+
+      // Narrow dependent symbols using proof-relevant variables from
+      // properties that passed. This identifies which variables actually
+      // matter for the proof, reducing the enumeration search space.
+      if(!verifier.proof_relevant_symbols.empty())
+      {
+        std::set<symbol_exprt> narrowed;
+        std::set_intersection(
+          dependent_symbols.begin(),
+          dependent_symbols.end(),
+          verifier.proof_relevant_symbols.begin(),
+          verifier.proof_relevant_symbols.end(),
+          std::inserter(narrowed, narrowed.end()));
+        if(!narrowed.empty())
+        {
+          log.debug() << "Narrowed dependent symbols from "
+                      << dependent_symbols.size() << " to " << narrowed.size()
+                      << " using proof-relevant variables" << messaget::eom;
+          dependent_symbols = std::move(narrowed);
+        }
+      }
+      [[fallthrough]];
     case cext::violation_typet::cex_not_preserved:
       terminal_symbols = construct_terminals(dependent_symbols);
       new_invariant_clause = synthesize_strengthening_clause(
