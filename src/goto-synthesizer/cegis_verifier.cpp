@@ -659,7 +659,11 @@ std::optional<cext> cegis_verifiert::verify()
 
   if(result == resultt::ERROR || result == resultt::UNKNOWN)
   {
-    INVARIANT(false, "Verification failed during loop contract synthesis.");
+    log.error() << "Verification returned "
+                << (result == resultt::ERROR ? "ERROR" : "UNKNOWN")
+                << " during loop contract synthesis" << messaget::eom;
+    restore_functions();
+    return std::optional<cext>();
   }
 
   properties = checker->get_properties();
