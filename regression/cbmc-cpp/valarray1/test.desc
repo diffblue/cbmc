@@ -1,4 +1,4 @@
-CORE gcc-only
+CORE
 main.cpp
 --cpp11 --show-goto-functions
 ^Generating GOTO Program$

@@ -1,4 +1,4 @@
-CORE gcc-only
+CORE
 main.cpp
 --cpp17 --depth 100 --no-unwinding-assertions
 \[main\.assertion\.1\] line 5 value: SUCCESS

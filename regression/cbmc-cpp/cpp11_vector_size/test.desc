@@ -1,4 +1,4 @@
-CORE gcc-only
+CORE
 main.cpp
 --cpp11 --unwind 2 --no-unwinding-assertions --depth 50
 \[main\.assertion\.1\] line 7 size after push_back: SUCCESS
