@@ -206,7 +206,8 @@ is_property_less_than(const propertyt &property1, const propertyt &property2)
            std::stoul(id2string(p2.get_line()));
 
   const auto split_property_id =
-    [](const irep_idt &property_id) -> std::pair<std::string, std::size_t> {
+    [](const irep_idt &property_id) -> std::pair<std::string, std::size_t>
+  {
     const auto property_string = id2string(property_id);
     const auto last_dot = property_string.rfind('.');
     std::string property_name;
@@ -252,9 +253,8 @@ get_sorted_properties(const propertiest &properties)
   std::sort(
     sorted_properties.begin(),
     sorted_properties.end(),
-    [](propertiest::const_iterator pit1, propertiest::const_iterator pit2) {
-      return is_property_less_than(*pit1, *pit2);
-    });
+    [](propertiest::const_iterator pit1, propertiest::const_iterator pit2)
+    { return is_property_less_than(*pit1, *pit2); });
   return sorted_properties;
 }
 
@@ -423,7 +423,9 @@ void output_fault_localization_scores(
   messaget &log)
 {
   log.conditional_output(
-    log.debug(), [fault_location](messaget::mstreamt &out) {
+    log.debug(),
+    [fault_location](messaget::mstreamt &out)
+    {
       out << "Fault localization scores:" << messaget::eom;
       for(auto &score_pair : fault_location.scores)
       {
@@ -443,9 +445,8 @@ max_fault_localization_score(const fault_location_infot &fault_location)
            fault_location.scores.end(),
            [](
              fault_location_infot::score_mapt::value_type score_pair1,
-             fault_location_infot::score_mapt::value_type score_pair2) {
-             return score_pair1.second < score_pair2.second;
-           })
+             fault_location_infot::score_mapt::value_type score_pair2)
+           { return score_pair1.second < score_pair2.second; })
     ->first;
 }
 
