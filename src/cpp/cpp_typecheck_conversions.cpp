@@ -1618,6 +1618,16 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
 
   if(!implicit_conversion_sequence(e, type, expr))
   {
+    // Empty brace-init {} to pointer type: produces null pointer.
+    // Used by MSVC's <exception> header: void* ptr = {};
+    if(
+      orig_expr.id() == ID_initializer_list &&
+      orig_expr.operands().empty() && type.id() == ID_pointer)
+    {
+      expr = null_pointer_exprt(to_pointer_type(type));
+      return;
+    }
+
     // Brace-init-list to std::initializer_list<T> conversion (C++11):
     // {a, b, c} creates a backing array and constructs the
     // initializer_list with _begin and _size.
