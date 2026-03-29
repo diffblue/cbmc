@@ -1621,8 +1621,8 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
     // Empty brace-init {} to pointer type: produces null pointer.
     // Used by MSVC's <exception> header: void* ptr = {};
     if(
-      orig_expr.id() == ID_initializer_list &&
-      orig_expr.operands().empty() && type.id() == ID_pointer)
+      orig_expr.id() == ID_initializer_list && orig_expr.operands().empty() &&
+      type.id() == ID_pointer)
     {
       expr = null_pointer_exprt(to_pointer_type(type));
       return;

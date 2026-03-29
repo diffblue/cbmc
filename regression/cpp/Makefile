@@ -11,6 +11,10 @@ endif
 
 ifeq ($(BUILD_ENV_),MSVC)
 	excluded_tests = -X gcc-only
+else ifneq ($(shell $(exe) --version 2>&1 | grep -c gcc),0)
+	excluded_tests =
+else
+	excluded_tests = -X gcc-only
 endif
 
 test:
