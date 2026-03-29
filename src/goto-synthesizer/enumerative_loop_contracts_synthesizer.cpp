@@ -230,7 +230,8 @@ void enumerative_loop_contracts_synthesizert::synthesize_assigns(
     if(assigns_map[loop_id].insert(new_assign).second)
       return;
   }
-  INVARIANT(false, "Failed to synthesize a new assigns target.");
+  log.warning() << "Failed to synthesize a new assigns target for "
+                << format(new_assign) << messaget::eom;
 }
 
 void enumerative_loop_contracts_synthesizert::build_tmp_post_map()
@@ -376,16 +377,22 @@ exprt enumerative_loop_contracts_synthesizert::synthesize_strengthening_clause(
   size_t count_all = 0;
   size_t count_filtered = 0;
 
+  // Maximum AST size for candidate expressions. Beyond this, the
+  // grammar produces too many candidates to enumerate in reasonable time.
+  static constexpr size_t max_enumeration_size = 20;
+
   // Start to enumerate and check.
-  while(true)
+  while(size_bound < max_enumeration_size)
   {
     size_bound++;
+    size_t candidates_at_size = 0;
 
     // generate candidate and verify
     for(auto strengthening_candidate : start_bool_ph.enumerate(size_bound))
     {
-      log.progress() << "Verifying candidate: "
-                     << format(strengthening_candidate) << messaget::eom;
+      candidates_at_size++;
+      log.debug() << "Verifying candidate: " << format(strengthening_candidate)
+                  << messaget::eom;
       invariant_mapt new_in_clauses = invariant_mapt(in_invariant_clause_map);
       new_in_clauses[cause_loop_id] =
         and_exprt(new_in_clauses[cause_loop_id], strengthening_candidate);
@@ -427,8 +434,16 @@ exprt enumerative_loop_contracts_synthesizert::synthesize_strengthening_clause(
         return strengthening_candidate;
       }
     }
+    log.progress() << "Enumeration size " << size_bound << ": checked "
+                   << candidates_at_size << " candidates (" << count_all
+                   << " total, " << count_filtered << " filtered)"
+                   << messaget::eom;
   }
-  UNREACHABLE;
+
+  log.warning() << "Failed to synthesize a strengthening clause after "
+                << "enumerating " << count_all << " candidates up to size "
+                << max_enumeration_size << messaget::eom;
+  return true_exprt();
 }
 
 invariant_mapt enumerative_loop_contracts_synthesizert::synthesize_all()
@@ -509,6 +524,15 @@ invariant_mapt enumerative_loop_contracts_synthesizert::synthesize_all()
       }
       [[fallthrough]];
     case cext::violation_typet::cex_not_preserved:
+      // When reached directly (not via fallthrough from cex_other),
+      // dependent_symbols may be empty. Compute them from live variables.
+      if(dependent_symbols.empty())
+      {
+        dependent_symbols = compute_dependent_symbols(
+          return_cex->cause_loop_ids.front(),
+          new_invariant_clause,
+          return_cex->live_variables);
+      }
       terminal_symbols = construct_terminals(dependent_symbols);
       new_invariant_clause = synthesize_strengthening_clause(
         terminal_symbols,
@@ -518,7 +542,9 @@ invariant_mapt enumerative_loop_contracts_synthesizert::synthesize_all()
       break;
 
     case cext::violation_typet::cex_not_hold_upon_entry:
-      INVARIANT(false, "unsupported violation type");
+      log.warning()
+        << "Unsupported violation type: invariant does not hold upon entry. "
+        << "Skipping this counterexample." << messaget::eom;
       break;
     }
 
