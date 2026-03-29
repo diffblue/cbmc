@@ -120,7 +120,8 @@ void parse_solver_options(const cmdlinet &cmdline, optionst &options);
   "(refine-arithmetic)"                                                        \
   "(outfile):"                                                                 \
   "(dump-smt-formula):"                                                        \
-  "(write-solver-stats-to):"
+  "(write-solver-stats-to):"                                                   \
+  "(pointer-encoding-via-maps)"
 
 #define HELP_SOLVER                                                            \
   " {y--sat-solver} {usolver} \t use specified SAT solver\n"                   \
@@ -154,6 +155,8 @@ void parse_solver_options(const cmdlinet &cmdline, optionst &options);
   " {y--dump-smt-formula} {ufilename} \t "                                     \
   "output smt incremental formula to the given file\n"                         \
   " {y--write-solver-stats-to} {ujson-file} \t "                               \
-  "collect the solver query complexity\n"
+  "collect the solver query complexity\n"                                      \
+  " {y--pointer-encoding-via-maps} \t "                                        \
+  "use map-based pointer encoding instead of bit-packing\n"
 
 #endif // CPROVER_GOTO_CHECKER_SOLVER_FACTORY_H
