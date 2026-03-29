@@ -52,6 +52,20 @@ protected:
   symbol_exprt object_map;
   symbol_exprt offset_map;
 
+  /// Solver-level array mapping object numbers to symbolic base addresses.
+  /// Used for pointer-to-integer casts: the integer value is
+  /// base_address_map[object] + offset.
+  symbol_exprt base_address_map;
+
+  /// Cache of base address bitvectors per object number.
+  /// Populated lazily when pointer-to-integer casts are encountered.
+  std::map<mp_integer, bvt> object_base_address;
+
+  /// Objects created from integer-to-pointer casts of constants.
+  /// These are excluded from non-overlapping constraints because
+  /// the integer address might point into an existing object.
+  std::set<mp_integer> integer_address_objects;
+
   /// Counter for allocating fresh pointer indices.
   mp_integer next_bv_pointer_index;
 
@@ -59,6 +73,10 @@ protected:
   /// extraction in bv_get_rec.  Populated by encode().
   std::map<mp_integer, std::pair<mp_integer, mp_integer>>
     index_to_object_offset;
+
+  /// Map from pointer index to (object_bv, offset_bv) for model
+  /// extraction of encode_fresh pointers.
+  std::map<mp_integer, std::pair<bvt, bvt>> index_to_bv_object_offset;
 
   /// Allocate a fresh index bitvector, constrain the maps, and return
   /// the index as a bvt.
@@ -123,6 +141,10 @@ protected:
 
   /// Read the offset for a pointer whose bitvector is \p bv.
   bvt read_offset(const bvt &bv, const pointer_typet &type);
+
+  /// Get or create a symbolic base address bitvector for the given
+  /// object number. Used for pointer-to-integer casts.
+  bvt get_object_base_address(const mp_integer &object, std::size_t width);
 
   /// Create Boolean functions describing all dynamic and all
   /// not-dynamic object encodings over \p placeholders as input

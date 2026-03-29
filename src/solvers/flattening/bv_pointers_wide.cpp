@@ -115,6 +115,11 @@ bv_pointers_widet::bv_pointers_widet(
       array_typet(
         unsignedbv_typet(config.ansi_c.pointer_width),
         infinity_exprt(unsignedbv_typet(config.ansi_c.pointer_width)))),
+    base_address_map(
+      "bv_pointers_wide::base_address_map",
+      array_typet(
+        unsignedbv_typet(config.ansi_c.pointer_width),
+        infinity_exprt(unsignedbv_typet(config.ansi_c.pointer_width)))),
     next_bv_pointer_index(0)
 {
 }
@@ -153,6 +158,21 @@ bvt bv_pointers_widet::read_offset(const bvt &bv, const pointer_typet &type)
   for(std::size_t i = 0; i < width; ++i)
     prop.set_equal(idx_bv[i], bv[i]);
   return convert_bv(index_exprt(offset_map, idx_sym));
+}
+
+// Get or create a symbolic base address for an object.
+
+bvt bv_pointers_widet::get_object_base_address(
+  const mp_integer &object,
+  std::size_t width)
+{
+  auto it = object_base_address.find(object);
+  if(it != object_base_address.end())
+    return it->second;
+
+  bvt base = prop.new_variables(width);
+  object_base_address[object] = base;
+  return base;
 }
 
 // Encode: allocate a fresh index, constrain the maps.
@@ -208,6 +228,8 @@ bvt bv_pointers_widet::encode_fresh(
   bvt off_read = convert_bv(index_exprt(offset_map, idx_expr));
   for(std::size_t i = 0; i < width; ++i)
     prop.set_equal(off_read[i], offset_bv[i]);
+
+  index_to_bv_object_offset[idx] = {object_bv, offset_bv};
 
   return index_bv;
 }
@@ -458,13 +480,73 @@ bvt bv_pointers_widet::convert_pointer_type(const exprt &expr)
       can_cast_type<bitvector_typet>(op_type) || op_type.id() == ID_bool ||
       op_type.id() == ID_c_enum || op_type.id() == ID_c_enum_tag)
     {
-      // Integer-to-pointer cast: in the map-based
-      // encoding, integer values have no direct
-      // relationship to the abstract pointer index.
-      // Produce a fully nondeterministic pointer
-      // (unconstrained index) so that the analysis
-      // remains sound.
-      return prop.new_variables(bits);
+      // Integer-to-pointer cast.
+      bvt int_bv = convert_bv(op);
+      const std::size_t ptr_width = type.get_width();
+
+      // Check if the integer value is a constant
+      mp_integer int_val = 0;
+      bool is_const = true;
+      for(std::size_t i = 0; i < int_bv.size(); ++i)
+      {
+        if(int_bv[i].is_true())
+          int_val += power(2, i);
+        else if(!int_bv[i].is_false())
+        {
+          is_const = false;
+          break;
+        }
+      }
+
+      if(is_const && int_val == 0)
+      {
+        // (T*)0 is NULL
+        return encode(pointer_logic.get_null_object(), type);
+      }
+      else if(is_const)
+      {
+        // For constant non-zero integer addresses, create a
+        // dedicated "integer address" object with the constant
+        // as its base address and offset 0.
+        const auto int_addr_obj = pointer_logic.add_object(constant_exprt(
+          integer2bvrep(int_val, ptr_width), unsignedbv_typet(ptr_width)));
+        bvt result = encode(int_addr_obj, type);
+        integer_address_objects.insert(int_addr_obj);
+        // Set the base address to the constant value
+        bvt base = get_object_base_address(int_addr_obj, ptr_width);
+        bvt val_bv = bv_utils.build_constant(int_val, ptr_width);
+        for(std::size_t i = 0; i < ptr_width; ++i)
+          prop.set_equal(base[i], val_bv[i]);
+        return result;
+      }
+      else
+      {
+        // Symbolic integer-to-pointer: create a fresh pointer
+        // constrained so base[object] + offset == integer value.
+        bvt obj_bv = prop.new_variables(ptr_width);
+        bvt off_bv = prop.new_variables(ptr_width);
+        bvt int_ext = bv_utils.zero_extension(int_bv, ptr_width);
+
+        const auto &objects = pointer_logic.objects;
+        std::size_t number = 0;
+        for(auto it = objects.cbegin(); it != objects.cend(); ++it, ++number)
+        {
+          bvt obj_const = bv_utils.build_constant(number, ptr_width);
+          literalt is_this_obj = bv_utils.equal(obj_bv, obj_const);
+          if(is_this_obj.is_false())
+            continue;
+
+          bvt base = get_object_base_address(number, ptr_width);
+          bvt flat = bv_utils.add(base, off_bv);
+          for(std::size_t i = 0; i < ptr_width; ++i)
+          {
+            prop.lcnf({!is_this_obj, !flat[i], int_ext[i]});
+            prop.lcnf({!is_this_obj, flat[i], !int_ext[i]});
+          }
+        }
+
+        return encode_fresh(obj_bv, off_bv, type);
+      }
     }
   }
   else if(expr.id() == ID_if)
@@ -748,17 +830,46 @@ bvt bv_pointers_widet::convert_bitvector(const exprt &expr)
     expr.id() == ID_typecast &&
     to_typecast_expr(expr).op().type().id() == ID_pointer)
   {
-    // Pointer-to-integer cast: the abstract pointer
-    // index is meaningless as an integer.  Return the
-    // byte offset from the offset map, which gives a
-    // meaningful integer value (the position within
-    // the pointed-to object).
+    // Pointer-to-integer cast: compute base[object] + offset.
+    // For pointers with known constant indices (from encode()),
+    // look up the object directly. For symbolic pointers,
+    // postpone to finish_eager_conversion.
     const exprt &ptr_op = to_typecast_expr(expr).op();
     const bvt &ptr_bv = convert_bv(ptr_op);
     const pointer_typet &ptr_type = to_pointer_type(ptr_op.type());
-    bvt off = read_offset(ptr_bv, ptr_type);
+    const std::size_t ptr_width = ptr_type.get_width();
     std::size_t width = boolbv_width(expr.type());
-    return bv_utils.zero_extension(off, width);
+
+    // Try to extract a constant index from the pointer bitvector
+    mp_integer idx_val = 0;
+    bool is_constant = true;
+    for(std::size_t i = 0; i < ptr_bv.size(); ++i)
+    {
+      if(ptr_bv[i].is_true())
+        idx_val += power(2, i);
+      else if(!ptr_bv[i].is_false())
+      {
+        is_constant = false;
+        break;
+      }
+    }
+
+    if(is_constant)
+    {
+      auto it = index_to_object_offset.find(idx_val);
+      if(it != index_to_object_offset.end())
+      {
+        bvt base = get_object_base_address(it->second.first, ptr_width);
+        bvt off_const = bv_utils.build_constant(it->second.second, ptr_width);
+        bvt flat = bv_utils.add(base, off_const);
+        return bv_utils.zero_extension(flat, width);
+      }
+    }
+
+    // For symbolic pointers, postpone
+    bvt result = prop.new_variables(width);
+    postponed_list.emplace_back(result, ptr_bv, expr);
+    return result;
   }
 
   return SUB::convert_bitvector(expr);
@@ -853,6 +964,35 @@ literalt bv_pointers_widet::convert_rest(const exprt &expr)
     return convert(simplify_expr(prophecy_pointer_in_range->lower(ns), ns));
   }
 
+  else if(expr.id() == ID_equal || expr.id() == ID_notequal)
+  {
+    const auto &rel = to_binary_relation_expr(expr);
+    if(
+      rel.lhs().type().id() == ID_pointer &&
+      rel.rhs().type().id() == ID_pointer)
+    {
+      // Compare (object, offset) pairs, not raw indices.
+      const pointer_typet &lhs_type = to_pointer_type(rel.lhs().type());
+      const pointer_typet &rhs_type = to_pointer_type(rel.rhs().type());
+
+      const bvt &lhs_bv = convert_bv(rel.lhs());
+      const bvt &rhs_bv = convert_bv(rel.rhs());
+
+      bvt lhs_obj = read_object(lhs_bv, lhs_type);
+      bvt rhs_obj = read_object(rhs_bv, rhs_type);
+      bvt lhs_off = read_offset(lhs_bv, lhs_type);
+      bvt rhs_off = read_offset(rhs_bv, rhs_type);
+
+      literalt obj_eq = bv_utils.equal(lhs_obj, rhs_obj);
+      literalt off_eq = bv_utils.equal(lhs_off, rhs_off);
+      literalt result = prop.land(obj_eq, off_eq);
+
+      if(expr.id() == ID_notequal)
+        return !result;
+      return result;
+    }
+  }
+
   return SUB::convert_rest(expr);
 }
 
@@ -912,12 +1052,45 @@ exprt bv_pointers_widet::bv_get_rec(
   if(it != index_to_object_offset.end())
   {
     pointer_logict::pointert pointer{it->second.first, it->second.second};
+    // Try to compute flat address for the hex display
+    irep_idt display_bvrep = bvrep;
+    auto base_it = object_base_address.find(it->second.first);
+    if(base_it != object_base_address.end())
+    {
+      std::string base_str = bits_to_string(prop, base_it->second);
+      mp_integer base_val = binary2integer(base_str, false);
+      mp_integer flat_addr = base_val + it->second.second;
+      display_bvrep = integer2bvrep(flat_addr, bits);
+    }
     return annotated_pointer_constant_exprt{
-      bvrep, pointer_logic.pointer_expr(pointer, pt)};
+      display_bvrep, pointer_logic.pointer_expr(pointer, pt)};
   }
 
-  // For indices not tracked (e.g., from encode_fresh),
-  // return the raw constant.
+  // For indices not tracked by encode(), try encode_fresh's
+  // bitvector map and read the model values.
+  auto it2 = index_to_bv_object_offset.find(idx_val);
+  if(it2 != index_to_bv_object_offset.end())
+  {
+    std::string obj_str = bits_to_string(prop, it2->second.first);
+    std::string off_str = bits_to_string(prop, it2->second.second);
+    mp_integer obj_val = binary2integer(obj_str, false);
+    mp_integer off_val = binary2integer(off_str, false);
+    pointer_logict::pointert pointer{obj_val, off_val};
+    // Try to compute flat address
+    irep_idt display_bvrep = bvrep;
+    auto base_it = object_base_address.find(obj_val);
+    if(base_it != object_base_address.end())
+    {
+      std::string base_str = bits_to_string(prop, base_it->second);
+      mp_integer base_val = binary2integer(base_str, false);
+      mp_integer flat_addr = base_val + off_val;
+      display_bvrep = integer2bvrep(flat_addr, bits);
+    }
+    return annotated_pointer_constant_exprt{
+      display_bvrep, pointer_logic.pointer_expr(pointer, pt)};
+  }
+
+  // Truly unknown index — return raw constant.
   return constant_exprt(bvrep, type);
 }
 
@@ -1051,7 +1224,9 @@ void bv_pointers_widet::finish_eager_conversion()
   // solver-level array reads that must be registered before
   // arrayst processes consistency constraints.
   std::vector<bvt> preread_obj;
+  std::vector<bvt> preread_off;
   preread_obj.reserve(postponed_list.size());
+  preread_off.reserve(postponed_list.size());
   for(const postponedt &postponed : postponed_list)
   {
     if(postponed.expr.id() == ID_is_dynamic_object)
@@ -1059,6 +1234,7 @@ void bv_pointers_widet::finish_eager_conversion()
       const auto &type =
         to_pointer_type(to_unary_expr(postponed.expr).op().type());
       preread_obj.push_back(read_object(postponed.op, type));
+      preread_off.push_back(bvt{});
     }
     else if(expr_try_dynamic_cast<object_size_exprt>(postponed.expr))
     {
@@ -1067,6 +1243,17 @@ void bv_pointers_widet::finish_eager_conversion()
                           ->pointer()
                           .type());
       preread_obj.push_back(read_object(postponed.op, type));
+      preread_off.push_back(bvt{});
+    }
+    else if(
+      postponed.expr.id() == ID_typecast &&
+      to_typecast_expr(postponed.expr).op().type().id() == ID_pointer)
+    {
+      // Pointer-to-integer cast: pre-read object and offset
+      const auto &ptr_type =
+        to_pointer_type(to_typecast_expr(postponed.expr).op().type());
+      preread_obj.push_back(read_object(postponed.op, ptr_type));
+      preread_off.push_back(read_offset(postponed.op, ptr_type));
     }
     else
       UNREACHABLE;
@@ -1165,8 +1352,133 @@ void bv_pointers_widet::finish_eager_conversion()
         }
       }
     }
+    else if(
+      postponed.expr.id() == ID_typecast &&
+      to_typecast_expr(postponed.expr).op().type().id() == ID_pointer)
+    {
+      // Pointer-to-integer cast: compute base[object] + offset
+      // using a MUX chain over all known objects.
+      const bvt &obj_bv = saved_obj_bv;
+      const bvt &off_bv = preread_off[postponed_idx - 1];
+      const std::size_t ptr_width = config.ansi_c.pointer_width;
+      const std::size_t result_width = postponed.bv.size();
+
+      bvt result = bv_utils.build_constant(0, result_width);
+
+      const auto &objects = pointer_logic.objects;
+      std::size_t obj_number = 0;
+      for(auto it = objects.cbegin(); it != objects.cend(); ++it, ++obj_number)
+      {
+        bvt obj_const = bv_utils.build_constant(obj_number, ptr_width);
+        literalt is_this_obj = bv_utils.equal(obj_bv, obj_const);
+
+        if(is_this_obj.is_false())
+          continue;
+
+        bvt base = get_object_base_address(obj_number, ptr_width);
+        bvt flat = bv_utils.add(base, off_bv);
+        bvt flat_ext = bv_utils.zero_extension(flat, result_width);
+
+        result = bv_utils.select(is_this_obj, flat_ext, result);
+      }
+
+      // Constrain postponed.bv == result
+      for(std::size_t i = 0; i < result_width; ++i)
+        prop.set_equal(postponed.bv[i], result[i]);
+    }
     else
       UNREACHABLE;
+  }
+
+  // Add non-overlapping constraints for base addresses AFTER
+  // all P2I casts have been processed (which creates the base
+  // address variables).
+  {
+    const auto &objects = pointer_logic.objects;
+    const std::size_t ptr_width = config.ansi_c.pointer_width;
+
+    // Constrain NULL object to have base address 0
+    // Always create the NULL base address so it participates
+    // in non-overlapping constraints.
+    bvt null_base =
+      get_object_base_address(pointer_logic.get_null_object(), ptr_width);
+    bvt zero_bv = bv_utils.build_constant(0, ptr_width);
+    for(std::size_t i = 0; i < ptr_width; ++i)
+      prop.set_equal(null_base[i], zero_bv[i]);
+
+    // Collect all objects with base addresses
+    std::vector<std::pair<mp_integer, mp_integer>> obj_sizes;
+    std::size_t number = 0;
+    for(auto it = objects.cbegin(); it != objects.cend(); ++it, ++number)
+    {
+      if(object_base_address.find(number) == object_base_address.end())
+        continue;
+      // Skip integer-address objects — they may overlap with
+      // regular objects (the integer address might point into
+      // an existing object).
+      if(integer_address_objects.count(number))
+        continue;
+      const exprt &expr = *it;
+      auto size_opt = pointer_offset_size(expr.type(), ns);
+      mp_integer size =
+        (size_opt.has_value() && *size_opt > 0) ? *size_opt : mp_integer{1};
+      obj_sizes.push_back({mp_integer(number), size});
+
+      // Constrain base address to avoid unsigned overflow:
+      // base + size <= 2^width (i.e., base <= MAX - size + 1)
+      bvt base = get_object_base_address(mp_integer(number), ptr_width);
+      mp_integer max_base = power(2, ptr_width) - size;
+      bvt max_base_bv = bv_utils.build_constant(max_base, ptr_width);
+      prop.l_set_to_true(bv_utils.rel(
+        base, ID_le, max_base_bv, bv_utilst::representationt::UNSIGNED));
+
+      // Constrain alignment: base addresses are aligned to the
+      // natural alignment of the object type.  For most types
+      // this is min(size, pointer_width/8).
+      mp_integer alignment = std::min(size, mp_integer(ptr_width / 8));
+      // Round down to power of 2
+      mp_integer align_pow2 = 1;
+      while(align_pow2 * 2 <= alignment)
+        align_pow2 *= 2;
+      if(align_pow2 > 1)
+      {
+        // base % align_pow2 == 0, i.e., low bits are zero
+        std::size_t align_bits = 0;
+        mp_integer tmp = align_pow2;
+        while(tmp > 1)
+        {
+          align_bits++;
+          tmp /= 2;
+        }
+        for(std::size_t i = 0; i < align_bits && i < ptr_width; ++i)
+          prop.l_set_to_true(!base[i]);
+      }
+    }
+
+    for(std::size_t i = 0; i < obj_sizes.size(); ++i)
+    {
+      bvt base_i = get_object_base_address(obj_sizes[i].first, ptr_width);
+
+      for(std::size_t j = i + 1; j < obj_sizes.size(); ++j)
+      {
+        bvt base_j = get_object_base_address(obj_sizes[j].first, ptr_width);
+
+        bvt end_i = bv_utils.add(
+          base_i, bv_utils.build_constant(obj_sizes[i].second, ptr_width));
+        literalt i_before_j = bv_utils.rel(
+          end_i, ID_le, base_j, bv_utilst::representationt::UNSIGNED);
+
+        bvt end_j = bv_utils.add(
+          base_j, bv_utils.build_constant(obj_sizes[j].second, ptr_width));
+        literalt j_before_i = bv_utils.rel(
+          end_j, ID_le, base_i, bv_utilst::representationt::UNSIGNED);
+
+        // Non-overlapping ranges
+        prop.l_set_to_true(prop.lor(i_before_j, j_before_i));
+        // Redundant but helps the solver: distinct base addresses
+        prop.l_set_to_true(!bv_utils.equal(base_i, base_j));
+      }
+    }
   }
 
   postponed_list.clear();
