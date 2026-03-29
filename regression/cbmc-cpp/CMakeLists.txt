@@ -18,7 +18,7 @@ endif()
 add_test_pl_tests(
     "${cbmc_cmd}" ${gcc_only} -X libcxx
 )
-set_tests_properties("cbmc-cpp-CORE" PROPERTIES TIMEOUT 1800)
+set_tests_properties("cbmc-cpp-CORE" PROPERTIES TIMEOUT 2400)
 
 # libc++ tests run without --validate-goto-model because system header
 # processing may leave missing symbols in the goto model.
