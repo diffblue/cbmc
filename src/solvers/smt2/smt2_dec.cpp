@@ -13,9 +13,19 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/run.h>
 #include <util/tempfile.h>
 
+#include <solvers/prop/literal_expr.h>
+
 #include "smt2irep.h"
 
 #include <fstream>
+
+static std::string drop_quotes(std::string src)
+{
+  if(src.size() >= 2 && src.front() == '|' && src.back() == '|')
+    return std::string(src, 1, src.size() - 2);
+  else
+    return src;
+}
 
 std::string smt2_dect::decision_procedure_text() const
 {
@@ -33,6 +43,40 @@ std::string smt2_dect::decision_procedure_text() const
      solver==solvert::Z3?"Z3":
      "(unknown)");
   // clang-format on
+}
+
+bool smt2_dect::is_in_conflict(const exprt &expr) const
+{
+  if(expr.id() != ID_literal)
+    return false;
+
+  const literalt lit = to_literal_expr(expr).get_literal();
+
+  if(lit.is_constant())
+    return false;
+
+  // Build the SMT2 identifier for this literal, matching
+  // what convert_literal() emits.
+  std::string smt2_id = convert_identifier("B" + std::to_string(lit.var_no()));
+
+  // The failed_assumptions set may contain quoted or unquoted
+  // forms; check both.
+  if(failed_assumptions.count(smt2_id))
+    return !lit.sign();
+
+  if(failed_assumptions.count(drop_quotes(smt2_id)))
+    return !lit.sign();
+
+  // Check the negated form for negated literals
+  const std::string negated = "(not " + smt2_id + ")";
+  if(failed_assumptions.count(negated))
+    return lit.sign();
+
+  const std::string negated_unquoted = "(not " + drop_quotes(smt2_id) + ")";
+  if(failed_assumptions.count(negated_unquoted))
+    return lit.sign();
+
+  return false;
 }
 
 decision_proceduret::resultt smt2_dect::dec_solve(const exprt &assumption)
@@ -165,14 +209,6 @@ decision_proceduret::resultt smt2_dect::dec_solve(const exprt &assumption)
   return read_result(in);
 }
 
-static std::string drop_quotes(std::string src)
-{
-  if(src.size() >= 2 && src.front() == '|' && src.back() == '|')
-    return std::string(src, 1, src.size() - 2);
-  else
-    return src;
-}
-
 decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
 {
   std::string line;
@@ -231,6 +267,37 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
         log.error() << "SMT2 solver returned error message:\n"
                     << "\t\"" << message << "\"" << messaget::eom;
         return decision_proceduret::resultt::D_ERROR;
+      }
+    }
+    else if(parsed.id().empty() && !parsed.get_sub().empty())
+    {
+      // Check if this looks like an unsat-assumptions response:
+      // a list of identifiers or (not identifier) forms.
+      bool looks_like_assumptions = true;
+      for(const auto &sub : parsed.get_sub())
+      {
+        if(sub.id().empty() && sub.get_sub().empty())
+        {
+          looks_like_assumptions = false;
+          break;
+        }
+      }
+
+      if(looks_like_assumptions)
+      {
+        for(const auto &sub : parsed.get_sub())
+        {
+          if(!sub.id().empty())
+          {
+            failed_assumptions.insert(id2string(sub.id()));
+          }
+          else if(sub.get_sub().size() == 2 && sub.get_sub()[0].id() == "not")
+          {
+            // Store as "(not name)" for negated literals
+            failed_assumptions.insert(
+              "(not " + id2string(sub.get_sub()[1].id()) + ")");
+          }
+        }
       }
     }
   }
