@@ -37,8 +37,8 @@ multi_path_symex_checkert::multi_path_symex_checkert(
   PRECONDITION(!has_vector(goto_model.get_goto_functions()));
 }
 
-incremental_goto_checkert::resultt multi_path_symex_checkert::
-operator()(propertiest &properties)
+incremental_goto_checkert::resultt
+multi_path_symex_checkert::operator()(propertiest &properties)
 {
   resultt result(resultt::progresst::DONE);
 

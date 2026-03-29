@@ -100,13 +100,16 @@ void goto_symex_property_decidert::add_constraint_from_goals(
   exprt goal_disjunction = disjunction(disjuncts);
   decision_procedure.set_to_true(goal_disjunction);
 
-  with_solver_hardness(decision_procedure, [](solver_hardnesst &hardness) {
-    // SSA expr and involved steps have already been collected
-    // in symex_target_equationt::convert_assertions
-    exprt ssa_expr_unused;
-    std::vector<goto_programt::const_targett> involved_steps_unused;
-    hardness.register_assertion_ssas(ssa_expr_unused, involved_steps_unused);
-  });
+  with_solver_hardness(
+    decision_procedure,
+    [](solver_hardnesst &hardness)
+    {
+      // SSA expr and involved steps have already been collected
+      // in symex_target_equationt::convert_assertions
+      exprt ssa_expr_unused;
+      std::vector<goto_programt::const_targett> involved_steps_unused;
+      hardness.register_assertion_ssas(ssa_expr_unused, involved_steps_unused);
+    });
 }
 
 decision_proceduret::resultt goto_symex_property_decidert::solve()

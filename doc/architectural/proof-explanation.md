@@ -410,15 +410,48 @@ reachability formula is UNSAT). The proof explanation is emitted only
 when there are unreachable goals (`PASS` status), since those are the
 cases where the UNSAT result can be explained.
 
-### 7.5 SMT-level unsat cores
+### 7.5 SMT-level unsat cores (implemented in Phase 5)
 
 When using SMT solvers (e.g., Z3 via the `--smt2` backend), the solver
-natively supports `(get-unsat-core)` at the theory level. SMT unsat
-cores are already expressed in terms of named word-level assertions,
-avoiding the need to lift from the propositional level. Integrating
-`(get-unsat-core)` with the existing SMT2 solver interface in
-`src/solvers/smt2_incremental/` would provide word-level proof
-explanations without the complexity of bit-level mapping.
+natively supports unsat core extraction at the theory level. Phase 5
+integrates this capability so that the existing Phase 2 assumption-based
+proof explanation approach works transparently with SMT backends.
+
+**Implementation approach.** Rather than using SMT `(get-unsat-core)` with
+named assertions, Phase 5 uses `(get-unsat-assumptions)` with
+`(check-sat-assuming ...)`. This reuses the same guard-handle-based
+conflict analysis that Phase 2 uses for SAT solvers. The key changes:
+
+1. `smt2_convt` gains a `produce_unsat_cores` flag. When true, the SMT2
+   preamble includes `(set-option :produce-unsat-cores true)`.
+
+2. `smt2_convt::write_footer()` emits `(get-unsat-assumptions)` after
+   `(check-sat-assuming ...)` when unsat core production is enabled.
+
+3. `smt2_dect` now inherits from `conflict_providert` and implements
+   `is_in_conflict(const exprt &)`. After an UNSAT result from
+   `check-sat-assuming`, `read_result()` parses the
+   `(get-unsat-assumptions)` response and stores the failed assumption
+   literal names. The `is_in_conflict()` method converts a `literal_exprt`
+   to its SMT2 identifier name and checks whether it appears in the
+   failed set.
+
+4. `solver_factory.cpp` enables `produce_unsat_cores` on the SMT2 solver
+   when `--proof-explanation` is active.
+
+With these changes, `get_proof_explanation_with_core()` in
+`proof_explanation.cpp` works without modification: the
+`dynamic_cast<conflict_providert*>(&solver)` now succeeds for
+`smt2_dect`, and the push/pop/is_in_conflict flow operates via the SMT
+solver's native unsat-assumptions mechanism.
+
+**Solver compatibility.** This approach requires SMT solvers that support
+both `check-sat-assuming` and `get-unsat-assumptions`. Z3, CVC5, and
+Bitwuzla all set `use_check_sat_assuming = true` in the CBMC SMT2
+interface. Solvers that do not support `check-sat-assuming` (e.g., CVC3,
+MathSAT, Yices) fall back to plain `(check-sat)` with assumptions as
+assertions, and `get-unsat-assumptions` is not emitted; in this case the
+Phase 2 code falls back to marking all steps as in_core=true.
 
 ## 8. Related Work
 
@@ -456,9 +489,15 @@ explanations without the complexity of bit-level mapping.
 | `src/goto-checker/stop_on_fail_verifier.h` | Calls proof explanation and invariants in the PASS case |
 | `src/goto-checker/all_properties_verifier_with_trace_storage.h` | Calls proof explanation and invariants for all proved properties |
 | `src/goto-checker/cover_goals_verifier_with_trace_storage.h` | Calls proof explanation and invariants for unreachable coverage goals |
+| `src/goto-checker/solver_factory.cpp` | Enables `produce_unsat_cores` on SMT2 solvers when `--proof-explanation` is active |
+| `src/solvers/smt2/smt2_conv.h` | `produce_unsat_cores` flag for SMT-level unsat core extraction |
+| `src/solvers/smt2/smt2_conv.cpp` | Emits `(set-option :produce-unsat-cores true)` and `(get-unsat-assumptions)` in the SMT2 output |
+| `src/solvers/smt2/smt2_dec.h` | `smt2_dect` inherits from `conflict_providert`; `is_in_conflict()` declaration |
+| `src/solvers/smt2/smt2_dec.cpp` | Parses `(get-unsat-assumptions)` response; implements `is_in_conflict()` for SMT-level conflict checking |
 | `src/goto-checker/bmc_util.h` | `OPT_BMC` and `HELP_BMC` entries for `--proof-explanation` |
 | `src/cbmc/cbmc_parse_options.h` | Includes `--proof-explanation` in `CBMC_OPTIONS` |
 | `regression/cbmc/proof-explanation1/` | Regression test: basic proof explanation |
 | `regression/cbmc/proof-explanation2/` | Regression test: unsat core `[core]` markers |
 | `regression/cbmc/proof-explanation3/` | Regression test: word-level invariant extraction |
 | `regression/cbmc/proof-explanation4/` | Regression test: coverage analysis integration |
+| `regression/cbmc/proof-explanation5/` | Regression test: SMT-level unsat core (requires Z3, tagged `smt-backend`) |
