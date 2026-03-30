@@ -3793,7 +3793,6 @@ void cpp_typecheckt::typecheck_expr_rel(binary_relation_exprt &expr)
   // pointer-to-member-function) may differ. Force the rhs type to
   // match the lhs type when both are pointers.
   if(
-    (expr.id() == ID_equal || expr.id() == ID_notequal) &&
     expr.op0().type().id() == ID_pointer &&
     expr.op1().type().id() == ID_pointer &&
     expr.op0().type() != expr.op1().type())
