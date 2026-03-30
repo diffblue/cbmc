@@ -66,7 +66,7 @@ jobs:
           echo "lcov_excl_line = UNREACHABLE" > ~/.lcovrc
           cmake --build build --target coverage -- -j${{env.linux-vcpus}}
       - name: Upload coverage statistics to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: build/html/coverage.info
