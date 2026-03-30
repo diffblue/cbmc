@@ -435,11 +435,6 @@ tvt constant_interval_exprt::equal(const constant_interval_exprt &o) const
     return tvt(equal(get_lower(), o.get_lower()));
   }
 
-  if(equal(get_upper(), o.get_upper()) && equal(get_lower(), o.get_lower()))
-  {
-    return tvt(true);
-  }
-
   if(
     less_than(o).is_true() || greater_than(o).is_true() ||
     o.less_than(*this).is_true() || o.greater_than(*this).is_true())
@@ -447,7 +442,7 @@ tvt constant_interval_exprt::equal(const constant_interval_exprt &o) const
     return tvt(false);
   }
 
-  // Don't know.  Could have [3, 5] == [4] (not equal)
+  // Overlapping intervals: some values may be equal, some may not.
   return tvt::unknown();
 }
 
@@ -1522,18 +1517,34 @@ bool operator>=(
   return lhs.greater_than(rhs).is_true();
 }
 
+/// Structural equality of two interval objects: the bounds compare
+/// value-equal and the types match.  This is what tests express as
+/// `actual == expected`, and what `interval_abstract_valuet::internal_equality`
+/// uses to deduplicate stored intervals.  It is deliberately *not* the
+/// value-equality predicate returned by `equal()`: `equal()` answers "is
+/// every value of lhs equal to the corresponding value of rhs?", which
+/// becomes `unknown` whenever the two intervals overlap (including two
+/// identical, non-singleton intervals), so using `equal().is_true()` here
+/// would make `actual == expected` false for every non-singleton interval.
 bool operator==(
   const constant_interval_exprt &lhs,
   const constant_interval_exprt &rhs)
 {
-  return lhs.equal(rhs).is_true();
+  // Compare each bound for value-equality -- via the static
+  // equal(exprt, exprt) helper, not the recursive member equal() -- and
+  // require matching types.  Per-bound value-equality preserves the
+  // historic intent (e.g. `min_value_exprt` of an unsigned type is treated
+  // as equal to a zero constant) while remaining sound.
+  return lhs.type() == rhs.type() &&
+         constant_interval_exprt::equal(lhs.get_lower(), rhs.get_lower()) &&
+         constant_interval_exprt::equal(lhs.get_upper(), rhs.get_upper());
 }
 
 bool operator!=(
   const constant_interval_exprt &lhs,
   const constant_interval_exprt &rhs)
 {
-  return lhs.not_equal(rhs).is_true();
+  return !(lhs == rhs);
 }
 
 const constant_interval_exprt operator+(
