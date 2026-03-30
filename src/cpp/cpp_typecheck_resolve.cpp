@@ -2571,6 +2571,42 @@ exprt cpp_typecheck_resolvet::resolve(
 
     if(still_not_accessible)
     {
+      // Check if the caller is in a derived class — derived class
+      // constructors can call base class constructors even if private
+      // (e.g., MSVC's bad_array_new_length calling bad_alloc(const char*)).
+      const irep_idt &current_class =
+        cpp_typecheck.cpp_scopes.current_scope().get_parent().identifier;
+      irep_idt comp_name = result.get(ID_component_name);
+      if(!comp_name.empty() && !current_class.empty())
+      {
+        const std::string id_str = id2string(comp_name);
+        auto pos = id_str.rfind("::");
+        if(pos != std::string::npos)
+        {
+          const std::string base_class = "tag-" + id_str.substr(0, pos);
+          // Check if current class inherits from the base class
+          const symbolt *cur_sym =
+            cpp_typecheck.symbol_table.lookup(current_class);
+          if(cur_sym != nullptr && cur_sym->type.id() == ID_struct)
+          {
+            for(const auto &base : to_struct_type(cur_sym->type).bases())
+            {
+              if(
+                base.type().id() == ID_struct_tag &&
+                id2string(to_struct_tag_type(base.type()).get_identifier()) ==
+                  base_class)
+              {
+                still_not_accessible = false;
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    if(still_not_accessible)
+    {
       if(!fail_with_exception)
         return nil_exprt();
 
