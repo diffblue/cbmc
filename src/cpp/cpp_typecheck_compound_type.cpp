@@ -681,9 +681,54 @@ void cpp_typecheckt::typecheck_compound_declarator(
         }
 
         // do the body of the function
-        typecast_exprt late_cast(
-          lookup(args[0].get_identifier()).symbol_expr(),
-          to_code_type(component.type()).parameters()[0].type());
+        // For multiple inheritance, adjust the 'this' pointer from
+        // the base subobject to the derived class.
+        const auto &this_param = args[0];
+        exprt this_expr = lookup(this_param.get_identifier()).symbol_expr();
+        const typet &target_type =
+          to_code_type(component.type()).parameters()[0].type();
+
+        // Check if this base class is at a non-zero offset (i.e., not
+        // the first/primary base). Only non-primary bases need pointer
+        // adjustment.
+        const struct_typet &derived_struct =
+          to_struct_type(symbol_table.lookup_ref(symbol.name).type);
+        bool is_primary_base = false;
+        for(const auto &base : derived_struct.bases())
+        {
+          if(
+            base.type().id() == ID_struct_tag &&
+            to_struct_tag_type(base.type()).get_identifier() == virtual_base)
+          {
+            is_primary_base = true;
+            break;
+          }
+          // First base with a vtable is the primary base
+          break;
+        }
+
+        exprt late_cast;
+        if(!is_primary_base)
+        {
+          // Non-primary base: compute offset and adjust this pointer
+          const irep_idt vt_ptr_name =
+            id2string(virtual_base) + "::@vtable_pointer";
+          auto base_off = member_offset(derived_struct, vt_ptr_name, *this);
+          if(base_off.has_value() && *base_off > 0)
+          {
+            auto char_ptr =
+              typecast_exprt(this_expr, pointer_type(unsigned_char_type()));
+            auto adjusted = minus_exprt(
+              char_ptr, from_integer(*base_off, pointer_diff_type()));
+            late_cast = typecast_exprt(adjusted, target_type);
+          }
+          else
+            late_cast = typecast_exprt(this_expr, target_type);
+        }
+        else
+        {
+          late_cast = typecast_exprt(this_expr, target_type);
+        }
 
         // Thunk calls must be direct (non-virtual) to avoid infinite
         // recursion through the vtable.
