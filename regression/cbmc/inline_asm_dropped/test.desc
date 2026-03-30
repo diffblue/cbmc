@@ -1,0 +1,16 @@
+CORE gcc-only
+main.c
+--show-goto-functions
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+CALL __asm_
+^ *FENCE
+ATOMIC_BEGIN
+--
+Pins that inline-assembly statements containing an unrecognized instruction
+are dropped by the remove_asm pass: no fence, atomic section, or __asm_*
+helper call is emitted -- including for "mfence; addl", where the recognized
+mfence is dropped together with the unrecognized addl.
+See GitHub issue diffblue/cbmc#6374.
