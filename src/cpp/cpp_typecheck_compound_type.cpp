@@ -1789,15 +1789,7 @@ bool cpp_typecheckt::get_component(
       bool not_ok = check_component_access(component, final_type);
       if(not_ok)
       {
-        // Disable access control for system headers (e.g., MSVC's
-        // bad_alloc(const char*) is private but used internally).
-        const std::string file = id2string(source_location.get_file());
-        bool in_system_header =
-          disable_access_control ||
-          file.find("Program Files") != std::string::npos ||
-          file.find("/usr/include/") == 0 || file.find("/usr/lib/") == 0 ||
-          file.find("/Applications/") == 0;
-        if(in_system_header)
+        if(disable_access_control)
         {
           member.set(ID_C_not_accessible, true);
           member.set(ID_C_access, component.get(ID_access));
