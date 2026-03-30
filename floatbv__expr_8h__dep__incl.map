@@ -1,41 +1,43 @@
 <map id="/home/runner/work/cbmc/cbmc/src/util/floatbv_expr.h" name="/home/runner/work/cbmc/cbmc/src/util/floatbv_expr.h">
-<area shape="rect" id="Node000001" title="API to expression classes for floating&#45;point arithmetic." alt="" coords="2184,5,2368,60"/>
+<area shape="rect" id="Node000001" title="API to expression classes for floating&#45;point arithmetic." alt="" coords="2299,5,2483,60"/>
 <area shape="rect" id="Node000002" href="$java__bytecode__convert__method_8cpp.html" title="JAVA Bytecode Language Conversion." alt="" coords="5,115,267,170"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="2170,38,1776,44,1229,57,680,79,452,93,279,111,237,118,236,113,278,105,451,88,680,74,1229,52,1776,39,2170,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="2285,38,1871,43,1291,56,707,78,463,93,279,111,237,118,236,113,278,105,463,87,706,72,1291,51,1871,38,2285,32"/>
 <area shape="rect" id="Node000003" href="$java__string__library__preprocess_8cpp.html" title="Java_string_libraries_preprocess, gives code for methods on strings of the java standard library." alt="" coords="291,115,543,170"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="2170,39,1825,46,1359,60,894,81,701,95,555,111,515,118,514,113,554,105,701,90,894,76,1359,55,1825,41,2170,33"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="2285,38,1919,45,1420,59,920,80,712,94,555,111,515,118,514,113,554,105,712,89,920,75,1419,53,1919,40,2285,33"/>
 <area shape="rect" id="Node000004" href="$c__typecheck__expr_8cpp.html" title="ANSI&#45;C Language Type Checking." alt="" coords="567,115,779,170"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="2170,39,1869,47,1471,61,1078,82,916,95,792,111,758,118,757,113,792,105,915,90,1078,77,1471,56,1869,41,2170,34"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="2285,38,1962,46,1531,59,1104,80,927,94,792,111,758,118,757,113,792,105,926,89,1104,75,1531,54,1962,40,2285,33"/>
 <area shape="rect" id="Node000005" href="$expr2c_8cpp.html" title=" " alt="" coords="804,123,1007,163"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="2170,40,1579,64,1255,85,1121,97,1019,111,961,125,959,120,1018,105,1120,92,1254,79,1579,59,2170,34"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="2285,39,2004,48,1639,62,1280,83,1132,96,1019,111,960,125,959,120,1018,105,1131,91,1280,78,1639,57,2004,42,2285,34"/>
 <area shape="rect" id="Node000006" href="$goto__check__c_8cpp.html" title="Checks for Errors in C/C++ Programs." alt="" coords="1031,115,1249,170"/>
-<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="2170,37,1996,42,1769,54,1515,76,1386,91,1260,111,1227,118,1225,113,1260,105,1386,86,1515,70,1769,48,1996,37,2170,32"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="2285,36,2092,40,1837,50,1549,72,1403,89,1260,111,1226,118,1225,113,1260,105,1403,84,1549,67,1837,45,2092,34,2285,31"/>
 <area shape="rect" id="Node000007" href="$adjust__float__expressions_8cpp.html" title="Symbolic Execution." alt="" coords="1273,115,1487,170"/>
-<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="2170,41,2035,48,1867,62,1683,82,1499,111,1466,118,1465,113,1498,105,1682,77,1867,56,2035,43,2170,35"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="2284,39,2130,45,1934,58,1717,79,1499,111,1466,118,1465,113,1498,105,1716,74,1934,52,2130,40,2284,34"/>
 <area shape="rect" id="Node000008" href="$boolbv_8cpp.html" title=" " alt="" coords="1511,115,1713,170"/>
-<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="2171,46,1963,70,1843,88,1725,111,1695,118,1694,113,1723,105,1842,83,1963,65,2170,41"/>
-<area shape="rect" id="Node000009" href="$boolbv__floatbv__op_8cpp.html" title=" " alt="" coords="1737,115,1938,170"/>
-<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="2171,59,1951,111,1925,118,1923,113,1950,105,2170,54"/>
-<area shape="rect" id="Node000010" href="$float__bv_8cpp.html" title=" " alt="" coords="1963,115,2147,170"/>
-<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="2211,69,2110,118,2107,113,2209,64"/>
-<area shape="rect" id="Node000011" href="$refine__arithmetic_8cpp.html" title=" " alt="" coords="2171,115,2381,170"/>
-<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="2279,74,2279,115,2273,115,2273,74"/>
-<area shape="rect" id="Node000012" href="$smt2__conv_8cpp.html" title="SMT Backend." alt="" coords="2405,115,2589,170"/>
-<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="2343,64,2445,113,2442,118,2341,69"/>
-<area shape="rect" id="Node000013" href="$smt2__parser_8cpp.html" title=" " alt="" coords="2613,115,2797,170"/>
-<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="2382,53,2602,105,2627,113,2626,118,2601,111,2381,58"/>
-<area shape="rect" id="Node000014" href="$convert__expr__to__smt_8cpp.html" title=" " alt="" coords="2822,108,3018,177"/>
-<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="2382,41,2582,65,2696,83,2810,105,2822,108,2821,114,2809,111,2695,89,2581,71,2382,46"/>
-<area shape="rect" id="Node000015" href="$string__constraint__generator__float_8cpp.html" title="Generates string constraints for functions generating strings from other types, in particular int,..." alt="" coords="3043,108,3248,177"/>
-<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="2382,36,2513,43,2676,57,2854,77,3031,105,3043,108,3042,113,3030,111,2853,82,2675,62,2513,49,2382,41"/>
-<area shape="rect" id="Node000016" href="$floatbv__expr_8cpp.html" title=" " alt="" coords="3272,115,3456,170"/>
-<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="2382,31,2551,35,2771,46,3016,68,3140,85,3261,105,3291,113,3290,118,3259,111,3139,90,3015,73,2771,51,2551,40,2382,37"/>
-<area shape="rect" id="Node000017" href="$format__expr_8cpp.html" title="Expression Pretty Printing." alt="" coords="3480,115,3664,170"/>
-<area shape="poly" id="edge16_Node000001_Node000017" title=" " alt="" coords="2382,35,2629,44,2942,58,3247,79,3373,91,3469,105,3499,113,3498,118,3467,111,3372,97,3246,84,2942,64,2629,49,2382,40"/>
-<area shape="rect" id="Node000018" href="$ieee__float_8cpp.html" title=" " alt="" coords="3689,123,3893,163"/>
-<area shape="poly" id="edge17_Node000001_Node000018" title=" " alt="" coords="2382,34,2668,42,3041,56,3409,77,3561,90,3676,105,3736,120,3735,125,3676,111,3560,96,3408,83,3041,62,2667,47,2381,39"/>
-<area shape="rect" id="Node000019" href="$simplify__expr_8cpp.html" title=" " alt="" coords="3917,115,4101,170"/>
-<area shape="poly" id="edge18_Node000001_Node000019" title=" " alt="" coords="2382,32,2710,38,3150,51,3587,72,3769,87,3906,105,3937,113,3935,118,3905,111,3768,93,3587,78,3150,56,2710,43,2382,38"/>
-<area shape="rect" id="Node000020" href="$simplify__expr__floatbv_8cpp.html" title=" " alt="" coords="4125,115,4309,170"/>
-<area shape="poly" id="edge19_Node000001_Node000020" title=" " alt="" coords="2382,32,2748,36,3249,47,3507,57,3749,69,3957,85,4114,105,4145,113,4144,118,4113,111,3956,91,3749,74,3507,62,3249,52,2748,41,2382,37"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="2285,43,2028,65,1876,84,1725,111,1694,118,1693,113,1723,105,1875,79,2028,60,2284,37"/>
+<area shape="rect" id="Node000009" href="$boolbv__floatbv__fma_8cpp.html" title=" " alt="" coords="1737,115,1938,170"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="2285,51,2126,76,1950,111,1921,118,1920,113,1949,105,2125,70,2284,45"/>
+<area shape="rect" id="Node000010" href="$boolbv__floatbv__op_8cpp.html" title=" " alt="" coords="1962,115,2163,170"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="2299,67,2143,118,2141,113,2297,62"/>
+<area shape="rect" id="Node000011" href="$float__bv_8cpp.html" title=" " alt="" coords="2188,115,2372,170"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="2356,72,2309,117,2305,113,2352,68"/>
+<area shape="rect" id="Node000012" href="$refine__arithmetic_8cpp.html" title=" " alt="" coords="2396,115,2607,170"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="2430,68,2476,113,2472,117,2426,72"/>
+<area shape="rect" id="Node000013" href="$smt2__conv_8cpp.html" title="SMT Backend." alt="" coords="2631,115,2815,170"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="2485,62,2643,113,2641,118,2484,67"/>
+<area shape="rect" id="Node000014" href="$smt2__parser_8cpp.html" title=" " alt="" coords="2839,115,3023,170"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="2497,45,2653,70,2827,105,2854,113,2853,118,2826,111,2652,75,2496,50"/>
+<area shape="rect" id="Node000015" href="$convert__expr__to__smt_8cpp.html" title=" " alt="" coords="3047,108,3243,177"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="2497,38,2744,60,2890,80,3035,105,3048,108,3047,113,3034,111,2889,85,2743,66,2497,43"/>
+<area shape="rect" id="Node000016" href="$string__constraint__generator__float_8cpp.html" title="Generates string constraints for functions generating strings from other types, in particular int,..." alt="" coords="3268,108,3473,177"/>
+<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="2497,34,2646,40,2836,53,3047,74,3256,105,3268,108,3267,113,3256,111,3046,79,2836,58,2646,45,2496,39"/>
+<area shape="rect" id="Node000017" href="$floatbv__expr_8cpp.html" title=" " alt="" coords="3497,115,3681,170"/>
+<area shape="poly" id="edge16_Node000001_Node000017" title=" " alt="" coords="2496,35,3009,60,3285,81,3399,92,3486,105,3516,113,3515,118,3485,111,3398,98,3285,86,3009,66,2496,41"/>
+<area shape="rect" id="Node000018" href="$format__expr_8cpp.html" title="Expression Pretty Printing." alt="" coords="3705,115,3889,170"/>
+<area shape="poly" id="edge17_Node000001_Node000018" title=" " alt="" coords="2496,34,2764,42,3110,56,3448,77,3588,90,3694,105,3725,113,3723,118,3693,111,3587,96,3447,83,3109,62,2764,47,2496,39"/>
+<area shape="rect" id="Node000019" href="$ieee__float_8cpp.html" title=" " alt="" coords="3914,123,4118,163"/>
+<area shape="poly" id="edge18_Node000001_Node000019" title=" " alt="" coords="2497,33,2803,41,3209,55,3610,76,3776,89,3902,105,3962,120,3961,125,3901,111,3775,95,3609,81,3209,60,2803,46,2497,39"/>
+<area shape="rect" id="Node000020" href="$simplify__expr_8cpp.html" title=" " alt="" coords="4143,115,4327,170"/>
+<area shape="poly" id="edge19_Node000001_Node000020" title=" " alt="" coords="2497,32,2845,37,3318,49,3788,71,3983,86,4131,105,4162,113,4161,118,4130,111,3983,91,3788,76,3318,54,2845,42,2497,37"/>
+<area shape="rect" id="Node000021" href="$simplify__expr__floatbv_8cpp.html" title=" " alt="" coords="4351,115,4535,170"/>
+<area shape="poly" id="edge20_Node000001_Node000021" title=" " alt="" coords="2496,32,2882,35,3415,45,3691,55,3949,67,4171,84,4339,105,4371,113,4369,118,4338,111,4171,89,3949,73,3691,60,3415,51,2882,40,2496,37"/>
 </map>

@@ -1607,6 +1607,7 @@ var hierarchy =
               [ "state_type_compatible_exprt", "classstate__type__compatible__exprt.html", null ]
             ] ],
             [ "extractbits_exprt", "classextractbits__exprt.html", null ],
+            [ "floatbv_fma_exprt", "classfloatbv__fma__exprt.html", null ],
             [ "index_designatort", "classindex__designatort.html", null ],
             [ "member_designatort", "classmember__designatort.html", null ],
             [ "multi_ary_exprt", "classmulti__ary__exprt.html", [

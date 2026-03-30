@@ -21,6 +21,7 @@ var classfloat__bvt =
     [ "div", "classfloat__bvt.html#a84bd174425b6d0e0a5cfa3e81794a2fa", null ],
     [ "exponent_all_ones", "classfloat__bvt.html#a1c2ab63da3850d4c9eb0f687196817d3", null ],
     [ "exponent_all_zeros", "classfloat__bvt.html#ad828f40be0b7967ee4a994d95b133f95", null ],
+    [ "fma", "classfloat__bvt.html#a8099fcb96efef130db7aee1a42fff090", null ],
     [ "fraction_all_zeros", "classfloat__bvt.html#ad5c196001f82dce9414b0aa2e7a8a6ee", null ],
     [ "fraction_rounding_decision", "classfloat__bvt.html#a58388fe81f528a87c1c88d7b359d8a22", null ],
     [ "from_signed_integer", "classfloat__bvt.html#a3c40de2128ff237bc8bf86462fdf4704", null ],

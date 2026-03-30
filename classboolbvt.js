@@ -49,6 +49,7 @@ var classboolbvt =
     [ "convert_equality", "classboolbvt.html#ac40a380081636f78795bd8306dbb367e", null ],
     [ "convert_extractbit", "classboolbvt.html#a7ff742b6b821f7c9e0925035ed482267", null ],
     [ "convert_extractbits", "classboolbvt.html#a923fb3ff6574ce2cea60263384f7aee5", null ],
+    [ "convert_floatbv_fma", "classboolbvt.html#ae673c9b2be5010251ef88f36d0237b06", null ],
     [ "convert_floatbv_mod_rem", "classboolbvt.html#aa622a627c9a9dbb4b3447b1d25755fc4", null ],
     [ "convert_floatbv_op", "classboolbvt.html#a901706dae21b9b3465f29671db5608a1", null ],
     [ "convert_floatbv_round_to_integral", "classboolbvt.html#af96b9e9bab8ddc603638b1550fce8789", null ],

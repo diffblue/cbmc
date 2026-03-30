@@ -24,6 +24,7 @@ var dir_95992f7eabcbd576bf4841b6d0d09aae =
     [ "boolbv_equality.cpp", "boolbv__equality_8cpp.html", null ],
     [ "boolbv_extractbit.cpp", "boolbv__extractbit_8cpp.html", null ],
     [ "boolbv_extractbits.cpp", "boolbv__extractbits_8cpp.html", null ],
+    [ "boolbv_floatbv_fma.cpp", "boolbv__floatbv__fma_8cpp.html", null ],
     [ "boolbv_floatbv_mod_rem.cpp", "boolbv__floatbv__mod__rem_8cpp.html", null ],
     [ "boolbv_floatbv_op.cpp", "boolbv__floatbv__op_8cpp.html", null ],
     [ "boolbv_get.cpp", "boolbv__get_8cpp.html", null ],

@@ -33,6 +33,7 @@ var classsmt2__convt =
     [ "convert_expr", "classsmt2__convt.html#ae95a07bc9f4010638d70eff9f7c6f527", null ],
     [ "convert_floatbv", "classsmt2__convt.html#af429f5149e4328b7a28d7fa5b3053cc9", null ],
     [ "convert_floatbv_div", "classsmt2__convt.html#a3b1d9042cfcf8c4e97089379eb86d14a", null ],
+    [ "convert_floatbv_fma", "classsmt2__convt.html#a5064601a78c4dc34b6e601eafed377aa", null ],
     [ "convert_floatbv_minus", "classsmt2__convt.html#a7dcee98c7b6dd116fb19afdeb7f65899", null ],
     [ "convert_floatbv_mult", "classsmt2__convt.html#a3e64c1905d38888a49c9a3f3f9e3d31d", null ],
     [ "convert_floatbv_plus", "classsmt2__convt.html#a8c5bfd301d6bbb738fa6008c09d30bec", null ],

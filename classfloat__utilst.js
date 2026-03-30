@@ -27,6 +27,7 @@ var classfloat__utilst =
     [ "div", "classfloat__utilst.html#a9fc44dce2a3201570f923ab0539a48cc", null ],
     [ "exponent_all_ones", "classfloat__utilst.html#ae1a16e80a2eddc45095f3df7500f4787", null ],
     [ "exponent_all_zeros", "classfloat__utilst.html#aabd83ff44673a1e98abeb3110dc9d70a", null ],
+    [ "fma", "classfloat__utilst.html#abc20fac9484b110c6fa884d5d1fb6b7c", null ],
     [ "fraction_all_zeros", "classfloat__utilst.html#aad84ed209e44fdbf1dc3f12a809c58f6", null ],
     [ "fraction_rounding_decision", "classfloat__utilst.html#a8af7b30d2e7f8f5f1f9a3bff2f6a0042", null ],
     [ "from_signed_integer", "classfloat__utilst.html#abe96ebed8b3669ecac3b340aad055c2d", null ],

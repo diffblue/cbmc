@@ -511,6 +511,7 @@ var annotated_dup =
     [ "float_approximationt", "classfloat__approximationt.html", "classfloat__approximationt" ],
     [ "float_bvt", "classfloat__bvt.html", "classfloat__bvt" ],
     [ "float_utilst", "classfloat__utilst.html", "classfloat__utilst" ],
+    [ "floatbv_fma_exprt", "classfloatbv__fma__exprt.html", "classfloatbv__fma__exprt" ],
     [ "floatbv_mod_exprt", "classfloatbv__mod__exprt.html", "classfloatbv__mod__exprt" ],
     [ "floatbv_rem_exprt", "classfloatbv__rem__exprt.html", "classfloatbv__rem__exprt" ],
     [ "floatbv_round_to_integral_exprt", "classfloatbv__round__to__integral__exprt.html", "classfloatbv__round__to__integral__exprt" ],
