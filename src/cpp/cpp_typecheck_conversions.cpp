@@ -1628,6 +1628,45 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
       return;
     }
 
+    // Brace-init {a, b, ...} to aggregate struct: assign members
+    // in order. Used by MSVC's <ratio> _Big_multiply return statement.
+    if(
+      orig_expr.id() == ID_initializer_list && !orig_expr.operands().empty() &&
+      (type.id() == ID_struct_tag || type.id() == ID_struct) &&
+      (type.id() != ID_struct_tag ||
+       id2string(to_struct_tag_type(type).get_identifier())
+           .find("tag-initializer_list<") == std::string::npos))
+    {
+      const struct_typet &st = type.id() == ID_struct_tag
+                                 ? follow_tag(to_struct_tag_type(type))
+                                 : to_struct_type(type);
+      const auto &comps = st.components();
+      struct_exprt result({}, type);
+      std::size_t i = 0;
+      bool ok = true;
+      for(const auto &c : comps)
+      {
+        if(c.get_is_padding() || c.type().id() == ID_code)
+          continue;
+        if(i < orig_expr.operands().size())
+        {
+          exprt val = orig_expr.operands()[i++];
+          implicit_typecast(val, c.type());
+          result.operands().push_back(std::move(val));
+        }
+        else
+        {
+          ok = false;
+          break;
+        }
+      }
+      if(ok && i == orig_expr.operands().size())
+      {
+        expr = std::move(result);
+        return;
+      }
+    }
+
     // Brace-init-list to std::initializer_list<T> conversion (C++11):
     // {a, b, c} creates a backing array and constructs the
     // initializer_list with _begin and _size.
