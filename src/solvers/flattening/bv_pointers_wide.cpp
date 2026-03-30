@@ -16,6 +16,7 @@ Author: CBMC Contributors
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/exception_utils.h>
+#include <util/expr_util.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
@@ -181,6 +182,11 @@ bvt bv_pointers_widet::encode(
   const mp_integer &object,
   const pointer_typet &type)
 {
+  // Return cached encoding if available
+  auto cache_it = encode_cache.find(object);
+  if(cache_it != encode_cache.end())
+    return cache_it->second;
+
   const std::size_t width = type.get_width();
   const unsignedbv_typet bv_type(width);
 
@@ -201,7 +207,9 @@ bvt bv_pointers_widet::encode(
 
   index_to_object_offset[idx] = {object, mp_integer{0}};
 
-  return convert_bv(idx_expr);
+  bvt result = convert_bv(idx_expr);
+  encode_cache[object] = result;
+  return result;
 }
 
 // encode_fresh: like encode but with symbolic object/offset bvs.
@@ -737,6 +745,33 @@ static bool is_pointer_subtraction(const exprt &expr)
          minus_expr.rhs().type().id() == ID_pointer;
 }
 
+// convert_byte_extract: lower when pointers are involved,
+// since the abstract pointer index is not meaningful as bytes.
+
+bvt bv_pointers_widet::convert_byte_extract(const byte_extract_exprt &expr)
+{
+  if(
+    has_subtype(expr.type(), ID_pointer, ns) ||
+    has_subtype(expr.op().type(), ID_pointer, ns))
+  {
+    return convert_bv(lower_byte_extract(expr, ns));
+  }
+  return SUB::convert_byte_extract(expr);
+}
+
+// convert_byte_update: lower when pointers are involved.
+
+bvt bv_pointers_widet::convert_byte_update(const byte_update_exprt &expr)
+{
+  if(
+    has_subtype(expr.value().type(), ID_pointer, ns) ||
+    has_subtype(expr.op0().type(), ID_pointer, ns))
+  {
+    return convert_bv(lower_byte_update(expr, ns));
+  }
+  return SUB::convert_byte_update(expr);
+}
+
 // convert_bitvector
 
 bvt bv_pointers_widet::convert_bitvector(const exprt &expr)
@@ -971,12 +1006,18 @@ literalt bv_pointers_widet::convert_rest(const exprt &expr)
       rel.lhs().type().id() == ID_pointer &&
       rel.rhs().type().id() == ID_pointer)
     {
-      // Compare (object, offset) pairs, not raw indices.
+      // Pointer equality: use both index comparison and
+      // semantic (object, offset) comparison.
+      // Index equality is sufficient (same index → same pointer).
+      // Semantic equality is necessary for pointers with different
+      // indices but same (object, offset) from pointer arithmetic.
       const pointer_typet &lhs_type = to_pointer_type(rel.lhs().type());
       const pointer_typet &rhs_type = to_pointer_type(rel.rhs().type());
 
       const bvt &lhs_bv = convert_bv(rel.lhs());
       const bvt &rhs_bv = convert_bv(rel.rhs());
+
+      literalt indices_equal = bv_utils.equal(lhs_bv, rhs_bv);
 
       bvt lhs_obj = read_object(lhs_bv, lhs_type);
       bvt rhs_obj = read_object(rhs_bv, rhs_type);
@@ -985,7 +1026,16 @@ literalt bv_pointers_widet::convert_rest(const exprt &expr)
 
       literalt obj_eq = bv_utils.equal(lhs_obj, rhs_obj);
       literalt off_eq = bv_utils.equal(lhs_off, rhs_off);
-      literalt result = prop.land(obj_eq, off_eq);
+      literalt semantic_eq = prop.land(obj_eq, off_eq);
+
+      // Equal if indices match OR (object, offset) pairs match.
+      literalt result = prop.lor(indices_equal, semantic_eq);
+
+      // Help the solver: if indices are equal, force the
+      // semantic comparison to also be true. This adds
+      // redundant but useful propagation hints.
+      prop.l_set_to_true(prop.limplies(indices_equal, obj_eq));
+      prop.l_set_to_true(prop.limplies(indices_equal, off_eq));
 
       if(expr.id() == ID_notequal)
         return !result;

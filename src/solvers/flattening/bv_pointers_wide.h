@@ -69,6 +69,10 @@ protected:
   /// Counter for allocating fresh pointer indices.
   mp_integer next_bv_pointer_index;
 
+  /// Cache of encode() results per object number, so that the same
+  /// object always gets the same pointer index (e.g., NULL).
+  std::map<mp_integer, bvt> encode_cache;
+
   /// Map from pointer index to (object, offset) for model
   /// extraction in bv_get_rec.  Populated by encode().
   std::map<mp_integer, std::pair<mp_integer, mp_integer>>
@@ -95,6 +99,8 @@ protected:
   // overloading
   literalt convert_rest(const exprt &) override;
   bvt convert_bitvector(const exprt &) override;
+  bvt convert_byte_extract(const byte_extract_exprt &expr) override;
+  bvt convert_byte_update(const byte_update_exprt &expr) override;
 
   exprt
   bv_get_rec(const exprt &, const bvt &, std::size_t offset) const override;
