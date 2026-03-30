@@ -9320,6 +9320,13 @@ bool Parser::rLambdaExpr(exprt &exp)
             return false;
           cap.add("init", init);
         }
+
+        // C++17 pack expansion: [&args...] or [args...]
+        if(lex.LookAhead(0) == TOK_ELLIPSIS)
+        {
+          lex.get_token(tk);
+          is_pack = true;
+        }
       }
       else
         return false;
