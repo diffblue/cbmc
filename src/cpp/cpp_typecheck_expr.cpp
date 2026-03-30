@@ -2696,6 +2696,35 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
           PRECONDITION(return_stmt->has_return_value());
           exprt tmp = return_stmt->return_value();
           value_map.replace(tmp);
+          simplify(tmp, *this);
+          // Aggregate init: convert {a, b, ...} to struct{.m1=a, .m2=b}
+          if(
+            tmp.id() == ID_initializer_list &&
+            code_type.return_type().id() == ID_struct_tag)
+          {
+            const auto &st =
+              follow_tag(to_struct_tag_type(code_type.return_type()));
+            const auto &comps = st.components();
+            struct_exprt s({}, code_type.return_type());
+            std::size_t i = 0;
+            for(const auto &c : comps)
+            {
+              if(c.get_is_padding() || c.type().id() == ID_code)
+                continue;
+              if(i < tmp.operands().size())
+                s.operands().push_back(typecast_exprt::conditional_cast(
+                  tmp.operands()[i++], c.type()));
+              else
+                break;
+            }
+            if(i == tmp.operands().size())
+              tmp = std::move(s);
+            else
+            {
+              can_evaluate = false;
+              break;
+            }
+          }
           expr.swap(tmp);
           return;
         }
