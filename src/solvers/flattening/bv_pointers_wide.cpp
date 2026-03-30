@@ -138,6 +138,26 @@ exprt bv_pointers_widet::index_to_expr(
 
 bvt bv_pointers_widet::read_object(const bvt &bv, const pointer_typet &type)
 {
+  // Try direct lookup from the index to avoid array reads
+  mp_integer idx_val = 0;
+  bool is_const = true;
+  for(std::size_t i = 0; i < bv.size(); ++i)
+  {
+    if(bv[i].is_true())
+      idx_val += power(2, i);
+    else if(!bv[i].is_false())
+    {
+      is_const = false;
+      break;
+    }
+  }
+  if(is_const)
+  {
+    auto it = index_to_bv_object_offset.find(idx_val);
+    if(it != index_to_bv_object_offset.end())
+      return it->second.first;
+  }
+
   const std::size_t width = type.get_width();
   const unsignedbv_typet bv_type(width);
   // Create a fresh symbol for the index value
@@ -151,6 +171,26 @@ bvt bv_pointers_widet::read_object(const bvt &bv, const pointer_typet &type)
 
 bvt bv_pointers_widet::read_offset(const bvt &bv, const pointer_typet &type)
 {
+  // Try direct lookup from the index to avoid array reads
+  mp_integer idx_val = 0;
+  bool is_const = true;
+  for(std::size_t i = 0; i < bv.size(); ++i)
+  {
+    if(bv[i].is_true())
+      idx_val += power(2, i);
+    else if(!bv[i].is_false())
+    {
+      is_const = false;
+      break;
+    }
+  }
+  if(is_const)
+  {
+    auto it = index_to_bv_object_offset.find(idx_val);
+    if(it != index_to_bv_object_offset.end())
+      return it->second.second;
+  }
+
   const std::size_t width = type.get_width();
   const unsignedbv_typet bv_type(width);
   symbol_exprt idx_sym(
@@ -206,6 +246,11 @@ bvt bv_pointers_widet::encode(
     true);
 
   index_to_object_offset[idx] = {object, mp_integer{0}};
+
+  // Store bitvector-level object/offset for direct lookup
+  // in offset_arithmetic (avoids array reads).
+  index_to_bv_object_offset[idx] = {
+    bv_utils.build_constant(object, width), bv_utils.build_constant(0, width)};
 
   bvt result = convert_bv(idx_expr);
   encode_cache[object] = result;
@@ -322,11 +367,9 @@ bvt bv_pointers_widet::offset_arithmetic(
   const std::size_t offset_bits = get_offset_width(type);
   bv_index = bv_utils.zero_extension(bv_index, offset_bits);
 
-  // Read the old object and offset from the maps
+  bvt obj = read_object(bv, type);
   bvt old_offset = read_offset(bv, type);
   bvt new_offset = bv_utils.add(old_offset, bv_index);
-  bvt obj = read_object(bv, type);
-
   return encode_fresh(obj, new_offset, type);
 }
 
@@ -898,6 +941,35 @@ bvt bv_pointers_widet::convert_bitvector(const exprt &expr)
         bvt off_const = bv_utils.build_constant(it->second.second, ptr_width);
         bvt flat = bv_utils.add(base, off_const);
         return bv_utils.zero_extension(flat, width);
+      }
+
+      // Also check encode_fresh's bitvector-level map
+      auto it2 = index_to_bv_object_offset.find(idx_val);
+      if(it2 != index_to_bv_object_offset.end())
+      {
+        const bvt &obj_bv = it2->second.first;
+        const bvt &off_bv = it2->second.second;
+
+        // Try to extract constant object number for base address
+        mp_integer obj_val = 0;
+        bool obj_is_const = true;
+        for(std::size_t i = 0; i < obj_bv.size(); ++i)
+        {
+          if(obj_bv[i].is_true())
+            obj_val += power(2, i);
+          else if(!obj_bv[i].is_false())
+          {
+            obj_is_const = false;
+            break;
+          }
+        }
+
+        if(obj_is_const)
+        {
+          bvt base = get_object_base_address(obj_val, ptr_width);
+          bvt flat = bv_utils.add(base, off_bv);
+          return bv_utils.zero_extension(flat, width);
+        }
       }
     }
 
@@ -1524,9 +1596,26 @@ void bv_pointers_widet::finish_eager_conversion()
           end_j, ID_le, base_i, bv_utilst::representationt::UNSIGNED);
 
         // Non-overlapping ranges
-        prop.l_set_to_true(prop.lor(i_before_j, j_before_i));
+        literalt range_lit = prop.lor(i_before_j, j_before_i);
+        prop.l_set_to_true(range_lit);
         // Redundant but helps the solver: distinct base addresses
-        prop.l_set_to_true(!bv_utils.equal(base_i, base_j));
+        literalt neq_lit = !bv_utils.equal(base_i, base_j);
+        prop.l_set_to_true(neq_lit);
+
+        // Explicit pairwise inequality for all offsets within
+        // the smaller object.  The range constraint is logically
+        // sufficient but the SAT solver cannot derive these
+        // inequalities from it.
+        mp_integer max_off = std::max(obj_sizes[i].second, obj_sizes[j].second);
+        for(mp_integer k = 0; k < max_off; ++k)
+        {
+          bvt shifted_i =
+            bv_utils.add(base_i, bv_utils.build_constant(k, ptr_width));
+          prop.l_set_to_true(!bv_utils.equal(shifted_i, base_j));
+          bvt shifted_j =
+            bv_utils.add(base_j, bv_utils.build_constant(k, ptr_width));
+          prop.l_set_to_true(!bv_utils.equal(shifted_j, base_i));
+        }
       }
     }
   }
