@@ -1,0 +1,11 @@
+CORE smt-backend
+precision.c
+--smt2 --outfile -
+float_bv\.floatbv_fma
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Verify that float_bvt generates valid SMT2 for FMA expressions
+(non-FPA bitvector encoding).

@@ -129,6 +129,13 @@ public:
   virtual bvt div(const bvt &src1, const bvt &src2);
   virtual bvt rem(const bvt &src1, const bvt &src2);
 
+  /// Fused multiply-add: round(multiply_lhs * multiply_rhs + addend)
+  /// with a single rounding step.
+  /// \param multiply_lhs: left-hand side of the multiplication
+  /// \param multiply_rhs: right-hand side of the multiplication
+  /// \param addend: value added to the product
+  bvt fma(const bvt &multiply_lhs, const bvt &multiply_rhs, const bvt &addend);
+
   bvt abs(const bvt &);
   bvt negate(const bvt &);
 

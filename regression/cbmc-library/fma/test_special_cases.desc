@@ -1,0 +1,10 @@
+CORE
+special_cases.c
+--floatbv --no-built-in-assertions
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+IEEE 754 FMA special cases: NaN propagation, 0*inf, inf+(-inf), inf results.
