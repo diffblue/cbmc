@@ -4,12 +4,16 @@ include ../../src/config.inc
 include ../../src/common
 
 ifeq ($(BUILD_ENV_),MSVC)
-	excluded_tests = -X gcc-only
-else
-	# Detect if the preprocessor is GCC; exclude gcc-only on Clang/MSVC
-	ifeq ($(shell gcc --version 2>&1 | grep -c 'Free Software Foundation'),0)
-		excluded_tests = -X gcc-only
-	endif
+  excluded_tests = -X gcc-only
+endif
+
+# On non-MSVC, detect if the compiler is GCC (Free Software Foundation)
+# or something else (Clang, Apple Clang). Exclude gcc-only on non-GCC.
+ifndef excluded_tests
+  IS_GCC := $(shell gcc --version 2>&1 | grep -c 'Free Software Foundation')
+  ifeq ($(IS_GCC),0)
+    excluded_tests = -X gcc-only
+  endif
 endif
 
 test:
