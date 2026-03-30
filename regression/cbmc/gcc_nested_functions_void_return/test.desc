@@ -1,0 +1,14 @@
+CORE
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+A nested function with a void return type inside an int-returning function
+must not clobber the enclosing function's return type (see
+c_typecheck_baset::typecheck_function_body). Without the save/restore this
+aborted in goto conversion.

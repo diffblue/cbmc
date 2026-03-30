@@ -1,0 +1,14 @@
+CORE
+main.c
+--unwind 6 --no-unwinding-assertions
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+A label defined before a nested function definition must remain visible to a
+goto after it (see c_typecheck_baset::typecheck_function_body). Without the
+save/restore of labels_used/labels_defined this was rejected as an undefined
+branching label.

@@ -1,0 +1,12 @@
+CORE
+main.c
+
+^EXIT=6$
+^SIGNAL=0$
+syntax error
+^PARSING ERROR$
+--
+^VERIFICATION
+--
+GCC rejects implicit-int nested functions, so a bare identifier_declarator
+head is deliberately not accepted (see gcc_nested_function_definition).

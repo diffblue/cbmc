@@ -1,0 +1,13 @@
+CORE
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+^PARSING ERROR$
+--
+Exercises the qualifier-only (type_qualifier_list) nested function head, e.g.
+`const add1(int x) { ... }`, which was previously untested.
