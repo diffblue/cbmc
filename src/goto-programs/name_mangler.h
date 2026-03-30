@@ -51,7 +51,7 @@ public:
     rename_symbolt rename;
     std::map<irep_idt, irep_idt> renamed_funs;
     std::vector<symbolt> new_syms;
-    std::vector<symbol_tablet::symbolst::const_iterator> old_syms;
+    std::vector<irep_idt> old_syms;
 
     for(auto sym_it = model.symbol_table.symbols.begin();
         sym_it != model.symbol_table.symbols.end();
@@ -75,7 +75,7 @@ public:
       new_sym.is_file_local = false;
 
       new_syms.push_back(new_sym);
-      old_syms.push_back(sym_it);
+      old_syms.push_back(sym.name);
 
       rename.insert(sym.symbol_expr(), new_sym.symbol_expr());
       renamed_funs.insert(std::make_pair(sym.name, mangled));
@@ -84,9 +84,38 @@ public:
     }
 
     for(const auto &sym : new_syms)
-      model.symbol_table.insert(sym);
-    for(const auto &sym : old_syms)
-      model.symbol_table.erase(sym);
+    {
+      auto result = model.symbol_table.insert(sym);
+      if(!result.second)
+      {
+        symbolt &existing = result.first;
+        if(existing.value.is_nil() && existing.type.id() == ID_code)
+        {
+          // The existing symbol is a function declaration (no body). This
+          // happens when user code forward-declares the mangled name. Replace
+          // it with the definition so that parameter identifiers and the full
+          // type are preserved. Do NOT touch existing.module or
+          // existing.base_name: both participate in symbol_tablet's indices
+          // (symbol_module_map / symbol_base_map) and must not change after a
+          // symbol has been inserted (see symbol_tablet::validate()).
+          existing.type = sym.type;
+          existing.value = sym.value;
+          existing.is_file_local = sym.is_file_local;
+          existing.mode = sym.mode;
+          existing.location = sym.location;
+          if(!sym.pretty_name.empty())
+            existing.pretty_name = sym.pretty_name;
+        }
+        else
+        {
+          log.warning() << "Mangled name '" << sym.name
+                        << "' already exists with a definition"
+                        << messaget::eom;
+        }
+      }
+    }
+    for(const auto &name : old_syms)
+      model.symbol_table.remove(name);
 
     for(auto it = model.symbol_table.begin(); it != model.symbol_table.end();
         ++it)
@@ -107,6 +136,12 @@ public:
     {
       if(!fun.second.body_available())
         continue;
+      for(auto &identifier : fun.second.parameter_identifiers)
+      {
+        auto entry = rename.expr_map.find(identifier);
+        if(entry != rename.expr_map.end())
+          identifier = entry->second;
+      }
       for(auto &ins : fun.second.body.instructions)
       {
         rename(ins.code_nonconst());
@@ -125,11 +160,26 @@ public:
         "of the function that we renamed '" +
           std::string(pair.first.c_str()) + "'");
 
-      auto inserted = model.goto_functions.function_map.emplace(
-        pair.second, std::move(found->second));
-      if(!inserted.second)
+      auto existing = model.goto_functions.function_map.find(pair.second);
+      if(existing == model.goto_functions.function_map.end())
+      {
+        model.goto_functions.function_map.emplace(
+          pair.second, std::move(found->second));
+      }
+      else if(existing->second.body.instructions.empty())
+      {
+        // The mangled name already has a function map entry (from a forward
+        // declaration) with an empty body. Swap in the definition's body and
+        // parameter identifiers (goto_functiont::swap() also carries over
+        // function_is_hidden). We look the entry up rather than relying on a
+        // failed emplace, as the latter would leave found->second moved-from.
+        existing->second.swap(found->second);
+      }
+      else
+      {
         log.debug() << "Found a mangled name that already exists: "
-                    << std::string(pair.second.c_str()) << log.eom;
+                    << pair.second << messaget::eom;
+      }
 
       model.goto_functions.function_map.erase(found);
     }
