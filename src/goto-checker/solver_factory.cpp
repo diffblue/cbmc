@@ -441,7 +441,7 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_bv_refinement()
 {
   std::unique_ptr<propt> prop = get_sat_solver(message_handler, options);
 
-  bv_refinementt::infot info;
+  bv_refinement_infot info;
   info.ns = &ns;
   info.prop = prop.get();
   info.output_xml = output_xml_in_refinement;
@@ -455,8 +455,16 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_bv_refinement()
   info.refine_arithmetic = options.get_bool_option("refine-arithmetic");
   info.message_handler = &message_handler;
 
-  std::unique_ptr<boolbvt> decision_procedure =
-    std::make_unique<bv_refinementt>(info);
+  std::unique_ptr<boolbvt> decision_procedure;
+  if(options.get_bool_option("pointer-encoding-via-maps"))
+  {
+    decision_procedure =
+      std::make_unique<bv_refinementt<bv_pointers_widet>>(info);
+  }
+  else
+  {
+    decision_procedure = std::make_unique<bv_refinementt<>>(info);
+  }
   set_decision_procedure_time_limit(*decision_procedure);
   return std::make_unique<solvert>(
     std::move(decision_procedure), std::move(prop));

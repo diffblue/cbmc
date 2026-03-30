@@ -60,7 +60,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 
 #define DEFAULT_MAX_NB_REFINEMENT std::numeric_limits<size_t>::max()
 
-class string_refinementt final : public bv_refinementt
+class string_refinementt final : public bv_refinementt<>
 {
 private:
   struct configt
@@ -71,7 +71,7 @@ private:
 
 public:
   /// string_refinementt constructor arguments
-  struct infot : public bv_refinementt::infot, public configt
+  struct infot : public bv_refinement_infot, public configt
   {
   };
 
@@ -90,7 +90,7 @@ protected:
 
 private:
   // Base class
-  typedef bv_refinementt supert;
+  typedef bv_refinementt<> supert;
 
   string_refinementt(const infot &, bool);
 

@@ -16,38 +16,47 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #define MAX_STATE 10000
 
-class bv_refinementt:public bv_pointerst
+/// Configuration and info for the refinement solver.
+/// Separated from the class template so callers don't need
+/// to know the template parameter.
+struct bv_refinement_configt
 {
-private:
-  struct configt
-  {
-    bool output_xml = false;
-    /// Max number of times we refine a formula node
-    unsigned max_node_refinement=5;
-    /// Enable array refinement
-    bool refine_arrays=true;
-    /// Enable arithmetic refinement
-    bool refine_arithmetic=true;
-  };
+  bool output_xml = false;
+  unsigned max_node_refinement = 5;
+  bool refine_arrays = true;
+  bool refine_arithmetic = true;
+};
+
+struct bv_refinement_infot : public bv_refinement_configt
+{
+  const namespacet *ns = nullptr;
+  propt *prop = nullptr;
+  message_handlert *message_handler = nullptr;
+};
+
+/// Abstraction refinement loop, parameterized on the pointer
+/// encoding base class.  The default is bv_pointerst (standard
+/// bit-packed encoding).  Use bv_pointers_widet for the map-based
+/// encoding.
+template <typename bv_pointers_baset = bv_pointerst>
+class bv_refinementt : public bv_pointers_baset
+{
 public:
-  struct infot:public configt
-  {
-    const namespacet *ns=nullptr;
-    propt *prop=nullptr;
-    message_handlert *message_handler = nullptr;
-  };
+  using resultt = decision_proceduret::resultt;
+
+  // Keep the old infot name for backward compatibility
+  using infot = bv_refinement_infot;
 
   explicit bv_refinementt(const infot &info);
 
-  decision_proceduret::resultt dec_solve(const exprt &) override;
+  resultt dec_solve(const exprt &) override;
 
   std::string decision_procedure_text() const override
   {
-    return "refinement loop with "+prop.solver_text();
+    return "refinement loop with " + bv_pointers_baset::prop.solver_text();
   }
 
 protected:
-
   // Refine array
   void finish_eager_conversion_arrays() override;
 
@@ -62,11 +71,8 @@ private:
   struct approximationt final
   {
   public:
-    explicit approximationt(std::size_t _id_nr):
-      no_operands(0),
-      under_state(0),
-      over_state(0),
-      id_nr(_id_nr)
+    explicit approximationt(std::size_t _id_nr)
+      : no_operands(0), under_state(0), over_state(0), id_nr(_id_nr)
     {
     }
 
@@ -79,7 +85,6 @@ private:
     std::vector<exprt> under_assumptions;
     std::vector<exprt> over_assumptions;
 
-    // the kind of under- or over-approximation
     unsigned under_state, over_state;
 
     std::string as_string() const;
@@ -102,14 +107,11 @@ private:
   void arrays_overapproximated();
   void freeze_lazy_constraints();
 
-  // MEMBERS
-
   bool progress;
   std::list<approximationt> approximations;
 
 protected:
-  // use gui format
-  configt config_;
+  bv_refinement_configt config_;
 };
 
 #endif // CPROVER_SOLVERS_REFINEMENT_BV_REFINEMENT_H
