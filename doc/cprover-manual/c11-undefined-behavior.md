@@ -106,7 +106,7 @@ This follows appendix J.2 ("Undefined behavior") of [N1570](https://www.open-std
 | – A `#pragma` STDC preprocessing directive does not match one of the well-defined forms (6.10.6). | no |
 | – The name of a predefined macro, or the identifier defined, is the subject of a `#define` or `#undef` preprocessing directive (6.10.8). | no |
 | – An attempt is made to copy an object to an overlapping object by use of a library function, other than as explicitly allowed (e.g., `memmove`) (clause 7). | yes |
-| – A file with the same name as one of the standard headers, not provided as part of the implementation, is placed in any of the standard places that are searched for included source files (7.1.2). |  |
+| – A file with the same name as one of the standard headers, not provided as part of the implementation, is placed in any of the standard places that are searched for included source files (7.1.2). | no |
 | – A header is included within an external declaration or definition (7.1.2). | no |
 | – A function, object, type, or macro that is specified as being declared or defined by some standard header is used before any header that declares or defines it is included (7.1.2). | no |
 | – A standard header is included while a macro is defined with the same name as a keyword (7.1.2). | no |
@@ -155,7 +155,7 @@ This follows appendix J.2 ("Undefined behavior") of [N1570](https://www.open-std
 | – Use is made of any portion of a file beyond the most recent wide character written to a wide-oriented stream (7.21.2). | no |
 | – The value of a pointer to a `FILE` object is used after the associated file is closed (7.21.3). | no |
 | – The stream for the `fflush` function points to an input stream or to an update stream in which the most recent operation was input (7.21.5.2). | no |
-| – The string pointed to by the mode argument in a call to the `fopen` function does not exactly match one of the specified character sequences (7.21.5.3). | mo |
+| – The string pointed to by the mode argument in a call to the `fopen` function does not exactly match one of the specified character sequences (7.21.5.3). | no |
 | – An output operation on an update stream is followed by an input operation without an intervening call to the `fflush` function or a file positioning function, or an input operation on an update stream is followed by an output operation with an intervening call to a file positioning function (7.21.5.3). | no |
 | – An attempt is made to use the contents of the array that was supplied in a call to the `setvbuf` function (7.21.5.6). | no |
 | – There are insufficient arguments for the format in a call to one of the formatted input/output functions, or an argument does not have an appropriate type (7.21.6.1, 7.21.6.2, 7.29.2.1, 7.29.2.2). | no |
