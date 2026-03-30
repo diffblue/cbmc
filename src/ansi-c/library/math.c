@@ -822,261 +822,38 @@ __CPROVER_hide:;
 
 /* FUNCTION: sqrtf */
 
-/* This code is *WRONG* in some circumstances, specifically:
- *
- *   1. If run with a rounding mode other than RNE the
- *      answer will be out by one or two ULP.  This could be fixed
- *      with careful choice of round mode for the multiplications.
- *
- *   2. Subnormals have the unusual property that there are
- *      multiple numbers that square to give them.  I.E. if
- *      f is subnormal then there are multiple f1 != f2 such that
- *      f1 * f1 == f == f2 * f2.  This code will return *a*
- *      square root of a subnormal input but not necessarily *the*
- *      square root (i.e. the real value of the square root rounded).
- */
-
 #ifndef __CPROVER_MATH_H_INCLUDED
 #include <math.h>
 #define __CPROVER_MATH_H_INCLUDED
 #endif
-
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
-
-float nextUpf(float f);
-
-float __VERIFIER_nondet_float(void);
 
 float sqrtf(float f)
 {
- __CPROVER_hide:;
-
-  if ( f < 0.0f )
-#pragma CPROVER check push
-#pragma CPROVER check disable "float-div-by-zero"
-    return 0.0f/0.0f; // NaN
-#pragma CPROVER check pop
-  else if (__CPROVER_isinff(f) ||   // +Inf only
-           f == 0.0f          ||   // Includes -0
-           __CPROVER_isnanf(f))
-    return f;
-  else if (__CPROVER_isnormalf(f))
-  {
-    float lower=__VERIFIER_nondet_float();
-    __CPROVER_assume(lower > 0.0f);
-    __CPROVER_assume(__CPROVER_isnormalf(lower));
-    // Tighter bounds can be given but are dependent on the
-    // number of exponent and significand bits.  Thus they are
-    // given implicitly...
-
-#pragma CPROVER check push
-#pragma CPROVER check disable "float-overflow"
-    float lowerSquare = lower * lower;
-    __CPROVER_assume(__CPROVER_isnormalf(lowerSquare));
-
-    float upper = nextUpf(lower);
-    float upperSquare = upper * upper;  // Might be +Inf
-#pragma CPROVER check pop
-
-    // Restrict these to bound f and thus compute the possible
-    // values for the square root.  Note that the lower bound
-    // can be equal, this is important to catch edge cases such as
-    // 0x1.fffffep+127f and relies on the smallest normal number
-    // being a perfect square (which it will be for any sensible
-    // bit width).
-    __CPROVER_assume(lowerSquare <= f);
-    __CPROVER_assume(f < upperSquare);
-
-    // Select between them to work out which to return
-    switch(fegetround())
-    {
-    case FE_TONEAREST :
-      return (f - lowerSquare < upperSquare - f) ? lower : upper; break;
-    case FE_UPWARD :
-      return (f - lowerSquare == 0.0f) ? lower : upper; break;
-    case FE_DOWNWARD : // Fall through
-    case FE_TOWARDZERO :
-      return (f - lowerSquare == 0.0f) ? lower : upper; break;
-    default:;
-      return __VERIFIER_nondet_float();
-    }
-
-  }
-  else
-  {
-    //assert(fpclassify(f) == FP_SUBNORMAL);
-    //assert(f > 0.0f);
-
-    // With respect to the algebra of floating point number
-    // all subnormals seem to be perfect squares, thus ...
-
-    float root=__VERIFIER_nondet_float();
-    __CPROVER_assume(root >= 0.0f);
-
-    __CPROVER_assume(root * root == f);
-
-    return root;
-  }
+  return __CPROVER_sqrtf(f);
 }
 
-
-
-
 /* FUNCTION: sqrt */
-
-/* The same caveats as sqrtf apply */
 
 #ifndef __CPROVER_MATH_H_INCLUDED
 #include <math.h>
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
-
-double nextUp(double d);
-
-double __VERIFIER_nondet_double(void);
-
 double sqrt(double d)
 {
- __CPROVER_hide:;
-
-  if ( d < 0.0 )
-#pragma CPROVER check push
-#pragma CPROVER check disable "float-div-by-zero"
-    return 0.0/0.0; // NaN
-#pragma CPROVER check pop
-  else if (__CPROVER_isinfd(d) ||   // +Inf only
-           d == 0.0            ||   // Includes -0
-           __CPROVER_isnand(d))
-    return d;
-  else if (__CPROVER_isnormald(d))
-  {
-    double lower=__VERIFIER_nondet_double();
-    __CPROVER_assume(lower > 0.0);
-    __CPROVER_assume(__CPROVER_isnormald(lower));
-
-#pragma CPROVER check push
-#pragma CPROVER check disable "float-overflow"
-    double lowerSquare = lower * lower;
-    __CPROVER_assume(__CPROVER_isnormald(lowerSquare));
-
-    double upper = nextUp(lower);
-    double upperSquare = upper * upper;  // Might be +Inf
-#pragma CPROVER check pop
-
-    __CPROVER_assume(lowerSquare <= d);
-    __CPROVER_assume(d < upperSquare);
-
-    switch(fegetround())
-    {
-    case FE_TONEAREST:
-      return (d - lowerSquare < upperSquare - d) ? lower : upper; break;
-    case FE_UPWARD:
-      return (d - lowerSquare == 0.0f) ? lower : upper; break;
-    case FE_DOWNWARD: // Fall through
-    case FE_TOWARDZERO:
-      return (d - lowerSquare == 0.0) ? lower : upper; break;
-    default:;
-      return __VERIFIER_nondet_double();
-    }
-
-  }
-  else
-  {
-    //assert(fpclassify(d) == FP_SUBNORMAL);
-    //assert(d > 0.0);
-
-    double root=__VERIFIER_nondet_double();
-    __CPROVER_assume(root >= 0.0);
-
-    __CPROVER_assume(root * root == d);
-
-    return root;
-  }
+  return __CPROVER_sqrt(d);
 }
 
 /* FUNCTION: sqrtl */
 
-/* The same caveats as sqrtf apply */
-
 #ifndef __CPROVER_MATH_H_INCLUDED
 #include <math.h>
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
-
-long double nextUpl(long double d);
-
-long double __VERIFIER_nondet_long_double(void);
-
 long double sqrtl(long double d)
 {
- __CPROVER_hide:;
-
-  if(d < 0.0l)
-#pragma CPROVER check push
-#pragma CPROVER check disable "float-div-by-zero"
-    return 0.0l/0.0l; // NaN
-#pragma CPROVER check pop
-  else if (__CPROVER_isinfld(d) ||   // +Inf only
-           d == 0.0l            ||   // Includes -0
-           __CPROVER_isnanld(d))
-    return d;
-  else if (__CPROVER_isnormalld(d))
-  {
-    long double lower=__VERIFIER_nondet_long_double();
-    __CPROVER_assume(lower > 0.0l);
-    __CPROVER_assume(__CPROVER_isnormalld(lower));
-
-#pragma CPROVER check push
-#pragma CPROVER check disable "float-overflow"
-    long double lowerSquare = lower * lower;
-    __CPROVER_assume(__CPROVER_isnormalld(lowerSquare));
-
-    long double upper = nextUpl(lower);
-    long double upperSquare = upper * upper;  // Might be +Inf
-#pragma CPROVER check pop
-
-    __CPROVER_assume(lowerSquare <= d);
-    __CPROVER_assume(d < upperSquare);
-
-    switch(fegetround())
-    {
-    case FE_TONEAREST:
-      return (d - lowerSquare < upperSquare - d) ? lower : upper; break;
-    case FE_UPWARD:
-      return (d - lowerSquare == 0.0l) ? lower : upper; break;
-    case FE_DOWNWARD: // Fall through
-    case FE_TOWARDZERO:
-      return (d - lowerSquare == 0.0l) ? lower : upper; break;
-    default:;
-      return __VERIFIER_nondet_long_double();
-    }
-
-  }
-  else
-  {
-    //assert(fpclassify(d) == FP_SUBNORMAL);
-    //assert(d > 0.0l);
-
-    long double root=__VERIFIER_nondet_long_double();
-    __CPROVER_assume(root >= 0.0l);
-
-    __CPROVER_assume(root * root == d);
-
-    return root;
-  }
+  return __CPROVER_sqrtl(d);
 }
 
 
@@ -1108,7 +885,7 @@ long double sqrtl(long double d)
 #endif
 
 // TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB
-double fmax(double f, double g) { return ((f >= g) || isnan(g)) ? f : g; }
+double fmax(double f, double g) { return __CPROVER_fmax(f, g); }
 
 /* FUNCTION: fmaxf */
 
@@ -1118,7 +895,7 @@ double fmax(double f, double g) { return ((f >= g) || isnan(g)) ? f : g; }
 #endif
 
 // TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB
-float fmaxf(float f, float g) { return ((f >= g) || isnan(g)) ? f : g; }
+float fmaxf(float f, float g) { return __CPROVER_fmaxf(f, g); }
 
 /* FUNCTION: fmaxl */
 
@@ -1128,7 +905,7 @@ float fmaxf(float f, float g) { return ((f >= g) || isnan(g)) ? f : g; }
 #endif
 
 // TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB
-long double fmaxl(long double f, long double g) { return ((f >= g) || isnan(g)) ? f : g; }
+long double fmaxl(long double f, long double g) { return __CPROVER_fmaxl(f, g); }
 
 
 /* ISO 9899:2011
@@ -1151,7 +928,7 @@ long double fmaxl(long double f, long double g) { return ((f >= g) || isnan(g)) 
 #endif
  
 // TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB
-double fmin(double f, double g) { return ((f <= g) || isnan(g)) ? f : g; }
+double fmin(double f, double g) { return __CPROVER_fmin(f, g); }
 
 /* FUNCTION: fminf */
 
@@ -1161,7 +938,7 @@ double fmin(double f, double g) { return ((f <= g) || isnan(g)) ? f : g; }
 #endif
 
 // TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB 
-float fminf(float f, float g) { return ((f <= g) || isnan(g)) ? f : g; }
+float fminf(float f, float g) { return __CPROVER_fminf(f, g); }
 
 /* FUNCTION: fminl */
 
@@ -1171,7 +948,7 @@ float fminf(float f, float g) { return ((f <= g) || isnan(g)) ? f : g; }
 #endif
 
 // TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB 
-long double fminl(long double f, long double g) { return ((f <= g) || isnan(g)) ? f : g; }
+long double fminl(long double f, long double g) { return __CPROVER_fminl(f, g); }
 
 
 /* ISO 9899:2011
@@ -1897,55 +1674,6 @@ long double modfl(long double x, long double *iptr)
   return (x - *iptr);
 }
 
-
-
-/* FUNCTION: __sort_of_CPROVER_remainder */
-// TODO : Should be a real __CPROVER function to convert to SMT-LIB
-
-double __sort_of_CPROVER_remainder (int rounding_mode, double x, double y)
-{
-  if (x == 0.0 || __CPROVER_isinfd(y))
-    return x;
-
-  // Extended precision helps... a bit...
-  long double div = x/y;
-  long double n = __CPROVER_round_to_integrald(rounding_mode, div);
-  long double res = (-y * n) + x;   // TODO : FMA would be an improvement
-  return res;
-}
-
-/* FUNCTION: __sort_of_CPROVER_remainderf */
-// TODO : Should be a real __CPROVER function to convert to SMT-LIB
-
-float __sort_of_CPROVER_remainderf (int rounding_mode, float x, float y)
-{
-  if (x == 0.0f || __CPROVER_isinff(y))
-    return x;
-
-  // Extended precision helps... a bit...
-  long double div = x/y;
-  long double n = __CPROVER_round_to_integralf(rounding_mode, div);
-  long double res = (-y * n) + x;   // TODO : FMA would be an improvement
-  return res;
-}
-
-/* FUNCTION: __sort_of_CPROVER_remainderl */
-// TODO : Should be a real __CPROVER function to convert to SMT-LIB
-
-long double __sort_of_CPROVER_remainderl (int rounding_mode, long double x, long double y)
-{
-  if (x == 0.0 || __CPROVER_isinfld(y))
-    return x;
-
-  // Extended precision helps... a bit...
-  long double div = x/y;
-  long double n = __CPROVER_round_to_integralld(rounding_mode, div);
-  long double res = (-y * n) + x;   // TODO : FMA would be an improvement
-  return res;
-}
-
-
-
 /* ISO 9899:2011
  *
  * The fmod functions return the value x - ny, for some
@@ -2026,15 +1754,10 @@ long double fmodl(long double x, long double y)
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
-
-double __sort_of_CPROVER_remainder (int rounding_mode, double x, double y);
-
-double remainder(double x, double y) { return __sort_of_CPROVER_remainder(FE_TONEAREST, x, y); }
-
+double remainder(double x, double y)
+{
+  return __CPROVER_remainder(x, y);
+}
 
 /* FUNCTION: remainderf */
 
@@ -2043,15 +1766,10 @@ double remainder(double x, double y) { return __sort_of_CPROVER_remainder(FE_TON
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
-
-float __sort_of_CPROVER_remainderf (int rounding_mode, float x, float y);
-
-float remainderf(float x, float y) { return __sort_of_CPROVER_remainderf(FE_TONEAREST, x, y); }
-
+float remainderf(float x, float y)
+{
+  return __CPROVER_remainderf(x, y);
+}
 
 /* FUNCTION: remainderl */
 
@@ -2060,17 +1778,10 @@ float remainderf(float x, float y) { return __sort_of_CPROVER_remainderf(FE_TONE
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-#ifndef __CPROVER_FENV_H_INCLUDED
-#include <fenv.h>
-#define __CPROVER_FENV_H_INCLUDED
-#endif
-
-long double __sort_of_CPROVER_remainderl (int rounding_mode, long double x, long double y);
-
-long double remainderl(long double x, long double y) { return __sort_of_CPROVER_remainderl(FE_TONEAREST, x, y); }
-
-
-
+long double remainderl(long double x, long double y)
+{
+  return __CPROVER_remainderl(x, y);
+}
 
 /* ISO 9899:2011
  * The copysign functions produce a value with the magnitude of x and
@@ -3486,44 +3197,19 @@ long double powl(long double x, long double y)
 #  define __CPROVER_FENV_H_INCLUDED
 #endif
 
-double __builtin_inf(void);
-
 double fma(double x, double y, double z)
 {
-  // see man fma (https://linux.die.net/man/3/fma)
-#pragma CPROVER check push
-#pragma CPROVER check disable "float-div-by-zero"
-  if(isnan(x) || isnan(y))
-    return 0.0 / 0.0;
-  else if(
-    (isinf(x) || isinf(y)) &&
-    (fpclassify(x) == FP_ZERO || fpclassify(y) == FP_ZERO))
+  // IEEE 754: raise FE_INVALID for 0*inf or inf+(-inf)
+  if((__CPROVER_isinfd(x) && y == 0.0) || (x == 0.0 && __CPROVER_isinfd(y)))
   {
     feraiseexcept(FE_INVALID);
-    return 0.0 / 0.0;
   }
-  else if(isnan(z))
-    return 0.0 / 0.0;
-
-#pragma CPROVER check disable "float-overflow"
-  double x_times_y = x * y;
-  if(
-    isinf(x_times_y) && isinf(z) &&
-    __CPROVER_signd(x_times_y) != __CPROVER_signd(z))
+  else if((__CPROVER_isinfd(x) || __CPROVER_isinfd(y)) && __CPROVER_isinfd(z))
   {
     feraiseexcept(FE_INVALID);
-    return 0.0 / 0.0;
   }
-#pragma CPROVER check pop
 
-  if(isinf(x_times_y))
-  {
-    feraiseexcept(FE_OVERFLOW);
-    return __CPROVER_signd(x_times_y) ? -__builtin_inf() : __builtin_inf();
-  }
-  // TODO: detect underflow (FE_UNDERFLOW), return +/- 0
-
-  return x_times_y + z;
+  return __CPROVER_fma(x, y, z);
 }
 
 /* FUNCTION: fmaf */
@@ -3538,44 +3224,18 @@ double fma(double x, double y, double z)
 #  define __CPROVER_FENV_H_INCLUDED
 #endif
 
-float __builtin_inff(void);
-
 float fmaf(float x, float y, float z)
 {
-  // see man fma (https://linux.die.net/man/3/fma)
-#pragma CPROVER check push
-#pragma CPROVER check disable "float-div-by-zero"
-  if(isnanf(x) || isnanf(y))
-    return 0.0f / 0.0f;
-  else if(
-    (isinff(x) || isinff(y)) &&
-    (fpclassify(x) == FP_ZERO || fpclassify(y) == FP_ZERO))
+  if((__CPROVER_isinff(x) && y == 0.0f) || (x == 0.0f && __CPROVER_isinff(y)))
   {
     feraiseexcept(FE_INVALID);
-    return 0.0f / 0.0f;
   }
-  else if(isnanf(z))
-    return 0.0f / 0.0f;
-
-#pragma CPROVER check disable "float-overflow"
-  float x_times_y = x * y;
-  if(
-    isinff(x_times_y) && isinff(z) &&
-    __CPROVER_signf(x_times_y) != __CPROVER_signf(z))
+  else if((__CPROVER_isinff(x) || __CPROVER_isinff(y)) && __CPROVER_isinff(z))
   {
     feraiseexcept(FE_INVALID);
-    return 0.0f / 0.0f;
   }
-#pragma CPROVER check pop
 
-  if(isinff(x_times_y))
-  {
-    feraiseexcept(FE_OVERFLOW);
-    return __CPROVER_signf(x_times_y) ? -__builtin_inff() : __builtin_inff();
-  }
-  // TODO: detect underflow (FE_UNDERFLOW), return +/- 0
-
-  return x_times_y + z;
+  return __CPROVER_fmaf(x, y, z);
 }
 
 /* FUNCTION: fmal */
@@ -3590,53 +3250,19 @@ float fmaf(float x, float y, float z)
 #  define __CPROVER_FENV_H_INCLUDED
 #endif
 
-#ifndef __CPROVER_FLOAT_H_INCLUDED
-#  include <float.h>
-#  define __CPROVER_FLOAT_H_INCLUDED
-#endif
-
-long double __builtin_infl(void);
-
 long double fmal(long double x, long double y, long double z)
 {
-  // see man fma (https://linux.die.net/man/3/fma)
-#pragma CPROVER check push
-#pragma CPROVER check disable "float-div-by-zero"
-  if(isnanl(x) || isnanl(y))
-    return 0.0l / 0.0l;
+  if((__CPROVER_isinfld(x) && y == 0.0l) || (x == 0.0l && __CPROVER_isinfld(y)))
+  {
+    feraiseexcept(FE_INVALID);
+  }
   else if(
-    (isinfl(x) || isinfl(y)) &&
-    (fpclassify(x) == FP_ZERO || fpclassify(y) == FP_ZERO))
+    (__CPROVER_isinfld(x) || __CPROVER_isinfld(y)) && __CPROVER_isinfld(z))
   {
     feraiseexcept(FE_INVALID);
-    return 0.0l / 0.0l;
   }
-  else if(isnanl(z))
-    return 0.0l / 0.0l;
 
-#pragma CPROVER check disable "float-overflow"
-  long double x_times_y = x * y;
-  if(
-    isinfl(x_times_y) && isinfl(z) &&
-    __CPROVER_signld(x_times_y) != __CPROVER_signld(z))
-  {
-    feraiseexcept(FE_INVALID);
-    return 0.0l / 0.0l;
-  }
-#pragma CPROVER check pop
-
-#if LDBL_MAX_EXP == DBL_MAX_EXP
-  return fma(x, y, z);
-#else
-  if(isinfl(x_times_y))
-  {
-    feraiseexcept(FE_OVERFLOW);
-    return __CPROVER_signld(x_times_y) ? -__builtin_infl() : __builtin_infl();
-  }
-  // TODO: detect underflow (FE_UNDERFLOW), return +/- 0
-
-  return x_times_y + z;
-#endif
+  return __CPROVER_fmal(x, y, z);
 }
 
 /* FUNCTION: __builtin_powi */

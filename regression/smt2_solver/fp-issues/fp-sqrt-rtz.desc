@@ -1,0 +1,8 @@
+CORE
+fp-sqrt-rtz.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+fp.sqrt(2.0) with RTZ: floor of sqrt(2) is 0x3FB504F3.

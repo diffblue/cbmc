@@ -1,0 +1,8 @@
+CORE
+fp-sub-rna1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+--
+Based on Z3#7162: fp.sub with RNA rounding on Float64.

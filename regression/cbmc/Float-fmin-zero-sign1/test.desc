@@ -1,0 +1,8 @@
+CORE
+main.c
+--floatbv
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+fminf zero sign: returns -0 per IEEE 754-2019.

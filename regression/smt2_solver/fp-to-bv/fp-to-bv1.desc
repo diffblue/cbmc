@@ -1,0 +1,9 @@
+CORE
+fp-to-bv1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+--
+fp.to_sbv and fp.to_ubv with various rounding modes.
+Previously crashed with non-RTZ rounding modes.

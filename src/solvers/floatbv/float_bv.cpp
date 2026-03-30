@@ -132,6 +132,27 @@ exprt float_bvt::convert(const exprt &expr) const
       float_expr.rounding_mode(),
       get_spec(expr));
   }
+  else if(expr.id() == ID_floatbv_fma)
+  {
+    const auto &fma_expr = to_floatbv_fma_expr(expr);
+    const ieee_float_spect spec{to_floatbv_type(fma_expr.type())};
+    return fma(
+      fma_expr.op_multiply_lhs(),
+      fma_expr.op_multiply_rhs(),
+      fma_expr.op_add(),
+      fma_expr.rounding_mode(),
+      spec);
+  }
+  else if(expr.id() == ID_floatbv_mod)
+  {
+    const auto &float_expr = to_binary_expr(expr);
+    return mod(float_expr.lhs(), float_expr.rhs());
+  }
+  else if(expr.id() == ID_floatbv_rem)
+  {
+    const auto &float_expr = to_binary_expr(expr);
+    return rem(float_expr.lhs(), float_expr.rhs());
+  }
   else if(expr.id()==ID_isnan)
   {
     const auto &op = to_unary_expr(expr).op();
@@ -821,6 +842,207 @@ exprt float_bvt::div(
       result.fraction);
 
   return rounder(result, rm, spec);
+}
+
+exprt float_bvt::fma(
+  const exprt &multiply_lhs,
+  const exprt &multiply_rhs,
+  const exprt &addend,
+  const exprt &rm,
+  const ieee_float_spect &spec) const
+{
+  // Fused multiply-add: round(multiply_lhs * multiply_rhs + addend) with single
+  // rounding.  Multiply at double width (exact), add at double width (exact),
+  // then round once.
+
+  const unbiased_floatt unpacked_lhs = unpack(multiply_lhs, spec);
+  const unbiased_floatt unpacked_rhs = unpack(multiply_rhs, spec);
+  const unbiased_floatt unpacked_add = unpack(addend, spec);
+
+  const std::size_t frac_size = spec.f + 1;
+  const std::size_t prod_width = frac_size * 2;
+  const typet prod_frac_type = unsignedbv_typet(prod_width);
+
+  // Exact product: multiply fractions at double width
+  const exprt fraction1 =
+    zero_extend_exprt{unpacked_lhs.fraction, prod_frac_type};
+  const exprt fraction2 =
+    zero_extend_exprt{unpacked_rhs.fraction, prod_frac_type};
+  exprt prod_fraction = mult_exprt(fraction1, fraction2);
+
+  const typet wide_exp_type = signedbv_typet(spec.e + 2);
+  exprt prod_exponent = plus_exprt(
+    typecast_exprt(unpacked_lhs.exponent, wide_exp_type),
+    typecast_exprt(unpacked_rhs.exponent, wide_exp_type));
+  prod_exponent = plus_exprt(prod_exponent, from_integer(1, wide_exp_type));
+
+  exprt prod_sign = notequal_exprt(unpacked_lhs.sign, unpacked_rhs.sign);
+
+  // Align addend fraction to product width (pad on the right)
+  const std::size_t c_pad = prod_width - frac_size;
+  exprt c_fraction = concatenation_exprt(
+    unpacked_add.fraction,
+    from_integer(0, unsignedbv_typet(c_pad)),
+    prod_frac_type);
+  exprt c_exponent = typecast_exprt(unpacked_add.exponent, wide_exp_type);
+
+  // Add product + c: align fractions by exponent difference
+  exprt exp_diff = minus_exprt(prod_exponent, c_exponent);
+  exprt c_bigger = sign_exprt(exp_diff);
+
+  exprt bigger_exp = if_exprt(c_bigger, c_exponent, prod_exponent);
+  exprt big_frac = if_exprt(c_bigger, c_fraction, prod_fraction);
+  exprt small_frac = if_exprt(c_bigger, prod_fraction, c_fraction);
+
+  exprt distance =
+    typecast_exprt(abs_exprt(exp_diff), unsignedbv_typet(spec.e + 2));
+  exprt limited_dist = limit_distance(distance, prod_width + 3);
+
+  // Pad with 3 guard bits
+  const typet padded_type = unsignedbv_typet(prod_width + 3);
+  exprt big_padded = concatenation_exprt(
+    big_frac, from_integer(0, unsignedbv_typet(3)), padded_type);
+  exprt small_padded = concatenation_exprt(
+    small_frac, from_integer(0, unsignedbv_typet(3)), padded_type);
+
+  // Shift smaller fraction right, tracking sticky bit
+  exprt sticky_bit;
+  exprt small_shifted =
+    sticky_right_shift(small_padded, limited_dist, sticky_bit);
+  small_shifted =
+    bitor_exprt(small_shifted, typecast_exprt(sticky_bit, padded_type));
+
+  // Extend for potential carry/borrow
+  const typet sum_type = unsignedbv_typet(prod_width + 5);
+  exprt big_ext = zero_extend_exprt{big_padded, sum_type};
+  exprt small_ext = zero_extend_exprt{small_shifted, sum_type};
+
+  // Add or subtract based on signs
+  exprt subtract_lit = notequal_exprt(prod_sign, unpacked_add.sign);
+  exprt sum = if_exprt(
+    subtract_lit,
+    minus_exprt(big_ext, small_ext),
+    plus_exprt(big_ext, small_ext));
+
+  // Handle negative result (from subtraction)
+  exprt fraction_sign =
+    sign_exprt(typecast_exprt(sum, signedbv_typet(prod_width + 5)));
+  sum = if_exprt(
+    fraction_sign,
+    unary_minus_exprt(typecast_exprt(sum, signedbv_typet(prod_width + 5))),
+    typecast_exprt(sum, signedbv_typet(prod_width + 5)));
+  sum = typecast_exprt(sum, sum_type);
+
+  unbiased_floatt result;
+  result.fraction = sum;
+  result.exponent = plus_exprt(
+    typecast_exprt(bigger_exp, signedbv_typet(spec.e + 3)),
+    from_integer(2, signedbv_typet(spec.e + 3)));
+
+  // Sign
+  exprt add_sub_sign = notequal_exprt(
+    if_exprt(c_bigger, unpacked_add.sign, prod_sign), fraction_sign);
+  result.sign = add_sub_sign;
+
+  // NaN
+  exprt prod_inf = or_exprt(unpacked_lhs.infinity, unpacked_rhs.infinity);
+  result.NaN = disjunction(
+    {isnan(multiply_lhs, spec),
+     isnan(multiply_rhs, spec),
+     isnan(addend, spec),
+     and_exprt(unpacked_lhs.zero, unpacked_rhs.infinity),
+     and_exprt(unpacked_rhs.zero, unpacked_lhs.infinity),
+     and_exprt(
+       and_exprt(prod_inf, unpacked_add.infinity),
+       notequal_exprt(prod_sign, unpacked_add.sign))});
+
+  // Infinity
+  result.infinity =
+    and_exprt(not_exprt(result.NaN), or_exprt(prod_inf, unpacked_add.infinity));
+
+  return rounder(result, rm, spec);
+}
+
+exprt float_bvt::mod(const exprt &x, const exprt &y) const
+{
+  PRECONDITION(x.type() == y.type());
+  const floatbv_typet &type = to_floatbv_type(x.type());
+  const ieee_float_spect spec{type};
+
+  // x - round-to-integer-towards-zero(x / y) * y
+  const constant_exprt round_to_zero =
+    from_integer(ieee_floatt::ROUND_TO_ZERO, unsignedbv_typet{2});
+
+  exprt div = convert(ieee_float_op_exprt{x, ID_floatbv_div, y, round_to_zero});
+  exprt round_to_int = from_signed_integer(
+    to_signed_integer(div, type.get_width(), round_to_zero, spec),
+    round_to_zero,
+    spec);
+  exprt mul = convert(ieee_float_op_exprt{
+    std::move(round_to_int), ID_floatbv_mult, y, round_to_zero});
+  return convert(
+    ieee_float_op_exprt{x, ID_floatbv_minus, std::move(mul), round_to_zero});
+}
+
+exprt float_bvt::rem(const exprt &x, const exprt &y) const
+{
+  PRECONDITION(x.type() == y.type());
+  const floatbv_typet &type = to_floatbv_type(x.type());
+  const ieee_float_spect spec{type};
+
+  // x - trunc(x / y) * y, then compare with the n±1 alternative.
+  const constant_exprt round_to_even =
+    from_integer(ieee_floatt::ROUND_TO_EVEN, unsignedbv_typet{2});
+  const constant_exprt round_to_zero =
+    from_integer(ieee_floatt::ROUND_TO_ZERO, unsignedbv_typet{2});
+
+  exprt div_result =
+    convert(ieee_float_op_exprt{x, ID_floatbv_div, y, round_to_even});
+  exprt n_float = from_signed_integer(
+    to_signed_integer(div_result, type.get_width(), round_to_zero, spec),
+    round_to_zero,
+    spec);
+  exprt n_times_y =
+    convert(ieee_float_op_exprt{n_float, ID_floatbv_mult, y, round_to_zero});
+  exprt result =
+    convert(ieee_float_op_exprt{x, ID_floatbv_minus, n_times_y, round_to_zero});
+
+  // Try both n+1 and n-1, pick the candidate with smallest |result|.
+  // We must try both directions because the sign of r does not reliably
+  // indicate which direction n is wrong.
+  exprt one = from_integer(1, type);
+  exprt n_plus_1 =
+    convert(ieee_float_op_exprt{n_float, ID_floatbv_plus, one, round_to_zero});
+  exprt n_minus_1 =
+    convert(ieee_float_op_exprt{n_float, ID_floatbv_minus, one, round_to_zero});
+
+  exprt r_plus_times_y =
+    convert(ieee_float_op_exprt{n_plus_1, ID_floatbv_mult, y, round_to_zero});
+  exprt r_plus = convert(
+    ieee_float_op_exprt{x, ID_floatbv_minus, r_plus_times_y, round_to_zero});
+
+  exprt r_minus_times_y =
+    convert(ieee_float_op_exprt{n_minus_1, ID_floatbv_mult, y, round_to_zero});
+  exprt r_minus = convert(
+    ieee_float_op_exprt{x, ID_floatbv_minus, r_minus_times_y, round_to_zero});
+
+  // Pick the alternative with smaller |result|.
+  // When |best_alt| == |result| (tie at |fmod| == |y/2|), pick the
+  // alternative if the truncated quotient n is odd (IEEE 754: even n).
+  // n is odd iff the LSB of n_float's integer representation is 1.
+  exprt n_int_bv =
+    to_signed_integer(n_float, type.get_width(), round_to_zero, spec);
+  exprt n_is_odd = extractbit_exprt(n_int_bv, 0);
+  exprt best_alt = if_exprt{
+    relation(abs(r_plus, spec), relt::LT, abs(r_minus, spec), spec),
+    r_plus,
+    r_minus};
+  exprt use_alt = or_exprt(
+    relation(abs(best_alt, spec), relt::LT, abs(result, spec), spec),
+    and_exprt(
+      relation(abs(best_alt, spec), relt::EQ, abs(result, spec), spec),
+      n_is_odd));
+  return if_exprt{use_alt, best_alt, result};
 }
 
 exprt float_bvt::relation(

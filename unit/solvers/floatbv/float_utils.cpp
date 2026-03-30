@@ -346,3 +346,76 @@ SCENARIO(
   REQUIRE(round_to_integral(from_double(0x1.0p+52), away) == 0x1.0p+52);
   REQUIRE(round_to_integral(from_double(dmax), away) == dmax);
 }
+
+SCENARIO("float_utils_fma", "[core][solvers][floatbv][float_utils]")
+{
+  // Test fused multiply-add: round(a * b + c) with single rounding.
+  // The key property: the product a*b is computed exactly before adding c.
+
+  satcheckt satcheck(null_message_handler);
+  float_utilst float_utils(satcheck);
+  float_utils.spec = ieee_float_spect::single_precision();
+  auto rm = bv_utilst(satcheck).build_constant(ieee_floatt::ROUND_TO_EVEN, 32);
+  float_utils.set_rounding_mode(rm);
+
+  auto from_float = [](float f)
+  {
+    ieee_float_valuet v{ieee_float_spect::single_precision()};
+    v.from_float(f);
+    return v;
+  };
+
+  auto check_fma = [&](float a, float b, float c, float expected)
+  {
+    const bvt ba = float_utils.build_constant(from_float(a));
+    const bvt bb = float_utils.build_constant(from_float(b));
+    const bvt bc = float_utils.build_constant(from_float(c));
+    const bvt result = float_utils.fma(ba, bb, bc);
+
+    const satcheckt::resultt sat_result = satcheck.prop_solve();
+    REQUIRE(sat_result == satcheckt::resultt::P_SATISFIABLE);
+
+    const ieee_float_valuet fres = float_utils.get(result);
+    const ieee_float_valuet fexp = from_float(expected);
+
+    if(!eq(fres, fexp))
+    {
+      std::cout << "fma(" << a << ", " << b << ", " << c << ") = " << fres
+                << " (expected " << fexp << ")\n";
+    }
+    REQUIRE(eq(fres, fexp));
+  };
+
+  GIVEN("Basic FMA operations")
+  {
+    THEN("Simple cases are correct")
+    {
+      check_fma(2.0f, 3.0f, 4.0f, 10.0f);
+      check_fma(-3.0f, 2.0f, 10.0f, 4.0f);
+      check_fma(0.0f, 100.0f, 5.0f, 5.0f);
+      check_fma(1.0f, 1.0f, -1.0f, 0.0f);
+    }
+  }
+
+  GIVEN("FMA differs from mul+add due to single rounding")
+  {
+    THEN("FMA preserves precision lost by separate mul+add")
+    {
+      // 0x1.fffffep+23 * 0x1.000002p+0 + 1.0:
+      // mul rounds product, losing low bit -> 0x1p+24
+      // FMA keeps exact product -> 0x1.000002p+24
+      check_fma(0x1.fffffep+23f, 0x1.000002p+0f, 1.0f, 0x1.000002p+24f);
+    }
+  }
+
+  GIVEN("FMA for remainder computation")
+  {
+    THEN("fma(-n, y, x) is more precise than x - n*y")
+    {
+      // x = 0x1.d55556p+0, y = 0x1.555556p-2, n = 5
+      // x - 5*y with separate ops: 0x1.55555p-3 (two roundings)
+      // fma(-5, y, x): 0x1.555554p-3 (single rounding, more precise)
+      check_fma(-5.0f, 0x1.555556p-2f, 0x1.d55556p+0f, 0x1.555554p-3f);
+    }
+  }
+}

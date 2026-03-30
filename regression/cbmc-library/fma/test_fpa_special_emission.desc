@@ -1,0 +1,10 @@
+CORE smt-backend
+special_cases.c
+--smt2 --fpa --outfile -
+fp\.fma
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Verify that FMA special cases (NaN, inf) emit fp.fma via FPA backend.

@@ -1,0 +1,8 @@
+CORE
+fp-to-fp-bv-unsupported1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+to_fp from bitvector (reinterpret cast): 0x3F800000 == 1.0f.

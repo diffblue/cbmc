@@ -1,0 +1,9 @@
+CORE
+z3-6972-quant-to-fp-isnan.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+Z3#6972: quantified to_fp/isNaN — counterexample found via BV
+boundary values (NaN pattern) in relevant value set.

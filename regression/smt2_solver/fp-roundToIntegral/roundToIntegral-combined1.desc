@@ -1,0 +1,9 @@
+CORE
+roundToIntegral-combined1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+--
+Based on Z3#4841: Combined constraints on non-standard FP sort.
+Satisfiable with NaN values (NaN + Z = NaN, NaN / Z = NaN, etc.).

@@ -31,14 +31,20 @@ irep_idt rounding_mode_identifier()
 /// yet.
 static bool have_to_adjust_float_expressions(const exprt &expr)
 {
-  if(expr.id()==ID_floatbv_plus ||
-     expr.id()==ID_floatbv_minus ||
-     expr.id()==ID_floatbv_mult ||
-     expr.id()==ID_floatbv_div ||
-     expr.id()==ID_floatbv_div ||
-     expr.id()==ID_floatbv_rem ||
-     expr.id()==ID_floatbv_typecast)
+  if(
+    expr.id() == ID_floatbv_plus || expr.id() == ID_floatbv_minus ||
+    expr.id() == ID_floatbv_mult || expr.id() == ID_floatbv_div ||
+    expr.id() == ID_floatbv_mod || expr.id() == ID_floatbv_rem ||
+    expr.id() == ID_floatbv_typecast)
+  {
     return false;
+  }
+
+  if(expr.id() == ID_floatbv_sqrt && expr.operands().size() == 3)
+    return false;
+
+  if(expr.id() == ID_floatbv_sqrt && expr.operands().size() == 2)
+    return true;
 
   const typet &type = expr.type();
 
@@ -52,6 +58,10 @@ static bool have_to_adjust_float_expressions(const exprt &expr)
       expr.id() == ID_div)
       return true;
   }
+
+  // FMA needs rounding mode added (3 operands -> 4)
+  if(expr.id() == ID_floatbv_fma && expr.operands().size() == 3)
+    return true;
 
   if(expr.id()==ID_typecast)
   {
@@ -129,6 +139,20 @@ void adjust_float_expressions(exprt &expr, const exprt &rounding_mode)
       expr.operands().resize(3);
       to_ieee_float_op_expr(expr).rounding_mode() = rounding_mode;
     }
+
+    if(expr.id() == ID_floatbv_sqrt && expr.operands().size() == 2)
+    {
+      // sqrt: add rounding mode as 3rd operand
+      expr.operands().resize(3);
+      to_ieee_float_op_expr(expr).rounding_mode() = rounding_mode;
+    }
+  }
+
+  // Add rounding mode to FMA
+  if(expr.id() == ID_floatbv_fma && expr.operands().size() == 3)
+  {
+    expr.operands().resize(4);
+    to_floatbv_fma_expr(expr).rounding_mode() = rounding_mode;
   }
 
   if(expr.id()==ID_typecast)

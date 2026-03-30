@@ -110,9 +110,21 @@ float __CPROVER_fabsf(float x);
 double __CPROVER_fmod(double, double);
 float __CPROVER_fmodf(float, float);
 long double __CPROVER_fmodl(long double, long double);
+double __CPROVER_fmin(double, double);
+float __CPROVER_fminf(float, float);
+long double __CPROVER_fminl(long double, long double);
+double __CPROVER_fmax(double, double);
+float __CPROVER_fmaxf(float, float);
+long double __CPROVER_fmaxl(long double, long double);
+double __CPROVER_sqrt(double);
+float __CPROVER_sqrtf(float);
+long double __CPROVER_sqrtl(long double);
 double __CPROVER_remainder(double, double);
 float __CPROVER_remainderf(float, float);
 long double __CPROVER_remainderl(long double, long double);
+double __CPROVER_fma(double, double, double);
+float __CPROVER_fmaf(float, float, float);
+long double __CPROVER_fmal(long double, long double, long double);
 
 // arrays
 __CPROVER_bool __CPROVER_array_equal(const void *array1, const void *array2);

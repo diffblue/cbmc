@@ -1,0 +1,8 @@
+CORE
+z3-6117-fma.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+--
+fp.fma now supported.

@@ -3341,7 +3341,8 @@ exprt c_typecheck_baset::do_special_functions(
   else if(
     identifier == CPROVER_PREFIX "fmod" ||
     identifier == CPROVER_PREFIX "fmodf" ||
-    identifier == CPROVER_PREFIX "fmodl")
+    identifier == CPROVER_PREFIX "fmodl" ||
+    identifier == CPROVER_PREFIX "fmodf16")
   {
     if(expr.arguments().size() != 2)
     {
@@ -3363,9 +3364,75 @@ exprt c_typecheck_baset::do_special_functions(
     return std::move(fmod_expr);
   }
   else if(
+    identifier == CPROVER_PREFIX "fmin" ||
+    identifier == CPROVER_PREFIX "fminf" ||
+    identifier == CPROVER_PREFIX "fminl")
+  {
+    if(expr.arguments().size() != 2)
+    {
+      error().source_location = f_op.source_location();
+      error() << "fmin-functions expect two operands" << eom;
+      throw 0;
+    }
+
+    typecheck_function_call_arguments(expr);
+
+    binary_exprt fmin_expr(
+      expr.arguments()[0], ID_floatbv_min, expr.arguments()[1]);
+
+    fmin_expr.add_source_location() = source_location;
+
+    return std::move(fmin_expr);
+  }
+  else if(
+    identifier == CPROVER_PREFIX "fmax" ||
+    identifier == CPROVER_PREFIX "fmaxf" ||
+    identifier == CPROVER_PREFIX "fmaxl")
+  {
+    if(expr.arguments().size() != 2)
+    {
+      error().source_location = f_op.source_location();
+      error() << "fmax-functions expect two operands" << eom;
+      throw 0;
+    }
+
+    typecheck_function_call_arguments(expr);
+
+    binary_exprt fmax_expr(
+      expr.arguments()[0], ID_floatbv_max, expr.arguments()[1]);
+
+    fmax_expr.add_source_location() = source_location;
+
+    return std::move(fmax_expr);
+  }
+  else if(
+    identifier == CPROVER_PREFIX "sqrt" ||
+    identifier == CPROVER_PREFIX "sqrtf" ||
+    identifier == CPROVER_PREFIX "sqrtl")
+  {
+    if(expr.arguments().size() != 1)
+    {
+      error().source_location = f_op.source_location();
+      error() << "sqrt-functions expect one operand" << eom;
+      throw 0;
+    }
+
+    typecheck_function_call_arguments(expr);
+
+    // Create as binary_exprt; adjust_float_expressions will add
+    // the rounding mode as a third operand.
+    binary_exprt sqrt_expr(
+      expr.arguments()[0], ID_floatbv_sqrt, expr.arguments()[0]);
+
+    sqrt_expr.add_source_location() = source_location;
+
+    return std::move(sqrt_expr);
+  }
+  else if(
     identifier == CPROVER_PREFIX "remainder" ||
     identifier == CPROVER_PREFIX "remainderf" ||
-    identifier == CPROVER_PREFIX "remainderl")
+    identifier == CPROVER_PREFIX "remainderl" ||
+    identifier == CPROVER_PREFIX "remainderf16")
   {
     if(expr.arguments().size() != 2)
     {
@@ -3385,6 +3452,29 @@ exprt c_typecheck_baset::do_special_functions(
     floatbv_rem_expr.add_source_location() = source_location;
 
     return std::move(floatbv_rem_expr);
+  }
+  else if(
+    identifier == CPROVER_PREFIX "fma" || identifier == CPROVER_PREFIX "fmaf" ||
+    identifier == CPROVER_PREFIX "fmal" ||
+    identifier == CPROVER_PREFIX "fmaf16")
+  {
+    if(expr.arguments().size() != 3)
+    {
+      error().source_location = f_op.source_location();
+      error() << "fma-functions expect three operands" << eom;
+      throw 0;
+    }
+
+    typecheck_function_call_arguments(expr);
+
+    // Create with 3 operands; adjust_float_expressions adds rounding mode
+    typet result_type = expr.arguments()[0].type();
+    multi_ary_exprt fma_expr(
+      ID_floatbv_fma, expr.arguments(), std::move(result_type));
+
+    fma_expr.add_source_location() = source_location;
+
+    return std::move(fma_expr);
   }
   else if(identifier==CPROVER_PREFIX "allocate")
   {

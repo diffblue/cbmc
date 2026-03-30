@@ -1,0 +1,7 @@
+CORE
+fp-rem-nonstandard1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+--
+Based on Z3#8414: fp.rem on non-standard FP sort should not crash.

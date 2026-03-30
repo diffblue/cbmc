@@ -1,0 +1,8 @@
+; Z3#4862: conversion from (_ FloatingPoint 11 53) to (_ FloatingPoint 9 53)
+(set-logic QF_FP)
+(declare-fun X () (_ FloatingPoint 11 53))
+(declare-fun Y () (_ FloatingPoint 9 53))
+(assert (fp.leq X (fp #b0 #b10011111110 #b1111111111111111111111111111111111111111111111111111)))
+(assert (= Y ((_ to_fp 9 53) RNE X)))
+(assert (not (fp.isInfinite Y)))
+(check-sat)

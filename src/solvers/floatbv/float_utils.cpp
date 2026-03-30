@@ -163,8 +163,48 @@ bvt float_utilst::round_to_integral(const bvt &src)
   // add 2^f, where f is the number of fraction bits,
   // by adding f to the exponent
   auto magic_number = ieee_floatt{
-    spec, ieee_floatt::rounding_modet::ROUND_TO_ZERO, power(2, spec.f)};
+    spec, ieee_floatt::rounding_modet::ROUND_TO_PLUS_INF, power(2, spec.f)};
 
+  // Check if the magic number is representable (not infinity).
+  // For non-standard sorts with small exponent range, 2^f may exceed
+  // the maximum representable value. We use ROUND_TO_PLUS_INF to ensure
+  // overflow produces infinity rather than clamping to max finite.
+  if(magic_number.is_infinity())
+  {
+    // Fall back: convert to a wider format where the magic number trick
+    // works, round there, then convert back.
+    // We need e' such that 2^f < 2^(2^(e'-1)-1), i.e., e' > log2(f)+2.
+    std::size_t wider_e = spec.e;
+    while(ieee_floatt{
+      ieee_float_spect(spec.f, wider_e),
+      ieee_floatt::rounding_modet::ROUND_TO_PLUS_INF,
+      power(2, spec.f)}
+            .is_infinity())
+    {
+      wider_e++;
+    }
+
+    ieee_float_spect wider_spec(spec.f, wider_e);
+
+    // Save and restore spec around conversions
+    auto saved_spec = spec;
+
+    // Convert src to wider format
+    bvt wider = conversion(src, wider_spec);
+
+    // Round in wider format
+    spec = wider_spec;
+    bvt rounded = round_to_integral(wider);
+
+    // Convert back to original format
+    bvt result = conversion(rounded, saved_spec);
+
+    spec = saved_spec;
+    return result;
+  }
+
+  // The magic number is exactly representable, so rounding mode
+  // doesn't matter for build_constant.
   auto magic_number_bv = build_constant(magic_number);
 
   // abs(x) >= magic_number? If so, then there is no fractional part.
@@ -494,6 +534,121 @@ bvt float_utilst::mul(const bvt &src1, const bvt &src2)
   return round_and_pack(result);
 }
 
+bvt float_utilst::fma(
+  const bvt &multiply_lhs,
+  const bvt &multiply_rhs,
+  const bvt &addend)
+{
+  // Fused multiply-add: round(src1 * src2 + src3) with a single rounding.
+  // The product src1 * src2 is computed exactly (double-width fraction),
+  // then src3 is added, and the result is rounded once.
+
+  const unbiased_floatt unpacked_lhs = unpack(multiply_lhs);
+  const unbiased_floatt unpacked_rhs = unpack(multiply_rhs);
+  const unbiased_floatt unpacked_add = unpack(addend);
+
+  // --- Exact product a*b ---
+  const std::size_t frac_size = unpacked_lhs.fraction.size(); // f+1
+
+  bvt prod_fraction = bv_utils.unsigned_multiplier(
+    bv_utils.zero_extension(unpacked_lhs.fraction, frac_size * 2),
+    bv_utils.zero_extension(unpacked_rhs.fraction, frac_size * 2));
+  // Product fraction has width 2*(f+1) bits (double-width fraction w.r.t.
+  // inputs).
+  // The value is prod_fraction * 2^(prod_exponent - (prod_fraction.size()-1)).
+  // Keep full width for exact intermediate result.
+
+  bvt prod_exponent = bv_utils.add(
+    bv_utils.sign_extension(
+      unpacked_lhs.exponent, unpacked_lhs.exponent.size() + 2),
+    bv_utils.sign_extension(
+      unpacked_rhs.exponent, unpacked_rhs.exponent.size() + 2));
+  prod_exponent = bv_utils.inc(prod_exponent);
+
+  literalt prod_sign = prop.lxor(unpacked_lhs.sign, unpacked_rhs.sign);
+
+  // --- Align c's fraction to the product's wider format ---
+  // Product fraction: prod_width bits, binary point after MSB.
+  // c fraction: (f+1) bits. Pad on the right to match width, then
+  // adjust exponent to compensate.
+  const std::size_t prod_width = prod_fraction.size();
+  const std::size_t c_pad = prod_width - frac_size;
+  bvt c_fraction =
+    bv_utils.concatenate(bv_utils.zeros(c_pad), unpacked_add.fraction);
+  bvt c_exponent =
+    bv_utils.sign_extension(unpacked_add.exponent, prod_exponent.size());
+
+  // --- Add product + c (same logic as add_sub) ---
+  bvt exp_diff = bv_utils.sub(prod_exponent, c_exponent);
+  literalt c_bigger = exp_diff.back();
+
+  bvt bigger_exp = bv_utils.select(c_bigger, c_exponent, prod_exponent);
+  bvt big_frac = bv_utils.select(c_bigger, c_fraction, prod_fraction);
+  bvt small_frac = bv_utils.select(c_bigger, prod_fraction, c_fraction);
+
+  bvt distance = bv_utils.absolute_value(exp_diff);
+  bvt limited_dist = limit_distance(distance, mp_integer(prod_width + 3));
+
+  bvt big_padded = bv_utils.concatenate(bv_utils.zeros(3), big_frac);
+  bvt small_padded = bv_utils.concatenate(bv_utils.zeros(3), small_frac);
+
+  literalt sticky_bit;
+  bvt small_shifted =
+    sticky_right_shift(small_padded, limited_dist, sticky_bit);
+  small_shifted[0] = prop.lor(small_shifted[0], sticky_bit);
+
+  bvt big_ext = bv_utils.zero_extension(big_padded, big_padded.size() + 2);
+  bvt small_ext =
+    bv_utils.zero_extension(small_shifted, small_shifted.size() + 2);
+
+  literalt subtract_lit = prop.lxor(prod_sign, unpacked_add.sign);
+  bvt sum = bv_utils.add_sub(big_ext, small_ext, subtract_lit);
+
+  literalt fraction_sign = sum.back();
+  sum = bv_utils.absolute_value(sum);
+
+  unbiased_floatt result;
+  result.fraction = sum;
+  result.exponent = bv_utils.add(
+    bv_utils.sign_extension(bigger_exp, bigger_exp.size() + 1),
+    bv_utils.build_constant(2, bigger_exp.size() + 1));
+
+  // Sign
+  literalt add_sub_sign = prop.lxor(
+    prop.lselect(c_bigger, unpacked_add.sign, prod_sign), fraction_sign);
+
+  // NaN: any input NaN, inf*0, or inf+(-inf) in the addition
+  literalt prod_inf = prop.lor(unpacked_lhs.infinity, unpacked_rhs.infinity);
+  result.NaN = prop.lor(
+    {is_NaN(multiply_lhs),
+     is_NaN(multiply_rhs),
+     is_NaN(addend),
+     prop.land(unpacked_lhs.zero, unpacked_rhs.infinity),
+     prop.land(unpacked_rhs.zero, unpacked_lhs.infinity),
+     prop.land(
+       prop.land(prod_inf, unpacked_add.infinity),
+       prop.lxor(prod_sign, unpacked_add.sign))});
+
+  result.infinity =
+    prop.land(!result.NaN, prop.lor(prod_inf, unpacked_add.infinity));
+
+  result.zero = prop.land(
+    !prop.lor(result.infinity, result.NaN), !prop.lor(result.fraction));
+
+  literalt infinity_sign = prop.lselect(prod_inf, prod_sign, unpacked_add.sign);
+  literalt zero_sign = prop.lselect(
+    rounding_mode_bits.round_to_minus_inf,
+    prop.lor(prod_sign, unpacked_add.sign),
+    prop.land(prod_sign, unpacked_add.sign));
+
+  result.sign = prop.lselect(
+    result.infinity,
+    infinity_sign,
+    prop.lselect(result.zero, zero_sign, add_sub_sign));
+
+  return round_and_pack(result);
+}
+
 bvt float_utilst::div(const bvt &src1, const bvt &src2)
 {
   // unpack
@@ -575,20 +730,256 @@ bvt float_utilst::div(const bvt &src1, const bvt &src2)
 
 bvt float_utilst::rem(const bvt &src1, const bvt &src2)
 {
-  /* The semantics of floating-point remainder implemented as below
-     is the sensible one.  Unfortunately this is not the one required
-     by IEEE-754 or fmod / remainder.  Martin has discussed the
-     'correct' semantics with Christoph and Alberto at length as
-     well as talking to various hardware designers and we still
-     hasn't found a good way to implement them in a solver.
-     We have some approaches that are correct but they really
-     don't scale. */
+  PRECONDITION(src1.size() == src2.size());
 
   const unbiased_floatt unpacked2 = unpack(src2);
 
-  // stub: do (src2.infinity ? src1 : (src1/src2)*src2))
+  // IEEE 754 fmod/remainder (see doc/proofs/ for Coq/HOL Light proofs).
+  //
+  // Proved properties and corresponding _Float16 exhaustive tests:
+  //   remainder_format     → remainderf/_Float16.desc (|r| <= |y|/2)
+  //   fmod_then_remainder  → remainderf/fmod_bound.desc (|fmod| < |y|)
+  //   comparison_step      → remainderf/_Float16.desc (min-selection)
+  //   special cases        → remainderf/special_cases.desc
+  //   nearest_int_small    → remainderf/_Float16.desc (n ∈ {-1,0,1})
+  //
+  // Step 1: Compute fmod(x, y) via integer significand arithmetic.
+  //   Align significands, compute mx_aligned mod my_aligned.
+  //   Result r_int < my_aligned, so r_int < 2^(f+1) and converts
+  //   to float exactly. (Coq: fmod_then_remainder, remainder_format)
+  // Step 2 (remainder only): Compute remainder(fmod, y) via FMA.
+  //   Since |fmod| < |y|, the quotient n is in {-1, 0, 1}.
+  //   (Coq: nearest_int_small)
+  //   Try n, n+1, n-1 and pick smallest |result|.
+  //   The correct candidate is exact (Coq: fma_remainder_exact).
+  //   Wrong candidates have |result| >= |r_correct|
+  //   (Coq: rounding_preserves_remainder_comparison).
+  //   So min-selection picks the correct IEEE remainder.
+
+  const unbiased_floatt unpacked1 = unpack(src1);
+  const std::size_t frac_bits = unpacked1.fraction.size();
+
+  // Exponent difference
+  bvt exp1 =
+    bv_utils.sign_extension(unpacked1.exponent, unpacked1.exponent.size() + 1);
+  bvt exp2 =
+    bv_utils.sign_extension(unpacked2.exponent, unpacked2.exponent.size() + 1);
+  bvt exp_diff = bv_utils.sub(exp1, exp2);
+  literalt ex_ge_ey = !exp_diff.back();
+  bvt abs_exp_diff = bv_utils.absolute_value(exp_diff);
+
+  // Integer width for aligned significands.
+  // Note: this is O(2^e) bits, which is feasible for half (45 bits),
+  // float (282 bits), and double (2099 bits), but infeasible for
+  // long double/quad (32834 bits). Use the SMT FPA backend for those.
+  const std::size_t int_width = (std::size_t(1) << spec.e) + frac_bits + 2;
+  bvt shift_dist = limit_distance(abs_exp_diff, mp_integer(int_width));
+
+  bvt mx = bv_utils.zero_extension(unpacked1.fraction, int_width);
+  bvt my = bv_utils.zero_extension(unpacked2.fraction, int_width);
+
+  // Align: shift the one with larger exponent left
+  bvt mx_aligned = bv_utils.select(
+    ex_ge_ey,
+    bv_utils.shift(mx, bv_utilst::shiftt::SHIFT_LEFT, shift_dist),
+    mx);
+  bvt my_aligned = bv_utils.select(
+    ex_ge_ey,
+    my,
+    bv_utils.shift(my, bv_utilst::shiftt::SHIFT_LEFT, shift_dist));
+
+  // Integer remainder: fmod significand (unsigned)
+  bvt r_int = bv_utils.remainder(
+    mx_aligned, my_aligned, bv_utilst::representationt::UNSIGNED);
+
+  // Integer quotient LSB (needed for remainder tie-breaking)
+  bvt q_int = bv_utils.divider(
+    mx_aligned, my_aligned, bv_utilst::representationt::UNSIGNED);
+  literalt trunc_q_odd = q_int[0];
+
+  // Pack as float: value = r_int * 2^min(ex,ey), sign = sign(x)
+  bvt min_exp = bv_utils.select(ex_ge_ey, exp2, exp1);
+  // The unbiased_floatt convention:
+  //   value = fraction * 2^(exponent - (frac_size-1))
+  // We want value = r_int * 2^(min_exp - (frac_bits - 1))
+  // With fraction.size() = int_width:
+  //   exponent - (int_width - 1) = min_exp - (frac_bits - 1)
+  //   exponent = min_exp + int_width - frac_bits
+  bvt adjusted_exp = bv_utils.add(
+    bv_utils.sign_extension(min_exp, spec.e + 2),
+    bv_utils.build_constant(
+      mp_integer(int_width) - mp_integer(frac_bits), spec.e + 2));
+  unbiased_floatt fmod_unpacked;
+  fmod_unpacked.fraction = r_int;
+  fmod_unpacked.exponent = adjusted_exp;
+  fmod_unpacked.sign = unpacked1.sign;
+  fmod_unpacked.NaN = const_literal(false);
+  fmod_unpacked.infinity = const_literal(false);
+  fmod_unpacked.zero = bv_utils.is_zero(r_int);
+  bvt fmod_result = round_and_pack(fmod_unpacked);
+
+  // Handle IEEE 754 special cases:
+  //   fmod(x, ±0)    = NaN
+  //   fmod(±inf, y)   = NaN
+  //   fmod(NaN, y)    = NaN
+  //   fmod(x, NaN)    = NaN
+  //   fmod(±0, y)     = ±0 (= x)
+  //   fmod(x, ±inf)   = x
+  literalt nan_result = prop.lor(
+    {unpacked1.infinity, unpacked1.NaN, unpacked2.NaN, unpacked2.zero});
+  ieee_floatt nan_val(
+    ieee_float_spect{spec}, ieee_floatt::rounding_modet::ROUND_TO_EVEN);
+  nan_val.make_NaN();
+  bvt nan_bv = build_constant(nan_val);
+  fmod_result = bv_utils.select(nan_result, nan_bv, fmod_result);
+  // x is ±0 and no NaN condition → return x (±0)
+  fmod_result =
+    bv_utils.select(prop.land(unpacked1.zero, !nan_result), src1, fmod_result);
+  // y is ±inf and no NaN condition → return x
+  fmod_result = bv_utils.select(
+    prop.land(unpacked2.infinity, !nan_result), src1, fmod_result);
+
+  // For fmod (ROUND_TO_ZERO), we're done
+  bvt result = fmod_result;
+
+  if(!rounding_mode_bits.round_to_zero.is_true())
+  {
+    // Step 2: remainder(fmod, y) via FMA. |fmod/y| < 1, n ∈ {-1,0,1}.
+    bvt small_q = round_to_integral(div(fmod_result, src2));
+    result = fma(negate(small_q), src2, fmod_result);
+
+    bvt one = build_constant(
+      ieee_floatt{spec, ieee_floatt::rounding_modet::ROUND_TO_ZERO, 1});
+    bvt r_plus = fma(negate(add(small_q, one)), src2, fmod_result);
+    bvt r_minus = fma(negate(sub(small_q, one)), src2, fmod_result);
+
+    bvt best_alt = bv_utils.select(
+      relation(abs(r_plus), relt::LT, abs(r_minus)), r_plus, r_minus);
+    // Use alternative if |alt| < |result|, OR if |alt| == |result| and
+    // the truncated quotient is odd (IEEE 754 tie-breaking: pick even n).
+    // When |fmod| == |y/2|, small_q=0 gives n=trunc_q (odd),
+    // small_q=±1 gives n=trunc_q±1 (even). So use alt when trunc_q odd.
+    literalt use_alt = prop.lor(
+      relation(abs(best_alt), relt::LT, abs(result)),
+      prop.land(relation(abs(best_alt), relt::EQ, abs(result)), trunc_q_odd));
+    result = bv_utils.select(use_alt, best_alt, result);
+  }
+
+  return result;
+}
+
+bvt float_utilst::sqrt(const bvt &src)
+{
+  PRECONDITION(src.size() == spec.width());
+
+  const unbiased_floatt unpacked = unpack(src);
+
+  // Create nondeterministic candidate r_low (the floor of the sqrt)
+  bvt r_low;
+  r_low.resize(spec.width());
+  for(auto &bit : r_low)
+    bit = prop.new_variable();
+
+  literalt is_normal_case = prop.land(
+    {!unpacked.zero, !unpacked.NaN, !unpacked.infinity, !unpacked.sign});
+
+  // r_low must be positive, not zero, not infinity, not NaN
+  prop.l_set_to_true(prop.limplies(is_normal_case, !sign_bit(r_low)));
+  prop.l_set_to_true(prop.limplies(is_normal_case, !is_zero(r_low)));
+  prop.l_set_to_true(prop.limplies(is_normal_case, !is_infinity(r_low)));
+  prop.l_set_to_true(prop.limplies(is_normal_case, !is_NaN(r_low)));
+
+  // r_high = r_low + 1 ulp (next positive FP value)
+  bvt r_high = bv_utils.add(r_low, bv_utils.build_constant(1, spec.width()));
+
+  // Pre-compute predicates on original-width values before changing spec
+  literalt r_high_inf = is_infinity(r_high);
+
+  // Compute r_low^2 and r_high^2 exactly using a wider format.
+  // With double the significand bits, the product of two f-bit
+  // significands fits exactly (no rounding needed).
+  ieee_float_spect wide_spec(spec.f * 2 + 1, spec.e + 1);
+
+  auto saved_spec = spec;
+  auto saved_rm = rounding_mode_bits;
+
+  // Convert r_low, r_high, src to wider format
+  INVARIANT(
+    r_low.size() == spec.width(), "r_low size matches spec before conversion");
+  INVARIANT(
+    r_low.size() == saved_spec.width(),
+    "r_low size matches saved_spec before conversion");
+  bvt r_low_wide = conversion(r_low, wide_spec);
+  // conversion() mutates spec as a side effect — restore it
+  spec = saved_spec;
+  INVARIANT(
+    r_low_wide.size() == wide_spec.width(), "r_low_wide has wide width");
+  bvt r_high_wide = conversion(r_high, wide_spec);
+  spec = saved_spec;
+  bvt x_wide = conversion(src, wide_spec);
+  spec = saved_spec;
+
+  // Switch to wide spec for squaring
+  spec = wide_spec;
+  rounding_mode_bits.round_to_even = const_literal(true);
+  rounding_mode_bits.round_to_plus_inf = const_literal(false);
+  rounding_mode_bits.round_to_minus_inf = const_literal(false);
+  rounding_mode_bits.round_to_zero = const_literal(false);
+  rounding_mode_bits.round_to_away = const_literal(false);
+
+  INVARIANT(r_low_wide.size() == spec.width(), "r_low_wide matches wide spec");
+  bvt r_low_sq = mul(r_low_wide, r_low_wide);
+  bvt r_high_sq = mul(r_high_wide, r_high_wide);
+
+  // Constraints in wide format (exact comparisons)
+  prop.l_set_to_true(
+    prop.limplies(is_normal_case, relation(r_low_sq, relt::LE, x_wide)));
+  prop.l_set_to_true(prop.limplies(
+    prop.land(is_normal_case, !r_high_inf),
+    relation(r_high_sq, relt::GT, x_wide)));
+
+  // Exact check and distance comparison
+  literalt r_low_exact = relation(r_low_sq, relt::EQ, x_wide);
+  bvt dist_low = sub(x_wide, r_low_sq);
+  bvt dist_high = sub(r_high_sq, x_wide);
+  literalt high_closer = relation(dist_high, relt::LT, dist_low);
+  literalt equal_dist = relation(dist_high, relt::EQ, dist_low);
+
+  // Restore original spec and rounding mode
+  spec = saved_spec;
+  rounding_mode_bits = saved_rm;
+
+  // RNE tie-breaking: prefer even (r_high is even iff r_low is odd)
+  literalt r_high_is_even = !r_low[0];
+
+  // Select based on rounding mode
+  literalt use_r_high_rtp =
+    prop.land(rounding_mode_bits.round_to_plus_inf, !r_low_exact);
+  literalt use_r_high_rne = prop.land(
+    rounding_mode_bits.round_to_even,
+    prop.lor(high_closer, prop.land(equal_dist, r_high_is_even)));
+  literalt use_r_high_rna = prop.land(
+    rounding_mode_bits.round_to_away, prop.lor(high_closer, equal_dist));
+
+  literalt use_r_high = prop.land(
+    !r_low_exact, prop.lor({use_r_high_rtp, use_r_high_rne, use_r_high_rna}));
+
+  bvt result = bv_utils.select(use_r_high, r_high, r_low);
+
+  // Handle special cases
+  bvt nan_result = build_constant(ieee_float_valuet::NaN(spec));
+  bvt inf_result = build_constant(ieee_float_valuet::plus_infinity(spec));
+
+  literalt is_nan_result =
+    prop.lor(unpacked.NaN, prop.land(!unpacked.zero, unpacked.sign));
+
   return bv_utils.select(
-    unpacked2.infinity, src1, sub(src1, mul(div(src1, src2), src2)));
+    is_nan_result,
+    nan_result,
+    bv_utils.select(
+      unpacked.infinity,
+      inf_result,
+      bv_utils.select(unpacked.zero, src, result)));
 }
 
 bvt float_utilst::negate(const bvt &src)

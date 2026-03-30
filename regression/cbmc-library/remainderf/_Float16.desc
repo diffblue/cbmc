@@ -1,0 +1,11 @@
+CORE
+_Float16.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Fully symbolic _Float16 remainder: verifies the IEEE 754 property
+|remainder(x,y)| <= |y|/2 for ALL finite _Float16 inputs (~3s).

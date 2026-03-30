@@ -374,12 +374,82 @@ exprt smt2_parsert::multi_ary(irep_idt id, const exprt::operandst &op)
 
 exprt smt2_parsert::binary_predicate(irep_idt id, const exprt::operandst &op)
 {
-  if(op.size()!=2)
+  if(op.size() != 2)
     throw error("expression must have two operands");
 
-  check_matching_operand_types(op);
+  // Handle fp.to_real comparisons with real constants:
+  // convert the real constant to the same scaled integer type.
+  auto adjusted = op;
+  for(int i = 0; i < 2; i++)
+  {
+    int other = 1 - i;
+    if(
+      adjusted[i].id() == ID_floatbv_to_real &&
+      (adjusted[other].type().id() == ID_real ||
+       adjusted[other].type().id() == ID_integer) &&
+      adjusted[other].is_constant())
+    {
+      const auto &target_type = adjusted[i].type();
+      const auto &fp_type =
+        to_floatbv_type(to_unary_expr(adjusted[i]).op().type());
+      const ieee_float_spect spec(fp_type);
+      std::size_t bias = (1u << (spec.e - 1)) - 1;
+      std::size_t scale = spec.f + bias;
+      std::size_t int_width = to_signedbv_type(target_type).get_width();
 
-  return binary_predicate_exprt(op[0], id, op[1]);
+      // Parse the real constant and scale it
+      const auto &val_str =
+        id2string(to_constant_expr(adjusted[other]).get_value());
+      auto dot_pos = val_str.find('.');
+      mp_integer significand;
+      mp_integer decimal_exp;
+      if(dot_pos == std::string::npos)
+      {
+        significand = string2integer(val_str);
+        decimal_exp = 0;
+      }
+      else
+      {
+        std::string s;
+        for(auto ch : val_str)
+          if(ch != '.')
+            s += ch;
+        significand = string2integer(s);
+        decimal_exp = mp_integer(dot_pos) - mp_integer(val_str.size()) + 1;
+      }
+
+      // Compute exact rational: significand * 10^decimal_exp
+      // Scale by 2^scale: result = significand * 10^decimal_exp * 2^scale
+      // = significand * 2^scale * 5^decimal_exp * 2^decimal_exp
+      // = significand * 2^(scale + decimal_exp) * 5^decimal_exp
+      // (when decimal_exp < 0, we have division by 5^|decimal_exp|)
+      mp_integer result;
+      if(decimal_exp >= 0)
+      {
+        result = significand * power(mp_integer(10), decimal_exp) *
+                 power(mp_integer(2), mp_integer(scale));
+      }
+      else
+      {
+        // significand * 2^scale / 10^|decimal_exp|
+        // = significand * 2^scale / (2^|de| * 5^|de|)
+        // = significand * 2^(scale - |de|) / 5^|de|
+        mp_integer abs_de = -decimal_exp;
+        mp_integer pow5 = power(mp_integer(5), abs_de);
+        mp_integer pow2_num = power(mp_integer(2), mp_integer(scale));
+        mp_integer pow2_den = power(mp_integer(2), abs_de);
+        result = (significand * pow2_num) / (pow5 * pow2_den);
+        // Note: this truncates. For exact representation, the real
+        // constant must be exactly representable as n/2^scale.
+      }
+
+      adjusted[other] = from_integer(result, signedbv_typet(int_width));
+    }
+  }
+
+  check_matching_operand_types(adjusted);
+
+  return binary_predicate_exprt(adjusted[0], id, adjusted[1]);
 }
 
 exprt smt2_parsert::unary(irep_idt id, const exprt::operandst &op)
@@ -724,8 +794,43 @@ exprt smt2_parsert::function_application()
           // width_f *includes* the hidden bit
           const ieee_float_spect spec(width_f - 1, width_e);
 
-          auto rounding_mode = expression();
+          auto first_operand = expression();
 
+          // Check if this is a 1-argument form (reinterpret cast from BV)
+          // or a 2-argument form (rounding_mode + source).
+          if(smt2_tokenizer.peek() == smt2_tokenizert::CLOSE)
+          {
+            // 1-argument form: ((_ to_fp eb sb) BitVec)
+            // This is a reinterpret cast from bitvector to FP.
+            next_token(); // consume the ')'
+
+            if(
+              first_operand.type().id() != ID_unsignedbv &&
+              first_operand.type().id() != ID_bv)
+            {
+              throw error()
+                << "to_fp with one operand requires a BitVec operand";
+            }
+
+            auto bv_width =
+              first_operand.type().id() == ID_unsignedbv
+                ? to_unsignedbv_type(first_operand.type()).get_width()
+                : to_bv_type(first_operand.type()).get_width();
+
+            if(bv_width != spec.width())
+            {
+              throw error()
+                << "to_fp BitVec width " << bv_width
+                << " does not match FloatingPoint width " << spec.width();
+            }
+
+            return typecast_exprt(
+              typecast_exprt(first_operand, bv_typet(bv_width)),
+              spec.to_type());
+          }
+
+          // 2-argument form: first_operand is the rounding mode
+          auto &rounding_mode = first_operand;
           auto source_op = expression();
 
           if(next_token() != smt2_tokenizert::CLOSE)
@@ -739,12 +844,12 @@ exprt smt2_parsert::function_application()
             source_op.type().id() == ID_real ||
             source_op.type().id() == ID_integer)
           {
-            // For now, we can only do this when
-            // the source operand is a constant.
+            // Handle constant reals and rational constants (/ p q)
+            mp_integer significand, exponent;
+            bool is_constant_real = false;
+
             if(source_op.is_constant())
             {
-              mp_integer significand, exponent;
-
               const auto &real_number =
                 id2string(to_constant_expr(source_op).get_value());
               auto dot_pos = real_number.find('.');
@@ -768,7 +873,77 @@ exprt smt2_parsert::function_application()
                   mp_integer(dot_pos) - mp_integer(real_number.size()) + 1;
                 significand = string2integer(significand_str);
               }
+              is_constant_real = true;
+            }
+            else if(
+              source_op.id() == ID_div &&
+              to_binary_expr(source_op).op0().is_constant() &&
+              to_binary_expr(source_op).op1().is_constant())
+            {
+              // Rational constant: (/ p q)
+              const auto &p_str = id2string(
+                to_constant_expr(to_binary_expr(source_op).op0()).get_value());
+              const auto &q_str = id2string(
+                to_constant_expr(to_binary_expr(source_op).op1()).get_value());
 
+              // Parse p
+              mp_integer p_sig, p_exp;
+              auto p_dot = p_str.find('.');
+              if(p_dot == std::string::npos)
+              {
+                p_exp = 0;
+                p_sig = string2integer(p_str);
+              }
+              else
+              {
+                std::string s;
+                for(auto ch : p_str)
+                  if(ch != '.')
+                    s += ch;
+                p_exp = mp_integer(p_dot) - mp_integer(p_str.size()) + 1;
+                p_sig = string2integer(s);
+              }
+
+              // Parse q
+              mp_integer q_sig, q_exp;
+              auto q_dot = q_str.find('.');
+              if(q_dot == std::string::npos)
+              {
+                q_exp = 0;
+                q_sig = string2integer(q_str);
+              }
+              else
+              {
+                std::string s;
+                for(auto ch : q_str)
+                  if(ch != '.')
+                    s += ch;
+                q_exp = mp_integer(q_dot) - mp_integer(q_str.size()) + 1;
+                q_sig = string2integer(s);
+              }
+
+              // p/q = (p_sig * 10^p_exp) / (q_sig * 10^q_exp)
+              //     = (p_sig / q_sig) * 10^(p_exp - q_exp)
+              // Use ieee_floatt to compute this via from_base10 on
+              // the numerator, then divide by the denominator.
+              ieee_floatt a(
+                spec,
+                static_cast<ieee_floatt::rounding_modet>(
+                  numeric_cast_v<int>(to_constant_expr(rounding_mode))));
+              a.from_base10(p_sig, p_exp);
+
+              ieee_floatt b(
+                spec,
+                static_cast<ieee_floatt::rounding_modet>(
+                  numeric_cast_v<int>(to_constant_expr(rounding_mode))));
+              b.from_base10(q_sig, q_exp);
+
+              a /= b;
+              return a.to_expr();
+            }
+
+            if(is_constant_real)
+            {
               ieee_floatt a(
                 spec,
                 static_cast<ieee_floatt::rounding_modet>(
@@ -776,9 +951,9 @@ exprt smt2_parsert::function_application()
               a.from_base10(significand, exponent);
               return a.to_expr();
             }
-            else
-              throw error()
-                << "to_fp for non-constant real expressions is not implemented";
+
+            throw error()
+              << "to_fp for non-constant real expressions is not implemented";
           }
           else if(source_op.type().id() == ID_unsignedbv)
           {
@@ -854,13 +1029,22 @@ exprt smt2_parsert::function_application()
           if(op[1].type().id() != ID_floatbv)
             throw error() << id << " takes a FloatingPoint operand";
 
+          // First round to integral with the given rounding mode,
+          // then convert to integer with RTZ. This avoids the
+          // precondition in float_utilst::to_integer() that requires
+          // round_to_zero.
+          auto rounded = floatbv_round_to_integral_exprt(op[1], op[0]);
+          auto rtz =
+            from_integer(ieee_floatt::ROUND_TO_ZERO, unsignedbv_typet(32));
+
           if(id == "fp.to_sbv")
             return typecast_exprt(
-              floatbv_typecast_exprt(op[1], op[0], signedbv_typet(width)),
+              floatbv_typecast_exprt(
+                std::move(rounded), std::move(rtz), signedbv_typet(width)),
               unsignedbv_typet(width));
           else
             return floatbv_typecast_exprt(
-              op[1], op[0], unsignedbv_typet(width));
+              std::move(rounded), std::move(rtz), unsignedbv_typet(width));
         }
         else
         {
@@ -1366,10 +1550,131 @@ void smt2_parsert::setup_expressions()
     if(op[0].type().id() != ID_floatbv)
       throw error("fp.isZero takes FloatingPoint operand");
 
-    return not_exprt(typecast_exprt(op[0], bool_typet()));
+    // fp.isZero is true for both +0 and -0.
+    // Use fp.eq with +0 (fp.eq treats -0 == +0).
+    const auto &type = to_floatbv_type(op[0].type());
+    return ieee_float_equal_exprt(
+      op[0], ieee_float_valuet::zero(type).to_expr());
+  };
+
+  expressions["fp.isSubnormal"] = [this]
+  {
+    auto op = operands();
+
+    if(op.size() != 1)
+      throw error("fp.isSubnormal takes one operand");
+
+    if(op[0].type().id() != ID_floatbv)
+      throw error("fp.isSubnormal takes FloatingPoint operand");
+
+    // subnormal iff not NaN, not infinite, not zero, and not normal
+    auto not_nan = not_exprt(unary_predicate_exprt(ID_isnan, op[0]));
+    auto not_inf = not_exprt(unary_predicate_exprt(ID_isinf, op[0]));
+    auto not_zero = typecast_exprt(op[0], bool_typet());
+    auto not_normal = not_exprt(isnormal_exprt(op[0]));
+    return and_exprt(
+      and_exprt(std::move(not_nan), std::move(not_inf)),
+      and_exprt(std::move(not_zero), std::move(not_normal)));
+  };
+
+  expressions["fp.isNegative"] = [this]
+  {
+    auto op = operands();
+
+    if(op.size() != 1)
+      throw error("fp.isNegative takes one operand");
+
+    if(op[0].type().id() != ID_floatbv)
+      throw error("fp.isNegative takes FloatingPoint operand");
+
+    // negative iff sign bit is 1 and not NaN
+    const auto &type = to_floatbv_type(op[0].type());
+    return and_exprt(
+      not_exprt(unary_predicate_exprt(ID_isnan, op[0])),
+      extractbit_exprt(
+        typecast_exprt(op[0], bv_typet(type.get_width())),
+        type.get_width() - 1));
+  };
+
+  expressions["fp.isPositive"] = [this]
+  {
+    auto op = operands();
+
+    if(op.size() != 1)
+      throw error("fp.isPositive takes one operand");
+
+    if(op[0].type().id() != ID_floatbv)
+      throw error("fp.isPositive takes FloatingPoint operand");
+
+    // positive iff sign bit is 0 and not NaN
+    const auto &type = to_floatbv_type(op[0].type());
+    return and_exprt(
+      not_exprt(unary_predicate_exprt(ID_isnan, op[0])),
+      not_exprt(extractbit_exprt(
+        typecast_exprt(op[0], bv_typet(type.get_width())),
+        type.get_width() - 1)));
   };
 
   expressions["fp"] = [this] { return function_application_fp(operands()); };
+
+  expressions["fp.min"] = [this]
+  {
+    auto op = operands();
+
+    if(op.size() != 2)
+      throw error("fp.min takes two operands");
+
+    if(op[0].type().id() != ID_floatbv || op[1].type().id() != ID_floatbv)
+      throw error("fp.min takes FloatingPoint operands");
+
+    // IEEE 754-2019 minimum:
+    // - if x is NaN, return y; if y is NaN, return x
+    // - if x < y, return x; if y < x, return y
+    // - if equal, return the one with sign bit 1 (negative)
+    auto x_nan = unary_predicate_exprt(ID_isnan, op[0]);
+    auto y_nan = unary_predicate_exprt(ID_isnan, op[1]);
+    auto x_lt_y = binary_relation_exprt(op[0], ID_lt, op[1]);
+    const auto &type = to_floatbv_type(op[0].type());
+    auto x_sign = extractbit_exprt(
+      typecast_exprt(op[0], bv_typet(type.get_width())), type.get_width() - 1);
+    // prefer x when x has sign bit (is negative or -0)
+    auto equal_case = if_exprt(x_sign, op[0], op[1]);
+    auto normal_case = if_exprt(x_lt_y, op[0], op[1]);
+    // fp.eq treats -0 == +0, use it to detect the tie case
+    auto x_eq_y = ieee_float_equal_exprt(op[0], op[1]);
+    auto non_nan = if_exprt(x_eq_y, equal_case, normal_case);
+    auto handle_y_nan = if_exprt(y_nan, op[0], non_nan);
+    return if_exprt(x_nan, op[1], handle_y_nan);
+  };
+
+  expressions["fp.max"] = [this]
+  {
+    auto op = operands();
+
+    if(op.size() != 2)
+      throw error("fp.max takes two operands");
+
+    if(op[0].type().id() != ID_floatbv || op[1].type().id() != ID_floatbv)
+      throw error("fp.max takes FloatingPoint operands");
+
+    // IEEE 754-2019 maximum:
+    // - if x is NaN, return y; if y is NaN, return x
+    // - if x > y, return x; if y > x, return y
+    // - if equal, return the one with sign bit 0 (positive)
+    auto x_nan = unary_predicate_exprt(ID_isnan, op[0]);
+    auto y_nan = unary_predicate_exprt(ID_isnan, op[1]);
+    auto x_gt_y = binary_relation_exprt(op[0], ID_gt, op[1]);
+    const auto &type = to_floatbv_type(op[0].type());
+    auto x_sign = extractbit_exprt(
+      typecast_exprt(op[0], bv_typet(type.get_width())), type.get_width() - 1);
+    // prefer x when x has no sign bit (is positive or +0)
+    auto equal_case = if_exprt(x_sign, op[1], op[0]);
+    auto normal_case = if_exprt(x_gt_y, op[0], op[1]);
+    auto x_eq_y = ieee_float_equal_exprt(op[0], op[1]);
+    auto non_nan = if_exprt(x_eq_y, equal_case, normal_case);
+    auto handle_y_nan = if_exprt(y_nan, op[0], non_nan);
+    return if_exprt(x_nan, op[1], handle_y_nan);
+  };
 
   expressions["fp.add"] = [this] {
     return function_application_ieee_float_op("fp.add", operands());
@@ -1408,6 +1713,22 @@ void smt2_parsert::setup_expressions()
     return binary_exprt(op[0], ID_floatbv_rem, op[1]);
   };
 
+  expressions["fp.sqrt"] = [this]
+  {
+    auto op = operands();
+
+    if(op.size() != 2)
+      throw error() << "fp.sqrt takes two operands";
+
+    if(op[1].type().id() != ID_floatbv)
+      throw error() << "fp.sqrt takes a FloatingPoint operand";
+
+    // op[0] = rounding mode, op[1] = FP operand
+    // Reuse ieee_float_op_exprt with the operand as both lhs and rhs;
+    // the boolbv layer will dispatch to float_utils.sqrt().
+    return ieee_float_op_exprt(op[1], ID_floatbv_sqrt, op[1], op[0]);
+  };
+
   expressions["fp.roundToIntegral"] = [this]
   {
     auto op = operands();
@@ -1439,6 +1760,26 @@ void smt2_parsert::setup_expressions()
   expressions["fp.gt"] = [this] { return binary_predicate(ID_gt, operands()); };
 
   expressions["fp.neg"] = [this] { return unary(ID_unary_minus, operands()); };
+
+  expressions["fp.to_real"] = [this]
+  {
+    auto op = operands();
+
+    if(op.size() != 1)
+      throw error("fp.to_real takes one operand");
+
+    if(op[0].type().id() != ID_floatbv)
+      throw error("fp.to_real takes a FloatingPoint operand");
+
+    // Encode as a wide signed integer representing the exact real value
+    // scaled by 2^k, where k = f + bias.
+    // The width needs to cover the full range: sign + max_exponent + f + 1.
+    const auto &fp_type = to_floatbv_type(op[0].type());
+    const ieee_float_spect spec(fp_type);
+    std::size_t int_width = (1u << spec.e) + spec.f;
+
+    return unary_exprt(ID_floatbv_to_real, op[0], signedbv_typet(int_width));
+  };
 }
 
 typet smt2_parsert::function_sort()

@@ -1,0 +1,8 @@
+CORE no-new-smt
+main.c
+--floatbv --no-built-in-assertions
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+fmaf with single rounding via __CPROVER_fmaf built-in.

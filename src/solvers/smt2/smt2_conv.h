@@ -30,6 +30,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "letify.h"
 
+class floatbv_fma_exprt;
 class floatbv_typecast_exprt;
 class ieee_float_op_exprt;
 class floatbv_round_to_integral_exprt;
@@ -145,7 +146,9 @@ protected:
   void convert_floatbv_minus(const ieee_float_op_exprt &expr);
   void convert_floatbv_div(const ieee_float_op_exprt &expr);
   void convert_floatbv_mult(const ieee_float_op_exprt &expr);
+  void convert_floatbv_mod(const binary_exprt &expr);
   void convert_floatbv_rem(const binary_exprt &expr);
+  void convert_floatbv_fma(const floatbv_fma_exprt &expr);
   void
   convert_floatbv_round_to_integral(const floatbv_round_to_integral_exprt &);
   void convert_mod(const mod_exprt &expr);

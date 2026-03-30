@@ -1,0 +1,10 @@
+; Z3#7135: to_fp from BV with fp.gt on Float64
+(set-logic QF_FP)
+(declare-fun bv4 () (_ BitVec 64))
+(declare-fun bv0 () (_ BitVec 64))
+(assert (not (fp.gt ((_ to_fp 11 53) bv4) ((_ to_fp 11 53) bv0))))
+(assert (fp.isNormal ((_ to_fp 11 53) bv4)))
+(assert (fp.isNormal ((_ to_fp 11 53) bv0)))
+(assert (fp.gt ((_ to_fp 11 53) bv4) (fp #b0 #b00000000000 #b0000000000000000000000000000000000000000000000000000)))
+(assert (fp.gt ((_ to_fp 11 53) bv0) (fp #b0 #b00000000000 #b0000000000000000000000000000000000000000000000000000)))
+(check-sat)

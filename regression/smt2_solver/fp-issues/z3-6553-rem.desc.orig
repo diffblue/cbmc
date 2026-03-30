@@ -1,0 +1,17 @@
+<<<<<<< HEAD
+FUTURE
+=======
+KNOWNBUG
+>>>>>>> fa7a81e906 (Add comprehensive SMT-LIB tests for external FP solver issues)
+z3-6553-rem.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+--
+<<<<<<< HEAD
+Z3#6553: fp.rem with Float64 operands times out due to the large
+integer-width encoding in the FMA-based remainder algorithm.
+=======
+Z3#6553: fp.rem bug (always returns +0)
+>>>>>>> fa7a81e906 (Add comprehensive SMT-LIB tests for external FP solver issues)

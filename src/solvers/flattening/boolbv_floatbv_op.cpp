@@ -129,6 +129,8 @@ bvt boolbvt::convert_floatbv_op(const ieee_float_op_exprt &expr)
       return float_utils.mul(lhs_as_bv, rhs_as_bv);
     else if(expr.id()==ID_floatbv_div)
       return float_utils.div(lhs_as_bv, rhs_as_bv);
+    else if(expr.id() == ID_floatbv_sqrt)
+      return float_utils.sqrt(lhs_as_bv);
     else
       UNREACHABLE;
   }

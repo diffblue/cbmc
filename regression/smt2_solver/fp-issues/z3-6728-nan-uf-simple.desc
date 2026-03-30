@@ -1,0 +1,8 @@
+CORE
+z3-6728-nan-uf-simple.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+Z3#6728: NaN structural equality through UF

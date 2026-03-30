@@ -1,0 +1,8 @@
+CORE
+fp-sqrt-subnormal.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+fp.sqrt of subnormal input gives correct result.
