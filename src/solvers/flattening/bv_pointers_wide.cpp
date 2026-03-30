@@ -12,6 +12,7 @@ Author: CBMC Contributors
 #include "bv_pointers_wide.h"
 
 #include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/config.h>
@@ -831,37 +832,75 @@ bvt bv_pointers_widet::convert_bitvector(const exprt &expr)
     const exprt same_obj = ::same_object(minus_expr.lhs(), minus_expr.rhs());
     const literalt same_object_lit = convert(same_obj);
 
+    const pointer_typet &lhs_pt = to_pointer_type(minus_expr.lhs().type());
+    const bvt &lhs = convert_bv(minus_expr.lhs());
+    const pointer_typet &rhs_pt = to_pointer_type(minus_expr.rhs().type());
+    const bvt &rhs = convert_bv(minus_expr.rhs());
+
+    bvt lhs_offset = bv_utils.zero_extension(read_offset(lhs, lhs_pt), width);
+    bvt rhs_offset = bv_utils.zero_extension(read_offset(rhs, rhs_pt), width);
+
+    DATA_INVARIANT(
+      lhs_pt.base_type().id() != ID_empty,
+      "no pointer arithmetic over void pointers");
+    auto element_size_opt = pointer_offset_size(lhs_pt.base_type(), ns);
+    CHECK_RETURN(element_size_opt.has_value() && *element_size_opt > 0);
+
     bvt bv = prop.new_variables(width);
 
+    // Same-object case: result = (lhs_offset - rhs_offset) / element_size
     if(!same_object_lit.is_false())
     {
-      const pointer_typet &lhs_pt = to_pointer_type(minus_expr.lhs().type());
-      const bvt &lhs = convert_bv(minus_expr.lhs());
-      const bvt lhs_offset =
-        bv_utils.zero_extension(read_offset(lhs, lhs_pt), width);
-
-      const pointer_typet &rhs_pt = to_pointer_type(minus_expr.rhs().type());
-      const bvt &rhs = convert_bv(minus_expr.rhs());
-      const bvt rhs_offset =
-        bv_utils.zero_extension(read_offset(rhs, rhs_pt), width);
-
       bvt difference = bv_utils.sub(lhs_offset, rhs_offset);
-
-      DATA_INVARIANT(
-        lhs_pt.base_type().id() != ID_empty,
-        "no pointer arithmetic over void pointers");
-      auto element_size_opt = pointer_offset_size(lhs_pt.base_type(), ns);
-      CHECK_RETURN(element_size_opt.has_value() && *element_size_opt > 0);
-
       if(*element_size_opt != 1)
       {
         bvt element_size_bv = bv_utils.build_constant(*element_size_opt, width);
         difference = bv_utils.divider(
           difference, element_size_bv, bv_utilst::representationt::SIGNED);
       }
-
       prop.l_set_to_true(
         prop.limplies(same_object_lit, bv_utils.equal(difference, bv)));
+    }
+
+    // Different-object case: use flat address difference.
+    // This handles integer-address objects like (char*)20-(char*)10.
+    if(!same_object_lit.is_true())
+    {
+      bvt lhs_obj = read_object(lhs, lhs_pt);
+      bvt rhs_obj = read_object(rhs, rhs_pt);
+      const std::size_t ptr_width = config.ansi_c.pointer_width;
+
+      bvt lhs_flat = lhs_offset;
+      bvt rhs_flat = rhs_offset;
+
+      const auto &objects = pointer_logic.objects;
+      std::size_t number = 0;
+      for(auto it = objects.cbegin(); it != objects.cend(); ++it, ++number)
+      {
+        auto base_it = object_base_address.find(mp_integer(number));
+        if(base_it == object_base_address.end())
+          continue;
+        bvt obj_const = bv_utils.build_constant(number, ptr_width);
+        bvt base_ext = bv_utils.zero_extension(base_it->second, width);
+
+        literalt is_l = bv_utils.equal(lhs_obj, obj_const);
+        lhs_flat =
+          bv_utils.select(is_l, bv_utils.add(base_ext, lhs_offset), lhs_flat);
+
+        literalt is_r = bv_utils.equal(rhs_obj, obj_const);
+        rhs_flat =
+          bv_utils.select(is_r, bv_utils.add(base_ext, rhs_offset), rhs_flat);
+      }
+
+      bvt flat_diff = bv_utils.sub(lhs_flat, rhs_flat);
+      if(*element_size_opt != 1)
+      {
+        bvt element_size_bv = bv_utils.build_constant(*element_size_opt, width);
+        flat_diff = bv_utils.divider(
+          flat_diff, element_size_bv, bv_utilst::representationt::SIGNED);
+      }
+      prop.l_set_to_true(
+        prop.limplies(!same_object_lit, bv_utils.equal(flat_diff, bv)));
     }
 
     return bv;
@@ -1080,9 +1119,6 @@ literalt bv_pointers_widet::convert_rest(const exprt &expr)
     {
       // Pointer equality: use both index comparison and
       // semantic (object, offset) comparison.
-      // Index equality is sufficient (same index → same pointer).
-      // Semantic equality is necessary for pointers with different
-      // indices but same (object, offset) from pointer arithmetic.
       const pointer_typet &lhs_type = to_pointer_type(rel.lhs().type());
       const pointer_typet &rhs_type = to_pointer_type(rel.rhs().type());
 
@@ -1091,6 +1127,7 @@ literalt bv_pointers_widet::convert_rest(const exprt &expr)
 
       literalt indices_equal = bv_utils.equal(lhs_bv, rhs_bv);
 
+      // Both sides symbolic — need semantic comparison
       bvt lhs_obj = read_object(lhs_bv, lhs_type);
       bvt rhs_obj = read_object(rhs_bv, rhs_type);
       bvt lhs_off = read_offset(lhs_bv, lhs_type);
@@ -1100,18 +1137,116 @@ literalt bv_pointers_widet::convert_rest(const exprt &expr)
       literalt off_eq = bv_utils.equal(lhs_off, rhs_off);
       literalt semantic_eq = prop.land(obj_eq, off_eq);
 
-      // Equal if indices match OR (object, offset) pairs match.
       literalt result = prop.lor(indices_equal, semantic_eq);
 
-      // Help the solver: if indices are equal, force the
-      // semantic comparison to also be true. This adds
-      // redundant but useful propagation hints.
       prop.l_set_to_true(prop.limplies(indices_equal, obj_eq));
       prop.l_set_to_true(prop.limplies(indices_equal, off_eq));
 
       if(expr.id() == ID_notequal)
         return !result;
       return result;
+    }
+  }
+
+  else if(
+    const auto minus_overflow =
+      expr_try_dynamic_cast<minus_overflow_exprt>(expr))
+  {
+    if(
+      minus_overflow->lhs().type().id() == ID_pointer &&
+      minus_overflow->rhs().type().id() == ID_pointer)
+    {
+      // Pointer subtraction overflow: use the offsets from the
+      // maps instead of the raw indices.  When both pointers
+      // are in the same object, the offsets are bounded by the
+      // object size and the difference cannot overflow.
+      const pointer_typet &lhs_pt =
+        to_pointer_type(minus_overflow->lhs().type());
+      const pointer_typet &rhs_pt =
+        to_pointer_type(minus_overflow->rhs().type());
+
+      const bvt &lhs_bv = convert_bv(minus_overflow->lhs());
+      const bvt &rhs_bv = convert_bv(minus_overflow->rhs());
+
+      // For same-object pointers, check offset overflow.
+      // For different-object pointers, the subtraction is
+      // undefined — use the flat address difference.
+      bvt lhs_obj = read_object(lhs_bv, lhs_pt);
+      bvt rhs_obj = read_object(rhs_bv, rhs_pt);
+      literalt same_obj = bv_utils.equal(lhs_obj, rhs_obj);
+
+      bvt lhs_off = read_offset(lhs_bv, lhs_pt);
+      bvt rhs_off = read_offset(rhs_bv, rhs_pt);
+
+      // Same object: overflow iff offset difference overflows
+      literalt off_overflow = bv_utils.overflow_sub(
+        lhs_off, rhs_off, bv_utilst::representationt::SIGNED);
+
+      // Different objects: use flat addresses for overflow check
+      const std::size_t width = lhs_off.size();
+      bvt lhs_flat = lhs_off; // placeholder
+      bvt rhs_flat = rhs_off;
+
+      // Try to get flat addresses from base address map
+      mp_integer lhs_idx = 0, rhs_idx = 0;
+      bool lhs_const = true, rhs_const = true;
+      for(std::size_t i = 0; i < lhs_bv.size(); ++i)
+      {
+        if(lhs_bv[i].is_true())
+          lhs_idx += power(2, i);
+        else if(!lhs_bv[i].is_false())
+          lhs_const = false;
+      }
+      for(std::size_t i = 0; i < rhs_bv.size(); ++i)
+      {
+        if(rhs_bv[i].is_true())
+          rhs_idx += power(2, i);
+        else if(!rhs_bv[i].is_false())
+          rhs_const = false;
+      }
+
+      if(lhs_const && rhs_const)
+      {
+        auto lit = index_to_bv_object_offset.find(lhs_idx);
+        auto rit = index_to_bv_object_offset.find(rhs_idx);
+        if(
+          lit != index_to_bv_object_offset.end() &&
+          rit != index_to_bv_object_offset.end())
+        {
+          // Extract object numbers
+          mp_integer lobj = 0, robj = 0;
+          bool lok = true, rok = true;
+          for(std::size_t i = 0; i < lit->second.first.size(); ++i)
+          {
+            if(lit->second.first[i].is_true())
+              lobj += power(2, i);
+            else if(!lit->second.first[i].is_false())
+              lok = false;
+          }
+          for(std::size_t i = 0; i < rit->second.first.size(); ++i)
+          {
+            if(rit->second.first[i].is_true())
+              robj += power(2, i);
+            else if(!rit->second.first[i].is_false())
+              rok = false;
+          }
+          if(lok && rok)
+          {
+            bvt lbase = get_object_base_address(lobj, width);
+            bvt rbase = get_object_base_address(robj, width);
+            lhs_flat = bv_utils.add(lbase, lhs_off);
+            rhs_flat = bv_utils.add(rbase, rhs_off);
+          }
+        }
+      }
+
+      literalt flat_overflow = bv_utils.overflow_sub(
+        lhs_flat, rhs_flat, bv_utilst::representationt::SIGNED);
+
+      // Overflow if same object and offset overflows, or
+      // different objects and flat address overflows
+      return prop.lor(
+        prop.land(same_obj, off_overflow), prop.land(!same_obj, flat_overflow));
     }
   }
 
@@ -1553,6 +1688,22 @@ void bv_pointers_widet::finish_eager_conversion()
       bvt max_base_bv = bv_utils.build_constant(max_base, ptr_width);
       prop.l_set_to_true(bv_utils.rel(
         base, ID_le, max_base_bv, bv_utilst::representationt::UNSIGNED));
+
+      // Also constrain base + size to fit in the positive range
+      // of a signed integer of pointer width.  This ensures that
+      // pointer-to-integer casts and subsequent arithmetic don't
+      // overflow signed types.  On real hardware, user-space
+      // addresses are in the lower half of the address space.
+      // Use 31 bits (not ptr_width-1) to also handle casts to
+      // 32-bit int on 64-bit platforms.
+      std::size_t addr_bits = std::min(ptr_width - 1, std::size_t{31});
+      mp_integer signed_max = power(2, addr_bits) - 1 - size;
+      if(signed_max > 0)
+      {
+        bvt signed_max_bv = bv_utils.build_constant(signed_max, ptr_width);
+        prop.l_set_to_true(bv_utils.rel(
+          base, ID_le, signed_max_bv, bv_utilst::representationt::UNSIGNED));
+      }
 
       // Constrain alignment: base addresses are aligned to the
       // natural alignment of the object type.  For most types
