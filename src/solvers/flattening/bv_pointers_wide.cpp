@@ -1027,6 +1027,61 @@ literalt bv_pointers_widet::convert_rest(const exprt &expr)
 {
   PRECONDITION(expr.is_boolean());
 
+  // Handle pointer equality/inequality FIRST, before the
+  // else-if chain below, to ensure it's always reached.
+  if(expr.id() == ID_equal || expr.id() == ID_notequal)
+  {
+    const auto &rel = to_binary_relation_expr(expr);
+    if(
+      rel.lhs().type().id() == ID_pointer &&
+      rel.rhs().type().id() == ID_pointer)
+    {
+      const pointer_typet &lhs_type = to_pointer_type(rel.lhs().type());
+      const pointer_typet &rhs_type = to_pointer_type(rel.rhs().type());
+
+      const bvt &lhs_bv = convert_bv(rel.lhs());
+      const bvt &rhs_bv = convert_bv(rel.rhs());
+
+      literalt indices_equal = bv_utils.equal(lhs_bv, rhs_bv);
+
+      if(indices_equal.is_false())
+      {
+        // Indices definitely different — semantic comparison
+        bvt lhs_obj = read_object(lhs_bv, lhs_type);
+        bvt rhs_obj = read_object(rhs_bv, rhs_type);
+        bvt lhs_off = read_offset(lhs_bv, lhs_type);
+        bvt rhs_off = read_offset(rhs_bv, rhs_type);
+
+        literalt obj_eq = bv_utils.equal(lhs_obj, rhs_obj);
+        literalt off_eq = bv_utils.equal(lhs_off, rhs_off);
+        literalt result = prop.land(obj_eq, off_eq);
+
+        if(expr.id() == ID_notequal)
+          return !result;
+        return result;
+      }
+
+      // Add semantic comparison for different indices
+      bvt lhs_obj = read_object(lhs_bv, lhs_type);
+      bvt rhs_obj = read_object(rhs_bv, rhs_type);
+      bvt lhs_off = read_offset(lhs_bv, lhs_type);
+      bvt rhs_off = read_offset(rhs_bv, rhs_type);
+
+      literalt obj_eq = bv_utils.equal(lhs_obj, rhs_obj);
+      literalt off_eq = bv_utils.equal(lhs_off, rhs_off);
+      literalt semantic_eq = prop.land(obj_eq, off_eq);
+
+      literalt result = prop.lor(indices_equal, semantic_eq);
+
+      prop.l_set_to_true(prop.limplies(indices_equal, obj_eq));
+      prop.l_set_to_true(prop.limplies(indices_equal, off_eq));
+
+      if(expr.id() == ID_notequal)
+        return !result;
+      return result;
+    }
+  }
+
   const exprt::operandst &operands = expr.operands();
 
   if(expr.id() == ID_is_invalid_pointer)
@@ -1108,44 +1163,6 @@ literalt bv_pointers_widet::convert_rest(const exprt &expr)
       expr_try_dynamic_cast<prophecy_pointer_in_range_exprt>(expr))
   {
     return convert(simplify_expr(prophecy_pointer_in_range->lower(ns), ns));
-  }
-
-  else if(expr.id() == ID_equal || expr.id() == ID_notequal)
-  {
-    const auto &rel = to_binary_relation_expr(expr);
-    if(
-      rel.lhs().type().id() == ID_pointer &&
-      rel.rhs().type().id() == ID_pointer)
-    {
-      // Pointer equality: use both index comparison and
-      // semantic (object, offset) comparison.
-      const pointer_typet &lhs_type = to_pointer_type(rel.lhs().type());
-      const pointer_typet &rhs_type = to_pointer_type(rel.rhs().type());
-
-      const bvt &lhs_bv = convert_bv(rel.lhs());
-      const bvt &rhs_bv = convert_bv(rel.rhs());
-
-      literalt indices_equal = bv_utils.equal(lhs_bv, rhs_bv);
-
-      // Both sides symbolic — need semantic comparison
-      bvt lhs_obj = read_object(lhs_bv, lhs_type);
-      bvt rhs_obj = read_object(rhs_bv, rhs_type);
-      bvt lhs_off = read_offset(lhs_bv, lhs_type);
-      bvt rhs_off = read_offset(rhs_bv, rhs_type);
-
-      literalt obj_eq = bv_utils.equal(lhs_obj, rhs_obj);
-      literalt off_eq = bv_utils.equal(lhs_off, rhs_off);
-      literalt semantic_eq = prop.land(obj_eq, off_eq);
-
-      literalt result = prop.lor(indices_equal, semantic_eq);
-
-      prop.l_set_to_true(prop.limplies(indices_equal, obj_eq));
-      prop.l_set_to_true(prop.limplies(indices_equal, off_eq));
-
-      if(expr.id() == ID_notequal)
-        return !result;
-      return result;
-    }
   }
 
   else if(
