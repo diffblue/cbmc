@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/replace_symbol.h>
+#include <util/simplify_expr.h>
 #include <util/symbol_table_base.h>
 
 #include <ansi-c/c_qualifiers.h>
@@ -2738,9 +2739,177 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
         {
           // no-op, just continue
         }
+        else if(stmt.get_statement() == ID_ifthenelse)
+        {
+          try {
+          // C++14 relaxed constexpr: if/else
+          exprt cond = stmt.op0();
+          value_map.replace(cond);
+          simplify(cond, *this);
+          if(cond.is_true())
+          {
+            // Evaluate 'then' branch
+            if(stmt.operands().size() >= 2)
+            {
+              if(stmt.op1().id() != ID_code) { can_evaluate = false; break; } const auto &then_code = to_code(stmt.op1());
+              if(then_code.get_statement() == ID_block)
+              {
+                for(const auto &s : to_code_block(then_code).statements())
+                {
+                  if(auto ret =
+                       expr_try_dynamic_cast<code_frontend_returnt>(s))
+                  {
+                    exprt tmp = ret->return_value();
+                    value_map.replace(tmp);
+                    expr.swap(tmp);
+                    return;
+                  }
+                  else if(
+                    auto es = expr_try_dynamic_cast<code_expressiont>(s))
+                  {
+                    if(auto assign =
+                         expr_try_dynamic_cast<side_effect_expr_assignt>(
+                           es->expression()))
+                    {
+                      if(assign->lhs().id() == ID_symbol)
+                      {
+                        exprt rhs = assign->rhs();
+                        value_map.replace(rhs);
+                        value_map.set(to_symbol_expr(assign->lhs()), rhs);
+                      }
+                      else
+                        can_evaluate = false;
+                    }
+                  }
+                }
+              }
+              else if(
+                auto ret =
+                  expr_try_dynamic_cast<code_frontend_returnt>(then_code))
+              {
+                exprt tmp = ret->return_value();
+                value_map.replace(tmp);
+                expr.swap(tmp);
+                return;
+              }
+            }
+          }
+          else if(cond.is_false())
+          {
+            // Evaluate 'else' branch if present
+            if(stmt.operands().size() >= 3)
+            {
+              if(stmt.op2().id() != ID_code) { can_evaluate = false; break; } const auto &else_code = to_code(stmt.op2());
+              if(
+                auto ret =
+                  expr_try_dynamic_cast<code_frontend_returnt>(else_code))
+              {
+                exprt tmp = ret->return_value();
+                value_map.replace(tmp);
+                expr.swap(tmp);
+                return;
+              }
+            }
+          }
+          else
+            can_evaluate = false;
+        } catch(...) { can_evaluate = false; }
+        }
+        else if(stmt.get_statement() == ID_while)
+        {
+          try {
+          // C++14 relaxed constexpr: while loop with bounded iterations
+          const unsigned max_iterations = 1000;
+          for(unsigned i = 0; i < max_iterations && can_evaluate; ++i)
+          {
+            exprt cond = stmt.op0();
+            value_map.replace(cond);
+            simplify(cond, *this);
+            if(cond.is_false())
+              break;
+            if(!cond.is_true())
+            {
+              can_evaluate = false;
+              break;
+            }
+            // Execute loop body
+            if(stmt.operands().size() < 2 || stmt.op1().id() != ID_code) { can_evaluate = false; break; } const auto &body = to_code(stmt.op1());
+            auto exec_stmt = [&](const codet &s) -> bool
+            {
+              if(auto ret =
+                   expr_try_dynamic_cast<code_frontend_returnt>(s))
+              {
+                exprt tmp = ret->return_value();
+                value_map.replace(tmp);
+                expr.swap(tmp);
+                return true; // return from function
+              }
+              else if(
+                auto es = expr_try_dynamic_cast<code_expressiont>(s))
+              {
+                if(auto assign =
+                     expr_try_dynamic_cast<side_effect_expr_assignt>(
+                       es->expression()))
+                {
+                  if(assign->lhs().id() == ID_symbol)
+                  {
+                    exprt rhs = assign->rhs();
+                    value_map.replace(rhs);
+                    simplify(rhs, *this);
+                    value_map.set(to_symbol_expr(assign->lhs()), rhs);
+                  }
+                  else
+                    can_evaluate = false;
+                }
+              }
+              else if(s.get_statement() == ID_decl_block)
+              {
+                for(const auto &d : s.operands())
+                {
+                  if(d.id() == ID_code && to_code(d).get_statement() == ID_decl)
+                  {
+                    const auto &decl =
+                      to_code_frontend_decl(to_code(d));
+                    if(decl.initial_value().has_value())
+                    {
+                      exprt init = decl.initial_value().value();
+                      value_map.replace(init);
+                      simplify(init, *this);
+                      value_map.set(decl.symbol(), init);
+                    }
+                  }
+                }
+              }
+              else if(s.get_statement() == ID_skip)
+              {
+              }
+              else
+                can_evaluate = false;
+              return false;
+            };
+
+            if(body.get_statement() == ID_block)
+            {
+              for(const auto &s :
+                  to_code_block(body).statements())
+              {
+                if(s.id() != ID_code) { can_evaluate = false; break; } if(exec_stmt(to_code(s)))
+                  return; // function returned
+                if(!can_evaluate)
+                  break;
+              }
+            }
+            else
+            {
+              if(exec_stmt(body))
+                return;
+            }
+          }
+        } catch(...) { can_evaluate = false; }
+        }
         else
         {
-          // C++14 relaxed constexpr: loops, if-else, etc.
+          // Unsupported statement type.
           // Fall back to treating as a regular function call.
           can_evaluate = false;
         }
