@@ -2503,13 +2503,18 @@ exprt cpp_typecheck_resolvet::resolve(
 
               if(not_ok)
               {
+                // If access check fails, silently mark as inaccessible
+                // rather than throwing. This allows overload resolution
+                // to proceed with other candidates (e.g., MSVC's
+                // bad_alloc has a private const char* ctor alongside
+                // the public default ctor).
                 if(!fail_with_exception)
                   return nil_exprt();
 
-                cpp_typecheck.error().source_location = source_location;
-                cpp_typecheck.error() << "member '" << base_name
-                                      << "' is not accessible" << messaget::eom;
-                throw 0;
+                // Mark as inaccessible but don't throw — the caller
+                // may have other overloads to try.
+                result.set(ID_C_not_accessible, true);
+                break;
               }
               break;
             }
