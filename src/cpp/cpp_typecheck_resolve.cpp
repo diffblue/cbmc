@@ -1193,6 +1193,8 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
       // navigate to that type's scope.
       exprt expr = static_cast<const exprt &>(pos->find(ID_type_arg));
       if(expr.is_nil())
+        expr = static_cast<const exprt &>(pos->find(ID_expr_arg));
+      if(expr.is_nil())
         expr = static_cast<const exprt &>(pos->find("expr"));
       if(expr.is_not_nil())
       {
@@ -1379,6 +1381,13 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
 
         if(id_set.empty())
         {
+          // Empty scope name can occur with decltype(expr)::member
+          // where the parser produces empty name components.
+          if(final_base_name.empty())
+          {
+            ++pos;
+            continue;
+          }
           cpp_typecheck.show_instantiation_stack(cpp_typecheck.error());
           cpp_typecheck.error().source_location = source_location;
           cpp_typecheck.error()
