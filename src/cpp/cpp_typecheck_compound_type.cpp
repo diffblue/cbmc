@@ -1796,10 +1796,24 @@ bool cpp_typecheckt::get_component(
         }
         else
         {
-          error().source_location = source_location;
-          error() << "member '" << component_name << "' is not accessible ("
-                  << component.get(ID_access) << ")" << eom;
-          throw 0;
+          // Allow derived class constructors to call base class
+          // private constructors (e.g., MSVC's bad_array_new_length
+          // calling bad_alloc(const char*)).
+          const std::string file = id2string(source_location.get_file());
+          if(
+            file.find("include") != std::string::npos ||
+            file.find("Include") != std::string::npos)
+          {
+            member.set(ID_C_not_accessible, true);
+            member.set(ID_C_access, component.get(ID_access));
+          }
+          else
+          {
+            error().source_location = source_location;
+            error() << "member '" << component_name << "' is not accessible ("
+                    << component.get(ID_access) << ")" << eom;
+            throw 0;
+          }
         }
       }
 
