@@ -581,10 +581,16 @@ bvt bv_pointers_widet::convert_pointer_type(const exprt &expr)
 
         const auto &objects = pointer_logic.objects;
         std::size_t number = 0;
+        // Constrain: object must be one of the known objects.
+        // Without this, the solver can choose an arbitrary object
+        // number that's not in the pointer maps, making safety
+        // checks (null, invalid, bounds) unprovable.
+        std::vector<literalt> valid_obj_lits;
         for(auto it = objects.cbegin(); it != objects.cend(); ++it, ++number)
         {
           bvt obj_const = bv_utils.build_constant(number, ptr_width);
           literalt is_this_obj = bv_utils.equal(obj_bv, obj_const);
+          valid_obj_lits.push_back(is_this_obj);
           if(is_this_obj.is_false())
             continue;
 
@@ -596,6 +602,8 @@ bvt bv_pointers_widet::convert_pointer_type(const exprt &expr)
             prop.lcnf({!is_this_obj, flat[i], !int_ext[i]});
           }
         }
+        // Object must be one of the known objects
+        prop.lcnf(valid_obj_lits);
 
         return encode_fresh(obj_bv, off_bv, type);
       }
