@@ -1362,6 +1362,40 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
 
         filter_for_named_scopes(id_set);
 
+        // If no named scope found, check for typedefs resolving to a
+        // class type (e.g., typedef Base _Mybase; using _Mybase::_Mybase)
+        if(id_set.empty())
+        {
+          auto typedef_set = cpp_typecheck.cpp_scopes.current_scope().lookup(
+            final_base_name, cpp_scopet::RECURSIVE);
+          for(const auto &id_ptr : typedef_set)
+          {
+            if(id_ptr->id_class == cpp_idt::id_classt::TYPEDEF)
+            {
+              const symbolt *sym =
+                cpp_typecheck.symbol_table.lookup(id_ptr->identifier);
+              if(sym != nullptr && sym->is_type)
+              {
+                typet t = sym->type;
+                if(t.id() == ID_struct_tag)
+                {
+                  cpp_typecheck.elaborate_class_template(t);
+                  const irep_idt &scope_id =
+                    to_struct_tag_type(t).get_identifier();
+                  cpp_typecheck.cpp_scopes.go_to(
+                    cpp_typecheck.cpp_scopes.get_scope(scope_id));
+                  final_base_name.clear();
+                  ++pos;
+                  final_base_name.clear();
+                  break;
+                }
+              }
+            }
+          }
+          if(final_base_name.empty())
+            continue; // typedef resolved, continue with next component
+        }
+
         if(id_set.empty())
         {
           // Fallback: search the global id_map for the namespace.
@@ -1950,9 +1984,10 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_namespace(const cpp_namet &cpp_name)
   resolve_scope(cpp_name, base_name, template_args);
 
   bool qualified = cpp_name.is_qualified();
+  (void)qualified;
 
   auto id_set = cpp_typecheck.cpp_scopes.current_scope().lookup(
-    base_name, qualified ? cpp_scopet::QUALIFIED : cpp_scopet::RECURSIVE);
+    base_name, cpp_scopet::RECURSIVE);
 
   filter_for_namespaces(id_set);
 
@@ -2119,8 +2154,7 @@ exprt cpp_typecheck_resolvet::resolve(
 
   cpp_scopest::id_sett id_set;
 
-  cpp_scopet::lookup_kindt lookup_kind =
-    qualified ? cpp_scopet::QUALIFIED : cpp_scopet::RECURSIVE;
+  cpp_scopet::lookup_kindt lookup_kind = cpp_scopet::RECURSIVE;
 
   if(template_args.is_nil())
   {
