@@ -1,4 +1,4 @@
-#if __has_include(<concepts>)
+#if !defined(_MSC_VER) && __has_include(<concepts>)
 // C++20 shorthand concept constraint: template<std::integral T>
 #  include <concepts>
 template <std::integral T>

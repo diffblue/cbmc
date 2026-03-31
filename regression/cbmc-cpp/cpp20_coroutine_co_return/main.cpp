@@ -1,4 +1,4 @@
-#if __has_include(<coroutine>)
+#if !defined(_MSC_VER) && __has_include(<coroutine>)
 // C++20 coroutine with co_return
 #  include <coroutine>
 struct Task

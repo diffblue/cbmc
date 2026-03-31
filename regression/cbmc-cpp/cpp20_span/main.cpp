@@ -1,4 +1,4 @@
-#if __has_include(<span>)
+#if !defined(_MSC_VER) && __has_include(<span>)
 #  include <span>
 
 int main()

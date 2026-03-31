@@ -1,5 +1,5 @@
 // std::string constructor from const char* requires GCC 11+ libstdc++
-#if !defined(__GNUC__) || __GNUC__ >= 11
+#if !defined(__GNUC__) && !defined(_MSC_VER) || __GNUC__ >= 11
 // Verify std::string basic operations
 #  include <cassert>
 #  include <string>

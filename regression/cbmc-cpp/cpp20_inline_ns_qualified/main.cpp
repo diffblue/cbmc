@@ -1,4 +1,4 @@
-#if __has_include(<coroutine>)
+#if !defined(_MSC_VER) && __has_include(<coroutine>)
 // Inline namespace qualified lookup: std::suspend_never
 #  include <coroutine>
 int main()
