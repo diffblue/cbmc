@@ -618,6 +618,32 @@ void arrayst::add_array_constraints_with(
 
   updated_indices.insert(expr.where());
 
+  // Also add x[I]=v for other indices I that may equal the
+  // write index.  This helps propagation when the write index
+  // and read index are different SSA symbols connected by
+  // equality constraints (e.g., argc'#0 and main_argc).
+  for(const auto &other_index : index_set)
+  {
+    if(other_index == expr.where())
+      continue;
+
+    const literalt idx_eq = convert(equal_exprt(
+      other_index,
+      typecast_exprt::conditional_cast(expr.where(), other_index.type())));
+
+    if(idx_eq.is_false())
+      continue;
+
+    index_exprt other_read(
+      expr, other_index, to_array_type(expr.type()).element_type());
+    lazy_constraintt lazy2(
+      lazy_typet::ARRAY_WITH,
+      implies_exprt(
+        literal_exprt(idx_eq), equal_exprt(other_read, expr.new_value())));
+    add_array_constraint(lazy2, false);
+    array_constraint_count[constraint_typet::ARRAY_WITH]++;
+  }
+
   // For all other indices use the existing value, i.e., add constraints
   // x[I]=y[I] for I!=i,j,...
 
