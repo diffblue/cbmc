@@ -1,4 +1,4 @@
-CORE gcc-only
+CORE
 main.cpp
 --cpp11 --unwind 2 --no-unwinding-assertions --no-built-in-assertions --depth 50
 ^EXIT=0$
