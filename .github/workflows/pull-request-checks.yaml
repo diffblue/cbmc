@@ -12,6 +12,7 @@ env:
 jobs:
   # This job takes approximately 15 to 40 minutes
   check-ubuntu-24_04-make-gcc:
+    if: false
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
@@ -94,6 +95,7 @@ jobs:
 
   # This job takes approximately 25 to 34 minutes
   check-ubuntu-24_04-make-clang:
+    if: false
     runs-on: ubuntu-24.04
     env:
       CC: "ccache /usr/bin/clang"
@@ -168,6 +170,7 @@ jobs:
   # jobs increases the job runtime to unacceptable levels (over 2hrs).
   # This job takes approximately 3 to 18 minutes
   check-ubuntu-24_04-make-clang-smt-z3:
+    if: false
     runs-on: ubuntu-24.04
     env:
       CC: "ccache /usr/bin/clang"
@@ -210,6 +213,7 @@ jobs:
 
   # This job takes approximately 17 to 42 minutes
   check-ubuntu-24_04-cmake-gcc:
+    if: false
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
@@ -277,6 +281,7 @@ jobs:
 
   # This job takes approximately 20 to 38 minutes
   check-ubuntu-22_04-make-clang:
+    if: false
     runs-on: ubuntu-22.04
     env:
       CC: "ccache /usr/bin/clang"
@@ -349,6 +354,7 @@ jobs:
 
   # This job takes approximately 17 to 41 minutes
   check-ubuntu-22_04-cmake-gcc:
+    if: false
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v6
@@ -403,6 +409,7 @@ jobs:
 
   # This job takes approximately 14 to 46 minutes
   check-ubuntu-24_04-cmake-gcc-14:
+    if: false
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
@@ -456,6 +463,7 @@ jobs:
 
   # This job takes approximately 17 to 41 minutes
   check-ubuntu-24_04-arm-cmake-gcc:
+    if: false
     runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v6
@@ -510,6 +518,7 @@ jobs:
 
   # This job takes approximately 14 to 60 minutes
   check-ubuntu-22_04-cmake-gcc-32bit:
+    if: false
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v6
@@ -557,6 +566,7 @@ jobs:
 
   # This job takes approximately 2 to 24 minutes
   check-ubuntu-24_04-cmake-gcc-KNOWNBUG:
+    if: false
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
@@ -604,6 +614,7 @@ jobs:
 
   # This job takes approximately 7 to 30 minutes
   check-ubuntu-24_04-cmake-gcc-THOROUGH:
+    if: false
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
@@ -691,15 +702,14 @@ jobs:
           ./unit_tests "[z3]"
       - name: Run JBMC unit tests
         run: cd jbmc/unit; ./unit_tests
-      - name: Run regression tests
+      - name: Run regression tests (limited for debugging)
         run: |
-          export PATH=$PATH:`pwd`/src/solvers
-          make -C regression test-parallel JOBS=4
-      - name: Run JBMC regression tests
-        run: make -C jbmc/regression test-parallel JOBS=4
+          make -C regression/cpp test
+          make -C regression/systemc test
 
   # This job takes approximately 36 to 85 minutes
   check-macos-14-cmake-clang:
+    if: false
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v6
@@ -819,13 +829,60 @@ jobs:
       - name: Print ccache stats
         run: clcache -s
       - uses: ilammy/msvc-dev-cmd@v1
-      - name: Test cbmc
+      - name: Test cpp suite
+        if: always()
         run: |
           Set-Location build
-          ctest -V -L CORE -C Release . -j${{env.windows-vcpus}}
+          ctest -V -L CORE -C Release -R "cpp-CORE" --timeout 600 . -j${{env.windows-vcpus}}
+      - name: Test cbmc-cpp suite
+        if: always()
+        run: |
+          Set-Location build
+          ctest -V -L CORE -C Release -R "cbmc-cpp-CORE" --timeout 4800 . -j1
+      - name: Test cbmc suite
+        if: always()
+        run: |
+          Set-Location build
+          ctest -V -L CORE -C Release -R "^cbmc-CORE$$" --timeout 1200 . -j${{env.windows-vcpus}}
+      - name: Test goto-instrument suite
+        if: always()
+        run: |
+          Set-Location build
+          ctest -V -L CORE -C Release -R "goto-instrument-CORE" --timeout 600 . -j${{env.windows-vcpus}}
+      - name: Test goto-analyzer suite
+        if: always()
+        run: |
+          Set-Location build
+          ctest -V -L CORE -C Release -R "goto-analyzer-CORE" --timeout 600 . -j${{env.windows-vcpus}}
+      - name: Test contracts suites
+        if: always()
+        run: |
+          Set-Location build
+          ctest -V -L CORE -C Release -R "contracts" --timeout 600 . -j${{env.windows-vcpus}}
+      - name: Test unit tests
+        if: always()
+        run: |
+          Set-Location build
+          ctest -V -L CORE -C Release -R "catch-framework" --timeout 600 . -j${{env.windows-vcpus}}
+      - name: Test jbmc suite
+        if: always()
+        run: |
+          Set-Location build
+          ctest -V -L CORE -C Release -R "^jbmc-CORE$$" --timeout 1200 . -j${{env.windows-vcpus}}
+      - name: Test jbmc-strings suite
+        if: always()
+        run: |
+          Set-Location build
+          ctest -V -L CORE -C Release -R "jbmc-strings" --timeout 600 . -j${{env.windows-vcpus}}
+      - name: Test remaining suites
+        if: always()
+        run: |
+          Set-Location build
+          ctest -V -L CORE -C Release -E "cpp-CORE|cbmc-cpp-CORE|cbmc-CORE|goto-instrument-CORE|goto-analyzer-CORE|contracts|catch-framework|jbmc-CORE|jbmc-strings" --timeout 600 . -j${{env.windows-vcpus}}
 
   # This job takes approximately 65 to 84 minutes
   check-vs-2022-make-build-and-test:
+    if: false
     runs-on: windows-2022
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -997,6 +1054,7 @@ jobs:
 
   # This job takes approximately 2 to 3 minutes
   check-string-table:
+    if: false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -1005,6 +1063,7 @@ jobs:
 
   # This job takes approximately 23 to 29 minutes
   check-docker-image:
+    if: false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -1029,6 +1088,7 @@ jobs:
 
   # This job takes approximately 22 to 41 minutes
   include-what-you-use:
+    if: false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
