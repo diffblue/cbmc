@@ -1,4 +1,4 @@
-#if __has_include(<ranges>)
+#if !defined(_MSC_VER) && __has_include(<ranges>)
 // C++20 std::ranges basic usage
 #  include <ranges>
 

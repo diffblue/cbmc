@@ -1,5 +1,5 @@
 // C++20 optional features require GCC 10+
-#if !defined(__GNUC__) || __GNUC__ >= 10
+#if !defined(__GNUC__) && !defined(_MSC_VER) || __GNUC__ >= 10
 // Test that basic STL headers work with system libc++ (Apple or LLVM).
 // This exercises _Float16 handling, __decay builtin, and error recovery
 // for parameter type mismatches in libc++ internals.

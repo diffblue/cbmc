@@ -1,5 +1,5 @@
 // C++26 language features require GCC 12+
-#if !defined(__GNUC__) || __GNUC__ >= 12
+#if !defined(__GNUC__) && !defined(_MSC_VER) || __GNUC__ >= 12
 int add(int a, int b) pre(a > 0) pre(b > 0) post(r : r > 0)
 {
   return a + b;

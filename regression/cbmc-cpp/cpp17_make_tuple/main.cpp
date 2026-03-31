@@ -1,5 +1,5 @@
 // std::make_tuple requires GCC 11+ (SFINAE in return type on older GCC)
-#if !defined(__GNUC__) || __GNUC__ >= 11
+#if !defined(__GNUC__) && !defined(_MSC_VER) || __GNUC__ >= 11
 #  include <tuple>
 
 int main()

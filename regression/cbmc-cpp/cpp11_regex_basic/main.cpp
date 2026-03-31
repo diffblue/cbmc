@@ -1,5 +1,5 @@
 // <regex> crashes on GCC 9 (segfault during type-checking)
-#if !defined(__GNUC__) || __GNUC__ >= 11
+#if !defined(__GNUC__) && !defined(_MSC_VER) || __GNUC__ >= 11
 // C++11 <regex> header parses and type-checks
 #  include <regex>
 
