@@ -1,5 +1,6 @@
 #include <version>
-#if !defined(_MSC_VER) && (defined(__cpp_lib_bit_cast) || (__has_include(<bit>) && (!defined(__GNUC__) || __GNUC__ >= 11)))
+#if !defined(_MSC_VER) &&                                                      \
+  (defined(__cpp_lib_bit_cast) || (__has_include(<bit>) && (!defined(__GNUC__) || __GNUC__ >= 11)))
 // C++20 std::bit_cast
 #  include <bit>
 int main()
