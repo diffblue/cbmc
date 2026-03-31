@@ -40,9 +40,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-checker/all_properties_verifier_with_fault_localization.h>
 #include <goto-checker/all_properties_verifier_with_trace_storage.h>
 #include <goto-checker/bmc_util.h>
+#include <goto-checker/concurrent_incremental_symex_checker.h>
 #include <goto-checker/cover_goals_verifier_with_trace_storage.h>
 #include <goto-checker/multi_path_symex_checker.h>
 #include <goto-checker/multi_path_symex_only_checker.h>
+#include <goto-checker/periodic_incremental_symex_checker.h>
 #include <goto-checker/properties.h>
 #include <goto-checker/single_loop_incremental_symex_checker.h>
 #include <goto-checker/single_path_symex_checker.h>
@@ -437,6 +439,16 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     }
   }
 
+  if(cmdline.isset("incremental-check-interval"))
+  {
+    options.set_option(
+      "incremental-check-interval",
+      cmdline.get_value("incremental-check-interval"));
+  }
+
+  if(cmdline.isset("concurrent-incremental"))
+    options.set_option("concurrent-incremental", true);
+
   if(cmdline.isset("graphml-witness"))
   {
     options.set_option("graphml-witness", cmdline.get_value("graphml-witness"));
@@ -704,7 +716,34 @@ int cbmc_parse_optionst::doit()
 
   std::unique_ptr<goto_verifiert> verifier = nullptr;
 
-  if(options.is_set("incremental-loop"))
+  if(
+    options.get_bool_option("concurrent-incremental") &&
+    !options.is_set("incremental-check-interval"))
+  {
+    log.error()
+      << "--concurrent-incremental requires --incremental-check-interval"
+      << messaget::eom;
+    return CPROVER_EXIT_USAGE_ERROR;
+  }
+
+  if(
+    options.get_bool_option("concurrent-incremental") &&
+    options.is_set("incremental-check-interval"))
+  {
+    if(options.get_bool_option("stop-on-fail"))
+    {
+      verifier = std::make_unique<
+        stop_on_fail_verifiert<concurrent_incremental_symex_checkert>>(
+        options, ui_message_handler, goto_model);
+    }
+    else
+    {
+      verifier = std::make_unique<all_properties_verifier_with_trace_storaget<
+        concurrent_incremental_symex_checkert>>(
+        options, ui_message_handler, goto_model);
+    }
+  }
+  else if(options.is_set("incremental-loop"))
   {
     if(options.get_bool_option("stop-on-fail"))
     {
@@ -716,6 +755,21 @@ int cbmc_parse_optionst::doit()
     {
       verifier = std::make_unique<all_properties_verifier_with_trace_storaget<
         single_loop_incremental_symex_checkert>>(
+        options, ui_message_handler, goto_model);
+    }
+  }
+  else if(options.is_set("incremental-check-interval"))
+  {
+    if(options.get_bool_option("stop-on-fail"))
+    {
+      verifier = std::make_unique<
+        stop_on_fail_verifiert<periodic_incremental_symex_checkert>>(
+        options, ui_message_handler, goto_model);
+    }
+    else
+    {
+      verifier = std::make_unique<all_properties_verifier_with_trace_storaget<
+        periodic_incremental_symex_checkert>>(
         options, ui_message_handler, goto_model);
     }
   }
