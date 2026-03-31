@@ -1,4 +1,4 @@
-#if __has_include(<numbers>)
+#if !defined(_MSC_VER) && __has_include(<numbers>)
 // C++20 std::numbers
 #  include <numbers>
 int main()

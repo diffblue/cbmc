@@ -1,5 +1,5 @@
 // Requires GCC 12+ or Clang (older libstdc++ lacks support).
-#if !defined(__GNUC__) || defined(__clang__) || __GNUC__ >= 12
+#if !defined(__GNUC__) && !defined(_MSC_VER) || defined(__clang__) || __GNUC__ >= 12
 // C++23 std::expected basic usage
 #  include <expected>
 

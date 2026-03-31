@@ -1,4 +1,4 @@
-#if __has_include(<compare>)
+#if !defined(_MSC_VER) && __has_include(<compare>)
 #  include <compare>
 int main()
 {

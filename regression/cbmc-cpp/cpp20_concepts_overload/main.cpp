@@ -1,4 +1,4 @@
-#if __has_include(<concepts>)
+#if !defined(_MSC_VER) && __has_include(<concepts>)
 // C++20 concept-constrained overload resolution
 #  include <concepts>
 template <typename T>

@@ -1,5 +1,5 @@
 // valarray internals changed in GCC 16, causing pointer arithmetic failures
-#if !defined(__GNUC__) || __GNUC__ <= 15
+#if !defined(__GNUC__) && !defined(_MSC_VER) || __GNUC__ <= 15
 #  include <cassert>
 #  include <valarray>
 int main()

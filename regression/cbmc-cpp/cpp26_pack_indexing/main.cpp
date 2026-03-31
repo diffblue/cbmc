@@ -1,5 +1,5 @@
 // C++26 language features require GCC 12+
-#if !defined(__GNUC__) || __GNUC__ >= 12
+#if !defined(__GNUC__) && !defined(_MSC_VER) || __GNUC__ >= 12
 // C++26 pack indexing
 template <typename... Ts>
 using first_t = Ts...[0];

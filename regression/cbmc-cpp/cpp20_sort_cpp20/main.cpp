@@ -1,5 +1,5 @@
 // GCC 16 std::less<void> uses nested requires that CBMC can't parse
-#if !defined(__GNUC__) || __GNUC__ <= 15
+#if !defined(__GNUC__) && !defined(_MSC_VER) || __GNUC__ <= 15
 // std::sort in C++20 mode
 #  include <algorithm>
 int main()
