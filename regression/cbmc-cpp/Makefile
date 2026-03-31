@@ -5,7 +5,7 @@ include ../../src/common
 
 ifeq ($(BUILD_ENV_),MSVC)
   excluded_tests = -X gcc-only
-else ifeq ($(shell gcc --version 2>&1 | grep -c 'Free Software Foundation'),1)
+else ifneq ($(shell ../../../src/goto-cc/goto-cc --version 2>&1 | grep -c 'gcc:'),0)
   excluded_tests =
 else
   excluded_tests = -X gcc-only
