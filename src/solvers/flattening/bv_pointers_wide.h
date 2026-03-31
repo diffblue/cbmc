@@ -99,6 +99,7 @@ protected:
   // overloading
   literalt convert_rest(const exprt &) override;
   bvt convert_bitvector(const exprt &) override;
+  bool boolbv_set_equality_to_true(const equal_exprt &expr) override;
   bvt convert_byte_extract(const byte_extract_exprt &expr) override;
   bvt convert_byte_update(const byte_update_exprt &expr) override;
 

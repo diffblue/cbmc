@@ -1,0 +1,19 @@
+CORE broken-smt-backend no-new-smt pointer-encoding-via-maps
+main.c
+
+^EXIT=10$
+^SIGNAL=0$
+^\[main.assertion.1\] line 6 correct: SUCCESS
+^\[main.pointer.1\] line 8 same object violation in array - other_array: FAILURE$
+^\[main.assertion.3\] line 13 undefined behavior: FAILURE$
+^\[main.assertion.8\] line 28 end plus 2 is nondet: (UNKNOWN|FAILURE)$
+^\[main.pointer_arithmetic.\d+\] line 28 pointer relation: pointer outside object bounds in p: FAILURE$
+^\*\* 5 of \d+ failed
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Map-based pointer encoding variant: fewer overflow failures because
+base addresses are constrained to the positive 32-bit range, so
+pointer-to-integer arithmetic doesn't overflow.

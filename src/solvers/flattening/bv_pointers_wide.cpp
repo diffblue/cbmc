@@ -789,6 +789,30 @@ static bool is_pointer_subtraction(const exprt &expr)
          minus_expr.rhs().type().id() == ID_pointer;
 }
 
+// boolbv_set_equality_to_true: for pointer equalities used as
+// constraints (via set_to), force bitvector identity.  This ensures
+// that the solver assigns the same index to both sides, which is
+// needed for model extraction (bv_get_rec looks up the index).
+
+bool bv_pointers_widet::boolbv_set_equality_to_true(const equal_exprt &expr)
+{
+  if(
+    expr.lhs().type().id() == ID_pointer &&
+    expr.rhs().type().id() == ID_pointer)
+  {
+    const bvt &lhs_bv = convert_bv(expr.lhs());
+    const bvt &rhs_bv = convert_bv(expr.rhs());
+
+    // Force bitvector identity (index equality)
+    for(std::size_t i = 0; i < lhs_bv.size() && i < rhs_bv.size(); ++i)
+      prop.set_equal(lhs_bv[i], rhs_bv[i]);
+
+    return false; // handled
+  }
+
+  return SUB::boolbv_set_equality_to_true(expr);
+}
+
 // convert_byte_extract: lower when pointers are involved,
 // since the abstract pointer index is not meaningful as bytes.
 
@@ -1073,6 +1097,7 @@ literalt bv_pointers_widet::convert_rest(const exprt &expr)
 
       literalt result = prop.lor(indices_equal, semantic_eq);
 
+      // Bidirectional: index equality implies semantic equality
       prop.l_set_to_true(prop.limplies(indices_equal, obj_eq));
       prop.l_set_to_true(prop.limplies(indices_equal, off_eq));
 
