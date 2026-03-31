@@ -702,10 +702,17 @@ jobs:
           ./unit_tests "[z3]"
       - name: Run JBMC unit tests
         run: cd jbmc/unit; ./unit_tests
-      - name: Run regression tests (limited for debugging)
+      - name: Run regression tests (expanded for debugging)
         run: |
+          export PATH=$PATH:`pwd`/src/solvers
           make -C regression/cpp test
+          make -C regression/cbmc-cpp test
+          make -C regression/cbmc test
           make -C regression/systemc test
+          make -C regression/goto-instrument test
+          make -C regression/goto-analyzer test
+          make -C regression/contracts test
+          make -C regression/contracts-dfcc test
 
   # This job takes approximately 36 to 85 minutes
   check-macos-14-cmake-clang:
