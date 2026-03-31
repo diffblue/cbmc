@@ -449,6 +449,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("concurrent-incremental"))
     options.set_option("concurrent-incremental", true);
 
+  if(cmdline.isset("speculative-check"))
+    options.set_option("speculative-check", true);
+
   if(cmdline.isset("graphml-witness"))
   {
     options.set_option("graphml-witness", cmdline.get_value("graphml-witness"));

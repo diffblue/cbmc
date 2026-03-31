@@ -341,12 +341,13 @@ concurrent_incremental_symex_checkert::operator()(propertiest &properties)
 
     full_equation_generated = sync.symex_done;
 
-    revert_slice(equation);
-
+    // New steps from symex will be converted on the next iteration
+    // by prepare_property_decider_incremental. We do NOT revert the
+    // slice or reset current_equation_converted, because re-converting
+    // the entire equation into the same solver creates duplicate
+    // Tseitin clauses that corrupt the formula.
     update_properties_status_from_symex_target_equation(
       properties, result.updated_properties, equation);
-
-    current_equation_converted = false;
   }
 
   return result;

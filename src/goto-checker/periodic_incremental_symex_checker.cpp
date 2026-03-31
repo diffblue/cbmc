@@ -13,15 +13,17 @@ Author: CBMC Contributors
 
 #include "periodic_incremental_symex_checker.h"
 
+#include <util/std_expr.h>
 #include <util/ui_message.h>
 
 #include <goto-symex/slice.h>
+#include <solvers/prop/prop_conv_solver.h>
 
 #include "bmc_util.h"
-#include "solver_factory.h"
-#include <sstream>
-#include <solvers/prop/prop_conv_solver.h>
 #include "counterexample_beautification.h"
+#include "solver_factory.h"
+
+#include <sstream>
 
 // --- symex_bmc_periodic_stept implementation ---
 
@@ -119,6 +121,7 @@ periodic_incremental_symex_checkert::periodic_incremental_symex_checkert(
       unwindset,
       static_cast<unsigned>(
         options.get_signed_int_option("incremental-check-interval"))),
+    speculative_checking_enabled(options.get_bool_option("speculative-check")),
     property_decider(options, ui_message_handler, equation, ns)
 {
   unwindset.parse_unwind(options.get_option("unwind"));
@@ -147,7 +150,6 @@ periodic_incremental_symex_checkert::operator()(propertiest &properties)
     full_equation_generated = !symex.from_entry_point_of(
       goto_symext::get_goto_function(goto_model), symex_symbol_table);
 
-    // This might add new properties such as unwinding assertions.
     update_properties_status_from_symex_target_equation(
       properties, result.updated_properties, equation);
 
@@ -181,8 +183,7 @@ periodic_incremental_symex_checkert::operator()(propertiest &properties)
         ++solver_calls;
         log.status()
           << "Periodic check #" << solver_calls << ": running "
-          << property_decider.get_decision_procedure()
-               .decision_procedure_text()
+          << property_decider.get_decision_procedure().decision_procedure_text()
           << messaget::eom;
 
         decision_proceduret::resultt dec_result = property_decider.solve();
@@ -193,8 +194,8 @@ periodic_incremental_symex_checkert::operator()(propertiest &properties)
         const auto solver_stop = std::chrono::steady_clock::now();
         solver_runtime +=
           std::chrono::duration<double>(solver_stop - solver_start);
-        log.status() << "Runtime decision procedure: "
-                     << solver_runtime.count() << "s" << messaget::eom;
+        log.status() << "Runtime decision procedure: " << solver_runtime.count()
+                     << "s" << messaget::eom;
 
         result.progress =
           dec_result == decision_proceduret::resultt::D_SATISFIABLE
@@ -206,74 +207,80 @@ periodic_incremental_symex_checkert::operator()(propertiest &properties)
 
         property_decider.pop_incremental_assumptions();
       }
-      else
+      else if(speculative_checking_enabled)
       {
-        // Partial equation: launch speculative check in a thread.
-        // Save equation state before the speculative check modifies it.
-        saved_step_state.clear();
-        saved_step_state.reserve(equation.SSA_steps.size());
-        for(const auto &step : equation.SSA_steps)
-          saved_step_state.push_back(
-            {step.converted, step.cond_handle, step.guard_handle});
+        // Speculative cone-of-influence check on partial equation.
+        // Only check the most recently discovered assertion to
+        // minimize overhead.
+        const std::size_t current_assertions = equation.count_assertions();
+        if(current_assertions > last_speculative_assertion_count)
+        {
+          last_speculative_assertion_count = current_assertions;
 
-        ++solver_calls;
-        log.status() << "Speculative check #" << solver_calls
-                     << " on partial equation (" << equation.SSA_steps.size()
-                     << " steps)" << messaget::eom;
+          ++solver_calls;
+          log.status() << "Speculative check #" << solver_calls
+                       << " on partial equation (" << equation.SSA_steps.size()
+                       << " steps)" << messaget::eom;
 
-        speculative_sat = false;
-        // Snapshot the current equation size. The speculative thread
-        // will only process steps up to this point. Symex may append
-        // new steps concurrently, but the thread won't see them.
-        const std::size_t snapshot_size = equation.SSA_steps.size();
-        speculative_thread = std::make_unique<std::thread>(
-          [this, snapshot_size]()
-          {
-            std::ostringstream spec_log_stream;
-            stream_message_handlert spec_mh(spec_log_stream);
-            spec_mh.set_verbosity(
-              ui_message_handler.get_verbosity());
-
-            solver_factoryt solvers(
-              options, ns, spec_mh, false);
-            auto spec_solver = solvers.get_solver();
-            auto &spec_dp = spec_solver->decision_procedure();
-
-            auto *prop_conv =
-              dynamic_cast<prop_conv_solvert *>(&spec_dp);
-            if(prop_conv)
-              prop_conv->set_all_frozen();
-
-            // Only convert the snapshot (existing steps).
-            // New steps appended by symex are not touched.
-            std::size_t count = 0;
-            for(auto &step : equation.SSA_steps)
+          speculative_sat = false;
+          const std::size_t snapshot_size = equation.SSA_steps.size();
+          speculative_thread = std::make_unique<std::thread>(
+            [this, snapshot_size]()
             {
-              if(count >= snapshot_size)
-                break;
-              if(!step.ignore)
+              std::ostringstream spec_log_stream;
+              stream_message_handlert spec_mh(spec_log_stream);
+              spec_mh.set_verbosity(ui_message_handler.get_verbosity());
+
+              // Find the last assertion in the snapshot.
+              symex_target_equationt::SSA_stepst::const_iterator last_assert;
+              bool found = false;
+              std::size_t count = 0;
+              for(auto it = equation.SSA_steps.begin();
+                  it != equation.SSA_steps.end() && count < snapshot_size;
+                  ++it, ++count)
               {
-                step.guard_handle = spec_dp.handle(step.guard);
-                if(step.is_assume())
-                  step.cond_handle = spec_dp.handle(step.cond_expr);
-                else if(step.is_assignment() || step.is_constraint())
-                  spec_dp.set_to_true(step.cond_expr);
-                else if(step.is_assert())
+                if(it->is_assert() && !it->ignore)
                 {
-                  step.cond_handle = spec_dp.handle(step.cond_expr);
-                  spec_dp.set_to_false(step.cond_expr);
+                  last_assert = it;
+                  found = true;
                 }
               }
-              ++count;
-            }
 
-            auto r = spec_solver->decision_procedure()();
-            speculative_sat =
-              (r == decision_proceduret::resultt::D_SATISFIABLE);
+              if(!found)
+              {
+                speculative_log_output = spec_log_stream.str();
+                return;
+              }
 
-            speculative_log_output = spec_log_stream.str();
-          });
-        // Symex continues immediately — speculative thread runs concurrently.
+              auto cone = cone_of_influence(
+                equation.SSA_steps, last_assert, snapshot_size);
+
+              solver_factoryt solvers(options, ns, spec_mh, false);
+              auto spec_solver = solvers.get_solver();
+              auto &dp = spec_solver->decision_procedure();
+
+              for(const auto *step : cone)
+              {
+                if(step->is_assignment() || step->is_constraint())
+                  dp.set_to_true(step->cond_expr);
+                else if(step->is_assume())
+                {
+                  exprt g = dp.handle(step->guard);
+                  dp.set_to_true(implies_exprt(g, step->cond_expr));
+                }
+                else if(step->is_assert())
+                {
+                  exprt g = dp.handle(step->guard);
+                  dp.set_to_true(implies_exprt(g, not_exprt(step->cond_expr)));
+                }
+              }
+
+              if(dp() == decision_proceduret::resultt::D_SATISFIABLE)
+                speculative_sat = true;
+
+              speculative_log_output = spec_log_stream.str();
+            });
+        }
       }
     }
 
@@ -288,56 +295,44 @@ periodic_incremental_symex_checkert::operator()(propertiest &properties)
       break;
     }
 
-    // We continue symbolic execution
+    // Resume symbolic execution
     if(!full_equation_generated)
     {
-      // Give symex a fresh merge_irep so new steps don't share
-      // the hash table with existing steps. This allows the
-      // speculative thread to safely read existing steps' ireps
-      // while symex appends new ones.
-      merge_irept saved_merge_irep =
-        equation.swap_merge_irep(merge_irept{});
-
-      // Resume symex concurrently with the speculative thread.
-      full_equation_generated =
-        !symex.resume(goto_symext::get_goto_function(goto_model));
-
-      // Join speculative thread after symex pauses.
-      if(speculative_thread)
+      if(speculative_checking_enabled)
       {
-        speculative_thread->join();
-        speculative_thread.reset();
+        // Swap merge_irep so speculative thread can safely read
+        // existing steps while symex appends new ones.
+        merge_irept saved = equation.swap_merge_irep(merge_irept{});
 
-        auto sit = saved_step_state.begin();
-        for(auto &step : equation.SSA_steps)
+        full_equation_generated =
+          !symex.resume(goto_symext::get_goto_function(goto_model));
+
+        if(speculative_thread)
         {
-          if(sit == saved_step_state.end())
-            break;
-          step.converted = sit->converted;
-          step.cond_handle = sit->cond_handle;
-          step.guard_handle = sit->guard_handle;
-          ++sit;
+          speculative_thread->join();
+          speculative_thread.reset();
+
+          if(speculative_sat)
+          {
+            log.status() << "Speculative check found potential failure"
+                         << messaget::eom;
+          }
+
+          equation.set_message_handler(ui_message_handler);
+          if(!speculative_log_output.empty())
+            log.debug() << speculative_log_output << messaget::eom;
         }
 
-        if(speculative_sat)
-        {
-          log.status() << "Speculative check found potential failure"
-                       << messaget::eom;
-        }
-
-        equation.set_message_handler(ui_message_handler);
-        if(!speculative_log_output.empty())
-        {
-          log.debug() << speculative_log_output << messaget::eom;
-        }
+        equation.swap_merge_irep(std::move(saved));
       }
-
-      // Restore the original merge_irep (merges both pools).
-      equation.swap_merge_irep(std::move(saved_merge_irep));
+      else
+      {
+        full_equation_generated =
+          !symex.resume(goto_symext::get_goto_function(goto_model));
+      }
 
       revert_slice(equation);
 
-      // This might add new properties such as unwinding assertions.
       update_properties_status_from_symex_target_equation(
         properties, result.updated_properties, equation);
 

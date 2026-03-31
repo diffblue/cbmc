@@ -294,7 +294,10 @@ public:
       step.validate(ns, vm);
   }
 
-  void set_message_handler(message_handlert &mh) { log.set_message_handler(mh); }
+  void set_message_handler(message_handlert &mh)
+  {
+    log.set_message_handler(mh);
+  }
 
   /// Swap the merge_irep instance. Returns the old one.
   /// Used to isolate irep sharing during concurrent access.
@@ -303,6 +306,7 @@ public:
     std::swap(merge_irep, other);
     return other;
   }
+
 protected:
   messaget log;
 

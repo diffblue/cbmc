@@ -14,9 +14,6 @@ Author: CBMC Contributors
 #ifndef CPROVER_GOTO_CHECKER_PERIODIC_INCREMENTAL_SYMEX_CHECKER_H
 #define CPROVER_GOTO_CHECKER_PERIODIC_INCREMENTAL_SYMEX_CHECKER_H
 
-#include <memory>
-#include <thread>
-
 #include <goto-programs/unwindset.h>
 
 #include <goto-symex/path_storage.h>
@@ -26,6 +23,9 @@ Author: CBMC Contributors
 #include "incremental_goto_checker.h"
 #include "symex_bmc.h"
 #include "witness_provider.h"
+
+#include <memory>
+#include <thread>
 
 /// Performs a multi-path symbolic execution using goto-symex
 /// that periodically pauses every N steps
@@ -100,19 +100,15 @@ protected:
   symex_bmc_periodic_stept symex;
   bool initial_equation_generated = false;
   bool full_equation_generated = false;
+  bool current_equation_converted = false;
 
-  /// State saved before a speculative check, restored after.
-  struct step_statet
-  {
-    bool converted;
-    exprt cond_handle;
-    exprt guard_handle;
-  };
-  std::vector<step_statet> saved_step_state;
+  /// Speculative checking state (only active with --speculative-check)
+  bool speculative_checking_enabled = false;
   std::unique_ptr<std::thread> speculative_thread;
   bool speculative_sat = false;
   std::string speculative_log_output;
-  bool current_equation_converted = false;
+  std::size_t last_speculative_assertion_count = 0;
+
   goto_symex_property_decidert property_decider;
 };
 

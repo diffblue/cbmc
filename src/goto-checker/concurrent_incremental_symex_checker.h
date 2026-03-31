@@ -14,7 +14,6 @@ Author: CBMC Contributors
 #ifndef CPROVER_GOTO_CHECKER_CONCURRENT_INCREMENTAL_SYMEX_CHECKER_H
 #define CPROVER_GOTO_CHECKER_CONCURRENT_INCREMENTAL_SYMEX_CHECKER_H
 
-
 #include <goto-programs/unwindset.h>
 
 #include <goto-symex/path_storage.h>

@@ -201,6 +201,7 @@ std::chrono::duration<double> prepare_property_decider_incremental(
   "(incremental-loop):"                                                        \
   "(incremental-check-interval):"                                              \
   "(concurrent-incremental)"                                                   \
+  "(speculative-check)"                                                        \
   "(unwind-min):"                                                              \
   "(unwind-max):"                                                              \
   "(ignore-properties-before-unwind-min)"                                      \
@@ -231,6 +232,10 @@ std::chrono::duration<double> prepare_property_decider_incremental(
   " {y--concurrent-incremental} \t "                                           \
   "run symbolic execution and SAT solving concurrently in separate "           \
   "threads (use with {y--incremental-check-interval})\n"                       \
+  " {y--speculative-check} \t "                                                \
+  "speculatively check assertions on partial equations using "                 \
+  "cone-of-influence slicing (use with "                                       \
+  "{y--incremental-check-interval})\n"                                         \
   " {y--unwind-min} {unr} \t "                                                 \
   "start incremental-loop after {unr} unwindings but before solving that "     \
   "iteration. If for example it is 1, then the loop will be unwound once, "    \

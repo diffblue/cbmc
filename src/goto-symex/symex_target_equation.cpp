@@ -679,7 +679,6 @@ symex_target_equationt::convert_assertions_incremental(
 
     if(step.is_assert() && !step.ignore && !step.converted)
     {
-
       log.conditional_output(
         log.debug(),
         [&step](messaget::mstreamt &mstream)
@@ -709,8 +708,7 @@ symex_target_equationt::convert_assertions_incremental(
         assumption.copy_to_operands(step.cond_handle);
       else
       {
-        assumption =
-          and_exprt(assumption, step.cond_handle);
+        assumption = and_exprt(assumption, step.cond_handle);
       }
 
       with_solver_hardness(
