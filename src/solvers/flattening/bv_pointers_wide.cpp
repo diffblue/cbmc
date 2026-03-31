@@ -581,10 +581,6 @@ bvt bv_pointers_widet::convert_pointer_type(const exprt &expr)
 
         const auto &objects = pointer_logic.objects;
         std::size_t number = 0;
-        // Constrain: object must be one of the known objects.
-        // Without this, the solver can choose an arbitrary object
-        // number that's not in the pointer maps, making safety
-        // checks (null, invalid, bounds) unprovable.
         std::vector<literalt> valid_obj_lits;
         for(auto it = objects.cbegin(); it != objects.cend(); ++it, ++number)
         {
@@ -596,10 +592,30 @@ bvt bv_pointers_widet::convert_pointer_type(const exprt &expr)
 
           bvt base = get_object_base_address(number, ptr_width);
           bvt flat = bv_utils.add(base, off_bv);
+          // Forward: obj == i => base[i] + offset == int_value
           for(std::size_t i = 0; i < ptr_width; ++i)
           {
             prop.lcnf({!is_this_obj, !flat[i], int_ext[i]});
             prop.lcnf({!is_this_obj, flat[i], !int_ext[i]});
+          }
+
+          // Backward: if int_value is in [base[i], base[i]+size),
+          // then obj must be i.  This helps the solver determine
+          // which object the I2P result points to.
+          auto size_opt = pointer_offset_size(it->type(), ns);
+          if(size_opt.has_value() && *size_opt > 0)
+          {
+            // base[i] <= int_value
+            literalt ge_base = bv_utils.rel(
+              int_ext, ID_ge, base, bv_utilst::representationt::UNSIGNED);
+            // int_value < base[i] + size
+            bvt end =
+              bv_utils.add(base, bv_utils.build_constant(*size_opt, ptr_width));
+            literalt lt_end = bv_utils.rel(
+              int_ext, ID_lt, end, bv_utilst::representationt::UNSIGNED);
+            // in_range => obj == i
+            literalt in_range = prop.land(ge_base, lt_end);
+            prop.l_set_to_true(prop.limplies(in_range, is_this_obj));
           }
         }
         // Object must be one of the known objects
