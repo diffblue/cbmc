@@ -840,7 +840,7 @@ jobs:
         if: always()
         run: |
           Set-Location build
-          ctest -V -L CORE -C Release -R "cpp-CORE" --timeout 600 . -j${{env.windows-vcpus}}
+          ctest -V -L CORE -C Release -R "^cpp-CORE$$" --timeout 600 . -j${{env.windows-vcpus}}
       - name: Test cbmc-cpp suite
         if: always()
         run: |
