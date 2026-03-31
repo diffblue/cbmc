@@ -1276,6 +1276,16 @@ bool configt::set(const cmdlinet &cmdline)
   if(cmdline.isset("cpp26"))
     cpp.set_cpp26();
 
+  // MSVC's STL requires at least C++14 (uses enable_if_t, etc.)
+  // Clang also defaults to C++14+. Upgrade C++11 to C++14 for these.
+  if(
+    cpp.cpp_standard == cppt::cpp_standardt::CPP11 &&
+    (ansi_c.preprocessor == ansi_ct::preprocessort::VISUAL_STUDIO ||
+     ansi_c.preprocessor == ansi_ct::preprocessort::CLANG))
+  {
+    cpp.set_cpp14();
+  }
+
   // set the upper bound for argc
   if(os == "windows")
   {
