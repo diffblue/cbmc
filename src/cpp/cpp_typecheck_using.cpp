@@ -28,6 +28,32 @@ void cpp_typecheckt::convert(cpp_usingt &cpp_using)
   cpp_template_args_non_tct template_args;
   resolver.resolve_scope(cpp_using.name(), base_name, template_args);
 
+  // For "using _Mybase::_Mybase" where _Mybase is a typedef for Base,
+  // resolve_scope navigates to Base's scope, but base_name is still
+  // "_Mybase". Replace with the actual class name so constructor
+  // lookup succeeds (inheriting constructors).
+  {
+    const irep_idt &current_scope_id = cpp_scopes.current_scope().identifier;
+    const symbolt *scope_sym = symbol_table.lookup(current_scope_id);
+    if(
+      scope_sym != nullptr && scope_sym->is_type &&
+      scope_sym->type.id() == ID_struct)
+    {
+      irep_idt class_base_name = scope_sym->base_name;
+      if(base_name != class_base_name)
+      {
+        // Check if base_name is a typedef in the CALLING scope
+        // that resolves to this class
+        // If so, replace base_name with the class's base_name
+        // (for inheriting constructor: using Typedef::Typedef -> Base::Base)
+        auto check_set =
+          cpp_scopes.current_scope().lookup(base_name, cpp_scopet::RECURSIVE);
+        if(check_set.empty())
+          base_name = class_base_name;
+      }
+    }
+  }
+
   bool qualified=cpp_using.name().is_qualified();
 
   const auto id_set = cpp_scopes.current_scope().lookup(
