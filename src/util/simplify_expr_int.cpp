@@ -768,6 +768,33 @@ simplify_exprt::simplify_bitwise(const multi_ary_exprt &expr)
     no_change = false;
   }
 
+  // 'all zeros' in bitand yields zero
+  if(new_expr.id() == ID_bitand)
+  {
+    const constant_exprt zero = new_expr.type().id() == ID_bv
+                                  ? to_bv_type(new_expr.type()).all_zeros_expr()
+                                  : from_integer(0, new_expr.type());
+    for(const auto &op : new_expr.operands())
+    {
+      if(op == zero)
+        return zero;
+    }
+  }
+
+  // 'all ones' in bitor yields all-ones
+  if(new_expr.id() == ID_bitor)
+  {
+    const constant_exprt all_ones =
+      new_expr.type().id() == ID_bv
+        ? to_bv_type(new_expr.type()).all_ones_expr()
+        : from_integer(power(2, width) - 1, new_expr.type());
+    for(const auto &op : new_expr.operands())
+    {
+      if(op == all_ones)
+        return all_ones;
+    }
+  }
+
   // now erase 'all zeros' out of bitor, bitxor
 
   if(new_expr.id() == ID_bitor || new_expr.id() == ID_bitxor)
