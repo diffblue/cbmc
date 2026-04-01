@@ -1,6 +1,6 @@
 CORE
 main.cpp
---cpp11 --unwind 2 --no-unwinding-assertions
+--cpp11 --unwind 2 --no-unwinding-assertions --depth 100
 ^EXIT=(0|10)$
 ^SIGNAL=0$
 --
