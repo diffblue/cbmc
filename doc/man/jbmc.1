@@ -451,6 +451,10 @@ incremental solving (experimental)
 .TP
 \fB\-\-outfile\fR filename
 output formula to given file
+.br
+If all properties are simplified to true before solving, the formula
+written to \fIfilename\fR will contain only the solver header and no
+assertions, and a status message is emitted to that effect.
 .TP
 \fB\-\-dump\-smt\-formula\fR filename
 output smt incremental formula to the given file
