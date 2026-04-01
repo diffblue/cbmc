@@ -78,6 +78,17 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
     if(has_auto(symbol.type))
     {
       cpp_convert_auto(symbol.type, symbol.value.type(), get_message_handler());
+      // For auto& in const context: if the initializer is const,
+      // the reference must also be const (e.g., auto& x = d; in
+      // a const method where d is a const member).
+      if(
+        is_reference(symbol.type) &&
+        symbol.value.type().get_bool(ID_C_constant) &&
+        symbol.type.id() == ID_pointer)
+      {
+        to_pointer_type(symbol.type).base_type().set(
+          ID_C_constant, true);
+      }
       typecheck_type(symbol.type);
       implicit_typecast(symbol.value, symbol.type);
     }
