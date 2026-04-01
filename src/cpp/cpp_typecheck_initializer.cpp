@@ -86,8 +86,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
         symbol.value.type().get_bool(ID_C_constant) &&
         symbol.type.id() == ID_pointer)
       {
-        to_pointer_type(symbol.type).base_type().set(
-          ID_C_constant, true);
+        to_pointer_type(symbol.type).base_type().set(ID_C_constant, true);
       }
       typecheck_type(symbol.type);
       implicit_typecast(symbol.value, symbol.type);

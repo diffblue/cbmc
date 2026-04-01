@@ -2798,6 +2798,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
                     {
                       exprt tmp = ret->return_value();
                       value_map.replace(tmp);
+                      simplify(tmp, *this);
                       expr.swap(tmp);
                       return;
                     }
@@ -2827,6 +2828,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
                 {
                   exprt tmp = ret->return_value();
                   value_map.replace(tmp);
+                  simplify(tmp, *this);
                   expr.swap(tmp);
                   return;
                 }
@@ -2849,6 +2851,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
                 {
                   exprt tmp = ret->return_value();
                   value_map.replace(tmp);
+                  simplify(tmp, *this);
                   expr.swap(tmp);
                   return;
                 }
@@ -2893,6 +2896,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
                 {
                   exprt tmp = ret->return_value();
                   value_map.replace(tmp);
+                  simplify(tmp, *this);
                   expr.swap(tmp);
                   return true; // return from function
                 }
