@@ -1,6 +1,6 @@
-CORE gcc-only
+CORE
 main.cpp
---cpp17 --unwind 5 --no-unwinding-assertions --no-built-in-assertions --depth 100
+--cpp17 --unwind 5 --no-unwinding-assertions --no-built-in-assertions --depth 200
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
