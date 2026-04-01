@@ -238,9 +238,31 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       if(t2.is_nil())
       {
         // __is_trivially_constructible(T) — default constructible
-        expr = (t1.id() != ID_struct_tag && t1.id() != ID_union_tag)
-                 ? exprt(true_exprt())
-                 : exprt(true_exprt());
+        // A type is trivially default constructible if it has no
+        // user-provided default constructor.
+        bool trivial = true;
+        if(t1.id() == ID_struct_tag)
+        {
+          const auto &st = follow_tag(to_struct_tag_type(t1));
+          for(const auto &c : st.components())
+          {
+            if(
+              c.type().id() == ID_code &&
+              to_code_type(c.type()).return_type().id() == ID_constructor &&
+              to_code_type(c.type()).parameters().size() == 1)
+            {
+              // Found a default constructor (only 'this' param).
+              // Check if it has a non-trivial body in the symbol table.
+              const auto *sym = symbol_table.lookup(c.get_name());
+              if(sym != nullptr && sym->value.is_not_nil())
+              {
+                trivial = false;
+                break;
+              }
+            }
+          }
+        }
+        expr = trivial ? exprt(true_exprt()) : exprt(false_exprt());
       }
       else
       {
@@ -2677,14 +2699,23 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       PRECONDITION(expr.arguments().size() == code_type.parameters().size());
       replace_symbolt value_map;
       auto param_it = code_type.parameters().begin();
+      bool args_are_constant = true;
       for(const auto &arg : expr.arguments())
       {
+        // Check if argument is fully constant (no symbol references).
+        // If not, we can't evaluate this constexpr call.
+        arg.visit_pre(
+          [&args_are_constant](const exprt &e)
+          {
+            if(e.id() == ID_symbol)
+              args_are_constant = false;
+          });
         value_map.insert(
           symbol_exprt{param_it->get_identifier(), param_it->type()},
           typecast_exprt::conditional_cast(arg, param_it->type()));
         ++param_it;
       }
-      bool can_evaluate = true;
+      bool can_evaluate = args_are_constant;
       const auto &block = to_code_block(to_code(symbol_ptr->value));
       for(const auto &stmt : block.statements())
       {
@@ -2718,8 +2749,43 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
                 break;
             }
             if(i == tmp.operands().size())
-              tmp = std::move(s);
+            {
+              // Verify all fields are constant (no remaining symbols
+              // from unevaluated parameters).
+              bool fully_evaluated = true;
+              s.visit_pre(
+                [&fully_evaluated](const exprt &e)
+                {
+                  if(e.id() == ID_symbol)
+                    fully_evaluated = false;
+                });
+              if(fully_evaluated)
+                tmp = std::move(s);
+              else
+              {
+                can_evaluate = false;
+                break;
+              }
+            }
             else
+            {
+              can_evaluate = false;
+              break;
+            }
+          }
+          // Only replace the call with the result if it's fully
+          // evaluated (no remaining function calls or symbols).
+          {
+            bool has_calls = false;
+            tmp.visit_pre(
+              [&has_calls](const exprt &e)
+              {
+                if(
+                  e.id() == ID_side_effect ||
+                  (e.id() == ID_symbol && e.type().id() != ID_code))
+                  has_calls = true;
+              });
+            if(has_calls)
             {
               can_evaluate = false;
               break;
@@ -2798,6 +2864,19 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
                       exprt tmp = ret->return_value();
                       value_map.replace(tmp);
                       simplify(tmp, *this);
+                      // Check if result is fully evaluated
+                      bool has_calls = false;
+                      tmp.visit_pre(
+                        [&has_calls](const exprt &e)
+                        {
+                          if(e.id() == ID_side_effect)
+                            has_calls = true;
+                        });
+                      if(has_calls)
+                      {
+                        can_evaluate = false;
+                        break;
+                      }
                       expr.swap(tmp);
                       return;
                     }
@@ -2828,6 +2907,20 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
                   exprt tmp = ret->return_value();
                   value_map.replace(tmp);
                   simplify(tmp, *this);
+                  {
+                    bool has_calls = false;
+                    tmp.visit_pre(
+                      [&has_calls](const exprt &e)
+                      {
+                        if(e.id() == ID_side_effect)
+                          has_calls = true;
+                      });
+                    if(has_calls)
+                    {
+                      can_evaluate = false;
+                      break;
+                    }
+                  }
                   expr.swap(tmp);
                   return;
                 }
@@ -2851,6 +2944,20 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
                   exprt tmp = ret->return_value();
                   value_map.replace(tmp);
                   simplify(tmp, *this);
+                  {
+                    bool has_calls = false;
+                    tmp.visit_pre(
+                      [&has_calls](const exprt &e)
+                      {
+                        if(e.id() == ID_side_effect)
+                          has_calls = true;
+                      });
+                    if(has_calls)
+                    {
+                      can_evaluate = false;
+                      break;
+                    }
+                  }
                   expr.swap(tmp);
                   return;
                 }
@@ -2896,6 +3003,17 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
                   exprt tmp = ret->return_value();
                   value_map.replace(tmp);
                   simplify(tmp, *this);
+                  {
+                    bool has_calls = false;
+                    tmp.visit_pre(
+                      [&has_calls](const exprt &e)
+                      {
+                        if(e.id() == ID_side_effect)
+                          has_calls = true;
+                      });
+                    if(has_calls)
+                      return false; // can't evaluate
+                  }
                   expr.swap(tmp);
                   return true; // return from function
                 }
