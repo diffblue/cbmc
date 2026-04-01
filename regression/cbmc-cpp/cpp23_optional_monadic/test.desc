@@ -1,4 +1,4 @@
-CORE gcc-only
+CORE
 main.cpp
 --cpp23 --depth 50 --no-unwinding-assertions
 ^VERIFICATION SUCCESSFUL$
