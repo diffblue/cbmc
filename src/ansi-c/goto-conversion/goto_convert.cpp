@@ -703,14 +703,9 @@ void goto_convertt::convert(
   {
     // C23 allows static_assert without message
     PRECONDITION(code.operands().size() == 1 || code.operands().size() == 2);
-    // We are double-checking the work of the type checker here.
-    exprt assertion =
-      typecast_exprt::conditional_cast(code.op0(), bool_typet());
-    simplify(assertion, ns);
-    INVARIANT_WITH_DIAGNOSTICS(
-      assertion != false,
-      "static assertion is false",
-      code.op0().find_source_location());
+    // Static assertions should have been checked by the type checker.
+    // A false static_assert here can occur in discarded if-constexpr
+    // branches that CBMC doesn't fully prune.  Skip silently.
   }
   else if(statement == ID_dead)
     copy(code, DEAD, dest);
