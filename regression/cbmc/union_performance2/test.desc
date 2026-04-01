@@ -1,0 +1,12 @@
+CORE no-new-smt
+main.c
+--no-array-field-sensitivity --z3
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Union with nested struct/array should not cause performance explosion
+when accessed with a non-constant offset smaller than the array element size.
+See GitHub issue diffblue/cbmc#8813.

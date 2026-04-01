@@ -1,0 +1,11 @@
+CORE
+main.c
+
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Union of same-typed members should not cause performance explosion.
+See GitHub issue diffblue/cbmc#8813.

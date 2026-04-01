@@ -886,6 +886,32 @@ std::optional<exprt> get_subexpression_at_offset(
 
       return {};
     }
+    else if(expr.type().id() == ID_union || expr.type().id() == ID_union_tag)
+    {
+      // For union-typed expressions with non-constant offset, access
+      // through the widest member to avoid expensive byte_extract lowering.
+      // This is safe when the widest member covers the full union (no
+      // trailing padding beyond it), since all members start at offset 0.
+      if(expr.id() == ID_symbol || expr.id() == ID_member)
+      {
+        const union_typet &union_type =
+          expr.type().id() == ID_union_tag
+            ? ns.follow_tag(to_union_tag_type(expr.type()))
+            : to_union_type(expr.type());
+
+        const auto union_size = pointer_offset_bits(union_type, ns);
+        const auto widest_member = union_type.find_widest_union_component(ns);
+        if(
+          widest_member.has_value() && union_size.has_value() &&
+          widest_member->second == *union_size)
+        {
+          const member_exprt member(
+            expr, widest_member->first.get_name(), widest_member->first.type());
+          return get_subexpression_at_offset(member, offset, target_type, ns);
+        }
+      }
+      return {};
+    }
     else
       return {};
   }
