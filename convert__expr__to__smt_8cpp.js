@@ -88,6 +88,7 @@ var convert__expr__to__smt_8cpp =
     [ "convert_type_to_smt_sort", "convert__expr__to__smt_8cpp.html#a00bfefcf2e98e7d77469d4cd2369228d", null ],
     [ "convert_type_to_smt_sort", "convert__expr__to__smt_8cpp.html#ac257d3906333ce54bf37774ede1df9cd", null ],
     [ "convert_type_to_smt_sort", "convert__expr__to__smt_8cpp.html#ac198171e63f7727687ccd38ea799f70a", null ],
+    [ "convert_type_to_smt_sort", "convert__expr__to__smt_8cpp.html#a0eb2845642ca66da305c9bc4c8c3c210", null ],
     [ "convert_type_to_smt_sort", "convert__expr__to__smt_8cpp.html#ab54130c24bec365e6443b95140f676b8", null ],
     [ "dispatch_expr_to_smt_conversion", "convert__expr__to__smt_8cpp.html#aa9679ae401be39dcfcd7be83b0ba45c0", null ],
     [ "extension_for_type", "convert__expr__to__smt_8cpp.html#a7d280750f51a6b6485e8787d149b53f2", null ],

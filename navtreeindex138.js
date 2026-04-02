@@ -1,5 +1,8 @@
 var NAVTREEINDEX138 =
 {
+"structclauset_1_1stept.html#a1fd650111199f5d384148f4b243ad0b9":[7,0,201,0,1],
+"structclauset_1_1stept.html#a96534295587ea6fb0e094ee023196827":[7,0,201,0,0],
+"structcmdlinet_1_1option__namest.html":[7,0,203,0],
 "structcmdlinet_1_1option__namest.html#a18e338b75b40cc4586e4f345456f6efe":[7,0,203,0,3],
 "structcmdlinet_1_1option__namest.html#a6d8d994b301a22e1ab5f93d4c88fc2a6":[7,0,203,0,2],
 "structcmdlinet_1_1option__namest.html#a86f9e32a8bc59200b10bf8208d65b31e":[7,0,203,0,1],
@@ -246,8 +249,5 @@ var NAVTREEINDEX138 =
 "structcpp__typecheck__resolvet_1_1matcht.html#a6e89c503ef0262e097587661609140e4":[7,0,342,0,0],
 "structcpp__typecheck__resolvet_1_1matcht.html#a8aa2fedc70554057433b6f7ef7ff4502":[7,0,342,0,3],
 "structcpp__typecheck__resolvet_1_1matcht.html#aefd2d6e65e1bc638dfbb217009f596fd":[7,0,342,0,2],
-"structcpp__typecheck__resolvet_1_1matcht.html#af1fccafbbadf8025e98ff80561db0067":[7,0,342,0,5],
-"structcpp__typecheckt_1_1method__bodyt.html":[7,0,343,2],
-"structcpp__typecheckt_1_1method__bodyt.html#a0f415d58f140baeff1b9695643444fb7":[7,0,343,2,3],
-"structcpp__typecheckt_1_1method__bodyt.html#a1e6141b7e5ab214f977a32a829251e3b":[7,0,343,2,1]
+"structcpp__typecheck__resolvet_1_1matcht.html#af1fccafbbadf8025e98ff80561db0067":[7,0,342,0,5]
 };
