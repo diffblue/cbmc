@@ -1389,10 +1389,20 @@ const symbolt &cpp_typecheckt::instantiate_template(
             if(it != cpp_scopes.id_map.end())
             {
               // Find the template symbol in the original class scope
+              // Search the template scope and its immediate children
+              // (the class body scope) for the member function template.
               auto tmpl_results = template_scope->lookup(
                 base_name,
                 cpp_scopet::SCOPE_ONLY,
                 cpp_idt::id_classt::TEMPLATE);
+              if(tmpl_results.empty())
+              {
+                // Search children (class body scope)
+                tmpl_results = template_scope->lookup(
+                  base_name,
+                  cpp_scopet::QUALIFIED,
+                  cpp_idt::id_classt::TEMPLATE);
+              }
               for(auto *tmpl_id : tmpl_results)
               {
                 auto &cs = static_cast<cpp_scopet &>(*it->second);

@@ -1,6 +1,6 @@
 CORE gcc-only
 main.cpp
---cpp17
+--cpp17 --verbosity 6
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
