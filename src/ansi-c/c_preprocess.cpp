@@ -265,6 +265,16 @@ bool c_preprocess_visual_studio(
     // It only works on Visual Studio 2015 or newer.
     command_file << "/source-charset:utf-8" << '\n';
 
+    // Pass the C++ standard to cl.exe so that headers guarded by
+    // _HAS_CXX17 etc. are correctly included.
+    if(config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP23)
+      command_file << "/std:c++latest" << '\n';
+    else if(config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP20)
+      command_file << "/std:c++20" << '\n';
+    else if(config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP17)
+      command_file << "/std:c++17" << '\n';
+    // C++14 is the default for MSVC, no flag needed
+
     command_file << "/D__CPROVER__" << "\n";
     command_file << "/D__WORDSIZE=" << config.ansi_c.pointer_width << "\n";
 
