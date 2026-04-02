@@ -624,10 +624,14 @@ std::optional<typet> java_type_from_string(
     {
       std::size_t e_pos=src.rfind(')');
       if(e_pos==std::string::npos)
-        return {};
+      {
+        throw unsupported_java_class_signature_exceptiont(
+          "Failed to find function signature closing delimiter");
+      }
 
       auto return_type = java_type_from_string(
         std::string(src, e_pos + 1, std::string::npos), class_name_prefix);
+      CHECK_RETURN(return_type.has_value());
 
       std::vector<typet> param_types =
         parse_list_types(src.substr(0, e_pos + 1), class_name_prefix, '(', ')');
@@ -648,10 +652,14 @@ std::optional<typet> java_type_from_string(
       // If this is a reference array, we generate a plain array[reference]
       // with void* members, but note the real type in ID_element_type.
       if(src.size()<=1)
-        return {};
+      {
+        throw unsupported_java_class_signature_exceptiont(
+          "Failed to find array signature closing delimiter");
+      }
       char subtype_letter=src[1];
       auto subtype = java_type_from_string(
         src.substr(1, std::string::npos), class_name_prefix);
+      CHECK_RETURN(subtype.has_value());
       if(subtype_letter=='L' || // [L denotes a reference array of some sort.
          subtype_letter=='[' || // Array-of-arrays
          subtype_letter=='T')   // Array of generic types
@@ -681,11 +689,11 @@ std::optional<typet> java_type_from_string(
     INVARIANT(src[src.size()-1]==';', "Generic type name must end on ';'.");
     PRECONDITION(!class_name_prefix.empty());
     irep_idt type_var_name(class_name_prefix+"::"+src.substr(1, src.size()-2));
+    auto lang_object = java_type_from_string("Ljava/lang/Object;");
+    CHECK_RETURN(lang_object.has_value());
     return java_generic_parametert(
       type_var_name,
-      to_struct_tag_type(
-        to_java_reference_type(*java_type_from_string("Ljava/lang/Object;"))
-          .base_type()));
+      to_struct_tag_type(to_java_reference_type(*lang_object).base_type()));
   }
   case 'L':
     {
@@ -781,13 +789,13 @@ std::vector<typet> java_generic_type_from_string(
 
     std::string type_var_name(
       "java::"+class_name+"::"+signature.substr(0, bound_sep));
-    std::string bound_type(signature.substr(bound_sep+1, var_sep-bound_sep));
-
+    std::string bound_type_str(
+      signature.substr(bound_sep + 1, var_sep - bound_sep));
+    auto bound_type = java_type_from_string(bound_type_str, class_name);
+    CHECK_RETURN(bound_type.has_value());
     java_generic_parametert type_var_type(
       type_var_name,
-      to_struct_tag_type(
-        to_java_reference_type(*java_type_from_string(bound_type, class_name))
-          .base_type()));
+      to_struct_tag_type(to_java_reference_type(*bound_type).base_type()));
 
     types.push_back(type_var_type);
     signature=signature.substr(var_sep+1, std::string::npos);
@@ -809,8 +817,11 @@ static std::string slash_to_dot(const std::string &src)
 struct_tag_typet java_classname(const std::string &id)
 {
   if(!id.empty() && id[0]=='[')
-    return to_struct_tag_type(
-      to_java_reference_type(*java_type_from_string(id)).base_type());
+  {
+    auto array_type = java_type_from_string(id);
+    CHECK_RETURN(array_type.has_value());
+    return to_struct_tag_type(to_java_reference_type(*array_type).base_type());
+  }
 
   std::string class_name=id;
 
@@ -1014,6 +1025,7 @@ void get_dependencies_from_generic_parameters(
     {
       auto type_from_string =
         java_type_from_string(signature, erase_type_arguments(signature));
+      CHECK_RETURN(type_from_string.has_value());
       get_dependencies_from_generic_parameters_rec(*type_from_string, refs);
     }
   }
@@ -1053,6 +1065,7 @@ java_generic_struct_tag_typet::java_generic_struct_tag_typet(
 {
   set(ID_C_java_generic_symbol, true);
   const auto base_type = java_type_from_string(base_ref, class_name_prefix);
+  CHECK_RETURN(base_type.has_value());
   PRECONDITION(is_java_generic_type(*base_type));
   const java_generic_typet &gen_base_type = to_java_generic_type(*base_type);
   INVARIANT(

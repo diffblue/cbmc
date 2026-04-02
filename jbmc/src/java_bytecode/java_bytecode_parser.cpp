@@ -85,7 +85,9 @@ private:
 
   const typet type_entry(u2 index)
   {
-    return *java_type_from_string(id2string(pool_entry(index).s));
+    auto type_opt = java_type_from_string(id2string(pool_entry(index).s));
+    CHECK_RETURN(type_opt.has_value());
+    return std::move(*type_opt);
   }
 
   void rClassFile();
@@ -408,6 +410,12 @@ bool java_bytecode_parsert::parse()
     return true;
   }
 
+  catch(const unsupported_java_class_signature_exceptiont &e)
+  {
+    log.error() << e.what() << messaget::eom;
+    return true;
+  }
+
   catch(...)
   {
     log.error() << "parsing error" << messaget::eom;
@@ -514,8 +522,11 @@ void java_bytecode_parsert::get_class_refs()
       break;
 
     case CONSTANT_NameAndType:
-      get_class_refs_rec(
-        *java_type_from_string(id2string(pool_entry(c.ref2).s)));
+    {
+      auto type_opt = java_type_from_string(id2string(pool_entry(c.ref2).s));
+      CHECK_RETURN(type_opt.has_value());
+      get_class_refs_rec(*type_opt);
+    }
       break;
 
     default: {}
@@ -543,7 +554,9 @@ void java_bytecode_parsert::get_class_refs()
     }
     else
     {
-      get_class_refs_rec(*java_type_from_string(field.descriptor));
+      auto type_opt = java_type_from_string(field.descriptor);
+      CHECK_RETURN(type_opt);
+      get_class_refs_rec(*type_opt);
     }
   }
 
@@ -565,7 +578,9 @@ void java_bytecode_parsert::get_class_refs()
     }
     else
     {
-      get_class_refs_rec(*java_type_from_string(method.descriptor));
+      auto type_opt = java_type_from_string(method.descriptor);
+      CHECK_RETURN(type_opt);
+      get_class_refs_rec(*type_opt);
     }
 
     for(const auto &var : method.local_variable_table)
@@ -582,7 +597,9 @@ void java_bytecode_parsert::get_class_refs()
       }
       else
       {
-        get_class_refs_rec(*java_type_from_string(var.descriptor));
+        auto type_opt = java_type_from_string(var.descriptor);
+        CHECK_RETURN(type_opt.has_value());
+        get_class_refs_rec(*type_opt);
       }
     }
   }
@@ -637,7 +654,9 @@ void java_bytecode_parsert::get_annotation_value_class_refs(const exprt &value)
   if(const auto &symbol_expr = expr_try_dynamic_cast<symbol_exprt>(value))
   {
     const irep_idt &value_id = symbol_expr->get_identifier();
-    get_class_refs_rec(*java_type_from_string(id2string(value_id)));
+    auto type_opt = java_type_from_string(id2string(value_id));
+    CHECK_RETURN(type_opt.has_value());
+    get_class_refs_rec(*type_opt);
   }
   else if(const auto &array_expr = expr_try_dynamic_cast<array_exprt>(value))
   {
@@ -1967,13 +1986,14 @@ java_bytecode_parsert::parse_method_handle(const method_handle_infot &entry)
   irep_idt method_name = name_and_type.get_name(pool_entry_lambda);
   std::string descriptor = name_and_type.get_descriptor(pool_entry_lambda);
   irep_idt mangled_method_name = id2string(method_name) + ":" + descriptor;
-  typet method_type = *java_type_from_string(descriptor);
+  auto method_type_opt = java_type_from_string(descriptor);
+  CHECK_RETURN(method_type_opt.has_value());
 
   method_handle_typet handle_type =
     get_method_handle_type(entry.get_handle_kind());
 
   class_method_descriptor_exprt method_descriptor{
-    method_type, mangled_method_name, class_name, method_name};
+    *method_type_opt, mangled_method_name, class_name, method_name};
   lambda_method_handlet lambda_method_handle{method_descriptor, handle_type};
 
   return lambda_method_handle;
