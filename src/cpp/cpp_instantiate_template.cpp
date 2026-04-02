@@ -1372,7 +1372,41 @@ const symbolt &cpp_typecheckt::instantiate_template(
         method_type.template_parameters().size();
 
       if(n_method_params != n_class_params)
+      {
+        // Member function template — register in the instantiated
+        // class scope so operator overload resolution can find it.
+        if(!method_decl.declarators().empty())
+        {
+          const irep_idt &base_name =
+            method_decl.declarators().front().name().get_base_name();
+          if(!base_name.empty())
+          {
+            std::string inst_suffix = template_suffix(full_template_args);
+            irep_idt class_id = id2string(sub_scope.prefix) + "tag-" +
+                                id2string(template_symbol.base_name) +
+                                inst_suffix;
+            auto it = cpp_scopes.id_map.find(class_id);
+            if(it != cpp_scopes.id_map.end())
+            {
+              // Find the template symbol in the original class scope
+              auto tmpl_results = template_scope->lookup(
+                base_name,
+                cpp_scopet::SCOPE_ONLY,
+                cpp_idt::id_classt::TEMPLATE);
+              for(auto *tmpl_id : tmpl_results)
+              {
+                auto &cs = static_cast<cpp_scopet &>(*it->second);
+                cpp_idt &new_id = cs.insert(base_name);
+                new_id.id_class = cpp_idt::id_classt::TEMPLATE;
+                new_id.identifier = tmpl_id->identifier;
+                new_id.is_member = true;
+                break;
+              }
+            }
+          }
+        }
         continue;
+      }
 
       // Skip methods whose class qualifier contains concrete template
       // arguments that don't match the current instantiation. This
