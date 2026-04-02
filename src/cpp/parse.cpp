@@ -7389,6 +7389,37 @@ bool Parser::rRelationalExpr(exprt &exp, bool template_args)
         (t == TOK_LE || t == TOK_GE || t == '<' ||
          (t == '>' && !template_args) || t == TOK_SPACESHIP))
   {
+    // When we see '<' and the left operand is a name, it might be
+    // a template-id (e.g., classify<Types> in a fold expression).
+    // Try template-id first; fall back to comparison if it fails.
+    // Only attempt this when the token after > is an operator that
+    // can follow a template-id in a fold/expression context.
+    if(t == '<' && !template_args && exp.id() == ID_cpp_name)
+    {
+      auto saved = lex.Save();
+      irept args;
+      if(rTemplateArgs(args))
+      {
+        int next = lex.LookAhead(0);
+        // Accept template-id if followed by a binary operator,
+        // closing paren/brace, comma, semicolon, or ellipsis.
+        // Also verify the template args don't contain commas at
+        // the top level (to avoid consuming brace-init elements).
+        bool single_arg = args.get_sub().size() <= 1;
+        if(
+          single_arg &&
+          (next == '|' || next == '&' || next == '^' || next == ')' ||
+           next == ',' || next == ';' || next == TOK_ELLIPSIS || next == '+' ||
+           next == '-' || next == '*' || next == '/' || next == TOK_OROR ||
+           next == TOK_ANDAND || next == '}'))
+        {
+          exp.get_sub().push_back(args);
+          continue;
+        }
+      }
+      lex.Restore(saved);
+    }
+
     cpp_tokent tk;
     lex.get_token(tk);
 
