@@ -530,3 +530,62 @@ End FMA_Remainder.
       have equal |remainder|. The algorithm keeps the tentative n
       from round-to-nearest-even, which is correct per IEEE 754.
     ============================================================ *)
+
+(** ============================================================
+    Conditional subtract approach for IEEE remainder
+    ============================================================
+
+    When |fmod| < |y|, the IEEE remainder can be computed by a
+    single conditional subtract rather than trying all three
+    candidates {n-1, n, n+1}:
+
+    - If |fmod| < |y|/2: remainder = fmod
+    - If |fmod| > |y|/2: remainder = fmod - sign(fmod)*|y|
+    - If |fmod| = |y|/2: tie-break using quotient parity
+
+    The correction subtracts |y| from |fmod| (preserving sign),
+    which is equivalent to moving n by 1 toward the correct
+    nearest integer. *)
+
+(** When |fmod| > |y|/2, subtracting |y| from |fmod| (preserving
+    sign) gives a result with smaller absolute value. *)
+Theorem conditional_subtract_closer :
+  forall fmod_val y : R,
+    y <> 0 ->
+    Rabs fmod_val < Rabs y ->
+    Rabs fmod_val > Rabs y / 2 ->
+    Rabs (Rabs fmod_val - Rabs y) < Rabs fmod_val /\
+    Rabs (Rabs fmod_val - Rabs y) <= Rabs y / 2.
+Proof.
+  intros f y Hy Hlt Hgt.
+  assert (Hay : Rabs y > 0) by (apply Rabs_pos_lt; exact Hy).
+  assert (Haf : Rabs f >= 0) by (apply Rle_ge; apply Rabs_pos).
+  assert (Hdiff : Rabs f - Rabs y < 0) by lra.
+  rewrite Rabs_left by lra. split; lra.
+Qed.
+
+(** When |fmod| < |y|/2, fmod itself is the IEEE remainder
+    (no correction needed). This is comparison_step. *)
+Theorem no_subtract_when_small :
+  forall fmod_val y : R,
+    y <> 0 ->
+    Rabs fmod_val < Rabs y / 2 ->
+    Rabs fmod_val < Rabs (fmod_val + y) /\
+    Rabs fmod_val < Rabs (fmod_val - y).
+Proof.
+  intros. apply comparison_step; assumption.
+Qed.
+
+(** At the tie |fmod| = |y|/2, the correction also gives |y|/2. *)
+Theorem tie_case_equal_abs :
+  forall fmod_val y : R,
+    y <> 0 ->
+    Rabs fmod_val = Rabs y / 2 ->
+    Rabs (Rabs fmod_val - Rabs y) = Rabs y / 2.
+Proof.
+  intros f y Hy Heq.
+  assert (Hay : Rabs y > 0) by (apply Rabs_pos_lt; exact Hy).
+  assert (Hdiff : Rabs f - Rabs y < 0) by lra.
+  rewrite Rabs_left by lra. lra.
+Qed.
+
