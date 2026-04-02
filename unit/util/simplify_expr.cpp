@@ -769,3 +769,81 @@ TEST_CASE("Simplify complementary pair in nested OR", "[core][util]")
   const or_exprt expr{a, inner};
   REQUIRE(simplify_expr(expr, ns) == true_exprt{});
 }
+
+TEST_CASE(
+  "Simplify algebraic identities over commutative operators",
+  "[core][util]")
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+
+  const unsignedbv_typet u32{32};
+  const symbol_exprt a{"a", u32};
+  const symbol_exprt b{"b", u32};
+  const symbol_exprt c{"c", u32};
+
+  SECTION("Commutativity: a * b == b * a")
+  {
+    const equal_exprt eq{mult_exprt{a, b}, mult_exprt{b, a}};
+    REQUIRE(simplify_expr(eq, ns) == true_exprt{});
+  }
+
+  SECTION("Commutativity: a + b == b + a")
+  {
+    const equal_exprt eq{plus_exprt{a, b}, plus_exprt{b, a}};
+    REQUIRE(simplify_expr(eq, ns) == true_exprt{});
+  }
+
+  SECTION("Commutativity: a & b != b & a is false")
+  {
+    const notequal_exprt neq{bitand_exprt{a, b}, bitand_exprt{b, a}};
+    REQUIRE(simplify_expr(neq, ns) == false_exprt{});
+  }
+
+  SECTION("Distributivity: a * (b + c) == a * b + a * c")
+  {
+    const mult_exprt lhs{a, plus_exprt{b, c}};
+    const plus_exprt rhs{mult_exprt{a, b}, mult_exprt{a, c}};
+    const equal_exprt eq{lhs, rhs};
+    REQUIRE(simplify_expr(eq, ns) == true_exprt{});
+  }
+
+  SECTION("Distributivity: (b + c) * a == a * c + a * b")
+  {
+    const mult_exprt lhs{plus_exprt{b, c}, a};
+    const plus_exprt rhs{mult_exprt{a, c}, mult_exprt{a, b}};
+    const equal_exprt eq{lhs, rhs};
+    REQUIRE(simplify_expr(eq, ns) == true_exprt{});
+  }
+
+  SECTION("Associativity: (a * b) * c == a * (b * c)")
+  {
+    const mult_exprt lhs{mult_exprt{a, b}, c};
+    const mult_exprt rhs{a, mult_exprt{b, c}};
+    const equal_exprt eq{lhs, rhs};
+    REQUIRE(simplify_expr(eq, ns) == true_exprt{});
+  }
+
+  SECTION("Associativity: (a + b) + c == a + (b + c)")
+  {
+    const plus_exprt lhs{plus_exprt{a, b}, c};
+    const plus_exprt rhs{a, plus_exprt{b, c}};
+    const equal_exprt eq{lhs, rhs};
+    REQUIRE(simplify_expr(eq, ns) == true_exprt{});
+  }
+
+  SECTION("Associativity+Commutativity: (a * b) * c == c * (b * a)")
+  {
+    const mult_exprt lhs{mult_exprt{a, b}, c};
+    const mult_exprt rhs{c, mult_exprt{b, a}};
+    const equal_exprt eq{lhs, rhs};
+    REQUIRE(simplify_expr(eq, ns) == true_exprt{});
+  }
+
+  SECTION("Non-equal expressions are not simplified")
+  {
+    const equal_exprt eq{mult_exprt{a, b}, mult_exprt{a, c}};
+    // Should NOT simplify to true (a*b != a*c in general)
+    REQUIRE(simplify_expr(eq, ns) != true_exprt{});
+  }
+}
