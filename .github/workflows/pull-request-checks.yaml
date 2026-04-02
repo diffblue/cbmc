@@ -834,6 +834,23 @@ jobs:
       - name: Print ccache stats
         run: clcache -s
       - uses: ilammy/msvc-dev-cmd@v1
+      - name: Preprocess MSVC headers for debugging
+        if: always()
+        run: |
+          New-Item -ItemType Directory -Force -Path msvc-preprocessed
+          $cbmc = "build\bin\Release\cbmc.exe"
+          foreach ($hdr in @("tuple", "string_view", "variant", "any", "string", "map", "optional", "vector")) {
+            $src = "#include <$hdr>`nint main() {}"
+            $src | Set-Content "pp_$hdr.cpp"
+            & $cbmc --cpp17 --preprocess "pp_$hdr.cpp" 2>$null | Set-Content "msvc-preprocessed\$hdr.i"
+          }
+      - name: Upload preprocessed headers
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: msvc-preprocessed-headers
+          path: msvc-preprocessed/
+          retention-days: 7
       - name: Test cpp suite
         if: always()
         run: |
