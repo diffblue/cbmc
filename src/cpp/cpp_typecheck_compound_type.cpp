@@ -857,7 +857,40 @@ void cpp_typecheckt::typecheck_compound_declarator(
       else if(cpp_is_pod(new_symbol->type))
       {
         new_symbol->value.swap(value);
-        c_typecheck_baset::do_initializer(*new_symbol);
+        if(new_symbol->is_macro)
+        {
+          // For constexpr members, suppress errors during the first
+          // evaluation attempt — it may fail because template
+          // parameters haven't been substituted yet.
+          null_message_handlert null_handler;
+          message_handlert &old_handler = get_message_handler();
+          set_message_handler(null_handler);
+          try
+          {
+            c_typecheck_baset::do_initializer(*new_symbol);
+            set_message_handler(old_handler);
+          }
+          catch(...)
+          {
+            set_message_handler(old_handler);
+            // The first do_initializer type-checked the value but
+            // make_constant failed. The value in new_symbol is the
+            // type-checked expression. Just substitute template params.
+            new_symbol->value.visit_pre(
+              [this](exprt &e)
+              {
+                if(e.id() == ID_symbol)
+                {
+                  exprt v =
+                    template_map.lookup(to_symbol_expr(e).get_identifier());
+                  if(v.is_not_nil())
+                    e = v;
+                }
+              });
+          }
+        }
+        else
+          c_typecheck_baset::do_initializer(*new_symbol);
       }
       else
       {
