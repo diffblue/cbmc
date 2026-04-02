@@ -485,6 +485,12 @@ void cpp_typecheckt::typecheck_compound_declarator(
   if(is_mutable)
     component.set(ID_is_mutable, true);
 
+  if(
+    declaration.storage_spec().is_constexpr() &&
+    !declaration.member_spec().is_virtual())
+  {
+  }
+
   exprt &value = declarator.value();
   irept &initializers = declarator.member_initializers();
 
