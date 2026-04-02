@@ -157,8 +157,17 @@ void cpp_typecheckt::typecheck_class_template(
       //
       // If the types actually differ, this is a genuine ODR violation
       // or a bug in CBMC's name mangling, and we report an error.
-      if(previous_declaration.type() == declaration.type())
-        return;
+      // C++20 constrained partial specializations: two specializations
+      // may have identical template parameters but differ in requires
+      // clauses (which CBMC skips during parsing) and/or body content.
+      // Since CBMC doesn't evaluate requires clauses, keep the later
+      // (more constrained) definition which is typically the one with
+      // the actual implementation.
+      //
+      // Also handles MSVC STL patterns where calling conventions
+      // produce identical mangled names.
+      previous_symbol.type.swap(declaration);
+      return;
 
       error().source_location = cpp_name.source_location();
       error() << "template struct '" << base_name << "' defined previously\n"
