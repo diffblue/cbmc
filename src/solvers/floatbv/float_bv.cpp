@@ -994,58 +994,52 @@ exprt float_bvt::rem(const exprt &x, const exprt &y) const
   const floatbv_typet &type = to_floatbv_type(x.type());
   const ieee_float_spect spec{type};
 
-  // x - trunc(x / y) * y, then compare with the n±1 alternative.
-  const constant_exprt round_to_even =
-    from_integer(ieee_floatt::ROUND_TO_EVEN, unsignedbv_typet{2});
+  // fmod: x - trunc(x / y) * y, i.e., the remainder with quotient truncated
+  // toward zero (C99 §7.12.10.1). This differs from IEEE 754 remainder
+  // (below) which uses round-to-nearest-even for the quotient
+  // (C99 §7.12.10.2).
   const constant_exprt round_to_zero =
     from_integer(ieee_floatt::ROUND_TO_ZERO, unsignedbv_typet{2});
 
+  // Compute x/y once, truncate to integer for fmod
   exprt div_result =
-    convert(ieee_float_op_exprt{x, ID_floatbv_div, y, round_to_even});
+    convert(ieee_float_op_exprt{x, ID_floatbv_div, y, round_to_zero});
   exprt n_float = from_signed_integer(
     to_signed_integer(div_result, type.get_width(), round_to_zero, spec),
     round_to_zero,
     spec);
   exprt n_times_y =
     convert(ieee_float_op_exprt{n_float, ID_floatbv_mult, y, round_to_zero});
-  exprt result =
+  exprt fmod_result =
     convert(ieee_float_op_exprt{x, ID_floatbv_minus, n_times_y, round_to_zero});
 
-  // Try both n+1 and n-1, pick the candidate with smallest |result|.
-  // We must try both directions because the sign of r does not reliably
-  // indicate which direction n is wrong.
-  exprt one = from_integer(1, type);
-  exprt n_plus_1 =
-    convert(ieee_float_op_exprt{n_float, ID_floatbv_plus, one, round_to_zero});
-  exprt n_minus_1 =
-    convert(ieee_float_op_exprt{n_float, ID_floatbv_minus, one, round_to_zero});
+  // Step 2: conditional subtract for IEEE remainder.
+  // Compare 2*|fmod| against |y|.
+  exprt abs_fmod = abs(fmod_result, spec);
+  exprt abs_y = abs(y, spec);
+  exprt two = from_integer(2, type);
+  exprt two_abs_fmod =
+    convert(ieee_float_op_exprt{abs_fmod, ID_floatbv_mult, two, round_to_zero});
 
-  exprt r_plus_times_y =
-    convert(ieee_float_op_exprt{n_plus_1, ID_floatbv_mult, y, round_to_zero});
-  exprt r_plus = convert(
-    ieee_float_op_exprt{x, ID_floatbv_minus, r_plus_times_y, round_to_zero});
+  // corrected = fmod ± y depending on sign match
+  exprt sign_fmod = extractbit_exprt{fmod_result, type.get_width() - 1};
+  exprt sign_y = extractbit_exprt{y, type.get_width() - 1};
+  exprt signs_equal = equal_exprt{sign_fmod, sign_y};
+  exprt fmod_minus_y = convert(
+    ieee_float_op_exprt{fmod_result, ID_floatbv_minus, y, round_to_zero});
+  exprt fmod_plus_y = convert(
+    ieee_float_op_exprt{fmod_result, ID_floatbv_plus, y, round_to_zero});
+  exprt corrected = if_exprt{signs_equal, fmod_minus_y, fmod_plus_y};
 
-  exprt r_minus_times_y =
-    convert(ieee_float_op_exprt{n_minus_1, ID_floatbv_mult, y, round_to_zero});
-  exprt r_minus = convert(
-    ieee_float_op_exprt{x, ID_floatbv_minus, r_minus_times_y, round_to_zero});
+  // Reuse the truncated quotient for tie-breaking parity
+  exprt trunc_q_odd = extractbit_exprt{
+    to_signed_integer(div_result, type.get_width(), round_to_zero, spec), 0};
 
-  // Pick the alternative with smaller |result|, or when tied,
-  // prefer the alternative that makes the quotient even (IEEE 754).
-  exprt best_alt = if_exprt{
-    relation(abs(r_plus, spec), relt::LT, abs(r_minus, spec), spec),
-    r_plus,
-    r_minus};
-  // Compute the truncated quotient's LSB for tie-breaking.
-  exprt n_int =
-    to_signed_integer(div_result, type.get_width(), round_to_zero, spec);
-  exprt trunc_q_odd = extractbit_exprt{n_int, 0};
-  exprt use_alt = or_exprt{
-    relation(abs(best_alt, spec), relt::LT, abs(result, spec), spec),
-    and_exprt{
-      relation(abs(best_alt, spec), relt::EQ, abs(result, spec), spec),
-      trunc_q_odd}};
-  return if_exprt{use_alt, best_alt, result};
+  exprt gt_half = relation(two_abs_fmod, relt::GT, abs_y, spec);
+  exprt eq_half = relation(two_abs_fmod, relt::EQ, abs_y, spec);
+  exprt use_corrected = or_exprt{gt_half, and_exprt{eq_half, trunc_q_odd}};
+
+  return if_exprt{use_corrected, corrected, fmod_result};
 }
 
 exprt float_bvt::relation(

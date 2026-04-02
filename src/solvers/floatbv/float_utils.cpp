@@ -821,27 +821,39 @@ bvt float_utilst::rem(const bvt &src1, const bvt &src2)
 
   if(!rounding_mode_bits.round_to_zero.is_true())
   {
-    // Step 2: remainder(fmod, y) via FMA. |fmod/y| < 1, n ∈ {-1,0,1}.
-    // Alternative: since n ∈ {-1,0,1}, a conditional subtract/add of y
-    // (comparing |fmod| against |y|/2) could replace the div + FMA chain.
-    bvt small_q = round_to_integral(div(fmod_result, src2));
-    result = fma(negate(small_q), src2, fmod_result);
+    // Step 2: IEEE remainder via conditional subtract.
+    // Since |fmod| < |y|, the nearest integer quotient n is in {-1,0,1}.
+    // (Coq: nearest_int_small, conditional_subtract_closer)
+    //
+    // - |fmod| < |y|/2: remainder = fmod (n = 0)
+    // - |fmod| > |y|/2: remainder = fmod - sign(fmod)*|y| (n = ±1)
+    // - |fmod| = |y|/2: tie-break by quotient parity (pick even n)
+    //
+    // The correction subtracts |y| from |fmod| preserving sign.
+    // In IEEE arithmetic: if signs match, subtract; else add.
+    bvt abs_fmod = abs(fmod_result);
+    bvt abs_y = abs(src2);
 
+    // Compare 2*|fmod| against |y| to avoid |y|/2 subnormal underflow.
+    bvt two = build_constant(
+      ieee_floatt{spec, ieee_floatt::rounding_modet::ROUND_TO_ZERO, 2});
+    bvt two_abs_fmod = mul(abs_fmod, two);
+
+    // corrected = fma(-1, y, fmod) or fma(+1, y, fmod)
+    // depending on whether signs match. FMA is exact here
+    // (Coq: fma_remainder_exact).
+    literalt signs_equal = prop.lequal(sign_bit(fmod_result), sign_bit(src2));
     bvt one = build_constant(
       ieee_floatt{spec, ieee_floatt::rounding_modet::ROUND_TO_ZERO, 1});
-    bvt r_plus = fma(negate(add(small_q, one)), src2, fmod_result);
-    bvt r_minus = fma(negate(sub(small_q, one)), src2, fmod_result);
+    bvt neg_one = negate(one);
+    bvt n_val = bv_utils.select(signs_equal, neg_one, one);
+    bvt corrected = fma(n_val, src2, fmod_result);
 
-    bvt best_alt = bv_utils.select(
-      relation(abs(r_plus), relt::LT, abs(r_minus)), r_plus, r_minus);
-    // Use alternative if |alt| < |result|, OR if |alt| == |result| and
-    // the truncated quotient is odd (IEEE 754 tie-breaking: pick even n).
-    // When |fmod| == |y/2|, small_q=0 gives n=trunc_q (odd),
-    // small_q=±1 gives n=trunc_q±1 (even). So use alt when trunc_q odd.
-    literalt use_alt = prop.lor(
-      relation(abs(best_alt), relt::LT, abs(result)),
-      prop.land(relation(abs(best_alt), relt::EQ, abs(result)), trunc_q_odd));
-    result = bv_utils.select(use_alt, best_alt, result);
+    // Use correction when 2*|fmod| > |y|, or at tie when quotient is odd
+    literalt gt_half = relation(two_abs_fmod, relt::GT, abs_y);
+    literalt eq_half = relation(two_abs_fmod, relt::EQ, abs_y);
+    literalt use_corrected = prop.lor(gt_half, prop.land(eq_half, trunc_q_odd));
+    result = bv_utils.select(use_corrected, corrected, fmod_result);
   }
 
   return result;
