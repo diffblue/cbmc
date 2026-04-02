@@ -6,6 +6,8 @@
 #include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/mathematical_expr.h>
+#include <util/mathematical_types.h>
 #include <util/range.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
@@ -69,8 +71,9 @@ get_problem_messages(const smt_responset &response)
 ///   `convert_expr_to_smt`. This is because any sub expressions which
 ///   `convert_expr_to_smt` translates into function applications, must also be
 ///   returned by this`gather_dependent_expressions` function.
-/// \details `symbol_exprt`, `array_exprt` and `nondet_symbol_exprt` add
-///   dependant expressions.
+/// \details `symbol_exprt`, `array_exprt`, `nondet_symbol_exprt`, and
+///   `function_application_exprt` (for the function part) add dependant
+///   expressions.
 static std::vector<exprt> gather_dependent_expressions(const exprt &root_expr)
 {
   std::vector<exprt> dependent_expressions;
@@ -90,6 +93,24 @@ static std::vector<exprt> gather_dependent_expressions(const exprt &root_expr)
       can_cast_expr<string_constantt>(expr_node))
     {
       dependent_expressions.push_back(expr_node);
+    }
+    // For function applications, we need to gather the function symbol as a
+    // dependency so it gets declared, and we need to traverse the arguments
+    // explicitly to avoid traversing the tuple wrapper.
+    if(
+      const auto func_app =
+        expr_try_dynamic_cast<function_application_exprt>(expr_node))
+    {
+      if(can_cast_expr<symbol_exprt>(func_app->function()))
+      {
+        dependent_expressions.push_back(func_app->function());
+      }
+      // Push arguments for traversal (not the tuple wrapper)
+      for(const auto &arg : func_app->arguments())
+      {
+        stack.push(&arg);
+      }
+      continue; // Skip normal operand traversal
     }
     // The decision procedure does not depend on the values inside address of
     // code typed expressions. We can build the address without knowing the
@@ -171,13 +192,40 @@ void send_function_definition(
     &expression_identifiers,
   std::unordered_map<irep_idt, smt_identifier_termt> &identifier_table)
 {
-  const smt_declare_function_commandt function{
-    smt_identifier_termt(
-      symbol_identifier, convert_type_to_smt_sort(expr.type())),
-    {}};
-  expression_identifiers.emplace(expr, function.identifier());
-  identifier_table.emplace(symbol_identifier, function.identifier());
-  solver_process->send(function);
+  // Handle mathematical (uninterpreted) functions
+  if(
+    const auto math_func_type =
+      type_try_dynamic_cast<mathematical_function_typet>(expr.type()))
+  {
+    // Build parameter sorts from the function domain
+    std::vector<smt_sortt> parameter_sorts;
+    for(const auto &param_type : math_func_type->domain())
+    {
+      parameter_sorts.push_back(convert_type_to_smt_sort(param_type));
+    }
+
+    // The return sort comes from the codomain
+    const smt_sortt return_sort =
+      convert_type_to_smt_sort(math_func_type->codomain());
+
+    const smt_declare_function_commandt function{
+      smt_identifier_termt(symbol_identifier, return_sort), parameter_sorts};
+
+    expression_identifiers.emplace(expr, function.identifier());
+    identifier_table.emplace(symbol_identifier, function.identifier());
+    solver_process->send(function);
+  }
+  else
+  {
+    // Normal symbol (non-function) declaration
+    const smt_declare_function_commandt function{
+      smt_identifier_termt(
+        symbol_identifier, convert_type_to_smt_sort(expr.type())),
+      {}};
+    expression_identifiers.emplace(expr, function.identifier());
+    identifier_table.emplace(symbol_identifier, function.identifier());
+    solver_process->send(function);
+  }
 }
 
 /// \brief Defines any functions which \p expr depends on, which have not yet

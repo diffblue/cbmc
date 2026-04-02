@@ -120,11 +120,27 @@ smt_sortt convert_type_to_smt_sort(const typet &type)
   {
     return convert_type_to_smt_sort(*array_type);
   }
+  if(can_cast_type<mathematical_function_typet>(type))
+  {
+    // Mathematical function types are not directly converted to sorts.
+    // They are used as function symbols in SMT and their applications
+    // are handled via function_application_exprt.
+    INVARIANT(
+      false, "mathematical_function type should not be converted to a sort");
+  }
   UNIMPLEMENTED_FEATURE("Generation of SMT formula for type: " + type.pretty());
 }
 
 static smt_termt convert_expr_to_smt(const symbol_exprt &symbol_expr)
 {
+  // Symbols with mathematical_function_typet represent uninterpreted functions.
+  // They should not be converted to SMT terms directly - only their applications
+  // (function_application_exprt) should be converted.
+  INVARIANT(
+    !can_cast_type<mathematical_function_typet>(symbol_expr.type()),
+    "Symbols with mathematical_function_typet should not be converted to SMT "
+    "terms - only function applications should be converted");
+
   return smt_identifier_termt{symbol_expr.get_identifier(),
                               convert_type_to_smt_sort(symbol_expr.type())};
 }
@@ -1421,6 +1437,71 @@ static smt_termt convert_expr_to_smt(
 }
 
 static smt_termt convert_expr_to_smt(
+  const function_application_exprt &function_application,
+  const sub_expression_mapt &converted)
+{
+  const auto func_symbol =
+    expr_try_dynamic_cast<symbol_exprt>(function_application.function());
+  if(!func_symbol)
+  {
+    UNIMPLEMENTED_FEATURE(
+      "Generation of SMT formula for function application with non-symbol "
+      "function: " +
+      function_application.pretty());
+  }
+
+  INVARIANT(
+    can_cast_type<mathematical_function_typet>(func_symbol->type()),
+    "Function in function_application_exprt should have "
+    "mathematical_function_typet");
+
+  const auto &math_func_type =
+    to_mathematical_function_type(func_symbol->type());
+  const smt_sortt return_sort =
+    convert_type_to_smt_sort(math_func_type.codomain());
+
+  // For zero-argument functions, return an identifier term (SMT constant).
+  if(function_application.arguments().empty())
+  {
+    return smt_identifier_termt{func_symbol->get_identifier(), return_sort};
+  }
+
+  // Convert function arguments
+  std::vector<smt_termt> argument_terms;
+  for(const auto &arg : function_application.arguments())
+  {
+    argument_terms.push_back(converted.at(arg));
+  }
+
+  // Use smt_function_application_termt for functions with arguments
+  struct uninterpreted_functiont
+  {
+    irep_idt name;
+    smt_sortt return_type;
+
+    const char *identifier() const
+    {
+      return id2string(name).c_str();
+    }
+
+    smt_sortt return_sort(const std::vector<smt_termt> &) const
+    {
+      return return_type;
+    }
+
+    void validate(const std::vector<smt_termt> &) const
+    {
+    }
+  };
+
+  const uninterpreted_functiont uninterpreted_function{
+    func_symbol->get_identifier(), return_sort};
+
+  return smt_function_application_termt::factoryt<uninterpreted_functiont>(
+    uninterpreted_function)(argument_terms);
+}
+
+static smt_termt convert_expr_to_smt(
   const object_size_exprt &object_size,
   const sub_expression_mapt &converted,
   const smt_object_sizet::make_applicationt &call_object_size)
@@ -1809,6 +1890,21 @@ static smt_termt dispatch_expr_to_smt_conversion(
   {
     return convert_expr_to_smt(*vector, converted);
   }
+  if(expr.id() == ID_tuple)
+  {
+    // Tuple expressions are used internally by function_application_exprt to
+    // store arguments. They should not be converted directly to SMT.
+    INVARIANT(
+      false,
+      "tuple expression should not be directly converted to SMT - it is used "
+      "internally by function_application_exprt");
+  }
+  if(
+    const auto function_application =
+      expr_try_dynamic_cast<function_application_exprt>(expr))
+  {
+    return convert_expr_to_smt(*function_application, converted);
+  }
   if(const auto object_size = expr_try_dynamic_cast<object_size_exprt>(expr))
   {
     return convert_expr_to_smt(*object_size, converted, call_object_size);
@@ -1965,17 +2061,32 @@ smt_termt convert_expr_to_smt(
   const auto lowered_expr = lower_address_of_array_index(expr);
   filtered_visit_post(
     lowered_expr,
-    [](const exprt &expr) {
+    [](const exprt &expr)
+    {
       // Code values inside "address of" expressions do not need to be converted
       // as the "address of" conversion only depends on the object identifier.
       // Avoiding the conversion side steps a need to convert arbitrary code to
       // SMT terms.
       const auto address_of = expr_try_dynamic_cast<address_of_exprt>(expr);
-      if(!address_of)
-        return true;
-      return !can_cast_type<code_typet>(address_of->object().type());
+      if(address_of && can_cast_type<code_typet>(address_of->object().type()))
+        return false;
+
+      return true;
     },
-    [&](const exprt &expr) {
+    [&](const exprt &expr)
+    {
+      // Skip symbols with mathematical_function_typet - they represent
+      // uninterpreted function declarations, not terms.
+      if(
+        can_cast_expr<symbol_exprt>(expr) &&
+        can_cast_type<mathematical_function_typet>(expr.type()))
+        return;
+
+      // Skip the tuple wrapper inside function_application_exprt - only
+      // the individual arguments (which are visited as children) matter.
+      if(expr.id() == ID_tuple)
+        return;
+
       const auto find_result = sub_expression_map.find(expr);
       if(find_result != sub_expression_map.cend())
         return;
