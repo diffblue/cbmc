@@ -1,0 +1,11 @@
+CORE
+float16_ops.c
+
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Tests float arithmetic, comparisons, negation, and casts via
+incremental SMT2 with float_bvt bit-blasting. Uses _Float16
+where available (GCC >= 12, Clang >= 15) for small formulae.
