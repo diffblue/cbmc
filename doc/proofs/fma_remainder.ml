@@ -373,9 +373,53 @@ let CORRECT_CANDIDATE_REPRESENTABLE = prove(
   REPEAT STRIP_TAC THEN MATCH_MP_TAC REMAINDER_FORMAT THEN
   ASM_REWRITE_TAC[]);;
 
+(* ================================================================ *)
+(* Section 11: Conditional subtract approach                        *)
+(* (Coq: conditional_subtract_closer, no_subtract_when_small,       *)
+(*  tie_case_equal_abs)                                             *)
+(* ================================================================ *)
+
+(* When |fmod| > |y|/2, the correction ||fmod| - |y|| < |fmod|
+   and ||fmod| - |y|| <= |y|/2. *)
+let CONDITIONAL_SUBTRACT_CLOSER = prove(
+  `!f y:real. ~(y = &0)
+   ==> abs(f) < abs(y)
+   ==> abs(f) > abs(y) / &2
+   ==> abs(abs(f) - abs(y)) < abs(f) /\
+       abs(abs(f) - abs(y)) <= abs(y) / &2`,
+  REPEAT STRIP_TAC THEN
+  SUBGOAL_THEN `abs(y) > &0` ASSUME_TAC THENL
+  [ASM_REAL_ARITH_TAC; ALL_TAC] THEN
+  SUBGOAL_THEN `abs(f) - abs(y) < &0` ASSUME_TAC THENL
+  [ASM_REAL_ARITH_TAC; ALL_TAC] THEN
+  REWRITE_TAC[REAL_ABS_BOUNDS] THEN ASM_REAL_ARITH_TAC);;
+
+(* When |fmod| < |y|/2, fmod is the correct remainder.
+   This is COMPARISON_STEP. *)
+let NO_SUBTRACT_WHEN_SMALL = prove(
+  `!f y:real. ~(y = &0)
+   ==> abs(f) < abs(y) / &2
+   ==> abs(f) < abs(f + y) /\ abs(f) < abs(f - y)`,
+  REPEAT STRIP_TAC THEN MATCH_MP_TAC COMPARISON_STEP THEN
+  ASM_REWRITE_TAC[]);;
+
+(* At the tie |fmod| = |y|/2, the correction also gives |y|/2. *)
+let TIE_CASE_EQUAL_ABS = prove(
+  `!f y:real. ~(y = &0)
+   ==> abs(f) = abs(y) / &2
+   ==> abs(abs(f) - abs(y)) = abs(y) / &2`,
+  REPEAT STRIP_TAC THEN
+  SUBGOAL_THEN `abs(y) > &0` ASSUME_TAC THENL
+  [ASM_REAL_ARITH_TAC; ALL_TAC] THEN
+  SUBGOAL_THEN `abs(f) - abs(y) < &0` ASSUME_TAC THENL
+  [ASM_REAL_ARITH_TAC; ALL_TAC] THEN
+  REWRITE_TAC[REAL_ABS_BOUNDS] THEN ASM_REAL_ARITH_TAC);;
+
 print_string "\n=== ALL HOL LIGHT PROOFS COMPLETE (zero mk_thm) ===\n";;
 print_string "Proved: COMPARISON_STEP, REMAINDER_FORMAT_GE/LT,\n";;
 print_string "        REMAINDER_FORMAT, INT_REMAINDER_IN_FORMAT,\n";;
 print_string "        REMAINDER_SCALING, NEAREST_INT_SMALL,\n";;
 print_string "        FMOD_RESULT_REPRESENTABLE, FMOD_RATIO_SMALL,\n";;
-print_string "        CORRECT_CANDIDATE_REPRESENTABLE\n";;
+print_string "        CORRECT_CANDIDATE_REPRESENTABLE,\n";;
+print_string "        CONDITIONAL_SUBTRACT_CLOSER,\n";;
+print_string "        NO_SUBTRACT_WHEN_SMALL, TIE_CASE_EQUAL_ABS\n";;

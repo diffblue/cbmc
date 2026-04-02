@@ -32,9 +32,10 @@
 //       infinity and the remainder is NaN. Counterexample: x=-0.563,
 //       y=2.563e-6 (|x/y|=219660 > _Float16 max 65504).
 //
-// For single-precision float, the Int-fmod formula has ~194K variables
-// and times out with MiniSat. The SMT FPA back-end (fp.rem) handles
-// all formats efficiently.
+// For single-precision float, the Int-fmod + conditional subtract
+// formula has ~383K variables and solves in ~17s with MiniSat.
+// The previous try-all-three FMA approach had ~402K variables and
+// timed out (>10 min).
 
 #include <assert.h>
 #include <math.h>

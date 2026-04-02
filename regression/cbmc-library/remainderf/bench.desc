@@ -1,4 +1,4 @@
-FUTURE
+CORE
 bench.c
 
 ^EXIT=0$
@@ -7,9 +7,5 @@ bench.c
 --
 ^warning: ignoring
 --
-Marked FUTURE (not KNOWNBUG) to avoid the KNOWNBUG CI job timing out.
-Fully symbolic remainderf verification. The integer significand
-division creates a ~194K variable formula that MiniSat cannot solve
-within a reasonable timeout. The implementation is correct for all
-concrete test cases. The SMT FPA back-end (fp.rem) handles this
-efficiently.
+Fully symbolic remainderf verification (~383K variables, ~17s with
+MiniSat after the conditional subtract optimisation).
