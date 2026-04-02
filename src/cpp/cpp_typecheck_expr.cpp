@@ -2728,6 +2728,35 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
           exprt tmp = return_stmt->return_value();
           value_map.replace(tmp);
           simplify(tmp, *this);
+          // Recursively evaluate nested constexpr function calls
+          // (e.g., _Big_multiply inside _Ratio_less).
+          {
+            bool changed = true;
+            while(changed)
+            {
+              changed = false;
+              tmp.visit_post(std::function<void(exprt &)>(
+                [&](exprt &node)
+                {
+                  if(
+                    node.id() == ID_side_effect &&
+                    to_side_effect_expr(node).get_statement() ==
+                      ID_function_call)
+                  {
+                    auto &call = to_side_effect_expr_function_call(node);
+                    exprt before = call;
+                    typecheck_side_effect_function_call(call);
+                    if(call != before)
+                    {
+                      node = call;
+                      changed = true;
+                    }
+                  }
+                }));
+              if(changed)
+                simplify(tmp, *this);
+            }
+          }
           // Aggregate init: convert {a, b, ...} to struct{.m1=a, .m2=b}
           if(
             tmp.id() == ID_initializer_list &&
@@ -2864,6 +2893,35 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
                       exprt tmp = ret->return_value();
                       value_map.replace(tmp);
                       simplify(tmp, *this);
+                      // Recursively evaluate nested constexpr calls
+                      {
+                        bool changed = true;
+                        while(changed)
+                        {
+                          changed = false;
+                          tmp.visit_post(std::function<void(exprt &)>(
+                            [&](exprt &node)
+                            {
+                              if(
+                                node.id() == ID_side_effect &&
+                                to_side_effect_expr(node).get_statement() ==
+                                  ID_function_call)
+                              {
+                                auto &call =
+                                  to_side_effect_expr_function_call(node);
+                                exprt before = call;
+                                typecheck_side_effect_function_call(call);
+                                if(call != before)
+                                {
+                                  node = call;
+                                  changed = true;
+                                }
+                              }
+                            }));
+                          if(changed)
+                            simplify(tmp, *this);
+                        }
+                      }
                       // Check if result is fully evaluated
                       bool has_calls = false;
                       tmp.visit_pre(
@@ -2908,6 +2966,33 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
                   value_map.replace(tmp);
                   simplify(tmp, *this);
                   {
+                    bool chg = true;
+                    while(chg)
+                    {
+                      chg = false;
+                      tmp.visit_post(std::function<void(exprt &)>(
+                        [&](exprt &node)
+                        {
+                          if(
+                            node.id() == ID_side_effect &&
+                            to_side_effect_expr(node).get_statement() ==
+                              ID_function_call)
+                          {
+                            auto &c2 = to_side_effect_expr_function_call(node);
+                            exprt b2 = c2;
+                            typecheck_side_effect_function_call(c2);
+                            if(c2 != b2)
+                            {
+                              node = c2;
+                              chg = true;
+                            }
+                          }
+                        }));
+                      if(chg)
+                        simplify(tmp, *this);
+                    }
+                  }
+                  {
                     bool has_calls = false;
                     tmp.visit_pre(
                       [&has_calls](const exprt &e)
@@ -2944,6 +3029,33 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
                   exprt tmp = ret->return_value();
                   value_map.replace(tmp);
                   simplify(tmp, *this);
+                  {
+                    bool chg = true;
+                    while(chg)
+                    {
+                      chg = false;
+                      tmp.visit_post(std::function<void(exprt &)>(
+                        [&](exprt &node)
+                        {
+                          if(
+                            node.id() == ID_side_effect &&
+                            to_side_effect_expr(node).get_statement() ==
+                              ID_function_call)
+                          {
+                            auto &c2 = to_side_effect_expr_function_call(node);
+                            exprt b2 = c2;
+                            typecheck_side_effect_function_call(c2);
+                            if(c2 != b2)
+                            {
+                              node = c2;
+                              chg = true;
+                            }
+                          }
+                        }));
+                      if(chg)
+                        simplify(tmp, *this);
+                    }
+                  }
                   {
                     bool has_calls = false;
                     tmp.visit_pre(
@@ -3003,6 +3115,33 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
                   exprt tmp = ret->return_value();
                   value_map.replace(tmp);
                   simplify(tmp, *this);
+                  {
+                    bool chg = true;
+                    while(chg)
+                    {
+                      chg = false;
+                      tmp.visit_post(std::function<void(exprt &)>(
+                        [&](exprt &node)
+                        {
+                          if(
+                            node.id() == ID_side_effect &&
+                            to_side_effect_expr(node).get_statement() ==
+                              ID_function_call)
+                          {
+                            auto &c2 = to_side_effect_expr_function_call(node);
+                            exprt b2 = c2;
+                            typecheck_side_effect_function_call(c2);
+                            if(c2 != b2)
+                            {
+                              node = c2;
+                              chg = true;
+                            }
+                          }
+                        }));
+                      if(chg)
+                        simplify(tmp, *this);
+                    }
+                  }
                   {
                     bool has_calls = false;
                     tmp.visit_pre(
@@ -3099,11 +3238,10 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 
       // If we couldn't evaluate at compile time, treat as a regular
       // function call by clearing the is_macro flag.
-      if(!can_evaluate)
-      {
-        symbol_table.get_writeable_ref(sym_expr->get_identifier()).is_macro =
-          false;
-      }
+      // Note: we intentionally do NOT clear is_macro here.
+      // The function may be evaluable with different (constant)
+      // arguments later (e.g., from make_constant during template
+      // instantiation).
     }
   }
 

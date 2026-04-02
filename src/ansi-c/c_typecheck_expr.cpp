@@ -4916,6 +4916,34 @@ void c_typecheck_baset::make_constant(exprt &expr)
 
   expr.add_source_location() = location;
 
+  // Evaluate constexpr function calls that simplify couldn't handle
+  // (e.g., template static constexpr members after parameter substitution).
+  if(!is_compile_time_constantt(*this)(expr))
+  {
+    // The expression might be a function call or contain function calls.
+    // Try to evaluate them via the constexpr evaluator.
+    bool eval_changed = false;
+    expr.visit_post(std::function<void(exprt &)>(
+      [this, &eval_changed](exprt &node)
+      {
+        if(
+          node.id() == ID_side_effect &&
+          to_side_effect_expr(node).get_statement() == ID_function_call)
+        {
+          exprt before = node;
+          typecheck_side_effect_function_call(
+            to_side_effect_expr_function_call(node));
+          if(node != before)
+            eval_changed = true;
+        }
+      }));
+    if(eval_changed)
+    {
+      simplify(expr, *this);
+      expr.add_source_location() = location;
+    }
+  }
+
   if(!is_compile_time_constantt(*this)(expr))
   {
     // Try harder: resolve constexpr/const symbol references to their
