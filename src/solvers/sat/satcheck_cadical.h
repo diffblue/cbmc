@@ -11,6 +11,7 @@ Author: Michael Tautschnig
 #define CPROVER_SOLVERS_SAT_SATCHECK_CADICAL_H
 
 #include "cnf.h"
+#include "xor_propagator.h"
 
 #include <solvers/hardness_collector.h>
 
@@ -22,8 +23,7 @@ namespace CaDiCaL // NOLINT(readability/namespace)
   class Solver; // NOLINT(readability/identifiers)
 }
 
-class cadical_xor_propagatort;
-struct xor_constraintt;
+class cadical_xor_propagator_simplet;
 
 class satcheck_cadical_baset : public cnf_solvert, public hardness_collectort
 {
@@ -61,9 +61,20 @@ public:
   }
 
   /// Enable XOR Gaussian elimination propagator.
-  void enable_xor_gauss()
+  void enable_xor_gauss();
+
+  void mark_input_variable(literalt lit) override
   {
-    xor_gauss_enabled = true;
+    unsigned v = lit.var_no();
+    if(v >= input_variables.size())
+      input_variables.resize(v + 1, false);
+    input_variables[v] = true;
+  }
+
+  /// Enable aux-first variable renumbering for CaDiCaL.
+  void enable_variable_renumbering()
+  {
+    renumber_variables = true;
   }
 
 #if 0
@@ -77,9 +88,21 @@ protected:
   // NOLINTNEXTLINE(readability/identifiers)
   CaDiCaL::Solver *solver;
   int preprocessing_limit = 0, localsearch_limit = 0;
-  std::unique_ptr<cadical_xor_propagatort> xor_propagator;
+  std::unique_ptr<cadical_xor_propagator_simplet> xor_propagator;
   std::vector<xor_constraintt> pending_xors;
   bool xor_gauss_enabled = false;
+  std::size_t xor_constraint_limit = 10000;
+  std::vector<bool> input_variables;
+  bool renumber_variables = false;
+  std::vector<unsigned> var_map;  // old var_no -> new var_no
+  std::vector<int> clause_buffer; // flat: lit lit ... 0 lit lit ... 0
+
+  /// Build the variable renumbering map: aux variables get low IDs,
+  /// input variables get high IDs.
+  void build_variable_map();
+
+  /// Remap a DIMACS literal through the variable map.
+  int remap_dimacs(int dimacs_lit) const;
 };
 
 class satcheck_cadical_no_preprocessingt : public satcheck_cadical_baset

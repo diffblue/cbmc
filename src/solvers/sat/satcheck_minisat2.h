@@ -67,11 +67,26 @@ public:
     time_limit_seconds=lim;
   }
 
+  void mark_input_variable(literalt lit) override
+  {
+    unsigned v = lit.var_no();
+    if(v >= input_variables.size())
+      input_variables.resize(v + 1, false);
+    input_variables[v] = true;
+  }
+
+  void enable_variable_reordering()
+  {
+    reorder_variables = true;
+  }
+
 protected:
   resultt do_prop_solve(const bvt &) override;
 
   std::unique_ptr<T> solver;
   uint32_t time_limit_seconds;
+  std::vector<bool> input_variables;
+  bool reorder_variables = false;
 
   void add_variables();
 };

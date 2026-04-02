@@ -54,6 +54,13 @@ public:
     (void)rhs;
   }
 
+  /// Mark a variable as an input (named program variable).
+  /// Solvers may use this for variable ordering heuristics.
+  virtual void mark_input_variable(literalt lit)
+  {
+    (void)lit;
+  }
+
   virtual void l_set_to(literalt a, bool value)
   {
     set_equal(a, const_literal(value));

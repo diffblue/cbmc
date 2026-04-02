@@ -10,7 +10,10 @@ Author: Michael Tautschnig
 
 #  include "satcheck_cadical.h"
 
-#  include "cadical_xor_propagator.h"
+#  include "cadical_xor_propagator_simple.h"
+// TEMP: using ExtProp
+#  include <cadical.hpp>
+// Native Gauss: uses solver->add_xor() instead of ExternalPropagator
 
 #  include <util/exception_utils.h>
 #  include <util/invariant.h>
@@ -27,10 +30,14 @@ tvt satcheck_cadical_baset::l_get(literalt a) const
 
   tvt result;
 
-  if(a.var_no() > narrow<unsigned>(solver->vars()))
+  unsigned v = a.var_no();
+  if(renumber_variables && !var_map.empty() && v < var_map.size())
+    v = var_map[v];
+
+  if(v > narrow<unsigned>(solver->vars()))
     return tvt(tvt::tv_enumt::TV_UNKNOWN);
 
-  const int val = solver->val(a.var_no(), true);
+  const int val = solver->val(static_cast<int>(v), true);
   if(val>0)
     result = tvt(!a.sign());
   else if(val<0)
@@ -56,15 +63,25 @@ void satcheck_cadical_baset::lcnf(const bvt &bv)
       INVARIANT(lit.var_no() < no_variables(), "reject out of bound variables");
   }
 
-  for(const auto &lit : bv)
+  if(renumber_variables)
   {
-    if(!lit.is_false())
+    // Buffer clause as flat sequence terminated by 0
+    for(const auto &lit : bv)
     {
-      // add literal with correct sign
-      solver->add(lit.dimacs());
+      if(!lit.is_false())
+        clause_buffer.push_back(lit.dimacs());
     }
+    clause_buffer.push_back(0);
   }
-  solver->add(0); // terminate clause
+  else
+  {
+    for(const auto &lit : bv)
+    {
+      if(!lit.is_false())
+        solver->add(lit.dimacs());
+    }
+    solver->add(0);
+  }
 
   if(solver_hardness)
   {
@@ -92,6 +109,29 @@ propt::resultt satcheck_cadical_baset::do_prop_solve(const bvt &assumptions)
 {
   INVARIANT(status != statust::ERROR, "there cannot be an error");
 
+  // Flush buffered clauses with remapped variable IDs
+  if(renumber_variables && !clause_buffer.empty())
+  {
+    build_variable_map();
+    const unsigned map_size = static_cast<unsigned>(var_map.size());
+    for(int lit : clause_buffer)
+    {
+      if(lit == 0)
+      {
+        solver->add(0);
+      }
+      else
+      {
+        unsigned v = static_cast<unsigned>(lit > 0 ? lit : -lit);
+        int mapped =
+          (v < map_size) ? static_cast<int>(var_map[v]) : static_cast<int>(v);
+        solver->add(lit > 0 ? mapped : -mapped);
+      }
+    }
+    clause_buffer.clear();
+    clause_buffer.shrink_to_fit();
+  }
+
   log.statistics() << (no_variables() - 1) << " variables, " << clause_counter
                    << " clauses" << messaget::eom;
 
@@ -109,7 +149,10 @@ propt::resultt satcheck_cadical_baset::do_prop_solve(const bvt &assumptions)
 
   for(const auto &a : assumptions)
     if(!a.is_true())
-      solver->assume(a.dimacs());
+    {
+      int d = a.dimacs();
+      solver->assume(renumber_variables ? remap_dimacs(d) : d);
+    }
 
   // set preprocessing and inprocessing limits
   auto limit1_ret = solver->limit("preprocessing", preprocessing_limit);
@@ -119,18 +162,47 @@ propt::resultt satcheck_cadical_baset::do_prop_solve(const bvt &assumptions)
 
   // Connect XOR Gaussian elimination propagator if we have XOR constraints
   // and the feature is enabled via --xor-gauss (or CBMC_XOR_GAUSS env var).
-  if(!pending_xors.empty() && !xor_propagator &&
+  if(!pending_xors.empty() &&
      (std::getenv("CBMC_XOR_GAUSS") || xor_gauss_enabled))
   {
-    // For now, always connect. TODO: lazy activation after N conflicts.
-    xor_propagator =
-      std::make_unique<cadical_xor_propagatort>(solver);
-    for(const auto &xc : pending_xors)
-      xor_propagator->add_xor(xc);
-    solver->connect_external_propagator(xor_propagator.get());
-    xor_propagator->finalize_observations();
-    log.statistics() << "XOR Gauss propagator: " << pending_xors.size()
-                     << " XOR constraints" << messaget::eom;
+    // Hybrid: native Gauss for fast propagation, ExternalPropagator for reasons
+    // Using native CaDiCaL Gauss propagator
+    for(auto &xc : pending_xors)
+    {
+      if(renumber_variables && !var_map.empty())
+      {
+        for(auto &v : xc.vars)
+        {
+          if(v < var_map.size() && var_map[v] != 0)
+            v = var_map[v];
+        }
+      }
+      // Add to native Gauss (for fast propagation)
+      std::vector<int> dimacs_lits;
+      for(unsigned v : xc.vars)
+        dimacs_lits.push_back(static_cast<int>(v));
+      solver->add_xor(dimacs_lits, xc.rhs);
+    }
+    // Perform Gaussian elimination and extract derived clauses
+    auto derived = solver->gauss_eliminate();
+    size_t n_unit = 0, n_binary = 0, n_ternary = 0;
+    for(auto &dc : derived)
+    {
+      for(int lit : dc.lits)
+        solver->add(lit);
+      solver->add(0);
+      if(dc.lits.size() == 0) {} else if(dc.lits.size() == 1)
+        n_unit++;
+      else if(dc.lits.size() == 2)
+        n_binary++;
+      else if(dc.lits.size() == 3)
+        n_ternary++;
+    }
+
+    log.statistics() << "XOR Gauss: " << pending_xors.size()
+                     << " XOR constraints -> " << n_unit << " unit, "
+                     << n_binary << " binary, " << n_ternary << " ternary derived clauses"
+                     << messaget::eom;
     pending_xors.clear();
   }
 
@@ -213,6 +285,11 @@ satcheck_cadical_baset::~satcheck_cadical_baset()
   delete solver;
 }
 
+void satcheck_cadical_baset::enable_xor_gauss()
+{
+  xor_gauss_enabled = true;
+}
+
 void satcheck_cadical_baset::add_xor_constraint(
   const std::vector<literalt> &lits,
   bool rhs)
@@ -228,17 +305,60 @@ void satcheck_cadical_baset::add_xor_constraint(
       continue;
     }
     // Use DIMACS variable number (1-based)
-    xc.vars.push_back(lit.var_no() + 1);
+    xc.vars.push_back(lit.var_no());
     if(lit.sign())
       xc.rhs = !xc.rhs;
   }
-  if(!xc.vars.empty())
+  if(!xc.vars.empty() && pending_xors.size() < xor_constraint_limit)
     pending_xors.push_back(std::move(xc));
 }
 
 bool satcheck_cadical_baset::is_in_conflict(literalt a) const
 {
-  return solver->failed(a.dimacs());
+  int d = a.dimacs();
+  return solver->failed(renumber_variables ? remap_dimacs(d) : d);
+}
+
+void satcheck_cadical_baset::build_variable_map()
+{
+  unsigned n = narrow<unsigned>(no_variables());
+  var_map.resize(n, 0);
+
+  // Two-tier ordering: auxiliary variables get low IDs,
+  // input (named) variables get high IDs.
+  unsigned next_id = 1;
+  unsigned num_aux = 0;
+
+  for(unsigned v = 1; v < n; ++v)
+  {
+    bool is_input = v < input_variables.size() && input_variables[v];
+    if(!is_input)
+    {
+      var_map[v] = next_id++;
+      ++num_aux;
+    }
+  }
+  for(unsigned v = 1; v < n; ++v)
+  {
+    bool is_input = v < input_variables.size() && input_variables[v];
+    if(is_input)
+      var_map[v] = next_id++;
+  }
+
+  log.statistics() << "Variable renumbering: " << num_aux
+                   << " aux variables first, " << (n - 1 - num_aux)
+                   << " input variables after" << messaget::eom;
+}
+
+int satcheck_cadical_baset::remap_dimacs(int dimacs_lit) const
+{
+  unsigned v = static_cast<unsigned>(std::abs(dimacs_lit));
+  if(v < var_map.size() && var_map[v] != 0)
+  {
+    int mapped = static_cast<int>(var_map[v]);
+    return dimacs_lit > 0 ? mapped : -mapped;
+  }
+  return dimacs_lit;
 }
 
 #endif

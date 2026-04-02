@@ -37,20 +37,14 @@ void xor_gausst::add_xor(const xor_constraintt &xc)
     }
   }
   std::sort(row.cols.begin(), row.cols.end());
-
-  // Reduce against existing rows (maintain echelon form)
-  for(size_t i = 0; i < matrix.size(); ++i)
-  {
-    if(matrix[i].is_empty())
-      continue;
-    if(!row.is_empty() && row.cols.front() == matrix[i].cols.front())
-      row.xor_with(matrix[i]);
-  }
+  row.origins.push_back(original_xors.size() - 1);
 
   if(row.is_conflict())
   {
-    conflict_row = static_cast<int>(matrix.size());
+    conflict_row = static_cast<int>(original_xors.size() - 1);
+    build_conflict_clause(conflict_row);
     matrix.push_back(std::move(row));
+    matrix_to_original.push_back(original_xors.size() - 1);
     return;
   }
 
@@ -68,6 +62,8 @@ void xor_gausst::add_xor(const xor_constraintt &xc)
     for(unsigned c : row.cols)
       var_to_rows[c].push_back(row_idx);
     matrix.push_back(std::move(row));
+    matrix_to_original.push_back(original_xors.size() - 1);
+    ++rank;
   }
 }
 
@@ -110,27 +106,10 @@ void xor_gausst::substitute_and_check(
         row.rhs = !row.rhs;
     }
 
-    // Reduce against existing rows to maintain echelon form
-    if(!row.is_empty())
-    {
-      unsigned pivot = row.cols.front();
-      for(size_t j = 0; j < matrix.size(); ++j)
-      {
-        if(j == row_idx || matrix[j].is_empty())
-          continue;
-        if(matrix[j].cols.front() == pivot && j < row_idx)
-        {
-          // Row j has the same pivot — XOR to eliminate
-          entry.row_snapshots.emplace_back(row_idx, row);
-          row.xor_with(matrix[j]);
-          break;
-        }
-      }
-    }
-
     if(row.is_conflict())
     {
       conflict_row = static_cast<int>(row_idx);
+      build_conflict_clause(conflict_row);
     }
     else if(row.is_unit())
     {
@@ -168,6 +147,7 @@ void xor_gausst::backtrack(size_t target_trail_size)
   // Clear stale propagations and conflicts
   prop_queue.clear();
   conflict_row = -1;
+  stored_conflict.clear();
 }
 
 int xor_gausst::propagate()
@@ -186,27 +166,31 @@ int xor_gausst::propagate()
 std::vector<int> xor_gausst::get_reason(int propagated_lit)
 {
   unsigned var = static_cast<unsigned>(std::abs(propagated_lit));
-  int row_idx = prop_reason_row[var];
+  int row_idx = (var < prop_reason_row.size()) ? prop_reason_row[var] : -1;
 
-  // Build reason clause from the original XOR that produced this row.
-  // The reason is: propagated_lit OR ~(assigned literals in the XOR).
-  // This is sound because the XOR constraint forces the propagated value
-  // when all other variables are assigned.
   std::vector<int> reason;
   reason.push_back(propagated_lit);
 
-  if(row_idx >= 0 && row_idx < static_cast<int>(original_xors.size()))
+  // Build reason from ALL original XORs that contributed to this row.
+  // The derived row is a linear combination of these originals.
+  if(row_idx >= 0 && row_idx < static_cast<int>(matrix.size()))
   {
-    const auto &xc = original_xors[row_idx];
-    for(unsigned v : xc.vars)
+    const auto &row = matrix[row_idx];
+    for(size_t oidx : row.origins)
     {
-      if(v == var)
-        continue;
-      if(v < assignments.size() && assignments[v] != 0)
+      if(oidx < original_xors.size())
       {
-        // Add negation of the assigned literal
-        reason.push_back(assignments[v] == 1 ? -static_cast<int>(v)
-                                             : static_cast<int>(v));
+        for(unsigned v : original_xors[oidx].vars)
+        {
+          if(v == var)
+            continue;
+          if(v < assignments.size() && assignments[v] != 0)
+          {
+            reason.push_back(
+              assignments[v] == 1 ? -static_cast<int>(v)
+                                  : static_cast<int>(v));
+          }
+        }
       }
     }
   }
@@ -224,23 +208,69 @@ std::vector<int> xor_gausst::get_conflict_clause()
   if(conflict_row < 0)
     return {};
 
-  // Build conflict clause from the original XOR.
-  // All variables are assigned but the parity is wrong.
-  // The conflict clause is the negation of all current assignments
-  // for variables in this XOR.
   std::vector<int> clause;
-  if(conflict_row < static_cast<int>(original_xors.size()))
+  if(conflict_row >= 0 && conflict_row < static_cast<int>(matrix.size()))
   {
-    const auto &xc = original_xors[conflict_row];
-    for(unsigned v : xc.vars)
+    for(size_t oidx : matrix[conflict_row].origins)
     {
-      if(v < assignments.size() && assignments[v] != 0)
+      if(oidx < original_xors.size())
       {
-        clause.push_back(assignments[v] == 1 ? -static_cast<int>(v)
-                                             : static_cast<int>(v));
+        for(unsigned v : original_xors[oidx].vars)
+        {
+          if(v < assignments.size() && assignments[v] != 0)
+          {
+            clause.push_back(
+              assignments[v] == 1 ? -static_cast<int>(v)
+                                  : static_cast<int>(v));
+          }
+        }
       }
     }
   }
   conflict_row = -1;
   return clause;
+}
+
+int xor_gausst::suggest_decision() const
+{
+  // Find the unassigned variable appearing in the most matrix rows.
+  unsigned best_var = 0;
+  size_t best_count = 0;
+
+  for(unsigned v = 1; v < var_to_rows.size(); ++v)
+  {
+    if(v < assignments.size() && assignments[v] != 0)
+      continue; // already assigned
+    size_t count = var_to_rows[v].size();
+    if(count > best_count)
+    {
+      best_count = count;
+      best_var = v;
+    }
+  }
+
+  return best_count > 1 ? static_cast<int>(best_var) : 0;
+}
+
+void xor_gausst::build_conflict_clause(int row_idx)
+{
+  stored_conflict.clear();
+  if(row_idx >= 0 && row_idx < static_cast<int>(matrix.size()))
+  {
+    for(size_t oidx : matrix[row_idx].origins)
+    {
+      if(oidx < original_xors.size())
+      {
+        for(unsigned v : original_xors[oidx].vars)
+        {
+          if(v < assignments.size() && assignments[v] != 0)
+          {
+            stored_conflict.push_back(
+              assignments[v] == 1 ? -static_cast<int>(v)
+                                  : static_cast<int>(v));
+          }
+        }
+      }
+    }
+  }
 }

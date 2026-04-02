@@ -215,6 +215,25 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve(const bvt &assumptions)
   {
     add_variables();
 
+    // Bump activity of auxiliary variables so VSIDS prioritizes them.
+    // Access protected members via a helper that inherits from Solver.
+    if(reorder_variables)
+    {
+      struct activity_helper : public T
+      {
+        using T::activity;
+        using T::rebuildOrderHeap;
+      };
+      auto *s = static_cast<activity_helper *>(solver.get());
+      for(unsigned v = 0; v < no_variables(); ++v)
+      {
+        bool is_input = v < input_variables.size() && input_variables[v];
+        if(!is_input)
+          s->activity[v] += 1.0;
+      }
+      s->rebuildOrderHeap();
+    }
+
     if(!solver->okay())
     {
       log.status() << "SAT checker inconsistent: instance is UNSATISFIABLE"

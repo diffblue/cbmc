@@ -13,6 +13,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/flattening/boolbv.h>
 #include <solvers/sat/satcheck.h>
+#ifdef SATCHECK_CADICAL
+#  include <solvers/sat/satcheck_cadical.h>
+#endif
+#ifdef SATCHECK_MINISAT2
+#  include <solvers/sat/satcheck_minisat2.h>
+#endif
 
 #include "smt2_format.h"
 #include "smt2_parser.h"
@@ -403,7 +409,7 @@ public:
   }
 };
 
-int solver(std::istream &in)
+int solver(std::istream &in, bool xor_gauss = false, bool reorder_vars = false)
 {
   symbol_tablet symbol_table;
   namespacet ns(symbol_table);
@@ -415,6 +421,36 @@ int solver(std::istream &in)
   message_handler.set_verbosity(messaget::M_STATISTICS);
 
   satcheckt satcheck{message_handler};
+#ifdef SATCHECK_CADICAL
+  // Use CaDiCaL when xor-gauss is requested (satcheckt may be MiniSat)
+  if(xor_gauss)
+  {
+    satcheck_cadical_no_preprocessingt cadical_satcheck{message_handler};
+    cadical_satcheck.enable_xor_gauss();
+    if(reorder_vars)
+      cadical_satcheck.enable_variable_renumbering();
+    boolbvt boolbv{ns, cadical_satcheck, message_handler};
+    smt2_solvert smt2_solver{in, boolbv};
+    bool error_found = false;
+    while(!smt2_solver.exit)
+    {
+      try
+      {
+        smt2_solver.parse();
+      }
+      catch(const smt2_tokenizert::smt2_errort &error)
+      {
+        smt2_solver.skip_to_end_of_list();
+        error_found = true;
+      }
+    }
+    if(error_found)
+      return 1;
+    return 0;
+  }
+#endif
+  (void)xor_gauss;
+  (void)reorder_vars;
   boolbvt boolbv{ns, satcheck, message_handler};
 
   smt2_solvert smt2_solver{in, boolbv};
@@ -449,21 +485,34 @@ int solver(std::istream &in)
 
 int main(int argc, const char *argv[])
 {
-  if(argc==1)
-    return solver(std::cin);
+  bool xor_gauss = false;
+  bool reorder_vars = false;
+  const char *filename = nullptr;
 
-  if(argc!=2)
+  for(int i = 1; i < argc; ++i)
   {
-    std::cerr << "usage: smt2_solver file\n";
-    return 1;
+    if(std::string{argv[i]} == "--xor-gauss")
+      xor_gauss = true;
+    else if(std::string{argv[i]} == "--reorder-vars")
+      reorder_vars = true;
+    else if(filename == nullptr)
+      filename = argv[i];
+    else
+    {
+      std::cerr << "usage: smt2_solver [--xor-gauss] [--reorder-vars] [file]\n";
+      return 1;
+    }
   }
 
-  std::ifstream in(argv[1]);
+  if(filename == nullptr)
+    return solver(std::cin, xor_gauss, reorder_vars);
+
+  std::ifstream in(filename);
   if(!in)
   {
-    std::cerr << "failed to open " << argv[1] << '\n';
+    std::cerr << "failed to open " << filename << '\n';
     return 1;
   }
 
-  return solver(in);
+  return solver(in, xor_gauss, reorder_vars);
 }

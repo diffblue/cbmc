@@ -11,18 +11,22 @@ SRC="$CBMC_DIR/src/solvers/flattening/bv_utils.cpp"
 RUNS=3
 TIMEOUT=60
 XOR_GAUSS=""
+REORDER_VARS=""
 
 while [ $# -gt 0 ]; do
   case "$1" in
     --runs) RUNS="$2"; shift 2 ;;
     --timeout) TIMEOUT="$2"; shift 2 ;;
     --xor-gauss) XOR_GAUSS="yes"; shift ;;
+    --reorder-vars) REORDER_VARS="yes"; shift ;;
     *) echo "Unknown: $1"; exit 1 ;;
   esac
 done
 
 SUFFIX=""
-[ -n "$XOR_GAUSS" ] && SUFFIX="_xg"
+CBMC_FLAGS=""
+[ -n "$XOR_GAUSS" ] && SUFFIX="${SUFFIX}_xg" && CBMC_FLAGS="$CBMC_FLAGS --xor-gauss"
+[ -n "$REORDER_VARS" ] && SUFFIX="${SUFFIX}_rv" && CBMC_FLAGS="$CBMC_FLAGS --reorder-vars"
 
 ENCODINGS="pc simple rani lookahead"
 # Skip parallel prefix — they're proven worse and very slow
@@ -62,17 +66,13 @@ for enc in $ENCODINGS; do
   build_encoding "$enc"
 
   echo "--- Running $config ---"
-  if [ -n "$XOR_GAUSS" ]; then
-    export CBMC_XOR_GAUSS=1
-  else
-    unset CBMC_XOR_GAUSS 2>/dev/null || true
-  fi
   ulimit -v 8000000
   bash "$SCRIPT_DIR/run_benchmarks.sh" \
     --runs "$RUNS" \
     --timeout "$TIMEOUT" \
     --config "$config" \
     --solver cadical \
+    --cbmc-flags "$CBMC_FLAGS" \
     2>&1 | grep -E "^\[|^  run|^=== Sum|^Bench|^----|^Results"
 
   echo ""

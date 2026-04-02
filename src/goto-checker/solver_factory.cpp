@@ -245,14 +245,19 @@ get_sat_solver(message_handlert &message_handler, const optionst &options)
 #if defined SATCHECK_MINISAT2
       if(no_simplifier)
       {
-        // simplifier won't work with beautification
-        return make_satcheck_prop<satcheck_minisat_no_simplifiert>(
+        auto solver = make_satcheck_prop<satcheck_minisat_no_simplifiert>(
           message_handler, options);
+        if(options.get_bool_option("reorder-vars"))
+          solver->enable_variable_reordering();
+        return solver;
       }
       else // with simplifier
       {
-        return make_satcheck_prop<satcheck_minisat_simplifiert>(
+        auto solver = make_satcheck_prop<satcheck_minisat_simplifiert>(
           message_handler, options);
+        if(options.get_bool_option("reorder-vars"))
+          solver->enable_variable_reordering();
+        return solver;
       }
 #else
       emit_solver_warning(message_handler, "minisat2");
@@ -307,6 +312,8 @@ get_sat_solver(message_handlert &message_handler, const optionst &options)
         message_handler, options);
       if(options.get_bool_option("xor-gauss"))
         solver->enable_xor_gauss();
+      if(options.get_bool_option("reorder-vars"))
+        solver->enable_variable_renumbering();
       return solver;
 #else
       emit_solver_warning(message_handler, "cadical");
@@ -629,6 +636,9 @@ static void parse_sat_options(const cmdlinet &cmdline, optionst &options)
 
   if(cmdline.isset("xor-gauss"))
     options.set_option("xor-gauss", true);
+
+  if(cmdline.isset("reorder-vars"))
+    options.set_option("reorder-vars", true);
 }
 
 static void parse_smt2_options(const cmdlinet &cmdline, optionst &options)

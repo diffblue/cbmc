@@ -57,6 +57,7 @@ const bvt &boolbv_mapt::get_literals(
     for(std::size_t bit = 0; bit < width; ++bit)
     {
       map_entry.literal_map.push_back(prop.new_variable());
+      prop.mark_input_variable(map_entry.literal_map.back());
 
 #ifdef DEBUG
       std::cout << "NEW: " << identifier << ":" << bit << "="

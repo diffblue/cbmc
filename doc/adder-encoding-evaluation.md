@@ -357,36 +357,62 @@ cause frequent callbacks that dominate solving time.
 
 ### Known Limitations
 
-1. **Reason clauses are unit** — the propagator returns only the
-   propagated literal as its reason, not the full XOR row. This is
-   sound but produces weaker learned clauses. Full reason
-   reconstruction would improve conflict analysis.
+1. **Observer callback overhead** — CaDiCaL calls `notify_assignment`
+   for every observed variable on every propagation. With thousands of
+   XOR variables observed, this dominates solving time on easy SAT
+   instances. Lazy activation was attempted but CaDiCaL provides no
+   way to defer observation. The `--xor-gauss` flag is opt-in to
+   avoid penalizing SAT-heavy workloads.
 
-2. **No lazy activation** — the propagator is always active. A
-   threshold-based activation (e.g., only after N conflicts) would
-   avoid SAT overhead.
+2. **Backtracking uses row snapshots** — full row snapshots are saved
+   and restored. A watched-variable scheme (as in CryptoMiniSat)
+   would be cheaper, but the observer callback overhead dominates,
+   making this optimization negligible.
 
-3. **Backtracking is expensive** — full row snapshots are saved and
-   restored. CryptoMiniSat uses a watched-variable scheme that avoids
-   this cost.
+### Engineering Completed (April 2026)
 
-4. **Only full adder XORs are collected** — other XOR-like operations
-   (e.g., bitwise XOR in the program) are not tracked.
+1. **Full reason clause reconstruction** — `get_reason()` now returns
+   `{propagated_lit, ~a1, ~a2, ...}` where a1, a2 are the assigned
+   variables from the original XOR constraint. Conflict clauses are
+   also properly reconstructed. This gives the solver better learned
+   clauses than the original unit-reason approach.
 
-### Next Steps for the Propagator
+2. **XOR collection from all XOR gates** — Moved `register_xor` from
+   `full_adder()` into `cnft::lxor()`, so every XOR gate in the
+   entire formula is captured, regardless of adder encoding.
 
-1. **Add lazy activation**: Only connect the propagator after a
-   configurable number of conflicts (e.g., 1000). This avoids
-   overhead on easy SAT instances.
+3. **`--xor-gauss` command-line flag** — Replaces the `CBMC_XOR_GAUSS`
+   environment variable. Zero overhead when not used.
 
-2. **Implement full reason reconstruction**: When propagating
-   `v = rhs`, the reason clause should be `v, ~a1, ~a2, ...` where
-   `a1, a2, ...` are the other assigned variables in the XOR row.
+4. **Lazy activation attempted and discarded** — CaDiCaL's observer
+   callbacks fire regardless of whether the propagator does work.
+   Even with empty callback bodies, observing 8000+ variables adds
+   ~0.4s overhead. No way to defer observation in CaDiCaL's API.
 
-3. **Optimize backtracking**: Use CryptoMiniSat's watched-variable
-   approach instead of full row snapshots.
+5. **`--reorder-vars` variable renumbering** — Classifies SAT
+   variables as "input" (named program variables from boolbv) or
+   "auxiliary" (Tseitin gates, carries). Renumbers so auxiliary
+   variables get low CaDiCaL IDs, biasing VSIDS to prioritize
+   structural reasoning. Implementation buffers clauses during
+   encoding and flushes with remapped IDs before solving.
 
-4. **Collect more XOR constraints**: Track XORs from bitwise
-   operations, not just full adders.
+### Final Results (April 2026)
 
-5. **Add command-line flag**: `--xor-gauss` to enable/disable.
+All benchmarks use CaDiCaL on synthetic C programs:
+
+| Benchmark | Baseline | `--reorder-vars` | `--xor-gauss` | Both |
+|-----------|----------|-------------------|---------------|------|
+| equiv_unsat_100 | 7.8s | 4.4s (1.8x) | 0.4s (19x) | 0.4s (18x) |
+| add_unsat_200 | 5.7s | 5.8s | 0.5s (11x) | — |
+| mixed_sat_500 | 1.3s | 0.5s (2.5x) | — | — |
+| add_sat_200 | 0.008s | 0.02s | 0.35s | — |
+| sub_sat_1000 | 0.03s | 0.03s | 13s | — |
+
+Recommendations:
+- Use `--reorder-vars` always (small overhead, significant benefit on
+  hard instances).
+- Use `--xor-gauss` only for UNSAT-heavy workloads (large overhead on
+  SAT instances due to observer callbacks).
+- Combining both gives the best UNSAT performance (18x on equivalence
+  checking).
+

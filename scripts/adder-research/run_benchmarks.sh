@@ -34,6 +34,7 @@ SMT2SOLVER="${SMT2SOLVER:-$CBMC_DIR/build/bin/smt2_solver}"
 BENCH_DIR="$SCRIPT_DIR/benchmarks"
 CONFIG="default"
 OUTPUT=""
+CBMC_EXTRA_FLAGS=""
 
 # Parse arguments
 while [ $# -gt 0 ]; do
@@ -47,6 +48,7 @@ while [ $# -gt 0 ]; do
     --cbmc)     CBMC="$2"; shift 2 ;;
     --smt2solver) SMT2SOLVER="$2"; shift 2 ;;
     --benchdir) BENCH_DIR="$2"; shift 2 ;;
+    --cbmc-flags) CBMC_EXTRA_FLAGS="$2"; shift 2 ;;
     *) echo "Unknown option: $1"; exit 1 ;;
   esac
 done
@@ -115,13 +117,19 @@ run_one() {
       *_10000*) unwind=10001 ;;
       *_1000*) unwind=1001 ;;
       *_500*) unwind=501 ;;
+      *_200*) unwind=201 ;;
       *_100*) unwind=101 ;;
+      crc_*) unwind=901 ;;
+      hash_combine_*) unwind=51 ;;
+      popcount_*) unwind=331 ;;
+      *_20*) unwind=21 ;;
+      *_10*) unwind=11 ;;
     esac
 
     out=$(ulimit -v $((MEMLIMIT * 1024)); \
       timeout "$TIMEOUT" "$CBMC" "$bench_file" \
         --unwind "$unwind" --no-unwinding-assertions \
-        --verbosity 8 --sat-solver "$SOLVER" 2>&1) || true
+        --verbosity 8 --sat-solver "$SOLVER" $CBMC_EXTRA_FLAGS 2>&1) || true
   elif [ "$bench_type" = "smt2" ]; then
     out=$(ulimit -v $((MEMLIMIT * 1024)); \
       timeout "$TIMEOUT" "$SMT2SOLVER" "$bench_file" 2>&1) || true
@@ -139,7 +147,7 @@ run_one() {
   if [ "$bench_type" = "smt2" ]; then
     vars=$(echo "$out" | grep "variables" | tail -1 | sed 's/.*; \([0-9]*\) variables.*/\1/')
     clauses=$(echo "$out" | grep "clauses" | tail -1 | sed 's/.*\([0-9]*\) clauses.*/\1/')
-    solver_time=$(echo "$out" | grep "Runtime Solving:" | sed 's/.*: //;s/s$//')
+    solver_time=$(echo "$out" | grep "Runtime" | tail -1 | sed 's/.*: //;s/s$//')
     total_time="$solver_time"
   fi
 
@@ -174,6 +182,17 @@ echo ""
 
 # C benchmarks
 for bench_file in "$BENCH_DIR"/synthetic/*.c; do
+  [ -f "$bench_file" ] || continue
+  bench_name=$(basename "$bench_file" .c)
+  echo "[$bench_name]"
+  for run in $(seq 1 "$RUNS"); do
+    run_one "$bench_file" "$bench_name" "c" "$run"
+  done
+  echo ""
+done
+
+# Real-world benchmarks
+for bench_file in "$BENCH_DIR"/realworld/*.c; do
   [ -f "$bench_file" ] || continue
   bench_name=$(basename "$bench_file" .c)
   echo "[$bench_name]"

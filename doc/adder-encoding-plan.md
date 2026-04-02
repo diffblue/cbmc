@@ -205,10 +205,16 @@ the adder encoding choice.
 
 ### Remaining
 
-- Lazy activation for the XOR Gauss propagator
-- Full reason clause reconstruction
-- Optimized backtracking (watched-variable scheme)
-- Command-line flag (`--xor-gauss`)
-- Variable ordering optimization in CBMC's propositional layer
 - Real-world benchmark validation (SV-COMP, AWS C Commons)
+- Interaction between XOR Gauss and CaDiCaL's own XOR detection
+- Can `cb_decide()` guide decisions based on XOR matrix structure?
 - Clean up PR: remove parallel prefix adders, document findings
+
+### Completed (April 2026)
+
+- ✅ Lazy activation attempted and discarded (observer overhead)
+- ✅ Full reason clause reconstruction
+- ✅ XOR collection from all XOR gates (via `cnft::lxor`)
+- ✅ `--xor-gauss` command-line flag
+- ✅ `--reorder-vars` aux-first variable renumbering
+- ✅ Backtracking optimization discarded (observer overhead dominates)
