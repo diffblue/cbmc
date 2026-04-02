@@ -33,4 +33,5 @@ if(CLANG_FOUND AND LIBCXX_FOUND)
       -I libcxx
       ${gcc_only}
   )
+  set_tests_properties("cbmc-cpp-libcxx-CORE" PROPERTIES TIMEOUT 900)
 endif()
