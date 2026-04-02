@@ -1,0 +1,7 @@
+(set-logic QF_BV)
+(declare-fun x () (_ BitVec 16))
+(declare-fun y () (_ BitVec 16))
+(declare-fun z () (_ BitVec 16))
+(assert (distinct (bvadd x (bvadd y z)) (bvadd (bvadd x y) z)))
+(check-sat)
+(exit)

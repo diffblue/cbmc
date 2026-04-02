@@ -216,6 +216,7 @@ literalt bv_utilst::full_adder(
       prop.lcnf(a,  b,  carry_in, !sum);
     }
 
+    // Register XOR constraint: sum = a XOR b XOR carry_in
     return sum;
   }
   else // NOLINT(readability/braces)
@@ -223,7 +224,9 @@ literalt bv_utilst::full_adder(
   {
     // trivial encoding
     carry_out=carry(a, b, carry_in);
-    return prop.lxor(prop.lxor(a, b), carry_in);
+    literalt sum = prop.lxor(prop.lxor(a, b), carry_in);
+    // Register XOR constraint: sum = a XOR b XOR carry_in
+    return sum;
   }
 }
 

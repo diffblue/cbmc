@@ -303,8 +303,11 @@ get_sat_solver(message_handlert &message_handler, const optionst &options)
     else if(solver_option == "cadical")
     {
 #if defined SATCHECK_CADICAL
-      return make_satcheck_prop<satcheck_cadical_no_preprocessingt>(
+      auto solver = make_satcheck_prop<satcheck_cadical_no_preprocessingt>(
         message_handler, options);
+      if(options.get_bool_option("xor-gauss"))
+        solver->enable_xor_gauss();
+      return solver;
 #else
       emit_solver_warning(message_handler, "cadical");
 #endif
@@ -623,6 +626,9 @@ static void parse_sat_options(const cmdlinet &cmdline, optionst &options)
 
   if(cmdline.isset("sat-solver"))
     options.set_option("sat-solver", cmdline.get_value("sat-solver"));
+
+  if(cmdline.isset("xor-gauss"))
+    options.set_option("xor-gauss", true);
 }
 
 static void parse_smt2_options(const cmdlinet &cmdline, optionst &options)

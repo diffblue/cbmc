@@ -44,6 +44,16 @@ public:
   virtual literalt lselect(literalt a, literalt b, literalt c)=0; // a?b:c
   virtual void set_equal(literalt a, literalt b);
 
+  /// Register a XOR constraint for solvers that support Gaussian elimination.
+  /// Default implementation is a no-op.
+  /// \param lits: literals in the XOR (result XOR lits[0] XOR lits[1] ... = rhs)
+  /// \param rhs: parity of the XOR
+  virtual void register_xor(const bvt &lits, bool rhs)
+  {
+    (void)lits;
+    (void)rhs;
+  }
+
   virtual void l_set_to(literalt a, bool value)
   {
     set_equal(a, const_literal(value));

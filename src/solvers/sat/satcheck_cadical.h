@@ -14,10 +14,16 @@ Author: Michael Tautschnig
 
 #include <solvers/hardness_collector.h>
 
+#include <memory>
+#include <vector>
+
 namespace CaDiCaL // NOLINT(readability/namespace)
 {
   class Solver; // NOLINT(readability/identifiers)
 }
+
+class cadical_xor_propagatort;
+struct xor_constraintt;
 
 class satcheck_cadical_baset : public cnf_solvert, public hardness_collectort
 {
@@ -44,6 +50,22 @@ public:
   }
   bool is_in_conflict(literalt a) const override;
 
+  /// Record a XOR constraint for Gaussian elimination.
+  /// The constraint is: vars[0] XOR vars[1] XOR ... = rhs.
+  /// Variables are literalt values (using var_no()).
+  void add_xor_constraint(const std::vector<literalt> &lits, bool rhs);
+
+  void register_xor(const bvt &lits, bool rhs) override
+  {
+    add_xor_constraint(lits, rhs);
+  }
+
+  /// Enable XOR Gaussian elimination propagator.
+  void enable_xor_gauss()
+  {
+    xor_gauss_enabled = true;
+  }
+
 #if 0
   literalt new_variable() override;
   bvt new_variables(std::size_t width) override;
@@ -55,6 +77,9 @@ protected:
   // NOLINTNEXTLINE(readability/identifiers)
   CaDiCaL::Solver *solver;
   int preprocessing_limit = 0, localsearch_limit = 0;
+  std::unique_ptr<cadical_xor_propagatort> xor_propagator;
+  std::vector<xor_constraintt> pending_xors;
+  bool xor_gauss_enabled = false;
 };
 
 class satcheck_cadical_no_preprocessingt : public satcheck_cadical_baset

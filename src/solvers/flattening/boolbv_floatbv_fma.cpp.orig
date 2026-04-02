@@ -1,0 +1,40 @@
+/*******************************************************************\
+
+Module:
+
+<<<<<<< HEAD
+Author: Michael Tautschnig
+=======
+Author: Daniel Kroening, kroening@kroening.com
+>>>>>>> 2280514b50 (Add __CPROVER_fma built-in and floatbv_fma_exprt expression)
+
+\*******************************************************************/
+
+#include <util/bitvector_types.h>
+#include <util/floatbv_expr.h>
+
+#include <solvers/floatbv/float_utils.h>
+
+#include "boolbv.h"
+
+bvt boolbvt::convert_floatbv_fma(const floatbv_fma_exprt &expr)
+{
+  float_utilst float_utils(prop);
+
+  float_utils.set_rounding_mode(convert_bv(expr.rounding_mode()));
+  float_utils.spec = ieee_float_spect(to_floatbv_type(expr.type()));
+
+<<<<<<< HEAD
+  bvt multiply_lhs = convert_bv(expr.op_multiply_lhs());
+  bvt multiply_rhs = convert_bv(expr.op_multiply_rhs());
+  bvt addend = convert_bv(expr.op_add());
+
+  return float_utils.fma(multiply_lhs, multiply_rhs, addend);
+=======
+  bvt bv0 = convert_bv(expr.op_multiply_lhs());
+  bvt bv1 = convert_bv(expr.op_multiply_rhs());
+  bvt bv2 = convert_bv(expr.op_add());
+
+  return float_utils.fma(bv0, bv1, bv2);
+>>>>>>> 2280514b50 (Add __CPROVER_fma built-in and floatbv_fma_exprt expression)
+}

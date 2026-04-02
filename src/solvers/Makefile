@@ -62,7 +62,7 @@ ifneq ($(LINGELING),)
 endif
 
 ifneq ($(CADICAL),)
-  CADICAL_SRC=sat/satcheck_cadical.cpp
+  CADICAL_SRC=sat/satcheck_cadical.cpp sat/xor_gauss.cpp
   CADICAL_INCLUDE=-I $(CADICAL)/src
   CADICAL_LIB=$(CADICAL)/build/libcadical$(LIBEXT)
   CP_CXXFLAGS += -DHAVE_CADICAL

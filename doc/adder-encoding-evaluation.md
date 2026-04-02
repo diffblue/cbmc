@@ -317,3 +317,76 @@ derives them through linear algebra over GF(2).
 This suggests that the most impactful improvement for adder-heavy
 formulas may not be in the encoding at all, but in **solver selection**
 or **native XOR support**.
+
+
+## XOR Gaussian Elimination Propagator (Prototype)
+
+### Implementation
+
+We implemented a GF(2) Gaussian elimination propagator that plugs into
+CaDiCaL via its `ExternalPropagator` interface. The propagator:
+
+1. **Collects XOR constraints** from full adders during encoding
+   (`bv_utilst::full_adder` calls `prop.register_xor()`)
+2. **Maintains a GF(2) matrix** in partial row echelon form
+3. **Propagates** when a variable assignment reduces a row to unit
+4. **Detects conflicts** when a row becomes empty with odd parity
+
+Files: `src/solvers/sat/xor_gauss.{h,cpp}`,
+`src/solvers/sat/cadical_xor_propagator.h`,
+integration in `satcheck_cadical.{h,cpp}`, `bv_utils.cpp`, `prop.h`.
+
+### Results
+
+| Benchmark | CaDiCaL | CaDiCaL+Gauss | CryptoMiniSat | MiniSat |
+|-----------|---------|---------------|---------------|---------|
+| UNSAT (N=200) | 5.74s | **0.60s** (9.5x) | 2.21s | 3.95s |
+| Equiv (N=100) | 7.79s | **0.19s** (41x) | 4.93s | 6.82s |
+| SAT (N=2000) | 0.14s | 37.8s (✗) | — | 3.64s |
+
+The propagator **beats CryptoMiniSat** on UNSAT by combining CaDiCaL's
+superior CDCL search with Gaussian elimination. CryptoMiniSat uses its
+own (weaker) CDCL engine.
+
+### SAT Overhead Problem
+
+The external propagator callbacks add significant overhead on SAT
+instances where the solver finds a satisfying assignment quickly
+without needing Gaussian elimination. The 128K observed variables
+cause frequent callbacks that dominate solving time.
+
+### Known Limitations
+
+1. **Reason clauses are unit** — the propagator returns only the
+   propagated literal as its reason, not the full XOR row. This is
+   sound but produces weaker learned clauses. Full reason
+   reconstruction would improve conflict analysis.
+
+2. **No lazy activation** — the propagator is always active. A
+   threshold-based activation (e.g., only after N conflicts) would
+   avoid SAT overhead.
+
+3. **Backtracking is expensive** — full row snapshots are saved and
+   restored. CryptoMiniSat uses a watched-variable scheme that avoids
+   this cost.
+
+4. **Only full adder XORs are collected** — other XOR-like operations
+   (e.g., bitwise XOR in the program) are not tracked.
+
+### Next Steps for the Propagator
+
+1. **Add lazy activation**: Only connect the propagator after a
+   configurable number of conflicts (e.g., 1000). This avoids
+   overhead on easy SAT instances.
+
+2. **Implement full reason reconstruction**: When propagating
+   `v = rhs`, the reason clause should be `v, ~a1, ~a2, ...` where
+   `a1, a2, ...` are the other assigned variables in the XOR row.
+
+3. **Optimize backtracking**: Use CryptoMiniSat's watched-variable
+   approach instead of full row snapshots.
+
+4. **Collect more XOR constraints**: Track XORs from bitwise
+   operations, not just full adders.
+
+5. **Add command-line flag**: `--xor-gauss` to enable/disable.

@@ -64,6 +64,13 @@ Based on Phase 1-2 findings, one of:
 **Path C: Hybrid encoding**
 - Refine generate-skip clauses, apply selectively
 
+**Path D: XOR Gaussian elimination propagator [IMPLEMENTED — PROTOTYPE]**
+- Collect XOR constraints from full adders during encoding
+- Plug into CaDiCaL's ExternalPropagator for runtime Gaussian elimination
+- Results: 9.5x–41x speedup on UNSAT, beats CryptoMiniSat
+- Remaining work: lazy activation (SAT overhead), full reason clauses,
+  optimized backtracking, command-line flag
+
 ## Phase 4: Clean up the PR
 
 - Remove parallel prefix adders (uniformly worse, 300+ lines dead code)
@@ -169,3 +176,39 @@ The adder encoding research should focus on:
 The universal lemma injection is a separate optimization opportunity
 that could be implemented as a preprocessing step, independent of
 the adder encoding choice.
+
+
+## Research Timeline
+
+### Completed
+
+- **Encoding evaluation**: 7 encodings × 5 benchmarks × 2 solvers.
+  PC ripple carry is the best default. Parallel prefix adders are
+  uniformly worse (explained via proof trace: BVE drops from 80% to 37%).
+
+- **Proof trace analysis**: Universal learned clauses are inter-adder
+  or cross-iteration, not intra-adder. The PC encoding is already
+  propagation complete within a single adder.
+
+- **Variable ordering**: Putting Tseitin/carry variables first gives
+  34–68% speedup on CaDiCaL (zero-cost optimization).
+
+- **Solver options**: Disabling BVE helps CaDiCaL on adder benchmarks
+  (38% faster). Always-negative phase reduces conflicts by 39%.
+
+- **4-solver comparison**: CryptoMiniSat dominates via Gaussian
+  elimination (148 conflicts vs 25K–249K for others).
+
+- **XOR Gauss propagator prototype**: Implemented for CaDiCaL via
+  ExternalPropagator. 9.5x–41x speedup on UNSAT, beats CryptoMiniSat.
+  SAT overhead needs lazy activation.
+
+### Remaining
+
+- Lazy activation for the XOR Gauss propagator
+- Full reason clause reconstruction
+- Optimized backtracking (watched-variable scheme)
+- Command-line flag (`--xor-gauss`)
+- Variable ordering optimization in CBMC's propositional layer
+- Real-world benchmark validation (SV-COMP, AWS C Commons)
+- Clean up PR: remove parallel prefix adders, document findings

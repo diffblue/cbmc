@@ -10,9 +10,12 @@ Author: Michael Tautschnig
 
 #  include "satcheck_cadical.h"
 
+#  include "cadical_xor_propagator.h"
+
 #  include <util/exception_utils.h>
 #  include <util/invariant.h>
 #  include <util/narrow.h>
+#  include <cstdlib>
 #  include <util/threeval.h>
 
 #  include <cadical.hpp>
@@ -114,6 +117,23 @@ propt::resultt satcheck_cadical_baset::do_prop_solve(const bvt &assumptions)
   auto limit2_ret = solver->limit("localsearch", localsearch_limit);
   CHECK_RETURN(limit2_ret);
 
+  // Connect XOR Gaussian elimination propagator if we have XOR constraints
+  // and the feature is enabled via --xor-gauss (or CBMC_XOR_GAUSS env var).
+  if(!pending_xors.empty() && !xor_propagator &&
+     (std::getenv("CBMC_XOR_GAUSS") || xor_gauss_enabled))
+  {
+    // For now, always connect. TODO: lazy activation after N conflicts.
+    xor_propagator =
+      std::make_unique<cadical_xor_propagatort>(solver);
+    for(const auto &xc : pending_xors)
+      xor_propagator->add_xor(xc);
+    solver->connect_external_propagator(xor_propagator.get());
+    xor_propagator->finalize_observations();
+    log.statistics() << "XOR Gauss propagator: " << pending_xors.size()
+                     << " XOR constraints" << messaget::eom;
+    pending_xors.clear();
+  }
+
   switch(solver->solve())
   {
   case 10:
@@ -188,7 +208,32 @@ satcheck_cadical_baset::satcheck_cadical_baset(
 
 satcheck_cadical_baset::~satcheck_cadical_baset()
 {
+  if(xor_propagator)
+    solver->disconnect_external_propagator();
   delete solver;
+}
+
+void satcheck_cadical_baset::add_xor_constraint(
+  const std::vector<literalt> &lits,
+  bool rhs)
+{
+  xor_constraintt xc;
+  xc.rhs = rhs;
+  for(const auto &lit : lits)
+  {
+    if(lit.is_constant())
+    {
+      if(lit.is_true())
+        xc.rhs = !xc.rhs;
+      continue;
+    }
+    // Use DIMACS variable number (1-based)
+    xc.vars.push_back(lit.var_no() + 1);
+    if(lit.sign())
+      xc.rhs = !xc.rhs;
+  }
+  if(!xc.vars.empty())
+    pending_xors.push_back(std::move(xc));
 }
 
 bool satcheck_cadical_baset::is_in_conflict(literalt a) const

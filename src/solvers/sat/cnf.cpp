@@ -309,6 +309,7 @@ literalt cnft::lxor(literalt a, literalt b)
 
   literalt o=new_variable();
   gate_xor(a, b, o);
+  register_xor({o, a, b}, false);
   return o;
 }
 
