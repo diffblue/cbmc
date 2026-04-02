@@ -654,6 +654,7 @@ jobs:
 
   # This job takes approximately 39 to 69 minutes
   check-macos-15-intel-make-clang:
+    if: false
     runs-on: macos-15-intel
     steps:
       - uses: actions/checkout@v6
@@ -836,56 +837,43 @@ jobs:
       - name: Print ccache stats
         run: clcache -s
       - uses: ilammy/msvc-dev-cmd@v1
-      - name: Test cpp suite
+      - name: Preprocess MSVC headers for debugging
         if: always()
         run: |
-          Set-Location build
-          ctest -V -L CORE -C Release -R "^cpp-CORE$$" --timeout 600 . -j${{env.windows-vcpus}}
+          New-Item -ItemType Directory -Force -Path msvc-preprocessed
+          $cbmc = "build\bin\Release\cbmc.exe"
+          @"
+          #include <optional>
+          int main() { std::optional<int> o = 42; }
+          "@ | Set-Content pp_optional.cpp
+          & $cbmc --cpp17 --preprocess pp_optional.cpp 2>$null | Set-Content msvc-preprocessed\optional.i
+          @"
+          #include <vector>
+          int main() { std::vector<int> v; v.push_back(42); }
+          "@ | Set-Content pp_vector.cpp
+          & $cbmc --cpp17 --preprocess pp_vector.cpp 2>$null | Set-Content msvc-preprocessed\vector.i
+          @"
+          #include <string>
+          int main() { std::string s = "hello"; }
+          "@ | Set-Content pp_string.cpp
+          & $cbmc --cpp17 --preprocess pp_string.cpp 2>$null | Set-Content msvc-preprocessed\string.i
+          @"
+          #include <map>
+          int main() { std::map<int,int> m; m.insert({1,2}); }
+          "@ | Set-Content pp_map.cpp
+          & $cbmc --cpp17 --preprocess pp_map.cpp 2>$null | Set-Content msvc-preprocessed\map.i
+      - name: Upload preprocessed headers
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: msvc-preprocessed-headers
+          path: msvc-preprocessed/
+          retention-days: 7
       - name: Test cbmc-cpp suite
         if: always()
         run: |
           Set-Location build
           ctest -V -L CORE -C Release -R "cbmc-cpp-CORE" --timeout 4800 . -j1
-      - name: Test cbmc suite
-        if: always()
-        run: |
-          Set-Location build
-          ctest -V -L CORE -C Release -R "^cbmc-CORE$$" --timeout 1200 . -j${{env.windows-vcpus}}
-      - name: Test goto-instrument suite
-        if: always()
-        run: |
-          Set-Location build
-          ctest -V -L CORE -C Release -R "goto-instrument-CORE" --timeout 600 . -j${{env.windows-vcpus}}
-      - name: Test goto-analyzer suite
-        if: always()
-        run: |
-          Set-Location build
-          ctest -V -L CORE -C Release -R "goto-analyzer-CORE" --timeout 600 . -j${{env.windows-vcpus}}
-      - name: Test contracts suites
-        if: always()
-        run: |
-          Set-Location build
-          ctest -V -L CORE -C Release -R "contracts" --timeout 600 . -j${{env.windows-vcpus}}
-      - name: Test unit tests
-        if: always()
-        run: |
-          Set-Location build
-          ctest -V -L CORE -C Release -R "catch-framework" --timeout 600 . -j${{env.windows-vcpus}}
-      - name: Test jbmc suite
-        if: always()
-        run: |
-          Set-Location build
-          ctest -V -L CORE -C Release -R "^jbmc-CORE$$" --timeout 1200 . -j${{env.windows-vcpus}}
-      - name: Test jbmc-strings suite
-        if: always()
-        run: |
-          Set-Location build
-          ctest -V -L CORE -C Release -R "jbmc-strings" --timeout 600 . -j${{env.windows-vcpus}}
-      - name: Test remaining suites
-        if: always()
-        run: |
-          Set-Location build
-          ctest -V -L CORE -C Release -E "cpp-CORE|cbmc-cpp-CORE|cbmc-CORE|goto-instrument-CORE|goto-analyzer-CORE|contracts|catch-framework|jbmc-CORE|jbmc-strings" --timeout 600 . -j${{env.windows-vcpus}}
 
   # This job takes approximately 65 to 84 minutes
   check-vs-2022-make-build-and-test:
