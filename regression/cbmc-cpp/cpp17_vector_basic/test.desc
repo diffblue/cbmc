@@ -1,4 +1,4 @@
-CORE
+CORE gcc-only
 main.cpp
 --cpp17 --unwind 5 --no-unwinding-assertions --no-built-in-assertions --depth 200
 ^EXIT=0$
