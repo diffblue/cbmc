@@ -1,0 +1,7 @@
+CORE broken-z3-smt-backend broken-cprover-smt-backend no-new-smt
+main.c
+--fpa --incremental-smt2-solver z3
+^EXIT=1$
+^SIGNAL=0$
+--fpa is not supported with --incremental-smt2-solver
+--

@@ -1,4 +1,4 @@
-CORE
+CORE no-new-smt
 main.c
 --smt2 --outfile -
 activate-multi-line-match

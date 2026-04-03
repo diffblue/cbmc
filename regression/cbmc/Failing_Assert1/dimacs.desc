@@ -1,4 +1,4 @@
-CORE no-new-smt
+CORE no-new-smt broken-z3-smt-backend broken-cprover-smt-backend
 main.c
 --dimacs --verbosity 8
 ^Runtime decision procedure: [0-9]+(\.[0-9]+)?(e-[0-9]+)?s$
