@@ -1,0 +1,13 @@
+CORE
+test.c
+--restrict-function-pointer main.function_pointer_call.1/gamma,alpha,beta _ --no-standard-checks
+activate-multi-line-match
+IF main.function_pointer_call.1 = address_of\(alpha\)(?s:.)*IF main.function_pointer_call.1 = address_of\(beta\)(?s:.)*IF main.function_pointer_call.1 = address_of\(gamma\)
+dereferenced function pointer must be one of \[alpha, beta, gamma\]
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Tests that function pointer targets are emitted in sorted order regardless of
+the order in which they are specified on the command line. This ensures
+deterministic output that does not depend on internal hash table ordering.

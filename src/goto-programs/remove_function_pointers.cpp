@@ -344,8 +344,8 @@ void remove_function_pointerst::remove_function_pointer(
     functions);
 }
 
-static std::string function_pointer_assertion_comment(
-  const std::unordered_set<symbol_exprt, irep_hash> &candidates)
+static std::string
+function_pointer_assertion_comment(const std::vector<symbol_exprt> &candidates)
 {
   std::stringstream comment;
 
@@ -382,8 +382,17 @@ void remove_function_pointer(
   goto_programt &goto_program,
   const irep_idt &function_id,
   goto_programt::targett target,
-  const std::unordered_set<symbol_exprt, irep_hash> &functions)
+  const std::unordered_set<symbol_exprt, irep_hash> &functions_set)
 {
+  // Sort by identifier to ensure deterministic output regardless of
+  // internal hash ordering.
+  std::vector<symbol_exprt> functions(
+    functions_set.begin(), functions_set.end());
+  std::sort(
+    functions.begin(),
+    functions.end(),
+    [](const symbol_exprt &a, const symbol_exprt &b)
+    { return id2string(a.get_identifier()) < id2string(b.get_identifier()); });
   const exprt &function = target->call_function();
   const exprt &pointer = to_dereference_expr(function).pointer();
 
