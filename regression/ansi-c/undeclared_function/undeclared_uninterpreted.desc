@@ -2,7 +2,7 @@ CORE
 uninterpreted.c
 
 missing type information required to construct call to uninterpreted function
-^EXIT=70$
+^EXIT=(1|64)$
 ^SIGNAL=0$
 --
 ^warning: ignoring

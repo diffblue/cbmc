@@ -314,7 +314,9 @@ void c_typecheck_baset::typecheck_decl(codet &code)
     // see if it's a typedef
     // or a function
     // or static
-    if(symbol.is_type || symbol.type.id() == ID_code)
+    if(
+      symbol.is_type || symbol.type.id() == ID_code ||
+      symbol.type.id() == ID_mathematical_function)
     {
       // we ignore
     }
