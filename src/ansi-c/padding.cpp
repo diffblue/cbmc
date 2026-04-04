@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 
-mp_integer alignment(const typet &type, const namespacet &ns)
+bytest alignment(const typet &type, const namespacet &ns)
 {
   // we need to consider a number of different cases:
   // - alignment specified in the source, which will be recorded in
@@ -37,32 +37,30 @@ mp_integer alignment(const typet &type, const namespacet &ns)
   const exprt &given_alignment=
     static_cast<const exprt &>(type.find(ID_C_alignment));
 
-  mp_integer a_int = 0;
+  bytest a_int{0};
 
   // we trust it blindly, no matter how nonsensical
   if(given_alignment.is_not_nil())
   {
-    const auto a = numeric_cast<mp_integer>(given_alignment);
+    const auto a = numeric_cast<bytest>(given_alignment);
     if(a.has_value())
       a_int = *a;
   }
 
   // alignment but no packing
-  if(a_int>0 && !type.get_bool(ID_C_packed))
+  if(a_int > bytest{0} && !type.get_bool(ID_C_packed))
     return a_int;
   // no alignment, packing
-  else if(a_int==0 && type.get_bool(ID_C_packed))
-    return 1;
+  else if(a_int == bytest{0} && type.get_bool(ID_C_packed))
+    return bytest{1};
 
   // compute default
-  mp_integer result;
+  bytest result{1};
 
   if(type.id()==ID_array)
     result = alignment(to_array_type(type).element_type(), ns);
   else if(type.id()==ID_struct || type.id()==ID_union)
   {
-    result=1;
-
     // get the max
     // (should really be the smallest common denominator)
     for(const auto &c : to_struct_union_type(type).components())
@@ -90,12 +88,10 @@ mp_integer alignment(const typet &type, const namespacet &ns)
     // we align these according to the 'underlying type'
     result = alignment(to_c_bit_field_type(type).underlying_type(), ns);
   }
-  else
-    result=1;
 
   // if an alignment had been provided and packing was requested, take
   // the smallest alignment
-  if(a_int>0 && a_int<result)
+  if(a_int > bytest{0} && a_int < result)
     result=a_int;
 
   return result;
@@ -172,7 +168,7 @@ static void add_padding_msvc(struct_typet &type, const namespacet &ns)
   struct_typet::componentst &components=type.components();
 
   std::size_t bit_field_bits = 0, underlying_bits = 0;
-  mp_integer offset = 0;
+  bytest offset{0};
 
   bool is_packed = type.get_bool(ID_C_packed);
 
@@ -205,26 +201,28 @@ static void add_padding_msvc(struct_typet &type, const namespacet &ns)
         const std::size_t pad_bits =
           underlying_bits - (bit_field_bits % underlying_bits);
         it = pad_bit_field(components, it, pad_bits);
-        offset += (bit_field_bits + pad_bits) / config.ansi_c.char_width;
+        offset += bits_to_bytes_trunc(
+          bitst{bit_field_bits + pad_bits}, config.ansi_c.char_width);
         underlying_bits = bit_field_bits = 0;
       }
       else
       {
-        offset += bit_field_bits / config.ansi_c.char_width;
+        offset +=
+          bits_to_bytes_trunc(bitst{bit_field_bits}, config.ansi_c.char_width);
         underlying_bits = bit_field_bits = 0;
       }
 
       // pad up to underlying type unless the struct is packed
       if(!is_packed)
       {
-        const mp_integer a = alignment(it->type(), ns);
-        if(a > 1)
+        const bytest a = alignment(it->type(), ns);
+        if(a > bytest{1})
         {
-          const mp_integer displacement = offset % a;
+          const bytest displacement = offset % a;
 
-          if(displacement != 0)
+          if(displacement != bytest{0})
           {
-            const mp_integer pad_bytes = a - displacement;
+            const bytest pad_bytes = a - displacement;
             std::size_t pad_bits =
               numeric_cast_v<std::size_t>(pad_bytes * config.ansi_c.char_width);
             it = pad(components, it, pad_bits);
@@ -250,7 +248,7 @@ static void add_padding_msvc(struct_typet &type, const namespacet &ns)
       {
         // keep track of offset
         const auto size = pointer_offset_size(it->type(), ns);
-        if(size.has_value() && *size >= 1)
+        if(size.has_value() && *size >= bytest{1})
           offset += *size;
       }
     }
@@ -263,19 +261,23 @@ static void add_padding_msvc(struct_typet &type, const namespacet &ns)
     const std::size_t pad =
       underlying_bits - (bit_field_bits % underlying_bits);
     pad_bit_field(components, components.end(), pad);
-    offset += (bit_field_bits + pad) / config.ansi_c.char_width;
+    offset += bits_to_bytes_trunc(
+      bitst{bit_field_bits + pad}, config.ansi_c.char_width);
   }
   else
-    offset += bit_field_bits / config.ansi_c.char_width;
+  {
+    offset +=
+      bits_to_bytes_trunc(bitst{bit_field_bits}, config.ansi_c.char_width);
+  }
 
   // alignment of the struct
   // Note that this is done even if the struct is packed.
-  const mp_integer a = alignment(type, ns);
-  const mp_integer displacement = offset % a;
+  const bytest a = alignment(type, ns);
+  const bytest displacement = offset % a;
 
-  if(displacement != 0)
+  if(displacement != bytest{0})
   {
-    const mp_integer pad_bytes = a - displacement;
+    const bytest pad_bytes = a - displacement;
     const std::size_t pad_bits =
       numeric_cast_v<std::size_t>(pad_bytes * config.ansi_c.char_width);
     pad(components, components.end(), pad_bits);
@@ -330,8 +332,8 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
     }
   }
 
-  mp_integer offset=0;
-  mp_integer max_alignment=0;
+  bytest offset{0};
+  bytest max_alignment{0};
   std::size_t bit_field_bits=0;
   const bool struct_is_packed = type.get_bool(ID_C_packed);
 
@@ -341,7 +343,7 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
       it++)
   {
     const typet it_type=it->type();
-    mp_integer a=1;
+    bytest a{1};
 
     if(it_type.id()==ID_c_bit_field)
     {
@@ -362,7 +364,7 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
         bit_field_bits += w;
         const std::size_t bytes = bit_field_bits / config.ansi_c.char_width;
         bit_field_bits %= config.ansi_c.char_width;
-        offset+=bytes;
+        offset += bytest{bytes};
         continue;
       }
     }
@@ -375,7 +377,7 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
       ++bit_field_bits;
       const std::size_t bytes = bit_field_bits / config.ansi_c.char_width;
       bit_field_bits %= config.ansi_c.char_width;
-      offset += bytes;
+      offset += bytest{bytes};
       continue;
     }
     else
@@ -399,15 +401,15 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
       max_alignment=a;
 
     if(
-      a != 1 &&
+      a != bytest{1} &&
       (!struct_is_packed || it_type.find(ID_C_alignment).is_not_nil()))
     {
       // we may need to align it
-      const mp_integer displacement = offset % a;
+      const bytest displacement = offset % a;
 
-      if(displacement!=0)
+      if(displacement != bytest{0})
       {
-        const mp_integer pad_bytes = a - displacement;
+        const bytest pad_bytes = a - displacement;
         const std::size_t pad_bits =
           numeric_cast_v<std::size_t>(pad_bytes * config.ansi_c.char_width);
         it = pad(components, it, pad_bits);
@@ -428,7 +430,7 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
   {
     if(alignment.id()!=ID_default)
     {
-      const auto tmp_i = numeric_cast<mp_integer>(simplify_expr(alignment, ns));
+      const auto tmp_i = numeric_cast<bytest>(simplify_expr(alignment, ns));
 
       if(tmp_i.has_value() && *tmp_i > max_alignment)
         max_alignment = *tmp_i;
@@ -441,14 +443,14 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
   // There may be a need for 'end of struct' padding.
   // We use 'max_alignment'.
 
-  if(max_alignment>1)
+  if(max_alignment > bytest{1})
   {
     // we may need to align it
-    mp_integer displacement=offset%max_alignment;
+    bytest displacement = offset % max_alignment;
 
-    if(displacement!=0)
+    if(displacement != bytest{0})
     {
-      mp_integer pad_bytes = max_alignment - displacement;
+      bytest pad_bytes = max_alignment - displacement;
       std::size_t pad_bits =
         numeric_cast_v<std::size_t>(pad_bytes * config.ansi_c.char_width);
       pad(components, components.end(), pad_bits);
@@ -467,9 +469,9 @@ void add_padding(struct_typet &type, const namespacet &ns)
 
 void add_padding(union_typet &type, const namespacet &ns)
 {
-  mp_integer max_alignment_bits =
-    alignment(type, ns) * config.ansi_c.char_width;
-  mp_integer size_bits=0;
+  bitst max_alignment_bits =
+    bytes_to_bits(alignment(type, ns), config.ansi_c.char_width);
+  bitst size_bits{0};
 
   // check per component, and ignore those without fixed size
   for(const auto &c : type.components())
@@ -483,7 +485,7 @@ void add_padding(union_typet &type, const namespacet &ns)
   if(type.get_bool(ID_C_packed))
   {
     // The size needs to be a multiple of 1 char only.
-    max_alignment_bits = config.ansi_c.char_width;
+    max_alignment_bits = bitst{config.ansi_c.char_width};
   }
 
   if(config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
@@ -494,18 +496,17 @@ void add_padding(union_typet &type, const namespacet &ns)
       if(c.type().id() == ID_c_bit_field)
       {
         auto w = underlying_width(to_c_bit_field_type(c.type()), ns);
-        if(w.has_value() && w.value() > max_alignment_bits)
-          max_alignment_bits = w.value();
+        if(w.has_value() && bitst{w.value()} > max_alignment_bits)
+          max_alignment_bits = bitst{w.value()};
       }
   }
 
   // The size must be a multiple of the alignment, or
   // we add a padding member to the union.
 
-  if(size_bits%max_alignment_bits!=0)
+  if(size_bits % max_alignment_bits != bitst{0})
   {
-    mp_integer padding_bits=
-      max_alignment_bits-(size_bits%max_alignment_bits);
+    bitst padding_bits = max_alignment_bits - (size_bits % max_alignment_bits);
 
     unsignedbv_typet padding_type(
       numeric_cast_v<std::size_t>(size_bits + padding_bits));

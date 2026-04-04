@@ -19,7 +19,7 @@ class struct_typet;
 class typet;
 class union_typet;
 
-mp_integer alignment(const typet &type, const namespacet &);
+bytest alignment(const typet &type, const namespacet &);
 void add_padding(struct_typet &type, const namespacet &);
 void add_padding(union_typet &type, const namespacet &);
 

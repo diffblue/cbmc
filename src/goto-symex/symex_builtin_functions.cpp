@@ -83,9 +83,9 @@ void goto_symext::symex_allocate(
       {
         // Did the size get multiplied?
         auto elem_size = pointer_offset_size(*tmp_type, ns);
-        const auto alloc_size = numeric_cast<mp_integer>(tmp_size);
+        const auto alloc_size = numeric_cast<bytest>(tmp_size);
 
-        if(!elem_size.has_value() || *elem_size==0)
+        if(!elem_size.has_value() || *elem_size == bytest{0})
         {
         }
         else if(

@@ -54,11 +54,11 @@ protected:
   [[nodiscard]] std::optional<bvt> convert_address_of_rec(const exprt &);
 
   [[nodiscard]] bvt
-  offset_arithmetic(const pointer_typet &, const bvt &, const mp_integer &);
+  offset_arithmetic(const pointer_typet &, const bvt &, const bytest &);
   [[nodiscard]] bvt offset_arithmetic(
     const pointer_typet &,
     const bvt &,
-    const mp_integer &factor,
+    const bytest &factor,
     const exprt &index);
   [[nodiscard]] bvt offset_arithmetic(
     const pointer_typet &type,
@@ -68,7 +68,7 @@ protected:
   [[nodiscard]] bvt offset_arithmetic(
     const pointer_typet &,
     const bvt &,
-    const mp_integer &factor,
+    const bytest &factor,
     const bvt &index_bv);
 
   struct postponedt
