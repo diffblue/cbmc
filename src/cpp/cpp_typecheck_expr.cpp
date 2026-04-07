@@ -2276,8 +2276,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       else
         result = isnormal_exprt(arg);
       result.add_source_location() = expr.source_location();
-      exprt cast = typecast_exprt::conditional_cast(result, expr.type());
-      expr.swap(cast);
+      expr.swap(result);
       return;
     }
   }
