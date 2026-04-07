@@ -430,7 +430,8 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     expr.id() == "__has_nothrow_constructor" ||
     expr.id() == "__has_nothrow_copy" ||
     expr.id() == "__has_virtual_destructor" ||
-    expr.id() == "__has_unique_object_representations")
+    expr.id() == "__has_unique_object_representations" ||
+    expr.id() == "__is_trivially_relocatable")
   {
     // Unary type predicates — conservatively return false for now.
     typet t = static_cast<const typet &>(expr.find(ID_type_arg));
