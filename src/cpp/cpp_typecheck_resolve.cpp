@@ -2650,6 +2650,21 @@ exprt cpp_typecheck_resolvet::resolve(
 
     if(still_not_accessible)
     {
+      // In system headers, silently ignore access violations —
+      // they may result from incomplete modelling of friend
+      // declarations or visibility attributes.
+      const auto &loc = result.source_location();
+      if(
+        !loc.get_file().empty() && loc.get_file()[0] == '/' &&
+        std::string(id2string(loc.get_file())).find("/include/") !=
+          std::string::npos)
+      {
+        still_not_accessible = false;
+      }
+    }
+
+    if(still_not_accessible)
+    {
       if(!fail_with_exception)
         return nil_exprt();
 
