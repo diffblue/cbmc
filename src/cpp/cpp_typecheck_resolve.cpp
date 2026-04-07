@@ -4266,6 +4266,8 @@ void cpp_typecheck_resolvet::filter_for_named_scopes(
 
       while(true)
       {
+        if(identifier.empty())
+          break;
         const symbolt &symbol = cpp_typecheck.lookup(identifier);
         CHECK_RETURN(symbol.is_type);
 
@@ -4353,6 +4355,8 @@ void cpp_typecheck_resolvet::filter_for_named_scopes(
         while(true)
         {
           irep_idt identifier = type.get_identifier();
+          if(identifier.empty())
+            break;
 
           const symbolt &symbol = cpp_typecheck.lookup(identifier);
           CHECK_RETURN(symbol.is_type);
@@ -4417,8 +4421,13 @@ void cpp_typecheck_resolvet::resolve_with_arguments(
             cpp_typecheck.follow_tag(to_union_tag_type(arg.type())));
 
     // Search in the struct's own scope (for friend declarations)
-    cpp_scopet &scope =
-      cpp_typecheck.cpp_scopes.get_scope(final_type.get(ID_name));
+    const irep_idt &struct_name = final_type.get(ID_name);
+    if(struct_name.empty())
+      continue;
+    auto scope_it = cpp_typecheck.cpp_scopes.id_map.find(struct_name);
+    if(scope_it == cpp_typecheck.cpp_scopes.id_map.end())
+      continue;
+    cpp_scopet &scope = static_cast<cpp_scopet &>(*scope_it->second);
     auto tmp_set = scope.lookup(base_name, cpp_scopet::SCOPE_ONLY);
     id_set.insert(tmp_set.begin(), tmp_set.end());
 
