@@ -5791,16 +5791,39 @@ bool Parser::rTemplateArgs(irept &template_args)
       exp.add_source_location()=a.source_location();
       exp.type().swap(a);
 
-      // but could also be an expr
-      lex.Restore(pos);
-      exprt tmp;
-      if(rConditionalExpr(tmp, true))
-        exp.id(ID_ambiguous);
-#ifdef DEBUG
-      std::cout << std::string(__indent, ' ') <<  "Parser::rTemplateArgs 4.1\n";
-#endif
-      lex.Restore(pos);
-      rTypeNameOrFunctionType(a);
+      // Check if this could also be an expression (ambiguity).
+      // Skip the expensive re-parse for compound types that are
+      // unambiguously types (e.g., template instantiations like
+      // vector<int>, nested types with ::, etc.).
+      bool is_unambiguous_type = false;
+      {
+        const typet &parsed_type = exp.type();
+        if(parsed_type.id() == ID_merged_type)
+          is_unambiguous_type = true;
+        else if(parsed_type.id() == ID_cpp_name)
+        {
+          const auto &sub = parsed_type.get_sub();
+          for(const auto &s : sub)
+          {
+            if(s.id() == ID_template_args || s.id() == "::")
+            {
+                is_unambiguous_type = true;
+                break;
+            }
+          }
+        }
+      }
+
+      if(!is_unambiguous_type)
+      {
+        // but could also be an expr
+        lex.Restore(pos);
+        exprt tmp;
+        if(rConditionalExpr(tmp, true))
+          exp.id(ID_ambiguous);
+        lex.Restore(pos);
+        rTypeNameOrFunctionType(a);
+      }
 
       if(lex.LookAhead(0)==TOK_ELLIPSIS)
       {
