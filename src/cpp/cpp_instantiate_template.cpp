@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/symbol_table_base.h>
 
 #include "cpp_convert_type.h"
+#include "cpp_template_qualifiers.h"
 #include "cpp_type2name.h"
 #include "cpp_typecheck_resolve.h"
 
@@ -634,9 +635,9 @@ void cpp_typecheckt::elaborate_class_template(
             full_args_tc.arguments())
           {
             // operator== on irept ignores #-prefixed attributes like
-            // C_constant, C_volatile, and C_c_type. Check them
-            // explicitly so that e.g. char vs signed char are
-            // distinguished in template specialization matching.
+            // C_constant and C_volatile. Check them recursively on
+            // the type tree so that e.g. const T* and T* partial
+            // specializations are correctly distinguished.
             bool qualifiers_match = true;
             for(std::size_t j = 0;
                 j < partial_specialization_args_tc.arguments().size();
@@ -646,12 +647,7 @@ void cpp_typecheckt::elaborate_class_template(
               const exprt &f = full_args_tc.arguments()[j];
               if(p.id() == ID_type)
               {
-                if(
-                  p.type().get_bool(ID_C_constant) !=
-                    f.type().get_bool(ID_C_constant) ||
-                  p.type().get_bool(ID_C_volatile) !=
-                    f.type().get_bool(ID_C_volatile) ||
-                  p.type().get(ID_C_c_type) != f.type().get(ID_C_c_type))
+                if(!qualifiers_match_recursively(p.type(), f.type()))
                 {
                   qualifiers_match = false;
                   break;

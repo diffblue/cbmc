@@ -27,6 +27,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_convert_type.h"
 #include "cpp_template_parameter.h"
+#include "cpp_template_qualifiers.h"
 #include "cpp_type2name.h"
 #include "cpp_typecheck.h"
 #include "cpp_typecheck_fargs.h"
@@ -1795,7 +1796,7 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
         // Also check that cv-qualifiers and #c_type match, since
         // operator== ignores #-prefixed attributes like C_constant,
         // C_volatile, and C_c_type (needed to distinguish char from
-        // signed char).
+        // signed char, and const T* from T*).
         bool qualifiers_match = true;
         for(std::size_t j = 0;
             j < partial_specialization_args_tc.arguments().size();
@@ -1806,10 +1807,7 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
           if(p.id() == ID_type)
           {
             if(
-              p.type().get_bool(ID_C_constant) !=
-                f.type().get_bool(ID_C_constant) ||
-              p.type().get_bool(ID_C_volatile) !=
-                f.type().get_bool(ID_C_volatile) ||
+              !qualifiers_match_recursively(p.type(), f.type()) ||
               p.type().get(ID_C_c_type) != f.type().get(ID_C_c_type))
             {
               qualifiers_match = false;
