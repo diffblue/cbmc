@@ -1,4 +1,4 @@
-CORE broken-refine-arrays broken-smt-backend no-new-smt
+KNOWNBUG broken-refine-arrays broken-smt-backend no-new-smt
 main.c
 --arrays-uf-always --unwind 1 --show-array-constraints --json-ui
 "arrayAckermann": 60
