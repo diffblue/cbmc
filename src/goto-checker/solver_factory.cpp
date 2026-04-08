@@ -542,6 +542,9 @@ solver_factoryt::get_smt2(smt2_dect::solvert solver)
     if(options.get_bool_option("fpa"))
       smt2_dec->use_FPA_theory = true;
 
+    if(options.get_bool_option("proof-explanation"))
+      smt2_dec->produce_unsat_cores = true;
+
     return std::make_unique<solvert>(std::move(smt2_dec));
   }
   else if(filename == "-")
