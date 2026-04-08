@@ -652,13 +652,19 @@ void cpp_typecheckt::typecheck_class_template_member(
     cpp_scopet::QUALIFIED,            // search using-scopes (inline namespaces)
     cpp_scopet::id_classt::TEMPLATE); // must be template
 
-  // remove any specializations
+  // remove any specializations and non-class templates (e.g., constructor
+  // templates that share the class name)
   for(auto it = id_set.begin(); it != id_set.end();)
   {
     auto next = it;
     ++next;
-    if(lookup((*it)->identifier).type.find(ID_specialization_of).is_not_nil())
+    const symbolt &sym = lookup((*it)->identifier);
+    if(
+      sym.type.find(ID_specialization_of).is_not_nil() ||
+      !to_cpp_declaration(sym.type).is_class_template())
+    {
       id_set.erase(it);
+    }
     it = next;
   }
 
@@ -1118,7 +1124,8 @@ void cpp_typecheckt::convert_class_template_specialization(
   auto id_set = cpp_scopes.current_scope().lookup(
     base_name, cpp_scopet::SCOPE_ONLY, cpp_idt::id_classt::TEMPLATE);
 
-  // remove any specializations
+  // remove any specializations and non-class templates (e.g., constructor
+  // templates that share the class name)
   for(cpp_scopest::id_sett::iterator
       it=id_set.begin();
       it!=id_set.end();
@@ -1127,8 +1134,13 @@ void cpp_typecheckt::convert_class_template_specialization(
     cpp_scopest::id_sett::iterator next=it;
     next++;
 
-    if(lookup((*it)->identifier).type.find(ID_specialization_of).is_not_nil())
+    const symbolt &sym = lookup((*it)->identifier);
+    if(
+      sym.type.find(ID_specialization_of).is_not_nil() ||
+      !to_cpp_declaration(sym.type).is_class_template())
+    {
       id_set.erase(it);
+    }
 
     it=next;
   }
