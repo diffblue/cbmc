@@ -5794,7 +5794,8 @@ bool Parser::rTemplateArgs(irept &template_args)
       // Check if this could also be an expression (ambiguity).
       // Skip the expensive re-parse for compound types that are
       // unambiguously types (e.g., template instantiations like
-      // vector<int>, nested types with ::, etc.).
+      // vector<int>). Qualified names with :: are NOT skipped
+      // because Foo<T>::value could be a static member (expression).
       bool is_unambiguous_type = false;
       {
         const typet &parsed_type = exp.type();
@@ -5803,14 +5804,19 @@ bool Parser::rTemplateArgs(irept &template_args)
         else if(parsed_type.id() == ID_cpp_name)
         {
           const auto &sub = parsed_type.get_sub();
+          bool has_template_args = false;
+          bool has_scope = false;
           for(const auto &s : sub)
           {
-            if(s.id() == ID_template_args || s.id() == "::")
-            {
-                is_unambiguous_type = true;
-                break;
-            }
+            if(s.id() == ID_template_args)
+                has_template_args = true;
+            if(s.id() == "::")
+                has_scope = true;
           }
+          // Template instantiation without :: is unambiguously a type.
+          // With ::, it could be Foo<T>::value (expression).
+          if(has_template_args && !has_scope)
+            is_unambiguous_type = true;
         }
       }
 

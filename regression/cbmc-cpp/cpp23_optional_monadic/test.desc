@@ -1,6 +1,6 @@
 CORE gcc-only
 main.cpp
---cpp23 --depth 50 --no-unwinding-assertions
+--cpp23 --no-unwinding-assertions
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

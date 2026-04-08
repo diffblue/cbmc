@@ -1,6 +1,6 @@
 CORE gcc-only
 main.cpp
---cpp20 --unwind 3 --depth 100 --no-unwinding-assertions
+--cpp20 --unwind 3 --no-unwinding-assertions
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
