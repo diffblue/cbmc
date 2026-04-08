@@ -12,10 +12,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_CPP_SCOPE_H
 #define CPROVER_CPP_CPP_SCOPE_H
 
+#include "cpp_id.h"
+
 #include <iosfwd>
 #include <set>
-
-#include "cpp_id.h"
+#include <unordered_set>
 
 class cpp_scopet:public cpp_idt
 {
@@ -115,13 +116,28 @@ public:
   class cpp_scopet &new_scope(const irep_idt &new_scope_name);
 
 protected:
+  typedef std::unordered_set<const cpp_scopet *> visited_sett;
+
   void lookup_rec(const irep_idt &base_name, lookup_kindt kind, id_sett &);
+
+  void lookup_rec(
+    const irep_idt &base_name,
+    lookup_kindt kind,
+    id_sett &,
+    visited_sett &visited);
 
   void lookup_rec(
     const irep_idt &base_name,
     lookup_kindt kind,
     cpp_idt::id_classt id_class,
     id_sett &);
+
+  void lookup_rec(
+    const irep_idt &base_name,
+    lookup_kindt kind,
+    cpp_idt::id_classt id_class,
+    id_sett &,
+    visited_sett &visited);
 };
 
 class cpp_root_scopet:public cpp_scopet
