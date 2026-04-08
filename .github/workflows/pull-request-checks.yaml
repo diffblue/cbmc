@@ -698,13 +698,13 @@ jobs:
           for hdr in vector iterator; do
             echo "#include <$hdr>" > pp_$hdr.cpp
             echo "int main() {}" >> pp_$hdr.cpp
-            $cbmc --cpp11 --preprocess pp_$hdr.cpp > macos-preprocessed/$hdr.i 2>/dev/null || true
+            $cbmc --cpp11 --preprocess pp_$hdr.cpp > macos-preprocessed/$hdr.ii 2>/dev/null || true
           done
           # Also preprocess STL1 and STL2 test files
           cp regression/cbmc-cpp/STL1/main.cpp pp_stl1.cpp
-          $cbmc --cpp11 --preprocess pp_stl1.cpp > macos-preprocessed/stl1.i 2>/dev/null || true
+          $cbmc --cpp11 --preprocess pp_stl1.cpp > macos-preprocessed/stl1.ii 2>/dev/null || true
           cp regression/cbmc-cpp/STL2/main.cpp pp_stl2.cpp
-          $cbmc --cpp11 --preprocess pp_stl2.cpp > macos-preprocessed/stl2.i 2>/dev/null || true
+          $cbmc --cpp11 --preprocess pp_stl2.cpp > macos-preprocessed/stl2.ii 2>/dev/null || true
       - name: Upload preprocessed headers
         if: always()
         uses: actions/upload-artifact@v4
@@ -848,12 +848,12 @@ jobs:
           foreach ($hdr in @("tuple", "string_view", "variant", "any", "string", "map", "optional", "vector")) {
             $src = "#include <$hdr>`nint main() {}"
             $src | Set-Content "pp_$hdr.cpp"
-            & $cbmc --cpp17 --preprocess "pp_$hdr.cpp" 2>$null | Set-Content "msvc-preprocessed\$hdr.i"
+            & $cbmc --cpp17 --preprocess "pp_$hdr.cpp" 2>$null | Set-Content "msvc-preprocessed\$hdr.ii"
           }
           foreach ($hdr in @("array", "numeric")) {
             $src = "#include <$hdr>`nint main() {}"
             $src | Set-Content "pp_${hdr}_20.cpp"
-            & $cbmc --cpp20 --preprocess "pp_${hdr}_20.cpp" 2>$null | Set-Content "msvc-preprocessed\${hdr}_cpp20.i"
+            & $cbmc --cpp20 --preprocess "pp_${hdr}_20.cpp" 2>$null | Set-Content "msvc-preprocessed\${hdr}_cpp20.ii"
           }
       - name: Upload preprocessed headers
         if: always()
