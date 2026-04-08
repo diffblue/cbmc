@@ -25,6 +25,7 @@ target_link_libraries(goto-analyzer-lib
 # Executable
 add_executable(goto-analyzer goto_analyzer_main.cpp)
 target_link_libraries(goto-analyzer goto-analyzer-lib)
+target_link_libraries(goto-analyzer cprover_allocator)
 install(TARGETS goto-analyzer DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 # Man page

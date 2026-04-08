@@ -23,6 +23,7 @@ jobs:
           sudo apt-get install --no-install-recommends -y clang-19 clang++-19 flex bison cmake ninja-build maven jq libxml2-utils dpkg-dev ccache
           sudo apt-get install --no-install-recommends -y libssl-dev libelf-dev libudev-dev libpci-dev libiberty-dev autoconf
           sudo apt-get install --no-install-recommends -y gawk jq
+          sudo apt-get install --no-install-recommends -y libgoogle-perftools-dev
 
       - name: Prepare ccache
         uses: actions/cache@v5

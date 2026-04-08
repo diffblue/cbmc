@@ -9,6 +9,7 @@ target_link_libraries(goto-harness
   json
   json-symtab-language
 )
+target_link_libraries(goto-harness cprover_allocator)
 install(TARGETS goto-harness DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 # Man page

@@ -19,6 +19,8 @@ Author: Michael Tautschnig
 
 #include "goto_symex_can_forward_propagate.h"
 
+#include <unordered_set>
+
 /// Try to evaluate a simple pointer comparison.
 /// \param operation: ID_equal or ID_not_equal
 /// \param symbol_expr: The symbol expression in the condition
@@ -164,7 +166,7 @@ simplify_expr_with_value_sett::simplify_inequality_pointer_object(
 
   auto collect_objects = [this](const exprt &pointer)
   {
-    std::set<exprt> objects;
+    std::unordered_set<exprt, irep_hash> objects;
     if(auto address_of = expr_try_dynamic_cast<address_of_exprt>(pointer))
     {
       objects.insert(
@@ -209,14 +211,16 @@ simplify_expr_with_value_sett::simplify_inequality_pointer_object(
                                  : changed(static_cast<exprt>(false_exprt{}));
   }
 
-  std::list<exprt> intersection;
-  std::set_intersection(
-    lhs_objects.begin(),
-    lhs_objects.end(),
-    rhs_objects.begin(),
-    rhs_objects.end(),
-    std::back_inserter(intersection));
-  if(!lhs_objects.empty() && !rhs_objects.empty() && intersection.empty())
+  bool has_intersection = false;
+  for(const auto &obj : lhs_objects)
+  {
+    if(rhs_objects.count(obj) != 0)
+    {
+      has_intersection = true;
+      break;
+    }
+  }
+  if(!lhs_objects.empty() && !rhs_objects.empty() && !has_intersection)
   {
     // all pointed-to objects on the left-hand side are different from any of
     // the pointed-to objects on the right-hand side

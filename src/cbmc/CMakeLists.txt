@@ -45,6 +45,7 @@ target_link_libraries(cbmc
 else()
 target_link_libraries(cbmc cbmc-lib)
 endif()
+target_link_libraries(cbmc cprover_allocator)
 install(TARGETS cbmc DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 # Man page

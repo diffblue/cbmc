@@ -24,7 +24,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq gcc gdb g++ maven jq flex bison libxml2-utils ccache cmake z3
+          sudo apt-get install --no-install-recommends -yq gcc gdb g++ maven jq flex bison libxml2-utils ccache cmake z3 libgoogle-perftools-dev
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
       - name: Download cvc-5 from the releases page and make sure it can be deployed
@@ -222,7 +222,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen graphviz z3
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen graphviz z3 libgoogle-perftools-dev
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
       - name: Download cvc-5 from the releases page and make sure it can be deployed
@@ -361,7 +361,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen graphviz z3
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen graphviz z3 libgoogle-perftools-dev
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
       - name: Download cvc-5 from the releases page and make sure it can be deployed
@@ -468,7 +468,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen graphviz z3
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen graphviz z3 libgoogle-perftools-dev
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
       - name: Download cvc-5 from the releases page and make sure it can be deployed
@@ -522,7 +522,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils ccache doxygen z3 g++-multilib
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils ccache doxygen z3 g++-multilib libgoogle-perftools-dev
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
       - name: Download cvc-5 from the releases page and make sure it can be deployed

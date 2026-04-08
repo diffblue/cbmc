@@ -285,11 +285,15 @@ exprt field_sensitivityt::get_fields(
 
     const exprt &compound_op = ssa_expr.get_original_expr();
 
+    // Hoist loop-invariant work: prepare template with L2 already removed.
+    ssa_exprt tmp_template = ssa_expr;
+    const bool was_l2 = !tmp_template.get_level_2().empty();
+    if(was_l2)
+      tmp_template.remove_level_2();
+
     for(const auto &comp : components)
     {
-      ssa_exprt tmp = ssa_expr;
-      bool was_l2 = !tmp.get_level_2().empty();
-      tmp.remove_level_2();
+      ssa_exprt tmp = tmp_template;
       tmp.set_expression(
         member_exprt{compound_op, comp.get_name(), comp.type()});
       exprt field = get_fields(ns, state, tmp, disjoined_fields_only);
@@ -328,13 +332,78 @@ exprt field_sensitivityt::get_fields(
 
     const exprt &array = ssa_expr.get_original_expr();
 
+    // Hoist loop-invariant work: prepare a template ssa_exprt once,
+    // then mutate only the index-dependent parts in each iteration.
+    // This avoids repeated ssa_exprt copies, remove_level_2 calls,
+    // and redundant irept operations.
+    ssa_exprt tmp_template = ssa_expr;
+    const bool was_l2 = !tmp_template.get_level_2().empty();
+    if(was_l2)
+      tmp_template.remove_level_2();
+
+    // Cache the identifier prefix/suffix from the first element.
+    std::string id_prefix, id_suffix, l1_prefix, l1_suffix;
+    bool have_cached_prefix = false;
+
+    // Pre-compute the index type (same for all elements).
+    const typet &idx_type = type.index_type();
+
     for(std::size_t i = 0; i < array_size; ++i)
     {
-      const index_exprt index(array, from_integer(i, type.index_type()));
-      ssa_exprt tmp = ssa_expr;
-      bool was_l2 = !tmp.get_level_2().empty();
-      tmp.remove_level_2();
-      tmp.set_expression(index);
+      // Reuse a single constant_exprt, just changing the value.
+      const constant_exprt idx_const = from_integer(i, idx_type);
+      const index_exprt index(array, idx_const);
+
+      // Copy the template (which already has L2 removed).
+      ssa_exprt tmp = tmp_template;
+
+      if(!have_cached_prefix)
+      {
+        // First element: use canonical set_expression to establish format.
+        tmp.set_expression(index);
+
+        const std::string &idx_val = id2string(idx_const.get_value());
+        const std::string marker = "[[" + idx_val + "]]";
+
+        const std::string &full_id = id2string(tmp.get_identifier());
+        const std::string &full_l1 = id2string(tmp.get_l1_object_identifier());
+        auto pos = full_id.rfind(marker);
+        if(pos != std::string::npos)
+        {
+          id_prefix = full_id.substr(0, pos);
+          id_suffix = full_id.substr(pos + marker.size());
+          auto l1_pos = full_l1.rfind(marker);
+          if(l1_pos != std::string::npos)
+          {
+            l1_prefix = full_l1.substr(0, l1_pos);
+            l1_suffix = full_l1.substr(l1_pos + marker.size());
+          }
+          have_cached_prefix = true;
+        }
+      }
+      else
+      {
+        // Subsequent elements: set expression and derive identifier directly.
+        tmp.type() = as_const(index).type();
+        static_cast<exprt &>(tmp).add(ID_expression, index);
+
+        const std::string &idx_val = id2string(idx_const.get_value());
+
+        std::string new_id = id_prefix;
+        new_id += "[[";
+        new_id += idx_val;
+        new_id += "]]";
+        new_id += id_suffix;
+        tmp.set_identifier(new_id);
+
+        std::string new_l1 = l1_prefix;
+        new_l1 += "[[";
+        new_l1 += idx_val;
+        new_l1 += "]]";
+        new_l1 += l1_suffix;
+        tmp.set(ID_L1_object_identifier, new_l1);
+      }
+
       exprt element = get_fields(ns, state, tmp, disjoined_fields_only);
       if(was_l2)
       {

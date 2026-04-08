@@ -11,6 +11,7 @@ target_link_libraries(symtab2gb
         goto-programs
         json-symtab-language)
 
+target_link_libraries(symtab2gb cprover_allocator)
 install(TARGETS symtab2gb DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 # Man page

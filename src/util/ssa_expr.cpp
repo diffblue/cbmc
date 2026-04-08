@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ssa_expr.h"
 
-#include <sstream>
-
 #include "pointer_expr.h"
 
 /// If \p expr is:
@@ -18,21 +16,28 @@ Author: Daniel Kroening, kroening@kroening.com
 ///   - an index_exprt where the index is a constant, apply recursively on the
 ///     array and add "[[index]]"
 /// \return the stream \p os
-static std::ostream &
-initialize_ssa_identifier(std::ostream &os, const exprt &expr)
+static void initialize_ssa_identifier(std::string &id, const exprt &expr)
 {
   if(auto member = expr_try_dynamic_cast<member_exprt>(expr))
   {
-    return initialize_ssa_identifier(os, member->struct_op())
-           << ".." << member->get_component_name();
+    initialize_ssa_identifier(id, member->struct_op());
+    id += "..";
+    id += id2string(member->get_component_name());
+    return;
   }
   if(auto index = expr_try_dynamic_cast<index_exprt>(expr))
   {
-    const irep_idt &idx = to_constant_expr(index->index()).get_value();
-    return initialize_ssa_identifier(os, index->array()) << "[[" << idx << "]]";
+    initialize_ssa_identifier(id, index->array());
+    id += "[[";
+    id += id2string(to_constant_expr(index->index()).get_value());
+    id += "]]";
+    return;
   }
   if(auto symbol = expr_try_dynamic_cast<symbol_exprt>(expr))
-    return os << symbol->get_identifier();
+  {
+    id += id2string(symbol->get_identifier());
+    return;
+  }
 
   UNREACHABLE;
 }
@@ -42,9 +47,9 @@ ssa_exprt::ssa_exprt(const exprt &expr) : symbol_exprt(expr.type())
   set(ID_C_SSA_symbol, true);
   add(ID_expression, expr);
   with_source_location(expr.source_location());
-  std::ostringstream os;
-  initialize_ssa_identifier(os, expr);
-  const std::string id = os.str();
+  std::string id;
+  id.reserve(64);
+  initialize_ssa_identifier(id, expr);
   set_identifier(id);
   set(ID_L1_object_identifier, id);
 }
@@ -53,57 +58,71 @@ ssa_exprt::ssa_exprt(const exprt &expr) : symbol_exprt(expr.type())
 /// "s!l0@l1".
 /// If \p expr is a member or index expression, recursively apply the procedure
 /// and add "..component_name" or "[[index]]" to \p os.
+/// Build the base part of an SSA identifier (without level suffixes)
+/// by appending to \p id and \p l1_object_id.
 static void build_ssa_identifier_rec(
   const exprt &expr,
   const irep_idt &l0,
   const irep_idt &l1,
   const irep_idt &l2,
-  std::ostream &os,
-  std::ostream &l1_object_os)
+  std::string &id,
+  std::string &l1_object_id)
 {
-  if(expr.id()==ID_member)
+  if(expr.id() == ID_member)
   {
-    const member_exprt &member=to_member_expr(expr);
+    const member_exprt &member = to_member_expr(expr);
 
-    build_ssa_identifier_rec(member.struct_op(), l0, l1, l2, os, l1_object_os);
+    build_ssa_identifier_rec(member.struct_op(), l0, l1, l2, id, l1_object_id);
 
-    os << ".." << member.get_component_name();
-    l1_object_os << ".." << member.get_component_name();
+    const std::string &component = id2string(member.get_component_name());
+    id += "..";
+    id += component;
+    l1_object_id += "..";
+    l1_object_id += component;
   }
-  else if(expr.id()==ID_index)
+  else if(expr.id() == ID_index)
   {
-    const index_exprt &index=to_index_expr(expr);
+    const index_exprt &index = to_index_expr(expr);
 
-    build_ssa_identifier_rec(index.array(), l0, l1, l2, os, l1_object_os);
+    build_ssa_identifier_rec(index.array(), l0, l1, l2, id, l1_object_id);
 
-    const irep_idt &idx = to_constant_expr(index.index()).get_value();
-    os << "[[" << idx << "]]";
-    l1_object_os << "[[" << idx << "]]";
+    const std::string &idx =
+      id2string(to_constant_expr(index.index()).get_value());
+    id += "[[";
+    id += idx;
+    id += "]]";
+    l1_object_id += "[[";
+    l1_object_id += idx;
+    l1_object_id += "]]";
   }
-  else if(expr.id()==ID_symbol)
+  else if(expr.id() == ID_symbol)
   {
-    auto symid=to_symbol_expr(expr).get_identifier();
-    os << symid;
-    l1_object_os << symid;
+    const std::string &symid = id2string(to_symbol_expr(expr).get_identifier());
+    id += symid;
+    l1_object_id += symid;
 
     if(!l0.empty())
     {
-      // Distinguish different threads of execution
-      os << '!' << l0;
-      l1_object_os << '!' << l0;
+      const std::string &l0s = id2string(l0);
+      id += '!';
+      id += l0s;
+      l1_object_id += '!';
+      l1_object_id += l0s;
     }
 
     if(!l1.empty())
     {
-      // Distinguish different calls to the same function (~stack frame)
-      os << '@' << l1;
-      l1_object_os << '@' << l1;
+      const std::string &l1s = id2string(l1);
+      id += '@';
+      id += l1s;
+      l1_object_id += '@';
+      l1_object_id += l1s;
     }
 
     if(!l2.empty())
     {
-      // Distinguish SSA steps for the same variable
-      os << '#' << l2;
+      id += '#';
+      id += id2string(l2);
     }
   }
   else
@@ -116,12 +135,16 @@ static std::pair<irep_idt, irep_idt> build_identifier(
   const irep_idt &l1,
   const irep_idt &l2)
 {
-  std::ostringstream oss;
-  std::ostringstream l1_object_oss;
+  std::string id;
+  std::string l1_object_id;
+  // Typical SSA identifiers are 20-60 chars; pre-allocate to avoid
+  // repeated reallocation during string building.
+  id.reserve(64);
+  l1_object_id.reserve(64);
 
-  build_ssa_identifier_rec(expr, l0, l1, l2, oss, l1_object_oss);
+  build_ssa_identifier_rec(expr, l0, l1, l2, id, l1_object_id);
 
-  return std::make_pair(irep_idt(oss.str()), irep_idt(l1_object_oss.str()));
+  return std::make_pair(irep_idt(id), irep_idt(l1_object_id));
 }
 
 static void update_identifier(ssa_exprt &ssa)
@@ -181,19 +204,42 @@ const irep_idt ssa_exprt::get_l1_object_identifier() const
 void ssa_exprt::set_level_0(std::size_t i)
 {
   set(ID_L0, i);
-  ::update_identifier(*this);
+  // Optimized: L0 is only set when it was previously empty (the caller
+  // guards against re-setting). The current identifier is "base" and
+  // we need "base!l0". Append directly instead of rebuilding.
+  const std::string &cur_id = id2string(get_identifier());
+  std::string suffix = "!" + std::to_string(i);
+  std::string new_id = cur_id + suffix;
+  set_identifier(new_id);
+  set(ID_L1_object_identifier, new_id);
 }
 
 void ssa_exprt::set_level_1(std::size_t i)
 {
   set(ID_L1, i);
-  ::update_identifier(*this);
+  // Optimized: L1 is only set when it was previously empty (the caller
+  // guards against re-setting). The current identifier is "base!l0" and
+  // we need "base!l0@l1". Append directly instead of rebuilding.
+  const std::string &cur_id = id2string(get_identifier());
+  std::string suffix = "@" + std::to_string(i);
+  std::string new_id = cur_id + suffix;
+  set_identifier(new_id);
+  set(ID_L1_object_identifier, new_id);
 }
 
 void ssa_exprt::set_level_2(std::size_t i)
 {
   set(ID_L2, i);
-  ::update_identifier(*this);
+  // Optimized: the L1 object identifier doesn't change when only L2 changes,
+  // and the main identifier just needs the #N suffix updated. Derive from
+  // the cached L1 object identifier instead of rebuilding from scratch.
+  const std::string &l1_id = id2string(get(ID_L1_object_identifier));
+  std::string new_id;
+  new_id.reserve(l1_id.size() + 8);
+  new_id = l1_id;
+  new_id += '#';
+  new_id += std::to_string(i);
+  set_identifier(new_id);
 }
 
 void ssa_exprt::remove_level_2()
