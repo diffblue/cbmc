@@ -1,0 +1,13 @@
+KNOWNBUG pointer-encoding-via-maps
+argv1.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Map-based pointer encoding does not correctly propagate
+argv[argc]==NULL through the array theory. The with-constraints
+fix for SSA-renamed indices is present but insufficient for the
+map encoding's pointer equality path.

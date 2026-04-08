@@ -1,0 +1,11 @@
+KNOWNBUG thorough-paths no-new-smt pointer-encoding-via-maps
+test.c
+--no-simplify --unwind 300 --object-bits 8
+^EXIT=6$
+^SIGNAL=0$
+too many addressed objects
+--
+--
+Map-based pointer encoding does not enforce the object-bits limit
+in the same way as the standard encoding, so the "too many
+addressed objects" error is not triggered.

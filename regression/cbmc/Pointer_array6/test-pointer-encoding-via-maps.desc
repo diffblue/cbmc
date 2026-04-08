@@ -1,0 +1,13 @@
+KNOWNBUG pointer-encoding-via-maps
+main.c
+--no-malloc-may-fail
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Map-based pointer encoding does not correctly handle byte-level
+round-trips through pointer arrays. The misaligned byte_extract
+and byte_update operations produce incorrect values because the
+map encoding stores pointer indices rather than flat addresses.

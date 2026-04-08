@@ -1,0 +1,13 @@
+KNOWNBUG pointer-encoding-via-maps
+main.c
+
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Map-based pointer encoding does not correctly model
+__CPROVER_allocated_memory or integer-address pointer
+dereferences, causing different failures than the standard
+encoding.
