@@ -1,4 +1,4 @@
-CORE libcxx gcc-only
+CORE libcxx
 main.cpp
 --cpp17 --stdlib libc++
 ^VERIFICATION
