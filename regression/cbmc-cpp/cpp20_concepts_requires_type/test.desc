@@ -1,0 +1,11 @@
+CORE
+main.cpp
+--cpp20
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+requires-expression with type requirements.
+The requires clause is skipped but SFINAE-like fallback to the
+primary template works.

@@ -1,0 +1,9 @@
+CORE
+main.cpp
+--cpp20
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+Abbreviated function templates with concept-constrained auto.
+CBMC skips concept constraints (treats as always satisfied).

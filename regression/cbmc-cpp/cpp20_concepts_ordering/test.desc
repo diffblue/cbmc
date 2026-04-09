@@ -1,0 +1,9 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+Constraint-based partial specialization ordering.
+Needs Phase 1.3: use constraint evaluation in specialization selection.
