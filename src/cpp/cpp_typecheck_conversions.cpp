@@ -1678,12 +1678,14 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
       const struct_typet &struct_type = follow_tag(to_struct_tag_type(type));
       const auto &components = struct_type.components();
 
-      // Find the element type from the _begin pointer member
+      // Find the element type from the pointer member (_begin or _M_array)
       typet elem_type;
       bool found = false;
       for(const auto &c : components)
       {
-        if(c.get_base_name() == "_begin" && c.type().id() == ID_pointer)
+        if(
+          (c.get_base_name() == "_begin" || c.get_base_name() == "_M_array") &&
+          c.type().id() == ID_pointer)
         {
           elem_type = to_pointer_type(c.type()).base_type();
           elem_type.remove(ID_C_constant);
@@ -1740,16 +1742,36 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
           arr_ref.add_source_location() = orig_expr.source_location();
 
           // Build struct { &arr[0], n }
-          struct_exprt result({}, type);
-          index_exprt first_elem(
-            arr_ref, from_integer(0, c_index_type()), elem_type);
-          address_of_exprt addr(first_elem);
-          addr.type() = components[0].type();
-          result.add_to_operands(std::move(addr));
-          result.add_to_operands(from_integer(n, components[1].type()));
-          result.add_source_location() = orig_expr.source_location();
-          expr = std::move(result);
-          return;
+          // Find the two data members (pointer and size)
+          const struct_typet::componentt *ptr_comp = nullptr;
+          const struct_typet::componentt *size_comp = nullptr;
+          for(const auto &c : components)
+          {
+            if(
+              c.type().id() == ID_code || c.get_bool(ID_is_type) ||
+              c.get_bool(ID_is_static))
+            {
+              continue;
+            }
+            if(!ptr_comp)
+              ptr_comp = &c;
+            else if(!size_comp)
+              size_comp = &c;
+          }
+
+          if(ptr_comp && size_comp)
+          {
+            struct_exprt result({}, type);
+            index_exprt first_elem(
+              arr_ref, from_integer(0, c_index_type()), elem_type);
+            address_of_exprt addr(first_elem);
+            addr.type() = ptr_comp->type();
+            result.add_to_operands(std::move(addr));
+            result.add_to_operands(from_integer(n, size_comp->type()));
+            result.add_source_location() = orig_expr.source_location();
+            expr = std::move(result);
+            return;
+          }
         }
       }
     }
