@@ -1,4 +1,4 @@
-CORE gcc-only
+CORE
 main.cpp
 --cpp20 --unwind 3 --no-unwinding-assertions
 ^VERIFICATION SUCCESSFUL$
