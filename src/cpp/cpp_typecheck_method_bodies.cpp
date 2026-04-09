@@ -58,6 +58,7 @@ void cpp_typecheckt::typecheck_method_bodies()
         // Only suppress for system headers (paths under /usr/include,
         // /usr/lib, etc.), not for all absolute paths.
         suppress = file.find("/include/") != std::string::npos ||
+                   file.find("\\include\\") != std::string::npos ||
                    file.find("/usr/lib/") == 0 ||
                    file.find("/Applications/") == 0;
       }

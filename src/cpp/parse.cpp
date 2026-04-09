@@ -204,7 +204,9 @@ public:
       message_handler(message_handler),
       max_errors(10),
       cpp11(config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP11),
-      cpp20(config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP20)
+      cpp20(config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP20),
+      msvc_concepts(
+        config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
   {
     root_scope.kind=new_scopet::kindt::NAMESPACE;
     current_scope=&root_scope;
@@ -432,6 +434,7 @@ protected:
   unsigned int max_errors;
   const bool cpp11;
   const bool cpp20;
+  const bool msvc_concepts;
 };
 
 static bool is_identifier(int token)
@@ -1713,7 +1716,7 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
   // When followed by ::, try non-type parameter parsing first (for
   // qualified types like std::size_t), falling back to concept path.
   if(
-    cpp20 && is_identifier(t0) &&
+    (cpp20 || msvc_concepts) && is_identifier(t0) &&
     (is_identifier(lex.LookAhead(1)) || lex.LookAhead(1) == TOK_ELLIPSIS ||
      lex.LookAhead(1) == '<' || lex.LookAhead(1) == TOK_SCOPE))
   {
@@ -7426,35 +7429,47 @@ bool Parser::rRelationalExpr(exprt &exp, bool template_args)
         (t == TOK_LE || t == TOK_GE || t == '<' ||
          (t == '>' && !template_args) || t == TOK_SPACESHIP))
   {
-    // When we see '<' and the left operand is a name, it might be
-    // a template-id (e.g., classify<Types> in a fold expression).
-    // Try template-id first; fall back to comparison if it fails.
-    // Only attempt this when the token after > is an operator that
-    // can follow a template-id in a fold/expression context.
-    if(t == '<' && !template_args && exp.id() == ID_cpp_name)
+    // When we see '<' and the left operand is a name (possibly
+    // wrapped in address_of or other unary operators), it might be
+    // a template-id. Try template-id first; fall back to comparison.
+    if(t == '<' && !template_args)
     {
-      auto saved = lex.Save();
-      irept args;
-      if(rTemplateArgs(args))
+      // Find the innermost name expression
+      exprt *name_expr = &exp;
+      while((name_expr->id() == ID_address_of ||
+             name_expr->id() == ID_dereference ||
+             name_expr->id() == ID_member) &&
+            name_expr->has_operands())
       {
-        int next = lex.LookAhead(0);
-        // Accept template-id if followed by a binary operator,
-        // closing paren/brace, comma, semicolon, or ellipsis.
-        // Also verify the template args don't contain commas at
-        // the top level (to avoid consuming brace-init elements).
-        bool single_arg = args.get_sub().size() <= 1;
-        if(
-          single_arg &&
-          (next == '|' || next == '&' || next == '^' || next == ')' ||
-           next == ',' || next == ';' || next == TOK_ELLIPSIS || next == '+' ||
-           next == '-' || next == '*' || next == '/' || next == TOK_OROR ||
-           next == TOK_ANDAND || next == '}'))
-        {
-          exp.get_sub().push_back(args);
-          continue;
-        }
+        name_expr = &to_unary_expr(*name_expr).op();
       }
-      lex.Restore(saved);
+
+      if(name_expr->id() == ID_cpp_name)
+      {
+        auto saved = lex.Save();
+        irept args;
+        if(rTemplateArgs(args))
+        {
+          int next = lex.LookAhead(0);
+          bool single_arg = args.get_sub().size() <= 1;
+          // Unambiguous follow tokens: these can't appear after a
+          // comparison, so multi-arg template-ids are safe.
+          bool unambiguous_follow =
+            next == ')' || next == '}' || next == ';' || next == TOK_ELLIPSIS;
+          if(
+            (single_arg || unambiguous_follow) &&
+            (next == '|' || next == '&' || next == '^' || next == ')' ||
+             next == ',' || next == ';' || next == TOK_ELLIPSIS ||
+             next == '+' || next == '-' || next == '*' || next == '/' ||
+             next == TOK_OROR || next == TOK_ANDAND || next == '}' ||
+             next == '(' || next == '['))
+          {
+            name_expr->get_sub().push_back(args);
+            continue;
+          }
+        }
+        lex.Restore(saved);
+      }
     }
 
     cpp_tokent tk;

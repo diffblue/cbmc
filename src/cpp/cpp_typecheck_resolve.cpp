@@ -2658,10 +2658,10 @@ exprt cpp_typecheck_resolvet::resolve(
       // they may result from incomplete modelling of friend
       // declarations or visibility attributes.
       const auto &loc = result.source_location();
+      const std::string file = id2string(loc.get_file());
       if(
-        !loc.get_file().empty() && loc.get_file()[0] == '/' &&
-        std::string(id2string(loc.get_file())).find("/include/") !=
-          std::string::npos)
+        !file.empty() && (file.find("/include/") != std::string::npos ||
+                          file.find("\\include\\") != std::string::npos))
       {
         still_not_accessible = false;
       }
