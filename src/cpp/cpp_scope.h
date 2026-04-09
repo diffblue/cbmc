@@ -33,6 +33,9 @@ public:
 
   id_sett lookup(const irep_idt &base_name_to_lookup, lookup_kindt kind)
   {
+    if(base_name_to_lookup.empty())
+      return {};
+
     if(kind != SCOPE_ONLY)
     {
       auto &entry = lookup_cache()[{this, base_name_to_lookup, kind}];
@@ -53,6 +56,9 @@ public:
     lookup_kindt kind,
     cpp_idt::id_classt identifier_class)
   {
+    if(base_name_to_lookup.empty())
+      return {};
+
     id_sett result;
     lookup_rec(base_name_to_lookup, kind, identifier_class, result);
     return result;

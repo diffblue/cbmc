@@ -43,6 +43,8 @@ void cpp_scopet::lookup_rec(
   id_sett &id_set,
   visited_sett &visited)
 {
+  if(base_name_to_lookup.empty())
+    return;
   if(!visited.insert(this).second)
     return;
 
@@ -111,6 +113,9 @@ void cpp_scopet::lookup_rec(
   id_sett &id_set,
   visited_sett &visited)
 {
+  if(base_name_to_lookup.empty())
+    return;
+
   bool already_visited = !visited.insert(this).second;
   if(already_visited && kind == QUALIFIED)
     return;
