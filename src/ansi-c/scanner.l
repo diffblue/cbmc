@@ -883,7 +883,7 @@ enable_or_disable ("enable"|"disable")
 "class"             { return conditional_keyword(PARSER.cpp98, TOK_CLASS); }
 "compl"             { return conditional_keyword(PARSER.cpp98, '~'); }
 "concept"           { return conditional_keyword(PARSER.cpp20, TOK_CONCEPT); }
-"requires"          { return conditional_keyword(PARSER.cpp20, TOK_REQUIRES); }
+"requires"          { return conditional_keyword(PARSER.cpp20 || PARSER.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO, TOK_REQUIRES); }
 "constexpr"         { return conditional_keyword(PARSER.cpp11 || PARSER.c23, TOK_CONSTEXPR); }
 "consteval"         { return conditional_keyword(PARSER.cpp20, TOK_CONSTEVAL); }
 "constinit"         { return conditional_keyword(PARSER.cpp20, TOK_CONSTINIT); }
