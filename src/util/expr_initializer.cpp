@@ -1,3 +1,4 @@
+#include <set>
 /*******************************************************************\
 
 Module: Expression Initialization
@@ -51,7 +52,52 @@ std::optional<exprt> expr_initializert::expr_initializer_rec(
   const source_locationt &source_location,
   const exprt &init_expr)
 {
+  static std::set<irep_idt> active_tags;
   const irep_idt &type_id=type.id();
+
+  // Detect recursive types (struct containing itself)
+  if(type_id == ID_struct_tag)
+  {
+    const auto &tag_id = to_struct_tag_type(type).get_identifier();
+    if(!active_tags.insert(tag_id).second)
+      return {}; // cycle detected
+    struct tag_guard_t
+    {
+      std::set<irep_idt> &s;
+      irep_idt id;
+      ~tag_guard_t()
+      {
+        s.erase(id);
+      }
+    } tag_guard{active_tags, tag_id};
+    auto result = expr_initializer_rec(
+      ns.follow_tag(to_struct_tag_type(type)), source_location, init_expr);
+    if(!result.has_value())
+      return {};
+    result->type() = type;
+    return *result;
+  }
+  if(type_id == ID_union_tag)
+  {
+    const auto &tag_id = to_union_tag_type(type).get_identifier();
+    if(!active_tags.insert(tag_id).second)
+      return {};
+    struct tag_guard_t
+    {
+      std::set<irep_idt> &s;
+      irep_idt id;
+      ~tag_guard_t()
+      {
+        s.erase(id);
+      }
+    } tag_guard{active_tags, tag_id};
+    auto result = expr_initializer_rec(
+      ns.follow_tag(to_union_tag_type(type)), source_location, init_expr);
+    if(!result.has_value())
+      return {};
+    result->type() = type;
+    return *result;
+  }
 
   if(type_id==ID_unsignedbv ||
      type_id==ID_signedbv ||
@@ -258,31 +304,10 @@ std::optional<exprt> expr_initializert::expr_initializer_rec(
 
     return *result;
   }
-  else if(type_id==ID_struct_tag)
+  else if(type_id == ID_struct_tag || type_id == ID_union_tag)
   {
-    auto result = expr_initializer_rec(
-      ns.follow_tag(to_struct_tag_type(type)), source_location, init_expr);
-
-    if(!result.has_value())
-      return {};
-
-    // use the tag type
-    result->type() = type;
-
-    return *result;
-  }
-  else if(type_id==ID_union_tag)
-  {
-    auto result = expr_initializer_rec(
-      ns.follow_tag(to_union_tag_type(type)), source_location, init_expr);
-
-    if(!result.has_value())
-      return {};
-
-    // use the tag type
-    result->type() = type;
-
-    return *result;
+    // Handled at the top of the function with cycle detection
+    UNREACHABLE;
   }
   else if(type_id==ID_string)
   {
