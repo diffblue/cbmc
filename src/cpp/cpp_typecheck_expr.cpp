@@ -372,7 +372,10 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   }
   else if(expr.id()==ID_initializer_list)
   {
-    expr.type().id(ID_initializer_list);
+    // Preserve the type if it was already set (e.g., from a
+    // brace-init-list for aggregate initialization).
+    if(expr.type().is_nil() || expr.type().id() == ID_empty)
+      expr.type().id(ID_initializer_list);
   }
   else if(
     expr.id() == ID_const_cast || expr.id() == ID_dynamic_cast ||

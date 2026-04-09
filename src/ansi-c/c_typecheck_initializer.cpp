@@ -267,9 +267,11 @@ void c_typecheck_baset::designator_enter(
 
     for(const auto &c : struct_type.components())
     {
-      // C++ structs may have methods or type aliases as components;
-      // skip them.
-      if(c.type().id() == ID_code || c.get_bool(ID_is_type))
+      // C++ structs may have methods, type aliases, or static members
+      // as components; skip them.
+      if(
+        c.type().id() == ID_code || c.get_bool(ID_is_type) ||
+        c.get_bool(ID_is_static))
       {
         ++entry.index;
         continue;
@@ -476,7 +478,8 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
       {
         if(
           components[i].type().id() == ID_code ||
-          components[i].get_bool(ID_is_type))
+          components[i].get_bool(ID_is_type) ||
+          components[i].get_bool(ID_is_static))
         {
           --op_index;
         }
@@ -764,6 +767,7 @@ void c_typecheck_baset::increment_designator(designatort &designator)
             (components[entry.index].get_is_padding() ||
              components[entry.index].type().id() == ID_code ||
              components[entry.index].get_bool(ID_is_type) ||
+             components[entry.index].get_bool(ID_is_static) ||
              (components[entry.index].get_anonymous() &&
               components[entry.index].type().id() == ID_c_bit_field)))
       {
@@ -1099,8 +1103,12 @@ exprt c_typecheck_baset::do_initializer_list(
     std::size_t data_idx = 0;
     for(const auto &c : components)
     {
-      if(c.type().id() == ID_code || c.get_bool(ID_is_type))
+      if(
+        c.type().id() == ID_code || c.get_bool(ID_is_type) ||
+        c.get_bool(ID_is_static))
+      {
         continue;
+      }
       if(data_idx >= init_count && op_idx < result.operands().size())
       {
         const irept &default_val = c.find(ID_C_default_value);
@@ -1122,8 +1130,12 @@ exprt c_typecheck_baset::do_initializer_list(
     std::size_t data_components = 0;
     for(const auto &c : components)
     {
-      if(c.type().id() != ID_code && !c.get_bool(ID_is_type))
+      if(
+        c.type().id() != ID_code && !c.get_bool(ID_is_type) &&
+        !c.get_bool(ID_is_static))
+      {
         ++data_components;
+      }
     }
     CHECK_RETURN(result.operands().size() == data_components);
 
