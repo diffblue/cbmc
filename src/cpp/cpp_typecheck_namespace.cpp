@@ -120,6 +120,7 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
       if(file.empty())
         file = id2string(namespace_spec.source_location().get_file());
       bool is_system = file.find("/include/") != std::string::npos ||
+                       file.find("\\include\\") != std::string::npos ||
                        file.find("/usr/lib/") == 0 ||
                        file.find("/Applications/") == 0;
 

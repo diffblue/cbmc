@@ -674,7 +674,10 @@ void cpp_typecheckt::typecheck_class_template_member(
     // definition. This handles cases where a class template failed
     // to register due to unsupported constructs.
     const std::string file = id2string(cpp_name.source_location().get_file());
-    if(file.find("/usr/include/") == 0 || file.find("/usr/lib/") == 0)
+    if(
+      file.find("/usr/include/") == 0 || file.find("/usr/lib/") == 0 ||
+      file.find("\\include\\") != std::string::npos ||
+      file.find("/Applications/") == 0)
       return;
     error() << cpp_scopes.current_scope();
     error().source_location=cpp_name.source_location();
