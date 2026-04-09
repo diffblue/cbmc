@@ -1866,6 +1866,12 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
               }
             }
           }
+          // Add weight from requires clause constraints
+          const auto &req_str =
+            cpp_declaration.template_type().get(ID_C_requires_clause);
+          if(!req_str.empty())
+            constrained += std::stoull(id2string(req_str));
+
           matches.push_back(matcht(
             guessed_template_args,
             full_template_args_tc,

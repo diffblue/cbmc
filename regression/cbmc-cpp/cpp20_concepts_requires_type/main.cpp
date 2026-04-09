@@ -2,15 +2,27 @@
 // requires { typename T::type; } checks if T has a member type 'type'
 
 // Primary template
-template<class T>
-struct get_inner { typedef T type; };
+template <class T>
+struct get_inner
+{
+  typedef T type;
+};
 
 // Constrained specialization: only matches when T has value_type
-template<class T>
-  requires requires { typename T::value_type; }
-struct get_inner<T> { typedef typename T::value_type type; };
+template <class T>
+requires requires
+{
+  typename T::value_type;
+}
+struct get_inner<T>
+{
+  typedef typename T::value_type type;
+};
 
-struct Container { typedef double value_type; };
+struct Container
+{
+  typedef double value_type;
+};
 
 int main()
 {
