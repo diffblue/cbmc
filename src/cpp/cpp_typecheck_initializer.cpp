@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// Initialize an object with a value
 void cpp_typecheckt::convert_initializer(symbolt &symbol)
 {
+  const irep_idt sym_id = symbol.name;
   // this is needed for template arguments that are types
 
   if(symbol.is_type)
@@ -237,7 +238,12 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
       return;
     }
 
-    typecheck_expr(symbol.value);
+    {
+      exprt val = symbol.value;
+      typecheck_expr(val);
+      symbolt &symbol = symbol_table.get_writeable_ref(sym_id);
+      symbol.value = std::move(val);
+    }
 
     if(symbol.value.type().find(ID_to_member).is_not_nil())
       symbol.type.add(ID_to_member) = symbol.value.type().find(ID_to_member);
@@ -269,6 +275,9 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
   else
   {
     // we need a constructor
+    // Re-acquire symbol reference — earlier type-checking may have
+    // invalidated it through symbol table reallocation.
+    symbolt &symbol = symbol_table.get_writeable_ref(sym_id);
 
     // Aggregate initialization: for braced-init-list on non-POD struct
     // types that have no user-declared constructors (only compiler-
@@ -282,8 +291,11 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
       const struct_typet &struct_type =
         follow_tag(to_struct_tag_type(symbol.type));
 
-      // Check whether the struct has any non-copy constructor.
+      // Find initializer_list<T> constructor AND check for non-copy
+      // constructors in ONE pass, before any operation that might
+      // invalidate the struct reference through template elaboration.
       bool has_non_copy_ctor = false;
+      irep_idt il_tag_id;
       for(const auto &c : struct_type.components())
       {
         if(c.type().id() != ID_code || c.get_bool(ID_from_base))
@@ -291,55 +303,43 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
         const code_typet &code_type = to_code_type(c.type());
         if(code_type.return_type().id() != ID_constructor)
           continue;
-        // Copy constructor: this + const T& (2 parameters)
-        // Default constructor: this only (1 parameter)
         const auto &params = code_type.parameters();
         if(params.size() <= 1)
           continue;
         if(params.size() == 2 && is_reference(params[1].type()))
           continue;
         has_non_copy_ctor = true;
-        break;
-      }
-
-      // Brace-init-list to std::initializer_list<T> constructor
-      if(has_non_copy_ctor)
-      {
-        // Ensure the class is fully elaborated so all constructors
-        // are available.
-        elaborate_class_template(symbol.type);
-        const struct_typet &full_struct =
-          follow_tag(to_struct_tag_type(symbol.type));
-
-        typet il_type;
-        for(const auto &c : full_struct.components())
+        // Check first non-this param for initializer_list<T>
+        if(il_tag_id.empty())
         {
-          if(c.type().id() != ID_code)
-            continue;
-          const code_typet &ct = to_code_type(c.type());
-          if(ct.return_type().id() != ID_constructor)
-            continue;
-          for(const auto &p : ct.parameters())
+          for(const auto &p : params)
           {
             if(p.get_this())
               continue;
-            const typet *pt = &p.type();
-            if(is_reference(*pt))
-              pt = &to_pointer_type(*pt).base_type();
-            typet bare = *pt;
-            bare.remove(ID_C_constant);
+            typet pt = p.type();
+            if(is_reference(pt))
+              pt = to_pointer_type(pt).base_type();
             if(
-              bare.id() == ID_struct_tag &&
-              id2string(to_struct_tag_type(bare).get_identifier())
+              pt.id() == ID_struct_tag &&
+              id2string(to_struct_tag_type(pt).get_identifier())
                   .find("tag-initializer_list<") != std::string::npos)
-              il_type = bare;
+            {
+              il_tag_id = to_struct_tag_type(pt).get_identifier();
+            }
             break;
           }
-          if(il_type.is_not_nil())
-            break;
         }
+        if(!il_tag_id.empty())
+          break;
+      }
 
-        if(il_type.is_not_nil() && il_type.id() == ID_struct_tag)
+      // Brace-init-list to std::initializer_list<T> constructor
+      if(!il_tag_id.empty())
+      {
+        // Re-acquire symbol — the loop may have invalidated it.
+        symbolt &symbol = symbol_table.get_writeable_ref(sym_id);
+        struct_tag_typet il_type(il_tag_id);
+        if(il_type.id() == ID_struct_tag)
         {
           try
           {
@@ -397,6 +397,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
 
               struct_exprt il_val{{}, il_type};
               symbol_exprt arr_ref{arr_id, arr_type};
+              arr_ref.set(ID_C_lvalue, true);
               index_exprt first{
                 arr_ref, from_integer(0, c_index_type()), elem_type};
               address_of_exprt addr{first};
@@ -408,6 +409,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
               symbol_exprt expr_sym(symbol.name, symbol.type);
               already_typechecked_exprt::make_already_typechecked(expr_sym);
               exprt::operandst ctor_ops;
+              already_typechecked_exprt::make_already_typechecked(il_val);
               ctor_ops.push_back(std::move(il_val));
               auto ctor = cpp_constructor(
                 symbol.value.source_location(), expr_sym, ctor_ops);
