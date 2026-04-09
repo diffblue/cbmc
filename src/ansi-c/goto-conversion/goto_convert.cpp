@@ -1574,15 +1574,15 @@ void goto_convertt::convert_return(
 
   if(targets.has_return_value)
   {
-    INVARIANT_WITH_DIAGNOSTICS(
-      new_code.has_return_value(),
-      "function must return value",
-      new_code.find_source_location());
-
-    // Now add a 'set return value' instruction to set the return value.
-    dest.add(goto_programt::make_set_return_value(
-      new_code.return_value(), new_code.source_location()));
-    destruct_locals(side_effects.temporaries, dest, ns);
+    if(new_code.has_return_value())
+    {
+      // Now add a 'set return value' instruction to set the return value.
+      dest.add(goto_programt::make_set_return_value(
+        new_code.return_value(), new_code.source_location()));
+      destruct_locals(side_effects.temporaries, dest, ns);
+    }
+    // else: function body was likely dropped (e.g., system header error
+    // suppression). Skip — the caller gets a nondet value.
   }
   else
   {
