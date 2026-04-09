@@ -9,15 +9,15 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
-#include "cpp_typecheck.h"
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/expr_initializer.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
+#include <util/symbol_table_base.h>
 
 #include "cpp_convert_type.h"
+#include "cpp_typecheck.h"
 #include "cpp_typecheck_fargs.h"
 
 /// Initialize an object with a value
@@ -300,6 +300,129 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
           continue;
         has_non_copy_ctor = true;
         break;
+      }
+
+      // Brace-init-list to std::initializer_list<T> constructor
+      if(has_non_copy_ctor)
+      {
+        // Ensure the class is fully elaborated so all constructors
+        // are available.
+        elaborate_class_template(symbol.type);
+        const struct_typet &full_struct =
+          follow_tag(to_struct_tag_type(symbol.type));
+
+        typet il_type;
+        for(const auto &c : full_struct.components())
+        {
+          if(c.type().id() != ID_code)
+            continue;
+          const code_typet &ct = to_code_type(c.type());
+          if(ct.return_type().id() != ID_constructor)
+            continue;
+          for(const auto &p : ct.parameters())
+          {
+            if(p.get_this())
+              continue;
+            const typet *pt = &p.type();
+            if(is_reference(*pt))
+              pt = &to_pointer_type(*pt).base_type();
+            typet bare = *pt;
+            bare.remove(ID_C_constant);
+            if(
+              bare.id() == ID_struct_tag &&
+              id2string(to_struct_tag_type(bare).get_identifier())
+                  .find("tag-initializer_list<") != std::string::npos)
+              il_type = bare;
+            break;
+          }
+          if(il_type.is_not_nil())
+            break;
+        }
+
+        if(il_type.is_not_nil() && il_type.id() == ID_struct_tag)
+        {
+          try
+          {
+            const struct_typet &il_struct =
+              follow_tag(to_struct_tag_type(il_type));
+            typet elem_type;
+            const struct_typet::componentt *ptr_comp = nullptr;
+            const struct_typet::componentt *size_comp = nullptr;
+            for(const auto &m : il_struct.components())
+            {
+              if(
+                m.type().id() == ID_code || m.get_bool(ID_is_type) ||
+                m.get_bool(ID_is_static))
+                continue;
+              if(!ptr_comp)
+              {
+                ptr_comp = &m;
+                if(m.type().id() == ID_pointer)
+                {
+                  elem_type = to_pointer_type(m.type()).base_type();
+                  elem_type.remove(ID_C_constant);
+                }
+              }
+              else if(!size_comp)
+                size_comp = &m;
+            }
+
+            if(elem_type.is_not_nil() && ptr_comp && size_comp)
+            {
+              exprt::operandst typed_elems;
+              for(const auto &op : symbol.value.operands())
+              {
+                exprt val = op;
+                typecheck_expr(val);
+                implicit_typecast(val, elem_type);
+                typed_elems.push_back(std::move(val));
+              }
+
+              std::size_t n = typed_elems.size();
+              auto arr_type =
+                array_typet{elem_type, from_integer(n, size_type())};
+              std::string arr_id =
+                "__init_list_arr$" + std::to_string(anon_counter++);
+              auxiliary_symbolt arr_sym;
+              arr_sym.name = arr_id;
+              arr_sym.base_name = arr_id;
+              arr_sym.type = arr_type;
+              arr_sym.type.set(ID_C_constant, true);
+              arr_sym.mode = ID_cpp;
+              arr_sym.is_static_lifetime = true;
+              arr_sym.is_lvalue = true;
+              arr_sym.location = symbol.value.source_location();
+              arr_sym.value = array_exprt{std::move(typed_elems), arr_type};
+              symbol_table.insert(std::move(arr_sym));
+
+              struct_exprt il_val{{}, il_type};
+              symbol_exprt arr_ref{arr_id, arr_type};
+              index_exprt first{
+                arr_ref, from_integer(0, c_index_type()), elem_type};
+              address_of_exprt addr{first};
+              addr.type() = ptr_comp->type();
+              il_val.add_to_operands(std::move(addr));
+              il_val.add_to_operands(from_integer(n, size_comp->type()));
+              il_val.add_source_location() = symbol.value.source_location();
+
+              symbol_exprt expr_sym(symbol.name, symbol.type);
+              already_typechecked_exprt::make_already_typechecked(expr_sym);
+              exprt::operandst ctor_ops;
+              ctor_ops.push_back(std::move(il_val));
+              auto ctor = cpp_constructor(
+                symbol.value.source_location(), expr_sym, ctor_ops);
+              if(ctor.has_value())
+              {
+                symbol.value = ctor.value();
+                return;
+              }
+            }
+          }
+          catch(...)
+          {
+            // conversion failed, fall through
+          }
+        }
       }
 
       if(!has_non_copy_ctor)
