@@ -8,6 +8,7 @@ Author: Michael Tautschnig
 
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
+#include <util/bitvector_types.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/cmdline.h>
@@ -651,4 +652,52 @@ TEST_CASE("Simplify quantifier", "[core][util]")
 
     REQUIRE(simplify_expr(forall_exprt{a, true_exprt{}}, ns) == true_exprt{});
   }
+}
+
+TEST_CASE("Simplify all-zero constant in bitand", "[core][util]")
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+
+  const unsignedbv_typet u8{8};
+  const symbol_exprt x{"x", u8};
+  const auto zero = from_integer(0, u8);
+  const bitand_exprt band{x, zero};
+  REQUIRE(simplify_expr(band, ns) == zero);
+}
+
+TEST_CASE("Simplify all-ones constant in bitor", "[core][util]")
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+
+  const unsignedbv_typet u8{8};
+  const symbol_exprt x{"x", u8};
+  const auto ones = from_integer(255, u8);
+  const bitor_exprt bor{x, ones};
+  REQUIRE(simplify_expr(bor, ns) == ones);
+}
+
+TEST_CASE("Simplify all-zero constant in bitand with bv_typet", "[core][util]")
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+
+  const bv_typet bv8{8};
+  const symbol_exprt x{"x", bv8};
+  const auto zero = bv8.all_zeros_expr();
+  const bitand_exprt band{x, zero};
+  REQUIRE(simplify_expr(band, ns) == zero);
+}
+
+TEST_CASE("Simplify all-ones constant in bitor with bv_typet", "[core][util]")
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+
+  const bv_typet bv8{8};
+  const symbol_exprt x{"x", bv8};
+  const auto ones = bv8.all_ones_expr();
+  const bitor_exprt bor{x, ones};
+  REQUIRE(simplify_expr(bor, ns) == ones);
 }
