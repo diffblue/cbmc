@@ -1,0 +1,9 @@
+CORE
+main.cpp
+--cpp20
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+Named concept declarations (template<class T> concept X = ...).
+CBMC skips concept constraints (treats as always satisfied).
