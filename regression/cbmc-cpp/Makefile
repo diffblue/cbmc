@@ -11,11 +11,18 @@ else
   excluded_tests = -X gcc-only
 endif
 
+# Exclude libc++ tests when libc++ headers are not installed
+ifeq ($(wildcard /usr/include/c++/v1/vector),)
+  ifeq ($(wildcard /Library/Developer/CommandLineTools/SDKs/*/usr/include/c++/v1/vector),)
+    excluded_libcxx = -X libcxx
+  endif
+endif
+
 test:
-	@../test.pl -e -p -c "../../../src/cbmc/cbmc --validate-goto-model --validate-ssa-equation" $(excluded_tests) -X libcxx -t 1800
+	@../test.pl -e -p -c "../../../src/cbmc/cbmc --validate-goto-model --validate-ssa-equation" $(excluded_tests) $(excluded_libcxx) -X libcxx-slow -t 1800
 
 tests.log: ../test.pl
-	@../test.pl -e -p -c "../../../src/cbmc/cbmc --validate-goto-model --validate-ssa-equation" $(excluded_tests) -X libcxx -t 1800
+	@../test.pl -e -p -c "../../../src/cbmc/cbmc --validate-goto-model --validate-ssa-equation" $(excluded_tests) $(excluded_libcxx) -X libcxx-slow -t 1800
 
 clean:
 	find . -name '*.out' -execdir $(RM) '{}' \;
