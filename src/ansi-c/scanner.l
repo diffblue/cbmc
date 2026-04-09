@@ -882,11 +882,11 @@ enable_or_disable ("enable"|"disable")
 "char8_t"           { return conditional_keyword(PARSER.cpp20, TOK_CHAR8_T); }
 "class"             { return conditional_keyword(PARSER.cpp98, TOK_CLASS); }
 "compl"             { return conditional_keyword(PARSER.cpp98, '~'); }
-"concept"           { return conditional_keyword(PARSER.cpp20, TOK_CONCEPT); }
+"concept"           { return conditional_keyword(PARSER.cpp20 || PARSER.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO, TOK_CONCEPT); }
 "requires"          { return conditional_keyword(PARSER.cpp20 || PARSER.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO, TOK_REQUIRES); }
 "constexpr"         { return conditional_keyword(PARSER.cpp11 || PARSER.c23, TOK_CONSTEXPR); }
-"consteval"         { return conditional_keyword(PARSER.cpp20, TOK_CONSTEVAL); }
-"constinit"         { return conditional_keyword(PARSER.cpp20, TOK_CONSTINIT); }
+"consteval"         { return conditional_keyword(PARSER.cpp20 || PARSER.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO, TOK_CONSTEVAL); }
+"constinit"         { return conditional_keyword(PARSER.cpp20 || PARSER.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO, TOK_CONSTINIT); }
 "co_await"          { return conditional_keyword(PARSER.cpp20, TOK_CO_AWAIT); }
 "co_return"         { return conditional_keyword(PARSER.cpp20, TOK_CO_RETURN); }
 "co_yield"          { return conditional_keyword(PARSER.cpp20, TOK_CO_YIELD); }
