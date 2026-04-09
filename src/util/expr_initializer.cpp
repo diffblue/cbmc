@@ -248,10 +248,15 @@ std::optional<exprt> expr_initializert::expr_initializer_rec(
 
     for(const auto &c : components)
     {
-      // C++ structs may have methods or type aliases as components;
-      // skip them as struct_exprt values only contain data member operands.
-      if(c.type().id() == ID_code || c.get_bool(ID_is_type))
+      // C++ structs may have methods, type aliases, or static members
+      // as components; skip them as struct_exprt values only contain
+      // non-static data member operands.
+      if(
+        c.type().id() == ID_code || c.get_bool(ID_is_type) ||
+        c.get_bool(ID_is_static))
+      {
         continue;
+      }
 
       const auto member =
         expr_initializer_rec(c.type(), source_location, init_expr);
