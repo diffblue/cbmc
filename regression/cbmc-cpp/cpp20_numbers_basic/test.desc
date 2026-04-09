@@ -1,7 +1,13 @@
-CORE
+KNOWNBUG
 main.cpp
 --cpp20
-^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
 --
+GCC 13's <numbers> header has __float128 explicit specializations
+of variable templates (pi_v<__float128>, e_v<__float128>, etc.)
+guarded by _GLIBCXX_USE_FLOAT128. These specializations corrupt
+the variable template state, causing pi_v<double> to produce an
+empty value. Root cause: variable template explicit specialization
+processing interferes with the primary template's instantiation.
