@@ -1398,11 +1398,13 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
   }
   else
   {
-    // C++20 leading requires clause: skip
+    // C++20 leading requires clause: skip but count constraints
     if(lex.LookAhead(0) == TOK_REQUIRES)
     {
       cpp_tokent req_tk;
       lex.get_token(req_tk);
+      // Count atomic constraints (separated by &&)
+      std::size_t constraint_count = 1;
       // requires-clause: skip all constraint expressions
       for(;;)
       {
@@ -1490,10 +1492,16 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
           }
         }
         if(lex.LookAhead(0) == TOK_ANDAND || lex.LookAhead(0) == TOK_OROR)
+        {
+          if(lex.LookAhead(0) == TOK_ANDAND)
+            ++constraint_count;
           lex.get_token(req_tk);
+        }
         else
           break;
       }
+      // Store constraint count for specialization ordering
+      template_type.set(ID_C_requires_clause, std::to_string(constraint_count));
     }
 
     if(lex.LookAhead(0) == TOK_USING)
