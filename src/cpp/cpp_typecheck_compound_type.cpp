@@ -841,8 +841,20 @@ void cpp_typecheckt::typecheck_compound_declarator(
       {
         new_symbol->value.swap(value);
         typecheck_expr(new_symbol->value);
-        cpp_convert_auto(
-          new_symbol->type, new_symbol->value.type(), get_message_handler());
+
+        // C++17: auto x{v} deduces to decltype(v), not
+        // initializer_list<decltype(v)>. Unwrap single-element
+        // brace-init-lists for auto deduction.
+        typet deduced_type = new_symbol->value.type();
+        if(
+          new_symbol->value.id() == ID_initializer_list &&
+          new_symbol->value.operands().size() == 1)
+        {
+          deduced_type = new_symbol->value.operands().front().type();
+          new_symbol->value = new_symbol->value.operands().front();
+        }
+
+        cpp_convert_auto(new_symbol->type, deduced_type, get_message_handler());
         typecheck_type(new_symbol->type);
         implicit_typecast(new_symbol->value, new_symbol->type);
         // Update the component type to match

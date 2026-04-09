@@ -77,7 +77,16 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
 
     if(has_auto(symbol.type))
     {
-      cpp_convert_auto(symbol.type, symbol.value.type(), get_message_handler());
+      // C++17: auto x{v} deduces to decltype(v)
+      typet deduced_type = symbol.value.type();
+      if(
+        symbol.value.id() == ID_initializer_list &&
+        symbol.value.operands().size() == 1)
+      {
+        deduced_type = symbol.value.operands().front().type();
+        symbol.value = symbol.value.operands().front();
+      }
+      cpp_convert_auto(symbol.type, deduced_type, get_message_handler());
       // For auto& in const context: if the initializer is const,
       // the reference must also be const (e.g., auto& x = d; in
       // a const method where d is a const member).
