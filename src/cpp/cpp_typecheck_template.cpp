@@ -1657,7 +1657,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
 
       if(arg.id()==ID_type)
       {
-        if(arg.type().is_nil())
+        if(arg.type().is_nil() || arg.type().id().empty())
         {
           error().source_location = arg.source_location();
           error() << "missing type in template argument" << eom;
@@ -1667,7 +1667,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       }
       else if(arg.id() == ID_ambiguous)
       {
-        if(arg.type().is_nil())
+        if(arg.type().is_nil() || arg.type().id().empty())
         {
           error().source_location = arg.source_location();
           error() << "missing type in template argument" << eom;
@@ -1738,7 +1738,8 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
           nullptr_exceptiont,
           "template_scope is null");
         cpp_scopes.go_to(*template_scope);
-        typecheck_type(type);
+        if(!type.id().empty())
+          typecheck_type(type);
       }
 
       // Now check the argument to match that.
@@ -1784,7 +1785,8 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
           typet t = arg.type();
           arg = exprt(ID_type, t);
         }
-        typecheck_type(arg.type());
+        if(!arg.type().id().empty())
+          typecheck_type(arg.type());
       }
       else
       {
