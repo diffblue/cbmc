@@ -8927,6 +8927,41 @@ bool Parser::rPostfixExpr(exprt &exp)
       continue;
     }
 
+    // Template-id detection: when the expression is a name and the
+    // next token is '<', try to parse template arguments. This handles
+    // function template calls like align_it<sizeof(T) < 8 ? 2 : 1>(x)
+    // where the '<' after the name starts template arguments, not a
+    // comparison. Without this, the template-id would only be detected
+    // in rRelationalExpr, which is too late for postfix operators like
+    // function calls.
+    if(lex.LookAhead(0) == '<')
+    {
+      exprt *name_expr = &exp;
+      while((name_expr->id() == ID_address_of ||
+             name_expr->id() == ID_dereference ||
+             name_expr->id() == ID_member) &&
+            name_expr->has_operands())
+      {
+        name_expr = &to_unary_expr(*name_expr).op();
+      }
+
+      if(name_expr->id() == ID_cpp_name)
+      {
+        auto saved = lex.Save();
+        irept args;
+        if(rTemplateArgs(args))
+        {
+          int next = lex.LookAhead(0);
+          if(next == '(' || next == '[' || next == '.' || next == ';')
+          {
+            name_expr->get_sub().push_back(args);
+            continue;
+          }
+        }
+        lex.Restore(saved);
+      }
+    }
+
     switch(lex.LookAhead(0))
     {
     case '[':
@@ -12102,7 +12137,26 @@ Parser::rOtherDeclStatement(cpp_storage_spect &storage_spec, typet &cv_q)
 bool Parser::MaybeTypeNameOrClassTemplate(cpp_tokent &tk)
 {
   if(!is_identifier(tk.kind))
-    return true;
+  {
+    // Expression-only keywords cannot start a type name.
+    switch(tk.kind)
+    {
+    case TOK_SIZEOF:
+    case TOK_ALIGNOF:
+    case TOK_THROW:
+    case TOK_NOEXCEPT:
+    case TOK_TRUE:
+    case TOK_FALSE:
+    case TOK_NULLPTR:
+    case TOK_INTEGER:
+    case TOK_FLOATING:
+    case TOK_CHARACTER:
+    case TOK_STRING:
+      return false;
+    default:
+      return true;
+    }
+  }
 
   irep_idt id = tk.data.get(ID_C_base_name);
   if(id.empty())
