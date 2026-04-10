@@ -348,6 +348,14 @@ protected:
 
   void add_method_body(symbolt *_method_symbol);
 
+  /// Static member symbols whose initializers are deferred until
+  /// after the class body is fully declared.
+  std::vector<irep_idt> deferred_static_initializers;
+
+  /// Depth of typecheck_compound_body nesting, used to track
+  /// recursive template elaboration.
+  unsigned compound_body_depth = 0;
+
   bool builtin_factory(const irep_idt &) override;
 
   // types
