@@ -17,7 +17,7 @@ void *kmalloc(size_t size, gfp_t flags)
 
 int main(void)
 {
-  struct pp_struct *pp;
+  struct pp_struct *pp = 0;
   atomic_t *pp2;
 
   pp = kmalloc(sizeof(struct pp_struct), 10);

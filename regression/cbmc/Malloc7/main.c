@@ -10,7 +10,7 @@ struct X
 
 int main()
 {
-  struct X *p;
+  struct X *p = 0;
   struct X x;
   int *q;
 

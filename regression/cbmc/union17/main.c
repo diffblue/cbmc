@@ -1,7 +1,7 @@
 int main()
 {
   // create a union type of non-constant, non-zero size
-  unsigned x;
+  unsigned x = __VERIFIER_nondet_unsigned();
   __CPROVER_assume(x > 0);
   union U
   {
