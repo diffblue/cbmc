@@ -1,11 +1,11 @@
 int main()
 {
-  double a, b;
+  double a = __VERIFIER_nondet_double(), b = __VERIFIER_nondet_double();
 
   union {
     double f;
     long long unsigned int i; // needs to have 64 bits
-  } au, bu;
+  } au = {0}, bu = {0};
 
   au.f = a;
   bu.f = b;

@@ -17,7 +17,7 @@ struct S2
 
 int main(void)
 {
-  _Bool b;
+  _Bool b = __VERIFIER_nondet__Bool();
 
   if(b)
   {

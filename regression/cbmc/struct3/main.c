@@ -2,7 +2,7 @@ int main() {
   struct
   {
     int a, b;
-  } s, q;
+  } s, q = {0};
 
   s=q;
 

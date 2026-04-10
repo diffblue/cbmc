@@ -4,7 +4,7 @@ int *array;
 
 int main()
 {
-  unsigned size;
+  unsigned size = __VERIFIER_nondet_unsigned();
   __CPROVER_assume(size==1);
 
   // produce unbounded array that does not have byte granularity
