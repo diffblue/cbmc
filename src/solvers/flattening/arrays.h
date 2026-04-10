@@ -26,6 +26,7 @@ class array_of_exprt;
 class equal_exprt;
 class if_exprt;
 class index_exprt;
+class symbol_exprt;
 class with_exprt;
 class update_exprt;
 
@@ -51,6 +52,12 @@ public:
 
   literalt record_array_equality(const equal_exprt &expr);
   void record_array_index(const index_exprt &expr);
+
+  /// Record that \p symbol is equal to \p value for the purposes of the
+  /// array theory. For unbounded-array-typed bindings this connects the
+  /// two expressions in the union-find so that element-wise constraints
+  /// propagate correctly.
+  void record_array_let_binding(const symbol_exprt &symbol, const exprt &value);
 
 protected:
   const namespacet &ns;

@@ -1,0 +1,11 @@
+CORE
+let-array.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+^sat$
+--
+Let-bound arrays must be connected to the original array in the
+array theory so that element-wise constraints propagate correctly.

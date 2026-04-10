@@ -80,6 +80,19 @@ literalt arrayst::record_array_equality(
   return array_equalities.back().l;
 }
 
+void arrayst::record_array_let_binding(
+  const symbol_exprt &symbol,
+  const exprt &value)
+{
+  DATA_INVARIANT(
+    symbol.type().id() == ID_array,
+    "record_array_let_binding parameter should be array-typed");
+
+  const equal_exprt eq{symbol, value};
+  const literalt eq_lit = record_array_equality(eq);
+  prop.l_set_to_true(eq_lit);
+}
+
 void arrayst::collect_indices()
 {
   for(std::size_t i=0; i<arrays.size(); i++)
