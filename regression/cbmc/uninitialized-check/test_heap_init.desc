@@ -1,0 +1,11 @@
+CORE
+main.c
+--function test_heap_init --uninitialized-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+reading uninitialized.*FAILURE
+--
+Heap allocation: initialized after malloc.

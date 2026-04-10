@@ -1,0 +1,11 @@
+CORE
+main.c
+--function test_goto_skip_init --uninitialized-check
+^EXIT=10$
+^SIGNAL=0$
+reading uninitialized local
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Goto skips initialization.

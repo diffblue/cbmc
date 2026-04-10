@@ -1,0 +1,11 @@
+CORE
+main.c
+--function test_multiple_reads --uninitialized-check
+^EXIT=10$
+^SIGNAL=0$
+reading uninitialized local
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Multiple reads of uninitialized variable should all be flagged.

@@ -1,0 +1,11 @@
+CORE
+main.c
+--function test_array_partial_element --uninitialized-check
+^EXIT=10$
+^SIGNAL=0$
+reading uninitialized local
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Array: per-element tracking for constant-size arrays.
