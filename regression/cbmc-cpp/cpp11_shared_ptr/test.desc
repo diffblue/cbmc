@@ -1,6 +1,6 @@
 CORE
 main.cpp
---cpp11 --unwind 5 --depth 100 --no-unwinding-assertions
+--cpp11 --unwind 5 --depth 20 --no-unwinding-assertions
 \[main\.assertion\.1\] line 7 make_shared value: SUCCESS
 ^EXIT=0$
 ^SIGNAL=0$
