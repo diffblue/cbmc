@@ -1,5 +1,6 @@
 var NAVTREEINDEX49 =
 {
+"classmerge__location__update__visitort.html":[7,0,822],
 "classmerge__location__update__visitort.html#a01e53c9b79a9438eedd95670b4c5e2b9":[7,0,822,2],
 "classmerge__location__update__visitort.html#a538a3b4937108bac8c83aa65ee63e9a1":[7,0,822,0],
 "classmerge__location__update__visitort.html#a8f18b7466e6c08b5ba88400710d79e2c":[7,0,822,1],
@@ -248,6 +249,5 @@ var NAVTREEINDEX49 =
 "classmonomialt.html#ab9cb0b4e40a5e3aeca3323701c851453":[7,0,846,1],
 "classmonomialt.html#af3457f8d60ca1265ce174087459e43dd":[7,0,846,2],
 "classmonotonic__timestampert.html":[7,0,847],
-"classmonotonic__timestampert.html#a9b2dad4049e87ca909ffd5cb0a75b3c7":[7,0,847,0],
-"classms__cl__cmdlinet.html":[7,0,848]
+"classmonotonic__timestampert.html#a9b2dad4049e87ca909ffd5cb0a75b3c7":[7,0,847,0]
 };

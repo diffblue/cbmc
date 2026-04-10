@@ -50,6 +50,7 @@ var classarrayst =
     [ "is_unbounded_array", "classarrayst.html#aa5eda4fc078bb7aed4cd33cc0dda3108", null ],
     [ "record_array_equality", "classarrayst.html#a5755a594050b27200fa9e0b982eba5ed", null ],
     [ "record_array_index", "classarrayst.html#aa874fcac84efd54c4e8aa306f3ec6039", null ],
+    [ "record_array_let_binding", "classarrayst.html#a4a8c485df36413d97982cb20972ca104", null ],
     [ "update_index_map", "classarrayst.html#ae76fc4516d560a3fce8800f3788a7abc", null ],
     [ "update_index_map", "classarrayst.html#ac5f1aa480dfacc89bd1b291a928aa489", null ],
     [ "array_comprehension_args", "classarrayst.html#a0e36ead533a7e20f7a69a58403cc166f", null ],
