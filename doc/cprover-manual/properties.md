@@ -129,7 +129,7 @@ The goto-instrument program supports these checks:
 | `--unsigned-overflow-check`  |  add arithmetic over- and underflow checks           |
 | `--undefined-shift-check`    |  add range checks for shift distances                |
 | `--nan-check`                |  add floating-point NaN checks                       |
-| `--uninitialized-check`      |  add checks for uninitialized locals (experimental)  |
+| `--uninitialized-check`      |  add checks for reads of uninitialized locals (C11 UB) |
 | `--error-label label`        |  check that given label is unreachable               |
 
 As all of these checks apply across the entire input program, we may wish to
@@ -205,6 +205,46 @@ unsigned foo(unsigned x)
   x = x + 3;
 #pragma CPROVER check pop
   x = x + 2;
+```
+
+### Flag --uninitialized-check
+
+The `--uninitialized-check` flag adds assertions that detect reads of
+uninitialized local variables that constitute undefined behavior per
+C11 §6.3.2.1p2. Specifically, the standard states that behavior is
+undefined when reading an object of automatic storage duration that
+"could have been declared with the register storage class (never had
+its address taken)" and "is uninitialized (not declared with an
+initializer and no assignment to it has been performed prior to use)."
+
+The check works by inserting shadow boolean variables that track whether
+each local variable has been assigned a value. An assertion is added
+before each read to verify the variable has been initialized.
+
+**What is checked:**
+- Scalar local variables (int, float, pointers, etc.)
+- Struct members (recursive per-member tracking)
+- Array elements (per-element for constant-size arrays up to 64 elements)
+- Symbolic array indices (conservative: all elements must be initialized)
+- Union variables (any member write initializes the whole union)
+- Heap allocations (via pointer init flags)
+
+**What is not checked (by design, per C11 §6.3.2.1p2):**
+- Variables whose address has been taken ("dirty" variables) — reading
+  these yields an indeterminate value, which is not undefined behavior
+- Static-lifetime variables (zero-initialized by the C runtime)
+
+**Note:** This check is not enabled by default. It may become a default
+check in a future version of CBMC. To enable it, pass
+`--uninitialized-check` on the command line. The check can also be
+controlled per-statement using CPROVER pragmas:
+
+```c
+#pragma CPROVER check push
+#pragma CPROVER check enable "uninitialized-check"
+int x;
+int y = x; // will generate an assertion
+#pragma CPROVER check pop
 ```
 
 ### Flag --nan-check limitations
