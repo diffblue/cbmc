@@ -343,6 +343,9 @@ protected:
   std::set<irep_idt> methods_seen;
   method_bodiest method_bodies;
 
+  // Deferred method bodies for lazy template elaboration.
+  std::map<irep_idt, method_bodyt> deferred_method_bodies;
+
   void add_method_body(symbolt *_method_symbol);
 
   bool builtin_factory(const irep_idt &) override;

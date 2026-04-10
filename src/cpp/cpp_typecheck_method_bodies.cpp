@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// C++ Language Type Checking
 
 #ifdef DEBUG
-#include <iostream>
 #endif
 
 #include <util/message.h>
@@ -132,6 +131,51 @@ void cpp_typecheckt::typecheck_method_bodies()
     }
   }
 
+  // Process remaining deferred method bodies. Some deferred methods
+  // were triggered on-demand during the loop above; others were never
+  // referenced. We must still process them all because method body
+  // type-checking has side effects: it triggers elaboration of
+  // referenced classes (e.g., std::bad_alloc), creates parameter
+  // symbols, and may add further methods to the queue.
+  while(!deferred_method_bodies.empty())
+  {
+    auto it = deferred_method_bodies.begin();
+    method_bodies.push_back(std::move(it->second));
+    deferred_method_bodies.erase(it);
+  }
+
+  // Process any methods that were just moved from deferred,
+  // plus any new methods added as side effects.
+  while(!method_bodies.empty())
+  {
+    method_bodyt &method_body = *method_bodies.begin();
+    symbolt &method_symbol = *method_body.method_symbol;
+
+    template_map.swap(method_body.template_map);
+    instantiation_stack.swap(method_body.instantiation_stack);
+
+    method_bodies.erase(method_bodies.begin());
+
+    exprt &body = method_symbol.value;
+    if(body.id() == ID_cpp_not_typechecked)
+      continue;
+
+    if(body.is_not_nil() && body != 0)
+    {
+      null_message_handlert null_handler;
+      message_handlert &old_handler = get_message_handler();
+      set_message_handler(null_handler);
+      try
+      {
+        convert_function(method_symbol);
+      }
+      catch(...)
+      {
+      }
+      set_message_handler(old_handler);
+    }
+  }
+
   old_instantiation_stack.swap(instantiation_stack);
 }
 
@@ -169,8 +213,42 @@ void cpp_typecheckt::add_method_body(symbolt *_method_symbol)
         }
       }
     }
-    method_bodies.push_back(
-      method_bodyt(_method_symbol, method_map, instantiation_stack));
+    bool defer = false;
+    {
+      const irep_idt &class_id = _method_symbol->type.get(ID_C_member_name);
+      if(!class_id.empty())
+      {
+        const symbolt *class_sym = symbol_table.lookup(class_id);
+        bool is_template_instance =
+          class_sym != nullptr &&
+          class_sym->type.find(ID_C_template_arguments).is_not_nil();
+        if(is_template_instance)
+        {
+          const auto &return_type =
+            to_code_type(_method_symbol->type).return_type();
+          bool is_ctor = return_type.id() == ID_constructor;
+          bool is_dtor = return_type.id() == ID_destructor;
+          bool is_virtual = _method_symbol->type.get_bool(ID_C_is_virtual);
+          bool is_operator =
+            id2string(_method_symbol->base_name).find("operator") !=
+            std::string::npos;
+          if(!is_ctor && !is_dtor && !is_virtual && !is_operator)
+            defer = true;
+        }
+      }
+    }
+
+    if(defer)
+    {
+      deferred_method_bodies.emplace(
+        _method_symbol->name,
+        method_bodyt(_method_symbol, method_map, instantiation_stack));
+    }
+    else
+    {
+      method_bodies.push_back(
+        method_bodyt(_method_symbol, method_map, instantiation_stack));
+    }
   }
 #ifdef DEBUG
   else
