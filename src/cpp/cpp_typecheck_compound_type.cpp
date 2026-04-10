@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/pointer_offset_size.h>
+#include <util/simplify_expr.h>
 #include <util/std_types.h>
 #include <util/symbol_table_base.h>
 
@@ -897,6 +898,26 @@ void cpp_typecheckt::typecheck_compound_declarator(
         }
         else
           c_typecheck_baset::do_initializer(*new_symbol);
+
+        // C++ [class.static.data]: a static const integral member with
+        // an in-class initializer is an integral constant expression.
+        // Mark it as a macro so that subsequent members referencing it
+        // get the constant value via simplify.
+        if(
+          !new_symbol->is_macro && new_symbol->type.get_bool(ID_C_constant) &&
+          (new_symbol->type.id() == ID_signedbv ||
+           new_symbol->type.id() == ID_unsignedbv ||
+           new_symbol->type.id() == ID_bool ||
+           new_symbol->type.id() == ID_c_bool ||
+           new_symbol->type.id() == ID_c_enum_tag))
+        {
+          // do_initializer type-checks but doesn't simplify for
+          // non-macro symbols. Simplify now to fold expressions
+          // like 1LL << 63 to constants.
+          simplify(new_symbol->value, *this);
+          if(new_symbol->value.is_constant())
+            new_symbol->is_macro = true;
+        }
       }
       else
       {
