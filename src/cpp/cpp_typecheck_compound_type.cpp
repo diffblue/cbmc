@@ -866,9 +866,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
         new_symbol->value.swap(value);
         if(new_symbol->is_macro)
         {
-          // For constexpr members, suppress errors during the first
-          // evaluation attempt — it may fail because template
-          // parameters haven't been substituted yet.
+          // Constexpr: evaluate eagerly (may be needed by other members).
           null_message_handlert null_handler;
           message_handlert &old_handler = get_message_handler();
           set_message_handler(null_handler);
@@ -880,9 +878,6 @@ void cpp_typecheckt::typecheck_compound_declarator(
           catch(...)
           {
             set_message_handler(old_handler);
-            // The first do_initializer type-checked the value but
-            // make_constant failed. The value in new_symbol is the
-            // type-checked expression. Just substitute template params.
             new_symbol->value.visit_pre(
               [this](exprt &e)
               {
@@ -897,26 +892,8 @@ void cpp_typecheckt::typecheck_compound_declarator(
           }
         }
         else
-          c_typecheck_baset::do_initializer(*new_symbol);
-
-        // C++ [class.static.data]: a static const integral member with
-        // an in-class initializer is an integral constant expression.
-        // Mark it as a macro so that subsequent members referencing it
-        // get the constant value via simplify.
-        if(
-          !new_symbol->is_macro && new_symbol->type.get_bool(ID_C_constant) &&
-          (new_symbol->type.id() == ID_signedbv ||
-           new_symbol->type.id() == ID_unsignedbv ||
-           new_symbol->type.id() == ID_bool ||
-           new_symbol->type.id() == ID_c_bool ||
-           new_symbol->type.id() == ID_c_enum_tag))
         {
-          // do_initializer type-checks but doesn't simplify for
-          // non-macro symbols. Simplify now to fold expressions
-          // like 1LL << 63 to constants.
-          simplify(new_symbol->value, *this);
-          if(new_symbol->value.is_constant())
-            new_symbol->is_macro = true;
+          deferred_static_initializers.push_back(new_symbol->name);
         }
       }
       else
@@ -1140,7 +1117,13 @@ void cpp_typecheckt::typecheck_friend_declaration(
 
 void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
 {
+  ++compound_body_depth;
+
   cpp_save_scopet saved_scope(cpp_scopes);
+
+  // Suppress cache invalidation during member processing.
+  bool old_suppress = cpp_scopet::suppress_cache_invalidation;
+  cpp_scopet::suppress_cache_invalidation = true;
 
   // enter scope of compound
   cpp_scopes.set_scope(symbol.name);
@@ -1580,6 +1563,71 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
 
   // clean up!
   symbol.type.remove(ID_body);
+
+  // Process deferred static member initializers now that all
+  // members are declared.
+  {
+    auto deferred = std::move(deferred_static_initializers);
+    deferred_static_initializers.clear();
+    for(const auto &sym_name : deferred)
+    {
+      symbolt &sym = symbol_table.get_writeable_ref(sym_name);
+      if(sym.value.is_nil())
+        continue;
+
+      if(sym.is_macro)
+      {
+        // Constexpr: suppress errors (template params may not be
+        // fully substituted yet).
+        null_message_handlert null_handler;
+        message_handlert &old_handler = get_message_handler();
+        set_message_handler(null_handler);
+        try
+        {
+          c_typecheck_baset::do_initializer(sym);
+          set_message_handler(old_handler);
+        }
+        catch(...)
+        {
+          set_message_handler(old_handler);
+          sym.value.visit_pre(
+            [this](exprt &e)
+            {
+              if(e.id() == ID_symbol)
+              {
+                exprt v =
+                  template_map.lookup(to_symbol_expr(e).get_identifier());
+                if(v.is_not_nil())
+                  e = v;
+              }
+            });
+        }
+      }
+      else
+      {
+        c_typecheck_baset::do_initializer(sym);
+      }
+
+      // Mark static const integral members as compile-time constants.
+      if(
+        !sym.is_macro && sym.type.get_bool(ID_C_constant) &&
+        (sym.type.id() == ID_signedbv || sym.type.id() == ID_unsignedbv ||
+         sym.type.id() == ID_bool || sym.type.id() == ID_c_bool ||
+         sym.type.id() == ID_c_enum_tag))
+      {
+        simplify(sym.value, *this);
+        if(sym.value.is_constant())
+          sym.is_macro = true;
+      }
+    }
+  }
+
+  // Restore cache invalidation and invalidate once for all the
+  // members we inserted.
+  cpp_scopet::suppress_cache_invalidation = old_suppress;
+  ++cpp_scopet::scope_generation;
+
+  --compound_body_depth;
 }
 
 void cpp_typecheckt::move_member_initializers(
