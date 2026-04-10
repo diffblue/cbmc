@@ -1,11 +1,9 @@
 CORE libcxx
 main.cpp
 --cpp11 --stdlib libc++
-^VERIFICATION
-^EXIT=(0|10)$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
 ^SIGNAL=0$
 --
 ^PARSING ERROR$
 ^CONVERSION ERROR$
-libc++ ratio/chrono headers contain intentional UB in static const
-initializers that CBMC flags as runtime errors.
