@@ -38,7 +38,7 @@ public:
 
     if(kind != SCOPE_ONLY)
     {
-      auto &entry = lookup_cache()[{this, base_name_to_lookup, kind}];
+      auto &entry = lookup_cache()[{this, base_name_to_lookup, kind, -1}];
       if(entry.generation == scope_generation)
         return entry.result;
       entry.generation = scope_generation;
@@ -59,6 +59,18 @@ public:
     if(base_name_to_lookup.empty())
       return {};
 
+    if(kind != SCOPE_ONLY)
+    {
+      auto &entry = lookup_cache()[{
+        this, base_name_to_lookup, kind, static_cast<int>(identifier_class)}];
+      if(entry.generation == scope_generation)
+        return entry.result;
+      entry.generation = scope_generation;
+      entry.result.clear();
+      lookup_rec(base_name_to_lookup, kind, identifier_class, entry.result);
+      return entry.result;
+    }
+
     id_sett result;
     lookup_rec(base_name_to_lookup, kind, identifier_class, result);
     return result;
@@ -69,7 +81,8 @@ public:
 
   cpp_idt &insert(const irep_idt &_base_name)
   {
-    ++scope_generation;
+    if(!suppress_cache_invalidation)
+      ++scope_generation;
     cpp_id_mapt::iterator it =
       sub.insert(std::pair<irep_idt, cpp_idt>(_base_name, cpp_idt()));
     it->second.base_name = _base_name;
@@ -79,12 +92,16 @@ public:
 
   cpp_idt &insert(const cpp_idt &cpp_id)
   {
-    ++scope_generation;
+    if(!suppress_cache_invalidation)
+      ++scope_generation;
     cpp_id_mapt::iterator it =
       sub.insert(std::pair<irep_idt, cpp_idt>(cpp_id.base_name, cpp_id));
     it->second.set_parent(*this);
     return it->second;
   }
+
+  /// When true, insert() does not invalidate the lookup cache.
+  static bool suppress_cache_invalidation;
 
   bool contains(const irep_idt &base_name_to_lookup);
 
@@ -138,9 +155,11 @@ public:
     const cpp_scopet *scope;
     irep_idt name;
     lookup_kindt kind;
+    int id_class; // -1 for unfiltered, enum value for filtered
     bool operator==(const cache_keyt &o) const
     {
-      return scope == o.scope && name == o.name && kind == o.kind;
+      return scope == o.scope && name == o.name && kind == o.kind &&
+             id_class == o.id_class;
     }
   };
 
@@ -151,6 +170,7 @@ public:
       auto h = std::hash<const void *>{}(k.scope);
       h ^= std::hash<irep_idt>{}(k.name) + 0x9e3779b9 + (h << 6) + (h >> 2);
       h ^= std::hash<int>{}(k.kind) + 0x9e3779b9 + (h << 6) + (h >> 2);
+      h ^= std::hash<int>{}(k.id_class) + 0x9e3779b9 + (h << 6) + (h >> 2);
       return h;
     }
   };
