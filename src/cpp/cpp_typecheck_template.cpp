@@ -1686,11 +1686,23 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
     }
     else // expression
     {
-      if(arg.id()==ID_type)
+      if(arg.id() == ID_type)
       {
-        error().source_location=arg.source_location();
-        error() << "expected expression, but got type" << eom;
-        throw 0;
+        // The parser may have interpreted a variable template
+        // instantiation (e.g., is_floating_point_v<T>) as a type
+        // because it looks like a template-id. Convert it back to
+        // an expression so it can be resolved as a variable template.
+        if(arg.type().id() == ID_cpp_name)
+        {
+          exprt e = static_cast<exprt &>(static_cast<irept &>(arg.type()));
+          arg.swap(e);
+        }
+        else
+        {
+          error().source_location = arg.source_location();
+          error() << "expected expression, but got type" << eom;
+          throw 0;
+        }
       }
       else if(arg.id() == ID_ambiguous)
       {
