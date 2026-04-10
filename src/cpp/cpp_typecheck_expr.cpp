@@ -2229,6 +2229,19 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
 
   if(expr.id()==ID_symbol)
     typecheck_expr_function_identifier(expr);
+  else if(expr.id() == ID_member)
+  {
+    const irep_idt &component = expr.get(ID_component_name);
+    if(!component.empty())
+    {
+      auto it = deferred_method_bodies.find(component);
+      if(it != deferred_method_bodies.end())
+      {
+        method_bodies.push_back(std::move(it->second));
+        deferred_method_bodies.erase(it);
+      }
+    }
+  }
 
   add_implicit_dereference(expr);
 }
@@ -2687,6 +2700,17 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   CHECK_RETURN(expr.operands().size() == 2);
 
   add_implicit_dereference(expr);
+
+  // Trigger elaboration of lazily deferred template method bodies.
+  if(auto sym_expr = expr_try_dynamic_cast<symbol_exprt>(expr.function()))
+  {
+    auto it = deferred_method_bodies.find(sym_expr->get_identifier());
+    if(it != deferred_method_bodies.end())
+    {
+      method_bodies.push_back(std::move(it->second));
+      deferred_method_bodies.erase(it);
+    }
+  }
 
   // constexpr function evaluation
   if(auto sym_expr = expr_try_dynamic_cast<symbol_exprt>(expr.function()))
@@ -4150,6 +4174,15 @@ void cpp_typecheckt::typecheck_expr_function_identifier(exprt &expr)
       deferred_typechecking.count(function_symbol.name))
     {
       add_method_body(&function_symbol);
+    }
+
+    {
+      auto it = deferred_method_bodies.find(function_symbol.name);
+      if(it != deferred_method_bodies.end())
+      {
+        method_bodies.push_back(std::move(it->second));
+        deferred_method_bodies.erase(it);
+      }
     }
   }
 
