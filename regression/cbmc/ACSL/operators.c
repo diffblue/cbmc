@@ -1,6 +1,6 @@
 void boolean()
 {
-  __CPROVER_bool a, b;
+  __CPROVER_bool a = __VERIFIER_nondet__Bool(), b = __VERIFIER_nondet__Bool();
   __CPROVER_assert((a ≡ b) == (a == b), "≡");
   __CPROVER_assert((a ≢ b) == (a != b), "≢");
   __CPROVER_assert((a ⇒ b) == (!a || b), "⇒");
@@ -13,7 +13,7 @@ void boolean()
 
 void relations()
 {
-  int a, b;
+  int a = __VERIFIER_nondet_int(), b = __VERIFIER_nondet_int();
   __CPROVER_assert((a ≥ b) == (a >= b), "≥");
   __CPROVER_assert((a ≤ b) == (a <= b), "≤");
   __CPROVER_assert((a ≡ b) == (a == b), "≡");

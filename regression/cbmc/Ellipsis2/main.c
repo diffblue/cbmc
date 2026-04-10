@@ -7,8 +7,8 @@ int foo(int a, ...)
 
 int main()
 {
-  char c;
-  long l;
+  char c = __VERIFIER_nondet_char();
+  long l = __VERIFIER_nondet_long();
 
   if(c<l)
     l=foo(c, c);

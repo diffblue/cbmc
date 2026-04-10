@@ -3,7 +3,7 @@
 int main()
 {
   char a[100], *p;
-  _Bool x;
+  _Bool x = __VERIFIER_nondet__Bool();
 
   p = x ? strcpy(a, "asd") : strcpy(a, "abc");
   assert(p == a);

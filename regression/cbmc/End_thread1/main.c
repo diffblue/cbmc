@@ -10,7 +10,7 @@ void pthread_exit(void *value_ptr);
 
 int main()
 {
-  int i;
+  int i = __VERIFIER_nondet_int();
 
   if(i == 100)
   {

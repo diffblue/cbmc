@@ -9,7 +9,7 @@ union U
 
 int main()
 {
-  unsigned char size;
+  unsigned char size = __VERIFIER_nondet_char();
   __CPROVER_assume(size > 1);
   __CPROVER_assume(size < 5);
   __CPROVER_assume(size % 4 == 0);

@@ -33,7 +33,7 @@ union _14237415465709481864_union
 
 void main(void)
 {
-  unsigned int x; // nondet
+  unsigned int x = __VERIFIER_nondet_int(); // nondet
 
   // the following is crucial (else pn trivially simplifies to 0)
   unsigned int var_7 = x;
