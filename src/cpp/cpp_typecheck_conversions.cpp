@@ -1311,7 +1311,27 @@ bool cpp_typecheckt::reference_binding(
         to_address_of_expr(to_dereference_expr(expr).pointer())
             .object()
             .get(ID_statement) == ID_temporary_object))))
+  {
+    // C++11: const lvalues can bind to T&& through a temporary copy.
+    // Create a temporary and bind the rvalue reference to it.
+    typet base = reference_type.base_type();
+    base.remove(ID_C_constant);
+    typet expr_base = expr.type();
+    expr_base.remove(ID_C_constant);
+    if(base == expr_base)
+    {
+      exprt tmp = expr;
+      tmp.remove(ID_C_lvalue);
+      tmp.set(ID_statement, ID_temporary_object);
+      if(reference_compatible(tmp, reference_type, rank))
+      {
+        new_expr = tmp;
+        rank += 4;
+        return true;
+      }
+    }
     return false;
+  }
 
   // C++11: xvalues (implicit dereferences of rvalue references) cannot
   // bind to non-const lvalue references. Named rvalue reference variables
