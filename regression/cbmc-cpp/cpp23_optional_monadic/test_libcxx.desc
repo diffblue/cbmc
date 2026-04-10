@@ -1,0 +1,9 @@
+CORE libcxx
+main.cpp
+--cpp23 --stdlib libc++
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^PARSING ERROR$
+^CONVERSION ERROR$
