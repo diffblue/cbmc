@@ -1,0 +1,11 @@
+CORE
+main.c
+--function test_parameter --uninitialized-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+\[test_parameter.uninitialized.*FAILURE
+--
+Function parameters are always initialized.

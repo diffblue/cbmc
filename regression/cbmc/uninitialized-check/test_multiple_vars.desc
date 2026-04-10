@@ -1,0 +1,12 @@
+CORE
+main.c
+--function test_multiple_vars --uninitialized-check
+^EXIT=10$
+^SIGNAL=0$
+reading uninitialized local 'y'.*FAILURE
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+reading uninitialized local 'x'.*FAILURE
+--
+Only the uninitialized variable should be flagged.

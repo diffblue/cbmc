@@ -1,9 +1,9 @@
 CORE
 main.c
 --uninitialized-check
-^\[main.uninitialized_local.1\] line \d+ use of uninitialized local variable main::1::definitely_uninitialized: FAILURE$
-^\[main.uninitialized_local.2\] line \d+ use of uninitialized local variable main::1::maybe_uninitialized: FAILURE$
-^\[main.uninitialized_local.3\] line \d+ use of uninitialized local variable main::1::actually_initialized: SUCCESS$
+reading uninitialized local 'definitely_uninitialized'.*FAILURE
+reading uninitialized local 'maybe_uninitialized'.*FAILURE
+reading uninitialized local 'actually_initialized'.*SUCCESS
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
@@ -11,6 +11,3 @@ main.c
 ^warning: ignoring
 --
 A basic test of the uninitialized variable check.
-In an ideal world there would be a check for heap_variables_uninitialized
-that would fail however this is beyond the current scope of the analysis.
-

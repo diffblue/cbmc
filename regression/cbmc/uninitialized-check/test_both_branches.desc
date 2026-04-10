@@ -1,0 +1,11 @@
+CORE
+main.c
+--function test_both_branches_init --uninitialized-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+\[test_both_branches_init.uninitialized.*FAILURE
+--
+Control flow: variable initialized on all branches should pass.

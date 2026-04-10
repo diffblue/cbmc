@@ -1,0 +1,11 @@
+CORE
+main.c
+--function test_switch_partial --uninitialized-check
+^EXIT=10$
+^SIGNAL=0$
+reading uninitialized local
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+One switch case doesn't initialize x.

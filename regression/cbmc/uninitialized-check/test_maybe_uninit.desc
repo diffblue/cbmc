@@ -1,0 +1,11 @@
+CORE
+main.c
+--function test_maybe_uninitialized --uninitialized-check
+^EXIT=10$
+^SIGNAL=0$
+reading uninitialized local
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Control flow: variable initialized on one branch only.
