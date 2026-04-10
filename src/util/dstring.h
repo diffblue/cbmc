@@ -68,7 +68,7 @@ public:
 
   // this one is not safe for static objects
   // NOLINTNEXTLINE(runtime/explicit)
-  dstringt(const char *s):no(get_string_container()[s])
+  dstringt(const char *s) : no(s[0] == '\0' ? 0 : get_string_container()[s])
   {
   }
 
