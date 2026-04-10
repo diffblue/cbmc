@@ -289,6 +289,11 @@ checks that all enum type expressions have values in the enum range
 check for reads of uninitialized local variables whose address has never
 been taken (undefined behavior per C11 \[sc]6.3.2.1p2)
 .TP
+\fB\-\-uninitialized\-check\-all\fR
+like \fB\-\-uninitialized\-check\fR, but also covers address\-taken locals
+using shadow memory for precise pointer aliasing tracking (reading such
+variables is not undefined behavior but may indicate a bug)
+.TP
 \fB\-\-pointer\-primitive\-check\fR
 checks that all pointers in pointer primitives are valid or null
 .TP

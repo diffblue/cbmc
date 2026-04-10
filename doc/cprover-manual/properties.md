@@ -247,6 +247,27 @@ int y = x; // will generate an assertion
 #pragma CPROVER check pop
 ```
 
+### Flag --uninitialized-check-all
+
+The `--uninitialized-check-all` flag extends `--uninitialized-check` to
+also cover address-taken (dirty) local variables. While reading such
+variables is not undefined behavior per C11 §6.3.2.1p2 (the value is
+merely indeterminate), it often indicates a bug.
+
+This extended check uses CBMC's shadow memory subsystem to track
+initialization precisely through pointer aliasing and interprocedural
+function calls. The shadow memory is resolved during symbolic execution
+via the value set, so writes through pointers (including in callees)
+are tracked correctly.
+
+**Additional coverage beyond --uninitialized-check:**
+- Address-taken locals initialized through pointer parameters
+- Writes through aliased pointers (`int *p = &x; *p = 42;`)
+- Conditional aliasing (`int *p = cond ? &x : &y; *p = 1;`)
+
+**Performance:** The shadow memory instrumentation adds 0-20% overhead,
+applied only to the subset of variables that are address-taken.
+
 ### Flag --nan-check limitations
 
 Please note that `--nan-check` flag is adding not-a-number checks only for
