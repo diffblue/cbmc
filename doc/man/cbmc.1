@@ -285,6 +285,10 @@ check floating\-point for NaN
 \fB\-\-enum\-range\-check\fR
 checks that all enum type expressions have values in the enum range
 .TP
+\fB\-\-uninitialized\-check\fR
+check for reads of uninitialized local variables whose address has never
+been taken (undefined behavior per C11 \[sc]6.3.2.1p2)
+.TP
 \fB\-\-pointer\-primitive\-check\fR
 checks that all pointers in pointer primitives are valid or null
 .TP

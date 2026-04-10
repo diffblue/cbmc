@@ -13,5 +13,5 @@ int main() {
   a[0] = y;
   a[0] = f(a[0]);
 
-  assert(a[0] == y+1);
+  assert(a[0] == y + 1);
 }

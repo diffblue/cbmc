@@ -45,6 +45,7 @@ void goto_check_c(
   "(pointer-overflow-check)(conversion-check)(undefined-shift-check)"          \
   "(float-overflow-check)(nan-check)(no-built-in-assertions)"                  \
   "(pointer-primitive-check)"                                                  \
+  "(uninitialized-check)"                                                      \
   "(retain-trivial-checks)"                                                    \
   "(error-label):"                                                             \
   "(no-assertions)(no-assumptions)"                                            \
@@ -90,6 +91,8 @@ void goto_check_c(
   "on)\n"                                                                      \
   " {y--no-pointer-primitive-check} \t "                                       \
   "disable checks that all pointers in pointer primitives are valid or null\n" \
+  " {y--uninitialized-check} \t "                                              \
+  "check for reads of uninitialized locals (C11 UB)\n"                         \
   " {y--retain-trivial-checks} \t include checks that are trivially true\n"    \
   " {y--error-label} {ulabel} \t check that label {ulabel} is unreachable\n"   \
   " {y--no-built-in-assertions} \t ignore assertions in built-in library\n"    \
@@ -131,6 +134,9 @@ void goto_check_c(
   PARSE_OPTION_OVERRIDE(cmdline, options, "signed-overflow-check"); \
   PARSE_OPTION_OVERRIDE(cmdline, options, "undefined-shift-check"); \
   PARSE_OPTION_OVERRIDE(cmdline, options, "pointer-primitive-check"); \
+  options.set_option(                                                \
+    "uninitialized-check",                                           \
+    cmdline.isset("uninitialized-check"));                           \
   (void)0
 // clang-format on
 
