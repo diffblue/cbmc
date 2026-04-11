@@ -112,7 +112,9 @@ void parse_solver_options(const cmdlinet &cmdline, optionst &options);
   "(external-sat-solver):"                                                     \
   "(no-sat-preprocessor)"                                                      \
   "(xor-gauss)"                                                                \
-  "(reorder-vars)"                                                             \
+  "(reorder-vars):"                                                             \
+  "(adder-encoding):"                                                          \
+  "(sat-phase):"                                                             \
   "(beautify)"                                                                 \
   "(dimacs)"                                                                   \
   "(refine)"                                                                   \
@@ -129,6 +131,8 @@ void parse_solver_options(const cmdlinet &cmdline, optionst &options);
   " {y--no-sat-preprocessor} \t disable the SAT solver's simplifier\n"         \
   " {y--xor-gauss} \t enable XOR Gaussian elimination (CaDiCaL only)\n"        \
   " {y--reorder-vars} \t reorder SAT variables (aux first, CaDiCaL)\n"         \
+  " {y--adder-encoding} {uripple-carry|brent-kung|kogge-stone|sklansky}"       \
+  " \t adder circuit encoding\n"                                               \
   " {y--dimacs} \t generate CNF in DIMACS format\n"                            \
   " {y--beautify} \t beautify the counterexample (greedy heuristic)\n"         \
   " {y--smt1} \t use default SMT1 solver (obsolete)\n"                         \

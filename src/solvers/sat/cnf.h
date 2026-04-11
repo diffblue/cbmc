@@ -52,6 +52,7 @@ public:
   void gate_implies(literalt a, literalt b, literalt o);
 
 protected:
+  bool skip_xor_clauses = false;
   static bvt eliminate_duplicates(const bvt &);
 
   size_t _no_variables;

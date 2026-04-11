@@ -1,3 +1,5 @@
+#include <random>
+#include <algorithm>
 /*******************************************************************\
 
 Module:
@@ -114,7 +116,11 @@ propt::resultt satcheck_cadical_baset::do_prop_solve(const bvt &assumptions)
   {
     build_variable_map();
     const unsigned map_size = static_cast<unsigned>(var_map.size());
-    for(int lit : clause_buffer)
+    // Move buffer to local and free member memory before CaDiCaL allocates
+    std::vector<int> buf = std::move(clause_buffer);
+    clause_buffer.clear();
+    clause_buffer.shrink_to_fit();
+    for(int lit : buf)
     {
       if(lit == 0)
       {
@@ -128,9 +134,8 @@ propt::resultt satcheck_cadical_baset::do_prop_solve(const bvt &assumptions)
         solver->add(lit > 0 ? mapped : -mapped);
       }
     }
-    clause_buffer.clear();
-    clause_buffer.shrink_to_fit();
   }
+
 
   log.statistics() << (no_variables() - 1) << " variables, " << clause_counter
                    << " clauses" << messaget::eom;
@@ -276,6 +281,23 @@ satcheck_cadical_baset::satcheck_cadical_baset(
   // then the above overrides of `new_variable` and `new_variables` need to be
   // enabled.
   solver->set("factor", 0);
+  // Pass through CaDiCaL options from environment
+  if(const char *opts = std::getenv("CADICAL_OPTS")) {
+    std::string s(opts);
+    size_t pos = 0;
+    while(pos < s.size()) {
+      size_t eq = s.find('=', pos);
+      size_t comma = s.find(',', pos);
+      if(eq != std::string::npos && (comma == std::string::npos || eq < comma)) {
+        std::string key = s.substr(pos, eq - pos);
+        size_t end = (comma != std::string::npos) ? comma : s.size();
+        int val = std::stoi(s.substr(eq + 1, end - eq - 1));
+        solver->set(key.c_str(), val);
+        pos = (comma != std::string::npos) ? comma + 1 : s.size();
+      } else break;
+    }
+  }
+  // Phase will be set via set_phase() before solving
 }
 
 satcheck_cadical_baset::~satcheck_cadical_baset()
@@ -283,6 +305,12 @@ satcheck_cadical_baset::~satcheck_cadical_baset()
   if(xor_propagator)
     solver->disconnect_external_propagator();
   delete solver;
+}
+
+void satcheck_cadical_baset::set_phase(int p)
+{
+  initial_phase = p;
+  solver->set("phase", p);
 }
 
 void satcheck_cadical_baset::enable_xor_gauss()
@@ -322,32 +350,102 @@ bool satcheck_cadical_baset::is_in_conflict(literalt a) const
 void satcheck_cadical_baset::build_variable_map()
 {
   unsigned n = narrow<unsigned>(no_variables());
+
+  // Only build the map once; extend for new variables
+  if(!var_map.empty())
+  {
+    // Map already built. Assign IDs to any new variables.
+    unsigned old_n = narrow<unsigned>(var_map.size());
+    if(n > old_n)
+    {
+      unsigned next_id = old_n; // continue from where we left off
+      // Find actual max ID used
+      for(unsigned v = 1; v < old_n; ++v)
+        if(var_map[v] > next_id) next_id = var_map[v];
+      next_id++;
+      var_map.resize(n, 0);
+      for(unsigned v = old_n; v < n; ++v)
+        var_map[v] = next_id++;
+    }
+    return;
+  }
+
   var_map.resize(n, 0);
 
-  // Two-tier ordering: auxiliary variables get low IDs,
-  // input (named) variables get high IDs.
   unsigned next_id = 1;
   unsigned num_aux = 0;
 
-  for(unsigned v = 1; v < n; ++v)
+  if(reorder_strategy == 0)
   {
-    bool is_input = v < input_variables.size() && input_variables[v];
-    if(!is_input)
+    // Strategy 0: aux first (creation order), input last
+    for(unsigned v = 1; v < n; ++v)
     {
-      var_map[v] = next_id++;
-      ++num_aux;
+      bool is_input = v < input_variables.size() && input_variables[v];
+      if(!is_input) { var_map[v] = next_id++; ++num_aux; }
+    }
+    for(unsigned v = 1; v < n; ++v)
+    {
+      bool is_input = v < input_variables.size() && input_variables[v];
+      if(is_input) var_map[v] = next_id++;
     }
   }
-  for(unsigned v = 1; v < n; ++v)
+  else if(reorder_strategy == 1)
   {
-    bool is_input = v < input_variables.size() && input_variables[v];
-    if(is_input)
-      var_map[v] = next_id++;
+    // Strategy 1: aux REVERSE order first (late-created aux = low ID),
+    // then input variables
+    for(unsigned v = n - 1; v >= 1; --v)
+    {
+      bool is_input = v < input_variables.size() && input_variables[v];
+      if(!is_input) { var_map[v] = next_id++; ++num_aux; }
+    }
+    for(unsigned v = 1; v < n; ++v)
+    {
+      bool is_input = v < input_variables.size() && input_variables[v];
+      if(is_input) var_map[v] = next_id++;
+    }
+  }
+  else if(reorder_strategy == 2)
+  {
+    // Strategy 2: input first, aux last
+    for(unsigned v = 1; v < n; ++v)
+    {
+      bool is_input = v < input_variables.size() && input_variables[v];
+      if(is_input) { var_map[v] = next_id++; }
+    }
+    for(unsigned v = 1; v < n; ++v)
+    {
+      bool is_input = v < input_variables.size() && input_variables[v];
+      if(!is_input) { var_map[v] = next_id++; ++num_aux; }
+    }
+  }
+  else if(reorder_strategy == 3)
+  {
+    // Strategy 3: input first, aux REVERSE last
+    for(unsigned v = 1; v < n; ++v)
+    {
+      bool is_input = v < input_variables.size() && input_variables[v];
+      if(is_input) var_map[v] = next_id++;
+    }
+  }
+  else if(reorder_strategy == 4)
+  {
+    // Strategy 4: random permutation (for debugging)
+    std::vector<unsigned> ids;
+    for(unsigned i = 1; i < n; ++i)
+      ids.push_back(i);
+    std::mt19937 rng(42);
+    std::shuffle(ids.begin(), ids.end(), rng);
+    for(unsigned v = 1; v < n; ++v)
+    {
+      var_map[v] = ids[v - 1];
+      bool is_input = v < input_variables.size() && input_variables[v];
+      if(!is_input) ++num_aux;
+    }
   }
 
-  log.statistics() << "Variable renumbering: " << num_aux
-                   << " aux variables first, " << (n - 1 - num_aux)
-                   << " input variables after" << messaget::eom;
+  log.statistics() << "Variable renumbering (strategy " << reorder_strategy
+                   << "): " << num_aux << " aux, "
+                   << (n - 1 - num_aux) << " input" << messaget::eom;
 }
 
 int satcheck_cadical_baset::remap_dimacs(int dimacs_lit) const

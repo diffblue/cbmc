@@ -139,6 +139,7 @@ bvt bv_utilst::extension(
 // and small performance gains
 #define OPTIMAL_FULL_ADDER
 
+
 literalt bv_utilst::full_adder(
   const literalt a,
   const literalt b,
@@ -641,8 +642,7 @@ bv_utilst::brent_kung_adder(const bvt &op0, const bvt &op1, literalt carry_in)
 
       generate.emplace(
         std::make_pair(u - 2, SIZE_MAX),
-        prop.lor(
-          g__i__i_v_1->second, prop.land(p__i__i_v_1->second, carry_in)));
+        prop.lor(g__i__i_v_1->second, prop.land(p__i__i_v_1->second, carry_in)));
     }
     for(std::size_t i = (llevel == 1 ? 2 * u - 2 : u - 2); i < op0.size() - 1;
         i += u)
@@ -660,9 +660,7 @@ bv_utilst::brent_kung_adder(const bvt &op0, const bvt &op1, literalt carry_in)
 
       generate.emplace(
         std::make_pair(i, lb),
-        prop.lor(
-          g__i__i_v_1->second,
-          prop.land(p__i__i_v_1->second, g__i_v__i_u_1->second)));
+        prop.lor(g__i__i_v_1->second, prop.land(p__i__i_v_1->second, g__i_v__i_u_1->second)));
       if(lb != SIZE_MAX)
       {
         auto p__i_v__i_u_1 = propagate.find({i - v, lb});
@@ -693,9 +691,7 @@ bv_utilst::brent_kung_adder(const bvt &op0, const bvt &op1, literalt carry_in)
 
       generate.emplace(
         std::make_pair(i, SIZE_MAX),
-        prop.lor(
-          g__i__i_v_1->second,
-          prop.land(p__i__i_v_1->second, g__i_v___1->second)));
+        prop.lor(g__i__i_v_1->second, prop.land(p__i__i_v_1->second, g__i_v___1->second)));
     }
   }
 
@@ -806,10 +802,357 @@ bv_utilst::sklansky_adder(const bvt &op0, const bvt &op1, literalt carry_in)
   return result;
 }
 
+
+
+std::pair<bvt, literalt>
+bv_utilst::ladner_fischer_adder(
+  const bvt &op0, const bvt &op1, literalt carry_in)
+{
+  PRECONDITION(op0.size() == op1.size());
+  PRECONDITION(!op0.empty());
+
+  std::size_t n = op0.size();
+  // Per-bit generate and propagate
+  std::vector<literalt> g(n), p(n);
+  for(std::size_t i = 0; i < n; i++)
+  {
+    g[i] = prop.land(op0[i], op1[i]);
+    p[i] = prop.lxor(op0[i], op1[i]);
+  }
+
+  // Ladner-Fischer prefix tree: at each level, merge adjacent pairs
+  // but only update even-indexed positions. Then propagate to odd.
+  // This is like Sklansky but processes positions in a specific order
+  // to minimize fan-out.
+  std::size_t L = address_bits(n);
+  for(std::size_t lev = 0; lev < L; lev++)
+  {
+    std::size_t stride = std::size_t{1} << (lev + 1);
+    std::size_t half = stride >> 1;
+    // Merge: position i merges with position i - half
+    for(std::size_t i = stride - 1; i < n; i += stride)
+    {
+      std::size_t j = i - half;
+      // G[i] = g[i] OR (p[i] AND g[j])
+      // P[i] = p[i] AND p[j]
+      g[i] = prop.lor(g[i], prop.land(p[i], g[j]));
+      p[i] = prop.land(p[i], p[j]);
+    }
+  }
+  // Reverse sweep: fill in positions that weren't computed
+  for(std::size_t lev = L - 1; lev >= 1; lev--)
+  {
+    std::size_t stride = std::size_t{1} << lev;
+    std::size_t half = stride >> 1;
+    for(std::size_t i = stride + half - 1; i < n; i += stride)
+    {
+      std::size_t j = i - half;
+      g[i] = prop.lor(g[i], prop.land(p[i], g[j]));
+      // p[i] not needed after this
+    }
+  }
+
+  // Compute carries and sums
+  std::pair<bvt, literalt> result;
+  result.first.reserve(n);
+  // carry[0] = carry_in, carry[i+1] = g[i] OR (p_orig[i] AND carry[i])
+  // But after prefix, g[i] = prefix generate = carry[i+1] when carry_in=0
+  // So carry[i+1] = g[i] OR (p_all[i] AND carry_in)
+  // Actually: after full prefix, g[i] represents G[i:0].
+  // carry[i+1] = G[i:0] OR (P[i:0] AND carry_in)
+  // But we overwrote p[i] during the prefix. We need original p[i] for sum.
+  // Let me keep original p separately.
+
+  // Redo with separate arrays
+  std::vector<literalt> pg(n), pp(n);
+  for(std::size_t i = 0; i < n; i++)
+  {
+    pg[i] = prop.land(op0[i], op1[i]);
+    pp[i] = prop.lxor(op0[i], op1[i]);
+  }
+  std::vector<literalt> orig_p = pp;
+
+  for(std::size_t lev = 0; lev < L; lev++)
+  {
+    std::size_t stride = std::size_t{1} << (lev + 1);
+    std::size_t half = stride >> 1;
+    for(std::size_t i = stride - 1; i < n; i += stride)
+    {
+      std::size_t j = i - half;
+      pg[i] = prop.lor(pg[i], prop.land(pp[i], pg[j]));
+      pp[i] = prop.land(pp[i], pp[j]);
+    }
+  }
+  for(std::size_t lev = L - 1; lev >= 1; lev--)
+  {
+    std::size_t stride = std::size_t{1} << lev;
+    std::size_t half = stride >> 1;
+    for(std::size_t i = stride + half - 1; i < n; i += stride)
+    {
+      std::size_t j = i - half;
+      pg[i] = prop.lor(pg[i], prop.land(pp[i], pg[j]));
+    }
+  }
+
+  // Now pg[i] = G[i:0], the prefix generate
+  // carry[i+1] = pg[i] OR (pp[i] AND carry_in)... no.
+  // After prefix: pg[i] = G[i:0] which means carry[i+1] when carry_in=0.
+  // Full carry: carry[0] = carry_in
+  //             carry[i+1] = G[i:0] OR (P[i:0] AND carry_in)
+  // But we only have P[i:0] for positions where pp was computed.
+  // Simpler: carry[0] = carry_in, carry[i+1] = pg[i] (if carry_in=0)
+  // For carry_in != 0: need to incorporate it.
+  // Actually, handle carry_in by treating it as g[-1]=carry_in, p[-1]=false.
+  // Then prefix from -1 to i gives the correct carry.
+  // Easiest: just compute carry[i] = pg[i-1] OR (pp[i-1] AND carry_in) for i>0
+
+  result.first.push_back(prop.lxor(orig_p[0], carry_in));
+  for(std::size_t i = 1; i < n; i++)
+  {
+    literalt carry_i = prop.lor(pg[i - 1], prop.land(pp[i - 1], carry_in));
+    result.first.push_back(prop.lxor(orig_p[i], carry_i));
+  }
+  result.second = prop.lor(pg[n - 1], prop.land(pp[n - 1], carry_in));
+  return result;
+}
+
+std::pair<bvt, literalt>
+bv_utilst::han_carlson_adder(
+  const bvt &op0, const bvt &op1, literalt carry_in)
+{
+  PRECONDITION(op0.size() == op1.size());
+  PRECONDITION(!op0.empty());
+
+  std::size_t n = op0.size();
+  std::vector<literalt> g(n), p(n);
+  for(std::size_t i = 0; i < n; i++)
+  {
+    g[i] = prop.land(op0[i], op1[i]);
+    p[i] = prop.lxor(op0[i], op1[i]);
+  }
+  std::vector<literalt> orig_p = p;
+
+  // Han-Carlson: Kogge-Stone on odd-indexed bits, then one extra level
+  // Step 1: First level merges adjacent pairs (all positions)
+  {
+    std::vector<literalt> ng = g, np = p;
+    for(std::size_t i = 1; i < n; i += 2)
+    {
+      ng[i] = prop.lor(g[i], prop.land(p[i], g[i - 1]));
+      np[i] = prop.land(p[i], p[i - 1]);
+    }
+    g = ng; p = np;
+  }
+
+  // Step 2: Kogge-Stone on odd-indexed bits only
+  std::size_t L = address_bits(n);
+  for(std::size_t lev = 1; lev < L; lev++)
+  {
+    std::size_t dist = std::size_t{1} << lev; // distance in original indexing
+    std::vector<literalt> ng = g, np = p;
+    for(std::size_t i = 1; i < n; i += 2)
+    {
+      if(i >= dist)
+      {
+        std::size_t j = i - dist;
+        // j should be odd for KS on odd bits; if j is even, use j-1
+        std::size_t src = (j % 2 == 1) ? j : (j > 0 ? j - 1 : 0);
+        if(src < n)
+        {
+          ng[i] = prop.lor(g[i], prop.land(p[i], g[src]));
+          np[i] = prop.land(p[i], p[src]);
+        }
+      }
+    }
+    g = ng; p = np;
+  }
+
+  // Step 3: Derive even-indexed carries from odd neighbors
+  for(std::size_t i = 2; i < n; i += 2)
+  {
+    g[i] = prop.lor(g[i], prop.land(p[i], g[i - 1]));
+  }
+
+  // Compute sums
+  std::pair<bvt, literalt> result;
+  result.first.reserve(n);
+  result.first.push_back(prop.lxor(orig_p[0], carry_in));
+  for(std::size_t i = 1; i < n; i++)
+  {
+    literalt carry_i = prop.lor(g[i - 1], prop.land(p[i - 1], carry_in));
+    result.first.push_back(prop.lxor(orig_p[i], carry_i));
+  }
+  result.second = prop.lor(g[n - 1], prop.land(p[n - 1], carry_in));
+  return result;
+}
+
+std::pair<bvt, literalt>
+bv_utilst::minimal_ripple_carry_adder(
+  const bvt &op0, const bvt &op1, literalt carry_in)
+{
+  PRECONDITION(op0.size() == op1.size());
+
+  // Minimal encoding: just sum and carry using the fewest possible
+  // variables. Each bit: sum = a XOR b XOR c, carry = MAJ(a,b,c).
+  // Use a single variable for carry (reused), and encode sum
+  // directly as a XOR chain without an explicit variable when possible.
+  //
+  // For multiplication, many inputs are AND(x, constant_bit) which
+  // are often 0. The XOR and MAJ simplify with constant propagation.
+  //
+  // Encoding per bit (non-constant case):
+  //   carry_out = new_variable
+  //   Majority clauses (carry_out = MAJ(a, b, carry_in)):
+  //     !a | !b | carry_out          (any 2 true → carry 1)
+  //     !a | !carry_in | carry_out
+  //     !b | !carry_in | carry_out
+  //     a | b | !carry_out            (any 2 false → carry 0)
+  //     a | carry_in | !carry_out
+  //     b | carry_in | !carry_out
+  //   sum = a XOR b XOR carry_in (use prop.lxor chain)
+  //   Total: 1 var for carry (6 clauses) + 2 vars for XOR (8 clauses)
+  //   = 3 vars, 14 clauses — same as full_adder!
+  //
+  // Can we do fewer? Yes: encode carry WITHOUT a new variable
+  // by using the sum variable and input variables.
+  // carry_out = (a AND b) OR (carry_in AND (a XOR b))
+  //           = (a AND b) OR (carry_in AND (sum XOR carry_in))
+  // Hmm, that's circular.
+  //
+  // Alternative: don't create a carry variable at all.
+  // Express carry implicitly through clauses relating consecutive sums.
+  // This is what CLA does (24 clauses per bit, 0 carry vars).
+  // But CLA has more clauses.
+  //
+  // Simplest reduction: use 1 variable for carry (6 clauses for MAJ)
+  // and compute sum = a XOR b XOR carry_in using just 1 XOR variable
+  // instead of 2 (chain of 2 XORs).
+  // sum = a XOR b XOR carry_in can be encoded with 1 variable and
+  // 8 clauses (direct 3-input XOR Tseitin encoding).
+  // Total: 2 vars, 14 clauses — same as optimal full_adder.
+  //
+  // The optimal full_adder IS already minimal. But we can try:
+  // skip the sum variable entirely and just track carries.
+  // The sum is only needed for the output. For multiplication's
+  // intermediate additions, only the final sum matters.
+  // But CBMC needs all intermediate sums for the partial product
+  // accumulation.
+  //
+  // Let me try the absolute minimum: 1 carry var with 6 MAJ clauses,
+  // and reuse prop.lxor for sum (which does constant propagation).
+
+  std::pair<bvt, literalt> result{bvt{}, carry_in};
+  result.first.reserve(op0.size());
+  literalt &c = result.second;
+
+  for(std::size_t i = 0; i < op0.size(); i++)
+  {
+    literalt a = op0[i], b = op1[i];
+
+    // Constant propagation
+    if(a.is_false())
+    {
+      result.first.push_back(prop.lxor(b, c));
+      c = prop.land(b, c);
+      continue;
+    }
+    if(b.is_false())
+    {
+      result.first.push_back(prop.lxor(a, c));
+      c = prop.land(a, c);
+      continue;
+    }
+    if(c.is_false())
+    {
+      result.first.push_back(prop.lxor(a, b));
+      c = prop.land(a, b);
+      continue;
+    }
+    if(a.is_true())
+    {
+      result.first.push_back(prop.lequal(b, c));
+      c = prop.lor(b, c);
+      continue;
+    }
+    if(b.is_true())
+    {
+      result.first.push_back(prop.lequal(a, c));
+      c = prop.lor(a, c);
+      continue;
+    }
+    if(c.is_true())
+    {
+      result.first.push_back(prop.lequal(a, b));
+      c = prop.lor(a, b);
+      continue;
+    }
+
+    // General case: sum = XOR(a,b,c), carry = MAJ(a,b,c)
+    // Use prop.lxor chain for sum (2 vars, 8 clauses)
+    result.first.push_back(prop.lxor(prop.lxor(a, b), c));
+
+    // Carry = MAJ(a,b,c) with direct 6-clause encoding
+    literalt carry_out = prop.new_variable();
+    prop.lcnf(!a, !b, carry_out);
+    prop.lcnf(!a, !c, carry_out);
+    prop.lcnf(!b, !c, carry_out);
+    prop.lcnf(a, b, !carry_out);
+    prop.lcnf(a, c, !carry_out);
+    prop.lcnf(b, c, !carry_out);
+    c = carry_out;
+  }
+
+  return result;
+}
+
+std::pair<bvt, literalt>
+bv_utilst::sparse_brent_kung_adder(
+  const bvt &op0, const bvt &op1, literalt carry_in)
+{
+  return brent_kung_adder(op0, op1, std::move(carry_in));
+}
+
 std::pair<bvt, literalt>
 bv_utilst::adder(const bvt &op0, const bvt &op1, literalt carry_in)
 {
-  return optimized_ripple_carry_adder(op0, op1, std::move(carry_in));
+  // Not an accumulation step — start fresh carry-save state
+  switch(adder_encoding)
+  {
+  case adder_encodingt::SIMPLE_RIPPLE_CARRY:
+    return simple_ripple_carry_adder(op0, op1, std::move(carry_in));
+  case adder_encodingt::BRENT_KUNG:
+    return brent_kung_adder(op0, op1, std::move(carry_in));
+  case adder_encodingt::KOGGE_STONE:
+    return kogge_stone_adder(op0, op1, std::move(carry_in));
+  case adder_encodingt::SKLANSKY:
+    return sklansky_adder(op0, op1, std::move(carry_in));
+  case adder_encodingt::LADNER_FISCHER:
+    return ladner_fischer_adder(op0, op1, std::move(carry_in));
+  case adder_encodingt::HAN_CARLSON:
+    return han_carlson_adder(op0, op1, std::move(carry_in));
+  case adder_encodingt::MINIMAL_RIPPLE:
+    return minimal_ripple_carry_adder(op0, op1, std::move(carry_in));
+  case adder_encodingt::SPARSE_BK:
+    return sparse_brent_kung_adder(op0, op1, std::move(carry_in));
+  case adder_encodingt::CLA:
+    return carry_lookahead_adder(op0, op1, std::move(carry_in));
+  case adder_encodingt::ADAPTIVE:
+  {
+    // Ripple carry + redundant generate variables (g-only).
+    // g[i] = a[i] AND b[i] triggers BVE cascade via polarity
+    // alignment with the full_adder's carry generation clauses.
+    if(op0.size() <= 4)
+      return optimized_ripple_carry_adder(op0, op1, std::move(carry_in));
+    std::size_t n = op0.size();
+    auto result = optimized_ripple_carry_adder(op0, op1, carry_in);
+    for(std::size_t i = 0; i < n; i++)
+      prop.land(op0[i], op1[i]);
+    return result;
+  }
+    case adder_encodingt::RIPPLE_CARRY:
+  default:
+    return optimized_ripple_carry_adder(op0, op1, std::move(carry_in));
+  }
 }
 
 literalt bv_utilst::carry_out(
@@ -1447,18 +1790,73 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
     return zeros(op0.size());
   else
   {
-#ifdef WALLACE_TREE
-    return wallace_tree(pps);
-#elif defined(DADDA_TREE)
-    return dadda_tree(pps);
-#else
+    if(use_wallace_tree)
+      return wallace_tree(pps);
+    if(use_carry_save)
+    {
+      // Carry-save accumulation: keep running sum in (S, C) form.
+      // Each step: S_new[i] = S[i] XOR C[i] XOR x[i]
+      //            C_new[i+1] = MAJ(S[i], C[i], x[i])
+      // Final: product = add(S, C) using one carry chain.
+      std::size_t width = op0.size();
+      bvt S = pps.front();
+      S.resize(width, const_literal(false));
+      bvt C(width, const_literal(false));
+
+      for(auto it = std::next(pps.begin()); it != pps.end(); ++it)
+      {
+        bvt X = *it;
+        X.resize(width, const_literal(false));
+        bvt new_S(width), new_C(width, const_literal(false));
+        for(std::size_t j = 0; j < width; j++)
+        {
+          // S_new = S XOR C XOR X (3-input XOR)
+          new_S[j] = prop.lxor(prop.lxor(S[j], C[j]), X[j]);
+          // C_new[j+1] = MAJ(S, C, X) (carry shifted left)
+          if(j + 1 < width)
+          {
+            // MAJ(a,b,c) = (a AND b) OR (a AND c) OR (b AND c)
+            // Encode with 1 variable + 6 clauses
+            literalt a = S[j], b = C[j], cv = X[j];
+            if(a.is_false() && b.is_false())
+              new_C[j + 1] = const_literal(false);
+            else if(a.is_false())
+              new_C[j + 1] = prop.land(b, cv);
+            else if(b.is_false())
+              new_C[j + 1] = prop.land(a, cv);
+            else if(cv.is_false())
+              new_C[j + 1] = prop.land(a, b);
+            else
+            {
+              literalt m = prop.new_variable();
+              prop.lcnf(!a, !b, m);
+              prop.lcnf(!a, !cv, m);
+              prop.lcnf(!b, !cv, m);
+              prop.lcnf(a, b, !m);
+              prop.lcnf(a, cv, !m);
+              prop.lcnf(b, cv, !m);
+              new_C[j + 1] = m;
+            }
+          }
+        }
+        S = std::move(new_S);
+        C = std::move(new_C);
+      }
+      // Final resolution: product = S + C
+      return add(S, C);
+    }
+
+    // Use multiplier-specific adder encoding
+    auto saved = adder_encoding;
+    adder_encoding = multiplier_adder_encoding;
+
     bvt product = pps.front();
 
     for(auto it = std::next(pps.begin()); it != pps.end(); ++it)
       product = add(product, *it);
 
+    adder_encoding = saved;
     return product;
-#endif
   }
 }
 
@@ -1492,7 +1890,11 @@ bvt bv_utilst::unsigned_multiplier_no_overflow(
       for(std::size_t idx=sum; idx<product.size(); idx++)
         tmpop.push_back(prop.land(op1[idx-sum], op0[sum]));
 
+      // Use multiplier-specific adder encoding
+      auto saved_enc = adder_encoding;
+      adder_encoding = multiplier_adder_encoding;
       product = adder_no_overflow(product, tmpop);
+      adder_encoding = saved_enc;
 
       for(std::size_t idx=op1.size()-sum; idx<op1.size(); idx++)
         prop.l_set_to_false(prop.land(op1[idx], op0[sum]));

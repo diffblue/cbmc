@@ -77,6 +77,8 @@ public:
     renumber_variables = true;
   }
 
+  void set_phase(int p);
+
 #if 0
   literalt new_variable() override;
   bvt new_variables(std::size_t width) override;
@@ -94,6 +96,10 @@ protected:
   std::size_t xor_constraint_limit = 10000;
   std::vector<bool> input_variables;
   bool renumber_variables = false;
+  public:
+  int reorder_strategy = 0;
+  int initial_phase = -1; // -1 = default
+protected:
   std::vector<unsigned> var_map;  // old var_no -> new var_no
   std::vector<int> clause_buffer; // flat: lit lit ... 0 lit lit ... 0
 

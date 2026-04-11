@@ -27,6 +27,7 @@ Author: Daniel Kroening, Peter Schrammel
 #include <solvers/sat/dimacs_cnf.h>
 #include <solvers/sat/external_sat.h>
 #include <solvers/sat/satcheck.h>
+#include <solvers/flattening/bv_utils.h>
 #include <solvers/smt2_incremental/smt2_incremental_decision_procedure.h>
 #include <solvers/smt2_incremental/smt_solver_process.h>
 #include <solvers/strings/string_refinement.h>
@@ -247,7 +248,7 @@ get_sat_solver(message_handlert &message_handler, const optionst &options)
       {
         auto solver = make_satcheck_prop<satcheck_minisat_no_simplifiert>(
           message_handler, options);
-        if(options.get_bool_option("reorder-vars"))
+        if(options.is_set("reorder-vars"))
           solver->enable_variable_reordering();
         return solver;
       }
@@ -255,7 +256,7 @@ get_sat_solver(message_handlert &message_handler, const optionst &options)
       {
         auto solver = make_satcheck_prop<satcheck_minisat_simplifiert>(
           message_handler, options);
-        if(options.get_bool_option("reorder-vars"))
+        if(options.is_set("reorder-vars"))
           solver->enable_variable_reordering();
         return solver;
       }
@@ -312,8 +313,15 @@ get_sat_solver(message_handlert &message_handler, const optionst &options)
         message_handler, options);
       if(options.get_bool_option("xor-gauss"))
         solver->enable_xor_gauss();
-      if(options.get_bool_option("reorder-vars"))
+      if(options.is_set("reorder-vars"))
+      {
         solver->enable_variable_renumbering();
+        std::string rv = options.get_option("reorder-vars");
+        if(!rv.empty() && rv != "1" && rv != "true")
+          solver->reorder_strategy = std::stoi(rv);
+      }
+      if(options.is_set("sat-phase"))
+        solver->set_phase(std::stoi(options.get_option("sat-phase")));
       return solver;
 #else
       emit_solver_warning(message_handler, "cadical");
@@ -386,6 +394,103 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
     bv_pointers->unbounded_array = bv_pointerst::unbounded_arrayt::U_ALL;
 
   set_decision_procedure_time_limit(*bv_pointers);
+
+  // Set adder encoding if specified
+  if(options.is_set("adder-encoding"))
+  {
+    const std::string &enc = options.get_option("adder-encoding");
+    if(enc == "brent-kung")
+      bv_pointers->set_adder_encoding(
+        bv_utilst::adder_encodingt::BRENT_KUNG);
+    else if(enc == "kogge-stone")
+      bv_pointers->set_adder_encoding(
+        bv_utilst::adder_encodingt::KOGGE_STONE);
+    else if(enc == "bk-ripple-mult")
+    {
+      bv_pointers->set_adder_encoding(
+        bv_utilst::adder_encodingt::BRENT_KUNG);
+      bv_pointers->set_multiplier_adder_encoding(
+        bv_utilst::adder_encodingt::RIPPLE_CARRY);
+    }
+    else if(enc == "simple-ripple")
+      bv_pointers->set_adder_encoding(
+        bv_utilst::adder_encodingt::SIMPLE_RIPPLE_CARRY);
+    else if(enc == "bk-simple-mult")
+    {
+      bv_pointers->set_adder_encoding(
+        bv_utilst::adder_encodingt::BRENT_KUNG);
+      bv_pointers->set_multiplier_adder_encoding(
+        bv_utilst::adder_encodingt::SIMPLE_RIPPLE_CARRY);
+    }
+    else if(enc == "sbk-simple-mult")
+    {
+      bv_pointers->set_adder_encoding(
+        bv_utilst::adder_encodingt::SPARSE_BK);
+      bv_pointers->set_multiplier_adder_encoding(
+        bv_utilst::adder_encodingt::SIMPLE_RIPPLE_CARRY);
+    }
+    else if(enc == "sbk-ripple-mult")
+    {
+      bv_pointers->set_adder_encoding(
+        bv_utilst::adder_encodingt::SPARSE_BK);
+      bv_pointers->set_multiplier_adder_encoding(
+        bv_utilst::adder_encodingt::RIPPLE_CARRY);
+    }
+    else if(enc == "ladner-fischer")
+      bv_pointers->set_adder_encoding(
+        bv_utilst::adder_encodingt::LADNER_FISCHER);
+    else if(enc == "han-carlson")
+      bv_pointers->set_adder_encoding(
+        bv_utilst::adder_encodingt::HAN_CARLSON);
+    else if(enc == "minimal-ripple")
+      bv_pointers->set_adder_encoding(
+        bv_utilst::adder_encodingt::MINIMAL_RIPPLE);
+    else if(enc == "bk-carry-save")
+    {
+      bv_pointers->set_adder_encoding(
+        bv_utilst::adder_encodingt::BRENT_KUNG);
+      bv_pointers->set_carry_save(true);
+    }
+    else if(enc == "bk-wallace")
+    {
+      bv_pointers->set_adder_encoding(
+        bv_utilst::adder_encodingt::BRENT_KUNG);
+      bv_pointers->set_wallace_tree(true);
+    }
+    else if(enc == "g-mult")
+    {
+      bv_pointers->set_adder_encoding(
+        bv_utilst::adder_encodingt::ADAPTIVE);
+      bv_pointers->set_multiplier_adder_encoding(
+        bv_utilst::adder_encodingt::ADAPTIVE);
+    }
+    else if(enc == "bk-g-mult")
+    {
+      bv_pointers->set_adder_encoding(
+        bv_utilst::adder_encodingt::BRENT_KUNG);
+      bv_pointers->set_multiplier_adder_encoding(
+        bv_utilst::adder_encodingt::ADAPTIVE);
+    }
+    else if(enc == "bk-minimal-mult")
+    {
+      bv_pointers->set_adder_encoding(
+        bv_utilst::adder_encodingt::BRENT_KUNG);
+      bv_pointers->set_multiplier_adder_encoding(
+        bv_utilst::adder_encodingt::MINIMAL_RIPPLE);
+    }
+    else if(enc == "sparse-bk")
+      bv_pointers->set_adder_encoding(
+        bv_utilst::adder_encodingt::SPARSE_BK);
+    else if(enc == "cla")
+      bv_pointers->set_adder_encoding(
+        bv_utilst::adder_encodingt::CLA);
+    else if(enc == "adaptive")
+      bv_pointers->set_adder_encoding(
+        bv_utilst::adder_encodingt::ADAPTIVE);
+    else if(enc == "sklansky")
+      bv_pointers->set_adder_encoding(
+        bv_utilst::adder_encodingt::SKLANSKY);
+  }
 
   std::unique_ptr<boolbvt> boolbv = std::move(bv_pointers);
   return std::make_unique<solvert>(std::move(boolbv), std::move(sat_solver));
@@ -647,7 +752,12 @@ static void parse_sat_options(const cmdlinet &cmdline, optionst &options)
     options.set_option("xor-gauss", true);
 
   if(cmdline.isset("reorder-vars"))
-    options.set_option("reorder-vars", true);
+    options.set_option("reorder-vars", cmdline.isset("reorder-vars") ? cmdline.get_value("reorder-vars") : "0");
+
+  if(cmdline.isset("adder-encoding"))
+    options.set_option("adder-encoding", cmdline.get_value("adder-encoding"));
+  if(cmdline.isset("sat-phase"))
+    options.set_option("sat-phase", cmdline.get_value("sat-phase"));
 }
 
 static void parse_smt2_options(const cmdlinet &cmdline, optionst &options)

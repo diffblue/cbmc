@@ -23,7 +23,12 @@ Author: Daniel Kroening, kroening@kroening.com
 class bv_utilst
 {
 public:
-  explicit bv_utilst(propt &_prop):prop(_prop) { }
+  enum class adder_encodingt { RIPPLE_CARRY, SIMPLE_RIPPLE_CARRY, BRENT_KUNG, KOGGE_STONE, SKLANSKY, CLA, SPARSE_BK, LADNER_FISCHER, HAN_CARLSON, MINIMAL_RIPPLE, ADAPTIVE };
+
+  explicit bv_utilst(propt &_prop):prop{_prop} { }
+
+  void set_adder_encoding(adder_encodingt e) { adder_encoding = e; }
+  void set_multiplier_adder_encoding(adder_encodingt e) { multiplier_adder_encoding = e; }
 
   enum class representationt { SIGNED, UNSIGNED };
 
@@ -226,6 +231,14 @@ public:
 
 protected:
   propt &prop;
+  adder_encodingt adder_encoding = adder_encodingt::RIPPLE_CARRY;
+  adder_encodingt multiplier_adder_encoding = adder_encodingt::RIPPLE_CARRY;
+  bool use_wallace_tree = false;
+  bool use_carry_save = false;
+  void set_wallace_tree(bool b) { use_wallace_tree = b; }
+public:
+  void set_carry_save(bool b) { use_carry_save = b; }
+protected:
 
   /// Return the sum and carry-out when adding \p op0 and \p op1 under initial
   /// carry \p carry_in.
@@ -253,6 +266,14 @@ protected:
 
   [[nodiscard]] std::pair<bvt, literalt>
   brent_kung_adder(const bvt &op0, const bvt &op1, literalt carry_in);
+  [[nodiscard]] std::pair<bvt, literalt>
+  sparse_brent_kung_adder(const bvt &op0, const bvt &op1, literalt carry_in);
+  [[nodiscard]] std::pair<bvt, literalt>
+  ladner_fischer_adder(const bvt &op0, const bvt &op1, literalt carry_in);
+  [[nodiscard]] std::pair<bvt, literalt>
+  han_carlson_adder(const bvt &op0, const bvt &op1, literalt carry_in);
+  [[nodiscard]] std::pair<bvt, literalt>
+  minimal_ripple_carry_adder(const bvt &op0, const bvt &op1, literalt carry_in);
 
   [[nodiscard]] std::pair<bvt, literalt>
   sklansky_adder(const bvt &op0, const bvt &op1, literalt carry_in);
