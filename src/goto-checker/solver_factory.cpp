@@ -319,6 +319,15 @@ get_sat_solver(message_handlert &message_handler, const optionst &options)
       emit_solver_warning(message_handler, "cadical");
 #endif
     }
+    else if(solver_option == "cryptominisat")
+    {
+#if defined SATCHECK_CRYPTOMINISAT
+      return make_satcheck_prop<satcheck_cryptominisatt>(
+        message_handler, options);
+#else
+      emit_solver_warning(message_handler, "cryptominisat");
+#endif
+    }
     else
     {
       messaget log(message_handler);

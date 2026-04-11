@@ -59,6 +59,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #define SATCHECK_CADICAL
 #endif
 
+#if defined(HAVE_CRYPTOMINISAT) && !defined(SATCHECK_CRYPTOMINISAT)
+#define SATCHECK_CRYPTOMINISAT
+#endif
+
 #if defined SATCHECK_ZCHAFF
 #  include "satcheck_zchaff.h"
 #endif
@@ -93,6 +97,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #if defined SATCHECK_CADICAL
 #  include "satcheck_cadical.h"
+#endif
+
+#if defined SATCHECK_CRYPTOMINISAT
+#  include "satcheck_cryptominisat.h"
 #endif
 
 #if defined SATCHECK_ZCHAFF
@@ -139,6 +147,11 @@ typedef satcheck_glucose_no_simplifiert satcheck_no_simplifiert;
 
 typedef satcheck_cadical_no_preprocessingt satcheckt;
 typedef satcheck_cadical_no_preprocessingt satcheck_no_simplifiert;
+
+#elif defined SATCHECK_CRYPTOMINISAT
+
+typedef satcheck_cryptominisatt satcheckt;
+typedef satcheck_cryptominisatt satcheck_no_simplifiert;
 
 #endif
 
