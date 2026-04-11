@@ -1158,6 +1158,14 @@ exprt cpp_typecheck_resolvet::do_builtin(
 /// \par parameters: a cpp_name
 /// \return a base_name, and potentially template arguments for the base name;
 ///   as side-effect, we got to the right scope
+struct rs_cache_entryt
+{
+  cpp_scopet *result_scope;
+  irep_idt result_base_name;
+  cpp_template_args_non_tct result_template_args;
+};
+static std::unordered_map<std::size_t, rs_cache_entryt> rs_cache;
+
 cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
   const cpp_namet &cpp_name,
   irep_idt &base_name,
@@ -1171,6 +1179,18 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
   irept::subt::const_iterator pos = cpp_name.get_sub().begin();
 
   bool recursive = true;
+
+  // Cache resolved scope results to avoid redundant traversals.
+  std::size_t cache_key =
+    cpp_name.hash() ^ (std::hash<const void *>{}(original_scope)*2654435761u);
+  auto cache_it = rs_cache.find(cache_key);
+  if(cache_it != rs_cache.end())
+  {
+    base_name = cache_it->second.result_base_name;
+    template_args = cache_it->second.result_template_args;
+    cpp_typecheck.cpp_scopes.go_to(*cache_it->second.result_scope);
+    return *cache_it->second.result_scope;
+  }
 
   // check if we need to go to the root scope
   if(pos->id() == "::")
@@ -1483,6 +1503,9 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
   }
 
   base_name = final_base_name;
+
+  rs_cache[cache_key] = {
+    &cpp_typecheck.cpp_scopes.current_scope(), base_name, template_args};
 
   return cpp_typecheck.cpp_scopes.current_scope();
 }
