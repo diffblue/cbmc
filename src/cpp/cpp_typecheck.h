@@ -355,6 +355,7 @@ protected:
   /// Depth of typecheck_compound_body nesting, used to track
   /// recursive template elaboration.
   unsigned compound_body_depth = 0;
+  bool suppress_elaborate = false;
 
   bool builtin_factory(const irep_idt &) override;
 
