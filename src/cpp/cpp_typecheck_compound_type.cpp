@@ -323,9 +323,11 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
   typet final_type = declarator.merge_type(declaration.type());
 
-  // this triggers template elaboration
-  elaborate_class_template(final_type);
-
+  // Type-check the member type. Do NOT call elaborate_class_template
+  // here — member parameter types don't need to be complete (per C++
+  // [temp.inst]). Elaboration is triggered on demand when the type
+  // needs to be complete (sizeof, member access, construction).
+  // This matches Clang's approach: SubstType without RequireCompleteType.
   typecheck_type(final_type);
 
   if(final_type.id() == ID_empty && !declaration.is_typedef())
