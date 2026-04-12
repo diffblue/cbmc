@@ -34,7 +34,7 @@ class symex_target_equationt:public symex_targett
 {
 public:
   explicit symex_target_equationt(message_handlert &message_handler)
-    : log(message_handler)
+    : log(message_handler), equation_id(next_equation_id())
   {
   }
 
@@ -294,6 +294,16 @@ protected:
 
   // for unique function call argument identifiers
   std::size_t argument_count = 0;
+
+  /// A per-equation identifier baked into `symex::args::<id>::<n>` so
+  /// that two equations sharing the same decision procedure (e.g., the
+  /// branch-pruning solver) never claim the same name for different
+  /// types. The counter is a static atomic so equation IDs are unique
+  /// across all live equations within a process.
+  std::size_t equation_id;
+
+  /// Allocate a fresh, process-wide-unique equation id.
+  static std::size_t next_equation_id();
 };
 
 inline bool operator<(
