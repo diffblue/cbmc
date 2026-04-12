@@ -344,6 +344,9 @@ void cpp_typecheckt::elaborate_class_template(
   if(type.id() != ID_struct_tag && type.id() != ID_union_tag)
     return;
 
+  if(suppress_elaborate)
+    return;
+
   const symbolt &symbol = lookup(to_tag_type(type));
 
   // Make a copy, as instantiate will destroy the symbol type!

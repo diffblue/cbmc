@@ -866,9 +866,12 @@ void cpp_typecheckt::typecheck_compound_declarator(
       else if(cpp_is_pod(new_symbol->type))
       {
         new_symbol->value.swap(value);
-        if(new_symbol->is_macro)
         {
-          // Constexpr: evaluate eagerly (may be needed by other members).
+          // Suppress elaborate_class_template during initializer
+          // evaluation to prevent recursive elaboration chains.
+          bool old_suppress = suppress_elaborate;
+          suppress_elaborate = true;
+
           null_message_handlert null_handler;
           message_handlert &old_handler = get_message_handler();
           set_message_handler(null_handler);
@@ -880,22 +883,34 @@ void cpp_typecheckt::typecheck_compound_declarator(
           catch(...)
           {
             set_message_handler(old_handler);
-            new_symbol->value.visit_pre(
-              [this](exprt &e)
-              {
-                if(e.id() == ID_symbol)
+            if(new_symbol->is_macro)
+              new_symbol->value.visit_pre(
+                [this](exprt &e)
                 {
-                  exprt v =
-                    template_map.lookup(to_symbol_expr(e).get_identifier());
-                  if(v.is_not_nil())
-                    e = v;
-                }
-              });
+                  if(e.id() == ID_symbol)
+                  {
+                    exprt v =
+                      template_map.lookup(to_symbol_expr(e).get_identifier());
+                    if(v.is_not_nil())
+                      e = v;
+                  }
+                });
           }
-        }
-        else
-        {
-          deferred_static_initializers.push_back(new_symbol->name);
+
+          suppress_elaborate = old_suppress;
+
+          if(
+            !new_symbol->is_macro && new_symbol->type.get_bool(ID_C_constant) &&
+            (new_symbol->type.id() == ID_signedbv ||
+             new_symbol->type.id() == ID_unsignedbv ||
+             new_symbol->type.id() == ID_bool ||
+             new_symbol->type.id() == ID_c_bool ||
+             new_symbol->type.id() == ID_c_enum_tag))
+          {
+            simplify(new_symbol->value, *this);
+            if(new_symbol->value.is_constant())
+              new_symbol->is_macro = true;
+          }
         }
       }
       else
