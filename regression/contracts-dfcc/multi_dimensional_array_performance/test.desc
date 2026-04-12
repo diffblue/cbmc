@@ -1,0 +1,8 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract mld_polymat_permute_bitrev_to_custom --replace-call-with-contract mld_poly_permute_bitrev_to_custom --apply-loop-contracts _ --slice-formula --no-array-field-sensitivity
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--

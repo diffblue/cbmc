@@ -722,6 +722,9 @@ std::optional<exprt> get_subexpression_at_offset(
         return {};
       }
 
+      const mp_integer elem_size_bytes =
+        *elem_size_bits / config.ansi_c.char_width;
+
       // If we have an offset C + x (where C is a constant) we can try to
       // recurse by first looking at the member at offset C.
       if(
@@ -766,14 +769,12 @@ std::optional<exprt> get_subexpression_at_offset(
         const exprt &other_factor =
           mul.op0().is_constant() ? mul.op1() : mul.op0();
 
-        if(const_factor % (*elem_size_bits / config.ansi_c.char_width) != 0)
+        if(const_factor % elem_size_bytes != 0)
           return {};
 
         exprt index = mult_exprt{
           other_factor,
-          from_integer(
-            const_factor / (*elem_size_bits / config.ansi_c.char_width),
-            other_factor.type())};
+          from_integer(const_factor / elem_size_bytes, other_factor.type())};
 
         return get_subexpression_at_offset(
           index_exprt{
@@ -798,14 +799,40 @@ std::optional<exprt> get_subexpression_at_offset(
       const exprt &other_factor =
         offset_mult.op0().is_constant() ? offset_mult.op1() : offset_mult.op0();
 
-      if(const_factor % (*elem_size_bits / config.ansi_c.char_width) != 0)
+      if(
+        *target_size_bits < *elem_size_bits && const_factor > 0 &&
+        const_factor < elem_size_bytes && elem_size_bytes % const_factor == 0)
+      {
+        // Decompose the flat index into outer and inner indices using
+        // integer division and remainder. This is correct because
+        // multi-dimensional arrays are laid out contiguously, so
+        // flat_offset = k * const_factor maps to array[k / divider] at
+        // remaining offset (k % divider) * const_factor within that
+        // element. An inner index exceeding the inner dimension simply
+        // wraps to the next element, which is the correct flat-layout
+        // semantics.
+        const mp_integer index_divider = elem_size_bytes / const_factor;
+        exprt index = div_exprt{
+          other_factor, from_integer(index_divider, other_factor.type())};
+        exprt remaining_offset = mult_exprt{
+          mod_exprt{
+            other_factor, from_integer(index_divider, other_factor.type())},
+          from_integer(const_factor, other_factor.type())};
+
+        return get_subexpression_at_offset(
+          index_exprt{
+            expr,
+            typecast_exprt::conditional_cast(index, array_type->index_type())},
+          remaining_offset,
+          target_type,
+          ns);
+      }
+      else if(const_factor % elem_size_bytes != 0)
         return {};
 
       exprt index = mult_exprt{
         other_factor,
-        from_integer(
-          const_factor / (*elem_size_bits / config.ansi_c.char_width),
-          other_factor.type())};
+        from_integer(const_factor / elem_size_bytes, other_factor.type())};
 
       return get_subexpression_at_offset(
         index_exprt{
