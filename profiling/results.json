@@ -1,0 +1,606 @@
+[
+  {
+    "name": "linked_list",
+    "elapsed": 1.0797018233333044,
+    "timings": {
+      "program_steps": 4433,
+      "program_steps_stddev": 0.0,
+      "Symex": 0.18353766666666665,
+      "Symex_stddev": 0.00252860877427358,
+      "Convert SSA": 0.36514233333333335,
+      "Convert SSA_stddev": 0.05840835120368775,
+      "Solver": 0.0042315366666666665,
+      "Solver_stddev": 7.723187964392268e-05,
+      "sliced_assignments": 5,
+      "sliced_assignments_stddev": 0.0,
+      "Post-process": 0.0042145233333333336,
+      "Post-process_stddev": 7.626227922986117e-05,
+      "decision procedure": 0.370509,
+      "decision procedure_stddev": 0.058426906806710234,
+      "Postprocess Equation": 0.0002764926666666667,
+      "Postprocess Equation_stddev": 3.672155144235238e-05
+    },
+    "functions": [
+      {
+        "pct": 9.4,
+        "samples": 64,
+        "module": "cbmc",
+        "symbol": "irept::operator==(irept const&) const"
+      },
+      {
+        "pct": 5.29,
+        "samples": 36,
+        "module": "cbmc",
+        "symbol": "irept::get(dstringt const&) const"
+      },
+      {
+        "pct": 4.55,
+        "samples": 31,
+        "module": "libc.so.6",
+        "symbol": "0x0000000000188d24"
+      },
+      {
+        "pct": 4.41,
+        "samples": 30,
+        "module": "libstdc++.so.6.0.33",
+        "symbol": "std::basic_ostream<char, std::char_traits<char> >& std::__ostream_insert<char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*, long)"
+      },
+      {
+        "pct": 3.52,
+        "samples": 24,
+        "module": "libstdc++.so.6.0.33",
+        "symbol": "std::basic_streambuf<char, std::char_traits<char> >::xsputn(char const*, long)"
+      },
+      {
+        "pct": 3.38,
+        "samples": 23,
+        "module": "libc.so.6",
+        "symbol": "malloc"
+      },
+      {
+        "pct": 3.23,
+        "samples": 22,
+        "module": "libc.so.6",
+        "symbol": "cfree"
+      },
+      {
+        "pct": 3.08,
+        "samples": 21,
+        "module": "cbmc",
+        "symbol": "sharing_treet<irept, forward_list_as_mapt<dstringt, irept> >::remove_ref(tree_nodet<irept, forward_list_as_mapt<dstringt, irept>, true>*)"
+      },
+      {
+        "pct": 3.08,
+        "samples": 21,
+        "module": "libstdc++.so.6.0.33",
+        "symbol": "std::ostream::put(char)"
+      },
+      {
+        "pct": 2.2,
+        "samples": 15,
+        "module": "[unknown]",
+        "symbol": "0xffffffffbba47509"
+      },
+      {
+        "pct": 1.91,
+        "samples": 13,
+        "module": "libstdc++.so.6.0.33",
+        "symbol": "std::ostream::sentry::sentry(std::ostream&)"
+      },
+      {
+        "pct": 1.76,
+        "samples": 12,
+        "module": "cbmc",
+        "symbol": "cnft::process_clause(std::vector<literalt, std::allocator<literalt> > const&, std::vector<literalt, std::allocator<literalt> >&) const"
+      },
+      {
+        "pct": 1.76,
+        "samples": 12,
+        "module": "cbmc",
+        "symbol": "std::_Hashtable<dstringt, std::pair<dstringt const, std::function<std::ostream& (std::ostream&, exprt const&)> >, std::allocator<std::pair<dstringt const, std::function<std::ostream& (std::ostream&, exprt const&)> > >, std::__detail::_Select1st, std::equal_to<dstringt>, std::hash<dstringt>, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, false, true> >::_M_find_before_node(unsigned long, dstringt const&, unsigned long) const [clone .isra.0]"
+      },
+      {
+        "pct": 1.62,
+        "samples": 11,
+        "module": "cbmc",
+        "symbol": "format_rec(std::ostream&, multi_ary_exprt const&)"
+      },
+      {
+        "pct": 1.62,
+        "samples": 11,
+        "module": "libstdc++.so.6.0.33",
+        "symbol": "std::ostream& std::ostream::_M_insert<long>(long)"
+      },
+      {
+        "pct": 1.47,
+        "samples": 10,
+        "module": "libstdc++.so.6.0.33",
+        "symbol": "0x0000000000146961"
+      },
+      {
+        "pct": 1.17,
+        "samples": 8,
+        "module": "cbmc",
+        "symbol": "merge_irept::merged(irept const&)"
+      },
+      {
+        "pct": 1.03,
+        "samples": 7,
+        "module": "cbmc",
+        "symbol": "dimacs_cnft::write_dimacs_clause(std::vector<literalt, std::allocator<literalt> > const&, std::ostream&, bool)"
+      },
+      {
+        "pct": 1.03,
+        "samples": 7,
+        "module": "cbmc",
+        "symbol": "irept::find(dstringt const&) const"
+      },
+      {
+        "pct": 1.03,
+        "samples": 7,
+        "module": "libstdc++.so.6.0.33",
+        "symbol": "std::ostreambuf_iterator<char, std::char_traits<char> > std::num_put<char, std::ostreambuf_iterator<char, std::char_traits<char> > >::_M_insert_int<long>(std::ostreambuf_iterator<char, std::char_traits<char> >, std::ios_base&, char, long) const"
+      },
+      {
+        "pct": 0.88,
+        "samples": 6,
+        "module": "libstdc++.so.6.0.33",
+        "symbol": "std::num_put<char, std::ostreambuf_iterator<char, std::char_traits<char> > >::do_put(std::ostreambuf_iterator<char, std::char_traits<char> >, std::ios_base&, char, long) const"
+      },
+      {
+        "pct": 0.88,
+        "samples": 6,
+        "module": "[unknown]",
+        "symbol": "0xffffffffbba2d987"
+      },
+      {
+        "pct": 0.73,
+        "samples": 5,
+        "module": "cbmc",
+        "symbol": "cnf_clause_listt::lcnf(std::vector<literalt, std::allocator<literalt> > const&)"
+      },
+      {
+        "pct": 0.73,
+        "samples": 5,
+        "module": "cbmc",
+        "symbol": "dstringt::operator<<(std::ostream&) const"
+      },
+      {
+        "pct": 0.73,
+        "samples": 5,
+        "module": "libc.so.6",
+        "symbol": "0x00000000000ab1fc"
+      },
+      {
+        "pct": 0.73,
+        "samples": 5,
+        "module": "libc.so.6",
+        "symbol": "0x0000000000188ad9"
+      },
+      {
+        "pct": 0.73,
+        "samples": 5,
+        "module": "libc.so.6",
+        "symbol": "0x0000000000188d87"
+      },
+      {
+        "pct": 0.73,
+        "samples": 5,
+        "module": "libstdc++.so.6.0.33",
+        "symbol": "0x000000000014694a"
+      },
+      {
+        "pct": 0.73,
+        "samples": 5,
+        "module": "[unknown]",
+        "symbol": "0xffffffffba92c3ac"
+      },
+      {
+        "pct": 0.59,
+        "samples": 4,
+        "module": "cbmc",
+        "symbol": "source_locationt::as_string[abi:cxx11](bool) const"
+      }
+    ],
+    "perf_data": "profile-results/run_2/linked_list/perf.data",
+    "bench_dir": "profile-results/run_2/linked_list",
+    "runs": 3,
+    "elapsed_stddev": 0.0020528552031187646
+  },
+  {
+    "name": "array_ops",
+    "elapsed": 3.0327949750000016,
+    "timings": {
+      "program_steps": 16448,
+      "program_steps_stddev": 0.0,
+      "Symex": 2.3893299999999997,
+      "Symex_stddev": 0.030617653404531188,
+      "Convert SSA": 0.15854066666666666,
+      "Convert SSA_stddev": 0.015867753852808957,
+      "Solver": 1.7069e-05,
+      "Solver_stddev": 3.3103702209873737e-06,
+      "sliced_assignments": 10,
+      "sliced_assignments_stddev": 0.0,
+      "Post-process": 3.704e-06,
+      "Post-process_stddev": 2.8587934517904564e-07,
+      "decision procedure": 0.15884566666666666,
+      "decision procedure_stddev": 0.015882330003287728,
+      "Postprocess Equation": 0.0023413733333333335,
+      "Postprocess Equation_stddev": 0.0007873256191902645
+    },
+    "functions": [
+      {
+        "pct": 7.71,
+        "samples": 213,
+        "module": "cbmc",
+        "symbol": "sharing_treet<irept, forward_list_as_mapt<dstringt, irept> >::remove_ref(tree_nodet<irept, forward_list_as_mapt<dstringt, irept>, true>*)"
+      },
+      {
+        "pct": 7.13,
+        "samples": 197,
+        "module": "libc.so.6",
+        "symbol": "malloc"
+      },
+      {
+        "pct": 5.32,
+        "samples": 147,
+        "module": "libc.so.6",
+        "symbol": "cfree"
+      },
+      {
+        "pct": 5.14,
+        "samples": 142,
+        "module": "cbmc",
+        "symbol": "irept::find(dstringt const&) const"
+      },
+      {
+        "pct": 4.31,
+        "samples": 119,
+        "module": "cbmc",
+        "symbol": "irept::get(dstringt const&) const"
+      },
+      {
+        "pct": 3.29,
+        "samples": 91,
+        "module": "cbmc",
+        "symbol": "sharing_treet<irept, forward_list_as_mapt<dstringt, irept> >::detach()"
+      },
+      {
+        "pct": 3.01,
+        "samples": 83,
+        "module": "libstdc++.so.6.0.33",
+        "symbol": "std::basic_ostream<char, std::char_traits<char> >& std::__ostream_insert<char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*, long)"
+      },
+      {
+        "pct": 2.32,
+        "samples": 64,
+        "module": "libstdc++.so.6.0.33",
+        "symbol": "std::basic_streambuf<char, std::char_traits<char> >::xsputn(char const*, long)"
+      },
+      {
+        "pct": 2.03,
+        "samples": 56,
+        "module": "cbmc",
+        "symbol": "std::_Hashtable<string_ptrt, std::pair<string_ptrt const, unsigned int>, std::allocator<std::pair<string_ptrt const, unsigned int> >, std::__detail::_Select1st, std::equal_to<string_ptrt>, string_ptr_hash, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, false, true> >::_M_find_before_node(unsigned long, string_ptrt const&, unsigned long) const"
+      },
+      {
+        "pct": 1.59,
+        "samples": 44,
+        "module": "libc.so.6",
+        "symbol": "0x00000000000ab678"
+      },
+      {
+        "pct": 1.41,
+        "samples": 39,
+        "module": "cbmc",
+        "symbol": "irept::add(dstringt const&)"
+      },
+      {
+        "pct": 1.41,
+        "samples": 39,
+        "module": "cbmc",
+        "symbol": "irept::add(dstringt const&, irept)"
+      },
+      {
+        "pct": 1.23,
+        "samples": 34,
+        "module": "cbmc",
+        "symbol": "irept::operator==(irept const&) const"
+      },
+      {
+        "pct": 1.19,
+        "samples": 33,
+        "module": "libstdc++.so.6.0.33",
+        "symbol": "operator new(unsigned long)"
+      },
+      {
+        "pct": 1.16,
+        "samples": 32,
+        "module": "cbmc",
+        "symbol": "hash_string(char const*)"
+      },
+      {
+        "pct": 1.09,
+        "samples": 30,
+        "module": "libstdc++.so.6.0.33",
+        "symbol": "std::ostream::sentry::sentry(std::ostream&)"
+      },
+      {
+        "pct": 1.01,
+        "samples": 28,
+        "module": "libc.so.6",
+        "symbol": "0x00000000000ab1fc"
+      },
+      {
+        "pct": 0.94,
+        "samples": 26,
+        "module": "libstdc++.so.6.0.33",
+        "symbol": "std::__cxx11::basic_stringbuf<char, std::char_traits<char>, std::allocator<char> >::overflow(int)"
+      },
+      {
+        "pct": 0.91,
+        "samples": 25,
+        "module": "cbmc",
+        "symbol": "dstringt::operator<<(std::ostream&) const"
+      },
+      {
+        "pct": 0.76,
+        "samples": 21,
+        "module": "cbmc",
+        "symbol": "ssa_exprt::check(exprt const&, validation_modet)"
+      },
+      {
+        "pct": 0.76,
+        "samples": 21,
+        "module": "libstdc++.so.6.0.33",
+        "symbol": "std::basic_ios<char, std::char_traits<char> >::_M_cache_locale(std::locale const&)"
+      },
+      {
+        "pct": 0.72,
+        "samples": 20,
+        "module": "cbmc",
+        "symbol": "constant_exprt::check(exprt const&, validation_modet)"
+      },
+      {
+        "pct": 0.69,
+        "samples": 19,
+        "module": "cbmc",
+        "symbol": "build_identifier(exprt const&, dstringt const&, dstringt const&, dstringt const&)"
+      },
+      {
+        "pct": 0.69,
+        "samples": 19,
+        "module": "cbmc",
+        "symbol": "sharing_mapt<dstringt, std::pair<ssa_exprt, unsigned long>, false, std::hash<dstringt>, std::equal_to<dstringt> >::get_leaf_node(dstringt const&) const"
+      },
+      {
+        "pct": 0.69,
+        "samples": 19,
+        "module": "libstdc++.so.6.0.33",
+        "symbol": "std::ostream::put(char)"
+      },
+      {
+        "pct": 0.62,
+        "samples": 17,
+        "module": "cbmc",
+        "symbol": "simplify_exprt::simplify_node_preorder(exprt const&)"
+      },
+      {
+        "pct": 0.54,
+        "samples": 15,
+        "module": "cbmc",
+        "symbol": "build_ssa_identifier_rec(exprt const&, dstringt const&, dstringt const&, dstringt const&, std::ostream&, std::ostream&)"
+      },
+      {
+        "pct": 0.54,
+        "samples": 15,
+        "module": "libstdc++.so.6.0.33",
+        "symbol": "std::ios_base::_M_init()"
+      }
+    ],
+    "perf_data": "profile-results/run_2/array_ops/perf.data",
+    "bench_dir": "profile-results/run_2/array_ops",
+    "runs": 3,
+    "elapsed_stddev": 0.007156389188574807
+  },
+  {
+    "name": "structs",
+    "elapsed": 1.0129368076666576,
+    "timings": {
+      "program_steps": 312,
+      "program_steps_stddev": 0.0,
+      "sliced_assignments": 0,
+      "sliced_assignments_stddev": 0.0,
+      "Symex": 0.023594233333333332,
+      "Symex_stddev": 0.00040909065417500526,
+      "Postprocess Equation": 2.299e-05,
+      "Postprocess Equation_stddev": 1.194333286817378e-06
+    },
+    "functions": [
+      {
+        "pct": 7.41,
+        "samples": 6,
+        "module": "libc.so.6",
+        "symbol": "cfree"
+      },
+      {
+        "pct": 6.17,
+        "samples": 5,
+        "module": "cbmc",
+        "symbol": "irept::get(dstringt const&) const"
+      },
+      {
+        "pct": 6.17,
+        "samples": 5,
+        "module": "cbmc",
+        "symbol": "sharing_treet<irept, forward_list_as_mapt<dstringt, irept> >::remove_ref(tree_nodet<irept, forward_list_as_mapt<dstringt, irept>, true>*)"
+      },
+      {
+        "pct": 6.17,
+        "samples": 5,
+        "module": "libc.so.6",
+        "symbol": "malloc"
+      },
+      {
+        "pct": 4.94,
+        "samples": 4,
+        "module": "cbmc",
+        "symbol": "sharing_treet<irept, forward_list_as_mapt<dstringt, irept> >::detach()"
+      },
+      {
+        "pct": 3.7,
+        "samples": 3,
+        "module": "libc.so.6",
+        "symbol": "0x00000000000a9afb"
+      },
+      {
+        "pct": 2.47,
+        "samples": 2,
+        "module": "cbmc",
+        "symbol": "irept::add(dstringt const&)"
+      },
+      {
+        "pct": 2.47,
+        "samples": 2,
+        "module": "cbmc",
+        "symbol": "irept::find(dstringt const&) const"
+      },
+      {
+        "pct": 2.47,
+        "samples": 2,
+        "module": "libstdc++.so.6.0.33",
+        "symbol": "operator delete(void*)"
+      },
+      {
+        "pct": 1.23,
+        "samples": 1,
+        "module": "cbmc",
+        "symbol": "BigInt::as_string(char*, unsigned int, unsigned int) const"
+      },
+      {
+        "pct": 1.23,
+        "samples": 1,
+        "module": "cbmc",
+        "symbol": "constant_exprt::check(exprt const&, validation_modet)"
+      },
+      {
+        "pct": 1.23,
+        "samples": 1,
+        "module": "cbmc",
+        "symbol": "field_sensitivityt::get_fields(namespacet const&, goto_symex_statet&, ssa_exprt const&, bool) const"
+      },
+      {
+        "pct": 1.23,
+        "samples": 1,
+        "module": "cbmc",
+        "symbol": "nullary_exprt::check(exprt const&, validation_modet)"
+      },
+      {
+        "pct": 1.23,
+        "samples": 1,
+        "module": "cbmc",
+        "symbol": "parsert::set_source_location(exprt&)"
+      },
+      {
+        "pct": 1.23,
+        "samples": 1,
+        "module": "cbmc",
+        "symbol": "simplify_exprt::simplify_node_preorder(exprt const&)"
+      },
+      {
+        "pct": 1.23,
+        "samples": 1,
+        "module": "cbmc",
+        "symbol": "simplify_exprt::simplify_unary_pointer_predicate_preorder(unary_exprt const&)"
+      },
+      {
+        "pct": 1.23,
+        "samples": 1,
+        "module": "cbmc",
+        "symbol": "std::_Hashtable<string_ptrt, std::pair<string_ptrt const, unsigned int>, std::allocator<std::pair<string_ptrt const, unsigned int> >, std::__detail::_Select1st, std::equal_to<string_ptrt>, string_ptr_hash, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, false, true> >::_M_find_before_node(unsigned long, string_ptrt const&, unsigned long) const"
+      },
+      {
+        "pct": 1.23,
+        "samples": 1,
+        "module": "cbmc",
+        "symbol": "symbol_tablet::erase(std::__detail::_Node_const_iterator<std::pair<dstringt const, symbolt>, false, true> const&)"
+      },
+      {
+        "pct": 1.23,
+        "samples": 1,
+        "module": "cbmc",
+        "symbol": "yyansi_clex()"
+      },
+      {
+        "pct": 1.23,
+        "samples": 1,
+        "module": "ld-linux-x86-64.so.2",
+        "symbol": "0x0000000000012b77"
+      },
+      {
+        "pct": 1.23,
+        "samples": 1,
+        "module": "libc.so.6",
+        "symbol": "0x00000000000ab178"
+      },
+      {
+        "pct": 1.23,
+        "samples": 1,
+        "module": "libc.so.6",
+        "symbol": "0x00000000000ab1f1"
+      },
+      {
+        "pct": 1.23,
+        "samples": 1,
+        "module": "libc.so.6",
+        "symbol": "0x00000000000ab1fc"
+      },
+      {
+        "pct": 1.23,
+        "samples": 1,
+        "module": "libc.so.6",
+        "symbol": "0x00000000000ab678"
+      },
+      {
+        "pct": 1.23,
+        "samples": 1,
+        "module": "libc.so.6",
+        "symbol": "0x00000000000abaee"
+      },
+      {
+        "pct": 1.23,
+        "samples": 1,
+        "module": "libc.so.6",
+        "symbol": "0x00000000000abd44"
+      },
+      {
+        "pct": 1.23,
+        "samples": 1,
+        "module": "libc.so.6",
+        "symbol": "0x0000000000188140"
+      },
+      {
+        "pct": 1.23,
+        "samples": 1,
+        "module": "libstdc++.so.6.0.33",
+        "symbol": "operator delete(void*, unsigned long)"
+      },
+      {
+        "pct": 1.23,
+        "samples": 1,
+        "module": "libstdc++.so.6.0.33",
+        "symbol": "operator new(unsigned long)"
+      },
+      {
+        "pct": 1.23,
+        "samples": 1,
+        "module": "libstdc++.so.6.0.33",
+        "symbol": "std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_append(char const*, unsigned long)"
+      }
+    ],
+    "perf_data": "profile-results/run_2/structs/perf.data",
+    "bench_dir": "profile-results/run_2/structs",
+    "runs": 3,
+    "elapsed_stddev": 0.00042536639884200624
+  }
+]
