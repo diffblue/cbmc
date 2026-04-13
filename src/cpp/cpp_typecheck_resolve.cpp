@@ -1166,6 +1166,11 @@ struct rs_cache_entryt
 };
 static std::unordered_map<std::size_t, rs_cache_entryt> rs_cache;
 
+void cpp_typecheck_resolvet::clear_resolve_scope_cache()
+{
+  rs_cache.clear();
+}
+
 cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
   const cpp_namet &cpp_name,
   irep_idt &base_name,
