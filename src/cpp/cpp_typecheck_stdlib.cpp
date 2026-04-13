@@ -378,6 +378,91 @@ void cpp_typecheckt::provide_stdlib_bodies()
         deferred_typechecking.erase(symbol.name);
       }
       else if(
+        base == "_M_realloc_insert" && name.find("vector") != std::string::npos)
+      {
+        // Remove __new_finish=pointer() initialization from the body.
+        // Walk the body looking for decl-init pairs where __new_finish
+        // is initialized to a zero/NULL value, and remove the init.
+        std::function<void(exprt &)> fix = [&](exprt &e)
+        {
+          // Look for side_effect assign: __new_finish = <null>
+          if(
+            e.id() == ID_side_effect && e.get(ID_statement) == ID_assign &&
+            e.operands().size() == 2 && e.operands()[0].id() == ID_symbol &&
+            id2string(to_symbol_expr(e.operands()[0]).get_identifier())
+                .find("__new_finish") != std::string::npos &&
+            (e.operands()[1].is_zero() || e.operands()[1].is_constant() ||
+             e.operands()[1].id() == ID_side_effect))
+          {
+            // Check if RHS is a zero-valued constructor call
+            const auto &rhs = e.operands()[1];
+            if(
+              rhs.is_zero() ||
+              (rhs.id() == ID_constant &&
+               (rhs.get(ID_value) == "NULL" || rhs.get(ID_value) == "0")) ||
+              (rhs.id() == ID_side_effect &&
+               rhs.get(ID_statement) == ID_temporary_object))
+            {
+              // Replace with: __new_finish = __new_finish (no-op)
+              e.operands()[1] = e.operands()[0];
+            }
+          }
+          for(auto &op : e.operands())
+            fix(op);
+        };
+        fix(symbol.value);
+      }
+      else if(
+        base.find("__uninitialized_move_if_noexcept_a") == 0 ||
+        base.find("__uninitialized_copy_a") == 0)
+      {
+        // Override with array_replace model (same as _S_relocate).
+        ensure_parameter_symbols(symbol, symbol_table);
+        const auto &params = to_code_type(symbol.type).parameters();
+        if(params.size() >= 3)
+        {
+          symbol_exprt first(params[0].get_identifier(), params[0].type());
+          symbol_exprt last(params[1].get_identifier(), params[1].type());
+          symbol_exprt result(params[2].get_identifier(), params[2].type());
+          const auto &ret_type = to_code_type(symbol.type).return_type();
+
+          auto get_ptr = [&](symbol_exprt &sym) -> exprt
+          {
+            if(sym.type().id() == ID_struct_tag)
+            {
+              const auto &st = follow_tag(to_struct_tag_type(sym.type()));
+              for(const auto &comp : st.components())
+              {
+                if(
+                  id2string(comp.get_name()).find("_M_current") !=
+                  std::string::npos)
+                  return member_exprt{sym, comp.get_name(), comp.type()};
+              }
+            }
+            return sym;
+          };
+          exprt first_ptr = get_ptr(first);
+          exprt last_ptr = get_ptr(last);
+
+          minus_exprt count{last_ptr, first_ptr};
+          count.type() = pointer_diff_type();
+          plus_exprt ret_val{result, count};
+          ret_val.type() = ret_type;
+
+          code_blockt copy_block;
+          copy_block.add(codet{ID_array_replace, {result, first_ptr}});
+          copy_block.add(code_frontend_returnt{ret_val});
+
+          code_blockt block;
+          block.add(code_ifthenelset{
+            notequal_exprt{first_ptr, last_ptr},
+            std::move(copy_block),
+            code_frontend_returnt{result}});
+          symbol.value = std::move(block);
+          symbol.value.type() = symbol.type;
+        }
+      }
+      else if(
         base == "__exchange_and_add_single" ||
         base == "__exchange_and_add_dispatch")
       {
@@ -413,6 +498,7 @@ void cpp_typecheckt::provide_stdlib_bodies()
         symbol.value.type() = symbol.type;
         deferred_typechecking.erase(symbol.name);
       }
+
       continue;
     }
 
@@ -493,10 +579,10 @@ void cpp_typecheckt::provide_stdlib_bodies()
 
     if(base == "_S_relocate" && name.find("vector") != std::string::npos)
     {
-      // _S_relocate(first, last, result, alloc) → return
-      // result + (last - first). The actual element copy is handled
-      // by the construct() body provided below. This body just
-      // computes the correct return pointer.
+      // _S_relocate(first, last, result, alloc) → copy [first,last) to
+      // result, return result + (last - first).
+      // Uses __CPROVER_array_replace to copy the source object's
+      // content into the destination object.
       ensure_parameter_symbols(symbol, symbol_table);
       const auto &params = to_code_type(symbol.type).parameters();
       if(params.size() >= 3)
@@ -509,12 +595,14 @@ void cpp_typecheckt::provide_stdlib_bodies()
         diff.type() = pointer_diff_type();
         plus_exprt sum(result, diff);
         sum.type() = ret_type;
+        code_blockt copy_block;
+        copy_block.add(codet{ID_array_replace, {result, first}});
+        copy_block.add(code_frontend_returnt{sum});
         code_blockt block;
-        code_ifthenelset if_empty(
-          equal_exprt(first, last),
-          code_frontend_returnt(result),
-          code_frontend_returnt(sum));
-        block.add(std::move(if_empty));
+        block.add(code_ifthenelset{
+          notequal_exprt{first, last},
+          std::move(copy_block),
+          code_frontend_returnt{result}});
         symbol.value = std::move(block);
         symbol.value.type() = symbol.type;
         deferred_typechecking.erase(symbol.name);
