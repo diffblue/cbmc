@@ -228,6 +228,41 @@ void cpp_internal_additions(std::ostream &out)
   out << "void __builtin_coro_destroy(void *);\n";
   out << "void *__builtin_coro_noop();\n";
 
+  // GCC 13+ <type_traits> defines __and_/__or_ using decltype + SFINAE
+  // on pack expansions, which CBMC cannot evaluate. Provide simple
+  // recursive implementations via the preprocessor that replace the
+  // GCC definitions before <type_traits> is included.
+  if(config.ansi_c.mode != configt::ansi_ct::flavourt::VISUAL_STUDIO)
+  {
+    // clang-format off
+    out <<
+      "namespace std {\n"
+      "  template<typename...> struct __and_;\n"
+      "  template<> struct __and_<>\n"
+      "    : integral_constant<bool, true> {};\n"
+      "  template<typename _B1> struct __and_<_B1>\n"
+      "    : _B1 {};\n"
+      "  template<typename _B1, typename _B2> struct __and_<_B1, _B2>\n"
+      "    : integral_constant<bool, _B1::value && _B2::value> {};\n"
+      "  template<typename _B1, typename _B2, typename _B3, typename... _Bn>\n"
+      "    struct __and_<_B1, _B2, _B3, _Bn...>\n"
+      "    : integral_constant<bool, _B1::value && __and_<_B2, _B3, _Bn...>::value> {};\n"
+      "  template<typename...> struct __or_;\n"
+      "  template<> struct __or_<>\n"
+      "    : integral_constant<bool, false> {};\n"
+      "  template<typename _B1> struct __or_<_B1>\n"
+      "    : _B1 {};\n"
+      "  template<typename _B1, typename _B2> struct __or_<_B1, _B2>\n"
+      "    : integral_constant<bool, _B1::value || _B2::value> {};\n"
+      "  template<typename _B1, typename _B2, typename _B3, typename... _Bn>\n"
+      "    struct __or_<_B1, _B2, _B3, _Bn...>\n"
+      "    : integral_constant<bool, _B1::value || __or_<_B2, _B3, _Bn...>::value> {};\n"
+      "  template<typename _Tp> constexpr _Tp*\n"
+      "    __to_address(_Tp* __ptr) { return __ptr; }\n"
+      "}\n";
+    // clang-format on
+  }
+
   // C++20 std::dynamic_extent — provide as built-in so that
   // <span> can use it as a default template argument without
   // needing to evaluate numeric_limits<size_t>::max().

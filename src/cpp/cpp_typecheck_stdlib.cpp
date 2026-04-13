@@ -494,10 +494,9 @@ void cpp_typecheckt::provide_stdlib_bodies()
     if(base == "_S_relocate" && name.find("vector") != std::string::npos)
     {
       // _S_relocate(first, last, result, alloc) → return
-      // result + (last - first). For trivially copyable types this
-      // is the correct behavior. When first == last (empty range),
-      // return result directly to avoid pointer arithmetic on
-      // potentially NULL pointers from empty vectors.
+      // result + (last - first). The actual element copy is handled
+      // by the construct() body provided below. This body just
+      // computes the correct return pointer.
       ensure_parameter_symbols(symbol, symbol_table);
       const auto &params = to_code_type(symbol.type).parameters();
       if(params.size() >= 3)
@@ -511,8 +510,6 @@ void cpp_typecheckt::provide_stdlib_bodies()
         plus_exprt sum(result, diff);
         sum.type() = ret_type;
         code_blockt block;
-        // If first == last (empty range), return result directly.
-        // Otherwise compute result + (last - first).
         code_ifthenelset if_empty(
           equal_exprt(first, last),
           code_frontend_returnt(result),
