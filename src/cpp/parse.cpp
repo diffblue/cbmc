@@ -1512,6 +1512,13 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
       if(!rTypedefUsing(body))
         return false;
     }
+    else if(lex.LookAhead(0) == TOK_TEMPLATE)
+    {
+      // Nested template after requires clause:
+      // template<...> requires ... template<...> class X::Y { ... };
+      if(!rTemplateDecl(body))
+        return false;
+    }
     else if(!rDeclaration(body))
       return false;
   }
