@@ -8947,18 +8947,33 @@ bool Parser::rPostfixExpr(exprt &exp)
 
       if(name_expr->id() == ID_cpp_name)
       {
-        auto saved = lex.Save();
-        irept args;
-        if(rTemplateArgs(args))
+        // Check if the name is a template. Non-type names (variables,
+        // non-type template parameters) followed by '<' should be
+        // treated as less-than, not template arguments.
+        bool is_template_name = true;
+        const auto &sub = name_expr->get_sub();
+        if(sub.size() == 1 && sub[0].id() == ID_name)
         {
-          int next = lex.LookAhead(0);
-          if(next == '(' || next == '[' || next == '.' || next == ';')
-          {
-            name_expr->get_sub().push_back(args);
-            continue;
-          }
+          new_scopet *found = lookup_id(sub[0].get(ID_identifier));
+          if(found != nullptr && !found->is_type() && !found->is_template())
+            is_template_name = false;
         }
-        lex.Restore(saved);
+
+        if(is_template_name)
+        {
+          auto saved = lex.Save();
+          irept args;
+          if(rTemplateArgs(args))
+          {
+            int next = lex.LookAhead(0);
+            if(next == '(' || next == '[' || next == '.' || next == ';')
+            {
+                name_expr->get_sub().push_back(args);
+                continue;
+            }
+          }
+          lex.Restore(saved);
+        }
       }
     }
 
