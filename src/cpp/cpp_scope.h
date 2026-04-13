@@ -188,6 +188,13 @@ public:
     return cache;
   }
 
+  /// Clear all static caches. Must be called between type-checking
+  /// different translation units to avoid dangling scope pointers.
+  static void clear_static_caches()
+  {
+    lookup_cache().clear();
+  }
+
 protected:
   typedef std::unordered_set<const cpp_scopet *> visited_sett;
 
