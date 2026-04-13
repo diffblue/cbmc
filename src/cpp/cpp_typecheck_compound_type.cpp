@@ -331,7 +331,15 @@ void cpp_typecheckt::typecheck_compound_declarator(
       is_function_member &&
       config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG)
       suppress_elaborate = true;
-    typecheck_type(final_type);
+    try
+    {
+      typecheck_type(final_type);
+    }
+    catch(...)
+    {
+      suppress_elaborate = old_suppress;
+      throw;
+    }
     suppress_elaborate = old_suppress;
   }
 
