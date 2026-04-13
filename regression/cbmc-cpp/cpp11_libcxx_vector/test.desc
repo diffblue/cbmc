@@ -1,4 +1,4 @@
-CORE libcxx libcxx-slow
+KNOWNBUG libcxx
 main.cpp
 --cpp11 --stdlib libc++ --unwind 2
 ^VERIFICATION
@@ -6,4 +6,6 @@ main.cpp
 ^SIGNAL=0$
 --
 ^PARSING ERROR$
-^CONVERSION ERROR$
+libc++ vector member access fails with "incomplete type on left hand
+side" due to deferred template elaboration not completing the vector
+class before member access.
