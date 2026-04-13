@@ -1,0 +1,10 @@
+KNOWNBUG libcxx
+main.cpp
+--cpp11 --unwind 2 --no-unwinding-assertions --no-built-in-assertions --stdlib libc++
+^VERIFICATION
+^EXIT=(0|10)$
+^SIGNAL=0$
+--
+^PARSING ERROR$
+libc++ container member access fails with incomplete type due to
+deferred template elaboration.
