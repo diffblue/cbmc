@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <ansi-c/gcc_version.h>
 
 #include "cpp_declarator.h"
+#include "cpp_typecheck_resolve.h"
 #include "cpp_util.h"
 #include "expr2cpp.h"
 
@@ -102,6 +103,11 @@ void cpp_typecheckt::convert(cpp_itemt &item)
 /// typechecking main method
 void cpp_typecheckt::typecheck()
 {
+  // Clear static caches from previous translation units to avoid
+  // dangling scope pointers when type-checking multiple files.
+  cpp_scopet::clear_static_caches();
+  cpp_typecheck_resolvet::clear_resolve_scope_cache();
+
   // default linkage is "automatic"
   current_linkage_spec=ID_auto;
 
