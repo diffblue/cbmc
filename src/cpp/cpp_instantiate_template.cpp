@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
+#include <util/config.h>
+
 #include "cpp_typecheck.h"
 
 #ifdef DEBUG
@@ -729,8 +731,29 @@ void cpp_typecheckt::elaborate_class_template(
       }
     }
 
-    instantiate_template(
-      type.source_location(), *best_match, best_spec_args, full_args);
+    // Catch instantiation errors to preserve partially-completed types.
+    // Template instantiation creates the struct body (components) first,
+    // then processes method bodies which may fail for system headers.
+    // Without catching, the exception propagates and the caller sees
+    // the type as incomplete even though the struct body is complete.
+    // Only do this for libc++ (CLANG preprocessor) where forward
+    // declarations in __fwd/ headers are common.
+    if(config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG)
+    {
+      try
+      {
+        instantiate_template(
+          type.source_location(), *best_match, best_spec_args, full_args);
+      }
+      catch(int)
+      {
+      }
+    }
+    else
+    {
+      instantiate_template(
+        type.source_location(), *best_match, best_spec_args, full_args);
+    }
   }
 }
 
