@@ -60,7 +60,7 @@ jobs:
       - name: Rename package for release
         run: cp ${{ steps.create_packages.outputs.deb_package }} ${{ steps.create_packages.outputs.deb_package_name }}
       - name: Upload binary packages
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: ${{ steps.create_packages.outputs.deb_package_name }}
       - name: Slack notification of CI status
@@ -127,7 +127,7 @@ jobs:
       - name: Rename package for release
         run: cp ${{ steps.create_packages.outputs.deb_package }} ${{ steps.create_packages.outputs.deb_package_name }}
       - name: Upload binary packages
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: ${{ steps.create_packages.outputs.deb_package_name }}
       - name: Slack notification of CI status
@@ -194,7 +194,7 @@ jobs:
       - name: Rename package for release
         run: cp ${{ steps.create_packages.outputs.deb_package }} ${{ steps.create_packages.outputs.deb_package_name }}
       - name: Upload binary packages
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: ${{ steps.create_packages.outputs.deb_package_name }}
       - name: Slack notification of CI status
@@ -340,7 +340,7 @@ jobs:
         run: |
           & signtool.exe verify /pa ${{ steps.create_packages.outputs.msi_installer }}
       - name: Upload binary packages
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: ${{ steps.create_packages.outputs.msi_installer }}
       - name: Slack notification of CI status
