@@ -60,9 +60,22 @@ bvt boolbvt::convert_byte_update(const byte_update_exprt &expr)
 
       const std::size_t offset_i = numeric_cast_v<std::size_t>(offset);
 
+      // When the update value is not a multiple of the byte width,
+      // lower_byte_update places the value at the high end of the
+      // last partial byte (concatenating {value, remaining_low_bits}).
+      // For little-endian the high end is at higher bit indices, so
+      // we shift the trailing partial byte's bits up. For big-endian
+      // the endianness map already places bit 0 at the MSB.
+      const std::size_t tail_bits = update_width % byte_width;
+      const std::size_t tail_shift =
+        little_endian && tail_bits != 0 ? byte_width - tail_bits : 0;
+
       for(std::size_t i = 0; i < update_width; i++)
       {
-        size_t index_op = map_op.map_bit(offset_i + i);
+        // Apply the shift only to bits in the last partial byte
+        const std::size_t shift =
+          (i >= update_width - tail_bits && tail_shift != 0) ? tail_shift : 0;
+        size_t index_op = map_op.map_bit(offset_i + shift + i);
         size_t index_value = map_value.map_bit(i);
 
         INVARIANT(
