@@ -7,3 +7,7 @@ main.cpp
 ^VERIFICATION SUCCESSFUL$
 --
 ^CONVERSION ERROR$
+Uses --depth 20 because virtual function resolution in
+_M_release_last_use expands 2 virtual calls into 78-way switches
+each, creating ~6000 path combinations that exhaust memory without
+a depth bound.
