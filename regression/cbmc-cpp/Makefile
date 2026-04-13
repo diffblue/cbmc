@@ -19,10 +19,10 @@ ifeq ($(wildcard /usr/include/c++/v1/vector),)
 endif
 
 test:
-	@../test.pl -e -p -c "../../../src/cbmc/cbmc --validate-goto-model --validate-ssa-equation" $(excluded_tests) $(excluded_libcxx) -X libcxx-slow -t 1800
+	@../test.pl -e -p -c "../../../src/cbmc/cbmc --validate-goto-model --validate-ssa-equation" $(excluded_tests) $(excluded_libcxx) -t 1800
 
 tests.log: ../test.pl
-	@../test.pl -e -p -c "../../../src/cbmc/cbmc --validate-goto-model --validate-ssa-equation" $(excluded_tests) $(excluded_libcxx) -X libcxx-slow -t 1800
+	@../test.pl -e -p -c "../../../src/cbmc/cbmc --validate-goto-model --validate-ssa-equation" $(excluded_tests) $(excluded_libcxx) -t 1800
 
 clean:
 	find . -name '*.out' -execdir $(RM) '{}' \;
