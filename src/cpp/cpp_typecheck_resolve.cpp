@@ -1697,6 +1697,23 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
 
   if(primary_templates.size() >= 2)
   {
+    // Multiple primary templates found. Filter by the current scope:
+    // only keep templates whose identifier is within the scope that
+    // resolve_scope navigated to via :: qualifiers.
+    cpp_scopet &current = cpp_typecheck.cpp_scopes.current_scope();
+    const std::string prefix = id2string(current.identifier) + "::";
+    std::set<irep_idt> filtered;
+    for(const auto &pt : primary_templates)
+    {
+      if(id2string(pt).find(prefix) == 0 || pt == current.identifier)
+        filtered.insert(pt);
+    }
+    if(filtered.size() == 1)
+      primary_templates = filtered;
+  }
+
+  if(primary_templates.size() >= 2)
+  {
     cpp_typecheck.show_instantiation_stack(cpp_typecheck.error());
     cpp_typecheck.error().source_location = source_location;
     cpp_typecheck.error() << "template scope '" << base_name << "' is ambiguous"
