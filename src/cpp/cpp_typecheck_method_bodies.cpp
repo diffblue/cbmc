@@ -66,6 +66,7 @@ void cpp_typecheckt::typecheck_method_bodies()
         null_message_handlert null_handler;
         message_handlert &old_handler = get_message_handler();
         set_message_handler(null_handler);
+        suppress_elaborate = false;
         try
         {
           convert_function(method_symbol);
@@ -80,6 +81,7 @@ void cpp_typecheckt::typecheck_method_bodies()
         had_template_instantiation = false;
         const std::size_t errors_before =
           get_message_handler().get_message_count(messaget::M_ERROR);
+        suppress_elaborate = false;
         try
         {
           convert_function(method_symbol);
