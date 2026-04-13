@@ -43,18 +43,19 @@ protected:
     }
     else if(expr.id() == ID_with)
     {
-      // this is bad
-#if 0
-      for(const auto &op : expr.operands())
-      {
-        if(!is_constant(op))
-          return false;
-      }
-
+      // Propagate WITH expressions so that indexing at unchanged
+      // positions can be simplified (e.g., (a WITH [2]:=x)[0] -> a[0]).
       return true;
-#else
-      return false;
-#endif
+    }
+    else if(expr.id() == ID_array || expr.id() == ID_struct)
+    {
+      // Propagate array/struct literals even when they contain
+      // non-constant elements so that constant-index access can
+      // extract the constant parts. This is needed when a WITH
+      // expression is simplified to the base array/struct and that
+      // base contains a mix of constant and non-constant elements
+      // (e.g., DFCC assigns clause tracking arrays).
+      return true;
     }
 
     return can_forward_propagatet::is_constant(expr);
