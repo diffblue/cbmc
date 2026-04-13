@@ -363,6 +363,12 @@ add nondeterministic initialization of variables with static lifetime
 \fB\-\-paths\fR [strategy]
 explore paths one at a time
 .TP
+\fB\-\-no\-branch\-pruning\fR
+disable solver-based branch pruning at goto branch points;
+pruning is enabled by default and queries the SAT solver
+to skip provably-infeasible branches in both \fB\-\-paths\fR
+and monolithic modes
+.TP
 \fB\-\-show\-symex\-strategies\fR
 list strategies for use with \fB\-\-paths\fR
 .TP
