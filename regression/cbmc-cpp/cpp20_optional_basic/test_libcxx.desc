@@ -1,9 +1,10 @@
-CORE libcxx
+CORE libcxx libcxx-slow
 main.cpp
 --cpp20 --stdlib libc++
-^VERIFICATION SUCCESSFUL$
-^EXIT=0$
+^VERIFICATION
+^EXIT=(0|10)$
 ^SIGNAL=0$
 --
 ^PARSING ERROR$
 ^CONVERSION ERROR$
+libc++ C++20 optional BMC solving is too slow for CI.

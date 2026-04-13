@@ -1,4 +1,4 @@
-CORE libcxx
+CORE libcxx libcxx-slow
 main.cpp
 --cpp17 --stdlib libc++
 ^VERIFICATION

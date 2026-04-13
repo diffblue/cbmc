@@ -323,12 +323,17 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
   typet final_type = declarator.merge_type(declaration.type());
 
-  // Type-check the member type. Do NOT call elaborate_class_template
-  // here — member parameter types don't need to be complete (per C++
-  // [temp.inst]). Elaboration is triggered on demand when the type
-  // needs to be complete (sizeof, member access, construction).
-  // This matches Clang's approach: SubstType without RequireCompleteType.
-  typecheck_type(final_type);
+  {
+    bool is_function_member =
+      final_type.id() == ID_code || final_type.id() == ID_function_type;
+    bool old_suppress = suppress_elaborate;
+    if(
+      is_function_member &&
+      config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG)
+      suppress_elaborate = true;
+    typecheck_type(final_type);
+    suppress_elaborate = old_suppress;
+  }
 
   if(final_type.id() == ID_empty && !declaration.is_typedef())
   {
@@ -1642,7 +1647,8 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
   // Restore cache invalidation and invalidate once for all the
   // members we inserted.
   cpp_scopet::suppress_cache_invalidation = old_suppress;
-  ++cpp_scopet::scope_generation;
+  if(compound_body_depth <= 1)
+    ++cpp_scopet::scope_generation;
 
   --compound_body_depth;
 }

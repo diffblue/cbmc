@@ -1245,6 +1245,54 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
       template_args = to_cpp_template_args_non_tc(*pos);
     else if(pos->id() == "::")
     {
+      if(cpp_typecheck.suppress_elaborate && template_args.is_nil())
+      {
+        // Fast path: use RECURSIVE lookup but only accept scopes.
+        // Skip the expensive filter_for_named_scopes.
+        auto id_set = cpp_typecheck.cpp_scopes.current_scope().lookup(
+          final_base_name,
+          recursive ? cpp_scopet::RECURSIVE : cpp_scopet::QUALIFIED);
+        bool found = false;
+        for(const auto *id_ptr : id_set)
+        {
+          if(id_ptr->is_scope)
+          {
+            cpp_typecheck.cpp_scopes.go_to(
+              static_cast<cpp_scopet &>(const_cast<cpp_idt &>(*id_ptr)));
+            found = true;
+            break;
+          }
+          if(id_ptr->is_typedef())
+          {
+            // Follow typedef to find the scope
+            const auto *sym =
+              cpp_typecheck.symbol_table.lookup(id_ptr->identifier);
+            if(sym && sym->is_type && sym->type.id() == ID_struct_tag)
+            {
+              auto it = cpp_typecheck.cpp_scopes.id_map.find(
+                to_struct_tag_type(sym->type).get_identifier());
+              if(
+                it != cpp_typecheck.cpp_scopes.id_map.end() &&
+                it->second->is_scope)
+              {
+                cpp_typecheck.cpp_scopes.go_to(
+                  static_cast<cpp_scopet &>(*it->second));
+                found = true;
+                break;
+              }
+            }
+          }
+        }
+        if(found)
+        {
+          final_base_name.clear();
+          ++pos;
+          continue;
+        }
+        // Scope not found with suppress — bail out
+        throw 0;
+      }
+
       if(template_args.is_not_nil())
       {
         auto id_set = cpp_typecheck.cpp_scopes.current_scope().lookup(
@@ -1443,6 +1491,8 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
             ++pos;
             continue;
           }
+          if(cpp_typecheck.suppress_elaborate)
+            throw 0;
           cpp_typecheck.show_instantiation_stack(cpp_typecheck.error());
           cpp_typecheck.error().source_location = source_location;
           cpp_typecheck.error()
