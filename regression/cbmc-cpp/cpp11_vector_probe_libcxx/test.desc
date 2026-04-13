@@ -1,4 +1,4 @@
-KNOWNBUG libcxx
+CORE libcxx
 main.cpp
 --cpp11 --no-unwinding-assertions --stdlib libc++
 ^VERIFICATION

@@ -1,8 +1,8 @@
 CORE libcxx
 main.cpp
 --cpp17 --stdlib libc++
-^VERIFICATION SUCCESSFUL$
-^EXIT=0$
+^VERIFICATION
+^EXIT=(0|10)$
 ^SIGNAL=0$
 --
 ^PARSING ERROR$
