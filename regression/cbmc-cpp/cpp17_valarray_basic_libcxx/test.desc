@@ -1,0 +1,10 @@
+KNOWNBUG libcxx
+main.cpp
+--cpp17 --unwind 5 --no-unwinding-assertions --stdlib libc++
+^VERIFICATION
+^EXIT=(0|10)$
+^SIGNAL=0$
+--
+^PARSING ERROR$
+libc++ CONVERSION ERROR: incomplete type, missing symbol, or
+implicit conversion failure.

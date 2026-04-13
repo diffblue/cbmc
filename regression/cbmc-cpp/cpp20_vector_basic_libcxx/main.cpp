@@ -1,0 +1,8 @@
+// C++20 <vector> header
+#include <vector>
+int main()
+{
+  std::vector<int> v;
+  v.push_back(42);
+  __CPROVER_assert(v.size() == 1, "vector size");
+}
