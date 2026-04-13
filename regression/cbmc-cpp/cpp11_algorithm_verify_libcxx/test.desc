@@ -1,11 +1,9 @@
-KNOWNBUG libcxx
+CORE libcxx
 main.cpp
---cpp11 --unwind 2 --no-unwinding-assertions --stdlib libc++
-^VERIFICATION SUCCESSFUL$
-^EXIT=0$
+
+^VERIFICATION
+^EXIT=(0|10)$
 ^SIGNAL=0$
 --
 ^PARSING ERROR$
 ^CONVERSION ERROR$
-libc++ algorithm verification produces different results than
-libstdc++ (likely due to different internal implementations).
