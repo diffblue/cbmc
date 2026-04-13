@@ -39,8 +39,52 @@ exprt field_sensitivityt::apply_byte_extract(
 {
   if(
     (be.op().type().id() != ID_union && be.op().type().id() != ID_union_tag) ||
-    !is_ssa_expr(be.op()) || !be.offset().is_constant())
+    !is_ssa_expr(be.op()))
   {
+    return be;
+  }
+
+  // For non-constant offsets, decompose through the widest union member so
+  // that field sensitivity can process the resulting struct/array expression.
+  // This avoids materialising the full union as a flat bitvector in the SMT
+  // encoding.
+  if(!be.offset().is_constant())
+  {
+    const union_typet &union_type =
+      be.op().type().id() == ID_union_tag
+        ? ns.follow_tag(to_union_tag_type(be.op().type()))
+        : to_union_type(be.op().type());
+
+    const auto union_size = pointer_offset_bits(union_type, ns);
+    const auto widest = union_type.find_widest_union_component(ns);
+    if(
+      widest.has_value() && union_size.has_value() &&
+      widest->second == *union_size)
+    {
+      ssa_exprt tmp = to_ssa_expr(be.op());
+      bool was_l2 = !tmp.get_level_2().empty();
+      tmp.remove_level_2();
+      const member_exprt member{
+        tmp.get_original_expr(),
+        widest->first.get_name(),
+        widest->first.type()};
+      tmp.set_expression(member);
+
+      exprt member_ssa;
+      if(was_l2)
+        member_ssa = state.rename(std::move(tmp), ns).get();
+      else
+        member_ssa = std::move(tmp);
+
+      byte_extract_exprt new_be{
+        be.id(),
+        std::move(member_ssa),
+        be.offset(),
+        be.get_bits_per_byte(),
+        be.type()};
+      return apply(ns, state, std::move(new_be), write);
+    }
+
     return be;
   }
 

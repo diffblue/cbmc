@@ -1,0 +1,11 @@
+CORE dfcc-only smt-backend
+main.c
+--dfcc harness --replace-call-with-contract stub _ --slice-formula --z3
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Union with quantified contract postconditions and array-of-1 pointer
+indirection should not cause performance explosion.
+See GitHub issue diffblue/cbmc#8813.
