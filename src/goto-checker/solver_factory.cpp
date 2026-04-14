@@ -393,6 +393,19 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
   else if(options.get_option("arrays-uf") == "always")
     bv_pointers->unbounded_array = bv_pointerst::unbounded_arrayt::U_ALL;
 
+  // Set multiplier encoding
+  if(options.is_set("multiplier-encoding"))
+  {
+    const std::string &menc = options.get_option("multiplier-encoding");
+    if(menc == "comba")
+      bv_pointers->set_comba(true);
+    else if(menc == "dadda")
+      bv_pointers->set_dadda(true);
+    else if(menc == "wallace")
+      bv_pointers->set_wallace_tree(true);
+    // else: shift-add (default)
+  }
+
   set_decision_procedure_time_limit(*bv_pointers);
 
   // Set adder encoding if specified
@@ -447,6 +460,10 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
         bv_utilst::adder_encodingt::MINIMAL_RIPPLE);
     else if(enc == "comba")
       bv_pointers->set_comba(true);
+    else if(enc == "dadda")
+      bv_pointers->set_dadda(true);
+    else if(enc == "wallace")
+      bv_pointers->set_wallace_tree(true);
     else if(enc == "bk-carry-save")
     {
       bv_pointers->set_adder_encoding(
@@ -758,6 +775,8 @@ static void parse_sat_options(const cmdlinet &cmdline, optionst &options)
 
   if(cmdline.isset("adder-encoding"))
     options.set_option("adder-encoding", cmdline.get_value("adder-encoding"));
+  if(cmdline.isset("multiplier-encoding"))
+    options.set_option("multiplier-encoding", cmdline.get_value("multiplier-encoding"));
   if(cmdline.isset("sat-phase"))
     options.set_option("sat-phase", cmdline.get_value("sat-phase"));
 }

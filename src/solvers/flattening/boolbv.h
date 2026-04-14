@@ -51,9 +51,10 @@ class boolbvt:public arrayst
 public:
   void set_adder_encoding(bv_utilst::adder_encodingt e) { bv_utils.set_adder_encoding(e); }
   void set_multiplier_adder_encoding(bv_utilst::adder_encodingt e) { bv_utils.set_multiplier_adder_encoding(e); }
-  void set_wallace_tree(bool b) {}
+  void set_wallace_tree(bool b) { bv_utils.set_wallace_tree(b); }
   void set_carry_save(bool b) { bv_utils.set_carry_save(b); }
   void set_comba(bool b) { bv_utils.set_comba(b); }
+  void set_dadda(bool b) { bv_utils.set_dadda(b); }
   boolbvt(
     const namespacet &_ns,
     propt &_prop,

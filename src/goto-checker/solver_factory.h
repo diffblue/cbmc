@@ -114,6 +114,7 @@ void parse_solver_options(const cmdlinet &cmdline, optionst &options);
   "(xor-gauss)"                                                                \
   "(reorder-vars):"                                                             \
   "(adder-encoding):"                                                          \
+  "(multiplier-encoding):"                                                   \
   "(sat-phase):"                                                             \
   "(beautify)"                                                                 \
   "(dimacs)"                                                                   \

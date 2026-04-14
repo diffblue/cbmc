@@ -180,3 +180,49 @@ This is analogous to the g-only effect for adders (BVE catalyst)
 rather than the BK effect (glue-1 shift). The extra variables from
 Comba's popcount trees are BVE-friendly, similar to how g-only's
 AND gates are BVE-friendly for adders.
+
+### Full Multiplier × Adder Matrix (comm benchmark, CaDiCaL)
+
+| mult × adder | comm-9 | comm-11 | fact-20 |
+|-------------|--------|---------|---------|
+| shift-add+ripple | 1.97 | 57.5 | 0.05 |
+| shift-add+BK | 1.97 | 57.7 | 0.05 |
+| shift-add+g-only | 1.97 | 57.7 | 0.05 |
+| dadda+ripple | 0.53 | 14.5 | 0.04 |
+| **dadda+BK** | **T/O** | **T/O** | 0.05 |
+| **dadda+g-only** | **0.71** | **7.92** | 0.04 |
+| comba+ripple | 0.24 | 1.76 | 0.06 |
+| **comba+BK** | **T/O** | **T/O** | **T/O** |
+| **comba+g-only** | **0.16** | 2.97 | 0.07 |
+
+### Critical Findings
+
+1. **BK KILLS multiplier encodings.** Both Dadda+BK and Comba+BK
+   time out. BK's extra variables (from the adder inside the multiplier)
+   overwhelm the solver. This is the opposite of BK's effect on
+   standalone additions.
+
+2. **g-only helps Dadda significantly.** Dadda+g-only gives 7.92s on
+   comm-11 (vs 14.5s for Dadda+ripple = 1.8x speedup). The BVE
+   catalyst effect works inside the multiplier's Dadda tree additions.
+
+3. **g-only has mixed effects on Comba.** Comba+g-only is fastest at
+   BW=9 (0.16s vs 0.24s = 1.5x) but slower at BW=11 (2.97 vs 1.76).
+   Comba uses popcount trees (not adders), so g-only adds AND gates
+   to the FINAL addition only.
+
+4. **Adder encoding is irrelevant for shift-add.** The shift-add
+   multiplier uses its own multiplier_adder_encoding (RIPPLE_CARRY)
+   regardless of the --adder-encoding flag.
+
+5. **The best configuration depends on bitwidth:**
+   - BW=9: comba+g-only (0.16s)
+   - BW=11: dadda+g-only (7.92s) or comba+ripple (1.76s)
+   - Factoring: shift-add or dadda (0.04-0.05s)
+
+### Next Steps
+
+- Profile learned clause quality for dadda+g-only vs dadda+ripple
+- Test on distributivity and other benchmarks
+- Investigate why BK kills multiplier encodings
+- Test Karatsuba and Toom-Cook with adder variations

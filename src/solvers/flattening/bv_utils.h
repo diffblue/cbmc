@@ -240,10 +240,12 @@ protected:
   bool use_wallace_tree = false;
   bool use_carry_save = false;
   bool use_comba = false;
-  void set_wallace_tree(bool b) { use_wallace_tree = b; }
+  bool use_dadda = false;
 public:
   void set_carry_save(bool b) { use_carry_save = b; }
+  void set_wallace_tree(bool b) { use_wallace_tree = b; }
   void set_comba(bool b) { use_comba = b; }
+  void set_dadda(bool b) { use_dadda = b; }
 protected:
 
   /// Return the sum and carry-out when adding \p op0 and \p op1 under initial

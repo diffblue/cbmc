@@ -2752,6 +2752,8 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
       return wallace_tree(pps);
     if(use_comba)
       return comba_column_wise(pps);
+    if(use_dadda)
+      return dadda_tree(pps);
 
     // Use multiplier-specific adder encoding
     auto saved = adder_encoding;
@@ -3026,20 +3028,22 @@ bvt bv_utilst::unsigned_toom_cook_multiplier(const bvt &_op0, const bvt &_op1)
     return zeros(_op0.size());
   else
   {
-#ifdef WALLACE_TREE
-    return wallace_tree(c_ops);
-#elif defined(DADDA_TREE)
-    return dadda_tree(c_ops);
-#elif defined(COMBA)
-    return comba_column_wise(c_ops);
-#else
-    bvt product = c_ops.front();
-
-    for(auto it = std::next(c_ops.begin()); it != c_ops.end(); ++it)
-      product = add(product, *it);
-
-    return product;
-#endif
+    if(use_wallace_tree)
+      return wallace_tree(c_ops);
+    if(use_comba)
+      return comba_column_wise(c_ops);
+    if(use_dadda)
+      return dadda_tree(c_ops);
+    // Default: shift-add accumulation
+    {
+      auto saved = adder_encoding;
+      adder_encoding = multiplier_adder_encoding;
+      bvt product = c_ops.front();
+      for(auto it = std::next(c_ops.begin()); it != c_ops.end(); ++it)
+        product = add(product, *it);
+      adder_encoding = saved;
+      return product;
+    }
   }
 }
 
