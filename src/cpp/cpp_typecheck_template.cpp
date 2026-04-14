@@ -1079,6 +1079,35 @@ std::string cpp_typecheckt::function_template_identifier(
       identifier += "#" + id2string(constraint);
   }
 
+  // C++20: include requires clause concept names in the identifier
+  // so that overloads differing only in requires clauses get distinct
+  // symbols.
+  {
+    const auto &req_expr = template_type.find(ID_C_requires_clause);
+    if(req_expr.is_not_nil() && req_expr.id() != ID_nil)
+    {
+      std::string concepts;
+      std::function<void(const irept &)> visit = [&](const irept &node)
+      {
+        if(node.id() == ID_name)
+        {
+          const irep_idt &nm = node.get(ID_identifier);
+          if(!nm.empty())
+          {
+            if(!concepts.empty())
+              concepts += "&&";
+            concepts += id2string(nm);
+          }
+        }
+        for(const auto &sub : node.get_sub())
+          visit(sub);
+      };
+      visit(req_expr);
+      if(!concepts.empty())
+        identifier += "#req_" + concepts;
+    }
+  }
+
   return identifier;
 }
 
