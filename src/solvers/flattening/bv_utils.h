@@ -241,11 +241,13 @@ protected:
   bool use_carry_save = false;
   bool use_comba = false;
   bool use_dadda = false;
+  bool use_simple_full_adder = false;
 public:
   void set_carry_save(bool b) { use_carry_save = b; }
   void set_wallace_tree(bool b) { use_wallace_tree = b; }
   void set_comba(bool b) { use_comba = b; }
   void set_dadda(bool b) { use_dadda = b; }
+  void set_simple_full_adder(bool b) { use_simple_full_adder = b; }
 protected:
 
   /// Return the sum and carry-out when adding \p op0 and \p op1 under initial

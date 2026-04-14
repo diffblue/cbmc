@@ -424,6 +424,14 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
         bv_utilst::adder_encodingt::ADAPTIVE);
   }
 
+  // Set simple full adder for reduction trees
+  if(options.is_set("multiplier-adder"))
+  {
+    const std::string &ma = options.get_option("multiplier-adder");
+    if(ma == "simple-fa")
+      bv_pointers->set_simple_full_adder(true);
+  }
+
   set_decision_procedure_time_limit(*bv_pointers);
 
   // Set adder encoding if specified

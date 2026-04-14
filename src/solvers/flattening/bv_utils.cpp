@@ -175,6 +175,12 @@ literalt bv_utilst::full_adder(
   const literalt carry_in,
   literalt &carry_out)
 {
+  if(use_simple_full_adder)
+  {
+    carry_out = carry(a, b, carry_in);
+    return prop.lxor(prop.lxor(a, b), carry_in);
+  }
+
   #ifdef OPTIMAL_FULL_ADDER
   if(prop.has_set_to() && prop.cnf_handled_well())
   {

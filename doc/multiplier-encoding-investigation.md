@@ -289,3 +289,104 @@ comparison, giving an additional 1.8x on top of any multiplier encoding.
 Best configurations:
 - **comba + g-only(top)**: 0.16s at BW=9 (12x vs baseline)
 - **dadda + g-only(top)**: 7.84s at BW=11 (7x vs baseline)
+
+
+## Open Investigation Leads
+
+### Priority 1: Embedded adder encodings in reduction trees
+
+Dadda/Wallace/Comba call `full_adder()` directly (not through `adder()`).
+The 14-clause propagation-complete full_adder is used for every reduction
+step. Investigations:
+
+a. **Simpler full_adder inside reduction trees** — test whether fewer
+   clauses (not propagation-complete) works better, similar to how
+   simple-ripple helped popcount's multiplication.
+
+b. **g-only at the full_adder level** — add redundant AND(a,b) for each
+   full_adder call inside Dadda/Wallace. Requires modifying full_adder()
+   or adding a wrapper. Could trigger BVE cascades within the reduction tree.
+
+c. **Alternative popcount implementations for Comba** — Comba uses
+   parallel bit counting with AND/XOR trees. Test sorting networks or
+   different tree structures.
+
+d. **BK vs ripple for Dadda/Wallace final addition** — the carry-save
+   form produces two rows; the final addition IS routed through `adder()`.
+   Test BK, g-only, and other adder encodings for this final step only.
+
+### Priority 2: Radix multiplier adder encoding
+
+The radix-8 multiplier has THREE types of embedded operations:
+
+a. **Pre-computation additions** (`x*3 = x + x<<1`, `x*5`, `x*7`) —
+   these ARE routed through `adder()`, so BK/g-only/multiplier-adder
+   all apply. These are standalone additions where our adder insights
+   should directly help.
+
+b. **Partial product selection** — MUX/conditional logic to select
+   pre-computed multiples. The MUX structure we investigated for arrays.
+
+c. **Final accumulation** — uses Dadda/Wallace/Comba/shift-add reduction.
+   The multiplier encoding choice applies here.
+
+The radix multiplier is the ONE encoding where adder encoding choice
+could make a real difference (via the pre-computation additions).
+
+### Priority 3: Cross-benchmark validation
+
+Test all multiplier × adder combinations on:
+- Distributivity (`a*(b+c) == a*b + a*c`)
+- Factoring (find `p*q == n`)
+- Constant multiplication (`a*3 == a+a+a`)
+- Square identity (`(a+b)^2 == a^2 + 2ab + b^2`)
+- Real-world benchmarks (aws_mul_checked, etc.)
+
+### Priority 4: Karatsuba and Toom-Cook with new controls
+
+Test Karatsuba and Toom-Cook with:
+- Independent multiplier-adder encoding
+- g-only on top-level
+- Different sub-multiplier encodings (Karatsuba uses recursive multiplication)
+
+### Previously completed
+
+- Full multiplier × adder matrix (Phase 1)
+- Learned clause quality for all multiplier encodings
+- BVE elimination rates
+- Propagation depth analysis
+- Corrected understanding: multiplier-internal adder irrelevant for Dadda/Wallace/Comba
+- g-only benefit comes from top-level equality check
+
+## Priority 1a Results: Simple Full Adder Inside Reduction Trees
+
+| Config | comm-9 | comm-11 | comm-13 |
+|--------|--------|---------|---------|
+| dadda | 0.53 | 14.3 | T/O |
+| **dadda+simple-fa** | 0.56 | **8.06** | T/O |
+| wallace | 1.82 | 52.1 | T/O |
+| **wallace+simple-fa** | 1.27 | **48.0** | T/O |
+| **comba** | **0.24** | **1.75** | **8.17** |
+| comba+simple-fa | 0.31 | 2.02 | 10.6 |
+
+**Simple-fa helps Dadda (1.8x at BW=11)** by using fewer clauses per
+full adder in the reduction tree. The non-propagation-complete encoding
+works better inside Dadda because the reduction tree's structure doesn't
+require carry chain propagation completeness — each full adder is
+independent (carry-save form).
+
+**Simple-fa hurts Comba** because Comba uses popcount trees (not full
+adders for reduction). The simple-fa only affects the FINAL addition
+in Comba, where propagation completeness matters.
+
+### Best Combinations with g-only Top-Level
+
+| Config | comm-9 | comm-11 | comm-13 |
+|--------|--------|---------|---------|
+| comba+g-top | **0.16** | 2.94 | 12.1 |
+| **comba+sfa+g-top** | 0.35 | 3.24 | **6.08** |
+| dadda+g-top | 0.70 | 7.81 | T/O |
+
+**comba+sfa+g-top is best at BW=13** (6.08s). The simple-fa helps
+Comba's final addition at larger bitwidths where the carry chain
+is longer.
