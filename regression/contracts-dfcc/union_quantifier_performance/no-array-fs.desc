@@ -1,0 +1,12 @@
+THOROUGH dfcc-only smt-backend
+main.c
+--dfcc harness --replace-call-with-contract stub _ --slice-formula --z3 --no-array-field-sensitivity
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Without array field sensitivity the array-of-1 union is a single SSA
+symbol, so the WITH-update equation still materialises the full union
+as a bitvector (~45s vs ~1s for struct). The forall body is properly
+decomposed, but the remaining overhead makes this too slow for CORE.
