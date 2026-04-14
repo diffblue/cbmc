@@ -892,6 +892,11 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
 
   if(to.id() == ID_struct_tag)
   {
+    // Ensure the target type is complete before looking for constructors.
+    // For libc++ std::function, the type may be incomplete from a
+    // forward declaration and needs elaboration.
+    elaborate_class_template(to);
+
     std::string err_msg;
 
     if(cpp_is_pod(to))
