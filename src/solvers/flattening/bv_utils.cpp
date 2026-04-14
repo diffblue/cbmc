@@ -10,6 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 
+#include <climits>
+#include <iostream>
 #include <list>
 #include <map>
 #include <utility>
@@ -1798,7 +1800,8 @@ bvt bv_utilst::dadda_tree(const std::vector<bvt> &pps)
 // CaDiCaL and MiniSat2 as solvers.
 // #define RADIX_MULTIPLIER 8
 // #define USE_KARATSUBA
-#define USE_TOOM_COOK
+// #define USE_TOOM_COOK
+#define USE_SCHOENHAGE_STRASSEN
 #ifdef RADIX_MULTIPLIER
 #  define DADDA_TREE
 #endif
@@ -3030,6 +3033,382 @@ bvt bv_utilst::unsigned_toom_cook_multiplier(const bvt &_op0, const bvt &_op1)
   }
 }
 
+bvt bv_utilst::unsigned_schoenhage_strassen_multiplier(
+  const bvt &a,
+  const bvt &b)
+{
+  PRECONDITION(a.size() == b.size());
+
+  // Running examples: we want to multiple 213 by 15 as 8- or 9-bit integers.
+  // That is, we seek to multiply 11010101 (011010101) by 00001111 (000001111).
+  //                              ^bit 7 ^bit 0
+  // The expected result is 123 as both an 8-bit and 9-bit result (001111011).
+
+  // We compute the result modulo a Fermat number F_m = 2^2^m + 1. The maximum
+  // result when multiplying a by b (with their sizes being the same per the
+  // precondition above) is 2^2*op_size - 1.
+  // TODO: we don't actually need a full multiplier, a result with up to op_size
+  // bits is sufficient for our purposes.
+  // Hence we require 2^2^m >= 2^2*op_size, i.e., 2^m >= 2*op_size, or
+  // m >= log_2(op_size) + 1.
+  // For our examples m will be 4 and 5, respectively, with Fermat numbers
+  // 2^16 + 1 and 2^32 + 1.
+  const std::size_t m = address_bits(a.size()) + 1;
+  std::cerr << "m: " << m << std::endl;
+
+  // Extend bit width to 2^(m + 1) = op_size (rounded to next power of 2) * 4
+  // For our examples, extended bit widths will be 32 and 64.
+  PRECONDITION(sizeof(std::size_t) * CHAR_BIT > m + 1);
+  const std::size_t two_to_m_plus_1 = (std::size_t)1 << (m + 1);
+  std::cerr << "a: " << beautify(a) << std::endl;
+  std::cerr << "b: " << beautify(b) << std::endl;
+  bvt a_ext = zero_extension(a, two_to_m_plus_1);
+  bvt b_ext = zero_extension(b, two_to_m_plus_1);
+
+  // We need to distinguish whether m is even or odd
+  // m = 2n - 1 for odd m and m = 2n -2 for even m
+  // For our 8-bit inputs we have m = 4 and, therefore, n = 3.
+  // For our 9-bit inputs we have m = 5 and, therefore, n = 3.
+  const std::size_t n = m % 2 == 1 ? (m + 1) / 2 : m / 2 + 1;
+  std::cerr << "n: " << n << std::endl;
+
+  // For even m create 2^n (of 2^(n - 1) bits) chunks from a_ext, b_ext (for our
+  // 8-bit inputs we have chunk_size = 4 with num_chunks = 8).
+  // For odd m create 2^(n + 1) chunks (of 2^(n - 1) bits) from a_ext, b_ext;
+  // a_0 will be bit positions 0 through to 2^(n - 1) - 1, a_{2^(n + 1) - 1}
+  // will be bit positions up to 2^(m + 1) - 1.
+  // For our 9-bit inputs we have chunk_size = 4 with num_chunks = 16
+  const std::size_t chunk_size = (std::size_t)1 << (n - 1);
+  const std::size_t num_chunks = two_to_m_plus_1 / chunk_size;
+  CHECK_RETURN(
+    num_chunks == m % 2 ? (std::size_t)1 << (n + 1) : (std::size_t)1 << n);
+  std::cerr << "chunk_size: " << chunk_size << std::endl;
+  std::cerr << "num_chunks: " << num_chunks << std::endl;
+  std::cerr << "address_bits(num_chunks): " << address_bits(num_chunks)
+            << std::endl;
+
+  std::vector<bvt> a_rho, b_sigma;
+  a_rho.reserve(num_chunks);
+  b_sigma.reserve(num_chunks);
+  for(std::size_t i = 0; i < num_chunks; ++i)
+  {
+    a_rho.emplace_back(
+      a_ext.begin() + i * chunk_size, a_ext.begin() + (i + 1) * chunk_size);
+    b_sigma.emplace_back(
+      b_ext.begin() + i * chunk_size, b_ext.begin() + (i + 1) * chunk_size);
+  }
+  // For our example we now have
+  // a_rho = [ 0101, 1101, 0000, ..., 0000 ]
+  // b_sigma = [ 1111, 0000, 0000, ..., 0000 ]
+
+  // Compute gamma_r = \sum_{i + j = r} a_i * b_j with bit width 3n + 5 with r
+  // ranging from 0 to 2^(n + 2) - 1 (to 2^(n + 1) - 1 when m is even).
+  // For our example this will be additions/multiplications of width 14
+  // (implying that school book multiplication would be cheaper, as is the case
+  // for all operand lengths below 32 bits).
+  // TODO: all subsequent steps seem to be using mod 2^(n + 2) (mod 2^(n + 1)
+  // when m is even), so it may be sufficient to do this over n + 2 bits instead
+  // of 3n + 5.
+  std::vector<bvt> gamma_tau{num_chunks * 2, zeros(3 * n + 5)};
+  for(std::size_t tau = 0; tau < num_chunks * 2; ++tau)
+  {
+    for(std::size_t rho = tau < num_chunks ? 0 : tau - num_chunks + 1;
+        rho < num_chunks && rho <= tau;
+        ++rho)
+    {
+      const std::size_t sigma = tau - rho;
+      gamma_tau[tau] = add(
+        gamma_tau[tau],
+        unsigned_multiplier(
+          zero_extension(a_rho[rho], 3 * n + 5),
+          zero_extension(b_sigma[sigma], 3 * n + 5)));
+    }
+  }
+  // For our example we obtain
+  // gamma_tau = [ 00 0000 0100 1011, 00 0000 1100 0011, 0.... ]
+
+  // Compute c_tau over bit width n + 2 (n + 1 when m is even) as gamma_tau +
+  // gamma_{tau + 2^(n + 1)} (gamma_{tau + 2^n} when m is even).
+  std::vector<bvt> c_tau;
+  c_tau.reserve(num_chunks);
+  for(std::size_t tau = 0; tau < num_chunks; ++tau)
+  {
+    c_tau.push_back(add(gamma_tau[tau], gamma_tau[tau + num_chunks]));
+    CHECK_RETURN(c_tau.back().size() >= address_bits(num_chunks) + 1);
+    c_tau.back().resize(address_bits(num_chunks) + 1);
+    std::cerr << "c_tau[" << tau << "]: " << beautify(c_tau[tau]) << std::endl;
+  }
+  // For our example we obtain
+  // c_tau = [ 01011, 00011, 0... ]
+
+  // Compute z_j = c_j - c_{j + 2^n} (mod 2^(n + 2)) (mod 2^(n + 1) and c_{j +
+  // 2^(n - 1)} when m is even)
+  std::vector<bvt> z_j;
+  z_j.reserve(num_chunks / 2);
+  for(std::size_t j = 0; j < num_chunks / 2; ++j)
+    z_j.push_back(sub(c_tau[j], c_tau[j + num_chunks / 2]));
+  // For our example we have z_j = c_tau as all elements beyond the second one
+  // are zeros.
+
+  // Compute z_j mod F_n using number-theoretic transform with omega = 2 for
+  // odd m and omega = 4 for even m.
+  // For our examples we have F_n = 2^2^n + 1 = 257 with 2 being a 2^(n + 1)-th
+  // root of unity, i.e., 2^16 \equiv 1 (mod 257) (with 4 being a 2^n-root of
+  // unity, i.e., 4^8 \equiv 1 (mod 257). The DFT table for omega = 2 would be
+  // 1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1
+  // 1   2   4   8  16  32  64 128  -1  -2  -4  -8 -16 -32 -64 -128
+  // 1   4  16  64  -1  -4 -16 -64   1   4  16  64  -1  -4 -16 -64
+  // 1   8  64  -2 -16 -128  4  32  -1  -8 -64   2  16 128  -4 -32
+  // 1  16  -1 -16   1  16  -1 -16   1  16  -1 -16   1  16  -1 -16
+  // 1  32  -4 -128 16  -2 -64   8  -1 -32   4 128 -16   2  64  -8
+  // 1  64 -16   4  -1 -64  16  -2   1  64 -16   4  -1 -64  16  -4
+  // 1 128 -64  32 -16   8  -2   2  -1 -128 64 -32  16  -8   4  -2
+  // 1  -1   1  -1   1  -1   1  -1   1  -1   1  -1   1  -1   1  -1
+  // 1  -2   4  -8  16 -32  64 -128 -1   2  -4   8 -16  32 -64 128
+  // 1  -4  16 -64  -1   4 -16  64   1  -4  16 -64  -1   4 -16  64
+  // 1  -8  64   2 -16 128   4 -32  -1   8 -64  -2  16 -128 -4  32
+  // 1 -16  -1  16   1 -16  -1  16   1 -16  -1  16   1 -16  -1  16
+  // 1 -32  -4 128  16   2 -64  -8  -1  32   4 -128 -16 -2  64   8
+  // 1 -64 -16  -4  -1  64  16   4   1 -64 -16  -4  -1  64  16   4
+  // 1 -128 -64 -32 -16 -8  -4  -2  -1 128  64  32  16   8   4   2
+  // For fast NTT (less than O(n^2)) use Cooley-Tukey for NTT, then perform
+  // element-wise multiplication, and finally apply Gentleman-Sande for
+  // inverse NTT.
+
+  // Addition mod F_n with overflow
+  auto cyclic_add = [this](const bvt &x, const bvt &y)
+  {
+    PRECONDITION(x.size() == y.size());
+
+    auto result_with_overflow = adder(x, y, const_literal(false));
+    if(result_with_overflow.second.is_false())
+      return result_with_overflow.first;
+
+    return add(
+      result_with_overflow.first,
+      zero_extension(bvt{1, result_with_overflow.second}, x.size()));
+  };
+
+  // Compute NTT
+  std::vector<bvt> a_j, b_j;
+  a_j.reserve(num_chunks);
+  b_j.reserve(num_chunks);
+  for(std::size_t j = 0; j < num_chunks; ++j)
+  {
+    // All NTT steps are mod F_n, i.e., mod 2^2^n + 1, which implies we need
+    // 2^(n + 1) bits to represent numbers
+    a_j.push_back(zero_extension(a_rho[j], (std::size_t)1 << (n + 1)));
+    b_j.push_back(zero_extension(b_sigma[j], (std::size_t)1 << (n + 1)));
+  }
+  // Use in-place iterative Cooley-Tukey
+  std::vector<bvt> Aa, Ab;
+  Aa.reserve(num_chunks);
+  Ab.reserve(num_chunks);
+  // In the following we use k represented as bits k_{n - 1}...k_0 and
+  // j_0...j_{n - 1}, i.e., the most-significant bit of k is k_{n - 1} while the
+  // MSB for j is j_0.
+  for(std::size_t k = 0; k < num_chunks; ++k)
+  {
+    // reverse n (n - 1 if m is even) bits of k
+    std::size_t j = 0;
+    for(std::size_t nu = 0; nu < address_bits(num_chunks); ++nu)
+    {
+      j <<= 1; // the initial shift has no effect
+      j |= (k & (1 << nu)) >> nu;
+    }
+    Aa.push_back(a_j[j]);
+    Ab.push_back(b_j[j]);
+  }
+  for(std::size_t nu = 1; nu <= address_bits(num_chunks); ++nu)
+  {
+    const std::size_t bit_nu = (std::size_t)1 << (nu - 1);
+    std::size_t bits_up_to_nu = 0;
+    for(std::size_t i = 0; i < nu - 1; ++i)
+      bits_up_to_nu |= 1 << i;
+
+    // we only need odd ones
+    for(std::size_t k = 1; k < num_chunks; k += 2)
+    {
+      if((k & bit_nu) == 0)
+        continue;
+
+      bvt Aa_nu_bit_is_zero = Aa[k & ~bit_nu];
+      bvt Ab_nu_bit_is_zero = Ab[k & ~bit_nu];
+
+      const std::size_t chi = (k & bits_up_to_nu)
+                              << (address_bits(num_chunks) - 1 - (nu - 1));
+      const std::size_t omega = m % 2 == 1 ? 2 : 4;
+      const std::size_t shift_dist = chi * omega / 2;
+
+      if(nu > 1) // no need to update even indices
+      {
+        Aa[k & ~bit_nu] = cyclic_add(
+          Aa_nu_bit_is_zero, shift(Aa[k], shiftt::ROTATE_LEFT, shift_dist));
+        Ab[k & ~bit_nu] = cyclic_add(
+          Ab_nu_bit_is_zero, shift(Ab[k], shiftt::ROTATE_LEFT, shift_dist));
+        std::cerr << "Aa[" << nu << "](" << (k & ~bit_nu)
+                  << "): " << beautify(Aa[k & ~bit_nu]) << std::endl;
+#if 0
+        std::cerr << "Ab[" << nu << "](" << (k & ~bit_nu)
+                  << "): " << beautify(Ab[k & ~bit_nu]) << std::endl;
+#endif
+      }
+
+      // subtraction mod F_n is addition of subtrahend cyclically shifted 2^n
+      // positions to the left
+      const std::size_t shift_dist_for_sub = shift_dist + ((std::size_t)1 << n);
+      Aa[k] = cyclic_add(
+        Aa_nu_bit_is_zero,
+        shift(Aa[k], shiftt::ROTATE_LEFT, shift_dist_for_sub));
+      Ab[k] = cyclic_add(
+        Ab_nu_bit_is_zero,
+        shift(Ab[k], shiftt::ROTATE_LEFT, shift_dist_for_sub));
+      std::cerr << "Aa[" << nu << "](" << k << "): " << beautify(Aa[k])
+                << std::endl;
+#if 0
+      std::cerr << "Ab[" << nu << "](" << k << "): " << beautify(Ab[k])
+                << std::endl;
+#endif
+    }
+  }
+
+  // Either compute u - v (if u > v), else u - v + 2^2^n + 1
+  auto reduce_to_mod_F_n = [this](const bvt &x)
+  {
+    const std::size_t two_to_power_of_n = x.size() / 2;
+    // std::cerr << "two_to_power_of_n: " << two_to_power_of_n << std::endl;
+    const bvt u =
+      zero_extension(bvt{x.begin(), x.begin() + two_to_power_of_n}, x.size());
+    // std::cerr << "u: " << beautify(u) << std::endl;
+    const bvt v =
+      zero_extension(bvt{x.begin() + two_to_power_of_n, x.end()}, x.size());
+    // std::cerr << "v: " << beautify(v) << std::endl;
+    bvt two_to_power_of_two_to_power_of_n_plus_1 = build_constant(1, x.size());
+    two_to_power_of_two_to_power_of_n_plus_1[two_to_power_of_n] =
+      const_literal(true);
+    const bvt u_ext = select(
+      unsigned_less_than(u, v),
+      add(u, two_to_power_of_two_to_power_of_n_plus_1),
+      u);
+    // std::cerr << "u_ext: " << beautify(u_ext) << std::endl;
+    return sub(u_ext, v);
+  };
+
+  std::vector<bvt> a_hat_k{num_chunks, bvt{}}, b_hat_k{num_chunks, bvt{}};
+  // Reduce by F_n
+  for(std::size_t j = 1; j < num_chunks; j += 2)
+  {
+    a_hat_k[j] = reduce_to_mod_F_n(Aa[j]);
+    std::cerr << "a_hat_k[" << j << "]: " << beautify(a_hat_k[j]) << std::endl;
+    b_hat_k[j] = reduce_to_mod_F_n(Ab[j]);
+    std::cerr << "b_hat_k[" << j << "]: " << beautify(b_hat_k[j]) << std::endl;
+  }
+
+  // Compute point-wise multiplication
+  std::vector<bvt> c_hat_k{num_chunks, bvt{}};
+  for(std::size_t j = 1; j < num_chunks; j += 2)
+  {
+    c_hat_k[j] = unsigned_multiplier(a_hat_k[j], b_hat_k[j]);
+    std::cerr << "c_hat_k[" << j << "]: " << beautify(c_hat_k[j]) << std::endl;
+  }
+
+  // Apply inverse NTT
+  for(std::size_t nu = address_bits(num_chunks) - 1; nu > 0; --nu)
+  {
+    const std::size_t bit_nu_plus_1 = (std::size_t)1 << nu;
+    std::size_t bits_up_to_nu_plus_1 = 0;
+    for(std::size_t i = 0; i < nu; ++i)
+      bits_up_to_nu_plus_1 |= 1 << i;
+
+    // we only need odd ones
+    for(std::size_t k = 1; k < num_chunks; k += 2)
+    {
+      if((k & bit_nu_plus_1) == 0)
+        continue;
+
+      bvt c_hat_k_nu_plus_1_bit_is_zero = c_hat_k[k & ~bit_nu_plus_1];
+
+      c_hat_k[k & ~bit_nu_plus_1] = shift(
+        cyclic_add(c_hat_k_nu_plus_1_bit_is_zero, c_hat_k[k]),
+        shiftt::ROTATE_RIGHT,
+        1);
+      std::cerr << "c_hat_k[" << nu << "](" << (k & ~bit_nu_plus_1)
+                << "): " << beautify(c_hat_k[k & ~bit_nu_plus_1]) << std::endl;
+
+      const std::size_t chi = (k & bits_up_to_nu_plus_1)
+                              << (address_bits(num_chunks) - 1 - nu);
+      const std::size_t omega = m % 2 == 1 ? 2 : 4;
+      const std::size_t shift_dist = chi * omega / 2 + 1;
+      std::cerr << "SHIFT: " << shift_dist << std::endl;
+
+      c_hat_k[k] = shift(
+        cyclic_add(
+          c_hat_k_nu_plus_1_bit_is_zero,
+          shift(c_hat_k[k], shiftt::ROTATE_LEFT, (std::size_t)1 << n)),
+        shiftt::ROTATE_RIGHT,
+        shift_dist);
+      std::cerr << "c_hat_k[" << nu << "](" << k
+                << "): " << beautify(c_hat_k[k]) << std::endl;
+    }
+  }
+  // Reduce by F_n
+  std::vector<bvt> z_j_mod_F_n;
+  z_j_mod_F_n.reserve(num_chunks / 2);
+  for(std::size_t j = 0; j < num_chunks / 2; ++j)
+  {
+    // reverse n - 1 (n - 2 if m is even) bits of j
+    std::size_t k = 0;
+    for(std::size_t nu = 0; nu < address_bits(num_chunks) - 1; ++nu)
+    {
+      k |= (j & (1 << nu)) >> nu;
+      k <<= 1;
+    }
+    k |= 1;
+    std::cerr << "j " << j << " maps to " << k << std::endl;
+    z_j_mod_F_n.push_back(reduce_to_mod_F_n(c_hat_k[k]));
+    std::cerr << "z_j_mod_F_n[" << j << "]: " << beautify(z_j_mod_F_n[j])
+              << std::endl;
+  }
+
+  // Compute final coefficients as eta + delta * F_n where delta = eta - xi for
+  // eta z_j and xi c_hat_k.
+  for(std::size_t j = 0; j < num_chunks / 2; ++j)
+  {
+    bvt eta = z_j_mod_F_n[j];
+    std::cerr << "eta[" << j << "]: " << beautify(eta) << std::endl;
+    bvt xi = z_j[j];
+    std::cerr << "xi[" << j << "]: " << beautify(xi) << std::endl;
+    // TODO: couldn't we do this over just xi.size() bits instead?
+    bvt delta = sub(eta, zero_extension(xi, eta.size()));
+    CHECK_RETURN(delta.size() >= xi.size());
+    delta.resize(xi.size());
+    std::cerr << "delta[" << j << "]: " << beautify(delta) << std::endl;
+    z_j[j] = add(
+      zero_extension(eta, two_to_m_plus_1),
+      add(
+        shift(
+          zero_extension(delta, two_to_m_plus_1),
+          shiftt::SHIFT_LEFT,
+          (std::size_t)1 << n),
+        zero_extension(delta, two_to_m_plus_1)));
+    std::cerr << "z_j[" << j << "]: " << beautify(z_j[j]) << std::endl;
+  }
+
+  bvt result = zeros(two_to_m_plus_1);
+  for(std::size_t j = 0; j < num_chunks / 2; ++j)
+  {
+    if(chunk_size * j >= a.size())
+      break;
+    result = add(result, shift(z_j[j], shiftt::SHIFT_LEFT, chunk_size * j));
+  }
+  std::cerr << "result: " << beautify(result) << std::endl;
+  CHECK_RETURN(result.size() >= a.size());
+  result.resize(a.size());
+  std::cerr << "result resized: " << beautify(result) << std::endl;
+
+  return result;
+}
+
 bvt bv_utilst::unsigned_multiplier_no_overflow(
   const bvt &op0,
   const bvt &op1)
@@ -3088,6 +3467,8 @@ bvt bv_utilst::signed_multiplier(const bvt &op0, const bvt &op1)
   bvt result = unsigned_karatsuba_multiplier(neg0, neg1);
 #elif defined(USE_TOOM_COOK)
   bvt result = unsigned_toom_cook_multiplier(neg0, neg1);
+#elif defined(USE_SCHOENHAGE_STRASSEN)
+  bvt result = unsigned_schoenhage_strassen_multiplier(neg0, neg1);
 #else
   bvt result=unsigned_multiplier(neg0, neg1);
 #endif
@@ -3164,6 +3545,9 @@ bvt bv_utilst::multiplier(
 #elif defined(USE_TOOM_COOK)
   case representationt::UNSIGNED:
     return unsigned_toom_cook_multiplier(op0, op1);
+#elif defined(USE_SCHOENHAGE_STRASSEN)
+  case representationt::UNSIGNED:
+    return unsigned_schoenhage_strassen_multiplier(op0, op1);
 #else
   case representationt::UNSIGNED: return unsigned_multiplier(op0, op1);
 #endif
