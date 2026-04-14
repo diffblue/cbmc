@@ -1326,6 +1326,26 @@ const symbolt &cpp_typecheckt::instantiate_template(
     cpp_scopes.go_to(sub_scope);
 
     // a class template
+    // Apply template map to static member initializers in the class
+    // body to substitute non-type template parameters before processing.
+    if(new_decl.type().id() == ID_struct || new_decl.type().id() == ID_union)
+    {
+      irept &body = new_decl.type().add(ID_body);
+      for(auto &member : body.get_sub())
+      {
+        if(member.id() != ID_cpp_declaration)
+          continue;
+        for(auto &sub : member.get_sub())
+        {
+          if(sub.id() == ID_cpp_declarator)
+          {
+            exprt &val = static_cast<exprt &>(sub.add(ID_value));
+            if(val.is_not_nil())
+              template_map.apply(val);
+          }
+        }
+      }
+    }
     convert_non_template_declaration(new_decl);
 
     // Propagate template info to the class symbol so that member
