@@ -2476,6 +2476,110 @@ exprt cpp_typecheck_resolvet::resolve(
   {
     new_identifiers = identifiers;
 
+    // C++20 concept subsumption: before instantiation, filter out
+    // templates subsumed by more constrained ones.
+    if(new_identifiers.size() > 1)
+    {
+      auto get_tmpl_concepts = [&](const exprt &id) -> std::string
+      {
+        irep_idt sym_id = id.get(ID_identifier);
+        if(sym_id.empty())
+          return {};
+        const auto *sym = cpp_typecheck.symbol_table.lookup(sym_id);
+        if(!sym || !sym->type.get_bool(ID_is_template))
+          return {};
+        const cpp_declarationt &decl = to_cpp_declaration(sym->type);
+        for(const auto &p : decl.template_type().template_parameters())
+        {
+          const irep_idt &cc = p.get("#C_concept_constraint");
+          if(!cc.empty())
+            return id2string(cc);
+        }
+        const auto &req_expr = decl.template_type().find(ID_C_requires_clause);
+        if(req_expr.is_not_nil() && req_expr.id() != ID_nil)
+        {
+          std::string concepts;
+          std::function<void(const irept &)> visit = [&](const irept &node)
+          {
+            if(node.id() == ID_name)
+            {
+              const irep_idt &nm = node.get(ID_identifier);
+              if(!nm.empty())
+              {
+                if(!concepts.empty())
+                  concepts += "&&";
+                concepts += id2string(nm);
+              }
+            }
+            for(const auto &sub : node.get_sub())
+              visit(sub);
+          };
+          visit(req_expr);
+          return concepts;
+        }
+        return {};
+      };
+
+      auto concept_subsumes =
+        [&](const std::string &cj, const std::string &ci) -> bool
+      {
+        if(cj == ci)
+          return false;
+        if(cj.find(ci) != std::string::npos)
+          return true;
+        // Look up concept template definition
+        for(const auto &entry : cpp_typecheck.symbol_table)
+        {
+          if(
+            id2string(entry.second.base_name) != cj ||
+            !entry.second.type.get_bool(ID_is_template))
+            continue;
+          bool found = false;
+          std::function<void(const irept &)> search = [&](const irept &node)
+          {
+            if(found)
+              return;
+            if(node.id() == ID_name && id2string(node.get(ID_identifier)) == ci)
+              found = true;
+            for(const auto &sub : node.get_sub())
+              search(sub);
+            for(const auto &named : node.get_named_sub())
+              search(named.second);
+          };
+          search(entry.second.type);
+          if(found)
+            return true;
+        }
+        return false;
+      };
+
+      std::vector<std::string> constraints;
+      for(const auto &id : new_identifiers)
+        constraints.push_back(get_tmpl_concepts(id));
+
+      std::vector<bool> subsumed(new_identifiers.size(), false);
+      for(std::size_t i = 0; i < constraints.size(); ++i)
+      {
+        if(constraints[i].empty())
+          continue;
+        for(std::size_t j = 0; j < constraints.size(); ++j)
+        {
+          if(i == j || constraints[j].empty())
+            continue;
+          if(concept_subsumes(constraints[j], constraints[i]))
+            subsumed[i] = true;
+        }
+      }
+
+      resolve_identifierst filtered;
+      auto it = new_identifiers.begin();
+      for(std::size_t i = 0; i < new_identifiers.size(); ++i, ++it)
+        if(!subsumed[i])
+          filtered.push_back(*it);
+      if(!filtered.empty() && filtered.size() < new_identifiers.size())
+        new_identifiers = filtered;
+    }
+
     {
       guess_function_template_args(new_identifiers, fargs);
 

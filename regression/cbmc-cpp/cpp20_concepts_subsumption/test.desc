@@ -1,11 +1,7 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
-Phase 3.1 of CONCEPTS_PLAN.md: constraint subsumption.
-When two overloads both match, the more constrained one should
-be selected. Requires constraint normalization and implication
-checking.
