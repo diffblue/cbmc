@@ -14,6 +14,33 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 #include <utility>
 
+static std::string beautify(const bvt &bv)
+{
+  for(const auto &v : bv)
+  {
+    if(!v.is_constant())
+    {
+      std::ostringstream oss;
+      oss << bv;
+      return oss.str();
+    }
+  }
+
+  std::string result;
+  std::size_t number = 0;
+  for(std::size_t i = 0; i < bv.size(); ++i)
+  {
+    if(result.size() % 5 == 4)
+      result = std::string(" ") + result;
+    result = std::string(bv[i].is_false() ? "0" : "1") + result;
+
+    if(bv[i].is_true())
+      number += 1 << i;
+  }
+
+  return result + " (" + std::to_string(number) + ")";
+}
+
 bvt bv_utilst::build_constant(const mp_integer &n, std::size_t width)
 {
   std::string n_str=integer2binary(n, width);
