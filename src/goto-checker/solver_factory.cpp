@@ -445,6 +445,8 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
     else if(enc == "minimal-ripple")
       bv_pointers->set_adder_encoding(
         bv_utilst::adder_encodingt::MINIMAL_RIPPLE);
+    else if(enc == "comba")
+      bv_pointers->set_comba(true);
     else if(enc == "bk-carry-save")
     {
       bv_pointers->set_adder_encoding(

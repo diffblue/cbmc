@@ -2750,7 +2750,7 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
   {
     if(use_wallace_tree)
       return wallace_tree(pps);
-    if(use_carry_save)
+    if(use_comba)
       return comba_column_wise(pps);
 
     // Use multiplier-specific adder encoding

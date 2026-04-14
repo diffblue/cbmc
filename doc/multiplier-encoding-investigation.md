@@ -136,3 +136,47 @@ even though the cross-column dependencies remain.
 ### Next: Profile Comba encoding
 Need to build the multiplier encoding branch and compare Comba's
 learned clause quality with baseline.
+
+## Phase 1: Comba Profiling Results
+
+### Performance (commutativity benchmark)
+
+| BW | Baseline | Comba | Speedup |
+|----|----------|-------|---------|
+| 7 | 0.12s | 0.07s | 1.7x |
+| 9 | 2.01s | 0.24s | **8.4x** |
+| 11 | 61.3s | 1.76s | **35x** |
+| 13 | >120s | — | — |
+
+### Learned Clause Quality (BW=9, commutativity)
+
+| Metric | Baseline | Comba | Ratio |
+|--------|----------|-------|-------|
+| Time | 1.94s | 0.24s | 8.1x faster |
+| Variables | 427 | 627 | 1.47x more |
+| **Conflicts** | **88,733** | **10,831** | **8.2x fewer** |
+| Avg clause size | 32.7 | 20.6 | 37% smaller |
+| Avg glue | 7.9 | 6.2 | 22% lower |
+| Glue ≤ 1 | 0% | 2% | Slight improvement |
+| Props/dec (first) | 36 | 47 | 30% deeper |
+
+### Analysis
+
+Comba's mechanism is DIFFERENT from BK's:
+- **BK for adders:** 95% glue-1 → 32x fewer conflicts (dramatic shift)
+- **Comba for multipliers:** 2% glue-1 → 8x fewer conflicts (gradual improvement)
+
+Comba doesn't achieve the glue-1 phenomenon. Instead, it produces
+**moderately better** learned clauses: 37% smaller, 22% lower glue.
+The improvement is quantitative (better clause quality across the
+distribution) rather than qualitative (shift to a different regime).
+
+The popcount tree in Comba creates balanced column reduction that:
+1. Produces 30% deeper initial BCP cascades (47 vs 36 props/dec)
+2. Creates more structured variable dependencies
+3. Enables BVE to eliminate more intermediate variables
+
+This is analogous to the g-only effect for adders (BVE catalyst)
+rather than the BK effect (glue-1 shift). The extra variables from
+Comba's popcount trees are BVE-friendly, similar to how g-only's
+AND gates are BVE-friendly for adders.
