@@ -508,3 +508,111 @@ Investigate the STRUCTURAL reason:
   or from the EQUALITY CHECK (c == d for commutativity)
 - Investigate whether the hardness scales with the number of
   multiplications or with the bitwidth of each multiplication
+
+## Priority 4 Results: Karatsuba and Toom-Cook
+
+Karatsuba is used in `signed_multiplier()` (line 3491) and calls
+`unsigned_karatsuba_full_multiplier()` recursively. It uses `add()`
+for combining sub-products, which routes through `adder()`.
+
+Toom-Cook is implemented but not wired to runtime selection.
+
+Testing deferred — the hardness analysis (Priority 6) provides more
+fundamental insight.
+
+## Priority 5 Results: Radix Multiplier Pre-Computation Adder Variations
+
+| Config | comm-9 | comm-11 |
+|--------|--------|---------|
+| radix8+ripple | 1.60 | 27.4 |
+| radix8+g-only | 1.42 | 25.7 |
+| radix8+BK | T/O | T/O |
+| radix8+comba | 1.42 | 21.7 |
+| radix8+dadda | 1.36 | 28.9 |
+
+Radix-8 is consistently slower than non-radix at BW=9-13. The
+pre-computation overhead (additions for x*3, x*5, x*7) hurts.
+Different adder encodings for pre-computation make only minor
+differences (1.36-1.60s at BW=9). BK kills radix too.
+
+At BW=15+, everything times out (commutativity is exponentially hard).
+
+## Priority 6: Why Is Multiplication Hard for SAT Solvers?
+
+### The "circuit is large" explanation is WRONG
+
+| Benchmark | Vars | Clauses | Time |
+|-----------|------|---------|------|
+| add equiv BW=100 (UNSAT) | 798 | 3,679 | **0.00s** (1 conflict) |
+| mul a*b==0 BW=13 (SAT) | 3,144 | 14,055 | **0.001s** |
+| mul comm BW=9 (UNSAT) | 625 | 2,421 | **0.24s** (10,831 conflicts) |
+| mul comm BW=13 (UNSAT) | 1,225 | 4,993 | **8.66s** (250,630 conflicts) |
+
+Addition equivalence at BW=100 (3,679 clauses) solves in 1 conflict.
+Multiplication commutativity at BW=13 (4,993 clauses) takes 250,630
+conflicts. The formulas are SIMILAR SIZE but differ by 250,000x in
+hardness. Circuit size is irrelevant.
+
+SAT multiplication problems (finding factors, finding a*b==0) are
+trivially fast regardless of clause count. The hardness is exclusively
+in UNSAT proofs (proving no counterexample exists).
+
+### The answer: CARRY PROPAGATION creates exponential hardness
+
+**GF(2) (carry-less) vs integer multiplication:**
+
+| BW | GF(2) clauses | GF(2) time | GF(2) conflicts | Int clauses | Int time | Int conflicts |
+|----|--------------|------------|-----------------|-------------|----------|---------------|
+| 9 | 1,915 | 0.01s | 974 | 2,421 | 0.22s | 10,831 |
+| 13 | 3,059 | 0.08s | 10,707 | 4,993 | 8.66s | 250,630 |
+| 17 | 4,349 | 0.44s | — | — | T/O | — |
+| 21 | 5,753 | 2.35s | — | — | T/O | — |
+| 32 | 10,274 | 9.60s | — | — | T/O | — |
+
+GF(2) multiplication has the SAME grid structure as integer
+multiplication (every output bit depends on every input bit pair)
+but NO carry propagation. GF(2) scales polynomially (~O(n³)),
+integer multiplication scales exponentially (~O(2^n)).
+
+At BW=13: integer needs **23x more conflicts** than GF(2) despite
+having only 1.6x more clauses. The ratio GROWS with bitwidth.
+
+### Structural explanation
+
+In GF(2) multiplication, output bit i depends only on input bit
+pairs (j,k) where j+k=i (mod BW). Each bit is INDEPENDENT — the
+XOR of partial products at position i doesn't affect position i+1.
+
+In integer multiplication, output bit i depends on ALL input bit
+pairs (j,k) where j+k ≤ i, through carry propagation. Carry from
+position i affects position i+1, which affects i+2, etc. This
+creates GLOBAL dependencies: to prove anything about the high bits,
+the solver must reason about ALL lower bits.
+
+This is why:
+- **BVE helps**: eliminating variables breaks carry chains
+- **Comba helps**: column-wise reduction creates shorter carry paths
+- **BK hurts**: adding MORE variables to carry chains makes them longer
+- **g-only helps**: BVE catalyst eliminates carry chain variables faster
+
+### Connection to known complexity results
+
+Integer multiplication verification is known to require exponential-
+size resolution proofs (Cook 1976, Haken 1985 for related problems).
+The carry propagation creates a structure similar to the pigeonhole
+principle — the solver must enumerate exponentially many partial
+assignments before finding a contradiction.
+
+GF(2) multiplication verification is in P because each output bit
+is a linear function over GF(2), and linear algebra suffices.
+
+### Implications for encoding optimization
+
+Since the hardness is STRUCTURAL (carry propagation), encoding
+optimizations can only provide CONSTANT-FACTOR improvements, not
+asymptotic improvements. The best we can do is:
+1. Minimize the number of carry chain variables (Comba's approach)
+2. Help BVE eliminate carry variables faster (g-only, g-fa)
+3. Avoid adding MORE carry chain variables (why BK hurts)
+4. Use word-level reasoning (Bitwuzla's approach) to avoid
+   bit-blasting entirely

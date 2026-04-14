@@ -56,6 +56,7 @@ public:
   void set_comba(bool b) { bv_utils.set_comba(b); }
   void set_simple_full_adder(bool b) { bv_utils.set_simple_full_adder(b); }
   void set_fa_g_only(bool b) { bv_utils.set_fa_g_only(b); }
+  void set_radix_multiplier(int r) { bv_utils.set_radix_multiplier(r); }
   void set_dadda(bool b) { bv_utils.set_dadda(b); }
   boolbvt(
     const namespacet &_ns,

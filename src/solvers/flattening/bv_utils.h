@@ -243,6 +243,7 @@ protected:
   bool use_dadda = false;
   bool use_simple_full_adder = false;
   bool use_fa_g_only = false;
+  int radix_multiplier = 0; // 0=disabled, 4, 8, 16
 public:
   void set_carry_save(bool b) { use_carry_save = b; }
   void set_wallace_tree(bool b) { use_wallace_tree = b; }
@@ -250,6 +251,7 @@ public:
   void set_dadda(bool b) { use_dadda = b; }
   void set_simple_full_adder(bool b) { use_simple_full_adder = b; }
   void set_fa_g_only(bool b) { use_fa_g_only = b; }
+  void set_radix_multiplier(int r) { radix_multiplier = r; }
 protected:
 
   /// Return the sum and carry-out when adding \p op0 and \p op1 under initial

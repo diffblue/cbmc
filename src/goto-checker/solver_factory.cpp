@@ -437,6 +437,10 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
       bv_pointers->set_simple_full_adder(true);
       bv_pointers->set_fa_g_only(true);
     }
+    else if(ma == "radix4")
+      bv_pointers->set_radix_multiplier(4);
+    else if(ma == "radix8")
+      bv_pointers->set_radix_multiplier(8);
   }
 
   set_decision_procedure_time_limit(*bv_pointers);
