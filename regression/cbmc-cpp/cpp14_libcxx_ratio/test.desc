@@ -6,7 +6,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^PARSING ERROR$
-libc++ std::ratio: __static_gcd recursive template has
-unsubstituted parameters (_Xp % _Yp) in template arguments
-of its own recursive definition. Root cause of chrono::duration
-failure.
+libc++ std::ratio fails because the self-referential typedef
+(typedef ratio<num, den> type) triggers recursive instantiation
+that overwrites constexpr static member values. See
+cpp11_constexpr_self_referential_typedef for minimal reproducer.
