@@ -390,3 +390,88 @@ in Comba, where propagation completeness matters.
 **comba+sfa+g-top is best at BW=13** (6.08s). The simple-fa helps
 Comba's final addition at larger bitwidths where the carry chain
 is longer.
+
+## Priority 1b Results: g-only at Full Adder Level
+
+| Config | comm-9 | comm-11 |
+|--------|--------|---------|
+| dadda | 0.53 | 14.3 |
+| dadda+simple-fa | 0.56 | 8.06 |
+| **dadda+g-fa** | **0.73** | **4.89** |
+| dadda+sfa+g (combined) | 0.56 | 8.05 |
+| comba | 0.24 | 1.75 |
+| comba+g-fa | 0.22 | 1.79 |
+| wallace+g-fa | 1.82 | 58.7 |
+
+**dadda+g-fa gives 2.9x speedup at BW=11** (14.3→4.89s). The g-only
+BVE catalyst at the full_adder level works inside Dadda's reduction
+tree. Each full_adder gets a redundant AND(a,b) that helps BVE
+simplify the carry-save reduction.
+
+g-fa is BETTER than simple-fa for Dadda (4.89 vs 8.06). The mechanisms
+are different: simple-fa reduces clauses per gate, g-fa adds BVE
+catalyst variables. g-fa wins because BVE cascade is more powerful
+than clause reduction for Dadda's structure.
+
+g-fa is neutral for Comba (1.79 vs 1.75) and HURTS Wallace (58.7 vs 52.1).
+
+## Priority 1d Results: Final Addition Encoding
+
+| Config | comm-9 | comm-11 |
+|--------|--------|---------|
+| dadda (ripple final) | 0.53 | 14.3 |
+| dadda (BK final) | T/O | T/O |
+| dadda (g-only final) | 0.71 | 7.84 |
+| dadda+g-fa (ripple final) | 0.73 | **4.89** |
+| dadda+g-fa (BK final) | T/O | T/O |
+| dadda+g-fa (g-only final) | 0.87 | 6.91 |
+
+BK for final addition: T/O (kills it). g-only for final addition
+helps plain dadda (1.8x) but hurts dadda+g-fa (too many redundant vars).
+**Best Dadda: g-fa with ripple final (4.89s).**
+
+## Priority 2 Results: Radix Multiplier
+
+| Config | comm-9 | comm-11 |
+|--------|--------|---------|
+| dadda (no radix) | 0.53 | 14.3 |
+| dadda+radix4 | 1.43 | 39.8 |
+| dadda+radix8 | 1.35 | 28.3 |
+| comba+radix8 | 1.40 | 21.4 |
+
+Radix multipliers are SLOWER at BW=9-11. The pre-computation overhead
+(additions for x*3, x*5, x*7) hurts at small bitwidths. Radix may
+help at BW=17+ where fewer partial products matter more.
+
+## Priority 3 Results: Cross-Benchmark Validation
+
+Factoring (SAT): all encodings equally fast (0.03-0.07s). Encoding
+doesn't matter for SAT problems (consistent with adder finding).
+
+Distributivity: T/O for all encodings at BW=7. Much harder than
+commutativity — requires reasoning about multiplication + addition
+interaction.
+
+Square identity: trivially fast for all (CBMC simplifies algebraically).
+
+## Summary: Best Configurations
+
+| Benchmark | Best config | Time | vs baseline |
+|-----------|-------------|------|-------------|
+| comm BW=9 | comba+g-top | **0.16s** | **12x** |
+| comm BW=11 | comba | **1.75s** | **32x** |
+| comm BW=11 (Dadda) | **dadda+g-fa** | **4.89s** | **11x** |
+| comm BW=13 | comba+sfa+g-top | **6.08s** | — |
+| factoring | any | ~0.05s | — |
+
+### Key Insight: g-fa is a Novel Discovery
+
+The g-only BVE catalyst applied at the full_adder level (inside
+Dadda's reduction tree) is a new finding not present in the earlier
+multiplier research. It gives 2.9x speedup for Dadda by adding
+redundant AND(a,b) gates that BVE eliminates, triggering cascading
+simplification of the carry-save reduction structure.
+
+This connects directly to the adder investigation's polarity alignment
+discovery: the AND gate's clauses match the full_adder's carry
+generation clauses, enabling BVE subsumption cascades.

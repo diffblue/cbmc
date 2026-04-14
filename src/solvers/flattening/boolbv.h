@@ -55,6 +55,7 @@ public:
   void set_carry_save(bool b) { bv_utils.set_carry_save(b); }
   void set_comba(bool b) { bv_utils.set_comba(b); }
   void set_simple_full_adder(bool b) { bv_utils.set_simple_full_adder(b); }
+  void set_fa_g_only(bool b) { bv_utils.set_fa_g_only(b); }
   void set_dadda(bool b) { bv_utils.set_dadda(b); }
   boolbvt(
     const namespacet &_ns,

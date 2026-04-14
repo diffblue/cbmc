@@ -430,6 +430,13 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
     const std::string &ma = options.get_option("multiplier-adder");
     if(ma == "simple-fa")
       bv_pointers->set_simple_full_adder(true);
+    else if(ma == "g-only-fa")
+      bv_pointers->set_fa_g_only(true);
+    else if(ma == "simple-fa+g")
+    {
+      bv_pointers->set_simple_full_adder(true);
+      bv_pointers->set_fa_g_only(true);
+    }
   }
 
   set_decision_procedure_time_limit(*bv_pointers);

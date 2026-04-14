@@ -181,6 +181,10 @@ literalt bv_utilst::full_adder(
     return prop.lxor(prop.lxor(a, b), carry_in);
   }
 
+  // Redundant AND gate for BVE polarity alignment (g-only at gate level)
+  if(use_fa_g_only && !a.is_constant() && !b.is_constant() && a != b && a != !b)
+    prop.land(a, b);
+
   #ifdef OPTIMAL_FULL_ADDER
   if(prop.has_set_to() && prop.cnf_handled_well())
   {
