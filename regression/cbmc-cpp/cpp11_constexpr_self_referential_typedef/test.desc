@@ -1,0 +1,12 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+Self-referential typedef (typedef ratio<num, den> type) in a class
+template with constexpr static members triggers recursive template
+instantiation that overwrites the constexpr values with unresolved
+expressions. Root cause of libc++ std::ratio failure.
