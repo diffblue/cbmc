@@ -357,6 +357,12 @@ protected:
   unsigned compound_body_depth = 0;
   bool suppress_elaborate = false;
 
+  /// When true, suppress_elaborate is ignored. Used during constexpr
+  /// member evaluation to ensure referenced templates can be
+  /// instantiated even when nested typecheck_compound_body calls
+  /// set suppress_elaborate=true.
+  bool force_elaborate = false;
+
   bool builtin_factory(const irep_idt &) override;
 
   // types

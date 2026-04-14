@@ -1,4 +1,4 @@
-KNOWNBUG libcxx
+CORE libcxx
 main.cpp
 --cpp14 --stdlib libc++
 ^VERIFICATION
@@ -6,5 +6,4 @@ main.cpp
 ^SIGNAL=0$
 --
 ^PARSING ERROR$
-libc++ CONVERSION ERROR: incomplete type, missing symbol, or
-implicit conversion failure.
+^CONVERSION ERROR$
