@@ -1,0 +1,12 @@
+KNOWNBUG libcxx
+main.cpp
+--cpp14 --stdlib libc++
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^PARSING ERROR$
+libc++ std::ratio: __static_gcd recursive template has
+unsubstituted parameters (_Xp % _Yp) in template arguments
+of its own recursive definition. Root cause of chrono::duration
+failure.
