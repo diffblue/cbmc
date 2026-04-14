@@ -3,13 +3,13 @@
 // in static_assert. The template parameter substitution works
 // (Abs<N> becomes Abs<1>) but the resulting Abs<1>::value
 // expression is not evaluated to a constant during type-checking.
-template<long long X>
+template <long long X>
 struct Abs
 {
   static const long long value = (X < 0 ? -X : X);
 };
 
-template<long long N>
+template <long long N>
 struct S
 {
   static constexpr long long v = Abs<N>::value;
