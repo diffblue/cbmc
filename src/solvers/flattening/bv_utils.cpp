@@ -1693,12 +1693,16 @@ bvt bv_utilst::comba_column_wise(const std::vector<bvt> &pps)
 
 // Wallace tree multiplier. This is disabled, as runtimes have
 // been observed to go up by 5%-10%, and on some models even by 20%.
+#ifndef WALLACE_TREE
 // #define WALLACE_TREE
+#endif
 // Dadda' reduction scheme. This yields a smaller formula size than Wallace
 // trees (and also the default addition scheme), but isn't consistently more
 // performant with simple partial-product generation. Only when using
 // higher-radix multipliers the combination appears to perform better.
+#ifndef DADDA_TREE
 // #define DADDA_TREE
+#endif
 
 // The following examples demonstrate the performance differences (with a
 // time-out of 7200 seconds):
@@ -1840,15 +1844,26 @@ bvt bv_utilst::comba_column_wise(const std::vector<bvt> &pps)
 // with Dadda's reduction yields the most consistent performance improvement
 // while not regressing substantially in the matrix of different benchmarks and
 // CaDiCaL and MiniSat2 as solvers.
+#ifndef RADIX_MULTIPLIER
 // #define RADIX_MULTIPLIER 8
-// #define USE_KARATSUBA
-// #define USE_TOOM_COOK
-#define USE_SCHOENHAGE_STRASSEN
-#ifdef RADIX_MULTIPLIER
-//#  define COMBA
-#  define DADDA_TREE
 #endif
-// #define COMBA
+#ifndef USE_KARATSUBA
+// #define USE_KARATSUBA
+#endif
+#ifndef USE_TOOM_COOK
+// #define USE_TOOM_COOK
+#endif
+#ifndef USE_SCHOENHAGE_STRASSEN
+// #define USE_SCHOENHAGE_STRASSEN
+#endif
+#ifdef RADIX_MULTIPLIER
+#  ifndef DADDA_TREE
+#  define DADDA_TREE
+#  endif
+#endif
+#if !defined(COMBA) && !defined(NO_COMBA)
+#define COMBA
+#endif
 
 #ifdef RADIX_MULTIPLIER
 static bvt unsigned_multiply_by_3(propt &prop, const bvt &op)
@@ -3030,12 +3045,11 @@ bvt bv_utilst::unsigned_toom_cook_multiplier(const bvt &_op0, const bvt &_op1)
 
 bvt bv_utilst::unsigned_schoenhage_strassen_multiplier(
   const bvt &a,
-  const bvt &_b)
+  const bvt &b)
 {
-  bvt b = a;
   PRECONDITION(a.size() == b.size());
 
-  // Running example: we want to multiply 213 by 15 as 8- or 9-bit integers.
+  // Running examples: we want to multiple 213 by 15 as 8- or 9-bit integers.
   // That is, we seek to multiply 11010101 (011010101) by 00001111 (000001111).
   //                              ^bit 7 ^bit 0
   // The expected result is 123 as both an 8-bit and 9-bit result (001111011).
@@ -3090,10 +3104,8 @@ bvt bv_utilst::unsigned_schoenhage_strassen_multiplier(
   {
     a_rho.emplace_back(
       a_ext.begin() + i * chunk_size, a_ext.begin() + (i + 1) * chunk_size);
-    std::cerr << "a_rho[" << i << "]: " << beautify(a_rho.back()) << std::endl;
     b_sigma.emplace_back(
       b_ext.begin() + i * chunk_size, b_ext.begin() + (i + 1) * chunk_size);
-    std::cerr << "b_sigma[" << i << "]: " << beautify(b_sigma.back()) << std::endl;
   }
   // For our example we now have
   // a_rho = [ 0101, 1101, 0000, ..., 0000 ]
@@ -3115,13 +3127,11 @@ bvt bv_utilst::unsigned_schoenhage_strassen_multiplier(
         ++rho)
     {
       const std::size_t sigma = tau - rho;
-      std::cerr << "Inner multiplication a_" << rho << " * b_" << sigma << std::endl;
       gamma_tau[tau] = add(
         gamma_tau[tau],
-        zero_extension(
         unsigned_multiplier(
-          zero_extension(a_rho[rho], chunk_size * 2),
-          zero_extension(b_sigma[sigma], chunk_size * 2)), 3 * n + 5));
+          zero_extension(a_rho[rho], 3 * n + 5),
+          zero_extension(b_sigma[sigma], 3 * n + 5)));
     }
   }
   // For our example we obtain
@@ -3133,7 +3143,6 @@ bvt bv_utilst::unsigned_schoenhage_strassen_multiplier(
   c_tau.reserve(num_chunks);
   for(std::size_t tau = 0; tau < num_chunks; ++tau)
   {
-    std::cerr << "gamma_tau[" << tau << "]: " << beautify(gamma_tau[tau]) << std::endl;
     c_tau.push_back(add(gamma_tau[tau], gamma_tau[tau + num_chunks]));
     CHECK_RETURN(c_tau.back().size() >= address_bits(num_chunks) + 1);
     c_tau.back().resize(address_bits(num_chunks) + 1);
@@ -3141,10 +3150,6 @@ bvt bv_utilst::unsigned_schoenhage_strassen_multiplier(
   }
   // For our example we obtain
   // c_tau = [ 01011, 00011, 0... ]
-
-  // XXX 19*19 seems ok up to here with
-  // http://malte-leip.net/beschreibung_ssa.pdf,
-  // https://de.wikipedia.org/wiki/Sch%C3%B6nhage-Strassen-Algorithmus
 
   // Compute z_j = c_j - c_{j + 2^n} (mod 2^(n + 2)) (mod 2^(n + 1) and c_{j +
   // 2^(n - 1)} when m is even)
