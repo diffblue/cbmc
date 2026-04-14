@@ -5,6 +5,6 @@ int add(int a, int b)
 }
 int main()
 {
-  std::function<int(int, int)> f = add;
+  std::function<int(int, int)> f(add);
   return 0;
 }
