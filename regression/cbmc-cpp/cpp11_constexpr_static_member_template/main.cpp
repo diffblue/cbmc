@@ -3,10 +3,14 @@
 // template parameter is not substituted during instantiation
 // when the member is declared constexpr (works with plain const).
 template <long long X>
-struct Abs { static const long long value = (X < 0 ? -X : X); };
+struct Abs
+{
+  static const long long value = (X < 0 ? -X : X);
+};
 
 template <long long N>
-struct S {
+struct S
+{
   static constexpr long long v = Abs<N>::value;
 };
 

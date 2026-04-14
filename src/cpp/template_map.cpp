@@ -196,6 +196,50 @@ void template_mapt::apply(exprt &expr) const
 
   Forall_operands(it, expr)
     apply(*it);
+
+  // Substitute non-type template parameters inside cpp_name
+  // template arguments. These appear as "ambiguous" nodes with
+  // a type containing a cpp_name whose identifier matches an
+  // expr_map entry (e.g., _Num in __static_abs<_Num>::value).
+  std::function<void(irept &)> subst_params = [&](irept &node)
+  {
+    if(node.id() == ID_template_args)
+    {
+      irept &args = node.add(ID_arguments);
+      for(auto &arg : args.get_sub())
+      {
+        if(arg.id() != ID_ambiguous)
+          continue;
+        // The ambiguous node stores the cpp_name in its "type" field
+        const irept &inner = arg.find(ID_type);
+        if(inner.id() != ID_cpp_name)
+          continue;
+        // Check if the cpp_name is a single identifier
+        if(inner.get_sub().size() != 1 || inner.get_sub()[0].id() != ID_name)
+          continue;
+        const std::string target =
+          id2string(inner.get_sub()[0].get(ID_identifier));
+        for(const auto &entry : expr_map)
+        {
+          const std::string &key = id2string(entry.first);
+          if(
+            key == target ||
+            (key.size() > target.size() + 2 &&
+             key.substr(key.size() - target.size()) == target &&
+             key[key.size() - target.size() - 1] == ':'))
+          {
+            arg = entry.second;
+            break;
+          }
+        }
+      }
+    }
+    for(auto &sub : node.get_sub())
+      subst_params(sub);
+    for(auto &named : node.get_named_sub())
+      subst_params(named.second);
+  };
+  subst_params(expr);
 }
 
 exprt template_mapt::lookup(const irep_idt &identifier) const
