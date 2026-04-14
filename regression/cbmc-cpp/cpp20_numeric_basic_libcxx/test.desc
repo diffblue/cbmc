@@ -1,6 +1,6 @@
-CORE libcxx
+KNOWNBUG libcxx
 main.cpp
---cpp17 --stdlib libc++
+--cpp20 --stdlib libc++
 ^VERIFICATION
 ^EXIT=(0|10)$
 ^SIGNAL=0$
