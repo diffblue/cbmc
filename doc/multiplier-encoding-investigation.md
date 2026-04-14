@@ -475,3 +475,36 @@ simplification of the carry-save reduction structure.
 This connects directly to the adder investigation's polarity alignment
 discovery: the AND gate's clauses match the full_adder's carry
 generation clauses, enabling BVE subsumption cascades.
+
+
+### Priority 5: Radix multiplier pre-computation adder variations
+
+The radix multiplier pre-computes x*3, x*5, x*7 using additions that
+ARE routed through `adder()`. Test:
+- BK for pre-computation additions (these are standalone, not in reduction)
+- g-only for pre-computation additions
+- simple-ripple for pre-computation additions
+- Different radix values (4, 8, 16) combined with each adder encoding
+- Test at LARGER bitwidths (BW=17+) where radix should help more
+
+### Priority 6: Why is multiplication hard for SAT solvers?
+
+The folk explanation "the circuit is large" doesn't hold — CBMC routinely
+generates much larger SAT formulas (e.g., array_sum has 327K clauses,
+hash_mix has 1.7M clauses) that solvers handle fine. Multiplication at
+BW=13 (a few thousand clauses) is harder than hash_mix at 1.7M clauses.
+
+Investigate the STRUCTURAL reason:
+- Compare clause/variable counts of multiplication vs equally-hard
+  non-multiplication problems
+- Analyze the DEPENDENCY GRAPH structure: multiplication creates a
+  grid of partial products where every output bit depends on every
+  input bit. This is fundamentally different from addition (chain)
+  or array access (tree).
+- Profile the CONFLICT GRAPH: which variables appear in conflicts?
+  Are they spread across the entire circuit or concentrated?
+- Compare with known-hard SAT structures (pigeonhole, random 3-SAT)
+- Test whether the hardness comes from the multiplication STRUCTURE
+  or from the EQUALITY CHECK (c == d for commutativity)
+- Investigate whether the hardness scales with the number of
+  multiplications or with the bitwidth of each multiplication
