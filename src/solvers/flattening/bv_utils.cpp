@@ -1649,6 +1649,48 @@ bvt bv_utilst::dadda_tree(const std::vector<bvt> &pps)
   return add(a, b);
 }
 
+bvt bv_utilst::comba_column_wise(const std::vector<bvt> &pps)
+{
+  PRECONDITION(!pps.empty());
+
+  std::vector<bvt> columns(pps.front().size());
+  for(const auto &pp : pps)
+  {
+    PRECONDITION(pp.size() == pps.front().size());
+    for(std::size_t i = 0; i < pp.size(); ++i)
+    {
+      if(!pp[i].is_false())
+        columns[i].push_back(pp[i]);
+    }
+  }
+
+  bvt result;
+  result.reserve(columns.size());
+
+  for(std::size_t i = 0; i < columns.size(); ++i)
+  {
+    const bvt &column = columns[i];
+
+    if(column.empty())
+      result.push_back(const_literal(false));
+    else
+    {
+      bvt column_sum = popcount(column);
+      CHECK_RETURN(!column_sum.empty());
+      result.push_back(column_sum.front());
+      for(std::size_t j = 1; j < column_sum.size(); ++j)
+      {
+        if(i + j >= columns.size())
+          break;
+        if(!column_sum[j].is_false())
+          columns[i + j].push_back(column_sum[j]);
+      }
+    }
+  }
+
+  return result;
+}
+
 // Wallace tree multiplier. This is disabled, as runtimes have
 // been observed to go up by 5%-10%, and on some models even by 20%.
 // #define WALLACE_TREE
@@ -1801,10 +1843,11 @@ bvt bv_utilst::dadda_tree(const std::vector<bvt> &pps)
 // #define RADIX_MULTIPLIER 8
 // #define USE_KARATSUBA
 // #define USE_TOOM_COOK
-#define USE_SCHOENHAGE_STRASSEN
+// #define USE_SCHOENHAGE_STRASSEN
 #ifdef RADIX_MULTIPLIER
 #  define DADDA_TREE
 #endif
+#define COMBA
 
 #ifdef RADIX_MULTIPLIER
 static bvt unsigned_multiply_by_3(propt &prop, const bvt &op)
@@ -2692,58 +2735,7 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
     if(use_wallace_tree)
       return wallace_tree(pps);
     if(use_carry_save)
-    {
-      // Carry-save accumulation: keep running sum in (S, C) form.
-      // Each step: S_new[i] = S[i] XOR C[i] XOR x[i]
-      //            C_new[i+1] = MAJ(S[i], C[i], x[i])
-      // Final: product = add(S, C) using one carry chain.
-      std::size_t width = op0.size();
-      bvt S = pps.front();
-      S.resize(width, const_literal(false));
-      bvt C(width, const_literal(false));
-
-      for(auto it = std::next(pps.begin()); it != pps.end(); ++it)
-      {
-        bvt X = *it;
-        X.resize(width, const_literal(false));
-        bvt new_S(width), new_C(width, const_literal(false));
-        for(std::size_t j = 0; j < width; j++)
-        {
-          // S_new = S XOR C XOR X (3-input XOR)
-          new_S[j] = prop.lxor(prop.lxor(S[j], C[j]), X[j]);
-          // C_new[j+1] = MAJ(S, C, X) (carry shifted left)
-          if(j + 1 < width)
-          {
-            // MAJ(a,b,c) = (a AND b) OR (a AND c) OR (b AND c)
-            // Encode with 1 variable + 6 clauses
-            literalt a = S[j], b = C[j], cv = X[j];
-            if(a.is_false() && b.is_false())
-              new_C[j + 1] = const_literal(false);
-            else if(a.is_false())
-              new_C[j + 1] = prop.land(b, cv);
-            else if(b.is_false())
-              new_C[j + 1] = prop.land(a, cv);
-            else if(cv.is_false())
-              new_C[j + 1] = prop.land(a, b);
-            else
-            {
-              literalt m = prop.new_variable();
-              prop.lcnf(!a, !b, m);
-              prop.lcnf(!a, !cv, m);
-              prop.lcnf(!b, !cv, m);
-              prop.lcnf(a, b, !m);
-              prop.lcnf(a, cv, !m);
-              prop.lcnf(b, cv, !m);
-              new_C[j + 1] = m;
-            }
-          }
-        }
-        S = std::move(new_S);
-        C = std::move(new_C);
-      }
-      // Final resolution: product = S + C
-      return add(S, C);
-    }
+      return comba_column_wise(pps);
 
     // Use multiplier-specific adder encoding
     auto saved = adder_encoding;
@@ -3022,6 +3014,8 @@ bvt bv_utilst::unsigned_toom_cook_multiplier(const bvt &_op0, const bvt &_op1)
     return wallace_tree(c_ops);
 #elif defined(DADDA_TREE)
     return dadda_tree(c_ops);
+#elif defined(COMBA)
+    return comba_column_wise(c_ops);
 #else
     bvt product = c_ops.front();
 

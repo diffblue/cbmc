@@ -300,6 +300,7 @@ protected:
 
   bvt wallace_tree(const std::vector<bvt> &pps);
   bvt dadda_tree(const std::vector<bvt> &pps);
+  bvt comba_column_wise(const std::vector<bvt> &pps);
 };
 
 #endif // CPROVER_SOLVERS_FLATTENING_BV_UTILS_H
