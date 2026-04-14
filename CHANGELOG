@@ -1,3 +1,86 @@
+# CBMC 6.9.0
+
+This release ensures cross-platform determinism of formulae created by CBMC (for
+a given input program), ensuring consistent solver performance
+(via #8830, #8952). This release fixes a variety of bugs, including the problem
+of orphan (SMT-solver) child processes left behind after terminating CBMC
+(via #8900), and various encoding improvements for unions (via #8950, #8958) and
+multi-dimensional arrays (via #8705).
+
+## What's Changed
+* Add clock_gettime model by @tautschnig in https://github.com/diffblue/cbmc/pull/8731
+* Require explicit contract for --replace-call-with-contract by @tautschnig in https://github.com/diffblue/cbmc/pull/8739
+* Fix SMT2 output determinism by using ordered maps by @tautschnig in https://github.com/diffblue/cbmc/pull/8830
+* Prevent orphan child processes when CBMC parent is killed by @tautschnig in https://github.com/diffblue/cbmc/pull/8900
+
+## Bug Fixes
+* Fix macOS compilation instructions for CMake by @tautschnig in https://github.com/diffblue/cbmc/pull/8729
+* Bump actions/checkout from 5 to 6 by @dependabot[bot] in https://github.com/diffblue/cbmc/pull/8735
+* Fix --cover help by @tautschnig in https://github.com/diffblue/cbmc/pull/8793
+* Add case_exprt to std_expr.h and refactor code to use it by @tautschnig in https://github.com/diffblue/cbmc/pull/8741
+* C front-end: recognize __builtin_inff() as constant expression by @tautschnig in https://github.com/diffblue/cbmc/pull/8775
+* Fix handling of empty intervals in interval_template.h by @tautschnig in https://github.com/diffblue/cbmc/pull/8779
+* SMT2: allow unary bitand, bitor, bitxor by @kroening in https://github.com/diffblue/cbmc/pull/8794
+* document non-binary case for Boolean and bit-wise operators by @kroening in https://github.com/diffblue/cbmc/pull/8795
+* Flattening backend: further cases for casts to range types by @kroening in https://github.com/diffblue/cbmc/pull/8807
+* Bump actions/upload-artifact from 5 to 6 by @dependabot[bot] in https://github.com/diffblue/cbmc/pull/8810
+* Bump actions/cache from 4 to 5 by @dependabot[bot] in https://github.com/diffblue/cbmc/pull/8809
+* constructors for multi-ary expressions with operand type by @kroening in https://github.com/diffblue/cbmc/pull/8808
+* Remove numeric suffixes and combine directories in regression/cbmc-library by @tautschnig in https://github.com/diffblue/cbmc/pull/8815
+* CONTRACTS: make ptr_pred_ctx_reset_call call reset instead of init by @remi-delmas-3000 in https://github.com/diffblue/cbmc/pull/8817
+* Add regression test to ascertain struct hack support by @tautschnig in https://github.com/diffblue/cbmc/pull/8801
+* pre_traversal range for expressions by @kroening in https://github.com/diffblue/cbmc/pull/8819
+* Fix misleading error message for --generate-function-body on existing bodies by @tautschnig in https://github.com/diffblue/cbmc/pull/8786
+* Catch out-of-memory exceptions during propositional reduction by @tautschnig in https://github.com/diffblue/cbmc/pull/8765
+* post-order traversal range for expressions by @kroening in https://github.com/diffblue/cbmc/pull/8822
+* Deprecate `case_exprt` by @kroening in https://github.com/diffblue/cbmc/pull/8823
+* Add AGENTS.md to guide AI coding assistants by @tautschnig in https://github.com/diffblue/cbmc/pull/8826
+* Make cnft::gate_* methods public by @tautschnig in https://github.com/diffblue/cbmc/pull/8827
+* SMT2: typecasts to the source type by @kroening in https://github.com/diffblue/cbmc/pull/8828
+* SMT2: concatenations with zero-width operands by @kroening in https://github.com/diffblue/cbmc/pull/8829
+* std_expr.h: use `exprt::check` consistently by @kroening in https://github.com/diffblue/cbmc/pull/8831
+* Update CaDiCaL from 2.0.0 to 3.0.0 by @tautschnig in https://github.com/diffblue/cbmc/pull/8736
+* use `power_exprt` in `boolbvt` by @kroening in https://github.com/diffblue/cbmc/pull/8833
+* Fix NetBSD and FreeBSD CI jobs by @tautschnig in https://github.com/diffblue/cbmc/pull/8825
+* Fix array refinement: use actual SAT model values in get() by @tautschnig in https://github.com/diffblue/cbmc/pull/8842
+* Bump actions/upload-artifact from 6 to 7 by @dependabot[bot] in https://github.com/diffblue/cbmc/pull/8845
+* Makefile builds: do not inherit SRC from environment in big-int by @tautschnig in https://github.com/diffblue/cbmc/pull/8742
+* Simplify pointer casts of pointer arithmetic by @tautschnig in https://github.com/diffblue/cbmc/pull/8836
+* Make scripts/diff-filter.pl portable to macOS by @tautschnig in https://github.com/diffblue/cbmc/pull/8839
+* Fail CI immediately when Chocolatey dependency installation fails by @tautschnig in https://github.com/diffblue/cbmc/pull/8847
+* Fix array refinement crash with CaDiCaL SAT solver by @tautschnig in https://github.com/diffblue/cbmc/pull/8849
+* Set 20-minute timeout for all CMake-based regression tests by @tautschnig in https://github.com/diffblue/cbmc/pull/8848
+* Fix heap-use-after-free in AI on empty goto programs by @tautschnig in https://github.com/diffblue/cbmc/pull/8853
+* Exit with error if --outfile cannot be written by @karkhaz in https://github.com/diffblue/cbmc/pull/6812
+* Mark slowest CI test outliers as THOROUGH by @tautschnig in https://github.com/diffblue/cbmc/pull/8854
+* Fix invalid assumptions and invariants in GraphML witness generation by @tautschnig in https://github.com/diffblue/cbmc/pull/8802
+* Add output_filet utility class from hw-cbmc by @tautschnig in https://github.com/diffblue/cbmc/pull/8858
+* Fix out-of-bounds read in MC/DC coverage eval_expr by @tautschnig in https://github.com/diffblue/cbmc/pull/8862
+* Initialise all POD members of goto_symex_statet by @tautschnig in https://github.com/diffblue/cbmc/pull/8865
+* Fix reference to temporary that has gone out of scope by @tautschnig in https://github.com/diffblue/cbmc/pull/8866
+* Initialise message_handler in bv_refinement unit test by @tautschnig in https://github.com/diffblue/cbmc/pull/8863
+* Amazon Linux 2023 compilation instructions by @kroening in https://github.com/diffblue/cbmc/pull/8850
+* Add CI performance analysis script and workflow by @tautschnig in https://github.com/diffblue/cbmc/pull/8857
+* Fix Xen CI job by moving to GitHub mirror by @tautschnig in https://github.com/diffblue/cbmc/pull/8789
+* Enable parallel regression test execution for Windows VS 2022 by @tautschnig in https://github.com/diffblue/cbmc/pull/8856
+* Replace deprecated upload-release-asset with action-gh-release by @tautschnig in https://github.com/diffblue/cbmc/pull/8740
+* Bump microsoft/setup-msbuild from 2 to 3 by @dependabot[bot] in https://github.com/diffblue/cbmc/pull/8883
+* cbmc-incr-smt2: Add test suffix to avoid intermittent failures by @tautschnig in https://github.com/diffblue/cbmc/pull/8885
+* Add profiling tool and run in CI by @tautschnig in https://github.com/diffblue/cbmc/pull/8859
+* Bump codecov/codecov-action from 5 to 6 by @dependabot[bot] in https://github.com/diffblue/cbmc/pull/8928
+* Add fused multiply-add (FMA) support with single rounding by @tautschnig in https://github.com/diffblue/cbmc/pull/8884
+* Add floating point support to incremental SMT2 solver via bit-blasting by @tautschnig in https://github.com/diffblue/cbmc/pull/8922
+* Fix solver option conflict detection in CBMC by @tautschnig in https://github.com/diffblue/cbmc/pull/8893
+* Make function pointer removal deterministic by @tautschnig in https://github.com/diffblue/cbmc/pull/8952
+* Simplify all-zero or all-one constants in bitand/bitor by @tautschnig in https://github.com/diffblue/cbmc/pull/8944
+* Connect let-bound arrays to originals in array theory by @tautschnig in https://github.com/diffblue/cbmc/pull/8942
+* Rewrite byte_extract from multi-dimensional array by @tautschnig in https://github.com/diffblue/cbmc/pull/8705
+* Decompose byte_extract from union through widest member by @tautschnig in https://github.com/diffblue/cbmc/pull/8950
+* Bump softprops/action-gh-release from 2 to 3 by @dependabot[bot] in https://github.com/diffblue/cbmc/pull/8957
+* Decompose non-constant-offset byte_extract from union in field sensitivity by @tautschnig in https://github.com/diffblue/cbmc/pull/8958
+
+**Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-6.8.0...cbmc-6.9.0
+
 # CBMC 6.8.0
 
 This release extends the JSON interface to reading full GOTO functions (and not
