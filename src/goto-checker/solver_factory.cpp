@@ -406,6 +406,24 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
     // else: shift-add (default)
   }
 
+  // Set multiplier-internal adder encoding
+  if(options.is_set("multiplier-adder"))
+  {
+    const std::string &ma = options.get_option("multiplier-adder");
+    if(ma == "ripple-carry")
+      bv_pointers->set_multiplier_adder_encoding(
+        bv_utilst::adder_encodingt::RIPPLE_CARRY);
+    else if(ma == "simple-ripple")
+      bv_pointers->set_multiplier_adder_encoding(
+        bv_utilst::adder_encodingt::SIMPLE_RIPPLE_CARRY);
+    else if(ma == "brent-kung")
+      bv_pointers->set_multiplier_adder_encoding(
+        bv_utilst::adder_encodingt::BRENT_KUNG);
+    else if(ma == "g-only")
+      bv_pointers->set_multiplier_adder_encoding(
+        bv_utilst::adder_encodingt::ADAPTIVE);
+  }
+
   set_decision_procedure_time_limit(*bv_pointers);
 
   // Set adder encoding if specified
@@ -777,6 +795,8 @@ static void parse_sat_options(const cmdlinet &cmdline, optionst &options)
     options.set_option("adder-encoding", cmdline.get_value("adder-encoding"));
   if(cmdline.isset("multiplier-encoding"))
     options.set_option("multiplier-encoding", cmdline.get_value("multiplier-encoding"));
+  if(cmdline.isset("multiplier-adder"))
+    options.set_option("multiplier-adder", cmdline.get_value("multiplier-adder"));
   if(cmdline.isset("sat-phase"))
     options.set_option("sat-phase", cmdline.get_value("sat-phase"));
 }

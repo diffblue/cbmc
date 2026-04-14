@@ -115,6 +115,7 @@ void parse_solver_options(const cmdlinet &cmdline, optionst &options);
   "(reorder-vars):"                                                             \
   "(adder-encoding):"                                                          \
   "(multiplier-encoding):"                                                   \
+  "(multiplier-adder):"                                                      \
   "(sat-phase):"                                                             \
   "(beautify)"                                                                 \
   "(dimacs)"                                                                   \

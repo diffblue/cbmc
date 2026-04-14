@@ -226,3 +226,66 @@ AND gates are BVE-friendly for adders.
 - Test on distributivity and other benchmarks
 - Investigate why BK kills multiplier encodings
 - Test Karatsuba and Toom-Cook with adder variations
+
+### Corrected Matrix: Multiplier-Internal Adder Is Irrelevant
+
+Testing with independent `--multiplier-adder` control revealed that
+the internal adder encoding **doesn't matter** for Dadda, Wallace,
+or Comba — they use their own reduction schemes (full adders directly,
+not through `adder()`). Only shift-add routes through `adder()`.
+
+The earlier "dadda+g-only = 7.92s" result was from g-only on the
+**top-level equality check** (`c == d`), not from inside the multiplier.
+
+### Learned Clause Quality: All Multiplier Encodings (comm BW=9)
+
+| Encoding | Vars | Conflicts | Avg size | Avg glue | Glue≤1 | Time |
+|----------|------|-----------|----------|----------|--------|------|
+| shift-add | 425 | 88,733 | 32.7 | 7.9 | 0% | 2.26s |
+| Wallace | 441 | 53,623 | 26.1 | 7.4 | 0% | 1.35s |
+| **Dadda** | **425** | **27,079** | **22.4** | **6.6** | **1%** | **0.59s** |
+| **Comba** | **625** | **10,831** | **20.6** | **6.2** | **2%** | **0.22s** |
+
+### BVE Elimination Rates
+
+| Encoding | Vars | Eliminated | Fixed | Remaining |
+|----------|------|-----------|-------|-----------|
+| shift-add | 425 | 159 | 127 | 139 |
+| Dadda | 425 | 141 | 152 | 132 |
+| Wallace | 441 | 231 | 71 | 139 |
+| Comba | 625 | 234 | 218 | 173 |
+
+### Propagation Depth
+
+| Encoding | First decision props | Pattern |
+|----------|---------------------|---------|
+| shift-add | 36 | 36, 2, ... |
+| Dadda | 27 | 27, 5, 5, ... |
+| Comba | 39 | 39, ... |
+
+### Analysis
+
+The multiplier encoding ranking correlates with **conflict count**:
+- Comba: 10,831 conflicts (fewest) → 0.22s (fastest)
+- Dadda: 27,079 conflicts → 0.59s
+- Wallace: 53,623 conflicts → 1.35s
+- shift-add: 88,733 conflicts (most) → 2.26s (slowest)
+
+The mechanism is **moderately better learned clauses** (smaller size,
+lower glue) rather than the dramatic glue-1 shift seen with BK for
+adders. No multiplier encoding achieves significant glue-1 rates.
+
+Comba has the most variables (625 vs 425) but the fewest remaining
+after BVE (173 vs 132-139). The extra popcount tree variables are
+efficiently eliminated, similar to the g-only BVE catalyst for adders.
+
+### Key Insight: Top-Level Encoding Matters More
+
+The g-only benefit on multiplication benchmarks comes from the
+**equality check** (`c == d`), not from the multiplication itself.
+Setting `--adder-encoding adaptive` (g-only) helps the top-level
+comparison, giving an additional 1.8x on top of any multiplier encoding.
+
+Best configurations:
+- **comba + g-only(top)**: 0.16s at BW=9 (12x vs baseline)
+- **dadda + g-only(top)**: 7.84s at BW=11 (7x vs baseline)
