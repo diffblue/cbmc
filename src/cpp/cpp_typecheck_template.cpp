@@ -1053,6 +1053,41 @@ std::string cpp_typecheckt::class_template_identifier(
     identifier+='>';
   }
 
+  // C++20: include requires clause in the identifier so that
+  // constrained specializations with the same argument pattern
+  // get distinct symbols.
+  {
+    const auto &req_expr = template_type.find(ID_C_requires_clause);
+    if(req_expr.is_not_nil() && req_expr.id() != ID_nil)
+    {
+      std::string concepts;
+      std::function<void(const irept &)> visit = [&](const irept &node)
+      {
+        if(node.id() == ID_name)
+        {
+          const irep_idt &nm = node.get(ID_identifier);
+          if(!nm.empty())
+          {
+            if(!concepts.empty())
+              concepts += "&&";
+            concepts += id2string(nm);
+          }
+        }
+        for(const auto &sub : node.get_sub())
+          visit(sub);
+      };
+      visit(req_expr);
+      if(!concepts.empty())
+        identifier += "#req_" + concepts;
+    }
+    // Also check constraint count string for type-trait-based requires
+    const irep_idt &req_str = template_type.get(ID_C_requires_clause);
+    if(!req_str.empty() && isdigit(id2string(req_str)[0]))
+    {
+      identifier += "#req_count_" + id2string(req_str);
+    }
+  }
+
   return identifier;
 }
 

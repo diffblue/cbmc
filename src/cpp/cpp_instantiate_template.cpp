@@ -767,6 +767,203 @@ void cpp_typecheckt::elaborate_class_template(
     // then processes method bodies which may fail for system headers.
     // Without catching, the exception propagates and the caller sees
     // the type as incomplete even though the struct body is complete.
+    // C++20: evaluate requires clause on the selected specialization.
+    if(!best_match->type.get(ID_specialization_of).empty())
+    {
+      const cpp_declarationt &spec_decl = to_cpp_declaration(best_match->type);
+      const exprt &req_clause = static_cast<const exprt &>(
+        spec_decl.template_type().find(ID_C_requires_clause));
+      if(req_clause.is_not_nil() && req_clause.id() != ID_nil)
+      {
+        // Build parameter name -> actual type mapping
+        const auto &params = spec_decl.template_type().template_parameters();
+        std::map<irep_idt, typet> param_map;
+        for(std::size_t i = 0;
+            i < params.size() && i < full_args_tc.arguments().size();
+            ++i)
+        {
+          if(params[i].id() == ID_type)
+          {
+            const std::string id_str =
+              id2string(params[i].type().get(ID_identifier));
+            auto pos = id_str.rfind("::");
+            irep_idt pname = pos != std::string::npos
+                               ? irep_idt{id_str.substr(pos + 2)}
+                               : irep_idt{id_str};
+            if(!pname.empty())
+              param_map[pname] = full_args_tc.arguments()[i].type();
+          }
+        }
+
+        // Resolve a type from a cpp_name or type_exprt
+        std::function<typet(const irept &)> resolve_type =
+          [&](const irept &node) -> typet
+        {
+          if(node.id() == ID_type)
+            return static_cast<const type_exprt &>(
+                     static_cast<const exprt &>(node))
+              .type();
+          if(node.id() == ID_cpp_name)
+          {
+            for(const auto &s : node.get_sub())
+              if(s.id() == ID_name)
+              {
+                auto it = param_map.find(s.get(ID_identifier));
+                if(it != param_map.end())
+                  return it->second;
+              }
+          }
+          return typet{};
+        };
+
+        // Evaluate a requires clause expression with substituted types
+        std::function<int(const irept &)> eval = [&](const irept &node) -> int
+        {
+          // -1 = can't evaluate, 0 = false, 1 = true
+          if(node.id() == ID_and)
+          {
+            for(const auto &sub : node.get_sub())
+            {
+              int v = eval(sub);
+              if(v == 0)
+                return 0;
+              if(v == -1)
+                return -1;
+            }
+            return 1;
+          }
+          if(node.id() == ID_or)
+          {
+            for(const auto &sub : node.get_sub())
+            {
+              int v = eval(sub);
+              if(v == 1)
+                return 1;
+              if(v == -1)
+                return -1;
+            }
+            return 0;
+          }
+          if(node.id() == ID_not)
+          {
+            if(node.get_sub().empty())
+              return -1;
+            int v = eval(node.get_sub()[0]);
+            return v == -1 ? -1 : (v == 0 ? 1 : 0);
+          }
+          // side_effect(statement=function_call) with cpp_name as function
+          if(node.id() == ID_side_effect)
+          {
+            const auto &subs = node.get_sub();
+            if(subs.size() >= 2 && subs[0].id() == ID_cpp_name)
+            {
+              irep_idt fname;
+              for(const auto &s : subs[0].get_sub())
+                if(s.id() == ID_name)
+                  fname = s.get(ID_identifier);
+              // Get the argument type
+              const auto &args = subs[1].get_sub();
+              if(args.empty())
+                return -1;
+              // For __remove_pointer, evaluate the inner call first
+              typet arg_type;
+              if(args[0].id() == ID_side_effect)
+              {
+                // Nested call like __remove_pointer(T)
+                irep_idt inner_fname;
+                const auto &inner_subs = args[0].get_sub();
+                if(inner_subs.size() >= 2 && inner_subs[0].id() == ID_cpp_name)
+                {
+                  for(const auto &s : inner_subs[0].get_sub())
+                    if(s.id() == ID_name)
+                      inner_fname = s.get(ID_identifier);
+                  const auto &inner_args = inner_subs[1].get_sub();
+                  if(!inner_args.empty())
+                  {
+                    typet inner_type = resolve_type(inner_args[0]);
+                    if(inner_type.is_nil())
+                      return -1;
+                    if(inner_fname == "__remove_pointer")
+                    {
+                      if(inner_type.id() == ID_pointer)
+                        arg_type = to_pointer_type(inner_type).base_type();
+                      else
+                        return -1;
+                    }
+                    else
+                      return -1;
+                  }
+                  else
+                    return -1;
+                }
+                else
+                  return -1;
+              }
+              else
+              {
+                arg_type = resolve_type(args[0]);
+              }
+              if(arg_type.is_nil())
+                return -1;
+              if(fname == "__is_pointer")
+                return arg_type.id() == ID_pointer ? 1 : 0;
+              if(fname == "__is_integral")
+                return (arg_type.id() == ID_signedbv ||
+                        arg_type.id() == ID_unsignedbv ||
+                        arg_type.id() == ID_bool || arg_type.id() == ID_c_bool)
+                         ? 1
+                         : 0;
+              if(fname == "__is_signed")
+                return arg_type.id() == ID_signedbv ? 1 : 0;
+            }
+          }
+          return -1;
+        };
+
+        int result = eval(req_clause);
+        if(result == 0)
+        {
+          // Requires clause is false — try other specializations
+          const irep_idt &prim_name =
+            best_match->type.get(ID_specialization_of);
+          const auto *primary = symbol_table.lookup(prim_name);
+          if(primary)
+          {
+            const symbolt *fallback = primary;
+            // Search for a satisfied specialization
+            cpp_scopet *ts = id_map_lookup(cpp_scopes, prim_name);
+            if(ts)
+            {
+              cpp_scopet &scope = ts->get_parent();
+              cpp_scopet::id_sett id_set =
+                scope.lookup(primary->base_name, cpp_scopet::SCOPE_ONLY);
+              for(const auto *id_ptr : id_set)
+              {
+                const symbolt &s = lookup(id_ptr->identifier);
+                if(s.type.get(ID_specialization_of).empty())
+                  continue;
+                if(&s == best_match)
+                  continue;
+                const cpp_declarationt &sd = to_cpp_declaration(s.type);
+                const exprt &rc = static_cast<const exprt &>(
+                  sd.template_type().find(ID_C_requires_clause));
+                if(rc.is_nil() || rc.id() == ID_nil)
+                  continue;
+                int rv = eval(rc);
+                if(rv == 1)
+                {
+                  fallback = &s;
+                  break;
+                }
+              }
+            }
+            best_match = fallback;
+            best_spec_args = full_args;
+          }
+        }
+      }
+    }
+
     // Only do this for libc++ (CLANG preprocessor) where forward
     // declarations in __fwd/ headers are common.
     if(config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG)
