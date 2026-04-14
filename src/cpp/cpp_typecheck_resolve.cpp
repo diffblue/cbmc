@@ -1964,8 +1964,12 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
           // Add weight from requires clause constraints
           const auto &req_str =
             cpp_declaration.template_type().get(ID_C_requires_clause);
-          if(!req_str.empty())
+          if(!req_str.empty() && isdigit(id2string(req_str)[0]))
             constrained += std::stoull(id2string(req_str));
+          else if(cpp_declaration.template_type()
+                    .find(ID_C_requires_clause)
+                    .is_not_nil())
+            constrained += 1; // has a requires clause expression
 
           matches.push_back(matcht(
             guessed_template_args,

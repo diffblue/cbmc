@@ -571,6 +571,37 @@ void cpp_typecheckt::elaborate_class_template(
           if(guessed_args.has_unassigned())
             continue;
 
+          // Evaluate requires clause (if present) with substituted args.
+          // If the clause evaluates to false, skip this specialization.
+          {
+            const cpp_declarationt &spec_decl = to_cpp_declaration(s.type);
+            const exprt &req_clause = static_cast<const exprt &>(
+              spec_decl.template_type().find(ID_C_requires_clause));
+            if(req_clause.is_not_nil() && req_clause.id() != ID_nil)
+            {
+              exprt req_copy = req_clause;
+              template_map.apply(req_copy);
+              null_message_handlert null_handler;
+              message_handlert &old_handler = get_message_handler();
+              set_message_handler(null_handler);
+              bool satisfied = true;
+              try
+              {
+                typecheck_expr(req_copy);
+                simplify(req_copy, *this);
+                if(req_copy.is_false())
+                  satisfied = false;
+              }
+              catch(...)
+              {
+                // Can't evaluate — treat as satisfied (backward compat)
+              }
+              set_message_handler(old_handler);
+              if(!satisfied)
+                continue;
+            }
+          }
+
           // Typecheck the partial specialization args with the guessed
           // values, using the primary template for type context.
           // If typechecking fails (e.g., accessing a member of a
