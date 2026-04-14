@@ -1401,14 +1401,44 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
   }
   else
   {
-    // C++20 leading requires clause: skip but count constraints
+    // C++20 leading requires clause: parse and store expression
     if(lex.LookAhead(0) == TOK_REQUIRES)
     {
       cpp_tokent req_tk;
       lex.get_token(req_tk);
-      // Count atomic constraints (separated by &&)
+
+      // Try to parse the requires clause as an expression.
+      // Only accept if the next token after the expression is
+      // a valid start of a declaration (not consumed by the expr).
+      {
+        auto saved_pos = lex.Save();
+        exprt requires_expr;
+        if(rConditionalExpr(requires_expr, false))
+        {
+          int next = lex.LookAhead(0);
+          // Valid tokens after requires clause: type keywords,
+          // identifiers (type names), template, using, struct, etc.
+          if(
+            next == TOK_TEMPLATE || next == TOK_USING || next == TOK_STRUCT ||
+            next == TOK_CLASS || next == TOK_UNION || next == TOK_ENUM ||
+            next == TOK_VOID || next == TOK_INT || next == TOK_CHAR ||
+            next == TOK_SHORT || next == TOK_LONG || next == TOK_FLOAT ||
+            next == TOK_DOUBLE || next == TOK_BOOL || next == TOK_SIGNED ||
+            next == TOK_UNSIGNED || next == TOK_AUTO || next == TOK_CONSTEXPR ||
+            next == TOK_STATIC || next == TOK_INLINE || next == TOK_EXTERN ||
+            next == TOK_FRIEND || next == TOK_VIRTUAL || next == TOK_TYPEDEF ||
+            next == TOK_TYPENAME || next == TOK_CONST || next == TOK_VOLATILE ||
+            (is_identifier(next) && !is_identifier(lex.LookAhead(1))))
+          {
+            template_type.add(ID_C_requires_clause).swap(requires_expr);
+            goto requires_done;
+          }
+        }
+        lex.Restore(saved_pos);
+      }
+
+      // Fallback: skip but count constraints
       std::size_t constraint_count = 1;
-      // requires-clause: skip all constraint expressions
       for(;;)
       {
         if(lex.LookAhead(0) == '!')
@@ -1506,6 +1536,7 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
       // Store constraint count for specialization ordering
       template_type.set(ID_C_requires_clause, std::to_string(constraint_count));
     }
+  requires_done:;
 
     if(lex.LookAhead(0) == TOK_USING)
     {
