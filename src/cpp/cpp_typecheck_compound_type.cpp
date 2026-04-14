@@ -890,18 +890,21 @@ void cpp_typecheckt::typecheck_compound_declarator(
           set_message_handler(null_handler);
           try
           {
-            // For constexpr members, resolve cpp_names in the value
-            // expression using the C++ type-checker before calling
-            // the C do_initializer. This handles expressions like
-            // Abs<1>::value that the C type-checker can't resolve.
-            // Temporarily allow elaboration so that template
-            // metafunctions (e.g., Abs<1>) can be instantiated.
-            if(new_symbol->is_macro && new_symbol->value.is_not_nil())
+            // For constexpr/const members during template instantiation,
+            // resolve cpp_names in the value expression using the C++
+            // type-checker. The C do_initializer can't resolve cpp_name
+            // expressions like gcd<Y, X%Y>::value or Abs<N>::value.
+            // Temporarily allow elaboration so that referenced templates
+            // can be instantiated.
+            bool use_cpp_typecheck = new_symbol->is_macro &&
+                                     new_symbol->value.is_not_nil() &&
+                                     !template_map.expr_map.empty();
+            if(use_cpp_typecheck)
             {
-              bool saved_suppress = suppress_elaborate;
-              suppress_elaborate = false;
+              bool saved_force = force_elaborate;
+              force_elaborate = true;
               typecheck_expr(new_symbol->value);
-              suppress_elaborate = saved_suppress;
+              force_elaborate = saved_force;
               implicit_typecast(new_symbol->value, new_symbol->type);
               simplify(new_symbol->value, *this);
             }
