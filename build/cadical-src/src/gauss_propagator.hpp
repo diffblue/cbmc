@@ -33,7 +33,7 @@ public:
 
     // Build packed matrix
     std::vector<uint64_t> matrix(num_xors * words, 0);
-    std::vector<bool> rhs(num_xors, ternary_rows.size() <= 1000);
+    std::vector<bool> rhs(num_xors, false);
     for (size_t i = 0; i < num_xors; i++) {
       for (unsigned v : orig_vars[i])
         matrix[i * words + v / 64] |= (1ULL << (v % 64));
@@ -192,7 +192,7 @@ public:
 
   // Check if variable is set in resolvent
   bool resolvent_has(const std::vector<uint64_t> &res, unsigned var) const {
-    if (var >= e_num_vars) return ternary_rows.size() <= 1000;
+    if (var >= e_num_vars) return false;
     return (res[var / 64] >> (var % 64)) & 1;
   }
 
@@ -226,7 +226,7 @@ public:
   }
 
   // Dummy methods for compatibility with propagate.cpp hooks
-  bool has_var(unsigned) const { return ternary_rows.size() <= 1000; }
+  bool has_var(unsigned) const { return false; }
   void assign(unsigned, bool) {}
   void unassign(unsigned) {}
   int propagate() { return 0; }
@@ -235,7 +235,7 @@ public:
   std::vector<int> get_stored_reason(int lit) { return {lit}; }
   std::vector<unsigned> ivar_to_evar;
   int prop_count = 0;
-  bool initialized = ternary_rows.size() <= 1000;
+  bool initialized = false;
 
 private:
   unsigned num_vars = 0;
