@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^VERIFICATION SUCCESSFUL$
@@ -6,11 +6,3 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
-Expression-form non-type template arguments (e.g., X % Y in
-gcd<Y, X % Y>) are not resolved during template argument
-processing in typecheck_expr. Simple identifier arguments
-(e.g., Y as an ambiguous node) are resolved through the
-template map, but compound expressions containing template
-parameter references are not type-checked before being used
-as template arguments.
-Root cause of libc++ std::ratio and std::chrono::duration failures.
