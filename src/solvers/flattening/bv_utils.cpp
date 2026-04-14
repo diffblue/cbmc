@@ -1769,7 +1769,8 @@ bvt bv_utilst::dadda_tree(const std::vector<bvt> &pps)
 // with Dadda's reduction yields the most consistent performance improvement
 // while not regressing substantially in the matrix of different benchmarks and
 // CaDiCaL and MiniSat2 as solvers.
-#define RADIX_MULTIPLIER 8
+// #define RADIX_MULTIPLIER 8
+#define USE_KARATSUBA
 #ifdef RADIX_MULTIPLIER
 #  define DADDA_TREE
 #endif
@@ -2727,6 +2728,132 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
   }
 }
 
+bvt bv_utilst::unsigned_karatsuba_full_multiplier(
+  const bvt &op0,
+  const bvt &op1)
+{
+  // We review symbolic encoding of multiplication in context of sw
+  // verification, bit width is 2^n, distinguish truncating (x mod 2^2^n) from
+  // double-output-width multiplication, truncating Karatsuba is 2 truncating
+  // half-width multiplication plus one double-output-width of half width, for
+  // double output width Karatsuba idea is challenge to avoid width extension,
+  // check Wikipedia edit history
+
+  PRECONDITION(op0.size() == op1.size());
+  const std::size_t op_size = op0.size();
+  PRECONDITION(op_size > 0);
+  PRECONDITION((op_size & (op_size - 1)) == 0);
+
+  if(op_size == 1)
+    return {prop.land(op0[0], op1[0]), const_literal(false)};
+
+  const std::size_t half_op_size = op_size >> 1;
+
+  bvt x0{op0.begin(), op0.begin() + half_op_size};
+  bvt x1{op0.begin() + half_op_size, op0.end()};
+
+  bvt y0{op1.begin(), op1.begin() + half_op_size};
+  bvt y1{op1.begin() + half_op_size, op1.end()};
+
+  bvt z0 = unsigned_karatsuba_full_multiplier(x0, y0);
+  bvt z2 = unsigned_karatsuba_full_multiplier(x1, y1);
+
+  bvt x0_sub = zero_extension(x0, half_op_size + 1);
+  bvt x1_sub = zero_extension(x1, half_op_size + 1);
+
+  bvt y0_sub = zero_extension(y0, half_op_size + 1);
+  bvt y1_sub = zero_extension(y1, half_op_size + 1);
+
+  bvt x1_minus_x0_ext = sub(x1_sub, x0_sub);
+  literalt x1_minus_x0_sign = sign_bit(x1_minus_x0_ext);
+  bvt x1_minus_x0_abs = absolute_value(x1_minus_x0_ext);
+  x1_minus_x0_abs.pop_back();
+  bvt y0_minus_y1_ext = sub(y0_sub, y1_sub);
+  literalt y0_minus_y1_sign = sign_bit(y0_minus_y1_ext);
+  bvt y0_minus_y1_abs = absolute_value(y0_minus_y1_ext);
+  y0_minus_y1_abs.pop_back();
+  bvt sub_mult =
+    unsigned_karatsuba_full_multiplier(x1_minus_x0_abs, y0_minus_y1_abs);
+  bvt sub_mult_ext = zero_extension(sub_mult, op_size + 1);
+  bvt z1_ext = add_sub(
+    add(zero_extension(z0, op_size + 1), zero_extension(z2, op_size + 1)),
+    sub_mult_ext,
+    prop.lxor(x1_minus_x0_sign, y0_minus_y1_sign));
+
+  bvt z0_full = zero_extension(z0, op_size << 1);
+  bvt z1_full =
+    zero_extension(concatenate(zeros(half_op_size), z1_ext), op_size << 1);
+  bvt z2_full = concatenate(zeros(op_size), z2);
+
+  return add(add(z0_full, z1_full), z2_full);
+}
+
+bvt bv_utilst::unsigned_karatsuba_multiplier(const bvt &_op0, const bvt &_op1)
+{
+  if(_op0.size() != _op1.size())
+    return unsigned_multiplier(_op0, _op1);
+
+  const std::size_t op_size = _op0.size();
+  if(op_size == 1)
+    return {prop.land(_op0[0], _op1[0])};
+
+  // Make sure we work with operands the length of which are powers of two
+  const std::size_t log2 = address_bits(op_size);
+  PRECONDITION(sizeof(std::size_t) * CHAR_BIT > log2);
+  const std::size_t two_to_log2 = (std::size_t)1 << log2;
+  bvt a = zero_extension(_op0, two_to_log2);
+  bvt b = zero_extension(_op1, two_to_log2);
+
+  const std::size_t half_op_size = two_to_log2 >> 1;
+
+  // We split each of the operands in half and treat them as coefficients of a
+  // polynomial a * 2^half_op_size + b. Straightforward polynomial
+  // multiplication then yields
+  // a0 * a1 * 2^op_size + (a0 * b1 + a1 * b0) * 2^half_op_size + b0 * b1
+  // These would be four multiplications (the operands of which have half the
+  // original bit width):
+  // z0 = b0 * b1
+  // z1 = a0 * b1 + a1 * b0
+  // z2 = a0 * a1
+  // Karatsuba's insight is that these four multiplications can be expressed
+  // using just three multiplications:
+  // z1 = (a0 - b0) * (b1 - a1) + z0 + z2
+  //
+  // Worked 4-bit example, 4-bit result:
+  // abcd * efgh -> 4-bit result
+  // cd * gh -> 4-bit result
+  // cd * ef -> 2-bit result
+  // ab * gh -> 2-bit result
+  // d * h -> 2-bit result
+  // c * g -> 2-bit result
+  // (c - d) * (h - g) + dh + cg; use an extra sign bit for each of the
+  // subtractions, and conditionally negate the product by xor-ing those sign
+  // bits; dh + cg is a 2-bit addition (with possible results 0, 1, 2); the
+  // product has possible values (-1, 0, 1); the final sum cannot evaluate to -1
+  // as
+  // * c=1, d=0, h=0, g=1 (1 * -1) implies cg=1
+  // * c=0, d=1, h=1, g=0 (-1 * 1) implies dh=1
+  // Therefore, after adding (dh + cg) the multiplication can safely be added
+  // over just 2 bits.
+
+  bvt x0{a.begin(), a.begin() + half_op_size};
+  bvt x1{a.begin() + half_op_size, a.end()};
+  bvt y0{b.begin(), b.begin() + half_op_size};
+  bvt y1{b.begin() + half_op_size, b.end()};
+
+  bvt z0 = unsigned_karatsuba_full_multiplier(x0, y0);
+  bvt z1 = add(
+    unsigned_karatsuba_multiplier(x1, y0),
+    unsigned_karatsuba_multiplier(x0, y1));
+  bvt z1_full = concatenate(zeros(half_op_size), z1);
+
+  bvt result = add(z0, z1_full);
+  CHECK_RETURN(result.size() >= op_size);
+  if(result.size() > op_size)
+    result.resize(op_size);
+  return result;
+}
+
 bvt bv_utilst::unsigned_multiplier_no_overflow(
   const bvt &op0,
   const bvt &op1)
@@ -2781,7 +2908,11 @@ bvt bv_utilst::signed_multiplier(const bvt &op0, const bvt &op1)
   bvt neg0=cond_negate(op0, sign0);
   bvt neg1=cond_negate(op1, sign1);
 
+#ifdef USE_KARATSUBA
+  bvt result = unsigned_karatsuba_multiplier(neg0, neg1);
+#else
   bvt result=unsigned_multiplier(neg0, neg1);
+#endif
 
   literalt result_sign=prop.lxor(sign0, sign1);
 
@@ -2849,7 +2980,12 @@ bvt bv_utilst::multiplier(
   switch(rep)
   {
   case representationt::SIGNED: return signed_multiplier(op0, op1);
+#ifdef USE_KARATSUBA
+  case representationt::UNSIGNED:
+    return unsigned_karatsuba_multiplier(op0, op1);
+#else
   case representationt::UNSIGNED: return unsigned_multiplier(op0, op1);
+#endif
   }
 
   UNREACHABLE;
