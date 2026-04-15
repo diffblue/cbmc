@@ -9772,8 +9772,9 @@ bool Parser::rPrimaryExpr(exprt &exp)
 
   case TOK_REQUIRES:
   {
-    // C++20 requires expression: treat as true for verification
+    // C++20 requires expression
     lex.get_token(tk);
+    // Optional parameter list: requires(T c) { ... }
     if(lex.LookAhead(0) == '(')
     {
       lex.get_token(tk);
@@ -9791,6 +9792,30 @@ bool Parser::rPrimaryExpr(exprt &exp)
     }
     if(lex.LookAhead(0) == '{')
     {
+      // Try to parse a single nested requirement:
+      // requires { requires <expr>; }
+      auto saved = lex.Save();
+      lex.get_token(tk); // consume '{'
+      if(lex.LookAhead(0) == TOK_REQUIRES)
+      {
+        cpp_tokent req_tk;
+        lex.get_token(req_tk); // consume inner 'requires'
+        exprt nested_expr;
+        if(rExpression(nested_expr, false) && lex.LookAhead(0) == ';')
+        {
+          lex.get_token(req_tk); // consume ';'
+          if(lex.LookAhead(0) == '}')
+          {
+            lex.get_token(req_tk); // consume '}'
+            // Successfully parsed nested requirement
+            exp = nested_expr;
+            set_location(exp, tk);
+            return true;
+          }
+        }
+      }
+      // Fallback: skip the { ... } block
+      lex.Restore(saved);
       lex.get_token(tk);
       int depth = 1;
       while(depth > 0)
