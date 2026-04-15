@@ -74,7 +74,10 @@ def run_benchmark(cbmc, bench, output_dir, timeout, memory_mb, skip_solver):
     if skip_solver:
         if not any(a in cmd for a in ("--dimacs", "--smt2", "--show-vcc")):
             cmd += ["--dimacs", "--outfile", "/dev/null"]
-    cmd += ["--verbosity", "10"]
+    # --verbosity 8 == M_STATISTICS (see src/util/message.h); captures the
+    # `Runtime ...` lines parsed below without enabling M_DEBUG=10, which
+    # dumps every SSA step via SSA_stept::output and distorts the profile.
+    cmd += ["--verbosity", "8"]
 
     perf_data = bench_dir / "perf.data"
     cbmc_output = bench_dir / "cbmc_output.txt"
