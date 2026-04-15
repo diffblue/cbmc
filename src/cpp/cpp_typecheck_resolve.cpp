@@ -163,7 +163,221 @@ void cpp_typecheck_resolvet::guess_function_template_args(
     if(e.is_not_nil())
     {
       CHECK_RETURN(e.id() != ID_type);
-      identifiers.push_back(e);
+
+      // C++20: check concept constraint satisfaction
+      bool concept_ok = true;
+      {
+        irep_idt tmpl_id = old_id.get(ID_identifier);
+        if(tmpl_id.empty() && old_id.id() == ID_symbol)
+          tmpl_id = to_symbol_expr(old_id).get_identifier();
+        const auto *tmpl_sym = cpp_typecheck.symbol_table.lookup(tmpl_id);
+        if(tmpl_sym && tmpl_sym->type.get_bool(ID_is_template))
+        {
+          const cpp_declarationt &tdecl = to_cpp_declaration(tmpl_sym->type);
+          for(const auto &p : tdecl.template_type().template_parameters())
+          {
+            const irep_idt &cc = p.get("#C_concept_constraint");
+            if(cc.empty())
+              continue;
+            // Get the deduced type from fargs
+            typet actual_type;
+            if(!fargs.operands.empty())
+              actual_type = fargs.operands[0].type();
+            if(actual_type.is_nil())
+              break;
+            // Look up concept definition
+            for(const auto &entry : cpp_typecheck.symbol_table)
+            {
+              if(
+                id2string(entry.second.base_name) != id2string(cc) ||
+                !entry.second.type.get_bool(ID_is_template))
+                continue;
+              const cpp_declarationt &cdecl =
+                to_cpp_declaration(entry.second.type);
+              if(cdecl.declarators().empty())
+                break;
+              const exprt &cval = cdecl.declarators()[0].value();
+              if(cval.is_nil())
+                break;
+              // Get concept parameter name
+              irep_idt cparam;
+              for(const auto &cp : cdecl.template_type().template_parameters())
+              {
+                if(cp.id() == ID_type)
+                {
+                  const std::string cid =
+                    id2string(cp.type().get(ID_identifier));
+                  auto pos = cid.rfind("::");
+                  cparam = pos != std::string::npos
+                             ? irep_idt{cid.substr(pos + 2)}
+                             : irep_idt{cid};
+                  break;
+                }
+              }
+              if(cparam.empty())
+                break;
+              // Evaluate the concept definition with the actual type.
+              // Resolve a type from a cpp_name node.
+              auto resolve_type = [&](const irept &node) -> typet
+              {
+                if(node.id() == ID_cpp_name)
+                {
+                  for(const auto &s : node.get_sub())
+                    if(s.id() == ID_name && s.get(ID_identifier) == cparam)
+                      return actual_type;
+                }
+                return typet{};
+              };
+
+              // Evaluate an expression tree directly.
+              std::function<int(const irept &)> eval =
+                [&](const irept &node) -> int
+              {
+                // -1 = unknown, 0 = false, 1 = true
+                if(node.id() == ID_and)
+                {
+                  for(const auto &sub : node.get_sub())
+                  {
+                    int v = eval(sub);
+                    if(v == 0)
+                      return 0;
+                    if(v == -1)
+                      return -1;
+                  }
+                  return 1;
+                }
+                if(node.id() == ID_or)
+                {
+                  bool any_unknown = false;
+                  for(const auto &sub : node.get_sub())
+                  {
+                    int v = eval(sub);
+                    if(v == 1)
+                      return 1;
+                    if(v == -1)
+                      any_unknown = true;
+                  }
+                  return any_unknown ? -1 : 0;
+                }
+                if(node.id() == ID_not)
+                {
+                  if(node.get_sub().empty())
+                    return -1;
+                  int v = eval(node.get_sub()[0]);
+                  return v == -1 ? -1 : (v ? 0 : 1);
+                }
+                // sizeof(T) <= N
+                if(
+                  node.id() == ID_le || node.id() == ID_lt ||
+                  node.id() == ID_ge || node.id() == ID_gt)
+                {
+                  // Try to evaluate via typecheck+simplify
+                  exprt cmp = static_cast<const exprt &>(node);
+                  std::function<void(irept &)> subst_types = [&](irept &n)
+                  {
+                    if(n.id() == ID_cpp_name)
+                    {
+                      for(const auto &s : n.get_sub())
+                        if(s.id() == ID_name && s.get(ID_identifier) == cparam)
+                        {
+                          n = actual_type;
+                          return;
+                        }
+                    }
+                    for(auto &sub : n.get_sub())
+                      subst_types(sub);
+                    for(auto &named : n.get_named_sub())
+                      subst_types(named.second);
+                  };
+                  subst_types(cmp);
+                  try
+                  {
+                    cpp_typecheck.typecheck_expr(cmp);
+                    simplify(cmp, cpp_typecheck);
+                    if(cmp.is_true())
+                      return 1;
+                    if(cmp.is_false())
+                      return 0;
+                  }
+                  catch(...)
+                  {
+                  }
+                  return -1;
+                }
+                // Type trait: side_effect(function_call)
+                if(node.id() == ID_side_effect)
+                {
+                  const auto &subs = node.get_sub();
+                  if(subs.size() >= 2 && subs[0].id() == ID_cpp_name)
+                  {
+                    irep_idt fname;
+                    for(const auto &s : subs[0].get_sub())
+                      if(s.id() == ID_name)
+                        fname = s.get(ID_identifier);
+                    const auto &args = subs[1].get_sub();
+                    if(args.empty())
+                      return -1;
+                    typet arg_type = resolve_type(args[0]);
+                    if(arg_type.is_nil())
+                      return -1;
+                    if(fname == "__is_integral")
+                      return (arg_type.id() == ID_signedbv ||
+                              arg_type.id() == ID_unsignedbv ||
+                              arg_type.id() == ID_bool ||
+                              arg_type.id() == ID_c_bool)
+                               ? 1
+                               : 0;
+                    if(fname == "__is_floating_point")
+                      return (arg_type.id() == ID_floatbv ||
+                              arg_type.id() == ID_fixedbv)
+                               ? 1
+                               : 0;
+                    if(fname == "__is_pointer")
+                      return arg_type.id() == ID_pointer ? 1 : 0;
+                    if(fname == "__is_signed")
+                      return arg_type.id() == ID_signedbv ? 1 : 0;
+                    if(fname == "__is_same")
+                    {
+                      if(args.size() >= 2)
+                      {
+                        typet t2 = resolve_type(args[1]);
+                        if(!t2.is_nil())
+                          return arg_type == t2 ? 1 : 0;
+                      }
+                      return -1;
+                    }
+                  }
+                }
+                // typecast(true) — from requires-expression fallback
+                if(node.id() == ID_typecast)
+                {
+                  const auto &subs = node.get_sub();
+                  if(!subs.empty())
+                    return eval(subs[0]);
+                }
+                if(node.id() == ID_constant)
+                {
+                  const auto &val = static_cast<const exprt &>(node);
+                  if(val.is_true())
+                    return 1;
+                  if(val.is_false())
+                    return 0;
+                }
+                return -1;
+              };
+
+              int result = eval(cval);
+              if(result == 0)
+                concept_ok = false;
+              break;
+            }
+            break;
+          }
+        }
+      }
+
+      if(concept_ok)
+        identifiers.push_back(e);
     }
     else if(old_id.id() == ID_symbol)
     {
