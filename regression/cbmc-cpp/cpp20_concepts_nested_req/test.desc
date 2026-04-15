@@ -1,11 +1,7 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
-Phase 3.3 of CONCEPTS_PLAN.md: nested requirements.
-requires { requires sizeof(T) <= 4; } evaluates the inner
-requires as a boolean constraint. Needs requires expression
-body parsing.
