@@ -34,6 +34,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_util.h"
 
 #include <algorithm>
+#include <iostream>
 #include <set>
 
 cpp_typecheck_resolvet::cpp_typecheck_resolvet(cpp_typecheckt &_cpp_typecheck)
@@ -347,6 +348,70 @@ void cpp_typecheck_resolvet::guess_function_template_args(
                       return -1;
                     }
                   }
+                }
+                // compound requirement: check method return type
+                if(node.id() == irep_idt{"compound_requirement"})
+                {
+                  const irep_idt &method =
+                    static_cast<const exprt &>(node).get("#method");
+                  const auto &constraint = node.find("#constraint");
+                  std::cerr << "COMPOUND_EVAL: method=" << method
+                            << " constraint_nil=" << constraint.is_nil()
+                            << " actual=" << actual_type.id() << std::endl;
+                  if(method.empty() || constraint.is_nil())
+                    return -1;
+                  if(actual_type.id() != ID_struct_tag)
+                    return -1;
+                  const auto &struct_type = to_struct_type(
+                    cpp_typecheck.follow_tag(to_struct_tag_type(actual_type)));
+                  typet return_type;
+                  for(const auto &comp : struct_type.components())
+                  {
+                    if(
+                      comp.get_base_name() == method &&
+                      comp.type().id() == ID_code)
+                    {
+                      return_type = to_code_type(comp.type()).return_type();
+                      break;
+                    }
+                  }
+                  if(return_type.is_nil())
+                    return -1;
+                  // Extract expected type from constraint template args.
+                  // Structure: cpp_name(name, template_args(arguments=(...)))
+                  // The arguments named sub contains nodes with type subs.
+                  typet expected_type;
+                  for(const auto &sub : constraint.get_sub())
+                  {
+                    if(sub.id() == ID_template_args)
+                    {
+                      const auto &args = sub.find(ID_arguments);
+                      if(!args.is_nil())
+                      {
+                        for(const auto &arg : args.get_sub())
+                        {
+                          const auto &t = arg.find(ID_type);
+                          if(!t.is_nil())
+                          {
+                            expected_type = static_cast<const typet &>(t);
+                            break;
+                          }
+                        }
+                      }
+                      break;
+                    }
+                  }
+                  if(expected_type.is_nil())
+                    return -1;
+                  try
+                  {
+                    cpp_typecheck.typecheck_type(expected_type);
+                  }
+                  catch(...)
+                  {
+                    return -1;
+                  }
+                  return return_type == expected_type ? 1 : 0;
                 }
                 // typecast(true) — from requires-expression fallback
                 if(node.id() == ID_typecast)
