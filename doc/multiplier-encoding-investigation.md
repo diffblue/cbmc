@@ -952,3 +952,100 @@ carry chains short.
 3. The g-fa technique helps the adder-tree popcount (5.25→4.63
    at BW=11) but cannot overcome the structural disadvantage
    of longer carry chains.
+
+## Investigation #3 + #5: Why Comba Beats Dadda — Deep BVE and BCP Analysis
+
+### CNF structure comparison (comm BW=9)
+
+| Metric | Comba (pop0) | Dadda |
+|--------|-------------|-------|
+| Variables | 625 | 425 |
+| Clauses | 2,421 | 1,735 |
+| Cheap BVE targets (cost≤0) | 18 | 8 |
+| First-round BVE eliminations | 54 (19%) | 24 (11%) |
+| Total BVE eliminations | 234 (37%) | 141 (33%) |
+| Fixed variables | 218 (35%) | 152 (36%) |
+| Remaining after BVE | 173 (28%) | 132 (31%) |
+
+Comba has 47% more variables and 40% more clauses, yet solves 2.7x
+faster. The extra variables are BVE-friendly: Comba has 2.25x more
+cheap BVE targets and eliminates 2.25x more variables in the first
+BVE round.
+
+### Polarity and connectivity
+
+Both encodings have nearly identical polarity distributions (all
+variables 50-60% balanced) and identical connectivity to input
+variables. The difference is in INTERNAL variable connectivity:
+
+| Internal degree | Comba | Dadda |
+|----------------|-------|-------|
+| degree 5 | 198 | 72 |
+| degree 7 | 54 | 2 |
+| degree 8 | 68 | 88 |
+| degree 9 | 0 | 14 |
+| Avg degree | 5.6 | 5.9 |
+
+Comba's internal variables are more uniformly connected (peak at
+degree 5-6), while Dadda has a bimodal distribution (peaks at 5
+and 8). The degree-8 variables in Dadda are full_adder outputs
+that connect to 4 clauses × 2 variables = 8 neighbors, making
+them harder to eliminate.
+
+### BCP depth analysis — the critical difference
+
+| Metric | Comba | Dadda |
+|--------|-------|-------|
+| Total decisions | 19,548 | 16,491 |
+| Total conflicts | 10,831 | 27,079 |
+| Total propagations | 589,330 | 377,427 |
+| **Conflicts/decision** | **0.55** | **1.64** |
+| **Props/conflict** | **54.4** | **13.9** |
+| Avg BCP depth | 30.1 | 22.9 |
+
+**Dadda hits 3x more dead ends per decision** (1.64 vs 0.55
+conflicts/decision). Each decision in Dadda is more likely to
+lead to a conflict.
+
+**Comba does 4x more propagation per conflict** (54.4 vs 13.9
+props/conflict). Each conflict in Comba is preceded by much more
+BCP work, meaning the solver explores more of the search space
+before hitting a dead end.
+
+### Structural explanation
+
+Comba's pop0 popcount creates **many short carry chains** (2-4 bits)
+through the parallel bit counting algorithm. Each stage adds small
+fields (2-bit, 4-bit) with short carry propagation. The shift and
+mask operations create intermediate AND variables that connect
+these short chains.
+
+When BCP sets a variable in one short chain, it can cascade through
+the masking/shifting connections to propagate into OTHER short chains.
+This creates LONG BCP cascades through MULTIPLE short chains per
+decision.
+
+Dadda's carry-save reduction creates **fewer but longer carry chains**.
+Each full_adder's carry output connects to the next column, creating
+cross-column dependencies. BCP gets stuck propagating along ONE long
+chain per decision, with fewer opportunities to cascade into other
+chains.
+
+In summary:
+- **Comba**: many short chains → BCP cascades across chains → more
+  propagation per decision → fewer dead ends → fewer conflicts
+- **Dadda**: fewer long chains → BCP stuck in one chain → less
+  propagation per decision → more dead ends → more conflicts
+
+### Connection to carry propagation theory
+
+This directly confirms the Priority 6 finding. The hardness of
+multiplication comes from carry propagation. Comba minimizes this
+by keeping carry chains SHORT (2-4 bits in pop0) while Dadda
+allows carry chains to grow LONG (up to BW bits in the final
+addition and cross-column carries in the reduction).
+
+The pop0 vs adder-tree comparison (Investigation #1) provides
+additional confirmation: replacing pop0's short-chain additions
+with adder-tree's full-width additions makes Comba 3x slower
+despite having fewer variables and clauses.
