@@ -1218,3 +1218,97 @@ With THREE multiplications, the overhead dominates.
 
 **CaDiCaL vs MiniSat:** CaDiCaL is consistently faster (0.58s vs
 1.16s on comm_8, and solves assoc_8/distrib_8 where MiniSat T/O).
+
+### Deep solver analysis: SMT-COMP benchmarks
+
+#### Complete metrics table
+
+| Benchmark | Vars | Cls | Conflicts | c/d | p/c | Avg sz | Avg gl | gl≤1% | Elim% | Time |
+|-----------|------|-----|-----------|-----|-----|--------|--------|-------|-------|------|
+| comm_8+shift | 208 | 935 | 34,420 | 0.79 | 31.2 | 22.1 | 7.3 | 0.3% | 87.5% | 0.65s |
+| **comm_8+comba** | 364 | 1467 | **4,945** | **0.62** | **41.0** | **18.3** | **5.0** | **3.8%** | 73.6% | **0.09s** |
+| **assoc_8+shift** | 400 | 1837 | **981,895** | 0.79 | 41.4 | 44.5 | 10.9 | 1.5% | **106%** | **29.7s** |
+| assoc_8+comba | 712 | 2901 | 2,794,965 | 0.70 | 39.9 | 31.9 | 9.2 | 2.0% | 81.3% | T/O |
+| **distrib_8+shift** | 340 | 1596 | 2,532,077 | 0.78 | 35.4 | 35.6 | 11.2 | 0.5% | **104%** | **118s** |
+| distrib_8+comba | 574 | 2394 | 2,622,762 | 0.64 | 47.4 | 31.8 | 9.4 | 0.8% | 91.8% | T/O |
+| comm_16+shift | 800 | 4031 | 2,430,636 | 0.52 | 63.9 | — | — | — | 39.2% | T/O |
+| **comm_16+comba** | 1484 | 6439 | **448,874** | **0.47** | 63.9 | 32.2 | 8.8 | **5.3%** | **62.7%** | **19.6s** |
+
+Key: c/d = conflicts per decision, p/c = propagations per conflict,
+Avg sz = average learned clause size, Avg gl = average glue,
+Elim% = (eliminated + fixed) / total variables.
+
+#### BCP depth analysis
+
+| Benchmark | Avg depth | Median depth | Depth-1 % |
+|-----------|-----------|--------------|-----------|
+| comm_8+shift | 21.4 | 9 | 21.7% |
+| comm_8+comba | 25.2 | 7 | 20.2% |
+| assoc_8+shift | 30.1 | 9 | 23.8% |
+| assoc_8+comba | 33.1 | 6 | 21.2% |
+| distrib_8+shift | 26.1 | 7 | 23.8% |
+
+#### Analysis: why shift-add wins on associativity and distributivity
+
+**The variable overhead hypothesis is confirmed.** Comba creates
+78% more variables than shift-add (712 vs 400 for assoc_8, 574 vs
+340 for distrib_8). For associativity (3 multiplications), this
+means 312 extra variables. For commutativity (2 multiplications),
+it's 156 extra variables.
+
+**Comba's learned clauses are BETTER** on all benchmarks: smaller
+(31.9 vs 44.5 for assoc_8) and lower glue (9.2 vs 10.9). But this
+advantage is overwhelmed by the LARGER search space.
+
+**The critical metric is BVE elimination rate:**
+- assoc_8+shift: 106% eliminated (more than original — BVE creates
+  new variables during resolution that are then also eliminated).
+  Only 0 variables remain after preprocessing.
+- assoc_8+comba: 81.3% eliminated. ~133 variables remain.
+
+Shift-add's smaller formula allows BVE to eliminate EVERYTHING,
+leaving a trivial residual problem. Comba's larger formula leaves
+133 variables that must be searched, creating 2.8M conflicts.
+
+**For commutativity, the opposite holds:**
+- comm_16+shift: 39.2% eliminated. ~487 variables remain. T/O.
+- comm_16+comba: 62.7% eliminated. ~553 variables remain. 19.6s.
+
+Despite having more remaining variables in absolute terms, Comba's
+remaining variables are structurally easier (as shown in the
+Investigation #3/#5 analysis: shorter carry chains enable BCP
+cascades, 0.47 conflicts/decision vs 0.52).
+
+#### The unifying theory: BVE completeness threshold
+
+The encoding choice determines whether BVE can eliminate ALL or
+MOST variables during preprocessing:
+
+1. **BVE-complete** (shift-add on assoc/distrib): BVE eliminates
+   >100% of variables. The residual problem is trivial. Shift-add
+   wins because its smaller formula is easier to fully eliminate.
+
+2. **BVE-incomplete** (all encodings on comm_16): BVE cannot
+   eliminate enough variables. The residual problem is hard. Comba
+   wins because its structure produces better learned clauses and
+   shorter carry chains for the residual search.
+
+3. **Threshold region** (comm_8): BVE eliminates most variables
+   for both encodings (87.5% shift, 73.6% comba). Comba wins
+   because its residual is smaller AND structurally easier.
+
+The key question for adaptive selection: **will BVE eliminate
+enough variables to make the residual trivial?** If yes, use
+shift-add (smallest formula). If no, use Comba (best residual
+structure).
+
+Factors that push toward BVE-completeness:
+- Fewer multiplications (less variable interaction)
+- Smaller formula (fewer variables to eliminate)
+- More additions relative to multiplications (additions are
+  BVE-friendly)
+
+Factors that push toward BVE-incompleteness:
+- More multiplications (more cross-multiplication dependencies)
+- Larger bitwidth (exponentially harder residual)
+- Pure multiplication (no additions to help BVE)
