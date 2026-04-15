@@ -234,8 +234,35 @@ the internal adder encoding **doesn't matter** for Dadda, Wallace,
 or Comba — they use their own reduction schemes (full adders directly,
 not through `adder()`). Only shift-add routes through `adder()`.
 
+**Verification data (Dadda with different multiplier-internal adders):**
+
+| Dadda + internal adder | comm-9 | comm-11 |
+|------------------------|--------|---------|
+| dadda + ripple(internal) | 0.53 | 14.3 |
+| dadda + simple-ripple(internal) | 0.53 | 14.3 |
+| dadda + BK(internal) | 0.53 | 14.4 |
+| dadda + g-only(internal) | 0.53 | 14.4 |
+
+All identical — the `multiplier_adder_encoding` flag has no effect
+on Dadda because Dadda calls `full_adder()` directly for its
+carry-save reduction, bypassing `adder()` entirely. The same is
+true for Wallace and Comba.
+
+**Isolating top-level vs internal adder effect (Dadda):**
+
+| Config | comm-9 | comm-11 |
+|--------|--------|---------|
+| dadda + ripple(top) + ripple(internal) | 0.53 | 14.3 |
+| dadda + g-only(top) + ripple(internal) | 0.71 | **7.84** |
+| dadda + ripple(top) + g-only(internal) | 0.53 | 14.4 |
+| dadda + g-only(both) | 0.71 | **7.85** |
+
 The earlier "dadda+g-only = 7.92s" result was from g-only on the
 **top-level equality check** (`c == d`), not from inside the multiplier.
+The commutativity benchmark is `c = a*b; d = b*a; assert(c == d)`.
+The top-level g-only adds AND gates to the equality encoding
+(`lequal` → `lxor`), and the BVE catalyst helps simplify that
+comparison — not the multiplication itself.
 
 ### Learned Clause Quality: All Multiplier Encodings (comm BW=9)
 
@@ -246,14 +273,37 @@ The earlier "dadda+g-only = 7.92s" result was from g-only on the
 | **Dadda** | **425** | **27,079** | **22.4** | **6.6** | **1%** | **0.59s** |
 | **Comba** | **625** | **10,831** | **20.6** | **6.2** | **2%** | **0.22s** |
 
+The multiplier encoding ranking correlates perfectly with conflict
+count. The mechanism is **moderately better learned clauses** — Comba
+produces clauses that are 37% smaller (20.6 vs 32.7 literals) and
+22% lower glue (6.2 vs 7.9) than shift-add. This is fundamentally
+different from the BK adder effect, where 95% of learned clauses
+had glue 1. No multiplier encoding achieves significant glue-1 rates.
+
+The improvement is quantitative (fewer, better conflicts) rather than
+qualitative (no regime shift). This is consistent with the Priority 6
+finding that multiplication hardness is structural — encoding changes
+can only provide constant-factor improvements.
+
 ### BVE Elimination Rates
 
-| Encoding | Vars | Eliminated | Fixed | Remaining |
-|----------|------|-----------|-------|-----------|
-| shift-add | 425 | 159 | 127 | 139 |
-| Dadda | 425 | 141 | 152 | 132 |
-| Wallace | 441 | 231 | 71 | 139 |
-| Comba | 625 | 234 | 218 | 173 |
+| Encoding | Vars | Eliminated | Fixed | Subsumed | Remaining |
+|----------|------|-----------|-------|----------|-----------|
+| shift-add | 425 | 159 (37%) | 127 (30%) | 25,522 | 139 (33%) |
+| Dadda | 425 | 141 (33%) | 152 (36%) | 6,938 | 132 (31%) |
+| Wallace | 441 | 231 (52%) | 71 (16%) | 15,349 | 139 (32%) |
+| Comba | 625 | 234 (37%) | 218 (35%) | 2,671 | 173 (28%) |
+
+Comba has the most variables (625 vs 425) but achieves the LOWEST
+remaining percentage (28%) after BVE. The extra popcount tree
+variables are efficiently eliminated — they serve as BVE catalysts,
+similar to the g-only AND gates for adders. The popcount tree
+creates intermediate variables with favorable polarity alignment
+that BVE can subsume.
+
+Shift-add has the most subsumptions (25,522) but the most remaining
+variables (33%). The sequential accumulation creates long dependency
+chains that BVE cannot break.
 
 ### Propagation Depth
 
@@ -263,21 +313,12 @@ The earlier "dadda+g-only = 7.92s" result was from g-only on the
 | Dadda | 27 | 27, 5, 5, ... |
 | Comba | 39 | 39, ... |
 
-### Analysis
-
-The multiplier encoding ranking correlates with **conflict count**:
-- Comba: 10,831 conflicts (fewest) → 0.22s (fastest)
-- Dadda: 27,079 conflicts → 0.59s
-- Wallace: 53,623 conflicts → 1.35s
-- shift-add: 88,733 conflicts (most) → 2.26s (slowest)
-
-The mechanism is **moderately better learned clauses** (smaller size,
-lower glue) rather than the dramatic glue-1 shift seen with BK for
-adders. No multiplier encoding achieves significant glue-1 rates.
-
-Comba has the most variables (625 vs 425) but the fewest remaining
-after BVE (173 vs 132-139). The extra popcount tree variables are
-efficiently eliminated, similar to the g-only BVE catalyst for adders.
+The first decision propagates many variables (initial unit propagation
+after preprocessing). Subsequent decisions propagate very few (2-5).
+This is the hallmark of multiplication hardness: short propagation
+chains mean the solver must make many decisions to explore the search
+space. Compare with BK adder where each decision propagates 8-18
+variables through the carry tree.
 
 ### Key Insight: Top-Level Encoding Matters More
 
@@ -360,6 +401,18 @@ Test Karatsuba and Toom-Cook with:
 
 ## Priority 1a Results: Simple Full Adder Inside Reduction Trees
 
+The 14-clause propagation-complete full_adder encoding is used for
+every carry-save reduction step in Dadda and Wallace. We tested
+whether a simpler encoding (using `carry()` + double-XOR, which
+creates more variables but fewer and simpler clauses) works better
+inside the reduction tree.
+
+**Rationale:** In carry-save form, each full_adder is independent —
+its carry output goes to the NEXT column, not to the next bit in
+the same column. Propagation completeness (the ability to derive
+all implied literals from any two inputs) may be unnecessary when
+the carry doesn't feed back into the same chain.
+
 | Config | comm-9 | comm-11 | comm-13 |
 |--------|--------|---------|---------|
 | dadda | 0.53 | 14.3 | T/O |
@@ -369,15 +422,20 @@ Test Karatsuba and Toom-Cook with:
 | **comba** | **0.24** | **1.75** | **8.17** |
 | comba+simple-fa | 0.31 | 2.02 | 10.6 |
 
-**Simple-fa helps Dadda (1.8x at BW=11)** by using fewer clauses per
-full adder in the reduction tree. The non-propagation-complete encoding
-works better inside Dadda because the reduction tree's structure doesn't
-require carry chain propagation completeness — each full adder is
-independent (carry-save form).
+**Simple-fa helps Dadda 1.8x at BW=11** (14.3→8.06s). The simpler
+encoding produces more variables (483 vs 427 for BW=9) but the
+clauses are individually simpler, and BVE can eliminate the extra
+variables. The net effect is that the solver's preprocessing
+simplifies the formula more effectively.
 
-**Simple-fa hurts Comba** because Comba uses popcount trees (not full
-adders for reduction). The simple-fa only affects the FINAL addition
-in Comba, where propagation completeness matters.
+**Simple-fa helps Wallace modestly** (52.1→48.0, 1.1x). Wallace
+has more full_adder calls than Dadda (it reduces more aggressively
+in early stages), so the per-gate improvement compounds less.
+
+**Simple-fa hurts Comba** (1.75→2.02, 0.87x) because Comba uses
+popcount trees for column reduction, not full_adders. The simple-fa
+only affects Comba's FINAL carry-propagate addition, where
+propagation completeness matters for the ripple carry chain.
 
 ### Best Combinations with g-only Top-Level
 
@@ -393,6 +451,19 @@ is longer.
 
 ## Priority 1b Results: g-only at Full Adder Level
 
+We added a redundant AND(a,b) gate inside each `full_adder()` call.
+The AND gate creates a new variable `g = a AND b` with 3 clauses
+that structurally match the carry generation term in the full_adder's
+MAJ(a,b,cin) computation. This is the same BVE polarity alignment
+mechanism discovered for adders (the "g-only" encoding), but applied
+at the individual gate level inside the reduction tree.
+
+**Implementation:** Before the optimal full_adder encoding, if
+`use_fa_g_only` is set and both inputs are non-constant and distinct,
+call `prop.land(a, b)` to create the redundant AND. The result is
+discarded — only the side-effect (adding the AND gate's clauses to
+the CNF) matters.
+
 | Config | comm-9 | comm-11 |
 |--------|--------|---------|
 | dadda | 0.53 | 14.3 |
@@ -403,19 +474,41 @@ is longer.
 | comba+g-fa | 0.22 | 1.79 |
 | wallace+g-fa | 1.82 | 58.7 |
 
-**dadda+g-fa gives 2.9x speedup at BW=11** (14.3→4.89s). The g-only
-BVE catalyst at the full_adder level works inside Dadda's reduction
-tree. Each full_adder gets a redundant AND(a,b) that helps BVE
-simplify the carry-save reduction.
+**dadda+g-fa gives 2.9x speedup at BW=11** (14.3→4.89s). This is
+the best Dadda result across all experiments. The mechanism: each
+redundant AND(a,b) in the reduction tree creates clauses that BVE
+can use to eliminate the full_adder's carry variable. When one
+carry variable is eliminated, it reduces the occurrence count of
+its input variables, enabling cascading elimination — the same
+BVE cascade mechanism discovered for adders.
 
-g-fa is BETTER than simple-fa for Dadda (4.89 vs 8.06). The mechanisms
-are different: simple-fa reduces clauses per gate, g-fa adds BVE
-catalyst variables. g-fa wins because BVE cascade is more powerful
-than clause reduction for Dadda's structure.
+**g-fa is BETTER than simple-fa for Dadda** (4.89 vs 8.06). The
+mechanisms are different and complementary in theory but not in
+practice:
+- simple-fa: reduces clauses per gate (fewer, simpler clauses)
+- g-fa: adds BVE catalyst variables (more variables, but BVE
+  eliminates them AND the original carry variables)
+- combined (sfa+g): 8.05s — the simple-fa path bypasses the
+  optimal full_adder, so the AND gate's polarity alignment with
+  the carry clauses is lost. The g-fa mechanism requires the
+  14-clause optimal encoding to work.
 
-g-fa is neutral for Comba (1.79 vs 1.75) and HURTS Wallace (58.7 vs 52.1).
+**g-fa is neutral for Comba** (1.79 vs 1.75) because Comba uses
+popcount trees, not full_adders, for column reduction. The g-fa
+only affects the few full_adders in Comba's final addition.
+
+**g-fa HURTS Wallace** (58.7 vs 52.1). Wallace has more full_adder
+calls than Dadda (it reduces all columns to height 2 in each pass,
+while Dadda only reduces to the minimum needed). The extra AND
+variables overwhelm BVE — too many catalyst variables without
+enough elimination opportunities.
 
 ## Priority 1d Results: Final Addition Encoding
+
+Dadda and Wallace produce two rows in carry-save form. The final
+step is a carry-propagate addition that IS routed through `adder()`,
+so the `--adder-encoding` flag controls it. We tested BK, g-only,
+and ripple for this final addition, both alone and combined with g-fa.
 
 | Config | comm-9 | comm-11 |
 |--------|--------|---------|
@@ -426,33 +519,100 @@ g-fa is neutral for Comba (1.79 vs 1.75) and HURTS Wallace (58.7 vs 52.1).
 | dadda+g-fa (BK final) | T/O | T/O |
 | dadda+g-fa (g-only final) | 0.87 | 6.91 |
 
-BK for final addition: T/O (kills it). g-only for final addition
-helps plain dadda (1.8x) but hurts dadda+g-fa (too many redundant vars).
-**Best Dadda: g-fa with ripple final (4.89s).**
+**BK for final addition: T/O.** BK adds O(n log n) extra variables
+for the parallel prefix tree. Inside a multiplication context, these
+extra variables compound with the already-large reduction tree,
+overwhelming the solver. This is consistent with the general finding
+that BK hurts multiplication.
+
+**g-only for final addition helps plain Dadda** (14.3→7.84, 1.8x).
+The g-only AND gates in the final carry-propagate addition trigger
+BVE cascades in the carry chain, same mechanism as for standalone
+additions.
+
+**g-only for final addition HURTS dadda+g-fa** (4.89→6.91). When
+g-fa already adds AND gates inside the reduction tree, adding MORE
+AND gates in the final addition creates too many redundant variables.
+The BVE catalyst has diminishing returns — each additional catalyst
+variable adds 3 clauses but the elimination opportunities are
+already saturated.
+
+**Best Dadda: g-fa with ripple final (4.89s).** The g-fa mechanism
+inside the reduction tree is more effective than g-only on the
+final addition, and combining them is counterproductive.
 
 ## Priority 2 Results: Radix Multiplier
+
+The radix-8 multiplier pre-computes x*3, x*5, x*7 using additions
+(routed through `adder()`), then selects partial products via MUX
+based on groups of 3 multiplier bits. This produces N/3 partial
+products instead of N, but each pre-computation addition has a
+carry chain.
+
+**Radix-8 is compile-time only** (`#define RADIX_MULTIPLIER 8`).
+The pre-computation additions use the top-level `adder_encoding`,
+not `multiplier_adder_encoding`.
 
 | Config | comm-9 | comm-11 |
 |--------|--------|---------|
 | dadda (no radix) | 0.53 | 14.3 |
 | dadda+radix4 | 1.43 | 39.8 |
 | dadda+radix8 | 1.35 | 28.3 |
+| comba (no radix) | 0.24 | 1.75 |
 | comba+radix8 | 1.40 | 21.4 |
 
-Radix multipliers are SLOWER at BW=9-11. The pre-computation overhead
-(additions for x*3, x*5, x*7) hurts at small bitwidths. Radix may
-help at BW=17+ where fewer partial products matter more.
+Radix multipliers are **2-15x SLOWER** at BW=9-11. The pre-computation
+overhead (3 additions for x*3, x*5, x*7 in radix-8) adds carry chains
+that dominate at small bitwidths. The reduction in partial products
+(N/3 vs N) doesn't compensate because the partial products are wider
+and the MUX selection logic adds clauses.
+
+At BW=15+, everything times out — commutativity is exponentially hard
+regardless of encoding (see Priority 6).
+
+**Conclusion:** Radix multipliers are not beneficial for SAT-based
+verification at any tested bitwidth. The carry chains in the
+pre-computation additions add exactly the kind of global dependencies
+that make multiplication hard (Priority 6).
 
 ## Priority 3 Results: Cross-Benchmark Validation
 
-Factoring (SAT): all encodings equally fast (0.03-0.07s). Encoding
-doesn't matter for SAT problems (consistent with adder finding).
+Tested all multiplier encodings on four benchmark types:
 
-Distributivity: T/O for all encodings at BW=7. Much harder than
-commutativity — requires reasoning about multiplication + addition
-interaction.
+| Config | comm-9 | dist-7 | fact-20 | const3-9 |
+|--------|--------|--------|---------|----------|
+| shift-add | 1.95 | T/O | 0.05 | 0.01 |
+| dadda | 0.53 | T/O | 0.04 | 0.01 |
+| dadda+g-fa | 0.73 | T/O | 0.05 | 0.01 |
+| comba | 0.24 | T/O | 0.06 | 0.01 |
+| comba+g-top | 0.16 | T/O | 0.07 | 0.01 |
 
-Square identity: trivially fast for all (CBMC simplifies algebraically).
+**Factoring (SAT):** All encodings equally fast (0.04-0.07s). The
+SAT solver finds factors immediately regardless of encoding. This
+is consistent with the adder finding (BK helps UNSAT, hurts SAT)
+and the Priority 6 analysis: SAT problems are easy because the
+solver only needs to find ONE satisfying assignment, not prove
+that NONE exists.
+
+**Factoring at larger bitwidths (BW=24, 28, 32):** Still trivially
+fast (0.00-0.07s) for all encodings. Factoring small numbers is
+easy for SAT solvers because the search space has many solutions.
+
+**Distributivity (UNSAT):** T/O for all encodings at BW=7. This is
+harder than commutativity because it requires reasoning about
+multiplication AND addition interaction: `a*(b+c) == a*b + a*c`.
+The formula has three multiplications and two additions, creating
+a much larger carry dependency network.
+
+**Constant multiplication:** Trivially fast (0.01s) — CBMC
+simplifies `a*3 == a+a+a` at the expression level.
+
+**Square identity:** Trivially fast — CBMC simplifies
+`(a+b)^2 == a^2 + 2*a*b + b^2` at the expression level.
+
+**Conclusion:** Encoding choice matters only for UNSAT multiplication
+proofs. SAT problems and algebraically simplifiable identities are
+unaffected. The commutativity benchmark is the canonical hard case.
 
 ## Summary: Best Configurations
 
@@ -512,30 +672,60 @@ Investigate the STRUCTURAL reason:
 ## Priority 4 Results: Karatsuba and Toom-Cook
 
 Karatsuba is used in `signed_multiplier()` (line 3491) and calls
-`unsigned_karatsuba_full_multiplier()` recursively. It uses `add()`
-for combining sub-products, which routes through `adder()`.
+`unsigned_karatsuba_full_multiplier()` recursively. It splits each
+operand into high and low halves, computes three sub-multiplications,
+and combines them with additions. The additions use `add()` which
+routes through `adder()`, so the `--adder-encoding` flag affects them.
 
-Toom-Cook is implemented but not wired to runtime selection.
+Toom-Cook is implemented (`unsigned_toom_cook_multiplier()`) but not
+wired to runtime selection via CLI flags.
 
-Testing deferred — the hardness analysis (Priority 6) provides more
-fundamental insight.
+**Not benchmarked in this investigation.** The Priority 6 analysis
+shows that Karatsuba's recursive structure adds MORE carry-propagate
+additions (for combining sub-products), which adds exactly the kind
+of global carry dependencies that make multiplication hard. Karatsuba
+reduces the number of sub-multiplications from 4 to 3 (for each
+recursion level), but each combination step adds carry chains.
+
+For SAT-based verification, Karatsuba is unlikely to help because:
+1. The carry chains in combination additions add global dependencies
+2. The recursive structure creates deeper variable dependency graphs
+3. BVE cannot easily eliminate variables across recursion boundaries
+
+Karatsuba and Toom-Cook are designed for COMPUTATION efficiency
+(fewer arithmetic operations), not for VERIFICATION efficiency
+(fewer SAT conflicts). The two objectives are fundamentally different.
 
 ## Priority 5 Results: Radix Multiplier Pre-Computation Adder Variations
+
+The radix-8 pre-computation additions (`x*3 = x + x<<1`, `x*5 = x + x<<2`,
+`x*7 = x*3 + x<<2`) use the top-level `adder_encoding`. We tested all
+adder encodings for these pre-computation additions.
 
 | Config | comm-9 | comm-11 |
 |--------|--------|---------|
 | radix8+ripple | 1.60 | 27.4 |
 | radix8+g-only | 1.42 | 25.7 |
 | radix8+BK | T/O | T/O |
-| radix8+comba | 1.42 | 21.7 |
-| radix8+dadda | 1.36 | 28.9 |
+| radix8+comba (reduction) | 1.42 | 21.7 |
+| radix8+dadda (reduction) | 1.36 | 28.9 |
+| radix8+dadda+g-fa | 1.35 | 27.6 |
 
-Radix-8 is consistently slower than non-radix at BW=9-13. The
-pre-computation overhead (additions for x*3, x*5, x*7) hurts.
-Different adder encodings for pre-computation make only minor
-differences (1.36-1.60s at BW=9). BK kills radix too.
+**Adder encoding makes only minor differences** for radix pre-computation
+(1.35-1.60s at BW=9, 21.7-28.9s at BW=11). The pre-computation additions
+are small (BW-wide) and few (3 for radix-8), so the adder encoding
+choice has limited impact compared to the overall radix overhead.
 
-At BW=15+, everything times out (commutativity is exponentially hard).
+**BK kills radix too** (T/O). The BK tree variables compound with
+the radix pre-computation variables.
+
+**Best radix config:** radix8+comba at 21.7s (BW=11), but this is
+still 12x slower than comba without radix (1.75s).
+
+**Conclusion:** Varying the pre-computation adder encoding does not
+rescue the radix multiplier. The fundamental problem is that radix
+adds carry chains (in pre-computation) to reduce partial products,
+but the carry chains are exactly what makes multiplication hard.
 
 ## Priority 6: Why Is Multiplication Hard for SAT Solvers?
 
@@ -616,3 +806,89 @@ asymptotic improvements. The best we can do is:
 3. Avoid adding MORE carry chain variables (why BK hurts)
 4. Use word-level reasoning (Bitwuzla's approach) to avoid
    bit-blasting entirely
+
+## Consolidated Findings and Recommendations
+
+### What works
+
+| Technique | Effect | Where | Mechanism |
+|-----------|--------|-------|-----------|
+| Comba encoding | 8-32x | All UNSAT mul | Column-wise popcount minimizes carry chains |
+| g-only top-level | 1.5-1.8x | Equality checks | BVE catalyst on comparison encoding |
+| g-fa (AND in full_adder) | 2.9x | Dadda reduction | BVE cascade in carry-save tree |
+| simple-fa | 1.8x | Dadda reduction | Fewer clauses per gate |
+| comba+sfa+g-top | best@BW=13 | Large bitwidths | Combined: popcount + simple final + BVE top |
+
+### What doesn't work
+
+| Technique | Effect | Why |
+|-----------|--------|-----|
+| BK inside multipliers | T/O | Extra variables overwhelm solver |
+| Radix multiplier | 2-15x slower | Pre-computation carry chains add hardness |
+| g-fa for Wallace | 1.1x slower | Too many catalyst variables |
+| g-fa + g-only combined | worse than g-fa alone | Diminishing returns on BVE catalysts |
+| Any encoding for SAT problems | no effect | SAT is trivially easy regardless |
+
+### Recommended Next Steps
+
+#### High priority (likely to yield results)
+
+1. **Comba popcount tree variations.** Comba's advantage comes from
+   its popcount-based column reduction. Test alternative popcount
+   implementations: sorting networks, compressor trees (4:2, 5:3),
+   or hybrid approaches. The popcount tree structure determines how
+   many carry chains exist — fewer chains = fewer global dependencies.
+
+2. **Adaptive multiplier selection.** Like `--adder-encoding adaptive`
+   selects g-only for adders, implement adaptive multiplier selection
+   that picks comba for UNSAT-likely problems and shift-add for
+   SAT-likely problems. The SAT/UNSAT asymmetry is even stronger
+   for multiplication than for addition.
+
+3. **Profile Comba's popcount in detail.** Comba achieves 28% remaining
+   variables after BVE (lowest). Understand exactly which popcount
+   tree variables BVE eliminates and why. This could reveal further
+   optimization opportunities within the popcount structure.
+
+4. **Test on real-world verification benchmarks.** All testing so far
+   uses algebraic identity benchmarks (commutativity, distributivity).
+   Test on actual CBMC verification tasks that involve multiplication:
+   overflow checks, range analysis, cryptographic code. The encoding
+   ranking may differ for problems where multiplication is embedded
+   in larger verification conditions.
+
+#### Medium priority (informative but uncertain payoff)
+
+5. **Deeper analysis of why Comba beats Dadda.** Both produce the same
+   partial products. Comba reduces columns independently (popcount),
+   Dadda reduces rows (carry-save). Why does column-wise reduction
+   produce fewer conflicts? Hypothesis: column-wise reduction creates
+   shorter carry paths because each column's popcount is independent,
+   while Dadda's row reduction creates cross-column carry dependencies.
+
+6. **Hybrid Dadda+g-fa / Comba.** Dadda+g-fa (4.89s) is competitive
+   with Comba (1.75s) at BW=11. At larger bitwidths, the gap may
+   narrow or reverse. Test whether a hybrid (Comba for small
+   sub-multiplications, Dadda+g-fa for large) could be optimal.
+
+7. **Word-level preprocessing.** The Priority 6 analysis shows that
+   carry propagation is the fundamental barrier. Word-level reasoning
+   (as in Bitwuzla) avoids bit-blasting entirely. Investigate whether
+   CBMC could add word-level simplification passes before bit-blasting:
+   e.g., recognizing `a*b == b*a` at the expression level (CBMC
+   already does this for addition but not multiplication).
+
+#### Low priority (unlikely to help based on current evidence)
+
+8. **Karatsuba/Toom-Cook benchmarking.** These add carry chains in
+   combination steps. Based on the Priority 6 analysis, they are
+   unlikely to help SAT-based verification.
+
+9. **Radix at very large bitwidths.** Radix reduces partial products
+   from N to N/3, which matters more at large N. But commutativity
+   times out at BW=15 regardless, so there's no testable regime
+   where radix could help.
+
+10. **CryptoMiniSat XOR handling for multiplication.** CMS's XOR
+    detection was tested for adders (no benefit). Multiplication's
+    carry structure is even less XOR-friendly.
