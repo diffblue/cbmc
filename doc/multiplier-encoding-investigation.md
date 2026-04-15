@@ -1312,3 +1312,136 @@ Factors that push toward BVE-incompleteness:
 - More multiplications (more cross-multiplication dependencies)
 - Larger bitwidth (exponentially harder residual)
 - Pure multiplication (no additions to help BVE)
+
+#### CaDiCaL BVE option sweep
+
+CaDiCaL has extensive BVE tuning options. We tested all of them
+on the key benchmarks.
+
+**comm_16+comba (baseline 19.7s):**
+
+| Option | Conflicts | Elim | Fixed | Time | Δ |
+|--------|-----------|------|-------|------|---|
+| default | 448,874 | 837 | 94 | 19.7s | — |
+| **elimsubst=false** | 415,453 | 737 | 204 | **17.5s** | **-11%** |
+| **elimequivs=false** | 438,296 | 838 | 96 | **18.4s** | **-6%** |
+| elimxors=false | 489,173 | 806 | 208 | 19.6s | 0% |
+| elimands=false | 499,077 | 799 | 154 | 23.3s | +18% |
+| elimites=false | 570,916 | 839 | 122 | 24.6s | +25% |
+| elim=false | 436,065 | 229 | 225 | 23.7s | +20% |
+| elimboundmax=100 | 1,238,698 | 945 | 62 | T/O | — |
+
+Disabling substitution (elimsubst=false) gives 11% speedup.
+Disabling equivalence detection gives 6% speedup. Both reduce
+the number of eliminations but increase fixed variables (unit
+propagation during preprocessing), suggesting these BVE features
+interfere with unit propagation.
+
+**elimboundmax=100 causes T/O** — allowing higher-cost eliminations
+is catastrophic. The extra resolvents bloat the formula without
+helping the search. This is BVE OVER-ELIMINATION.
+
+**assoc_8+shift (baseline 30.0s):**
+
+| Option | Conflicts | Time | Δ |
+|--------|-----------|------|---|
+| default | 981,895 | 30.0s | — |
+| elimands=false | 1,226,667 | 39.5s | +32% |
+| elim=false | 1,023,011 | 41.4s | +38% |
+| elimequivs=false | 941,295 | 29.0s | -3% |
+
+AND gate detection is critical for assoc_8 (32% slower without it).
+This is the opposite of comm_16 where AND detection helps less.
+
+**distrib_8+shift (baseline T/O at 120s):**
+
+| Option | Conflicts | Fixed | Time | Result |
+|--------|-----------|-------|------|--------|
+| default | 2,520,492 | 20 | T/O | — |
+| **elimands=false** | 2,134,159 | **102** | **106s** | **SOLVED** |
+| **elimxors=false** | 2,052,739 | **133** | **101s** | **SOLVED** |
+| elimands+xors=false | 2,425,161 | 3 | T/O | — |
+| elimrounds=10 | 2,233,869 | 138 | 105s | SOLVED |
+
+**Disabling AND or XOR gate detection individually SOLVES distrib_8**
+(from T/O to 101-106s). The key: "fixed" variables jump from 20 to
+102-133. Gate detection INTERFERES with unit propagation — the gate
+clauses prevent BCP from fixing variables that would otherwise be
+determined.
+
+Disabling BOTH AND and XOR detection hurts (T/O, only 3 fixed).
+This is a phase transition: the solver needs SOME gate detection
+but not all of it.
+
+#### Analysis: BVE over-elimination
+
+The BVE option sweep reveals that CaDiCaL's default BVE configuration
+is not optimal for multiplication circuits:
+
+1. **Substitution hurts commutativity** (elimsubst=false gives 11%
+   speedup on comm_16). Substitution replaces a variable with its
+   definition, which can create larger clauses that slow down BCP.
+
+2. **Gate detection interferes with unit propagation** on distributivity.
+   AND and XOR gate detection creates new clauses (resolvents) that
+   prevent BCP from fixing variables. Disabling one type of gate
+   detection allows more unit propagation.
+
+3. **Higher elimination bounds are catastrophic** (elimboundmax=100
+   causes T/O on comm_16). Eliminating high-cost variables creates
+   too many resolvents, bloating the formula.
+
+4. **ITE detection is consistently helpful** (elimites=false hurts
+   on all benchmarks). ITE gates in multiplication circuits are
+   from MUX structures in the encoding.
+
+These findings suggest that multiplication circuits have a specific
+BVE "sweet spot" that differs from CaDiCaL's general-purpose defaults.
+A multiplication-aware BVE configuration could improve performance.
+
+## Further Investigation Areas
+
+Based on all findings so far, the following areas warrant further study:
+
+### 1. Multiplication-tuned CaDiCaL configuration
+The BVE option sweep shows that default CaDiCaL is not optimal for
+multiplication. A systematic search over BVE parameters (elimsubst,
+elimequivs, elimboundmax, elimrounds) could find a better configuration.
+This could be passed via CADICAL_OPTS when multiplication is detected.
+
+### 2. Encoding-specific BVE tuning
+Different encodings may benefit from different BVE configurations:
+- Comba: benefits from AND detection (elimands), hurt by substitution
+- Shift-add: benefits from AND detection, hurt by equiv detection
+- The optimal BVE config may depend on the encoding
+
+### 3. Carry-save vs carry-propagate tradeoff
+Dadda's carry-save form avoids carry propagation until the final
+addition. But our analysis shows Comba's pop0 (which does carry
+propagation in small fields) is better. Is there an intermediate
+approach: carry-save reduction with pop0-style small-field additions?
+
+### 4. Variable ordering interaction
+CaDiCaL's variable ordering (VSIDS/VMTF) interacts with BVE.
+The order in which variables are eliminated affects which resolvents
+are created. Testing --phase and --score options may reveal
+interactions with encoding choice.
+
+### 5. Preprocessing vs inprocessing balance
+The smt2_solver uses satcheck_cadical_no_preprocessingt (no
+preprocessing, only inprocessing). The standalone CaDiCaL does
+preprocessing. For comm_16+comba, the no-preprocessing path
+(smt2_solver) is faster. Understanding when preprocessing helps
+vs hurts for multiplication could inform solver configuration.
+
+### 6. Clause sharing between multiplications
+In commutativity (a*b == b*a), the two multiplications share
+input variables. The solver could potentially share learned clauses
+or BVE results between them. Understanding how CaDiCaL handles
+this sharing could explain why Comba wins on commutativity.
+
+### 7. Resolution proof structure
+The Priority 6 analysis showed multiplication requires exponential
+resolution proofs. Analyzing the actual resolution proof structure
+(which variables appear in the proof, how deep the proof tree is)
+could reveal why some encodings produce shorter proofs.
