@@ -62,6 +62,8 @@ bool cpp_parsert::parse()
   token_buffer.ansi_c_parser.gcc13_type_traits =
     *support_float16 ||
     config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG;
+  token_buffer.ansi_c_parser.clang_preprocessor =
+    config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG;
   // GCC 14+ uses __is_array, __is_function, __is_reference, etc. as builtins
   // in <type_traits>. Older GCC uses template specialization instead.
   {

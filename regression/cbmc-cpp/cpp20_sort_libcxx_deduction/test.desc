@@ -1,4 +1,4 @@
-KNOWNBUG libcxx
+CORE libcxx
 main.cpp
 --cpp20 --unwind 3 --no-unwinding-assertions --stdlib libc++
 ^VERIFICATION
@@ -6,5 +6,4 @@ main.cpp
 ^SIGNAL=0$
 --
 ^PARSING ERROR$
-libc++ C++20 std::sort: __partial_sort_impl template instantiation
-fails during the deep sort algorithm call chain.
+^CONVERSION ERROR$
