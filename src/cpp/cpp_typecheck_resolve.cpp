@@ -4433,7 +4433,20 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
         target != arg_type && arg_type.id() != ID_struct_tag &&
         arg_type.id() != ID_struct)
       {
-        return nil_exprt();
+        // Allow reference-to-struct to match struct_tag target
+        if(
+          arg_type.id() == ID_pointer &&
+          (arg_type.get_bool(ID_C_reference) ||
+           arg_type.get_bool(ID_C_rvalue_reference)))
+        {
+          // The base type of the reference should match the target
+          // (this handles the case where _Compare&& deduces _Compare
+          // from an lvalue reference argument)
+        }
+        else
+        {
+          return nil_exprt();
+        }
       }
     }
   }

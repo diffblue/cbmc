@@ -42,6 +42,7 @@ public:
       bf16_type(false),
       fp16_type(false),
       gcc13_type_traits(false),
+      clang_preprocessor(false),
       gcc14_builtins(false)
   {
     // set up global scope
@@ -81,6 +82,7 @@ public:
   // GCC 13+ type trait builtins: __remove_cv, __remove_reference,
   // __remove_cvref
   bool gcc13_type_traits;
+  bool clang_preprocessor;
   // GCC 14+ type trait builtins: __is_array, __is_function,
   // __is_reference, __is_member_pointer, etc.
   bool gcc14_builtins;
