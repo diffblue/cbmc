@@ -1182,10 +1182,7 @@ bool configt::set(const cmdlinet &cmdline)
     const std::string stdlib = cmdline.get_value("stdlib");
     ansi_c.preprocessor_options.push_back("-stdlib=" + stdlib);
     if(stdlib == "libc++")
-    {
       ansi_c.preprocessor = ansi_ct::preprocessort::CLANG;
-      ansi_c.mode = ansi_ct::flavourt::CLANG;
-    }
   }
 
   if(cmdline.isset("little-endian"))

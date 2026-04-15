@@ -1,4 +1,4 @@
-CORE libcxx
+KNOWNBUG libcxx
 main.cpp
 --cpp20 --unwind 3 --no-unwinding-assertions --stdlib libc++
 ^VERIFICATION
@@ -6,4 +6,5 @@ main.cpp
 ^SIGNAL=0$
 --
 ^PARSING ERROR$
-^CONVERSION ERROR$
+libc++ CONVERSION ERROR: incomplete type, missing symbol, or
+implicit conversion failure.
