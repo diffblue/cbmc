@@ -9807,12 +9807,71 @@ bool Parser::rPrimaryExpr(exprt &exp)
           if(lex.LookAhead(0) == '}')
           {
             lex.get_token(req_tk); // consume '}'
-            // Successfully parsed nested requirement
             exp = nested_expr;
             set_location(exp, tk);
             return true;
           }
         }
+        // Nested requirement parse failed — restore and retry
+        lex.Restore(saved);
+        lex.get_token(tk); // re-consume outer '{'
+      }
+      // Try compound requirement: { { expr } -> concept<type>; }
+      if(lex.LookAhead(0) == '{')
+      {
+        auto saved2 = lex.Save();
+        cpp_tokent req_tk;
+        lex.get_token(req_tk); // consume inner '{'
+        irep_idt method_name;
+        int inner_depth = 1;
+        while(inner_depth > 0)
+        {
+          int t = lex.LookAhead(0);
+          if(t == '{')
+            ++inner_depth;
+          else if(t == '}')
+          {
+            --inner_depth;
+            if(inner_depth == 0)
+                break;
+          }
+          else if(t == '.' && inner_depth == 1)
+          {
+            lex.get_token(req_tk);
+            if(is_identifier(lex.LookAhead(0)))
+            {
+                cpp_tokent name_tk;
+                lex.get_token(name_tk);
+                method_name = name_tk.data.get(ID_C_base_name);
+                continue;
+            }
+          }
+          else if(t == 0)
+            break;
+          lex.get_token(req_tk);
+        }
+        if(lex.LookAhead(0) == '}')
+          lex.get_token(req_tk); // consume inner '}'
+        if(lex.LookAhead(0) == TOK_ARROW && !method_name.empty())
+        {
+          lex.get_token(req_tk); // consume '->'
+          irept constraint_name;
+          if(rName(constraint_name) && lex.LookAhead(0) == ';')
+          {
+            lex.get_token(req_tk); // consume ';'
+            if(lex.LookAhead(0) == '}')
+            {
+                lex.get_token(req_tk); // consume outer '}'
+                exprt compound{"compound_requirement"};
+                compound.set("#method", method_name);
+                compound.add("#constraint").swap(constraint_name);
+                exp = compound;
+                set_location(exp, tk);
+                return true;
+            }
+          }
+        }
+        lex.Restore(saved2);
       }
       // Fallback: skip the { ... } block
       lex.Restore(saved);

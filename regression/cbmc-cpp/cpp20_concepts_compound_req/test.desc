@@ -1,11 +1,7 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
-Phase 3.2 of CONCEPTS_PLAN.md: compound requirements.
-requires(T x) { { expr } -> concept; } checks both validity
-and return type constraint. Needs requires expression parsing
-and concept evaluation.
