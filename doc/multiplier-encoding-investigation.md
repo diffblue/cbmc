@@ -1115,3 +1115,60 @@ g-only top-level benefit comes from the equality check, and Comba's
 BCP cascade advantage also manifests primarily through the equality
 check. On single-multiplication problems, the simpler Dadda encoding
 with fewer variables is more efficient.
+
+### Floating-point benchmarks
+
+FP multiplication uses `bv_utils.unsigned_multiplier()` for the
+mantissa multiplication (line 461 of float_utils.cpp). For float
+(24-bit mantissa), this is a 48-bit multiplication. For double
+(53-bit mantissa), this is a 106-bit multiplication.
+
+| Benchmark | shift-add | comba | dadda | dadda+g-fa |
+|-----------|-----------|-------|-------|------------|
+| FP mul comm (float) | 0.03 | 0.03 | 0.03 | 0.03 |
+| FP mul comm (double) | T/O | T/O | T/O | T/O |
+| FP distributivity (float, SAT) | 0.19 | 0.19 | 0.19 | 0.19 |
+| FP [0,1]*[0,1] bounded (float) | 0.04 | 0.04 | 0.04 | 0.04 |
+| FP a*a >= 0 (float) | 0.03 | 0.03 | 0.03 | 0.03 |
+| Float4 (mixed FP ops) | 21.8 | 21.9 | 21.9 | 21.9 |
+
+**No encoding difference on any FP benchmark.** Reasons:
+- Float (24-bit mantissa): the 48-bit integer multiplication inside
+  the FP circuit is small enough that the solver handles it easily
+  regardless of encoding. The FP wrapper (NaN/Inf handling, rounding,
+  exponent arithmetic) dominates.
+- Double (53-bit mantissa): the 106-bit multiplication is too hard
+  for ANY encoding (T/O at 60s). The FP wrapper adds ~20K variables
+  on top of the multiplication.
+- Float4 (21.8s): multiplication is a small fraction of the total
+  work (the test checks addition, subtraction, division, comparison,
+  and many other FP properties).
+
+**Conclusion:** FP benchmarks are not useful for evaluating multiplier
+encoding because the encoding effect is either invisible (float) or
+overwhelmed (double). The integer multiplication "sweet spot" for
+encoding evaluation is BW=8-16.
+
+### SMT-COMP benchmarks
+
+The `bench-multiplication/smt-comp/` directory contains SMT2 formulas
+for multiplication properties (commutativity, distributivity, factoring,
+overflow). These are solved by `smt2_solver` using MiniSAT, which
+doesn't support our encoding options. The formulas are equivalent to
+the C benchmarks we already test.
+
+### Additional real-world benchmarks
+
+| Benchmark | shift-add | comba | dadda | dadda+g-fa | Status |
+|-----------|-----------|-------|-------|------------|--------|
+| overflow bound BW=8 | 0.024 | 0.033 | **0.023** | 0.025 | UNSAT |
+| overflow bound BW=16 | 0.353 | 0.524 | **0.324** | 0.335 | UNSAT |
+| mul monotone BW=8 | **5.90** | 9.43 | 10.3 | 9.91 | UNSAT |
+
+The overflow bound benchmark confirms: **Dadda is best for single-
+multiplication UNSAT problems** (0.324s vs Comba's 0.524s at BW=16).
+
+The monotonicity benchmark (a≤b ∧ c>0 → a*c≤b*c) is surprisingly
+hard at BW=8 (5.9s) and shift-add wins. This involves TWO
+multiplications with an inequality (not equality) check, which is
+a different structure from commutativity.
