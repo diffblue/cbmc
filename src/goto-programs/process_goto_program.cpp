@@ -22,6 +22,7 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 #include <goto-programs/remove_complex.h>
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_returns.h>
+#include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/remove_vector.h>
 #include <goto-programs/rewrite_rw_ok.h>
 #include <goto-programs/rewrite_union.h>
@@ -73,6 +74,16 @@ bool process_goto_program(
 
   if(options.get_bool_option("rewrite-rw-ok"))
     rewrite_rw_ok(goto_model);
+
+  // Drop unused functions before property instrumentation to avoid
+  // instrumenting functions that will never be reached. The entry point
+  // has been set, and function pointers have already been removed above,
+  // so the static call graph is now an accurate reachability oracle.
+  if(options.get_bool_option("drop-unused-functions"))
+  {
+    log.status() << "Removing unused functions" << messaget::eom;
+    remove_unused_functions(goto_model, log.get_message_handler());
+  }
 
   // add generic checks
   log.status() << "Generic Property Instrumentation" << messaget::eom;
