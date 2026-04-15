@@ -833,6 +833,17 @@ asymptotic improvements. The best we can do is:
 
 #### High priority (likely to yield results)
 
+0. **Word-level simplification already exists.** Commit
+   `b0b5c5a3b60657fe18155f8579b8be446064c7ea` (not yet in this branch)
+   implements word-level processing optimizations. A related commit
+   `cb50af334f` ("Simplify algebraic identities involving commutative
+   operators") is available locally. These would make algebraic identity
+   benchmarks (commutativity, distributivity) trivial by simplifying
+   them before bit-blasting. We deliberately do NOT include these now
+   because they would eliminate our ability to measure encoding effects
+   on these benchmarks. They should be integrated after the encoding
+   investigation is complete.
+
 1. **Comba popcount tree variations.** Comba's advantage comes from
    its popcount-based column reduction. Test alternative popcount
    implementations: sorting networks, compressor trees (4:2, 5:3),
