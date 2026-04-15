@@ -1172,3 +1172,49 @@ The monotonicity benchmark (a≤b ∧ c>0 → a*c≤b*c) is surprisingly
 hard at BW=8 (5.9s) and shift-add wins. This involves TWO
 multiplications with an inequality (not equality) check, which is
 a different structure from commutativity.
+
+### SMT-COMP benchmarks with CaDiCaL (via smt2_solver --cadical)
+
+Added `--cadical` and `--multiplier-encoding` options to `smt2_solver`
+to enable testing SMT2 formulas with CaDiCaL and different multiplier
+encodings.
+
+| Benchmark | Vars | Cls | shift-add | comba | dadda | minisat |
+|-----------|------|-----|-----------|-------|-------|---------|
+| comm_8 | 210 | 944 | 0.58 | **0.09** | 0.10 | 1.16 |
+| comm_16 | 802 | 4048 | T/O | **15.6** | T/O | T/O |
+| comm_32 | 3138 | 16784 | T/O | T/O | T/O | T/O |
+| **assoc_8** | 402 | 1846 | **28.3** | 114.9 | T/O | T/O |
+| **distrib_8** | 342 | 1605 | **100.1** | T/O | T/O | T/O |
+| distrib_16 | 1258 | 6465 | T/O | T/O | T/O | T/O |
+| mixed_arith_8 | 582 | 2822 | T/O | T/O | T/O | T/O |
+| factor_12-20 | — | — | 0.00 | 0.00 | 0.00 | 0.00 |
+| mul_no_overflow_16 | 1057 | 5082 | 0.00 | 0.00 | 0.00 | 0.00 |
+
+**Critical finding: encoding ranking depends on algebraic structure.**
+
+- **Commutativity** (a*b == b*a): Comba wins (0.09s vs 0.58s at BW=8,
+  only solver at BW=16). Two multiplications with equality check.
+
+- **Associativity** ((a*b)*c == a*(b*c)): **shift-add wins** (28.3s
+  vs Comba's 114.9s, Dadda T/O). Three multiplications with equality.
+
+- **Distributivity** (a*(b+c) == a*b + a*c): **ONLY shift-add solves
+  it** (100.1s). Three multiplications + addition. Comba and Dadda T/O.
+
+- **Factoring and overflow** (SAT): all encodings equally fast.
+
+**Why shift-add wins on associativity and distributivity:**
+
+These properties involve THREE multiplications (not two). The Comba
+and Dadda encodings create larger formulas (more variables per
+multiplication), and with three multiplications the overhead compounds.
+Shift-add's smaller per-multiplication formula wins when the total
+formula size matters more than per-multiplication BVE efficiency.
+
+This also explains why Comba wins on commutativity: with only TWO
+multiplications, Comba's BVE advantage outweighs its variable overhead.
+With THREE multiplications, the overhead dominates.
+
+**CaDiCaL vs MiniSat:** CaDiCaL is consistently faster (0.58s vs
+1.16s on comm_8, and solves assoc_8/distrib_8 where MiniSat T/O).

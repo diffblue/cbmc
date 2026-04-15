@@ -409,7 +409,12 @@ public:
   }
 };
 
-int solver(std::istream &in, bool xor_gauss = false, bool reorder_vars = false)
+int solver(
+  std::istream &in,
+  bool xor_gauss,
+  bool reorder_vars,
+  bool use_cadical,
+  const std::string &multiplier_encoding)
 {
   symbol_tablet symbol_table;
   namespacet ns(symbol_table);
@@ -422,14 +427,21 @@ int solver(std::istream &in, bool xor_gauss = false, bool reorder_vars = false)
 
   satcheckt satcheck{message_handler};
 #ifdef SATCHECK_CADICAL
-  // Use CaDiCaL when xor-gauss is requested (satcheckt may be MiniSat)
-  if(xor_gauss)
+  // Use CaDiCaL when requested or when xor-gauss is requested
+  if(use_cadical || xor_gauss)
   {
     satcheck_cadical_no_preprocessingt cadical_satcheck{message_handler};
-    cadical_satcheck.enable_xor_gauss();
+    if(xor_gauss)
+      cadical_satcheck.enable_xor_gauss();
     if(reorder_vars)
       cadical_satcheck.enable_variable_renumbering();
     boolbvt boolbv{ns, cadical_satcheck, message_handler};
+    if(multiplier_encoding == "comba")
+      boolbv.set_comba(true);
+    else if(multiplier_encoding == "dadda")
+      boolbv.set_dadda(true);
+    else if(multiplier_encoding == "wallace")
+      boolbv.set_wallace_tree(true);
     smt2_solvert smt2_solver{in, boolbv};
     bool error_found = false;
     while(!smt2_solver.exit)
@@ -452,6 +464,12 @@ int solver(std::istream &in, bool xor_gauss = false, bool reorder_vars = false)
   (void)xor_gauss;
   (void)reorder_vars;
   boolbvt boolbv{ns, satcheck, message_handler};
+  if(multiplier_encoding == "comba")
+    boolbv.set_comba(true);
+  else if(multiplier_encoding == "dadda")
+    boolbv.set_dadda(true);
+  else if(multiplier_encoding == "wallace")
+    boolbv.set_wallace_tree(true);
 
   smt2_solvert smt2_solver{in, boolbv};
   bool error_found = false;
@@ -487,6 +505,8 @@ int main(int argc, const char *argv[])
 {
   bool xor_gauss = false;
   bool reorder_vars = false;
+  bool use_cadical = false;
+  std::string multiplier_encoding;
   const char *filename = nullptr;
 
   for(int i = 1; i < argc; ++i)
@@ -495,17 +515,24 @@ int main(int argc, const char *argv[])
       xor_gauss = true;
     else if(std::string{argv[i]} == "--reorder-vars")
       reorder_vars = true;
+    else if(std::string{argv[i]} == "--cadical")
+      use_cadical = true;
+    else if(
+      std::string{argv[i]} == "--multiplier-encoding" && i + 1 < argc)
+      multiplier_encoding = argv[++i];
     else if(filename == nullptr)
       filename = argv[i];
     else
     {
-      std::cerr << "usage: smt2_solver [--xor-gauss] [--reorder-vars] [file]\n";
+      std::cerr
+        << "usage: smt2_solver [--cadical] [--multiplier-encoding ENC] "
+           "[--xor-gauss] [--reorder-vars] [file]\n";
       return 1;
     }
   }
 
   if(filename == nullptr)
-    return solver(std::cin, xor_gauss, reorder_vars);
+    return solver(std::cin, xor_gauss, reorder_vars, use_cadical, multiplier_encoding);
 
   std::ifstream in(filename);
   if(!in)
@@ -514,5 +541,5 @@ int main(int argc, const char *argv[])
     return 1;
   }
 
-  return solver(in, xor_gauss, reorder_vars);
+  return solver(in, xor_gauss, reorder_vars, use_cadical, multiplier_encoding);
 }
