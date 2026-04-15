@@ -722,7 +722,10 @@ int gcc_modet::doit()
     const std::string stdlib = cmdline.get_value("-stdlib");
     config.ansi_c.preprocessor_options.push_back("-stdlib=" + stdlib);
     if(stdlib == "libc++")
+    {
       config.ansi_c.preprocessor = configt::ansi_ct::preprocessort::CLANG;
+      config.ansi_c.mode = configt::ansi_ct::flavourt::CLANG;
+    }
   }
 
   if(cmdline.isset('L'))
