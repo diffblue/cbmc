@@ -441,6 +441,13 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
       bv_pointers->set_radix_multiplier(4);
     else if(ma == "radix8")
       bv_pointers->set_radix_multiplier(8);
+    else if(ma == "fa-tree")
+      bv_pointers->set_fa_tree_popcount(true);
+    else if(ma == "fa-tree+g")
+    {
+      bv_pointers->set_fa_tree_popcount(true);
+      bv_pointers->set_fa_g_only(true);
+    }
   }
 
   set_decision_procedure_time_limit(*bv_pointers);

@@ -1685,7 +1685,7 @@ bvt bv_utilst::comba_column_wise(const std::vector<bvt> &pps)
       result.push_back(const_literal(false));
     else
     {
-      bvt column_sum = popcount(column);
+      bvt column_sum = use_fa_tree_popcount ? popcount_fa_tree(column) : popcount(column);
       CHECK_RETURN(!column_sum.empty());
       result.push_back(column_sum.front());
       for(std::size_t j = 1; j < column_sum.size(); ++j)
@@ -4199,6 +4199,59 @@ bvt bv_utilst::verilog_bv_normal_bits(const bvt &src)
   }
 
   return even_bits;
+}
+
+/// Full-adder tree popcount: reduce column using adder tree
+/// Instead of the parallel bit-counting pop0 algorithm, this uses
+/// a tree of additions: split the input in half, recursively count
+/// each half, then add the counts.
+bvt bv_utilst::popcount_fa_tree(const bvt &bv)
+{
+  PRECONDITION(!bv.empty());
+
+  if(bv.size() == 1)
+    return bv;
+
+  if(bv.size() == 2)
+  {
+    // count of 2 bits: {carry, sum} = {AND, XOR}
+    bvt result;
+    result.push_back(prop.lxor(bv[0], bv[1]));
+    result.push_back(prop.land(bv[0], bv[1]));
+    return result;
+  }
+
+  if(bv.size() == 3)
+  {
+    // count of 3 bits: use full adder
+    literalt carry;
+    literalt sum = full_adder(bv[0], bv[1], bv[2], carry);
+    bvt result;
+    result.push_back(sum);
+    result.push_back(carry);
+    return result;
+  }
+
+  // Split in half, count each, add
+  std::size_t mid = bv.size() / 2;
+  bvt left(bv.begin(), bv.begin() + mid);
+  bvt right(bv.begin() + mid, bv.end());
+
+  bvt left_count = popcount_fa_tree(left);
+  bvt right_count = popcount_fa_tree(right);
+
+  // Pad to same size
+  while(left_count.size() < right_count.size())
+    left_count.push_back(const_literal(false));
+  while(right_count.size() < left_count.size())
+    right_count.push_back(const_literal(false));
+
+  // Add with possible carry extension
+  auto sum_carry = adder(left_count, right_count, const_literal(false));
+  bvt result = sum_carry.first;
+  if(!sum_carry.second.is_false())
+    result.push_back(sum_carry.second);
+  return result;
 }
 
 /// Symbolic implementation of popcount (count of 1 bits in a bit vector)

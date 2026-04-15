@@ -232,6 +232,7 @@ public:
   /// \param bv: The bit vector to count 1s in
   /// \return A bit vector representing the count
   bvt popcount(const bvt &bv);
+  bvt popcount_fa_tree(const bvt &bv);
 
 protected:
   propt &prop;
@@ -243,6 +244,7 @@ protected:
   bool use_dadda = false;
   bool use_simple_full_adder = false;
   bool use_fa_g_only = false;
+  bool use_fa_tree_popcount = false;
   int radix_multiplier = 0; // 0=disabled, 4, 8, 16
 public:
   void set_carry_save(bool b) { use_carry_save = b; }
@@ -251,6 +253,7 @@ public:
   void set_dadda(bool b) { use_dadda = b; }
   void set_simple_full_adder(bool b) { use_simple_full_adder = b; }
   void set_fa_g_only(bool b) { use_fa_g_only = b; }
+  void set_fa_tree_popcount(bool b) { use_fa_tree_popcount = b; }
   void set_radix_multiplier(int r) { radix_multiplier = r; }
 protected:
 

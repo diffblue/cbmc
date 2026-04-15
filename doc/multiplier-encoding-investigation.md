@@ -903,3 +903,52 @@ asymptotic improvements. The best we can do is:
 10. **CryptoMiniSat XOR handling for multiplication.** CMS's XOR
     detection was tested for adders (no benefit). Multiplication's
     carry structure is even less XOR-friendly.
+
+## Investigation #1: Comba Popcount Tree Variations
+
+### Adder-tree popcount vs pop0 (Hacker's Delight)
+
+Implemented an alternative popcount using a recursive adder tree:
+split input in half, recursively count each half, add the counts.
+This uses `adder()` for combining sub-counts.
+
+| Config | comm-9 | comm-11 | comm-13 | Vars | Clauses |
+|--------|--------|---------|---------|------|---------|
+| comba (pop0) | **0.24** | **1.78** | **8.45** | 627 | 2435 |
+| comba (adder-tree) | 0.67 | 5.25 | 22.6 | 527 | 2127 |
+| comba (adder-tree+g-fa) | 0.68 | 4.63 | 10.1 | — | — |
+
+**pop0 is 3x faster despite having MORE variables and clauses.**
+
+The adder-tree has fewer variables (527 vs 627) and fewer clauses
+(2127 vs 2435) but is 2.8x slower. This perfectly illustrates the
+carry propagation theory from Priority 6:
+
+- **pop0** adds small fields (2-bit, 4-bit) using shift+mask+add.
+  The additions have SHORT carry chains (2-4 bits). The shift/mask
+  operations create intermediate AND variables that are BVE-friendly
+  (AND with constant mask → easily eliminated).
+
+- **adder-tree** adds full-width counts using `adder()`. The
+  additions have LONGER carry chains (log2(n) bits). These carry
+  chains create the same global dependencies that make multiplication
+  hard.
+
+This confirms: **the carry chain length within the popcount is the
+critical factor**, not the total variable/clause count. pop0's
+parallel bit counting is structurally superior because it keeps
+carry chains short.
+
+### Implications
+
+1. The pop0 popcount is already near-optimal for SAT solving.
+   Alternative popcount implementations that use longer additions
+   will be slower.
+
+2. Any popcount variation should minimize carry chain length.
+   Potential improvements: use carry-save form within popcount
+   (avoid carry propagation entirely until the final step).
+
+3. The g-fa technique helps the adder-tree popcount (5.25→4.63
+   at BW=11) but cannot overcome the structural disadvantage
+   of longer carry chains.
