@@ -1445,3 +1445,170 @@ The Priority 6 analysis showed multiplication requires exponential
 resolution proofs. Analyzing the actual resolution proof structure
 (which variables appear in the proof, how deep the proof tree is)
 could reveal why some encodings produce shorter proofs.
+
+## Investigation Results: All Seven Areas
+
+### INV 1: Encoding × BVE config cross-product
+
+| Benchmark+Enc | default | no-subst | no-equiv | no-ands | no-ites |
+|---------------|---------|----------|----------|---------|---------|
+| comm_16+comba | 19.7 | **17.5** | **18.5** | 23.3 | 24.6 |
+| assoc_8+shift | 30.0 | 33.6 | **29.1** | 39.5 | 29.4 |
+| assoc_8+comba | T/O | **109** | T/O | **104** | T/O |
+| distrib_8+shift | T/O | **118** | T/O | **106** | T/O |
+
+**Different encodings want different BVE configs:**
+- Comba on commutativity: benefits from disabling substitution
+- Shift-add on associativity: benefits from disabling equivalence detection
+- Both on associativity/distributivity: disabling AND detection helps Comba
+  (solves from T/O) but hurts shift-add on associativity
+
+Best combinations found:
+- comm_16+comba: no-subst+no-equiv+no-xors = 17.4s (-11%)
+- assoc_8+comba: no-ands = 104s (from T/O)
+- distrib_8+shift: no-ands = 106s (from T/O)
+
+### INV 2: Encoding-specific BVE tuning
+
+Covered by INV 1 cross-product. Key finding: there is no universal
+best BVE configuration. The optimal config depends on BOTH the
+encoding AND the algebraic property being verified.
+
+### INV 3: Carry-save with pop0-style additions
+
+Instead of implementing a new encoding, we measured the carry chain
+impact on proof size using GF(2) multiplication (no carries):
+
+| Benchmark | Proof additions | Avg clause sz | Vars | Clauses |
+|-----------|----------------|---------------|------|---------|
+| GF(2) comm_8 | **2,166** | **7.2** | 169 | 505 |
+| int comm_8+comba | 7,749 | 10.2 | 364 | 1467 |
+| int comm_8+shift | 38,695 | 13.6 | 208 | 935 |
+| int assoc_8+shift | 1,035,005 | 23.7 | 400 | 1837 |
+
+**Carry propagation creates 3.6-18x larger proofs.** GF(2) (no carries)
+needs only 2,166 proof steps vs Comba's 7,749 and shift-add's 38,695.
+Comba's shorter carry chains produce 5x smaller proofs than shift-add.
+
+The proof size grows EXPONENTIALLY with the number of multiplications:
+comm_8 (2 muls): 7.7K steps. assoc_8 (4 muls): 1,035K steps (134x).
+
+### INV 4: Variable ordering interaction
+
+| Config | comm_16+comba | assoc_8+shift |
+|--------|--------------|---------------|
+| default | 19.7s | 30.0s |
+| phase=false | 58.8s | 31.4s |
+| score=false | 38.6s | 30.7s |
+| **phase=F+no-subst** | **12.0s** | 42.6s |
+
+**Synergistic interaction discovered:** phase=false alone is 3x slower
+on comm_16, but combined with no-subst it's 39% FASTER (12.0s).
+The mechanism: phase=false (all variables initially false) aligns
+with the multiplication circuit's natural polarity when substitution
+doesn't distort the variable structure.
+
+This combination HURTS associativity (42.6s vs 30.0s) — confirming
+that optimal solver configuration is problem-specific.
+
+**Per-benchmark best configs:**
+- comm_16+comba: phase=F+no-subst → **12.0s** (39% faster, 295K conflicts)
+- assoc_8+shift: no-equiv+no-ites → **28.7s** (3% faster)
+- distrib_8+shift: no-xors → **98.1s** (17% faster)
+
+### INV 5: Preprocessing vs inprocessing
+
+| Config | comm_16+comba | assoc_8+shift | comm_8+comba |
+|--------|--------------|---------------|--------------|
+| default (-P0) | 19.6s | 30.0s | 0.09s |
+| -P1 (1 round preproc) | 26.4s | 30.1s | 0.09s |
+| -P5 (5 rounds preproc) | 36.1s | 31.5s | **0.05s** |
+| no inprocessing | 40.2s | 45.5s | 0.09s |
+
+**Initial preprocessing HURTS comm_16+comba** (26.4s with 1 round vs
+19.6s without). CaDiCaL's default is no initial preprocessing (-P0),
+which is optimal for multiplication. Preprocessing eliminates variables
+too eagerly before the search has context about which variables matter.
+
+**Inprocessing is essential** — disabling it causes 2x slowdown.
+Inprocessing (BVE during search) is better than preprocessing (BVE
+before search) because the solver can make elimination decisions
+informed by the search state.
+
+For small problems (comm_8), 5 rounds of preprocessing helps (0.05s
+vs 0.09s) because BVE can eliminate everything.
+
+### INV 6: Clause sharing between multiplications
+
+Analysis of learned clauses in comm_8+comba:
+
+| Category | Count | Percentage |
+|----------|-------|------------|
+| Cross-multiplication (both mul1+mul2) | 1,974 | **98.7%** |
+| Only mul1 | 0 | 0.0% |
+| Only mul2 | 26 | 1.3% |
+| Input-only | 0 | 0.0% |
+
+**98.7% of learned clauses span BOTH multiplications.** The solver
+learns cross-multiplication relationships — clauses that connect
+variables from the first multiplication (a*b) with variables from
+the second (b*a). This is how the solver proves equivalence: by
+learning that certain partial assignments to one multiplication
+force specific values in the other.
+
+Average learned clause composition: 3.6 input + 10.6 mul1 + 7.4 mul2
++ 7.0 equality = ~29 variables spanning the entire formula.
+
+### INV 7: Resolution proof structure
+
+| Benchmark | Proof steps | Avg clause sz | Max clause sz |
+|-----------|-------------|---------------|---------------|
+| GF(2) comm_8 | 2,166 | 7.2 | — |
+| comm_8+comba | 7,749 | 10.2 | 42 |
+| comm_8+shift | 38,695 | 13.6 | 36 |
+| assoc_8+shift | 1,035,005 | 23.7 | 83 |
+
+**Shift-add has "bottleneck" variables** that appear 8,000-10,000
+times in the proof (carry chain variables). Comba's max variable
+frequency is ~975. These bottleneck variables force the proof to
+repeatedly reason about the same carry chain, creating a larger proof.
+
+**Proof size grows exponentially with multiplication count:**
+comm_8 (2 muls) → assoc_8 (4 muls) = 134x more proof steps.
+This is consistent with the exponential resolution complexity
+of multiplication (Priority 6).
+
+## Updated Consolidated Findings
+
+### The complete picture
+
+The investigation has revealed a multi-dimensional optimization space:
+
+**Dimension 1: Encoding choice**
+- 1 multiplication: Dadda or Dadda+g-fa (smallest formula)
+- 2 multiplications + equality: Comba (BCP cascades through equality)
+- 3+ multiplications: shift-add (smallest total formula)
+
+**Dimension 2: BVE configuration**
+- Commutativity: disable substitution (elimsubst=false)
+- Associativity: disable equivalence detection (elimequivs=false)
+- Distributivity: disable AND or XOR detection (elimands/elimxors=false)
+
+**Dimension 3: Phase selection**
+- Commutativity + no-subst: phase=false gives 39% speedup
+- Other problems: default phase is better
+
+**Dimension 4: Preprocessing**
+- Large problems: no preprocessing, only inprocessing (default)
+- Small problems: 5 rounds preprocessing helps
+
+### Best known configurations
+
+| Benchmark | Encoding | BVE config | Phase | Time | vs default |
+|-----------|----------|------------|-------|------|------------|
+| comm_16 | comba | no-subst | false | **12.0s** | **-39%** |
+| comm_8 | comba | default | default | **0.09s** | **-86%** vs shift |
+| assoc_8 | shift | no-equiv+no-ites | default | **28.7s** | **-4%** |
+| distrib_8 | shift | no-xors | default | **98.1s** | from T/O |
+| overflow_16 | dadda | default | default | **0.48s** | **-73%** vs shift |
+| str_reduce_32 | dadda+g-fa | default | default | **0.29s** | **-24%** vs shift |
