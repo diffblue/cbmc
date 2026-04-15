@@ -1049,3 +1049,69 @@ The pop0 vs adder-tree comparison (Investigation #1) provides
 additional confirmation: replacing pop0's short-chain additions
 with adder-tree's full-width additions makes Comba 3x slower
 despite having fewer variables and clauses.
+
+## Investigation #4: Real-World Verification Benchmarks
+
+### Benchmark descriptions
+
+| Benchmark | Description | SAT/UNSAT |
+|-----------|-------------|-----------|
+| overflow | Wide multiplication matches narrow | UNSAT |
+| bounds | Product of bounded inputs is bounded | SAT |
+| div roundtrip | q*b + r == a for unsigned division | UNSAT |
+| strength reduce | x*15 == (x<<4)-x | UNSAT |
+| mod mul | Modular multiplication commutativity | UNSAT |
+| commutativity | a*b == b*a | UNSAT |
+
+### Results
+
+| Benchmark | shift-add | comba | dadda | dadda+g-fa | Best |
+|-----------|-----------|-------|-------|------------|------|
+| overflow BW=8 | 0.19 | 0.05 | 0.05 | **0.02** | dadda+g-fa |
+| overflow BW=12 | 0.74 | 0.40 | 0.23 | **0.19** | dadda+g-fa |
+| overflow BW=16 | 1.78 | 1.57 | **0.48** | 0.74 | dadda |
+| bounds BW=16 (SAT) | **0.02** | 0.03 | **0.02** | 0.02 | any |
+| str reduce BW=16 | 0.19 | 0.40 | 0.11 | **0.10** | dadda+g-fa |
+| str reduce BW=32 | 0.38 | 0.67 | 0.36 | **0.29** | dadda+g-fa |
+| comm BW=9 | 1.97 | **0.24** | 0.53 | 0.74 | comba |
+| comm BW=11 | 57.6 | **1.76** | 14.5 | 4.95 | comba |
+
+### Critical finding: ranking depends on benchmark type
+
+**Comba wins on commutativity** (two multiplications + equality check)
+but **Dadda/Dadda+g-fa wins on single-multiplication problems**
+(overflow, strength reduce).
+
+The commutativity benchmark is NOT representative of real-world
+verification. On actual verification tasks:
+
+1. **Single multiplication + property check** (overflow, strength
+   reduce): Dadda's smaller formula (425 vs 625 vars) wins because
+   there's no equality check to benefit from Comba's BCP cascades.
+   dadda+g-fa provides an additional 1.2-2.5x improvement.
+
+2. **Two multiplications + equality** (commutativity): Comba wins
+   because its popcount structure enables BCP cascades across the
+   equality check between the two multiplication results.
+
+3. **SAT problems** (bounds): all encodings are equally fast because
+   the solver finds a satisfying assignment quickly regardless of
+   encoding.
+
+### Implications for adaptive selection
+
+An adaptive multiplier encoding should consider:
+- **Number of multiplications**: Comba for problems with multiple
+  multiplications being compared; Dadda for single multiplications.
+- **SAT/UNSAT likelihood**: encoding doesn't matter for SAT problems.
+- **Bitwidth**: dadda+g-fa is best at BW=8-12 for single-multiplication
+  UNSAT; plain dadda is best at BW=16+ where g-fa's extra variables
+  become a liability.
+
+### Comba's advantage is from the equality check, not multiplication
+
+This confirms the earlier finding (Corrected Matrix section): the
+g-only top-level benefit comes from the equality check, and Comba's
+BCP cascade advantage also manifests primarily through the equality
+check. On single-multiplication problems, the simpler Dadda encoding
+with fewer variables is more efficient.
