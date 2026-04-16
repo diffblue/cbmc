@@ -211,6 +211,16 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve(const bvt &assumptions)
   log.statistics() << (no_variables() - 1) << " variables, "
                    << solver->nClauses() << " clauses" << messaget::eom;
 
+  // Print pre-solve stats
+  if(std::getenv("CBMC_MINISAT_STATS"))
+  {
+    log.statistics() << "MiniSat pre-solve: "
+                     << solver->nVars() << " vars, "
+                     << solver->nClauses() << " clauses, "
+                     << solver->nFreeVars() << " free vars"
+                     << messaget::eom;
+  }
+
   try
   {
     add_variables();
@@ -293,6 +303,15 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve(const bvt &assumptions)
     lbool solver_result = solver->solve(solver_assumptions) ? l_True : l_False;
 
 #endif
+
+    if(std::getenv("CBMC_MINISAT_STATS"))
+    {
+      log.statistics() << "MiniSat post-solve:"
+                       << " conflicts=" << solver->conflicts
+                       << " decisions=" << solver->decisions
+                       << " propagations=" << solver->propagations
+                       << messaget::eom;
+    }
 
     if(solver_result == l_True)
     {

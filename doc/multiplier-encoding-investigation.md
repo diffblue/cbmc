@@ -1681,3 +1681,103 @@ depth as CaDiCaL. Conduct:
 - Compare MiniSat's preprocessing (SatELite) vs CaDiCaL's inprocessing
 - Test whether MiniSat's different restart/clause management strategies
   interact differently with multiplication encodings
+
+## NI-7 Results: In-depth MiniSat Analysis
+
+### MiniSat vs CaDiCaL comparison (comm_8)
+
+| Metric | MiniSat shift | CaDiCaL shift | MiniSat comba | CaDiCaL comba |
+|--------|--------------|---------------|---------------|---------------|
+| Conflicts | 148,977 | 34,420 | 24,337 | 4,945 |
+| Decisions | 180,681 | 43,486 | 30,671 | 7,877 |
+| Propagations | 6,892,981 | 1,075,686 | 1,579,094 | 203,067 |
+| BVE eliminated | ~1 | 55 | ~1 | 138 |
+| Time | 1.15s | 0.65s | 0.24s | 0.09s |
+
+**MiniSat needs 4-5x more conflicts than CaDiCaL** on the same CNF.
+MiniSat T/O on everything beyond comm_8 (comm_16, assoc_8, distrib_8).
+
+### Root cause: SatELite is disabled by freeze_all
+
+**MiniSat's SatELite preprocessing eliminates only ~1 variable** because
+CBMC's incremental solving path calls `solver.push()` which sets
+`freeze_all=true`, freezing ALL variables and preventing SatELite
+from eliminating them.
+
+CaDiCaL's inprocessing works DESPITE frozen variables because it
+performs BVE during search, not as preprocessing. This is the
+fundamental advantage of CaDiCaL over MiniSat for multiplication:
+CaDiCaL has inprocessing, MiniSat does not.
+
+### Implications
+
+MiniSat is structurally disadvantaged for multiplication verification
+because it lacks inprocessing. The 4-5x conflict ratio is entirely
+explained by the absence of BVE during search. No encoding change
+can compensate for this — the solver architecture is the bottleneck.
+
+## NI-1 Results: Targeted BVE — Elimination Scoring
+
+### CaDiCaL elimination scoring options
+
+| Option | comm_16+comba | assoc_8+shift | distrib_8+shift |
+|--------|--------------|---------------|-----------------|
+| default | 19.6s | 30.0s | T/O |
+| **elimsum=0** | **17.3s** | 30.0s | T/O |
+| elimprod=0 | 32.6s | 32.1s | T/O |
+| elimsum=100 | 34.1s | 31.1s | **120s** |
+
+**elimsum=0 gives 12% speedup on comm_16+comba** by using only
+product-based scoring (positive × negative occurrences). Sum-based
+scoring adds noise that leads to suboptimal elimination ordering.
+
+**Best combination found:** sum=0+phase=F+no-subst → 12.6s on
+comm_16+comba (36% faster than default).
+
+## NI-3 Results: Cross-Multiplication Structure
+
+### Partial product equivalences: no benefit
+
+Adding explicit equivalence clauses between matching partial products
+(pp[i][j] in mul1 == pp[j][i] in mul2) does NOT help:
+- comm_8+comba: 4,945→5,653 conflicts (14% MORE), 0.09→0.10s
+- comm_16+comba: 448K→514K conflicts (14% more), 19.6→23.0s
+
+CaDiCaL's BVE already discovers these equivalences through
+`elimequivs=true`. Adding them explicitly just adds clauses.
+
+### AND gate caching: sharing hurts!
+
+Caching `prop.land(a,b)` so that `land(a,b) == land(b,a)` shares
+partial product variables between the two multiplications:
+
+| Benchmark | Before (vars/cls) | After (vars/cls) | Before time | After time |
+|-----------|-------------------|-------------------|-------------|------------|
+| comm_8+shift | 208/935 | 170/820 (-18%) | 0.64s | 0.59s |
+| comm_16+comba | 1484/6439 | 1311/5919 (-12%) | 19.6s | **37.2s** (+89%) |
+
+**Variable sharing between multiplications is HARMFUL for BVE.**
+With separate variables, BVE can eliminate each multiplication's
+variables independently. With shared variables, eliminating a shared
+variable affects BOTH multiplications, creating larger resolvents.
+
+This is a fundamental insight: the solver benefits from REDUNDANT
+copies of partial products because they enable independent BVE.
+
+## NI-5 Results: Preprocessing vs Inprocessing (corrected)
+
+| Config | comm_16+comba | assoc_8+shift |
+|--------|--------------|---------------|
+| default (-P0, no initial preproc) | **19.6s** | **30.0s** |
+| -P1 (1 round preprocessing) | 26.4s (+34%) | 30.1s |
+| -P5 (5 rounds preprocessing) | 36.1s (+84%) | 31.5s |
+| no inprocessing | 40.2s (+105%) | 45.5s (+52%) |
+
+**Initial preprocessing HURTS multiplication** (34-84% slower on
+comm_16). CaDiCaL's default (no initial preprocessing, -P0) is
+optimal. Inprocessing (BVE during search) is essential — disabling
+it causes 2x slowdown.
+
+The reason: preprocessing eliminates variables without search context.
+For multiplication, the solver needs to explore the search space
+before knowing which variables are worth eliminating.
