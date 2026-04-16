@@ -2324,3 +2324,47 @@ There is a fundamental tradeoff:
 
 No single encoding can be optimal for both. This confirms the
 need for adaptive encoding selection based on problem structure.
+
+## External SMT Benchmark Validation (#3)
+
+### Real-world-inspired benchmarks
+
+| Benchmark | Description | Muls | Type | shift | comba-cs | dadda-cs | dadda |
+|-----------|-------------|------|------|-------|----------|----------|-------|
+| hw_mul_equiv_12 | HW multiplier equiv | 2 eq | UNSAT | **18.1** | 95.8 | T/O | T/O |
+| barrett_red_8 | Barrett reduction | 2+mod | UNSAT | 0.01 | 0.01 | 0.00 | 0.01 |
+| checked_mul_16 | Rust checked_mul | 2 (diff width) | UNSAT | **0.46** | 0.77 | 0.56 | 0.59 |
+| fixedpoint_mul_16 | Fixed-point mul | 2 | SAT | 0.00 | 0.03 | 0.00 | 0.02 |
+| strength_chain_16 | 3 strength reductions | 3 const | UNSAT | 1.27 | 1.35 | 0.89 | **0.74** |
+
+### Key finding: comba-cs's advantage is narrow
+
+**comba-cs wins ONLY on the commutativity pattern** — two multiplications
+of the SAME operands in swapped order (a*b vs b*a). For all other
+2-multiplication patterns, shift-add or dadda wins:
+
+- **hw_mul_equiv_12** (built-in mul vs manual shift-add): shift-add
+  wins 5.3x. The two sides have DIFFERENT structure, so comba-cs's
+  column-independence advantage doesn't apply.
+
+- **checked_mul_16** (wide mul vs narrow mul): shift-add wins 1.7x.
+  Different operand widths mean different multiplication circuits.
+
+- **strength_chain_16** (3 constant multiplications): dadda wins.
+  Constant multiplication is simplified by CBMC.
+
+### Refined encoding selection rules
+
+| Pattern | Best encoding | Examples |
+|---------|---------------|---------|
+| a*b == b*a (swapped operands) | **comba-cs** | commutativity |
+| mul1 == mul2 (different structure) | **shift-add** | HW equiv checking |
+| mul(wide) vs mul(narrow) | **shift-add** | overflow detection |
+| Single mul + property | **dadda** | strength reduction |
+| Constant multiplication | **dadda** | x*15 == x<<4-x |
+| 3+ multiplications | **shift-add** | associativity |
+| SAT problems | any | factoring |
+
+The discriminator is not just "2 multiplications + equality" but
+specifically "2 multiplications of the SAME operands in swapped
+order." This is a much narrower pattern than previously thought.
