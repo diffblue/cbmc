@@ -2068,3 +2068,55 @@ UNSAT problems. It provides:
 - 74% more unit propagation
 - Zero regressions (691/691 tests pass)
 - Extends solvable frontier from BW~19 to BW~27
+
+## Remaining Investigations
+
+### Recursive carry-save: not beneficial
+
+Second-pass columns have max size 4 (even at BW=17). Recursive
+carry-save would add a third pass for columns of 2-4 bits, producing
+columns of 1-2 bits. The overhead of an additional pass outweighs
+the benefit for such small columns.
+
+### comba-cs + CaDiCaL tuning: no-subst compounds the improvement
+
+| Config | comm_9 | comm_11 | comm_17 | overflow_16 | str_red_32 |
+|--------|--------|---------|---------|-------------|------------|
+| comba-cs | 0.13 | 0.77 | 7.19 | 0.78 | 0.60 |
+| **comba-cs+no-subst** | **0.11** | **0.56** | **4.58** | **0.67** | 0.64 |
+| Change | -15% | -27% | -36% | -14% | +7% |
+
+**no-subst is robust with comba-cs:** consistent 15-36% improvement
+on commutativity and overflow, with only 7% regression on strength
+reduction. Much more robust than with standard comba (which had
+52% regression on comm_11).
+
+The phase=false+no-subst synergy found for standard comba does NOT
+help comba-cs (phase=F hurts). comba-cs already achieves the
+structural improvement that phase=false was compensating for.
+
+### Combined scaling: comba-cs+no-subst vs baseline
+
+| BW | baseline (shift-add) | comba | comba-cs+no-subst | Total speedup |
+|----|---------------------|-------|-------------------|---------------|
+| 9 | 1.93s | 0.24s | **0.11s** | **17x** |
+| 11 | 55.9s | 1.74s | **0.56s** | **100x** |
+| 13 | T/O | 8.14s | **1.49s** | ∞ |
+| 17 | T/O | 47.3s | **4.58s** | ∞ |
+| 19 | T/O | 179.8s | **8.53s** | ∞ |
+| 21 | T/O | T/O | **26.4s** | ∞ |
+| 25 | T/O | T/O | **58.9s** | ∞ |
+
+**100x speedup at BW=11 vs baseline.** Solves BW=25 where baseline
+times out at BW=13 and standard comba times out at BW=21.
+
+### Final encoding recommendations
+
+| Problem type | Best encoding | Best CaDiCaL config |
+|-------------|---------------|---------------------|
+| Multi-mul UNSAT (commutativity) | **comba-cs** | elimsubst=false |
+| Single-mul UNSAT (overflow ≤12) | **comba-cs** | default |
+| Single-mul UNSAT (overflow 16+) | **dadda** | default |
+| Single-mul UNSAT (strength red.) | **dadda+g-fa** | default |
+| 3+ mul UNSAT (assoc/distrib) | **shift-add** | elimxors=false |
+| SAT problems (factoring, bounds) | any | default |
