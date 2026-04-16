@@ -1612,3 +1612,72 @@ The investigation has revealed a multi-dimensional optimization space:
 | distrib_8 | shift | no-xors | default | **98.1s** | from T/O |
 | overflow_16 | dadda | default | default | **0.48s** | **-73%** vs shift |
 | str_reduce_32 | dadda+g-fa | default | default | **0.29s** | **-24%** vs shift |
+
+
+## Next Investigation Round
+
+### NI-1: Targeted BVE — eliminate carry variables first
+
+The bottleneck variable analysis (INV 7) shows specific carry chain
+variables appearing 8,000-10,000 times in the proof. CaDiCaL's
+`--elimprod` and `--elimsum` control elimination scoring. Test whether:
+- Changing elimination scoring prioritizes carry variables
+- CBMC's variable emission order affects BVE elimination order
+- Emitting carry variables first/last changes BVE effectiveness
+
+### NI-2: Redundant clause injection for BVE
+
+The g-only and g-fa techniques add redundant AND gates that help BVE.
+The BVE over-elimination finding suggests the STRUCTURE of redundant
+clauses matters. Systematically test:
+- Binary implications between carry variables
+- Redundant clauses targeting the bottleneck carry variables specifically
+- Different gate types (not just AND) as BVE catalysts
+- Adding clauses AFTER bit-blasting but BEFORE solving
+
+### NI-3: Cross-multiplication structure exploitation
+
+98.7% of learned clauses span both multiplications. The solver
+re-derives cross-multiplication relationships from scratch. Test:
+- Symmetry breaking clauses encoding that inputs are shared
+- Redundant clauses connecting corresponding partial products
+  from the two multiplications
+- Whether adding the equality constraint earlier (before full
+  bit-blasting) helps BVE
+
+### NI-4: Systematic CaDiCaL option search
+
+Manual exploration found phase=false+no-subst gives 39% speedup.
+CaDiCaL has ~100 options. Use systematic parameter tuning:
+- Grid search over key options (phase, elim*, score, chrono, etc.)
+- Test on multiple benchmarks simultaneously to find robust configs
+- Compare per-benchmark-optimal vs robust-across-benchmarks configs
+
+### NI-5: Proof-guided encoding design
+
+DRAT proof analysis shows which variables are bottlenecks. Design
+encodings that avoid creating bottleneck variables:
+- Analyze proof structure per encoding
+- Identify which encoding decisions create bottleneck variables
+- Iteratively modify encoding to reduce proof size
+- Novel research direction
+
+### NI-6: Mixed encoding within a single multiplication
+
+Different columns of the partial product matrix have different sizes.
+Test hybrid approaches:
+- Small columns (edges) use shift-add, large columns (middle) use
+  Comba popcount
+- Transition point optimization: at what column size should we switch?
+- Per-column encoding selection based on column height
+
+### NI-7: In-depth MiniSat analysis
+
+MiniSat has been tested for timing but never analyzed at the same
+depth as CaDiCaL. Conduct:
+- Learned clause quality analysis (size, LBD/glue)
+- BVE/SatELite preprocessing effectiveness per encoding
+- Propagation depth and conflict analysis
+- Compare MiniSat's preprocessing (SatELite) vs CaDiCaL's inprocessing
+- Test whether MiniSat's different restart/clause management strategies
+  interact differently with multiplication encodings
