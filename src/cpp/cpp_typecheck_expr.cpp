@@ -163,9 +163,20 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     // GCC/Clang built-in type traits
     typet t1 = static_cast<const typet &>(expr.find("type_arg1"));
     typet t2 = static_cast<const typet &>(expr.find("type_arg2"));
+    if(t1.is_nil() && !expr.find(ID_type_arg).is_nil())
+      t1 = static_cast<const typet &>(expr.find(ID_type_arg));
     typecheck_type(t1);
     if(t2.is_not_nil())
-      typecheck_type(t2);
+    {
+      try
+      {
+        typecheck_type(t2);
+      }
+      catch(int)
+      {
+        t2 = typet{ID_nil};
+      }
+    }
 
     if(expr.id() == "__is_same")
     {
@@ -385,7 +396,11 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   }
   else if(expr.id() == "__is_abstract")
   {
-    typet t = static_cast<const typet &>(expr.find(ID_type_arg));
+    typet t;
+    if(!expr.find(ID_type_arg).is_nil())
+      t = static_cast<const typet &>(expr.find(ID_type_arg));
+    else if(!expr.find("type_arg1").is_nil())
+      t = static_cast<const typet &>(expr.find("type_arg1"));
     typecheck_type(t);
     // A class is abstract if it has at least one pure virtual function.
     if(t.id() == ID_struct_tag)
@@ -434,10 +449,17 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     expr.id() == "__has_nothrow_copy" ||
     expr.id() == "__has_virtual_destructor" ||
     expr.id() == "__has_unique_object_representations" ||
-    expr.id() == "__is_trivially_relocatable")
+    expr.id() == "__is_trivially_relocatable" ||
+    expr.id() == "__is_trivially_destructible" ||
+    expr.id() == "__is_destructible" || expr.id() == "__is_compound" ||
+    expr.id() == "__is_fundamental" || expr.id() == "__is_scalar")
   {
     // Unary type predicates — conservatively return false for now.
-    typet t = static_cast<const typet &>(expr.find(ID_type_arg));
+    typet t;
+    if(!expr.find(ID_type_arg).is_nil())
+      t = static_cast<const typet &>(expr.find(ID_type_arg));
+    else if(!expr.find("type_arg1").is_nil())
+      t = static_cast<const typet &>(expr.find("type_arg1"));
     typecheck_type(t);
     if(expr.id() == "__is_class")
       expr =
@@ -583,6 +605,48 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     {
       bool result = t.id() == ID_array && to_array_type(t).size().is_nil();
       expr = result ? exprt(true_exprt()) : exprt(false_exprt());
+    }
+    else if(
+      expr.id() == "__is_trivially_destructible" ||
+      expr.id() == "__is_destructible")
+    {
+      bool result = true;
+      if(t.id() == ID_struct_tag)
+      {
+        const auto &st = follow_tag(to_struct_tag_type(t));
+        for(const auto &comp : to_struct_type(st).components())
+          if(comp.get_bool(ID_destructor))
+          {
+            result = false;
+            break;
+          }
+      }
+      expr = result ? exprt(true_exprt()) : exprt(false_exprt());
+    }
+    else if(expr.id() == "__is_compound")
+    {
+      bool f = t.id() == ID_empty || t.id() == ID_signedbv ||
+               t.id() == ID_unsignedbv || t.id() == ID_c_bool ||
+               t.id() == ID_bool || t.id() == ID_floatbv ||
+               t.id() == ID_fixedbv;
+      expr = !f ? exprt(true_exprt()) : exprt(false_exprt());
+    }
+    else if(expr.id() == "__is_fundamental")
+    {
+      bool r = t.id() == ID_empty || t.id() == ID_signedbv ||
+               t.id() == ID_unsignedbv || t.id() == ID_c_bool ||
+               t.id() == ID_bool || t.id() == ID_floatbv ||
+               t.id() == ID_fixedbv;
+      expr = r ? exprt(true_exprt()) : exprt(false_exprt());
+    }
+    else if(expr.id() == "__is_scalar")
+    {
+      bool r = t.id() == ID_signedbv || t.id() == ID_unsignedbv ||
+               t.id() == ID_c_bool || t.id() == ID_bool ||
+               t.id() == ID_floatbv || t.id() == ID_fixedbv ||
+               t.id() == ID_c_enum_tag ||
+               (t.id() == ID_pointer && !is_reference(t));
+      expr = r ? exprt(true_exprt()) : exprt(false_exprt());
     }
     else
       expr = false_exprt();
