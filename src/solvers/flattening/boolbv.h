@@ -58,6 +58,7 @@ public:
   void set_fa_g_only(bool b) { bv_utils.set_fa_g_only(b); }
   void set_fa_tree_popcount(bool b) { bv_utils.set_fa_tree_popcount(b); }
   void set_comba_carry_save(bool b) { bv_utils.set_comba_carry_save(b); }
+  void set_dadda_carry_save(bool b) { bv_utils.set_dadda_carry_save(b); }
   void set_radix_multiplier(int r) { bv_utils.set_radix_multiplier(r); }
   void set_dadda(bool b) { bv_utils.set_dadda(b); }
   boolbvt(

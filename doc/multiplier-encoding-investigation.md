@@ -2120,3 +2120,114 @@ times out at BW=13 and standard comba times out at BW=21.
 | Single-mul UNSAT (strength red.) | **dadda+g-fa** | default |
 | 3+ mul UNSAT (assoc/distrib) | **shift-add** | elimxors=false |
 | SAT problems (factoring, bounds) | any | default |
+
+## Adder Encoding Interaction with comba-cs (#1)
+
+| Config | comm_9 | comm_11 | comm_17 |
+|--------|--------|---------|---------|
+| comba-cs (ripple) | **0.13** | **0.77** | **7.19** |
+| comba-cs + BK | T/O | T/O | T/O |
+| comba-cs + g-only(top) | 0.09 | 1.07 | 10.41 |
+| comba-cs + g-fa | 0.13 | 0.83 | 9.14 |
+| comba-cs + g-only(internal) | 0.13 | 0.77 | — |
+
+**No adder encoding interaction benefits comba-cs.** BK kills it
+(as with all multiplier encodings). g-only and g-fa hurt at BW≥11.
+The internal adder is irrelevant (same as standard Comba).
+Default ripple-carry is optimal.
+
+## The 3+ Multiplication Gap (#4)
+
+### dadda-cs: Dadda-style carry-save encoding
+
+Combines Dadda's compact full_adder reduction (same variable count
+as shift-add) with comba-cs's column-independent first pass.
+
+| Encoding | Vars (BW=9) | Clauses |
+|----------|-------------|---------|
+| shift-add | 427 | 1749 |
+| dadda | 427 | 1749 |
+| **dadda-cs** | **427** | **1749** |
+| comba | 627 | 2435 |
+| comba-cs | 679 | 2561 |
+
+dadda-cs achieves the SAME variable count as shift-add/dadda.
+
+### Performance comparison
+
+| Benchmark | shift | dadda | comba-cs | dadda-cs |
+|-----------|-------|-------|----------|----------|
+| comm_9 | 1.97 | 0.53 | **0.13** | 0.71 |
+| comm_11 | 57.5 | 14.6 | **0.78** | 2.00 |
+| str_red_32 | 0.38 | 0.36 | 0.60 | **0.21** |
+| overflow_16 | 1.78 | **0.48** | 0.78 | 1.03 |
+
+dadda-cs is BEST on strength reduction (0.21s) and competitive
+on commutativity (2.00s vs comba-cs's 0.78s).
+
+### 3+ multiplication benchmarks: gap persists
+
+| Benchmark | shift | comba-cs | dadda-cs |
+|-----------|-------|----------|----------|
+| assoc_8 | **29.1** | T/O | T/O |
+| distrib_8 | **103.6** | T/O | T/O |
+
+dadda-cs T/O on assoc/distrib despite having the same variable
+count as shift-add. The reason: BVE analysis shows shift-add
+achieves 106% elimination (BVE-completeness) while dadda-cs
+achieves only 58%. The carry-save clause structure PREVENTS
+BVE from achieving completeness.
+
+**The 3+ multiplication gap is a BVE-completeness phenomenon,
+not a variable count issue.** shift-add's sequential accumulation
+creates a clause structure that BVE can fully eliminate. Carry-save
+structures (both comba-cs and dadda-cs) create clause structures
+that resist full BVE elimination.
+
+## Real-World SMT Benchmark Validation
+
+### Benchmark suite
+
+| Benchmark | Description | Muls | Type |
+|-----------|-------------|------|------|
+| comm_N | a*b == b*a | 2 | eq UNSAT |
+| assoc_8 | (a*b)*c == a*(b*c) | 4 | eq UNSAT |
+| distrib_8 | a*(b+c) == a*b+a*c | 3 | eq UNSAT |
+| crypto_sq_mod | (a²)%m == ((a%m)²)%m | 2+mod | SAT |
+| overflow_det_16 | wide vs narrow product | 2 | UNSAT |
+| div_mul_rt_12 | q*b+r == a | 1+div | UNSAT |
+| mul_ineq_12 | a≤b ∧ c>0 → a*c≤b*c | 2 | ineq UNSAT |
+| strength_red_16 | x*7 == x*8-x | 1 | eq UNSAT |
+| factor_N | find p*q==n | 1 | SAT |
+
+### Results
+
+| Benchmark | shift | comba-cs | dadda-cs | dadda | Winner |
+|-----------|-------|----------|----------|-------|--------|
+| comm_8 | 0.59 | **0.09** | 0.14 | 0.11 | comba-cs |
+| comm_16 | T/O | **4.54** | T/O | T/O | comba-cs |
+| comm_20 | T/O | **17.1** | T/O | T/O | comba-cs |
+| assoc_8 | **29.1** | T/O | T/O | T/O | shift |
+| distrib_8 | **103.6** | T/O | T/O | T/O | shift |
+| crypto_sq_mod | all fast | — | — | — | any |
+| overflow_det_16 | 1.03 | 0.98 | **0.92** | 1.12 | dadda-cs |
+| div_mul_rt_12 | **7.42** | 9.17 | 11.2 | 9.10 | shift |
+| mul_ineq_12 | **1.39** | 2.08 | 1.83 | 1.63 | shift |
+| strength_red_16 | 0.01 | 0.02 | 0.01 | 0.01 | any |
+| factor_* | all fast | — | — | — | any |
+
+### Encoding selection rules (validated)
+
+| Problem pattern | Best encoding | Reason |
+|----------------|---------------|--------|
+| 2 muls + equality | **comba-cs** | Short carry chains, BCP cascades |
+| 2 muls + inequality | **shift-add** | Smaller formula, BVE-friendly |
+| 3+ muls | **shift-add** | BVE-completeness |
+| 1 mul + property | **dadda** or **dadda-cs** | Smallest formula |
+| SAT problems | any | Trivially fast |
+| Division involved | **shift-add** | Division dominates |
+
+The key discriminator is whether the problem has TWO multiplications
+compared by EQUALITY. Only in this case does comba-cs's structural
+advantage (column independence, short carry chains) outweigh its
+variable overhead. For all other patterns, smaller formulas win.

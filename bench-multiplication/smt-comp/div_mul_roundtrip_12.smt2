@@ -1,0 +1,10 @@
+; q*b + r == a where q = a/b, r = a%b
+(set-logic QF_BV)
+(declare-fun a () (_ BitVec 12))
+(declare-fun b () (_ BitVec 12))
+(assert (not (= b (_ bv0 12))))
+(define-fun q () (_ BitVec 12) (bvudiv a b))
+(define-fun r () (_ BitVec 12) (bvurem a b))
+(assert (not (= (bvadd (bvmul q b) r) a)))
+(check-sat)
+(exit)

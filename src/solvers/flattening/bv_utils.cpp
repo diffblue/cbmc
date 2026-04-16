@@ -1775,6 +1775,107 @@ bvt bv_utilst::comba_carry_save(const std::vector<bvt> &pps)
   return result;
 }
 
+/// Dadda carry-save: reduce each column using full_adders independently,
+/// deferring carries to a second pass. Combines Dadda's compact encoding
+/// with comba-cs's column independence.
+bvt bv_utilst::dadda_carry_save(const std::vector<bvt> &pps)
+{
+  PRECONDITION(!pps.empty());
+
+  std::size_t width = pps.front().size();
+
+  // Collect partial product bits per column
+  std::vector<bvt> columns(width);
+  for(const auto &pp : pps)
+  {
+    PRECONDITION(pp.size() == width);
+    for(std::size_t i = 0; i < width; ++i)
+      if(!pp[i].is_false())
+        columns[i].push_back(pp[i]);
+  }
+
+  // First pass: reduce each column independently using full_adders
+  std::vector<bvt> weighted_columns(width);
+
+  for(std::size_t i = 0; i < width; ++i)
+  {
+    bvt &col = columns[i];
+
+    // Reduce using full_adders: groups of 3 → sum + carry
+    while(col.size() >= 3)
+    {
+      bvt next;
+      std::size_t j = 0;
+      for(; j + 2 < col.size(); j += 3)
+      {
+        literalt carry;
+        literalt sum = full_adder(col[j], col[j + 1], col[j + 2], carry);
+        next.push_back(sum);
+        // Carry has weight 2 → goes to column i+1
+        if(i + 1 < width)
+          weighted_columns[i + 1].push_back(carry);
+      }
+      for(; j < col.size(); j++)
+        next.push_back(col[j]);
+      col = next;
+    }
+
+    // Remaining 1-2 bits go to weighted_columns for second pass
+    for(const auto &lit : col)
+      weighted_columns[i].push_back(lit);
+  }
+
+  // Second pass: reduce weighted columns (same as comba-cs)
+  bvt result;
+  result.reserve(width);
+
+  for(std::size_t i = 0; i < width; ++i)
+  {
+    bvt &col = weighted_columns[i];
+
+    if(col.empty())
+    {
+      result.push_back(const_literal(false));
+    }
+    else if(col.size() == 1)
+    {
+      result.push_back(col[0]);
+    }
+    else
+    {
+      // Reduce using full_adders again
+      while(col.size() >= 3)
+      {
+        bvt next;
+        std::size_t j = 0;
+        for(; j + 2 < col.size(); j += 3)
+        {
+          literalt carry;
+          literalt sum = full_adder(col[j], col[j + 1], col[j + 2], carry);
+          next.push_back(sum);
+          if(i + 1 < width)
+            weighted_columns[i + 1].push_back(carry);
+        }
+        for(; j < col.size(); j++)
+          next.push_back(col[j]);
+        col = next;
+      }
+      if(col.size() == 2)
+      {
+        result.push_back(prop.lxor(col[0], col[1]));
+        if(i + 1 < width)
+          weighted_columns[i + 1].push_back(prop.land(col[0], col[1]));
+      }
+      else
+      {
+        result.push_back(col[0]);
+      }
+    }
+  }
+
+  return result;
+}
+
 // Wallace tree multiplier. This is disabled, as runtimes have
 // been observed to go up by 5%-10%, and on some models even by 20%.
 #ifndef WALLACE_TREE
@@ -2836,6 +2937,8 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
       return wallace_tree(pps);
     if(use_comba_carry_save)
       return comba_carry_save(pps);
+    if(use_dadda_carry_save)
+      return dadda_carry_save(pps);
     if(use_comba)
       return comba_column_wise(pps);
     if(use_dadda)

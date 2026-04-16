@@ -401,6 +401,8 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
       bv_pointers->set_comba(true);
     else if(menc == "comba-cs")
       bv_pointers->set_comba_carry_save(true);
+    else if(menc == "dadda-cs")
+      bv_pointers->set_dadda_carry_save(true);
     else if(menc == "dadda")
       bv_pointers->set_dadda(true);
     else if(menc == "wallace")
