@@ -1782,6 +1782,15 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
           throw 0;
         }
       }
+      // Simplify comma expressions: (expr1, expr2) -> expr2
+      // This handles libc++ patterns like ((void)Pred, true)
+      else if(arg.id() == ID_comma)
+      {
+        typecheck_expr(arg);
+        // After type-checking, extract the right operand
+        if(arg.id() == ID_comma && arg.operands().size() == 2)
+          arg = to_binary_expr(arg).op1();
+      }
       else if(arg.id() == ID_ambiguous)
       {
         exprt e;
