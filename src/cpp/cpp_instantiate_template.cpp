@@ -347,7 +347,22 @@ void cpp_typecheckt::elaborate_class_template(
     return;
 
   if(suppress_elaborate && !force_elaborate)
-    return;
+  {
+    if(type.id() == ID_struct_tag || type.id() == ID_union_tag)
+    {
+      const symbolt &sym = lookup(to_tag_type(type));
+      if(
+        (sym.type.id() == ID_struct || sym.type.id() == ID_union) &&
+        sym.type.get_bool(ID_template_class_instance) &&
+        to_struct_union_type(sym.type).components().empty())
+      {
+      }
+      else
+        return;
+    }
+    else
+      return;
+  }
 
   const symbolt &symbol = lookup(to_tag_type(type));
 
