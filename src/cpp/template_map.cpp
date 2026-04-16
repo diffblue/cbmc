@@ -1,3 +1,4 @@
+#include <iostream>
 /*******************************************************************\
 
 Module: C++ Language Type Checking
@@ -146,7 +147,9 @@ void template_mapt::apply(typet &type) const
         auto pos = key.rfind("::");
         std::string suffix =
           pos != std::string::npos ? key.substr(pos + 2) : key;
-        if(suffix == id2string(base) && entry.second.id() != ID_unassigned)
+        if(
+          suffix == id2string(base) && entry.second.id() != ID_unassigned &&
+          entry.second.id() != ID_nil)
         {
           if(has_targs || sub.size() == 1)
           {
@@ -173,6 +176,21 @@ void template_mapt::apply(typet &type) const
 void template_mapt::apply(exprt &expr) const
 {
   apply(expr.type());
+
+  // Recursively apply to ALL named sub-nodes to handle deeply
+  // nested template parameters (e.g., inside decltype expressions).
+  for(auto &named : expr.get_named_sub())
+  {
+    if(named.first == irep_idt{"operands"} || named.first == "#source_location")
+      continue; // handled separately or not relevant
+    if(named.second.id() == ID_nil)
+      continue;
+    apply(static_cast<typet &>(named.second));
+  }
+
+  // Also apply to all sub-nodes (the unnamed children)
+  for(auto &sub : expr.get_sub())
+    apply(static_cast<typet &>(sub));
 
   // Handle sizeof...(Pack) — replace with pack size constant
   if(expr.id() == ID_sizeof)
@@ -201,9 +219,6 @@ void template_mapt::apply(exprt &expr) const
       return;
     }
   }
-
-  Forall_operands(it, expr)
-    apply(*it);
 
   // Substitute non-type template parameters inside cpp_name
   // template arguments. These appear as "ambiguous" nodes with
