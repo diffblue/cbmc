@@ -2231,3 +2231,33 @@ The key discriminator is whether the problem has TWO multiplications
 compared by EQUALITY. Only in this case does comba-cs's structural
 advantage (column independence, short carry chains) outweigh its
 variable overhead. For all other patterns, smaller formulas win.
+
+## Signed Multiplication: Not a Gap
+
+### Code path analysis
+
+`signed_multiplier()` (line 3658) does:
+1. Extract sign bits: `sign0 = sign_bit(op0)`
+2. Conditionally negate: `neg0 = cond_negate(op0, sign0)`
+3. **Call `unsigned_multiplier(neg0, neg1)`** — uses our encoding flags
+4. Conditionally negate result: `cond_negate(result, result_sign)`
+
+The `#ifdef USE_KARATSUBA` path that would bypass `unsigned_multiplier`
+is **commented out** (`// #define USE_KARATSUBA` at line 2036).
+
+### Empirical verification
+
+| Config | Unsigned BW=9 | Signed BW=9 | Unsigned BW=11 | Signed BW=11 |
+|--------|--------------|-------------|----------------|--------------|
+| shift-add | 1.97s | 1.97s | 57.4s | 57.4s |
+| comba-cs | 0.13s | 0.13s | 0.77s | 0.78s |
+
+**Identical performance.** The `cond_negate` overhead is negligible
+(~2.6% extra variables for the sign-handling MUX gates).
+
+### Note on expression-level simplification
+
+CBMC simplifies `a * b == b * a` at the expression level (0 VCCs)
+but NOT `c = a*b; d = b*a; assert(c == d)` (1 VCC, reaches SAT solver).
+The intermediate variables hide the commutativity from the simplifier.
+This applies equally to signed and unsigned.
