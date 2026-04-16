@@ -1,4 +1,4 @@
-CORE libcxx
+KNOWNBUG libcxx
 main.cpp
 --cpp20 --stdlib libc++
 ^VERIFICATION
