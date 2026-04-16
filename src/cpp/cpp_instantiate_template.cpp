@@ -369,6 +369,11 @@ void cpp_typecheckt::elaborate_class_template(
   // Make a copy, as instantiate will destroy the symbol type!
   const typet t_type=symbol.type;
 
+  // When force-elaborating empty template instances, catch errors
+  // to avoid breaking callers. Errors in system header templates
+  // (e.g., compressed_pair reference initialization) are non-fatal.
+  bool force_elaborated = false;
+
   if(
     (t_type.id() == ID_struct || t_type.id() == ID_union) &&
     t_type.get_bool(ID_template_class_instance))
@@ -981,7 +986,10 @@ void cpp_typecheckt::elaborate_class_template(
 
     // Only do this for libc++ (CLANG preprocessor) where forward
     // declarations in __fwd/ headers are common.
-    if(config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG)
+    // Also catch errors when force-elaborating empty template instances.
+    if(
+      config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG ||
+      force_elaborated)
     {
       try
       {
