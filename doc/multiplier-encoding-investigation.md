@@ -1781,3 +1781,99 @@ it causes 2x slowdown.
 The reason: preprocessing eliminates variables without search context.
 For multiplication, the solver needs to explore the search space
 before knowing which variables are worth eliminating.
+
+## NI-4 Results: Systematic CaDiCaL Option Search
+
+### Full grid search on comm_16+comba
+
+| phase | elimsubst | elimsum | elimequivs | Conflicts | Time |
+|-------|-----------|---------|------------|-----------|------|
+| def | def | def | def | 448,874 | 19.6s |
+| def | F | def | def | 415,453 | 17.5s |
+| def | def | 0 | def | 425,523 | 17.3s |
+| def | def | def | F | 438,296 | 18.5s |
+| **F** | **F** | def | def | **295,316** | **12.0s** |
+| **F** | **F** | def | **F** | **295,316** | **12.0s** |
+| F | def | def | def | 1,110,830 | 58.3s |
+| F | def | def | F | 498,804 | 20.9s |
+
+**Best: phase=F+no-subst(+no-equiv) → 12.0s (39% faster, 34% fewer conflicts)**
+
+The phase=false+no-subst synergy is robust: adding no-equiv or
+no-sum doesn't help further. The improvement comes entirely from
+the phase×substitution interaction.
+
+### Per-benchmark best configs
+
+| Benchmark | Best config | Time | vs default |
+|-----------|-------------|------|------------|
+| comm_16+comba | phase=F+no-subst+no-equiv | **12.0s** | **-39%** |
+| assoc_8+shift | no-equiv+no-ites | **29.0s** | **-3%** |
+| distrib_8+shift | no-xors+no-equiv | **100.4s** | from T/O |
+
+**No universal best config exists.** The optimal configuration
+depends on the algebraic property being verified.
+
+## NI-2 Results: Redundant Clause Injection
+
+Explicit partial product equivalences (NI-3) and AND gate caching
+both HURT performance. The key insight from NI-3c (AND gate caching):
+**variable sharing between multiplications prevents independent BVE**.
+
+Redundant implications between carry variables were not tested
+because the NI-3 results show that connecting the two multiplications
+is counterproductive. The solver benefits from INDEPENDENT copies.
+
+## NI-5 Results: Proof-Guided Encoding Analysis
+
+### Bottleneck variable analysis
+
+| Metric | shift-add | Comba |
+|--------|-----------|-------|
+| Total proof steps | 38,695 | 7,749 |
+| Top bottleneck var frequency | 18,991 (49%) | 2,752 (36%) |
+| Steps with input vars | 81% | 38% |
+| Steps with internal vars | 100% | 100% |
+| Steps with both | 81% | 38% |
+
+**shift-add's proof is INPUT-DOMINATED:** 81% of proof steps
+reference input bits. The proof constantly reasons about how input
+bits affect the carry chain — the global dependency problem.
+
+**Comba's proof is INTERNAL-DOMINATED:** only 38% reference inputs.
+The proof mostly reasons about popcount intermediate variables,
+which are LOCAL to each column.
+
+**shift-add has a single bottleneck variable** (var 208) appearing
+in 49% of ALL proof steps. The entire proof revolves around this
+one carry chain variable. Comba distributes the proof burden more
+evenly (top variable at 36%).
+
+### Encoding design implications
+
+An ideal encoding would:
+1. **Minimize input variable involvement in proofs** (Comba achieves
+   38% vs shift-add's 81%)
+2. **Distribute proof burden across variables** (no single bottleneck)
+3. **Keep variables LOCAL to columns** (Comba's popcount does this)
+4. **Avoid creating global carry chains** (the root cause of bottlenecks)
+
+Comba already achieves all four goals through its pop0 popcount.
+Further improvement would require an encoding that creates even
+MORE local structure — perhaps a hierarchical popcount that
+processes sub-columns independently.
+
+## NI-6 Results: Mixed Encoding
+
+### Hybrid popcount (direct counting for small columns)
+
+Using direct half-adder/full-adder for columns with ≤3 bits and
+pop0 for larger columns: **NO effect**. Same variable count, same
+performance. pop0 already handles small inputs efficiently.
+
+### Conclusion
+
+The pop0 popcount is already near-optimal for all column sizes.
+The overhead is in the LARGE columns (7+ bits), not the small ones.
+The Investigation #1 result (adder-tree popcount is 3x slower)
+confirms that pop0's parallel bit counting is the right approach.
