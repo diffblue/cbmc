@@ -239,7 +239,7 @@ static void instrument_synchronized_code(
   symbol_exprt catch_var(tmp_symbol.name, tmp_symbol.type);
   catch_var.set(ID_C_base_name, tmp_symbol.base_name);
   code_landingpadt catch_statement(catch_var);
-  codet catch_instruction = catch_statement;
+  codet catch_instruction = std::move(catch_statement);
   code_labelt catch_label(handler, code_blockt());
   code_blockt &catch_block = to_code_block(catch_label.code());
   catch_block.add(catch_instruction);

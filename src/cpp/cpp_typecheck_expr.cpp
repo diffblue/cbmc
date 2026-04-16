@@ -2231,7 +2231,7 @@ void cpp_typecheckt::convert_pmop(exprt &expr)
     }
   }
 
-  exprt tmp(op1);
+  exprt tmp(std::move(op1));
   tmp.type().set(ID_C_bound, op0);
   expr.swap(tmp);
   return;
