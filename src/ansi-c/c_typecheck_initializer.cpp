@@ -247,7 +247,20 @@ void c_typecheck_baset::do_initializer(symbolt &symbol)
   }
 
   if(symbol.is_macro)
-    make_constant(symbol.value);
+  {
+    // Skip make_constant for values with unresolved template
+    // parameters (cpp_name nodes). These will be evaluated
+    // during template instantiation.
+    bool has_cpp_name = false;
+    symbol.value.visit_pre(
+      [&has_cpp_name](const exprt &e)
+      {
+        if(e.id() == ID_cpp_name)
+          has_cpp_name = true;
+      });
+    if(!has_cpp_name)
+      make_constant(symbol.value);
+  }
 }
 
 void c_typecheck_baset::designator_enter(
