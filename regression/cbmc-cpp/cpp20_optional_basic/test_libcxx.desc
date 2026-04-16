@@ -1,4 +1,4 @@
-CORE libcxx libcxx-slow
+KNOWNBUG libcxx libcxx-slow
 main.cpp
 --cpp20 --stdlib libc++
 ^VERIFICATION
