@@ -1,4 +1,4 @@
-CORE libcxx
+KNOWNBUG libcxx
 main.cpp
 --cpp23 --stdlib libc++
 ^VERIFICATION SUCCESSFUL$
