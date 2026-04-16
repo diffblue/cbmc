@@ -2261,3 +2261,66 @@ CBMC simplifies `a * b == b * a` at the expression level (0 VCCs)
 but NOT `c = a*b; d = b*a; assert(c == d)` (1 VCC, reaches SAT solver).
 The intermediate variables hide the commutativity from the simplifier.
 This applies equally to signed and unsigned.
+
+## Why Shift-Add Achieves BVE-Completeness (#1)
+
+### The data
+
+| Phase | shift-add | dadda-cs |
+|-------|-----------|----------|
+| Preprocessing: elim | 45 | 42 |
+| Preprocessing: fixed | 2 | 2 |
+| **Inprocessing: elim** | **+255** | +184 |
+| **Inprocessing: fixed** | **+123** | **+2** |
+| **Total removed** | **425 (106%)** | 230 (58%) |
+
+Preprocessing is nearly identical (47 vs 44 removed). The ENTIRE
+difference is in inprocessing: shift-add gets **123 fixed variables**
+during search vs dadda-cs's 2.
+
+### The mechanism
+
+"Fixed" variables come from unit propagation during inprocessing.
+When BVE eliminates a variable during search, it creates resolvents.
+If a resolvent combined with a learned clause creates a unit
+implication, a variable gets fixed. This can cascade: fixing one
+variable may create new unit implications.
+
+**shift-add's sequential accumulation creates CARRY CHAINS** that
+enable cascading unit propagation. When one carry variable is
+determined (by a learned clause or BVE resolvent), it propagates
+through the chain, fixing the next carry, which fixes the next,
+etc. This cascade can fix 123 variables.
+
+**dadda-cs's carry-save structure BREAKS these chains.** The
+deferred carries go to different columns, preventing cascading
+unit propagation. Each carry is independent, so fixing one doesn't
+cascade to others. Only 2 variables get fixed.
+
+### The paradox resolved
+
+This explains the paradox: carry-save helps commutativity but
+hurts associativity.
+
+- **Commutativity** (2 muls, hard residual): The problem is too
+  hard for BVE-completeness regardless. What matters is BCP
+  cascade DURING SEARCH (not during BVE). Carry-save's column
+  independence enables better BCP cascades → fewer conflicts.
+
+- **Associativity** (4 muls, achievable BVE-completeness): The
+  problem CAN be solved by BVE-completeness if enough variables
+  are fixed during inprocessing. Carry chains enable cascading
+  unit propagation → BVE-completeness → trivial residual.
+  Carry-save breaks these chains → no BVE-completeness → hard
+  residual → T/O.
+
+### Implication
+
+There is a fundamental tradeoff:
+- **Carry chains**: enable BVE-completeness (good for 3+ muls)
+  but create proof bottlenecks (bad for 2 muls)
+- **Carry-save**: avoids proof bottlenecks (good for 2 muls)
+  but prevents BVE-completeness (bad for 3+ muls)
+
+No single encoding can be optimal for both. This confirms the
+need for adaptive encoding selection based on problem structure.
