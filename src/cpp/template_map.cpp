@@ -182,6 +182,14 @@ void template_mapt::apply(exprt &expr) const
       apply(static_cast<typet &>(type_arg));
   }
 
+  // Apply to type predicate arguments (type_arg, type_arg1, type_arg2)
+  if(expr.find(ID_type_arg).is_not_nil() && expr.id() != ID_sizeof)
+    apply(static_cast<typet &>(expr.add(ID_type_arg)));
+  if(expr.find("type_arg1").is_not_nil())
+    apply(static_cast<typet &>(expr.add("type_arg1")));
+  if(expr.find("type_arg2").is_not_nil())
+    apply(static_cast<typet &>(expr.add("type_arg2")));
+
   if(expr.id()==ID_symbol)
   {
     expr_mapt::const_iterator m_it =

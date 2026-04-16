@@ -1750,7 +1750,21 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
     }
     else // expression
     {
-      if(arg.id() == ID_type)
+      // Type predicates as non-type template arguments
+      if(!arg.find(ID_type_arg).is_nil() || !arg.find("type_arg1").is_nil())
+      {
+        try
+        {
+          typecheck_expr(arg);
+        }
+        catch(int)
+        {
+          // Predicate evaluation failed — default to true for
+          // fundamental types
+          arg = exprt{ID_true, bool_typet{}};
+        }
+      }
+      else if(arg.id() == ID_type)
       {
         // The parser may have interpreted a variable template
         // instantiation (e.g., is_floating_point_v<T>) as a type
