@@ -207,6 +207,7 @@ SRC += analyses/ai/ai.cpp \
        util/ssa_expr.cpp \
        util/std_expr.cpp \
        util/string2int.cpp \
+       util/string_hash.cpp \
        util/structured_data.cpp \
        util/string_utils/capitalize.cpp \
        util/string_utils/escape.cpp \
