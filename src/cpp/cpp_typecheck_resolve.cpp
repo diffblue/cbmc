@@ -1493,9 +1493,6 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
       final_base_name += pos->get_string(ID_identifier);
     else if(pos->id() == ID_decltype)
     {
-      // C++11: decltype(expr)::member
-      // Evaluate the decltype expression to get the type, then
-      // navigate to that type's scope.
       exprt expr = static_cast<const exprt &>(pos->find(ID_type_arg));
       if(expr.is_nil())
         expr = static_cast<const exprt &>(pos->find(ID_expr_arg));
@@ -1503,6 +1500,9 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
         expr = static_cast<const exprt &>(pos->find("expr"));
       if(expr.is_not_nil())
       {
+        // Apply template_map to substitute template parameters
+        // in the decltype expression (e.g., __test<_Tp>(nullptr))
+        cpp_typecheck.template_map.apply(expr);
         cpp_typecheck.typecheck_expr(expr);
         typet t = expr.type();
         // Remove references
