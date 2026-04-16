@@ -245,6 +245,7 @@ protected:
   bool use_simple_full_adder = false;
   bool use_fa_g_only = false;
   bool use_fa_tree_popcount = false;
+  bool use_comba_carry_save = false;
   int radix_multiplier = 0; // 0=disabled, 4, 8, 16
 public:
   void set_carry_save(bool b) { use_carry_save = b; }
@@ -254,6 +255,7 @@ public:
   void set_simple_full_adder(bool b) { use_simple_full_adder = b; }
   void set_fa_g_only(bool b) { use_fa_g_only = b; }
   void set_fa_tree_popcount(bool b) { use_fa_tree_popcount = b; }
+  void set_comba_carry_save(bool b) { use_comba_carry_save = b; }
   void set_radix_multiplier(int r) { radix_multiplier = r; }
 protected:
 
@@ -314,6 +316,7 @@ protected:
   bvt wallace_tree(const std::vector<bvt> &pps);
   bvt dadda_tree(const std::vector<bvt> &pps);
   bvt comba_column_wise(const std::vector<bvt> &pps);
+  bvt comba_carry_save(const std::vector<bvt> &pps);
 };
 
 #endif // CPROVER_SOLVERS_FLATTENING_BV_UTILS_H

@@ -1877,3 +1877,99 @@ The pop0 popcount is already near-optimal for all column sizes.
 The overhead is in the LARGE columns (7+ bits), not the small ones.
 The Investigation #1 result (adder-tree popcount is 3x slower)
 confirms that pop0's parallel bit counting is the right approach.
+
+## NI-5b Results: Carry-Save Comba Encoding (NEW)
+
+### Design
+
+Based on the NI-5 proof analysis showing that Comba's inter-column
+carry propagation creates proof bottlenecks, we designed a carry-save
+variant that computes popcount per column INDEPENDENTLY, then does
+a second pass to handle the weighted carry bits.
+
+Standard Comba: popcount(column[i]) → LSB to result[i], higher bits
+propagated to column[i+1], column[i+2], etc. during the SAME pass.
+
+Carry-save Comba: popcount(column[i]) → collect ALL weighted results,
+then reduce the accumulated weighted columns in a SECOND pass.
+
+### Results
+
+| Benchmark | comba | **comba-cs** | dadda | shift |
+|-----------|-------|-------------|-------|-------|
+| comm_9 | 0.24 | **0.13** | 0.53 | 1.97 |
+| comm_11 | 1.77 | **0.78** | 14.6 | 57.5 |
+| comm_13 | 8.27 | **2.66** | T/O | T/O |
+| overflow_8 | 0.05 | **0.02** | 0.05 | 0.19 |
+| overflow_12 | 0.39 | **0.14** | 0.24 | 0.74 |
+| overflow_16 | 1.57 | **0.78** | **0.48** | 1.79 |
+| str_red_16 | 0.40 | 0.27 | **0.11** | 0.19 |
+| str_red_32 | 0.67 | 0.60 | **0.36** | 0.38 |
+| factor_20 | 0.06 | 0.06 | **0.04** | 0.05 |
+
+**comba-cs is 1.8-3.1x faster than standard Comba on commutativity**
+and 2-2.8x faster on overflow checks. It NEVER regresses vs Comba.
+
+### CaDiCaL analysis (comm_16, smt2_solver)
+
+| Metric | comba | comba-cs |
+|--------|-------|----------|
+| Variables | 1,484 | 1,608 (+8%) |
+| Clauses | 6,439 | 6,845 (+6%) |
+| Conflicts | 448,874 | **112,882** (-75%) |
+| Eliminated | 837 | 783 |
+| Fixed | 94 | 147 |
+| Time | 19.5s | **4.2s** (-78%) |
+
+**75% fewer conflicts despite 8% more variables.** The carry-save
+structure creates more variables but they're easier to search because
+inter-column dependencies are eliminated during the popcount phase.
+
+### Why it works
+
+The carry-save Comba separates two concerns:
+1. **Column reduction** (popcount): each column is reduced independently
+2. **Carry propagation**: handled in a second pass on smaller columns
+
+In standard Comba, these are interleaved: popcount carries propagate
+to the next column DURING the first pass, creating inter-column
+dependencies. In carry-save Comba, the first pass is fully independent
+per column, and the second pass handles only the small carry bits.
+
+This directly addresses the NI-5 finding: the proof bottleneck in
+standard Comba comes from inter-column carry propagation. Carry-save
+Comba eliminates this by deferring carry propagation to a second pass
+where the columns are much smaller (1-3 bits instead of 8-16 bits).
+
+## NI-7 Corrected: MiniSat Analysis
+
+### SatELite IS running (corrected)
+
+Earlier analysis incorrectly stated SatELite eliminates ~1 variable.
+Corrected data:
+
+| Encoding | MiniSat SatELite eliminated | CaDiCaL total removed |
+|----------|---------------------------|----------------------|
+| comm_8+shift | 29 | 182 (55 elim + 127 fixed) |
+| comm_8+comba | 105 | 268 (138 elim + 130 fixed) |
+
+SatELite eliminates 29-105 variables (reasonable preprocessing).
+CaDiCaL removes 182-268 through inprocessing (BVE during search).
+The 6x difference is from CaDiCaL's ability to "fix" variables
+(unit propagation during search) which MiniSat cannot do.
+
+**freeze_all is NOT the issue.** Only 1 variable is frozen (the
+assertion literal). SatELite has full access to all other variables.
+The limitation is MiniSat's lack of inprocessing, not freezing.
+
+## NI-1 Corrected: elimsum=0 is NOT robust
+
+| Benchmark | default | elimsum=0 | Change |
+|-----------|---------|-----------|--------|
+| SMT comm_16+comba | 19.6s | 17.3s | -12% |
+| CBMC comm_11+comba | 1.77s | 2.69s | **+52%** |
+| CBMC overflow_16+dadda | 0.48s | 0.53s | +10% |
+
+elimsum=0 helps the SMT-COMP benchmark but HURTS the CBMC benchmark
+for the same property (commutativity). The difference is in the CNF
+structure produced by the two paths. **Not safe as a default change.**

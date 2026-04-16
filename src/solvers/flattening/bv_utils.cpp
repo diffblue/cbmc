@@ -1701,6 +1701,80 @@ bvt bv_utilst::comba_column_wise(const std::vector<bvt> &pps)
   return result;
 }
 
+/// Carry-save Comba: compute popcount per column independently,
+/// then do a single final addition. This avoids inter-column
+/// carry propagation during the popcount phase.
+bvt bv_utilst::comba_carry_save(const std::vector<bvt> &pps)
+{
+  PRECONDITION(!pps.empty());
+
+  std::size_t width = pps.front().size();
+
+  // Collect all partial product bits per column
+  std::vector<bvt> columns(width);
+  for(const auto &pp : pps)
+  {
+    PRECONDITION(pp.size() == width);
+    for(std::size_t i = 0; i < width; ++i)
+    {
+      if(!pp[i].is_false())
+        columns[i].push_back(pp[i]);
+    }
+  }
+
+  // Compute popcount for each column INDEPENDENTLY
+  // Collect weighted results: result[bit_position] += popcount_bit
+  std::vector<bvt> weighted_columns(width);
+
+  for(std::size_t i = 0; i < width; ++i)
+  {
+    if(columns[i].empty())
+      continue;
+
+    bvt column_count = popcount(columns[i]);
+
+    // Each bit j of the popcount has weight 2^j at position i
+    // So it contributes to result position i+j
+    for(std::size_t j = 0; j < column_count.size(); ++j)
+    {
+      if(i + j < width && !column_count[j].is_false())
+        weighted_columns[i + j].push_back(column_count[j]);
+    }
+  }
+
+  // Now reduce the weighted columns using a final Comba pass
+  // (this handles the carry propagation from popcount higher bits)
+  bvt result;
+  result.reserve(width);
+
+  for(std::size_t i = 0; i < width; ++i)
+  {
+    bvt &col = weighted_columns[i];
+
+    if(col.empty())
+    {
+      result.push_back(const_literal(false));
+    }
+    else if(col.size() == 1)
+    {
+      result.push_back(col[0]);
+    }
+    else
+    {
+      bvt col_sum = popcount(col);
+      result.push_back(col_sum.front());
+      // Propagate higher bits to next columns
+      for(std::size_t j = 1; j < col_sum.size(); ++j)
+      {
+        if(i + j < width && !col_sum[j].is_false())
+          weighted_columns[i + j].push_back(col_sum[j]);
+      }
+    }
+  }
+
+  return result;
+}
+
 // Wallace tree multiplier. This is disabled, as runtimes have
 // been observed to go up by 5%-10%, and on some models even by 20%.
 #ifndef WALLACE_TREE
@@ -2760,6 +2834,8 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
   {
     if(use_wallace_tree)
       return wallace_tree(pps);
+    if(use_comba_carry_save)
+      return comba_carry_save(pps);
     if(use_comba)
       return comba_column_wise(pps);
     if(use_dadda)

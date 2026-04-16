@@ -212,7 +212,6 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve(const bvt &assumptions)
                    << solver->nClauses() << " clauses" << messaget::eom;
 
   // Print pre-solve stats
-  if(std::getenv("CBMC_MINISAT_STATS"))
   {
     log.statistics() << "MiniSat pre-solve: "
                      << solver->nVars() << " vars, "
@@ -304,7 +303,6 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve(const bvt &assumptions)
 
 #endif
 
-    if(std::getenv("CBMC_MINISAT_STATS"))
     {
       log.statistics() << "MiniSat post-solve:"
                        << " conflicts=" << solver->conflicts

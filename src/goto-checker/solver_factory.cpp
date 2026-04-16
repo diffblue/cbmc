@@ -399,6 +399,8 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
     const std::string &menc = options.get_option("multiplier-encoding");
     if(menc == "comba")
       bv_pointers->set_comba(true);
+    else if(menc == "comba-cs")
+      bv_pointers->set_comba_carry_save(true);
     else if(menc == "dadda")
       bv_pointers->set_dadda(true);
     else if(menc == "wallace")

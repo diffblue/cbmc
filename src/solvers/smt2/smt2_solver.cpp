@@ -442,6 +442,8 @@ int solver(
       boolbv.set_dadda(true);
     else if(multiplier_encoding == "wallace")
       boolbv.set_wallace_tree(true);
+    else if(multiplier_encoding == "comba-cs")
+      boolbv.set_comba_carry_save(true);
     smt2_solvert smt2_solver{in, boolbv};
     bool error_found = false;
     while(!smt2_solver.exit)
@@ -470,6 +472,8 @@ int solver(
     boolbv.set_dadda(true);
   else if(multiplier_encoding == "wallace")
     boolbv.set_wallace_tree(true);
+  else if(multiplier_encoding == "comba-cs")
+    boolbv.set_comba_carry_save(true);
 
   smt2_solvert smt2_solver{in, boolbv};
   bool error_found = false;
