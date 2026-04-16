@@ -896,9 +896,9 @@ void cpp_typecheckt::typecheck_compound_declarator(
             // expressions like gcd<Y, X%Y>::value or Abs<N>::value.
             // Temporarily allow elaboration so that referenced templates
             // can be instantiated.
-            bool use_cpp_typecheck = new_symbol->is_macro &&
-                                     new_symbol->value.is_not_nil() &&
-                                     !template_map.expr_map.empty();
+            bool use_cpp_typecheck = new_symbol->value.is_not_nil() &&
+                                     (!template_map.expr_map.empty() ||
+                                      !template_map.type_map.empty());
             if(use_cpp_typecheck)
             {
               bool saved_force = force_elaborate;
