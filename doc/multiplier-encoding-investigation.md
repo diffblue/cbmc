@@ -2368,3 +2368,45 @@ of the SAME operands in swapped order (a*b vs b*a). For all other
 The discriminator is not just "2 multiplications + equality" but
 specifically "2 multiplications of the SAME operands in swapped
 order." This is a much narrower pattern than previously thought.
+
+## Word-Level Simplification Impact (cb50af334f)
+
+Cherry-picked commit cb50af334f which simplifies algebraic identities
+(commutativity, distributivity, associativity) at the expression level.
+
+### What it simplifies
+
+| Form | Simplified? | Example |
+|------|-------------|---------|
+| Direct assertion | **YES** | `assert(a*b == b*a)` → 0 VCCs |
+| Variable form | **NO** | `c=a*b; d=b*a; assert(c==d)` → 1 VCC |
+| smt2_solver | **NO** | SMT2 formulas bypass CBMC's simplifier |
+
+### Why variable form is not simplified
+
+CBMC's symbolic execution creates SSA variables for every intermediate
+result. The simplifier sees `c == d` (two SSA variables), not
+`a*b == b*a` (the algebraic identity). The commutativity pattern
+is hidden by the intermediate variables.
+
+In real C code, the variable form IS the common pattern:
+```c
+int result1 = compute(a, b);
+int result2 = compute(b, a);
+assert(result1 == result2);
+```
+
+### Impact on encoding relevance
+
+**All encoding work remains fully relevant.** The word-level
+simplification helps only for direct assertions in source code,
+which is a narrow use case. For the common variable form (and for
+smt2_solver), the SAT encoding determines performance:
+
+| Benchmark (variable form) | shift-add | comba-cs | dadda |
+|--------------------------|-----------|----------|-------|
+| comm BW=17 | T/O | **7.19s** | T/O |
+| overflow BW=16 | 1.77s | 0.78s | **0.48s** |
+| str_red BW=32 | 0.38s | 0.60s | **0.36s** |
+
+These are UNCHANGED from before the cherry-pick.
