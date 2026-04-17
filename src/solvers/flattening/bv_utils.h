@@ -122,6 +122,7 @@ public:
     bvt &res,
     bvt &rem);
 
+  void restoring_divider(const bvt &op0, const bvt &op1, bvt &res, bvt &rem);
   void unsigned_divider(
     const bvt &op0,
     const bvt &op1,
@@ -247,6 +248,7 @@ protected:
   bool use_fa_tree_popcount = false;
   bool use_comba_carry_save = false;
   bool use_dadda_carry_save = false;
+  bool use_restoring_divider = false;
   int radix_multiplier = 0; // 0=disabled, 4, 8, 16
 public:
   void set_carry_save(bool b) { use_carry_save = b; }
@@ -258,6 +260,7 @@ public:
   void set_fa_tree_popcount(bool b) { use_fa_tree_popcount = b; }
   void set_comba_carry_save(bool b) { use_comba_carry_save = b; }
   void set_dadda_carry_save(bool b) { use_dadda_carry_save = b; }
+  void set_restoring_divider(bool b) { use_restoring_divider = b; }
   void set_radix_multiplier(int r) { radix_multiplier = r; }
 protected:
 

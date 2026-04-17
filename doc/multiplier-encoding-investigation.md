@@ -2966,3 +2966,89 @@ Potential optimization directions for future work:
    conditional logic)
 3. **FP barrel shifter:** use a different shift encoding that
    creates fewer MUX variables
+
+## Alternative Division Encodings
+
+### Restoring division
+
+Implemented a restoring (long division) algorithm that computes
+quotient and remainder bit by bit through a chain of
+subtract-compare-select operations. Creates a deterministic circuit
+(no free variables) with O(n²) gates.
+
+| BW | Constraint vars | Restoring vars | Constraint time | Restoring time |
+|----|----------------|----------------|-----------------|----------------|
+| 8 | 3065 | 9345 | 0.33s | 1.47s |
+| 10 | 3540 | 9528 | 1.40s | 5.59s |
+| 12 | 3987 | 9699 | 7.89s | 14.35s |
+| **14** | 4406 | 9858 | 40.3s | **36.1s** |
+
+**Crossover at BW=14:** restoring is faster above BW=14 because
+the deterministic circuit avoids the search for free variables.
+Below BW=14, the 2-3x variable overhead dominates.
+
+**Catastrophic on modexp:** restoring division creates the full
+division circuit even when the divisor is a free variable, causing
+T/O on modexp_step (vs 0.02s for constraint-based).
+
+**Conclusion:** Restoring division is not a viable default. It helps
+only on large-BW division roundtrip properties and catastrophically
+hurts modular arithmetic with symbolic moduli.
+
+## FP Wrapper: Propagation Chain Analysis
+
+### Adder encoding has ZERO effect on FP
+
+| Config | FP add comm time |
+|--------|-----------------|
+| ripple | 4.43s |
+| BK | 4.42s |
+| g-only | 4.43s |
+
+The fraction addition is a small part of the FP circuit.
+
+### Sign handling is the main hardness source
+
+| Config | Vars | Time | Speedup |
+|--------|------|------|---------|
+| full (no constraints) | 2656 | 4.43s | baseline |
+| no NaN/Inf only | 2670 | 4.79s | 0.9x |
+| **positive only** | 2735 | **1.57s** | **2.8x** |
+| **positive + no NaN/Inf** | 2749 | **1.21s** | **3.7x** |
+
+**Restricting to positive operands gives 2.8x speedup.** The sign
+handling creates a conditional branch: if same sign → add fractions,
+if different sign → subtract fractions. The SAT solver must reason
+about BOTH branches simultaneously.
+
+When both operands are positive, there's no branch — always add.
+This eliminates the conditional logic. Adding "no NaN/Inf" gives
+another 1.3x on top.
+
+### Why propagation chains don't help FP
+
+The FP wrapper's hardness comes from CONDITIONAL BRANCHES (sign
+handling, NaN/Inf detection), not from carry propagation. The
+barrel shifters use MUX trees (no carry chains). The fraction
+addition uses adder() but it's a small fraction of the total.
+
+Adding propagation chains (BK, g-only) to the fraction addition
+has zero effect because the fraction addition is not the bottleneck.
+The bottleneck is the CONDITIONAL CONTROL FLOW that connects
+the components.
+
+### Potential optimization directions
+
+1. **Sign-aware FP encoding:** If both operands are known to have
+   the same sign (from assumes or value analysis), use a simplified
+   circuit without the sign branch. This would give 2.8x speedup.
+
+2. **Lazy NaN/Inf handling:** Generate the NaN/Inf checks as
+   separate assertions rather than embedding them in the circuit.
+   This would reduce the circuit size and let BVE eliminate the
+   NaN/Inf variables when they're not relevant.
+
+3. **Barrel shifter with implications:** Add redundant binary
+   clauses between adjacent MUX outputs to create propagation
+   paths. Not tested — the sign handling dominates, so this
+   would have limited impact.

@@ -3850,12 +3850,65 @@ void bv_utilst::divider(
   }
 }
 
+/// Restoring division: computes quotient and remainder bit by bit.
+/// Creates a deterministic circuit (no free variables) with a chain
+/// of subtract-compare-select operations.
+void bv_utilst::restoring_divider(
+  const bvt &op0,
+  const bvt &op1,
+  bvt &res,
+  bvt &rem)
+{
+  std::size_t width = op0.size();
+
+  // Handle division by zero: produce all-ones quotient, op0 remainder
+  literalt is_not_zero = prop.lor(op1);
+
+  // Restoring division algorithm
+  bvt remainder = zeros(width);
+  res.resize(width);
+
+  for(int i = (int)width - 1; i >= 0; i--)
+  {
+    // Shift remainder left by 1, bring in next dividend bit
+    for(int j = (int)width - 1; j > 0; j--)
+      remainder[j] = remainder[j - 1];
+    remainder[0] = op0[i];
+
+    // Compare: remainder >= divisor?
+    literalt ge = lt_or_le(true, op1, remainder, representationt::UNSIGNED);
+
+    // If remainder >= divisor: quotient bit = 1, remainder -= divisor
+    bvt subtracted = adder(remainder, inverted(op1), const_literal(true)).first;
+
+    // Select: if ge, use subtracted remainder; else keep remainder
+    for(std::size_t j = 0; j < width; j++)
+      remainder[j] = prop.lselect(ge, subtracted[j], remainder[j]);
+
+    res[i] = ge;
+  }
+
+  // Division by zero: quotient = all 1s, remainder = op0
+  bvt all_ones;
+  all_ones.resize(width, const_literal(true));
+  for(std::size_t j = 0; j < width; j++)
+  {
+    res[j] = prop.lselect(is_not_zero, res[j], all_ones[j]);
+    remainder[j] = prop.lselect(is_not_zero, remainder[j], op0[j]);
+  }
+
+  rem = remainder;
+}
+
 void bv_utilst::unsigned_divider(
   const bvt &op0,
   const bvt &op1,
   bvt &res,
   bvt &rem)
 {
+  if(use_restoring_divider)
+    return restoring_divider(op0, op1, res, rem);
+
   std::size_t width=op0.size();
 
   // check if we divide by a power of two
