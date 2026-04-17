@@ -2882,3 +2882,87 @@ selection based on problem-level context (which is not available at
 the bit-blasting level). The tradeoff is overwhelmingly positive:
 the wins (54-73x on commutativity, ∞ on fir_tap) far outweigh
 this minor regression.
+
+## FP Wrapper and Division/Modulo Encoding Investigation
+
+### Arithmetic operation cost map (16-bit)
+
+| Operation | Vars | Clauses | Time | Notes |
+|-----------|------|---------|------|-------|
+| int16 add comm | 146 | 516 | 0.00s | trivial |
+| int16 mul comm | 1642 | 6862 | 5.98s | hard |
+| int16 div determ | 1727 | 8135 | 0.00s | trivial (same expr) |
+| int16 div roundtrip | ~3065 | ~14548 | T/O@16 | VERY hard |
+| float add comm | 2656 | 10382 | 4.42s | hard! |
+| float mul comm | — | — | T/O | very hard |
+| float div determ | 4750 | 22417 | 0.00s | trivial (same expr) |
+
+### Division encoding
+
+Division uses a CONSTRAINT-BASED encoding: free variables for
+quotient and remainder, with constraints q*b + r == a, r < b, q <= a.
+The internal multiplication uses `unsigned_multiplier_no_overflow`
+which is ALWAYS shift-add (does not respect `--multiplier-encoding`).
+
+**Division roundtrip (a/b*b + a%b == a) scaling:**
+
+| BW | Vars | Time |
+|----|------|------|
+| 4 | 2031 | 0.04s |
+| 8 | 3065 | 0.33s |
+| 12 | 3987 | 7.90s |
+| 14 | 4406 | 40.5s |
+| 16 | — | T/O |
+
+Exponential growth, similar to multiplication commutativity.
+
+**Multiplier encoding has minimal effect on division:**
+shift 7.88s vs comba-cs 10.71s vs dadda 11.20s at BW=12.
+Routing the division's internal multiplication through comba-cs
+(matched encoding) does not help: comba-cs 11.64s vs shift 8.08s.
+
+**Root cause:** The division's internal multiplication (q*b where q
+is a free variable) and the explicit multiplication ((a/b)*b where
+a/b is determined) are structurally different circuits. The SAT
+solver must prove they produce the same result, but the free
+variables in the division circuit create a fundamentally different
+search problem from commutativity.
+
+### FP wrapper encoding
+
+FP addition creates 2656 vars (4.42s) — almost as hard as int16
+multiplication (1642 vars, 5.98s). The FP wrapper components:
+
+| Component | Vars (approx) | Purpose |
+|-----------|--------------|---------|
+| Barrel shifter (alignment) | ~135 | Shift fraction by exponent difference |
+| Barrel shifter (normalize) | ~145 | Find leading 1, shift left |
+| MUX (operand swap) | ~60 | Select larger operand |
+| Fraction add/sub | ~60 | Add aligned fractions |
+| NaN/Inf/zero detection | ~50 | Special value handling |
+| Rounding | ~100 | Round to nearest even |
+| Exponent arithmetic | ~50 | Add/subtract exponents |
+| Other (sign, pack, etc.) | ~100 | Miscellaneous |
+
+Individual components are trivially fast when isolated. The hardness
+comes from COMBINING them — the conditional dependencies between
+components (rounding depends on addition result, normalization
+depends on rounding, etc.) create a complex clause structure that
+resists BVE.
+
+### Conclusion
+
+**Division and FP wrapper encodings are not amenable to the same
+optimization approach as multiplication.** The multiplication
+encoding improvements (comba-cs) exploit the STRUCTURAL SYMMETRY
+of partial product accumulation. Division and FP wrappers have
+CONDITIONAL CONTROL FLOW (if NaN, if overflow, if subnormal)
+that creates a fundamentally different clause structure.
+
+Potential optimization directions for future work:
+1. **Division:** recognize a/b*b + a%b == a as a tautology at the
+   expression level (word-level simplification)
+2. **FP wrapper:** simplify the rounding circuit (the most complex
+   conditional logic)
+3. **FP barrel shifter:** use a different shift encoding that
+   creates fewer MUX variables
