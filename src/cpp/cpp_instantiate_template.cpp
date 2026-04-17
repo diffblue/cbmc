@@ -346,6 +346,31 @@ void cpp_typecheckt::elaborate_class_template(
   if(type.id() != ID_struct_tag && type.id() != ID_union_tag)
     return;
 
+  {
+    const symbolt &dbg_sym = lookup(to_tag_type(type));
+    if(
+      id2string(dbg_sym.name).find("is_nothrow_destructible") !=
+        std::string::npos &&
+      id2string(dbg_sym.name).find("__wrap_iter") != std::string::npos)
+    {
+      FILE *f = fopen("/tmp/concept_debug.txt", "a");
+      if(f)
+      {
+        fprintf(
+          f,
+          "ELAB: %s suppress=%d force=%d tci=%d comps=%zu\n",
+          dbg_sym.name.c_str(),
+          suppress_elaborate,
+          force_elaborate,
+          dbg_sym.type.get_bool(ID_template_class_instance),
+          dbg_sym.type.id() == ID_struct
+            ? to_struct_type(dbg_sym.type).components().size()
+            : 0);
+        fclose(f);
+      }
+    }
+  }
+
   if(suppress_elaborate && !force_elaborate)
   {
     if(type.id() == ID_struct_tag || type.id() == ID_union_tag)
@@ -356,9 +381,7 @@ void cpp_typecheckt::elaborate_class_template(
         sym.type.get_bool(ID_template_class_instance) &&
         to_struct_union_type(sym.type).components().empty())
       {
-        // Allow nested elaborations during force-elaboration of
-        // empty template instances.
-        force_elaborate = true;
+        // Empty template instance — allow elaboration
       }
       else
         return;
@@ -387,9 +410,36 @@ void cpp_typecheckt::elaborate_class_template(
     // same arguments (on the instantiation stack), skip elaboration
     // to break infinite recursion. Also limit recursion depth for
     // the same primary template to prevent non-terminating chains.
-    const cpp_template_args_tct &full_args =
+    cpp_template_args_tct full_args =
       static_cast<const cpp_template_args_tct &>(
         t_type.find(ID_full_template_args));
+    // Simplify non-type template arguments so that expressions like
+    // is_destructible<T>::value are constant-folded before
+    // specialization matching.
+    for(auto &arg : full_args.arguments())
+    {
+      if(arg.id() != ID_type && arg.id() != ID_ambiguous)
+      {
+        try
+        {
+          typecheck_expr(arg);
+          simplify(arg, *this);
+          // Resolve symbol references to their constant values
+          if(arg.id() == ID_symbol)
+          {
+            const auto *sym =
+              symbol_table.lookup(to_symbol_expr(arg).get_identifier());
+            if(
+              sym && sym->is_macro && sym->value.is_not_nil() &&
+              sym->value.is_constant())
+              arg = sym->value;
+          }
+        }
+        catch(...)
+        {
+        }
+      }
+    }
     unsigned same_template_depth = 0;
     bool has_converging_int_args = false;
     for(const auto &entry : instantiation_stack)
@@ -758,6 +808,8 @@ void cpp_typecheckt::elaborate_class_template(
                 null_message_handlert null_h2;
                 message_handlert &old_h2 = get_message_handler();
                 set_message_handler(null_h2);
+                bool old_suppress2 = suppress_elaborate;
+                suppress_elaborate = false;
                 try
                 {
                   typecheck_expr(body);
@@ -769,6 +821,7 @@ void cpp_typecheckt::elaborate_class_template(
                 {
                   params_ok = false;
                 }
+                suppress_elaborate = old_suppress2;
                 set_message_handler(old_h2);
               }
               if(!params_ok)
@@ -2362,7 +2415,15 @@ const symbolt &cpp_typecheckt::instantiate_template(
       }
     }
 
-    convert_non_template_declaration(new_decl);
+    // Force elaboration during variable template body processing
+    // so that nested type traits (e.g., is_nothrow_destructible<T>::value)
+    // can be fully resolved.
+    {
+      bool old_suppress = suppress_elaborate;
+      suppress_elaborate = false;
+      convert_non_template_declaration(new_decl);
+      suppress_elaborate = old_suppress;
+    }
 
     const symbolt &symb = lookup(new_decl.declarators()[0].get(ID_identifier));
 

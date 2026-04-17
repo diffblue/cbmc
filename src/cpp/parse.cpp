@@ -5822,6 +5822,21 @@ bool Parser::rTemplateArgs(irept &template_args)
       a.make_nil();
     }
 
+    // C++ standard [expr.unary.noexcept]: noexcept(expr) is always
+    // an expression (prvalue of type bool), never a type.
+    // Parse it directly as an expression in template argument context.
+    if(lex.LookAhead(0) == TOK_NOEXCEPT)
+    {
+      if(!rConditionalExpr(exp, true))
+        return false;
+      if(lex.LookAhead(0) == TOK_ELLIPSIS)
+      {
+        lex.get_token(tk1);
+        exp.set(ID_ellipsis, true);
+      }
+      goto template_arg_done;
+    }
+
     // try type name first
     if(rTypeNameOrFunctionType(a) &&
        ((lex.LookAhead(0) == '>' || lex.LookAhead(0) == ',' ||

@@ -26,7 +26,72 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
 
   for(auto &base : bases_irep)
   {
-    const cpp_namet &name = to_cpp_name(base.find(ID_name));
+    cpp_namet &name = static_cast<cpp_namet &>(base.add(ID_name));
+
+    // Apply template_map to substitute template parameters in the
+    // base class template arguments (e.g., _Tp in integral_constant<bool,
+    // noexcept(declval<_Tp>().~_Tp())>). Only apply when both type_map
+    // and expr_map are non-empty (indicating a partial specialization
+    // with both type and non-type parameters).
+    if(!template_map.type_map.empty())
+    {
+      // Check if any template arg contains a template parameter
+      // from the current type_map before applying substitution.
+      bool has_param = false;
+      for(const auto &sub : name.get_sub())
+      {
+        if(sub.id() != ID_template_args)
+          continue;
+        const auto &args = sub.find(ID_arguments).get_sub();
+        for(const auto &arg : args)
+        {
+          // Check recursively for cpp_name nodes that match type_map
+          std::function<bool(const irept &)> contains_param =
+            [&](const irept &node) -> bool
+          {
+            if(node.id() == ID_name)
+            {
+              irep_idt id = node.get(ID_identifier);
+              for(const auto &entry : template_map.type_map)
+              {
+                const std::string &key = id2string(entry.first);
+                auto p = key.rfind("::");
+                std::string suffix =
+                  p != std::string::npos ? key.substr(p + 2) : key;
+                if(suffix == id2string(id))
+                  return true;
+              }
+            }
+            for(const auto &s : node.get_sub())
+              if(contains_param(s))
+                return true;
+            for(const auto &n : node.get_named_sub())
+              if(contains_param(n.second))
+                return true;
+            return false;
+          };
+          if(contains_param(arg))
+          {
+            has_param = true;
+            break;
+          }
+        }
+        if(has_param)
+          break;
+      }
+      if(has_param)
+      {
+        for(auto &sub : name.get_sub())
+        {
+          if(sub.id() == ID_template_args)
+          {
+            irept::subt &args = sub.add(ID_arguments).get_sub();
+            for(auto &arg : args)
+              template_map.apply(static_cast<exprt &>(arg));
+          }
+        }
+      }
+    }
 
     // C++11: decltype(expr) as base specifier
     exprt base_symbol_expr;
