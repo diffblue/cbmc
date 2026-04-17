@@ -156,16 +156,13 @@ void template_mapt::apply(typet &type) const
             return;
           }
           // Qualified name like _Up::X where _Up maps to a struct:
-          // replace _Up with the struct's base name so scope
-          // resolution can find the member.
+          // replace _Up with the struct_tag identifier so scope
+          // resolution can find the member via id_map or symbol table.
           if(sub.size() > 1 && entry.second.id() == ID_struct_tag)
           {
             irep_idt tag = to_struct_tag_type(entry.second).get_identifier();
-            std::string tag_str = id2string(tag);
-            if(tag_str.substr(0, 4) == "tag-")
-              tag_str = tag_str.substr(4);
             sub.front() = irept{ID_name};
-            sub.front().set(ID_identifier, tag_str);
+            sub.front().set(ID_identifier, tag);
             return;
           }
         }

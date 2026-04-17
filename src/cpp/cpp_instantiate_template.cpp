@@ -356,6 +356,9 @@ void cpp_typecheckt::elaborate_class_template(
         sym.type.get_bool(ID_template_class_instance) &&
         to_struct_union_type(sym.type).components().empty())
       {
+        // Allow nested elaborations during force-elaboration of
+        // empty template instances.
+        force_elaborate = true;
       }
       else
         return;
