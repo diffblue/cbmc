@@ -2410,3 +2410,68 @@ smt2_solver), the SAT encoding determines performance:
 | str_red BW=32 | 0.38s | 0.60s | **0.36s** |
 
 These are UNCHANGED from before the cherry-pick.
+
+## Floating-Point Benchmark Results
+
+### FP encoding has NO effect
+
+| Benchmark | shift | comba-cs | dadda |
+|-----------|-------|----------|-------|
+| Float4 (mixed FP ops) | 21.6s | 21.6s | 21.6s |
+| FP dot product comm | 0.9s | 0.9s | 0.9s |
+| FP cross product antisym | 1.0s | 1.0s | 1.0s |
+| FP mul no overflow | 0.03s | 0.03s | 0.03s |
+
+**No encoding difference on any FP benchmark.** The FP wrapper
+(NaN/Inf handling, rounding, exponent arithmetic) accounts for
+96% of solving time. The 24-bit mantissa multiplication (48-bit
+integer multiplication) is too small to show encoding effects.
+
+Double precision (53-bit mantissa → 106-bit multiplication) is
+beyond the solvable frontier for all encodings.
+
+There is no FP "sweet spot" where encoding matters with current
+CBMC. FP benchmarks are not useful for encoding evaluation.
+
+## Real-World Integer Benchmark Results
+
+### Comprehensive benchmark suite
+
+| Benchmark | Description | Muls | shift | comba-cs | dadda |
+|-----------|-------------|------|-------|----------|-------|
+| matrix_trace_8bit | tr(AB)==tr(BA) | 8 | 29.5s | **0.58s** | 3.70s |
+| matrix_trace_16bit | tr(AB)==tr(BA) | 8 | T/O | **35.1s** | T/O |
+| MAC_comm_4x8bit | a·b==b·a (4D) | 8 | 17.5s | **0.37s** | 1.68s |
+| hash_deterministic | h(x)==h(x) | 2 const | T/O | 13.2s | **7.83s** |
+| wide_mul_comm_32bit | (u32)a*b==(u32)b*a | 2 | T/O | **50.2s** | T/O |
+| poly_horner_vs_direct | Horner==direct | 3 | 0.05s | 0.05s | 0.04s |
+| hw_mul_equiv_12 | bvmul vs shift-add | 2 diff | **18.1s** | 95.8s | T/O |
+| checked_mul_16 | wide vs narrow | 2 diff | **0.46s** | 0.77s | 0.59s |
+
+### Key findings
+
+**comba-cs provides 47-51x speedup on real verification tasks:**
+- Matrix trace invariant (tr(AB)==tr(BA)): 0.58s vs 29.5s (**51x**)
+- MAC commutativity (dot product): 0.37s vs 17.5s (**47x**)
+- 16-bit matrix trace: ONLY comba-cs solves it (35.1s)
+- 32-bit wide multiplication: ONLY comba-cs solves it (50.2s)
+
+**dadda wins on constant multiplication:**
+- Hash determinism: 7.83s vs 13.2s (comba-cs)
+- Polynomial evaluation: 0.04s vs 0.05s
+
+**shift-add wins on structurally different multiplications:**
+- HW multiplier equivalence: 18.1s vs 95.8s (comba-cs)
+- Checked multiplication: 0.46s vs 0.77s (comba-cs)
+
+### The pattern
+
+comba-cs excels when the problem has **multiple multiplications
+with operand symmetry** (same operands in different order). This
+includes:
+- Commutativity: a*b == b*a
+- Matrix trace: tr(AB) == tr(BA) (each element has swapped products)
+- Dot product: Σ a[i]*b[i] == Σ b[i]*a[i]
+
+For problems WITHOUT operand symmetry (different structures,
+constant multiplication, different widths), dadda or shift-add wins.
