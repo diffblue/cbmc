@@ -2815,3 +2815,70 @@ Files modified:
 - `src/solvers/smt2/smt2_solver.cpp`: --cadical, --multiplier-encoding
 
 Zero regressions on 691 CORE regression tests.
+
+## overflow_16 Regression: Deep Analysis
+
+### Circuit structure
+
+overflow_16 has TWO multiplications:
+- Wide: 32-bit (16-bit operands zero-extended) → 16 PPs ≤ 21 → dadda-cs
+- Narrow: 16-bit (fully symbolic) → 16 PPs > 10 → pop0
+
+The narrow multiplication uses pop0, creating 1918 extra variables
+(4390 total vs dadda's 2472).
+
+### CaDiCaL analysis
+
+| Encoding | Vars | Conflicts | Elim | Fixed | Remain | Time |
+|----------|------|-----------|------|-------|--------|------|
+| comba-cs | 4390 | 33,121 | 1703 | 848 | 1839 | 0.98s |
+| dadda | 2472 | 18,564 | 869 | 450 | 1153 | 0.53s |
+| shift | 2472 | 33,231 | 786 | 475 | 1211 | 1.06s |
+
+comba-cs has 1839 remaining vars vs dadda's 1153 (1.6x), directly
+explaining the 1.6x time difference.
+
+### Crossover analysis
+
+| BW | comba-cs | dadda | Ratio |
+|----|----------|-------|-------|
+| 8 | 0.02s | 0.05s | **0.4x** (comba-cs 2.5x faster) |
+| 10 | 0.08s | 0.16s | **0.5x** |
+| 12 | 0.14s | 0.23s | **0.6x** |
+| 14 | 0.40s | 0.51s | **0.7x** |
+| 16 | 0.77s | 0.48s | 1.6x (regression) |
+| 18 | 1.05s | 0.49s | 2.1x |
+| 20 | 2.44s | 1.07s | 2.2x |
+
+**Crossover at BW=15-16.** Below BW=14, comba-cs is faster because
+pop0's structural benefit (BCP cascades) outweighs its variable
+overhead. Above BW=16, the overhead dominates.
+
+### Root cause
+
+The narrow multiplication is FULLY SYMBOLIC (16 PPs = width).
+pop0 creates ~1900 extra variables for the parallel bit counting
+structure. These variables help commutativity (enable BCP cascades
+across the equality check) but are pure overhead for a single
+multiplication compared with a different operation (division/shift).
+
+### Why it cannot be fixed
+
+The multiplier doesn't know whether its result will be compared
+with another multiplication (commutativity → pop0 helps) or with
+a different operation (overflow → pop0 hurts). No threshold or
+heuristic at the multiplier level can distinguish these cases.
+
+Approaches tested:
+- Width ≤ 16 fallback: breaks comm_9 (5.5x regression)
+- Adjusted threshold: catches commutativity at small BW
+- Smart popcount (fa_tree for small): hurts commutativity
+
+### Conclusion
+
+The 1.6x regression on overflow_16 (0.29s absolute) is a fundamental
+tradeoff. It cannot be eliminated without per-multiplication encoding
+selection based on problem-level context (which is not available at
+the bit-blasting level). The tradeoff is overwhelmingly positive:
+the wins (54-73x on commutativity, ∞ on fir_tap) far outweigh
+this minor regression.
