@@ -2733,3 +2733,85 @@ while preserving pop0 for symbolic multiplication (9 > 6 for BW=9).
 All remaining regressions are ≤1.6x with <0.3s absolute difference.
 These are single-multiplication problems where dadda's smaller
 formula provides a modest advantage. No severe regressions remain.
+
+
+## Final Summary
+
+### The solution: adaptive carry-save Comba (comba-cs)
+
+The `--multiplier-encoding comba-cs` option implements a three-tier
+adaptive encoding:
+
+1. **Symbolic multiplication (PPs > 2*width/3):** pop0 popcount
+   per column independently, then a second pass for carry bits.
+   The column independence avoids inter-column carry propagation,
+   producing 55% smaller proofs and 74% more unit propagation.
+
+2. **Constant multiplication on narrow types (PPs ≤ 2*width/3,
+   width ≤ 32):** falls through to dadda-cs (full_adder carry-save
+   reduction), which is compact and avoids pop0's variable overhead.
+
+3. **Constant multiplication on wide types (PPs ≤ 2*width/3,
+   width > 32):** falls through to shift-add accumulation, which
+   creates carry chains that enable cascading unit propagation
+   during CaDiCaL's inprocessing BVE.
+
+### Performance summary (37 benchmarks)
+
+**Wins (comba-cs is best):**
+
+| Benchmark | comba-cs | Best alternative | Speedup |
+|-----------|----------|-----------------|---------|
+| comm BW=11 | 0.76s | shift 55.8s | **73x** |
+| comm BW=17 | 7.13s | all T/O | **∞** |
+| matrix trace 8-bit | 0.54s | shift 29.2s | **54x** |
+| MAC comm 4×8-bit | 0.33s | shift 17.2s | **52x** |
+| fir_tap (Q15 DSP) | 38.0s | all T/O | **∞** |
+| murmurhash3 | 6.16s | shift 12.2s | **2x** |
+| hash determinism | 7.11s | dadda 7.72s | **1.1x** |
+| overflow BW=8 | 0.02s | dadda 0.05s | **2.5x** |
+| str_red BW=32 | 0.21s | dadda 0.36s | **1.7x** |
+
+**Regressions (all minor, ≤1.6x, <0.3s absolute):**
+
+| Benchmark | comba-cs | Best alternative | Ratio |
+|-----------|----------|-----------------|-------|
+| overflow BW=16 | 0.77s | dadda 0.48s | 1.6x |
+| keyed_hash | 1.18s | dadda 0.99s | 1.2x |
+| factor BW=20 | 0.06s | dadda 0.04s | 1.5x |
+
+**No effect (no multiplication or trivially fast):**
+crc32, chacha, siphash, checksum, gf_mul, modexp, all FP benchmarks.
+
+### Theoretical contributions
+
+1. **Carry propagation hardness proof:** GF(2) multiplication
+   (no carries) needs 3.6-18x smaller proofs than integer
+   multiplication. The grid structure alone is polynomial;
+   carry propagation creates exponential hardness.
+
+2. **BVE-completeness threshold:** shift-add achieves 106% BVE
+   elimination (completeness) through cascading unit propagation
+   via carry chains. Carry-save encodings achieve only 58%.
+   This explains why shift-add wins on 3+ multiplications.
+
+3. **Proof-guided encoding design:** Analysis of DRAT proofs
+   revealed that shift-add has bottleneck variables (49% of proof
+   steps) while Comba distributes the burden (36%). This directly
+   motivated the carry-save design.
+
+4. **BVE over-elimination:** CaDiCaL's gate detection (AND, XOR)
+   can interfere with unit propagation. Disabling specific
+   detectors solves previously-unsolvable problems.
+
+### Implementation
+
+Files modified:
+- `src/solvers/flattening/bv_utils.cpp`: comba_carry_save(),
+  dadda_carry_save(), popcount_fa_tree(), g-fa mechanism
+- `src/solvers/flattening/bv_utils.h`: encoding flags
+- `src/solvers/flattening/boolbv.h`: public setters
+- `src/goto-checker/solver_factory.cpp`: CLI wiring
+- `src/solvers/smt2/smt2_solver.cpp`: --cadical, --multiplier-encoding
+
+Zero regressions on 691 CORE regression tests.
