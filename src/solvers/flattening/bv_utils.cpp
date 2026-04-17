@@ -1722,6 +1722,13 @@ bvt bv_utilst::comba_carry_save(const std::vector<bvt> &pps)
     }
   }
 
+  // For sparse constant multiplication (few partial products relative
+  // to bitwidth), use dadda-cs which creates fewer variables.
+  // pop0 popcount is better for tall columns (symbolic multiplication)
+  // but wasteful for short columns (constant multiplication).
+  if(pps.size() <= width / 2)
+    return dadda_carry_save(pps);
+
   // Compute popcount for each column INDEPENDENTLY
   // Collect weighted results: result[bit_position] += popcount_bit
   std::vector<bvt> weighted_columns(width);

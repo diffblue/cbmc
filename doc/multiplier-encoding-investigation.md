@@ -2475,3 +2475,61 @@ includes:
 
 For problems WITHOUT operand symmetry (different structures,
 constant multiplication, different widths), dadda or shift-add wins.
+
+## Constant Multiplication Optimization
+
+### Problem
+
+comba-cs creates 2-2.5x more variables than dadda for constant
+multiplication because pop0 popcount has shift+mask+add overhead
+even for short columns:
+
+| Benchmark | comba-cs vars | dadda vars | Ratio |
+|-----------|--------------|------------|-------|
+| str_red_16 (x*15, 4 PPs) | 1035 | 533 | 1.9x |
+| hash_32 (x*0x45d9f3b, 17 PPs) | 7170 | 2858 | 2.5x |
+
+### Solution: adaptive first-pass selection
+
+When the number of partial products is ≤ width/2 (indicating
+constant multiplication with a sparse constant), comba-cs falls
+through to dadda-cs which uses full_adder reduction (compact)
+instead of pop0 popcount (variable-heavy).
+
+### Results
+
+| Benchmark | Before | After | dadda | shift |
+|-----------|--------|-------|-------|-------|
+| str_red_16 | 0.27s | **0.12s** | 0.11s | 0.19s |
+| str_red_32 | 0.60s | **0.21s** | 0.36s | 0.38s |
+| hash_32 | 13.2s | 13.2s | **7.89s** | T/O |
+| comm_9 | 0.13s | **0.13s** | 0.53s | 1.98s |
+| comm_11 | 0.78s | **0.78s** | 14.6s | 57.7s |
+| matrix_trace_8 | 0.54s | **0.54s** | 3.67s | 29.9s |
+
+**str_red_32: comba-cs now BEATS dadda** (0.21s vs 0.36s) because
+the sparse constant (15 = 4 set bits, 4 PPs ≤ 16) triggers
+dadda-cs fallback, which is both compact AND carry-save.
+
+### Remaining gap: dense constants
+
+Hash multiplication (0x45d9f3b = 17 set bits out of 32) has
+17 PPs > 16 = width/2, so it stays in pop0 and creates 2.5x
+more variables than dadda. Dense constants (>50% set bits) are
+not caught by the heuristic.
+
+### Alternatives explored
+
+| Approach | Result |
+|----------|--------|
+| Column height threshold (≤6) | Helps str_red, misses hash |
+| Column height threshold (≤12) | Catches hash but breaks comm_9 |
+| Full_adder first pass (hybrid) | Destroys column independence |
+| Smart popcount (fa_tree for ≤6) | Helps const mul, hurts comm |
+| PP count heuristic (≤width/2) | **Best tradeoff** |
+
+The fundamental tension: pop0's parallel structure is essential
+for comba-cs's advantage on symbolic multiplication, but wasteful
+for constant multiplication. The PP count heuristic is the best
+compromise — it catches sparse constants without affecting
+symbolic multiplication.
