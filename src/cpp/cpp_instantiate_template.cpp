@@ -1924,6 +1924,9 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
   if(is_template_method && !new_decl.is_typedef())
   {
+    // Apply template_map to parameter types for SFINAE substitution
+    for(auto &d : new_decl.declarators())
+      template_map.apply(d.type());
     symbolt &symb = symbol_table.get_writeable_ref(class_name);
 
     PRECONDITION(new_decl.declarators().size() == 1);
