@@ -1,0 +1,9 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+Simple requirements in requires-expressions are not evaluated.
+The parser skips them and returns true.
