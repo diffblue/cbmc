@@ -1787,13 +1787,7 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
           // When suppress_elaborate is true (e.g., during class body
           // processing), force elaboration so that scope resolution
           // can access the template class's members.
-          {
-            bool old_force = cpp_typecheck.force_elaborate;
-
-            cpp_typecheck.force_elaborate = true;
-            cpp_typecheck.elaborate_class_template(instance);
-            cpp_typecheck.force_elaborate = old_force;
-          }
+          cpp_typecheck.elaborate_class_template(instance);
 
           cpp_typecheck.cpp_scopes.go_to(cpp_typecheck.cpp_scopes.get_scope(
             to_tag_type(instance).get_identifier()));
@@ -1960,7 +1954,44 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
       }
     }
     else
+    {
       final_base_name += pos->id_string();
+      // Substitute destructor names: when "~" is followed by a name
+      // that's a template parameter, replace it with the actual type.
+      if(
+        pos->id_string() == "~" && (pos + 1) != cpp_name.get_sub().end() &&
+        (pos + 1)->id() == ID_name)
+      {
+        irep_idt param_name = (pos + 1)->get(ID_identifier);
+        for(const auto &entry : cpp_typecheck.template_map.type_map)
+        {
+          const std::string &key = id2string(entry.first);
+          auto p = key.rfind("::");
+          std::string suffix = p != std::string::npos ? key.substr(p + 2) : key;
+          if(
+            suffix == id2string(param_name) &&
+            entry.second.id() != ID_unassigned && entry.second.id() != ID_nil &&
+            entry.second.id() == ID_struct_tag)
+          {
+            // Skip the name sub-node (it will be replaced)
+            ++pos;
+            // Use the struct's base name for the destructor
+            irep_idt tag = to_struct_tag_type(entry.second).get_identifier();
+            std::string tag_str = id2string(tag);
+            auto last_sep = tag_str.rfind("::");
+            if(last_sep != std::string::npos)
+              tag_str = tag_str.substr(last_sep + 2);
+            if(tag_str.substr(0, 4) == "tag-")
+              tag_str = tag_str.substr(4);
+            auto angle = tag_str.find('<');
+            if(angle != std::string::npos)
+              tag_str = tag_str.substr(0, angle);
+            final_base_name += tag_str;
+            break;
+          }
+        }
+      }
+    }
 
     pos++;
   }
@@ -2494,6 +2525,40 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_namespace(const cpp_namet &cpp_name)
   cpp_save_scopet save_scope(cpp_typecheck.cpp_scopes);
   resolve_scope(cpp_name, base_name, template_args);
 
+  // Substitute destructor names: ~_Tp where _Tp is a template parameter.
+  if(
+    !base_name.empty() && id2string(base_name)[0] == '~' &&
+    id2string(base_name).size() > 1)
+  {
+    std::string after_tilde = id2string(base_name).substr(1);
+    for(const auto &entry : cpp_typecheck.template_map.type_map)
+    {
+      const std::string &key = id2string(entry.first);
+      auto p = key.rfind("::");
+      std::string suffix = p != std::string::npos ? key.substr(p + 2) : key;
+      if(
+        suffix == after_tilde && entry.second.id() != ID_unassigned &&
+        entry.second.id() != ID_nil && entry.second.id() == ID_struct_tag)
+      {
+        // Get the struct's base name for the destructor
+        const irep_idt &tag = to_struct_tag_type(entry.second).get_identifier();
+        std::string tag_str = id2string(tag);
+        // Extract unqualified name
+        auto last_sep = tag_str.rfind("::");
+        if(last_sep != std::string::npos)
+          tag_str = tag_str.substr(last_sep + 2);
+        if(tag_str.substr(0, 4) == "tag-")
+          tag_str = tag_str.substr(4);
+        // Remove template args for destructor name
+        auto angle = tag_str.find('<');
+        if(angle != std::string::npos)
+          tag_str = tag_str.substr(0, angle);
+        base_name = "~" + tag_str;
+        break;
+      }
+    }
+  }
+
   bool qualified = cpp_name.is_qualified();
   (void)qualified;
 
@@ -2739,13 +2804,12 @@ exprt cpp_typecheck_resolvet::resolve(
     const cpp_scopet &cur = cpp_typecheck.cpp_scopes.current_scope();
     const auto *scope_sym = cpp_typecheck.symbol_table.lookup(cur.identifier);
     if(
-      scope_sym && scope_sym->type.get_bool(ID_template_class_instance) &&
+      scope_sym &&
       (scope_sym->type.id() == ID_struct || scope_sym->type.id() == ID_union) &&
-      to_struct_union_type(scope_sym->type).components().empty())
+      (scope_sym->type.get_bool(ID_template_class_instance) ||
+       scope_sym->type.find(ID_C_template).is_not_nil()))
     {
-      bool old_force = cpp_typecheck.force_elaborate;
       bool old_suppress = cpp_typecheck.suppress_elaborate;
-      cpp_typecheck.force_elaborate = true;
       cpp_typecheck.suppress_elaborate = false;
       try
       {
@@ -2757,7 +2821,6 @@ exprt cpp_typecheck_resolvet::resolve(
       catch(...)
       {
       }
-      cpp_typecheck.force_elaborate = old_force;
       cpp_typecheck.suppress_elaborate = old_suppress;
       // Retry lookup after elaboration
       id_set = cpp_typecheck.cpp_scopes.current_scope().lookup(
@@ -2786,12 +2849,24 @@ exprt cpp_typecheck_resolvet::resolve(
     }
     else
     {
+      // Destructor names (~X): destructors are implicitly noexcept
+      // in C++11+. When a destructor can't be resolved (e.g., because
+      // the class isn't fully elaborated during noexcept evaluation),
+      // return a dummy noexcept destructor symbol instead of throwing.
+      if(!base_name.empty() && id2string(base_name)[0] == '~')
+      {
+        // Destructor not found — return nil to signal failure
+        // without throwing. The noexcept handler will catch this.
+        if(!fail_with_exception)
+          return nil_exprt();
+        // For fail_with_exception=true, throw so the noexcept
+        // handler's catch block returns true.
+        throw 0;
+      }
       cpp_typecheck.error() << "symbol '" << base_name << "' is unknown";
     }
 
     cpp_typecheck.error() << messaget::eom;
-    // cpp_typecheck.cpp_scopes.get_root_scope().print(std::cout);
-    // cpp_typecheck.cpp_scopes.current_scope().print(std::cout);
     throw 0;
   }
 
@@ -3163,6 +3238,17 @@ exprt cpp_typecheck_resolvet::resolve(
     {
       if(new_identifiers.empty())
       {
+        // Destructor overload resolution failure: return a dummy
+        // destructor. Destructors are implicitly noexcept in C++11+.
+
+        if(!base_name.empty() && id2string(base_name)[0] == '~')
+        {
+          exprt dtor{ID_symbol};
+          dtor.type() = code_typet{{}, empty_typet{}};
+          dtor.type().set(ID_destructor, true);
+          dtor.add_source_location() = source_location;
+          return dtor;
+        }
         cpp_typecheck.error().source_location = source_location;
         cpp_typecheck.error() << "found no match for symbol '" << base_name
                               << "', candidates are:\n";

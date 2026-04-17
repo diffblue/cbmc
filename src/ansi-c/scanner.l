@@ -1039,6 +1039,7 @@ enable_or_disable ("enable"|"disable")
 "__is_referenceable"  { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
 "__is_trivially_destructible" { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
 "__is_destructible"       { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
+"__is_nothrow_destructible" { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
 "__is_compound"           { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
 "__is_fundamental"        { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
 "__is_scalar"             { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }

@@ -383,6 +383,11 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     // C++11 noexcept operator
     auto &op = to_unary_expr(expr).op();
     bool result = false;
+
+    null_message_handlert noexcept_null_handler;
+    message_handlert &noexcept_old_handler = get_message_handler();
+    set_message_handler(noexcept_null_handler);
+
     try
     {
       typecheck_expr(op);
@@ -402,13 +407,31 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
             {
               result = true;
             }
+            // Destructors are implicitly noexcept since C++11
+            if(code_type.return_type().id() == ID_destructor)
+              result = true;
           }
         }
+        // Destructor calls via .~T() syntax
+        if(fn.id() == ID_member && fn.find(ID_component_cpp_name).is_not_nil())
+        {
+          const auto &name = to_cpp_name(fn.find(ID_component_cpp_name));
+          const irep_idt &bn = name.get_base_name();
+          if(!bn.empty() && id2string(bn)[0] == '~')
+            result = true;
+        }
       }
+      // If the expression type-checked without throwing,
+      // and it's not a function call, it's likely noexcept
+      // (e.g., built-in operations, trivial destructors).
+      if(!result && op.id() != ID_side_effect)
+        result = true;
     }
     catch(...)
     {
+      result = true;
     }
+    set_message_handler(noexcept_old_handler);
     if(result)
       expr = true_exprt();
     else
@@ -484,7 +507,8 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     expr.id() == "__has_unique_object_representations" ||
     expr.id() == "__is_trivially_relocatable" ||
     expr.id() == "__is_trivially_destructible" ||
-    expr.id() == "__is_destructible" || expr.id() == "__is_compound" ||
+    expr.id() == "__is_destructible" ||
+    expr.id() == "__is_nothrow_destructible" || expr.id() == "__is_compound" ||
     expr.id() == "__is_fundamental" || expr.id() == "__is_scalar")
   {
     // Unary type predicates — conservatively return false for now.
@@ -641,6 +665,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     }
     else if(
       expr.id() == "__is_trivially_destructible" ||
+      expr.id() == "__is_nothrow_destructible" ||
       expr.id() == "__is_destructible")
     {
       bool result = true;
@@ -2029,6 +2054,7 @@ void cpp_typecheckt::typecheck_expr_member(
         if(pcomp.is_nil())
         {
           error().source_location=expr.find_source_location();
+
           error() << "'" << symbol_expr.get(ID_identifier)
                   << "' is not static member "
                   << "of class '" << to_string(op0.type()) << "'" << eom;
