@@ -9873,22 +9873,89 @@ bool Parser::rPrimaryExpr(exprt &exp)
         }
         lex.Restore(saved2);
       }
-      // Fallback: skip the { ... } block
+      // Parse the requires body as a sequence of requirements.
       lex.Restore(saved);
-      lex.get_token(tk);
-      int depth = 1;
-      while(depth > 0)
+      lex.get_token(tk); // consume '{'
       {
-        int t = lex.get_token(tk);
-        if(t == '{')
-          ++depth;
-        else if(t == '}')
-          --depth;
-        else if(t == 0)
-          return false;
+        exprt result = typecast_exprt{true_exprt(), c_bool_type()};
+        while(lex.LookAhead(0) != '}' && lex.LookAhead(0) != 0)
+        {
+          if(lex.LookAhead(0) == TOK_TYPENAME)
+          {
+            auto type_saved = lex.Save();
+            cpp_tokent typename_tk;
+            lex.get_token(typename_tk);
+            typet type_name;
+            if(rTypeName(type_name) && lex.LookAhead(0) == ';')
+            {
+                lex.get_token(typename_tk);
+                exprt req{"type_requirement"};
+                req.type() = c_bool_type();
+                req.add(ID_type_arg).swap(type_name);
+                result = and_exprt{std::move(result), std::move(req)};
+                continue;
+            }
+            lex.Restore(type_saved);
+          }
+          if(lex.LookAhead(0) == TOK_REQUIRES)
+          {
+            auto req_saved = lex.Save();
+            cpp_tokent req_tk;
+            lex.get_token(req_tk);
+            exprt nested;
+            if(rExpression(nested, false) && lex.LookAhead(0) == ';')
+            {
+                lex.get_token(req_tk);
+                result = and_exprt{std::move(result), std::move(nested)};
+                continue;
+            }
+            // Concept check failed. Try rExpression.
+            lex.Restore(req_saved);
+            lex.get_token(req_tk); // consume 'requires'
+            {
+                exprt nested;
+                if(rExpression(nested, false) && lex.LookAhead(0) == ';')
+                {
+                  lex.get_token(req_tk);
+                  result = and_exprt{std::move(result), std::move(nested)};
+                  continue;
+                }
+            }
+            lex.Restore(req_saved);
+          }
+          // Skip unknown requirement
+          {
+            cpp_tokent skip_tk;
+            int skip_depth = 0;
+            while(lex.LookAhead(0) != 0)
+            {
+                if(lex.LookAhead(0) == '{' || lex.LookAhead(0) == '(')
+                  ++skip_depth;
+                else if(lex.LookAhead(0) == '}' || lex.LookAhead(0) == ')')
+                {
+                  if(skip_depth == 0)
+                    break;
+                  --skip_depth;
+                }
+                else if(lex.LookAhead(0) == ';' && skip_depth == 0)
+                {
+                  lex.get_token(skip_tk);
+                  break;
+                }
+                lex.get_token(skip_tk);
+            }
+          }
+        }
+        if(lex.LookAhead(0) == '}')
+        {
+          cpp_tokent close_tk;
+          lex.get_token(close_tk);
+        }
+        exp = std::move(result);
       }
     }
-    exp = typecast_exprt(true_exprt(), c_bool_type());
+    else
+      exp = typecast_exprt{true_exprt(), c_bool_type()};
     set_location(exp, tk);
     return true;
   }
