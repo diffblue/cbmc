@@ -34,7 +34,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_util.h"
 
 #include <algorithm>
-#include <iostream>
 #include <set>
 
 cpp_typecheck_resolvet::cpp_typecheck_resolvet(cpp_typecheckt &_cpp_typecheck)
@@ -355,9 +354,6 @@ void cpp_typecheck_resolvet::guess_function_template_args(
                   const irep_idt &method =
                     static_cast<const exprt &>(node).get("#method");
                   const auto &constraint = node.find("#constraint");
-                  std::cerr << "COMPOUND_EVAL: method=" << method
-                            << " constraint_nil=" << constraint.is_nil()
-                            << " actual=" << actual_type.id() << std::endl;
                   if(method.empty() || constraint.is_nil())
                     return -1;
                   if(actual_type.id() != ID_struct_tag)
@@ -1580,6 +1576,37 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
           ++pos;
           continue;
         }
+        // Check if the name is a struct_tag identifier that has a
+        // registered scope (e.g., an elaborated template class).
+        // The name might be a full identifier (tag-X) or a base name
+        // from template_map substitution. Try both.
+        {
+          auto it = cpp_typecheck.cpp_scopes.id_map.find(final_base_name);
+          if(it == cpp_typecheck.cpp_scopes.id_map.end())
+          {
+            // Try with current scope prefix
+            const std::string &scope_id =
+              id2string(cpp_typecheck.cpp_scopes.current_scope().identifier);
+            if(!scope_id.empty())
+              it = cpp_typecheck.cpp_scopes.id_map.find(
+                scope_id + "::" + id2string(final_base_name));
+          }
+          if(it == cpp_typecheck.cpp_scopes.id_map.end())
+          {
+            // Try as tag identifier
+            it = cpp_typecheck.cpp_scopes.id_map.find(
+              "tag-" + id2string(final_base_name));
+          }
+          if(
+            it != cpp_typecheck.cpp_scopes.id_map.end() && it->second->is_scope)
+          {
+            cpp_typecheck.cpp_scopes.go_to(
+              static_cast<cpp_scopet &>(*it->second));
+            final_base_name.clear();
+            ++pos;
+            continue;
+          }
+        }
         // Check template_map for template parameters like _Up::X
         {
           typet mapped{};
@@ -1615,6 +1642,47 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
           }
         }
         // Scope not found with suppress — bail out
+        // Try to elaborate template class instances before giving up.
+        // The name might be a struct_tag identifier (e.g.,
+        // "std::__1::tag-__wrap_iter<ptr_signed_int>") that the scope
+        // system doesn't know about. Look it up in the symbol table.
+        {
+          const auto *sym = cpp_typecheck.symbol_table.lookup(final_base_name);
+          if(
+            sym && sym->type.get_bool(ID_template_class_instance) &&
+            (sym->type.id() == ID_struct || sym->type.id() == ID_union))
+          {
+            bool old_suppress = cpp_typecheck.suppress_elaborate;
+            bool old_force = cpp_typecheck.force_elaborate;
+            cpp_typecheck.suppress_elaborate = false;
+            cpp_typecheck.force_elaborate = true;
+            try
+            {
+              typet tag_type =
+                sym->type.id() == ID_struct
+                  ? static_cast<typet>(struct_tag_typet{sym->name})
+                  : static_cast<typet>(union_tag_typet{sym->name});
+              cpp_typecheck.elaborate_class_template(tag_type);
+            }
+            catch(...)
+            {
+            }
+            cpp_typecheck.suppress_elaborate = old_suppress;
+            cpp_typecheck.force_elaborate = old_force;
+            // After elaboration, the scope should be registered
+            auto it = cpp_typecheck.cpp_scopes.id_map.find(sym->name);
+            if(
+              it != cpp_typecheck.cpp_scopes.id_map.end() &&
+              it->second->is_scope)
+            {
+              cpp_typecheck.cpp_scopes.go_to(
+                static_cast<cpp_scopet &>(*it->second));
+              final_base_name.clear();
+              ++pos;
+              continue;
+            }
+          }
+        }
         throw 0;
       }
 
@@ -1715,8 +1783,17 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
 
           instance.add_source_location() = source_location;
 
-          // the "::" triggers template elaboration
-          cpp_typecheck.elaborate_class_template(instance);
+          // the "::" triggers template elaboration.
+          // When suppress_elaborate is true (e.g., during class body
+          // processing), force elaboration so that scope resolution
+          // can access the template class's members.
+          {
+            bool old_force = cpp_typecheck.force_elaborate;
+
+            cpp_typecheck.force_elaborate = true;
+            cpp_typecheck.elaborate_class_template(instance);
+            cpp_typecheck.force_elaborate = old_force;
+          }
 
           cpp_typecheck.cpp_scopes.go_to(cpp_typecheck.cpp_scopes.get_scope(
             to_tag_type(instance).get_identifier()));
@@ -2643,6 +2720,39 @@ exprt cpp_typecheck_resolvet::resolve(
   // to be found when called from outside namespace std.
   if(!qualified && !fargs.has_object)
     resolve_with_arguments(id_set, base_name, fargs);
+
+  if(id_set.empty() && qualified)
+  {
+    // The scope might be an un-elaborated template class instance.
+    // Try to elaborate it and retry the lookup.
+    const cpp_scopet &cur = cpp_typecheck.cpp_scopes.current_scope();
+    const auto *scope_sym = cpp_typecheck.symbol_table.lookup(cur.identifier);
+    if(
+      scope_sym && scope_sym->type.get_bool(ID_template_class_instance) &&
+      (scope_sym->type.id() == ID_struct || scope_sym->type.id() == ID_union) &&
+      to_struct_union_type(scope_sym->type).components().empty())
+    {
+      bool old_force = cpp_typecheck.force_elaborate;
+      bool old_suppress = cpp_typecheck.suppress_elaborate;
+      cpp_typecheck.force_elaborate = true;
+      cpp_typecheck.suppress_elaborate = false;
+      try
+      {
+        typet tag = scope_sym->type.id() == ID_struct
+                      ? static_cast<typet>(struct_tag_typet{scope_sym->name})
+                      : static_cast<typet>(union_tag_typet{scope_sym->name});
+        cpp_typecheck.elaborate_class_template(tag);
+      }
+      catch(...)
+      {
+      }
+      cpp_typecheck.force_elaborate = old_force;
+      cpp_typecheck.suppress_elaborate = old_suppress;
+      // Retry lookup after elaboration
+      id_set = cpp_typecheck.cpp_scopes.current_scope().lookup(
+        base_name, cpp_scopet::SCOPE_ONLY);
+    }
+  }
 
   if(id_set.empty())
   {
