@@ -1,0 +1,18 @@
+; bf16: if 0 < a <= b and c > 0, then a*c <= b*c (monotonicity)
+(set-logic QF_FP)
+(declare-fun a () (_ FloatingPoint 8 8))
+(declare-fun b () (_ FloatingPoint 8 8))
+(declare-fun c () (_ FloatingPoint 8 8))
+(assert (not (fp.isNaN a)))
+(assert (not (fp.isNaN b)))
+(assert (not (fp.isNaN c)))
+(assert (fp.gt a ((_ to_fp 8 8) RNE 0.0)))
+(assert (fp.gt c ((_ to_fp 8 8) RNE 0.0)))
+(assert (fp.leq a b))
+; No overflow
+(assert (not (fp.isInfinite (fp.mul RNE a c))))
+(assert (not (fp.isInfinite (fp.mul RNE b c))))
+; Check monotonicity
+(assert (not (fp.leq (fp.mul RNE a c) (fp.mul RNE b c))))
+(check-sat)
+(exit)

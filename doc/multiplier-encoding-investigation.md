@@ -2533,3 +2533,71 @@ for comba-cs's advantage on symbolic multiplication, but wasteful
 for constant multiplication. The PP count heuristic is the best
 compromise — it catches sparse constants without affecting
 symbolic multiplication.
+
+## Floating-Point Deep Investigation
+
+### FP circuit decomposition
+
+| Component | bf16 vars | float vars | Contribution |
+|-----------|-----------|------------|-------------|
+| FP wrapper (NaN, Inf, rounding, exponent) | ~1452 | ~5500 | 89% |
+| Integer multiplication | ~171 | ~500 | 11% |
+| Total | 1623 | ~6000 | 100% |
+
+### Why encoding doesn't matter for FP
+
+| Benchmark | Vars | Conflicts | Time | Encoding effect |
+|-----------|------|-----------|------|-----------------|
+| bf16 mul comm (symbolic) | 1623 | 427,055 | 24.9s | **NONE** |
+| bf16 mul const (× 2.0) | 1452 | ~100 | 0.02s | N/A |
+| int8 comm (pure integer) | 364 | 4,945 | 0.09s | **2.6x** (comba-cs) |
+
+The FP wrapper accounts for 89% of variables but the wrapper ALONE
+(with constant multiplication) is trivially fast (0.02s). The hardness
+comes from the INTERACTION between wrapper and multiplication:
+rounding depends on the product, overflow depends on the product.
+This creates dependencies between wrapper and multiplication variables
+that resist BVE.
+
+### BVE analysis
+
+| Metric | bf16 | int8 (comba-cs) |
+|--------|------|-----------------|
+| Total vars | 1622 | 364 |
+| BVE eliminated | 1069 (66%) | 138 (38%) |
+| Fixed | 237 (15%) | 130 (36%) |
+| **Remaining** | **316 (19%)** | **96 (26%)** |
+| Conflicts | 427,055 | 4,945 |
+
+bf16 has 316 remaining variables (vs int8's 96). These remaining
+variables are primarily FP wrapper variables (conditional rounding,
+overflow detection) that BVE cannot eliminate due to their complex
+clause structure.
+
+### FP precision sweet spots
+
+| FP type | Mantissa | Mul width | Comm time | Encoding effect |
+|---------|----------|-----------|-----------|-----------------|
+| bf16 | 7-bit | 16-bit | 24.9s | None |
+| half | 10-bit | 22-bit | T/O | N/A |
+| float | 23-bit | 48-bit | T/O | N/A |
+| double | 52-bit | 106-bit | T/O | N/A |
+
+Only bf16 is solvable for commutativity (24.9s). Half-float and
+larger are beyond the frontier. The encoding has no effect at any
+FP precision because the FP wrapper dominates.
+
+### Conclusion
+
+**Multiplier encoding optimization does not help FP verification.**
+The bottleneck is the FP wrapper (rounding, NaN/Inf handling,
+exponent arithmetic), not the integer multiplication inside it.
+To improve FP verification performance, the FP WRAPPER encoding
+needs optimization — a different research direction from multiplier
+encoding.
+
+The wrapper-multiplication interaction creates dependencies that
+resist BVE: rounding logic depends on multiplication results,
+creating high-connectivity clause structures. This is fundamentally
+different from pure integer multiplication where BVE can eliminate
+multiplication variables independently.
