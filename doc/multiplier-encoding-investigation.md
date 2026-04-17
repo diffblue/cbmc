@@ -3214,3 +3214,87 @@ which is a property of the inputs, not the encoding.
 3. **XOR-aware BVE:** The no-xors finding suggests that CaDiCaL's
    XOR gate detection hurts FP circuits. A FP-aware solver
    configuration could disable XOR detection for FP formulas.
+
+## Deep FP Wrapper Creative Investigation
+
+### Proof analysis
+
+| Metric | FP add comm |
+|--------|------------|
+| Proof steps | 244,265 |
+| Avg clause size | 3.6 (very small!) |
+| Top bottleneck var | var 377: 123,968 occ (**51% of proof**) |
+| Input var involvement | 8% (92% internal) |
+
+**var 377 = sign_a XOR sign_b (the subtract flag).** This single
+variable appears in 51% of ALL proof steps. The entire proof
+revolves around whether the FP addition is actually an addition
+or a subtraction.
+
+### Creative encoding changes tested
+
+| Approach | Vars | Time | vs baseline (2656/4.49s) |
+|----------|------|------|--------------------------|
+| **Baseline** | **2656** | **4.49s** | — |
+| Split add_sub (compute both, select) | 2742 | 6.05s | **+35% worse** |
+| Barrel shifter g-only (AND gates) | 2900 | 5.05s | +12% worse |
+| One-hot barrel shifter | 5218 | 6.12s | +36% worse |
+| XOR gate caching | — | T/O | **catastrophic** |
+| CaDiCaL --elimxors=false | 2656 | 4.65s | -14% better |
+
+### Split add_sub analysis
+
+Computing BOTH addition and subtraction results independently,
+then selecting based on the subtract flag. This makes each carry
+chain independent of the subtract flag.
+
+Result: +35% worse on full benchmark because the extra adder
+circuit (2742 vs 2656 vars) overwhelms the structural benefit.
+Slightly helps the positive-only variant (-8%) where the subtract
+path is dead code that BVE eliminates.
+
+### XOR caching: catastrophic for FP, helpful for integer multiplication
+
+Caching lxor(a,b) so that lxor(a,b) == lxor(b,a) shares XOR gates
+between the two FP additions.
+
+| Benchmark | Without cache | With cache | Change |
+|-----------|--------------|------------|--------|
+| FP add comm | 4.49s | **T/O** | catastrophic |
+| int mul BW=9 | 0.13s | 0.10s | -23% |
+| int mul BW=11 | 0.78s | **0.42s** | **-46%** |
+| int mul BW=13 | 2.63s | 1.71s | -35% |
+| int mul BW=17 | 7.19s | 11.03s | +53% worse |
+| murmurhash3 | 5.18s | 14.24s | +175% worse |
+
+**XOR caching helps integer multiplication at BW=9-13** (up to 1.9x)
+by sharing XOR gates between the two multiplication circuits.
+But it **catastrophically hurts FP** and **hurts at large BW**
+because sharing prevents independent BVE.
+
+Same pattern as AND gate caching: sharing helps when the shared
+variables are few and the circuits are small, but hurts when
+sharing creates tight coupling that blocks BVE.
+
+### Why FP wrappers resist all encoding optimizations
+
+The FP wrapper's hardness is fundamentally different from
+multiplication:
+
+1. **Multiplication:** hardness from carry propagation (global
+   chain dependencies). Encoding optimization breaks chains.
+
+2. **FP wrapper:** hardness from conditional MUX trees (barrel
+   shifter) and conditional branches (sign handling). The
+   conditionality is INHERENT in IEEE 754 semantics.
+
+The barrel shifter MUST shift by a variable amount. The sign
+handling MUST branch on the sign XOR. No SAT encoding can
+eliminate these — they're required by the specification.
+
+The only effective optimization is CONSTRAINING THE INPUTS:
+- Same exponent: 90x speedup (barrel shifter collapses)
+- Same sign: 3.1x speedup (sign branch eliminated)
+
+This points to VALUE ANALYSIS and CONSTRAINT PROPAGATION as
+the optimization path, not SAT encoding changes.
