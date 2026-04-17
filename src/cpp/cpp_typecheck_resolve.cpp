@@ -1886,10 +1886,21 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
 
         if(id_set.empty())
         {
-          // Empty scope name can occur with decltype(expr)::member
-          // where the parser produces empty name components.
           if(final_base_name.empty())
           {
+            ++pos;
+            continue;
+          }
+          // Check id_map for struct_tag identifiers from
+          // template_map substitution (e.g., tag-A::value_type).
+          auto id_it = cpp_typecheck.cpp_scopes.id_map.find(final_base_name);
+          if(
+            id_it != cpp_typecheck.cpp_scopes.id_map.end() &&
+            id_it->second->is_scope)
+          {
+            cpp_typecheck.cpp_scopes.go_to(
+              static_cast<cpp_scopet &>(*id_it->second));
+            final_base_name.clear();
             ++pos;
             continue;
           }
@@ -2853,10 +2864,68 @@ exprt cpp_typecheck_resolvet::resolve(
     }
     else
     {
-      // methods and functions
-      convert_identifiers(id_set, fargs, identifiers);
+      // Check for variable templates (concepts) with explicit args.
+      // These need to be instantiated as variable templates, not
+      // as function templates.
+      bool handled_variable_template = false;
+      if(template_args.is_not_nil())
+      {
+        for(const auto *id_ptr : id_set)
+        {
+          const symbolt &s = cpp_typecheck.lookup(id_ptr->identifier);
+          if(!s.type.get_bool(ID_is_template))
+            continue;
+          const cpp_declarationt &decl = to_cpp_declaration(s.type);
+          // Variable templates have declarators but are not class
+          // templates and not function templates (no function type).
+          if(decl.is_class_template() || decl.is_template_alias())
+            continue;
+          if(
+            !decl.declarators().empty() &&
+            decl.declarators()[0].type().id() != ID_function_type)
+          {
+            // This is a variable template (e.g., concept).
+            // Instantiate with explicit template args.
+            cpp_template_args_tct tc_args;
+            try
+            {
+              tc_args = cpp_typecheck.typecheck_template_args(
+                source_location, s, template_args);
+            }
+            catch(...)
+            {
+              continue;
+            }
+            const symbolt &inst_sym = cpp_typecheck.instantiate_template(
+              source_location, s, tc_args, tc_args);
+            // The instantiated symbol is a constexpr bool variable.
+            // Return its value.
+            if(inst_sym.value.is_not_nil())
+            {
+              exprt val = inst_sym.value;
+              val.add_source_location() = source_location;
+              identifiers.push_back(val);
+              handled_variable_template = true;
+            }
+            else
+            {
+              // No value — return the symbol
+              symbol_exprt sym_expr{inst_sym.name, inst_sym.type};
+              sym_expr.add_source_location() = source_location;
+              identifiers.push_back(sym_expr);
+              handled_variable_template = true;
+            }
+            break;
+          }
+        }
+      }
+      if(!handled_variable_template)
+      {
+        // methods and functions
+        convert_identifiers(id_set, fargs, identifiers);
 
-      apply_template_args(identifiers, template_args, fargs);
+        apply_template_args(identifiers, template_args, fargs);
+      }
     }
   }
   else

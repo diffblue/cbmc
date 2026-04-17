@@ -1086,6 +1086,15 @@ std::string cpp_typecheckt::class_template_identifier(
     {
       identifier += "#req_count_" + id2string(req_str);
     }
+    // Include concept constraint names from template parameters
+    // so that specializations with the same argument pattern but
+    // different concept constraints get distinct identifiers.
+    for(const auto &p : template_type.template_parameters())
+    {
+      const irep_idt &cc = p.get("#C_concept_constraint");
+      if(!cc.empty())
+        identifier += "#concept_" + id2string(cc);
+    }
   }
 
   return identifier;

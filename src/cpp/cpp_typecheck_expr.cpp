@@ -72,6 +72,39 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     typecheck_type(expr.type());
     c_typecheck_baset::typecheck_expr_main(expr);
   }
+  else if(expr.id() == "type_requirement")
+  {
+    typet &t = static_cast<typet &>(expr.add(ID_type_arg));
+    typecheck_type(t);
+    expr = typecast_exprt{true_exprt(), c_bool_type()};
+  }
+  else if(expr.id() == "concept_check")
+  {
+    // C++20 nested concept requirement: requires ConceptName<T>;
+    // Look up the concept and evaluate its body.
+    const irep_idt &concept_name = expr.get("concept_name");
+    const auto concept_ids =
+      cpp_scopes.current_scope().lookup(concept_name, cpp_scopet::RECURSIVE);
+    if(concept_ids.empty())
+      throw 0;
+    const auto *concept_sym =
+      symbol_table.lookup((*concept_ids.begin())->identifier);
+    if(!concept_sym || !concept_sym->type.get_bool(ID_is_template))
+      throw 0;
+    const cpp_declarationt &cdecl = to_cpp_declaration(concept_sym->type);
+    if(cdecl.declarators().empty())
+      throw 0;
+    exprt body = cdecl.declarators()[0].value();
+    if(body.is_nil())
+      throw 0;
+    // Apply the current template_map to substitute parameters
+    template_map.apply(body);
+    typecheck_expr(body);
+    simplify(body, *this);
+    if(body.is_false())
+      throw 0;
+    expr = typecast_exprt{true_exprt(), c_bool_type()};
+  }
   else if(expr.id() == ID_bit_cast)
   {
     // __builtin_bit_cast(Type, expr) — resolve cpp_name type
