@@ -3122,3 +3122,95 @@ cannot replicate.
 The only viable improvement direction is at the WORD LEVEL:
 recognizing division tautologies (a/b*b + a%b == a) before
 bit-blasting.
+
+## Deep FP Wrapper Investigation
+
+### Hardness decomposition (float addition commutativity)
+
+| Constraint | Vars | Time | Speedup | What's eliminated |
+|-----------|------|------|---------|-------------------|
+| full | 2656 | 4.49s | baseline | — |
+| same sign (positive) | 2742 | 1.44s | **3.1x** | sign branch |
+| close exp [1,256) | 2830 | 0.43s | **10x** | most barrel shift + sign |
+| same exp [1,2) | 2830 | **0.05s** | **90x** | barrel shift + sign |
+| no subnormals | 2844 | 5.22s | 0.9x | nothing useful |
+
+**The barrel shifter is the DOMINANT hardness source (28x combined),
+not sign handling (3.1x).** When the exponent difference is zero
+(same exponent), the barrel shifter's MUX tree collapses and the
+problem becomes trivial (0.05s).
+
+### Hardness hierarchy
+
+1. **Barrel shift with variable amount** (28x): The logarithmic
+   MUX tree creates cascaded conditional dependencies. Each stage's
+   output depends on the previous stage's output AND the shift
+   control bit. The solver must reason about all possible shift
+   amounts simultaneously.
+
+2. **Sign handling** (3.1x): Conditional branch between addition
+   and subtraction. The solver must reason about both paths.
+
+3. **NaN/Inf handling** (1.3x): Minor contribution.
+
+4. **Subnormals** (0x): No measurable effect.
+
+### Alternative barrel shifter encodings
+
+**One-hot encoding:** Decode shift amount to one-hot, compute each
+output bit directly from input bits. Creates 2x more variables
+(5218 vs 2656) and is 36% SLOWER (6.12 vs 4.49). The equality
+checks (dist==k) for each shift value create too many variables.
+
+**Conclusion:** The logarithmic barrel shifter is already well-
+optimized. Alternative encodings create more variables without
+proportional benefit.
+
+### CaDiCaL options for FP
+
+| Option | FP add comm | bf16 mul comm |
+|--------|------------|---------------|
+| default | 5.42s | 25.0s |
+| no-xors | **4.65s (-14%)** | **19.8s (-21%)** |
+| no-ands | 7.41s (+37%) | — |
+| phase=F | 4.95s (-9%) | — |
+
+**no-xors helps FP** (14-21% speedup on standalone CaDiCaL).
+XOR gate detection interferes with BVE on FP circuits, similar
+to the distrib_8 finding for multiplication. However, this
+improvement is NOT consistent through CBMC's pipeline (the CBMC
+path produces different CNF structure).
+
+### Why FP wrappers resist SAT encoding optimization
+
+The FP wrapper's hardness is fundamentally different from
+multiplication:
+
+- **Multiplication:** hardness from CARRY PROPAGATION (global
+  dependencies through carry chains). Encoding optimization
+  (comba-cs) reduces carry chain length → shorter proofs.
+
+- **FP wrapper:** hardness from CONDITIONAL MUX TREES (barrel
+  shifter) and CONDITIONAL BRANCHES (sign handling). These create
+  a web of conditional dependencies that no encoding change can
+  eliminate — the conditionality is inherent in the FP semantics.
+
+The barrel shifter MUST shift by a variable amount (determined by
+the exponent difference). No encoding can avoid this — it's
+required by the IEEE 754 specification. The only way to reduce
+the hardness is to CONSTRAIN the shift amount (e.g., same exponent),
+which is a property of the inputs, not the encoding.
+
+### Potential optimization directions
+
+1. **Constraint propagation:** If CBMC can determine that the
+   exponent difference is bounded (from value analysis or assumes),
+   it could use a SMALLER barrel shifter (fewer stages).
+
+2. **Lazy barrel shifting:** Generate the barrel shifter lazily —
+   start with a small shift range and extend if needed. This is
+   a form of abstraction refinement.
+
+3. **XOR-aware BVE:** The no-xors finding suggests that CaDiCaL's
+   XOR gate detection hurts FP circuits. A FP-aware solver
+   configuration could disable XOR detection for FP formulas.
