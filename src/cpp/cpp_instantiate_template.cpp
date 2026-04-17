@@ -623,6 +623,157 @@ void cpp_typecheckt::elaborate_class_template(
               if(!satisfied)
                 continue;
             }
+
+            // Check concept constraints on individual parameters.
+            {
+              const auto &spec_params =
+                spec_decl.template_type().template_parameters();
+              bool params_ok = true;
+              for(std::size_t pi = 0; pi < spec_params.size() &&
+                                      pi < full_args_tc.arguments().size();
+                  ++pi)
+              {
+                const irep_idt &cc =
+                  spec_params[pi].get("#C_concept_constraint");
+                {
+                  FILE *f = fopen("/tmp/concept_debug.txt", "a");
+                  if(f)
+                  {
+                    fprintf(
+                      f,
+                      "PARAM[%zu] cc=[%s] id=%s\n",
+                      pi,
+                      cc.c_str(),
+                      spec_params[pi].id().c_str());
+                    fclose(f);
+                  }
+                }
+                if(cc.empty())
+                  continue;
+                const auto concept_ids =
+                  cpp_scopes.current_scope().lookup(cc, cpp_scopet::RECURSIVE);
+                if(concept_ids.empty())
+                  continue;
+                const auto *concept_sym =
+                  symbol_table.lookup((*concept_ids.begin())->identifier);
+                if(!concept_sym || !concept_sym->type.get_bool(ID_is_template))
+                  continue;
+                const cpp_declarationt &cdecl =
+                  to_cpp_declaration(concept_sym->type);
+                if(cdecl.declarators().empty())
+                  continue;
+                exprt body = cdecl.declarators()[0].value();
+                {
+                  FILE *f = fopen("/tmp/concept_debug.txt", "a");
+                  if(f)
+                  {
+                    fprintf(
+                      f, "BODY: %s nil=%d\n", body.id().c_str(), body.is_nil());
+                    fclose(f);
+                  }
+                }
+                if(body.is_nil())
+                  continue;
+                // Evaluate type_requirement nodes in the concept body.
+                // Substitute the concept parameter with the actual type
+                // and try to resolve each type requirement.
+                template_mapt cmap;
+                cpp_template_args_tct cargs;
+                cargs.arguments().push_back(full_args_tc.arguments()[pi]);
+                cmap.build(cdecl.template_type(), cargs);
+                // Evaluate type_requirements by resolving types
+                body.visit_pre(
+                  [&](exprt &e)
+                  {
+                    // Handle nested concept references (cpp_name with template_args)
+                    if(e.id() == ID_cpp_name && params_ok)
+                    {
+                      bool has_targs = false;
+                      for(const auto &s : e.get_sub())
+                        if(s.id() == ID_template_args)
+                          has_targs = true;
+                      if(has_targs)
+                      {
+                        exprt copy = e;
+                        cmap.apply(copy);
+                        null_message_handlert nh;
+                        message_handlert &oh = get_message_handler();
+                        set_message_handler(nh);
+                        try
+                        {
+                          typecheck_expr(copy);
+                          simplify(copy, *this);
+                          if(copy.is_true())
+                            e = typecast_exprt{true_exprt(), c_bool_type()};
+                          else
+                            params_ok = false;
+                        }
+                        catch(...)
+                        {
+                          params_ok = false;
+                        }
+                        set_message_handler(oh);
+                      }
+                    }
+                    if(e.id() == "type_requirement" && params_ok)
+                    {
+                      typet t = static_cast<const typet &>(e.find(ID_type_arg));
+                      cmap.apply(t);
+                      null_message_handlert nh;
+                      message_handlert &oh = get_message_handler();
+                      set_message_handler(nh);
+                      try
+                      {
+                        typecheck_type(t);
+                        {
+                          FILE *f = fopen("/tmp/concept_debug.txt", "a");
+                          if(f)
+                          {
+                            fprintf(f, "TYPE_OK: %s\n", t.id().c_str());
+                            fclose(f);
+                          }
+                        }
+                        e = typecast_exprt{true_exprt(), c_bool_type()};
+                      }
+                      catch(...)
+                      {
+                        {
+                          FILE *f = fopen("/tmp/concept_debug.txt", "a");
+                          if(f)
+                          {
+                            fprintf(f, "TYPE_FAIL\n");
+                            fclose(f);
+                          }
+                        }
+                        params_ok = false;
+                      }
+                      set_message_handler(oh);
+                    }
+                  });
+                if(!params_ok)
+                  break;
+                // Evaluate the concept body after type_requirement
+                // and cpp_name nodes have been resolved.
+                cmap.apply(body);
+                null_message_handlert null_h2;
+                message_handlert &old_h2 = get_message_handler();
+                set_message_handler(null_h2);
+                try
+                {
+                  typecheck_expr(body);
+                  simplify(body, *this);
+                  if(body.is_false())
+                    params_ok = false;
+                }
+                catch(...)
+                {
+                  params_ok = false;
+                }
+                set_message_handler(old_h2);
+              }
+              if(!params_ok)
+                continue;
+            }
           }
 
           // Typecheck the partial specialization args with the guessed
