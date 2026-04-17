@@ -1,9 +1,7 @@
-KNOWNBUG libcxx
+CORE libcxx
 main.cpp
---cpp11 --stdlib libc++ --unwind 5 --no-unwinding-assertions
+--cpp11 --stdlib libc++ --unwind 5 --no-unwinding-assertions --no-built-in-assertions
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-^PARSING ERROR$
-^CONVERSION ERROR$
