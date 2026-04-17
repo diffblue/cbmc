@@ -1529,6 +1529,13 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
       template_args = to_cpp_template_args_non_tc(*pos);
     else if(pos->id() == "::")
     {
+      // If final_base_name is empty, the scope was already navigated
+      // (e.g., by a decltype handler). Just advance past ::.
+      if(final_base_name.empty() && template_args.is_nil())
+      {
+        ++pos;
+        continue;
+      }
       if(cpp_typecheck.suppress_elaborate && template_args.is_nil())
       {
         // Fast path: use RECURSIVE lookup but only accept scopes.
@@ -1572,6 +1579,40 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
           final_base_name.clear();
           ++pos;
           continue;
+        }
+        // Check template_map for template parameters like _Up::X
+        {
+          typet mapped{};
+          for(const auto &entry : cpp_typecheck.template_map.type_map)
+          {
+            const std::string &key = id2string(entry.first);
+            auto p = key.rfind("::");
+            std::string suffix =
+              p != std::string::npos ? key.substr(p + 2) : key;
+            if(
+              suffix == id2string(final_base_name) &&
+              entry.second.id() != ID_unassigned && entry.second.id() != ID_nil)
+            {
+              mapped = entry.second;
+              break;
+            }
+          }
+          if(mapped.is_not_nil() && mapped.id() == ID_struct_tag)
+          {
+            const irep_idt &scope_id =
+              to_struct_tag_type(mapped).get_identifier();
+            auto it = cpp_typecheck.cpp_scopes.id_map.find(scope_id);
+            if(
+              it != cpp_typecheck.cpp_scopes.id_map.end() &&
+              it->second->is_scope)
+            {
+              cpp_typecheck.cpp_scopes.go_to(
+                static_cast<cpp_scopet &>(*it->second));
+              final_base_name.clear();
+              ++pos;
+              continue;
+            }
+          }
         }
         // Scope not found with suppress — bail out
         throw 0;
