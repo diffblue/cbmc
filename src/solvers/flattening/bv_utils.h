@@ -122,6 +122,7 @@ public:
     bvt &res,
     bvt &rem);
 
+  void non_restoring_divider(const bvt &op0, const bvt &op1, bvt &res, bvt &rem);
   void restoring_divider(const bvt &op0, const bvt &op1, bvt &res, bvt &rem);
   void unsigned_divider(
     const bvt &op0,
@@ -249,6 +250,8 @@ protected:
   bool use_comba_carry_save = false;
   bool use_dadda_carry_save = false;
   bool use_restoring_divider = false;
+  bool use_non_restoring_divider = false;
+  bool use_hybrid_divider = false;
   int radix_multiplier = 0; // 0=disabled, 4, 8, 16
 public:
   void set_carry_save(bool b) { use_carry_save = b; }

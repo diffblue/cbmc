@@ -3052,3 +3052,73 @@ the components.
    clauses between adjacent MUX outputs to create propagation
    paths. Not tested — the sign handling dominates, so this
    would have limited impact.
+
+## Deep Division Encoding Investigation
+
+### Algorithms tested
+
+| Algorithm | Approach | Vars (BW=12) | Time (BW=12) |
+|-----------|----------|-------------|-------------|
+| **Constraint-based** | Free vars + q*b+r==a | **3987** | **8.0s** |
+| Restoring | Deterministic subtract-compare-select | 9699 | 15.0s |
+| Non-restoring | Alternate add/subtract | 11989 | 91.6s |
+| Hybrid (hints) | Constraint + restoring hints | ~13000 | T/O |
+| Tighter bounds | Constraint + q*b<=a | ~4000 | 8.6s |
+| Bit-level hints | Constraint + quotient bit bounds | 5715 | 9.4s |
+
+### Why constraint-based wins
+
+CaDiCaL analysis (div_rt BW=12):
+
+| Metric | Constraint | Restoring |
+|--------|-----------|-----------|
+| Variables | 3987 | 9699 |
+| Eliminated (BVE) | 1041 (25%) | 6620 (64%) |
+| **Fixed (unit prop)** | **2352 (55%)** | 1693 (16%) |
+| Total removed | 3393 (80%) | 8313 (80%) |
+| Remaining | ~594 | ~1386 |
+| Conflicts | 238,862 | 280,899 |
+
+**Same removal percentage (80%) but different mechanism:**
+- Constraint-based: 55% FIXED through unit propagation. The free
+  variables create implications that cascade — the solver DISCOVERS
+  the quotient through BCP.
+- Restoring: 64% eliminated through BVE. The deterministic circuit
+  variables are removed by resolution. But 2.3x more remaining vars.
+
+### Key insight: division is the OPPOSITE of multiplication
+
+For multiplication equivalence (UNSAT): deterministic circuits
+(comba-cs) beat search because the solver must PROVE non-existence.
+More structure → better BCP cascades → fewer conflicts.
+
+For division (finding q,r): constraint-based (free vars + search)
+beats deterministic circuits because the solver must FIND a solution.
+Free variables enable unit propagation cascades as the solver
+discovers the quotient bit by bit.
+
+### Non-restoring division: worse than restoring
+
+Non-restoring computes BOTH add and subtract at each step (two
+adder calls), then selects. This creates 11989 vars (vs restoring's
+9699) — 24% more. The simpler control flow doesn't compensate.
+
+### Encoding-aware internal multiplication
+
+Routing the division's internal q*b through comba-cs instead of
+shift-add: HURTS div_rt (11.37 vs 7.86) because comba-cs creates
+more variables for the free-variable multiplication. Slightly helps
+div_by_const (9.42 vs 9.75) where the divisor is constant.
+
+### Conclusion
+
+The constraint-based division encoding is already near-optimal.
+Alternative algorithms (restoring, non-restoring, SRT) create
+2-3x more variables without proportional benefit. The constraint
+approach's strength — massive unit propagation through free
+variables — is a fundamental advantage that deterministic circuits
+cannot replicate.
+
+The only viable improvement direction is at the WORD LEVEL:
+recognizing division tautologies (a/b*b + a%b == a) before
+bit-blasting.
