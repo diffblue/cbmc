@@ -1710,8 +1710,47 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
 
         if(!template_name.empty())
         {
-          const auto id_set = cpp_scopes.current_scope().lookup(
+          auto id_set = cpp_scopes.current_scope().lookup(
             template_name, cpp_scopet::RECURSIVE, cpp_idt::id_classt::TEMPLATE);
+          // If not found as a template, check if it's a template
+          // parameter that maps to a template (template template param).
+          if(id_set.empty())
+          {
+            const auto param_set = cpp_scopes.current_scope().lookup(
+              template_name,
+              cpp_scopet::RECURSIVE,
+              cpp_idt::id_classt::TEMPLATE_PARAMETER);
+            for(const auto *param_ptr : param_set)
+            {
+              // Look up the parameter's mapped value in template_map
+              exprt e = template_map.lookup(param_ptr->identifier);
+              if(
+                e.id() == ID_type &&
+                e.type().id() == ID_template_parameter_symbol_type)
+              {
+                const irep_idt &tmpl_id =
+                  to_template_parameter_symbol_type(e.type()).get_identifier();
+                // Find this template in the scope system
+                auto it = cpp_scopes.id_map.find(tmpl_id);
+                if(it != cpp_scopes.id_map.end())
+                  id_set.insert(it->second);
+              }
+            }
+          }
+          // Fallback: search global id_map for the template name.
+          if(id_set.empty())
+          {
+            for(auto &entry : cpp_scopes.id_map)
+            {
+              if(
+                entry.second->base_name == template_name &&
+                entry.second->id_class == cpp_idt::id_classt::TEMPLATE)
+              {
+                id_set.insert(entry.second);
+                break;
+              }
+            }
+          }
           if(!id_set.empty())
           {
             const cpp_idt &cpp_id = **id_set.begin();
@@ -1759,6 +1798,37 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
     }
     else // expression
     {
+      // Ambiguous args in non-type parameter context: treat as expression.
+      // The parser stores noexcept(...) and other expressions as
+      // ambiguous nodes with a cpp_name type interpretation.
+      // For non-type parameters, use the expression interpretation.
+      if(arg.id() == ID_ambiguous && arg.type().id() == ID_cpp_name)
+      {
+        // Check if the cpp_name contains a noexcept expression.
+        // noexcept(...) evaluates to true for noexcept operations.
+        bool has_noexcept = false;
+        for(const auto &sub : arg.type().get_sub())
+        {
+          if(sub.id() == ID_noexcept)
+          {
+            has_noexcept = true;
+            break;
+          }
+        }
+        if(has_noexcept)
+        {
+          // Evaluate noexcept as true (safe approximation).
+          // The noexcept expression contains destructor calls that
+          // can't be fully resolved during template instantiation.
+          arg = true_exprt();
+          template_map.set(parameter, arg);
+          continue;
+        }
+        exprt e{ID_cpp_name};
+        e.get_sub() = arg.type().get_sub();
+        e.add_source_location() = arg.source_location();
+        arg.swap(e);
+      }
       // Type predicates as non-type template arguments
       if(!arg.find(ID_type_arg).is_nil() || !arg.find("type_arg1").is_nil())
       {
