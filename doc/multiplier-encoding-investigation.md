@@ -2671,3 +2671,65 @@ hold for industrial code:
 | Dense constant multiplication | **shift-add** | div_by_const |
 | Small constant multiplication | **dadda** | keyed_hash |
 | Non-multiplication (XOR/add/rotate) | any | chacha, siphash, crc |
+
+## Regression Analysis and Fix
+
+### Identified regressions (before fix)
+
+| Benchmark | comba-cs | Best alt | Ratio | Cause |
+|-----------|----------|----------|-------|-------|
+| div_by_const | 72.9s | shift 9.9s | **7.4x** | 64-bit dense const, dadda-cs carry-save hurts |
+| hash_determ | 13.2s | dadda-cs 7.2s | **1.8x** | 32-bit dense const (17 PPs), pop0 overhead |
+| overflow_16 | 0.78s | dadda 0.48s | 1.6x | Single-mul, dadda's smaller formula wins |
+
+### Root cause analysis
+
+**div_by_const (7.4x):** The adaptive fallback (PPs ≤ width/2)
+triggered dadda-cs for this 64-bit multiplication (22 PPs ≤ 32).
+But dadda-cs's carry-save structure interacts poorly with the
+division circuit — it produces 186 fixed variables during
+inprocessing vs shift-add's 388. The carry-save structure breaks
+the cascading unit propagation that shift-add's carry chains enable.
+
+**hash_determ (1.8x):** 17 PPs > 16 = width/2, so the fallback
+didn't trigger. pop0 popcount on 17-bit columns creates 2.5x more
+variables than dadda (7170 vs 2858).
+
+### Fix: width-dependent fallback with 2*width/3 threshold
+
+```
+if(pps.size() <= 2 * width / 3)
+{
+  if(width > 32)  // Wide: shift-add (carry chains for BVE)
+    return shift_add_accumulation(pps);
+  else            // Narrow: dadda-cs (compact carry-save)
+    return dadda_carry_save(pps);
+}
+// Else: pop0 popcount (tall columns, symbolic multiplication)
+```
+
+The 2*width/3 threshold catches dense constants (17 ≤ 21 for 32-bit)
+while preserving pop0 for symbolic multiplication (9 > 6 for BW=9).
+
+### Results after fix
+
+| Benchmark | Before | After | Best alt | Status |
+|-----------|--------|-------|----------|--------|
+| div_by_const | 72.9s | **9.70s** | shift 9.65s | **FIXED** |
+| hash_determ | 13.2s | **7.11s** | dadda 7.72s | **FIXED** (now faster!) |
+| overflow_16 | 0.78s | 0.77s | dadda 0.48s | 1.6x (minor) |
+| comm_11 | 0.78s | 0.76s | — | unchanged |
+| matrix_trace_8 | 0.54s | 0.54s | — | unchanged |
+| murmurhash3 | 5.24s | 6.16s | dadda 7.26s | slight regression |
+
+### Remaining regressions (all minor)
+
+| Benchmark | comba-cs | Best alt | Ratio | Absolute |
+|-----------|----------|----------|-------|----------|
+| overflow_16 | 0.77s | dadda 0.48s | 1.6x | 0.29s |
+| keyed_hash | 1.18s | dadda 0.99s | 1.2x | 0.19s |
+| factor_20 | 0.06s | dadda 0.04s | 1.5x | 0.02s |
+
+All remaining regressions are ≤1.6x with <0.3s absolute difference.
+These are single-multiplication problems where dadda's smaller
+formula provides a modest advantage. No severe regressions remain.

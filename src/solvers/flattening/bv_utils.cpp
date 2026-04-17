@@ -1726,8 +1726,23 @@ bvt bv_utilst::comba_carry_save(const std::vector<bvt> &pps)
   // to bitwidth), use dadda-cs which creates fewer variables.
   // pop0 popcount is better for tall columns (symbolic multiplication)
   // but wasteful for short columns (constant multiplication).
-  if(pps.size() <= width / 2)
+  if(pps.size() <= 2 * width / 3)
+  {
+    // For wide types (>32 bits), use shift-add accumulation which
+    // creates carry chains that enable cascading unit propagation.
+    // For narrow types, use dadda-cs which is more compact.
+    if(width > 32)
+    {
+      auto saved = adder_encoding;
+      adder_encoding = multiplier_adder_encoding;
+      bvt product = pps.front();
+      for(auto it = std::next(pps.begin()); it != pps.end(); ++it)
+        product = add(product, *it);
+      adder_encoding = saved;
+      return product;
+    }
     return dadda_carry_save(pps);
+  }
 
   // Compute popcount for each column INDEPENDENTLY
   // Collect weighted results: result[bit_position] += popcount_bit
