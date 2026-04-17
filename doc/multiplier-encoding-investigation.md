@@ -2601,3 +2601,73 @@ resist BVE: rounding logic depends on multiplication results,
 creating high-connectivity clause structures. This is fundamentally
 different from pure integer multiplication where BVE can eliminate
 multiplication variables independently.
+
+## Industrial Validation
+
+### Benchmark suite
+
+12 benchmarks from real-world domains: cryptography, DSP, hash
+functions, compiler optimizations, overflow checking.
+
+| Benchmark | Domain | shift | comba-cs | dadda | Winner |
+|-----------|--------|-------|----------|-------|--------|
+| **fir_tap** | DSP (Q15 fixed-point) | T/O | **39.1s** | T/O | **comba-cs** |
+| **murmurhash3_fmix** | Hash function | 12.5s | **5.27s** | 7.47s | **comba-cs** |
+| **poly_hash** | Hash function | 2.13s | **0.99s** | 0.99s | **comba-cs/dadda** |
+| keyed_hash | Crypto | 1.73s | 1.35s | **1.04s** | dadda |
+| **div_by_const** | Compiler opt | **9.86s** | 72.6s | 103.7s | **shift-add** |
+| gf_mul | AES (GF(2^8)) | 2.48s | 2.48s | 2.48s | — |
+| modexp_step | RSA | 0.06s | 0.06s | 0.06s | — |
+| safe_mul | Overflow check | T/O | T/O | T/O | — |
+| crc32_byte | Checksum | 0.04s | 0.03s | 0.03s | — |
+| siphash_round | Hash function | 0.32s | 0.31s | 0.31s | — |
+| chacha_qr | Crypto | 0.20s | 0.20s | 0.20s | — |
+| checksum | Networking | 0.08s | 0.08s | 0.07s | — |
+
+### Key findings
+
+**comba-cs wins on 3 of 5 multiplication-heavy benchmarks:**
+
+1. **fir_tap (Q15 DSP commutativity):** ONLY comba-cs solves it
+   (39.1s). This is 16-bit fixed-point multiplication commutativity
+   — a real DSP verification task. shift-add and dadda both T/O.
+
+2. **murmurhash3 (hash determinism):** comba-cs 5.27s vs shift
+   12.5s (**2.4x faster**). The determinism check creates two copies
+   of the hash function, each with two constant multiplications.
+   The equality between copies benefits from comba-cs's BCP cascades.
+
+3. **poly_hash (Java-style hash):** comba-cs/dadda 0.99s vs shift
+   2.13s (**2.2x faster**). Uses h*31 (sparse constant, 5 set bits).
+   The adaptive comba-cs falls through to dadda-cs for this.
+
+**shift-add wins on dense 64-bit constant multiplication:**
+
+4. **div_by_const:** shift 9.86s vs comba-cs 72.6s (**7.4x faster**).
+   Uses 64-bit multiplication by 0xCCCCCCCD (22 set bits, dense).
+   comba-cs's pop0 overhead on 64-bit columns is enormous.
+
+**dadda wins on small constant multiplication:**
+
+5. **keyed_hash:** dadda 1.04s vs comba-cs 1.35s. Two 16-bit
+   constant multiplications.
+
+### Benchmarks where encoding doesn't matter
+
+6 of 12 benchmarks show NO encoding effect because they don't
+involve integer multiplication (CRC uses XOR, ChaCha uses
+add/XOR/rotate, SipHash uses add/XOR/rotate, checksum uses
+addition, GF multiplication uses XOR-based polynomial arithmetic).
+
+### Industrial validation summary
+
+The encoding selection rules validated on synthetic benchmarks
+hold for industrial code:
+
+| Pattern | Best encoding | Industrial examples |
+|---------|---------------|---------------------|
+| Determinism (2 copies + equality) | **comba-cs** | murmurhash3, fir_tap |
+| Sparse constant multiplication | **comba-cs/dadda** | poly_hash |
+| Dense constant multiplication | **shift-add** | div_by_const |
+| Small constant multiplication | **dadda** | keyed_hash |
+| Non-multiplication (XOR/add/rotate) | any | chacha, siphash, crc |
