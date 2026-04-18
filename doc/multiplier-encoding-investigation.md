@@ -3298,3 +3298,75 @@ The only effective optimization is CONSTRAINING THE INPUTS:
 
 This points to VALUE ANALYSIS and CONSTRAINT PROPAGATION as
 the optimization path, not SAT encoding changes.
+
+## Variable Ordering and Case Splitting for FP
+
+### CaDiCaL's decision order
+
+CaDiCaL decides variables 1, 2, 3, ... (input bits) first, based
+on initial VSIDS scores from occurrence counts. The subtract flag
+(var 377, 130 occurrences) and exponent comparison (var 148, 273
+occurrences) are decided LATER, after many input bits.
+
+### Manual case splitting results
+
+| Split variable | Positive | Negative | Total | vs original (5.53s) |
+|---------------|----------|----------|-------|---------------------|
+| **var 148** (exp comparison) | 1.41s | 2.55s | **3.96s** | **-28%** |
+| var 377 (subtract flag) | 3.50s | 1.39s | 4.89s | -12% |
+| Both (4 cases) | 0.51-2.56s | — | 5.00s | -10% |
+
+**Splitting on the exponent comparison (var 148) gives 28% speedup.**
+This variable determines which operand has the larger exponent,
+resolving the operand-swap MUX gates and determining the barrel
+shift direction.
+
+### Combined case analysis
+
+| Case | 148 | 377 | Time | Conflicts | Interpretation |
+|------|-----|-----|------|-----------|----------------|
+| 1 | + | + | 1.13s | 37,804 | a>b, different sign |
+| 2 | + | - | **0.51s** | 19,746 | a>b, same sign |
+| 3 | - | + | 2.56s | 73,012 | b>a, different sign |
+| 4 | - | - | 0.80s | 30,382 | b>a, same sign |
+
+The easiest case (a>b, same sign) is **10.8x faster** than the
+original. The hardest case (b>a, different sign) is still 2.2x
+faster. The total across all 4 cases (5.00s) is comparable to
+the original (5.53s) due to solver startup overhead.
+
+### Why case splitting helps
+
+When the exponent comparison is decided, the barrel shifter's
+MUX gates resolve: one operand is selected as "bigger" and the
+other is shifted. This eliminates the conditional branching in
+the alignment step, making the remaining problem simpler.
+
+Similarly, when the subtract flag is decided, the add/subtract
+MUX gates resolve, eliminating the sign-dependent branching.
+
+### Implementation path
+
+1. **Encoding-level case split:** Modify float_utils::add_sub to
+   create separate circuits for same-sign and different-sign cases,
+   then MUX the results. This is the split add_sub approach, which
+   we showed hurts (+35%) because of extra variables. However,
+   combined with the exponent comparison split, it might help.
+
+2. **SAT-level case split:** Use CaDiCaL's assume() API to force
+   early decision of key variables. Requires identifying the right
+   variables automatically (by occurrence count or structural analysis).
+
+3. **Cube-and-conquer:** Generate cubes (partial assignments) for
+   the key FP control variables, then solve each cube independently.
+   This is the most general approach but requires infrastructure.
+
+### Potential for automation
+
+The key variables for case splitting can be identified automatically:
+- Highest occurrence count in the CNF
+- Variables that appear in MUX/select gates
+- Variables that connect the two copies of the FP circuit
+
+This could be implemented as a preprocessing step that identifies
+"control flow" variables and adds them as early decisions.
