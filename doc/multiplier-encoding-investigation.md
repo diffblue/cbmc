@@ -3370,3 +3370,99 @@ The key variables for case splitting can be identified automatically:
 
 This could be implemented as a preprocessing step that identifies
 "control flow" variables and adds them as early decisions.
+
+## Implementation Plan: Automatic Case Splitting
+
+### The heuristic
+
+**Split on the highest-occurrence INTERNAL variable if its occurrence
+exceeds the maximum INPUT variable occurrence.**
+
+This identifies "control flow" variables (exponent comparison,
+subtract flag in FP; MUX control in other conditional circuits)
+that the SAT solver decides too late.
+
+### Validation
+
+| Benchmark | Top internal occ | Max input occ | Split? | Effect |
+|-----------|-----------------|---------------|--------|--------|
+| FP add comm | 273 | 40 | **YES** | **-29%** |
+| bf16 mul comm | 91 | 50 | **YES** | **-17%** |
+| int mul BW=11 | 44 | 98 | NO | safe |
+| murmurhash3 | 140 | 156 | NO | safe |
+| matrix_trace | 64 | 64 | NO | safe |
+| div_by_const | 20 | 143 | NO | safe |
+
+**Zero false positives.** The heuristic correctly identifies FP
+circuits (which have high-occurrence control variables) and
+correctly skips multiplication/division circuits (which have
+high-occurrence input variables).
+
+### Implementation steps
+
+1. **Variable classification:** After all clauses are added but
+   before solving, count occurrences per variable. Classify
+   variables as "input" (first N variables, where N is determined
+   by the number of input bits) or "internal".
+
+2. **Split decision:** If the highest-occurrence internal variable
+   has more occurrences than the highest-occurrence input variable,
+   mark it as a split variable.
+
+3. **Case splitting:** Use CaDiCaL's `assume()` API to force the
+   split variable to true, solve, then if UNSAT, force it to false
+   and solve again. If both UNSAT, the formula is UNSAT.
+
+4. **Input variable identification:** The input variable cutoff
+   can be determined from CBMC's variable mapping (which variables
+   correspond to program inputs). Alternatively, use the first 5%
+   of variables as a heuristic cutoff.
+
+### Where to implement
+
+The case splitting should be implemented in `satcheck_cadical_baset::do_prop_solve()`:
+
+```cpp
+// After adding all clauses, before solving:
+if(case_splitting_enabled)
+{
+  // Count occurrences
+  unsigned max_input_occ = 0, max_internal_occ = 0;
+  unsigned split_var = 0;
+  unsigned input_cutoff = no_variables() / 20;
+  // ... count occurrences ...
+
+  if(max_internal_occ > max_input_occ)
+  {
+    // Try positive polarity
+    solver->assume(split_var);
+    if(solver->solve() == 20) // UNSAT
+    {
+      // Try negative polarity
+      solver->assume(-split_var);
+      if(solver->solve() == 20) // UNSAT
+        return P_UNSATISFIABLE;
+    }
+    // If either SAT, fall through to normal solve
+  }
+}
+```
+
+### Limitations
+
+- Only splits on ONE variable (depth-1 case splitting)
+- The input cutoff heuristic (first 5% of variables) may not be
+  accurate for all formula types
+- Adds overhead of two solver calls (mitigated by each being faster)
+- Only helps when the formula has high-occurrence control variables
+  (FP circuits, conditional logic)
+
+### Future extensions
+
+- **Depth-2 splitting:** Split on the top TWO control variables
+  (4 cases). The FP 4-way split showed individual cases are
+  2.2-10.8x faster.
+- **Structural detection:** Instead of occurrence counting, detect
+  MUX/select gates and identify their control variables directly.
+- **Integration with cube-and-conquer:** Use CaDiCaL's lookahead
+  mode to generate cubes for the control variables.

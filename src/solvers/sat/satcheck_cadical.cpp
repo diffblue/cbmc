@@ -137,7 +137,6 @@ propt::resultt satcheck_cadical_baset::do_prop_solve(const bvt &assumptions)
   }
 
 
-  if(const char *df = std::getenv("CBMC_DUMP_CNF")) solver->write_dimacs(df);
   log.statistics() << (no_variables() - 1) << " variables, " << clause_counter
                    << " clauses" << messaget::eom;
 
