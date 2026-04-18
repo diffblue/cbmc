@@ -292,6 +292,8 @@ bvt float_utilst::add_sub(
   // figure out which operand has the bigger exponent
   const bvt exponent_difference=subtract_exponents(unpacked1, unpacked2);
   literalt src2_bigger=exponent_difference.back();
+  if(!src2_bigger.is_constant())
+    prop.mark_control_variable(src2_bigger);
 
   const bvt bigger_exponent=
     bv_utils.select(src2_bigger, unpacked2.exponent, unpacked1.exponent);

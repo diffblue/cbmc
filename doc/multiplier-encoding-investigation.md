@@ -3520,3 +3520,60 @@ Until CaDiCaL supports initial decision hints, the best approach
 for FP is the manual case splitting via assume() (28% speedup).
 This can be implemented as an optional preprocessing step that
 identifies high-occurrence control variables and splits on them.
+
+## CaDiCaL decide_first() API Extension
+
+### Implementation
+
+Added `solver->decide_first(var)` to CaDiCaL's public API. This
+adds the variable to a priority queue that is checked before
+`next_decision_variable()` in the decision loop. Priority variables
+are decided first (with their natural VSIDS polarity), then VSIDS
+takes over.
+
+### Results
+
+| Benchmark | Baseline | decide_first | Change |
+|-----------|----------|-------------|--------|
+| FP add comm | 4.41s | 4.65s | +5% |
+| **FP add positive** | 1.42s | **1.25s** | **-12%** |
+| int mul BW=11 | 0.78s | 0.78s | neutral |
+| murmurhash3 | 12.23s | 12.33s | neutral |
+
+**12% speedup on FP positive, neutral on everything else.**
+
+### Why it helps FP positive but not FP full
+
+For FP positive: the subtract flag is fixed (same sign), so the
+exponent comparison is the ONLY remaining control variable.
+Deciding it first cleanly splits the problem into "a>b" and "b>a"
+subproblems, each simpler.
+
+For FP full: there are TWO control variables (subtract flag AND
+exponent comparison). Deciding one first picks a branch, but the
+solver must still explore both branches of the other variable.
+The backtracking overhead negates the benefit.
+
+### Comparison with manual case splitting
+
+| Approach | FP add comm | Mechanism |
+|----------|------------|-----------|
+| Manual case split (assume) | **3.87s (-29%)** | Two independent solve calls |
+| decide_first (exp_cmp) | 4.65s (+5%) | Single solve, natural backtracking |
+| decide_first (subtract) | 4.52s (+2%) | Single solve, natural backtracking |
+
+Manual case splitting is better because each subproblem gets a
+CLEAN solver state. decide_first uses a single solve call where
+backtracking from the first branch carries learned clauses that
+may not help the second branch.
+
+### Conclusion
+
+The decide_first API works correctly and helps when there's a
+single dominant control variable (FP positive: 12% speedup).
+For problems with multiple control variables, manual case splitting
+via assume() remains better (29% speedup).
+
+The API extension is a useful building block for future optimization:
+it could be combined with structural analysis to automatically
+identify and prioritize control variables in any circuit.

@@ -132,6 +132,7 @@ public:
 
   // an incremental solver may remove any variables that aren't frozen
   virtual void set_frozen(literalt) { }
+  virtual void mark_control_variable(literalt) {}
 
   // Resource limits:
   virtual void set_time_limit_seconds(uint32_t)

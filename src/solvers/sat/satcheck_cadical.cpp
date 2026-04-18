@@ -140,6 +140,20 @@ propt::resultt satcheck_cadical_baset::do_prop_solve(const bvt &assumptions)
   log.statistics() << (no_variables() - 1) << " variables, " << clause_counter
                    << " clauses" << messaget::eom;
 
+  // Add priority decisions for control variables
+  for(const auto &lit : control_variables)
+  {
+    int d = lit.dimacs();
+    if(renumber_variables && !var_map.empty())
+    {
+      unsigned v = lit.var_no();
+      if(v < var_map.size())
+        d = lit.sign() ? -static_cast<int>(var_map[v])
+                       : static_cast<int>(var_map[v]);
+    }
+    solver->decide_first(d > 0 ? d : -d);
+  }
+
   // if assumptions contains false, we need this to be UNSAT
   for(const auto &a : assumptions)
   {

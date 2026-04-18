@@ -99,6 +99,8 @@ protected:
   public:
   int reorder_strategy = 0;
   int initial_phase = -1; // -1 = default
+  std::vector<literalt> control_variables;
+  void mark_control_variable(literalt lit) override { control_variables.push_back(lit); }
 protected:
   std::vector<unsigned> var_map;  // old var_no -> new var_no
   std::vector<int> clause_buffer; // flat: lit lit ... 0 lit lit ... 0
