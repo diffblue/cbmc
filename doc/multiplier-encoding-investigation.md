@@ -3466,3 +3466,57 @@ if(case_splitting_enabled)
   MUX/select gates and identify their control variables directly.
 - **Integration with cube-and-conquer:** Use CaDiCaL's lookahead
   mode to generate cubes for the control variables.
+
+## Variable Ordering Investigation for FP
+
+### CaDiCaL's initial decision order
+
+CaDiCaL decides variables 1, 2, 3, ... SEQUENTIALLY in the initial
+phase (before any conflicts). Only after the first conflict does
+VSIDS take over. This means the first ~64 decisions are input bits,
+and control variables (exponent comparison at var 148, subtract
+flag at var 377) are decided much later.
+
+### Approaches tested
+
+| Approach | FP add comm | Multiplication | Status |
+|----------|------------|----------------|--------|
+| Manual case split (assume) | **3.87s (-29%)** | no effect | works but 2 calls |
+| Reorder strategy 0 (aux first) | 4.63s (+3%) | 0.93s (+19%) | hurts |
+| Reorder strategy 2 (input first) | **4.15s (-8%)** | 0.87s (+12%) | mixed |
+| Occurrence-sorted (strat 5) | T/O | 0.66s (-15%) | mixed |
+| Targeted promotion (high-occ internal) | T/O | — | broken |
+| CaDiCaL bump() 1000x | T/O | — | catastrophic |
+| CaDiCaL bump() 10x | 4.56s (+3%) | — | hurts |
+| CaDiCaL bump() 1x | 4.56s (+3%) | — | hurts |
+
+### Why activity bumping doesn't work
+
+Even a SINGLE bump() call disrupts CaDiCaL's carefully tuned VSIDS
+scoring, making it 3% slower. CaDiCaL's VSIDS is already optimized
+for the formula structure — any external interference degrades it.
+
+The manual case splitting worked (28% speedup) because it FORCES
+the decision without disrupting VSIDS for the rest of the search.
+Each subproblem gets a clean VSIDS run.
+
+### The right approach: initial decision hints
+
+The ideal mechanism would be a list of variables that CaDiCaL
+decides FIRST (in order) before VSIDS takes over. This is different
+from:
+- assume(): constrains polarity AND requires two solve calls
+- bump(): disrupts VSIDS scoring
+- Variable renumbering: affects ALL variables, not just the targets
+
+This would require a CaDiCaL API extension: `solver->decide_first(var)`.
+CaDiCaL would decide these variables in order during the initial
+phase, then switch to VSIDS. Each variable would be decided with
+its natural VSIDS polarity (not forced).
+
+### Practical recommendation
+
+Until CaDiCaL supports initial decision hints, the best approach
+for FP is the manual case splitting via assume() (28% speedup).
+This can be implemented as an optional preprocessing step that
+identifies high-occurrence control variables and splits on them.
