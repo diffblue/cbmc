@@ -16,13 +16,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "std_expr.h"
 #include "string2int.h"
 
-constant_exprt bv_typet::all_zeros_expr() const
+constant_exprt bitvector_typet::all_zeros_expr() const
 {
   return constant_exprt{
     make_bvrep(get_width(), [](std::size_t) { return false; }), *this};
 }
 
-constant_exprt bv_typet::all_ones_expr() const
+constant_exprt bitvector_typet::all_ones_expr() const
 {
   return constant_exprt{
     make_bvrep(get_width(), [](std::size_t) { return true; }), *this};
