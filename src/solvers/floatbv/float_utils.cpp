@@ -564,6 +564,8 @@ bvt float_utilst::fma(
     bv_utils.zero_extension(small_shifted, small_shifted.size() + 2);
 
   literalt subtract_lit = prop.lxor(prod_sign, unpacked_add.sign);
+  if(!subtract_lit.is_constant())
+    prop.mark_control_variable(subtract_lit);
   bvt sum = bv_utils.add_sub(big_ext, small_ext, subtract_lit);
 
   literalt fraction_sign = sum.back();

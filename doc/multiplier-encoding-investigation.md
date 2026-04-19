@@ -3577,3 +3577,28 @@ via assume() remains better (29% speedup).
 The API extension is a useful building block for future optimization:
 it could be combined with structural analysis to automatically
 identify and prioritize control variables in any circuit.
+
+### Generalization: structural control variables
+
+The FP encoding ALWAYS creates these control variables at specific
+code locations:
+
+| Variable | Code location | Role |
+|----------|--------------|------|
+| `subtract_lit` | float_utils.cpp:337 | Add vs subtract MUX control |
+| `src2_bigger` | float_utils.cpp:294 | Operand swap MUX control |
+| `limited_dist[0..4]` | float_utils.cpp:312 | Barrel shifter stage controls |
+
+These are STRUCTURAL properties of the IEEE 754 encoding. They
+appear in EVERY FP addition regardless of the property being
+verified. The proof analysis confirmed they are bottlenecks
+(subtract_lit: 51% of proof steps, src2_bigger: highest occurrence).
+
+**No automatic detection is needed.** CBMC controls the encoding
+and knows exactly which variables are control variables. Marking
+them is a one-line `prop.mark_control_variable(lit)` call at each
+creation point.
+
+FP multiplication does NOT have these control variables (no
+conditional branching — always multiply). FP FMA has similar
+control variables (subtract_lit for the addition step).
