@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 
 class ansi_c_declarationt;
+class bitvector_typet;
 class c_bit_field_typet;
 class shift_exprt;
 

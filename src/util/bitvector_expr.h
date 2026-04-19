@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file util/bitvector_expr.h
 /// API to expression classes for bitvectors
 
+#include "bitvector_types.h"
 #include "std_expr.h"
 
 /// \brief The byte swap expression
