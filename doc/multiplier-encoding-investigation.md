@@ -3978,3 +3978,63 @@ to eliminate.
 Ternary hints reduce regressions but also reduce benefits.
 g-only AND gates make things worse. The binary hints with a
 conservative threshold (10-13) remain the best approach.
+
+## SAT vs UNSAT Encoding Sensitivity
+
+### Matched SAT/UNSAT pairs (same bitwidth)
+
+| BW | UNSAT (commutativity) | SAT (factoring) |
+|----|----------------------|-----------------|
+| | shift / comba-cs / dadda | shift / comba-cs / dadda |
+| 11 | 45.3 / **0.64** / 6.24 | 0.001 / 0.001 / 0.001 |
+| 13 | T/O / **1.25** / T/O | 0.001 / 0.001 / 0.001 |
+
+**UNSAT: up to 71x encoding sensitivity. SAT: zero sensitivity.**
+At the same bitwidth, UNSAT problems show massive encoding
+differences while SAT problems are trivially fast regardless.
+
+### Hard SAT (factoring at larger bitwidths)
+
+| BW | shift | comba-cs | dadda | Best |
+|----|-------|----------|-------|------|
+| 16 | 0.016 | 0.019 | 0.022 | shift |
+| 18 | 0.74 | 3.04 | **0.22** | **dadda** |
+| 20 | 1.05 | **0.22** | 0.39 | **comba-cs** |
+| 22 | **0.11** | 0.31 | 0.33 | **shift** |
+| 24 | **0.02** | 0.38 | 0.17 | **shift** |
+
+**Hard SAT shows encoding sensitivity but INCONSISTENT ranking.**
+The best encoding varies by bitwidth (dadda at BW=18, comba-cs at
+BW=20, shift at BW=22-24). This is because SAT solving depends on
+finding ONE satisfying assignment, and the encoding affects which
+solution the solver finds first — a non-deterministic process.
+
+### Analysis
+
+**UNSAT problems:** The solver must prove NO solution exists. This
+requires exhaustive search through the entire space. The encoding
+determines the PROOF STRUCTURE — shorter proofs (comba-cs) are
+consistently faster. The ranking is STABLE across bitwidths.
+
+**Easy SAT problems:** The solver finds a solution immediately
+regardless of encoding. No encoding sensitivity.
+
+**Hard SAT problems:** The solver must search for a solution in a
+large space. The encoding affects the SEARCH LANDSCAPE — which
+solutions are easy to find depends on the encoding's clause
+structure. The ranking is UNSTABLE because different encodings
+make different solutions easy to find.
+
+### Implications
+
+1. **For UNSAT verification (the common case):** encoding choice
+   matters enormously and comba-cs is consistently best.
+
+2. **For SAT problems (finding counterexamples):** encoding choice
+   matters only for HARD SAT (large bitwidth factoring). The
+   ranking is unpredictable, so no single encoding is optimal.
+
+3. **Adaptive selection based on SAT/UNSAT is NOT useful** because
+   we don't know the answer before solving. However, most
+   verification tasks are UNSAT (proving properties hold), so
+   optimizing for UNSAT (comba-cs) is the right default.
