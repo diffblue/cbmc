@@ -4242,3 +4242,116 @@ preprocessing, which is less effective on comba-cs's structure.
 
 The BCP cascade benefit (from short carry chains) helps both solvers
 equally. The additional CaDiCaL advantage comes from inprocessing.
+
+## Three-Solver Encoding Comparison: MiniSat, MergeSat, CaDiCaL
+
+### Complete data
+
+| Benchmark | Encoding | MiniSat | MergeSat | CaDiCaL |
+|-----------|----------|---------|----------|---------|
+| comm BW=9 | shift | 5.16 | 7.67 | 2.02 |
+| | **comba-cs** | 7.59 | **2.00** | **0.13** |
+| | dadda | 11.68 | 5.12 | 0.54 |
+| comm BW=11 | shift | T/O | T/O | 49.2 |
+| | **comba-cs** | 62.1 | **6.66** | **0.64** |
+| | dadda | T/O | 49.4 | 6.49 |
+| overflow BW=8 | **shift** | **0.65** | **0.40** | 0.19 |
+| | comba-cs | 1.20 | 0.54 | **0.02** |
+| | **dadda** | 1.01 | **0.36** | 0.05 |
+| overflow BW=16 | shift | T/O | T/O | 1.79 |
+| | comba-cs | T/O | 13.4 | 0.78 |
+| | **dadda** | T/O | **3.43** | **0.48** |
+| matrix trace | shift | T/O | 41.2 | 31.5 |
+| | **comba-cs** | **5.65** | **2.94** | **0.55** |
+| | dadda | 23.6 | 8.06 | 3.78 |
+| MAC comm | shift | 55.9 | 48.9 | 18.5 |
+| | **comba-cs** | **2.29** | **2.39** | **0.34** |
+| | dadda | 5.85 | 4.84 | 1.69 |
+| str_red BW=32 | shift | 0.39 | 0.62 | 0.38 |
+| | **comba-cs** | **0.21** | 0.47 | **0.21** |
+| | **dadda** | 0.24 | **0.38** | 0.36 |
+| keyed_hash | shift | 23.1 | 23.1 | 1.68 |
+| | comba-cs | 38.7 | 28.7 | 1.19 |
+| | **dadda** | 37.6 | 34.5 | **0.99** |
+
+### Per-solver encoding rankings
+
+**MiniSat best encoding per benchmark:**
+
+| Benchmark | Best | Speedup vs shift |
+|-----------|------|-----------------|
+| comm BW=9 | **shift** (5.16s) | baseline |
+| comm BW=11 | **comba-cs** (62.1s) | ∞ (shift T/O) |
+| overflow BW=8 | **shift** (0.65s) | baseline |
+| overflow BW=16 | all T/O | — |
+| matrix trace | **comba-cs** (5.65s) | ∞ (shift T/O) |
+| MAC comm | **comba-cs** (2.29s) | **24x** |
+| str_red BW=32 | **comba-cs** (0.21s) | 1.9x |
+| keyed_hash | **shift** (23.1s) | baseline |
+
+**MiniSat surprise: shift-add wins on comm BW=9!** comba-cs (7.59s)
+is SLOWER than shift-add (5.16s). This is the OPPOSITE of CaDiCaL
+and MergeSat. MiniSat's SatELite preprocessing handles shift-add's
+smaller formula better than comba-cs's larger formula.
+
+**MergeSat best encoding per benchmark:**
+
+| Benchmark | Best | Speedup vs shift |
+|-----------|------|-----------------|
+| comm BW=9 | **comba-cs** (2.00s) | **3.8x** |
+| comm BW=11 | **comba-cs** (6.66s) | ∞ |
+| overflow BW=8 | **dadda** (0.36s) | 1.1x |
+| overflow BW=16 | **dadda** (3.43s) | ∞ |
+| matrix trace | **comba-cs** (2.94s) | **14x** |
+| MAC comm | **comba-cs** (2.39s) | **20x** |
+| str_red BW=32 | **dadda** (0.38s) | 1.6x |
+| keyed_hash | **shift** (23.1s) | baseline |
+
+**CaDiCaL best encoding per benchmark:**
+
+| Benchmark | Best | Speedup vs shift |
+|-----------|------|-----------------|
+| comm BW=9 | **comba-cs** (0.13s) | **15x** |
+| comm BW=11 | **comba-cs** (0.64s) | **77x** |
+| overflow BW=8 | **comba-cs** (0.02s) | 9.5x |
+| overflow BW=16 | **dadda** (0.48s) | 3.7x |
+| matrix trace | **comba-cs** (0.55s) | **57x** |
+| MAC comm | **comba-cs** (0.34s) | **54x** |
+| str_red BW=32 | **comba-cs** (0.21s) | 1.8x |
+| keyed_hash | **dadda** (0.99s) | 1.7x |
+
+### Where dadda still wins (across all solvers)
+
+| Benchmark | MiniSat | MergeSat | CaDiCaL | Pattern |
+|-----------|---------|----------|---------|---------|
+| overflow BW=8 | shift (0.65) | **dadda** (0.36) | comba-cs (0.02) | single-mul, small |
+| overflow BW=16 | all T/O | **dadda** (3.43) | **dadda** (0.48) | single-mul, large |
+| str_red BW=32 | comba-cs (0.21) | **dadda** (0.38) | comba-cs (0.21) | constant mul |
+| keyed_hash | shift (23.1) | shift (23.1) | **dadda** (0.99) | constant mul |
+
+**dadda wins on single-multiplication and constant-multiplication
+problems on MergeSat and CaDiCaL.** On MiniSat, the picture is
+mixed (shift sometimes wins due to SatELite preprocessing).
+
+### Why MiniSat differs from MergeSat and CaDiCaL
+
+**MiniSat: shift-add wins on comm BW=9 (5.16s vs comba-cs 7.59s).**
+This is unique to MiniSat. The reason: MiniSat's SatELite
+preprocessing is more effective on shift-add's smaller formula
+(427 vars) than comba-cs's larger formula (679 vars). SatELite
+does BVE as PREPROCESSING (before search), and the smaller formula
+allows more complete elimination.
+
+MergeSat and CaDiCaL both have comba-cs winning because:
+- MergeSat: SatELite is less aggressive (different defaults)
+- CaDiCaL: inprocessing BVE works better with comba-cs's structure
+
+### Cross-solver consistency
+
+The encoding ranking is **mostly consistent** across solvers:
+- comba-cs wins on multi-multiplication equality: **ALL 3 solvers**
+  (except MiniSat on comm BW=9)
+- dadda wins on single-multiplication: **MergeSat and CaDiCaL**
+  (MiniSat: shift sometimes wins)
+- The MiniSat anomaly (shift winning on comm BW=9) is from
+  SatELite's preprocessing advantage on smaller formulas
