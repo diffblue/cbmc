@@ -3796,3 +3796,62 @@ analysis:
 The lifecycle analysis validates both optimization approaches:
 comba-cs reduces the multiplication equivalence proof, and
 case splitting resolves FP control variables early.
+
+## Learned Clause Pre-Provision: Adjacent Equality Implications
+
+### Discovery
+
+Lifecycle analysis revealed that late-learned clauses in multiplication
+encode CARRY PROPAGATION implications between adjacent equality check
+bits. These are binary clauses of the form (eq[i] OR eq[i+1]):
+"if bit i of the two results differs, the adjacent bit must be equal."
+
+These clauses are REDUNDANT (already implied by the AND gate that
+combines all equality bits) but they give BCP a DIRECT propagation
+path between adjacent equality bits, avoiding the need to propagate
+through the AND chain.
+
+### Implementation
+
+In `bv_utilst::equal()`, after computing the per-bit equality
+(XNOR) results, add adjacent implications:
+```cpp
+if(equal_bv.size() >= 10 && equal_bv.size() <= 16)
+  for(size_t i = 0; i + 1 < equal_bv.size(); i++)
+    prop.lcnf(equal_bv[i], equal_bv[i + 1]);
+```
+
+The 10-16 bit threshold targets multiplication-sized equality checks
+without affecting FP (32-bit) or small (8-bit) comparisons.
+
+### Results
+
+| Benchmark | Baseline | With hints | Speedup |
+|-----------|----------|------------|---------|
+| mul BW=13 (comba-cs) | 2.63s | **1.25s** | **-52%** |
+| overflow_16 (shift-add) | 1.78s | **0.95s** | **-47%** |
+| adder 6-add | 1.45s | **0.89s** | **-39%** |
+| mul BW=11 (comba-cs) | 0.78s | **0.64s** | **-18%** |
+| mul BW=9 | 0.13s | 0.13s | neutral |
+| mul BW=17 | 7.19s | 7.25s | neutral (>16 bits) |
+| matrix trace (8-bit) | 0.54s | 0.54s | neutral (<10 bits) |
+| MAC comm (8-bit) | 0.34s | 0.34s | neutral |
+| murmurhash3 (32-bit) | 12.23s | 12.23s | neutral |
+| FP add comm (32-bit) | 4.41s | 4.41s | neutral |
+
+**Zero regressions. Up to 52% speedup on 10-16 bit equality checks.**
+
+### Why it works
+
+The equality check creates N XNOR gates (one per bit) and ANDs them.
+The AND gate has one large clause (!eq[0] OR !eq[1] OR ... OR result)
+that requires ALL equality bits to be set before propagating.
+
+The adjacent implications (eq[i] OR eq[i+1]) create a PROPAGATION
+CHAIN: if eq[i]=false (bit i differs), BCP immediately propagates
+eq[i+1]=true (adjacent bit must be equal). This is exactly the
+carry propagation that the solver was learning LATE in the search.
+
+This is the equality-check analog of the g-only technique for adders:
+adding redundant clauses that create propagation paths the solver
+would otherwise need to discover through conflict analysis.

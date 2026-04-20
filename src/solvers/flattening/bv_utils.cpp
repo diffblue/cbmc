@@ -4136,6 +4136,16 @@ literalt bv_utilst::equal(const bvt &op0, const bvt &op1)
   for(std::size_t i=0; i<op0.size(); i++)
     equal_bv[i]=prop.lequal(op0[i], op1[i]);
 
+  // Add redundant ADJACENT implications between equality bits.
+  // Only for small bitvectors (multiplication-sized, not FP-sized).
+  // eq[i] OR eq[i+1]: if bit i differs, adjacent bit must be equal.
+  if(prop.has_set_to() && equal_bv.size() >= 10 && equal_bv.size() <= 16)
+  {
+    for(std::size_t i = 0; i + 1 < equal_bv.size(); i++)
+      if(!equal_bv[i].is_constant() && !equal_bv[i + 1].is_constant())
+        prop.lcnf(equal_bv[i], equal_bv[i + 1]);
+  }
+
   return prop.land(equal_bv);
 }
 
