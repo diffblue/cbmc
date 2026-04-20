@@ -276,8 +276,13 @@ void cpp_typecheckt::typecheck_template_alias(cpp_declarationt &declaration)
   typet alias_type = declarator.merge_type(declaration.type());
   cpp_convert_plain_type(alias_type, get_message_handler());
 
+  // Use class_template_identifier for template aliases.
+  // function_template_identifier appends the alias body (via
+  // cpp_type2name) which creates garbled identifiers that can't
+  // be used as symbol names for template template parameters.
+  cpp_template_args_non_tct no_spec_args;
   irep_idt symbol_name =
-    function_template_identifier(base_name, template_type, alias_type);
+    class_template_identifier(base_name, template_type, no_spec_args);
 
   // check if we have it already
   if(symbol_table.has_symbol(symbol_name))
@@ -1682,7 +1687,16 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         throw 0;
       }
 
-      args.push_back(parameter.default_argument());
+      {
+        exprt def = parameter.default_argument();
+        // Apply template_map to substitute already-resolved parameters
+        // in the default argument (e.g., _Templ<_Args...> where _Templ
+        // and _Args were resolved from earlier template arguments).
+        template_map.apply(def);
+        if(def.id() == ID_type)
+          template_map.apply(def.type());
+        args.push_back(def);
+      }
 
       // these need to be typechecked in the scope of the template,
       // not in the current scope!
@@ -1712,8 +1726,21 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         {
           auto id_set = cpp_scopes.current_scope().lookup(
             template_name, cpp_scopet::RECURSIVE, cpp_idt::id_classt::TEMPLATE);
-          // If not found as a template, check if it's a template
-          // parameter that maps to a template (template template param).
+          // If the found template is actually a template template
+          // PARAMETER (has a numeric scope ID), resolve it via the
+          // template_map to get the actual template.
+          if(!id_set.empty())
+          {
+            const cpp_idt &found_id = **id_set.begin();
+            std::string found_str = id2string(found_id.identifier);
+            auto last_sep = found_str.rfind("::");
+            std::string suffix = last_sep != std::string::npos
+                                   ? found_str.substr(last_sep + 2)
+                                   : found_str;
+            // Numeric suffix indicates a template parameter scope ID
+            if(!suffix.empty() && std::isdigit(suffix[0]))
+              id_set.clear();
+          }
           if(id_set.empty())
           {
             const auto param_set = cpp_scopes.current_scope().lookup(
@@ -1754,8 +1781,14 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
           if(!id_set.empty())
           {
             const cpp_idt &cpp_id = **id_set.begin();
-            arg =
-              type_exprt(template_parameter_symbol_typet(cpp_id.identifier));
+            // Use the symbol table identifier (full name) for the
+            // template template parameter, not the scope ID.
+            irep_idt tmpl_id = cpp_id.identifier;
+
+            const auto *tmpl_sym = symbol_table.lookup(tmpl_id);
+            if(tmpl_sym)
+              tmpl_id = tmpl_sym->name;
+            arg = type_exprt(template_parameter_symbol_typet(tmpl_id));
             arg.type().add_source_location() = parameter.source_location();
             template_map.set(parameter, arg);
             continue;
