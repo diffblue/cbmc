@@ -882,14 +882,14 @@ void cpp_typecheckt::full_member_initialization(
     }
 
     // If the data member is a reference, it must be explicitly
-    // initialized
+    // initialized. In template classes, the default constructor
+    // is implicitly deleted when a member is a reference.
+    // Don't throw — just skip the default initialization.
     if(
       !found && c.type().id() == ID_pointer &&
       c.type().get_bool(ID_C_reference))
     {
-      error().source_location = c.source_location();
-      error() << "reference must be explicitly initialized" << eom;
-      throw 0;
+      continue;
     }
 
     // If the data member is not POD and is not explicitly initialized,

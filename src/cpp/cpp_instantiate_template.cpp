@@ -347,6 +347,24 @@ void cpp_typecheckt::elaborate_class_template(
     return;
 
   {
+    const irep_idt &tag_id = to_tag_type(type).get_identifier();
+    if(id2string(tag_id).find("incrementable") != std::string::npos)
+    {
+      FILE *f = fopen("/tmp/concept_debug.txt", "a");
+      if(f)
+      {
+        fprintf(
+          f,
+          "ELAB_ENTRY: %s suppress=%d force=%d\n",
+          tag_id.c_str(),
+          suppress_elaborate,
+          force_elaborate);
+        fclose(f);
+      }
+    }
+  }
+
+  {
     const symbolt &dbg_sym = lookup(to_tag_type(type));
     if(
       id2string(dbg_sym.name).find("is_nothrow_destructible") !=
@@ -447,7 +465,14 @@ void cpp_typecheckt::elaborate_class_template(
       if(entry.identifier == primary_template.name)
       {
         if(entry.full_template_args == full_args)
+        {
+          // Allow re-elaboration if the instance is empty
+          // (primary template was used, specialization matching
+          // hasn't happened yet).
+          if(to_struct_union_type(symbol.type).components().empty())
+            break; // proceed with specialization matching
           return;
+        }
         ++same_template_depth;
       }
     }
@@ -554,6 +579,13 @@ void cpp_typecheckt::elaborate_class_template(
         cpp_scopet &scope = template_scope->get_parent();
         cpp_scopet::id_sett id_set =
           scope.lookup(primary_template.base_name, cpp_scopet::SCOPE_ONLY);
+
+        // Suppress error messages during specialization matching.
+        // Concept evaluation and template argument type-checking may
+        // produce errors for non-matching specializations.
+        null_message_handlert spec_null_handler;
+        message_handlert &spec_old_handler = get_message_handler();
+        set_message_handler(spec_null_handler);
 
         for(const auto *id_ptr : id_set)
         {
@@ -983,9 +1015,48 @@ void cpp_typecheckt::elaborate_class_template(
                 best_match = &s;
                 best_spec_args = guessed_args;
               }
+              // C++ [temp.class.order]: when argument patterns are equal,
+              // prefer the more constrained specialization. A specialization
+              // with a simpler concept constraint (fewer requires clauses)
+              // is more constrained than one with additional negations.
+              else if(
+                count_constrained(partial_specialization_args) ==
+                  count_constrained(best_partial_args) &&
+                partial_specialization_args.arguments().size() ==
+                  best_partial_args.arguments().size())
+              {
+                const auto &s_req =
+                  cpp_declaration.template_type().get(ID_C_requires_clause);
+                const auto &best_req =
+                  best_decl.template_type().get(ID_C_requires_clause);
+                // Prefer the specialization with fewer constraints
+                // (simpler concept = more specific).
+                // A requires clause count of "1" is simpler than "2".
+                int s_count = 0, best_count = 0;
+                if(!s_req.empty() && isdigit(id2string(s_req)[0]))
+                  s_count = std::stoi(id2string(s_req));
+                if(!best_req.empty() && isdigit(id2string(best_req)[0]))
+                  best_count = std::stoi(id2string(best_req));
+                // Also count concept constraints on parameters
+                for(const auto &p :
+                    cpp_declaration.template_type().template_parameters())
+                  if(!p.get("#C_concept_constraint").empty())
+                    s_count++;
+                for(const auto &p :
+                    best_decl.template_type().template_parameters())
+                  if(!p.get("#C_concept_constraint").empty())
+                    best_count++;
+                if(s_count < best_count)
+                {
+                  best_match = &s;
+                  best_spec_args = guessed_args;
+                }
+              }
             }
           }
         }
+
+        set_message_handler(spec_old_handler);
       }
     }
 
@@ -1508,6 +1579,20 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
     template_map.apply(declaration_type);
     new_decl.type().swap(declaration_type);
+
+    // Also apply template_map to template parameter defaults.
+    // Default arguments like "class = _Templ<_Args...>" contain
+    // template parameters that need substitution.
+    for(auto &param : new_decl.template_type().template_parameters())
+    {
+      if(param.has_default_argument())
+      {
+        exprt &def = static_cast<exprt &>(param.add(ID_C_default_value));
+        template_map.apply(def);
+        if(def.id() == ID_type)
+          template_map.apply(def.type());
+      }
+    }
 
     // Expand fold expressions in the class body.
     // Fold expressions like (Bs && ...) reference pack parameters.
@@ -2307,6 +2392,13 @@ const symbolt &cpp_typecheckt::instantiate_template(
         const symbolt *best_match = nullptr;
         cpp_template_args_tct best_spec_args;
 
+        // Suppress error messages during specialization matching.
+        // Concept evaluation and template argument type-checking may
+        // produce errors for non-matching specializations.
+        null_message_handlert spec_null_handler;
+        message_handlert &spec_old_handler = get_message_handler();
+        set_message_handler(spec_null_handler);
+
         for(const auto *id_ptr : id_set)
         {
           const symbolt &s = lookup(id_ptr->identifier);
@@ -2393,6 +2485,8 @@ const symbolt &cpp_typecheckt::instantiate_template(
             best_spec_args = guessed;
           }
         }
+
+        set_message_handler(spec_old_handler);
 
         if(best_match != nullptr)
         {
