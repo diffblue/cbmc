@@ -3905,3 +3905,76 @@ The hints hurt when:
 1. The equality check has 14+ bits (too many extra clauses)
 2. The equality check is NOT the bottleneck (easy problem)
 3. The extra clauses interfere with BVE elimination order
+
+### Extended data: all bitwidths and benchmarks
+
+**Multiplication commutativity (hints enabled for ALL bitwidths):**
+
+| BW | Without | With | Change | Pattern |
+|----|---------|------|--------|---------|
+| 7 | 0.03 | 0.03 | 0% | trivial |
+| **8** | 0.12 | **0.08** | **-33%** | helps |
+| 9 | 0.13 | 0.15 | +15% | hurts |
+| **10** | 0.69 | **0.22** | **-68%** | helps |
+| **11** | 0.77 | **0.64** | **-18%** | helps |
+| **12** | 1.30 | **0.90** | **-30%** | helps |
+| **13** | 2.66 | **1.25** | **-53%** | helps |
+| 14 | 2.76 | 4.39 | +59% | **hurts** |
+| **15** | 5.42 | **4.62** | **-14%** | helps |
+| 16 | 4.33 | 8.47 | +95% | **hurts** |
+| 17 | 7.28 | 9.14 | +25% | hurts |
+| 18 | 11.50 | 14.96 | +30% | hurts |
+| 19 | 16.04 | 15.32 | -4% | neutral |
+
+**Other multiplication benchmarks (hints for all sizes):**
+
+| Benchmark | Without | With | Change |
+|-----------|---------|------|--------|
+| overflow_8 | 0.19 | 0.17 | -10% |
+| overflow_12 | 0.73 | 0.67 | -8% |
+| **overflow_16** | 1.77 | **0.95** | **-46%** |
+| str_red_16 | 0.18 | 0.15 | -16% |
+| matrix_trace | 0.54 | 0.76 | +40% |
+| **MAC_comm** | 0.34 | **0.27** | **-20%** |
+| murmurhash3 | 12.21 | T/O | regression |
+| keyed_hash | 1.65 | 1.38 | -16% |
+
+**Adder benchmarks (hints for all sizes):**
+
+| Benchmark | Without | With | Change |
+|-----------|---------|------|--------|
+| 8-bit 4-var | 0.04 | 0.04 | 0% |
+| 10-bit 4-var | 0.06 | 0.07 | +16% |
+| **12-bit 6-var** | 0.90 | **0.63** | **-30%** |
+| 16-bit 4-var | 0.09 | 0.10 | +11% |
+| **16-bit 6-var** | 1.43 | **0.88** | **-38%** |
+
+### BVE interaction analysis
+
+| BW | Metric | Without hints | With hints |
+|----|--------|--------------|------------|
+| 13 (helps) | Conflicts | 60K | 65K (+8%) |
+| 13 | Eliminated | 612 | 645 (+5%) |
+| 13 | Fixed | 161 | 112 (-30%) |
+| 14 (hurts) | Conflicts | 86K | 111K (+29%) |
+| 14 | Eliminated | 787 | 746 (-5%) |
+| 14 | Fixed | 185 | 318 (+72%) |
+
+At BW=14, hints PREVENT BVE eliminations (787→746) while increasing
+fixed variables (185→318). The net effect: more remaining variables,
+more conflicts, slower. The binary hint clauses increase the
+occurrence count of equality variables, making them harder for BVE
+to eliminate.
+
+### Approaches to mitigate BVE interference
+
+| Approach | BW=13 | BW=14 | BW=16 |
+|----------|-------|-------|-------|
+| No hints | 2.66s | 2.76s | 4.33s |
+| Binary hints | **1.25s** | 4.39s | 8.47s |
+| Ternary hints (aux var) | 1.47s | 3.04s | 6.08s |
+| Binary + g-only | 1.79s | 2.81s | — |
+
+Ternary hints reduce regressions but also reduce benefits.
+g-only AND gates make things worse. The binary hints with a
+conservative threshold (10-13) remain the best approach.
