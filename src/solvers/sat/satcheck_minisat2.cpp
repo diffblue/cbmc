@@ -245,7 +245,11 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve(const bvt &assumptions)
     {
       struct activity_helper : public T
       {
+#ifdef HAVE_MERGESAT
         using T::activity_CHB;
+#else
+        using T::activity;
+#endif
         using T::rebuildOrderHeap;
       };
       auto *s = static_cast<activity_helper *>(solver.get());
@@ -253,7 +257,11 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve(const bvt &assumptions)
       {
         bool is_input = v < input_variables.size() && input_variables[v];
         if(!is_input)
+#ifdef HAVE_MERGESAT
           s->activity_CHB[v] += 1.0;
+#else
+          s->activity[v] += 1.0;
+#endif
       }
       s->rebuildOrderHeap();
     }

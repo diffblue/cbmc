@@ -4397,3 +4397,62 @@ The encoding ranking is **mostly consistent** across solvers:
 | MAC comm | 18.5 | **0.34** | 1.69 | comba-cs |
 | str_red BW=32 | 0.38 | **0.21** | 0.36 | comba-cs |
 | keyed_hash | 1.68 | 1.19 | **0.99** | dadda |
+
+### Division and FP benchmarks (three solvers)
+
+**MiniSat:**
+
+| Benchmark | shift-add | comba-cs | dadda | Best |
+|-----------|-----------|----------|-------|------|
+| div_rt BW=10 | **1.94** | 2.68 | 2.05 | shift |
+| modexp_step | 0.01 | 0.01 | 0.01 | — |
+| FP add comm | 6.96 | 6.95 | 6.96 | — |
+| FP add positive | 1.10 | 1.10 | 1.10 | — |
+| Float4 | 5.77 | 5.73 | 5.77 | — |
+
+**MergeSat:**
+
+| Benchmark | shift-add | comba-cs | dadda | Best |
+|-----------|-----------|----------|-------|------|
+| div_rt BW=10 | 6.60 | 7.30 | **6.35** | dadda |
+| modexp_step | 0.01 | 0.01 | 0.01 | — |
+| FP add comm | 8.80 | 8.80 | 8.76 | — |
+| FP add positive | 2.56 | 2.55 | 2.54 | — |
+| Float4 | 15.85 | 15.85 | 15.87 | — |
+
+**CaDiCaL:**
+
+| Benchmark | shift-add | comba-cs | dadda | Best |
+|-----------|-----------|----------|-------|------|
+| div_rt BW=10 | **1.40** | 2.18 | 1.72 | shift |
+| modexp_step | 0.02 | 0.03 | 0.03 | — |
+| FP add comm | 4.38 | 4.38 | 4.37 | — |
+| FP add positive | 1.41 | 1.41 | 1.40 | — |
+| Float4 | 20.92 | 20.97 | 20.81 | — |
+
+### Analysis: division and FP encoding sensitivity
+
+**FP operations: ZERO encoding sensitivity on all three solvers.**
+FP add comm, FP add positive, and Float4 show identical times
+regardless of encoding. The FP wrapper (barrel shifter, rounding,
+NaN/Inf handling) dominates; the integer multiplication inside
+is a negligible fraction of the total.
+
+**Division roundtrip: SMALL encoding sensitivity.**
+- MiniSat: shift 1.94s vs comba-cs 2.68s (+38%) — shift wins
+- MergeSat: dadda 6.35s vs comba-cs 7.30s (+15%) — dadda wins
+- CaDiCaL: shift 1.40s vs comba-cs 2.18s (+56%) — shift wins
+
+Division uses `unsigned_multiplier_no_overflow` internally (always
+shift-add), so the `--multiplier-encoding` flag only affects the
+EXPLICIT multiplication `(a/b)*b` in the roundtrip formula. The
+explicit multiplication is a small part of the total formula.
+
+**shift-add wins on division** because the division's internal
+multiplication (shift-add) and the explicit multiplication should
+use the SAME encoding for structural consistency. When comba-cs
+is used for the explicit multiplication but shift-add for the
+internal one, the solver must prove equivalence between two
+DIFFERENT multiplication circuits — harder than two identical ones.
+
+**modexp_step: trivially fast** (0.01-0.03s) regardless of encoding.
