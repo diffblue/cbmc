@@ -4355,3 +4355,45 @@ The encoding ranking is **mostly consistent** across solvers:
   (MiniSat: shift sometimes wins)
 - The MiniSat anomaly (shift winning on comm BW=9) is from
   SatELite's preprocessing advantage on smaller formulas
+
+
+### Per-solver encoding tables
+
+**MiniSat:**
+
+| Benchmark | shift-add | comba-cs | dadda | Best |
+|-----------|-----------|----------|-------|------|
+| comm BW=9 | **5.16** | 7.59 | 11.68 | shift |
+| comm BW=11 | T/O | **62.1** | T/O | comba-cs |
+| overflow BW=8 | **0.65** | 1.20 | 1.01 | shift |
+| overflow BW=16 | T/O | T/O | T/O | — |
+| matrix trace | T/O | **5.65** | 23.6 | comba-cs |
+| MAC comm | 55.9 | **2.29** | 5.85 | comba-cs |
+| str_red BW=32 | 0.39 | **0.21** | 0.24 | comba-cs |
+| keyed_hash | **23.1** | 38.7 | 37.6 | shift |
+
+**MergeSat:**
+
+| Benchmark | shift-add | comba-cs | dadda | Best |
+|-----------|-----------|----------|-------|------|
+| comm BW=9 | 7.67 | **2.00** | 5.12 | comba-cs |
+| comm BW=11 | T/O | **6.66** | 49.4 | comba-cs |
+| overflow BW=8 | 0.40 | 0.54 | **0.36** | dadda |
+| overflow BW=16 | T/O | 13.4 | **3.43** | dadda |
+| matrix trace | 41.2 | **2.94** | 8.06 | comba-cs |
+| MAC comm | 48.9 | **2.39** | 4.84 | comba-cs |
+| str_red BW=32 | 0.62 | 0.47 | **0.38** | dadda |
+| keyed_hash | **23.1** | 28.7 | 34.5 | shift |
+
+**CaDiCaL:**
+
+| Benchmark | shift-add | comba-cs | dadda | Best |
+|-----------|-----------|----------|-------|------|
+| comm BW=9 | 2.02 | **0.13** | 0.54 | comba-cs |
+| comm BW=11 | 49.2 | **0.64** | 6.49 | comba-cs |
+| overflow BW=8 | 0.19 | **0.02** | 0.05 | comba-cs |
+| overflow BW=16 | 1.79 | 0.78 | **0.48** | dadda |
+| matrix trace | 31.5 | **0.55** | 3.78 | comba-cs |
+| MAC comm | 18.5 | **0.34** | 1.69 | comba-cs |
+| str_red BW=32 | 0.38 | **0.21** | 0.36 | comba-cs |
+| keyed_hash | 1.68 | 1.19 | **0.99** | dadda |
