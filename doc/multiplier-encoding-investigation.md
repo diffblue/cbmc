@@ -4476,3 +4476,67 @@ external) that makes the problem harder.
 **Implication:** Making comba-cs the default will NOT affect FP or
 division performance — both correctly use shift-add for their
 internal multiplications through the adaptive fallback.
+
+## Three-Solver Adder Encoding Comparison
+
+### Per-solver adder encoding tables
+
+**MiniSat:**
+
+| Benchmark | ripple | BK | g-only | Best |
+|-----------|--------|-----|--------|------|
+| 8-add BW=8 | T/O | T/O | T/O | — |
+| 8-add BW=12 | T/O | T/O | T/O | — |
+| 8-add BW=16 | T/O | T/O | T/O | — |
+| mul comm BW=9 | 7.71 | T/O | **5.33** | g-only |
+| matrix trace | **5.78** | T/O | 5.60 | ripple |
+
+**MergeSat:**
+
+| Benchmark | ripple | BK | g-only | Best |
+|-----------|--------|-----|--------|------|
+| 8-add BW=8 | 6.97 | 8.39 | **5.73** | g-only |
+| 8-add BW=12 | **5.94** | 13.28 | 6.13 | ripple |
+| 8-add BW=16 | 15.11 | 26.57 | **11.17** | g-only |
+| mul comm BW=9 | **2.04** | T/O | 2.17 | ripple |
+| matrix trace | **3.06** | T/O | 4.48 | ripple |
+
+**CaDiCaL:**
+
+| Benchmark | ripple | BK | g-only | Best |
+|-----------|--------|-----|--------|------|
+| 8-add BW=8 | **1.93** | 13.30 | 1.99 | ripple |
+| 8-add BW=12 | **2.50** | 57.80 | 2.61 | ripple |
+| 8-add BW=16 | 5.80 | T/O | **5.50** | g-only |
+| mul comm BW=9 | 0.13 | T/O | **0.09** | g-only |
+| matrix trace | **0.54** | T/O | 0.70 | ripple |
+
+### Analysis
+
+**BK (Brent-Kung) HURTS on all three solvers.** BK causes T/O or
+massive slowdowns (13x-57x) on every benchmark. The extra variables
+from the parallel prefix tree overwhelm all three solvers. This is
+consistent across MiniSat, MergeSat, and CaDiCaL.
+
+**g-only helps on some benchmarks, hurts on others:**
+- Helps: 8-add BW=8 (MergeSat -18%), 8-add BW=16 (MergeSat -26%,
+  CaDiCaL -5%), mul comm BW=9 (MiniSat -31%, CaDiCaL -31%)
+- Hurts: matrix trace (MergeSat +46%, CaDiCaL +30%)
+
+**Ripple-carry is the safest default.** It's never the worst
+encoding (except on mul comm BW=9 where g-only is slightly better).
+The g-only improvement is inconsistent across benchmarks and solvers.
+
+### Cross-solver consistency for adders
+
+| Pattern | MiniSat | MergeSat | CaDiCaL |
+|---------|---------|----------|---------|
+| BK hurts | ✓ (T/O) | ✓ (1.4-2.2x) | ✓ (6.9-23x) |
+| g-only on 8-add | T/O | mixed | mixed |
+| g-only on mul comm | helps (-31%) | neutral | helps (-31%) |
+| Ripple safest | ✓ | ✓ | ✓ |
+
+**BK is universally harmful** — the only consistent finding across
+all three solvers. Ripple-carry is the safest default for adders.
+g-only provides modest benefits on some benchmarks but is not
+consistently better than ripple.
