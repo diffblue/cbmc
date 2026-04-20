@@ -4193,3 +4193,52 @@ predictably beneficial at BW=10-13 and neutral elsewhere.
 For comba-cs multiplication, the optimal CaDiCaL configuration is
 `elim=0` (disable BVE). This can be set via `CADICAL_OPTS=elim=0`
 or by adding `solver->set("elim", 0)` when multiplication is detected.
+
+## MergeSat Encoding Comparison
+
+### Per-solver encoding effect
+
+**MergeSat (comm BW=9):**
+
+| Encoding | Vars | Conflicts | Time | vs shift |
+|----------|------|-----------|------|----------|
+| shift | 427 | 108,090 | 7.70s | baseline |
+| **comba-cs** | 679 | **30,401** | **1.99s** | **3.9x** |
+| dadda | 427 | 66,042 | 5.11s | 1.5x |
+
+**MergeSat (matrix trace):**
+
+| Encoding | Vars | Conflicts | Time | vs shift |
+|----------|------|-----------|------|----------|
+| shift | 1770 | 572,122 | 41.2s | baseline |
+| **comba-cs** | 3242 | **70,267** | **2.95s** | **14.0x** |
+| dadda | 1770 | 147,566 | 8.06s | 5.1x |
+
+### Cross-solver comparison
+
+| Benchmark | Metric | MergeSat | CaDiCaL |
+|-----------|--------|----------|---------|
+| comm BW=9 | shift→comba-cs conflict reduction | 3.6x | 6.8x |
+| comm BW=9 | shift→comba-cs time speedup | 3.9x | 14.7x |
+| matrix trace | shift→comba-cs time speedup | 14.0x | 54.5x |
+
+### Why comba-cs helps BOTH solvers
+
+The encoding creates a structurally simpler formula. Both solvers
+need fewer conflicts to prove UNSAT. The carry-save structure
+reduces proof complexity REGARDLESS of the solver's search strategy.
+
+The conflict reduction (3.6x on MergeSat, 6.8x on CaDiCaL) shows
+that comba-cs's benefit is partly STRUCTURAL (fewer conflicts needed,
+helps both) and partly SOLVER-SPECIFIC (CaDiCaL's inprocessing BVE
+exploits the BVE-friendly popcount variables, giving additional benefit).
+
+### Why CaDiCaL benefits MORE
+
+CaDiCaL's inprocessing BVE eliminates comba-cs's popcount intermediate
+variables during search, reducing the formula further. MergeSat
+(like MiniSat) lacks inprocessing — it can only do SatELite
+preprocessing, which is less effective on comba-cs's structure.
+
+The BCP cascade benefit (from short carry chains) helps both solvers
+equally. The additional CaDiCaL advantage comes from inprocessing.
