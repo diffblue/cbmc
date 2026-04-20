@@ -152,6 +152,32 @@ void template_mapt::apply(typet &type) const
         {
           if(has_targs || sub.size() == 1)
           {
+            // For template template parameters: when the mapped type
+            // is a template_parameter_symbol_type and the cpp_name has
+            // template_args, replace only the name (preserving args).
+            // Per C++ standard, template template parameter substitution
+            // replaces the template name, not the template arguments.
+            if(
+              has_targs &&
+              entry.second.id() == ID_template_parameter_symbol_type)
+            {
+              const irep_idt &tmpl_id =
+                to_template_parameter_symbol_type(entry.second)
+                  .get_identifier();
+              // Extract base name from the template identifier
+              std::string tmpl_str = id2string(tmpl_id);
+              auto last_sep = tmpl_str.rfind("::");
+              std::string tmpl_base = last_sep != std::string::npos
+                                        ? tmpl_str.substr(last_sep + 2)
+                                        : tmpl_str;
+              // Remove template suffix if present
+              auto angle = tmpl_base.find('<');
+              if(angle != std::string::npos)
+                tmpl_base = tmpl_base.substr(0, angle);
+              sub.front() = irept{ID_name};
+              sub.front().set(ID_identifier, tmpl_base);
+              return;
+            }
             type = entry.second;
             return;
           }
@@ -439,7 +465,27 @@ void template_mapt::set(
     typet tmp=value.type();
 
     irep_idt identifier=parameter.type().get(ID_identifier);
-    type_map[identifier]=tmp;
+
+    // Skip template_parameter_symbol_typet values with numeric
+    // scope IDs — these are unresolved template template parameters.
+    if(tmp.id() == ID_template_parameter_symbol_type)
+    {
+      const irep_idt &ttp_id =
+        to_template_parameter_symbol_type(tmp).get_identifier();
+      std::string ttp_str = id2string(ttp_id);
+      auto ttp_pos = ttp_str.rfind("::");
+      std::string ttp_suffix =
+        ttp_pos != std::string::npos ? ttp_str.substr(ttp_pos + 2) : ttp_str;
+      if(!ttp_suffix.empty() && std::isdigit(ttp_suffix[0]))
+      {
+        // Don't store — the value is an unresolved scope ID.
+        // A later set() call will provide the correct value.
+      }
+      else
+        type_map[identifier] = tmp;
+    }
+    else
+      type_map[identifier] = tmp;
   }
   else
   {

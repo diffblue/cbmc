@@ -2863,12 +2863,23 @@ exprt cpp_typecheck_resolvet::resolve(
         // handler's catch block returns true.
         throw 0;
       }
+      // Template template parameters may have "template." prefix.
+      // Strip it and retry.
+      if(id2string(base_name).substr(0, 9) == "template.")
+      {
+        irep_idt stripped = id2string(base_name).substr(9);
+        id_set = cpp_typecheck.cpp_scopes.current_scope().lookup(
+          stripped, qualified ? cpp_scopet::QUALIFIED : cpp_scopet::RECURSIVE);
+        if(!id_set.empty())
+          goto resolved_after_strip;
+      }
       cpp_typecheck.error() << "symbol '" << base_name << "' is unknown";
     }
 
     cpp_typecheck.error() << messaget::eom;
     throw 0;
   }
+resolved_after_strip:
 
   resolve_identifierst identifiers;
 

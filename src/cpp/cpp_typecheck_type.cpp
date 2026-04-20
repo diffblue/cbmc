@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/mathematical_types.h>
 #include <util/simplify_expr.h>
 #include <util/source_location.h>
+#include <util/symbol_table_base.h>
 
 #include <ansi-c/c_qualifiers.h>
 #include <ansi-c/merged_type.h>
@@ -44,6 +45,29 @@ void cpp_typecheckt::typecheck_type(typet &type)
     error().source_location=type.source_location();
     error() << err << eom;
     throw 0;
+  }
+
+  if(type.id() == ID_template_parameter_symbol_type)
+  {
+    const irep_idt &id =
+      to_template_parameter_symbol_type(type).get_identifier();
+    const symbolt *ttp_sym = symbol_table.lookup(id);
+    if(ttp_sym && ttp_sym->type.get_bool(ID_is_template))
+    {
+      std::string bn = id2string(ttp_sym->base_name);
+      if(bn.substr(0, 9) == "template.")
+        bn = bn.substr(9);
+      cpp_namet cpp_name{bn};
+      type = static_cast<typet &>(static_cast<irept &>(cpp_name));
+      // Fall through to cpp_name handler
+    }
+    else if(ttp_sym && ttp_sym->is_type)
+    {
+      type = ttp_sym->type;
+      return;
+    }
+    else
+      return;
   }
 
   if(type.id()==ID_cpp_name)
