@@ -3651,3 +3651,63 @@ use decide_first with src2_bigger — 12% speedup, zero regression.
 For unconstrained FP addition: the manual case splitting approach
 (assume-based, two solve calls) gives 29% speedup but requires
 infrastructure for splitting and combining results.
+
+## Case Splitting Ceiling Analysis
+
+### Systematic depth exploration (FP add comm, baseline 5.54s)
+
+| Depth | Split variables | Cases | Total time | Speedup |
+|-------|----------------|-------|------------|---------|
+| 0 | none | 1 | 5.54s | baseline |
+| **1** | **148 (exp cmp)** | **2** | **3.93s** | **-29%** |
+| 1 | 377 (subtract) | 2 | 4.88s | -12% |
+| 1 | 768 (barrel ctrl) | 2 | 4.54s | -18% |
+| 2 | 148+377 | 4 | 4.96s | -10% |
+| 3 | 148+377+768 | 8 | 5.26s | -5% |
+
+### Individual depth-2 cases
+
+| 148 | 377 | Time | Interpretation |
+|-----|-----|------|----------------|
+| + | + | 1.11s | a>b, different sign |
+| + | - | **0.51s** | a>b, same sign |
+| - | + | 2.55s | b>a, different sign |
+| - | - | 0.80s | b>a, same sign |
+
+### The ceiling is at depth-1
+
+**Depth-1 on the exponent comparison (var 148) gives the maximum
+speedup of 29%.** Going deeper does NOT help:
+
+- Depth-2 (4 cases): 4.96s — WORSE than depth-1 (3.93s)
+- Depth-3 (8 cases): 5.26s — even worse
+
+The reason: each additional split level adds solver startup
+overhead (~0.1-0.2s per call). With 4 cases at depth-2, the
+overhead is 0.4-0.8s, which exceeds the per-case speedup.
+
+Individual depth-2 cases ARE faster (0.51-2.55s) but the TOTAL
+across all cases exceeds depth-1's total because of the overhead.
+
+### Optimal strategy
+
+**Split on the SINGLE highest-occurrence internal variable.**
+For FP addition, this is the exponent comparison (src2_bigger).
+This gives 29% speedup with only 2 solver calls and minimal
+overhead.
+
+The implementation requires:
+1. After CNF generation, identify the split variable (CBMC knows
+   it — it's src2_bigger from float_utils.cpp:294)
+2. Solve with the variable assumed true
+3. If UNSAT, solve with the variable assumed false
+4. If both UNSAT, return UNSAT
+
+### Applicability
+
+The case splitting ceiling depends on the problem:
+- **FP add comm (5.54s):** 29% ceiling at depth-1
+- **bf16 mul comm:** CNF solves in <1s standalone; the 24.9s
+  overhead is from the smt2_solver pipeline, not the SAT solver
+- **Integer multiplication:** case splitting doesn't help (bottleneck
+  variables are computed values, not control flow)
