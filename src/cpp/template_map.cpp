@@ -80,6 +80,19 @@ void template_mapt::apply(typet &type) const
       for(auto &base : bases)
         apply(static_cast<typet &>(base.add(ID_type)));
     }
+
+    // Traverse the body sub-tree (member declarations).
+    // This handles template template parameter substitution in
+    // using declarations within template bodies.
+    if(type.find(ID_body).is_not_nil())
+    {
+      for(auto &op : type.add(ID_body).get_sub())
+      {
+        irept &decl_type = op.add(ID_type);
+        for(auto &sub : decl_type.get_sub())
+          apply(static_cast<typet &>(sub));
+      }
+    }
   }
   else if(type.id() == ID_template_parameter_symbol_type)
   {
@@ -174,8 +187,51 @@ void template_mapt::apply(typet &type) const
               auto angle = tmpl_base.find('<');
               if(angle != std::string::npos)
                 tmpl_base = tmpl_base.substr(0, angle);
-              sub.front() = irept{ID_name};
-              sub.front().set(ID_identifier, tmpl_base);
+              // Strip 'template.' prefix if present
+              if(tmpl_base.substr(0, 9) == "template.")
+                tmpl_base = tmpl_base.substr(9);
+              // Build a qualified name from the full identifier.
+              // E.g., Tester::template._Apply<Type0> becomes
+              // Tester::_Apply with template_args preserved.
+              if(last_sep != std::string::npos)
+              {
+                std::string prefix = tmpl_str.substr(0, last_sep);
+                irept::subt new_subs;
+                std::size_t pos2 = 0;
+                while(pos2 < prefix.size())
+                {
+                  auto next = prefix.find("::", pos2);
+                  std::string part;
+                  if(next == std::string::npos)
+                  {
+                    part = prefix.substr(pos2);
+                    pos2 = prefix.size();
+                  }
+                  else
+                  {
+                    part = prefix.substr(pos2, next - pos2);
+                    pos2 = next + 2;
+                  }
+                  if(!part.empty())
+                  {
+                    irept name_sub{ID_name};
+                    name_sub.set(ID_identifier, part);
+                    new_subs.push_back(std::move(name_sub));
+                    new_subs.push_back(irept{"::"});
+                  }
+                }
+                irept base_sub{ID_name};
+                base_sub.set(ID_identifier, tmpl_base);
+                new_subs.push_back(std::move(base_sub));
+                for(std::size_t si = 1; si < sub.size(); si++)
+                  new_subs.push_back(sub[si]);
+                sub = std::move(new_subs);
+              }
+              else
+              {
+                sub.front() = irept{ID_name};
+                sub.front().set(ID_identifier, tmpl_base);
+              }
               return;
             }
             type = entry.second;
