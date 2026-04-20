@@ -19,6 +19,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_template_type.h"
 #include "cpp_type2name.h"
 #include "cpp_typecheck.h"
+#include "cpp_typecheck_fargs.h"
+#include "cpp_typecheck_resolve.h"
 
 void cpp_typecheckt::salvage_default_arguments(
   const template_typet &old_type,
@@ -1775,6 +1777,53 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
               {
                 id_set.insert(entry.second);
                 break;
+              }
+            }
+          }
+          // Fallback for qualified names (e.g., Tester::_Apply):
+          // resolve the scope prefix, then look up the template
+          // in that scope.
+          if(id_set.empty())
+          {
+            const cpp_namet *cn = nullptr;
+            if(arg.id() == ID_ambiguous && arg.type().id() == ID_cpp_name)
+              cn = &to_cpp_name(arg.type());
+            else if(arg.id() == ID_type && arg.type().id() == ID_cpp_name)
+              cn = &to_cpp_name(arg.type());
+            if(cn != nullptr && cn->get_sub().size() >= 3)
+            {
+              // Build the scope prefix (everything before the last
+              // ::name)
+              cpp_namet scope_name;
+              for(std::size_t si = 0; si + 2 < cn->get_sub().size(); si++)
+                scope_name.get_sub().push_back(cn->get_sub()[si]);
+              // Resolve the scope prefix as a type
+              cpp_typecheck_resolvet resolver{*this};
+              try
+              {
+                exprt scope_expr = resolver.resolve(
+                  scope_name,
+                  cpp_typecheck_resolvet::wantt::TYPE,
+                  cpp_typecheck_fargst{});
+                if(scope_expr.id() == ID_type)
+                {
+                  irep_idt scope_id;
+                  if(scope_expr.type().id() == ID_struct_tag)
+                    scope_id =
+                      to_struct_tag_type(scope_expr.type()).get_identifier();
+                  if(!scope_id.empty())
+                  {
+                    auto it = cpp_scopes.id_map.find(scope_id);
+                    if(it != cpp_scopes.id_map.end())
+                    {
+                      id_set = static_cast<cpp_scopet &>(*it->second)
+                                 .lookup(template_name, cpp_scopet::SCOPE_ONLY);
+                    }
+                  }
+                }
+              }
+              catch(...)
+              {
               }
             }
           }
