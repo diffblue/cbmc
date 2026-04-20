@@ -4089,3 +4089,43 @@ complexity (2x memory, multi-threading) for marginal benefit:
 If portfolio solving is desired, the simplest approach is:
 run comba-cs with a timeout, then fall back to shift-add if needed.
 This handles the rare case where comba-cs is slow on a SAT problem.
+
+### Root cause: chaotic BVE interaction
+
+Complete BVE data with hints enabled for all bitwidths:
+
+| BW | Hints | Conflicts | Elim | Fixed | Remain | Time | Δ conflicts |
+|----|-------|-----------|------|-------|--------|------|-------------|
+| 12 | no | 39,823 | 499 | 94 | 551 | 1.30s | |
+| 12 | yes | 37,770 | 506 | 150 | **488** | **0.90s** | -5% |
+| 13 | no | 59,859 | 612 | 161 | 552 | 2.66s | |
+| 13 | yes | 65,363 | 645 | 112 | 568 | **1.25s** | +9% |
+| 14 | no | 85,846 | 787 | 185 | 540 | 2.76s | |
+| 14 | yes | 111,080 | 746 | 318 | **448** | **4.39s** | **+29%** |
+| 15 | no | 154,857 | 905 | 168 | 636 | 5.42s | |
+| 15 | yes | 109,960 | 858 | 374 | **477** | **4.62s** | -29% |
+| 16 | no | 103,414 | 811 | 245 | 856 | 4.33s | |
+| 16 | yes | 127,389 | 947 | 175 | **790** | **8.47s** | **+23%** |
+
+**The hints ALWAYS reduce remaining variables** (more fixed vars
+compensate for fewer eliminations). But the effect on CONFLICTS
+is unpredictable: -29% at BW=15 but +29% at BW=14.
+
+**Root cause:** The hints change BVE's elimination ORDER by
+modifying occurrence counts of equality variables. Different
+elimination orders create different RESIDUAL problems. The
+residual problem's difficulty is a chaotic function of the
+elimination order — small perturbations cause large, unpredictable
+changes in the solver's search trajectory.
+
+This is NOT a threshold issue — it's a fundamental property of
+the BVE-hint interaction. No fixed threshold can avoid all
+regressions because the effect depends on the specific BVE
+elimination sequence, which varies chaotically with bitwidth.
+
+**Implication:** The adjacent equality hints are a HEURISTIC
+optimization, not a guaranteed improvement. The 10-13 bit
+threshold is empirically safe but not theoretically justified.
+A more robust approach would require controlling the BVE
+elimination order (e.g., via CaDiCaL's elimination scoring)
+to ensure the hints don't create harder residual problems.
