@@ -105,26 +105,31 @@ $(document).ready(function(){initNavTree('bitvector__types_8h.html',''); initRes
 
 <p>Pre-defined bitvector types.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &quot;<a class="el" href="std__types_8h_source.html">std_types.h</a>&quot;</code><br />
+<div class="textblock"><code>#include &quot;<a class="el" href="expr__cast_8h_source.html">expr_cast.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="mp__arith_8h_source.html">mp_arith.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="type_8h_source.html">type.h</a>&quot;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for bitvector_types.h:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="bitvector__types_8h__incl.svg" width="1164" height="799"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="bitvector__types_8h__incl.svg" width="1256" height="726"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-1-trigger" src="closed.png" alt="+"/> This graph shows which files directly or indirectly include this file:</div>
 <div id="dynsection-1-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-1-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="bitvector__types_8h__dep__incl.svg" width="10468" height="300"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="bitvector__types_8h__dep__incl.svg" width="11326" height="300"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div>
 <p><a href="bitvector__types_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbitvector__typet.html">bitvector_typet</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base class of fixed-width bit-vector types.  <a href="classbitvector__typet.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbv__typet.html">bv_typet</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fixed-width bit-vector without numerical interpretation.  <a href="classbv__typet.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -146,6 +151,10 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:aadba04e5690e61413127a2ecfea55fcb" id="r_aadba04e5690e61413127a2ecfea55fcb"><td class="memItemLeft" align="right" valign="top">template&lt;&gt; </td></tr>
+<tr class="memitem:aadba04e5690e61413127a2ecfea55fcb"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classait.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="bitvector__types_8h.html#aadba04e5690e61413127a2ecfea55fcb">can_cast_type&lt; bitvector_typet &gt;</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classtypet.html">typet</a> &amp;type)</td></tr>
+<tr class="memdesc:aadba04e5690e61413127a2ecfea55fcb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether a reference to a typet is a <a class="el" href="classbitvector__typet.html">bitvector_typet</a>.  <br /></td></tr>
+<tr class="separator:aadba04e5690e61413127a2ecfea55fcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a132851aaf2e0b33d7dc8ebb600dfa9d3" id="r_a132851aaf2e0b33d7dc8ebb600dfa9d3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitvector__types_8h.html#a132851aaf2e0b33d7dc8ebb600dfa9d3">is_signed_or_unsigned_bitvector</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classtypet.html">typet</a> &amp;type)</td></tr>
 <tr class="memdesc:a132851aaf2e0b33d7dc8ebb600dfa9d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">This method tests, if the given typet is a signed or unsigned bitvector.  <br /></td></tr>
 <tr class="separator:a132851aaf2e0b33d7dc8ebb600dfa9d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -221,6 +230,45 @@ Functions</h2></td></tr>
 
 <p class="definition">Definition in file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="aadba04e5690e61413127a2ecfea55fcb" name="aadba04e5690e61413127a2ecfea55fcb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aadba04e5690e61413127a2ecfea55fcb">&#9670;&#160;</a></span>can_cast_type&lt; bitvector_typet &gt;()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">bool</a> <a class="el" href="expr__cast_8h.html#ac7fb78eb80468dbaf7502996c29e3b10">can_cast_type</a>&lt; <a class="el" href="classbitvector__typet.html">bitvector_typet</a> &gt; </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classtypet.html">typet</a> &amp;&#160;</td>
+          <td class="paramname"><em>type</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Check whether a reference to a typet is a <a class="el" href="classbitvector__typet.html">bitvector_typet</a>. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">type</td><td>Source type. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if <code>type</code> is a <a class="el" href="classbitvector__typet.html">bitvector_typet</a>. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00074">74</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
+
+</div>
+</div>
 <a id="a6dc94b793b209e3a19ec01c69454da7e" name="a6dc94b793b209e3a19ec01c69454da7e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6dc94b793b209e3a19ec01c69454da7e">&#9670;&#160;</a></span>can_cast_type&lt; bv_typet &gt;()</h2>
 
@@ -256,7 +304,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if <code>type</code> is a <a class="el" href="classbv__typet.html">bv_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00073">73</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00136">136</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
 
 </div>
 </div>
@@ -295,7 +343,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if <code>type</code> is a <a class="el" href="classfixedbv__typet.html">fixedbv_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00311">311</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00374">374</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
 
 </div>
 </div>
@@ -334,7 +382,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if <code>type</code> is a <a class="el" href="classfloatbv__typet.html">floatbv_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00373">373</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00436">436</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
 
 </div>
 </div>
@@ -373,7 +421,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if <code>type</code> is an <a class="el" href="classinteger__bitvector__typet.html">integer_bitvector_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00137">137</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00200">200</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
 
 </div>
 </div>
@@ -412,7 +460,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if <code>type</code> is a <a class="el" href="classsignedbv__typet.html">signedbv_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00247">247</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00310">310</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
 
 </div>
 </div>
@@ -451,7 +499,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if <code>type</code> is a <a class="el" href="classunsignedbv__typet.html">unsignedbv_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00192">192</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00255">255</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
 
 </div>
 </div>
@@ -481,7 +529,7 @@ template&lt;&gt; </div>
 
 <p>This method tests, if the given typet is a signed or unsigned bitvector. </p>
 
-<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00019">19</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00086">86</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
 
 </div>
 </div>
@@ -519,7 +567,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classbitvector__typet.html">bitvector_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00032">32</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00099">99</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
 
 </div>
 </div>
@@ -557,7 +605,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classbitvector__typet.html">bitvector_typet</a>.   </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00040">40</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00107">107</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
 
 </div>
 </div>
@@ -595,7 +643,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classbv__typet.html">bv_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00086">86</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00149">149</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
 
 </div>
 </div>
@@ -633,7 +681,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classbv__typet.html">bv_typet</a>.   </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00094">94</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00157">157</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
 
 </div>
 </div>
@@ -671,7 +719,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classfixedbv__typet.html">fixedbv_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00324">324</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00387">387</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
 
 </div>
 </div>
@@ -709,7 +757,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classfixedbv__typet.html">fixedbv_typet</a>.   </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00332">332</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00395">395</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
 
 </div>
 </div>
@@ -747,7 +795,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classfloatbv__typet.html">floatbv_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00386">386</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00449">449</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
 
 </div>
 </div>
@@ -785,7 +833,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classfloatbv__typet.html">floatbv_typet</a>.   </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00394">394</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00457">457</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
 
 </div>
 </div>
@@ -823,7 +871,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classinteger__bitvector__typet.html">integer_bitvector_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00151">151</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00214">214</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
 
 </div>
 </div>
@@ -861,7 +909,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classinteger__bitvector__typet.html">integer_bitvector_typet</a>.   </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00159">159</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00222">222</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
 
 </div>
 </div>
@@ -899,7 +947,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classsignedbv__typet.html">signedbv_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00260">260</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00323">323</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
 
 </div>
 </div>
@@ -937,7 +985,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classsignedbv__typet.html">signedbv_typet</a>.   </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00268">268</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00331">331</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
 
 </div>
 </div>
@@ -975,7 +1023,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classunsignedbv__typet.html">unsignedbv_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00205">205</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00268">268</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
 
 </div>
 </div>
@@ -1013,7 +1061,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classunsignedbv__typet.html">unsignedbv_typet</a>.   </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00213">213</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="bitvector__types_8h_source.html#l00276">276</a> of file <a class="el" href="bitvector__types_8h_source.html">bitvector_types.h</a>.</p>
 
 </div>
 </div>

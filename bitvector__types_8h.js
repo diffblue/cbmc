@@ -1,11 +1,13 @@
 var bitvector__types_8h =
 [
+    [ "bitvector_typet", "classbitvector__typet.html", "classbitvector__typet" ],
     [ "bv_typet", "classbv__typet.html", "classbv__typet" ],
     [ "integer_bitvector_typet", "classinteger__bitvector__typet.html", "classinteger__bitvector__typet" ],
     [ "unsignedbv_typet", "classunsignedbv__typet.html", "classunsignedbv__typet" ],
     [ "signedbv_typet", "classsignedbv__typet.html", "classsignedbv__typet" ],
     [ "fixedbv_typet", "classfixedbv__typet.html", "classfixedbv__typet" ],
     [ "floatbv_typet", "classfloatbv__typet.html", "classfloatbv__typet" ],
+    [ "can_cast_type< bitvector_typet >", "bitvector__types_8h.html#aadba04e5690e61413127a2ecfea55fcb", null ],
     [ "can_cast_type< bv_typet >", "bitvector__types_8h.html#a6dc94b793b209e3a19ec01c69454da7e", null ],
     [ "can_cast_type< fixedbv_typet >", "bitvector__types_8h.html#aab70aee1a3afabb19872d25a36294072", null ],
     [ "can_cast_type< floatbv_typet >", "bitvector__types_8h.html#ac719debe2e42c66b93b54610b85487fd", null ],

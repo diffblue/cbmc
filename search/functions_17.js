@@ -24,7 +24,7 @@ var searchData=
   ['widen_5fvalue_5fset_21',['widen_value_set',['../value__set__abstract__object_8cpp.html#aa642956bf62c2fe961e3fc92cdfec31c',1,'value_set_abstract_object.cpp']]],
   ['widened_5franget_22',['widened_ranget',['../classwidened__ranget.html#a0547440f127210cb7dd4e32f09da0622',1,'widened_ranget']]],
   ['widening_5fmerge_23',['widening_merge',['../interval__abstract__value_8cpp.html#a6bd31c4f60e797cbaad8cdb3f640e88d',1,'interval_abstract_value.cpp']]],
-  ['width_24',['width',['../classbitvector__typet.html#a329dda8beb4a928f2cdd0698619871a3',1,'bitvector_typet::width(const mp_integer &amp;)'],['../classbitvector__typet.html#a85b6c74c58b144e2d8f306a514ce1582',1,'bitvector_typet::width() const'],['../classieee__float__spect.html#af291cf7d83ffb8d23e7f08592dd9d71b',1,'ieee_float_spect::width()'],['../classconsolet.html#a8b2f0cf55009c8500ca6d802ff36e67e',1,'consolet::width()']]],
+  ['width_24',['width',['../classieee__float__spect.html#af291cf7d83ffb8d23e7f08592dd9d71b',1,'ieee_float_spect::width()'],['../classconsolet.html#a8b2f0cf55009c8500ca6d802ff36e67e',1,'consolet::width()'],['../classbitvector__typet.html#a329dda8beb4a928f2cdd0698619871a3',1,'bitvector_typet::width(const mp_integer &amp;)'],['../classbitvector__typet.html#a85b6c74c58b144e2d8f306a514ce1582',1,'bitvector_typet::width() const']]],
   ['with_5fexprt_25',['with_exprt',['../classwith__exprt.html#ad9a66237a53b421b55f85b64b0e4d814',1,'with_exprt']]],
   ['with_5flocation_26',['with_location',['../classtypecheckt_1_1errort.html#a37a59d275d2a11da1aa68f142e6d1f0e',1,'typecheckt::errort']]],
   ['with_5fsolver_5fhardness_27',['with_solver_hardness',['../solver__hardness_8h.html#ae24d1a70d42b6469a25e4a6f96b1e1fa',1,'solver_hardness.h']]],
