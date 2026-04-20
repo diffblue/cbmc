@@ -4145,8 +4145,16 @@ literalt bv_utilst::equal(const bvt &op0, const bvt &op1)
   if(prop.has_set_to() && equal_bv.size() >= 10 && equal_bv.size() <= 13)
   {
     for(std::size_t i = 0; i + 1 < equal_bv.size(); i++)
+    {
       if(!equal_bv[i].is_constant() && !equal_bv[i + 1].is_constant())
+      {
         prop.lcnf(equal_bv[i], equal_bv[i + 1]);
+        // Freeze equality variables to prevent BVE from eliminating them.
+        // This ensures hints only affect BCP, not BVE elimination order.
+        prop.set_frozen(equal_bv[i]);
+        prop.set_frozen(equal_bv[i + 1]);
+      }
+    }
   }
 
   return prop.land(equal_bv);

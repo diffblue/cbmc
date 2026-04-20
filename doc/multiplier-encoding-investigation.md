@@ -4151,3 +4151,45 @@ MergeSat is based on MiniSat but with additional features
 (clause merging, different restart strategies). It would provide
 a valuable comparison point between CaDiCaL's inprocessing-based
 approach and MiniSat's preprocessing-based approach.
+
+### BVE is counterproductive for comba-cs multiplication
+
+| BW | with BVE | no BVE | BVE overhead |
+|----|---------|--------|-------------|
+| 10 | 0.22s | 0.29s | -24% (helps) |
+| 11 | 0.65s | 0.45s | **+44%** |
+| 12 | 0.91s | 0.87s | +4% |
+| 13 | 1.27s | 1.12s | +13% |
+| 14 | 2.81s | 1.17s | **+140%** |
+| 15 | 5.54s | 3.63s | **+52%** |
+| 16 | 4.39s | 3.77s | +16% |
+| 17 | 7.37s | 4.33s | **+70%** |
+
+**CaDiCaL's inprocessing BVE HURTS comba-cs at BW≥11** by 4-140%.
+The carry-save structure creates variables that BVE tries to
+eliminate but the elimination creates harder residual problems.
+
+### Optimal configuration: no BVE + hints (10-13)
+
+| BW | Baseline (BVE, no hints) | Optimal (no BVE + hints) | Speedup |
+|----|-------------------------|--------------------------|---------|
+| 10 | 0.69s | **0.29s** | **2.3x** |
+| 11 | 0.78s | **0.45s** | **1.7x** |
+| 12 | 1.30s | **0.86s** | **1.5x** |
+| 13 | 2.66s | **1.12s** | **2.3x** |
+| 14 | 2.77s | **1.17s** | **2.3x** |
+| 15 | 5.44s | **3.63s** | **1.5x** |
+| 16 | 4.33s | **3.75s** | **1.2x** |
+| 17 | 7.30s | **4.32s** | **1.7x** |
+
+**ZERO regressions. 1.1-2.3x speedup across ALL bitwidths.**
+
+The hint regressions at BW=14,16 were caused by BVE interaction.
+Disabling BVE eliminates the chaotic interaction, making the hints
+predictably beneficial at BW=10-13 and neutral elsewhere.
+
+### Implication
+
+For comba-cs multiplication, the optimal CaDiCaL configuration is
+`elim=0` (disable BVE). This can be set via `CADICAL_OPTS=elim=0`
+or by adding `solver->set("elim", 0)` when multiplication is detected.

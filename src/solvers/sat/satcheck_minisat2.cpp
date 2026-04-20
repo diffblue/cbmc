@@ -318,7 +318,6 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve(const bvt &assumptions)
 
 #endif
 
-<<<<<<< HEAD
     {
       log.statistics() << "MiniSat post-solve:"
                        << " conflicts=" << solver->conflicts
@@ -326,7 +325,6 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve(const bvt &assumptions)
                        << " propagations=" << solver->propagations
                        << messaget::eom;
     }
-=======
 #ifdef HAVE_MERGESAT
     // We do not actually use MergeSat's "constrain" clauses at the moment, but
     // MergeSat internally still uses them to track UNSAT. To make sure we
@@ -335,7 +333,6 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve(const bvt &assumptions)
     // See also https://github.com/conp-solutions/mergesat/pull/124
     ((Minisat::Solver *)solver.get())->reset_constrain_clause();
 #endif
->>>>>>> 93cc3bb8b6 (Add support for MergeSat)
 
     if(solver_result == l_True)
     {
