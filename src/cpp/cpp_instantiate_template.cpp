@@ -422,7 +422,29 @@ void cpp_typecheckt::elaborate_class_template(
     (t_type.id() == ID_struct || t_type.id() == ID_union) &&
     t_type.get_bool(ID_template_class_instance))
   {
-    const symbolt &primary_template = lookup(t_type.get(ID_identifier));
+    const symbolt &initial_template = lookup(t_type.get(ID_identifier));
+    // If the instance was created with a concept-constrained partial
+    // specialization but is still empty, follow ID_specialization_of
+    // to get the actual primary template. This re-does the
+    // specialization search with concept evaluation, which may select
+    // a more constrained specialization. Only do this for partial
+    // specializations with concept constraints — full specializations
+    // are always correct.
+    bool has_concept_constraint = false;
+    if(
+      !initial_template.type.get(ID_specialization_of).empty() &&
+      to_struct_union_type(symbol.type).components().empty())
+    {
+      const auto &tmpl_type =
+        to_cpp_declaration(initial_template.type).template_type();
+      for(const auto &p : tmpl_type.template_parameters())
+        if(!p.get("#C_concept_constraint").empty())
+          has_concept_constraint = true;
+    }
+    const symbolt &primary_template =
+      has_concept_constraint
+        ? lookup(initial_template.type.get(ID_specialization_of))
+        : initial_template;
 
     // If this class template is already being instantiated with the
     // same arguments (on the instantiation stack), skip elaboration
@@ -2481,6 +2503,67 @@ const symbolt &cpp_typecheckt::instantiate_template(
             }
             if(!c_type_match)
               continue;
+
+            // Evaluate concept constraints on template parameters.
+            // Skip specializations whose concept is not satisfied.
+            {
+              const auto &spec_params =
+                spec_decl.template_type().template_parameters();
+              bool concept_ok = true;
+              for(std::size_t pi = 0;
+                  pi < spec_params.size() &&
+                  pi < full_args_resolved.arguments().size();
+                  ++pi)
+              {
+                const irep_idt &cc =
+                  spec_params[pi].get("#C_concept_constraint");
+                if(cc.empty())
+                  continue;
+                const auto concept_ids =
+                  cpp_scopes.current_scope().lookup(cc, cpp_scopet::RECURSIVE);
+                if(concept_ids.empty())
+                  continue;
+                const auto *concept_sym =
+                  symbol_table.lookup((*concept_ids.begin())->identifier);
+                if(!concept_sym || !concept_sym->type.get_bool(ID_is_template))
+                  continue;
+                const cpp_declarationt &cdecl =
+                  to_cpp_declaration(concept_sym->type);
+                if(cdecl.declarators().empty())
+                  continue;
+                exprt body = cdecl.declarators()[0].value();
+                if(body.is_nil())
+                  continue;
+                template_mapt cmap;
+                cpp_template_args_tct cargs;
+                cargs.arguments().push_back(full_args_resolved.arguments()[pi]);
+                cmap.build(cdecl.template_type(), cargs);
+                cmap.apply(body);
+                null_message_handlert null_h;
+                message_handlert &old_h = get_message_handler();
+                set_message_handler(null_h);
+                bool old_suppress = suppress_elaborate;
+                suppress_elaborate = false;
+                try
+                {
+                  typecheck_expr(body);
+                  simplify(body, *this);
+                  if(body.is_false())
+                    concept_ok = false;
+                }
+                catch(...)
+                {
+                  concept_ok = false;
+                }
+                suppress_elaborate = old_suppress;
+                set_message_handler(old_h);
+                if(!concept_ok)
+                  break;
+              }
+              if(!concept_ok)
+                continue;
+            }
+
             best_match = &s;
             best_spec_args = guessed;
           }
