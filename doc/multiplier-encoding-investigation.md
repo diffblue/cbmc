@@ -4456,3 +4456,23 @@ internal one, the solver must prove equivalence between two
 DIFFERENT multiplication circuits — harder than two identical ones.
 
 **modexp_step: trivially fast** (0.01-0.03s) regardless of encoding.
+
+### FP and division encoding propagation
+
+**FP multiplication encoding propagation:** Added
+`set_multiplier_encoding_from()` to propagate encoding flags from
+boolbvt's bv_utils to float_utilst's bv_utils. The propagation
+works correctly, but the adaptive comba-cs falls through to
+shift-add for FP's 48-bit multiplication (24 PPs ≤ 32 = 2×48/3,
+width 48 > 32). This is the correct behavior — comba-cs's popcount
+is not beneficial for wide sparse multiplications.
+
+**Division internal multiplication:** `unsigned_multiplier_no_overflow`
+is always shift-add regardless of encoding flags. Only the EXPLICIT
+multiplication `(a/b)*b` in the roundtrip formula uses the encoding.
+This creates a structural mismatch (shift-add internal vs comba-cs
+external) that makes the problem harder.
+
+**Implication:** Making comba-cs the default will NOT affect FP or
+division performance — both correctly use shift-add for their
+internal multiplications through the adaptive fallback.

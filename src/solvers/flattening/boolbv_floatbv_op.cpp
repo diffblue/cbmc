@@ -38,6 +38,11 @@ bvt boolbvt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
   }
 
   float_utilst float_utils(prop);
+  float_utils.set_multiplier_encoding_from(bv_utils);
+  
+  
+  
+  
 
   float_utils.set_rounding_mode(convert_bv(op1));
 
@@ -86,6 +91,7 @@ bvt boolbvt::convert_floatbv_round_to_integral(
   if(expr.op().type().id() == ID_floatbv)
   {
     float_utilst float_utils(prop);
+  float_utils.set_multiplier_encoding_from(bv_utils);
 
     float_utils.set_rounding_mode(convert_bv(expr.rounding_mode()));
     float_utils.spec = ieee_float_spect{to_floatbv_type(expr.op().type())};
@@ -114,6 +120,11 @@ bvt boolbvt::convert_floatbv_op(const ieee_float_op_exprt &expr)
     irep_pretty_diagnosticst{expr});
 
   float_utilst float_utils(prop);
+  float_utils.set_multiplier_encoding_from(bv_utils);
+  
+  
+  
+  
 
   float_utils.set_rounding_mode(rounding_mode_as_bv);
 

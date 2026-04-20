@@ -164,6 +164,15 @@ public:
   bvt debug1(const bvt &op0, const bvt &op1);
   bvt debug2(const bvt &op0, const bvt &op1);
 
+public:
+  void set_multiplier_encoding_from(const bv_utilst &src)
+  {
+    bv_utils.set_comba_carry_save(src.get_comba_carry_save());
+    bv_utils.set_comba(src.get_comba());
+    bv_utils.set_dadda(src.get_dadda());
+    bv_utils.set_dadda_carry_save(src.get_dadda_carry_save());
+  }
+
 protected:
   propt &prop;
   bv_utilst bv_utils;
