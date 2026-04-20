@@ -104,7 +104,7 @@ foreach(SOLVER ${sat_impl})
         download_project(PROJ mergesat
             URL https://github.com/conp-solutions/mergesat/archive/docker-solvers.tar.gz
             PATCH_COMMAND true
-            COMMAND cmake -E copy ${CBMC_SOURCE_DIR}/../scripts/mergesat_CMakeLists.txt CMakeLists.txt
+            COMMAND cmake -E copy ${CBMC_SOURCE_DIR}/scripts/mergesat_CMakeLists.txt CMakeLists.txt
             URL_MD5 1cef063f3255e86beef91f3cdd2eefb7
         )
 
@@ -289,7 +289,8 @@ if(EXISTS "${CMS_DIR}/build/lib/libcryptominisat5.a")
   target_sources(solvers PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/sat/satcheck_cryptominisat.cpp)
   target_include_directories(solvers PUBLIC ${CMS_DIR}/build/include ${CMS_DIR}/src)
   # Use INTERFACE library to avoid libcprover-cpp issues
-  add_library(cms_link INTERFACE)
+  if(NOT TARGET cms_link)
+    add_library(cms_link INTERFACE)
+  endif()
   target_link_libraries(cms_link INTERFACE "${CMS_DIR}/build/lib/libcryptominisat5.a")
-  target_link_libraries(solvers cms_link)
 endif()

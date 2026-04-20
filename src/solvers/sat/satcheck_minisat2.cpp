@@ -245,7 +245,7 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve(const bvt &assumptions)
     {
       struct activity_helper : public T
       {
-        using T::activity;
+        using T::activity_CHB;
         using T::rebuildOrderHeap;
       };
       auto *s = static_cast<activity_helper *>(solver.get());
@@ -253,7 +253,7 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve(const bvt &assumptions)
       {
         bool is_input = v < input_variables.size() && input_variables[v];
         if(!is_input)
-          s->activity[v] += 1.0;
+          s->activity_CHB[v] += 1.0;
       }
       s->rebuildOrderHeap();
     }
@@ -331,7 +331,7 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve(const bvt &assumptions)
     // aren't stuck with "UNSAT" in incremental calls the status needs to be
     // reset.
     // See also https://github.com/conp-solutions/mergesat/pull/124
-    ((Minisat::Solver *)solver.get())->reset_constrain_clause();
+    ((Minisat::SimpSolver *)solver.get())->reset_constrain_clause();
 #endif
 
     if(solver_result == l_True)

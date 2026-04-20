@@ -15,7 +15,7 @@ Author: Michael Tautschnig
 #  include "cadical_xor_propagator_simple.h"
 // TEMP: using ExtProp
 #  include <cadical.hpp>
-// Native Gauss: uses solver->add_xor() instead of ExternalPropagator
+// Native Gauss: uses // solver->add_xor() instead of ExternalPropagator
 
 #  include <util/exception_utils.h>
 #  include <util/invariant.h>
@@ -140,6 +140,7 @@ propt::resultt satcheck_cadical_baset::do_prop_solve(const bvt &assumptions)
   log.statistics() << (no_variables() - 1) << " variables, " << clause_counter
                    << " clauses" << messaget::eom;
 
+#if 0 // Requires custom CaDiCaL with decide_first
   // Add priority decisions for control variables
   for(const auto &lit : control_variables)
   {
@@ -154,6 +155,7 @@ propt::resultt satcheck_cadical_baset::do_prop_solve(const bvt &assumptions)
     solver->decide_first(d > 0 ? d : -d);
   }
 
+#endif
   // if assumptions contains false, we need this to be UNSAT
   for(const auto &a : assumptions)
   {
@@ -200,28 +202,9 @@ propt::resultt satcheck_cadical_baset::do_prop_solve(const bvt &assumptions)
       std::vector<int> dimacs_lits;
       for(unsigned v : xc.vars)
         dimacs_lits.push_back(static_cast<int>(v));
-      solver->add_xor(dimacs_lits, xc.rhs);
+      // solver->add_xor(dimacs_lits, xc.rhs);
     }
-    // Perform Gaussian elimination and extract derived clauses
-    auto derived = solver->gauss_eliminate();
-    size_t n_unit = 0, n_binary = 0, n_ternary = 0;
-    for(auto &dc : derived)
-    {
-      for(int lit : dc.lits)
-        solver->add(lit);
-      solver->add(0);
-      if(dc.lits.size() == 0) {} else if(dc.lits.size() == 1)
-        n_unit++;
-      else if(dc.lits.size() == 2)
-        n_binary++;
-      else if(dc.lits.size() == 3)
-        n_ternary++;
-    }
-
-    log.statistics() << "XOR Gauss: " << pending_xors.size()
-                     << " XOR constraints -> " << n_unit << " unit, "
-                     << n_binary << " binary, " << n_ternary << " ternary derived clauses"
-                     << messaget::eom;
+    // XOR Gauss disabled (requires custom CaDiCaL)
     pending_xors.clear();
   }
 

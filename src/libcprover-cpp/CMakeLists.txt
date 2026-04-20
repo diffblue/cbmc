@@ -77,7 +77,6 @@ string(REPLACE ";" " " DEPENDENCY_TARGETS "${DEPENDENCY_TARGETS}")
 # `cprover-api-cpp` has been built where the `aggregate_dependencies.sh` script is run with the `ar`
 # command, the destination library and the dependencies paths
 add_custom_command(TARGET cprover-api-cpp POST_BUILD
-                   COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/add_dependencies.sh" "${CMAKE_AR}" "$<TARGET_FILE:cprover-api-cpp>" "${DEPENDENCY_TARGETS}"
                    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 
 # Set the properties of `cprover-api-cpp`.  Mainly the output name `libcprover.<version>.a`, its
