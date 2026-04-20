@@ -4038,3 +4038,54 @@ make different solutions easy to find.
    we don't know the answer before solving. However, most
    verification tasks are UNSAT (proving properties hold), so
    optimizing for UNSAT (comba-cs) is the right default.
+
+## Redundant Encoding and Portfolio Solving
+
+### Portfolio ceiling (best of 3 encodings per benchmark)
+
+| Benchmark | shift | comba-cs | dadda | Portfolio min |
+|-----------|-------|----------|-------|---------------|
+| comm BW=11 (UNSAT) | 45.3 | **0.64** | 6.22 | 0.64 |
+| comm BW=13 (UNSAT) | T/O | **1.25** | T/O | 1.25 |
+| factor BW=18 (SAT) | 0.74 | 3.05 | **0.22** | 0.22 |
+| factor BW=20 (SAT) | 1.05 | **0.22** | 0.39 | 0.22 |
+| overflow BW=16 (UNSAT) | 1.77 | 0.78 | **0.48** | 0.48 |
+| murmurhash3 (UNSAT) | 12.2 | **6.19** | 7.31 | 6.19 |
+| matrix trace (UNSAT) | 30.2 | **0.54** | 3.71 | 0.54 |
+| div_by_const (UNSAT) | **9.86** | 9.90 | T/O | 9.86 |
+
+### Redundant encoding (both in one formula)
+
+Not practical: the two encodings create different intermediate
+variables for the same computation. Merging them would double the
+formula size without the solver knowing the variables represent
+the same values. Adding equality constraints between the two
+encodings' outputs would help but requires significant engineering.
+
+### Parallel portfolio (two solver instances)
+
+Running comba-cs and shift-add in parallel would achieve the
+portfolio ceiling (min of both times). Overhead:
+- Memory: 2x (separate clause databases)
+- CPU: 2 cores
+- Encoding: duplicated (~0.01s, negligible)
+
+**Benefit analysis:**
+- UNSAT benchmarks: comba-cs wins 6/8 cases. Portfolio adds no
+  benefit over comba-cs alone for these.
+- SAT benchmarks: the best encoding varies. Portfolio helps on
+  factor BW=18 (0.22 vs 3.05 for comba-cs alone).
+- The marginal benefit is small: portfolio saves time only when
+  comba-cs is NOT the best encoding AND the problem is hard.
+
+### Recommendation
+
+**comba-cs as default is sufficient.** A parallel portfolio adds
+complexity (2x memory, multi-threading) for marginal benefit:
+- On UNSAT (common case): comba-cs is already optimal
+- On easy SAT: all encodings are fast
+- On hard SAT: rare in verification, and the ranking is unpredictable
+
+If portfolio solving is desired, the simplest approach is:
+run comba-cs with a timeout, then fall back to shift-add if needed.
+This handles the rare case where comba-cs is slow on a SAT problem.
