@@ -13,21 +13,24 @@ Author: Daniel Kroening, kroening@kroening.com
 #  include <unistd.h>
 #endif
 
-#include <limits>
-
 #include <util/invariant.h>
 #include <util/threeval.h>
 
 #include <minisat/core/Solver.h>
 #include <minisat/simp/SimpSolver.h>
 
+#include <cstdlib>
+#include <limits>
+
 #ifndef l_False
 #  define l_False Minisat::l_False
 #  define l_True Minisat::l_True
 #endif
 
-#ifndef HAVE_MINISAT2
-#error "Expected HAVE_MINISAT2"
+// MergeSat is based on MiniSat2; variations in their API are handled via
+// #ifdefs
+#if !defined(HAVE_MINISAT2) && !defined(HAVE_MERGESAT)
+#  error "Expected HAVE_MINISAT2 or HAVE_MERGESAT"
 #endif
 
 void convert(const bvt &bv, Minisat::vec<Minisat::Lit> &dest)
@@ -95,7 +98,11 @@ void satcheck_minisat2_baset<T>::set_polarity(literalt a, bool value)
   try
   {
     add_variables();
+#ifdef HAVE_MERGESAT
+    solver->setPolarity(a.var_no(), value);
+#else
     solver->setPolarity(a.var_no(), value ? l_True : l_False);
+#endif
   }
   catch(Minisat::OutOfMemoryException)
   {
@@ -119,12 +126,20 @@ void satcheck_minisat2_baset<T>::clear_interrupt()
 
 std::string satcheck_minisat_no_simplifiert::solver_text() const
 {
+#ifdef HAVE_MERGESAT
+  return "MergeSat 4.0-rc without simplifier";
+#else
   return "MiniSAT 2.2.1 without simplifier";
+#endif
 }
 
 std::string satcheck_minisat_simplifiert::solver_text() const
 {
+#ifdef HAVE_MERGESAT
+  return "MergeSat 4.0-rc4 with simplifier";
+#else
   return "MiniSAT 2.2.1 with simplifier";
+#endif
 }
 
 template<typename T>
@@ -303,6 +318,7 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve(const bvt &assumptions)
 
 #endif
 
+<<<<<<< HEAD
     {
       log.statistics() << "MiniSat post-solve:"
                        << " conflicts=" << solver->conflicts
@@ -310,6 +326,16 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve(const bvt &assumptions)
                        << " propagations=" << solver->propagations
                        << messaget::eom;
     }
+=======
+#ifdef HAVE_MERGESAT
+    // We do not actually use MergeSat's "constrain" clauses at the moment, but
+    // MergeSat internally still uses them to track UNSAT. To make sure we
+    // aren't stuck with "UNSAT" in incremental calls the status needs to be
+    // reset.
+    // See also https://github.com/conp-solutions/mergesat/pull/124
+    ((Minisat::Solver *)solver.get())->reset_constrain_clause();
+#endif
+>>>>>>> 93cc3bb8b6 (Add support for MergeSat)
 
     if(solver_result == l_True)
     {
@@ -368,6 +394,15 @@ satcheck_minisat2_baset<T>::satcheck_minisat2_baset(
     solver(std::make_unique<T>()),
     time_limit_seconds(0)
 {
+#ifdef HAVE_MERGESAT
+  if constexpr(std::is_same<T, Minisat::SimpSolver>::value)
+  {
+    solver->grow_iterations = false;
+    // limit the amount of work spent in simplification; the optimal value needs
+    // to be found via benchmarking
+    solver->nr_max_simp_cls = 1000000;
+  }
+#endif
 }
 
 template <typename T>
