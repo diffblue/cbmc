@@ -13,6 +13,7 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 
 #include <util/bitvector_types.h>
 #include <util/ieee_float.h>
+#include <util/std_types.h>
 
 signedbv_typet get_int_type()
 {

@@ -14,6 +14,7 @@ Author: Daniel Kroening
 #include "xml_goto_trace.h"
 
 #include <util/arith_tools.h>
+#include <util/bitvector_types.h>
 #include <util/namespace.h>
 #include <util/string_constant.h>
 #include <util/symbol.h>

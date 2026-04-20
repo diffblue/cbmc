@@ -771,9 +771,8 @@ simplify_exprt::simplify_bitwise(const multi_ary_exprt &expr)
   // 'all zeros' in bitand yields zero
   if(new_expr.id() == ID_bitand)
   {
-    const constant_exprt zero = new_expr.type().id() == ID_bv
-                                  ? to_bv_type(new_expr.type()).all_zeros_expr()
-                                  : from_integer(0, new_expr.type());
+    const constant_exprt zero =
+      to_bitvector_type(new_expr.type()).all_zeros_expr();
     for(const auto &op : new_expr.operands())
     {
       if(op == zero)

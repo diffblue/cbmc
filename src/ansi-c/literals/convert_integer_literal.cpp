@@ -11,12 +11,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "convert_integer_literal.h"
 
-#include <cctype>
-
 #include <util/arith_tools.h>
+#include <util/c_types.h> // IWYU pragma: keep
 #include <util/config.h>
 #include <util/std_expr.h>
 #include <util/string2int.h>
+
+#include <cctype>
 
 exprt convert_integer_literal(const std::string &src)
 {

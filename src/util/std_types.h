@@ -900,65 +900,6 @@ inline array_typet &to_array_type(typet &type)
   return static_cast<array_typet &>(type);
 }
 
-/// Base class of fixed-width bit-vector types
-///
-/// Superclass of anything represented by bits, for example integers (in 32
-/// or 64-bit representation), floating point numbers etc. In contrast, \ref
-/// integer_typet is a direct integer representation.
-class bitvector_typet : public typet
-{
-public:
-  explicit bitvector_typet(const irep_idt &_id) : typet(_id)
-  {
-  }
-
-  bitvector_typet(const irep_idt &_id, std::size_t width) : typet(_id)
-  {
-    set_width(width);
-  }
-
-  bitvector_typet(const irep_idt &_id, mp_integer _width) : typet(_id)
-  {
-    width(_width);
-  }
-
-  std::size_t get_width() const
-  {
-    return get_size_t(ID_width);
-  }
-
-  std::size_t width() const;
-
-  void set_width(std::size_t width)
-  {
-    set_size_t(ID_width, width);
-  }
-
-  void width(const mp_integer &);
-
-  static void check(
-    const typet &type,
-    const validation_modet vm = validation_modet::INVARIANT)
-  {
-    DATA_CHECK(
-      vm, !type.get(ID_width).empty(), "bitvector type must have width");
-  }
-};
-
-/// Check whether a reference to a typet is a \ref bitvector_typet.
-/// \param type: Source type.
-/// \return True if \p type is a \ref bitvector_typet.
-template <>
-inline bool can_cast_type<bitvector_typet>(const typet &type)
-{
-  return type.id() == ID_signedbv || type.id() == ID_unsignedbv ||
-         type.id() == ID_fixedbv || type.id() == ID_floatbv ||
-         type.id() == ID_verilog_signedbv ||
-         type.id() == ID_verilog_unsignedbv || type.id() == ID_bv ||
-         type.id() == ID_pointer || type.id() == ID_c_bit_field ||
-         type.id() == ID_c_bool;
-}
-
 /// String type
 ///
 /// Represents string constants, such as `@class_identifier`.
