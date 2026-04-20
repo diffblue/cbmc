@@ -4129,3 +4129,25 @@ threshold is empirically safe but not theoretically justified.
 A more robust approach would require controlling the BVE
 elimination order (e.g., via CaDiCaL's elimination scoring)
 to ensure the hints don't create harder residual problems.
+
+## MergeSat Integration (In Progress)
+
+Cherry-picked MergeSat support from tautschnig/mergesat branch.
+MergeSat source downloads and configures successfully, but build
+fails due to API incompatibilities between the downloaded MergeSat
+version and the integration code:
+
+1. `reset_constrain_clause` not available in downloaded version
+2. `bool` to `Minisat::lbool` conversion difference
+3. `grow_iterations` member not available
+
+These require updating the MergeSat integration code to match
+the downloaded version's API. Once fixed, MergeSat testing would
+validate whether our encoding improvements (comba-cs, equality
+hints) transfer to a different SAT solver with different
+BVE/search strategies.
+
+MergeSat is based on MiniSat but with additional features
+(clause merging, different restart strategies). It would provide
+a valuable comparison point between CaDiCaL's inprocessing-based
+approach and MiniSat's preprocessing-based approach.
