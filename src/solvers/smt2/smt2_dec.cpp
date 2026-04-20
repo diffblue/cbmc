@@ -25,8 +25,6 @@ std::string smt2_dect::decision_procedure_text() const
      solver==solvert::BITWUZLA?"Bitwuzla":
      solver==solvert::BOOLECTOR?"Boolector":
      solver==solvert::CPROVER_SMT2?"CPROVER SMT2":
-     solver==solvert::CVC3?"CVC3":
-     solver==solvert::CVC4?"CVC4":
      solver==solvert::CVC5?"CVC5":
      solver==solvert::MATHSAT?"MathSAT":
      solver==solvert::YICES?"Yices":
@@ -87,23 +85,6 @@ decision_proceduret::resultt smt2_dect::dec_solve(const exprt &assumption)
   case solvert::CPROVER_SMT2:
     argv = {solver_binary_name("smt2_solver")};
     stdin_filename = temp_file_problem();
-    break;
-
-  case solvert::CVC3:
-    argv = {
-      solver_binary_name("cvc3"),
-      "+model",
-      "-lang",
-      "smtlib",
-      "-output-lang",
-      "smtlib",
-      temp_file_problem()};
-    break;
-
-  case solvert::CVC4:
-    // The flags --bitblast=eager --bv-div-zero-const help but only
-    // work for pure bit-vector formulas.
-    argv = {solver_binary_name("cvc4"), "-L", "smt2", temp_file_problem()};
     break;
 
   case solvert::CVC5:
