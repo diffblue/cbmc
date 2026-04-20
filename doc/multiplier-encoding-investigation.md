@@ -3711,3 +3711,88 @@ The case splitting ceiling depends on the problem:
   overhead is from the smt2_solver pipeline, not the SAT solver
 - **Integer multiplication:** case splitting doesn't help (bottleneck
   variables are computed values, not control flow)
+
+## Learned Clause Lifecycle Analysis
+
+### Methodology
+
+CaDiCaL with `-DLOGGING` and `set("log", 1)` prints clause creation
+("1st UIP size S and glue G clause lits") and deletion events
+("delete redundant clause[ID] lits") with conflict numbers.
+
+We analyzed: (1) which clauses live longest (created early, never
+deleted), (2) which clauses are learned latest (hardest to derive),
+and (3) which variables dominate in each category.
+
+### Multiplier (comba-cs BW=9, 677 vars, ~5K conflicts)
+
+**Longest-lived clauses:** Unit clauses from BVE (vars 214, 183,
+-266, -22, -210), created at conflict 1, NEVER deleted. These are
+the BVE elimination results that persist throughout the entire solve.
+
+**Late-learned clauses (near final conflict):**
+- vars 487, 485, 479: high-numbered variables near the end of the
+  circuit — these are EQUALITY CHECK variables comparing the two
+  multiplication outputs.
+- vars 489, 488: also equality check variables.
+
+**Long-lived clause variables:** vars 180, 231, 169, 214, 98, 80, 265
+— all INTERNAL multiplication variables (popcount intermediates,
+carry chain variables). These appear in clauses that persist
+throughout the solve because they encode structural relationships
+that remain relevant.
+
+**Interpretation:** The solver learns structural relationships about
+the multiplication circuit early (BVE unit clauses) and retains them.
+The HARDEST clauses to learn (latest) involve the equality check
+between the two multiplications — confirming that the equivalence
+proof is the bottleneck, not the individual multiplications.
+
+### FP Addition (2654 vars, ~191K conflicts)
+
+**Longest-lived clauses:**
+1. Unit clauses: vars -93, -126 (BVE results, NEVER deleted)
+2. A 6-literal clause containing **var 377 (subtract flag)**:
+   `-126 -567 377 -2654 -93 -577` — created at conflict 2,
+   NEVER deleted. This clause connects the subtract flag to
+   BVE-derived unit literals.
+
+**Late-learned clauses:**
+- Conflict 483: `1481 -1456 1476 -1395` — contains **var 1395**
+  (second addition's exponent comparison, 273 occurrences)
+- Conflict 458: `576 462 377 -64` — contains **var 377**
+  (subtract flag) and **var 64** (input sign bit b[31])
+  and **var 462** (barrel shifter control, 125 occurrences)
+
+**Long-lived clause variables:** vars 90, 813, 213, 851, 127, 128,
+928, 112 — barrel shifter outputs (813, 851), exponent arithmetic
+(127, 128, 90), and normalization variables (928).
+
+**Interpretation:** The solver learns relationships about the barrel
+shifter and exponent arithmetic early and retains them. The HARDEST
+clauses to learn (latest) involve the **control variables** we
+identified: subtract flag (377), exponent comparison (1395), and
+barrel shifter control (462). The solver struggles with these
+until the very end — confirming our proof bottleneck analysis.
+
+### Cross-circuit comparison
+
+| Property | Multiplier | FP Addition |
+|----------|-----------|-------------|
+| Longest-lived | BVE unit clauses | BVE units + subtract flag clause |
+| Late-learned vars | Equality check vars | **Control variables** (377, 1395, 462) |
+| Long-lived vars | Popcount intermediates | Barrel shifter outputs |
+| Bottleneck nature | Equivalence proof | **Control flow resolution** |
+
+**Key finding:** The late-learned clauses confirm the structural
+analysis:
+- **Multiplier:** the solver struggles with the EQUALITY CHECK
+  (comparing two multiplication outputs) — this is the equivalence
+  proof bottleneck that comba-cs addresses by making the proof smaller.
+- **FP addition:** the solver struggles with CONTROL VARIABLES
+  (subtract flag, exponent comparison) — these are the MUX control
+  variables that decide_first and case splitting address.
+
+The lifecycle analysis validates both optimization approaches:
+comba-cs reduces the multiplication equivalence proof, and
+case splitting resolves FP control variables early.
