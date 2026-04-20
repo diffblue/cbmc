@@ -202,6 +202,17 @@ std::size_t address_bits(const mp_integer &size)
   return result;
 }
 
+bool is_power_of_two(const mp_integer &n)
+{
+  mp_integer x;
+
+  for(x = 1; n > x; x *= 2)
+  {
+  }
+
+  return x == n;
+}
+
 /// A multi-precision implementation of the power operator.
 /// \par parameters: Two mp_integers, base and exponent
 /// \return One mp_integer with the value base^{exponent}

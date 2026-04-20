@@ -3,13 +3,17 @@
 /// \file
 /// Unit tests for smt2_convt
 
+#include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
+#include <util/mathematical_types.h>
+#include <util/message.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 
 #include <solvers/smt2/smt2_conv.h>
+#include <solvers/smt2/smt2_dec.h>
 #include <testing-utils/use_catch.h>
 
 TEST_CASE(
@@ -129,4 +133,33 @@ TEST_CASE(
   // the non-zero-width operand directly, not (concat x)
   concatenation_exprt concat{{z, x}, u8};
   REQUIRE(get_assert(equal_exprt{concat, x}) == "(assert (= x x))");
+}
+
+TEST_CASE("smt2_convt range encoding", "[core][solvers][smt2]")
+{
+  symbol_tablet symbol_table;
+  namespacet ns{symbol_table};
+  null_message_handlert message_handler;
+  smt2_dect smt2_dec(
+    ns,
+    "unit test",
+    "",
+    "QF_AUFBV",
+    smt2_dect::solvert::Z3,
+    "",
+    message_handler);
+
+  GIVEN("An unsatisfiable formula over range-typed variables")
+  {
+    integer_range_typet range_type{0, 2}; // {0,...,2}
+    symbol_exprt a{"a", range_type};
+    smt2_dec << notequal_exprt{a, from_integer(0, range_type)};
+    smt2_dec << notequal_exprt{a, from_integer(1, range_type)};
+    smt2_dec << notequal_exprt{a, from_integer(2, range_type)};
+
+    THEN("the SMT2 solver says it's UNSAT")
+    {
+      REQUIRE(smt2_dec() == decision_proceduret::resultt::D_UNSATISFIABLE);
+    }
+  }
 }

@@ -142,6 +142,7 @@ SRC += analyses/ai/ai.cpp \
        solvers/strings/string_refinement/string_refinement.cpp \
        solvers/strings/string_refinement/substitute_array_list.cpp \
        solvers/strings/string_refinement/union_find_replace.cpp \
+       util/arith_tools.cpp \
        util/bitvector_expr.cpp \
        util/case_expr.cpp \
        util/cmdline.cpp \
