@@ -3855,3 +3855,53 @@ carry propagation that the solver was learning LATE in the search.
 This is the equality-check analog of the g-only technique for adders:
 adding redundant clauses that create propagation paths the solver
 would otherwise need to discover through conflict analysis.
+
+### Complete bitwidth sweep (multiplication commutativity, comba-cs)
+
+| BW | Without hints | With hints (10-16) | Change | In threshold? |
+|----|--------------|-------------------|--------|---------------|
+| 7 | 0.03s | 0.03s | 0% | no |
+| 8 | 0.12s | 0.12s | 0% | no |
+| 9 | 0.13s | 0.13s | 0% | no |
+| **10** | 0.69s | **0.22s** | **-68%** | YES |
+| **11** | 0.78s | **0.64s** | **-18%** | YES |
+| **12** | 1.29s | **0.90s** | **-30%** | YES |
+| **13** | 2.66s | **1.25s** | **-53%** | YES |
+| 14 | 2.77s | 4.39s | **+59%** | YES (regression!) |
+| 15 | 5.45s | 4.62s | -15% | YES |
+| 16 | 4.32s | 8.42s | **+94%** | YES (regression!) |
+| 17 | 7.28s | 7.25s | 0% | no |
+| 19 | 16.10s | 16.00s | 0% | no |
+
+**Non-monotonic behavior:** hints help at BW=10-13 and BW=15 but
+HURT at BW=14 (+59%) and BW=16 (+94%). The regressions are stable
+(confirmed across 3 runs). They occur because the extra binary
+clauses change BVE's elimination order, creating a harder residual
+at specific bitwidths.
+
+**Safe threshold: 10-13.** This gives 18-68% speedup with zero
+regressions on multiplication. BW=14+ is excluded.
+
+### Adder results
+
+| Benchmark | Without hints | With hints | Change |
+|-----------|--------------|------------|--------|
+| 10-bit 6-add reorder | 0.54s | **0.33s** | **-38%** |
+| 12-bit 4-add reorder | 0.06s | 0.08s | +30% (regression) |
+| 16-bit 6-add reorder | 1.42s | **0.88s** | **-38%** (with 10-16 threshold) |
+
+The hints help adders when the equality check is the bottleneck
+(many additions, hard equality). They hurt when the equality is
+easy (few additions). The same non-monotonic pattern as multiplication.
+
+### Pattern analysis
+
+The hints help when:
+1. The equality check has 10-13 bits (sweet spot)
+2. The equality check is the BOTTLENECK (hard problem)
+3. The solver would otherwise learn these clauses LATE
+
+The hints hurt when:
+1. The equality check has 14+ bits (too many extra clauses)
+2. The equality check is NOT the bottleneck (easy problem)
+3. The extra clauses interfere with BVE elimination order
