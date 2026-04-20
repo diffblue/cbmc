@@ -3602,3 +3602,52 @@ creation point.
 FP multiplication does NOT have these control variables (no
 conditional branching — always multiply). FP FMA has similar
 control variables (subtract_lit for the addition step).
+
+## Depth-2 Decision Control Investigation
+
+### Configurations tested
+
+| Config | FP add comm | FP add pos | int mul BW=11 |
+|--------|------------|------------|---------------|
+| Baseline (no decide_first) | **4.41s** | 1.42s | 0.78s |
+| Depth-1: src2_bigger only | 4.62s | **1.25s** | 0.78s |
+| Depth-1: subtract_lit only | 4.52s | 1.25s | 0.78s |
+| Depth-2 LIFO: both (sub first) | 4.53s | 1.25s | 0.78s |
+| Depth-2 FIFO: both (exp first) | 5.13s | 1.32s | 0.78s |
+| Manual 2-way split (assume) | **3.87s** | — | — |
+| Manual 4-way split (assume) | 5.00s | — | — |
+
+### Analysis
+
+**Depth-2 decide_first does NOT improve over depth-1.** The solver
+must still backtrack through all combinations within a single solve
+call. The backtracking overhead negates the per-case speedup.
+
+**Manual case splitting (assume) remains better** for the full FP
+add comm case (3.87s vs 4.41s = 29% speedup) because each
+subproblem gets a clean solver state.
+
+**decide_first is effective for depth-1** when there's a single
+dominant control variable (FP positive: 12% speedup). For depth-2,
+the two control variables interact — deciding one doesn't fully
+resolve the other's MUX gates.
+
+### Why depth-2 doesn't help in a single solve call
+
+In the manual 4-way split, each case has BOTH variables fixed:
+- Case (148=+, 377=-): ALL MUX gates resolved → 0.51s
+- The solver works on a SIMPLIFIED formula
+
+With decide_first depth-2, the solver decides both variables early
+but then must EXPLORE all 4 combinations through backtracking.
+The learned clauses from one branch may not help (or may hurt)
+other branches by polluting the clause database.
+
+### Recommendation
+
+For FP addition with constrained inputs (positive, bounded range):
+use decide_first with src2_bigger — 12% speedup, zero regression.
+
+For unconstrained FP addition: the manual case splitting approach
+(assume-based, two solve calls) gives 29% speedup but requires
+infrastructure for splitting and combining results.
