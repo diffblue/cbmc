@@ -1,0 +1,11 @@
+KNOWNBUG gcc14
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+Concept-constrained specialization ordering with __is_pointer and
+__remove_pointer builtins fails on GCC 14.2+ system headers.
+The builtins interact differently with GCC 14.2's type_traits,
+causing incorrect specialization selection. Passes on GCC 13.
