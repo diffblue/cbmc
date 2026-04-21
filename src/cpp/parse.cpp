@@ -9790,19 +9790,59 @@ bool Parser::rPrimaryExpr(exprt &exp)
     // C++20 requires expression
     lex.get_token(tk);
     // Optional parameter list: requires(T c) { ... }
+    // Parse and store parameter declarations for evaluation.
+    irept requires_params;
     if(lex.LookAhead(0) == '(')
     {
-      lex.get_token(tk);
-      int depth = 1;
-      while(depth > 0)
+      auto param_saved = lex.Save();
+      lex.get_token(tk); // consume '('
+      // Try to parse parameter declarations
+      bool parsed_params = true;
+      while(lex.LookAhead(0) != ')' && lex.LookAhead(0) != 0)
       {
-        int t = lex.get_token(tk);
-        if(t == '(')
-          ++depth;
-        else if(t == ')')
-          --depth;
-        else if(t == 0)
-          return false;
+        typet param_type;
+        if(!rTypeNameOrFunctionType(param_type))
+        {
+          parsed_params = false;
+          break;
+        }
+        // Optional parameter name
+        irep_idt param_name;
+        if(is_identifier(lex.LookAhead(0)))
+        {
+          cpp_tokent name_tk;
+          lex.get_token(name_tk);
+          param_name = name_tk.data.get(ID_C_base_name);
+        }
+        irept param;
+        param.add(ID_type).swap(param_type);
+        if(!param_name.empty())
+          param.set(ID_name, param_name);
+        requires_params.get_sub().push_back(std::move(param));
+        if(lex.LookAhead(0) == ',')
+          lex.get_token(tk);
+      }
+      if(parsed_params && lex.LookAhead(0) == ')')
+      {
+        lex.get_token(tk); // consume ')'
+      }
+      else
+      {
+        // Fallback: skip the parameter list
+        lex.Restore(param_saved);
+        lex.get_token(tk); // consume '('
+        int depth = 1;
+        while(depth > 0)
+        {
+          int t = lex.get_token(tk);
+          if(t == '(')
+            ++depth;
+          else if(t == ')')
+            --depth;
+          else if(t == 0)
+            return false;
+        }
+        requires_params.clear();
       }
     }
     if(lex.LookAhead(0) == '{')
@@ -9938,6 +9978,60 @@ bool Parser::rPrimaryExpr(exprt &exp)
             }
             lex.Restore(req_saved);
           }
+          // Compound requirement: { expr } -> concept<type>; or { expr };
+          if(lex.LookAhead(0) == '{')
+          {
+            auto compound_saved = lex.Save();
+            cpp_tokent req_tk;
+            lex.get_token(req_tk); // consume '{'
+            exprt inner_expr;
+            if(rExpression(inner_expr, false) && lex.LookAhead(0) == '}')
+            {
+                lex.get_token(req_tk); // consume '}'
+                if(lex.LookAhead(0) == TOK_ARROW)
+                {
+                  lex.get_token(req_tk); // consume '->'
+                  irept constraint_name;
+                  if(rName(constraint_name) && lex.LookAhead(0) == ';')
+                  {
+                    lex.get_token(req_tk); // consume ';'
+                    exprt compound{"compound_requirement"};
+                    compound.type() = c_bool_type();
+                    compound.add_to_operands(std::move(inner_expr));
+                    compound.add("#constraint").swap(constraint_name);
+                    result = and_exprt{std::move(result), std::move(compound)};
+                    continue;
+                  }
+                }
+                else if(lex.LookAhead(0) == ';')
+                {
+                  // { expr }; — simple requirement in braces
+                  lex.get_token(req_tk); // consume ';'
+                  exprt req{"simple_requirement"};
+                  req.type() = c_bool_type();
+                  req.add_to_operands(std::move(inner_expr));
+                  result = and_exprt{std::move(result), std::move(req)};
+                  continue;
+                }
+            }
+            lex.Restore(compound_saved);
+          }
+          // Simple requirement: expr;
+          {
+            auto expr_saved = lex.Save();
+            exprt simple_expr;
+            if(rExpression(simple_expr, false) && lex.LookAhead(0) == ';')
+            {
+                cpp_tokent semi_tk;
+                lex.get_token(semi_tk); // consume ';'
+                exprt req{"simple_requirement"};
+                req.type() = c_bool_type();
+                req.add_to_operands(std::move(simple_expr));
+                result = and_exprt{std::move(result), std::move(req)};
+                continue;
+            }
+            lex.Restore(expr_saved);
+          }
           // Skip unknown requirement
           {
             cpp_tokent skip_tk;
@@ -9967,6 +10061,9 @@ bool Parser::rPrimaryExpr(exprt &exp)
           lex.get_token(close_tk);
         }
         exp = std::move(result);
+        // Attach requires-expression parameters for evaluation
+        if(!requires_params.get_sub().empty())
+          exp.add("#requires_params").swap(requires_params);
       }
     }
     else
