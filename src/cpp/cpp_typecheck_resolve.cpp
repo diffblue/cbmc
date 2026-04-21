@@ -4119,7 +4119,15 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
             symbol_exprt synthetic{"funcaddr_synthetic", arg_type};
             cpp_typecheck_fargst synthetic_fargs;
             synthetic_fargs.operands.push_back(synthetic);
-            exprt result = guess_function_template_args(expr, synthetic_fargs);
+            exprt result;
+            try
+            {
+              result = guess_function_template_args(expr, synthetic_fargs);
+            }
+            catch(...)
+            {
+              continue;
+            }
             if(result.is_not_nil())
             {
               deduced_from_context = true;
