@@ -4741,3 +4741,66 @@ Multiplier encoding irrelevant (no multiplication). **g-only 2x faster.**
    on some benchmarks but causes 45-120% regressions on comba-cs
    at BW≥11. The g-only benefit on pure addition can be achieved
    by using g-only ONLY for top-level adders (not inside multiplication).
+
+
+### Optimal per-solver configuration (with separate adder control)
+
+Using `--adder-encoding` for top-level adders and `--multiplier-adder`
+for adders inside multiplication:
+
+| Solver | Multiplier | Mul-internal adder | Top-level adder | Rationale |
+|--------|-----------|-------------------|-----------------|-----------|
+| CaDiCaL | comba-cs | ripple | **BK** | BK 16x on equiv_unsat; ripple inside mul avoids T/O |
+| MiniSat | comba-cs | ripple | **g-only** | g-only 2x on equiv_unsat, 31% on mul comm |
+| MergeSat | comba-cs | ripple | ripple | g-only helps 8-add but hurts comba-cs BW≥11 |
+
+Note: for comba-cs and dadda, the `--multiplier-adder` flag is
+irrelevant (they use `full_adder` directly, not `adder()`). The
+top-level adder encoding affects:
+- Direct additions in user code (a + b)
+- The equality check encoding
+- The popcount's internal `add()` calls in comba-cs
+
+The BK T/O on multiplication is caused by BK being used for the
+popcount's internal additions AND the equality check, not just
+the top-level adder. With `--multiplier-adder ripple`, the
+popcount would still use ripple (since comba-cs ignores
+multiplier-adder), but the equality check would use BK.
+
+**TODO:** Verify that `--adder-encoding brent-kung` with
+`--multiplier-adder ripple-carry` actually avoids the BK T/O
+on multiplication. The BK T/O might be from the equality check
+(which uses the top-level adder encoding), not from inside
+the multiplication.
+
+### Fix: comba-cs now respects multiplier_adder_encoding
+
+Added adder_encoding swap in comba_carry_save() and dadda_carry_save()
+so that the popcount's internal add() calls use multiplier_adder_encoding
+(default: ripple) instead of the top-level adder_encoding.
+
+**Before fix:** `--adder-encoding brent-kung` caused T/O on comba-cs
+because BK was used for popcount's internal additions.
+
+**After fix:** BK only affects top-level adders (direct additions,
+equality check). Popcount always uses ripple.
+
+**CaDiCaL results after fix:**
+
+| Benchmark | comba-cs+ripple | comba-cs+BK | comba-cs+g-only |
+|-----------|----------------|-------------|-----------------|
+| mul comm BW=9 | 0.13 | 0.13 | 0.13 |
+| mul comm BW=11 | 0.64 | 0.64 | 0.64 |
+| equiv_unsat | 0.63 | **0.04** | 0.60 |
+| matrix trace | **0.54** | 1.59 | 0.72 |
+
+BK no longer causes T/O on multiplication. It still helps 16x on
+equiv_unsat. But it hurts matrix trace (0.54→1.59) because the
+direct additions in the matrix trace use BK.
+
+**Revised optimal CaDiCaL configuration:**
+- comba-cs for multiplication
+- BK for top-level adder ONLY when the problem is addition-heavy
+  (equiv_unsat-style)
+- Ripple for top-level adder when multiplication is present
+  (matrix trace, mul comm)

@@ -2959,9 +2959,21 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
     if(use_wallace_tree)
       return wallace_tree(pps);
     if(use_comba_carry_save)
-      return comba_carry_save(pps);
+    {
+      auto saved = adder_encoding;
+      adder_encoding = multiplier_adder_encoding;
+      auto result = comba_carry_save(pps);
+      adder_encoding = saved;
+      return result;
+    }
     if(use_dadda_carry_save)
-      return dadda_carry_save(pps);
+    {
+      auto saved = adder_encoding;
+      adder_encoding = multiplier_adder_encoding;
+      auto result = dadda_carry_save(pps);
+      adder_encoding = saved;
+      return result;
+    }
     if(use_comba)
       return comba_column_wise(pps);
     if(use_dadda)
