@@ -4857,3 +4857,40 @@ solvers.** Neither BK nor g-only can be safely deployed as a default:
 
 BK and g-only should remain available as CLI options for users who
 know their workload is addition-heavy.
+
+### Equality hint regression: deep investigation
+
+**Regression persists without BVE and with different hint patterns:**
+
+| Pattern | BW=13 | BW=14 |
+|---------|-------|-------|
+| No hints (no BVE) | 1.55s | 1.16s |
+| Adjacent hints (no BVE) | 1.11s (-28%) | 1.79s (+54%) |
+| Skip-1 hints (no BVE) | 0.82s (-47%) | 1.52s (+31%) |
+| Single hint (no BVE) | 1.58s (0%) | 1.18s (0%) |
+
+**Regression onset at BW=14 (no BVE):**
+
+| n_hints | BW=14 time | BW=13 time |
+|---------|-----------|-----------|
+| 0 | 1.16s | 1.55s |
+| 3 | 1.90s (+64%) | 1.17s (-25%) |
+| 5 | 2.11s (+82%) | 0.94s (-39%) |
+| 7 | 2.01s | 1.55s (0%) |
+| 9 | 2.08s | 1.05s (-32%) |
+
+**The behavior is CHAOTIC:** at BW=13, 3 hints help but 7 hints
+are neutral. At BW=14, 3 hints already cause 64% regression.
+The effect is non-monotonic in the number of hints.
+
+**Root cause: SAT solver butterfly effect.** Even 3 extra binary
+clauses change the unit propagation graph, which changes conflict
+discovery order, which changes learned clauses, which changes the
+entire search trajectory. This is an inherent property of CDCL
+solvers — small perturbations to the clause structure cause large,
+unpredictable changes in solving time.
+
+**This is NOT fixable** by adjusting hint count, pattern, BVE
+settings, or variable freezing. The hints are a heuristic that
+helps on average but can hurt on specific instances. The 10-13
+bit threshold is an empirical safe zone.
