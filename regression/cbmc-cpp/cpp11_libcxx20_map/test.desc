@@ -1,4 +1,4 @@
-KNOWNBUG libcxx20
+CORE libcxx20
 main.cpp
 --cpp11 --stdlib libc++ --unwind 5 --no-unwinding-assertions
 ^VERIFICATION
