@@ -4062,7 +4062,76 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
       }
     }
     if(!all_have_defaults)
-      return nil_exprt(); // give up
+    {
+      // [temp.deduct.funcaddr]: try to deduce template arguments
+      // from the function's parameter types by matching against
+      // known class template instantiations in the symbol table.
+      // Build synthetic fargs from the instantiation types and
+      // let the existing deduction code handle the matching.
+      bool deduced_from_context = false;
+      if(
+        cpp_declaration.declarators().size() == 1 &&
+        cpp_declaration.declarators()[0].type().id() == ID_function_type)
+      {
+        const auto &fn_params =
+          cpp_declaration.declarators()[0].type().find(ID_parameters);
+        for(const auto &param : fn_params.get_sub())
+        {
+          if(param.id() != ID_cpp_declaration)
+            continue;
+          const auto &pdecl =
+            to_cpp_declaration(static_cast<const exprt &>(param));
+          if(pdecl.declarators().empty())
+            continue;
+          typet ptype = pdecl.declarators()[0].merge_type(pdecl.type());
+          // Strip reference
+          bool is_ref = false;
+          if(ptype.id() == ID_frontend_pointer || ptype.id() == ID_pointer)
+          {
+            if(!ptype.get_sub().empty())
+              ptype = static_cast<const typet &>(ptype.get_sub()[0]);
+            is_ref = true;
+          }
+          if(ptype.id() != ID_cpp_name)
+            continue;
+          irep_idt base = to_cpp_name(ptype).get_base_name();
+          if(base.empty())
+            continue;
+          // Search for a complete instantiation
+          std::string search = "tag-" + id2string(base) + "<";
+          for(const auto &entry : cpp_typecheck.symbol_table.symbols)
+          {
+            const std::string &eid = id2string(entry.first);
+            if(eid.find(search) == std::string::npos)
+              continue;
+            // Skip virtual tables and other non-type symbols
+            if(eid.find("virtual_table") != std::string::npos)
+              continue;
+            if(
+              entry.second.type.id() != ID_struct ||
+              to_struct_type(entry.second.type).is_incomplete())
+              continue;
+            // Build a synthetic fargs with this instantiation type
+            // and re-call guess_function_template_args
+            typet arg_type{struct_tag_typet{entry.first}};
+            if(is_ref)
+              arg_type = reference_type(arg_type);
+            symbol_exprt synthetic{"funcaddr_synthetic", arg_type};
+            cpp_typecheck_fargst synthetic_fargs;
+            synthetic_fargs.operands.push_back(synthetic);
+            exprt result = guess_function_template_args(expr, synthetic_fargs);
+            if(result.is_not_nil())
+            {
+              deduced_from_context = true;
+              return result;
+            }
+          }
+          break; // only try the first parameter
+        }
+      }
+      if(!deduced_from_context)
+        return nil_exprt(); // give up
+    }
   }
 
   // We need to guess in the case of function templates!
