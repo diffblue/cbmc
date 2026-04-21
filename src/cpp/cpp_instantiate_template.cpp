@@ -784,6 +784,48 @@ void cpp_typecheckt::elaborate_class_template(
                 cpp_template_args_tct cargs;
                 cargs.arguments().push_back(full_args_tc.arguments()[pi]);
                 cmap.build(cdecl.template_type(), cargs);
+                // Create temporary symbols for requires-expression
+                // parameters (e.g., requires(T t) { ++t; } needs 't').
+                {
+                  const irept &req_params = body.find("#requires_params");
+
+                  for(const auto &param : req_params.get_sub())
+                  {
+                    irep_idt pname = param.get(ID_name);
+                    if(pname.empty())
+                      continue;
+                    typet ptype =
+                      static_cast<const typet &>(param.find(ID_type));
+                    cmap.apply(ptype);
+                    null_message_handlert nh;
+                    message_handlert &oh = get_message_handler();
+                    set_message_handler(nh);
+                    try
+                    {
+                      typecheck_type(ptype);
+                    }
+                    catch(...)
+                    {
+                    }
+                    set_message_handler(oh);
+                    irep_idt id = "requires_param::" + id2string(pname);
+                    if(!symbol_table.has_symbol(id))
+                    {
+                      symbolt param_sym{id, ptype, ID_cpp};
+                      param_sym.base_name = pname;
+                      param_sym.is_lvalue = true;
+                      symbol_table.add(param_sym);
+                    }
+                    else
+                    {
+                      symbol_table.get_writeable_ref(id).type = ptype;
+                    }
+                    cpp_idt &scope_id =
+                      cpp_scopes.current_scope().insert(pname);
+                    scope_id.identifier = id;
+                    scope_id.id_class = cpp_idt::id_classt::SYMBOL;
+                  }
+                }
                 // Evaluate type_requirements by resolving types
                 body.visit_pre(
                   [&](exprt &e)
@@ -828,29 +870,120 @@ void cpp_typecheckt::elaborate_class_template(
                       try
                       {
                         typecheck_type(t);
-                        {
-                          FILE *f = fopen("/tmp/concept_debug.txt", "a");
-                          if(f)
-                          {
-                            fprintf(f, "TYPE_OK: %s\n", t.id().c_str());
-                            fclose(f);
-                          }
-                        }
                         e = typecast_exprt{true_exprt(), c_bool_type()};
                       }
                       catch(...)
                       {
-                        {
-                          FILE *f = fopen("/tmp/concept_debug.txt", "a");
-                          if(f)
-                          {
-                            fprintf(f, "TYPE_FAIL\n");
-                            fclose(f);
-                          }
-                        }
                         params_ok = false;
                       }
                       set_message_handler(oh);
+                    }
+                    // Simple requirement: check if expression type-checks
+                    if(e.id() == "simple_requirement" && params_ok)
+                    {
+                      exprt expr_copy = to_unary_expr(e).op();
+                      cmap.apply(expr_copy);
+                      null_message_handlert nh;
+                      message_handlert &oh = get_message_handler();
+                      set_message_handler(nh);
+                      try
+                      {
+                        typecheck_expr(expr_copy);
+                        e = typecast_exprt{true_exprt(), c_bool_type()};
+                      }
+                      catch(...)
+                      {
+                        params_ok = false;
+                      }
+                      set_message_handler(oh);
+                    }
+                    // Compound requirement: check expression type-checks
+                    // and result type satisfies constraint
+                    if(e.id() == "compound_requirement" && params_ok)
+                    {
+                      exprt expr_copy = to_unary_expr(e).op();
+                      cmap.apply(expr_copy);
+                      null_message_handlert nh;
+                      message_handlert &oh = get_message_handler();
+                      set_message_handler(nh);
+                      bool ok = true;
+                      try
+                      {
+                        typecheck_expr(expr_copy);
+                        // Check return type constraint if present
+                        const irept &constraint = e.find("#constraint");
+                        if(constraint.is_not_nil())
+                        {
+                          // Per [expr.prim.req.compound], prepend
+                          // decltype((expr)) to constraint template args.
+                          typet result_type = expr_copy.type();
+                          if(expr_copy.get_bool(ID_C_lvalue))
+                            result_type = reference_type(result_type);
+                          // Look up the concept and evaluate directly
+                          irep_idt concept_name;
+                          for(const auto &sub : constraint.get_sub())
+                            if(sub.id() == ID_name)
+                              concept_name = sub.get(ID_identifier);
+                          if(!concept_name.empty())
+                          {
+                            auto cids = cpp_scopes.current_scope().lookup(
+                              concept_name, cpp_scopet::RECURSIVE);
+                            for(const auto *cid : cids)
+                            {
+                              const auto *csym =
+                                symbol_table.lookup(cid->identifier);
+                              if(!csym || !csym->type.get_bool(ID_is_template))
+                                continue;
+                              const auto &cd = to_cpp_declaration(csym->type);
+                              if(cd.declarators().empty())
+                                continue;
+                              exprt cbody = cd.declarators()[0].value();
+                              if(cbody.is_nil())
+                                continue;
+                              // Build template args: prepend result_type
+                              // to the constraint's existing args
+                              cpp_template_args_tct check_args;
+                              exprt ta{ID_type};
+                              ta.type() = result_type;
+                              check_args.arguments().push_back(std::move(ta));
+                              for(const auto &sub : constraint.get_sub())
+                              {
+                                if(sub.id() == ID_template_args)
+                                {
+                                  const auto &args_sub = sub.find(ID_arguments);
+                                  for(const auto &a : args_sub.get_sub())
+                                  {
+                                    exprt arg_copy =
+                                      static_cast<const exprt &>(a);
+                                    cmap.apply(arg_copy);
+                                    typecheck_type(arg_copy.type());
+                                    check_args.arguments().push_back(
+                                      std::move(arg_copy));
+                                  }
+                                }
+                              }
+                              template_mapt cmap2;
+                              cmap2.build(cd.template_type(), check_args);
+                              cmap2.apply(cbody);
+
+                              typecheck_expr(cbody);
+                              simplify(cbody, *this);
+                              if(cbody.is_false())
+                                ok = false;
+                              break;
+                            }
+                          }
+                        }
+                      }
+                      catch(...)
+                      {
+                        ok = false;
+                      }
+                      set_message_handler(oh);
+                      if(ok)
+                        e = typecast_exprt{true_exprt(), c_bool_type()};
+                      else
+                        params_ok = false;
                     }
                   });
                 if(!params_ok)
