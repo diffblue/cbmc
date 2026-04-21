@@ -4959,3 +4959,16 @@ solvers.
 
 **No single adder encoding wins across all solvers and benchmarks.**
 Ripple-carry remains the safest default.
+
+
+## Open Investigation: Equality Hints Four-Solver Validation
+
+The adjacent equality implications (10-13 bit threshold) give
+18-52% speedup on CaDiCaL at BW=10-13 with zero regressions
+within that range. However, they have only been tested on CaDiCaL.
+
+**TODO:** Test equality hints on MiniSat, MergeSat, and CryptoMiniSat
+to determine if they are safe to include as a default. The hints
+may interact differently with each solver's preprocessing/search
+strategy (SatELite for MiniSat, MergeSat's clause merging,
+CryptoMiniSat's XOR handling).
