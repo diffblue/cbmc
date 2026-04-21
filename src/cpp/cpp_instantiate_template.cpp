@@ -416,7 +416,6 @@ void cpp_typecheckt::elaborate_class_template(
   // When force-elaborating empty template instances, catch errors
   // to avoid breaking callers. Errors in system header templates
   // (e.g., compressed_pair reference initialization) are non-fatal.
-  bool force_elaborated = false;
 
   if(
     (t_type.id() == ID_struct || t_type.id() == ID_union) &&
@@ -1284,27 +1283,8 @@ void cpp_typecheckt::elaborate_class_template(
       }
     }
 
-    // Only do this for libc++ (CLANG preprocessor) where forward
-    // declarations in __fwd/ headers are common.
-    // Also catch errors when force-elaborating empty template instances.
-    if(
-      config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG ||
-      force_elaborated)
-    {
-      try
-      {
-        instantiate_template(
-          type.source_location(), *best_match, best_spec_args, full_args);
-      }
-      catch(int)
-      {
-      }
-    }
-    else
-    {
-      instantiate_template(
-        type.source_location(), *best_match, best_spec_args, full_args);
-    }
+    instantiate_template(
+      type.source_location(), *best_match, best_spec_args, full_args);
   }
 }
 
