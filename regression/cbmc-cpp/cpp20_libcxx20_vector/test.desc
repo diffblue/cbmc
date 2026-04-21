@@ -5,6 +5,6 @@ main.cpp
 ^EXIT=(0|10)$
 ^SIGNAL=0$
 --
-^PARSING ERROR$
-libc++-20 headers use SIMD intrinsics (__algorithm/simd_utils.h)
-that CBMC's parser cannot handle.
+libc++-20 C++20 headers use compound requirements in
+synth_three_way.h that the parser cannot handle in the
+general requires-expression context (outside concept bodies).

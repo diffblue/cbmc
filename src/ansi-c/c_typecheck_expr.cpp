@@ -2318,6 +2318,18 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
         return;
       }
       else if(
+        identifier == "__builtin_reduce_and" ||
+        identifier == "__builtin_reduce_or" ||
+        identifier == "__builtin_reduce_xor" ||
+        identifier == "__builtin_reduce_add" ||
+        identifier == "__builtin_reduce_mul")
+      {
+        exprt result = typecheck_vector_reduce(expr);
+        expr.swap(result);
+
+        return;
+      }
+      else if(
         identifier == CPROVER_PREFIX "saturating_minus" ||
         identifier == CPROVER_PREFIX "saturating_plus" ||
         identifier == "__builtin_elementwise_add_sat" ||

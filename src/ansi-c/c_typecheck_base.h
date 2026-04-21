@@ -240,6 +240,7 @@ protected:
   typecheck_shadow_memory_builtin(const side_effect_expr_function_callt &expr);
   virtual exprt
   typecheck_shuffle_vector(const side_effect_expr_function_callt &expr);
+  exprt typecheck_vector_reduce(const side_effect_expr_function_callt &expr);
   void disallow_subexpr_by_id(
     const exprt &,
     const irep_idt &,
