@@ -9599,6 +9599,13 @@ bool Parser::rLambdaExpr(exprt &exp)
     if(lex.LookAhead(0) == TOK_CONSTEXPR)
       lex.get_token(tk);
 
+    // optional attributes (e.g., __attribute__((__always_inline__)))
+    {
+      typet discard;
+      if(!optAttribute(discard))
+        return false;
+    }
+
     // optional exception specification
     optThrowDecl(exp.add(ID_exception_list));
 
@@ -10213,6 +10220,29 @@ bool Parser::rPrimaryExpr(exprt &exp)
 
   case '[':
     return rLambdaExpr(exp);
+
+  case TOK_CLANG_BUILTIN_CONVERTVECTOR:
+  {
+    // __builtin_convertvector(expr, type)
+    lex.get_token(tk);
+    if(lex.get_token(tk2) != '(')
+      return false;
+    exprt arg;
+    if(!rExpression(arg, false))
+      return false;
+    if(lex.get_token(tk2) != ',')
+      return false;
+    typet target_type;
+    if(!rTypeName(target_type))
+      return false;
+    if(lex.get_token(tk2) != ')')
+      return false;
+    exp = exprt{ID_clang_builtin_convertvector};
+    exp.type() = target_type;
+    exp.add_to_operands(std::move(arg));
+    set_location(exp, tk);
+    return true;
+  }
 
   default:
 #ifdef DEBUG

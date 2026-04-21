@@ -228,6 +228,15 @@ void cpp_internal_additions(std::ostream &out)
   out << "void __builtin_coro_destroy(void *);\n";
   out << "void *__builtin_coro_noop();\n";
 
+  // Clang SIMD vector reduction builtins (polymorphic stubs).
+  // The actual lowering to element-wise operations is done by
+  // typecheck_vector_reduce in c_typecheck_gcc_polymorphic_builtins.cpp.
+  out << "template<typename _Tp> _Tp __builtin_reduce_and(_Tp);\n";
+  out << "template<typename _Tp> _Tp __builtin_reduce_or(_Tp);\n";
+  out << "template<typename _Tp> _Tp __builtin_reduce_xor(_Tp);\n";
+  out << "template<typename _Tp> _Tp __builtin_reduce_add(_Tp);\n";
+  out << "template<typename _Tp> _Tp __builtin_reduce_mul(_Tp);\n";
+
   // GCC 13+ <type_traits> defines __and_/__or_ using decltype + SFINAE
   // on pack expansions, which CBMC cannot evaluate. Provide simple
   // recursive implementations via the preprocessor that replace the
