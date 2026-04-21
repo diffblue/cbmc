@@ -4540,3 +4540,53 @@ The g-only improvement is inconsistent across benchmarks and solvers.
 all three solvers. Ripple-carry is the safest default for adders.
 g-only provides modest benefits on some benchmarks but is not
 consistently better than ripple.
+
+### Corrected adder analysis: BK helps CaDiCaL only
+
+**equiv_unsat N=20 (20 × 32-bit additions):**
+
+| Solver | ripple | BK | g-only | Best |
+|--------|--------|-----|--------|------|
+| MiniSat | 1.87 | 2.41 | **0.94** | g-only |
+| MergeSat | **0.67** | 1.87 | 0.70 | ripple |
+| CaDiCaL | 0.63 | **0.04** | 0.60 | **BK (16x!)** |
+
+**BK's 16x speedup is CaDiCaL-SPECIFIC.** MiniSat and MergeSat
+don't benefit — BK is actually slower on both. The BK advantage
+comes from glue-1 learned clauses that CaDiCaL's inprocessing
+exploits. MiniSat and MergeSat lack inprocessing.
+
+**checksum BW=200 (3-add reorder on 200-bit):**
+
+| Solver | ripple | BK | g-only | Best |
+|--------|--------|-----|--------|------|
+| MiniSat | **0.67** | 3.44 | 0.69 | ripple |
+| MergeSat | **0.83** | 3.09 | 0.97 | ripple |
+| CaDiCaL | **0.39** | 1.77 | 0.55 | ripple |
+
+BK is 2-5x SLOWER on all three solvers. Ripple wins.
+
+**8-add BW=16 (8 additions on 16-bit):**
+
+| Solver | ripple | BK | g-only | Best |
+|--------|--------|-----|--------|------|
+| MiniSat | T/O | T/O | T/O | — |
+| MergeSat | 15.1 | 26.4 | **11.2** | g-only |
+| CaDiCaL | 5.78 | T/O | **5.51** | g-only |
+
+g-only helps modestly on 8-add. BK hurts or T/O.
+
+### Revised adder encoding recommendation
+
+The original adder investigation's BK results (4.7x on equiv_unsat,
+23x on checksum) were CaDiCaL-specific. On MiniSat and MergeSat,
+BK consistently hurts.
+
+| Solver | Best adder encoding |
+|--------|-------------------|
+| CaDiCaL | BK for equiv_unsat-style (many independent additions); ripple otherwise |
+| MiniSat | g-only or ripple |
+| MergeSat | ripple or g-only |
+
+**For a solver-independent default: ripple-carry remains safest.**
+BK should only be used with CaDiCaL on addition-heavy UNSAT problems.
