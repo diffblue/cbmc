@@ -4590,3 +4590,154 @@ BK consistently hurts.
 
 **For a solver-independent default: ripple-carry remains safest.**
 BK should only be used with CaDiCaL on addition-heavy UNSAT problems.
+
+## Full 9-Combination Matrix: Multiplier × Top-Level Adder
+
+### MiniSat
+
+**equiv_unsat (pure addition):**
+
+| mul \ adder | ripple | BK | g-only |
+|-------------|--------|-----|--------|
+| shift | 1.87 | 2.41 | **0.94** |
+| comba-cs | 1.87 | 2.41 | **0.94** |
+| dadda | 1.87 | 2.41 | **0.94** |
+
+Multiplier encoding irrelevant (no multiplication). **g-only 2x faster.**
+
+**mul comm BW=9:**
+
+| mul \ adder | ripple | BK | g-only |
+|-------------|--------|-----|--------|
+| shift | 5.23 | 5.23 | 5.23 |
+| comba-cs | 7.78 | T/O | **5.33** |
+| **dadda** | 11.88 | T/O | **5.08** |
+
+**matrix trace:**
+
+| mul \ adder | ripple | BK | g-only |
+|-------------|--------|-----|--------|
+| shift | T/O | T/O | T/O |
+| **comba-cs** | **5.78** | T/O | 5.60 |
+| dadda | 24.37 | 50.02 | 20.84 |
+
+### MergeSat
+
+**equiv_unsat (pure addition):**
+
+| mul \ adder | ripple | BK | g-only |
+|-------------|--------|-----|--------|
+| any | **0.67** | 1.87 | 0.70 |
+
+**8-add BW=16 (pure addition):**
+
+| mul \ adder | ripple | BK | g-only |
+|-------------|--------|-----|--------|
+| any | 15.0 | 26.3 | **11.1** |
+
+**g-only 26% faster** on 8-add. Multiplier encoding irrelevant.
+
+**mul comm BW=9:**
+
+| mul \ adder | ripple | BK | g-only |
+|-------------|--------|-----|--------|
+| shift | 7.91 | 7.88 | 7.90 |
+| **comba-cs** | **2.05** | T/O | 2.17 |
+| dadda | 5.26 | T/O | 4.49 |
+
+**mul comm BW=11:**
+
+| mul \ adder | ripple | BK | g-only |
+|-------------|--------|-----|--------|
+| **comba-cs** | **7.24** | T/O | 15.64 |
+| dadda | 36.45 | T/O | 47.40 |
+
+**g-only HURTS comba-cs on BW=11** (7.24→15.64, 2.2x slower).
+
+**matrix trace:**
+
+| mul \ adder | ripple | BK | g-only |
+|-------------|--------|-----|--------|
+| shift | 42.74 | T/O | **29.74** |
+| **comba-cs** | **3.06** | T/O | 4.47 |
+| dadda | **8.39** | 10.32 | 10.97 |
+
+**overflow BW=16:**
+
+| mul \ adder | ripple | BK | g-only |
+|-------------|--------|-----|--------|
+| comba-cs | 13.89 | T/O | **10.35** |
+| **dadda** | **3.55** | 4.65 | 4.34 |
+
+### CaDiCaL
+
+**equiv_unsat (pure addition):**
+
+| mul \ adder | ripple | BK | g-only |
+|-------------|--------|-----|--------|
+| any | 0.63 | **0.04** | 0.60 |
+
+**BK 16x faster** (CaDiCaL-specific).
+
+**8-add BW=16 (pure addition):**
+
+| mul \ adder | ripple | BK | g-only |
+|-------------|--------|-----|--------|
+| any | 5.78 | T/O | **5.50** |
+
+**mul comm BW=9:**
+
+| mul \ adder | ripple | BK | g-only |
+|-------------|--------|-----|--------|
+| shift | 1.96 | 1.96 | 1.96 |
+| **comba-cs** | 0.13 | T/O | **0.09** |
+| dadda | 0.53 | T/O | 0.71 |
+
+**mul comm BW=11:**
+
+| mul \ adder | ripple | BK | g-only |
+|-------------|--------|-----|--------|
+| **comba-cs** | **0.64** | T/O | 0.93 |
+| dadda | 6.21 | T/O | **4.11** |
+
+**g-only HURTS comba-cs on BW=11** (0.64→0.93, 45% slower).
+
+**matrix trace:**
+
+| mul \ adder | ripple | BK | g-only |
+|-------------|--------|-----|--------|
+| shift | 30.08 | T/O | 36.54 |
+| **comba-cs** | **0.54** | T/O | 0.70 |
+| dadda | 3.71 | 5.40 | **3.17** |
+
+**overflow BW=16:**
+
+| mul \ adder | ripple | BK | g-only |
+|-------------|--------|-----|--------|
+| shift | 1.77 | 1.77 | 1.77 |
+| comba-cs | 0.77 | T/O | **0.73** |
+| **dadda** | **0.48** | 0.64 | 0.56 |
+
+### Key observations
+
+1. **Pure addition benchmarks:** multiplier encoding is irrelevant
+   (identical times for shift/comba-cs/dadda). Only adder encoding
+   matters. g-only helps MiniSat (2x) and MergeSat (26%).
+
+2. **BK is universally harmful for multiplication** (T/O on all
+   solvers when combined with comba-cs or dadda). BK only helps
+   CaDiCaL on pure addition (equiv_unsat: 16x).
+
+3. **g-only helps pure addition but HURTS comba-cs multiplication
+   at BW≥11.** On MergeSat: comba-cs+ripple 7.24s vs comba-cs+g-only
+   15.64s (2.2x slower). On CaDiCaL: 0.64s vs 0.93s (45% slower).
+
+4. **Best combination per solver:**
+   - MiniSat: comba-cs + g-only (5.33s on mul comm, 0.94s on equiv)
+   - MergeSat: comba-cs + ripple (2.05s on mul comm, 3.06s on matrix)
+   - CaDiCaL: comba-cs + ripple (0.13s on mul comm, 0.54s on matrix)
+
+5. **Ripple is safest for comba-cs multiplication.** g-only helps
+   on some benchmarks but causes 45-120% regressions on comba-cs
+   at BW≥11. The g-only benefit on pure addition can be achieved
+   by using g-only ONLY for top-level adders (not inside multiplication).
