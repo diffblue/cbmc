@@ -1,0 +1,12 @@
+KNOWNBUG libcxx20
+main.cpp
+--cpp11 --stdlib libc++ --unwind 5 --no-unwinding-assertions
+^VERIFICATION
+^EXIT=(0|10)$
+^SIGNAL=0$
+--
+^PARSING ERROR$
+libc++-20 headers use SIMD intrinsics (__algorithm/simd_utils.h)
+that CBMC's parser cannot handle. This test documents the
+incompatibility with libc++-20 (LLVM 20, e.g., ubuntu 25.04).
+Tests pass with libc++-18 (LLVM 18, e.g., ubuntu 24.04).
