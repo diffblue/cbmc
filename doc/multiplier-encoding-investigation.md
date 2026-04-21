@@ -4894,3 +4894,68 @@ unpredictable changes in solving time.
 settings, or variable freezing. The hints are a heuristic that
 helps on average but can hurt on specific instances. The 10-13
 bit threshold is an empirical safe zone.
+
+## CryptoMiniSat Encoding Comparison
+
+### Multiplier encoding
+
+| Benchmark | shift-add | comba-cs | dadda | Best |
+|-----------|-----------|----------|-------|------|
+| comm BW=9 | 8.21 | **7.44** | 8.11 | comba-cs |
+| comm BW=11 | 104.1 | **76.9** | 80.0 | comba-cs |
+| overflow BW=8 | **0.97** | 3.61 | 2.91 | shift |
+| overflow BW=16 | T/O | T/O | **45.2** | dadda |
+| matrix trace | T/O | **26.0** | 53.4 | comba-cs |
+| MAC comm | T/O | **7.44** | 25.7 | comba-cs |
+| str_red BW=32 | 0.33 | 0.35 | **0.25** | dadda |
+| keyed_hash | **13.7** | 24.3 | 15.5 | shift |
+
+### Adder encoding (with comba-cs multiplication)
+
+| Benchmark | ripple | BK | g-only | Best |
+|-----------|--------|-----|--------|------|
+| equiv_unsat | **1.37** | 6.43 | 1.52 | ripple |
+| 8-add BW=16 | 23.1 | T/O | **18.9** | g-only |
+| mul comm BW=9 | 7.45 | 7.43 | 7.44 | — |
+| mul comm BW=11 | 76.8 | 77.1 | 76.4 | — |
+| matrix trace | 26.0 | **18.0** | 21.1 | BK |
+
+### Division and FP
+
+| Benchmark | shift-add | comba-cs | dadda | Best |
+|-----------|-----------|----------|-------|------|
+| div_rt BW=10 | 6.25 | 5.88 | **5.54** | dadda |
+| FP add comm | 7.95 | 8.00 | 8.01 | — |
+| FP add positive | 2.37 | 2.36 | 2.37 | — |
+| Float4 | 9.00 | 8.84 | 8.98 | — |
+
+### CryptoMiniSat analysis
+
+**comba-cs helps CryptoMiniSat on multi-multiplication benchmarks:**
+comm BW=9 (1.1x), comm BW=11 (1.4x), matrix trace (∞ from T/O),
+MAC comm (∞ from T/O). The pattern is consistent with all other
+solvers.
+
+**CryptoMiniSat-specific findings:**
+- **overflow BW=8: shift-add wins** (0.97s vs comba-cs 3.61s).
+  CMS is the only solver where shift-add beats comba-cs on overflow
+  at small BW. The XOR handling in CMS may interact differently
+  with comba-cs's popcount structure.
+- **keyed_hash: shift-add wins** (13.7s vs comba-cs 24.3s).
+  Constant multiplication favors smaller formulas on CMS.
+- **BK helps matrix trace** (18.0s vs ripple 26.0s, -31%).
+  CMS is the only solver besides CaDiCaL where BK helps on any
+  benchmark. But BK hurts equiv_unsat (6.43s vs 1.37s, 4.7x worse).
+- **FP: zero encoding sensitivity** (consistent with all solvers).
+
+### Four-solver adder encoding summary
+
+| Benchmark | MiniSat | MergeSat | CaDiCaL | CryptoMiniSat |
+|-----------|---------|----------|---------|---------------|
+| equiv_unsat best | g-only | ripple | **BK** | ripple |
+| 8-add BW=16 best | T/O | g-only | g-only | g-only |
+| matrix trace best | ripple | ripple | ripple | **BK** |
+| mul comm BW=9 best | — | — | — | — |
+
+**No single adder encoding wins across all solvers and benchmarks.**
+Ripple-carry remains the safest default.
