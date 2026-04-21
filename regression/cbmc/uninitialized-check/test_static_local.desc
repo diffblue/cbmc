@@ -1,0 +1,11 @@
+CORE
+main.c
+--function test_static_local --uninitialized-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+\[test_static_local.uninitialized.*FAILURE
+--
+Static locals are zero-initialized, should not be flagged.

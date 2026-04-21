@@ -1,0 +1,12 @@
+CORE
+main.c
+--function test_heap_uninit --uninitialized-check
+^EXIT=10$
+^SIGNAL=0$
+reading uninitialized
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Heap allocation: malloc'd memory is indeterminate.
+Needs heap tracking (beyond local variables).

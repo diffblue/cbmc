@@ -1,0 +1,10 @@
+CORE
+main.c
+--function test_dirty_cond_alias --uninitialized-check --pointer-check
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Dirty var may not be initialized (conditional alias).

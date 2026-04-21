@@ -53,6 +53,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-instrument/full_slicer.h>
 #include <goto-instrument/nondet_static.h>
 #include <goto-instrument/reachability_slicer.h>
+#include <goto-instrument/uninitialized_precise.h>
 #include <goto-symex/path_storage.h>
 #include <langapi/language.h>
 #include <langapi/mode.h>
@@ -913,6 +914,13 @@ bool cbmc_parse_optionst::process_goto_program(
                     "of static/global variables"
                  << messaget::eom;
     nondet_static(goto_model);
+  }
+
+  if(options.get_bool_option("uninitialized-check"))
+  {
+    // Hybrid: shadow-bool handles non-dirty variables (in goto_check_c),
+    // shadow-mem handles dirty (address-taken) variables precisely.
+    add_uninitialized_checks_precise(goto_model, log.get_message_handler());
   }
 
   // add failed symbols

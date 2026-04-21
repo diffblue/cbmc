@@ -1,0 +1,11 @@
+CORE
+main.c
+--function test_array_uninitialized --uninitialized-check
+^EXIT=10$
+^SIGNAL=0$
+reading uninitialized local
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Phase 3: reading element of uninitialized array.

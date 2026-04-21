@@ -9,7 +9,7 @@ union uuu {
 
 int main()
 {
-  union uuu ebx;
+  union uuu ebx = {0};
   ebx.l=10;
   assert(ebx.l<1000);
 }

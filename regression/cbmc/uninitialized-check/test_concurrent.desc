@@ -1,0 +1,11 @@
+CORE
+main.c
+--function test_concurrent_init --uninitialized-check
+^EXIT=10$
+^SIGNAL=0$
+reading uninitialized local
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Uninitialized in this thread, no address taken.

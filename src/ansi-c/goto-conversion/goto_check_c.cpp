@@ -48,11 +48,17 @@ public:
   goto_check_ct(
     const namespacet &_ns,
     const optionst &_options,
-    message_handlert &_message_handler)
-    : ns(_ns), local_bitvector_analysis(nullptr), log(_message_handler)
+    message_handlert &_message_handler,
+    symbol_table_baset *_symbol_table = nullptr)
+    : ns(_ns),
+      symbol_table(_symbol_table),
+      local_bitvector_analysis(nullptr),
+      log(_message_handler)
   {
     enable_bounds_check = _options.get_bool_option("bounds-check");
     enable_pointer_check = _options.get_bool_option("pointer-check");
+    enable_uninitialized_check =
+      _options.get_bool_option("uninitialized-check");
     enable_memory_leak_check = _options.get_bool_option("memory-leak-check");
     enable_memory_cleanup_check =
       _options.get_bool_option("memory-cleanup-check");
@@ -95,7 +101,11 @@ public:
 
 protected:
   const namespacet &ns;
+  /// Optional mutable symbol table for adding init-tracking symbols.
+  symbol_table_baset *symbol_table;
   std::unique_ptr<local_bitvector_analysist> local_bitvector_analysis;
+  /// Map from tracked local variable identifiers to their init flag symbols.
+  std::unordered_map<irep_idt, exprt> init_flags;
   goto_programt::const_targett current_target;
   messaget log;
 
@@ -265,6 +275,7 @@ protected:
 
   bool enable_bounds_check;
   bool enable_pointer_check;
+  bool enable_uninitialized_check;
   bool enable_memory_leak_check;
   bool enable_memory_cleanup_check;
   bool enable_div_by_zero_check;
@@ -286,6 +297,7 @@ protected:
   std::map<irep_idt, bool *> name_to_flag{
     {"bounds-check", &enable_bounds_check},
     {"pointer-check", &enable_pointer_check},
+    {"uninitialized-check", &enable_uninitialized_check},
     {"memory-leak-check", &enable_memory_leak_check},
     {"memory-cleanup-check", &enable_memory_cleanup_check},
     {"div-by-zero-check", &enable_div_by_zero_check},
@@ -2019,8 +2031,17 @@ void goto_check_ct::check_rec(
       return;
   }
 
-  for(const auto &op : expr.operands())
-    check_rec(op, guard, false);
+  for(std::size_t i = 0; i < expr.operands().size(); ++i)
+  {
+    // When a member/index expression is on the LHS of an assignment,
+    // the struct/array operand (operand 0) is also being assigned to,
+    // so propagate is_assigned for it.
+    bool op_is_assigned = is_assigned && i == 0 &&
+                          (expr.id() == ID_member || expr.id() == ID_index ||
+                           expr.id() == ID_byte_extract_little_endian ||
+                           expr.id() == ID_byte_extract_big_endian);
+    check_rec(expr.operands()[i], guard, op_is_assigned);
+  }
 
   if(expr.type().id() == ID_c_enum_tag)
     enum_range_check(expr, guard, is_assigned);
@@ -2060,6 +2081,66 @@ void goto_check_ct::check_rec(
   else if(expr.id() == ID_dereference)
   {
     pointer_validity_check(to_dereference_expr(expr), expr, guard);
+  }
+  else if(enable_uninitialized_check && !is_assigned && expr.id() == ID_symbol)
+  {
+    const irep_idt &id = to_symbol_expr(expr).get_identifier();
+    auto init_it = init_flags.find(id);
+    if(init_it != init_flags.end())
+    {
+      source_locationt loc = expr.find_source_location();
+      loc.set_comment(
+        "reading uninitialized local '" + id2string(ns.lookup(id).base_name) +
+        "'");
+      loc.set_property_class("uninitialized");
+      new_code.add(goto_programt::make_assertion(init_it->second, loc));
+    }
+  }
+  else if(
+    enable_uninitialized_check && !is_assigned &&
+    (expr.id() == ID_member || expr.id() == ID_index))
+  {
+    // Build full access path for member/index reads.
+    const exprt *cur = &expr;
+    std::string suffix;
+    while(cur->id() == ID_member || cur->id() == ID_index)
+    {
+      if(cur->id() == ID_member)
+      {
+        suffix =
+          "." + id2string(to_member_expr(*cur).get_component_name()) + suffix;
+        cur = &to_member_expr(*cur).struct_op();
+      }
+      else
+      {
+        auto idx_expr = to_index_expr(*cur).index();
+        if(idx_expr.id() == ID_typecast)
+          idx_expr = to_typecast_expr(idx_expr).op();
+        const auto idx = numeric_cast<mp_integer>(idx_expr);
+        if(idx.has_value())
+          suffix = "$" + integer2string(*idx) + "$" + suffix;
+        else
+          suffix.clear();
+        cur = &to_index_expr(*cur).array();
+      }
+    }
+    if(cur->id() == ID_symbol)
+    {
+      const irep_idt &sym_id = to_symbol_expr(*cur).get_identifier();
+      irep_idt key = id2string(sym_id) + suffix;
+      auto init_it = init_flags.find(key);
+      if(init_it == init_flags.end() && !suffix.empty())
+        init_it = init_flags.find(sym_id);
+      if(init_it != init_flags.end())
+      {
+        source_locationt loc = expr.find_source_location();
+        loc.set_comment(
+          "reading uninitialized local '" +
+          id2string(ns.lookup(sym_id).base_name) + "'");
+        loc.set_property_class("uninitialized");
+        new_code.add(goto_programt::make_assertion(init_it->second, loc));
+      }
+    }
   }
   else if(requires_pointer_primitive_check(expr))
   {
@@ -2117,7 +2198,218 @@ void goto_check_ct::goto_check(
   local_bitvector_analysis =
     std::make_unique<local_bitvector_analysist>(goto_function, ns);
 
+  // For --uninitialized-check: clear init flags from previous function.
+  init_flags.clear();
+
   goto_programt &goto_program = goto_function.body;
+
+  // First pass: identify which locals need init tracking and insert
+  // DECL + init=false after each DECL of a tracked variable.
+  if(enable_uninitialized_check)
+  {
+    Forall_goto_program_instructions(it, goto_program)
+    {
+      if(!it->is_decl())
+        continue;
+
+      const auto &decl_symbol = it->decl_symbol();
+      const irep_idt &id = decl_symbol.get_identifier();
+      const auto &symbol = ns.lookup(id);
+
+      // Skip static lifetime (zero-initialized by runtime)
+      if(symbol.is_static_lifetime)
+        continue;
+
+      // Skip code-typed symbols (function pointers)
+      if(symbol.type.id() == ID_code)
+        continue;
+
+      // For composite types (struct/union/array), track initialization
+      // at whole-variable granularity: any write to any member marks
+      // the entire variable as initialized. This is conservative
+      // (may miss partial-init bugs) but sound.
+
+      // Skip address-taken variables (indeterminate but not UB)
+      if(local_bitvector_analysis->dirty(decl_symbol))
+        continue;
+
+      // Skip compiler-generated temporaries (always initialized by
+      // the instruction that creates them)
+      if(id2string(symbol.base_name).find("$tmp") != std::string::npos)
+        continue;
+
+      // Skip variables that are initialized immediately after declaration.
+      // Pattern: DECL x; ASSIGN x := ...; or DECL x; CALL x := f();
+      {
+        auto next = std::next(it);
+        if(next != goto_program.instructions.end())
+        {
+          bool init_at_decl = false;
+          if(
+            next->is_assign() && next->assign_lhs().id() == ID_symbol &&
+            to_symbol_expr(next->assign_lhs()).get_identifier() == id)
+          {
+            // Check that the RHS doesn't read the same variable
+            bool rhs_reads_self = false;
+            next->assign_rhs().visit_pre(
+              [&](const exprt &e)
+              {
+                if(
+                  e.id() == ID_symbol &&
+                  to_symbol_expr(e).get_identifier() == id)
+                {
+                  rhs_reads_self = true;
+                }
+              });
+            if(!rhs_reads_self)
+              init_at_decl = true;
+          }
+          if(
+            next->is_function_call() && next->call_lhs().id() == ID_symbol &&
+            to_symbol_expr(next->call_lhs()).get_identifier() == id)
+          {
+            init_at_decl = true;
+          }
+          if(init_at_decl && symbol.type.id() != ID_pointer)
+            continue;
+        }
+      }
+
+      // For pointer-typed locals, create a heap init flag.
+      // Starts true (conservative); set to false on p = malloc().
+      if(symbol.type.id() == ID_pointer)
+      {
+        const irep_idt heap_flag_id = id2string(id) + "$heap_init";
+        symbol_exprt heap_flag(heap_flag_id, bool_typet{});
+        init_flags[id2string(id) + "$deref"] = heap_flag;
+        if(symbol_table && !symbol_table->has_symbol(heap_flag_id))
+        {
+          auxiliary_symbolt new_sym{heap_flag_id, bool_typet{}, symbol.mode};
+          new_sym.is_static_lifetime = false;
+          new_sym.is_file_local = true;
+          new_sym.is_thread_local = true;
+          symbol_table->add(new_sym);
+        }
+        auto next = std::next(it);
+        goto_program.insert_before(
+          next, goto_programt::make_decl(heap_flag, it->source_location()));
+        goto_program.insert_before(
+          next,
+          goto_programt::make_assignment(
+            heap_flag, true_exprt{}, it->source_location()));
+        ++it;
+        ++it;
+        continue; // pointer locals don't need the scalar init flag
+      }
+
+      // Create init flag(s) and add to symbol table.
+      // For struct types, create per-member flags.
+      // For constant-size arrays (up to threshold), per-element flags.
+      // For other types, a single flag.
+      const typet &resolved_type = symbol.type.id() == ID_struct_tag
+                                     ? static_cast<const typet &>(ns.follow_tag(
+                                         to_struct_tag_type(symbol.type)))
+                                     : symbol.type;
+      std::vector<std::pair<irep_idt, symbol_exprt>> new_flags;
+      static const mp_integer MAX_ARRAY_TRACK{64};
+
+      // Recursively generate leaf init flags for composite types.
+      // key_prefix uses "." for members and "$N$" for array indices.
+      // flag_prefix uses "$" separators (avoids encoding issues).
+      std::function<void(
+        const std::string &, const std::string &, const typet &)>
+        add_leaf_flags = [&](
+                           const std::string &key_prefix,
+                           const std::string &flag_prefix,
+                           const typet &type)
+      {
+        const typet &t = type.id() == ID_struct_tag
+                           ? static_cast<const typet &>(
+                               ns.follow_tag(to_struct_tag_type(type)))
+                           : type;
+
+        if(t.id() == ID_struct)
+        {
+          for(const auto &comp : to_struct_type(t).components())
+          {
+            const std::string cname = id2string(comp.get_name());
+            add_leaf_flags(
+              key_prefix + "." + cname, flag_prefix + "$" + cname, comp.type());
+          }
+        }
+        else if(t.id() == ID_array && to_array_type(t).size().is_constant())
+        {
+          const auto sz = numeric_cast<mp_integer>(to_array_type(t).size());
+          if(sz.has_value() && *sz > 0 && *sz <= MAX_ARRAY_TRACK)
+          {
+            for(mp_integer i = 0; i < *sz; ++i)
+            {
+              const std::string idx = integer2string(i);
+              add_leaf_flags(
+                key_prefix + "$" + idx + "$",
+                flag_prefix + "$elem_" + idx,
+                to_array_type(t).element_type());
+            }
+            return;
+          }
+          // Large/dynamic array: single flag for whole array
+          const irep_idt flag_id = id2string(id) + "$init" + flag_prefix;
+          symbol_exprt flag_sym{flag_id, bool_typet{}};
+          new_flags.emplace_back(
+            irep_idt{id2string(id) + key_prefix}, flag_sym);
+        }
+        else
+        {
+          const irep_idt flag_id = id2string(id) + "$init" + flag_prefix;
+          symbol_exprt flag_sym{flag_id, bool_typet{}};
+          new_flags.emplace_back(
+            irep_idt{id2string(id) + key_prefix}, flag_sym);
+        }
+      };
+
+      if(resolved_type.id() == ID_struct)
+      {
+        add_leaf_flags("", "", resolved_type);
+      }
+      else if(
+        resolved_type.id() == ID_array &&
+        to_array_type(resolved_type).size().is_constant())
+      {
+        add_leaf_flags("", "", resolved_type);
+      }
+      else
+      {
+        const irep_idt flag_id = id2string(id) + "$init";
+        symbol_exprt flag_sym{flag_id, bool_typet{}};
+        new_flags.emplace_back(id, flag_sym);
+      }
+
+      for(const auto &[key, flag_sym] : new_flags)
+      {
+        init_flags[key] = flag_sym;
+
+        if(symbol_table && !symbol_table->has_symbol(flag_sym.get_identifier()))
+        {
+          auxiliary_symbolt new_sym{
+            flag_sym.get_identifier(), bool_typet{}, symbol.mode};
+          new_sym.is_static_lifetime = false;
+          new_sym.is_file_local = true;
+          new_sym.is_thread_local = true;
+          symbol_table->add(new_sym);
+        }
+
+        auto next = std::next(it);
+        goto_program.insert_before(
+          next, goto_programt::make_decl(flag_sym, it->source_location()));
+        goto_program.insert_before(
+          next,
+          goto_programt::make_assignment(
+            flag_sym, false_exprt{}, it->source_location()));
+        ++it;
+        ++it;
+      }
+    }
+  }
 
   Forall_goto_program_instructions(it, goto_program)
   {
@@ -2213,6 +2505,251 @@ void goto_check_ct::goto_check(
       check(assign_lhs, true);
       check(assign_rhs, false);
 
+      // Check array element reads in the RHS
+      if(enable_uninitialized_check)
+      {
+        assign_rhs.visit_pre(
+          [&](const exprt &e)
+          {
+            if(e.id() == ID_dereference)
+            {
+              const auto &deref = to_dereference_expr(e);
+              if(deref.pointer().id() == ID_symbol)
+              {
+                const irep_idt &ptr_id =
+                  to_symbol_expr(deref.pointer()).get_identifier();
+                auto it2 = init_flags.find(id2string(ptr_id) + "$deref");
+                if(it2 != init_flags.end())
+                {
+                  source_locationt loc = i.source_location();
+                  loc.set_comment(
+                    "reading uninitialized heap via '" +
+                    id2string(ns.lookup(ptr_id).base_name) + "'");
+                  loc.set_property_class("uninitialized");
+                  new_code.add(goto_programt::make_assertion(it2->second, loc));
+                }
+              }
+              return;
+            }
+            if(e.id() != ID_index)
+              return;
+            // Build full access path through member/index chain
+            const exprt *cur = &e;
+            std::string suffix;
+            bool has_symbolic_index = false;
+            while(cur->id() == ID_index || cur->id() == ID_member)
+            {
+              if(cur->id() == ID_index)
+              {
+                auto idx_val = to_index_expr(*cur).index();
+                if(idx_val.id() == ID_typecast)
+                  idx_val = to_typecast_expr(idx_val).op();
+                const auto idx = numeric_cast<mp_integer>(idx_val);
+                if(!idx.has_value())
+                {
+                  has_symbolic_index = true;
+                  suffix.clear();
+                }
+                else
+                {
+                  suffix = "$" + integer2string(*idx) + "$" + suffix;
+                }
+                cur = &to_index_expr(*cur).array();
+              }
+              else
+              {
+                suffix = "." +
+                         id2string(to_member_expr(*cur).get_component_name()) +
+                         suffix;
+                cur = &to_member_expr(*cur).struct_op();
+              }
+            }
+            if(cur->id() != ID_symbol)
+              return;
+            const irep_idt &root_id = to_symbol_expr(*cur).get_identifier();
+
+            if(has_symbolic_index)
+            {
+              // Symbolic index: assert conjunction of all element flags
+              // matching the array prefix
+              const std::string prefix = id2string(root_id) + suffix;
+              exprt all_init = true_exprt{};
+              for(const auto &[k, flag] : init_flags)
+              {
+                if(id2string(k).substr(0, prefix.size()) == prefix)
+                  all_init = and_exprt{all_init, flag};
+              }
+              if(all_init.id() != ID_constant)
+              {
+                source_locationt loc = i.source_location();
+                loc.set_comment(
+                  "reading uninitialized local '" +
+                  id2string(ns.lookup(root_id).base_name) + "'");
+                loc.set_property_class("uninitialized");
+                new_code.add(goto_programt::make_assertion(all_init, loc));
+              }
+              return;
+            }
+
+            const irep_idt key = id2string(root_id) + suffix;
+            auto init_it = init_flags.find(key);
+            if(init_it != init_flags.end())
+            {
+              source_locationt loc = i.source_location();
+              loc.set_comment(
+                "reading uninitialized local '" +
+                id2string(ns.lookup(root_id).base_name) + "'");
+              loc.set_property_class("uninitialized");
+              new_code.add(goto_programt::make_assertion(init_it->second, loc));
+            }
+          });
+      }
+
+      // Track initialization: if LHS (or its root symbol for member/index
+      // writes) is a tracked symbol, set init=true.
+      // For struct member writes, use the per-member key.
+      if(enable_uninitialized_check)
+      {
+        const exprt *lhs_cur = &assign_lhs;
+        std::string suffix;
+        bool has_symbolic_index = false;
+        // Build full access path: member, index, and byte_extract
+        while(lhs_cur->id() == ID_member || lhs_cur->id() == ID_index ||
+              lhs_cur->id() == ID_byte_extract_little_endian ||
+              lhs_cur->id() == ID_byte_extract_big_endian)
+        {
+          if(lhs_cur->id() == ID_member)
+          {
+            suffix = "." +
+                     id2string(to_member_expr(*lhs_cur).get_component_name()) +
+                     suffix;
+            lhs_cur = &to_member_expr(*lhs_cur).struct_op();
+          }
+          else if(lhs_cur->id() == ID_index)
+          {
+            auto idx_expr = to_index_expr(*lhs_cur).index();
+            if(idx_expr.id() == ID_typecast)
+              idx_expr = to_typecast_expr(idx_expr).op();
+            const auto idx = numeric_cast<mp_integer>(idx_expr);
+            if(idx.has_value())
+            {
+              suffix = "$" + integer2string(*idx) + "$" + suffix;
+            }
+            else
+            {
+              has_symbolic_index = true;
+              suffix.clear();
+            }
+            lhs_cur = &to_index_expr(*lhs_cur).array();
+          }
+          else
+          {
+            // byte_extract: treat as writing to the root object
+            suffix.clear();
+            lhs_cur = &to_byte_extract_expr(*lhs_cur).op();
+          }
+        }
+        if(lhs_cur->id() == ID_symbol)
+        {
+          const irep_idt &root_id = to_symbol_expr(*lhs_cur).get_identifier();
+
+          if(has_symbolic_index)
+          {
+            // Symbolic index write: conservatively set all matching
+            // element flags to true
+            const std::string prefix = id2string(root_id) + suffix;
+            for(const auto &[k, flag] : init_flags)
+            {
+              if(id2string(k).substr(0, prefix.size()) == prefix)
+              {
+                new_code.add(goto_programt::make_assignment(
+                  flag, true_exprt{}, i.source_location()));
+              }
+            }
+          }
+          else
+          {
+            irep_idt key = id2string(root_id) + suffix;
+            auto init_it = init_flags.find(key);
+            if(init_it == init_flags.end() && !suffix.empty())
+              init_it = init_flags.find(root_id);
+            // Skip pointer locals tracked via $deref (handled separately)
+            if(
+              init_it != init_flags.end() &&
+              init_flags.find(id2string(root_id) + "$deref") ==
+                init_flags.end())
+            {
+              new_code.add(goto_programt::make_assignment(
+                init_it->second, true_exprt{}, i.source_location()));
+            }
+            // Whole-variable assignment: set all sub-flags
+            if(suffix.empty())
+            {
+              const std::string pfx = id2string(root_id);
+              for(auto &[k, v] : init_flags)
+              {
+                const std::string ks = id2string(k);
+                if(
+                  ks.size() > pfx.size() && ks.substr(0, pfx.size()) == pfx &&
+                  (ks[pfx.size()] == '.' || ks[pfx.size()] == '$'))
+                {
+                  new_code.add(goto_programt::make_assignment(
+                    v, true_exprt{}, i.source_location()));
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Track heap writes: *p = ... sets heap_init = true
+      if(enable_uninitialized_check && assign_lhs.id() == ID_dereference)
+      {
+        const auto &deref = to_dereference_expr(assign_lhs);
+        if(deref.pointer().id() == ID_symbol)
+        {
+          const irep_idt &ptr_id =
+            to_symbol_expr(deref.pointer()).get_identifier();
+          auto it2 = init_flags.find(id2string(ptr_id) + "$deref");
+          if(it2 != init_flags.end())
+          {
+            new_code.add(goto_programt::make_assignment(
+              it2->second, true_exprt{}, i.source_location()));
+          }
+        }
+      }
+
+      // Track pointer assignment: p = q propagates heap flag
+      // by making p share q's deref flag (so writes through either
+      // pointer set the same flag)
+      if(
+        enable_uninitialized_check && assign_lhs.id() == ID_symbol &&
+        assign_lhs.type().id() == ID_pointer)
+      {
+        const irep_idt &lhs_id = to_symbol_expr(assign_lhs).get_identifier();
+        const irep_idt lhs_key = id2string(lhs_id) + "$deref";
+        auto lhs_it = init_flags.find(lhs_key);
+        if(lhs_it != init_flags.end())
+        {
+          // Check if RHS is a symbol with a heap flag (pointer copy)
+          exprt rhs_stripped = assign_rhs;
+          while(rhs_stripped.id() == ID_typecast)
+            rhs_stripped = to_typecast_expr(rhs_stripped).op();
+          if(rhs_stripped.id() == ID_symbol)
+          {
+            const irep_idt &rhs_id =
+              to_symbol_expr(rhs_stripped).get_identifier();
+            auto rhs_it = init_flags.find(id2string(rhs_id) + "$deref");
+            if(rhs_it != init_flags.end())
+            {
+              // Share the same flag symbol: p$deref now points to
+              // q's flag, so *p = val and *q = val both set it
+              lhs_it->second = rhs_it->second;
+            }
+          }
+        }
+      }
+
       // the LHS might invalidate any assertion
       invalidate(assign_lhs);
     }
@@ -2225,6 +2762,46 @@ void goto_check_ct::goto_check(
         check(arg, false);
 
       check_shadow_memory_api_calls(i);
+
+      // Track initialization: function call LHS is initialized
+      if(enable_uninitialized_check && i.call_lhs().id() == ID_symbol)
+      {
+        const irep_idt &lhs_id = to_symbol_expr(i.call_lhs()).get_identifier();
+        auto it2 = init_flags.find(lhs_id);
+        if(it2 != init_flags.end())
+        {
+          new_code.add(goto_programt::make_assignment(
+            it2->second, true_exprt{}, i.source_location()));
+        }
+      }
+
+      // Track heap allocation: if call returns a pointer, create
+      // a heap init flag and set it to false (uninitialized heap)
+      if(
+        enable_uninitialized_check && i.call_lhs().id() == ID_symbol &&
+        i.call_lhs().type().id() == ID_pointer)
+      {
+        const irep_idt &lhs_id = to_symbol_expr(i.call_lhs()).get_identifier();
+        const irep_idt deref_key = id2string(lhs_id) + "$deref";
+        if(init_flags.find(deref_key) == init_flags.end())
+        {
+          const irep_idt flag_id = id2string(lhs_id) + "$heap_init";
+          symbol_exprt flag_sym(flag_id, bool_typet{});
+          init_flags[deref_key] = flag_sym;
+          if(symbol_table && !symbol_table->has_symbol(flag_id))
+          {
+            auxiliary_symbolt new_sym{flag_id, bool_typet{}, mode};
+            new_sym.is_static_lifetime = false;
+            new_sym.is_file_local = true;
+            new_sym.is_thread_local = true;
+            symbol_table->add(new_sym);
+          }
+          new_code.add(goto_programt::make_decl(flag_sym, i.source_location()));
+        }
+        auto it2 = init_flags.find(deref_key);
+        new_code.add(goto_programt::make_assignment(
+          it2->second, false_exprt{}, i.source_location()));
+      }
 
       // the call might invalidate any assertion
       assertions.clear();
@@ -2502,7 +3079,15 @@ void goto_check_c(
   message_handlert &message_handler)
 {
   const namespacet ns(goto_model.symbol_table);
-  goto_check_c(ns, options, goto_model.goto_functions, message_handler);
+  goto_check_ct goto_check(
+    ns, options, message_handler, &goto_model.symbol_table);
+
+  goto_check.collect_allocations(goto_model.goto_functions);
+
+  for(auto &gf_entry : goto_model.goto_functions.function_map)
+  {
+    goto_check.goto_check(gf_entry.first, gf_entry.second);
+  }
 }
 
 void goto_check_ct::add_active_named_check_pragmas(

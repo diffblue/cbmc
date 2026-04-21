@@ -1,0 +1,12 @@
+CORE
+main.c
+--function test_nested_struct_partial --uninitialized-check
+^EXIT=10$
+^SIGNAL=0$
+reading uninitialized local
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Nested struct: partial init of nested members.
+Needs recursive per-member tracking.

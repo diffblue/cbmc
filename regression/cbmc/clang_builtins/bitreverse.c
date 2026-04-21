@@ -29,14 +29,14 @@ unsigned long long __builtin_bitreverse64(unsigned long long);
 
 void check_8(void)
 {
-  uint8_t op;
+  uint8_t op = __VERIFIER_nondet_uint8_t();
   assert(__builtin_bitreverse8(op) == test_bit_reverse8(op));
   assert(__builtin_bitreverse8(1) == 0x80);
 }
 
 void check_16(void)
 {
-  uint16_t op;
+  uint16_t op = {0};
   assert(__builtin_bitreverse16(op) == test_bit_reverse16(op));
   assert(__builtin_bitreverse16(1) == 0x8000);
 }

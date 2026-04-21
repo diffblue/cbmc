@@ -1,0 +1,10 @@
+CORE
+main.c
+--function test_symbolic_index_all_init --uninitialized-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Symbolic array index: all elements initialized, should pass.

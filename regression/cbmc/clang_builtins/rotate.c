@@ -24,7 +24,7 @@ __builtin_rotateright64(unsigned long long, unsigned long long);
 
 void check_left8(void)
 {
-  uint8_t op;
+  uint8_t op = __VERIFIER_nondet_uint8_t();
   assert(__builtin_rotateleft8(op, 1) == rol(uint8_t, op, 1));
   assert(__builtin_rotateleft8(op, 2) == rol(uint8_t, op, 2));
   assert(__builtin_rotateleft8(op, 3) == rol(uint8_t, op, 3));
@@ -33,7 +33,7 @@ void check_left8(void)
 
 void check_left16(void)
 {
-  uint16_t op;
+  uint16_t op = {0};
   assert(__builtin_rotateleft16(op, 1) == rol(uint16_t, op, 1));
   assert(__builtin_rotateleft16(op, 2) == rol(uint16_t, op, 2));
   assert(__builtin_rotateleft16(op, 3) == rol(uint16_t, op, 3));

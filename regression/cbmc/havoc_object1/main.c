@@ -16,7 +16,7 @@ int main()
   __CPROVER_assert(some_struct.j==2, "struct j"); // should fail
 
   // now conditional
-  _Bool c;
+  _Bool c = __VERIFIER_nondet__Bool();
   int *p=c?&i:&some_struct.i;
   i=20;
   some_struct.i=30;
