@@ -1,4 +1,4 @@
-KNOWNBUG gcc14
+KNOWNBUG clang20
 main.cpp
 --cpp20
 ^VERIFICATION SUCCESSFUL$
@@ -6,6 +6,9 @@ main.cpp
 ^SIGNAL=0$
 --
 Concept-constrained specialization ordering with __is_pointer and
-__remove_pointer builtins fails on GCC 14.2+ system headers.
-The builtins interact differently with GCC 14.2's type_traits,
-causing incorrect specialization selection. Passes on GCC 13.
+__remove_pointer builtins in requires clauses produces incorrect
+results when CBMC uses Clang 20 as the preprocessor. The requires
+clause requires(__is_pointer(T)) incorrectly matches non-pointer
+types. The same test passes with Clang 18. The preprocessed C++
+code is identical; the issue is in CBMC's internal state when
+configured for Clang 20.
