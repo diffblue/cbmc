@@ -4804,3 +4804,56 @@ direct additions in the matrix trace use BK.
   (equiv_unsat-style)
 - Ripple for top-level adder when multiplication is present
   (matrix trace, mul comm)
+
+### Per-solver top-level adder default analysis
+
+**CaDiCaL + BK top-level (comba-cs multiplication):**
+
+| Benchmark | ripple | BK | Change |
+|-----------|--------|-----|--------|
+| equiv_unsat | 0.63 | **0.04** | **-94%** |
+| mul comm BW=9-11 | 0.13-0.64 | 0.13-0.64 | 0% |
+| MAC comm | 0.34 | 0.33 | 0% |
+| overflow BW=16 | 1.77 | 1.77 | 0% |
+| FP add comm | 4.38 | 4.37 | 0% |
+| matrix trace | 0.54 | **1.59** | **+194%** |
+| 8-add BW=16 | 5.76 | **T/O** | **regression** |
+
+**NOT safe as default.** 3x regression on matrix trace, T/O on 8-add.
+
+**MiniSat + g-only top-level (comba-cs multiplication):**
+
+| Benchmark | ripple | g-only | Change |
+|-----------|--------|--------|--------|
+| equiv_unsat | 1.84 | **0.92** | **-50%** |
+| matrix trace | 5.66 | **4.73** | **-16%** |
+| mul comm BW=9 | 7.56 | 7.57 | 0% |
+| FP add comm | 6.74 | 6.76 | 0% |
+| MAC comm | 2.29 | **2.57** | **+12%** |
+
+**Mostly safe** but 12% regression on MAC comm.
+
+**MergeSat + g-only top-level (comba-cs multiplication):**
+
+| Benchmark | ripple | g-only | Change |
+|-----------|--------|--------|--------|
+| 8-add BW=16 | 15.02 | **11.10** | **-26%** |
+| MAC comm | 2.44 | **2.08** | **-15%** |
+| equiv_unsat | 0.67 | 0.70 | +4% |
+| mul comm BW=9 | 2.05 | 2.17 | +6% |
+| mul comm BW=11 | 7.22 | **15.74** | **+118%** |
+| matrix trace | 3.05 | **4.48** | **+47%** |
+
+**NOT safe as default.** 2.2x regression on mul comm BW=11.
+
+### Conclusion
+
+**Ripple-carry remains the safest top-level adder default for all
+solvers.** Neither BK nor g-only can be safely deployed as a default:
+- BK: 16x win on equiv_unsat (CaDiCaL only) but 3x loss on matrix
+  trace and T/O on 8-add
+- g-only: 2x win on equiv_unsat (MiniSat) but 2.2x loss on mul
+  comm BW=11 (MergeSat)
+
+BK and g-only should remain available as CLI options for users who
+know their workload is addition-heavy.
