@@ -5,6 +5,5 @@ main.cpp
 ^EXIT=(0|10)$
 ^SIGNAL=0$
 --
-libc++-20 C++20 headers use compound requirements in
-synth_three_way.h that the parser cannot handle in the
-general requires-expression context (outside concept bodies).
+libc++-20 C++20 vector with brace initialization fails with
+'struct nil is still incomplete' during initializer_list processing.

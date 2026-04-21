@@ -9623,6 +9623,7 @@ bool Parser::rLambdaExpr(exprt &exp)
     if(lex.LookAhead(0) == TOK_REQUIRES)
     {
       lex.get_token(tk);
+      // requires(expr) or requires requires { ... }
       if(lex.LookAhead(0) == '(')
       {
         lex.get_token(tk);
@@ -9637,6 +9638,13 @@ bool Parser::rLambdaExpr(exprt &exp)
           else if(t == 0)
             return false;
         }
+      }
+      // requires requires { ... } — nested requires-expression
+      if(lex.LookAhead(0) == TOK_REQUIRES)
+      {
+        exprt req_expr;
+        if(!rPrimaryExpr(req_expr))
+          return false;
       }
     }
   }
