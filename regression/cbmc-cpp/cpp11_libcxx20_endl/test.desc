@@ -1,12 +1,7 @@
-KNOWNBUG libcxx20
+CORE libcxx20
 main.cpp
 --cpp11 --stdlib libc++
 ^VERIFICATION
 ^EXIT=(0|10)$
 ^SIGNAL=0$
 --
-std::endl template argument deduction fails on libc++-20.
-Cannot be reproduced via preprocessed files because clang -E
-preserves built-ins (__remove_cv etc.) that CBMC's internal
-preprocessing expands. The failure is in CBMC's internal
-preprocessing pipeline when used with libc++-20 headers.
