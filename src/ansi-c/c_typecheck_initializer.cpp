@@ -64,10 +64,23 @@ exprt c_typecheck_baset::do_initializer_rec(
     (type.id() == ID_union_tag &&
      follow_tag(to_union_tag_type(type)).is_incomplete()))
   {
-    error().source_location = value.source_location();
-    error() << "type '" << to_string(type)
-            << "' is still incomplete -- cannot initialize" << eom;
-    throw 0;
+    // Try to elaborate the type before giving up.
+    // Template class instances may not have been elaborated yet
+    // (e.g., initializer_list<int> when <vector> is included).
+    elaborate_class_template(type);
+
+    // Re-check after elaboration
+    if(
+      (type.id() == ID_struct_tag &&
+       follow_tag(to_struct_tag_type(type)).is_incomplete()) ||
+      (type.id() == ID_union_tag &&
+       follow_tag(to_union_tag_type(type)).is_incomplete()))
+    {
+      error().source_location = value.source_location();
+      error() << "type '" << to_string(type)
+              << "' is still incomplete -- cannot initialize" << eom;
+      throw 0;
+    }
   }
 
   if(value.id()==ID_initializer_list)
