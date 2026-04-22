@@ -1,9 +1,9 @@
-KNOWNBUG libcxx20
+CORE libcxx20
 main.cpp
 --cpp20 --stdlib libc++ --unwind 5 --no-unwinding-assertions
 ^VERIFICATION
 ^EXIT=(0|10)$
 ^SIGNAL=0$
 --
-libc++-20 C++20 vector with brace initialization fails with
-'struct nil is still incomplete' during initializer_list processing.
+^PARSING ERROR$
+^CONVERSION ERROR$

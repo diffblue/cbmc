@@ -1,10 +1,9 @@
-KNOWNBUG libcxx20
+CORE libcxx20
 main.cpp
 --cpp11 --stdlib libc++
 ^VERIFICATION
 ^EXIT=(0|10)$
 ^SIGNAL=0$
 --
-std::endl resolution requires [temp.deduct.funcaddr] with the
-specific libc++-20 header layout. The endl template is in a
-different header path than libc++-18.
+^PARSING ERROR$
+^CONVERSION ERROR$
