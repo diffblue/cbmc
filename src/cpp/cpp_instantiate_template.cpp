@@ -2356,7 +2356,12 @@ const symbolt &cpp_typecheckt::instantiate_template(
       template_map.apply(d.type());
     symbolt &symb = symbol_table.get_writeable_ref(class_name);
 
-    PRECONDITION(new_decl.declarators().size() == 1);
+    if(new_decl.declarators().size() != 1)
+    {
+      error().source_location = source_location;
+      error() << "expected exactly one declarator in template" << eom;
+      throw 0;
+    }
 
     if(new_decl.member_spec().is_virtual())
     {
@@ -2471,7 +2476,12 @@ const symbolt &cpp_typecheckt::instantiate_template(
   // not a class template, not a class template method,
   // it must be a function template, a template alias, or a variable template!
 
-  PRECONDITION(new_decl.declarators().size() == 1);
+  if(new_decl.declarators().size() != 1)
+  {
+    error().source_location = source_location;
+    error() << "expected exactly one declarator in template" << eom;
+    throw 0;
+  }
 
   // Variable template: the declarator type is not a function type.
   // Instantiate by converting the declaration directly.
