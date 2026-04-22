@@ -5,7 +5,8 @@ main.cpp
 ^EXIT=(0|10)$
 ^SIGNAL=0$
 --
-std::endl requires [temp.deduct.funcaddr] template argument deduction.
-This works with libc++-18 but fails with libc++-20 because
-basic_ostream is forward-declared in __fwd/ostream.h without
-template metadata, causing the template instantiation to fail.
+std::endl resolution requires template argument deduction from
+basic_ostream, which fails on libc++-20 because the struct
+symbol lacks ID_C_template metadata. Root cause: libc++-20
+forward-declares basic_ostream in __fwd/ostream.h, and the
+elaboration doesn't set template metadata on the resulting struct.
