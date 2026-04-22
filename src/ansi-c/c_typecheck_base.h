@@ -300,6 +300,9 @@ protected:
   void add_parameters_to_symbol_table(symbolt &symbol);
 
   virtual void do_initializer(symbolt &symbol);
+  virtual void elaborate_class_template(const typet &)
+  {
+  }
 
   static bool is_numeric_type(const typet &src)
   {
