@@ -1,0 +1,11 @@
+KNOWNBUG libcxx20
+main.cpp
+--cpp11 --stdlib libc++
+^VERIFICATION
+^EXIT=(0|10)$
+^SIGNAL=0$
+--
+[temp.deduct.funcaddr] for std::endl fails on libc++-20 because
+basic_ostream is forward-declared without ID_C_template metadata.
+The synthetic fargs deduction path can't match the struct_tag
+against the template pattern. Works on libc++-18.
