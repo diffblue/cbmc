@@ -178,16 +178,27 @@ run_smt2() {
   echo "# smt2 suite" >&2
   local smt_dir="$BENCH/smt-comp"
   [[ -d "$smt_dir" ]] || { echo "No smt-comp dir" >&2; return; }
+  local smt2_ms="$ROOT_DIR/build-mergesat/bin/smt2_solver"
   for f in "$smt_dir"/*.smt2; do
     local label
     label=$(basename "$f" .smt2)
     for enc in shift-add dadda comba comba-cs; do
       smt2_job cadical "$enc" "$label" "$f"
+      # CryptoMiniSat
+      enqueue smt2 cryptominisat "$enc" "$label" \
+        "'$SMT2' --cryptominisat --multiplier-encoding $enc '$f'"
     done
-    # MiniSat: only shift-add and comba-cs to save time
+    # MiniSat
     for enc in shift-add comba-cs; do
       smt2_job minisat "$enc" "$label" "$f"
     done
+    # MergeSat (separate binary, default solver)
+    if [[ -x "$smt2_ms" ]]; then
+      for enc in shift-add comba-cs; do
+        enqueue smt2 mergesat "$enc" "$label" \
+          "'$smt2_ms' --multiplier-encoding $enc '$f'"
+      done
+    fi
   done
 }
 

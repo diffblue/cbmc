@@ -19,6 +19,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifdef SATCHECK_MINISAT2
 #  include <solvers/sat/satcheck_minisat2.h>
 #endif
+#ifdef SATCHECK_CRYPTOMINISAT
+#  include <solvers/sat/satcheck_cryptominisat.h>
+#endif
 
 #include "smt2_format.h"
 #include "smt2_parser.h"
@@ -421,6 +424,7 @@ int solver(
   bool xor_gauss,
   bool reorder_vars,
   bool use_cadical,
+  bool use_cryptominisat,
   const std::string &multiplier_encoding_arg)
 {
   // Default to comba-cs (carry-save Comba), matching cbmc's default.
@@ -476,8 +480,43 @@ int solver(
     return 0;
   }
 #endif
+#ifdef SATCHECK_CRYPTOMINISAT
+  if(use_cryptominisat)
+  {
+    satcheck_cryptominisatt cms_satcheck{message_handler};
+    boolbvt boolbv{ns, cms_satcheck, message_handler};
+    if(multiplier_encoding == "comba")
+      boolbv.set_comba(true);
+    else if(multiplier_encoding == "dadda")
+      boolbv.set_dadda(true);
+    else if(multiplier_encoding == "wallace")
+      boolbv.set_wallace_tree(true);
+    else if(multiplier_encoding == "comba-cs")
+      boolbv.set_comba_carry_save(true);
+    else if(multiplier_encoding == "dadda-cs")
+      boolbv.set_dadda_carry_save(true);
+    smt2_solvert smt2_solver{in, boolbv};
+    bool error_found = false;
+    while(!smt2_solver.exit)
+    {
+      try
+      {
+        smt2_solver.parse();
+      }
+      catch(const smt2_tokenizert::smt2_errort &error)
+      {
+        smt2_solver.skip_to_end_of_list();
+        error_found = true;
+      }
+    }
+    if(error_found)
+      return 1;
+    return 0;
+  }
+#endif
   (void)xor_gauss;
   (void)reorder_vars;
+  (void)use_cryptominisat;
   boolbvt boolbv{ns, satcheck, message_handler};
   if(multiplier_encoding == "comba")
     boolbv.set_comba(true);
@@ -525,6 +564,7 @@ int main(int argc, const char *argv[])
   bool xor_gauss = false;
   bool reorder_vars = false;
   bool use_cadical = false;
+  bool use_cryptominisat = false;
   std::string multiplier_encoding;
   const char *filename = nullptr;
 
@@ -536,13 +576,16 @@ int main(int argc, const char *argv[])
       reorder_vars = true;
     else if(std::string{argv[i]} == "--cadical")
       use_cadical = true;
+    else if(std::string{argv[i]} == "--cryptominisat")
+      use_cryptominisat = true;
     else if(std::string{argv[i]} == "--multiplier-encoding" && i + 1 < argc)
       multiplier_encoding = argv[++i];
     else if(filename == nullptr)
       filename = argv[i];
     else
     {
-      std::cerr << "usage: smt2_solver [--cadical] [--multiplier-encoding ENC] "
+      std::cerr << "usage: smt2_solver [--cadical] [--cryptominisat] "
+                   "[--multiplier-encoding ENC] "
                    "[--xor-gauss] [--reorder-vars] [file]\n";
       return 1;
     }
@@ -550,7 +593,12 @@ int main(int argc, const char *argv[])
 
   if(filename == nullptr)
     return solver(
-      std::cin, xor_gauss, reorder_vars, use_cadical, multiplier_encoding);
+      std::cin,
+      xor_gauss,
+      reorder_vars,
+      use_cadical,
+      use_cryptominisat,
+      multiplier_encoding);
 
   std::ifstream in(filename);
   if(!in)
@@ -559,5 +607,11 @@ int main(int argc, const char *argv[])
     return 1;
   }
 
-  return solver(in, xor_gauss, reorder_vars, use_cadical, multiplier_encoding);
+  return solver(
+    in,
+    xor_gauss,
+    reorder_vars,
+    use_cadical,
+    use_cryptominisat,
+    multiplier_encoding);
 }
