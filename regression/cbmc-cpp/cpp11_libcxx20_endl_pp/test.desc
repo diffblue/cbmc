@@ -1,0 +1,12 @@
+CORE libcxx20
+main.ii
+--cpp11
+^VERIFICATION
+^EXIT=(0|10)$
+^SIGNAL=0$
+--
+^PARSING ERROR$
+^CONVERSION ERROR$
+Preprocessed version of cpp11_libcxx20_endl test.
+Created from ubuntu:25.04 with libc++-20 headers.
+_Float types renamed to avoid keyword conflicts.
