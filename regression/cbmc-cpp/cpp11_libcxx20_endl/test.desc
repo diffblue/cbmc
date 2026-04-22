@@ -1,0 +1,11 @@
+KNOWNBUG libcxx20
+main.cpp
+--cpp11 --stdlib libc++
+^VERIFICATION
+^EXIT=(0|10)$
+^SIGNAL=0$
+--
+std::endl requires [temp.deduct.funcaddr] template argument deduction.
+This works with libc++-18 but fails with libc++-20 because
+basic_ostream is forward-declared in __fwd/ostream.h without
+template metadata, causing the template instantiation to fail.
