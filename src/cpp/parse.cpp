@@ -823,7 +823,17 @@ bool Parser::rTypedef(cpp_declarationt &declaration)
     return false;
 
   if(!rDeclarators(declaration.declarators(), true))
-    return false;
+  {
+    // Redundant typedef: 'typedef __float128 _Float128;' where
+    // _Float128 is already a built-in type keyword. The declarator
+    // parse fails because the scanner returns a type token instead
+    // of an identifier. Skip to the next ';'.
+    while(lex.LookAhead(0) != ';' && lex.LookAhead(0) != 0)
+      lex.get_token(tk);
+    if(lex.LookAhead(0) == ';')
+      lex.get_token(tk);
+    return true;
+  }
 
   for(const auto &declarator : declaration.declarators())
   {
