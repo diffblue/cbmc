@@ -65,13 +65,13 @@ public:
 
   ~smt2_convt() override = default;
 
-  bool use_FPA_theory;
-  bool use_array_of_bool;
-  bool use_as_const;
-  bool use_check_sat_assuming;
-  bool use_datatypes;
-  bool use_lambda_for_array;
-  bool emit_set_logic;
+  bool use_FPA_theory = false;
+  bool use_array_of_bool = false;
+  bool use_as_const = false;
+  bool use_check_sat_assuming = false;
+  bool use_datatypes = false;
+  bool use_lambda_for_array = false;
+  bool emit_set_logic = true;
 
   exprt handle(const exprt &expr) override;
   void set_to(const exprt &expr, bool value) override;
