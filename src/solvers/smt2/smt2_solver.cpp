@@ -425,11 +425,34 @@ int solver(
   bool reorder_vars,
   bool use_cadical,
   bool use_cryptominisat,
-  const std::string &multiplier_encoding_arg)
+  const std::string &multiplier_encoding_arg,
+  const std::string &adder_encoding_str)
 {
   // Default to comba-cs (carry-save Comba), matching cbmc's default.
   const std::string multiplier_encoding =
     multiplier_encoding_arg.empty() ? "comba-cs" : multiplier_encoding_arg;
+
+  // Helper: apply multiplier and adder encoding to a boolbvt
+  auto configure_encodings = [&](boolbvt &boolbv)
+  {
+    if(multiplier_encoding == "comba")
+      boolbv.set_comba(true);
+    else if(multiplier_encoding == "dadda")
+      boolbv.set_dadda(true);
+    else if(multiplier_encoding == "wallace")
+      boolbv.set_wallace_tree(true);
+    else if(multiplier_encoding == "comba-cs")
+      boolbv.set_comba_carry_save(true);
+    else if(multiplier_encoding == "dadda-cs")
+      boolbv.set_dadda_carry_save(true);
+
+    if(adder_encoding_str == "brent-kung")
+      boolbv.set_adder_encoding(bv_utilst::adder_encodingt::BRENT_KUNG);
+    else if(adder_encoding_str == "kogge-stone")
+      boolbv.set_adder_encoding(bv_utilst::adder_encodingt::KOGGE_STONE);
+    else if(adder_encoding_str == "g-only")
+      boolbv.set_adder_encoding(bv_utilst::adder_encodingt::ADAPTIVE);
+  };
 
   symbol_tablet symbol_table;
   namespacet ns(symbol_table);
@@ -451,16 +474,7 @@ int solver(
     if(reorder_vars)
       cadical_satcheck.enable_variable_renumbering();
     boolbvt boolbv{ns, cadical_satcheck, message_handler};
-    if(multiplier_encoding == "comba")
-      boolbv.set_comba(true);
-    else if(multiplier_encoding == "dadda")
-      boolbv.set_dadda(true);
-    else if(multiplier_encoding == "wallace")
-      boolbv.set_wallace_tree(true);
-    else if(multiplier_encoding == "comba-cs")
-      boolbv.set_comba_carry_save(true);
-    else if(multiplier_encoding == "dadda-cs")
-      boolbv.set_dadda_carry_save(true);
+    configure_encodings(boolbv);
     smt2_solvert smt2_solver{in, boolbv};
     bool error_found = false;
     while(!smt2_solver.exit)
@@ -485,16 +499,7 @@ int solver(
   {
     satcheck_cryptominisatt cms_satcheck{message_handler};
     boolbvt boolbv{ns, cms_satcheck, message_handler};
-    if(multiplier_encoding == "comba")
-      boolbv.set_comba(true);
-    else if(multiplier_encoding == "dadda")
-      boolbv.set_dadda(true);
-    else if(multiplier_encoding == "wallace")
-      boolbv.set_wallace_tree(true);
-    else if(multiplier_encoding == "comba-cs")
-      boolbv.set_comba_carry_save(true);
-    else if(multiplier_encoding == "dadda-cs")
-      boolbv.set_dadda_carry_save(true);
+    configure_encodings(boolbv);
     smt2_solvert smt2_solver{in, boolbv};
     bool error_found = false;
     while(!smt2_solver.exit)
@@ -518,16 +523,7 @@ int solver(
   (void)reorder_vars;
   (void)use_cryptominisat;
   boolbvt boolbv{ns, satcheck, message_handler};
-  if(multiplier_encoding == "comba")
-    boolbv.set_comba(true);
-  else if(multiplier_encoding == "dadda")
-    boolbv.set_dadda(true);
-  else if(multiplier_encoding == "wallace")
-    boolbv.set_wallace_tree(true);
-  else if(multiplier_encoding == "comba-cs")
-    boolbv.set_comba_carry_save(true);
-  else if(multiplier_encoding == "dadda-cs")
-    boolbv.set_dadda_carry_save(true);
+  configure_encodings(boolbv);
 
   smt2_solvert smt2_solver{in, boolbv};
   bool error_found = false;
@@ -566,6 +562,7 @@ int main(int argc, const char *argv[])
   bool use_cadical = false;
   bool use_cryptominisat = false;
   std::string multiplier_encoding;
+  std::string adder_encoding;
   const char *filename = nullptr;
 
   for(int i = 1; i < argc; ++i)
@@ -580,12 +577,14 @@ int main(int argc, const char *argv[])
       use_cryptominisat = true;
     else if(std::string{argv[i]} == "--multiplier-encoding" && i + 1 < argc)
       multiplier_encoding = argv[++i];
+    else if(std::string{argv[i]} == "--adder-encoding" && i + 1 < argc)
+      adder_encoding = argv[++i];
     else if(filename == nullptr)
       filename = argv[i];
     else
     {
       std::cerr << "usage: smt2_solver [--cadical] [--cryptominisat] "
-                   "[--multiplier-encoding ENC] "
+                   "[--multiplier-encoding ENC] [--adder-encoding ENC] "
                    "[--xor-gauss] [--reorder-vars] [file]\n";
       return 1;
     }
@@ -598,7 +597,8 @@ int main(int argc, const char *argv[])
       reorder_vars,
       use_cadical,
       use_cryptominisat,
-      multiplier_encoding);
+      multiplier_encoding,
+      adder_encoding);
 
   std::ifstream in(filename);
   if(!in)
@@ -613,5 +613,6 @@ int main(int argc, const char *argv[])
     reorder_vars,
     use_cadical,
     use_cryptominisat,
-    multiplier_encoding);
+    multiplier_encoding,
+    adder_encoding);
 }

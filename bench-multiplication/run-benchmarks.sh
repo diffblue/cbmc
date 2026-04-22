@@ -39,16 +39,18 @@ done
 CBMC="$ROOT_DIR/build/bin/cbmc"
 CBMC_MS="$ROOT_DIR/build-mergesat/bin/cbmc"
 SMT2="$ROOT_DIR/build/bin/smt2_solver"
+SMT2_MS="$ROOT_DIR/build-mergesat/bin/smt2_solver"
 BENCH="$SCRIPT_DIR"
 
 [[ -x "$CBMC" ]] || { echo "Missing: $CBMC" >&2; exit 1; }
 [[ -x "$SMT2" ]] || { echo "Missing: $SMT2" >&2; exit 1; }
 HAVE_MS=false; [[ -x "$CBMC_MS" ]] && HAVE_MS=true
+HAVE_SMT2_MS=false; [[ -x "$SMT2_MS" ]] && HAVE_SMT2_MS=true
 
 WORKDIR=$(mktemp -d /tmp/bench-mul.XXXXXX)
 trap 'rm -rf "$WORKDIR"' EXIT
 
-# --- Run one command, return solver time or wall time or T/O ---
+# --- Single run: return solver time or wall time or T/O ---
 run_once() {
   local start end elapsed solver_time result
   start=$(date +%s%N)
@@ -79,134 +81,136 @@ median() {
 }
 
 # --- Enqueue a job ---
+# Output columns: suite solver mul_enc adder_enc benchmark time
 JOBID=0
 enqueue() {
-  local suite="$1" solver="$2" enc="$3" label="$4"
-  shift 4
+  local suite="$1" solver="$2" mul_enc="$3" adder_enc="$4" label="$5"
+  shift 5
   local cmd="$*"
   local jid=$((JOBID++))
   (
     local t
     t=$(median "$cmd")
-    printf '%s\t%s\t%s\t%s\t%s\n' "$suite" "$solver" "$enc" "$label" "$t" \
+    printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
+      "$suite" "$solver" "$mul_enc" "$adder_enc" "$label" "$t" \
       > "$WORKDIR/$jid.tsv"
-    printf '  [%d] %s/%s/%s = %s\n' "$jid" "$solver" "$enc" "$label" "$t" >&2
+    printf '  [%d] %s/%s+%s/%s = %s\n' \
+      "$jid" "$solver" "$mul_enc" "$adder_enc" "$label" "$t" >&2
   ) &
   if (( (JOBID % JOBS) == 0 )); then wait; fi
 }
 
-# --- cbmc helper: enqueue one cbmc run ---
+# --- cbmc helper ---
 cbmc_job() {
-  local solver="$1" enc="$2" label="$3" src="$4"
-  shift 4
+  local solver="$1" mul_enc="$2" adder_enc="$3" label="$4" src="$5"
+  shift 5
   local extra="$*"
-  local bin="$CBMC"
-  local sflag=""
+  local bin="$CBMC" sflag="" aflag=""
   case "$solver" in
     cadical)       sflag="--sat-solver cadical" ;;
     cryptominisat) sflag="--sat-solver cryptominisat" ;;
-    mergesat)      bin="$CBMC_MS"; sflag="" ;;
-    minisat)       sflag="" ;;
+    mergesat)      bin="$CBMC_MS" ;;
   esac
-  enqueue cbmc "$solver" "$enc" "$label" \
-    "'$bin' '$src' $extra --no-standard-checks --verbosity 10 --multiplier-encoding $enc $sflag"
+  [[ "$adder_enc" != "ripple" ]] && aflag="--adder-encoding $adder_enc"
+  enqueue cbmc "$solver" "$mul_enc" "$adder_enc" "$label" \
+    "'$bin' '$src' $extra --no-standard-checks --verbosity 10 --multiplier-encoding $mul_enc $aflag $sflag"
 }
 
 # --- smt2 helper ---
 smt2_job() {
-  local solver="$1" enc="$2" label="$3" src="$4"
-  local sflag=""
-  [[ "$solver" == "cadical" ]] && sflag="--cadical"
-  enqueue smt2 "$solver" "$enc" "$label" \
-    "'$SMT2' $sflag --multiplier-encoding $enc '$src'"
+  local solver="$1" mul_enc="$2" adder_enc="$3" label="$4" src="$5"
+  local bin="$SMT2" sflag="" aflag=""
+  case "$solver" in
+    cadical)       sflag="--cadical" ;;
+    cryptominisat) sflag="--cryptominisat" ;;
+    mergesat)      bin="$SMT2_MS" ;;
+  esac
+  [[ "$adder_enc" != "ripple" ]] && aflag="--adder-encoding $adder_enc"
+  enqueue smt2 "$solver" "$mul_enc" "$adder_enc" "$label" \
+    "'$bin' $sflag --multiplier-encoding $mul_enc $aflag '$src'"
 }
 
 # =====================================================================
 # SUITES
 # =====================================================================
 
+MUL_ENCS=(shift-add dadda comba comba-cs)
+ADDER_ENCS=(ripple brent-kung g-only)
+
 run_cbmc() {
   echo "# cbmc suite" >&2
   local solvers=(minisat cadical cryptominisat)
   $HAVE_MS && solvers+=(mergesat)
-  local encs=(shift-add dadda comba comba-cs)
 
-  # Commutativity scaling
+  # Commutativity scaling: all mul × adder × solver
   for bw in 9 11 13; do
-    for enc in "${encs[@]}"; do
-      for s in "${solvers[@]}"; do
-        cbmc_job "$s" "$enc" "comm_$bw" "$BENCH/comm.c" "-DBW=$bw"
+    for me in "${MUL_ENCS[@]}"; do
+      for ae in "${ADDER_ENCS[@]}"; do
+        for s in "${solvers[@]}"; do
+          cbmc_job "$s" "$me" "$ae" "comm_$bw" "$BENCH/comm.c" "-DBW=$bw"
+        done
       done
     done
   done
 
-  # Matrix trace
-  for enc in "${encs[@]}"; do
-    for s in "${solvers[@]}"; do
-      cbmc_job "$s" "$enc" "matrix_trace" "$BENCH/matrix_mul.c"
+  # Matrix trace: all mul × adder × solver
+  for me in "${MUL_ENCS[@]}"; do
+    for ae in "${ADDER_ENCS[@]}"; do
+      for s in "${solvers[@]}"; do
+        cbmc_job "$s" "$me" "$ae" "matrix_trace" "$BENCH/matrix_mul.c"
+      done
     done
   done
 
-  # MAC commutativity
-  for enc in "${encs[@]}"; do
-    cbmc_job cadical "$enc" "mac_comm" "$BENCH/mac_equiv.c"
+  # MAC commutativity (CaDiCaL only, all mul × adder)
+  for me in "${MUL_ENCS[@]}"; do
+    for ae in "${ADDER_ENCS[@]}"; do
+      cbmc_job cadical "$me" "$ae" "mac_comm" "$BENCH/mac_equiv.c"
+    done
   done
 
-  # Overflow
-  for enc in shift-add dadda comba-cs; do
-    cbmc_job cadical "$enc" "overflow_16" "$BENCH/overflow_check.c" "-DBW=16"
+  # Overflow (CaDiCaL, key encodings)
+  for me in shift-add dadda comba-cs; do
+    cbmc_job cadical "$me" ripple "overflow_16" "$BENCH/overflow_check.c" "-DBW=16"
   done
 
-  # Industrial
+  # Industrial (CaDiCaL, shift-add vs comba-cs, ripple only)
   for ind in murmurhash3_fmix keyed_hash fir_tap div_by_const; do
     local src="$BENCH/industrial/${ind}.c"
     [[ -f "$src" ]] || continue
-    for enc in shift-add comba-cs; do
-      cbmc_job cadical "$enc" "$ind" "$src"
+    for me in shift-add comba-cs; do
+      cbmc_job cadical "$me" ripple "$ind" "$src"
     done
   done
-
-  # Strength reduction
-  if [[ -f "$BENCH/strength_reduce.c" ]]; then
-    for enc in shift-add comba-cs; do
-      cbmc_job cadical "$enc" "strength_red" "$BENCH/strength_reduce.c"
-    done
-  fi
 }
 
 run_smt2() {
   echo "# smt2 suite" >&2
   local smt_dir="$BENCH/smt-comp"
   [[ -d "$smt_dir" ]] || { echo "No smt-comp dir" >&2; return; }
-  local smt2_ms="$ROOT_DIR/build-mergesat/bin/smt2_solver"
+  local solvers=(cadical cryptominisat minisat)
+  $HAVE_SMT2_MS && solvers+=(mergesat)
+
   for f in "$smt_dir"/*.smt2; do
     local label
     label=$(basename "$f" .smt2)
-    for enc in shift-add dadda comba comba-cs; do
-      smt2_job cadical "$enc" "$label" "$f"
-      # CryptoMiniSat
-      enqueue smt2 cryptominisat "$enc" "$label" \
-        "'$SMT2' --cryptominisat --multiplier-encoding $enc '$f'"
-    done
-    # MiniSat
-    for enc in shift-add comba-cs; do
-      smt2_job minisat "$enc" "$label" "$f"
-    done
-    # MergeSat (separate binary, default solver)
-    if [[ -x "$smt2_ms" ]]; then
-      for enc in shift-add comba-cs; do
-        enqueue smt2 mergesat "$enc" "$label" \
-          "'$smt2_ms' --multiplier-encoding $enc '$f'"
+    for me in "${MUL_ENCS[@]}"; do
+      for ae in "${ADDER_ENCS[@]}"; do
+        for s in "${solvers[@]}"; do
+          smt2_job "$s" "$me" "$ae" "$label" "$f"
+        done
       done
-    fi
+    done
   done
 }
 
 run_quick() {
   echo "# quick suite" >&2
-  for enc in shift-add comba-cs; do
-    cbmc_job cadical "$enc" "comm_9" "$BENCH/comm.c" "-DBW=9"
-    smt2_job cadical "$enc" "comm_8_smt2" "$BENCH/smt-comp/comm_8.smt2"
+  for me in shift-add comba-cs; do
+    for ae in ripple brent-kung; do
+      cbmc_job cadical "$me" "$ae" "comm_9" "$BENCH/comm.c" "-DBW=9"
+      smt2_job cadical "$me" "$ae" "comm_8_smt2" "$BENCH/smt-comp/comm_8.smt2"
+    done
   done
 }
 
@@ -224,9 +228,12 @@ cat << EOF
 # CBMC: $("$CBMC" --version 2>&1 | head -1)
 # Runs: $RUNS (median), Timeout: ${TIMEOUT}s, Memlimit: $((MEMLIMIT/1024/1024))GB, Jobs: $JOBS
 # Solvers: CaDiCaL $(cat "$ROOT_DIR/build/cadical-src/VERSION" 2>/dev/null || echo '?'), MiniSat 2.2.1, CryptoMiniSat 5.11.21
+# Mul encodings: ${MUL_ENCS[*]}
+# Adder encodings: ${ADDER_ENCS[*]}
 EOF
-$HAVE_MS && echo "# MergeSat: available"
-printf '#\nsuite\tsolver\tencoding\tbenchmark\ttime\n'
+$HAVE_MS && echo "# MergeSat: available (cbmc)"
+$HAVE_SMT2_MS && echo "# MergeSat: available (smt2_solver)"
+printf '#\nsuite\tsolver\tmul_enc\tadder_enc\tbenchmark\ttime\n'
 
 echo "Starting ($SUITE, jobs=$JOBS, runs=$RUNS, timeout=${TIMEOUT}s)..." >&2
 
@@ -241,5 +248,4 @@ esac
 wait
 echo "All $JOBID jobs complete." >&2
 
-# Collect and sort
-cat "$WORKDIR"/*.tsv 2>/dev/null | sort -t$'\t' -k1,1 -k4,4 -k2,2 -k3,3
+cat "$WORKDIR"/*.tsv 2>/dev/null | sort -t$'\t' -k1,1 -k5,5 -k2,2 -k3,3 -k4,4
