@@ -6,6 +6,7 @@ main.cpp
 ^SIGNAL=0$
 --
 std::endl template argument deduction fails on libc++-20.
-Cannot be reproduced without libc++-20 headers.
-See preprocessed version in cpp11_libcxx20_endl_pp for
-a host-reproducible test.
+Cannot be reproduced via preprocessed files because clang -E
+preserves built-ins (__remove_cv etc.) that CBMC's internal
+preprocessing expands. The failure is in CBMC's internal
+preprocessing pipeline when used with libc++-20 headers.
