@@ -3822,8 +3822,14 @@ void cpp_typecheck_resolvet::guess_template_args(
                   all_ok = false;
                   break;
                 }
-                guess_template_args(
-                  static_cast<const typet &>(targs[i]), arg_t);
+                {
+                  const typet &targ_type =
+                    targs[i].id() == ID_ambiguous
+                      ? static_cast<const typet &>(targs[i].find(ID_type))
+                      : static_cast<const typet &>(
+                          static_cast<const irept &>(targs[i]));
+                  guess_template_args(targ_type, arg_t);
+                }
               }
               if(all_ok)
                 return;

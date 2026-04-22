@@ -1,11 +1,7 @@
-KNOWNBUG libcxx20
+CORE libcxx20
 main.ii
 --cpp11 --stdlib libc++
 ^VERIFICATION
 ^EXIT=(0|10)$
 ^SIGNAL=0$
 --
-Preprocessed version of cpp11_libcxx20_endl from ubuntu:25.04
-with libc++-20 headers. Preprocessed using the exact clang
-flags that cbmc uses internally. Requires --stdlib libc++ to
-set the correct scanner mode (gcc13_type_traits etc.).
