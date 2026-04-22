@@ -5,4 +5,7 @@ main.cpp
 ^EXIT=(0|10)$
 ^SIGNAL=0$
 --
-Same root cause as cpp11_libcxx20_fwd_decl_deduction.
+std::endl template argument deduction fails on libc++-20.
+Cannot be reproduced without libc++-20 headers.
+See preprocessed version in cpp11_libcxx20_endl_pp for
+a host-reproducible test.
