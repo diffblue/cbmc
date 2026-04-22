@@ -5,9 +5,14 @@ main.cpp
 ^EXIT=(0|10)$
 ^SIGNAL=0$
 --
-Template argument deduction fails for basic_ostream on libc++-20
-because the struct symbol has no ID_C_template metadata (it was
-elaborated from a forward declaration in __fwd/ostream.h).
-The deduction can't match the struct against the template pattern
-to extract _CharT and _Traits. Works on libc++-18 where the
-struct has ID_C_template set.
+Template argument deduction for endl(cerr) fails on libc++-20.
+Root cause: basic_ostream<char,...> loses ID_C_template metadata
+when typecheck_compound_type swaps the incomplete type with the
+complete type (line 211). The full_template_args set by
+class_template_symbol are also lost. Without this metadata,
+guess_template_args can't match the struct against the template
+pattern to deduce _CharT and _Traits.
+Fix: preserve full_template_args during the type swap in
+typecheck_compound_type. This was verified to work but also
+requires not preserving template_class_instance (which causes
+invariant violations in other tests).

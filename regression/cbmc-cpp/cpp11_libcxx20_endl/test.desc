@@ -5,8 +5,4 @@ main.cpp
 ^EXIT=(0|10)$
 ^SIGNAL=0$
 --
-std::endl resolution requires template argument deduction from
-basic_ostream, which fails on libc++-20 because the struct
-symbol lacks ID_C_template metadata. Root cause: libc++-20
-forward-declares basic_ostream in __fwd/ostream.h, and the
-elaboration doesn't set template metadata on the resulting struct.
+Same root cause as cpp11_libcxx20_fwd_decl_deduction.
