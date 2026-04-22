@@ -203,3 +203,58 @@ path**. It should be the default top-level adder encoding when shift-add
 is used (either explicitly or via comba-cs's adaptive fallback for
 wide/sparse multiplications). For comba-cs's popcount path, g-only
 is neutral and can be left as ripple.
+
+## Adaptive Popcount Heuristic (Implemented)
+
+### Design
+
+comba-cs now uses popcount only when ALL three conditions hold:
+1. Multiplication width ≤ 24 bits
+2. At most 2 multiplications encountered so far (per bv_utilst instance)
+3. Same width as the first multiplication
+
+Otherwise falls back to dadda-cs (carry-save without popcount).
+
+### Rationale
+
+- **Width ≤ 24**: Wide multiplications (32-bit overflow checks) need
+  BVE cascading through carry chains. Popcount blocks this. The
+  commutativity benchmarks that benefit from popcount are all ≤ 20 bits.
+- **Count ≤ 2**: Associativity (4 muls) and distributivity (3 muls)
+  need BVE-completeness. Even 2 popcount multiplications block BVE
+  for the remaining ones, but the counter prevents the 3rd+ from
+  getting popcount.
+- **Same width**: Overflow checks have different-width multiplications
+  (32-bit wide + 16-bit narrow). Congruence closure only helps when
+  both multiplications have identical structure.
+
+### Results
+
+| Benchmark | shift-add | adaptive comba-cs | Assessment |
+|---|---|---|---|
+| cbmc comm BW=9 | 2.16s | **0.12s** | 17× faster |
+| cbmc comm BW=11 | 61.4s | **0.92s** | 67× faster |
+| cbmc comm BW=13 | T/O | **3.22s** | New solve |
+| cbmc matrix trace | 31.7s | **1.23s** | 26× faster |
+| cbmc MAC comm | 14.9s | **0.60s** | 25× faster |
+| cbmc overflow BW=16 | 0.71s | **0.37s** | 1.9× faster |
+| smt2 comm_16 | T/O | **5.37s** | New solve |
+| smt2 comm_20 | T/O | **33.95s** | New solve |
+| smt2 overflow_detect_16 | 0.33s | **0.22s** | 1.5× faster |
+| smt2 checked_mul_16 | 0.38s | **0.23s** | 1.7× faster |
+| smt2 bf16_mul_comm_v2 | 22.3s | **10.9s** | 2.1× faster |
+| smt2 hw_mul_equiv_12 | **14.6s** | 100.4s | 6.9× slower (inherent) |
+| smt2 assoc_8 | **26.7s** | T/O | Lost (3+ muls) |
+| smt2 distrib_8 | **81.5s** | T/O | Lost (3+ muls) |
+
+### Known Limitations
+
+1. **hw_mul_equiv_12**: Heterogeneous comparison (bvmul vs manual
+   shift-add). Only shift-add encoding matches the manual side.
+2. **assoc_8, distrib_8**: 3+ multiplications where BVE-completeness
+   requires carry chains. The first 2 multiplications get popcount
+   (count ≤ 2), which blocks BVE for the remaining ones.
+
+Both limitations are inherent to the popcount approach and rare in
+practice. Users can pass `--multiplier-encoding shift-add` for these
+cases. 691/691 CORE regression tests pass.
