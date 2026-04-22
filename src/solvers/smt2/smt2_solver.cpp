@@ -421,8 +421,12 @@ int solver(
   bool xor_gauss,
   bool reorder_vars,
   bool use_cadical,
-  const std::string &multiplier_encoding)
+  const std::string &multiplier_encoding_arg)
 {
+  // Default to comba-cs (carry-save Comba), matching cbmc's default.
+  const std::string multiplier_encoding =
+    multiplier_encoding_arg.empty() ? "comba-cs" : multiplier_encoding_arg;
+
   symbol_tablet symbol_table;
   namespacet ns(symbol_table);
 
