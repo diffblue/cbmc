@@ -102,3 +102,104 @@ with minimal risk. Warrants deeper investigation.
 | MergeSat | 300/432 | Second best, no inprocessing |
 | CryptoMiniSat | 291/432 | XOR handling provides no benefit |
 | MiniSat | 264/432 | SatELite preprocessing helps on small formulas |
+
+## Deep Investigation: comba-cs Regression Root Causes
+
+The regressions are NOT from carry-save separation. dadda-cs (carry-save
+without popcount) is fast on all regression benchmarks:
+
+| Benchmark | shift-add | dadda | dadda-cs | comba | comba-cs |
+|---|---|---|---|---|---|
+| overflow_detect_16 | 0.34s | 0.18s | **0.22s** | 1.18s | 119.7s |
+| checked_mul_16 | 0.39s | 0.31s | **0.23s** | 0.61s | 14.1s |
+| assoc_8 | **27.2s** | T/O | T/O | 119.2s | T/O |
+| distrib_8 | **83.3s** | T/O | T/O | T/O | T/O |
+
+The regression is from **popcount specifically**. Popcount creates
+intermediate variables that prevent BVE from cascading through the
+relationship between multiplications.
+
+### When popcount helps vs hurts
+
+**Popcount helps** (commutativity): Two multiplications with IDENTICAL
+structure. Popcount's balanced tree creates congruent gate pairs that
+CaDiCaL's congruence closure discovers. Without popcount (dadda-cs),
+the circuits have different internal structure and congruence closure
+can't help. Only comba-cs solves comm_16 (5.5s) and comm_20 (35.2s).
+
+**Popcount hurts** (overflow, assoc, distrib): Multiple multiplications
+with DIFFERENT relationships. BVE needs to cascade through carry chains
+to discover the relationship. Popcount's intermediate variables block
+this cascade.
+
+### Isolation experiment
+
+overflow_detect_16 has two multiplications: wide (32-bit, 16 PPs from
+zero-extension) and narrow (16-bit, 16 PPs symbolic). Each alone is
+trivial (SAT, instant). The hardness comes from proving the UNSAT
+relationship between them. The 403 extra variables from comba-cs's
+popcount on the narrow multiplication make this proof 340× harder.
+
+### Potential adaptive fix
+
+The current adaptive fallback routes sparse constants through dadda-cs.
+It should also route cases where popcount is counterproductive:
+- When the multiplication is part of an overflow check (one wide, one narrow)
+- When there are 3+ multiplications (associativity, distributivity)
+
+This requires information not available at encoding time (how many
+multiplications are in the formula). A practical heuristic: count
+unsigned_multiplier() calls and switch to dadda-cs after the 2nd call.
+This would fix assoc/distrib but might hurt some 2-multiplication
+benchmarks. Needs further investigation.
+
+## Deep Investigation: g-only Adder Encoding
+
+### Mechanism
+
+g-only adds redundant AND gates (g[i] = a[i] & b[i]) to every
+top-level ripple-carry addition. These do NOT affect multiplier-internal
+additions (isolated by the adder_encoding swap in unsigned_multiplier).
+
+The AND gates enable BVE polarity alignment cascades: the AND gate's
+clauses structurally match carry generation clauses, enabling BVE to
+eliminate them trivially, which reduces occurrence counts of input
+variables, enabling further cascading elimination.
+
+### Where g-only helps (shift-add multiplier)
+
+| Benchmark | Solver | ripple | g-only | Ratio |
+|---|---|---|---|---|
+| strength_chain_16 | MergeSat | 5.05s | **2.05s** | 2.46× |
+| hw_mul_equiv_12 | MiniSat | T/O | **119s** | ∞ (new solve) |
+| add_chain_32 | CaDiCaL | 0.46s | **0.33s** | 1.40× |
+| add_chain_32 | MergeSat | 0.98s | **0.76s** | 1.28× |
+| distrib_8 | CaDiCaL | 83.3s | **72.7s** | 1.15× |
+| div_roundtrip_12 | MiniSat | 13.2s | **11.9s** | 1.11× |
+| div_roundtrip_12 | MergeSat | 11.4s | **10.3s** | 1.10× |
+
+### Where g-only is neutral (comba-cs multiplier)
+
+With comba-cs, g-only is almost entirely neutral on all benchmarks.
+The popcount already creates enough intermediate variables for BVE,
+so the additional AND gates from g-only are redundant.
+
+Two borderline regressions with comba-cs: hw_mul_equiv_12 (103→T/O)
+and overflow_detect_16 (120→T/O), but these are already near T/O
+with ripple.
+
+### Why g-only helps more on MergeSat/MiniSat
+
+MergeSat and MiniSat rely on preprocessing BVE (SatELite) rather than
+inprocessing. The g-only AND gates provide BVE targets that are
+available during preprocessing, before the search starts. CaDiCaL's
+inprocessing can discover similar elimination opportunities during
+search, so g-only provides less additional benefit.
+
+### Practical verdict
+
+g-only is a **safe, consistent improvement for the shift-add multiplier
+path**. It should be the default top-level adder encoding when shift-add
+is used (either explicitly or via comba-cs's adaptive fallback for
+wide/sparse multiplications). For comba-cs's popcount path, g-only
+is neutral and can be left as ripple.
