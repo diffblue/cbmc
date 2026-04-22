@@ -2,6 +2,6 @@
 #include <iostream>
 int main()
 {
-  std::cerr << "test" << std::endl;
+  std::cerr << "test" << '\n';
   return 0;
 }
