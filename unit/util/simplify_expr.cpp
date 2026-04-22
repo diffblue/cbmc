@@ -710,3 +710,100 @@ TEST_CASE("Simplify complementary pair in nested OR", "[core][util]")
   const or_exprt expr{a, inner};
   REQUIRE(simplify_expr(expr, empty_namespace) == true_exprt{});
 }
+
+TEST_CASE("Simplify nested if-then-else with same condition", "[core][util]")
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+
+  const symbol_exprt c{"c", bool_typet{}};
+  const symbol_exprt a{"a", signedbv_typet{32}};
+  const symbol_exprt b{"b", signedbv_typet{32}};
+
+  // (c ? a : (c ? a : b)) should simplify to (c ? a : b)
+  // because in the false branch, c is false, so inner (c ? a : b) -> b
+  const if_exprt inner{c, a, b};
+  const if_exprt nested{c, a, inner};
+  const exprt result = simplify_expr(nested, ns);
+  REQUIRE(result == if_exprt{c, a, b});
+}
+
+TEST_CASE(
+  "Simplify nested if: AND condition substitutes conjuncts in true branch",
+  "[core][util]")
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+
+  const symbol_exprt a{"a", bool_typet{}};
+  const symbol_exprt b{"b", bool_typet{}};
+  const symbol_exprt y{"y", signedbv_typet{32}};
+  const symbol_exprt z{"z", signedbv_typet{32}};
+  const symbol_exprt w{"w", signedbv_typet{32}};
+
+  // if(a && b, if(a, y, z), w): in the true branch a is known true, so the
+  // inner if(a, y, z) collapses to y.
+  const if_exprt inner{a, y, z};
+  const if_exprt nested{and_exprt{a, b}, inner, w};
+  REQUIRE(simplify_expr(nested, ns) == if_exprt{and_exprt{a, b}, y, w});
+}
+
+TEST_CASE(
+  "Simplify nested if: OR condition substitutes disjuncts in false branch",
+  "[core][util]")
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+
+  const symbol_exprt a{"a", bool_typet{}};
+  const symbol_exprt b{"b", bool_typet{}};
+  const symbol_exprt x{"x", signedbv_typet{32}};
+  const symbol_exprt y{"y", signedbv_typet{32}};
+  const symbol_exprt z{"z", signedbv_typet{32}};
+
+  // if(a || b, x, if(a, y, z)): in the false branch a is known false, so the
+  // inner if(a, y, z) collapses to z.
+  const if_exprt inner{a, y, z};
+  const if_exprt nested{or_exprt{a, b}, x, inner};
+  REQUIRE(simplify_expr(nested, ns) == if_exprt{or_exprt{a, b}, x, z});
+}
+
+TEST_CASE(
+  "Simplify nested if: negated conjunct flips polarity in true branch",
+  "[core][util]")
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+
+  const symbol_exprt a{"a", bool_typet{}};
+  const symbol_exprt b{"b", bool_typet{}};
+  const symbol_exprt y{"y", signedbv_typet{32}};
+  const symbol_exprt z{"z", signedbv_typet{32}};
+  const symbol_exprt w{"w", signedbv_typet{32}};
+
+  // if(a && !b, if(b, y, z), w): in the true branch a is true and b is false,
+  // so the inner if(b, y, z) collapses to z.
+  const if_exprt inner{b, y, z};
+  const if_exprt nested{and_exprt{a, not_exprt{b}}, inner, w};
+  REQUIRE(
+    simplify_expr(nested, ns) == if_exprt{and_exprt{a, not_exprt{b}}, z, w});
+}
+
+TEST_CASE(
+  "Simplify nested if: negated outer condition (swap branches)",
+  "[core][util]")
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+
+  const symbol_exprt c{"c", bool_typet{}};
+  const symbol_exprt y{"y", signedbv_typet{32}};
+  const symbol_exprt z{"z", signedbv_typet{32}};
+  const symbol_exprt w{"w", signedbv_typet{32}};
+
+  // if(!c, if(c, y, z), w) == if(c, w, if(c, y, z)); in the (swapped) false
+  // branch c is known false, so the inner if(c, y, z) collapses to z.
+  const if_exprt inner{c, y, z};
+  const if_exprt nested{not_exprt{c}, inner, w};
+  REQUIRE(simplify_expr(nested, ns) == if_exprt{c, w, z});
+}

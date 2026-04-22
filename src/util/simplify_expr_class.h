@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "expr.h"
 #include "mp_arith.h"
 #include "type.h"
-// #define USE_LOCAL_REPLACE_MAP
+#define USE_LOCAL_REPLACE_MAP
 #ifdef USE_LOCAL_REPLACE_MAP
 #include "replace_expr.h"
 #endif

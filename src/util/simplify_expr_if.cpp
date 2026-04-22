@@ -264,15 +264,25 @@ simplify_exprt::simplify_if_preorder(const if_exprt &expr)
     }
 
 #ifdef USE_LOCAL_REPLACE_MAP
+    // Populate local_replace_map so that sub-expressions matching the
+    // condition are replaced by true/false during recursive simplification
+    // of the respective branch. The map is consulted via O(1) exact-match
+    // lookup in simplify_rec (not recursive tree replacement), so the cost
+    // is linear in expression size.
+    //
+    // For AND conditions (a && b), each conjunct is individually true in
+    // the true branch. For OR conditions (a || b), each disjunct is
+    // individually false in the false branch.
     replace_mapt map_before(local_replace_map);
 
-    // a ? b : c  --> a ? b[a/true] : c
+    // True branch: condition (or its conjuncts) known to be true.
     if(r_cond.expr.id() == ID_and)
     {
       for(const auto &op : r_cond.expr.operands())
       {
         if(op.id() == ID_not)
-          local_replace_map.insert(std::make_pair(op.op0(), false_exprt()));
+          local_replace_map.insert(
+            std::make_pair(to_not_expr(op).op(), false_exprt()));
         else
           local_replace_map.insert(std::make_pair(op, true_exprt()));
       }
@@ -284,13 +294,14 @@ simplify_exprt::simplify_if_preorder(const if_exprt &expr)
 
     local_replace_map = map_before;
 
-    // a ? b : c  --> a ? b : c[a/false]
+    // False branch: condition (or its disjuncts) known to be false.
     if(r_cond.expr.id() == ID_or)
     {
       for(const auto &op : r_cond.expr.operands())
       {
         if(op.id() == ID_not)
-          local_replace_map.insert(std::make_pair(op.op0(), true_exprt()));
+          local_replace_map.insert(
+            std::make_pair(to_not_expr(op).op(), true_exprt()));
         else
           local_replace_map.insert(std::make_pair(op, false_exprt()));
       }
@@ -305,8 +316,8 @@ simplify_exprt::simplify_if_preorder(const if_exprt &expr)
     if(swap_branches)
     {
       // tell build_if_expr to replace truevalue and falsevalue
-      r_truevalue.expr_changed = CHANGED;
-      r_falsevalue.expr_changed = CHANGED;
+      r_truevalue.expr_changed = resultt<>::CHANGED;
+      r_falsevalue.expr_changed = resultt<>::CHANGED;
     }
     return build_if_expr(expr, r_cond, r_truevalue, r_falsevalue);
 #else
