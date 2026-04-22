@@ -2954,7 +2954,33 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
     {
       auto saved = adder_encoding;
       adder_encoding = multiplier_adder_encoding;
-      auto result = comba_carry_save(pps);
+
+      // Adaptive popcount: use popcount (comba_carry_save) only when
+      // it helps — i.e., for pairs of same-width multiplications at
+      // moderate bitwidths (commutativity pattern). Otherwise use
+      // dadda_carry_save which preserves carry chains for BVE.
+      //
+      // Popcount helps: congruence closure discovers equivalent gates
+      // between two identical-structure multiplier circuits.
+      // Popcount hurts: intermediate variables block BVE cascading
+      // needed for overflow checks, associativity, wide multiplications.
+      ++mul_count;
+      bool use_popcount = false;
+      if(mul_count <= 2 && op0.size() <= 24)
+      {
+        if(mul_count == 1)
+        {
+          first_mul_width = op0.size();
+          use_popcount = true;
+        }
+        else if(op0.size() == first_mul_width)
+        {
+          use_popcount = true;
+        }
+      }
+
+      auto result =
+        use_popcount ? comba_carry_save(pps) : dadda_carry_save(pps);
       adder_encoding = saved;
       return result;
     }

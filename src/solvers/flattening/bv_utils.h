@@ -276,6 +276,10 @@ protected:
   bool use_dadda_carry_save = false;
   bool use_hybrid_divider = false;
 
+  // Track multiplications for adaptive popcount decisions
+  std::size_t mul_count = 0;
+  std::size_t first_mul_width = 0;
+
 public:
   void set_carry_save(bool b)
   {
