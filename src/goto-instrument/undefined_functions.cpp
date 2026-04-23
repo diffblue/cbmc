@@ -31,37 +31,3 @@ void list_undefined_functions(
       os << gf_entry.first << '\n';
   }
 }
-
-void undefined_function_abort_path(goto_modelt &goto_model)
-{
-  for(auto &gf_entry : goto_model.goto_functions.function_map)
-  {
-    for(auto &ins : gf_entry.second.body.instructions)
-    {
-      if(!ins.is_function_call())
-        continue;
-
-      const auto &function = ins.call_function();
-
-      if(function.id() != ID_symbol)
-        continue;
-
-      const irep_idt &function_identifier =
-        to_symbol_expr(function).get_identifier();
-
-      goto_functionst::function_mapt::const_iterator entry =
-        goto_model.goto_functions.function_map.find(function_identifier);
-      DATA_INVARIANT(
-        entry!=goto_model.goto_functions.function_map.end(),
-        "called function must be in function_map");
-
-      if(entry->second.body_available())
-        continue;
-
-      source_locationt annotated_location = ins.source_location();
-      annotated_location.set_comment(
-        "'" + id2string(function_identifier) + "' is undefined");
-      ins = goto_programt::make_assumption(false_exprt(), annotated_location);
-    }
-  }
-}
