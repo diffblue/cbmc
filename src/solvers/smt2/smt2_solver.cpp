@@ -46,6 +46,7 @@ protected:
   void expand_function_applications(exprt &);
 
   std::set<irep_idt> constants_done;
+  std::vector<exprt> deferred_assertions;
 
   enum
   {
@@ -134,12 +135,38 @@ void smt2_solvert::setup_commands()
       if(e.is_not_nil())
       {
         expand_function_applications(e);
-        solver.set_to_true(e);
+        deferred_assertions.push_back(std::move(e));
       }
     };
 
     commands["check-sat"] = [this]()
     {
+      // Pre-scan: count symbolic multiplications in deferred assertions.
+      // If 3+, disable popcount so comba-cs uses shift-add for BVE.
+      {
+        std::size_t mult_count = 0;
+        for(const auto &e : deferred_assertions)
+          e.visit_pre(
+            [&mult_count](const exprt &sub)
+            {
+              if(
+                sub.id() == ID_mult && sub.operands().size() == 2 &&
+                !sub.operands()[0].is_constant() &&
+                !sub.operands()[1].is_constant())
+                ++mult_count;
+            });
+        if(mult_count > 2)
+        {
+          if(auto *bv = dynamic_cast<boolbvt *>(&solver))
+            bv->set_comba_carry_save(false);
+        }
+      }
+
+      // Now encode all deferred assertions
+      for(const auto &e : deferred_assertions)
+        solver.set_to_true(e);
+      deferred_assertions.clear();
+
       // add constant definitions as constraints
       define_constants();
 
