@@ -208,7 +208,21 @@ void cpp_typecheckt::typecheck_compound_type(struct_union_typet &type)
       {
         // a previously incomplete struct/union becomes complete
         symbolt &writeable_symbol = symbol_table.get_writeable_ref(symbol_name);
+        // Preserve template metadata across the type swap — the
+        // incomplete type may carry ID_C_template set by
+        // class_template_symbol, which the new complete type lacks.
+        irept saved_c_template = writeable_symbol.type.find(ID_C_template);
+        irept saved_c_template_arguments =
+          writeable_symbol.type.find(ID_C_template_arguments);
         writeable_symbol.type.swap(type);
+        if(
+          writeable_symbol.type.find(ID_C_template).is_nil() &&
+          saved_c_template.is_not_nil())
+        {
+          writeable_symbol.type.set(ID_C_template, saved_c_template);
+          writeable_symbol.type.set(
+            ID_C_template_arguments, saved_c_template_arguments);
+        }
         typecheck_compound_body(writeable_symbol);
       }
       else if(symbol.type.get_bool(ID_C_is_anonymous))

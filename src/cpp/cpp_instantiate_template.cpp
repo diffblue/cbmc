@@ -297,8 +297,24 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   // already there?
   symbol_table_baset::symbolst::const_iterator s_it =
     symbol_table.symbols.find(identifier);
-  if(s_it!=symbol_table.symbols.end())
+  if(s_it != symbol_table.symbols.end())
+  {
+    // The symbol may have been created by a forward declaration
+    // (e.g., libc++-20's __fwd/ headers) without template metadata.
+    // Set ID_C_template and ID_C_template_arguments so that template
+    // argument deduction can match instantiation arguments later.
+    if(symbolt *ws = symbol_table.get_writeable(identifier))
+    {
+      if(ws->type.find(ID_C_template).is_nil())
+      {
+        ws->type.set(
+          ID_C_template,
+          to_cpp_declaration(template_symbol.type).template_type());
+        ws->type.set(ID_C_template_arguments, specialization_template_args);
+      }
+    }
     return s_it->second;
+  }
 
   // Create as incomplete struct/union, but mark as
   // "template_class_instance", to be elaborated later.
