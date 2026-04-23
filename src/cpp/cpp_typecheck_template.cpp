@@ -1665,10 +1665,31 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
   const template_typet::template_parameterst &parameters=
     template_type.template_parameters();
 
-  if(parameters.size()<args.size())
+  if(parameters.size() < args.size())
   {
     // Check if the last parameter is a parameter pack (ellipsis)
-    if(parameters.empty() || !parameters.back().get_bool(ID_ellipsis))
+    bool has_pack =
+      !parameters.empty() && parameters.back().get_bool(ID_ellipsis);
+    // For partial specializations, the specialization's own parameters
+    // may not include the pack. Check the primary template.
+    if(!has_pack)
+    {
+      const irep_idt &primary_id =
+        template_symbol.type.get(ID_specialization_of);
+      if(!primary_id.empty())
+      {
+        const symbolt *primary = symbol_table.lookup(primary_id);
+        if(primary != nullptr && primary->type.get_bool(ID_is_template))
+        {
+          const auto &primary_params = to_cpp_declaration(primary->type)
+                                         .template_type()
+                                         .template_parameters();
+          has_pack = !primary_params.empty() &&
+                     primary_params.back().get_bool(ID_ellipsis);
+        }
+      }
+    }
+    if(!has_pack)
     {
       error().source_location = source_location;
       error() << "too many template arguments (expected " << parameters.size()
@@ -2080,6 +2101,29 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         typecheck_expr(arg);
         simplify(arg, *this);
       }
+    }
+  }
+
+  // Typecheck remaining arguments beyond the parameter list.
+  // These correspond to variadic pack expansion arguments when the
+  // primary template has a parameter pack (class... Args).
+  for(std::size_t i = parameters.size(); i < args.size(); i++)
+  {
+    exprt &arg = args[i];
+    if(arg.id() == ID_type || arg.id() == ID_ambiguous)
+    {
+      if(arg.id() == ID_ambiguous)
+      {
+        arg.id(ID_type);
+        arg.type() = static_cast<const typet &>(arg.find(ID_type));
+      }
+      if(!arg.type().id().empty())
+        typecheck_type(arg.type());
+    }
+    else
+    {
+      typecheck_expr(arg);
+      simplify(arg, *this);
     }
   }
 
