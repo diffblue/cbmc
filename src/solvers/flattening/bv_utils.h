@@ -279,6 +279,8 @@ protected:
   // Track multiplications for adaptive popcount decisions
   std::size_t mul_count = 0;
   std::size_t first_mul_width = 0;
+  std::size_t first_mul_prop_vars = 0;
+  std::size_t last_mul_end_vars = 0;
 
 public:
   void set_carry_save(bool b)

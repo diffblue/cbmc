@@ -2965,22 +2965,65 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
       // Popcount hurts: intermediate variables block BVE cascading
       // needed for overflow checks, associativity, wide multiplications.
       ++mul_count;
-      bool use_popcount = false;
-      if(mul_count <= 2 && op0.size() <= 24)
+      if(mul_count == 1)
       {
-        if(mul_count == 1)
-        {
-          first_mul_width = op0.size();
-          use_popcount = true;
-        }
-        else if(op0.size() == first_mul_width)
-        {
-          use_popcount = true;
-        }
+        first_mul_width = op0.size();
+        first_mul_prop_vars = prop.no_variables();
       }
 
-      auto result =
-        use_popcount ? comba_carry_save(pps) : dadda_carry_save(pps);
+      // Check if any operand variable was created by a previous
+      // multiplication (falls in the encoding range of a prior mul).
+      // Variables before first_mul_prop_vars are original inputs.
+      // Variables in [first_mul_prop_vars, current_prop_vars) may be
+      // multiplication outputs OR SSA variables allocated between muls.
+      // We check conservatively: an operand is "computed" only if it
+      // contains variables in the range of a previous multiplication's
+      // INTERNAL encoding (between first_mul_prop_vars and the end of
+      // the last multiplication, excluding SSA gaps).
+      bool has_mul_output_operand = false;
+      for(const auto &l : op0)
+        if(
+          !l.is_constant() && l.var_no() >= first_mul_prop_vars &&
+          l.var_no() < last_mul_end_vars)
+        {
+          has_mul_output_operand = true;
+          break;
+        }
+      if(!has_mul_output_operand)
+        for(const auto &l : op1)
+          if(
+            !l.is_constant() && l.var_no() >= first_mul_prop_vars &&
+            l.var_no() < last_mul_end_vars)
+          {
+            has_mul_output_operand = true;
+            break;
+          }
+
+      bool use_popcount = !has_mul_output_operand && mul_count <= 2 &&
+                          op0.size() <= 24 && op0.size() == first_mul_width;
+
+      bvt result;
+      if(use_popcount)
+      {
+        result = comba_carry_save(pps);
+      }
+      else if(has_mul_output_operand)
+      {
+        // Operand is output of a previous multiplication: use dadda-cs.
+        // Carry-save is fine here (the relationship between this mul
+        // and the previous one is through the operand, not through
+        // BVE cascading).
+        result = dadda_carry_save(pps);
+      }
+      else
+      {
+        // 3+ independent multiplications: use shift-add to preserve
+        // carry chains that BVE needs for cascading elimination.
+        result = pps.front();
+        for(auto it = std::next(pps.begin()); it != pps.end(); ++it)
+          result = add(result, *it);
+      }
+      last_mul_end_vars = prop.no_variables();
       adder_encoding = saved;
       return result;
     }
