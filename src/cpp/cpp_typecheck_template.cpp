@@ -43,6 +43,13 @@ void cpp_typecheckt::salvage_default_arguments(
   }
 }
 
+/// Typecheck a class template declaration.
+///
+/// Implements [temp.class.general]: "A class template defines the layout
+/// and operations for an unbounded set of related types."
+///
+/// Also handles partial specializations per [temp.spec.partial.general]
+/// and explicit specializations per [temp.expl.spec].
 void cpp_typecheckt::typecheck_class_template(
   cpp_declarationt &declaration)
 {
@@ -316,7 +323,11 @@ void cpp_typecheckt::typecheck_template_alias(cpp_declarationt &declaration)
   cpp_scopes.id_map[symbol_name] = &template_scope;
 }
 
-/// typecheck function templates
+/// Typecheck a function template declaration.
+///
+/// Implements [temp.fct.general]: "A function template defines an unbounded
+/// set of related functions."  Also handles function template overloading
+/// per [temp.over.link].
 void cpp_typecheckt::typecheck_function_template(
   cpp_declarationt &declaration)
 {
