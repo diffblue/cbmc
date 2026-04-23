@@ -1081,6 +1081,15 @@ std::string cpp_typecheckt::class_template_identifier(
       std::string concepts;
       std::function<void(const irept &)> visit = [&](const irept &node)
       {
+        // Collect type-predicate expression IDs (e.g., __is_pointer)
+        // which are stored as the node id, not as ID_name sub-nodes.
+        const std::string &nid = id2string(node.id());
+        if(nid.find("__is_") == 0 || nid.find("__has_") == 0)
+        {
+          if(!concepts.empty())
+            concepts += "&&";
+          concepts += nid;
+        }
         if(node.id() == ID_name)
         {
           const irep_idt &nm = node.get(ID_identifier);
@@ -1151,6 +1160,13 @@ std::string cpp_typecheckt::function_template_identifier(
       std::string concepts;
       std::function<void(const irept &)> visit = [&](const irept &node)
       {
+        const std::string &nid = id2string(node.id());
+        if(nid.find("__is_") == 0 || nid.find("__has_") == 0)
+        {
+          if(!concepts.empty())
+            concepts += "&&";
+          concepts += nid;
+        }
         if(node.id() == ID_name)
         {
           const irep_idt &nm = node.get(ID_identifier);
