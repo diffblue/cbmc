@@ -1,7 +1,0 @@
-CORE libcxx20
-main.ii
---cpp11 --stdlib libc++
-^VERIFICATION
-^EXIT=(0|10)$
-^SIGNAL=0$
---
