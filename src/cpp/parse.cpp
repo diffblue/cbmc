@@ -1358,7 +1358,11 @@ bool Parser::rLinkageBody(cpp_linkage_spect::itemst &items)
   | TEMPLATE declaration                              (explicit instantiation)
   | TEMPLATE '<' '>' declaration                      (explicit specialization)
 
-  C++11 [temp] (A.12)
+  C++11 [temp.pre] (A.12)
+
+  Parses template-declaration, including template-head (template
+  parameter list) and the declaration body.  Also handles
+  explicit-specialization (template<>) per [temp.expl.spec].
 */
 bool Parser::rTemplateDecl(cpp_declarationt &decl)
 {
@@ -1411,7 +1415,9 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
   }
   else
   {
-    // C++20 leading requires clause: parse and store expression
+    // [temp.constr.decl]/1: a requires-clause associates a
+    // constraint-expression with a declaration.
+    // [temp.pre]/4: template-head may include a requires-clause.
     if(lex.LookAhead(0) == TOK_REQUIRES)
     {
       cpp_tokent req_tk;

@@ -3565,14 +3565,26 @@ void cpp_typecheck_resolvet::guess_template_args(
   }
 }
 
+/// Deduce template arguments by comparing a type pattern P against an
+/// actual type A.  This implements [temp.deduct.type] from the C++ standard.
+///
+/// The type P (template_type) is composed from template parameters and
+/// concrete types.  The type A (desired_type) is a fully resolved type.
+/// The function attempts to find template argument values that make P
+/// match A, recording them in the template_map.
+///
+/// Decomposition rules implemented (per [temp.deduct.type]/3):
+///  - [temp.deduct.type]/8  reference types (is_reference branch)
+///  - [temp.deduct.type]/9  pointer types (ID_pointer branch)
+///  - [temp.deduct.type]/10 array types (ID_array branch)
+///  - [temp.deduct.type]/11 function types (ID_code/ID_function_type branch)
+///  - [temp.deduct.type]/3.3 class template specializations (cpp_name with
+///    template_args — matches instantiation arguments from ID_C_template_arguments)
+///  - [temp.deduct.type]/14 cv-qualified types (ID_merged_type branch)
 void cpp_typecheck_resolvet::guess_template_args(
   const typet &template_type,
   const typet &desired_type)
 {
-  // look at
-  // http://publib.boulder.ibm.com/infocenter/comphelp/v8v101/topic/
-  //  com.ibm.xlcpp8a.doc/language/ref/template_argument_deduction.htm
-
 #ifdef DEBUG
   std::cout << "guess_template_args: TT.id=" << template_type.id()
             << " DT.id=" << desired_type.id() << '\n';
@@ -3904,8 +3916,11 @@ void cpp_typecheck_resolvet::guess_template_args(
         guess_template_args(t, desired);
     }
   }
+  // [temp.deduct.type]/14: cv-qualified types — strip cv and recurse
   else if(is_reference(template_type) || is_rvalue_reference(template_type))
   {
+    // [temp.deduct.type]/8: if P is a reference type, the referred-to
+    // type is used for type deduction.
     typet desired = desired_type;
     if(is_reference(desired) || is_rvalue_reference(desired))
       desired = to_reference_type(desired).base_type();
@@ -4017,7 +4032,19 @@ void cpp_typecheck_resolvet::guess_template_args(
   }
 }
 
-/// Guess template arguments for function templates
+/// Deduce template arguments for a function template from a function call.
+///
+/// Implements [temp.deduct.call]: for each function template parameter type P
+/// that contains template parameters, compare P with the type of the
+/// corresponding call argument A.  Also implements [temp.deduct.funcaddr]
+/// when called with synthetic fargs from known class template instantiations.
+///
+/// Key rules implemented:
+///  - [temp.deduct.call]/1: P/A comparison for each parameter
+///  - [temp.deduct.call]/3: forwarding references (T&& with lvalue → T&)
+///  - [temp.deduct.call]/4: cv-stripping when P is just T (not T&, T*, etc.)
+///  - [temp.deduct.call]/4: array-to-pointer decay
+///  - [temp.deduct.funcaddr]: deduction from function address target type
 exprt cpp_typecheck_resolvet::guess_function_template_args(
   const exprt &expr,
   const cpp_typecheck_fargst &fargs)
@@ -4314,9 +4341,9 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
         continue;
       }
 
-      // C++11 forwarding reference: if the parameter is T&& where T is
-      // a template parameter, and the argument is an lvalue, deduce T
-      // as the argument type with an added lvalue reference.
+      // [temp.deduct.call]/3: forwarding reference — if the parameter is
+      // T&& where T is a template parameter, and the argument is an
+      // lvalue, deduce T as "lvalue reference to A".
       // Exception: a dereference of an rvalue reference (e.g., the
       // result of std::move) is an xvalue, not an lvalue.
       // Named rvalue reference variables are lvalues, not xvalues.
@@ -4339,10 +4366,9 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
       }
       else
       {
-        // For function template argument deduction, top-level
-        // cv-qualifiers on the argument type are ignored when the
-        // parameter type is just T (not T&, T*, etc.).
-        // Also, array types decay to pointer types (C++ [temp.deduct.call]).
+        // [temp.deduct.call]/4: when P is just T (not T&, T*, etc.),
+        // top-level cv-qualifiers on A are ignored.
+        // Also, array types decay to pointer types per [temp.deduct.call]/4.
         typet arg_actual_type = it->type();
         if(arg_type.id() == ID_cpp_name)
         {
