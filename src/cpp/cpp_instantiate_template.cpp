@@ -362,49 +362,6 @@ void cpp_typecheckt::elaborate_class_template(
   if(type.id() != ID_struct_tag && type.id() != ID_union_tag)
     return;
 
-  {
-    const irep_idt &tag_id = to_tag_type(type).get_identifier();
-    if(id2string(tag_id).find("incrementable") != std::string::npos)
-    {
-      FILE *f = fopen("/tmp/concept_debug.txt", "a");
-      if(f)
-      {
-        fprintf(
-          f,
-          "ELAB_ENTRY: %s suppress=%d force=%d\n",
-          tag_id.c_str(),
-          suppress_elaborate,
-          force_elaborate);
-        fclose(f);
-      }
-    }
-  }
-
-  {
-    const symbolt &dbg_sym = lookup(to_tag_type(type));
-    if(
-      id2string(dbg_sym.name).find("is_nothrow_destructible") !=
-        std::string::npos &&
-      id2string(dbg_sym.name).find("__wrap_iter") != std::string::npos)
-    {
-      FILE *f = fopen("/tmp/concept_debug.txt", "a");
-      if(f)
-      {
-        fprintf(
-          f,
-          "ELAB: %s suppress=%d force=%d tci=%d comps=%zu\n",
-          dbg_sym.name.c_str(),
-          suppress_elaborate,
-          force_elaborate,
-          dbg_sym.type.get_bool(ID_template_class_instance),
-          dbg_sym.type.id() == ID_struct
-            ? to_struct_type(dbg_sym.type).components().size()
-            : 0);
-        fclose(f);
-      }
-    }
-  }
-
   if(suppress_elaborate && !force_elaborate)
   {
     if(type.id() == ID_struct_tag || type.id() == ID_union_tag)
@@ -754,19 +711,6 @@ void cpp_typecheckt::elaborate_class_template(
               {
                 const irep_idt &cc =
                   spec_params[pi].get("#C_concept_constraint");
-                {
-                  FILE *f = fopen("/tmp/concept_debug.txt", "a");
-                  if(f)
-                  {
-                    fprintf(
-                      f,
-                      "PARAM[%zu] cc=[%s] id=%s\n",
-                      pi,
-                      cc.c_str(),
-                      spec_params[pi].id().c_str());
-                    fclose(f);
-                  }
-                }
                 if(cc.empty())
                   continue;
                 const auto concept_ids =
@@ -782,15 +726,6 @@ void cpp_typecheckt::elaborate_class_template(
                 if(cdecl.declarators().empty())
                   continue;
                 exprt body = cdecl.declarators()[0].value();
-                {
-                  FILE *f = fopen("/tmp/concept_debug.txt", "a");
-                  if(f)
-                  {
-                    fprintf(
-                      f, "BODY: %s nil=%d\n", body.id().c_str(), body.is_nil());
-                    fclose(f);
-                  }
-                }
                 if(body.is_nil())
                   continue;
                 // Evaluate type_requirement nodes in the concept body.
