@@ -11381,7 +11381,7 @@ std::optional<codet> Parser::rIfStatement()
   exprt exp;
   codet init_stmt(ID_skip);
   {
-    // Try: declaration ';' condition
+    // Try: declaration with initializer ';' condition
     auto saved_pos = lex.Save();
     cpp_declarationt init_decl;
     if(rSimpleDeclaration(init_decl) && lex.LookAhead(0) == ';')
@@ -11395,6 +11395,39 @@ std::optional<codet> Parser::rIfStatement()
     {
         lex.Restore(saved_pos);
 
+        // Try: declaration without initializer ';' condition
+        // e.g., if(T sum; !overflow(...))
+        auto saved_pos2 = lex.Save();
+        typet cv_q2, integral2;
+        cv_q2.make_nil();
+        if(
+          optCvQualify(cv_q2) && optIntegralTypeOrClassSpec(integral2) &&
+          (integral2.is_not_nil() || rName(integral2)) &&
+          integral2.is_not_nil())
+        {
+          if(cv_q2.is_not_nil())
+          merge_types(cv_q2, integral2);
+          cpp_declaratort declarator2;
+          if(
+            rDeclarator(declarator2, kDeclarator, true, true) &&
+            lex.LookAhead(0) == ';')
+          {
+          lex.get_token(tk3); // consume ';'
+          cpp_declarationt decl2;
+          decl2.type().swap(integral2);
+          decl2.declarators().push_back(declarator2);
+          init_stmt = codet(ID_decl);
+          init_stmt.add_to_operands(std::move(decl2));
+          set_location(init_stmt, tk2);
+          }
+          else
+          lex.Restore(saved_pos2);
+        }
+        else
+          lex.Restore(saved_pos2);
+    }
+    if(init_stmt.get_statement() == ID_skip)
+    {
         // Try: structured binding ';' condition
         // auto [a, b] = expr ;
         // auto& [a, b] = expr ;
