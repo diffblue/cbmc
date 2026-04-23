@@ -364,6 +364,18 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
 
     if(constructor_name.empty())
     {
+      // [class.default.ctor]: a defaulted default constructor
+      // zero-initializes all members. If the type has no explicit
+      // constructor (e.g., template instantiation where the
+      // "= default" constructor was not elaborated), fall through
+      // to zero-initialization instead of reporting an error.
+      if(operands.empty())
+      {
+        // Default construction with no arguments — treat as
+        // zero-initialization (same as "= default" semantics).
+        return code_expressiont{
+          side_effect_expr_nondett{object.type(), source_location}};
+      }
       error().source_location = source_location;
       error() << "non-POD type has no constructor" << eom;
       throw 0;
