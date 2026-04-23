@@ -2400,7 +2400,10 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
               }
             }
           }
-          // Add weight from requires clause constraints
+          // Add weight from requires clause constraints.
+          // Count the number of atomic constraints (type predicates,
+          // function calls) in the expression for proper ordering
+          // per [temp.constr.order].
           const auto &req_str =
             cpp_declaration.template_type().get(ID_C_requires_clause);
           if(!req_str.empty() && isdigit(id2string(req_str)[0]))
@@ -2408,7 +2411,26 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
           else if(cpp_declaration.template_type()
                     .find(ID_C_requires_clause)
                     .is_not_nil())
-            constrained += 1; // has a requires clause expression
+          {
+            const auto &req_expr =
+              cpp_declaration.template_type().find(ID_C_requires_clause);
+            // Count atomic constraints by visiting the expression tree
+            std::function<std::size_t(const irept &)> count_atoms =
+              [&](const irept &node) -> std::size_t
+            {
+              if(node.id() == ID_and || node.id() == ID_or)
+              {
+                std::size_t n = 0;
+                for(const auto &sub : node.get_sub())
+                  n += count_atoms(sub);
+                return n;
+              }
+              if(node.id() == ID_not)
+                return count_atoms(node.get_sub().front());
+              return 1;
+            };
+            constrained += count_atoms(req_expr);
+          }
 
           // [temp.constr.decl]: evaluate the requires clause to check
           // if the constraint is satisfied for the deduced arguments.
