@@ -527,6 +527,18 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
       bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::ADAPTIVE);
     else if(enc == "sklansky")
       bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::SKLANSKY);
+    else if(enc == "ripple")
+    {
+      // Explicitly selected ripple-carry: don't set any encoding
+    }
+  }
+  else
+  {
+    // Default: g-only (ADAPTIVE) top-level adder encoding.
+    // Adds redundant AND gates that enable BVE polarity alignment
+    // cascades on equality checks and explicit additions.
+    // Safe across all 4 solvers with no regressions on hard benchmarks.
+    bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::ADAPTIVE);
   }
 
   std::unique_ptr<boolbvt> boolbv = std::move(bv_pointers);

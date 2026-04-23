@@ -479,6 +479,15 @@ int solver(
       boolbv.set_adder_encoding(bv_utilst::adder_encodingt::KOGGE_STONE);
     else if(adder_encoding_str == "g-only")
       boolbv.set_adder_encoding(bv_utilst::adder_encodingt::ADAPTIVE);
+    else if(adder_encoding_str == "ripple")
+    {
+      // Explicitly selected ripple-carry
+    }
+    else
+    {
+      // Default: g-only (ADAPTIVE)
+      boolbv.set_adder_encoding(bv_utilst::adder_encodingt::ADAPTIVE);
+    }
   };
 
   symbol_tablet symbol_table;
