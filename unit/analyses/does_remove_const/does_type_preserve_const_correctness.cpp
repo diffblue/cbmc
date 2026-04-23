@@ -9,19 +9,17 @@ Author: Diffblue Ltd.
 /// \file
 /// Does Remove Const Unit Tests
 
-#include <testing-utils/use_catch.h>
-
 #include <util/c_types.h>
 #include <util/mathematical_types.h>
 #include <util/namespace.h>
 #include <util/symbol_table.h>
 
-#include <ansi-c/c_qualifiers.h>
-
+#include <goto-programs/does_remove_const.h>
 #include <goto-programs/goto_program.h>
 
 #include <analyses/does_remove_const/does_remove_const_util.h>
-#include <analyses/does_remove_const.h>
+#include <ansi-c/c_qualifiers.h>
+#include <testing-utils/use_catch.h>
 
 SCENARIO("does_type_preserve_const_correctness",
   "[core][analyses][does_remove_const][does_type_preserve_const_correctness]")

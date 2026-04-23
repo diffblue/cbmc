@@ -1,8 +1,7 @@
-analyses # dubious - concerns call_graph and does_remove_const
 ansi-c # for GraphML witnesses
 architecture # system
 goto-programs
-goto-symex # dubious - spurious inclusion of symex_target_equation in graphml_witness
+goto-symex # for GraphML witnesses
 json
 langapi # should go away
 linking

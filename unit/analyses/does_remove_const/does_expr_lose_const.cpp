@@ -16,9 +16,9 @@ Author: Diffblue Ltd.
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 
+#include <goto-programs/does_remove_const.h>
 #include <goto-programs/goto_program.h>
 
-#include <analyses/does_remove_const.h>
 #include <analyses/does_remove_const/does_remove_const_util.h>
 #include <ansi-c/c_qualifiers.h>
 #include <testing-utils/use_catch.h>

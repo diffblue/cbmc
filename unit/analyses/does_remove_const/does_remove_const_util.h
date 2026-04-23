@@ -12,7 +12,7 @@ Author: Diffblue Ltd.
 #ifndef CPROVER__ANALYSES_DOES_REMOVE_CONST_DOES_REMOVE_CONST_UTIL_H
 #define CPROVER__ANALYSES_DOES_REMOVE_CONST_DOES_REMOVE_CONST_UTIL_H
 
-#include <analyses/does_remove_const.h>
+#include <goto-programs/does_remove_const.h>
 
 // This class provides access to private members and functions of
 // does_remove_const
