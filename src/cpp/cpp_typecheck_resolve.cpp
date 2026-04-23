@@ -2410,6 +2410,57 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
                     .is_not_nil())
             constrained += 1; // has a requires clause expression
 
+          // [temp.constr.decl]: evaluate the requires clause to check
+          // if the constraint is satisfied for the deduced arguments.
+          // If not satisfied, skip this specialization.
+          //
+          // Only evaluate type-predicate constraints (e.g.,
+          // __is_pointer(T)) that can be resolved without full
+          // type-checking. Complex constraints are deferred to
+          // elaborate_class_template.
+          {
+            const exprt &req_clause = static_cast<const exprt &>(
+              cpp_declaration.template_type().find(ID_C_requires_clause));
+            if(req_clause.is_not_nil() && req_clause.id() != ID_nil)
+            {
+              exprt req_copy = req_clause;
+              cpp_typecheck.template_map.apply(req_copy);
+              // Try to evaluate the constraint. Use typecheck_expr
+              // in a safe context: suppress elaboration and catch
+              // all errors. If evaluation fails, treat as satisfied
+              // and let elaborate_class_template re-check later.
+              null_message_handlert null_handler;
+              message_handlert &old_handler =
+                cpp_typecheck.get_message_handler();
+              cpp_typecheck.set_message_handler(null_handler);
+              bool satisfied = true;
+              bool evaluated = false;
+              // Only attempt evaluation for simple type predicates
+              // and boolean combinations. Skip complex expressions
+              // that might trigger invariant violations.
+              if(
+                req_copy.id() == ID_and || req_copy.id() == ID_or ||
+                id2string(req_copy.id()).find("__is_") == 0 ||
+                id2string(req_copy.id()).find("__has_") == 0)
+              {
+                try
+                {
+                  cpp_typecheck.typecheck_expr(req_copy);
+                  simplify(req_copy, cpp_typecheck);
+                  if(req_copy.is_false())
+                    satisfied = false;
+                  evaluated = true;
+                }
+                catch(...)
+                {
+                }
+              }
+              cpp_typecheck.set_message_handler(old_handler);
+              if(evaluated && !satisfied)
+                continue;
+            }
+          }
+
           matches.push_back(matcht(
             guessed_template_args,
             full_template_args_tc,
