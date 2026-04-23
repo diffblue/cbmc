@@ -202,6 +202,18 @@ cpp_scopet &cpp_typecheckt::sub_scope_for_instantiation(
   }
 }
 
+/// Create or find the symbol for a class template instantiation.
+///
+/// Per [temp.inst]/1, class template specializations are implicitly
+/// instantiated when referenced.  This function creates the incomplete
+/// type symbol (marked with template_class_instance) that will be
+/// elaborated later by elaborate_class_template.
+///
+/// When the symbol already exists (e.g., from a forward declaration in
+/// libc++-20's __fwd/ headers), ensures that template metadata
+/// (ID_C_template, ID_C_template_arguments) is set so that template
+/// argument deduction ([temp.deduct.type]/3.3) can match instantiation
+/// arguments.
 const symbolt &cpp_typecheckt::class_template_symbol(
   const source_locationt &source_location,
   const symbolt &template_symbol,
@@ -355,7 +367,16 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   return *s_ptr;
 }
 
-/// elaborate class template instances
+/// Elaborate (instantiate) a class template instance.
+///
+/// Implements [temp.inst]/1: "Unless a class template specialization has been
+/// explicitly instantiated or explicitly specialized, the class template
+/// specialization is implicitly instantiated when the specialization is
+/// referenced in a context that requires a completely-defined object type."
+///
+/// Also implements [temp.spec.partial.match]: when elaborating, searches
+/// for the best-matching partial specialization using the rules from
+/// [temp.spec.partial.order] and [temp.constr.order] (constraint ordering).
 void cpp_typecheckt::elaborate_class_template(
   const typet &type)
 {
@@ -1372,10 +1393,23 @@ void cpp_typecheckt::elaborate_class_template(
   }
 }
 
-/// \par parameters: location of the instantiation,
-/// the identifier of the template symbol,
-/// typechecked template arguments,
-/// an (optional) specialization
+/// Instantiate a template with the given arguments.
+///
+/// Implements [temp.inst]: implicit instantiation of class and function
+/// templates.  For class templates, creates the class symbol with
+/// substituted template arguments and processes the class body
+/// ([temp.mem.func], [temp.mem.class], [temp.static]).  For function
+/// templates, creates the function symbol with substituted types.
+///
+/// Template argument substitution follows [temp.deduct.type]: the
+/// template_map is used to replace template parameters with their
+/// deduced or explicitly specified values.
+///
+/// \param source_location: location of the instantiation
+/// \param template_symbol: the template being instantiated
+/// \param specialization_template_args: typechecked template arguments
+/// \param full_template_args: full set of template arguments
+/// \param specialization: optional explicit specialization type
 #define MAX_DEPTH 50
 
 const symbolt &cpp_typecheckt::instantiate_template(
