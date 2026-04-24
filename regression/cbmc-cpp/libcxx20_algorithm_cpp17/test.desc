@@ -1,0 +1,10 @@
+KNOWNBUG libcxx20
+main.cpp
+--cpp17 --stdlib libc++
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+libc++-20's std::sort in C++17 mode produces incorrect
+verification results (VERIFICATION FAILED instead of
+VERIFICATION SUCCESSFUL).
