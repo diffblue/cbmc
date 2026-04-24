@@ -1277,9 +1277,10 @@ bool configt::set(const cmdlinet &cmdline)
     cpp.set_cpp26();
 
   // MSVC's STL requires at least C++14 (uses enable_if_t, etc.)
-  // Clang also defaults to C++14+. Upgrade C++11 to C++14 for these.
+  // Clang/libc++ also defaults to C++14+. Upgrade to C++14 for these
+  // when the user hasn't explicitly requested a higher standard.
   if(
-    cpp.cpp_standard == cppt::cpp_standardt::CPP11 &&
+    cpp.cpp_standard < cppt::cpp_standardt::CPP14 &&
     (ansi_c.preprocessor == ansi_ct::preprocessort::VISUAL_STUDIO ||
      ansi_c.preprocessor == ansi_ct::preprocessort::CLANG))
   {

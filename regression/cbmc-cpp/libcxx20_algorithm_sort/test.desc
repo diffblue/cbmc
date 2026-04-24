@@ -1,13 +1,10 @@
 KNOWNBUG libcxx20
 main.cpp
 --stdlib libc++
-^VERIFICATION
-^EXIT=(0|10)$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
 ^SIGNAL=0$
 --
-^PARSING ERROR$
-^CONVERSION ERROR$
-libc++-20's <algorithm> internal headers (iterator_operations.h,
-lower_bound.h) use if-with-initializer and other C++17/20
-constructs that CBMC's C++ parser cannot handle, causing
-PARSING ERROR when no explicit C++ standard is specified.
+libc++-20's std::sort in default mode (now C++14 with libc++)
+produces incorrect verification results because the internal
+sort chain is not fully instantiated.
