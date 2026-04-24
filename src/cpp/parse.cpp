@@ -3463,14 +3463,51 @@ bool Parser::optAttribute(typet &t)
       }
 
     default:
-        // TODO: we may wish to change this: GCC, Clang, Visual Studio merely
-        // warn when they see an attribute that they don't recognize
+        // Skip unknown attributes. GCC, Clang, Visual Studio merely
+        // warn when they see an attribute that they don't recognize.
         if(is_identifier(tk.kind) && lex.LookAhead(0) == TOK_SCOPE)
         {
-        // scoped attribute like clang::something
-        exprt discarded;
-        if(!rExpression(discarded, false))
-          return false;
+        // scoped attribute like clang::something or _Clang::__lifetimebound__
+        // Consume scope::name tokens
+        while(lex.LookAhead(0) == TOK_SCOPE)
+        {
+          lex.get_token(tk); // ::
+          if(
+            is_identifier(lex.LookAhead(0)) ||
+            lex.LookAhead(0) == TOK_GCC_ATTRIBUTE)
+            lex.get_token(tk); // name
+        }
+        // Optionally followed by (argument-list)
+        if(lex.LookAhead(0) == '(')
+        {
+          int depth = 0;
+          do
+          {
+            lex.get_token(tk);
+            if(tk.kind == '(')
+                depth++;
+            else if(tk.kind == ')')
+                depth--;
+          } while(depth > 0);
+        }
+        }
+        else if(is_identifier(tk.kind))
+        {
+        // simple attribute like maybe_unused, carries_dependency, etc.
+        // Optionally followed by (argument-list)
+        if(lex.LookAhead(0) == '(')
+        {
+          // Skip the argument list
+          int depth = 0;
+          do
+          {
+            lex.get_token(tk);
+            if(tk.kind == '(')
+                depth++;
+            else if(tk.kind == ')')
+                depth--;
+          } while(depth > 0);
+        }
         }
         else
         return false;
@@ -6123,6 +6160,13 @@ bool Parser::rArgDeclaration(cpp_declarationt &declaration)
   typet header;
   cpp_tokent tk;
   bool is_explicit_this = false;
+
+  // C++11 [dcl.attr.grammar]: attributes may appear before a
+  // parameter declaration (e.g., [[_Clang::__lifetimebound__]]).
+  // Skip them.
+  typet discard_attr;
+  if(!optAttribute(discard_attr))
+    return false;
 
   switch(lex.LookAhead(0))
   {
