@@ -2257,7 +2257,25 @@ bool Parser::rExternTemplateDecl(cpp_declarationt &decl)
   if(!rDeclaration(decl))
     return false;
 
-  // Mark as extern so the type-checker can skip it.
+  // C++11 [temp.explicit]: An explicit instantiation declaration
+  // (extern template) suppresses implicit instantiation. Since CBMC
+  // analyses source code without linking against precompiled libraries,
+  // we discard extern template declarations for FUNCTIONS so that the
+  // template will be implicitly instantiated when needed. Class extern
+  // templates are kept because they affect struct layout.
+  // Only skip free function extern templates (not class or member
+  // function extern templates, which affect struct layout).
+  // Free functions have unqualified names in their declarators.
+  if(
+    !decl.declarators().empty() && !decl.declarators()[0].name().is_qualified())
+  {
+    cpp_declarationt empty;
+    empty.type().make_nil();
+    decl.swap(empty);
+    return true;
+  }
+
+  // For class extern templates, mark as extern (original behavior).
   decl.storage_spec().set_extern();
 
   return true;

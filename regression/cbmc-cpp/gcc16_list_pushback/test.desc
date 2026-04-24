@@ -1,9 +1,10 @@
 KNOWNBUG gcc16
 main.cpp
---cpp11 --unwind 2 --no-unwinding-assertions --no-built-in-assertions
+--cpp11 --unwind 2 --depth 200 --no-unwinding-assertions --no-built-in-assertions
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-GCC 16's std::list implementation causes CBMC to time out
-during bounded model checking.
+GCC 16's std::list implementation uses __allocated_obj RAII
+guards that cause symex to explore exponentially many paths.
+The --depth limit prevents the blowup but is a workaround.
