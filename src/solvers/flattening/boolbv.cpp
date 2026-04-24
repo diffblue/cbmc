@@ -552,6 +552,22 @@ void boolbvt::set_to(const exprt &expr, bool value)
         algebraic_disequalities.push_back(expr);
     }
   }
+  // Also catch not(equal(...)) set to true = disequality
+  if(!algebraic_solved && expr.id() == ID_not &&
+     expr.operands().size() == 1 &&
+     expr.operands()[0].id() == ID_equal && value)
+  {
+    const auto &eq = to_equal_expr(expr.operands()[0]);
+    auto is_internal = [](const exprt &e) {
+      return e.id() == ID_symbol &&
+             id2string(to_symbol_expr(e).get_identifier())
+                 .find("__CPROVER") != std::string::npos;
+    };
+    if(!is_internal(eq.lhs()) && !is_internal(eq.rhs()))
+    {
+      algebraic_disequalities.push_back(expr.operands()[0]);
+    }
+  }
 
   // Count symbolic multiplications for adaptive encoding
   expr.visit_pre(
