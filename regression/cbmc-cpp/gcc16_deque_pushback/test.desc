@@ -1,0 +1,10 @@
+KNOWNBUG gcc16
+main.cpp
+--cpp11 --unwind 3 --no-unwinding-assertions
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+GCC 16's std::deque implementation uses constructs that cause
+CBMC to produce incorrect verification results. The test
+produces VERIFICATION FAILED instead of VERIFICATION SUCCESSFUL.

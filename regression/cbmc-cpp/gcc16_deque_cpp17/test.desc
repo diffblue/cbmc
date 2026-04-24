@@ -1,0 +1,9 @@
+KNOWNBUG gcc16
+main.cpp
+--cpp17 --unwind 5 --no-unwinding-assertions
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+GCC 16's std::deque implementation in C++17 mode causes
+CBMC to produce incorrect verification results.

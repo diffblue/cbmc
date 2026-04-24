@@ -1,0 +1,9 @@
+KNOWNBUG gcc16
+main.cpp
+--cpp11 --unwind 2 --no-unwinding-assertions --no-built-in-assertions
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+GCC 16's std::list implementation causes CBMC to time out
+during bounded model checking.
