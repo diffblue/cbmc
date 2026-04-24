@@ -1,0 +1,239 @@
+/// \file
+/// Strong Gröbner basis computation over Z_{2^d}
+
+#include "groebner.h"
+
+#include <set>
+
+bool strong_groebner_basist::has_constant(
+  const std::vector<polynomialt> &basis) const
+{
+  for(const auto &p : basis)
+  {
+    if(!p.is_zero() && p.is_constant())
+    {
+      // A nonzero constant in the ideal means 1 is in the ideal
+      // (since the constant is a unit or we can derive 1 from it).
+      // In Z_{2^d}, a nonzero constant c generates the ideal (gcd(c, 2^d)).
+      // If gcd(c, 2^d) = 1 (c is odd), then 1 is in the ideal.
+      // If gcd(c, 2^d) = 2^k, we need to check further.
+      // For now, check if c is odd (unit in Z_{2^d}).
+      mp_integer c = p.terms.front().first;
+      if(c % 2 != 0)
+        return true;
+    }
+  }
+  return false;
+}
+
+polynomialt strong_groebner_basist::s_polynomial(
+  const polynomialt &f,
+  const polynomialt &g)
+{
+  PRECONDITION(!f.is_zero() && !g.is_zero());
+  PRECONDITION(f.bitwidth == g.bitwidth);
+
+  const monomialt &lm_f = f.leading_monomial();
+  const monomialt &lm_g = g.leading_monomial();
+  mp_integer lc_f = f.leading_coefficient();
+  mp_integer lc_g = g.leading_coefficient();
+  unsigned bw = f.bitwidth;
+  mp_integer m = power(mp_integer{2}, mp_integer{bw});
+
+  // LCM of leading monomials
+  monomialt lcm_mon;
+  {
+    auto it0 = lm_f.vars.begin(), it1 = lm_g.vars.begin();
+    while(it0 != lm_f.vars.end() || it1 != lm_g.vars.end())
+    {
+      if(it1 == lm_g.vars.end() ||
+         (it0 != lm_f.vars.end() && it0->first < it1->first))
+      {
+        lcm_mon.vars.push_back(*it0++);
+      }
+      else if(
+        it0 == lm_f.vars.end() ||
+        (it1 != lm_g.vars.end() && it1->first < it0->first))
+      {
+        lcm_mon.vars.push_back(*it1++);
+      }
+      else
+      {
+        lcm_mon.vars.emplace_back(
+          it0->first, std::max(it0->second, it1->second));
+        ++it0;
+        ++it1;
+      }
+    }
+  }
+
+  monomialt quot_f = lcm_mon.quotient(lm_f);
+  monomialt quot_g = lcm_mon.quotient(lm_g);
+
+  // S-poly = lc_g * (lcm/lm_f) * f - lc_f * (lcm/lm_g) * g
+  // This cancels the leading terms.
+  polynomialt term_f{bw};
+  term_f.terms.emplace_back(lc_g, quot_f);
+  polynomialt term_g{bw};
+  term_g.terms.emplace_back(lc_f, quot_g);
+
+  polynomialt result = (term_f * f) - (term_g * g);
+  result.normalize();
+  return result;
+}
+
+polynomialt strong_groebner_basist::strong_reduce(
+  const polynomialt &f,
+  const std::vector<polynomialt> &basis)
+{
+  polynomialt r = f;
+  unsigned bw = f.bitwidth;
+  mp_integer m = power(mp_integer{2}, mp_integer{bw});
+
+  bool changed = true;
+  while(changed && !r.is_zero())
+  {
+    changed = false;
+    if(++steps_taken > max_steps && max_steps > 0)
+      return r; // step limit reached
+
+    mp_integer lc_r = r.leading_coefficient();
+    const monomialt &lm_r = r.leading_monomial();
+    unsigned v_r = val_2(lc_r, bw);
+
+    // Try to reduce by a basis element
+    for(const auto &g : basis)
+    {
+      if(g.is_zero())
+        continue;
+      const monomialt &lm_g = g.leading_monomial();
+      if(!lm_g.divides(lm_r))
+        continue;
+
+      mp_integer lc_g = g.leading_coefficient();
+      unsigned v_g = val_2(lc_g, bw);
+
+      if(v_g <= v_r)
+      {
+        // lc_g divides lc_r in the 2-adic sense.
+        // Compute quotient: lc_r / lc_g mod 2^d
+        // lc_r = 2^v_r * u_r, lc_g = 2^v_g * u_g (u_r, u_g odd)
+        // lc_r / lc_g = 2^(v_r - v_g) * u_r * inverse(u_g)
+        mp_integer u_r = lc_r / power(2, v_r);
+        mp_integer u_g = lc_g / power(2, v_g);
+        mp_integer inv_u_g = inverse_mod_2d(u_g, bw);
+        mp_integer q = (power(mp_integer{2}, mp_integer{v_r - v_g}) * u_r % m * inv_u_g) % m;
+
+        monomialt quot_mon = lm_r.quotient(lm_g);
+        polynomialt mult_term{bw};
+        mult_term.terms.emplace_back(q, quot_mon);
+
+        r = r - (mult_term * g);
+        r.normalize();
+        changed = true;
+        break;
+      }
+    }
+
+    // If no basis element reduced r, try the "2-trick":
+    // Multiply r by 2^(d - v_r) to kill the leading term
+    // (since lc_r * 2^(d-v_r) = 2^d * ... ≡ 0 mod 2^d)
+    // This produces a polynomial with a smaller leading term.
+    if(!changed && !r.is_zero() && v_r > 0)
+    {
+      mp_integer factor = power(2, bw - v_r);
+      polynomialt r2 = r * factor;
+      r2.normalize();
+      if(!r2.is_zero() && r2.leading_monomial() != r.leading_monomial())
+      {
+        // The leading term changed — try reducing again
+        r = r2;
+        changed = true;
+      }
+    }
+  }
+  return r;
+}
+
+strong_groebner_basist::resultt
+strong_groebner_basist::compute(std::vector<polynomialt> &polys)
+{
+  steps_taken = 0;
+
+  // Remove zero polynomials
+  polys.erase(
+    std::remove_if(
+      polys.begin(), polys.end(), [](const polynomialt &p) {
+        return p.is_zero();
+      }),
+    polys.end());
+
+  if(polys.empty())
+    return resultt::UNKNOWN;
+
+  if(has_constant(polys))
+    return resultt::UNSAT;
+
+  // Buchberger-like algorithm
+  // Track which pairs have been processed
+  std::set<std::pair<std::size_t, std::size_t>> processed;
+  std::vector<std::pair<std::size_t, std::size_t>> pairs;
+
+  for(std::size_t i = 0; i < polys.size(); ++i)
+    for(std::size_t j = i + 1; j < polys.size(); ++j)
+      pairs.emplace_back(i, j);
+
+  while(!pairs.empty())
+  {
+    if(steps_taken > max_steps && max_steps > 0)
+      return resultt::UNKNOWN;
+
+    auto [i, j] = pairs.back();
+    pairs.pop_back();
+
+    if(i >= polys.size() || j >= polys.size())
+      continue;
+    if(polys[i].is_zero() || polys[j].is_zero())
+      continue;
+
+    polynomialt s = s_polynomial(polys[i], polys[j]);
+    polynomialt r = strong_reduce(s, polys);
+
+    if(!r.is_zero())
+    {
+      std::size_t new_idx = polys.size();
+      polys.push_back(std::move(r));
+
+      if(has_constant(polys))
+        return resultt::UNSAT;
+
+      for(std::size_t k = 0; k < new_idx; ++k)
+        pairs.emplace_back(k, new_idx);
+    }
+
+    // Also process 2-multiples of basis elements with non-unit lc
+    for(std::size_t k = 0; k < polys.size(); ++k)
+    {
+      if(polys[k].is_zero())
+        continue;
+      unsigned v = val_2(polys[k].leading_coefficient(), polys[k].bitwidth);
+      if(v > 0 && v < polys[k].bitwidth)
+      {
+        polynomialt h = polys[k] * power(mp_integer{2}, mp_integer{polys[k].bitwidth - v});
+        h.normalize();
+        polynomialt rh = strong_reduce(h, polys);
+        if(!rh.is_zero())
+        {
+          std::size_t new_idx = polys.size();
+          polys.push_back(std::move(rh));
+          if(has_constant(polys))
+            return resultt::UNSAT;
+          for(std::size_t l = 0; l < new_idx; ++l)
+            pairs.emplace_back(l, new_idx);
+        }
+      }
+    }
+  }
+
+  return has_constant(polys) ? resultt::UNSAT : resultt::UNKNOWN;
+}
