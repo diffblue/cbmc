@@ -689,16 +689,25 @@ bool boolbvt::try_algebraic_solve()
       equations.push_back(std::move(constraint));
   }
 
-  // Include side equations from inline expression decomposition
-  for(auto &se : extractor.side_equations)
-  {
-    se.normalize();
-    if(!se.is_zero())
-      equations.push_back(std::move(se));
-  }
-
-  if(equations.size() < 2)
+  if(equations.size() + extractor.side_equations.size() < 2)
     return false;
+
+  // Insert side equations (from fresh variable decomposition)
+  // before the Rabinowitsch equations for better Gröbner basis
+  // performance (the algorithm is sensitive to input order).
+  {
+    std::vector<polynomialt> ordered;
+    for(auto &se : extractor.side_equations)
+    {
+      se.normalize();
+      if(!se.is_zero())
+        ordered.push_back(std::move(se));
+    }
+    // Append the main equations (equalities + Rabinowitsch) after
+    for(auto &eq : equations)
+      ordered.push_back(std::move(eq));
+    equations = std::move(ordered);
+  }
 
   strong_groebner_basist gb{100000};
   auto result = gb.compute(equations);
