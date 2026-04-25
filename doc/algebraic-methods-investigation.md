@@ -145,35 +145,271 @@ multiplication is faster.
 - Kaufmann & Biere 2021: AMulet2 (TACAS)
 - Brain 2021: SMT Workshop, CEUR-WS Vol-2908
 
-## Level 3: Hybrid Algebraic + Bit-Blasting
+## Level 3: Hybrid Algebraic + Bit-Blasting (Detailed Plan)
 
-### What it would do
-Decompose the formula into:
-- Equational part (polynomial equations) → solve algebraically
-- Residual part (inequalities, bitwise ops) → bit-blast with comba-cs
+### Motivation
 
-CEGAR loop:
-1. Solve equational part algebraically
-2. If UNSAT → done
-3. If SAT → check algebraic solution against residual part
-4. If residual violated → add violated constraint as equation, iterate
+Levels 1-2 handle pure polynomial equations. Level 4 (bit-blasting)
+handles everything else. But some problems are MIXED: mostly polynomial
+with a few non-polynomial constraints. Examples:
 
-### Why this matters
-Many real verification problems are MOSTLY algebraic with a few
-bit-level constraints (e.g., overflow check on a multiplication
-result). Neither pure algebraic methods nor pure bit-blasting
-handles these well alone.
+```
+// Overflow-safe commutativity: polynomial + inequality
+assert(a * b == b * a);          // polynomial (Gröbner solves)
+assert(a * b <= MAX_UINT16);     // inequality (needs bit-blasting)
 
-### Architecture
-Maps onto CBMC's existing `--refine-arithmetic` framework:
-- The algebraic solver replaces the weak initial approximation
-- The bit-blasting solver handles the residual
-- The CEGAR loop connects them
+// Hash with algebraic property: polynomial + XOR
+uint16_t h = key * data;         // polynomial
+h ^= h >> 8;                     // XOR + shift (non-polynomial)
+assert(f(key, data) == f(key, data));  // determinism
+```
 
-### Open questions
-- How to efficiently extract the equational fragment from SSA?
-- How to handle bitwise operations (AND, OR, XOR) in the polynomial ring?
-  (Rabinowitsch trick: x AND y = x*y for single bits, but multi-bit
-  AND requires bit-level decomposition)
-- Performance: is the Gröbner basis computation fast enough to be
-  worthwhile as a preprocessing step?
+Currently, the Gröbner basis ignores the inequality/XOR and returns
+UNKNOWN. The bit-blasting then solves the entire problem from scratch,
+not benefiting from the algebraic structure at all.
+
+### Architecture: CEGAR via `bv_refinementt`
+
+Level 3 extends the existing `bv_refinementt` CEGAR loop:
+
+```
+                    ┌─────────────────────┐
+                    │ Polynomial Extractor │
+                    │ (separate equational │
+                    │  and residual parts) │
+                    └──────┬──────────────┘
+                           │
+              ┌────────────┴────────────┐
+              │                         │
+    ┌─────────▼─────────┐   ┌──────────▼──────────┐
+    │ Gröbner Basis      │   │ Residual Constraints │
+    │ (equational part)  │   │ (inequalities, XOR,  │
+    │                    │   │  shifts, etc.)        │
+    └─────────┬─────────┘   └──────────┬──────────┘
+              │                         │
+              │ SAT → candidate         │
+              │ assignment              │
+              │                         │
+              ▼                         ▼
+    ┌─────────────────────────────────────────────┐
+    │ Check candidate against residual via SAT    │
+    │ (bit-blast only the residual constraints    │
+    │  with the algebraic variables fixed)        │
+    └──────────────────┬──────────────────────────┘
+                       │
+              ┌────────┴────────┐
+              │                 │
+         consistent         violated
+              │                 │
+              ▼                 ▼
+           RESULT          Add violated constraint
+           (SAT/UNSAT)     as polynomial equation,
+                           re-run Gröbner basis
+```
+
+### Implementation Steps
+
+#### Step 1: Extract candidate assignment from Gröbner basis
+
+When the Gröbner basis returns UNKNOWN (not UNSAT), the reduced
+basis represents the set of solutions. For simple cases (linear
+equations), we can read off a candidate assignment directly.
+
+**File:** `src/solvers/algebraic/groebner.h`
+
+```cpp
+class strong_groebner_basist {
+public:
+  // ... existing ...
+
+  /// After compute() returns UNKNOWN, try to extract a candidate
+  /// assignment for the variables. Returns empty map if no
+  /// assignment can be extracted.
+  std::map<std::size_t, mp_integer>
+  extract_candidate(const std::vector<polynomialt> &basis, unsigned bw);
+};
+```
+
+**Algorithm:** Walk the basis looking for univariate polynomials
+(polynomials in a single variable). For each `c*x + d = 0`, extract
+`x = -d/c mod 2^bw`. For multivariate polynomials, substitute
+already-determined variables and repeat.
+
+This is a best-effort extraction — it may not find a complete
+assignment. If it can't, fall through to bit-blasting.
+
+**Estimated:** ~50 lines.
+
+#### Step 2: Check candidate against residual constraints
+
+The residual constraints (inequalities, bitwise ops) are already
+in the SAT solver from `boolbvt::set_to()`. We need to check if
+the candidate assignment satisfies them.
+
+**Integration point:** `bv_refinementt::check_SAT()`
+
+The existing CEGAR loop already does this: after `prop_solve()`
+returns SAT, `check_SAT()` verifies the assignment against the
+approximated operations. We extend this to also verify against
+the algebraic candidate.
+
+**Approach:** Before the first `prop_solve()` call, if the Gröbner
+basis extracted a candidate, add it as assumptions to the SAT solver:
+
+```cpp
+// In bv_refinementt::dec_solve(), after try_algebraic_solve():
+if(algebraic_candidate.has_value()) {
+  // For each variable x_i = v_i in the candidate:
+  // Add assumption: x_i == v_i (as a SAT assumption, retractable)
+  for(auto &[var_idx, value] : *algebraic_candidate) {
+    // Find the corresponding bit-vector in the SAT solver
+    // and add equality constraints as assumptions
+  }
+}
+```
+
+If the SAT solver returns SAT with these assumptions, the candidate
+is consistent with the residual — we have a genuine SAT result.
+
+If the SAT solver returns UNSAT (the candidate violates the residual),
+the conflict clause tells us which residual constraint was violated.
+We can then:
+1. Remove the assumptions
+2. Add the violated constraint as a polynomial equation (if possible)
+3. Re-run the Gröbner basis with the additional equation
+4. Repeat
+
+**Estimated:** ~100 lines.
+
+#### Step 3: Convert residual violations to polynomial equations
+
+When the SAT solver finds that the algebraic candidate violates a
+residual constraint, we need to convert that constraint to a
+polynomial equation (if possible) and add it to the Gröbner basis.
+
+**What can be converted:**
+- `a > b` → `a - b - 1 >= 0` → introduce slack variable s:
+  `a - b - 1 - s = 0` with `s >= 0` (partial — the non-negativity
+  of s still needs bit-blasting)
+- `a & b == c` → for single bits: `a*b - c = 0` (exact)
+  For multi-bit: decompose into per-bit equations (expensive)
+
+**What cannot be converted:**
+- Shifts by variable amounts
+- Division
+- Complex control flow
+
+**Practical approach:** Only convert simple inequalities and
+single-bit bitwise operations. For everything else, fall through
+to full bit-blasting.
+
+**Estimated:** ~80 lines.
+
+#### Step 4: Integration into `bv_refinementt`
+
+Modify `bv_refinementt::dec_solve()`:
+
+```cpp
+resultt bv_refinementt::dec_solve(const exprt &assumption) {
+  finish_eager_conversion();
+
+  // Level 2: try pure algebraic solving
+  auto algebraic_result = try_algebraic_solve();
+  if(algebraic_result == resultt::D_UNSATISFIABLE)
+    return resultt::D_UNSATISFIABLE;
+
+  // Level 3: if Gröbner basis returned UNKNOWN with a candidate,
+  // try the candidate against the residual constraints
+  if(algebraic_candidate.has_value()) {
+    // Add candidate as SAT assumptions
+    add_algebraic_assumptions(*algebraic_candidate);
+
+    switch(prop_solve()) {
+    case resultt::D_SATISFIABLE:
+      // Candidate is consistent with residual — genuine SAT
+      check_SAT();
+      if(!progress)
+        return resultt::D_SATISFIABLE;
+      // Spurious — fall through to normal CEGAR
+      break;
+    case resultt::D_UNSATISFIABLE:
+      // Candidate violates residual — extract conflict,
+      // add as polynomial equation, re-run Gröbner basis
+      retract_algebraic_assumptions();
+      if(refine_from_conflict()) {
+        // Re-run Gröbner basis with additional equation
+        algebraic_result = try_algebraic_solve();
+        if(algebraic_result == resultt::D_UNSATISFIABLE)
+          return resultt::D_UNSATISFIABLE;
+      }
+      break;
+    }
+  }
+
+  // Fall through to normal CEGAR loop
+  // ... existing code ...
+}
+```
+
+**Estimated:** ~80 lines of integration code.
+
+### Variable Mapping Challenge
+
+The main engineering challenge: mapping between polynomial variables
+(indices in the Gröbner basis) and SAT variables (bit-vectors in
+the SAT solver). The `poly_extractort` maintains a `var_map` from
+symbol names to polynomial indices. We need the reverse mapping:
+from polynomial indices to the bit-vectors in `boolbvt`.
+
+**Solution:** Store the reverse mapping in `poly_extractort`:
+
+```cpp
+// In poly_extractort:
+std::map<std::size_t, irep_idt> reverse_var_map;
+// Populated in get_var_index()
+```
+
+Then in the integration code, use `boolbvt::convert_bv()` to get
+the bit-vector for each symbol and add equality constraints.
+
+### Expected Performance
+
+For pure polynomial problems: no change (Gröbner basis solves them
+at Level 2, Level 3 is never reached).
+
+For mixed problems (polynomial + inequality):
+- Best case: Gröbner basis extracts a candidate that satisfies the
+  residual on the first try → one SAT call with assumptions (fast)
+- Typical case: 1-3 CEGAR iterations before convergence
+- Worst case: falls through to full bit-blasting (no regression)
+
+### Testing Strategy
+
+1. **Pure polynomial:** verify Level 2 still works (no regression)
+2. **Pure non-polynomial:** verify fall-through works (no regression)
+3. **Mixed:** new benchmarks:
+   - `a*b == b*a && a > 100` (polynomial + inequality)
+   - `a*b == b*a && (a & 0xFF) == a` (polynomial + bitwise)
+   - `a*(b+c) == a*b + a*c && a*b < 1000` (distributivity + inequality)
+
+### Estimated Total: ~310 lines of new code
+
+- Step 1 (candidate extraction): ~50 lines
+- Step 2 (residual checking): ~100 lines
+- Step 3 (conflict conversion): ~80 lines
+- Step 4 (integration): ~80 lines
+
+### Dependencies
+
+- Phases 1-4 (all implemented)
+- `bv_refinementt` CEGAR infrastructure (existing)
+- Reverse variable mapping (new, ~20 lines)
+
+### Risk Assessment
+
+- **Low risk:** Steps 1-2 (candidate extraction and checking) are
+  straightforward extensions of existing infrastructure
+- **Medium risk:** Step 3 (conflict conversion) is limited by what
+  constraints can be polynomialized — many can't
+- **High risk:** The CEGAR loop may not converge for complex mixed
+  problems — but the fallback to full bit-blasting ensures correctness
