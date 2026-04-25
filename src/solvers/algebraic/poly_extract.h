@@ -38,9 +38,15 @@ public:
     return bitwidth;
   }
 
+  /// Side equations generated when decomposing inline multiplications.
+  /// E.g., for mult(a,b), a fresh variable c is introduced and
+  /// the equation c - a*b = 0 is added here.
+  std::vector<polynomialt> side_equations;
+
 private:
   std::map<irep_idt, std::size_t> var_map;
   std::size_t next_var_index = 0;
+  std::size_t next_fresh = 0;
   unsigned bitwidth = 0;
 
   /// Set bitwidth from a bitvector type. Returns false if incompatible.

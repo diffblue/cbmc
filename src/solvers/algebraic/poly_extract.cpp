@@ -107,6 +107,10 @@ std::optional<polynomialt> poly_extractort::to_polynomial(const exprt &e)
   }
 
   // Multiplication: a * b
+  // For inline expressions (not SSA), introduce a fresh variable for
+  // the product and add a side equation: fresh - a*b = 0.
+  // This enables the Gröbner basis to reason about the multiplication
+  // algebraically even when there are no SSA intermediate variables.
   if(e.id() == ID_mult)
   {
     if(e.operands().size() < 2)
@@ -119,7 +123,14 @@ std::optional<polynomialt> poly_extractort::to_polynomial(const exprt &e)
       auto op = to_polynomial(e.operands()[i]);
       if(!op)
         return std::nullopt;
-      result = *result * *op;
+      polynomialt product = *result * *op;
+      // Introduce fresh variable for the product
+      unsigned bw = product.bitwidth;
+      std::size_t fresh_idx =
+        get_var_index("__fresh_mul_" + std::to_string(next_fresh++));
+      polynomialt fresh_var{bw, mp_integer{1}, fresh_idx};
+      side_equations.push_back(fresh_var - product);
+      result = fresh_var;
     }
     return result;
   }
