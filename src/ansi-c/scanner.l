@@ -1369,7 +1369,7 @@ enable_or_disable ("enable"|"disable")
                 }
 
 "__remove_reference_t" { return conditional_keyword(
-                    PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || (PARSER.cpp20 && PARSER.clang_preprocessor)),
+                    PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor),
                     TOK_GCC_BUILTIN_REMOVE_REFERENCE);
                 }
 
