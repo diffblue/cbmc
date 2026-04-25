@@ -1,10 +1,14 @@
 KNOWNBUG libcxx20
 main.cpp
---stdlib libc++
+
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-libc++-20's std::sort in default mode (now C++14 with libc++)
-produces incorrect verification results because the internal
-sort chain is not fully instantiated.
+libc++-20's sort chain fails because __unwrap_iter cannot be
+resolved during __sort_impl's body elaboration. The template
+IS in the scope (id_class=TEMPLATE) but the resolver doesn't
+call guess_function_template_args for it. The pattern works in
+isolation but fails in the full libc++-20 header context,
+suggesting a scope/ordering issue specific to deeply nested
+template instantiations in system headers.
