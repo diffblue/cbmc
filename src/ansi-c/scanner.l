@@ -1378,6 +1378,11 @@ enable_or_disable ("enable"|"disable")
                     TOK_GCC_BUILTIN_REMOVE_CVREF);
                 }
 
+"__decay" { return conditional_keyword(
+                    PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor),
+                    TOK_GCC_BUILTIN_REMOVE_CVREF);
+                }
+
 "__forceinline" { return conditional_keyword(
                     PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO ||
                     PARSER.mode==configt::ansi_ct::flavourt::ARM,
