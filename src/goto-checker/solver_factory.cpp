@@ -149,10 +149,6 @@ smt2_dect::solvert solver_factoryt::get_smt2_solver_type() const
     s = smt2_dect::solvert::CPROVER_SMT2;
   else if(options.get_bool_option("mathsat"))
     s = smt2_dect::solvert::MATHSAT;
-  else if(options.get_bool_option("cvc3"))
-    s = smt2_dect::solvert::CVC3;
-  else if(options.get_bool_option("cvc4"))
-    s = smt2_dect::solvert::CVC4;
   else if(options.get_bool_option("cvc5"))
     s = smt2_dect::solvert::CVC5;
   else if(options.get_bool_option("yices"))
@@ -663,12 +659,6 @@ static void parse_smt2_options(const cmdlinet &cmdline, optionst &options)
     options.set_option("smt2", true);
   }
 
-  if(cmdline.isset("cvc4"))
-  {
-    options.set_option("cvc4", true), solver_set = true;
-    options.set_option("smt2", true);
-  }
-
   if(cmdline.isset("cvc5"))
   {
     options.set_option("cvc5", true), solver_set = true;
@@ -742,8 +732,6 @@ void parse_solver_options(const cmdlinet &cmdline, optionst &options)
        "boolector",
        "cprover-smt2",
        "mathsat",
-       "cvc3",
-       "cvc4",
        "cvc5",
        "yices",
        "z3",

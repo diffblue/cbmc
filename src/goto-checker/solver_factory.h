@@ -103,8 +103,7 @@ void parse_solver_options(const cmdlinet &cmdline, optionst &options);
   "(smt1)" /* rejected, will eventually disappear */                           \
   "(smt2)"                                                                     \
   "(fpa)"                                                                      \
-  "(cvc3)"                                                                     \
-  "(cvc4)(cvc5)(bitwuzla)(boolector)(yices)(z3)"                               \
+  "(cvc5)(bitwuzla)(boolector)(yices)(z3)"                                     \
   "(mathsat)"                                                                  \
   "(cprover-smt2)"                                                             \
   "(incremental-smt2-solver):"                                                 \
@@ -133,8 +132,6 @@ void parse_solver_options(const cmdlinet &cmdline, optionst &options);
   " {y--bitwuzla} \t use Bitwuzla\n"                                           \
   " {y--boolector} \t use Boolector\n"                                         \
   " {y--cprover-smt2} \t use CPROVER SMT2 solver\n"                            \
-  " {y--cvc3} \t use CVC3\n"                                                   \
-  " {y--cvc4} \t use CVC4\n"                                                   \
   " {y--cvc5} \t use CVC5\n"                                                   \
   " {y--mathsat} \t use MathSAT\n"                                             \
   " {y--yices} \t use Yices\n"                                                 \
