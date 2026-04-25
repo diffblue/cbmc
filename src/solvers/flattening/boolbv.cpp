@@ -692,18 +692,24 @@ bool boolbvt::try_algebraic_solve()
   if(equations.size() + extractor.side_equations.size() < 2)
     return false;
 
-  // Insert side equations (from fresh variable decomposition)
-  // before the Rabinowitsch equations for better Gröbner basis
-  // performance (the algorithm is sensitive to input order).
+  // IMPORTANT: Equation ordering is critical for Gröbner basis performance.
+  // Defining equations (e.g., f0 - a*b = 0) MUST come before the
+  // Rabinowitsch equation ((c-d)*e - 1 = 0). With the wrong order
+  // (Rabinowitsch first), the algorithm takes 2000x longer because
+  // the initial S-polynomials involve the auxiliary Rabinowitsch
+  // variable, producing harder intermediate polynomials. With
+  // definitions first, the algorithm builds up the ideal incrementally
+  // and reduces the Rabinowitsch equation efficiently.
   {
     std::vector<polynomialt> ordered;
+    // 1. Side equations (definitions from fresh variable decomposition)
     for(auto &se : extractor.side_equations)
     {
       se.normalize();
       if(!se.is_zero())
         ordered.push_back(std::move(se));
     }
-    // Append the main equations (equalities + Rabinowitsch) after
+    // 2. Main equations (SSA equalities, then Rabinowitsch last)
     for(auto &eq : equations)
       ordered.push_back(std::move(eq));
     equations = std::move(ordered);
