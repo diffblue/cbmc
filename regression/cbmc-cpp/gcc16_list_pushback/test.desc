@@ -5,6 +5,10 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
-GCC 16's std::list implementation uses __allocated_obj RAII
-guards that cause symex to explore exponentially many paths.
-The --depth limit prevents the blowup but is a workaround.
+GCC 16's std::list uses __allocate_guarded_obj whose return type
+__allocated_obj<_Alloc> is not recognized by CBMC's parser in the
+deeply nested namespace context. The parser falls back to 'auto'
+return type, the body is lost, and symex treats the function as
+nondeterministic, causing path explosion. Root cause: parser type
+name recognition failure for template class names in inline
+namespace contexts.
