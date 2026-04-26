@@ -43,6 +43,21 @@ void cpp_typecheckt::typecheck_return(code_frontend_returnt &code)
     return;
   }
 
+  // [dcl.init.list] p3: For non-aggregate class types, brace-init
+  // calls a constructor. Unwrap single-element initializer_lists
+  // so the base class typecheck handles the conversion through
+  // the normal constructor call path (which correctly handles
+  // rvalue references for move constructors).
+  if(
+    code.has_return_value() &&
+    code.return_value().id() == ID_initializer_list &&
+    code.return_value().operands().size() == 1 &&
+    (return_type.id() == ID_struct_tag || return_type.id() == ID_union_tag) &&
+    !cpp_is_pod(return_type))
+  {
+    code.return_value() = code.return_value().operands().front();
+  }
+
   c_typecheck_baset::typecheck_return(code);
 
   // For non-POD class-type return values, insert a copy constructor call.
