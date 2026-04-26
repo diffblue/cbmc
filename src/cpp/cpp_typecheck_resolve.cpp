@@ -4597,11 +4597,13 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
           cpp_typecheck.set_message_handler(null_handler);
           try
           {
-            cpp_save_scopet saved_scope(cpp_typecheck.cpp_scopes);
-            cpp_idt *tscope =
-              cpp_typecheck.cpp_scopes.id_map[template_symbol.name];
-            if(tscope != nullptr)
-              cpp_typecheck.cpp_scopes.go_to(*tscope);
+            // [temp.point] p1,7: the context of a template instantiation
+            // includes both the definition and instantiation contexts.
+            // Use the current (instantiation) scope rather than the
+            // template (definition) scope, because the template scope
+            // may lack using-scope links to enclosing inline namespaces
+            // (e.g., std::__1 in libc++). The instantiation scope has
+            // full visibility of the enclosing namespace.
             typet param_type = param.type();
             cpp_typecheck.template_map.apply(param_type);
             cpp_typecheck.typecheck_type(param_type);
