@@ -1703,6 +1703,8 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
   old_template_map=template_map;
 
   // check for default arguments
+  std::size_t first_default = parameters.size();
+  cpp_scopet *instantiation_scope_ptr = &cpp_scopes.current_scope();
   for(std::size_t i=0; i<parameters.size(); i++)
   {
     const template_parametert &parameter=parameters[i];
@@ -1738,10 +1740,9 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       }
 
       {
+        if(first_default > i)
+          first_default = i;
         exprt def = parameter.default_argument();
-        // Apply template_map to substitute already-resolved parameters
-        // in the default argument (e.g., _Templ<_Args...> where _Templ
-        // and _Args were resolved from earlier template arguments).
         template_map.apply(def);
         if(def.id() == ID_type)
           template_map.apply(def.type());
@@ -2051,7 +2052,24 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       }
 
       // Now check the argument to match that.
-      typecheck_expr(arg);
+      // For default non-type arguments (e.g., SFINAE enable_if_t),
+      // the template scope may lack visibility of type aliases from
+      // enclosing inline namespaces. Per [temp.point] p1,7, retry
+      // in the instantiation scope which has full namespace visibility.
+      if(i >= first_default)
+      {
+        try
+        {
+          typecheck_expr(arg);
+        }
+        catch(int)
+        {
+          cpp_scopes.go_to(*instantiation_scope_ptr);
+          typecheck_expr(arg);
+        }
+      }
+      else
+        typecheck_expr(arg);
       simplify(arg, *this);
       // C++17 template<auto>: deduce type from argument
       if(type.id() == ID_auto)
