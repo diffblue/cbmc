@@ -4,26 +4,29 @@
 #include "poly_extract.h"
 
 #include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
 #include <util/std_expr.h>
 
 bool poly_extractort::set_bitwidth(const typet &type)
 {
+  unsigned bw = 0;
   if(type.id() == ID_unsignedbv)
+    bw = to_unsignedbv_type(type).get_width();
+  else if(type.id() == ID_signedbv)
+    bw = to_signedbv_type(type).get_width();
+  else
+    return false;
+
+  if(bitwidth == 0)
   {
-    unsigned bw = to_unsignedbv_type(type).get_width();
-    if(bitwidth == 0)
-      bitwidth = bw;
-    return bitwidth == bw;
+    bitwidth = bw;
+    return true;
   }
-  if(type.id() == ID_signedbv)
-  {
-    unsigned bw = to_signedbv_type(type).get_width();
-    if(bitwidth == 0)
-      bitwidth = bw;
-    return bitwidth == bw;
-  }
-  return false;
+  // Accept same width or wider (for extractbits of wider expressions).
+  // Polynomial arithmetic mod 2^bitwidth automatically handles the
+  // wider intermediate values.
+  return bw >= bitwidth;
 }
 
 std::size_t poly_extractort::get_var_index(const irep_idt &name)
@@ -39,7 +42,7 @@ std::size_t poly_extractort::get_var_index(const irep_idt &name)
 
 std::optional<polynomialt> poly_extractort::to_polynomial(const exprt &e)
 {
-  if(bitwidth == 0 && !set_bitwidth(e.type()))
+  if(!set_bitwidth(e.type()))
     return std::nullopt;
 
   // Constant
@@ -68,6 +71,32 @@ std::optional<polynomialt> poly_extractort::to_polynomial(const exprt &e)
     if(!set_bitwidth(e.type()))
       return std::nullopt;
     return to_polynomial(to_typecast_expr(e).op());
+  }
+
+  // Zero-extend: same value, wider type — treat as identity.
+  // Don't set bitwidth from the wider type; keep the narrower ring.
+  if(e.id() == ID_zero_extend)
+  {
+    return to_polynomial(to_zero_extend_expr(e).op());
+  }
+
+  // Extract bits: extract(x, hi, lo) extracts bits hi..lo.
+  // When lo=0 and the result width matches our polynomial ring,
+  // this is x mod 2^bw — just convert x in our ring.
+  // When the source is wider, we convert the source's subexpressions
+  // in our (narrower) ring, which automatically reduces mod 2^bw.
+  if(e.id() == ID_extractbits)
+  {
+    if(!set_bitwidth(e.type()))
+      return std::nullopt;
+    // Convert the source expression in our ring (narrower bitwidth).
+    // This works because polynomial arithmetic mod 2^bw automatically
+    // discards the high bits — extract(a*b_wide, bw-1, 0) = a*b mod 2^bw.
+    unsigned saved_bw = bitwidth;
+    auto result = to_polynomial(to_extractbits_expr(e).src());
+    // Restore bitwidth in case the source changed it
+    bitwidth = saved_bw;
+    return result;
   }
 
   // Addition: a + b

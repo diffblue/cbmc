@@ -655,7 +655,7 @@ bool boolbvt::try_algebraic_solve()
   if(algebraic_disequalities.empty())
     return false;
 
-  algebraic_solved = true; // only try once
+  algebraic_solved = true;
 
   poly_extractort extractor;
   std::vector<polynomialt> equations;
@@ -687,6 +687,61 @@ bool boolbvt::try_algebraic_solve()
     constraint.normalize();
     if(!constraint.is_zero())
       equations.push_back(std::move(constraint));
+  }
+
+  // Try each disequality independently: if any single disequality
+  // is provably UNSAT (regardless of other constraints), the whole
+  // formula is UNSAT. This handles cases like overflow_detect where
+  // one assertion is non-polynomial but the disequality is polynomial.
+  for(const auto &diseq : algebraic_disequalities)
+  {
+    if(diseq.id() != ID_equal || diseq.operands().size() != 2)
+      continue;
+    poly_extractort single_extractor;
+    auto lhs = single_extractor.to_polynomial(to_equal_expr(diseq).lhs());
+    auto rhs = single_extractor.to_polynomial(to_equal_expr(diseq).rhs());
+    if(!lhs || !rhs)
+      continue;
+    unsigned single_bw = single_extractor.get_bitwidth();
+    if(single_bw == 0)
+      continue;
+    polynomialt diff = *lhs - *rhs;
+    std::size_t e_idx = single_extractor.get_var_index("__rab");
+    polynomialt e_var{single_bw, mp_integer{1}, e_idx};
+    polynomialt rab = (diff * e_var) - polynomialt{single_bw, mp_integer{1}};
+    rab.normalize();
+    if(rab.is_zero())
+      continue;
+
+    std::vector<polynomialt> single_eqs;
+    // Also extract equalities (SSA definitions) using the same extractor
+    // so that define-fun equations are included.
+    for(const auto &eq : algebraic_equalities)
+    {
+      auto poly = single_extractor.extract_equation(eq);
+      if(poly.has_value() && !poly->is_zero())
+        single_eqs.push_back(std::move(*poly));
+    }
+    // Add side equations from fresh variable decomposition
+    for(auto &se : single_extractor.side_equations)
+    {
+      se.normalize();
+      if(!se.is_zero())
+        single_eqs.push_back(std::move(se));
+    }
+    // Add Rabinowitsch last (ordering matters for Gröbner basis)
+    single_eqs.push_back(std::move(rab));
+
+    if(single_eqs.size() >= 2)
+    {
+      strong_groebner_basist single_gb{100000};
+      if(
+        single_gb.compute(single_eqs) == strong_groebner_basist::resultt::UNSAT)
+      {
+        prop.l_set_to_true(const_literal(false));
+        return true;
+      }
+    }
   }
 
   if(equations.size() + extractor.side_equations.size() < 2)
