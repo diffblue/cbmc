@@ -32,6 +32,12 @@ public:
   /// Get the variable index for a symbol (creates new index if needed)
   std::size_t get_var_index(const irep_idt &name);
 
+  /// Get the reverse mapping: polynomial variable index → symbol name
+  const std::map<std::size_t, irep_idt> &get_reverse_var_map() const
+  {
+    return reverse_var_map;
+  }
+
   /// Get the bitwidth for polynomial arithmetic (0 if not yet determined)
   unsigned get_bitwidth() const
   {
@@ -45,6 +51,7 @@ public:
 
 private:
   std::map<irep_idt, std::size_t> var_map;
+  std::map<std::size_t, irep_idt> reverse_var_map;
   std::size_t next_var_index = 0;
   std::size_t next_fresh = 0;
   unsigned bitwidth = 0;

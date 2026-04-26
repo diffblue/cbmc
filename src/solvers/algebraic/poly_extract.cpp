@@ -30,7 +30,10 @@ std::size_t poly_extractort::get_var_index(const irep_idt &name)
 {
   auto [it, inserted] = var_map.emplace(name, next_var_index);
   if(inserted)
+  {
+    reverse_var_map[next_var_index] = name;
     ++next_var_index;
+  }
   return it->second;
 }
 

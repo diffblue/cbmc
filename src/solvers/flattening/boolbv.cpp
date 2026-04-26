@@ -725,10 +725,47 @@ bool boolbvt::try_algebraic_solve()
     return true;
   }
 
-  // Level 3 (future): when UNKNOWN, extract candidate assignment
-  // from the reduced basis for potential use in CEGAR loop.
-  // Currently unused — the candidate could guide SAT solver phase
-  // decisions or be checked against residual constraints.
+  // Level 3: when UNKNOWN, extract candidate assignment and use it
+  // to add unit propagation clauses that guide the SAT solver.
+  unsigned bw = extractor.get_bitwidth();
+  if(bw > 0)
+  {
+    auto candidate = strong_groebner_basist::extract_candidate(equations, bw);
+    if(!candidate.empty())
+    {
+      const auto &rev_map = extractor.get_reverse_var_map();
+      for(const auto &[var_idx, val] : candidate)
+      {
+        auto name_it = rev_map.find(var_idx);
+        if(name_it == rev_map.end())
+          continue;
+
+        // Look up the bit-vector for this symbol in boolbvt's cache
+        symbol_exprt sym(name_it->second, unsignedbv_typet(bw));
+        const bvt &bv = convert_bv(sym);
+
+        // Add implications: for each bit, if the candidate value
+        // determines it, add as a soft hint (assumption-gated).
+        // We use a gate literal so these can be retracted if wrong.
+        literalt gate = prop.new_variable();
+        mp_integer v = val;
+        for(std::size_t bit = 0; bit < bv.size() && bit < bw; ++bit)
+        {
+          if(!bv[bit].is_constant())
+          {
+            literalt expected = (v % 2 != 0) ? bv[bit] : !bv[bit];
+            // gate => expected (i.e., !gate OR expected)
+            prop.lcnf(!gate, expected);
+          }
+          v /= 2;
+        }
+        // The gate is an assumption — if the candidate is wrong,
+        // the SAT solver will find a conflict involving the gate
+        // and can ignore it.
+        algebraic_assumptions.push_back(gate);
+      }
+    }
+  }
 
   return false;
 }
