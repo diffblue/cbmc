@@ -239,3 +239,115 @@ strong_groebner_basist::compute(std::vector<polynomialt> &polys)
 
   return has_constant(polys) ? resultt::UNSAT : resultt::UNKNOWN;
 }
+
+std::map<std::size_t, mp_integer> strong_groebner_basist::extract_candidate(
+  const std::vector<polynomialt> &basis,
+  unsigned bw)
+{
+  std::map<std::size_t, mp_integer> assignment;
+  mp_integer m = power(mp_integer{2}, mp_integer{bw});
+
+  bool progress = true;
+  while(progress)
+  {
+    progress = false;
+    for(const auto &p : basis)
+    {
+      if(p.is_zero() || p.is_constant())
+        continue;
+
+      // Substitute known assignments
+      polynomialt reduced = p;
+      for(const auto &[var, val] : assignment)
+      {
+        polynomialt subst{bw};
+        for(const auto &[coeff, mon] : reduced.terms)
+        {
+          mp_integer new_coeff = coeff;
+          monomialt new_mon;
+          for(const auto &[vi, exp] : mon.vars)
+          {
+            if(vi == var)
+            {
+              mp_integer v = val;
+              for(unsigned e = 0; e < exp; ++e)
+                new_coeff = (new_coeff * v) % m;
+            }
+            else
+              new_mon.vars.emplace_back(vi, exp);
+          }
+          subst.terms.emplace_back(new_coeff, new_mon);
+        }
+        subst.normalize();
+        reduced = subst;
+      }
+
+      if(reduced.is_zero())
+        continue;
+
+      // Check if univariate linear: c*x + d = 0
+      if(reduced.terms.size() > 2)
+        continue;
+
+      std::size_t var_idx = 0;
+      mp_integer coeff_x{0}, coeff_const{0};
+      bool is_univariate_linear = true;
+
+      for(const auto &[c, mon] : reduced.terms)
+      {
+        if(mon.is_constant())
+        {
+          coeff_const = c;
+        }
+        else if(mon.vars.size() == 1 && mon.vars[0].second == 1)
+        {
+          if(coeff_x != 0)
+          {
+            is_univariate_linear = false;
+            break;
+          }
+          var_idx = mon.vars[0].first;
+          coeff_x = c;
+        }
+        else
+        {
+          is_univariate_linear = false;
+          break;
+        }
+      }
+
+      if(!is_univariate_linear || coeff_x == 0)
+        continue;
+      if(assignment.count(var_idx))
+        continue;
+
+      // x = -coeff_const / coeff_x mod 2^bw
+      // If coeff_x = 2^k * u (u odd), we can solve if coeff_const
+      // is also divisible by 2^k: divide both by 2^k, then
+      // x = -coeff_const' * inverse(u) mod 2^(bw-k).
+      unsigned v_x = val_2(coeff_x, bw);
+      unsigned v_c = val_2(coeff_const, bw);
+      if(v_x > 0 && v_c < v_x)
+        continue; // coeff_const not divisible by 2^v_x, no solution
+
+      mp_integer cx = coeff_x;
+      mp_integer cc = coeff_const;
+      unsigned effective_bw = bw;
+      if(v_x > 0)
+      {
+        mp_integer divisor = power(mp_integer{2}, mp_integer{v_x});
+        cx = cx / divisor;
+        cc = cc / divisor;
+        effective_bw = bw - v_x;
+      }
+      mp_integer eff_m = power(mp_integer{2}, mp_integer{effective_bw});
+      mp_integer inv = inverse_mod_2d(cx, effective_bw);
+      mp_integer val = (eff_m - ((cc * inv) % eff_m)) % eff_m;
+      // The solution is x ≡ val (mod 2^(bw-k)), pick the smallest
+      assignment[var_idx] = val % m;
+      progress = true;
+    }
+  }
+
+  return assignment;
+}

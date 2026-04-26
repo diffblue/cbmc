@@ -725,5 +725,10 @@ bool boolbvt::try_algebraic_solve()
     return true;
   }
 
+  // Level 3 (future): when UNKNOWN, extract candidate assignment
+  // from the reduced basis for potential use in CEGAR loop.
+  // Currently unused — the candidate could guide SAT solver phase
+  // decisions or be checked against residual constraints.
+
   return false;
 }

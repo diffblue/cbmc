@@ -31,6 +31,11 @@ public:
   /// Returns UNSAT if a nonzero constant is found in the basis.
   resultt compute(std::vector<polynomialt> &polys);
 
+  /// After compute() returns UNKNOWN, try to extract a candidate
+  /// assignment. Looks for univariate linear polynomials in the basis.
+  static std::map<std::size_t, mp_integer>
+  extract_candidate(const std::vector<polynomialt> &basis, unsigned bw);
+
 private:
   std::size_t max_steps;
   std::size_t steps_taken = 0;
