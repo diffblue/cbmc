@@ -1,14 +1,19 @@
 KNOWNBUG gcc16
 main.cpp
---cpp11 --unwind 2 --depth 200 --no-unwinding-assertions --no-built-in-assertions
+
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-GCC 16's std::list uses __allocate_guarded_obj whose return type
-__allocated_obj<_Alloc> is not recognized by CBMC's parser in the
-deeply nested namespace context. The parser falls back to 'auto'
-return type, the body is lost, and symex treats the function as
-nondeterministic, causing path explosion. Root cause: parser type
-name recognition failure for template class names in inline
-namespace contexts.
+GCC 16 uses __allocated_obj (inheriting from __allocated_ptr)
+as an RAII allocation guard. __allocate_guarded_obj returns
+__allocated_obj via brace-init: return { __allocate_guarded(a) }.
+CBMC's brace-init handling incorrectly uses aggregate
+initialization instead of calling __allocated_obj's constructor
+(__allocated_obj(__allocated_ptr&&)). The aggregate init tries
+to assign __allocated_ptr to the base class's pointer member,
+causing 'invalid implicit conversion'. The function body is
+lost, symex treats it as nondeterministic, and the RAII guard's
+conditional destructor causes path explosion.
+Root cause: [dcl.init.list] p3 — brace-init for non-aggregate
+class types should call constructors, not do aggregate init.
