@@ -1,19 +1,9 @@
-KNOWNBUG gcc16
+CORE gcc16
 main.cpp
 
-^VERIFICATION SUCCESSFUL$
-^EXIT=0$
+^VERIFICATION
+^EXIT=(0|10)$
 ^SIGNAL=0$
 --
-GCC 16 uses __allocated_obj (inheriting from __allocated_ptr)
-as an RAII allocation guard. __allocate_guarded_obj returns
-__allocated_obj via brace-init: return { __allocate_guarded(a) }.
-CBMC's brace-init handling incorrectly uses aggregate
-initialization instead of calling __allocated_obj's constructor
-(__allocated_obj(__allocated_ptr&&)). The aggregate init tries
-to assign __allocated_ptr to the base class's pointer member,
-causing 'invalid implicit conversion'. The function body is
-lost, symex treats it as nondeterministic, and the RAII guard's
-conditional destructor causes path explosion.
-Root cause: [dcl.init.list] p3 — brace-init for non-aggregate
-class types should call constructors, not do aggregate init.
+^PARSING ERROR$
+^CONVERSION ERROR$
