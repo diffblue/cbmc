@@ -92,7 +92,7 @@ are implemented in CBMC's C++ frontend, and where.
 | [temp.local] locally declared names | 🔲 | | |
 | [temp.dep.type] dependent types | ⚠️ | cpp_typecheck_resolve.cpp | |
 | [temp.dep.expr] type-dependent expressions | ⚠️ | cpp_typecheck_resolve.cpp | |
-| [temp.point] point of instantiation | ⚠️ | cpp_instantiate_template.cpp | |
+| [temp.point] point of instantiation | ✅ | cpp_typecheck_resolve.cpp, cpp_typecheck_template.cpp | Use instantiation scope for default non-type args |
 
 ### 13.9 Template instantiation and specialization [temp.spec]
 
@@ -160,3 +160,33 @@ are implemented in CBMC's C++ frontend, and where.
 
 *Last updated: 2026-04-23*
 *Standard reference: N5008 (C++26 draft)*
+
+## 9 Declarations [dcl]
+
+### 9.4.5 List-initialization [dcl.init.list]
+
+| Rule | Status | Location | Notes |
+|------|--------|----------|-------|
+| [dcl.init.list]/3 non-aggregate brace-init | ✅ | cpp_typecheck_code.cpp `typecheck_return` | Unwrap single-element initializer_list for non-POD types |
+
+### 9.4.4 Reference initialization [dcl.init.ref]
+
+| Rule | Status | Location | Notes |
+|------|--------|----------|-------|
+| [dcl.init.ref]/5 rvalue ref binding | ✅ | cpp_typecheck_expr.cpp, cpp_typecheck_conversions.cpp | Explicit calls + derived-to-base conversion |
+
+## 11 Classes [class]
+
+### 11.4.4.2 Copy/move constructors [class.copy.ctor]
+
+| Rule | Status | Location | Notes |
+|------|--------|----------|-------|
+| [class.copy.ctor]/1 copy ctor definition | ✅ | cpp_typecheck_constructor.cpp `find_cpctor` | Excludes rvalue references (move ctors) |
+
+## 7 Expressions [expr]
+
+### 7.2.1 Value category [basic.lval]
+
+| Rule | Status | Location | Notes |
+|------|--------|----------|-------|
+| [basic.lval]/1 xvalue from derived-to-base | ✅ | cpp_typecheck_conversions.cpp | Preserve value category in user_defined_conversion_sequence |
