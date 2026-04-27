@@ -92,3 +92,106 @@ Definitions before Rabinowitsch gives 2000x speedup. This is an
 empirical observation about the Buchberger algorithm's heuristic
 behavior, not a formal property. The algorithm is correct regardless
 of ordering; only performance differs.
+
+## 6. Mechanization Strategy
+
+### What to mechanize
+
+The soundness proof (items 1-3 above) is the most valuable target
+for mechanization. It establishes that the algebraic solver never
+reports UNSAT when a solution exists — a critical safety property
+for a verification tool.
+
+### Proof structure for mechanization
+
+The proof decomposes into three independent lemmas:
+
+**Lemma 1 (Gröbner basis ideal membership):**
+If the strong Gröbner basis algorithm terminates with basis G,
+then G generates the same ideal as the input polynomials F.
+I.e., ⟨G⟩ = ⟨F⟩ in Z_{2^d}[x_1, ..., x_n].
+
+This is the correctness of the Buchberger-like algorithm over
+principal ideal rings. Reference: Adams & Loustaunau 1994,
+Chapter 4 (Gröbner bases over PIRs). The proof involves showing
+that each S-polynomial reduction preserves the ideal and that
+the algorithm terminates (Noetherian property of Z_{2^d}[x]).
+
+**Lemma 2 (Unit constant implies no solution):**
+If 1 ∈ ⟨F⟩ (equivalently, an odd constant is in the Gröbner basis),
+then the system {f_1 = 0, ..., f_k = 0} has no solution in Z_{2^d}^n.
+
+Proof: If 1 = Σ h_i · f_i, then for any assignment σ:
+1 = Σ h_i(σ) · f_i(σ) = Σ h_i(σ) · 0 = 0, contradiction.
+
+**Lemma 3 (Rabinowitsch soundness):**
+If {f_1, ..., f_k, (a-b)·e - 1} has 1 in its ideal (with the
+odd-constant check), then a = b for all solutions of {f_1 = 0, ..., f_k = 0}.
+
+Proof: Contrapositive. Suppose σ satisfies f_i(σ) = 0 for all i
+and a(σ) ≠ b(σ). Let d = a(σ) - b(σ) ≠ 0.
+- If d is odd: d is a unit in Z_{2^d}, so e = d^{-1} exists.
+  Then σ ∪ {e ↦ d^{-1}} satisfies all equations including
+  (a-b)·e - 1 = 0. So the system is satisfiable, contradicting
+  1 ∈ ideal (by Lemma 2).
+- If d is even: (a-b)·e is always even for any e, so
+  (a-b)·e - 1 is always odd (nonzero). The Rabinowitsch equation
+  has no solution. But the Gröbner basis of the system may contain
+  a constant c. If c is even, our check returns inconclusive (not
+  UNSAT). If c is odd, then 1 ∈ ideal, but we showed the system
+  IS satisfiable (with e free) — contradiction. So c cannot be odd.
+  Therefore our check never falsely reports UNSAT in this case. □
+
+### Choice of proof assistant
+
+**Lean 4** is recommended for several reasons:
+- Mathlib has extensive algebraic infrastructure: polynomial rings,
+  ideals, Gröbner bases (partial), modular arithmetic
+- `Mathlib.RingTheory.Polynomial.Basic` provides polynomial ring
+  definitions over commutative rings
+- `Mathlib.RingTheory.Ideal.Basic` provides ideal membership
+- `Mathlib.Data.ZMod.Basic` provides Z/nZ (including Z_{2^d})
+- Active community with good documentation
+
+**Coq** with MathComp is an alternative:
+- MathComp has strong algebraic foundations (ssralg)
+- CoqQFBV (Hou et al. 2021) already mechanizes QF_BV solving
+  with certified results — could potentially be extended
+
+**HOL Light** is less suitable:
+- Weaker algebraic library support
+- No existing Gröbner basis formalization
+
+### Mechanization effort estimate
+
+- Lemma 2 (unit constant → no solution): ~50 lines in Lean 4,
+  straightforward from ring axioms
+- Lemma 3 (Rabinowitsch soundness): ~200 lines in Lean 4,
+  requires case analysis on 2-adic valuation
+- Lemma 1 (Gröbner basis correctness): ~1000+ lines in Lean 4,
+  requires formalizing the strong reduction algorithm and proving
+  termination. This is the hardest part and may benefit from
+  existing partial formalizations in Mathlib.
+
+### Incremental approach
+
+1. Start with Lemma 2 (easiest, most impactful for trust)
+2. Then Lemma 3 (Rabinowitsch soundness — the subtle part)
+3. Then Lemma 1 (algorithm correctness — the bulk of the work)
+
+Lemmas 2 and 3 together establish that IF the Gröbner basis
+algorithm is correct, THEN our UNSAT reporting is sound. This
+is valuable even without mechanizing Lemma 1, because Lemma 1
+is a well-known result in computer algebra (just not yet
+mechanized for Z_{2^d} specifically).
+
+### Connection to existing mechanized work
+
+- CoqQFBV (Hou et al., JSAT 2021): mechanized QF_BV solver in Coq
+  with certified UNSAT proofs. Our Gröbner basis could potentially
+  produce certificates that CoqQFBV verifies.
+- Lean 4 Mathlib: `Mathlib.RingTheory.Polynomial.Groebner` has
+  partial Gröbner basis formalization over fields. Extending to
+  principal ideal rings (Z_{2^d}) is the main gap.
+- Isabelle/HOL: Immler & Maletzky (2019) formalized Buchberger's
+  algorithm over fields. Extension to PIRs would be needed.
