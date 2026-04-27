@@ -742,11 +742,11 @@ void cpp_typecheckt::elaborate_class_template(
                   symbol_table.lookup((*concept_ids.begin())->identifier);
                 if(!concept_sym || !concept_sym->type.get_bool(ID_is_template))
                   continue;
-                const cpp_declarationt &cdecl =
+                const cpp_declarationt &concept_decl =
                   to_cpp_declaration(concept_sym->type);
-                if(cdecl.declarators().empty())
+                if(concept_decl.declarators().empty())
                   continue;
-                exprt body = cdecl.declarators()[0].value();
+                exprt body = concept_decl.declarators()[0].value();
                 if(body.is_nil())
                   continue;
                 // Evaluate type_requirement nodes in the concept body.
@@ -755,7 +755,7 @@ void cpp_typecheckt::elaborate_class_template(
                 template_mapt cmap;
                 cpp_template_args_tct cargs;
                 cargs.arguments().push_back(full_args_tc.arguments()[pi]);
-                cmap.build(cdecl.template_type(), cargs);
+                cmap.build(concept_decl.template_type(), cargs);
                 // Create temporary symbols for requires-expression
                 // parameters (e.g., requires(T t) { ++t; } needs 't').
                 {
@@ -2675,17 +2675,17 @@ const symbolt &cpp_typecheckt::instantiate_template(
                   symbol_table.lookup((*concept_ids.begin())->identifier);
                 if(!concept_sym || !concept_sym->type.get_bool(ID_is_template))
                   continue;
-                const cpp_declarationt &cdecl =
+                const cpp_declarationt &concept_decl =
                   to_cpp_declaration(concept_sym->type);
-                if(cdecl.declarators().empty())
+                if(concept_decl.declarators().empty())
                   continue;
-                exprt body = cdecl.declarators()[0].value();
+                exprt body = concept_decl.declarators()[0].value();
                 if(body.is_nil())
                   continue;
                 template_mapt cmap;
                 cpp_template_args_tct cargs;
                 cargs.arguments().push_back(full_args_resolved.arguments()[pi]);
-                cmap.build(cdecl.template_type(), cargs);
+                cmap.build(concept_decl.template_type(), cargs);
                 cmap.apply(body);
                 null_message_handlert null_h;
                 message_handlert &old_h = get_message_handler();
