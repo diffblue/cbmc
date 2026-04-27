@@ -87,14 +87,20 @@ std::optional<polynomialt> poly_extractort::to_polynomial(const exprt &e)
   // in our (narrower) ring, which automatically reduces mod 2^bw.
   if(e.id() == ID_extractbits)
   {
+    // extract(x, hi, lo): only handle when lo=0 (low-bit extraction).
+    // extract(x, bw-1, 0) = x mod 2^bw, which is just x in our ring.
+    // extract with lo>0 is a shift, which is non-polynomial.
+    const auto &eb = to_extractbits_expr(e);
+    if(eb.index().is_constant())
+    {
+      auto lo = numeric_cast<mp_integer>(eb.index());
+      if(lo.has_value() && *lo != 0)
+        return std::nullopt; // non-zero low index = shift
+    }
     if(!set_bitwidth(e.type()))
       return std::nullopt;
-    // Convert the source expression in our ring (narrower bitwidth).
-    // This works because polynomial arithmetic mod 2^bw automatically
-    // discards the high bits — extract(a*b_wide, bw-1, 0) = a*b mod 2^bw.
     unsigned saved_bw = bitwidth;
-    auto result = to_polynomial(to_extractbits_expr(e).src());
-    // Restore bitwidth in case the source changed it
+    auto result = to_polynomial(eb.src());
     bitwidth = saved_bw;
     return result;
   }
