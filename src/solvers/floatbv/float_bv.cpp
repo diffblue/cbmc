@@ -723,7 +723,7 @@ exprt float_bvt::mul(
 
   const plus_exprt added_exponent(exponent1, exponent2);
 
-  // Adjust exponent; we are thowing in an extra fraction bit,
+  // Adjust exponent; we are throwing in an extra fraction bit,
   // it has been extended above.
   result.exponent=
     plus_exprt(added_exponent, from_integer(1, new_exponent_type));
@@ -785,17 +785,19 @@ exprt float_bvt::div(
     concatenation_exprt(
       result.fraction, have_remainder, unsignedbv_typet(div_width+1));
 
-  // We will subtract the exponents;
-  // to account for overflow, we add a bit.
+  // We will subtract the exponents; the result needs to be wider than
+  // spec.e by two bits: one bit to absorb subtraction overflow, and one
+  // more bit to absorb the subsequent +spec.f adjustment for the extra
+  // fraction bits we padded in above.
   const typecast_exprt exponent1(
-    unpacked1.exponent, signedbv_typet(spec.e + 1));
+    unpacked1.exponent, signedbv_typet(spec.e + 2));
   const typecast_exprt exponent2(
-    unpacked2.exponent, signedbv_typet(spec.e + 1));
+    unpacked2.exponent, signedbv_typet(spec.e + 2));
 
   // subtract exponents
   const minus_exprt added_exponent(exponent1, exponent2);
 
-  // adjust, as we have thown in extra fraction bits
+  // adjust, as we have thrown in extra fraction bits
   result.exponent=plus_exprt(
     added_exponent,
     from_integer(spec.f, added_exponent.type()));
@@ -1453,13 +1455,19 @@ void float_bvt::round_exponent(
       notequal_exprt(result.fraction, from_integer(0, result.fraction.type())));
 
 #if 1
-    // Directed rounding modes round overflow to the maximum normal
-    // depending on the particular mode and the sign
+    // Round-to-nearest modes (round_to_even, round_to_away) overflow to
+    // infinity. Directed modes (round_to_zero, round_to_plus_inf,
+    // round_to_minus_inf) overflow to infinity only when the rounding
+    // direction matches the sign; otherwise the result is saturated to
+    // the largest finite representable value (set_to_max below).
     const or_exprt overflow_to_inf(
       rounding_mode_bits.round_to_even,
       or_exprt(
-        and_exprt(rounding_mode_bits.round_to_plus_inf, not_exprt(result.sign)),
-        and_exprt(rounding_mode_bits.round_to_minus_inf, result.sign)));
+        rounding_mode_bits.round_to_away,
+        or_exprt(
+          and_exprt(
+            rounding_mode_bits.round_to_plus_inf, not_exprt(result.sign)),
+          and_exprt(rounding_mode_bits.round_to_minus_inf, result.sign))));
 
     const and_exprt set_to_max(exponent_too_large, not_exprt(overflow_to_inf));
 

@@ -467,7 +467,7 @@ bvt float_utilst::mul(const bvt &src1, const bvt &src2)
 
   bvt added_exponent=bv_utils.add(exponent1, exponent2);
 
-  // adjust, we are thowing in an extra fraction bit
+  // adjust, we are throwing in an extra fraction bit
   // it has been extended above
   result.exponent=bv_utils.inc(added_exponent);
 
@@ -640,9 +640,10 @@ bvt float_utilst::div(const bvt &src1, const bvt &src2)
   result.fraction.insert(
     result.fraction.begin(), have_remainder);
 
-  // We will subtract the exponents;
-  // to account for overflow, we add a bit.
-  // we add a second bit for the adjust by extra fraction bits
+  // We will subtract the exponents; the result needs to be wider than
+  // spec.e by two bits: one bit to absorb subtraction overflow, and one
+  // more bit to absorb the subsequent +spec.f adjustment for the extra
+  // fraction bits we padded in above.
   const bvt exponent1=
     bv_utils.sign_extension(unpacked1.exponent, unpacked1.exponent.size()+2);
   const bvt exponent2=
@@ -651,7 +652,7 @@ bvt float_utilst::div(const bvt &src1, const bvt &src2)
   // subtract exponents
   bvt added_exponent=bv_utils.sub(exponent1, exponent2);
 
-  // adjust, as we have thown in extra fraction bits
+  // adjust, as we have thrown in extra fraction bits
   result.exponent=bv_utils.add(
     added_exponent,
     bv_utils.build_constant(spec.f, added_exponent.size()));
@@ -1291,14 +1292,18 @@ void float_utilst::round_exponent(unbiased_floatt &result)
         !bv_utils.is_zero(result.fraction));
 
 #if 1
-    // Directed rounding modes round overflow to the maximum normal
-    // depending on the particular mode and the sign
-    literalt overflow_to_inf=
-      prop.lor(rounding_mode_bits.round_to_even,
-      prop.lor(prop.land(rounding_mode_bits.round_to_plus_inf,
-                         !result.sign),
-               prop.land(rounding_mode_bits.round_to_minus_inf,
-                         result.sign)));
+    // Round-to-nearest modes (round_to_even, round_to_away) overflow to
+    // infinity. Directed modes (round_to_zero, round_to_plus_inf,
+    // round_to_minus_inf) overflow to infinity only when the rounding
+    // direction matches the sign; otherwise the result is saturated to
+    // the largest finite representable value (set_to_max below).
+    literalt overflow_to_inf = prop.lor(
+      rounding_mode_bits.round_to_even,
+      prop.lor(
+        rounding_mode_bits.round_to_away,
+        prop.lor(
+          prop.land(rounding_mode_bits.round_to_plus_inf, !result.sign),
+          prop.land(rounding_mode_bits.round_to_minus_inf, result.sign))));
 
     literalt set_to_max=
       prop.land(exponent_too_large, !overflow_to_inf);
