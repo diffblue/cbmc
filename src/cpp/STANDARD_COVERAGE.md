@@ -103,6 +103,12 @@ See section 4.4 above.
 | [dcl.enum] enumeration declarations | ✅ | parse.cpp `rEnumSpec` | C++11 scoped enums | Enum* |
 | [dcl.align] alignment specifier | ✅ | parse.cpp `rAlignasSpecifier` | alignas | |
 | [dcl.attr] attributes | ✅ | parse.cpp `optAttribute` | C++11 [[attr]], scoped attributes | |
+| [dcl.attr] [[noreturn]] | ✅ | parse.cpp `optAttribute` | Stored as ID_noreturn | |
+| [dcl.attr] [[nodiscard]] | ✅ | parse.cpp `optAttribute` | Stored as ID_nodiscard | |
+| [dcl.attr] [[maybe_unused]] | ✅ | parse.cpp `optAttribute` | Consumed and discarded | |
+| [dcl.attr] [[carries_dependency]] | ✅ | parse.cpp `optAttribute` | Consumed and discarded | |
+| [dcl.attr] scoped attributes | ✅ | parse.cpp `optAttribute` | `gnu::`, `clang::`, `_Clang::`, `msvc::` — consumed and discarded | |
+| [dcl.attr] on parameters | ✅ | parse.cpp `rArgDeclaration` | `[[_Clang::__lifetimebound__]]`, `[[gnu::unused]]` on function params | |
 
 ### 8.4 Function definitions [dcl.fct.def]
 
@@ -111,7 +117,7 @@ See section 4.4 above.
 | [dcl.fct] function declarators | ✅ | parse.cpp `rDeclarator` | Trailing return types | |
 | [dcl.fct]/5 parameter adjustment | ✅ | cpp_typecheck_type.cpp, cpp_typecheck_function.cpp | Array-to-pointer, function-to-pointer | |
 | [dcl.fct.spec] function specifiers | ✅ | parse.cpp | virtual, explicit, inline | |
-| [dcl.fct.def.default] defaulted functions | ✅ | cpp_typecheck_compound_type.cpp | = default | |
+| [dcl.fct.def.default] defaulted functions | ✅ | cpp_typecheck_compound_type.cpp `typecheck_compound_declarator` | = default | |
 
 ### 8.5 Structured bindings [dcl.struct.bind]
 
@@ -163,10 +169,10 @@ See section 4.4 above.
 
 | Rule | Status | Location | Notes | Tests |
 |------|--------|----------|-------|-------|
-| [class.default.ctor] default constructor | ✅ | cpp_constructor.cpp | Defaulted default ctor generation | Constructor* |
+| [class.default.ctor] default constructor | ✅ | cpp_constructor.cpp `cpp_constructor` | Defaulted default ctor generation | Constructor* |
 | [class.copy.ctor]/1 copy constructor | ✅ | cpp_typecheck_constructor.cpp `find_cpctor` | Excludes rvalue refs (move ctors) | Copy_Constructor* |
-| [class.copy.assign] copy assignment | ✅ | cpp_typecheck_constructor.cpp | | Copy_Operator* |
-| [class.dtor] destructors | ✅ | cpp_destructor.cpp | Virtual destructor dispatch | Destructor* |
+| [class.copy.assign] copy assignment | ✅ | cpp_typecheck_constructor.cpp `default_assignop` | | Copy_Operator* |
+| [class.dtor] destructors | ✅ | cpp_destructor.cpp `cpp_destructor` | Virtual destructor dispatch | Destructor* |
 
 ### 11.4.5 Constructors and initialization
 
@@ -182,11 +188,46 @@ See section 4.4 above.
 
 | Rule | Status | Location | Notes | Tests |
 |------|--------|----------|-------|-------|
-| Virtual function dispatch | ✅ | cpp_typecheck_virtual_table.cpp, cpp_typecheck_compound_type.cpp | vtable generation and dispatch | Virtual* |
+| Virtual function dispatch | ✅ | cpp_typecheck_virtual_table.cpp `make_vtable_entries`, cpp_typecheck_compound_type.cpp | vtable generation and dispatch | Virtual* |
 | Pure virtual functions | ✅ | cpp_typecheck_compound_type.cpp | | virtual1 |
 | Virtual destructors | ✅ | cpp_destructor.cpp | Direct call resolution | Destructor* |
 
 ## 12 Overloading [over]
+
+### 12.2 Implicit conversion sequences [over.ics]
+
+| Rule | Status | Location | Notes | Tests |
+|------|--------|----------|-------|-------|
+| [conv.lval] lvalue-to-rvalue | ✅ | cpp_typecheck_conversions.cpp `standard_conversion_lvalue_to_rvalue` | | |
+| [conv.array] array-to-pointer | ✅ | cpp_typecheck_conversions.cpp `standard_conversion_array_to_pointer` | | |
+| [conv.func] function-to-pointer | ✅ | cpp_typecheck_conversions.cpp `standard_conversion_function_to_pointer` | | |
+| [conv.qual] qualification conversions | ✅ | cpp_typecheck_conversions.cpp `standard_conversion_qualification` | const/volatile | |
+| [conv.prom] integral promotion | ✅ | cpp_typecheck_conversions.cpp `standard_conversion_integral_promotion` | | |
+| [conv.fpprom] floating-point promotion | ✅ | cpp_typecheck_conversions.cpp `standard_conversion_floating_point_promotion` | | |
+| [conv.integral] integral conversion | ✅ | cpp_typecheck_conversions.cpp `standard_conversion_integral_conversion` | | Conversion* |
+| [conv.fpint] floating-integral | ✅ | cpp_typecheck_conversions.cpp `standard_conversion_floating_integral_conversion` | | |
+| [conv.double] floating-point conversion | ✅ | cpp_typecheck_conversions.cpp `standard_conversion_floating_point_conversion` | | |
+| [conv.ptr] pointer conversions | ✅ | cpp_typecheck_conversions.cpp `standard_conversion_pointer` | null, derived-to-base, void* | |
+| [conv.mem] pointer-to-member | ✅ | cpp_typecheck_conversions.cpp `standard_conversion_pointer_to_member` | | |
+| [conv.bool] boolean conversions | ✅ | cpp_typecheck_conversions.cpp `standard_conversion_boolean` | | |
+| [over.ics.scs] standard conversion sequence | ✅ | cpp_typecheck_conversions.cpp `standard_conversion_sequence` | Chains the above in order | |
+| [over.ics.user] user-defined conversion | ✅ | cpp_typecheck_conversions.cpp `user_defined_conversion_sequence` | Converting constructors, conversion operators | Conversion_Operator* |
+| [over.ics.ref] reference binding | ✅ | cpp_typecheck_conversions.cpp `reference_binding`, `reference_compatible`, `reference_related` | Lvalue and rvalue reference binding | |
+| [over.ics.implicit] implicit conversion | ✅ | cpp_typecheck_conversions.cpp `implicit_conversion_sequence` | Combines standard + user-defined + reference | |
+| Implicit typecast dispatch | ✅ | cpp_typecheck_conversions.cpp `implicit_typecast` | Entry point for all implicit conversions | |
+| Reference initializer | ✅ | cpp_typecheck_conversions.cpp `reference_initializer` | | |
+
+### 12.3 Explicit type conversions [over.cast]
+
+| Rule | Status | Location | Notes | Tests |
+|------|--------|----------|-------|-------|
+| const_cast | ✅ | cpp_typecheck_conversions.cpp `const_typecast` | [expr.const.cast] | |
+| static_cast | ✅ | cpp_typecheck_conversions.cpp `static_typecast` | [expr.static.cast] | |
+| dynamic_cast | ⚠️ | cpp_typecheck_conversions.cpp `dynamic_typecast` | Parsed; limited runtime support | |
+| reinterpret_cast | ✅ | cpp_typecheck_conversions.cpp `reinterpret_typecast` | [expr.reinterpret.cast] | |
+| cast_away_constness | ✅ | cpp_typecheck_conversions.cpp `cast_away_constness` | Helper for const_cast/reinterpret_cast | |
+
+### 12.4 Overload resolution [over.match]
 
 | Rule | Status | Location | Notes | Tests |
 |------|--------|----------|-------|-------|
@@ -245,7 +286,7 @@ See section 4.4 above.
 
 | Rule | Status | Location | Notes | Tests |
 |------|--------|----------|-------|-------|
-| [temp.type]/1 equivalent types | 🔲 | | | |
+| [temp.type]/1 equivalent types | ✅ | cpp_instantiate_template.cpp `template_suffix`, `sub_scope_for_instantiation` | Same template args → same suffix → same symbol | |
 
 ### 13.7 Template declarations [temp.decls]
 
@@ -272,8 +313,8 @@ See section 4.4 above.
 
 | Rule | Status | Location | Notes | Tests |
 |------|--------|----------|-------|-------|
-| [temp.res.general] general | 🔲 | | | |
-| [temp.local] locally declared names | 🔲 | | | |
+| [temp.res.general] general | ⚠️ | cpp_typecheck_resolve.cpp `resolve` | No two-phase lookup; names resolved eagerly | |
+| [temp.local] locally declared names | ⚠️ | cpp_typecheck_resolve.cpp | | |
 | [temp.dep.type] dependent types | ⚠️ | cpp_typecheck_resolve.cpp | | |
 | [temp.dep.expr] type-dependent expressions | ⚠️ | cpp_typecheck_resolve.cpp | | |
 | [temp.point] point of instantiation | ✅ | cpp_typecheck_resolve.cpp, cpp_typecheck_template.cpp, cpp_instantiate_template.cpp | Instantiation scope for default args; prefer definition over forward declaration | cpp20_sort_cpp20 |
@@ -343,7 +384,7 @@ See section 4.4 above.
 | `cpp_instantiate_template.cpp` | [temp.inst], [temp.spec.partial.match], [temp.constr.*], [expr.prim.req.*], [temp.point] |
 | `cpp_typecheck_compound_type.cpp` | [class.mem], [class.virtual], [temp.mem.*], [dcl.fct.def.default] |
 | `cpp_typecheck_expr.cpp` | [expr.*], [dcl.init.ref] |
-| `cpp_typecheck_conversions.cpp` | [basic.lval], [dcl.init.ref], implicit conversion sequences |
+| `cpp_typecheck_conversions.cpp` | [conv.*], [over.ics.*], [basic.lval], [dcl.init.ref], [expr.const.cast], [expr.static.cast], [expr.reinterpret.cast] |
 | `cpp_typecheck_code.cpp` | [dcl.init.list], [stmt.*], structured bindings, if constexpr |
 | `cpp_typecheck_constructor.cpp` | [class.copy.ctor], [class.copy.assign] |
 | `cpp_constructor.cpp` | [class.default.ctor], aggregate/brace initialization |
