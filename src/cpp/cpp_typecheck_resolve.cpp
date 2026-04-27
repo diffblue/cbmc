@@ -192,16 +192,17 @@ void cpp_typecheck_resolvet::guess_function_template_args(
                 id2string(entry.second.base_name) != id2string(cc) ||
                 !entry.second.type.get_bool(ID_is_template))
                 continue;
-              const cpp_declarationt &cdecl =
+              const cpp_declarationt &concept_decl =
                 to_cpp_declaration(entry.second.type);
-              if(cdecl.declarators().empty())
+              if(concept_decl.declarators().empty())
                 break;
-              const exprt &cval = cdecl.declarators()[0].value();
+              const exprt &cval = concept_decl.declarators()[0].value();
               if(cval.is_nil())
                 break;
               // Get concept parameter name
               irep_idt cparam;
-              for(const auto &cp : cdecl.template_type().template_parameters())
+              for(const auto &cp :
+                  concept_decl.template_type().template_parameters())
               {
                 if(cp.id() == ID_type)
                 {
