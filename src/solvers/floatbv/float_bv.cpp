@@ -757,7 +757,17 @@ exprt float_bvt::div(
 
   std::size_t fraction_width=
     to_unsignedbv_type(unpacked1.fraction.type()).get_width();
-  std::size_t div_width=fraction_width*2+1;
+  // Division width: we need enough bits below the round position so that
+  // `have_remainder` (used as a single sticky bit) survives the left-shift
+  // performed by the rounder's normalization step.  When the unpacked
+  // dividend is subnormal it has up to spec.f leading zeros, so the
+  // normalization shift is correspondingly larger and would otherwise move
+  // the sticky into the round position with all-zero bits below it; the
+  // extra bits give the sticky room to survive.  fraction_width == spec.f + 1
+  // by construction (unpack concatenates the hidden bit onto the fraction),
+  // so derive the extra width from it as a single source of truth.
+  const std::size_t extra_div_bits = fraction_width - 1; // == spec.f
+  std::size_t div_width = fraction_width * 2 + 1 + extra_div_bits;
 
   // pad fraction1 with zeros
   const concatenation_exprt fraction1(
