@@ -1030,7 +1030,11 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
 
             // create temporary object
             dereference_exprt expr_deref(expr_ptmp);
-            expr_deref.set(ID_C_lvalue, true);
+            // Preserve the value category: if the original expression
+            // is an rvalue, the derived-to-base result is an xvalue
+            // (not an lvalue), so it can bind to rvalue references.
+            if(expr.get_bool(ID_C_lvalue))
+              expr_deref.set(ID_C_lvalue, true);
             expr_deref.add_source_location() = expr.source_location();
 
             exprt new_object(ID_new_object, to);

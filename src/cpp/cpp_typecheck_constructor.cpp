@@ -951,6 +951,12 @@ bool cpp_typecheckt::find_cpctor(const symbolt &symbol) const
     if(!is_reference(parameter1_type))
       continue;
 
+    // [class.copy] p2: A copy constructor has a first parameter of
+    // type X&, const X&, volatile X&, or const volatile X&.
+    // Rvalue references (X&&) are move constructors, not copy constructors.
+    if(is_rvalue_reference(parameter1_type))
+      continue;
+
     if(
       to_reference_type(parameter1_type).base_type().get(ID_identifier) !=
       symbol.name)
