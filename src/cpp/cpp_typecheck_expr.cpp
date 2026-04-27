@@ -3446,7 +3446,26 @@ void cpp_typecheckt::typecheck_function_call_arguments(
       }
     }
     else if(
-      !is_reference(parameter.type()) && !cpp_is_pod(parameter.type()) &&
+      is_rvalue_reference(parameter.type()) &&
+      arg_it->type().id() != ID_pointer &&
+      arg_it->id() != ID_address_of &&
+      arg_it->id() != ID_temporary_object &&
+      arg_it->id() != ID_dereference &&
+      (arg_it->type().id() == ID_struct_tag ||
+       arg_it->type().id() == ID_struct ||
+       arg_it->type().id() == ID_union_tag ||
+       arg_it->type().id() == ID_union))
+    {
+      // [dcl.init.ref] p5: An rvalue reference binds to an rvalue.
+      // When the argument is a struct/union value (including function
+      // call results), take its address to create the reference binding.
+      // For side_effect (function call) results, the result is
+      // materialized as a temporary by the GOTO conversion.
+      exprt addr = address_of_exprt(*arg_it);
+      addr.type() = parameter.type();
+      arg_it->swap(addr);
+    }
+    else if(
       (parameter.type().id() == ID_struct_tag ||
        parameter.type().id() == ID_union_tag) &&
       arg_it->id() != ID_temporary_object && arg_it->id() != ID_side_effect)
