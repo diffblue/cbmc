@@ -943,7 +943,6 @@ exprt float_bvt::fma(
   // Sign
   exprt add_sub_sign = notequal_exprt(
     if_exprt(c_bigger, unpacked_add.sign, prod_sign), fraction_sign);
-  result.sign = add_sub_sign;
 
   // NaN
   exprt prod_inf = or_exprt(unpacked_lhs.infinity, unpacked_rhs.infinity);
@@ -960,6 +959,26 @@ exprt float_bvt::fma(
   // Infinity
   result.infinity =
     and_exprt(not_exprt(result.NaN), or_exprt(prod_inf, unpacked_add.infinity));
+
+  // Zero: result is zero when fraction is zero and not inf/NaN
+  result.zero = and_exprt(
+    not_exprt(or_exprt(result.infinity, result.NaN)),
+    equal_exprt(result.fraction, from_integer(0, result.fraction.type())));
+
+  // Sign for infinity: use product sign if product is inf, else addend sign
+  exprt infinity_sign = if_exprt(prod_inf, prod_sign, unpacked_add.sign);
+
+  // Sign for zero: under round-to-minus-inf, +0 + (-0) = -0
+  const rounding_mode_bitst rounding_mode_bits(rm);
+  exprt zero_sign = if_exprt(
+    rounding_mode_bits.round_to_minus_inf,
+    or_exprt(prod_sign, unpacked_add.sign),
+    and_exprt(prod_sign, unpacked_add.sign));
+
+  result.sign = if_exprt(
+    result.infinity,
+    infinity_sign,
+    if_exprt(result.zero, zero_sign, add_sub_sign));
 
   return rounder(result, rm, spec);
 }
