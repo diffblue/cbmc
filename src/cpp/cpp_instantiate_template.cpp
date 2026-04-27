@@ -1537,8 +1537,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
           continue;
         const symbolt *candidate = symbol_table.lookup(id_ptr->identifier);
         if(
-          candidate != nullptr &&
-          candidate->type.get_bool(ID_is_template) &&
+          candidate != nullptr && candidate->type.get_bool(ID_is_template) &&
           candidate->base_name == template_symbol.base_name)
         {
           const cpp_declarationt &cand_decl =
@@ -1548,8 +1547,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
             cand_decl.declarators()[0].value().is_not_nil())
           {
             effective_template = candidate;
-            template_scope =
-              id_map_lookup(cpp_scopes, candidate->name);
+            template_scope = id_map_lookup(cpp_scopes, candidate->name);
             break;
           }
         }
@@ -1558,8 +1556,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
   }
 
   // produce new declaration
-  cpp_declarationt new_decl =
-    to_cpp_declaration(effective_template->type);
+  cpp_declarationt new_decl = to_cpp_declaration(effective_template->type);
 
   // The new one is not a template any longer, but we remember the
   // template type that was used.

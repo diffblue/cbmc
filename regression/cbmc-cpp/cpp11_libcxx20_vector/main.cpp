@@ -1,6 +1,6 @@
 // libc++-20 basic vector test
-#include <vector>
 #include <cassert>
+#include <vector>
 int main()
 {
   std::vector<int> v;
