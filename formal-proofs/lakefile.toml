@@ -9,3 +9,6 @@ rev = "v4.18.0"
 
 [[lean_lib]]
 name = "GroebnerSoundness"
+
+[[lean_lib]]
+name = "BuchbergerCorrectness"
