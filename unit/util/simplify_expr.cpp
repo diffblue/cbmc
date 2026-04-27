@@ -701,3 +701,33 @@ TEST_CASE("Simplify all-ones constant in bitor with bv_typet", "[core][util]")
   const bitor_exprt bor{x, ones};
   REQUIRE(simplify_expr(bor, ns) == ones);
 }
+
+TEST_CASE("Simplify flatten nested OR", "[core][util]")
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+
+  const symbol_exprt a{"a", bool_typet{}};
+  const symbol_exprt b{"b", bool_typet{}};
+  const symbol_exprt c{"c", bool_typet{}};
+
+  // (a || (b || c)) should flatten to (a || b || c)
+  const or_exprt inner{b, c};
+  const or_exprt nested{a, inner};
+  REQUIRE(simplify_expr(nested, ns) == or_exprt{a, b, c});
+}
+
+TEST_CASE("Simplify flatten nested AND", "[core][util]")
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+
+  const symbol_exprt a{"a", bool_typet{}};
+  const symbol_exprt b{"b", bool_typet{}};
+  const symbol_exprt c{"c", bool_typet{}};
+
+  // (a && (b && c)) should flatten to (a && b && c)
+  const and_exprt inner{b, c};
+  const and_exprt nested{a, inner};
+  REQUIRE(simplify_expr(nested, ns) == and_exprt{a, b, c});
+}
