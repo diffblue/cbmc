@@ -1516,8 +1516,50 @@ const symbolt &cpp_typecheckt::instantiate_template(
     throw 0;
   }
 
+  // [temp.point] p1: When a function template is instantiated, the
+  // definition (not just a forward declaration) must be used.  If the
+  // template_symbol is a forward declaration (no body), search the
+  // parent scope for the definition of the same template.
+  const symbolt *effective_template = &template_symbol;
+  {
+    const cpp_declarationt &check_decl =
+      to_cpp_declaration(template_symbol.type);
+    if(
+      !check_decl.declarators().empty() &&
+      check_decl.declarators()[0].value().is_nil())
+    {
+      cpp_scopet &parent = template_scope->get_parent();
+      cpp_scopet::id_sett id_set =
+        parent.lookup(template_symbol.base_name, cpp_scopet::SCOPE_ONLY);
+      for(const auto *id_ptr : id_set)
+      {
+        if(id_ptr->identifier == template_symbol.name)
+          continue;
+        const symbolt *candidate = symbol_table.lookup(id_ptr->identifier);
+        if(
+          candidate != nullptr &&
+          candidate->type.get_bool(ID_is_template) &&
+          candidate->base_name == template_symbol.base_name)
+        {
+          const cpp_declarationt &cand_decl =
+            to_cpp_declaration(candidate->type);
+          if(
+            !cand_decl.declarators().empty() &&
+            cand_decl.declarators()[0].value().is_not_nil())
+          {
+            effective_template = candidate;
+            template_scope =
+              id_map_lookup(cpp_scopes, candidate->name);
+            break;
+          }
+        }
+      }
+    }
+  }
+
   // produce new declaration
-  cpp_declarationt new_decl=to_cpp_declaration(template_symbol.type);
+  cpp_declarationt new_decl =
+    to_cpp_declaration(effective_template->type);
 
   // The new one is not a template any longer, but we remember the
   // template type that was used.
