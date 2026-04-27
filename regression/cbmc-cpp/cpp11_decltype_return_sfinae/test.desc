@@ -6,5 +6,4 @@ main.cpp
 ^SIGNAL=0$
 --
 Function template with decltype return type, default type
-parameter, and SFINAE non-type default parameter. This pattern
-is used by libc++-20's __unwrap_iter.
+parameter, and SFINAE non-type default parameter.
