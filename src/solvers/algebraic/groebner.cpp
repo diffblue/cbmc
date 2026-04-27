@@ -12,12 +12,15 @@ bool strong_groebner_basist::has_constant(
   {
     if(!p.is_zero() && p.is_constant())
     {
-      // A nonzero constant in the ideal means 1 is in the ideal
-      // (since the constant is a unit or we can derive 1 from it).
-      // In Z_{2^d}, a nonzero constant c generates the ideal (gcd(c, 2^d)).
-      // If gcd(c, 2^d) = 1 (c is odd), then 1 is in the ideal.
-      // If gcd(c, 2^d) = 2^k, we need to check further.
-      // For now, check if c is odd (unit in Z_{2^d}).
+      // In Z_{2^d}, an element is a unit iff it is odd (coprime to 2^d).
+      // If an odd constant c is in the ideal I, then c^{-1} * c = 1 ∈ I,
+      // so I = Z_{2^d}[x] (the whole ring), meaning the polynomial system
+      // has no solution. This is formally verified in GroebnerSoundness.lean
+      // (theorems ZMod.isUnit_of_odd_nat and ideal_eq_top_of_unit_mem).
+      //
+      // Even nonzero constants (e.g., 2) are NON-units in Z_{2^d}, so we
+      // correctly return false for them. This is verified in
+      // ZMod.two_not_isUnit (GroebnerSoundness.lean).
       mp_integer c = p.terms.front().first;
       if(c % 2 != 0)
         return true;
