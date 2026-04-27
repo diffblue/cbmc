@@ -1434,19 +1434,6 @@ exprt cpp_typecheck_resolvet::do_builtin(
 /// \par parameters: a cpp_name
 /// \return a base_name, and potentially template arguments for the base name;
 ///   as side-effect, we got to the right scope
-struct rs_cache_entryt
-{
-  cpp_scopet *result_scope;
-  irep_idt result_base_name;
-  cpp_template_args_non_tct result_template_args;
-};
-static std::unordered_map<std::size_t, rs_cache_entryt> rs_cache;
-
-void cpp_typecheck_resolvet::clear_resolve_scope_cache()
-{
-  rs_cache.clear();
-}
-
 cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
   const cpp_namet &cpp_name,
   irep_idt &base_name,
@@ -1460,18 +1447,6 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
   irept::subt::const_iterator pos = cpp_name.get_sub().begin();
 
   bool recursive = true;
-
-  // Cache resolved scope results to avoid redundant traversals.
-  std::size_t cache_key =
-    cpp_name.hash() ^ (std::hash<const void *>{}(original_scope)*2654435761u);
-  auto cache_it = rs_cache.find(cache_key);
-  if(cache_it != rs_cache.end())
-  {
-    base_name = cache_it->second.result_base_name;
-    template_args = cache_it->second.result_template_args;
-    cpp_typecheck.cpp_scopes.go_to(*cache_it->second.result_scope);
-    return *cache_it->second.result_scope;
-  }
 
   // check if we need to go to the root scope
   if(pos->id() == "::")
@@ -1998,9 +1973,6 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
   }
 
   base_name = final_base_name;
-
-  rs_cache[cache_key] = {
-    &cpp_typecheck.cpp_scopes.current_scope(), base_name, template_args};
 
   return cpp_typecheck.cpp_scopes.current_scope();
 }
@@ -3038,7 +3010,11 @@ resolved_after_strip:
           const cpp_declarationt &decl = to_cpp_declaration(s.type);
           // Variable templates have declarators but are not class
           // templates and not function templates (no function type).
+          // Skip partial specializations — they are matched later
+          // by instantiate_template, not used for direct instantiation.
           if(decl.is_class_template() || decl.is_template_alias())
+            continue;
+          if(!s.type.get(ID_specialization_of).empty())
             continue;
           if(
             !decl.declarators().empty() &&
