@@ -1,4 +1,3 @@
-#include <set>
 /*******************************************************************\
 
 Module: Expression Initialization
@@ -11,6 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// Expression Initialization
 
 #include "expr_initializer.h"
+
+#include <set>
 
 #include "arith_tools.h"
 #include "bitvector_expr.h"
@@ -61,11 +62,11 @@ std::optional<exprt> expr_initializert::expr_initializer_rec(
     const auto &tag_id = to_struct_tag_type(type).get_identifier();
     if(!active_tags.insert(tag_id).second)
       return {}; // cycle detected
-    struct tag_guard_t
+    struct tag_guardt
     {
       std::set<irep_idt> &s;
       irep_idt id;
-      ~tag_guard_t()
+      ~tag_guardt()
       {
         s.erase(id);
       }
@@ -82,11 +83,11 @@ std::optional<exprt> expr_initializert::expr_initializer_rec(
     const auto &tag_id = to_union_tag_type(type).get_identifier();
     if(!active_tags.insert(tag_id).second)
       return {};
-    struct tag_guard_t
+    struct tag_guardt
     {
       std::set<irep_idt> &s;
       irep_idt id;
-      ~tag_guard_t()
+      ~tag_guardt()
       {
         s.erase(id);
       }

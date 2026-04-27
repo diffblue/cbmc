@@ -3652,7 +3652,8 @@ void cpp_typecheck_resolvet::guess_template_args(
 ///  - [temp.deduct.type]/10 array types (ID_array branch)
 ///  - [temp.deduct.type]/11 function types (ID_code/ID_function_type branch)
 ///  - [temp.deduct.type]/3.3 class template specializations (cpp_name with
-///    template_args — matches instantiation arguments from ID_C_template_arguments)
+///    template_args — matches instantiation arguments
+///    from ID_C_template_arguments)
 ///  - [temp.deduct.type]/14 cv-qualified types (ID_merged_type branch)
 void cpp_typecheck_resolvet::guess_template_args(
   const typet &template_type,
