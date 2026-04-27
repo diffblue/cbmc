@@ -106,7 +106,6 @@ void cpp_typecheckt::typecheck()
   // Clear static caches from previous translation units to avoid
   // dangling scope pointers when type-checking multiple files.
   cpp_scopet::clear_static_caches();
-  cpp_typecheck_resolvet::clear_resolve_scope_cache();
 
   // default linkage is "automatic"
   current_linkage_spec=ID_auto;
