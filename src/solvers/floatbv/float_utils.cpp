@@ -91,6 +91,10 @@ bvt float_utilst::to_integer(
   // The following is the usual case in ANSI-C, and we optimize for that.
   PRECONDITION(rounding_mode_bits.round_to_zero.is_true());
 
+  // Keep in sync with float_bvt::to_integer — the body below is a
+  // line-for-line translation of that function between the
+  // literalt/bvt and exprt APIs.
+
   const unbiased_floatt unpacked = unpack(src);
 
   bvt fraction = unpacked.fraction;
@@ -103,10 +107,17 @@ bvt float_utilst::to_integer(
       fraction.begin(), lsb_extension.begin(), lsb_extension.end());
   }
 
-  // if the exponent is positive, shift right
-  bvt offset =
-    bv_utils.build_constant(fraction.size() - 1, unpacked.exponent.size());
-  bvt distance = bv_utils.sub(offset, unpacked.exponent);
+  // if the exponent is positive, shift right by (fraction.size() - 1) minus
+  // the exponent. The shift distance is built in a bit-vector wide enough to
+  // hold both `fraction.size() - 1` and the (sign-extended) exponent, so it
+  // does not wrap for wide destination types -- e.g. a narrow source such as
+  // _Float16 (spec.e = 5) converted to a 64-bit integer. Keep in sync with
+  // float_bvt::to_integer.
+  const std::size_t distance_width =
+    std::max(unpacked.exponent.size(), address_bits(fraction.size()) + 1);
+  bvt offset = bv_utils.build_constant(fraction.size() - 1, distance_width);
+  bvt distance = bv_utils.sub(
+    offset, bv_utils.sign_extension(unpacked.exponent, distance_width));
   bvt shift_result =
     bv_utils.shift(fraction, bv_utilst::shiftt::SHIFT_LRIGHT, distance);
 
