@@ -1445,12 +1445,13 @@ void float_utilst::round_exponent(unbiased_floatt &result)
 #if 1
     // Directed rounding modes round overflow to the maximum normal
     // depending on the particular mode and the sign
-    literalt overflow_to_inf=
-      prop.lor(rounding_mode_bits.round_to_even,
-      prop.lor(prop.land(rounding_mode_bits.round_to_plus_inf,
-                         !result.sign),
-               prop.land(rounding_mode_bits.round_to_minus_inf,
-                         result.sign)));
+    literalt overflow_to_inf = prop.lor(
+      rounding_mode_bits.round_to_even,
+      prop.lor(
+        rounding_mode_bits.round_to_away,
+        prop.lor(
+          prop.land(rounding_mode_bits.round_to_plus_inf, !result.sign),
+          prop.land(rounding_mode_bits.round_to_minus_inf, result.sign))));
 
     literalt set_to_max=
       prop.land(exponent_too_large, !overflow_to_inf);

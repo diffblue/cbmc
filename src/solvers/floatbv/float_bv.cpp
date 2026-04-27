@@ -797,10 +797,11 @@ exprt float_bvt::div(
 
   // We will subtract the exponents;
   // to account for overflow, we add a bit.
+  // we add a second bit for the adjust by extra fraction bits
   const typecast_exprt exponent1(
-    unpacked1.exponent, signedbv_typet(spec.e + 1));
+    unpacked1.exponent, signedbv_typet(spec.e + 2));
   const typecast_exprt exponent2(
-    unpacked2.exponent, signedbv_typet(spec.e + 1));
+    unpacked2.exponent, signedbv_typet(spec.e + 2));
 
   // subtract exponents
   const minus_exprt added_exponent(exponent1, exponent2);
@@ -1547,8 +1548,11 @@ void float_bvt::round_exponent(
     const or_exprt overflow_to_inf(
       rounding_mode_bits.round_to_even,
       or_exprt(
-        and_exprt(rounding_mode_bits.round_to_plus_inf, not_exprt(result.sign)),
-        and_exprt(rounding_mode_bits.round_to_minus_inf, result.sign)));
+        rounding_mode_bits.round_to_away,
+        or_exprt(
+          and_exprt(
+            rounding_mode_bits.round_to_plus_inf, not_exprt(result.sign)),
+          and_exprt(rounding_mode_bits.round_to_minus_inf, result.sign))));
 
     const and_exprt set_to_max(exponent_too_large, not_exprt(overflow_to_inf));
 
