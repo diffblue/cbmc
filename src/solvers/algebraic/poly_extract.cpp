@@ -162,13 +162,22 @@ std::optional<polynomialt> poly_extractort::to_polynomial(const exprt &e)
       if(!op)
         return std::nullopt;
       polynomialt product = *result * *op;
-      // Introduce fresh variable for the product
-      unsigned bw = product.bitwidth;
-      std::size_t fresh_idx =
-        get_var_index("__fresh_mul_" + std::to_string(next_fresh++));
-      polynomialt fresh_var{bw, mp_integer{1}, fresh_idx};
-      side_equations.push_back(fresh_var - product);
-      result = fresh_var;
+      // Only introduce a fresh variable when both factors are
+      // non-constant (genuine symbolic multiplication). For scalar
+      // multiplication (a * 5), return the product directly.
+      if(result->is_constant() || op->is_constant())
+      {
+        result = product;
+      }
+      else
+      {
+        unsigned bw = product.bitwidth;
+        std::size_t fresh_idx =
+          get_var_index("__fresh_mul_" + std::to_string(next_fresh++));
+        polynomialt fresh_var{bw, mp_integer{1}, fresh_idx};
+        side_equations.push_back(fresh_var - product);
+        result = fresh_var;
+      }
     }
     return result;
   }
