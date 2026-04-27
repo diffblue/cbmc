@@ -784,7 +784,10 @@ exprt float_bvt::div(
 
   std::size_t fraction_width=
     to_unsignedbv_type(unpacked1.fraction.type()).get_width();
-  std::size_t div_width=fraction_width*2+1;
+  // Division width: we need enough bits for the quotient to have
+  // full precision even when the dividend is subnormal.  A subnormal
+  // has up to f leading zeros in the fraction, so we add f extra bits.
+  std::size_t div_width=fraction_width*2+1+spec.f;
 
   // pad fraction1 with zeros
   const concatenation_exprt fraction1(

@@ -615,7 +615,10 @@ bvt float_utilst::div(const bvt &src1, const bvt &src2)
   const unbiased_floatt unpacked1=unpack(src1);
   const unbiased_floatt unpacked2=unpack(src2);
 
-  std::size_t div_width=unpacked1.fraction.size()*2+1;
+  // Division width: we need enough bits for the quotient to have
+  // full precision even when the dividend is subnormal.  A subnormal
+  // has up to f leading zeros in the fraction, so we add f extra bits.
+  std::size_t div_width=unpacked1.fraction.size()*2+1+spec.f;
 
   // pad fraction1 with zeros
   bvt fraction1=unpacked1.fraction;
