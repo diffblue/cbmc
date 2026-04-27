@@ -91,10 +91,11 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       symbol_table.lookup((*concept_ids.begin())->identifier);
     if(!concept_sym || !concept_sym->type.get_bool(ID_is_template))
       throw 0;
-    const cpp_declarationt &cdecl = to_cpp_declaration(concept_sym->type);
-    if(cdecl.declarators().empty())
+    const cpp_declarationt &concept_decl =
+      to_cpp_declaration(concept_sym->type);
+    if(concept_decl.declarators().empty())
       throw 0;
-    exprt body = cdecl.declarators()[0].value();
+    exprt body = concept_decl.declarators()[0].value();
     if(body.is_nil())
       throw 0;
     // Apply the current template_map to substitute parameters

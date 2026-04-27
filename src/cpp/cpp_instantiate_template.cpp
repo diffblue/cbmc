@@ -9,8 +9,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
-#include <util/config.h>
-
 #include "cpp_typecheck.h"
 
 #ifdef DEBUG
