@@ -73,6 +73,9 @@ void cpp_typecheckt::typecheck_method_bodies()
         }
         catch(...)
         {
+          // Type-checking failed — clear the partially-checked body
+          // so the function is cleanly in the "no body" state.
+          method_symbol.value.make_nil();
         }
         set_message_handler(old_handler);
       }
