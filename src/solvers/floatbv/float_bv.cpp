@@ -398,10 +398,27 @@ exprt float_bvt::to_integer(
   // Right now hard-wired to round-to-zero, which is
   // the usual case in ANSI-C.
 
+  const std::size_t fraction_width =
+    to_unsignedbv_type(unpacked.fraction.type()).get_width();
+
+  // Extend the fraction to dest_width if needed, padding with zeros
+  // at the LSB end (like float_utilst does).
+  exprt fraction = unpacked.fraction;
+  std::size_t effective_width = fraction_width;
+
+  if(dest_width > fraction_width)
+  {
+    effective_width = dest_width;
+    fraction = concatenation_exprt(
+      fraction,
+      from_integer(0, unsignedbv_typet(dest_width - fraction_width)),
+      unsignedbv_typet(effective_width));
+  }
+
   // if the exponent is positive, shift right
-  exprt offset=from_integer(spec.f, signedbv_typet(spec.e));
+  exprt offset = from_integer(effective_width - 1, signedbv_typet(spec.e));
   const minus_exprt distance(offset, unpacked.exponent);
-  const lshr_exprt shift_result(unpacked.fraction, distance);
+  const lshr_exprt shift_result(fraction, distance);
 
   // if the exponent is negative, we have zero anyways
   exprt result=shift_result;
