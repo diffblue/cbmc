@@ -581,27 +581,6 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
       throw 0;
     }
   }
-  else if(expr.id() == ID_noexcept)
-  {
-    expr = true_exprt();
-  }
-  else if(expr.id() == "cpp_right_fold" || expr.id() == "cpp_left_fold")
-  {
-    expr = true_exprt();
-  }
-  else if(expr.id() == ID_cpp_name)
-  {
-    const auto &subs = expr.get_sub();
-    if(!subs.empty() && subs.front().id() == "~")
-      expr = side_effect_exprt{
-        ID_function_call, typet{ID_empty}, expr.source_location()};
-    else
-    {
-      error().source_location = expr.source_location();
-      error() << "unresolved C++ name in C context" << eom;
-      throw 0;
-    }
-  }
   else
   {
     error().source_location = expr.source_location();
