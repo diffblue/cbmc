@@ -40,6 +40,7 @@ public:
 
 protected:
   const namespacet &ns;
+  std::set<irep_idt> active_tags;
 
   std::optional<exprt> expr_initializer_rec(
     const typet &type,
@@ -52,7 +53,6 @@ std::optional<exprt> expr_initializert::expr_initializer_rec(
   const source_locationt &source_location,
   const exprt &init_expr)
 {
-  static std::set<irep_idt> active_tags;
   const irep_idt &type_id=type.id();
 
   // Detect recursive types (struct containing itself)
