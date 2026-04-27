@@ -1552,7 +1552,9 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
       // Store constraint count for specialization ordering
       template_type.set(ID_C_requires_clause, std::to_string(constraint_count));
     }
-  requires_done:;
+  requires_done:
+  {
+  }
 
     if(lex.LookAhead(0) == TOK_USING)
     {
