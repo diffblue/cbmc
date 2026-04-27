@@ -43,7 +43,6 @@ public:
 
   /// Clear the static resolve_scope cache. Must be called between
   /// type-checking different translation units.
-  static void clear_resolve_scope_cache();
 
   void guess_template_args(
     const typet &template_parameter,
