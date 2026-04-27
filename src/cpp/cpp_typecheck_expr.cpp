@@ -3447,14 +3447,11 @@ void cpp_typecheckt::typecheck_function_call_arguments(
     }
     else if(
       is_rvalue_reference(parameter.type()) &&
-      arg_it->type().id() != ID_pointer &&
-      arg_it->id() != ID_address_of &&
-      arg_it->id() != ID_temporary_object &&
-      arg_it->id() != ID_dereference &&
+      arg_it->type().id() != ID_pointer && arg_it->id() != ID_address_of &&
+      arg_it->id() != ID_temporary_object && arg_it->id() != ID_dereference &&
       (arg_it->type().id() == ID_struct_tag ||
        arg_it->type().id() == ID_struct ||
-       arg_it->type().id() == ID_union_tag ||
-       arg_it->type().id() == ID_union))
+       arg_it->type().id() == ID_union_tag || arg_it->type().id() == ID_union))
     {
       // [dcl.init.ref] p5: An rvalue reference binds to an rvalue.
       // When the argument is a struct/union value (including function
@@ -3880,33 +3877,29 @@ void cpp_typecheckt::instantiate_generic_lambda(
   expr.type() = func_type.return_type();
 }
 
-void cpp_typecheckt::typecheck_expr_side_effect(
-  side_effect_exprt &expr)
+void cpp_typecheckt::typecheck_expr_side_effect(side_effect_exprt &expr)
 {
-  const irep_idt &statement=expr.get(ID_statement);
+  const irep_idt &statement = expr.get(ID_statement);
 
-  if(statement==ID_cpp_new ||
-     statement==ID_cpp_new_array)
+  if(statement == ID_cpp_new || statement == ID_cpp_new_array)
   {
     typecheck_expr_new(expr);
   }
-  else if(statement==ID_cpp_delete ||
-          statement==ID_cpp_delete_array)
+  else if(statement == ID_cpp_delete || statement == ID_cpp_delete_array)
   {
     typecheck_expr_delete(expr);
   }
-  else if(statement==ID_preincrement ||
-          statement==ID_predecrement ||
-          statement==ID_postincrement ||
-          statement==ID_postdecrement)
+  else if(
+    statement == ID_preincrement || statement == ID_predecrement ||
+    statement == ID_postincrement || statement == ID_postdecrement)
   {
     typecheck_side_effect_inc_dec(expr);
   }
-  else if(statement==ID_throw)
+  else if(statement == ID_throw)
   {
     typecheck_expr_throw(expr);
   }
-  else if(statement==ID_temporary_object)
+  else if(statement == ID_temporary_object)
   {
     // TODO
   }

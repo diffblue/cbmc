@@ -3,18 +3,18 @@
 // with unresolved expressions during recursive instantiation.
 #include <cstdint>
 
-template<intmax_t X, intmax_t Y>
+template <intmax_t X, intmax_t Y>
 struct gcd
 {
   static const intmax_t value = gcd<Y, X % Y>::value;
 };
-template<intmax_t X>
+template <intmax_t X>
 struct gcd<X, 0>
 {
   static const intmax_t value = X;
 };
 
-template<intmax_t N, intmax_t D = 1>
+template <intmax_t N, intmax_t D = 1>
 struct ratio
 {
   static constexpr intmax_t num = N / gcd<N, D>::value;
