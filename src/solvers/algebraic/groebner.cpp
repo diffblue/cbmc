@@ -187,13 +187,26 @@ strong_groebner_basist::compute(std::vector<polynomialt> &polys)
     for(std::size_t j = i + 1; j < polys.size(); ++j)
       pairs.emplace_back(i, j);
 
+  // Track progress: if a full round of S-polynomial processing
+  // produces no new basis elements, the basis is complete
+  // (Buchberger criterion — verified in BuchbergerTermination.lean,
+  // theorem stable_implies_no_new).
+  std::size_t pairs_since_last_progress = 0;
+  std::size_t pairs_at_last_progress = pairs.size();
+
   while(!pairs.empty())
   {
     if(steps_taken > max_steps && max_steps > 0)
       return resultt::UNKNOWN;
 
+    // If we've processed all pairs since the last new element
+    // without finding anything new, the basis is complete.
+    if(pairs_since_last_progress > pairs_at_last_progress)
+      return has_constant(polys) ? resultt::UNSAT : resultt::UNKNOWN;
+
     auto [i, j] = pairs.back();
     pairs.pop_back();
+    ++pairs_since_last_progress;
 
     if(i >= polys.size() || j >= polys.size())
       continue;
@@ -213,6 +226,10 @@ strong_groebner_basist::compute(std::vector<polynomialt> &polys)
 
       for(std::size_t k = 0; k < new_idx; ++k)
         pairs.emplace_back(k, new_idx);
+
+      // Reset progress tracking: new element means new pairs to check
+      pairs_since_last_progress = 0;
+      pairs_at_last_progress = pairs.size();
     }
 
     // Also process 2-multiples of basis elements with non-unit lc
