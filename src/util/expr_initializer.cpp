@@ -11,8 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "expr_initializer.h"
 
-#include <set>
-
 #include "arith_tools.h"
 #include "bitvector_expr.h"
 #include "byte_operators.h"
@@ -23,6 +21,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "simplify_expr.h"
 #include "std_code.h"
 #include "symbol_table.h"
+
+#include <set>
 
 class expr_initializert
 {

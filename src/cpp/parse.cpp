@@ -9864,7 +9864,7 @@ bool Parser::rPrimaryExpr(exprt &exp)
 
   case TOK_THIS:
     lex.get_token(tk);
-    exp=exprt("cpp-this");
+    exp = exprt("cpp-this");
     set_location(exp, tk);
 #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 3\n";

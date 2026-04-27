@@ -206,8 +206,7 @@ protected:
     const cpp_template_args_tct &specialization_template_args,
     const cpp_template_args_tct &full_template_args);
 
-  void elaborate_class_template(
-    const typet &type) override;
+  void elaborate_class_template(const typet &type) override;
 
   const symbolt &instantiate_template(
     const source_locationt &source_location,
