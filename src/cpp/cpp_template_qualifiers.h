@@ -1,3 +1,4 @@
+/// Author: Michael Tautschnig
 /// \file
 /// Recursive cv-qualifier comparison for template specialization matching
 

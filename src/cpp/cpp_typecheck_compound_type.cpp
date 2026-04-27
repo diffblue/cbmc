@@ -932,6 +932,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
           {
             set_message_handler(old_handler);
             if(new_symbol->is_macro)
+            {
               new_symbol->value.visit_pre(
                 [this](exprt &e)
                 {
@@ -943,6 +944,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
                       e = v;
                   }
                 });
+            }
           }
 
           suppress_elaborate = old_suppress;

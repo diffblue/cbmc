@@ -802,7 +802,8 @@ void cpp_typecheckt::elaborate_class_template(
                 body.visit_pre(
                   [&](exprt &e)
                   {
-                    // Handle nested concept references (cpp_name with template_args)
+                    // Handle nested concept references
+                    // (cpp_name with template_args)
                     if(e.id() == ID_cpp_name && params_ok)
                     {
                       bool has_targs = false;
