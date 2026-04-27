@@ -182,6 +182,87 @@ std::optional<polynomialt> poly_extractort::to_polynomial(const exprt &e)
     return result;
   }
 
+  // Left shift by constant: a << k = a * 2^k
+  if(
+    e.id() == ID_shl && e.operands().size() == 2 &&
+    e.operands()[1].is_constant())
+  {
+    auto base = to_polynomial(e.operands()[0]);
+    if(!base)
+      return std::nullopt;
+    auto shift_amt = numeric_cast<mp_integer>(e.operands()[1]);
+    if(!shift_amt || *shift_amt < 0)
+      return std::nullopt;
+    mp_integer factor = power(mp_integer{2}, *shift_amt);
+    return *base * factor;
+  }
+
+  // if-then-else: ite(cond, a, 0) = cond * a (when cond is 0/1)
+  if(e.id() == ID_if && e.operands().size() == 3)
+  {
+    const auto &cond = to_if_expr(e).cond();
+    const auto &true_val = to_if_expr(e).true_case();
+    const auto &false_val = to_if_expr(e).false_case();
+
+    // ite(cond, a, 0): check if false branch is zero
+    if(false_val.is_constant())
+    {
+      auto fv = numeric_cast<mp_integer>(false_val);
+      if(fv && *fv == 0)
+      {
+        // cond must be a boolean (0 or 1) — model as a variable
+        auto cond_poly = to_polynomial(cond);
+        auto true_poly = to_polynomial(true_val);
+        if(cond_poly && true_poly)
+          return *cond_poly * *true_poly;
+      }
+    }
+    // ite(cond, 0, b): check if true branch is zero
+    if(true_val.is_constant())
+    {
+      auto tv = numeric_cast<mp_integer>(true_val);
+      if(tv && *tv == 0)
+      {
+        auto cond_poly = to_polynomial(cond);
+        auto false_poly = to_polynomial(false_val);
+        if(cond_poly && false_poly)
+        {
+          // ite(cond, 0, b) = (1 - cond) * b
+          polynomialt one{false_poly->bitwidth, mp_integer{1}};
+          return (one - *cond_poly) * *false_poly;
+        }
+      }
+    }
+  }
+
+  // Boolean equality: (a == b) as a 1-bit value
+  // In polynomial terms: 1 - (a - b)^2 ... no, that's not right.
+  // For single-bit: (extract(b, i, i) == 1) is just extract(b, i, i).
+  // Model boolean comparisons as variables.
+  if(e.id() == ID_equal && e.type().id() == ID_bool)
+  {
+    // Check if this is (extract(b, i, i) == 1)
+    const auto &eq = to_equal_expr(e);
+    if(eq.rhs().is_constant())
+    {
+      auto rhs_val = numeric_cast<mp_integer>(eq.rhs());
+      if(rhs_val && *rhs_val == 1)
+        return to_polynomial(eq.lhs());
+    }
+    if(eq.lhs().is_constant())
+    {
+      auto lhs_val = numeric_cast<mp_integer>(eq.lhs());
+      if(lhs_val && *lhs_val == 1)
+        return to_polynomial(eq.rhs());
+    }
+  }
+
+  // Single-bit extractbits: extract(b, i, i) — model as a variable
+  // with the implicit constraint that it's 0 or 1.
+  // (The 0/1 constraint is not added — the Gröbner basis treats it
+  // as a free variable. This is sound for UNSAT checking because
+  // if the system is UNSAT for free variables, it's UNSAT for 0/1.)
+
   // Anything else (bitwise ops, shifts, division, etc.) is non-polynomial
   return std::nullopt;
 }
