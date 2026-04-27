@@ -12,3 +12,6 @@ name = "GroebnerSoundness"
 
 [[lean_lib]]
 name = "BuchbergerCorrectness"
+
+[[lean_lib]]
+name = "BuchbergerTermination"
