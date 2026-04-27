@@ -11,6 +11,53 @@ are implemented in CBMC's C++ frontend, and where.
 - ➖ Not applicable (CBMC does not need this rule)
 - 🔲 Not yet audited
 
+## 7 Expressions [expr]
+
+### 7.2.1 Value category [basic.lval]
+
+| Rule | Status | Location | Notes |
+|------|--------|----------|-------|
+| [basic.lval]/1 xvalue from derived-to-base | ✅ | cpp_typecheck_conversions.cpp | Preserve value category in user_defined_conversion_sequence |
+
+### 7.5.7 Requires expressions [expr.prim.req]
+
+| Rule | Status | Location | Notes |
+|------|--------|----------|-------|
+| [expr.prim.req.general] grammar | ✅ | parse.cpp `rRequiresExpr` | |
+| [expr.prim.req.simple] simple requirements | ✅ | parse.cpp, cpp_instantiate_template.cpp | `expr;` form |
+| [expr.prim.req.type] type requirements | ✅ | cpp_instantiate_template.cpp | `typename T;` form |
+| [expr.prim.req.compound] compound requirements | ✅ | parse.cpp, cpp_instantiate_template.cpp | `{ expr } -> concept<type>;` |
+| [expr.prim.req.nested] nested requirements | ⚠️ | parse.cpp | `requires constraint-expression;` |
+
+## 9 Declarations [dcl]
+
+### 9.4.4 Reference initialization [dcl.init.ref]
+
+| Rule | Status | Location | Notes |
+|------|--------|----------|-------|
+| [dcl.init.ref]/5 rvalue ref binding | ✅ | cpp_typecheck_expr.cpp, cpp_typecheck_conversions.cpp | Explicit calls + derived-to-base conversion |
+
+### 9.4.5 List-initialization [dcl.init.list]
+
+| Rule | Status | Location | Notes |
+|------|--------|----------|-------|
+| [dcl.init.list]/3 non-aggregate brace-init | ✅ | cpp_typecheck_code.cpp `typecheck_return` | Unwrap single-element initializer_list for non-POD types |
+
+## 11 Classes [class]
+
+### 11.4.4.2 Copy/move constructors [class.copy.ctor]
+
+| Rule | Status | Location | Notes |
+|------|--------|----------|-------|
+| [class.copy.ctor]/1 copy ctor definition | ✅ | cpp_typecheck_constructor.cpp `find_cpctor` | Excludes rvalue references (move ctors) |
+
+## 12 Overloading [over]
+
+| Rule | Status | Location | Notes |
+|------|--------|----------|-------|
+| [over.match] overload resolution | ✅ | cpp_typecheck_resolve.cpp | |
+| [over.match.best] best viable function | ⚠️ | cpp_typecheck_resolve.cpp | |
+
 ## 13 Templates [temp]
 
 ### 13.1 Preamble [temp.pre]
@@ -92,7 +139,7 @@ are implemented in CBMC's C++ frontend, and where.
 | [temp.local] locally declared names | 🔲 | | |
 | [temp.dep.type] dependent types | ⚠️ | cpp_typecheck_resolve.cpp | |
 | [temp.dep.expr] type-dependent expressions | ⚠️ | cpp_typecheck_resolve.cpp | |
-| [temp.point] point of instantiation | ✅ | cpp_typecheck_resolve.cpp, cpp_typecheck_template.cpp | Use instantiation scope for default non-type args |
+| [temp.point] point of instantiation | ✅ | cpp_typecheck_resolve.cpp, cpp_typecheck_template.cpp, cpp_instantiate_template.cpp | Use instantiation scope for default non-type args; prefer definition over forward declaration |
 
 ### 13.9 Template instantiation and specialization [temp.spec]
 
@@ -122,25 +169,6 @@ are implemented in CBMC's C++ frontend, and where.
 | [temp.deduct.type]/11 function type matching | ✅ | cpp_typecheck_resolve.cpp | ID_code/ID_function_type branch |
 | [temp.over] overload resolution | ✅ | cpp_typecheck_resolve.cpp `resolve` | |
 
-## 7 Expressions [expr]
-
-### 7.5.7 Requires expressions [expr.prim.req]
-
-| Rule | Status | Location | Notes |
-|------|--------|----------|-------|
-| [expr.prim.req.general] grammar | ✅ | parse.cpp `rRequiresExpr` | |
-| [expr.prim.req.simple] simple requirements | ✅ | parse.cpp, cpp_instantiate_template.cpp | `expr;` form |
-| [expr.prim.req.type] type requirements | ✅ | cpp_instantiate_template.cpp | `typename T;` form |
-| [expr.prim.req.compound] compound requirements | ✅ | parse.cpp, cpp_instantiate_template.cpp | `{ expr } -> concept<type>;` |
-| [expr.prim.req.nested] nested requirements | ⚠️ | parse.cpp | `requires constraint-expression;` |
-
-## 12 Overloading [over]
-
-| Rule | Status | Location | Notes |
-|------|--------|----------|-------|
-| [over.match] overload resolution | ✅ | cpp_typecheck_resolve.cpp | |
-| [over.match.best] best viable function | ⚠️ | cpp_typecheck_resolve.cpp | |
-
 ---
 
 ## Files and their primary standard coverage
@@ -150,43 +178,14 @@ are implemented in CBMC's C++ frontend, and where.
 | `parse.cpp` | [temp.pre], [temp.param], [temp.names], [temp.explicit], [expr.prim.req], [expr.prim.lambda] |
 | `cpp_typecheck_template.cpp` | [temp.class.general], [temp.spec.partial.general], [temp.expl.spec], [temp.alias] |
 | `cpp_typecheck_resolve.cpp` | [temp.deduct.*], [temp.over], [temp.arg.explicit], [over.match] |
-| `cpp_instantiate_template.cpp` | [temp.inst], [temp.spec.partial.match], [temp.constr.*], [expr.prim.req.*] |
+| `cpp_instantiate_template.cpp` | [temp.inst], [temp.spec.partial.match], [temp.constr.*], [expr.prim.req.*], [temp.point] |
 | `cpp_typecheck_compound_type.cpp` | [temp.mem.func], [temp.mem.class], [temp.static], [class.mem] |
-| `cpp_typecheck_expr.cpp` | [expr.*], [conv.*] |
-| `cpp_typecheck_conversions.cpp` | [conv.*], [over.ics] |
-| `template_map.cpp` | [temp.deduct.type] (substitution) |
+| `cpp_typecheck_expr.cpp` | [expr.*], [conv.*], [dcl.init.ref] |
+| `cpp_typecheck_conversions.cpp` | [conv.*], [over.ics], [basic.lval], [dcl.init.ref] |
+| `cpp_typecheck_code.cpp` | [dcl.init.list] |
+| `cpp_typecheck_constructor.cpp` | [class.copy.ctor] |
 
 ---
 
-*Last updated: 2026-04-23*
+*Last updated: 2026-04-27*
 *Standard reference: N5008 (C++26 draft)*
-
-## 9 Declarations [dcl]
-
-### 9.4.5 List-initialization [dcl.init.list]
-
-| Rule | Status | Location | Notes |
-|------|--------|----------|-------|
-| [dcl.init.list]/3 non-aggregate brace-init | ✅ | cpp_typecheck_code.cpp `typecheck_return` | Unwrap single-element initializer_list for non-POD types |
-
-### 9.4.4 Reference initialization [dcl.init.ref]
-
-| Rule | Status | Location | Notes |
-|------|--------|----------|-------|
-| [dcl.init.ref]/5 rvalue ref binding | ✅ | cpp_typecheck_expr.cpp, cpp_typecheck_conversions.cpp | Explicit calls + derived-to-base conversion |
-
-## 11 Classes [class]
-
-### 11.4.4.2 Copy/move constructors [class.copy.ctor]
-
-| Rule | Status | Location | Notes |
-|------|--------|----------|-------|
-| [class.copy.ctor]/1 copy ctor definition | ✅ | cpp_typecheck_constructor.cpp `find_cpctor` | Excludes rvalue references (move ctors) |
-
-## 7 Expressions [expr]
-
-### 7.2.1 Value category [basic.lval]
-
-| Rule | Status | Location | Notes |
-|------|--------|----------|-------|
-| [basic.lval]/1 xvalue from derived-to-base | ✅ | cpp_typecheck_conversions.cpp | Preserve value category in user_defined_conversion_sequence |
