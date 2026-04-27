@@ -1299,8 +1299,8 @@ exprt float_bvt::fraction_rounding_decision(
   // round to zero
   false_exprt round_to_zero;
 
-  // round to away
-  const auto round_to_away = or_exprt(rounding_bit, sticky_bit);
+  // round-to-nearest (ties to away)
+  const auto round_to_away = rounding_bit;
 
   // now select appropriate one
   // clang-format off
