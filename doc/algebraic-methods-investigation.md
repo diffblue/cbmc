@@ -413,3 +413,45 @@ For mixed problems (polynomial + inequality):
   constraints can be polynomialized — many can't
 - **High risk:** The CEGAR loop may not converge for complex mixed
   problems — but the fallback to full bit-blasting ensures correctness
+
+## XOR Slicing (Investigated, Not Implemented)
+
+### What it is
+XOR slicing (Kaufmann & Biere, AMulet2) exploits the structure of
+multiplier circuits by separating XOR-linear parts (sum bits in full
+adders) from nonlinear parts (AND gates for carry generation). The
+circuit is processed column by column: XOR chains are handled by
+Gaussian elimination over GF(2), AND gates by Gröbner bases. Each
+column involves only 2-3 variables, keeping the polynomial system
+small.
+
+### Why it works for AMulet2 but not for us
+AMulet2 operates on gate-level circuits (and-inverter graphs) with
+known structure. It knows which gates are XOR, which are AND, and
+processes columns from LSB to MSB exploiting the multiplier's regular
+structure.
+
+Our Gröbner basis operates on word-level polynomials. We see `a * b`
+as a single polynomial operation. When decomposed to bit level (as in
+hw_mul_equiv_12), we get a 24+ variable system without column
+structure, which the Gröbner basis can't handle efficiently.
+
+### Would it help?
+For hw_mul_equiv_12: yes. Column-by-column processing would reduce
+the 24-variable system to twelve 2-3 variable systems, each solvable
+in microseconds.
+
+For general verification: narrow applicability. Only helps multiplier
+equivalence checking against known circuit structures.
+
+### Implementation effort
+Substantial (months):
+- Circuit-level representation (AIG) alongside word-level
+- Column detection in the circuit
+- GF(2) Gaussian elimination integrated with Z_{2^d} Gröbner bases
+- Essentially reimplementing AMulet2 inside CBMC
+
+### Decision
+Not worth pursuing for the PoS paper. The 33/36 solve rate is already
+competitive with Bitwuzla (31/36). XOR slicing is a future direction
+for the specific case of multiplier circuit equivalence checking.
