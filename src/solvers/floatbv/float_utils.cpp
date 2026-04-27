@@ -849,10 +849,16 @@ bvt float_utilst::rem(const bvt &src1, const bvt &src2)
     bvt n_val = bv_utils.select(signs_equal, neg_one, one);
     bvt corrected = fma(n_val, src2, fmod_result);
 
-    // Use correction when 2*|fmod| > |y|, or at tie when quotient is odd
+    // Use correction when 2*|fmod| > |y|, or at tie when quotient is odd.
+    // Skip correction for special cases (NaN, infinity, zero inputs)
+    // where fmod_result is already the final answer.
     literalt gt_half = relation(two_abs_fmod, relt::GT, abs_y);
     literalt eq_half = relation(two_abs_fmod, relt::EQ, abs_y);
-    literalt use_corrected = prop.lor(gt_half, prop.land(eq_half, trunc_q_odd));
+    literalt special = prop.lor(
+      {nan_result, unpacked1.zero, unpacked2.infinity});
+    literalt use_corrected = prop.land(
+      !special,
+      prop.lor(gt_half, prop.land(eq_half, trunc_q_odd)));
     result = bv_utils.select(use_corrected, corrected, fmod_result);
   }
 
