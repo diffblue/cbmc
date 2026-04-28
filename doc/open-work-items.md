@@ -175,3 +175,57 @@ at any precision — no bit-blasting of the mantissa multiplication.
 - float_bvt results (if implemented before deadline)
 - Both would strengthen the paper but are not required — the
   four-layer defense story is already complete
+
+---
+
+## 5. Investigation of Leads from Related Work (Completed)
+
+### #1: Bitwuzla abstraction-refinement
+- Tested eager vs lazy bit-blasting on our benchmarks
+- Result: No difference. Their abstraction-refinement targets
+  different problem types (general QF_BV, not multiplication-specific).
+
+### #2: ZDD representation for polynomials
+- CBMC has BDD support (miniBDD, CUDD interface) but no ZDD
+- CUDD has ZDD support but isn't installed
+- Key insight: the fundamental issue is Gröbner basis incompleteness
+  for boolean-constrained systems over Z_{2^d}, not polynomial size
+- ZDDs would help with intermediate polynomial blowup but won't
+  fix the incompleteness
+
+### #3: SAT partitioning for hw_mul_equiv
+- Tested fixing 4-11 of 12 bits of b
+- Result: Gröbner basis still can't solve (hits step limit);
+  SAT solver still T/Os on the residual
+- Partitioning doesn't help because the structural mismatch
+  between bvmul and manual shift-add is the core difficulty
+
+### #4: Topology-aware variable ordering
+- The right idea: gate-level approaches (Yu, Kaufmann) succeed
+  because reverse topological ordering makes gate polynomials
+  a Gröbner basis WITHOUT computing one
+- Our word-level approach can't exploit this because we don't
+  have gate-level structure
+
+### #5: GF multiplier ordering
+- Not applicable (we work in Z_{2^d}, not GF(2^k))
+
+### KEY FINDING: Boolean constraints
+- Adding x*(x-1)=0 constraints for bit variables enables
+  solving hw_mul_equiv at 2 bits (UNSAT in 23 basis elements)
+- But NOT at 4+ bits (UNKNOWN, basis complete at 18 elements)
+- This is the gap between word-level and gate-level approaches:
+  gate-level methods use topology ordering to avoid computing
+  the Gröbner basis; our general-purpose computation doesn't
+  converge for larger boolean-constrained systems
+
+### Implementation effort summary:
+- #1: No implementation needed (experiment done)
+- #2: Install CUDD (~1 hour) + ZDD adapter (~100 lines) — but
+  won't solve the fundamental incompleteness issue
+- #3: No implementation needed (experiment done)
+- #4: Would require gate-level decomposition of expressions
+  (~500+ lines) — essentially reimplementing Yu et al.
+- #5: Not applicable
+- Boolean constraints: ~20 lines to add x*(x-1)=0 for ite
+  condition variables — helps 2-bit but not 4+ bit
