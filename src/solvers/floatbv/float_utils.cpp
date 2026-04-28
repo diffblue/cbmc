@@ -1045,10 +1045,6 @@ literalt float_utilst::is_zero(const bvt &src)
   return bv_utils.is_zero(all_but_sign);
 }
 
-literalt float_utilst::is_plus_inf(const bvt &src)
-{
-  return prop.land(!sign_bit(src), is_infinity(src));
-}
 
 literalt float_utilst::is_infinity(const bvt &src)
 {
@@ -1071,10 +1067,6 @@ bvt float_utilst::get_fraction(const bvt &src)
   return bv_utils.extract(src, 0, spec.f-1);
 }
 
-literalt float_utilst::is_minus_inf(const bvt &src)
-{
-  return prop.land(sign_bit(src), is_infinity(src));
-}
 
 literalt float_utilst::is_NaN(const bvt &src)
 {
