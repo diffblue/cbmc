@@ -239,14 +239,20 @@ void cpp_typecheckt::default_cpctor(
     {
       const cpp_namet cppname(mem_c.get_base_name(), source_location);
 
-      const symbolt &virtual_table_symbol_type =
-        lookup(to_pointer_type(mem_c.type()).base_type().get(ID_identifier));
+      const symbolt *virtual_table_symbol_type;
+      if(lookup(
+           to_pointer_type(mem_c.type()).base_type().get(ID_identifier),
+           virtual_table_symbol_type))
+        continue;
 
-      const symbolt &virtual_table_symbol_var = lookup(
-        id2string(virtual_table_symbol_type.name) + "@" +
-        id2string(symbol.name));
+      const symbolt *virtual_table_symbol_var;
+      if(lookup(
+           id2string(virtual_table_symbol_type->name) + "@" +
+             id2string(symbol.name),
+           virtual_table_symbol_var))
+        continue;
 
-      exprt var=virtual_table_symbol_var.symbol_expr();
+      exprt var = virtual_table_symbol_var->symbol_expr();
       address_of_exprt address(var);
       CHECK_RETURN(address.type() == mem_c.type());
 
@@ -828,14 +834,20 @@ void cpp_typecheckt::full_member_initialization(
     {
       const cpp_namet cppname(c.get_base_name(), c.source_location());
 
-      const symbolt &virtual_table_symbol_type =
-        lookup(to_pointer_type(c.type()).base_type().get(ID_identifier));
+      const symbolt *virtual_table_symbol_type;
+      if(lookup(
+           to_pointer_type(c.type()).base_type().get(ID_identifier),
+           virtual_table_symbol_type))
+        continue;
 
-      const symbolt &virtual_table_symbol_var  =
-        lookup(id2string(virtual_table_symbol_type.name) + "@" +
-            id2string(struct_union_type.get(ID_name)));
+      const symbolt *virtual_table_symbol_var;
+      if(lookup(
+           id2string(virtual_table_symbol_type->name) + "@" +
+             id2string(struct_union_type.get(ID_name)),
+           virtual_table_symbol_var))
+        continue;
 
-      exprt var=virtual_table_symbol_var.symbol_expr();
+      exprt var = virtual_table_symbol_var->symbol_expr();
       address_of_exprt address(var);
       CHECK_RETURN(address.type() == c.type());
 
