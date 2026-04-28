@@ -869,7 +869,7 @@ jobs:
       - name: Run tests
         run: |
           Set-Location build
-          ctest -V -L CORE -C Release . -j${{env.windows-vcpus}}
+          ctest -V -L CORE -C Release . -j${{env.windows-vcpus}} --timeout 600
 
   # This job takes approximately 65 to 84 minutes
   check-vs-2022-make-build-and-test:
