@@ -1174,6 +1174,16 @@ exprt float_bvt::isinf(
     fraction_all_zeros(src, spec));
 }
 
+exprt float_bvt::is_plus_inf(const exprt &src, const ieee_float_spect &spec)
+{
+  return and_exprt(not_exprt(sign_bit(src)), isinf(src, spec));
+}
+
+exprt float_bvt::is_minus_inf(const exprt &src, const ieee_float_spect &spec)
+{
+  return and_exprt(sign_bit(src), isinf(src, spec));
+}
+
 exprt float_bvt::isfinite(
   const exprt &src,
   const ieee_float_spect &spec)

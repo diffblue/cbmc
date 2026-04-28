@@ -457,9 +457,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
     if(op.type().id() == ID_floatbv)
     {
       float_utilst float_utils(prop, to_floatbv_type(op.type()));
-      return prop.land(
-        !float_utils.is_infinity(bv),
-        !float_utils.is_NaN(bv));
+      return float_utils.is_finite(bv);
     }
     else if(op.id() == ID_fixedbv)
       return const_literal(true);

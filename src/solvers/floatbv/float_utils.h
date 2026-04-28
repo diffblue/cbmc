@@ -110,6 +110,8 @@ public:
   literalt is_plus_inf(const bvt &);
   literalt is_minus_inf(const bvt &);
   literalt is_NaN(const bvt &);
+  /// Returns true iff \p src is finite (not NaN and not infinity).
+  literalt is_finite(const bvt &);
 
   // add/sub
   virtual bvt add_sub(const bvt &src1, const bvt &src2, bool subtract);

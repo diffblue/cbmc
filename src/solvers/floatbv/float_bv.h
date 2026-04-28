@@ -29,6 +29,10 @@ public:
   static exprt is_zero(const exprt &);
   static exprt isnan(const exprt &, const ieee_float_spect &);
   static exprt isinf(const exprt &, const ieee_float_spect &);
+  /// Returns true iff \p src is positive infinity.
+  static exprt is_plus_inf(const exprt &, const ieee_float_spect &);
+  /// Returns true iff \p src is negative infinity.
+  static exprt is_minus_inf(const exprt &, const ieee_float_spect &);
   static exprt isnormal(const exprt &, const ieee_float_spect &);
   static exprt isfinite(const exprt &, const ieee_float_spect &);
 

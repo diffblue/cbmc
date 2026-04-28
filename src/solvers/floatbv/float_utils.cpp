@@ -1018,6 +1018,11 @@ literalt float_utilst::is_NaN(const bvt &src)
                    !fraction_all_zeros(src));
 }
 
+literalt float_utilst::is_finite(const bvt &src)
+{
+  return !exponent_all_ones(src);
+}
+
 literalt float_utilst::exponent_all_ones(const bvt &src)
 {
   bvt exponent=src;
