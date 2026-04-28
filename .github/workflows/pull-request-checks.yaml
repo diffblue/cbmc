@@ -849,7 +849,7 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force -Path msvc-preprocessed
           $cbmc = "build\bin\Release\cbmc.exe"
-          foreach ($hdr in @("tuple", "string_view", "variant", "any", "string", "map", "optional", "vector")) {
+          foreach ($hdr in @("tuple", "string_view", "variant", "any", "string", "map", "optional", "vector", "list", "set", "thread", "mutex", "filesystem", "chrono", "valarray", "iostream", "memory", "functional")) {
             $src = "#include <$hdr>`nint main() {}"
             $src | Set-Content "pp_$hdr.cpp"
             & $cbmc --cpp17 --preprocess "pp_$hdr.cpp" 2>$null | Set-Content "msvc-preprocessed\$hdr.ii"
@@ -859,6 +859,9 @@ jobs:
             $src | Set-Content "pp_${hdr}_20.cpp"
             & $cbmc --cpp20 --preprocess "pp_${hdr}_20.cpp" 2>$null | Set-Content "msvc-preprocessed\${hdr}_cpp20.ii"
           }
+          # Also preprocess the STL1 and STL2 test files
+          & $cbmc --cpp17 --preprocess "regression\cbmc-cpp\STL1\main.cpp" 2>$null | Set-Content "msvc-preprocessed\stl1.ii"
+          & $cbmc --cpp17 --preprocess "regression\cbmc-cpp\STL2\main.cpp" 2>$null | Set-Content "msvc-preprocessed\stl2.ii"
       - name: Upload preprocessed headers
         if: always()
         uses: actions/upload-artifact@v4
