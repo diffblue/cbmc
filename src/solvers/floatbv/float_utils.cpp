@@ -813,15 +813,6 @@ literalt float_utilst::is_zero(const bvt &src)
   return bv_utils.is_zero(all_but_sign);
 }
 
-literalt float_utilst::is_plus_inf(const bvt &src)
-{
-  bvt and_bv;
-  and_bv.push_back(!sign_bit(src));
-  and_bv.push_back(exponent_all_ones(src));
-  and_bv.push_back(fraction_all_zeros(src));
-  return prop.land(and_bv);
-}
-
 literalt float_utilst::is_infinity(const bvt &src)
 {
   return prop.land(
@@ -841,19 +832,15 @@ bvt float_utilst::get_fraction(const bvt &src)
   return bv_utils.extract(src, 0, spec.f-1);
 }
 
-literalt float_utilst::is_minus_inf(const bvt &src)
-{
-  bvt and_bv;
-  and_bv.push_back(sign_bit(src));
-  and_bv.push_back(exponent_all_ones(src));
-  and_bv.push_back(fraction_all_zeros(src));
-  return prop.land(and_bv);
-}
-
 literalt float_utilst::is_NaN(const bvt &src)
 {
   return prop.land(exponent_all_ones(src),
                    !fraction_all_zeros(src));
+}
+
+literalt float_utilst::is_finite(const bvt &src)
+{
+  return !exponent_all_ones(src);
 }
 
 literalt float_utilst::exponent_all_ones(const bvt &src)
