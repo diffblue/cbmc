@@ -249,7 +249,9 @@ void cpp_internal_additions(std::ostream &out)
   // on pack expansions, which CBMC cannot evaluate. Provide simple
   // recursive implementations via the preprocessor that replace the
   // GCC definitions before <type_traits> is included.
-  if(config.ansi_c.mode != configt::ansi_ct::flavourt::VISUAL_STUDIO)
+  if(
+    config.ansi_c.mode != configt::ansi_ct::flavourt::VISUAL_STUDIO &&
+    config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP11)
   {
     // clang-format off
     out <<

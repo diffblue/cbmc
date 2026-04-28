@@ -25,7 +25,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <ansi-c/gcc_version.h>
 
 #include "cpp_declarator.h"
-#include "cpp_typecheck_resolve.h"
 #include "cpp_util.h"
 #include "expr2cpp.h"
 
