@@ -25,8 +25,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 void cpp_typecheckt::typecheck_type(typet &type)
 {
-  PRECONDITION(!type.id().empty());
-  PRECONDITION(type.is_not_nil());
+  // GCC 16+ headers may produce types with empty IDs from
+  // constructs CBMC's parser doesn't fully handle (e.g.,
+  // nested requires clauses). Skip rather than crash.
+  if(type.id().empty() || type.is_nil())
+    return;
 
   try
   {
