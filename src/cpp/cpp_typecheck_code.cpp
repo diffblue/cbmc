@@ -892,7 +892,15 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
 
     // we have to add 'this'
     exprt this_expr = cpp_scopes.current_scope().this_expr;
-    PRECONDITION(this_expr.is_not_nil());
+    if(this_expr.is_nil())
+    {
+      // Not in a class context — the member initializer can't be
+      // processed (e.g., constructor from a header that failed to
+      // elaborate its class scope).
+      error().source_location = code.source_location();
+      error() << "member initializer outside class context" << eom;
+      throw 0;
+    }
 
     make_ptr_typecast(
       this_expr, to_pointer_type(code_type.parameters().front().type()));

@@ -9,56 +9,35 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
-#include <util/message.h>
-
 #include "cpp_typecheck.h"
 
 void cpp_typecheckt::convert(cpp_linkage_spect &linkage_spec)
 {
-  irep_idt old_linkage_spec=current_linkage_spec;
+  irep_idt old_linkage_spec = current_linkage_spec;
 
-  current_linkage_spec=linkage_spec.linkage().get(ID_value);
+  current_linkage_spec = linkage_spec.linkage().get(ID_value);
 
   // there is a linkage spec "C++", which we know as "cpp"
-  if(current_linkage_spec=="C++")
-    current_linkage_spec=ID_cpp;
+  if(current_linkage_spec == "C++")
+    current_linkage_spec = ID_cpp;
 
   // do the declarations
-  for(cpp_linkage_spect::itemst::iterator
-      it=linkage_spec.items().begin();
-      it!=linkage_spec.items().end();
+  for(auto it = linkage_spec.items().begin();
+      it != linkage_spec.items().end();
       it++)
   {
-    const auto &loc = it->source_location();
-    std::string file = id2string(loc.get_file());
-    if(file.empty())
-      file = id2string(linkage_spec.source_location().get_file());
-    bool is_system =
-      file.find("/usr/include/") == 0 || file.find("/usr/lib/") == 0;
-
-    // Items inside extern "C"/"C++" linkage specs from system headers
-    // often have empty source locations. Treat all linkage spec items
-    // as system headers when the file cannot be determined.
-    if(is_system || file.empty())
-    {
-      null_message_handlert null_mh;
-      message_handlert &old_mh = get_message_handler();
-      set_message_handler(null_mh);
-      try
-      {
-        convert(*it);
-      }
-      catch(...)
-      {
-      }
-      set_message_handler(old_mh);
-    }
-    else
+    try
     {
       convert(*it);
+    }
+    catch(int)
+    {
+      // Continue processing remaining items so that later
+      // declarations (e.g., forward declarations, typedefs)
+      // are still registered in the symbol table.
     }
   }
 
   // back to previous linkage spec
-  current_linkage_spec=old_linkage_spec;
+  current_linkage_spec = old_linkage_spec;
 }
