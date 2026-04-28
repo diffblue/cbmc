@@ -62,6 +62,10 @@ public:
     const exprt &rm,
     const ieee_float_spect &) const;
 
+  // fmod and remainder
+  exprt mod(const exprt &, const exprt &) const;
+  exprt rem(const exprt &, const exprt &) const;
+
   // conversion
   exprt from_unsigned_integer(
     const exprt &,
@@ -92,6 +96,11 @@ public:
     const exprt &rm,
     const ieee_float_spect &src_spec,
     const ieee_float_spect &dest_spec) const;
+
+  exprt round_to_integral(
+    const exprt &src,
+    const exprt &rm,
+    const ieee_float_spect &) const;
 
   // relations
   enum class relt { LT, LE, EQ, GT, GE };

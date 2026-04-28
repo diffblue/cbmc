@@ -419,3 +419,149 @@ SCENARIO("float_utils_fma", "[core][solvers][floatbv][float_utils]")
     }
   }
 }
+
+/// Compare float_utilst against ieee_floatt (software reference) across
+/// all rounding modes and operations.
+SCENARIO(
+  "float_utils_all_rounding_modes",
+  "[core][solvers][floatbv][float_utils]")
+{
+  const ieee_floatt::rounding_modet modes[] = {
+    ieee_floatt::ROUND_TO_EVEN,
+    ieee_floatt::ROUND_TO_MINUS_INF,
+    ieee_floatt::ROUND_TO_PLUS_INF,
+    ieee_floatt::ROUND_TO_ZERO,
+    ieee_floatt::ROUND_TO_AWAY,
+  };
+
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  distt dist(0, std::numeric_limits<unsigned>::max());
+
+  for(const auto rm : modes)
+  {
+    GIVEN("Rounding mode " + std::to_string(static_cast<int>(rm)))
+    {
+      for(unsigned i = 0; i < 100; i++)
+      {
+        satcheckt satcheck(null_message_handler);
+        float_utilst float_utils(satcheck);
+        float_utils.spec = ieee_float_spect::single_precision();
+        float_utils.rounding_mode_bits.set(rm);
+
+        float f1 = random_float(dist, gen);
+        float f2 = random_float(dist, gen);
+
+        ieee_floatt i1{ieee_float_spect::single_precision(), rm};
+        ieee_floatt i2{ieee_float_spect::single_precision(), rm};
+        i1.from_float(f1);
+        i2.from_float(f2);
+
+        const bvt b1 = float_utils.build_constant(i1);
+        const bvt b2 = float_utils.build_constant(i2);
+
+        // Test all four operations
+        struct op_test
+        {
+          const char *name;
+          bvt result_bv;
+          ieee_floatt expected;
+        };
+
+        ieee_floatt expected_add = i1;
+        expected_add += i2;
+        ieee_floatt expected_sub = i1;
+        expected_sub -= i2;
+        ieee_floatt expected_mul = i1;
+        expected_mul *= i2;
+        ieee_floatt expected_div = i1;
+        expected_div /= i2;
+
+        op_test tests[] = {
+          {"add", float_utils.add(b1, b2), expected_add},
+          {"sub", float_utils.sub(b1, b2), expected_sub},
+          {"mul", float_utils.mul(b1, b2), expected_mul},
+          {"div", float_utils.div(b1, b2), expected_div},
+        };
+
+        const satcheckt::resultt sat_result = satcheck.prop_solve();
+        REQUIRE(sat_result == satcheckt::resultt::P_SATISFIABLE);
+
+        for(const auto &t : tests)
+        {
+          const ieee_float_valuet actual = float_utils.get(t.result_bv);
+          if(!eq(actual, t.expected))
+          {
+            std::cerr << "rm=" << static_cast<int>(rm) << " " << t.name << ": "
+                      << i1 << " (0x" << integer2string(i1.pack(), 16)
+                      << ") op " << i2 << " (0x"
+                      << integer2string(i2.pack(), 16) << ") = " << actual
+                      << " (0x" << integer2string(actual.pack(), 16)
+                      << ") expected " << t.expected << " (0x"
+                      << integer2string(t.expected.pack(), 16) << ")\n";
+          }
+          REQUIRE(eq(actual, t.expected));
+        }
+      }
+    }
+  }
+}
+
+/// Test float_utilst conversions against ieee_floatt across rounding modes.
+SCENARIO(
+  "float_utils_conversions_all_rounding_modes",
+  "[core][solvers][floatbv][float_utils]")
+{
+  const ieee_floatt::rounding_modet modes[] = {
+    ieee_floatt::ROUND_TO_EVEN,
+    ieee_floatt::ROUND_TO_MINUS_INF,
+    ieee_floatt::ROUND_TO_PLUS_INF,
+    ieee_floatt::ROUND_TO_ZERO,
+    ieee_floatt::ROUND_TO_AWAY,
+  };
+
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  distt dist(0, std::numeric_limits<unsigned>::max());
+
+  for(const auto rm : modes)
+  {
+    GIVEN("Rounding mode " + std::to_string(static_cast<int>(rm)))
+    {
+      // Test double -> float conversion
+      for(unsigned i = 0; i < 50; i++)
+      {
+        satcheckt satcheck(null_message_handler);
+        float_utilst float_utils(satcheck);
+        float_utils.spec = ieee_float_spect::double_precision();
+        float_utils.rounding_mode_bits.set(rm);
+
+        // Generate a random double
+        double d = random_float(dist, gen) * random_float(dist, gen);
+        ieee_floatt id{ieee_float_spect::double_precision(), rm};
+        id.from_double(d);
+
+        const bvt bd = float_utils.build_constant(id);
+
+        // Convert to single precision
+        bvt result_bv =
+          float_utils.conversion(bd, ieee_float_spect::single_precision());
+
+        // Reference: ieee_floatt conversion
+        ieee_floatt expected{ieee_float_spect::double_precision(), rm};
+        expected.from_double(d);
+        expected.change_spec(ieee_float_spect::single_precision());
+
+        const satcheckt::resultt sat_result = satcheck.prop_solve();
+        REQUIRE(sat_result == satcheckt::resultt::P_SATISFIABLE);
+
+        float_utilst result_utils(satcheck);
+        result_utils.spec = ieee_float_spect::single_precision();
+        const ieee_float_valuet actual = result_utils.get(result_bv);
+
+        if(!eq(actual, expected))
+          REQUIRE(eq(actual, expected));
+      }
+    }
+  }
+}

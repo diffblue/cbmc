@@ -1,8 +1,10 @@
-KNOWNBUG
+CORE no-new-smt
 main.c
---pointer-check --bounds-check
+--floatbv
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+--
+Division with subnormal dividend.

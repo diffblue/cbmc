@@ -1,0 +1,10 @@
+CORE no-new-smt
+main.c
+--floatbv
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Float-to-integer conversion for values needing more bits than the fraction.

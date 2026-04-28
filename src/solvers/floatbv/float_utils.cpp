@@ -156,30 +156,99 @@ bvt float_utilst::round_to_integral(const bvt &src)
 {
   PRECONDITION(src.size() == spec.width());
 
-  // Zero? NaN? Infinity?
-  auto unpacked = unpack(src);
-  auto is_special = prop.lor({unpacked.zero, unpacked.NaN, unpacked.infinity});
+  // Direct bitvector approach: for each possible biased exponent,
+  // mask off fractional bits and apply rounding on the packed
+  // representation.  This avoids the add-magic-subtract-magic algorithm
+  // which overflows when |x| + 2^f exceeds the representable range.
 
-  // add 2^f, where f is the number of fraction bits,
-  // by adding f to the exponent
-  auto magic_number = ieee_floatt{
-    spec, ieee_floatt::rounding_modet::ROUND_TO_ZERO, power(2, spec.f)};
+  const unbiased_floatt unpacked = unpack(src);
+  const literalt is_special =
+    prop.lor({unpacked.zero, unpacked.NaN, unpacked.infinity});
 
-  auto magic_number_bv = build_constant(magic_number);
+  // If unbiased exponent >= f, the number is already integral.
+  const bvt f_const = bv_utils.build_constant(spec.f, unpacked.exponent.size());
+  const literalt exp_ge_f =
+    !bv_utils.signed_less_than(unpacked.exponent, f_const);
 
-  // abs(x) >= magic_number? If so, then there is no fractional part.
-  literalt ge_magic_number = relation(abs(src), relt::GE, magic_number_bv);
+  const bvt biased_exp = get_exponent(src);
 
-  magic_number_bv.back() = src.back(); // copy sign bit
+  // ±0 and ±1 as packed bitvectors
+  ieee_floatt pz{spec, ieee_floatt::ROUND_TO_ZERO, 0};
+  ieee_floatt nz{spec, ieee_floatt::ROUND_TO_ZERO, 0};
+  nz.set_sign(true);
+  ieee_floatt p1{spec, ieee_floatt::ROUND_TO_ZERO, 1};
+  ieee_floatt n1{spec, ieee_floatt::ROUND_TO_ZERO, -1};
 
-  auto tmp1 = add_sub(src, magic_number_bv, false);
+  const bvt signed_zero =
+    bv_utils.select(sign_bit(src), build_constant(nz), build_constant(pz));
+  const bvt signed_one =
+    bv_utils.select(sign_bit(src), build_constant(n1), build_constant(p1));
 
-  auto tmp2 = add_sub(tmp1, magic_number_bv, true);
+  // For |x| < 1 (biased exponent < bias): result is ±0 or ±1.
+  // |x| >= 0.5 iff biased exponent >= bias-1.
+  // |x| == 0.5 iff biased exponent == bias-1 AND fraction == 0.
+  const bvt bias_m1 = bv_utils.build_constant(spec.bias() - 1, spec.e);
+  const literalt exp_ge_bm1 = !bv_utils.unsigned_less_than(biased_exp, bias_m1);
+  const literalt exp_eq_bm1 = bv_utils.equal(biased_exp, bias_m1);
+  const literalt frac_zero = fraction_all_zeros(src);
+  const literalt abs_eq_half = prop.land(exp_eq_bm1, frac_zero);
+  const literalt abs_gt_half = prop.land(exp_ge_bm1, !abs_eq_half);
 
-  // restore the original sign bit
-  tmp2.back() = src.back();
+  // clang-format off
+  const literalt round_up = prop.lselect(
+    rounding_mode_bits.round_to_even, abs_gt_half,
+    prop.lselect(rounding_mode_bits.round_to_away,
+      prop.lor(abs_gt_half, abs_eq_half),
+    prop.lselect(rounding_mode_bits.round_to_plus_inf,
+      !unpacked.sign,
+    prop.lselect(rounding_mode_bits.round_to_minus_inf,
+      unpacked.sign,
+      const_literal(false)))));
+  // clang-format on
 
-  return bv_utils.select(prop.lor(is_special, ge_magic_number), src, tmp2);
+  bvt result = bv_utils.select(round_up, signed_one, signed_zero);
+
+  // For each unbiased exponent 0..f-1 (biased: bias..bias+f-1):
+  for(std::size_t eu = 0; eu < static_cast<std::size_t>(spec.f); eu++)
+  {
+    const mp_integer be = eu + spec.bias();
+    const std::size_t drop = spec.f - eu;
+
+    // Mask: clear bottom 'drop' bits
+    bvt masked = src;
+    for(std::size_t i = 0; i < drop; i++)
+      masked[i] = const_literal(false);
+
+    // Round bit, sticky bit, least kept bit
+    const literalt rbit = src[drop - 1];
+    literalt sticky = const_literal(false);
+    for(std::size_t i = 0; i + 1 < drop; i++)
+      sticky = prop.lor(sticky, src[i]);
+    const literalt lsb = src[drop];
+
+    // clang-format off
+    const literalt inc = prop.lselect(
+      rounding_mode_bits.round_to_even,
+        prop.land(rbit, prop.lor(lsb, sticky)),
+      prop.lselect(rounding_mode_bits.round_to_away, rbit,
+      prop.lselect(rounding_mode_bits.round_to_plus_inf,
+        prop.land(!unpacked.sign, prop.lor(rbit, sticky)),
+      prop.lselect(rounding_mode_bits.round_to_minus_inf,
+        prop.land(unpacked.sign, prop.lor(rbit, sticky)),
+        const_literal(false)))));
+    // clang-format on
+
+    // Increment: add 1 at position 'drop'
+    const bvt inc_val = bv_utils.build_constant(power(2, drop), spec.width());
+    const bvt incremented = bv_utils.add(masked, inc_val);
+    const bvt branch = bv_utils.select(inc, incremented, masked);
+
+    const bvt be_const = bv_utils.build_constant(be, spec.e);
+    const literalt match = bv_utils.equal(biased_exp, be_const);
+    result = bv_utils.select(match, branch, result);
+  }
+
+  return bv_utils.select(prop.lor(is_special, exp_ge_f), src, result);
 }
 
 bvt float_utilst::conversion(
@@ -255,9 +324,11 @@ bvt float_utilst::conversion(
 
 literalt float_utilst::is_normal(const bvt &src)
 {
-  return prop.land(
-           !exponent_all_zeros(src),
-           !exponent_all_ones(src));
+  literalt result =
+    prop.land(!exponent_all_zeros(src), !exponent_all_ones(src));
+  if(spec.x86_extended)
+    result = prop.land(result, src[spec.f]);
+  return result;
 }
 
 /// Subtracts the exponents
@@ -615,7 +686,10 @@ bvt float_utilst::div(const bvt &src1, const bvt &src2)
   const unbiased_floatt unpacked1=unpack(src1);
   const unbiased_floatt unpacked2=unpack(src2);
 
-  std::size_t div_width=unpacked1.fraction.size()*2+1;
+  // Division width: we need enough bits for the quotient to have
+  // full precision even when the dividend is subnormal.  A subnormal
+  // has up to f leading zeros in the fraction, so we add f extra bits.
+  std::size_t div_width = unpacked1.fraction.size() * 2 + 1 + spec.f;
 
   // pad fraction1 with zeros
   bvt fraction1=unpacked1.fraction;
@@ -690,20 +764,178 @@ bvt float_utilst::div(const bvt &src1, const bvt &src2)
 
 bvt float_utilst::rem(const bvt &src1, const bvt &src2)
 {
-  /* The semantics of floating-point remainder implemented as below
-     is the sensible one.  Unfortunately this is not the one required
-     by IEEE-754 or fmod / remainder.  Martin has discussed the
-     'correct' semantics with Christoph and Alberto at length as
-     well as talking to various hardware designers and we still
-     hasn't found a good way to implement them in a solver.
-     We have some approaches that are correct but they really
-     don't scale. */
+  PRECONDITION(src1.size() == src2.size());
 
   const unbiased_floatt unpacked2 = unpack(src2);
 
-  // stub: do (src2.infinity ? src1 : (src1/src2)*src2))
-  return bv_utils.select(
-    unpacked2.infinity, src1, sub(src1, mul(div(src1, src2), src2)));
+  // IEEE 754 fmod/remainder (see doc/proofs/ for Coq/HOL Light proofs).
+  //
+  // Proved properties and corresponding _Float16 exhaustive tests:
+  //   remainder_format     → remainderf/_Float16.desc (|r| <= |y|/2)
+  //   fmod_then_remainder  → remainderf/fmod_bound.desc (|fmod| < |y|)
+  //   comparison_step      → remainderf/_Float16.desc (min-selection)
+  //   special cases        → remainderf/special_cases.desc
+  //   nearest_int_small    → remainderf/_Float16.desc (n ∈ {-1,0,1})
+  //
+  // Step 1: Compute fmod(x, y) via integer significand arithmetic.
+  //   Align significands, compute mx_aligned mod my_aligned.
+  //   Result r_int < my_aligned, so r_int < 2^(f+1) and converts
+  //   to float exactly. (Coq: fmod_then_remainder, remainder_format)
+  // Step 2 (remainder only): Compute remainder(fmod, y) via FMA.
+  //   Since |fmod| < |y|, the quotient n is in {-1, 0, 1}.
+  //   (Coq: nearest_int_small)
+  //   Try n, n+1, n-1 and pick smallest |result|.
+  //   The correct candidate is exact (Coq: fma_remainder_exact).
+  //   Wrong candidates have |result| >= |r_correct|
+  //   (Coq: rounding_preserves_remainder_comparison).
+  //   So min-selection picks the correct IEEE remainder.
+
+  const unbiased_floatt unpacked1 = unpack(src1);
+  const std::size_t frac_bits = unpacked1.fraction.size();
+
+  // Note: |x| < |y| does NOT imply remainder(x,y) = x. While
+  // fmod(x,y) = x when |x| < |y| (truncated quotient is 0), the IEEE
+  // remainder uses round-to-nearest-even, so when |x| > |y|/2 the
+  // nearest integer quotient is ±1 and remainder(x,y) = x ∓ y ≠ x.
+
+  // Exponent difference
+  bvt exp1 =
+    bv_utils.sign_extension(unpacked1.exponent, unpacked1.exponent.size() + 1);
+  bvt exp2 =
+    bv_utils.sign_extension(unpacked2.exponent, unpacked2.exponent.size() + 1);
+  bvt exp_diff = bv_utils.sub(exp1, exp2);
+  literalt ex_ge_ey = !exp_diff.back();
+  bvt abs_exp_diff = bv_utils.absolute_value(exp_diff);
+
+  // Integer width for aligned significands. The maximum exponent
+  // difference is emax - emin_subnormal = 2^e + p - 4, so we need
+  // that plus p significand bits plus 2 guard bits = 2^e + 2p - 2.
+  // This is feasible for half (52 bits), float (302 bits), and
+  // double (2152 bits), but infeasible for long double/quad.
+  // Use the SMT FPA backend for those.
+  // Note: the integer remainder below implicitly performs up to
+  // exponent-difference divide/subtract steps when bit-blasted;
+  // this is inherent to all approaches for computing fmod/remainder.
+  const std::size_t int_width = (std::size_t(1) << spec.e) + 2 * frac_bits - 2;
+  bvt shift_dist = limit_distance(abs_exp_diff, mp_integer(int_width));
+
+  bvt mx = bv_utils.zero_extension(unpacked1.fraction, int_width);
+  bvt my = bv_utils.zero_extension(unpacked2.fraction, int_width);
+
+  // Align: shift the one with larger exponent left
+  bvt mx_aligned = bv_utils.select(
+    ex_ge_ey,
+    bv_utils.shift(mx, bv_utilst::shiftt::SHIFT_LEFT, shift_dist),
+    mx);
+  bvt my_aligned = bv_utils.select(
+    ex_ge_ey,
+    my,
+    bv_utils.shift(my, bv_utilst::shiftt::SHIFT_LEFT, shift_dist));
+
+  // Integer remainder: fmod significand (unsigned)
+  bvt r_int = bv_utils.remainder(
+    mx_aligned, my_aligned, bv_utilst::representationt::UNSIGNED);
+
+  // Integer quotient LSB (needed for remainder tie-breaking).
+  // Only the parity matters; a specialised divider that stops one step
+  // early could avoid computing the full quotient.
+  bvt q_int = bv_utils.divider(
+    mx_aligned, my_aligned, bv_utilst::representationt::UNSIGNED);
+  literalt trunc_q_odd = q_int[0];
+
+  // Pack as float: value = r_int * 2^min(ex,ey), sign = sign(x)
+  bvt min_exp = bv_utils.select(ex_ge_ey, exp2, exp1);
+  // The unbiased_floatt convention:
+  //   value = fraction * 2^(exponent - (frac_size-1))
+  // We want value = r_int * 2^(min_exp - (frac_bits - 1))
+  // With fraction.size() = int_width:
+  //   exponent - (int_width - 1) = min_exp - (frac_bits - 1)
+  //   exponent = min_exp + int_width - frac_bits
+  bvt adjusted_exp = bv_utils.add(
+    bv_utils.sign_extension(min_exp, spec.e + 2),
+    bv_utils.build_constant(
+      mp_integer(int_width) - mp_integer(frac_bits), spec.e + 2));
+  unbiased_floatt fmod_unpacked;
+  fmod_unpacked.fraction = r_int;
+  fmod_unpacked.exponent = adjusted_exp;
+  fmod_unpacked.sign = unpacked1.sign;
+  fmod_unpacked.NaN = const_literal(false);
+  fmod_unpacked.infinity = const_literal(false);
+  fmod_unpacked.zero = bv_utils.is_zero(r_int);
+  // The fmod result is mathematically exact (r_int < my_aligned, so it
+  // fits in p bits), but round_and_pack is needed to normalize the
+  // representation (handle subnormals, adjust exponent).
+  bvt fmod_result = round_and_pack(fmod_unpacked);
+
+  // Handle IEEE 754 special cases (cf. SymFPU
+  // addRemainderSpecialCases in core/remainder.h,
+  // https://github.com/martin-cs/symfpu):
+  //   fmod(x, ±0)    = NaN
+  //   fmod(±inf, y)   = NaN
+  //   fmod(NaN, y)    = NaN
+  //   fmod(x, NaN)    = NaN
+  //   fmod(±0, y)     = ±0 (= x)
+  //   fmod(x, ±inf)   = x
+  literalt nan_result = prop.lor(
+    {unpacked1.infinity, unpacked1.NaN, unpacked2.NaN, unpacked2.zero});
+  ieee_floatt nan_val(
+    ieee_float_spect{spec}, ieee_floatt::rounding_modet::ROUND_TO_EVEN);
+  nan_val.make_NaN();
+  bvt nan_bv = build_constant(nan_val);
+  fmod_result = bv_utils.select(nan_result, nan_bv, fmod_result);
+  // x is ±0 and no NaN condition → return x (±0)
+  fmod_result =
+    bv_utils.select(prop.land(unpacked1.zero, !nan_result), src1, fmod_result);
+  // y is ±inf and no NaN condition → return x
+  fmod_result = bv_utils.select(
+    prop.land(unpacked2.infinity, !nan_result), src1, fmod_result);
+
+  // For fmod (ROUND_TO_ZERO), we're done
+  bvt result = fmod_result;
+
+  if(!rounding_mode_bits.round_to_zero.is_true())
+  {
+    // Step 2: IEEE remainder via conditional subtract.
+    // Since |fmod| < |y|, the nearest integer quotient n is in {-1,0,1}.
+    // (Coq: nearest_int_small, conditional_subtract_closer)
+    //
+    // - |fmod| < |y|/2: remainder = fmod (n = 0)
+    // - |fmod| > |y|/2: remainder = fmod - sign(fmod)*|y| (n = ±1)
+    // - |fmod| = |y|/2: tie-break by quotient parity (pick even n)
+    //
+    // The correction subtracts |y| from |fmod| preserving sign.
+    // In IEEE arithmetic: if signs match, subtract; else add.
+    bvt abs_fmod = abs(fmod_result);
+    bvt abs_y = abs(src2);
+
+    // Compare 2*|fmod| against |y| to avoid |y|/2 subnormal underflow.
+    bvt two = build_constant(
+      ieee_floatt{spec, ieee_floatt::rounding_modet::ROUND_TO_ZERO, 2});
+    bvt two_abs_fmod = mul(abs_fmod, two);
+
+    // corrected = fma(-1, y, fmod) or fma(+1, y, fmod)
+    // depending on whether signs match. FMA is exact here
+    // (Coq: fma_remainder_exact).
+    literalt signs_equal = prop.lequal(sign_bit(fmod_result), sign_bit(src2));
+    bvt one = build_constant(
+      ieee_floatt{spec, ieee_floatt::rounding_modet::ROUND_TO_ZERO, 1});
+    bvt neg_one = negate(one);
+    bvt n_val = bv_utils.select(signs_equal, neg_one, one);
+    bvt corrected = fma(n_val, src2, fmod_result);
+
+    // Use correction when 2*|fmod| > |y|, or at tie when quotient is odd.
+    // Skip correction for special cases (NaN, infinity, zero inputs)
+    // where fmod_result is already the final answer.
+    literalt gt_half = relation(two_abs_fmod, relt::GT, abs_y);
+    literalt eq_half = relation(two_abs_fmod, relt::EQ, abs_y);
+    literalt special =
+      prop.lor({nan_result, unpacked1.zero, unpacked2.infinity});
+    literalt use_corrected =
+      prop.land(!special, prop.lor(gt_half, prop.land(eq_half, trunc_q_odd)));
+    result = bv_utils.select(use_corrected, corrected, fmod_result);
+  }
+
+  return result;
 }
 
 bvt float_utilst::negate(const bvt &src)
@@ -813,26 +1045,20 @@ literalt float_utilst::is_zero(const bvt &src)
   return bv_utils.is_zero(all_but_sign);
 }
 
-literalt float_utilst::is_plus_inf(const bvt &src)
-{
-  bvt and_bv;
-  and_bv.push_back(!sign_bit(src));
-  and_bv.push_back(exponent_all_ones(src));
-  and_bv.push_back(fraction_all_zeros(src));
-  return prop.land(and_bv);
-}
 
 literalt float_utilst::is_infinity(const bvt &src)
 {
-  return prop.land(
-    exponent_all_ones(src),
-    fraction_all_zeros(src));
+  literalt result = prop.land(exponent_all_ones(src), fraction_all_zeros(src));
+  if(spec.x86_extended)
+    result = prop.land(result, src[spec.f]);
+  return result;
 }
 
 /// Gets the unbiased exponent in a floating-point bit-vector
 bvt float_utilst::get_exponent(const bvt &src)
 {
-  return bv_utils.extract(src, spec.f, spec.f+spec.e-1);
+  const std::size_t offset = spec.x86_extended ? spec.f + 1 : spec.f;
+  return bv_utils.extract(src, offset, offset + spec.e - 1);
 }
 
 /// Gets the fraction without hidden bit in a floating-point bit-vector src
@@ -841,44 +1067,29 @@ bvt float_utilst::get_fraction(const bvt &src)
   return bv_utils.extract(src, 0, spec.f-1);
 }
 
-literalt float_utilst::is_minus_inf(const bvt &src)
-{
-  bvt and_bv;
-  and_bv.push_back(sign_bit(src));
-  and_bv.push_back(exponent_all_ones(src));
-  and_bv.push_back(fraction_all_zeros(src));
-  return prop.land(and_bv);
-}
 
 literalt float_utilst::is_NaN(const bvt &src)
 {
-  return prop.land(exponent_all_ones(src),
-                   !fraction_all_zeros(src));
+  literalt result = prop.land(exponent_all_ones(src), !fraction_all_zeros(src));
+  if(spec.x86_extended)
+    result = prop.land(result, src[spec.f]);
+  return result;
+}
+
+literalt float_utilst::is_finite(const bvt &src)
+{
+  return !exponent_all_ones(src);
 }
 
 literalt float_utilst::exponent_all_ones(const bvt &src)
 {
-  bvt exponent=src;
-
-  // removes the fractional part
-  exponent.erase(exponent.begin(), exponent.begin()+spec.f);
-
-  // removes the sign
-  exponent.resize(spec.e);
-
+  bvt exponent = get_exponent(src);
   return bv_utils.is_all_ones(exponent);
 }
 
 literalt float_utilst::exponent_all_zeros(const bvt &src)
 {
-  bvt exponent=src;
-
-  // removes the fractional part
-  exponent.erase(exponent.begin(), exponent.begin()+spec.f);
-
-  // removes the sign
-  exponent.resize(spec.e);
-
+  bvt exponent = get_exponent(src);
   return bv_utils.is_zero(exponent);
 }
 
@@ -1286,12 +1497,13 @@ void float_utilst::round_exponent(unbiased_floatt &result)
 #if 1
     // Directed rounding modes round overflow to the maximum normal
     // depending on the particular mode and the sign
-    literalt overflow_to_inf=
-      prop.lor(rounding_mode_bits.round_to_even,
-      prop.lor(prop.land(rounding_mode_bits.round_to_plus_inf,
-                         !result.sign),
-               prop.land(rounding_mode_bits.round_to_minus_inf,
-                         result.sign)));
+    literalt overflow_to_inf = prop.lor(
+      rounding_mode_bits.round_to_even,
+      prop.lor(
+        rounding_mode_bits.round_to_away,
+        prop.lor(
+          prop.land(rounding_mode_bits.round_to_plus_inf, !result.sign),
+          prop.land(rounding_mode_bits.round_to_minus_inf, result.sign))));
 
     literalt set_to_max=
       prop.land(exponent_too_large, !overflow_to_inf);
@@ -1376,7 +1588,17 @@ float_utilst::unbiased_floatt float_utilst::unpack(const bvt &src)
   result.sign=sign_bit(src);
 
   result.fraction=get_fraction(src);
-  result.fraction.push_back(is_normal(src)); // add hidden bit
+
+  // add hidden bit
+  if(spec.x86_extended)
+  {
+    // x86 extended has an explicit integer bit at position spec.f
+    result.fraction.push_back(src[spec.f]);
+  }
+  else
+  {
+    result.fraction.push_back(is_normal(src));
+  }
 
   result.exponent=get_exponent(src);
   CHECK_RETURN(result.exponent.size() == spec.e);
@@ -1418,11 +1640,20 @@ bvt float_utilst::pack(const biased_floatt &src)
 
   result[0]=prop.lor(result[0], src.NaN);
 
+  // for x86 extended, add the explicit integer bit
+  const std::size_t exp_offset = spec.x86_extended ? spec.f + 1 : spec.f;
+
+  if(spec.x86_extended)
+  {
+    // integer bit: 1 for normals (non-zero exponent), 0 for denormals
+    literalt int_bit = !bv_utils.is_zero(src.exponent);
+    // infinity and NaN also have integer bit = 1
+    result[spec.f] = prop.lor(int_bit, infinity_or_NaN);
+  }
+
   // do exponent
   for(std::size_t i=0; i<spec.e; i++)
-    result[i+spec.f]=prop.lor(
-      src.exponent[i],
-      infinity_or_NaN);
+    result[i + exp_offset] = prop.lor(src.exponent[i], infinity_or_NaN);
 
   return result;
 }
