@@ -529,7 +529,6 @@ exprt float_bvt::conversion(
   }
 }
 
-
 exprt float_bvt::round_to_integral(
   const exprt &src,
   const exprt &rm,
@@ -635,14 +634,16 @@ exprt float_bvt::round_to_integral(
   return if_exprt(or_exprt(is_special, exp_ge_f), src, result);
 }
 
-
 exprt float_bvt::isnormal(
   const exprt &src,
   const ieee_float_spect &spec)
 {
-  return and_exprt(
-           not_exprt(exponent_all_zeros(src, spec)),
-           not_exprt(exponent_all_ones(src, spec)));
+  exprt result = and_exprt(
+    not_exprt(exponent_all_zeros(src, spec)),
+    not_exprt(exponent_all_ones(src, spec)));
+  if(spec.x86_extended)
+    result = and_exprt(result, extractbit_exprt(src, spec.f));
+  return result;
 }
 
 /// Subtracts the exponents
@@ -900,7 +901,7 @@ exprt float_bvt::div(
   // Division width: we need enough bits for the quotient to have
   // full precision even when the dividend is subnormal.  A subnormal
   // has up to f leading zeros in the fraction, so we add f extra bits.
-  std::size_t div_width=fraction_width*2+1+spec.f;
+  std::size_t div_width = fraction_width * 2 + 1 + spec.f;
 
   // pad fraction1 with zeros
   const concatenation_exprt fraction1(
@@ -1394,9 +1395,11 @@ exprt float_bvt::isinf(
   const exprt &src,
   const ieee_float_spect &spec)
 {
-  return and_exprt(
-    exponent_all_ones(src, spec),
-    fraction_all_zeros(src, spec));
+  exprt result =
+    and_exprt(exponent_all_ones(src, spec), fraction_all_zeros(src, spec));
+  if(spec.x86_extended)
+    result = and_exprt(result, extractbit_exprt(src, spec.f));
+  return result;
 }
 
 exprt float_bvt::is_plus_inf(const exprt &src, const ieee_float_spect &spec)
@@ -1421,7 +1424,8 @@ exprt float_bvt::get_exponent(
   const exprt &src,
   const ieee_float_spect &spec)
 {
-  return extractbits_exprt(src, spec.f, unsignedbv_typet(spec.e));
+  const std::size_t offset = spec.x86_extended ? spec.f + 1 : spec.f;
+  return extractbits_exprt(src, offset, unsignedbv_typet(spec.e));
 }
 
 /// Gets the fraction without hidden bit in a floating-point bit-vector src
@@ -1436,8 +1440,11 @@ exprt float_bvt::isnan(
   const exprt &src,
   const ieee_float_spect &spec)
 {
-  return and_exprt(exponent_all_ones(src, spec),
-                   not_exprt(fraction_all_zeros(src, spec)));
+  exprt result = and_exprt(
+    exponent_all_ones(src, spec), not_exprt(fraction_all_zeros(src, spec)));
+  if(spec.x86_extended)
+    result = and_exprt(result, extractbit_exprt(src, spec.f));
+  return result;
 }
 
 /// normalize fraction/exponent pair returns 'zero' if fraction is zero
@@ -1915,7 +1922,16 @@ float_bvt::unbiased_floatt float_bvt::unpack(
   result.fraction=get_fraction(src, spec);
 
   // add hidden bit
-  exprt hidden_bit=isnormal(src, spec);
+  exprt hidden_bit;
+  if(spec.x86_extended)
+  {
+    // x86 extended has an explicit integer bit at position spec.f
+    hidden_bit = extractbit_exprt(src, spec.f);
+  }
+  else
+  {
+    hidden_bit = isnormal(src, spec);
+  }
   result.fraction=
     concatenation_exprt(hidden_bit, result.fraction,
       unsignedbv_typet(spec.f+1));
@@ -1961,6 +1977,31 @@ exprt float_bvt::pack(
     infinity_or_NaN, from_integer(-1, src.exponent.type()), src.exponent);
 
   // stitch all three together
+  if(spec.x86_extended)
+  {
+    // x86 extended has an explicit integer bit between exponent and fraction
+    const exprt integer_bit = if_exprt(
+      infinity_or_NaN,
+      true_exprt(),
+      extractbit_exprt(src.fraction, spec.f - 1));
+    // Actually, the integer bit is the hidden bit: 1 for normals, 0 for
+    // denormals. In the biased representation, it's been stripped.
+    // We need to reconstruct it: it's 1 when exponent is non-zero.
+    const exprt int_bit = if_exprt(
+      equal_exprt(src.exponent, from_integer(0, src.exponent.type())),
+      false_exprt(),
+      true_exprt());
+    const exprt int_bit_final = if_exprt(infinity_or_NaN, true_exprt(), int_bit);
+    return typecast_exprt(
+      concatenation_exprt(
+        {std::move(sign_bit),
+         std::move(exponent),
+         std::move(int_bit_final),
+         std::move(fraction)},
+        bv_typet(spec.width())),
+      spec.to_type());
+  }
+
   return typecast_exprt(
     concatenation_exprt(
       {std::move(sign_bit), std::move(exponent), std::move(fraction)},

@@ -324,9 +324,11 @@ bvt float_utilst::conversion(
 
 literalt float_utilst::is_normal(const bvt &src)
 {
-  return prop.land(
-           !exponent_all_zeros(src),
-           !exponent_all_ones(src));
+  literalt result =
+    prop.land(!exponent_all_zeros(src), !exponent_all_ones(src));
+  if(spec.x86_extended)
+    result = prop.land(result, src[spec.f]);
+  return result;
 }
 
 /// Subtracts the exponents
@@ -687,7 +689,7 @@ bvt float_utilst::div(const bvt &src1, const bvt &src2)
   // Division width: we need enough bits for the quotient to have
   // full precision even when the dividend is subnormal.  A subnormal
   // has up to f leading zeros in the fraction, so we add f extra bits.
-  std::size_t div_width=unpacked1.fraction.size()*2+1+spec.f;
+  std::size_t div_width = unpacked1.fraction.size() * 2 + 1 + spec.f;
 
   // pad fraction1 with zeros
   bvt fraction1=unpacked1.fraction;
@@ -926,11 +928,10 @@ bvt float_utilst::rem(const bvt &src1, const bvt &src2)
     // where fmod_result is already the final answer.
     literalt gt_half = relation(two_abs_fmod, relt::GT, abs_y);
     literalt eq_half = relation(two_abs_fmod, relt::EQ, abs_y);
-    literalt special = prop.lor(
-      {nan_result, unpacked1.zero, unpacked2.infinity});
-    literalt use_corrected = prop.land(
-      !special,
-      prop.lor(gt_half, prop.land(eq_half, trunc_q_odd)));
+    literalt special =
+      prop.lor({nan_result, unpacked1.zero, unpacked2.infinity});
+    literalt use_corrected =
+      prop.land(!special, prop.lor(gt_half, prop.land(eq_half, trunc_q_odd)));
     result = bv_utils.select(use_corrected, corrected, fmod_result);
   }
 
@@ -1046,24 +1047,22 @@ literalt float_utilst::is_zero(const bvt &src)
 
 literalt float_utilst::is_plus_inf(const bvt &src)
 {
-  bvt and_bv;
-  and_bv.push_back(!sign_bit(src));
-  and_bv.push_back(exponent_all_ones(src));
-  and_bv.push_back(fraction_all_zeros(src));
-  return prop.land(and_bv);
+  return prop.land(!sign_bit(src), is_infinity(src));
 }
 
 literalt float_utilst::is_infinity(const bvt &src)
 {
-  return prop.land(
-    exponent_all_ones(src),
-    fraction_all_zeros(src));
+  literalt result = prop.land(exponent_all_ones(src), fraction_all_zeros(src));
+  if(spec.x86_extended)
+    result = prop.land(result, src[spec.f]);
+  return result;
 }
 
 /// Gets the unbiased exponent in a floating-point bit-vector
 bvt float_utilst::get_exponent(const bvt &src)
 {
-  return bv_utils.extract(src, spec.f, spec.f+spec.e-1);
+  const std::size_t offset = spec.x86_extended ? spec.f + 1 : spec.f;
+  return bv_utils.extract(src, offset, offset + spec.e - 1);
 }
 
 /// Gets the fraction without hidden bit in a floating-point bit-vector src
@@ -1074,17 +1073,15 @@ bvt float_utilst::get_fraction(const bvt &src)
 
 literalt float_utilst::is_minus_inf(const bvt &src)
 {
-  bvt and_bv;
-  and_bv.push_back(sign_bit(src));
-  and_bv.push_back(exponent_all_ones(src));
-  and_bv.push_back(fraction_all_zeros(src));
-  return prop.land(and_bv);
+  return prop.land(sign_bit(src), is_infinity(src));
 }
 
 literalt float_utilst::is_NaN(const bvt &src)
 {
-  return prop.land(exponent_all_ones(src),
-                   !fraction_all_zeros(src));
+  literalt result = prop.land(exponent_all_ones(src), !fraction_all_zeros(src));
+  if(spec.x86_extended)
+    result = prop.land(result, src[spec.f]);
+  return result;
 }
 
 literalt float_utilst::is_finite(const bvt &src)
@@ -1094,27 +1091,13 @@ literalt float_utilst::is_finite(const bvt &src)
 
 literalt float_utilst::exponent_all_ones(const bvt &src)
 {
-  bvt exponent=src;
-
-  // removes the fractional part
-  exponent.erase(exponent.begin(), exponent.begin()+spec.f);
-
-  // removes the sign
-  exponent.resize(spec.e);
-
+  bvt exponent = get_exponent(src);
   return bv_utils.is_all_ones(exponent);
 }
 
 literalt float_utilst::exponent_all_zeros(const bvt &src)
 {
-  bvt exponent=src;
-
-  // removes the fractional part
-  exponent.erase(exponent.begin(), exponent.begin()+spec.f);
-
-  // removes the sign
-  exponent.resize(spec.e);
-
+  bvt exponent = get_exponent(src);
   return bv_utils.is_zero(exponent);
 }
 
@@ -1613,7 +1596,17 @@ float_utilst::unbiased_floatt float_utilst::unpack(const bvt &src)
   result.sign=sign_bit(src);
 
   result.fraction=get_fraction(src);
-  result.fraction.push_back(is_normal(src)); // add hidden bit
+
+  // add hidden bit
+  if(spec.x86_extended)
+  {
+    // x86 extended has an explicit integer bit at position spec.f
+    result.fraction.push_back(src[spec.f]);
+  }
+  else
+  {
+    result.fraction.push_back(is_normal(src));
+  }
 
   result.exponent=get_exponent(src);
   CHECK_RETURN(result.exponent.size() == spec.e);
@@ -1655,11 +1648,20 @@ bvt float_utilst::pack(const biased_floatt &src)
 
   result[0]=prop.lor(result[0], src.NaN);
 
+  // for x86 extended, add the explicit integer bit
+  const std::size_t exp_offset = spec.x86_extended ? spec.f + 1 : spec.f;
+
+  if(spec.x86_extended)
+  {
+    // integer bit: 1 for normals (non-zero exponent), 0 for denormals
+    literalt int_bit = !bv_utils.is_zero(src.exponent);
+    // infinity and NaN also have integer bit = 1
+    result[spec.f] = prop.lor(int_bit, infinity_or_NaN);
+  }
+
   // do exponent
   for(std::size_t i=0; i<spec.e; i++)
-    result[i+spec.f]=prop.lor(
-      src.exponent[i],
-      infinity_or_NaN);
+    result[i + exp_offset] = prop.lor(src.exponent[i], infinity_or_NaN);
 
   return result;
 }

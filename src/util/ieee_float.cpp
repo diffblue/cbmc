@@ -332,6 +332,12 @@ void ieee_float_valuet::unpack(const mp_integer &i)
     fraction=tmp%pf;
     tmp/=pf;
 
+    if(spec.x86_extended)
+    {
+      // skip the explicit integer bit (we'll handle it below)
+      tmp /= 2;
+    }
+
     mp_integer pe=power(2, spec.e);
     exponent=tmp%pe;
     tmp/=pe;
@@ -339,26 +345,37 @@ void ieee_float_valuet::unpack(const mp_integer &i)
     sign_flag=(tmp!=0);
   }
 
+  // For x86 extended, read the explicit integer bit
+  const bool x86_int_bit =
+    spec.x86_extended && ((i / power(2, spec.f)) % 2) == 1;
+
   // NaN?
-  if(exponent==spec.max_exponent() && fraction!=0)
+  if(
+    exponent == spec.max_exponent() &&
+    (spec.x86_extended ? x86_int_bit && fraction != 0 : fraction != 0))
   {
     make_NaN();
   }
-  else if(exponent==spec.max_exponent() && fraction==0) // Infinity
+  else if(
+    exponent == spec.max_exponent() &&
+    (spec.x86_extended ? x86_int_bit && fraction == 0 : fraction == 0))
   {
     NaN_flag=false;
     infinity_flag=true;
   }
-  else if(exponent==0 && fraction==0) // zero
+  else if(
+    exponent == 0 && fraction == 0 && (!spec.x86_extended || !x86_int_bit))
   {
     NaN_flag=false;
     infinity_flag=false;
   }
-  else if(exponent==0) // denormal?
+  else if(exponent == 0) // denormal (or pseudo-denormal for x86)
   {
     NaN_flag=false;
     infinity_flag=false;
-    exponent=-spec.bias()+1; // NOT -spec.bias()!
+    if(spec.x86_extended && x86_int_bit)
+      fraction += power(2, spec.f); // explicit integer bit
+    exponent = -spec.bias() + 1;
   }
   else // normal
   {
@@ -378,34 +395,45 @@ mp_integer ieee_float_valuet::pack() const
 {
   mp_integer result=0;
 
+  // For x86 extended, the integer bit is explicit at position spec.f,
+  // shifting the exponent and sign up by 1.
+  const std::size_t exp_offset = spec.x86_extended ? spec.f + 1 : spec.f;
+
   // sign bit
   if(sign_flag)
-    result+=power(2, spec.e+spec.f);
+    result += power(2, exp_offset + spec.e);
 
   if(NaN_flag)
   {
-    result+=power(2, spec.f)*spec.max_exponent();
+    result += power(2, exp_offset) * spec.max_exponent();
+    if(spec.x86_extended)
+      result += power(2, spec.f); // integer bit = 1 for NaN
     result+=1;
   }
   else if(infinity_flag)
   {
-    result+=power(2, spec.f)*spec.max_exponent();
+    result += power(2, exp_offset) * spec.max_exponent();
+    if(spec.x86_extended)
+      result += power(2, spec.f); // integer bit = 1 for infinity
   }
   else if(fraction==0 && exponent==0)
   {
-    // zero
+    // zero — integer bit = 0
   }
   else if(is_normal()) // normal?
   {
     // fraction -- need to hide hidden bit
     result+=fraction-power(2, spec.f); // hidden bit
 
+    if(spec.x86_extended)
+      result += power(2, spec.f); // explicit integer bit = 1
+
     // exponent -- bias!
-    result+=power(2, spec.f)*(exponent+spec.bias());
+    result += power(2, exp_offset) * (exponent + spec.bias());
   }
   else // denormal
   {
-    result+=fraction; // denormal -- no hidden bit
+    result += fraction; // denormal -- no hidden bit, integer bit = 0
     // the exponent is zero
   }
 
