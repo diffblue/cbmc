@@ -2919,6 +2919,21 @@ exprt cpp_typecheck_resolvet::resolve(
         if(!id_set.empty())
           goto resolved_after_strip;
       }
+      // C++ [dcl.link]: extern "C" only affects linkage, not name
+      // lookup. Try tag-name fallback for struct/class/union tags.
+      {
+        irep_idt tag_name = "tag-" + id2string(base_name);
+        const symbolt *tag_sym = cpp_typecheck.symbol_table.lookup(tag_name);
+        if(tag_sym)
+        {
+          // Found as a tag — create a type expression
+          struct_tag_typet tag_type(tag_name);
+          exprt type_expr(ID_type);
+          type_expr.type() = tag_type;
+          type_expr.add_source_location() = source_location;
+          return type_expr;
+        }
+      }
       cpp_typecheck.error() << "symbol '" << base_name << "' is unknown";
     }
 
