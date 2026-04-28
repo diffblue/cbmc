@@ -104,6 +104,7 @@ SRC += analyses/ai/ai.cpp \
        solvers/flattening/boolbv_enumeration.cpp \
        solvers/flattening/boolbv_onehot.cpp \
        solvers/flattening/boolbv_update_bit.cpp \
+       solvers/floatbv/float_bv_utils_equivalence.cpp \
        solvers/floatbv/float_utils.cpp \
        solvers/prop/bdd_expr.cpp \
        solvers/sat/external_sat.cpp \
