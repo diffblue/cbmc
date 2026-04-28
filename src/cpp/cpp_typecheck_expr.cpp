@@ -3464,8 +3464,7 @@ void cpp_typecheckt::typecheck_function_call_arguments(
       arg_it->swap(addr);
     }
     else if(
-      (parameter.type().id() == ID_struct_tag ||
-       parameter.type().id() == ID_union_tag) &&
+      parameter.type().id() == ID_struct_tag &&
       arg_it->id() != ID_temporary_object && arg_it->id() != ID_side_effect)
     {
       // Brace-init-list to std::initializer_list<T>: convert before
