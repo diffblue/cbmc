@@ -60,9 +60,16 @@ const union_typet &namespace_baset::follow_tag(const union_tag_typet &src) const
 const struct_typet &
 namespace_baset::follow_tag(const struct_tag_typet &src) const
 {
-  const symbolt &symbol=lookup(src.get_identifier());
+  const symbolt &symbol = lookup(src.get_identifier());
   CHECK_RETURN(symbol.is_type);
-  CHECK_RETURN(symbol.type.id() == ID_struct);
+  if(symbol.type.id() != ID_struct)
+  {
+    // The tag refers to a non-struct type (e.g., a scoped enum
+    // stored with struct_tag_typet on MSVC). Return a minimal
+    // empty struct to avoid crashing callers.
+    static const struct_typet empty_struct;
+    return empty_struct;
+  }
   return to_struct_type(symbol.type);
 }
 

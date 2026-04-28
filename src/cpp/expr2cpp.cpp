@@ -5,6 +5,7 @@ Module:
 Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
+#include <util/symbol.h>
 
 #include "expr2cpp.h"
 
@@ -186,6 +187,16 @@ std::string expr2cppt::convert_rec(
   }
   else if(src.id() == ID_struct_tag)
   {
+    const irep_idt &id = to_struct_tag_type(src).get_identifier();
+    const symbolt &symbol = ns.lookup(id);
+
+    // The tag might refer to an enum (e.g., MSVC's scoped enums
+    // like __std_win_error can end up with struct_tag_typet).
+    if(symbol.type.id() == ID_c_enum)
+    {
+      return q + "enum " + id2string(id);
+    }
+
     const struct_typet &struct_type = ns.follow_tag(to_struct_tag_type(src));
 
     std::string dest = q;
