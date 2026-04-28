@@ -68,14 +68,20 @@ codet cpp_typecheckt::dtor(const symbolt &symbol, const symbol_exprt &this_expr)
     {
       const cpp_namet cppname(c.get_base_name());
 
-      const symbolt &virtual_table_symbol_type =
-        lookup(to_pointer_type(c.type()).base_type().get(ID_identifier));
+      const symbolt *virtual_table_symbol_type;
+      if(lookup(
+           to_pointer_type(c.type()).base_type().get(ID_identifier),
+           virtual_table_symbol_type))
+        continue;
 
-      const symbolt &virtual_table_symbol_var = lookup(
-        id2string(virtual_table_symbol_type.name) + "@" +
-        id2string(symbol.name));
+      const symbolt *virtual_table_symbol_var;
+      if(lookup(
+           id2string(virtual_table_symbol_type->name) + "@" +
+             id2string(symbol.name),
+           virtual_table_symbol_var))
+        continue;
 
-      exprt var=virtual_table_symbol_var.symbol_expr();
+      exprt var = virtual_table_symbol_var->symbol_expr();
       address_of_exprt address(var);
       DATA_INVARIANT(address.type() == c.type(), "type mismatch");
 

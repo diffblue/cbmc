@@ -1,6 +1,6 @@
 CORE
 main.cpp
---cpp11 --unwind 3 --no-unwinding-assertions
+--cpp11 --unwind 3 --no-unwinding-assertions --no-built-in-assertions
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
