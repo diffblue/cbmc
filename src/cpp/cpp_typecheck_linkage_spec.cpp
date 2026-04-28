@@ -22,8 +22,7 @@ void cpp_typecheckt::convert(cpp_linkage_spect &linkage_spec)
     current_linkage_spec = ID_cpp;
 
   // do the declarations
-  for(auto it = linkage_spec.items().begin();
-      it != linkage_spec.items().end();
+  for(auto it = linkage_spec.items().begin(); it != linkage_spec.items().end();
       it++)
   {
     try
