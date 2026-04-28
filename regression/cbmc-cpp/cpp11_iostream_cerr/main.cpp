@@ -1,5 +1,5 @@
 #if defined(__GNUC__) && __GNUC__ >= 13
-#include <iostream>
+#  include <iostream>
 
 int main(int argc, char *argv[])
 {
@@ -7,5 +7,7 @@ int main(int argc, char *argv[])
   return 0;
 }
 #else
-int main() {}
+int main()
+{
+}
 #endif
