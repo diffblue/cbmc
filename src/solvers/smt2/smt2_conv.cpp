@@ -3452,7 +3452,13 @@ void smt2_convt::convert_floatbv_round_to_integral(
     out << ")";
   }
   else
-    UNEXPECTEDCASE("TODO floatbv_round_to_integral without FPA");
+  {
+    const float_bvt float_bv;
+    convert_expr(float_bv.round_to_integral(
+      expr.op(),
+      expr.rounding_mode(),
+      ieee_float_spect{to_floatbv_type(expr.type())}));
+  }
 }
 
 void smt2_convt::convert_struct(const struct_exprt &expr)

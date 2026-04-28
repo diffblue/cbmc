@@ -1,0 +1,10 @@
+CORE no-new-smt
+main.c
+--smt2 --z3
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Round-to-integral (rintf) via SMT path (float_bvt::round_to_integral).

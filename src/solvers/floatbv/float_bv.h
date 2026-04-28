@@ -101,6 +101,11 @@ public:
     const ieee_float_spect &src_spec,
     const ieee_float_spect &dest_spec) const;
 
+  exprt round_to_integral(
+    const exprt &src,
+    const exprt &rm,
+    const ieee_float_spect &) const;
+
   // relations
   enum class relt { LT, LE, EQ, GT, GE };
   static exprt
