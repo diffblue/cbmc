@@ -8,6 +8,10 @@ env:
   cvc5-version: "1.2.1"
   linux-vcpus: 4
   windows-vcpus: 4
+  # Per-test virtual memory limit (KB) for test.pl.
+  # CI runners have ~10 GB RAM; with 4 parallel jobs, each test
+  # gets ~2.5 GB. This prevents OOM kills from masking real failures.
+  CBMC_TEST_MEMLIMIT: 2500000
 
 jobs:
   # This job takes approximately 15 to 40 minutes
