@@ -39,8 +39,7 @@ void cpp_typecheckt::convert(cpp_linkage_spect &linkage_spec)
       // Restore the error count: the failed item's error was
       // already reported but should not cause a hard failure
       // of the entire translation unit.
-      get_message_handler().set_message_count(
-        messaget::M_ERROR, errors_before);
+      get_message_handler().set_message_count(messaget::M_ERROR, errors_before);
     }
   }
 
