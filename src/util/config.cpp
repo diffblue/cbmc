@@ -1284,7 +1284,8 @@ bool configt::set(const cmdlinet &cmdline)
     cmdline.isset("cpp98") || cmdline.isset("cpp03") ||
     cmdline.isset("cpp11") || cmdline.isset("cpp14") ||
     cmdline.isset("cpp17") || cmdline.isset("cpp20") ||
-    cmdline.isset("cpp23") || cmdline.isset("cpp26");
+    cmdline.isset("cpp23") || cmdline.isset("cpp26") ||
+    cmdline.isset("std");
   if(
     !explicit_cpp_standard && cpp.cpp_standard < cppt::cpp_standardt::CPP14 &&
     (ansi_c.preprocessor == ansi_ct::preprocessort::VISUAL_STUDIO ||
