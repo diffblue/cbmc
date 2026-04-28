@@ -163,6 +163,12 @@ exprt float_bvt::convert(const exprt &expr) const
     const auto &op = to_unary_expr(expr).op();
     return isnormal(op, get_spec(op));
   }
+  else if(expr.id() == ID_floatbv_round_to_integral)
+  {
+    const auto &rti_expr = to_floatbv_round_to_integral_expr(expr);
+    return round_to_integral(
+      rti_expr.op(), rti_expr.rounding_mode(), get_spec(expr));
+  }
   else if(expr.id()==ID_lt)
   {
     const auto &rel_expr = to_binary_relation_expr(expr);
@@ -494,6 +500,134 @@ exprt float_bvt::conversion(
     unbiased_floatt result=unpack(src, src_spec);
     return rounder(result, rm, dest_spec);
   }
+}
+
+/// Round a floating-point value to integral.
+///
+/// Strategy: enumerate the possible biased exponents that have a non-trivial
+/// fractional part (`bias..bias+f-1`) and, for each one, mask off the bottom
+/// `drop = f - unbiased_exp` bits of the packed representation and
+/// conditionally increment by `2^drop`. Values with `|x| < 1` are handled
+/// separately (result is ±0 or ±1 depending on rounding mode and sign).
+/// Special values (NaN, ±Inf, ±0) and values whose unbiased exponent already
+/// meets or exceeds the fraction width short-circuit to `src`.
+///
+/// The encoding builds an `f`-deep ITE cascade where each branch contains an
+/// `f`-bit adder, giving an O(f^2) expression-tree size. For `double` (f=52)
+/// that is roughly a 25× growth in node count over the prior
+/// add-magic-subtract-magic formulation; the trade is correctness on the SMT
+/// non-FPA path (which previously hit `UNEXPECTEDCASE`) and a more directly
+/// auditable algorithm. A loop-free formulation using a single
+/// barrel-shifted mask plus a variable-position increment is plausible as a
+/// follow-up.
+///
+/// `float_utilst::round_to_integral` is the bvt-level mirror of this code;
+/// keep the two implementations in lockstep when changing the rounding
+/// tables.
+exprt float_bvt::round_to_integral(
+  const exprt &src,
+  const exprt &rm,
+  const ieee_float_spect &spec) const
+{
+  const unbiased_floatt unpacked = unpack(src, spec);
+  const exprt is_special =
+    or_exprt(unpacked.zero, or_exprt(unpacked.NaN, unpacked.infinity));
+  const exprt exp_ge_f = binary_relation_exprt(
+    unpacked.exponent, ID_ge, from_integer(spec.f, unpacked.exponent.type()));
+
+  const floatbv_typet float_type = spec.to_type();
+  const std::size_t width = spec.width();
+  const unsignedbv_typet uint_type{width};
+  const exprt src_uint = extractbits_exprt{src, 0, uint_type};
+
+  const rounding_mode_bitst rounding_mode_bits(rm);
+  const exprt biased_exp = get_exponent(src, spec);
+
+  // ±0 and ±1 as unsigned bitvectors
+  ieee_floatt pz{spec, ieee_floatt::ROUND_TO_ZERO, 0};
+  ieee_floatt nz{spec, ieee_floatt::ROUND_TO_ZERO, 0};
+  nz.set_sign(true);
+  ieee_floatt p1{spec, ieee_floatt::ROUND_TO_ZERO, 1};
+  ieee_floatt n1{spec, ieee_floatt::ROUND_TO_ZERO, -1};
+
+  const exprt signed_zero_uint = if_exprt(
+    sign_bit(src),
+    from_integer(nz.pack(), uint_type),
+    from_integer(pz.pack(), uint_type));
+  const exprt signed_one_uint = if_exprt(
+    sign_bit(src),
+    from_integer(n1.pack(), uint_type),
+    from_integer(p1.pack(), uint_type));
+
+  // For |x| < 1 (biased exponent < bias): result is ±0 or ±1.
+  // |x| >= 0.5 iff biased exponent >= bias-1 (for normals).
+  // |x| == 0.5 iff biased exponent == bias-1 AND fraction == 0.
+  const exprt bias_m1 = from_integer(spec.bias() - 1, unsignedbv_typet(spec.e));
+  const exprt exp_ge_bias_m1 =
+    binary_relation_exprt(biased_exp, ID_ge, bias_m1);
+  const exprt exp_eq_bias_m1 = equal_exprt(biased_exp, bias_m1);
+  const exprt frac_zero = fraction_all_zeros(src, spec);
+  const exprt abs_eq_half = and_exprt(exp_eq_bias_m1, frac_zero);
+  const exprt abs_gt_half = and_exprt(exp_ge_bias_m1, not_exprt(abs_eq_half));
+
+  // clang-format off
+  const exprt round_up = if_exprt(
+    rounding_mode_bits.round_to_even, abs_gt_half,
+    if_exprt(rounding_mode_bits.round_to_away,
+      or_exprt(abs_gt_half, abs_eq_half),
+    if_exprt(rounding_mode_bits.round_to_plus_inf,
+      not_exprt(unpacked.sign),  // any positive non-zero rounds up
+    if_exprt(rounding_mode_bits.round_to_minus_inf,
+      unpacked.sign,  // any negative non-zero rounds down (to -1)
+      false_exprt()))));
+  // clang-format on
+
+  exprt result_uint = if_exprt(round_up, signed_one_uint, signed_zero_uint);
+
+  // For each unbiased exponent 0..f-1 (biased: bias..bias+f-1):
+  for(std::size_t eu = 0; eu < static_cast<std::size_t>(spec.f); eu++)
+  {
+    const mp_integer be = eu + spec.bias();
+    const std::size_t drop = spec.f - eu;
+
+    mp_integer mask_val = power(2, width) - power(2, drop);
+    const exprt masked =
+      bitand_exprt(src_uint, from_integer(mask_val, uint_type));
+
+    const exprt rbit = extractbit_exprt(src_uint, drop - 1);
+    exprt sticky = false_exprt();
+    for(std::size_t i = 0; i + 1 < drop; i++)
+      sticky = or_exprt(sticky, extractbit_exprt(src_uint, i));
+    const exprt lsb = extractbit_exprt(src_uint, drop);
+
+    // clang-format off
+    const exprt inc = if_exprt(
+      rounding_mode_bits.round_to_even,
+        and_exprt(rbit, or_exprt(lsb, sticky)),
+      if_exprt(rounding_mode_bits.round_to_away, rbit,
+      if_exprt(rounding_mode_bits.round_to_plus_inf,
+        and_exprt(not_exprt(unpacked.sign), or_exprt(rbit, sticky)),
+      if_exprt(rounding_mode_bits.round_to_minus_inf,
+        and_exprt(unpacked.sign, or_exprt(rbit, sticky)),
+        false_exprt()))));
+    // clang-format on
+
+    // Increment: add 1 at position `drop`. The add runs on the full packed
+    // representation, so for the largest in-loop biased exponent
+    // (`bias + f - 1`) a fraction-bit carry can propagate into the exponent
+    // bits and bump the biased exponent to `bias + f`. That is intentional
+    // and bounded — `bias + f` stays well below the NaN/Inf range
+    // (`2*bias + 1`), so no saturation is needed.
+    const exprt inc_val = from_integer(power(2, drop), uint_type);
+    const exprt branch = if_exprt(inc, plus_exprt(masked, inc_val), masked);
+    const exprt match =
+      equal_exprt(biased_exp, from_integer(be, unsignedbv_typet(spec.e)));
+    result_uint = if_exprt(match, branch, result_uint);
+  }
+
+  // Bitwise reinterpret unsigned as float via extractbits
+  const exprt result = extractbits_exprt{result_uint, 0, float_type};
+  return if_exprt(or_exprt(is_special, exp_ge_f), src, result);
 }
 
 exprt float_bvt::isnormal(

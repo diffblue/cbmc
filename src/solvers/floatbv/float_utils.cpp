@@ -152,34 +152,117 @@ bvt float_utilst::build_constant(const ieee_float_valuet &src)
   return pack(bias(result));
 }
 
+/// Round a floating-point value to integral, IEEE 754 semantics.
+///
+/// Bvt-level mirror of `float_bvt::round_to_integral` (see the Doxygen on
+/// that method for the full algorithmic description). The two
+/// implementations are line-for-line translations between the `exprt` API
+/// and the `literalt`/`bvt` API; keep them in lockstep when changing the
+/// rounding tables.
+///
+/// The encoding builds an `f`-deep `bv_utils.select` cascade where each
+/// branch contains an `f`-bit adder, giving an O(f^2) circuit size. For
+/// `double` (f=52) that is roughly a 25× growth in node count over the
+/// prior add-magic-subtract-magic formulation. A loop-free formulation
+/// using a single barrel-shifted mask plus a variable-position increment
+/// is plausible as a follow-up.
 bvt float_utilst::round_to_integral(const bvt &src)
 {
   PRECONDITION(src.size() == spec.width());
 
-  // Zero? NaN? Infinity?
-  auto unpacked = unpack(src);
-  auto is_special = prop.lor({unpacked.zero, unpacked.NaN, unpacked.infinity});
+  const unbiased_floatt unpacked = unpack(src);
+  const literalt is_special =
+    prop.lor({unpacked.zero, unpacked.NaN, unpacked.infinity});
 
-  // add 2^f, where f is the number of fraction bits,
-  // by adding f to the exponent
-  auto magic_number = ieee_floatt{
-    spec, ieee_floatt::rounding_modet::ROUND_TO_ZERO, power(2, spec.f)};
+  // If unbiased exponent >= f, the number is already integral.
+  const bvt f_const = bv_utils.build_constant(spec.f, unpacked.exponent.size());
+  const literalt exp_ge_f =
+    !bv_utils.signed_less_than(unpacked.exponent, f_const);
 
-  auto magic_number_bv = build_constant(magic_number);
+  const bvt biased_exp = get_exponent(src);
 
-  // abs(x) >= magic_number? If so, then there is no fractional part.
-  literalt ge_magic_number = relation(abs(src), relt::GE, magic_number_bv);
+  // ±0 and ±1 as packed bitvectors
+  ieee_floatt pz{spec, ieee_floatt::ROUND_TO_ZERO, 0};
+  ieee_floatt nz{spec, ieee_floatt::ROUND_TO_ZERO, 0};
+  nz.set_sign(true);
+  ieee_floatt p1{spec, ieee_floatt::ROUND_TO_ZERO, 1};
+  ieee_floatt n1{spec, ieee_floatt::ROUND_TO_ZERO, -1};
 
-  magic_number_bv.back() = src.back(); // copy sign bit
+  const bvt signed_zero =
+    bv_utils.select(sign_bit(src), build_constant(nz), build_constant(pz));
+  const bvt signed_one =
+    bv_utils.select(sign_bit(src), build_constant(n1), build_constant(p1));
 
-  auto tmp1 = add_sub(src, magic_number_bv, false);
+  // For |x| < 1 (biased exponent < bias): result is ±0 or ±1.
+  // |x| >= 0.5 iff biased exponent >= bias-1.
+  // |x| == 0.5 iff biased exponent == bias-1 AND fraction == 0.
+  const bvt bias_m1 = bv_utils.build_constant(spec.bias() - 1, spec.e);
+  const literalt exp_ge_bm1 = !bv_utils.unsigned_less_than(biased_exp, bias_m1);
+  const literalt exp_eq_bm1 = bv_utils.equal(biased_exp, bias_m1);
+  const literalt frac_zero = fraction_all_zeros(src);
+  const literalt abs_eq_half = prop.land(exp_eq_bm1, frac_zero);
+  const literalt abs_gt_half = prop.land(exp_ge_bm1, !abs_eq_half);
 
-  auto tmp2 = add_sub(tmp1, magic_number_bv, true);
+  // clang-format off
+  const literalt round_up = prop.lselect(
+    rounding_mode_bits.round_to_even, abs_gt_half,
+    prop.lselect(rounding_mode_bits.round_to_away,
+      prop.lor(abs_gt_half, abs_eq_half),
+    prop.lselect(rounding_mode_bits.round_to_plus_inf,
+      !unpacked.sign,
+    prop.lselect(rounding_mode_bits.round_to_minus_inf,
+      unpacked.sign,
+      const_literal(false)))));
+  // clang-format on
 
-  // restore the original sign bit
-  tmp2.back() = src.back();
+  bvt result = bv_utils.select(round_up, signed_one, signed_zero);
 
-  return bv_utils.select(prop.lor(is_special, ge_magic_number), src, tmp2);
+  // For each unbiased exponent 0..f-1 (biased: bias..bias+f-1):
+  for(std::size_t eu = 0; eu < static_cast<std::size_t>(spec.f); eu++)
+  {
+    const mp_integer be = eu + spec.bias();
+    const std::size_t drop = spec.f - eu;
+
+    // Mask: clear bottom 'drop' bits
+    bvt masked = src;
+    for(std::size_t i = 0; i < drop; i++)
+      masked[i] = const_literal(false);
+
+    // Round bit, sticky bit, least kept bit
+    const literalt rbit = src[drop - 1];
+    literalt sticky = const_literal(false);
+    for(std::size_t i = 0; i + 1 < drop; i++)
+      sticky = prop.lor(sticky, src[i]);
+    const literalt lsb = src[drop];
+
+    // clang-format off
+    const literalt inc = prop.lselect(
+      rounding_mode_bits.round_to_even,
+        prop.land(rbit, prop.lor(lsb, sticky)),
+      prop.lselect(rounding_mode_bits.round_to_away, rbit,
+      prop.lselect(rounding_mode_bits.round_to_plus_inf,
+        prop.land(!unpacked.sign, prop.lor(rbit, sticky)),
+      prop.lselect(rounding_mode_bits.round_to_minus_inf,
+        prop.land(unpacked.sign, prop.lor(rbit, sticky)),
+        const_literal(false)))));
+    // clang-format on
+
+    // Increment: add 1 at position `drop`. The add runs on the full packed
+    // representation, so for the largest in-loop biased exponent
+    // (`bias + f - 1`) a fraction-bit carry can propagate into the exponent
+    // bits and bump the biased exponent to `bias + f`. That is intentional
+    // and bounded — `bias + f` stays well below the NaN/Inf range
+    // (`2*bias + 1`), so no saturation is needed.
+    const bvt inc_val = bv_utils.build_constant(power(2, drop), spec.width());
+    const bvt incremented = bv_utils.add(masked, inc_val);
+    const bvt branch = bv_utils.select(inc, incremented, masked);
+
+    const bvt be_const = bv_utils.build_constant(be, spec.e);
+    const literalt match = bv_utils.equal(biased_exp, be_const);
+    result = bv_utils.select(match, branch, result);
+  }
+
+  return bv_utils.select(prop.lor(is_special, exp_ge_f), src, result);
 }
 
 bvt float_utilst::conversion(
