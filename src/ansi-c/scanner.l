@@ -1641,7 +1641,7 @@ enable_or_disable ("enable"|"disable")
 
   /* This is a clang extension */
 
-"_Nullable" { if(PARSER.mode==configt::ansi_ct::flavourt::CLANG)
+"_Nullable" { if(PARSER.cpp98 || PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor)
                 { /* ignore */ }
               else
                 return make_identifier();
@@ -1649,7 +1649,7 @@ enable_or_disable ("enable"|"disable")
 
   /* This is a clang extension */
 
-"_Nonnull" { if(PARSER.mode==configt::ansi_ct::flavourt::CLANG)
+"_Nonnull" { if(PARSER.cpp98 || PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor)
                 { /* ignore */ }
               else
                 return make_identifier();
@@ -1657,7 +1657,7 @@ enable_or_disable ("enable"|"disable")
 
   /* This is a clang extension */
 
-"_Null_unspecified" { if(PARSER.mode==configt::ansi_ct::flavourt::CLANG)
+"_Null_unspecified" { if(PARSER.cpp98 || PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor)
                 { /* ignore */ }
               else
                 return make_identifier();
