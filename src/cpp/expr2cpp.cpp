@@ -5,9 +5,8 @@ Module:
 Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
-#include <util/symbol.h>
-
 #include "expr2cpp.h"
+#include <ansi-c/expr2c_class.h>
 
 #include <util/c_types.h>
 #include <util/lispexpr.h>
@@ -15,10 +14,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
+#include <util/symbol.h>
 
 #include <ansi-c/c_misc.h>
 #include <ansi-c/c_qualifiers.h>
-#include <ansi-c/expr2c_class.h>
 
 #include "cpp_name.h"
 #include "cpp_template_type.h"

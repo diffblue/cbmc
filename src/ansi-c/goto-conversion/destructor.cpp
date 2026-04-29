@@ -23,7 +23,12 @@ code_function_callt get_destructor(const namespacet &ns, const typet &type)
 {
   if(type.id() == ID_struct_tag)
   {
-    return get_destructor(ns, ns.follow_tag(to_struct_tag_type(type)));
+    const symbolt *symbol;
+    if(ns.lookup(to_struct_tag_type(type).get_identifier(), symbol))
+      return code_function_callt{nil_exprt{}};
+    if(symbol->type.id() != ID_struct)
+      return code_function_callt{nil_exprt{}};
+    return get_destructor(ns, symbol->type);
   }
   else if(type.id() == ID_struct)
   {
