@@ -1849,7 +1849,12 @@ void cpp_typecheckt::typecheck_expr_this(exprt &expr)
   const exprt &this_expr=cpp_scopes.current_scope().this_expr;
   const source_locationt source_location=expr.find_source_location();
 
-  PRECONDITION(this_expr.is_not_nil());
+  if(this_expr.is_nil())
+  {
+    error().source_location = source_location;
+    error() << "'this' used outside class context" << eom;
+    throw 0;
+  }
   PRECONDITION(this_expr.type().id() == ID_pointer);
 
   expr=this_expr;
