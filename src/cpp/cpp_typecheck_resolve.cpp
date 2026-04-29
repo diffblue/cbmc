@@ -1870,6 +1870,18 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
           {
             cpp_typecheck.cpp_scopes.go_to(
               static_cast<cpp_scopet &>(*id_it->second));
+
+            // Trigger class elaboration so that base-class members
+            // (e.g., inherited typedefs) are available for the
+            // subsequent qualified lookup.
+            if(!cpp_typecheck.cpp_scopes.current_scope()
+                  .class_identifier.empty())
+            {
+              struct_tag_typet instance{
+                cpp_typecheck.cpp_scopes.current_scope().class_identifier};
+              cpp_typecheck.elaborate_class_template(instance);
+            }
+
             final_base_name.clear();
             ++pos;
             continue;
