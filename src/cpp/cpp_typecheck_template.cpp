@@ -1906,7 +1906,14 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
           error() << "missing type in template argument" << eom;
           throw 0;
         }
-        typecheck_type(arg.type());
+        // Skip typecheck_type for types that are already resolved
+        // (e.g., struct_tag from a previous instantiation).
+        // Re-typechecking can fail when the type references local
+        // scopes that are no longer accessible.
+        if(arg.type().id() != ID_struct_tag && arg.type().id() != ID_union_tag)
+        {
+          typecheck_type(arg.type());
+        }
       }
       else if(arg.id() == ID_ambiguous)
       {
