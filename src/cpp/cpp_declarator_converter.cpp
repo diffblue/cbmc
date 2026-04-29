@@ -610,6 +610,19 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
   symbol.value = declarator.value();
   symbol.location = declarator.name().source_location();
   symbol.is_extern = storage_spec.is_extern();
+  // [dcl.link]/7: a declaration directly in a linkage-specification
+  // without a storage class specifier is treated as extern.
+  // For non-POD class types without an initializer, mark as extern
+  // to prevent default construction attempts that may fail
+  // (e.g., MSVC's 'extern "C++" istream cin;').
+  if(
+    !symbol.is_extern && !is_code && linkage_spec != ID_auto &&
+    declarator.value().is_nil() && !storage_spec.is_static() &&
+    (final_type.id() == ID_struct_tag || final_type.id() == ID_union_tag) &&
+    !cpp_typecheck.cpp_is_pod(final_type))
+  {
+    symbol.is_extern = true;
+  }
   symbol.is_parameter = declarator.get_is_parameter();
   symbol.is_weak = storage_spec.is_weak();
   symbol.module = cpp_typecheck.module;
