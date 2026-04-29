@@ -696,6 +696,7 @@ jobs:
       - name: Run JBMC unit tests
         run: cd jbmc/unit; ./unit_tests
       - name: Preprocess libc++ headers for debugging
+        if: always()
         run: |
           mkdir -p macos-preprocessed
           cbmc=src/cbmc/cbmc
@@ -704,11 +705,14 @@ jobs:
             echo "int main() {}" >> pp_$hdr.cpp
             $cbmc --cpp11 --preprocess pp_$hdr.cpp > macos-preprocessed/$hdr.ii 2>/dev/null || true
           done
-          # Also preprocess STL1 and STL2 test files
-          cp regression/cbmc-cpp/STL1/main.cpp pp_stl1.cpp
-          $cbmc --cpp11 --preprocess pp_stl1.cpp > macos-preprocessed/stl1.ii 2>/dev/null || true
-          cp regression/cbmc-cpp/STL2/main.cpp pp_stl2.cpp
-          $cbmc --cpp11 --preprocess pp_stl2.cpp > macos-preprocessed/stl2.ii 2>/dev/null || true
+          # Preprocess failing test programs
+          for t in Address_of_Method1 Vector1 STL1 STL2 cpp11_vector_size cpp17_any_basic cpp20_coroutine_types; do
+            src="regression/cbmc-cpp/$t/main.cpp"
+            if [ -f "$src" ]; then
+              flags=$(sed -n '3p' "regression/cbmc-cpp/$t/test.desc")
+              $cbmc $flags --preprocess "$src" > "macos-preprocessed/test_$t.ii" 2>/dev/null || true
+            fi
+          done
       - name: Upload preprocessed headers
         if: always()
         uses: actions/upload-artifact@v4
@@ -891,6 +895,7 @@ jobs:
       - name: Run tests
         run: |
           Set-Location build
+          $env:CBMC_TEST_MEMLIMIT = "3000000"
           ctest -V -L CORE -C Release . -j${{env.windows-vcpus}} --timeout 600
 
   # This job takes approximately 65 to 84 minutes
@@ -990,7 +995,9 @@ jobs:
           make CXX=clcache BUILD_ENV=MSVC -C unit test TAGS="[z3]"
           make CXX=clcache BUILD_ENV=MSVC -C jbmc/unit test
       - name: Run CBMC regression tests
-        run: make CXX=clcache BUILD_ENV=MSVC -j${{env.windows-vcpus}} -C regression test-parallel-jobs
+        run: |
+          $env:CBMC_TEST_MEMLIMIT = "3000000"
+          make CXX=clcache BUILD_ENV=MSVC -j${{env.windows-vcpus}} -C regression test-parallel-jobs
 
   # This job takes approximately 7 to 32 minutes
   windows-msi-package:
