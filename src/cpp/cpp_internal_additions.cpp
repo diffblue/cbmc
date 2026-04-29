@@ -205,8 +205,13 @@ void cpp_internal_additions(std::ostream &out)
          " { return &__r; }\n";
 
   // Microsoft stuff
-  if(config.ansi_c.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
+  if(config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
   {
+    // MSVC headers use GCC-style builtins like __builtin_strlen and
+    // __builtin_memcmp in their STL implementations.
+    out << "extern \"C\" __CPROVER_size_t __builtin_strlen(const char*);\n";
+    out << "extern \"C\" int __builtin_memcmp"
+           "(const void*, const void*, __CPROVER_size_t);\n";
     // type_info infrastructure -- the standard wants this to be in the
     // std:: namespace, but MS has it in the root namespace
     out << "class type_info;" << '\n';
