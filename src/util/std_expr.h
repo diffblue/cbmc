@@ -799,7 +799,10 @@ public:
     DATA_CHECK(
       vm,
       expr_binary.op0().type() == expr_binary.op1().type(),
-      "lhs and rhs of binary relation expression should have same type");
+      "lhs and rhs of binary relation expression should have same "
+      "type\nlhs type: " +
+        expr_binary.op0().type().id_string() +
+        "\nrhs type: " + expr_binary.op1().type().id_string());
   }
 };
 
