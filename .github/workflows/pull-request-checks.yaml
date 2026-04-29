@@ -859,9 +859,28 @@ jobs:
             $src | Set-Content "pp_${hdr}_20.cpp"
             & $cbmc --cpp20 --preprocess "pp_${hdr}_20.cpp" 2>$null | Set-Content "msvc-preprocessed\${hdr}_cpp20.ii"
           }
-          # Also preprocess the STL1 and STL2 test files
-          & $cbmc --cpp17 --preprocess "regression\cbmc-cpp\STL1\main.cpp" 2>$null | Set-Content "msvc-preprocessed\stl1.ii"
-          & $cbmc --cpp17 --preprocess "regression\cbmc-cpp\STL2\main.cpp" 2>$null | Set-Content "msvc-preprocessed\stl2.ii"
+          # Preprocess all cbmc-cpp test programs that fail on MSVC
+          $tests = @(
+            "STL1", "STL2", "Vector1",
+            "cpp11_condition_variable_header", "cpp11_future_header",
+            "cpp11_map_insert", "cpp11_map_verify", "cpp11_set_insert",
+            "cpp11_shared_ptr", "cpp11_vector_front_body",
+            "cpp11_vector_probe", "cpp11_vector_push_back",
+            "cpp11_vector_pushback", "cpp11_vector_verify",
+            "cpp14_chrono_basic", "cpp17_filesystem_basic",
+            "cpp17_filesystem_path_ops", "cpp17_mutex_basic",
+            "cpp17_numeric_basic", "cpp17_shared_ptr",
+            "cpp17_string_view", "cpp17_string_view_basic",
+            "cpp17_thread_basic", "cpp17_valarray_basic",
+            "cpp17_vector_basic", "cpp20_iostream_basic"
+          )
+          foreach ($t in $tests) {
+            $src = "regression\cbmc-cpp\$t\main.cpp"
+            if (Test-Path $src) {
+              $flags = (Get-Content "regression\cbmc-cpp\$t\test.desc" | Select-Object -Index 2).Trim()
+              & $cbmc $flags.Split(" ") --preprocess $src 2>$null | Set-Content "msvc-preprocessed\test_$t.ii"
+            }
+          }
       - name: Upload preprocessed headers
         if: always()
         uses: actions/upload-artifact@v4
