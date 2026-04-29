@@ -413,6 +413,14 @@ void cpp_typecheckt::elaborate_class_template(
     (t_type.id() == ID_struct || t_type.id() == ID_union) &&
     t_type.get_bool(ID_template_class_instance))
   {
+    // If the instance already has components, it was previously
+    // elaborated — skip re-instantiation.  Re-elaborating can fail
+    // when template arguments reference local scopes that are no
+    // longer accessible (e.g., local typedefs inside function
+    // template bodies).
+    if(!to_struct_union_type(symbol.type).components().empty())
+      return;
+
     const symbolt &initial_template = lookup(t_type.get(ID_identifier));
     // If the instance was created with a concept-constrained partial
     // specialization but is still empty, follow ID_specialization_of
