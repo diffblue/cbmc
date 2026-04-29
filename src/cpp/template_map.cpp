@@ -58,7 +58,8 @@ void template_mapt::apply(typet &type) const
       }
     }
     apply(to_array_type(type).element_type());
-    apply(to_array_type(type).size());
+    if(!to_array_type(type).size().is_nil())
+      apply(to_array_type(type).size());
   }
   else if(type.id()==ID_pointer)
   {
