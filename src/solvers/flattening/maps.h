@@ -8,7 +8,7 @@ Author: Michael Tautschnig
 
 /// \file
 /// Map Theory — base class for arrayst, providing map-theoretic
-/// reasoning (index tracking, equality tracking, Ackermann constraints).
+/// reasoning (key tracking, equality tracking, Ackermann constraints).
 
 #ifndef CPROVER_SOLVERS_FLATTENING_MAPS_H
 #define CPROVER_SOLVERS_FLATTENING_MAPS_H
@@ -32,60 +32,59 @@ public:
     const namespacet &_ns,
     propt &_prop,
     message_handlert &_message_handler,
-    bool _get_array_constraints = false);
+    bool _get_constraints = false);
 
   ~mapst() override = default;
 
   // -- Pure virtual: implemented by arrayst --
-  virtual literalt record_array_equality(const equal_exprt &expr) = 0;
-  virtual void
-  record_array_let_binding(const symbol_exprt &s, const exprt &v) = 0;
+  virtual literalt record_equality(const equal_exprt &expr) = 0;
+  virtual void record_let_binding(const symbol_exprt &s, const exprt &v) = 0;
 
   // -- Virtual: default in mapst, may be overridden --
-  virtual void record_array_index(const index_exprt &expr);
+  virtual void record_key(const index_exprt &expr);
 
 protected:
   const namespacet &ns;
   messaget log;
 
-  // -- Array equality tracking --
-  struct array_equalityt
+  // -- Map equality tracking --
+  struct map_equalityt
   {
     literalt l;
     exprt f1, f2;
   };
-  typedef std::list<array_equalityt> array_equalitiest;
-  array_equalitiest array_equalities;
+  typedef std::list<map_equalityt> map_equalitiest;
+  map_equalitiest map_equalities;
 
-  // -- Arrays union-find --
-  union_find<exprt, irep_hash> arrays;
+  // -- Maps union-find --
+  union_find<exprt, irep_hash> maps;
 
-  // -- Index tracking --
-  typedef std::set<exprt> index_sett;
-  typedef std::map<std::size_t, index_sett> index_mapt;
-  index_mapt index_map;
-  std::set<std::size_t> update_indices;
+  // -- Key tracking --
+  typedef std::set<exprt> key_sett;
+  typedef std::map<std::size_t, key_sett> domain_mapt;
+  domain_mapt domain_map;
+  std::set<std::size_t> update_keys;
   std::unordered_set<irep_idt> array_comprehension_args;
 
-  void collect_indices();
-  void collect_indices(const exprt &a);
-  virtual void collect_arrays(const exprt &a);
-  void update_index_map(bool update_all);
-  void update_index_map(std::size_t i);
+  void collect_keys();
+  void collect_keys(const exprt &a);
+  virtual void collect_maps(const exprt &a);
+  void update_domain_map(bool update_all);
+  void update_domain_map(std::size_t i);
 
-  virtual bool is_unbounded_array(const typet &type) const = 0;
+  virtual bool is_unbounded_map(const typet &type) const = 0;
 
   // -- Lazy constraint management --
   enum class lazy_typet
   {
-    ARRAY_ACKERMANN,
-    ARRAY_WITH,
-    ARRAY_IF,
-    ARRAY_OF,
-    ARRAY_TYPECAST,
-    ARRAY_CONSTANT,
-    ARRAY_COMPREHENSION,
-    ARRAY_LET
+    MAP_ACKERMANN,
+    MAP_WITH,
+    MAP_IF,
+    MAP_OF,
+    MAP_TYPECAST,
+    MAP_CONSTANT,
+    MAP_COMPREHENSION,
+    MAP_LET
   };
 
   struct lazy_constraintt
@@ -99,51 +98,51 @@ protected:
     }
   };
 
-  std::list<lazy_constraintt> lazy_array_constraints;
-  bool lazy_arrays;
+  std::list<lazy_constraintt> lazy_constraints;
+  bool lazy_dispatch;
   bool incremental_cache;
-  bool get_array_constraints;
+  bool get_constraints;
   std::map<exprt, bool> expr_map;
 
-  void add_array_constraint(const lazy_constraintt &lazy, bool refine = true);
+  void add_map_constraint(const lazy_constraintt &lazy, bool refine = true);
 
   // -- Ackermann constraints --
-  void add_array_Ackermann_constraints();
-  void add_array_constraints_equality(
-    const index_sett &index_set,
-    const array_equalityt &array_equality);
+  void add_Ackermann_constraints();
+  void add_map_equality_constraints(
+    const key_sett &key_set,
+    const map_equalityt &equality);
 
   // -- Constraint counting --
   enum class constraint_typet
   {
-    ARRAY_ACKERMANN,
-    ARRAY_WITH,
-    ARRAY_IF,
-    ARRAY_OF,
-    ARRAY_TYPECAST,
-    ARRAY_CONSTANT,
-    ARRAY_COMPREHENSION,
-    ARRAY_EQUALITY,
-    ARRAY_LET
+    MAP_ACKERMANN,
+    MAP_WITH,
+    MAP_IF,
+    MAP_OF,
+    MAP_TYPECAST,
+    MAP_CONSTANT,
+    MAP_COMPREHENSION,
+    MAP_EQUALITY,
+    MAP_LET
   };
-  typedef std::map<constraint_typet, size_t> array_constraint_countt;
-  array_constraint_countt array_constraint_count;
+  typedef std::map<constraint_typet, size_t> map_constraint_countt;
+  map_constraint_countt constraint_count;
   std::string enum_to_string(constraint_typet type);
-  void display_array_constraint_count();
+  void display_constraint_count();
 
   // -- Eager conversion --
   void finish_eager_conversion() override
   {
-    finish_eager_conversion_arrays();
+    finish_eager_conversion_maps();
     equalityt::finish_eager_conversion();
-    if(get_array_constraints)
-      display_array_constraint_count();
+    if(get_constraints)
+      display_constraint_count();
   }
 
-  virtual void finish_eager_conversion_arrays()
+  virtual void finish_eager_conversion_maps()
   {
-    collect_indices();
-    update_index_map(true);
+    collect_keys();
+    update_domain_map(true);
   }
 };
 

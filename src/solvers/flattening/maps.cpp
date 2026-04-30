@@ -27,35 +27,35 @@ mapst::mapst(
   const namespacet &_ns,
   propt &_prop,
   message_handlert &_message_handler,
-  bool _get_array_constraints)
+  bool _get_constraints)
   : equalityt(_prop, _message_handler),
     ns(_ns),
     log(_message_handler),
-    lazy_arrays(false),
+    lazy_dispatch(false),
     incremental_cache(false),
-    get_array_constraints(_get_array_constraints)
+    get_constraints(_get_constraints)
 {
 }
 
-void mapst::record_array_index(const index_exprt &index)
+void mapst::record_key(const index_exprt &index)
 {
-  // we are not allowed to put the index directly in the
+  // we are not allowed to put the key directly in the
   //   entry for the root of the equivalence class
   //   because this map is accessed during building the error trace
-  std::size_t number = arrays.number(index.array());
-  if(index_map[number].insert(index.index()).second)
-    update_indices.insert(number);
+  std::size_t number = maps.number(index.array());
+  if(domain_map[number].insert(index.index()).second)
+    update_keys.insert(number);
 }
 
-void mapst::collect_indices()
+void mapst::collect_keys()
 {
-  for(std::size_t i = 0; i < arrays.size(); i++)
+  for(std::size_t i = 0; i < maps.size(); i++)
   {
-    collect_indices(arrays[i]);
+    collect_keys(maps[i]);
   }
 }
 
-void mapst::collect_indices(const exprt &expr)
+void mapst::collect_keys(const exprt &expr)
 {
   if(expr.id() != ID_index)
   {
@@ -64,7 +64,7 @@ void mapst::collect_indices(const exprt &expr)
         to_array_comprehension_expr(expr).arg().get_identifier());
 
     for(const auto &op : expr.operands())
-      collect_indices(op);
+      collect_keys(op);
   }
   else
   {
@@ -78,7 +78,7 @@ void mapst::collect_indices(const exprt &expr)
       return;
     }
 
-    collect_indices(e.index()); // necessary?
+    collect_keys(e.index()); // necessary?
 
     const typet &array_op_type = e.array().type();
 
@@ -86,15 +86,15 @@ void mapst::collect_indices(const exprt &expr)
     {
       const array_typet &array_type = to_array_type(array_op_type);
 
-      if(is_unbounded_array(array_type))
+      if(is_unbounded_map(array_type))
       {
-        record_array_index(e);
+        record_key(e);
       }
     }
   }
 }
 
-void mapst::collect_arrays(const exprt &a)
+void mapst::collect_maps(const exprt &a)
 {
   const array_typet &array_type = to_array_type(a.type());
 
@@ -104,15 +104,15 @@ void mapst::collect_arrays(const exprt &a)
 
     DATA_INVARIANT_WITH_DIAGNOSTICS(
       array_type == with_expr.old().type(),
-      "collect_arrays got 'with' without matching types",
+      "collect_maps got 'with' without matching types",
       irep_pretty_diagnosticst{a});
 
-    arrays.make_union(a, with_expr.old());
-    collect_arrays(with_expr.old());
+    maps.make_union(a, with_expr.old());
+    collect_maps(with_expr.old());
 
     // make sure this shows as an application
     index_exprt index_expr(with_expr.old(), with_expr.where());
-    record_array_index(index_expr);
+    record_key(index_expr);
   }
   else if(a.id() == ID_update)
   {
@@ -120,16 +120,16 @@ void mapst::collect_arrays(const exprt &a)
 
     DATA_INVARIANT_WITH_DIAGNOSTICS(
       array_type == update_expr.old().type(),
-      "collect_arrays got 'update' without matching types",
+      "collect_maps got 'update' without matching types",
       irep_pretty_diagnosticst{a});
 
-    arrays.make_union(a, update_expr.old());
-    collect_arrays(update_expr.old());
+    maps.make_union(a, update_expr.old());
+    collect_maps(update_expr.old());
 
 #if 0
     // make sure this shows as an application
     index_exprt index_expr(update_expr.old(), update_expr.index());
-    record_array_index(index_expr);
+    record_key(index_expr);
 #endif
   }
   else if(a.id() == ID_if)
@@ -138,18 +138,18 @@ void mapst::collect_arrays(const exprt &a)
 
     DATA_INVARIANT_WITH_DIAGNOSTICS(
       array_type == if_expr.true_case().type(),
-      "collect_arrays got if without matching types",
+      "collect_maps got if without matching types",
       irep_pretty_diagnosticst{a});
 
     DATA_INVARIANT_WITH_DIAGNOSTICS(
       array_type == if_expr.false_case().type(),
-      "collect_arrays got if without matching types",
+      "collect_maps got if without matching types",
       irep_pretty_diagnosticst{a});
 
-    arrays.make_union(a, if_expr.true_case());
-    arrays.make_union(a, if_expr.false_case());
-    collect_arrays(if_expr.true_case());
-    collect_arrays(if_expr.false_case());
+    maps.make_union(a, if_expr.true_case());
+    maps.make_union(a, if_expr.false_case());
+    collect_maps(if_expr.true_case());
+    collect_maps(if_expr.false_case());
   }
   else if(a.id() == ID_symbol)
   {
@@ -163,8 +163,7 @@ void mapst::collect_arrays(const exprt &a)
 
     DATA_INVARIANT(
       struct_op.id() == ID_symbol || struct_op.id() == ID_nondet_symbol,
-      "unexpected array expression: member with '" + struct_op.id_string() +
-        "'");
+      "unexpected map expression: member with '" + struct_op.id_string() + "'");
   }
   else if(a.is_constant() || a.id() == ID_array || a.id() == ID_string_constant)
   {
@@ -176,63 +175,60 @@ void mapst::collect_arrays(const exprt &a)
     a.id() == ID_byte_update_little_endian ||
     a.id() == ID_byte_update_big_endian)
   {
-    DATA_INVARIANT(
-      false, "byte_update should be removed before collect_arrays");
+    DATA_INVARIANT(false, "byte_update should be removed before collect_maps");
   }
   else if(a.id() == ID_typecast)
   {
     const auto &typecast_op = to_typecast_expr(a).op();
 
-    // cast between array types?
+    // cast between map types?
     DATA_INVARIANT(
       typecast_op.type().id() == ID_array,
-      "unexpected array type cast from " + typecast_op.type().id_string());
+      "unexpected map type cast from " + typecast_op.type().id_string());
 
-    arrays.make_union(a, typecast_op);
-    collect_arrays(typecast_op);
+    maps.make_union(a, typecast_op);
+    collect_maps(typecast_op);
   }
   else if(a.id() == ID_index)
   {
-    // nested unbounded arrays
+    // nested unbounded maps
     const auto &array_op = to_index_expr(a).array();
-    arrays.make_union(a, array_op);
-    collect_arrays(array_op);
+    maps.make_union(a, array_op);
+    collect_maps(array_op);
   }
   else if(a.id() == ID_array_comprehension)
   {
   }
   else if(auto let_expr = expr_try_dynamic_cast<let_exprt>(a))
   {
-    arrays.make_union(a, let_expr->where());
-    collect_arrays(let_expr->where());
+    maps.make_union(a, let_expr->where());
+    collect_maps(let_expr->where());
   }
   else
   {
     DATA_INVARIANT(
       false,
-      "unexpected array expression (collect_arrays): '" + a.id_string() + "'");
+      "unexpected map expression (collect_maps): '" + a.id_string() + "'");
   }
 }
 
-/// adds array constraints (refine=true...lazily for the refinement loop)
-void mapst::add_array_constraint(
-  const lazy_constraintt &lazy,
-  bool refine)
+/// adds map constraints (refine=true...lazily for the refinement loop)
+void mapst::add_map_constraint(const lazy_constraintt &lazy, bool refine)
 {
-  if(lazy_arrays && refine)
+  if(lazy_dispatch && refine)
   {
     // lazily add the constraint
     if(incremental_cache)
     {
       if(expr_map.find(lazy.lazy) == expr_map.end())
       {
-        lazy_array_constraints.push_back(lazy);
+        lazy_constraints.push_back(lazy);
         expr_map[lazy.lazy] = true;
       }
     }
     else
     {
-      lazy_array_constraints.push_back(lazy);
+      lazy_constraints.push_back(lazy);
     }
   }
   else
@@ -242,34 +238,33 @@ void mapst::add_array_constraint(
   }
 }
 
-void mapst::add_array_Ackermann_constraints()
+void mapst::add_Ackermann_constraints()
 {
   // this is quadratic!
 
 #ifdef DEBUG
-  std::cout << "arrays.size(): " << arrays.size() << '\n';
+  std::cout << "maps.size(): " << maps.size() << '\n';
 #endif
 
-  // iterate over arrays
-  for(std::size_t i = 0; i < arrays.size(); i++)
+  // iterate over maps
+  for(std::size_t i = 0; i < maps.size(); i++)
   {
-    const index_sett &index_set = index_map[arrays.find_number(i)];
+    const key_sett &key_set = domain_map[maps.find_number(i)];
 
 #ifdef DEBUG
-    std::cout << "index_set.size(): " << index_set.size() << '\n';
+    std::cout << "key_set.size(): " << key_set.size() << '\n';
 #endif
 
-    // iterate over indices, 2x!
-    for(index_sett::const_iterator i1 = index_set.begin();
-        i1 != index_set.end();
+    // iterate over keys, 2x!
+    for(key_sett::const_iterator i1 = key_set.begin(); i1 != key_set.end();
         i1++)
-      for(index_sett::const_iterator i2 = i1; i2 != index_set.end(); i2++)
+      for(key_sett::const_iterator i2 = i1; i2 != key_set.end(); i2++)
         if(i1 != i2)
         {
           if(i1->is_constant() && i2->is_constant())
             continue;
 
-          // index equality
+          // key equality
           const equal_exprt indices_equal(
             *i1, typecast_exprt::conditional_cast(*i2, i1->type()));
 
@@ -277,9 +272,8 @@ void mapst::add_array_Ackermann_constraints()
 
           if(indices_equal_lit != const_literal(false))
           {
-            const typet &subtype =
-              to_array_type(arrays[i].type()).element_type();
-            index_exprt index_expr1(arrays[i], *i1, subtype);
+            const typet &subtype = to_array_type(maps[i].type()).element_type();
+            index_exprt index_expr1(maps[i], *i1, subtype);
 
             index_exprt index_expr2 = index_expr1;
             index_expr2.index() = *i2;
@@ -288,10 +282,10 @@ void mapst::add_array_Ackermann_constraints()
 
             // add constraint
             lazy_constraintt lazy(
-              lazy_typet::ARRAY_ACKERMANN,
+              lazy_typet::MAP_ACKERMANN,
               implies_exprt(literal_exprt(indices_equal_lit), values_equal));
-            add_array_constraint(lazy, true); // added lazily
-            array_constraint_count[constraint_typet::ARRAY_ACKERMANN]++;
+            add_map_constraint(lazy, true); // added lazily
+            constraint_count[constraint_typet::MAP_ACKERMANN]++;
 
 #if 0 // old code for adding, not significantly faster
             prop.lcnf(!indices_equal_lit, convert(values_equal));
@@ -301,117 +295,123 @@ void mapst::add_array_Ackermann_constraints()
   }
 }
 
-/// merge the indices into the root
-void mapst::update_index_map(std::size_t i)
+/// merge the keys into the root
+void mapst::update_domain_map(std::size_t i)
 {
-  if(arrays.is_root_number(i))
+  if(maps.is_root_number(i))
     return;
 
-  std::size_t root_number = arrays.find_number(i);
+  std::size_t root_number = maps.find_number(i);
   INVARIANT(root_number != i, "is_root_number incorrect?");
 
-  index_sett &root_index_set = index_map[root_number];
-  index_sett &index_set = index_map[i];
+  key_sett &root_key_set = domain_map[root_number];
+  key_sett &key_set = domain_map[i];
 
-  root_index_set.insert(index_set.begin(), index_set.end());
+  root_key_set.insert(key_set.begin(), key_set.end());
 }
 
-void mapst::update_index_map(bool update_all)
+void mapst::update_domain_map(bool update_all)
 {
   // iterate over non-roots
   // possible reasons why update is needed:
-  //  -- there are new equivalence classes in arrays
-  //  -- there are new indices for arrays that are not the root
+  //  -- there are new equivalence classes in maps
+  //  -- there are new keys for maps that are not the root
   //     of an equivalence class
-  //     (and we cannot do that in record_array_index())
+  //     (and we cannot do that in record_key())
   //  -- equivalence classes have been merged
   if(update_all)
   {
-    for(std::size_t i = 0; i < arrays.size(); i++)
-      update_index_map(i);
+    for(std::size_t i = 0; i < maps.size(); i++)
+      update_domain_map(i);
   }
   else
   {
-    for(const auto &index : update_indices)
-      update_index_map(index);
+    for(const auto &key : update_keys)
+      update_domain_map(key);
 
-    update_indices.clear();
+    update_keys.clear();
   }
 
 #ifdef DEBUG
-  // print index sets
-  for(const auto &index_entry : index_map)
-    for(const auto &index : index_entry.second)
-      std::cout << "Index set (" << index_entry.first << " = "
-                << arrays.find_number(index_entry.first) << " = "
-                << format(arrays[arrays.find_number(index_entry.first)])
-                << "): " << format(index) << '\n';
+  // print key sets
+  for(const auto &domain_entry : domain_map)
+    for(const auto &key : domain_entry.second)
+      std::cout << "Key set (" << domain_entry.first << " = "
+                << maps.find_number(domain_entry.first) << " = "
+                << format(maps[maps.find_number(domain_entry.first)])
+                << "): " << format(key) << '\n';
   std::cout << "-----\n";
 #endif
 }
 
-void mapst::add_array_constraints_equality(
-  const index_sett &index_set,
-  const array_equalityt &array_equality)
+void mapst::add_map_equality_constraints(
+  const key_sett &key_set,
+  const map_equalityt &equality)
 {
   // add constraints x=y => x[i]=y[i]
 
-  for(const auto &index : index_set)
+  for(const auto &key : key_set)
   {
     const typet &element_type1 =
-      to_array_type(array_equality.f1.type()).element_type();
-    index_exprt index_expr1(array_equality.f1, index, element_type1);
+      to_array_type(equality.f1.type()).element_type();
+    index_exprt index_expr1(equality.f1, key, element_type1);
 
     const typet &element_type2 =
-      to_array_type(array_equality.f2.type()).element_type();
-    index_exprt index_expr2(array_equality.f2, index, element_type2);
+      to_array_type(equality.f2.type()).element_type();
+    index_exprt index_expr2(equality.f2, key, element_type2);
 
     DATA_INVARIANT(
       index_expr1.type() == index_expr2.type(),
-      "array elements should all have same type");
+      "map elements should all have same type");
 
-    array_equalityt equal;
+    map_equalityt equal;
     equal.f1 = index_expr1;
     equal.f2 = index_expr2;
-    equal.l = array_equality.l;
+    equal.l = equality.l;
     equal_exprt equality_expr(index_expr1, index_expr2);
 
     // add constraint
     // equality constraints are not added lazily
-    // convert must be done to guarantee correct update of the index_set
-    prop.lcnf(!array_equality.l, convert(equality_expr));
-    array_constraint_count[constraint_typet::ARRAY_EQUALITY]++;
+    // convert must be done to guarantee correct update of the key_set
+    prop.lcnf(!equality.l, convert(equality_expr));
+    constraint_count[constraint_typet::MAP_EQUALITY]++;
   }
 }
 
 std::string mapst::enum_to_string(constraint_typet type)
 {
+  // The internal enum tags are MAP_X, but the JSON strings are kept as
+  // arrayX/arrayConstraints because the constraints reported by
+  // --show-array-constraints are array-specific (arrayst is the only
+  // implementation that records them, and the CLI option name says
+  // 'array'). Decoupling here preserves backward compatibility for
+  // consumers of --show-array-constraints --json-ui output.
   switch(type)
   {
-  case constraint_typet::ARRAY_ACKERMANN:
+  case constraint_typet::MAP_ACKERMANN:
     return "arrayAckermann";
-  case constraint_typet::ARRAY_WITH:
+  case constraint_typet::MAP_WITH:
     return "arrayWith";
-  case constraint_typet::ARRAY_IF:
+  case constraint_typet::MAP_IF:
     return "arrayIf";
-  case constraint_typet::ARRAY_OF:
+  case constraint_typet::MAP_OF:
     return "arrayOf";
-  case constraint_typet::ARRAY_TYPECAST:
+  case constraint_typet::MAP_TYPECAST:
     return "arrayTypecast";
-  case constraint_typet::ARRAY_CONSTANT:
+  case constraint_typet::MAP_CONSTANT:
     return "arrayConstant";
-  case constraint_typet::ARRAY_COMPREHENSION:
+  case constraint_typet::MAP_COMPREHENSION:
     return "arrayComprehension";
-  case constraint_typet::ARRAY_EQUALITY:
+  case constraint_typet::MAP_EQUALITY:
     return "arrayEquality";
-  case constraint_typet::ARRAY_LET:
+  case constraint_typet::MAP_LET:
     return "arrayLet";
   default:
     UNREACHABLE;
   }
 }
 
-void mapst::display_array_constraint_count()
+void mapst::display_constraint_count()
 {
   json_objectt json_result;
   json_objectt &json_array_theory =
@@ -419,8 +419,8 @@ void mapst::display_array_constraint_count()
 
   size_t num_constraints = 0;
 
-  array_constraint_countt::iterator it = array_constraint_count.begin();
-  while(it != array_constraint_count.end())
+  map_constraint_countt::iterator it = constraint_count.begin();
+  while(it != constraint_count.end())
   {
     std::string contraint_type_string = enum_to_string(it->first);
     json_array_theory[contraint_type_string] =

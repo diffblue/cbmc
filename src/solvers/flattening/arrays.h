@@ -30,12 +30,12 @@ public:
     const namespacet &_ns,
     propt &_prop,
     message_handlert &message_handler,
-    bool get_array_constraints = false);
+    bool get_constraints = false);
 
   // NOLINTNEXTLINE(readability/identifiers)
   typedef mapst SUB;
 
-  literalt record_array_equality(const equal_exprt &expr) override;
+  literalt record_equality(const equal_exprt &expr) override;
 
   /// Record that \p symbol is equal to \p value for the purposes of the
   /// array theory. For unbounded-array-typed bindings this connects the
@@ -43,33 +43,33 @@ public:
   /// propagate correctly.
   /// \pre \p value must be free of byte_update operators; lower them at the
   ///   call site (collect_arrays otherwise fails a DATA_INVARIANT).
-  void record_array_let_binding(const symbol_exprt &symbol, const exprt &value)
-    override;
+  void
+  record_let_binding(const symbol_exprt &symbol, const exprt &value) override;
 
 protected:
   message_handlert &message_handler;
 
-  void finish_eager_conversion_arrays() override
+  void finish_eager_conversion_maps() override
   {
     add_array_constraints();
   }
 
   void add_array_constraints();
-  void add_array_constraints(
-    const index_sett &index_set, const exprt &expr);
-  void add_array_constraints_if(
-    const index_sett &index_set, const if_exprt &exprt);
-  void add_array_constraints_with(
-    const index_sett &index_set, const with_exprt &expr);
+  void add_array_constraints(const key_sett &key_set, const exprt &expr);
+  void add_array_constraints_if(const key_sett &key_set, const if_exprt &exprt);
+  void
+  add_array_constraints_with(const key_sett &key_set, const with_exprt &expr);
   void add_array_constraints_update(
-    const index_sett &index_set, const update_exprt &expr);
+    const key_sett &key_set,
+    const update_exprt &expr);
   void add_array_constraints_array_of(
-    const index_sett &index_set, const array_of_exprt &exprt);
+    const key_sett &key_set,
+    const array_of_exprt &exprt);
   void add_array_constraints_array_constant(
-    const index_sett &index_set,
+    const key_sett &key_set,
     const array_exprt &exprt);
   void add_array_constraints_comprehension(
-    const index_sett &index_set,
+    const key_sett &key_set,
     const array_comprehension_exprt &expr);
 };
 

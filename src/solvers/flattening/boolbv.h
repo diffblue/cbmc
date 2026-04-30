@@ -53,8 +53,8 @@ public:
     const namespacet &_ns,
     propt &_prop,
     message_handlert &message_handler,
-    bool get_array_constraints = false)
-    : arrayst(_ns, _prop, message_handler, get_array_constraints),
+    bool get_constraints = false)
+    : arrayst(_ns, _prop, message_handler, get_constraints),
       unbounded_array(unbounded_arrayt::U_NONE),
       bv_width(_ns),
       bv_utils(_prop),
@@ -267,7 +267,7 @@ protected:
   exprt get_value(const exprt &expr) const;
 
   // unbounded arrays
-  bool is_unbounded_array(const typet &type) const override;
+  bool is_unbounded_map(const typet &type) const override;
 
   // quantifier instantiations
   class quantifiert

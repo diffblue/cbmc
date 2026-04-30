@@ -108,7 +108,7 @@ exprt boolbvt::bv_get_rec(const exprt &expr, const bvt &bv, std::size_t offset)
     {
       const auto &array_type = to_array_type(type);
 
-      if(is_unbounded_array(type))
+      if(is_unbounded_map(type))
         return bv_get_unbounded_array(expr);
 
       const typet &subtype = array_type.element_type();
@@ -328,20 +328,18 @@ exprt boolbvt::bv_get_unbounded_array(const exprt &expr) const
   typedef std::map<mp_integer, exprt> valuest;
   valuest values;
 
-  const auto opt_num = arrays.get_number(expr);
+  const auto opt_num = maps.get_number(expr);
   if(opt_num.has_value())
   {
     // get root
-    const auto number = arrays.find_number(*opt_num);
+    const auto number = maps.find_number(*opt_num);
 
-    CHECK_RETURN(number < index_map.size());
-    index_mapt::const_iterator it=index_map.find(number);
-    CHECK_RETURN(it != index_map.end());
-    const index_sett &index_set=it->second;
+    CHECK_RETURN(number < domain_map.size());
+    domain_mapt::const_iterator it = domain_map.find(number);
+    CHECK_RETURN(it != domain_map.end());
+    const key_sett &key_set = it->second;
 
-    for(index_sett::const_iterator it1=
-        index_set.begin();
-        it1!=index_set.end();
+    for(key_sett::const_iterator it1 = key_set.begin(); it1 != key_set.end();
         it1++)
     {
       index_exprt index(expr, *it1);

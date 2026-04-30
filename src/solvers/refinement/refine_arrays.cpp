@@ -17,17 +17,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/sat/satcheck.h>
 
-/// generate array constraints
-void bv_refinementt::finish_eager_conversion_arrays()
+/// generate map constraints
+void bv_refinementt::finish_eager_conversion_maps()
 {
-  collect_indices();
-  // at this point all indices should in the index set
+  collect_keys();
+  // at this point all keys should be in the key set
 
   // just build the data structure
-  update_index_map(true);
+  update_domain_map(true);
 
   // we don't actually add any constraints
-  lazy_arrays=config_.refine_arrays;
+  lazy_dispatch = config_.refine_arrays;
   add_array_constraints();
   freeze_lazy_constraints();
 }
@@ -52,11 +52,9 @@ void bv_refinementt::arrays_overapproximated()
     std::list<lazy_constraintt>::iterator list_it;
   };
   std::vector<evaluated_constraintt> to_check;
-  to_check.reserve(lazy_array_constraints.size());
+  to_check.reserve(lazy_constraints.size());
 
-  for(auto it = lazy_array_constraints.begin();
-      it != lazy_array_constraints.end();
-      ++it)
+  for(auto it = lazy_constraints.begin(); it != lazy_constraints.end(); ++it)
   {
     const exprt &current = it->lazy;
 
@@ -105,7 +103,7 @@ void bv_refinementt::arrays_overapproximated()
     case decision_proceduret::resultt::D_UNSATISFIABLE:
       prop.l_set_to_true(convert(entry.constraint));
       nb_active++;
-      lazy_array_constraints.erase(entry.list_it);
+      lazy_constraints.erase(entry.list_it);
       break;
     case decision_proceduret::resultt::D_ERROR:
       INVARIANT(false, "error in array over approximation check");
@@ -114,7 +112,7 @@ void bv_refinementt::arrays_overapproximated()
 
   log.debug() << "BV-Refinement: " << nb_active
               << " array expressions become active" << messaget::eom;
-  log.debug() << "BV-Refinement: " << lazy_array_constraints.size()
+  log.debug() << "BV-Refinement: " << lazy_constraints.size()
               << " inactive array expressions" << messaget::eom;
   if(nb_active > 0)
     progress=true;
@@ -124,10 +122,10 @@ void bv_refinementt::arrays_overapproximated()
 /// freeze symbols for incremental solving
 void bv_refinementt::freeze_lazy_constraints()
 {
-  if(!lazy_arrays)
+  if(!lazy_dispatch)
     return;
 
-  for(const auto &constraint : lazy_array_constraints)
+  for(const auto &constraint : lazy_constraints)
   {
     // Freeze all symbols in the constraint
     for(const auto &symbol : find_symbols(constraint.lazy))

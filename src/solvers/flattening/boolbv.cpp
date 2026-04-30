@@ -511,7 +511,7 @@ bool boolbvt::boolbv_set_equality_to_true(const equal_exprt &expr)
     type.id() != ID_bool)
   {
     // see if it is an unbounded array
-    if(is_unbounded_array(type))
+    if(is_unbounded_map(type))
       return true;
 
     const bvt &bv1=convert_bv(expr.rhs());
@@ -539,7 +539,7 @@ void boolbvt::set_to(const exprt &expr, bool value)
   SUB::set_to(expr, value);
 }
 
-bool boolbvt::is_unbounded_array(const typet &type) const
+bool boolbvt::is_unbounded_map(const typet &type) const
 {
   if(type.id()!=ID_array)
     return false;

@@ -17,8 +17,7 @@ bvt boolbvt::convert_byte_update(const byte_update_exprt &expr)
   // if we update (from) an unbounded array, lower the expression as the array
   // logic does not handle byte operators
   if(
-    is_unbounded_array(expr.op().type()) ||
-    is_unbounded_array(expr.value().type()))
+    is_unbounded_map(expr.op().type()) || is_unbounded_map(expr.value().type()))
   {
     return convert_bv(lower_byte_update(expr, ns));
   }
