@@ -63,9 +63,13 @@ void cpp_typecheckt::typecheck_method_bodies()
       }
       if(suppress)
       {
-        null_message_handlert null_handler;
-        message_handlert &old_handler = get_message_handler();
-        set_message_handler(null_handler);
+        // Save/restore error count instead of using null_handler.
+        // The null_message_handlert causes template instantiations
+        // inside the body to fail (e.g., _Deallocate<_New_alignof>)
+        // because some code paths behave differently when the
+        // message handler is null.
+        const std::size_t errors_before =
+          get_message_handler().get_message_count(messaget::M_ERROR);
         suppress_elaborate = false;
         try
         {
@@ -77,7 +81,8 @@ void cpp_typecheckt::typecheck_method_bodies()
           // so the function is cleanly in the "no body" state.
           method_symbol.value.make_nil();
         }
-        set_message_handler(old_handler);
+        get_message_handler().set_message_count(
+          messaget::M_ERROR, errors_before);
       }
       else
       {
@@ -167,9 +172,8 @@ void cpp_typecheckt::typecheck_method_bodies()
 
     if(body.is_not_nil() && body != 0)
     {
-      null_message_handlert null_handler;
-      message_handlert &old_handler = get_message_handler();
-      set_message_handler(null_handler);
+      const std::size_t errors_before =
+        get_message_handler().get_message_count(messaget::M_ERROR);
       try
       {
         convert_function(method_symbol);
@@ -177,7 +181,8 @@ void cpp_typecheckt::typecheck_method_bodies()
       catch(...)
       {
       }
-      set_message_handler(old_handler);
+      get_message_handler().set_message_count(
+        messaget::M_ERROR, errors_before);
     }
   }
 

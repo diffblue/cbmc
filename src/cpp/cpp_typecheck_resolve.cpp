@@ -2321,9 +2321,9 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
       cpp_template_args_tct partial_specialization_args_tc;
       bool sfinae_failed = false;
       {
-        null_message_handlert null_handler;
-        message_handlert &old_handler = cpp_typecheck.get_message_handler();
-        cpp_typecheck.set_message_handler(null_handler);
+        // error count save/restore instead of null_handler
+        const std::size_t sfinae_err_0 =
+          cpp_typecheck.get_message_handler().get_message_count(messaget::M_ERROR);
         try
         {
           partial_specialization_args_tc =
@@ -2336,7 +2336,8 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
         {
           sfinae_failed = true;
         }
-        cpp_typecheck.set_message_handler(old_handler);
+        cpp_typecheck.get_message_handler().set_message_count(
+          messaget::M_ERROR, sfinae_err_0);
       }
       if(sfinae_failed)
         continue;
@@ -2491,10 +2492,9 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
               // in a safe context: suppress elaboration and catch
               // all errors. If evaluation fails, treat as satisfied
               // and let elaborate_class_template re-check later.
-              null_message_handlert null_handler;
-              message_handlert &old_handler =
-                cpp_typecheck.get_message_handler();
-              cpp_typecheck.set_message_handler(null_handler);
+              // error count save/restore instead of null_handler
+              const std::size_t sfinae_err_1 =
+                cpp_typecheck.get_message_handler().get_message_count(messaget::M_ERROR);
               bool satisfied = true;
               bool evaluated = false;
               // Only attempt evaluation for simple type predicates
@@ -2517,7 +2517,8 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
                 {
                 }
               }
-              cpp_typecheck.set_message_handler(old_handler);
+              cpp_typecheck.get_message_handler().set_message_count(
+                messaget::M_ERROR, sfinae_err_1);
               if(evaluated && !satisfied)
                 continue;
             }
@@ -4651,9 +4652,9 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
           typet default_type = param.default_argument().type();
           // Evaluate the default argument in a SFINAE context: suppress
           // error messages and treat failure as deduction failure.
-          null_message_handlert null_handler;
-          message_handlert &old_handler = cpp_typecheck.get_message_handler();
-          cpp_typecheck.set_message_handler(null_handler);
+          // error count save/restore instead of null_handler
+          const std::size_t sfinae_err_2 =
+            cpp_typecheck.get_message_handler().get_message_count(messaget::M_ERROR);
           try
           {
             cpp_save_scopet saved_scope(cpp_typecheck.cpp_scopes);
@@ -4666,11 +4667,13 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
             args[i] = exprt(ID_type);
             args[i].type() = default_type;
             cpp_typecheck.template_map.set(param, args[i]);
-            cpp_typecheck.set_message_handler(old_handler);
+            cpp_typecheck.get_message_handler().set_message_count(
+              messaget::M_ERROR, sfinae_err_2);
           }
           catch(...)
           {
-            cpp_typecheck.set_message_handler(old_handler);
+            cpp_typecheck.get_message_handler().set_message_count(
+              messaget::M_ERROR, sfinae_err_2);
             // If this is an anonymous type parameter, the default
             // argument is a SFINAE constraint (e.g.,
             // typename = enable_if_t<...>).
@@ -4697,9 +4700,9 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
           // Non-type parameter with default value (e.g.,
           // typename enable_if<...>::type = 0).
           // Evaluate the parameter type in a SFINAE context.
-          null_message_handlert null_handler;
-          message_handlert &old_handler = cpp_typecheck.get_message_handler();
-          cpp_typecheck.set_message_handler(null_handler);
+          // error count save/restore instead of null_handler
+          const std::size_t sfinae_err_3 =
+            cpp_typecheck.get_message_handler().get_message_count(messaget::M_ERROR);
           try
           {
             // [temp.point] p1,7: the context of a template instantiation
@@ -4718,11 +4721,13 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
             cpp_typecheck.typecheck_expr(default_val);
             args[i] = default_val;
             cpp_typecheck.template_map.set(param, args[i]);
-            cpp_typecheck.set_message_handler(old_handler);
+            cpp_typecheck.get_message_handler().set_message_count(
+              messaget::M_ERROR, sfinae_err_3);
           }
           catch(...)
           {
-            cpp_typecheck.set_message_handler(old_handler);
+            cpp_typecheck.get_message_handler().set_message_count(
+              messaget::M_ERROR, sfinae_err_3);
             // SFINAE: substitution failure in parameter type
             return nil_exprt();
           }
@@ -4868,13 +4873,13 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   }
 
   // Type-check the function type in a SFINAE context: suppress error
-  // messages so that substitution failures (e.g., enable_if with false
+  // count so that substitution failures (e.g., enable_if with false
   // condition in the return type) are silently discarded.
-  null_message_handlert null_handler;
   message_handlert &old_handler = cpp_typecheck.get_message_handler();
+  const std::size_t sfinae_errors =
+    old_handler.get_message_count(messaget::M_ERROR);
   try
   {
-    cpp_typecheck.set_message_handler(null_handler);
     // Apply template map to the function type before typechecking.
     // This handles template template parameters where C<T> in the
     // function type needs to be replaced with the actual instantiated type.
@@ -4934,11 +4939,11 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
       }
     }
     cpp_typecheck.typecheck_type(function_type);
-    cpp_typecheck.set_message_handler(old_handler);
+    old_handler.set_message_count(messaget::M_ERROR, sfinae_errors);
   }
   catch(...)
   {
-    cpp_typecheck.set_message_handler(old_handler);
+    old_handler.set_message_count(messaget::M_ERROR, sfinae_errors);
     return nil_exprt();
   }
 
@@ -5131,23 +5136,27 @@ void cpp_typecheck_resolvet::apply_template_args(
     // Instantiation may fail due to SFINAE (e.g., enable_if in the
     // return type).  Suppress errors and treat failure as deduction
     // failure so that other overloads can be considered.
-    null_message_handlert null_handler;
+    // Note: we save/restore the error count instead of using a
+    // null_message_handlert because the null handler changes the
+    // behavior of some error-count-dependent code paths, causing
+    // instantiations to fail that would otherwise succeed.
     message_handlert &old_handler = cpp_typecheck.get_message_handler();
+    const std::size_t errors_before =
+      old_handler.get_message_count(messaget::M_ERROR);
     const symbolt *new_sym_ptr = nullptr;
     try
     {
-      cpp_typecheck.set_message_handler(null_handler);
       const symbolt &new_symbol = cpp_typecheck.instantiate_template(
         source_location, template_symbol, template_args_tc, template_args_tc);
       new_sym_ptr = &new_symbol;
     }
     catch(...)
     {
-      cpp_typecheck.set_message_handler(old_handler);
+      old_handler.set_message_count(messaget::M_ERROR, errors_before);
       expr.make_nil();
       return;
     }
-    cpp_typecheck.set_message_handler(old_handler);
+    old_handler.set_message_count(messaget::M_ERROR, errors_before);
     const symbolt &new_symbol = *new_sym_ptr;
 
     // Variable template: the type is not a function type
