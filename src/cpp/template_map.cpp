@@ -260,6 +260,44 @@ void template_mapt::apply(typet &type) const
         irept::subt &args = s.add(ID_arguments).get_sub();
         for(auto &arg : args)
           apply(static_cast<exprt &>(arg));
+        // Remove empty-type arguments produced by empty parameter
+        // packs.  Without this, an empty pack expands to a void
+        // argument that poisons downstream template instantiations.
+        args.erase(
+          std::remove_if(
+            args.begin(),
+            args.end(),
+            [](const irept &arg)
+            {
+              return arg.id() == ID_type &&
+                     static_cast<const exprt &>(arg).type().id() == ID_empty;
+            }),
+          args.end());
+      }
+    }
+
+    // Substitute template parameters used as scope qualifiers
+    // (e.g., _Next::value where _Next is mapped to a concrete type).
+    // Replace the name component with the mapped type's identifier.
+    if(sub.size() >= 3 && sub[0].id() == ID_name && sub[1].id() == "::")
+    {
+      irep_idt scope_base = sub[0].get(ID_identifier);
+      for(const auto &entry : type_map)
+      {
+        const std::string &key = id2string(entry.first);
+        auto p = key.rfind("::");
+        std::string suffix = p != std::string::npos ? key.substr(p + 2) : key;
+        if(
+          suffix == id2string(scope_base) &&
+          entry.second.id() != ID_unassigned && entry.second.id() != ID_nil)
+        {
+          if(entry.second.id() == ID_struct_tag)
+          {
+            sub[0].set(
+              ID_identifier, to_struct_tag_type(entry.second).get_identifier());
+          }
+          break;
+        }
       }
     }
   }
