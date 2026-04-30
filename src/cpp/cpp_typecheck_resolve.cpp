@@ -715,8 +715,15 @@ exprt cpp_typecheck_resolvet::convert_identifier(
   {
     // a regular struct or union member
 
-    const symbolt &compound_symbol =
-      cpp_typecheck.lookup(identifier.class_identifier);
+    const symbolt *compound_ptr =
+      cpp_typecheck.symbol_table.lookup(identifier.class_identifier);
+    if(!compound_ptr)
+    {
+      exprt nil;
+      nil.make_nil();
+      return nil;
+    }
+    const symbolt &compound_symbol = *compound_ptr;
 
     CHECK_RETURN(
       compound_symbol.type.id() == ID_struct ||
@@ -845,7 +852,18 @@ exprt cpp_typecheck_resolvet::convert_identifier(
       {
         // this has to be a method or form a pointer-to-member expression
         if(identifier.is_method)
-          e = cpp_symbol_expr(cpp_typecheck.lookup(identifier.identifier));
+        {
+          const symbolt *sym_ptr =
+            cpp_typecheck.symbol_table.lookup(identifier.identifier);
+          if(!sym_ptr)
+          {
+            e.make_nil();
+          }
+          else
+          {
+            e = cpp_symbol_expr(*sym_ptr);
+          }
+        }
         else
         {
           e.id(ID_ptrmember);
@@ -861,7 +879,15 @@ exprt cpp_typecheck_resolvet::convert_identifier(
   }
   else
   {
-    const symbolt &symbol = cpp_typecheck.lookup(identifier.identifier);
+    const symbolt *sym_ptr =
+      cpp_typecheck.symbol_table.lookup(identifier.identifier);
+    if(!sym_ptr)
+    {
+      exprt nil;
+      nil.make_nil();
+      return nil;
+    }
+    const symbolt &symbol = *sym_ptr;
 
     if(symbol.is_type)
     {
