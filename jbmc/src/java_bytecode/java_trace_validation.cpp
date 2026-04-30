@@ -21,7 +21,7 @@ Author: Jeannie Moulton
 bool check_symbol_structure(const exprt &expr)
 {
   const auto symbol = expr_try_dynamic_cast<symbol_exprt>(expr);
-  return symbol && !symbol->get_identifier().empty();
+  return symbol && !symbol->identifier().empty();
 }
 
 /// \return true iff the expression is a symbol or is an expression whose first

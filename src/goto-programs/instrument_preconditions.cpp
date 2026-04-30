@@ -19,7 +19,7 @@ std::vector<goto_programt::const_targett> get_preconditions(
   const symbol_exprt &function,
   const goto_functionst &goto_functions)
 {
-  const irep_idt &identifier=function.get_identifier();
+  const irep_idt &identifier = function.identifier();
 
   auto f_it=goto_functions.function_map.find(identifier);
   if(f_it==goto_functions.function_map.end())

@@ -223,7 +223,7 @@ void interval_domaint::havoc_rec(const exprt &lhs)
   }
   else if(lhs.id()==ID_symbol)
   {
-    irep_idt identifier=to_symbol_expr(lhs).get_identifier();
+    irep_idt identifier = to_symbol_expr(lhs).identifier();
 
     if(is_int(lhs.type()))
       int_map.erase(identifier);
@@ -274,7 +274,7 @@ void interval_domaint::assume_rec(
 
   if(lhs.id() == ID_symbol && rhs.is_constant())
   {
-    irep_idt lhs_identifier=to_symbol_expr(lhs).get_identifier();
+    irep_idt lhs_identifier = to_symbol_expr(lhs).identifier();
 
     if(is_int(lhs.type()) && is_int(rhs.type()))
     {
@@ -299,7 +299,7 @@ void interval_domaint::assume_rec(
   }
   else if(lhs.is_constant() && rhs.id() == ID_symbol)
   {
-    irep_idt rhs_identifier=to_symbol_expr(rhs).get_identifier();
+    irep_idt rhs_identifier = to_symbol_expr(rhs).identifier();
 
     if(is_int(lhs.type()) && is_int(rhs.type()))
     {
@@ -324,8 +324,8 @@ void interval_domaint::assume_rec(
   }
   else if(lhs.id()==ID_symbol && rhs.id()==ID_symbol)
   {
-    irep_idt lhs_identifier=to_symbol_expr(lhs).get_identifier();
-    irep_idt rhs_identifier=to_symbol_expr(rhs).get_identifier();
+    irep_idt lhs_identifier = to_symbol_expr(lhs).identifier();
+    irep_idt rhs_identifier = to_symbol_expr(rhs).identifier();
 
     if(is_int(lhs.type()) && is_int(rhs.type()))
     {
@@ -409,7 +409,7 @@ exprt interval_domaint::make_expression(const symbol_exprt &src) const
 {
   if(is_int(src.type()))
   {
-    int_mapt::const_iterator i_it=int_map.find(src.get_identifier());
+    int_mapt::const_iterator i_it = int_map.find(src.identifier());
     if(i_it==int_map.end())
       return true_exprt();
 
@@ -437,7 +437,7 @@ exprt interval_domaint::make_expression(const symbol_exprt &src) const
   }
   else if(is_float(src.type()))
   {
-    float_mapt::const_iterator i_it=float_map.find(src.get_identifier());
+    float_mapt::const_iterator i_it = float_map.find(src.identifier());
     if(i_it==float_map.end())
       return true_exprt();
 

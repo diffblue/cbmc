@@ -51,7 +51,7 @@ void functions_in_scope_visitort::operator()(const goto_programt &prog)
       }
       else
       {
-        const irep_idt &fun_name = to_symbol_expr(function).get_identifier();
+        const irep_idt &fun_name = to_symbol_expr(function).identifier();
         if(function_set.find(fun_name) == function_set.end())
         {
           function_set.insert(fun_name);
@@ -99,7 +99,7 @@ void find_is_fresh_calls_visitort::operator()(goto_programt &prog)
 
       if(function.id() == ID_symbol)
       {
-        const irep_idt &fun_name = to_symbol_expr(function).get_identifier();
+        const irep_idt &fun_name = to_symbol_expr(function).identifier();
 
         if(fun_name == (CPROVER_PREFIX + std::string("is_fresh")))
         {
@@ -230,7 +230,7 @@ void is_fresh_baset::update_fn_call(
   }
 
   // fixing the function name.
-  to_symbol_expr(ins->call_function()).set_identifier(fn_name);
+  to_symbol_expr(ins->call_function()).identifier(fn_name);
 
   // pass the memory mmap
   ins->call_arguments().push_back(address_of_exprt(

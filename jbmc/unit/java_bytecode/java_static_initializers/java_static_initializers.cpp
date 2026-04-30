@@ -93,7 +93,7 @@ SCENARIO("get_user_specified_clinit_body", "[core][java_static_initializers]")
       const exprt function_called =
         make_query(clinit_body)[0].as<code_function_callt>().get().function();
       REQUIRE(
-        make_query(function_called).as<symbol_exprt>().get().get_identifier() ==
+        make_query(function_called).as<symbol_exprt>().get().identifier() ==
         clinit_symbol.name);
     }
   }
@@ -175,10 +175,8 @@ SCENARIO("get_user_specified_clinit_body", "[core][java_static_initializers]")
     {
       auto assignment = make_query(clinit_body)[0].as<code_assignt>().get();
       REQUIRE(
-        make_query(assignment.lhs())
-          .as<symbol_exprt>()
-          .get()
-          .get_identifier() == "field_name_for_codet");
+        make_query(assignment.lhs()).as<symbol_exprt>().get().identifier() ==
+        "field_name_for_codet");
       REQUIRE(assignment.rhs() == from_integer(42, java_int_type()));
     }
   }

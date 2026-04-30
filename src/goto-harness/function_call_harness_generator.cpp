@@ -476,7 +476,7 @@ function_call_harness_generatort::implt::declare_arguments(
     auto argument = allocate_objects.allocate_automatic_local_object(
       remove_const(parameter.type()), parameter.get_base_name());
     parameter_name_to_argument_name.insert(
-      {parameter.get_base_name(), argument.get_identifier()});
+      {parameter.get_base_name(), argument.identifier()});
     arguments.push_back(argument);
   }
 

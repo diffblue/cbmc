@@ -91,7 +91,7 @@ void slice_global_inits(
       if(!*seen_it && instruction.is_assign())
       {
         const irep_idt id =
-          to_symbol_expr(instruction.assign_lhs()).get_identifier();
+          to_symbol_expr(instruction.assign_lhs()).identifier();
 
         // if we are to keep the left-hand side, then we also need to keep all
         // symbols occurring in the right-hand side

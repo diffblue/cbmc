@@ -69,7 +69,7 @@ xmlt full_lhs_value(const goto_trace_stept &step, const namespacet &ns)
 
   const auto &lhs_object = step.get_lhs_object();
   const irep_idt identifier =
-    lhs_object.has_value() ? lhs_object->get_identifier() : irep_idt();
+    lhs_object.has_value() ? lhs_object->identifier() : irep_idt();
   value_xml.data = get_printable_xml(ns, identifier, value);
 
   const auto &bv_type = type_try_dynamic_cast<bitvector_typet>(value.type());
@@ -129,7 +129,7 @@ void convert(
     {
       auto lhs_object = step.get_lhs_object();
       irep_idt identifier =
-        lhs_object.has_value() ? lhs_object->get_identifier() : irep_idt();
+        lhs_object.has_value() ? lhs_object->identifier() : irep_idt();
       xmlt &xml_assignment = dest.new_element("assignment");
 
       if(!xml_location.name.empty())
@@ -140,7 +140,7 @@ void convert(
 
         if(
           lhs_object.has_value() &&
-          !ns.lookup(lhs_object->get_identifier(), symbol))
+          !ns.lookup(lhs_object->identifier(), symbol))
         {
           std::string type_string =
             from_type(ns, symbol->name, step.full_lhs.type());

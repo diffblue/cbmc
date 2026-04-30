@@ -249,7 +249,7 @@ std::pair<binding_exprt::variablest, exprt> smt2_parsert::binding(irep_idt id)
   for(auto &b : bindings)
   {
     auto insert_result =
-      id_map.insert({b.get_identifier(), idt{idt::BINDING, b.type()}});
+      id_map.insert({b.identifier(), idt{idt::BINDING, b.type()}});
     if(!insert_result.second) // already there
     {
       auto &id_entry = *insert_result.first;
@@ -266,7 +266,7 @@ std::pair<binding_exprt::variablest, exprt> smt2_parsert::binding(irep_idt id)
 
   // remove bindings from id_map
   for(const auto &b : bindings)
-    id_map.erase(b.get_identifier());
+    id_map.erase(b.identifier());
 
   // restore any previous ids
   for(auto &saved_id : saved_ids)
@@ -565,7 +565,7 @@ exprt smt2_parsert::function_application()
             const symbol_exprt symbol_expr(
               smt2_tokenizer.get_buffer(), bool_typet());
             named_terms.emplace(
-              symbol_expr.get_identifier(), named_termt(term, symbol_expr));
+              symbol_expr.identifier(), named_termt(term, symbol_expr));
           }
           else
             throw error("invalid name attribute, expected symbol");

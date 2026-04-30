@@ -30,7 +30,7 @@ TEST_CASE("Constructor of ssa_exprt", "[unit][util][ssa_expr]")
       const ssa_exprt ssa{index};
       THEN("the ssa_exprt has identifier 'sym..array_field[[9]]'")
       {
-        REQUIRE(ssa.get_identifier() == "sym..array_field[[9]]");
+        REQUIRE(ssa.identifier() == "sym..array_field[[9]]");
         REQUIRE(ssa.get_l1_object_identifier() == "sym..array_field[[9]]");
       }
       THEN("the ssa_exprt has no level set")
@@ -58,7 +58,7 @@ TEST_CASE("Set level", "[unit][util][ssa_expr]")
       REQUIRE(ssa.get_level_1() == irep_idt{});
       REQUIRE(ssa.get_level_2() == irep_idt{});
       REQUIRE(ssa.get_original_expr() == symbol);
-      REQUIRE(ssa.get_identifier() == "sym!1");
+      REQUIRE(ssa.identifier() == "sym!1");
       REQUIRE(ssa.get_l1_object_identifier() == "sym!1");
     }
 
@@ -69,7 +69,7 @@ TEST_CASE("Set level", "[unit][util][ssa_expr]")
       REQUIRE(ssa.get_level_1() == "3");
       REQUIRE(ssa.get_level_2() == irep_idt{});
       REQUIRE(ssa.get_original_expr() == symbol);
-      REQUIRE(ssa.get_identifier() == "sym@3");
+      REQUIRE(ssa.identifier() == "sym@3");
       REQUIRE(ssa.get_l1_object_identifier() == "sym@3");
     }
 
@@ -80,7 +80,7 @@ TEST_CASE("Set level", "[unit][util][ssa_expr]")
       REQUIRE(ssa.get_level_1() == irep_idt{});
       REQUIRE(ssa.get_level_2() == "7");
       REQUIRE(ssa.get_original_expr() == symbol);
-      REQUIRE(ssa.get_identifier() == "sym#7");
+      REQUIRE(ssa.identifier() == "sym#7");
       REQUIRE(ssa.get_l1_object_identifier() == "sym");
     }
   }
@@ -114,7 +114,7 @@ TEST_CASE("Set expression", "[unit][util][ssa_expr]")
       }
       THEN("The identifiers are updated")
       {
-        REQUIRE(ssa.get_identifier() == "sym!1@3#7[[9]]");
+        REQUIRE(ssa.identifier() == "sym!1@3#7[[9]]");
         REQUIRE(ssa.get_l1_object_identifier() == "sym!1@3[[9]]");
       }
     }
@@ -168,7 +168,7 @@ TEST_CASE("ssa_exprt::get_l1_object", "[unit][util][ssa_expr]")
     ssa.set_level_2(7);
 
     // Check we have constructed the desired SSA expression
-    REQUIRE(ssa.get_identifier() == "sym!1@3#7");
+    REQUIRE(ssa.identifier() == "sym!1@3#7");
 
     WHEN("get_l1_object is called on the SSA expression")
     {
@@ -178,7 +178,7 @@ TEST_CASE("ssa_exprt::get_l1_object", "[unit][util][ssa_expr]")
         REQUIRE(l1_object.get_level_0() == "1");
         REQUIRE(l1_object.get_level_1() == "3");
         REQUIRE(l1_object.get_level_2() == irep_idt{});
-        REQUIRE(l1_object.get_identifier() == "sym!1@3");
+        REQUIRE(l1_object.identifier() == "sym!1@3");
       }
     }
   }
@@ -197,7 +197,7 @@ TEST_CASE("ssa_exprt::get_l1_object", "[unit][util][ssa_expr]")
     ssa.set_level_2(7);
 
     // Check we have constructed the desired SSA expression
-    REQUIRE(ssa.get_identifier() == "sym!1@3#7..array_field[[9]]");
+    REQUIRE(ssa.identifier() == "sym!1@3#7..array_field[[9]]");
 
     WHEN("get_l1_object is called on the SSA expression")
     {
@@ -207,7 +207,7 @@ TEST_CASE("ssa_exprt::get_l1_object", "[unit][util][ssa_expr]")
         REQUIRE(l1_object.get_level_0() == "1");
         REQUIRE(l1_object.get_level_1() == "3");
         REQUIRE(l1_object.get_level_2() == irep_idt{});
-        REQUIRE(l1_object.get_identifier() == "sym!1@3");
+        REQUIRE(l1_object.identifier() == "sym!1@3");
       }
     }
   }

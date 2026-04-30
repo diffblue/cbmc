@@ -320,8 +320,7 @@ SCENARIO(
           {
             if(
               symbol_expr->source_location().get_java_bytecode_index() == "0" &&
-              symbol_expr->get_identifier() ==
-                "java::ClassReadingStaticField.x")
+              symbol_expr->identifier() == "java::ClassReadingStaticField.x")
               found = true;
           }
         });
@@ -1029,12 +1028,12 @@ TEST_CASE(
   // Assert side effects on variables
   REQUIRE(variables.size() == 3);
   REQUIRE(
-    variables[0][0].symbol_expr.get_identifier() ==
+    variables[0][0].symbol_expr.identifier() ==
     id2string(method_id) + "::this");
   REQUIRE(
-    variables[1][0].symbol_expr.get_identifier() ==
+    variables[1][0].symbol_expr.identifier() ==
     id2string(method_id) + "::this$0");
   REQUIRE(
-    variables[2][0].symbol_expr.get_identifier() ==
+    variables[2][0].symbol_expr.identifier() ==
     id2string(method_id) + "::other");
 }

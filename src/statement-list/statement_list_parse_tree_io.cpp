@@ -238,7 +238,7 @@ void output_instruction(
         expr_try_dynamic_cast<symbol_exprt>(expr);
       if(symbol)
       {
-        os << '\t' << symbol->get_identifier();
+        os << '\t' << symbol->identifier();
         continue;
       }
       const constant_exprt *const constant =

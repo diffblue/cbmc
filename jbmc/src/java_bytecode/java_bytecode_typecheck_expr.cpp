@@ -67,7 +67,7 @@ void java_bytecode_typecheckt::typecheck_expr_java_new_array(
 
 void java_bytecode_typecheckt::typecheck_expr_symbol(symbol_exprt &expr)
 {
-  const irep_idt &identifier = expr.get_identifier();
+  const irep_idt &identifier = expr.identifier();
 
   // the java_bytecode_convert_class and java_bytecode_convert_method made sure
   // "identifier" exists in the symbol table

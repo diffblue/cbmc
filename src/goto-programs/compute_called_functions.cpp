@@ -34,7 +34,7 @@ void compute_address_taken_functions(
     {
       const exprt &target = address.object();
       if(target.id() == ID_symbol)
-        address_taken.insert(to_symbol_expr(target).get_identifier());
+        address_taken.insert(to_symbol_expr(target).identifier());
     }
   }
 }
@@ -49,7 +49,7 @@ void compute_functions(
 
   if(src.type().id()==ID_code &&
      src.id()==ID_symbol)
-    address_taken.insert(to_symbol_expr(src).get_identifier());
+    address_taken.insert(to_symbol_expr(src).identifier());
 }
 
 /// get all functions whose address is taken

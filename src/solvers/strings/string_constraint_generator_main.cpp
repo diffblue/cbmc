@@ -189,7 +189,7 @@ static irep_idt get_function_name(const function_application_exprt &expr)
   const exprt &name = expr.function();
   PRECONDITION(name.id() == ID_symbol);
   PRECONDITION(!is_ssa_expr(name));
-  return to_symbol_expr(name).get_identifier();
+  return to_symbol_expr(name).identifier();
 }
 
 std::optional<exprt>

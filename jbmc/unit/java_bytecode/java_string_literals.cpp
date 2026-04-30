@@ -28,7 +28,7 @@ TEST_CASE(
   generate_class_stub("java.lang.String", symbol_table, message_handler, {});
   REQUIRE(symbol_table.lookup(
     get_or_create_string_literal_symbol("foo", symbol_table, false)
-      .get_identifier()));
+      .identifier()));
 
   create_java_initialize(symbol_table);
   symbol_table.get_writeable_ref(INITIALIZE_FUNCTION).value = code_blockt{};

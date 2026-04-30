@@ -168,7 +168,7 @@ static std::string type2name(
     const exprt &size = to_array_type(type).size();
 
     if(size.id() == ID_symbol)
-      result += "ARR" + id2string(to_symbol_expr(size).get_identifier());
+      result += "ARR" + id2string(to_symbol_expr(size).identifier());
     else
     {
       const auto size_int = numeric_cast<mp_integer>(size);

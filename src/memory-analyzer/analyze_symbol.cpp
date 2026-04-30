@@ -193,7 +193,7 @@ symbol_tablet gdb_value_extractort::get_snapshot_as_symbol_table()
   for(const auto &pair : assignments)
   {
     const symbol_exprt &symbol_expr = to_symbol_expr(pair.first);
-    const irep_idt id = symbol_expr.get_identifier();
+    const irep_idt id = symbol_expr.identifier();
 
     INVARIANT(symbol_table.has_symbol(id), "symbol must exist in symbol table");
 
@@ -455,8 +455,8 @@ exprt gdb_value_extractort::get_non_char_pointer_value(
       return known_value;
     if(known_value.is_not_nil() && known_value.type() != expected_type)
     {
-      return symbol_exprt{to_symbol_expr(known_value).get_identifier(),
-                          expected_type};
+      return symbol_exprt{
+        to_symbol_expr(known_value).identifier(), expected_type};
     }
     return known_value;
   }

@@ -206,7 +206,7 @@ exprt java_bytecode_convert_methodt::variable(
   const variablet &var=
     find_variable_for_slot(address, var_list);
 
-  if(!var.symbol_expr.get_identifier().empty())
+  if(!var.symbol_expr.identifier().empty())
     return var.symbol_expr;
 
   // an unnamed local variable
@@ -952,7 +952,7 @@ static void gather_symbol_live_ranges(
     const auto &symexpr=to_symbol_expr(e);
     auto findit = result.emplace(
       std::piecewise_construct,
-      std::forward_as_tuple(symexpr.get_identifier()),
+      std::forward_as_tuple(symexpr.identifier()),
       std::forward_as_tuple(symexpr, pc, 1));
     if(!findit.second)
     {
@@ -1895,9 +1895,9 @@ java_bytecode_convert_methodt::convert_instructions(const methodt &method)
   // Add anonymous locals to the symtab:
   for(const auto &var : used_local_names)
   {
-    symbolt new_symbol{var.get_identifier(), var.type(), ID_java};
+    symbolt new_symbol{var.identifier(), var.type(), ID_java};
     new_symbol.base_name=var.get(ID_C_base_name);
-    new_symbol.pretty_name=strip_java_namespace_prefix(var.get_identifier());
+    new_symbol.pretty_name = strip_java_namespace_prefix(var.identifier());
     new_symbol.is_file_local=true;
     new_symbol.is_thread_local=true;
     new_symbol.is_lvalue=true;
@@ -1982,11 +1982,11 @@ java_bytecode_convert_methodt::convert_instructions(const methodt &method)
 
   for(const auto &v : tmp_vars)
     vars_to_process.push_back(
-      &temporary_variable_live_ranges.at(v.get_identifier()));
+      &temporary_variable_live_ranges.at(v.identifier()));
 
   for(const auto &v : used_local_names)
     vars_to_process.push_back(
-      &temporary_variable_live_ranges.at(v.get_identifier()));
+      &temporary_variable_live_ranges.at(v.identifier()));
 
   for(const auto vp : vars_to_process)
   {
@@ -2012,7 +2012,7 @@ java_bytecode_convert_methodt::convert_instructions(const methodt &method)
     if(v.is_parameter)
       continue;
     // Skip anonymous variables:
-    if(v.symbol_expr.get_identifier().empty())
+    if(v.symbol_expr.identifier().empty())
       continue;
     auto &block = get_block_for_pcrange(
       root,
@@ -2674,7 +2674,7 @@ code_blockt java_bytecode_convert_methodt::convert_putstatic(
     "stack_static_field",
     block,
     bytecode_write_typet::STATIC_FIELD,
-    symbol_expr.get_identifier());
+    symbol_expr.identifier());
   block.add(code_assignt(symbol_expr, op[0]));
   return block;
 }
@@ -2834,7 +2834,7 @@ code_blockt java_bytecode_convert_methodt::convert_iinc(
     "stack_iinc",
     block,
     bytecode_write_typet::VARIABLE,
-    to_symbol_expr(locvar).get_identifier());
+    to_symbol_expr(locvar).identifier());
 
   const exprt arg1_int_type =
     typecast_exprt::conditional_cast(arg1, java_int_type());
@@ -3039,7 +3039,7 @@ code_blockt java_bytecode_convert_methodt::convert_store(
   const source_locationt &location)
 {
   const exprt var = variable(arg0, statement[0], address);
-  const irep_idt &var_name = to_symbol_expr(var).get_identifier();
+  const irep_idt &var_name = to_symbol_expr(var).identifier();
 
   code_blockt block;
   block.add_source_location() = location;
@@ -3390,7 +3390,7 @@ void java_bytecode_convert_methodt::save_stack_entries(
     [&identifier](const exprt &expr) {
       const auto symbol_expr = expr_try_dynamic_cast<symbol_exprt>(expr);
       return !symbol_expr ? tvt::unknown()
-                          : tvt(symbol_expr->get_identifier() == identifier);
+                          : tvt(symbol_expr->identifier() == identifier);
     };
 
   // Function that checks whether the expression is a dereference

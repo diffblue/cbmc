@@ -190,7 +190,7 @@ is_procedure_local(const irep_idt &function_identifier, const exprt &lhs)
   else if(lhs.id() == ID_symbol)
   {
     const auto &symbol_expr = to_symbol_expr(lhs);
-    return symbol_expr.get_identifier().starts_with(
+    return symbol_expr.identifier().starts_with(
       id2string(function_identifier) + "::");
   }
   else
@@ -202,7 +202,7 @@ static bool is_old(const exprt &lhs)
   if(lhs.id() == ID_symbol)
   {
     const auto &symbol_expr = to_symbol_expr(lhs);
-    return symbol_expr.get_identifier().starts_with("old::");
+    return symbol_expr.identifier().starts_with("old::");
   }
   else
     return false;

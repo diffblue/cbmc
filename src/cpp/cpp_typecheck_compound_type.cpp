@@ -774,7 +774,7 @@ void cpp_typecheckt::check_fixed_size_array(typet &type)
       if(array_type.size().id() == ID_symbol)
       {
         const symbol_exprt &s = to_symbol_expr(array_type.size());
-        const symbolt &symbol = lookup(s.get_identifier());
+        const symbolt &symbol = lookup(s.identifier());
 
         if(cpp_is_pod(symbol.type) && symbol.type.get_bool(ID_C_constant))
           array_type.size() = symbol.value;

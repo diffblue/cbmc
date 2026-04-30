@@ -330,7 +330,7 @@ exprt smt2_convt::get(const exprt &expr) const
 {
   if(expr.id()==ID_symbol)
   {
-    const irep_idt &id=to_symbol_expr(expr).get_identifier();
+    const irep_idt &id = to_symbol_expr(expr).identifier();
 
     identifier_mapt::const_iterator it=identifier_map.find(id);
 
@@ -1198,7 +1198,7 @@ void smt2_convt::convert_floatbv(const exprt &expr)
 
   if(expr.id()==ID_symbol)
   {
-    const irep_idt &id = to_symbol_expr(expr).get_identifier();
+    const irep_idt &id = to_symbol_expr(expr).identifier();
     out << convert_identifier(id);
     return;
   }
@@ -1252,7 +1252,7 @@ void smt2_convt::convert_expr(const exprt &expr)
   // huge monster case split over expression id
   if(expr.id()==ID_symbol)
   {
-    const irep_idt &id = to_symbol_expr(expr).get_identifier();
+    const irep_idt &id = to_symbol_expr(expr).identifier();
     DATA_INVARIANT(!id.empty(), "symbol must have identifier");
     out << convert_identifier(id);
   }
@@ -1905,7 +1905,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     out << "(! ";
     convert(named_term_expr.value());
     out << " :named "
-        << convert_identifier(named_term_expr.symbol().get_identifier()) << ')';
+        << convert_identifier(named_term_expr.symbol().identifier()) << ')';
   }
   else if(expr.id()==ID_with)
   {
@@ -5111,8 +5111,8 @@ void smt2_convt::set_to(const exprt &expr, bool value)
 
     if(equal_expr.lhs().id()==ID_symbol)
     {
-      const irep_idt &identifier=
-        to_symbol_expr(equal_expr.lhs()).get_identifier();
+      const irep_idt &identifier =
+        to_symbol_expr(equal_expr.lhs()).identifier();
 
       if(
         identifier_map.find(identifier) == identifier_map.end() &&
@@ -5324,7 +5324,7 @@ void smt2_convt::find_symbols(const exprt &expr)
     const auto &q_expr = to_quantifier_expr(expr);
     for(const auto &symbol : q_expr.variables())
     {
-      const auto identifier = symbol.get_identifier();
+      const auto identifier = symbol.identifier();
       auto id_entry =
         identifier_map.insert({identifier, identifiert{symbol.type(), true}});
       shadowed_syms.insert(
@@ -5358,7 +5358,7 @@ void smt2_convt::find_symbols(const exprt &expr)
     irep_idt identifier;
 
     if(expr.id()==ID_symbol)
-      identifier=to_symbol_expr(expr).get_identifier();
+      identifier = to_symbol_expr(expr).identifier();
     else
       identifier="nondet_"+
         id2string(to_nondet_symbol_expr(expr).get_identifier());

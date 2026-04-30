@@ -69,11 +69,10 @@ static bool references_class_model(const exprt &expr)
 
   for(auto it = expr.depth_begin(); it != expr.depth_end(); ++it)
   {
-    if(can_cast_expr<symbol_exprt>(*it) &&
-       it->type() == class_type &&
-       has_suffix(
-         id2string(to_symbol_expr(*it).get_identifier()),
-         JAVA_CLASS_MODEL_SUFFIX))
+    if(
+      can_cast_expr<symbol_exprt>(*it) && it->type() == class_type &&
+      has_suffix(
+        id2string(to_symbol_expr(*it).identifier()), JAVA_CLASS_MODEL_SUFFIX))
     {
       return true;
     }
@@ -527,8 +526,8 @@ void ci_lazy_methodst::gather_needed_globals(
     // on an opaque type (i.e. we don't have the class definition at this point)
     // and will be created during the typecheck phase.
     // We don't mark it as 'needed' as it doesn't exist yet to keep.
-    const auto findit=
-      symbol_table.symbols.find(to_symbol_expr(e).get_identifier());
+    const auto findit =
+      symbol_table.symbols.find(to_symbol_expr(e).identifier());
     if(findit!=symbol_table.symbols.end() &&
        findit->second.is_static_lifetime)
     {

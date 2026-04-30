@@ -53,7 +53,7 @@ void dfcc_pointer_in_ranget::rewrite_calls(
 
       if(function.id() == ID_symbol)
       {
-        const irep_idt &fun_name = to_symbol_expr(function).get_identifier();
+        const irep_idt &fun_name = to_symbol_expr(function).identifier();
 
         if(has_prefix(
              id2string(fun_name), CPROVER_PREFIX "pointer_in_range_dfcc"))
@@ -64,7 +64,7 @@ void dfcc_pointer_in_ranget::rewrite_calls(
 
           // fix the function name.
           to_symbol_expr(target->call_function())
-            .set_identifier(
+            .identifier(
               library.dfcc_fun_symbol[dfcc_funt::POINTER_IN_RANGE_DFCC].name);
 
           // pass the may_fail flag

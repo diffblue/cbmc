@@ -427,9 +427,8 @@ void format_expr_configt::setup()
   };
 
   expr_map[ID_symbol] =
-    [](std::ostream &os, const exprt &expr) -> std::ostream & {
-    return os << to_symbol_expr(expr).get_identifier();
-  };
+    [](std::ostream &os, const exprt &expr) -> std::ostream &
+  { return os << to_symbol_expr(expr).identifier(); };
 
   expr_map[ID_index] =
     [](std::ostream &os, const exprt &expr) -> std::ostream & {

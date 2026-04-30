@@ -617,7 +617,7 @@ void generate_function_bodies(
     if(expr.id() != ID_symbol)
       return false;
     std::string called_function_name =
-      id2string(to_symbol_expr(expr).get_identifier());
+      id2string(to_symbol_expr(expr).identifier());
     if(called_function_name == function_name)
       return true;
 

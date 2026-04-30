@@ -95,8 +95,7 @@ aliasingt aliasing(
   // the trivial case first
   if(e1.id()==ID_symbol && e2.id()==ID_symbol)
   {
-    if(to_symbol_expr(e1).get_identifier()==
-       to_symbol_expr(e2).get_identifier())
+    if(to_symbol_expr(e1).identifier() == to_symbol_expr(e2).identifier())
       return aliasingt::A_MUST;
     else
       return aliasingt::A_MUSTNOT;

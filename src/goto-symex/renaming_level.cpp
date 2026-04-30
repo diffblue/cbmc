@@ -49,7 +49,7 @@ void symex_level1t::insert(
   std::size_t index)
 {
   current_names.insert(
-    ssa.get().get_identifier(), std::make_pair(ssa.get(), index));
+    ssa.get().identifier(), std::make_pair(ssa.get(), index));
 }
 
 std::optional<std::pair<ssa_exprt, std::size_t>>
@@ -57,7 +57,7 @@ symex_level1t::insert_or_replace(
   const renamedt<ssa_exprt, L0> &ssa,
   std::size_t index)
 {
-  const irep_idt &identifier = ssa.get().get_identifier();
+  const irep_idt &identifier = ssa.get().identifier();
   const auto old_value = current_names.find(identifier);
   if(old_value)
   {
@@ -71,7 +71,7 @@ symex_level1t::insert_or_replace(
 
 bool symex_level1t::has(const renamedt<ssa_exprt, L0> &ssa) const
 {
-  return current_names.has_key(ssa.get().get_identifier());
+  return current_names.has_key(ssa.get().identifier());
 }
 
 renamedt<ssa_exprt, L1> symex_level1t::
@@ -103,7 +103,7 @@ operator()(renamedt<ssa_exprt, L1> l1_expr) const
 {
   if(!l1_expr.get().get_level_2().empty())
     return renamedt<ssa_exprt, L2>{std::move(l1_expr.value())};
-  l1_expr.value().set_level_2(latest_index(l1_expr.get().get_identifier()));
+  l1_expr.value().set_level_2(latest_index(l1_expr.get().identifier()));
   return renamedt<ssa_exprt, L2>{std::move(l1_expr.value())};
 }
 

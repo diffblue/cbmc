@@ -271,7 +271,7 @@ void c_safety_checks(
       const auto &function = it->call_function();
       if(function.id() == ID_symbol)
       {
-        const auto &identifier = to_symbol_expr(function).get_identifier();
+        const auto &identifier = to_symbol_expr(function).identifier();
         if(identifier == "free")
         {
           if(

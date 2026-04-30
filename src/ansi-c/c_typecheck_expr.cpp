@@ -845,7 +845,7 @@ void c_typecheck_baset::typecheck_expr_operands(exprt &expr)
 
 void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
 {
-  irep_idt identifier=to_symbol_expr(expr).get_identifier();
+  irep_idt identifier = to_symbol_expr(expr).identifier();
 
   // Is it a parameter? We do this while checking parameter lists.
   id_type_mapt::const_iterator p_it=parameter_map.find(identifier);
@@ -863,7 +863,7 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
   if(entry!=asm_label_map.end())
   {
     identifier=entry->second;
-    to_symbol_expr(expr).set_identifier(identifier);
+    to_symbol_expr(expr).identifier(identifier);
   }
 
   // look it up
@@ -2006,7 +2006,7 @@ void c_typecheck_baset::typecheck_typed_target_call(
 {
   INVARIANT(
     expr.function().id() == ID_symbol &&
-      to_symbol_expr(expr.function()).get_identifier() == CPROVER_PREFIX
+      to_symbol_expr(expr.function()).identifier() == CPROVER_PREFIX
         "typed_target",
     "expression must be a " CPROVER_PREFIX "typed_target function call");
 
@@ -2040,7 +2040,7 @@ void c_typecheck_baset::typecheck_typed_target_call(
   }
 
   // rewrite call to "assignable"
-  f_op.set_identifier(CPROVER_PREFIX "assignable");
+  f_op.identifier(CPROVER_PREFIX "assignable");
   exprt::operandst arguments;
   // pointer
   arguments.push_back(address_of_exprt(arg0));
@@ -2061,7 +2061,7 @@ void c_typecheck_baset::typecheck_obeys_contract_call(
 {
   INVARIANT(
     expr.function().id() == ID_symbol &&
-      to_symbol_expr(expr.function()).get_identifier() == CPROVER_PREFIX
+      to_symbol_expr(expr.function()).identifier() == CPROVER_PREFIX
         "obeys_contract",
     "expression must be a " CPROVER_PREFIX "obeys_contract function call");
 
@@ -2148,7 +2148,7 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
 
   if(f_op.id()==ID_symbol)
   {
-    irep_idt identifier=to_symbol_expr(f_op).get_identifier();
+    irep_idt identifier = to_symbol_expr(f_op).identifier();
 
     asm_label_mapt::const_iterator entry=
       asm_label_map.find(identifier);
@@ -2401,8 +2401,7 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
       else if(
         auto shadow_memory_builtin = typecheck_shadow_memory_builtin(expr))
       {
-        irep_idt shadow_memory_builtin_id =
-          shadow_memory_builtin->get_identifier();
+        irep_idt shadow_memory_builtin_id = shadow_memory_builtin->identifier();
 
         const auto builtin_code_type =
           to_code_type(shadow_memory_builtin->type());
@@ -2434,7 +2433,7 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
         auto gcc_polymorphic = typecheck_gcc_polymorphic_builtin(
           identifier, expr.arguments(), f_op.source_location()))
       {
-        irep_idt identifier_with_type = gcc_polymorphic->get_identifier();
+        irep_idt identifier_with_type = gcc_polymorphic->identifier();
         auto &parameters = to_code_type(gcc_polymorphic->type()).parameters();
         INVARIANT(
           !parameters.empty(),
@@ -2456,7 +2455,7 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
             id2string(identifier) + "_" +
             type_to_partial_identifier(parameters.front().type(), *this);
         }
-        gcc_polymorphic->set_identifier(identifier_with_type);
+        gcc_polymorphic->identifier(identifier_with_type);
 
         if(!symbol_table.has_symbol(identifier_with_type))
         {
@@ -2633,7 +2632,7 @@ exprt c_typecheck_baset::do_special_functions(
   if(f_op.id()!=ID_symbol)
     return nil_exprt();
 
-  const irep_idt &identifier=to_symbol_expr(f_op).get_identifier();
+  const irep_idt &identifier = to_symbol_expr(f_op).identifier();
 
   if(identifier == CPROVER_PREFIX "pointer_equals")
   {
@@ -3891,7 +3890,7 @@ exprt c_typecheck_baset::typecheck_builtin_overflow(
   side_effect_expr_function_callt &expr,
   const irep_idt &arith_op)
 {
-  const irep_idt &identifier = to_symbol_expr(expr.function()).get_identifier();
+  const irep_idt &identifier = to_symbol_expr(expr.function()).identifier();
 
   // check function signature
   if(expr.arguments().size() != 3)
@@ -3953,7 +3952,7 @@ exprt c_typecheck_baset::typecheck_builtin_overflow(
 exprt c_typecheck_baset::typecheck_saturating_arithmetic(
   const side_effect_expr_function_callt &expr)
 {
-  const irep_idt &identifier = to_symbol_expr(expr.function()).get_identifier();
+  const irep_idt &identifier = to_symbol_expr(expr.function()).identifier();
 
   // check function signature
   if(expr.arguments().size() != 2)
@@ -4773,7 +4772,7 @@ protected:
     if(e.id() == ID_symbol)
     {
       return e.type().id() == ID_code ||
-             ns.lookup(to_symbol_expr(e).get_identifier()).is_static_lifetime;
+             ns.lookup(to_symbol_expr(e).identifier()).is_static_lifetime;
     }
     else if(e.id() == ID_array && e.get_bool(ID_C_string_constant))
       return true;

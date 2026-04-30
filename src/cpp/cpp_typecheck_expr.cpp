@@ -1170,7 +1170,7 @@ void cpp_typecheckt::typecheck_expr_member(
       {
         // it must be a static component
         const struct_typet::componentt &pcomp =
-          type.get_component(to_symbol_expr(symbol_expr).get_identifier());
+          type.get_component(to_symbol_expr(symbol_expr).identifier());
 
         if(pcomp.is_nil())
         {

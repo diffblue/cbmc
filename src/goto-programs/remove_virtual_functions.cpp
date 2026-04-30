@@ -103,7 +103,7 @@ static void create_static_function_call(
   // type (in Java, for example, we see ArrayList.add(ArrayList::E arg)
   // overriding Collection.add(Collection::E arg))
   const auto &callee_parameters =
-    to_code_type(ns.lookup(function_symbol.get_identifier()).type).parameters();
+    to_code_type(ns.lookup(function_symbol.identifier()).type).parameters();
   auto &call_args = call.arguments();
 
   INVARIANT(
@@ -360,9 +360,8 @@ static goto_programt::targett replace_virtual_function_with_dispatch_table(
   for(auto it=functions.crbegin(), itend=functions.crend(); it!=itend; ++it)
   {
     const auto &fun=*it;
-    irep_idt id_or_empty = fun.symbol_expr.has_value()
-                             ? fun.symbol_expr->get_identifier()
-                             : irep_idt();
+    irep_idt id_or_empty =
+      fun.symbol_expr.has_value() ? fun.symbol_expr->identifier() : irep_idt();
     auto insertit = calls.insert({id_or_empty, goto_programt::targett()});
 
     // Only create one call sequence per possible target:
@@ -523,7 +522,7 @@ void get_virtual_calleest::get_child_functions_rec(
     if(
       it != entry_map.end() &&
       (!it->second.symbol_expr.has_value() ||
-       !it->second.symbol_expr->get_identifier().starts_with(
+       !it->second.symbol_expr->identifier().starts_with(
          "java::java.lang.Object")))
     {
       continue;
@@ -610,13 +609,12 @@ void get_virtual_calleest::get_functions(
   std::sort(
     functions.begin(),
     functions.end(),
-    [](const dispatch_table_entryt &a, const dispatch_table_entryt &b) {
-      irep_idt a_id = a.symbol_expr.has_value()
-                        ? a.symbol_expr->get_identifier()
-                        : irep_idt();
-      irep_idt b_id = b.symbol_expr.has_value()
-                        ? b.symbol_expr->get_identifier()
-                        : irep_idt();
+    [](const dispatch_table_entryt &a, const dispatch_table_entryt &b)
+    {
+      irep_idt a_id =
+        a.symbol_expr.has_value() ? a.symbol_expr->identifier() : irep_idt();
+      irep_idt b_id =
+        b.symbol_expr.has_value() ? b.symbol_expr->identifier() : irep_idt();
 
       if(a_id.starts_with("java::java.lang.Object"))
         return false;

@@ -90,8 +90,7 @@ SCENARIO(
         REQUIRE(annotations.size() == 1);
         const auto &annotation = annotations.front();
         const auto &element_value_pair = annotation.element_value_pairs.front();
-        const auto &id =
-          to_symbol_expr(element_value_pair.value).get_identifier();
+        const auto &id = to_symbol_expr(element_value_pair.value).identifier();
         const auto &java_type = java_type_from_string(id2string(id));
         const std::string &class_name = id2string(
           to_struct_tag_type(to_reference_type(*java_type).base_type())
@@ -116,8 +115,7 @@ SCENARIO(
         REQUIRE(annotations.size() == 1);
         const auto &annotation = annotations.front();
         const auto &element_value_pair = annotation.element_value_pairs.front();
-        const auto &id =
-          to_symbol_expr(element_value_pair.value).get_identifier();
+        const auto &id = to_symbol_expr(element_value_pair.value).identifier();
         const auto &java_type = java_type_from_string(id2string(id));
         REQUIRE(*java_type == java_byte_type());
       }
@@ -138,8 +136,7 @@ SCENARIO(
         REQUIRE(annotations.size() == 1);
         const auto &annotation = annotations.front();
         const auto &element_value_pair = annotation.element_value_pairs.front();
-        const auto &id =
-          to_symbol_expr(element_value_pair.value).get_identifier();
+        const auto &id = to_symbol_expr(element_value_pair.value).identifier();
         const auto &java_type = java_type_from_string(id2string(id));
         REQUIRE(*java_type == java_void_type());
       }

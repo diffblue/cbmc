@@ -88,8 +88,7 @@ void goto_symext::trigger_auto_object(const exprt &expr, statet &state)
         if(symbol.base_name.starts_with("symex::auto_object"))
         {
           // done already?
-          if(!state.get_level2().current_names.has_key(
-               ssa_expr.get_identifier()))
+          if(!state.get_level2().current_names.has_key(ssa_expr.identifier()))
           {
             initialize_auto_object(e, state);
           }

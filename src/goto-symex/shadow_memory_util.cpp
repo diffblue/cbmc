@@ -282,9 +282,9 @@ void replace_invalid_object_by_null(exprt &expr)
 {
   if(
     expr.id() == ID_symbol && expr.type().id() == ID_pointer &&
-    (id2string(to_symbol_expr(expr).get_identifier()).rfind("invalid_object") !=
+    (id2string(to_symbol_expr(expr).identifier()).rfind("invalid_object") !=
        std::string::npos ||
-     id2string(to_symbol_expr(expr).get_identifier()).rfind("$object") !=
+     id2string(to_symbol_expr(expr).identifier()).rfind("$object") !=
        std::string::npos))
   {
     expr = null_pointer_exprt(to_pointer_type(expr.type()));

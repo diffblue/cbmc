@@ -120,7 +120,7 @@ static std::string comment(const rw_set_baset::entryt &entry, bool write)
 
 static bool is_shared(const namespacet &ns, const symbol_exprt &symbol_expr)
 {
-  const irep_idt &identifier=symbol_expr.get_identifier();
+  const irep_idt &identifier = symbol_expr.identifier();
 
   if(
     identifier == CPROVER_PREFIX "alloc" ||

@@ -152,7 +152,7 @@ void instrument_spec_assignst::check_inclusion_assignment(
   // Don't check assignable for CPROVER symbol
   if(
     lhs.id() == ID_symbol &&
-    has_prefix(id2string(to_symbol_expr(lhs).get_identifier()), CPROVER_PREFIX))
+    has_prefix(id2string(to_symbol_expr(lhs).identifier()), CPROVER_PREFIX))
   {
     return;
   }
@@ -263,7 +263,7 @@ void instrument_spec_assignst::traverse_instructions(
       PRECONDITION_WITH_DIAGNOSTICS(
         fun_expr.id() == ID_symbol,
         "Local static search requires function pointer removal");
-      const irep_idt &fun_id = to_symbol_expr(fun_expr).get_identifier();
+      const irep_idt &fun_id = to_symbol_expr(fun_expr).identifier();
 
       const auto &found = functions.function_map.find(fun_id);
       INVARIANT(
@@ -391,7 +391,7 @@ void instrument_spec_assignst::instrument_instructions(
         // are not automatically tracked in the stack_allocated map,
         // so to be writable these variables must be listed in the assigns
         // clause.
-        log.warning() << "Found a `DEAD` variable " << symbol.get_identifier()
+        log.warning() << "Found a `DEAD` variable " << symbol.identifier()
                       << " without corresponding `DECL`, at: "
                       << instruction_it->source_location() << messaget::eom;
       }
@@ -507,7 +507,7 @@ car_exprt instrument_spec_assignst::create_car_expr(
     const auto &funcall = to_side_effect_expr_function_call(target);
     if(can_cast_expr<symbol_exprt>(funcall.function()))
     {
-      const auto &ident = to_symbol_expr(funcall.function()).get_identifier();
+      const auto &ident = to_symbol_expr(funcall.function()).identifier();
 
       PRECONDITION_WITH_DIAGNOSTICS(
         ident == CPROVER_PREFIX "object_from" ||
@@ -940,7 +940,7 @@ bool instrument_spec_assignst::must_check_assign(
   {
     const auto &symbol_expr = to_symbol_expr(target->assign_lhs());
 
-    if(cfg_info.is_local(symbol_expr.get_identifier()))
+    if(cfg_info.is_local(symbol_expr.identifier()))
     {
       log.debug() << LOG_HEADER
                   << "skipping checking on assignment to local symbol "
@@ -1003,7 +1003,7 @@ bool instrument_spec_assignst::must_track_decl(
   const goto_programt::const_targett &target) const
 {
   log.debug().source_location = target->source_location();
-  if(must_track_decl_or_dead(target->decl_symbol().get_identifier()))
+  if(must_track_decl_or_dead(target->decl_symbol().identifier()))
   {
     log.debug() << LOG_HEADER << "explicitly tracking "
                 << format(target->decl_symbol()) << " as assignable"
@@ -1024,7 +1024,7 @@ bool instrument_spec_assignst::must_track_decl(
 bool instrument_spec_assignst::must_track_dead(
   const goto_programt::const_targett &target) const
 {
-  return must_track_decl_or_dead(target->dead_symbol().get_identifier());
+  return must_track_decl_or_dead(target->dead_symbol().identifier());
 }
 
 void instrument_spec_assignst::instrument_assign_statement(
@@ -1048,7 +1048,7 @@ void instrument_spec_assignst::instrument_call_statement(
     "a function call");
 
   const auto &callee_name =
-    to_symbol_expr(instruction_it->call_function()).get_identifier();
+    to_symbol_expr(instruction_it->call_function()).identifier();
 
   if(callee_name == "malloc")
   {

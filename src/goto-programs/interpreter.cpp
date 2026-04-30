@@ -703,8 +703,8 @@ void interpretert::assign(
       if(show)
       {
         output.status() << total_steps << " ** assigning "
-                        << address_to_symbol(address_val).get_identifier()
-                        << "[" << address_to_offset(address_val)
+                        << address_to_symbol(address_val).identifier() << "["
+                        << address_to_offset(address_val)
                         << "]:=" << rhs[numeric_cast_v<std::size_t>(i)] << "\n"
                         << messaget::eom;
       }
@@ -751,7 +751,7 @@ void interpretert::execute_function_call()
 #if 0
   const memory_cellt &cell=memory[address];
 #endif
-  const irep_idt identifier = address_to_symbol(address).get_identifier();
+  const irep_idt identifier = address_to_symbol(address).identifier();
   trace_step.called_function = identifier;
 
   const goto_functionst::function_mapt::const_iterator f_it=
@@ -817,7 +817,7 @@ void interpretert::execute_function_call()
   else
   {
     list_input_varst::iterator it =
-      function_input_vars.find(to_symbol_expr(call_function).get_identifier());
+      function_input_vars.find(to_symbol_expr(call_function).identifier());
 
     if(it!=function_input_vars.end())
     {
@@ -910,15 +910,15 @@ mp_integer interpretert::build_memory_map(const symbol_exprt &symbol_expr)
 {
   typet alloc_type = concretize_type(symbol_expr.type());
   mp_integer size=get_size(alloc_type);
-  auto it = dynamic_types.find(symbol_expr.get_identifier());
+  auto it = dynamic_types.find(symbol_expr.identifier());
 
   if(it!=dynamic_types.end())
   {
-    mp_integer address = memory_map[symbol_expr.get_identifier()];
+    mp_integer address = memory_map[symbol_expr.identifier()];
     mp_integer current_size=base_address_to_alloc_size(address);
     // current size <= size already recorded
     if(size<=current_size)
-      return memory_map[symbol_expr.get_identifier()];
+      return memory_map[symbol_expr.identifier()];
   }
 
   // The current size is bigger then the one previously recorded
@@ -929,10 +929,10 @@ mp_integer interpretert::build_memory_map(const symbol_exprt &symbol_expr)
 
   mp_integer address=memory.size();
   memory.resize(numeric_cast_v<std::size_t>(address + size));
-  memory_map[symbol_expr.get_identifier()] = address;
+  memory_map[symbol_expr.identifier()] = address;
   inverse_memory_map[address] = symbol_expr;
   dynamic_types.insert(
-    std::pair<const irep_idt, typet>(symbol_expr.get_identifier(), alloc_type));
+    std::pair<const irep_idt, typet>(symbol_expr.identifier(), alloc_type));
 
   return address;
 }
@@ -1048,7 +1048,7 @@ void interpretert::print_memory(bool input_flags)
   {
     mp_integer i=cell_address.first;
     const memory_cellt &cell=cell_address.second;
-    const auto identifier = address_to_symbol(i).get_identifier();
+    const auto identifier = address_to_symbol(i).identifier();
     const auto offset=address_to_offset(i);
     output.status() << identifier << "[" << offset << "]"
                     << "=" << cell.value << messaget::eom;

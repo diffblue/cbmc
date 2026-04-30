@@ -23,7 +23,7 @@ void rename_symbolt::insert(
   const symbol_exprt &old_expr,
   const symbol_exprt &new_expr)
 {
-  insert_expr(old_expr.get_identifier(), new_expr.get_identifier());
+  insert_expr(old_expr.identifier(), new_expr.identifier());
 }
 
 bool rename_symbolt::rename(exprt &dest) const
@@ -45,13 +45,13 @@ bool rename_symbolt::rename(exprt &dest) const
     if(it->id()==ID_symbol)
     {
       expr_mapt::const_iterator entry =
-        expr_map.find(to_symbol_expr(*it).get_identifier());
+        expr_map.find(to_symbol_expr(*it).identifier());
 
       if(entry != expr_map.end())
       {
         if(!modifiable_expr)
           modifiable_expr = &it.mutate();
-        to_symbol_expr(*modifiable_expr).set_identifier(entry->second);
+        to_symbol_expr(*modifiable_expr).identifier(entry->second);
         result = false;
       }
     }
@@ -94,7 +94,7 @@ bool rename_symbolt::have_to_rename(const exprt &dest) const
 
   if(dest.id()==ID_symbol)
   {
-    const irep_idt &identifier = to_symbol_expr(dest).get_identifier();
+    const irep_idt &identifier = to_symbol_expr(dest).identifier();
     return expr_map.find(identifier) != expr_map.end();
   }
 

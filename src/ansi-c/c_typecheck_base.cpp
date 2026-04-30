@@ -739,7 +739,7 @@ void c_typecheck_baset::check_history_expr_return_value(
     if(!can_cast_expr<symbol_exprt>(expr))
       return false;
 
-    return to_symbol_expr(expr).get_identifier() == id;
+    return to_symbol_expr(expr).identifier() == id;
   };
 
   if(!has_subexpr(expr, pred))
@@ -760,7 +760,7 @@ void c_typecheck_baset::check_was_freed(
     if(!can_cast_expr<symbol_exprt>(expr))
       return false;
 
-    return to_symbol_expr(expr).get_identifier() == id;
+    return to_symbol_expr(expr).identifier() == id;
   };
 
   if(has_subexpr(expr, pred))
@@ -963,7 +963,7 @@ void c_typecheck_baset::typecheck_declaration(
         }
 
         for(const auto &parameter_sym : temporary_parameter_symbols)
-          parameter_map.erase(parameter_sym.get_identifier());
+          parameter_map.erase(parameter_sym.identifier());
 
         // create a contract symbol
         symbolt contract;

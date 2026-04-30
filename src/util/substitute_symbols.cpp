@@ -19,7 +19,7 @@ static std::optional<exprt> substitute_symbols_rec(
 {
   if(src.id() == ID_symbol)
   {
-    auto s_it = substitutions.find(to_symbol_expr(src).get_identifier());
+    auto s_it = substitutions.find(to_symbol_expr(src).identifier());
     if(s_it == substitutions.end())
       return {};
     else
@@ -34,7 +34,7 @@ static std::optional<exprt> substitute_symbols_rec(
     // which may hide some of our substitutions
     auto new_substitutions = substitutions;
     for(const auto &variable : binding_expr.variables())
-      new_substitutions.erase(variable.get_identifier());
+      new_substitutions.erase(variable.identifier());
 
     auto op_result =
       substitute_symbols_rec(new_substitutions, binding_expr.where());
@@ -56,7 +56,7 @@ static std::optional<exprt> substitute_symbols_rec(
     // which may hide some of our substitutions
     auto new_substitutions = substitutions;
     for(const auto &variable : binding_expr.variables())
-      new_substitutions.erase(variable.get_identifier());
+      new_substitutions.erase(variable.identifier());
 
     bool op_changed = false;
 

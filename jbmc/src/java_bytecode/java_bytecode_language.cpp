@@ -518,10 +518,10 @@ static symbol_exprt get_or_create_class_literal_symbol(
   symbol_exprt symbol_expr(
     id2string(class_id) + JAVA_CLASS_MODEL_SUFFIX,
     java_lang_Class);
-  if(!symbol_table.has_symbol(symbol_expr.get_identifier()))
+  if(!symbol_table.has_symbol(symbol_expr.identifier()))
   {
     symbolt new_class_symbol{
-      symbol_expr.get_identifier(), symbol_expr.type(), ID_java};
+      symbol_expr.identifier(), symbol_expr.type(), ID_java};
     INVARIANT(
       new_class_symbol.name.starts_with("java::"),
       "class identifier should have 'java::' prefix");
@@ -1241,7 +1241,7 @@ static void notify_static_method_calls(
         const symbol_exprt *fn_sym =
           expr_try_dynamic_cast<symbol_exprt>(fn_call->function());
         if(fn_sym)
-          needed_lazy_methods->add_needed_method(fn_sym->get_identifier());
+          needed_lazy_methods->add_needed_method(fn_sym->identifier());
       }
       else if(
         it->id() == ID_side_effect &&

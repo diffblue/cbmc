@@ -448,8 +448,8 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_address_of(
 
   if(tmp0_object.id() == ID_symbol && tmp1_object.id() == ID_symbol)
   {
-    bool equal = to_symbol_expr(tmp0_object).get_identifier() ==
-                 to_symbol_expr(tmp1_object).get_identifier();
+    bool equal = to_symbol_expr(tmp0_object).identifier() ==
+                 to_symbol_expr(tmp1_object).identifier();
 
     return make_boolean_expr(expr.id() == ID_equal ? equal : !equal);
   }
@@ -581,7 +581,7 @@ simplify_exprt::simplify_is_dynamic_object(const unary_exprt &expr)
 
     if(op_object.id() == ID_symbol)
     {
-      const irep_idt identifier = to_symbol_expr(op_object).get_identifier();
+      const irep_idt identifier = to_symbol_expr(op_object).identifier();
 
       // this is for the benefit of symex
       return make_boolean_expr(

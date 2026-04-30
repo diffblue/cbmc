@@ -64,7 +64,7 @@ static bool is_call_to(
   const exprt &callee_expr = inst->call_function();
   if(callee_expr.id() != ID_symbol)
     return false;
-  return to_symbol_expr(callee_expr).get_identifier() == callee;
+  return to_symbol_expr(callee_expr).identifier() == callee;
 }
 
 static bool is_assume_false(goto_programt::const_targett inst)

@@ -1416,7 +1416,7 @@ void goto_convertt::convert_switch(
     convert(copy_value, side_effects.side_effects, mode);
 
     argument = new_symbol.symbol_expr();
-    side_effects.add_temporary(to_symbol_expr(argument).get_identifier());
+    side_effects.add_temporary(to_symbol_expr(argument).identifier());
   }
 
   // save break/default/cases targets
@@ -2183,7 +2183,7 @@ irep_idt goto_convertt::make_temp_symbol(
 
   expr = new_symbol.symbol_expr();
 
-  return to_symbol_expr(expr).get_identifier();
+  return to_symbol_expr(expr).identifier();
 }
 
 void goto_convert(

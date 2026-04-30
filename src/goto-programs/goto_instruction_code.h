@@ -147,7 +147,7 @@ public:
 
   const irep_idt &get_identifier() const
   {
-    return symbol().get_identifier();
+    return symbol().identifier();
   }
 
   static void check(
@@ -220,7 +220,7 @@ public:
 
   const irep_idt &get_identifier() const
   {
-    return symbol().get_identifier();
+    return symbol().identifier();
   }
 
   static void check(
@@ -233,7 +233,7 @@ public:
       vm,
       code.op0().id() == ID_symbol,
       "declaring a non-symbol: " +
-        id2string(to_symbol_expr(code.op0()).get_identifier()));
+        id2string(to_symbol_expr(code.op0()).identifier()));
   }
 };
 

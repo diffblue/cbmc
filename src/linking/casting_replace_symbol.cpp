@@ -82,7 +82,7 @@ bool casting_replace_symbolt::replace(exprt &dest) const
 
 bool casting_replace_symbolt::replace_symbol_expr(symbol_exprt &s) const
 {
-  expr_mapt::const_iterator it = expr_map.find(s.get_identifier());
+  expr_mapt::const_iterator it = expr_map.find(s.identifier());
 
   if(it == expr_map.end())
     return true;

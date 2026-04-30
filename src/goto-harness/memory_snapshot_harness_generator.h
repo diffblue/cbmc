@@ -281,7 +281,7 @@ protected:
   void collect_references(const exprt &expr, Adder &&add_reference) const
   {
     if(expr.id() == ID_symbol)
-      add_reference(to_symbol_expr(expr).get_identifier());
+      add_reference(to_symbol_expr(expr).identifier());
     for(const auto &operand : expr.operands())
     {
       collect_references(operand, add_reference);

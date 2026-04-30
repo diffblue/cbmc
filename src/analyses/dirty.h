@@ -72,7 +72,7 @@ public:
   bool operator()(const symbol_exprt &expr) const
   {
     die_if_uninitialized();
-    return operator()(expr.get_identifier());
+    return operator()(expr.identifier());
   }
 
   const std::unordered_set<irep_idt> &get_dirty_ids() const

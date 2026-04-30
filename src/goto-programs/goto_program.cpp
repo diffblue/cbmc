@@ -329,7 +329,7 @@ void goto_programt::get_decl_identifiers(
       DATA_INVARIANT(
         instruction.code().operands().size() == 1,
         "declaration statement expects one operand");
-      decl_identifiers.insert(instruction.decl_symbol().get_identifier());
+      decl_identifiers.insert(instruction.decl_symbol().identifier());
     }
   }
 }
@@ -808,7 +808,7 @@ void goto_programt::instructiont::validate(
       if(e.id() == ID_symbol)
       {
         const auto &goto_symbol_expr = to_symbol_expr(e);
-        const auto &goto_id = goto_symbol_expr.get_identifier();
+        const auto &goto_id = goto_symbol_expr.identifier();
 
         const symbolt *table_symbol;
         if(!ns.lookup(goto_id, table_symbol))
@@ -944,9 +944,9 @@ void goto_programt::instructiont::validate(
       source_location());
     DATA_CHECK_WITH_DIAGNOSTICS(
       vm,
-      !ns.lookup(decl_symbol().get_identifier(), table_symbol),
+      !ns.lookup(decl_symbol().identifier(), table_symbol),
       "declared symbols should be known",
-      id2string(decl_symbol().get_identifier()),
+      id2string(decl_symbol().identifier()),
       source_location());
     break;
   case DEAD:
@@ -957,9 +957,9 @@ void goto_programt::instructiont::validate(
       source_location());
     DATA_CHECK_WITH_DIAGNOSTICS(
       vm,
-      !ns.lookup(dead_symbol().get_identifier(), table_symbol),
+      !ns.lookup(dead_symbol().identifier(), table_symbol),
       "removed symbols should be known",
-      id2string(dead_symbol().get_identifier()),
+      id2string(dead_symbol().identifier()),
       source_location());
     break;
   case FUNCTION_CALL:

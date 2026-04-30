@@ -115,9 +115,8 @@ void variable_encoding(std::vector<exprt> &constraints)
   std::sort(
     variables.begin(),
     variables.end(),
-    [](const symbol_exprt &a, const symbol_exprt &b) {
-      return id2string(a.get_identifier()) < id2string(b.get_identifier());
-    });
+    [](const symbol_exprt &a, const symbol_exprt &b)
+    { return id2string(a.identifier()) < id2string(b.identifier()); });
 
   for(auto &c : constraints)
     c = variable_encoding(c, variables);

@@ -211,7 +211,7 @@ void expr2stlt::convert(const symbol_exprt &expr)
     result << REFERENCE_FLAG;
     is_reference = false;
   }
-  result << id2string(id_shorthand(expr.get_identifier()));
+  result << id2string(id_shorthand(expr.identifier()));
 }
 
 void expr2stlt::convert_multiary_bool(

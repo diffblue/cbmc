@@ -182,9 +182,9 @@ void finalize_linking(
       const symbolt &symbol = symbol_pair.second;
 
       INVARIANT(symbol.value.id() == ID_symbol, "must have symbol");
-      const irep_idt &id = to_symbol_expr(symbol.value).get_identifier();
+      const irep_idt &id = to_symbol_expr(symbol.value).identifier();
 
-      #if 0
+#if 0
       if(!base_type_eq(symbol.type, ns.lookup(id).type, ns))
       {
         std::cerr << symbol << '\n';
@@ -192,7 +192,7 @@ void finalize_linking(
       }
       INVARIANT(base_type_eq(symbol.type, ns.lookup(id).type, ns),
                 "type matches");
-      #endif
+#endif
 
       macro_application.insert_expr(symbol.name, id);
     }

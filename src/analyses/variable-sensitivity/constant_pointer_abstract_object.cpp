@@ -159,7 +159,7 @@ void constant_pointer_abstract_objectt::output(
       {
         const symbol_exprt &symbol_pointed_to(to_symbol_expr(addressee));
 
-        out << symbol_pointed_to.get_identifier();
+        out << symbol_pointed_to.identifier();
       }
       else if(addressee.id() == ID_dynamic_object)
       {
@@ -172,7 +172,7 @@ void constant_pointer_abstract_objectt::output(
         if(array.id() == ID_symbol)
         {
           auto const &array_symbol = to_symbol_expr(array);
-          out << array_symbol.get_identifier() << "[";
+          out << array_symbol.identifier() << "[";
           if(array_index.index().is_constant())
             out << to_constant_expr(array_index.index()).get_value();
           else
@@ -340,8 +340,8 @@ exprt symbol_ptr_comparison_expr(
   exprt const &lhs,
   exprt const &rhs)
 {
-  auto const &lhs_identifier = to_symbol_expr(lhs).get_identifier();
-  auto const &rhs_identifier = to_symbol_expr(rhs).get_identifier();
+  auto const &lhs_identifier = to_symbol_expr(lhs).identifier();
+  auto const &rhs_identifier = to_symbol_expr(rhs).identifier();
 
   if(id == ID_equal)
     return to_bool_expr(lhs_identifier == rhs_identifier);

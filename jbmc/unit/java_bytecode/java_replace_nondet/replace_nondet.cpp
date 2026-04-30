@@ -67,7 +67,7 @@ void validate_nondet_method_removed(
       if(function.id() != ID_symbol)
         continue;
 
-      const irep_idt function_id = to_symbol_expr(function).get_identifier();
+      const irep_idt function_id = to_symbol_expr(function).identifier();
       if(
         function_id ==
         "java::org.cprover.CProver.nondetWithoutNull:()"

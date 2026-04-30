@@ -850,7 +850,7 @@ void dfcc_instrumentt::instrument_call_instruction(
     {
       // this is a function call
       if(!do_not_instrument(
-           to_symbol_expr(target->call_function()).get_identifier()))
+           to_symbol_expr(target->call_function()).identifier()))
       {
         // pass write set argument only if function is known to be instrumented
         target->call_arguments().push_back(write_set);
@@ -876,7 +876,7 @@ void dfcc_instrumentt::instrument_deallocate_call(
   INVARIANT(target->is_function_call(), "target must be a function call");
   INVARIANT(
     target->call_function().id() == ID_symbol &&
-      (id2string(to_symbol_expr(target->call_function()).get_identifier()) ==
+      (id2string(to_symbol_expr(target->call_function()).identifier()) ==
        CPROVER_PREFIX "deallocate"),
     "target must be a call to" CPROVER_PREFIX "deallocate");
 
@@ -958,7 +958,7 @@ void dfcc_instrumentt::instrument_function_call(
   const auto &call_function = target->call_function();
   if(
     call_function.id() == ID_symbol &&
-    (id2string(to_symbol_expr(call_function).get_identifier()) == CPROVER_PREFIX
+    (id2string(to_symbol_expr(call_function).identifier()) == CPROVER_PREFIX
      "deallocate"))
   {
     instrument_deallocate_call(function_id, write_set, target, goto_program);

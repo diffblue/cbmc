@@ -48,14 +48,13 @@ void graphml_witnesst::remove_l0_l1(exprt &expr)
       expr=to_ssa_expr(expr).get_original_expr();
     else
     {
-      std::string identifier=
-        id2string(to_symbol_expr(expr).get_identifier());
+      std::string identifier = id2string(to_symbol_expr(expr).identifier());
 
       std::string::size_type l0_l1=identifier.find_first_of("!@");
       if(l0_l1!=std::string::npos)
       {
         identifier.resize(l0_l1);
-        to_symbol_expr(expr).set_identifier(identifier);
+        to_symbol_expr(expr).identifier(identifier);
       }
     }
 
@@ -262,7 +261,7 @@ static bool contains_symbol_prefix(const exprt &expr, const std::string &prefix)
 {
   if(
     expr.id() == ID_symbol &&
-    to_symbol_expr(expr).get_identifier().starts_with(prefix))
+    to_symbol_expr(expr).identifier().starts_with(prefix))
   {
     return true;
   }
@@ -489,7 +488,7 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
         it->type == goto_trace_stept::typet::ASSIGNMENT &&
         lhs_object.has_value())
       {
-        const std::string &lhs_id = id2string(lhs_object->get_identifier());
+        const std::string &lhs_id = id2string(lhs_object->identifier());
         if(lhs_id.find("pthread_create::thread") != std::string::npos)
         {
           xmlt &data_t = edge.new_element("data");

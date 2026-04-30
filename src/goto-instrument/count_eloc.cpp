@@ -180,7 +180,7 @@ void print_global_state_size(const goto_modelt &goto_model)
         if(ode.root_object().id() == ID_symbol)
         {
           const symbol_exprt &symbol_expr = to_symbol_expr(ode.root_object());
-          initialized.insert(symbol_expr.get_identifier());
+          initialized.insert(symbol_expr.identifier());
         }
       }
     }

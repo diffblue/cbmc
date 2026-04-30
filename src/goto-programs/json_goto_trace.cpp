@@ -69,7 +69,7 @@ void convert_decl(
   auto lhs_object=step.get_lhs_object();
 
   irep_idt identifier =
-    lhs_object.has_value()?lhs_object->get_identifier():irep_idt();
+    lhs_object.has_value() ? lhs_object->identifier() : irep_idt();
 
   json_assignment["stepType"] = json_stringt("assignment");
 
