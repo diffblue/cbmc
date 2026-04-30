@@ -12,16 +12,16 @@ Author: Michael Tautschnig
 #ifndef CPROVER_LINKING_LINKING_DIAGNOSTICS_H
 #define CPROVER_LINKING_LINKING_DIAGNOSTICS_H
 
+#include <util/namespace.h>
 #include <util/std_expr.h>
 #include <util/symbol.h>
 
 class message_handlert;
-class namespacet;
 
 class linking_diagnosticst
 {
 public:
-  linking_diagnosticst(message_handlert &message_handler, namespacet &ns)
+  linking_diagnosticst(message_handlert &message_handler, const namespacet &ns)
     : message_handler(message_handler), ns(ns)
   {
   }
@@ -54,7 +54,7 @@ public:
 
 protected:
   message_handlert &message_handler;
-  const namespacet &ns;
+  const namespacet ns;
 
   std::string
   type_to_string_verbose(const symbolt &symbol, const typet &type) const;

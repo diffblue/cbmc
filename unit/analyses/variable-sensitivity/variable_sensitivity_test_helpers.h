@@ -21,7 +21,7 @@ class value_set_abstract_objectt;
 class variable_sensitivity_domaint;
 
 std::shared_ptr<const constant_abstract_valuet>
-make_constant(exprt val, abstract_environmentt &env, namespacet &ns);
+make_constant(exprt val, abstract_environmentt &env, const namespacet &ns);
 
 std::shared_ptr<const constant_abstract_valuet> make_top_constant();
 std::shared_ptr<const constant_abstract_valuet> make_bottom_constant();
@@ -30,25 +30,25 @@ std::shared_ptr<const interval_abstract_valuet> make_interval(
   const exprt &vall,
   const exprt &valh,
   abstract_environmentt &env,
-  namespacet &ns);
+  const namespacet &ns);
 std::shared_ptr<const interval_abstract_valuet> make_interval(
   const binary_relation_exprt &val,
   abstract_environmentt &env,
-  namespacet &ns);
+  const namespacet &ns);
 std::shared_ptr<const interval_abstract_valuet> make_interval(
   const constant_interval_exprt &val,
   abstract_environmentt &env,
-  namespacet &ns);
+  const namespacet &ns);
 std::shared_ptr<const interval_abstract_valuet> make_top_interval();
 std::shared_ptr<const interval_abstract_valuet> make_bottom_interval();
 
 std::shared_ptr<const value_set_abstract_objectt>
-make_value_set(exprt val, abstract_environmentt &env, namespacet &ns);
+make_value_set(exprt val, abstract_environmentt &env, const namespacet &ns);
 
 std::shared_ptr<const value_set_abstract_objectt> make_value_set(
   const std::vector<exprt> &vals,
   abstract_environmentt &env,
-  namespacet &ns);
+  const namespacet &ns);
 
 std::shared_ptr<const value_set_abstract_objectt> make_bottom_value_set();
 std::shared_ptr<const value_set_abstract_objectt> make_top_value_set();
@@ -89,18 +89,18 @@ void EXPECT_INDEX(
   int index,
   int expected,
   abstract_environmentt &environment,
-  namespacet &ns);
+  const namespacet &ns);
 void EXPECT_INDEX(
   std::shared_ptr<const abstract_objectt> &result,
   int index,
   std::vector<int> expected,
   abstract_environmentt &environment,
-  namespacet &ns);
+  const namespacet &ns);
 void EXPECT_INDEX_TOP(
   std::shared_ptr<const abstract_objectt> &result,
   int index,
   abstract_environmentt &environment,
-  namespacet &ns);
+  const namespacet &ns);
 
 void EXPECT_TOP(std::shared_ptr<const abstract_objectt> result);
 
@@ -241,31 +241,31 @@ std::shared_ptr<const abstract_objectt> add(
   const abstract_object_pointert &op1,
   const abstract_object_pointert &op2,
   abstract_environmentt &environment,
-  namespacet &ns);
+  const namespacet &ns);
 
 std::shared_ptr<const constant_abstract_valuet> add_as_constant(
   const abstract_object_pointert &op1,
   const abstract_object_pointert &op2,
   abstract_environmentt &environment,
-  namespacet &ns);
+  const namespacet &ns);
 
 std::shared_ptr<const interval_abstract_valuet> add_as_interval(
   const abstract_object_pointert &op1,
   const abstract_object_pointert &op2,
   abstract_environmentt &environment,
-  namespacet &ns);
+  const namespacet &ns);
 
 std::shared_ptr<const value_set_abstract_objectt> add_as_value_set(
   const abstract_object_pointert &op1,
   const abstract_object_pointert &op2,
   abstract_environmentt &environment,
-  namespacet &ns);
+  const namespacet &ns);
 std::shared_ptr<const value_set_abstract_objectt> add_as_value_set(
   const abstract_object_pointert &op1,
   const abstract_object_pointert &op2,
   const abstract_object_pointert &op3,
   abstract_environmentt &environment,
-  namespacet &ns);
+  const namespacet &ns);
 
 exprt to_expr(int v);
 std::string expr_to_str(const exprt &expr);
