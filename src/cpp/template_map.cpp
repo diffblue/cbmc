@@ -258,6 +258,43 @@ void template_mapt::apply(typet &type) const
       if(s.id() == ID_template_args)
       {
         irept::subt &args = s.add(ID_arguments).get_sub();
+        // Expand parameter packs in template arguments.
+        // Before applying substitutions, check if any arg is a
+        // pack parameter and replace it with all pack args.
+        irept::subt expanded_args;
+        for(auto &arg : args)
+        {
+          bool was_pack = false;
+          if(arg.id() == ID_type)
+          {
+            const typet &arg_type =
+              static_cast<const exprt &>(arg).type();
+            if(arg_type.id() == ID_template_parameter_symbol_type)
+            {
+              const irep_idt &param_id =
+                to_template_parameter_symbol_type(arg_type)
+                  .get_identifier();
+              for(const auto &pack_entry : pack_args_map)
+              {
+                if(pack_entry.first == param_id)
+                {
+                  // Replace with all pack args
+                  for(const auto &pack_type : pack_entry.second)
+                  {
+                    expanded_args.push_back(
+                      static_cast<const irept &>(type_exprt{pack_type}));
+                  }
+                  was_pack = true;
+                  break;
+                }
+              }
+            }
+          }
+          if(!was_pack)
+            expanded_args.push_back(arg);
+        }
+        args = expanded_args;
+
         for(auto &arg : args)
           apply(static_cast<exprt &>(arg));
         // Remove empty-type arguments produced by empty parameter
