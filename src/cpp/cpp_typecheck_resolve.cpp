@@ -3157,6 +3157,15 @@ resolved_after_strip:
                 };
                 eval_calls(val);
               }
+              // Store the evaluated constant back in the symbol table
+              // so subsequent lookups get the constant directly.
+              if(val.is_constant())
+              {
+                symbolt *writable =
+                  cpp_typecheck.symbol_table.get_writeable(inst_sym.name);
+                if(writable)
+                  writable->value = val;
+              }
               val.add_source_location() = source_location;
               identifiers.push_back(val);
               handled_variable_template = true;
