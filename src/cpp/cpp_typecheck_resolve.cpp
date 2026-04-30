@@ -1135,6 +1135,28 @@ void cpp_typecheck_resolvet::disambiguate_functions(
       if(!dominated[i])
         identifiers.push_back(old_identifiers[i]);
     }
+
+    // If still ambiguous, prefer candidates with resolved return
+    // types over those with unresolved 'auto'.  This handles the
+    // case where a more specialized template (e.g., _Ty* _Unfancy)
+    // ties with a generic one (auto _Unfancy) after instantiation.
+    if(identifiers.size() > 1)
+    {
+      resolve_identifierst resolved;
+      for(const auto &id : identifiers)
+      {
+        if(id.type().id() != ID_code)
+        {
+          resolved.push_back(id);
+          continue;
+        }
+        const auto &ret = to_code_type(id.type()).return_type();
+        if(ret.id() != ID_auto)
+          resolved.push_back(id);
+      }
+      if(!resolved.empty() && resolved.size() < identifiers.size())
+        identifiers = resolved;
+    }
   }
   else
   {
