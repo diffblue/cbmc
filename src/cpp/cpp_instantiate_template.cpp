@@ -393,16 +393,22 @@ exprt try_evaluate_constexpr(
   const auto &function = call.function();
   const auto &arguments = call.arguments();
 
-  // All arguments must be constants (or address_of(constant) for
-  // reference parameters).
+  // All arguments must be constants (or address_of for reference
+  // parameters, possibly wrapping a temporary with a constant value).
   for(const auto &arg : arguments)
   {
     if(arg.is_constant())
       continue;
-    if(
-      arg.id() == ID_address_of &&
-      to_address_of_expr(arg).object().is_constant())
-      continue;
+    if(arg.id() == ID_address_of)
+    {
+      const auto &obj = to_address_of_expr(arg).object();
+      if(obj.is_constant())
+        continue;
+      if(
+        obj.id() == ID_side_effect && obj.operands().size() == 1 &&
+        obj.operands()[0].is_constant())
+        continue;
+    }
     return nil_exprt();
   }
 
@@ -437,21 +443,24 @@ exprt try_evaluate_constexpr(
     return nil_exprt();
 
   // Build a variable map: parameter → constant value
-  // For reference parameters (address_of(constant)), unwrap to the constant.
+  // For reference parameters, unwrap address_of and temporaries.
   std::map<irep_idt, exprt> vars;
   for(std::size_t i = 0; i < params.size(); ++i)
   {
-    if(
-      arguments[i].id() == ID_address_of &&
-      to_address_of_expr(arguments[i]).object().is_constant())
+    if(arguments[i].id() == ID_address_of)
     {
-      vars[params[i].get_identifier()] =
-        to_address_of_expr(arguments[i]).object();
+      const auto &obj = to_address_of_expr(arguments[i]).object();
+      if(obj.is_constant())
+        vars[params[i].get_identifier()] = obj;
+      else if(
+        obj.id() == ID_side_effect && obj.operands().size() == 1 &&
+        obj.operands()[0].is_constant())
+        vars[params[i].get_identifier()] = obj.operands()[0];
+      else
+        vars[params[i].get_identifier()] = arguments[i];
     }
     else
-    {
       vars[params[i].get_identifier()] = arguments[i];
-    }
   }
 
   // Mini-interpreter: execute the body with bounded iterations
@@ -563,8 +572,19 @@ exprt try_evaluate_constexpr(
   };
 
   auto result = execute(to_code(body), 0);
-  if(result.has_value() && result->is_constant())
-    return *result;
+  if(result.has_value())
+  {
+    if(result->is_constant())
+      return *result;
+    // Reference-returning functions (like std::max) return
+    // address_of(constant).  Unwrap to the constant.
+    if(
+      result->id() == ID_address_of &&
+      to_address_of_expr(*result).object().is_constant())
+    {
+      return to_address_of_expr(*result).object();
+    }
+  }
 
   return nil_exprt();
 }

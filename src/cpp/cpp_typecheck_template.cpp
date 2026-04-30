@@ -2132,6 +2132,12 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
               e = r;
           }
           simplify(e, *this);
+          if(
+            e.id() == ID_dereference && e.operands().size() == 1 &&
+            e.operands()[0].is_constant())
+          {
+            e = e.operands()[0];
+          }
         };
         eval_calls(arg);
       }
