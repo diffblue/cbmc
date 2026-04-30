@@ -9,7 +9,6 @@
 #include <util/namespace.h>
 #include <util/pointer_predicates.h>
 #include <util/std_expr.h>
-#include <util/symbol_table.h>
 
 #include <solvers/smt2_incremental/ast/smt_terms.h>
 #include <solvers/smt2_incremental/convert_expr_to_smt.h>
@@ -19,6 +18,7 @@
 #include <solvers/smt2_incremental/theories/smt_bit_vector_theory.h>
 #include <solvers/smt2_incremental/theories/smt_core_theory.h>
 #include <solvers/smt2_incremental/type_size_mapping.h>
+#include <testing-utils/empty_namespace.h>
 #include <testing-utils/invariant.h>
 #include <testing-utils/use_catch.h>
 
@@ -469,8 +469,7 @@ TEST_CASE(
   {
     // (int32_t *)a + 2
     const auto pointer_arith_expr = plus_exprt{pointer_a, two_bvint_32bit};
-    const symbol_tablet symbol_table;
-    const namespacet ns{symbol_table};
+    const auto &ns = empty_namespace;
     track_expression_objects(pointer_arith_expr, ns, test.object_map);
     associate_pointer_sizes(
       pointer_arith_expr,
@@ -545,8 +544,7 @@ TEST_CASE(
     // (int *)a - 2 is coming to us as (int *)a + (-2), so a design decision
     // was made to handle only that form.
     const auto pointer_arith_expr = plus_exprt{pointer_a, minus_two_bvint};
-    const symbol_tablet symbol_table;
-    const namespacet ns{symbol_table};
+    const auto &ns = empty_namespace;
     track_expression_objects(pointer_arith_expr, ns, test.object_map);
     associate_pointer_sizes(
       pointer_arith_expr,
@@ -577,8 +575,7 @@ TEST_CASE(
     const auto two_bvint = from_integer(2, signedbv_typet{pointer_width});
     const auto pointer_arith_expr = minus_exprt{pointer_a, two_bvint};
 
-    const symbol_tablet symbol_table;
-    const namespacet ns{symbol_table};
+    const auto &ns = empty_namespace;
     track_expression_objects(pointer_arith_expr, ns, test.object_map);
     associate_pointer_sizes(
       pointer_arith_expr,
@@ -615,8 +612,7 @@ TEST_CASE(
   {
     // (int32_t *)a - (int32_t *)b
     const auto pointer_subtraction = minus_exprt{pointer_b, pointer_a};
-    const symbol_tablet symbol_table;
-    const namespacet ns{symbol_table};
+    const auto &ns = empty_namespace;
     track_expression_objects(pointer_subtraction, ns, test.object_map);
     associate_pointer_sizes(
       pointer_subtraction,
@@ -1471,8 +1467,7 @@ TEST_CASE(
 {
   auto test =
     expr_to_smt_conversion_test_environmentt::make(test_archt::x86_64);
-  const symbol_tablet symbol_table;
-  const namespacet ns{symbol_table};
+  const auto &ns = empty_namespace;
   const symbol_exprt foo{"foo", unsignedbv_typet{32}};
   const symbol_exprt bar{"bar", unsignedbv_typet{32}};
   SECTION("Address of symbol")
@@ -1674,8 +1669,7 @@ TEST_CASE(
 {
   auto test =
     expr_to_smt_conversion_test_environmentt::make(test_archt::x86_64);
-  const symbol_tablet symbol_table;
-  const namespacet ns{symbol_table};
+  const auto &ns = empty_namespace;
   const symbol_exprt foo{"foo", unsignedbv_typet{32}};
   const object_size_exprt object_size{
     address_of_exprt{foo}, unsignedbv_typet{64}};
@@ -1699,8 +1693,7 @@ TEST_CASE(
 {
   auto test =
     expr_to_smt_conversion_test_environmentt::make(test_archt::x86_64);
-  const symbol_tablet symbol_table;
-  const namespacet ns{symbol_table};
+  const auto &ns = empty_namespace;
   const symbol_exprt foo{"foo", unsignedbv_typet{32}};
   const is_dynamic_object_exprt is_dynamic_object{address_of_exprt{foo}};
   track_expression_objects(is_dynamic_object, ns, test.object_map);
@@ -1723,8 +1716,7 @@ TEST_CASE(
 {
   auto test =
     expr_to_smt_conversion_test_environmentt::make(test_archt::x86_64);
-  const symbol_tablet symbol_table;
-  const namespacet ns{symbol_table};
+  const auto &ns = empty_namespace;
   const typet value_type = signedbv_typet{8};
   const exprt array = symbol_exprt{
     "my_array", array_typet{value_type, from_integer(10, signed_size_type())}};

@@ -6,19 +6,19 @@
 
 \*******************************************************************/
 
-#include <testing-utils/use_catch.h>
-#include <typeinfo>
+#include <util/mathematical_types.h>
+#include <util/namespace.h>
+#include <util/std_expr.h>
 
 #include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/abstract_object.h>
 #include <analyses/variable-sensitivity/full_struct_abstract_object/struct_builder.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_test_helpers.h>
+#include <testing-utils/empty_namespace.h>
+#include <testing-utils/use_catch.h>
 
-#include <util/mathematical_types.h>
-#include <util/namespace.h>
-#include <util/std_expr.h>
-#include <util/symbol_table.h>
+#include <typeinfo>
 
 SCENARIO(
   "merge_full_struct_abstract_object",
@@ -45,8 +45,7 @@ SCENARIO(
       vsd_configt::constant_domain());
     abstract_environmentt environment(object_factory);
     environment.make_top();
-    symbol_tablet symbol_table;
-    namespacet ns(symbol_table);
+    auto &ns = empty_namespace;
 
     WHEN("Merging two constant struct AOs with the same contents")
     {

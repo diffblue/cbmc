@@ -7,16 +7,15 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <testing-utils/use_catch.h>
-
-#include <solvers/strings/format_specifier.h>
-#include <solvers/strings/string_format_builtin_function.h>
-
 #include <util/pointer_expr.h>
 #include <util/range.h>
 #include <util/simplify_expr.h>
 #include <util/string_expr.h>
-#include <util/symbol_table.h>
+
+#include <solvers/strings/format_specifier.h>
+#include <solvers/strings/string_format_builtin_function.h>
+#include <testing-utils/empty_namespace.h>
+#include <testing-utils/use_catch.h>
 
 // Create array_string_exprt from array of characters
 array_string_exprt from_char_vector(
@@ -49,8 +48,7 @@ SCENARIO(
   const std::size_t pointer_width = 16;
   const auto pointer_type = pointer_typet(char_type, pointer_width);
 
-  const symbol_tablet symbol_table;
-  const namespacet ns{symbol_table};
+  const auto &ns = empty_namespace;
   symbol_generatort fresh_symbol;
   array_poolt array_pool{fresh_symbol};
 

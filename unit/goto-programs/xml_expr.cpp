@@ -6,22 +6,21 @@ Author: Michael Tautschnig
 
 \*******************************************************************/
 
-#include <testing-utils/use_catch.h>
-
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 #include <util/config.h>
 #include <util/namespace.h>
-#include <util/symbol_table.h>
 
 #include <goto-programs/xml_expr.h>
+
+#include <testing-utils/empty_namespace.h>
+#include <testing-utils/use_catch.h>
 
 TEST_CASE("Constant expression to XML")
 {
   config.set_arch("none");
 
-  const symbol_tablet symbol_table;
-  const namespacet ns(symbol_table);
+  const auto &ns = empty_namespace;
 
   const constant_exprt number_ubv = from_integer(0xFF, unsignedbv_typet(8));
   const xmlt x_ubv = xml(number_ubv, ns);

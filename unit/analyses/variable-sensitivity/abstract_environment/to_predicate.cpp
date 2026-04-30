@@ -9,11 +9,11 @@
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 #include <util/namespace.h>
-#include <util/symbol_table.h>
 
 #include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_test_helpers.h>
+#include <testing-utils/empty_namespace.h>
 
 // NOLINTNEXTLINE(whitespace/line_length)
 #include <analyses/variable-sensitivity/constant_abstract_value.h> // IWYU pragma: keep
@@ -28,8 +28,7 @@ SCENARIO(
   config.context_tracking.last_write_context = false;
   auto object_factory =
     variable_sensitivity_object_factoryt::configured_with(config);
-  symbol_tablet symbol_table;
-  namespacet ns(symbol_table);
+  auto &ns = empty_namespace;
 
   GIVEN("an abstract environment")
   {

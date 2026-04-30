@@ -10,17 +10,16 @@
 #include <util/string_constant.h>
 
 #include <goto-symex/shadow_memory_util.h>
+#include <testing-utils/empty_namespace.h>
 #include <testing-utils/invariant.h>
+#include <testing-utils/message.h>
 
 #include <array>
 
 /// Helper struct to hold useful test components.
 struct shadow_memory_util_test_environmentt
 {
-  symbol_tablet symbol_table;
-  namespacet ns{symbol_table};
   source_locationt loc{};
-  null_message_handlert null_message_handler{};
   messaget log{null_message_handler};
 
   static shadow_memory_util_test_environmentt make()
@@ -183,9 +182,9 @@ TEST_CASE(
         unsignedbv_typet{56});
 
       const exprt max_over_struct =
-        compute_max_over_bytes(bitvector, sm_type, test.ns);
+        compute_max_over_bytes(bitvector, sm_type, empty_namespace);
 
-      const exprt simplified = simplify_expr(max_over_struct, test.ns);
+      const exprt simplified = simplify_expr(max_over_struct, empty_namespace);
 
       REQUIRE(simplified == from_integer(max(values), sm_type));
     }
@@ -204,9 +203,9 @@ TEST_CASE(
       const array_exprt array_expr{array_operands, array_type};
 
       const exprt max_over_struct =
-        compute_max_over_bytes(array_expr, sm_type, test.ns);
+        compute_max_over_bytes(array_expr, sm_type, empty_namespace);
 
-      const exprt simplified = simplify_expr(max_over_struct, test.ns);
+      const exprt simplified = simplify_expr(max_over_struct, empty_namespace);
 
       REQUIRE(simplified == from_integer(max(values), sm_type));
     }
@@ -231,9 +230,9 @@ TEST_CASE(
       const struct_exprt struct_expr{struct_operands, struct_type};
 
       const exprt max_over_struct =
-        compute_max_over_bytes(struct_expr, sm_type, test.ns);
+        compute_max_over_bytes(struct_expr, sm_type, empty_namespace);
 
-      const exprt simplified = simplify_expr(max_over_struct, test.ns);
+      const exprt simplified = simplify_expr(max_over_struct, empty_namespace);
 
       REQUIRE(simplified == from_integer(max(values), sm_type));
     }
@@ -299,11 +298,11 @@ TEST_CASE(
           (values[4] << 32) + (values[5] << 40) + (values[6] << 48),
         unsignedbv_typet{56});
 
-      const exprt max_over_struct =
-        compute_or_over_bytes(bitvector, sm_type, test.ns, test.log, false);
+      const exprt max_over_struct = compute_or_over_bytes(
+        bitvector, sm_type, empty_namespace, test.log, false);
 
       const exprt simplified =
-        simplify_bit_or_exprt(simplify_expr(max_over_struct, test.ns));
+        simplify_bit_or_exprt(simplify_expr(max_over_struct, empty_namespace));
 
       REQUIRE(simplified == from_integer(compute_or(values), sm_type));
     }
@@ -321,11 +320,11 @@ TEST_CASE(
         from_integer(values[6], unsigned_char_type())};
       const array_exprt array_expr{array_operands, array_type};
 
-      const exprt max_over_struct =
-        compute_or_over_bytes(array_expr, sm_type, test.ns, test.log, false);
+      const exprt max_over_struct = compute_or_over_bytes(
+        array_expr, sm_type, empty_namespace, test.log, false);
 
       const exprt simplified =
-        simplify_bit_or_exprt(simplify_expr(max_over_struct, test.ns));
+        simplify_bit_or_exprt(simplify_expr(max_over_struct, empty_namespace));
 
       REQUIRE(simplified == from_integer(compute_or(values), sm_type));
     }
@@ -349,11 +348,11 @@ TEST_CASE(
         from_integer(fizz, char_type()), inner_struct_expr};
       const struct_exprt struct_expr{struct_operands, struct_type};
 
-      const exprt max_over_struct =
-        compute_or_over_bytes(struct_expr, sm_type, test.ns, test.log, false);
+      const exprt max_over_struct = compute_or_over_bytes(
+        struct_expr, sm_type, empty_namespace, test.log, false);
 
       const exprt simplified =
-        simplify_bit_or_exprt(simplify_expr(max_over_struct, test.ns));
+        simplify_bit_or_exprt(simplify_expr(max_over_struct, empty_namespace));
 
       REQUIRE(simplified == from_integer(compute_or(values), sm_type));
     }

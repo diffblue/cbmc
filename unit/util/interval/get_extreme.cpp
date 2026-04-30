@@ -9,8 +9,8 @@
 #include <util/mp_arith.h>
 #include <util/namespace.h>
 #include <util/simplify_expr.h>
-#include <util/symbol_table.h>
 
+#include <testing-utils/empty_namespace.h>
 #include <testing-utils/use_catch.h>
 
 #include <random>
@@ -23,8 +23,7 @@ SCENARIO("get extreme exprt value", "[core][analyses][interval][get_extreme]")
 {
   GIVEN("A selection of constant_exprts in a std::vector and map")
   {
-    symbol_tablet symbol_table;
-    namespacet ns(symbol_table);
+    auto &ns = empty_namespace;
 
     std::vector<exprt> ve;
 

@@ -9,9 +9,9 @@
 #include <util/bitvector_types.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
-#include <util/symbol_table.h>
 
 #include <analyses/variable-sensitivity/abstract_environment.h>
+#include <testing-utils/empty_namespace.h>
 // NOLINTNEXTLINE(whitespace/line_length)
 #include <analyses/variable-sensitivity/value_set_pointer_abstract_object.h> // IWYU pragma: keep
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
@@ -44,8 +44,7 @@ SCENARIO(
     variable_sensitivity_object_factoryt::configured_with(config);
   abstract_environmentt environment{object_factory};
   environment.make_top();
-  symbol_tablet symbol_table;
-  namespacet ns(symbol_table);
+  auto &ns = empty_namespace;
 
   GIVEN("value_set_pointer_abstract_object")
   {

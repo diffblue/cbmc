@@ -9,15 +9,14 @@ Author: Diffblue Ltd.
 #include <util/bitvector_types.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
-#include <util/symbol_table.h>
 
 #include <goto-symex/goto_symex_can_forward_propagate.h>
+#include <testing-utils/empty_namespace.h>
 #include <testing-utils/use_catch.h>
 
 SCENARIO("goto-symex-is-constant", "[core][goto-symex][is_constant]")
 {
-  symbol_tablet symbol_table;
-  namespacet ns{symbol_table};
+  auto &ns = empty_namespace;
 
   signedbv_typet int_type(32);
   constant_exprt sizeof_constant("4", int_type);

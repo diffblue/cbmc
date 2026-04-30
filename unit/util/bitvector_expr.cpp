@@ -6,10 +6,10 @@
 #include <util/cout_message.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
-#include <util/symbol_table.h>
 
 #include <solvers/flattening/boolbv.h>
 #include <solvers/sat/satcheck.h>
+#include <testing-utils/empty_namespace.h>
 #include <testing-utils/use_catch.h>
 
 TEST_CASE(
@@ -77,8 +77,7 @@ TEST_CASE("onehot expression lowering", "[core][util][expr]")
   console_message_handlert message_handler;
   message_handler.set_verbosity(0);
   satcheckt satcheck{message_handler};
-  symbol_tablet symbol_table;
-  namespacet ns{symbol_table};
+  auto &ns = empty_namespace;
   boolbvt boolbv{ns, satcheck, message_handler};
   unsignedbv_typet u8{8};
 

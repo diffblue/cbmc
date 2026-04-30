@@ -9,13 +9,13 @@
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 #include <util/namespace.h>
-#include <util/symbol_table.h>
 
 #include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 #include <analyses/variable-sensitivity/interval_abstract_value.h>
 #include <analyses/variable-sensitivity/value_set_abstract_object.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
+#include <testing-utils/empty_namespace.h>
 #include <testing-utils/use_catch.h>
 
 #include "analyses/variable-sensitivity/variable_sensitivity_test_helpers.h"
@@ -30,8 +30,7 @@ SCENARIO(
     vsd_configt::constant_domain());
   abstract_environmentt env{object_factory};
   env.make_top();
-  symbol_tablet symbol_table;
-  namespacet ns(symbol_table);
+  auto &ns = empty_namespace;
 
   GIVEN("an integer constant has an index_range")
   {
@@ -95,8 +94,7 @@ SCENARIO(
     vsd_configt::intervals());
   abstract_environmentt env{object_factory};
   env.make_top();
-  symbol_tablet symbol_table;
-  namespacet ns(symbol_table);
+  auto &ns = empty_namespace;
   auto type = signedbv_typet(32);
 
   GIVEN("a top intervals's range is empty")
@@ -196,8 +194,7 @@ SCENARIO(
     vsd_configt::intervals());
   abstract_environmentt env{object_factory};
   env.make_top();
-  symbol_tablet symbol_table;
-  namespacet ns(symbol_table);
+  auto &ns = empty_namespace;
   auto type = signedbv_typet(32);
 
   GIVEN("a TOP value_set is empty")

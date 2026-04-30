@@ -9,20 +9,17 @@ Author: Diffblue Ltd.
 /// \file
 /// Unit tests for ai_domain_baset::ai_simplify_lhs
 
-#include <testing-utils/message.h>
-#include <testing-utils/use_catch.h>
-
-#include <analyses/ai_domain.h>
-
-#include <ansi-c/ansi_c_language.h>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
-#include <util/namespace.h>
 #include <util/simplify_expr.h>
-#include <util/symbol_table.h>
 #include <util/ui_message.h>
+
+#include <analyses/ai_domain.h>
+#include <ansi-c/ansi_c_language.h>
+#include <testing-utils/empty_namespace.h>
+#include <testing-utils/message.h>
+#include <testing-utils/use_catch.h>
 
 class constant_simplification_mockt:public ai_domain_baset
 {
@@ -74,8 +71,7 @@ SCENARIO("ai_domain_baset::ai_simplify_lhs",
 {
   ansi_c_languaget language;
 
-  symbol_tablet symbol_table;
-  namespacet ns(symbol_table);
+  auto &ns = empty_namespace;
 
   constant_simplification_mockt mock_ai_domain;
 

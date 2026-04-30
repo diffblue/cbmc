@@ -7,11 +7,11 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <testing-utils/use_catch.h>
+#include <util/simplify_expr.h>
 
 #include <solvers/strings/string_format_builtin_function.h>
-#include <util/simplify_expr.h>
-#include <util/symbol_table.h>
+#include <testing-utils/empty_namespace.h>
+#include <testing-utils/use_catch.h>
 
 SCENARIO(
   "length_of_decimal_int",
@@ -19,8 +19,7 @@ SCENARIO(
 {
   const typet type = signedbv_typet(32);
 
-  const symbol_tablet symbol_table;
-  const namespacet ns{symbol_table};
+  const auto &ns = empty_namespace;
 
   const std::vector<mp_integer> input_values = {
     0, 1, 10, 15, 999, 1000000001, -1, -21111111, -1234567890};

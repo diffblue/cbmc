@@ -8,13 +8,13 @@
 
 #include <util/arith_tools.h>
 #include <util/mathematical_types.h>
-#include <util/symbol_table.h>
 
 #include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/abstract_object.h>
 #include <analyses/variable-sensitivity/context_abstract_object.h>
 #include <analyses/variable-sensitivity/full_array_abstract_object.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
+#include <testing-utils/empty_namespace.h>
 #include <testing-utils/use_catch.h>
 
 void test_array(
@@ -33,8 +33,7 @@ SCENARIO(
       vsd_configt::constant_domain())};
   environment.make_top(); // Domains are bottom on construction
 
-  symbol_tablet symbol_table;
-  namespacet ns{symbol_table};
+  auto &ns = empty_namespace;
 
   GIVEN("An array of {1, 2, 3}")
   {
