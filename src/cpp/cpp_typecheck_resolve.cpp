@@ -3139,6 +3139,20 @@ resolved_after_strip:
                     if(r.is_not_nil())
                       e = r;
                   }
+                  // Handle dereference(function_call) for reference-
+                  // returning functions like std::max(const T&, const T&)
+                  if(
+                    e.id() == ID_dereference && e.operands().size() == 1 &&
+                    e.operands()[0].id() == ID_side_effect &&
+                    e.operands()[0].get(ID_statement) == ID_function_call)
+                  {
+                    exprt r = try_evaluate_constexpr(
+                      e.operands()[0],
+                      cpp_typecheck.symbol_table,
+                      cpp_typecheck);
+                    if(r.is_not_nil())
+                      e = r;
+                  }
                   simplify(e, cpp_typecheck);
                 };
                 eval_calls(val);
