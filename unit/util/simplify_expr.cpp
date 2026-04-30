@@ -731,3 +731,41 @@ TEST_CASE("Simplify flatten nested AND", "[core][util]")
   const and_exprt nested{a, inner};
   REQUIRE(simplify_expr(nested, ns) == and_exprt{a, b, c});
 }
+
+TEST_CASE("Simplify complementary pair in OR", "[core][util]")
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+
+  const symbol_exprt a{"a", bool_typet{}};
+
+  // (a || !a) should simplify to true
+  const or_exprt expr{a, not_exprt{a}};
+  REQUIRE(simplify_expr(expr, ns) == true_exprt{});
+}
+
+TEST_CASE("Simplify complementary pair in AND", "[core][util]")
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+
+  const symbol_exprt a{"a", bool_typet{}};
+
+  // (a && !a) should simplify to false
+  const and_exprt expr{a, not_exprt{a}};
+  REQUIRE(simplify_expr(expr, ns) == false_exprt{});
+}
+
+TEST_CASE("Simplify complementary pair in nested OR", "[core][util]")
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+
+  const symbol_exprt a{"a", bool_typet{}};
+  const symbol_exprt b{"b", bool_typet{}};
+
+  // (a || (b || !a)) should simplify to true (after flattening)
+  const or_exprt inner{b, not_exprt{a}};
+  const or_exprt expr{a, inner};
+  REQUIRE(simplify_expr(expr, ns) == true_exprt{});
+}
