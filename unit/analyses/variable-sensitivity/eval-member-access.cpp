@@ -20,7 +20,7 @@
 void test_array(
   std::vector<int> contents,
   abstract_environmentt &environment,
-  namespacet &ns);
+  const namespacet &ns);
 
 const auto TOP = -99;
 
@@ -53,13 +53,13 @@ SCENARIO(
 exprt make_array(
   std::vector<int> contents,
   abstract_environmentt &environment,
-  namespacet &ns);
+  const namespacet &ns);
 
 exprt fetch_element(
   int index,
   exprt &array,
   abstract_environmentt &environment,
-  namespacet &ns);
+  const namespacet &ns);
 
 exprt integer_expression(int i);
 exprt top_expression();
@@ -67,7 +67,7 @@ exprt top_expression();
 void test_array(
   std::vector<int> values,
   abstract_environmentt &environment,
-  namespacet &ns)
+  const namespacet &ns)
 {
   auto array = make_array(values, environment, ns);
 
@@ -107,7 +107,7 @@ exprt fetch_element(
   int index,
   exprt &array,
   abstract_environmentt &environment,
-  namespacet &ns)
+  const namespacet &ns)
 {
   auto index_expression =
     index_exprt(array, from_integer(index, integer_typet()));
@@ -129,7 +129,7 @@ exprt fetch_element(
 exprt make_array(
   std::vector<int> contents,
   abstract_environmentt &environment,
-  namespacet &ns)
+  const namespacet &ns)
 {
   const array_typet array_type(
     integer_typet(), from_integer(contents.size(), integer_typet()));

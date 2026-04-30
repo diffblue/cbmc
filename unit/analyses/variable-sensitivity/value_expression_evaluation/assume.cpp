@@ -28,7 +28,7 @@ exprt binary_expression(
   const abstract_object_pointert &op1,
   const abstract_object_pointert &op2,
   abstract_environmentt &environment,
-  namespacet &ns)
+  const namespacet &ns)
 {
   auto op1_sym = symbol_exprt("op1", op1->type());
   auto op2_sym = symbol_exprt("op2", op2->type());
@@ -105,7 +105,7 @@ public:
     }
   }
 
-  assume_testert(abstract_environmentt &env, namespacet &n)
+  assume_testert(abstract_environmentt &env, const namespacet &n)
     : environment(env), ns(n)
   {
   }
@@ -155,7 +155,7 @@ private:
   const typet type = signedbv_typet(32);
 
   abstract_environmentt &environment;
-  namespacet &ns;
+  const namespacet &ns;
 };
 
 SCENARIO(

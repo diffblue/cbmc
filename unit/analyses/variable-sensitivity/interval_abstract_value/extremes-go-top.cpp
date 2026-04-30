@@ -19,8 +19,10 @@
 #include <analyses/variable-sensitivity/variable_sensitivity_test_helpers.h>
 #include <testing-utils/use_catch.h>
 
-static void
-verify_extreme_interval(typet type, abstract_environmentt &env, namespacet &ns)
+static void verify_extreme_interval(
+  typet type,
+  abstract_environmentt &env,
+  const namespacet &ns)
 {
   auto interval =
     make_interval(min_value_exprt(type), max_value_exprt(type), env, ns);
