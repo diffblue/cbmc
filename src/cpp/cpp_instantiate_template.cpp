@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/base_exceptions.h> // IWYU pragma: keep
 #include <util/c_types.h>
 #include <util/simplify_expr.h>
+#include <util/std_code.h>
 #include <util/symbol_table_base.h>
 
 #include "cpp_convert_type.h"
@@ -375,6 +376,178 @@ const symbolt &cpp_typecheckt::class_template_symbol(
 /// Also implements [temp.spec.partial.match]: when elaborating, searches
 /// for the best-matching partial specialization using the rules from
 /// [temp.spec.partial.order] and [temp.constr.order] (constraint ordering).
+
+// Evaluate a constexpr function call with constant arguments.
+// Returns the result as a constant expression, or nil if evaluation fails.
+exprt try_evaluate_constexpr(
+  const exprt &expr,
+  const symbol_table_baset &symbol_table,
+  const namespacet &ns)
+{
+  if(expr.id() != ID_side_effect)
+    return nil_exprt();
+  if(expr.get(ID_statement) != ID_function_call)
+    return nil_exprt();
+
+  const auto &call = to_side_effect_expr_function_call(expr);
+  const auto &function = call.function();
+  const auto &arguments = call.arguments();
+
+  // All arguments must be constants
+  for(const auto &arg : arguments)
+    if(!arg.is_constant())
+      return nil_exprt();
+
+  // Look up the function body
+  if(function.id() != ID_symbol)
+    return nil_exprt();
+  const irep_idt &func_id = to_symbol_expr(function).get_identifier();
+  const symbolt *func_sym = symbol_table.lookup(func_id);
+  if(!func_sym || func_sym->value.is_nil())
+    return nil_exprt();
+
+  const auto &body = func_sym->value;
+  if(body.id() != ID_code)
+    return nil_exprt();
+  // Guard against re-entrant evaluation
+  static int eval_depth = 0;
+  if(eval_depth > 10)
+    return nil_exprt();
+  ++eval_depth;
+  struct depth_guard
+  {
+    ~depth_guard()
+    {
+      --eval_depth;
+    }
+  } dg;
+
+  // Get parameter names
+  const auto &func_type = to_code_type(func_sym->type);
+  const auto &params = func_type.parameters();
+  if(params.size() != arguments.size())
+    return nil_exprt();
+
+  // Build a variable map: parameter → constant value
+  std::map<irep_idt, exprt> vars;
+  for(std::size_t i = 0; i < params.size(); ++i)
+    vars[params[i].get_identifier()] = arguments[i];
+
+  // Mini-interpreter: execute the body with bounded iterations
+  std::function<std::optional<exprt>(const codet &, int)> execute;
+  std::function<exprt(const exprt &)> eval;
+
+  eval = [&](const exprt &e) -> exprt
+  {
+    if(e.id() == ID_symbol)
+    {
+      auto it = vars.find(to_symbol_expr(e).get_identifier());
+      if(it != vars.end())
+        return it->second;
+      return e;
+    }
+    if(e.id() == ID_side_effect && e.get(ID_statement) == ID_function_call)
+    {
+      // Recursively evaluate nested function calls
+      exprt evaluated = try_evaluate_constexpr(e, symbol_table, ns);
+      if(evaluated.is_not_nil())
+        return evaluated;
+    }
+    // Rebuild expression with evaluated operands
+    exprt result = e;
+    for(auto &op : result.operands())
+      op = eval(op);
+    // Try to simplify
+    simplify(result, ns);
+    return result;
+  };
+
+  execute = [&](const codet &code, int depth) -> std::optional<exprt>
+  {
+    if(depth > 100)
+      return std::nullopt;
+
+    if(code.get_statement() == ID_return)
+    {
+      if(code.operands().size() == 1)
+        return eval(code.op0());
+      return std::nullopt;
+    }
+    if(code.get_statement() == ID_block)
+    {
+      for(const auto &stmt : code.operands())
+      {
+        if(stmt.id() != ID_code)
+          continue;
+        auto r = execute(to_code(stmt), depth + 1);
+        if(r.has_value())
+          return r;
+      }
+      return std::nullopt;
+    }
+    if(code.get_statement() == ID_ifthenelse)
+    {
+      exprt cond = eval(code.op0());
+      if(cond.is_true() && code.operands()[1].id() == ID_code)
+        return execute(to_code(code.operands()[1]), depth + 1);
+      if(
+        cond.is_false() && code.operands().size() > 2 &&
+        code.operands()[2].id() == ID_code)
+        return execute(to_code(code.operands()[2]), depth + 1);
+      if(cond.is_false())
+        return std::nullopt;
+      return std::nullopt; // can't evaluate condition
+    }
+    if(code.get_statement() == ID_while)
+    {
+      for(int iter = 0; iter < 64; ++iter)
+      {
+        exprt cond = eval(code.op0());
+        if(cond.is_false())
+          return std::nullopt; // loop done, no return
+        if(!cond.is_true())
+          return std::nullopt; // can't evaluate condition
+        if(code.operands()[1].id() != ID_code)
+          return std::nullopt;
+        auto r = execute(to_code(code.operands()[1]), depth + 1);
+        if(r.has_value())
+          return r;
+      }
+      return std::nullopt; // too many iterations
+    }
+    if(code.get_statement() == ID_assign)
+    {
+      const auto &lhs = code.op0();
+      exprt rhs = eval(code.op1());
+      if(lhs.id() == ID_symbol)
+        vars[to_symbol_expr(lhs).get_identifier()] = rhs;
+      return std::nullopt;
+    }
+    if(code.get_statement() == ID_decl)
+    {
+      // Variable declaration — initialize if has value
+      if(code.operands().size() > 0 && code.op0().id() == ID_symbol)
+      {
+        const auto &sym = to_symbol_expr(code.op0());
+        vars[sym.get_identifier()] = from_integer(0, sym.type());
+      }
+      return std::nullopt;
+    }
+    if(code.get_statement() == ID_expression)
+      return std::nullopt; // side-effect expression, skip
+    if(code.get_statement() == ID_skip)
+      return std::nullopt;
+
+    return std::nullopt; // unknown statement
+  };
+
+  auto result = execute(to_code(body), 0);
+  if(result.has_value() && result->is_constant())
+    return *result;
+
+  return nil_exprt();
+}
+
 void cpp_typecheckt::elaborate_class_template(
   const typet &type)
 {
@@ -467,6 +640,25 @@ void cpp_typecheckt::elaborate_class_template(
         {
           typecheck_expr(arg);
           simplify(arg, *this);
+          // Try constexpr evaluation for remaining function calls
+          {
+            std::function<void(exprt &)> eval_calls;
+            eval_calls = [&](exprt &e)
+            {
+              for(auto &op : e.operands())
+                eval_calls(op);
+              if(
+                e.id() == ID_side_effect &&
+                e.get(ID_statement) == ID_function_call)
+              {
+                exprt r = try_evaluate_constexpr(e, symbol_table, *this);
+                if(r.is_not_nil())
+                  e = r;
+              }
+              simplify(e, *this);
+            };
+            eval_calls(arg);
+          }
           // Resolve symbol references to their constant values
           if(arg.id() == ID_symbol)
           {

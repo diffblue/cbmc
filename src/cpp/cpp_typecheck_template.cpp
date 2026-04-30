@@ -11,6 +11,13 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/base_exceptions.h> // IWYU pragma: keep
 #include <util/simplify_expr.h>
+#include <util/std_code.h>
+#include <util/symbol_table_base.h>
+
+extern exprt try_evaluate_constexpr(
+  const exprt &expr,
+  const symbol_table_baset &symbol_table,
+  const namespacet &ns);
 #include <util/symbol_table_base.h>
 
 #include "cpp_convert_type.h"
@@ -2083,6 +2090,41 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         type = arg.type();
       implicit_typecast(arg, type);
       simplify(arg, *this);
+      // Resolve symbol references to their constant values
+      if(arg.id() == ID_symbol)
+      {
+        const auto *sym =
+          symbol_table.lookup(to_symbol_expr(arg).get_identifier());
+        if(sym && sym->value.is_not_nil())
+        {
+          if(sym->value.is_constant())
+            arg = sym->value;
+          else
+          {
+            arg = sym->value;
+            simplify(arg, *this);
+          }
+        }
+      }
+      // Try constexpr evaluation for remaining function calls
+      if(!arg.is_constant())
+      {
+        std::function<void(exprt &)> eval_calls;
+        eval_calls = [&](exprt &e)
+        {
+          for(auto &op : e.operands())
+            eval_calls(op);
+          if(
+            e.id() == ID_side_effect && e.get(ID_statement) == ID_function_call)
+          {
+            exprt r = try_evaluate_constexpr(e, symbol_table, *this);
+            if(r.is_not_nil())
+              e = r;
+          }
+          simplify(e, *this);
+        };
+        eval_calls(arg);
+      }
     }
 
     // Set right away -- this is for the benefit of default
