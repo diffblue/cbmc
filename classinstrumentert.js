@@ -36,7 +36,7 @@ var classinstrumentert =
     [ "map_function_graph", "classinstrumentert.html#a9e4c3e5385f23cf7d4a0777b20fe8772", null ],
     [ "map_vertex_gnode", "classinstrumentert.html#aad60103958e706b3f9fd4e0db51df9c5", null ],
     [ "message", "classinstrumentert.html#adb51e9059bdd730797f09af4215f1a6c", null ],
-    [ "ns", "classinstrumentert.html#ac1aa42c3eaeaaacc9092a0eea8e9e71d", null ],
+    [ "ns", "classinstrumentert.html#a905440afd9d522c3d290de466c4322e5", null ],
     [ "num_sccs", "classinstrumentert.html#a2584f0bcdffb7925232bf74615536ad6", null ],
     [ "render_by_file", "classinstrumentert.html#aa82ecd2d9446aeb3a06a987becf22221", null ],
     [ "render_by_function", "classinstrumentert.html#a8b4a80015186ade8f48cea132ff4f12d", null ],
