@@ -139,6 +139,16 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       expr = typecast_exprt(cast_arg, cast_target);
       return;
     }
+    // A return statement in expression context can occur when a
+    // constexpr function body is used as a value during template
+    // instantiation.  Extract the return value.
+    if(expr.get(ID_statement) == ID_return && expr.operands().size() == 1)
+    {
+      exprt ret_val = to_code_frontend_return(to_code(expr)).return_value();
+      typecheck_expr(ret_val);
+      expr = ret_val;
+      return;
+    }
     error().source_location = expr.source_location();
     error() << "unexpected ID_code expression" << eom;
     throw 0;
