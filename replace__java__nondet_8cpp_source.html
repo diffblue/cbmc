@@ -180,7 +180,7 @@ $(document).ready(function(){initNavTree('replace__java__nondet_8cpp_source.html
 <div class="line"><a id="l00068" name="l00068"></a><span class="lineno"><a class="line" href="replace__java__nondet_8cpp.html#a1b19b278f7cac75b86caca76cf63344b">   68</a></span><a class="code hl_function" href="replace__java__nondet_8cpp.html#a1b19b278f7cac75b86caca76cf63344b">is_nondet_returning_object</a>(<span class="keyword">const</span> <a class="code hl_class" href="classcode__function__callt.html">code_function_callt</a> &amp;function_call)</div>
 <div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>{</div>
 <div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>  <span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code hl_class" href="classait.html">function_symbol</a> = <a class="code hl_function" href="std__expr_8h.html#ab73d10aafcdec6cfd5992704af55dd51">to_symbol_expr</a>(function_call.<a class="code hl_function" href="classcode__function__callt.html#a1335f5f13bee6c479719192809b8eb5b">function</a>());</div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>  <span class="keyword">const</span> <span class="keyword">auto</span> function_name = <a class="code hl_function" href="irep_8h.html#ac5e91c37aa36daafdb4168bd34a42ced">id2string</a>(<a class="code hl_class" href="classait.html">function_symbol</a>.get_identifier());</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>  <span class="keyword">const</span> <span class="keyword">auto</span> function_name = <a class="code hl_function" href="irep_8h.html#ac5e91c37aa36daafdb4168bd34a42ced">id2string</a>(<a class="code hl_class" href="classait.html">function_symbol</a>.identifier());</div>
 <div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>  <span class="keyword">const</span> std::regex <a class="code hl_class" href="classait.html">reg</a>(</div>
 <div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>    R<span class="stringliteral">&quot;(.*org\.cprover\.CProver\.nondet)&quot;</span></div>
 <div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span><span class="stringliteral">    R</span><span class="stringliteral">&quot;((?:Boolean|Byte|Char|Short|Int|Long|Float|Double|With(out)?Null.*))&quot;);</span></div>
@@ -216,7 +216,7 @@ $(document).ready(function(){initNavTree('replace__java__nondet_8cpp_source.html
 <div class="line"><a id="l00108" name="l00108"></a><span class="lineno"><a class="line" href="replace__java__nondet_8cpp.html#a3db82b94452333502f01d5a43e2f47ed">  108</a></span><span class="keyword">static</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="replace__java__nondet_8cpp.html#a3db82b94452333502f01d5a43e2f47ed">is_symbol_with_id</a>(<span class="keyword">const</span> <a class="code hl_class" href="classexprt.html">exprt</a> &amp;expr, <span class="keyword">const</span> <a class="code hl_class" href="classdstringt.html">irep_idt</a> &amp;identifier)</div>
 <div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>{</div>
 <div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>  <span class="keywordflow">return</span> expr.<a class="code hl_function" href="classirept.html#ad2e8b084a2d7f6b9707534756f9705bf">id</a>() == <a class="code hl_class" href="classait.html">ID_symbol</a> &amp;&amp;</div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>         <a class="code hl_function" href="std__expr_8h.html#ab73d10aafcdec6cfd5992704af55dd51">to_symbol_expr</a>(expr).get_identifier() == identifier;</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>         <a class="code hl_function" href="std__expr_8h.html#ab73d10aafcdec6cfd5992704af55dd51">to_symbol_expr</a>(expr).identifier() == identifier;</div>
 <div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>}</div>
 </div>
 <div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span> </div>
@@ -234,7 +234,7 @@ $(document).ready(function(){initNavTree('replace__java__nondet_8cpp_source.html
 <div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>  }</div>
 <div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>  <span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code hl_class" href="classait.html">op_symbol</a> = <a class="code hl_function" href="std__expr_8h.html#ab73d10aafcdec6cfd5992704af55dd51">to_symbol_expr</a>(typecast.op());</div>
 <div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>  <span class="comment">// Return whether the typecast has the expected operand</span></div>
-<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>  <span class="keywordflow">return</span> <a class="code hl_class" href="classait.html">op_symbol</a>.get_identifier() == identifier;</div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>  <span class="keywordflow">return</span> <a class="code hl_class" href="classait.html">op_symbol</a>.identifier() == identifier;</div>
 <div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>}</div>
 </div>
 <div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span> </div>
@@ -291,7 +291,7 @@ $(document).ready(function(){initNavTree('replace__java__nondet_8cpp_source.html
 <div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>  <a class="code hl_class" href="classdstringt.html">irep_idt</a> <a class="code hl_class" href="classait.html">return_identifier</a>;</div>
 <div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span>  <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">remove_returns_not_run</a>)</div>
 <div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>  {</div>
-<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>    <a class="code hl_class" href="classait.html">return_identifier</a> = <a class="code hl_function" href="std__expr_8h.html#ab73d10aafcdec6cfd5992704af55dd51">to_symbol_expr</a>(target-&gt;call_lhs()).get_identifier();</div>
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>    <a class="code hl_class" href="classait.html">return_identifier</a> = <a class="code hl_function" href="std__expr_8h.html#ab73d10aafcdec6cfd5992704af55dd51">to_symbol_expr</a>(target-&gt;call_lhs()).identifier();</div>
 <div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span>  }</div>
 <div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>  <span class="keywordflow">else</span></div>
 <div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span>  {</div>
@@ -313,113 +313,112 @@ $(document).ready(function(){initNavTree('replace__java__nondet_8cpp_source.html
 <div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span>    }</div>
 <div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span> </div>
 <div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>    <span class="comment">// Otherwise it&#39;s the temporary variable.</span></div>
-<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>    <a class="code hl_class" href="classait.html">return_identifier</a> =</div>
-<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>      <a class="code hl_function" href="std__expr_8h.html#ab73d10aafcdec6cfd5992704af55dd51">to_symbol_expr</a>(<a class="code hl_class" href="classait.html">return_value_assignment</a>).get_identifier();</div>
-<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>  }</div>
-<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span> </div>
-<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>  <span class="comment">// Look for the assignment of the temporary return variable into our target</span></div>
-<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>  <span class="comment">// variable.</span></div>
-<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>  <span class="keyword">const</span> <span class="keyword">auto</span> end = goto_program.<a class="code hl_variable" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.end();</div>
-<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>  <span class="keyword">auto</span> <a class="code hl_class" href="classait.html">target_instruction</a> = std::find_if(</div>
-<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>    <a class="code hl_class" href="classait.html">next_instr</a>,</div>
-<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span>    end,</div>
-<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>    [&amp;<a class="code hl_class" href="classait.html">return_identifier</a>](<span class="keyword">const</span> <a class="code hl_class" href="classgoto__programt_1_1instructiont.html">goto_programt::instructiont</a> &amp;<a class="code hl_class" href="classait.html">instr</a>) {</div>
-<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="replace__java__nondet_8cpp.html#a4a8ff85779250a374ee536cceced0963">is_assignment_from</a>(<a class="code hl_class" href="classait.html">instr</a>, <a class="code hl_class" href="classait.html">return_identifier</a>);</div>
-<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>    });</div>
-<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span> </div>
-<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>  <span class="comment">// If we can&#39;t find an assign, it might be a direct return.</span></div>
-<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span>  <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">target_instruction</a> == end)</div>
-<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>  {</div>
-<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>    <a class="code hl_class" href="classait.html">target_instruction</a> = std::find_if(</div>
-<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span>      <a class="code hl_class" href="classait.html">next_instr</a>,</div>
-<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span>      end,</div>
-<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span>      [&amp;<a class="code hl_class" href="classait.html">return_identifier</a>](<span class="keyword">const</span> <a class="code hl_class" href="classgoto__programt_1_1instructiont.html">goto_programt::instructiont</a> &amp;<a class="code hl_class" href="classait.html">instr</a>) {</div>
-<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="replace__java__nondet_8cpp.html#a42a10330425d1a853e681359de991876">is_return_with_variable</a>(<a class="code hl_class" href="classait.html">instr</a>, <a class="code hl_class" href="classait.html">return_identifier</a>);</div>
-<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span>      });</div>
-<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span>  }</div>
-<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span> </div>
-<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>  <a class="code hl_define" href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a>(</div>
-<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>    <a class="code hl_class" href="classait.html">target_instruction</a> != end,</div>
-<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span>    <span class="stringliteral">&quot;failed to find return of the temporary return variable or assignment of &quot;</span></div>
-<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>    <span class="stringliteral">&quot;the temporary return variable into a target variable&quot;</span>);</div>
-<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span> </div>
-<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>  std::for_each(</div>
-<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>    target, <a class="code hl_class" href="classait.html">target_instruction</a>, [](<a class="code hl_class" href="classgoto__programt_1_1instructiont.html">goto_programt::instructiont</a> &amp;<a class="code hl_class" href="classait.html">instr</a>) {</div>
-<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span>      <a class="code hl_class" href="classait.html">instr</a>.turn_into_skip();</div>
-<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>    });</div>
-<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span> </div>
-<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>  <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">target_instruction</a>-&gt;is_set_return_value())</div>
-<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>  {</div>
-<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code hl_class" href="classait.html">nondet_var</a> = <a class="code hl_class" href="classait.html">target_instruction</a>-&gt;return_value();</div>
-<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span> </div>
-<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>    <a class="code hl_class" href="classside__effect__expr__nondett.html">side_effect_expr_nondett</a> <a class="code hl_class" href="classait.html">inserted_expr</a>(</div>
-<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>      <a class="code hl_class" href="classait.html">nondet_var</a>.type(), <a class="code hl_class" href="classait.html">target_instruction</a>-&gt;source_location());</div>
-<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>    <a class="code hl_class" href="classait.html">inserted_expr</a>.set_nullable(</div>
-<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>      <a class="code hl_class" href="classait.html">instr_info</a>.get_nullable_type() ==</div>
-<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span>      <a class="code hl_enumvalue" href="classnondet__instruction__infot.html#a61c7ecf3ae38767aa703a9c59f6936caac0d83f0b82a6b30de8811e69e6d95c61">nondet_instruction_infot::is_nullablet::TRUE</a>);</div>
-<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span>    <a class="code hl_class" href="classait.html">target_instruction</a>-&gt;code_nonconst() = <a class="code hl_class" href="classcode__returnt.html">code_returnt</a>(<a class="code hl_class" href="classait.html">inserted_expr</a>);</div>
-<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span>    <a class="code hl_class" href="classait.html">target_instruction</a>-&gt;code_nonconst().add_source_location() =</div>
-<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span>      <a class="code hl_class" href="classait.html">target_instruction</a>-&gt;source_location();</div>
-<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span>  }</div>
-<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span>  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">target_instruction</a>-&gt;is_assign())</div>
-<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span>  {</div>
-<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span>    <span class="comment">// Assume that the LHS of *this* assignment is the actual nondet variable</span></div>
-<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span>    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code hl_class" href="classait.html">nondet_var</a> = <a class="code hl_class" href="classait.html">target_instruction</a>-&gt;assign_lhs();</div>
-<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span> </div>
-<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span>    <a class="code hl_class" href="classside__effect__expr__nondett.html">side_effect_expr_nondett</a> <a class="code hl_class" href="classait.html">inserted_expr</a>(</div>
-<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span>      <a class="code hl_class" href="classait.html">nondet_var</a>.type(), <a class="code hl_class" href="classait.html">target_instruction</a>-&gt;source_location());</div>
-<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span>    <a class="code hl_class" href="classait.html">inserted_expr</a>.set_nullable(</div>
-<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span>      <a class="code hl_class" href="classait.html">instr_info</a>.get_nullable_type() ==</div>
-<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span>      <a class="code hl_enumvalue" href="classnondet__instruction__infot.html#a61c7ecf3ae38767aa703a9c59f6936caac0d83f0b82a6b30de8811e69e6d95c61">nondet_instruction_infot::is_nullablet::TRUE</a>);</div>
-<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span>    <a class="code hl_class" href="classait.html">target_instruction</a>-&gt;assign_rhs_nonconst() = <a class="code hl_class" href="classait.html">inserted_expr</a>;</div>
-<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span>  }</div>
-<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span> </div>
-<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span>  goto_program.<a class="code hl_function" href="classgoto__programt.html#a2d19ab1e24b01874b1371c8272da146b">update</a>();</div>
-<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span> </div>
-<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span>  <span class="keywordflow">return</span> std::next(<a class="code hl_class" href="classait.html">target_instruction</a>);</div>
-<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span>}</div>
+<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>    <a class="code hl_class" href="classait.html">return_identifier</a> = <a class="code hl_function" href="std__expr_8h.html#ab73d10aafcdec6cfd5992704af55dd51">to_symbol_expr</a>(<a class="code hl_class" href="classait.html">return_value_assignment</a>).identifier();</div>
+<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>  }</div>
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span> </div>
+<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>  <span class="comment">// Look for the assignment of the temporary return variable into our target</span></div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>  <span class="comment">// variable.</span></div>
+<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>  <span class="keyword">const</span> <span class="keyword">auto</span> end = goto_program.<a class="code hl_variable" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.end();</div>
+<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>  <span class="keyword">auto</span> <a class="code hl_class" href="classait.html">target_instruction</a> = std::find_if(</div>
+<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>    <a class="code hl_class" href="classait.html">next_instr</a>,</div>
+<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>    end,</div>
+<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span>    [&amp;<a class="code hl_class" href="classait.html">return_identifier</a>](<span class="keyword">const</span> <a class="code hl_class" href="classgoto__programt_1_1instructiont.html">goto_programt::instructiont</a> &amp;<a class="code hl_class" href="classait.html">instr</a>) {</div>
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="replace__java__nondet_8cpp.html#a4a8ff85779250a374ee536cceced0963">is_assignment_from</a>(<a class="code hl_class" href="classait.html">instr</a>, <a class="code hl_class" href="classait.html">return_identifier</a>);</div>
+<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>    });</div>
+<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span> </div>
+<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>  <span class="comment">// If we can&#39;t find an assign, it might be a direct return.</span></div>
+<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>  <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">target_instruction</a> == end)</div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span>  {</div>
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>    <a class="code hl_class" href="classait.html">target_instruction</a> = std::find_if(</div>
+<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>      <a class="code hl_class" href="classait.html">next_instr</a>,</div>
+<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span>      end,</div>
+<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span>      [&amp;<a class="code hl_class" href="classait.html">return_identifier</a>](<span class="keyword">const</span> <a class="code hl_class" href="classgoto__programt_1_1instructiont.html">goto_programt::instructiont</a> &amp;<a class="code hl_class" href="classait.html">instr</a>) {</div>
+<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span>        <span class="keywordflow">return</span> <a class="code hl_function" href="replace__java__nondet_8cpp.html#a42a10330425d1a853e681359de991876">is_return_with_variable</a>(<a class="code hl_class" href="classait.html">instr</a>, <a class="code hl_class" href="classait.html">return_identifier</a>);</div>
+<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span>      });</div>
+<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span>  }</div>
+<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span> </div>
+<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span>  <a class="code hl_define" href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a>(</div>
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>    <a class="code hl_class" href="classait.html">target_instruction</a> != end,</div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>    <span class="stringliteral">&quot;failed to find return of the temporary return variable or assignment of &quot;</span></div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span>    <span class="stringliteral">&quot;the temporary return variable into a target variable&quot;</span>);</div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span> </div>
+<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>  std::for_each(</div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>    target, <a class="code hl_class" href="classait.html">target_instruction</a>, [](<a class="code hl_class" href="classgoto__programt_1_1instructiont.html">goto_programt::instructiont</a> &amp;<a class="code hl_class" href="classait.html">instr</a>) {</div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>      <a class="code hl_class" href="classait.html">instr</a>.turn_into_skip();</div>
+<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span>    });</div>
+<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span> </div>
+<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>  <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">target_instruction</a>-&gt;is_set_return_value())</div>
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>  {</div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code hl_class" href="classait.html">nondet_var</a> = <a class="code hl_class" href="classait.html">target_instruction</a>-&gt;return_value();</div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span> </div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span>    <a class="code hl_class" href="classside__effect__expr__nondett.html">side_effect_expr_nondett</a> <a class="code hl_class" href="classait.html">inserted_expr</a>(</div>
+<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>      <a class="code hl_class" href="classait.html">nondet_var</a>.type(), <a class="code hl_class" href="classait.html">target_instruction</a>-&gt;source_location());</div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>    <a class="code hl_class" href="classait.html">inserted_expr</a>.set_nullable(</div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>      <a class="code hl_class" href="classait.html">instr_info</a>.get_nullable_type() ==</div>
+<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>      <a class="code hl_enumvalue" href="classnondet__instruction__infot.html#a61c7ecf3ae38767aa703a9c59f6936caac0d83f0b82a6b30de8811e69e6d95c61">nondet_instruction_infot::is_nullablet::TRUE</a>);</div>
+<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span>    <a class="code hl_class" href="classait.html">target_instruction</a>-&gt;code_nonconst() = <a class="code hl_class" href="classcode__returnt.html">code_returnt</a>(<a class="code hl_class" href="classait.html">inserted_expr</a>);</div>
+<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span>    <a class="code hl_class" href="classait.html">target_instruction</a>-&gt;code_nonconst().add_source_location() =</div>
+<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span>      <a class="code hl_class" href="classait.html">target_instruction</a>-&gt;source_location();</div>
+<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span>  }</div>
+<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span>  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">target_instruction</a>-&gt;is_assign())</div>
+<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span>  {</div>
+<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span>    <span class="comment">// Assume that the LHS of *this* assignment is the actual nondet variable</span></div>
+<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span>    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code hl_class" href="classait.html">nondet_var</a> = <a class="code hl_class" href="classait.html">target_instruction</a>-&gt;assign_lhs();</div>
+<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span> </div>
+<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span>    <a class="code hl_class" href="classside__effect__expr__nondett.html">side_effect_expr_nondett</a> <a class="code hl_class" href="classait.html">inserted_expr</a>(</div>
+<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span>      <a class="code hl_class" href="classait.html">nondet_var</a>.type(), <a class="code hl_class" href="classait.html">target_instruction</a>-&gt;source_location());</div>
+<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span>    <a class="code hl_class" href="classait.html">inserted_expr</a>.set_nullable(</div>
+<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span>      <a class="code hl_class" href="classait.html">instr_info</a>.get_nullable_type() ==</div>
+<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span>      <a class="code hl_enumvalue" href="classnondet__instruction__infot.html#a61c7ecf3ae38767aa703a9c59f6936caac0d83f0b82a6b30de8811e69e6d95c61">nondet_instruction_infot::is_nullablet::TRUE</a>);</div>
+<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span>    <a class="code hl_class" href="classait.html">target_instruction</a>-&gt;assign_rhs_nonconst() = <a class="code hl_class" href="classait.html">inserted_expr</a>;</div>
+<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span>  }</div>
+<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span> </div>
+<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span>  goto_program.<a class="code hl_function" href="classgoto__programt.html#a2d19ab1e24b01874b1371c8272da146b">update</a>();</div>
+<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span> </div>
+<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span>  <span class="keywordflow">return</span> std::next(<a class="code hl_class" href="classait.html">target_instruction</a>);</div>
+<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span>}</div>
 </div>
-<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span> </div>
-<div class="foldopen" id="foldopen00309" data-start="{" data-end="}">
-<div class="line"><a id="l00309" name="l00309"></a><span class="lineno"><a class="line" href="replace__java__nondet_8cpp.html#a1e685d731c669bcfa0586e92a87790e3">  309</a></span><span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code hl_function" href="replace__java__nondet_8cpp.html#a1e685d731c669bcfa0586e92a87790e3">replace_java_nondet</a>(<a class="code hl_class" href="classgoto__programt.html">goto_programt</a> &amp;goto_program)</div>
-<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span>{</div>
-<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span>  <span class="keywordflow">for</span>(<span class="keyword">auto</span> <a class="code hl_class" href="classait.html">instruction_iterator</a> = goto_program.<a class="code hl_variable" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.begin(),</div>
-<div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span>           end = goto_program.<a class="code hl_variable" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.end();</div>
-<div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span>      <a class="code hl_class" href="classait.html">instruction_iterator</a> != end;)</div>
-<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span>  {</div>
-<div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span>    <a class="code hl_class" href="classait.html">instruction_iterator</a> =</div>
-<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span>      <a class="code hl_function" href="replace__java__nondet_8cpp.html#a824f1133f86c2774523620401a5e12e2">check_and_replace_target</a>(goto_program, <a class="code hl_class" href="classait.html">instruction_iterator</a>);</div>
-<div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span>  }</div>
-<div class="line"><a id="l00318" name="l00318"></a><span class="lineno">  318</span>}</div>
+<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span> </div>
+<div class="foldopen" id="foldopen00308" data-start="{" data-end="}">
+<div class="line"><a id="l00308" name="l00308"></a><span class="lineno"><a class="line" href="replace__java__nondet_8cpp.html#a1e685d731c669bcfa0586e92a87790e3">  308</a></span><span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code hl_function" href="replace__java__nondet_8cpp.html#a1e685d731c669bcfa0586e92a87790e3">replace_java_nondet</a>(<a class="code hl_class" href="classgoto__programt.html">goto_programt</a> &amp;goto_program)</div>
+<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span>{</div>
+<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span>  <span class="keywordflow">for</span>(<span class="keyword">auto</span> <a class="code hl_class" href="classait.html">instruction_iterator</a> = goto_program.<a class="code hl_variable" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.begin(),</div>
+<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span>           end = goto_program.<a class="code hl_variable" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>.end();</div>
+<div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span>      <a class="code hl_class" href="classait.html">instruction_iterator</a> != end;)</div>
+<div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span>  {</div>
+<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span>    <a class="code hl_class" href="classait.html">instruction_iterator</a> =</div>
+<div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span>      <a class="code hl_function" href="replace__java__nondet_8cpp.html#a824f1133f86c2774523620401a5e12e2">check_and_replace_target</a>(goto_program, <a class="code hl_class" href="classait.html">instruction_iterator</a>);</div>
+<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span>  }</div>
+<div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span>}</div>
 </div>
-<div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span> </div>
-<div class="foldopen" id="foldopen00323" data-start="{" data-end="}">
-<div class="line"><a id="l00323" name="l00323"></a><span class="lineno"><a class="line" href="replace__java__nondet_8cpp.html#ad1cfb98a7d466cdc8c0213b21b93b234">  323</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="replace__java__nondet_8cpp.html#a1e685d731c669bcfa0586e92a87790e3">replace_java_nondet</a>(<a class="code hl_class" href="classgoto__model__functiont.html">goto_model_functiont</a> &amp;function)</div>
-<div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span>{</div>
-<div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span>  <a class="code hl_class" href="classgoto__programt.html">goto_programt</a> &amp;program = function.<a class="code hl_function" href="classgoto__model__functiont.html#abe40a0e9eb38873ef9e5496f83e1324f">get_goto_function</a>().body;</div>
-<div class="line"><a id="l00326" name="l00326"></a><span class="lineno">  326</span>  <a class="code hl_function" href="replace__java__nondet_8cpp.html#a1e685d731c669bcfa0586e92a87790e3">replace_java_nondet</a>(program);</div>
-<div class="line"><a id="l00327" name="l00327"></a><span class="lineno">  327</span> </div>
-<div class="line"><a id="l00328" name="l00328"></a><span class="lineno">  328</span>  <a class="code hl_function" href="remove__skip_8cpp.html#aa6e82b3693efc89611c59d82db650af3">remove_skip</a>(program);</div>
-<div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span>}</div>
+<div class="line"><a id="l00318" name="l00318"></a><span class="lineno">  318</span> </div>
+<div class="foldopen" id="foldopen00322" data-start="{" data-end="}">
+<div class="line"><a id="l00322" name="l00322"></a><span class="lineno"><a class="line" href="replace__java__nondet_8cpp.html#ad1cfb98a7d466cdc8c0213b21b93b234">  322</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="replace__java__nondet_8cpp.html#a1e685d731c669bcfa0586e92a87790e3">replace_java_nondet</a>(<a class="code hl_class" href="classgoto__model__functiont.html">goto_model_functiont</a> &amp;function)</div>
+<div class="line"><a id="l00323" name="l00323"></a><span class="lineno">  323</span>{</div>
+<div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span>  <a class="code hl_class" href="classgoto__programt.html">goto_programt</a> &amp;program = function.<a class="code hl_function" href="classgoto__model__functiont.html#abe40a0e9eb38873ef9e5496f83e1324f">get_goto_function</a>().body;</div>
+<div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span>  <a class="code hl_function" href="replace__java__nondet_8cpp.html#a1e685d731c669bcfa0586e92a87790e3">replace_java_nondet</a>(program);</div>
+<div class="line"><a id="l00326" name="l00326"></a><span class="lineno">  326</span> </div>
+<div class="line"><a id="l00327" name="l00327"></a><span class="lineno">  327</span>  <a class="code hl_function" href="remove__skip_8cpp.html#aa6e82b3693efc89611c59d82db650af3">remove_skip</a>(program);</div>
+<div class="line"><a id="l00328" name="l00328"></a><span class="lineno">  328</span>}</div>
 </div>
-<div class="line"><a id="l00330" name="l00330"></a><span class="lineno">  330</span> </div>
-<div class="foldopen" id="foldopen00331" data-start="{" data-end="}">
-<div class="line"><a id="l00331" name="l00331"></a><span class="lineno"><a class="line" href="replace__java__nondet_8cpp.html#a86323a49f9e27c9110aad7097bd7024b">  331</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="replace__java__nondet_8cpp.html#a1e685d731c669bcfa0586e92a87790e3">replace_java_nondet</a>(<a class="code hl_class" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions)</div>
-<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span>{</div>
-<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span>  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;goto_program : goto_functions.<a class="code hl_variable" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
-<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span>  {</div>
-<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span>    <a class="code hl_function" href="replace__java__nondet_8cpp.html#a1e685d731c669bcfa0586e92a87790e3">replace_java_nondet</a>(goto_program.second.body);</div>
-<div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span>  }</div>
-<div class="line"><a id="l00337" name="l00337"></a><span class="lineno">  337</span> </div>
-<div class="line"><a id="l00338" name="l00338"></a><span class="lineno">  338</span>  <a class="code hl_function" href="remove__skip_8cpp.html#aa6e82b3693efc89611c59d82db650af3">remove_skip</a>(goto_functions);</div>
-<div class="line"><a id="l00339" name="l00339"></a><span class="lineno">  339</span>}</div>
+<div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span> </div>
+<div class="foldopen" id="foldopen00330" data-start="{" data-end="}">
+<div class="line"><a id="l00330" name="l00330"></a><span class="lineno"><a class="line" href="replace__java__nondet_8cpp.html#a86323a49f9e27c9110aad7097bd7024b">  330</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="replace__java__nondet_8cpp.html#a1e685d731c669bcfa0586e92a87790e3">replace_java_nondet</a>(<a class="code hl_class" href="classgoto__functionst.html">goto_functionst</a> &amp;goto_functions)</div>
+<div class="line"><a id="l00331" name="l00331"></a><span class="lineno">  331</span>{</div>
+<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span>  <span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;goto_program : goto_functions.<a class="code hl_variable" href="classgoto__functionst.html#a749020112f81660d0cd07a2cb2201cb9">function_map</a>)</div>
+<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span>  {</div>
+<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span>    <a class="code hl_function" href="replace__java__nondet_8cpp.html#a1e685d731c669bcfa0586e92a87790e3">replace_java_nondet</a>(goto_program.second.body);</div>
+<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span>  }</div>
+<div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span> </div>
+<div class="line"><a id="l00337" name="l00337"></a><span class="lineno">  337</span>  <a class="code hl_function" href="remove__skip_8cpp.html#aa6e82b3693efc89611c59d82db650af3">remove_skip</a>(goto_functions);</div>
+<div class="line"><a id="l00338" name="l00338"></a><span class="lineno">  338</span>}</div>
 </div>
-<div class="line"><a id="l00340" name="l00340"></a><span class="lineno">  340</span> </div>
-<div class="foldopen" id="foldopen00344" data-start="{" data-end="}">
-<div class="line"><a id="l00344" name="l00344"></a><span class="lineno"><a class="line" href="replace__java__nondet_8cpp.html#a370c29cbd4d6dc28e9dc4c6cd4003ec4">  344</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="replace__java__nondet_8cpp.html#a1e685d731c669bcfa0586e92a87790e3">replace_java_nondet</a>(<a class="code hl_class" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model)</div>
-<div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span>{</div>
-<div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span>  <a class="code hl_function" href="replace__java__nondet_8cpp.html#a1e685d731c669bcfa0586e92a87790e3">replace_java_nondet</a>(goto_model.<a class="code hl_variable" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>);</div>
-<div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span>}</div>
+<div class="line"><a id="l00339" name="l00339"></a><span class="lineno">  339</span> </div>
+<div class="foldopen" id="foldopen00343" data-start="{" data-end="}">
+<div class="line"><a id="l00343" name="l00343"></a><span class="lineno"><a class="line" href="replace__java__nondet_8cpp.html#a370c29cbd4d6dc28e9dc4c6cd4003ec4">  343</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="replace__java__nondet_8cpp.html#a1e685d731c669bcfa0586e92a87790e3">replace_java_nondet</a>(<a class="code hl_class" href="classgoto__modelt.html">goto_modelt</a> &amp;goto_model)</div>
+<div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span>{</div>
+<div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span>  <a class="code hl_function" href="replace__java__nondet_8cpp.html#a1e685d731c669bcfa0586e92a87790e3">replace_java_nondet</a>(goto_model.<a class="code hl_variable" href="classgoto__modelt.html#ae63ccd9b824a94422f0bcead059bcaa2">goto_functions</a>);</div>
+<div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span>}</div>
 </div>
 <div class="ttc" id="aclassait_html"><div class="ttname"><a href="classait.html">ait</a></div><div class="ttdoc">ait supplies three of the four components needed: an abstract interpreter (in this case handling func...</div><div class="ttdef"><b>Definition</b> <a href="ai_8h_source.html#l00565">ai.h:566</a></div></div>
 <div class="ttc" id="aclasscode__function__callt_html"><div class="ttname"><a href="classcode__function__callt.html">code_function_callt</a></div><div class="ttdoc">goto_instruction_codet representation of a function call statement.</div><div class="ttdef"><b>Definition</b> <a href="goto__instruction__code_8h_source.html#l00270">goto_instruction_code.h:271</a></div></div>
@@ -460,7 +459,7 @@ $(document).ready(function(){initNavTree('replace__java__nondet_8cpp_source.html
 <div class="ttc" id="aremove__skip_8cpp_html_aa6e82b3693efc89611c59d82db650af3"><div class="ttname"><a href="remove__skip_8cpp.html#aa6e82b3693efc89611c59d82db650af3">remove_skip</a></div><div class="ttdeci">void remove_skip(goto_programt &amp;goto_program, goto_programt::targett begin, goto_programt::targett end)</div><div class="ttdoc">remove unnecessary skip statements</div><div class="ttdef"><b>Definition</b> <a href="remove__skip_8cpp_source.html#l00087">remove_skip.cpp:87</a></div></div>
 <div class="ttc" id="aremove__skip_8h_html"><div class="ttname"><a href="remove__skip_8h.html">remove_skip.h</a></div><div class="ttdoc">Program Transformation.</div></div>
 <div class="ttc" id="areplace__java__nondet_8cpp_html_a1b19b278f7cac75b86caca76cf63344b"><div class="ttname"><a href="replace__java__nondet_8cpp.html#a1b19b278f7cac75b86caca76cf63344b">is_nondet_returning_object</a></div><div class="ttdeci">static nondet_instruction_infot is_nondet_returning_object(const code_function_callt &amp;function_call)</div><div class="ttdoc">Checks whether the function call is one of our nondet library functions.</div><div class="ttdef"><b>Definition</b> <a href="replace__java__nondet_8cpp_source.html#l00068">replace_java_nondet.cpp:68</a></div></div>
-<div class="ttc" id="areplace__java__nondet_8cpp_html_a1e685d731c669bcfa0586e92a87790e3"><div class="ttname"><a href="replace__java__nondet_8cpp.html#a1e685d731c669bcfa0586e92a87790e3">replace_java_nondet</a></div><div class="ttdeci">static void replace_java_nondet(goto_programt &amp;goto_program)</div><div class="ttdoc">Checks each instruction in the goto program to see whether it is a method returning nondet.</div><div class="ttdef"><b>Definition</b> <a href="replace__java__nondet_8cpp_source.html#l00309">replace_java_nondet.cpp:309</a></div></div>
+<div class="ttc" id="areplace__java__nondet_8cpp_html_a1e685d731c669bcfa0586e92a87790e3"><div class="ttname"><a href="replace__java__nondet_8cpp.html#a1e685d731c669bcfa0586e92a87790e3">replace_java_nondet</a></div><div class="ttdeci">static void replace_java_nondet(goto_programt &amp;goto_program)</div><div class="ttdoc">Checks each instruction in the goto program to see whether it is a method returning nondet.</div><div class="ttdef"><b>Definition</b> <a href="replace__java__nondet_8cpp_source.html#l00308">replace_java_nondet.cpp:308</a></div></div>
 <div class="ttc" id="areplace__java__nondet_8cpp_html_a3db82b94452333502f01d5a43e2f47ed"><div class="ttname"><a href="replace__java__nondet_8cpp.html#a3db82b94452333502f01d5a43e2f47ed">is_symbol_with_id</a></div><div class="ttdeci">static bool is_symbol_with_id(const exprt &amp;expr, const irep_idt &amp;identifier)</div><div class="ttdoc">Return whether the expression is a symbol with the specified identifier.</div><div class="ttdef"><b>Definition</b> <a href="replace__java__nondet_8cpp_source.html#l00108">replace_java_nondet.cpp:108</a></div></div>
 <div class="ttc" id="areplace__java__nondet_8cpp_html_a42a10330425d1a853e681359de991876"><div class="ttname"><a href="replace__java__nondet_8cpp.html#a42a10330425d1a853e681359de991876">is_return_with_variable</a></div><div class="ttdeci">static bool is_return_with_variable(const goto_programt::instructiont &amp;instr, const irep_idt &amp;identifier)</div><div class="ttdoc">Return whether the instruction is a return, and the rhs is a symbol or typecast expression with the s...</div><div class="ttdef"><b>Definition</b> <a href="replace__java__nondet_8cpp_source.html#l00161">replace_java_nondet.cpp:161</a></div></div>
 <div class="ttc" id="areplace__java__nondet_8cpp_html_a4a8ff85779250a374ee536cceced0963"><div class="ttname"><a href="replace__java__nondet_8cpp.html#a4a8ff85779250a374ee536cceced0963">is_assignment_from</a></div><div class="ttdeci">static bool is_assignment_from(const goto_programt::instructiont &amp;instr, const irep_idt &amp;identifier)</div><div class="ttdoc">Return whether the instruction is an assignment, and the rhs is a symbol or typecast expression with ...</div><div class="ttdef"><b>Definition</b> <a href="replace__java__nondet_8cpp_source.html#l00141">replace_java_nondet.cpp:141</a></div></div>
@@ -471,8 +470,8 @@ $(document).ready(function(){initNavTree('replace__java__nondet_8cpp_source.html
 <div class="ttc" id="asrc_2util_2invariant_8h_html_a3bbb0ca244ed91263aa51797d6b7ad9e"><div class="ttname"><a href="src_2util_2invariant_8h.html#a3bbb0ca244ed91263aa51797d6b7ad9e">DATA_INVARIANT</a></div><div class="ttdeci">#define DATA_INVARIANT(CONDITION, REASON)</div><div class="ttdoc">This condition should be used to document that assumptions that are made on goto_functions,...</div><div class="ttdef"><b>Definition</b> <a href="src_2util_2invariant_8h_source.html#l00534">invariant.h:534</a></div></div>
 <div class="ttc" id="asrc_2util_2invariant_8h_html_ab5a3ae9c361c72d5dc551b87f56824de"><div class="ttname"><a href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a></div><div class="ttdeci">#define INVARIANT(CONDITION, REASON)</div><div class="ttdoc">This macro uses the wrapper function 'invariant_violated_string'.</div><div class="ttdef"><b>Definition</b> <a href="src_2util_2invariant_8h_source.html#l00423">invariant.h:423</a></div></div>
 <div class="ttc" id="astd__code_8h_html"><div class="ttname"><a href="std__code_8h.html">std_code.h</a></div></div>
-<div class="ttc" id="astd__expr_8h_html_a5f80218fd4a0b448a01e9b09dd9c732c"><div class="ttname"><a href="std__expr_8h.html#a5f80218fd4a0b448a01e9b09dd9c732c">to_typecast_expr</a></div><div class="ttdeci">const typecast_exprt &amp; to_typecast_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to a typecast_exprt.</div><div class="ttdef"><b>Definition</b> <a href="std__expr_8h_source.html#l02014">std_expr.h:2014</a></div></div>
-<div class="ttc" id="astd__expr_8h_html_ab73d10aafcdec6cfd5992704af55dd51"><div class="ttname"><a href="std__expr_8h.html#ab73d10aafcdec6cfd5992704af55dd51">to_symbol_expr</a></div><div class="ttdeci">const symbol_exprt &amp; to_symbol_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to a symbol_exprt.</div><div class="ttdef"><b>Definition</b> <a href="std__expr_8h_source.html#l00211">std_expr.h:211</a></div></div>
+<div class="ttc" id="astd__expr_8h_html_a5f80218fd4a0b448a01e9b09dd9c732c"><div class="ttname"><a href="std__expr_8h.html#a5f80218fd4a0b448a01e9b09dd9c732c">to_typecast_expr</a></div><div class="ttdeci">const typecast_exprt &amp; to_typecast_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to a typecast_exprt.</div><div class="ttdef"><b>Definition</b> <a href="std__expr_8h_source.html#l02024">std_expr.h:2024</a></div></div>
+<div class="ttc" id="astd__expr_8h_html_ab73d10aafcdec6cfd5992704af55dd51"><div class="ttname"><a href="std__expr_8h.html#ab73d10aafcdec6cfd5992704af55dd51">to_symbol_expr</a></div><div class="ttdeci">const symbol_exprt &amp; to_symbol_expr(const exprt &amp;expr)</div><div class="ttdoc">Cast an exprt to a symbol_exprt.</div><div class="ttdef"><b>Definition</b> <a href="std__expr_8h_source.html#l00221">std_expr.h:221</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

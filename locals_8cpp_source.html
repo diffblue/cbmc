@@ -125,7 +125,7 @@ $(document).ready(function(){initNavTree('locals_8cpp_source.html',''); initResi
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>  <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;instruction : goto_function.<a class="code hl_variable" href="classgoto__functiont.html#a2374f74a53fbd62d61a683fc6d4b5a62">body</a>.<a class="code hl_variable" href="classgoto__programt.html#a02da75dda2bb6a101b93ebbca2e01ea1">instructions</a>)</div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>  {</div>
 <div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    <span class="keywordflow">if</span>(instruction.is_decl())</div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>      <a class="code hl_variable" href="classlocalst.html#ac2b70de02358491c7391ef8ef8aaa4ef">locals</a>.insert(instruction.decl_symbol().get_identifier());</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>      <a class="code hl_variable" href="classlocalst.html#ac2b70de02358491c7391ef8ef8aaa4ef">locals</a>.insert(instruction.decl_symbol().identifier());</div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>  }</div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>  <a class="code hl_variable" href="classlocalst.html#ac2b70de02358491c7391ef8ef8aaa4ef">locals</a>.insert(</div>

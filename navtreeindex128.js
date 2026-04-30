@@ -1,5 +1,7 @@
 var NAVTREEINDEX128 =
 {
+"report__properties_8h.html":[8,0,2,6,40],
+"report__properties_8h.html#a513a7c32550eea42ad4aa60373eb9518":[8,0,2,6,40,0],
 "report__properties_8h.html#abdf7c9c0ac8adc3688c22ad7ed3458c7":[8,0,2,6,40,1],
 "report__properties_8h_source.html":[8,0,2,6,40],
 "report__traces_8cpp.html":[8,0,2,6,41],
@@ -247,7 +249,5 @@ var NAVTREEINDEX128 =
 "satcheck__booleforce_8cpp.html":[8,0,2,27,7,13],
 "satcheck__booleforce_8cpp_source.html":[8,0,2,27,7,13],
 "satcheck__booleforce_8h.html":[8,0,2,27,7,14],
-"satcheck__booleforce_8h_source.html":[8,0,2,27,7,14],
-"satcheck__cadical_8cpp.html":[8,0,2,27,7,15],
-"satcheck__cadical_8cpp_source.html":[8,0,2,27,7,15]
+"satcheck__booleforce_8h_source.html":[8,0,2,27,7,14]
 };

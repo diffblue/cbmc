@@ -318,7 +318,7 @@ Functions</h2></td></tr>
 
 <p>Generate defaults for all contract clauses of the loop with ID <code>loop_id</code> if at least one type of clause is defined. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00308">308</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00307">307</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
 
 </div>
 </div>
@@ -410,7 +410,7 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00393">393</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00392">392</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
 
 </div>
 </div>
@@ -463,7 +463,7 @@ Functions</h2></td></tr>
 <p>Compute subset of locals that must be tracked in the loop's write set. </p>
 <p>A local must be tracked if it is dirty or if it may be assigned by one of the inner loops. To understand why, just consider what would happen in this situation: The loop-local must be declared in the assigns clause of the inner loop otherwise assigns clause checking for the inner loop would fail (from the point of view of the inner loop, that variable is non-local). Since write sets inclusion checks are performed between a loop and its immediately inner loops, if a loop-local variable that's dirty or that is assigned by an inner loop is not tracked in the loop's write set the inclusion check between the loop write set and inner loop would fail, because the inner loop contains a location that cannot be found in the outer loop's write set. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00269">269</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00268">268</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
 
 </div>
 </div>
@@ -594,7 +594,7 @@ Functions</h2></td></tr>
 <p>Returns true if the lhs to an assignment must be checked against its write set. </p>
 <p>The set of locally declared identifiers and the subset of that that are tracked explicitly in the write set are used to make the decision. See comments inside the function for explanations. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00786">786</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__cfg__info_8cpp_source.html#l00785">785</a> of file <a class="el" href="dfcc__cfg__info_8cpp_source.html">dfcc_cfg_info.cpp</a>.</p>
 
 </div>
 </div>
