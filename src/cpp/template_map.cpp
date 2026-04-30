@@ -79,7 +79,58 @@ void template_mapt::apply(typet &type) const
     {
       irept::subt &bases = type.add(ID_bases).get_sub();
       for(auto &base : bases)
+      {
         apply(static_cast<typet &>(base.add(ID_type)));
+        // Base class specifiers store the class name in ID_name
+        // (as a cpp_name).  Expand pack parameters in the base
+        // class template arguments.  We only touch the
+        // template_args sub-nodes to avoid disturbing other
+        // name components.
+        if(!pack_args_map.empty() && base.find(ID_name).id() == ID_cpp_name)
+        {
+          for(auto &s : base.add(ID_name).get_sub())
+          {
+            if(s.id() == ID_template_args)
+            {
+              irept::subt &args = s.add(ID_arguments).get_sub();
+              // Expand pack parameters
+              irept::subt expanded;
+              for(auto &arg : args)
+              {
+                bool was_pack = false;
+                if(arg.id() == ID_type)
+                {
+                  const typet &at = static_cast<const exprt &>(arg).type();
+                  if(at.id() == ID_template_parameter_symbol_type)
+                  {
+                    const irep_idt &pid =
+                      to_template_parameter_symbol_type(at).get_identifier();
+                    for(const auto &pe : pack_args_map)
+                    {
+                      if(pe.first == pid)
+                      {
+                        for(const auto &pt : pe.second)
+                          expanded.push_back(
+                            static_cast<const irept &>(type_exprt{pt}));
+                        was_pack = true;
+                        break;
+                      }
+                    }
+                  }
+                }
+                if(!was_pack)
+                {
+                  apply(static_cast<exprt &>(arg));
+                  if(!(arg.id() == ID_type &&
+                       static_cast<const exprt &>(arg).type().id() == ID_empty))
+                    expanded.push_back(arg);
+                }
+              }
+              args = expanded;
+            }
+          }
+        }
+      }
     }
 
     // Traverse the body sub-tree (member declarations).
