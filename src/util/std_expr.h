@@ -2103,7 +2103,7 @@ inline and_exprt &to_and_expr(exprt &expr)
 /// Any number of operands that is greater or equal one.
 /// When given one operand, this is equivalent to the negation.
 /// When given three or more operands, this is equivalent to the negation
-/// of the and expression with the same operands.
+/// of the 'and' expression with the same operands.
 class nand_exprt : public multi_ary_exprt
 {
 public:
@@ -2248,7 +2248,7 @@ inline or_exprt &to_or_expr(exprt &expr)
 /// Any number of operands that is greater or equal one.
 /// When given one operand, this is equivalent to the negation.
 /// When given three or more operands, this is equivalent to the negation
-/// of the and expression with the same operands.
+/// of the 'or' expression with the same operands.
 class nor_exprt : public multi_ary_exprt
 {
 public:
@@ -2331,7 +2331,7 @@ inline xor_exprt &to_xor_expr(exprt &expr)
 ///
 /// When given one operand, this is equivalent to the negation.
 /// When given three or more operands, this is equivalent to the negation
-/// of the xor expression with the same operands.
+/// of the 'xor' expression with the same operands.
 class xnor_exprt : public multi_ary_exprt
 {
 public:
