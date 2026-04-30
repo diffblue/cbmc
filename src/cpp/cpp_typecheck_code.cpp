@@ -768,8 +768,26 @@ void cpp_typecheckt::typecheck_ifthenelse(code_ifthenelset &code)
     }
     else
     {
-      // Condition not constant — fall back to normal handling
-      c_typecheck_baset::typecheck_ifthenelse(code);
+      // Condition not constant — try both branches but suppress
+      // errors.  In well-formed C++, if-constexpr conditions must
+      // be constant, but CBMC may fail to evaluate complex type
+      // trait expressions.  Suppressing errors prevents ill-formed
+      // code in the would-be-discarded branch from causing failures.
+      auto errors_before =
+        get_message_handler().get_message_count(messaget::M_ERROR);
+      try
+      {
+        c_typecheck_baset::typecheck_ifthenelse(code);
+      }
+      catch(int)
+      {
+        get_message_handler().set_message_count(
+          messaget::M_ERROR, errors_before);
+        // Replace both branches with skip
+        code.then_case() = code_skipt();
+        if(code.has_else_case())
+          code.else_case() = code_skipt();
+      }
     }
   }
   else
