@@ -3155,6 +3155,14 @@ resolved_after_strip:
                       e = r;
                   }
                   simplify(e, cpp_typecheck);
+                  // Unwrap dereference(constant) from ref-returning constexpr
+                  if(
+                    e.id() == ID_dereference &&
+                    e.operands().size() == 1 &&
+                    e.operands()[0].is_constant())
+                  {
+                    e = e.operands()[0];
+                  }
                 };
                 eval_calls(val);
               }
