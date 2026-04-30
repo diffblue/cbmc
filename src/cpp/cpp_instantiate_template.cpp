@@ -393,10 +393,18 @@ exprt try_evaluate_constexpr(
   const auto &function = call.function();
   const auto &arguments = call.arguments();
 
-  // All arguments must be constants
+  // All arguments must be constants (or address_of(constant) for
+  // reference parameters).
   for(const auto &arg : arguments)
-    if(!arg.is_constant())
-      return nil_exprt();
+  {
+    if(arg.is_constant())
+      continue;
+    if(
+      arg.id() == ID_address_of &&
+      to_address_of_expr(arg).object().is_constant())
+      continue;
+    return nil_exprt();
+  }
 
   // Look up the function body
   if(function.id() != ID_symbol)
@@ -429,9 +437,22 @@ exprt try_evaluate_constexpr(
     return nil_exprt();
 
   // Build a variable map: parameter → constant value
+  // For reference parameters (address_of(constant)), unwrap to the constant.
   std::map<irep_idt, exprt> vars;
   for(std::size_t i = 0; i < params.size(); ++i)
-    vars[params[i].get_identifier()] = arguments[i];
+  {
+    if(
+      arguments[i].id() == ID_address_of &&
+      to_address_of_expr(arguments[i]).object().is_constant())
+    {
+      vars[params[i].get_identifier()] =
+        to_address_of_expr(arguments[i]).object();
+    }
+    else
+    {
+      vars[params[i].get_identifier()] = arguments[i];
+    }
+  }
 
   // Mini-interpreter: execute the body with bounded iterations
   std::function<std::optional<exprt>(const codet &, int)> execute;
