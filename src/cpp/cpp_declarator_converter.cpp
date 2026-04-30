@@ -483,6 +483,33 @@ void cpp_declarator_convertert::combine_types(
     return; // ok
   }
 
+  else if(
+    symbol.type.id() == ID_code && decl_type.id() == ID_code &&
+    to_code_type(symbol.type).parameters().size() ==
+      to_code_type(decl_type).parameters().size())
+  {
+    // When the existing symbol has a resolved return type (e.g.,
+    // auto deduced to int*) and the new declaration has an
+    // unresolved auto/decltype return type, keep the existing
+    // resolved type.  This happens when a function template is
+    // instantiated twice — the first deduces auto, the second
+    // doesn't.
+    const auto &existing_ret = to_code_type(symbol.type).return_type();
+    const auto &new_ret = to_code_type(decl_type).return_type();
+    if(
+      existing_ret.id() != ID_auto && new_ret.id() == ID_auto)
+    {
+      return; // keep existing resolved type
+    }
+    if(
+      existing_ret.id() != ID_auto &&
+      (new_ret.id() == ID_auto ||
+       id2string(new_ret.id()).find("decltype") != std::string::npos))
+    {
+      return; // keep existing resolved type
+    }
+  }
+
   cpp_typecheck.error().source_location = source_location;
   cpp_typecheck.error() << "symbol '" << symbol.display_name()
                         << "' already declared with different type:\n"
