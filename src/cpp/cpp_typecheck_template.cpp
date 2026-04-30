@@ -2121,6 +2121,16 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
             if(r.is_not_nil())
               e = r;
           }
+          if(
+            e.id() == ID_dereference && e.operands().size() == 1 &&
+            e.operands()[0].id() == ID_side_effect &&
+            e.operands()[0].get(ID_statement) == ID_function_call)
+          {
+            exprt r =
+              try_evaluate_constexpr(e.operands()[0], symbol_table, *this);
+            if(r.is_not_nil())
+              e = r;
+          }
           simplify(e, *this);
         };
         eval_calls(arg);
