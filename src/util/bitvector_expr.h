@@ -483,6 +483,8 @@ inline shift_exprt &to_shift_expr(exprt &expr)
 }
 
 /// \brief Left shift
+/// Shift distances may exceed the width of the shifted operand.
+/// Shifts with negative shift distance do not have meaning.
 class shl_exprt : public shift_exprt
 {
 public:
@@ -527,6 +529,8 @@ inline shl_exprt &to_shl_expr(exprt &expr)
 }
 
 /// \brief Arithmetic right shift
+/// Shift distances may exceed the width of the shifted operand.
+/// Shifts with negative shift distance do not have meaning.
 class ashr_exprt : public shift_exprt
 {
 public:
@@ -548,6 +552,8 @@ inline bool can_cast_expr<ashr_exprt>(const exprt &base)
 }
 
 /// \brief Logical right shift
+/// Shift distances may exceed the width of the shifted operand.
+/// Shifts with negative shift distance do not have meaning.
 class lshr_exprt : public shift_exprt
 {
 public:
