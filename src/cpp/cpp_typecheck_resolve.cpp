@@ -18,6 +18,13 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/simplify_expr.h>
+#include <util/std_code.h>
+#include <util/symbol_table_base.h>
+
+extern exprt try_evaluate_constexpr(
+  const exprt &expr,
+  const symbol_table_baset &symbol_table,
+  const namespacet &ns);
 #include <util/std_expr.h>
 #include <util/string_constant.h>
 #include <util/symbol_table_base.h>
@@ -3087,11 +3094,33 @@ resolved_after_strip:
             }
             const symbolt &inst_sym = cpp_typecheck.instantiate_template(
               source_location, s, tc_args, tc_args);
-            // The instantiated symbol is a constexpr bool variable.
-            // Return its value.
+            // The instantiated symbol is a constexpr variable.
+            // Return its value, evaluating any remaining constexpr
+            // function calls.
             if(inst_sym.value.is_not_nil())
             {
               exprt val = inst_sym.value;
+              if(!val.is_constant())
+              {
+                // Try constexpr evaluation of function calls
+                std::function<void(exprt &)> eval_calls;
+                eval_calls = [&](exprt &e)
+                {
+                  for(auto &op : e.operands())
+                    eval_calls(op);
+                  if(
+                    e.id() == ID_side_effect &&
+                    e.get(ID_statement) == ID_function_call)
+                  {
+                    exprt r = try_evaluate_constexpr(
+                      e, cpp_typecheck.symbol_table, cpp_typecheck);
+                    if(r.is_not_nil())
+                      e = r;
+                  }
+                  simplify(e, cpp_typecheck);
+                };
+                eval_calls(val);
+              }
               val.add_source_location() = source_location;
               identifiers.push_back(val);
               handled_variable_template = true;
