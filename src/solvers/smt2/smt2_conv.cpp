@@ -267,6 +267,10 @@ static bool is_zero_width(const typet &type, const namespacet &ns)
     // out-of-bounds accesses that we need to model
     return is_zero_width(array_type->element_type(), ns);
   }
+  else if(auto bv_type = type_try_dynamic_cast<bitvector_typet>(type))
+  {
+    return bv_type->width() == 0;
+  }
   else
     return false;
 }
