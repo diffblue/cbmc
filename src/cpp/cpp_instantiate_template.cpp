@@ -1249,9 +1249,8 @@ void cpp_typecheckt::elaborate_class_template(
           cpp_template_args_tct partial_specialization_args_tc;
           bool sfinae_failed = false;
           {
-            null_message_handlert null_handler;
-            message_handlert &old_handler = get_message_handler();
-            set_message_handler(null_handler);
+            const std::size_t ps_errors =
+              get_message_handler().get_message_count(messaget::M_ERROR);
             try
             {
               partial_specialization_args_tc = typecheck_template_args(
@@ -1263,7 +1262,8 @@ void cpp_typecheckt::elaborate_class_template(
             {
               sfinae_failed = true;
             }
-            set_message_handler(old_handler);
+            get_message_handler().set_message_count(
+              messaget::M_ERROR, ps_errors);
           }
           if(sfinae_failed)
             continue;
