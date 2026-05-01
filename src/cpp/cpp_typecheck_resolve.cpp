@@ -1943,10 +1943,11 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
           }
           if(cpp_typecheck.suppress_elaborate)
             throw 0;
-          cpp_typecheck.show_instantiation_stack(cpp_typecheck.error());
-          cpp_typecheck.error().source_location = source_location;
-          cpp_typecheck.error()
-            << "scope '" << final_base_name << "' not found" << messaget::eom;
+          // Scope-not-found during qualified name lookup is a
+          // potential SFINAE failure.  Throw without error message
+          // so that template specialization matching can discard
+          // this candidate.  The error is caught by method body
+          // processing or template instantiation.
           throw 0;
         }
         else if(id_set.size() >= 2)
