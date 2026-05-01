@@ -3,6 +3,7 @@
 /// \file
 /// Unit tests for smt2_convt
 
+#include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
@@ -113,4 +114,19 @@ TEST_CASE("smt2_convt reduction operators", "[core][solvers][smt2]")
       get_assert(unary_predicate_exprt{ID_reduction_or, sym1}) ==
       "(assert (not (= y (_ bv0 1))))");
   }
+}
+
+TEST_CASE(
+  "smt2_convt no unary concat for zero-width operand",
+  "[core][solvers][smt2]")
+{
+  unsignedbv_typet u8{8};
+  unsignedbv_typet u0{0};
+  symbol_exprt x{"x", u8};
+  symbol_exprt z{"z", u0};
+
+  // concat of a zero-width and a non-zero-width operand should emit
+  // the non-zero-width operand directly, not (concat x)
+  concatenation_exprt concat{{z, x}, u8};
+  REQUIRE(get_assert(equal_exprt{concat, x}) == "(assert (= x x))");
 }
