@@ -476,6 +476,16 @@ exprt try_evaluate_constexpr(
         return it->second;
       return e;
     }
+    // dereference(symbol) where symbol maps to a constant:
+    // the parameter is a reference, unwrap the dereference.
+    if(
+      e.id() == ID_dereference && e.operands().size() == 1 &&
+      e.operands()[0].id() == ID_symbol)
+    {
+      auto it = vars.find(to_symbol_expr(e.operands()[0]).get_identifier());
+      if(it != vars.end() && it->second.is_constant())
+        return it->second;
+    }
     if(e.id() == ID_side_effect && e.get(ID_statement) == ID_function_call)
     {
       // Recursively evaluate nested function calls
