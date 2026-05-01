@@ -470,6 +470,19 @@ void cpp_declarator_convertert::combine_types(
       // ok
       return;
     }
+
+    // Return types differ but parameters match: if the existing
+    // symbol has a resolved return type and the new one has
+    // unresolved auto/decltype, keep the existing type.
+    const auto &existing_ret = symbol_code_type.return_type();
+    const auto &new_ret = decl_code_type.return_type();
+    if(
+      existing_ret.id() != ID_auto &&
+      (new_ret.id() == ID_auto ||
+       id2string(new_ret.id()).find("decltype") != std::string::npos))
+    {
+      return;
+    }
   }
   else if(symbol.type == decl_type)
     return; // ok

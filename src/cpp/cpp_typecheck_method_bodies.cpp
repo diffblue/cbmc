@@ -1,3 +1,4 @@
+#include <iostream>
 /*******************************************************************\
 
 Module: C++ Language Type Checking
@@ -79,6 +80,8 @@ void cpp_typecheckt::typecheck_method_bodies()
         {
           // Type-checking failed — clear the partially-checked body
           // so the function is cleanly in the "no body" state.
+          if(id2string(method_symbol.name).find("vector(this)") != std::string::npos || id2string(method_symbol.name).find("_Uninitialized_move") != std::string::npos)
+            std::cerr << "BFAIL: " << method_symbol.name << " errors=" << (get_message_handler().get_message_count(messaget::M_ERROR) - errors_before) << std::endl;
           method_symbol.value.make_nil();
         }
         get_message_handler().set_message_count(
