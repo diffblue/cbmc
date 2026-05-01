@@ -1843,8 +1843,14 @@ void cpp_typecheckt::typecheck_member_function(
 
   // Is this in a class template?
   // If so, we defer typechecking until used.
-  if(cpp_scopes.current_scope().get_parent().is_template_scope())
+  // But for template INSTANTIATIONS (template_class_instance),
+  // the methods should be processed — they ARE being used.
+  if(
+    cpp_scopes.current_scope().get_parent().is_template_scope() &&
+    !symbol.type.get_bool(ID_template_class_instance))
+  {
     deferred_typechecking.insert(new_symbol->name);
+  }
   else
     add_method_body(new_symbol);
 }
