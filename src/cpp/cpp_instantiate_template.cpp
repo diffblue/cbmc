@@ -613,9 +613,10 @@ void cpp_typecheckt::elaborate_class_template(
       if(
         (sym.type.id() == ID_struct || sym.type.id() == ID_union) &&
         sym.type.get_bool(ID_template_class_instance) &&
-        to_struct_union_type(sym.type).components().empty())
+        (to_struct_union_type(sym.type).components().empty() ||
+         to_struct_union_type(sym.type).is_incomplete()))
       {
-        // Empty template instance — allow elaboration
+        // Empty or incomplete template instance — allow elaboration
       }
       else
         return;
@@ -1251,6 +1252,12 @@ void cpp_typecheckt::elaborate_class_template(
           {
             const std::size_t ps_errors =
               get_message_handler().get_message_count(messaget::M_ERROR);
+            // Per [temp.inst]/1, template arguments in partial
+            // specialization matching don't require complete types.
+            // Suppress eager elaboration to avoid instantiating
+            // unused branches (e.g., conditional_t's false branch).
+            bool old_suppress = suppress_elaborate;
+            suppress_elaborate = true;
             try
             {
               partial_specialization_args_tc = typecheck_template_args(
@@ -1262,6 +1269,7 @@ void cpp_typecheckt::elaborate_class_template(
             {
               sfinae_failed = true;
             }
+            suppress_elaborate = old_suppress;
             get_message_handler().set_message_count(
               messaget::M_ERROR, ps_errors);
           }
