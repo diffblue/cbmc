@@ -2724,6 +2724,67 @@ void smt2_convt::convert_expr(const exprt &expr)
     // use the lowering
     convert_expr(to_cond_expr(expr).lower());
   }
+  else if(expr.id() == ID_reduction_and)
+  {
+    // This is true iff all bits in the operand are true
+    auto &op = to_unary_expr(expr).op();
+    auto all_ones = to_bitvector_type(op.type()).all_ones_expr();
+    convert_expr(equal_exprt{op, all_ones});
+  }
+  else if(expr.id() == ID_reduction_nand)
+  {
+    // This is the negation of "reduction and"
+    auto &op = to_unary_expr(expr).op();
+    convert_expr(not_exprt{unary_predicate_exprt{ID_reduction_and, op}});
+  }
+  else if(expr.id() == ID_reduction_or)
+  {
+    // This is true iff the operand is not zero
+    auto &op = to_unary_expr(expr).op();
+    auto all_zeros = to_bitvector_type(op.type()).all_zeros_expr();
+    convert_expr(notequal_exprt{op, all_zeros});
+  }
+  else if(expr.id() == ID_reduction_nor)
+  {
+    // This is the negation of "reduction or"
+    auto &op = to_unary_expr(expr).op();
+    convert_expr(not_exprt{unary_predicate_exprt{ID_reduction_or, op}});
+  }
+  else if(expr.id() == ID_reduction_xor)
+  {
+    // This is the parity of the operand. No SMT-LIB 2 equivalent.
+    // Do bit-wise. SMT-LIB 3.0 could do this with "fold bvxor".
+    auto &op = to_unary_expr(expr).op();
+    auto width = to_bitvector_type(op.type()).get_width();
+    PRECONDITION(width >= 1);
+
+    if(width == 1)
+    {
+      out << "(= ";
+      flatten2bv(op);
+      out << " #b1)";
+    }
+    else
+    {
+      out << "(let ((?rop ";
+      flatten2bv(op);
+      out << ")) ";
+
+      // XOR all bits: extract each bit and use multi-ary bvxor
+      out << "(= (bvxor";
+      for(std::size_t i = 0; i < width; i++)
+        out << " ((_ extract " << i << " " << i << ") ?rop)";
+      out << ") #b1)";
+
+      out << ')'; // let
+    }
+  }
+  else if(expr.id() == ID_reduction_xnor)
+  {
+    // This is the negation of "reduction xor"
+    auto &op = to_unary_expr(expr).op();
+    convert_expr(not_exprt{unary_predicate_exprt{ID_reduction_xor, op}});
+  }
   else
     INVARIANT_WITH_DIAGNOSTICS(
       false,
