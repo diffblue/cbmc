@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string_constant.h>
 
 #include <solvers/algebraic/groebner.h>
+#include <solvers/algebraic/vanishing.h>
 #include <solvers/algebraic/poly_extract.h>
 #include <solvers/floatbv/float_utils.h>
 
@@ -706,6 +707,18 @@ bool boolbvt::try_algebraic_solve()
     if(single_bw == 0)
       continue;
     polynomialt diff = *lhs - *rhs;
+
+    // Try vanishing polynomial test first (complete for equivalence)
+    {
+      // All variables have the same bitwidth in this context
+      std::vector<unsigned> input_widths;
+      if(is_vanishing_polynomial(diff, input_widths))
+      {
+        prop.l_set_to_true(const_literal(false));
+        return true;
+      }
+    }
+
     std::size_t e_idx = single_extractor.get_var_index("__rab");
     polynomialt e_var{single_bw, mp_integer{1}, e_idx};
     polynomialt rab = (diff * e_var) - polynomialt{single_bw, mp_integer{1}};

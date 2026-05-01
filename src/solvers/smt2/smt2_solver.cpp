@@ -162,6 +162,14 @@ void smt2_solvert::setup_commands()
         }
       }
 
+      // Simplify assertions (word-level: commutativity, distributivity)
+      {
+        const symbol_tablet empty_symbol_table;
+        const namespacet simplify_ns{empty_symbol_table};
+        for(auto &e : deferred_assertions)
+          e = simplify_expr(e, simplify_ns);
+      }
+
       // Now encode all deferred assertions
       for(const auto &e : deferred_assertions)
         solver.set_to_true(e);
