@@ -708,14 +708,67 @@ bool boolbvt::try_algebraic_solve()
       continue;
     polynomialt diff = *lhs - *rhs;
 
-    // Try vanishing polynomial test first (complete for equivalence)
+    // Try vanishing polynomial test (complete for polynomial equivalence).
+    // Substitute SSA definitions to get the polynomial in input variables.
     {
-      // All variables have the same bitwidth in this context
-      std::vector<unsigned> input_widths;
-      if(is_vanishing_polynomial(diff, input_widths))
+      std::map<irep_idt, exprt> subst_map;
+      for(const auto &eq : algebraic_equalities)
       {
-        prop.l_set_to_true(const_literal(false));
-        return true;
+        if(eq.id() == ID_equal)
+        {
+          const auto &eqe = to_equal_expr(eq);
+          if(eqe.lhs().id() == ID_symbol)
+            subst_map[to_symbol_expr(eqe.lhs()).get_identifier()] =
+              eqe.rhs();
+          else if(eqe.rhs().id() == ID_symbol)
+            subst_map[to_symbol_expr(eqe.rhs()).get_identifier()] =
+              eqe.lhs();
+        }
+      }
+
+      // Recursively substitute symbols with their definitions
+      std::function<void(exprt &)> substitute = [&](exprt &e) {
+        for(auto &op : e.operands())
+          substitute(op);
+        if(e.id() == ID_symbol)
+        {
+          auto it =
+            subst_map.find(to_symbol_expr(e).get_identifier());
+          if(it != subst_map.end())
+          {
+            e = it->second;
+            substitute(e); // recurse into the replacement
+          }
+        }
+      };
+      exprt expanded = diseq;
+      substitute(expanded);
+
+      if(expanded.id() == ID_equal)
+      {
+        poly_extractort inline_extractor;
+        inline_extractor.inline_products = true;
+        auto ilhs = inline_extractor.to_polynomial(
+          to_equal_expr(expanded).lhs());
+        auto irhs = inline_extractor.to_polynomial(
+          to_equal_expr(expanded).rhs());
+        if(ilhs && irhs)
+        {
+          polynomialt idiff = *ilhs - *irhs;
+          // Build input widths from zero_extend tracking
+          std::vector<unsigned> input_widths(
+            inline_extractor.var_input_widths.empty()
+              ? 0
+              : inline_extractor.var_input_widths.rbegin()->first + 1,
+            0);
+          for(const auto &[var, w] : inline_extractor.var_input_widths)
+            input_widths[var] = w;
+          if(is_vanishing_polynomial(idiff, input_widths))
+          {
+            prop.l_set_to_true(const_literal(false));
+            return true;
+          }
+        }
       }
     }
 

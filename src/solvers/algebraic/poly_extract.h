@@ -49,6 +49,14 @@ public:
   /// the equation c - a*b = 0 is added here.
   std::vector<polynomialt> side_equations;
 
+  /// When true, inline all products instead of creating fresh variables.
+  /// Used by the vanishing polynomial test which needs a single polynomial.
+  bool inline_products = false;
+
+  /// Map from variable index to actual input bitwidth (may be smaller
+  /// than the polynomial bitwidth due to zero_extend).
+  std::map<std::size_t, unsigned> var_input_widths;
+
 private:
   std::map<irep_idt, std::size_t> var_map;
   std::map<std::size_t, irep_idt> reverse_var_map;

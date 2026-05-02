@@ -74,10 +74,29 @@ std::optional<polynomialt> poly_extractort::to_polynomial(const exprt &e)
   }
 
   // Zero-extend: same value, wider type — treat as identity.
-  // Don't set bitwidth from the wider type; keep the narrower ring.
+  // Set bitwidth from the outer (wider) type first, so that the
+  // inner expression's polynomial uses the correct ring.
   if(e.id() == ID_zero_extend)
   {
-    return to_polynomial(to_zero_extend_expr(e).op());
+    if(!set_bitwidth(e.type()))
+      return std::nullopt;
+    unsigned saved_bw = bitwidth;
+    bitwidth = 0; // allow inner expression to set its own width
+    auto result = to_polynomial(to_zero_extend_expr(e).op());
+    bitwidth = saved_bw; // restore outer width
+    if(result && inline_products)
+    {
+      auto inner_width = to_bitvector_type(
+        to_zero_extend_expr(e).op().type()).get_width();
+      for(const auto &term : result->terms)
+        for(const auto &[var, exp] : term.second.vars)
+          if(var_input_widths.find(var) == var_input_widths.end())
+            var_input_widths[var] = inner_width;
+    }
+    // Ensure the polynomial uses the outer bitwidth
+    if(result && result->bitwidth < bitwidth)
+      result->bitwidth = bitwidth;
+    return result;
   }
 
   // Extract bits: extract(x, hi, lo) extracts bits hi..lo.
@@ -165,7 +184,7 @@ std::optional<polynomialt> poly_extractort::to_polynomial(const exprt &e)
       // Only introduce a fresh variable when both factors are
       // non-constant (genuine symbolic multiplication). For scalar
       // multiplication (a * 5), return the product directly.
-      if(result->is_constant() || op->is_constant())
+      if(result->is_constant() || op->is_constant() || inline_products)
       {
         result = product;
       }
