@@ -1650,6 +1650,21 @@ void cpp_typecheckt::elaborate_class_template(
       }
     }
 
+    // Re-check: the symbol may have been elaborated by a recursive
+    // call during the specialization matching above.  Per the
+    // standard, a class template specialization that is already
+    // complete should not be re-instantiated.
+    {
+      const symbolt &sym_now = lookup(to_tag_type(type));
+      if(
+        (sym_now.type.id() == ID_struct || sym_now.type.id() == ID_union) &&
+        !to_struct_union_type(sym_now.type).components().empty() &&
+        !to_struct_union_type(sym_now.type).is_incomplete())
+      {
+        return;
+      }
+    }
+
     instantiate_template(
       type.source_location(), *best_match, best_spec_args, full_args);
   }
