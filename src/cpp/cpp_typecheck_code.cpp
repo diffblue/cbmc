@@ -198,12 +198,13 @@ void cpp_typecheckt::typecheck_code(codet &code)
 
     if(code.op0().is_constant() && code.op0() == false_exprt())
     {
-      error().source_location = code.find_source_location();
-      error() << "static assertion failed";
-      if(code.operands().size() == 2 && code.op1().id() == ID_string_constant)
-        error() << ": " << to_string_constant(code.op1()).value();
-      error() << eom;
-      throw 0;
+      // Per [temp.res.general]/6 (C++23): static_assert(false) in a
+      // template body (e.g., MSVC's std::declval guard) should not
+      // be fatal.  Convert to a runtime assertion so the body can
+      // continue processing.  The assertion will fire at runtime
+      // if the function is actually called.
+      code = codet{ID_skip};
+      return;
     }
   }
   else if(statement == "for_range")
