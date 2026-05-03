@@ -1800,10 +1800,9 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
           }
           else
           {
-            cpp_typecheck.error().source_location = source_location;
-            cpp_typecheck.error()
-              << "template alias '" << final_base_name
-              << "' does not resolve to a class type" << messaget::eom;
+            // Per [temp.deduct]/8: when a template alias resolves to
+            // a non-class type during qualified name lookup, treat it
+            // as a substitution failure (SFINAE).
             throw 0;
           }
         }
