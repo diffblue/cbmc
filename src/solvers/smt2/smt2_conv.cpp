@@ -1299,22 +1299,31 @@ void smt2_convt::convert_expr(const exprt &expr)
       "concatenation expression should have at least one operand",
       expr.id_string());
 
-    if(expr.operands().size() == 1)
+    // collect non-zero-width operands (zero-width not allowed by SMT-LIB)
+    exprt::operandst non_zero_width_ops;
+    for(const auto &op : expr.operands())
     {
-      flatten2bv(expr.operands().front());
+      if(!is_zero_width(op.type(), ns))
+        non_zero_width_ops.push_back(op);
     }
-    else // >= 2
+
+    DATA_INVARIANT(
+      !non_zero_width_ops.empty(),
+      "concatenation must have at least one non-zero-width operand");
+
+    if(non_zero_width_ops.size() == 1)
+    {
+      // unary concat is not valid SMT-LIB; emit the operand directly
+      flatten2bv(non_zero_width_ops.front());
+    }
+    else
     {
       out << "(concat";
 
-      for(const auto &op : expr.operands())
+      for(const auto &op : non_zero_width_ops)
       {
-        // drop zero-width operands, which are not allowed by SMT-LIB
-        if(!is_zero_width(op.type(), ns))
-        {
-          out << ' ';
-          flatten2bv(op);
-        }
+        out << ' ';
+        flatten2bv(op);
       }
 
       out << ')';

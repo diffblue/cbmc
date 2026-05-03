@@ -952,7 +952,8 @@ inline replication_exprt &to_replication_expr(exprt &expr)
 
 /// \brief Concatenation of bit-vector operands
 ///
-/// This expression takes any number of operands
+/// This expression takes any number of operands, including
+/// zero-width operands.
 /// The ordering of the operands is the same as in the SMT-LIB 2 standard,
 /// i.e., most-significant operands come first.
 class concatenation_exprt : public multi_ary_exprt
