@@ -4518,6 +4518,29 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
       // sorts of trouble.
       cpp_convert_plain_type(arg_type, cpp_typecheck.get_message_handler());
 
+      // Per [temp.deduct.call]/1: resolve remaining simple cpp_name
+      // types to actual types for deduction via scope lookup.
+      if(
+        arg_type.id() == ID_cpp_name &&
+        arg_type.get_sub().size() == 1 &&
+        arg_type.get_sub().front().id() == ID_name)
+      {
+        irep_idt name = arg_type.get_sub().front().get(ID_identifier);
+        if(!name.empty())
+        {
+          auto ids = cpp_typecheck.cpp_scopes.current_scope().lookup(
+            name, cpp_scopet::RECURSIVE);
+          for(const auto *id_ptr : ids)
+          {
+            if(id_ptr->is_class())
+            {
+              arg_type = struct_tag_typet{id_ptr->identifier};
+              break;
+            }
+          }
+        }
+      }
+
       // For pack parameters, deduce from all remaining arguments
       if(is_pack)
       {
