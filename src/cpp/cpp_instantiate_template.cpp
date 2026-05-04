@@ -2750,15 +2750,31 @@ const symbolt &cpp_typecheckt::instantiate_template(
     }
     }
 
-    typecheck_compound_declarator(
-      symb,
-      new_decl,
-      new_decl.declarators()[0],
-      to_struct_union_type(symb.type).components(),
-      access,
-      is_static,
-      false,
-      false);
+    // Per [temp.inst]/3: member function template type-checking
+    // may fail when function template parameters are not in the
+    // class template map.  Catch and return the template symbol.
+    {
+      auto saved_errors = get_message_handler().get_message_count(
+        messaget::M_ERROR);
+      try
+      {
+        typecheck_compound_declarator(
+          symb,
+          new_decl,
+          new_decl.declarators()[0],
+          to_struct_union_type(symb.type).components(),
+          access,
+          is_static,
+          false,
+          false);
+      }
+      catch(...)
+      {
+        get_message_handler().set_message_count(
+          messaget::M_ERROR, saved_errors);
+        return template_symbol;
+      }
+    }
 
     const symbolt &method_sym =
       lookup(to_struct_type(symb.type).components().back().get_name());
