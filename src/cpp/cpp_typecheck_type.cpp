@@ -52,6 +52,20 @@ void cpp_typecheckt::typecheck_type(typet &type)
 
   if(type.id() == ID_template_parameter_symbol_type)
   {
+    // Per [temp.arg]/2: if this template parameter is bound
+    // in the enclosing template_map, resolve it to the bound type.
+    // This handles cases like forward<_Other1> where _Other1 is
+    // a template parameter mapped to a concrete type (e.g.,
+    // const less<int>) in the enclosing function template.
+    {
+      typet resolved = type;
+      template_map.apply(resolved);
+      if(resolved.id() != ID_template_parameter_symbol_type)
+      {
+        type = resolved;
+        return;
+      }
+    }
     const irep_idt &id =
       to_template_parameter_symbol_type(type).get_identifier();
     const symbolt *ttp_sym = symbol_table.lookup(id);

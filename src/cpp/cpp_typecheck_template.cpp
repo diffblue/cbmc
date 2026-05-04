@@ -348,6 +348,18 @@ void cpp_typecheckt::typecheck_function_template(
   cpp_scopet &template_scope=
     typecheck_template_parameters(declaration.template_type());
 
+  // Per [temp.variadic]/5: set pack_size_map for variadic
+  // parameters so that add_method_body captures it.
+  for(const auto &p : declaration.template_type().template_parameters())
+  {
+    if(p.get_bool(ID_ellipsis))
+    {
+      irep_idt pid = p.type().get(ID_identifier);
+      if(!pid.empty())
+        template_map.pack_size_map[pid] = 0;
+    }
+  }
+
   if(!cpp_name.is_simple_name())
   {
     error().source_location=declaration.source_location();
@@ -1928,10 +1940,43 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         // (e.g., struct_tag from a previous instantiation).
         // Re-typechecking can fail when the type references local
         // scopes that are no longer accessible.
+        // Also try to resolve a simple cpp_name via template_map
+        // first, in case the name refers to a template parameter
+        // that's out of scope (e.g., a method template parameter
+        // referenced via a qualified member access when scope has
+        // been switched to the target class).
+        if(
+          arg.type().id() == ID_cpp_name &&
+          arg.type().get_sub().size() == 1 &&
+          arg.type().get_sub().front().id() == ID_name)
+        {
+          const irep_idt &nm =
+            arg.type().get_sub().front().get(ID_identifier);
+          // Search template_map for a matching template parameter
+          for(const auto &tm : template_map.type_map)
+          {
+            const std::string full = id2string(tm.first);
+            auto p = full.rfind("::");
+            const std::string sn =
+              p != std::string::npos ? full.substr(p + 2) : full;
+            if(sn == id2string(nm) &&
+               tm.second.id() != ID_unassigned)
+            {
+              arg.type() = tm.second;
+              goto tm_resolved;
+            }
+          }
+        }
         if(arg.type().id() != ID_struct_tag && arg.type().id() != ID_union_tag)
         {
           typecheck_type(arg.type());
         }
+tm_resolved:
+        // Per [temp.arg]/2: resolve remaining template parameter
+        // references via template_map (e.g., forward<_Other1> where
+        // _Other1 is mapped to const less<int>).
+        if(arg.type().id() == ID_template_parameter_symbol_type)
+          template_map.apply(arg.type());
       }
       else if(arg.id() == ID_ambiguous)
       {

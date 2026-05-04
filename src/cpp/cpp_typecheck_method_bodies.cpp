@@ -1,4 +1,6 @@
-#include <iostream>
+#include <functional>
+#include <set>
+#include <algorithm>
 /*******************************************************************\
 
 Module: C++ Language Type Checking
@@ -35,9 +37,179 @@ void cpp_typecheckt::typecheck_method_bodies()
 
     method_bodies.erase(method_bodies.begin());
 
+    // Per [temp.variadic]/5: set pack_size_map for empty
+    // variadic function template parameters.
+    {
+      const irept &c_tmpl = method_symbol.type.find(ID_C_template);
+      if(c_tmpl.is_not_nil())
+      {
+        for(const auto &p :
+          static_cast<const template_typet &>(c_tmpl)
+            .template_parameters())
+        {
+          if(p.get_bool(ID_ellipsis))
+          {
+            irep_idt pid = p.type().get(ID_identifier);
+            if(!pid.empty() &&
+               template_map.type_map.find(pid) ==
+                 template_map.type_map.end())
+              template_map.pack_size_map[pid] = 0;
+          }
+        }
+      }
+    }
+
     exprt &body=method_symbol.value;
     if(body.id() == ID_cpp_not_typechecked)
       continue;
+
+    // Per [temp.inst]/1: restore function template map if this
+    // is an instantiated member function template.
+    if(method_symbol.type.find(irep_idt{"#fn_template_type"}).is_not_nil())
+    {
+      template_map.build(
+        static_cast<const template_typet &>(
+          method_symbol.type.find(irep_idt{"#fn_template_type"})),
+        static_cast<const cpp_template_args_tct &>(
+          method_symbol.type.find(irep_idt{"#fn_template_args"})));
+    }
+
+    // Per [temp.variadic]/7: substitute non-empty pack parameter
+    // names in the body with their actual types.
+    if(!template_map.pack_args_map.empty())
+    {
+      std::map<std::string, irep_idt> pack_subst;
+      for(const auto &pa : template_map.pack_args_map)
+      {
+        if(pa.second.empty())
+          continue;
+        const std::string full = id2string(pa.first);
+        auto p = full.rfind("::");
+        const std::string sn =
+          p != std::string::npos ? full.substr(p + 2) : full;
+        const typet &t = pa.second.front();
+        if(t.id() == ID_struct_tag)
+        {
+          std::string tag = id2string(
+            to_struct_tag_type(t).get_identifier());
+          if(tag.substr(0, 4) == "tag-")
+            tag = tag.substr(4);
+          auto tag_pos = tag.find("tag-");
+          if(tag_pos != std::string::npos)
+            tag = tag.substr(0, tag_pos) + tag.substr(tag_pos + 4);
+          auto last_sep = tag.rfind("::");
+          if(last_sep != std::string::npos)
+            tag = tag.substr(last_sep + 2);
+          pack_subst[sn] = tag;
+        }
+      }
+      if(!pack_subst.empty())
+      {
+        std::function<void(irept &)> subst =
+          [&](irept &node)
+        {
+          if(node.id() == ID_name &&
+             pack_subst.count(id2string(node.get(ID_identifier))))
+            node.set(ID_identifier,
+              pack_subst.at(id2string(node.get(ID_identifier))));
+          node.remove(ID_ellipsis);
+          for(auto &s : node.get_sub())
+            subst(s);
+          for(auto &ns : node.get_named_sub())
+            subst(ns.second);
+        };
+        subst(static_cast<irept &>(body));
+      }
+    }
+
+    // Per [temp.variadic]/7: substitute non-empty pack parameter
+    // names in the body with their actual types.
+    if(!template_map.pack_args_map.empty())
+    {
+      std::map<std::string, irep_idt> pack_subst;
+      for(const auto &pa : template_map.pack_args_map)
+      {
+        if(pa.second.empty())
+          continue;
+        const std::string full = id2string(pa.first);
+        auto p = full.rfind("::");
+        const std::string sn =
+          p != std::string::npos ? full.substr(p + 2) : full;
+        const typet &t = pa.second.front();
+        if(t.id() == ID_struct_tag)
+        {
+          std::string tag = id2string(
+            to_struct_tag_type(t).get_identifier());
+          if(tag.substr(0, 4) == "tag-")
+            tag = tag.substr(4);
+          pack_subst[sn] = tag;
+        }
+      }
+      if(!pack_subst.empty())
+      {
+        std::function<void(irept &)> subst =
+          [&](irept &node)
+        {
+          if(node.id() == ID_name &&
+             pack_subst.count(id2string(node.get(ID_identifier))))
+            node.set(ID_identifier,
+              pack_subst.at(id2string(node.get(ID_identifier))));
+          for(auto &s : node.get_sub())
+            subst(s);
+          for(auto &ns : node.get_named_sub())
+            subst(ns.second);
+        };
+        subst(static_cast<irept &>(body));
+      }
+    }
+
+    // Per [temp.variadic]/7: remove empty pack expansion
+    // expressions from member initializers in the body.
+    if(!template_map.pack_size_map.empty())
+    {
+      std::set<std::string> ep_names;
+      for(const auto &ps : template_map.pack_size_map)
+        if(ps.second == 0)
+        {
+          const std::string f = id2string(ps.first);
+          auto p = f.rfind("::");
+          ep_names.insert(p != std::string::npos ? f.substr(p+2) : f);
+        }
+      if(!ep_names.empty())
+      {
+        std::function<bool(const irept &)> has_ep =
+          [&](const irept &n) -> bool {
+          if(n.id() == ID_template_parameter_symbol_type)
+          {
+            const std::string f = id2string(n.get(ID_identifier));
+            auto p = f.rfind("::");
+            if(ep_names.count(p != std::string::npos ? f.substr(p+2) : f))
+              return true;
+          }
+          if(n.id() == ID_name &&
+             ep_names.count(id2string(n.get(ID_identifier))))
+            return true;
+          for(const auto &s : n.get_sub())
+            if(has_ep(s)) return true;
+          for(const auto &ns : n.get_named_sub())
+            if(has_ep(ns.second)) return true;
+          return false;
+        };
+        // Check member_initializers in the declarator (if present)
+        irept &mi = method_symbol.value.add(ID_member_initializers);
+        if(mi.is_not_nil())
+        {
+          for(auto &init : mi.get_sub())
+          {
+            auto &subs = init.get_sub();
+            subs.erase(
+              std::remove_if(subs.begin(), subs.end(),
+                [&](const irept &s) { return has_ep(s); }),
+              subs.end());
+          }
+        }
+      }
+    }
 
 #ifdef DEBUG
     std::cout << "convert_method_body: " << method_symbol.name << '\n';
@@ -80,8 +252,6 @@ void cpp_typecheckt::typecheck_method_bodies()
         {
           // Type-checking failed — clear the partially-checked body
           // so the function is cleanly in the "no body" state.
-          if(id2string(method_symbol.name).find("vector(this)") != std::string::npos || id2string(method_symbol.name).find("_Uninitialized_move") != std::string::npos)
-            std::cerr << "BFAIL: " << method_symbol.name << " errors=" << (get_message_handler().get_message_count(messaget::M_ERROR) - errors_before) << std::endl;
           method_symbol.value.make_nil();
         }
         get_message_handler().set_message_count(
@@ -168,6 +338,28 @@ void cpp_typecheckt::typecheck_method_bodies()
     instantiation_stack.swap(method_body.instantiation_stack);
 
     method_bodies.erase(method_bodies.begin());
+
+    // Per [temp.variadic]/5: set pack_size_map for empty
+    // variadic function template parameters.
+    {
+      const irept &c_tmpl = method_symbol.type.find(ID_C_template);
+      if(c_tmpl.is_not_nil())
+      {
+        for(const auto &p :
+          static_cast<const template_typet &>(c_tmpl)
+            .template_parameters())
+        {
+          if(p.get_bool(ID_ellipsis))
+          {
+            irep_idt pid = p.type().get(ID_identifier);
+            if(!pid.empty() &&
+               template_map.type_map.find(pid) ==
+                 template_map.type_map.end())
+              template_map.pack_size_map[pid] = 0;
+          }
+        }
+      }
+    }
 
     exprt &body = method_symbol.value;
     if(body.id() == ID_cpp_not_typechecked)
