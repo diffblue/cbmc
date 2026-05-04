@@ -1409,6 +1409,7 @@ literalt bv_utilst::lt_or_le(
   representationt rep)
 {
   PRECONDITION(bv0.size() == bv1.size());
+  PRECONDITION(!bv0.empty());
 
 #ifdef COMPACT_LT_OR_LE
   if(prop.has_set_to() && prop.cnf_handled_well())
@@ -1422,8 +1423,18 @@ literalt bv_utilst::lt_or_le(
       else if(top0.is_true() && top1.is_false())
         return const_literal(true);
 
+      // 1-bit signed: the sign bit is the only bit
+      if(bv0.size() == 1)
+      {
+        if(or_equal)
+          return prop.lor(top0, !top1);
+        else
+          return prop.land(top0, !top1);
+      }
+
       INVARIANT(
-        bv0.size() >= 2, "signed bitvectors should have at least two bits");
+        bv0.size() >= 2,
+        "the compact signed comparison encoding requires at least two bits");
       // 1 if a compare is needed below this bit
       bvt compareBelow = prop.new_variables(bv0.size() - 1);
       size_t start = compareBelow.size() - 1;
