@@ -500,14 +500,24 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
     // individual constructor arguments.
     if(symbol.value.id() == ID_initializer_list)
     {
-      // Try as single initializer_list argument first
+      // Per [over.match.list]: try as single initializer_list argument
+      // first.  If that fails (including via exception from the
+      // resolver), fall back to unpacking the elements as individual
+      // constructor arguments per [dcl.init.list]/3.6.
       ops.push_back(symbol.value);
-      auto constructor =
-        cpp_constructor(symbol.value.source_location(), expr_symbol, ops);
-      if(constructor.has_value())
+      try
       {
-        symbol.value = constructor.value();
-        return;
+        auto constructor =
+          cpp_constructor(symbol.value.source_location(), expr_symbol, ops);
+        if(constructor.has_value())
+        {
+          symbol.value = constructor.value();
+          return;
+        }
+      }
+      catch(...)
+      {
+        // initializer_list constructor not found — fall through
       }
       // Fall back to unpacking
       ops = symbol.value.operands();
