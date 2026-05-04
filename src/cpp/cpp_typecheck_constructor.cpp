@@ -667,6 +667,54 @@ void cpp_typecheckt::full_member_initialization(
 
   PRECONDITION(initializers.id() == ID_member_initializers);
 
+  // Per [temp.variadic]/7: remove empty pack expansion
+  // expressions from member initializer arguments.
+  if(!template_map.pack_size_map.empty())
+  {
+    std::set<std::string> ep_names;
+    for(const auto &ps : template_map.pack_size_map)
+      if(ps.second == 0)
+      {
+        const std::string f = id2string(ps.first);
+        auto p = f.rfind("::");
+        ep_names.insert(p != std::string::npos ? f.substr(p + 2) : f);
+      }
+    if(!ep_names.empty())
+    {
+      std::function<bool(const irept &)> refs_empty_pack =
+        [&](const irept &n) -> bool
+      {
+        if(n.id() == ID_template_parameter_symbol_type)
+        {
+          const std::string f = id2string(n.get(ID_identifier));
+          auto p = f.rfind("::");
+          if(ep_names.count(
+               p != std::string::npos ? f.substr(p + 2) : f))
+            return true;
+        }
+        if(n.id() == ID_name &&
+           ep_names.count(id2string(n.get(ID_identifier))))
+          return true;
+        for(const auto &s : n.get_sub())
+          if(refs_empty_pack(s))
+            return true;
+        for(const auto &ns : n.get_named_sub())
+          if(refs_empty_pack(ns.second))
+            return true;
+        return false;
+      };
+      for(auto &init : initializers.get_sub())
+      {
+        auto &subs = init.get_sub();
+        subs.erase(
+          std::remove_if(
+            subs.begin(), subs.end(),
+            [&](const irept &s) { return refs_empty_pack(s); }),
+          subs.end());
+      }
+    }
+  }
+
   // Delegating constructors (C++11) delegate to another constructor of the
   // same class. No base class or member initialization should be added.
   if(struct_union_type.id() == ID_struct)

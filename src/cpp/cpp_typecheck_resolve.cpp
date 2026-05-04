@@ -2998,6 +2998,27 @@ exprt cpp_typecheck_resolvet::resolve(
           return type_expr;
         }
       }
+      // Fallback: the name may be a template parameter that's out
+      // of scope (e.g., a method template parameter referenced via
+      // a qualified call where resolve_scope has shifted to the
+      // target class). Look it up in template_map.
+      {
+        const std::string bn = id2string(base_name);
+        for(const auto &tm : cpp_typecheck.template_map.type_map)
+        {
+          const std::string full = id2string(tm.first);
+          auto p = full.rfind("::");
+          const std::string sn =
+            p != std::string::npos ? full.substr(p + 2) : full;
+          if(sn == bn && tm.second.id() != ID_unassigned)
+          {
+            exprt type_expr(ID_type);
+            type_expr.type() = tm.second;
+            type_expr.add_source_location() = source_location;
+            return type_expr;
+          }
+        }
+      }
       cpp_typecheck.error() << "symbol '" << base_name << "' is unknown";
     }
 
@@ -3368,6 +3389,15 @@ resolved_after_strip:
     {
       guess_function_template_args(new_identifiers, fargs);
 
+      // Remove uninstantiated template entries
+      new_identifiers.erase(
+        std::remove_if(
+          new_identifiers.begin(),
+          new_identifiers.end(),
+          [](const exprt &e)
+          { return e.type().get_bool(ID_is_template); }),
+        new_identifiers.end());
+
       if(new_identifiers.empty())
       {
         new_identifiers = identifiers;
@@ -3397,7 +3427,17 @@ resolved_after_strip:
 #endif
   }
   else
+  {
     remove_duplicates(new_identifiers);
+    // Remove uninstantiated template entries
+    new_identifiers.erase(
+      std::remove_if(
+        new_identifiers.begin(),
+        new_identifiers.end(),
+        [](const exprt &e)
+        { return e.type().get_bool(ID_is_template); }),
+      new_identifiers.end());
+  }
 
 #ifdef DEBUG
   std::cout << "P4 " << base_name << " " << new_identifiers.size() << '\n';
@@ -4279,11 +4319,13 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   if(fargs.operands.empty() && expr.find(ID_C_template_arguments).is_nil())
   {
     // C++11: check if all template parameters have default values
+    // or are variadic packs (per [temp.variadic]/7: a pack can match
+    // zero arguments).
     const auto &params = cpp_declaration.template_type().template_parameters();
     bool all_have_defaults = !params.empty();
     for(const auto &p : params)
     {
-      if(p.find(ID_C_default_value).is_nil())
+      if(p.find(ID_C_default_value).is_nil() && !p.get_bool(ID_ellipsis))
       {
         all_have_defaults = false;
         break;
@@ -4437,7 +4479,12 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
         explicit_args.arguments()[i].id() != ID_unassigned &&
         explicit_args.arguments()[i].type().id() != ID_unassigned)
       {
-        cpp_typecheck.template_map.set(params[i], explicit_args.arguments()[i]);
+        // Per [temp.arg]/2: resolve template parameter references
+        // in explicit args using the enclosing template_map.
+        exprt resolved_arg = explicit_args.arguments()[i];
+        if(resolved_arg.id() == ID_type)
+          cpp_typecheck.template_map.apply(resolved_arg.type());
+        cpp_typecheck.template_map.set(params[i], resolved_arg);
       }
     }
   }
@@ -4510,6 +4557,22 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
       bool is_pack = declarator.get_bool(ID_ellipsis) ||
                      declarator.type().get_bool(ID_ellipsis);
 
+      // Per [temp.deduct.call]/3: detect forwarding references (T&&)
+      // before type conversion, by checking if the declarator has
+      // rvalue_reference type and the base is a template parameter.
+      bool is_forwarding_ref = false;
+      if(!is_pack &&
+         (declarator.type().id() == ID_frontend_pointer ||
+          declarator.type().id() == ID_pointer) &&
+         declarator.type().get_bool(ID_C_rvalue_reference))
+      {
+        // The base type (from the declaration) should be a template param
+        const auto &base = arg_declaration.type();
+        if(base.id() == ID_cpp_name || base.id() == ID_template_parameter_symbol_type)
+          is_forwarding_ref = true;
+      }
+
+
       // turn into type
       typet arg_type = declarator.merge_type(arg_declaration.type());
 
@@ -4581,8 +4644,21 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
         is_lvalue = false;
       }
       if(
+        is_forwarding_ref && is_lvalue &&
+        it->type().get_bool(ID_C_constant))
+      {
+        // Per [temp.deduct.call]/3: for T&& with const lvalue arg,
+        // preserve const in the deduction. Without this, the
+        // const-stripping in the else branch would deduce T = A
+        // instead of T = const A, causing forward<T> to produce
+        // wrong overloads.
+        guess_template_args(arg_declaration.type(), it->type());
+      }
+      else if(
         is_rvalue_reference(arg_type) && is_lvalue &&
-        to_pointer_type(arg_type).base_type().id() == ID_cpp_name)
+        (to_pointer_type(arg_type).base_type().id() == ID_cpp_name ||
+         to_pointer_type(arg_type).base_type().id() ==
+           ID_template_parameter_symbol_type))
       {
         typet lvalue_ref_type = ::reference_type(it->type());
         guess_template_args(
@@ -4593,8 +4669,10 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
         // [temp.deduct.call]/4: when P is just T (not T&, T*, etc.),
         // top-level cv-qualifiers on A are ignored.
         // Also, array types decay to pointer types per [temp.deduct.call]/4.
+        // Exception: for forwarding references (T&&), cv-qualifiers
+        // are preserved per [temp.deduct.call]/3.
         typet arg_actual_type = it->type();
-        if(arg_type.id() == ID_cpp_name)
+        if(arg_type.id() == ID_cpp_name && !is_forwarding_ref)
         {
           arg_actual_type.remove(ID_C_constant);
           arg_actual_type.remove(ID_C_volatile);
@@ -4602,7 +4680,11 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
             arg_actual_type =
               pointer_type(to_array_type(arg_actual_type).element_type());
         }
-        guess_template_args(arg_type, arg_actual_type);
+        if(is_forwarding_ref && is_rvalue_reference(arg_type))
+          guess_template_args(
+            to_pointer_type(arg_type).base_type(), arg_actual_type);
+        else
+          guess_template_args(arg_type, arg_actual_type);
       }
     }
 
@@ -5154,6 +5236,17 @@ void cpp_typecheck_resolvet::apply_template_args(
     // go back to where we used to be
   }
 
+  // Per [temp.arg]/2: resolve template parameter references in
+  // explicit template args using the enclosing template_map.
+  for(auto &arg : template_args_tc.arguments())
+  {
+    if(arg.id() == ID_type &&
+       arg.type().id() == ID_template_parameter_symbol_type)
+    {
+      cpp_typecheck.template_map.apply(arg.type());
+    }
+  }
+
   // For function templates with unassigned (partial) args, skip
   // instantiation. Store the explicit args for later deduction.
   if(template_args_tc.has_unassigned())
@@ -5202,6 +5295,15 @@ void cpp_typecheck_resolvet::apply_template_args(
       return;
     }
     old_handler.set_message_count(messaget::M_ERROR, errors_before);
+    // Per [temp.deduct]/8: if instantiation returns the template
+    // symbol itself (not a code-typed specialization), treat as
+    // deduction failure.
+    if(new_sym_ptr->type.id() != ID_code &&
+       new_sym_ptr->type.get_bool(ID_is_template))
+    {
+      expr.make_nil();
+      return;
+    }
     const symbolt &new_symbol = *new_sym_ptr;
 
     // Variable template: the type is not a function type
@@ -5232,15 +5334,24 @@ void cpp_typecheck_resolvet::apply_template_args(
 
           const struct_typet &struct_type = to_struct_type(type_symb.type);
 
-          DATA_INVARIANT(
-            struct_type.has_component(new_symbol.name),
-            "method should exist in struct");
-
-          member_exprt member(
-            *fargs.operands.begin(), new_symbol.name, code_type);
-          member.add_source_location() = source_location;
-          expr.swap(member);
-          return;
+          // The method may be inherited from a base class template
+          // (e.g., this->_Freenode() where _Freenode is in the base).
+          // In that case, has_component on the derived class fails.
+          // Skip the member construction and fall through to the
+          // non-member (symbol) path — the call site will dispatch
+          // correctly via the inherited symbol.
+          if(!struct_type.has_component(new_symbol.name))
+          {
+            // Fall through to symbol-based dispatch
+          }
+          else
+          {
+            member_exprt member(
+              *fargs.operands.begin(), new_symbol.name, code_type);
+            member.add_source_location() = source_location;
+            expr.swap(member);
+            return;
+          }
         }
       }
 
@@ -5257,7 +5368,14 @@ bool cpp_typecheck_resolvet::disambiguate_functions(
 {
   args_distance = 0;
 
-  if(expr.type().id() != ID_code || !fargs.in_use)
+  if(!fargs.in_use)
+    return true;
+
+  // Per [over.match]/1: reject template declarations
+  if(expr.type().id() != ID_code && expr.type().get_bool(ID_is_template))
+    return false;
+
+  if(expr.type().id() != ID_code)
     return true;
 
   const code_typet &type = to_code_type(expr.type());
@@ -5338,12 +5456,13 @@ bool cpp_typecheck_resolvet::disambiguate_functions(
     return false;
   }
   else if(
-    expr.id() == ID_symbol && !fargs.operands.empty() &&
+    expr.id() == ID_symbol &&
     !type.parameters().empty() && type.parameters().front().get_this())
   {
     // Instantiated template member function (symbol_exprt with this
     // parameter) called without an explicit object — add a synthetic
-    // this for matching purposes.
+    // this for matching purposes. This includes calls with empty
+    // operand lists (e.g., variadic methods called with no args).
     const typet &object_type =
       to_pointer_type(type.parameters().front().type()).base_type();
     symbol_exprt object(irep_idt(), object_type);

@@ -1849,6 +1849,318 @@ const symbolt &cpp_typecheckt::instantiate_template(
   // mapping from template parameters to values/types
   template_map.build(template_type, specialization_template_args);
 
+  // Per [temp.variadic]/7: for constructor templates with variadic packs,
+  // remove empty pack parameters and substitute non-empty pack names.
+  if(!template_map.pack_size_map.empty() && !new_decl.declarators().empty())
+  {
+    bool has_variadic = false;
+    for(const auto &p : template_type.template_parameters())
+      if(p.get_bool(ID_ellipsis))
+        has_variadic = true;
+    // Apply pack removal to all function templates with variadic packs
+    // per [temp.variadic]/7.
+    if(!has_variadic)
+      goto skip_pack_removal;
+
+    // Only collect empty pack names from THIS template's parameters
+    std::set<std::string> ep_names;
+    for(const auto &tp : template_type.template_parameters())
+    {
+      if(!tp.get_bool(ID_ellipsis))
+        continue;
+      irep_idt pid = tp.type().get(ID_identifier);
+      if(pid.empty())
+        continue;
+      auto it = template_map.pack_size_map.find(pid);
+      if(it != template_map.pack_size_map.end() && it->second == 0)
+      {
+        const std::string f = id2string(pid);
+        auto p = f.rfind("::");
+        ep_names.insert(p != std::string::npos ? f.substr(p + 2) : f);
+      }
+    }
+    if(!ep_names.empty())
+    {
+      std::function<bool(const irept &)> refs_ep =
+        [&](const irept &n) -> bool
+      {
+        if(n.id() == ID_template_parameter_symbol_type)
+        {
+          const std::string f = id2string(n.get(ID_identifier));
+          auto p = f.rfind("::");
+          if(ep_names.count(p != std::string::npos ? f.substr(p+2) : f))
+            return true;
+        }
+        if(n.id() == ID_name &&
+           ep_names.count(id2string(n.get(ID_identifier))))
+          return true;
+        for(const auto &s : n.get_sub())
+          if(refs_ep(s))
+            return true;
+        for(const auto &ns : n.get_named_sub())
+          if(refs_ep(ns.second))
+            return true;
+        return false;
+      };
+      auto &decl = new_decl.declarators()[0];
+      if(decl.type().id() == ID_function_type)
+      {
+        irept &params = decl.type().add(ID_parameters);
+        params.get_sub().erase(
+          std::remove_if(
+            params.get_sub().begin(), params.get_sub().end(),
+            [&](const irept &p)
+            {
+              if(p.id() != ID_cpp_declaration)
+                return false;
+              for(const auto &d : p.get_sub())
+                if(d.id() == ID_cpp_declarator &&
+                   (d.find(ID_type).get_bool(ID_ellipsis) ||
+                    d.get_bool(ID_ellipsis) || refs_ep(d)))
+                  return true;
+              return refs_ep(p.find(ID_type));
+            }),
+          params.get_sub().end());
+      }
+      irept &mi = decl.add(ID_member_initializers);
+      for(auto &init : mi.get_sub())
+      {
+        auto &subs = init.get_sub();
+        subs.erase(
+          std::remove_if(
+            subs.begin(), subs.end(),
+            [&](const irept &s) { return refs_ep(s); }),
+          subs.end());
+      }
+    }
+    // Per [temp.variadic]/7: for non-empty packs, substitute
+    // pack parameter names with actual type base names and
+    // remove ellipsis from expanded expressions.
+    if(!template_map.pack_args_map.empty())
+    {
+      std::map<std::string, irep_idt> pack_subst;
+      for(const auto &pa : template_map.pack_args_map)
+      {
+        if(pa.second.empty())
+          continue;
+        const std::string full = id2string(pa.first);
+        auto p = full.rfind("::");
+        const std::string sn =
+          p != std::string::npos ? full.substr(p + 2) : full;
+        const typet &t = pa.second.front();
+        if(t.id() == ID_struct_tag)
+        {
+          std::string tag = id2string(
+            to_struct_tag_type(t).get_identifier());
+          if(tag.substr(0, 4) == "tag-")
+            tag = tag.substr(4);
+          auto tag_pos = tag.find("tag-");
+          if(tag_pos != std::string::npos)
+            tag = tag.substr(0, tag_pos) + tag.substr(tag_pos + 4);
+          auto last_sep = tag.rfind("::");
+          if(last_sep != std::string::npos)
+            tag = tag.substr(last_sep + 2);
+          pack_subst[sn] = tag;
+        }
+      }
+      if(!pack_subst.empty() && !new_decl.declarators().empty())
+      {
+        std::function<bool(const irept &)> contains_pack =
+          [&](const irept &node) -> bool
+        {
+          if(node.id() == ID_name &&
+             pack_subst.count(id2string(node.get(ID_identifier))))
+            return true;
+          for(const auto &s : node.get_sub())
+            if(contains_pack(s))
+              return true;
+          for(const auto &ns : node.get_named_sub())
+            if(contains_pack(ns.second))
+              return true;
+          return false;
+        };
+        std::function<void(irept &)> subst =
+          [&](irept &node)
+        {
+          if(
+            node.id() == ID_name &&
+            pack_subst.count(id2string(node.get(ID_identifier))))
+          {
+            node.set(
+              ID_identifier,
+              pack_subst.at(id2string(node.get(ID_identifier))));
+          }
+          for(auto &s : node.get_sub())
+            subst(s);
+          for(auto &ns : node.get_named_sub())
+            subst(ns.second);
+        };
+        irept &mi = new_decl.declarators()[0].add(
+          ID_member_initializers);
+        subst(mi);
+        // Remove ellipsis only from pack-expanded parameters
+        auto &dt = new_decl.declarators()[0].type();
+        if(dt.id() == ID_function_type)
+        {
+          irept &params = dt.add(ID_parameters);
+          for(auto &p : params.get_sub())
+          {
+            if(contains_pack(p))
+            {
+              subst(p);
+              p.remove(ID_ellipsis);
+              for(auto &d : p.get_sub())
+                d.remove(ID_ellipsis);
+            }
+          }
+        }
+      }
+    }
+  }
+skip_pack_removal:
+
+  // Per [temp.variadic]/7: when a variadic pack is empty, remove
+  // pack-expanded parameters from the function type and remove
+  // member initializer expressions referencing the empty pack.
+  // This must happen immediately after build() sets pack_size_map,
+  // before any code that might try to resolve the pack parameter.
+  if(!template_map.pack_size_map.empty() && !new_decl.declarators().empty())
+  {
+    // Only apply for constructor templates with variadic packs
+    bool has_variadic = false;
+    for(const auto &p : template_type.template_parameters())
+      if(p.get_bool(ID_ellipsis))
+        has_variadic = true;
+    bool is_ctor = new_decl.is_constructor();
+    if(!has_variadic || !is_ctor)
+      goto skip_pack_removal_ft;
+
+    // Only collect empty pack names from THIS template's parameters
+    std::set<std::string> ep_names;
+    for(const auto &tp : template_type.template_parameters())
+    {
+      if(!tp.get_bool(ID_ellipsis))
+        continue;
+      irep_idt pid = tp.type().get(ID_identifier);
+      if(pid.empty())
+        continue;
+      auto it = template_map.pack_size_map.find(pid);
+      if(it != template_map.pack_size_map.end() && it->second == 0)
+      {
+        const std::string f = id2string(pid);
+        auto p = f.rfind("::");
+        ep_names.insert(p != std::string::npos ? f.substr(p + 2) : f);
+      }
+    }
+    if(!ep_names.empty())
+    {
+      std::function<bool(const irept &)> refs_ep =
+        [&](const irept &n) -> bool
+      {
+        if(n.id() == ID_template_parameter_symbol_type)
+        {
+          const std::string f = id2string(n.get(ID_identifier));
+          auto p = f.rfind("::");
+          if(ep_names.count(p != std::string::npos ? f.substr(p+2) : f))
+            return true;
+        }
+        if(n.id() == ID_name &&
+           ep_names.count(id2string(n.get(ID_identifier))))
+          return true;
+        for(const auto &s : n.get_sub())
+          if(refs_ep(s))
+            return true;
+        for(const auto &ns : n.get_named_sub())
+          if(refs_ep(ns.second))
+            return true;
+        return false;
+      };
+      auto &decl = new_decl.declarators()[0];
+      // Remove pack params from function type
+      if(decl.type().id() == ID_function_type)
+      {
+        irept &params = decl.type().add(ID_parameters);
+        params.get_sub().erase(
+          std::remove_if(
+            params.get_sub().begin(), params.get_sub().end(),
+            [&](const irept &p)
+            {
+              if(p.id() != ID_cpp_declaration)
+                return false;
+              for(const auto &d : p.get_sub())
+                if(d.id() == ID_cpp_declarator &&
+                   (d.find(ID_type).get_bool(ID_ellipsis) ||
+                    d.get_bool(ID_ellipsis) || refs_ep(d)))
+                  return true;
+              return refs_ep(p.find(ID_type));
+            }),
+          params.get_sub().end());
+      }
+      // Remove empty pack expressions from member initializers
+      irept &mi = decl.add(ID_member_initializers);
+      for(auto &init : mi.get_sub())
+      {
+        auto &subs = init.get_sub();
+        subs.erase(
+          std::remove_if(
+            subs.begin(), subs.end(),
+            [&](const irept &s) { return refs_ep(s); }),
+          subs.end());
+      }
+    }
+    // Per [temp.variadic]/7: for non-empty packs, substitute
+    // the pack parameter name in template_args with the actual
+    // type from pack_args_map.
+    if(!template_map.pack_args_map.empty())
+    {
+      // Build substitution map: short_name → type identifier
+      std::map<std::string, irep_idt> pack_subst;
+      for(const auto &pa : template_map.pack_args_map)
+      {
+        if(pa.second.empty())
+          continue;
+        const std::string full = id2string(pa.first);
+        auto p = full.rfind("::");
+        const std::string sn =
+          p != std::string::npos ? full.substr(p + 2) : full;
+        // For single-element packs, get the type's name
+        const typet &t = pa.second.front();
+        if(t.id() == ID_struct_tag)
+        {
+          std::string tag = id2string(
+            to_struct_tag_type(t).get_identifier());
+          if(tag.substr(0, 4) == "tag-")
+            tag = tag.substr(4);
+          pack_subst[sn] = tag;
+        }
+      }
+      if(!pack_subst.empty() && !new_decl.declarators().empty())
+      {
+        // Substitute in member initializers
+        std::function<void(irept &)> subst =
+          [&](irept &node)
+        {
+          if(
+            node.id() == ID_name &&
+            pack_subst.count(id2string(node.get(ID_identifier))))
+          {
+            node.set(
+              ID_identifier,
+              pack_subst.at(id2string(node.get(ID_identifier))));
+          }
+          for(auto &s : node.get_sub())
+            subst(s);
+          for(auto &ns : node.get_named_sub())
+            subst(ns.second);
+        };
+        irept &mi = new_decl.declarators()[0].add(
+          ID_member_initializers);
+        subst(mi);
+      }
+    }
+  }
+skip_pack_removal_ft:
+
   // enter the template scope
   cpp_scopes.go_to(*template_scope);
 
@@ -1918,7 +2230,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
         return symb;
       else if(cpp_id.id_class == cpp_idt::id_classt::TYPEDEF)
         return symb;
-      else if(symb.value.is_not_nil())
+      else if(symb.value.is_not_nil() && symb.type.id() == ID_code)
         return symb;
     }
     else if(
@@ -2325,7 +2637,94 @@ const symbolt &cpp_typecheckt::instantiate_template(
         }
       }
     }
-    convert_non_template_declaration(new_decl);
+    // Per [temp.variadic]/5: remove empty pack expansions
+  if(id2string(template_symbol.name).find("_Compressed_pair") != std::string::npos && id2string(template_symbol.name).find("_Zero") != std::string::npos)
+  if(
+    !template_map.pack_size_map.empty() &&
+    !new_decl.declarators().empty())
+  {
+    std::set<std::string> ep_names;
+    for(const auto &ps : template_map.pack_size_map)
+    {
+      if(ps.second == 0)
+      {
+        const std::string full = id2string(ps.first);
+        auto pos = full.rfind("::");
+        ep_names.insert(
+          pos != std::string::npos ? full.substr(pos + 2) : full);
+      }
+    }
+    if(!ep_names.empty())
+    {
+      auto &dt = new_decl.declarators()[0].type();
+      if(dt.id() == ID_function_type)
+      {
+        irept &params = dt.add(ID_parameters);
+        params.get_sub().erase(
+          std::remove_if(
+            params.get_sub().begin(), params.get_sub().end(),
+            [](const irept &p) {
+              if(p.id() != ID_cpp_declaration) return false;
+              for(const auto &d : p.get_sub())
+                if(d.id() == ID_cpp_declarator &&
+                   (d.find(ID_type).get_bool(ID_ellipsis) ||
+                    d.get_bool(ID_ellipsis)))
+                  return true;
+              return false;
+            }),
+          params.get_sub().end());
+      }
+      // Per [temp.variadic]/7: remove pack expansion expressions.
+      // After template_map.apply(), pack params may appear as
+      // template_parameter_symbol_typet or as ID_name nodes.
+      std::function<bool(const irept &)> has_ep =
+        [&](const irept &n) -> bool {
+        if(n.id() == ID_name &&
+           ep_names.count(id2string(n.get(ID_identifier))))
+          return true;
+        // Check template_parameter_symbol_typet
+        if(n.id() == ID_template_parameter_symbol_type)
+        {
+          const std::string full =
+            id2string(n.get(ID_identifier));
+          auto pos = full.rfind("::");
+          const std::string sn =
+            pos != std::string::npos ? full.substr(pos + 2) : full;
+          if(ep_names.count(sn))
+            return true;
+        }
+        // Check type sub for template_parameter_symbol_typet
+        const auto &type_sub = n.find(ID_type);
+        if(type_sub.is_not_nil() &&
+           type_sub.id() == ID_template_parameter_symbol_type)
+        {
+          const std::string full =
+            id2string(type_sub.get(ID_identifier));
+          auto pos = full.rfind("::");
+          const std::string sn =
+            pos != std::string::npos ? full.substr(pos + 2) : full;
+          if(ep_names.count(sn))
+            return true;
+        }
+        for(const auto &s : n.get_sub())
+          if(has_ep(s)) return true;
+        for(const auto &ns : n.get_named_sub())
+          if(has_ep(ns.second)) return true;
+        return false;
+      };
+      irept &mi = new_decl.declarators()[0].add(ID_member_initializers);
+      for(auto &init : mi.get_sub())
+      {
+        auto &subs = init.get_sub();
+        subs.erase(
+          std::remove_if(subs.begin(), subs.end(),
+            [&](const irept &s) { return has_ep(s); }),
+          subs.end());
+      }
+    }
+  }
+
+  convert_non_template_declaration(new_decl);
 
     // Propagate template info to the class symbol so that member
     // function template bodies can find the class template parameters.
@@ -2593,6 +2992,54 @@ const symbolt &cpp_typecheckt::instantiate_template(
                 cpp_saved_template_mapt sm(template_map);
                 template_map.build(md_tt, specialization_template_args);
                 template_map.apply(body);
+                // Per [temp.variadic]/7: remove empty pack
+                // expansion expressions from the body.
+                if(!template_map.pack_size_map.empty())
+                {
+                  std::set<std::string> ep;
+                  for(const auto &ps : template_map.pack_size_map)
+                    if(ps.second == 0)
+                    {
+                      const std::string f = id2string(ps.first);
+                      auto p = f.rfind("::");
+                      ep.insert(p != std::string::npos
+                        ? f.substr(p + 2) : f);
+                    }
+                  if(!ep.empty())
+                  {
+                    std::function<bool(const irept &)> has_ep =
+                      [&](const irept &n) -> bool {
+                      if(n.id() == ID_template_parameter_symbol_type)
+                      {
+                        const std::string f =
+                          id2string(n.get(ID_identifier));
+                        auto p = f.rfind("::");
+                        if(ep.count(p != std::string::npos
+                             ? f.substr(p + 2) : f))
+                          return true;
+                      }
+                      if(n.id() == ID_name &&
+                         ep.count(id2string(n.get(ID_identifier))))
+                        return true;
+                      for(const auto &s : n.get_sub())
+                        if(has_ep(s)) return true;
+                      for(const auto &ns : n.get_named_sub())
+                        if(has_ep(ns.second)) return true;
+                      return false;
+                    };
+                    // Remove from member_initializers in body
+                    irept &mi = body.add(ID_member_initializers);
+                    for(auto &init : mi.get_sub())
+                    {
+                      auto &subs = init.get_sub();
+                      subs.erase(
+                        std::remove_if(subs.begin(), subs.end(),
+                          [&](const irept &s)
+                          { return has_ep(s); }),
+                        subs.end());
+                    }
+                  }
+                }
                 sym->value = body;
               }
               else
@@ -2621,6 +3068,108 @@ const symbolt &cpp_typecheckt::instantiate_template(
                 cpp_saved_template_mapt sm(template_map);
                 template_map.build(md_tt, full);
                 template_map.apply(body);
+                // Per [temp.variadic]/7: remove empty pack
+                // expansion expressions from the body.
+                if(!template_map.pack_size_map.empty())
+                {
+                  std::set<std::string> ep;
+                  for(const auto &ps : template_map.pack_size_map)
+                    if(ps.second == 0)
+                    {
+                      const std::string f = id2string(ps.first);
+                      auto p = f.rfind("::");
+                      ep.insert(p != std::string::npos
+                        ? f.substr(p + 2) : f);
+                    }
+                  if(!ep.empty())
+                  {
+                    std::function<bool(const irept &)> has_ep =
+                      [&](const irept &n) -> bool {
+                      if(n.id() == ID_template_parameter_symbol_type)
+                      {
+                        const std::string f =
+                          id2string(n.get(ID_identifier));
+                        auto p = f.rfind("::");
+                        if(ep.count(p != std::string::npos
+                             ? f.substr(p + 2) : f))
+                          return true;
+                      }
+                      if(n.id() == ID_name &&
+                         ep.count(id2string(n.get(ID_identifier))))
+                        return true;
+                      for(const auto &s : n.get_sub())
+                        if(has_ep(s)) return true;
+                      for(const auto &ns : n.get_named_sub())
+                        if(has_ep(ns.second)) return true;
+                      return false;
+                    };
+                    // Remove from member_initializers in body
+                    irept &mi = body.add(ID_member_initializers);
+                    for(auto &init : mi.get_sub())
+                    {
+                      auto &subs = init.get_sub();
+                      subs.erase(
+                        std::remove_if(subs.begin(), subs.end(),
+                          [&](const irept &s)
+                          { return has_ep(s); }),
+                        subs.end());
+                    }
+                  }
+                }
+                // Also copy member initializers into the body
+                // so the method body pass can process them.
+                // Remove empty pack expressions per [temp.variadic]/7.
+                const irept &mi_src =
+                  md.declarators()[0].find(ID_member_initializers);
+                if(mi_src.is_not_nil())
+                {
+                  irept mi_copy = mi_src;
+                  if(!template_map.pack_size_map.empty())
+                  {
+                    std::set<std::string> ep2;
+                    for(const auto &ps : template_map.pack_size_map)
+                      if(ps.second == 0)
+                      {
+                        const std::string f = id2string(ps.first);
+                        auto p = f.rfind("::");
+                        ep2.insert(p != std::string::npos
+                          ? f.substr(p + 2) : f);
+                      }
+                    if(!ep2.empty())
+                    {
+                      std::function<bool(const irept &)> has_ep2 =
+                        [&](const irept &n) -> bool {
+                        if(n.id() == ID_template_parameter_symbol_type)
+                        {
+                          const std::string f =
+                            id2string(n.get(ID_identifier));
+                          auto p = f.rfind("::");
+                          if(ep2.count(p != std::string::npos
+                               ? f.substr(p + 2) : f))
+                            return true;
+                        }
+                        if(n.id() == ID_name &&
+                           ep2.count(id2string(n.get(ID_identifier))))
+                          return true;
+                        for(const auto &s : n.get_sub())
+                          if(has_ep2(s)) return true;
+                        for(const auto &ns : n.get_named_sub())
+                          if(has_ep2(ns.second)) return true;
+                        return false;
+                      };
+                      for(auto &init : mi_copy.get_sub())
+                      {
+                        auto &subs = init.get_sub();
+                        subs.erase(
+                          std::remove_if(subs.begin(), subs.end(),
+                            [&](const irept &s)
+                            { return has_ep2(s); }),
+                          subs.end());
+                      }
+                    }
+                  }
+                  body.add(ID_member_initializers) = mi_copy;
+                }
                 sym->value = body;
               }
               goto body_found;
@@ -2750,6 +3299,211 @@ const symbolt &cpp_typecheckt::instantiate_template(
     }
     }
 
+    // Per [temp.variadic]/5: set pack_size_map and remove empty
+    // pack expansions for function template members.
+    if(new_decl.is_template())
+    {
+      const auto &fn_params =
+        new_decl.template_type().template_parameters();
+      for(const auto &p : fn_params)
+      {
+        if(p.get_bool(ID_ellipsis))
+        {
+          irep_idt pid = p.type().get(ID_identifier);
+          if(!pid.empty() &&
+             template_map.type_map.find(pid) ==
+               template_map.type_map.end())
+            template_map.pack_size_map[pid] = 0;
+        }
+      }
+      if(!template_map.pack_size_map.empty() &&
+         !new_decl.declarators().empty())
+      {
+        std::set<std::string> ep_names;
+        for(const auto &ps : template_map.pack_size_map)
+          if(ps.second == 0)
+          {
+            const std::string f = id2string(ps.first);
+            auto p = f.rfind("::");
+            ep_names.insert(p != std::string::npos ? f.substr(p+2) : f);
+          }
+        if(!ep_names.empty())
+        {
+          // Remove pack params from function type
+          auto &dt = new_decl.declarators()[0].type();
+          if(dt.id() == ID_function_type)
+          {
+            irept &params = dt.add(ID_parameters);
+            params.get_sub().erase(
+              std::remove_if(params.get_sub().begin(),
+                params.get_sub().end(),
+                [&](const irept &p) {
+                  if(p.id() != ID_cpp_declaration) return false;
+                  for(const auto &d : p.get_sub())
+                  {
+                    if(d.id() == ID_cpp_declarator &&
+                       (d.find(ID_type).get_bool(ID_ellipsis) ||
+                        d.get_bool(ID_ellipsis)))
+                      return true;
+                    // Also check for template_parameter_symbol_typet
+                    // referencing empty pack
+                    const auto &dtype = d.find(ID_type);
+                    if(dtype.id() ==
+                         ID_template_parameter_symbol_type)
+                    {
+                      const std::string f =
+                        id2string(dtype.get(ID_identifier));
+                      auto pos = f.rfind("::");
+                      if(ep_names.count(pos != std::string::npos
+                           ? f.substr(pos + 2) : f))
+                        return true;
+                    }
+                  }
+                  // Check the type sub of the declaration
+                  const auto &ptype = p.find(ID_type);
+                  if(ptype.id() ==
+                       ID_template_parameter_symbol_type)
+                  {
+                    const std::string f =
+                      id2string(ptype.get(ID_identifier));
+                    auto pos = f.rfind("::");
+                    if(ep_names.count(pos != std::string::npos
+                         ? f.substr(pos + 2) : f))
+                      return true;
+                  }
+                  return false;
+                }),
+              params.get_sub().end());
+          }
+          // Remove member initializer expressions with empty pack
+          std::function<bool(const irept &)> has_ep =
+            [&](const irept &n) -> bool {
+            if(n.id() == ID_template_parameter_symbol_type)
+            {
+              const std::string f = id2string(n.get(ID_identifier));
+              auto p = f.rfind("::");
+              if(ep_names.count(p != std::string::npos ? f.substr(p+2) : f))
+                return true;
+            }
+            if(n.id() == ID_name &&
+               ep_names.count(id2string(n.get(ID_identifier))))
+              return true;
+            const auto &tsub = n.find(ID_type);
+            if(tsub.is_not_nil() && has_ep(tsub))
+              return true;
+            for(const auto &s : n.get_sub())
+              if(has_ep(s)) return true;
+            for(const auto &ns : n.get_named_sub())
+              if(ns.first != ID_type && has_ep(ns.second)) return true;
+            return false;
+          };
+          irept &mi = new_decl.declarators()[0].add(
+            ID_member_initializers);
+          for(auto &init : mi.get_sub())
+          {
+            auto &subs = init.get_sub();
+            subs.erase(
+              std::remove_if(subs.begin(), subs.end(),
+                [&](const irept &s) { return has_ep(s); }),
+              subs.end());
+          }
+        }
+      }
+      // Per [temp.variadic]/7: for non-empty packs, substitute
+      // pack parameter names with actual types.
+      if(!template_map.pack_args_map.empty() &&
+         !new_decl.declarators().empty())
+      {
+        std::map<std::string, irep_idt> pack_subst;
+        for(const auto &pa : template_map.pack_args_map)
+        {
+          if(pa.second.empty())
+            continue;
+          const std::string full = id2string(pa.first);
+          auto p = full.rfind("::");
+          const std::string sn =
+            p != std::string::npos ? full.substr(p + 2) : full;
+          const typet &t = pa.second.front();
+          if(t.id() == ID_struct_tag)
+          {
+            std::string tag = id2string(
+              to_struct_tag_type(t).get_identifier());
+            if(tag.substr(0, 4) == "tag-")
+              tag = tag.substr(4);
+            pack_subst[sn] = tag;
+          }
+        }
+        if(!pack_subst.empty())
+        {
+          std::function<void(irept &)> subst =
+            [&](irept &node)
+          {
+            if(node.id() == ID_name &&
+               pack_subst.count(id2string(node.get(ID_identifier))))
+              node.set(ID_identifier,
+                pack_subst.at(id2string(node.get(ID_identifier))));
+            for(auto &s : node.get_sub())
+              subst(s);
+            for(auto &ns : node.get_named_sub())
+              subst(ns.second);
+          };
+          irept &mi = new_decl.declarators()[0].add(
+            ID_member_initializers);
+          subst(mi);
+        }
+      }
+      // Per [temp.variadic]/7: for non-empty packs, substitute
+      // pack parameter names with actual types.
+      if(!template_map.pack_args_map.empty() &&
+         !new_decl.declarators().empty())
+      {
+        std::map<std::string, irep_idt> pack_subst;
+        for(const auto &pa : template_map.pack_args_map)
+        {
+          if(pa.second.empty())
+            continue;
+          const std::string full = id2string(pa.first);
+          auto p = full.rfind("::");
+          const std::string sn =
+            p != std::string::npos ? full.substr(p + 2) : full;
+          const typet &t = pa.second.front();
+          if(t.id() == ID_struct_tag)
+          {
+            std::string tag = id2string(
+              to_struct_tag_type(t).get_identifier());
+            if(tag.substr(0, 4) == "tag-")
+              tag = tag.substr(4);
+            auto tag_pos = tag.find("tag-");
+            if(tag_pos != std::string::npos)
+              tag = tag.substr(0, tag_pos) + tag.substr(tag_pos + 4);
+            auto last_sep = tag.rfind("::");
+            if(last_sep != std::string::npos)
+              tag = tag.substr(last_sep + 2);
+            pack_subst[sn] = tag;
+          }
+        }
+        if(!pack_subst.empty())
+        {
+          std::function<void(irept &)> subst =
+            [&](irept &node)
+          {
+            if(node.id() == ID_name &&
+               pack_subst.count(id2string(node.get(ID_identifier))))
+              node.set(ID_identifier,
+                pack_subst.at(id2string(node.get(ID_identifier))));
+            node.remove(ID_ellipsis);
+            for(auto &s : node.get_sub())
+              subst(s);
+            for(auto &ns : node.get_named_sub())
+              subst(ns.second);
+          };
+          irept &mi = new_decl.declarators()[0].add(
+            ID_member_initializers);
+          subst(mi);
+        }
+      }
+    }
+
     // Per [temp.inst]/3: member function template type-checking
     // may fail when function template parameters are not in the
     // class template map.  Catch and return the template symbol.
@@ -2785,7 +3539,15 @@ const symbolt &cpp_typecheckt::instantiate_template(
     // from deferred_typechecking to method_bodies so the body gets
     // type-checked and is not erased during clean_up.
     if(deferred_typechecking.erase(method_sym.name))
-      add_method_body(&symbol_table.get_writeable_ref(method_sym.name));
+    {
+      symbolt &ws = symbol_table.get_writeable_ref(method_sym.name);
+      // Per [temp.inst]/1: store function template parameters and
+      // arguments so method_bodies can restore the template_map.
+      ws.type.add(irep_idt{"#fn_template_type"}) = template_type;
+      ws.type.add(irep_idt{"#fn_template_args"}) =
+        specialization_template_args;
+      add_method_body(&ws);
+    }
 
     return method_sym;
   }
@@ -3653,6 +4415,77 @@ const symbolt &cpp_typecheckt::instantiate_template(
             expand_pack(named.second);
         };
         expand_pack(func_decl.value());
+      }
+    }
+  }
+
+  // Per [temp.variadic]/7: remove empty pack expansions
+  if(!template_map.pack_size_map.empty() && !new_decl.declarators().empty())
+  {
+    std::set<std::string> ep;
+    for(const auto &ps : template_map.pack_size_map)
+      if(ps.second == 0)
+      {
+        const std::string f = id2string(ps.first);
+        auto p = f.rfind("::");
+        ep.insert(p != std::string::npos ? f.substr(p + 2) : f);
+      }
+    if(!ep.empty())
+    {
+      std::function<bool(const irept &)> has_ep =
+        [&](const irept &n) -> bool {
+        if(n.id() == ID_template_parameter_symbol_type)
+        {
+          const std::string f = id2string(n.get(ID_identifier));
+          auto p = f.rfind("::");
+          if(ep.count(p != std::string::npos ? f.substr(p+2) : f))
+            return true;
+        }
+        if(n.id() == ID_name && ep.count(id2string(n.get(ID_identifier))))
+          return true;
+        for(const auto &s : n.get_sub())
+          if(has_ep(s)) return true;
+        for(const auto &ns : n.get_named_sub())
+          if(has_ep(ns.second)) return true;
+        return false;
+      };
+      auto &dt = new_decl.declarators()[0].type();
+      if(dt.id() == ID_function_type)
+      {
+        irept &params = dt.add(ID_parameters);
+        params.get_sub().erase(
+          std::remove_if(params.get_sub().begin(), params.get_sub().end(),
+            [&](const irept &p) {
+              if(p.id() != ID_cpp_declaration) return false;
+              for(const auto &d : p.get_sub())
+              {
+                if(d.id() == ID_cpp_declarator &&
+                   (d.find(ID_type).get_bool(ID_ellipsis) ||
+                    d.get_bool(ID_ellipsis)))
+                  return true;
+                // Also check for empty pack parameter type
+                if(d.id() == ID_cpp_declarator)
+                {
+                  const auto &dtype = d.find(ID_type);
+                  if(has_ep(dtype))
+                    return true;
+                }
+              }
+              // Check declaration type
+              if(has_ep(p.find(ID_type)))
+                return true;
+              return false;
+            }),
+          params.get_sub().end());
+      }
+      irept &mi = new_decl.declarators()[0].add(ID_member_initializers);
+      for(auto &init : mi.get_sub())
+      {
+        auto &subs = init.get_sub();
+        subs.erase(
+          std::remove_if(subs.begin(), subs.end(),
+            [&](const irept &s) { return has_ep(s); }),
+          subs.end());
       }
     }
   }

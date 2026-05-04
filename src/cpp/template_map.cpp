@@ -632,7 +632,13 @@ void template_mapt::build(
         pack_types.push_back(instance[j].type());
     }
     if(!pack_types.empty())
+    {
       pack_args_map[pack_id] = std::move(pack_types);
+      // Per [temp.variadic]/7: for single-element packs, also add
+      // the type to type_map so template_map.apply() can substitute.
+      if(pack_args_map[pack_id].size() == 1)
+        type_map[pack_id] = pack_args_map[pack_id].front();
+    }
   }
 }
 
