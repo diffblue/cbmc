@@ -3208,8 +3208,26 @@ resolved_after_strip:
   // change types into constructors if we want a constructor
   if(want == wantt::VAR)
   {
-    make_constructors(identifiers);
-    remove_duplicates(identifiers);
+    // Per [dcl.type.simple]/2: when a name with template arguments
+    // resolves to a class type and no function arguments are
+    // provided, it is a type-name, not a constructor call.
+    bool has_class_type_no_args = false;
+    if(template_args.is_not_nil() && !fargs.in_use)
+    {
+      for(const auto &id : identifiers)
+      {
+        if(id.id() == ID_type && id.type().id() == ID_struct_tag)
+        {
+          has_class_type_no_args = true;
+          break;
+        }
+      }
+    }
+    if(!has_class_type_no_args)
+    {
+      make_constructors(identifiers);
+      remove_duplicates(identifiers);
+    }
   }
 
   filter(identifiers, want);
