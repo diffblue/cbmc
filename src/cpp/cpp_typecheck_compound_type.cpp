@@ -1249,24 +1249,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
         }
         // remember access mode
         declaration.set(ID_C_access, access);
-        // Per [temp.inst]/3: member function templates may reference
-        // their own template parameters during class body processing.
-        // These parameters are not in the class template map, so
-        // type resolution may throw.  Catch and skip — the member
-        // template will be instantiated on demand when called.
-        {
-          auto saved_errors = get_message_handler().get_message_count(
-            messaget::M_ERROR);
-          try
-          {
-            convert_template_declaration(declaration);
-          }
-          catch(...)
-          {
-            get_message_handler().set_message_count(
-              messaget::M_ERROR, saved_errors);
-          }
-        }
+        convert_template_declaration(declaration);
         continue;
       }
 
