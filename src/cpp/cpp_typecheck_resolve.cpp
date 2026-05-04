@@ -2952,14 +2952,10 @@ exprt cpp_typecheck_resolvet::resolve(
 
     if(qualified)
     {
-      cpp_typecheck.error() << "symbol '" << base_name << "' not found";
-
-      if(cpp_typecheck.cpp_scopes.current_scope().is_root_scope())
-        cpp_typecheck.error() << " in root scope";
-      else
-        cpp_typecheck.error()
-          << " in scope '" << cpp_typecheck.cpp_scopes.current_scope().prefix
-          << "'";
+      // Per [temp.deduct]/8: qualified lookup failure during
+      // template instantiation is a substitution failure.
+      // Throw silently so SFINAE can handle it.
+      throw 0;
     }
     else
     {
