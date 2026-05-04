@@ -362,7 +362,18 @@ void cpp_typecheckt::typecheck_function_template(
   typet function_type=
     declarator.merge_type(declaration.type());
 
-  cpp_convert_plain_type(function_type, get_message_handler());
+  // Per [temp.res]/8: function template parameter types may
+  // reference other template parameters not yet in the template
+  // map.  If conversion fails, use the unconverted type — it
+  // will be resolved when the function template is instantiated.
+  try
+  {
+    cpp_convert_plain_type(function_type, get_message_handler());
+  }
+  catch(...)
+  {
+    function_type = declarator.merge_type(declaration.type());
+  }
 
   irep_idt symbol_name=
     function_template_identifier(
