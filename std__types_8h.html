@@ -108,7 +108,6 @@ $(document).ready(function(){initNavTree('std__types_8h.html',''); initResizable
 <div class="textblock"><code>#include &quot;<a class="el" href="expr_8h_source.html">expr.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="expr__cast_8h_source.html">expr_cast.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="src_2util_2invariant_8h_source.html">invariant.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="mp__arith_8h_source.html">mp_arith.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="validate_8h_source.html">validate.h</a>&quot;</code><br />
 <code>#include &lt;unordered_map&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -116,7 +115,7 @@ $(document).ready(function(){initNavTree('std__types_8h.html',''); initResizable
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="std__types_8h__incl.svg" width="1346" height="858"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="std__types_8h__incl.svg" width="1254" height="858"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-1-trigger" src="closed.png" alt="+"/> This graph shows which files directly or indirectly include this file:</div>
@@ -172,9 +171,6 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstring__typet.html">string_typet</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">String type.  <a href="classstring__typet.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrange__typet.html">range_typet</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A type for subranges of integers.  <a href="classrange__typet.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvector__typet.html">vector_typet</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The vector type.  <a href="classvector__typet.html#details">More...</a><br /></td></tr>
@@ -291,16 +287,6 @@ Functions</h2></td></tr>
 <tr class="memitem:a8ef022c9b509661e23439860313804ea" id="r_a8ef022c9b509661e23439860313804ea"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classstring__typet.html">string_typet</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="std__types_8h.html#a8ef022c9b509661e23439860313804ea">to_string_type</a> (<a class="el" href="classtypet.html">typet</a> &amp;type)</td></tr>
 <tr class="memdesc:a8ef022c9b509661e23439860313804ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cast a typet to a <a class="el" href="classstring__typet.html">string_typet</a>.    <br /></td></tr>
 <tr class="separator:a8ef022c9b509661e23439860313804ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a89825885a6d69cba86c3ffee5507e0a0" id="r_a89825885a6d69cba86c3ffee5507e0a0"><td class="memItemLeft" align="right" valign="top">template&lt;&gt; </td></tr>
-<tr class="memitem:a89825885a6d69cba86c3ffee5507e0a0"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classait.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="std__types_8h.html#a89825885a6d69cba86c3ffee5507e0a0">can_cast_type&lt; range_typet &gt;</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classtypet.html">typet</a> &amp;type)</td></tr>
-<tr class="memdesc:a89825885a6d69cba86c3ffee5507e0a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether a reference to a typet is a <a class="el" href="classrange__typet.html">range_typet</a>.  <br /></td></tr>
-<tr class="separator:a89825885a6d69cba86c3ffee5507e0a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a01a83d3e3e6bed5a6e245ae3f1474d0f" id="r_a01a83d3e3e6bed5a6e245ae3f1474d0f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">const</a> <a class="el" href="classrange__typet.html">range_typet</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="std__types_8h.html#a01a83d3e3e6bed5a6e245ae3f1474d0f">to_range_type</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classtypet.html">typet</a> &amp;type)</td></tr>
-<tr class="memdesc:a01a83d3e3e6bed5a6e245ae3f1474d0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cast a typet to a <a class="el" href="classrange__typet.html">range_typet</a>.  <br /></td></tr>
-<tr class="separator:a01a83d3e3e6bed5a6e245ae3f1474d0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a59e48baf77b829024d95248b2755ac14" id="r_a59e48baf77b829024d95248b2755ac14"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrange__typet.html">range_typet</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="std__types_8h.html#a59e48baf77b829024d95248b2755ac14">to_range_type</a> (<a class="el" href="classtypet.html">typet</a> &amp;type)</td></tr>
-<tr class="memdesc:a59e48baf77b829024d95248b2755ac14"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cast a typet to a <a class="el" href="classrange__typet.html">range_typet</a>.    <br /></td></tr>
-<tr class="separator:a59e48baf77b829024d95248b2755ac14"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4d86cd8302d48818b26ca96a9bd2d2e3" id="r_a4d86cd8302d48818b26ca96a9bd2d2e3"><td class="memItemLeft" align="right" valign="top">template&lt;&gt; </td></tr>
 <tr class="memitem:a4d86cd8302d48818b26ca96a9bd2d2e3"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classait.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="std__types_8h.html#a4d86cd8302d48818b26ca96a9bd2d2e3">can_cast_type&lt; vector_typet &gt;</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classtypet.html">typet</a> &amp;type)</td></tr>
 <tr class="memdesc:a4d86cd8302d48818b26ca96a9bd2d2e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether a reference to a typet is a <a class="el" href="classvector__typet.html">vector_typet</a>.  <br /></td></tr>
@@ -365,7 +351,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if <code>type</code> is a <a class="el" href="classarray__typet.html">array_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00875">875</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00874">874</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -395,7 +381,7 @@ template&lt;&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00044">44</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00043">43</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -434,7 +420,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if <code>type</code> is a <a class="el" href="classclass__typet.html">class_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00368">368</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00367">367</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -473,7 +459,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if <code>type</code> is a <a class="el" href="classcode__typet.html">code_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00775">775</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00774">774</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -512,7 +498,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if <code>type</code> is a <a class="el" href="classcomplex__typet.html">complex_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l01086">1086</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l01035">1035</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -551,46 +537,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if <code>type</code> is a <a class="el" href="classenumeration__typet.html">enumeration_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00555">555</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
-
-</div>
-</div>
-<a id="a89825885a6d69cba86c3ffee5507e0a0" name="a89825885a6d69cba86c3ffee5507e0a0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a89825885a6d69cba86c3ffee5507e0a0">&#9670;&#160;</a></span>can_cast_type&lt; range_typet &gt;()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classait.html">bool</a> <a class="el" href="expr__cast_8h.html#ac7fb78eb80468dbaf7502996c29e3b10">can_cast_type</a>&lt; <a class="el" href="classrange__typet.html">range_typet</a> &gt; </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classtypet.html">typet</a> &amp;&#160;</td>
-          <td class="paramname"><em>type</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Check whether a reference to a typet is a <a class="el" href="classrange__typet.html">range_typet</a>. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">type</td><td>Source type. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>True if <code>type</code> is a <a class="el" href="classrange__typet.html">range_typet</a>. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00968">968</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00554">554</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -629,7 +576,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if <code>type</code> is a <a class="el" href="classstring__typet.html">string_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00918">918</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00917">917</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -668,7 +615,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if <code>type</code> is a <a class="el" href="classstruct__or__union__tag__typet.html">struct_or_union_tag_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00464">464</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00463">463</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -707,7 +654,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if <code>type</code> is a <a class="el" href="classstruct__tag__typet.html">struct_tag_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00505">505</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00504">504</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -746,7 +693,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if <code>type</code> is a <a class="el" href="classstruct__typet.html">struct_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00295">295</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00294">294</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -785,7 +732,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if <code>type</code> is a <a class="el" href="classstruct__union__typet.html">struct_union_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00201">201</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00200">200</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -824,7 +771,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if <code>type</code> is a <a class="el" href="classtag__typet.html">tag_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00420">420</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00419">419</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -863,7 +810,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if <code>type</code> is a <a class="el" href="classvector__typet.html">vector_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l01044">1044</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00993">993</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -893,7 +840,7 @@ template&lt;&gt; </div>
 
 <p>This method tests, if the given typet is a constant. </p>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00029">29</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00028">28</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -938,7 +885,7 @@ template&lt;&gt; </div>
 </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8cpp_source.html#l00214">214</a> of file <a class="el" href="std__types_8cpp_source.html">std_types.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8cpp_source.html#l00177">177</a> of file <a class="el" href="std__types_8cpp_source.html">std_types.cpp</a>.</p>
 
 </div>
 </div>
@@ -976,7 +923,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classarray__typet.html">array_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00888">888</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00887">887</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -1014,7 +961,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classarray__typet.html">array_typet</a>.   </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00896">896</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00895">895</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -1052,7 +999,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classclass__typet.html">class_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00381">381</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00380">380</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -1090,7 +1037,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classclass__typet.html">class_typet</a>.   </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00388">388</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00387">387</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -1128,7 +1075,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classcode__typet.html">code_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00788">788</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00787">787</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -1166,7 +1113,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classcode__typet.html">code_typet</a>.   </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00796">796</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00795">795</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -1204,7 +1151,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classcomplex__typet.html">complex_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l01099">1099</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l01048">1048</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -1242,7 +1189,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classcomplex__typet.html">complex_typet</a>.   </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l01107">1107</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l01056">1056</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -1280,7 +1227,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classenumeration__typet.html">enumeration_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00568">568</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00567">567</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -1318,83 +1265,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classenumeration__typet.html">enumeration_typet</a>.   </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00575">575</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
-
-</div>
-</div>
-<a id="a01a83d3e3e6bed5a6e245ae3f1474d0f" name="a01a83d3e3e6bed5a6e245ae3f1474d0f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a01a83d3e3e6bed5a6e245ae3f1474d0f">&#9670;&#160;</a></span>to_range_type() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classait.html">const</a> <a class="el" href="classrange__typet.html">range_typet</a> &amp; to_range_type </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classtypet.html">typet</a> &amp;&#160;</td>
-          <td class="paramname"><em>type</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Cast a typet to a <a class="el" href="classrange__typet.html">range_typet</a>. </p>
-<p>This is an unchecked conversion. <em>type</em> must be known to be <a class="el" href="classrange__typet.html">range_typet</a>. Will fail with a precondition violation if type doesn't match.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">type</td><td>Source type. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classrange__typet.html">range_typet</a>. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00981">981</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
-
-</div>
-</div>
-<a id="a59e48baf77b829024d95248b2755ac14" name="a59e48baf77b829024d95248b2755ac14"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a59e48baf77b829024d95248b2755ac14">&#9670;&#160;</a></span>to_range_type() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classrange__typet.html">range_typet</a> &amp; to_range_type </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classtypet.html">typet</a> &amp;&#160;</td>
-          <td class="paramname"><em>type</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Cast a typet to a <a class="el" href="classrange__typet.html">range_typet</a>.   </p>
-<p>This is an unchecked conversion. <em>type</em> must be known to be <a class="el" href="classrange__typet.html">range_typet</a>. Will fail with a precondition violation if type doesn't match.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">type</td><td>Source type. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classrange__typet.html">range_typet</a>.   </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00988">988</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00574">574</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -1432,7 +1303,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classstring__typet.html">string_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00931">931</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00930">930</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -1470,7 +1341,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classstring__typet.html">string_typet</a>.   </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00938">938</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00937">937</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -1508,7 +1379,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classstruct__or__union__tag__typet.html">struct_or_union_tag_typet</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00478">478</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00477">477</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -1546,7 +1417,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classstruct__or__union__tag__typet.html">struct_or_union_tag_typet</a>   </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00485">485</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00484">484</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -1584,7 +1455,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classstruct__tag__typet.html">struct_tag_typet</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00518">518</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00517">517</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -1622,7 +1493,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classstruct__tag__typet.html">struct_tag_typet</a>   </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00525">525</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00524">524</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -1660,7 +1531,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classstruct__typet.html">struct_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00308">308</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00307">307</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -1698,7 +1569,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classstruct__typet.html">struct_typet</a>.   </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00315">315</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00314">314</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -1736,7 +1607,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classstruct__union__typet.html">struct_union_typet</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00214">214</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00213">213</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -1774,7 +1645,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classstruct__union__typet.html">struct_union_typet</a>   </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00221">221</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00220">220</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -1812,7 +1683,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classtag__typet.html">tag_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00434">434</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00433">433</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -1850,7 +1721,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classtag__typet.html">tag_typet</a>.   </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00441">441</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l00440">440</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -1888,7 +1759,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classvector__typet.html">vector_typet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l01057">1057</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l01006">1006</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>
@@ -1926,7 +1797,7 @@ template&lt;&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classvector__typet.html">vector_typet</a>.   </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l01065">1065</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="std__types_8h_source.html#l01014">1014</a> of file <a class="el" href="std__types_8h_source.html">std_types.h</a>.</p>
 
 </div>
 </div>

@@ -267,7 +267,7 @@ var searchData=
   ['can_5fcast_5ftype_3c_20java_5freference_5ftypet_20_3e_264',['can_cast_type&lt; java_reference_typet &gt;',['../java__types_8h.html#aaf09dd09eac5a3bde6eb58ee472bab50',1,'java_types.h']]],
   ['can_5fcast_5ftype_3c_20mathematical_5ffunction_5ftypet_20_3e_265',['can_cast_type&lt; mathematical_function_typet &gt;',['../mathematical__types_8h.html#ac759df92b404d29bde2652f17994c8ad',1,'mathematical_types.h']]],
   ['can_5fcast_5ftype_3c_20pointer_5ftypet_20_3e_266',['can_cast_type&lt; pointer_typet &gt;',['../pointer__expr_8h.html#a263668d57e4ac209286f7140a596f02e',1,'pointer_expr.h']]],
-  ['can_5fcast_5ftype_3c_20range_5ftypet_20_3e_267',['can_cast_type&lt; range_typet &gt;',['../std__types_8h.html#a89825885a6d69cba86c3ffee5507e0a0',1,'std_types.h']]],
+  ['can_5fcast_5ftype_3c_20range_5ftypet_20_3e_267',['can_cast_type&lt; range_typet &gt;',['../mathematical__types_8h.html#a89825885a6d69cba86c3ffee5507e0a0',1,'mathematical_types.h']]],
   ['can_5fcast_5ftype_3c_20reference_5ftypet_20_3e_268',['can_cast_type&lt; reference_typet &gt;',['../pointer__expr_8h.html#a0e49f887d3e1afa57ada1bb6314ed704',1,'pointer_expr.h']]],
   ['can_5fcast_5ftype_3c_20signedbv_5ftypet_20_3e_269',['can_cast_type&lt; signedbv_typet &gt;',['../bitvector__types_8h.html#a41f8a86e0dc96cd82d1eba8f6d53f482',1,'bitvector_types.h']]],
   ['can_5fcast_5ftype_3c_20string_5ftypet_20_3e_270',['can_cast_type&lt; string_typet &gt;',['../std__types_8h.html#ad5fefc9505e2e9e24ab7b83a4fde8f34',1,'std_types.h']]],
