@@ -4657,74 +4657,86 @@ bvt bv_utilst::popcount(const bvt &bv)
 bvt bv_utilst::booth_multiply(const bvt &op0, const bvt &op1)
 {
   std::size_t w = op0.size();
-  // Extend op1 with a 0 bit at position -1 (Booth requires looking at bit[-1])
-  bvt b(w + 1, const_literal(false));
-  for(std::size_t i = 0; i < w; ++i)
-    b[i + 1] = op1[i];
-  // b[0] = 0 (the implicit bit -1)
+
+  // Booth radix-4: process multiplier (op1) two bits at a time.
+  // We need bit[-1] = 0, then bits 0,1,2,...,w-1.
+  // For each group starting at position i (i=0,2,4,...):
+  //   Examine bits: op1[i-1], op1[i], op1[i+1]
+  //   Decode to multiplier in {-2,-1,0,+1,+2}
+  //   Partial product = multiplier × op0, shifted left by i
 
   std::vector<bvt> pps;
 
-  for(std::size_t i = 0; i + 1 < w; i += 2)
+  for(std::size_t i = 0; i < w; i += 2)
   {
-    // Booth radix-4: examine bits b[i], b[i+1], b[i+2]
-    // (shifted by 1 because b[0] is the implicit -1 bit)
-    literalt b0 = b[i];     // bit at position i-1
-    literalt b1 = b[i + 1]; // bit at position i
-    literalt b2 = (i + 2 < b.size()) ? b[i + 2] : const_literal(false);
+    // Get the three bits for Booth decoding
+    literalt bit_im1 = (i == 0) ? const_literal(false) : op1[i - 1];
+    literalt bit_i = op1[i];
+    literalt bit_ip1 = (i + 1 < w) ? op1[i + 1] : const_literal(false);
 
-    // Booth decode: value = -2*b2 + b1 + b0
-    // neg = b2 (sign bit)
-    // double_sel = b2 XOR b1 (select ×2)
-    // zero_sel = (b2 == b1) AND (b1 == b0) → all same = zero
-    literalt neg = b2;
-    literalt double_sel = prop.lxor(b2, b1);
-    literalt zero_sel = prop.land(prop.lequal(b2, b1), prop.lequal(b1, b0));
+    // Booth radix-4 decode:
+    // value = -2*bit_ip1 + bit_i + bit_im1
+    // Possible values: 000→0, 001→+1, 010→+1, 011→+2, 100→-2, 101→-1, 110→-1, 111→0
+    //
+    // neg = bit_ip1 (the sign)
+    // sel1 = bit_i XOR bit_im1 (select ×1 vs ×2)
+    // sel2 = NOT sel1 AND (bit_i OR bit_im1) ... actually:
+    // zero = (bit_ip1 == bit_i) AND (bit_i == bit_im1) (all same → 0)
+    // double = bit_ip1 XOR bit_i (differs → magnitude is 2 if sel1=0)
+    //
+    // Simpler: magnitude is |value|:
+    // |value| = 0 when all three bits are same
+    // |value| = 1 when exactly one of (bit_i, bit_im1) differs from bit_ip1
+    // |value| = 2 when both (bit_i, bit_im1) differ from bit_ip1
 
-    // Partial product: select 0, ±op0, or ±2*op0
+    literalt neg = bit_ip1;
+    // sel_double: both bit_i and bit_im1 differ from bit_ip1
+    // → (bit_ip1 XOR bit_i) AND (bit_ip1 XOR bit_im1)
+    // But that gives ×2 for 011 and 100, which is correct.
+    // sel_single: exactly one differs
+    // zero: none differ
+    literalt xor_i = prop.lxor(bit_ip1, bit_i);
+    literalt xor_im1 = prop.lxor(bit_ip1, bit_im1);
+    literalt sel_double = prop.land(xor_i, xor_im1); // both differ → ×2
+    literalt sel_any = prop.lor(xor_i, xor_im1);     // at least one differs → not zero
+
+    // Build partial product (before negation):
+    // If sel_double: use op0 shifted left by 1 (×2)
+    // If sel_any AND NOT sel_double: use op0 (×1)
+    // If NOT sel_any: zero
     bvt pp(w, const_literal(false));
-
     for(std::size_t j = 0; j < w; ++j)
     {
-      // single: op0[j], double: op0[j-1] (shift left by 1)
       literalt single_bit = op0[j];
       literalt double_bit = (j > 0) ? op0[j - 1] : const_literal(false);
-
-      // mux: double_sel ? double_bit : single_bit
-      literalt selected = prop.lselect(double_sel, double_bit, single_bit);
-      // zero out if zero_sel
-      selected = prop.land(selected, !(zero_sel));
-      // negate if neg (XOR with neg, will add 1 later)
-      pp[j] = prop.lxor(selected, neg);
+      // mux: sel_double ? double_bit : single_bit
+      literalt mag_bit = prop.lselect(sel_double, double_bit, single_bit);
+      // zero out if not sel_any
+      pp[j] = prop.land(mag_bit, sel_any);
     }
 
-    // For negative (two's complement), add 1 at the LSB position
-    // We handle this by adding neg as a carry-in during accumulation
-    // Shift pp to correct position (weight = 2^i)
-    bvt shifted_pp(w, const_literal(false));
-    for(std::size_t j = 0; j < w && j + i / 2 * 2 < w; ++j)
-    {
-      std::size_t pos = j + i;
-      if(pos < w)
-        shifted_pp[pos] = pp[j];
-    }
+    // Negate if neg (one's complement + 1):
+    // XOR all bits with neg, then add neg at LSB
+    for(std::size_t j = 0; j < w; ++j)
+      pp[j] = prop.lxor(pp[j], neg);
 
-    // Add the +1 for two's complement negation at position i
-    if(i < w)
-    {
-      // Create a correction term: neg at position i
-      bvt correction(w, const_literal(false));
-      correction[i] = neg;
-      shifted_pp = add(shifted_pp, correction);
-    }
+    // Shift to position i and add the +1 correction for negation
+    bvt shifted(w, const_literal(false));
+    for(std::size_t j = 0; j + i < w; ++j)
+      shifted[j + i] = pp[j];
 
-    pps.push_back(shifted_pp);
+    // Add neg at position i (the +1 for two's complement)
+    bvt correction(w, const_literal(false));
+    correction[i] = neg;
+    shifted = add(shifted, correction);
+
+    pps.push_back(shifted);
   }
 
   if(pps.empty())
     return bvt(w, const_literal(false));
 
-  // Accumulate partial products using carry-save (Dadda tree)
+  // Accumulate using Dadda tree
   return dadda_tree(pps);
 }
 

@@ -198,6 +198,7 @@ propt::resultt satcheck_cadical_baset::do_prop_solve(const bvt &assumptions)
     status = statust::SAT;
     return resultt::P_SATISFIABLE;
   case 20:
+    log.statistics() << "CaDiCaL: " << solver->get_statistic_value("conflicts") << " conflicts, " << solver->get_statistic_value("decisions") << " decisions, " << solver->get_statistic_value("propagations") << " propagations, " << solver->get_statistic_value("eliminated") << " eliminated" << messaget::eom;
     log.status() << "SAT checker: instance is UNSATISFIABLE" << messaget::eom;
     break;
   default:
