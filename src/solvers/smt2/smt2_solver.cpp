@@ -480,6 +480,12 @@ int solver(
       boolbv.set_comba_carry_save(true);
     else if(multiplier_encoding == "dadda-cs")
       boolbv.set_dadda_carry_save(true);
+    else if(multiplier_encoding == "booth")
+      boolbv.set_booth(true);
+    else if(multiplier_encoding == "block4")
+      boolbv.set_4bit_blocks(true);
+    else if(multiplier_encoding == "sortnet")
+      boolbv.set_sorting_network(true);
 
     if(adder_encoding_str == "brent-kung")
       boolbv.set_adder_encoding(bv_utilst::adder_encodingt::BRENT_KUNG);

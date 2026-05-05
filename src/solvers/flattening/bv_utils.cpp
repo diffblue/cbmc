@@ -2121,6 +2121,14 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
     return product;
   }
 
+  // Check for alternative full-product encodings first
+  if(use_booth)
+    return booth_multiply(_op0, _op1);
+  if(use_4bit_blocks)
+    return block4_multiply(_op0, _op1);
+  if(use_sorting_network)
+    return sorting_network_multiply(_op0, _op1);
+
   // store partial products
   std::vector<bvt> pps;
   pps.reserve(_op0.size());
@@ -4638,4 +4646,262 @@ bvt bv_utilst::popcount(const bvt &bv)
   }
 
   return x;
+}
+
+// ============================================================
+// Booth radix-4 multiplier encoding
+// ============================================================
+// Booth encoding reduces partial products by half by examining
+// pairs of bits and generating {-2, -1, 0, +1, +2} × multiplicand.
+// For SAT, we encode the sign and magnitude separately.
+bvt bv_utilst::booth_multiply(const bvt &op0, const bvt &op1)
+{
+  std::size_t w = op0.size();
+  // Extend op1 with a 0 bit at position -1 (Booth requires looking at bit[-1])
+  bvt b(w + 1, const_literal(false));
+  for(std::size_t i = 0; i < w; ++i)
+    b[i + 1] = op1[i];
+  // b[0] = 0 (the implicit bit -1)
+
+  std::vector<bvt> pps;
+
+  for(std::size_t i = 0; i + 1 < w; i += 2)
+  {
+    // Booth radix-4: examine bits b[i], b[i+1], b[i+2]
+    // (shifted by 1 because b[0] is the implicit -1 bit)
+    literalt b0 = b[i];     // bit at position i-1
+    literalt b1 = b[i + 1]; // bit at position i
+    literalt b2 = (i + 2 < b.size()) ? b[i + 2] : const_literal(false);
+
+    // Booth decode: value = -2*b2 + b1 + b0
+    // neg = b2 (sign bit)
+    // double_sel = b2 XOR b1 (select ×2)
+    // zero_sel = (b2 == b1) AND (b1 == b0) → all same = zero
+    literalt neg = b2;
+    literalt double_sel = prop.lxor(b2, b1);
+    literalt zero_sel = prop.land(prop.lequal(b2, b1), prop.lequal(b1, b0));
+
+    // Partial product: select 0, ±op0, or ±2*op0
+    bvt pp(w, const_literal(false));
+
+    for(std::size_t j = 0; j < w; ++j)
+    {
+      // single: op0[j], double: op0[j-1] (shift left by 1)
+      literalt single_bit = op0[j];
+      literalt double_bit = (j > 0) ? op0[j - 1] : const_literal(false);
+
+      // mux: double_sel ? double_bit : single_bit
+      literalt selected = prop.lselect(double_sel, double_bit, single_bit);
+      // zero out if zero_sel
+      selected = prop.land(selected, !(zero_sel));
+      // negate if neg (XOR with neg, will add 1 later)
+      pp[j] = prop.lxor(selected, neg);
+    }
+
+    // For negative (two's complement), add 1 at the LSB position
+    // We handle this by adding neg as a carry-in during accumulation
+    // Shift pp to correct position (weight = 2^i)
+    bvt shifted_pp(w, const_literal(false));
+    for(std::size_t j = 0; j < w && j + i / 2 * 2 < w; ++j)
+    {
+      std::size_t pos = j + i;
+      if(pos < w)
+        shifted_pp[pos] = pp[j];
+    }
+
+    // Add the +1 for two's complement negation at position i
+    if(i < w)
+    {
+      // Create a correction term: neg at position i
+      bvt correction(w, const_literal(false));
+      correction[i] = neg;
+      shifted_pp = add(shifted_pp, correction);
+    }
+
+    pps.push_back(shifted_pp);
+  }
+
+  if(pps.empty())
+    return bvt(w, const_literal(false));
+
+  // Accumulate partial products using carry-save (Dadda tree)
+  return dadda_tree(pps);
+}
+
+// ============================================================
+// 4-bit block multiplier encoding
+// ============================================================
+// Divide inputs into 4-bit sections, compute 4×4→8 sub-products,
+// then sum diagonals.
+bvt bv_utilst::block4_multiply(const bvt &op0, const bvt &op1)
+{
+  std::size_t w = op0.size();
+  std::size_t blocks = (w + 3) / 4; // number of 4-bit blocks
+
+  // Extract 4-bit blocks
+  auto get_block = [&](const bvt &op, std::size_t blk) -> bvt {
+    bvt block(4, const_literal(false));
+    for(std::size_t i = 0; i < 4 && blk * 4 + i < w; ++i)
+      block[i] = op[blk * 4 + i];
+    return block;
+  };
+
+  // Compute all block products (4×4 → 8 bits using shift-add)
+  // Each block product has weight 2^(4*(i+j))
+  std::vector<bvt> pps;
+
+  for(std::size_t i = 0; i < blocks; ++i)
+  {
+    bvt a_block = get_block(op0, i);
+    for(std::size_t j = 0; j < blocks; ++j)
+    {
+      bvt b_block = get_block(op1, j);
+      std::size_t offset = (i + j) * 4;
+      if(offset >= w)
+        continue;
+
+      // 4×4 multiplication using shift-add (small, propagation-friendly)
+      bvt product(8, const_literal(false));
+      for(std::size_t bit = 0; bit < 4; ++bit)
+      {
+        if(a_block[bit] == const_literal(false))
+          continue;
+        bvt pp(8, const_literal(false));
+        for(std::size_t k = 0; k < 4 && bit + k < 8; ++k)
+          pp[bit + k] = prop.land(b_block[k], a_block[bit]);
+        product = add(product, pp);
+      }
+
+      // Place product at correct offset in the full-width result
+      bvt shifted(w, const_literal(false));
+      for(std::size_t k = 0; k < 8 && offset + k < w; ++k)
+        shifted[offset + k] = product[k];
+
+      pps.push_back(shifted);
+    }
+  }
+
+  if(pps.empty())
+    return bvt(w, const_literal(false));
+
+  // Accumulate using Dadda tree
+  return dadda_tree(pps);
+}
+
+// ============================================================
+// Sorting network multiplier encoding
+// ============================================================
+// Compute partial products bitwise, sort each column using a
+// bitwise sorting network, then extract sum bits and carries.
+bvt bv_utilst::sorting_network_multiply(const bvt &op0, const bvt &op1)
+{
+  std::size_t w = op0.size();
+
+  // Build partial product matrix: pp[col] contains all bits for column col
+  std::vector<std::vector<literalt>> columns(w);
+  for(std::size_t i = 0; i < w; ++i)
+  {
+    for(std::size_t j = 0; j < w; ++j)
+    {
+      std::size_t col = i + j;
+      if(col >= w)
+        break;
+      columns[col].push_back(prop.land(op0[i], op1[j]));
+    }
+  }
+
+  // Sort each column using a bitwise sorting network.
+  // Compare-and-swap: (a, b) → (a|b, a&b) = (max, min)
+  // After sorting, all 1s are at the bottom (low indices).
+  auto sort_column = [this](std::vector<literalt> &col) {
+    std::size_t n = col.size();
+    if(n <= 1)
+      return;
+    // Use odd-even merge sort network (simple, O(n log²n) comparators)
+    for(std::size_t gap = n / 2; gap > 0; gap /= 2)
+    {
+      for(std::size_t i = 0; i + gap < n; ++i)
+      {
+        if((i / gap) % 2 == 0 || gap == n / 2)
+        {
+          // Compare and swap: put max at [i], min at [i+gap]
+          literalt a = col[i];
+          literalt b = col[i + gap];
+          col[i] = prop.lor(a, b);       // max
+          col[i + gap] = prop.land(a, b); // min
+        }
+      }
+    }
+    // Additional passes for correctness (bubble sort fallback for small n)
+    for(std::size_t pass = 0; pass < n; ++pass)
+    {
+      for(std::size_t i = 0; i + 1 < n; ++i)
+      {
+        literalt a = col[i];
+        literalt b = col[i + 1];
+        col[i] = prop.lor(a, b);
+        col[i + 1] = prop.land(a, b);
+      }
+    }
+  };
+
+  // Sort each column
+  for(auto &col : columns)
+    sort_column(col);
+
+  // Add auxiliary constraints: sorted[i] => sorted[i-1]
+  // (This helps propagation: if a bit is 1, all bits above it are 1)
+  for(auto &col : columns)
+  {
+    for(std::size_t i = 1; i < col.size(); ++i)
+    {
+      // sorted[i] => sorted[i-1], i.e., !sorted[i] | sorted[i-1]
+      prop.lcnf(!(col[i]), col[i - 1]);
+    }
+  }
+
+  // Extract result: for each column, the sum bit is the parity
+  // (number of 1s mod 2), and carries go to the next column.
+  // After sorting, count of 1s = index of first 0.
+  // Sum bit = col.size() is odd position of transition.
+  // Carries = floor(count / 2) bits to next column.
+
+  // Simple approach: use the sorted columns to build a popcount-like
+  // structure. The sum bit for column c is XOR of all bits (parity).
+  // Carries are pairs of 1s.
+  bvt result(w, const_literal(false));
+  std::vector<literalt> next_carries;
+
+  for(std::size_t c = 0; c < w; ++c)
+  {
+    auto &col = columns[c];
+
+    // Add carries from previous column
+    for(auto carry : next_carries)
+      col.push_back(carry);
+    next_carries.clear();
+
+    // Re-sort after adding carries
+    sort_column(col);
+
+    // The sum bit is the parity (XOR of all bits in the column)
+    literalt parity = const_literal(false);
+    for(auto bit : col)
+      parity = prop.lxor(parity, bit);
+    result[c] = parity;
+
+    // Carries: pairs of 1s. In sorted array, carries are at even positions.
+    // carry[k] = col[2*k+1] (the (2k+1)-th bit being 1 means ≥2k+2 ones,
+    // so at least k+1 pairs → k+1 carries)
+    // Simpler: carry count = floor(n_ones / 2).
+    // In sorted array: col[1] means ≥2 ones → 1 carry.
+    // col[3] means ≥4 ones → 2 carries. Etc.
+    for(std::size_t k = 1; k < col.size(); k += 2)
+    {
+      if(c + 1 < w)
+        next_carries.push_back(col[k]);
+    }
+  }
+
+  return result;
 }

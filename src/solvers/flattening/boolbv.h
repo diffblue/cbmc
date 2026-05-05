@@ -80,6 +80,18 @@ public:
   {
     bv_utils.set_dadda(b);
   }
+  void set_booth(bool b)
+  {
+    bv_utils.set_booth(b);
+  }
+  void set_4bit_blocks(bool b)
+  {
+    bv_utils.set_4bit_blocks(b);
+  }
+  void set_sorting_network(bool b)
+  {
+    bv_utils.set_sorting_network(b);
+  }
   boolbvt(
     const namespacet &_ns,
     propt &_prop,

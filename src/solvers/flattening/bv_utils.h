@@ -274,6 +274,9 @@ protected:
   bool use_dadda = false;
   bool use_comba_carry_save = false;
   bool use_dadda_carry_save = false;
+  bool use_booth = false;
+  bool use_4bit_blocks = false;
+  bool use_sorting_network = false;
   bool use_hybrid_divider = false;
 
   // Track multiplications for adaptive popcount decisions
@@ -322,6 +325,18 @@ public:
   void set_dadda_carry_save(bool b)
   {
     use_dadda_carry_save = b;
+  }
+  void set_booth(bool b)
+  {
+    use_booth = b;
+  }
+  void set_4bit_blocks(bool b)
+  {
+    use_4bit_blocks = b;
+  }
+  void set_sorting_network(bool b)
+  {
+    use_sorting_network = b;
   }
 
 protected:
@@ -382,6 +397,9 @@ protected:
   bvt comba_column_wise(const std::vector<bvt> &pps);
   bvt comba_carry_save(const std::vector<bvt> &pps);
   bvt dadda_carry_save(const std::vector<bvt> &pps);
+  bvt booth_multiply(const bvt &op0, const bvt &op1);
+  bvt block4_multiply(const bvt &op0, const bvt &op1);
+  bvt sorting_network_multiply(const bvt &op0, const bvt &op1);
 };
 
 #endif // CPROVER_SOLVERS_FLATTENING_BV_UTILS_H
