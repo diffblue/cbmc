@@ -1,6 +1,6 @@
 CORE
 JavaExceptionTest
---function JavaExceptionTest.test
+--function JavaExceptionTest.test -cp target/classes
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

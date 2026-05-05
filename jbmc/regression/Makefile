@@ -59,6 +59,13 @@ $(PARALLEL_DIRS): parallel__%: mvn-package
 .PHONY: clean
 clean:
 	mvn --quiet clean -T1C
+	rm -rf jbmc/classpath-class-incorrect-package/incorrect-classes
+	rm -rf jbmc/classpath-class-with-one-dir/default-classes
+	rm -f jbmc/overlay-class/Test.class
+	rm -f jbmc/overlay-class/annotations/org/cprover/*.class
+	rm -f jbmc/overlay-class/correct-overlay/Test.class
+	rm -f jbmc/overlay-class/ignored-method/Test.class
+	rm -f jbmc/overlay-class/unmarked-overlay/Test.class
 	@for dir in *; do \
 		if [ -d "$$dir" ]; then \
 			$(MAKE) -C "$$dir" clean; \

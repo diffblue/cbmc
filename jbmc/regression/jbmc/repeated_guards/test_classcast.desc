@@ -1,6 +1,6 @@
 CORE
 Test
---function Test.testClassCast
+--function Test.testClassCast -cp target/classes
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

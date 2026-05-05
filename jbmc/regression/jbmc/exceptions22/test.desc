@@ -1,6 +1,6 @@
 CORE
 test
---function test.main
+--function test.main -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 VERIFICATION SUCCESSFUL

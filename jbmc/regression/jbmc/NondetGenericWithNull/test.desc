@@ -1,6 +1,6 @@
 CORE
 NondetGenericWithNull
---function NondetGenericWithNull.main
+--function NondetGenericWithNull.main -cp target/classes
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

@@ -1,6 +1,6 @@
 CORE
 shift1.foo
-
+-cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

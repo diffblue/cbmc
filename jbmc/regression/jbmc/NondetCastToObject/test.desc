@@ -1,6 +1,6 @@
 CORE
 NondetCastToObject
---function NondetCastToObject.main
+--function NondetCastToObject.main -cp target/classes
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

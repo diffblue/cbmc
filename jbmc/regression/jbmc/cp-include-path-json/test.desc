@@ -1,6 +1,6 @@
 CORE
 
--jar C.jar --function jarfile3.f --java-cp-include-files '@jar.json'
+-jar target/C.jar --function jarfile3.f --java-cp-include-files '@jar.json'
 ^EXIT=10$
 ^SIGNAL=0$
 .*SUCCESS$

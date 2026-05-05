@@ -1,6 +1,6 @@
 CORE
 Test
---function Test.main --validate-goto-model
+--function Test.main --validate-goto-model -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

@@ -1,6 +1,6 @@
 CORE
 Test
---classpath `../../../../scripts/format_classpath.sh src.jar .`
+--classpath `../../../../scripts/format_classpath.sh target/src.jar target/classes`
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

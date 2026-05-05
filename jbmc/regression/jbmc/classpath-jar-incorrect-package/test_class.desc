@@ -1,6 +1,6 @@
 CORE
 Test
---classpath test.jar
+--classpath target/test.jar
 ^EXIT=6$
 ^SIGNAL=0$
 Could not find or load main class Test

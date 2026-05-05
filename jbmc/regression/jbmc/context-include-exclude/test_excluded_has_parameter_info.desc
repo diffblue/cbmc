@@ -1,9 +1,9 @@
 CORE
 ExcludedProperties
---context-exclude org.cprover.other --show-symbol-table --function ExcludedProperties.parameters
+--context-exclude org.cprover.other --show-symbol-table --function ExcludedProperties.parameters -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
-java::org\.cprover\.other\.MyOther\.identity:\(I\)I::arg0i
+java::org\.cprover\.other\.MyOther\.identity:\(I\)I::x
 --
 java::org\.cprover\.other\.MyOther\.identity:\(I\)I::stub
 --

@@ -1,6 +1,6 @@
 CORE
 NondetAssume1
---function NondetAssume1.main
+--function NondetAssume1.main -cp target/classes
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

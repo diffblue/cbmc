@@ -1,6 +1,6 @@
 CORE
 E
---function E.f --show-goto-functions
+--function E.f --show-goto-functions -cp target/classes
 IF.*"java::D"
 IF.*"java::O"
 IF.*"java::C"

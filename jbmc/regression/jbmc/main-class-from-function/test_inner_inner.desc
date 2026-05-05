@@ -1,6 +1,6 @@
 CORE
 
-'NoPackage$Nested$Deeper.<init>'
+'NoPackage$Nested$Deeper.<init>' -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 ^Found Java main class: NoPackage\$Nested\$Deeper$

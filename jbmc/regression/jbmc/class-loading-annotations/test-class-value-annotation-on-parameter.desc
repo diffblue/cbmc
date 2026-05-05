@@ -1,9 +1,9 @@
 CORE
 ClassValueAnnotationOnParameter
---verbosity 10
+--verbosity 10 -cp target/classes
 ^EXIT=6$
 ^SIGNAL=0$
-Getting class 'MyClassA' from file \.[\\/]MyClassA\.class
+Getting class 'MyClassA' from file target[\\/]classes[\\/]MyClassA\.class
 --
 MyClassB
 --

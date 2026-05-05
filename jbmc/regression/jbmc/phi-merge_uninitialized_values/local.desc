@@ -1,6 +1,6 @@
 CORE 
 PhiMergeUninitialized
---function PhiMergeUninitialized.dynamicAllocationUninitialized --show-vcc
+--function PhiMergeUninitialized.dynamicAllocationUninitialized --show-vcc -cp target/classes
 activate-multi-line-match
 ^EXIT=0$
 ^SIGNAL=0$

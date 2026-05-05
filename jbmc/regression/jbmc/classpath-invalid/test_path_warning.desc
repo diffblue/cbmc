@@ -1,6 +1,6 @@
 CORE
 Test
---classpath `../../../../scripts/format_classpath.sh ./NotHere .`
+--classpath `../../../../scripts/format_classpath.sh ./NotHere target/classes`
 ^EXIT=0$
 ^SIGNAL=0$
 Warning: failed to access directory `./NotHere'

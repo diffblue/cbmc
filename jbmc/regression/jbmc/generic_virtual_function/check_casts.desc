@@ -1,6 +1,6 @@
 CORE
 Base
---function Base.main --show-goto-functions
+--function Base.main --show-goto-functions -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 CALL java::Impl1\.f:\(Ljava/lang/Object;\)V\(cast\(.*::b, struct java::Impl1\*\), cast\(\*.*\.genericData, struct java::java\.lang\.Object\*\)\)

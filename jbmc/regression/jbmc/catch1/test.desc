@@ -1,9 +1,0 @@
-CORE
-catch1
-
-^EXIT=10$
-^SIGNAL=0$
-^VERIFICATION FAILED$
-^\[.*\] line 15 no uncaught exception: FAILURE$
---
-^warning: ignoring

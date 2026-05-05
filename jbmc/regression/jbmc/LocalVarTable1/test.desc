@@ -1,6 +1,6 @@
 CORE
 CtorLocalVar
---function CtorLocalVar.test
+--function CtorLocalVar.test -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

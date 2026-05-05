@@ -1,6 +1,6 @@
 CORE
 A
---function A.main --show-goto-functions
+--function A.main --show-goto-functions -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 IF "java::A".*THEN GOTO

@@ -1,6 +1,6 @@
 CORE
 NullPointer3
-
+-cp target/classes
 ^EXIT=10$
 ^SIGNAL=0$
 ^.*Null pointer check: FAILURE$

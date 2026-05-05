@@ -1,6 +1,6 @@
 CORE
 test
---unwind 10
+--unwind 10 -cp target/classes
 ^\[java::test.main:\(\[Ljava/lang/String;\)V\.1\] line 7 no uncaught exception: FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$

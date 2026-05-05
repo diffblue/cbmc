@@ -1,6 +1,6 @@
 CORE
 ManyLocalVariables
---function ManyLocalVariables.test
+--function ManyLocalVariables.test -cp target/classes
 VERIFICATION SUCCESSFUL
 ^EXIT=0$
 ^SIGNAL=0$

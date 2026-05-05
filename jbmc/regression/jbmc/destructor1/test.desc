@@ -1,6 +1,6 @@
 CORE
 Break
---show-goto-functions --function Break.main
+--show-goto-functions --function Break.main -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 DEAD .*::i

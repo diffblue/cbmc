@@ -1,6 +1,6 @@
 CORE
 NondetLong
---function NondetLong.main
+--function NondetLong.main -cp target/classes
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

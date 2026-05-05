@@ -1,6 +1,6 @@
 CORE
 Main
---show-goto-functions --function Main.twoCandidatesWithDerefs
+--show-goto-functions --function Main.twoCandidatesWithDerefs -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 DECL .*::this_argument : struct java::A\*$

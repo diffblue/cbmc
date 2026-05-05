@@ -1,6 +1,6 @@
 CORE
 static_init
---function static_init.main --java-threading
+--function static_init.main --java-threading -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

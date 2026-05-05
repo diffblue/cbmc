@@ -1,6 +1,6 @@
 CORE symex-driven-lazy-loading-expected-failure
 test
---verbosity 10 --function test.f --lazy-methods-extra-entry-point test.setx
+--verbosity 10 --function test.f --lazy-methods-extra-entry-point test.setx -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 VERIFICATION SUCCESSFUL

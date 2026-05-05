@@ -1,6 +1,6 @@
 CORE
 Main
---context-exclude 'org.cprover.MyClass$Inner.' --function 'org.cprover.MyClass$Inner.doIt:(I)I'
+--context-exclude 'org.cprover.MyClass$Inner.' --function 'org.cprover.MyClass$Inner.doIt:(I)I' -cp target/classes
 ^EXIT=1$
 ^SIGNAL=0$
 the program has no entry point

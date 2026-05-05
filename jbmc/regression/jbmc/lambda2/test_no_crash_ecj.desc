@@ -1,6 +1,6 @@
 CORE
 StaticMethodRef
---function StaticMethodRef.Smr
+--function StaticMethodRef.Smr -cp target/classes
 VERIFICATION FAILED
 ^EXIT=10$
 ^SIGNAL=0$

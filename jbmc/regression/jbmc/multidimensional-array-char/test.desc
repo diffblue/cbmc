@@ -1,6 +1,6 @@
 KNOWNBUG
 My.class
---function My.check2DCharArray --unwind 5 --max-nondet-array-length 10
+--function My.check2DCharArray --unwind 5 --max-nondet-array-length 10 -cp target/classes
 line 8 assertion at file My.java.*: FAILURE
 line 9 assertion at file My.java.*: SUCCESS
 line 12 assertion at file My.java.*: FAILURE

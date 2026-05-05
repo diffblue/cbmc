@@ -1,6 +1,6 @@
 CORE
 NondetArrayPrimitive
---function NondetArrayPrimitive.charArray --max-nondet-array-length 2000 --unwind 1
+--function NondetArrayPrimitive.charArray --max-nondet-array-length 2000 --unwind 1 -cp target/classes
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

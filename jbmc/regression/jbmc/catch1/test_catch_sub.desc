@@ -1,0 +1,9 @@
+CORE
+catch1.catchSub
+-cp target/classes
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^\[.*\] line 27 no uncaught exception: FAILURE$
+--
+^warning: ignoring

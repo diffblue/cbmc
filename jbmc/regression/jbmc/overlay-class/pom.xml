@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.cprover.regression</groupId>
+    <artifactId>regression.jbmc.overlay-class</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <parent>
+        <groupId>org.cprover.regression</groupId>
+        <artifactId>regression.jbmc</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <build>
+        <!-- Compile annotations as the main source so overlay variants
+             can reference them on the classpath. -->
+        <sourceDirectory>src/annotations</sourceDirectory>
+        <plugins>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-jar</id>
+                        <phase>none</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- After the annotations are compiled into target/classes/,
+                 compile each Test.java variant into its own directory.
+                 The test descriptors reference these directories by path. -->
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals><goal>run</goal></goals>
+                        <configuration>
+                            <target>
+                                <!-- Copy annotations to their expected location -->
+                                <mkdir dir="${project.basedir}/annotations/org/cprover"/>
+                                <copy todir="${project.basedir}/annotations/org/cprover">
+                                    <fileset dir="${project.build.outputDirectory}/org/cprover"
+                                             includes="*.class"/>
+                                </copy>
+                                <!-- Base Test (assert false) into ./ -->
+                                <javac srcdir="${project.basedir}/src/base"
+                                       destdir="${project.basedir}"
+                                       source="1.8" target="1.8"
+                                       includeantruntime="false"/>
+                                <!-- correct-overlay Test -->
+                                <mkdir dir="${project.basedir}/correct-overlay"/>
+                                <javac srcdir="${project.basedir}/src/correct-overlay"
+                                       destdir="${project.basedir}/correct-overlay"
+                                       classpath="${project.build.outputDirectory}"
+                                       source="1.8" target="1.8"
+                                       includeantruntime="false"/>
+                                <!-- ignored-method Test -->
+                                <mkdir dir="${project.basedir}/ignored-method"/>
+                                <javac srcdir="${project.basedir}/src/ignored-method"
+                                       destdir="${project.basedir}/ignored-method"
+                                       classpath="${project.build.outputDirectory}"
+                                       source="1.8" target="1.8"
+                                       includeantruntime="false"/>
+                                <!-- unmarked-overlay Test -->
+                                <mkdir dir="${project.basedir}/unmarked-overlay"/>
+                                <javac srcdir="${project.basedir}/src/unmarked-overlay"
+                                       destdir="${project.basedir}/unmarked-overlay"
+                                       classpath="${project.build.outputDirectory}"
+                                       source="1.8" target="1.8"
+                                       includeantruntime="false"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

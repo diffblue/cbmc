@@ -1,6 +1,6 @@
 CORE
 NondetFloat
---function NondetFloat.main
+--function NondetFloat.main -cp target/classes
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

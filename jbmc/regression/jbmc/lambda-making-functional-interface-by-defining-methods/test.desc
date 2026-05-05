@@ -1,6 +1,6 @@
 CORE
 Test
---function Test.main
+--function Test.main -cp target/classes
 line 37 assertion at file Test\.java line 37 function java::Test\.main:\(\[Ljava/lang/String;\)V bytecode-index 16: SUCCESS
 line 38 assertion at file Test\.java line 38 function java::Test\.main:\(\[Ljava/lang/String;\)V bytecode-index 27: SUCCESS
 line 39 assertion at file Test\.java line 39 function java::Test\.main:\(\[Ljava/lang/String;\)V bytecode-index 38: SUCCESS
