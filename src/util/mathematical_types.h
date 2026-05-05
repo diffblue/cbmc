@@ -146,23 +146,24 @@ inline mathematical_function_typet &to_mathematical_function_type(typet &type)
 
 /// A type for closed integer intervals `[from, to]`. Both endpoints are
 /// inclusive. The interval may be empty (if `from > to`).
-class range_typet : public typet
+class integer_range_typet : public typet
 {
 public:
-  range_typet(const mp_integer &from, const mp_integer &to) : typet(ID_range)
+  integer_range_typet(const mp_integer &_from, const mp_integer &_to)
+    : typet(ID_range)
   {
-    set_from(from);
-    set_to(to);
+    from(_from);
+    to(_to);
   }
 
   /// \return The lower bound of the interval (inclusive).
-  mp_integer get_from() const;
+  mp_integer from() const;
 
   /// \return The upper bound of the interval (inclusive).
-  mp_integer get_to() const;
+  mp_integer to() const;
 
   /// \return True iff the given value lies within the closed interval
-  ///   `[get_from(), get_to()]`.
+  ///   `[from(), to()]`.
   bool includes(const mp_integer &) const;
 
   /// \return A constant expression of this type representing the value 0.
@@ -175,38 +176,46 @@ public:
   ///   `includes(1)` must hold.
   constant_exprt one_expr() const;
 
-  void set_from(const mp_integer &from);
-  void set_to(const mp_integer &to);
+  /// \return The number of integers in the closed interval `[from(), to()]`,
+  ///   or `0` if the range is empty (i.e. `from() > to()`).
+  mp_integer size() const;
+
+  /// \return True iff the range contains no elements, i.e. `from() > to()`
+  ///   (equivalently, `size() == 0`).
+  bool empty() const;
+
+  void from(const mp_integer &);
+  void to(const mp_integer &);
 };
 
-/// Check whether a reference to a typet is a \ref range_typet.
+/// Check whether a reference to a typet is a \ref integer_range_typet.
 /// \param type: Source type.
-/// \return True if \p type is a \ref range_typet.
+/// \return True if \p type is a \ref integer_range_typet.
 template <>
-inline bool can_cast_type<range_typet>(const typet &type)
+inline bool can_cast_type<integer_range_typet>(const typet &type)
 {
   return type.id() == ID_range;
 }
 
-/// \brief Cast a typet to a \ref range_typet
+/// \brief Cast a typet to a \ref integer_range_typet
 ///
 /// This is an unchecked conversion. \a type must be known to be \ref
-/// range_typet. Will fail with a precondition violation if type
+/// integer_range_typet. Will fail with a precondition violation if type
 /// doesn't match.
 ///
 /// \param type: Source type.
-/// \return Object of type \ref range_typet.
-inline const range_typet &to_range_type(const typet &type)
+/// \return Object of type \ref integer_range_typet.
+inline const integer_range_typet &to_integer_range_type(const typet &type)
 {
-  PRECONDITION(can_cast_type<range_typet>(type));
-  return static_cast<const range_typet &>(type);
+  PRECONDITION(can_cast_type<integer_range_typet>(type));
+  return static_cast<const integer_range_typet &>(type);
 }
 
-/// \copydoc to_range_type(const typet &)
-inline range_typet &to_range_type(typet &type)
+/// \copydoc to_integer_range_type(const typet &)
+inline integer_range_typet &to_integer_range_type(typet &type)
 {
-  PRECONDITION(can_cast_type<range_typet>(type));
-  return static_cast<range_typet &>(type);
+  PRECONDITION(can_cast_type<integer_range_typet>(type));
+  return static_cast<integer_range_typet &>(type);
 }
 
 bool is_number(const typet &type);

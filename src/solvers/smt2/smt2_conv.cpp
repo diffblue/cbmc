@@ -597,7 +597,7 @@ constant_exprt smt2_convt::parse_literal(
   }
   else if(type.id() == ID_range)
   {
-    return from_integer(value + to_range_type(type).get_from(), type);
+    return from_integer(value + to_integer_range_type(type).from(), type);
   }
   else
     UNREACHABLE_BECAUSE(
@@ -1440,7 +1440,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     }
     else if(type.id() == ID_range)
     {
-      auto &range_type = to_range_type(type);
+      auto &range_type = to_integer_range_type(type);
       PRECONDITION(type == unary_minus_expr.op().type());
       // turn -x into 0-x
       auto minus_expr =
@@ -3246,16 +3246,12 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
   }
   else if(dest_type.id()==ID_range)
   {
-    auto &dest_range_type = to_range_type(dest_type);
-    const auto dest_size =
-      dest_range_type.get_to() - dest_range_type.get_from() + 1;
-    const auto dest_width = address_bits(dest_size);
+    auto &dest_range_type = to_integer_range_type(dest_type);
+    const auto dest_width = address_bits(dest_range_type.size());
     if(src_type.id() == ID_range)
     {
-      auto &src_range_type = to_range_type(src_type);
-      const auto src_size =
-        src_range_type.get_to() - src_range_type.get_from() + 1;
-      const auto src_width = address_bits(src_size);
+      auto &src_range_type = to_integer_range_type(src_type);
+      const auto src_width = address_bits(src_range_type.size());
       if(src_width < dest_width)
       {
         out << "((_ zero_extend " << dest_width - src_width << ") ";
@@ -3821,12 +3817,10 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
   }
   else if(expr_type.id() == ID_range)
   {
-    auto &range_type = to_range_type(expr_type);
-    const auto size = range_type.get_to() - range_type.get_from() + 1;
-    const auto width = address_bits(size);
+    auto &range_type = to_integer_range_type(expr_type);
+    const auto width = address_bits(range_type.size());
     const auto value_int = numeric_cast_v<mp_integer>(expr);
-    out << "(_ bv" << (value_int - range_type.get_from()) << " " << width
-        << ")";
+    out << "(_ bv" << (value_int - range_type.from()) << " " << width << ")";
   }
   else
     UNEXPECTEDCASE("unknown constant: "+expr_type.id_string());
@@ -4051,22 +4045,20 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
   }
   else if(expr.type().id() == ID_range)
   {
-    auto &range_type = to_range_type(expr.type());
+    auto &range_type = to_integer_range_type(expr.type());
 
     // These could be chained, i.e., need not be binary,
     // but at least MathSat doesn't like that.
     if(expr.operands().size() == 2)
     {
       // add: lhs + from + rhs + from - from = lhs + rhs + from
-      mp_integer from = range_type.get_from();
-      const auto size = range_type.get_to() - range_type.get_from() + 1;
-      const auto width = address_bits(size);
+      const auto width = address_bits(range_type.size());
 
       out << "(bvadd ";
       convert_expr(expr.op0());
       out << " (bvadd ";
       convert_expr(expr.op1());
-      out << " (_ bv" << range_type.get_from() << ' ' << width
+      out << " (_ bv" << range_type.from() << ' ' << width
           << ")))"; // bv, bvadd, bvadd
     }
     else
@@ -4321,19 +4313,16 @@ void smt2_convt::convert_minus(const minus_exprt &expr)
   }
   else if(expr.type().id() == ID_range)
   {
-    auto &range_type = to_range_type(expr.type());
+    auto &range_type = to_integer_range_type(expr.type());
 
     // sub: lhs + from - (rhs + from) - from = lhs - rhs - from
-    mp_integer from = range_type.get_from();
-    const auto size = range_type.get_to() - range_type.get_from() + 1;
-    const auto width = address_bits(size);
+    const auto width = address_bits(range_type.size());
 
     out << "(bvsub (bvsub ";
     convert_expr(expr.op0());
     out << ' ';
     convert_expr(expr.op1());
-    out << ") (_ bv" << range_type.get_from() << ' ' << width
-        << "))"; // bv, bvsub
+    out << ") (_ bv" << range_type.from() << ' ' << width << "))"; // bv, bvsub
   }
   else
     UNEXPECTEDCASE("unsupported type for -: "+expr.type().id_string());
@@ -6082,11 +6071,10 @@ void smt2_convt::convert_type(const typet &type)
   }
   else if(type.id() == ID_range)
   {
-    auto &range_type = to_range_type(type);
-    mp_integer size = range_type.get_to() - range_type.get_from() + 1;
-    if(size <= 0)
-      UNEXPECTEDCASE("unsuppored range type");
-    out << "(_ BitVec " << address_bits(size) << ")";
+    auto &range_type = to_integer_range_type(type);
+    if(range_type.empty())
+      UNEXPECTEDCASE("unsupported range type");
+    out << "(_ BitVec " << address_bits(range_type.size()) << ")";
   }
   else
   {
