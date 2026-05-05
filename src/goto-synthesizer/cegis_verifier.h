@@ -12,6 +12,8 @@ Author: Qinheping Hu
 #ifndef CPROVER_GOTO_SYNTHESIZER_CEGIS_VERIFIER_H
 #define CPROVER_GOTO_SYNTHESIZER_CEGIS_VERIFIER_H
 
+#include <util/mp_arith.h>
+
 #include <goto-programs/goto_model.h>
 #include <goto-programs/loop_ids.h>
 

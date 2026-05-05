@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "fixedbv.h"
 #include "ieee_float.h"
 #include "invariant.h"
+#include "mathematical_types.h"
 #include "std_expr.h"
 
 #include <algorithm>

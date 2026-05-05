@@ -63,3 +63,40 @@ constant_exprt real_typet::one_expr() const
 {
   return constant_exprt{ID_1, *this};
 }
+
+bool range_typet::includes(const mp_integer &singleton) const
+{
+  return get_from() <= singleton && singleton <= get_to();
+}
+
+constant_exprt range_typet::one_expr() const
+{
+  PRECONDITION(includes(1));
+  return constant_exprt{ID_1, *this};
+}
+
+constant_exprt range_typet::zero_expr() const
+{
+  PRECONDITION(includes(0));
+  return constant_exprt{ID_0, *this};
+}
+
+void range_typet::set_from(const mp_integer &from)
+{
+  set(ID_from, integer2string(from));
+}
+
+void range_typet::set_to(const mp_integer &to)
+{
+  set(ID_to, integer2string(to));
+}
+
+mp_integer range_typet::get_from() const
+{
+  return string2integer(get_string(ID_from));
+}
+
+mp_integer range_typet::get_to() const
+{
+  return string2integer(get_string(ID_to));
+}

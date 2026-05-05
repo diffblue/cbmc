@@ -8,6 +8,7 @@
 
 #include <util/format.h>
 #include <util/format_type.h>
+#include <util/mathematical_types.h>
 #include <util/std_expr.h>
 
 #include <testing-utils/use_catch.h>
