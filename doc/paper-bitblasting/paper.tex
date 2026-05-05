@@ -1,0 +1,1153 @@
+\documentclass[a4paper]{ceurart}
+
+\usepackage{booktabs}
+\usepackage{xspace}
+\usepackage{amsthm}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\newtheorem{theorem}{Theorem}
+
+
+\newcommand{\combacs}{\textsc{comba-cs}\xspace}
+\newcommand{\cadical}{\textsc{CaDiCaL}\xspace}
+\newcommand{\minisat}{\textsc{MiniSat}\xspace}
+\newcommand{\mergesat}{\textsc{MergeSat}\xspace}
+\newcommand{\cryptominisat}{\textsc{CryptoMiniSat}\xspace}
+\newcommand{\cbmc}{\textsc{CBMC}\xspace}
+
+\begin{document}
+
+\copyrightyear{2026}
+\copyrightclause{Copyright for this paper by its authors.
+  Use permitted under Creative Commons License Attribution 4.0
+  International (CC BY 4.0).}
+
+\title{Algebraic and Encoding Optimizations for Arithmetic\\in SAT-Based Verification}
+
+\author[1]{Michael Tautschnig}[orcid=0000-0002-7947-983X]
+\author[1]{TBD}
+\address[1]{Amazon Web Services}
+
+\begin{abstract}
+Multiplication is a bottleneck in SAT-based bounded model checking:
+the standard shift-and-add encoding creates carry chains that cause
+exponential blowup in solver effort. We show that carry
+propagation---not circuit size---is the dominant hardness source: at
+13 bits, integer multiplication needs 23$\times$ more conflicts than
+carry-free GF(2) multiplication despite only 1.6$\times$ more
+clauses. Based on this insight, we present \combacs, a carry-save
+Comba~\cite{comba1990exponentiation} encoding that separates column
+reduction from carry propagation, achieving 2.6--71$\times$ speedup
+across four SAT solvers. For pure polynomial equations
+(commutativity, associativity, overflow), a Gr\"obner basis solver
+over $\mathbb{Z}_{2^d}$ resolves them algebraically in under 1\,ms
+regardless of bitwidth. On 44 QF\_BV benchmarks (36 custom + 8 DSP datapath),
+\cbmc~\cite{clarke2004tool} solves 41 instances---more than
+Bitwuzla (39, SMT-COMP 2024 QF\_BV winner) and cvc5 (36).
+\end{abstract}
+
+\begin{keywords}
+SAT encoding \sep
+bounded model checking \sep
+multiplication \sep
+Gr\"obner basis \sep
+bounded variable elimination
+\end{keywords}
+
+\maketitle
+
+\section{Introduction}
+
+Consider verifying that 16-bit multiplication commutes: does
+$a \times b = b \times a$ hold for all 16-bit inputs $a$ and $b$?
+A bounded model checker encodes this as a SAT problem with two
+multiplier circuits and an equality check. With the standard
+shift-and-add encoding, \cadical~\cite{biere2019cadical} times out
+after 120\,s. With our carry-save Comba encoding, it solves in
+5.3\,s. With our Gr\"obner basis solver, it solves in 0.009\,s---by
+recognizing that $ab - ba = 0$ is a polynomial identity over
+$\mathbb{Z}_{2^{16}}$, without generating any SAT clauses at all.
+
+This example illustrates a broader problem: SAT-based bounded model
+checking (BMC)~\cite{biere1999symbolic} encodes program semantics as
+Boolean formulas, and for programs involving integer
+multiplication---common in cryptography, DSP, and overflow
+checking---the encoding choice dramatically affects solver
+performance. Yet the interaction between encoding choices and modern
+SAT solver techniques
+(inprocessing~\cite{jarvisalo2012inprocessing},
+BVE~\cite{een2005effective}) is poorly understood. Prior work has
+focused on BDD-based complexity~\cite{bryant1991complexity}, algebraic
+methods at the gate level~\cite{kaufmann2021amulet}, and word-level
+normalization~\cite{niemetz2023bitwuzla}, but not on systematic
+evaluation of SAT encodings across multiple solvers with solver-level
+analysis.
+
+We present a layered approach that matches each problem to the right
+solving technique. Our contributions are:
+
+\begin{enumerate}
+\item \textbf{Carry propagation as the hardness source.} We compare
+  integer and GF(2) (carry-less) multiplication and show that carry
+  propagation---not circuit size---causes exponential blowup: at
+  BW=13, integer multiplication needs 23$\times$ more conflicts than
+  GF(2) despite only 1.6$\times$ more clauses
+  (Section~\ref{sec:hardness}).
+
+\item \textbf{Carry-save Comba encoding (\combacs).} Based on this
+  insight, we separate column reduction from carry propagation,
+  achieving 2.6--71$\times$ speedup across four SAT solvers.
+  Counterintuitively, \combacs produces ${\sim}$2$\times$ more
+  clauses than Dadda yet is up to 30$\times$ faster. An adaptive
+  heuristic selects the encoding per multiplication, eliminating
+  all regressions (Section~\ref{sec:combacs}).
+
+\item \textbf{Algebraic solving via Gr\"obner bases and vanishing
+  polynomials.} We implement a
+  strong Gr\"obner basis computation over $\mathbb{Z}_{2^d}$ that
+  solves polynomial equations in under 1\,ms regardless of bitwidth,
+  complemented by a vanishing polynomial
+  test~\cite{shekhar2007equivalence} for DSP datapath equivalence,
+  with soundness verified by 25 mechanized theorems in Lean~4
+  (Section~\ref{sec:algebraic}).
+\end{enumerate}
+
+Section~\ref{sec:negative} catalogues 20+ approaches that failed,
+including Karatsuba, Toom-Cook, Sch\"onhage-Strassen, XOR Gaussian
+elimination, and abstraction refinement---to save future effort and
+because the failure modes illuminate SAT solver behavior.
+
+On 44 QF\_BV benchmarks (36 custom + 8 DSP datapath),
+\cbmc~\cite{clarke2004tool} solves
+41 instances, more than Bitwuzla~\cite{niemetz2023bitwuzla} (39,
+SMT-COMP 2024 QF\_BV winner) and cvc5 (36), with zero correctness
+regressions across 691 existing regression tests. The five-layer
+architecture---word-level simplification, vanishing polynomial test,
+Gr\"obner basis, \combacs encoding, and shift-add fallback---matches
+each problem to the right solving technique.
+
+\section{Background}
+
+An $N$-bit unsigned multiplication $a \times b$ produces $N$ partial
+products $\mathit{pp}[i] = a[i] \wedge b$, each shifted by $i$
+positions. These must be accumulated into the final $2N$-bit product.
+The standard \emph{shift-add} encoding adds partial products
+sequentially using a ripple-carry adder chain, creating a carry chain
+of length $O(N^2)$. \emph{Dadda trees}~\cite{dadda1965some} reduce
+the partial product matrix to two rows using carry-save full adders,
+followed by a single carry-propagate addition.
+\emph{Comba}~\cite{comba1990exponentiation} reduces each column
+independently using popcount (parallel bit counting via the pop0
+algorithm from~\cite{warren2012hackers}), propagating carries to
+adjacent columns during the same pass. Section~\ref{sec:combacs}
+introduces our carry-save variant that decouples these two steps.
+
+Modern CDCL solvers employ techniques that interact with encoding
+design in ways we exploit throughout this paper. Bounded Variable
+Elimination (BVE)~\cite{een2005effective} eliminates variables by
+resolving all clauses containing them; it is effective when the
+resolvent count is small. \cadical~\cite{biere2019cadical} performs
+BVE during search (\emph{inprocessing}), while
+\minisat/SatELite~\cite{een2005effective} performs it only during
+preprocessing. \cadical also extracts XOR and AND gates from CNF and
+identifies congruent (functionally equivalent) gate pairs---for BW=9
+commutativity, it finds 131 XOR gates, 138 AND gates, and 130
+congruent pairs between two multiplier circuits.
+
+Brain et al.~\cite{brain2016propagation} showed that composition of
+propagation-complete (PC) primitives preserves PC for adders but
+\emph{not} for multipliers. Brain~\cite{brain2021wrong} conjectured
+that a PC multiplier encoding is exponential in size. Rather than
+seeking propagation completeness, we optimize encoding structure for
+interaction with BVE and inprocessing.
+
+\section{Carry Propagation Hardness}
+\label{sec:hardness}
+
+We compare integer multiplication commutativity ($a \times b = b
+\times a$) with GF(2) (carry-less) multiplication commutativity. Both
+have identical partial product grids; the only difference is carry
+propagation (integer uses addition with carries, GF(2) uses XOR).
+This comparison isolates carry propagation as a variable, though we
+note that the change in addition operation also affects clause
+structure and propagation properties.
+
+\begin{table}[ht]
+\caption{Integer vs.\ GF(2) multiplication commutativity (\cadical).}
+\label{tab:gf2}
+\centering
+\begin{tabular}{lrrrrrr}
+\toprule
+& \multicolumn{3}{c}{GF(2)} & \multicolumn{3}{c}{Integer} \\
+\cmidrule(lr){2-4} \cmidrule(lr){5-7}
+BW & Clauses & Conflicts & Time & Clauses & Conflicts & Time \\
+\midrule
+9  & 1,915 & 974     & 0.01s & 2,421 & 10,831  & 0.22s \\
+13 & 3,059 & 10,707  & 0.08s & 4,993 & 250,630 & 8.66s \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+At BW=13, integer multiplication needs 23$\times$ more conflicts than
+GF(2) despite only 1.6$\times$ more clauses. Empirically, GF(2)
+conflict count grows roughly as $n^3$ (measured across BW=5--17);
+integer multiplication grows exponentially. DRAT proof analysis
+confirms: GF(2) proofs are 3.6--18$\times$ smaller.
+
+This is consistent with known exponential resolution lower bounds for
+related problems~\cite{haken1985intractability} and with Lv and
+Kalla's finding~\cite{lv2012galois} that GF($2^k$) multipliers
+(carry-free) are verifiable algebraically but intractable for SAT
+beyond 16 bits. We emphasize that this is empirical evidence; a formal
+proof of exponential resolution complexity for multiplication remains
+open. The practical implication is clear: encodings that minimize
+carry propagation depth should reduce SAT solver effort. Corroborating
+evidence comes from the encoding comparison itself
+(Table~\ref{tab:allencodings}): the encoding hierarchy shift-add $<$
+Dadda $<$ Comba $<$ \combacs exactly mirrors decreasing carry
+propagation depth, with all four using the same partial products and
+integer addition. This is exactly what \combacs does.
+
+\section{Carry-Save Comba Encoding}
+\label{sec:combacs}
+
+Standard Comba processes columns left-to-right, propagating carry bits
+from each column's popcount to the next column during the same pass.
+This creates inter-column dependencies that manifest as proof
+bottlenecks: the top bottleneck variable appears in 31\% of all DRAT
+proof steps.
+
+\combacs separates the two concerns:
+\begin{enumerate}
+\item \textbf{First pass:} Reduce each column independently via
+  popcount. Carry bits are collected but \emph{not} propagated to
+  adjacent columns.
+\item \textbf{Second pass:} Reduce the accumulated carry bits (which
+  form much shorter columns, max height 4 even at BW=17).
+\end{enumerate}
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[scale=0.38, every node/.style={font=\scriptsize}]
+  % Partial product grid (4-bit example)
+  \node[anchor=east] at (-0.5, 3.5) {\textbf{Partial}};
+  \node[anchor=east] at (-0.5, 3.0) {\textbf{products:}};
+  \foreach \col/\h in {0/1, 1/2, 2/3, 3/4, 4/3, 5/2, 6/1} {
+    \foreach \row in {1,...,\h} {
+      \fill[black!20] (\col*1.1, \row*0.5-0.1) rectangle ++(0.9, 0.4);
+    }
+  }
+  \foreach \col in {0,...,6} {
+    \node[below] at (\col*1.1+0.45, -0.1) {\col};
+  }
+
+  % Arrow
+  \draw[->, thick] (8.0, 1.0) -- (9.5, 1.0);
+  \node[above] at (8.75, 1.0) {Pass 1};
+
+  % After pass 1: sum bits + carry bits
+  \node[anchor=east] at (9.5, 3.5) {\textbf{Sum}};
+  \node[anchor=east] at (9.5, 3.0) {\textbf{bits:}};
+  \foreach \col in {0,...,6} {
+    \fill[blue!30] (\col*1.1+10, 0.4) rectangle ++(0.9, 0.4);
+  }
+  \node[anchor=east] at (9.5, 1.8) {\textbf{Carry}};
+  \node[anchor=east] at (9.5, 1.3) {\textbf{bits:}};
+  \foreach \col/\h in {1/1, 2/1, 3/2, 4/2, 5/1, 6/1} {
+    \foreach \row in {1,...,\h} {
+      \fill[red!30] (\col*1.1+10, \row*0.5+0.9) rectangle ++(0.9, 0.4);
+    }
+  }
+
+  % Arrow
+  \draw[->, thick] (18.0, 1.0) -- (19.5, 1.0);
+  \node[above] at (18.75, 1.0) {Pass 2};
+
+  % Final result
+  \node[anchor=east] at (19.5, 1.5) {\textbf{Result:}};
+  \foreach \col in {0,...,6} {
+    \fill[green!30] (\col*1.1+20, 0.4) rectangle ++(0.9, 0.4);
+  }
+\end{tikzpicture}
+\caption{The \combacs two-pass encoding for a 4-bit multiplier.
+  Pass~1 reduces each column independently via popcount (no
+  inter-column carries). Pass~2 reduces the short carry columns
+  (max height 2 here, max 4 at BW=17).}
+\label{fig:combacs}
+\end{figure}
+
+Counterintuitively, \combacs produces ${\sim}$2$\times$ more clauses
+than Dadda, yet is up to 30$\times$ faster. The extra auxiliary
+variables from popcount create intermediate ``summary'' variables
+representing the count of 1-bits in groups of 2, 4, 8. These act as
+abstractions the solver reasons about at a higher level. Formula size
+is not the right optimization target---propagation structure is.
+
+\subsection{Adaptive Encoding Selection}
+
+While popcount benefits commutativity checking (two identical-structure
+multiplications), it hurts problems with 3+ independent multiplications
+where BVE needs carry chains for cascading elimination. We measured
+that shift-add achieves 106\% BVE elimination on associativity
+problems---through resolution, BVE creates new variables that are
+themselves eliminated in subsequent rounds, so the cumulative count
+exceeds the original variable count---while carry-save encodings
+achieve only 58\%.
+
+The adaptive heuristic makes a two-way decision per multiplication.
+It selects \emph{popcount} when the formula has $\leq$2 symbolic
+multiplications of the same width---the commutativity pattern where
+congruence closure discovers equivalent gates between identical
+multiplier circuits. It selects \emph{shift-add} otherwise: when the
+formula has 3+ multiplications, or when widths differ. A pre-scan
+counts symbolic multiplications before encoding begins; if the count
+exceeds 2, popcount is disabled globally. For constant multiplication
+with few partial products, \combacs falls back to Dadda-style
+carry-save reduction. The multiplication count threshold is
+insensitive: changing it from 2 to 1, 4, or 99 produces identical
+results because the Gr\"obner basis solver
+(Section~\ref{sec:algebraic}) subsumes the threshold's purpose for
+polynomial benchmarks, and non-polynomial benchmarks in our suite
+have $\leq$2 multiplications.
+
+DRAT proof analysis confirms the benefit of column independence:
+
+\begin{table}[ht]
+\caption{DRAT proof comparison, commutativity BW=11 (\cadical).}
+\label{tab:proof}
+\centering
+\begin{tabular}{lrrr}
+\toprule
+Metric & Std.\ Comba & \combacs & Change \\
+\midrule
+Proof steps       & 125,956 & 57,295  & $-55\%$ \\
+Avg clause size   & 11.5    & 9.3     & $-19\%$ \\
+Input var involvement & 30\% & 22\%   & $-27\%$ \\
+Fixed variables   & 124     & 216     & $+74\%$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\combacs produces 55\% smaller proofs with 74\% more unit propagation
+during search. The increase in fixed variables means \combacs enables
+the solver to determine more variable values through unit propagation
+alone, reducing the search space. This confirms that column
+independence reduces inter-column reasoning in the proof.
+
+\section{Evaluation}
+\label{sec:evaluation}
+
+We ran all experiments on an Intel Xeon Platinum 8124M (3.0\,GHz,
+36 cores) with 68\,GB RAM, Ubuntu 24.04, GCC 13.3.0. Solver versions:
+\cadical 3.0.0, \minisat 2.2.1, \mergesat (docker-solvers branch,
+MiniSat-compatible API), \cryptominisat 5.11.21. We report median of
+3 runs with a 120\,s timeout and 6\,GB memory limit. Unless otherwise
+noted, we use the g-only adder encoding (the new default; see
+Appendix~\ref{app:adders}).
+
+We evaluate on 44 verification problems in 6 categories: algebraic
+identities (commutativity, overflow, strength reduction: 15 benchmarks
+at varying bitwidths), industrial (MurmurHash3, Q15 DSP, keyed hash,
+division-by-constant: 6), matrix/MAC (trace, dot product
+commutativity: 4), division/FP (roundtrip, FP add/mul: 6), factoring
+(SAT instances: 6), and DSP datapath (Horner equivalence, image
+rejection, vanishing polynomials: 8).
+
+\subsection{Multiplier Encoding Comparison}
+
+\begin{table}[ht]
+\caption{Four multiplier encodings across four solvers, g-only adder
+  (seconds, T/O\,=\,120\,s). Best per row in bold.}
+\label{tab:allencodings}
+\centering
+\small
+\begin{tabular}{llrrrrr}
+\toprule
+Solver & Benchmark & shift & Dadda & Std.\ Comba & \combacs & Speedup \\
+\midrule
+\cadical & comm 9    & 2.29  & 0.59  & 0.32  & \textbf{0.13} & 18$\times$ \\
+\cadical & comm 11   & 68.6  & 3.59  & 1.80  & \textbf{0.96} & 71$\times$ \\
+\cadical & comm 13   & T/O   & T/O   & 8.79  & \textbf{3.39} & $\infty$ \\
+\cadical & mat.\ trace & 34.4 & 3.16 & \textbf{1.34} & 1.93 & 18$\times$ \\
+\midrule
+\minisat & comm 9    & \textbf{6.62} & 8.99 & 11.7 & 6.67 & --- \\
+\minisat & comm 11   & T/O   & T/O   & T/O   & T/O & --- \\
+\minisat & mat.\ trace & T/O & 61.1  & \textbf{5.39} & 17.3 & $\infty$ \\
+\midrule
+\mergesat & comm 9   & 7.44  & 7.23  & 3.76  & \textbf{2.85} & 2.6$\times$ \\
+\mergesat & comm 11  & T/O   & 22.7  & 31.3  & \textbf{14.0} & $\infty$ \\
+\mergesat & comm 13  & T/O   & T/O   & 65.9  & \textbf{16.2} & $\infty$ \\
+\mergesat & mat.\ trace & 44.1 & 14.6 & \textbf{5.35} & 8.70 & 5.1$\times$ \\
+\midrule
+\cryptominisat & comm 9 & 10.2 & \textbf{7.90} & 10.1 & 9.19 & 1.1$\times$ \\
+\cryptominisat & comm 11 & T/O & 102 & 66.7 & \textbf{62.0} & $\infty$ \\
+\cryptominisat & mat.\ trace & T/O & 35.0 & \textbf{32.5} & 88.7 & $\infty$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The ``Speedup'' column shows \combacs vs.\ shift-add (the previous
+default). A clear encoding hierarchy emerges for commutativity:
+shift-add $<$ Dadda $<$ standard Comba $<$ \combacs, consistent
+across all four solvers. For matrix trace, standard Comba is slightly
+faster than \combacs on \cadical (1.34\,s vs.\ 1.93\,s) because the
+the carry-save second pass in \combacs creates slightly different
+variable structure than standard Comba's immediate carry propagation.
+
+\subsection{Cross-Solver Analysis}
+
+The four solvers differ in their response to \combacs for identifiable
+reasons. \cadical benefits most (71$\times$) because it combines the
+structural improvement with inprocessing BVE that exploits \combacs's
+popcount intermediate variables, plus congruence closure that
+identifies equivalent gates between the two multiplier circuits.
+\mergesat benefits from the structural improvement alone
+(2.6--$\infty\times$): as a \minisat fork with CHB activity and phase
+saving but no inprocessing, the carry-save structure is sufficient to
+solve comm BW=11 and BW=13 (both T/O with shift-add). \minisat's
+SatELite preprocessor achieves greater simplification on the compact
+shift-add formula for small problems (comm BW=9: 6.62\,s vs.\
+6.67\,s), but on larger formulas the structural benefit dominates
+(matrix trace: 5.39\,s where shift-add times out). Notably, \minisat
+times out on comm BW=11 for \emph{all} encodings---the problem exceeds
+its capacity regardless. \cryptominisat is consistently the slowest on
+multiplication; its native XOR handling provides no benefit (confirmed
+by running with and without XOR constraints), and it lacks both
+inprocessing BVE and congruence closure.
+
+\subsection{Scaling}
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.85\columnwidth,
+  height=5cm,
+  xlabel={Bitwidth},
+  ylabel={Time (seconds)},
+  ymode=log,
+  xmin=8, xmax=24,
+  ymin=0.05, ymax=150,
+  legend pos=north west,
+  legend style={font=\small},
+  grid=major,
+  grid style={gray!30},
+  mark size=2pt,
+]
+\addplot[blue, thick, mark=square*] coordinates {
+  (9, 0.31) (13, 8.57) (17, 49.1)
+};
+\addlegendentry{Std.\ Comba}
+\addplot[red, thick, mark=triangle*] coordinates {
+  (9, 0.13) (13, 3.29) (17, 9.57) (19, 33.5) (21, 52.1) (23, 98.3)
+};
+\addlegendentry{\combacs}
+% T/O line
+\draw[dashed, gray] (axis cs:8,120) -- (axis cs:24,120);
+\node[gray, font=\small] at (axis cs:22,115) {T/O};
+\end{axis}
+\end{tikzpicture}
+\caption{Commutativity scaling (\cadical, ripple adder). Standard
+  Comba times out at BW$\geq$19; \combacs extends the solvable
+  frontier to BW=23. The speedup accelerates with bitwidth.}
+\label{fig:scaling}
+\end{figure}
+
+\subsection{Industrial Benchmarks}
+
+\begin{table}[ht]
+\caption{Industrial benchmarks: shift-add vs.\ \combacs, g-only adder
+  (\cadical).}
+\label{tab:industrial}
+\centering
+\begin{tabular}{lrrr}
+\toprule
+Benchmark & shift-add & \combacs & Speedup \\
+\midrule
+MurmurHash3 determinism & 10.0s & 7.2s & 1.4$\times$ \\
+$\mathrm{tr}(AB) = \mathrm{tr}(BA)$ & 34.4s & 1.9s & 18$\times$ \\
+MAC dot product comm    & 11.8s & 4.3s & 2.8$\times$ \\
+keyed hash determinism  & 1.3s & 6.5s & 0.2$\times$ \\
+div-by-const optimization & 9.7s & 9.7s & 1.0$\times$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\combacs provides large speedups on benchmarks with multiple
+symbolic$\times$symbolic multiplications (matrix trace, MAC).
+The keyed hash regression (1.3\,s $\to$ 6.5\,s) is from constant
+multiplication where the adaptive fallback routes through dadda-cs
+instead of shift-add; the benchmark remains fast in absolute terms.
+
+More broadly, UNSAT problems show consistent encoding sensitivity (up
+to 71$\times$) with stable ranking across solvers. SAT problems
+(factoring) show encoding sensitivity at large bitwidths but with
+unpredictable ranking---different encodings make different solutions
+easy to find.
+
+\subsection{SMT-LIB QF\_BV Benchmarks}
+
+To assess external validity, we evaluate on 44 QF\_BV benchmarks in
+SMT-LIB format using \cbmc's \texttt{smt2\_solver} with \cadical.
+The \texttt{smt2\_solver} lacks \cbmc's word-level simplification,
+so algebraic identities must be resolved at the SAT level or by the
+Gr\"obner basis solver described in Section~\ref{sec:algebraic}.
+
+\begin{table}[ht]
+\caption{QF\_BV benchmarks with adaptive \combacs (\cadical, seconds).}
+\label{tab:qfbv}
+\centering
+\begin{tabular}{llrrr}
+\toprule
+Category & Benchmark & shift & default & Speedup \\
+\midrule
+\multicolumn{5}{l}{\emph{\combacs wins (2-mul commutativity, popcount)}} \\
+& comm\_8 & 0.69 & \textbf{0.09} & 8$\times$ \\
+& comm\_16 & T/O & \textbf{5.3} & $\infty$ \\
+& comm\_20 & T/O & \textbf{33.7} & $\infty$ \\
+& bf16\_mul\_v2 & 22.9 & \textbf{11.0} & 2.1$\times$ \\
+\midrule
+\multicolumn{5}{l}{\emph{Matched (adaptive selects shift-add)}} \\
+& overflow\_16 & 0.34 & 0.34 & 1.0$\times$ \\
+& checked\_mul\_16 & 0.39 & 0.39 & 1.0$\times$ \\
+& assoc\_8 & 27.2 & 26.7 & 1.0$\times$ \\
+& distrib\_8 & 83.3 & 81.6 & 1.0$\times$ \\
+\midrule
+\multicolumn{5}{l}{\emph{Remaining regression (inherent)}} \\
+& hw\_equiv\_12 & \textbf{14.9} & 101 & 0.15$\times$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The ``default'' column uses the adaptive \combacs heuristic,
+which selects popcount or shift-add per multiplication.
+With the Gr\"obner basis solver, the overall QF\_BV solve rate
+increased from 606/1728 (baseline) to 1320/1728 ($+$714 benchmarks),
+where 1728 = 36 benchmarks $\times$ 4 multiplier encodings $\times$
+3 adder encodings $\times$ 4 solvers. Including the 8 DSP benchmarks,
+the total benchmark count is 44.
+The adaptive heuristic (Section~\ref{sec:combacs}) and pre-scan
+eliminate all regressions except hw\_equiv\_12, where a single
+\texttt{bvmul} is compared against a manually-constructed shift-add
+circuit---no encoding heuristic can detect this without knowing the
+comparison target's structure.
+
+\section{Algebraic Solving via Gr\"obner Bases}
+\label{sec:algebraic}
+
+We implement a strong Gr\"obner basis computation over
+$\mathbb{Z}_{2^d}$, building on the algebraic framework of Song et
+al.~\cite{song2024equational}, who showed that strong Gr\"obner bases
+can solve the equational theory of bit-vectors. Our contribution
+beyond their work is the integration into a BMC tool: (1)~the
+Rabinowitsch trick for handling disequalities (not just equations),
+(2)~fresh variable decomposition for inline expressions in SSA form,
+(3)~candidate extraction with assumption-gated SAT hints for mixed
+polynomial/non-polynomial problems, (4)~an equation ordering strategy
+(definitions before Rabinowitsch) that improves performance by
+2000$\times$, and (5)~mechanized soundness proofs in Lean~4.
+
+The solver runs before
+bit-blasting. Polynomial equations are collected during SSA
+conversion: each \texttt{c = a*b} becomes $c - a \cdot b = 0$,
+and negated assertions use the Rabinowitsch trick ($c \neq d$
+becomes $(c-d) \cdot e - 1 = 0$). A vanishing polynomial
+test~\cite{shekhar2007equivalence} runs first, checking whether the
+difference polynomial vanishes as a function over
+$\mathbb{Z}_{2^d}$ (complete for polynomial equivalence). If
+inconclusive, the Gr\"obner basis handles the full system including
+the Rabinowitsch equation. If the Gr\"obner basis contains
+a unit constant, the system is unsatisfiable. In $\mathbb{Z}_{2^d}$,
+the units are precisely the odd elements (those coprime to $2^d$),
+so the check reduces to testing whether any constant in the basis
+is odd. When this holds, the system
+is unsatisfiable and no bit-blasting is needed. The computation
+uses a step limit of 100,000; all polynomial equation benchmarks
+converge within 1,000 steps. When the step limit is reached, the
+solver returns inconclusive and falls through to bit-blasting; we
+have not encountered this on any benchmark in our suite.
+
+\begin{theorem}[Soundness]
+If the strong Gr\"obner basis of
+$\{f_1, \ldots, f_k, (a{-}b) \cdot e - 1\}$ over
+$\mathbb{Z}_{2^d}$ contains an odd constant, then $a = b$ for all
+solutions of $\{f_1 = 0, \ldots, f_k = 0\}$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+An odd element of $\mathbb{Z}_{2^d}$ is a unit (coprime to $2^d$).
+A unit in an ideal $I$ implies $1 \in I$, hence $I$ is the whole
+ring. But if a solution $\sigma$ existed with $f_i(\sigma) = 0$ for
+all $i$, the evaluation homomorphism $\phi_\sigma$ would send every
+element of $I$ to $0$, contradicting $\phi_\sigma(1) = 1 \neq 0$.
+The Rabinowitsch polynomial $(a{-}b) \cdot e - 1$ ensures that any
+solution must satisfy $a = b$: if $a \neq b$ then $e = (a{-}b)^{-1}$
+would need to exist, but the polynomial $-1$ would be in $I$,
+triggering the unit check. The algorithm is sound (never falsely
+reports UNSAT) but incomplete (returns inconclusive when the basis
+contains only even constants).
+Full proof mechanized in Lean~4 (25 theorems, zero \texttt{sorry}),
+covering: (a)~unit characterization in $\mathbb{Z}_{2^d}$ (odd
+$\Leftrightarrow$ unit, 2 is not a unit for $d \geq 1$),
+(b)~ideal preservation under S-polynomial computation and reduction,
+(c)~soundness of the Rabinowitsch trick (unit in ideal $\Rightarrow$
+no solution via ring homomorphism), and (d)~Buchberger termination
+via the ascending chain condition in Noetherian rings.
+\end{proof}
+
+\begin{table}[ht]
+\caption{Five-layer arithmetic solving (\cadical).}
+\label{tab:wordlevel}
+\centering
+\small
+\begin{tabular}{llrr}
+\toprule
+Layer & Example & \cbmc & smt2 \\
+\midrule
+\multicolumn{4}{l}{\emph{1. Word-level simplification (inline expressions)}} \\
+& \texttt{a*b == b*a} & 0\,s & 0.004\,s \\
+& \texttt{(a*b)*c == a*(b*c)} & 0\,s & 0.004\,s \\
+\midrule
+\multicolumn{4}{l}{\emph{2. Vanishing polynomial test (DSP datapath equivalence)}} \\
+& dsp\_image\_reject (12$\times$8-bit) & 0.014\,s \\
+& dsp\_horner\_16 & --- & 0.009\,s \\
+& dsp\_vanishing\_poly\_8 & --- & 0.008\,s \\
+\midrule
+\multicolumn{4}{l}{\emph{3. Gr\"obner basis (polynomial equations, any BW)}} \\
+& commutativity BW=16 (interm.\ vars) & 0.0002\,s & 0.009\,s \\
+& commutativity BW=32 (interm.\ vars) & 0.0003\,s & 0.012\,s \\
+& associativity BW=8 & 0\,s$^*$ & 0.009\,s \\
+& distributivity BW=8 & 0\,s$^*$ & 0.006\,s \\
+& overflow check BW=16$^\dagger$ & 0.0004\,s & 0.008\,s \\
+\midrule
+\multicolumn{4}{l}{\emph{4. \combacs (non-polynomial, 2 multiplications)}} \\
+& matrix trace $\mathrm{tr}(AB) = \mathrm{tr}(BA)$ & 1.8\,s & --- \\
+& MAC dot product commutativity & 4.0\,s & --- \\
+\midrule
+\multicolumn{4}{l}{\emph{5. Shift-add (non-polynomial, 3+ multiplications)}} \\
+& keyed hash (has XOR) & 6.3\,s & --- \\
+\bottomrule
+\end{tabular}
+
+\smallskip\noindent
+$^*$Resolved by word-level simplification before Gr\"obner basis.\\
+$^\dagger$\texttt{extract(wide\_prod, 15, 0)} handled as modular reduction.
+\end{table}
+
+The Gr\"obner basis computation is bitwidth-independent: commutativity
+at BW=32 takes the same 0.3\,ms as BW=16. For the
+\texttt{smt2\_solver} (which lacks word-level simplification), inline
+multiplications are decomposed into fresh variables with defining
+equations, enabling the Gr\"obner basis to solve associativity
+(0.009\,s) and distributivity (0.006\,s) that previously required
+26--71\,s of SAT solving. Notably, the Gr\"obner basis makes the
+multiplier encoding and SAT solver choice \emph{irrelevant} for
+polynomial equation benchmarks: all encoding$\times$solver
+combinations produce the same $<$10\,ms result.
+
+When the Gr\"obner basis returns inconclusive (non-polynomial
+residual constraints), a candidate assignment is extracted from the
+reduced basis and used to generate assumption-gated SAT hints that
+guide the bit-blasting solver. Problems with non-polynomial
+operations (bitwise XOR, shifts, inequalities) fall through to
+bit-blasting with \combacs. The implementation uses \cbmc's existing
+\texttt{mp\_integer} for coefficient arithmetic, with no external
+dependencies ($\sim$700 lines). The Gr\"obner basis computation is
+a standalone decision procedure for the polynomial fragment of
+QF\_BV (equations involving addition, multiplication, and
+truncation); problems with bitwise operations, inequalities, or
+shifts fall through to bit-blasting.
+
+We measured the overhead of unsuccessful algebraic layers on
+benchmarks that require SAT solving (bf16\_mul\_comm\_v2,
+strength\_chain\_16, div\_mul\_roundtrip\_12). Word-level
+simplification adds $<$0.02\,s, and the vanishing polynomial test
+plus Gr\"obner basis add $<$0.05\,s---less than 0.5\% of the
+hardest benchmark's solving time. The layers are effectively free
+when they do not apply.
+
+\section{External Solver Comparison}
+\label{sec:external}
+
+We compare \cbmc's \texttt{smt2\_solver} against
+Bitwuzla~\cite{niemetz2023bitwuzla} (SMT-COMP 2024 QF\_BV winner,
+version 0.9.0-dev) and cvc5 (version 1.3.3) on all 44 QF\_BV
+benchmarks.
+
+\begin{table}[ht]
+\caption{External solver comparison (seconds, T/O\,=\,120\,s).}
+\label{tab:external}
+\centering
+\small
+\begin{tabular}{lrrr}
+\toprule
+Benchmark & Bitwuzla & cvc5 & \cbmc \\
+\midrule
+\multicolumn{4}{l}{\emph{Polynomial (Gr\"obner basis)}} \\
+comm\_16 & 0.005 & 0.006 & 0.009 \\
+assoc\_8 & 0.005 & 0.006 & 0.010 \\
+overflow\_16 & 0.005 & 0.015 & \textbf{0.009} \\
+\midrule
+\multicolumn{4}{l}{\emph{\cbmc wins}} \\
+bf16\_mul\_comm & T/O & T/O & \textbf{0.009} \\
+bf16\_mul\_v2 & T/O & T/O & \textbf{11.6} \\
+bf16\_mul\_const & T/O & T/O & \textbf{0.029} \\
+bf16\_mul\_mono & T/O & T/O & \textbf{30.3} \\
+div\_roundtrip & 5.24 & 6.25 & \textbf{4.08} \\
+\midrule
+\multicolumn{4}{l}{\emph{Bitwuzla wins}} \\
+float\_mul\_v2 & \textbf{0.005} & 0.006 & T/O \\
+half\_mul\_v2 & \textbf{0.005} & T/O & T/O \\
+strength\_chain & \textbf{0.005} & 0.008 & 1.49 \\
+\midrule
+\multicolumn{4}{l}{\emph{Solved instances (of 44)}} \\
+& 39 & 36 & \textbf{41} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\cbmc solves the most instances (41/44 benchmarks), followed by Bitwuzla
+(39/44) and cvc5 (36/44). The strengths are complementary: \cbmc
+uniquely solves 4 bfloat16 multiplication benchmarks (non-standard
+FP operations that word-level normalization cannot handle), while
+Bitwuzla uniquely solves 2 IEEE FP benchmarks via word-level
+normalization. On polynomial equation benchmarks, all three solvers
+are fast ($<$15\,ms) via different mechanisms: \cbmc uses Gr\"obner
+bases, Bitwuzla and cvc5 use word-level rewriting.
+
+To probe the limits of our algebraic approach, we created 8 DSP
+datapath verification benchmarks inspired by
+Shekhar et al.~\cite{shekhar2007equivalence}: Horner-form polynomial
+equivalence, image rejection with coefficient scaling, and vanishing
+polynomials. On these, Bitwuzla solves all 8 in $<$50\,ms via
+word-level normalization, and \cbmc now also solves all 8 in
+$<$15\,ms via the algebraic vanishing polynomial
+test~\cite{gamez2024efficient}---including dsp\_image\_reject
+(0.014\,s) and dsp\_horner\_16 (0.009\,s), both of which
+previously timed out. The vanishing polynomial test converts the
+difference polynomial to the falling factorial basis using Stirling
+numbers of the second kind and checks divisibility conditions on the
+coefficients, providing a complete decision procedure for polynomial
+equivalence over $\mathbb{Z}_{2^d}$.
+
+\subsection{Threats to Validity}
+
+The main threat is benchmark selection bias: our benchmarks emphasize
+multiplication-heavy verification, which is common in cryptography and
+DSP but rare in typical pointer-safety checking.
+
+To assess external validity beyond our custom suite, we evaluated on
+26 QF\_BV benchmarks from the SMT-LIB 2023 benchmark submission
+(GRS cryptographic signatures, p4dfa network protocols, and
+UltimateAutomizer program verification). On these community
+benchmarks, Bitwuzla solves 7, \cbmc solves 6, and cvc5 solves 2
+(30\,s timeout). \cbmc is faster than Bitwuzla on GRS benchmarks
+with 32-bit operands (6.5\,s vs.\ 7.1\,s on grs-32-16) but slower
+on the UltimateAutomizer benchmarks that contain multiplication
+within larger program verification problems (4.7\,s vs.\ 0.004\,s
+on cohencu), where Bitwuzla's word-level reasoning avoids
+bit-blasting entirely. Bitwuzla uniquely solves grs-128-16.
+
+The Gr\"obner basis
+primarily benefits algebraic properties (commutativity, overflow
+safety); for typical \cbmc workloads it adds negligible overhead
+($<$4\,ms). The 691 \cbmc regression tests (covering array bounds,
+pointer safety, floating-point, and other properties) provide evidence
+that the encoding changes do not cause correctness or performance
+regressions on typical verification tasks.
+
+Appendix~\ref{sec:bve} discusses the interaction between
+\combacs and BVE: \cadical's inprocessing BVE is counterproductive
+for popcount (4--140\% overhead), but the adaptive heuristic routes
+many multiplications to shift-add where BVE is beneficial.
+
+\section{Negative Results}
+\label{sec:negative}
+
+A significant portion of this investigation produced negative results.
+We report them to save future effort and because the failure modes
+illuminate SAT solver behavior. A natural first question is whether
+asymptotically superior algorithms---Karatsuba~\cite{karatsuba1962multiplication}
+($O(n^{1.585})$), Toom-Cook~\cite{toom1963complexity} ($O(n^{1.465})$),
+or Sch\"onhage-Strassen~\cite{schonhage1971schnelle}
+($O(n \log n \log \log n)$)---produce better SAT encodings.
+\cbmc includes implementations of all three. They are designed for
+\emph{computational} efficiency (fewer arithmetic operations), not
+\emph{verification} efficiency (fewer SAT conflicts). Karatsuba's
+combination step requires additions with carry chains---exactly the
+structure Section~\ref{sec:hardness} identifies as the hardness source.
+
+\begin{table}[ht]
+\caption{Subquadratic encodings vs.\ std.\ Comba (\cadical, seconds).}
+\label{tab:subquad}
+\centering
+\begin{tabular}{lrrrr}
+\toprule
+Benchmark & Std.\ Comba & Karatsuba & Toom-Cook & Sch\"onhage \\
+\midrule
+comm BW=9   & \textbf{0.26} & 5.54  & 2.48  & 86.4 \\
+comm BW=13  & \textbf{8.08} & 10.0  & 31.4  & $>$300 \\
+prime BW=28 & \textbf{3.09} & 69.7  & 71.7  & $>$120 \\
+aws\_mul    & 39.4          & \textbf{3.89} & $>$120 & $>$120 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Karatsuba is competitive on commutativity at BW=13 but 22$\times$
+slower on primality. Sch\"onhage-Strassen produces 43K variables for
+BW=7 (vs.\ ${\sim}$600 for Comba)---designed for thousands of bits,
+it is orders of magnitude too expensive at practical bitwidths.
+Note that standard Comba loses to Dadda on aws\_mul (39.4\,s vs.\
+1.29\,s), where constant multiplication dominates; \combacs's adaptive
+fallback handles this.
+
+\subsection{Approaches That Hurt Performance}
+
+Several approaches that add structure to the encoding actually hurt
+performance because they reintroduce carry chains. Radix-4/8
+multipliers are 2--15$\times$ slower: pre-computing $3x$, $5x$, $7x$
+adds carry chains that dominate at practical bitwidths. Full-adder
+tree popcount is 3$\times$ slower than pop0 despite fewer variables,
+because it creates longer carry chains ($\log_2 n$ bits vs.\ 2--4
+bits). Non-propagation-complete carry merge causes a 25$\times$
+regression: encoding carry with 4 clauses instead of 6 violates
+propagation completeness~\cite{brain2016propagation}.
+
+Sharing structure between multiplications also hurts: caching AND
+gates between multiplications is 89\% slower because shared partial
+product variables prevent independent BVE---the solver cannot
+eliminate a variable that appears in clauses from both multipliers.
+
+\subsection{Approaches With Limited or Chaotic Benefit}
+
+XOR-based techniques consistently disappoint. We tested offline
+Gaussian elimination, online incremental GE, and \cryptominisat's
+built-in XOR handling. The best result was 1.4$\times$ on one
+benchmark, with neutral or negative results on all others. The
+problem is that \cbmc's XOR constraints are 3-variable gates---too
+short for GE to combine usefully.
+
+Solver tuning and abstraction refinement fail because the problem is
+structural, not parametric. We tested 512 \cadical option
+combinations (16 options $\times$ 4 encodings $\times$ 8 benchmarks);
+no option changed any result by more than $\pm$3\%. \cbmc's existing
+CEGAR loop for multiplication (\texttt{--refine-arithmetic}) starts
+with $x \cdot 0 = 0$ and $x \cdot 1 = x$, then adds the full
+multiplier on the first spurious counterexample. On UNSAT benchmarks,
+the full multiplier is always needed, so the refinement loop adds 2+
+solver calls of overhead (commutativity BW=11: 4.0\,s vs.\ 0.9\,s
+direct \combacs). All five parallel prefix adders (BK, Kogge-Stone,
+Sklansky, Han-Carlson, Ladner-Fischer) produce identical learned
+clause quality (95\% glue-1~\cite{audemard2009predicting}); BK wins solely by having the fewest
+variables (Appendix~\ref{app:adders}).
+
+\section{Related Work}
+
+\paragraph{Algebraic and polynomial methods.}
+Bryant~\cite{bryant1991complexity} showed that BDD-based multiplication
+verification requires exponential size. Clegg et
+al.~\cite{clegg1996groebner} proved that the Gr\"obner proof system
+can be exponentially more powerful than resolution, providing
+theoretical justification for why our algebraic solver outperforms
+resolution-based SAT solving on polynomial equation benchmarks.
+Biere, Kauers, and Ritirc~\cite{biere2017challenges} showed that
+gate polynomials and field polynomials of an arithmetic circuit form
+a Gr\"obner basis when variables follow reverse topological order,
+enabling column-wise verification of multipliers.
+Kaufmann~\cite{kaufmann2020thesis} extended this with SAT-based
+variable elimination to simplify the Gr\"obner basis before
+reduction, and showed that SAT proofs (DRUP) and algebraic proofs
+(PAC) are interconvertible---connecting the two proof systems that
+our layered approach uses separately. Kaufmann and
+Biere~\cite{kaufmann2021amulet} built on this in AMulet2, using XOR
+slicing to separate XOR-linear parts (full-adder sums, handled by
+Gaussian elimination over GF(2)) from nonlinear parts (carry
+generation, handled by Gr\"obner bases). A key difference is the
+coefficient domain: their approach works over $\mathbb{Q}$ with
+field polynomials $x^2 - x = 0$ to enforce boolean values, while
+ours works directly over $\mathbb{Z}_{2^d}$ where modular
+arithmetic is native---avoiding the exponential blowup from field
+polynomials at the cost of incompleteness for non-unit constants.
+Yu et al.~\cite{yu2016arithmetic} achieve linear-time verification
+of gate-level multipliers via function extraction (backward
+rewriting through gate polynomials), scaling to 512-bit designs.
+Mahzoon et al.~\cite{mahzoon2019revsca} address the vanishing
+monomial problem (intermediate polynomial explosion from carry
+propagation) via reverse engineering of atomic arithmetic blocks.
+Our approach operates at the word level ($a \times b$ as a single
+polynomial), making it domain-agnostic but unable to exploit
+circuit-specific structure.
+Song et al.~\cite{song2024equational} apply strong Gr\"obner bases
+over $\mathbb{Z}_{2^d}$ to solve the equational theory of
+bit-vectors algebraically. We build on their algebraic framework
+and extend it with BMC-specific techniques
+(Section~\ref{sec:algebraic}).
+
+Shekhar et al.~\cite{shekhar2007equivalence} take a different
+algebraic approach: they characterize the vanishing ideal of
+$\mathbb{Z}_{2^m}$ using falling factorials and provide a complete
+$O(n^2)$ decision procedure for polynomial equivalence (where
+$n = \mathrm{SF}(2^m)$, the least $k$ with $2^m | k!$). Their
+approach handles the case where $f - g \neq 0$ as a polynomial but
+vanishes as a function---e.g., $4x^2 + 4x \equiv 0 \pmod{8}$---which
+our Gr\"obner basis cannot detect (it only finds ideal membership in
+the polynomial ring). We confirmed this experimentally: on the image
+rejection benchmark from~\cite{shekhar2007equivalence} ($f : \mathbb{Z}_{2^{12}} \times
+\mathbb{Z}_{2^{8}} \to \mathbb{Z}_{2^{16}}$), our Gr\"obner basis
+times out while Bitwuzla solves it in 7\,ms via word-level
+normalization. The vanishing polynomial test solves it in 307\,ms by
+brute-force evaluation. Their technique is complete for polynomial
+equivalence but does not handle non-polynomial operations (bitwise,
+shifts, inequalities). The two approaches are complementary: our
+Gr\"obner basis handles arbitrary polynomial systems with the
+Rabinowitsch trick, while their vanishing polynomial test provides
+completeness for the equivalence fragment.
+
+\paragraph{Encoding and SAT techniques.}
+Dadda~\cite{dadda1965some} and Wallace~\cite{wallace1964suggestion}
+proposed tree-based partial product reduction.
+Comba~\cite{comba1990exponentiation} proposed column-wise reduction.
+\combacs extends Comba with carry-save separation, optimized for SAT
+solving rather than hardware implementation.
+Howe et al.~\cite{howe2025subpolynomial} decompose univariate binary
+polynomials into subpolynomials by fixing input bits one at a time,
+exploiting the fact that coefficients are multiplied by powers of 2
+at each level and thus vanish rapidly. Combined with degree reduction
+via the factorial basis~\cite{gamez2024efficient}, this produces
+compact bit-blasting encodings for polynomial evaluation. The
+technique is developed for univariate polynomials; extending it to
+multivariate polynomials (such as $a \times b$) yields the standard
+partial product structure, since fixing one bit of one operand
+produces a subpolynomial that still contains a full multiplication
+of the remaining bits.
+E\'en and Biere~\cite{een2005effective} introduced SatELite
+preprocessing with BVE. Biere et al.~\cite{biere2019cadical} extended
+this to inprocessing in \cadical. Our analysis
+(Section~\ref{sec:bve}) reveals that inprocessing BVE can be
+counterproductive for specific encoding structures.
+Brain et al.~\cite{brain2016propagation} showed that PC encodings
+compose for adders but not multipliers.
+Brain~\cite{brain2021wrong} conjectured that a PC multiplier
+is exponential, and explored Toom-Cook polynomial interpolation as
+an alternative approximation strategy.
+Jia et al.~\cite{jia2023improving} improve bit-blasting for
+nonlinear integer arithmetic (QF\_NIA) with Greedy Addition (a
+Huffman-like ordering that minimizes auxiliary variables) and
+Multiplication Adaptation (starting with narrow bit-widths). We
+tested Greedy Addition across four solvers and found mixed results:
+\cadical benefits (1.4--2.6$\times$ faster) because its inprocessing
+BVE works better with balanced trees, but \minisat and \mergesat
+regress (up to 1.8$\times$ slower) because their preprocessing BVE
+prefers long sequential carry chains. This solver-dependent effect
+reinforces our finding that encoding structure interacts deeply with
+solver-specific techniques.
+Fazekas et al.~\cite{fazekas2025incremental} extend incremental
+inprocessing to support Bounded Variable Addition (BVA), the dual of
+BVE. We found BVA catastrophic for multiplication (all benchmarks T/O
+when enabled in \cadical). Our g-only technique
+(Appendix~\ref{app:adders}) is superficially similar but fundamentally
+different: g-only adds AND gates that \emph{enable} BVE, while BVA
+adds variables that \emph{prevent} it.
+Encoding techniques for SAT have been studied
+extensively~\cite{tseitin1983complexity,plaisted1986structure}.
+
+\paragraph{Word-level solvers and complementary approaches.}
+Niemetz et al.~\cite{niemetz2023bitwuzla} implement word-level
+normalization in Bitwuzla that avoids bit-blasting for algebraic
+identities. These algebraic approaches are complementary to
+\combacs: they handle pure polynomial equations without bit-blasting,
+while \combacs handles the general case including inequalities,
+bitwise operations, and overflow checks.
+Chukharev et al.~\cite{chukharev2025partitioning} show that
+circuit-structure-aware SAT partitioning can solve multiplier
+equivalence checking instances that are intractable for both
+standard SAT solving and algebraic methods, complementing our
+approach.
+
+\section{Conclusion and Future Work}
+
+Carry propagation---not circuit size---is the dominant source of
+hardness for multiplication in SAT-based verification. Our five-layer
+architecture addresses this systematically: word-level simplification
+resolves inline identities, a vanishing polynomial test handles DSP
+datapath equivalence, a Gr\"obner basis solver eliminates SAT encoding
+for polynomial equations in under 1\,ms regardless of bitwidth,
+\combacs separates column reduction from carry propagation achieving
+2.6--71$\times$ speedup on commutativity benchmarks, and a shift-add
+fallback handles the remaining cases. On 44 QF\_BV benchmarks (36
+custom + 8 DSP datapath), \cbmc solves 41 instances---more than
+Bitwuzla (39) and cvc5 (36). All techniques are now defaults in
+\cbmc, with zero regressions across 691 existing tests.
+
+Several directions remain open. First, the Gr\"obner basis solver is
+incomplete for non-polynomial constraints (bitwise operations,
+inequalities); extending it with theory combination could close this
+gap. Second, the adaptive heuristic uses a simple multiplication
+count; a more sophisticated analysis of formula structure (e.g.,
+detecting symmetry between multiplier circuits) could improve encoding
+selection. Third, our carry-propagation hardness result is empirical;
+a formal proof of exponential resolution complexity for multiplication
+would place this on firmer theoretical ground. Fourth, the vanishing polynomial test currently handles
+polynomials over a single output ring $\mathbb{Z}_{2^m}$; extending
+it to mixed input/output widths ($\mathbb{Z}_{2^{n_1}} \times
+\cdots \times \mathbb{Z}_{2^{n_d}} \to \mathbb{Z}_{2^m}$) as
+in~\cite{shekhar2007equivalence} would broaden its applicability.
+
+\paragraph{Declaration on Generative AI.}
+During preparation, the authors used Kiro (an AI coding assistant
+by Amazon) to assist with implementation, experimentation, and
+drafting. Kiro is the tool referenced in this declaration, not the
+second author. All results were verified by the authors, and the
+final paper was reviewed and edited by the authors.
+
+\bibliography{references}
+
+\newpage
+\appendix
+
+\section{Adder Encoding Interaction}
+\label{app:adders}
+
+The top-level adder encoding (used for direct additions and equality
+checks) interacts with the multiplier encoding. The Brent-Kung (BK)
+parallel prefix adder~\cite{brent1982regular} produces 95\% glue-1
+learned clauses on \cadical. All five parallel prefix adders (BK,
+Kogge-Stone, Sklansky, Han-Carlson, Ladner-Fischer) produce identical
+glue-1 rates; BK wins because it has the fewest variables
+(1.9$\times$ overhead vs.\ 2.2--3.0$\times$ for others). This gives
+16$\times$ speedup on addition-heavy UNSAT benchmarks with \cadical.
+
+However, BK \emph{hurts} all other solvers because they lack
+inprocessing to exploit the glue-1 structure. The extra variables are
+pure overhead without inprocessing.
+
+\begin{table}[ht]
+\caption{Adder encoding with \combacs multiplication (\cadical).}
+\label{tab:adder}
+\centering
+\begin{tabular}{lrrr}
+\toprule
+Benchmark & Ripple & BK & g-only \\
+\midrule
+equiv\_unsat (pure addition) & 0.63s & \textbf{0.04s} & 0.60s \\
+mul comm BW=9 & 0.13s & 0.13s & 0.13s \\
+matrix trace & \textbf{0.54s} & 1.59s & 0.72s \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+BK is neutral on multiplication (after our adder encoding swap fix
+that isolates popcount from the top-level adder) but hurts matrix
+trace. Ripple-carry is the safest solver-independent default.
+
+\subsection{g-only BVE Catalyst}
+
+Adding redundant AND gates ($g[i] = a[i] \wedge b[i]$) to the
+ripple-carry adder triggers BVE polarity alignment cascades: the AND
+gate's clauses structurally match carry generation clauses, enabling
+BVE to eliminate them trivially, which reduces occurrence counts of
+input variables, enabling further cascading elimination.
+
+g-only is applied only to \emph{top-level} additions (equality checks,
+explicit \texttt{bvadd}). Multiplier-internal additions are isolated
+by the adder encoding swap in \texttt{unsigned\_multiplier} and always
+use ripple-carry.
+
+\begin{table}[ht]
+\caption{g-only vs.\ ripple-carry (shift-add multiplier).}
+\label{tab:gonly}
+\centering
+\begin{tabular}{llrr}
+\toprule
+Benchmark & Solver & ripple & g-only \\
+\midrule
+strength\_chain\_16 & \mergesat & 5.05s & \textbf{2.05s} \\
+hw\_mul\_equiv\_12 & \minisat & T/O & \textbf{119s} \\
+add\_chain\_32 & \cadical & 0.46s & \textbf{0.33s} \\
+div\_roundtrip\_12 & \mergesat & 11.4s & \textbf{10.3s} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+g-only is neutral on \combacs benchmarks (popcount already provides
+BVE targets) and causes no regressions on any hard benchmark. It is
+now the default top-level adder encoding in \cbmc.
+
+\subsection{Division and Floating-Point}
+
+Division and floating-point operations show zero encoding sensitivity
+across all four solvers (FP add commutativity: 4.42--4.43\,s for all
+three adder encodings; division roundtrip: 7.86\,s for all multiplier
+encodings). This is because: (1)~division's internal multiplication
+always uses shift-add; (2)~FP's 48-bit mantissa multiplication falls
+through to shift-add via \combacs's sparse-constant fallback
+($>$32 bits with few partial products); (3)~the FP barrel shifter and rounding logic dominate
+solving time.
+
+
+\subsection{Threshold Sensitivity}
+\label{sec:thresholds}
+
+\begin{table}[ht]
+\caption{Adaptive fallback threshold sensitivity (\cadical).}
+\label{tab:thresholds}
+\centering
+\begin{tabular}{llrr}
+\toprule
+Configuration & Benchmark & Time & vs.\ default \\
+\midrule
+\multicolumn{4}{l}{\emph{PP sparsity threshold (width threshold fixed at 32)}} \\
+No fallback (always popcount) & div\_by\_const & 52.3s & 5.6$\times$ slower \\
+$\leq$width/2 & div\_by\_const & 9.08s & 1.0$\times$ \\
+$\leq$2$\cdot$width/3 (default) & div\_by\_const & 9.31s & 1.0$\times$ \\
+No fallback & keyed\_hash & 0.90s & 1.0$\times$ \\
+Default & keyed\_hash & 1.11s & 1.0$\times$ \\
+\midrule
+\multicolumn{4}{l}{\emph{Width threshold (PP threshold fixed at 2/3)}} \\
+$>$16 & comm BW=11 & 0.94s & 1.0$\times$ \\
+$>$32 (default) & comm BW=11 & 0.93s & 1.0$\times$ \\
+$>$64 & comm BW=11 & 0.93s & 1.0$\times$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The PP sparsity threshold is critical: disabling the fallback causes
+5.6$\times$ regression on div\_by\_const (wide constant multiplication).
+The exact threshold value (1/2 vs.\ 2/3) makes no measurable
+difference. The width threshold has no effect on our benchmarks because
+wide sparse constant multiplication is rare; the threshold exists as a
+safety margin for FP mantissa multiplication (48 bits).
+
+
+\section{BVE Interaction}
+\label{sec:bve}
+
+\cadical's inprocessing BVE is \emph{counterproductive} for \combacs
+at BW$\geq$11, adding 4--140\% overhead. Disabling BVE
+(\texttt{elim=0}) gives 1.1--2.3$\times$ additional speedup. The
+carry-save structure creates popcount intermediate variables that BVE
+attempts to eliminate, but the resulting resolvents are harder than the
+original clauses. We do not disable BVE by default because the
+adaptive heuristic routes many multiplications to shift-add where
+BVE is beneficial.
+
+Tracing clause creation and deletion in \cadical reveals that the
+latest-learned clauses encode carry propagation relationships between
+adjacent equality check bits. For commutativity ($c = a \times b$,
+$d = b \times a$, assert $c = d$), the equality check creates XNOR
+gates $\mathit{eq}[i] = c[i] \Leftrightarrow d[i]$. The late-learned
+clauses are of the form $(\mathit{eq}[i] \vee \mathit{eq}[i{+}1])$:
+``if bit $i$ differs, the adjacent bit must agree.''
+
+Pre-providing these as encoding clauses achieves 18--52\% speedup at
+BW=10--13. However, the effect is non-monotonic: +59\% regression at
+BW=14 and +94\% at BW=16. This is an instance of CDCL sensitivity to
+clause perturbation~\cite{elffers2018trade}: the hints change BVE's
+elimination order, and the residual problem's difficulty is a
+non-monotonic function of that order. The hints are enabled in \cbmc
+for 10--13 bit equality checks only (below 10, the effect is
+negligible; above 13, regressions dominate).
+
+
+\end{document}
