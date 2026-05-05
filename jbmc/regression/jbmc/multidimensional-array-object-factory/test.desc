@@ -1,6 +1,6 @@
 CORE
 My
---function My.func --unwind 3 --max-nondet-array-length 10 --show-vcc
+--function My.func --unwind 3 --max-nondet-array-length 10 --show-vcc -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 --

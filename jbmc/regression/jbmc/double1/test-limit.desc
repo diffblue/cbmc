@@ -1,10 +1,10 @@
 CORE
 double1
- --function double1.testLimit --trace
+--function double1.testLimit --trace -cp target/classes
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
-INPUT arg0d: 0x1(\.0*)?p-1022 /\* 2.22507e-308
+INPUT inputValue: 0x1(\.0*)?p-1022 /\* 2.22507e-308
 --
 ^warning: ignoring
 --

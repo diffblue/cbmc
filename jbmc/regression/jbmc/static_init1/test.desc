@@ -1,6 +1,6 @@
 CORE
 static_init
---function static_init.main
+--function static_init.main -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

@@ -1,6 +1,6 @@
 CORE
 Test
---classpath src
+--classpath incorrect-classes
 ^EXIT=6$
 ^SIGNAL=0$
 Could not find or load main class Test

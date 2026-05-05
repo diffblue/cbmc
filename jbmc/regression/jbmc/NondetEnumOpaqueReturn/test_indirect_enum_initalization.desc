@@ -1,6 +1,6 @@
 CORE
 indirect/IndirectVirtualCall
---function indirect.IndirectVirtualCall.main
+--function indirect.IndirectVirtualCall.main -cp target/classes
 ^EXIT=10$
 ^SIGNAL=0$
 --

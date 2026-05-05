@@ -1,6 +1,6 @@
 CORE
 LambdaTest.Test
---show-symbol-table --function LambdaTest.Test.recvLambda
+--show-symbol-table --function LambdaTest.Test.recvLambda -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 --

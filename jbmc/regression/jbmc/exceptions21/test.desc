@@ -1,6 +1,6 @@
 CORE
 test
---function test.f --throw-runtime-exceptions
+--function test.f --throw-runtime-exceptions -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 VERIFICATION SUCCESSFUL

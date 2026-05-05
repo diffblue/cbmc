@@ -1,6 +1,6 @@
 CORE
 Test
---function Test.main --show-vcc
+--function Test.main --show-vcc -cp target/classes
 java::Test\.main:\(Z\)V::14::t1!0@1#\d+ = address_of\(symex_dynamic::dynamic_object\$1\)
 java::Test\.main:\(Z\)V::9::x!0@1#\d+ = java::Test\.main:\(Z\)V::9::x!0@1#\d+ \+ 5
 java::Test\.g:\(\)I#return_value!0#[0-9]+ = 5

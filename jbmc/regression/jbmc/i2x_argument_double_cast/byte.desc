@@ -1,6 +1,6 @@
 CORE
 IntToX
---function IntToX.byteCast
+--function IntToX.byteCast -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

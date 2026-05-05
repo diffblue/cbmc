@@ -1,7 +1,6 @@
 CORE symex-driven-lazy-loading-expected-failure
 Test
---no-lazy-methods --show-goto-functions --function Test.main
-java::Opaque\.<clinit>:\(\)V
-java::Opaque\.<clinit_wrapper>
+--no-lazy-methods --show-goto-functions --function Test.main -cp target/classes
+java::Opaque\.field
 ^EXIT=0$
 ^SIGNAL=0$

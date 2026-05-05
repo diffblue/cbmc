@@ -1,6 +1,6 @@
 CORE symex-driven-lazy-loading-expected-failure
 A
---reachability-slice --function A.foo --show-goto-functions
+--reachability-slice --function A.foo --show-goto-functions -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 := .*1001

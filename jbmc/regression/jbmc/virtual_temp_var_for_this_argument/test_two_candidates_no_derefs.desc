@@ -1,6 +1,6 @@
 CORE
 Main
---show-goto-functions --function Main.twoCandidatesNoDerefs
+--show-goto-functions --function Main.twoCandidatesNoDerefs -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 CALL java::A\.f:\(\)V\(.*::a\)$

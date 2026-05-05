@@ -1,6 +1,6 @@
 CORE
 Test
---function Test.main2 --show-goto-functions
+--function Test.main2 --show-goto-functions -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 java::Test.callee2:\(LTest;\)V\(.*::this, cast\(java::Test\.main2:\(LTest;\)V::param, struct java::Test\*\)\)

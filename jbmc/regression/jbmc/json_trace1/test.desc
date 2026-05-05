@@ -1,6 +1,6 @@
 CORE
 Test
---trace --json-ui --function Test.main
+--trace --json-ui --function Test.main -cp target/classes
 ^EXIT=10$
 ^SIGNAL=0$
 --

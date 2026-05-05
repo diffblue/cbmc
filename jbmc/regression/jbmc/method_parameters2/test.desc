@@ -1,6 +1,6 @@
 CORE symex-driven-lazy-loading-expected-failure
 method_parameters
---show-symbol-table
+--show-symbol-table -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 --

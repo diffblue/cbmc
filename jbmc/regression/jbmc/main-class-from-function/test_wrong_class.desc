@@ -1,6 +1,6 @@
 CORE
 
-'mypackage.Baggage'
+'mypackage.Baggage' -cp target/classes
 ^EXIT=6$
 ^SIGNAL=0$
 ^Error: Could not find or load main class mypackage\.Baggage$

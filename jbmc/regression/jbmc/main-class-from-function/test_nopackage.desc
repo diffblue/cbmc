@@ -1,6 +1,6 @@
 CORE
 
-'NoPackage.<init>:()V'
+'NoPackage.<init>:()V' -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 ^Found Java main class: NoPackage$

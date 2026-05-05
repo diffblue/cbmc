@@ -1,6 +1,6 @@
 CORE
 DestructorStackTests
---show-goto-functions --function DestructorStackTests.mainTest --unwind 10
+--show-goto-functions --function DestructorStackTests.mainTest --unwind 10 -cp target/classes
 activate-multi-line-match
 (?<comment_block>\/\/ [0-9]+ file DestructorStackTests\.java line 18 function java::DestructorStackTests.mainTest:\(Z\)V bytecode-index 40)[\s]*DEAD .*::minor[0-9]+[\s]*(?P>comment_block)[\s]*DEAD .*::new_tmp[0-9]+[\s]*(?P>comment_block)[\s]*DEAD .*anonlocal::[0-9a-zA-Z]+[\s]*(?P>comment_block)[\s]*DEAD .*::new_tmp[0-9]+[\s]*(?P>comment_block)[\s]*DEAD .*::ex[\s]*(?P>comment_block)[\s]*DEAD .*::minor2[\s]*(?P>comment_block)[\s]*DEAD .*::minor1[\s]*(?P>comment_block)[\s]*DEAD .*::anonlocal::[0-9a-zA-Z]+[\s]*(?P>comment_block)[\s]*GOTO [0-9]+
 ^EXIT=0$

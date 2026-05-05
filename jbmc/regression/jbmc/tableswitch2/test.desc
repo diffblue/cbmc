@@ -1,6 +1,6 @@
 CORE
 table_switch_neg_offset
---function table_switch_neg_offset.f
+--function table_switch_neg_offset.f -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

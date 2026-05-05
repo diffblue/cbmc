@@ -1,6 +1,6 @@
 CORE
 VarLengthArrayTrace1
---trace --function VarLengthArrayTrace1.main
+--trace --function VarLengthArrayTrace1.main -cp target/classes
 ^EXIT=10$
 ^SIGNAL=0$
 dynamic_array\$?\d*\[1.*\]=10

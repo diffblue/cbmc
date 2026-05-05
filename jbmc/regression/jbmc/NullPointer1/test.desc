@@ -1,6 +1,6 @@
 CORE
 NullPointer1
---stop-on-fail
+--stop-on-fail -cp target/classes
 ^EXIT=10$
 ^SIGNAL=0$
 ^  file NullPointer1\.java function NullPointer1\.main\(java\.lang\.String\[\]\) line 16 thread 0$

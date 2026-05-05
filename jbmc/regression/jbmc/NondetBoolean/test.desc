@@ -1,6 +1,6 @@
 CORE
 NondetBoolean
---function NondetBoolean.main
+--function NondetBoolean.main -cp target/classes
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

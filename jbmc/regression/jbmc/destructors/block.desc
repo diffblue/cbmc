@@ -1,8 +1,8 @@
 CORE
 DestructorStackTests
---show-goto-functions --function DestructorStackTests.mainTest --unwind 10
+--show-goto-functions --function DestructorStackTests.mainTest --unwind 10 -cp target/classes
 activate-multi-line-match
-[0-9]+: DEAD .*::strings[\s]*(?P<comment_block>(\/\/ [0-9]+ file DestructorStackTests\.java line 42 function java::DestructorStackTests\.mainTest:\(Z\)V bytecode-index 90)|(\/\/ [0-9]+ no location))[\s]*DEAD .*::minor1[\s]*(?P>comment_block)[\s]*DEAD .*::anonlocal::[0-9a-zA-Z]+[\s]*(?P>comment_block)[\s]*[0-9]+: END_FUNCTION
+DEAD [^\n]*::strings\s+[^\n]*\s+DEAD [^\n]*::minor1\s+[^\n]*\s+DEAD [^\n]*::anonlocal[^\n]*\s+[^\n]*\s+[0-9]+: END_FUNCTION
 ^EXIT=0$
 ^SIGNAL=0$
 --

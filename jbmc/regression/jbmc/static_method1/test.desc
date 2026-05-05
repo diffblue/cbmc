@@ -1,6 +1,6 @@
 CORE
 static_method1
---function 'static_method1.f'
+--function 'static_method1.f' -cp target/classes
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

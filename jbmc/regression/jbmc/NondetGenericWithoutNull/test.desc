@@ -1,6 +1,6 @@
 CORE
 NondetGenericWithoutNull
---function NondetGenericWithoutNull.main
+--function NondetGenericWithoutNull.main -cp target/classes
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

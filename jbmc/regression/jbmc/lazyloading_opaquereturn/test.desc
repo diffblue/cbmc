@@ -1,12 +1,12 @@
 CORE symex-driven-lazy-loading-expected-failure
 TestClass
---function TestClass.testFunction --verbosity 10
+--function TestClass.testFunction --verbosity 10 -cp target/classes
 ^EXIT=10$
 ^SIGNAL=0$
-CI lazy methods: elaborate java::Foo\.cproverNondetInitialize:\(\)V
-CI lazy methods: elaborate java::Bar\.cproverNondetInitialize:\(\)V
-CI lazy methods: elaborate java::Baz\.cproverNondetInitialize:\(\)V
-CI lazy methods: elaborate java::GenFiller\.cproverNondetInitialize:\(\)V
+java::Foo\.cproverNondetInitialize:\(\)V
+java::Bar\.cproverNondetInitialize:\(\)V
+java::Baz\.cproverNondetInitialize:\(\)V
+java::GenFiller\.cproverNondetInitialize:\(\)V
 --
 --
 Testing that the return type of an opaque method is correctly elaborated. The

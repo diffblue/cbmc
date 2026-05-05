@@ -1,6 +1,6 @@
 CORE
 stack_typecast
---function stack_typecast.f
+--function stack_typecast.f -cp target/classes
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

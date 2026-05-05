@@ -1,6 +1,6 @@
 CORE
 Test
---function Test.main
+--function Test.main -cp target/classes
 assertion at file Test\.java line 6 .* SUCCESS
 assertion at file Test\.java line 7 .* FAILURE
 ^VERIFICATION FAILED$

@@ -1,6 +1,6 @@
 CORE
 ExcludedProperties
---context-exclude org.cprover.other --function ExcludedProperties.runtimeReturnType
+--context-exclude org.cprover.other --function ExcludedProperties.runtimeReturnType -cp target/classes
 ^EXIT=10$
 ^SIGNAL=0$
 .* line 28 assertion at file ExcludedProperties.java line 28.*: FAILURE

@@ -1,6 +1,6 @@
 CORE
 short2
---function short2.f
+--function short2.f -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

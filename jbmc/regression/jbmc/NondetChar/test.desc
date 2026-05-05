@@ -1,6 +1,6 @@
 CORE
 NondetChar
---function NondetChar.main
+--function NondetChar.main -cp target/classes
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

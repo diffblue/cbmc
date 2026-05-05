@@ -1,6 +1,6 @@
 CORE symex-driven-lazy-loading-expected-failure
 Test
---function Test.check
+--function Test.check -cp target/classes
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

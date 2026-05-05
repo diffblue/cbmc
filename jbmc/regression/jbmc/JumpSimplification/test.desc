@@ -1,6 +1,6 @@
 CORE
 Test
---show-goto-functions --function Test.foo
+--show-goto-functions --function Test.foo -cp target/classes
 activate-multi-line-match
 ^EXIT=0$
 ^SIGNAL=0$

@@ -1,6 +1,6 @@
 CORE
 Test
---function Test.test --show-vcc
+--function Test.test --show-vcc -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 --

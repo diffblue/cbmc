@@ -1,6 +1,6 @@
 CORE
 TestClass
---validate-trace --function TestClass.test
+--validate-trace --function TestClass.test -cp target/classes
 ^EXIT=10$
 ^SIGNAL=0$
 Trace validation successful

@@ -1,6 +1,6 @@
 CORE
 virtual_filter_value_sets
---show-vcc --function virtual_filter_value_sets.test_with_deref
+--show-vcc --function virtual_filter_value_sets.test_with_deref -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 java::B\.f:\(\)I#return_value!0#.* = 9$

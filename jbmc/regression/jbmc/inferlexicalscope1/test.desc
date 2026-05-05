@@ -1,6 +1,6 @@
 CORE
 test
---show-symbol-table --function test.main
+--show-symbol-table --function test.main -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 ^pc7:

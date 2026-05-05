@@ -1,6 +1,6 @@
 CORE
 test
---function test.translate
+--function test.translate -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

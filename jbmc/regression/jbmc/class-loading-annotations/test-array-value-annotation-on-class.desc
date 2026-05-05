@@ -1,10 +1,10 @@
 CORE
 ArrayValueAnnotationOnClass
---verbosity 10
+--verbosity 10 -cp target/classes
 ^EXIT=6$
 ^SIGNAL=0$
-Getting class 'MyClassA' from file \.[\\/]MyClassA\.class
-Getting class 'MyClassB' from file \.[\\/]MyClassB\.class
+Getting class 'MyClassA' from file target[\\/]classes[\\/]MyClassA\.class
+Getting class 'MyClassB' from file target[\\/]classes[\\/]MyClassB\.class
 --
 --
 This test checks that element classes of arrays that are given as values of a class-level annotation

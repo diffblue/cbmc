@@ -1,6 +1,6 @@
 CORE symex-driven-lazy-loading-expected-failure
 Gn
---no-lazy-methods --no-refine-strings
+--no-lazy-methods --no-refine-strings -cp target/classes
 ^EXIT=10$
 ^SIGNAL=0$
 .*file Gn.java line 11 function java::Gn.foo1:\(LGn;\)V.*SUCCESS

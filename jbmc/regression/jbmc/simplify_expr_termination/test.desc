@@ -1,6 +1,6 @@
 CORE
 test
---function test.check
+--function test.check -cp target/classes
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

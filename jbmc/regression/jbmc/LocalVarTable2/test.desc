@@ -1,6 +1,6 @@
 CORE
 LocalVarTable2
---show-goto-functions
+--show-goto-functions -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 --

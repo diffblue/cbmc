@@ -1,6 +1,6 @@
 CORE
 NondetGenericRecursive2
---function NondetGenericRecursive2.main
+--function NondetGenericRecursive2.main -cp target/classes
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

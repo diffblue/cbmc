@@ -1,6 +1,6 @@
 CORE
 Test
---function Test.main
+--function Test.main -cp target/classes
 line 36 assertion at file Test\.java line 36 function java::Test\.main:\(\)V bytecode-index 22: SUCCESS
 line 37 assertion at file Test\.java line 37 function java::Test\.main:\(\)V bytecode-index 33: SUCCESS
 line 38 assertion at file Test\.java line 38 function java::Test\.main:\(\)V bytecode-index 44: SUCCESS

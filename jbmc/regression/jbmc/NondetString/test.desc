@@ -1,6 +1,6 @@
 CORE
 NondetString
---function NondetString.main
+--function NondetString.main -cp target/classes
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

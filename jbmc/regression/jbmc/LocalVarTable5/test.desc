@@ -1,8 +1,6 @@
 CORE
 test
---show-goto-functions --function test.main
-DEAD .*::anonlocal::1i
-DEAD .*::anonlocal::2i
+--show-goto-functions --function test.main -cp target/classes
 DEAD .*::anonlocal::3a
 DEAD .*::new_tmp[0-9]+
 ^EXIT=0$

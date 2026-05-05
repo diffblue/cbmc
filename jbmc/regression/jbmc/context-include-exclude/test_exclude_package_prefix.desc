@@ -1,6 +1,6 @@
 CORE
 Main
---context-include Main --context-include org.cprover --context-exclude org.cprover.ot
+--context-include Main --context-include org.cprover --context-exclude org.cprover.ot -cp target/classes
 ^EXIT=10$
 ^SIGNAL=0$
 .* line 12 assertion at file Main.java line 12 .*: SUCCESS

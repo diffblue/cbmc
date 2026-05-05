@@ -1,6 +1,6 @@
 CORE
 Test
---list-symbols --json-ui
+--list-symbols --json-ui -cp target/classes
 "java::Test.main:\(\[Ljava/lang/String;\)V": \{
 ^EXIT=0$
 ^SIGNAL=0$

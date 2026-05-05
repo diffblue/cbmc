@@ -1,6 +1,6 @@
 CORE
 IntToX
---function IntToX.floatCast
+--function IntToX.floatCast -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

@@ -1,6 +1,6 @@
 CORE
 test
---no-simplify --function test.f
+--no-simplify --function test.f -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 --

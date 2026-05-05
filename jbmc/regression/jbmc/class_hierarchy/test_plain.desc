@@ -1,6 +1,6 @@
 CORE symex-driven-lazy-loading-expected-failure
 HierarchyTest
---show-class-hierarchy
+--show-class-hierarchy -cp target/classes
 activate-multi-line-match
 ^EXIT=0$
 ^SIGNAL=0$

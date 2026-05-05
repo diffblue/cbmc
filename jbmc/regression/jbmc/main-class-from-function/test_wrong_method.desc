@@ -1,6 +1,6 @@
 CORE
 
-'mypackage.Package.do:()V'
+'mypackage.Package.do:()V' -cp target/classes
 ^EXIT=6$
 ^SIGNAL=0$
 ^Found Java main class: mypackage.Package$

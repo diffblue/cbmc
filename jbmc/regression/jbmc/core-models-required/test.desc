@@ -1,6 +1,6 @@
 KNOWNBUG
 HelloWorld
---function 'HelloWorld.helloWorld:()Ljava/lang/String;' --context-include wrongpkg
+--function 'HelloWorld.helloWorld:()Ljava/lang/String;' --context-include wrongpkg -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 --
