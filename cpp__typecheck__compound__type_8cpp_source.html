@@ -1827,17 +1827,17 @@ $(document).ready(function(){initNavTree('cpp__typecheck__compound__type_8cpp_so
 <div class="line"><a id="l01686" name="l01686"></a><span class="lineno"> 1686</span> </div>
 <div class="foldopen" id="foldopen01687" data-start="{" data-end="}">
 <div class="line"><a id="l01687" name="l01687"></a><span class="lineno"><a class="line" href="classcpp__typecheckt.html#abec6012a5128b0fbd534bae768357fcd"> 1687</a></span><span class="keywordtype">bool</span> <a class="code hl_function" href="classcpp__typecheckt.html#abec6012a5128b0fbd534bae768357fcd">cpp_typecheckt::subtype_typecast</a>(</div>
-<div class="line"><a id="l01688" name="l01688"></a><span class="lineno"> 1688</span>  <span class="keyword">const</span> <a class="code hl_class" href="classstruct__typet.html">struct_typet</a> &amp;<a class="code hl_class" href="classait.html">from</a>,</div>
-<div class="line"><a id="l01689" name="l01689"></a><span class="lineno"> 1689</span>  <span class="keyword">const</span> <a class="code hl_class" href="classstruct__typet.html">struct_typet</a> &amp;<a class="code hl_class" href="classait.html">to</a>)<span class="keyword"> const</span></div>
+<div class="line"><a id="l01688" name="l01688"></a><span class="lineno"> 1688</span>  <span class="keyword">const</span> <a class="code hl_class" href="classstruct__typet.html">struct_typet</a> &amp;from,</div>
+<div class="line"><a id="l01689" name="l01689"></a><span class="lineno"> 1689</span>  <span class="keyword">const</span> <a class="code hl_class" href="classstruct__typet.html">struct_typet</a> &amp;to)<span class="keyword"> const</span></div>
 <div class="line"><a id="l01690" name="l01690"></a><span class="lineno"> 1690</span><span class="keyword"></span>{</div>
-<div class="line"><a id="l01691" name="l01691"></a><span class="lineno"> 1691</span>  <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">from</a>.get(<a class="code hl_class" href="classait.html">ID_name</a>)==<a class="code hl_class" href="classait.html">to</a>.get(<a class="code hl_class" href="classait.html">ID_name</a>))</div>
+<div class="line"><a id="l01691" name="l01691"></a><span class="lineno"> 1691</span>  <span class="keywordflow">if</span>(from.<a class="code hl_function" href="classirept.html#a419293b53104ea25f073e5d8fc452b07">get</a>(<a class="code hl_class" href="classait.html">ID_name</a>)==to.<a class="code hl_function" href="classirept.html#a419293b53104ea25f073e5d8fc452b07">get</a>(<a class="code hl_class" href="classait.html">ID_name</a>))</div>
 <div class="line"><a id="l01692" name="l01692"></a><span class="lineno"> 1692</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a id="l01693" name="l01693"></a><span class="lineno"> 1693</span> </div>
 <div class="line"><a id="l01694" name="l01694"></a><span class="lineno"> 1694</span>  std::set&lt;irep_idt&gt; bases;</div>
 <div class="line"><a id="l01695" name="l01695"></a><span class="lineno"> 1695</span> </div>
-<div class="line"><a id="l01696" name="l01696"></a><span class="lineno"> 1696</span>  <a class="code hl_function" href="classcpp__typecheckt.html#aed3646d1dafd60ba23301d1783719216">get_bases</a>(<a class="code hl_class" href="classait.html">from</a>, bases);</div>
+<div class="line"><a id="l01696" name="l01696"></a><span class="lineno"> 1696</span>  <a class="code hl_function" href="classcpp__typecheckt.html#aed3646d1dafd60ba23301d1783719216">get_bases</a>(from, bases);</div>
 <div class="line"><a id="l01697" name="l01697"></a><span class="lineno"> 1697</span> </div>
-<div class="line"><a id="l01698" name="l01698"></a><span class="lineno"> 1698</span>  <span class="keywordflow">return</span> bases.find(<a class="code hl_class" href="classait.html">to</a>.get(<a class="code hl_class" href="classait.html">ID_name</a>))!=bases.end();</div>
+<div class="line"><a id="l01698" name="l01698"></a><span class="lineno"> 1698</span>  <span class="keywordflow">return</span> bases.find(to.<a class="code hl_function" href="classirept.html#a419293b53104ea25f073e5d8fc452b07">get</a>(<a class="code hl_class" href="classait.html">ID_name</a>))!=bases.end();</div>
 <div class="line"><a id="l01699" name="l01699"></a><span class="lineno"> 1699</span>}</div>
 </div>
 <div class="line"><a id="l01700" name="l01700"></a><span class="lineno"> 1700</span> </div>

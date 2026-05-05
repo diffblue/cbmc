@@ -119,7 +119,7 @@ $(document).ready(function(){initNavTree('local__control__flow__history_8cpp_sou
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><a class="code hl_typedef" href="classai__history__baset.html#a2726cd2e1d32a644b1dc8bd641bd5df3">ai_history_baset::step_returnt</a></div>
 <div class="foldopen" id="foldopen00016" data-start="{" data-end="}">
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno"><a class="line" href="classlocal__control__flow__historyt.html#ac57ac17ab6642e7f25385d6be5c96988">   16</a></span><a class="code hl_function" href="classlocal__control__flow__historyt.html#ac57ac17ab6642e7f25385d6be5c96988">local_control_flow_historyt&lt;track_forward_jumps, track_backward_jumps&gt;::step</a>(</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>  <a class="code hl_typedef" href="classai__history__baset.html#a8ee51f9575afd5f692814b8bb8a8ae6b">locationt</a> <a class="code hl_class" href="classait.html">to</a>,</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>  <a class="code hl_typedef" href="classai__history__baset.html#a8ee51f9575afd5f692814b8bb8a8ae6b">locationt</a> to,</div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>  <span class="keyword">const</span> <a class="code hl_typedef" href="classai__history__baset.html#ae5fc198ff456dd60a81fa4ea151117a1">trace_sett</a> &amp;<a class="code hl_class" href="classait.html">others</a>,</div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>  <a class="code hl_typedef" href="classai__history__baset.html#a1dc3e50852b866d60923c54a87cb7868">trace_ptrt</a> <a class="code hl_class" href="classait.html">caller_hist</a>)<span class="keyword"> const</span></div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="keyword"></span>{</div>
@@ -137,7 +137,7 @@ $(document).ready(function(){initNavTree('local__control__flow__history_8cpp_sou
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    (current_loc-&gt;is_backwards_goto() ? track_backward_jumps</div>
 <div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>                                      : track_forward_jumps))</div>
 <div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>  {</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    <span class="keywordtype">bool</span> branch_taken = (current_loc-&gt;get_target() == <a class="code hl_function" href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">to</a>) &amp;&amp;</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    <span class="keywordtype">bool</span> branch_taken = (current_loc-&gt;get_target() == to) &amp;&amp;</div>
 <div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>                        !(current_loc-&gt;get_target() == std::next(current_loc));</div>
 <div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    <span class="comment">// Slight oddity -- we regard branches to the next instruction as not taken</span></div>
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    <span class="comment">// regardless of their guard condition.  This is slightly more general than</span></div>
@@ -148,11 +148,11 @@ $(document).ready(function(){initNavTree('local__control__flow__history_8cpp_sou
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>      current_loc, branch_taken, control_flow_decision_history);</div>
 <div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    <a class="code hl_class" href="classait.html">next_step</a> = std::make_shared&lt;</div>
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>      <a class="code hl_class" href="classait.html">local_control_flow_historyt&lt;track_forward_jumps, track_backward_jumps&gt;</a>&gt;(</div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>      <a class="code hl_function" href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">to</a>, <a class="code hl_function" href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">decision</a>, max_histories_per_location);</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>      to, <a class="code hl_function" href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">decision</a>, max_histories_per_location);</div>
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>  }</div>
 <div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>  <span class="keywordflow">else</span> <span class="keywordflow">if</span>(</div>
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    current_loc-&gt;is_function_call() &amp;&amp;</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    std::next(this-&gt;current_loc)-&gt;location_number != <a class="code hl_class" href="classait.html">to</a>-&gt;location_number)</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    std::next(this-&gt;current_loc)-&gt;location_number != to-&gt;location_number)</div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>  {</div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    <span class="comment">// Because the history is local (to avoid massive explosion in work)</span></div>
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    <span class="comment">// the history at function start should be a merge of all callers.</span></div>
@@ -161,7 +161,7 @@ $(document).ready(function(){initNavTree('local__control__flow__history_8cpp_sou
 <div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    {</div>
 <div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>      <a class="code hl_class" href="classait.html">next_step</a> = std::make_shared&lt;</div>
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>        <a class="code hl_class" href="classait.html">local_control_flow_historyt&lt;track_forward_jumps, track_backward_jumps&gt;</a>&gt;(</div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>        <a class="code hl_function" href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">to</a>, <span class="keyword">nullptr</span>, max_histories_per_location);</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>        to, <span class="keyword">nullptr</span>, max_histories_per_location);</div>
 <div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>      <span class="keywordflow">return</span> std::make_pair(<a class="code hl_enumvalue" href="classai__history__baset.html#a20ae5102d85971f6ff5c5f3c62ee1f83a24d459a81449d7210c8f9a86c2913034">ai_history_baset::step_statust::NEW</a>, <a class="code hl_class" href="classait.html">next_step</a>);</div>
 <div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    }</div>
 <div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    <span class="keywordflow">else</span></div>
@@ -186,7 +186,7 @@ $(document).ready(function(){initNavTree('local__control__flow__history_8cpp_sou
 <div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span> </div>
 <div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    <a class="code hl_class" href="classait.html">next_step</a> = std::make_shared&lt;</div>
 <div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>      <a class="code hl_class" href="classait.html">local_control_flow_historyt&lt;track_forward_jumps, track_backward_jumps&gt;</a>&gt;(</div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>      <a class="code hl_function" href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">to</a>,</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>      to,</div>
 <div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>      to_local_control_flow_history(<a class="code hl_class" href="classait.html">caller_hist</a>)-&gt;control_flow_decision_history,</div>
 <div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>      max_histories_per_location);</div>
 <div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>  }</div>
@@ -196,7 +196,7 @@ $(document).ready(function(){initNavTree('local__control__flow__history_8cpp_sou
 <div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    <span class="comment">// Is a local step forward with no branching (or a skipped function call).</span></div>
 <div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    <a class="code hl_class" href="classait.html">next_step</a> = std::make_shared&lt;</div>
 <div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>      <a class="code hl_class" href="classait.html">local_control_flow_historyt&lt;track_forward_jumps, track_backward_jumps&gt;</a>&gt;(</div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>      <a class="code hl_function" href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">to</a>, control_flow_decision_history, max_histories_per_location);</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>      to, control_flow_decision_history, max_histories_per_location);</div>
 <div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>  }</div>
 <div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>  <a class="code hl_define" href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a>(</div>
 <div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    <a class="code hl_class" href="classait.html">next_step</a> != <span class="keyword">nullptr</span>, <span class="stringliteral">&quot;All branches should create a candidate history&quot;</span>);</div>
@@ -219,7 +219,7 @@ $(document).ready(function(){initNavTree('local__control__flow__history_8cpp_sou
 <div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>        <span class="comment">// Last space --&gt; we must create the merged history</span></div>
 <div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>        <a class="code hl_class" href="classait.html">next_step</a> = std::make_shared&lt;<a class="code hl_class" href="classlocal__control__flow__historyt.html">local_control_flow_historyt</a>&lt;</div>
 <div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>          track_forward_jumps,</div>
-<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>          track_backward_jumps&gt;&gt;(<a class="code hl_function" href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">to</a>, <span class="keyword">nullptr</span>, max_histories_per_location);</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>          track_backward_jumps&gt;&gt;(to, <span class="keyword">nullptr</span>, max_histories_per_location);</div>
 <div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>        <span class="keywordflow">return</span> std::make_pair(<a class="code hl_enumvalue" href="classai__history__baset.html#a20ae5102d85971f6ff5c5f3c62ee1f83a24d459a81449d7210c8f9a86c2913034">ai_history_baset::step_statust::NEW</a>, <a class="code hl_class" href="classait.html">next_step</a>);</div>
 <div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>      }</div>
 <div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>      <span class="keywordflow">else</span> <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">others</a>.size() == max_histories_per_location)</div>
@@ -475,25 +475,25 @@ $(document).ready(function(){initNavTree('local__control__flow__history_8cpp_sou
 <div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span><span class="comment">// Instantiate the versions we need</span></div>
 <div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span><span class="keyword">template</span> <a class="code hl_typedef" href="classai__history__baset.html#a2726cd2e1d32a644b1dc8bd641bd5df3">ai_history_baset::step_returnt</a></div>
 <div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span><a class="code hl_function" href="classlocal__control__flow__historyt.html#ac57ac17ab6642e7f25385d6be5c96988">local_control_flow_historyt&lt;true, true&gt;::step</a>(</div>
-<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span>  locationt <a class="code hl_class" href="classait.html">to</a>,</div>
+<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span>  locationt to,</div>
 <div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span>  <span class="keyword">const</span> trace_sett &amp;<a class="code hl_class" href="classait.html">others</a>,</div>
 <div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span>  trace_ptrt <a class="code hl_class" href="classait.html">caller_hist</a>) <span class="keyword">const</span>;</div>
 <div class="line"><a id="l00365" name="l00365"></a><span class="lineno">  365</span> </div>
 <div class="line"><a id="l00366" name="l00366"></a><span class="lineno">  366</span><span class="keyword">template</span> <a class="code hl_typedef" href="classai__history__baset.html#a2726cd2e1d32a644b1dc8bd641bd5df3">ai_history_baset::step_returnt</a></div>
 <div class="line"><a id="l00367" name="l00367"></a><span class="lineno">  367</span><a class="code hl_function" href="classlocal__control__flow__historyt.html#ac57ac17ab6642e7f25385d6be5c96988">local_control_flow_historyt&lt;true, false&gt;::step</a>(</div>
-<div class="line"><a id="l00368" name="l00368"></a><span class="lineno">  368</span>  locationt <a class="code hl_class" href="classait.html">to</a>,</div>
+<div class="line"><a id="l00368" name="l00368"></a><span class="lineno">  368</span>  locationt to,</div>
 <div class="line"><a id="l00369" name="l00369"></a><span class="lineno">  369</span>  <span class="keyword">const</span> trace_sett &amp;<a class="code hl_class" href="classait.html">others</a>,</div>
 <div class="line"><a id="l00370" name="l00370"></a><span class="lineno">  370</span>  trace_ptrt <a class="code hl_class" href="classait.html">caller_hist</a>) <span class="keyword">const</span>;</div>
 <div class="line"><a id="l00371" name="l00371"></a><span class="lineno">  371</span> </div>
 <div class="line"><a id="l00372" name="l00372"></a><span class="lineno">  372</span><span class="keyword">template</span> <a class="code hl_typedef" href="classai__history__baset.html#a2726cd2e1d32a644b1dc8bd641bd5df3">ai_history_baset::step_returnt</a></div>
 <div class="line"><a id="l00373" name="l00373"></a><span class="lineno">  373</span><a class="code hl_function" href="classlocal__control__flow__historyt.html#ac57ac17ab6642e7f25385d6be5c96988">local_control_flow_historyt&lt;false, true&gt;::step</a>(</div>
-<div class="line"><a id="l00374" name="l00374"></a><span class="lineno">  374</span>  locationt <a class="code hl_class" href="classait.html">to</a>,</div>
+<div class="line"><a id="l00374" name="l00374"></a><span class="lineno">  374</span>  locationt to,</div>
 <div class="line"><a id="l00375" name="l00375"></a><span class="lineno">  375</span>  <span class="keyword">const</span> trace_sett &amp;<a class="code hl_class" href="classait.html">others</a>,</div>
 <div class="line"><a id="l00376" name="l00376"></a><span class="lineno">  376</span>  trace_ptrt <a class="code hl_class" href="classait.html">caller_hist</a>) <span class="keyword">const</span>;</div>
 <div class="line"><a id="l00377" name="l00377"></a><span class="lineno">  377</span> </div>
 <div class="line"><a id="l00378" name="l00378"></a><span class="lineno">  378</span><span class="keyword">template</span> <a class="code hl_typedef" href="classai__history__baset.html#a2726cd2e1d32a644b1dc8bd641bd5df3">ai_history_baset::step_returnt</a></div>
 <div class="line"><a id="l00379" name="l00379"></a><span class="lineno">  379</span><a class="code hl_function" href="classlocal__control__flow__historyt.html#ac57ac17ab6642e7f25385d6be5c96988">local_control_flow_historyt&lt;false, false&gt;::step</a>(</div>
-<div class="line"><a id="l00380" name="l00380"></a><span class="lineno">  380</span>  locationt <a class="code hl_class" href="classait.html">to</a>,</div>
+<div class="line"><a id="l00380" name="l00380"></a><span class="lineno">  380</span>  locationt to,</div>
 <div class="line"><a id="l00381" name="l00381"></a><span class="lineno">  381</span>  <span class="keyword">const</span> trace_sett &amp;<a class="code hl_class" href="classait.html">others</a>,</div>
 <div class="line"><a id="l00382" name="l00382"></a><span class="lineno">  382</span>  trace_ptrt <a class="code hl_class" href="classait.html">caller_hist</a>) <span class="keyword">const</span>;</div>
 <div class="ttc" id="aclassai__history__baset_html"><div class="ttname"><a href="classai__history__baset.html">ai_history_baset</a></div><div class="ttdoc">A history object is an abstraction / representation of the control-flow part of a set of traces.</div><div class="ttdef"><b>Definition</b> <a href="ai__history_8h_source.html#l00036">ai_history.h:37</a></div></div>

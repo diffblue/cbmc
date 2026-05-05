@@ -1,5 +1,7 @@
 var NAVTREEINDEX75 =
 {
+"cover__util_8cpp.html#a02d3ae66aff265688b7fd267285cda23":[8,0,2,15,29,1],
+"cover__util_8cpp.html#a5b373451e00ca10cfb3b6ef328286373":[8,0,2,15,29,4],
 "cover__util_8cpp.html#a7df39180921aa998beeebdbfec25ca82":[8,0,2,15,29,2],
 "cover__util_8cpp.html#a8f6c9a1cac1314f6cf63ddb4b80a617f":[8,0,2,15,29,5],
 "cover__util_8cpp.html#ac0717250f14366d21e94d01ce3e376ed":[8,0,2,15,29,3],
@@ -247,7 +249,5 @@ var NAVTREEINDEX75 =
 "cpp__typecheck__method__bodies_8cpp.html":[8,0,2,5,66],
 "cpp__typecheck__method__bodies_8cpp_source.html":[8,0,2,5,66],
 "cpp__typecheck__namespace_8cpp.html":[8,0,2,5,67],
-"cpp__typecheck__namespace_8cpp_source.html":[8,0,2,5,67],
-"cpp__typecheck__resolve_8cpp.html":[8,0,2,5,68],
-"cpp__typecheck__resolve_8cpp_source.html":[8,0,2,5,68]
+"cpp__typecheck__namespace_8cpp_source.html":[8,0,2,5,67]
 };

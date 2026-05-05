@@ -629,12 +629,12 @@
 <area shape="poly" id="edge787_Node000318_Node000339" title=" " alt="" coords="543,7638,565,7595,598,7541,641,7486,667,7461,695,7440,719,7428,746,7420,747,7425,721,7433,697,7444,670,7465,645,7489,602,7544,570,7597,548,7641"/>
 <area shape="rect" id="Node000340" href="$classenumeration__typet.html" title="An enumeration type, i.e., a type with elements (not to be confused with C enums)" alt="" coords="726,7455,873,7480"/>
 <area shape="poly" id="edge788_Node000318_Node000340" title=" " alt="" coords="548,7639,572,7605,606,7564,647,7523,695,7489,725,7476,727,7481,697,7494,651,7527,610,7568,577,7608,552,7642"/>
-<area shape="rect" id="Node000341" href="$classinteger__typet.html" title="Unbounded, signed integers (mathematical integers, not bitvectors)" alt="" coords="745,7504,854,7529"/>
-<area shape="poly" id="edge789_Node000318_Node000341" title=" " alt="" coords="555,7641,615,7589,654,7562,695,7538,743,7522,745,7527,697,7543,656,7566,618,7593,559,7645"/>
-<area shape="rect" id="Node000342" href="$classnatural__typet.html" title="Natural numbers including zero (mathematical integers, not bitvectors)" alt="" coords="745,7553,854,7579"/>
+<area shape="rect" id="Node000341" href="$classinteger__range__typet.html" title="A type for closed integer intervals [from, to]." alt="" coords="723,7504,876,7529"/>
+<area shape="poly" id="edge789_Node000318_Node000341" title=" " alt="" coords="555,7641,615,7589,654,7562,695,7538,726,7527,727,7532,697,7543,656,7566,618,7593,559,7645"/>
+<area shape="rect" id="Node000342" href="$classinteger__typet.html" title="Unbounded, signed integers (mathematical integers, not bitvectors)" alt="" coords="745,7553,854,7579"/>
 <area shape="poly" id="edge790_Node000318_Node000342" title=" " alt="" coords="569,7643,627,7615,695,7587,744,7574,745,7579,697,7593,629,7620,571,7648"/>
-<area shape="rect" id="Node000343" href="$classrange__typet.html" title="A type for closed integer intervals [from, to]." alt="" coords="749,7603,849,7628"/>
-<area shape="poly" id="edge791_Node000318_Node000343" title=" " alt="" coords="574,7655,748,7622,749,7627,575,7660"/>
+<area shape="rect" id="Node000343" href="$classnatural__typet.html" title="Natural numbers including zero (mathematical integers, not bitvectors)" alt="" coords="745,7603,854,7628"/>
+<area shape="poly" id="edge791_Node000318_Node000343" title=" " alt="" coords="575,7654,744,7623,745,7628,576,7660"/>
 <area shape="rect" id="Node000344" href="$classrational__typet.html" title="Unbounded, signed rational numbers." alt="" coords="743,7652,856,7677"/>
 <area shape="poly" id="edge792_Node000318_Node000344" title=" " alt="" coords="575,7662,742,7662,742,7667,575,7667"/>
 <area shape="rect" id="Node000345" href="$classreal__typet.html" title="Unbounded, signed real numbers." alt="" coords="755,7701,843,7727"/>

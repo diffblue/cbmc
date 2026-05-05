@@ -1,5 +1,7 @@
 var NAVTREEINDEX56 =
 {
+"classremove__returnst.html#abef2a8e489a03ed9652cf10f936f5226":[7,0,1013,4],
+"classremove__returnst.html#acfd9a689526eb90cb5b84ad3ee51a991":[7,0,1013,1],
 "classremove__virtual__functionst.html":[7,0,1014],
 "classremove__virtual__functionst.html#a0a9979d9b884d8e061e91299ba7eb7ad":[7,0,1014,0],
 "classremove__virtual__functionst.html#a2c6f6fe04c9c5fdacb1fe4220fb223d9":[7,0,1014,5],
@@ -77,12 +79,12 @@ var NAVTREEINDEX56 =
 "classreplication__exprt.html#a6aa6dffeb099233025e4df3798b8c043":[7,0,1021,3],
 "classreplication__exprt.html#ad5edbcce37859064fd86423070ea0962":[7,0,1021,1],
 "classreplication__exprt.html#af7b233e7c592a3e935f38892cfa0436b":[7,0,1021,0],
-"classrequire__goto__statements_1_1no__decl__found__exceptiont.html":[7,0,1,0],
 "classrequire__goto__statements_1_1no__decl__found__exceptiont.html":[6,0,6,0],
+"classrequire__goto__statements_1_1no__decl__found__exceptiont.html":[7,0,1,0],
 "classrequire__goto__statements_1_1no__decl__found__exceptiont.html#a767d3177baf716e70eaf79d39950ced5":[6,0,6,0,2],
 "classrequire__goto__statements_1_1no__decl__found__exceptiont.html#a767d3177baf716e70eaf79d39950ced5":[7,0,1,0,2],
-"classrequire__goto__statements_1_1no__decl__found__exceptiont.html#ac12959524eebd6ba47d12ac704e02dc1":[7,0,1,0,1],
 "classrequire__goto__statements_1_1no__decl__found__exceptiont.html#ac12959524eebd6ba47d12ac704e02dc1":[6,0,6,0,1],
+"classrequire__goto__statements_1_1no__decl__found__exceptiont.html#ac12959524eebd6ba47d12ac704e02dc1":[7,0,1,0,1],
 "classrequire__goto__statements_1_1no__decl__found__exceptiont.html#ad237205052e4ff0c9b5cc7fac680fc96":[7,0,1,0,0],
 "classrequire__goto__statements_1_1no__decl__found__exceptiont.html#ad237205052e4ff0c9b5cc7fac680fc96":[6,0,6,0,0],
 "classresolution__prooft.html":[7,0,1022],
@@ -247,7 +249,5 @@ var NAVTREEINDEX56 =
 "classsatcheck__booleforce__baset.html#a3a0e85e99bea8a12c8ce9bcb5f2eb0dc":[7,0,1036,3],
 "classsatcheck__booleforce__baset.html#a4a6e5d626da0c203e8dc527f04081542":[7,0,1036,4],
 "classsatcheck__booleforce__baset.html#a5f6630037e1615dab4550f47e181ec4f":[7,0,1036,1],
-"classsatcheck__booleforce__baset.html#aa5ace9ef0cb72699a8ce61b60e2e0edf":[7,0,1036,2],
-"classsatcheck__booleforce__coret.html":[7,0,1037],
-"classsatcheck__booleforce__coret.html#a105496665bc719d726b61471130b201e":[7,0,1037,1]
+"classsatcheck__booleforce__baset.html#aa5ace9ef0cb72699a8ce61b60e2e0edf":[7,0,1036,2]
 };

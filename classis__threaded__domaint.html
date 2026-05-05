@@ -469,7 +469,7 @@ Additional Inherited Members</h2></td></tr>
 <p>how function calls are treated: a) there is an edge from each call site to the function head b) there is an edge from the last instruction (END_FUNCTION) of the function to the instruction <em>following</em> the call site (this also needs to set the LHS, if applicable) </p>
 <p>in some cases, function calls are skipped, in which case: c) there is an edge from the call instruction to the instruction after</p>
 <p>"this" is the domain before the instruction "from" "from" is the instruction to be interpreted "to" is the next instruction (for GOTO, FUNCTION_CALL, END_FUNCTION)</p>
-<p>PRECONDITION(<a class="el" href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">from.is_dereferenceable()</a>, "Must not be _::end()") PRECONDITION(<a class="el" href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">to.is_dereferenceable()</a>, "Must not be _::end()") PRECONDITION(are_comparable(from,to) || (from-&gt;is_function_call() || from-&gt;is_end_function())</p>
+<p>PRECONDITION(from.is_dereferenceable(), "Must not be _::end()") PRECONDITION(to.is_dereferenceable(), "Must not be _::end()") PRECONDITION(are_comparable(from,to) || (from-&gt;is_function_call() || from-&gt;is_end_function())</p>
 <p>The history aware version is used by the abstract interpreter for backwards compatability it calls the older signature </p>
 
 <p>Implements <a class="el" href="classai__domain__baset.html#a185aac034215f7bbb38ddc560ed1d4c4">ai_domain_baset</a>.</p>

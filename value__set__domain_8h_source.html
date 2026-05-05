@@ -197,9 +197,9 @@ $(document).ready(function(){initNavTree('value__set__domain_8h_source.html','')
 <div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span> </div>
 <div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classvalue__set__domain__templatet.html#ae633f5046966ed1d8f7f7fc6a123df5f">transform</a>(</div>
 <div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>    <span class="keyword">const</span> <a class="code hl_class" href="classdstringt.html">irep_idt</a> &amp;<a class="code hl_class" href="classait.html">function_from</a>,</div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    <a class="code hl_typedef" href="classai__domain__baset.html#a56c706f5f21b92f4af5a0e1f776c290c">trace_ptrt</a> <a class="code hl_class" href="classait.html">from</a>,</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    <a class="code hl_typedef" href="classai__domain__baset.html#a56c706f5f21b92f4af5a0e1f776c290c">trace_ptrt</a> from,</div>
 <div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    <span class="keyword">const</span> <a class="code hl_class" href="classdstringt.html">irep_idt</a> &amp;<a class="code hl_class" href="classait.html">function_to</a>,</div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    <a class="code hl_typedef" href="classai__domain__baset.html#a56c706f5f21b92f4af5a0e1f776c290c">trace_ptrt</a> <a class="code hl_class" href="classait.html">to</a>,</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    <a class="code hl_typedef" href="classai__domain__baset.html#a56c706f5f21b92f4af5a0e1f776c290c">trace_ptrt</a> to,</div>
 <div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>    <a class="code hl_class" href="classai__baset.html">ai_baset</a> &amp;<a class="code hl_class" href="classait.html">ai</a>,</div>
 <div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    <span class="keyword">const</span> <a class="code hl_class" href="classnamespacet.html">namespacet</a> &amp;ns) <span class="keyword">override</span>;</div>
 <div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span> </div>
@@ -214,17 +214,17 @@ $(document).ready(function(){initNavTree('value__set__domain_8h_source.html','')
 </div>
 <div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span> </div>
 <div class="foldopen" id="foldopen00098" data-start="{" data-end="}">
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno"><a class="line" href="classvalue__set__domain__templatet.html#a159eab8cf24a2e1103ac88375112c8e8">   98</a></span>  <a class="code hl_class" href="classexprt.html">exprt</a> <a class="code hl_function" href="classvalue__set__domain__templatet.html#a159eab8cf24a2e1103ac88375112c8e8">get_return_lhs</a>(<a class="code hl_typedef" href="classai__domain__baset.html#a69906981e631f4eab72c700ce14ce458">locationt</a> <a class="code hl_class" href="classait.html">to</a>)<span class="keyword"> const</span></div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno"><a class="line" href="classvalue__set__domain__templatet.html#a159eab8cf24a2e1103ac88375112c8e8">   98</a></span>  <a class="code hl_class" href="classexprt.html">exprt</a> <a class="code hl_function" href="classvalue__set__domain__templatet.html#a159eab8cf24a2e1103ac88375112c8e8">get_return_lhs</a>(<a class="code hl_typedef" href="classai__domain__baset.html#a69906981e631f4eab72c700ce14ce458">locationt</a> to)<span class="keyword"> const</span></div>
 <div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span><span class="keyword">  </span>{</div>
 <div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    <span class="comment">// get predecessor of &quot;to&quot;</span></div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>    <a class="code hl_class" href="classait.html">to</a>--;</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>    to--;</div>
 <div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span> </div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>    <span class="keywordflow">if</span>(<a class="code hl_class" href="classait.html">to</a>-&gt;is_end_function())</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>    <span class="keywordflow">if</span>(to-&gt;is_end_function())</div>
 <div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>      <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code hl_class" href="classexprt.html">exprt</a> &amp;<span class="keyword">&gt;</span>(<a class="code hl_function" href="irep_8cpp.html#a294c4d6c72ca1775955007f2fc428283">get_nil_irep</a>());</div>
 <div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span> </div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>    <a class="code hl_define" href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a>(<a class="code hl_class" href="classait.html">to</a>-&gt;is_function_call(), <span class="stringliteral">&quot;must be the function call&quot;</span>);</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>    <a class="code hl_define" href="src_2util_2invariant_8h.html#ab5a3ae9c361c72d5dc551b87f56824de">INVARIANT</a>(to-&gt;is_function_call(), <span class="stringliteral">&quot;must be the function call&quot;</span>);</div>
 <div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span> </div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>    <span class="keywordflow">return</span> <a class="code hl_class" href="classait.html">to</a>-&gt;call_lhs();</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>    <span class="keywordflow">return</span> to-&gt;call_lhs();</div>
 <div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>  }</div>
 </div>
 <div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span> </div>
@@ -243,17 +243,17 @@ $(document).ready(function(){initNavTree('value__set__domain_8h_source.html','')
 <div class="foldopen" id="foldopen00120" data-start="{" data-end="}">
 <div class="line"><a id="l00120" name="l00120"></a><span class="lineno"><a class="line" href="classvalue__set__domain__templatet.html#ae633f5046966ed1d8f7f7fc6a123df5f">  120</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="classvalue__set__domain__templatet.html#ae633f5046966ed1d8f7f7fc6a123df5f">value_set_domain_templatet&lt;VST&gt;::transform</a>(</div>
 <div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>  <span class="keyword">const</span> <a class="code hl_class" href="classdstringt.html">irep_idt</a> &amp;,</div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>  <a class="code hl_typedef" href="classai__domain__baset.html#a56c706f5f21b92f4af5a0e1f776c290c">trace_ptrt</a> <a class="code hl_class" href="classait.html">from</a>,</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>  <a class="code hl_typedef" href="classai__domain__baset.html#a56c706f5f21b92f4af5a0e1f776c290c">trace_ptrt</a> from,</div>
 <div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>  <span class="keyword">const</span> <a class="code hl_class" href="classdstringt.html">irep_idt</a> &amp;<a class="code hl_class" href="classait.html">function_to</a>,</div>
-<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>  <a class="code hl_typedef" href="classai__domain__baset.html#a56c706f5f21b92f4af5a0e1f776c290c">trace_ptrt</a> <a class="code hl_class" href="classait.html">to</a>,</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>  <a class="code hl_typedef" href="classai__domain__baset.html#a56c706f5f21b92f4af5a0e1f776c290c">trace_ptrt</a> to,</div>
 <div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>  <a class="code hl_class" href="classai__baset.html">ai_baset</a> &amp;,</div>
 <div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>  <span class="keyword">const</span> <a class="code hl_class" href="classnamespacet.html">namespacet</a> &amp;ns)</div>
 <div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>{</div>
 <div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>  <span class="keywordflow">if</span>(!reachable)</div>
 <div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>    <span class="keywordflow">return</span>;</div>
 <div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span> </div>
-<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>  <a class="code hl_typedef" href="classai__domain__baset.html#a69906981e631f4eab72c700ce14ce458">locationt</a> <a class="code hl_class" href="classait.html">from_l</a>{<a class="code hl_class" href="classait.html">from</a>-&gt;current_location()};</div>
-<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>  <a class="code hl_typedef" href="classai__domain__baset.html#a69906981e631f4eab72c700ce14ce458">locationt</a> <a class="code hl_class" href="classait.html">to_l</a>{<a class="code hl_class" href="classait.html">to</a>-&gt;current_location()};</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>  <a class="code hl_typedef" href="classai__domain__baset.html#a69906981e631f4eab72c700ce14ce458">locationt</a> <a class="code hl_class" href="classait.html">from_l</a>{from-&gt;current_location()};</div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>  <a class="code hl_typedef" href="classai__domain__baset.html#a69906981e631f4eab72c700ce14ce458">locationt</a> <a class="code hl_class" href="classait.html">to_l</a>{to-&gt;current_location()};</div>
 <div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span> </div>
 <div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>  <span class="keywordflow">switch</span>(<a class="code hl_class" href="classait.html">from_l</a>-&gt;type())</div>
 <div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>  {</div>

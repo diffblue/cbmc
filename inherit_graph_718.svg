@@ -5720,9 +5720,9 @@
 <!-- Node341 -->
 <g id="Node000341" class="node">
 <title>Node341</title>
-<g id="a_Node000341"><a xlink:href="classinteger__typet.html" target="_top" xlink:title="Unbounded, signed integers (mathematical integers, not bitvectors)">
-<polygon fill="white" stroke="#666666" points="636.5,-635 554.5,-635 554.5,-616 636.5,-616 636.5,-635"/>
-<text text-anchor="middle" x="595.5" y="-623" font-family="Helvetica,sans-Serif" font-size="10.00">integer_typet</text>
+<g id="a_Node000341"><a xlink:href="classinteger__range__typet.html" target="_top" xlink:title="A type for closed integer intervals [from, to].">
+<polygon fill="white" stroke="#666666" points="653,-635 538,-635 538,-616 653,-616 653,-635"/>
+<text text-anchor="middle" x="595.5" y="-623" font-family="Helvetica,sans-Serif" font-size="10.00">integer_range_typet</text>
 </a>
 </g>
 </g>
@@ -5730,7 +5730,7 @@
 <g id="edge789_Node000318_Node000341" class="edge">
 <title>Node318&#45;&gt;Node341</title>
 <g id="a_edge789_Node000318_Node000341"><a xlink:title=" ">
-<path fill="none" stroke="#63b8ff" d="M413.6,-531.05C435.58,-552.01 476.43,-587.77 518,-607.5 529.22,-612.82 542.13,-616.64 554.11,-619.34"/>
+<path fill="none" stroke="#63b8ff" d="M413.6,-531.05C435.58,-552.01 476.43,-587.77 518,-607.5 525.15,-610.89 532.99,-613.67 540.83,-615.94"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="416,-528.5 406.39,-524.05 411.13,-533.53 416,-528.5"/>
 </a>
 </g>
@@ -5738,9 +5738,9 @@
 <!-- Node342 -->
 <g id="Node000342" class="node">
 <title>Node342</title>
-<g id="a_Node000342"><a xlink:href="classnatural__typet.html" target="_top" xlink:title="Natural numbers including zero (mathematical integers, not bitvectors)">
+<g id="a_Node000342"><a xlink:href="classinteger__typet.html" target="_top" xlink:title="Unbounded, signed integers (mathematical integers, not bitvectors)">
 <polygon fill="white" stroke="#666666" points="636.5,-598 554.5,-598 554.5,-579 636.5,-579 636.5,-598"/>
-<text text-anchor="middle" x="595.5" y="-586" font-family="Helvetica,sans-Serif" font-size="10.00">natural_typet</text>
+<text text-anchor="middle" x="595.5" y="-586" font-family="Helvetica,sans-Serif" font-size="10.00">integer_typet</text>
 </a>
 </g>
 </g>
@@ -5756,9 +5756,9 @@
 <!-- Node343 -->
 <g id="Node000343" class="node">
 <title>Node343</title>
-<g id="a_Node000343"><a xlink:href="classrange__typet.html" target="_top" xlink:title="A type for closed integer intervals [from, to].">
-<polygon fill="white" stroke="#666666" points="633,-561 558,-561 558,-542 633,-542 633,-561"/>
-<text text-anchor="middle" x="595.5" y="-549" font-family="Helvetica,sans-Serif" font-size="10.00">range_typet</text>
+<g id="a_Node000343"><a xlink:href="classnatural__typet.html" target="_top" xlink:title="Natural numbers including zero (mathematical integers, not bitvectors)">
+<polygon fill="white" stroke="#666666" points="636.5,-561 554.5,-561 554.5,-542 636.5,-542 636.5,-561"/>
+<text text-anchor="middle" x="595.5" y="-549" font-family="Helvetica,sans-Serif" font-size="10.00">natural_typet</text>
 </a>
 </g>
 </g>
@@ -5766,7 +5766,7 @@
 <g id="edge791_Node000318_Node000343" class="edge">
 <title>Node318&#45;&gt;Node343</title>
 <g id="a_edge791_Node000318_Node000343"><a xlink:title=" ">
-<path fill="none" stroke="#63b8ff" d="M427.12,-520.14C462.16,-526.71 520.01,-537.54 557.68,-544.6"/>
+<path fill="none" stroke="#63b8ff" d="M427.27,-520.17C461.29,-526.54 516.66,-536.92 554.29,-543.97"/>
 <polygon fill="#63b8ff" stroke="#63b8ff" points="427.5,-516.65 417.02,-518.25 426.21,-523.53 427.5,-516.65"/>
 </a>
 </g>

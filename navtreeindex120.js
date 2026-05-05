@@ -1,5 +1,7 @@
 var NAVTREEINDEX120 =
 {
+"lower__byte__operators_8cpp.html#a77b7426519585fb095c477b66865638f":[8,0,2,30,122,5],
+"lower__byte__operators_8cpp.html#a790158f602004d1804e82c2fa5254e09":[8,0,2,30,122,27],
 "lower__byte__operators_8cpp.html#a7abe1942cd3a6a144be91a154016d574":[8,0,2,30,122,26],
 "lower__byte__operators_8cpp.html#a7b41eb082f093266237d1edbb68dc10d":[8,0,2,30,122,15],
 "lower__byte__operators_8cpp.html#a842870bce16a7d3b88ad6e93aa92b578":[8,0,2,30,122,16],
@@ -237,17 +239,15 @@ var NAVTREEINDEX120 =
 "mathematical__types_8cpp.html#a4dbd3512cff41a42aad30545c12268e3":[8,0,2,30,126,0],
 "mathematical__types_8cpp_source.html":[8,0,2,30,126],
 "mathematical__types_8h.html":[8,0,2,30,127],
-"mathematical__types_8h.html#a01a83d3e3e6bed5a6e245ae3f1474d0f":[8,0,2,30,127,11],
-"mathematical__types_8h.html#a3a06fcd876f0d2f84f846120e20349f3":[8,0,2,30,127,10],
+"mathematical__types_8h.html#a2173ed6e6de1edc660bfc63b0da16df3":[8,0,2,30,127,9],
+"mathematical__types_8h.html#a3a06fcd876f0d2f84f846120e20349f3":[8,0,2,30,127,12],
 "mathematical__types_8h.html#a4dbd3512cff41a42aad30545c12268e3":[8,0,2,30,127,8],
-"mathematical__types_8h.html#a59e48baf77b829024d95248b2755ac14":[8,0,2,30,127,12],
-"mathematical__types_8h.html#a5f7b215ef523e41451a0d1eb1006050c":[8,0,2,30,127,9],
-"mathematical__types_8h.html#a89825885a6d69cba86c3ffee5507e0a0":[8,0,2,30,127,7],
-"mathematical__types_8h.html#ac759df92b404d29bde2652f17994c8ad":[8,0,2,30,127,6],
+"mathematical__types_8h.html#a5f7b215ef523e41451a0d1eb1006050c":[8,0,2,30,127,11],
+"mathematical__types_8h.html#a981380c3c5d1ec226a755b06ce04ba61":[8,0,2,30,127,10],
+"mathematical__types_8h.html#aad980bc692e782950759fc7d9f1c4de3":[8,0,2,30,127,6],
+"mathematical__types_8h.html#ac759df92b404d29bde2652f17994c8ad":[8,0,2,30,127,7],
 "mathematical__types_8h_source.html":[8,0,2,30,127],
 "may__alias_8cpp.html":[8,0,2,6,33],
 "may__alias_8cpp.html#a05e10e41b7c32c933a47dfc33810547d":[8,0,2,6,33,6],
-"may__alias_8cpp.html#a21e2735269a82e5422945c700cee7fdf":[8,0,2,6,33,1],
-"may__alias_8cpp.html#a2b8c90e0feca57539e391fb46ff1e7a0":[8,0,2,6,33,4],
-"may__alias_8cpp.html#a34abad41da3fe92dbae7ab103611eb6e":[8,0,2,6,33,5]
+"may__alias_8cpp.html#a21e2735269a82e5422945c700cee7fdf":[8,0,2,6,33,1]
 };
