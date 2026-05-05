@@ -27,7 +27,7 @@ bvt boolbvt::convert_constant(const constant_exprt &expr)
   }
   else if(expr_type.id()==ID_range)
   {
-    mp_integer from=to_range_type(expr_type).get_from();
+    mp_integer from = to_integer_range_type(expr_type).from();
     mp_integer value=string2integer(id2string(expr.get_value()));
     mp_integer v=value-from;
 

@@ -128,7 +128,7 @@ bvt boolbvt::convert_add_sub(const exprt &expr)
     {
       // add: lhs + from + rhs + from - from = lhs + rhs + from
       // sub: lhs + from - (rhs + from) - from = lhs - rhs - from
-      mp_integer from = to_range_type(type).get_from();
+      mp_integer from = to_integer_range_type(type).from();
       bv = bv_utils.add_sub(bv, op, subtract);
       bv = bv_utils.add_sub(
         bv, bv_utils.build_constant(from, op.size()), subtract);

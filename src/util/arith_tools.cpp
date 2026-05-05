@@ -114,9 +114,9 @@ constant_exprt from_integer(
   }
   else if(type_id == ID_range)
   {
-    auto &range_type = to_range_type(type);
-    PRECONDITION(int_value >= range_type.get_from());
-    PRECONDITION(int_value <= range_type.get_to());
+    auto &range_type = to_integer_range_type(type);
+    PRECONDITION(int_value >= range_type.from());
+    PRECONDITION(int_value <= range_type.to());
     return constant_exprt{integer2string(int_value), type};
   }
   else if(type_id==ID_unsignedbv)
