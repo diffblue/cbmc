@@ -144,7 +144,8 @@ inline mathematical_function_typet &to_mathematical_function_type(typet &type)
   return static_cast<mathematical_function_typet &>(type);
 }
 
-/// A type for subranges of integers
+/// A type for closed integer intervals `[from, to]`. Both endpoints are
+/// inclusive. The interval may be empty (if `from > to`).
 class range_typet : public typet
 {
 public:
@@ -154,10 +155,24 @@ public:
     set_to(to);
   }
 
+  /// \return The lower bound of the interval (inclusive).
   mp_integer get_from() const;
+
+  /// \return The upper bound of the interval (inclusive).
   mp_integer get_to() const;
+
+  /// \return True iff the given value lies within the closed interval
+  ///   `[get_from(), get_to()]`.
   bool includes(const mp_integer &) const;
+
+  /// \return A constant expression of this type representing the value 0.
+  /// \remark Precondition: the interval must include 0, i.e.
+  ///   `includes(0)` must hold.
   constant_exprt zero_expr() const;
+
+  /// \return A constant expression of this type representing the value 1.
+  /// \remark Precondition: the interval must include 1, i.e.
+  ///   `includes(1)` must hold.
   constant_exprt one_expr() const;
 
   void set_from(const mp_integer &from);
