@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "expr_cast.h" // IWYU pragma: keep
 #include "invariant.h"
+#include "mp_arith.h"
 #include "type.h"
 
 class constant_exprt;
@@ -141,6 +142,71 @@ inline mathematical_function_typet &to_mathematical_function_type(typet &type)
 {
   PRECONDITION(can_cast_type<mathematical_function_typet>(type));
   return static_cast<mathematical_function_typet &>(type);
+}
+
+/// A type for closed integer intervals `[from, to]`. Both endpoints are
+/// inclusive. The interval may be empty (if `from > to`).
+class range_typet : public typet
+{
+public:
+  range_typet(const mp_integer &from, const mp_integer &to) : typet(ID_range)
+  {
+    set_from(from);
+    set_to(to);
+  }
+
+  /// \return The lower bound of the interval (inclusive).
+  mp_integer get_from() const;
+
+  /// \return The upper bound of the interval (inclusive).
+  mp_integer get_to() const;
+
+  /// \return True iff the given value lies within the closed interval
+  ///   `[get_from(), get_to()]`.
+  bool includes(const mp_integer &) const;
+
+  /// \return A constant expression of this type representing the value 0.
+  /// \remark Precondition: the interval must include 0, i.e.
+  ///   `includes(0)` must hold.
+  constant_exprt zero_expr() const;
+
+  /// \return A constant expression of this type representing the value 1.
+  /// \remark Precondition: the interval must include 1, i.e.
+  ///   `includes(1)` must hold.
+  constant_exprt one_expr() const;
+
+  void set_from(const mp_integer &from);
+  void set_to(const mp_integer &to);
+};
+
+/// Check whether a reference to a typet is a \ref range_typet.
+/// \param type: Source type.
+/// \return True if \p type is a \ref range_typet.
+template <>
+inline bool can_cast_type<range_typet>(const typet &type)
+{
+  return type.id() == ID_range;
+}
+
+/// \brief Cast a typet to a \ref range_typet
+///
+/// This is an unchecked conversion. \a type must be known to be \ref
+/// range_typet. Will fail with a precondition violation if type
+/// doesn't match.
+///
+/// \param type: Source type.
+/// \return Object of type \ref range_typet.
+inline const range_typet &to_range_type(const typet &type)
+{
+  PRECONDITION(can_cast_type<range_typet>(type));
+  return static_cast<const range_typet &>(type);
+}
+
+/// \copydoc to_range_type(const typet &)
+inline range_typet &to_range_type(typet &type)
+{
+  PRECONDITION(can_cast_type<range_typet>(type));
+  return static_cast<range_typet &>(type);
 }
 
 bool is_number(const typet &type);
