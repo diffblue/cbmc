@@ -148,10 +148,10 @@ inline mathematical_function_typet &to_mathematical_function_type(typet &type)
 class range_typet : public typet
 {
 public:
-  range_typet(const mp_integer &_from, const mp_integer &_to) : typet(ID_range)
+  range_typet(const mp_integer &from, const mp_integer &to) : typet(ID_range)
   {
-    set_from(_from);
-    set_to(_to);
+    set_from(from);
+    set_to(to);
   }
 
   mp_integer get_from() const;
@@ -160,7 +160,7 @@ public:
   constant_exprt zero_expr() const;
   constant_exprt one_expr() const;
 
-  void set_from(const mp_integer &_from);
+  void set_from(const mp_integer &from);
   void set_to(const mp_integer &to);
 };
 
