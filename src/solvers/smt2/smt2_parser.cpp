@@ -1018,6 +1018,119 @@ exprt smt2_parsert::bv_mod(const exprt::operandst &operands, bool is_signed)
 
 exprt smt2_parsert::expression()
 {
+  // Deeply nested (let ((x v)) (let ((y w)) ...)) expressions — common in
+  // SMT-COMP benchmarks — would otherwise descend recursively once per
+  // nested let and overflow the call stack. Collect such nested lets on an
+  // explicit frame stack first, then parse the innermost non-let body, and
+  // finally walk the frame stack back out to build the let_exprt chain.
+  //
+  // Binding values and the innermost body are still parsed recursively; a
+  // later change breaks recursion for those too.
+  struct let_framet
+  {
+    std::vector<std::pair<irep_idt, exprt>> bindings;
+    std::vector<std::pair<irep_idt, idt>> saved_ids;
+  };
+  std::vector<let_framet> let_stack;
+
+  auto apply_let_frames = [&](exprt body) -> exprt
+  {
+    for(auto it = let_stack.rbegin(); it != let_stack.rend(); ++it)
+    {
+      if(next_token() != smt2_tokenizert::CLOSE)
+        throw error("expected ')' after let");
+
+      binding_exprt::variablest variables;
+      exprt::operandst values;
+      variables.reserve(it->bindings.size());
+      values.reserve(it->bindings.size());
+      for(const auto &b : it->bindings)
+      {
+        variables.emplace_back(b.first, b.second.type());
+        values.push_back(b.second);
+      }
+
+      for(const auto &b : it->bindings)
+        id_map.erase(b.first);
+      for(auto &saved : it->saved_ids)
+        id_map.insert(std::move(saved));
+
+      body =
+        let_exprt(std::move(variables), std::move(values), std::move(body));
+    }
+    return body;
+  };
+
+  while(smt2_tokenizer.peek() == smt2_tokenizert::OPEN)
+  {
+    next_token(); // consume '('
+
+    if(smt2_tokenizer.peek() != smt2_tokenizert::SYMBOL)
+    {
+      // '(' not followed by SYMBOL — this is a nested function application
+      // such as ((_ extract 3 0) op) or bare double parentheses. Let the
+      // existing function_application() helper consume the head token and
+      // dispatch. It expects the outer '(' to already be consumed, which
+      // matches our state here.
+      return apply_let_frames(function_application());
+    }
+
+    next_token(); // consume the head SYMBOL
+    const auto id = smt2_tokenizer.get_buffer();
+
+    if(id != "let")
+    {
+      // Not a let — dispatch the function application using the already
+      // consumed head symbol.
+      return apply_let_frames(function_application_with_id(id));
+    }
+
+    // It is a let — parse the bindings and push a frame.
+    let_framet frame;
+
+    if(next_token() != smt2_tokenizert::OPEN)
+      throw error("expected bindings after let");
+
+    while(smt2_tokenizer.peek() == smt2_tokenizert::OPEN)
+    {
+      next_token(); // consume '('
+
+      if(next_token() != smt2_tokenizert::SYMBOL)
+        throw error("expected symbol in binding");
+
+      irep_idt bind_id = smt2_tokenizer.get_buffer();
+
+      // note that the previous bindings are _not_ visible yet
+      exprt value = expression();
+
+      if(next_token() != smt2_tokenizert::CLOSE)
+        throw error("expected ')' after value in binding");
+
+      frame.bindings.emplace_back(bind_id, std::move(value));
+    }
+
+    if(next_token() != smt2_tokenizert::CLOSE)
+      throw error("expected ')' at end of bindings");
+
+    // add the bindings to id_map so that they are visible for the body
+    for(const auto &b : frame.bindings)
+    {
+      auto insert_result =
+        id_map.insert({b.first, idt{idt::BINDING, b.second}});
+      if(!insert_result.second) // already there
+      {
+        auto &id_entry = *insert_result.first;
+        frame.saved_ids.emplace_back(
+          id_entry.first, std::move(id_entry.second));
+        id_entry.second = idt{idt::BINDING, b.second};
+      }
+    }
+
+    let_stack.push_back(std::move(frame));
+    // loop back to check whether the body of this let is itself a let
+  }
+
+  // The next token is not '(' — parse an atom.
   switch(next_token())
   {
   case smt2_tokenizert::SYMBOL:
@@ -1027,7 +1140,7 @@ exprt smt2_parsert::expression()
       // in the expression table?
       const auto e_it = expressions.find(identifier);
       if(e_it != expressions.end())
-        return e_it->second();
+      return apply_let_frames(e_it->second());
 
       // rummage through id_map
       auto id_it = id_map.find(identifier);
@@ -1036,7 +1149,7 @@ exprt smt2_parsert::expression()
         symbol_exprt symbol_expr(identifier, id_it->second.type);
         if(smt2_tokenizer.token_is_quoted_symbol())
           symbol_expr.set(ID_C_quoted, true);
-        return std::move(symbol_expr);
+        return apply_let_frames(std::move(symbol_expr));
       }
 
       // don't know, give up
@@ -1053,7 +1166,7 @@ exprt smt2_parsert::expression()
       const std::size_t width = 4 * (buffer.size() - 2);
       CHECK_RETURN(width != 0 && width % 4 == 0);
       unsignedbv_typet type(width);
-      return from_integer(value, type);
+      return apply_let_frames(from_integer(value, type));
     }
     else if(buffer.size() >= 2 && buffer[0] == '#' && buffer[1] == 'b')
     {
@@ -1062,20 +1175,18 @@ exprt smt2_parsert::expression()
       const std::size_t width = buffer.size() - 2;
       CHECK_RETURN(width != 0);
       unsignedbv_typet type(width);
-      return from_integer(value, type);
+      return apply_let_frames(from_integer(value, type));
     }
     else
     {
-      return constant_exprt(buffer, integer_typet());
+      return apply_let_frames(constant_exprt(buffer, integer_typet()));
     }
   }
-
-  case smt2_tokenizert::OPEN: // function application
-    return function_application();
 
   case smt2_tokenizert::END_OF_FILE:
     throw error("EOF in an expression");
 
+  case smt2_tokenizert::OPEN:
   case smt2_tokenizert::CLOSE:
   case smt2_tokenizert::STRING_LITERAL:
   case smt2_tokenizert::NONE:
