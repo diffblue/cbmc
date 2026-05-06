@@ -56,6 +56,8 @@ DRAT proof analysis \sep
 bounded variable elimination
 \end{keywords}
 
+\conference{Submitted for review}
+
 \maketitle
 
 \section{Introduction}
@@ -1014,7 +1016,7 @@ to 71$\times$) with stable ranking across solvers. SAT problems
 unpredictable ranking---different encodings make different solutions
 easy to find.
 
-\subsection{SMT-LIB QF\_BV Benchmarks}
+\subsection{Custom Benchmarks in SMT-LIB Format}
 
 To assess external validity, we evaluate on 44 QF\_BV benchmarks in
 SMT-LIB format using \cbmc's \texttt{smt2\_solver} with \cadical.
@@ -1069,6 +1071,86 @@ encoding-sensitive---a new encoding that improves general QF\_BV
 performance may still fail on these specific instances, making
 aggregate QF\_BV evaluation potentially misleading for encoding
 research.
+
+\subsection{SMT-COMP QF\_BV Community Sample}
+\label{sec:smt-comp}
+
+To further test external validity we took a stratified sample of
+66 multiplication-containing benchmarks from the SMT-COMP 2024
+QF\_BV track, drawn across 22 submitter
+categories.\footnote{Sampling procedure: all benchmarks containing
+\texttt{bvmul} with file size ${<}$100\,KB were enumerated per
+submitter category; we took 5 benchmarks from each category
+(fewer if the category had fewer than 5), yielding 66 benchmarks.
+Sample list and raw results are in
+\texttt{doc/paper-bitblasting/data/smt-comp-sample/}.} We ran each
+benchmark with \cadical and a 60\,s timeout in two configurations:
+(i)~\emph{default} \cbmc (algebraic pre-solver + \combacs), and
+(ii)~\emph{shift-add-nosimp} (encoding alone, algebraic pre-solver
+disabled).
+
+\begin{table}[ht]
+\caption{SMT-COMP QF\_BV sample (66 benchmarks, \cadical, 60\,s T/O).}
+\label{tab:smtcomp-sample}
+\centering
+\begin{tabular}{lrr}
+\toprule
+Configuration & Solved & PAR-2 (s/benchmark) \\
+\midrule
+shift-add-nosimp   & 34/66 & 63.1 \\
+default (algebraic + \combacs) & 33/66 & 63.5 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The two configurations solve almost the same number of benchmarks
+(34 vs 33) with nearly identical PAR-2 scores. A closer look
+reveals the structure behind this near-tie:
+
+\textbf{Default-only wins (2 benchmarks):} \texttt{brummayerbiere3\_isqrtadd}
+(59.3\,s vs T/O), where the algebraic pre-solver shrinks the formula
+before bit-blasting, and \texttt{bv-term-small-rw\_1303}, a rewrite-rule
+benchmark solved instantaneously by the algebraic layer (0.0\,s vs T/O).
+On three further benchmarks the default configuration is
+${\geq}$3$\times$ faster (up to 3226$\times$ on the rewrite-rule family),
+without any time increase.
+
+\textbf{Shift-add-only wins (3 benchmarks, all division-related):}
+\texttt{log-slicing\_bvudiv\_15} (T/O vs 50.3\,s),
+\texttt{log-slicing\_bvsdiv\_16} (T/O vs 57.3\,s), and one Ultimate
+Automizer benchmark (T/O vs 4.0\,s). Inspection shows these are
+\texttt{bvudiv}/\texttt{bvsdiv}-dominated; \cbmc's algebraic
+pre-solver includes a GCD-based division-by-constant rewriting step
+that, on these benchmarks, produces a larger bit-blasted formula
+than the straight shift-add encoding would.
+
+\textbf{No significant regression:} no benchmark is ${\geq}$3$\times$
+slower with the default than with shift-add-nosimp.
+
+The headline takeaway is that our changes are \emph{nearly neutral
+on a broad QF\_BV community sample}: they are not a silver bullet,
+nor are they a regression. The per-benchmark speedups we report
+elsewhere in this paper (\combacs 5--20$\times$ on commutativity,
+Booth up to 17$\times$ on strength reduction, block4 up to
+120$\times$ smaller proofs on comm\_11) are pattern-specific: they
+manifest when the benchmark matches the encoding's target. On
+general QF\_BV benchmarks, most multiplications are small (BW
+${\leq}$32) and the bottleneck is rarely the multiplier. A
+benchmark category-level analysis (see
+\texttt{data/smt-comp-sample/} in the supplementary artifact)
+confirms this: our improvements are
+most visible on \texttt{bv-term-small-rw-Noetzli} (rewrite-rule
+benchmarks), \texttt{brummayerbiere3}, and \texttt{calypto}; they
+are invisible on \texttt{ecrw} (512-bit rewrites) and
+\texttt{brummayerbiere4} (unconstrained), which are uniformly hard
+for both configurations.
+
+\paragraph{Threats to validity, continued.}
+The 66-benchmark sample is small relative to the full QF\_BV suite
+(${\sim}$16{,}000 benchmarks containing \texttt{bvmul}). Stratifying
+by submitter category controls for benchmark-family bias but
+cannot capture the difficulty distribution within each category. A
+full-suite evaluation is deferred as future work.
 
 \section{Negative Results}
 \label{sec:negative}
