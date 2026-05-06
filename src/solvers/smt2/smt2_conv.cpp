@@ -5458,7 +5458,22 @@ void smt2_convt::find_symbols(const exprt &expr)
         convert_type(expr.type());
       }
 
-      out << ")" << "\n";
+      out << ')' << '\n';
+
+      // We need an additional constraint for range-typed symbols,
+      // or otherwise we get satisfying assignments with values
+      // outside of the range when the size of the range isn't
+      // a power of two.
+      if(expr.type().id() == ID_range)
+      {
+        auto &range_type = to_integer_range_type(expr.type());
+        if(!is_power_of_two(range_type.size()))
+        {
+          out << "(assert (bvule " << smt2_identifier << ' ';
+          convert_expr(from_integer(range_type.to(), range_type));
+          out << "))\n"; // bvule, assert
+        }
+      }
     }
   }
   else if(expr.id() == ID_array_of)
