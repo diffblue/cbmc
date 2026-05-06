@@ -37,14 +37,14 @@ steps---and use these findings to redesign the encoding. This
 methodology produced \combacs, a carry-save Comba encoding that
 separates column reduction from carry propagation, achieving
 2.6--71$\times$ speedup across four SAT solvers. We further show
-that carry propagation---not circuit size---is the dominant hardness
-source: at 13 bits, integer multiplication needs 23$\times$ more
-conflicts than carry-free GF(2) multiplication despite only
-1.6$\times$ more clauses. Applying the same methodology to
+that carry propagation correlates strongly with SAT hardness: at 13
+bits, integer multiplication needs 23$\times$ more conflicts than
+carry-free GF(2) multiplication despite only 1.6$\times$ more
+clauses. Applying the same methodology to
 alternative encodings (Booth radix-4, 4-bit blocks, sorting
 networks), we find that no single encoding dominates: Booth is
-17$\times$ faster on constant multiplication, while \combacs is
-2$\times$ faster on commutativity. The optimal encoding depends on
+17$\times$ faster on strength-reduction benchmarks, while \combacs
+is 2$\times$ faster on commutativity. The optimal encoding depends on
 problem structure, motivating adaptive selection.
 \end{abstract}
 
@@ -99,10 +99,12 @@ Our contributions are:
   produced \combacs and can be applied to other encoding problems
   (Section~\ref{sec:methodology}).
 
-\item \textbf{Carry propagation as the hardness source.} We compare
-  integer and GF(2) (carry-less) multiplication and show that carry
-  propagation---not circuit size---causes exponential blowup
-  (Section~\ref{sec:hardness}).
+\item \textbf{Carry propagation as a strong hardness correlate.} We
+  compare integer and GF(2) (carry-less) multiplication and show
+  that the shift from integer to GF(2) reduces conflict counts by
+  one to two orders of magnitude while changing clause count by
+  only ${\sim}1.6\times$; at BW=13, integer multiplication needs
+  23$\times$ more conflicts (Section~\ref{sec:hardness}).
 
 \item \textbf{Six-encoding comparison with solver statistics.} We
   evaluate shift-add, Dadda, Comba, \combacs, Booth radix-4, 4-bit
@@ -197,69 +199,103 @@ conflict count grows roughly as $n^3$ (measured across BW=5--17);
 integer multiplication grows exponentially. DRAT proof analysis
 confirms: GF(2) proofs are 3.6--18$\times$ smaller.
 
-This is consistent with known exponential resolution lower bounds for
-related problems~\cite{haken1985intractability} and with Lv and
+This is consistent with known exponential resolution lower bounds
+for related problems~\cite{haken1985intractability} and with Lv and
 Kalla's finding~\cite{lv2012galois} that GF($2^k$) multipliers
 (carry-free) are verifiable algebraically but intractable for SAT
-beyond 16 bits. We emphasize that this is empirical evidence; a formal
-proof of exponential resolution complexity for multiplication remains
-open. The practical implication is clear: encodings that minimize
-carry propagation depth should reduce SAT solver effort. Corroborating
-evidence comes from the encoding comparison itself
-(Table~\ref{tab:allencodings}): the encoding hierarchy shift-add $<$
-Dadda $<$ Comba $<$ \combacs exactly mirrors decreasing carry
-propagation depth, with all four using the same partial products and
-integer addition. This is exactly what \combacs does.
+beyond 16 bits.
+
+\paragraph{Correlation, not causation.}
+We emphasize what this experiment does and does not establish.
+Integer multiplication and GF(2) multiplication differ not only in
+whether carries propagate but also in the clause-level structure of
+addition vs.\ XOR, which affects propagation and learning
+behavior. The experiment shows that removing carries (and replacing
+integer addition with XOR) makes commutativity
+drastically easier; it does not isolate carry propagation as the
+sole causal factor. A formal proof of exponential resolution
+complexity for multiplication remains open. We nonetheless find
+the pattern informative: it consistently separates benchmarks
+where encoding changes help (integer multiplication with long
+carry chains) from benchmarks where they do not (typically
+XOR-dominated problems). Corroborating evidence comes from the
+encoding comparison itself (Table~\ref{tab:allencodings}): the
+ordering shift-add $<$ Dadda $<$ Comba $<$ \combacs mirrors
+decreasing carry propagation depth, with all four using the same
+partial products and integer addition.
 
 
 \section{Proof-Driven Encoding Design}
 \label{sec:methodology}
 
-Our encoding improvements were not discovered by theoretical analysis
-but by a systematic methodology that examines solver behavior:
+\combacs was designed through a systematic methodology based on
+examining solver proof traces. We describe the procedure here both
+as a record of how the encoding was found and as a reproducible
+technique for future encoding work.
 
 \begin{enumerate}
-\item \textbf{Generate DRAT proof} of the existing encoding on a
-  representative benchmark.
-\item \textbf{Identify bottleneck variables}: measure which variables
-  appear most frequently in proof steps.
-\item \textbf{Trace to encoding structure}: map bottleneck variables
-  back to the multiplier circuit to understand which encoding
-  decisions cause the bottleneck.
-\item \textbf{Redesign encoding} to reduce the identified bottleneck.
-\item \textbf{Validate} across multiple solvers and benchmarks.
+\item \textbf{Generate a DRAT proof} of the existing encoding on a
+  representative hard benchmark (we used commutativity at BW=11
+  with standard Comba).
+\item \textbf{Count variable participation}: for each variable,
+  count the number of proof steps in which it appears as a
+  literal. Rank variables by participation count.
+\item \textbf{Trace the top variables} back to the multiplier
+  circuit: which partial product bits, carry bits, or intermediate
+  gates do they represent?
+\item \textbf{Hypothesize a structural cause} for the
+  concentration: what aspect of the encoding forces the solver to
+  repeatedly reason about these variables?
+\item \textbf{Propose an encoding modification} that breaks the
+  identified dependency without losing correctness.
+\item \textbf{Validate} the modification across multiple solvers
+  and benchmarks to ensure the improvement is not solver-specific.
 \end{enumerate}
 
-Applying this to standard Comba on commutativity BW=11, we found that
-the top bottleneck variable appears in 31\% of all DRAT proof steps.
-This variable corresponds to a carry bit at the boundary between two
-columns---the point where standard Comba propagates carries from one
-column's popcount to the next. This inter-column dependency forces
-the solver to reason about carry propagation across the entire width,
-creating a sequential bottleneck in an otherwise parallel structure.
+Applying this to standard Comba on commutativity BW=11, the top
+variable by proof participation appears in 31\% of all DRAT
+steps. Tracing it back to the encoding, we found it represents a
+carry bit at the boundary between adjacent columns---the point
+where standard Comba propagates the carry from one column's
+popcount to the next during the same pass. This inter-column
+dependency forces the solver to reason about carry propagation
+across the entire width, creating a sequential bottleneck in an
+otherwise parallel structure.
 
-The fix was \combacs: separate column reduction (first pass) from
-carry propagation (second pass). The result: 55\% smaller proofs,
-74\% more unit propagation during search, and 2.6--71$\times$
-speedup (Table~\ref{tab:proof}).
+The proposed fix---\combacs---separates column reduction (first
+pass) from carry propagation (second pass), eliminating the
+inter-column dependency during the popcount phase. The validation
+step showed: 55\% smaller proofs, 74\% more unit propagation
+during search, and 2.6--71$\times$ speedup (Table~\ref{tab:proof})
+across four different SAT solvers.
 
-This methodology is transferable. We applied it to identify why
-Booth radix-4 excels on constant multiplication (Section~\ref{sec:alternative}):
-proof analysis shows that Booth's zero-valued digits for constants
-with few set bits eliminate entire partial products, reducing
-conflicts by 10$\times$. Similarly, proof analysis of the sorting
-network encoding reveals that its 2,915 fixed variables (from
-auxiliary sorted-property constraints) are overwhelmed by the 13K
-extra variables---a net negative despite excellent propagation
-properties.
+\paragraph{Retrospective analysis of known encodings.}
+We did not design Booth radix-4, 4-bit blocks, or sorting
+networks via this methodology---these are pre-existing ideas (Booth
+from hardware arithmetic~\cite{booth1951signed}; 4-bit blocks
+suggested by Martin Brain in private communication; sorting
+networks from the synthesis literature). However, the same DRAT
+analysis proves useful for \emph{understanding} why each encoding
+wins or loses on specific benchmarks. Applied post-hoc to Booth on
+constant multiplication, proof-variable analysis shows that Booth's
+zero-valued digits for constants with few set bits eliminate entire
+partial products, reducing conflicts 10$\times$
+(Section~\ref{sec:alternative}). Applied to sorting networks,
+analysis reveals that the 2,915 fixed variables from
+sorted-property constraints are overwhelmed by the 13K extra
+variables the encoding introduces.
 
-The methodology could be automated: an AI system that reads DRAT
-proofs, identifies structural bottlenecks, and proposes encoding
-modifications would close the loop that we perform manually. No
-existing work automates this full cycle---prior work either analyzes
-encoding \emph{code} (not solver output)~\cite{jarvisalo2012inprocessing}
-or modifies solver \emph{heuristics} (not
-encodings)~\cite{biere2019cadical}.
+\paragraph{Towards automation.}
+The manual steps above---proof generation, variable ranking,
+circuit tracing, structural hypothesis, modification---are
+candidates for automation. An AI system that reads DRAT proofs,
+identifies structural bottlenecks, and proposes encoding
+modifications would close the loop. Existing work analyzes
+encoding source code~\cite{jarvisalo2012inprocessing} or modifies
+solver heuristics~\cite{biere2019cadical}, but to our knowledge no
+system closes the full proof-to-encoding cycle. We view our manual
+use of the methodology as preliminary evidence that the cycle is
+tractable; automating it is future work.
 
 \section{Carry-Save Comba Encoding}
 \label{sec:combacs}
@@ -401,12 +437,60 @@ pairs, generating partial products with values in
 $\{-2, -1, 0, +1, +2\} \times$ multiplicand. This halves the number
 of partial products at the cost of two's complement correction.
 
-For constant multiplication (e.g., $x \times 15$), many Booth digits
-are zero, eliminating entire partial products. On
-strength\_chain\_16 ($x \times 15$, $x \times 17$, $x \times 255$):
+We initially expected Booth to excel broadly on constant
+multiplication. Running a sweep over two benchmark families
+(with the algebraic solver disabled to isolate the encoding
+effect) gave a more nuanced picture:
 
 \begin{table}[ht]
-\caption{Booth radix-4 vs.\ shift-add on constant multiplication (\cadical).}
+\caption{Booth vs.\ shift-add with algebraic solver disabled,
+  on representative benchmarks (\cadical).}
+\label{tab:booth-sweep}
+\centering
+\small
+\begin{tabular}{llrrr}
+\toprule
+Pattern & Benchmark & shift-add & Booth & Ratio \\
+\midrule
+\multicolumn{5}{l}{\emph{Commutativity of constant mul: $\mathbf{x\cdot c = c \cdot x}$}} \\
+& const\_mul\_16\_3 & 0.007s & 0.138s & 0.05$\times$ \\
+& const\_mul\_16\_15 & 0.013s & 0.233s & 0.05$\times$ \\
+& const\_mul\_16\_255 & 0.399s & 0.348s & 1.14$\times$ \\
+& const\_mul\_32\_15 & 0.057s & T/O & $\ll$1$\times$ \\
+\midrule
+\multicolumn{5}{l}{\emph{Strength reduction: $\mathbf{x \cdot (2^{k+1}-1) = (x \ll (k{+}1)) - x}$}} \\
+& strength\_16\_7 & 0.021s & 0.015s & 1.4$\times$ \\
+& strength\_16\_15 & 0.053s & 0.015s & 3.5$\times$ \\
+& strength\_16\_31 & 0.111s & 0.013s & 8.5$\times$ \\
+& strength\_32\_31 & 0.378s & 0.027s & 14$\times$ \\
+& strength\_32\_63 & 0.898s & 0.025s & 36$\times$ \\
+& strength\_chain\_16 & 1.075s & 0.063s & 17$\times$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Two observations. First, Booth is actually \emph{worse} on pure
+constant-commutativity ($x \cdot c = c \cdot x$), often by $5$--$20\times$,
+and it times out on most 32-bit instances. The additional structure
+(sign correction, pre-computed doublings) adds overhead that the
+solver cannot simplify away when both sides are computed with
+\texttt{bvmul}. Second, Booth excels on strength-reduction
+benchmarks where one side uses \texttt{bvmul} and the other is a
+hand-coded shift-add expression: here its compressed
+representation matches the target structure more closely, and the
+equivalence check becomes a few small consistency constraints
+rather than a full circuit-to-circuit comparison. On the chained
+benchmark strength\_chain\_16 (verifying three strength reductions
+simultaneously), Booth is 17$\times$ faster than shift-add.
+
+Proof analysis on strength\_chain\_16 supports this
+interpretation: Booth's DRAT proof is 277\,KB with 4,071
+conflicts, while shift-add produces ${\sim}$10\,MB of proof with
+39,757 conflicts. The solver requires fundamentally less reasoning
+when the encoding aligns with the target circuit.
+
+\begin{table}[ht]
+\caption{Six encodings on strength\_chain\_16 (\cadical).}
 \label{tab:booth}
 \centering
 \begin{tabular}{lrrrrrr}
@@ -423,9 +507,12 @@ sortnet & 13,316 & 40,462 & 34,985 & 64,579 & 25M & 6.5s \\
 \end{tabular}
 \end{table}
 
-Booth produces 30\% fewer variables and 10$\times$ fewer conflicts.
-Proof analysis confirms: Booth's proof is 277\,KB vs.\ ${\sim}$10\,MB
-for shift-add---the solver requires fundamentally less reasoning.
+The broader lesson is that Booth's benefit depends on whether the
+benchmark structure matches Booth's own decomposition. This is
+consistent with our general finding
+(Section~\ref{sec:alternative} below): the optimal encoding
+depends on the problem structure, not on a single ``best
+encoding'' hierarchy.
 
 \subsection{4-Bit Block Multiplication}
 
@@ -469,7 +556,8 @@ size.
 Problem class & Best encoding & Key metric \\
 \midrule
 Commutativity (2 identical circuits) & \combacs & congruence closure \\
-Constant multiplication & Booth & fewer partial products \\
+Constant multiplication: strength-reduction form & Booth & compressed PP matches target \\
+Constant multiplication: pure commutativity & shift-add & Booth overhead dominates \\
 Circuit equivalence (vs.\ shift-add) & shift-add & structural matching \\
 Inequality constraints & block4 & BVE elimination \\
 \bottomrule
@@ -479,6 +567,30 @@ Inequality constraints & block4 & BVE elimination \\
 The optimal encoding depends on problem structure, not just
 multiplication count. This motivates encoding selection based on
 deeper structural analysis of the verification problem.
+
+\paragraph{A methodological caveat: encoding flags must reach the
+solver.}
+We observed an instructive phenomenon on the bfloat16 benchmark
+bf16\_mul\_comm\_v2: switching among shift-add, Booth, 4-bit block,
+and sorting-network encodings produces \emph{identical} CNF
+formulas (1743 variables, 6697 clauses) with identical conflict
+counts (417,623) and solve times (${\approx}$22\,s). Only \combacs
+produces a different formula (6683 clauses, 230,430 conflicts,
+11\,s). Investigating this, we found that CBMC's floating-point
+path---which produces the mantissa multiplication internally---does
+not propagate the alternative encoding flags (\verb|use_booth|,
+\verb|use_4bit_blocks|, \verb|use_sorting_network|) to the
+recursive call for mantissa multiplication. The flag
+\verb|use_comba_carry_save| \emph{is} propagated because it is
+also set by our adaptive heuristic at a higher level. The
+consequence is that for floating-point arithmetic all encodings
+except \combacs effectively fall back to the same shift-add
+multiplier. This is a concrete instance of a more general
+lesson: encoding experiments must verify that the flag actually
+reaches every multiplier instance in the compiled formula. Fixing
+the flag propagation is a small engineering change that we defer,
+but it means our FP results understate the differences among
+alternative encodings.
 
 \section{Evaluation}
 \label{sec:evaluation}
@@ -491,9 +603,13 @@ MiniSat-compatible API), \cryptominisat 5.11.21. We report median of
 noted, we use the g-only adder encoding (the new default; see
 Appendix~\ref{app:adders}).
 
-identities (commutativity, overflow, strength reduction: 15 benchmarks
+We evaluate on 36 verification problems in five categories: algebraic
+identities (commutativity, overflow, strength reduction: 15
+benchmarks), industrial workloads (MurmurHash3, Q15 DSP, keyed hash,
 division-by-constant: 6), matrix/MAC (trace, dot product
-commutativity: 4), division/FP (roundtrip, FP add/mul: 6), factoring
+commutativity: 4), division/FP (roundtrip, FP add/mul: 6), and
+factoring (SAT instances: 6). Where explicitly noted, we extend to
+44 benchmarks by adding eight DSP datapath verification problems.
 
 \subsection{Multiplier Encoding Comparison}
 
@@ -660,10 +776,12 @@ Category & Benchmark & shift & default & Speedup \\
 \end{table}
 
 The ``default'' column uses the adaptive \combacs heuristic,
-which selects popcount or shift-add per multiplication.
-increased from 606/1728 (baseline) to 1320/1728 ($+$714 benchmarks),
-where 1728 = 36 benchmarks $\times$ 4 multiplier encodings $\times$
-the total benchmark count is 44.
+which selects popcount or shift-add per multiplication. We also ran
+a wider configuration sweep: with \cbmc's smt2\_solver invoked on
+all 1728 = 36 benchmarks $\times$ 4 multiplier encodings $\times$ 3
+adder encodings $\times$ 4 SAT solvers, the solved count increased
+from 606/1728 (baseline) to 1320/1728 ($+$714 benchmarks) when
+enabling the adaptive \combacs and Gr\"obner pre-solver.
 The adaptive heuristic (Section~\ref{sec:combacs}) and pre-scan
 eliminate all regressions except hw\_equiv\_12, where a single
 \texttt{bvmul} is compared against a manually-constructed shift-add
@@ -763,57 +881,23 @@ variables (Appendix~\ref{app:adders}).
 
 \section{Related Work}
 
-\paragraph{Algebraic and polynomial methods.}
-Bryant~\cite{bryant1991complexity} showed that BDD-based multiplication
-verification requires exponential size. Clegg et
-al.~\cite{clegg1996groebner} proved that the Gr\"obner proof system
-can be exponentially more powerful than resolution, providing
-theoretical justification for why our algebraic solver outperforms
-resolution-based SAT solving on polynomial equation benchmarks.
-Biere, Kauers, and Ritirc~\cite{biere2017challenges} showed that
-gate polynomials and field polynomials of an arithmetic circuit form
-a Gr\"obner basis when variables follow reverse topological order,
-enabling column-wise verification of multipliers.
-Kaufmann~\cite{kaufmann2020thesis} extended this with SAT-based
-variable elimination to simplify the Gr\"obner basis before
-reduction, and showed that SAT proofs (DRUP) and algebraic proofs
-(PAC) are interconvertible---connecting the two proof systems that
-our layered approach uses separately. Kaufmann and
-Biere~\cite{kaufmann2021amulet} built on this in AMulet2, using XOR
-slicing to separate XOR-linear parts (full-adder sums, handled by
-Gaussian elimination over GF(2)) from nonlinear parts (carry
-generation, handled by Gr\"obner bases). A key difference is the
-coefficient domain: their approach works over $\mathbb{Q}$ with
-field polynomials $x^2 - x = 0$ to enforce boolean values, while
-ours works directly over $\mathbb{Z}_{2^d}$ where modular
-arithmetic is native---avoiding the exponential blowup from field
-polynomials at the cost of incompleteness for non-unit constants.
-Yu et al.~\cite{yu2016arithmetic} achieve linear-time verification
-of gate-level multipliers via function extraction (backward
-rewriting through gate polynomials), scaling to 512-bit designs.
-monomial problem (intermediate polynomial explosion from carry
-propagation) via reverse engineering of atomic arithmetic blocks.
-Our approach operates at the word level ($a \times b$ as a single
-polynomial), making it domain-agnostic but unable to exploit
-circuit-specific structure.
-over $\mathbb{Z}_{2^d}$ to solve the equational theory of
-bit-vectors algebraically. We build on their algebraic framework
-and extend it with BMC-specific techniques
-(the algebraic solver).
-
-$n = \mathrm{SF}(2^m)$, the least $k$ with $2^m | k!$). Their
-approach handles the case where $f - g \neq 0$ as a polynomial but
-vanishes as a function---e.g., $4x^2 + 4x \equiv 0 \pmod{8}$---which
-our Gr\"obner basis cannot detect (it only finds ideal membership in
-the polynomial ring). We confirmed this experimentally: on the image
-rejection benchmark from~\cite{shekhar2007equivalence} ($f : \mathbb{Z}_{2^{12}} \times
-\mathbb{Z}_{2^{8}} \to \mathbb{Z}_{2^{16}}$), our Gr\"obner basis
-times out while Bitwuzla solves it in 7\,ms via word-level
-brute-force evaluation. Their technique is complete for polynomial
-equivalence but does not handle non-polynomial operations (bitwise,
-shifts, inequalities). The two approaches are complementary: our
-Gr\"obner basis handles arbitrary polynomial systems with the
-completeness for the equivalence fragment.
+\paragraph{Algebraic verification (brief).}
+Bryant~\cite{bryant1991complexity} showed BDD-based multiplication
+verification requires exponential size. Biere, Kauers, and
+Ritirc~\cite{biere2017challenges}, Kaufmann~\cite{kaufmann2020thesis},
+Kaufmann and Biere~\cite{kaufmann2021amulet}, and
+Yu et al.~\cite{yu2016arithmetic} develop gate-level algebraic
+verification of multipliers using Gr\"obner bases or function
+extraction, typically over $\mathbb{Q}$ with field polynomials.
+Song et al.~\cite{song2024equational} apply strong Gr\"obner bases
+over $\mathbb{Z}_{2^d}$ to the equational theory of bit-vectors.
+Algebraic techniques scale well with bitwidth but are limited to
+universal queries over polynomial fragments; they are complementary
+to bit-blasting, which we treat in a companion paper.
+Clegg et al.~\cite{clegg1996groebner} proved the Gr\"obner proof
+system can be exponentially more powerful than resolution,
+providing theoretical justification for why algebraic approaches
+can outperform SAT solvers on polynomial equation benchmarks.
 
 \paragraph{Encoding and SAT techniques.}
 Dadda~\cite{dadda1965some} and Wallace~\cite{wallace1964suggestion}
@@ -823,24 +907,22 @@ Comba~\cite{comba1990exponentiation} proposed column-wise reduction.
 solving rather than hardware implementation.
 Howe et al.~\cite{howe2025subpolynomial} decompose univariate binary
 polynomials into subpolynomials by fixing input bits one at a time,
-exploiting the fact that coefficients are multiplied by powers of 2
-at each level and thus vanish rapidly. Combined with degree reduction
-compact bit-blasting encodings for polynomial evaluation. The
-technique is developed for univariate polynomials; extending it to
-multivariate polynomials (such as $a \times b$) yields the standard
-partial product structure, since fixing one bit of one operand
-produces a subpolynomial that still contains a full multiplication
-of the remaining bits.
+giving compact bit-blasting encodings for polynomial evaluation.
+Their technique is developed for univariate polynomials; extending
+it to multivariate polynomials (such as $a \times b$) yields
+structure close to the standard partial-product array.
 E\'en and Biere~\cite{een2005effective} introduced SatELite
 preprocessing with BVE. Biere et al.~\cite{biere2019cadical} extended
 this to inprocessing in \cadical. Our analysis
-(Section~\ref{sec:bve}) reveals that inprocessing BVE can be
+(Appendix~\ref{sec:bve}) reveals that inprocessing BVE can be
 counterproductive for specific encoding structures.
 Brain et al.~\cite{brain2016propagation} showed that PC encodings
 compose for adders but not multipliers.
 Brain~\cite{brain2021wrong} conjectured that a PC multiplier
 is exponential, and explored Toom-Cook polynomial interpolation as
-an alternative approximation strategy.
+an alternative approximation strategy. Martin Brain suggested the
+4-bit block encoding idea explored in Section~\ref{sec:alternative}
+in private communication; we implemented and evaluated it.
 Jia et al.~\cite{jia2023improving} improve bit-blasting for
 nonlinear integer arithmetic (QF\_NIA) with Greedy Addition (a
 Huffman-like ordering that minimizes auxiliary variables) and
@@ -862,16 +944,17 @@ adds variables that \emph{prevent} it.
 Encoding techniques for SAT have been studied
 extensively~\cite{tseitin1983complexity,plaisted1986structure}.
 
-\paragraph{Word-level solvers and complementary approaches.}
+\paragraph{Word-level solvers.}
 Niemetz et al.~\cite{niemetz2023bitwuzla} implement word-level
 normalization in Bitwuzla that avoids bit-blasting for algebraic
-\combacs: they handle pure polynomial equations without bit-blasting,
-while \combacs handles the general case including inequalities,
-bitwise operations, and overflow checks.
-Chukharev et al.~\cite{chukharev2025partitioning} show that
-circuit-structure-aware SAT partitioning can solve multiplier
-equivalence checking instances that are intractable for both
-approach.
+identities; cvc5 uses a similar rewriting infrastructure. These
+approaches are complementary to our encoding improvements: when
+word-level rewriting succeeds, bit-blasting is not needed; when it
+does not (bitwise operations, non-polynomial constraints), the
+encoding matters. Chukharev et al.~\cite{chukharev2025partitioning}
+show that circuit-structure-aware SAT partitioning can solve
+multiplier equivalence checking instances intractable for both
+standard SAT and algebraic methods, complementary to our approach.
 
 
 \section{Conclusion and Future Work}
@@ -880,12 +963,13 @@ We presented a proof-guided methodology for SAT encoding design:
 analyze DRAT proofs to identify structural bottlenecks, then redesign
 the encoding to eliminate them. This methodology produced \combacs
 (2.6--71$\times$ speedup on commutativity) and guided our evaluation
-of Booth radix-4 (17$\times$ on constant multiplication), 4-bit
+of Booth radix-4 (up to 17$\times$ on strength-reduction benchmarks),
+4-bit
 blocks, and sorting networks.
 
-Our analysis reveals that carry propagation---not circuit size---is
-the dominant hardness source, and that no single encoding dominates
-all problem classes. The optimal encoding depends on problem
+Our analysis reveals that carry propagation correlates strongly
+with SAT hardness, and that no single encoding dominates all
+problem classes. The optimal encoding depends on problem
 structure: commutativity benefits from congruence closure (\combacs),
 constant multiplication from fewer partial products (Booth), and
 circuit equivalence from structural matching (shift-add).

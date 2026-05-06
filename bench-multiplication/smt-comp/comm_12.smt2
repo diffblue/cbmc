@@ -1,0 +1,5 @@
+(set-logic QF_BV)
+(declare-fun a () (_ BitVec 12))
+(declare-fun b () (_ BitVec 12))
+(assert (not (= (bvmul a b) (bvmul b a))))
+(check-sat)
