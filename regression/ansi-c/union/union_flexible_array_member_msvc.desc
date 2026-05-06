@@ -1,0 +1,6 @@
+CORE
+union_flexible_array_member_msvc.c
+--i386-win32
+^EXIT=0$
+^SIGNAL=0$
+--
