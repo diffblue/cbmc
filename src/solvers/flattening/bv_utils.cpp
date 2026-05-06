@@ -3010,6 +3010,17 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
       bool use_popcount = !has_mul_output_operand && mul_count <= 2 &&
                           op0.size() <= 24 && op0.size() == first_mul_width;
 
+      // Ablation env vars for adaptive heuristic (Paper 1):
+      //   FORCE_COMBA_CS_POPCOUNT=1: always use popcount variant
+      //   FORCE_COMBA_CS_SHIFTADD=1: never use carry-save, fall through to shift-add
+      if(std::getenv("FORCE_COMBA_CS_POPCOUNT"))
+        use_popcount = true;
+      if(std::getenv("FORCE_COMBA_CS_SHIFTADD"))
+      {
+        use_popcount = false;
+        has_mul_output_operand = false;
+      }
+
       bvt result;
       if(use_popcount)
       {

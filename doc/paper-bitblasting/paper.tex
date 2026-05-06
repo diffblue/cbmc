@@ -399,6 +399,45 @@ results because the Gr\"obner basis solver
 polynomial benchmarks, and non-polynomial benchmarks in our suite
 have $\leq$2 multiplications.
 
+\paragraph{Ablation of the adaptive heuristic.}
+To validate the heuristic we ran three configurations on
+commutativity, associativity, and distributivity benchmarks, with
+the algebraic pre-solver disabled to isolate the encoding's effect:
+(i) the default adaptive choice, (ii) popcount always, and
+(iii) shift-add always (no carry-save at all). Table~\ref{tab:heuristic}
+shows the result.
+
+\begin{table}[ht]
+\caption{Adaptive heuristic ablation (algebraic layers disabled,
+  \cadical, seconds; T/O\,=\,120\,s).}
+\label{tab:heuristic}
+\centering
+\small
+\begin{tabular}{lrrr}
+\toprule
+Benchmark & adaptive & popcount always & shift-add always \\
+\midrule
+comm\_8 & \textbf{0.089} & 0.088 & 0.683 \\
+comm\_10 & \textbf{0.194} & 0.194 & 17.08 \\
+comm\_11 & \textbf{0.422} & 0.421 & 91.5 \\
+comm\_12 & \textbf{1.042} & 1.040 & T/O \\
+assoc\_8 & \textbf{26.89} & 26.72 & 26.74 \\
+distrib\_8 & \textbf{70.95} & 70.96 & 70.85 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Two observations. First, for the commutativity pattern
+(comm\_8--12, two symbolic multiplications of equal width)
+popcount is decisive: at BW=11 it is 217$\times$ faster than
+shift-add, and at BW=12 it avoids a timeout. Second, for
+three-multiplication problems (assoc\_8, distrib\_8), the
+three configurations perform identically---the adaptive heuristic
+correctly recognizes the pattern and falls back to shift-add
+accumulation. This confirms that the heuristic's gain is real on
+the targeted pattern and its cost on other patterns is essentially
+zero.
+
 DRAT proof analysis confirms the benefit of column independence:
 
 \begin{table}[ht]
