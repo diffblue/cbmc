@@ -1,0 +1,13 @@
+CORE
+deep-let.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+^\(error
+--
+Regression test for the iterative SMT2 parser. A deeply-nested chain of
+`(let ((xN xN-1)) ...)` of depth 3500 parses and solves without overflowing
+the default 8 MB C++ stack. The recursive parser that preceded this change
+segfaults on the same input.

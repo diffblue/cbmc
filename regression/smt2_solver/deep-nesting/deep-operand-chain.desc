@@ -1,0 +1,13 @@
+CORE
+deep-operand-chain.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+--
+^\(error
+--
+Regression test for the iterative SMT2 expression parser. A deeply right-
+associated operand chain `(bvand x (bvand x (bvand x ... x)))` of depth 5000
+is parsed and solved without overflowing the default 8 MB C++ stack. The
+recursive operand-collection path segfaults on the same input.
