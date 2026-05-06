@@ -953,26 +953,42 @@ Amulet verifies a specific multiplier implementation (the AIG
 circuit it is given) against the integer multiplication
 specification; we verify an SMT query involving one or more
 uninterpreted \texttt{bvmul} calls. The two use cases overlap when
-a verification problem can be phrased either way. A typical
-AIG multiplier at 16 bits is verified by Amulet in ${\sim}$0.5--2\,s
-(Kaufmann/Biere, TACAS 2021); our Gr\"obner-basis layer reports
-``polynomial identity'' on the corresponding SMT query $a \cdot b = b \cdot a$
-in $<$10\,ms regardless of bitwidth. But this is not apples-to-apples:
-Amulet handles circuit-structural details (signed/unsigned wire
-encoding, carry-lookahead structure) that our SMT-level approach
-abstracts away.
+a verification problem can be phrased either way.
+
+We ran Amulet2.1 (compiled from source, default configuration,
+300\,s timeout) on the four AIG multiplier benchmarks shipped with
+its artifact (\texttt{u\_4bp\_wt\_lf} at 128, 256, 512, 1024 bits;
+Booth partial-product generator, Wallace-tree accumulation,
+Ladner-Fischer final adder). Amulet times out on all four
+benchmarks within the 300\,s budget. These are the larger
+scalability benchmarks in the distribution; Amulet's own published
+evaluation~\cite{kaufmann2021amulet} uses 64-bit multipliers
+which verify in fractions of a second (${<}$1\,s per benchmark
+according to the artifact's timing data). At 64 bits the AIG
+structure is small enough that gate-level algebraic reasoning
+works well; at 128+ bits the field-polynomial approach accumulates
+symbolic overhead that the 300\,s budget cannot absorb.
+
+Our Gr\"obner-basis solver, at an equivalent-sized problem (SMT
+query $a \cdot b = b \cdot a$ at BW$=$256), reports the identity in
+$<$5\,ms (Table~\ref{tab:scaling}). The two numbers are not
+directly comparable: Amulet verifies a specific AIG
+implementation, while we verify the abstract identity $a \cdot b = b \cdot a$
+against itself, which our solver recognizes algebraically. Amulet
+would also handle this case in a few milliseconds at its natural
+64-bit scale; beyond that, the field-polynomial cost dominates.
 
 The difference in coefficient rings matters. Amulet uses
 $\mathbb{Q}$ with field polynomials $x^2 - x$, which makes every
 bit a field element but produces exponential polynomial blowup in
 the worst case. We use $\mathbb{Z}_{2^d}$ with no field polynomials,
 which avoids the blowup but loses field structure (division only
-works for odd elements). Paper 2's empirical finding is that on
+works for odd elements). This paper's empirical finding is that on
 arithmetic-identity queries the $\mathbb{Z}_{2^d}$ approach is
 dramatically faster because the unit-constant check terminates
 quickly; on gate-level circuit verification we expect Amulet to
-retain its advantage due to the completeness of its field-based
-reduction.
+retain its advantage at modest bitwidths due to the completeness
+of its field-based reduction.
 
 \subsection{Threats to Validity}
 

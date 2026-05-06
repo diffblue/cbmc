@@ -1,0 +1,6 @@
+benchmark	bitwidth	time	result
+u_4bp_wt_lf_128	128	300.074	T/O
+u_4bp_wt_lf_256	256	300.303	T/O
+u_4bp_wt_lf_512	512	301.160	T/O
+u_4bp_wt_lf_1024	1024	303.484	T/O
+AMULET_BENCH_DONE
