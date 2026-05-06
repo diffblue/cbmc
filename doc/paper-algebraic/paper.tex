@@ -370,7 +370,8 @@ To quantify the contribution of each layer we disabled layers
 sequentially and measured solved counts and running time on 12
 representative benchmarks (\cadical, 120\,s T/O). Results in
 Table~\ref{tab:ablation} use the same benchmark set and
-configurations as in the bit-blasting companion paper's ablation.
+configurations as in the bit-blasting companion
+paper's~\cite{companion-bitblasting} ablation.
 
 \begin{table}[ht]
 \caption{Layer ablation (\cadical, seconds; T/O\,=\,120\,s).
@@ -793,26 +794,33 @@ Configuration & Solved & PAR-2 (s/benchmark) \\
 \midrule
 shift-add (bit-blasting only) & 34/66 & 63.1 \\
 \cbmc default (algebraic + \combacs) & 33/66 & 63.5 \\
-cvc5 default & TBD/66 & TBD \\
+cvc5 default & \textbf{38/66} & \textbf{52.6} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-On the stratified sample the algebraic procedure is essentially
-neutral: default \cbmc solves 33 benchmarks while shift-add
-solves 34. Three benchmarks where default times out but shift-add
-succeeds are all \texttt{bvudiv}/\texttt{bvsdiv}-dominated: the
-algebraic layer's GCD-based division-by-constant rewriting expands
-the formula on these instances. Two further benchmarks are solved
-by default but not by shift-add (a rewrite-rule family and
-\texttt{brummayerbiere3\_isqrtadd}); on three more,
-default is ${\geq}$3$\times$ faster than shift-add (up to
-3226$\times$ on the rewrite-rule family). No benchmark in the
-sample is ${\geq}$3$\times$ slower with default than with
-shift-add. The honest reading: our technique is pattern-specific
-(commutativity, strength reduction, DSP patterns) and does not
-translate to a silver-bullet speedup on general QF\_BV community
-benchmarks, but it is also not a regression.
+On the stratified sample cvc5 solves the most benchmarks (38),
+followed by shift-add \cbmc (34) and default \cbmc (33) at
+essentially the same level. Three benchmarks where default
+\cbmc times out but shift-add succeeds are all
+\texttt{bvudiv}/\texttt{bvsdiv}-dominated: the algebraic layer's
+GCD-based division-by-constant rewriting expands the formula on
+these instances. Two further benchmarks are solved by default
+\cbmc but not by shift-add (a rewrite-rule family and
+\texttt{brummayerbiere3\_isqrtadd}); on three more, default is
+${\geq}$3$\times$ faster than shift-add (up to 3226$\times$ on the
+rewrite-rule family). No benchmark in the sample is
+${\geq}$3$\times$ slower with default than with shift-add.
+
+cvc5's advantage on this broader sample reflects its mature
+word-level rewriting and its NIA integer reasoning on queries
+that contain multiplication as part of a richer
+structure---strengths that our current implementation does not
+fully exploit. The honest reading: our algebraic technique is
+pattern-specific (commutativity, strength reduction, DSP
+patterns) and does not replace mature SMT solvers on general
+QF\_BV community benchmarks; it is a complementary fast path for
+arithmetic identities.
 
 \subsection{SMT-LIB Community Benchmarks (26 benchmarks)}
 \label{sec:eval-community}
@@ -932,7 +940,8 @@ algebraic layers add $<$4\,ms of overhead on benchmarks that do
 not exercise them.
 
 \textbf{Interaction with bit-blasting.} Paper 2 shares with the
-bit-blasting companion paper the observation that \cadical's
+bit-blasting companion paper~\cite{companion-bitblasting} the
+observation that \cadical's
 inprocessing BVE can be counterproductive for carry-save popcount
 encodings (4--140\% overhead in one subset of benchmarks). In
 practice the adaptive heuristic in the bit-blasting solver routes
@@ -1047,7 +1056,7 @@ commutativity~\cite{buss1995bounded}, a fact we rely on implicitly:
 our algebraic procedure can be viewed as constructing such a proof.
 Whether resolution also has polynomial proofs of these identities
 is open~\cite{biere2017challenges}; the bit-blasting companion
-paper provides empirical evidence that it does not (integer
+paper~\cite{companion-bitblasting} provides empirical evidence that it does not (integer
 commutativity is $1000\times$ harder than GF(2) in CDCL).
 
 
