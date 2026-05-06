@@ -1,0 +1,47 @@
+encoding	benchmark	time	result	proof_bytes	vars	clauses	conflicts
+# missing: comm_9
+shift-add	comm_11	60.004	T/O	102248448	477	1883	-
+dadda	comm_11	3.089	unsat	6618346	497	1943	95684
+comba	comm_11	1.343	unsat	3609559	1023	3811	56851
+comba-cs	comm_11	.442	unsat	1655346	859	3349	19931
+booth	comm_11	60.003	T/O	94740480	759	2787	-
+block4	comm_11	.254	unsat	832621	799	3035	13879
+sortnet	comm_11	15.272	unsat	23194889	8891	26945	156500
+shift-add	comm_13	60.003	T/O	124485632	667	2665	-
+dadda	comm_13	60.004	T/O	100966400	691	2737	-
+comba	comm_13	5.245	unsat	13329870	1457	5459	167131
+comba-cs	comm_13	1.090	unsat	3259230	1207	4759	39190
+booth	comm_13	60.003	T/O	117604352	1041	3857	-
+block4	comm_13	1.617	unsat	4404895	1187	4533	60151
+sortnet	comm_13	48.771	unsat	75901588	14751	44653	441327
+shift-add	strength_chain_16	1.195	unsat	3341764	714	2910	39757
+dadda	strength_chain_16	.747	unsat	1864543	756	3036	29188
+comba	strength_chain_16	1.558	unsat	4652265	1510	5741	46923
+comba-cs	strength_chain_16	1.567	unsat	5035769	714	2906	43804
+booth	strength_chain_16	.068	unsat	277696	496	1780	4071
+block4	strength_chain_16	.434	unsat	2115706	983	3842	18590
+sortnet	strength_chain_16	6.855	unsat	8181811	13316	40462	34985
+shift-add	strength_16_31	.115	unsat	255977	243	1024	6260
+dadda	strength_16_31	.079	unsat	180415	258	1069	4941
+comba	strength_16_31	.134	unsat	317995	550	2111	6254
+comba-cs	strength_16_31	.083	unsat	174007	243	1020	4885
+booth	strength_16_31	.013	unsat	12206	158	578	386
+block4	strength_16_31	.064	unsat	129753	339	1356	3919
+sortnet	strength_16_31	.634	unsat	928318	4889	14862	6409
+shift-add	mul_ineq_12	.554	unsat	1439839	2876	11717	16899
+dadda	mul_ineq_12	.441	unsat	1380903	2944	11921	12680
+comba	mul_ineq_12	.521	unsat	1671093	6302	23845	12355
+comba-cs	mul_ineq_12	.553	unsat	1439839	2876	11717	16899
+booth	mul_ineq_12	1.595	unsat	3631425	4268	16105	43819
+block4	mul_ineq_12	.536	unsat	1668424	4206	16377	14717
+sortnet	mul_ineq_12	2.564	unsat	8044801	105532	318453	10043
+shift-add	overflow_detect_16	.368	unsat	1497111	1542	6230	16618
+dadda	overflow_detect_16	.191	unsat	700968	1587	6366	6559
+comba	overflow_detect_16	.781	unsat	2421871	3426	12873	20233
+comba-cs	overflow_detect_16	.371	unsat	1497111	1542	6230	16618
+booth	overflow_detect_16	.106	unsat	441470	2280	8715	3603
+block4	overflow_detect_16	.498	unsat	1682358	2126	8223	15684
+sortnet	overflow_detect_16	.275	unsat	294085	51930	156722	0
+# missing: dot_product_8
+# missing: mat_trace_small
+PROOF_SWEEP_DONE

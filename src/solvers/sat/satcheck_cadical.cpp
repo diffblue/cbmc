@@ -191,6 +191,16 @@ propt::resultt satcheck_cadical_baset::do_prop_solve(const bvt &assumptions)
     pending_xors.clear();
   }
 
+  // Optional DIMACS dump via env var (for Paper 1 external solver comparison)
+  if(const char *dimacs_path = std::getenv("CBMC_DIMACS_FILE"))
+  {
+    solver->write_dimacs(dimacs_path);
+    // Exit immediately without solving
+    log.status() << "DIMACS written to " << dimacs_path << messaget::eom;
+    status = statust::UNSAT;
+    return resultt::P_UNSATISFIABLE;
+  }
+
   switch(solver->solve())
   {
   case 10:
@@ -282,6 +292,11 @@ satcheck_cadical_baset::satcheck_cadical_baset(
       else
         break;
     }
+  }
+  // Optional proof tracing via env var (for Paper 1 analysis)
+  if(const char *proof_path = std::getenv("CBMC_PROOF_FILE"))
+  {
+    solver->trace_proof(proof_path);
   }
   // Phase will be set via set_phase() before solving
 }

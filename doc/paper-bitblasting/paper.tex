@@ -297,6 +297,29 @@ system closes the full proof-to-encoding cycle. We view our manual
 use of the methodology as preliminary evidence that the cycle is
 tractable; automating it is future work.
 
+\paragraph{Development effort.}
+The \combacs encoding, the six alternative encodings compared in
+Section~\ref{sec:alternative}, the adaptive heuristic, and the
+supporting DRAT analysis infrastructure were developed and
+evaluated over ${\sim}$23 active working days with AI-assisted
+pair programming (Amazon's Kiro agent;
+${\sim}$200 commits, ${\sim}$8,900 lines of C++ added, across
+38 source files). The agent handled routine tasks---implementing
+variants of an encoding given a clear specification, writing
+benchmark-runner scripts, producing tabular results, drafting
+prose---quickly. Human judgment was decisive for:
+(i)~formulating the structural hypothesis behind \combacs (why the
+top-variable concentration in standard Comba implies a carry-save
+second pass would help); (ii)~recognizing that the adaptive
+heuristic should disable popcount globally when multiplication
+count exceeds 2, because carry-save variables block BVE cascading;
+(iii)~honest scoping in the writeup (e.g., distinguishing
+proof-guided \emph{design} from proof-guided \emph{analysis}, or
+reporting that Booth is faster on strength-reduction but slower on
+pure constant commutativity). We report these figures not as a
+contribution but as a data point for future methodological studies
+of AI-assisted encoding design.
+
 \section{Carry-Save Comba Encoding}
 \label{sec:combacs}
 
@@ -823,6 +846,61 @@ encoding dominates. Third, the spread between best and worst
 encoding on a single benchmark ranges from ${\sim}$10\% (div\_mul)
 to ${\sim}$17$\times$ (strength\_chain), so the encoding choice
 can be decisive even when all encodings terminate.
+
+\subsection{Proof Size Across Encodings}
+\label{sec:proof-sizes}
+
+DRAT proof size gives an encoding-independent measure of solver
+effort. We collected proofs (CaDiCaL, algebraic layers disabled)
+for all seven encodings on six benchmarks spanning each pattern.
+
+\begin{table}[ht]
+\caption{DRAT proof sizes in KB across encodings (algebraic layers
+  disabled, \cadical). Best (smallest) per row in bold.}
+\label{tab:proof-sizes}
+\centering
+\small
+\begin{tabular}{lrrrrrrr}
+\toprule
+Benchmark & shift-add & Dadda & Comba & \combacs & Booth & block4 & sortnet \\
+\midrule
+comm\_11 & 99,852 & 6,463 & 3,525 & 1,617 & 92,520 & \textbf{813} & 22,651 \\
+comm\_13 & 121,568 & 98,600 & 13,017 & \textbf{3,183} & 114,848 & 4,302 & 74,123 \\
+mul\_ineq\_12 & 1,406 & \textbf{1,349} & 1,632 & 1,406 & 3,546 & 1,629 & 7,856 \\
+overflow\_detect\_16 & 1,462 & 685 & 2,365 & 1,462 & 431 & 1,643 & \textbf{287} \\
+strength\_16\_31 & 250 & 176 & 311 & 170 & \textbf{12} & 127 & 907 \\
+strength\_chain\_16 & 3,263 & 1,821 & 4,543 & 4,918 & \textbf{271} & 2,066 & 7,990 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The proof sizes confirm and extend the timing observations:
+
+\textbf{\combacs} compresses commutativity proofs by 40--60$\times$
+relative to shift-add. On comm\_11 the proof shrinks from 99.8 MB
+to 1.6 MB.
+
+\textbf{Booth} compresses strength-reduction proofs by 12--20$\times$
+(strength\_chain\_16: 3.3 MB $\to$ 271 KB; strength\_16\_31:
+250 KB $\to$ 12 KB) and on overflow\_detect\_16 by 3$\times$, but
+makes no progress on inequality or general commutativity.
+
+\textbf{block4} achieves the smallest proof on comm\_11 (813 KB,
+120$\times$ smaller than shift-add); it is competitive on
+comm\_13 and on mul\_ineq\_12.
+
+\textbf{sortnet} produces the largest proofs on every benchmark
+except overflow\_detect\_16 (where its fixed-variable injection
+from sorted-property constraints lets the solver short-circuit);
+this aligns with the solver-time results and confirms sortnet
+generally hurts.
+
+The proof-size ratios track the solver-time ratios closely but are
+insensitive to wall-clock measurement noise, making them the more
+reliable comparison statistic. All claims in this paper could be
+restated in terms of proof sizes with the same conclusions.
+
+\subsection{Multiplier Encoding Comparison}
 
 \subsection{Scaling}
 

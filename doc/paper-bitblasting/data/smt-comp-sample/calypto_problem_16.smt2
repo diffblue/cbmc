@@ -1,0 +1,23 @@
+(set-info :smt-lib-version 2.6)
+(set-logic QF_BV)
+(set-info :source |
+    Sequential equivalence checking.
+    Calypto Design Systems, Inc. <www.calypto.com>
+  |)
+(set-info :category "industrial")
+(set-info :status unsat)
+(declare-fun P_2 () (_ BitVec 1))
+(declare-fun P_3 () (_ BitVec 1))
+(declare-fun P_4 () (_ BitVec 1))
+(declare-fun P_5 () (_ BitVec 1))
+(declare-fun P_6 () (_ BitVec 32))
+(declare-fun P_7 () (_ BitVec 32))
+(declare-fun P_8 () (_ BitVec 32))
+(declare-fun P_9 () (_ BitVec 32))
+(declare-fun P_10 () (_ BitVec 32))
+(declare-fun P_11 () (_ BitVec 32))
+(declare-fun P_12 () (_ BitVec 32))
+(declare-fun P_13 () (_ BitVec 32))
+(assert (let ((?v_7 ((_ extract 31 16) P_6)) (?v_16 ((_ extract 31 16) P_7)) (?v_3 (= (_ bv1 1) P_5)) (?v_6 ((_ extract 31 16) P_8)) (?v_15 ((_ extract 31 16) P_9)) (?v_2 (= (_ bv1 1) P_4)) (?v_5 ((_ extract 31 16) P_10)) (?v_14 ((_ extract 31 16) P_11)) (?v_1 (= (_ bv1 1) P_3)) (?v_4 ((_ extract 31 16) P_12)) (?v_13 ((_ extract 31 16) P_13)) (?v_0 (= (_ bv1 1) P_2))) (let ((?v_8 (ite ?v_0 (_ bv3 2) (ite ?v_1 (_ bv3 2) (ite ?v_2 (_ bv3 2) (ite ?v_3 (_ bv3 2) (_ bv0 2)))))) (?v_10 (ite ?v_0 ?v_4 (ite ?v_1 ?v_5 (ite ?v_2 ?v_6 (ite ?v_3 ?v_7 (_ bv0 16))))))) (let ((?v_11 (concat (_ bv0 1) ?v_10)) (?v_9 ((_ sign_extend 1) ?v_10)) (?v_19 (= (_ bv1 2) ?v_8)) (?v_17 (= (_ bv2 2) ?v_8)) (?v_12 (= (_ bv3 2) ?v_8)) (?v_18 (ite ?v_0 ?v_13 (ite ?v_1 ?v_14 (ite ?v_2 ?v_15 (ite ?v_3 ?v_16 (_ bv0 16))))))) (let ((?v_21 (concat (_ bv0 1) ?v_18)) (?v_20 ((_ sign_extend 1) ?v_18))) (not (= (ite ?v_0 (bvmul ((_ sign_extend 16) ?v_4) ((_ sign_extend 16) ?v_13)) (ite ?v_1 (bvmul ((_ sign_extend 16) ?v_5) ((_ sign_extend 16) ?v_14)) (ite ?v_2 (bvmul ((_ sign_extend 16) ?v_6) ((_ sign_extend 16) ?v_15)) (ite ?v_3 (bvmul ((_ sign_extend 16) ?v_7) ((_ sign_extend 16) ?v_16)) (_ bv0 32))))) (bvmul ((_ sign_extend 15) (ite ?v_12 ?v_9 (ite ?v_17 ?v_9 (ite ?v_19 ?v_11 ?v_11)))) ((_ sign_extend 15) (ite ?v_12 ?v_20 (ite ?v_17 ?v_21 (ite ?v_19 ?v_20 ?v_21))))))))))))
+(check-sat)
+(exit)
