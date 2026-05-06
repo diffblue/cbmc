@@ -1,0 +1,264 @@
+\begin{thebibliography}{33}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\href}[2]{#2}
+\providecommand{\path}[1]{#1}
+\providecommand{\DOIprefix}{doi:}
+\providecommand{\ArXivprefix}{arXiv:}
+\providecommand{\URLprefix}{URL: }
+\providecommand{\Pubmedprefix}{pmid:}
+\providecommand{\doi}[1]{\href{http://dx.doi.org/#1}{\path{#1}}}
+\providecommand{\Pubmed}[1]{\href{pmid:#1}{\path{#1}}}
+\providecommand{\bibinfo}[2]{#2}
+\ifx\xfnm\relax \def\xfnm[#1]{\unskip,\space#1}\fi
+%Type = Inproceedings
+\bibitem[{Biere(2020)}]{biere2019cadical}
+\bibinfo{author}{A.~Biere},
+\newblock \bibinfo{title}{{CaDiCaL}, {Kissat}, {Paracooba}, {Plingeling} and
+  {Treengeling} entering the {SAT Competition} 2020},
+\newblock in: \bibinfo{booktitle}{Proc.\ SAT Competition 2020},
+  \bibinfo{year}{2020}, pp. \bibinfo{pages}{51--53}.
+%Type = Inproceedings
+\bibitem[{Biere et~al.(1999)Biere, Cimatti, Clarke, and
+  Zhu}]{biere1999symbolic}
+\bibinfo{author}{A.~Biere}, \bibinfo{author}{A.~Cimatti},
+  \bibinfo{author}{E.~M. Clarke}, \bibinfo{author}{Y.~Zhu},
+\newblock \bibinfo{title}{Symbolic model checking without {BDDs}},
+\newblock in: \bibinfo{booktitle}{TACAS}, \bibinfo{year}{1999}, pp.
+  \bibinfo{pages}{193--207}. \DOIprefix\doi{10.1007/3-540-49059-0_14}.
+%Type = Inproceedings
+\bibitem[{J{\"a}rvisalo et~al.(2012)J{\"a}rvisalo, Heule, and
+  Biere}]{jarvisalo2012inprocessing}
+\bibinfo{author}{M.~J{\"a}rvisalo}, \bibinfo{author}{M.~J.~H. Heule},
+  \bibinfo{author}{A.~Biere},
+\newblock \bibinfo{title}{Inprocessing rules},
+\newblock in: \bibinfo{booktitle}{IJCAR}, \bibinfo{year}{2012}, pp.
+  \bibinfo{pages}{355--370}. \DOIprefix\doi{10.1007/978-3-642-31365-3_28}.
+%Type = Inproceedings
+\bibitem[{E{\'e}n and Biere(2005)}]{een2005effective}
+\bibinfo{author}{N.~E{\'e}n}, \bibinfo{author}{A.~Biere},
+\newblock \bibinfo{title}{Effective preprocessing in {SAT} through variable and
+  clause elimination},
+\newblock in: \bibinfo{booktitle}{SAT}, \bibinfo{year}{2005}, pp.
+  \bibinfo{pages}{61--75}. \DOIprefix\doi{10.1007/11499107_5}.
+%Type = Article
+\bibitem[{Bryant(1991)}]{bryant1991complexity}
+\bibinfo{author}{R.~E. Bryant},
+\newblock \bibinfo{title}{On the complexity of {VLSI} implementations and graph
+  representations of {Boolean} functions with application to integer
+  multiplication},
+\newblock \bibinfo{journal}{IEEE Trans. Computers} \bibinfo{volume}{40}
+  (\bibinfo{year}{1991}) \bibinfo{pages}{205--213}.
+  \DOIprefix\doi{10.1109/12.73590}.
+%Type = Inproceedings
+\bibitem[{Brain et~al.(2016)Brain, Hadarean, Kroening, and
+  Martins}]{brain2016propagation}
+\bibinfo{author}{M.~Brain}, \bibinfo{author}{L.~Hadarean},
+  \bibinfo{author}{D.~Kroening}, \bibinfo{author}{R.~Martins},
+\newblock \bibinfo{title}{Automatic generation of propagation complete {SAT}
+  encodings},
+\newblock in: \bibinfo{booktitle}{VMCAI}, \bibinfo{year}{2016}, pp.
+  \bibinfo{pages}{536--556}. \DOIprefix\doi{10.1007/978-3-662-49122-5_26}.
+%Type = Inproceedings
+\bibitem[{Brain(2021)}]{brain2021wrong}
+\bibinfo{author}{M.~Brain},
+\newblock \bibinfo{title}{Further steps down the wrong path: Improving the
+  bit-blasting of multiplication},
+\newblock in: \bibinfo{booktitle}{SMT Workshop}, \bibinfo{year}{2021}, pp.
+  \bibinfo{pages}{23--31}. \URLprefix \url{https://ceur-ws.org/Vol-2908/}.
+%Type = Article
+\bibitem[{Dadda(1965)}]{dadda1965some}
+\bibinfo{author}{L.~Dadda},
+\newblock \bibinfo{title}{Some schemes for parallel multipliers},
+\newblock \bibinfo{journal}{Alta Frequenza} \bibinfo{volume}{34}
+  (\bibinfo{year}{1965}) \bibinfo{pages}{349--356}.
+%Type = Article
+\bibitem[{Comba(1990)}]{comba1990exponentiation}
+\bibinfo{author}{P.~G. Comba},
+\newblock \bibinfo{title}{Exponentiation cryptosystems on the {IBM PC}},
+\newblock \bibinfo{journal}{IBM Systems Journal} \bibinfo{volume}{29}
+  (\bibinfo{year}{1990}) \bibinfo{pages}{526--538}.
+  \DOIprefix\doi{10.1147/sj.294.0526}.
+%Type = Book
+\bibitem[{Warren(2012)}]{warren2012hackers}
+\bibinfo{author}{H.~S. Warren}, \bibinfo{title}{Hacker's Delight},
+  \bibinfo{edition}{2nd} ed., \bibinfo{publisher}{Addison-Wesley},
+  \bibinfo{year}{2012}.
+%Type = Article
+\bibitem[{Haken(1985)}]{haken1985intractability}
+\bibinfo{author}{A.~Haken},
+\newblock \bibinfo{title}{The intractability of resolution},
+\newblock \bibinfo{journal}{Theoretical Computer Science} \bibinfo{volume}{39}
+  (\bibinfo{year}{1985}) \bibinfo{pages}{297--308}.
+  \DOIprefix\doi{10.1016/0304-3975(85)90144-6}.
+%Type = Inproceedings
+\bibitem[{Lv and Kalla(2012)}]{lv2012galois}
+\bibinfo{author}{J.~Lv}, \bibinfo{author}{P.~Kalla},
+\newblock \bibinfo{title}{Formal verification of {Galois} field multipliers
+  using computer algebra},
+\newblock in: \bibinfo{booktitle}{VLSI Design}, \bibinfo{year}{2012}.
+  \DOIprefix\doi{10.1109/VLSID.2012.74}.
+%Type = Article
+\bibitem[{Booth(1951)}]{booth1951signed}
+\bibinfo{author}{A.~D. Booth},
+\newblock \bibinfo{title}{A signed binary multiplication technique},
+\newblock \bibinfo{journal}{The Quarterly Journal of Mechanics and Applied
+  Mathematics} \bibinfo{volume}{4} (\bibinfo{year}{1951})
+  \bibinfo{pages}{236--240}. \DOIprefix\doi{10.1093/qjmam/4.2.236}.
+%Type = Article
+\bibitem[{Karatsuba and Ofman(1962)}]{karatsuba1962multiplication}
+\bibinfo{author}{A.~Karatsuba}, \bibinfo{author}{Y.~Ofman},
+\newblock \bibinfo{title}{Multiplication of multidigit numbers on automata},
+\newblock \bibinfo{journal}{Soviet Physics Doklady} \bibinfo{volume}{7}
+  (\bibinfo{year}{1962}) \bibinfo{pages}{595--596}.
+%Type = Article
+\bibitem[{Toom(1963)}]{toom1963complexity}
+\bibinfo{author}{A.~L. Toom},
+\newblock \bibinfo{title}{The complexity of a scheme of functional elements
+  realizing the multiplication of integers},
+\newblock \bibinfo{journal}{Soviet Mathematics Doklady} \bibinfo{volume}{3}
+  (\bibinfo{year}{1963}) \bibinfo{pages}{714--716}.
+%Type = Article
+\bibitem[{Sch{\"o}nhage and Strassen(1971)}]{schonhage1971schnelle}
+\bibinfo{author}{A.~Sch{\"o}nhage}, \bibinfo{author}{V.~Strassen},
+\newblock \bibinfo{title}{Schnelle {Multiplikation} gro{\ss}er {Zahlen}},
+\newblock \bibinfo{journal}{Computing} \bibinfo{volume}{7}
+  (\bibinfo{year}{1971}) \bibinfo{pages}{281--292}.
+  \DOIprefix\doi{10.1007/BF02242355}.
+%Type = Inproceedings
+\bibitem[{Audemard and Simon(2009)}]{audemard2009predicting}
+\bibinfo{author}{G.~Audemard}, \bibinfo{author}{L.~Simon},
+\newblock \bibinfo{title}{Predicting learnt clauses quality in modern {SAT}
+  solvers},
+\newblock in: \bibinfo{booktitle}{IJCAI}, \bibinfo{year}{2009}, pp.
+  \bibinfo{pages}{399--404}.
+%Type = Inproceedings
+\bibitem[{Clegg et~al.(1996)Clegg, Edmonds, and
+  Impagliazzo}]{clegg1996groebner}
+\bibinfo{author}{M.~Clegg}, \bibinfo{author}{J.~Edmonds},
+  \bibinfo{author}{R.~Impagliazzo},
+\newblock \bibinfo{title}{Using the {Groebner} basis algorithm to find proofs
+  of unsatisfiability},
+\newblock in: \bibinfo{booktitle}{STOC}, \bibinfo{year}{1996}, pp.
+  \bibinfo{pages}{174--183}. \DOIprefix\doi{10.1145/237814.237860}.
+%Type = Inproceedings
+\bibitem[{Biere et~al.(2017)Biere, Kauers, and Ritirc}]{biere2017challenges}
+\bibinfo{author}{A.~Biere}, \bibinfo{author}{M.~Kauers},
+  \bibinfo{author}{D.~Ritirc},
+\newblock \bibinfo{title}{Challenges in verifying arithmetic circuits using
+  computer algebra},
+\newblock in: \bibinfo{booktitle}{SYNASC}, \bibinfo{year}{2017}, pp.
+  \bibinfo{pages}{1--8}. \DOIprefix\doi{10.1109/SYNASC.2017.00009}.
+%Type = Phdthesis
+\bibitem[{Kaufmann(2020)}]{kaufmann2020thesis}
+\bibinfo{author}{D.~Kaufmann}, \bibinfo{title}{Formal Verification of
+  Multiplier Circuits using Computer Algebra}, Ph.D. thesis, Johannes Kepler
+  University Linz, \bibinfo{year}{2020}.
+%Type = Inproceedings
+\bibitem[{Kaufmann and Biere(2021)}]{kaufmann2021amulet}
+\bibinfo{author}{D.~Kaufmann}, \bibinfo{author}{A.~Biere},
+\newblock \bibinfo{title}{{AMulet} 2.0 for verifying multiplier circuits},
+\newblock in: \bibinfo{booktitle}{TACAS}, \bibinfo{year}{2021}, pp.
+  \bibinfo{pages}{357--364}. \DOIprefix\doi{10.1007/978-3-030-72013-1_19}.
+%Type = Article
+\bibitem[{Yu et~al.(2016)Yu, Brown, Liu, Rossi, and
+  Ciesielski}]{yu2016arithmetic}
+\bibinfo{author}{C.~Yu}, \bibinfo{author}{W.~Brown}, \bibinfo{author}{D.~Liu},
+  \bibinfo{author}{A.~Rossi}, \bibinfo{author}{M.~Ciesielski},
+\newblock \bibinfo{title}{Formal verification of arithmetic circuits by
+  function extraction},
+\newblock \bibinfo{journal}{IEEE Trans. CAD} \bibinfo{volume}{35}
+  (\bibinfo{year}{2016}) \bibinfo{pages}{2131--2142}.
+  \DOIprefix\doi{10.1109/TCAD.2016.2547898}.
+%Type = Article
+\bibitem[{Shekhar et~al.(2007)Shekhar, Kalla, and
+  Enescu}]{shekhar2007equivalence}
+\bibinfo{author}{N.~Shekhar}, \bibinfo{author}{P.~Kalla},
+  \bibinfo{author}{F.~Enescu},
+\newblock \bibinfo{title}{Equivalence verification of polynomial datapaths
+  using ideal membership testing},
+\newblock \bibinfo{journal}{IEEE Transactions on Computer-Aided Design of
+  Integrated Circuits and Systems} \bibinfo{volume}{26} (\bibinfo{year}{2007})
+  \bibinfo{pages}{1320--1330}. \DOIprefix\doi{10.1109/TCAD.2006.888277}.
+%Type = Article
+\bibitem[{Wallace(1964)}]{wallace1964suggestion}
+\bibinfo{author}{C.~S. Wallace},
+\newblock \bibinfo{title}{A suggestion for a fast multiplier},
+\newblock \bibinfo{journal}{IEEE Trans. Electronic Computers}
+  \bibinfo{volume}{EC-13} (\bibinfo{year}{1964}) \bibinfo{pages}{14--17}.
+  \DOIprefix\doi{10.1109/PGEC.1964.263830}.
+%Type = Inproceedings
+\bibitem[{Howe et~al.(2025)Howe, Brain, and
+  G{\`a}mez-Montolio}]{howe2025subpolynomial}
+\bibinfo{author}{J.~M. Howe}, \bibinfo{author}{M.~Brain},
+  \bibinfo{author}{A.~G{\`a}mez-Montolio},
+\newblock \bibinfo{title}{Evaluating binary polynomials using subpolynomials},
+\newblock in: \bibinfo{booktitle}{Proceedings of the 23rd International
+  Workshop on Satisfiability Modulo Theories (SMT)}, volume
+  \bibinfo{volume}{4008} of \textit{\bibinfo{series}{CEUR Workshop
+  Proceedings}}, \bibinfo{publisher}{CEUR-WS.org}, \bibinfo{year}{2025}, pp.
+  \bibinfo{pages}{3--15}.
+%Type = Inproceedings
+\bibitem[{Jia et~al.(2023)Jia, Han, Huang, Liu, Ma, and
+  Zhang}]{jia2023improving}
+\bibinfo{author}{F.~Jia}, \bibinfo{author}{R.~Han}, \bibinfo{author}{P.~Huang},
+  \bibinfo{author}{M.~Liu}, \bibinfo{author}{F.~Ma},
+  \bibinfo{author}{J.~Zhang},
+\newblock \bibinfo{title}{Improving bit-blasting for nonlinear integer
+  constraints},
+\newblock in: \bibinfo{booktitle}{ISSTA}, \bibinfo{year}{2023}, pp.
+  \bibinfo{pages}{1230--1241}. \DOIprefix\doi{10.1145/3597926.3598034}.
+%Type = Inproceedings
+\bibitem[{Fazekas et~al.(2025)Fazekas, Pollitt, Fleury, and
+  Biere}]{fazekas2025incremental}
+\bibinfo{author}{K.~Fazekas}, \bibinfo{author}{F.~Pollitt},
+  \bibinfo{author}{M.~Fleury}, \bibinfo{author}{A.~Biere},
+\newblock \bibinfo{title}{Incremental inprocessing rules beyond resolution},
+\newblock in: \bibinfo{booktitle}{Pragmatics of SAT}, \bibinfo{year}{2025}.
+%Type = Inproceedings
+\bibitem[{Tseitin(1983)}]{tseitin1983complexity}
+\bibinfo{author}{G.~S. Tseitin},
+\newblock \bibinfo{title}{On the complexity of derivation in propositional
+  calculus},
+\newblock in: \bibinfo{booktitle}{Automation of Reasoning},
+  \bibinfo{year}{1983}, pp. \bibinfo{pages}{466--483}.
+  \DOIprefix\doi{10.1007/978-3-642-81955-1_28}.
+%Type = Article
+\bibitem[{Plaisted and Greenbaum(1986)}]{plaisted1986structure}
+\bibinfo{author}{D.~A. Plaisted}, \bibinfo{author}{S.~Greenbaum},
+\newblock \bibinfo{title}{A structure-preserving clause form translation},
+\newblock \bibinfo{journal}{J. Symbolic Computation} \bibinfo{volume}{2}
+  (\bibinfo{year}{1986}) \bibinfo{pages}{293--304}.
+  \DOIprefix\doi{10.1016/S0747-7171(86)80028-1}.
+%Type = Inproceedings
+\bibitem[{Niemetz and Preiner(2023)}]{niemetz2023bitwuzla}
+\bibinfo{author}{A.~Niemetz}, \bibinfo{author}{M.~Preiner},
+\newblock \bibinfo{title}{Bitwuzla},
+\newblock in: \bibinfo{booktitle}{CAV}, \bibinfo{year}{2023}, pp.
+  \bibinfo{pages}{3--17}. \DOIprefix\doi{10.1007/978-3-031-37703-7_1}.
+%Type = Article
+\bibitem[{Chukharev et~al.(2025)Chukharev, Gribanova, Ivanov, Kochemazov,
+  Kondratiev, and Semenov}]{chukharev2025partitioning}
+\bibinfo{author}{K.~Chukharev}, \bibinfo{author}{I.~Gribanova},
+  \bibinfo{author}{D.~Ivanov}, \bibinfo{author}{S.~Kochemazov},
+  \bibinfo{author}{V.~Kondratiev}, \bibinfo{author}{A.~Semenov},
+\newblock \bibinfo{title}{Effective partitioning method with predictable
+  hardness for {CircuitSAT}},
+\newblock \bibinfo{journal}{IEEE Access} \bibinfo{volume}{13}
+  (\bibinfo{year}{2025}). \DOIprefix\doi{10.1109/ACCESS.2025.3527819}.
+%Type = Article
+\bibitem[{Brent and Kung(1982)}]{brent1982regular}
+\bibinfo{author}{R.~P. Brent}, \bibinfo{author}{H.-T. Kung},
+\newblock \bibinfo{title}{A regular layout for parallel adders},
+\newblock \bibinfo{journal}{IEEE Trans. Computers} \bibinfo{volume}{C-31}
+  (\bibinfo{year}{1982}) \bibinfo{pages}{260--264}.
+  \DOIprefix\doi{10.1109/TC.1982.1675982}.
+%Type = Inproceedings
+\bibitem[{Elffers and Nordstr{\"o}m(2018)}]{elffers2018trade}
+\bibinfo{author}{J.~Elffers}, \bibinfo{author}{J.~Nordstr{\"o}m},
+\newblock \bibinfo{title}{Trade-offs between time and memory in a tighter model
+  of {CDCL} {SAT} solvers},
+\newblock in: \bibinfo{booktitle}{SAT}, \bibinfo{year}{2018}, pp.
+  \bibinfo{pages}{160--176}. \DOIprefix\doi{10.1007/978-3-319-94144-8_10}.
+
+\end{thebibliography}
