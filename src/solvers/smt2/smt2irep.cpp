@@ -25,7 +25,7 @@ public:
   std::optional<irept> operator()();
 
 protected:
-  smt2_tokenizert tokenizer;
+  smt2_tokenizert &tokenizer;
 };
 
 std::optional<irept> smt2irept::operator()()
