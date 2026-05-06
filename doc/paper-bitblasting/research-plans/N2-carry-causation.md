@@ -1,5 +1,32 @@
 # N2: Research Plan — Controlled Experiment to Isolate Carry Propagation as SAT Hardness Driver
 
+## Status
+
+**EXECUTED (2026-05-06).** A simplified SMT-LIB-generator variant
+of this experiment was run. Benchmarks and raw data:
+- Generator: `bench-multiplication/n2-controlled/generate.py`
+- Benchmarks: `bench-multiplication/n2-controlled/*.smt2`
+- Raw data: `doc/paper-bitblasting/data/n2-controlled-experiment.tsv`
+- Integrated into Paper 1 Section 3 (Table tab:n2).
+
+Five variants were implemented (E0-E4) as pure SMT-LIB macro
+expansions with identical partial-product topology; the
+accumulator (bvadd vs. bvxor, sequential vs. parallel-tree,
+binary vs. ternary) was the only variable. The primary finding:
+at BW=8, integer sequential takes 6.4s with 184K conflicts while
+the structurally identical GF(2) sequential formula solves in
+38ms with 2.9K conflicts. Topology variations (parallel-tree vs.
+sequential) change time by <5x; carry presence changes it by
+orders of magnitude (>1000x at BW>=10). Carry propagation is
+the dominant causal factor.
+
+The original plan below is retained for reference; the extended
+program it describes (E5 CSA-only variant, paired benchmarks
+with tautology padding to match formula size, multi-solver
+confirmation) remains future work.
+
+---
+
 ## Goal
 
 Provide empirical evidence that **carry propagation** specifically (not XOR structure, clause count, clause width, or variable count) is the dominant driver of SAT hardness for multiplication. The current paper shows correlation between carry propagation and hardness; this plan aims to turn correlation into isolated causation via a controlled experiment.

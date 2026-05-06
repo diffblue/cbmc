@@ -93,6 +93,30 @@ for bw in 8 10 12 14 16 20 24 32; do
 done
 ```
 
+### Controlled accumulator experiment (N2, Section 3)
+
+Raw data: `data/n2-controlled-experiment.tsv`.
+
+To re-run:
+```bash
+# Regenerate benchmarks (already committed, but this is the script)
+python3 bench-multiplication/n2-controlled/generate.py
+
+# Run sweep
+OUT=/tmp/n2.tsv
+echo -e "variant\tbw\ttime\tresult\tvars\tclauses\tconflicts\tproof_bytes" > $OUT
+for variant in E0_int_seq E1_gf2_seq E2_int_par E3_gf2_par E4_int_ternary; do
+  for bw in 6 8 10 12 14 16; do
+    f="bench-multiplication/n2-controlled/${variant}_comm_${bw}.smt2"
+    env CBMC_PROOF_FILE=/tmp/proof.drat DISABLE_SIMPLIFY=1 DISABLE_ALGEBRAIC=1 \
+      timeout -s 9 120 build/bin/smt2_solver --cadical "$f"
+  done
+done
+```
+
+The key comparison is E0 (integer sequential) vs E1 (GF(2) sequential):
+identical partial-product topology, only the accumulator operator differs.
+
 ## Benchmarks
 
 All benchmarks are in `bench-multiplication/smt-comp/`. Categories:
