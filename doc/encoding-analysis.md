@@ -138,3 +138,56 @@ All encodings except comba-cs produce IDENTICAL formulas (1743 vars,
 
 This is a BUG in our encoding propagation — booth/block4 should also
 affect FP multiplications. Fixing this could improve FP benchmarks.
+
+## Proof Size Analysis (strength_chain_16)
+
+| Encoding | Proof size | Interpretation |
+|----------|-----------|----------------|
+| booth | 277 KB | Compact proof — solver finds UNSAT quickly |
+| block4 | ~1.4 MB | Medium — more search needed |
+| dadda | ~6 MB | Larger — significant search |
+| shift-add | ~10 MB | Large — extensive search |
+| comba-cs | ~20 MB | Largest — many intermediate learned clauses |
+
+Booth's proof is 36× smaller than shift-add's, confirming that the
+radix-4 encoding makes the problem fundamentally easier for the solver
+(not just faster to propagate, but requiring less reasoning overall).
+
+## Learned Clause Quality
+
+The "redundant" count (learned clauses retained at the end of solving)
+measures how many learned clauses the solver found useful enough to keep:
+
+- **comba-cs: 5,820 retained** — generates many learned clauses, but they
+  don't help on constant multiplication (wrong problem structure)
+- **sortnet: 8,357 retained** — even more, but the solver is still slow
+  because the 13K auxiliary variables create a huge search space
+- **booth: 716 retained** — fewest, because the proof is so short that
+  few learned clauses are needed
+
+**Key insight:** High learned clause retention does NOT predict good
+performance. What matters is whether the learned clauses capture
+USEFUL structural information about the problem. comba-cs's learned
+clauses are useful for commutativity (where they encode carry
+propagation relationships) but not for constant multiplication.
+
+## The bf16 Identical Formula Explanation
+
+The identical formula counts (1743 vars, 6697 clauses) for all encodings
+except comba-cs on bf16_mul_comm_v2 are NOT suspicious — they are
+EXPECTED because:
+
+1. The benchmark uses QF_FP (floating-point), not QF_BV
+2. The FP mantissa multiplication goes through `float_bvt` which uses
+   `boolbvt::bv_utils` — but the encoding flags (booth, block4, sortnet)
+   are set on the `bv_utilst` instance that handles BV operations
+3. The FP path creates its own multiplication via `mult_exprt` which
+   goes through `convert_mult` → `signed_multiplier` → `unsigned_multiplier`
+4. The `unsigned_multiplier` checks `use_booth` etc., but these flags
+   are NOT set because the FP path doesn't trigger the encoding configuration
+5. Only `comba_carry_save` differs because the adaptive heuristic's pre-scan
+   counts ALL multiplications (including FP-internal ones) and sets the flag
+   on the boolbvt instance that IS used by the FP path
+
+This is a known architectural limitation, not a bug in the encodings.
+Fixing it would require propagating encoding flags through the FP path.
