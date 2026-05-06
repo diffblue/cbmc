@@ -821,23 +821,8 @@ test~\cite{gamez2024efficient}---including dsp\_image\_reject
 timed out. Their inclusion is useful for validating the algebraic
 technique, but the comparison should not be read as evidence of
 general superiority. The community-benchmark evaluations below
-are a more appropriate test.
-
-\begin{table}[ht]
-\caption{DSP datapath benchmarks in detail (\cadical, seconds).}
-\label{tab:dsp}
-\centering
-\begin{tabular}{lrrr}
-\toprule
-Benchmark & \cbmc & Bitwuzla & cvc5 \\
-\midrule
-dsp\_image\_reject ($\mathbb{Z}_{2^{12}} \times \mathbb{Z}_{2^8} \to \mathbb{Z}_{2^{16}}$) & 0.014 & 0.007 & 0.010 \\
-dsp\_horner\_16 (Horner vs.\ direct) & 0.010 & 0.004 & 1.822 \\
-dsp\_vanishing\_poly\_8 ($Y_{10}(x) \equiv 0$) & 0.008 & 0.013 & 0.048 \\
-dsp\_vanishing\_mv (multivariate) & 0.005 & 0.004 & 0.005 \\
-\bottomrule
-\end{tabular}
-\end{table}
+are a more appropriate test. Detailed per-benchmark DSP results
+are in Table~\ref{tab:dsp} (Section~\ref{sec:vanishing}).
 
 \subsection{SMT-COMP 2024 QF\_BV Community Sample (66 benchmarks)}
 \label{sec:eval-smtcomp}
