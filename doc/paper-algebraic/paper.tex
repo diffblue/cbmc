@@ -1026,8 +1026,8 @@ of its field-based reduction.
 
 \subsection{Threats to Validity}
 
-\textbf{Benchmark selection.} The 44-benchmark custom suite is
-biased toward multiplication-heavy verification queries common in
+\textbf{Benchmark selection.} The 39-benchmark custom suite is
+biased toward multiplication-heavy arithmetic queries common in
 cryptography and DSP but rare in typical pointer-safety checking.
 We include the 66-benchmark SMT-COMP sample
 (Section~\ref{sec:eval-smtcomp}) and the 26-benchmark SMT-LIB
@@ -1052,13 +1052,38 @@ up to 512-bit operands which our implementation does not yet
 handle on every instance; understanding the remaining gap is
 future work.
 
+\textbf{Gate-level equivalence is a gap.} Our procedure is
+complete for the polynomial ideal-membership fragment, but
+\emph{gate-level} multiplier equivalence checking---the problem
+Amulet2 (Section~\ref{sec:eval-amulet}) solves---sits just outside
+our coverage. A natural way to encode a gate-level circuit in our
+setting is to add a field polynomial $x \cdot (x - 1) = 0$ for
+every bit variable, forcing it to be Boolean, and then to check
+that the circuit's output polynomial equals the specification. We
+tested this on a small hardware-multiplier-equivalence benchmark
+(\texttt{hw\_mul\_equiv}): at BW=2 the augmented system has
+a strong Gr\"obner basis of 23 elements including a unit constant,
+so we correctly report UNSAT. At BW$\geq$4, however, the basis
+converges to 18 elements with no unit constant, and our procedure
+returns ``unknown.'' This is consistent with the literature: the
+gate-level approaches of
+Biere, Kauers, and Ritirc~\cite{biere2017challenges} and
+Kaufmann and Biere~\cite{kaufmann2021amulet} exploit the topology
+of the AIG (reverse topological ordering of gate polynomials) to
+avoid computing a full Gr\"obner basis in the first place; a
+general-purpose Buchberger loop cannot reproduce that structural
+shortcut without explicit circuit information. Bridging this gap
+is a promising direction for future work (one could, for example,
+extract and use the SSA topological order of \cbmc's bit-level
+decomposition).
+
 \textbf{No correctness regressions.} The 691 \cbmc regression
 tests (covering array bounds, pointer safety, floating-point, and
 other properties) all pass with the algebraic layers enabled. The
 algebraic layers add $<$4\,ms of overhead on benchmarks that do
 not exercise them.
 
-\textbf{Interaction with bit-blasting.} Paper 2 shares with the
+\textbf{Interaction with bit-blasting.} This paper shares with the
 bit-blasting companion paper~\cite{companion-bitblasting} the
 observation that \cadical's
 inprocessing BVE can be counterproductive for carry-save popcount
