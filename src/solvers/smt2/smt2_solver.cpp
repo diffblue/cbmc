@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message.h>
 #include <util/namespace.h>
 #include <util/simplify_expr.h>
+#include <cstdlib>
 #include <util/symbol_table.h>
 
 #include <solvers/flattening/boolbv.h>
@@ -163,6 +164,8 @@ void smt2_solvert::setup_commands()
       }
 
       // Simplify assertions (word-level: commutativity, distributivity)
+      // DISABLE_SIMPLIFY env var disables this for ablation experiments
+      if(!std::getenv("DISABLE_SIMPLIFY"))
       {
         const symbol_tablet empty_symbol_table;
         const namespacet simplify_ns{empty_symbol_table};

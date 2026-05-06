@@ -655,6 +655,9 @@ bool boolbvt::try_algebraic_solve()
     return false;
   if(algebraic_disequalities.empty())
     return false;
+  // For layer ablation experiments: disable entire algebraic solving
+  if(std::getenv("DISABLE_ALGEBRAIC"))
+    return false;
 
   algebraic_solved = true;
 
@@ -763,7 +766,8 @@ bool boolbvt::try_algebraic_solve()
             0);
           for(const auto &[var, w] : inline_extractor.var_input_widths)
             input_widths[var] = w;
-          if(is_vanishing_polynomial(idiff, input_widths))
+          const bool van_disabled = std::getenv("DISABLE_VANISHING") != nullptr;
+      if(!van_disabled && is_vanishing_polynomial(idiff, input_widths))
           {
             prop.l_set_to_true(const_literal(false));
             return true;
@@ -821,18 +825,36 @@ bool boolbvt::try_algebraic_solve()
   // variable, producing harder intermediate polynomials. With
   // definitions first, the algorithm builds up the ideal incrementally
   // and reduces the Rabinowitsch equation efficiently.
+  // The GROEBNER_REVERSE_ORDER env var enables reversed ordering
+  // for ablation experiments.
   {
     std::vector<polynomialt> ordered;
-    // 1. Side equations (definitions from fresh variable decomposition)
-    for(auto &se : extractor.side_equations)
+    const bool reverse_order = std::getenv("GROEBNER_REVERSE_ORDER") != nullptr;
+    if(reverse_order)
     {
-      se.normalize();
-      if(!se.is_zero())
-        ordered.push_back(std::move(se));
+      // Wrong order: Rabinowitsch first, then definitions
+      for(auto &eq : equations)
+        ordered.push_back(std::move(eq));
+      for(auto &se : extractor.side_equations)
+      {
+        se.normalize();
+        if(!se.is_zero())
+          ordered.push_back(std::move(se));
+      }
     }
-    // 2. Main equations (SSA equalities, then Rabinowitsch last)
-    for(auto &eq : equations)
-      ordered.push_back(std::move(eq));
+    else
+    {
+      // 1. Side equations (definitions from fresh variable decomposition)
+      for(auto &se : extractor.side_equations)
+      {
+        se.normalize();
+        if(!se.is_zero())
+          ordered.push_back(std::move(se));
+      }
+      // 2. Main equations (SSA equalities, then Rabinowitsch last)
+      for(auto &eq : equations)
+        ordered.push_back(std::move(eq));
+    }
     equations = std::move(ordered);
   }
 
