@@ -1,5 +1,7 @@
 var NAVTREEINDEX58 =
 {
+"classshadow__memoryt.html#aa88918dceff1b0e01bbb112606d7205e":[7,0,1069,3],
+"classshadow__memoryt.html#aab4949efe2faa15291d8a49125bc411a":[7,0,1069,6],
 "classshadow__memoryt.html#aabfb96e83698ddc414455e4c111ac702":[7,0,1069,0],
 "classshadow__memoryt.html#ac0c01cef72b27a8141e57a6e3a6dcfac":[7,0,1069,4],
 "classshadow__memoryt.html#accc467c2c7e17133f220e96ca24080b6":[7,0,1069,10],
@@ -247,7 +249,5 @@ var NAVTREEINDEX58 =
 "classside__effect__expr__overflowt.html#afeb586c1d3ba03bd18b8824ed686e124":[7,0,1083,3],
 "classside__effect__expr__statement__expressiont.html":[7,0,1084],
 "classside__effect__expr__statement__expressiont.html#a1c45f2161e1f6dd2fe32b5e7813db337":[7,0,1084,2],
-"classside__effect__expr__statement__expressiont.html#a2cd473d026e71e2a3fa7801a105a64e2":[7,0,1084,1],
-"classside__effect__expr__statement__expressiont.html#afbe630529d76806c888692839e7b5964":[7,0,1084,0],
-"classside__effect__expr__throwt.html":[7,0,1085]
+"classside__effect__expr__statement__expressiont.html#a2cd473d026e71e2a3fa7801a105a64e2":[7,0,1084,1]
 };

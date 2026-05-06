@@ -1,9 +1,11 @@
 var NAVTREEINDEX10 =
 {
-"classallocate__exprt.html#a74d0433828e291d4412d817a55d9106a":[7,0,57,3],
+"classallocate__exprt.html#a4eff2513f05e18a25333251c62058efe":[7,0,57,0],
+"classallocate__exprt.html#a523ebe1de59acd3d4bd7be474bbdf868":[7,0,57,9],
 "classallocate__exprt.html#a74d0433828e291d4412d817a55d9106a":[7,0,57,4],
-"classallocate__exprt.html#adb21a8b77bc59c401de7db3bb054f140":[7,0,57,8],
+"classallocate__exprt.html#a74d0433828e291d4412d817a55d9106a":[7,0,57,3],
 "classallocate__exprt.html#adb21a8b77bc59c401de7db3bb054f140":[7,0,57,7],
+"classallocate__exprt.html#adb21a8b77bc59c401de7db3bb054f140":[7,0,57,8],
 "classallocate__objectst.html":[7,0,58],
 "classallocate__objectst.html#a0fe0ad9ce2ef77ef4bbea8e5339d1240":[7,0,58,1],
 "classallocate__objectst.html#a15b9e59458c237a7e53f47cca778259c":[7,0,58,6],
@@ -247,7 +249,5 @@ var NAVTREEINDEX10 =
 "classansi__c__scopet.html#a0f2502f07dc1fefdee01b0a7d1bdfedc":[7,0,75,1],
 "classansi__c__scopet.html#a17f3f0cec34348c66a2a6807097774ca":[7,0,75,4],
 "classansi__c__scopet.html#a1f39061507fe86dc3b250f9df11d07dd":[7,0,75,2],
-"classansi__c__scopet.html#a30c08b255b360028eaa9a4b03958c0cc":[7,0,75,3],
-"classansi__c__scopet.html#a5e86c78bf2dc697fbc06d7e41f347896":[7,0,75,8],
-"classansi__c__scopet.html#a726cfd7ee69f5a9bf770eb738e8995eb":[7,0,75,7]
+"classansi__c__scopet.html#a30c08b255b360028eaa9a4b03958c0cc":[7,0,75,3]
 };

@@ -153,6 +153,8 @@ Functions</h2></td></tr>
 <tr class="memitem:aeb16c38f897b6b8d22a2c6d169e9f456" id="r_aeb16c38f897b6b8d22a2c6d169e9f456"><td class="memItemLeft" align="right" valign="top"><a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="arith__tools_8h.html#aeb16c38f897b6b8d22a2c6d169e9f456">power</a> (<a class="el" href="classait.html">const</a> <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;base, <a class="el" href="classait.html">const</a> <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;exponent)</td></tr>
 <tr class="memdesc:aeb16c38f897b6b8d22a2c6d169e9f456"><td class="mdescLeft">&#160;</td><td class="mdescRight">A multi-precision implementation of the power operator.  <br /></td></tr>
 <tr class="separator:aeb16c38f897b6b8d22a2c6d169e9f456"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7ef35213fbfc656e4f056e3b28d6a9f6" id="r_a7ef35213fbfc656e4f056e3b28d6a9f6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="arith__tools_8h.html#a7ef35213fbfc656e4f056e3b28d6a9f6">is_power_of_two</a> (<a class="el" href="classait.html">const</a> <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;)</td></tr>
+<tr class="separator:a7ef35213fbfc656e4f056e3b28d6a9f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af7257419ef83a22f3ae229baae37a67e" id="r_af7257419ef83a22f3ae229baae37a67e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="arith__tools_8h.html#af7257419ef83a22f3ae229baae37a67e">mp_min</a> (<a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;<a class="el" href="classait.html">a</a>, <a class="el" href="classait.html">const</a> <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;<a class="el" href="classait.html">b</a>)</td></tr>
 <tr class="separator:af7257419ef83a22f3ae229baae37a67e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5e7a495b9a73d0fb4c37d941dcec5be9" id="r_a5e7a495b9a73d0fb4c37d941dcec5be9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="arith__tools_8h.html#a5e7a495b9a73d0fb4c37d941dcec5be9">mp_max</a> (<a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;<a class="el" href="classait.html">a</a>, <a class="el" href="classait.html">const</a> <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;<a class="el" href="classait.html">b</a>)</td></tr>
@@ -227,7 +229,7 @@ Functions</h2></td></tr>
 
 <p>convert a bit-vector representation (possibly signed) to integer </p>
 
-<p class="definition">Definition at line <a class="el" href="arith__tools_8cpp_source.html#l00415">415</a> of file <a class="el" href="arith__tools_8cpp_source.html">arith_tools.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="arith__tools_8cpp_source.html#l00426">426</a> of file <a class="el" href="arith__tools_8cpp_source.html">arith_tools.cpp</a>.</p>
 
 </div>
 </div>
@@ -303,7 +305,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="arith__tools_8cpp_source.html#l00275">275</a> of file <a class="el" href="arith__tools_8cpp_source.html">arith_tools.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="arith__tools_8cpp_source.html#l00286">286</a> of file <a class="el" href="arith__tools_8cpp_source.html">arith_tools.cpp</a>.</p>
 
 </div>
 </div>
@@ -336,7 +338,27 @@ Functions</h2></td></tr>
 <p>convert an integer to bit-vector representation with given width This uses two's complement for negative numbers. </p>
 <p>If the value is out of range, it is 'wrapped around'. </p>
 
-<p class="definition">Definition at line <a class="el" href="arith__tools_8cpp_source.html#l00393">393</a> of file <a class="el" href="arith__tools_8cpp_source.html">arith_tools.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="arith__tools_8cpp_source.html#l00404">404</a> of file <a class="el" href="arith__tools_8cpp_source.html">arith_tools.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a7ef35213fbfc656e4f056e3b28d6a9f6" name="a7ef35213fbfc656e4f056e3b28d6a9f6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7ef35213fbfc656e4f056e3b28d6a9f6">&#9670;&#160;</a></span>is_power_of_two()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">bool</a> is_power_of_two </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;&#160;</td>
+          <td class="paramname"><em>n</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="arith__tools_8cpp_source.html#l00205">205</a> of file <a class="el" href="arith__tools_8cpp_source.html">arith_tools.cpp</a>.</p>
 
 </div>
 </div>
@@ -376,7 +398,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>new bitvector representation </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="arith__tools_8cpp_source.html#l00319">319</a> of file <a class="el" href="arith__tools_8cpp_source.html">arith_tools.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="arith__tools_8cpp_source.html#l00330">330</a> of file <a class="el" href="arith__tools_8cpp_source.html">arith_tools.cpp</a>.</p>
 
 </div>
 </div>
@@ -406,7 +428,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="arith__tools_8cpp_source.html#l00265">265</a> of file <a class="el" href="arith__tools_8cpp_source.html">arith_tools.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="arith__tools_8cpp_source.html#l00276">276</a> of file <a class="el" href="arith__tools_8cpp_source.html">arith_tools.cpp</a>.</p>
 
 </div>
 </div>
@@ -436,7 +458,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="arith__tools_8cpp_source.html#l00259">259</a> of file <a class="el" href="arith__tools_8cpp_source.html">arith_tools.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="arith__tools_8cpp_source.html#l00270">270</a> of file <a class="el" href="arith__tools_8cpp_source.html">arith_tools.cpp</a>.</p>
 
 </div>
 </div>
@@ -581,7 +603,7 @@ template&lt;<a class="el" href="classait.html">typename</a> <a class="el" href="
 <dl class="section user"><dt>parameters: Two mp_integers, base and exponent</dt><dd></dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>One mp_integer with the value base^{exponent} </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="arith__tools_8cpp_source.html#l00208">208</a> of file <a class="el" href="arith__tools_8cpp_source.html">arith_tools.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="arith__tools_8cpp_source.html#l00219">219</a> of file <a class="el" href="arith__tools_8cpp_source.html">arith_tools.cpp</a>.</p>
 
 </div>
 </div>

@@ -8,6 +8,7 @@ var arith__tools_8h =
     [ "from_integer", "arith__tools_8h.html#a31f0721a9ec3035332ed9ede9732fc9b", null ],
     [ "get_bvrep_bit", "arith__tools_8h.html#a94aad2c2b250c696a03398149d4d78a1", null ],
     [ "integer2bvrep", "arith__tools_8h.html#a4d06cc8c81db0245efe3a17fd8fcd02e", null ],
+    [ "is_power_of_two", "arith__tools_8h.html#a7ef35213fbfc656e4f056e3b28d6a9f6", null ],
     [ "make_bvrep", "arith__tools_8h.html#a18174caf9f9c9856324582e7936b6318", null ],
     [ "mp_max", "arith__tools_8h.html#a5e7a495b9a73d0fb4c37d941dcec5be9", null ],
     [ "mp_min", "arith__tools_8h.html#af7257419ef83a22f3ae229baae37a67e", null ],

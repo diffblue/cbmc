@@ -1,5 +1,7 @@
 var NAVTREEINDEX52 =
 {
+"classparse__options__baset.html#a57d1fa7463566f7db57b439d247dfa24":[7,0,918,7],
+"classparse__options__baset.html#a84eca064e003ec106cabf10702fb5895":[7,0,918,4],
 "classparse__options__baset.html#a89ec84a325b90f5b18159b4dd9d353d6":[7,0,918,1],
 "classparse__options__baset.html#a9ce581b89f432a5c6584e7203dc405d5":[7,0,918,5],
 "classparse__options__baset.html#aa21794e085419f7a31dd9a21896216f9":[7,0,918,11],
@@ -247,7 +249,5 @@ var NAVTREEINDEX52 =
 "classpolynomial__acceleratort.html#aa8a1e36be589693d10378ab52eab803b":[7,0,942,23],
 "classpolynomial__acceleratort.html#aaac55f685652b28a604363304aa1d242":[7,0,942,13],
 "classpolynomial__acceleratort.html#abcd8c28d51b169100c2b0488e3d2d14e":[7,0,942,12],
-"classpolynomial__acceleratort.html#ac3196ff637e0853b5ecd7ad3a7ddf62a":[7,0,942,28],
-"classpolynomial__acceleratort.html#ad5d2b559ff7e21d82366ff6a42a31298":[7,0,942,11],
-"classpolynomial__acceleratort.html#ad926c3d1936c468e3c9e1528b3bc28b2":[7,0,942,25]
+"classpolynomial__acceleratort.html#ac3196ff637e0853b5ecd7ad3a7ddf62a":[7,0,942,28]
 };
