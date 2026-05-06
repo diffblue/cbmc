@@ -1,0 +1,17 @@
+benchmark	k	time	result
+varscale_k2	2	.0095	unsat
+varscale_k2	2	.0090	unsat
+varscale_k2	2	.0088	unsat
+varscale_k3	3	.0177	unsat
+varscale_k3	3	.0178	unsat
+varscale_k3	3	.0171	unsat
+varscale_k4	4	.0636	unsat
+varscale_k4	4	.0643	unsat
+varscale_k4	4	.0619	unsat
+varscale_k5	5	.3484	unsat
+varscale_k5	5	.3460	unsat
+varscale_k5	5	.3455	unsat
+varscale_k6	6	2.2539	unsat
+varscale_k6	6	2.2508	unsat
+varscale_k6	6	2.2535	unsat
+VARSCALE_DONE
