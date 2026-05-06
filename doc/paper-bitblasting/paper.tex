@@ -1252,13 +1252,21 @@ we perform manually. Second, the encoding selection heuristic could
 be extended beyond multiplication count to consider deeper structural
 properties (symmetry, constant operands, comparison targets). Third,
 propagating encoding flags through the floating-point path would
-enable Booth and block4 to benefit FP verification.
+enable Booth and block4 to benefit FP verification. Fourth, the
+observed correlation between carry propagation and SAT hardness
+invites two follow-up studies: (i)~a controlled experiment with
+encoding variants that independently vary carry depth, XOR
+structure, and variable dependency (a detailed design is included
+with the artifact); and (ii)~a formal proof that integer
+multiplication commutativity requires exponential-size resolution
+proofs on standard encodings (a research plan is also included).
+Either result would upgrade Section~\ref{sec:hardness}'s
+correlation claim into a causation claim.
 
 \paragraph{Declaration on Generative AI.}
 During preparation, the authors used Kiro (an AI coding assistant
 by Amazon) to assist with implementation, experimentation, and
-drafting. Kiro is the tool referenced in this declaration, not the
-second author. All results were verified by the authors, and the
+drafting. All results were verified by the authors, and the
 final paper was reviewed and edited by the authors.
 
 \bibliography{references}
