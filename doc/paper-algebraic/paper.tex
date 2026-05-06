@@ -14,7 +14,7 @@
 
 \begin{document}
 
-\title{Algebraic Solving for Bit-Vector Arithmetic\\in Bounded Model Checking}
+\title{Algebraic Solving for Bit-Vector Arithmetic\\in SAT-Based Decision Procedures}
 
 \titlerunning{Algebraic Solving for Bit-Vector Arithmetic}
 
@@ -44,14 +44,14 @@ is verified by 25 mechanized theorems in Lean~4 (zero
 \texttt{sorry}).
 
 \keywords{Gr\"obner basis \and bit-vector arithmetic \and
-vanishing polynomials \and bounded model checking \and Lean 4.}
+vanishing polynomials \and bit-vector SMT \and Lean 4.}
 \end{abstract}
 
 \section{Introduction}
 
 Consider verifying that 16-bit multiplication commutes: does
 $a \times b = b \times a$ hold for all 16-bit inputs? A SAT-based
-bounded model checker must encode two multiplier circuits and prove
+bit-vector SMT solver must encode two multiplier circuits and prove
 their outputs equal---a problem that grows exponentially with
 bitwidth. But $ab - ba = 0$ is a polynomial identity over
 $\mathbb{Z}_{2^{16}}$: it holds by the commutativity of ring
@@ -59,8 +59,8 @@ multiplication, regardless of bitwidth. Our Gr\"obner basis solver
 recognizes this in 0.009\,s without generating any SAT clauses.
 
 This paper presents algebraic techniques that complement bit-blasting
-for arithmetic verification. The key insight is that many verification
-problems reduce to polynomial equations over $\mathbb{Z}_{2^d}$
+for arithmetic bit-vector reasoning. The key insight is that many
+SMT queries reduce to polynomial equations over $\mathbb{Z}_{2^d}$
 (the ring of integers modulo $2^d$), where algebraic methods scale
 with polynomial degree rather than bitwidth. We address two classes:
 
@@ -83,7 +83,7 @@ BW=32 takes the same 0.3\,ms as BW=16) but are limited to
 polynomial operations---problems involving bitwise operations,
 shifts, or inequalities fall through to bit-blasting.
 
-Multiplication problems in verification fall into two classes.
+Bit-vector SMT queries involving multiplication fall into two classes.
 \emph{Universal/equational} queries ($\forall x, y.\; P(x,y) =
 Q(x,y)$) ask whether two implementations are equivalent for all
 inputs---commutativity, associativity, DSP datapath equivalence.
@@ -260,16 +260,17 @@ Song et al.~\cite{song2024equational} established that strong
 Gr\"obner bases over $\mathbb{Z}_{2^d}$ solve the equational theory
 of bit-vectors, and provided a paper-and-pencil proof of this
 result. Our contributions sit at the next layer: integrating the
-algebraic procedure into a bounded model checker and making the
+algebraic procedure into a bit-vector SMT solver and making the
 combined system robust and reproducible.
 
 \begin{enumerate}
-\item \textbf{End-to-end BMC integration.} We implement the strong
+\item \textbf{End-to-end integration in an SMT solver.} We
+  implement the strong
   Gr\"obner basis inside \cbmc's post-SSA pipeline so it runs
-  transparently on every verification query; no user annotation
+  transparently on every bit-vector query; no user annotation
   is required.
 \item \textbf{Rabinowitsch trick for disequalities.} Song et
-  al.\ consider the equational theory; verification queries
+  al.\ consider the equational theory; SMT queries also
   include disequalities ($c \neq d$). We model these with an
   auxiliary polynomial $(c - d) \cdot e - 1 = 0$
   (Rabinowitsch), reducing disequation satisfiability to
@@ -293,7 +294,8 @@ combined system robust and reproducible.
 
 None of the six individually is a standalone research result;
 together they are what makes algebraic solving practical inside a
-BMC tool. The empirical evidence in Section~\ref{sec:external}
+general-purpose bit-vector SMT solver. The empirical evidence in
+Section~\ref{sec:external}
 shows that the combined procedure solves 41/44 benchmarks from our
 suite, including all the polynomial-equation benchmarks that SAT
 solvers time out on.
@@ -737,7 +739,7 @@ than 0.5\% of the hardest benchmark's solving time).
 \section{Evaluation}
 \label{sec:external}
 
-We evaluate on three benchmark pools: (i) 44 verification problems
+We evaluate on three benchmark pools: (i) 44 QF\_BV benchmarks
 we designed (Section~\ref{sec:eval-custom}) covering commutativity,
 associativity, DSP datapaths, and floating-point multiplication;
 (ii) a 66-benchmark stratified sample from the SMT-COMP 2024
@@ -1074,7 +1076,7 @@ Song et al.~\cite{song2024equational} prove that strong Gr\"obner
 bases over $\mathbb{Z}_{2^d}$ solve the equational theory of
 bit-vectors: their theorems give the algebraic foundation for
 any such procedure. Our contribution is end-to-end integration
-with a BMC tool, including the Rabinowitsch trick for
+with a bit-vector SMT solver, including the Rabinowitsch trick for
 disequalities, SSA-aware decomposition, progress-based
 termination, and mechanized soundness in Lean 4
 (Section~\ref{sec:algebraic-contrib}).
