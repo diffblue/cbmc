@@ -1047,6 +1047,55 @@ exprt smt2_parsert::bv_mod(const exprt::operandst &operands, bool is_signed)
     if_exprt(divisor_is_zero, dividend, mod_result));
 }
 
+void smt2_parsert::serialize_irept(const irept &ir, std::string &out)
+{
+  if(ir.get_sub().empty())
+  {
+    out += ir.id_string();
+    return;
+  }
+  out += '(';
+  bool first = true;
+  for(const auto &c : ir.get_sub())
+  {
+    if(!first)
+      out += ' ';
+    serialize_irept(c, out);
+    first = false;
+  }
+  out += ')';
+}
+
+exprt smt2_parsert::convert_irept_via_recursive(const irept &ir)
+{
+  // Serialize the irept back to SMT-LIB text and evaluate it via
+  // expression() on a temporarily-swapped tokenizer. This is used as a
+  // fallback for constructs the iterative walker does not implement
+  // (quantifiers, 'as const', indexed identifiers such as to_fp).
+  //
+  // Because these constructs are not deeply right-nested in practice, the
+  // short recursion through expression() does not compromise the stack
+  // safety that motivates the iterative walker.
+  std::string text;
+  serialize_irept(ir, text);
+
+  std::istringstream iss(text);
+  smt2_tokenizert saved{std::move(smt2_tokenizer)};
+  smt2_tokenizer = smt2_tokenizert{iss};
+  exprt result;
+  try
+  {
+    result = expression();
+  }
+  catch(...)
+  {
+    smt2_tokenizer = std::move(saved);
+    throw;
+  }
+  smt2_tokenizer = std::move(saved);
+  return result;
+}
+
 exprt smt2_parsert::convert_irep_to_exprt(const irept &root)
 {
   // Post-order walk over the S-expression irept using an explicit frame
@@ -1225,6 +1274,18 @@ exprt smt2_parsert::convert_irep_to_exprt(const irept &root)
           continue;
         }
 
+        if(head_id == "forall" || head_id == "exists" || head_id == "lambda")
+        {
+          // Quantifiers and lambdas introduce bound variables with typed
+          // sorts. Rather than re-implementing the binding machinery in
+          // the iterative walker, fall back to the recursive expression()
+          // path via serialize-and-swap. Quantifier bodies are not deeply
+          // right-nested in practice.
+          results.push_back(convert_irept_via_recursive(n));
+          frames.pop_back();
+          continue;
+        }
+
         // Regular function application: queue all operand children.
         top.stage = S_CHILDREN_DONE;
         for(std::size_t i = n.get_sub().size(); i-- > 1;)
@@ -1234,6 +1295,31 @@ exprt smt2_parsert::convert_irep_to_exprt(const irept &root)
 
       // head is itself an interior node — ((_ extract ...) op) etc.
       const irept &head_head = head.get_sub().front();
+
+      // Filter out heads that the S_CHILDREN_DONE stage does not
+      // implement (`((as const T) v)`, `((_ to_fp ...) op)` and its
+      // unsigned variant). These are handled by the fallback to the
+      // recursive expression() path instead, so do NOT queue children
+      // here — the fallback will re-parse from the SMT-LIB text and
+      // manage its own operand evaluation.
+      auto indexed_is_handled = [](const std::string &id)
+      {
+        return id == "extract" || id == "rotate_left" || id == "rotate_right" ||
+               id == "repeat" || id == "sign_extend" || id == "zero_extend" ||
+               id == "fp.to_sbv" || id == "fp.to_ubv";
+      };
+      const bool fallback =
+        is_leaf(head_head) &&
+        ((head_head.id_string() == "_" && head.get_sub().size() >= 2 &&
+          !indexed_is_handled(head.get_sub()[1].id_string())) ||
+         head_head.id_string() == "as");
+      if(fallback)
+      {
+        results.push_back(convert_irept_via_recursive(n));
+        frames.pop_back();
+        continue;
+      }
+
       if(
         is_leaf(head_head) &&
         (head_head.id_string() == "_" || head_head.id_string() == "as"))
@@ -1414,26 +1500,15 @@ exprt smt2_parsert::convert_irep_to_exprt(const irept &root)
         // For `to_fp` / `to_fp_unsigned` the existing implementation
         // depends on whether the source operand is real, integer, bitvector
         // or floating-point, and in the real-or-integer case on the
-        // constant representation. Re-implementing that here duplicates a
-        // non-trivial amount of logic; in QF_ABV these forms do not
-        // appear. Fall back to an error rather than risk a behavioural
-        // divergence.
-        throw error() << "indexed identifier '" << id
-                      << "' not supported in iterative walk";
+        // constant representation. This is handled via the S_START
+        // fallback to the recursive expression() path.
+        UNREACHABLE;
       }
 
       if(is_leaf(head_head) && head_head.id_string() == "as")
       {
-        // ((as const T) v)
-        if(
-          head.get_sub().size() != 3 || !is_leaf(head.get_sub()[1]) ||
-          head.get_sub()[1].id_string() != "const" || ops.size() != 1)
-        {
-          throw error("unexpected 'as' expression");
-        }
-        // The sort T was parsed by smt2irep as a generic irept, not a
-        // typet — we do not support as-const in the iterative walk.
-        throw error() << "as-const not supported in iterative walk";
+        // ((as const T) v) — handled via the S_START fallback.
+        UNREACHABLE;
       }
 
       throw error("unsupported s-expression head in stage S_CHILDREN_DONE");

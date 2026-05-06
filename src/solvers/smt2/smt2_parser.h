@@ -176,6 +176,18 @@ protected:
   /// dispatching through function_application_with_id() with
   /// precollected_operands populated from the walk's result stack.
   exprt convert_irep_to_exprt(const irept &);
+
+  /// Append the SMT-LIB text form of \p ir to \p out, using the same
+  /// conventions as smt2irep(): leaves are emitted verbatim, interior
+  /// nodes are wrapped in parentheses with children space-separated.
+  static void serialize_irept(const irept &ir, std::string &out);
+
+  /// Fallback used by convert_irep_to_exprt(): serialize \p ir back to
+  /// SMT-LIB text, temporarily redirect the parser's tokenizer to that
+  /// text, and evaluate via expression(). Used for constructs that the
+  /// iterative walker does not implement directly (quantifiers, 'as const',
+  /// indexed identifiers such as to_fp).
+  exprt convert_irept_via_recursive(const irept &ir);
   typet function_signature_declaration();
   signature_with_parameter_idst function_signature_definition();
   void check_matching_operand_types(const exprt::operandst &) const;
