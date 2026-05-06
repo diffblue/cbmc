@@ -84,11 +84,20 @@ with polynomial degree rather than bitwidth. We address two classes:
 Algebraic techniques scale well with bitwidth (commutativity at
 BW=32 takes the same 0.3\,ms as BW=16) but are limited to
 polynomial operations---problems involving bitwise operations,
-shifts, or inequalities fall through to bit-blasting. The two
-approaches are complementary: algebraic layers handle universal
-equational queries ($\forall x, y.\; P(x,y) = Q(x,y)$) while
-bit-blasting handles existential queries and non-polynomial
-constraints.
+shifts, or inequalities fall through to bit-blasting.
+
+Multiplication problems in verification fall into two classes.
+\emph{Universal/equational} queries ($\forall x, y.\; P(x,y) =
+Q(x,y)$) ask whether two implementations are equivalent for all
+inputs---commutativity, associativity, DSP datapath equivalence.
+\emph{Existential} queries ($\exists x, y.\; P(x,y) = c$) ask
+whether a specific output is reachable---factoring, overflow
+detection, finding counterexamples. Algebraic techniques excel on
+universal queries (they prove identities without enumerating inputs)
+but are not constructive for existential queries. Bit-blasting
+handles both but scales exponentially with bitwidth. The two
+approaches are complementary; this paper focuses on the algebraic
+side.
 
 On 44 QF\_BV benchmarks (36 custom + 8 DSP datapath),
 \cbmc solves 41 instances, more than

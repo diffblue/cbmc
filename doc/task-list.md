@@ -192,3 +192,33 @@ algebraic layer of the five-layer architecture.
 12. Multiple-encodings-simultaneously experiment
 13. Automated DRAT→encoding feedback loop (future work / third paper)
 14. Mathlib PR follow-up
+
+---
+
+## Status Update (2026-05-06)
+
+### Completed since last update:
+- [x] Paper 1 written (14 pages, 33 references)
+- [x] Paper 2 first draft (6 pages, 11 references)
+- [x] Mathlib PR feedback addressed (iff version, pushed)
+- [x] Martin's taxonomy added to both papers
+- [x] Booth encoding fixed and benchmarked
+- [x] Full solver statistics analysis (conflicts, propagations, BVE, fixed, proof size)
+- [x] Learned clause / proof compactness analysis
+
+### Paper 2 expansion items (open):
+- [ ] More detail on Gröbner basis algorithm (currently just the existing section from combined paper)
+- [ ] Equation ordering insight (definitions before Rabinowitsch = 2000× impact)
+- [ ] Fresh variable decomposition for inline expressions (smt2_solver path)
+- [ ] Scaling analysis: demonstrate bitwidth independence formally (BW=8,16,32,64 same time)
+- [ ] Comparison with Kaufmann/Biere (Q + field polynomials vs Z_{2^d})
+- [ ] The boolean constraint gap (x²-x=0 enables 2-bit but not 4-bit hw_mul_equiv)
+- [ ] More DSP benchmark detail (describe each benchmark, what makes it hard)
+- [ ] Candidate extraction + SAT hints (Level 3 architecture)
+- [ ] Progress-based Buchberger termination (from formal proof insight)
+
+### Other open items:
+- [ ] Token/effort analysis for GenAI methodology (Paper 1)
+- [ ] Self-plagiarism check between the two papers
+- [ ] CoCoALib comparison (Paper 2 future work or experiment)
+- [ ] SABER-inspired benchmarks (Paper 2 future work)
