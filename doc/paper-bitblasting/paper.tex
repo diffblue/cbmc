@@ -117,6 +117,18 @@ Our contributions are:
   (Section~\ref{sec:negative}).
 \end{enumerate}
 
+Multiplication problems in verification fall into two classes:
+\emph{universal/equational} queries ($\forall x, y.\; P(x,y) =
+Q(x,y)$, e.g., commutativity, equivalence checking) and
+\emph{existential} queries ($\exists x, y.\; P(x,y) = c$, e.g.,
+factoring, overflow detection). Bit-blasting handles both but scales
+poorly with bitwidth; algebraic techniques (treated in a companion
+paper) handle universal queries efficiently but are not constructive
+for existential queries. This paper focuses on improving bit-blasting
+for both classes. The same techniques apply to division and remainder
+(encoding $a = b \cdot q + r$ with non-deterministic $q$, $r$
+requires an internal multiplier).
+
 \section{Background}
 
 An $N$-bit unsigned multiplication $a \times b$ produces $N$ partial
@@ -657,6 +669,17 @@ eliminate all regressions except hw\_equiv\_12, where a single
 \texttt{bvmul} is compared against a manually-constructed shift-add
 circuit---no encoding heuristic can detect this without knowing the
 comparison target's structure.
+
+\paragraph{Threats to validity.}
+Bit-blasting scales poorly with bitwidth (exponential in the worst
+case) but is relatively insensitive to the number of variables.
+Our benchmarks exercise bitwidths 8--32; results may differ at
+64+ bits. Additionally, some QF\_BV benchmarks in SMT-LIB are
+circuit-equivalence problems whose difficulty is highly
+encoding-sensitive---a new encoding that improves general QF\_BV
+performance may still fail on these specific instances, making
+aggregate QF\_BV evaluation potentially misleading for encoding
+research.
 
 \section{Negative Results}
 \label{sec:negative}
