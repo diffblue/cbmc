@@ -4,7 +4,7 @@
 
 Prove (or refute) that proving integer multiplication commutativity (`x*y = y*x` over `N`-bit bitvectors) via CDCL requires resolution proofs of length exponential in `N`, while the analogous GF(2) commutativity has polynomial-length proofs.
 
-The paper currently states this only as empirical observation. A formal result would significantly strengthen the contribution.
+The paper currently states empirical causation (§3 controlled experiment, §N2 results: carry presence drives hardness at least 1000× on commutativity). A formal proof-complexity result would upgrade this from "empirical causation at BW ≤ 16" to "proven exponential separation for all N."
 
 ## Background and prior art
 
@@ -14,109 +14,115 @@ The paper currently states this only as empirical observation. A formal result w
 
 3. **Urquhart 1987** — exponential lower bounds for Tseitin formulas over expander graphs.
 
-4. **Beame et al.** — various lower bounds for graph pigeonhole and counting principles.
+4. **Buss 1995** ("Bounded Arithmetic and Propositional Proof Complexity", survey) — canonical reference for the bounded-arithmetic → propositional-proof translations. Key results relevant to N1:
+   - **Theorem 44-47 (Craig interpolation for resolution, and limited-extension resolution)**: If a set of clauses `{A_i(p,q)} ∪ {B_j(p,r)}` has a resolution refutation of `n` inferences, there is a circuit of size `O(n)` that serves as an interpolant (a function of the shared variables `p` that separates the two half-refutations). Therefore, if we can show that any such interpolant must have superpolynomial circuit complexity, resolution proofs must be superpolynomial.
+   - **Translation from `S_2^1` to Extended Frege (eF)**: basic arithmetic axioms, including associativity and commutativity of multiplication, have polynomial-size eF-proofs (Theorem 30, case 2: BASIC axioms). This tells us Frege-with-extension can do commutativity in polynomial size, but does **not** say the same about resolution.
+   - **Razborov 1995 (Theorem 49)**: `S_2^2(α)` cannot prove superpolynomial circuit lower bounds on `NP` predicates unless the SPRNG conjecture fails (Razborov–Rudich natural proofs obstacle). This is an obstacle to any interpolation-based strategy that tries to invoke circuit lower bounds on `Sat` or other general `NP` functions — *but it does not apply to lower bounds on polynomial-time functions like multiplication itself*.
 
-5. **Biere and Kauers 2019** — "New Challenges for Automated Reasoning in Multiplication Verification." Conjectures (but does not prove) exponential lower bounds for integer multiplier verification. Explicitly calls this an open question.
+5. **Biere and Kauers 2019** ("New Challenges for Automated Reasoning in Multiplication Verification") — conjecture exponential lower bounds for integer multiplier verification; explicitly calls this open.
 
 6. **Kojevnikov and Kulikov 2010** — bounds on SAT encodings of specific arithmetic problems.
 
 7. **Brain 2021** — conjectures PC multiplier encoding is exponential size.
 
+8. **Krajíček 1997** ("Interpolation theorems, lower bounds for proof systems, and independence results for bounded arithmetic") — the foundational paper that made resolution-via-interpolation concrete. Connects lower bounds on circuit complexity to resolution proof lengths.
+
 ## What is known vs unknown
 
-- **Known**: Any _propagation-complete_ (PC) encoding of `N`-bit integer multiplication requires exponentially many clauses (Brain 2021 conjecture, partially supported).
-- **Known**: Some related arithmetic problems (pigeonhole, parity over linear equations) have exponential resolution lower bounds.
-- **Open**: Whether resolution proofs of `x*y - y*x = 0` over `N`-bit bitvectors are exponential in `N`.
-- **Open**: Whether the gap between integer and GF(2) multiplication commutativity is provable.
+- **Known**: Any *propagation-complete* (PC) encoding of `N`-bit integer multiplication requires exponentially many clauses (Brain 2021 conjecture, partially supported).
+- **Known**: Some related arithmetic problems (pigeonhole, parity over linear equations) have exponential resolution lower bounds (Haken; Urquhart).
+- **Known**: Commutativity of integer multiplication has polynomial-size eF-proofs (Buss 1995 Theorem 30, case 2 BASIC axioms).
+- **Open**: Whether resolution proofs of `x·y - y·x = 0` over `N`-bit bitvectors are exponential in `N`.
+- **Open**: Whether the empirical gap between integer and GF(2) multiplication commutativity reflects a provable proof-complexity separation.
+- **Known (our §3 N2 experiment)**: Empirically, integer is ≥1000× harder than GF(2) on identical-topology formulas for commutativity at BW ≥ 10, with the gap widening with BW. This is compatible with a proof-complexity separation but does not prove one.
 
-## Proposed strategy
+## The Buss-1995-informed strategy: interpolation
 
-### Approach 1: Direct size-width lower bound
+The most promising framework comes directly from Buss's presentation of Krajíček's interpolation theorem (Theorem 44-47). The strategy has three moves:
 
-**Target theorem (T1):** For all `N`, every resolution proof of commutativity of `N`-bit unsigned integer multiplication has size at least `2^{Ω(N)}` on the canonical shift-add CNF encoding.
+1. **Split the commutativity formula Φ_N into two halves.** Choose auxiliary variables carefully so the two halves share only the "observable" interface:
+   - A-half: encodes the assertion `z₁ = x·y` using internal multiplier variables `q` (partial products, carries).
+   - B-half: encodes `z₂ ≠ y·x` using internal multiplier variables `r` (a disjoint set).
+   - Shared (observable) variables `p = {x, y, z₁, z₂}`.
+   - The full formula `A ∪ B ∪ {z₁ = z₂}` is unsatisfiable iff multiplication commutes (always), so any refutation proves commutativity.
 
-**Plan:**
-1. Formalize the commutativity formula as a CNF family `Φ_N`:
-   - Encode `z₁ = x·y` and `z₂ = y·x` using standard shift-add.
-   - Negate the equality: `¬(z₁ = z₂)` becomes a set of clauses.
-2. Define a "bottleneck" random variable over partial assignments:
-   - Consider a random assignment of `x` drawn from a specific distribution.
-   - Show any sub-formula on fewer than `w` variables (for suitable `w = Ω(N)`) has high probability of being simultaneously satisfiable.
-3. Apply the Ben-Sasson–Wigderson size-width theorem:
-   - Width lower bound `w(Φ_N ⊢ ⊥) ≥ Ω(N)` plus formula width `O(1)` gives size `2^{Ω(N^2/N)} = 2^{Ω(N)}`.
-4. Key technical step: reducing to a known hard problem (e.g., pigeonhole or a counting problem) via an affine embedding.
+2. **Derive the interpolant.** By Buss's Theorem 45, any resolution refutation of `n` clauses gives an interpolant circuit `C(p)` of size `O(n)` such that:
+   - if `τ(C) = False`, then A is unsatisfiable under τ (i.e., `z₁ ≠ x·y`);
+   - if `τ(C) = True`, then B is unsatisfiable under τ (i.e., `z₂ = y·x` after all).
 
-**Risk:** The reduction may not be straightforward because shift-add CNF has specific structure that doesn't obviously contain pigeonhole as a minor.
+   Interpreting `C`: fed with `(x, y, z₁, z₂)`, `C` must decide whether `z₁` is the correct product of `x` and `y`. In other words, **`C` computes a version of multiplication verification**.
 
-### Approach 2: Reduction from parity / linear algebra over GF(2)
+3. **Bound the interpolant's circuit complexity from below.**
+   - If we can show any circuit that computes or verifies multiplication of `N`-bit numbers has size `ω(poly(N))`, then by Krajíček's theorem the resolution refutation has size `ω(poly(N))`.
+   - *This is where N1 is hard.* Multiplication of `N`-bit integers is in polynomial-size circuits (trivially in `O(N^2)`, sub-quadratic with Karatsuba/FFT). So a direct "multiplication is hard to compute" argument does not work.
+   - **The promising direction**: the interpolant must compute multiplication *relative to a fixed subset of input bits* (determined by the split). For suitable splits, this restricted form may be harder than general multiplication — e.g., if the split forces the interpolant to handle a carry-chain that crosses the A/B boundary. This is where the technical depth of N1 lies.
 
-**Target theorem (T2):** There is a polynomial-time reduction from `N`-bit _integer_ multiplication commutativity to a related problem known to have exponential resolution lower bounds.
+## Proposed strategy (revised after Buss 1995)
 
-**Candidate target problems:**
-- Urquhart formulas (Tseitin over expander)
-- `MOD_p` counting principles for `p > 2` (parity won't work directly because it's in GF(2))
+### Approach 1': Interpolation-based lower bound (refined)
 
-**Plan:**
-1. Observe that in integer multiplication, the high-order bit of `x·y` is a degree-`N` multilinear function of the input bits (with specific coefficients from integer addition).
-2. Show that deciding the value of this high-order bit reduces (in the CNF representation) to a problem with known exponential lower bound.
-3. Since the commutativity formula includes this high-order bit agreement as a constraint, the exponential lower bound carries over.
-
-**Risk:** The reduction must preserve CNF size polynomially and clause width; these constraints are non-trivial.
-
-### Approach 3: Lower bound relative to a specific encoding family
-
-**Target theorem (T3):** For any encoding in a certain family (that we characterize algebraically), the resolution proof length of integer multiplication commutativity is exponential in `N`.
+**Target theorem (T1'):** For all `N`, every resolution proof of the canonical CNF encoding `Φ_N` of `N`-bit unsigned multiplication commutativity has size `n^{ω(1)}` (superpolynomial in `N`).
 
 **Plan:**
-1. Define a class of "carry-propagation-faithful" encodings: encodings where the carry bit at position `i` is represented by a variable that can be resolved to either 0 or 1 by the solver.
-2. Show that any such encoding must include a gadget isomorphic to a known hard sub-formula.
-3. Apply existing lower bounds.
+1. Formalize `Φ_N` with partial-product and carry variables explicit.
+2. Construct a split `A ∪ B` where the shared variables are `{x, y, z₁, z₂}` and the interpolant must compute a *carry-chain-crossing* predicate.
+3. Show this predicate (a restricted form of multiplication verification) requires circuit size `n^{ω(1)}`, e.g., via a reduction from a known hard-for-small-circuits predicate (e.g., parity or inner-product mod 2 — but these are easy; better candidates needed).
+4. Apply Krajíček's interpolation theorem (Buss Theorem 45).
 
-**Advantage:** This weaker statement is easier to prove and still useful (captures shift-add, Dadda, Comba, combacs, Booth).
+**Risk:** Step 3 is likely the place where this approach either succeeds or reveals fundamental obstacles. If the "restricted multiplication predicate" is also in polynomial circuit size, this strategy fails. We would then need to appeal to more sophisticated models (monotone circuits, restricted depth, GF(2) arithmetic circuits) for the lower bound.
 
-**Risk:** The characterization "carry-propagation-faithful" may be technical.
+### Approach 2': Reduction from a known-hard resolution problem
 
-### Approach 4: GF(2) upper bound as a separating oracle
-
-**Target theorem (T4):** GF(2) multiplication commutativity has resolution proofs of polynomial size (we know it does empirically).
+**Target theorem (T2'):** There is a polynomial-size reduction from `PHP_n` (or Tseitin over an expander) to `Φ_N` such that any resolution proof of `Φ_N` yields a resolution proof of the source problem with a polynomial-size blowup.
 
 **Plan:**
-1. Explicitly construct a polynomial-size resolution proof for GF(2) commutativity.
-2. This establishes the existence of a provable separation between integer and GF(2), conditional on proving the integer side exponential.
-3. The construction: use the fact that GF(2) multiplication's bit-level circuit is a collection of XOR trees; prove commutativity one bit at a time via small local arguments.
+1. Identify a copy of `PHP_n` or a Tseitin formula embedded in `Φ_N`. The commutativity formula has `O(N²)` partial-product variables and `O(N²)` carry variables — enough degrees of freedom to embed an `N`-pigeon / `N-1`-hole structure.
+2. Prove the embedding preserves resolution proof size.
+3. Use Haken's `2^{Ω(n)}` lower bound on `PHP_n`.
 
-**Payoff:** Even without proving T1, T4 gives a concrete witness of why the two problems are fundamentally different, strengthening the empirical observation.
+**Risk:** Finding the explicit embedding is non-trivial. Multiplication's partial products are AND gates, not arbitrary relations, so the "pigeon" structure is not obviously there. This approach may need an intermediate step (e.g., embedding via a Tseitin formula that comes from a graph whose edges correspond to carry dependencies).
 
-## Deliverables and timeline
+### Approach 3': GF(2) upper bound as a provable separation
+
+**Target theorem (T3'):** There is a polynomial-size family of resolution proofs for GF(2) multiplication commutativity.
+
+**Plan:**
+1. Give an explicit polynomial-size resolution refutation for the GF(2) commutativity formula `Ψ_N`.
+2. Technique: exploit the fact that GF(2) partial-product accumulation is *linear* in GF(2), so each output bit is an XOR of ANDs. Use the standard resolution proof of linear identities, which is polynomial in `N`.
+3. This, combined with either Approach 1' or 2' on the integer side, would yield the provable separation.
+
+**Payoff:** Even without proving T1' or T2', T3' alone is publishable: a polynomial-size proof for the GF(2) case, combined with our empirical evidence that integer is exponentially harder at BW ≥ 10, would be a substantial partial result.
+
+### Approach 4': Obstacles and meta-theorem
+
+Check whether the interpolation approach is blocked by natural-proof-style obstacles:
+- **Natural proofs (Razborov-Rudich) do not obviously apply** here because multiplication is in `P/poly`, so lower bounds on multiplication-verification are not constrained by SPRNG. This is an important *negative* observation: the Razborov 1995 meta-obstacle does *not* rule out the approach.
+- The approach could still be blocked by more subtle obstacles (e.g., algebraic natural proofs [Grochow et al. 2017]). Worth investigating.
+
+## Deliverables and timeline (revised)
 
 | Month | Deliverable |
 |---|---|
-| 1 | Literature review and identification of most promising reduction target |
-| 2 | Formal statement of `Φ_N` family and the separation theorem, written in Lean 4 |
-| 3 | Attempt Approach 4 (GF(2) upper bound) — formal construction |
-| 4 | Attempt Approach 3 (restricted encoding family lower bound) |
-| 5-6 | Write up results, submit to a proof complexity venue (STACS, CCC, ICALP) |
+| 1 | Formalize `Φ_N` CNF family in Lean 4; state T1', T2', T3' precisely. |
+| 2 | Attempt T3' (GF(2) polynomial-size resolution upper bound). This is the most concrete and likely most tractable goal. |
+| 3 | Attempt T1' (interpolation) or T2' (reduction), whichever looks more promising after T3'. |
+| 4 | Formalize the relevant portions in Lean 4 / Isabelle / Coq as a verification step. |
+| 5-6 | Write up. Target venues: CCC (Computational Complexity Conference), ICALP (Track B), STACS. |
 
 ## Tools
 
 - **Lean 4 / Mathlib** for any formal proof (the algebraic paper already formalizes part of this; extending is natural).
-- **CaDiCaL / CakeML** for machine-checked proof verification of any explicit constructions.
-- **PRADA / RaMus** for automated proof complexity lower bound research tools.
+- **Krajíček's textbook** "Proof Complexity" (Cambridge 2019) for technical details on interpolation.
+- **Buss 1995** (this document) for the overall framework.
+- **Chu, Krajíček** "Proof complexity and cryptography" for additional tooling on natural-proof obstacles.
 
 ## Expected outcome
 
-A paper of the form:
-- **Theorem:** Resolution proof length of integer multiplication commutativity is `2^{Ω(N)}` (under `<caveat>`).
-- **Separation:** GF(2) commutativity has polynomial proofs.
-- **Implication:** The exponential-scaling phenomenon observed empirically in SAT solvers for multiplication is proof-theoretic, not solver-heuristic. This closes an open question posed by Biere and Kauers (2019).
+A paper of one of the following forms:
+- **Best case**: "Exponential separation between integer and GF(2) multiplication commutativity in resolution" (T1' + T3').
+- **Realistic**: "A polynomial-size resolution proof for GF(2) multiplication commutativity" (T3' alone, with empirical evidence for the integer side from our current paper).
+- **Fallback**: "Obstacles to proving exponential lower bounds for integer multiplication via interpolation" (a meta-result clarifying what techniques cannot work, guiding future research).
 
-## Fallback
+## Explicit connection to Paper 1
 
-If a full lower bound is not provable in the available time:
-1. Prove a conditional lower bound (e.g., "assuming Hypothesis H, the integer case is `2^{Ω(N)}`").
-2. Prove a weaker "no short polynomial calculus proof" result, which is typically easier and still publishable.
-3. Formalize the GF(2) upper bound (Approach 4) alone as a separation result, which is itself a contribution.
-
-## Connection to Paper 1
-
-A proof, even conditional or restricted, would be cited from Paper 1 Section 3 to upgrade "carry propagation correlates strongly with SAT hardness" to "carry propagation provably causes exponential resolution length in specific encoding families (Theorem X)." This is the single most impactful improvement a reviewer would ask for.
+Paper 1 currently presents the empirical causation result (§3 Table tab:n2: carry presence is the dominant causal factor, ≥1000× at BW ≥ 10). The N1 result, in any of the three forms above, would upgrade this to a proof-theoretic separation. The narrative would then be: "empirically observed in our controlled experiment; provably an exponential gap." This is the single most impactful theoretical improvement possible for this line of work.
