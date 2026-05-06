@@ -40,11 +40,11 @@ separates column reduction from carry propagation, achieving
 that carry propagation correlates strongly with SAT hardness: at 13
 bits, integer multiplication needs 23$\times$ more conflicts than
 carry-free GF(2) multiplication despite only 1.6$\times$ more
-clauses. Applying the same methodology to
-alternative encodings (Booth radix-4, 4-bit blocks, sorting
-networks), we find that no single encoding dominates: Booth is
-17$\times$ faster on strength-reduction benchmarks, while \combacs
-is 2$\times$ faster on commutativity. The optimal encoding depends on
+clauses. Comparing \combacs with pre-existing alternative
+encodings (Booth radix-4, 4-bit blocks, sorting networks), we
+find that no single encoding dominates: Booth is 17$\times$ faster
+on strength-reduction benchmarks, while \combacs is 2$\times$
+faster on bfloat16 commutativity. The optimal encoding depends on
 problem structure, motivating adaptive selection.
 \end{abstract}
 
