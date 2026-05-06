@@ -66,7 +66,15 @@ A bounded model checker encodes this as a SAT problem with two
 multiplier circuits and an equality check. With the standard
 shift-and-add encoding, \cadical~\cite{biere2019cadical} times out
 after 120\,s. With our carry-save Comba encoding, it solves in
-5.3\,s---a 71$\times$ speedup from changing only the encoding.
+5.6\,s---a 21$\times$ speedup from changing only the
+encoding.\footnote{With \cbmc's algebraic pre-solver enabled (a
+companion paper), commutativity benchmarks are solved in
+${\sim}$5\,ms regardless of encoding. The numbers here are with
+the algebraic pre-solver disabled, isolating the encoding's
+contribution. In the deployed configuration, the encoding matters
+primarily for problems the algebraic layer cannot handle:
+bitwise operations, inequalities, floating-point, and structural
+mismatches.}
 
 How did we arrive at this encoding? Not by theoretical analysis of
 circuit complexity, but by a systematic methodology: generate a DRAT
@@ -491,8 +499,16 @@ independence reduces inter-column reasoning in the proof.
 \section{Alternative Encodings}
 \label{sec:alternative}
 
-Applying the proof-guided methodology to other encoding strategies,
-we implemented and evaluated three alternatives.
+Three alternative encodings from the literature were implemented in
+\cbmc and evaluated alongside \combacs: Booth radix-4 from hardware
+arithmetic~\cite{booth1951signed}, 4-bit block multiplication
+(suggested by Martin Brain, private communication), and sorting
+networks adapted from counting-based synthesis. For each, we use
+the same DRAT proof analysis that guided \combacs's design to
+\emph{understand} why the encoding helps or hurts on specific
+benchmark patterns. These encodings were not designed via proof
+analysis; they are pre-existing ideas whose interaction with SAT
+solvers we characterize here.
 
 \subsection{Booth Radix-4}
 
@@ -901,8 +917,6 @@ The proof-size ratios track the solver-time ratios closely but are
 insensitive to wall-clock measurement noise, making them the more
 reliable comparison statistic. All claims in this paper could be
 restated in terms of proof sizes with the same conclusions.
-
-\subsection{Multiplier Encoding Comparison}
 
 \subsection{Scaling}
 
