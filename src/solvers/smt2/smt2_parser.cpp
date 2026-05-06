@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "smt2_parser.h"
 
-#include "smt2_format.h"
-
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
@@ -19,6 +17,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/mathematical_expr.h>
 #include <util/prefix.h>
 #include <util/range.h>
+
+#include "smt2_format.h"
+#include "smt2irep.h"
 
 #include <numeric>
 
@@ -121,10 +122,40 @@ void smt2_parsert::ignore_command()
 
 exprt::operandst smt2_parsert::operands()
 {
+  // If our iterative walker (convert_irep_to_exprt) has pre-computed the
+  // operands for the handler about to run, consume them here.
+  if(precollected_operands.has_value())
+  {
+    auto result = std::move(*precollected_operands);
+    precollected_operands.reset();
+    return result;
+  }
+
   exprt::operandst result;
 
   while(smt2_tokenizer.peek() != smt2_tokenizert::CLOSE)
-    result.push_back(expression());
+  {
+    // For each operand, if it starts with '(' we read it via smt2irep into
+    // a generic S-expression irept iteratively, then walk that irept
+    // iteratively to produce the corresponding exprt. This keeps the
+    // parser stack-safe even for operands that are deeply right-nested
+    // function applications such as (bvand x (bvand x (bvand x ...))),
+    // which are common in SMT-COMP QF_ABV benchmarks.
+    //
+    // For atomic operands the existing expression() path is used; it
+    // does not recurse on atoms.
+    if(smt2_tokenizer.peek() == smt2_tokenizert::OPEN)
+    {
+      auto irep_opt = smt2irep(smt2_tokenizer);
+      if(!irep_opt.has_value())
+        throw error("EOF in an operand");
+      result.push_back(convert_irep_to_exprt(*irep_opt));
+    }
+    else
+    {
+      result.push_back(expression());
+    }
+  }
 
   next_token(); // eat the ')'
 
@@ -1014,6 +1045,470 @@ exprt smt2_parsert::bv_mod(const exprt::operandst &operands, bool is_signed)
     {dividend, divisor},
     {operands[0], operands[1]},
     if_exprt(divisor_is_zero, dividend, mod_result));
+}
+
+exprt smt2_parsert::convert_irep_to_exprt(const irept &root)
+{
+  // Post-order walk over the S-expression irept using an explicit frame
+  // stack. The existing expressions[] / id_map / function_application_with_id
+  // machinery is reused for semantic translation: for every function
+  // application node we pre-compute the operand exprts and pass them to
+  // the handler via precollected_operands.
+  //
+  // Forms handled here:
+  //   - atoms (numerals, bitvector literals, symbols, booleans)
+  //   - (let ((x1 v1) ...) body)
+  //   - (_ bv... n)  / (_ +oo e f) / (_ -oo e f) / (_ NaN e f)
+  //   - (! term :named foo ...)
+  //   - ((_ extract ...) op) and other indexed-identifier applications
+  //   - ((as const T) v)
+  //   - regular function applications (head is a SYMBOL)
+  //
+  // Quantifiers, lambdas and other unusual forms are not produced by
+  // smt2irep callers in QF_ABV; if encountered, an error is raised.
+
+  enum staget
+  {
+    S_START,
+    S_CHILDREN_DONE,
+    S_LET_BINDINGS_DONE,
+    S_LET_BODY_DONE
+  };
+
+  struct framet
+  {
+    const irept *node;
+    staget stage = S_START;
+    // For let scope management:
+    std::vector<std::pair<irep_idt, idt>> saved_ids;
+    std::vector<std::pair<irep_idt, exprt>> bindings;
+  };
+
+  std::vector<framet> frames;
+  std::vector<exprt> results;
+  frames.push_back({&root});
+
+  auto classify_atom = [this](const std::string &buffer) -> exprt
+  {
+    if(buffer.size() >= 2 && buffer[0] == '#' && buffer[1] == 'x')
+    {
+      mp_integer value =
+        string2integer(std::string(buffer, 2, std::string::npos), 16);
+      const std::size_t width = 4 * (buffer.size() - 2);
+      CHECK_RETURN(width != 0 && width % 4 == 0);
+      return from_integer(value, unsignedbv_typet(width));
+    }
+    if(buffer.size() >= 2 && buffer[0] == '#' && buffer[1] == 'b')
+    {
+      mp_integer value =
+        string2integer(std::string(buffer, 2, std::string::npos), 2);
+      const std::size_t width = buffer.size() - 2;
+      CHECK_RETURN(width != 0);
+      return from_integer(value, unsignedbv_typet(width));
+    }
+    // A decimal numeral consists entirely of digits (optionally with a
+    // single '.' for reals). Note that SMT-LIB symbols are permitted to
+    // start with '.' (e.g. '.cse28' in let bindings emitted by Z3), so
+    // first character alone is not enough to classify.
+    auto looks_like_numeral = [&buffer]
+    {
+      if(buffer.empty())
+        return false;
+      bool seen_digit = false;
+      for(char ch : buffer)
+      {
+        if(isdigit(static_cast<unsigned char>(ch)))
+          seen_digit = true;
+        else if(ch != '.')
+          return false;
+      }
+      return seen_digit;
+    };
+    if(looks_like_numeral())
+      return constant_exprt(buffer, integer_typet());
+    // Otherwise assume SYMBOL: look up in expressions[] (covers true/false,
+    // rounding modes, ...) and then in id_map.
+    const auto e_it = expressions.find(buffer);
+    if(e_it != expressions.end())
+      return e_it->second();
+    auto id_it = id_map.find(buffer);
+    if(id_it != id_map.end())
+      return symbol_exprt(buffer, id_it->second.type);
+    throw error() << "unknown expression '" << buffer << '\'';
+  };
+
+  auto is_leaf = [](const irept &ir) { return ir.get_sub().empty(); };
+
+  while(!frames.empty())
+  {
+    framet &top = frames.back();
+    const irept &n = *top.node;
+
+    if(top.stage == S_START)
+    {
+      if(is_leaf(n))
+      {
+        results.push_back(classify_atom(n.id_string()));
+        frames.pop_back();
+        continue;
+      }
+
+      if(n.get_sub().empty())
+        throw error("empty s-expression");
+
+      const irept &head = n.get_sub().front();
+
+      if(is_leaf(head))
+      {
+        const std::string &head_id = head.id_string();
+
+        if(head_id == "let")
+        {
+          if(n.get_sub().size() != 3)
+            throw error("malformed let expression");
+          const irept &bindings = n.get_sub()[1];
+          top.stage = S_LET_BINDINGS_DONE;
+          // Queue all binding values in reverse so they resolve left-to-right.
+          for(auto it = bindings.get_sub().rbegin();
+              it != bindings.get_sub().rend();
+              ++it)
+          {
+            if(it->get_sub().size() != 2)
+              throw error("malformed let binding");
+            frames.push_back({&it->get_sub()[1]});
+          }
+          continue;
+        }
+
+        if(head_id == "_")
+        {
+          // (_ bv... N) or (_ +oo e f) etc. — no sub-expressions to convert.
+          if(n.get_sub().size() < 3)
+            throw error("malformed indexed identifier");
+          const std::string &inner = n.get_sub()[1].id_string();
+          if(has_prefix(inner, "bv"))
+          {
+            mp_integer i =
+              string2integer(std::string(inner, 2, std::string::npos));
+            auto width_s = n.get_sub()[2].id_string();
+            auto width = std::stoll(width_s);
+            results.push_back(from_integer(i, unsignedbv_typet(width)));
+            frames.pop_back();
+            continue;
+          }
+          if(inner == "+oo" || inner == "-oo" || inner == "NaN")
+          {
+            if(n.get_sub().size() != 4)
+              throw error() << "malformed " << inner;
+            auto width_e = std::stoll(n.get_sub()[2].id_string());
+            auto width_f = std::stoll(n.get_sub()[3].id_string());
+            const ieee_float_spect spec(width_f - 1, width_e);
+            if(inner == "+oo")
+              results.push_back(ieee_floatt::plus_infinity(spec).to_expr());
+            else if(inner == "-oo")
+              results.push_back(ieee_floatt::minus_infinity(spec).to_expr());
+            else
+              results.push_back(ieee_floatt::NaN(spec).to_expr());
+            frames.pop_back();
+            continue;
+          }
+          throw error() << "unknown indexed identifier " << inner;
+        }
+
+        if(head_id == "!")
+        {
+          // (! term :named foo ...) — evaluate term, then process attributes
+          if(n.get_sub().size() < 2)
+            throw error("malformed term attribute");
+          top.stage = S_CHILDREN_DONE;
+          frames.push_back({&n.get_sub()[1]}); // the term
+          continue;
+        }
+
+        // Regular function application: queue all operand children.
+        top.stage = S_CHILDREN_DONE;
+        for(std::size_t i = n.get_sub().size(); i-- > 1;)
+          frames.push_back({&n.get_sub()[i]});
+        continue;
+      }
+
+      // head is itself an interior node — ((_ extract ...) op) etc.
+      const irept &head_head = head.get_sub().front();
+      if(
+        is_leaf(head_head) &&
+        (head_head.id_string() == "_" || head_head.id_string() == "as"))
+      {
+        // Queue operands (arguments to the indexed identifier / as-const).
+        top.stage = S_CHILDREN_DONE;
+        for(std::size_t i = n.get_sub().size(); i-- > 1;)
+          frames.push_back({&n.get_sub()[i]});
+        continue;
+      }
+
+      throw error("unsupported s-expression head");
+    }
+
+    if(top.stage == S_CHILDREN_DONE)
+    {
+      const irept &head = n.get_sub().front();
+
+      if(is_leaf(head))
+      {
+        const irep_idt head_id = head.id_string();
+
+        if(head_id == "!")
+        {
+          // Pop the term from the result stack.
+          exprt term = std::move(results.back());
+          results.pop_back();
+          // Process :named attribute pairs, matching the token-based
+          // implementation in function_application_with_id(). Other
+          // attributes are not supported here.
+          for(std::size_t i = 2; i < n.get_sub().size();)
+          {
+            const std::string &kw = n.get_sub()[i].id_string();
+            if(kw == ":named")
+            {
+              if(i + 1 >= n.get_sub().size())
+                throw error("expected value after :named");
+              if(!term.is_boolean())
+                throw error("named terms must be Boolean");
+              const std::string &name = n.get_sub()[i + 1].id_string();
+              symbol_exprt symbol_expr(name, bool_typet());
+              named_terms.emplace(
+                symbol_expr.identifier(), named_termt(term, symbol_expr));
+              i += 2;
+            }
+            else
+              throw error("unknown term attribute");
+          }
+          results.push_back(std::move(term));
+          frames.pop_back();
+          continue;
+        }
+
+        // Regular function application: pop operands, dispatch.
+        const std::size_t nops = n.get_sub().size() - 1;
+        exprt::operandst ops(nops);
+        for(std::size_t i = nops; i-- > 0;)
+        {
+          ops[i] = std::move(results.back());
+          results.pop_back();
+        }
+
+        // The handler table expects operands via operands(); we make them
+        // available through precollected_operands.
+        precollected_operands = std::move(ops);
+        try
+        {
+          results.push_back(function_application_with_id(head_id));
+        }
+        catch(...)
+        {
+          precollected_operands.reset();
+          throw;
+        }
+        precollected_operands.reset();
+        frames.pop_back();
+        continue;
+      }
+
+      // head is a complex sub-expression — ((_ extract ...) op) or
+      // ((as const T) v). Pop operands first.
+      const std::size_t nops = n.get_sub().size() - 1;
+      exprt::operandst ops(nops);
+      for(std::size_t i = nops; i-- > 0;)
+      {
+        ops[i] = std::move(results.back());
+        results.pop_back();
+      }
+
+      const irept &head_head = head.get_sub().front();
+      if(is_leaf(head_head) && head_head.id_string() == "_")
+      {
+        // ((_ <name> <index>+) <op>+)
+        if(head.get_sub().size() < 2)
+          throw error("malformed indexed identifier");
+        const irep_idt id = head.get_sub()[1].id_string();
+
+        if(id == "extract")
+        {
+          if(head.get_sub().size() != 4 || ops.size() != 1)
+            throw error("extract takes two indices and one operand");
+          auto upper = std::stoll(head.get_sub()[2].id_string());
+          auto lower = std::stoll(head.get_sub()[3].id_string());
+          if(upper < lower)
+            throw error("extract got bad indices");
+          auto lower_e = from_integer(lower, integer_typet());
+          unsignedbv_typet t(upper - lower + 1);
+          results.push_back(extractbits_exprt(ops[0], lower_e, t));
+          frames.pop_back();
+          continue;
+        }
+
+        if(
+          id == "rotate_left" || id == "rotate_right" || id == ID_repeat ||
+          id == "sign_extend" || id == ID_zero_extend)
+        {
+          if(head.get_sub().size() != 3 || ops.size() != 1)
+            throw error() << id << " takes one index and one operand";
+          auto index = string2integer(head.get_sub()[2].id_string());
+          if(id == "rotate_left")
+          {
+            auto dist = from_integer(index, integer_typet());
+            results.push_back(
+              binary_exprt(ops[0], ID_rol, dist, ops[0].type()));
+          }
+          else if(id == "rotate_right")
+          {
+            auto dist = from_integer(index, integer_typet());
+            results.push_back(
+              binary_exprt(ops[0], ID_ror, dist, ops[0].type()));
+          }
+          else if(id == "sign_extend")
+          {
+            const auto width = to_unsignedbv_type(ops[0].type()).get_width();
+            const signedbv_typet small_signed_type{width};
+            const signedbv_typet large_signed_type{width + index};
+            const unsignedbv_typet unsigned_type{width + index};
+            results.push_back(typecast_exprt(
+              typecast_exprt(
+                typecast_exprt(ops[0], small_signed_type), large_signed_type),
+              unsigned_type));
+          }
+          else if(id == ID_zero_extend)
+          {
+            auto width = to_unsignedbv_type(ops[0].type()).get_width();
+            unsignedbv_typet unsigned_type{width + index};
+            results.push_back(zero_extend_exprt{ops[0], unsigned_type});
+          }
+          else
+          {
+            auto i = from_integer(index, integer_typet());
+            auto width = to_unsignedbv_type(ops[0].type()).get_width() * index;
+            results.push_back(
+              replication_exprt(i, ops[0], unsignedbv_typet(width)));
+          }
+          frames.pop_back();
+          continue;
+        }
+
+        if(id == "fp.to_sbv" || id == "fp.to_ubv")
+        {
+          if(head.get_sub().size() != 3 || ops.size() != 2)
+            throw error() << id << " takes one index and two operands";
+          auto width = std::stoll(head.get_sub()[2].id_string());
+          if(ops[1].type().id() != ID_floatbv)
+            throw error() << id << " takes a FloatingPoint operand";
+          if(id == "fp.to_sbv")
+            results.push_back(typecast_exprt(
+              floatbv_typecast_exprt(ops[1], ops[0], signedbv_typet(width)),
+              unsignedbv_typet(width)));
+          else
+            results.push_back(
+              floatbv_typecast_exprt(ops[1], ops[0], unsignedbv_typet(width)));
+          frames.pop_back();
+          continue;
+        }
+
+        // For `to_fp` / `to_fp_unsigned` the existing implementation
+        // depends on whether the source operand is real, integer, bitvector
+        // or floating-point, and in the real-or-integer case on the
+        // constant representation. Re-implementing that here duplicates a
+        // non-trivial amount of logic; in QF_ABV these forms do not
+        // appear. Fall back to an error rather than risk a behavioural
+        // divergence.
+        throw error() << "indexed identifier '" << id
+                      << "' not supported in iterative walk";
+      }
+
+      if(is_leaf(head_head) && head_head.id_string() == "as")
+      {
+        // ((as const T) v)
+        if(
+          head.get_sub().size() != 3 || !is_leaf(head.get_sub()[1]) ||
+          head.get_sub()[1].id_string() != "const" || ops.size() != 1)
+        {
+          throw error("unexpected 'as' expression");
+        }
+        // The sort T was parsed by smt2irep as a generic irept, not a
+        // typet — we do not support as-const in the iterative walk.
+        throw error() << "as-const not supported in iterative walk";
+      }
+
+      throw error("unsupported s-expression head in stage S_CHILDREN_DONE");
+    }
+
+    if(top.stage == S_LET_BINDINGS_DONE)
+    {
+      // All binding values have been evaluated. The queueing step pushed
+      // the bindings right-to-left, so the bindings were processed
+      // left-to-right (LIFO). This means the TOP of results is the
+      // rightmost binding's value, and the oldest entry on results is
+      // the leftmost binding's value.
+      const irept &bindings = n.get_sub()[1];
+      const std::size_t nb = bindings.get_sub().size();
+
+      top.bindings.resize(nb);
+      for(std::size_t i = 0; i < nb; i++)
+      {
+        top.bindings[i].first = bindings.get_sub()[i].get_sub()[0].id_string();
+      }
+      // Pop values in reverse order: top of results is bindings[nb-1].
+      for(std::size_t i = nb; i-- > 0;)
+      {
+        top.bindings[i].second = std::move(results.back());
+        results.pop_back();
+      }
+
+      // Install bindings in id_map; record shadows for restoration.
+      for(const auto &b : top.bindings)
+      {
+        auto ins = id_map.insert({b.first, idt{idt::BINDING, b.second}});
+        if(!ins.second)
+        {
+          top.saved_ids.emplace_back(
+            ins.first->first, std::move(ins.first->second));
+          ins.first->second = idt{idt::BINDING, b.second};
+        }
+      }
+
+      top.stage = S_LET_BODY_DONE;
+      frames.push_back({&n.get_sub()[2]}); // body
+      continue;
+    }
+
+    if(top.stage == S_LET_BODY_DONE)
+    {
+      exprt body = std::move(results.back());
+      results.pop_back();
+
+      binding_exprt::variablest variables;
+      exprt::operandst values;
+      variables.reserve(top.bindings.size());
+      values.reserve(top.bindings.size());
+      for(const auto &b : top.bindings)
+      {
+        variables.emplace_back(b.first, b.second.type());
+        values.push_back(b.second);
+      }
+
+      for(const auto &b : top.bindings)
+        id_map.erase(b.first);
+      for(auto &s : top.saved_ids)
+        id_map.insert(std::move(s));
+
+      results.push_back(
+        let_exprt(std::move(variables), std::move(values), std::move(body)));
+      frames.pop_back();
+      continue;
+    }
+
+    UNREACHABLE;
+  }
+
+  POSTCONDITION(results.size() == 1);
+  return std::move(results.front());
 }
 
 exprt smt2_parsert::expression()

@@ -9,13 +9,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_SMT2_SMT2_PARSER_H
 #define CPROVER_SOLVERS_SMT2_SMT2_PARSER_H
 
-#include <map>
-#include <unordered_map>
-
 #include <util/mathematical_types.h>
 #include <util/std_expr.h>
 
 #include "smt2_tokenizer.h"
+
+#include <map>
+#include <optional>
+#include <unordered_map>
+
+class irept;
 
 class smt2_parsert
 {
@@ -157,6 +160,22 @@ protected:
   exprt function_application_ieee_float_eq(const exprt::operandst &);
   exprt function_application_fp(const exprt::operandst &);
   exprt::operandst operands();
+
+  /// When set, the next call to operands() takes these as its result rather
+  /// than reading further from the tokenizer. Used by the iterative
+  /// walker in convert_irep_to_exprt() to feed pre-computed operand
+  /// exprts to the expressions[] / id_map dispatch logic in
+  /// function_application_with_id().
+  std::optional<exprt::operandst> precollected_operands;
+
+  /// Convert a generic S-expression irept (as produced by smt2irep())
+  /// into the corresponding exprt without using the C++ call stack for
+  /// tree traversal: both operand collection and nested 'let' scoping are
+  /// driven by an explicit work-list of frames. For simple function
+  /// applications the existing tokenizer-based machinery is reused by
+  /// dispatching through function_application_with_id() with
+  /// precollected_operands populated from the walk's result stack.
+  exprt convert_irep_to_exprt(const irept &);
   typet function_signature_declaration();
   signature_with_parameter_idst function_signature_definition();
   void check_matching_operand_types(const exprt::operandst &) const;
