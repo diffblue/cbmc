@@ -265,11 +265,18 @@ jobs:
         run: cd build; ctest . -V -L CORE -j${{env.linux-vcpus}}
       - name: Check cleanup
         run: |
+          cmake --build build --target clean
           rm -r build
-          rm scripts/bash-autocomplete/cbmc.sh
-          make -C unit clean
-          make -C regression clean
-          make -C jbmc/regression clean
+          find regression jbmc/regression \( -name '*.out' -o -name '*.gb' -o -name '*.dimacs' -o -name '*.obj' -o -name '*.o' -o -name '*.goto-cc-saved' \) -delete
+          find regression -not -path 'regression/goto-bmc/invalid-files/*' -name '*.goto' -delete
+          find regression/cbmc regression/cbmc-incr-smt2 regression/cbmc-sequentialization regression/cbmc-shadow-memory regression/book-examples regression/statement-list -name '*.smt2' -delete
+          find regression/snapshot-harness regression/solver-hardness -name '*.json' -delete
+          find regression/goto-harness -name '*-harness.c' -delete
+          find regression/goto-instrument-wmm-core -mindepth 2 \( -name '*.txt' -o -name '*.dot' \) -delete
+          rm -rf jbmc/regression/jbmc/classpath-class-incorrect-package/incorrect-classes
+          rm -rf jbmc/regression/jbmc/classpath-class-with-one-dir/default-classes
+          rm -rf jbmc/regression/jbmc/overlay-class/annotations jbmc/regression/jbmc/overlay-class/correct-overlay jbmc/regression/jbmc/overlay-class/ignored-method jbmc/regression/jbmc/overlay-class/unmarked-overlay
+          rm -f jbmc/regression/jbmc/overlay-class/Test.class
           if [[ $(git status --ignored --porcelain | grep -v .ccache/) ]] ; then
             git status --ignored
             exit 1

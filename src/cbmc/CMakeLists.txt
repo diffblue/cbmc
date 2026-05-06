@@ -65,6 +65,9 @@ if(NOT WIN32)
   add_custom_target(cbmc.sh ALL
     DEPENDS "${CBMC_ROOT_DIR}/scripts/bash-autocomplete/cbmc.sh"
   )
+  set_property(TARGET cbmc.sh APPEND PROPERTY
+    ADDITIONAL_CLEAN_FILES "${CBMC_ROOT_DIR}/scripts/bash-autocomplete/cbmc.sh"
+  )
   install(
     FILES ${CBMC_ROOT_DIR}/scripts/bash-autocomplete/cbmc.sh
     DESTINATION etc/bash_completion.d
