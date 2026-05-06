@@ -57,3 +57,34 @@ Running 5 configurations × 12 benchmarks. Will show:
 - What does 1 layer (shift-add only) solve?
 - What does each additional layer add?
 - Which benchmarks require which layer?
+
+## Update: Equation Ordering Investigation
+
+The 2000× claim in the paper was based on a reading where:
+- `assoc_8` with wrong ordering hit the step limit at 7.5s
+- `assoc_8` with correct ordering solved in 3.3ms (2272× faster)
+
+However, since that original finding, we added **progress-based
+Buchberger termination** (commit 8a43c203a2) which tracks whether
+the ideal grew in each round. This means the algorithm terminates
+even without correct ordering—it just takes a few more rounds.
+
+**Current state:** With all current optimizations (progress-based
+termination, fresh variable decomposition), equation ordering makes
+no measurable difference (<10% on tested benchmarks).
+
+**Implication for Paper 2:** The 2000× claim is historically accurate
+but not currently reproducible on the same benchmarks. Two honest
+options:
+
+1. **Reframe:** "Early versions of our implementation were highly
+   sensitive to equation ordering (2000× slowdown with naive
+   ordering). Progress-based termination (motivated by the Lean
+   formalization) eliminated this sensitivity."
+2. **Retract:** Remove the specific 2000× number and describe
+   equation ordering as an implementation concern.
+
+The Lean 4 formalization led to a better algorithm (progress-based
+termination) is itself a PAPER-WORTHY finding — mechanized proofs
+improved the C++ implementation. This is strong evidence of the
+value of mechanized verification for solver development.
