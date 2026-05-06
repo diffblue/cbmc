@@ -485,126 +485,134 @@ exprt smt2_parsert::function_application_fp(const exprt::operandst &op)
     fp_type);
 }
 
+exprt smt2_parsert::function_application_with_id(const irep_idt &id)
+{
+  if(id == "_") // indexed identifier
+  {
+    // indexed identifier
+    if(next_token() != smt2_tokenizert::SYMBOL)
+      throw error("expected symbol after '_'");
+
+    // copy, the reference won't be stable
+    const auto inner_id = smt2_tokenizer.get_buffer();
+
+    if(has_prefix(inner_id, "bv"))
+    {
+      mp_integer i = string2integer(
+        std::string(smt2_tokenizer.get_buffer(), 2, std::string::npos));
+
+      if(next_token() != smt2_tokenizert::NUMERAL)
+        throw error("expected numeral as bitvector literal width");
+
+      auto width = std::stoll(smt2_tokenizer.get_buffer());
+
+      if(next_token() != smt2_tokenizert::CLOSE)
+        throw error("expected ')' after bitvector literal");
+
+      return from_integer(i, unsignedbv_typet(width));
+    }
+    else if(inner_id == "+oo" || inner_id == "-oo" || inner_id == "NaN")
+    {
+      // These are the "plus infinity", "minus infinity" and NaN
+      // floating-point literals.
+      if(next_token() != smt2_tokenizert::NUMERAL)
+        throw error() << "expected number after " << inner_id;
+
+      auto width_e = std::stoll(smt2_tokenizer.get_buffer());
+
+      if(next_token() != smt2_tokenizert::NUMERAL)
+        throw error() << "expected second number after " << inner_id;
+
+      auto width_f = std::stoll(smt2_tokenizer.get_buffer());
+
+      if(next_token() != smt2_tokenizert::CLOSE)
+        throw error() << "expected ')' after " << inner_id;
+
+      // width_f *includes* the hidden bit
+      const ieee_float_spect spec(width_f - 1, width_e);
+
+      if(inner_id == "+oo")
+        return ieee_floatt::plus_infinity(spec).to_expr();
+      else if(inner_id == "-oo")
+        return ieee_floatt::minus_infinity(spec).to_expr();
+      else // NaN
+        return ieee_floatt::NaN(spec).to_expr();
+    }
+    else
+    {
+      throw error() << "unknown indexed identifier " << inner_id;
+    }
+  }
+  else if(id == "!")
+  {
+    // these are "term attributes"
+    const auto term = expression();
+
+    while(smt2_tokenizer.peek() == smt2_tokenizert::KEYWORD)
+    {
+      next_token(); // eat the keyword
+      if(smt2_tokenizer.get_buffer() == "named")
+      {
+        // 'named terms' must be Boolean
+        if(!term.is_boolean())
+          throw error("named terms must be Boolean");
+
+        if(next_token() == smt2_tokenizert::SYMBOL)
+        {
+          const symbol_exprt symbol_expr(
+            smt2_tokenizer.get_buffer(), bool_typet());
+          named_terms.emplace(
+            symbol_expr.identifier(), named_termt(term, symbol_expr));
+        }
+        else
+          throw error("invalid name attribute, expected symbol");
+      }
+      else
+        throw error("unknown term attribute");
+    }
+
+    if(next_token() != smt2_tokenizert::CLOSE)
+      throw error("expected ')' at end of term attribute");
+    else
+      return term;
+  }
+  else
+  {
+    // non-indexed symbol, look up in expression table
+    const auto e_it = expressions.find(id2string(id));
+    if(e_it != expressions.end())
+      return e_it->second();
+
+    // get the operands
+    auto op = operands();
+
+    // rummage through id_map
+    auto id_it = id_map.find(id);
+    if(id_it != id_map.end())
+    {
+      if(id_it->second.type.id() == ID_mathematical_function)
+      {
+        return function_application(symbol_exprt(id, id_it->second.type), op);
+      }
+      else
+        return symbol_exprt(id, id_it->second.type);
+    }
+    else
+      throw error() << "unknown function symbol '" << id << '\'';
+  }
+
+  UNREACHABLE;
+}
+
 exprt smt2_parsert::function_application()
 {
   switch(next_token())
   {
   case smt2_tokenizert::SYMBOL:
-    if(smt2_tokenizer.get_buffer() == "_") // indexed identifier
-    {
-      // indexed identifier
-      if(next_token() != smt2_tokenizert::SYMBOL)
-        throw error("expected symbol after '_'");
-
-      // copy, the reference won't be stable
-      const auto id = smt2_tokenizer.get_buffer();
-
-      if(has_prefix(id, "bv"))
-      {
-        mp_integer i = string2integer(
-          std::string(smt2_tokenizer.get_buffer(), 2, std::string::npos));
-
-        if(next_token() != smt2_tokenizert::NUMERAL)
-          throw error("expected numeral as bitvector literal width");
-
-        auto width = std::stoll(smt2_tokenizer.get_buffer());
-
-        if(next_token() != smt2_tokenizert::CLOSE)
-          throw error("expected ')' after bitvector literal");
-
-        return from_integer(i, unsignedbv_typet(width));
-      }
-      else if(id == "+oo" || id == "-oo" || id == "NaN")
-      {
-        // These are the "plus infinity", "minus infinity" and NaN
-        // floating-point literals.
-        if(next_token() != smt2_tokenizert::NUMERAL)
-          throw error() << "expected number after " << id;
-
-        auto width_e = std::stoll(smt2_tokenizer.get_buffer());
-
-        if(next_token() != smt2_tokenizert::NUMERAL)
-          throw error() << "expected second number after " << id;
-
-        auto width_f = std::stoll(smt2_tokenizer.get_buffer());
-
-        if(next_token() != smt2_tokenizert::CLOSE)
-          throw error() << "expected ')' after " << id;
-
-        // width_f *includes* the hidden bit
-        const ieee_float_spect spec(width_f - 1, width_e);
-
-        if(id == "+oo")
-          return ieee_floatt::plus_infinity(spec).to_expr();
-        else if(id == "-oo")
-          return ieee_floatt::minus_infinity(spec).to_expr();
-        else // NaN
-          return ieee_floatt::NaN(spec).to_expr();
-      }
-      else
-      {
-        throw error() << "unknown indexed identifier " << id;
-      }
-    }
-    else if(smt2_tokenizer.get_buffer() == "!")
-    {
-      // these are "term attributes"
-      const auto term = expression();
-
-      while(smt2_tokenizer.peek() == smt2_tokenizert::KEYWORD)
-      {
-        next_token(); // eat the keyword
-        if(smt2_tokenizer.get_buffer() == "named")
-        {
-          // 'named terms' must be Boolean
-          if(!term.is_boolean())
-            throw error("named terms must be Boolean");
-
-          if(next_token() == smt2_tokenizert::SYMBOL)
-          {
-            const symbol_exprt symbol_expr(
-              smt2_tokenizer.get_buffer(), bool_typet());
-            named_terms.emplace(
-              symbol_expr.identifier(), named_termt(term, symbol_expr));
-          }
-          else
-            throw error("invalid name attribute, expected symbol");
-        }
-        else
-          throw error("unknown term attribute");
-      }
-
-      if(next_token() != smt2_tokenizert::CLOSE)
-        throw error("expected ')' at end of term attribute");
-      else
-        return term;
-    }
-    else
-    {
-      // non-indexed symbol, look up in expression table
-      const auto id = smt2_tokenizer.get_buffer();
-      const auto e_it = expressions.find(id);
-      if(e_it != expressions.end())
-        return e_it->second();
-
-      // get the operands
-      auto op = operands();
-
-      // rummage through id_map
-      auto id_it = id_map.find(id);
-      if(id_it != id_map.end())
-      {
-        if(id_it->second.type.id() == ID_mathematical_function)
-        {
-          return function_application(symbol_exprt(id, id_it->second.type), op);
-        }
-        else
-          return symbol_exprt(id, id_it->second.type);
-      }
-      else
-        throw error() << "unknown function symbol '" << id << '\'';
-    }
-    break;
+  {
+    const auto id = smt2_tokenizer.get_buffer();
+    return function_application_with_id(id);
+  }
 
   case smt2_tokenizert::OPEN: // likely indexed identifier
     if(smt2_tokenizer.peek() == smt2_tokenizert::SYMBOL)

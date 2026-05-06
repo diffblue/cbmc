@@ -150,6 +150,7 @@ protected:
   void setup_expressions();
   exprt expression();
   exprt function_application();
+  exprt function_application_with_id(const irep_idt &id);
   exprt function_application_ieee_float_op(
     const irep_idt &,
     const exprt::operandst &);
