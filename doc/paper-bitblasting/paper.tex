@@ -22,7 +22,7 @@
   Use permitted under Creative Commons License Attribution 4.0
   International (CC BY 4.0).}
 
-\title{Proof-Guided SAT Encoding Selection\\for Multiplication in Bounded Model Checking}
+\title{Proof-Guided SAT Encoding Selection\\for Bit-Vector Multiplication}
 
 \author[1]{Michael Tautschnig}[orcid=0000-0002-7947-983X]
 \author[1]{TBD}
@@ -55,7 +55,7 @@ problem structure, motivating adaptive selection.
 
 \begin{keywords}
 SAT encoding \sep
-bounded model checking \sep
+bit-vector SMT \sep
 multiplication \sep
 DRAT proof analysis \sep
 bounded variable elimination
@@ -69,11 +69,11 @@ bounded variable elimination
 
 Consider verifying that 16-bit multiplication commutes: does
 $a \times b = b \times a$ hold for all 16-bit inputs $a$ and $b$?
-A bounded model checker encodes this as a SAT problem with two
-multiplier circuits and an equality check. With the standard
-shift-and-add encoding, \cadical~\cite{biere2019cadical} times out
-after 120\,s. With our carry-save Comba encoding, it solves in
-5.6\,s---a 21$\times$ speedup from changing only the
+A SAT-based bit-vector SMT solver encodes this as a CNF formula
+with two multiplier circuits and an equality check. With the
+standard shift-and-add encoding, \cadical~\cite{biere2019cadical}
+times out after 120\,s. With our carry-save Comba encoding, it
+solves in 5.6\,s---a 21$\times$ speedup from changing only the
 encoding.\footnote{With \cbmc's algebraic pre-solver enabled (a
 companion paper~\cite{companion-algebraic}), commutativity benchmarks are solved in
 ${\sim}$5\,ms regardless of encoding. The numbers here are with
@@ -91,12 +91,15 @@ structure, and redesign to reduce the identified bottlenecks. This
 proof-guided approach is transferable to other encoding problems and
 is the primary contribution of this paper.
 
-SAT-based bounded model checking
-(BMC)~\cite{biere1999symbolic} encodes program semantics as Boolean
-formulas, and for programs involving integer
-multiplication---common in cryptography, DSP, and overflow
-checking---the encoding choice dramatically affects solver
-performance. Yet the interaction between encoding choices and modern
+Bit-vector SMT solvers, including those used for bounded and
+unbounded model checking, IC3-style invariant
+inference~\cite{bradley2011sat}, hardware equivalence
+checking, cryptographic circuit analysis, and symbolic execution,
+reduce bit-vector formulas to SAT via \emph{bit-blasting}. For
+formulas involving integer multiplication---common in cryptography,
+DSP, overflow checking, and compiler verification---the encoding
+choice dramatically affects solver performance. Yet the interaction
+between encoding choices and modern
 SAT solver techniques
 (inprocessing~\cite{jarvisalo2012inprocessing},
 BVE~\cite{een2005effective}) is poorly understood. Prior work has
@@ -139,13 +142,15 @@ Our contributions are:
   (Section~\ref{sec:negative}).
 \end{enumerate}
 
-Multiplication problems in verification fall into two classes:
+Multiplication queries encountered by bit-vector SMT solvers fall
+into two classes:
 \emph{universal/equational} queries ($\forall x, y.\; P(x,y) =
-Q(x,y)$, e.g., commutativity, equivalence checking) and
+Q(x,y)$, e.g., commutativity, hardware equivalence checking) and
 \emph{existential} queries ($\exists x, y.\; P(x,y) = c$, e.g.,
 factoring, overflow detection). Bit-blasting handles both but scales
 poorly with bitwidth; algebraic techniques (treated in a companion
-paper) handle universal queries efficiently but are not constructive
+paper~\cite{companion-algebraic}) handle universal queries
+efficiently but are not constructive
 for existential queries. This paper focuses on improving bit-blasting
 for both classes. The same techniques apply to division and remainder
 (encoding $a = b \cdot q + r$ with non-deterministic $q$, $r$
@@ -757,13 +762,13 @@ MiniSat-compatible API), \cryptominisat 5.11.21. We report median of
 noted, we use the g-only adder encoding (the new default; see
 Appendix~\ref{app:adders}).
 
-We evaluate on 36 verification problems in five categories: algebraic
+We evaluate on 36 QF\_BV benchmarks in five categories: algebraic
 identities (commutativity, overflow, strength reduction: 15
 benchmarks), industrial workloads (MurmurHash3, Q15 DSP, keyed hash,
 division-by-constant: 6), matrix/MAC (trace, dot product
 commutativity: 4), division/FP (roundtrip, FP add/mul: 6), and
 factoring (SAT instances: 6). Where explicitly noted, we extend to
-44 benchmarks by adding eight DSP datapath verification problems.
+44 benchmarks by adding eight DSP datapath benchmarks.
 
 \subsection{Layer Ablation}
 \label{sec:ablation}
