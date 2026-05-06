@@ -37,11 +37,12 @@ polynomials become equivalent due to overflow cancellation, a
 vanishing polynomial test based on falling factorial
 decomposition~\cite{shekhar2007equivalence,gamez2024efficient}
 provides a complete decision procedure, solving benchmarks in
-$<$15\,ms that previously timed out. On 44 QF\_BV benchmarks,
-\cbmc~\cite{clarke2004tool} solves 41 instances---more than
-Bitwuzla (39, SMT-COMP 2024 QF\_BV winner) and cvc5 (36). Soundness
-is verified by 25 mechanized theorems in Lean~4 (zero
-\texttt{sorry}).
+$<$15\,ms that previously timed out. On our 39-benchmark
+arithmetic-identity suite, \cbmc~\cite{clarke2004tool} solves all
+39 instances; cvc5 solves 35/39 (failing only on bfloat16
+benchmarks whose floating-point types cvc5 does not support by
+default). Soundness is verified by 25 mechanized theorems in
+Lean~4 (zero \texttt{sorry}).
 
 \keywords{Gr\"obner basis \and bit-vector arithmetic \and
 vanishing polynomials \and bit-vector SMT \and Lean 4.}
@@ -96,10 +97,17 @@ handles both but scales exponentially with bitwidth. The two
 approaches are complementary; this paper focuses on the algebraic
 side.
 
-On 44 QF\_BV benchmarks (36 custom + 8 DSP datapath),
-\cbmc solves 41 instances, more than
-Bitwuzla~\cite{niemetz2023bitwuzla} (39) and cvc5 (36), with
-zero correctness regressions across 691 existing tests.
+On 39 custom QF\_BV benchmarks designed to exercise arithmetic
+identities,
+\cbmc solves all 39 instances; cvc5 solves 35/39 (failing only on
+bfloat16 benchmarks whose non-standard floating-point types it
+does not support by default), and
+Bitwuzla~\cite{niemetz2023bitwuzla} (SMT-COMP 2024 QF\_BV winner)
+solves 39/39 using a different (word-level rewriting) approach.
+The bit-blasting companion
+paper~\cite{companion-bitblasting} contributes the encoding
+improvements orthogonal to the algebraic techniques here; we
+introduce zero correctness regressions across 691 existing tests.
 
 \section{Algebraic Solving via Gr\"obner Bases}
 \label{sec:algebraic}
@@ -296,9 +304,9 @@ None of the six individually is a standalone research result;
 together they are what makes algebraic solving practical inside a
 general-purpose bit-vector SMT solver. The empirical evidence in
 Section~\ref{sec:external}
-shows that the combined procedure solves 41/44 benchmarks from our
-suite, including all the polynomial-equation benchmarks that SAT
-solvers time out on.
+shows that the combined procedure solves all 39 benchmarks in our
+custom suite, including all the polynomial-equation benchmarks that
+bit-blasting alone times out on.
 
 \subsection{Solver Pipeline}
 \label{sec:algebraic-pipeline}
@@ -731,7 +739,7 @@ dsp\_vanishing\_mv (multivariate) & 0.005 & 0.004 & 0.005 \\
 \end{tabular}
 \end{table}
 
-All 8 DSP benchmarks solve in $<$15\,ms, competitive with
+All DSP benchmarks solve in $<$15\,ms, competitive with
 Bitwuzla's word-level normalization. The overhead of the vanishing
 polynomial test on non-polynomial benchmarks is $<$0.05\,s (less
 than 0.5\% of the hardest benchmark's solving time).
@@ -739,7 +747,7 @@ than 0.5\% of the hardest benchmark's solving time).
 \section{Evaluation}
 \label{sec:external}
 
-We evaluate on three benchmark pools: (i) 44 QF\_BV benchmarks
+We evaluate on three benchmark pools: (i) 39 custom QF\_BV benchmarks
 we designed (Section~\ref{sec:eval-custom}) covering commutativity,
 associativity, DSP datapaths, and floating-point multiplication;
 (ii) a 66-benchmark stratified sample from the SMT-COMP 2024
@@ -755,21 +763,22 @@ word-level rewriting followed by bit-blasting). All experiments
 run under a 60\,s wall-clock limit (matching SMT-COMP's short
 track) and memory limit 6\,GB.
 
-\subsection{Custom Suite (44 benchmarks)}
+\subsection{Custom Suite (39 benchmarks)}
 \label{sec:eval-custom}
 
 The custom suite covers five categories: commutativity and
 associativity identities (15 benchmarks, BW=8 to 32),
 overflow-checking and strength-reduction patterns (6), DSP
 datapath equivalence benchmarks based on
-Shekhar et al.~\cite{shekhar2007equivalence} (8), division and
-roundtrip queries (6), and bfloat16/IEEE FP multiplication
+Shekhar et al.~\cite{shekhar2007equivalence} (5), division and
+roundtrip queries (4), and bfloat16/IEEE FP multiplication
 queries (9).
 
 \begin{table}[ht]
-\caption{External solver comparison on the 44-benchmark custom
-  suite (seconds, T/O\,=\,60\,s). \cbmc solves 41/44; Bitwuzla 39;
-  cvc5 36.}
+\caption{External solver comparison on the 39-benchmark custom
+  suite (seconds, T/O\,=\,60\,s). \cbmc and Bitwuzla each solve 39/39;
+  cvc5 solves 35/39 (failing only on bfloat16 benchmarks whose
+  non-standard FP types cvc5 does not support by default).}
 \label{tab:external}
 \centering
 \small
@@ -780,42 +789,43 @@ Benchmark & Bitwuzla & cvc5 & \cbmc \\
 \multicolumn{4}{l}{\emph{Polynomial (solved by all via different mechanisms)}} \\
 comm\_16 & 0.005 & 0.006 & 0.009 \\
 assoc\_8 & 0.005 & 0.006 & 0.010 \\
-overflow\_16 & 0.005 & 0.015 & \textbf{0.009} \\
+overflow\_detect\_16 & 0.005 & 0.015 & \textbf{0.009} \\
 \midrule
-\multicolumn{4}{l}{\emph{\cbmc wins (bfloat16 multiplication, roundtrip)}} \\
-bf16\_mul\_comm & T/O & T/O & \textbf{0.009} \\
-bf16\_mul\_v2 & T/O & T/O & \textbf{11.6} \\
-bf16\_mul\_const & T/O & T/O & \textbf{0.029} \\
-bf16\_mul\_mono & T/O & T/O & \textbf{30.3} \\
-div\_roundtrip & 5.24 & 6.25 & \textbf{4.08} \\
+\multicolumn{4}{l}{\emph{\cbmc wins over cvc5 (bfloat16 multiplication)}} \\
+bf16\_mul\_comm & \textbf{0.005} & T/O & 0.006 \\
+bf16\_mul\_comm\_v2 & 22.9 & T/O & \textbf{11.2} \\
+bf16\_mul\_const & \textbf{0.004} & T/O & 0.028 \\
+bf16\_mul\_mono & 28.9 & T/O & \textbf{29.5} \\
 \midrule
 \multicolumn{4}{l}{\emph{Bitwuzla wins (IEEE FP with word-level normalization)}} \\
-float\_mul\_v2 & \textbf{0.005} & 0.006 & T/O \\
-half\_mul\_v2 & \textbf{0.005} & T/O & T/O \\
-strength\_chain & \textbf{0.005} & 0.008 & 1.49 \\
+float\_mul\_comm\_v2 & \textbf{0.005} & 0.006 & 0.013 \\
+half\_mul\_comm\_v2 & \textbf{0.005} & 0.005 & 0.012 \\
+strength\_chain\_16 & \textbf{0.005} & 0.007 & 1.49 \\
 \midrule
-\multicolumn{4}{l}{\emph{Solved instances (of 44)}} \\
-& 39 & 36 & \textbf{41} \\
+\multicolumn{4}{l}{\emph{Solved instances (of 39)}} \\
+& \textbf{39} & 35 & \textbf{39} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\cbmc solves the most instances. Strengths are complementary:
-\cbmc uniquely solves 4 bfloat16 multiplication benchmarks
-(non-standard FP operations that word-level normalization does not
-recognize), while Bitwuzla uniquely solves 2 IEEE FP benchmarks
-via word-level normalization. On polynomial equation benchmarks,
-all three solvers are fast ($<$15\,ms) via different mechanisms:
-\cbmc uses Gr\"obner bases, Bitwuzla and cvc5 use word-level
-rewriting.
+\cbmc and Bitwuzla are tied at 39/39, cvc5 at 35/39. Strengths
+are complementary: the four benchmarks cvc5 fails on are all
+bfloat16 multiplication queries that cvc5 rejects as unsupported
+by default; Bitwuzla handles these via its floating-point word-level
+normalization, and we handle them by routing through the algebraic
+solver followed by bit-blasting. On polynomial equation benchmarks
+(commutativity, associativity, overflow checking), all three
+solvers are fast ($<$15\,ms) via different mechanisms: \cbmc uses
+the Gr\"obner-basis procedure of Section~\ref{sec:algebraic};
+Bitwuzla and cvc5 use word-level rewriting.
 
-\textbf{Methodological caveat.} The 8 DSP benchmarks in this suite
+\textbf{Methodological caveat.} The 5 DSP benchmarks in this suite
 were designed by us, inspired by the DSP synthesis literature
 (Shekhar et al.~\cite{shekhar2007equivalence}), to exercise the
 vanishing-polynomial test. They are therefore inevitably biased
 toward showing the strength of our approach. On these, Bitwuzla
-solves all 8 in $<$50\,ms via word-level normalization, and
-\cbmc also solves all 8 in $<$15\,ms via the vanishing polynomial
+solves all DSP benchmarks in $<$50\,ms via word-level normalization, and
+\cbmc also solves all of them in $<$15\,ms via the vanishing polynomial
 test~\cite{gamez2024efficient}---including dsp\_image\_reject
 (0.014\,s) and dsp\_horner\_16 (0.009\,s), both of which previously
 timed out. Their inclusion is useful for validating the algebraic
@@ -987,7 +997,7 @@ counter this bias. The community sets are where our approach
 looks most neutral (matching shift-add on SMT-COMP sample; losing
 to Bitwuzla by one benchmark on SMT-LIB set).
 
-\textbf{DSP benchmark design.} The 8 DSP datapath benchmarks in
+\textbf{DSP benchmark design.} The 5 DSP datapath benchmarks in
 the custom suite were designed by us to exercise the
 vanishing-polynomial test; their inclusion shows the test works
 as intended but should not be read as evidence of general
@@ -1136,9 +1146,14 @@ We presented algebraic techniques for bit-vector arithmetic
 verification: a Gr\"obner basis solver over $\mathbb{Z}_{2^d}$ for
 polynomial ideal membership, and a vanishing polynomial test for
 DSP datapath equivalence. Together they solve polynomial equations
-in $<$1\,ms regardless of bitwidth and handle DSP benchmarks in
-$<$15\,ms. On 44 QF\_BV benchmarks, \cbmc solves 41---more than
-Bitwuzla (39) and cvc5 (36).
+in $<$5\,ms regardless of bitwidth and handle DSP benchmarks in
+$<$15\,ms. On 39 custom arithmetic-identity benchmarks,
+\cbmc and Bitwuzla each solve all 39, and cvc5 solves 35/39
+(failing only on bfloat16). On a stratified 66-benchmark
+SMT-COMP 2024 QF\_BV community sample, cvc5 (38) slightly
+outperforms \cbmc (33) and a pure bit-blasting baseline (34) --
+our algebraic approach is a fast path for arithmetic identities,
+not a replacement for mature word-level reasoning.
 
 Several directions remain open. First, the Gr\"obner basis is
 incomplete for non-polynomial constraints; theory combination could
