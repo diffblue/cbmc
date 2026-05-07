@@ -36,7 +36,9 @@ std::optional<irept> smt2irept::operator()()
 
     while(true)
     {
-      switch(next_token())
+      auto token = next_token();
+
+      switch(token)
       {
       case END_OF_FILE:
         if(stack.empty())
@@ -48,9 +50,9 @@ std::optional<irept> smt2irept::operator()()
       case NUMERAL:
       case SYMBOL:
         if(stack.empty())
-          return irept(buffer); // all done!
+          return irept{token.text}; // all done!
         else
-          stack.top().get_sub().push_back(irept(buffer));
+          stack.top().get_sub().push_back(irept{token.text});
         break;
 
       case OPEN: // '('
