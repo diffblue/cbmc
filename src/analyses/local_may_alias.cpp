@@ -80,8 +80,7 @@ void local_may_aliast::assign_lhs(
       {
         if(objects[i].id()==ID_symbol)
         {
-          const irep_idt &identifier=
-            to_symbol_expr(objects[i]).get_identifier();
+          const irep_idt &identifier = to_symbol_expr(objects[i]).identifier();
 
           if(dirty(identifier) || !locals.is_local(identifier))
           {
@@ -404,8 +403,7 @@ void local_may_aliast::build(const goto_functiont &goto_function)
       {
         if(objects[i].id() == ID_symbol)
         {
-          const irep_idt &identifier =
-            to_symbol_expr(objects[i]).get_identifier();
+          const irep_idt &identifier = to_symbol_expr(objects[i]).identifier();
 
           if(dirty(identifier) || !locals.is_local(identifier))
           {
@@ -485,7 +483,7 @@ void local_may_aliast::output(
             INVARIANT(j < objects.size(), "invalid object index");
             irep_idt identifier;
             if(objects[j].id() == ID_symbol)
-              identifier = to_symbol_expr(objects[j]).get_identifier();
+              identifier = to_symbol_expr(objects[j]).identifier();
             out << ' ' << from_expr(ns, identifier, objects[j]);
           }
 

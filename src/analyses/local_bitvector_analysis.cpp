@@ -67,7 +67,7 @@ void local_bitvector_analysist::assign_lhs(
 {
   if(lhs.id()==ID_symbol)
   {
-    const irep_idt &identifier=to_symbol_expr(lhs).get_identifier();
+    const irep_idt &identifier = to_symbol_expr(lhs).identifier();
 
     if(is_tracked(identifier))
     {
@@ -122,7 +122,7 @@ local_bitvector_analysist::flagst local_bitvector_analysist::get_rec(
   }
   else if(rhs.id()==ID_symbol)
   {
-    const irep_idt &identifier=to_symbol_expr(rhs).get_identifier();
+    const irep_idt &identifier = to_symbol_expr(rhs).identifier();
     if(is_tracked(identifier))
     {
       const auto src_pointer = pointers.number(identifier);
@@ -137,7 +137,7 @@ local_bitvector_analysist::flagst local_bitvector_analysist::get_rec(
 
     if(object.id()==ID_symbol)
     {
-      if(locals.is_local(to_symbol_expr(object).get_identifier()))
+      if(locals.is_local(to_symbol_expr(object).identifier()))
         return flagst::mk_dynamic_local();
       else
         return flagst::mk_static_lifetime();
@@ -147,8 +147,7 @@ local_bitvector_analysist::flagst local_bitvector_analysist::get_rec(
       const index_exprt &index_expr=to_index_expr(object);
       if(index_expr.array().id()==ID_symbol)
       {
-        if(locals.is_local(
-          to_symbol_expr(index_expr.array()).get_identifier()))
+        if(locals.is_local(to_symbol_expr(index_expr.array()).identifier()))
           return flagst::mk_dynamic_local() | flagst::mk_uses_offset();
         else
           return flagst::mk_static_lifetime() | flagst::mk_uses_offset();

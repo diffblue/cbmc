@@ -27,7 +27,7 @@ static void remove_l1_object_rec(
   if(is_ssa_expr(l1_expr))
   {
     const ssa_exprt &l1_ssa = to_ssa_expr(l1_expr);
-    const irep_idt &l1_identifier = l1_ssa.get_identifier();
+    const irep_idt &l1_identifier = l1_ssa.identifier();
 
     // We cannot remove the object from the L1 renaming map, because L1 renaming
     // information is not local to a path, but removing it from the propagation

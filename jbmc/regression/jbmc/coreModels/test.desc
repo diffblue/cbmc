@@ -1,9 +1,9 @@
 CORE
 test
---no-lazy-methods --no-refine-strings --show-symbol-table --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
+--no-lazy-methods --no-refine-strings --show-symbol-table -cp `../../../../scripts/format_classpath.sh target/classes ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar`
 ^EXIT=0$
 ^SIGNAL=0$
-^Symbol\s*\.*\: java\:\:org\.cprover\.CProver\.\<init\>\:\(\)V$
+^Symbol\s*\.*\: java\:\:org\.cprover\.CProver\.nondetInt\:\(\)I$
 --
 --
 tests that the core models are being loaded by checking if the constructor for the CProver class was

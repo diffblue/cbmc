@@ -104,7 +104,7 @@ void symex_slicet::slice(SSA_stept &SSA_step)
 void symex_slicet::slice_assignment(SSA_stept &SSA_step)
 {
   PRECONDITION(SSA_step.ssa_lhs.id() == ID_symbol);
-  const irep_idt &id=SSA_step.ssa_lhs.get_identifier();
+  const irep_idt &id = SSA_step.ssa_lhs.identifier();
 
   auto entry = depends.find(id);
   if(entry == depends.end())
@@ -122,7 +122,7 @@ void symex_slicet::slice_assignment(SSA_stept &SSA_step)
 
 void symex_slicet::slice_decl(SSA_stept &SSA_step)
 {
-  const irep_idt &id = to_symbol_expr(SSA_step.ssa_lhs).get_identifier();
+  const irep_idt &id = to_symbol_expr(SSA_step.ssa_lhs).identifier();
 
   if(depends.find(id)==depends.end())
   {
@@ -170,7 +170,7 @@ void symex_slicet::collect_open_variables(
 
     case goto_trace_stept::typet::ASSIGNMENT:
       get_symbols(SSA_step.ssa_rhs);
-      lhs.insert(SSA_step.ssa_lhs.get_identifier());
+      lhs.insert(SSA_step.ssa_lhs.identifier());
       break;
 
     case goto_trace_stept::typet::OUTPUT:

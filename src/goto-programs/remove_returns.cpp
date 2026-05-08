@@ -68,7 +68,7 @@ remove_returnst::get_or_create_return_value_symbol(const irep_idt &function_id)
 {
   const namespacet ns(symbol_table);
   const auto symbol_expr = return_value_symbol(function_id, ns);
-  const auto symbol_name = symbol_expr.get_identifier();
+  const auto symbol_name = symbol_expr.identifier();
   if(symbol_table.has_symbol(symbol_name))
     return symbol_expr;
 
@@ -162,7 +162,7 @@ bool remove_returnst::do_function_calls(
         "remove-returns");
 
       const irep_idt function_id =
-        to_symbol_expr(i_it->call_function()).get_identifier();
+        to_symbol_expr(i_it->call_function()).identifier();
 
       // Do we return anything?
       if(does_function_call_return(*i_it))
@@ -314,7 +314,7 @@ bool remove_returnst::restore_returns(
     {
       if(
         instruction.assign_lhs().id() != ID_symbol ||
-        to_symbol_expr(instruction.assign_lhs()).get_identifier() != rv_name_id)
+        to_symbol_expr(instruction.assign_lhs()).identifier() != rv_name_id)
       {
         continue;
       }
@@ -348,7 +348,7 @@ void remove_returnst::undo_function_calls(
         continue;
 
       const irep_idt function_id =
-        to_symbol_expr(i_it->call_function()).get_identifier();
+        to_symbol_expr(i_it->call_function()).identifier();
 
       // find "f(...); lhs=f#return_value; DEAD f#return_value;"
       // and revert to "lhs=f(...);"
@@ -424,7 +424,7 @@ bool is_return_value_identifier(const irep_idt &id)
 
 bool is_return_value_symbol(const symbol_exprt &symbol_expr)
 {
-  return is_return_value_identifier(symbol_expr.get_identifier());
+  return is_return_value_identifier(symbol_expr.identifier());
 }
 
 bool does_function_call_return(const goto_programt::instructiont &function_call)

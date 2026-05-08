@@ -340,10 +340,11 @@ void goto_symext::symex_goto(statet &state)
 
       log.conditional_output(
         log.debug(),
-        [this, &new_lhs](messaget::mstreamt &mstream) {
-          mstream << "Assignment to " << new_lhs.get_identifier()
-                  << " [" << pointer_offset_bits(new_lhs.type(), ns).value_or(0) << " bits]"
-                  << messaget::eom;
+        [this, &new_lhs](messaget::mstreamt &mstream)
+        {
+          mstream << "Assignment to " << new_lhs.identifier() << " ["
+                  << pointer_offset_bits(new_lhs.type(), ns).value_or(0)
+                  << " bits]" << messaget::eom;
         });
 
       target.assignment(
@@ -584,7 +585,7 @@ static void merge_names(
   const std::size_t goto_count,
   const std::size_t dest_count)
 {
-  const irep_idt l1_identifier = ssa.get_identifier();
+  const irep_idt l1_identifier = ssa.identifier();
   const irep_idt &obj_identifier = ssa.get_object_name();
 
   if(obj_identifier == goto_symext::statet::guard_identifier())
@@ -683,8 +684,10 @@ static void merge_names(
   dest_state.record_events.pop();
 
   log.conditional_output(
-    log.debug(), [ns, &new_lhs](messaget::mstreamt &mstream) {
-      mstream << "Assignment to " << new_lhs.get_identifier() << " ["
+    log.debug(),
+    [ns, &new_lhs](messaget::mstreamt &mstream)
+    {
+      mstream << "Assignment to " << new_lhs.identifier() << " ["
               << pointer_offset_bits(new_lhs.type(), ns).value_or(0) << " bits]"
               << messaget::eom;
     });

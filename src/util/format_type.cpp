@@ -100,9 +100,9 @@ std::ostream &format_rec(std::ostream &os, const typet &type)
     return os << "\xe2\x84\x95"; // u+2115, 'N'
   else if(id == ID_range)
   {
-    auto &range_type = to_range_type(type);
-    return os << "{ " << range_type.get_from() << ", ..., "
-              << range_type.get_to() << " }";
+    auto &range_type = to_integer_range_type(type);
+    return os << "{ " << range_type.from() << ", ..., " << range_type.to()
+              << " }";
   }
   else if(id == ID_rational)
     return os << "\xe2\x84\x9a"; // u+211A, 'Q'

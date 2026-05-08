@@ -468,7 +468,7 @@ bool ai_baset::visit_function_call(
     if(callee_expression.id() == ID_symbol)
     {
       const irep_idt &callee_function_id =
-        to_symbol_expr(callee_expression).get_identifier();
+        to_symbol_expr(callee_expression).identifier();
 
       log.progress() << "Calling " << callee_function_id << messaget::eom;
 

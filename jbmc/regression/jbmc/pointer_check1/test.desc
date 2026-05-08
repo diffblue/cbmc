@@ -1,6 +1,6 @@
 CORE
 pointer_check1
-
+-cp target/classes
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

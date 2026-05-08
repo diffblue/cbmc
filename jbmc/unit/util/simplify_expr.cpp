@@ -33,7 +33,7 @@ void test_unnecessary_cast(const typet &type)
     REQUIRE(simplified.id()==ID_symbol);
     REQUIRE(simplified.type()==type);
     const auto &symbol=to_symbol_expr(simplified);
-    REQUIRE(symbol.get_identifier()=="foo");
+    REQUIRE(symbol.identifier() == "foo");
   }
 
   WHEN("Casts should remain, they are left untouched")

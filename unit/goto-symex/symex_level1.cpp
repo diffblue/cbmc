@@ -24,13 +24,15 @@ SCENARIO("Level 1 renaming", "[core][goto-symex][symex-level1]")
     const signedbv_typet int_type{32};
     const symbol_exprt symbol_nonshared{"foo", int_type};
     ssa_exprt ssa{symbol_nonshared};
-    symbol_table.insert([&] {
-      symbolt symbol{
-        symbol_nonshared.get_identifier(), symbol_nonshared.type(), irep_idt{}};
-      symbol.value = symbol_nonshared;
-      symbol.is_thread_local = true;
-      return symbol;
-    }());
+    symbol_table.insert(
+      [&]
+      {
+        symbolt symbol{
+          symbol_nonshared.identifier(), symbol_nonshared.type(), irep_idt{}};
+        symbol.value = symbol_nonshared;
+        symbol.is_thread_local = true;
+        return symbol;
+      }());
     auto l0_symbol = symex_level0(ssa, ns, 50);
     symex_level1t symex_level1;
 
@@ -40,7 +42,7 @@ SCENARIO("Level 1 renaming", "[core][goto-symex][symex-level1]")
       {
         REQUIRE(!symex_level1.has(l0_symbol));
         auto renamed = symex_level1(l0_symbol);
-        REQUIRE(renamed.get().get_identifier() == "foo!50");
+        REQUIRE(renamed.get().identifier() == "foo!50");
       }
     }
 
@@ -51,7 +53,7 @@ SCENARIO("Level 1 renaming", "[core][goto-symex][symex-level1]")
       {
         REQUIRE(symex_level1.has(l0_symbol));
         auto renamed = symex_level1(l0_symbol);
-        REQUIRE(renamed.get().get_identifier() == "foo!50@12134");
+        REQUIRE(renamed.get().identifier() == "foo!50@12134");
       }
 
       auto old = symex_level1.insert_or_replace(l0_symbol, 43950);
@@ -63,7 +65,7 @@ SCENARIO("Level 1 renaming", "[core][goto-symex][symex-level1]")
       THEN("The symbol is renamed to the new value")
       {
         auto renamed2 = symex_level1(l0_symbol);
-        REQUIRE(renamed2.get().get_identifier() == "foo!50@43950");
+        REQUIRE(renamed2.get().identifier() == "foo!50@43950");
       }
       REQUIRE(symex_level1.has(l0_symbol));
     }
@@ -79,7 +81,7 @@ SCENARIO("Level 1 renaming", "[core][goto-symex][symex-level1]")
       {
         REQUIRE(symex_level1.has(l0_symbol));
         auto renamed = symex_level1(l0_symbol);
-        REQUIRE(renamed.get().get_identifier() == "foo!50@20051");
+        REQUIRE(renamed.get().identifier() == "foo!50@20051");
       }
     }
   }

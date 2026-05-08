@@ -166,7 +166,7 @@ void enumerative_loop_contracts_synthesizert::init_candidates()
             if(auto symbol_expr = expr_try_dynamic_cast<symbol_exprt>(*it))
             {
               if(has_prefix(
-                   id2string(symbol_expr->get_identifier()), CPROVER_PREFIX))
+                   id2string(symbol_expr->identifier()), CPROVER_PREFIX))
               {
                 it = assigns_map[new_id].erase(it);
                 continue;
@@ -246,7 +246,7 @@ void enumerative_loop_contracts_synthesizert::build_tmp_post_map()
 
       // tmp_post variables have identifiers with the prefix tmp::tmp_post.
       if(
-        id2string(symbol_lhs->get_identifier()).find("tmp::tmp_post") !=
+        id2string(symbol_lhs->identifier()).find("tmp::tmp_post") !=
         std::string::npos)
       {
         tmp_post_map[instruction.assign_lhs()] = instruction.assign_rhs();
@@ -272,7 +272,7 @@ enumerative_loop_contracts_synthesizert::compute_dependent_symbols(
   // the original symbol table.
   for(auto it = result.begin(); it != result.end();)
   {
-    if(original_symbol_table.lookup(it->get_identifier()) == nullptr)
+    if(original_symbol_table.lookup(it->identifier()) == nullptr)
     {
       it = result.erase(it);
     }

@@ -138,7 +138,7 @@ object_address_exprt::object_address_exprt(
   pointer_typet type)
   : nullary_exprt(ID_object_address, std::move(type))
 {
-  set(ID_identifier, object.get_identifier());
+  set(ID_identifier, object.identifier());
 }
 
 symbol_exprt object_address_exprt::object_expr() const

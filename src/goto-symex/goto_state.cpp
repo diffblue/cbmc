@@ -105,7 +105,7 @@ void goto_statet::apply_condition(
           goto_symex_statet::write_is_shared_resultt::SHARED)
       {
         const ssa_exprt l1_lhs = remove_level_2(ssa_lhs);
-        const irep_idt &l1_identifier = l1_lhs.get_identifier();
+        const irep_idt &l1_identifier = l1_lhs.identifier();
 
         level2.increase_generation(
           l1_identifier, l1_lhs, previous_state.get_l2_name_provider());

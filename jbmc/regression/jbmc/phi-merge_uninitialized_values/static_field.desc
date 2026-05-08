@@ -1,6 +1,6 @@
 CORE 
 PhiMergeUninitialized
---function PhiMergeUninitialized.staticFieldUninitialized --show-vcc
+--function PhiMergeUninitialized.staticFieldUninitialized --show-vcc -cp target/classes
 activate-multi-line-match
 ^EXIT=0$
 ^SIGNAL=0$

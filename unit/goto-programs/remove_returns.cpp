@@ -30,7 +30,7 @@ TEST_CASE("Return-value removal", "[core][goto-programs][remove_returns]")
 
   symbol_exprt a_rv_symbol = return_value_symbol("a", ns);
   REQUIRE(is_return_value_symbol(a_rv_symbol));
-  REQUIRE(is_return_value_identifier(a_rv_symbol.get_identifier()));
+  REQUIRE(is_return_value_identifier(a_rv_symbol.identifier()));
 
   irep_idt a_rv_id = return_value_identifier("a");
 
@@ -38,7 +38,7 @@ TEST_CASE("Return-value removal", "[core][goto-programs][remove_returns]")
 
   symbol_exprt other_symbol("a::local", signedbv_typet(8));
   REQUIRE(!is_return_value_symbol(other_symbol));
-  REQUIRE(!is_return_value_identifier(other_symbol.get_identifier()));
+  REQUIRE(!is_return_value_identifier(other_symbol.identifier()));
 }
 
 TEST_CASE(

@@ -514,7 +514,7 @@ try_get_string_data_array(const exprt &content, const namespacet &ns)
   const symbolt *symbol_ptr = nullptr;
 
   if(
-    ns.lookup(array.get_identifier(), symbol_ptr) ||
+    ns.lookup(array.identifier(), symbol_ptr) ||
     symbol_ptr->value.id() != ID_array)
   {
     return {};

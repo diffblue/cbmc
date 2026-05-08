@@ -49,7 +49,7 @@ public:
   const irep_idt get_original_name() const
   {
     ssa_exprt o(get_original_expr());
-    return o.get_identifier();
+    return o.identifier();
   }
 
   void set_level_0(std::size_t i);

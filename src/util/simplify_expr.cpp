@@ -709,7 +709,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_function_application(
   if(expr.function().id() != ID_symbol)
     return unchanged(expr);
 
-  const irep_idt &func_id = to_symbol_expr(expr.function()).get_identifier();
+  const irep_idt &func_id = to_symbol_expr(expr.function()).identifier();
 
   // String.startsWith() is used to implement String.equals() in the models
   // library

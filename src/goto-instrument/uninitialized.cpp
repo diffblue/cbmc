@@ -48,7 +48,7 @@ void uninitializedt::get_tracking(goto_programt::const_targett i_it)
   {
     if(object.id() == ID_symbol)
     {
-      const irep_idt &identifier = to_symbol_expr(object).get_identifier();
+      const irep_idt &identifier = to_symbol_expr(object).identifier();
       const std::set<irep_idt> &uninitialized=
         uninitialized_analysis[i_it].uninitialized;
       if(uninitialized.find(identifier)!=uninitialized.end())
@@ -101,7 +101,7 @@ void uninitializedt::add_assertions(
       // if we track it, add declaration and assignment
       // for tracking variable!
 
-      const irep_idt &identifier = instruction.decl_symbol().get_identifier();
+      const irep_idt &identifier = instruction.decl_symbol().identifier();
 
       if(tracking.find(identifier)!=tracking.end())
       {
@@ -138,7 +138,7 @@ void uninitializedt::add_assertions(
       {
         if(object.id() == ID_symbol)
         {
-          const irep_idt &identifier = to_symbol_expr(object).get_identifier();
+          const irep_idt &identifier = to_symbol_expr(object).identifier();
 
           if(uninitialized.find(identifier)!=uninitialized.end())
           {
@@ -166,7 +166,7 @@ void uninitializedt::add_assertions(
       {
         if(object.id() == ID_symbol)
         {
-          const irep_idt &identifier = to_symbol_expr(object).get_identifier();
+          const irep_idt &identifier = to_symbol_expr(object).identifier();
 
           if(tracking.find(identifier)!=tracking.end())
           {

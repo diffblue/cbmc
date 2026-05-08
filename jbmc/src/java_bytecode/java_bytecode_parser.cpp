@@ -636,7 +636,7 @@ void java_bytecode_parsert::get_annotation_value_class_refs(const exprt &value)
 {
   if(const auto &symbol_expr = expr_try_dynamic_cast<symbol_exprt>(value))
   {
-    const irep_idt &value_id = symbol_expr->get_identifier();
+    const irep_idt &value_id = symbol_expr->identifier();
     get_class_refs_rec(*java_type_from_string(id2string(value_id)));
   }
   else if(const auto &array_expr = expr_try_dynamic_cast<array_exprt>(value))

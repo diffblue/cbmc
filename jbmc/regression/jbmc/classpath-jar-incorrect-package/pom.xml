@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.cprover.regression</groupId>
+    <artifactId>regression.jbmc.classpath-jar-incorrect-package</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <parent>
+        <groupId>org.cprover.regression</groupId>
+        <artifactId>regression.jbmc</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-jar</id>
+                        <phase>none</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Build a deliberately malformed jar: Test.class is placed at
+                 the jar root instead of in com/diffblue/ matching its package
+                 declaration. This lets the test verify that JBMC rejects it. -->
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals><goal>run</goal></goals>
+                        <configuration>
+                            <target>
+                                <!-- Copy class to a flat staging directory -->
+                                <mkdir dir="${project.build.directory}/flat-classes"/>
+                                <copy todir="${project.build.directory}/flat-classes"
+                                      flatten="true">
+                                    <fileset dir="${project.build.outputDirectory}"
+                                             includes="com/diffblue/Test.class"/>
+                                </copy>
+                                <!-- Build jar from the flat directory -->
+                                <jar destfile="${project.build.directory}/test.jar"
+                                     basedir="${project.build.directory}/flat-classes"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

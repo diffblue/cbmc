@@ -27,7 +27,7 @@ static void add_to_symbol_table(
   symbol_tablet &symbol_table,
   const symbol_exprt &symbol_expr)
 {
-  symbolt symbol{symbol_expr.get_identifier(), symbol_expr.type(), irep_idt{}};
+  symbolt symbol{symbol_expr.identifier(), symbol_expr.type(), irep_idt{}};
   symbol.value = symbol_expr;
   symbol.is_thread_local = true;
   symbol_table.insert(symbol);
@@ -104,29 +104,27 @@ SCENARIO(
 
         THEN("The left-hand-side of the equation is foo!0#1")
         {
-          REQUIRE(to_symbol_expr(step.ssa_lhs).get_identifier() == "foo!0#1");
+          REQUIRE(to_symbol_expr(step.ssa_lhs).identifier() == "foo!0#1");
         }
         THEN("The right-hand-side of the equation is g!0#0 ? 475 : foo!0#0")
         {
           const if_exprt *rhs_if =
             expr_try_dynamic_cast<if_exprt>(step.ssa_rhs);
           REQUIRE(rhs_if != nullptr);
-          REQUIRE(to_symbol_expr(rhs_if->cond()).get_identifier() == "g!0#0");
+          REQUIRE(to_symbol_expr(rhs_if->cond()).identifier() == "g!0#0");
           const auto then_value =
             numeric_cast_v<mp_integer>(to_constant_expr(rhs_if->true_case()));
           REQUIRE(then_value == 475);
           const symbol_exprt rhs_symbol = to_symbol_expr(rhs_if->false_case());
-          REQUIRE(rhs_symbol.get_identifier() == "foo!0#0");
+          REQUIRE(rhs_symbol.identifier() == "foo!0#0");
         }
         THEN("ssa_full_lhs is foo!0#1")
         {
-          REQUIRE(
-            to_symbol_expr(step.ssa_full_lhs).get_identifier() == "foo!0#1");
+          REQUIRE(to_symbol_expr(step.ssa_full_lhs).identifier() == "foo!0#1");
         }
         THEN("original_full_lhs is foo")
         {
-          REQUIRE(
-            to_symbol_expr(step.original_full_lhs).get_identifier() == "foo");
+          REQUIRE(to_symbol_expr(step.original_full_lhs).identifier() == "foo");
         }
       }
     }
@@ -179,8 +177,7 @@ SCENARIO(
 
             THEN("The left-hand-side of the equation is foo!0#2")
             {
-              REQUIRE(
-                to_symbol_expr(step.ssa_lhs).get_identifier() == "foo!0#2");
+              REQUIRE(to_symbol_expr(step.ssa_lhs).identifier() == "foo!0#2");
             }
             THEN("The right-hand-side of the equation is 1841")
             {
@@ -191,14 +188,12 @@ SCENARIO(
             THEN("ssa_full_lhs is foo!0#1")
             {
               REQUIRE(
-                to_symbol_expr(step.ssa_full_lhs).get_identifier() ==
-                "foo!0#2");
+                to_symbol_expr(step.ssa_full_lhs).identifier() == "foo!0#2");
             }
             THEN("original_full_lhs is foo")
             {
               REQUIRE(
-                to_symbol_expr(step.original_full_lhs).get_identifier() ==
-                "foo");
+                to_symbol_expr(step.original_full_lhs).identifier() == "foo");
             }
           }
         }
@@ -244,7 +239,7 @@ SCENARIO(
         SSA_stept expand_step = target_equation.SSA_steps.back();
         THEN("Assign step LHS is `struct1!0#1`")
         {
-          REQUIRE(assign_step.ssa_lhs.get_identifier() == "struct1!0#1");
+          REQUIRE(assign_step.ssa_lhs.identifier() == "struct1!0#1");
         }
         THEN("Assign step original full LHS is `struct1.field1`")
         {
@@ -257,7 +252,7 @@ SCENARIO(
           const auto as_symbol =
             expr_try_dynamic_cast<symbol_exprt>(assign_step.ssa_lhs);
           REQUIRE(as_symbol);
-          REQUIRE(as_symbol->get_identifier() == "struct1!0#1");
+          REQUIRE(as_symbol->identifier() == "struct1!0#1");
         }
         THEN("Assign step RHS is { struct1!0#0..field1 } with field1 = 234")
         {
@@ -272,8 +267,7 @@ SCENARIO(
         }
         THEN("Expand step LHS is `struct1!0#2..field1`")
         {
-          REQUIRE(
-            expand_step.ssa_lhs.get_identifier() == "struct1!0#2..field1");
+          REQUIRE(expand_step.ssa_lhs.identifier() == "struct1!0#2..field1");
         }
         THEN("Expand step original full LHS is `struct1.field1`")
         {
@@ -286,7 +280,7 @@ SCENARIO(
           const auto as_symbol =
             expr_try_dynamic_cast<symbol_exprt>(expand_step.ssa_lhs);
           REQUIRE(as_symbol);
-          REQUIRE(as_symbol->get_identifier() == "struct1!0#2..field1");
+          REQUIRE(as_symbol->identifier() == "struct1!0#2..field1");
         }
         THEN("Expand step RHS is 234")
         {

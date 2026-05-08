@@ -77,7 +77,7 @@ void validate_goto_modelt::check_called_functions()
 
         if(pointee.id() == ID_symbol && pointee.type().id() == ID_code)
         {
-          const auto &identifier = to_symbol_expr(pointee).get_identifier();
+          const auto &identifier = to_symbol_expr(pointee).identifier();
 
           DATA_CHECK(
             vm,
@@ -108,7 +108,7 @@ void validate_goto_modelt::check_called_functions()
           "function call expected to be code-typed symbol expression");
 
         const irep_idt &identifier =
-          to_symbol_expr(instr.call_function()).get_identifier();
+          to_symbol_expr(instr.call_function()).identifier();
 
         // C++ constexpr/inline functions may be marked as macros and
         // skipped by goto conversion. They will be handled as no-body

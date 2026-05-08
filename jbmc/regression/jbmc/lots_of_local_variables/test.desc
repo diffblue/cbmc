@@ -1,6 +1,6 @@
 CORE
 TooManyLocals
---function TooManyLocals.test
+--function TooManyLocals.test -cp target/classes
 VERIFICATION SUCCESSFUL
 ^EXIT=0$
 ^SIGNAL=0$

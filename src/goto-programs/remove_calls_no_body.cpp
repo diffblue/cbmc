@@ -76,7 +76,7 @@ bool remove_calls_no_bodyt::is_opaque_function_call(
     return false;
 
   const symbol_exprt &se = to_symbol_expr(f);
-  const irep_idt id = se.get_identifier();
+  const irep_idt id = se.identifier();
 
   goto_functionst::function_mapt::const_iterator f_it =
     goto_functions.function_map.find(id);
@@ -108,7 +108,7 @@ void remove_calls_no_bodyt::operator()(
     {
       messaget log{message_handler};
       log.status() << "Removing call to "
-                   << to_symbol_expr(it->call_function()).get_identifier()
+                   << to_symbol_expr(it->call_function()).identifier()
                    << ", which has no body" << messaget::eom;
       remove_call_no_body(
         goto_program, it, it->call_lhs(), it->call_arguments());

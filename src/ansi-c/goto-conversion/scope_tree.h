@@ -189,8 +189,7 @@ private:
       if(!declaration.has_value())
         return "";
 
-      return id2string(
-        declaration->instruction->decl_symbol().get_identifier());
+      return id2string(declaration->instruction->decl_symbol().identifier());
     }
   };
 

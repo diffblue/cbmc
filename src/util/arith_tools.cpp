@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "fixedbv.h"
 #include "ieee_float.h"
 #include "invariant.h"
+#include "mathematical_types.h"
 #include "std_expr.h"
 
 #include <algorithm>
@@ -113,9 +114,9 @@ constant_exprt from_integer(
   }
   else if(type_id == ID_range)
   {
-    auto &range_type = to_range_type(type);
-    PRECONDITION(int_value >= range_type.get_from());
-    PRECONDITION(int_value <= range_type.get_to());
+    auto &range_type = to_integer_range_type(type);
+    PRECONDITION(int_value >= range_type.from());
+    PRECONDITION(int_value <= range_type.to());
     return constant_exprt{integer2string(int_value), type};
   }
   else if(type_id==ID_unsignedbv)
@@ -199,6 +200,17 @@ std::size_t address_bits(const mp_integer &size)
   INVARIANT(power(2, result) >= size, "address_bits(size) >= log2(size)");
 
   return result;
+}
+
+bool is_power_of_two(const mp_integer &n)
+{
+  mp_integer x;
+
+  for(x = 1; n > x; x *= 2)
+  {
+  }
+
+  return x == n;
 }
 
 /// A multi-precision implementation of the power operator.

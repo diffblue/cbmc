@@ -36,14 +36,14 @@ SCENARIO(
     const irep_idt identifier = "hello";
     auto first_val = symbol_exprt(identifier, integer_typet());
     symbolt first_sym;
-    first_sym.name = first_val.get_identifier();
+    first_sym.name = first_val.identifier();
 
     auto rhs_val = from_integer(5, integer_typet());
 
     const irep_idt second_identifier = "world";
     auto second_val = symbol_exprt(second_identifier, integer_typet());
     symbolt second_sym;
-    second_sym.name = second_val.get_identifier();
+    second_sym.name = second_val.identifier();
 
     symbol_tablet symbol_table;
 
@@ -82,14 +82,14 @@ SCENARIO(
     const irep_idt identifier = "hello";
     auto first_val = symbol_exprt(identifier, integer_typet());
     symbolt first_sym;
-    first_sym.name = first_val.get_identifier();
+    first_sym.name = first_val.identifier();
 
     auto rhs_val = from_integer(5, integer_typet());
 
     const irep_idt second_identifier = "world";
     auto second_val = symbol_exprt(second_identifier, integer_typet());
     symbolt second_sym;
-    second_sym.name = second_val.get_identifier();
+    second_sym.name = second_val.identifier();
 
     symbol_tablet symbol_table;
 

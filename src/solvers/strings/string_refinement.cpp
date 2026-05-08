@@ -1145,8 +1145,8 @@ void debug_model(
 
   for(const auto &symbol : symbols)
   {
-    stream << " - " << symbol.get_identifier() << ": "
-           << format(super_get(symbol)) << '\n';
+    stream << " - " << symbol.identifier() << ": " << format(super_get(symbol))
+           << '\n';
   }
   stream << messaget::eom;
 }
@@ -1451,7 +1451,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
         ns, negated_axiom, univ_var, stream.message.get_message_handler()))
     {
       stream << std::string(4, ' ')
-             << "- violated_for: " << univ_var.get_identifier() << "="
+             << "- violated_for: " << univ_var.identifier() << "="
              << format(*witness) << messaget::eom;
       violated_not_contains[i] = *witness;
     }

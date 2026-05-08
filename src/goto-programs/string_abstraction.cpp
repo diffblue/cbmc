@@ -273,7 +273,7 @@ void string_abstractiont::declare_define_locals(goto_programt &dest)
       // same name may exist several times due to inlining, make sure the first
       // declaration is used
       available_decls.insert(
-        std::make_pair(it->decl_symbol().get_identifier(), it));
+        std::make_pair(it->decl_symbol().identifier(), it));
 
   // declare (and, if necessary, define) locals
   for(const auto &l : locals)
@@ -1002,7 +1002,7 @@ exprt string_abstractiont::build_unknown(const typet &type, bool write)
 
 bool string_abstractiont::build_symbol(const symbol_exprt &sym, exprt &dest)
 {
-  const symbolt &symbol=ns.lookup(sym.get_identifier());
+  const symbolt &symbol = ns.lookup(sym.identifier());
 
   const typet &abstract_type=build_abstraction_type(symbol.type);
   CHECK_RETURN(!abstract_type.is_nil());

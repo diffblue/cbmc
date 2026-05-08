@@ -56,7 +56,7 @@ void dfcc_obeys_contractt::get_contract_name(
       to_address_of_expr(expr).object().id() == ID_symbol,
       "symbol expression expected");
     function_pointer_contracts.insert(
-      to_symbol_expr(to_address_of_expr(expr).object()).get_identifier());
+      to_symbol_expr(to_address_of_expr(expr).object()).identifier());
   }
 }
 
@@ -75,7 +75,7 @@ void dfcc_obeys_contractt::rewrite_calls(
 
       if(function.id() == ID_symbol)
       {
-        const irep_idt &fun_name = to_symbol_expr(function).get_identifier();
+        const irep_idt &fun_name = to_symbol_expr(function).identifier();
 
         if(has_prefix(id2string(fun_name), CPROVER_PREFIX "obeys_contract"))
         {
@@ -85,7 +85,7 @@ void dfcc_obeys_contractt::rewrite_calls(
 
           // fix the function name.
           to_symbol_expr(target->call_function())
-            .set_identifier(
+            .identifier(
               library.dfcc_fun_symbol[dfcc_funt::OBEYS_CONTRACT].name);
 
           // pass the may_fail flag

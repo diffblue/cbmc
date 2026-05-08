@@ -158,7 +158,7 @@ bool postconditiont::is_used(
   }
   else if(expr.id()==ID_symbol)
   {
-    return to_symbol_expr(expr).get_identifier() == identifier;
+    return to_symbol_expr(expr).identifier() == identifier;
   }
   else if(expr.id()==ID_dereference)
   {

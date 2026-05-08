@@ -32,7 +32,7 @@ void uninitialized_domaint::transform(
 
   if(from->is_decl())
   {
-    const irep_idt &identifier = from->decl_symbol().get_identifier();
+    const irep_idt &identifier = from->decl_symbol().identifier();
     const symbolt &symbol = ns.lookup(identifier);
 
     if(!symbol.is_static_lifetime)
@@ -59,7 +59,7 @@ void uninitialized_domaint::assign(const exprt &lhs)
   else if(lhs.id()==ID_member)
     assign(to_member_expr(lhs).struct_op());
   else if(lhs.id()==ID_symbol)
-    uninitialized.erase(to_symbol_expr(lhs).get_identifier());
+    uninitialized.erase(to_symbol_expr(lhs).identifier());
 }
 
 void uninitialized_domaint::output(

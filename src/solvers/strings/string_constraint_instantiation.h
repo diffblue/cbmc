@@ -12,6 +12,7 @@ Author: Jesse Sigal, jesse.sigal@diffblue.com
 #ifndef CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_INSTANTIATION_H
 #define CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_INSTANTIATION_H
 
+#include <util/mp_arith.h>
 #include <util/std_expr.h> // IWYU pragma: keep
 
 #include <set>

@@ -1,6 +1,6 @@
 CORE symex-driven-lazy-loading-expected-failure
 Test
---function Test.main --java-lift-clinit-calls --show-goto-functions
+--function Test.main --java-lift-clinit-calls --show-goto-functions -cp target/classes
 activate-multi-line-match
 ^EXIT=0$
 ^SIGNAL=0$

@@ -53,7 +53,7 @@ public:
     // case-splitting on the lhs structure copied from symex_assignt::assign_rec
     if(expr.id() == ID_symbol)
     {
-      return is_local(to_symbol_expr(expr).get_identifier());
+      return is_local(to_symbol_expr(expr).identifier());
     }
     else if(expr.id() == ID_index)
     {
@@ -148,7 +148,7 @@ public:
     for(const auto &t : loop)
     {
       if(t->is_decl())
-        locals.insert(t->decl_symbol().get_identifier());
+        locals.insert(t->decl_symbol().identifier());
     }
   }
 

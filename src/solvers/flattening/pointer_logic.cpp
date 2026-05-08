@@ -27,7 +27,7 @@ bool pointer_logict::is_dynamic_object(const exprt &expr) const
   return expr.type().get_bool(ID_C_dynamic) ||
          (expr.id() == ID_symbol &&
           has_prefix(
-            id2string(to_symbol_expr(expr).get_identifier()),
+            id2string(to_symbol_expr(expr).identifier()),
             SYMEX_DYNAMIC_PREFIX "::"));
 }
 

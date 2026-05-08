@@ -46,7 +46,7 @@ static bool contains_symbol_prefix(const exprt &expr, const std::string &prefix)
   {
     if(
       it->id() == ID_symbol &&
-      to_symbol_expr(*it).get_identifier().starts_with(prefix))
+      to_symbol_expr(*it).identifier().starts_with(prefix))
     {
       return true;
     }
@@ -416,7 +416,7 @@ cext cegis_verifiert::build_cex(
             expr_try_dynamic_cast<symbol_exprt>(step.full_lhs);
 
           // malloc_size is not-hidden tmp variable.
-          if(id2string(symbol->get_identifier()) != "malloc::malloc_size")
+          if(id2string(symbol->identifier()) != "malloc::malloc_size")
           {
             live_variables.emplace(step.full_lhs);
           }

@@ -537,7 +537,7 @@ static void throw_on_unsupported(const goto_programt &program)
   {
     if(
       it.is_function_call() && it.call_function().id() == ID_symbol &&
-      to_symbol_expr(it.call_function()).get_identifier() == CPROVER_PREFIX
+      to_symbol_expr(it.call_function()).identifier() == CPROVER_PREFIX
         "obeys_contract")
     {
       throw invalid_source_file_exceptiont(
@@ -610,7 +610,7 @@ void code_contractst::apply_function_contract(
   PRECONDITION(const_target->call_function().id() == ID_symbol);
 
   const irep_idt &target_function =
-    to_symbol_expr(const_target->call_function()).get_identifier();
+    to_symbol_expr(const_target->call_function()).identifier();
   const symbolt &function_symbol = ns.lookup(target_function);
   const code_typet &function_type = to_code_type(function_symbol.type);
 
@@ -1460,7 +1460,7 @@ void code_contractst::replace_calls(const std::set<std::string> &to_replace)
           continue;
 
         const irep_idt &called_function =
-          to_symbol_expr(ins->call_function()).get_identifier();
+          to_symbol_expr(ins->call_function()).identifier();
         auto found = std::find(
           to_replace.begin(), to_replace.end(), id2string(called_function));
         if(found == to_replace.end())
@@ -1529,7 +1529,7 @@ void code_contractst::apply_loop_contracts(
         const auto &assign_lhs =
           expr_try_dynamic_cast<symbol_exprt>(it_instr->assign_lhs());
         original_loop_number_map[it_instr] = get_suffix_unsigned(
-          id2string(assign_lhs->get_identifier()),
+          id2string(assign_lhs->identifier()),
           std::string(ENTERED_LOOP) + "__");
         continue;
       }
@@ -1546,7 +1546,7 @@ void code_contractst::apply_loop_contracts(
         const auto &assign_lhs =
           expr_try_dynamic_cast<symbol_exprt>(it_instr->assign_lhs());
         loop_number_of_loop_havoc = get_suffix_unsigned(
-          id2string(assign_lhs->get_identifier()),
+          id2string(assign_lhs->identifier()),
           std::string(IN_LOOP_HAVOC_BLOCK) + "__");
         continue;
       }

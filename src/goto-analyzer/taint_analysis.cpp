@@ -80,7 +80,7 @@ void taint_analysist::instrument(
 
       if(function.id() == ID_symbol)
       {
-        const irep_idt &identifier = to_symbol_expr(function).get_identifier();
+        const irep_idt &identifier = to_symbol_expr(function).identifier();
 
         std::set<irep_idt> identifiers;
 

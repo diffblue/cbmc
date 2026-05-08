@@ -1,6 +1,6 @@
 CORE
 TestClass
---function 'TestClass.minimalJbmc' --unwind 5 --max-nondet-string-length 10 --java-unwind-enum-static --trace --json-ui
+--function 'TestClass.minimalJbmc' --unwind 5 --max-nondet-string-length 10 --java-unwind-enum-static --trace --json-ui -cp target/classes
 ^EXIT=10$
 ^SIGNAL=0$
 VERIFICATION FAILED

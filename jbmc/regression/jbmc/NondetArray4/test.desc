@@ -1,6 +1,6 @@
 CORE
 NondetArray4
---function NondetArray4.main
+--function NondetArray4.main -cp target/classes
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

@@ -1,6 +1,6 @@
 CORE symex-driven-lazy-loading-expected-failure
 org.symphonyoss.symphony.clients.model.SymStream
---no-lazy-methods --show-goto-functions
+--no-lazy-methods --show-goto-functions -cp `../../../../scripts/format_classpath.sh . target/classes`
 ^EXIT=0$
 ^SIGNAL=0$
 --

@@ -1,6 +1,6 @@
 CORE
 Test
---function Test.main
+--function Test.main -cp target/classes
 ^EXIT=10$
 ^SIGNAL=0$
 \[java::Test\.main:\(I\)V\.null-pointer-exception\.3\] line 6.*SUCCESS

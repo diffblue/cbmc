@@ -1,10 +1,10 @@
 CORE
 NondetArrayPrimitive
---function NondetArrayPrimitive.intArrayMulti --max-nondet-array-length 51 --unwind 4
+--function NondetArrayPrimitive.intArrayMulti --max-nondet-array-length 51 --unwind 4 -cp target/classes
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
-line 65 assertion.*: FAILURE
+line 58 assertion.*: FAILURE
 --
 ^warning: ignoring
 --

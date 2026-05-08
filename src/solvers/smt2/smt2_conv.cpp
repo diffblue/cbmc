@@ -267,6 +267,10 @@ static bool is_zero_width(const typet &type, const namespacet &ns)
     // out-of-bounds accesses that we need to model
     return is_zero_width(array_type->element_type(), ns);
   }
+  else if(auto bv_type = type_try_dynamic_cast<bitvector_typet>(type))
+  {
+    return bv_type->width() == 0;
+  }
   else
     return false;
 }
@@ -326,7 +330,7 @@ exprt smt2_convt::get(const exprt &expr) const
 {
   if(expr.id()==ID_symbol)
   {
-    const irep_idt &id=to_symbol_expr(expr).get_identifier();
+    const irep_idt &id = to_symbol_expr(expr).identifier();
 
     identifier_mapt::const_iterator it=identifier_map.find(id);
 
@@ -593,7 +597,7 @@ constant_exprt smt2_convt::parse_literal(
   }
   else if(type.id() == ID_range)
   {
-    return from_integer(value + to_range_type(type).get_from(), type);
+    return from_integer(value + to_integer_range_type(type).from(), type);
   }
   else
     UNREACHABLE_BECAUSE(
@@ -1194,7 +1198,7 @@ void smt2_convt::convert_floatbv(const exprt &expr)
 
   if(expr.id()==ID_symbol)
   {
-    const irep_idt &id = to_symbol_expr(expr).get_identifier();
+    const irep_idt &id = to_symbol_expr(expr).identifier();
     out << convert_identifier(id);
     return;
   }
@@ -1248,7 +1252,7 @@ void smt2_convt::convert_expr(const exprt &expr)
   // huge monster case split over expression id
   if(expr.id()==ID_symbol)
   {
-    const irep_idt &id = to_symbol_expr(expr).get_identifier();
+    const irep_idt &id = to_symbol_expr(expr).identifier();
     DATA_INVARIANT(!id.empty(), "symbol must have identifier");
     out << convert_identifier(id);
   }
@@ -1295,22 +1299,31 @@ void smt2_convt::convert_expr(const exprt &expr)
       "concatenation expression should have at least one operand",
       expr.id_string());
 
-    if(expr.operands().size() == 1)
+    // collect non-zero-width operands (zero-width not allowed by SMT-LIB)
+    exprt::operandst non_zero_width_ops;
+    for(const auto &op : expr.operands())
     {
-      flatten2bv(expr.operands().front());
+      if(!is_zero_width(op.type(), ns))
+        non_zero_width_ops.push_back(op);
     }
-    else // >= 2
+
+    DATA_INVARIANT(
+      !non_zero_width_ops.empty(),
+      "concatenation must have at least one non-zero-width operand");
+
+    if(non_zero_width_ops.size() == 1)
+    {
+      // unary concat is not valid SMT-LIB; emit the operand directly
+      flatten2bv(non_zero_width_ops.front());
+    }
+    else
     {
       out << "(concat";
 
-      for(const auto &op : expr.operands())
+      for(const auto &op : non_zero_width_ops)
       {
-        // drop zero-width operands, which are not allowed by SMT-LIB
-        if(!is_zero_width(op.type(), ns))
-        {
-          out << ' ';
-          flatten2bv(op);
-        }
+        out << ' ';
+        flatten2bv(op);
       }
 
       out << ')';
@@ -1427,7 +1440,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     }
     else if(type.id() == ID_range)
     {
-      auto &range_type = to_range_type(type);
+      auto &range_type = to_integer_range_type(type);
       PRECONDITION(type == unary_minus_expr.op().type());
       // turn -x into 0-x
       auto minus_expr =
@@ -1565,7 +1578,7 @@ void smt2_convt::convert_expr(const exprt &expr)
       if(expr.id() == ID_nand)
         out << "(and";
       else if(expr.id() == ID_nor)
-        out << "(and";
+        out << "(or";
       else if(expr.id() == ID_xnor)
         out << "(xor";
       else
@@ -1901,7 +1914,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     out << "(! ";
     convert(named_term_expr.value());
     out << " :named "
-        << convert_identifier(named_term_expr.symbol().get_identifier()) << ')';
+        << convert_identifier(named_term_expr.symbol().identifier()) << ')';
   }
   else if(expr.id()==ID_with)
   {
@@ -2720,6 +2733,67 @@ void smt2_convt::convert_expr(const exprt &expr)
     // use the lowering
     convert_expr(to_cond_expr(expr).lower());
   }
+  else if(expr.id() == ID_reduction_and)
+  {
+    // This is true iff all bits in the operand are true
+    auto &op = to_unary_expr(expr).op();
+    auto all_ones = to_bitvector_type(op.type()).all_ones_expr();
+    convert_expr(equal_exprt{op, all_ones});
+  }
+  else if(expr.id() == ID_reduction_nand)
+  {
+    // This is the negation of "reduction and"
+    auto &op = to_unary_expr(expr).op();
+    convert_expr(not_exprt{unary_predicate_exprt{ID_reduction_and, op}});
+  }
+  else if(expr.id() == ID_reduction_or)
+  {
+    // This is true iff the operand is not zero
+    auto &op = to_unary_expr(expr).op();
+    auto all_zeros = to_bitvector_type(op.type()).all_zeros_expr();
+    convert_expr(notequal_exprt{op, all_zeros});
+  }
+  else if(expr.id() == ID_reduction_nor)
+  {
+    // This is the negation of "reduction or"
+    auto &op = to_unary_expr(expr).op();
+    convert_expr(not_exprt{unary_predicate_exprt{ID_reduction_or, op}});
+  }
+  else if(expr.id() == ID_reduction_xor)
+  {
+    // This is the parity of the operand. No SMT-LIB 2 equivalent.
+    // Do bit-wise. SMT-LIB 3.0 could do this with "fold bvxor".
+    auto &op = to_unary_expr(expr).op();
+    auto width = to_bitvector_type(op.type()).get_width();
+    PRECONDITION(width >= 1);
+
+    if(width == 1)
+    {
+      out << "(= ";
+      flatten2bv(op);
+      out << " #b1)";
+    }
+    else
+    {
+      out << "(let ((?rop ";
+      flatten2bv(op);
+      out << ")) ";
+
+      // XOR all bits: extract each bit and use multi-ary bvxor
+      out << "(= (bvxor";
+      for(std::size_t i = 0; i < width; i++)
+        out << " ((_ extract " << i << " " << i << ") ?rop)";
+      out << ") #b1)";
+
+      out << ')'; // let
+    }
+  }
+  else if(expr.id() == ID_reduction_xnor)
+  {
+    // This is the negation of "reduction xor"
+    auto &op = to_unary_expr(expr).op();
+    convert_expr(not_exprt{unary_predicate_exprt{ID_reduction_xor, op}});
+  }
   else
     INVARIANT_WITH_DIAGNOSTICS(
       false,
@@ -3172,16 +3246,12 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
   }
   else if(dest_type.id()==ID_range)
   {
-    auto &dest_range_type = to_range_type(dest_type);
-    const auto dest_size =
-      dest_range_type.get_to() - dest_range_type.get_from() + 1;
-    const auto dest_width = address_bits(dest_size);
+    auto &dest_range_type = to_integer_range_type(dest_type);
+    const auto dest_width = address_bits(dest_range_type.size());
     if(src_type.id() == ID_range)
     {
-      auto &src_range_type = to_range_type(src_type);
-      const auto src_size =
-        src_range_type.get_to() - src_range_type.get_from() + 1;
-      const auto src_width = address_bits(src_size);
+      auto &src_range_type = to_integer_range_type(src_type);
+      const auto src_width = address_bits(src_range_type.size());
       if(src_width < dest_width)
       {
         out << "((_ zero_extend " << dest_width - src_width << ") ";
@@ -3747,12 +3817,10 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
   }
   else if(expr_type.id() == ID_range)
   {
-    auto &range_type = to_range_type(expr_type);
-    const auto size = range_type.get_to() - range_type.get_from() + 1;
-    const auto width = address_bits(size);
+    auto &range_type = to_integer_range_type(expr_type);
+    const auto width = address_bits(range_type.size());
     const auto value_int = numeric_cast_v<mp_integer>(expr);
-    out << "(_ bv" << (value_int - range_type.get_from()) << " " << width
-        << ")";
+    out << "(_ bv" << (value_int - range_type.from()) << " " << width << ")";
   }
   else
     UNEXPECTEDCASE("unknown constant: "+expr_type.id_string());
@@ -3977,22 +4045,20 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
   }
   else if(expr.type().id() == ID_range)
   {
-    auto &range_type = to_range_type(expr.type());
+    auto &range_type = to_integer_range_type(expr.type());
 
     // These could be chained, i.e., need not be binary,
     // but at least MathSat doesn't like that.
     if(expr.operands().size() == 2)
     {
       // add: lhs + from + rhs + from - from = lhs + rhs + from
-      mp_integer from = range_type.get_from();
-      const auto size = range_type.get_to() - range_type.get_from() + 1;
-      const auto width = address_bits(size);
+      const auto width = address_bits(range_type.size());
 
       out << "(bvadd ";
       convert_expr(expr.op0());
       out << " (bvadd ";
       convert_expr(expr.op1());
-      out << " (_ bv" << range_type.get_from() << ' ' << width
+      out << " (_ bv" << range_type.from() << ' ' << width
           << ")))"; // bv, bvadd, bvadd
     }
     else
@@ -4247,19 +4313,16 @@ void smt2_convt::convert_minus(const minus_exprt &expr)
   }
   else if(expr.type().id() == ID_range)
   {
-    auto &range_type = to_range_type(expr.type());
+    auto &range_type = to_integer_range_type(expr.type());
 
     // sub: lhs + from - (rhs + from) - from = lhs - rhs - from
-    mp_integer from = range_type.get_from();
-    const auto size = range_type.get_to() - range_type.get_from() + 1;
-    const auto width = address_bits(size);
+    const auto width = address_bits(range_type.size());
 
     out << "(bvsub (bvsub ";
     convert_expr(expr.op0());
     out << ' ';
     convert_expr(expr.op1());
-    out << ") (_ bv" << range_type.get_from() << ' ' << width
-        << "))"; // bv, bvsub
+    out << ") (_ bv" << range_type.from() << ' ' << width << "))"; // bv, bvsub
   }
   else
     UNEXPECTEDCASE("unsupported type for -: "+expr.type().id_string());
@@ -5107,8 +5170,8 @@ void smt2_convt::set_to(const exprt &expr, bool value)
 
     if(equal_expr.lhs().id()==ID_symbol)
     {
-      const irep_idt &identifier=
-        to_symbol_expr(equal_expr.lhs()).get_identifier();
+      const irep_idt &identifier =
+        to_symbol_expr(equal_expr.lhs()).identifier();
 
       if(
         identifier_map.find(identifier) == identifier_map.end() &&
@@ -5320,7 +5383,7 @@ void smt2_convt::find_symbols(const exprt &expr)
     const auto &q_expr = to_quantifier_expr(expr);
     for(const auto &symbol : q_expr.variables())
     {
-      const auto identifier = symbol.get_identifier();
+      const auto identifier = symbol.identifier();
       auto id_entry =
         identifier_map.insert({identifier, identifiert{symbol.type(), true}});
       shadowed_syms.insert(
@@ -5354,7 +5417,7 @@ void smt2_convt::find_symbols(const exprt &expr)
     irep_idt identifier;
 
     if(expr.id()==ID_symbol)
-      identifier=to_symbol_expr(expr).get_identifier();
+      identifier = to_symbol_expr(expr).identifier();
     else
       identifier="nondet_"+
         id2string(to_nondet_symbol_expr(expr).get_identifier());
@@ -5395,7 +5458,22 @@ void smt2_convt::find_symbols(const exprt &expr)
         convert_type(expr.type());
       }
 
-      out << ")" << "\n";
+      out << ')' << '\n';
+
+      // We need an additional constraint for range-typed symbols,
+      // or otherwise we get satisfying assignments with values
+      // outside of the range when the size of the range isn't
+      // a power of two.
+      if(expr.type().id() == ID_range)
+      {
+        auto &range_type = to_integer_range_type(expr.type());
+        if(!is_power_of_two(range_type.size()))
+        {
+          out << "(assert (bvule " << smt2_identifier << ' ';
+          convert_expr(from_integer(range_type.to(), range_type));
+          out << "))\n"; // bvule, assert
+        }
+      }
     }
   }
   else if(expr.id() == ID_array_of)
@@ -6008,11 +6086,10 @@ void smt2_convt::convert_type(const typet &type)
   }
   else if(type.id() == ID_range)
   {
-    auto &range_type = to_range_type(type);
-    mp_integer size = range_type.get_to() - range_type.get_from() + 1;
-    if(size <= 0)
-      UNEXPECTEDCASE("unsuppored range type");
-    out << "(_ BitVec " << address_bits(size) << ")";
+    auto &range_type = to_integer_range_type(type);
+    if(range_type.empty())
+      UNEXPECTEDCASE("unsupported range type");
+    out << "(_ BitVec " << address_bits(range_type.size()) << ")";
   }
   else
   {

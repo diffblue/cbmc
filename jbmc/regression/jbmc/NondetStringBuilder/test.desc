@@ -1,6 +1,6 @@
 CORE
 NondetStringBuilder
---function NondetStringBuilder.main
+--function NondetStringBuilder.main -cp target/classes
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

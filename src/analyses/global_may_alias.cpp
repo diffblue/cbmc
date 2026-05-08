@@ -24,7 +24,7 @@ void global_may_alias_domaint::assign_lhs_aliases(
 {
   if(lhs.id()==ID_symbol)
   {
-    irep_idt identifier=to_symbol_expr(lhs).get_identifier();
+    irep_idt identifier = to_symbol_expr(lhs).identifier();
 
     aliases.isolate(identifier);
 
@@ -46,7 +46,7 @@ void global_may_alias_domaint::get_rhs_aliases(
 {
   if(rhs.id()==ID_symbol)
   {
-    irep_idt identifier=to_symbol_expr(rhs).get_identifier();
+    irep_idt identifier = to_symbol_expr(rhs).identifier();
     alias_set.insert(identifier);
 
     for(const auto &alias : alias_set)
@@ -79,7 +79,7 @@ void global_may_alias_domaint::get_rhs_aliases_address_of(
 {
   if(rhs.id()==ID_symbol)
   {
-    irep_idt identifier=to_symbol_expr(rhs).get_identifier();
+    irep_idt identifier = to_symbol_expr(rhs).identifier();
     alias_set.insert("&"+id2string(identifier));
   }
   else if(rhs.id()==ID_if)
@@ -118,11 +118,11 @@ void global_may_alias_domaint::transform(
   }
 
   case DECL:
-    aliases.isolate(instruction.decl_symbol().get_identifier());
+    aliases.isolate(instruction.decl_symbol().identifier());
     break;
 
   case DEAD:
-    aliases.isolate(instruction.dead_symbol().get_identifier());
+    aliases.isolate(instruction.dead_symbol().identifier());
     break;
 
   case FUNCTION_CALL: // Probably safe

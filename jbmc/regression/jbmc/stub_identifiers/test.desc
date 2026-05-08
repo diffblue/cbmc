@@ -1,10 +1,10 @@
 CORE symex-driven-lazy-loading-expected-failure
 Test
---show-symbol-table
+--show-symbol-table -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
-^Symbol\.*: java::Opaque\.static_method:\(LOpaque;\)LOpaque;::malloc_site\$[0-3]?$
-^Symbol\.*: java::Opaque\.method:\(\[LOpaque;\)\[LOpaque;::malloc_site\$[0-3]?$
+^Symbol\.*: java::Opaque\.static_method:\(LOpaque;\)LOpaque;::o$
+^Symbol\.*: java::Opaque\.method:\(\[LOpaque;\)\[LOpaque;::o$
 --
 ^Symbol\.*: malloc_site
 ^Symbol\.*: to_construct

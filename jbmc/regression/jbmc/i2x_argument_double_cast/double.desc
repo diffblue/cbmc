@@ -1,6 +1,6 @@
 CORE
 IntToX
---function IntToX.doubleCast
+--function IntToX.doubleCast -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

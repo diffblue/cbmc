@@ -1,6 +1,6 @@
 CORE
 Main
---function 'A.dummy:()V'
+--function 'A.dummy:()V' -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

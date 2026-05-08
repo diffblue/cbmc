@@ -223,7 +223,7 @@ void goto_inlinet::insert_function_body(
   PRECONDITION(!dest.empty());
   PRECONDITION(goto_function.body_available());
 
-  const irep_idt identifier=function.get_identifier();
+  const irep_idt identifier = function.identifier();
 
   goto_programt body;
   body.copy_from(goto_function.body);
@@ -326,7 +326,7 @@ void goto_inlinet::expand_function_call(
 
   const symbol_exprt &function=to_symbol_expr(function_expr);
 
-  const irep_idt identifier=function.get_identifier();
+  const irep_idt identifier = function.identifier();
 
   if(is_ignored(identifier))
     return;

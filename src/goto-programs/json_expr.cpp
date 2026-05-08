@@ -327,7 +327,7 @@ json_objectt json(const exprt &expr, const namespacet &ns, const irep_idt &mode)
       CHECK_RETURN(!error);
       result["type"] = json_stringt(type_string);
 
-      const irep_idt &ptr_id = to_symbol_expr(simpl_expr).get_identifier();
+      const irep_idt &ptr_id = to_symbol_expr(simpl_expr).identifier();
       identifiert identifier(id2string(ptr_id));
       DATA_INVARIANT(
         !identifier.components.empty(),

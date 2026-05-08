@@ -53,7 +53,7 @@ TEST_CASE("Label function pointer call sites", "[core]")
         // second call instruction
         const auto &fp_symbol =
           to_symbol_expr(to_dereference_expr(it->call_function()).pointer())
-            .get_identifier();
+            .identifier();
         REQUIRE(fp_symbol == "h.function_pointer_call.1");
         break;
       }
@@ -62,7 +62,7 @@ TEST_CASE("Label function pointer call sites", "[core]")
         // third call instruction
         const auto &fp_symbol =
           to_symbol_expr(to_dereference_expr(it->call_function()).pointer())
-            .get_identifier();
+            .identifier();
         REQUIRE(fp_symbol == "h.function_pointer_call.2");
 
         auto it_prev = std::prev(it);
@@ -71,7 +71,7 @@ TEST_CASE("Label function pointer call sites", "[core]")
         const auto &rhs = it_prev->assign_rhs();
 
         REQUIRE(
-          to_symbol_expr(lhs).get_identifier() == "h.function_pointer_call.2");
+          to_symbol_expr(lhs).identifier() == "h.function_pointer_call.2");
 
         REQUIRE(rhs.id() == ID_if);
 

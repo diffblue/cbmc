@@ -30,7 +30,7 @@ static std::unique_ptr<string_builtin_functiont> to_string_builtin_function(
   const auto name = expr_checked_cast<symbol_exprt>(fun_app.function());
   PRECONDITION(!is_ssa_expr(name));
 
-  const irep_idt &id = name.get_identifier();
+  const irep_idt &id = name.identifier();
 
   if(id == ID_cprover_string_insert_func)
     return std::make_unique<string_insertion_builtin_functiont>(

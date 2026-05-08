@@ -1,6 +1,6 @@
 CORE
 AbstractTest
---function AbstractTest.getFromAbstract
+--function AbstractTest.getFromAbstract -cp target/classes
 ^EXIT=10$
 ^SIGNAL=0$
 assertion at file AbstractTest.java line 24 .*: FAILURE

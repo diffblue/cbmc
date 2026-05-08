@@ -1026,7 +1026,7 @@ void c_typecheck_baset::typecheck_spec_assigns_target(exprt &target)
     {
       throw invalid_source_file_exceptiont(
         "expecting void return type for function '" +
-          id2string(to_symbol_expr(funcall.function()).get_identifier()) +
+          id2string(to_symbol_expr(funcall.function()).identifier()) +
           "' called in assigns clause",
         target.source_location());
     }
@@ -1071,7 +1071,7 @@ void c_typecheck_baset::typecheck_spec_frees_target(exprt &target)
     {
       throw invalid_source_file_exceptiont(
         "expecting void return type for function '" +
-          id2string(to_symbol_expr(funcall.function()).get_identifier()) +
+          id2string(to_symbol_expr(funcall.function()).identifier()) +
           "' called in frees clause",
         target.source_location());
     }

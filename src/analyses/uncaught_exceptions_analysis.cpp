@@ -123,8 +123,7 @@ void uncaught_exceptions_domaint::transform(
     DATA_INVARIANT(
       function_expr.id()==ID_symbol,
       "identifier expected to be a symbol");
-    const irep_idt &function_name=
-      to_symbol_expr(function_expr).get_identifier();
+    const irep_idt &function_name = to_symbol_expr(function_expr).identifier();
     // use the current information about the callee
     join(uea.exceptions_map[function_name]);
     break;

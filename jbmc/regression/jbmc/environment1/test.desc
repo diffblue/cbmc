@@ -1,6 +1,6 @@
 KNOWNBUG
 Main
---all-properties --unwind 2
+--all-properties --unwind 2 -cp target/classes
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[assertion.1\] assertion at file Main.java line 5: SUCCESS$

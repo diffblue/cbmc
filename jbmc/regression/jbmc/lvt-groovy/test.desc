@@ -6,3 +6,11 @@ org.springframework.build.gradle.DetectSplitPackagesTask
 --
 --
 This doesn't work under symex-driven lazy loading because no entry-point function is given.
+
+The pre-compiled class file was compiled from Groovy source using a
+specific Groovy compiler version. It exercises JBMC's handling of
+Groovy-specific bytecode patterns, particularly the Local Variable
+Table format. The Groovy source is kept in src/main/groovy/ for
+reference but is not used for compilation (different Groovy/JDK
+versions produce different bytecode that may not match what JBMC
+expects).

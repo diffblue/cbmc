@@ -144,7 +144,7 @@ abstract_object_pointert abstract_environmentt::resolve_symbol(
   const namespacet &ns) const
 {
   const symbol_exprt &symbol(to_symbol_expr(expr));
-  const auto symbol_entry = map.find(symbol.get_identifier());
+  const auto symbol_entry = map.find(symbol.identifier());
 
   if(symbol_entry.has_value())
     return symbol_entry.value();
@@ -233,8 +233,8 @@ bool abstract_environmentt::assign(
 
     if(final_value != lhs_value)
     {
-      CHECK_RETURN(!symbol_expr.get_identifier().empty());
-      map.insert_or_replace(symbol_expr.get_identifier(), final_value);
+      CHECK_RETURN(!symbol_expr.identifier().empty());
+      map.insert_or_replace(symbol_expr.identifier(), final_value);
     }
   }
   return true;
@@ -480,7 +480,7 @@ abstract_object_pointert abstract_environmentt::eval_expression(
 
 void abstract_environmentt::erase(const symbol_exprt &expr)
 {
-  map.erase_if_exists(expr.get_identifier());
+  map.erase_if_exists(expr.identifier());
 }
 
 std::vector<abstract_environmentt::map_keyt>

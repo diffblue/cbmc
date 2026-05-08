@@ -1,6 +1,6 @@
 CORE
 virtual5
---function virtual5.test
+--function virtual5.test -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

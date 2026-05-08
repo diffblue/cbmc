@@ -16,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "expr.h"
 #include "expr_cast.h" // IWYU pragma: keep
 #include "invariant.h"
-#include "mp_arith.h"
 #include "validate.h"
 
 #include <unordered_map>
@@ -939,56 +938,6 @@ inline string_typet &to_string_type(typet &type)
 {
   PRECONDITION(can_cast_type<string_typet>(type));
   return static_cast<string_typet &>(type);
-}
-
-/// A type for subranges of integers
-class range_typet:public typet
-{
-public:
-  range_typet(const mp_integer &_from, const mp_integer &_to) : typet(ID_range)
-  {
-    set_from(_from);
-    set_to(_to);
-  }
-
-  mp_integer get_from() const;
-  mp_integer get_to() const;
-  bool includes(const mp_integer &) const;
-  constant_exprt zero_expr() const;
-  constant_exprt one_expr() const;
-
-  void set_from(const mp_integer &_from);
-  void set_to(const mp_integer &to);
-};
-
-/// Check whether a reference to a typet is a \ref range_typet.
-/// \param type: Source type.
-/// \return True if \p type is a \ref range_typet.
-template <>
-inline bool can_cast_type<range_typet>(const typet &type)
-{
-  return type.id() == ID_range;
-}
-
-/// \brief Cast a typet to a \ref range_typet
-///
-/// This is an unchecked conversion. \a type must be known to be \ref
-/// range_typet. Will fail with a precondition violation if type
-/// doesn't match.
-///
-/// \param type: Source type.
-/// \return Object of type \ref range_typet.
-inline const range_typet &to_range_type(const typet &type)
-{
-  PRECONDITION(can_cast_type<range_typet>(type));
-  return static_cast<const range_typet &>(type);
-}
-
-/// \copydoc to_range_type(const typet &)
-inline range_typet &to_range_type(typet &type)
-{
-  PRECONDITION(can_cast_type<range_typet>(type));
-  return static_cast<range_typet &>(type);
 }
 
 /// The vector type

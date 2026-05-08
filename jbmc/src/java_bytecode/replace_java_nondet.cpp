@@ -68,7 +68,7 @@ static nondet_instruction_infot
 is_nondet_returning_object(const code_function_callt &function_call)
 {
   const auto &function_symbol = to_symbol_expr(function_call.function());
-  const auto function_name = id2string(function_symbol.get_identifier());
+  const auto function_name = id2string(function_symbol.identifier());
   const std::regex reg(
     R"(.*org\.cprover\.CProver\.nondet)"
     R"((?:Boolean|Byte|Char|Short|Int|Long|Float|Double|With(out)?Null.*))");
@@ -108,7 +108,7 @@ get_nondet_instruction_info(const goto_programt::const_targett &instr)
 static bool is_symbol_with_id(const exprt &expr, const irep_idt &identifier)
 {
   return expr.id() == ID_symbol &&
-         to_symbol_expr(expr).get_identifier() == identifier;
+         to_symbol_expr(expr).identifier() == identifier;
 }
 
 /// Return whether the expression is a typecast with the specified identifier.
@@ -129,7 +129,7 @@ static bool is_typecast_with_id(const exprt &expr, const irep_idt &identifier)
   }
   const auto &op_symbol = to_symbol_expr(typecast.op());
   // Return whether the typecast has the expected operand
-  return op_symbol.get_identifier() == identifier;
+  return op_symbol.identifier() == identifier;
 }
 
 /// Return whether the instruction is an assignment, and the rhs is a symbol or
@@ -214,7 +214,7 @@ static goto_programt::targett check_and_replace_target(
   irep_idt return_identifier;
   if(remove_returns_not_run)
   {
-    return_identifier = to_symbol_expr(target->call_lhs()).get_identifier();
+    return_identifier = to_symbol_expr(target->call_lhs()).identifier();
   }
   else
   {
@@ -236,8 +236,7 @@ static goto_programt::targett check_and_replace_target(
     }
 
     // Otherwise it's the temporary variable.
-    return_identifier =
-      to_symbol_expr(return_value_assignment).get_identifier();
+    return_identifier = to_symbol_expr(return_value_assignment).identifier();
   }
 
   // Look for the assignment of the temporary return variable into our target

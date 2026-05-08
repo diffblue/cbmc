@@ -29,20 +29,19 @@ void replace_symbolt::insert(
     old_expr.type() == new_expr.type(),
     "types to be replaced should match. old type:\n" +
       old_expr.type().pretty() + "\nnew.type:\n" + new_expr.type().pretty());
-  expr_map.insert(std::pair<irep_idt, exprt>(
-    old_expr.get_identifier(), new_expr));
+  expr_map.insert(std::pair<irep_idt, exprt>(old_expr.identifier(), new_expr));
 }
 
 void replace_symbolt::set(const symbol_exprt &old_expr, const exprt &new_expr)
 {
   PRECONDITION(old_expr.type() == new_expr.type());
-  expr_map[old_expr.get_identifier()] = new_expr;
+  expr_map[old_expr.identifier()] = new_expr;
 }
 
 
 bool replace_symbolt::replace_symbol_expr(symbol_exprt &s) const
 {
-  expr_mapt::const_iterator it = expr_map.find(s.get_identifier());
+  expr_mapt::const_iterator it = expr_map.find(s.identifier());
 
   if(it == expr_map.end())
     return true;
@@ -118,7 +117,7 @@ bool replace_symbolt::replace(exprt &dest) const
     // now set up the binding
     auto old_bindings = bindings;
     for(auto &variable : let_expr.variables())
-      bindings.insert(variable.get_identifier());
+      bindings.insert(variable.identifier());
 
     // now replace in the 'where' expression
     if(!replace(let_expr.where()))
@@ -134,7 +133,7 @@ bool replace_symbolt::replace(exprt &dest) const
 
     auto old_bindings = bindings;
     for(auto &binding : binding_expr.variables())
-      bindings.insert(binding.get_identifier());
+      bindings.insert(binding.identifier());
 
     if(!replace(binding_expr.where()))
       result = false;
@@ -175,7 +174,7 @@ bool replace_symbolt::have_to_replace(const exprt &dest) const
 
   if(dest.id()==ID_symbol)
   {
-    const irep_idt &identifier = to_symbol_expr(dest).get_identifier();
+    const irep_idt &identifier = to_symbol_expr(dest).identifier();
     if(bindings.find(identifier) != bindings.end())
       return false;
     else
@@ -329,12 +328,12 @@ void unchecked_replace_symbolt::insert(
   const symbol_exprt &old_expr,
   const exprt &new_expr)
 {
-  expr_map.emplace(old_expr.get_identifier(), new_expr);
+  expr_map.emplace(old_expr.identifier(), new_expr);
 }
 
 bool unchecked_replace_symbolt::replace_symbol_expr(symbol_exprt &s) const
 {
-  expr_mapt::const_iterator it = expr_map.find(s.get_identifier());
+  expr_mapt::const_iterator it = expr_map.find(s.identifier());
 
   if(it == expr_map.end())
     return true;

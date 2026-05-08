@@ -1,6 +1,6 @@
 CORE
 Main
---context-include Main.main --context-include 'Main.<clinit' --context-include org.cprover.MyClass --context-exclude 'org.cprover.MyClass$Inner.' --max-nondet-string-length 10
+--context-include Main.main --context-include 'Main.<clinit' --context-include org.cprover.MyClass --context-exclude 'org.cprover.MyClass$Inner.' --max-nondet-string-length 10 -cp target/classes
 ^EXIT=10$
 ^SIGNAL=0$
 .* line 12 assertion at file Main.java line 12 .*: FAILURE

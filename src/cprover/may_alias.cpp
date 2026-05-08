@@ -113,7 +113,7 @@ bool stack_and_not_dirty(
   if(object.has_value())
   {
     auto symbol_expr = object->object_expr();
-    auto identifier = symbol_expr.get_identifier();
+    auto identifier = symbol_expr.identifier();
     if(identifier.starts_with("va_arg::"))
       return true; // on the stack, and might alias
     else if(identifier.starts_with("var_args::"))

@@ -1,6 +1,6 @@
 CORE
 live_range_with_holes
---function live_range_with_holes.main
+--function live_range_with_holes.main -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

@@ -10,6 +10,18 @@ macro(add_test_pl_profile name cmdline flag profile)
         LABELS "${profile};CBMC"
         TIMEOUT 1200
     )
+    # Determine the log file name and register it for cmake clean.
+    set(_test_pl_flags ${flag} ${ARGN})
+    list(FIND _test_pl_flags "-s" _s_index)
+    if(_s_index GREATER -1)
+        math(EXPR _s_value_index "${_s_index} + 1")
+        list(GET _test_pl_flags ${_s_value_index} _log_suffix)
+        set_property(DIRECTORY "${CMAKE_SOURCE_DIR}" APPEND PROPERTY
+            ADDITIONAL_CLEAN_FILES "${CMAKE_CURRENT_SOURCE_DIR}/tests-${_log_suffix}.log")
+    else()
+        set_property(DIRECTORY "${CMAKE_SOURCE_DIR}" APPEND PROPERTY
+            ADDITIONAL_CLEAN_FILES "${CMAKE_CURRENT_SOURCE_DIR}/tests.log")
+    endif()
 endmacro(add_test_pl_profile)
 
 macro(add_test_pl_tests cmdline)
@@ -103,3 +115,4 @@ if(WITH_MEMORY_ANALYZER)
   add_subdirectory(memory-analyzer)
   add_subdirectory(extract_type_header)
 endif()
+

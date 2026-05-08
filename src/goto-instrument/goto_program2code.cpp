@@ -95,7 +95,7 @@ void goto_program2codet::build_dead_map()
   {
     if(instruction.is_dead())
     {
-      dead_map[instruction.dead_symbol().get_identifier()] =
+      dead_map[instruction.dead_symbol().identifier()] =
         instruction.location_number;
     }
   }
@@ -460,7 +460,7 @@ goto_programt::const_targett goto_program2codet::convert_decl(
   CHECK_RETURN(next != goto_program.instructions.end());
 
   // see if decl can go in current dest block
-  dead_mapt::const_iterator entry=dead_map.find(symbol.get_identifier());
+  dead_mapt::const_iterator entry = dead_map.find(symbol.identifier());
   bool move_to_dest= &toplevel_block==&dest ||
     (entry!=dead_map.end() &&
      upper_bound->location_number > entry->second);
@@ -1525,9 +1525,9 @@ void goto_program2codet::cleanup_function_call(
 
   // don't edit function calls we might have introduced
   const symbolt *s;
-  if(!ns.lookup(fn.get_identifier(), s))
+  if(!ns.lookup(fn.identifier(), s))
   {
-    const symbolt &fn_sym=ns.lookup(fn.get_identifier());
+    const symbolt &fn_sym = ns.lookup(fn.identifier());
     const code_typet &code_type=to_code_type(fn_sym.type);
     const code_typet::parameterst &parameters=code_type.parameters();
 
@@ -1957,7 +1957,7 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
   {
     if(expr.type().id()!=ID_code)
     {
-      const irep_idt &identifier=to_symbol_expr(expr).get_identifier();
+      const irep_idt &identifier = to_symbol_expr(expr).identifier();
       const symbolt &symbol=ns.lookup(identifier);
 
       if(symbol.is_static_lifetime &&

@@ -1,6 +1,6 @@
 CORE
 
-'mypackage.Package$Inner.<init>'
+'mypackage.Package$Inner.<init>' -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 ^Found Java main class: mypackage.Package\$Inner$

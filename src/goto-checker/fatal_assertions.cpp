@@ -85,7 +85,7 @@ reachable_fixpoint(const loc_sett &locs, const goto_functionst &goto_functions)
       if(function.id() == ID_symbol)
       {
         // add the callee to the working set
-        auto &function_identifier = to_symbol_expr(function).get_identifier();
+        auto &function_identifier = to_symbol_expr(function).identifier();
         auto function_iterator =
           goto_functions.function_map.find(function_identifier);
         // Function may be missing if template instantiation failed

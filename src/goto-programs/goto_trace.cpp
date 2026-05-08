@@ -297,7 +297,7 @@ static void trace_value(
   irep_idt identifier;
 
   if(lhs_object.has_value())
-    identifier=lhs_object->get_identifier();
+    identifier = lhs_object->identifier();
 
   out << from_expr(ns, identifier, full_lhs) << '=';
 

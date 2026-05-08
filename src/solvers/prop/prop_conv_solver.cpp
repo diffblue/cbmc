@@ -89,7 +89,7 @@ std::optional<bool> prop_conv_solvert::get_bool(const exprt &expr) const
   else if(expr.id() == ID_symbol)
   {
     symbolst::const_iterator result =
-      symbols.find(to_symbol_expr(expr).get_identifier());
+      symbols.find(to_symbol_expr(expr).identifier());
 
     // This may fail if the symbol isn't Boolean or
     // not in the formula.
@@ -207,7 +207,7 @@ literalt prop_conv_solvert::convert_bool(const exprt &expr)
   }
   else if(expr.id() == ID_symbol)
   {
-    return get_literal(to_symbol_expr(expr).get_identifier());
+    return get_literal(to_symbol_expr(expr).identifier());
   }
   else if(expr.id() == ID_literal)
   {
@@ -328,7 +328,7 @@ bool prop_conv_solvert::set_equality_to_true(const equal_exprt &expr)
 
   if(expr.lhs().id() == ID_symbol)
   {
-    const irep_idt &identifier = to_symbol_expr(expr.lhs()).get_identifier();
+    const irep_idt &identifier = to_symbol_expr(expr.lhs()).identifier();
 
     literalt tmp = convert(expr.rhs());
 

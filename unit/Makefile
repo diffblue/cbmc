@@ -104,6 +104,7 @@ SRC += analyses/ai/ai.cpp \
        solvers/flattening/boolbv_enumeration.cpp \
        solvers/flattening/boolbv_onehot.cpp \
        solvers/flattening/boolbv_update_bit.cpp \
+       solvers/flattening/bv_utils.cpp \
        solvers/floatbv/float_utils.cpp \
        solvers/prop/bdd_expr.cpp \
        solvers/sat/external_sat.cpp \
@@ -141,6 +142,7 @@ SRC += analyses/ai/ai.cpp \
        solvers/strings/string_refinement/string_refinement.cpp \
        solvers/strings/string_refinement/substitute_array_list.cpp \
        solvers/strings/string_refinement/union_find_replace.cpp \
+       util/arith_tools.cpp \
        util/bitvector_expr.cpp \
        util/case_expr.cpp \
        util/cmdline.cpp \
@@ -180,6 +182,7 @@ SRC += analyses/ai/ai.cpp \
        util/lazy.cpp \
        util/lower_byte_operators.cpp \
        util/max_malloc_size.cpp \
+       util/mathematical_types.cpp \
        util/memory_info.cpp \
        util/message.cpp \
        util/optional_utils.cpp \

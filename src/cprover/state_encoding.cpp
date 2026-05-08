@@ -216,7 +216,7 @@ exprt state_encodingt::evaluate_expr_rec(
   {
     const auto &symbol_expr = to_symbol_expr(what);
 
-    if(symbol_expr.get_identifier() == CPROVER_PREFIX "return_value")
+    if(symbol_expr.identifier() == CPROVER_PREFIX "return_value")
     {
       auto new_symbol = symbol_exprt("return_value", what.type());
       return evaluate_exprt(
@@ -650,7 +650,7 @@ void state_encodingt::function_call_symbol(
 {
   const auto &function = to_symbol_expr(loc->call_function());
   const auto &type = to_code_type(function.type());
-  auto identifier = function.get_identifier();
+  auto identifier = function.identifier();
 
   auto new_annotation = annotation + u8" \u2192 " + id2string(identifier);
   dest.annotation(new_annotation);
@@ -980,15 +980,15 @@ void state_encodingt::encode(
       if(
         lhs.id() == ID_symbol &&
         has_prefix(
-          id2string(to_symbol_expr(lhs).get_identifier()), CPROVER_PREFIX) &&
-        to_symbol_expr(lhs).get_identifier() != CPROVER_PREFIX "rounding_mode")
+          id2string(to_symbol_expr(lhs).identifier()), CPROVER_PREFIX) &&
+        to_symbol_expr(lhs).identifier() != CPROVER_PREFIX "rounding_mode")
       {
         // skip for now
         dest << equal_exprt(out_state_expr(loc), in_state_expr(loc));
       }
       else if(
         lhs.id() == ID_symbol &&
-        to_symbol_expr(lhs).get_identifier() == "_DefaultRuneLocale")
+        to_symbol_expr(lhs).identifier() == "_DefaultRuneLocale")
       {
         // /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/runetype.h
         // skip for now

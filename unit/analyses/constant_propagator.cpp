@@ -20,7 +20,7 @@ static bool starts_with_x(const exprt &e, const namespacet &)
 {
   if(e.id() != ID_symbol)
     return false;
-  return has_prefix(id2string(to_symbol_expr(e).get_identifier()), "x");
+  return has_prefix(id2string(to_symbol_expr(e).identifier()), "x");
 }
 
 SCENARIO("constant_propagator", "[core][analyses][constant_propagator]")

@@ -291,7 +291,7 @@ void variable_sensitivity_domaint::transform_function_call(
   {
     // called function identifier
     const symbol_exprt &symbol_expr = to_symbol_expr(function);
-    const irep_idt function_id = symbol_expr.get_identifier();
+    const irep_idt function_id = symbol_expr.identifier();
 
     const code_function_callt::argumentst &called_arguments =
       from->call_arguments();

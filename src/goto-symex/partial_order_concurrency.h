@@ -85,7 +85,7 @@ protected:
   /// \return identifier
   static inline irep_idt id(event_it event)
   {
-    return event->ssa_lhs.get_identifier();
+    return event->ssa_lhs.identifier();
   }
 
   /// Produce an address ID for an event
@@ -93,7 +93,7 @@ protected:
   /// \return L1-renamed identifier
   irep_idt address(event_it event) const
   {
-    return remove_level_2(event->ssa_lhs).get_identifier();
+    return remove_level_2(event->ssa_lhs).identifier();
   }
 
   typet clock_type;

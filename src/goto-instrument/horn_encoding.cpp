@@ -712,7 +712,7 @@ void state_encodingt::function_call_symbol(
 {
   const auto &function = to_symbol_expr(loc->call_function());
   const auto &type = to_code_type(function.type());
-  auto identifier = function.get_identifier();
+  auto identifier = function.identifier();
 
   auto new_annotation = annotation + u8" \u2192 " + id2string(identifier);
   dest.annotation(new_annotation);
@@ -896,8 +896,8 @@ void state_encodingt::encode(
       else if(
         lhs.id() == ID_symbol &&
         has_prefix(
-          id2string(to_symbol_expr(lhs).get_identifier()), CPROVER_PREFIX) &&
-        to_symbol_expr(lhs).get_identifier() != CPROVER_PREFIX "rounding_mode")
+          id2string(to_symbol_expr(lhs).identifier()), CPROVER_PREFIX) &&
+        to_symbol_expr(lhs).identifier() != CPROVER_PREFIX "rounding_mode")
       {
         // skip for now
         dest << equal_exprt(out_state_expr(loc), in_state_expr(loc));
@@ -1142,9 +1142,8 @@ void variable_encoding(std::vector<exprt> &constraints)
   std::sort(
     variables.begin(),
     variables.end(),
-    [](const symbol_exprt &a, const symbol_exprt &b) {
-      return id2string(a.get_identifier()) < id2string(b.get_identifier());
-    });
+    [](const symbol_exprt &a, const symbol_exprt &b)
+    { return id2string(a.identifier()) < id2string(b.identifier()); });
 
   for(auto &c : constraints)
     c = variable_encoding(c, variables);
@@ -1173,7 +1172,7 @@ void equality_propagation(std::vector<exprt> &constraints)
         const auto &symbol_expr = to_symbol_expr(equal_expr.lhs());
 
         // this is a (deliberate) no-op when the symbol is already in the map
-        if(values.replaces_symbol(symbol_expr.get_identifier()))
+        if(values.replaces_symbol(symbol_expr.identifier()))
         {
         }
         else

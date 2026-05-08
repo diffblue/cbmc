@@ -65,7 +65,7 @@ bool dfcc_lift_memory_predicatest::calls_memory_predicates(
       instruction.call_function().id() == ID_symbol)
     {
       const auto &callee_id =
-        to_symbol_expr(instruction.call_function()).get_identifier();
+        to_symbol_expr(instruction.call_function()).identifier();
 
       if(
         is_core_memory_predicate(callee_id) ||
@@ -154,7 +154,7 @@ std::set<irep_idt> dfcc_lift_memory_predicatest::lift_predicates(
         instruction.call_function().id() == ID_symbol)
       {
         const auto &callee =
-          to_symbol_expr(instruction.call_function()).get_identifier();
+          to_symbol_expr(instruction.call_function()).identifier();
         if(predicates.find(callee) != predicates.end())
         {
           log.conditional_output(log.debug(), [&](messaget::mstreamt &mstream) {
@@ -196,7 +196,7 @@ static std::optional<std::size_t> is_param_expr(
   }
   else if(expr.id() == ID_symbol)
   {
-    const irep_idt &ident = to_symbol_expr(expr).get_identifier();
+    const irep_idt &ident = to_symbol_expr(expr).identifier();
     const auto found = parameter_rank.find(ident);
     if(found != parameter_rank.end())
     {
@@ -235,7 +235,7 @@ void dfcc_lift_memory_predicatest::collect_parameters_to_lift(
     if(it.is_function_call() && it.call_function().id() == ID_symbol)
     {
       const irep_idt &callee_id =
-        to_symbol_expr(it.call_function()).get_identifier();
+        to_symbol_expr(it.call_function()).identifier();
       if(callee_id == CPROVER_PREFIX "pointer_equals")
       {
         auto opt_rank = is_param_expr(it.call_arguments()[0], parameter_rank);
@@ -355,7 +355,7 @@ void dfcc_lift_memory_predicatest::lift_parameters_and_update_body(
     {
       // add address-of to arguments that are passed in lifted position
       auto &callee_id =
-        to_symbol_expr(instruction.call_function()).get_identifier();
+        to_symbol_expr(instruction.call_function()).identifier();
       if(is_lifted_function(callee_id))
       {
         for(const auto &rank : lifted_parameters[callee_id])
@@ -422,7 +422,7 @@ void dfcc_lift_memory_predicatest::fix_calls(
 
       if(function.id() == ID_symbol)
       {
-        const irep_idt &fun_name = to_symbol_expr(function).get_identifier();
+        const irep_idt &fun_name = to_symbol_expr(function).identifier();
 
         if(is_lifted_function(fun_name))
         {

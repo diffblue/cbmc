@@ -9,6 +9,7 @@ Author: Diffblue Ltd.
 #ifndef CPROVER_JAVA_BYTECODE_NONDET_H
 #define CPROVER_JAVA_BYTECODE_NONDET_H
 
+#include <util/mp_arith.h>
 #include <util/std_code.h>
 
 class allocate_objectst;

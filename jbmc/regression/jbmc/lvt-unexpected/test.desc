@@ -1,6 +1,6 @@
 CORE symex-driven-lazy-loading-expected-failure
 unexpected
---show-symbol-table
+--show-symbol-table -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 --

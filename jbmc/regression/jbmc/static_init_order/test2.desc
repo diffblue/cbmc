@@ -1,6 +1,6 @@
 CORE
 static_init_order
---function static_init_order.test2
+--function static_init_order.test2 -cp target/classes
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

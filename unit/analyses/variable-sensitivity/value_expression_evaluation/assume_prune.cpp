@@ -28,7 +28,7 @@ static void ASSUME_TRUE(
   const irep_idt &id,
   symbol_exprt const &y,
   abstract_environmentt &env,
-  namespacet &ns)
+  const namespacet &ns)
 {
   auto assumption = env.do_assume(binary_relation_exprt(x, id, y), ns);
 
@@ -43,7 +43,7 @@ static void EXPECT_RESULT(
   symbol_exprt const &y,
   const std::vector<exprt> &y_expected,
   abstract_environmentt &env,
-  namespacet &ns)
+  const namespacet &ns)
 {
   auto x_result = as_value_set(env.eval(x, ns));
   auto y_result = as_value_set(env.eval(y, ns));
@@ -60,7 +60,7 @@ static void EXPECT_RESULT(
   exprt const &y_lower,
   exprt const &y_upper,
   abstract_environmentt &env,
-  namespacet &ns)
+  const namespacet &ns)
 {
   auto x_result = as_interval(env.eval(x, ns));
   auto y_result = as_interval(env.eval(y, ns));

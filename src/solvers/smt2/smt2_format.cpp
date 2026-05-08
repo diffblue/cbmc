@@ -126,7 +126,7 @@ std::ostream &smt2_format_rec(std::ostream &out, const exprt &expr)
   }
   else if(expr.id() == ID_symbol)
   {
-    const auto &identifier = to_symbol_expr(expr).get_identifier();
+    const auto &identifier = to_symbol_expr(expr).identifier();
     if(expr.get_bool("#quoted"))
     {
       out << '|';

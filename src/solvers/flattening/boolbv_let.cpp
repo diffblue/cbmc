@@ -52,7 +52,7 @@ bvt boolbvt::convert_let(const let_exprt &expr)
   // Now assign
   for(const auto &binding : make_range(fresh_variables).zip(converted_values))
   {
-    const auto &identifier = binding.first.get_identifier();
+    const auto &identifier = binding.first.identifier();
 
     // make the symbol visible
     if(binding.first.is_boolean())
@@ -96,9 +96,9 @@ bvt boolbvt::convert_let(const let_exprt &expr)
   {
     const auto &type = entry.type();
     if(type.id() == ID_bool)
-      symbols.erase(entry.get_identifier());
+      symbols.erase(entry.identifier());
     else
-      map.erase_literals(entry.get_identifier(), type);
+      map.erase_literals(entry.identifier(), type);
   }
 
   return result_bv;

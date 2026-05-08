@@ -1,6 +1,6 @@
 CORE
 NondetDouble
---function NondetDouble.main
+--function NondetDouble.main -cp target/classes
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

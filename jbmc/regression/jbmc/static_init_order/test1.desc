@@ -1,6 +1,6 @@
 CORE
 static_init_order
---function static_init_order.test1 --trace
+--function static_init_order.test1 --trace -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

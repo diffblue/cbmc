@@ -81,7 +81,7 @@ void concurrency_instrumentationt::instrument(exprt &expr)
 
   for(const symbol_exprt &s : find_symbols(expr))
   {
-    shared_varst::const_iterator v_it = shared_vars.find(s.get_identifier());
+    shared_varst::const_iterator v_it = shared_vars.find(s.identifier());
 
     if(v_it != shared_vars.end())
     {

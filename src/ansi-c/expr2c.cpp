@@ -2864,7 +2864,7 @@ expr2ct::convert_code_frontend_decl(const codet &src, unsigned indent)
   const symbolt *symbol=nullptr;
   if(
     src.op0().id() == ID_symbol &&
-    !ns.lookup(to_symbol_expr(src.op0()).get_identifier(), symbol))
+    !ns.lookup(to_symbol_expr(src.op0()).identifier(), symbol))
   {
     if(symbol->is_file_local &&
        (src.op0().type().id()==ID_code || symbol->is_static_lifetime))

@@ -163,6 +163,8 @@ std::size_t address_bits(const mp_integer &size);
 
 mp_integer power(const mp_integer &base, const mp_integer &exponent);
 
+bool is_power_of_two(const mp_integer &);
+
 void mp_min(mp_integer &a, const mp_integer &b);
 void mp_max(mp_integer &a, const mp_integer &b);
 

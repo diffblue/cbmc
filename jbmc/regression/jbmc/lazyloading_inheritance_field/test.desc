@@ -1,6 +1,6 @@
 CORE symex-driven-lazy-loading-expected-failure
 test
---verbosity 10 --function test.test
+--verbosity 10 --function test.test -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 elaborate java::Base\.f:\(\)V

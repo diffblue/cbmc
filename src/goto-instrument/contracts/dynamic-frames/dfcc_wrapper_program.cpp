@@ -582,7 +582,7 @@ void disable_may_fail_rec(exprt &expr, bool no_fail)
       exprt &function = side_effect.operands()[0];
       if(function.id() == ID_symbol)
       {
-        const irep_idt &func_name = to_symbol_expr(function).get_identifier();
+        const irep_idt &func_name = to_symbol_expr(function).identifier();
         if(dfcc_is_cprover_pointer_predicate(func_name))
         {
           function.add_source_location().set("no_fail", no_fail);

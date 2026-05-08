@@ -126,7 +126,7 @@ SCENARIO(
           .as<code_assignt>()[0]
           .as<symbol_exprt>()
           .get()
-          .get_identifier() == "symbol_to_assign");
+          .identifier() == "symbol_to_assign");
     }
     THEN("The instruction zero-initializes the struct")
     {
@@ -226,7 +226,7 @@ SCENARIO(
           .as<code_assignt>()[0]
           .as<symbol_exprt>()
           .get()
-          .get_identifier() == "symbol_to_assign");
+          .identifier() == "symbol_to_assign");
     }
 
     THEN("The instruction zero-initializes the struct")
@@ -259,7 +259,7 @@ SCENARIO(
           .as<code_assignt>()[0]
           .as<symbol_exprt>()
           .get()
-          .get_identifier() ==
+          .identifier() ==
         "java::TestClass.<clinit>:()V::user_specified_array_data_init");
     }
     THEN("The instruction assigns the array cell to 42")
@@ -358,7 +358,7 @@ SCENARIO(
           .as<code_assignt>()[0]
           .as<symbol_exprt>()
           .get()
-          .get_identifier() == "symbol_to_assign");
+          .identifier() == "symbol_to_assign");
     }
 
     THEN("The instruction zero-initializes the struct")
@@ -412,7 +412,7 @@ SCENARIO(
           .as<code_assignt>()[0]
           .as<symbol_exprt>()
           .get()
-          .get_identifier() ==
+          .identifier() ==
         "java::TestClass.<clinit>:()V::user_specified_array_data_init");
     }
     THEN("The instruction assigns the array cell to 42")
@@ -556,7 +556,7 @@ SCENARIO(
           .as<code_assignt>()[0]
           .as<symbol_exprt>()
           .get()
-          .get_identifier() == "symbol_to_assign");
+          .identifier() == "symbol_to_assign");
     }
     THEN(
       "zero-initialize the object:"

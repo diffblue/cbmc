@@ -1,6 +1,6 @@
 CORE symex-driven-lazy-loading-expected-failure
 VirtualFunctions
---java-max-vla-length 48 --unwind 8 --java-unwind-enum-static --trace --function VirtualFunctions.check --show-goto-functions
+--java-max-vla-length 48 --unwind 8 --java-unwind-enum-static --trace --function VirtualFunctions.check --show-goto-functions -cp target/classes
 CALL java::VirtualFunctions\$B\.f:\(\)V\(cast\(.*::a, struct java::VirtualFunctions\$B\*\)\)$
 CALL java::VirtualFunctions\$A\.f:\(\)V\(.*::a\)$
 CALL java::VirtualFunctions\$B\.f:\(\)V\(.*::b\)$

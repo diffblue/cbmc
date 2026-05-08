@@ -20,7 +20,7 @@ static void add_to_symbol_table(
   symbol_tablet &symbol_table,
   const symbol_exprt &symbol_expr)
 {
-  symbolt symbol{symbol_expr.get_identifier(), symbol_expr.type(), irep_idt{}};
+  symbolt symbol{symbol_expr.identifier(), symbol_expr.type(), irep_idt{}};
   symbol.value = symbol_expr;
   symbol.is_thread_local = true;
   symbol_table.insert(symbol);
@@ -69,13 +69,13 @@ SCENARIO(
         state.assignment(ssa_foo, rhs1, ns, true, true, false);
       THEN("The result is `foo` renamed to L2")
       {
-        REQUIRE(result.get().get_identifier() == "foo!0#1");
+        REQUIRE(result.get().identifier() == "foo!0#1");
       }
       THEN("The propagation map contains an entry for `foo`")
       {
         const auto l1_foo = state.rename_ssa<L1>(ssa_foo, ns);
         const auto foo_propagated =
-          state.propagation.find(l1_foo.get().get_identifier());
+          state.propagation.find(l1_foo.get().identifier());
         REQUIRE(foo_propagated.has_value());
         const auto foo_value =
           numeric_cast_v<mp_integer>(to_constant_expr(foo_propagated->get()));
@@ -93,13 +93,13 @@ SCENARIO(
 
         THEN("The level 2 index of `foo` is incremented")
         {
-          REQUIRE(result2.get().get_identifier() == "foo!0#2");
+          REQUIRE(result2.get().identifier() == "foo!0#2");
         }
         THEN("The propagation map entry for `foo` is updated")
         {
           const auto l1_foo = state.rename_ssa<L1>(ssa_foo, ns);
           const auto foo_propagated =
-            state.propagation.find(l1_foo.get().get_identifier());
+            state.propagation.find(l1_foo.get().identifier());
           REQUIRE(foo_propagated.has_value());
           const auto foo_value =
             numeric_cast_v<mp_integer>(to_constant_expr(foo_propagated->get()));
@@ -131,7 +131,7 @@ SCENARIO(
         state.assignment(ssa_foo, null_pointer, ns, true, true, false);
       THEN("The result is `foo` renamed to L2")
       {
-        REQUIRE(result.get().get_identifier() == "foo!0#1");
+        REQUIRE(result.get().identifier() == "foo!0#1");
       }
       THEN("The value set contains an entry for `foo`")
       {
@@ -159,7 +159,7 @@ SCENARIO(
 
         THEN("The level 2 index of `foo` is incremented")
         {
-          REQUIRE(result2.get().get_identifier() == "foo!0#2");
+          REQUIRE(result2.get().identifier() == "foo!0#2");
         }
         THEN("The value set for `foo` is updated to contain int_value!0")
         {
@@ -172,7 +172,7 @@ SCENARIO(
           REQUIRE(object_descriptor != nullptr);
           const symbol_exprt object_symbol =
             to_symbol_expr(object_descriptor->object());
-          REQUIRE(object_symbol.get_identifier() == "int_value!0");
+          REQUIRE(object_symbol.identifier() == "int_value!0");
           REQUIRE(object_descriptor->offset() == 0);
         }
         THEN("The target equations are unchanged")

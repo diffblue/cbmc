@@ -1,0 +1,7 @@
+CORE
+union_flexible_array_member_msvc_address.c
+--i386-win32
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$

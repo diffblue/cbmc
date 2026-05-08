@@ -8,3 +8,12 @@ edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap
 \\"statement\\" \(\\"ret\\"\)
 --
 This doesn't work under symex-driven lazy loading because no entry-point function is given.
+
+The pre-compiled class file cannot be compiled from source because it
+contains JSR (Jump SubRoutine) and RET (Return from subroutine) JVM
+bytecode instructions. These instructions were deprecated in Java 6 and
+removed from the class file specification in Java 7. No modern Java
+compiler produces them. The class originates from the
+edu.emory.mathcs.backport library (a Java 1.4 backport of
+java.util.concurrent) and is the only way to test JBMC's handling of
+these legacy instructions.

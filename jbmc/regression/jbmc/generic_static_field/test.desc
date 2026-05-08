@@ -1,6 +1,6 @@
 CORE
 Test
---function Test.test --validate-goto-model --show-goto-functions
+--function Test.test --validate-goto-model --show-goto-functions -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 ASSIGN java::Test\.test:\(\)LTest;#return_value := java::Test\.static_field$

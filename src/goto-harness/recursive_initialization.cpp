@@ -142,7 +142,7 @@ void recursive_initializationt::initialize(
 {
   if(lhs.id() == ID_symbol && !initialization_config.selection_specs.empty())
   {
-    auto lhs_id = to_symbol_expr(lhs).get_identifier();
+    auto lhs_id = to_symbol_expr(lhs).identifier();
     for(const auto &selection_spec : initialization_config.selection_specs)
     {
       if(selection_spec.front() == lhs_id)
@@ -158,7 +158,7 @@ void recursive_initializationt::initialize(
   if(lhs.id() == ID_symbol)
   {
     const auto maybe_cluster_index =
-      find_equal_cluster(to_symbol_expr(lhs).get_identifier());
+      find_equal_cluster(to_symbol_expr(lhs).identifier());
     if(maybe_cluster_index.has_value())
     {
       if(common_arguments_origins[*maybe_cluster_index].has_value())
@@ -196,7 +196,7 @@ void recursive_initializationt::initialize(
 
   if(lhs.id() == ID_symbol)
   {
-    const irep_idt &lhs_name = to_symbol_expr(lhs).get_identifier();
+    const irep_idt &lhs_name = to_symbol_expr(lhs).identifier();
     if(should_be_treated_as_array(lhs_name))
     {
       auto size_var = get_associated_size_variable(lhs_name);
@@ -303,7 +303,7 @@ irep_idt recursive_initializationt::build_constructor(const exprt &expr)
   bool has_size_param = false;
   if(expr.id() == ID_symbol)
   {
-    expr_name = to_symbol_expr(expr).get_identifier();
+    expr_name = to_symbol_expr(expr).identifier();
     is_nullable = initialization_config.potential_null_function_pointers.count(
       expr_name.value());
     if(should_be_treated_as_array(*expr_name))
@@ -906,9 +906,8 @@ bool recursive_initializationt::needs_freeing(const exprt &expr) const
   {
     if(common_arguments_origin.has_value() && expr.id() == ID_symbol)
     {
-      auto origin_name =
-        to_symbol_expr(*common_arguments_origin).get_identifier();
-      auto expr_name = to_symbol_expr(expr).get_identifier();
+      auto origin_name = to_symbol_expr(*common_arguments_origin).identifier();
+      auto expr_name = to_symbol_expr(expr).identifier();
       return origin_name == expr_name;
     }
   }
@@ -938,7 +937,7 @@ void recursive_initializationt::free_if_possible(
   code_blockt &body)
 {
   PRECONDITION(expr.id() == ID_symbol);
-  const auto expr_id = to_symbol_expr(expr).get_identifier();
+  const auto expr_id = to_symbol_expr(expr).identifier();
   const auto maybe_cluster_index = find_equal_cluster(expr_id);
   if(!maybe_cluster_index.has_value())
   {
@@ -949,7 +948,7 @@ void recursive_initializationt::free_if_possible(
 
   if(
     to_symbol_expr(*common_arguments_origins[*maybe_cluster_index])
-        .get_identifier() != expr_id &&
+        .identifier() != expr_id &&
     initialization_config.arguments_may_be_equal)
   {
     // in equality cluster but not common origin -> free if not equal to origin
@@ -1013,7 +1012,7 @@ code_blockt recursive_initializationt::build_function_pointer_constructor(
         // This is either address of or pointer; in pointer case, we don't
         // need to do anything. In the address of case, the operand is
         // a symbol representing a target function.
-        to_symbol_expr(to_address_of_expr(target).object()).get_identifier()
+        to_symbol_expr(to_address_of_expr(target).object()).identifier()
         : "";
     // skip referencing globals because the corresponding symbols in the symbol
     // table are no longer marked as file local.

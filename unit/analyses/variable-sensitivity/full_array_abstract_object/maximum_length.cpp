@@ -24,7 +24,7 @@ static abstract_object_ptrt write_array(
   int index,
   int new_value,
   abstract_environmentt &env,
-  namespacet &ns)
+  const namespacet &ns)
 {
   const typet type = signedbv_typet(32);
 

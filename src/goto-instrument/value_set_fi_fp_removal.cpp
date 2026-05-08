@@ -65,7 +65,7 @@ void value_set_fi_fp_removal(
 
           for(const auto &f : functions)
             message.status()
-              << "  function: " << f.get_identifier() << messaget::eom;
+              << "  function: " << f.identifier() << messaget::eom;
 
           if(functions.size() > 0)
           {

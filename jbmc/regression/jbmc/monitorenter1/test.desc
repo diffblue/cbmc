@@ -1,6 +1,6 @@
 CORE
 monitorenter1
---function monitorenter1.test
+--function monitorenter1.test -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

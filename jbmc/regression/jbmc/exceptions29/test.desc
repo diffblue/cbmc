@@ -1,6 +1,6 @@
 CORE
 test
---unwind 10 --max-nondet-string-length 10
+--unwind 10 --max-nondet-string-length 10 -cp target/classes
 ^\[java::test.main:\(\[Ljava/lang/String;\)V\.assertion.1\] line 14 assertion at file test\.java line 14 function java::test.main:\(\[Ljava/lang/String;\)V bytecode-index 21: FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$

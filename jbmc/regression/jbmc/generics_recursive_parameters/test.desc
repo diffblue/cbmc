@@ -1,6 +1,6 @@
 CORE
 MutuallyRecursiveGenerics
---function MutuallyRecursiveGenerics.f
+--function MutuallyRecursiveGenerics.f -cp target/classes
 ^EXIT=0$
 ^SIGNAL=0$
 --

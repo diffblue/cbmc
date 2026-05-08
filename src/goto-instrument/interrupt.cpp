@@ -205,7 +205,7 @@ void interrupt(
     if(
       gf_entry.first != INITIALIZE_FUNCTION &&
       gf_entry.first != goto_functionst::entry_point() &&
-      gf_entry.first != isr.get_identifier())
+      gf_entry.first != isr.identifier())
     {
       interrupt(
         value_sets,

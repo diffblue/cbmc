@@ -1,6 +1,6 @@
 CORE
 NondetCharSequence
---function NondetCharSequence.main
+--function NondetCharSequence.main -cp target/classes
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

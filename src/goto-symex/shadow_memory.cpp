@@ -58,7 +58,7 @@ void shadow_memoryt::initialize_shadow_memory(
     }
 
     log.debug() << "Shadow memory: initialize field "
-                << id2string(shadow.get_identifier()) << " for " << format(expr)
+                << id2string(shadow.identifier()) << " for " << format(expr)
                 << " with initial value " << format(field_pair.second)
                 << messaget::eom;
   }
@@ -348,7 +348,7 @@ void shadow_memoryt::symex_field_static_init(
     return;
 
   const irep_idt &identifier =
-    to_symbol_expr(lhs.get_original_expr()).get_identifier();
+    to_symbol_expr(lhs.get_original_expr()).identifier();
 
   if(state.source.function_id != INITIALIZE_FUNCTION)
     return;
@@ -386,7 +386,7 @@ void shadow_memoryt::symex_field_static_init_string_constant(
   if(
     expr.get_original_expr().id() == ID_symbol &&
     to_symbol_expr(expr.get_original_expr())
-      .get_identifier()
+      .identifier()
       .starts_with(CPROVER_PREFIX))
   {
     return;
@@ -408,7 +408,7 @@ void shadow_memoryt::symex_field_local_init(
   const ssa_exprt &expr)
 {
   const symbolt &symbol =
-    ns.lookup(to_symbol_expr(expr.get_original_expr()).get_identifier());
+    ns.lookup(to_symbol_expr(expr.get_original_expr()).identifier());
 
   const std::string symbol_name = id2string(symbol.name);
   if(
@@ -439,7 +439,7 @@ void shadow_memoryt::symex_field_local_init(
   const typet &type = expr.type();
   ssa_exprt expr_l1 = remove_level_2(expr);
   log.debug() << "Shadow memory: local memory "
-              << id2string(expr_l1.get_identifier()) << " of type "
+              << id2string(expr_l1.identifier()) << " of type "
               << from_type(ns, "", type) << messaget::eom;
 
   initialize_shadow_memory(
@@ -479,7 +479,7 @@ shadow_memory_field_definitionst shadow_memoryt::gather_field_declarations(
       if(function.id() != ID_symbol)
         continue;
 
-      const irep_idt &identifier = to_symbol_expr(function).get_identifier();
+      const irep_idt &identifier = to_symbol_expr(function).identifier();
 
       if(
         identifier ==

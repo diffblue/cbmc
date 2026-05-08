@@ -73,7 +73,7 @@ exprt remove_const_function_pointerst::replace_const_symbols(
     if(is_const_expression(expression))
     {
       const symbolt &symbol =
-        symbol_table.lookup_ref(to_symbol_expr(expression).get_identifier());
+        symbol_table.lookup_ref(to_symbol_expr(expression).identifier());
       if(symbol.type.id() != ID_code && symbol.value.is_not_nil())
       {
         const exprt &symbol_value=symbol.value;
@@ -109,7 +109,7 @@ exprt remove_const_function_pointerst::replace_const_symbols(
 exprt remove_const_function_pointerst::resolve_symbol(
   const symbol_exprt &symbol_expr) const
 {
-  const symbolt &symbol = symbol_table.lookup_ref(symbol_expr.get_identifier());
+  const symbolt &symbol = symbol_table.lookup_ref(symbol_expr.identifier());
   return symbol.value;
 }
 

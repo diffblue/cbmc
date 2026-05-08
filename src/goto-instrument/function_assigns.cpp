@@ -46,7 +46,7 @@ void function_assignst::get_assigns_function(
 {
   if(function.id() == ID_symbol)
   {
-    const irep_idt &identifier = to_symbol_expr(function).get_identifier();
+    const irep_idt &identifier = to_symbol_expr(function).identifier();
 
     function_mapt::const_iterator fm_it = function_map.find(identifier);
 

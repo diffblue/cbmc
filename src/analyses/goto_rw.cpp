@@ -585,7 +585,7 @@ void rw_range_sett::get_objects_rec(
   else if(expr.id()==ID_symbol)
   {
     const symbol_exprt &symbol=to_symbol_expr(expr);
-    const irep_idt identifier=symbol.get_identifier();
+    const irep_idt identifier = symbol.identifier();
 
     auto symbol_bits = pointer_offset_bits(symbol.type(), ns);
 

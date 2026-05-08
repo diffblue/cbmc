@@ -83,7 +83,7 @@ std::string cpp_typecheckt::template_suffix(
             if(node.id() == ID_symbol)
             {
               const symbolt &symbol =
-                lookup(to_symbol_expr(node).get_identifier());
+                lookup(to_symbol_expr(node).identifier());
               if(symbol.value.is_not_nil() && cpp_is_pod(symbol.type))
               {
                 node = symbol.value;

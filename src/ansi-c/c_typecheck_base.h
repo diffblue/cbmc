@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANSI_C_C_TYPECHECK_BASE_H
 #define CPROVER_ANSI_C_C_TYPECHECK_BASE_H
 
+#include <util/mp_arith.h>
 #include <util/namespace.h>
 #include <util/std_code.h>
 #include <util/symbol.h>

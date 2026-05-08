@@ -37,7 +37,7 @@ bool is_nondet_initializable_static(
   const symbol_exprt &symbol_expr,
   const namespacet &ns)
 {
-  const irep_idt &id = symbol_expr.get_identifier();
+  const irep_idt &id = symbol_expr.identifier();
 
   // is it a __CPROVER_* variable?
   if(id.starts_with(CPROVER_PREFIX))
@@ -103,7 +103,7 @@ static void nondet_static(
         side_effect_expr_nondett nondet{
           sym.type(), instruction.source_location()};
         instruction.assign_rhs_nonconst() = nondet;
-        goto_model.symbol_table.get_writeable_ref(sym.get_identifier()).value =
+        goto_model.symbol_table.get_writeable_ref(sym.identifier()).value =
           nondet;
       }
     }
@@ -112,9 +112,9 @@ static void nondet_static(
       const symbol_exprt &fsym = to_symbol_expr(instruction.call_function());
 
       // see cpp/cpp_typecheck.cpp, which creates initialization functions
-      if(fsym.get_identifier().starts_with("#cpp_dynamic_initialization#"))
+      if(fsym.identifier().starts_with("#cpp_dynamic_initialization#"))
       {
-        nondet_static(ns, goto_model, fsym.get_identifier());
+        nondet_static(ns, goto_model, fsym.identifier());
       }
     }
   }

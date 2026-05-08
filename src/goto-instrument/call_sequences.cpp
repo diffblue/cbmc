@@ -50,8 +50,8 @@ void show_call_sequences(
       const exprt &callee = t->call_function();
       if(callee.id()==ID_symbol)
       {
-        std::cout << caller << " -> "
-                  << to_symbol_expr(callee).get_identifier() << '\n';
+        std::cout << caller << " -> " << to_symbol_expr(callee).identifier()
+                  << '\n';
       }
     }
 
@@ -202,7 +202,7 @@ void check_call_sequencet::operator()()
       const exprt &function = e.pc->call_function();
       if(function.id()==ID_symbol)
       {
-        irep_idt identifier=to_symbol_expr(function).get_identifier();
+        irep_idt identifier = to_symbol_expr(function).identifier();
 
         if(sequence[e.index]==identifier)
         {
@@ -282,7 +282,7 @@ static void list_calls_and_arguments(
     if(f.id()!=ID_symbol)
       continue;
 
-    const irep_idt &identifier=to_symbol_expr(f).get_identifier();
+    const irep_idt &identifier = to_symbol_expr(f).identifier();
     if(identifier == INITIALIZE_FUNCTION)
       continue;
 

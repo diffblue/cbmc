@@ -1,6 +1,6 @@
 CORE
 Test
---trace --json-ui --trace-json-extended --function Test.main
+--trace --json-ui --trace-json-extended --function Test.main -cp target/classes
 ^EXIT=10$
 ^SIGNAL=0$
 rawLhs

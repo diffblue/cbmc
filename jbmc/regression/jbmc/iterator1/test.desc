@@ -1,6 +1,6 @@
 CORE
 iterator1
---unwind 3 --function iterator1.f
+--unwind 3 --function iterator1.f -cp target/classes
 ^EXIT=10$
 ^SIGNAL=0$
 ^.*FAILURE

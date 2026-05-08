@@ -51,7 +51,7 @@ static bool find_symbols(
       const auto &binding_expr = to_binding_expr(src);
       std::unordered_set<irep_idt> new_bindings{bindings};
       for(const auto &v : binding_expr.variables())
-        new_bindings.insert(v.get_identifier());
+        new_bindings.insert(v.identifier());
 
       if(!find_symbols(
            kind, binding_expr.where(), op, new_bindings, subs_to_find))
@@ -65,7 +65,7 @@ static bool find_symbols(
       const auto &let_expr = to_let_expr(src);
       std::unordered_set<irep_idt> new_bindings{bindings};
       for(const auto &v : let_expr.variables())
-        new_bindings.insert(v.get_identifier());
+        new_bindings.insert(v.identifier());
 
       if(!find_symbols(kind, let_expr.where(), op, new_bindings, subs_to_find))
         return false;
@@ -112,7 +112,7 @@ static bool find_symbols(
     }
     else if(kind == symbol_kindt::F_EXPR_FREE)
     {
-      if(bindings.find(s.get_identifier()) == bindings.end() && !op(s))
+      if(bindings.find(s.identifier()) == bindings.end() && !op(s))
         return false;
     }
   }
@@ -272,25 +272,32 @@ bool has_symbol_expr(
   return !find_symbols(
     include_bound_symbols ? symbol_kindt::F_EXPR : symbol_kindt::F_EXPR_FREE,
     src,
-    [&identifier](const symbol_exprt &e) {
-      return e.get_identifier() != identifier;
-    });
+    [&identifier](const symbol_exprt &e)
+    { return e.identifier() != identifier; });
 }
 
 void find_type_symbols(const exprt &src, find_symbols_sett &dest)
 {
-  find_symbols(symbol_kindt::F_TYPE, src, [&dest](const symbol_exprt &e) {
-    dest.insert(e.get_identifier());
-    return true;
-  });
+  find_symbols(
+    symbol_kindt::F_TYPE,
+    src,
+    [&dest](const symbol_exprt &e)
+    {
+      dest.insert(e.identifier());
+      return true;
+    });
 }
 
 void find_type_symbols(const typet &src, find_symbols_sett &dest)
 {
-  find_symbols(symbol_kindt::F_TYPE, src, [&dest](const symbol_exprt &e) {
-    dest.insert(e.get_identifier());
-    return true;
-  });
+  find_symbols(
+    symbol_kindt::F_TYPE,
+    src,
+    [&dest](const symbol_exprt &e)
+    {
+      dest.insert(e.identifier());
+      return true;
+    });
 }
 
 void find_non_pointer_type_symbols(
@@ -298,8 +305,11 @@ void find_non_pointer_type_symbols(
   find_symbols_sett &dest)
 {
   find_symbols(
-    symbol_kindt::F_TYPE_NON_PTR, src, [&dest](const symbol_exprt &e) {
-      dest.insert(e.get_identifier());
+    symbol_kindt::F_TYPE_NON_PTR,
+    src,
+    [&dest](const symbol_exprt &e)
+    {
+      dest.insert(e.identifier());
       return true;
     });
 }
@@ -309,8 +319,11 @@ void find_non_pointer_type_symbols(
   find_symbols_sett &dest)
 {
   find_symbols(
-    symbol_kindt::F_TYPE_NON_PTR, src, [&dest](const symbol_exprt &e) {
-      dest.insert(e.get_identifier());
+    symbol_kindt::F_TYPE_NON_PTR,
+    src,
+    [&dest](const symbol_exprt &e)
+    {
+      dest.insert(e.identifier());
       return true;
     });
 }
@@ -323,8 +336,9 @@ void find_type_and_expr_symbols(
   find_symbols(
     symbol_kindt::F_ALL,
     src,
-    [&dest](const symbol_exprt &e) {
-      dest.insert(e.get_identifier());
+    [&dest](const symbol_exprt &e)
+    {
+      dest.insert(e.identifier());
       return true;
     },
     subs_to_find);
@@ -338,8 +352,9 @@ void find_type_and_expr_symbols(
   find_symbols(
     symbol_kindt::F_ALL,
     src,
-    [&dest](const symbol_exprt &e) {
-      dest.insert(e.get_identifier());
+    [&dest](const symbol_exprt &e)
+    {
+      dest.insert(e.identifier());
       return true;
     },
     subs_to_find);
@@ -347,8 +362,12 @@ void find_type_and_expr_symbols(
 
 void find_symbols(const exprt &src, find_symbols_sett &dest)
 {
-  find_symbols(symbol_kindt::F_EXPR, src, [&dest](const symbol_exprt &e) {
-    dest.insert(e.get_identifier());
-    return true;
-  });
+  find_symbols(
+    symbol_kindt::F_EXPR,
+    src,
+    [&dest](const symbol_exprt &e)
+    {
+      dest.insert(e.identifier());
+      return true;
+    });
 }

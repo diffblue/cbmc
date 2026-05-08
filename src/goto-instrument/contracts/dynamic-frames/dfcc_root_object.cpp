@@ -114,7 +114,7 @@ static exprt slice_op_to_deref(const exprt &expr)
     INVARIANT(
       function_expr.id() == ID_symbol,
       "no function pointer calls in loop assigns clause targets");
-    auto function_id = to_symbol_expr(function_expr).get_identifier();
+    auto function_id = to_symbol_expr(function_expr).identifier();
     INVARIANT(
       function_id == CPROVER_PREFIX "assignable" ||
         function_id == CPROVER_PREFIX "object_whole" ||

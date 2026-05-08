@@ -1,6 +1,6 @@
 CORE
 Test
---trace --json-ui --unwind 5 --function Test.main
+--trace --json-ui --unwind 5 --function Test.main -cp target/classes
 activate-multi-line-match
 ^EXIT=10$
 ^SIGNAL=0$

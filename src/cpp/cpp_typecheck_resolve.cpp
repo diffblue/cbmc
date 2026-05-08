@@ -651,7 +651,7 @@ void cpp_typecheck_resolvet::remove_duplicates(
     irep_idt id;
 
     if(old_id.id() == ID_symbol)
-      id = to_symbol_expr(old_id).get_identifier();
+      id = to_symbol_expr(old_id).identifier();
     else if(old_id.id() == ID_type && old_id.type().id() == ID_struct_tag)
       id = to_struct_tag_type(old_id.type()).get_identifier();
     else if(old_id.id() == ID_type && old_id.type().id() == ID_union_tag)
@@ -2223,7 +2223,7 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
       if(arg.id() == ID_symbol)
       {
         const symbol_exprt &s = to_symbol_expr(arg);
-        const symbolt &symbol = cpp_typecheck.lookup(s.get_identifier());
+        const symbolt &symbol = cpp_typecheck.lookup(s.identifier());
 
         if(
           cpp_typecheck.cpp_is_pod(symbol.type) &&
@@ -4414,7 +4414,7 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
 
   // We need to guess in the case of function templates!
 
-  irep_idt template_identifier = to_symbol_expr(expr).get_identifier();
+  irep_idt template_identifier = to_symbol_expr(expr).identifier();
 
   const symbolt &template_symbol = cpp_typecheck.lookup(template_identifier);
 
@@ -5200,7 +5200,7 @@ void cpp_typecheck_resolvet::apply_template_args(
     return; // templates are always symbols
 
   const symbolt &template_symbol =
-    cpp_typecheck.lookup(to_symbol_expr(expr).get_identifier());
+    cpp_typecheck.lookup(to_symbol_expr(expr).identifier());
 
   if(!template_symbol.type.get_bool(ID_is_template))
     return;

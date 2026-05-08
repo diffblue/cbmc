@@ -47,7 +47,7 @@ void undefined_function_abort_path(goto_modelt &goto_model)
         continue;
 
       const irep_idt &function_identifier =
-        to_symbol_expr(function).get_identifier();
+        to_symbol_expr(function).identifier();
 
       goto_functionst::function_mapt::const_iterator entry =
         goto_model.goto_functions.function_map.find(function_identifier);

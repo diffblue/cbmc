@@ -30,7 +30,7 @@ class instrumentert
 {
 public:
   /* reference to goto-functions and symbol_table */
-  namespacet ns;
+  const namespacet ns;
 
 protected:
   goto_functionst &goto_functions;
@@ -86,7 +86,7 @@ protected:
   class cfg_visitort
   {
   protected:
-    namespacet &ns;
+    const namespacet ns;
     instrumentert &instrumenter;
 
     /* pointer to the egraph(s) that we construct */
@@ -227,10 +227,12 @@ protected:
     /* set of functions visited so far -- we don't handle recursive functions */
     std::set<irep_idt> functions_met;
 
-    cfg_visitort(namespacet &_ns, instrumentert &_instrumenter)
-    :ns(_ns), instrumenter(_instrumenter), egraph(_instrumenter.egraph),
-      egraph_SCCs(_instrumenter.egraph_SCCs),
-      egraph_alt(_instrumenter.egraph_alt)
+    cfg_visitort(const namespacet &_ns, instrumentert &_instrumenter)
+      : ns(_ns),
+        instrumenter(_instrumenter),
+        egraph(_instrumenter.egraph),
+        egraph_SCCs(_instrumenter.egraph_SCCs),
+        egraph_alt(_instrumenter.egraph_alt)
     {
       write_counter = 0;
       read_counter = 0;

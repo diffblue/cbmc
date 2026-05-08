@@ -35,8 +35,7 @@ void check_function_call(
     REQUIRE(target->type() == goto_program_instruction_typet::FUNCTION_CALL);
     REQUIRE(target->call_function().id() == ID_symbol);
     REQUIRE(
-      to_symbol_expr(target->call_function()).get_identifier() ==
-      function_name);
+      to_symbol_expr(target->call_function()).identifier() == function_name);
   }
 }
 

@@ -29,7 +29,7 @@ namespace_baset::~namespace_baset()
 /// INVARIANT.
 const symbolt &namespace_baset::lookup(const symbol_exprt &expr) const
 {
-  return lookup(expr.get_identifier());
+  return lookup(expr.identifier());
 }
 
 /// Generic lookup function for a tag type in a symbol table.
