@@ -4643,16 +4643,13 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
       {
         is_lvalue = false;
       }
-      if(
-        is_forwarding_ref && is_lvalue &&
-        it->type().get_bool(ID_C_constant))
+      if(is_forwarding_ref && is_lvalue)
       {
-        // Per [temp.deduct.call]/3: for T&& with const lvalue arg,
-        // preserve const in the deduction. Without this, the
-        // const-stripping in the else branch would deduce T = A
-        // instead of T = const A, causing forward<T> to produce
-        // wrong overloads.
-        guess_template_args(arg_declaration.type(), it->type());
+        // Per [temp.deduct.call]/3: for forwarding reference T&&
+        // and lvalue argument of type A, deduce T as "lvalue
+        // reference to A" (preserving cv-qualifiers).
+        typet lvalue_ref_type = ::reference_type(it->type());
+        guess_template_args(arg_declaration.type(), lvalue_ref_type);
       }
       else if(
         is_rvalue_reference(arg_type) && is_lvalue &&
