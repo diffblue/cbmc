@@ -63,7 +63,15 @@ std::string cpp_typecheckt::template_suffix(
     {
       const typet &type=expr.type();
       if(type.id() == ID_struct_tag || type.id() == ID_union_tag)
+      {
+        // Include cv-qualifiers so that T and const T are distinct
+        // instantiations (e.g., forward<const X> vs forward<X>).
+        if(type.get_bool(ID_C_constant))
+          result += "const ";
+        if(type.get_bool(ID_C_volatile))
+          result += "volatile ";
         result += id2string(to_tag_type(type).get_identifier());
+      }
       else
         result+=cpp_type2name(type);
     }
