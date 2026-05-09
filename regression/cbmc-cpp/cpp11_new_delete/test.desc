@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+--
+Verifies [expr.new] and [expr.delete]: non-array new runs the
+constructor and returns a valid pointer; delete runs the destructor
+exactly once.  Array new with a braced-init-list initializes each
+element; array delete runs at least one destructor.
