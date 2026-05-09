@@ -209,10 +209,11 @@ void cpp_internal_additions(std::ostream &out)
   {
     // MSVC headers use GCC-style builtins like __builtin_strlen and
     // __builtin_memcmp in their STL implementations.
-    out << "extern \"C\" __CPROVER_size_t __builtin_strlen(const char *s)\n"
-           "{ __CPROVER_size_t i=0; while(s[i]!=0) i++; return i; }\n";
+    out << "extern \"C\" " CPROVER_PREFIX
+        << "size_t __builtin_strlen(const char *s)\n"
+        << "{ " CPROVER_PREFIX "size_t i=0; while(s[i]!=0) i++; return i; }\n";
     out << "extern \"C\" int __builtin_memcmp"
-           "(const void*, const void*, __CPROVER_size_t);\n";
+           "(const void*, const void*, " CPROVER_PREFIX "size_t);\n";
     // type_info infrastructure -- the standard wants this to be in the
     // std:: namespace, but MS has it in the root namespace
     out << "class type_info;" << '\n';

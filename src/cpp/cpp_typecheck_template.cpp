@@ -1945,12 +1945,10 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         // referenced via a qualified member access when scope has
         // been switched to the target class).
         if(
-          arg.type().id() == ID_cpp_name &&
-          arg.type().get_sub().size() == 1 &&
+          arg.type().id() == ID_cpp_name && arg.type().get_sub().size() == 1 &&
           arg.type().get_sub().front().id() == ID_name)
         {
-          const irep_idt &nm =
-            arg.type().get_sub().front().get(ID_identifier);
+          const irep_idt &nm = arg.type().get_sub().front().get(ID_identifier);
           // Search template_map for a matching template parameter
           for(const auto &tm : template_map.type_map)
           {
@@ -1958,8 +1956,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
             auto p = full.rfind("::");
             const std::string sn =
               p != std::string::npos ? full.substr(p + 2) : full;
-            if(sn == id2string(nm) &&
-               tm.second.id() != ID_unassigned)
+            if(sn == id2string(nm) && tm.second.id() != ID_unassigned)
             {
               arg.type() = tm.second;
               goto tm_resolved;
@@ -1970,7 +1967,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         {
           typecheck_type(arg.type());
         }
-tm_resolved:
+      tm_resolved:
         // Per [temp.arg]/2: resolve remaining template parameter
         // references via template_map (e.g., forward<_Other1> where
         // _Other1 is mapped to const less<int>).
@@ -2297,15 +2294,15 @@ tm_resolved:
   // instantiations to map non-pack parameters to empty_typet.
   if(!parameters.empty() && parameters.back().get_bool(ID_ellipsis))
   {
-    while(
-      !args.empty() && args.back().id() == ID_type &&
-      args.back().type().id() == ID_empty)
+    while(!args.empty() && args.back().id() == ID_type &&
+          args.back().type().id() == ID_empty)
     {
       args.pop_back();
     }
   }
 
   return result;
+  // NOLINTNEXTLINE(readability/fn_size)
 }
 
 void cpp_typecheckt::convert_template_declaration(

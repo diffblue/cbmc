@@ -380,8 +380,7 @@ goto_convertt::clean_expr_resultt goto_convertt::remove_function_call(
 
   if(expr.function().id() == ID_symbol)
   {
-    const irep_idt &identifier =
-      to_symbol_expr(expr.function()).identifier();
+    const irep_idt &identifier = to_symbol_expr(expr.function()).identifier();
     const symbolt *symbol_ptr;
     if(!ns.lookup(identifier, symbol_ptr))
     {

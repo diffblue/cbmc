@@ -1,6 +1,6 @@
+#include <algorithm>
 #include <functional>
 #include <set>
-#include <algorithm>
 /*******************************************************************\
 
 Module: C++ Language Type Checking
@@ -44,15 +44,14 @@ void cpp_typecheckt::typecheck_method_bodies()
       if(c_tmpl.is_not_nil())
       {
         for(const auto &p :
-          static_cast<const template_typet &>(c_tmpl)
-            .template_parameters())
+            static_cast<const template_typet &>(c_tmpl).template_parameters())
         {
           if(p.get_bool(ID_ellipsis))
           {
             irep_idt pid = p.type().get(ID_identifier);
-            if(!pid.empty() &&
-               template_map.type_map.find(pid) ==
-                 template_map.type_map.end())
+            if(
+              !pid.empty() &&
+              template_map.type_map.find(pid) == template_map.type_map.end())
               template_map.pack_size_map[pid] = 0;
           }
         }
@@ -90,8 +89,7 @@ void cpp_typecheckt::typecheck_method_bodies()
         const typet &t = pa.second.front();
         if(t.id() == ID_struct_tag)
         {
-          std::string tag = id2string(
-            to_struct_tag_type(t).get_identifier());
+          std::string tag = id2string(to_struct_tag_type(t).get_identifier());
           if(tag.substr(0, 4) == "tag-")
             tag = tag.substr(4);
           auto tag_pos = tag.find("tag-");
@@ -105,13 +103,13 @@ void cpp_typecheckt::typecheck_method_bodies()
       }
       if(!pack_subst.empty())
       {
-        std::function<void(irept &)> subst =
-          [&](irept &node)
+        std::function<void(irept &)> subst = [&](irept &node)
         {
-          if(node.id() == ID_name &&
-             pack_subst.count(id2string(node.get(ID_identifier))))
-            node.set(ID_identifier,
-              pack_subst.at(id2string(node.get(ID_identifier))));
+          if(
+            node.id() == ID_name &&
+            pack_subst.count(id2string(node.get(ID_identifier))))
+            node.set(
+              ID_identifier, pack_subst.at(id2string(node.get(ID_identifier))));
           node.remove(ID_ellipsis);
           for(auto &s : node.get_sub())
             subst(s);
@@ -138,8 +136,7 @@ void cpp_typecheckt::typecheck_method_bodies()
         const typet &t = pa.second.front();
         if(t.id() == ID_struct_tag)
         {
-          std::string tag = id2string(
-            to_struct_tag_type(t).get_identifier());
+          std::string tag = id2string(to_struct_tag_type(t).get_identifier());
           if(tag.substr(0, 4) == "tag-")
             tag = tag.substr(4);
           pack_subst[sn] = tag;
@@ -147,13 +144,13 @@ void cpp_typecheckt::typecheck_method_bodies()
       }
       if(!pack_subst.empty())
       {
-        std::function<void(irept &)> subst =
-          [&](irept &node)
+        std::function<void(irept &)> subst = [&](irept &node)
         {
-          if(node.id() == ID_name &&
-             pack_subst.count(id2string(node.get(ID_identifier))))
-            node.set(ID_identifier,
-              pack_subst.at(id2string(node.get(ID_identifier))));
+          if(
+            node.id() == ID_name &&
+            pack_subst.count(id2string(node.get(ID_identifier))))
+            node.set(
+              ID_identifier, pack_subst.at(id2string(node.get(ID_identifier))));
           for(auto &s : node.get_sub())
             subst(s);
           for(auto &ns : node.get_named_sub())
@@ -173,26 +170,29 @@ void cpp_typecheckt::typecheck_method_bodies()
         {
           const std::string f = id2string(ps.first);
           auto p = f.rfind("::");
-          ep_names.insert(p != std::string::npos ? f.substr(p+2) : f);
+          ep_names.insert(p != std::string::npos ? f.substr(p + 2) : f);
         }
       if(!ep_names.empty())
       {
-        std::function<bool(const irept &)> has_ep =
-          [&](const irept &n) -> bool {
+        std::function<bool(const irept &)> has_ep = [&](const irept &n) -> bool
+        {
           if(n.id() == ID_template_parameter_symbol_type)
           {
             const std::string f = id2string(n.get(ID_identifier));
             auto p = f.rfind("::");
-            if(ep_names.count(p != std::string::npos ? f.substr(p+2) : f))
+            if(ep_names.count(p != std::string::npos ? f.substr(p + 2) : f))
               return true;
           }
-          if(n.id() == ID_name &&
-             ep_names.count(id2string(n.get(ID_identifier))))
+          if(
+            n.id() == ID_name &&
+            ep_names.count(id2string(n.get(ID_identifier))))
             return true;
           for(const auto &s : n.get_sub())
-            if(has_ep(s)) return true;
+            if(has_ep(s))
+              return true;
           for(const auto &ns : n.get_named_sub())
-            if(has_ep(ns.second)) return true;
+            if(has_ep(ns.second))
+              return true;
           return false;
         };
         // Check member_initializers in the declarator (if present)
@@ -203,7 +203,9 @@ void cpp_typecheckt::typecheck_method_bodies()
           {
             auto &subs = init.get_sub();
             subs.erase(
-              std::remove_if(subs.begin(), subs.end(),
+              std::remove_if(
+                subs.begin(),
+                subs.end(),
                 [&](const irept &s) { return has_ep(s); }),
               subs.end());
           }
@@ -346,15 +348,14 @@ void cpp_typecheckt::typecheck_method_bodies()
       if(c_tmpl.is_not_nil())
       {
         for(const auto &p :
-          static_cast<const template_typet &>(c_tmpl)
-            .template_parameters())
+            static_cast<const template_typet &>(c_tmpl).template_parameters())
         {
           if(p.get_bool(ID_ellipsis))
           {
             irep_idt pid = p.type().get(ID_identifier);
-            if(!pid.empty() &&
-               template_map.type_map.find(pid) ==
-                 template_map.type_map.end())
+            if(
+              !pid.empty() &&
+              template_map.type_map.find(pid) == template_map.type_map.end())
               template_map.pack_size_map[pid] = 0;
           }
         }
@@ -376,8 +377,7 @@ void cpp_typecheckt::typecheck_method_bodies()
       catch(...)
       {
       }
-      get_message_handler().set_message_count(
-        messaget::M_ERROR, errors_before);
+      get_message_handler().set_message_count(messaget::M_ERROR, errors_before);
     }
   }
 
