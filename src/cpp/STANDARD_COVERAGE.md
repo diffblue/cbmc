@@ -66,7 +66,7 @@ See section 4.4 above.
 | [expr.typeid] typeid | ⚠️ | parse.cpp `rTypeidExpr` | Parsed; limited runtime support | Typeid* |
 | [expr.cast] explicit type conversion | ✅ | parse.cpp `rCastExpr` | static_cast, dynamic_cast, const_cast, reinterpret_cast | |
 | [expr.unary] unary expressions | ✅ | parse.cpp `rUnaryExpr` | | |
-| [expr.unary.noexcept] noexcept operator | ⚠️ | parse.cpp `rNoexceptExpr` | Parsed; always evaluates to false | |
+| [expr.unary.noexcept] noexcept operator | ✅ | parse.cpp `rNoexceptExpr`, cpp_typecheck_expr.cpp | Builtins/literals, `noexcept`-declared functions, destructors recognised as noexcept; non-`noexcept` calls and throw-expressions as potentially-throwing | cpp11_noexcept_operator |
 | [expr.sizeof] sizeof | ✅ | parse.cpp `rSizeofExpr` | sizeof... for packs | |
 | [expr.alignof] alignof | ✅ | parse.cpp `rAlignofExpr` | | |
 | [expr.new] new expression | ✅ | parse.cpp `rNewExpr` | | New* |
@@ -131,7 +131,7 @@ See section 4.4 above.
 |------|--------|----------|-------|-------|
 | [dcl.init] initializer grammar | ✅ | parse.cpp `rInitializeExpr` | | |
 | [dcl.init.list]/3 non-aggregate brace-init | ✅ | cpp_typecheck_code.cpp `typecheck_return` | Unwrap single-element initializer_list for non-POD | cpp11_brace_init_nonaggregate |
-| [dcl.init.ref]/5 rvalue ref binding | ✅ | cpp_typecheck_expr.cpp, cpp_typecheck_conversions.cpp | Explicit calls + derived-to-base | cpp11_rvalue_ref_derived_to_base |
+| [dcl.init.ref]/5 rvalue ref binding | ✅ | cpp_typecheck_expr.cpp, cpp_typecheck_conversions.cpp | Explicit calls + derived-to-base; to_member preserved through address_arithmetic (symex_dereference.cpp) | cpp11_rvalue_ref_derived_to_base, cpp11_addrof_member_compare |
 
 ### 8.7 Linkage specifications [dcl.link]
 
@@ -298,7 +298,7 @@ See section 4.4 above.
 | [temp.mem.class] member classes | ✅ | cpp_typecheck_compound_type.cpp | | |
 | [temp.static] static data members | ✅ | cpp_typecheck_compound_type.cpp | | |
 | [temp.mem] member templates | ⚠️ | cpp_typecheck_template.cpp | | |
-| [temp.variadic] variadic templates | ⚠️ | cpp_typecheck_resolve.cpp | Parameter packs, pack expansion | |
+| [temp.variadic] variadic templates | ⚠️ | cpp_typecheck_resolve.cpp, cpp_instantiate_template.cpp | Parameter packs, pack expansion, empty/non-empty pack removal | cpp11_variadic_pack_expansion |
 | [temp.friend] friends | ⚠️ | cpp_typecheck_compound_type.cpp | | |
 | [temp.spec.partial.general] partial specialization | ✅ | cpp_typecheck_template.cpp | | |
 | [temp.spec.partial.match] matching | ✅ | cpp_instantiate_template.cpp `elaborate_class_template` | | |
@@ -335,7 +335,7 @@ See section 4.4 above.
 | [temp.arg.explicit] explicit template args | ✅ | cpp_typecheck_resolve.cpp | | |
 | [temp.deduct.general] deduction general | ✅ | cpp_typecheck_resolve.cpp `guess_template_args` | | |
 | [temp.deduct.call]/1 P/A comparison | ✅ | cpp_typecheck_resolve.cpp `guess_function_template_args` | | |
-| [temp.deduct.call]/3 forwarding reference | ✅ | cpp_typecheck_resolve.cpp | T&& with lvalue → T& | |
+| [temp.deduct.call]/3 forwarding reference | ✅ | cpp_typecheck_resolve.cpp | T&& with lvalue → T& | cpp11_forwarding_ref_deduction |
 | [temp.deduct.call]/4 cv-qualification | ✅ | cpp_typecheck_resolve.cpp | cv-stripping, array decay | |
 | [temp.deduct.funcaddr] address deduction | ✅ | cpp_typecheck_resolve.cpp | Synthetic fargs from known instantiations | |
 | [temp.deduct.partial] partial ordering | ⚠️ | cpp_typecheck_resolve.cpp | | |
@@ -399,5 +399,5 @@ See section 4.4 above.
 
 ---
 
-*Last updated: 2026-04-27*
+*Last updated: 2026-05-09*
 *Standard reference: N5008 (C++26 draft)*
