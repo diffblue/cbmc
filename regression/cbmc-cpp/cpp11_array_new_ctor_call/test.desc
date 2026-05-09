@@ -1,0 +1,16 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+--
+Documents a CBMC bug for [expr.new]/24 on array form:
+  counted *arr = new counted[3];
+should call counted::counted() three times, but CBMC neither calls
+the constructor nor (subsequently) the destructor under delete[].
+The array-new with braced-init-list also crashes with an invariant
+violation.  Discovered while writing the positive test for
+[expr.new].
