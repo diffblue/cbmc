@@ -502,8 +502,6 @@ int cbmc_parse_optionst::doit()
   messaget::eval_verbosity(
     cmdline.get_value("verbosity"), messaget::M_STATUS, ui_message_handler);
 
-  log_version_and_architecture("CBMC");
-
   //
   // Unwinding of transition systems is done by hw-cbmc.
   //
@@ -559,6 +557,12 @@ int cbmc_parse_optionst::doit()
     preprocessing(options);
     return CPROVER_EXIT_SUCCESS;
   }
+
+  // Log the banner now that the preprocess-only short-circuits are past:
+  // doing so earlier would write the banner to stdout (via log.status())
+  // and corrupt the output of --preprocess, which has to emit the
+  // preprocessed source on stdout.
+  log_version_and_architecture("CBMC");
 
   if(cmdline.isset("show-parse-tree"))
   {
