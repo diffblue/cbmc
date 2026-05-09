@@ -101,7 +101,7 @@ perl -p -i -e 's/^_mm_setr_epi(16|32)\n//' __functions # cbmc/SIMD1
 perl -p -i -e 's/^_mm_setr_pi16\n//' __functions # cbmc/SIMD1
 perl -p -i -e 's/^_mm_subs_ep[iu]16\n//' __functions # cbmc/SIMD1
 
-ls ../../regression/cbmc-library/ | egrep -v '(Makefile|CMakeLists.txt)' | sort -u > __tests
+ls ../../regression/cbmc-library/ | egrep -v '(Makefile|CMakeLists.txt|tests.log)' | sort -u > __tests
 diff -u __tests __functions
 ec="${?}"
 rm __functions __tests
