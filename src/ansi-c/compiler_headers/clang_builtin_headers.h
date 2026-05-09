@@ -97,4 +97,11 @@ void __builtin_assume(__CPROVER_bool);
 void __builtin_cpu_init(void);
 _Bool __builtin_cpu_is(const char *);
 _Bool __builtin_cpu_supports(const char *);
+
+// Clang provides __builtin_operator_new/delete as intrinsics that have
+// the same semantics as operator new/delete but can be used in constant
+// evaluation and with special handling in libc++. They take the same
+// arguments as the operator versions.
+void *__builtin_operator_new(__CPROVER_size_t);
+void __builtin_operator_delete(void *);
 // clang-format on
