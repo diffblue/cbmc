@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+--
+Verifies [temp.inst]/1: a class template specialization is implicitly
+instantiated on demand when a complete class type is required.
+Exercises: pointer-only use (incomplete-type OK) and subsequent member
+access / static-member access (triggers full instantiation).

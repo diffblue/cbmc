@@ -69,7 +69,7 @@ See section 4.4 above.
 | [expr.unary.noexcept] noexcept operator | ✅ | parse.cpp `rNoexceptExpr`, cpp_typecheck_expr.cpp | Builtins/literals, `noexcept`-declared functions, destructors recognised as noexcept; non-`noexcept` calls and throw-expressions as potentially-throwing | cpp11_noexcept_operator |
 | [expr.sizeof] sizeof | ✅ | parse.cpp `rSizeofExpr` | sizeof... for packs | |
 | [expr.alignof] alignof | ✅ | parse.cpp `rAlignofExpr` | | |
-| [expr.new] new expression | ✅ | parse.cpp `rNewExpr` | | New* |
+| [expr.new] new expression | ⚠️ | parse.cpp `rNewExpr` | Non-array new correctly calls constructor; array new does NOT call element constructors and array new with braced-init-list crashes with an invariant violation | New*, cpp11_new_delete, cpp11_array_new_ctor_call (KNOWNBUG) |
 | [expr.delete] delete expression | ✅ | parse.cpp `rDeleteExpr` | | |
 | [expr.mul] multiplicative operators | ✅ | parse.cpp `rMultiplyExpr` | | |
 | [expr.add] additive operators | ✅ | parse.cpp `rAdditiveExpr` | | |
@@ -171,7 +171,7 @@ See section 4.4 above.
 | Rule | Status | Location | Notes | Tests |
 |------|--------|----------|-------|-------|
 | [class.default.ctor] default constructor | ✅ | cpp_constructor.cpp `cpp_constructor` | Defaulted default ctor generation | Constructor* |
-| [class.copy.ctor]/1 copy constructor | ✅ | cpp_typecheck_constructor.cpp `find_cpctor` | Excludes rvalue refs (move ctors) | Copy_Constructor* |
+| [class.copy.ctor]/1 copy constructor | ✅ | cpp_typecheck_constructor.cpp `find_cpctor` | Excludes rvalue refs (move ctors) | Copy_Constructor*, cpp11_class_copy_ctor |
 | [class.copy.assign] copy assignment | ✅ | cpp_typecheck_constructor.cpp `default_assignop` | | Copy_Operator* |
 | [class.dtor] destructors | ✅ | cpp_destructor.cpp `cpp_destructor` | Virtual destructor dispatch | Destructor* |
 
@@ -324,7 +324,7 @@ See section 4.4 above.
 
 | Rule | Status | Location | Notes | Tests |
 |------|--------|----------|-------|-------|
-| [temp.inst]/1 implicit instantiation | ✅ | cpp_instantiate_template.cpp `elaborate_class_template` | | |
+| [temp.inst]/1 implicit instantiation | ✅ | cpp_instantiate_template.cpp `elaborate_class_template` | | cpp11_temp_inst_implicit |
 | [temp.inst]/2 unless specialization needed | ✅ | cpp_instantiate_template.cpp | | |
 | [temp.explicit] explicit instantiation | ✅ | parse.cpp `rExplicitInstantiation` | | |
 | [temp.expl.spec] explicit specialization | ✅ | cpp_typecheck_template.cpp | | |
