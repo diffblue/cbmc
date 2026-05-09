@@ -129,8 +129,9 @@ See section 4.4 above.
 
 | Rule | Status | Location | Notes | Tests |
 |------|--------|----------|-------|-------|
-| [dcl.init] initializer grammar | ✅ | parse.cpp `rInitializeExpr` | | |
-| [dcl.init.list]/3 non-aggregate brace-init | ✅ | cpp_typecheck_code.cpp `typecheck_return` | Unwrap single-element initializer_list for non-POD | cpp11_brace_init_nonaggregate |
+| [dcl.init.list] initializer grammar | ✅ | parse.cpp `rInitializeExpr` | | |
+| [dcl.init.list]/3.6 non-aggregate brace-init | ✅ | cpp_typecheck_code.cpp `typecheck_return` | Unwrap single-element initializer_list for non-POD | cpp11_brace_init_nonaggregate |
+| [dcl.init.list]/3.10 empty brace-init for scalar | ❌ | | T{} for int/double rejected with "cannot initialize ... with an initializer list" | cpp11_value_init_scalar_brace (KNOWNBUG) |
 | [dcl.init.ref]/5 rvalue ref binding | ✅ | cpp_typecheck_expr.cpp, cpp_typecheck_conversions.cpp | Explicit calls + derived-to-base; to_member preserved through address_arithmetic (symex_dereference.cpp) | cpp11_rvalue_ref_derived_to_base, cpp11_addrof_member_compare |
 
 ### 8.7 Linkage specifications [dcl.link]
@@ -317,7 +318,7 @@ See section 4.4 above.
 | [temp.local] locally declared names | ⚠️ | cpp_typecheck_resolve.cpp | | |
 | [temp.dep.type] dependent types | ⚠️ | cpp_typecheck_resolve.cpp | | |
 | [temp.dep.expr] type-dependent expressions | ⚠️ | cpp_typecheck_resolve.cpp | | |
-| [temp.point] point of instantiation | ✅ | cpp_typecheck_resolve.cpp, cpp_typecheck_template.cpp, cpp_instantiate_template.cpp | Instantiation scope for default args; prefer definition over forward declaration | cpp20_sort_cpp20 |
+| [temp.point] point of instantiation | ✅ | cpp_typecheck_resolve.cpp, cpp_typecheck_template.cpp, cpp_instantiate_template.cpp | Instantiation scope for default args; prefer definition over forward declaration | cpp11_temp_point_definition, cpp20_sort_cpp20 |
 
 ### 13.9 Template instantiation [temp.spec]
 
@@ -337,7 +338,7 @@ See section 4.4 above.
 | [temp.deduct.call]/1 P/A comparison | ✅ | cpp_typecheck_resolve.cpp `guess_function_template_args` | | |
 | [temp.deduct.call]/3 forwarding reference | ✅ | cpp_typecheck_resolve.cpp | T&& with lvalue → T& | cpp11_forwarding_ref_deduction |
 | [temp.deduct.call]/4 cv-qualification | ✅ | cpp_typecheck_resolve.cpp | cv-stripping, array decay | |
-| [temp.deduct.funcaddr] address deduction | ✅ | cpp_typecheck_resolve.cpp | Synthetic fargs from known instantiations | |
+| [temp.deduct.funcaddr] address deduction | ⚠️ | cpp_typecheck_resolve.cpp | Works when target type is a class-template instantiation (e.g. std::endl passed to operator&lt;&lt;); plain function-pointer target types with scalar parameters not yet deduced | cpp11_deduct_funcaddr (KNOWNBUG) |
 | [temp.deduct.partial] partial ordering | ⚠️ | cpp_typecheck_resolve.cpp | | |
 | [temp.deduct.type]/1 P/A matching | ✅ | cpp_typecheck_resolve.cpp `guess_template_args` (type) | | |
 | [temp.deduct.type]/3.3 class specialization | ✅ | cpp_typecheck_resolve.cpp | cpp_name with template_args | |
