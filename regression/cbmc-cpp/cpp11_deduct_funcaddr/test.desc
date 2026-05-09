@@ -1,0 +1,24 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+--
+Documents the current state of [temp.deduct.funcaddr]: template
+argument deduction from the target type of a function-address
+context.
+
+CBMC's implementation (added in 18e846497c) handles the std::endl
+case where the function parameter is a class-template instantiation
+and matching instances can be found in the symbol table.  It does
+NOT yet handle the simpler case where the target type is a plain
+function pointer with scalar parameter types, as in
+  apply(&id_sum, 3, 4)
+with
+  template <class T> int id_sum(T a, T b);
+  int apply(int (*)(int, int), int, int);
+The deduction of T=int from 'int (*)(int, int)' falls through to a
+"found no match for symbol 'id_sum'" error.
