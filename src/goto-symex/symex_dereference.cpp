@@ -399,8 +399,25 @@ void goto_symext::dereference_rec(
 
     exprt &object=address_of_expr.object();
 
+    // Preserve pointer-to-member attribute: address_arithmetic may
+    // rebuild the address_of using address_of_exprt(object) which
+    // constructs a plain pointer_type without the to_member attribute.
+    // For pointer-to-member-function expressions (e.g., &x::f), the
+    // outer pointer type carries to_member; we must restore it on the
+    // rewritten expression so that downstream consumers (in particular,
+    // comparison with a null pointer-to-member constant) see matching
+    // types.
+    const auto original_to_member = expr.type().find(ID_to_member);
+
     expr = address_arithmetic(
       object, state, to_pointer_type(expr.type()).base_type().id() == ID_array);
+
+    if(
+      original_to_member.is_not_nil() && expr.type().id() == ID_pointer &&
+      expr.type().find(ID_to_member).is_nil())
+    {
+      expr.type().add(ID_to_member) = original_to_member;
+    }
   }
   else if(expr.id()==ID_typecast)
   {
