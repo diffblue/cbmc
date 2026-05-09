@@ -18,7 +18,6 @@ extern exprt try_evaluate_constexpr(
   const exprt &expr,
   const symbol_table_baset &symbol_table,
   const namespacet &ns);
-#include <util/symbol_table_base.h>
 
 #include "cpp_convert_type.h"
 #include "cpp_declarator_converter.h"
