@@ -27,7 +27,6 @@ extern exprt try_evaluate_constexpr(
   const namespacet &ns);
 #include <util/std_expr.h>
 #include <util/string_constant.h>
-#include <util/symbol_table_base.h>
 
 #include <ansi-c/anonymous_member.h>
 #include <ansi-c/merged_type.h>
@@ -2323,7 +2322,8 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
       {
         // error count save/restore instead of null_handler
         const std::size_t sfinae_err_0 =
-          cpp_typecheck.get_message_handler().get_message_count(messaget::M_ERROR);
+          cpp_typecheck.get_message_handler().get_message_count(
+            messaget::M_ERROR);
         try
         {
           partial_specialization_args_tc =
@@ -2494,7 +2494,8 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
               // and let elaborate_class_template re-check later.
               // error count save/restore instead of null_handler
               const std::size_t sfinae_err_1 =
-                cpp_typecheck.get_message_handler().get_message_count(messaget::M_ERROR);
+                cpp_typecheck.get_message_handler().get_message_count(
+                  messaget::M_ERROR);
               bool satisfied = true;
               bool evaluated = false;
               // Only attempt evaluation for simple type predicates
@@ -3174,8 +3175,7 @@ resolved_after_strip:
                   simplify(e, cpp_typecheck);
                   // Unwrap dereference(constant) from ref-returning constexpr
                   if(
-                    e.id() == ID_dereference &&
-                    e.operands().size() == 1 &&
+                    e.id() == ID_dereference && e.operands().size() == 1 &&
                     e.operands()[0].is_constant())
                   {
                     e = e.operands()[0];
@@ -3394,8 +3394,7 @@ resolved_after_strip:
         std::remove_if(
           new_identifiers.begin(),
           new_identifiers.end(),
-          [](const exprt &e)
-          { return e.type().get_bool(ID_is_template); }),
+          [](const exprt &e) { return e.type().get_bool(ID_is_template); }),
         new_identifiers.end());
 
       if(new_identifiers.empty())
@@ -3434,8 +3433,7 @@ resolved_after_strip:
       std::remove_if(
         new_identifiers.begin(),
         new_identifiers.end(),
-        [](const exprt &e)
-        { return e.type().get_bool(ID_is_template); }),
+        [](const exprt &e) { return e.type().get_bool(ID_is_template); }),
       new_identifiers.end());
   }
 
@@ -4561,17 +4559,19 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
       // before type conversion, by checking if the declarator has
       // rvalue_reference type and the base is a template parameter.
       bool is_forwarding_ref = false;
-      if(!is_pack &&
-         (declarator.type().id() == ID_frontend_pointer ||
-          declarator.type().id() == ID_pointer) &&
-         declarator.type().get_bool(ID_C_rvalue_reference))
+      if(
+        !is_pack &&
+        (declarator.type().id() == ID_frontend_pointer ||
+         declarator.type().id() == ID_pointer) &&
+        declarator.type().get_bool(ID_C_rvalue_reference))
       {
         // The base type (from the declaration) should be a template param
         const auto &base = arg_declaration.type();
-        if(base.id() == ID_cpp_name || base.id() == ID_template_parameter_symbol_type)
+        if(
+          base.id() == ID_cpp_name ||
+          base.id() == ID_template_parameter_symbol_type)
           is_forwarding_ref = true;
       }
-
 
       // turn into type
       typet arg_type = declarator.merge_type(arg_declaration.type());
@@ -4584,8 +4584,7 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
       // Per [temp.deduct.call]/1: resolve remaining simple cpp_name
       // types to actual types for deduction via scope lookup.
       if(
-        arg_type.id() == ID_cpp_name &&
-        arg_type.get_sub().size() == 1 &&
+        arg_type.id() == ID_cpp_name && arg_type.get_sub().size() == 1 &&
         arg_type.get_sub().front().id() == ID_name)
       {
         irep_idt name = arg_type.get_sub().front().get(ID_identifier);
@@ -4778,7 +4777,8 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
           // error messages and treat failure as deduction failure.
           // error count save/restore instead of null_handler
           const std::size_t sfinae_err_2 =
-            cpp_typecheck.get_message_handler().get_message_count(messaget::M_ERROR);
+            cpp_typecheck.get_message_handler().get_message_count(
+              messaget::M_ERROR);
           try
           {
             cpp_save_scopet saved_scope(cpp_typecheck.cpp_scopes);
@@ -4826,7 +4826,8 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
           // Evaluate the parameter type in a SFINAE context.
           // error count save/restore instead of null_handler
           const std::size_t sfinae_err_3 =
-            cpp_typecheck.get_message_handler().get_message_count(messaget::M_ERROR);
+            cpp_typecheck.get_message_handler().get_message_count(
+              messaget::M_ERROR);
           try
           {
             // [temp.point] p1,7: the context of a template instantiation
@@ -5237,8 +5238,9 @@ void cpp_typecheck_resolvet::apply_template_args(
   // explicit template args using the enclosing template_map.
   for(auto &arg : template_args_tc.arguments())
   {
-    if(arg.id() == ID_type &&
-       arg.type().id() == ID_template_parameter_symbol_type)
+    if(
+      arg.id() == ID_type &&
+      arg.type().id() == ID_template_parameter_symbol_type)
     {
       cpp_typecheck.template_map.apply(arg.type());
     }
@@ -5295,8 +5297,9 @@ void cpp_typecheck_resolvet::apply_template_args(
     // Per [temp.deduct]/8: if instantiation returns the template
     // symbol itself (not a code-typed specialization), treat as
     // deduction failure.
-    if(new_sym_ptr->type.id() != ID_code &&
-       new_sym_ptr->type.get_bool(ID_is_template))
+    if(
+      new_sym_ptr->type.id() != ID_code &&
+      new_sym_ptr->type.get_bool(ID_is_template))
     {
       expr.make_nil();
       return;
@@ -5453,8 +5456,8 @@ bool cpp_typecheck_resolvet::disambiguate_functions(
     return false;
   }
   else if(
-    expr.id() == ID_symbol &&
-    !type.parameters().empty() && type.parameters().front().get_this())
+    expr.id() == ID_symbol && !type.parameters().empty() &&
+    type.parameters().front().get_this())
   {
     // Instantiated template member function (symbol_exprt with this
     // parameter) called without an explicit object — add a synthetic

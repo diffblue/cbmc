@@ -509,8 +509,7 @@ void cpp_declarator_convertert::combine_types(
     // doesn't.
     const auto &existing_ret = to_code_type(symbol.type).return_type();
     const auto &new_ret = to_code_type(decl_type).return_type();
-    if(
-      existing_ret.id() != ID_auto && new_ret.id() == ID_auto)
+    if(existing_ret.id() != ID_auto && new_ret.id() == ID_auto)
     {
       return; // keep existing resolved type
     }

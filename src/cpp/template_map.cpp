@@ -318,13 +318,11 @@ void template_mapt::apply(typet &type) const
           bool was_pack = false;
           if(arg.id() == ID_type)
           {
-            const typet &arg_type =
-              static_cast<const exprt &>(arg).type();
+            const typet &arg_type = static_cast<const exprt &>(arg).type();
             if(arg_type.id() == ID_template_parameter_symbol_type)
             {
               const irep_idt &param_id =
-                to_template_parameter_symbol_type(arg_type)
-                  .get_identifier();
+                to_template_parameter_symbol_type(arg_type).get_identifier();
               for(const auto &pack_entry : pack_args_map)
               {
                 if(pack_entry.first == param_id)
