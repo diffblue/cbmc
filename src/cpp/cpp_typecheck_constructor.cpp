@@ -688,12 +688,10 @@ void cpp_typecheckt::full_member_initialization(
         {
           const std::string f = id2string(n.get(ID_identifier));
           auto p = f.rfind("::");
-          if(ep_names.count(
-               p != std::string::npos ? f.substr(p + 2) : f))
+          if(ep_names.count(p != std::string::npos ? f.substr(p + 2) : f))
             return true;
         }
-        if(n.id() == ID_name &&
-           ep_names.count(id2string(n.get(ID_identifier))))
+        if(n.id() == ID_name && ep_names.count(id2string(n.get(ID_identifier))))
           return true;
         for(const auto &s : n.get_sub())
           if(refs_empty_pack(s))
@@ -708,7 +706,8 @@ void cpp_typecheckt::full_member_initialization(
         auto &subs = init.get_sub();
         subs.erase(
           std::remove_if(
-            subs.begin(), subs.end(),
+            subs.begin(),
+            subs.end(),
             [&](const irept &s) { return refs_empty_pack(s); }),
           subs.end());
       }
