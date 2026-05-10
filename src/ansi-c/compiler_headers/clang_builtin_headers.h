@@ -104,4 +104,27 @@ _Bool __builtin_cpu_supports(const char *);
 // arguments as the operator versions.
 void *__builtin_operator_new(__CPROVER_size_t);
 void __builtin_operator_delete(void *);
+
+// Clang provides __c11_atomic_* intrinsics that libc++'s <atomic> uses
+// to implement the C++11 std::atomic primitives.  They take a pointer
+// to a _Atomic qualified object plus memory order arguments.  CBMC
+// models them as nondet on the atomic object's value; the semantics
+// used downstream only need type-compatible declarations.
+void __c11_atomic_thread_fence(int);
+void __c11_atomic_signal_fence(int);
+void __c11_atomic_init(volatile void *, ...);
+void __c11_atomic_store(volatile void *, ...);
+void __c11_atomic_load(const volatile void *, ...);
+void __c11_atomic_exchange(volatile void *, ...);
+__CPROVER_bool __c11_atomic_compare_exchange_strong(volatile void *, void *, ...);
+__CPROVER_bool __c11_atomic_compare_exchange_weak(volatile void *, void *, ...);
+void __c11_atomic_fetch_add(volatile void *, ...);
+void __c11_atomic_fetch_sub(volatile void *, ...);
+void __c11_atomic_fetch_and(volatile void *, ...);
+void __c11_atomic_fetch_or(volatile void *, ...);
+void __c11_atomic_fetch_xor(volatile void *, ...);
+void __c11_atomic_fetch_nand(volatile void *, ...);
+void __c11_atomic_fetch_max(volatile void *, ...);
+void __c11_atomic_fetch_min(volatile void *, ...);
+__CPROVER_bool __c11_atomic_is_lock_free(__CPROVER_size_t);
 // clang-format on
