@@ -1,0 +1,245 @@
+# CI Known Failures — `cpp11-parser-rework-squashed`
+
+This document tracks all known CI failures on the `cpp11-parser-rework-squashed`
+branch that we carry as pre-existing technical debt.  Each item is a TODO
+we will eventually need to resolve before the branch is merged upstream.
+
+Snapshot taken against GitHub Actions run for commit [`ac830e7ef6`](
+https://github.com/diffblue/cbmc/pull/.../commits/ac830e7ef6) (2026-05-10).
+See [the CI run index](
+https://github.com/diffblue/cbmc/actions/runs/25620772992) for the source
+logs.
+
+The "Performance Benchmarking" job (perf-benchcomp) fails at the end of the
+AWS C Common comparison with exit code 1 on otherwise-successful metrics; by
+agreement with the branch owner it is tracked separately and not part of this
+list.
+
+Legend:
+- 🆕 introduced on this branch (pre-existing on parent commit would be 🅿️)
+- 🅿️ pre-existing before this branch
+- 🔄 intermittent / flaky on the platform
+- 📐 toolchain/stdlib compatibility gap (requires CBMC front-end work)
+- 🪲 CBMC type-check or goto-conversion bug (reproducible on smaller inputs)
+
+---
+
+## 1. macOS — libc++ (Xcode 15.4 on macOS 14, Xcode 16.4 on macOS 15)
+
+Job IDs: `check-macos-14-cmake-clang`, `check-macos-15-intel-make-clang`
+
+| Test | Status | Root cause |
+|------|--------|------------|
+| `regression/cbmc-cpp/Vector1` | 🅿️ 📐 | libc++ `__libcpp_operator_new(_Args&&...)` is a variadic function template; CBMC's `--cpp11` deduction cannot deduce `_Args = {size_t}` from a single `size_t` argument, so the call at `new:296` fails with `found no match for symbol '__libcpp_operator_new'`.  This cascades: `std::logic_error`/`std::runtime_error` constructors fail, `__cxx_atomic_*` primitives are missing, `std::basic_string::append` and `__system_error::error_category`/`error_code` operators misresolve, main() never reaches the goto model, and the assertion at line 35 is never verified. |
+| `regression/cbmc-cpp/cpp11_vector_size` | 🅿️ 📐 | Same `__libcpp_operator_new` / libc++ cascade as above.  Was incorrectly untagged in `9ab95889af` based on a flawed `--cpp14` verification; re-tagged `gcc-only` in `b12307a216` as a holding action until CBMC properly parses the libc++ allocator helpers. |
+
+### What to do
+
+1. Fix the variadic-template argument deduction path in
+   `src/cpp/cpp_typecheck_resolve.cpp::guess_function_template_args` so that
+   `template <class... Args> void f(Args... args)` correctly deduces `Args =
+   {T}` when called with a single argument of type `T` — *including the case
+   where the function is within a class/namespace with `abi_tag`/visibility
+   attributes applied*.  Minimal reproducer:
+   ```cpp
+   typedef unsigned long size_t;
+   namespace std {
+     template <class... A>
+     __attribute__((__abi_tag__("ne190102")))
+     void *op_new(A... a) { return 0; }
+     inline void *alloc(size_t s) { return op_new(s); }
+   }
+   ```
+   Works on Linux today but fails when the full libc++ preamble is included
+   (presumably an interaction with earlier SFINAE failures poisoning the
+   candidate set).
+2. Once (1) is done, drop `gcc-only` from `cpp11_vector_size` again (and any
+   other tests on the libc++ path).
+3. Repeat the audit that `be467fbd92` started for the remaining tests that
+   pass *structurally* on the `.ii` artifact but fail at verification on real
+   macOS.
+
+### Reproducing locally
+
+The macOS CI uploads `macos-preprocessed-headers` artifacts; download them
+with `gh run download <run-id> --name macos-preprocessed-headers` and run
+CBMC locally with the test.desc flags (typically `--cpp11`).  Do **not**
+rely on the final `VERIFICATION SUCCESSFUL` line alone — look for a
+`main.cpp function main` section in the output; if it is missing, the
+test.pl assertion match will still fail.
+
+---
+
+## 2. Windows — MSVC VS2022 (cl 14.44.35207) and VS2025
+
+Job IDs: `check-vs-2022-make-build-and-test`, `check-vs-2025-cmake-build-and-test`
+
+### 2.1 MSVC STL header compatibility (deterministic)
+
+Both VS2022 and VS2025 share the same 14 cbmc-cpp failures; all trace back
+to one of three MSVC-STL-specific construct families that CBMC's parser
+does not yet handle.
+
+| Test | Root cause |
+|------|------------|
+| `STL2` | 🅿️ 📐 MSVC `<vector>` / `<xmemory>`: `std::_Rebind_alloc_t<Alloc, T>` alias template (uses `__t` helper) / `_Normal_allocator_traits` specialization path.  CBMC repeatedly instantiates `std::vector<int, allocator>` and cycles through the same `allocator_traits`/`_Normal_allocator_traits` instantiation without reaching a concrete answer. |
+| `cpp11_vector_size` | 🅿️ 📐 Same MSVC `_Rebind_alloc_t` / `allocator_traits` issue as STL2. |
+| `cpp11_vector_front_body` | 🅿️ 📐 Same. |
+| `cpp11_vector_probe` | 🅿️ 📐 Same. |
+| `cpp11_vector_push_back` | 🅿️ 📐 Same. |
+| `cpp11_vector_pushback` | 🅿️ 📐 Same. |
+| `cpp11_vector_verify` | 🅿️ 📐 Same. |
+| `cpp17_vector_basic` | 🅿️ 📐 Same. |
+| `cpp11_map_insert` | 🅿️ 📐 MSVC `<xmemory>` / `<xstring>`: `_Myproxy` control block, plus `"direct assignments to arrays not permitted"` in `<xstring>` at line 493 (SSO buffer assignment via `_Bx._Buf`). |
+| `cpp11_condition_variable_header` | 🅿️ 📐 MSVC `<atomic>` line 472 `_Atomic_lock_acquire`: address-of a built-in atomic operation that CBMC cannot represent. |
+| `cpp11_future_header` | 🅿️ 📐 Same atomic-lock issue as `cpp11_condition_variable_header`. |
+| `cpp14_chrono_basic` | 🅿️ 📐 MSVC `<chrono>` uses `_Rebind_alloc_t` / `allocator_traits` paths. |
+| `cpp17_filesystem_basic` | 🅿️ 📐 MSVC `<filesystem>` uses `<xstring>` SSO array assignment. |
+| `cpp17_filesystem_path_ops` | 🅿️ 📐 Same. |
+| `cpp17_mutex_basic` | 🅿️ 📐 Same `_Atomic_lock_acquire` root as condition_variable. |
+| `cpp17_thread_basic` | 🅿️ 📐 MSVC `<utility>` line 137 `forward` / `move` template resolution with constrained `_Remove_reference_t`. |
+| `cpp17_valarray_basic` | 🅿️ 📐 MSVC `<valarray>` (allocator traits path). |
+
+### 2.2 Non-cpp VS2022-only failures (likely flaky / Makefile-driver issue)
+
+Three non-STL regression suites have new VS2022 failures that are not seen
+on VS2025:
+
+| Test | Status | Notes |
+|------|--------|-------|
+| `regression/acceleration/array_safe4` | 🔄 🪲 | Failed on ac830e7; was passing on 7c68e97 and 894e427.  Error text not captured by the Makefile test driver — needs a dedicated re-run with `-p` to see stdout/stderr. |
+| `regression/contracts-dfcc/assigns_enforce_havoc_object` | 🔄 | Same (Makefile suppresses detail). |
+| `regression/contracts-dfcc/dont_skip_cprover_prefixed_vars_pass` | 🔄 | Same. |
+| `regression/goto-harness/pointer-function-parameters-struct-mutual-recursion` | 🔄 | Same. |
+| `regression/cbmc/overflow/leftshift_overflow-c89` | 🆕 | Newly failing at ac830e7 vs 7c68e97.  Possibly affected by `config.cpp.cpp_standard` default change in `config.cpp::1289`.  Needs investigation. |
+
+### 2.3 VS2025-only unit-test noise (not build-blocking)
+
+The `unit` binary on VS2025 prints `FAILED:` lines from
+`unit/solvers/smt2_incremental/smt_to_smt2_string.cpp:{256,257,258}`,
+`unit/util/irep.cpp:311`, and `unit/util/irep_sharing.cpp:{33,138}`, plus
+a large volume of `jbmc/unit/java_bytecode/.../convert_invoke_dynamic.cpp`
+failures.  All of these test cases still report "All tests passed" at the
+suite level, so they are Catch2 `CHECK_FALSE`/`SECTION` lines inside
+passing tests — cosmetic but worth auditing (and probably removing the
+`CHECK(false)` lines if they are meant to be negative-path assertions).
+
+### What to do
+
+1. Start with the smallest reproducers: `cpp11_condition_variable_header`
+   and `cpp17_mutex_basic` both fail on MSVC `<atomic>` line 472
+   `_Atomic_lock_acquire`.  This is likely solvable with a CBMC library
+   stub for MSVC's `_Atomic_*` intrinsics (we already stub GCC's
+   `__atomic_*`).
+2. Next tackle `<xstring>` SSO assignment — add support for direct
+   assignment to in-class `char[N]` members (currently rejected with
+   `"direct assignments to arrays not permitted"`).  This probably needs
+   work in `cpp_typecheck_expr::typecheck_expr_binary` for `=` with
+   array lvalue.
+3. The `_Rebind_alloc_t` / `allocator_traits` cycle is the big one —
+   half the vector/chrono/filesystem tests share it.  Needs deep
+   investigation of MSVC's `_Normal_allocator_traits`
+   specialization pattern.
+4. For the flaky non-cpp tests on VS2022 (§2.2): re-run the CI job and
+   see whether the set is stable.  If it is, get them tagged
+   `broken-msvc` or similar so the makefile test runner prints detail.
+
+---
+
+## 3. Linux — include-what-you-use (clang-19 + iwyu 8.21)
+
+Job ID: `include-what-you-use`
+
+- **Status**: 🅿️ — passing on 7b3950b (2026-04-29), failing on 7c68e97
+  (2026-05-08).  So it broke inside the ~160-commit develop merge that
+  created 7c68e97 (most likely the cmake-clean / SMT2 range-encoding /
+  flexible-array-members PRs).
+- **Scope**: `/usr/bin/iwyu` suggests header changes for **1631
+  translation units** (1.6k distinct `.cpp`/`.h` files across `src/`,
+  `jbmc/src/`, and `build/minisat2-src/`).  The suggestions are a mix
+  of "add this direct include" (mostly missing STL forward-decl headers
+  like `<iosfwd>`, `<memory>`, `<optional>`, `<set>`) and "remove this
+  transitive include".
+- **Example**:
+  ```
+  src/analyses/ai_history.h should add these lines:
+    #include <ostream>    // for basic_ostream, basic_ios
+    #include <set>        // for set
+    #include <string>     // for char_traits, basic_string
+    #include <utility>    // for make_pair, pair
+  ```
+
+### What to do
+
+1. This cannot be fixed in one PR.  Split into tranches:
+   - Tranche 1: `src/util/` only (`~50` files).
+   - Tranche 2: `src/analyses/`, `src/pointer-analysis/`, `src/solvers/`.
+   - Tranche 3: `src/goto-*`, `src/cbmc/`, `src/cpp/`, `src/ansi-c/`.
+   - Tranche 4: `jbmc/src/`.
+2. The `build/minisat2-src/` entries are upstream MiniSat — do **not**
+   try to fix those; file a .iwyu-ignore or teach the CI runner to skip
+   that directory.
+3. Until then, tag the job `continue-on-error: true` in the workflow
+   if we want green-on-PR (but note that doing so hides the signal).
+
+Also check whether upgrading iwyu from 8.21 to a newer Ubuntu-noble
+package, or pinning the version, would reduce the false-positive rate —
+these suggestions look conservatively noisy.
+
+---
+
+## 4. Linux — newer libstdc++ (GCC 15 on Ubuntu 26.04)
+
+Not in the GitHub Actions matrix, but **will be** when Ubuntu 26.04
+joins.  Discovered by running the cbmc-cpp regression in a
+`ubuntu:26.04` container.
+
+| Test | Root cause |
+|------|------------|
+| `cpp20_sort_cpp20` | 🅿️ 📐 libstdc++ 15 `<bits/max_size_type.h>`: `__max_size_type` is a struct wrapping `unsigned __int128` with implicit arithmetic conversions (`operator*=`, `/=`, `<<=`, etc.).  CBMC rejects struct↔integer implicit conversions and emits a cascade of `"conversion from 'unsigned __int128' to 'struct __max_size_type': implicit arithmetic conversion not permitted"` / `"conversion from 'struct __max_size_type' to 'unsigned long int': implicit arithmetic conversion not permitted"`. |
+| `cpp23_optional_monadic` | 🅿️ 📐 libstdc++ 15 `<optional>` line 495 `_Optional_payload`: uses `auto` return types in member templates that CBMC cannot resolve (`"member operator requires struct/union type on left hand side but got 'auto'"`), and the subsequent `_Optional_payload` lookup fails. |
+| `cpp11_vector_front_body` | 🅿️ 🪲 | Cascades: libstdc++ 15 `stl_vector.h` line 501 `_S_nothrow_relocate` → `"unexpected ID_code expression"` → `__builtin_operator_new` / `__uninitialized_move_if_noexcept_a` template instantiation fails → symex invariant violation `"level0: failed to find this"`. |
+| `cpp17_vector_basic` | 🅿️ 🪲 Same cascade as `cpp11_vector_front_body`. |
+| `cpp20_optional_basic` | 🔄 | Times out on Ubuntu 26.04 at the 60 s limit (runs to VERIFICATION SUCCESSFUL within 30 s if invoked directly — so it is a scheduler / timeout configuration issue, not a correctness bug).  Bumping the per-test timeout or enabling `--unwind` caps should recover it. |
+
+### What to do
+
+1. Implement implicit struct↔integer conversions for types flagged with
+   a libstdc++-internal marker (or, better, detect the `__abi_tag_`
+   tagged struct wrappers over `unsigned __int128`).  This is the root
+   cause of both `__max_size_type` and many future integer-extension
+   types.
+2. Extend `auto` return-type deduction to class-template member
+   functions that are evaluated as part of operand types (currently
+   only works for function *definitions*).
+3. Investigate `"unexpected ID_code expression"` during type-checking
+   of `_S_nothrow_relocate` — likely a `noexcept(auto)` or concept
+   predicate path that the type-checker does not expect.
+
+Note that none of these are *regressions* — they are new failures
+because the toolchain is new.  When Ubuntu 26.04 (or an equivalent
+GCC 15 container) enters the CI matrix, every one of these tests will
+need a matching `gcc<15` or `libstdc++<15` exclusion **or** a fix.
+
+---
+
+## Summary of forthcoming work (rough ordering)
+
+1. **Small**: Stub `_Atomic_lock_acquire`/`_Atomic_*` MSVC intrinsics
+   — unlocks `cpp11_condition_variable_header`, `cpp11_future_header`,
+   `cpp17_mutex_basic`.
+2. **Small**: Handle empty-pack deduction cascade under earlier SFINAE
+   failure — unlocks macOS `Vector1`, `cpp11_vector_size`.
+3. **Medium**: MSVC `<xstring>` SSO direct-array assignment — unlocks
+   `cpp17_filesystem_{basic,path_ops}`, part of `cpp11_map_insert`.
+4. **Medium**: libstdc++ 15 struct-wrapped-integer implicit conversions
+   — unlocks `cpp20_sort_cpp20` and the `__max_size_type` cascade.
+5. **Large**: MSVC `_Rebind_alloc_t` / `allocator_traits` path — 8+
+   vector/chrono tests on Windows.
+6. **Large**: include-what-you-use cleanup across `src/`, `jbmc/src/`.
+7. **Ongoing**: flaky contract tests on VS2022 (§2.2) — need per-test
+   detail in the Makefile runner to know what's actually going wrong.
+
+---
+
+*Last updated: 2026-05-10*
