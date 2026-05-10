@@ -2219,7 +2219,18 @@ bool cpp_typecheckt::reinterpret_typecast(
 
   if(is_reference(type) && e.get_bool(ID_C_lvalue))
   {
-    new_expr = typecast_exprt::conditional_cast(address_of_exprt(e), type);
+    // Per [expr.reinterpret.cast]/11: a glvalue of type T1 can be cast
+    // to a reference-to-T2 if an expression of type "pointer to T1" can
+    // be explicitly converted to "pointer to T2" via reinterpret_cast.
+    // The resulting glvalue refers to the same storage.
+    //
+    // In CBMC's IR, `T&` is modelled as `T*` with `C_reference` set.
+    // Take the address of the source lvalue, cast it to the target
+    // pointer type, and hand it back as the reference value.
+    address_of_exprt addr{e};
+    typecast_exprt cast_ptr{addr, pointer_type(to_reference_type(type).base_type())};
+    cast_ptr.type() = type;
+    new_expr.swap(cast_ptr);
     return true;
   }
 
