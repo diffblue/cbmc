@@ -2,7 +2,20 @@
 
 ## Status
 
-**In progress (May 2026).** Implementation complete; first sweep running. Status reported as plan + early results at end.
+**Executed (May 2026).** Implementation complete; ablation sweep over
+9 benchmarks × 4 primary encodings × 7 secondary encodings (including
+singleton baseline) completed. Headline findings:
+
+- **Portfolio-like outcome** (Outcome N from the plan below).
+- Median multi/min(A, B) = 1.31; geometric mean 1.23.
+- Median multi/max(A, B) = 0.14 (multi is on median 7× faster than the slower singleton).
+- 44 "rescue" cases where one singleton timed out and the multi-encoding solved within 60s.
+- 42% of multi runs within 1.25× of min(A, B); 40% more than 1.5× slower than min(A, B).
+- Integrated into Paper 1 as new Section~\ref{sec:multi-encoding}
+  ("Multi-Encoding Combinations") after the Alternative Encodings section.
+
+Raw data: `doc/paper-bitblasting/data/multi-encoding-results.tsv`
+(216 measurements).
 
 ## Goal
 
