@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+^.*direct assignments to arrays not permitted$
+--
+Regression for the "direct assignments to arrays not permitted"
+bug hit by MSVC's <xstring> SSO buffer (`union _Bxty { char _Buf[N];
+_Bxty() : _Buf() {} }`).  Per [dcl.init]/8 value-initialization of
+an array performs element-wise zero-initialization; we must not
+emit a direct assignment to an array lvalue, which [expr.ass]
+rejects.

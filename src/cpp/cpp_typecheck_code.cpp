@@ -1083,11 +1083,58 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
           {
             inner.type().set(ID_C_constant, false);
             inner.set(ID_C_lvalue, true);
-            side_effect_expr_assignt assign(
-              inner, *zero, typet(), code.source_location());
-            typecheck_side_effect_assignment(assign);
-            code_expressiont new_code(std::move(assign));
-            code.swap(new_code);
+            // Per [dcl.init]/8 value-initialization of an array is
+            // applied element-wise; a direct assignment to an array is
+            // not permitted by [expr.ass].  Emit element-wise
+            // zero-assignments so that type-check succeeds.
+            if(inner.type().id() == ID_array)
+            {
+              const auto &array_type = to_array_type(inner.type());
+              const exprt &size_expr = array_type.size();
+              exprt tmp_size = size_expr;
+              make_constant_index(tmp_size);
+              mp_integer s;
+              if(!to_integer(to_constant_expr(tmp_size), s))
+              {
+                code_blockt block;
+                auto elem_zero = ::zero_initializer(
+                  array_type.element_type(),
+                  code.source_location(),
+                  *this);
+                if(elem_zero.has_value())
+                {
+                  for(mp_integer i = 0; i < s; ++i)
+                  {
+                    index_exprt element{
+                      inner, from_integer(i, c_index_type())};
+                    element.add_source_location() = code.source_location();
+                    element.set(ID_C_lvalue, true);
+                    side_effect_expr_assignt elem_assign(
+                      element,
+                      *elem_zero,
+                      typet(),
+                      code.source_location());
+                    typecheck_side_effect_assignment(elem_assign);
+                    block.add(code_expressiont{elem_assign});
+                  }
+                  code.swap(block);
+                  return;
+                }
+              }
+              // Fall through to skip if size not constant or no
+              // element zero initializer.
+              auto source_location = code.source_location();
+              code = code_skipt();
+              code.add_source_location() = source_location;
+            }
+            else
+            {
+              side_effect_expr_assignt assign(
+                inner, *zero, typet(), code.source_location());
+              typecheck_side_effect_assignment(assign);
+              code_expressiont new_code(std::move(assign));
+              code.swap(new_code);
+            }
           }
           else
           {
