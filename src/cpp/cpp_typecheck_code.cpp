@@ -1098,22 +1098,16 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
               {
                 code_blockt block;
                 auto elem_zero = ::zero_initializer(
-                  array_type.element_type(),
-                  code.source_location(),
-                  *this);
+                  array_type.element_type(), code.source_location(), *this);
                 if(elem_zero.has_value())
                 {
                   for(mp_integer i = 0; i < s; ++i)
                   {
-                    index_exprt element{
-                      inner, from_integer(i, c_index_type())};
+                    index_exprt element{inner, from_integer(i, c_index_type())};
                     element.add_source_location() = code.source_location();
                     element.set(ID_C_lvalue, true);
                     side_effect_expr_assignt elem_assign(
-                      element,
-                      *elem_zero,
-                      typet(),
-                      code.source_location());
+                      element, *elem_zero, typet(), code.source_location());
                     typecheck_side_effect_assignment(elem_assign);
                     block.add(code_expressiont{elem_assign});
                   }
