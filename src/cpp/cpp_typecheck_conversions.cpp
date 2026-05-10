@@ -2228,7 +2228,8 @@ bool cpp_typecheckt::reinterpret_typecast(
     // Take the address of the source lvalue, cast it to the target
     // pointer type, and hand it back as the reference value.
     address_of_exprt addr{e};
-    typecast_exprt cast_ptr{addr, pointer_type(to_reference_type(type).base_type())};
+    typecast_exprt cast_ptr{
+      addr, pointer_type(to_reference_type(type).base_type())};
     cast_ptr.type() = type;
     new_expr.swap(cast_ptr);
     return true;
