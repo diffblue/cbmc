@@ -1245,7 +1245,27 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
         }
         // remember access mode
         declaration.set(ID_C_access, access);
-        convert_template_declaration(declaration);
+        // Per [temp.inst]/11: failure to convert one template member
+        // during class instantiation should not abort processing of
+        // siblings.  Catch and continue.
+        if(!instantiation_stack.empty())
+        {
+          const std::size_t errors_before =
+            get_message_handler().get_message_count(messaget::M_ERROR);
+          try
+          {
+            convert_template_declaration(declaration);
+          }
+          catch(...)
+          {
+            get_message_handler().set_message_count(
+              messaget::M_ERROR, errors_before);
+          }
+        }
+        else
+        {
+          convert_template_declaration(declaration);
+        }
         continue;
       }
 
@@ -1330,15 +1350,49 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           continue;
         }
 
-        typecheck_compound_declarator(
-          symbol,
-          declaration,
-          declarator,
-          components,
-          access,
-          is_static,
-          is_typedef,
-          is_mutable);
+        // Per [temp.res] and [temp.inst]/11: type-checking a member
+        // declaration during class template instantiation may fail
+        // because a dependent name cannot be resolved in the current
+        // instantiation context (for example
+        //   typedef typename __alloc_traits::pointer pointer;
+        // when __alloc_traits itself requires further instantiation).
+        // The failure is local to the member being processed; letting
+        // sibling members continue lets the class scope accumulate
+        // the typedefs/members that do not depend on the failing one.
+        if(!instantiation_stack.empty())
+        {
+          const std::size_t errors_before =
+            get_message_handler().get_message_count(messaget::M_ERROR);
+          try
+          {
+            typecheck_compound_declarator(
+              symbol,
+              declaration,
+              declarator,
+              components,
+              access,
+              is_static,
+              is_typedef,
+              is_mutable);
+          }
+          catch(...)
+          {
+            get_message_handler().set_message_count(
+              messaget::M_ERROR, errors_before);
+          }
+        }
+        else
+        {
+          typecheck_compound_declarator(
+            symbol,
+            declaration,
+            declarator,
+            components,
+            access,
+            is_static,
+            is_typedef,
+            is_mutable);
+        }
       }
     }
     else if(it->id() == "cpp-public")
