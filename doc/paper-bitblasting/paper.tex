@@ -50,7 +50,7 @@ exist~\cite{beame2019toward}. A controlled experiment holds the
 partial-product layout and accumulation
 topology fixed and varies only the accumulator (integer addition
 vs.\ GF(2) XOR): on CaDiCaL, integer commutativity is at least
-$1000\times$ harder than GF(2) at bitwidth 12, and structural
+$1000\times$ harder than GF(2) at bit-width 12, and structural
 variations (sequential vs.\ parallel-tree accumulation) change
 running time by less than $5\times$. The gap is between
 \emph{existence} of short proofs and the ability of CDCL
@@ -163,7 +163,7 @@ into two classes:
 Q(x,y)$, e.g., commutativity, hardware equivalence checking) and
 \emph{existential} queries ($\exists x, y.\; P(x,y) = c$, e.g.,
 factoring, overflow detection). Bit-blasting handles both but scales
-poorly with bitwidth; algebraic techniques (treated in a companion
+poorly with bit-width; algebraic techniques (treated in a companion
 paper~\cite{companion-algebraic}) handle universal queries
 efficiently but are not constructive
 for existential queries. This paper focuses on improving bit-blasting
@@ -179,13 +179,19 @@ positions. These must be accumulated into the final $2N$-bit product.
 The standard \emph{shift-add} encoding adds partial products
 sequentially using a ripple-carry adder chain, creating a carry chain
 of length $O(N^2)$. \emph{Dadda trees}~\cite{dadda1965some} reduce
-the partial product matrix to two rows using carry-save full adders,
+the partial-product grid to two rows using carry-save full adders,
 followed by a single carry-propagate addition.
 \emph{Comba}~\cite{comba1990exponentiation} reduces each column
 independently using popcount (parallel bit counting via the pop0
 algorithm from~\cite{warren2012hackers}), propagating carries to
-adjacent columns during the same pass. Section~\ref{sec:combacs}
-introduces our carry-save variant that decouples these two steps.
+adjacent columns during the same pass. Combining column-wise
+popcount with immediate carry propagation couples two otherwise
+independent sources of structure in the same set of clauses, which
+limits how aggressively downstream CDCL inprocessing can
+simplify the encoding. Section~\ref{sec:combacs} introduces our
+carry-save Comba variant that decouples these two steps by first
+reducing every column to a small set of sum/carry bits independently,
+and only then propagating carries in a second pass.
 
 Modern CDCL solvers employ techniques that interact with encoding
 design in ways we exploit throughout this paper. Bounded Variable
@@ -211,7 +217,7 @@ interaction with BVE and inprocessing.
 
 We compare integer multiplication commutativity ($a \times b = b
 \times a$) with GF(2) (carry-less) multiplication commutativity. Both
-have identical partial product grids; the only difference is carry
+have identical partial-product grids; the only difference is carry
 propagation (integer uses addition with carries, GF(2) uses XOR).
 This comparison isolates carry propagation as a variable, though we
 note that the change in addition operation also affects clause
@@ -272,13 +278,26 @@ accumulator operator specifically, we constructed five benchmark
 families in pure SMT-LIB with identical partial-product layouts
 and identical accumulation topologies, changing only the
 operator:
+Each variant takes the $N$ partial products
+$\mathit{pp}[i] = a[i] \wedge b$ (shifted by $i$) and differs
+\emph{only} in how it sums them into the $2N$-bit output.
+Let $\mathit{pp}_0, \ldots, \mathit{pp}_{N-1}$ be the shifted
+partial products as $2N$-bit values.
 \begin{itemize}
-\item E0: integer, sequential (bvadd chain);
-\item E1: GF(2), sequential (bvxor chain);
-\item E2: integer, parallel-tree (bvadd, log-depth);
-\item E3: GF(2), parallel-tree (bvxor, log-depth);
-\item E4: integer, ternary (3-input bvadd chain, more carry
-  depth per step).
+\item \textbf{E0 (integer, sequential)}: fold with bvadd left-to-right,
+      $\mathrm{acc}_i = \mathrm{bvadd}(\mathrm{acc}_{i-1}, \mathit{pp}_i)$.
+      Carries propagate through the full width at each step.
+\item \textbf{E1 (GF(2), sequential)}: identical topology but bvxor
+      instead of bvadd: $\mathrm{acc}_i = \mathrm{bvxor}(\mathrm{acc}_{i-1}, \mathit{pp}_i)$.
+      No carries.
+\item \textbf{E2 (integer, parallel-tree)}: pairwise bvadd in a
+      balanced tree of depth $\lceil \log_2 N \rceil$.
+\item \textbf{E3 (GF(2), parallel-tree)}: same balanced tree, but
+      with bvxor at each internal node.
+\item \textbf{E4 (integer, ternary)}: sequential but in groups of
+      three, $\mathrm{acc} = \mathrm{bvadd}(\mathrm{bvadd}(\mathrm{acc}, \mathit{pp}_i), \mathit{pp}_{i+1})$,
+      making each accumulation step perform two dependent
+      additions through the full carry chain.
 \end{itemize}
 Each variant is a macro expansion of $a \times b$ in the
 commutativity assertion $a \times b = b \times a$. Because the SMT
@@ -319,7 +338,7 @@ bvadd\,vs.\,bvxor. At BW$\geq$10 the integer variant times out at
 \textbf{(2) Topology alone does not rescue integer multiplication.}
 Switching from sequential (E0) to parallel-tree (E2) accumulation
 produces ${<}$10\% time difference on integer, and both time out
-at the same bitwidth. Parallel structure helps GF(2) by 2--5$\times$
+at the same bit-width. Parallel structure helps GF(2) by 2--5$\times$
 (E1 vs E3), confirming a minor structural effect, but
 structure cannot overcome carry-induced hardness.
 
@@ -1086,7 +1105,7 @@ restated in terms of proof sizes with the same conclusions.
   \cadical with algebraic layers disabled. shift-add and Booth
   time out at BW=12; Dadda at BW=14; only standard Comba, block4,
   and \combacs solve BW=16 within 120\,s. \combacs's advantage
-  grows with bitwidth.}
+  grows with bit-width.}
 \label{fig:scaling}
 \end{figure}
 
@@ -1097,7 +1116,7 @@ top-three encodings remains stable up to BW=16 (beyond which
 all bit-blasting encodings eventually time out in this range of
 wall-clock). The ordering shift-add $<$ Dadda $<$ Comba $<$
 \combacs predicted by carry-propagation depth
-(Section~\ref{sec:hardness}) holds at every bitwidth tested.
+(Section~\ref{sec:hardness}) holds at every bit-width tested.
 
 \subsection{Industrial Benchmarks}
 
@@ -1127,7 +1146,7 @@ instead of shift-add; the benchmark remains fast in absolute terms.
 
 More broadly, UNSAT problems show consistent encoding sensitivity (up
 to 71$\times$) with stable ranking across solvers. SAT problems
-(factoring) show encoding sensitivity at large bitwidths but with
+(factoring) show encoding sensitivity at large bit-widths but with
 unpredictable ranking---different encodings make different solutions
 easy to find.
 
@@ -1177,9 +1196,9 @@ circuit---no encoding heuristic can detect this without knowing the
 comparison target's structure.
 
 \paragraph{Threats to validity.}
-Bit-blasting scales poorly with bitwidth (exponential in the worst
+Bit-blasting scales poorly with bit-width (exponential in the worst
 case) but is relatively insensitive to the number of variables.
-Our benchmarks exercise bitwidths 8--32; results may differ at
+Our benchmarks exercise bit-widths 8--32; results may differ at
 64+ bits. Additionally, some QF\_BV benchmarks in SMT-LIB are
 circuit-equivalence problems whose difficulty is highly
 encoding-sensitive---a new encoding that improves general QF\_BV
@@ -1302,7 +1321,7 @@ aws\_mul    & 39.4          & \textbf{3.89} & $>$120 & $>$120 \\
 Karatsuba is competitive on commutativity at BW=13 but 22$\times$
 slower on primality. Sch\"onhage-Strassen produces 43K variables for
 BW=7 (vs.\ ${\sim}$600 for Comba)---designed for thousands of bits,
-it is orders of magnitude too expensive at practical bitwidths.
+it is orders of magnitude too expensive at practical bit-widths.
 Note that standard Comba loses to Dadda on aws\_mul (39.4\,s vs.\
 1.29\,s), where constant multiplication dominates; \combacs's adaptive
 fallback handles this.
@@ -1312,7 +1331,7 @@ fallback handles this.
 Several approaches that add structure to the encoding actually hurt
 performance because they reintroduce carry chains. Radix-4/8
 multipliers are 2--15$\times$ slower: pre-computing $3x$, $5x$, $7x$
-adds carry chains that dominate at practical bitwidths. Full-adder
+adds carry chains that dominate at practical bit-widths. Full-adder
 tree popcount is 3$\times$ slower than pop0 despite fewer variables,
 because it creates longer carry chains ($\log_2 n$ bits vs.\ 2--4
 bits). Non-propagation-complete carry merge causes a 25$\times$
@@ -1359,7 +1378,7 @@ verification of multipliers using Gr\"obner bases or function
 extraction, typically over $\mathbb{Q}$ with field polynomials.
 Song et al.~\cite{song2024equational} apply strong Gr\"obner bases
 over $\mathbb{Z}_{2^d}$ to the equational theory of bit-vectors.
-Algebraic techniques scale well with bitwidth but are limited to
+Algebraic techniques scale well with bit-width but are limited to
 universal queries over polynomial fragments; they are complementary
 to bit-blasting, which we treat in a companion paper~\cite{companion-algebraic}.
 Clegg et al.~\cite{clegg1996groebner} proved the Gr\"obner proof
@@ -1378,7 +1397,7 @@ polynomials into subpolynomials by fixing input bits one at a time,
 giving compact bit-blasting encodings for polynomial evaluation.
 Their technique is developed for univariate polynomials; extending
 it to multivariate polynomials (such as $a \times b$) yields
-structure close to the standard partial-product array.
+structure close to the standard partial-product grid.
 E\'en and Biere~\cite{een2005effective} introduced SatELite
 preprocessing with BVE. Biere et al.~\cite{biere2019cadical} extended
 this to inprocessing in \cadical. Our analysis
