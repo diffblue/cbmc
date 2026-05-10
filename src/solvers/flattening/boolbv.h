@@ -92,6 +92,10 @@ public:
   {
     bv_utils.set_sorting_network(b);
   }
+  void set_secondary_encoding(const std::string &name)
+  {
+    bv_utils.set_secondary_encoding(name);
+  }
   boolbvt(
     const namespacet &_ns,
     propt &_prop,

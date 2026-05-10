@@ -279,6 +279,14 @@ protected:
   bool use_sorting_network = false;
   bool use_hybrid_divider = false;
 
+  // Secondary encoding for multi-encoding experiments (N4).
+  // When non-empty, unsigned_multiplier() computes the primary encoding
+  // (using the flags above), then additionally computes a second
+  // encoding named by secondary_encoding, and constrains the two
+  // outputs to be equal. This effectively ORs the proof power of the
+  // two encodings while sharing input and output variables.
+  std::string secondary_encoding;
+
   // Track multiplications for adaptive popcount decisions
   std::size_t mul_count = 0;
   std::size_t first_mul_width = 0;
@@ -337,6 +345,21 @@ public:
   void set_sorting_network(bool b)
   {
     use_sorting_network = b;
+  }
+  /// Set a secondary multiplication encoding. When non-empty, the
+  /// unsigned multiplier will compute both the primary encoding
+  /// (selected by the other flags) and this secondary encoding, then
+  /// constrain the outputs to be equal. Accepted names:
+  /// "shift-add", "comba", "comba-cs", "dadda", "dadda-cs",
+  /// "wallace", "booth", "block4", "sortnet". Empty string
+  /// disables the feature.
+  void set_secondary_encoding(const std::string &name)
+  {
+    secondary_encoding = name;
+  }
+  const std::string &get_secondary_encoding() const
+  {
+    return secondary_encoding;
   }
 
 protected:

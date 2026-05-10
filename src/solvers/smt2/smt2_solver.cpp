@@ -490,6 +490,15 @@ int solver(
     else if(multiplier_encoding == "sortnet")
       boolbv.set_sorting_network(true);
 
+    // Multi-encoding (N4): if CBMC_MULTI_ENCODING is set, use its
+    // value as a secondary encoding name. The multiplier then
+    // produces both the primary encoding (selected above) and the
+    // secondary one, tying the output bitvectors.
+    if(const char *sec = std::getenv("CBMC_MULTI_ENCODING"))
+    {
+      boolbv.set_secondary_encoding(std::string(sec));
+    }
+
     if(adder_encoding_str == "brent-kung")
       boolbv.set_adder_encoding(bv_utilst::adder_encodingt::BRENT_KUNG);
     else if(adder_encoding_str == "kogge-stone")

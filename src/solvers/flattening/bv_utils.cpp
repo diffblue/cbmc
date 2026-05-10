@@ -2121,6 +2121,99 @@ bvt bv_utilst::unsigned_multiplier(const bvt &_op0, const bvt &_op1)
     return product;
   }
 
+  // Multi-encoding mode (N4): if a secondary encoding is set, compute
+  // the primary encoding with the current flags, then compute a
+  // secondary encoding with flags swapped to the named encoding, and
+  // constrain the two output bitvectors to be equal. This adds the
+  // conjunction of two different encodings of the same multiplication,
+  // sharing input and output variables. We temporarily clear
+  // secondary_encoding for the recursive calls to avoid re-entry.
+  if(!secondary_encoding.empty())
+  {
+    std::string sec = secondary_encoding;
+    secondary_encoding.clear();
+
+    // Snapshot primary encoding flags
+    const bool saved_comba = use_comba;
+    const bool saved_dadda = use_dadda;
+    const bool saved_comba_cs = use_comba_carry_save;
+    const bool saved_dadda_cs = use_dadda_carry_save;
+    const bool saved_wallace = use_wallace_tree;
+    const bool saved_booth = use_booth;
+    const bool saved_4bit = use_4bit_blocks;
+    const bool saved_sortnet = use_sorting_network;
+
+    // Primary: use current flags.
+    bvt primary = unsigned_multiplier(_op0, _op1);
+
+    // Secondary: clear all encoding flags, set the named one.
+    use_comba = false;
+    use_dadda = false;
+    use_comba_carry_save = false;
+    use_dadda_carry_save = false;
+    use_wallace_tree = false;
+    use_booth = false;
+    use_4bit_blocks = false;
+    use_sorting_network = false;
+
+    if(sec == "comba")
+      use_comba = true;
+    else if(sec == "dadda")
+      use_dadda = true;
+    else if(sec == "comba-cs")
+      use_comba_carry_save = true;
+    else if(sec == "dadda-cs")
+      use_dadda_carry_save = true;
+    else if(sec == "wallace")
+      use_wallace_tree = true;
+    else if(sec == "booth")
+      use_booth = true;
+    else if(sec == "block4")
+      use_4bit_blocks = true;
+    else if(sec == "sortnet")
+      use_sorting_network = true;
+    else if(sec == "shift-add")
+    {
+      // Leave all flags false: the fallback path is shift-add.
+    }
+    else
+    {
+      // Unknown secondary encoding; fall back to primary-only.
+      // Restore flags.
+      use_comba = saved_comba;
+      use_dadda = saved_dadda;
+      use_comba_carry_save = saved_comba_cs;
+      use_dadda_carry_save = saved_dadda_cs;
+      use_wallace_tree = saved_wallace;
+      use_booth = saved_booth;
+      use_4bit_blocks = saved_4bit;
+      use_sorting_network = saved_sortnet;
+      secondary_encoding = sec;
+      return primary;
+    }
+
+    bvt secondary = unsigned_multiplier(_op0, _op1);
+
+    // Tie outputs: primary and secondary must agree bit-for-bit.
+    INVARIANT(
+      primary.size() == secondary.size(),
+      "multi-encoding output widths must match");
+    set_equal(primary, secondary);
+
+    // Restore primary flags and re-enable secondary-encoding mode.
+    use_comba = saved_comba;
+    use_dadda = saved_dadda;
+    use_comba_carry_save = saved_comba_cs;
+    use_dadda_carry_save = saved_dadda_cs;
+    use_wallace_tree = saved_wallace;
+    use_booth = saved_booth;
+    use_4bit_blocks = saved_4bit;
+    use_sorting_network = saved_sortnet;
+    secondary_encoding = sec;
+
+    return primary;
+  }
+
   // Check for alternative full-product encodings first
   if(use_booth)
     return booth_multiply(_op0, _op1);
