@@ -13,7 +13,8 @@ logs.
 The "Performance Benchmarking" job (perf-benchcomp) fails at the end of the
 AWS C Common comparison with exit code 1 on otherwise-successful metrics; by
 agreement with the branch owner it is tracked separately and not part of this
-list.
+list.  The `include-what-you-use` job is also outside the scope of this
+document.
 
 Legend:
 - 🆕 introduced on this branch (pre-existing on parent commit would be 🅿️)
@@ -146,49 +147,7 @@ passing tests — cosmetic but worth auditing (and probably removing the
 
 ---
 
-## 3. Linux — include-what-you-use (clang-19 + iwyu 8.21)
-
-Job ID: `include-what-you-use`
-
-- **Status**: 🅿️ — passing on 7b3950b (2026-04-29), failing on 7c68e97
-  (2026-05-08).  So it broke inside the ~160-commit develop merge that
-  created 7c68e97 (most likely the cmake-clean / SMT2 range-encoding /
-  flexible-array-members PRs).
-- **Scope**: `/usr/bin/iwyu` suggests header changes for **1631
-  translation units** (1.6k distinct `.cpp`/`.h` files across `src/`,
-  `jbmc/src/`, and `build/minisat2-src/`).  The suggestions are a mix
-  of "add this direct include" (mostly missing STL forward-decl headers
-  like `<iosfwd>`, `<memory>`, `<optional>`, `<set>`) and "remove this
-  transitive include".
-- **Example**:
-  ```
-  src/analyses/ai_history.h should add these lines:
-    #include <ostream>    // for basic_ostream, basic_ios
-    #include <set>        // for set
-    #include <string>     // for char_traits, basic_string
-    #include <utility>    // for make_pair, pair
-  ```
-
-### What to do
-
-1. This cannot be fixed in one PR.  Split into tranches:
-   - Tranche 1: `src/util/` only (`~50` files).
-   - Tranche 2: `src/analyses/`, `src/pointer-analysis/`, `src/solvers/`.
-   - Tranche 3: `src/goto-*`, `src/cbmc/`, `src/cpp/`, `src/ansi-c/`.
-   - Tranche 4: `jbmc/src/`.
-2. The `build/minisat2-src/` entries are upstream MiniSat — do **not**
-   try to fix those; file a .iwyu-ignore or teach the CI runner to skip
-   that directory.
-3. Until then, tag the job `continue-on-error: true` in the workflow
-   if we want green-on-PR (but note that doing so hides the signal).
-
-Also check whether upgrading iwyu from 8.21 to a newer Ubuntu-noble
-package, or pinning the version, would reduce the false-positive rate —
-these suggestions look conservatively noisy.
-
----
-
-## 4. Linux — newer libstdc++ (GCC 15 on Ubuntu 26.04)
+## 3. Linux — newer libstdc++ (GCC 15 on Ubuntu 26.04)
 
 Not in the GitHub Actions matrix, but **will be** when Ubuntu 26.04
 joins.  Discovered by running the cbmc-cpp regression in a
@@ -236,8 +195,7 @@ need a matching `gcc<15` or `libstdc++<15` exclusion **or** a fix.
    — unlocks `cpp20_sort_cpp20` and the `__max_size_type` cascade.
 5. **Large**: MSVC `_Rebind_alloc_t` / `allocator_traits` path — 8+
    vector/chrono tests on Windows.
-6. **Large**: include-what-you-use cleanup across `src/`, `jbmc/src/`.
-7. **Ongoing**: flaky contract tests on VS2022 (§2.2) — need per-test
+6. **Ongoing**: flaky contract tests on VS2022 (§2.2) — need per-test
    detail in the Makefile runner to know what's actually going wrong.
 
 ---
