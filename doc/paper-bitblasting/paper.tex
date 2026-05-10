@@ -209,7 +209,7 @@ Brain et al.~\cite{brain2016propagation} showed that composition of
 propagation-complete (PC) primitives preserves PC for adders but
 \emph{not} for multipliers. Brain~\cite{brain2021wrong} conjectured
 that a PC multiplier encoding is exponential in size. Rather than
-seeking propagation completeness, we optimize encoding structure for
+seeking propagation completeness, we optimise encoding structure for
 interaction with BVE and inprocessing.
 
 \section{Carry Propagation Hardness}
@@ -389,7 +389,7 @@ technique for future encoding work.
 \item \textbf{Trace the top variables} back to the multiplier
   circuit: which partial product bits, carry bits, or intermediate
   gates do they represent?
-\item \textbf{Hypothesize a structural cause} for the
+\item \textbf{Hypothesise a structural cause} for the
   concentration: what aspect of the encoding forces the solver to
   repeatedly reason about these variables?
 \item \textbf{Propose an encoding modification} that breaks the
@@ -436,7 +436,7 @@ The manual steps above---proof generation, variable ranking,
 circuit tracing, structural hypothesis, modification---are
 candidates for automation. An AI system that reads DRAT proofs,
 identifies structural bottlenecks, and proposes encoding
-modifications would close the loop. Existing work analyzes
+modifications would close the loop. Existing work analyses
 encoding source code~\cite{jarvisalo2012inprocessing} or modifies
 solver heuristics~\cite{biere2019cadical}, but to our knowledge no
 system closes the full proof-to-encoding cycle. We view our manual
@@ -456,7 +456,7 @@ benchmark-runner scripts, producing tabular results, drafting
 prose---quickly. Human judgment was decisive for:
 (i)~formulating the structural hypothesis behind \combacs (why the
 top-variable concentration in standard Comba implies a carry-save
-second pass would help); (ii)~recognizing that the adaptive
+second pass would help); (ii)~recognising that the adaptive
 heuristic should disable popcount globally when multiplication
 count exceeds 2, because carry-save variables block BVE cascading;
 (iii)~honest scoping in the writeup (e.g., distinguishing
@@ -539,7 +539,7 @@ than Dadda, yet is up to 30$\times$ faster. The extra auxiliary
 variables from popcount create intermediate ``summary'' variables
 representing the count of 1-bits in groups of 2, 4, 8. These act as
 abstractions the solver reasons about at a higher level. Formula size
-is not the right optimization target---propagation structure is.
+is not the right optimisation target---propagation structure is.
 
 \subsection{Adaptive Encoding Selection}
 
@@ -602,7 +602,7 @@ popcount is decisive: at BW=11 it is 217$\times$ faster than
 shift-add, and at BW=12 it avoids a timeout. Second, for
 three-multiplication problems (assoc\_8, distrib\_8), the
 three configurations perform identically---the adaptive heuristic
-correctly recognizes the pattern and falls back to shift-add
+correctly recognises the pattern and falls back to shift-add
 accumulation. This confirms that the heuristic's gain is real on
 the targeted pattern and its cost on other patterns is essentially
 zero.
@@ -644,7 +644,7 @@ the same DRAT proof analysis that guided \combacs's design to
 \emph{understand} why the encoding helps or hurts on specific
 benchmark patterns. These encodings were not designed via proof
 analysis; they are pre-existing ideas whose interaction with SAT
-solvers we characterize here.
+solvers we characterise here.
 
 \subsection{Booth Radix-4}
 
@@ -1205,7 +1205,7 @@ MurmurHash3 determinism & 10.0s & 7.2s & 1.4$\times$ \\
 $\mathrm{tr}(AB) = \mathrm{tr}(BA)$ & 34.4s & 1.9s & 18$\times$ \\
 MAC dot product comm    & 11.8s & 4.3s & 2.8$\times$ \\
 keyed hash determinism  & 1.3s & 6.5s & 0.2$\times$ \\
-div-by-const optimization & 9.7s & 9.7s & 1.0$\times$ \\
+div-by-const optimisation & 9.7s & 9.7s & 1.0$\times$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1363,7 +1363,7 @@ full-suite evaluation is deferred as future work.
 
 A significant portion of this investigation produced negative results.
 We report them to save future effort and because the failure modes
-illuminate SAT solver behavior. A natural first question is whether
+illuminate SAT solver behaviour. A natural first question is whether
 asymptotically superior algorithms---Karatsuba~\cite{karatsuba1962multiplication}
 ($O(n^{1.585})$), Toom-Cook~\cite{toom1963complexity} ($O(n^{1.465})$),
 or Sch\"onhage-Strassen~\cite{schonhage1971schnelle}
@@ -1462,7 +1462,7 @@ can outperform SAT solvers on polynomial equation benchmarks.
 Dadda~\cite{dadda1965some} and Wallace~\cite{wallace1964suggestion}
 proposed tree-based partial product reduction.
 Comba~\cite{comba1990exponentiation} proposed column-wise reduction.
-\combacs extends Comba with carry-save separation, optimized for SAT
+\combacs extends Comba with carry-save separation, optimised for SAT
 solving rather than hardware implementation.
 Howe et al.~\cite{howe2025subpolynomial} decompose univariate binary
 polynomials into subpolynomials by fixing input bits one at a time,
@@ -1484,7 +1484,7 @@ an alternative approximation strategy. Martin Brain suggested the
 in private communication; we implemented and evaluated it.
 Jia et al.~\cite{jia2023improving} improve bit-blasting for
 nonlinear integer arithmetic (QF\_NIA) with Greedy Addition (a
-Huffman-like ordering that minimizes auxiliary variables) and
+Huffman-like ordering that minimises auxiliary variables) and
 Multiplication Adaptation (starting with narrow bit-widths). We
 tested Greedy Addition across four solvers and found mixed results:
 \cadical benefits (1.4--2.6$\times$ faster) because its inprocessing
@@ -1522,9 +1522,9 @@ Three complementary lines of work address the gap between
 existence of short proofs and CDCL's ability to find them.
 (i)~Encoding-level guidance---our approach---reshapes the
 initial formula so CDCL's standard heuristics reach short
-proofs. (ii)~Solver-level generalization to stronger proof
+proofs. (ii)~Solver-level generalisation to stronger proof
 systems: Danner's dissertation~\cite{danner2025sat} develops
-CDXCL, a CDCL generalization to XOR-OR-AND Normal Form
+CDXCL, a CDCL generalisation to XOR-OR-AND Normal Form
 (XNF) clauses that operates in the Res($\oplus$) proof
 system---equivalent to Itsykson and Sokolov's SRES---and
 that provably escapes Resolution lower bounds on Tseitin
@@ -1535,7 +1535,7 @@ inside modern CDCL through CaDiCaL-ER (definition introduction
 during conflict analysis) and CaDiCaL-FX (bounded variable
 addition extended to XOR and ITE gate detection on learned
 clauses). They further give polynomial-size ER proofs for
-Tseitin formulas via XOR gate factorization followed by
+Tseitin formulas via XOR gate factorisation followed by
 bounded variable elimination. Our encoding-selection work is
 orthogonal to both: we shape the CNF that is fed to CDCL,
 whereas CDXCL changes the proof system and CaDiCaL-FX
@@ -1543,7 +1543,7 @@ reshapes clauses during search.
 
 \paragraph{Word-level solvers.}
 Niemetz et al.~\cite{niemetz2023bitwuzla} implement word-level
-normalization in Bitwuzla that avoids bit-blasting for algebraic
+normalisation in Bitwuzla that avoids bit-blasting for algebraic
 identities; cvc5 uses a similar rewriting infrastructure. These
 approaches are complementary to our encoding improvements: when
 word-level rewriting succeeds, bit-blasting is not needed; when it
@@ -1557,7 +1557,7 @@ standard SAT and algebraic methods, complementary to our approach.
 \section{Conclusion and Future Work}
 
 We presented a proof-guided methodology for SAT encoding design:
-analyze DRAT proofs to identify structural bottlenecks, then redesign
+analyse DRAT proofs to identify structural bottlenecks, then redesign
 the encoding to eliminate them. This methodology produced \combacs
 (2.6--71$\times$ speedup on commutativity) and guided our evaluation
 of Booth radix-4 (up to 17$\times$ on strength-reduction benchmarks),
@@ -1598,7 +1598,7 @@ guidance we provide is an important open problem: a positive
 answer would make our encoding-selection layer unnecessary, a
 negative answer would strengthen the case for encoding-aware
 SAT solving. Recent work in two complementary directions---
-solver-level generalization to stronger proof systems
+solver-level generalisation to stronger proof systems
 (Danner~\cite{danner2025sat}, and work on CDCL with XOR reasoning
 that bidirectionally simulates Res($\oplus$)) and
 inprocessing-level definition introduction

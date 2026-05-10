@@ -42,7 +42,7 @@ $<$15\,ms that previously timed out. On our 39-benchmark
 arithmetic-identity suite, \cbmc~\cite{clarke2004tool} solves all
 39 instances; cvc5 solves 35/39 (failing only on bfloat16
 benchmarks whose floating-point types cvc5 does not support by
-default). Soundness is verified by 25 mechanized theorems in
+default). Soundness is verified by 25 mechanised theorems in
 Lean~4 (zero \texttt{sorry}).
 
 \keywords{Gr\"obner basis \and bit-vector arithmetic \and
@@ -58,7 +58,7 @@ their outputs equal---a problem that grows exponentially with
 bitwidth. But $ab - ba = 0$ is a polynomial identity over
 $\mathbb{Z}_{2^{16}}$: it holds by the commutativity of ring
 multiplication, regardless of bitwidth. Our Gr\"obner basis solver
-recognizes this in 0.009\,s without generating any SAT clauses.
+recognises this in 0.009\,s without generating any SAT clauses.
 
 This paper presents algebraic techniques that complement bit-blasting
 for arithmetic bit-vector reasoning. The key insight is that many
@@ -128,13 +128,13 @@ Song et al.~\cite{song2024equational}
 
 The ring $\mathbb{Z}_{2^d}$ is not a field: not every non-zero
 element has a multiplicative inverse. Only the \emph{units}---the
-odd elements, characterized by $\gcd(x, 2^d) = 1$---are invertible.
+odd elements, characterised by $\gcd(x, 2^d) = 1$---are invertible.
 This non-field structure invalidates the standard Buchberger
 algorithm over a field $k$, because Buchberger's S-polynomial
 reduction relies on clearing leading coefficients, which requires
 division by leading coefficients.
 
-A \emph{strong Gr\"obner basis} generalizes the field case to
+A \emph{strong Gr\"obner basis} generalises the field case to
 principal-ideal rings by adding ``coefficient S-polynomials'' that
 handle non-unit leading coefficients. Formally, following
 Song et al.~\cite{song2024equational}:
@@ -219,7 +219,7 @@ was eliminated by the progress-based termination rule
 (line~17): once all pairs that could contribute to the unit constant
 are explored, further pairs cannot help, and the algorithm
 terminates regardless of the initial order. This is a concrete
-instance of a formalization-informed improvement: the need to
+instance of a formalisation-informed improvement: the need to
 prove termination in Lean forced us to isolate the
 ``progress'' notion, which in turn showed that the ordering
 sensitivity was a symptom rather than a necessity. We returned to
@@ -295,9 +295,9 @@ combined system robust and reproducible.
   When the algebraic layer is inconclusive (non-unit basis) we
   extract a partial model and pass it as SAT hints to the
   bit-blasting layer, avoiding duplicated exploration.
-\item \textbf{Mechanized soundness in Lean 4.} 25 theorems with
+\item \textbf{Mechanised soundness in Lean 4.} 25 theorems with
   zero \texttt{sorry}, including a new Mathlib contribution
-  (PR \#38628) on the unit characterization of
+  (PR \#38628) on the unit characterisation of
   $\mathbb{Z}_{2^d}$.
 \end{enumerate}
 
@@ -351,8 +351,8 @@ would need to exist, but the polynomial $-1$ would be in $I$,
 triggering the unit check. The algorithm is sound (never falsely
 reports UNSAT) but incomplete (returns inconclusive when the basis
 contains only even constants).
-Full proof mechanized in Lean~4 (25 theorems, zero \texttt{sorry}),
-covering: (a)~unit characterization in $\mathbb{Z}_{2^d}$ (odd
+Full proof mechanised in Lean~4 (25 theorems, zero \texttt{sorry}),
+covering: (a)~unit characterisation in $\mathbb{Z}_{2^d}$ (odd
 $\Leftrightarrow$ unit, 2 is not a unit for $d \geq 1$),
 (b)~ideal preservation under S-polynomial computation and reduction,
 (c)~soundness of the Rabinowitsch trick (unit in ideal $\Rightarrow$
@@ -553,7 +553,7 @@ coefficients.
 Such vanishing polynomials arise in DSP datapath verification where
 coefficient scaling causes overflow cancellation. We implement the
 algebraic test of Shekhar et al.~\cite{shekhar2007equivalence},
-extended with the efficient normalization algorithm of
+extended with the efficient normalisation algorithm of
 G\`amez-Montolio et al.~\cite{gamez2024efficient}.
 
 \subsection{Falling Factorials and Stirling Numbers}
@@ -705,7 +705,7 @@ $k$ & perms ($k!$) & muls on LHS & time (s) & ratio to $k{-}1$ & log-log slope \
 The running time grows as approximately $k^5$
 (log--log slope 4.9) and sub-factorially when measured against $k \log k$
 (slope 0.6, whereas factorial growth would give slope 1.0). This
-is consistent with the Gr\"obner basis recognizing equivalent
+is consistent with the Gr\"obner basis recognising equivalent
 monomials by the commutativity relations in the ideal, rather than
 enumerating all $k!$ perm\-ut\-ations separately.
 The slowdown at $k = 6$ (2.25\,s) is dominated by the $720$
@@ -779,7 +779,7 @@ dsp\_vanishing\_mv (multivariate) & 0.005 & 0.004 & 0.005 \\
 \end{table}
 
 All DSP benchmarks solve in $<$15\,ms, competitive with
-Bitwuzla's word-level normalization. The overhead of the vanishing
+Bitwuzla's word-level normalisation. The overhead of the vanishing
 polynomial test on non-polynomial benchmarks is $<$0.05\,s (less
 than 0.5\% of the hardest benchmark's solving time).
 
@@ -836,7 +836,7 @@ bf16\_mul\_comm\_v2 & 22.9 & T/O & \textbf{11.2} \\
 bf16\_mul\_const & \textbf{0.004} & T/O & 0.028 \\
 bf16\_mul\_mono & 28.9 & T/O & \textbf{29.5} \\
 \midrule
-\multicolumn{4}{l}{\emph{Bitwuzla wins (IEEE FP with word-level normalization)}} \\
+\multicolumn{4}{l}{\emph{Bitwuzla wins (IEEE FP with word-level normalisation)}} \\
 float\_mul\_comm\_v2 & \textbf{0.005} & 0.006 & 0.013 \\
 half\_mul\_comm\_v2 & \textbf{0.005} & 0.005 & 0.012 \\
 strength\_chain\_16 & \textbf{0.005} & 0.007 & 1.49 \\
@@ -851,7 +851,7 @@ strength\_chain\_16 & \textbf{0.005} & 0.007 & 1.49 \\
 are complementary: the four benchmarks cvc5 fails on are all
 bfloat16 multiplication queries that cvc5 rejects as unsupported
 by default; Bitwuzla handles these via its floating-point word-level
-normalization, and we handle them by routing through the algebraic
+normalisation, and we handle them by routing through the algebraic
 solver followed by bit-blasting. On polynomial equation benchmarks
 (commutativity, associativity, overflow checking), all three
 solvers are fast ($<$15\,ms) via different mechanisms: \cbmc uses
@@ -863,7 +863,7 @@ were designed by us, inspired by the DSP synthesis literature
 (Shekhar et al.~\cite{shekhar2007equivalence}), to exercise the
 vanishing-polynomial test. They are therefore inevitably biased
 toward showing the strength of our approach. On these, Bitwuzla
-solves all DSP benchmarks in $<$50\,ms via word-level normalization, and
+solves all DSP benchmarks in $<$50\,ms via word-level normalisation, and
 \cbmc also solves all of them in $<$15\,ms via the vanishing polynomial
 test~\cite{gamez2024efficient}---including dsp\_image\_reject
 (0.014\,s) and dsp\_horner\_16 (0.009\,s), both of which previously
@@ -1008,7 +1008,7 @@ query $a \cdot b = b \cdot a$ at BW$=$256), reports the identity in
 $<$5\,ms (Table~\ref{tab:scaling}). The two numbers are not
 directly comparable: Amulet verifies a specific AIG
 implementation, while we verify the abstract identity $a \cdot b = b \cdot a$
-against itself, which our solver recognizes algebraically. Amulet
+against itself, which our solver recognises algebraically. Amulet
 would also handle this case in a few milliseconds at its natural
 64-bit scale; beyond that, the field-polynomial cost dominates.
 
@@ -1093,14 +1093,14 @@ such multiplications to shift-add when BVE would cascade
 usefully.
 
 
-\section{Mechanized Soundness Proofs}
+\section{Mechanised Soundness Proofs}
 \label{sec:lean4}
 
 We verified the soundness of the Gr\"obner basis solver with 25
 theorems in Lean~4 (Lean 4.18.0, Mathlib v4.18.0), covering:
 
 \begin{enumerate}
-\item \textbf{Unit characterization in $\mathbb{Z}_{2^d}$}: odd
+\item \textbf{Unit characterisation in $\mathbb{Z}_{2^d}$}: odd
   elements are units (coprime to $2^d$); 2 is not a unit for
   $d \geq 1$. (Submitted to Mathlib as PR \#38628.)
 \item \textbf{Ideal preservation}: S-polynomial computation and
@@ -1153,16 +1153,16 @@ bit-vectors: their theorems give the algebraic foundation for
 any such procedure. Our contribution is end-to-end integration
 with a bit-vector SMT solver, including the Rabinowitsch trick for
 disequalities, SSA-aware decomposition, progress-based
-termination, and mechanized soundness in Lean 4
+termination, and mechanised soundness in Lean 4
 (Section~\ref{sec:algebraic-contrib}).
 
-\paragraph{Vanishing polynomials and normalization.}
-Shekhar et al.~\cite{shekhar2007equivalence} characterize the
+\paragraph{Vanishing polynomials and normalisation.}
+Shekhar et al.~\cite{shekhar2007equivalence} characterise the
 vanishing ideal of $\mathbb{Z}_{2^{n_1}} \times \cdots \times
 \mathbb{Z}_{2^{n_d}} \to \mathbb{Z}_{2^m}$ using falling factorials
 and give a complete decision procedure for polynomial equivalence.
 G\`amez-Montolio et al.~\cite{gamez2024efficient} give efficient
-normalization via Stirling numbers and Kronecker products; their
+normalisation via Stirling numbers and Kronecker products; their
 Algorithm~3 is what we implement.
 Howe et al.~\cite{howe2025subpolynomial} decompose univariate
 polynomials into subpolynomials for compact bit-blasting; the
@@ -1241,7 +1241,7 @@ available in the artifact accompanying this paper, in
 \texttt{doc/paper-algebraic/data/} and
 \texttt{bench-multiplication/}, together with a Makefile that
 rebuilds the paper and a \texttt{REPRODUCE.md} that describes how
-to re-run each experiment. Mechanized Lean 4 proofs of soundness
+to re-run each experiment. Mechanised Lean 4 proofs of soundness
 are distributed with the artifact and submitted as PR \#38628 to
 Mathlib.
 
