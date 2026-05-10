@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^EXIT=0$
@@ -7,11 +7,6 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-[expr.type.conv]/2 + [dcl.init.list]/3.10: a braced-init-list with
-no elements for a scalar type performs value-initialization
-(yielding zero).  CBMC currently rejects T{} at type-check time for
-primitive T with "cannot initialize 'signed int' with an initializer
-list" and produces a CONVERSION ERROR.
-
-Discovered while writing a positive test for [temp.point] that used
-T{} as a generic zero producer.
+Per [expr.type.conv]/2 and [dcl.init.list]/3.10: a braced-init-list
+with no elements for a scalar type performs value-initialization
+(yielding zero).
