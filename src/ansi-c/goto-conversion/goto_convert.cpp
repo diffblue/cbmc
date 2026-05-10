@@ -19,6 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/fresh_symbol.h>
 #include <util/pointer_expr.h>
+#include <util/pointer_offset_size.h>
+#include <util/pointer_predicates.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/string_constant.h>
@@ -159,7 +161,8 @@ goto_convertt::build_declaration_hops(
 
   declaration_hop_instrumentationt instructions_to_add;
 
-  const auto flag = [&]() -> symbolt {
+  const auto flag = [&]() -> symbolt
+  {
     const auto existing_flag = label_flags.find(inputs.label);
     if(existing_flag != label_flags.end())
       return existing_flag->second;
@@ -179,7 +182,8 @@ goto_convertt::build_declaration_hops(
     instructions_to_add.emplace_back(
       program.instructions.begin(),
       goto_programt::make_decl(new_flag.symbol_expr(), label_location));
-    const auto make_clear_flag = [&]() -> goto_programt::instructiont {
+    const auto make_clear_flag = [&]() -> goto_programt::instructiont
+    {
       return goto_programt::make_assignment(
         new_flag.symbol_expr(), false_exprt{}, label_location);
     };
@@ -812,7 +816,8 @@ void goto_convertt::convert_frontend_decl(
 
   std::list<irep_idt> ref_bound_temporaries;
 
-  const goto_programt::targett declaration_iterator = [&]() {
+  const goto_programt::targett declaration_iterator = [&]()
+  {
     if(code.operands().size() == 1)
     {
       copy(code, DECL, dest);
@@ -1022,7 +1027,72 @@ void goto_convertt::convert_cpp_delete(const codet &code, goto_programt &dest)
   {
     if(code.get_statement() == ID_cpp_delete_array)
     {
-      // build loop
+      // Per [expr.delete]/6: for an array delete-expression with N
+      // elements, the destructor is invoked on each element.  Expand
+      // the per-element destructor into a loop.  N is derived from
+      // the pointer's object size divided by sizeof(T).
+      const typet &pointer_type_ = tmp_op.type();
+      const typet &element_type = to_pointer_type(pointer_type_).base_type();
+
+      const exprt size_type_zero = from_integer(0, size_type());
+      const auto size_of_opt = size_of_expr(element_type, ns);
+      if(!size_of_opt.has_value())
+      {
+        error().source_location = code.find_source_location();
+        error() << "cannot compute sizeof element type for delete[]" << eom;
+        throw 0;
+      }
+
+      // count = object_size(ptr) / sizeof(T)
+      exprt count = div_exprt(
+        object_size(tmp_op),
+        typecast_exprt::conditional_cast(size_of_opt.value(), size_type()));
+
+      const symbolt &index_symbol = get_fresh_aux_symbol(
+        size_type(),
+        tmp_symbol_prefix,
+        "delete_array_index",
+        code.find_source_location(),
+        ID_cpp,
+        symbol_table);
+      const symbol_exprt index_expr = index_symbol.symbol_expr();
+
+      dest.add(goto_programt::make_decl(index_expr, code.source_location()));
+      dest.add(goto_programt::make_assignment(
+        index_expr, from_integer(0, size_type()), code.source_location()));
+
+      goto_programt loop;
+      goto_programt::targett loop_top =
+        loop.add(goto_programt::make_skip(code.source_location()));
+
+      auto cond_goto = goto_programt::make_incomplete_goto(
+        binary_relation_exprt{index_expr, ID_ge, count},
+        code.source_location());
+      goto_programt::targett cond = loop.add(std::move(cond_goto));
+
+      const plus_exprt element_address{
+        typecast_exprt::conditional_cast(tmp_op, pointer_type(element_type)),
+        index_expr};
+      const dereference_exprt element_deref{element_address, element_type};
+
+      codet tmp_code = to_code(destructor);
+      replace_new_object(element_deref, tmp_code);
+      convert(tmp_code, loop, ID_cpp);
+
+      loop.add(goto_programt::make_assignment(
+        index_expr,
+        plus_exprt{index_expr, from_integer(1, size_type())},
+        code.source_location()));
+      loop.add(goto_programt::make_goto(
+        loop_top, true_exprt{}, code.source_location()));
+
+      goto_programt::targett loop_end =
+        loop.add(goto_programt::make_skip(code.source_location()));
+
+      cond->complete_goto(loop_end);
+
+      dest.destructive_append(loop);
+      dest.add(goto_programt::make_dead(index_expr, code.source_location()));
     }
     else if(code.get_statement() == ID_cpp_delete)
     {
