@@ -84,8 +84,8 @@ with two multiplier circuits and an equality check. With the
 standard shift-and-add encoding, \cadical~\cite{biere2019cadical}
 times out after 120\,s. With our carry-save Comba encoding, it
 solves in 5.6\,s---a 21$\times$ speedup from changing only the
-encoding.\footnote{With \cbmc's algebraic pre-solver enabled (a
-companion paper~\cite{companion-algebraic}), commutativity benchmarks are solved in
+encoding.\footnote{With \cbmc's algebraic pre-solver enabled,
+commutativity benchmarks are solved in
 ${\sim}$5\,ms regardless of encoding. The numbers here are with
 the algebraic pre-solver disabled, isolating the encoding's
 contribution. In the deployed configuration, the encoding matters
@@ -121,10 +121,18 @@ solvers with solver-level proof analysis.
 Our contributions are:
 
 \begin{enumerate}
-\item \textbf{Proof-guided encoding methodology.} We demonstrate a
-  systematic approach: DRAT proof analysis $\to$ bottleneck
-  identification $\to$ encoding redesign $\to$ validation. This
-  produced \combacs and can be applied to other encoding problems
+\item \textbf{Proof-guided encoding design.} We apply DRAT
+  proof-trace analysis in a single encoding-design case
+  (standard Comba $\to$ \combacs), following the sequence
+  DRAT analysis $\to$ bottleneck identification $\to$
+  structural hypothesis $\to$ encoding redesign $\to$
+  cross-solver validation, and demonstrate the same analysis
+  lens retrospectively on three pre-existing encodings
+  (Booth, 4-bit blocks, sorting networks). We do not claim
+  the process is a general methodology on the basis of one
+  design case; we do claim it is reproducible, transferable to
+  similar encoding problems, and sufficient to explain both
+  successful and unsuccessful encodings
   (Section~\ref{sec:methodology}).
 
 \item \textbf{Carry propagation as the causal driver of CDCL
@@ -163,9 +171,8 @@ into two classes:
 Q(x,y)$, e.g., commutativity, hardware equivalence checking) and
 \emph{existential} queries ($\exists x, y.\; P(x,y) = c$, e.g.,
 factoring, overflow detection). Bit-blasting handles both but scales
-poorly with bit-width; algebraic techniques (treated in a companion
-paper~\cite{companion-algebraic}) handle universal queries
-efficiently but are not constructive
+poorly with bit-width; algebraic techniques handle universal
+queries efficiently but are not constructive
 for existential queries. This paper focuses on improving bit-blasting
 for both classes. The same techniques apply to division and remainder
 (encoding $a = b \cdot q + r$ with non-deterministic $q$, $r$
@@ -412,7 +419,7 @@ The proposed fix---\combacs---separates column reduction (first
 pass) from carry propagation (second pass), eliminating the
 inter-column dependency during the popcount phase. The validation
 step showed: 55\% smaller proofs, 74\% more unit propagation
-during search, and 2.6--71$\times$ speedup (Table~\ref{tab:proof})
+during search, and 2.6--71$\times$ speedup (Table~\ref{tab:allencodings})
 across four different SAT solvers.
 
 \paragraph{Retrospective analysis of known encodings.}
@@ -443,6 +450,10 @@ system closes the full proof-to-encoding cycle. We view our manual
 use of the methodology as preliminary evidence that the cycle is
 tractable; automating it is future work.
 
+\iffalse
+% Commented out pending peer-review feedback: the German reviewer's
+% interest in AI-assisted effort characterisation may surface this
+% again in the response-to-reviewers phase.
 \paragraph{Development effort.}
 The \combacs encoding, the six alternative encodings compared in
 Section~\ref{sec:alternative}, the adaptive heuristic, and the
@@ -465,6 +476,7 @@ reporting that Booth is faster on strength-reduction but slower on
 pure constant commutativity). We report these figures not as a
 contribution but as a data point for future methodological studies
 of AI-assisted encoding design.
+\fi
 
 \section{Carry-Save Comba Encoding}
 \label{sec:combacs}
@@ -543,14 +555,33 @@ is not the right optimisation target---propagation structure is.
 
 \subsection{Adaptive Encoding Selection}
 
-While popcount benefits commutativity checking (two identical-structure
-multiplications), it hurts problems with 3+ independent multiplications
-where BVE needs carry chains for cascading elimination. We measured
-that shift-add achieves 106\% BVE elimination on associativity
-problems---through resolution, BVE creates new variables that are
-themselves eliminated in subsequent rounds, so the cumulative count
-exceeds the original variable count---while carry-save encodings
-achieve only 58\%.
+The interaction between \combacs and inprocessing Bounded Variable
+Elimination is pattern-dependent, which motivates an adaptive
+rather than one-shot choice. We observe three distinct regimes
+for \combacs interacting with CDCL's BVE (as measured on
+\cadical):
+\begin{itemize}
+\item \emph{Two-multiplication commutativity pattern (BW$\leq$11).}
+Popcount intermediate variables are structurally aligned with
+the congruence-closure pairs \cadical identifies between the
+two multiplier circuits. BVE cleans up the matched pairs and
+\combacs benefits by large factors (up to 71$\times$, §\ref{sec:evaluation}).
+\item \emph{Three-or-more multiplication patterns (associativity,
+distributivity, matrix products).} These benefit from the
+carry-chain cascading that \emph{shift-add} exposes to BVE:
+shift-add achieves 106\% BVE elimination on associativity problems
+(through resolution, BVE creates new variables that are themselves
+eliminated in subsequent rounds, so the cumulative count exceeds
+the original variable count), while carry-save encodings achieve
+only 58\%.
+\item \emph{Wide single multiplication (BW$\geq$11).}
+Inprocessing BVE attempts to resolve away \combacs's popcount
+variables but produces longer resolvents than the originals; we
+measure 4--140\% overhead relative to BVE-disabled (Appendix~\ref{sec:bve}).
+The adaptive heuristic does not disable BVE at solver-level
+because the resulting residual benchmark is still faster with
+\combacs than with shift-add.
+\end{itemize}
 
 The adaptive heuristic makes a two-way decision per multiplication.
 It selects \emph{popcount} when the formula has $\leq$2 symbolic
@@ -563,10 +594,9 @@ exceeds 2, popcount is disabled globally. For constant multiplication
 with few partial products, \combacs falls back to Dadda-style
 carry-save reduction. The multiplication count threshold is
 insensitive: changing it from 2 to 1, 4, or 99 produces identical
-results because the Gr\"obner basis solver
-(the algebraic solver) subsumes the threshold's purpose for
-polynomial benchmarks, and non-polynomial benchmarks in our suite
-have $\leq$2 multiplications.
+results because CBMC's word-level algebraic pre-solver subsumes
+the threshold's purpose for polynomial benchmarks, and
+non-polynomial benchmarks in our suite have $\leq$2 multiplications.
 
 \paragraph{Ablation of the adaptive heuristic.}
 To validate the heuristic we ran three configurations on
@@ -630,6 +660,83 @@ during search. The increase in fixed variables means \combacs enables
 the solver to determine more variable values through unit propagation
 alone, reducing the search space. This confirms that column
 independence reduces inter-column reasoning in the proof.
+
+\subsection{Multi-Encoding as Hybrid Selection}
+\label{sec:multi-encoding}
+
+The adaptive heuristic above selects \emph{one} encoding per
+multiplication based on structural cues. A complementary strategy,
+useful when structural cues are ambiguous, is to present the solver
+with \emph{two} encodings of the same multiplication at once. We
+refer to this as \emph{multi-encoding}: both encodings share input
+and output bit-vectors but have disjoint internal variables, with
+bit-wise equality constraints tying the two output bit-vectors.
+The SAT formula then contains two parallel encodings whose clauses
+are free to interact during CDCL search. The intuition is that
+each additional encoding provides another structural handle; the
+risk is formula bloat and heuristic confusion between the
+alternatives.
+
+We implemented this as an extension of
+\texttt{bv\_utilst::unsigned\_multiplier}: it accepts a secondary
+encoding name in addition to the primary encoding flags, and
+emits both. We evaluated the mode on nine benchmarks
+(algebraic pre-solver disabled, \cadical, 60\,s timeout,
+6\,GB memory) with every combination of primary
+$\in \{$shift-add, \combacs, Booth, block4$\}$ and secondary
+$\in \{$none, shift-add, \combacs, Comba, Dadda, Booth,
+block4$\}$, for a total of 180 multi-encoding runs plus 36
+singleton baselines.
+
+\begin{table}[ht]
+\caption{Multi-encoding behaviour relative to singletons:
+  ``multi/min'' is the ratio of the multi-encoding time to the
+  faster of the two singletons; ``multi/max'' is the ratio to
+  the slower. A multi-encoding run that matches portfolio
+  behaviour has multi/min $\approx 1$ and multi/max $\ll 1$.
+  Median over 180 multi-encoding runs; T/O at 60\,s counted as
+  60\,s for all ratios.}
+\label{tab:multi-enc}
+\centering
+\begin{tabular}{lr}
+\toprule
+Statistic & Value \\
+\midrule
+Median multi / min(A, B) & 1.31$\times$ \\
+Geometric mean multi / min(A, B) & 1.23$\times$ \\
+Median multi / max(A, B) & 0.14$\times$ \\
+Multi within 1.25$\times$ of min(A, B) & 76/180 (42\%) \\
+Multi more than 1.5$\times$ slower than min(A, B) & 72/180 (40\%) \\
+Multi solved where one singleton timed out & 44/180 runs \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The outcome is \emph{portfolio-like}: multi-encoding behaves
+approximately as a free portfolio of the two singletons,
+paying about 30\% overhead (median) versus the best singleton
+but running on median 7$\times$ faster than the worse one.
+Notable rescues: on \texttt{comm\_11} shift-add alone times
+out, while \texttt{shift-add+combacs} solves in 0.66\,s; on
+\texttt{bf16\_mul\_comm\_v2} every combacs-containing pair
+inherits the combacs speed, whereas combinations that exclude
+combacs inherit the 22\,s shift-add baseline. On simple
+benchmarks the overhead is visible (\texttt{comm\_8}
+\texttt{block4} alone solves in 81\,ms; \texttt{block4+shift-add}
+multi takes 104\,ms, a 28\% penalty), and 40\% of multi runs are
+more than 1.5$\times$ slower than the better singleton, so
+multi-encoding is not a universally free lunch. The 44 rescue
+cases are counted against the faster of the two singletons; when
+both time out, neither the rescue count nor the ``within 1.25\%''
+count is incremented.
+
+Multi-encoding therefore complements the adaptive selection
+above: where adaptive selection commits to one encoding based on
+static pattern cues, multi-encoding lets CDCL's learning
+dynamically pick whichever encoding yields shorter proofs on
+a given run. It is a hybrid strategy that trades a modest
+constant-factor overhead for safer default behaviour when the
+best single encoding for a benchmark is unknown a priori.
 
 
 \section{Alternative Encodings}
@@ -700,10 +807,12 @@ benchmark strength\_chain\_16 (verifying three strength reductions
 simultaneously), Booth is 17$\times$ faster than shift-add.
 
 Proof analysis on strength\_chain\_16 supports this
-interpretation: Booth's DRAT proof is 277\,KB with 4,071
-conflicts, while shift-add produces ${\sim}$10\,MB of proof with
+interpretation: Booth's DRAT proof is 271\,KB with 4,071
+conflicts, while shift-add produces ${\sim}$3.3\,MB of proof with
 39,757 conflicts. The solver requires fundamentally less reasoning
-when the encoding aligns with the target circuit.
+when the encoding aligns with the target circuit. The proof-size
+comparison extends across all encodings in
+Table~\ref{tab:proof-sizes}.
 
 \begin{table}[ht]
 \caption{Six encodings on strength\_chain\_16 (\cadical).}
@@ -726,7 +835,7 @@ sortnet & 13,316 & 40,462 & 34,985 & 64,579 & 25M & 6.5s \\
 The broader lesson is that Booth's benefit depends on whether the
 benchmark structure matches Booth's own decomposition. This is
 consistent with our general finding
-(Section~\ref{sec:alternative} below): the optimal encoding
+(Table~\ref{tab:best} below): the optimal encoding
 depends on the problem structure, not on a single ``best
 encoding'' hierarchy.
 
@@ -808,78 +917,6 @@ the flag propagation is a small engineering change that we defer,
 but it means our FP results understate the differences among
 alternative encodings.
 
-\subsection{Multi-Encoding Combinations}
-\label{sec:multi-encoding}
-
-A natural question after establishing that no single encoding
-dominates is whether the solver can be given more than one
-encoding at once, sharing inputs and outputs. We implemented
-such a mode: \texttt{bv\_utilst::unsigned\_multiplier} accepts a
-secondary encoding name; when set, the multiplier emits both
-the primary encoding (selected by the existing flags) and the
-secondary encoding on the same input bit-vectors, and adds the
-bit-wise equality constraint between the two output bit-vectors.
-The SAT formula then contains two parallel encodings with
-disjoint internal variables and a shared interface. The
-intuition is that each additional encoding provides another
-structural handle; the risk is formula bloat and heuristic
-confusion between the two alternatives.
-
-We ran an ablation over nine benchmarks (algebraic pre-solver
-disabled, \cadical, 60\,s timeout, 6\,GB memory) with every
-combination of primary $\in \{$shift-add, \combacs, Booth,
-block4$\}$ and secondary $\in \{$none, shift-add, \combacs,
-Comba, Dadda, Booth, block4$\}$, for a total of 180 multi-encoding
-runs plus 36 singleton baselines.
-
-\begin{table}[ht]
-\caption{Multi-encoding behaviour relative to singletons:
-  ``multi/min'' is the ratio of the multi-encoding time to the
-  faster of the two singletons; ``multi/max'' is the ratio to
-  the slower. A multi-encoding run that matches portfolio
-  behaviour has multi/min $\approx 1$ and multi/max $\ll 1$.
-  Median over 180 multi-encoding runs; T/O at 60\,s counted as
-  60\,s.}
-\label{tab:multi-enc}
-\centering
-\begin{tabular}{lr}
-\toprule
-Statistic & Value \\
-\midrule
-Median multi / min(A, B) & 1.31$\times$ \\
-Geometric mean multi / min(A, B) & 1.23$\times$ \\
-Median multi / max(A, B) & 0.14$\times$ \\
-Multi within 1.25$\times$ of min(A, B) & 76/180 (42\%) \\
-Multi more than 1.5$\times$ slower than min(A, B) & 72/180 (40\%) \\
-Multi solved where one singleton timed out & 44/180 runs \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-The outcome is \emph{portfolio-like}: multi-encoding behaves
-approximately as a free portfolio of the two singletons,
-paying about 30\% overhead (median) versus the best singleton
-but running on median 7$\times$ faster than the worse one.
-Notable rescues: on \texttt{comm\_11} shift-add alone times
-out, while \texttt{shift-add+combacs} solves in 0.66\,s; on
-\texttt{bf16\_mul\_comm\_v2} every combacs-containing pair
-inherits the combacs speed, whereas combinations that exclude
-combacs inherit the 22\,s shift-add baseline. On simple
-benchmarks the overhead is visible (\texttt{comm\_8}
-\texttt{block4} alone solves in 81\,ms; \texttt{block4+shift-add}
-multi takes 104\,ms, a 28\% penalty), and 40\% of multi runs are
-more than 1.5$\times$ slower than the better singleton, so
-multi-encoding is not a universally free lunch.
-
-The practical implication: if a user does not know which
-encoding is best for a given benchmark family, a multi-encoding
-configuration provides a safer default than guessing a single
-encoding, at the cost of up to ${\sim}1.3\times$ overhead vs.\
-the optimal choice. For the adaptive encoding-selection
-heuristic in Section~\ref{sec:combacs}, multi-encoding offers
-a complementary strategy when pattern recognition is not
-reliable.
-
 \section{Evaluation}
 \label{sec:evaluation}
 
@@ -891,13 +928,20 @@ MiniSat-compatible API), \cryptominisat 5.11.21. We report median of
 noted, we use the g-only adder encoding (the new default; see
 Appendix~\ref{app:adders}).
 
-We evaluate on 36 QF\_BV benchmarks in five categories: algebraic
+We use three benchmark pools in this section, in order of
+increasing external validity: 36 custom QF\_BV benchmarks for
+the core ablations (Sections~\ref{sec:ablation}--\ref{sec:scaling}),
+extended to 44 with eight DSP datapath benchmarks
+(Section~\ref{sec:custom}), and a 66-benchmark stratified sample
+drawn from the SMT-COMP 2024 QF\_BV track
+(Section~\ref{sec:smt-comp}).
+
+The 36-benchmark core suite covers five categories: algebraic
 identities (commutativity, overflow, strength reduction: 15
 benchmarks), industrial workloads (MurmurHash3, Q15 DSP, keyed hash,
 division-by-constant: 6), matrix/MAC (trace, dot product
 commutativity: 4), division/FP (roundtrip, FP add/mul: 6), and
-factoring (SAT instances: 6). Where explicitly noted, we extend to
-44 benchmarks by adding eight DSP datapath benchmarks.
+factoring (SAT instances: 6).
 
 \subsection{Layer Ablation}
 \label{sec:ablation}
@@ -1001,7 +1045,7 @@ variable structure than standard Comba's immediate carry propagation.
 
 \paragraph{Context: algebraic pre-solver disabled.}
 The numbers in Table~\ref{tab:allencodings} are measured with the
-algebraic pre-solver (a companion paper~\cite{companion-algebraic}) disabled, which is the
+algebraic pre-solver disabled, which is the
 relevant comparison for evaluating the encoding itself. When the
 pre-solver is enabled---the current \cbmc default---all polynomial
 commutativity benchmarks (comm\_9, comm\_11, comm\_13) are solved
@@ -1127,6 +1171,7 @@ reliable comparison statistic. All claims in this paper could be
 restated in terms of proof sizes with the same conclusions.
 
 \subsection{Scaling}
+\label{sec:scaling}
 
 \begin{figure}[ht]
 \centering
@@ -1223,6 +1268,7 @@ unpredictable ranking---different encodings make different solutions
 easy to find.
 
 \subsection{Custom Benchmarks in SMT-LIB Format}
+\label{sec:custom}
 
 To assess external validity, we evaluate on 44 QF\_BV benchmarks in
 SMT-LIB format using \cbmc's \texttt{smt2\_solver} with \cadical.
@@ -1255,12 +1301,7 @@ Category & Benchmark & shift & default & Speedup \\
 \end{table}
 
 The ``default'' column uses the adaptive \combacs heuristic,
-which selects popcount or shift-add per multiplication. We also ran
-a wider configuration sweep: with \cbmc's smt2\_solver invoked on
-all 1728 = 36 benchmarks $\times$ 4 multiplier encodings $\times$ 3
-adder encodings $\times$ 4 SAT solvers, the solved count increased
-from 606/1728 (baseline) to 1320/1728 ($+$714 benchmarks) when
-enabling the adaptive \combacs and Gr\"obner pre-solver.
+which selects popcount or shift-add per multiplication.
 The adaptive heuristic (Section~\ref{sec:combacs}) and pre-scan
 eliminate all regressions except hw\_equiv\_12, where a single
 \texttt{bvmul} is compared against a manually-constructed shift-add
@@ -1452,7 +1493,7 @@ Song et al.~\cite{song2024equational} apply strong Gr\"obner bases
 over $\mathbb{Z}_{2^d}$ to the equational theory of bit-vectors.
 Algebraic techniques scale well with bit-width but are limited to
 universal queries over polynomial fragments; they are complementary
-to bit-blasting, which we treat in a companion paper~\cite{companion-algebraic}.
+to the bit-blasting approach of this paper.
 Clegg et al.~\cite{clegg1996groebner} proved the Gr\"obner proof
 system can be exponentially more powerful than resolution,
 providing theoretical justification for why algebraic approaches
