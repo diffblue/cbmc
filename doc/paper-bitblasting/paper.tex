@@ -1419,9 +1419,30 @@ a branching program (read-once BDD) that scans each strip
 in parallel; they note explicitly that current CDCL solvers
 do not find these short proofs and call it an important open
 problem to add the right guiding information to help them.
-Our work is in that direction: we engineer the encoding itself
-so that CDCL reaches the short proof efficiently, validated
-by empirical conflict-count and DRAT-size measurements.
+
+\paragraph{Escaping resolution hardness in CDCL.}
+Three complementary lines of work address the gap between
+existence of short proofs and CDCL's ability to find them.
+(i)~Encoding-level guidance---our approach---reshapes the
+initial formula so CDCL's standard heuristics reach short
+proofs. (ii)~Solver-level generalization to stronger proof
+systems: Danner's dissertation~\cite{danner2025sat} develops
+CDXCL, a CDCL generalization to XOR-OR-AND Normal Form
+(XNF) clauses that operates in the Res($\oplus$) proof
+system---equivalent to Itsykson and Sokolov's SRES---and
+that provably escapes Resolution lower bounds on Tseitin
+formulas and related XOR-rich instances.
+(iii)~Inprocessing-level reshaping: Pollitt et
+al.~\cite{pollitt2026factoring} revive Extended Resolution
+inside modern CDCL through CaDiCaL-ER (definition introduction
+during conflict analysis) and CaDiCaL-FX (bounded variable
+addition extended to XOR and ITE gate detection on learned
+clauses). They further give polynomial-size ER proofs for
+Tseitin formulas via XOR gate factorization followed by
+bounded variable elimination. Our encoding-selection work is
+orthogonal to both: we shape the CNF that is fed to CDCL,
+whereas CDXCL changes the proof system and CaDiCaL-FX
+reshapes clauses during search.
 
 \paragraph{Word-level solvers.}
 Niemetz et al.~\cite{niemetz2023bitwuzla} implement word-level
@@ -1479,7 +1500,14 @@ proofs guaranteed by~\cite{beame2019toward} without the encoding
 guidance we provide is an important open problem: a positive
 answer would make our encoding-selection layer unnecessary, a
 negative answer would strengthen the case for encoding-aware
-SAT solving.
+SAT solving. Recent work in two complementary directions---
+solver-level generalization to stronger proof systems
+(Danner~\cite{danner2025sat}, and work on CDCL with XOR reasoning
+that bidirectionally simulates Res($\oplus$)) and
+inprocessing-level definition introduction
+(Pollitt et al.~\cite{pollitt2026factoring})---suggests that the
+broader research programme is active and that encoding-level,
+solver-level, and inprocessing-level guidance can be combined.
 
 \paragraph{Declaration on Generative AI.}
 During preparation, the authors used Kiro (an AI coding assistant
