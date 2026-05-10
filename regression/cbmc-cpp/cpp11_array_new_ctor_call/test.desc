@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^EXIT=0$
@@ -7,10 +7,9 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-Documents a CBMC bug for [expr.new]/24 on array form:
-  counted *arr = new counted[3];
-should call counted::counted() three times, but CBMC neither calls
-the constructor nor (subsequently) the destructor under delete[].
-The array-new with braced-init-list also crashes with an invariant
-violation.  Discovered while writing the positive test for
-[expr.new].
+Per [expr.new]/24 and [expr.delete]/6: `new T[N]` runs T's default
+constructor N times, and `delete[] ptr` runs T's destructor N times.
+
+Previously CBMC's `cpp_new_initializer` and `convert_cpp_delete` each
+contained a "build loop" placeholder that did nothing.  This test
+verifies the implementations now match the standard.
