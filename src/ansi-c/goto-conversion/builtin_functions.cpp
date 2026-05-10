@@ -519,7 +519,75 @@ void goto_convertt::cpp_new_initializer(
   {
     if(rhs.get_statement() == "cpp_new[]")
     {
-      // build loop
+      // Per [expr.new]/24: for an array new-expression with N elements,
+      // the constructor is invoked on each element in turn.  Expand the
+      // per-element initializer into a loop over the N elements:
+      //
+      //   size_t __i = 0;
+      // top: if(__i >= count) goto done;
+      //   <initializer on *(lhs + __i)>
+      //   __i = __i + 1;
+      //   goto top;
+      // done:
+      const pointer_typet &ptr_type = to_pointer_type(rhs.type());
+      const typet &element_type = ptr_type.base_type();
+
+      exprt count = static_cast<const exprt &>(rhs.find(ID_size));
+      if(count.is_nil())
+        UNREACHABLE;
+
+      const typet count_type = count.type();
+
+      const symbolt &index_symbol = get_fresh_aux_symbol(
+        count_type,
+        tmp_symbol_prefix,
+        "new_array_index",
+        rhs.find_source_location(),
+        ID_cpp,
+        symbol_table);
+      const symbol_exprt index_expr = index_symbol.symbol_expr();
+
+      dest.add(goto_programt::make_decl(index_expr, rhs.source_location()));
+      dest.add(goto_programt::make_assignment(
+        index_expr, from_integer(0, count_type), rhs.source_location()));
+
+      // Pre-create the targets of the loop
+      goto_programt loop;
+      goto_programt::targett loop_top =
+        loop.add(goto_programt::make_skip(rhs.source_location()));
+
+      // condition: if(__i >= count) goto done
+      auto cond_goto = goto_programt::make_incomplete_goto(
+        binary_relation_exprt{index_expr, ID_ge, count}, rhs.source_location());
+      goto_programt::targett cond = loop.add(std::move(cond_goto));
+
+      // body: <initializer on *(lhs + __i)>
+      const plus_exprt element_address{
+        typecast_exprt::conditional_cast(lhs, pointer_type(element_type)),
+        index_expr};
+      const dereference_exprt element_deref{element_address, element_type};
+
+      exprt per_element = initializer;
+      replace_new_object(element_deref, per_element);
+      if(per_element.id() == ID_code)
+        convert(to_code(per_element), loop, ID_cpp);
+
+      // ++__i; goto loop_top
+      loop.add(goto_programt::make_assignment(
+        index_expr,
+        plus_exprt{index_expr, from_integer(1, count_type)},
+        rhs.source_location()));
+      loop.add(goto_programt::make_goto(
+        loop_top, true_exprt{}, rhs.source_location()));
+
+      goto_programt::targett loop_end =
+        loop.add(goto_programt::make_skip(rhs.source_location()));
+
+      // now rewire the conditional jump to loop_end
+      cond->complete_goto(loop_end);
+
+      dest.destructive_append(loop);
+      dest.add(goto_programt::make_dead(index_expr, rhs.source_location()));
     }
     else if(rhs.get_statement() == ID_cpp_new)
     {
