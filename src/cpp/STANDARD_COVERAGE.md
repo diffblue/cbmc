@@ -69,7 +69,7 @@ See section 4.4 above.
 | [expr.unary.noexcept] noexcept operator | ✅ | parse.cpp `rNoexceptExpr`, cpp_typecheck_expr.cpp | Builtins/literals, `noexcept`-declared functions, destructors recognised as noexcept; non-`noexcept` calls and throw-expressions as potentially-throwing | cpp11_noexcept_operator |
 | [expr.sizeof] sizeof | ✅ | parse.cpp `rSizeofExpr` | sizeof... for packs | |
 | [expr.alignof] alignof | ✅ | parse.cpp `rAlignofExpr` | | |
-| [expr.new] new expression | ⚠️ | parse.cpp `rNewExpr` | Non-array new correctly calls constructor; array new does NOT call element constructors and array new with braced-init-list crashes with an invariant violation | New*, cpp11_new_delete, cpp11_array_new_ctor_call (KNOWNBUG) |
+| [expr.new] new expression | ✅ | parse.cpp `rNewExpr`, builtin_functions.cpp `cpp_new_initializer`, goto_convert.cpp `convert_cpp_delete` | Non-array and array forms both call constructors/destructors per [expr.new]/24, [expr.delete]/6 | New*, cpp11_new_delete, cpp11_array_new_ctor_call |
 | [expr.delete] delete expression | ✅ | parse.cpp `rDeleteExpr` | | |
 | [expr.mul] multiplicative operators | ✅ | parse.cpp `rMultiplyExpr` | | |
 | [expr.add] additive operators | ✅ | parse.cpp `rAdditiveExpr` | | |
@@ -131,7 +131,7 @@ See section 4.4 above.
 |------|--------|----------|-------|-------|
 | [dcl.init.list] initializer grammar | ✅ | parse.cpp `rInitializeExpr` | | |
 | [dcl.init.list]/3.6 non-aggregate brace-init | ✅ | cpp_typecheck_code.cpp `typecheck_return` | Unwrap single-element initializer_list for non-POD | cpp11_brace_init_nonaggregate |
-| [dcl.init.list]/3.10 empty brace-init for scalar | ❌ | | T{} for int/double rejected with "cannot initialize ... with an initializer list" | cpp11_value_init_scalar_brace (KNOWNBUG) |
+| [dcl.init.list]/3.10 empty brace-init for scalar | ✅ | c_typecheck_initializer.cpp `do_initializer_list` | T{} for scalar produces zero via zero_initializer | cpp11_value_init_scalar_brace |
 | [dcl.init.ref]/5 rvalue ref binding | ✅ | cpp_typecheck_expr.cpp, cpp_typecheck_conversions.cpp | Explicit calls + derived-to-base; to_member preserved through address_arithmetic (symex_dereference.cpp) | cpp11_rvalue_ref_derived_to_base, cpp11_addrof_member_compare |
 
 ### 8.7 Linkage specifications [dcl.link]
@@ -400,5 +400,5 @@ See section 4.4 above.
 
 ---
 
-*Last updated: 2026-05-09*
+*Last updated: 2026-05-10*
 *Standard reference: N5008 (C++26 draft)*
