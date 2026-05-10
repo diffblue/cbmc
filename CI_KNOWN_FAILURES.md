@@ -25,10 +25,67 @@ re-triggered:
 * **`cpp_scope suppress_cache_invalidation` stale-lookup bug** —
   fixed in `b4f40b57b3`.  Affected class-scope lookups across
   both MSVC and libc++ (e.g. MSVC `_Iterator_base12::_Myproxy`).
-  Locally, the following MSVC preprocessed-header tests now pass
-  that previously failed: Vector1, cpp11_condition_variable_header,
-  cpp17_filesystem_basic, cpp17_filesystem_path_ops,
-  cpp17_mutex_basic, cpp17_thread_basic.
+* **Silent SFINAE for unassigned template args** — fixed in
+  `368b07d6ea`.  `cpp_typecheck::instantiate_template` emitted
+  `"internal error: template parameter without instance"` as a
+  hard error; per [temp.deduct]/8 it should be a silent
+  substitution failure.
+* **Per-member catch during template instantiation** — fixed in
+  `97f5d81455`.  Per [temp.inst]/11, a failed type-check of one
+  member should not abort processing of sibling members; added
+  try/catch around `convert_template_declaration` and
+  `typecheck_compound_declarator` inside class-body processing
+  when we are currently instantiating a template.
+
+### Preprocessed-header test results after these fixes
+
+Locally, against `/tmp/macos-pp-new/` and `/tmp/msvc-pp-new/`:
+
+* **macOS (Xcode 16.4 libc++)**: 5 of 7 preprocessed-header tests
+  now report VERIFICATION SUCCESSFUL on the CBMC output —
+  `Address_of_Method1`, `STL1`, `STL2`, `Vector1`,
+  `cpp11_vector_size`.  Only `cpp17_any_basic` and
+  `cpp20_coroutine_types` still fail (both for reasons outside the
+  basic_string cascade: `std::any` method bodies and libstdc++-
+  internal `std::__n4861` respectively).  Note: on the *real* CI
+  runner these tests still fail their test.desc assertion match
+  because `main()` doesn't reach the goto model — see "Remaining
+  work" below.
+* **MSVC (VC 14.44.35207)**: 12 of 26 preprocessed-header tests
+  now pass: Vector1, cpp11_condition_variable_header,
+  cpp11_shared_ptr, cpp17_filesystem_basic,
+  cpp17_filesystem_path_ops, cpp17_mutex_basic,
+  cpp17_numeric_basic, cpp17_shared_ptr, cpp17_string_view(_basic),
+  cpp17_thread_basic, cpp20_iostream_basic.
+
+### Remaining work (not yet fixed)
+
+The remaining MSVC and macOS failures all reduce to one deeper
+issue: **using an uninstantiated class template as the type of a
+data member or the underlying type of a typedef**.  Examples:
+
+* macOS libc++ `basic_string` — `typedef typename __alloc_traits::
+  pointer pointer;` fails because `allocator_traits<allocator<T>>`
+  isn't eagerly instantiated; after this typedef fails, sibling
+  typedefs (`__is_long`, `__fits_in_sso`, `npos`) also fail to
+  register in the instantiated class scope, and out-of-class
+  method bodies then emit `symbol 'pointer' is unknown`.  With the
+  per-member catch in place, errors no longer cascade, but the
+  member still doesn't register.
+* MSVC `atomic_flag::_Storage` — type is `atomic<long>` which is
+  a class template that hasn't been instantiated when
+  `atomic_flag` is elaborated; the data member declaration throws
+  during `typecheck_type(declaration.type())` (the type-check of
+  the declaration's *type* itself, before reaching
+  `typecheck_compound_declarator`).  Wrapping that call in a
+  try/catch makes the member name register but suppresses real
+  errors for 30+ regression tests.
+* MSVC `_Rebind_alloc_t` / `allocator_traits` deduction cycle —
+  same shape, deeper call graph.
+
+A proper fix needs eager instantiation of class templates used as
+data-member or typedef types during class-body elaboration, rather
+than the current lazy-on-use approach.
 
 The "Performance Benchmarking" job (perf-benchcomp) fails at the end of the
 AWS C Common comparison with exit code 1 on otherwise-successful metrics; by
