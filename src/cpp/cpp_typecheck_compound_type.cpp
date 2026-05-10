@@ -1188,10 +1188,6 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
 
   cpp_save_scopet saved_scope(cpp_scopes);
 
-  // Suppress cache invalidation during member processing.
-  bool old_suppress = cpp_scopet::suppress_cache_invalidation;
-  cpp_scopet::suppress_cache_invalidation = true;
-
   // enter scope of compound
   cpp_scopes.set_scope(symbol.name);
 
@@ -1688,12 +1684,6 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
       }
     }
   }
-
-  // Restore cache invalidation and invalidate once for all the
-  // members we inserted.
-  cpp_scopet::suppress_cache_invalidation = old_suppress;
-  if(compound_body_depth <= 1)
-    ++cpp_scopet::scope_generation;
 
   --compound_body_depth;
 }

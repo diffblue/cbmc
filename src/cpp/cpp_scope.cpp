@@ -222,4 +222,3 @@ bool cpp_scopet::contains(const irep_idt &base_name_to_lookup)
 {
   return !lookup(base_name_to_lookup, SCOPE_ONLY).empty();
 }
-bool cpp_scopet::suppress_cache_invalidation = false;

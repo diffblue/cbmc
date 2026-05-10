@@ -81,8 +81,7 @@ public:
 
   cpp_idt &insert(const irep_idt &_base_name)
   {
-    if(!suppress_cache_invalidation)
-      ++scope_generation;
+    ++scope_generation;
     cpp_id_mapt::iterator it =
       sub.insert(std::pair<irep_idt, cpp_idt>(_base_name, cpp_idt()));
     it->second.base_name = _base_name;
@@ -92,16 +91,12 @@ public:
 
   cpp_idt &insert(const cpp_idt &cpp_id)
   {
-    if(!suppress_cache_invalidation)
-      ++scope_generation;
+    ++scope_generation;
     cpp_id_mapt::iterator it =
       sub.insert(std::pair<irep_idt, cpp_idt>(cpp_id.base_name, cpp_id));
     it->second.set_parent(*this);
     return it->second;
   }
-
-  /// When true, insert() does not invalidate the lookup cache.
-  static bool suppress_cache_invalidation;
 
   bool contains(const irep_idt &base_name_to_lookup);
 
