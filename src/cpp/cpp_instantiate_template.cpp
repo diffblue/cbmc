@@ -1730,14 +1730,13 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
   bool specialization_given=specialization.is_not_nil();
 
-  // we should never get 'unassigned' here
+  // If specialization arguments still contain unassigned template
+  // parameters, this is a substitution failure during template
+  // instantiation (per [temp.deduct]).  Throw silently so that
+  // SFINAE and overload resolution can try other candidates
+  // instead of reporting a hard error.
   if(specialization_template_args.has_unassigned())
-  {
-    error().source_location = source_location;
-    error() << "internal error: template parameter without instance:\n"
-            << template_symbol.name << eom;
     throw 0;
-  }
   DATA_INVARIANT(
     !full_template_args.has_unassigned(), "should never get 'unassigned' here");
 
