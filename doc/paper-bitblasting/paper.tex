@@ -37,15 +37,19 @@ steps---and use these findings to redesign the encoding. This
 methodology produced \combacs, a carry-save Comba encoding that
 separates column reduction from carry propagation, achieving
 2.6--71$\times$ speedup across four SAT solvers. We further show
-that carry propagation is the dominant driver of SAT hardness
-for multiplication---not merely correlated with it. A controlled
-experiment holds the partial-product layout and accumulation
+that carry propagation is the dominant driver of CDCL search
+difficulty for multiplication on standard encodings---even though
+polynomial-size resolution refutations of commutativity provably
+exist~\cite{beame2019toward}. A controlled experiment holds the
+partial-product layout and accumulation
 topology fixed and varies only the accumulator (integer addition
-vs.\ GF(2) XOR): integer commutativity is at least
+vs.\ GF(2) XOR): on CaDiCaL, integer commutativity is at least
 $1000\times$ harder than GF(2) at bitwidth 12, and structural
 variations (sequential vs.\ parallel-tree accumulation) change
-running time by less than $5\times$. This establishes causation
-for the commutativity pattern on CaDiCaL. Comparing \combacs with pre-existing alternative
+running time by less than $5\times$. The gap is between
+\emph{existence} of short proofs and the ability of CDCL
+search to find them; we address it by engineering encodings
+that guide CDCL toward those proofs. Comparing \combacs with pre-existing alternative
 encodings (Booth radix-4, 4-bit blocks, sorting networks), we
 find that no single encoding dominates: Booth is 17$\times$ faster
 on strength-reduction benchmarks, while \combacs is 2$\times$
@@ -117,15 +121,20 @@ Our contributions are:
   produced \combacs and can be applied to other encoding problems
   (Section~\ref{sec:methodology}).
 
-\item \textbf{Carry propagation as the causal hardness driver.} We
-  combine a GF(2) comparison with a controlled five-variant
-  experiment holding topology fixed and varying only the
-  accumulator operator: integer multiplication is orders of
-  magnitude harder than GF(2) on structurally identical formulas
-  at BW$\geq$8, while topology variations change running time by
-  less than 5$\times$. This establishes causation for the
-  commutativity pattern on CaDiCaL
-  (Section~\ref{sec:hardness}).
+\item \textbf{Carry propagation as the causal driver of CDCL
+  search difficulty.} We combine a GF(2) comparison with a
+  controlled five-variant experiment holding topology fixed and
+  varying only the accumulator operator: on CaDiCaL, integer
+  multiplication is orders of magnitude harder than GF(2) on
+  structurally identical formulas at BW$\geq$8, while topology
+  variations change running time by less than 5$\times$. This
+  isolates the cause of the \emph{empirical} difficulty, rather
+  than of proof-theoretic hardness---Beame and Liew have shown
+  that polynomial-size regular resolution proofs of
+  commutativity exist for array, diagonal, and Booth
+  multipliers~\cite{beame2019toward}. The practical gap is
+  that CDCL does not find those proofs without encoding-level
+  guidance (Section~\ref{sec:hardness}).
 
 \item \textbf{Six-encoding comparison with solver statistics.} We
   evaluate shift-add, Dadda, Comba, \combacs, Booth radix-4, 4-bit
@@ -221,14 +230,32 @@ BW & Clauses & Conflicts & Time & Clauses & Conflicts & Time \\
 At BW=13, integer multiplication needs 23$\times$ more conflicts than
 GF(2) despite only 1.6$\times$ more clauses. Empirically, GF(2)
 conflict count grows roughly as $n^3$ (measured across BW=5--17);
-integer multiplication grows exponentially. DRAT proof analysis
+integer multiplication conflict count grows rapidly over the
+bit-widths we tested. DRAT proof analysis
 confirms: GF(2) proofs are 3.6--18$\times$ smaller.
 
-This is consistent with known exponential resolution lower bounds
-for related problems~\cite{haken1985intractability} and with Lv and
-Kalla's finding~\cite{lv2012galois} that GF($2^k$) multipliers
-(carry-free) are verifiable algebraically but intractable for SAT
-beyond 16 bits.
+\paragraph{The gap is between proof existence and CDCL search.}
+It is important to be clear about what this data does and does
+not mean. An influential line of work~\cite{beame2017towards,beame2019toward}
+proves that ring identities such as commutativity and
+distributivity on array, diagonal, and Booth multipliers admit
+\emph{polynomial-size regular resolution refutations}---the very
+proof system that CDCL solvers operate in. A slightly weaker
+quasi-polynomial bound is known for Wallace tree multipliers.
+The gap we observe is therefore not that short proofs do not
+exist, but that current CDCL solvers do not find them on the
+standard shift-add encoding. Beame and Liew themselves remark
+on this gap and call it an open engineering problem: ``the
+observed scaling of SAT solver performance on these problems
+suggests that they do not currently find proofs matching even
+these upper bounds. An important direction for improving SAT
+solvers is to find the right guiding information to add, either
+to the formulas derived from the circuits or to CDCL SAT solver
+heuristics, to help them find shorter proofs''~\cite{beame2019toward}.
+Our paper is squarely in the ``guiding information via encoding
+structure'' direction: we engineer encodings (\combacs, Booth,
+4-bit blocks) that let CDCL find the short proofs on instances
+where the standard shift-add encoding does not.
 
 \paragraph{From correlation to controlled experiment.}
 The integer-vs-GF(2) comparison above changes three things
@@ -275,8 +302,8 @@ BW & E0 int-seq & E1 GF(2)-seq & E2 int-par & E3 GF(2)-par & E4 int-tern. \\
 
 Four observations:
 
-\textbf{(1) Carry presence is the dominant causal factor.} At BW=8
-integer sequential takes 6.4\,s with 184K conflicts; GF(2)
+\textbf{(1) Carry presence dominates CDCL search difficulty.} At
+BW=8 integer sequential takes 6.4\,s with 184K conflicts; GF(2)
 sequential solves the \emph{structurally identical} formula in
 38\,ms with 2.9K conflicts---a 169$\times$ speedup and
 64$\times$ fewer conflicts on formulas that differ only in
@@ -299,19 +326,24 @@ isolate carry depth per step from carry depth overall.
 data.} The ordering shift-add $<$ Dadda $<$ Comba $<$ \combacs
 in Table~\ref{tab:allencodings} mirrors decreasing effective
 carry propagation depth, at constant partial-product count. Combined
-with C3, this supports the claim that carry propagation is
-\emph{the} dominant hardness driver for integer multiplication
-bit-blasting---no longer just a correlation.
+with the N2 experiment, this supports the claim that carry
+propagation is the dominant driver of \emph{CDCL search
+difficulty} for integer multiplication bit-blasting with
+standard encodings.
 
-\textbf{Scope of the claim.} The experiment establishes causation
-for the specific \emph{commutativity} pattern on CaDiCaL. We do
-not claim that carry propagation is the only hardness driver for
-all multiplication problems (e.g., factoring has different
-structure), nor that a formal proof-complexity lower bound
-follows---that remains open. What the data does establish is that
-on identical formulas differing only in carry vs.\ XOR
-accumulation, the integer case is orders of magnitude harder, and
-this gap dominates any structural variation we tested.
+\textbf{Scope of the claim.} The experiment establishes
+that, on commutativity and on CaDiCaL, carry presence
+dominates the choice of accumulation topology in determining
+CDCL running time. It does \emph{not} establish a proof-theoretic
+lower bound: Beame and Liew have shown that polynomial-size
+regular resolution proofs of commutativity exist for array,
+diagonal, and Booth multipliers~\cite{beame2019toward}, so the
+hardness we observe is CDCL-search-relative, not
+proof-complexity-absolute. Whether the difficulty is
+intrinsic to the current generation of CDCL heuristics, or
+whether better heuristics (or encoding-level guidance, as we
+explore in Section~\ref{sec:combacs}) can close the gap, is
+the engineering question Beame and Liew identify as open.
 
 
 \section{Proof-Driven Encoding Design}
@@ -1374,6 +1406,23 @@ adds variables that \emph{prevent} it.
 Encoding techniques for SAT have been studied
 extensively~\cite{tseitin1983complexity,plaisted1986structure}.
 
+\paragraph{Resolution upper bounds for ring identities.}
+Beame and Liew~\cite{beame2017towards,beame2019toward} refute
+an earlier conjecture that multiplier commutativity requires
+exponential-size resolution proofs: they give polynomial-size
+regular resolution proofs for any degree-2 ring identity
+(commutativity, distributivity) on array, diagonal, and Booth
+multipliers, and quasi-polynomial-size ($n^{O(\log n)}$) proofs
+for Wallace tree multipliers. Their construction splits the
+multiplier formula into narrow ``critical strips'' and uses
+a branching program (read-once BDD) that scans each strip
+in parallel; they note explicitly that current CDCL solvers
+do not find these short proofs and call it an important open
+problem to add the right guiding information to help them.
+Our work is in that direction: we engineer the encoding itself
+so that CDCL reaches the short proof efficiently, validated
+by empirical conflict-count and DRAT-size measurements.
+
 \paragraph{Word-level solvers.}
 Niemetz et al.~\cite{niemetz2023bitwuzla} implement word-level
 normalization in Bitwuzla that avoids bit-blasting for algebraic
@@ -1398,14 +1447,23 @@ of Booth radix-4 (up to 17$\times$ on strength-reduction benchmarks),
 blocks, and sorting networks.
 
 Our analysis establishes that carry propagation is the dominant
-driver of SAT hardness for integer multiplication commutativity,
-via a controlled experiment varying only the accumulator
-operator on identical partial-product layouts; structural
-variations change running time by less than $5\times$ while
-carry presence changes it by orders of magnitude. No single
-encoding dominates all problem classes. The optimal encoding
-depends on problem structure: commutativity benefits from congruence closure (\combacs),
-constant multiplication from fewer partial products (Booth), and
+driver of \emph{CDCL search difficulty} for integer multiplication
+commutativity on standard encodings, via a controlled experiment
+varying only the accumulator operator on identical partial-product
+layouts; structural variations change running time by less than
+$5\times$ while carry presence changes it by orders of magnitude.
+Beame and Liew~\cite{beame2019toward} have shown that
+polynomial-size regular resolution proofs of commutativity on
+array, diagonal, and Booth multipliers exist; our empirical
+result therefore establishes that the gap between \emph{provable
+existence} of short proofs and \emph{CDCL's ability to find them}
+is where the practical difficulty lies. The encoding choices we
+investigate can be understood as adding problem-specific
+guidance that helps CDCL find the short proofs that are known to
+exist. No single encoding dominates all problem classes. The
+optimal encoding depends on problem structure: commutativity
+benefits from congruence closure (\combacs), constant
+multiplication from fewer partial products (Booth), and
 circuit equivalence from structural matching (shift-add).
 
 Several directions remain open. First, the proof-guided methodology
@@ -1415,14 +1473,13 @@ we perform manually. Second, the encoding selection heuristic could
 be extended beyond multiplication count to consider deeper structural
 properties (symmetry, constant operands, comparison targets). Third,
 propagating encoding flags through the floating-point path would
-enable Booth and block4 to benefit FP verification. Fourth, while our
-controlled experiment establishes empirical causation of carry
-propagation for the commutativity pattern, a formal proof that
-integer multiplication commutativity requires exponential-size
-resolution proofs on standard encodings (with a corresponding
-polynomial proof for GF(2)) remains open and would upgrade our
-experimental result to a provable proof-complexity separation; a
-detailed research plan is included with the artifact.
+enable Booth and block4 to benefit FP verification. Fourth,
+whether CDCL heuristics can be steered to find the polynomial-size
+proofs guaranteed by~\cite{beame2019toward} without the encoding
+guidance we provide is an important open problem: a positive
+answer would make our encoding-selection layer unnecessary, a
+negative answer would strengthen the case for encoding-aware
+SAT solving.
 
 \paragraph{Declaration on Generative AI.}
 During preparation, the authors used Kiro (an AI coding assistant
