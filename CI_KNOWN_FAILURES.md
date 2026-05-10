@@ -22,6 +22,13 @@ re-triggered:
   `_Atomic_lock_acquire`) — fixed in `311dd6e68a`.
 * **Clang `__c11_atomic_*` intrinsics** (macOS libc++ `<atomic>`
   primitives) — declared in `e255c90e72`.
+* **`cpp_scope suppress_cache_invalidation` stale-lookup bug** —
+  fixed in `b4f40b57b3`.  Affected class-scope lookups across
+  both MSVC and libc++ (e.g. MSVC `_Iterator_base12::_Myproxy`).
+  Locally, the following MSVC preprocessed-header tests now pass
+  that previously failed: Vector1, cpp11_condition_variable_header,
+  cpp17_filesystem_basic, cpp17_filesystem_path_ops,
+  cpp17_mutex_basic, cpp17_thread_basic.
 
 The "Performance Benchmarking" job (perf-benchcomp) fails at the end of the
 AWS C Common comparison with exit code 1 on otherwise-successful metrics; by
