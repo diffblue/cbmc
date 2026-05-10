@@ -1420,6 +1420,12 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
 
   exprt &op = to_address_of_expr(expr).op();
 
+  // Per [expr.unary.op]/3: if the operand is a reference, &E produces
+  // the address of the referred object.  Implicitly dereference the
+  // reference first so the subsequent lvalue check passes.
+  if(is_reference(op.type()))
+    add_implicit_dereference(op);
+
   if(!op.get_bool(ID_C_lvalue) && expr.type().id()==ID_code)
   {
     error().source_location=expr.source_location();
