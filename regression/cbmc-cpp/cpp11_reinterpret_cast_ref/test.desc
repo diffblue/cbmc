@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+^.*address_of error.*not an lvalue$
+^.*bad reference initializer$
+--
+Per [expr.reinterpret.cast]/11 and [expr.unary.op]/3:
+reinterpret_cast<T&>(x) yields an lvalue to the same storage, and
+taking &<reference> yields the address of the referred-to object.
+The MSVC <atomic> _Atomic_lock_acquire pattern (`&reinterpret_cast<
+int&>(_Spinlock)`) tripped both of these.
