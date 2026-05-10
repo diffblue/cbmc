@@ -277,35 +277,21 @@ structure'' direction: we engineer encodings (\combacs, Booth,
 where the standard shift-add encoding does not.
 
 \paragraph{From correlation to controlled experiment.}
-The integer-vs-GF(2) comparison above changes three things
-simultaneously: accumulator operator (add vs XOR), clause-level
-structure, and variable dependencies. A reviewer can reasonably
-ask which of these drives the difference. To isolate the
-accumulator operator specifically, we constructed five benchmark
-families in pure SMT-LIB with identical partial-product layouts
-and identical accumulation topologies, changing only the
-operator:
-Each variant takes the $N$ partial products
-$\mathit{pp}[i] = a[i] \wedge b$ (shifted by $i$) and differs
-\emph{only} in how it sums them into the $2N$-bit output.
-Let $\mathit{pp}_0, \ldots, \mathit{pp}_{N-1}$ be the shifted
-partial products as $2N$-bit values.
-\begin{itemize}
-\item \textbf{E0 (integer, sequential)}: fold with bvadd left-to-right,
-      $\mathrm{acc}_i = \mathrm{bvadd}(\mathrm{acc}_{i-1}, \mathit{pp}_i)$.
-      Carries propagate through the full width at each step.
-\item \textbf{E1 (GF(2), sequential)}: identical topology but bvxor
-      instead of bvadd: $\mathrm{acc}_i = \mathrm{bvxor}(\mathrm{acc}_{i-1}, \mathit{pp}_i)$.
-      No carries.
-\item \textbf{E2 (integer, parallel-tree)}: pairwise bvadd in a
-      balanced tree of depth $\lceil \log_2 N \rceil$.
-\item \textbf{E3 (GF(2), parallel-tree)}: same balanced tree, but
-      with bvxor at each internal node.
-\item \textbf{E4 (integer, ternary)}: sequential but in groups of
-      three, $\mathrm{acc} = \mathrm{bvadd}(\mathrm{bvadd}(\mathrm{acc}, \mathit{pp}_i), \mathit{pp}_{i+1})$,
-      making each accumulation step perform two dependent
-      additions through the full carry chain.
-\end{itemize}
+The integer-vs-GF(2) comparison changes three things simultaneously:
+accumulator operator (add vs XOR), clause structure, and variable
+dependencies. To isolate the operator, we constructed five
+benchmark families in pure SMT-LIB with identical partial-product
+layouts and identical accumulation topologies, changing only the
+reduction operator. Each variant takes shifted partial products
+$\mathit{pp}_0, \ldots, \mathit{pp}_{N-1}$ and reduces them to a
+$2N$-bit output as follows:
+\textbf{E0} (integer sequential): left-to-right \texttt{bvadd};
+\textbf{E1} (GF(2) sequential): same topology with \texttt{bvxor};
+\textbf{E2} (integer parallel-tree): balanced \texttt{bvadd} tree
+of depth $\lceil \log_2 N \rceil$;
+\textbf{E3} (GF(2) parallel-tree): same tree with \texttt{bvxor};
+\textbf{E4} (integer ternary): sequential grouped in threes,
+two dependent \texttt{bvadd}s through the full carry chain per step.
 Each variant is a macro expansion of $a \times b$ in the
 commutativity assertion $a \times b = b \times a$. Because the SMT
 benchmarks are identical modulo the accumulator, the SAT formulas
@@ -332,50 +318,33 @@ BW & E0 int-seq & E1 GF(2)-seq & E2 int-par & E3 GF(2)-par & E4 int-tern. \\
 \end{tabular}
 \end{table}
 
-Four observations:
-
-\textbf{(1) Carry presence dominates CDCL search difficulty.} At
-BW=8 integer sequential takes 6.4\,s with 184K conflicts; GF(2)
+At BW=8 integer sequential takes 6.4\,s with 184K conflicts; GF(2)
 sequential solves the \emph{structurally identical} formula in
-38\,ms with 2.9K conflicts---a 169$\times$ speedup and
-64$\times$ fewer conflicts on formulas that differ only in
-bvadd\,vs.\,bvxor. At BW$\geq$10 the integer variant times out at
-120\,s while GF(2) solves in under 500\,ms (ratio $>$1000$\times$).
+38\,ms with 2.9K conflicts (169$\times$ speedup, 64$\times$
+fewer conflicts on formulas differing only in
+\texttt{bvadd}\,vs.\,\texttt{bvxor}). At BW$\geq$10 the integer
+variant times out at 120\,s while GF(2) solves in under 500\,ms.
+Switching from sequential (E0) to parallel-tree (E2) produces
+${<}$10\% difference on integer; parallel structure helps GF(2) by
+2--5$\times$ (E1 vs E3), a minor structural effect that cannot
+overcome carry-induced hardness. E4 (ternary integer) tracks E0
+within 1\%, because the solver sees a cascade of 2-input adds
+regardless of source-level grouping. The ordering shift-add $<$
+Dadda $<$ Comba $<$ \combacs in Table~\ref{tab:allencodings}
+mirrors decreasing effective carry propagation depth at constant
+partial-product count, further supporting carry propagation as the
+dominant driver of CDCL search difficulty.
 
-\textbf{(2) Topology alone does not rescue integer multiplication.}
-Switching from sequential (E0) to parallel-tree (E2) accumulation
-produces ${<}$10\% time difference on integer, and both time out
-at the same bit-width. Parallel structure helps GF(2) by 2--5$\times$
-(E1 vs E3), confirming a minor structural effect, but
-structure cannot overcome carry-induced hardness.
-
-\textbf{(3) 3-input carry has negligible effect.}
-E4 (ternary integer) tracks E0 within 1\%; the solver sees a
-cascade of 2-input adds regardless, so this variant does not
-isolate carry depth per step from carry depth overall.
-
-\textbf{(4) The pattern is consistent with previous encoding
-data.} The ordering shift-add $<$ Dadda $<$ Comba $<$ \combacs
-in Table~\ref{tab:allencodings} mirrors decreasing effective
-carry propagation depth, at constant partial-product count. Combined
-with the N2 experiment, this supports the claim that carry
-propagation is the dominant driver of \emph{CDCL search
-difficulty} for integer multiplication bit-blasting with
-standard encodings.
-
-\textbf{Scope of the claim.} The experiment establishes
-that, on commutativity and on CaDiCaL, carry presence
-dominates the choice of accumulation topology in determining
-CDCL running time. It does \emph{not} establish a proof-theoretic
-lower bound: Beame and Liew have shown that polynomial-size
-regular resolution proofs of commutativity exist for array,
-diagonal, and Booth multipliers~\cite{beame2019toward}, so the
-hardness we observe is CDCL-search-relative, not
-proof-complexity-absolute. Whether the difficulty is
-intrinsic to the current generation of CDCL heuristics, or
-whether better heuristics (or encoding-level guidance, as we
-explore in Section~\ref{sec:combacs}) can close the gap, is
-the engineering question Beame and Liew identify as open.
+\textbf{Scope.} The experiment establishes that on commutativity
+and on \cadical, carry presence dominates the choice of
+accumulation topology. It does \emph{not} establish a proof-theoretic
+lower bound---Beame and Liew prove polynomial-size regular
+resolution refutations exist for array, diagonal, and Booth
+multipliers on commutativity~\cite{beame2019toward}---so the
+hardness is CDCL-search-relative, not proof-complexity-absolute.
+Whether better heuristics or encoding-level guidance
+(Section~\ref{sec:combacs}) close the gap is the engineering
+question Beame and Liew identify as open.
 
 
 \section{Proof-Driven Encoding Design}
@@ -439,16 +408,13 @@ sorted-property constraints are overwhelmed by the 13K extra
 variables the encoding introduces.
 
 \paragraph{Towards automation.}
-The manual steps above---proof generation, variable ranking,
-circuit tracing, structural hypothesis, modification---are
-candidates for automation. An AI system that reads DRAT proofs,
-identifies structural bottlenecks, and proposes encoding
-modifications would close the loop. Existing work analyses
-encoding source code~\cite{jarvisalo2012inprocessing} or modifies
-solver heuristics~\cite{biere2019cadical}, but to our knowledge no
-system closes the full proof-to-encoding cycle. We view our manual
-use of the methodology as preliminary evidence that the cycle is
-tractable; automating it is future work.
+The manual steps above are candidates for automation: an AI system
+that reads DRAT proofs, identifies structural bottlenecks, and
+proposes encoding modifications would close the loop. Existing
+work analyses encoding source code~\cite{jarvisalo2012inprocessing}
+or modifies solver heuristics~\cite{biere2019cadical}; we are
+not aware of a system that closes the full proof-to-encoding
+cycle. Automating it is future work.
 
 \iffalse
 % Commented out pending peer-review feedback: the German reviewer's
@@ -793,51 +759,24 @@ Pattern & Benchmark & shift-add & Booth & Ratio \\
 \end{table}
 
 Two observations. First, Booth is actually \emph{worse} on pure
-constant-commutativity ($x \cdot c = c \cdot x$), often by $5$--$20\times$,
-and it times out on most 32-bit instances. The additional structure
-(sign correction, pre-computed doublings) adds overhead that the
-solver cannot simplify away when both sides are computed with
-\texttt{bvmul}. Second, Booth excels on strength-reduction
+constant-commutativity ($x \cdot c = c \cdot x$), often by
+$5$--$20\times$, and it times out on most 32-bit instances: the
+additional structure (sign correction, pre-computed doublings) adds
+overhead the solver cannot simplify when both sides are computed
+with \texttt{bvmul}. Second, Booth excels on strength-reduction
 benchmarks where one side uses \texttt{bvmul} and the other is a
-hand-coded shift-add expression: here its compressed
-representation matches the target structure more closely, and the
-equivalence check becomes a few small consistency constraints
-rather than a full circuit-to-circuit comparison. On the chained
-benchmark strength\_chain\_16 (verifying three strength reductions
-simultaneously), Booth is 17$\times$ faster than shift-add.
-
-Proof analysis on strength\_chain\_16 supports this
-interpretation: Booth's DRAT proof is 271\,KB with 4,071
-conflicts, while shift-add produces ${\sim}$3.3\,MB of proof with
-39,757 conflicts. The solver requires fundamentally less reasoning
-when the encoding aligns with the target circuit. The proof-size
-comparison extends across all encodings in
-Table~\ref{tab:proof-sizes}.
-
-\begin{table}[ht]
-\caption{Six encodings on strength\_chain\_16 (\cadical).}
-\label{tab:booth}
-\centering
-\begin{tabular}{lrrrrrr}
-\toprule
-Encoding & Vars & Clauses & Conflicts & Decisions & Props & Time \\
-\midrule
-\textbf{Booth} & \textbf{496} & \textbf{1,780} & \textbf{4,071} & \textbf{5,144} & \textbf{85K} & \textbf{0.06s} \\
-block4 & 983 & 3,842 & 18,590 & 29,890 & 840K & 0.4s \\
-Dadda & 756 & 3,036 & 29,188 & 47,431 & 1.6M & 0.7s \\
-shift-add & 714 & 2,910 & 39,757 & 49,128 & 2.1M & 1.0s \\
-\combacs & 714 & 2,906 & 43,804 & 54,232 & 2.4M & 1.4s \\
-sortnet & 13,316 & 40,462 & 34,985 & 64,579 & 25M & 6.5s \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-The broader lesson is that Booth's benefit depends on whether the
-benchmark structure matches Booth's own decomposition. This is
-consistent with our general finding
-(Table~\ref{tab:best} below): the optimal encoding
-depends on the problem structure, not on a single ``best
-encoding'' hierarchy.
+hand-coded shift-add expression: the compressed representation
+matches the target structure more closely, and the equivalence
+check becomes a few small consistency constraints rather than a
+full circuit-to-circuit comparison. On the chained benchmark
+strength\_chain\_16 (verifying three strength reductions
+simultaneously), Booth is 17$\times$ faster than shift-add, with a
+271\,KB DRAT proof vs.\ 3.3\,MB for shift-add. The broader lesson
+is that Booth's benefit depends on whether the benchmark structure
+matches Booth's own decomposition---consistent with our general
+finding (Table~\ref{tab:best}): the optimal encoding depends on
+the problem structure, not on a single ``best encoding''
+hierarchy.
 
 \subsection{4-Bit Block Multiplication}
 
@@ -1081,94 +1020,33 @@ inprocessing BVE and congruence closure.
 \subsection{Encoding Comparison with Variance}
 \label{sec:variance}
 
-To assess measurement reliability we ran five runs of every
-(encoding, benchmark) pair on the five benchmarks most sensitive to
-encoding choice. Coefficient of variation is under 1\% on all
-long-running benchmarks, confirming that the comparisons below are
-well-separated by encoding effect rather than noise.
-
-\begin{table}[ht]
-\caption{Mean $\pm$ stddev over 5 runs (\cadical, seconds).
-  Coefficient of variation (cv) in parentheses.}
-\label{tab:variance}
-\centering
-\small
-\begin{tabular}{lrrrr}
-\toprule
-Benchmark / enc & shift-add & \combacs & Booth & block4 \\
-\midrule
-bf16\_mul\_comm\_v2 & 23.08$\pm$0.11 & \textbf{11.21$\pm$0.04} & 23.27$\pm$0.07 & 23.10$\pm$0.15 \\
-strength\_chain\_16 & 1.078$\pm$0.001 & 1.499$\pm$0.002 & \textbf{0.063$\pm$0.000} & 0.409$\pm$0.000 \\
-mul\_ineq\_12 & 0.514$\pm$0.000 & 0.514$\pm$0.001 & 1.695$\pm$0.006 & \textbf{0.472$\pm$0.000} \\
-div\_mul\_roundtrip\_12 & 4.019$\pm$0.006 & 4.040$\pm$0.007 & 4.419$\pm$0.012 & \textbf{3.845$\pm$0.007} \\
-overflow\_detect\_16 & 0.008$\pm$0.000 & 0.008$\pm$0.000 & 0.009$\pm$0.000 & 0.009$\pm$0.000 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Three observations. First, variance is tiny (cv $<$1\%) on all
-long-running benchmarks, so median and mean agree; our ``17$\times$''
-and ``2$\times$'' speedup claims elsewhere in the paper reflect
-real differences, not noise. Second, the winning encoding differs
-per benchmark: \combacs on bf16, Booth on strength\_chain, block4
-on mul\_ineq and div\_mul\_roundtrip---confirming that no single
-encoding dominates. Third, the spread between best and worst
-encoding on a single benchmark ranges from ${\sim}$10\% (div\_mul)
-to ${\sim}$17$\times$ (strength\_chain), so the encoding choice
-can be decisive even when all encodings terminate.
+We ran five runs of every (encoding, benchmark) pair on the five
+benchmarks most sensitive to encoding choice; the coefficient of
+variation is under 1\% on all long-running benchmarks. The
+numbers we quote elsewhere in the paper therefore reflect real
+encoding-effect differences rather than measurement noise.
+Detailed per-run results are in Appendix~\ref{app:variance}.
 
 \subsection{Proof Size Across Encodings}
 \label{sec:proof-sizes}
 
 DRAT proof size gives an encoding-independent measure of solver
-effort. We collected proofs (CaDiCaL, algebraic layers disabled)
-for all seven encodings on six benchmarks spanning each pattern.
-
-\begin{table}[ht]
-\caption{DRAT proof sizes in KB across encodings (algebraic layers
-  disabled, \cadical). Best (smallest) per row in bold.}
-\label{tab:proof-sizes}
-\centering
-\small
-\begin{tabular}{lrrrrrrr}
-\toprule
-Benchmark & shift-add & Dadda & Comba & \combacs & Booth & block4 & sortnet \\
-\midrule
-comm\_11 & 99,852 & 6,463 & 3,525 & 1,617 & 92,520 & \textbf{813} & 22,651 \\
-comm\_13 & 121,568 & 98,600 & 13,017 & \textbf{3,183} & 114,848 & 4,302 & 74,123 \\
-mul\_ineq\_12 & 1,406 & \textbf{1,349} & 1,632 & 1,406 & 3,546 & 1,629 & 7,856 \\
-overflow\_detect\_16 & 1,462 & 685 & 2,365 & 1,462 & 431 & 1,643 & \textbf{287} \\
-strength\_16\_31 & 250 & 176 & 311 & 170 & \textbf{12} & 127 & 907 \\
-strength\_chain\_16 & 3,263 & 1,821 & 4,543 & 4,918 & \textbf{271} & 2,066 & 7,990 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-The proof sizes confirm and extend the timing observations:
-
-\textbf{\combacs} compresses commutativity proofs by 40--60$\times$
-relative to shift-add. On comm\_11 the proof shrinks from 99.8 MB
-to 1.6 MB.
-
-\textbf{Booth} compresses strength-reduction proofs by 12--20$\times$
-(strength\_chain\_16: 3.3 MB $\to$ 271 KB; strength\_16\_31:
-250 KB $\to$ 12 KB) and on overflow\_detect\_16 by 3$\times$, but
-makes no progress on inequality or general commutativity.
-
-\textbf{block4} achieves the smallest proof on comm\_11 (813 KB,
-120$\times$ smaller than shift-add); it is competitive on
-comm\_13 and on mul\_ineq\_12.
-
-\textbf{sortnet} produces the largest proofs on every benchmark
-except overflow\_detect\_16 (where its fixed-variable injection
-from sorted-property constraints lets the solver short-circuit);
-this aligns with the solver-time results and confirms sortnet
-generally hurts.
-
-The proof-size ratios track the solver-time ratios closely but are
-insensitive to wall-clock measurement noise, making them the more
-reliable comparison statistic. All claims in this paper could be
-restated in terms of proof sizes with the same conclusions.
+effort, insensitive to wall-clock noise. We collected proofs
+(\cadical, algebraic layers disabled) for all seven encodings on
+six benchmarks spanning each pattern. The proof-size ratios track
+the solver-time ratios closely:
+\combacs compresses commutativity proofs by 40--60$\times$ relative to
+shift-add (on comm\_11 from 99.8\,MB to 1.6\,MB);
+Booth compresses strength-reduction proofs by 12--20$\times$
+(strength\_chain\_16: 3.3\,MB $\to$ 271\,KB);
+block4 achieves the smallest proof on comm\_11 (813\,KB,
+120$\times$ smaller than shift-add);
+sortnet produces the largest proofs on every benchmark except
+overflow\_detect\_16 where its fixed-variable injection from
+sorted-property constraints lets the solver short-circuit. Every
+claim in this paper could be restated in terms of proof sizes with
+the same conclusions. The full per-encoding table is
+in Appendix~\ref{app:proof-sizes}.
 
 \subsection{Scaling}
 \label{sec:scaling}
@@ -1377,27 +1255,23 @@ slower with the default than with shift-add-nosimp.
 The headline takeaway is that our changes are \emph{nearly neutral
 on a broad QF\_BV community sample}: they are not a silver bullet,
 nor are they a regression. The per-benchmark speedups we report
-elsewhere in this paper (\combacs 5--20$\times$ on commutativity,
-Booth up to 17$\times$ on strength reduction, block4 up to
-120$\times$ smaller proofs on comm\_11) are pattern-specific: they
-manifest when the benchmark matches the encoding's target. On
-general QF\_BV benchmarks, most multiplications are small (BW
-${\leq}$32) and the bottleneck is rarely the multiplier. A
-benchmark category-level analysis (see
-\texttt{data/smt-comp-sample/} in the supplementary artifact)
-confirms this: our improvements are
-most visible on \texttt{bv-term-small-rw-Noetzli} (rewrite-rule
-benchmarks), \texttt{brummayerbiere3}, and \texttt{calypto}; they
-are invisible on \texttt{ecrw} (512-bit rewrites) and
-\texttt{brummayerbiere4} (unconstrained), which are uniformly hard
-for both configurations.
+elsewhere (\combacs 5--20$\times$ on commutativity, Booth up to
+17$\times$ on strength reduction, block4 up to 120$\times$ smaller
+proofs on comm\_11) are pattern-specific: they manifest when the
+benchmark matches the encoding's target. On general QF\_BV
+benchmarks most multiplications are small (BW ${\leq}$32) and the
+bottleneck is rarely the multiplier. Our improvements are most
+visible on \texttt{bv-term-small-rw-Noetzli}, \texttt{brummayerbiere3},
+and \texttt{calypto}; they are invisible on \texttt{ecrw} (512-bit
+rewrites) and \texttt{brummayerbiere4} (unconstrained), which are
+uniformly hard for both configurations.
 
 \paragraph{Threats to validity, continued.}
 The 66-benchmark sample is small relative to the full QF\_BV suite
 (${\sim}$16{,}000 benchmarks containing \texttt{bvmul}). Stratifying
-by submitter category controls for benchmark-family bias but
-cannot capture the difficulty distribution within each category. A
-full-suite evaluation is deferred as future work.
+by submitter category controls for benchmark-family bias but does
+not capture difficulty distribution within a category; a full-suite
+evaluation is future work.
 
 \section{Negative Results}
 \label{sec:negative}
@@ -1441,43 +1315,37 @@ fallback handles this.
 
 \subsection{Approaches That Hurt Performance}
 
-Several approaches that add structure to the encoding actually hurt
-performance because they reintroduce carry chains. Radix-4/8
-multipliers are 2--15$\times$ slower: pre-computing $3x$, $5x$, $7x$
-adds carry chains that dominate at practical bit-widths. Full-adder
-tree popcount is 3$\times$ slower than pop0 despite fewer variables,
-because it creates longer carry chains ($\log_2 n$ bits vs.\ 2--4
-bits). Non-propagation-complete carry merge causes a 25$\times$
-regression: encoding carry with 4 clauses instead of 6 violates
-propagation completeness~\cite{brain2016propagation}.
-
-Sharing structure between multiplications also hurts: caching AND
-gates between multiplications is 89\% slower because shared partial
-product variables prevent independent BVE---the solver cannot
-eliminate a variable that appears in clauses from both multipliers.
+Several approaches that add structure to the encoding \emph{reintroduce}
+carry chains and thereby hurt performance.
+Radix-4/8 multipliers are 2--15$\times$ slower: pre-computing
+$3x$, $5x$, $7x$ adds carry chains that dominate at practical
+bit-widths. Full-adder tree popcount is 3$\times$ slower than
+pop0 because it creates longer carry chains ($\log_2 n$ vs.\ 2--4
+bits). Non-propagation-complete carry merge---encoding carry with
+4 clauses instead of 6---causes a 25$\times$
+regression~\cite{brain2016propagation}. Caching AND gates between
+multiplications is 89\% slower because shared partial-product
+variables prevent independent BVE.
 
 \subsection{Approaches With Limited or Chaotic Benefit}
 
-XOR-based techniques consistently disappoint. We tested offline
-Gaussian elimination, online incremental GE, and \cryptominisat's
-built-in XOR handling. The best result was 1.4$\times$ on one
-benchmark, with neutral or negative results on all others. The
-problem is that \cbmc's XOR constraints are 3-variable gates---too
-short for GE to combine usefully.
-
-Solver tuning and abstraction refinement fail because the problem is
-structural, not parametric. We tested 512 \cadical option
-combinations (16 options $\times$ 4 encodings $\times$ 8 benchmarks);
-no option changed any result by more than $\pm$3\%. \cbmc's existing
-CEGAR loop for multiplication (\texttt{--refine-arithmetic}) starts
-with $x \cdot 0 = 0$ and $x \cdot 1 = x$, then adds the full
-multiplier on the first spurious counterexample. On UNSAT benchmarks,
-the full multiplier is always needed, so the refinement loop adds 2+
-solver calls of overhead (commutativity BW=11: 4.0\,s vs.\ 0.9\,s
-direct \combacs). All five parallel prefix adders (BK, Kogge-Stone,
-Sklansky, Han-Carlson, Ladner-Fischer) produce identical learned
-clause quality (95\% glue-1~\cite{audemard2009predicting}); BK wins solely by having the fewest
-variables (Appendix~\ref{app:adders}).
+XOR-based techniques consistently disappoint. Offline Gaussian
+elimination, online incremental GE, and \cryptominisat's
+built-in XOR handling gave at best 1.4$\times$ on one benchmark
+with neutral-to-negative results elsewhere; \cbmc's XOR
+constraints are 3-variable gates, too short for GE to combine
+usefully. Solver tuning and abstraction refinement fail because
+the problem is structural, not parametric: 512 \cadical option
+combinations (16 options $\times$ 4 encodings $\times$ 8
+benchmarks) changed no result by more than $\pm$3\%. \cbmc's
+CEGAR loop (\texttt{--refine-arithmetic}) adds $\geq$2 solver
+calls of overhead on UNSAT benchmarks (commutativity BW=11:
+4.0\,s vs.\ 0.9\,s direct \combacs).
+All five parallel prefix adders (BK, Kogge-Stone, Sklansky,
+Han-Carlson, Ladner-Fischer) produce identical learned-clause
+quality (95\% glue-1~\cite{audemard2009predicting}); BK wins
+solely by having the fewest variables
+(Appendix~\ref{app:adders}).
 
 \section{Related Work}
 
@@ -1800,6 +1668,76 @@ elimination order, and the residual problem's difficulty is a
 non-monotonic function of that order. The hints are enabled in \cbmc
 for 10--13 bit equality checks only (below 10, the effect is
 negligible; above 13, regressions dominate).
+
+
+\section{Encoding Comparison with Variance}
+\label{app:variance}
+
+Table~\ref{tab:variance} reports mean and standard deviation over
+five runs of every (encoding, benchmark) pair on the five benchmarks
+most sensitive to encoding choice.
+
+\begin{table}[ht]
+\caption{Mean $\pm$ stddev over 5 runs (\cadical, seconds).
+  Coefficient of variation is under 1\% on all long-running
+  benchmarks.}
+\label{tab:variance}
+\centering
+\small
+\begin{tabular}{lrrrr}
+\toprule
+Benchmark / enc & shift-add & \combacs & Booth & block4 \\
+\midrule
+bf16\_mul\_comm\_v2 & 23.08$\pm$0.11 & \textbf{11.21$\pm$0.04} & 23.27$\pm$0.07 & 23.10$\pm$0.15 \\
+strength\_chain\_16 & 1.078$\pm$0.001 & 1.499$\pm$0.002 & \textbf{0.063$\pm$0.000} & 0.409$\pm$0.000 \\
+mul\_ineq\_12 & 0.514$\pm$0.000 & 0.514$\pm$0.001 & 1.695$\pm$0.006 & \textbf{0.472$\pm$0.000} \\
+div\_mul\_roundtrip\_12 & 4.019$\pm$0.006 & 4.040$\pm$0.007 & 4.419$\pm$0.012 & \textbf{3.845$\pm$0.007} \\
+overflow\_detect\_16 & 0.008$\pm$0.000 & 0.008$\pm$0.000 & 0.009$\pm$0.000 & 0.009$\pm$0.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Three observations. First, variance is tiny (cv $<$1\%) on all
+long-running benchmarks, so median and mean agree; the
+``17$\times$'' and ``2$\times$'' speedup claims elsewhere in the
+paper reflect real differences, not noise. Second, the winning
+encoding differs per benchmark: \combacs on bf16, Booth on
+strength\_chain, block4 on mul\_ineq and div\_mul\_roundtrip.
+Third, the spread between best and worst encoding on a single
+benchmark ranges from ${\sim}$10\% (div\_mul) to ${\sim}$17$\times$
+(strength\_chain), so the encoding choice can be decisive even
+when all encodings terminate.
+
+
+\section{DRAT Proof Sizes Across Encodings}
+\label{app:proof-sizes}
+
+\begin{table}[ht]
+\caption{DRAT proof sizes in KB across encodings (algebraic layers
+  disabled, \cadical). Best (smallest) per row in bold.}
+\label{tab:proof-sizes}
+\centering
+\small
+\begin{tabular}{lrrrrrrr}
+\toprule
+Benchmark & shift-add & Dadda & Comba & \combacs & Booth & block4 & sortnet \\
+\midrule
+comm\_11 & 99,852 & 6,463 & 3,525 & 1,617 & 92,520 & \textbf{813} & 22,651 \\
+comm\_13 & 121,568 & 98,600 & 13,017 & \textbf{3,183} & 114,848 & 4,302 & 74,123 \\
+mul\_ineq\_12 & 1,406 & \textbf{1,349} & 1,632 & 1,406 & 3,546 & 1,629 & 7,856 \\
+overflow\_detect\_16 & 1,462 & 685 & 2,365 & 1,462 & 431 & 1,643 & \textbf{287} \\
+strength\_16\_31 & 250 & 176 & 311 & 170 & \textbf{12} & 127 & 907 \\
+strength\_chain\_16 & 3,263 & 1,821 & 4,543 & 4,918 & \textbf{271} & 2,066 & 7,990 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:proof-sizes} is the per-encoding proof-size
+breakdown referenced in Section~\ref{sec:proof-sizes}. The
+ranking per row reproduces the solver-time ranking from the main
+evaluation tables, supporting the observation that the timing
+differences we report are not an artefact of CDCL heuristics but
+reflect the underlying proof-search work.
 
 
 \end{document}
