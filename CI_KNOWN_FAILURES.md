@@ -10,6 +10,19 @@ See [the CI run index](
 https://github.com/diffblue/cbmc/actions/runs/25620772992) for the source
 logs.
 
+### Progress since ac830e7ef6
+
+The following issues have already been addressed on this branch
+*after* the CI snapshot above.  They will be reflected once CI is
+re-triggered:
+
+* **Array member initializer `: _Buf() {}`** (MSVC `<xstring>` SSO
+  buffer) — fixed in `b10e77f534`.
+* **`reinterpret_cast<T&>(x)` and `&reference`** (MSVC `<atomic>`
+  `_Atomic_lock_acquire`) — fixed in `311dd6e68a`.
+* **Clang `__c11_atomic_*` intrinsics** (macOS libc++ `<atomic>`
+  primitives) — declared in `e255c90e72`.
+
 The "Performance Benchmarking" job (perf-benchcomp) fails at the end of the
 AWS C Common comparison with exit code 1 on otherwise-successful metrics; by
 agreement with the branch owner it is tracked separately and not part of this
@@ -184,13 +197,25 @@ need a matching `gcc<15` or `libstdc++<15` exclusion **or** a fix.
 
 ## Summary of forthcoming work (rough ordering)
 
-1. **Small**: Stub `_Atomic_lock_acquire`/`_Atomic_*` MSVC intrinsics
-   — unlocks `cpp11_condition_variable_header`, `cpp11_future_header`,
-   `cpp17_mutex_basic`.
-2. **Small**: Handle empty-pack deduction cascade under earlier SFINAE
-   failure — unlocks macOS `Vector1`, `cpp11_vector_size`.
-3. **Medium**: MSVC `<xstring>` SSO direct-array assignment — unlocks
-   `cpp17_filesystem_{basic,path_ops}`, part of `cpp11_map_insert`.
+1. **Small (DONE)**: Stub `__c11_atomic_*` intrinsics for libc++ and
+   `_Atomic_lock_acquire`/array-member-init for MSVC `<xstring>` —
+   fixed in b10e77f534, 311dd6e68a, e255c90e72.
+2. **Medium**: Deep out-of-class template-member-scope lookup: both
+   macOS `basic_string::operator=` (`pointer`, `__is_long`, `npos`,
+   `__fits_in_sso`) and MSVC `_Iterator_base12::operator=` (`_Myproxy`)
+   and `atomic_flag::test_and_set` (`_Storage`) fail with
+   `"symbol 'X' is unknown"`.  CBMC's class-scope lookup for unqualified
+   identifiers inside a template-member-function body defined outside
+   the class does not find members that are declared later in the
+   class or come from dependent base classes.  Both platforms share
+   this root cause.  A minimal reproducer that reliably breaks would
+   speed up the fix substantially.
+3. **Medium**: SFINAE `enable_if_t<V, int> = 0` with uninstantiated
+   value template parameter — see MSVC `system_error:174` and libc++
+   `error_code.h:55` ("instantiating 'std::enable_if_t' with <FALSE,
+   signed int>").  Value-template-parameter evaluation during
+   deduction needs to produce the actual bool, not FALSE as a
+   fallback.
 4. **Medium**: libstdc++ 15 struct-wrapped-integer implicit conversions
    — unlocks `cpp20_sort_cpp20` and the `__max_size_type` cascade.
 5. **Large**: MSVC `_Rebind_alloc_t` / `allocator_traits` path — 8+
@@ -200,4 +225,4 @@ need a matching `gcc<15` or `libstdc++<15` exclusion **or** a fix.
 
 ---
 
-*Last updated: 2026-05-10*
+*Last updated: 2026-05-10 (after c_typecheck and clang-intrinsic fixes)*
