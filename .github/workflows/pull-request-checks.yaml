@@ -1078,6 +1078,52 @@ jobs:
           echo "msi_installer=build/$msi_name" >> $env:GITHUB_OUTPUT
           echo "msi_name=$msi_name" >> $env:GITHUB_OUTPUT
 
+  # This job takes approximately 10 to 15 minutes
+  check-dogfood-goto-cc:
+    # Compile a curated sample of CBMC's own .cpp files with
+    # goto-cc itself ("dog-fooding"): the baseline is expected to
+    # produce clean goto binaries.  New entries are added to the
+    # baseline as the underlying front-end bugs are fixed.  The
+    # expanded sample is reported for visibility but does not
+    # fail the job.
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ flex bison libxml2-utils ccache python3
+      - name: Prepare ccache
+        uses: actions/cache@v5
+        with:
+          save-always: true
+          path: .ccache
+          key: ${{ runner.os }}-24.04-dogfood-${{ github.ref }}-${{ github.sha }}-PR
+          restore-keys: |
+            ${{ runner.os }}-24.04-dogfood-${{ github.ref }}
+            ${{ runner.os }}-24.04-dogfood
+      - name: ccache environment
+        run: |
+          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
+          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
+      - name: Configure using CMake
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -DCMAKE_EXPORT_COMPILE_COMMANDS=1
+      - name: Zero ccache stats and limit in size
+        run: ccache -z --max-size=500M
+      - name: Build goto-cc
+        run: ninja -C build -j${{env.linux-vcpus}} goto-cc
+      - name: Print ccache stats
+        run: ccache -s
+      - name: Run dog-food harness on baseline (gate)
+        run: ./scripts/dogfood_goto_cc.sh --baseline
+      - name: Run dog-food harness on extended sample (report only)
+        continue-on-error: true
+        run: ./scripts/dogfood_goto_cc.sh
+
   # This job takes approximately 2 to 3 minutes
   check-string-table:
     runs-on: ubuntu-latest
