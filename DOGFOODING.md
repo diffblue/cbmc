@@ -74,10 +74,49 @@ that actually invokes goto-cc on a representative CBMC source file;
 the current crashes (`SIGSEGV` on 2 of 15 files) mean we cannot
 confidently test at that scale yet.
 
+## Tooling
+
+* `scripts/dogfood_goto_cc.sh` — dog-food harness.  Classifies each
+  file as OK / OK_NOISY / FAIL / CRASH.  Three modes:
+  * `--baseline` (CI gate): just the files that must compile
+    cleanly; exits non-zero if any do not.
+  * default: the 30 smallest `.cpp` files under `src/util/`.
+  * `--expand`: every `.cpp` under `src/util/`.
+* `.github/workflows/pull-request-checks.yaml` job
+  `check-dogfood-goto-cc`: runs the baseline as a gate and the
+  default sample for visibility.
+
 ## Progress
 
-| Date | Layer | OK / Total | Commit |
-|------|-------|-----------|--------|
-| 2026-05-11 | 0 | 1 / 15 | (initial baseline after SFINAE fix `e7080a017e`) |
+| Date | Sample (30 smallest src/util/*.cpp) | OK | OK_NOISY | FAIL | CRASH | Notes |
+|------|-------------------------------------|----|----------|------|-------|-------|
+| 2026-05-11 (initial)   | 15 smallest | 1 | 0 | 12 | 2 | baseline after SFINAE fix `e7080a017e` |
+| 2026-05-11 (alignment) | 15 smallest | 1 | 0 | 13 | 1 | cycle guard `424da3ca32` — 1 crash eliminated |
+| 2026-05-11 (rebind)    | 15 smallest | 1 | 3 | 10 | 1 | `87d40979a3` — unordered_map + custom hash unblocks 3 files (noisy) |
+| 2026-05-11 (invariants)| 30 smallest | 1 | 5 | 24 | 0 | `bb36504ba4` — two invariants softened; 0 crashes on the 30-file sample |
+
+## Fixes that have landed (in order)
+
+1. `e7080a017e` — SFINAE substitution-failure leak absorbed per
+   [temp.deduct]/7-8.  (Pre-dog-food context; large front-end
+   ripple effect.)
+2. `424da3ca32` — `alignment()` cycle guard for pathological
+   type-graph cycles, removing one SIGSEGV class.
+3. `87d40979a3` — class-inheritance dominance rule in
+   `disambiguate_template_classes`, fixing
+   `std::unordered_map<K, V, CustomHash>` `rebind is ambiguous`.
+4. `bb36504ba4` — soften two invariants
+   (`member_offset::bit_field_bits == 0` and destructor-body
+    precondition) to graceful failure, eliminating the remaining
+    crashes seen in the 30-file sample.
+
+## Remaining recurring errors (30-file sample)
+
+| # files | First error | Root cause (hypothesis) |
+|---------|-------------|-------------------------|
+| ≥8 | `invalid implicit conversion from 'char [1l]' to 'struct basic_string'` | Default argument `std::string x = ""` on a constructor of a class that inherits from another — implicit conversion pathway not finding the `basic_string(const char*)` constructor. |
+| ≥5 | cascade from `std::unordered_map` instantiation | Downstream of the basic_string / __stoa failures: many files cascade when `std::string` operations fail. |
+| ≥3 | `found no match for symbol '__stoa'` | libstdc++ `ext/string_conversions.h` variadic template with function-pointer parameter.  Candidate does deduce `<float, float, char>` but outer lookup still fails. |
+| 1 | `instantiating 'nfat' with <char>` | CBMC-internal template `nfat<char>` in `src/util/edit_distance.h` — needs investigation. |
 
 *Updated: 2026-05-11*
