@@ -84,10 +84,7 @@ void cpp_typecheckt::typecheck_return(code_frontend_returnt &code)
     }
     exprt temporary;
     new_temporary(
-      code.return_value().source_location(),
-      return_type,
-      ctor_args,
-      temporary);
+      code.return_value().source_location(), return_type, ctor_args, temporary);
     code.return_value() = std::move(temporary);
   }
 

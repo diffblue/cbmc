@@ -4059,7 +4059,46 @@ void cpp_typecheck_resolvet::guess_template_args(
           }
           if(!is_tt_param)
           {
-            mark_targs_conflicting();
+            // Per [temp.deduct.call]/4.3: if P is a class template-id
+            // and A is a derived class, the template arguments may be
+            // deduced from the base class of A that is an instantiation
+            // of P.  Walk the base-class list of desired_sym and retry
+            // deduction against the first base that is an instantiation
+            // of a template whose base_name matches tmpl_base_name.
+            const irept &bases = desired_sym->type.find(ID_bases);
+            bool found_base = false;
+            for(const auto &base : bases.get_sub())
+            {
+              const typet &base_type =
+                static_cast<const typet &>(base.find(ID_type));
+              if(
+                base_type.id() != ID_struct_tag &&
+                base_type.id() != ID_union_tag)
+                continue;
+              const irep_idt base_id =
+                base_type.id() == ID_struct_tag
+                  ? to_struct_tag_type(base_type).get_identifier()
+                  : to_union_tag_type(base_type).get_identifier();
+              const symbolt *base_sym =
+                cpp_typecheck.symbol_table.lookup(base_id);
+              if(base_sym == nullptr)
+                continue;
+              if(base_sym->base_name != tmpl_base_name)
+                continue;
+              // Found a base class that is an instantiation of the
+              // template we're deducing against.  Retry deduction
+              // against this base.
+              guess_template_args(template_type, base_type);
+              found_base = true;
+              break;
+            }
+            if(!found_base)
+            {
+              mark_targs_conflicting();
+              return;
+            }
+            // We dispatched to the base class — nothing else to do
+            // here.
             return;
           }
         }
