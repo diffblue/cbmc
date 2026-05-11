@@ -228,37 +228,40 @@ CBMC reports `instantiating 'std::_Construct_in_place' with
 <signed int, std::remove_reference_t<ref_signed_int>>` and then
 `symbol '_Args' is unknown`.
 
-Analysis: `_Types` is instantiated with `remove_reference_t<int&>`,
-which CBMC preserves as an unresolved trait rather than reducing
-to `int`.  During body type-check of `_Construct_in_place`, the
-pack expansion `forward<_Types>(_Args)...` tries to expand `_Args`
-whose type is `_Types&&... = (remove_reference_t<int&>)&&...` — at
-this point something in CBMC's substitution loses track of the
-`_Args` pack parameter, emitting `_Args is unknown`.
+Phase 3 fix (2026-05-11) — `cpp_instantiate_template: restrict
+empty-pack short-name removal to local packs` — landed in
+commit shortly following this diagnosis.  Root cause is a
+scope-violation bug, not a pack-expansion bug: the 'remove empty
+pack expansions' pass at line 4566 of
+`cpp_instantiate_template.cpp` collected pack parameter short
+names globally from `pack_size_map` (which accumulates entries
+from every template on the instantiation stack).  When an outer
+template on the stack had an empty pack named `_Types` (common in
+MSVC's `_Invoker_*` templates), its short name polluted the
+inner `_Construct_in_place`'s pack removal, and `_Construct_in_
+place`'s `_Args` parameter (whose declared type references its
+LOCAL `_Types`) was wrongly stripped from the instantiated
+function.  Per [basic.scope.temp] and [temp.variadic]/5, a pack
+parameter's short name in a template definition refers to THAT
+template's pack, not to some other template's pack with the same
+short name — so restricting the short-name set to packs declared
+by `template_type.template_parameters()` is the standard-
+conformant fix.  Two earlier sibling passes in the same file
+already did this correctly; this third pass was missed.
 
-Isolated minimal reproducers of the pattern (with plain `int` and
-`remove_reference_t<int&>` explicit template args) *pass* on
-trunk, so the bug requires the full context: member function of a
-class template, parameter-pack forward + explicit-template-arg
-call sequence, builtin type-trait type in the instantiated pack.
+Regression: `cpp11_variadic_pack_short_name_collision` exercises
+the exact pattern: nested template instantiations with
+distinct packs sharing the short name `_Types`, the outer
+instantiated with zero arguments (empty pack) and the inner with
+one.  Pre-fix emits `symbol '_Args' is unknown`; post-fix passes.
 
-A proper fix has two likely angles:
- 1. Ensure `remove_reference_t<T>` (and other builtin type-trait
-    aliases) is reduced to its canonical form early — at template
-    argument binding time rather than left unresolved in the
-    template_map.  This is a change in the substitution path in
-    `src/cpp/cpp_instantiate_template.cpp` and
-    `src/cpp/template_map.cpp`.
- 2. Ensure pack-expansion substitution in the body of the
-    instantiated function correctly maps `_Args` → the expanded
-    forms even when the enclosing parameter pack element is a
-    class-template-derived type.  This is a change in how
-    `cpp_typecheckt::typecheck_expr_cpp_name` handles variadic
-    parameters in an instantiated context.
-
-Both angles warrant their own targeted investigation and isolated
-reproducer.  This is out of scope for this session but the
-diagnosis narrows the remaining work substantially.
+Impact: MSVC preprocessed-header artifacts for push_back, insert,
+shared_ptr, etc. now exercise `_Construct_in_place` correctly
+rather than silently having main() emptied by the stripped pack
+parameter.  Downstream issues (missing inline method bodies
+defined outside the header) surface as VERIFICATION FAILED on
+some artifacts that previously vacuously verified successful
+with empty main — improved correctness, not regression.
 
 The "Performance Benchmarking" job (perf-benchcomp) fails at the end of the
 AWS C Common comparison with exit code 1 on otherwise-successful metrics; by
