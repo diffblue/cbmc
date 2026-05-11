@@ -1,0 +1,41 @@
+KNOWNBUG
+main.cpp
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+unexpected expression: struct_tag
+found no match for symbol 'swap'
+\* identifier: std::tag-__not_<
+--
+Matching `goto-cc` reproducer for the libstdc++ SFINAE-leak bug
+documented in cbmc-cpp/cpp11_std_is_swappable_sfinae.
+
+User-visible symptoms of the bug (reported as "goto-cc ~/harness.cpp
+should work today but both yields debug output and just doesn't
+work"):
+
+1. `goto-cc` writes spurious `error: unexpected expression:
+   struct_tag` diagnostics to stderr when `#include <array>`
+   transitively instantiates `std::__is_swappable_impl<T>`.  Per
+   [temp.deduct]/8 these substitution failures must be absorbed
+   silently during overload resolution — no user-visible error
+   may be emitted.
+
+2. The error diagnostic itself embeds an `irep::pretty()` dump
+   (indented sub-fields with `* #source_location:`, `* line:`,
+   `* identifier:` entries) rather than a clean source-level
+   message.  This is the "debug output" referenced by the user.
+
+The test ships a minimum-size reproducer that exercises the bug
+via `goto-cc` (chain.sh builds with goto-cc then runs cbmc on the
+resulting .gb).  `std::array<double, 3>` is chosen because it is
+the smallest `std::array` instantiation that triggers the
+SFINAE-leak code path.
+
+Fix expectations:
+ * No `error:` line in the combined stdout/stderr.
+ * No `irep::pretty()` indented-sub-field dump in the output.
+ * `VERIFICATION SUCCESSFUL` from cbmc.
