@@ -71,6 +71,18 @@ re-triggered:
   overload resolution.  Unlocks 4 additional MSVC preprocessed-
   header artifacts: cpp11_map_verify, cpp11_set_insert,
   cpp11_shared_ptr, cpp17_valarray_basic.
+* **Derived-to-base template argument deduction for pointers** —
+  fixed in `491b2d58dc`.  Per [temp.deduct.call]/4.3: when the
+  parameter pattern P has the form `Base<T>*` and the argument A
+  has type `Derived<U>*` where `Derived<U> : Base<U>`, deduction
+  must retry against the base class specialisation.  CBMC
+  previously gave up when the template names didn't match.  The
+  fix walks the base-class list of the argument's source symbol
+  and retries deduction against the first base whose source
+  template name matches the one in P.  Unlocks MSVC
+  `cpp17_shared_ptr` (VERIFICATION SUCCESSFUL with --unwind 2;
+  was FAIL) and macOS `cpp17_any_basic` (was HANG on the
+  `__cxx_atomic_load` call chain).
 
 ### Preprocessed-header test results after these fixes
 
