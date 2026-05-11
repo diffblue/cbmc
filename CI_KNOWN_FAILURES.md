@@ -46,6 +46,31 @@ re-triggered:
   not find the data member `_Storage` because an earlier throw
   had aborted atomic_flag's class-body processing before
   `_Storage` registered).
+* **Variadic pack short-name collision** — fixed in
+  `3f1d94d0d4`.  The "remove empty pack expansions" pass in
+  `cpp_instantiate_template.cpp` collected pack parameter short
+  names from the global `pack_size_map` (which accumulates across
+  every template currently on the instantiation stack).  This
+  violated [basic.scope.temp] and [temp.variadic]/5 — a pack
+  parameter's short name in a template refers to THAT template's
+  pack — and caused the inner template's non-empty `_Types` pack
+  to be silently stripped when any outer template on the stack
+  had an empty pack with the same short name.  Concrete
+  manifestation was MSVC `_Construct_in_place` losing its `_Args`
+  parameter during instantiation from `vector::_Emplace_*`.
+* **Multi-element braced return to non-POD class** — fixed in
+  `f070895af0`.  Per [stmt.return]/3, `return { a, b };` in a
+  function whose return type is a class type must construct a
+  temporary of the return type via list-initialization.  CBMC
+  only handled the single-element case; multi-element fell
+  through to `implicit_typecast` which has no conversion from
+  initializer_list to class type and emitted
+  `invalid implicit conversion from 'irep("(\"\")")' to 'struct T'`.
+  Now constructs the temporary explicitly via `new_temporary` /
+  `cpp_constructor` which performs proper [over.match.list]
+  overload resolution.  Unlocks 4 additional MSVC preprocessed-
+  header artifacts: cpp11_map_verify, cpp11_set_insert,
+  cpp11_shared_ptr, cpp17_valarray_basic.
 
 ### Preprocessed-header test results after these fixes
 
