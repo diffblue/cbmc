@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.assertion\.1\].*multi-element braced return picks correct ctor: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+^invalid implicit conversion from$
+--
+Regression for the MSVC `<map>` _Try_emplace multi-element braced
+return failure.  Per [stmt.return]/3, `return { a, b };` in a
+function whose return type is a class type must construct a
+temporary of that type via list-initialization with the braced-
+init-list.  CBMC's cpp_typecheck_return now explicitly constructs
+the temporary for multi-element braced returns to non-POD class
+types via new_temporary/cpp_constructor, which performs proper
+[over.match.list] overload resolution.
