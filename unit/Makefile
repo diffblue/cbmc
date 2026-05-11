@@ -149,6 +149,7 @@ SRC += analyses/ai/ai.cpp \
        util/case_expr.cpp \
        util/cmdline.cpp \
        util/dense_integer_map.cpp \
+       util/dstring.cpp \
        util/edit_distance.cpp \
        util/expr_cast/expr_cast.cpp \
        util/expr_initializer.cpp \
