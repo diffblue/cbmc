@@ -88,12 +88,13 @@ confidently test at that scale yet.
 
 ## Progress
 
-| Date | Sample (30 smallest src/util/*.cpp) | OK | OK_NOISY | FAIL | CRASH | Notes |
-|------|-------------------------------------|----|----------|------|-------|-------|
-| 2026-05-11 (initial)   | 15 smallest | 1 | 0 | 12 | 2 | baseline after SFINAE fix `e7080a017e` |
-| 2026-05-11 (alignment) | 15 smallest | 1 | 0 | 13 | 1 | cycle guard `424da3ca32` — 1 crash eliminated |
-| 2026-05-11 (rebind)    | 15 smallest | 1 | 3 | 10 | 1 | `87d40979a3` — unordered_map + custom hash unblocks 3 files (noisy) |
-| 2026-05-11 (invariants)| 30 smallest | 1 | 5 | 24 | 0 | `bb36504ba4` — two invariants softened; 0 crashes on the 30-file sample |
+| Date | Sample | OK | OK_NOISY | FAIL | CRASH | Notes |
+|------|--------|----|----------|------|-------|-------|
+| 2026-05-11 (initial)   | 15 smallest   | 1 | 0 | 12  | 2 | baseline after SFINAE fix `e7080a017e` |
+| 2026-05-11 (alignment) | 15 smallest   | 1 | 0 | 13  | 1 | cycle guard `424da3ca32` — 1 crash eliminated |
+| 2026-05-11 (rebind)    | 15 smallest   | 1 | 3 | 10  | 1 | `87d40979a3` — unordered_map + custom hash unblocks 3 files (noisy) |
+| 2026-05-11 (invariants)| 30 smallest   | 1 | 5 | 24  | 0 | `bb36504ba4` — two invariants softened; 0 crashes on the 30-file sample |
+| 2026-05-11 (expand)    | all src/util/ | 1 | 7 | 109 | 0 | `6b09016f4a` — vtable type-mismatch invariant + cleaner `expr2c` fallback (replaces megabyte-long irep dumps with `<<expr:ID>>` placeholders) |
 
 ## Fixes that have landed (in order)
 
@@ -105,18 +106,25 @@ confidently test at that scale yet.
 3. `87d40979a3` — class-inheritance dominance rule in
    `disambiguate_template_classes`, fixing
    `std::unordered_map<K, V, CustomHash>` `rebind is ambiguous`.
-4. `bb36504ba4` — soften two invariants
-   (`member_offset::bit_field_bits == 0` and destructor-body
-    precondition) to graceful failure, eliminating the remaining
-    crashes seen in the 30-file sample.
+4. `bb36504ba4` — harness + soften `member_offset` and
+   `convert_function` destructor preconditions; add CI gate
+   harness.
+5. `4648a540b8` — CI job `check-dogfood-goto-cc` added to
+   `pull-request-checks.yaml`.
+6. `6b09016f4a` — soften vtable type-mismatch invariant; replace
+   irep-dump fallback in `convert_norep` with a compact
+   placeholder.
 
-## Remaining recurring errors (30-file sample)
+## Remaining recurring errors (full src/util/ sample, 117 files)
 
 | # files | First error | Root cause (hypothesis) |
 |---------|-------------|-------------------------|
-| ≥8 | `invalid implicit conversion from 'char [1l]' to 'struct basic_string'` | Default argument `std::string x = ""` on a constructor of a class that inherits from another — implicit conversion pathway not finding the `basic_string(const char*)` constructor. |
-| ≥5 | cascade from `std::unordered_map` instantiation | Downstream of the basic_string / __stoa failures: many files cascade when `std::string` operations fail. |
-| ≥3 | `found no match for symbol '__stoa'` | libstdc++ `ext/string_conversions.h` variadic template with function-pointer parameter.  Candidate does deduce `<float, float, char>` but outer lookup still fails. |
-| 1 | `instantiating 'nfat' with <char>` | CBMC-internal template `nfat<char>` in `src/util/edit_distance.h` — needs investigation. |
+| 42 | cascade from `std::unordered_map` instantiation | Downstream of basic_string / __stoa failures. |
+| 35 | `invalid implicit conversion from 'char [1l]' to 'struct basic_string'` | Default argument `std::string x = ""` on a constructor; implicit `basic_string(const char*)` not found in this specific inheritance context.  Not reproduced in minimal isolation. |
+| 11 | `found no match for symbol '__stoa'` | libstdc++ `ext/string_conversions.h` variadic template with function-pointer parameter.  Candidate does deduce `<float, float, char>` but outer lookup still fails. |
+| 3  | `std::optional` instantiation fallout | Needs follow-on investigation. |
+| 2  | `use of enum 'validation_modet' without previous declaration` | C++ front-end missing forward declaration for an enum class. |
+| 2  | `'<<expr:side_effect>>' not an lvalue` | prvalue materialization (`std::max<T>(prvalue, …)`) still not handled. |
+| 1  | `parse error before 'virtual bool'`, `const exprt &` | Parse errors in specific headers — need targeted investigation. |
 
 *Updated: 2026-05-11*
