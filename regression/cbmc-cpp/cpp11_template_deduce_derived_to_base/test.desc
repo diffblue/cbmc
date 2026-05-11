@@ -1,0 +1,22 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.assertion\.1\].*derived-to-base template argument deduction for pointers: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+^found no match for symbol$
+--
+Regression for [temp.deduct.call]/4.3 derived-to-base template
+argument deduction.  A function template taking
+`Base<T> const volatile*` called with an argument of type
+`Derived<bool> const volatile*` where `Derived<U> : Base<U>` must
+deduce `T = bool` via the derived-to-base pointer rule.
+
+This is the macOS libc++ `__cxx_atomic_load` failure pattern:
+`__cxx_atomic_impl<_Tp>` publicly derives from
+`__cxx_atomic_base_impl<_Tp>`; `__cxx_atomic_load` takes a pointer
+to the base template, so calling it through a pointer to the
+derived template needs this deduction rule.
