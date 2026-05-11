@@ -1,0 +1,24 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.assertion\.1\].*deep-template member exchange prev: SUCCESS$
+^\[main\.assertion\.2\].*deep-template member exchange new: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+--
+Defense-in-depth coverage for the MSVC atomic_flag::_Storage pattern
+(in isolation): a non-template class has a data member of an
+uninstantiated class template specialization, declared after the
+methods that use it.  Per [class.mem]/4 and [temp.inst]/2 the
+specialization must be implicitly instantiated when the data-member
+declaration is processed.
+
+Note: this isolated pattern currently passes.  The real-world MSVC
+failure requires the full std::atomic<long> cascade (partial
+specializations by sizeof(T), _Atomic_storage/_Atomic_integral/
+_Atomic_integral_facade inheritance chain, type_traits SFINAE) to
+trigger.  Keeping this test ensures the simple pattern remains
+working when the complex fix lands.

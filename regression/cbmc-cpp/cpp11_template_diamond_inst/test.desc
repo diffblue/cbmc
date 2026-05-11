@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.assertion\.1\].*A<int>::data usable: SUCCESS$
+^\[main\.assertion\.2\].*A<int>::buddy points to B<int>: SUCCESS$
+^\[main\.assertion\.3\].*B<int>::buddy points to A<int>: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+--
+Guard-rail test for template-instantiation fixes: two templates that
+reference each other by pointer (no completeness required) must not
+trigger infinite recursion.  Per [temp.inst]/2 only complete-type
+requirements trigger instantiation.
