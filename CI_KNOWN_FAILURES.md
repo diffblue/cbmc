@@ -83,9 +83,73 @@ data member or the underlying type of a typedef**.  Examples:
 * MSVC `_Rebind_alloc_t` / `allocator_traits` deduction cycle —
   same shape, deeper call graph.
 
-A proper fix needs eager instantiation of class templates used as
-data-member or typedef types during class-body elaboration, rather
-than the current lazy-on-use approach.
+#### Phase 1 diagnosis (2026-05-10)
+
+Detailed investigation of the MSVC `atomic_flag::_Storage` case
+was done using runtime instrumentation of `typecheck_compound_body`,
+`elaborate_class_template`, and `resolve`.  Findings:
+
+* `atomic_flag` is a non-template struct, processed via the normal
+  `convert_non_template_declaration → typecheck_compound_body`
+  path.  Its body has 6 member declarations: 4 methods
+  (`test_and_set x2`, `clear x2`), 1 default constructor, and the
+  data member `atomic<long> _Storage;` at the end.
+* The first 5 declarations process successfully; `_Storage`'s type
+  declaration reaches `typecheck_type(declaration.type())` at
+  `cpp_typecheck_compound_type.cpp:1337` (as `cpp_name{atomic,
+  template_args{long}}`).
+* `typecheck_type` dispatches to `resolve(atomic<long>, TYPE, ...)`.
+  `resolve` triggers `elaborate_class_template(atomic<long>)` which
+  cascades through 22+ sub-elaborations (remove_cv, is_same,
+  disjunction, _Disjunction, _Select, _Atomic_integral_facade,
+  _Atomic_integral<long,4>, _Atomic_storage<long,4>,
+  remove_reference, etc.).  The elaboration *chain runs to
+  completion* — none of the sub-elaborations throw at class-body
+  time.
+* Nevertheless, `typecheck_type(atomic<long>)` throws `int 0`
+  with exactly one error added to the message handler during the
+  call.  The error's source_location is `atomic_flag::test_and_set`
+  line 2811 (`return _Storage.exchange(true, _Order) != 0;`) and
+  the text is `symbol '_Storage' is unknown`.
+* The backtrace of the `_Storage unknown` emission goes through
+  `typecheck_method_bodies()` → `convert_function` → ... →
+  `resolve`.  That path runs at top-level, *after*
+  `typecheck_compound_body`.  So the error is emitted much later,
+  yet its presence is reflected in the error counter at class-body
+  time.  This suggests CBMC's method-body deferral queue is being
+  flushed eagerly during `resolve` (probably via
+  `deferred_method_bodies` promotion in `typecheck_expr.cpp`),
+  which in turn pulls out atomic_flag's 4 methods and tries to
+  type-check them in a scope where `_Storage` isn't yet registered.
+* The throw from `typecheck_type` then propagates up, aborting the
+  remainder of `typecheck_compound_body` for atomic_flag.  Because
+  `_Storage`'s declarator is the last in the body, at least no
+  sibling members are dropped, but `_Storage` itself never
+  registers.
+
+The root cause is therefore twofold and mutually reinforcing:
+ 1. `resolve` (or `elaborate_class_template` or a sub-step)
+    promotes methods of atomic_flag out of `deferred_method_bodies`
+    *before* atomic_flag's class body is complete.
+ 2. When those methods are type-checked, they can't find
+    `_Storage` and emit an error, which aborts atomic_flag's class
+    body mid-way (so `_Storage` never gets registered).
+
+A proper fix needs to break this deadlock: either (A) the
+method-body deferral queue must not be flushed while any enclosing
+class body is still being processed, or (B) data-member
+declarations must be registered in the class scope (by name, even
+with a placeholder type) *before* any sub-elaboration that might
+flush the queue.  Option (B) is likely simpler and less invasive.
+
+The isolated reproducers added in `regression/cbmc-cpp/cpp11_
+template_member_data/`, `.../cpp11_template_nested_typedef/`, and
+`.../cpp11_template_diamond_inst/` currently pass because they
+don't trigger the deferred-queue flush — the real failure requires
+the full `_Atomic_storage`/`_Atomic_integral`/`atomic` inheritance
+chain plus SFINAE cascades that exist in the live MSVC headers.
+Extending one of those reproducers to also trigger the premature
+flush is a useful next step for the fix work.
 
 The "Performance Benchmarking" job (perf-benchcomp) fails at the end of the
 AWS C Common comparison with exit code 1 on otherwise-successful metrics; by
