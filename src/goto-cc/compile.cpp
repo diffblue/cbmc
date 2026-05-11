@@ -15,8 +15,11 @@ Date: June 2006
 
 #include <util/cmdline.h>
 #include <util/config.h>
+#include <util/expr_util.h>
 #include <util/get_base_name.h>
+#include <util/prefix.h>
 #include <util/run.h>
+#include <util/suffix.h>
 #include <util/symbol_table_builder.h>
 #include <util/tempdir.h>
 #include <util/tempfile.h>
@@ -312,6 +315,86 @@ bool compilet::find_library(const std::string &name)
   return false;
 }
 
+/// Warn about a file-local (`static`) function that
+/// has a body under its mangled name `__CPROVER_file_local_<file>_<sym>` (as
+/// produced by `--export-file-local-symbols`), while the same program also
+/// calls the *unmangled* name `<sym>` -- typically through an `extern`
+/// declaration in another translation unit.  The unmangled call does not bind
+/// to the mangled body, so at link time `<sym>` has no body and cbmc replaces
+/// the call with a nondet-return stub.  Any verification that depends on the
+/// function's behaviour is then silently vacuous.
+///
+/// We warn only when both halves of that signature are present (a bodiless
+/// called `<sym>` and a `__CPROVER_file_local_..._<sym>` with a body), which is
+/// what makes the diagnostic precise: ordinary bodiless library symbols
+/// (printf, memcpy, ...) have no file-local twin and never trigger it.
+static void
+warn_file_local_stub_calls(const goto_modelt &goto_model, messaget &log)
+{
+  // File-local functions that *do* have a body, under their mangled
+  // __CPROVER_file_local_<file>_<sym> name.
+  std::vector<irep_idt> file_local_with_body;
+  for(const auto &f : goto_model.goto_functions.function_map)
+  {
+    if(
+      f.second.body_available() &&
+      has_prefix(id2string(f.first), FILE_LOCAL_PREFIX))
+    {
+      file_local_with_body.push_back(f.first);
+    }
+  }
+
+  // No file-local bodies -> this situation cannot occur.
+  if(file_local_with_body.empty())
+    return;
+
+  // Direct call targets (a bare symbol, possibly behind a no-op typecast).
+  std::set<irep_idt> called_functions;
+  for(const auto &f : goto_model.goto_functions.function_map)
+  {
+    if(!f.second.body_available())
+      continue;
+    for(const auto &ins : f.second.body.instructions)
+    {
+      if(!ins.is_function_call())
+        continue;
+      const exprt &callee = skip_typecast(ins.call_function());
+      if(callee.id() == ID_symbol)
+        called_functions.insert(to_symbol_expr(callee).get_identifier());
+    }
+  }
+
+  for(const auto &name : called_functions)
+  {
+    auto it = goto_model.goto_functions.function_map.find(name);
+    if(
+      it == goto_model.goto_functions.function_map.end() ||
+      it->second.body_available())
+    {
+      continue;
+    }
+
+    // Only warn when a file-local twin with a body exists, i.e. a mangled
+    // __CPROVER_file_local_<file>_<name>.  The mangled name ends in "_<name>".
+    const std::string suffix = "_" + id2string(name);
+    for(const auto &mangled : file_local_with_body)
+    {
+      if(has_suffix(id2string(mangled), suffix))
+      {
+        log.warning()
+          << "symbol '" << id2string(name)
+          << "' is called but has no linked body, while a file-local "
+          << "definition exists as '" << id2string(mangled)
+          << "'; cbmc will treat the call as a nondet-return stub, so any "
+          << "verification depending on it is silently vacuous. This usually "
+          << "means a `static` function is reached through an `extern` "
+          << "declaration that uses the unmangled name." << messaget::eom;
+        break;
+      }
+    }
+  }
+}
+
 /// parses object files and links them
 /// \return true on error, false otherwise
 bool compilet::link(std::optional<symbol_tablet> &&symbol_table)
@@ -357,6 +440,18 @@ bool compilet::link(std::optional<symbol_tablet> &&symbol_table)
     function_name_manglert<file_name_manglert> mangler(
       log.get_message_handler(), goto_model, file_local_mangle_suffix);
     mangler.mangle();
+  }
+
+  // Warn about a file-local body that is shadowed by a bodiless unmangled
+  // call; see warn_file_local_stub_calls.  Restricted to
+  // executable links (a `gcc -shared` link legitimately leaves symbols
+  // unresolved) and skipped unless warnings are actually shown, since the scan
+  // is a non-trivial double loop whose output would otherwise be discarded.
+  if(
+    mode == COMPILE_LINK_EXECUTABLE &&
+    log.get_message_handler().get_verbosity() >= messaget::M_WARNING)
+  {
+    warn_file_local_stub_calls(goto_model, log);
   }
 
   if(write_bin_object_file(output_file_executable, goto_model))
