@@ -166,8 +166,9 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     // whose value is nil or not a block.  Skip the implicit-code
     // insertion in that case rather than aborting via a
     // PRECONDITION violation.
-    if(symbol.value.id() != ID_code ||
-       symbol.value.get(ID_statement) != ID_block)
+    if(
+      symbol.value.id() != ID_code ||
+      symbol.value.get(ID_statement) != ID_block)
     {
       return;
     }
