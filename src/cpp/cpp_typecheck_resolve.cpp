@@ -2206,9 +2206,24 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
 
   if(primary_templates.size() >= 2)
   {
-    // Multiple primary templates found. Filter by the current scope:
-    // only keep templates whose identifier is within the scope that
-    // resolve_scope navigated to via :: qualifiers.
+    // Multiple primary templates found.  Per [class.member.lookup]
+    // and [temp.names]/3, name lookup for `T::template name<args>`
+    // is restricted to the scope of T, and a name declared in a
+    // derived class hides a name with the same base_name inherited
+    // from any base class.
+    //
+    // Filter in two passes:
+    //
+    //   (1) Keep only candidates whose identifier is within the
+    //       current scope (either starts with `current::` or is
+    //       `current` itself).  This matches the classic "scope of
+    //       T" rule.
+    //
+    //   (2) Among the surviving candidates, drop any candidate whose
+    //       declaring class is a base of another candidate's
+    //       declaring class (dominance / name hiding by derived
+    //       class).  If that also fails to narrow, leave the set
+    //       unchanged so the ambiguity error below fires.
     cpp_scopet &current = cpp_typecheck.cpp_scopes.current_scope();
     const std::string prefix = id2string(current.identifier) + "::";
     std::set<irep_idt> filtered;
@@ -2217,16 +2232,134 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
       if(id2string(pt).find(prefix) == 0 || pt == current.identifier)
         filtered.insert(pt);
     }
-    if(filtered.size() == 1)
+    if(!filtered.empty() && filtered.size() < primary_templates.size())
       primary_templates = filtered;
+
+    if(primary_templates.size() >= 2)
+    {
+      // Strip the trailing `::<something>` to get each candidate's
+      // declaring class identifier, and translate it into the
+      // canonical `tag-<classname><args>` form the symbol table
+      // uses.  A primary template identifier looks like
+      // `std::allocator<...>::template.rebind<Type0>`; the
+      // declaring class's symbol-table identifier is
+      // `std::tag-allocator<...>`.
+      //
+      // Note: `std::string::rfind("::")` is wrong here because the
+      // template arguments may themselves contain `::` (e.g.
+      // `std::allocator<std::pair<...>>`).  Walk the string
+      // tracking angle-bracket depth and only consider separators
+      // at depth zero.
+      auto last_separator_at_depth_zero =
+        [](const std::string &s) -> std::string::size_type
+      {
+        int depth = 0;
+        std::string::size_type result = std::string::npos;
+        for(std::string::size_type i = 0; i + 1 < s.size(); ++i)
+        {
+          char c = s[i];
+          if(c == '<')
+            ++depth;
+          else if(c == '>')
+            --depth;
+          else if(depth == 0 && c == ':' && s[i + 1] == ':')
+          {
+            result = i;
+            ++i; // skip the second ':'
+          }
+        }
+        return result;
+      };
+      auto declaring_class =
+        [&last_separator_at_depth_zero](const irep_idt &pt) -> irep_idt
+      {
+        const std::string s = id2string(pt);
+        auto p = last_separator_at_depth_zero(s);
+        if(p == std::string::npos)
+          return irep_idt{};
+        std::string scope = s.substr(0, p);
+        // Insert "tag-" before the class name (the part after the
+        // last depth-0 "::" in the remaining scope).  If the scope
+        // has no namespace prefix, prepend "tag-".
+        auto q = last_separator_at_depth_zero(scope);
+        if(q == std::string::npos)
+          return irep_idt{"tag-" + scope};
+        return irep_idt{scope.substr(0, q + 2) + "tag-" + scope.substr(q + 2)};
+      };
+      // Transitive "is base of" walk of the derived-class's ID_bases
+      // list in the symbol table.
+      auto is_base_of =
+        [&](const irep_idt &base, const irep_idt &derived) -> bool
+      {
+        if(base.empty() || derived.empty())
+          return false;
+        std::set<irep_idt> visited;
+        std::vector<irep_idt> todo{derived};
+        while(!todo.empty())
+        {
+          irep_idt d = todo.back();
+          todo.pop_back();
+          if(!visited.insert(d).second)
+            continue;
+          const symbolt *sym = cpp_typecheck.symbol_table.lookup(d);
+          if(sym == nullptr)
+            continue;
+          const irept &bases = sym->type.find(ID_bases);
+          for(const auto &b : bases.get_sub())
+          {
+            const typet &bt = static_cast<const typet &>(b.find(ID_type));
+            if(bt.id() != ID_struct_tag)
+              continue;
+            const irep_idt &bid = to_struct_tag_type(bt).get_identifier();
+            if(bid == base)
+              return true;
+            todo.push_back(bid);
+          }
+        }
+        return false;
+      };
+      std::set<irep_idt> dominant = primary_templates;
+      bool changed = true;
+      while(changed && dominant.size() > 1)
+      {
+        changed = false;
+        for(auto it = dominant.begin(); it != dominant.end();)
+        {
+          irep_idt ci = declaring_class(*it);
+          bool dropped = false;
+          for(auto jt = dominant.begin(); jt != dominant.end(); ++jt)
+          {
+            if(it == jt)
+              continue;
+            irep_idt cj = declaring_class(*jt);
+            // If ci is a base of cj, the candidate from ci is
+            // hidden by cj's candidate — drop ci.
+            if(is_base_of(ci, cj))
+            {
+              it = dominant.erase(it);
+              dropped = true;
+              changed = true;
+              break;
+            }
+          }
+          if(!dropped)
+            ++it;
+        }
+      }
+      if(dominant.size() == 1)
+        primary_templates = dominant;
+    }
   }
 
   if(primary_templates.size() >= 2)
   {
     cpp_typecheck.show_instantiation_stack(cpp_typecheck.error());
     cpp_typecheck.error().source_location = source_location;
-    cpp_typecheck.error() << "template scope '" << base_name << "' is ambiguous"
-                          << messaget::eom;
+    cpp_typecheck.error() << "template scope '" << base_name
+                          << "' is ambiguous";
+    for(const auto &pt : primary_templates)
+      cpp_typecheck.error() << "\n  " << pt;
+    cpp_typecheck.error() << messaget::eom;
     throw 0;
   }
 
