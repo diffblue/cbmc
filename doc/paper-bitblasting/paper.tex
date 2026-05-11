@@ -166,18 +166,13 @@ Our contributions are:
   (Section~\ref{sec:negative}).
 \end{enumerate}
 
-Multiplication queries encountered by bit-vector SMT solvers fall
-into two classes:
-\emph{universal/equational} queries ($\forall x, y.\; P(x,y) =
-Q(x,y)$, e.g., commutativity, hardware equivalence checking) and
-\emph{existential} queries ($\exists x, y.\; P(x,y) = c$, e.g.,
-factoring, overflow detection). Bit-blasting handles both but scales
-poorly with bit-width; algebraic techniques handle universal
-queries efficiently but are not constructive
-for existential queries. This paper focuses on improving bit-blasting
-for both classes. The same techniques apply to division and remainder
-(encoding $a = b \cdot q + r$ with non-deterministic $q$, $r$
-requires an internal multiplier).
+For this paper the algebraic pre-solver is disabled, isolating
+the encoding's contribution. In the deployed configuration, the
+encoding matters primarily for problems the algebraic layer
+cannot handle: bitwise operations, inequalities, floating-point,
+and structural mismatches. The same encoding techniques apply to
+division and remainder, which can be encoded as
+$a = b \times q + r$ with non-deterministic $q, r$.
 
 \section{Background}
 
@@ -260,8 +255,8 @@ confirms: GF(2) proofs are 3.6--18$\times$ smaller.
 
 \paragraph{The gap is between proof existence and CDCL search.}
 It is important to be clear about what this data does and does
-not mean. An influential line of work~\cite{beame2017towards,beame2019toward}
-proves that ring identities such as commutativity and
+not mean. Beame and Liew~\cite{beame2017towards,beame2019toward}
+prove that ring identities such as commutativity and
 distributivity on array, diagonal, and Booth multipliers admit
 \emph{polynomial-size regular resolution refutations}---the very
 proof system that CDCL solvers operate in. A slightly weaker
@@ -1176,13 +1171,13 @@ usefully. Solver tuning and abstraction refinement fail because
 the problem is structural, not parametric: 512 \cadical option
 combinations (16 options $\times$ 4 encodings $\times$ 8
 benchmarks) changed no result by more than $\pm$3\%. \cbmc's
-CEGAR loop (\texttt{--refine-arithmetic}) adds $\geq$2 solver
+CEGAR loop (\texttt{-{}-refine-arithmetic}) adds $\geq$2 solver
 calls of overhead on UNSAT benchmarks (commutativity BW=11:
 4.0\,s vs.\ 0.9\,s direct \combacs).
-All five parallel prefix adders (BK, Kogge-Stone, Sklansky,
-Han-Carlson, Ladner-Fischer) produce identical learned-clause
-quality (95\% glue-1~\cite{audemard2009predicting}); BK wins
-solely by having the fewest variables
+All five parallel prefix adders (Brent-Kung [BK], Kogge-Stone,
+Sklansky, Han-Carlson, Ladner-Fischer) produce identical
+learned-clause quality (95\% glue-1~\cite{audemard2009predicting});
+BK wins solely by having the fewest variables
 (Appendix~\ref{app:adders}).
 Pre-providing carry-chain hint clauses is non-monotonic in
 bit-width: 18--52\% speedup at BW=10--13, 59--94\% regression at
