@@ -58,6 +58,39 @@ void cpp_typecheckt::typecheck_return(code_frontend_returnt &code)
     code.return_value() = code.return_value().operands().front();
   }
 
+  // Per [stmt.return]/3 (C++11): `return { a, b, ... };` in a function
+  // whose return type is a class type constructs a temporary of the
+  // return type using list-initialization with the braced-init-list
+  // and returns that temporary.  For multi-element braced returns
+  // to non-POD class types, CBMC's `implicit_typecast` has no
+  // conversion from `initializer_list` to the class type and emits
+  // "invalid implicit conversion from 'irep(\"(\\\"\\\")\")' to 'struct T'".
+  // Construct the temporary explicitly via `new_temporary` (which
+  // wraps `cpp_constructor`, performing [over.match.list] overload
+  // resolution) before the base typecheck runs.
+  if(
+    code.has_return_value() &&
+    code.return_value().id() == ID_initializer_list &&
+    code.return_value().operands().size() > 1 &&
+    (return_type.id() == ID_struct_tag || return_type.id() == ID_union_tag) &&
+    !cpp_is_pod(return_type))
+  {
+    exprt::operandst ctor_args;
+    for(auto &op : code.return_value().operands())
+    {
+      exprt arg = op;
+      typecheck_expr(arg);
+      ctor_args.push_back(std::move(arg));
+    }
+    exprt temporary;
+    new_temporary(
+      code.return_value().source_location(),
+      return_type,
+      ctor_args,
+      temporary);
+    code.return_value() = std::move(temporary);
+  }
+
   c_typecheck_baset::typecheck_return(code);
 
   // For non-POD class-type return values, insert a copy constructor call.
