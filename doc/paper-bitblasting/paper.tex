@@ -837,6 +837,13 @@ consistently the slowest on multiplication, as its native XOR
 handling provides no benefit (confirmed with and without XOR
 constraints) and it lacks both inprocessing BVE and congruence
 closure.
+The CaDiCaL-vs-others gap we observe on multiplication-heavy
+benchmarks is consistent with Dutertre's broader empirical
+evaluation of sixteen SAT solvers on 15{,}447 bit-blasted QF\_BV
+CNFs from SMT-LIB, which also found \cadical clearly
+superior~\cite{dutertre2020empirical}; our contribution is to
+identify BVE and congruence closure as the specific features
+responsible on multiplication.
 
 \paragraph{Robustness.}
 The comparison is robust to run-to-run noise (coefficient of
@@ -1188,9 +1195,20 @@ non-monotonic function of that order.
 \section{Related Work}
 
 \paragraph{Algebraic verification (brief).}
-Bryant~\cite{bryant1991complexity} showed BDD-based multiplication
-verification requires exponential size. Biere, Kauers, and
-Ritirc~\cite{biere2017challenges}, Kaufmann~\cite{kaufmann2020thesis},
+Early BDD-based multiplier verification~\cite{burch1991bdds}
+succeeded on circuits up to 16 bits by exploiting circuit
+structure. Bryant~\cite{bryant1991complexity} subsequently showed
+that the standard input-variable BDD representation is
+exponential in the bit-width.
+Kumar et al.~\cite{kumar2023bdd} revisit BDD construction using
+partial-product variables rather than input variables and verify
+integer multipliers up to 1024 bits at $O(n^3)$ BDD size,
+demonstrating that the exponential blow-up is representation-dependent
+rather than inherent: a theme that parallels our SAT-encoding
+finding that CDCL-level difficulty depends on how the multiplier
+is compiled, not just on what is being verified.
+Biere, Kauers, and Ritirc~\cite{biere2017challenges},
+Kaufmann~\cite{kaufmann2020thesis},
 Kaufmann and Biere~\cite{kaufmann2021amulet}, and
 Yu et al.~\cite{yu2016arithmetic} develop gate-level algebraic
 verification of multipliers using Gr\"obner bases or function
