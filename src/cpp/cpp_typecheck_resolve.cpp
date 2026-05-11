@@ -183,8 +183,7 @@ void cpp_typecheck_resolvet::guess_function_template_args(
     // failed candidates never produce user-visible output, as
     // required by the standard.
     null_message_handlert sfinae_null_handler;
-    message_handlert &sfinae_old_handler =
-      cpp_typecheck.get_message_handler();
+    message_handlert &sfinae_old_handler = cpp_typecheck.get_message_handler();
     cpp_typecheck.set_message_handler(sfinae_null_handler);
     exprt e;
     try
