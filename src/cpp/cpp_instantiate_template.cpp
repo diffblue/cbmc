@@ -4443,9 +4443,26 @@ skip_pack_removal_ft:
   // Per [temp.variadic]/7: remove empty pack expansions
   if(!template_map.pack_size_map.empty() && !new_decl.declarators().empty())
   {
+    // Per [basic.scope.temp] and [temp.variadic]/5: a pack parameter's
+    // short name in this template refers to THIS template's pack
+    // parameter, not a pack with the same short name declared by
+    // some other template that happens to be in the pack_size_map.
+    // Restrict to packs declared by the template being instantiated
+    // so that `_Types` from one template doesn't cause parameters of
+    // another template to be stripped.
+    std::set<irep_idt> local_pack_ids;
+    for(const auto &tp : template_type.template_parameters())
+    {
+      if(tp.get_bool(ID_ellipsis))
+      {
+        irep_idt pid = tp.type().get(ID_identifier);
+        if(!pid.empty())
+          local_pack_ids.insert(pid);
+      }
+    }
     std::set<std::string> ep;
     for(const auto &ps : template_map.pack_size_map)
-      if(ps.second == 0)
+      if(ps.second == 0 && local_pack_ids.count(ps.first))
       {
         const std::string f = id2string(ps.first);
         auto p = f.rfind("::");
