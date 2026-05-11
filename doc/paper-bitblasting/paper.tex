@@ -121,19 +121,18 @@ solvers with solver-level proof analysis.
 Our contributions are:
 
 \begin{enumerate}
-\item \textbf{Proof-guided encoding design.} We apply DRAT
-  proof-trace analysis in a single encoding-design case
+\item \textbf{A DRAT-guided design case study.} We apply DRAT
+  proof-trace analysis to a single encoding-design case
   (standard Comba $\to$ \combacs), following the sequence
   DRAT analysis $\to$ bottleneck identification $\to$
   structural hypothesis $\to$ encoding redesign $\to$
   cross-solver validation, and demonstrate the same analysis
   lens retrospectively on three pre-existing encodings
-  (Booth, 4-bit blocks, sorting networks). We do not claim
-  the process is a general methodology on the basis of one
-  design case; we do claim it is reproducible, transferable to
-  similar encoding problems, and sufficient to explain both
-  successful and unsuccessful encodings
-  (Section~\ref{sec:methodology}).
+  (Booth, 4-bit blocks, sorting networks). This is a detailed
+  case study, not a general methodology claim; the sequence is
+  reproducible and transferable, and we find it sufficient to
+  explain both successful and unsuccessful encodings in our
+  evaluation (Section~\ref{sec:methodology}).
 
 \item \textbf{Carry propagation as the causal driver of CDCL
   search difficulty.} We combine a GF(2) comparison with a
@@ -212,10 +211,11 @@ resolving all clauses containing them; it is effective when the
 resolvent count is small. \cadical~\cite{biere2019cadical} performs
 BVE during search (\emph{inprocessing}), while
 \minisat/SatELite~\cite{een2005effective} performs it only during
-preprocessing. \cadical also extracts XOR and AND gates from CNF and
-identifies congruent (functionally equivalent) gate pairs---for BW=9
-commutativity, it finds 131 XOR gates, 138 AND gates, and 130
-congruent pairs between two multiplier circuits.
+preprocessing. \cadical also extracts XOR and AND gates from CNF
+and identifies congruent (functionally equivalent) gate pairs
+between multiplier circuits; this feature underpins the
+congruence-closure benefits we exploit in
+Section~\ref{sec:combacs}.
 
 Brain et al.~\cite{brain2016propagation} showed that composition of
 propagation-complete (PC) primitives preserves PC for adders but
@@ -342,17 +342,11 @@ dominant driver of CDCL search difficulty.
 
 \textbf{Scope.} The experiment establishes that on commutativity
 and on \cadical, carry presence dominates the choice of
-accumulation topology. It does \emph{not} establish a proof-theoretic
-lower bound---Beame and Liew prove polynomial-size regular
-resolution refutations exist for array, diagonal, and Booth
-multipliers on commutativity~\cite{beame2019toward}---so the
-hardness is CDCL-search-relative, not proof-complexity-absolute.
-Whether better heuristics or encoding-level guidance
-(Section~\ref{sec:combacs}) close the gap is the engineering
-question Beame and Liew identify as open.
+accumulation topology; it does not establish a proof-theoretic
+lower bound, given the Beame--Liew upper bounds cited above.
 
 
-\section{Proof-Driven Encoding Design}
+\section{Designing \combacs through DRAT Analysis}
 \label{sec:methodology}
 
 \combacs was designed through a systematic methodology based on
@@ -398,28 +392,12 @@ across four different SAT solvers.
 
 \paragraph{Retrospective analysis of known encodings.}
 We did not design Booth radix-4, 4-bit blocks, or sorting
-networks via this methodology---these are pre-existing ideas (Booth
-from hardware arithmetic~\cite{booth1951signed}; 4-bit blocks
-from earlier unpublished work by one of the authors; sorting
-networks from the synthesis literature). However, the same DRAT
-analysis proves useful for \emph{understanding} why each encoding
-wins or loses on specific benchmarks. Applied post-hoc to Booth on
-constant multiplication, proof-variable analysis shows that Booth's
-zero-valued digits for constants with few set bits eliminate entire
-partial products, reducing conflicts 10$\times$
-(Section~\ref{sec:alternative}). Applied to sorting networks,
-analysis reveals that the 2,915 fixed variables from
-sorted-property constraints are overwhelmed by the 13K extra
-variables the encoding introduces.
-
-\paragraph{Towards automation.}
-The manual steps above are candidates for automation: an AI system
-that reads DRAT proofs, identifies structural bottlenecks, and
-proposes encoding modifications would close the loop. Existing
-work analyses encoding source code~\cite{jarvisalo2012inprocessing}
-or modifies solver heuristics~\cite{biere2019cadical}; we are
-not aware of a system that closes the full proof-to-encoding
-cycle. Automating it is future work.
+networks via this methodology---these are pre-existing ideas
+(Booth from hardware arithmetic~\cite{booth1951signed}; 4-bit
+blocks from earlier unpublished work by one of the authors;
+sorting networks from the synthesis literature). The same DRAT
+analysis explains why each encoding wins or loses on specific
+patterns in Section~\ref{sec:alternative}.
 
 \iffalse
 % Commented out pending peer-review feedback: the German reviewer's
@@ -464,7 +442,7 @@ proof steps.
   popcount. Carry bits are collected but \emph{not} propagated to
   adjacent columns.
 \item \textbf{Second pass:} Reduce the accumulated carry bits (which
-  form much shorter columns, max height 4 even at BW=17).
+  form much shorter columns, at most 4 for the bit-widths we test).
 \end{enumerate}
 
 \begin{figure}[ht]
@@ -511,7 +489,8 @@ proof steps.
 \caption{The \combacs two-pass encoding for a 4-bit multiplier.
   Pass~1 reduces each column independently via popcount (no
   inter-column carries). Pass~2 reduces the short carry columns
-  (max height 2 here, max 4 at BW=17).}
+  (max height 2 here; at most 4 even for the largest bit-widths
+  we test).}
 \label{fig:combacs}
 \end{figure}
 
@@ -607,78 +586,14 @@ independence reduces inter-column reasoning in the proof.
 \subsection{Multi-Encoding as Hybrid Selection}
 \label{sec:multi-encoding}
 
-The adaptive heuristic above selects \emph{one} encoding per
-multiplication based on structural cues. A complementary strategy,
-useful when structural cues are ambiguous, is to present the solver
-with \emph{two} encodings of the same multiplication at once. We
-refer to this as \emph{multi-encoding}: both encodings share input
-and output bit-vectors but have disjoint internal variables, with
-bit-wise equality constraints tying the two output bit-vectors.
-The SAT formula then contains two parallel encodings whose clauses
-are free to interact during CDCL search. The intuition is that
-each additional encoding provides another structural handle; the
-risk is formula bloat and heuristic confusion between the
-alternatives.
-
-We implemented this as an extension of
-\texttt{bv\_utilst::unsigned\_multiplier}: it accepts a secondary
-encoding name in addition to the primary encoding flags, and
-emits both. We evaluated the mode on nine benchmarks
-(algebraic pre-solver disabled, \cadical, 60\,s timeout,
-6\,GB memory) with every combination of primary
-$\in \{$shift-add, \combacs, Booth, block4$\}$ and secondary
-$\in \{$none, shift-add, \combacs, Comba, Dadda, Booth, block4$\}$,
-for 180 multi-encoding runs plus 36 singleton baselines.
-
-\begin{table}[ht]
-\caption{Multi-encoding behaviour relative to singletons:
-  ``multi/min'' is the ratio of the multi-encoding time to the
-  faster of the two singletons; ``multi/max'' is the ratio to
-  the slower. A multi-encoding run that matches portfolio
-  behaviour has multi/min $\approx 1$ and multi/max $\ll 1$.
-  Median over 180 multi-encoding runs; T/O at 60\,s counted as
-  60\,s for all ratios.}
-\label{tab:multi-enc}
-\centering
-\begin{tabular}{lr}
-\toprule
-Statistic & Value \\
-\midrule
-Median multi / min(A, B) & 1.31$\times$ \\
-Geometric mean multi / min(A, B) & 1.23$\times$ \\
-Median multi / max(A, B) & 0.14$\times$ \\
-Multi within 1.25$\times$ of min(A, B) & 76/180 (42\%) \\
-Multi more than 1.5$\times$ slower than min(A, B) & 72/180 (40\%) \\
-Multi solved where one singleton timed out & 44/180 runs \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-The outcome is \emph{portfolio-like}: multi-encoding behaves
-approximately as a free portfolio of the two singletons,
-paying about 30\% overhead (median) versus the best singleton
-but running on median 7$\times$ faster than the worse one.
-Notable rescues: on \texttt{comm\_11} shift-add alone times
-out, while \texttt{shift-add+combacs} solves in 0.66\,s; on
-\texttt{bf16\_mul\_comm\_v2} every combacs-containing pair
-inherits the combacs speed, whereas combinations that exclude
-combacs inherit the 22\,s shift-add baseline. On simple
-benchmarks the overhead is visible (\texttt{comm\_8}
-\texttt{block4} alone solves in 81\,ms; \texttt{block4+shift-add}
-multi takes 104\,ms, a 28\% penalty), and 40\% of multi runs are
-more than 1.5$\times$ slower than the better singleton, so
-multi-encoding is not a universally free lunch. The 44 rescue
-cases are counted against the faster of the two singletons; when
-both time out, neither the rescue count nor the ``within 1.25\%''
-count is incremented.
-
-Multi-encoding therefore complements the adaptive selection
-above: where adaptive selection commits to one encoding based on
-static pattern cues, multi-encoding lets CDCL's learning
-dynamically pick whichever encoding yields shorter proofs on
-a given run. It is a hybrid strategy that trades a modest
-constant-factor overhead for safer default behaviour when the
-best single encoding for a benchmark is unknown a priori.
+We also evaluated a \emph{multi-encoding} mode that emits two
+encodings of the same multiplication with equality constraints
+tying their outputs, letting CDCL's learning arbitrate. The mode
+is slower than the best singleton on 58\% of 180 configurations
+(median 30\% overhead); it is therefore not a selection strategy
+but effectively another encoding with worse numbers than the
+singletons it combines. We document the experiment in
+Appendix~\ref{app:multi-encoding} for completeness.
 
 
 \section{Alternative Encodings}
@@ -768,23 +683,6 @@ encoding (13,617 conflicts vs.\ 15,662 for shift-add), suggesting
 that the balanced tree structure from 4-bit blocks aids BVE on
 problems with mixed arithmetic and comparison operations.
 
-\subsection{Sorting Network (Negative Result)}
-
-We compute $n^2$ partial product bits, sort each column using a
-bitwise sorting network (compare-and-swap = $(x \lor y, x \land y)$),
-and add auxiliary constraints enforcing the sorted property
-($\mathit{out}[i] \Rightarrow \mathit{out}[i{-}1]$). The sorted
-representation makes carry structure explicit.
-
-Despite achieving the highest fixed-variable count (2,915 vs.\ 217
-for shift-add)---confirming excellent propagation from the auxiliary
-constraints---the encoding produces 13,316 variables and 40,462
-clauses (18$\times$ and 14$\times$ more than shift-add). The 25M
-propagations overwhelm the structural benefit. This is a clear
-negative result: auxiliary constraints that improve propagation
-locally can be net-negative when they dramatically increase formula
-size.
-
 \subsection{No Single Encoding Dominates}
 
 \begin{table}[ht]
@@ -834,15 +732,16 @@ and factoring (SAT instances: 6).
 \subsection{Layer Ablation}
 \label{sec:ablation}
 
-To understand what the encoding contributes on top of the
-algebraic pre-solver (a separate layer, described in a companion
-paper), we ran a four-layer ablation on twelve representative
-benchmarks, each configuration enabling one further layer:
-shift-add only $\to$ $+$simplify $\to$ $+$algebraic $\to$
-$+$\combacs.
+To understand what the encoding contributes on top of \cbmc's
+word-level simplification and algebraic pre-solver, we ran a
+four-layer ablation on twelve representative benchmarks, each
+configuration enabling one further layer: shift-add only $\to$
+$+$simplify $\to$ $+$algebraic $\to$ $+$\combacs.
 
 \begin{table}[ht]
-\caption{Layer ablation (\cadical, seconds; T/O\,=\,120\,s).}
+\caption{Layer ablation, one representative per regime (\cadical,
+  seconds; T/O\,=\,120\,s). The full 12-benchmark table is in
+  Appendix~\ref{app:layer-full}.}
 \label{tab:ablation}
 \centering
 \small
@@ -850,46 +749,26 @@ $+$\combacs.
 \toprule
 Benchmark & shift only & +simplify & +algebraic & +\combacs \\
 \midrule
-comm\_8 & 0.72 & 0.005 & 0.005 & 0.005 \\
-comm\_16 & T/O & 0.005 & 0.005 & 0.005 \\
-comm\_32 & T/O & 0.005 & 0.005 & 0.005 \\
-assoc\_8 & 29.1 & 0.005 & 0.005 & 0.005 \\
-distrib\_8 & 78.4 & 0.005 & 0.005 & 0.005 \\
-overflow\_detect\_16 & 0.35 & 0.35 & 0.008 & 0.008 \\
-dsp\_vanishing\_poly\_8 & 0.040 & 0.039 & 0.008 & 0.008 \\
-dsp\_horner\_16 & 7.77 & 7.74 & 0.010 & 0.010 \\
-dsp\_image\_reject & T/O & T/O & 0.015 & 0.015 \\
-mul\_ineq\_12 & 0.53 & 0.51 & 0.52 & 0.51 \\
-strength\_chain\_16 & 1.07 & 1.07 & 1.08 & 1.50 \\
-bf16\_mul\_comm\_v2 & 23.0 & 22.9 & 23.1 & \textbf{11.2} \\
-\midrule
-Benchmarks solved & 9/12 & 11/12 & 12/12 & 12/12 \\
+comm\_16  (algebraic-solved)            & T/O  & 0.005 & 0.005 & 0.005 \\
+dsp\_image\_reject (algebraic-solved)   & T/O  & T/O   & 0.015 & 0.015 \\
+bf16\_mul\_comm\_v2 (encoding-driven)   & 23.0 & 22.9  & 23.1  & \textbf{11.2} \\
+mul\_ineq\_12 (neither helps)           & 0.53 & 0.51  & 0.52  & 0.51 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The ablation reveals three distinct regimes:
-
-\textbf{Algebraic-solved:} comm, assoc, distrib, overflow, and the
-DSP vanishing/Horner benchmarks are solved by the algebraic layers
-(simplify + Gr\"obner + vanishing polynomial test) to
-${\approx}$5\,ms. The encoding has no measurable effect on these.
-
-\textbf{Encoding-driven:} bf16\_mul\_comm\_v2 is beyond the
-algebraic layers' reach (floating-point semantics) and benefits
-from \combacs for a 2$\times$ speedup.
-
-\textbf{Neither helps:} mul\_ineq\_12 (inequality constraints) and
-strength\_chain\_16 (structural mismatch) are insensitive to both
-layers on this configuration, though we showed earlier that Booth
-dramatically improves strength\_chain\_16 when selected explicitly.
-
-The broader picture: in the deployed pipeline the algebraic layers
-handle the polynomial fragment for free, and the encoding matters
-for the residual problems. An encoding change that targets the
-residual problems (like \combacs targets floating-point mantissa
-multiplication) is effective; an encoding change that targets
-problems the algebraic layers already solve contributes nothing.
+The ablation reveals three regimes: polynomial benchmarks (comm,
+assoc, distrib, overflow and several DSP workloads) are solved by
+simplify/algebraic to ${\approx}$5\,ms, so the encoding has no
+measurable effect; bf16\_mul\_comm\_v2 is beyond the algebraic
+layers' reach (floating-point semantics) and benefits from
+\combacs for a 2$\times$ speedup; mul\_ineq\_12 and
+strength\_chain\_16 are insensitive to both layers on this
+configuration, although we showed earlier that Booth dramatically
+improves strength\_chain\_16 when selected explicitly. In the
+deployed pipeline the algebraic layers handle the polynomial
+fragment for free, and the encoding matters for the residual
+problems.
 
 \subsection{Multiplier Encoding Comparison}
 
@@ -947,55 +826,37 @@ structural circuit mismatches.
 
 \subsection{Cross-Solver Analysis}
 
-The four solvers differ in their response to \combacs for identifiable
-reasons. \cadical benefits most (71$\times$) because it combines the
-structural improvement with inprocessing BVE that exploits \combacs's
-popcount intermediate variables, plus congruence closure that
-identifies equivalent gates between the two multiplier circuits.
-\mergesat benefits from the structural improvement alone
-(2.6--$\infty\times$): as a \minisat fork with CHB activity and phase
-saving but no inprocessing, the carry-save structure is sufficient to
-solve comm BW=11 and BW=13 (both T/O with shift-add). \minisat's
-SatELite preprocessor achieves greater simplification on the compact
-shift-add formula for small problems (comm BW=9: 6.62\,s vs.\
-6.67\,s), but on larger formulas the structural benefit dominates
-(matrix trace: 5.39\,s where shift-add times out). Notably, \minisat
-times out on comm BW=11 for \emph{all} encodings---the problem exceeds
-its capacity regardless. \cryptominisat is consistently the slowest on
-multiplication; its native XOR handling provides no benefit (confirmed
-by running with and without XOR constraints), and it lacks both
-inprocessing BVE and congruence closure.
+The four solvers differ in their response to \combacs for
+identifiable reasons: \cadical benefits most (71$\times$) because
+it combines the structural improvement with inprocessing BVE on
+\combacs's popcount variables and congruence closure on the gates
+between the two multiplier circuits; \mergesat benefits from the
+structural improvement alone (2.6--$\infty\times$), as a \minisat
+fork without inprocessing; \minisat's SatELite preprocessor
+simplifies the compact shift-add formula on small problems (comm
+BW=9: 6.62 vs.\ 6.67\,s) but on larger formulas the structural
+benefit dominates (matrix trace: 5.39\,s where shift-add times
+out); \minisat times out on comm BW=11 for \emph{all} encodings,
+exceeding its capacity regardless of encoding; \cryptominisat is
+consistently the slowest on multiplication, as its native XOR
+handling provides no benefit (confirmed with and without XOR
+constraints) and it lacks both inprocessing BVE and congruence
+closure.
 
-\subsection{Encoding Comparison with Variance}
-\label{sec:variance}
-
-We ran five runs of every (encoding, benchmark) pair on the five
-benchmarks most sensitive to encoding choice; the coefficient of
-variation is under 1\% on all long-running benchmarks. The
-numbers we quote elsewhere in the paper therefore reflect real
-encoding-effect differences rather than measurement noise.
-Detailed per-run results are in Appendix~\ref{app:variance}.
-
-\subsection{Proof Size Across Encodings}
-\label{sec:proof-sizes}
-
-DRAT proof size gives an encoding-independent measure of solver
-effort, insensitive to wall-clock noise. We collected proofs
-(\cadical, algebraic layers disabled) for all eight encodings on
-six benchmarks spanning each pattern. The proof-size ratios track
-the solver-time ratios closely:
-\combacs compresses commutativity proofs by 40--60$\times$ relative to
-shift-add (on comm\_11 from 99.8\,MB to 1.6\,MB);
-Booth compresses strength-reduction proofs by 12--20$\times$
-(strength\_chain\_16: 3.3\,MB $\to$ 271\,KB);
-block4 achieves the smallest proof on comm\_11 (813\,KB,
-120$\times$ smaller than shift-add);
-sortnet produces the largest proofs on every benchmark except
-overflow\_detect\_16 where its fixed-variable injection from
-sorted-property constraints lets the solver short-circuit. Every
-claim in this paper could be restated in terms of proof sizes with
-the same conclusions. The full per-encoding table is
-in Appendix~\ref{app:proof-sizes}.
+\paragraph{Robustness.}
+The comparison is robust to run-to-run noise (coefficient of
+variation $<$1\% over five runs; Appendix~\ref{app:variance}) and
+reproduces when solver effort is measured by DRAT proof size
+rather than wall-clock: \combacs compresses commutativity proofs
+by 40--60$\times$ (comm\_11: 99.8\,MB $\to$ 1.6\,MB), Booth
+compresses strength-reduction proofs by 12--20$\times$, block4
+achieves the smallest proof on comm\_11 (813\,KB), and sortnet
+produces the largest proofs on every benchmark except
+overflow\_detect\_16. Wallace and Dadda diverge by up to
+14$\times$ despite both being tree-based reductions. The full
+proof-size table across eight encodings is in
+Appendix~\ref{app:proof-sizes}; every claim in the paper could
+be restated in terms of proof sizes with the same conclusions.
 
 \subsection{Scaling}
 \label{sec:scaling}
@@ -1105,7 +966,9 @@ easy to find.
 
 To assess external validity, we evaluate on 44 QF\_BV benchmarks in
 SMT-LIB format using \cbmc's \texttt{smt2\_solver} with \cadical.
-The \texttt{smt2\_solver} lacks \cbmc's word-level simplification,
+The \texttt{smt2\_solver} lacks \cbmc's word-level simplification
+and algebraic pre-solver, so the numbers below reflect the
+encoding alone on top of the raw bit-blasting pipeline.
 
 \begin{table}[ht]
 \caption{QF\_BV benchmarks with adaptive \combacs (\cadical, seconds).}
@@ -1164,10 +1027,17 @@ submitter category; we took 5 benchmarks from each category
 (fewer if the category had fewer than 5), yielding 66 benchmarks.
 Sample list and raw results are in
 \texttt{doc/paper-bitblasting/data/smt-comp-sample/}.} We ran each
-benchmark with \cadical and a 60\,s timeout in two configurations:
-(i)~\emph{default} \cbmc (algebraic pre-solver + \combacs), and
-(ii)~\emph{shift-add-nosimp} (encoding alone, algebraic pre-solver
-disabled).
+benchmark with \cadical and a 60\,s timeout in three configurations:
+(i)~\emph{default} \cbmc (algebraic pre-solver + \combacs), which
+exercises the full pipeline;
+(ii)~\emph{shift-add-nosimp} (algebraic and simplification
+disabled, shift-add encoding), which measures the raw bit-blasting
+baseline; and
+(iii)~\emph{combacs-nosimp} (algebraic and simplification disabled,
+\combacs encoding), which isolates the encoding's contribution on
+top of the same baseline. Configuration (i) is run with the full
+\cbmc tool; (ii) and (iii) use \cbmc's \texttt{smt2\_solver} so
+that the only difference between them is the multiplier encoding.
 
 \begin{table}[ht]
 \caption{SMT-COMP QF\_BV sample (66 benchmarks, \cadical, 60\,s T/O).}
@@ -1177,35 +1047,27 @@ disabled).
 \toprule
 Configuration & Solved & PAR-2 (s/benchmark) \\
 \midrule
-shift-add-nosimp   & 34/66 & 63.1 \\
-default (algebraic + \combacs) & 33/66 & 63.5 \\
+shift-add-nosimp (\texttt{smt2\_solver}) & 41/66 & 52.1 \\
+\combacs-nosimp (\texttt{smt2\_solver})  & 41/66 & 52.1 \\
+default (algebraic + \combacs, \cbmc)    & 33/66 & 63.5 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The two configurations solve almost the same number of benchmarks
-(34 vs 33) with nearly identical PAR-2 scores. A closer look
-reveals the structure behind this near-tie:
-
-\textbf{Default-only wins (2 benchmarks):} \texttt{brummayerbiere3\_isqrtadd}
-(59.3\,s vs T/O), where the algebraic pre-solver shrinks the formula
-before bit-blasting, and \texttt{bv-term-small-rw\_1303}, a rewrite-rule
-benchmark solved instantaneously by the algebraic layer (0.0\,s vs T/O).
-On three further benchmarks the default configuration is
-${\geq}$3$\times$ faster (up to 3226$\times$ on the rewrite-rule family),
-without any time increase.
-
-\textbf{Shift-add-only wins (3 benchmarks, all division-related):}
-\texttt{log-slicing\_bvudiv\_15} (T/O vs 50.3\,s),
-\texttt{log-slicing\_bvsdiv\_16} (T/O vs 57.3\,s), and one Ultimate
-Automizer benchmark (T/O vs 4.0\,s). Inspection shows these are
-\texttt{bvudiv}/\texttt{bvsdiv}-dominated; \cbmc's algebraic
-pre-solver includes a GCD-based division-by-constant rewriting step
-that, on these benchmarks, produces a larger bit-blasted formula
-than the straight shift-add encoding would.
-
-\textbf{No significant regression:} no benchmark is ${\geq}$3$\times$
-slower with the default than with shift-add-nosimp.
+The encoding-isolation comparison (rows 1 vs 2) is decisive: on
+this broad community sample \combacs and shift-add solve the same
+41 benchmarks with identical PAR-2, and on the 41 both-solved
+the per-benchmark ratio is between $0.83\times$ and $1.15\times$.
+The pipeline comparison (row 3 vs rows 1--2) is dominated by the
+tool change---running through \cbmc's C front-end rather than
+\texttt{smt2\_solver}---plus the algebraic pre-solver's effect on
+a handful of benchmarks: algebraic pre-solving rescues
+\texttt{brummayerbiere3\_isqrtadd} (59.3\,s vs T/O), solves one
+rewrite-rule benchmark instantaneously (0.0\,s vs T/O), and
+accelerates three others by up to $3226\times$, but has one
+regression on \texttt{bvudiv}/\texttt{bvsdiv}-dominated benchmarks
+where its GCD-based rewriting step produces a larger bit-blasted
+formula.
 
 The headline takeaway is that our changes are \emph{nearly neutral
 on a broad QF\_BV community sample}: they are not a silver bullet,
@@ -1282,6 +1144,27 @@ regression~\cite{brain2016propagation}. Caching AND gates between
 multiplications is 89\% slower because shared partial-product
 variables prevent independent BVE.
 
+\textbf{Sorting networks.} We compute $n^2$ partial product bits,
+sort each column with a bitwise sorting network (compare-and-swap
+$=(x \lor y, x \land y)$), and add auxiliary constraints enforcing
+the sorted property ($\mathit{out}[i] \Rightarrow \mathit{out}[i{-}1]$).
+Despite achieving the highest fixed-variable count (2{,}915 vs.\
+217 for shift-add), the encoding produces 13{,}316 variables and
+40{,}462 clauses (18$\times$ and 14$\times$ more than shift-add),
+and the 25M propagations overwhelm the structural benefit.
+Auxiliary constraints that improve propagation locally can be
+net-negative when they dramatically increase formula size.
+
+\textbf{Greedy Addition and BVA.} We tested Jia et al.'s Greedy
+Addition~\cite{jia2023improving} (Huffman-like partial-product
+ordering) across the four solvers: \cadical benefits 1.4--2.6$\times$
+because its inprocessing BVE works better with balanced trees, but
+\minisat and \mergesat regress up to 1.8$\times$ because their
+preprocessing BVE prefers long sequential carry chains. Fazekas et
+al.'s Bounded Variable Addition~\cite{fazekas2025incremental},
+when enabled in \cadical, times out on every multiplication
+benchmark in our suite.
+
 \subsection{Approaches With Limited or Chaotic Benefit}
 
 XOR-based techniques consistently disappoint. Offline Gaussian
@@ -1301,6 +1184,11 @@ Han-Carlson, Ladner-Fischer) produce identical learned-clause
 quality (95\% glue-1~\cite{audemard2009predicting}); BK wins
 solely by having the fewest variables
 (Appendix~\ref{app:adders}).
+Pre-providing carry-chain hint clauses is non-monotonic in
+bit-width: 18--52\% speedup at BW=10--13, 59--94\% regression at
+BW=14--16 (Appendix~\ref{app:bve}); the hints change BVE's
+elimination order and the residual problem's difficulty is a
+non-monotonic function of that order.
 
 \section{Related Work}
 
@@ -1349,21 +1237,15 @@ the authors (unpublished prior to the present work).
 Jia et al.~\cite{jia2023improving} improve bit-blasting for
 nonlinear integer arithmetic (QF\_NIA) with Greedy Addition (a
 Huffman-like ordering that minimises auxiliary variables) and
-Multiplication Adaptation (starting with narrow bit-widths). We
-tested Greedy Addition across four solvers and found mixed results:
-\cadical benefits (1.4--2.6$\times$ faster) because its inprocessing
-BVE works better with balanced trees, but \minisat and \mergesat
-regress (up to 1.8$\times$ slower) because their preprocessing BVE
-prefers long sequential carry chains. This solver-dependent effect
-reinforces our finding that encoding structure interacts deeply with
-solver-specific techniques.
+Multiplication Adaptation (starting with narrow bit-widths);
+we evaluate Greedy Addition across four solvers in
+Section~\ref{sec:negative}.
 Fazekas et al.~\cite{fazekas2025incremental} extend incremental
-inprocessing to support Bounded Variable Addition (BVA), the dual of
-BVE. We found BVA catastrophic for multiplication (all benchmarks T/O
-when enabled in \cadical). Our g-only technique
-(Appendix~\ref{app:adders}) is superficially similar but fundamentally
-different: g-only adds AND gates that \emph{enable} BVE, while BVA
-adds variables that \emph{prevent} it.
+inprocessing to support Bounded Variable Addition (BVA), the dual
+of BVE. Our g-only technique (Appendix~\ref{app:adders}) is
+superficially similar but fundamentally different: g-only adds
+AND gates that \emph{enable} BVE, while BVA adds variables that
+\emph{prevent} it.
 Encoding techniques for SAT have been studied
 extensively~\cite{tseitin1983complexity,plaisted1986structure}.
 
@@ -1447,6 +1329,15 @@ and reconciling our encoding-level guidance with recent
 solver-level~\cite{danner2025sat} and
 inprocessing-level~\cite{pollitt2026factoring} work on finding
 the short proofs guaranteed by~\cite{beame2019toward}.
+Multiplication-containing formulae encountered by bit-vector SMT
+solvers split into four classes by quantification and top-level
+connective between the two multiplication expressions: universal
+and existential, crossed with equational and relational. The
+encoding-level results here address all four but target primarily
+the bitwise, inequality, floating-point, and structural-mismatch
+cases where pre-solver techniques do not apply; a complementary
+treatment of the universal equational fragment via Gr\"obner
+bases and vanishing polynomials is the subject of ongoing work.
 
 \paragraph{Declaration on Generative AI.}
 During preparation, the authors used Kiro (an AI coding assistant
@@ -1458,6 +1349,86 @@ final paper was reviewed and edited by the authors.
 
 \newpage
 \appendix
+
+\section{Multi-Encoding Experiment}
+\label{app:multi-encoding}
+
+We implemented multi-encoding as an extension of
+\texttt{bv\_utilst::unsigned\_multiplier}: it accepts a secondary
+encoding name in addition to the primary encoding flags and emits
+both, with bit-wise equality constraints tying their outputs.
+We evaluated the mode on nine benchmarks (algebraic pre-solver
+disabled, \cadical, 60\,s timeout, 6\,GB memory) with every
+combination of primary $\in \{$shift-add, \combacs, Booth,
+block4$\}$ and secondary $\in \{$none, shift-add, \combacs, Comba,
+Dadda, Booth, block4$\}$, for 180 multi-encoding runs plus 36
+singleton baselines.
+
+\begin{table}[ht]
+\caption{Multi-encoding behaviour relative to singletons:
+  ``multi/min'' is the ratio of the multi-encoding time to the
+  faster of the two singletons; ``multi/max'' is the ratio to
+  the slower. Median over 180 multi-encoding runs; T/O at 60\,s
+  counted as 60\,s for all ratios.}
+\label{tab:multi-enc}
+\centering
+\begin{tabular}{lr}
+\toprule
+Statistic & Value \\
+\midrule
+Median multi / min(A, B) & 1.31$\times$ \\
+Geometric mean multi / min(A, B) & 1.23$\times$ \\
+Median multi / max(A, B) & 0.14$\times$ \\
+Multi within 1.25$\times$ of min(A, B) & 76/180 (42\%) \\
+Multi more than 1.5$\times$ slower than min(A, B) & 72/180 (40\%) \\
+Multi solved where one singleton timed out & 44/180 runs \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The median multi-encoding run is 30\% slower than the better of
+its two singletons and 7$\times$ faster than the worse; 44 of 180
+configurations are rescues (a singleton timed out). This is
+portfolio-like behaviour with a constant-factor cost, not a
+first-class selection strategy: the multi-encoding formula is
+effectively an eighth encoding whose performance is dominated by
+the singletons it combines.
+
+
+\section{Layer Ablation: Full Table}
+\label{app:layer-full}
+
+Table~\ref{tab:ablation-full} is the 12-benchmark layer-ablation
+table summarised in Section~\ref{sec:ablation}.
+
+\begin{table}[ht]
+\caption{Layer ablation (\cadical, seconds; T/O\,=\,120\,s), full
+  table.}
+\label{tab:ablation-full}
+\centering
+\small
+\begin{tabular}{lrrrr}
+\toprule
+Benchmark & shift only & +simplify & +algebraic & +\combacs \\
+\midrule
+comm\_8 & 0.72 & 0.005 & 0.005 & 0.005 \\
+comm\_16 & T/O & 0.005 & 0.005 & 0.005 \\
+comm\_32 & T/O & 0.005 & 0.005 & 0.005 \\
+assoc\_8 & 29.1 & 0.005 & 0.005 & 0.005 \\
+distrib\_8 & 78.4 & 0.005 & 0.005 & 0.005 \\
+overflow\_detect\_16 & 0.35 & 0.35 & 0.008 & 0.008 \\
+dsp\_vanishing\_poly\_8 & 0.040 & 0.039 & 0.008 & 0.008 \\
+dsp\_horner\_16 & 7.77 & 7.74 & 0.010 & 0.010 \\
+dsp\_image\_reject & T/O & T/O & 0.015 & 0.015 \\
+mul\_ineq\_12 & 0.53 & 0.51 & 0.52 & 0.51 \\
+strength\_chain\_16 & 1.07 & 1.07 & 1.08 & 1.50 \\
+bf16\_mul\_comm\_v2 & 23.0 & 22.9 & 23.1 & \textbf{11.2} \\
+\midrule
+Benchmarks solved & 9/12 & 11/12 & 12/12 & 12/12 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 
 \section{Adder Encoding Interaction}
 \label{app:adders}
@@ -1525,18 +1496,13 @@ div\_roundtrip\_12 & \mergesat & 11.4s & \textbf{10.3s} \\
 
 g-only is neutral on \combacs benchmarks (popcount already provides
 BVE targets) and causes no regressions on any hard benchmark. It is
-now the default top-level adder encoding in \cbmc.
-
-\subsection{Division and Floating-Point}
-
-Division and floating-point operations show zero encoding sensitivity
-across all four solvers (FP add commutativity: 4.42--4.43\,s for all
-three adder encodings; division roundtrip: 7.86\,s for all multiplier
-encodings). This is because: (1)~division's internal multiplication
-always uses shift-add; (2)~FP's 48-bit mantissa multiplication falls
-through to shift-add via \combacs's sparse-constant fallback
-($>$32 bits with few partial products); (3)~the FP barrel shifter and rounding logic dominate
-solving time.
+now the default top-level adder encoding in \cbmc.\footnote{Division
+and floating-point operations show zero encoding sensitivity across
+all four solvers (FP add commutativity: 4.42--4.43\,s for all three
+adder encodings): division's internal multiplication always uses
+shift-add, FP's 48-bit mantissa multiplication falls through to
+shift-add via \combacs's sparse-constant fallback, and the FP
+barrel shifter and rounding logic dominate solving time.}
 
 
 \subsection{Threshold Sensitivity}
@@ -1603,6 +1569,7 @@ distrib\_8 & \textbf{70.95} & 70.96 & 70.85 \\
 
 
 \section{BVE Interaction}
+\label{app:bve}
 \label{sec:bve}
 
 \cadical's inprocessing BVE is \emph{counterproductive} for \combacs
@@ -1696,7 +1663,7 @@ strength\_chain\_16 & 3,263 & 1,821 & 3,953 & 4,543 & 4,918 & \textbf{271} & 2,0
 \end{table}
 
 Table~\ref{tab:proof-sizes} is the per-encoding proof-size
-breakdown referenced in Section~\ref{sec:proof-sizes}. The
+breakdown referenced in Section~\ref{sec:evaluation}. The
 ranking per row reproduces the solver-time ranking from the main
 evaluation tables, supporting the observation that the timing
 differences we report are not an artefact of CDCL heuristics but

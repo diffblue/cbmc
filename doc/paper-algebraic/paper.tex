@@ -85,18 +85,30 @@ BW=32 takes the same 0.3\,ms as BW=16) but are limited to
 polynomial operations---problems involving bitwise operations,
 shifts, or inequalities fall through to bit-blasting.
 
-Bit-vector SMT queries involving multiplication fall into two classes.
-\emph{Universal/equational} queries ($\forall x, y.\; P(x,y) =
-Q(x,y)$) ask whether two implementations are equivalent for all
-inputs---commutativity, associativity, DSP datapath equivalence.
-\emph{Existential} queries ($\exists x, y.\; P(x,y) = c$) ask
-whether a specific output is reachable---factoring, overflow
-detection, finding counterexamples. Algebraic techniques excel on
-universal queries (they prove identities without enumerating inputs)
-but are not constructive for existential queries. Bit-blasting
-handles both but scales exponentially with bitwidth. The two
-approaches are complementary; this paper focuses on the algebraic
-side.
+Bit-vector SMT queries involving multiplication can be classified
+into four groups according to quantification and the top-level
+connective between the two multiplication expressions:
+\emph{universal equational} formulae ($\forall x, y.\; P(x,y) = Q(x,y)$,
+e.g.\ commutativity, hardware equivalence checking);
+\emph{existential equational} formulae ($\exists x, y.\; P(x,y) = Q(x,y)$,
+e.g.\ factoring, root-finding);
+\emph{universal relational} formulae
+($\forall x, y.\; P(x,y) \bowtie Q(x,y)$,
+where $\bowtie$ is a relation such as $<$, $\leq$, $\neq$,
+e.g.\ bounds checking); and
+\emph{existential relational} formulae
+($\exists x, y.\; P(x,y) \bowtie Q(x,y)$,
+e.g.\ overflow detection).
+Bit-blasting handles all four but scales poorly with bit-width.
+Algebraic techniques excel on universal equational formulae---they
+prove identities without enumerating inputs---but are often not
+constructive on failure and are difficult to apply to existential
+formulae, limiting their usefulness as a full replacement for
+bit-blasting. This paper focuses on the algebraic side; the
+bit-blasting companion
+paper~\cite{companion-bitblasting} contributes encoding
+improvements that target the classes where algebraic techniques
+do not apply.
 
 On 39 custom QF\_BV benchmarks designed to exercise arithmetic
 identities,
@@ -105,10 +117,8 @@ bfloat16 benchmarks whose non-standard floating-point types it
 does not support by default), and
 Bitwuzla~\cite{niemetz2023bitwuzla} (SMT-COMP 2024 QF\_BV winner)
 solves 39/39 using a different (word-level rewriting) approach.
-The bit-blasting companion
-paper~\cite{companion-bitblasting} contributes the encoding
-improvements orthogonal to the algebraic techniques here; we
-introduce zero correctness regressions across 691 existing tests.
+We introduce zero correctness regressions across 691 existing
+tests.
 
 \section{Algebraic Solving via Gr\"obner Bases}
 \label{sec:algebraic}
