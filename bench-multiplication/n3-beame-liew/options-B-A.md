@@ -82,3 +82,46 @@ structural rather than a CDCL-search artefact:
 > supplementary material), suggesting encoding- and proof-structure
 > guidance captures the commutativity proof more compactly than
 > CDCL's conflict-driven lemma stream.
+
+
+## Phase 3 Step 1 (2026-05-11 continuation)
+
+Extracted phi_Strip(k) from the CNF per Beame-Liew §3.3 and
+verified UNSAT via CaDiCaL at n=4, 6, 8 for k in [1, 2n-1]. This
+confirms Lemma 3.1 and validates the strip-extraction criterion
+(column-based variables + tableau symmetry + ZERO-constant units).
+
+Files: `phase3_strip_extract.py`.
+
+## Phase 3 Step 2 probe: strip BDD sizes
+
+Built BDDs for all strip variables as functions of input bits
+(a[0..n-1], b[0..n-1]) using the `dd` package. The BDD sizes
+confirm why the Beame-Liew construction is intricate:
+
+| n | k  | strip cols       | total strip var BDD size | peak single-var BDD |
+|---|----|------------------|-------------------------:|--------------------:|
+| 4 | 3  | [0, 3]           | 508                      | 30                  |
+| 4 | 5  | [2, 5]           | 1,276                    | 55                  |
+| 6 | 5  | [1, 5]           | 3,310                    | 144                 |
+| 6 | 7  | [3, 7]           | 10,399                   | 462                 |
+| 6 | 9  | [5, 9]           | 14,222                   | 462                 |
+| 8 | 7  | [3, 7]           | 21,871                   | 818                 |
+| 8 | 9  | [5, 9]           | 81,689                   | 3,537               |
+| 8 | 11 | [7, 11]          | 137,161                  | 4,419               |
+
+The BDDs for middle-k strip variables explode exponentially
+(consistent with Bryant 1991). A naive BDD-based BP would not
+deliver the O(n^6 log n) polynomial bound from Beame-Liew. The
+polynomial bound requires the paper's specific variable-ordering
+trick:
+
+1. Branch first on `o^{yx}_i` output bits.
+2. Then on tableau variables row-by-row.
+3. Crucially, *merge* BP nodes with the same `Cut(j)` assignment,
+   where `Cut(j)` has |Cut(j)| = 4 log k variables.
+
+Our BDD probe branches on inputs a, b in interleaved order, which
+is the WRONG ordering for polynomial size -- hence the exponential
+blowup we measure. Implementing the paper's specific BP (Step 2
+proper) is the next milestone for Phase 3.
