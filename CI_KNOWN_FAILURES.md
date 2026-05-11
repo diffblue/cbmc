@@ -83,6 +83,22 @@ re-triggered:
   `cpp17_shared_ptr` (VERIFICATION SUCCESSFUL with --unwind 2;
   was FAIL) and macOS `cpp17_any_basic` (was HANG on the
   `__cxx_atomic_load` call chain).
+* **SFINAE substitution-failure leak on libstdc++ `swap`** — new
+  KNOWNBUG tests `cpp11_std_is_swappable_sfinae` (cbmc-cpp) and
+  `cpp11_std_array_sfinae` (goto-cc-cbmc).  Not yet fixed.
+  User-visible symptom: running `goto-cc` on a file that
+  `#include <array>`s emits spurious
+    `error: unexpected expression: struct_tag`
+    `error: found no match for symbol 'swap'`
+  with an `irep::pretty()` dump leaked into the error text.
+  Root cause: substituting `_Tp = double` into the return type
+  `_Require<__not_<__is_tuple_like<_Tp>>, ...>` of libstdc++'s
+  `swap<_Tp>(_Tp&, _Tp&)` reaches `c_typecheck_expr.cpp:587`
+  with an `ID_struct_tag` expression.  Per [temp.deduct]/8
+  this substitution failure must be silently absorbed — the
+  candidate is simply removed during overload resolution, no
+  diagnostic is emitted, and `std::is_swappable<double>::value`
+  evaluates to `true`.
 
 ### Preprocessed-header test results after these fixes
 
