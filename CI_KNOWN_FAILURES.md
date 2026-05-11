@@ -161,6 +161,105 @@ chain plus SFINAE cascades that exist in the live MSVC headers.
 Extending one of those reproducers to also trigger the premature
 flush is a useful next step for the fix work.
 
+#### Phase 2 diagnosis (2026-05-11) — macOS basic_string typedef
+cascade is a runtime preprocessor-mode issue, not a code bug
+
+Detailed investigation of the macOS `basic_string<char,...>::pointer
+/__is_long/npos/__fits_in_sso` failures (reported in the original
+CI snapshot) revealed that these errors only appear when CBMC is
+told to use the GCC preprocessor mode on a Clang-preprocessed
+libc++ header.  The cascade starts at:
+
+    typedef allocator_traits<allocator_type> __alloc_traits;
+    typedef typename __alloc_traits::pointer pointer;
+
+Inside `allocator_traits<allocator<char>>`:
+
+    using pointer = typename __pointer<value_type, allocator_type>::type;
+
+`__pointer<char, allocator<char>>` has a default template argument
+`_RawAlloc = __libcpp_remove_reference_t<_Alloc>` where
+`__libcpp_remove_reference_t<T>` is an alias for the Clang builtin
+type trait `__remove_reference_t(T)`.  If CBMC is running in GCC
+preprocessor mode (the Linux default), `__remove_reference_t` is
+treated as a regular identifier — lookup fails, `__pointer<char,
+allocator<char>>` cannot be instantiated, the pointer typedef in
+`allocator_traits<allocator<char>>` fails, and the basic_string
+typedef cascade aborts.
+
+When running with either `--stdlib libc++` (which sets preprocessor
+mode to CLANG) or `--os macos` (which also selects CLANG), CBMC
+correctly parses `__remove_reference_t` as `TOK_GCC_BUILTIN_REMOVE_
+REFERENCE` and the cascade resolves successfully.  The original
+`pointer/__is_long/npos/__fits_in_sso` errors are eliminated.
+
+So these tests should already pass on actual macOS CI (which is
+running on `macos-15-intel` or `macos-14` runners where the default
+OS is macOS, hence default preprocessor is CLANG).  Without access
+to live CI logs, this is based on the config defaults in
+`src/util/config.cpp:1017-1030`.
+
+After `--os macos`, the remaining basic_string errors are a
+different class — private inner-struct members inside the
+`__long`/`__short`/`__rep` SSO union (`__is_long_`, `__size_`,
+`__cap_`) and method-local parameter packs (`__first`, `__t`,
+`__j1`) — which are unrelated to the original typedef cascade and
+would need separate investigation.
+
+#### Phase 2 diagnosis (2026-05-11) — MSVC `_Rebind_alloc_t`
+deduction cycle reduces to a `_Construct_in_place` variadic pack
+expansion bug
+
+Detailed investigation of the MSVC `_Rebind_alloc_t` failures in
+11 vector/string tests revealed that the real error isn't in
+`_Rebind_alloc_t` itself — that alias resolves correctly.  The
+failure is in a method called *during* the cascade:
+
+    template <class _Ty, class... _Types>
+    inline void _Construct_in_place(_Ty& _Obj, _Types&&... _Args)
+      noexcept(is_nothrow_constructible_v<_Ty, _Types...>) {
+        ::new (static_cast<void*>(::std::addressof(_Obj)))
+          _Ty(::std::forward<_Types>(_Args)...);
+    }
+
+When called as `_Construct_in_place(*_Mylast, forward<_Valty>(
+_Val)...)` from `vector<int>::_Emplace_back_with_unused_capacity`,
+CBMC reports `instantiating 'std::_Construct_in_place' with
+<signed int, std::remove_reference_t<ref_signed_int>>` and then
+`symbol '_Args' is unknown`.
+
+Analysis: `_Types` is instantiated with `remove_reference_t<int&>`,
+which CBMC preserves as an unresolved trait rather than reducing
+to `int`.  During body type-check of `_Construct_in_place`, the
+pack expansion `forward<_Types>(_Args)...` tries to expand `_Args`
+whose type is `_Types&&... = (remove_reference_t<int&>)&&...` — at
+this point something in CBMC's substitution loses track of the
+`_Args` pack parameter, emitting `_Args is unknown`.
+
+Isolated minimal reproducers of the pattern (with plain `int` and
+`remove_reference_t<int&>` explicit template args) *pass* on
+trunk, so the bug requires the full context: member function of a
+class template, parameter-pack forward + explicit-template-arg
+call sequence, builtin type-trait type in the instantiated pack.
+
+A proper fix has two likely angles:
+ 1. Ensure `remove_reference_t<T>` (and other builtin type-trait
+    aliases) is reduced to its canonical form early — at template
+    argument binding time rather than left unresolved in the
+    template_map.  This is a change in the substitution path in
+    `src/cpp/cpp_instantiate_template.cpp` and
+    `src/cpp/template_map.cpp`.
+ 2. Ensure pack-expansion substitution in the body of the
+    instantiated function correctly maps `_Args` → the expanded
+    forms even when the enclosing parameter pack element is a
+    class-template-derived type.  This is a change in how
+    `cpp_typecheckt::typecheck_expr_cpp_name` handles variadic
+    parameters in an instantiated context.
+
+Both angles warrant their own targeted investigation and isolated
+reproducer.  This is out of scope for this session but the
+diagnosis narrows the remaining work substantially.
+
 The "Performance Benchmarking" job (perf-benchcomp) fails at the end of the
 AWS C Common comparison with exit code 1 on otherwise-successful metrics; by
 agreement with the branch owner it is tracked separately and not part of this
