@@ -41,7 +41,10 @@ struct Atomic : Integral<T>
 // the member's type is the outer class template specialization
 struct Flag
 {
-  long test_and_set(long v) { return storage.exchange(v); }
+  long test_and_set(long v)
+  {
+    return storage.exchange(v);
+  }
   Atomic<long> storage;
 };
 

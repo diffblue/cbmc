@@ -1283,7 +1283,57 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           declaration.type().set(ID_C_tag_only_declaration, true);
 
       declaration.name_anon_struct_union();
-      typecheck_type(declaration.type());
+      // Per [class.mem]/4 and [temp.inst]/2: the type of a data
+      // member must be complete at the closing `}` of the class.
+      // If `typecheck_type` on the declaration's base type throws
+      // *during* class body processing, the remainder of the
+      // compound body loop is abandoned and the data member does
+      // not register in the class scope.  That in turn causes
+      // sibling method bodies to fail name lookup when
+      // `typecheck_method_bodies` runs later (the classic MSVC
+      // atomic_flag::_Storage failure: methods declared before the
+      // data member reference it; _Storage's type `atomic<long>`
+      // fails to typecheck; atomic_flag's class body is abandoned
+      // with _Storage unregistered; later test_and_set's body
+      // emits `symbol '_Storage' is unknown`).
+      //
+      // Narrow mitigation: when the type is specifically an
+      // unresolved class-template specialization (cpp_name with a
+      // template_args sub-element) inside a plain class body,
+      // catch the failure and keep the unresolved cpp_name so the
+      // declarator loop can still register the member by name.
+      // Method bodies that access the member get a resolvable
+      // identifier; only uses that require the concrete type fail.
+      bool type_is_tpl_cpp_name = false;
+      if(declaration.type().id() == ID_cpp_name)
+      {
+        for(const auto &sub : declaration.type().get_sub())
+          if(sub.id() == ID_template_args)
+          {
+            type_is_tpl_cpp_name = true;
+            break;
+          }
+      }
+      if(instantiation_stack.empty() && type_is_tpl_cpp_name)
+      {
+        const std::size_t errors_before =
+          get_message_handler().get_message_count(messaget::M_ERROR);
+        typet saved_type = declaration.type();
+        try
+        {
+          typecheck_type(declaration.type());
+        }
+        catch(...)
+        {
+          get_message_handler().set_message_count(
+            messaget::M_ERROR, errors_before);
+          declaration.type() = saved_type; // keep unresolved cpp_name
+        }
+      }
+      else
+      {
+        typecheck_type(declaration.type());
+      }
 
       bool is_static = declaration.storage_spec().is_static();
       bool is_mutable = declaration.storage_spec().is_mutable();
