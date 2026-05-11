@@ -186,3 +186,75 @@ Not committed (would be weeks of additional work):
 The session closes having made substantial empirical progress on
 all phases of the N3 plan while explicitly calling out the
 remaining core theoretical implementation task.
+
+
+## Phase 3 step 2: BP construction attempts
+
+Tried to construct the per-strip BP in phase3_bp_build.py with
+input-based (a, b) branching and cut-state merging at
+`cut_vars(j, k, delta)`. Result: gets stuck at non-trivial k
+because UP within the strip cannot determine c[k] and d[k] from
+just a, b inputs -- the strip is missing the constraints from
+lower columns (pp_c[i][j] for i+j < k-delta, which by design are
+NOT in phi_Strip(k)).
+
+To fix this, one must follow the paper's actual ordering:
+1. Branch on o^{yx}_i (output bits) first, not on inputs.
+2. Branch on incoming carries at column k-delta-1 (variables
+   cry_c[row, k-delta-1] and cry_d[row, k-delta-1]) -- these are
+   the "input boundary" to the strip.
+3. Branch on tableau variables row-by-row.
+4. Merge on Cut(j) at each row boundary.
+
+Step (1) is a 2^(delta+1)-way branch for each initial output
+configuration. Step (2) adds another 2^n factor per row (one
+carry per row crosses into the strip).
+
+This is a concrete implementation plan, but getting it right
+requires:
+- Correct cut-state definitions matching the paper.
+- Handling the bottom boundary (columns < k-delta) by carry-only
+  branching.
+- Output ordering for DRAT emission (post-order from leaves up).
+
+We verified via `phase3_up_trivial.py` that NO strip refutes by
+UP alone from the forced e assignment -- every strip requires
+real branching. So UP-only fallback is not possible.
+
+`phase3_up_trivial.py` confirms every k in [1, 2n-1] needs
+branching at n=4..8.
+
+## Session stopping point
+
+Total session committed deliverables across Phase 1-3:
+
+- `generate_array_mul_comm.py` + `generate_array_mul_comm_meta.py`:
+  CNF generators.
+- `beame_liew_phase1_v2.py`: Phase 1 case-analysis proof. Verified
+  4-10x smaller than CaDiCaL raw; 2.5-4x smaller than CaDiCaL
+  trimmed core at n>=5.
+- `beame_liew_phase2_v2.py`: Phase 2 column-structured proof. 2n
+  times larger than Phase 1 (theoretical factor confirmed).
+- `phase2_bdd_probe.py`: BDD sanity check for commutativity.
+- `phase3_strip_extract.py`: strip extraction validates Lemma 3.1
+  UNSAT at n=4, 6, 8 for all k.
+- `phase3_bdd_size.py`: measures exponential BDD growth for wrong
+  variable ordering (peak 4,419 at n=8, k=11).
+- `phase3_per_strip.py`: per-strip CaDiCaL proxy, beats full-CNF
+  CaDiCaL at n>=7.
+- `phase3_bp_build.py`: scaffolding for BP construction (doesn't
+  yet achieve polynomial size due to need for proper branching
+  ordering per paper).
+- `phase3_up_trivial.py`: confirms every strip needs real branching.
+- `rat_test.py`: confirms drat-trim accepts RAT extension-variable
+  lemmas (infrastructure check for potential future use).
+
+Remaining open for N3 Phase 3 in a future session:
+- Implement the paper's exact BP variable ordering (outputs first,
+  tableau row-by-row, carry boundary branches) with proper Cut(j)
+  merging.
+- Translate DAG-structured BP to DRAT via Krajicek Prop. 2.1.
+- Scaling experiments and O(n^6 log n) validation.
+
+The infrastructure is in place; what's missing is careful,
+correct implementation of the paper's specific construction.
