@@ -1965,7 +1965,33 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         }
         if(arg.type().id() != ID_struct_tag && arg.type().id() != ID_union_tag)
         {
-          typecheck_type(arg.type());
+          // Per [temp.deduct]/7-8: substituting a default template
+          // argument is part of the deduction process; failures there
+          // must be treated as silent deduction failures.  For
+          // default type arguments, redirect diagnostics to a null
+          // message handler so substitution failures in e.g.
+          //   typename = decltype(swap(std::declval<_Tp&>(),
+          //                            std::declval<_Tp&>()))
+          // of libstdc++'s __do_is_swappable_impl::__test do not leak
+          // "found no match for symbol 'swap'" errors to the user.
+          if(i >= first_default)
+          {
+            null_message_handlert default_arg_null_handler;
+            message_handlert &default_arg_old_handler = get_message_handler();
+            set_message_handler(default_arg_null_handler);
+            try
+            {
+              typecheck_type(arg.type());
+            }
+            catch(...)
+            {
+              set_message_handler(default_arg_old_handler);
+              throw;
+            }
+            set_message_handler(default_arg_old_handler);
+          }
+          else
+            typecheck_type(arg.type());
         }
       tm_resolved:
         // Per [temp.arg]/2: resolve remaining template parameter
