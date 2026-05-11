@@ -36,16 +36,20 @@ gdb_value_extractort::memory_scopet::memory_scopet(
   const memory_addresst &begin,
   const mp_integer &byte_size,
   const irep_idt &name)
-  : begin_int(safe_string2size_t(begin.address_string, 0)),
+  : // the address is given in hex, starting with 0x....
+    begin_int(safe_string2size_t(begin.address_string.substr(2), 16)),
     byte_size(byte_size),
     name(name)
 {
+  PRECONDITION(begin.address_string.substr(0, 2) == "0x");
 }
 
 size_t gdb_value_extractort::memory_scopet::address2size_t(
   const memory_addresst &point) const
 {
-  return safe_string2size_t(point.address_string, 0);
+  // the address is given in hex, starting with 0x....
+  PRECONDITION(point.address_string.substr(0, 2) == "0x");
+  return safe_string2size_t(point.address_string.substr(2), 16);
 }
 
 mp_integer gdb_value_extractort::memory_scopet::distance(

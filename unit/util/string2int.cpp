@@ -6,8 +6,11 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <testing-utils/use_catch.h>
 #include <util/string2int.h>
+
+#include <testing-utils/use_catch.h>
+
+#include <cstdint>
 
 TEST_CASE(
   "converting optionally to a valid integer should succeed",
@@ -85,4 +88,79 @@ TEST_CASE(
     !string2optional_size_t("0xfffffffffffffffffffffffffffffffffffffffffff", 16)
        .has_value());
   REQUIRE(!string2optional_size_t("-5").has_value());
+}
+
+// Tests for string2optional<T> template directly
+
+TEST_CASE(
+  "string2optional with various integral types",
+  "[core][util][string2int]")
+{
+  REQUIRE(
+    string2optional<long long>("9223372036854775807") == 9223372036854775807LL);
+  REQUIRE(
+    string2optional<long long>("-9223372036854775808") ==
+    (-9223372036854775807LL - 1));
+  REQUIRE(
+    string2optional<unsigned long long>("18446744073709551615") ==
+    18446744073709551615ULL);
+  REQUIRE(string2optional<std::int16_t>("32767") == 32767);
+  REQUIRE(string2optional<std::int16_t>("-32768") == -32768);
+}
+
+TEST_CASE(
+  "string2optional overflow returns nullopt",
+  "[core][util][string2int]")
+{
+  // signed overflow (use types with guaranteed width)
+  REQUIRE(!string2optional<std::int32_t>("2147483648").has_value());
+  REQUIRE(!string2optional<std::int32_t>("-2147483649").has_value());
+  REQUIRE(!string2optional<std::int16_t>("32768").has_value());
+  // unsigned overflow
+  REQUIRE(!string2optional<std::uint32_t>("4294967296").has_value());
+  REQUIRE(
+    !string2optional<unsigned long long>("18446744073709551616").has_value());
+}
+
+TEST_CASE(
+  "string2optional rejects negative input for unsigned types",
+  "[core][util][string2int]")
+{
+  REQUIRE(!string2optional<unsigned>("-1").has_value());
+  REQUIRE(!string2optional<unsigned long long>("-42").has_value());
+  REQUIRE(!string2optional<std::size_t>("-100").has_value());
+}
+
+TEST_CASE("string2optional rejects partial parses", "[core][util][string2int]")
+{
+  // trailing non-digit characters must cause rejection
+  REQUIRE(!string2optional<int>("123abc").has_value());
+  REQUIRE(!string2optional<int>("42 ").has_value());
+  REQUIRE(!string2optional<unsigned>("99x").has_value());
+}
+
+TEST_CASE(
+  "string2optional rejects leading whitespace",
+  "[core][util][string2int]")
+{
+  // from_chars does not skip whitespace (unlike stoll/stoull)
+  REQUIRE(!string2optional<int>(" 42").has_value());
+  REQUIRE(!string2optional<int>("\t7").has_value());
+  REQUIRE(!string2optional<unsigned>(" 1").has_value());
+}
+
+TEST_CASE("string2optional rejects empty string", "[core][util][string2int]")
+{
+  REQUIRE(!string2optional<int>("").has_value());
+  REQUIRE(!string2optional<unsigned>("").has_value());
+  REQUIRE(!string2optional<long long>("").has_value());
+}
+
+TEST_CASE("string2optional with different bases", "[core][util][string2int]")
+{
+  REQUIRE(string2optional<int>("FF", 16) == 255);
+  REQUIRE(string2optional<int>("ff", 16) == 255);
+  REQUIRE(string2optional<int>("77", 8) == 63);
+  REQUIRE(string2optional<int>("101", 2) == 5);
+  REQUIRE(string2optional<unsigned long long>("DEADBEEF", 16) == 0xDEADBEEFULL);
 }
