@@ -1,0 +1,10 @@
+CORE
+main.c
+final-link
+^EXIT=0$
+^SIGNAL=0$
+function 'target' has no body, but a file-local function of that name exists as '__CPROVER_file_local_impl_c_target'
+--
+--
+A static function reached through a function pointer obtained from an extern
+declaration in another translation unit is reported as well.
