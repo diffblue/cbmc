@@ -680,6 +680,12 @@ problems with mixed arithmetic and comparison operations.
 
 \subsection{No Single Encoding Dominates}
 
+The encoding comparison in this section and the cross-solver table
+in Section~\ref{sec:evaluation} together show that no multiplier
+encoding wins on every pattern. Table~\ref{tab:best} summarises
+which encoding is fastest on each problem class and, briefly,
+which structural feature drives the win:
+
 \begin{table}[ht]
 \caption{Best encoding per benchmark class.}
 \label{tab:best}
@@ -697,9 +703,31 @@ Inequality constraints & block4 & BVE elimination \\
 \end{tabular}
 \end{table}
 
-The optimal encoding depends on problem structure, not just
-multiplication count. This motivates encoding selection based on
-deeper structural analysis of the verification problem.
+Each row has a mechanistic explanation traceable to DRAT analysis.
+On two-identical-circuit commutativity, \combacs's popcount
+intermediate variables structurally align with the congruence
+pairs \cadical discovers between the two multiplier circuits,
+yielding large speedups once BVE consolidates the aligned
+structure. On strength-reduction benchmarks ($x \cdot (2^{k}-1) =
+(x \ll k) - x$), Booth's compressed partial-product grid matches
+the hand-coded shift-add target, so the equivalence check
+collapses to a small set of consistency constraints rather than a
+full circuit-to-circuit comparison. On pure constant-commutativity
+($x \cdot c = c \cdot x$), both sides are computed with
+\texttt{bvmul} and Booth's additional structure (sign correction,
+pre-computed doublings) becomes dead weight the solver cannot
+simplify; shift-add's smaller formula wins. When the verification
+target itself is a shift-add circuit, shift-add on the other side
+yields the tightest structural match and the fewest learned
+clauses. On inequality constraints, block4's balanced 4-bit block
+decomposition creates intermediate variables that BVE eliminates
+aggressively---block4 achieves the highest BVE elimination rate of
+any encoding we tested (78\%).
+
+The consequence is that encoding selection needs to respond to
+problem structure rather than a static ranking---the motivation
+for the adaptive heuristic in Section~\ref{sec:combacs} and the
+cross-solver comparison in Section~\ref{sec:evaluation}.
 
 \section{Evaluation}
 \label{sec:evaluation}
