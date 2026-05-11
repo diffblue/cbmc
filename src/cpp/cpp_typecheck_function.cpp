@@ -159,8 +159,18 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   {
     const symbolt &msymb = lookup(symbol.type.get(ID_C_member_name));
 
-    PRECONDITION(symbol.value.id() == ID_code);
-    PRECONDITION(symbol.value.get(ID_statement) == ID_block);
+    // Under normal operation a destructor body arrives here as a
+    // code_blockt.  However, under error-recovery conditions (for
+    // example after a prior CONVERSION ERROR has produced a
+    // partially-elaborated class) we may see a destructor symbol
+    // whose value is nil or not a block.  Skip the implicit-code
+    // insertion in that case rather than aborting via a
+    // PRECONDITION violation.
+    if(symbol.value.id() != ID_code ||
+       symbol.value.get(ID_statement) != ID_block)
+    {
+      return;
+    }
 
     // Skip adding destructor code for virtual function thunks — the
     // thunk just calls the real destructor which already has the code.

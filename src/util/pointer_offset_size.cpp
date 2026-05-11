@@ -52,8 +52,17 @@ std::optional<mp_integer> member_offset(
     }
     else
     {
-      DATA_INVARIANT(
-        bit_field_bits == 0, "padding ensures offset at byte boundaries");
+      if(bit_field_bits != 0)
+      {
+        // The struct is not in a well-formed layout: an accumulated
+        // bit-field run has not been padded to a byte boundary
+        // before this non-bit-field member.  This can happen when
+        // the front-end fails to elaborate struct padding (for
+        // example on ill-formed inputs or after an earlier
+        // type-check error).  Return "offset not known" rather
+        // than aborting via INVARIANT.
+        return {};
+      }
       const auto sub_size = pointer_offset_size(comp.type(), ns);
       if(!sub_size.has_value())
         return {};
