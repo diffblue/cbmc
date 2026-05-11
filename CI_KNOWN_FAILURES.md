@@ -36,6 +36,16 @@ re-triggered:
   try/catch around `convert_template_declaration` and
   `typecheck_compound_declarator` inside class-body processing
   when we are currently instantiating a template.
+* **Unresolved class-template cpp_name for data members** —
+  fixed in `f3885853bb`.  When the type of a data member is an
+  unresolved cpp_name with a template_args sub-element and
+  `typecheck_type` throws, we now keep the unresolved cpp_name
+  so the declarator loop can still register the member by name
+  in the class scope.  This eliminates the `atomic.h _Storage is
+  unknown` errors on MSVC (atomic_flag's 4 method bodies could
+  not find the data member `_Storage` because an earlier throw
+  had aborted atomic_flag's class-body processing before
+  `_Storage` registered).
 
 ### Preprocessed-header test results after these fixes
 
