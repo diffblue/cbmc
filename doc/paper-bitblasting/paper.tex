@@ -150,13 +150,15 @@ Our contributions are:
   that CDCL does not find those proofs without encoding-level
   guidance (Section~\ref{sec:hardness}).
 
-\item \textbf{Six-encoding comparison with solver statistics.} We
-  evaluate shift-add, Dadda, Comba, \combacs, Booth radix-4, 4-bit
-  blocks, and sorting networks across four SAT solvers, reporting
-  conflicts, propagations, BVE eliminations, fixed variables, and
-  proof sizes. Results are presented with statistical variance,
-  multi-layer ablation, and adaptive-heuristic ablation; no single
-  encoding dominates
+\item \textbf{Eight-encoding comparison with solver statistics.} We
+  evaluate shift-add, Dadda, Wallace, Comba, \combacs, Booth
+  radix-4, 4-bit blocks, and sorting networks across four SAT
+  solvers, reporting conflicts, propagations, BVE eliminations,
+  fixed variables, and proof sizes. Results are presented with
+  statistical variance, multi-layer ablation, and adaptive-heuristic
+  ablation; no single encoding dominates, and Wallace and Dadda
+  --- both tree-based reductions --- differ by up to
+  $14\times$ in solve time
   (Sections~\ref{sec:combacs},~\ref{sec:alternative},~\ref{sec:evaluation}).
 
 \item \textbf{Negative results.} We catalogue 20+ approaches that
@@ -185,9 +187,12 @@ products $\mathit{pp}[i] = a[i] \wedge b$, each shifted by $i$
 positions. These must be accumulated into the final $2N$-bit product.
 The standard \emph{shift-add} encoding adds partial products
 sequentially using a ripple-carry adder chain, creating a carry chain
-of length $O(N^2)$. \emph{Dadda trees}~\cite{dadda1965some} reduce
+of length $O(N^2)$. \emph{Dadda trees}~\cite{dadda1965some} and
+the earlier \emph{Wallace trees}~\cite{wallace1964suggestion} reduce
 the partial-product grid to two rows using carry-save full adders,
-followed by a single carry-propagate addition.
+followed by a single carry-propagate addition; Dadda differs from
+Wallace by deferring reductions until the column height forces them,
+yielding fewer full and half adders than Wallace.
 \emph{Comba}~\cite{comba1990exponentiation} reduces each column
 independently using popcount (parallel bit counting via the pop0
 algorithm from~\cite{warren2012hackers}), propagating carries to
@@ -976,7 +981,7 @@ Detailed per-run results are in Appendix~\ref{app:variance}.
 
 DRAT proof size gives an encoding-independent measure of solver
 effort, insensitive to wall-clock noise. We collected proofs
-(\cadical, algebraic layers disabled) for all seven encodings on
+(\cadical, algebraic layers disabled) for all eight encodings on
 six benchmarks spanning each pattern. The proof-size ratios track
 the solver-time ratios closely:
 \combacs compresses commutativity proofs by 40--60$\times$ relative to
@@ -1024,6 +1029,10 @@ in Appendix~\ref{app:proof-sizes}.
   (8, 0.17) (10, 1.14) (11, 3.12) (12, 6.99)
 };
 \addlegendentry{Dadda}
+\addplot[orange, thick, mark=+, dashed] coordinates {
+  (8, 0.18) (10, 4.28) (11, 58.1) (12, 98.6)
+};
+\addlegendentry{Wallace}
 \addplot[blue, thick, mark=square*] coordinates {
   (8, 0.09) (10, 0.88) (11, 1.34) (12, 2.78) (14, 38.4) (16, 25.4)
 };
@@ -1040,11 +1049,13 @@ in Appendix~\ref{app:proof-sizes}.
 \node[gray, font=\small] at (axis cs:15.5,115) {T/O};
 \end{axis}
 \end{tikzpicture}
-\caption{Commutativity scaling: six encodings across BW=8--16 on
-  \cadical with algebraic layers disabled. shift-add and Booth
-  time out at BW=12; Dadda at BW=14; only standard Comba, block4,
-  and \combacs solve BW=16 within 120\,s. \combacs's advantage
-  grows with bit-width.}
+\caption{Commutativity scaling: seven encodings across BW=8--16 on
+  \cadical with algebraic layers disabled. shift-add, Booth, and
+  Wallace time out at BW$\leq$14 (Wallace at BW=12 is $14\times$
+  slower than Dadda despite both being tree-based reductions);
+  Dadda times out at BW=14; only standard Comba, block4, and
+  \combacs solve BW=16 within 120\,s. \combacs's advantage grows
+  with bit-width.}
 \label{fig:scaling}
 \end{figure}
 
@@ -1665,20 +1676,21 @@ when all encodings terminate.
 
 \begin{table}[ht]
 \caption{DRAT proof sizes in KB across encodings (algebraic layers
-  disabled, \cadical). Best (smallest) per row in bold.}
+  disabled, \cadical, 300\,s timeout). Best (smallest) per row in bold.}
 \label{tab:proof-sizes}
 \centering
 \small
-\begin{tabular}{lrrrrrrr}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lrrrrrrrr}
 \toprule
-Benchmark & shift-add & Dadda & Comba & \combacs & Booth & block4 & sortnet \\
+Benchmark & shift-add & Dadda & Wallace & Comba & \combacs & Booth & block4 & sortnet \\
 \midrule
-comm\_11 & 99,852 & 6,463 & 3,525 & 1,617 & 92,520 & \textbf{813} & 22,651 \\
-comm\_13 & 121,568 & 98,600 & 13,017 & \textbf{3,183} & 114,848 & 4,302 & 74,123 \\
-mul\_ineq\_12 & 1,406 & \textbf{1,349} & 1,632 & 1,406 & 3,546 & 1,629 & 7,856 \\
-overflow\_detect\_16 & 1,462 & 685 & 2,365 & 1,462 & 431 & 1,643 & \textbf{287} \\
-strength\_16\_31 & 250 & 176 & 311 & 170 & \textbf{12} & 127 & 907 \\
-strength\_chain\_16 & 3,263 & 1,821 & 4,543 & 4,918 & \textbf{271} & 2,066 & 7,990 \\
+comm\_11 & 99,852 & 6,463 & 94,128 & 3,525 & 1,617 & 92,520 & \textbf{813} & 22,651 \\
+comm\_13 & 121,568 & 98,600 & T/O & 13,017 & \textbf{3,183} & 114,848 & 4,302 & 74,123 \\
+mul\_ineq\_12 & 1,406 & \textbf{1,349} & 1,467 & 1,632 & 1,406 & 3,546 & 1,629 & 7,856 \\
+overflow\_detect\_16 & 1,462 & 685 & 960 & 2,365 & 1,462 & 431 & 1,643 & \textbf{287} \\
+strength\_16\_31 & 250 & 176 & 155 & 311 & 170 & \textbf{12} & 127 & 907 \\
+strength\_chain\_16 & 3,263 & 1,821 & 3,953 & 4,543 & 4,918 & \textbf{271} & 2,066 & 7,990 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1688,7 +1700,12 @@ breakdown referenced in Section~\ref{sec:proof-sizes}. The
 ranking per row reproduces the solver-time ranking from the main
 evaluation tables, supporting the observation that the timing
 differences we report are not an artefact of CDCL heuristics but
-reflect the underlying proof-search work.
+reflect the underlying proof-search work. In particular, Wallace
+and Dadda---both tree-based partial-product reductions---diverge
+substantially on commutativity benchmarks (Wallace's comm\_11
+proof is 94\,MB vs Dadda's 6.5\,MB; Wallace times out on comm\_13
+where Dadda completes): the specific reduction schedule, not
+just the tree structure, shapes the CDCL proof.
 
 
 \end{document}
