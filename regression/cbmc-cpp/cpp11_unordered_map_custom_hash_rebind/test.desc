@@ -1,0 +1,31 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+template scope 'rebind' is ambiguous
+--
+Regression for [class.member.lookup]/1 + [temp.names]/3: a
+nested-template member (`rebind<_Up>`) declared in a derived
+class hides a same-named member inherited from any base class.
+
+Previously CBMC's `disambiguate_template_classes` found both
+`std::__new_allocator<T>::rebind` and `std::allocator<T>::rebind`
+as primary candidates for the `_Tp::template rebind<_Up>` lookup
+inside libstdc++'s `std::__alloc_rebind` and errored out with
+  template scope 'rebind' is ambiguous
+
+Fix applies the class-inheritance dominance rule: when multiple
+primary template candidates have the same base_name, drop any
+candidate whose declaring class is a (transitive) base of
+another candidate's declaring class.  Here `__new_allocator<T>`
+is a base of `allocator<T>` so `__new_allocator::rebind` is
+dropped, leaving `allocator<T>::rebind` as the unique match.
+
+Distilled from dog-fooding `goto-cc` on CBMC's own
+`src/util/string_container.h`:
+  typedef std::unordered_map<string_ptrt, unsigned, string_ptr_hash>
+      hash_tablet;
