@@ -258,3 +258,71 @@ Remaining open for N3 Phase 3 in a future session:
 
 The infrastructure is in place; what's missing is careful,
 correct implementation of the paper's specific construction.
+
+
+## Phase 3 step 2 further work (same session)
+
+Implemented three increasingly careful attempts at BP-DRAT emission:
+
+- `phase3_bp_paper_order.py`: constructs the BP DAG with the
+  paper's variable ordering (outputs first, then incoming
+  carries, then tableau by row). The BP builds successfully
+  with 0 stuck nodes at n=3..5:
+
+  | n | k | BP nodes |
+  |---|---|---------:|
+  | 3 | 3 |       87 |
+  | 4 | 3 |      143 |
+  | 4 | 5 |      904 |
+  | 5 | 5 |    1,044 |
+  | 5 | 7 |   21,000 |
+
+- `phase3_bp_drat.py`, `phase3_bp_drat_v2.py`, `phase3_bp_drat_v3.py`:
+  three successive DRAT emission attempts (resolution-based,
+  path-based, full-UP-assignment-based). None validates with
+  `drat-trim`.
+
+Root cause: my BP branches on intermediate variables (output
+bits, tableau, accumulators) which means the "path to leaf"
+clause includes literals for those non-input variables. When
+`drat-trim` does its RUP check, it only knows about the literals
+in the lemma being checked; it has to re-derive intermediate
+values via UP. Starting from a partial assignment that mixes
+input and output variables, UP cannot always re-derive the
+same intermediate state my BP relied on, so the cut clause
+fails RUP.
+
+The correct path forward (from Prop 2.1 of Beame-Liew): emit a
+resolution step per BP internal node, not a flat collection of
+cut clauses. Each resolution step must be a RUP-valid lemma in
+the accumulating proof set. Getting the emission order right
+(post-order from leaves to root) and ensuring each clause is a
+true resolvent (not a weakening) is where my implementation
+stops. This is a concrete pending work item.
+
+## Final session status (2026-05-11)
+
+N3 Phase 3 delivered:
+
+- Phase 3 step 1 (strip extraction): DONE.
+- Phase 3 step 2 (per-strip CaDiCaL proxy): DONE,
+  beats CaDiCaL-full at n >= 7.
+- Phase 3 step 2 (BP construction with paper ordering): DONE
+  as a DAG in Python; BP size small for small k.
+- Phase 3 step 2 (BP → DRAT translation): UNSUCCESSFUL in this
+  session. Three attempts committed as scaffolding; each fails
+  `drat-trim` validation. Root cause documented above.
+
+What remains for a future session:
+- Implement Prop 2.1's exact post-order resolution emission on
+  the existing BP DAG. Each BP internal node should emit exactly
+  one resolution step; leaves emit the weakening of a violated
+  CNF clause; root emits the empty clause.
+- Alternatively, adopt a RAT-based encoding where each BP
+  internal node gets an extension variable, and UP+RAT steps
+  encode the BP structure directly.
+
+The session leaves a concrete foundation for a future N3 Phase 3
+push: the BP is built and measured, we understand why flat cut
+clauses don't validate, and we have a precise implementation
+target (Prop 2.1 post-order emission).
