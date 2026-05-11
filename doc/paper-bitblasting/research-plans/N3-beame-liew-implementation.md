@@ -2,7 +2,7 @@
 
 ## Status
 
-**Phase 1 prototype (2026-05-11): partial.** A case-analysis DRAT proof
+**Phase 1 prototype (2026-05-11): DONE.** A case-analysis DRAT proof
 generator for array-multiplier commutativity is implemented in
 `bench-multiplication/n3-beame-liew/`. The generator:
 
@@ -16,17 +16,41 @@ generator for array-multiplier commutativity is implemented in
   CaDiCaL's DRAT output at `n <= 8` and remains smaller at `n = 9, 10`
   (though CaDiCaL starts timing out there).
 
-What this does NOT yet achieve: the Beame-Liew polynomial-size
-critical-strip refutation. The prototype's proof is
-`O(2^(2n) * poly(n))`, dominated by the flat enumeration; the
-Beame-Liew construction folds the `2^(2n)` leaves into a read-once
-branching program whose size is `O(n^6 log n)` by exploiting the
-`Delta = log(2n)` strip decomposition. Implementing that branching
-program and the Krajicek-Prop.-2.6 translation from branching
-program to DRAT is Phase 2-3.
+**Phase 2 structural prototype (2026-05-11): DONE, but NOT polynomial.**
+`beame_liew_phase2_v2.py` produces a per-column-structured DRAT
+proof that validates with drat-trim. It emits 2n independent
+column sub-proofs, each of which is a Phase-1-style resolution tree
+terminating in the unit `-diff[k]` rather than in the empty clause.
+Empirically the result is `2n x Phase 1` (20.4 MB for n=7 vs
+1.3 MB for Phase 1), confirming that per-column decomposition alone
+cannot beat the flat enumeration.
 
-See `bench-multiplication/n3-beame-liew/README.md` for details and
-reproduction instructions.
+Key technical blockers to the polynomial O(n^6 log n) bound,
+documented in `README.md`:
+
+1. **UP alone cannot derive `-diff[k]` from partial-input strip
+   refutations.** The AND/XOR gate encodings need biconditionals
+   that UP does not perform, so fixing only a[0..k], b[0..k] is
+   insufficient to force c[k]=d[k] by propagation.
+
+2. **Per-column DRAT lemmas share no input-enumeration work.** The
+   2n sub-proofs cannot be merged because their suffix literals
+   `-diff[k]` differ.
+
+3. **BDDs of multiplier outputs are exponential** (Bryant 1991),
+   confirmed empirically: peak BDD DAG sizes 462 (n=6),
+   4,419 (n=8), 41,148 (n=10). A BDD-to-DRAT translation therefore
+   cannot yield a polynomial proof either.
+
+4. **The actual Beame-Liew polynomial construction requires
+   extension variables.** Their branching program (BP) branches on
+   internal tableau variables, not on inputs, and translates to
+   resolution via Krajicek's Prop. 2.6, which in DRAT requires RAT
+   rather than just RUP. Implementing the BP and its RAT encoding
+   is strictly Phase 3 work beyond a single session's budget.
+
+See `bench-multiplication/n3-beame-liew/README.md` for details,
+reproduction instructions, and the full comparison tables.
 
 ## Goal
 
