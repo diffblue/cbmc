@@ -1,0 +1,25 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.assertion\.1\].*nested pack short-name collision doesn't strip params: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+^symbol '_Args' is unknown$
+--
+Regression for the MSVC _Construct_in_place / _Emplace_back pack
+short-name collision bug.  Per [basic.scope.temp] and
+[temp.variadic]/5, a pack parameter's short name in a template
+refers to THAT template's pack; `pack_size_map` in CBMC is shared
+across nested template instantiations, so the "remove empty pack
+expansions" pass in `cpp_instantiate_template.cpp` must filter to
+THIS template's own pack parameters to avoid cross-template name
+collisions.
+
+The reproducer nests `inner()` inside `outer<>()` where both declare
+a pack named `_Types`; outer's is empty, inner's has one argument.
+Before the fix, inner's `_Args` function parameter was wrongly
+stripped during instantiation and its use in the body emitted
+`symbol '_Args' is unknown`.
