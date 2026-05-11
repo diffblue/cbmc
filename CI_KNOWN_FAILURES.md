@@ -83,43 +83,54 @@ re-triggered:
   `cpp17_shared_ptr` (VERIFICATION SUCCESSFUL with --unwind 2;
   was FAIL) and macOS `cpp17_any_basic` (was HANG on the
   `__cxx_atomic_load` call chain).
-* **SFINAE substitution-failure leak on libstdc++ `swap`** — new
-  KNOWNBUG tests `cpp11_std_is_swappable_sfinae` (cbmc-cpp) and
-  `cpp11_std_array_sfinae` (goto-cc-cbmc).  Not yet fixed.
-  User-visible symptom: running `goto-cc` on a file that
-  `#include <array>`s emits spurious
+* **SFINAE substitution-failure leak on libstdc++ `swap`** — fixed
+  in `e7080a017e`.  Per [temp.deduct]/7-8, substitution failures
+  during function-template overload resolution must be silently
+  absorbed (no diagnostic, candidate discarded).  Two
+  null_message_handlert wraps added:
+  (1) around per-candidate substitution in
+  `cpp_typecheck_resolvet::guess_function_template_args` (plural),
+  (2) around default TYPE template-argument substitution in
+  `cpp_typecheckt::typecheck_template_args` when
+  `i >= first_default`.  Unlocks `goto-cc` on source that
+  `#include <array>`s — previously emitted
     `error: unexpected expression: struct_tag`
     `error: found no match for symbol 'swap'`
-  with an `irep::pretty()` dump leaked into the error text.
-  Root cause: substituting `_Tp = double` into the return type
-  `_Require<__not_<__is_tuple_like<_Tp>>, ...>` of libstdc++'s
-  `swap<_Tp>(_Tp&, _Tp&)` reaches `c_typecheck_expr.cpp:587`
-  with an `ID_struct_tag` expression.  Per [temp.deduct]/8
-  this substitution failure must be silently absorbed — the
-  candidate is simply removed during overload resolution, no
-  diagnostic is emitted, and `std::is_swappable<double>::value`
-  evaluates to `true`.
+  with an `irep::pretty()` dump; now produces a clean goto binary.
+  Regression tests `cpp11_std_is_swappable_sfinae` (cbmc-cpp) and
+  `cpp11_std_array_sfinae` (goto-cc-cbmc) promoted from KNOWNBUG
+  to CORE.
 
 ### Preprocessed-header test results after these fixes
 
-Locally, against `/tmp/macos-pp-new/` and `/tmp/msvc-pp-new/`:
+Locally, against `/tmp/macos-pp-new/` and `/tmp/msvc-pp-new/`
+(with `--depth 100` to bound BMC iteration count):
 
-* **macOS (Xcode 16.4 libc++)**: 5 of 7 preprocessed-header tests
-  now report VERIFICATION SUCCESSFUL on the CBMC output —
-  `Address_of_Method1`, `STL1`, `STL2`, `Vector1`,
-  `cpp11_vector_size`.  Only `cpp17_any_basic` and
-  `cpp20_coroutine_types` still fail (both for reasons outside the
-  basic_string cascade: `std::any` method bodies and libstdc++-
-  internal `std::__n4861` respectively).  Note: on the *real* CI
-  runner these tests still fail their test.desc assertion match
-  because `main()` doesn't reach the goto model — see "Remaining
-  work" below.
-* **MSVC (VC 14.44.35207)**: 12 of 26 preprocessed-header tests
-  now pass: Vector1, cpp11_condition_variable_header,
-  cpp11_shared_ptr, cpp17_filesystem_basic,
+* **macOS (Xcode 16.4 libc++)**: **6 of 7** preprocessed-header
+  tests now report VERIFICATION SUCCESSFUL: `Address_of_Method1`,
+  `STL1`, `STL2`, `Vector1`, `cpp11_vector_size`, `cpp17_any_basic`
+  (last unlocked by the SFINAE fix via the `__cxx_atomic_load`
+  call chain).  Only `cpp20_coroutine_types` still fails
+  (libstdc++-internal `std::__n4861`).
+* **MSVC (VC 14.44.35207)**: **24 of 26** preprocessed-header
+  tests now pass: Vector1, STL1, STL2,
+  cpp11_condition_variable_header, cpp11_map_insert,
+  cpp11_map_verify, cpp11_set_insert, cpp11_shared_ptr,
+  cpp11_vector_front_body, cpp11_vector_probe,
+  cpp11_vector_push_back, cpp11_vector_pushback,
+  cpp11_vector_verify, cpp17_filesystem_basic,
   cpp17_filesystem_path_ops, cpp17_mutex_basic,
   cpp17_numeric_basic, cpp17_shared_ptr, cpp17_string_view(_basic),
-  cpp17_thread_basic, cpp20_iostream_basic.
+  cpp17_thread_basic, cpp17_valarray_basic, cpp17_vector_basic,
+  cpp20_iostream_basic.  Remaining:
+  * `cpp11_future_header` — HANG (core dump during `make_shared`
+    for `_ExceptionHolder`).
+  * `cpp14_chrono_basic` — CONVERSION ERROR "non-POD type has no
+    constructor" during `std::decay<duration>` instantiation.
+
+The MSVC jump from 15/26 to 24/26 is primarily attributable to the
+SFINAE fix in `e7080a017e` removing spurious error leaks that
+previously tripped downstream overload-resolution paths.
 
 ### Remaining work (not yet fixed)
 
