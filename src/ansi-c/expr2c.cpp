@@ -632,10 +632,11 @@ std::string expr2ct::convert_rec(
   }
 
   {
-    lispexprt lisp;
-    irep2lisp(src, lisp);
-    std::string dest="irep(\""+MetaString(lisp.expr2string())+"\")";
-    dest+=d;
+    // Fallback for types that don't have a dedicated converter.
+    // Emit a compact placeholder rather than a full irep lisp
+    // dump — see convert_norep for the expression counterpart.
+    std::string dest = "<<type:" + id2string(src.id()) + ">>";
+    dest += d;
 
     return dest;
   }
@@ -1635,11 +1636,14 @@ std::string expr2ct::convert_norep(
   const exprt &src,
   unsigned &precedence)
 {
-  lispexprt lisp;
-  irep2lisp(src, lisp);
-  std::string dest="irep(\""+MetaString(lisp.expr2string())+"\")";
-  precedence=16;
-  return dest;
+  // Fallback for expressions that don't have a dedicated converter
+  // in expr2c.  Emit a compact placeholder rather than an
+  // `irep::pretty()` dump — the full lisp form of an expression
+  // can exceed a megabyte and makes error messages unreadable.
+  // The precise form is available via `--verbosity 10` for
+  // debugging.
+  precedence = 16;
+  return "<<expr:" + id2string(src.id()) + ">>";
 }
 
 std::string expr2ct::convert_symbol(const exprt &src)
