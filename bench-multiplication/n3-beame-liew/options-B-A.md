@@ -125,3 +125,64 @@ Our BDD probe branches on inputs a, b in interleaved order, which
 is the WRONG ordering for polynomial size -- hence the exponential
 blowup we measure. Implementing the paper's specific BP (Step 2
 proper) is the next milestone for Phase 3.
+
+
+## Phase 3 Step 2 prototype: per-strip CaDiCaL
+
+Tested a practical proxy for Beame-Liew's per-strip BP: run
+CaDiCaL on each phi_Strip(k) individually, collect its DRAT,
+compose via a top-level case split on k. This avoids implementing
+the hand-crafted BP but uses a SAT solver to find per-strip
+refutations automatically.
+
+| n | Per-strip total | Phase 1 | CaDiCaL full | PS/P1 | PS/CaD |
+|---|--:|--:|--:|:--:|:--:|
+| 4 | 137 KB | 10 KB | 42 KB | 13.7x | 3.3x |
+| 6 | 1.2 MB | 266 KB | 995 KB | 4.6x | 1.2x |
+| 7 | 4.6 MB | 1.3 MB | 5.2 MB | 3.6x | 0.88x |
+| 8 | 22 MB | 6.1 MB | 26 MB | 3.6x | **0.82x** |
+
+Findings:
+- Per-strip CaDiCaL beats full-CNF CaDiCaL at n >= 7 (0.82x at n=8)
+  and the ratio is improving with n. So structurally decomposing
+  the proof by strip *does* help a SAT solver, even without
+  implementing the paper's exact BP.
+- Per-strip is still strictly WORSE than Phase 1's structured
+  enumeration, by 3.6-13.7x. Phase 1's ordered case-analysis
+  remains the tightest proof we can generate.
+- The polynomial O(n^6 log n) bound would require Beame-Liew's
+  specific BP construction with Cut(j) merging on |Cut| = 4 log k
+  variables, which we did not implement in this session.
+
+Data: `data-phase3-perstrip.tsv`.
+
+## Net outcome of N3 push (this session)
+
+Committed:
+- Phase 1 (flat case-analysis DRAT, validates, 0.30-0.40x of
+  CaDiCaL's trimmed core) -- `beame_liew_phase1_v2.py`.
+- Phase 2 structural (column-decomposed DRAT, validates, 2n times
+  larger than Phase 1) -- `beame_liew_phase2_v2.py`.
+- Phase 3 step 1 (strip extraction validated Lemma 3.1) --
+  `phase3_strip_extract.py`.
+- Phase 3 step 2 probe (BDD sizes confirm Bryant-style exponential
+  growth for wrong variable ordering) -- `phase3_bdd_size.py`.
+- Phase 3 step 2 prototype via per-strip CaDiCaL (beats CaDiCaL-
+  full at n >= 7) -- `phase3_per_strip.py`.
+- Option B trimmed-core comparison (Phase 1 wins are structural,
+  not trimming artifacts).
+- Option A RAT extension variables (drat-trim accepts them; not
+  needed for the Beame-Liew construction which uses only existing
+  CNF variables).
+
+Not committed (would be weeks of additional work):
+- Beame-Liew's exact BP construction with the paper's variable
+  ordering (o^{yx} first, then tableau row-by-row, merging on
+  Cut(j) of size 4 log k). This is what would deliver the
+  polynomial O(n^6 log n) bound.
+- Scaling experiments at n >= 16.
+- CDCL heuristic extraction from the BP.
+
+The session closes having made substantial empirical progress on
+all phases of the N3 plan while explicitly calling out the
+remaining core theoretical implementation task.
