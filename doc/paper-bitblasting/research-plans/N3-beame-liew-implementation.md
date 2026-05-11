@@ -1,5 +1,33 @@
 # N3: Research Plan — Practical CDCL-Guided Execution of Beame-Liew's Critical-Strip Construction
 
+## Status
+
+**Phase 1 prototype (2026-05-11): partial.** A case-analysis DRAT proof
+generator for array-multiplier commutativity is implemented in
+`bench-multiplication/n3-beame-liew/`. The generator:
+
+- emits a DIMACS CNF for `a*b = b*a` on an `n`-bit array multiplier
+  (`generate_array_mul_comm.py`);
+- emits a DRAT refutation by flat case-split on the `2^(2n)` input
+  assignments, followed by a binary resolution tree over the `2n`
+  input bits (`beame_liew_phase1_v2.py`);
+- the DRAT proof is validated by `drat-trim` at `n = 1..11`;
+- on equal CNFs, the prototype's DRAT proof is 4--10x smaller than
+  CaDiCaL's DRAT output at `n <= 8` and remains smaller at `n = 9, 10`
+  (though CaDiCaL starts timing out there).
+
+What this does NOT yet achieve: the Beame-Liew polynomial-size
+critical-strip refutation. The prototype's proof is
+`O(2^(2n) * poly(n))`, dominated by the flat enumeration; the
+Beame-Liew construction folds the `2^(2n)` leaves into a read-once
+branching program whose size is `O(n^6 log n)` by exploiting the
+`Delta = log(2n)` strip decomposition. Implementing that branching
+program and the Krajicek-Prop.-2.6 translation from branching
+program to DRAT is Phase 2-3.
+
+See `bench-multiplication/n3-beame-liew/README.md` for details and
+reproduction instructions.
+
 ## Goal
 
 Turn the *theoretical* polynomial-size regular resolution proof of multiplier commutativity due to Beame and Liew~\cite{beame2017towards,beame2019toward} into an *executable* procedure that a SAT solver (or a DRAT proof checker) can produce and verify on real multiplier CNFs.
