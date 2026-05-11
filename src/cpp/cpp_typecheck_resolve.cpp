@@ -164,7 +164,39 @@ void cpp_typecheck_resolvet::guess_function_template_args(
 
   for(const auto &old_id : old_identifiers)
   {
-    exprt e = guess_function_template_args(old_id, fargs);
+    // [temp.deduct]/8: "If a substitution failure occurs for any
+    // reason during the deduction process, the program is
+    // ill-formed (no diagnostic required), with the exception that
+    // specific substitution failures are treated as deduction
+    // failures."  During overload resolution, the failing candidate
+    // is silently discarded and no diagnostic is emitted.
+    //
+    // CBMC's `guess_function_template_args` may emit errors during
+    // substitution of the function-template candidate (for example,
+    // libstdc++'s `swap(_Tp&, _Tp&)` whose return type expands to
+    //   _Require<__not_<__is_tuple_like<_Tp>>,
+    //            is_move_constructible<_Tp>,
+    //            is_move_assignable<_Tp>>
+    // leaks an `unexpected expression: struct_tag` from the
+    // recursive alias-expansion path).  Redirect diagnostics to a
+    // null message handler during the per-candidate substitution so
+    // failed candidates never produce user-visible output, as
+    // required by the standard.
+    null_message_handlert sfinae_null_handler;
+    message_handlert &sfinae_old_handler =
+      cpp_typecheck.get_message_handler();
+    cpp_typecheck.set_message_handler(sfinae_null_handler);
+    exprt e;
+    try
+    {
+      e = guess_function_template_args(old_id, fargs);
+    }
+    catch(...)
+    {
+      cpp_typecheck.set_message_handler(sfinae_old_handler);
+      continue;
+    }
+    cpp_typecheck.set_message_handler(sfinae_old_handler);
 
     if(e.is_not_nil())
     {

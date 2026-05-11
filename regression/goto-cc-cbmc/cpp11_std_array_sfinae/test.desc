@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 
 ^EXIT=0$
@@ -10,32 +10,22 @@ unexpected expression: struct_tag
 found no match for symbol 'swap'
 \* identifier: std::tag-__not_<
 --
-Matching `goto-cc` reproducer for the libstdc++ SFINAE-leak bug
-documented in cbmc-cpp/cpp11_std_is_swappable_sfinae.
+End-to-end `goto-cc` regression for the SFINAE-leak fix landed
+alongside cbmc-cpp/cpp11_std_is_swappable_sfinae.
 
-User-visible symptoms of the bug (reported as "goto-cc ~/harness.cpp
-should work today but both yields debug output and just doesn't
-work"):
+User-reported bug (prior to fix): running
+  goto-cc harness.cpp
+on source that `#include <array>`s `std::array<double, N>` emitted
+spurious type-checker errors
+  error: unexpected expression: struct_tag
+  error: found no match for symbol 'swap'
+with an `irep::pretty()` dump leaked into the error text, and
+failed to produce a goto binary despite exit code 0.
 
-1. `goto-cc` writes spurious `error: unexpected expression:
-   struct_tag` diagnostics to stderr when `#include <array>`
-   transitively instantiates `std::__is_swappable_impl<T>`.  Per
-   [temp.deduct]/8 these substitution failures must be absorbed
-   silently during overload resolution — no user-visible error
-   may be emitted.
+Fixed by wrapping per-candidate function-template substitution
+and default TYPE template argument substitution with a
+null-message-handler per [temp.deduct]/7-8, so SFINAE failures no
+longer leak diagnostics.
 
-2. The error diagnostic itself embeds an `irep::pretty()` dump
-   (indented sub-fields with `* #source_location:`, `* line:`,
-   `* identifier:` entries) rather than a clean source-level
-   message.  This is the "debug output" referenced by the user.
-
-The test ships a minimum-size reproducer that exercises the bug
-via `goto-cc` (chain.sh builds with goto-cc then runs cbmc on the
-resulting .gb).  `std::array<double, 3>` is chosen because it is
-the smallest `std::array` instantiation that triggers the
-SFINAE-leak code path.
-
-Fix expectations:
- * No `error:` line in the combined stdout/stderr.
- * No `irep::pretty()` indented-sub-field dump in the output.
- * `VERIFICATION SUCCESSFUL` from cbmc.
+`std::array<double, 3> a{}` now compiles cleanly through the
+goto-cc + cbmc chain.
