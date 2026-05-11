@@ -395,7 +395,7 @@ across four different SAT solvers.
 We did not design Booth radix-4, 4-bit blocks, or sorting
 networks via this methodology---these are pre-existing ideas (Booth
 from hardware arithmetic~\cite{booth1951signed}; 4-bit blocks
-suggested by Martin Brain in private communication; sorting
+from earlier unpublished work by one of the authors; sorting
 networks from the synthesis literature). However, the same DRAT
 analysis proves useful for \emph{understanding} why each encoding
 wins or loses on specific benchmarks. Applied post-hoc to Booth on
@@ -466,8 +466,7 @@ proof steps.
 \centering
 \begin{tikzpicture}[scale=0.38, every node/.style={font=\scriptsize}]
   % Partial product grid (4-bit example)
-  \node[anchor=east] at (-0.5, 3.5) {\textbf{Partial}};
-  \node[anchor=east] at (-0.5, 3.0) {\textbf{products:}};
+  \node[anchor=south] at (3.3, 4.2) {\textbf{Partial products}};
   \foreach \col/\h in {0/1, 1/2, 2/3, 3/4, 4/3, 5/2, 6/1} {
     \foreach \row in {1,...,\h} {
       \fill[black!20] (\col*1.1, \row*0.5-0.1) rectangle ++(0.9, 0.4);
@@ -477,32 +476,31 @@ proof steps.
     \node[below] at (\col*1.1+0.45, -0.1) {\col};
   }
 
-  % Arrow
-  \draw[->, thick] (8.0, 1.0) -- (9.5, 1.0);
-  \node[below] at (8.75, 1.0) {Pass 1};
+  % Arrow for Pass 1
+  \draw[->, thick] (8.0, 1.0) -- (9.8, 1.0);
+  \node[above=2pt] at (8.9, 1.0) {Pass~1};
 
-  % After pass 1: sum bits + carry bits
-  \node[anchor=east] at (9.5, 3.5) {\textbf{Sum}};
-  \node[anchor=east] at (9.5, 3.0) {\textbf{bits:}};
+  % After pass 1: sum bits (bottom row) + carry bits (stacked on top)
+  \node[anchor=south] at (13.85, 4.2) {\textbf{Sum + carry bits}};
   \foreach \col in {0,...,6} {
-    \fill[blue!30] (\col*1.1+10, 0.4) rectangle ++(0.9, 0.4);
+    \fill[blue!30] (\col*1.1+10.3, 0.4) rectangle ++(0.9, 0.4);
   }
-  \node[anchor=east] at (9.5, 1.8) {\textbf{Carry}};
-  \node[anchor=east] at (9.5, 1.3) {\textbf{bits:}};
+  \node[anchor=west, font=\tiny] at (17.8, 0.6) {sums};
   \foreach \col/\h in {1/1, 2/1, 3/2, 4/2, 5/1, 6/1} {
     \foreach \row in {1,...,\h} {
-      \fill[red!30] (\col*1.1+10, \row*0.5+0.9) rectangle ++(0.9, 0.4);
+      \fill[red!30] (\col*1.1+10.3, \row*0.5+0.9) rectangle ++(0.9, 0.4);
     }
   }
+  \node[anchor=west, font=\tiny] at (17.8, 1.5) {carries};
 
-  % Arrow
-  \draw[->, thick] (18.0, 1.0) -- (19.5, 1.0);
-  \node[below] at (18.75, 1.0) {Pass 2};
+  % Arrow for Pass 2
+  \draw[->, thick] (20.3, 1.0) -- (22.0, 1.0);
+  \node[above=2pt] at (21.15, 1.0) {Pass~2};
 
   % Final result
-  \node[anchor=east] at (19.5, 1.5) {\textbf{Result:}};
+  \node[anchor=south] at (25.85, 4.2) {\textbf{Result}};
   \foreach \col in {0,...,6} {
-    \fill[green!30] (\col*1.1+20, 0.4) rectangle ++(0.9, 0.4);
+    \fill[green!30] (\col*1.1+22.4, 0.4) rectangle ++(0.9, 0.4);
   }
 \end{tikzpicture}
 \caption{The \combacs two-pass encoding for a 4-bit multiplier.
@@ -574,11 +572,10 @@ multiplications) popcount is decisive---at BW=11 it is
 on three-multiplication problems (assoc, distrib) the three
 configurations perform identically, confirming that the
 heuristic's gain on the targeted pattern is matched by zero cost
-elsewhere. The full ablation table is in
-Appendix~\ref{app:heuristic}.
-
-DRAT proof analysis on commutativity at BW=11 confirms the
-benefit of column independence at the proof-search level:
+elsewhere; the full ablation table is in
+Appendix~\ref{app:heuristic}. DRAT proof analysis on commutativity
+at BW=11 (Table~\ref{tab:proof}) confirms the benefit of column
+independence at the proof-search level.
 
 \begin{table}[ht]
 \caption{DRAT proof comparison, commutativity BW=11 (\cadical).}
@@ -625,9 +622,8 @@ emits both. We evaluated the mode on nine benchmarks
 (algebraic pre-solver disabled, \cadical, 60\,s timeout,
 6\,GB memory) with every combination of primary
 $\in \{$shift-add, \combacs, Booth, block4$\}$ and secondary
-$\in \{$none, shift-add, \combacs, Comba, Dadda, Booth,
-block4$\}$, for a total of 180 multi-encoding runs plus 36
-singleton baselines.
+$\in \{$none, shift-add, \combacs, Comba, Dadda, Booth, block4$\}$,
+for 180 multi-encoding runs plus 36 singleton baselines.
 
 \begin{table}[ht]
 \caption{Multi-encoding behaviour relative to singletons:
@@ -686,7 +682,7 @@ best single encoding for a benchmark is unknown a priori.
 Three alternative encodings from the literature were implemented in
 \cbmc and evaluated alongside \combacs: Booth radix-4 from hardware
 arithmetic~\cite{booth1951signed}, 4-bit block multiplication
-(suggested by Martin Brain, private communication), and sorting
+(unpublished, proposed by one of the authors), and sorting
 networks adapted from counting-based synthesis. For each, we use
 the same DRAT proof analysis that guided \combacs's design to
 \emph{understand} why the encoding helps or hurts on specific
@@ -807,64 +803,38 @@ The optimal encoding depends on problem structure, not just
 multiplication count. This motivates encoding selection based on
 deeper structural analysis of the verification problem.
 
-\paragraph{A methodological caveat: encoding flags must reach the
-solver.}
-We observed an instructive phenomenon on the bfloat16 benchmark
-bf16\_mul\_comm\_v2: switching among shift-add, Booth, 4-bit block,
-and sorting-network encodings produces \emph{identical} CNF
-formulas (1743 variables, 6697 clauses) with identical conflict
-counts (417,623) and solve times (${\approx}$22\,s). Only \combacs
-produces a different formula (6683 clauses, 230,430 conflicts,
-11\,s). Investigating this, we found that CBMC's floating-point
-path---which produces the mantissa multiplication internally---does
-not propagate the alternative encoding flags (\verb|use_booth|,
-\verb|use_4bit_blocks|, \verb|use_sorting_network|) to the
-recursive call for mantissa multiplication. The flag
-\verb|use_comba_carry_save| \emph{is} propagated because it is
-also set by our adaptive heuristic at a higher level. The
-consequence is that for floating-point arithmetic all encodings
-except \combacs effectively fall back to the same shift-add
-multiplier. This is a concrete instance of a more general
-lesson: encoding experiments must verify that the flag actually
-reaches every multiplier instance in the compiled formula. Fixing
-the flag propagation is a small engineering change that we defer,
-but it means our FP results understate the differences among
-alternative encodings.
-
 \section{Evaluation}
 \label{sec:evaluation}
 
 We ran all experiments on an Intel Xeon Platinum 8124M (3.0\,GHz,
-36 cores) with 68\,GB RAM, Ubuntu 24.04, GCC 13.3.0. Solver versions:
+36 cores) with 68\,GB RAM, Ubuntu 24.04, GCC 13.3.0 and solvers
 \cadical 3.0.0, \minisat 2.2.1, \mergesat (docker-solvers branch,
-MiniSat-compatible API), \cryptominisat 5.11.21. We report median of
-3 runs with a 120\,s timeout and 6\,GB memory limit. Unless otherwise
-noted, we use the g-only adder encoding (the new default; see
-Appendix~\ref{app:adders}).
-
-We use three benchmark pools in this section, in order of
-increasing external validity: 36 custom QF\_BV benchmarks for
-the core ablations (Sections~\ref{sec:ablation}--\ref{sec:scaling}),
+MiniSat-compatible API), and \cryptominisat 5.11.21, reporting the
+median of 3 runs with a 120\,s timeout and a 6\,GB memory limit and
+using the g-only adder encoding (the new default; see
+Appendix~\ref{app:adders}) unless otherwise noted. Three benchmark
+pools, in order of increasing external validity, underlie the
+sections that follow: 36 custom QF\_BV benchmarks for the core
+ablations (Sections~\ref{sec:ablation}--\ref{sec:scaling}),
 extended to 44 with eight DSP datapath benchmarks
 (Section~\ref{sec:custom}), and a 66-benchmark stratified sample
 drawn from the SMT-COMP 2024 QF\_BV track
-(Section~\ref{sec:smt-comp}).
-
-The 36-benchmark core suite covers five categories: algebraic
-identities (commutativity, overflow, strength reduction: 15
-benchmarks), industrial workloads (MurmurHash3, Q15 DSP, keyed hash,
-division-by-constant: 6), matrix/MAC (trace, dot product
-commutativity: 4), division/FP (roundtrip, FP add/mul: 6), and
-factoring (SAT instances: 6).
+(Section~\ref{sec:smt-comp}). The 36-benchmark core suite covers
+five categories: algebraic identities (commutativity, overflow,
+strength reduction: 15), industrial workloads (MurmurHash3, Q15
+DSP, keyed hash, division-by-constant: 6), matrix/MAC (trace, dot
+product commutativity: 4), division/FP (roundtrip, FP add/mul: 6),
+and factoring (SAT instances: 6).
 
 \subsection{Layer Ablation}
 \label{sec:ablation}
 
 To understand what the encoding contributes on top of the
-algebraic pre-solver (a separate layer described in a companion
+algebraic pre-solver (a separate layer, described in a companion
 paper), we ran a four-layer ablation on twelve representative
-benchmarks. Each configuration enables an additional layer:
-shift-add only $\to$ $+$simplify $\to$ $+$algebraic $\to$ $+$\combacs.
+benchmarks, each configuration enabling one further layer:
+shift-add only $\to$ $+$simplify $\to$ $+$algebraic $\to$
+$+$\combacs.
 
 \begin{table}[ht]
 \caption{Layer ablation (\cadical, seconds; T/O\,=\,120\,s).}
@@ -963,13 +933,12 @@ algebraic pre-solver disabled, which is the
 relevant comparison for evaluating the encoding itself. When the
 pre-solver is enabled---the current \cbmc default---all polynomial
 commutativity benchmarks (comm\_9, comm\_11, comm\_13) are solved
-algebraically in ${\sim}$5\,ms regardless of the multiplier
-encoding, so the encoding's effect on these benchmarks is
-effectively masked. Table~\ref{tab:allencodings} therefore
-isolates the encoding's contribution to solver effort; in the
-deployed pipeline, encoding choices matter primarily for
-benchmarks the pre-solver cannot handle (bitwise operations,
-inequalities, floating-point, structural circuit mismatches).
+algebraically in ${\sim}$5\,ms regardless of encoding, masking
+the encoding's effect. Table~\ref{tab:allencodings} therefore
+isolates the encoding's contribution; in the deployed pipeline,
+encoding choices matter for benchmarks the pre-solver cannot
+handle: bitwise operations, inequalities, floating-point, and
+structural circuit mismatches.
 
 \subsection{Cross-Solver Analysis}
 
@@ -1244,8 +1213,8 @@ uniformly hard for both configurations.
 \paragraph{Threats to validity, continued.}
 The 66-benchmark sample is small relative to the full QF\_BV suite
 (${\sim}$16{,}000 benchmarks containing \texttt{bvmul}). Stratifying
-by submitter category controls for benchmark-family bias but does
-not capture difficulty distribution within a category; a full-suite
+by submitter category controls for benchmark-family bias but not
+for difficulty distribution within a category; a full-suite
 evaluation is future work.
 
 \section{Negative Results}
@@ -1284,9 +1253,9 @@ Karatsuba is competitive on commutativity at BW=13 but 22$\times$
 slower on primality. Sch\"onhage-Strassen produces 43K variables for
 BW=7 (vs.\ ${\sim}$600 for Comba)---designed for thousands of bits,
 it is orders of magnitude too expensive at practical bit-widths.
-Note that standard Comba loses to Dadda on aws\_mul (39.4\,s vs.\
-1.29\,s), where constant multiplication dominates; \combacs's adaptive
-fallback handles this.
+Standard Comba loses to Dadda on aws\_mul (39.4\,s vs.\ 1.29\,s) where
+constant multiplication dominates, which \combacs's adaptive fallback
+to Dadda-style reduction resolves.
 
 \subsection{Approaches That Hurt Performance}
 
@@ -1363,9 +1332,9 @@ Brain et al.~\cite{brain2016propagation} showed that PC encodings
 compose for adders but not multipliers.
 Brain~\cite{brain2021wrong} conjectured that a PC multiplier
 is exponential, and explored Toom-Cook polynomial interpolation as
-an alternative approximation strategy. Martin Brain suggested the
-4-bit block encoding idea explored in Section~\ref{sec:alternative}
-in private communication; we implemented and evaluated it.
+an alternative approximation strategy. The 4-bit block encoding
+evaluated in Section~\ref{sec:alternative} is also due to one of
+the authors (unpublished prior to the present work).
 Jia et al.~\cite{jia2023improving} improve bit-blasting for
 nonlinear integer arithmetic (QF\_NIA) with Greedy Addition (a
 Huffman-like ordering that minimises auxiliary variables) and
@@ -1396,10 +1365,10 @@ regular resolution proofs for any degree-2 ring identity
 multipliers, and quasi-polynomial-size ($n^{O(\log n)}$) proofs
 for Wallace tree multipliers. Their construction splits the
 multiplier formula into narrow ``critical strips'' and uses
-a branching program (read-once BDD) that scans each strip
-in parallel; they note explicitly that current CDCL solvers
-do not find these short proofs and call it an important open
-problem to add the right guiding information to help them.
+a branching program (read-once BDD) that scans each strip in
+parallel; they note that current CDCL solvers do not find these
+short proofs and call it an open problem to add guiding
+information that does.
 
 \paragraph{Escaping resolution hardness in CDCL.}
 Three complementary lines of work address the gap between
@@ -1433,9 +1402,9 @@ approaches are complementary to our encoding improvements: when
 word-level rewriting succeeds, bit-blasting is not needed; when it
 does not (bitwise operations, non-polynomial constraints), the
 encoding matters. Chukharev et al.~\cite{chukharev2025partitioning}
-show that circuit-structure-aware SAT partitioning can solve
-multiplier equivalence checking instances intractable for both
-standard SAT and algebraic methods, complementary to our approach.
+complement both by showing that circuit-structure-aware SAT
+partitioning solves multiplier-equivalence instances intractable
+for standard SAT and for algebraic methods.
 
 
 \section{Conclusion and Future Work}
@@ -1522,10 +1491,10 @@ gate's clauses structurally match carry generation clauses, enabling
 BVE to eliminate them trivially, which reduces occurrence counts of
 input variables, enabling further cascading elimination.
 
-g-only is applied only to \emph{top-level} additions (equality checks,
-explicit \texttt{bvadd}). Multiplier-internal additions are isolated
-by the adder encoding swap in \texttt{unsigned\_multiplier} and always
-use ripple-carry.
+g-only applies only to \emph{top-level} additions (equality
+checks, explicit \texttt{bvadd}); multiplier-internal additions
+are isolated by the adder encoding swap in
+\texttt{unsigned\_multiplier} and always use ripple-carry.
 
 \begin{table}[ht]
 \caption{g-only vs.\ ripple-carry (shift-add multiplier).}
