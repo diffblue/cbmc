@@ -53,36 +53,33 @@ TEST_CASE("smt2_convt reduction operators", "[core][solvers][smt2]")
 
   SECTION("reduction_and")
   {
-    REQUIRE(
-      get_assert(unary_predicate_exprt{ID_reduction_and, sym}) ==
-      "(assert (= x (_ bv3 2)))");
+    REQUIRE(get_assert(reduction_and_exprt{sym}) == "(assert (= x (_ bv3 2)))");
   }
 
   SECTION("reduction_nand")
   {
     REQUIRE(
-      get_assert(unary_predicate_exprt{ID_reduction_nand, sym}) ==
+      get_assert(reduction_nand_exprt{sym}) ==
       "(assert (not (= x (_ bv3 2))))");
   }
 
   SECTION("reduction_or")
   {
     REQUIRE(
-      get_assert(unary_predicate_exprt{ID_reduction_or, sym}) ==
-      "(assert (not (= x (_ bv0 2))))");
+      get_assert(reduction_or_exprt{sym}) == "(assert (not (= x (_ bv0 2))))");
   }
 
   SECTION("reduction_nor")
   {
     REQUIRE(
-      get_assert(unary_predicate_exprt{ID_reduction_nor, sym}) ==
+      get_assert(reduction_nor_exprt{sym}) ==
       "(assert (not (not (= x (_ bv0 2)))))");
   }
 
   SECTION("reduction_xor")
   {
     REQUIRE(
-      get_assert(unary_predicate_exprt{ID_reduction_xor, sym}) ==
+      get_assert(reduction_xor_exprt{sym}) ==
       "(assert (let ((?rop x)) "
       "(= (bvxor ((_ extract 0 0) ?rop) ((_ extract 1 1) ?rop)) #b1)))");
   }
@@ -90,7 +87,7 @@ TEST_CASE("smt2_convt reduction operators", "[core][solvers][smt2]")
   SECTION("reduction_xnor")
   {
     REQUIRE(
-      get_assert(unary_predicate_exprt{ID_reduction_xnor, sym}) ==
+      get_assert(reduction_xnor_exprt{sym}) ==
       "(assert (not (let ((?rop x)) "
       "(= (bvxor ((_ extract 0 0) ?rop) ((_ extract 1 1) ?rop)) #b1))))");
   }
@@ -98,25 +95,21 @@ TEST_CASE("smt2_convt reduction operators", "[core][solvers][smt2]")
   SECTION("reduction_xor 1-bit")
   {
     symbol_exprt sym1("y", unsignedbv_typet(1));
-    REQUIRE(
-      get_assert(unary_predicate_exprt{ID_reduction_xor, sym1}) ==
-      "(assert (= y #b1))");
+    REQUIRE(get_assert(reduction_xor_exprt{sym1}) == "(assert (= y #b1))");
   }
 
   SECTION("reduction_and 1-bit")
   {
     symbol_exprt sym1("y", unsignedbv_typet(1));
     REQUIRE(
-      get_assert(unary_predicate_exprt{ID_reduction_and, sym1}) ==
-      "(assert (= y (_ bv1 1)))");
+      get_assert(reduction_and_exprt{sym1}) == "(assert (= y (_ bv1 1)))");
   }
 
   SECTION("reduction_or 1-bit")
   {
     symbol_exprt sym1("y", unsignedbv_typet(1));
     REQUIRE(
-      get_assert(unary_predicate_exprt{ID_reduction_or, sym1}) ==
-      "(assert (not (= y (_ bv0 1))))");
+      get_assert(reduction_or_exprt{sym1}) == "(assert (not (= y (_ bv0 1))))");
   }
 }
 

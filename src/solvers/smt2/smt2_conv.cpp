@@ -2736,34 +2736,34 @@ void smt2_convt::convert_expr(const exprt &expr)
   else if(expr.id() == ID_reduction_and)
   {
     // This is true iff all bits in the operand are true
-    auto &op = to_unary_expr(expr).op();
+    auto &op = to_reduction_and_expr(expr).op();
     auto all_ones = to_bitvector_type(op.type()).all_ones_expr();
     convert_expr(equal_exprt{op, all_ones});
   }
   else if(expr.id() == ID_reduction_nand)
   {
     // This is the negation of "reduction and"
-    auto &op = to_unary_expr(expr).op();
-    convert_expr(not_exprt{unary_predicate_exprt{ID_reduction_and, op}});
+    auto &op = to_reduction_nand_expr(expr).op();
+    convert_expr(not_exprt{reduction_and_exprt{op}});
   }
   else if(expr.id() == ID_reduction_or)
   {
     // This is true iff the operand is not zero
-    auto &op = to_unary_expr(expr).op();
+    auto &op = to_reduction_or_expr(expr).op();
     auto all_zeros = to_bitvector_type(op.type()).all_zeros_expr();
     convert_expr(notequal_exprt{op, all_zeros});
   }
   else if(expr.id() == ID_reduction_nor)
   {
     // This is the negation of "reduction or"
-    auto &op = to_unary_expr(expr).op();
-    convert_expr(not_exprt{unary_predicate_exprt{ID_reduction_or, op}});
+    auto &op = to_reduction_nor_expr(expr).op();
+    convert_expr(not_exprt{reduction_or_exprt{op}});
   }
   else if(expr.id() == ID_reduction_xor)
   {
     // This is the parity of the operand. No SMT-LIB 2 equivalent.
     // Do bit-wise. SMT-LIB 3.0 could do this with "fold bvxor".
-    auto &op = to_unary_expr(expr).op();
+    auto &op = to_reduction_xor_expr(expr).op();
     auto width = to_bitvector_type(op.type()).get_width();
     PRECONDITION(width >= 1);
 
@@ -2791,8 +2791,8 @@ void smt2_convt::convert_expr(const exprt &expr)
   else if(expr.id() == ID_reduction_xnor)
   {
     // This is the negation of "reduction xor"
-    auto &op = to_unary_expr(expr).op();
-    convert_expr(not_exprt{unary_predicate_exprt{ID_reduction_xor, op}});
+    auto &op = to_reduction_xnor_expr(expr).op();
+    convert_expr(not_exprt{reduction_xor_exprt{op}});
   }
   else
     INVARIANT_WITH_DIAGNOSTICS(
