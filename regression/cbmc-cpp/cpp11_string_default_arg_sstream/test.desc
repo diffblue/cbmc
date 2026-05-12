@@ -1,0 +1,24 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+invalid implicit conversion from 'char \[1l\]' to 'struct basic_string'
+--
+Regression for `char[N]` -> `std::string` implicit conversion on
+constructor default arguments.  Previously the conversion failed
+with `invalid implicit conversion from 'char [1l]' to 'struct
+basic_string'` when `<sstream>` (or any header that fully
+elaborates `std::basic_string`) was in the translation unit,
+because the libstdc++ constructor
+  basic_string(const _CharT*, const _Alloc& = _Alloc())
+is a member template with a SFINAE guard and therefore not
+elaborated into the struct's components list.
+
+Distilled from dog-fooding goto-cc on CBMC's own source; fixed
+by synthesising a call to `basic_string(const char*, size_type,
+const _Alloc&)` in `implicit_typecast` when the source is a
+char-array / char-pointer and the target is a basic_string tag.

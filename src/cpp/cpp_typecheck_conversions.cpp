@@ -16,6 +16,7 @@ Author:
 #include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
+#include <util/string_constant.h>
 #include <util/symbol.h>
 #include <util/symbol_table_base.h>
 
@@ -962,7 +963,28 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
 
         const auto &parameters = to_code_type(comp_type).parameters();
 
-        if(parameters.size() != 2)
+        // Accept constructors with exactly one real parameter (the
+        // traditional single-arg converting constructor) OR
+        // constructors where every parameter from position 2
+        // onwards has a default value — i.e., still a single-arg
+        // call site from the user's perspective.  Without this,
+        // constructors like
+        //   basic_string(const char*, const _Alloc& = _Alloc())
+        // would be skipped even though they are the standard
+        // conversion path for `const char*` / `char[N]` to
+        // std::string.
+        if(parameters.size() < 2)
+          continue;
+        bool all_extras_have_default = true;
+        for(std::size_t pi = 2; pi < parameters.size(); ++pi)
+        {
+          if(!parameters[pi].has_default_value())
+          {
+            all_extras_have_default = false;
+            break;
+          }
+        }
+        if(!all_extras_have_default)
           continue;
 
         exprt curr_arg1 = parameters[1];
@@ -1647,6 +1669,132 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
 
   if(!implicit_conversion_sequence(e, type, expr))
   {
+    // Fallback: if the source is a char array (a string literal
+    // after C++17 array-to-pointer decay) and the target is a
+    // basic_string struct, try converting the source to `const
+    // char*` first and retry.  libstdc++'s
+    //   basic_string(const _CharT* __s, const _Alloc& __a = _Alloc())
+    // constructor (basic_string.h line 641) is wrapped in a member
+    // template with a SFINAE guard
+    //   template<typename = _RequireAllocator<_Alloc>>
+    // and is therefore not present in the struct's components
+    // list.  The other `const char*` constructor,
+    //   basic_string(const _CharT*, size_type, const _Alloc& = _Alloc())
+    // requires an explicit size argument and is therefore unusable
+    // for a plain `std::string = "hello"` initializer.
+    //
+    // Rather than teach the general conversion-sequence logic to
+    // enumerate member-template constructors (an architectural
+    // change), recognise this specific pattern and emit the
+    // explicit `basic_string(const char*, size_type, Alloc())`
+    // constructor call using strlen to compute the size.
+    if(
+      type.id() == ID_struct_tag &&
+      id2string(to_struct_tag_type(type).get_identifier())
+          .find("tag-basic_string<") != std::string::npos)
+    {
+      typet src_t = e.type();
+      bool src_is_char_array =
+        src_t.id() == ID_array &&
+        (to_array_type(src_t).element_type().id() == ID_signedbv ||
+         to_array_type(src_t).element_type().id() == ID_unsignedbv) &&
+        to_bitvector_type(to_array_type(src_t).element_type()).get_width() ==
+          config.ansi_c.char_width;
+      bool src_is_char_ptr =
+        src_t.id() == ID_pointer &&
+        (to_pointer_type(src_t).base_type().id() == ID_signedbv ||
+         to_pointer_type(src_t).base_type().id() == ID_unsignedbv) &&
+        to_bitvector_type(to_pointer_type(src_t).base_type()).get_width() ==
+          config.ansi_c.char_width;
+      if(src_is_char_array || src_is_char_ptr)
+      {
+        // Decay array to pointer if needed.
+        exprt char_ptr = e;
+        if(src_is_char_array)
+        {
+          pointer_typet ptr_type =
+            pointer_type(to_array_type(src_t).element_type());
+          ptr_type.base_type().set(ID_C_constant, true);
+          char_ptr = typecast_exprt(
+            address_of_exprt(index_exprt(
+              e, from_integer(0, c_index_type()),
+              to_array_type(src_t).element_type())),
+            ptr_type);
+        }
+        // Use strlen-style length: front end's __builtin_strlen is
+        // recognised by CBMC.  Fall back to a nondet size if the
+        // char_ptr is a non-constant expression.
+        exprt length_expr;
+        if(char_ptr.id() == ID_typecast &&
+           to_typecast_expr(char_ptr).op().id() == ID_address_of &&
+           to_address_of_expr(to_typecast_expr(char_ptr).op()).object().id() ==
+             ID_index &&
+           to_index_expr(to_address_of_expr(
+             to_typecast_expr(char_ptr).op()).object()).array().id() ==
+             ID_string_constant)
+        {
+          const irep_idt &raw =
+            to_string_constant(to_index_expr(to_address_of_expr(
+              to_typecast_expr(char_ptr).op()).object()).array()).value();
+          length_expr = from_integer(id2string(raw).size(), size_type());
+        }
+        else
+        {
+          length_expr = side_effect_expr_nondett{
+            size_type(), e.source_location()};
+        }
+        // Find `basic_string(const _CharT*, size_type, const _Alloc&)`.
+        const struct_typet &struct_type_to =
+          follow_tag(to_struct_tag_type(type));
+        for(const auto &component : struct_type_to.components())
+        {
+          if(component.get_bool(ID_from_base))
+            continue;
+          const typet &comp_type = component.type();
+          if(comp_type.id() != ID_code)
+            continue;
+          if(to_code_type(comp_type).return_type().id() != ID_constructor)
+            continue;
+          const auto &parameters = to_code_type(comp_type).parameters();
+          // Look for (this, const char*, size_type, const Alloc&=...)
+          if(parameters.size() != 4)
+            continue;
+          const typet &p1 = parameters[1].type();
+          if(p1.id() != ID_pointer)
+            continue;
+          const typet &p1_base = to_pointer_type(p1).base_type();
+          if(p1_base.id() != ID_signedbv && p1_base.id() != ID_unsignedbv)
+            continue;
+          const typet &p2 = parameters[2].type();
+          if(p2.id() != ID_unsignedbv && p2.id() != ID_signedbv)
+            continue;
+          // Build the constructor call.
+          exprt func_symb = cpp_symbol_expr(lookup(component.get_name()));
+          func_symb.type() = comp_type;
+          already_typechecked_exprt::make_already_typechecked(func_symb);
+          side_effect_expr_function_callt ctor_expr(
+            std::move(func_symb),
+            {char_ptr, length_expr},
+            uninitialized_typet{},
+            e.source_location());
+          try
+          {
+            typecheck_side_effect_function_call(ctor_expr);
+            if(ctor_expr.get(ID_statement) == ID_temporary_object)
+            {
+              expr = std::move(ctor_expr);
+              return;
+            }
+          }
+          catch(...)
+          {
+            // fall through to the standard error below
+          }
+          break;
+        }
+      }
+    }
+
     // Empty brace-init {} to pointer type: produces null pointer.
     // Used by MSVC's <exception> header: void* ptr = {};
     if(
