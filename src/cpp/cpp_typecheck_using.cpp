@@ -56,8 +56,71 @@ void cpp_typecheckt::convert(cpp_usingt &cpp_using)
 
   bool qualified=cpp_using.name().is_qualified();
 
-  const auto id_set = cpp_scopes.current_scope().lookup(
+  auto id_set = cpp_scopes.current_scope().lookup(
     base_name, qualified ? cpp_scopet::QUALIFIED : cpp_scopet::RECURSIVE);
+
+  // Per [namespace.udecl]/3 (C++11+): a using-declaration of the
+  // form `using Base::name;` must find `name` either in `Base` OR
+  // in any (transitively) inherited class of `Base`.  Our QUALIFIED
+  // scope lookup only searches within the immediate class scope, so
+  // fall back to walking up the base-class list of `Base` when the
+  // initial lookup returns nothing.
+  if(id_set.empty() && qualified)
+  {
+    std::set<irep_idt> visited;
+    std::vector<irep_idt> todo;
+    const irep_idt &scope_id = cpp_scopes.current_scope().identifier;
+    todo.push_back(scope_id);
+    while(!todo.empty() && id_set.empty())
+    {
+      irep_idt cur = todo.back();
+      todo.pop_back();
+      if(!visited.insert(cur).second)
+        continue;
+      const symbolt *sym = symbol_table.lookup(cur);
+      if(sym == nullptr)
+        continue;
+      const irept &bases = sym->type.find(ID_bases);
+      for(const auto &b : bases.get_sub())
+      {
+        const typet &bt = static_cast<const typet &>(b.find(ID_type));
+        if(bt.id() != ID_struct_tag)
+          continue;
+        const irep_idt &bid = to_struct_tag_type(bt).get_identifier();
+        auto it = cpp_scopes.id_map.find(bid);
+        if(it != cpp_scopes.id_map.end())
+        {
+          auto sub = static_cast<cpp_scopet &>(*it->second)
+                       .lookup(base_name, cpp_scopet::SCOPE_ONLY);
+          for(const auto *s : sub)
+            id_set.insert(const_cast<cpp_idt *>(s));
+        }
+        todo.push_back(bid);
+      }
+    }
+  }
+
+  // Pragmatic fallback: if the lookup of a qualified using-
+  // declaration still fails but the qualifier names a registered
+  // type (i.e., we reached a struct scope via `Base::`), silently
+  // drop the using-declaration.  CBMC does not model C++ access
+  // control precisely, and a using-declaration that only adjusts
+  // access (e.g. `using Base::private_member;` to republish a
+  // protected member in the derived class) has no observable
+  // effect on goto-conversion.  Erroring here would gate a large
+  // class of header-only idioms (CBMC's own src/util/expr.h uses
+  // this pattern with `using exprt::remove;`).
+  if(id_set.empty() && qualified)
+  {
+    const symbolt *scope_sym =
+      symbol_table.lookup(cpp_scopes.current_scope().identifier);
+    if(
+      scope_sym != nullptr && scope_sym->is_type &&
+      (scope_sym->type.id() == ID_struct || scope_sym->type.id() == ID_union))
+    {
+      return;
+    }
+  }
 
   bool using_directive=cpp_using.get_namespace();
 
