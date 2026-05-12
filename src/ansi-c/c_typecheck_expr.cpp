@@ -1656,6 +1656,84 @@ void c_typecheck_baset::typecheck_expr_member(exprt &expr)
   }
 }
 
+/// Determine whether \p expr, a type-checked but not simplified expression,
+/// is an integer constant expression (C11 6.6p6): it has integer type, and
+/// its operands are integer, enumeration or character constants, `sizeof` or
+/// `_Alignof` expressions (which the type checker has already folded into
+/// constants), or floating constants that are the immediate operand of a cast
+/// to an integer type.
+static bool is_integer_constant_expression(const exprt &expr)
+{
+  const irep_idt &type_id = expr.type().id();
+  if(
+    type_id != ID_signedbv && type_id != ID_unsignedbv &&
+    type_id != ID_c_bool && type_id != ID_bool && type_id != ID_c_enum_tag &&
+    type_id != ID_c_bit_field)
+  {
+    return false;
+  }
+
+  if(expr.is_constant())
+    return true;
+
+  if(expr.id() == ID_typecast)
+  {
+    const exprt &op = to_typecast_expr(expr).op();
+    if(
+      op.is_constant() &&
+      (op.type().id() == ID_floatbv || op.type().id() == ID_fixedbv))
+    {
+      return true;
+    }
+    return is_integer_constant_expression(op);
+  }
+
+  const irep_idt &id = expr.id();
+  if(
+    id == ID_plus || id == ID_minus || id == ID_mult || id == ID_div ||
+    id == ID_mod || id == ID_unary_minus || id == ID_unary_plus ||
+    id == ID_shl || id == ID_ashr || id == ID_lshr || id == ID_bitand ||
+    id == ID_bitor || id == ID_bitxor || id == ID_bitnot || id == ID_not ||
+    id == ID_and || id == ID_or || id == ID_equal || id == ID_notequal ||
+    id == ID_lt || id == ID_le || id == ID_gt || id == ID_ge || id == ID_if)
+  {
+    return std::all_of(
+      expr.operands().begin(),
+      expr.operands().end(),
+      is_integer_constant_expression);
+  }
+
+  return false;
+}
+
+/// Determine whether \p original, a type-checked pointer-typed operand that
+/// simplifies to \p simplified, is a null pointer constant (C11 6.3.2.3p3):
+/// an integer constant expression with value 0 cast to `void *`.  A cast to a
+/// qualified `void *` (e.g. `(const void *)0`) is not a null pointer
+/// constant.
+static bool
+is_null_pointer_constant(const exprt &original, const exprt &simplified)
+{
+  if(
+    !simplified.is_constant() ||
+    !to_constant_expr(simplified).is_null_pointer())
+  {
+    return false;
+  }
+
+  if(original.type().id() != ID_pointer)
+    return false;
+  const c_qualifierst qualifiers{to_pointer_type(original.type()).base_type()};
+  if(qualifiers.is_constant || qualifiers.is_volatile || qualifiers.is_atomic)
+    return false;
+
+  if(original.is_constant())
+    return true;
+
+  return original.id() == ID_typecast &&
+         is_integer_constant_expression(to_typecast_expr(original).op());
+}
+
 void c_typecheck_baset::typecheck_expr_trinary(if_exprt &expr)
 {
   exprt::operandst &operands=expr.operands();
@@ -1703,17 +1781,22 @@ void c_typecheck_baset::typecheck_expr_trinary(if_exprt &expr)
     exprt tmp1=simplify_expr(operands[1], *this);
     exprt tmp2=simplify_expr(operands[2], *this);
 
+    // C11 6.5.15p6 distinguishes null pointer constants from other `void *`
+    // operands; simplifying is not enough, as `(void *)(x * 0)` shows.
+    const bool op1_ice_zero = is_null_pointer_constant(operands[1], tmp1);
+    const bool op2_ice_zero = is_null_pointer_constant(operands[2], tmp2);
+
     // is one of them void * AND null? Convert that to the other.
     // (at least that's how GCC behaves)
     if(
       to_pointer_type(operands[1].type()).base_type().id() == ID_empty &&
-      tmp1.is_constant() && to_constant_expr(tmp1).is_null_pointer())
+      op1_ice_zero)
     {
       implicit_typecast(operands[1], operands[2].type());
     }
     else if(
       to_pointer_type(operands[2].type()).base_type().id() == ID_empty &&
-      tmp2.is_constant() && to_constant_expr(tmp2).is_null_pointer())
+      op2_ice_zero)
     {
       implicit_typecast(operands[2], operands[1].type());
     }
