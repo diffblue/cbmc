@@ -1717,7 +1717,8 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
           ptr_type.base_type().set(ID_C_constant, true);
           char_ptr = typecast_exprt(
             address_of_exprt(index_exprt(
-              e, from_integer(0, c_index_type()),
+              e,
+              from_integer(0, c_index_type()),
               to_array_type(src_t).element_type())),
             ptr_type);
         }
@@ -1725,23 +1726,28 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
         // recognised by CBMC.  Fall back to a nondet size if the
         // char_ptr is a non-constant expression.
         exprt length_expr;
-        if(char_ptr.id() == ID_typecast &&
-           to_typecast_expr(char_ptr).op().id() == ID_address_of &&
-           to_address_of_expr(to_typecast_expr(char_ptr).op()).object().id() ==
-             ID_index &&
-           to_index_expr(to_address_of_expr(
-             to_typecast_expr(char_ptr).op()).object()).array().id() ==
-             ID_string_constant)
+        if(
+          char_ptr.id() == ID_typecast &&
+          to_typecast_expr(char_ptr).op().id() == ID_address_of &&
+          to_address_of_expr(to_typecast_expr(char_ptr).op()).object().id() ==
+            ID_index &&
+          to_index_expr(
+            to_address_of_expr(to_typecast_expr(char_ptr).op()).object())
+              .array()
+              .id() == ID_string_constant)
         {
           const irep_idt &raw =
-            to_string_constant(to_index_expr(to_address_of_expr(
-              to_typecast_expr(char_ptr).op()).object()).array()).value();
+            to_string_constant(
+              to_index_expr(
+                to_address_of_expr(to_typecast_expr(char_ptr).op()).object())
+                .array())
+              .value();
           length_expr = from_integer(id2string(raw).size(), size_type());
         }
         else
         {
-          length_expr = side_effect_expr_nondett{
-            size_type(), e.source_location()};
+          length_expr =
+            side_effect_expr_nondett{size_type(), e.source_location()};
         }
         // Find `basic_string(const _CharT*, size_type, const _Alloc&)`.
         const struct_typet &struct_type_to =

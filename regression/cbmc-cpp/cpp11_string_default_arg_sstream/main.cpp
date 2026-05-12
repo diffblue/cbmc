@@ -27,8 +27,8 @@
 // constructor with a strlen-computed length, which IS in the
 // components list.
 
-#include <string>
 #include <sstream>
+#include <string>
 
 class ex
 {
