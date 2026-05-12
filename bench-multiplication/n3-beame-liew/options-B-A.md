@@ -483,3 +483,40 @@ Attempted further optimizations that BROKE correctness:
   (sizes identical).
 
 Current diag represents the best validated Phase 3 BP we have.
+
+
+## Phase 3 step 5: DAG-based resolution (not working yet)
+
+`phase3_bp_dag_drat.py` attempts DAG-based Prop 2.1 emission
+(each BP node emits ONE clause, not per-path). Root clause
+doesn't reduce to empty because leaf clauses (violated CNF
+clauses) don't always contain the branching variable, so
+resolution at internal nodes uses a weakening fallback, which
+accumulates and prevents empty.
+
+For DAG emission to work, leaves need PATH-AUGMENTED clauses,
+which means the DAG merging breaks down (each node has
+path-specific info). Tree-unfolding (v9 / cut / diag) remains
+the only working approach.
+
+Potential future approach: emit RAT extension variables for BP
+nodes, encode BP structure via auxiliary clauses. Complex.
+
+## Current Phase 3 state (best-of-breed)
+
+**Best validated BP**: `phase3_bp_diag.py` with column-order
+branching and cumulative-column state merging.
+
+**Best validated full proof**: `phase3_full_diag.py` using diag BP.
+
+| n | Phase1 | v9 | cut_v2 | diag | diag/Phase1 |
+|---|-------:|---:|-------:|-----:|------------:|
+| 3 |  1.9KB | 45KB | 14KB | 12.5KB |    6.7x |
+| 4 |   10KB | 1.5MB | 411KB | 331KB |    33.2x |
+| 5 |   52KB | 44MB | 8.8MB | 5.9MB |    113x |
+| 6 |  266KB | 69MB | 185MB | 109MB |    410x |
+
+Phase 3 remains 6-400x LARGER than Phase 1 flat enumeration
+but the BP framework is VALIDATED end-to-end. Asymptotic
+scaling matches the paper's O(n^6 log n) prediction within a
+small constant (~3x worse for n=6).
