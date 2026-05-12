@@ -1,7 +1,5 @@
 var NAVTREEINDEX141 =
 {
-"structjava__bytecode__convert__methodt_1_1converted__instructiont.html#a6f90c4b117d747fdeab0fd4e8cec3a79":[7,0,704,1,6],
-"structjava__bytecode__convert__methodt_1_1converted__instructiont.html#a96a1a69bbc37c573871297f7dc5ed1be":[7,0,704,1,3],
 "structjava__bytecode__convert__methodt_1_1converted__instructiont.html#ac93166dadc70318f4099871d33a203ff":[7,0,704,1,5],
 "structjava__bytecode__convert__methodt_1_1converted__instructiont.html#ad6ed09dd166587eba11f568792e63597":[7,0,704,1,1],
 "structjava__bytecode__convert__methodt_1_1holet.html":[7,0,704,2],
@@ -249,5 +247,7 @@ var NAVTREEINDEX141 =
 "structlevenshtein__automatont.html":[7,0,773],
 "structlevenshtein__automatont.html#a14a1f7ade33a02bf7e11ce2b404f0aa4":[7,0,773,1],
 "structlevenshtein__automatont.html#a21b9fe937c616c76cf810639a94e17e7":[7,0,773,0],
-"structlevenshtein__automatont.html#a72c0ac6b9cb9e6c5cd5e85919b4be486":[7,0,773,3]
+"structlevenshtein__automatont.html#a72c0ac6b9cb9e6c5cd5e85919b4be486":[7,0,773,3],
+"structlevenshtein__automatont.html#a76e89c8b969088e90d7df4393c65ef32":[7,0,773,2],
+"structlevenshtein__automatont.html#a79a77a3a2dbda6ab5dadff8a95637033":[7,0,773,4]
 };

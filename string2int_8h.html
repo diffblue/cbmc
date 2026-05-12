@@ -102,6 +102,7 @@ $(document).ready(function(){initNavTree('string2int_8h.html',''); initResizable
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="narrow_8h_source.html">narrow.h</a>&quot;</code><br />
+<code>#include &lt;charconv&gt;</code><br />
 <code>#include &lt;optional&gt;</code><br />
 <code>#include &lt;string&gt;</code><br />
 <code>#include &lt;type_traits&gt;</code><br />
@@ -110,7 +111,7 @@ $(document).ready(function(){initNavTree('string2int_8h.html',''); initResizable
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="string2int_8h__incl.svg" width="388" height="271"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="string2int_8h__incl.svg" width="495" height="271"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-1-trigger" src="closed.png" alt="+"/> This graph shows which files directly or indirectly include this file:</div>
@@ -147,17 +148,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a9f7a02ed0159fc79447b4768baf59ba9" id="r_a9f7a02ed0159fc79447b4768baf59ba9"><td class="memItemLeft" align="right" valign="top">std::optional&lt; std::size_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string2int_8h.html#a9f7a02ed0159fc79447b4768baf59ba9">string2optional_size_t</a> (<a class="el" href="classait.html">const</a> std::string &amp;, <a class="el" href="classait.html">int</a> base=10)</td></tr>
 <tr class="memdesc:a9f7a02ed0159fc79447b4768baf59ba9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert string to size_t similar to the stoul or stoull functions, return nullopt when the conversion fails.  <br /></td></tr>
 <tr class="separator:a9f7a02ed0159fc79447b4768baf59ba9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a46b7a0f7bfdb99c23ef7be6a3eda6da7" id="r_a46b7a0f7bfdb99c23ef7be6a3eda6da7"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="classait.html">typename</a> T &gt; </td></tr>
-<tr class="memitem:a46b7a0f7bfdb99c23ef7be6a3eda6da7"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classait.html">auto</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="string2int_8h.html#a46b7a0f7bfdb99c23ef7be6a3eda6da7">string2optional_base</a> (<a class="el" href="classait.html">const</a> std::string &amp;str, <a class="el" href="classait.html">int</a> base) -&gt; <a class="el" href="classait.html">typename</a> std::enable_if&lt; <a class="el" href="util_8cpp.html#a64961c7c96a166ee16517f63747c3496">std::is_signed</a>&lt; T &gt;::value, <a class="el" href="classait.html">long</a> <a class="el" href="classait.html">long</a> &gt;::type</td></tr>
-<tr class="memdesc:a46b7a0f7bfdb99c23ef7be6a3eda6da7"><td class="mdescLeft">&#160;</td><td class="mdescRight">convert string to signed long long if T is signed  <br /></td></tr>
-<tr class="separator:a46b7a0f7bfdb99c23ef7be6a3eda6da7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adfde0989df473fafe7d329a9667ce09e" id="r_adfde0989df473fafe7d329a9667ce09e"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="classait.html">typename</a> <a class="el" href="classait.html">do_conversiont</a> &gt; </td></tr>
-<tr class="memitem:adfde0989df473fafe7d329a9667ce09e"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classait.html">auto</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="string2int_8h.html#adfde0989df473fafe7d329a9667ce09e">wrap_string_conversion</a> (<a class="el" href="classait.html">do_conversiont</a> <a class="el" href="classait.html">do_conversion</a>) -&gt; std::optional&lt; <a class="el" href="classait.html">decltype</a>(<a class="el" href="classait.html">do_conversion</a>())&gt;</td></tr>
-<tr class="memdesc:adfde0989df473fafe7d329a9667ce09e"><td class="mdescLeft">&#160;</td><td class="mdescRight">attempt a given conversion, return nullopt if the conversion fails with out_of_range or invalid_argument  <br /></td></tr>
-<tr class="separator:adfde0989df473fafe7d329a9667ce09e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8eaaf15c530689b220aba3ceb9ed7207" id="r_a8eaaf15c530689b220aba3ceb9ed7207"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="classait.html">typename</a> T &gt; </td></tr>
 <tr class="memitem:a8eaaf15c530689b220aba3ceb9ed7207"><td class="memTemplItemLeft" align="right" valign="top">std::optional&lt; T &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="string2int_8h.html#a8eaaf15c530689b220aba3ceb9ed7207">string2optional</a> (<a class="el" href="classait.html">const</a> std::string &amp;str, <a class="el" href="classait.html">int</a> base=10)</td></tr>
-<tr class="memdesc:a8eaaf15c530689b220aba3ceb9ed7207"><td class="mdescLeft">&#160;</td><td class="mdescRight">convert a string to an integer, given the base of the representation works with signed and unsigned integer types smaller than (unsigned) long long does not accept negative inputs when the result type is unsigned  <br /></td></tr>
+<tr class="memdesc:a8eaaf15c530689b220aba3ceb9ed7207"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a string to an integer, given the base of the representation, works with signed and unsigned integer types, rejects negative inputs when the result type is unsigned, rejects the empty string, rejects leading spaces, rejects any trailing non-numerical suffix.  <br /></td></tr>
 <tr class="separator:a8eaaf15c530689b220aba3ceb9ed7207"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
@@ -249,45 +242,10 @@ template&lt;<a class="el" href="classait.html">typename</a> T &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>convert a string to an integer, given the base of the representation works with signed and unsigned integer types smaller than (unsigned) long long does not accept negative inputs when the result type is unsigned </p>
+<p>Convert a string to an integer, given the base of the representation, works with signed and unsigned integer types, rejects negative inputs when the result type is unsigned, rejects the empty string, rejects leading spaces, rejects any trailing non-numerical suffix. </p>
+<p>A prefix such as 0, 0x, 0X to change base is <em>not</em> supported. </p>
 
-<p class="definition">Definition at line <a class="el" href="string2int_8h_source.html#l00111">111</a> of file <a class="el" href="string2int_8h_source.html">string2int.h</a>.</p>
-
-</div>
-</div>
-<a id="a46b7a0f7bfdb99c23ef7be6a3eda6da7" name="a46b7a0f7bfdb99c23ef7be6a3eda6da7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a46b7a0f7bfdb99c23ef7be6a3eda6da7">&#9670;&#160;</a></span>string2optional_base()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;<a class="el" href="classait.html">typename</a> T &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classait.html">auto</a> string2optional_base </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classait.html">const</a> std::string &amp;&#160;</td>
-          <td class="paramname"><em>str</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classait.html">int</a>&#160;</td>
-          <td class="paramname"><em>base</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> -&gt; <a class="el" href="classait.html">typename</a> std::enable_if&lt;<a class="el" href="util_8cpp.html#a64961c7c96a166ee16517f63747c3496">std::is_signed</a>&lt;T&gt;::value, <a class="el" href="classait.html">long</a> <a class="el" href="classait.html">long</a>&gt;::type
-</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>convert string to signed long long if T is signed </p>
-<p>convert string to unsigned long long if T is unsigned </p>
-
-<p class="definition">Definition at line <a class="el" href="string2int_8h_source.html#l00058">58</a> of file <a class="el" href="string2int_8h_source.html">string2int.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string2int_8h_source.html#l00065">65</a> of file <a class="el" href="string2int_8h_source.html">string2int.h</a>.</p>
 
 </div>
 </div>
@@ -536,31 +494,6 @@ template&lt;<a class="el" href="classait.html">typename</a> T &gt; </div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="string2int_8cpp_source.html#l00052">52</a> of file <a class="el" href="string2int_8cpp_source.html">string2int.cpp</a>.</p>
-
-</div>
-</div>
-<a id="adfde0989df473fafe7d329a9667ce09e" name="adfde0989df473fafe7d329a9667ce09e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adfde0989df473fafe7d329a9667ce09e">&#9670;&#160;</a></span>wrap_string_conversion()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;<a class="el" href="classait.html">typename</a> <a class="el" href="classait.html">do_conversiont</a> &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classait.html">auto</a> wrap_string_conversion </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classait.html">do_conversiont</a>&#160;</td>
-          <td class="paramname"><em>do_conversion</em></td><td>)</td>
-          <td> -&gt; std::optional&lt;<a class="el" href="classait.html">decltype</a>(<a class="el" href="classait.html">do_conversion</a>())&gt;
-</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>attempt a given conversion, return nullopt if the conversion fails with out_of_range or invalid_argument </p>
-
-<p class="definition">Definition at line <a class="el" href="string2int_8h_source.html#l00089">89</a> of file <a class="el" href="string2int_8h_source.html">string2int.h</a>.</p>
 
 </div>
 </div>
