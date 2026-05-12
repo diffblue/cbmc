@@ -504,8 +504,7 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   // be discarded on a throw anyway — see the catch below).
   const std::string body_file = id2string(symbol.location.get_file());
   const bool is_system_header_body =
-    body_file.find("/usr/include/") == 0 ||
-    body_file.find("/usr/lib/") == 0;
+    body_file.find("/usr/include/") == 0 || body_file.find("/usr/lib/") == 0;
 
   null_message_handlert syshdr_null_handler;
   message_handlert *syshdr_old_handler = nullptr;

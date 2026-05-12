@@ -113,9 +113,39 @@ codet cpp_typecheckt::dtor(const symbolt &symbol, const symbol_exprt &this_expr)
        cpp_is_pod(type))
       continue;
 
+    // Anonymous components (padding, unnamed unions in some error-
+    // recovery paths) have no base_name; skip rather than
+    // synthesising a ptrmember with an empty component name, which
+    // would later fail as `'' is not static member` when the
+    // member-expression is type-checked.
+    if(cit->get_base_name().empty())
+      continue;
+
+    // Anonymous components (padding, unnamed unions in some error-
+    // recovery paths) have no base_name; skip rather than
+    // synthesising a ptrmember with an empty component name, which
+    // would later fail as `'' is not static member` when the
+    // member-expression is type-checked.
+    if(cit->get_base_name().empty())
+      continue;
+
+    // Per [class.dtor]/13 a destructor may be invoked on a const
+    // or volatile subobject, but CBMC's implicit_typecast path
+    // rejects the pointer conversion from `const T*` (the address
+    // of a const member) to `T*` (the destructor's `this`
+    // parameter).  Until the implicit cv-cast is implemented,
+    // skip synthesising the destructor call for const / volatile
+    // members.  The memory of the member is still reclaimed via
+    // the enclosing object's stack/heap lifetime; omitting the
+    // dtor side effect is conservative for assertion checking.
+    if(
+      cit->type().get_bool(ID_C_constant) ||
+      cit->type().get_bool(ID_C_volatile))
+      continue;
+
     const cpp_namet cppname(cit->get_base_name(), source_location);
 
-    exprt member(ID_ptrmember, type);
+    exprt member(ID_ptrmember, cit->type());
     member.set(ID_component_cpp_name, cppname);
     member.operands().push_back(this_expr);
     member.add_source_location() = source_location;

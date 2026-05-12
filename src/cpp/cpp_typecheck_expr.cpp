@@ -2028,10 +2028,20 @@ void cpp_typecheckt::typecheck_expr_member(
       symbol_expr.swap(tmp);
     }
 
-    DATA_INVARIANT(
-      symbol_expr.id() == ID_symbol || symbol_expr.id() == ID_member ||
-        symbol_expr.is_constant(),
-      "expression kind unexpected");
+    // Soften to graceful error: typecheck_expr_member may receive
+    // an unusual symbol_expr shape when resolve has fallen back to
+    // a partial synthesis for an unresolvable member (for example
+    // the destructor of a class whose components list has the
+    // destructor but whose scope does not).  Rather than aborting
+    // via DATA_INVARIANT, emit a diagnostic and throw.
+    if(!(symbol_expr.id() == ID_symbol || symbol_expr.id() == ID_member ||
+         symbol_expr.is_constant()))
+    {
+      error().source_location = expr.find_source_location();
+      error() << "unresolved member expression (id=" << symbol_expr.id() << ")"
+              << eom;
+      throw 0;
+    }
 
     // If it is a symbol or a constant, just return it!
     // Note: the resolver returns a symbol if the member
