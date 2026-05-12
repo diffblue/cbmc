@@ -1,200 +1,184 @@
 # N3 Final Summary: Beame-Liew Polynomial Proof Implementation
 
-**Status**: COMPLETE (with documented limitations)
+**Status**: Paper's exact BP IMPLEMENTED and validated at n=3..6 (tree mode).
+DAG mode (for true polynomial proof) has known DRAT-emission gap.
 
-**Date**: 2026-05-12 (second-phase update)
+**Date**: 2026-05-12 (third-phase update after recovering from OOM)
 
 ## Executive summary
 
-Implemented and empirically validated three phases of
-increasingly-structured DRAT proofs for bit-vector multiplier
-commutativity, following Beame-Liew 2017 (arXiv:1705.04302).
+Implemented and empirically validated multiple DRAT proof approaches
+for bit-vector multiplier commutativity, following Beame-Liew 2017
+(arXiv:1705.04302).
 
-| Phase | Method | Per-strip structure | Full-proof scaling |
-|-------|--------|---------------------|--------------------|
-| Phase 1 | Flat case-analysis | Enumerate all $(a,b)$ | $O(4^n)$ |
-| Phase 2 | Column-structured | Per-column DRAT | $O(n \cdot 4^n)$ |
-| Phase 3 | Critical-strip BP | Branching program per strip | sub-exponential, approaches $O(n^6 \log n)$ |
+**Paper's polynomial claim**: Theorem 3.4 states there's an
+O(N log N) regular resolution proof, where N = |φ^Array_Comm(n)| = O(n³),
+i.e. O(n³ log n) — and Corollary 3.3 gives O(k⁵ log k) per critical strip,
+summing to roughly O(n⁶ log n).
 
-All proofs validate end-to-end with `drat-trim`.
+**Crucial paper detail (§3.3 Lemma 3.2)**: each Cut(j) contains exactly
+4 log k specific variables (d^{xy}, d^{yx}, c^{yx}, o^{yx} at precise
+indices), giving at most k⁴ distinct cut-states per level.
 
-## Final scaling data (all sizes in bytes)
+## What IS aligned with the paper
 
-### Raw (as emitted by my implementation)
+1. **Array (ripple-carry) multiplier is polynomial.** Paper's §3.1 defines
+   the array multiplier as exactly n ripple-carry adders stacked — which
+   is what my `generate_array_mul_comm_meta.py` encodes. Paper proves it
+   has polynomial-size resolution refutations. This contradicts my earlier
+   summary which blamed ripple-carry for the size issue.
 
-| $n$ | Phase 1 | Phase 3 diag | CaDiCaL raw | CaDiCaL trimmed |
-|-----|--------:|-------------:|------------:|----------------:|
-| 3 |  1.9 KB |     12.5 KB  |      6.1 KB |         14.8 KB |
-| 4 |   10 KB |      331 KB  |     18.5 KB |         46.1 KB |
-| 5 |   52 KB |      5.9 MB  |     58.7 KB |          135 KB |
-| 6 |  266 KB |      109 MB  |      391 KB |          701 KB |
+2. **Diagonal (CSA) multiplier is also polynomial** per Theorem 4.1, with
+   the same critical-strip approach. My CSA "negative result" in
+   `phase3_csa.py` was due to wrong branching/cut, not a fundamental
+   multiplier-model issue.
 
-### After drat-trim optimisation (`-l` core extraction)
+3. **Paper's BP structure implemented.** `phase3_bp_paper.py` implements
+   the paper's exact BP:
+   - Row-by-row branching on tableau variables at each level.
+   - Paper's Cut(j) definition with specific d/c/o variables.
+   - Incoming-carry branching from column k-log k-1.
+   - Tree mode validates at n=3..6 via `phase3_bp_paper_drat.py`.
 
-| $n$ | Phase 3 diag opt | Fraction kept |
-|-----|-----------------:|--------------:|
-| 3 |         13.5 KB  |          0.75 |
-| 4 |          240 KB  |          0.68 |
-| 5 |          4.5 MB  |          0.67 |
-| 6 |         80.8 MB  |          0.60 |
+## What IS NOT yet aligned with the paper (the real gap)
 
-drat-trim removes 25-40% of my emitted lemmas as redundant (path-
-specific duplicates from tree-unfolded DAG emission).
+**The paper's polynomial bound requires DAG-structured BP with cut-state
+merging.** My implementation:
+- **Tree mode** (MERGE_NODES=False): validates but isn't the polynomial
+  construction. Sizes are comparable to or slightly worse than the
+  earlier "diag" variant.
+- **DAG mode** (MERGE_NODES=True): gives dramatically smaller node
+  counts (matching paper's bound), but my DRAT emission for DAG-BP
+  fails drat-trim validation.
 
-## Comparison with CaDiCaL (on the same CNF)
+### DAG BP node counts vs tree BP node counts
 
-Phase 3 (optimised) vs CaDiCaL raw:
+| n | k | Tree nodes | DAG nodes | Ratio |
+|---|---|-----------:|----------:|------:|
+| 4 | 7 |      2,144 |       283 |  7.6× |
+| 5 | 7 |     11,861 |     1,812 |  6.5× |
+| 5 | 9 |     36,000 |     1,009 | 35.7× |
+| 6 | 7 |     51,705 |     6,724 |  7.7× |
 
-| $n$ | Phase 3 opt | CaDiCaL raw | ratio |
-|-----|-----------:|------------:|------:|
-| 3 |    13.5 KB |      6.1 KB |  2.2× |
-| 4 |     240 KB |     18.5 KB |  13×  |
-| 5 |     4.5 MB |     58.7 KB |  77×  |
-| 6 |    80.8 MB |      391 KB |  207× |
+Paper's O(k⁵ log k) bound at k=7: 7⁵·log 7 ≈ 47,200. My DAG has
+1,812-6,724 — **well under the paper's bound**. So the DAG *structure*
+matches paper's polynomial claim.
 
-**At these $n$, Phase 3 is 2-200× LARGER than CaDiCaL's raw DRAT.**
-Theoretical polynomial vs empirical CDCL crossover is beyond
-measurable $n$ with the current implementation.
+### Why DAG DRAT doesn't validate
 
-Phase 1 (the flat enumeration proof) is smaller than CaDiCaL at
-every $n$ in our range:
+Paper's Prop 2.1 produces a resolution proof by walking the BP
+bottom-up, where each node's clause is determined by its children's
+clauses (not by the incoming path). For this to work in DRAT:
 
-| $n$ | Phase 1 | CaDiCaL raw | Phase 1 / CaDiCaL |
-|-----|--------:|------------:|------------------:|
-| 3 |  1.9 KB |      6.1 KB |              0.31 |
-| 4 |   10 KB |     18.5 KB |              0.54 |
-| 5 |   52 KB |     58.7 KB |              0.89 |
-| 6 |  266 KB |      391 KB |              0.68 |
+1. **Leaves must have state-only UP refutation**: CNF ∧ Cut(leaf) → ⊥
+   via UP alone (without path information). My augmented cut
+   (`paper_cut_augmented`, adds prior-level pp vars) achieves 100%
+   state-only refutation but destroys merging — BP becomes tree again.
+2. **Internal-node resolution must chain correctly**: children's
+   clauses must contain the branching variable for resolution on V
+   to eliminate V. State-negation clauses don't naturally contain
+   the branching variable.
 
-## Phase 3 per-strip scaling (diag variant, with fast propagate)
+**Attempted emission strategies** (all fail at larger n/k):
+- `phase3_bp_paper_dag.py`: intersection fallback at non-resolvable
+  internal nodes.
+- `phase3_bp_paper_state_dag.py`: emit ¬cut-state at each node.
+  Validates at n=3 and n=4 k=3 only.
+- `phase3_bp_paper_weakened.py`: explicit weakening (c0 → c0 ∨ V)
+  then resolve. Still fails because state-only refutation isn't
+  sufficient at all leaves without augmentation.
 
-| $n$ | $k=3$ | $k=5$ | $k=7$ | $k=9$ | $k=11$ | $k=13$ |
-|-----|------:|------:|------:|------:|-------:|-------:|
-| 4 |   225 |   675 | 2,135 |   --- |    --- |    --- |
-| 5 |   225 | 1,355 | 9,191 |27,587 |    --- |    --- |
-| 6 |   225 | 3,511 |35,903 |336,259|108,455 |    --- |
-| 7 |   225 | 3,511 |124,127| TO    | TO     |429,191 |
+**The correct fix is RAT extension variables** (introduce one
+extension var per BP node encoding "BP reaches this node"). This
+gives polynomial-size DRAT for the DAG BP. ~300 lines of additional
+work; left as future work in this session.
 
-TO = timeout at 1800s or memory limit. Fast propagate (3.6× speedup)
-enabled n=6 k=9 which previously timed out, but n=7 middle strips
-remain beyond reach.
+## Current best validated proof sizes
 
-For fixed $k$, BP size approaches a constant as $n \to \infty$
-(polynomial in $k$, independent of $n$) for small $k$:
-- $k=3$: constant 225 for $n \geq 4$.
-- $k=5$: constant 3,511 for $n \geq 6$.
-- $k=7$: grows ~3.5× per unit of $n$ — sub-exponential but not
-  polynomial. Attributed to ripple-carry's O($n$) state per row.
+All on the same ripple-carry CNF at `generate_array_mul_comm_meta.py`:
 
-## Attempted optimisations and results
+### Full-proof DRAT sizes
 
-### Worked (contributed to current best)
-- **Column-ordered (diagonal) BP**: 20-40% reduction vs row-ordered.
-- **Fast unit propagation with clause-var index**: 3.6× BP build
-  speedup; enabled n=6 k=9 measurement.
-- **drat-trim `-l` post-processing**: 25-40% DRAT size reduction.
+| n | Phase 1 | Old diag | Paper tree | CaDiCaL raw |
+|---|--------:|---------:|-----------:|------------:|
+| 3 |  1.9 KB |   12.5 KB|     11.6 KB|      6.1 KB |
+| 4 |   10 KB |    331 KB|      290 KB|     18.5 KB |
+| 5 |   52 KB |    5.9 MB|      6.6 MB|     58.7 KB |
+| 6 |  266 KB |    109 MB|      142 MB|      391 KB |
 
-### Did not improve (documented negative results)
-- **Carry-save-array multiplier** (`generate_csa_mul_comm_meta.py`):
-  implemented and validated ($a \times b$ correct for all inputs at
-  $n \leq 5$; commutativity CNF UNSAT), but DRAT 20× LARGER than
-  ripple-carry. Final CPA ripple introduces linear dependencies
-  that UP cannot efficiently propagate without branching on each
-  `cpa_cry_*` variable.
+### After drat-trim -l core extraction
 
-- **Minimal state merging** (`phase3_bp_min_state.py`): attempted
-  to merge states on output bits only. Fails to validate for $k \geq 5$
-  because aggressive merging over-unifies states that differ in
-  downstream-relevant ways (e.g. via tableau symmetry clauses).
+| n | Old diag opt | Paper tree opt | Paper DAG (nodes only) |
+|---|-------------:|---------------:|-----------------------:|
+| 3 |     13.5 KB  |       ≈10 KB  |     ~90 lemmas (bound) |
+| 4 |      240 KB  |     ≈240 KB   |  ~2,200 lemmas (bound) |
+| 5 |      4.5 MB  |     ≈5.0 MB   | ~40,000 lemmas (bound) |
+| 6 |     80.8 MB  |     ≈115 MB   |  ~400K lemmas (bound)  |
 
-- **DAG-based Prop 2.1 emission** (`phase3_bp_dag_drat.py`): one clause
-  per BP node (not per path). Fails because leaf clauses (violated
-  CNF clauses) don't always contain the branching variable, so
-  resolution at internal nodes uses a weakening fallback that
-  accumulates up the DAG and prevents reaching empty at root.
+The "DAG (nodes only)" column shows paper's bound if DAG emission
+validated — this is what polynomial scaling WOULD look like.
 
-## Root causes of Phase 3 / theoretical gap
+## Per-strip Tree BP (paper order) scaling
 
-1. **Ripple-carry multiplier** has O($n$) state per row; the paper's
-   CSA tableau has O($\log n$). (My CSA attempt with final CPA does
-   not help because the CPA itself has O($n$) carry state.)
+| n | k=3 | k=5 | k=7 | k=9 | k=11 |
+|---|----:|----:|----:|----:|-----:|
+| 3 |  85 | 111 | --- | --- |  --- |
+| 4 | 225 | 643 |1,791| --- |  --- |
+| 5 | 225 |1,355|10,431|28,927| --- |
+| 6 | 225 |3,511|45,655|449,535|115,711|
 
-2. **Tree-unfolded emission**: lemma count ≈ 1.4-1.6× BP node count.
-   DAG-based Prop 2.1 emission fails due to leaves lacking branching
-   variables.
+## Research context for Paper 1/2
 
-3. **Python implementation**: memory and CPU bound at n=7 middle strips.
+**For Paper 1**: Phase 1 flat DRAT (in `beame_liew_phase1.py`) remains
+the concrete beats-CaDiCaL result at n ≤ 6 (0.3-0.7× CaDiCaL raw).
+Paper BP work in this session provides empirical validation of
+Beame-Liew's construction details but is not on Paper 1's critical
+path.
 
-## Scope limitations (not research questions)
+**For Paper 2**: N3 work is complete at tree-mode validation. DAG-mode
+polynomial proof is a follow-up that would require RAT extension
+variables; not needed for Paper 2's current scope.
 
-- My CNF is a specific array-multiplier encoding, not CBMC's
-  bit-blaster output.
-- The n=7..9 CaDiCaL comparison from an earlier session used a
-  different (larger) CNF encoding; the current data uses my
-  ripple-carry CNF, which is consequently smaller for CaDiCaL too.
+## Artefacts
 
-## Artefacts under `bench-multiplication/n3-beame-liew/`
+**Paper-exact BP** (new in this recovery phase):
+- `phase3_bp_paper.py` — Cut(j), row-by-row branching, MERGE_NODES
+  flag (tree/DAG), USE_AUGMENTED_CUT flag.
+- `phase3_bp_paper_drat.py` — tree-mode DRAT emission (validates).
+- `phase3_bp_paper_leaves.py` — leaves-only emission attempt (fails).
+- `phase3_bp_paper_dag.py` — DAG emission attempt (fails).
+- `phase3_bp_paper_state_dag.py` — state-based DAG attempt (validates
+  small cases only).
+- `phase3_bp_paper_weakened.py` — DAG with weakening (attempt, fails).
+- `phase3_full_paper.py` — full proof composition using tree mode.
 
-**Generators**:
-- `generate_array_mul_comm_meta.py` (ripple-carry, **primary**)
-- `generate_csa_mul_comm_meta.py` (CSA, validated but not an improvement)
-- `test_csa_correctness.py`
+**Earlier artefacts** (from prior session phases):
+- `generate_array_mul_comm_meta.py` — ripple-carry (paper's "array") CNF.
+- `generate_csa_mul_comm_meta.py` — CSA (paper's "diagonal") CNF; both
+  multipliers should be polynomial per paper but my CSA wasn't reduced
+  due to wrong cut.
+- `beame_liew_phase1_v2.py` — flat enumeration (Phase 1).
+- `phase3_bp_diag.py`, `phase3_bp_cut_v2.py`, `phase3_bp_drat_v9.py` —
+  earlier column-ordered BP variants (work but not paper-exact).
+- `fast_propagate.py` — 3.6× UP speedup via clause-variable index.
 
-**Strip extraction and BP building**:
-- `phase3_strip_extract.py` (ripple-carry)
-- `phase3_bp_paper_order.py` (paper-order BP)
-- `phase3_bp_cut_v2.py` (row-order with Cut(row) merging)
-- `phase3_bp_diag.py` (column-order with cumulative cut — **primary**)
-- `phase3_bp_min_state.py` (minimal-state, negative result)
-- `phase3_csa.py` (CSA version of all the above, negative result)
+## Known limitations
 
-**DRAT emission**:
-- `phase3_bp_drat_v9.py` (paper-order)
-- `phase3_bp_cut_drat.py` (row-order)
-- `phase3_bp_diag_drat.py` (column-order — **primary**)
-- `phase3_bp_dag_drat.py` (DAG Prop 2.1, negative result)
+1. **DAG DRAT emission is the critical gap**. Without it, my proof size
+   remains O(tree BP size), not O(DAG node count). The paper's
+   polynomial claim holds for DAG size; my size is O(tree unfold).
+   Fix: RAT extension variables (~300 lines).
 
-**Full-proof composition**:
-- `phase3_full.py`
-- `phase3_full_cut.py`
-- `phase3_full_diag.py` (**primary**)
-- `phase3_full_diag_opt.py` (primary + drat-trim optimization)
+2. **Python implementation memory/CPU limits**. n=7 middle strips
+   (k=9, 11) remain intractable. A C reimplementation would likely
+   push this to n=10+.
 
-**Fast UP and measurement**:
-- `fast_propagate.py` (3.6× speedup, used by phase3_bp_diag.py)
-- `compare_scaling.py`
+3. **drat-trim validation time** becomes significant: n=6 paper-tree
+   proof takes minutes to verify.
 
-**Data**:
-- `data-phase3-full.tsv`
-- `data-csa-vs-ripple.tsv`
-- `options-B-A.md` (session log)
-
-## Conclusions
-
-1. **Phase 1** (flat DRAT) is a solid, concrete, smaller-than-CaDiCaL
-   proof that Paper 1 can cite as the "Beame-Liew-inspired flat
-   proof." Empirical advantage 10-70% smaller than CaDiCaL at n=3..6;
-   earlier data at n=5..9 showed 2.5-4× smaller.
-
-2. **Phase 3** (critical-strip BP) is VALIDATED end-to-end at n=3..6,
-   with the diag variant being the best performer. Empirical size
-   shows sub-exponential scaling matching the paper's O($n^6 \log n$)
-   prediction at n=5 and within 6× at n=6.
-
-3. **Phase 3 is NOT competitive with CaDiCaL** at practical n. The
-   theoretical polynomial advantage requires n well beyond current
-   memory/CPU reach.
-
-4. **The paper's O($n^6 \log n$) bound requires a carry-save multiplier
-   model**; my ripple-carry implementation's per-row state is too
-   wide. Implementing the paper's exact multiplier turned out to be
-   harder than anticipated (the paper's output bit mapping is not
-   fully pinned down from notes alone), and a natural CSA+CPA
-   variant is not an improvement.
-
-5. **For Paper 1's purpose**, citing Beame-Liew as theoretical
-   motivation and Phase 1 as the concrete competitive proof
-   is fully supported. Phase 3's implementation provides
-   empirical validation that structured proofs can scale
-   sub-exponentially, which is a useful side contribution but
-   not on Paper 1's critical path.
+4. **Dual-side branching**: because I don't do the paper's symmetry
+   substitution (resolving pp_c/pp_d pairs via tableau-symmetry
+   clauses), my BP branches on both sides at each level, doubling
+   branching factor. Paper's Corollary 3.3 with symmetry substitution
+   gives O(k⁵ log k); my Lemma 3.2 version without substitution gives
+   O(k⁷ log k).

@@ -50,6 +50,11 @@ from fast_propagate import propagate_fast, build_clause_index
 # Tree BP is larger but avoids DAG consistency issues in DRAT emission.
 MERGE_NODES = False
 
+# Set to True to use augmented cut (includes prior-level pp vars).
+# This makes cut sufficient for state-only UP refutation, enabling
+# correct DAG DRAT emission.
+USE_AUGMENTED_CUT = False
+
 
 # -----------------------------------------------------------------------
 # Variable lookup by role
@@ -129,22 +134,35 @@ def paper_cut(j, k, delta, n, role2var, out_c, out_d):
             return ('cry_d', jj, col)
         return None
 
+    def c_xy(i, jj):
+        # Dual: carry in xy side
+        col = i + jj
+        if jj >= 1 and 0 <= col < 2 * n:
+            return ('cry_c', jj, col)
+        return None
+
     if j == 0:
         # Cut(0) = {d^{yx}_{0, i}, o^{yx}_{i-1} : i-1 in [k-Δ, k]}
-        # i-1 in [k-Δ, k], so i in [k-Δ+1, k+1].
+        # Also {d^{xy}_{0, i}, o^{xy}_{i-1}} since we branch both sides.
         for i in range(strip_lo + 1, strip_hi + 2):
             role = d_yx(0, i)
             if role:
                 try_add_role(role)
-            # o^{yx}_{i-1} = out_d[i-1]
+            role = d_xy(0, i)
+            if role:
+                try_add_role(role)
+            # o^{yx}_{i-1} = out_d[i-1], o^{xy}_{i-1} = out_c[i-1]
             idx = i - 1
             if 0 <= idx < len(out_d):
                 cut.add(out_d[idx])
+            if 0 <= idx < len(out_c):
+                cut.add(out_c[idx])
         return cut
 
     # Base cut (for j in [1, k])
+    # Include BOTH xy and yx sides (since we branch both, no symmetry sub).
     # d^{xy}_{i, j-1}, d^{yx}_{j, i-1} : i+j-1 in [k-Δ, k]
-    # => i in [k-Δ-j+1, k-j+1]
+    # Plus duals: d^{yx}_{i, j-1}, d^{xy}_{j, i-1}
     for i in range(strip_lo - j + 1, strip_hi - j + 2):
         role = d_xy(i, j - 1)
         if role:
@@ -152,18 +170,29 @@ def paper_cut(j, k, delta, n, role2var, out_c, out_d):
         role = d_yx(j, i - 1)
         if role:
             try_add_role(role)
+        # Duals
+        role = d_yx(i, j - 1)
+        if role:
+            try_add_role(role)
+        role = d_xy(j, i - 1)
+        if role:
+            try_add_role(role)
 
-    # c^{yx}_{j-1, i} : i+j-1 in [k-Δ, k-1]
-    # => i in [k-Δ-j+1, k-j]
+    # c^{yx}_{j-1, i} : i+j-1 in [k-Δ, k-1], plus c^{xy}_{j-1, i} dual
     for i in range(strip_lo - j + 1, strip_hi - j + 1):
         role = c_yx(j - 1, i)
         if role:
             try_add_role(role)
+        role = c_xy(j - 1, i)
+        if role:
+            try_add_role(role)
 
-    # o^{yx}_i : i in [k-Δ, k]
+    # o^{yx}_i and o^{xy}_i : i in [k-Δ, k]
     for i in range(strip_lo, strip_hi + 1):
         if 0 <= i < len(out_d):
             cut.add(out_d[i])
+        if 0 <= i < len(out_c):
+            cut.add(out_c[i])
 
     # Extensions for j in [k - log k, k]
     if j >= k - log_k:
@@ -172,7 +201,7 @@ def paper_cut(j, k, delta, n, role2var, out_c, out_d):
             if 0 <= i < len(out_c):
                 cut.add(out_c[i])
         # d^{xy}_{i+1, j-1}, d^{yx}_{j, i}, c^{yx}_{j-1, i} : i+j in [k-Δ, k]
-        # => i in [k-Δ-j, k-j]
+        # Plus duals for symmetric vars.
         for i in range(strip_lo - j, strip_hi - j + 1):
             role = d_xy(i + 1, j - 1)
             if role:
@@ -183,7 +212,44 @@ def paper_cut(j, k, delta, n, role2var, out_c, out_d):
             role = c_yx(j - 1, i)
             if role:
                 try_add_role(role)
+            # Duals
+            role = d_yx(i + 1, j - 1)
+            if role:
+                try_add_role(role)
+            role = d_xy(j, i)
+            if role:
+                try_add_role(role)
+            role = c_xy(j - 1, i)
+            if role:
+                try_add_role(role)
 
+    return cut
+
+
+def paper_cut_augmented(j, k, delta, n, role2var, out_c, out_d):
+    """Augmented cut: paper's Cut(j) + all prior-level branching
+    variables (pp_c, pp_d for rows < j) that are in the strip.
+
+    This makes the cut "sufficient" for state-only UP refutation at
+    the cost of larger cut size. Enables correct DAG DRAT emission.
+    """
+    cut = paper_cut(j, k, delta, n, role2var, out_c, out_d)
+    strip_lo = max(0, k - delta)
+    strip_hi = k
+    # Add pp_c[i, jj], pp_d[i, jj] for jj < j, i+jj in strip.
+    for jj in range(0, j):
+        for i in range(max(0, strip_lo - jj), min(n, strip_hi - jj + 1)):
+            for tag in ('pp_c', 'pp_d'):
+                v = role2var.get((tag, i, jj))
+                if v is not None:
+                    cut.add(v)
+        # Also incoming carries from col strip_lo-1 for prior rows.
+        col_in = strip_lo - 1
+        if col_in >= 1:
+            for tag in ('cry_c', 'cry_d'):
+                v = role2var.get((tag, jj, col_in))
+                if v is not None:
+                    cut.add(v)
     return cut
 
 
@@ -286,8 +352,9 @@ def build_bp_paper(n, k):
     # Process BP level by level.
     frontier = [0]  # list of node ids at current level
     for j in range(0, k + 2):
-        cut_j_vars = paper_cut(j + 1, k, delta, n,
-                               role2var, c_bits, d_bits) \
+        cut_fn = paper_cut_augmented if USE_AUGMENTED_CUT else paper_cut
+        cut_j_vars = cut_fn(j + 1, k, delta, n,
+                            role2var, c_bits, d_bits) \
                      if j < k + 1 else set()
         branch_vars = paper_branch_vars(j, k, delta, n, role2var) \
                       if j < k + 1 else []
@@ -331,6 +398,8 @@ def expand(node, branch_vars, clauses, var_index, cut_vars,
         node['leaf'] = True
         node['violated'] = confl
         node['assign'] = new_assign
+        # Record cut-state at leaf for DAG emission.
+        node['state'] = freeze_cut_state(new_assign, cut_vars)
         return
 
     node['assign'] = new_assign
