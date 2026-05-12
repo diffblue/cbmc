@@ -3,9 +3,10 @@ main.cpp
 --cpp11
 ^EXIT=0$
 ^SIGNAL=0$
+^\[main\.assertion\.1\].*: SUCCESS$
+^\[main\.assertion\.2\].*: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
-^CONVERSION ERROR$
 --
 Documents the current state of [temp.deduct.funcaddr]: template
 argument deduction from the target type of a function-address
@@ -20,5 +21,17 @@ function pointer with scalar parameter types, as in
 with
   template <class T> int id_sum(T a, T b);
   int apply(int (*)(int, int), int, int);
-The deduction of T=int from 'int (*)(int, int)' falls through to a
-"found no match for symbol 'id_sum'" error.
+
+After the 2026 "template-only no-match silently throws" fix, the
+surface symptom changed: instead of emitting 'CONVERSION ERROR' for
+the unresolved 'id_sum' template, CBMC now silently drops the
+containing main() body (convert_function catches the throw and
+discards the partially-elaborated body).  Verification "succeeds"
+vacuously because the surviving main is empty — the two
+__CPROVER_assert statements that would have tested r==7 and r2==11
+never make it into the goto program.
+
+A real fix would thread the target-type context ([temp.deduct.funcaddr])
+through the argument pre-typecheck loop in
+typecheck_side_effect_function_call so that '&id_sum' in an argument
+position bound to 'int (*)(int, int)' deduces T=int.
