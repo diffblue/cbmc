@@ -230,12 +230,10 @@ void cpp_typecheckt::convert_non_template_declaration(
             // no declarator-name sub-elements yet).  Without this
             // guard, the `.front()` below dereferences a null
             // pointer and crashes with SIGSEGV.
-            const auto &name_sub =
-              pdecl.declarators().front().name().get_sub();
+            const auto &name_sub = pdecl.declarators().front().name().get_sub();
             if(name_sub.empty())
               continue;
-            const irep_idt &pname =
-              name_sub.front().get(ID_identifier);
+            const irep_idt &pname = name_sub.front().get(ID_identifier);
             if(pname.empty())
               continue;
             const std::string sym_name =
