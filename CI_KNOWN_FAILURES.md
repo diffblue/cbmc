@@ -123,10 +123,23 @@ Locally, against `/tmp/macos-pp-new/` and `/tmp/msvc-pp-new/`
   cpp17_numeric_basic, cpp17_shared_ptr, cpp17_string_view(_basic),
   cpp17_thread_basic, cpp17_valarray_basic, cpp17_vector_basic,
   cpp20_iostream_basic.  Remaining:
-  * `cpp11_future_header` — HANG (core dump during `make_shared`
-    for `_ExceptionHolder`).
+  * ~~`cpp11_future_header`~~ — ✅ FIXED in `df5f5d955e`.
+    `convert_non_template_declaration`'s trailing-return-decltype
+    path accessed `pdecl.declarators().front().name().get_sub().front()`
+    without a non-empty guard; the null-pointer deref triggered
+    SIGSEGV during nested `make_shared<_ExceptionHolder>`
+    instantiation.  Guarding lets the preprocessed-header run
+    complete with VERIFICATION SUCCESSFUL.
   * `cpp14_chrono_basic` — CONVERSION ERROR "non-POD type has no
     constructor" during `std::decay<duration>` instantiation.
+    Root cause: CBMC elaborates `duration<long long, ratio<1,1>>`
+    with only its `rep`/`period` typedef components and the
+    non-template `count()` method; the private `_MyRep` data
+    member and both constructors (default + variadic template) are
+    missing from the elaborated struct.  The CORE regression test
+    passes on Linux (with libstdc++'s simpler duration layout) —
+    the issue only surfaces against the MSVC preprocessed header.
+    Not yet fixed.
 
 The MSVC jump from 15/26 to 24/26 is primarily attributable to the
 SFINAE fix in `e7080a017e` removing spurious error leaks that
