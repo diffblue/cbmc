@@ -20,6 +20,7 @@ from collections import defaultdict
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from phase3_bp_paper_order import build_strip_all, propagate
+from fast_propagate import build_clause_index, propagate_fast
 from phase3_strip_extract import strip_delta
 
 
@@ -95,8 +96,10 @@ def build_bp_diag(n, k):
     branch_order = diagonal_branch_order(cnf, k, delta, n)
     state_by_col = get_diagonal_state_vars(cnf, k, delta, n)
     strip_cols = list(range(max(0, k - delta), k + 1))
+    var_index = build_clause_index(strip_clauses)
 
-    init_final, init_conflict = propagate(strip_clauses, forced_e)
+    init_final, init_conflict = propagate_fast(
+        strip_clauses, forced_e, var_index)
     if init_conflict is not None:
         return {"root": None, "nodes": {}, "conflict": init_conflict,
                 "flat_order": branch_order}
@@ -141,7 +144,8 @@ def build_bp_diag(n, k):
         for bit in (False, True):
             new_assign = dict(assign)
             new_assign[var] = bit
-            new_final, conflict = propagate(strip_clauses, new_assign)
+            new_final, conflict = propagate_fast(
+                strip_clauses, new_assign, var_index)
             if conflict is not None:
                 leaf_key = ("leaf", tuple(conflict))
                 nodes[leaf_key] = {"leaf": list(conflict)}
