@@ -35,6 +35,7 @@ Date: February 2016
 #include "utils.h"
 
 #include <algorithm>
+#include <functional>
 #include <map>
 
 void code_contractst::check_apply_loop_contracts(
@@ -590,8 +591,47 @@ get_contract(const irep_idt &function, const namespacet &ns)
   }
 
   const auto &type = to_code_with_contract_type(contract_sym->type);
+  // Compare the contract-declaration's signature to the function
+  // declaration's signature *structurally*.  A literal
+  // `irept::operator==` recurses into every sub-irep — including
+  // source-location stamps, contract-spec clauses, and per-
+  // declaration `#identifier` strings on parameter types — and
+  // reports unequal on signature-identical declarations that merely
+  // live in different translation units.  That produces
+  // DATA_INVARIANT false-positives when a contract-declaration in
+  // a scan adapter matches a plain re-declaration in a kernel TU
+  // (see integration/linux/CBMC_LIMITATIONS.md LIM-016).
+  //
+  // Helper: strip all per-declaration metadata (source locations,
+  // comments prefixed with `#`) from a type irep, recursively.
+  // Contract-spec sub-ireps get stripped too so they don't throw
+  // off the comparison against the plain function-declaration.
+  std::function<void(irept &)> strip_metadata = [&strip_metadata](irept &node)
+  {
+    node.remove(ID_C_source_location);
+    node.remove(ID_C_spec_requires);
+    node.remove(ID_C_spec_ensures);
+    node.remove(ID_C_spec_assigns);
+    node.remove(ID_C_spec_frees);
+    // Also strip per-declaration identifier/base-name ireps so
+    // two parameter declarations with the same type but
+    // different mangled caller-specific identifiers still
+    // compare equal.
+    node.remove(ID_C_identifier);
+    node.remove(ID_C_base_name);
+    // Walk named sub-ireps (the ones that aren't comments).
+    for(auto &[name, sub] : node.get_named_sub())
+      strip_metadata(sub);
+    for(auto &sub : node.get_sub())
+      strip_metadata(sub);
+  };
+
+  typet contract_type_stripped = type;
+  strip_metadata(contract_type_stripped);
+  typet function_type_stripped = function_symbol.type;
+  strip_metadata(function_type_stripped);
   DATA_INVARIANT(
-    type == function_symbol.type,
+    contract_type_stripped == function_type_stripped,
     "front-end should have rejected re-declarations with a different type");
 
   return type;
