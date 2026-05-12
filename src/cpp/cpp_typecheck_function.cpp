@@ -499,16 +499,33 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     }
   }
 
+  // Detect system-header functions up front so we can suppress
+  // diagnostics emitted while typechecking their body (they will
+  // be discarded on a throw anyway — see the catch below).
+  const std::string body_file = id2string(symbol.location.get_file());
+  const bool is_system_header_body =
+    body_file.find("/usr/include/") == 0 ||
+    body_file.find("/usr/lib/") == 0;
+
+  null_message_handlert syshdr_null_handler;
+  message_handlert *syshdr_old_handler = nullptr;
+  if(is_system_header_body)
+  {
+    syshdr_old_handler = &get_message_handler();
+    set_message_handler(syshdr_null_handler);
+  }
+
   try
   {
     typecheck_code(to_code(symbol.value));
   }
   catch(int)
   {
+    if(syshdr_old_handler != nullptr)
+      set_message_handler(*syshdr_old_handler);
     // For system headers, clear the broken body and return.
     // For user code, re-throw.
-    const std::string file = id2string(symbol.location.get_file());
-    if(file.find("/usr/include/") == 0 || file.find("/usr/lib/") == 0)
+    if(is_system_header_body)
     {
       symbol.value.make_nil();
       functions_being_typechecked.erase(symbol.name);
@@ -516,6 +533,8 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     }
     throw;
   }
+  if(syshdr_old_handler != nullptr)
+    set_message_handler(*syshdr_old_handler);
 
   // Deferred auto return type deduction: the initial attempt failed
   // (e.g., if constexpr with type-dependent discarded branch).

@@ -2150,15 +2150,36 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       // in the instantiation scope which has full namespace visibility.
       if(i >= first_default)
       {
+        // Per [temp.deduct]/7-8: substitution failure in a default
+        // template argument is silently absorbed.  Suppress
+        // diagnostics emitted during the typecheck attempt; if both
+        // the primary and the instantiation-scope retry fail,
+        // re-throw.
+        null_message_handlert default_arg_null_handler;
+        message_handlert &default_arg_old_handler = get_message_handler();
+        set_message_handler(default_arg_null_handler);
+        bool succeeded = false;
         try
         {
           typecheck_expr(arg);
+          succeeded = true;
         }
         catch(int)
         {
-          cpp_scopes.go_to(*instantiation_scope_ptr);
-          typecheck_expr(arg);
+          try
+          {
+            cpp_scopes.go_to(*instantiation_scope_ptr);
+            typecheck_expr(arg);
+            succeeded = true;
+          }
+          catch(int)
+          {
+            // Rethrow below with the real message handler.
+          }
         }
+        set_message_handler(default_arg_old_handler);
+        if(!succeeded)
+          throw 0;
       }
       else
         typecheck_expr(arg);
