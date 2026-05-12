@@ -100,6 +100,7 @@ confidently test at that scale yet.
 | 2026-05-12 (syshdr)    | all src/util/ | **7** | **1** | 109 | 0 | `a760f05e84` — null message handler around system-header function body + default template args; eliminates 27 `__stoa` leaks and moves 6 files from OK_NOISY to OK_CLEAN |
 | 2026-05-12 (destr)     | all src/util/ | 7 | 5 | 105 | 0 | `5e7efee580` + `7a9154a46e` + `56c27ea9d3` — destructor fallback + silent fallbacks for uninitialised constexpr + bare `enum class X;` forward declaration; eliminates 64 `'' is not static member of 'const struct basic_string'` errors |
 | 2026-05-12 (tmpl-no-match) | all src/util/ | **10** | **4** | 103 | 0 | `01507a3e6d` — resolve: silently discard template-only no-match per [temp.deduct]/8; eliminates the `invariant_violated_structured` cascade that had been emitted by 60+ files and moves 3 files to OK_CLEAN + 1 to OK_NOISY-to-OK_CLEAN |
+| 2026-05-12 (funcaddr+SIGSEGV) | all src/util/ | 10 | 4 | 103 | 0 | `d612fe6dac` (plain function-pointer target-type deduction per [temp.deduct.funcaddr]; promotes `cpp11_deduct_funcaddr` KNOWNBUG→CORE) + `df5f5d955e` (guard empty declarator-name sub on trailing-return-decltype path; eliminates MSVC `cpp11_future_header` SIGSEGV on preprocessed-header runs) |
 
 ## Fixes that have landed (in order)
 
