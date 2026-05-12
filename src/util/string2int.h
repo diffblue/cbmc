@@ -12,6 +12,7 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 #include "narrow.h"
 
+#include <charconv>
 #include <optional>
 #include <string>
 #include <type_traits>
@@ -53,66 +54,38 @@ string2optional_unsigned(const std::string &, int base = 10);
 std::optional<std::size_t>
 string2optional_size_t(const std::string &, int base = 10);
 
-/// convert string to signed long long if T is signed
-template <typename T>
-auto string2optional_base(const std::string &str, int base) ->
-  typename std::enable_if<std::is_signed<T>::value, long long>::type
-{
-  static_assert(
-    sizeof(T) <= sizeof(long long),
-    "this works under the assumption that long long is the largest type we try "
-    "to convert");
-  return std::stoll(str, nullptr, base);
-}
-
-/// convert string to unsigned long long if T is unsigned
-template <typename T>
-auto string2optional_base(const std::string &str, int base) ->
-  typename std::enable_if<std::is_unsigned<T>::value, unsigned long long>::type
-{
-  static_assert(
-    sizeof(T) <= sizeof(unsigned long long),
-    "this works under the assumption that long long is the largest type we try "
-    "to convert");
-  if(str.find('-') != std::string::npos)
-  {
-    throw std::out_of_range{
-      "unsigned conversion behaves a bit strangely with negative values, "
-      "therefore we disable it"};
-  }
-  return std::stoull(str, nullptr, base);
-}
-
-/// attempt a given conversion, return nullopt if the conversion fails
-/// with out_of_range or invalid_argument
-template <typename do_conversiont>
-auto wrap_string_conversion(do_conversiont do_conversion)
-  -> std::optional<decltype(do_conversion())>
-{
-  try
-  {
-    return do_conversion();
-  }
-  catch(const std::invalid_argument &)
-  {
-    return std::nullopt;
-  }
-  catch(const std::out_of_range &)
-  {
-    return std::nullopt;
-  }
-}
-
-/// convert a string to an integer, given the base of the representation
-/// works with signed and unsigned integer types smaller than
-///   (unsigned) long long
-/// does not accept negative inputs when the result type is unsigned
+/// Convert a string to an integer, given the base of the representation,
+/// works with signed and unsigned integer types,
+/// rejects negative inputs when the result type is unsigned,
+/// rejects the empty string,
+/// rejects leading spaces,
+/// rejects any trailing non-numerical suffix.
+/// A prefix such as 0, 0x, 0X to change base is _not_ supported.
 template <typename T>
 std::optional<T> string2optional(const std::string &str, int base = 10)
 {
-  return wrap_string_conversion([&]() {
-    return narrow_or_throw_out_of_range<T>(string2optional_base<T>(str, base));
-  });
+  PRECONDITION(base == 2 || base == 8 || base == 10 || base == 16);
+
+  static_assert(
+    std::is_integral<T>::value, "string2optional requires an integral type");
+
+  if(str.empty())
+    return std::nullopt;
+
+  // reject negative inputs for unsigned types
+  if(std::is_unsigned<T>::value && str.front() == '-')
+    return std::nullopt;
+
+  const char *first = str.data();
+  const char *last = str.data() + str.size();
+
+  T value{};
+  auto [ptr, ec] = std::from_chars(first, last, value, base);
+
+  if(ec != std::errc{} || ptr != last)
+    return std::nullopt;
+
+  return value;
 }
 
 #endif // CPROVER_UTIL_STRING2INT_H
