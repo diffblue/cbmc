@@ -95,6 +95,9 @@ confidently test at that scale yet.
 | 2026-05-11 (rebind)    | 15 smallest   | 1 | 3 | 10  | 1 | `87d40979a3` — unordered_map + custom hash unblocks 3 files (noisy) |
 | 2026-05-11 (invariants)| 30 smallest   | 1 | 5 | 24  | 0 | `bb36504ba4` — two invariants softened; 0 crashes on the 30-file sample |
 | 2026-05-11 (expand)    | all src/util/ | 1 | 7 | 109 | 0 | `6b09016f4a` — vtable type-mismatch invariant + cleaner `expr2c` fallback (replaces megabyte-long irep dumps with `<<expr:ID>>` placeholders) |
+| 2026-05-12 (string)    | all src/util/ | 1 | 7 | 109 | 0 | `9cbd9daef9` — `char[N]`→`std::string` fallback; eliminates 35 `invalid implicit conversion from 'char [1l]' to 'struct basic_string'` errors (cascades, same count) |
+| 2026-05-12 (using)     | all src/util/ | 1 | 7 | 109 | 0 | `9537b6bfc5` — class-member `using Base::X` with unresolved lookup silently dropped; eliminates 31 `using identifier 'remove' not found` errors (cascades, same count) |
+| 2026-05-12 (syshdr)    | all src/util/ | **7** | **1** | 109 | 0 | `a760f05e84` — null message handler around system-header function body + default template args; eliminates 27 `__stoa` leaks and moves 6 files from OK_NOISY to OK_CLEAN |
 
 ## Fixes that have landed (in order)
 
@@ -114,6 +117,19 @@ confidently test at that scale yet.
 6. `6b09016f4a` — soften vtable type-mismatch invariant; replace
    irep-dump fallback in `convert_norep` with a compact
    placeholder.
+7. `9cbd9daef9` — `implicit_typecast`: `char[N]` → `std::string`
+   fallback synthesising the 3-arg basic_string ctor, since
+   libstdc++'s convenience ctor
+   `basic_string(const _CharT*, const _Alloc& = _Alloc())` is a
+   SFINAE-guarded member template not elaborated into the struct
+   components list.
+8. `9537b6bfc5` — `cpp_typecheck_using`: base-class walk + silent
+   drop of class-member `using Base::X` when lookup fails
+   (access-control-only, no goto-conversion effect).
+9. `a760f05e84` — null message handler around system-header
+   function bodies (existing error-recovery already clears the
+   body) and default template args (per [temp.deduct]/7-8).
+   Removes 27 leaked `__stoa` errors from dog-food output.
 
 ## Remaining recurring errors (full src/util/ sample, 117 files)
 
