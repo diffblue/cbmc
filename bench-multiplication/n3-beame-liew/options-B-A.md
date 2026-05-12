@@ -437,3 +437,49 @@ Remaining work for polynomial:
    reaching the merge. RAT extension variables would handle this.
 3. Current implementation's tree-unfolding in DFS recovers
    correctness but defeats merging.
+
+
+## Phase 3 step 4: diagonal (column) ordering (2026-05-12)
+
+`phase3_bp_diag.py` + `phase3_bp_diag_drat.py` + `phase3_full_diag.py`
+implement the BP with column-by-column (diagonal) branching order,
+aligning with the paper's §3.3 construction (which orders variables
+by tableau diagonal).
+
+Branching order within a strip:
+1. Incoming carries at col strip_start - 1 (from outside strip).
+2. For each column c in strip (increasing):
+   - pp_c[i, c-i] for valid i (partial products at diagonal c).
+3. Output vars c[col], d[col] for col in strip (at the end).
+
+State merging at column boundaries; cut state is cumulative acc/cry/pp
+vars for cols <= current.
+
+Per-strip size comparison:
+
+| n | k | cut_v2 lemmas | diag lemmas | diag/cut_v2 |
+|---|---|--------------:|------------:|------------:|
+| 5 | 7 |        12,159 |       9,191 |       0.76x |
+| 5 | 9 |        39,619 |      27,587 |       0.70x |
+| 6 | 7 |        43,531 |      35,903 |       0.82x |
+| 6 | 11|       157,095 |     108,455 |       0.69x |
+
+Full-proof size comparison:
+
+| n | cut_v2 | diag | diag/cut_v2 |
+|---|-------:|-----:|------------:|
+| 3 |  14KB  | 13KB |       0.93x |
+| 4 |  411KB |331KB |       0.81x |
+| 5 |  8.8MB |5.9MB |       0.68x |
+| 6 |  185MB | 109MB |      0.59x |
+
+Diagonal ordering gives 20-40% additional reduction over cut_v2 row
+ordering. All DRATs validate with drat-trim.
+
+Attempted further optimizations that BROKE correctness:
+- Live-only state (cry + output only): merging too aggressive,
+  missed critical info for downstream cuts.
+- Cumulative row-state restricted to current row only: didn't help
+  (sizes identical).
+
+Current diag represents the best validated Phase 3 BP we have.
