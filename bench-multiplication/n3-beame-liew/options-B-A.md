@@ -385,3 +385,55 @@ level) would require:
 
 This is concrete future work. The phase3_bp_drat_v9.py +
 phase3_full.py pipeline shows the overall structure is right.
+
+
+## Phase 3 step 3: Cut(row) merging (v2 polynomial attempt)
+
+`phase3_bp_cut_v2.py` + `phase3_bp_cut_drat.py` + `phase3_full_cut.py`
+implement a BP with row-based Cut state merging. State at row
+boundary = assignment of {acc_c[row, col], cry_c[row, col+1],
+acc_d[row, col], cry_d[row, col+1] : col in strip} plus pp_c[0, col]
+for row 0 (ripple-carry specific).
+
+After debugging the state_sig definition (row 0 Cut was empty; row
+-1 "incoming carries" shouldn't trigger merging), all per-strip
+DRATs validate with drat-trim.
+
+Per-strip size improvements vs v9:
+
+| n | k | v9 lemmas | cut_v2 lemmas | cut/v9 |
+|---|---|---:|---:|---:|
+| 3 | 3 |    135 |     85 | 0.63x |
+| 3 | 5 |    671 |    167 | 0.25x |
+| 4 | 5 |  1,695 |    779 | 0.46x |
+| 4 | 7 | 10,751 |  2,519 | 0.23x |
+| 5 | 7 | 41,727 | 12,159 | 0.29x |
+| 5 | 9 |226,943 | 39,619 | 0.17x |
+| 6 | 7 | 91,191 | 43,531 | 0.48x |
+
+Full-proof comparison vs Phase 1 and v9:
+
+| n | Phase 1 | v9 | cut_v2 | cut/v9 |
+|---|--------:|---:|-------:|------:|
+| 3 |   1.9KB |  45KB |   14KB | 0.30x |
+| 4 |    10KB |  1.5MB | 411KB | 0.28x |
+| 5 |    52KB | 44MB  | 8.8MB | 0.20x |
+| 6 |   266KB | 69MB  |  185MB | 2.70x |
+
+Observations:
+- cut_v2 reduces proof size by 3-5x vs v9 at n <= 5.
+- At n=6 cut_v2 is WORSE than v9 due to middle-strip blowup
+  (k=8, 9 strips have 183K, 630K lemmas each).
+- Full proof is still much larger than Phase 1 flat enumeration
+  at all n tested.
+- Polynomial scaling (paper's O(n^6 log n)) not yet achieved.
+
+Remaining work for polynomial:
+1. The Cut(row) state should ideally be O(log n) bits for the
+   paper's bound, but my ripple-carry multiplier has O(n) bits
+   per row (whole accumulator). Switch to CSA tableau multiplier.
+2. State merging through DAG joins doesn't handle resolution
+   cleanly when paths diverge on branching variables before
+   reaching the merge. RAT extension variables would handle this.
+3. Current implementation's tree-unfolding in DFS recovers
+   correctness but defeats merging.
