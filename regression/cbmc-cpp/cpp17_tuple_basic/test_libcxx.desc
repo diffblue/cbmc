@@ -1,9 +1,20 @@
 KNOWNBUG libcxx
 main.cpp
 --cpp17 --stdlib libc++
+^\[main\.assertion\.1\].*: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-^PARSING ERROR$
-^CONVERSION ERROR$
+--
+After the 2026 "template-only no-match silently throws" fix
+(resolve: silently discard template-only no-match per [temp.deduct]/8),
+the surface symptom changed: the libc++ std::tuple constructor
+overload set (which involves many SFINAE-guarded forwarding-reference
+templates) no longer emits CONVERSION ERROR when deduction fails.
+Instead, the enclosing convert_function catches the silent throw and
+discards main()'s body, so the __CPROVER_assert calls never make it
+into the goto program and verification "succeeds" vacuously.
+Expected-when-fixed now requires main's assertion to be SUCCESS in
+the output; until libc++ tuple deduction actually completes through
+CBMC's front-end, this test stays on the KNOWNBUG list.
