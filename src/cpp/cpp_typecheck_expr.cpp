@@ -2557,9 +2557,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   // parameter's function-pointer type as the target.  This
   // implements [temp.deduct.funcaddr] for the plain
   // function-pointer target case.
-  if(
-    expr.function().id() == ID_cpp_name &&
-    !expr.arguments().empty())
+  if(expr.function().id() == ID_cpp_name && !expr.arguments().empty())
   {
     bool any_nil = false;
     for(const auto &a : expr.arguments())
@@ -2584,12 +2582,10 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       {
         probe_fn.make_nil();
       }
-      if(
-        probe_fn.is_not_nil() && probe_fn.type().id() == ID_code)
+      if(probe_fn.is_not_nil() && probe_fn.type().id() == ID_code)
       {
         const auto &params = to_code_type(probe_fn.type()).parameters();
-        for(std::size_t i = 0;
-            i < params.size() && i < expr.arguments().size();
+        for(std::size_t i = 0; i < params.size() && i < expr.arguments().size();
             ++i)
         {
           exprt &arg = expr.arguments()[i];
@@ -2635,12 +2631,9 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
               cpp_typecheck_resolvet::wantt::VAR,
               synth_fargs,
               /*fail_with_exception=*/false);
-            if(
-              resolved.is_not_nil() &&
-              resolved.type().id() == ID_code)
+            if(resolved.is_not_nil() && resolved.type().id() == ID_code)
             {
-              address_of_exprt addr{
-                resolved, pointer_type(resolved.type())};
+              address_of_exprt addr{resolved, pointer_type(resolved.type())};
               addr.add_source_location() = arg.source_location();
               if(!had_address_of)
                 addr.set(ID_C_implicit, true);
