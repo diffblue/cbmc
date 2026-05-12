@@ -105,6 +105,23 @@ std::string cpp_typecheckt::template_suffix(
           break;
       }
 
+      // If a template's default non-type argument failed to
+      // resolve (e.g. a reference-template-parameter whose default
+      // names a member that doesn't exist on the actual template
+      // argument type — like libstdc++-wrapping code using
+      //   template<typename T, const T &empty = T::blank>
+      // with T = std::basic_string, which has no `blank`), `e` is
+      // nil.  Rather than fail with `expected constant expression,
+      // but got '<<expr:nil>>'`, emit a placeholder suffix so the
+      // instantiation can proceed (with an undefined value).  This
+      // matches the "soft failure" behaviour of other template
+      // argument fallbacks in this file.
+      if(e.is_nil())
+      {
+        result += "<nil_default>";
+        continue;
+      }
+
       make_constant(e);
 
       // this must be a constant, which includes true/false
