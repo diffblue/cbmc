@@ -38,7 +38,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_qualifiers.h"
 #include "c_typecast.h"
 #include "c_typecheck_base.h"
-
 #include "expr2c.h"
 #include "gcc_conditional_expression.h"
 #include "padding.h"
