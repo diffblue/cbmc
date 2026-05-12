@@ -182,7 +182,7 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
     has_body ||
     config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO ||
     type.add_subtype()
-      .is_not_nil() || // forward-declared enum with underlying type
+      .is_not_nil() ||         // forward-declared enum with underlying type
     type.get_bool(ID_C_class)) // C++11: forward-declared `enum class`
   {
     std::string pretty_name=
