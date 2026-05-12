@@ -13,14 +13,14 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 #include "invariant.h"
 
-unsigned safe_string2unsigned(const std::string &str, int base)
+unsigned safe_string2unsigned(std::string_view str, int base)
 {
   auto converted = string2optional<unsigned>(str, base);
   CHECK_RETURN(converted.has_value());
   return *converted;
 }
 
-std::size_t safe_string2size_t(const std::string &str, int base)
+std::size_t safe_string2size_t(std::string_view str, int base)
 {
   auto converted = string2optional<std::size_t>(str, base);
   CHECK_RETURN(converted.has_value());
@@ -56,19 +56,18 @@ unsigned long long int unsafe_string2unsignedlonglong(
   return *string2optional<unsigned long long>(str, base);
 }
 
-std::optional<int> string2optional_int(const std::string &str, int base)
+std::optional<int> string2optional_int(std::string_view str, int base)
 {
   return string2optional<int>(str, base);
 }
 
-std::optional<unsigned>
-string2optional_unsigned(const std::string &str, int base)
+std::optional<unsigned> string2optional_unsigned(std::string_view str, int base)
 {
   return string2optional<unsigned>(str, base);
 }
 
 std::optional<std::size_t>
-string2optional_size_t(const std::string &str, int base)
+string2optional_size_t(std::string_view str, int base)
 {
   return string2optional<std::size_t>(str, base);
 }

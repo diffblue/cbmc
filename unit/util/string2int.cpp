@@ -164,3 +164,31 @@ TEST_CASE("string2optional with different bases", "[core][util][string2int]")
   REQUIRE(string2optional<int>("101", 2) == 5);
   REQUIRE(string2optional<unsigned long long>("DEADBEEF", 16) == 0xDEADBEEFULL);
 }
+
+TEST_CASE(
+  "string2optional accepts a non-null-terminated string_view",
+  "[core][util][string2int]")
+{
+  // The string_view is not null-terminated — this is the case where
+  // string_view is meaningfully different from std::string.
+  REQUIRE(string2optional<int>(std::string_view{"123abc", 3}) == 123);
+  REQUIRE(string2optional<int>(std::string_view{"abc", 1}, 16) == 0xa);
+  REQUIRE(string2optional<unsigned>(std::string_view{"42xyz", 2}) == 42u);
+  REQUIRE(!string2optional<int>(std::string_view{"123abc", 4}).has_value());
+}
+
+TEST_CASE(
+  "safe_string2unsigned and safe_string2size_t",
+  "[core][util][string2int]")
+{
+  REQUIRE(safe_string2unsigned("0") == 0u);
+  REQUIRE(safe_string2unsigned("123") == 123u);
+  REQUIRE(safe_string2unsigned("FF", 16) == 255u);
+  REQUIRE(safe_string2size_t("0") == 0u);
+  REQUIRE(safe_string2size_t("999") == 999u);
+  REQUIRE(safe_string2size_t("10", 16) == 16u);
+
+  // Verify these also work with a non-null-terminated string_view
+  REQUIRE(safe_string2unsigned(std::string_view{"42xyz", 2}) == 42u);
+  REQUIRE(safe_string2size_t(std::string_view{"99end", 2}) == 99u);
+}
