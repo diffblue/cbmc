@@ -3746,6 +3746,31 @@ resolved_after_strip:
           dtor.add_source_location() = source_location;
           return dtor;
         }
+        // [temp.deduct]/8: template argument deduction failure is
+        // not an error when the deduction occurs in an SFINAE
+        // context.  CBMC's caller chain here (body elaboration of
+        // an inline function in a user header calling a variadic
+        // template with forwarding references) is indistinguishable
+        // at this point from a legitimate SFINAE probe.  When every
+        // remaining candidate is a function template (meaning no
+        // non-template overload matched and deduction failed for
+        // each template), silently throw instead of emitting a
+        // user-visible diagnostic — the caller's body will be
+        // discarded by the catch in convert_function, matching the
+        // behaviour of true SFINAE contexts.
+        bool all_templates = !identifiers.empty();
+        for(const auto &id : identifiers)
+        {
+          if(!id.type().get_bool(ID_is_template))
+          {
+            all_templates = false;
+            break;
+          }
+        }
+        if(all_templates)
+        {
+          throw 0;
+        }
         cpp_typecheck.error().source_location = source_location;
         cpp_typecheck.error() << "found no match for symbol '" << base_name
                               << "', candidates are:\n";
