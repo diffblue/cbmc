@@ -326,3 +326,62 @@ The session leaves a concrete foundation for a future N3 Phase 3
 push: the BP is built and measured, we understand why flat cut
 clauses don't validate, and we have a precise implementation
 target (Prop 2.1 post-order emission).
+
+
+## Phase 3 step 2 BREAKTHROUGH (follow-up session)
+
+After seven failed attempts, phase3_bp_drat_v9.py delivered the
+first VALIDATED per-strip BP-DRAT proof.
+
+**Key insight**: Prop 2.1 post-order resolution emission on a
+TREE-UNFOLDED BP with per-node resolution on branching variables.
+
+Per-strip data (all drat-trim VERIFIED):
+
+| n | k | BP nodes | |bo| | DRAT bytes | Lemmas |
+|---|---|---------:|----:|-----------:|-------:|
+| 5 | 5 |    1,044 |  28 |     69,069 |  1,991 |
+| 5 | 7 |   21,000 |  32 |  2,231,197 | 41,727 |
+| 6 | 7 |   45,716 |  38 |  5,794,589 | 91,191 |
+
+**Full commutativity proof via phase3_full.py**: composes all
+strip DRATs with tableau-symmetry RUP pre-lemmas and diff-bit
+resolution chain at the end. All VERIFIED at n=3..6.
+
+| n | Phase 1 (KB) | Phase 3 BP (KB) | Ratio |
+|---|-------------:|----------------:|------:|
+| 3 |          1.9 |              45 |   24x |
+| 4 |           10 |           1,460 |  146x |
+| 5 |           52 |          44,160 |  846x |
+| 6 |          266 |          68,592 |  258x |
+
+Phase 3 BP is significantly LARGER than Phase 1 flat
+enumeration, because:
+- My BP's UP-state merging does not achieve the paper's Cut(j)
+  polynomial state bound.
+- My ripple-carry multiplier differs from the paper's
+  carry-save tableau, which affects merging effectiveness.
+
+But the **structure is correct and validated**: a per-strip
+DAG-unfolded BP emits resolution lemmas in post-order, each
+RUP-valid, composing to the final empty clause.
+
+## Path from here to the paper's O(n^6 log n)
+
+For true polynomial scaling, the BP construction needs to
+explicitly use the paper's Cut(j) variable sets (|Cut(j)| <=
+4 log k), which yields at most k^4 distinct cut states per
+level. My current BP merges on *any* UP-state equivalence,
+which is too coarse and yields exponential blowup.
+
+Making the BP use the paper's exact Cut(j) state signature
+(the specific subset of d, c, o variables defined at each cut
+level) would require:
+1. Implementing the carry-save tableau multiplier as the CNF
+   source (instead of ripple-carry).
+2. Tracking only Cut(j) variables in state signatures for
+   merging.
+3. Verifying the 4 log k bound on Cut(j) size.
+
+This is concrete future work. The phase3_bp_drat_v9.py +
+phase3_full.py pipeline shows the overall structure is right.

@@ -1,6 +1,6 @@
 # Next Steps (Paper 1 and Paper 2)
 
-Snapshot updated 2026-05-11 after Phase 3 exploration.
+Snapshot updated 2026-05-12 after Phase 3 BP-DRAT breakthrough.
 
 ## Status
 
@@ -12,22 +12,25 @@ Snapshot updated 2026-05-11 after Phase 3 exploration.
 | N3 | Implementing Beame-Liew's critical-strip construction | **Partial** (see below) |
 | N4 | Multi-encoding ablation | **Done** -- Paper 1 Appendix |
 
-### N3 progress detail (2026-05-11 session)
+### N3 progress detail (2026-05-12 session)
 - Phase 1 (flat case-analysis DRAT): **DONE**, validates, 4-10x
   smaller than CaDiCaL raw, 2.5-4x smaller than CaDiCaL trimmed
   core at n>=5.
 - Phase 2 structural (per-column DRAT): **DONE**, validates, 2n
-  times larger than Phase 1 (theoretical factor confirmed).
-- Phase 3 step 1 (strip extraction): **DONE**, phi_Strip(k)
-  extraction validates Lemma 3.1 UNSAT at n=4, 6, 8 for all k.
-- Phase 3 step 2 (BP construction): **SCAFFOLDING**.
-  Scaffolding committed in `phase3_bp_build.py`, plus probes:
-  `phase3_bdd_size.py` (BDD sizes), `phase3_per_strip.py` (proxy),
-  `phase3_up_trivial.py` (no strip is UP-trivial).
-- Phase 3 remainder (polynomial O(n^6 log n) construction):
-  **OPEN**. Concrete implementation plan documented in
-  `bench-multiplication/n3-beame-liew/options-B-A.md`:
-  1. Branch on o^{yx}_i first (outputs of b*a).
+  times larger than Phase 1.
+- Phase 3 step 1 (strip extraction): **DONE**, Lemma 3.1 UNSAT
+  verified.
+- Phase 3 step 2 (BP construction + DRAT translation):
+  **DONE** (first validation). `phase3_bp_drat_v9.py` emits
+  per-strip DRAT that validates with drat-trim via Prop 2.1
+  post-order resolution on a tree-unfolded BP.
+  `phase3_full.py` composes all strip DRATs into a full
+  commutativity proof (validated at n=3..6).
+- Phase 3 polynomial O(n^6 log n) scaling: **OPEN**. The
+  current BP merges on UP-state, not the paper's Cut(j) state,
+  yielding exponential (not polynomial) size in k. Making the
+  BP use the paper's Cut(j) state signature is concrete future
+  work documented in `options-B-A.md`.
   2. Branch on incoming carry boundary at col k-Delta-1.
   3. Branch on tableau row-by-row.
   4. Merge on Cut(j) of size O(log k).
