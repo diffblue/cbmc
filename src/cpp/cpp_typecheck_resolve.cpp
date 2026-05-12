@@ -3656,6 +3656,90 @@ resolved_after_strip:
 
         if(!base_name.empty() && id2string(base_name)[0] == '~')
         {
+          // Last-chance direct lookup in the struct's components
+          // list: `put_compound_into_scope` occasionally misses the
+          // destructor for a template class (e.g. std::basic_string),
+          // so the name-based lookup above returns nothing even
+          // though the destructor IS present in the struct.  Before
+          // falling back to the fully-dummy destructor below, scan
+          // the current scope's struct components for a matching
+          // destructor and return a member expression pointing at
+          // it.  This lets callers (typecheck_expr_member on a
+          // member access, or cpp_destructor on a synthesised dtor
+          // call for a data member) build a valid function call.
+          const irep_idt &cur_scope_id =
+            cpp_typecheck.cpp_scopes.current_scope().identifier;
+          const symbolt *scope_sym =
+            cpp_typecheck.symbol_table.lookup(cur_scope_id);
+          if(
+            scope_sym != nullptr && scope_sym->is_type &&
+            (scope_sym->type.id() == ID_struct ||
+             scope_sym->type.id() == ID_union))
+          {
+            const auto &components =
+              to_struct_union_type(scope_sym->type).components();
+            for(const auto &c : components)
+            {
+              if(
+                c.type().id() == ID_code &&
+                to_code_type(c.type()).return_type().id() == ID_destructor &&
+                c.get_base_name() == base_name)
+              {
+                // Build a member expression equivalent to what the
+                // regular SYMBOL-class code at line ~786 produces
+                // for non-static member lookups: ID_member with
+                // component_name set to the destructor's full
+                // identifier and the object as the single operand.
+                //
+                // Pull the object from fargs if the caller supplied
+                // one (member access of the form obj.~T()); else
+                // leave the operand list empty — the member-call
+                // path in typecheck_side_effect_function_call fills
+                // in the enclosing object when needed.
+                //
+                // Strip cv-qualifiers from the object's type: per
+                // [class.dtor]/13 a destructor may be invoked on a
+                // const-qualified object, and CBMC's subsequent
+                // reference-binding check would otherwise reject
+                // the implicit cast.
+                exprt dtor_member(ID_member, c.type());
+                dtor_member.set(ID_component_name, c.get_name());
+                if(fargs.has_object && !fargs.operands.empty())
+                {
+                  exprt obj = fargs.operands.front();
+                  typet obj_t = obj.type();
+                  obj_t.remove(ID_C_constant);
+                  obj_t.remove(ID_C_volatile);
+                  obj.type() = obj_t;
+                  // Patch the `this` parameter type on a local copy
+                  // of the dtor code_type so it matches the
+                  // (possibly-const) object without requiring an
+                  // implicit const-to-non-const conversion.  The
+                  // actual dtor symbol's type in the symbol table
+                  // stays unchanged.
+                  code_typet patched_type = to_code_type(c.type());
+                  if(
+                    !patched_type.parameters().empty() &&
+                    patched_type.parameters().front().get_this() &&
+                    patched_type.parameters().front().type().id() == ID_pointer)
+                  {
+                    typet this_base =
+                      to_pointer_type(patched_type.parameters().front().type())
+                        .base_type();
+                    if(fargs.operands.front().type().get_bool(ID_C_constant))
+                      this_base.set(ID_C_constant, true);
+                    patched_type.parameters().front().type() =
+                      pointer_type(this_base);
+                  }
+                  dtor_member.type() = patched_type;
+                  dtor_member.copy_to_operands(std::move(obj));
+                }
+                dtor_member.add_source_location() = source_location;
+                return dtor_member;
+              }
+            }
+          }
+
           exprt dtor{ID_symbol};
           dtor.type() = code_typet{{}, empty_typet{}};
           dtor.type().set(ID_destructor, true);
