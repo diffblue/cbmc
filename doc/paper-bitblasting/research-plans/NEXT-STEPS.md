@@ -1,6 +1,6 @@
 # Next Steps (Paper 1 and Paper 2)
 
-Snapshot updated 2026-05-12 after Phase 3 BP-DRAT breakthrough.
+Snapshot updated 2026-05-12 after Phase 3 Cut(row)-merging.
 
 ## Status
 
@@ -9,10 +9,10 @@ Snapshot updated 2026-05-12 after Phase 3 BP-DRAT breakthrough.
 |---|---|---|
 | N1 | Characterising the CDCL-vs-Beame-Liew gap | **Open** (never executed) |
 | N2 | Controlled experiment isolating carry propagation | **Done** -- in Paper 1 Section 3 |
-| N3 | Implementing Beame-Liew's critical-strip construction | **Partial** (see below) |
+| N3 | Implementing Beame-Liew's critical-strip construction | **Advanced** (see below) |
 | N4 | Multi-encoding ablation | **Done** -- Paper 1 Appendix |
 
-### N3 progress detail (2026-05-12 session)
+### N3 progress detail (2026-05-12 follow-up session)
 - Phase 1 (flat case-analysis DRAT): **DONE**, validates, 4-10x
   smaller than CaDiCaL raw, 2.5-4x smaller than CaDiCaL trimmed
   core at n>=5.
@@ -21,16 +21,23 @@ Snapshot updated 2026-05-12 after Phase 3 BP-DRAT breakthrough.
 - Phase 3 step 1 (strip extraction): **DONE**, Lemma 3.1 UNSAT
   verified.
 - Phase 3 step 2 (BP construction + DRAT translation):
-  **DONE** (first validation). `phase3_bp_drat_v9.py` emits
-  per-strip DRAT that validates with drat-trim via Prop 2.1
-  post-order resolution on a tree-unfolded BP.
-  `phase3_full.py` composes all strip DRATs into a full
-  commutativity proof (validated at n=3..6).
-- Phase 3 polynomial O(n^6 log n) scaling: **OPEN**. The
-  current BP merges on UP-state, not the paper's Cut(j) state,
-  yielding exponential (not polynomial) size in k. Making the
-  BP use the paper's Cut(j) state signature is concrete future
-  work documented in `options-B-A.md`.
+  **DONE** (v9 paper-order BP, and cut_v2 Cut(row)-merging BP).
+  Both validate with drat-trim.
+- Phase 3 full proof composition: **DONE**, validated at n=3..6
+  via `phase3_full.py` (v9) and `phase3_full_cut.py` (cut_v2).
+  cut_v2 reduces per-strip DRAT by 3-5x at n=3..5.
+- Phase 3 polynomial O(n^6 log n) scaling: **PARTIAL**. BP is
+  polynomial-in-k for small k (k=3: 116 nodes regardless of n)
+  but still exponential-ish for middle k due to ripple-carry's
+  wider state per row. Paper's bound assumes CSA tableau.
+
+### Remaining work for true polynomial (for future session)
+1. Switch from ripple-carry to CSA tableau multiplier (matches
+   paper's model; Cut(j) becomes O(log n) bits).
+2. Alternative: use RAT extension variables to encode BP DAG
+   structure directly, avoiding the tree-unfolding that defeats
+   merging in the current approach.
+3. Measure for n=7, 8 with sufficient memory; extrapolate scaling.
   2. Branch on incoming carry boundary at col k-Delta-1.
   3. Branch on tableau row-by-row.
   4. Merge on Cut(j) of size O(log k).
