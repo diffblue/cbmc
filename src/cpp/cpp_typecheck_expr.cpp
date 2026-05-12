@@ -2483,6 +2483,23 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   {
     if(arg.type().id().empty() || arg.type().is_nil())
     {
+      // [temp.deduct.funcaddr]: an argument of the form `&f` or
+      // just `f` where `f` names a function template cannot be
+      // typechecked in isolation — the deduction requires the
+      // target parameter type of the outer call.  Defer this arg
+      // to the post-function-resolution retry pass below so its
+      // failure here doesn't abort the whole expression.
+      bool is_funcaddr_template_candidate = false;
+      {
+        const exprt *probe = &arg;
+        if(probe->id() == ID_address_of && probe->operands().size() == 1)
+          probe = &to_unary_expr(*probe).op();
+        if(probe->id() == ID_cpp_name)
+          is_funcaddr_template_candidate = true;
+      }
+      if(is_funcaddr_template_candidate)
+        continue;
+
       try
       {
         typecheck_expr(arg);
@@ -2526,6 +2543,114 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
           result.add_source_location() = expr.source_location();
           expr.swap(result);
           return;
+        }
+      }
+    }
+  }
+
+  // [temp.deduct.funcaddr]: before resolving the function, attempt
+  // an early lookup without fargs to learn its candidate parameter
+  // types.  If the function is ordinary (non-overloaded,
+  // non-template) and an argument is an untyped `&f` / `f` where
+  // `f` names a function template (deferred by our arguments-list
+  // typechecker), retry deduction using the corresponding
+  // parameter's function-pointer type as the target.  This
+  // implements [temp.deduct.funcaddr] for the plain
+  // function-pointer target case.
+  if(
+    expr.function().id() == ID_cpp_name &&
+    !expr.arguments().empty())
+  {
+    bool any_nil = false;
+    for(const auto &a : expr.arguments())
+      if(a.type().is_nil() || a.type().id().empty())
+      {
+        any_nil = true;
+        break;
+      }
+    if(any_nil)
+    {
+      cpp_typecheck_fargst probe_fargs;
+      exprt probe_fn = expr.function();
+      try
+      {
+        probe_fn = resolve(
+          to_cpp_name(probe_fn),
+          cpp_typecheck_resolvet::wantt::VAR,
+          probe_fargs,
+          /*fail_with_exception=*/false);
+      }
+      catch(...)
+      {
+        probe_fn.make_nil();
+      }
+      if(
+        probe_fn.is_not_nil() && probe_fn.type().id() == ID_code)
+      {
+        const auto &params = to_code_type(probe_fn.type()).parameters();
+        for(std::size_t i = 0;
+            i < params.size() && i < expr.arguments().size();
+            ++i)
+        {
+          exprt &arg = expr.arguments()[i];
+          if(!arg.type().is_nil() && !arg.type().id().empty())
+            continue;
+
+          const typet &ptype = params[i].type();
+          if(ptype.id() != ID_pointer && ptype.id() != ID_frontend_pointer)
+            continue;
+          if(ptype.get_sub().empty())
+            continue;
+          const typet &target_fn =
+            static_cast<const typet &>(ptype.get_sub().front());
+          if(target_fn.id() != ID_code)
+            continue;
+
+          exprt inner = arg;
+          bool had_address_of = false;
+          if(inner.id() == ID_address_of)
+          {
+            had_address_of = true;
+            if(inner.operands().size() != 1)
+              continue;
+            inner = to_unary_expr(inner).op();
+          }
+          if(inner.id() != ID_cpp_name)
+            continue;
+
+          const code_typet &target_code = to_code_type(target_fn);
+          cpp_typecheck_fargst synth_fargs;
+          synth_fargs.in_use = true;
+          for(const auto &p : target_code.parameters())
+          {
+            symbol_exprt synth{"funcaddr_target_synth", p.type()};
+            synth.set(ID_C_lvalue, true);
+            synth_fargs.operands.push_back(synth);
+          }
+
+          try
+          {
+            exprt resolved = resolve(
+              to_cpp_name(inner),
+              cpp_typecheck_resolvet::wantt::VAR,
+              synth_fargs,
+              /*fail_with_exception=*/false);
+            if(
+              resolved.is_not_nil() &&
+              resolved.type().id() == ID_code)
+            {
+              address_of_exprt addr{
+                resolved, pointer_type(resolved.type())};
+              addr.add_source_location() = arg.source_location();
+              if(!had_address_of)
+                addr.set(ID_C_implicit, true);
+              arg = std::move(addr);
+            }
+          }
+          catch(...)
+          {
+            // fall through — mismatch reported later
+          }
         }
       }
     }
@@ -4368,6 +4493,47 @@ void cpp_typecheckt::typecheck_expr(exprt &expr)
     typecheck_expr_cpp_name(expr, cpp_typecheck_fargst());
   else if(expr.id() == "lambda")
     typecheck_expr_lambda(expr);
+  else if(expr.id() == ID_arguments)
+  {
+    // Arguments list for a function call.  Typecheck each argument
+    // individually, catching and deferring failures: an argument
+    // of the form `&f` or `f` where `f` names a function template
+    // cannot be typechecked in isolation here because the deduction
+    // needs the outer call's parameter types
+    // ([temp.deduct.funcaddr]).  Leave such arguments untyped so
+    // the containing typecheck_side_effect_function_call can retry
+    // them with target-type context.  For arguments with an already
+    // typechecked body (`ID_already_typechecked`) just continue; for
+    // all others, attempt the full typecheck and let any C++
+    // exception propagate unless the operand is a function-address
+    // candidate we can retry later.
+    for(auto &op : expr.operands())
+    {
+      const bool may_need_target_type = [&]() -> bool
+      {
+        const exprt *probe = &op;
+        if(probe->id() == ID_address_of && probe->operands().size() == 1)
+          probe = &to_unary_expr(*probe).op();
+        return probe->id() == ID_cpp_name;
+      }();
+
+      if(!may_need_target_type)
+      {
+        typecheck_expr(op);
+        continue;
+      }
+
+      // Function-address template candidate — try, but defer on failure.
+      try
+      {
+        typecheck_expr(op);
+      }
+      catch(...)
+      {
+        op.type().make_nil();
+      }
+    }
+  }
   else
   {
     // This does the operands, and then calls typecheck_expr_main.

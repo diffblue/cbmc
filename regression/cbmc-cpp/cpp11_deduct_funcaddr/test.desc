@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^EXIT=0$
@@ -8,30 +8,16 @@ main.cpp
 ^VERIFICATION SUCCESSFUL$
 --
 --
-Documents the current state of [temp.deduct.funcaddr]: template
-argument deduction from the target type of a function-address
-context.
+[temp.deduct.funcaddr]: template argument deduction from the target
+type of a function-address context.  The plain function-pointer case:
 
-CBMC's implementation (added in 18e846497c) handles the std::endl
-case where the function parameter is a class-template instantiation
-and matching instances can be found in the symbol table.  It does
-NOT yet handle the simpler case where the target type is a plain
-function pointer with scalar parameter types, as in
-  apply(&id_sum, 3, 4)
-with
   template <class T> int id_sum(T a, T b);
   int apply(int (*)(int, int), int, int);
+  apply(&id_sum, 3, 4);  // T deduced as int from int (*)(int, int)
 
-After the 2026 "template-only no-match silently throws" fix, the
-surface symptom changed: instead of emitting 'CONVERSION ERROR' for
-the unresolved 'id_sum' template, CBMC now silently drops the
-containing main() body (convert_function catches the throw and
-discards the partially-elaborated body).  Verification "succeeds"
-vacuously because the surviving main is empty — the two
-__CPROVER_assert statements that would have tested r==7 and r2==11
-never make it into the goto program.
-
-A real fix would thread the target-type context ([temp.deduct.funcaddr])
-through the argument pre-typecheck loop in
-typecheck_side_effect_function_call so that '&id_sum' in an argument
-position bound to 'int (*)(int, int)' deduces T=int.
+CBMC's implementation resolves the outer call's function
+(`apply`) without fargs in a probe pass, reads back the target
+parameter types, synthesises fargs matching the target
+function-pointer's parameter list, and re-resolves the function-
+template name with those synthetic fargs.  The resolved
+instantiation then flows back as the argument to the outer call.
