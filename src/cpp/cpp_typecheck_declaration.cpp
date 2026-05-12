@@ -224,9 +224,18 @@ void cpp_typecheckt::convert_non_template_declaration(
               continue;
             typet ptype = pdecl.type();
             typecheck_type(ptype);
+            // Guard against malformed parameter declarators that
+            // reach this path through template instantiation
+            // (e.g., variadic pack expansions where the pack has
+            // no declarator-name sub-elements yet).  Without this
+            // guard, the `.front()` below dereferences a null
+            // pointer and crashes with SIGSEGV.
+            const auto &name_sub =
+              pdecl.declarators().front().name().get_sub();
+            if(name_sub.empty())
+              continue;
             const irep_idt &pname =
-              pdecl.declarators().front().name().get_sub().front().get(
-                ID_identifier);
+              name_sub.front().get(ID_identifier);
             if(pname.empty())
               continue;
             const std::string sym_name =
