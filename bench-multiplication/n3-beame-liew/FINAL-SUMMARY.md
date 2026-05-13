@@ -1,18 +1,45 @@
 # N3 Final Summary: Beame-Liew Polynomial Proof Implementation
 
-**Status**: Paper's exact construction IMPLEMENTED (including symmetry
-substitution) and DAG BP sizes match paper's polynomial bound. DAG-to-DRAT
-emission remains the open technical problem.
+**Status**: Paper's exact construction IMPLEMENTED — including valid
+DAG-form DRAT emission. All sizes n=3..6 verify end-to-end.
 
-**Date**: 2026-05-13 (fourth-phase update)
+**Date**: 2026-05-13 (fifth-phase update — DAG DRAT validated)
 
 ## Executive summary
 
 Implemented Beame-Liew's full construction for array-multiplier
 commutativity: paper's exact BP with Cut(j), symmetry substitution
-(Corollary 3.3), multiple DRAT emission strategies. DAG BP node
-counts match paper's O(k⁵ log k) theoretical bound. Tree-unfolded
-DRAT validates end-to-end at n=3..6.
+(Corollary 3.3), and Prop 2.1 resolution extraction with explicit
+UP-as-branching. DAG BP node counts match paper's O(k⁵ log k)
+theoretical bound. **DAG DRAT emission validates with drat-trim at
+n=3..6**, and post-optimized proof is smaller than tree-unfolded
+version at n≥5.
+
+## Key breakthrough: Prop 2.1 with explicit UP-as-branching
+
+Previously my BP bundled UP propagation into a single step, losing the
+resolution structure needed for Prop 2.1. The paper's construction has
+each UP step as a **separate branching node**:
+- Node at σ with UP-derivable z=v: branch on z.
+- Conflict-child (z=¬v): LEAF labeled by the unit CNF clause (axiom).
+- Continuation-child (z=v): continues with σ ∪ {z=v}.
+- Branching-node's clause = resolve(axiom, continuation's clause, z).
+
+This matches paper's Figure 3 ("Propagating to c = 1") exactly.
+Combined with structural hash consing (DAG sharing of identical
+subtrees), the resulting DRAT validates end-to-end.
+
+## Full-proof sizes (post-drat-trim optimization, all VERIFIED)
+
+| n | Phase 1 | Old sym tree | **Paper DAG (new)** | CaDiCaL raw |
+|---|--------:|-------------:|--------------------:|------------:|
+| 3 | 1.9 KB  | 13.6 KB      | 37.5 KB             | 6.1 KB      |
+| 4 | 10 KB   | 349 KB       | 506 KB              | 18.5 KB     |
+| 5 | 52 KB   | 7.7 MB       | **6.1 MB**          | 58.7 KB     |
+| 6 | 266 KB  | 160 MB       | **65.5 MB**         | 391 KB      |
+
+The paper-DAG approach wins at n=5 and n=6. At smaller n, explicit
+UP-as-branching overhead dominates.
 
 ## Paper-exact BP implementation (phase3_bp_paper.py, phase3_bp_paper_sym.py)
 
@@ -47,54 +74,57 @@ This validates the paper's polynomial claim empirically.
 |---|---|---|
 | Tree-unfolded path-negation (non-sym) | phase3_bp_paper_drat.py | ✓ n=3..6 |
 | Tree-unfolded path-negation (sym)     | phase3_bp_paper_sym_tree.py | ✓ n=3..5 |
+| **Paper-true Prop 2.1 DAG (with hash consing)** | **phase3_bp_paper_prop21_true.py** | **✓ n=3..6 (current best)** |
 | Direct Prop 2.1 DAG (CNF clause at leaf) | phase3_bp_paper_prop21.py | ✗ |
 | State-based DAG (¬cut-state at node) | phase3_bp_paper_state_dag.py | partial (n=3) |
 | Weakened DAG (explicit V-weakening) | phase3_bp_paper_weakened.py | ✗ |
+| Conflict-analysis learned clauses | phase3_bp_paper_learned.py | ✗ (merged leaves inconsistent) |
 | RAT extension variables (non-sym) | phase3_bp_paper_rat.py | ✗ |
 | RAT extension variables (sym) | phase3_bp_paper_rat_sym.py | ✗ |
 
-## Why DAG DRAT emission fails
+## How the paper-true DAG emission works
 
-The paper's proof of polynomial size (via Prop 2.1) constructs a
-resolution refutation from the BP in which:
-1. Leaves are labeled with FALSIFIED CNF CLAUSES (in the strip).
-2. Internal nodes' clauses are resolvents on the branching variable.
+The key was to re-read Proposition 2.1's proof carefully and implement
+the **explicit** resolution structure:
 
-For this resolution chain to produce the empty clause at root:
-- Children's clauses must contain the branching variable V (so
-  resolution on V "eliminates" it).
-- Merged nodes' clauses must be PATH-INDEPENDENT.
+> "We will label each node v with the maximal clause C_v that is
+> falsified by every assignment reaching v." — Prop 2.1
+>
+> "In the case that one of these children has an assignment conflicting
+> with a clause C ∈ φ, we say that we propagated the assignment σ
+> to the other child's assignment." — Fig 3 caption
 
-**The gap** (confirmed via diagnostic at n=3, k=3, leaf 91):
+Each UP propagation is a BRANCHING NODE:
+- Current node at σ; UP derives z=v via unit clause U.
+- Child z=¬v: leaf labeled by axiom U (σ ∪ {z=¬v} falsifies U).
+- Child z=v: continuation with σ ∪ {z=v}.
+- Parent's clause = resolve(axiom, continuation, z).
 
-A merged leaf in the sym DAG BP is reachable via MULTIPLE paths
-with DIFFERENT variable assignments:
-  - Path 0: {V=8=T, V=10=F, V=13=F, V=7=T, V=9=F}
-  - Path 1: {V=8=F, V=10=T, V=13=F, V=7=T, V=9=F}
+**Structural hash consing** handles the DAG compression: subtrees with
+same (kind, var, c0_id, c1_id) share a single BP node. Two paths that
+reach structurally-identical future subtrees merge naturally.
 
-Conflict-analysis (1UIP-like) produces path-specific learned clauses:
-  - Path 0 → learned: {-8, -7, 9, 10, 13}
-  - Path 1 → learned: {-10, -7, 8, 9, 13}
+No explicit cut-boundary merging is needed. The BP-level merging at
+Cut(j+1) that paper describes is implicitly handled by hash consing.
 
-Both are individually RUP-valid, but their intersection
-{-7, 9, 13} is NOT RUP (insufficient to UP-refute with strip CNF).
+## Why earlier DAG attempts failed
 
-So no single path-independent clause at the merged leaf works for
-all incoming paths. The DAG merging fundamentally conflicts with
-path-based conflict analysis.
+Earlier attempts (`phase3_bp_paper_learned.py`, `*_rat*.py`, `*_state_dag.py`)
+tried to produce DAG DRAT by:
+1. Sharing nodes based on cut-state alone (without accounting for non-cut
+   path-specific state).
+2. Conflict-analysis-derived learned clauses at leaves.
 
-**What Paper Likely Does (speculation)**: the paper's proof must use
-some additional machinery — likely extension variables, symbolic
-reasoning, or a cleverer leaf-clause assignment — to make the
-merged-leaf clauses consistent. Without more time to study the paper's
-Section 2 in detail (Prop 2.1's proof), I can't replicate this.
+These failed because merged leaves reachable via paths with
+different variable assignments have **path-specific clauses that don't
+intersect to an RUP-valid common clause**. Example at n=3 k=3 leaf 91:
+  - Path 0: {V=8=T, V=10=F} → learned: {-8, -7, 9, 10, 13}
+  - Path 1: {V=8=F, V=10=T} → learned: {-10, -7, 8, 9, 13}
+  - Intersection {-7, 9, 13} — NOT RUP.
 
-**RAT extension variables** (phase3_bp_paper_rat*.py) introduce e_v
-("BP reaches v") as a fresh variable with auxiliary clauses defining
-BP transitions. For the chain to validate, ¬e_v must be RUP at each
-leaf, which requires **state-only UP-refutation**: strip-CNF ∧ state(leaf)
-→ ⊥ via UP alone. Empirically, this only holds for 0-60% of leaves
-with paper's Cut(j) alone (even with sym substitution).
+The successful approach (`phase3_bp_paper_prop21_true.py`) avoids this
+by keeping the CHILDREN STRUCTURE specific (via hash cons on identical
+subtrees) rather than trying to merge on ABSTRACT STATE.
 
 ## Current best validated proof sizes
 
@@ -141,16 +171,25 @@ All on the same ripple-carry CNF:
 
 ## What's NOT yet aligned
 
-**DAG DRAT emission remains the open technical issue.** Paper's
-proof of polynomial SIZE is via resolution proof construction that
-needs careful machinery (Prop 2.1 with proper leaf clauses). My
-implementations of this machinery fail validation because:
+**Constant factors differ from paper's theoretical bound.** The
+paper-true Prop 2.1 implementation validates correctness but my BP
+node counts are 5-10× the paper's O(k⁵ log k) bound. Possible causes:
 
-- State-only UP-refutation at leaves requires richer state than
-  paper's Cut(j) (or equivalently, the BP's "propagation" uses
-  more than pure UP).
-- Paper likely uses an additional resolution step at each leaf
-  that my Python implementation doesn't capture.
+- **UP order**: my `find_up_step` scans all CNF clauses sequentially,
+  picking the first unit clause. Paper specifies a specific order
+  ("propagate to c^{xy}_{i,j}, d^{xy}_{i+1,j} ..."). Different UP
+  orders produce different BP structures.
+- **Hash consing is structural only**: it shares subtrees with
+  identical (var, c0, c1) but doesn't compress semantically equivalent
+  subtrees with different var orders.
+- **No per-level scoping**: my BP has a single flat branching plan
+  rather than paper's "level-by-level" structure. This may cause
+  more nodes at boundary regions.
+
+These are optimisations that could close the gap between empirical
+sizes (227k at n=6 k=7) and paper's theoretical 47k. Even without
+those, current sizes are sufficient to demonstrate polynomial scaling
+and generate valid DRAT proofs.
 
 Without this, my proof sizes are O(tree-unfold), not O(DAG nodes).
 Tree-unfold is 10-100× larger than DAG bound. See sizes above.
