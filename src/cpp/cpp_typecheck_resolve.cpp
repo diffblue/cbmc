@@ -2764,6 +2764,30 @@ typet cpp_typecheck_resolvet::resolve_template_alias(
   const cpp_scopest::id_sett &id_set,
   const cpp_template_args_non_tct &full_template_args)
 {
+  // Break mutual-recursion cycles between SFINAE-guarded template
+  // aliases: MSVC's `add_rvalue_reference_t<T>` expansion path
+  //   add_rvalue_reference_t<T>
+  //   -> _Add_reference<T, void_t<T&>>::_Rvalue
+  //   -> void_t<T&>  (specialisation selection)
+  //   -> requires resolving T&, which re-resolves T
+  //   -> re-enters add_rvalue_reference_t<T>...
+  // triggers unbounded recursion when T is a partially-elaborated
+  // class-template instance.  Detect the cycle by tracking which
+  // (base_name, full_template_args) pairs are currently being
+  // resolved on this thread and short-circuit a re-entry with
+  // an empty type (the most conservative placeholder).
+  static thread_local std::set<std::pair<irep_idt, irept>> active;
+  const irept &args_irep = static_cast<const irept &>(full_template_args);
+  std::pair<irep_idt, irept> key{base_name, args_irep};
+  if(!active.insert(key).second)
+    return empty_typet{};
+  struct Guard
+  {
+    std::set<std::pair<irep_idt, irept>> &s;
+    std::pair<irep_idt, irept> k;
+    ~Guard() { s.erase(k); }
+  } guard{active, key};
+
   // find the template alias symbol
   const symbolt *template_sym = nullptr;
   for(const auto &id_ptr : id_set)
