@@ -484,6 +484,34 @@ work below.
   `cpp_typecheckt::ensure_member_complete(struct, base_name)` call
   resolves each member's full type on demand.  This is the single
   change that would most change the dog-food pass rate.
+
+  **2026-05-13 attempt notes.**  An incremental "wrap each member
+  typecheck in try/catch and skip on failure" was tried and
+  produced a net-negative trade-off: for `string_containert`-style
+  classes (class body: typedef of `unordered_map<...>` followed by
+  unrelated methods) the skip correctly lets the methods survive
+  and `get()` be found; but for `validate_expressions.cpp` and
+  similar files, the same change surfaced previously-suppressed
+  "symbol `parameter_indicest` is unknown" errors whose
+  suppression had depended on the body loop exiting *early* at the
+  first throw.  Net: dog-food `--expand` moved from 10 OK_CLEAN to
+  8 OK_CLEAN while the intended string_containert-case fix worked
+  as hoped.  Reverted.
+
+  The learning generalises: you cannot get lazy class-body
+  elaboration by adding a try/catch around per-member typecheck,
+  because the "errors emitted" count is anti-monotone in
+  "members registered".  The right shape is the one described in
+  the bullet above: register member *names* eagerly (without
+  resolving types), defer full type-check to the use site, and
+  have the use-site path produce the diagnostic if resolution
+  fails.  That's a deeper refactor of `typecheck_compound_body`
+  and every caller that reads `struct_union_typet::components()`
+  expecting fully-resolved types — the component iteration sites
+  would need to call the new `ensure_member_complete` helper
+  before accessing the member's type.  Size-wise this is the
+  2-3-week full-time estimate in the introduction, and it is not
+  amenable to incremental patching.
 - **Target-type threading in overload resolution (§3.3).**  Retire the
   P2 probe-retry pipeline in favour of a `typet target` parameter on
   arg type-check.  Pick up [temp.deduct.conv] and brace-init-list
