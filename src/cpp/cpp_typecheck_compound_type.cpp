@@ -28,6 +28,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_convert_type.h"
 #include "cpp_declarator_converter.h"
 #include "cpp_name.h"
+#include "cpp_sfinae_context.h"
 #include "cpp_type2name.h"
 #include "cpp_using.h"
 #include "cpp_util.h"
@@ -894,16 +895,18 @@ void cpp_typecheckt::typecheck_compound_declarator(
       {
         new_symbol->value.swap(value);
         {
-          // Suppress elaborate_class_template during initializer
-          // evaluation to prevent recursive elaboration chains.
+          // Per [temp.deduct]/8 applied to class-member initializer
+          // evaluation during class-template instantiation: treat
+          // substitution failure as SFINAE rather than a user-visible
+          // error.  Also suppress recursive `elaborate_class_template`
+          // to prevent elaboration chains that would re-enter the
+          // class currently being elaborated.
           bool old_suppress = suppress_elaborate;
           suppress_elaborate = true;
 
-          null_message_handlert null_handler;
-          message_handlert &old_handler = get_message_handler();
-          set_message_handler(null_handler);
           try
           {
+            sfinae_contextt sfinae_guard{*this};
             // For constexpr/const members during template instantiation,
             // resolve cpp_names in the value expression using the C++
             // type-checker. The C do_initializer can't resolve cpp_name
@@ -926,11 +929,9 @@ void cpp_typecheckt::typecheck_compound_declarator(
             {
               c_typecheck_baset::do_initializer(*new_symbol);
             }
-            set_message_handler(old_handler);
           }
           catch(...)
           {
-            set_message_handler(old_handler);
             if(new_symbol->is_macro)
             {
               new_symbol->value.visit_pre(
@@ -1825,19 +1826,18 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
 
       if(sym.is_macro)
       {
-        // Constexpr: suppress errors (template params may not be
-        // fully substituted yet).
-        null_message_handlert null_handler;
-        message_handlert &old_handler = get_message_handler();
-        set_message_handler(null_handler);
+        // Per [temp.deduct]/8 applied to constexpr-macro init:
+        // initializer substitution may fail if template parameters
+        // are not yet fully substituted at this deferred elaboration
+        // point.  Treat as deduction failure and fall back to a
+        // template_map-directed expression-walk substitution below.
         try
         {
+          sfinae_contextt sfinae_guard{*this};
           c_typecheck_baset::do_initializer(sym);
-          set_message_handler(old_handler);
         }
         catch(...)
         {
-          set_message_handler(old_handler);
           sym.value.visit_pre(
             [this](exprt &e)
             {

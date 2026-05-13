@@ -22,6 +22,7 @@ Author:
 
 #include <ansi-c/c_qualifiers.h>
 
+#include "cpp_sfinae_context.h"
 #include "cpp_typecheck.h"
 #include "cpp_util.h"
 
@@ -1096,23 +1097,24 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
         struct_type_to.get_bool("has_template_constructor"))
       {
         in_template_conversion = true;
-        null_message_handlert null_handler;
-        message_handlert &old_handler = get_message_handler();
-        set_message_handler(null_handler);
+        // [over.ics.user] + [temp.deduct]/8: a user-defined
+        // conversion that instantiates a template constructor is
+        // SFINAE-guarded — substitution failure means "no viable
+        // conversion sequence", not a compilation error.  The
+        // conversion is simply dropped from the candidate set.
         try
         {
+          sfinae_contextt sfinae_guard{*this};
           exprt tmp_expr;
           exprt::operandst ops;
           ops.push_back(expr);
           new_temporary(expr.source_location(), to, ops, tmp_expr);
-          set_message_handler(old_handler);
           in_template_conversion = false;
           new_expr.swap(tmp_expr);
           return true;
         }
         catch(...)
         {
-          set_message_handler(old_handler);
           in_template_conversion = false;
         }
       }
