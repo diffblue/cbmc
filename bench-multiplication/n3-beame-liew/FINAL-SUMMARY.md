@@ -65,23 +65,36 @@ For this resolution chain to produce the empty clause at root:
   resolution on V "eliminates" it).
 - Merged nodes' clauses must be PATH-INDEPENDENT.
 
-**The gap**: my BP leaves have violated CNF clauses that don't
-always contain the immediate branching variable (V ∈ path might
-not be V ∈ violated_clause). Path-based clauses work for tree-
-unfold but not for DAG.
+**The gap** (confirmed via diagnostic at n=3, k=3, leaf 91):
 
-**RAT extension variables** introduce e_v ("BP reaches v") as a
-fresh variable with auxiliary clauses defining BP transitions.
-For the chain to validate, ¬e_v must be RUP at each leaf, which
-requires **state-only UP-refutation**: `strip-CNF ∧ state(leaf) → ⊥
-via UP alone`. Empirically, this only holds for 0-60% of leaves
+A merged leaf in the sym DAG BP is reachable via MULTIPLE paths
+with DIFFERENT variable assignments:
+  - Path 0: {V=8=T, V=10=F, V=13=F, V=7=T, V=9=F}
+  - Path 1: {V=8=F, V=10=T, V=13=F, V=7=T, V=9=F}
+
+Conflict-analysis (1UIP-like) produces path-specific learned clauses:
+  - Path 0 → learned: {-8, -7, 9, 10, 13}
+  - Path 1 → learned: {-10, -7, 8, 9, 13}
+
+Both are individually RUP-valid, but their intersection
+{-7, 9, 13} is NOT RUP (insufficient to UP-refute with strip CNF).
+
+So no single path-independent clause at the merged leaf works for
+all incoming paths. The DAG merging fundamentally conflicts with
+path-based conflict analysis.
+
+**What Paper Likely Does (speculation)**: the paper's proof must use
+some additional machinery — likely extension variables, symbolic
+reasoning, or a cleverer leaf-clause assignment — to make the
+merged-leaf clauses consistent. Without more time to study the paper's
+Section 2 in detail (Prop 2.1's proof), I can't replicate this.
+
+**RAT extension variables** (phase3_bp_paper_rat*.py) introduce e_v
+("BP reaches v") as a fresh variable with auxiliary clauses defining
+BP transitions. For the chain to validate, ¬e_v must be RUP at each
+leaf, which requires **state-only UP-refutation**: strip-CNF ∧ state(leaf)
+→ ⊥ via UP alone. Empirically, this only holds for 0-60% of leaves
 with paper's Cut(j) alone (even with sym substitution).
-
-**What would be needed**: augmenting the leaf's state-to-e clauses
-with all path-branching variables (not just cut-state vars). This
-eliminates DAG merging, defeating the purpose. Alternative is
-extended-resolution-style encoding that's more complex than plain
-RAT extension.
 
 ## Current best validated proof sizes
 
