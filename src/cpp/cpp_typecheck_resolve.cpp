@@ -32,6 +32,7 @@ extern exprt try_evaluate_constexpr(
 #include <ansi-c/merged_type.h>
 
 #include "cpp_convert_type.h"
+#include "cpp_sfinae_context.h"
 #include "cpp_template_parameter.h"
 #include "cpp_template_qualifiers.h"
 #include "cpp_type2name.h"
@@ -164,38 +165,24 @@ void cpp_typecheck_resolvet::guess_function_template_args(
 
   for(const auto &old_id : old_identifiers)
   {
-    // [temp.deduct]/8: "If a substitution failure occurs for any
-    // reason during the deduction process, the program is
-    // ill-formed (no diagnostic required), with the exception that
-    // specific substitution failures are treated as deduction
-    // failures."  During overload resolution, the failing candidate
-    // is silently discarded and no diagnostic is emitted.
-    //
-    // CBMC's `guess_function_template_args` may emit errors during
-    // substitution of the function-template candidate (for example,
-    // libstdc++'s `swap(_Tp&, _Tp&)` whose return type expands to
-    //   _Require<__not_<__is_tuple_like<_Tp>>,
-    //            is_move_constructible<_Tp>,
-    //            is_move_assignable<_Tp>>
-    // leaks an `unexpected expression: struct_tag` from the
-    // recursive alias-expansion path).  Redirect diagnostics to a
-    // null message handler during the per-candidate substitution so
-    // failed candidates never produce user-visible output, as
-    // required by the standard.
-    null_message_handlert sfinae_null_handler;
-    message_handlert &sfinae_old_handler = cpp_typecheck.get_message_handler();
-    cpp_typecheck.set_message_handler(sfinae_null_handler);
+    // [temp.deduct]/3 and [temp.deduct]/8: a substitution failure
+    // while deducing this candidate is a SFINAE failure — discard
+    // the candidate and continue with the next one.  The
+    // `sfinae_contextt` guard suppresses diagnostics for the
+    // duration of the substitution and rolls the error count back
+    // on exit, including when leaving via `throw 0`.
     exprt e;
-    try
     {
-      e = guess_function_template_args(old_id, fargs);
+      sfinae_contextt sfinae_guard{cpp_typecheck};
+      try
+      {
+        e = guess_function_template_args(old_id, fargs);
+      }
+      catch(...)
+      {
+        continue;
+      }
     }
-    catch(...)
-    {
-      cpp_typecheck.set_message_handler(sfinae_old_handler);
-      continue;
-    }
-    cpp_typecheck.set_message_handler(sfinae_old_handler);
 
     if(e.is_not_nil())
     {

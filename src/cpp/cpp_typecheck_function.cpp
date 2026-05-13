@@ -17,8 +17,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/std_expr.h>
 #include <util/symbol_table_base.h>
 
+#include <optional>
+
 #include "cpp_convert_type.h"
 #include "cpp_name.h"
+#include "cpp_sfinae_context.h"
 #include "cpp_template_type.h"
 #include "cpp_type2name.h"
 #include "cpp_typecheck.h"
@@ -499,20 +502,24 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     }
   }
 
-  // Detect system-header functions up front so we can suppress
-  // diagnostics emitted while typechecking their body (they will
-  // be discarded on a throw anyway — see the catch below).
+  // [temp.deduct]/8 and the system-header analogue: when the
+  // function whose body we are elaborating lives in a system
+  // header, any typecheck failure is treated as SFINAE rather
+  // than a user-visible compilation error.  This matches what
+  // conforming implementations do when a non-template system
+  // header function happens to be ill-formed against CBMC's
+  // (deliberately incomplete) model of system headers — the
+  // caller gets a "no usable body" symbol rather than a
+  // diagnostic attributed to the header.
+  //
+  // User-code bodies use normal error propagation below.
   const std::string body_file = id2string(symbol.location.get_file());
   const bool is_system_header_body =
     body_file.find("/usr/include/") == 0 || body_file.find("/usr/lib/") == 0;
 
-  null_message_handlert syshdr_null_handler;
-  message_handlert *syshdr_old_handler = nullptr;
+  std::optional<sfinae_contextt> syshdr_guard;
   if(is_system_header_body)
-  {
-    syshdr_old_handler = &get_message_handler();
-    set_message_handler(syshdr_null_handler);
-  }
+    syshdr_guard.emplace(*this);
 
   try
   {
@@ -520,10 +527,10 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   }
   catch(int)
   {
-    if(syshdr_old_handler != nullptr)
-      set_message_handler(*syshdr_old_handler);
     // For system headers, clear the broken body and return.
-    // For user code, re-throw.
+    // For user code, re-throw.  The `syshdr_guard` destructor (if
+    // engaged) runs on the way out and restores handler/error
+    // count; the user-code rethrow keeps going to the caller.
     if(is_system_header_body)
     {
       symbol.value.make_nil();
@@ -532,8 +539,6 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     }
     throw;
   }
-  if(syshdr_old_handler != nullptr)
-    set_message_handler(*syshdr_old_handler);
 
   // Deferred auto return type deduction: the initial attempt failed
   // (e.g., if constexpr with type-dependent discarded branch).

@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/source_location.h>
 #include <util/symbol_table_base.h>
 
+#include "cpp_sfinae_context.h"
 #include "cpp_typecheck.h"
 
 void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
@@ -126,17 +127,16 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
 
       if(is_system)
       {
-        null_message_handlert null_mh;
-        message_handlert &old_mh = get_message_handler();
-        set_message_handler(null_mh);
+        // System-header item inside a namespace: treat as SFINAE
+        // (see cpp_typecheck.cpp for the sibling code path).
         try
         {
+          sfinae_contextt sfinae_guard{*this};
           convert(item);
         }
         catch(...)
         {
         }
-        set_message_handler(old_mh);
       }
       else
       {
