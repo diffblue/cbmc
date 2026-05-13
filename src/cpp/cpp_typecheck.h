@@ -501,6 +501,40 @@ protected:
   void typecheck_side_effect_function_call(
     side_effect_expr_function_callt &) override;
 
+  /// Deduce template-function arguments from the target function type
+  /// per N5008 [temp.deduct.funcaddr]/1:
+  ///
+  ///   > Template arguments can be deduced from the type specified
+  ///   > when taking the address of an overload set.  If there is
+  ///   > a target, the function template's function type and the
+  ///   > target type are used as the types of P and A, and the
+  ///   > deduction is done as described in 13.10.3.6.
+  ///
+  /// Context: overload resolution for a function call whose callee
+  /// is a non-template ordinary function and whose corresponding
+  /// parameter type is a pointer-to-function.  Any argument of the
+  /// form `&f` or plain `f` (implicit function-to-pointer per
+  /// [conv.func]) where `f` names a function template is deduced
+  /// against the parameter's pointed-to code type, so that the
+  /// template argument is determined by the target rather than by
+  /// the argument alone (the argument alone has no fargs to
+  /// deduce from and would fail in the default resolve path).
+  ///
+  /// The function is a no-op when every argument is already
+  /// typed; it runs as a "probe + retry" because CBMC's overall
+  /// pipeline typechecks arguments before resolving the callee.
+  /// Once a proper target-type threading is in place (roadmap
+  /// §3.3), the probe step becomes redundant and this helper
+  /// collapses into the main path.
+  ///
+  /// Pre-condition: `expr.function().id() == ID_cpp_name`.
+  /// Side-effect: arguments of the form `&f` / `f` that deduce
+  /// against a function-pointer target are rewritten to
+  /// `address_of(symbol_expr(resolved_specialization))` with the
+  /// usual [conv.func] implicit-address marker preserved.
+  void deduce_function_address_args_from_target(
+    side_effect_expr_function_callt &expr);
+
   void typecheck_method_application(side_effect_expr_function_callt &);
 
 public:
