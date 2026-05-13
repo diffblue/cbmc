@@ -3606,7 +3606,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   }
 
   // we will deal with some 'special' functions here
-  exprt tmp=do_special_functions(expr);
+  exprt tmp = do_special_functions(expr);
   if(tmp.is_not_nil())
     expr.swap(tmp);
 }
@@ -3615,34 +3615,34 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 void cpp_typecheckt::typecheck_function_call_arguments(
   side_effect_expr_function_callt &expr)
 {
-  exprt &f_op=expr.function();
-  const code_typet &code_type=to_code_type(f_op.type());
-  const code_typet::parameterst &parameters=code_type.parameters();
+  exprt &f_op = expr.function();
+  const code_typet &code_type = to_code_type(f_op.type());
+  const code_typet::parameterst &parameters = code_type.parameters();
 
   // do default arguments
 
-  if(parameters.size()>expr.arguments().size())
+  if(parameters.size() > expr.arguments().size())
   {
-    std::size_t i=expr.arguments().size();
+    std::size_t i = expr.arguments().size();
 
-    for(; i<parameters.size(); i++)
+    for(; i < parameters.size(); i++)
     {
       if(!parameters[i].has_default_value())
         break;
 
-      const exprt &value=parameters[i].default_value();
+      const exprt &value = parameters[i].default_value();
       expr.arguments().push_back(value);
     }
   }
 
-  exprt::operandst::iterator arg_it=expr.arguments().begin();
+  exprt::operandst::iterator arg_it = expr.arguments().begin();
   for(const auto &parameter : parameters)
   {
     if(parameter.get_bool(ID_C_call_by_value))
     {
       DATA_INVARIANT(is_reference(parameter.type()), "reference expected");
 
-      if(arg_it->id()!=ID_temporary_object)
+      if(arg_it->id() != ID_temporary_object)
       {
         // create a temporary for the parameter
 
