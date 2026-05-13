@@ -17,14 +17,14 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/std_expr.h>
 #include <util/symbol_table_base.h>
 
-#include <optional>
-
 #include "cpp_convert_type.h"
 #include "cpp_name.h"
 #include "cpp_sfinae_context.h"
 #include "cpp_template_type.h"
 #include "cpp_type2name.h"
 #include "cpp_typecheck.h"
+
+#include <optional>
 
 void cpp_typecheckt::convert_parameter(
   const irep_idt &current_mode,

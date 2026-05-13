@@ -2763,6 +2763,32 @@ typet cpp_typecheck_resolvet::resolve_template_alias(
   // (base_name, full_template_args) pairs are currently being
   // resolved on this thread and short-circuit a re-entry with
   // an empty type (the most conservative placeholder).
+  // Break mutual-recursion cycles between SFINAE-guarded template
+  // aliases ([temp.alias]).  A canonical cycle:
+  //
+  //   add_rvalue_reference_t<T>
+  //     -> _Add_reference<T, void_t<T&>>::_Rvalue
+  //     -> void_t<T&>  (specialisation selection)
+  //     -> resolves T  (may re-enter add_rvalue_reference_t<T>)
+  //
+  // When T is a partially-elaborated class-template instance, a
+  // naive resolver loops unbounded.  Maintain a thread-local set of
+  // (alias-name, full-args) pairs that are currently being
+  // resolved; re-entry with the same pair returns a conservative
+  // placeholder (`empty_typet{}`, which composes like `void_t<...>`
+  // does).
+  //
+  // Note: we deliberately do *not* cache *successful* results
+  // across the entire thread lifetime.  Two textually-identical
+  // `irept` argument lists may legitimately denote different types
+  // depending on the scope in which they are resolved (e.g. a
+  // `cpp_name` may resolve differently in one class-body scope vs.
+  // another).  A scope-agnostic cache was tried and regressed
+  // several CORE tests (cpp11_deque_pushback,
+  // cpp11_string_default_arg_sstream, cpp17_deque_basic) by
+  // returning stale types from a prior scope.  Keep the fix minimal
+  // (cycle break only) until the medium-term lazy-elaboration work
+  // introduces scope-keyed memoization.
   static thread_local std::set<std::pair<irep_idt, irept>> active;
   const irept &args_irep = static_cast<const irept &>(full_template_args);
   std::pair<irep_idt, irept> key{base_name, args_irep};
@@ -2772,7 +2798,10 @@ typet cpp_typecheck_resolvet::resolve_template_alias(
   {
     std::set<std::pair<irep_idt, irept>> &s;
     std::pair<irep_idt, irept> k;
-    ~Guard() { s.erase(k); }
+    ~Guard()
+    {
+      s.erase(k);
+    }
   } guard{active, key};
 
   // find the template alias symbol
