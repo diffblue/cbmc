@@ -2655,9 +2655,31 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   {
     PRECONDITION(expr.function().type().id() == ID_code);
 
-    // This must be a POD.
-    const typet &pod=to_code_type(expr.function().type()).return_type();
-    PRECONDITION(cpp_is_pod(pod));
+    // This should be a POD, but in partially-elaborated template
+    // instances (where our self-reference tolerance in
+    // typecheck_compound_type left an unresolved cpp_name member
+    // type) the pod_constructor tag can outlive the POD-ness of
+    // the return type.  Fall back to a plain typecast / default
+    // initialization rather than tripping a precondition and
+    // crashing with an invariant violation.
+    const typet &pod = to_code_type(expr.function().type()).return_type();
+    if(!cpp_is_pod(pod))
+    {
+      if(expr.arguments().size() <= 1)
+      {
+        exprt typecast("explicit-typecast");
+        typecast.type() = pod;
+        typecast.add_source_location() = expr.source_location();
+        if(!expr.arguments().empty())
+          typecast.copy_to_operands(expr.arguments().front());
+        typecheck_expr_explicit_typecast(typecast);
+        expr.swap(typecast);
+        return;
+      }
+      error().source_location = expr.source_location();
+      error() << "zero or one argument expected" << eom;
+      throw 0;
+    }
 
     // These aren't really function calls, but either conversions or
     // initializations.

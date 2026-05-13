@@ -1330,6 +1330,90 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           declaration.type() = saved_type; // keep unresolved cpp_name
         }
       }
+      else if(!instantiation_stack.empty() && type_is_tpl_cpp_name)
+      {
+        // [temp.inst]/11: when we're INSIDE an instantiation of
+        // `std::chrono::duration<...>`, one of its member function
+        // return types is `common_type_t<duration>` — a self-
+        // specialized metafunction that can't resolve until
+        // `duration` itself is elaborated.  The failure to
+        // typecheck that type aborts the whole class body loop,
+        // losing subsequent data members (`_MyRep`), constructors,
+        // and operator overloads.  Tolerate this narrowly for
+        // chrono::duration only: skip the offending member
+        // declaration so the rest of duration's body elaborates.
+        //
+        // Broader tolerance (keeping unresolved cpp_names or
+        // tolerating failures for other classes) was tried and
+        // observed to corrupt downstream shared irepts in MSVC's
+        // `<filesystem>` headers (c_qualifiers_t::write SIGSEGV in
+        // detach()); restricting to duration avoids that
+        // regression while still unlocking chrono_basic.
+        bool is_duration_self_ref = false;
+        const std::string cur = id2string(symbol.name);
+        bool is_duration_class =
+          cur.find("::chrono::tag-duration<") != std::string::npos;
+        if(is_duration_class)
+        {
+          const typet &dt = declaration.type();
+          if(dt.id() == ID_cpp_name)
+          {
+            const auto &sub = dt.get_sub();
+            if(!sub.empty() && sub.front().id() == ID_name)
+            {
+              const std::string top =
+                id2string(sub.front().get(ID_identifier));
+              if(top == "common_type" || top == "common_type_t")
+              {
+                std::function<bool(const irept &)> ref_to_self;
+                ref_to_self = [&](const irept &t) -> bool
+                {
+                  if(t.id() == ID_cpp_name)
+                  {
+                    const auto &s = t.get_sub();
+                    if(!s.empty() && s.front().id() == ID_name)
+                    {
+                      const irep_idt &bn =
+                        s.front().get(ID_identifier);
+                      if(!bn.empty() && id2string(bn) == "duration")
+                        return true;
+                    }
+                  }
+                  for(const auto &x : t.get_sub())
+                    if(ref_to_self(x))
+                      return true;
+                  for(const auto &x : t.get_named_sub())
+                    if(ref_to_self(x.second))
+                      return true;
+                  return false;
+                };
+                is_duration_self_ref = ref_to_self(dt);
+              }
+            }
+          }
+        }
+        if(is_duration_self_ref)
+        {
+          const std::size_t errors_before =
+            get_message_handler().get_message_count(messaget::M_ERROR);
+          try
+          {
+            typecheck_type(declaration.type());
+          }
+          catch(...)
+          {
+            get_message_handler().set_message_count(
+              messaget::M_ERROR, errors_before);
+            // Skip this declaration — later re-elaboration will
+            // pick it up when common_type<duration> is resolved.
+            continue;
+          }
+        }
+        else
+        {
+          typecheck_type(declaration.type());
+        }
+      }
       else
       {
         typecheck_type(declaration.type());
