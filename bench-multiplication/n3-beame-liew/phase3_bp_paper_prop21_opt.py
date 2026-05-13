@@ -27,10 +27,12 @@ from phase3_strip_extract import extract_strip, forced_e_assignment
 from phase3_bp_paper_sym import paper_cut_onesided, paper_branch_vars_onesided
 from fast_propagate import propagate_fast, build_clause_index
 from canonical_up import propagate_canonical
+from paper_order_up import build_paper_priority, propagate_paper_order
 
 
 class OptimizedBP:
-    def __init__(self, clauses, var_index, cut_vars_per_level=None):
+    def __init__(self, clauses, var_index, cut_vars_per_level=None,
+                 priorities=None):
         self.clauses = clauses
         self.var_index = var_index
         # Sort clauses by (length, smallest |var|) for canonical UP.
@@ -51,6 +53,8 @@ class OptimizedBP:
         self.wrap_cache = {}
         # cut_vars_per_level[j] = set of vars in Cut(j+1).
         self.cut_vars_per_level = cut_vars_per_level or []
+        # Priorities for paper-ordered UP.
+        self.priorities = priorities
 
     def _register_node(self, kind, **kwargs):
         """Add a node and return its ID.
@@ -168,9 +172,14 @@ class OptimizedBP:
         """
         # Saturate UP at once using propagate_fast with trace.
         trace = []
-        final, conflict = propagate_fast(
-            self.clauses, sigma, self.var_index, trace=trace
-        )
+        if self.priorities is not None:
+            final, conflict, trace = propagate_paper_order(
+                self.clauses, sigma, self.priorities
+            )
+        else:
+            final, conflict = propagate_fast(
+                self.clauses, sigma, self.var_index, trace=trace
+            )
 
         # Cache key: saturated sigma AFTER UP. Includes conflict if any.
         if conflict is not None:
@@ -243,7 +252,9 @@ class OptimizedBP:
             c_good = nid
             c0 = c_bad if bad_val is False else c_good
             c1 = c_bad if bad_val is True else c_good
-            nid = self._register_node('branch', var=var, c0=c0, c1=c1)
+            nid = self._register_node(
+                'branch', var=var, c0=c0, c1=c1, up_step=True,
+            )
 
         self.wrap_cache[wrap_key] = nid
         return nid
@@ -258,7 +269,8 @@ def compute_clauses(nodes, node_clause_cache):
     return clause_of
 
 
-def emit_drat(nodes, root_id, clause_of, cnf_clauses_set, out):
+def emit_drat(nodes, root_id, clause_of, cnf_clauses_set, out,
+              skip_up_chain=False):
     emitted = set()
     visited = set()
 
@@ -271,6 +283,10 @@ def emit_drat(nodes, root_id, clause_of, cnf_clauses_set, out):
             visit(node['c0'])
             visit(node['c1'])
         if node['kind'] == 'leaf_conflict':
+            return
+        if skip_up_chain and node.get('up_step'):
+            # Skip intermediate UP-chain resolvents — drat-trim can
+            # reconstruct them via UP from CNF axioms + final clause.
             return
         cl = clause_of[nid]
         if cl in cnf_clauses_set:
@@ -306,7 +322,11 @@ def build_optimized_bp(n, k):
             lit = cl[0]
             initial_sigma[abs(lit)] = lit > 0
 
-    bp = OptimizedBP(clauses, var_index)
+    # Build paper-ordered priorities (toggle via env var).
+    use_paper_order = os.environ.get('PAPER_UP_ORDER', '0') == '1'
+    priorities = build_paper_priority(cnf, role2var) if use_paper_order else None
+
+    bp = OptimizedBP(clauses, var_index, priorities=priorities)
 
     # Per-level branching: use paper's Cut(j) structure.
     levels = []
