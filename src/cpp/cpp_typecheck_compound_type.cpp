@@ -1333,77 +1333,88 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
       }
       else if(!instantiation_stack.empty() && type_is_tpl_cpp_name)
       {
-        // [temp.inst]/11: when we're INSIDE an instantiation of
-        // `std::chrono::duration<...>`, one of its member function
-        // return types is `common_type_t<duration>` — a metafunction
-        // specialization keyed on the class currently being
-        // elaborated, so it cannot be resolved until duration
-        // itself is complete.  A plain throw here would abandon
-        // the remaining 15+ members of duration's body (operator
-        // overloads, static zero/min/max, and the private `_MyRep`
-        // data member), leaving `cpp_constructor` unable to find
-        // a constructor and emitting CONVERSION ERROR on any
-        // `duration d(5);` construction.
+        // [temp.inst]/3 semantics applied to member-declaration
+        // elaboration: a class-template specialization's body may
+        // declare members whose type is a metafunction
+        // specialization over the class currently being elaborated
+        // (e.g. `common_type_t<duration>` in MSVC `<chrono>`'s
+        // duration, or `rebind<T>` inside an allocator).  Such
+        // self-references can only resolve after the enclosing
+        // class is fully elaborated; substitution now would either
+        // fail or recurse.
         //
-        // Narrow the tolerance to exactly this duration self-
-        // reference case to avoid corrupting downstream shared
-        // irepts in unrelated template instances (observed
-        // breaking MSVC's `<filesystem>` preprocessed-header run).
+        // Per [temp.inst]/3 "the implicit instantiation of a class
+        // template specialization causes the implicit instantiation
+        // of the declarations, but not of the definitions, of the
+        // non-deleted class member functions" — i.e. the standard
+        // already expects the compiler to be tolerant of incomplete
+        // member declarations during class-body elaboration.
+        //
+        // Detect the self-reference by scanning the member's type
+        // for any `cpp_name` whose base matches the current class's
+        // unqualified base name.  On failure, skip the declaration;
+        // a later re-elaboration pass picks it up once the
+        // dependent metafunction can resolve.  This generalizes the
+        // earlier duration-only mitigation (commit 2e8e74f8ed) to
+        // any class whose body contains self-referential metafunction
+        // specializations.
         const std::string cur = id2string(symbol.name);
-        const bool is_duration_class =
-          cur.find("::chrono::tag-duration<") != std::string::npos;
-        bool is_duration_self_ref = false;
-        if(is_duration_class)
+        std::string cur_head = cur;
         {
-          const typet &dt = declaration.type();
-          if(dt.id() == ID_cpp_name)
+          std::size_t lt = cur_head.find('<');
+          if(lt != std::string::npos)
+            cur_head = cur_head.substr(0, lt);
+        }
+        std::string cur_base = cur_head;
+        {
+          std::size_t pos = cur_head.rfind("::tag-");
+          if(pos != std::string::npos)
+            cur_base = cur_head.substr(pos + 6);
+          else
           {
-            const auto &sub = dt.get_sub();
-            if(!sub.empty() && sub.front().id() == ID_name)
-            {
-              const std::string top = id2string(sub.front().get(ID_identifier));
-              if(top == "common_type" || top == "common_type_t")
-              {
-                std::function<bool(const irept &)> ref_to_self;
-                ref_to_self = [&](const irept &t) -> bool
-                {
-                  if(t.id() == ID_cpp_name)
-                  {
-                    const auto &s = t.get_sub();
-                    if(!s.empty() && s.front().id() == ID_name)
-                    {
-                      const irep_idt &bn = s.front().get(ID_identifier);
-                      if(!bn.empty() && id2string(bn) == "duration")
-                        return true;
-                    }
-                  }
-                  for(const auto &x : t.get_sub())
-                    if(ref_to_self(x))
-                      return true;
-                  for(const auto &x : t.get_named_sub())
-                    if(ref_to_self(x.second))
-                      return true;
-                  return false;
-                };
-                is_duration_self_ref = ref_to_self(dt);
-              }
-            }
+            pos = cur_head.rfind("::");
+            if(pos != std::string::npos)
+              cur_base = cur_head.substr(pos + 2);
           }
         }
-        if(is_duration_self_ref)
+        bool is_self_reference = false;
+        if(!cur_base.empty())
         {
-          const std::size_t errors_before =
-            get_message_handler().get_message_count(messaget::M_ERROR);
+          std::function<bool(const irept &)> ref_to_self;
+          ref_to_self = [&](const irept &t) -> bool
+          {
+            if(t.id() == ID_cpp_name)
+            {
+              const auto &s = t.get_sub();
+              if(!s.empty() && s.front().id() == ID_name)
+              {
+                const irep_idt &bn = s.front().get(ID_identifier);
+                if(!bn.empty() && id2string(bn) == cur_base)
+                  return true;
+              }
+            }
+            for(const auto &x : t.get_sub())
+              if(ref_to_self(x))
+                return true;
+            for(const auto &x : t.get_named_sub())
+              if(ref_to_self(x.second))
+                return true;
+            return false;
+          };
+          is_self_reference = ref_to_self(declaration.type());
+        }
+        if(is_self_reference)
+        {
+          // Per [temp.inst]/3 + [temp.deduct]/8: elaborate under a
+          // SFINAE immediate-context guard; on failure, skip the
+          // declaration and let a later pass retry.
           try
           {
+            sfinae_contextt sfinae_guard{*this};
             typecheck_type(declaration.type());
           }
           catch(...)
           {
-            get_message_handler().set_message_count(
-              messaget::M_ERROR, errors_before);
-            // Skip this declaration — later re-elaboration picks
-            // it back up once common_type<duration> can resolve.
             continue;
           }
         }
