@@ -16,9 +16,12 @@ def build_clause_index(clauses):
     return idx
 
 
-def propagate_fast(clauses, assign, var_index=None):
+def propagate_fast(clauses, assign, var_index=None, trace=None):
     """Watched-literal-style UP: for each newly-assigned var, only
     re-check clauses containing that var. Return (final, conflict).
+
+    If trace is not None, it's a list appended with (var, value, unit_clause)
+    for each UP-derived variable (in order of derivation).
     """
     assign = dict(assign)
     if var_index is None:
@@ -37,6 +40,8 @@ def propagate_fast(clauses, assign, var_index=None):
                     return assign, cl
             else:
                 assign[vv] = new_val
+                if trace is not None:
+                    trace.append((vv, new_val, tuple(cl)))
                 pending.append(vv)
 
     while pending:
@@ -66,5 +71,7 @@ def propagate_fast(clauses, assign, var_index=None):
                         return assign, cl
                     continue
                 assign[vv] = new_val
+                if trace is not None:
+                    trace.append((vv, new_val, tuple(cl)))
                 pending.append(vv)
     return assign, None
