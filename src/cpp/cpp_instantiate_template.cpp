@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/symbol_table_base.h>
 
 #include "cpp_convert_type.h"
+#include "cpp_sfinae_context.h"
 #include "cpp_template_qualifiers.h"
 #include "cpp_type2name.h"
 #include "cpp_typecheck_resolve.h"
@@ -873,12 +874,11 @@ void cpp_typecheckt::elaborate_class_template(
         cpp_scopet::id_sett id_set =
           scope.lookup(primary_template.base_name, cpp_scopet::SCOPE_ONLY);
 
-        // Suppress error messages during specialization matching.
-        // Concept evaluation and template argument type-checking may
-        // produce errors for non-matching specializations.
-        null_message_handlert spec_null_handler;
-        message_handlert &spec_old_handler = get_message_handler();
-        set_message_handler(spec_null_handler);
+        // [temp.deduct]/8 + [temp.class.spec.match]: specialization
+        // matching iterates candidate partial specializations; per-
+        // candidate substitution failure is SFINAE, not a compile
+        // error.
+        sfinae_contextt spec_sfinae_guard{*this};
 
         for(const auto *id_ptr : id_set)
         {
@@ -979,12 +979,13 @@ void cpp_typecheckt::elaborate_class_template(
             {
               exprt req_copy = req_clause;
               template_map.apply(req_copy);
-              null_message_handlert null_handler;
-              message_handlert &old_handler = get_message_handler();
-              set_message_handler(null_handler);
+              // [temp.constr.atomic]/3: an unsatisfied atomic
+              // constraint is a soft failure, not an ill-formed
+              // program — treat typecheck errors here as SFINAE.
               bool satisfied = true;
               try
               {
+                sfinae_contextt sfinae_guard{*this};
                 typecheck_expr(req_copy);
                 simplify(req_copy, *this);
                 if(req_copy.is_false())
@@ -994,7 +995,6 @@ void cpp_typecheckt::elaborate_class_template(
               {
                 // Can't evaluate — treat as satisfied (backward compat)
               }
-              set_message_handler(old_handler);
               if(!satisfied)
                 continue;
             }
@@ -1047,17 +1047,18 @@ void cpp_typecheckt::elaborate_class_template(
                     typet ptype =
                       static_cast<const typet &>(param.find(ID_type));
                     cmap.apply(ptype);
-                    null_message_handlert nh;
-                    message_handlert &oh = get_message_handler();
-                    set_message_handler(nh);
+                    // [temp.constr.atomic]/3: substitution failure
+                    // inside a requires-clause parameter type is a
+                    // SFINAE failure (unsatisfied constraint), not
+                    // a compilation error.
                     try
                     {
+                      sfinae_contextt sfinae_guard{*this};
                       typecheck_type(ptype);
                     }
                     catch(...)
                     {
                     }
-                    set_message_handler(oh);
                     irep_idt id = "requires_param::" + id2string(pname);
                     if(!symbol_table.has_symbol(id))
                     {
@@ -1092,11 +1093,11 @@ void cpp_typecheckt::elaborate_class_template(
                       {
                         exprt copy = e;
                         cmap.apply(copy);
-                        null_message_handlert nh;
-                        message_handlert &oh = get_message_handler();
-                        set_message_handler(nh);
+                        // [temp.constr.atomic]/3: per-candidate
+                        // concept check is SFINAE-guarded.
                         try
                         {
+                          sfinae_contextt sfinae_guard{*this};
                           typecheck_expr(copy);
                           simplify(copy, *this);
                           if(copy.is_true())
@@ -1108,18 +1109,19 @@ void cpp_typecheckt::elaborate_class_template(
                         {
                           params_ok = false;
                         }
-                        set_message_handler(oh);
                       }
                     }
                     if(e.id() == "type_requirement" && params_ok)
                     {
                       typet t = static_cast<const typet &>(e.find(ID_type_arg));
                       cmap.apply(t);
-                      null_message_handlert nh;
-                      message_handlert &oh = get_message_handler();
-                      set_message_handler(nh);
+                      // [expr.prim.req.type]/1 + [temp.deduct]/8:
+                      // a type requirement is satisfied iff the
+                      // type-id is valid; substitution failure is
+                      // a SFINAE failure.
                       try
                       {
+                        sfinae_contextt sfinae_guard{*this};
                         typecheck_type(t);
                         e = typecast_exprt{true_exprt(), c_bool_type()};
                       }
@@ -1127,18 +1129,19 @@ void cpp_typecheckt::elaborate_class_template(
                       {
                         params_ok = false;
                       }
-                      set_message_handler(oh);
                     }
                     // Simple requirement: check if expression type-checks
                     if(e.id() == "simple_requirement" && params_ok)
                     {
                       exprt expr_copy = to_unary_expr(e).op();
                       cmap.apply(expr_copy);
-                      null_message_handlert nh;
-                      message_handlert &oh = get_message_handler();
-                      set_message_handler(nh);
+                      // [expr.prim.req.simple]/1 + [temp.deduct]/8:
+                      // a simple requirement is satisfied iff the
+                      // expression is valid; substitution failure
+                      // is SFINAE.
                       try
                       {
+                        sfinae_contextt sfinae_guard{*this};
                         typecheck_expr(expr_copy);
                         e = typecast_exprt{true_exprt(), c_bool_type()};
                       }
@@ -1146,7 +1149,6 @@ void cpp_typecheckt::elaborate_class_template(
                       {
                         params_ok = false;
                       }
-                      set_message_handler(oh);
                     }
                     // Compound requirement: check expression type-checks
                     // and result type satisfies constraint
@@ -1154,12 +1156,16 @@ void cpp_typecheckt::elaborate_class_template(
                     {
                       exprt expr_copy = to_unary_expr(e).op();
                       cmap.apply(expr_copy);
-                      null_message_handlert nh;
-                      message_handlert &oh = get_message_handler();
-                      set_message_handler(nh);
+                      // [expr.prim.req.compound] + [temp.deduct]/8:
+                      // a compound requirement checks that the
+                      // expression is valid AND (if a trailing
+                      // return-type constraint is present) that the
+                      // result satisfies it.  Both checks are
+                      // SFINAE-guarded.
                       bool ok = true;
                       try
                       {
+                        sfinae_contextt sfinae_guard{*this};
                         typecheck_expr(expr_copy);
                         // Check return type constraint if present
                         const irept &constraint = e.find("#constraint");
@@ -1230,7 +1236,6 @@ void cpp_typecheckt::elaborate_class_template(
                       {
                         ok = false;
                       }
-                      set_message_handler(oh);
                       if(ok)
                         e = typecast_exprt{true_exprt(), c_bool_type()};
                       else
@@ -1240,15 +1245,16 @@ void cpp_typecheckt::elaborate_class_template(
                 if(!params_ok)
                   break;
                 // Evaluate the concept body after type_requirement
-                // and cpp_name nodes have been resolved.
+                // and cpp_name nodes have been resolved.  Per
+                // [temp.constr.constr]: the concept is satisfied
+                // iff the body evaluates to `true` — substitution
+                // failures are SFINAE failures.
                 cmap.apply(body);
-                null_message_handlert null_h2;
-                message_handlert &old_h2 = get_message_handler();
-                set_message_handler(null_h2);
                 bool old_suppress2 = suppress_elaborate;
                 suppress_elaborate = false;
                 try
                 {
+                  sfinae_contextt sfinae_guard{*this};
                   typecheck_expr(body);
                   simplify(body, *this);
                   if(body.is_false())
@@ -1259,7 +1265,6 @@ void cpp_typecheckt::elaborate_class_template(
                   params_ok = false;
                 }
                 suppress_elaborate = old_suppress2;
-                set_message_handler(old_h2);
               }
               if(!params_ok)
                 continue;
@@ -1467,8 +1472,6 @@ void cpp_typecheckt::elaborate_class_template(
             }
           }
         }
-
-        set_message_handler(spec_old_handler);
       }
     }
 
@@ -3654,12 +3657,10 @@ skip_pack_removal_ft:
         const symbolt *best_match = nullptr;
         cpp_template_args_tct best_spec_args;
 
-        // Suppress error messages during specialization matching.
-        // Concept evaluation and template argument type-checking may
-        // produce errors for non-matching specializations.
-        null_message_handlert spec_null_handler;
-        message_handlert &spec_old_handler = get_message_handler();
-        set_message_handler(spec_null_handler);
+        // [temp.deduct]/8 + [temp.class.spec.match]: specialization
+        // matching for the second search (after primary-template
+        // substitution of explicit args).
+        sfinae_contextt spec_sfinae_guard{*this};
 
         for(const auto *id_ptr : id_set)
         {
@@ -3707,9 +3708,10 @@ skip_pack_removal_ft:
           cpp_template_args_tct partial_tc;
           bool sfinae_failed = false;
           {
-            null_message_handlert null_handler;
-            message_handlert &old_handler = get_message_handler();
-            set_message_handler(null_handler);
+            // [temp.deduct]/8: substituting explicit template args
+            // into the partial specialization's parameter list may
+            // fail; treat as SFINAE and skip this candidate.
+            sfinae_contextt sfinae_guard{*this};
             try
             {
               partial_tc = typecheck_template_args(
@@ -3719,7 +3721,6 @@ skip_pack_removal_ft:
             {
               sfinae_failed = true;
             }
-            set_message_handler(old_handler);
           }
           if(sfinae_failed)
             continue;
@@ -3779,13 +3780,15 @@ skip_pack_removal_ft:
                 cargs.arguments().push_back(full_args_resolved.arguments()[pi]);
                 cmap.build(concept_decl.template_type(), cargs);
                 cmap.apply(body);
-                null_message_handlert null_h;
-                message_handlert &old_h = get_message_handler();
-                set_message_handler(null_h);
+                // [temp.constr.constr] + [temp.deduct]/8: concept
+                // body evaluation is SFINAE-guarded; failure to
+                // substitute or a `false` result means the concept
+                // is not satisfied, not an ill-formed program.
                 bool old_suppress = suppress_elaborate;
                 suppress_elaborate = false;
                 try
                 {
+                  sfinae_contextt sfinae_guard{*this};
                   typecheck_expr(body);
                   simplify(body, *this);
                   if(body.is_false())
@@ -3796,7 +3799,6 @@ skip_pack_removal_ft:
                   concept_ok = false;
                 }
                 suppress_elaborate = old_suppress;
-                set_message_handler(old_h);
                 if(!concept_ok)
                   break;
               }
@@ -3808,8 +3810,6 @@ skip_pack_removal_ft:
             best_spec_args = guessed;
           }
         }
-
-        set_message_handler(spec_old_handler);
 
         if(best_match != nullptr)
         {

@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <ansi-c/gcc_version.h>
 
 #include "cpp_declarator.h"
+#include "cpp_sfinae_context.h"
 #include "cpp_util.h"
 #include "expr2cpp.h"
 
@@ -118,19 +119,19 @@ void cpp_typecheckt::typecheck()
 
     if(is_system)
     {
-      // Suppress error messages from system headers so that
-      // unsupported constructs don't increment the error count.
-      null_message_handlert null_mh;
-      message_handlert &old_mh = get_message_handler();
-      set_message_handler(null_mh);
+      // System-header item: analogous to SFINAE — a failure to
+      // type-check an item from a system header (typically a
+      // built-in or implementation-defined construct we don't
+      // model) should not be a compilation error against user code.
+      // Suppress diagnostics and roll the error count back.
       try
       {
+        sfinae_contextt sfinae_guard{*this};
         convert(item);
       }
       catch(...)
       {
       }
-      set_message_handler(old_mh);
     }
     else
     {

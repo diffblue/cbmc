@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <ansi-c/c_qualifiers.h>
 
 #include "cpp_exception_id.h"
+#include "cpp_sfinae_context.h"
 #include "cpp_type2name.h"
 #include "cpp_typecheck.h"
 #include "cpp_typecheck_fargs.h"
@@ -391,16 +392,19 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   }
   else if(expr.id() == ID_noexcept)
   {
-    // C++11 noexcept operator
+    // C++11 noexcept operator per [expr.unary.noexcept]/3: "The
+    // result of the noexcept operator is a prvalue of type bool.
+    // Its value is false if the expression would throw because of
+    // …; otherwise it is true."  Evaluating the operand for this
+    // determination is an unevaluated operand ([basic.def.odr]/2,
+    // [expr.context]/1) and substitution failures must not leak
+    // as diagnostics — treat it as a SFINAE immediate context.
     auto &op = to_unary_expr(expr).op();
     bool result = false;
 
-    null_message_handlert noexcept_null_handler;
-    message_handlert &noexcept_old_handler = get_message_handler();
-    set_message_handler(noexcept_null_handler);
-
     try
     {
+      sfinae_contextt sfinae_guard{*this};
       typecheck_expr(op);
       if(op.id() == ID_side_effect && op.get(ID_statement) == ID_function_call)
       {
@@ -440,9 +444,11 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     }
     catch(...)
     {
+      // Substitution failure inside noexcept is a SFINAE failure
+      // that in turn makes the noexcept-expr evaluate to `true`
+      // (the operand can't throw because it can't even exist).
       result = true;
     }
-    set_message_handler(noexcept_old_handler);
     if(result)
       expr = true_exprt();
     else

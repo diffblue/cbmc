@@ -21,6 +21,7 @@ extern exprt try_evaluate_constexpr(
 
 #include "cpp_convert_type.h"
 #include "cpp_declarator_converter.h"
+#include "cpp_sfinae_context.h"
 #include "cpp_template_args.h"
 #include "cpp_template_type.h"
 #include "cpp_type2name.h"
@@ -1973,22 +1974,16 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
           //   typename = decltype(swap(std::declval<_Tp&>(),
           //                            std::declval<_Tp&>()))
           // of libstdc++'s __do_is_swappable_impl::__test do not leak
-          // "found no match for symbol 'swap'" errors to the user.
+          // Per [temp.deduct]/3 and [temp.deduct]/8: substituting
+          // default template arguments is an immediate context —
+          // e.g. libstdc++ often makes default args SFINAE-guarded
+          // (`typename = _Require<...>`), and a failure here must
+          // be a silent deduction failure, not a user-visible
+          // "found no match for symbol 'swap'" diagnostic.
           if(i >= first_default)
           {
-            null_message_handlert default_arg_null_handler;
-            message_handlert &default_arg_old_handler = get_message_handler();
-            set_message_handler(default_arg_null_handler);
-            try
-            {
-              typecheck_type(arg.type());
-            }
-            catch(...)
-            {
-              set_message_handler(default_arg_old_handler);
-              throw;
-            }
-            set_message_handler(default_arg_old_handler);
+            sfinae_contextt sfinae_guard{*this};
+            typecheck_type(arg.type());
           }
           else
             typecheck_type(arg.type());
@@ -2154,30 +2149,32 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         // template argument is silently absorbed.  Suppress
         // diagnostics emitted during the typecheck attempt; if both
         // the primary and the instantiation-scope retry fail,
-        // re-throw.
-        null_message_handlert default_arg_null_handler;
-        message_handlert &default_arg_old_handler = get_message_handler();
-        set_message_handler(default_arg_null_handler);
+        // re-throw.  Per [temp.deduct]/8 the whole block is a SFINAE
+        // immediate context (substitution of a default non-type
+        // template argument at use site).
         bool succeeded = false;
-        try
         {
-          typecheck_expr(arg);
-          succeeded = true;
-        }
-        catch(int)
-        {
+          sfinae_contextt sfinae_guard{*this};
           try
           {
-            cpp_scopes.go_to(*instantiation_scope_ptr);
             typecheck_expr(arg);
             succeeded = true;
           }
           catch(int)
           {
-            // Rethrow below with the real message handler.
+            try
+            {
+              cpp_scopes.go_to(*instantiation_scope_ptr);
+              typecheck_expr(arg);
+              succeeded = true;
+            }
+            catch(int)
+            {
+              // Rethrow below once the real message handler is
+              // restored.
+            }
           }
         }
-        set_message_handler(default_arg_old_handler);
         if(!succeeded)
           throw 0;
       }
