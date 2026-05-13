@@ -34,13 +34,13 @@ subtrees), the resulting DRAT validates end-to-end.
 | n | Phase 1 | Old sym tree | **Paper DAG baseline** | **Paper DAG optimized** | CaDiCaL raw |
 |---|--------:|-------------:|-----------------------:|------------------------:|------------:|
 | 3 | 1.9 KB  | 13.6 KB      | 37.5 KB                | 34.0 KB                 | 6.1 KB      |
-| 4 | 10 KB   | 349 KB       | 506 KB                 | 461 KB                  | 18.5 KB     |
-| 5 | 52 KB   | 7.7 MB       | 6.1 MB                 | **5.7 MB**              | 58.7 KB     |
-| 6 | 266 KB  | 160 MB       | 65.5 MB                | **51.1 MB**             | 391 KB      |
+| 4 | 10 KB   | 349 KB       | 506 KB                 | **384 KB**              | 18.5 KB     |
+| 5 | 52 KB   | 7.7 MB       | 6.1 MB                 | **4.7 MB**              | 58.7 KB     |
+| 6 | 266 KB  | 160 MB       | 65.5 MB                | **49 MB**               | 391 KB      |
 
-The optimized paper-DAG approach is 1.35× smaller at n=5 and 3.1×
-smaller at n=6 vs old sym tree. At smaller n, explicit UP-as-branching
-overhead dominates — the crossover point is around n=5.
+The optimized paper-DAG approach is **1.6× smaller at n=5** and
+**3.3× smaller at n=6** vs old sym tree. At smaller n, explicit
+UP-as-branching overhead dominates — crossover is between n=4 and n=5.
 
 ### BP size growth (n=6, optimized; vs paper's O(k⁵ log k))
 
@@ -56,9 +56,14 @@ Optimizations (in `phase3_bp_paper_prop21_opt.py`):
 - Trace-based UP saturation via `propagate_fast` (one pass instead of
   per-step).
 - Per-level branching scoping.
-- Canonical UP order.
-- Clause-based hash consing (not just structural).
-- State-based sub-DAG caching.
+- Canonical UP order (via canonical_up.py — implemented but disabled:
+  produces different trace order which broke resolution chain validity).
+- Paper-specific UP priority (via paper_order_up.py, opt-in via env var
+  `PAPER_UP_ORDER=1` — gives mixed results: 11% better at k=7, 2.2×
+  worse at k=11).
+- Clause-based hash consing (90% combined cache hit rate with structural).
+- State-based caching on post-UP saturated sigma.
+- Wrap cache for UP-as-branching chains.
 
 ## Paper-exact BP implementation (phase3_bp_paper.py, phase3_bp_paper_sym.py)
 
