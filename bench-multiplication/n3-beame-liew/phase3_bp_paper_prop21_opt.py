@@ -26,6 +26,7 @@ from generate_sym_mul_comm_meta import symmetry_substituted_cnf
 from phase3_strip_extract import extract_strip, forced_e_assignment
 from phase3_bp_paper_sym import paper_cut_onesided, paper_branch_vars_onesided
 from fast_propagate import propagate_fast, build_clause_index
+from canonical_up import propagate_canonical
 
 
 class OptimizedBP:
@@ -44,12 +45,11 @@ class OptimizedBP:
         self.clause_cons = {}
         # Cache of clauses per node (for clause-cons lookup).
         self.node_clause = {}
-        # State-based cache: sigma-key -> node_id.
-        # Two paths reaching the same sigma produce the same subtree.
+        # State-based cache: saturated-sigma-key -> node_id (POST-UP).
         self.state_cache = {}
-        # cut_vars_per_level[j] = set of vars in Cut(j+1). When caching
-        # state at level j, project sigma to cut vars + branching vars
-        # of current and future levels.
+        # Wrap cache: (inner_nid, trace_tuple) -> wrapped_nid.
+        self.wrap_cache = {}
+        # cut_vars_per_level[j] = set of vars in Cut(j+1).
         self.cut_vars_per_level = cut_vars_per_level or []
 
     def _register_node(self, kind, **kwargs):
@@ -166,68 +166,74 @@ class OptimizedBP:
         When current level's branching is exhausted and no UP possible,
         move to next level.
         """
-        # State-based cache: identical sigmas produce identical subtrees.
-        state_key = tuple(sorted(sigma.items()))
-        if state_key in self.state_cache:
-            return self.state_cache[state_key]
-
         # Saturate UP at once using propagate_fast with trace.
         trace = []
         final, conflict = propagate_fast(
             self.clauses, sigma, self.var_index, trace=trace
         )
 
+        # Cache key: saturated sigma AFTER UP. Includes conflict if any.
         if conflict is not None:
-            # Build UP-as-branching chain: innermost is conflict leaf,
-            # then branching nodes for each UP step (in reverse).
-            nid = self._register_node(
+            sat_key = ('conflict', tuple(conflict))
+        else:
+            sat_key = tuple(sorted(final.items()))
+
+        # Cache: saturated state -> (inner_node_id, None).
+        # 'inner_node_id' is the BP node for the post-UP subtree.
+        # We then wrap it with UP-as-branching chain.
+        cached_inner = self.state_cache.get(sat_key)
+
+        if cached_inner is not None:
+            inner_nid = cached_inner
+        elif conflict is not None:
+            inner_nid = self._register_node(
                 'leaf_conflict',
                 axiom=tuple(conflict),
             )
-            for (var, val, unit_cl) in reversed(trace):
-                bad_val = not val
-                c_bad = self._register_node(
-                    'leaf_conflict',
-                    axiom=tuple(unit_cl),
-                )
-                c_good = nid
-                c0 = c_bad if bad_val is False else c_good
-                c1 = c_bad if bad_val is True else c_good
-                nid = self._register_node('branch', var=var, c0=c0, c1=c1)
-            self.state_cache[state_key] = nid
-            return nid
-
-        # No conflict. Find next branching var.
-        next_var = None
-        for lidx in range(level_idx, len(levels)):
-            for v in levels[lidx]:
-                if v not in final:
-                    next_var = v
-                    level_idx = lidx
+            self.state_cache[sat_key] = inner_nid
+        else:
+            # Build inner subtree (no UP pending).
+            # Find next branching var.
+            next_var = None
+            for lidx in range(level_idx, len(levels)):
+                for v in levels[lidx]:
+                    if v not in final:
+                        next_var = v
+                        level_idx = lidx
+                        break
+                if next_var is not None:
                     break
-            if next_var is not None:
-                break
 
-        if next_var is None:
-            self.nodes.append({'kind': 'stuck'})
-            nid = len(self.nodes) - 1
-            self.node_clause[nid] = frozenset()
-            self.state_cache[state_key] = nid
-            return nid
+            if next_var is None:
+                self.nodes.append({'kind': 'stuck'})
+                inner_nid = len(self.nodes) - 1
+                self.node_clause[inner_nid] = frozenset()
+            else:
+                sigma0 = dict(final)
+                sigma0[next_var] = False
+                sigma1 = dict(final)
+                sigma1[next_var] = True
+                c0 = self.build(sigma0, levels, level_idx)
+                c1 = self.build(sigma1, levels, level_idx)
+                inner_nid = self._register_node(
+                    'branch', var=next_var, c0=c0, c1=c1,
+                )
 
-        # Branch on next_var.
-        sigma0 = dict(final)
-        sigma0[next_var] = False
-        sigma1 = dict(final)
-        sigma1[next_var] = True
-        c0 = self.build(sigma0, levels, level_idx)
-        c1 = self.build(sigma1, levels, level_idx)
-        branch_nid = self._register_node(
-            'branch', var=next_var, c0=c0, c1=c1,
+            self.state_cache[sat_key] = inner_nid
+
+        # Wrap inner_nid with UP-as-branching chain for THIS path's trace.
+        # Use wrap_cache: (inner_nid, frozen trace) -> wrapped_nid.
+        # Sort trace entries to canonicalize the cache key: same inner +
+        # same set-of-UP-derivations -> same wrapped (regardless of order).
+        # But actual wrapping must respect dependencies — use trace as-is.
+        trace_key = tuple(
+            (v, val, unit) for (v, val, unit) in trace
         )
+        wrap_key = (inner_nid, trace_key)
+        if wrap_key in self.wrap_cache:
+            return self.wrap_cache[wrap_key]
 
-        # Wrap branch_nid with UP-as-branching chain.
-        nid = branch_nid
+        nid = inner_nid
         for (var, val, unit_cl) in reversed(trace):
             bad_val = not val
             c_bad = self._register_node(
@@ -239,7 +245,7 @@ class OptimizedBP:
             c1 = c_bad if bad_val is True else c_good
             nid = self._register_node('branch', var=var, c0=c0, c1=c1)
 
-        self.state_cache[state_key] = nid
+        self.wrap_cache[wrap_key] = nid
         return nid
 
 
