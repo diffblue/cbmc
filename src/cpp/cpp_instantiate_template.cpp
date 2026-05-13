@@ -1279,16 +1279,16 @@ void cpp_typecheckt::elaborate_class_template(
           cpp_template_args_tct partial_specialization_args_tc;
           bool sfinae_failed = false;
           {
-            const std::size_t ps_errors =
-              get_message_handler().get_message_count(messaget::M_ERROR);
-            // Per [temp.inst]/1, template arguments in partial
-            // specialization matching don't require complete types.
+            // Per [temp.inst]/1 + [temp.deduct]/8: partial
+            // specialization matching uses template-argument
+            // deduction, so substitution failure is SFINAE.
             // Suppress eager elaboration to avoid instantiating
-            // unused branches (e.g., conditional_t's false branch).
+            // unused branches (e.g. conditional_t's false branch).
             bool old_suppress = suppress_elaborate;
             suppress_elaborate = true;
             try
             {
+              sfinae_contextt sfinae_guard{*this};
               partial_specialization_args_tc = typecheck_template_args(
                 type.source_location(),
                 primary_template,
@@ -1299,8 +1299,6 @@ void cpp_typecheckt::elaborate_class_template(
               sfinae_failed = true;
             }
             suppress_elaborate = old_suppress;
-            get_message_handler().set_message_count(
-              messaget::M_ERROR, ps_errors);
           }
           if(sfinae_failed)
             continue;
@@ -3550,10 +3548,15 @@ skip_pack_removal_ft:
     // may fail when function template parameters are not in the
     // class template map.  Catch and return the template symbol.
     {
-      auto saved_errors =
-        get_message_handler().get_message_count(messaget::M_ERROR);
+      // [temp.inst]/2 + [temp.deduct]/8: substituting and type-
+      // checking a compound member declaration during template
+      // instantiation is a SFINAE immediate context — a failure
+      // here doesn't invalidate the template specialization, it
+      // just means we can't complete this member and bail out to
+      // the caller with the template symbol.
       try
       {
+        sfinae_contextt sfinae_guard{*this};
         typecheck_compound_declarator(
           symb,
           new_decl,
@@ -3566,8 +3569,6 @@ skip_pack_removal_ft:
       }
       catch(...)
       {
-        get_message_handler().set_message_count(
-          messaget::M_ERROR, saved_errors);
         return template_symbol;
       }
     }

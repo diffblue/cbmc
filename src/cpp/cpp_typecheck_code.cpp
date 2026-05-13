@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_declarator_converter.h"
 #include "cpp_exception_id.h"
+#include "cpp_sfinae_context.h"
 #include "cpp_typecheck.h"
 #include "cpp_typecheck_fargs.h"
 #include "cpp_util.h"
@@ -803,17 +804,20 @@ void cpp_typecheckt::typecheck_ifthenelse(code_ifthenelset &code)
       // errors.  In well-formed C++, if-constexpr conditions must
       // be constant, but CBMC may fail to evaluate complex type
       // trait expressions.  Suppressing errors prevents ill-formed
-      // code in the would-be-discarded branch from causing failures.
-      auto errors_before =
-        get_message_handler().get_message_count(messaget::M_ERROR);
+      // [stmt.if]/2: for `if constexpr (c) T; else F;`, the
+      // discarded substatement is not instantiated.  CBMC's
+      // typecheck_ifthenelse still elaborates both branches and
+      // may fail on the discarded one; treat the enclosing
+      // `if constexpr` as a SFINAE-like context so a failure in
+      // the discarded branch is silently swallowed.  Matches the
+      // standard's "discarded statement" semantics.
       try
       {
+        sfinae_contextt sfinae_guard{*this};
         c_typecheck_baset::typecheck_ifthenelse(code);
       }
       catch(int)
       {
-        get_message_handler().set_message_count(
-          messaget::M_ERROR, errors_before);
         // Replace both branches with skip
         code.then_case() = code_skipt();
         if(code.has_else_case())
