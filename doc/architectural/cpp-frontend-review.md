@@ -362,22 +362,44 @@ context available.
 
 ### 4.4 `irept` sharing discipline under template recursion
 
-**Not a standard issue.**  CBMC's COW-shared `irept` backing is
-fundamentally correct, but the template code path exercises a pattern
-that has exposed several crashes (two in the last week: `detach()`
-SIGSEGVs from `c_qualifiers_t::write` and from `convert_non_template_declaration`
-on an empty `name().get_sub()`).  Root causes:
+**Not a standard issue**, and on re-examination *not an active
+source of bugs either*.
 
-- A shared `irept` gets mutated through one handle while another
-  handle is being read elsewhere (template instantiation is full of
-  save-restore patterns).
-- The same `declaration.type()` is saved, a throwing typecheck mutates
-  the shared payload, and the "restore" is still looking at the mutated
-  shared state.
+When this review was first drafted I hypothesised that the two
+`sharing_treet::detach()` SIGSEGVs seen during the session were the
+result of shallow-copy save-restore races against CBMC's
+copy-on-write `irept`.  A closer look after the short-term
+roadmap's item 3 (audit) ran the matter down to the ground:
 
-**Fix:** audit the template-instantiation path for shallow-copy save
-points and convert them to deep copies where the data will be mutated.
-This is localized and doesn't require a wider redesign.
+1. The `detach()` crash in `c_qualifiers_t::write` was a **stack
+   overflow** (on the function prologue instruction
+   `mov %rdi, 0x8(%rsp)` — a spill, not a dereference) caused by
+   unbounded mutual recursion in `resolve_template_alias`.  Fixed
+   deterministically by commit `09e5625681`'s active-set cycle
+   break.
+
+2. The `detach()` frames attributed to `convert_non_template_declaration`
+   were actually a **null-pointer dereference** on an empty
+   `name().get_sub()` in the trailing-return-decltype path — a
+   parser-output precondition violation.  Fixed by commit
+   `df5f5d955e` with an explicit `empty()` guard.
+
+3. The only remaining `typet saved_type = declaration.type(); try {
+   typecheck_type(…); } catch(…) { declaration.type() = saved_type;
+   }` pattern in the tree
+   (`cpp_typecheck_compound_type.cpp:1322`) turns out to be safe:
+   `typecheck_type` goes through `detach()` on every write path, so
+   the shallow copy in `saved_type` observes the pre-detach `dt*`
+   and cannot be corrupted by the inner mutations.
+
+There is therefore no concrete bug class here to retire as part of
+the short-term plan.  The COW discipline is holding up; when new
+crashes appear, the first question is still "is this stack
+exhaustion or a real null-deref?", answered quickly by running in
+gdb and decoding the faulting instruction.  If a future bug *does*
+trace to shallow-copy races, the fix would be a `deep_copy()`
+helper on `irept` at the specific call site, not a tree-wide
+refactor.
 
 ---
 
@@ -423,22 +445,37 @@ the OK rate from ~12% to ~50%+ with no additional one-off fixes.
 
 ## 6. Recommended roadmap
 
-### Short term (2–4 weeks, no architectural changes)
+### Short term (2–4 weeks, no architectural changes) — **in progress**
 
-- **Consolidate SFINAE guards behind a single `sfinae_contextt` RAII
-  type (§3.2 first half).**  Don't refactor the surrounding logic yet
-  — just get every hand-rolled `null_message_handlert` swap behind the
-  RAII guard.  Deletes ~20 call-site duplications and prevents future
-  P1-tail-style leaks.
-- **Add a `template_alias_cachet` (§4.1).**  Replace the active-set
-  guard in `09e5625681` with a real cache.  Returns the correct alias
-  type rather than `empty_typet{}`.
-- **Audit and patch the shared-irep save-restore sites (§4.4).**
-  Localized, mechanical.  Eliminates the class of detach() crashes.
+- ✅ **Consolidate SFINAE guards behind a single `sfinae_contextt`
+  RAII type (§3.2 first half).**  Landed in commit `7160102bc3`.
+  Retires ~20 hand-rolled `null_message_handlert` + error-count
+  save/restore patterns across 8 files.  Every converted site
+  carries a comment citing the standard clause the guard
+  implements ([temp.deduct]/8, [temp.constr.atomic]/3,
+  [expr.prim.req.*]/1, [over.ics.user], [expr.unary.noexcept]/3).
+- 🟡 **Add a `template_alias_cachet` (§4.1).**  Attempted; regressed
+  three CORE tests because CBMC's `irept` argument lists are not
+  scope-agnostic and a thread-local cache keyed on
+  `(alias, full_args)` returns stale types from a prior scope.
+  Reverted to the minimal cycle-break from `09e5625681` with an
+  expanded comment; proper scope-keyed memoization is deferred to
+  the medium-term lazy-elaboration work (commit `2d0e466bd7`).
+- ❌ **Audit and patch the shared-irep save-restore sites (§4.4).**
+  On re-examination the hypothesised bug class doesn't exist —
+  CBMC's COW discipline holds up and the two recent `detach()`
+  SIGSEGVs were stack exhaustion (fixed by `09e5625681`) and a
+  null-deref (fixed by `df5f5d955e`), neither sharing-related.
+  See §4.4 for the details; no action taken.
 
-These three together would retire roughly half the recent patches —
-they'd become either no-ops (consolidated into the new primitives) or
-proper fixes (e.g. the active-set guard becomes a cache).
+Net short-term effect: one retired concern (SFINAE hand-rolls), one
+refactor deferred with explicit rationale, one hypothesis
+falsified.  All CORE + KNOWNBUG regressions green; MSVC
+preprocessed headers still 26/26.  The dog-food `--expand`
+baseline is unchanged (10 OK_CLEAN / 4 OK_NOISY / 103 FAIL / 0
+CRASH) — the short-term consolidation was about architectural
+hygiene, not pass-rate movement; that belongs to the medium-term
+work below.
 
 ### Medium term (1–3 months)
 
