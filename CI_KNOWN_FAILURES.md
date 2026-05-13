@@ -130,16 +130,23 @@ Locally, against `/tmp/macos-pp-new/` and `/tmp/msvc-pp-new/`
     SIGSEGV during nested `make_shared<_ExceptionHolder>`
     instantiation.  Guarding lets the preprocessed-header run
     complete with VERIFICATION SUCCESSFUL.
-  * `cpp14_chrono_basic` — CONVERSION ERROR "non-POD type has no
-    constructor" during `std::decay<duration>` instantiation.
-    Root cause: CBMC elaborates `duration<long long, ratio<1,1>>`
-    with only its `rep`/`period` typedef components and the
-    non-template `count()` method; the private `_MyRep` data
-    member and both constructors (default + variadic template) are
-    missing from the elaborated struct.  The CORE regression test
-    passes on Linux (with libstdc++'s simpler duration layout) —
-    the issue only surfaces against the MSVC preprocessed header.
-    Not yet fixed.
+  * ~~`cpp14_chrono_basic`~~ — ✅ FIXED in `2e8e74f8ed`.
+    MSVC's `duration` declares operator overloads whose return
+    type is `common_type_t<duration>` — a self-specialized
+    metafunction that CBMC cannot resolve during duration's own
+    elaboration.  Previously the throw from typechecking that
+    return type abandoned the rest of duration's class body
+    (losing `_MyRep`, constructors, and all operators).  The fix
+    skips just that self-referential member so the rest of
+    duration's body elaborates, giving `cpp_constructor` the
+    `_MyRep` data member and defaulted constructor it needs.
+    Trade-off: the newly-elaborated duration members expose a
+    pre-existing latent issue in MSVC's `<filesystem>`
+    preprocessed-header run (c_qualifiers_t::write crashes with
+    SIGSEGV during template-arg typechecking for some
+    unrelated type).  Both filesystem CORE regressions continue
+    to pass on Linux — the regression is limited to manual MSVC
+    preprocessed-header runs that are not part of CI.
 
 The MSVC jump from 15/26 to 24/26 is primarily attributable to the
 SFINAE fix in `e7080a017e` removing spurious error leaks that
