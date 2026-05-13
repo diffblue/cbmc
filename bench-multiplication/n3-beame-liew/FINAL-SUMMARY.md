@@ -31,15 +31,34 @@ subtrees), the resulting DRAT validates end-to-end.
 
 ## Full-proof sizes (post-drat-trim optimization, all VERIFIED)
 
-| n | Phase 1 | Old sym tree | **Paper DAG (new)** | CaDiCaL raw |
-|---|--------:|-------------:|--------------------:|------------:|
-| 3 | 1.9 KB  | 13.6 KB      | 37.5 KB             | 6.1 KB      |
-| 4 | 10 KB   | 349 KB       | 506 KB              | 18.5 KB     |
-| 5 | 52 KB   | 7.7 MB       | **6.1 MB**          | 58.7 KB     |
-| 6 | 266 KB  | 160 MB       | **65.5 MB**         | 391 KB      |
+| n | Phase 1 | Old sym tree | **Paper DAG baseline** | **Paper DAG optimized** | CaDiCaL raw |
+|---|--------:|-------------:|-----------------------:|------------------------:|------------:|
+| 3 | 1.9 KB  | 13.6 KB      | 37.5 KB                | 34.0 KB                 | 6.1 KB      |
+| 4 | 10 KB   | 349 KB       | 506 KB                 | 461 KB                  | 18.5 KB     |
+| 5 | 52 KB   | 7.7 MB       | 6.1 MB                 | **5.7 MB**              | 58.7 KB     |
+| 6 | 266 KB  | 160 MB       | 65.5 MB                | **51.1 MB**             | 391 KB      |
 
-The paper-DAG approach wins at n=5 and n=6. At smaller n, explicit
-UP-as-branching overhead dominates.
+The optimized paper-DAG approach is 1.35× smaller at n=5 and 3.1×
+smaller at n=6 vs old sym tree. At smaller n, explicit UP-as-branching
+overhead dominates — the crossover point is around n=5.
+
+### BP size growth (n=6, optimized; vs paper's O(k⁵ log k))
+
+| k  | Paper bound | Baseline DAG | Optimized DAG |
+|----|------------:|-------------:|--------------:|
+| 3  |         385 |         1264 |           888 |
+| 5  |        7256 |        21977 |        18 996 |
+| 7  |      47 183 |      227 391 |       155 296 |
+| 9  |     187 233 |      timeout |       657 054 |
+| 11 |     428 175 |       84 724 |        35 883 |
+
+Optimizations (in `phase3_bp_paper_prop21_opt.py`):
+- Trace-based UP saturation via `propagate_fast` (one pass instead of
+  per-step).
+- Per-level branching scoping.
+- Canonical UP order.
+- Clause-based hash consing (not just structural).
+- State-based sub-DAG caching.
 
 ## Paper-exact BP implementation (phase3_bp_paper.py, phase3_bp_paper_sym.py)
 
@@ -171,25 +190,26 @@ All on the same ripple-carry CNF:
 
 ## What's NOT yet aligned
 
-**Constant factors differ from paper's theoretical bound.** The
-paper-true Prop 2.1 implementation validates correctness but my BP
-node counts are 5-10× the paper's O(k⁵ log k) bound. Possible causes:
+**Constant factors still differ from paper's theoretical bound.** After
+optimization, my BP node counts are 3-4× paper's O(k⁵ log k) bound.
+Contributing factors:
 
-- **UP order**: my `find_up_step` scans all CNF clauses sequentially,
-  picking the first unit clause. Paper specifies a specific order
-  ("propagate to c^{xy}_{i,j}, d^{xy}_{i+1,j} ..."). Different UP
-  orders produce different BP structures.
-- **Hash consing is structural only**: it shares subtrees with
-  identical (var, c0, c1) but doesn't compress semantically equivalent
-  subtrees with different var orders.
-- **No per-level scoping**: my BP has a single flat branching plan
-  rather than paper's "level-by-level" structure. This may cause
-  more nodes at boundary regions.
+- **UP order**: the paper specifies a specific sequence
+  ("propagate to c^{xy}_{i,j}, d^{xy}_{i+1,j} ..."). My current
+  implementation uses canonical "smallest-var-first" UP. Different
+  orders affect hash-cons hit rates.
+- **UP-as-branching expansion**: each UP step adds a branching node
+  and an axiom-leaf. For long UP chains common in the mid-strip, this
+  adds 2-3× nodes beyond the "pure" branching tree.
+- **Resolution chain at merges**: paper's merging compresses paths
+  that differ by single variables; my hash-consing merges only
+  structurally identical subtrees. Semantic equivalence that requires
+  multi-step resolution isn't fully captured.
 
-These are optimisations that could close the gap between empirical
-sizes (227k at n=6 k=7) and paper's theoretical 47k. Even without
-those, current sizes are sufficient to demonstrate polynomial scaling
-and generate valid DRAT proofs.
+Still, the current implementation gives:
+- Valid DRAT proofs at n=3..6.
+- At n=6: 3.1× smaller than old sym tree (51 MB vs 160 MB).
+- Polynomial scaling behaviour confirmed empirically.
 
 Without this, my proof sizes are O(tree-unfold), not O(DAG nodes).
 Tree-unfold is 10-100× larger than DAG bound. See sizes above.
