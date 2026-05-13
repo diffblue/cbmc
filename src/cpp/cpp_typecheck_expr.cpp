@@ -2420,6 +2420,134 @@ void cpp_typecheckt::add_implicit_dereference(exprt &expr)
   }
 }
 
+void cpp_typecheckt::deduce_function_address_args_from_target(
+  side_effect_expr_function_callt &expr)
+{
+  // [temp.deduct.funcaddr]/1 requires a target type to drive
+  // deduction when the argument is the address of a function
+  // template.  This helper is a no-op unless there is at least one
+  // untyped argument that might be such a template-address: the
+  // arguments-list typechecker
+  // (cpp_typecheckt::typecheck_expr for ID_arguments) defers those
+  // with a try/catch so they can be retried here once we know the
+  // callee's parameter types.
+  if(expr.function().id() != ID_cpp_name || expr.arguments().empty())
+    return;
+
+  bool any_deferred = false;
+  for(const auto &a : expr.arguments())
+    if(a.type().is_nil() || a.type().id().empty())
+    {
+      any_deferred = true;
+      break;
+    }
+  if(!any_deferred)
+    return;
+
+  // Probe the callee without fargs: per [temp.deduct.funcaddr] we
+  // need the callee's parameter types to know the target P for
+  // each deferred argument.  Ordinary (non-overloaded, non-template)
+  // functions resolve cleanly here; overloaded / template callees
+  // leave the probe nil and fall through to the default path.
+  cpp_typecheck_fargst probe_fargs;
+  exprt probe_fn = expr.function();
+  try
+  {
+    probe_fn = resolve(
+      to_cpp_name(probe_fn),
+      cpp_typecheck_resolvet::wantt::VAR,
+      probe_fargs,
+      /*fail_with_exception=*/false);
+  }
+  catch(...)
+  {
+    probe_fn.make_nil();
+  }
+  if(probe_fn.is_nil() || probe_fn.type().id() != ID_code)
+    return;
+
+  const auto &params = to_code_type(probe_fn.type()).parameters();
+  for(std::size_t i = 0; i < params.size() && i < expr.arguments().size(); ++i)
+  {
+    exprt &arg = expr.arguments()[i];
+    if(!arg.type().is_nil() && !arg.type().id().empty())
+      continue;
+
+    // Target P must be pointer-to-code per [conv.func].  When P is
+    // a reference-to-function we could apply [temp.deduct.call]/3
+    // forwarding-reference rules, but the conforming lvalue-to-
+    // rvalue / function-to-pointer conversion sequence reduces
+    // those to the same deduction.
+    const typet &ptype = params[i].type();
+    if(ptype.id() != ID_pointer && ptype.id() != ID_frontend_pointer)
+      continue;
+    if(ptype.get_sub().empty())
+      continue;
+    const typet &target_fn =
+      static_cast<const typet &>(ptype.get_sub().front());
+    if(target_fn.id() != ID_code)
+      continue;
+
+    // Argument shape: `&cpp_name` (explicit address-of of a name)
+    // or plain `cpp_name` (implicit function-to-pointer per
+    // [conv.func]/1).  Everything else is passed through to the
+    // default resolve path so real type mismatches surface as
+    // user-visible errors.
+    exprt inner = arg;
+    bool had_address_of = false;
+    if(inner.id() == ID_address_of)
+    {
+      had_address_of = true;
+      if(inner.operands().size() != 1)
+        continue;
+      inner = to_unary_expr(inner).op();
+    }
+    if(inner.id() != ID_cpp_name)
+      continue;
+
+    // Build synthetic fargs matching the target function's
+    // parameter list.  Per [temp.deduct.funcaddr]/1 these drive
+    // the [temp.deduct.type] algorithm (13.10.3.6) to deduce the
+    // template-argument that makes P == A.
+    const code_typet &target_code = to_code_type(target_fn);
+    cpp_typecheck_fargst synth_fargs;
+    synth_fargs.in_use = true;
+    for(const auto &p : target_code.parameters())
+    {
+      symbol_exprt synth{"funcaddr_target_synth", p.type()};
+      synth.set(ID_C_lvalue, true);
+      synth_fargs.operands.push_back(synth);
+    }
+
+    try
+    {
+      exprt resolved = resolve(
+        to_cpp_name(inner),
+        cpp_typecheck_resolvet::wantt::VAR,
+        synth_fargs,
+        /*fail_with_exception=*/false);
+      if(resolved.is_not_nil() && resolved.type().id() == ID_code)
+      {
+        // [conv.func]/1: function-to-pointer conversion is
+        // implicit when the target context requires it; keep
+        // the `C_implicit` marker iff the source wasn't an
+        // explicit `&`.
+        address_of_exprt addr{resolved, pointer_type(resolved.type())};
+        addr.add_source_location() = arg.source_location();
+        if(!had_address_of)
+          addr.set(ID_C_implicit, true);
+        arg = std::move(addr);
+      }
+    }
+    catch(...)
+    {
+      // [temp.deduct]/8: substitution failure is silent; if this
+      // candidate can't be deduced, leave the argument untyped
+      // and let the default resolve path report the mismatch.
+    }
+  }
+}
+
 void cpp_typecheckt::typecheck_side_effect_function_call(
   side_effect_expr_function_callt &expr)
 {
@@ -2554,106 +2682,10 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     }
   }
 
-  // [temp.deduct.funcaddr]: before resolving the function, attempt
-  // an early lookup without fargs to learn its candidate parameter
-  // types.  If the function is ordinary (non-overloaded,
-  // non-template) and an argument is an untyped `&f` / `f` where
-  // `f` names a function template (deferred by our arguments-list
-  // typechecker), retry deduction using the corresponding
-  // parameter's function-pointer type as the target.  This
-  // implements [temp.deduct.funcaddr] for the plain
-  // function-pointer target case.
-  if(expr.function().id() == ID_cpp_name && !expr.arguments().empty())
-  {
-    bool any_nil = false;
-    for(const auto &a : expr.arguments())
-      if(a.type().is_nil() || a.type().id().empty())
-      {
-        any_nil = true;
-        break;
-      }
-    if(any_nil)
-    {
-      cpp_typecheck_fargst probe_fargs;
-      exprt probe_fn = expr.function();
-      try
-      {
-        probe_fn = resolve(
-          to_cpp_name(probe_fn),
-          cpp_typecheck_resolvet::wantt::VAR,
-          probe_fargs,
-          /*fail_with_exception=*/false);
-      }
-      catch(...)
-      {
-        probe_fn.make_nil();
-      }
-      if(probe_fn.is_not_nil() && probe_fn.type().id() == ID_code)
-      {
-        const auto &params = to_code_type(probe_fn.type()).parameters();
-        for(std::size_t i = 0; i < params.size() && i < expr.arguments().size();
-            ++i)
-        {
-          exprt &arg = expr.arguments()[i];
-          if(!arg.type().is_nil() && !arg.type().id().empty())
-            continue;
-
-          const typet &ptype = params[i].type();
-          if(ptype.id() != ID_pointer && ptype.id() != ID_frontend_pointer)
-            continue;
-          if(ptype.get_sub().empty())
-            continue;
-          const typet &target_fn =
-            static_cast<const typet &>(ptype.get_sub().front());
-          if(target_fn.id() != ID_code)
-            continue;
-
-          exprt inner = arg;
-          bool had_address_of = false;
-          if(inner.id() == ID_address_of)
-          {
-            had_address_of = true;
-            if(inner.operands().size() != 1)
-              continue;
-            inner = to_unary_expr(inner).op();
-          }
-          if(inner.id() != ID_cpp_name)
-            continue;
-
-          const code_typet &target_code = to_code_type(target_fn);
-          cpp_typecheck_fargst synth_fargs;
-          synth_fargs.in_use = true;
-          for(const auto &p : target_code.parameters())
-          {
-            symbol_exprt synth{"funcaddr_target_synth", p.type()};
-            synth.set(ID_C_lvalue, true);
-            synth_fargs.operands.push_back(synth);
-          }
-
-          try
-          {
-            exprt resolved = resolve(
-              to_cpp_name(inner),
-              cpp_typecheck_resolvet::wantt::VAR,
-              synth_fargs,
-              /*fail_with_exception=*/false);
-            if(resolved.is_not_nil() && resolved.type().id() == ID_code)
-            {
-              address_of_exprt addr{resolved, pointer_type(resolved.type())};
-              addr.add_source_location() = arg.source_location();
-              if(!had_address_of)
-                addr.set(ID_C_implicit, true);
-              arg = std::move(addr);
-            }
-          }
-          catch(...)
-          {
-            // fall through — mismatch reported later
-          }
-        }
-      }
-    }
-  }
+  // Forward-deduce template-function-address arguments against
+  // target parameter types per [temp.deduct.funcaddr]/1 — see the
+  // helper's class-header comment for the rationale.
+  deduce_function_address_args_from_target(expr);
 
   typecheck_function_expr(expr.function(), cpp_typecheck_fargst(expr));
 
