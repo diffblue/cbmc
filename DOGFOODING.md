@@ -148,3 +148,13 @@ confidently test at that scale yet.
 | 1  | `parse error before 'virtual bool'`, `const exprt &` | Parse errors in specific headers — need targeted investigation. |
 
 *Updated: 2026-05-11*
+
+### 2026-05-13 filesystem stack-overflow fix
+
+Follow-up to the 2026-05-13 (duration) row: the additional duration
+members elaborated by `2e8e74f8ed` triggered a previously-masked
+mutual-recursion cycle in `resolve_template_alias` on MSVC's
+`<filesystem>` preprocessed-header run.  Commit `09e5625681` adds a
+thread-local active-set guard that breaks the cycle
+deterministically, restoring the two filesystem tests to PASS and
+bringing the MSVC preprocessed-header pass rate to **26/26**.

@@ -140,7 +140,15 @@ Locally, against `/tmp/macos-pp-new/` and `/tmp/msvc-pp-new/`
     skips just that self-referential member so the rest of
     duration's body elaborates, giving `cpp_constructor` the
     `_MyRep` data member and defaulted constructor it needs.
-    Trade-off: the newly-elaborated duration members expose a
+    Additionally, 2026-05-13 fix `09e5625681` added a thread-local active-set
+    guard in `resolve_template_alias` that breaks mutual-recursion
+    cycles between SFINAE-guarded template aliases (`add_rvalue_reference_t`
+    → `void_t` → T → back), which was the stack-overflow root cause
+    for the MSVC `<filesystem>` preprocessed-header runs.  With both
+    fixes in place, all 26 MSVC preprocessed-header tests now
+    VERIFY SUCCESSFUL.
+
+    Original trade-off (now resolved): the newly-elaborated duration members exposed a
     pre-existing latent issue in MSVC's `<filesystem>`
     preprocessed-header run (c_qualifiers_t::write crashes with
     SIGSEGV during template-arg typechecking for some
