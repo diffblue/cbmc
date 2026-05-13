@@ -1334,25 +1334,24 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
       {
         // [temp.inst]/11: when we're INSIDE an instantiation of
         // `std::chrono::duration<...>`, one of its member function
-        // return types is `common_type_t<duration>` — a self-
-        // specialized metafunction that can't resolve until
-        // `duration` itself is elaborated.  The failure to
-        // typecheck that type aborts the whole class body loop,
-        // losing subsequent data members (`_MyRep`), constructors,
-        // and operator overloads.  Tolerate this narrowly for
-        // chrono::duration only: skip the offending member
-        // declaration so the rest of duration's body elaborates.
+        // return types is `common_type_t<duration>` — a metafunction
+        // specialization keyed on the class currently being
+        // elaborated, so it cannot be resolved until duration
+        // itself is complete.  A plain throw here would abandon
+        // the remaining 15+ members of duration's body (operator
+        // overloads, static zero/min/max, and the private `_MyRep`
+        // data member), leaving `cpp_constructor` unable to find
+        // a constructor and emitting CONVERSION ERROR on any
+        // `duration d(5);` construction.
         //
-        // Broader tolerance (keeping unresolved cpp_names or
-        // tolerating failures for other classes) was tried and
-        // observed to corrupt downstream shared irepts in MSVC's
-        // `<filesystem>` headers (c_qualifiers_t::write SIGSEGV in
-        // detach()); restricting to duration avoids that
-        // regression while still unlocking chrono_basic.
-        bool is_duration_self_ref = false;
+        // Narrow the tolerance to exactly this duration self-
+        // reference case to avoid corrupting downstream shared
+        // irepts in unrelated template instances (observed
+        // breaking MSVC's `<filesystem>` preprocessed-header run).
         const std::string cur = id2string(symbol.name);
-        bool is_duration_class =
+        const bool is_duration_class =
           cur.find("::chrono::tag-duration<") != std::string::npos;
+        bool is_duration_self_ref = false;
         if(is_duration_class)
         {
           const typet &dt = declaration.type();
@@ -1361,8 +1360,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
             const auto &sub = dt.get_sub();
             if(!sub.empty() && sub.front().id() == ID_name)
             {
-              const std::string top =
-                id2string(sub.front().get(ID_identifier));
+              const std::string top = id2string(sub.front().get(ID_identifier));
               if(top == "common_type" || top == "common_type_t")
               {
                 std::function<bool(const irept &)> ref_to_self;
@@ -1373,8 +1371,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
                     const auto &s = t.get_sub();
                     if(!s.empty() && s.front().id() == ID_name)
                     {
-                      const irep_idt &bn =
-                        s.front().get(ID_identifier);
+                      const irep_idt &bn = s.front().get(ID_identifier);
                       if(!bn.empty() && id2string(bn) == "duration")
                         return true;
                     }
@@ -1404,8 +1401,8 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           {
             get_message_handler().set_message_count(
               messaget::M_ERROR, errors_before);
-            // Skip this declaration — later re-elaboration will
-            // pick it up when common_type<duration> is resolved.
+            // Skip this declaration — later re-elaboration picks
+            // it back up once common_type<duration> can resolve.
             continue;
           }
         }
