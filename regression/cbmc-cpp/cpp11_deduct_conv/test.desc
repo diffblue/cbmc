@@ -1,0 +1,45 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+^warning: ignoring
+--
+[temp.deduct.conv]/1: deducing template arguments for a
+conversion-function template.
+
+The class `any_t` has a single `template <class T> operator T()
+const` template conversion operator.  Per [temp.deduct.conv]/1, T
+should be deduced from the destination type of each conversion:
+T = int for `int as_int = a;`, T = long for `long as_long = a;`.
+
+CBMC currently rejects both with `invalid implicit conversion from
+'struct any_t' to ...`, because `user_defined_conversion_sequence`
+in `cpp_typecheck_conversions.cpp` only iterates `components()`
+for non-template cast operators.  Template conversion operators
+are stored separately by `convert_template_declaration` and never
+considered.
+
+Phase 4B of the target-type-threading refactor (see
+`doc/architectural/cpp-frontend-plan-target-type-threading.md`)
+will:
+
+* mark classes containing template conversion operators with a
+  `has_template_conversion_operator` flag, mirroring the existing
+  `has_template_constructor`;
+
+* extend `user_defined_conversion_sequence` to look up the
+  source class's template cast operators when no non-template
+  match is found, then deduce T against the destination type via
+  `instantiate_template` with `fargs.target` driving deduction.
+
+The Phase 4A target-type carrier (commit a62079307f) already
+threads the target through `fargs.target`; what remains is the
+producer-side template-conversion-operator tracking and the
+consumer-side deduction call.
+
+Promote this test to CORE in the same commit that lands the
+implementation.
