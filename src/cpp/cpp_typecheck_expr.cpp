@@ -2536,71 +2536,11 @@ exprt cpp_typecheckt::deduce_funcaddr_against_target(
   return nil_exprt{};
 }
 
-void cpp_typecheckt::deduce_function_address_args_from_target(
-  side_effect_expr_function_callt &expr)
-{
-  // [temp.deduct.funcaddr]/1 requires a target type to drive
-  // deduction when the argument is the address of a function
-  // template.  This helper is a no-op unless there is at least one
-  // untyped argument that might be such a template-address: the
-  // arguments-list typechecker
-  // (cpp_typecheckt::typecheck_expr for ID_arguments) defers those
-  // with a try/catch so they can be retried here once we know the
-  // callee's parameter types.
-  if(expr.function().id() != ID_cpp_name || expr.arguments().empty())
-    return;
-
-  bool any_deferred = false;
-  for(const auto &a : expr.arguments())
-    if(a.type().is_nil() || a.type().id().empty())
-    {
-      any_deferred = true;
-      break;
-    }
-  if(!any_deferred)
-    return;
-
-  // Probe the callee without fargs: per [temp.deduct.funcaddr] we
-  // need the callee's parameter types to know the target P for
-  // each deferred argument.  Ordinary (non-overloaded, non-template)
-  // functions resolve cleanly here; overloaded / template callees
-  // leave the probe nil and fall through to the default path.
-  cpp_typecheck_fargst probe_fargs;
-  exprt probe_fn = expr.function();
-  try
-  {
-    probe_fn = resolve(
-      to_cpp_name(probe_fn),
-      cpp_typecheck_resolvet::wantt::VAR,
-      probe_fargs,
-      /*fail_with_exception=*/false);
-  }
-  catch(...)
-  {
-    probe_fn.make_nil();
-  }
-  if(probe_fn.is_nil() || probe_fn.type().id() != ID_code)
-    return;
-
-  const auto &params = to_code_type(probe_fn.type()).parameters();
-  for(std::size_t i = 0; i < params.size() && i < expr.arguments().size(); ++i)
-  {
-    exprt &arg = expr.arguments()[i];
-    if(!arg.type().is_nil() && !arg.type().id().empty())
-      continue;
-
-    exprt deduced = deduce_funcaddr_against_target(arg, params[i].type());
-    if(deduced.is_not_nil())
-      arg = std::move(deduced);
-  }
-}
-
-/// Phase 1B target-typet overload — currently forwards to the
-/// no-target implementation.  Phase 2 will use the target to drive
-/// per-argument deduction for arguments whose parameter is a
-/// pointer-to-function ([temp.deduct.funcaddr]/1) or whose
-/// parameter is a class with a conversion-function-template
-/// ([temp.deduct.conv]/1).
+/// Phase 2 target-typet overload — currently forwards to the
+/// no-target implementation; per-argument funcaddr deduction is
+/// driven from inside that implementation via
+/// `typecheck_expr(arg, target_typet{...})` per Phase 2F.  This
+/// overload is the carrier for [temp.deduct.conv]/1 in Phase 4.
 void cpp_typecheckt::typecheck_side_effect_function_call(
   side_effect_expr_function_callt &expr,
   const target_typet &target)
