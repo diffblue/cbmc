@@ -254,6 +254,15 @@ std::string cpp_typecheckt::to_string(const typet &type)
   return type2cpp(type, *this);
 }
 
+bool cpp_typecheckt::empty_brace_value_initializes_scalar() const
+{
+  // C++ [dcl.init.list]/3.10: an empty braced-init-list `{}` for a
+  // scalar performs value-initialization, yielding the scalar's
+  // zero value.  This is a C++11 feature; CBMC accepts it in all
+  // C++ modes for consistency with other permissive extensions.
+  return true;
+}
+
 void cpp_typecheckt::typecheck_contracts()
 {
   // Collect symbols to process (avoid modifying symbol table while iterating)
