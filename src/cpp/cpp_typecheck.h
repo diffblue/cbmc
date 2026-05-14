@@ -478,6 +478,10 @@ protected:
   // expressions
   void explicit_typecast_ambiguity(exprt &);
   void typecheck_expr_main(exprt &) override;
+  /// Phase 1B target-typet overload of \ref typecheck_expr_main; the
+  /// target is currently discarded.  See
+  /// `doc/architectural/cpp-frontend-plan-target-type-threading.md`.
+  void typecheck_expr_main(exprt &, const target_typet &);
   void typecheck_expr_member(exprt &) override;
   void typecheck_expr_ptrmember(exprt &) override;
   void typecheck_expr_throw(exprt &);
@@ -491,6 +495,11 @@ protected:
   void typecheck_expr_explicit_typecast(exprt &);
   void typecheck_expr_explicit_constructor_call(exprt &);
   void typecheck_expr_address_of(exprt &) override;
+  /// Phase 1B target-typet overload of \ref typecheck_expr_address_of;
+  /// the target is currently discarded.  Phase 2 of the target-type-
+  /// threading refactor will use this to deduce
+  /// [temp.deduct.funcaddr]/1 template arguments forward.
+  void typecheck_expr_address_of(exprt &, const target_typet &);
   void typecheck_expr_dereference(exprt &) override;
   void typecheck_expr_function_identifier(exprt &) override;
   void typecheck_expr_reference_to(exprt &);
@@ -519,6 +528,14 @@ protected:
 
   void typecheck_side_effect_function_call(
     side_effect_expr_function_callt &) override;
+
+  /// Phase 1B target-typet overload of
+  /// \ref typecheck_side_effect_function_call; the target is
+  /// currently discarded.  Phase 2 will use this to thread the
+  /// target through to per-argument deduction.
+  void typecheck_side_effect_function_call(
+    side_effect_expr_function_callt &,
+    const target_typet &);
 
   /// Deduce template-function arguments from the target function type
   /// per N5008 [temp.deduct.funcaddr]/1:
