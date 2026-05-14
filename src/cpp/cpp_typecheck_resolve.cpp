@@ -2794,11 +2794,11 @@ typet cpp_typecheck_resolvet::resolve_template_alias(
   std::pair<irep_idt, irept> key{base_name, args_irep};
   if(!active.insert(key).second)
     return empty_typet{};
-  struct Guard
+  struct guardt
   {
     std::set<std::pair<irep_idt, irept>> &s;
     std::pair<irep_idt, irept> k;
-    ~Guard()
+    ~guardt()
     {
       s.erase(k);
     }

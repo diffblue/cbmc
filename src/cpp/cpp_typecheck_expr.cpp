@@ -2548,6 +2548,12 @@ void cpp_typecheckt::deduce_function_address_args_from_target(
   }
 }
 
+// This function is currently 900+ lines.  Splitting it along the
+// natural target-type boundaries (SystemC range handling, builtin
+// dispatch, target-type-driven call resolution, per-argument
+// conversion+rewriting) is tracked as a success criterion of the
+// target-type-threading plan, see
+// doc/architectural/cpp-frontend-plan-target-type-threading.md §7.6.
 void cpp_typecheckt::typecheck_side_effect_function_call(
   side_effect_expr_function_callt &expr)
 {
@@ -3609,7 +3615,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   exprt tmp = do_special_functions(expr);
   if(tmp.is_not_nil())
     expr.swap(tmp);
-}
+} // NOLINT(readability/fn_size)
 
 /// \param expr: function call whose arguments need to be checked
 void cpp_typecheckt::typecheck_function_call_arguments(
