@@ -101,6 +101,13 @@ protected:
     const typet &type,
     bool force_constant);
 
+  /// Whether the empty braced-init-list `{}` value-initializes a scalar
+  /// at the current language level.  Per C [dcl.init]/11 this requires
+  /// C23+; per C++ [dcl.init.list]/3.10 (C++11+) this is permitted.
+  /// Default implementation covers the C side; cpp_typecheckt overrides
+  /// for C++.
+  virtual bool empty_brace_value_initializes_scalar() const;
+
   virtual exprt::operandst::const_iterator do_designated_initializer(
     exprt &result,
     designatort &designator,
