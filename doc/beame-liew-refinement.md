@@ -143,3 +143,36 @@ rounds. We did not implement this in the current session.
   (Variant A). Variant B is in commit history.
 - `bench-multiplication/n3-beame-liew/` — paper's construction
   generating DRAT proofs offline.
+
+## Real-world benchmark results
+
+Run on `bench-multiplication/*.c` (excluding `fp_*` floating-point
+benchmarks) with `--refine-arithmetic --no-standard-checks` at a 30 s
+timeout:
+
+| Benchmark | Without pair detection | With pair detection | Speedup |
+|-----------|----------------------:|---------------------:|--------:|
+| `widen_mul.c` (uint16→uint32 commutativity) | timeout (>30 s) | 0.03 s | >1000× |
+| `mod_mul.c` (modular commutativity)         | 4.90 s          | 1.47 s | 3.3× |
+| `mac_equiv.c` (dot-product order)           | 0.03 s          | 0.03 s | (4 pairs detected) |
+| `matrix_mul.c` (2×2 trace invariant uint8)  | 0.03 s          | 0.03 s | (4 pairs detected) |
+| `matrix_trace_16.c` (uint16 version)        | 0.03 s          | 0.03 s | (4 pairs detected) |
+| `mul_double.c`                              | 0.03 s          | 0.03 s | (1 pair detected) |
+| `comm.c`                                    | 0.03 s          | 0.03 s | (1 pair detected) |
+| `multiply-correctness-refine` regression    | 2.70 s          | 0.21 s | 13× |
+
+Other benchmarks in the suite (`bounds.c`, `mul_monotone.c`, `square.c`,
+`hash_mul.c`, ...) verify identical runtime in both modes — no
+regression introduced where pair detection finds nothing.
+
+Out of 26 multiplication benchmarks, pair detection fires on 7 and
+provides measurable speed-up on 3 (`widen_mul`, `mod_mul`,
+`multiply-correctness-refine`). On the remaining 4 cases where pairs
+are detected, the benchmark is already trivially fast even without
+the hint.
+
+The big wins (`widen_mul`, several synthetic stored-commutativity
+patterns) are exactly the cases where CBMC's expression-level
+simplifier cannot see the commutativity because the multiplication
+results have crossed a value-laundering boundary (type cast, opaque
+function, store/load).
