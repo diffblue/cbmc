@@ -31,6 +31,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "bv_refinement.h"
 
 #include <algorithm>
+#include <cstdlib>
 #include <functional>
 #include <map>
 #include <variant>
@@ -922,6 +923,12 @@ void bv_refinementt::detect_algebraic_pairs()
   if(!config_.refine_arithmetic)
     return;
 
+  // Allow disabling pair detection at runtime for benchmarking/A-B
+  // comparison (CBMC_DISABLE_REFINE_PAIR_DETECTION=1).
+  if(const char *env = std::getenv("CBMC_DISABLE_REFINE_PAIR_DETECTION");
+     env != nullptr && env[0] != '\0' && env[0] != '0')
+    return;
+
   // Map result_bv -> approximation iterator, for BV-level operand
   // resolution.
   std::map<bvt, approximationt *> result_bv_index;
@@ -939,12 +946,14 @@ void bv_refinementt::detect_algebraic_pairs()
   // approximation. Recurses through:
   //  (1) mult sub-expressions: mult(a, b)'s factors are factors(a) ++ factors(b);
   //  (2) operand BVs that match another approximation's result_bv.
-  // The result is a sorted vector of approximation IDs (for known mults)
-  // and expression strings (for unrecognised leaves).
-  //
-  // Recognised leaf: an unrecognised operand expr; its identity is its
-  // expression. Two leaves are equal iff their exprs are equal.
-  using factor_kind = std::variant<exprt, std::size_t>;
+  // The result is a sorted vector of "factors". A factor is either an
+  // approximation pointer (for mults whose result_bv we resolved
+  // through), or an operand bit-vector (for unresolved leaves —
+  // typically symbol references). Comparing leaves at the BV level
+  // catches cases where the same value reaches two multiplications
+  // through differently-named SSA variables (e.g. inlined function
+  // parameters).
+  using factor_kind = std::variant<bvt, std::size_t>;
   std::function<void(approximationt *, std::vector<factor_kind> &)>
     flatten_mult;
   flatten_mult = [&](approximationt *m, std::vector<factor_kind> &out)
@@ -963,24 +972,20 @@ void bv_refinementt::detect_algebraic_pairs()
       {
         // Best-effort: assume the operand expr's bit-blasting is the
         // standard one. We can't easily look up the resulting bv
-        // here, so just flatten the expression syntactically.
-        std::function<void(const exprt &)> walk;
-        walk = [&out, &walk](const exprt &e)
-        {
-          if(e.id() == ID_mult && e.operands().size() == 2)
-          {
-            walk(to_binary_expr(e).op0());
-            walk(to_binary_expr(e).op1());
-          }
-          else
-          {
-            out.push_back(e);
-          }
-        };
-        walk(op_expr);
+        // here, so just flatten the expression syntactically by
+        // emitting placeholder leaves identified by the operand bv
+        // of each sub-leaf. Without per-sub-expression bvs, fall
+        // back to a conservative leaf using the entire op_bv.
+        // (This case is uncommon: it only triggers when a mult
+        // operand expression contains a nested mult that did not
+        // produce its own approximation, e.g. constant-folded
+        // sub-products, which are rare under refine_arithmetic.)
+        out.push_back(op_bv);
         return;
       }
-      out.push_back(op_expr);
+      // Leaf identified by its bit-vector (catches differently-named
+      // SSA variables with the same bit-blasted bv).
+      out.push_back(op_bv);
     };
 
     add_operand(to_binary_expr(m->expr).op0(), m->op0_bv);
@@ -991,8 +996,8 @@ void bv_refinementt::detect_algebraic_pairs()
   {
     if(a.index() != b.index())
       return a.index() < b.index();
-    if(std::holds_alternative<exprt>(a))
-      return std::get<exprt>(a) < std::get<exprt>(b);
+    if(std::holds_alternative<bvt>(a))
+      return std::get<bvt>(a) < std::get<bvt>(b);
     return std::get<std::size_t>(a) < std::get<std::size_t>(b);
   };
 
