@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <list>
 #include <set>
 #include <unordered_set>
+#include <vector>
 
 class pointer_typet;
 class reference_typet;
@@ -704,6 +705,16 @@ private:
   std::unordered_set<irep_idt> functions_being_typechecked;
   std::map<irep_idt, exprt> generic_lambda_map;
   bool support_float16_type;
+
+  /// Stack of currently-active target types for nested calls; pushed
+  /// by `typecheck_side_effect_function_call(exprt &,
+  /// const target_typet &)` and read by
+  /// `typecheck_function_expr` when constructing `fargs`.  The
+  /// resolver and conversion paths consult `fargs.target` to drive
+  /// [temp.deduct.conv]/1 deduction.  See
+  /// `doc/architectural/cpp-frontend-plan-target-type-threading.md`
+  /// Phase 4.
+  std::vector<target_typet> call_target_stack;
 };
 
 #endif // CPROVER_CPP_CPP_TYPECHECK_H
