@@ -65,6 +65,12 @@ public:
   std::string to_string(const typet &) override;
   std::string to_string(const exprt &) override;
 
+  /// In C++ the empty braced-init-list `{}` value-initializes a scalar
+  /// per [dcl.init.list]/3.10.  Strictly this is a C++11 feature, but
+  /// CBMC's earlier `--cppNN` modes already accept many C++11
+  /// constructs as permissive extensions, so we always return true.
+  bool empty_brace_value_initializes_scalar() const override;
+
   friend class cpp_typecheck_resolvet;
   friend class cpp_declarator_convertert;
 
