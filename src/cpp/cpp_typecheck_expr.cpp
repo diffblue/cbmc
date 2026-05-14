@@ -1427,15 +1427,26 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
   return false;
 }
 
-/// Phase 1B target-typet overload — currently forwards to the
-/// no-target implementation.  Phase 2 will use the target to
-/// drive [temp.deduct.funcaddr]/1 forward when the target is a
-/// pointer-to-function.
+/// Phase 2 target-typet overload — drives [temp.deduct.funcaddr]/1
+/// deduction forward when the target is a pointer-to-function and
+/// the operand is a cpp_name.  Falls through to the no-target
+/// implementation otherwise.
 void cpp_typecheckt::typecheck_expr_address_of(
   exprt &expr,
   const target_typet &target)
 {
-  (void)target;
+  if(
+    target.has_target() && expr.id() == ID_address_of &&
+    expr.operands().size() == 1 && to_unary_expr(expr).op().id() == ID_cpp_name)
+  {
+    exprt deduced = deduce_funcaddr_against_target(expr, *target.get());
+    if(deduced.is_not_nil())
+    {
+      expr.swap(deduced);
+      return;
+    }
+  }
+
   typecheck_expr_address_of(expr);
 }
 
@@ -4591,11 +4602,33 @@ void cpp_typecheckt::typecheck_expr_function_identifier(exprt &expr)
 
 void cpp_typecheckt::typecheck_expr(exprt &expr, const target_typet &target)
 {
-  // Phase 1 of the target-type-threading refactor: the API surface is
-  // in place but the target is not yet consumed.  Forward to the
-  // existing isolated implementation so behaviour is unchanged.
-  // See `doc/architectural/cpp-frontend-plan-target-type-threading.md`.
-  (void)target;
+  // Phase 2 of the target-type-threading refactor.
+  //
+  // [temp.deduct.funcaddr]/1: a plain cpp_name argument bound to a
+  // pointer-to-function parameter is an implicit function-to-pointer
+  // ([conv.func]/1) of a deduced template specialisation.  If the
+  // target is a pointer-to-function and the source is a cpp_name,
+  // try to deduce template arguments forward; on success swap in
+  // the typed `address_of(specialisation)`.
+  //
+  // The same machinery is reachable via `typecheck_expr_address_of`
+  // when the source is `&cpp_name`; here we only handle the bare
+  // form so the main dispatch sees the operand-list machinery for
+  // the `address_of` case.
+  if(target.has_target() && expr.id() == ID_cpp_name)
+  {
+    exprt deduced = deduce_funcaddr_against_target(expr, *target.get());
+    if(deduced.is_not_nil())
+    {
+      expr.swap(deduced);
+      return;
+    }
+  }
+
+  // Fall through to the no-target implementation.  Note this is
+  // also the path for the `address_of` case: the operands-then-main
+  // recursion will land in `typecheck_expr_address_of(exprt &,
+  // const target_typet &)` once Phase 2 wires the dispatcher.
   typecheck_expr(expr);
 }
 
