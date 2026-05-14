@@ -18,8 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #define REFINE_MULT_MODE 1
 #endif
 
-#include "bv_refinement.h"
-
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 #include <util/bv_arithmetic.h>
@@ -29,6 +27,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/floatbv/float_utils.h>
 #include <solvers/prop/literal_expr.h>
+
+#include "bv_refinement.h"
+
+#include <algorithm>
+#include <functional>
+#include <map>
+#include <variant>
 
 // Parameters
 #define MAX_INTEGER_UNDERAPPROX 3
@@ -883,65 +888,135 @@ bv_refinementt::add_approximation(
 }
 
 /// Identify approximations that must produce equal results by algebraic
-/// identity (currently: multiplications with swapped operands —
-/// commutativity of multiplication on bitvectors). For each detected
-/// pair, assert that their bit-vector results are equal.
+/// identity (commutativity and associativity of bit-vector
+/// multiplication). For each detected pair, assert that their
+/// bit-vector results are equal.
+///
+/// We compute a flat multiset of "leaf" factors per multiplication
+/// approximation. Operand vectors that match the result_bv of another
+/// multiplication approximation are recursively expanded; this lets
+/// us see through opaque computations that replaced an expression
+/// with a fresh variable. For example, with code like
+///   ab = store((uint64_t)a * (uint64_t)b);
+///   left = ab * (uint64_t)c;
+/// the SSA flow makes `left.op0 = ab_var` (a symbol) at the expression
+/// level, but the bit-vector `ab_var.bv` is the result_bv of the
+/// `a*b` approximation. We recover this link via BV identity.
+///
+/// Two multiplications with the same flat factor multiset must
+/// produce equal bit-vector results (mod 2^n) because integer
+/// multiplication is commutative and associative.
 ///
 /// This catches cases where CBMC's expression-level simplifier could
-/// not see the equality (e.g., the multiplication results flow through
-/// opaque function calls, array stores, or pointer dereferences before
-/// being compared). Without this hint, the SAT solver must
-/// independently bit-blast both multipliers and prove their outputs
-/// agree, which scales poorly with bitwidth. The asserted equality is
-/// constant-size (n equality clauses) and sound: for any bit-vector
-/// type, a*b mod 2^n = b*a mod 2^n.
+/// not see the equality (multiplication results flowing through
+/// opaque function calls, array stores, pointer dereferences, type
+/// casts). The asserted equality is sound and constant-size (n
+/// equality clauses per pair).
 ///
-/// Future work: emit Beame-Liew-style strip lemmas as additional
-/// redundant clauses to give the SAT solver a polynomial-size proof
-/// witness for the equality, useful when the equality is propagated
-/// through further opaque computation.
+/// Future work: emit Beame-Liew-style strip lemmas alongside the
+/// equality to give the SAT solver a polynomial-size proof witness
+/// for the equality, useful when the equality is propagated through
+/// further opaque computation.
 void bv_refinementt::detect_algebraic_pairs()
 {
   if(!config_.refine_arithmetic)
     return;
 
-  std::size_t pairs_found = 0;
-  for(auto it1 = approximations.begin(); it1 != approximations.end(); ++it1)
+  // Map result_bv -> approximation iterator, for BV-level operand
+  // resolution.
+  std::map<bvt, approximationt *> result_bv_index;
+  for(auto &a : approximations)
   {
-    if(it1->expr.id() != ID_mult || it1->expr.operands().size() != 2)
+    if(a.expr.id() != ID_mult || a.expr.operands().size() != 2)
       continue;
-    const typet &t1 = it1->expr.type();
-    if(t1.id() != ID_unsignedbv && t1.id() != ID_signedbv)
+    const typet &t = a.expr.type();
+    if(t.id() != ID_unsignedbv && t.id() != ID_signedbv)
       continue;
+    result_bv_index.emplace(a.result_bv, &a);
+  }
 
-    const auto &m1_op0 = to_binary_expr(it1->expr).op0();
-    const auto &m1_op1 = to_binary_expr(it1->expr).op1();
-
-    for(auto it2 = std::next(it1); it2 != approximations.end(); ++it2)
+  // Compute a flat multiset of leaf factors per multiplication
+  // approximation. Recurses through:
+  //  (1) mult sub-expressions: mult(a, b)'s factors are factors(a) ++ factors(b);
+  //  (2) operand BVs that match another approximation's result_bv.
+  // The result is a sorted vector of approximation IDs (for known mults)
+  // and expression strings (for unrecognised leaves).
+  //
+  // Recognised leaf: an unrecognised operand expr; its identity is its
+  // expression. Two leaves are equal iff their exprs are equal.
+  using factor_kind = std::variant<exprt, std::size_t>;
+  std::function<void(approximationt *, std::vector<factor_kind> &)>
+    flatten_mult;
+  flatten_mult = [&](approximationt *m, std::vector<factor_kind> &out)
+  {
+    auto add_operand = [&](const exprt &op_expr, const bvt &op_bv)
     {
-      if(it2->expr.id() != ID_mult || it2->expr.operands().size() != 2)
-        continue;
-      if(it2->expr.type() != t1)
-        continue;
-
-      const auto &m2_op0 = to_binary_expr(it2->expr).op0();
-      const auto &m2_op1 = to_binary_expr(it2->expr).op1();
-
-      // Same-operand pair (CSE-equivalent): m1 = a*b, m2 = a*b.
-      // This catches cases where CBMC's CSE didn't merge two
-      // multiplications with identical operands (e.g., they appear in
-      // different SSA blocks).
-      if(m1_op0 == m2_op0 && m1_op1 == m2_op1)
+      // Try to resolve operand as another mult approximation via BV.
+      auto it = result_bv_index.find(op_bv);
+      if(it != result_bv_index.end() && it->second != m)
       {
-        bv_utils.set_equal(it1->result_bv, it2->result_bv);
-        ++pairs_found;
-        continue;
+        flatten_mult(it->second, out);
+        return;
       }
-
-      // Commutative pair: m1 = a*b, m2 = b*a.
-      if(m1_op0 == m2_op1 && m1_op1 == m2_op0)
+      // Else: try to flatten the expression itself if it is mult(.,.).
+      if(op_expr.id() == ID_mult && op_expr.operands().size() == 2)
       {
-        bv_utils.set_equal(it1->result_bv, it2->result_bv);
+        // Best-effort: assume the operand expr's bit-blasting is the
+        // standard one. We can't easily look up the resulting bv
+        // here, so just flatten the expression syntactically.
+        std::function<void(const exprt &)> walk;
+        walk = [&out, &walk](const exprt &e)
+        {
+          if(e.id() == ID_mult && e.operands().size() == 2)
+          {
+            walk(to_binary_expr(e).op0());
+            walk(to_binary_expr(e).op1());
+          }
+          else
+          {
+            out.push_back(e);
+          }
+        };
+        walk(op_expr);
+        return;
+      }
+      out.push_back(op_expr);
+    };
+
+    add_operand(to_binary_expr(m->expr).op0(), m->op0_bv);
+    add_operand(to_binary_expr(m->expr).op1(), m->op1_bv);
+  };
+
+  auto factor_lt = [](const factor_kind &a, const factor_kind &b)
+  {
+    if(a.index() != b.index())
+      return a.index() < b.index();
+    if(std::holds_alternative<exprt>(a))
+      return std::get<exprt>(a) < std::get<exprt>(b);
+    return std::get<std::size_t>(a) < std::get<std::size_t>(b);
+  };
+
+  std::vector<std::pair<approximationt *, std::vector<factor_kind>>> mult_flats;
+  for(auto &entry : result_bv_index)
+  {
+    auto *m = entry.second;
+    std::vector<factor_kind> factors;
+    flatten_mult(m, factors);
+    std::sort(factors.begin(), factors.end(), factor_lt);
+    mult_flats.emplace_back(m, std::move(factors));
+  }
+
+  std::size_t pairs_found = 0;
+  for(std::size_t i = 0; i < mult_flats.size(); ++i)
+  {
+    for(std::size_t j = i + 1; j < mult_flats.size(); ++j)
+    {
+      if(mult_flats[i].first->expr.type() != mult_flats[j].first->expr.type())
+        continue;
+      if(mult_flats[i].second == mult_flats[j].second)
+      {
+        bv_utils.set_equal(
+          mult_flats[i].first->result_bv, mult_flats[j].first->result_bv);
         ++pairs_found;
       }
     }
@@ -950,7 +1025,8 @@ void bv_refinementt::detect_algebraic_pairs()
   if(pairs_found > 0)
   {
     log.status() << "BV-Refinement: detected " << pairs_found
-                 << " commutative multiplier pair(s)" << messaget::eom;
+                 << " commutative/associative multiplier pair(s)"
+                 << messaget::eom;
   }
 }
 

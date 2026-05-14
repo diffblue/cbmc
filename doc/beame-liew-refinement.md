@@ -7,19 +7,26 @@ parts:
 
 1. **Algebraic-pair detection** (committed, in
    `bv_refinementt::detect_algebraic_pairs`) — walks the approximation
-   list after `finish_eager_conversion()` and asserts result-bit-vector
-   equality between any two `mult_exprt` approximations whose operands
-   are equal up to operand swap (commutativity) or coincide outright
-   (CSE-equivalent). This catches cases where CBMC's expression-level
-   simplifier missed the equality because the multiplication results
-   flow through opaque function calls, array stores, or pointer
-   dereferences before being compared. Empirically:
+   list after `finish_eager_conversion()`. For each pair of `mult_exprt`
+   approximations, it computes a flat multiset of leaf factors,
+   recursively expanding sub-mult expressions and resolving operand
+   bit-vectors that match another approximation's `result_bv` (the
+   BV-level link that survives opaque computations like `store(x*y)`).
+   When two approximations have equal flat multisets, it asserts
+   result-bit-vector equality. This catches commutativity (`a*b ↔ b*a`),
+   common subexpressions, and associativity through stored
+   intermediates (`(a*b)*c ↔ a*(b*c)`). The asserted equality is sound
+   (`a*b mod 2^n = b*a mod 2^n` and analogously for associativity)
+   and constant-size (n equality clauses per pair).
+
+   Empirically:
 
    | Benchmark | Without pair detection | With pair detection |
    |-----------|----------------------:|---------------------:|
    | uint16 stored commutativity (`p = store(a*b); q = store(b*a); p==q`) | timeout (>60 s) | 1.23 s |
    | uint32 stored commutativity                                         | timeout (>5 min) | 1.36 s |
    | uint16 `(a*b - b*a) == 0`                                            | timeout (>60 s) | 0.03 s |
+   | uint16 stored associativity (`store((a*b)*c) == store(a*(b*c))`)    | timeout (>60 s) | 1.38 s |
    | `multiply-correctness-refine` regression test (Mode 1)               | 2.68 s          | 0.20 s |
 
 2. **`REFINE_MULT_MODE = 4`** (also committed) — adaptive-prefix
