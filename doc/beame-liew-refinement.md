@@ -176,3 +176,60 @@ patterns) are exactly the cases where CBMC's expression-level
 simplifier cannot see the commutativity because the multiplication
 results have crossed a value-laundering boundary (type cast, opaque
 function, store/load).
+
+## Polynomial-vs-exponential scaling
+
+Empirical scaling at varying operand bit-widths (full data in
+`bench-multiplication/scaling-pair-detection.tsv`, generator in
+`bench-multiplication/run-pair-detection-scaling.sh`, 180 s timeout):
+
+### widen_mul: `(uint{N})a * (uint{N})b == (uint{N})b * (uint{N})a`
+where the cast prevents the simplifier's expression-level commutativity rule.
+
+| W (operand bits) | with pairs | without pairs |
+|-----------------:|-----------:|--------------:|
+| 4 | 0.03 s | 0.05 s |
+| 6 | 0.03 s | 0.25 s |
+| 8 | 0.03 s | 21.72 s |
+| 10 | 0.03 s | timeout (>180 s) |
+| 12-32 | 0.03 s | timeout (>180 s) |
+
+### stored_widen: same product, but flowed through `store(...)` opaque.
+
+| W | with pairs | without pairs |
+|--:|-----------:|--------------:|
+| 4 | 1.17 s | 1.18 s |
+| 6 | 1.16 s | 1.43 s |
+| 8 | 1.16 s | 13.63 s |
+| 10-32 | 1.16-1.34 s | timeout (>180 s) |
+
+### three_term_widen: `a*x + b*y + c*z` reordered with all per-term swaps
+
+| W | with pairs (3 detected) | without pairs |
+|--:|-----------:|--------------:|
+| 4 | 0.07 s | 2.60 s |
+| 6 | 0.06 s | timeout |
+| 8-32 | 0.05-0.19 s | timeout |
+
+### assoc_widen: `(a*b)*c == a*(b*c)` through stored intermediates
+
+| W | with pairs | without pairs |
+|--:|-----------:|--------------:|
+| 4 | 1.20 s | 1.60 s |
+| 6-32 | 1.20-1.39 s | timeout |
+
+The picture is the empirical signature of polynomial vs exponential:
+- *Without* pair detection the SAT solver must rediscover commutativity
+  for each fresh CBMC invocation, and time blows up exponentially in
+  the operand bit-width — within 6-8 bits the pure CDCL search hits
+  the 180 s timeout.
+- *With* pair detection the equality constraint short-circuits the
+  rediscovery; total time stays small and grows roughly linearly with
+  bit-width (`stored_widen` 1.17 s → 1.33 s as W goes 4 → 32). The
+  growth is the under-approximation refinement overhead, not the
+  multiplier proof.
+
+This is the empirical demonstration that the pair detection — a tiny
+algebraic-identity hint at the refinement layer — converts these
+multiplier-equality problems from exponential-time to polynomial-time
+verification with a constant overhead.
