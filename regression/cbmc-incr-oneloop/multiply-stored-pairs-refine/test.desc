@@ -1,0 +1,16 @@
+CORE
+main.c
+--no-standard-checks --refine-arithmetic
+\[test_stored_commutativity\.assertion\.1\].*stored commutativity.*SUCCESS
+\[test_subtractive_commutativity\.assertion\.1\].*subtractive commutativity.*SUCCESS
+\[test_stored_associativity\.assertion\.1\].*stored associativity.*SUCCESS
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Tests bv_refinementt::detect_algebraic_pairs: commutativity and
+associativity of bit-vector multiplication detected through opaque
+stored intermediates. Without pair detection these assertions time
+out at uint16; with pair detection each is dispatched in seconds.
