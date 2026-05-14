@@ -579,14 +579,6 @@ protected:
     const exprt &name_or_addressof,
     const typet &target_fn_pointer_type);
 
-  /// Pre-condition: `expr.function().id() == ID_cpp_name`.
-  /// Side-effect: arguments of the form `&f` / `f` that deduce
-  /// against a function-pointer target are rewritten to
-  /// `address_of(symbol_expr(resolved_specialization))` with the
-  /// usual [conv.func] implicit-address marker preserved.
-  void deduce_function_address_args_from_target(
-    side_effect_expr_function_callt &expr);
-
   void typecheck_method_application(side_effect_expr_function_callt &);
 
 public:
