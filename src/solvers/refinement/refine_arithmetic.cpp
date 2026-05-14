@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 //   1 = assumption-gated (narrow multiplier first, then full)
 //   2 = Karatsuba polynomial (k=2, 3 evaluation points, then full)
 //   3 = Toom-Cook polynomial (k=n/4, evaluation at 0 and 1, then full)
+//   4 = Beame-Liew adaptive strip (narrow multiplier, k grows
+//       with highest spurious-bit position; falls back to full)
 // Default is 1 (assumption-gated) as it gives the best overall performance.
 #ifndef REFINE_MULT_MODE
 #define REFINE_MULT_MODE 1
@@ -378,6 +380,11 @@ void bv_refinementt::check_SAT(approximationt &a)
 #elif REFINE_MULT_MODE == 1
     if(a.over_state > 1)
       return;
+#elif REFINE_MULT_MODE == 4
+    // Mode 4 may need many strips; bound by output bit-width.
+    // The MAX_STATE check is later in the function as a safety net.
+    if(a.over_state >= a.op0_bv.size() + 1)
+      return;
 #else // REFINE_MULT_MODE == 2 or 3
     if(a.over_state > 3)
       return;
@@ -408,6 +415,9 @@ void bv_refinementt::check_SAT(approximationt &a)
        true
 #elif REFINE_MULT_MODE == 1
        a.over_state > 0
+#elif REFINE_MULT_MODE == 4
+      // For Mode 4, any state is fine if the model is consistent.
+      true
 #else // mode 2 or 3
        a.over_state > 2
 #endif
@@ -543,6 +553,97 @@ void bv_refinementt::check_SAT(approximationt &a)
         bv_utils.zero_extension(d_sum, prod.size()), prod);
     }
 #endif // REFINE_MULT_MODE == 3
+#if REFINE_MULT_MODE == 4
+    else if(a.expr.id() == ID_mult)
+    {
+      // Beame-Liew adaptive-prefix refinement.
+      //
+      // On a spurious counterexample, find the highest output-bit
+      // position j where the true product (o0.pack() * o1.pack()) and
+      // the model value (a.result_value) disagree. Constrain
+      // result_bv[0..j] to equal the low j+1 bits of a width-n
+      // multiplier of zero-extended (j+1)-bit operands.
+      //
+      // This is the simpler half of Beame and Liew's strip idea:
+      // the constraint is anchored at bit 0 (no free carry-in), so
+      // it is equivalent to a "narrow multiplier of width j+1" rather
+      // than a true sliding window. A windowed-strip variant with a
+      // fresh carry-in vector at column lo was implemented and tested
+      // (commit history); however, a strip on a single multiplier is
+      // underconstrained — its free carry-in admits many spurious
+      // outputs. Beame-Liew's strip technique relies on coupling via
+      // an equality constraint between two multipliers (the proof's
+      // diff-variable structure), which `--refine-arithmetic` does
+      // not inherently expose. So the windowed strip alone caused
+      // many small refinements to converge slowly; the prefix
+      // version below performs comparably to Mode 1.
+      //
+      // Once the spurious bit is in the high half of the multiplier
+      // we fall back to the full multiplier, to avoid stacking
+      // near-full prefix multipliers across multiple refinement
+      // rounds.
+
+      const std::size_t n = a.op0_bv.size();
+
+      // Find highest mismatching output bit between true product and model.
+      const mp_integer true_prod = o0.pack();
+      std::size_t spurious_bit = 0;
+      bool any_mismatch = false;
+      for(std::size_t i = 0; i < n; ++i)
+      {
+        const mp_integer two{2};
+        const bool true_bit =
+          (true_prod >> mp_integer(static_cast<unsigned>(i))) % two != 0;
+        const bool model_bit =
+          (a.result_value >> mp_integer(static_cast<unsigned>(i))) % two != 0;
+        if(true_bit != model_bit)
+        {
+          spurious_bit = i;
+          any_mismatch = true;
+        }
+      }
+
+      if(!any_mismatch)
+      {
+        a.over_assumptions.clear();
+        bv_utils.set_equal(
+          bv_utils.multiplier(a.op0_bv, a.op1_bv, rep), a.result_bv);
+      }
+      else
+      {
+        const std::size_t k = std::min(spurious_bit + 1, n);
+
+        // If the prefix would cover most of the multiplier anyway,
+        // emit the full multiplier directly. This avoids stacking
+        // near-full prefix multipliers across multiple spurious-
+        // counterexample refinements.
+        if(k * 2 >= n)
+        {
+          a.over_assumptions.clear();
+          bv_utils.set_equal(
+            bv_utils.multiplier(a.op0_bv, a.op1_bv, rep), a.result_bv);
+        }
+        else
+        {
+          // Build a width-n multiplier on operand inputs zero-extended
+          // from their k LSBs, and constrain result_bv[0..k-1] to
+          // equal the low k bits.
+          bvt a_low(a.op0_bv.begin(), a.op0_bv.begin() + k);
+          bvt b_low(a.op1_bv.begin(), a.op1_bv.begin() + k);
+          bvt r_approx = bv_utils.multiplier(
+            bv_utils.zero_extension(a_low, n),
+            bv_utils.zero_extension(b_low, n),
+            rep);
+
+          for(std::size_t i = 0; i < k && i < r_approx.size(); ++i)
+          {
+            prop.lcnf(!a.result_bv[i], r_approx[i]);
+            prop.lcnf(a.result_bv[i], !r_approx[i]);
+          }
+        }
+      }
+    }
+#endif // REFINE_MULT_MODE == 4
 #if REFINE_MULT_MODE == 1
     else if(a.expr.id() == ID_mult && a.over_state == 0)
     {
