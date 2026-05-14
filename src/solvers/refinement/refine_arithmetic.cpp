@@ -882,6 +882,78 @@ bv_refinementt::add_approximation(
   return a;
 }
 
+/// Identify approximations that must produce equal results by algebraic
+/// identity (currently: multiplications with swapped operands —
+/// commutativity of multiplication on bitvectors). For each detected
+/// pair, assert that their bit-vector results are equal.
+///
+/// This catches cases where CBMC's expression-level simplifier could
+/// not see the equality (e.g., the multiplication results flow through
+/// opaque function calls, array stores, or pointer dereferences before
+/// being compared). Without this hint, the SAT solver must
+/// independently bit-blast both multipliers and prove their outputs
+/// agree, which scales poorly with bitwidth. The asserted equality is
+/// constant-size (n equality clauses) and sound: for any bit-vector
+/// type, a*b mod 2^n = b*a mod 2^n.
+///
+/// Future work: emit Beame-Liew-style strip lemmas as additional
+/// redundant clauses to give the SAT solver a polynomial-size proof
+/// witness for the equality, useful when the equality is propagated
+/// through further opaque computation.
+void bv_refinementt::detect_algebraic_pairs()
+{
+  if(!config_.refine_arithmetic)
+    return;
+
+  std::size_t pairs_found = 0;
+  for(auto it1 = approximations.begin(); it1 != approximations.end(); ++it1)
+  {
+    if(it1->expr.id() != ID_mult || it1->expr.operands().size() != 2)
+      continue;
+    const typet &t1 = it1->expr.type();
+    if(t1.id() != ID_unsignedbv && t1.id() != ID_signedbv)
+      continue;
+
+    const auto &m1_op0 = to_binary_expr(it1->expr).op0();
+    const auto &m1_op1 = to_binary_expr(it1->expr).op1();
+
+    for(auto it2 = std::next(it1); it2 != approximations.end(); ++it2)
+    {
+      if(it2->expr.id() != ID_mult || it2->expr.operands().size() != 2)
+        continue;
+      if(it2->expr.type() != t1)
+        continue;
+
+      const auto &m2_op0 = to_binary_expr(it2->expr).op0();
+      const auto &m2_op1 = to_binary_expr(it2->expr).op1();
+
+      // Same-operand pair (CSE-equivalent): m1 = a*b, m2 = a*b.
+      // This catches cases where CBMC's CSE didn't merge two
+      // multiplications with identical operands (e.g., they appear in
+      // different SSA blocks).
+      if(m1_op0 == m2_op0 && m1_op1 == m2_op1)
+      {
+        bv_utils.set_equal(it1->result_bv, it2->result_bv);
+        ++pairs_found;
+        continue;
+      }
+
+      // Commutative pair: m1 = a*b, m2 = b*a.
+      if(m1_op0 == m2_op1 && m1_op1 == m2_op0)
+      {
+        bv_utils.set_equal(it1->result_bv, it2->result_bv);
+        ++pairs_found;
+      }
+    }
+  }
+
+  if(pairs_found > 0)
+  {
+    log.status() << "BV-Refinement: detected " << pairs_found
+                 << " commutative multiplier pair(s)" << messaget::eom;
+  }
+}
+
 std::string bv_refinementt::approximationt::as_string() const
 {
   return std::to_string(id_nr)+"/"+id2string(expr.id());

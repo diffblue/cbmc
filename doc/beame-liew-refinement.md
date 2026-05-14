@@ -2,8 +2,33 @@
 
 This document records an attempt to apply Beame & Liew's polynomial-size
 proof structure for array-multiplier commutativity (Beame & Liew, 2017)
-to CBMC's `--refine-arithmetic` refinement loop, as `REFINE_MULT_MODE = 4`
-in `src/solvers/refinement/refine_arithmetic.cpp`.
+to CBMC's `--refine-arithmetic` refinement loop. The work landed in two
+parts:
+
+1. **Algebraic-pair detection** (committed, in
+   `bv_refinementt::detect_algebraic_pairs`) — walks the approximation
+   list after `finish_eager_conversion()` and asserts result-bit-vector
+   equality between any two `mult_exprt` approximations whose operands
+   are equal up to operand swap (commutativity) or coincide outright
+   (CSE-equivalent). This catches cases where CBMC's expression-level
+   simplifier missed the equality because the multiplication results
+   flow through opaque function calls, array stores, or pointer
+   dereferences before being compared. Empirically:
+
+   | Benchmark | Without pair detection | With pair detection |
+   |-----------|----------------------:|---------------------:|
+   | uint16 stored commutativity (`p = store(a*b); q = store(b*a); p==q`) | timeout (>60 s) | 1.23 s |
+   | uint32 stored commutativity                                         | timeout (>5 min) | 1.36 s |
+   | uint16 `(a*b - b*a) == 0`                                            | timeout (>60 s) | 0.03 s |
+   | `multiply-correctness-refine` regression test (Mode 1)               | 2.68 s          | 0.20 s |
+
+2. **`REFINE_MULT_MODE = 4`** (also committed) — adaptive-prefix
+   over-approximation: on a spurious counterexample, find the highest
+   mismatching output bit `j` and constrain `result_bv[0..j]` via a
+   width-`n` multiplier of zero-extended `(j+1)`-bit operands. Falls
+   back to the full multiplier when `j+1 ≥ n/2`. This is the simpler
+   half of Beame-Liew's strip idea (anchored at bit 0; no free
+   carry-in). It does not by itself beat Mode 1 in practice.
 
 ## Context
 
@@ -17,6 +42,7 @@ Existing modes:
 - 1 (default): narrow multiplier (low 4 bits exact, high free) first,
   then full.
 - 2 / 3: Karatsuba / Toom-Cook polynomial-evaluation refinements.
+- 4: this work — adaptive-prefix.
 
 The Beame-Liew construction (`bench-multiplication/n3-beame-liew/`)
 proves multiplier commutativity in polynomial time using a "strip" of

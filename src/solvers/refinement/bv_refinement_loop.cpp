@@ -27,6 +27,15 @@ decision_proceduret::resultt bv_refinementt::dec_solve(const exprt &assumption)
   log.progress() << "BV-Refinement: post-processing" << messaget::eom;
   finish_eager_conversion();
 
+  // Find commutative pairs of approximations and assert result equality.
+  // For two approximations m1 = a*b and m2 = b*a (operands swapped),
+  // the results must be equal even though their bit-blastings would
+  // not be syntactically related. Asserting equality is sound and
+  // gives the SAT solver a shortcut whenever the wider context
+  // prevented expression-level simplification (e.g., results stored
+  // through opaque calls or array elements).
+  detect_algebraic_pairs();
+
   log.debug() << "Solving with " << prop.solver_text() << messaget::eom;
 
   unsigned iteration=0;

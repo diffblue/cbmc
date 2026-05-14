@@ -99,6 +99,7 @@ private:
   void get_values(approximationt &approximation);
   void check_SAT();
   void check_UNSAT();
+  void detect_algebraic_pairs();
   void arrays_overapproximated();
   void freeze_lazy_constraints();
 
