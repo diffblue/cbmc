@@ -1244,6 +1244,15 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           // and not stored as a regular component.
           symbol.type.set("has_template_constructor", true);
         }
+        else if(declaration.type().id() == "cpp-cast-operator")
+        {
+          // Phase 4B target-type-threading: mark classes with
+          // template conversion operators so
+          // `user_defined_conversion_sequence` can find them when
+          // looking for [temp.deduct.conv]/1 candidates.  Mirrors
+          // `has_template_constructor` above.
+          symbol.type.set("has_template_conversion_operator", true);
+        }
         // remember access mode
         declaration.set(ID_C_access, access);
         // Per [temp.inst]/11: failure to convert one template member
