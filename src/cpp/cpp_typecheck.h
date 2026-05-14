@@ -563,6 +563,22 @@ protected:
   /// §3.3), the probe step becomes redundant and this helper
   /// collapses into the main path.
   ///
+  /// [temp.deduct.funcaddr]/1: deduce template arguments for a
+  /// function-template name being matched against a target
+  /// pointer-to-function type.  Returns a typed `address_of` expr
+  /// on success, or nil on substitution failure
+  /// (silent per [temp.deduct]/8).  The \p source_location is
+  /// attached to the synthesised `address_of`.
+  ///
+  /// \p name_or_addressof is the source argument: either a bare
+  /// `cpp_name` (implicit function-to-pointer per [conv.func]/1)
+  /// or an explicit `&cpp_name` `address_of`.  In either case the
+  /// resulting expression is a typed `address_of` that the caller
+  /// can substitute for the original.
+  exprt deduce_funcaddr_against_target(
+    const exprt &name_or_addressof,
+    const typet &target_fn_pointer_type);
+
   /// Pre-condition: `expr.function().id() == ID_cpp_name`.
   /// Side-effect: arguments of the form `&f` / `f` that deduce
   /// against a function-pointer target are rewritten to
