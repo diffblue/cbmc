@@ -1033,6 +1033,80 @@ void bv_refinementt::detect_algebraic_pairs()
                  << " commutative/associative multiplier pair(s)"
                  << messaget::eom;
   }
+
+  // Distributivity: for each mult m_dist whose expression has the form
+  // mult(f, plus(p, q)) (or mult(plus(p, q), f)), search for two other
+  // mult approximations m_p with expr ~ mult(f, p) and m_q with
+  // expr ~ mult(f, q). If both exist, assert
+  //   m_dist.result_bv == m_p.result_bv + m_q.result_bv (mod 2^n).
+  // Sound because bit-vector multiplication distributes over addition.
+  std::size_t dist_found = 0;
+
+  // Helper: does a mult approximation's expression match mult(x, y)
+  // (in either operand order)?
+  auto mult_matches =
+    [](const approximationt &m, const exprt &x, const exprt &y)
+  {
+    const auto &m0 = to_binary_expr(m.expr).op0();
+    const auto &m1 = to_binary_expr(m.expr).op1();
+    return (m0 == x && m1 == y) || (m0 == y && m1 == x);
+  };
+
+  for(auto &m_dist : approximations)
+  {
+    if(m_dist.expr.id() != ID_mult || m_dist.expr.operands().size() != 2)
+      continue;
+    const typet &t = m_dist.expr.type();
+    if(t.id() != ID_unsignedbv && t.id() != ID_signedbv)
+      continue;
+
+    // Look for plus operand.
+    for(std::size_t side = 0; side < 2; ++side)
+    {
+      const exprt &factor = side == 0 ? to_binary_expr(m_dist.expr).op0()
+                                      : to_binary_expr(m_dist.expr).op1();
+      const exprt &sum = side == 0 ? to_binary_expr(m_dist.expr).op1()
+                                   : to_binary_expr(m_dist.expr).op0();
+      if(sum.id() != ID_plus || sum.operands().size() != 2)
+        continue;
+      const exprt &p = to_binary_expr(sum).op0();
+      const exprt &q = to_binary_expr(sum).op1();
+
+      // Find m_p (factor*p) and m_q (factor*q).
+      approximationt *m_p = nullptr;
+      approximationt *m_q = nullptr;
+      for(auto &candidate : approximations)
+      {
+        if(&candidate == &m_dist)
+          continue;
+        if(
+          candidate.expr.id() != ID_mult ||
+          candidate.expr.operands().size() != 2)
+          continue;
+        if(candidate.expr.type() != t)
+          continue;
+        if(!m_p && mult_matches(candidate, factor, p))
+          m_p = &candidate;
+        else if(!m_q && mult_matches(candidate, factor, q))
+          m_q = &candidate;
+      }
+
+      if(m_p != nullptr && m_q != nullptr)
+      {
+        // Assert m_dist.result_bv == m_p.result_bv + m_q.result_bv.
+        bvt sum_bv = bv_utils.add(m_p->result_bv, m_q->result_bv);
+        bv_utils.set_equal(m_dist.result_bv, sum_bv);
+        ++dist_found;
+        break;
+      }
+    }
+  }
+
+  if(dist_found > 0)
+  {
+    log.status() << "BV-Refinement: detected " << dist_found
+                 << " distributive multiplier triple(s)" << messaget::eom;
+  }
 }
 
 std::string bv_refinementt::approximationt::as_string() const
