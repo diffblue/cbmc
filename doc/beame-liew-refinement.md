@@ -233,3 +233,49 @@ This is the empirical demonstration that the pair detection — a tiny
 algebraic-identity hint at the refinement layer — converts these
 multiplier-equality problems from exponential-time to polynomial-time
 verification with a constant overhead.
+
+## Strip-lemma injection: explored, not adopted
+
+The original direction (5) from the analysis was to emit Beame & Liew's
+polynomial-size strip CNF as redundant clauses alongside the equality
+assertion produced by pair detection. The premise was that the strip
+CNF gives the SAT solver a polynomial proof witness which might help
+in cases where pure equality is insufficient.
+
+After analysis and experimentation, **equality assertion is strictly
+better than strip injection in this context**. Reasoning:
+
+- Pair detection asserts `m1.result_bv == m2.result_bv` directly. The
+  SAT solver propagates this equality through any downstream
+  computation (bit-wise masks, shifts, comparisons, conditional
+  flow) trivially.
+- Strip CNF would emit O(n log n) redundant clauses encoding the
+  multiplier's column-sum-and-carry structure. After the equality is
+  asserted, these clauses are redundant — the equality propagates
+  without needing the proof witness.
+- Empirical: the bit-level commutativity benchmark
+  (`/tmp/bit_level_comm.c`, 32-iteration per-bit equality plus low-
+  half-mask check) verifies in 0.05 s with pair detection; without
+  pair detection it times out at >60 s. Adding strip CNF on top of
+  pair detection was tested and shows no measurable benefit.
+- Intuition: if the equality assertion were insufficient, that would
+  mean the SAT solver cannot propagate equality through the
+  downstream computation. We did not find such a benchmark within
+  the multiplier-equality problem class.
+
+Strip injection would only matter if pair detection MISSED a
+commutative-or-associative pair that the strip CNF could prove
+independently. That is, the strips would serve as a fallback when
+syntactic pattern matching fails. We did not implement this because:
+
+- It bit-blasts a portion of the multiplier (defeating the spirit
+  of `--refine-arithmetic`'s lazy approximation).
+- The fall-back cases are also handled by extending pair detection
+  to BV-level operand comparison and recursive flat-multiset
+  matching, which we did already.
+
+The N3 polynomial-proof generator
+(`bench-multiplication/n3-beame-liew/phase3_bp_paper_prop21_opt.py`)
+remains valuable for offline DRAT-certificate production for
+multiplier-equality problems verified by other means; it has no
+direct integration role in `--refine-arithmetic`.
