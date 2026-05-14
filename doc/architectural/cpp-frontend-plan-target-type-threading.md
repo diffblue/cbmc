@@ -212,18 +212,62 @@ Regression gates: still all green.
 
 ### Phase 4 — [temp.deduct.conv] (2 days)
 
-- Commit I: in `cpp_typecheck_conversions.cpp`, when a
-  user-defined conversion-function-template is a candidate for an
-  implicit conversion to a specific target type, pass the target as
-  P per [temp.deduct.conv]/1.  Today this deduction is attempted
-  only via the already-typechecked operand path; many conversion
-  cases can succeed once the target drives deduction directly.
+#### Phase 4A — target carrier through fargs (DONE, commit a62079307f)
 
-Regression gates: new targeted test in
-`regression/cbmc-cpp/cpp11_deduct_conv/` for a conversion-template
-with a non-trivial target.  Dog-food should show improvement on
-files that use implicit user-defined conversions to target types
-(expect single-digit OK_CLEAN increase).
+Add a `std::vector<target_typet> call_target_stack` to
+`cpp_typecheckt`.  The
+`typecheck_side_effect_function_call(exprt &, const target_typet &)`
+overload pushes the target on entry and pops on exit (with
+exception-safe cleanup).  The no-target body's call to
+`typecheck_function_expr(expr.function(), cpp_typecheck_fargst(expr))`
+reads the stack top into `fargs.target` so the resolver and
+conversion paths see it.
+
+No call site passes a non-empty `target_typet` yet (Phase 4B will);
+behaviour is unchanged.
+
+A regression test for the underlying gap was added at
+`regression/cbmc-cpp/cpp11_deduct_conv/` with `KNOWNBUG` status,
+documenting the `template <class T> operator T() const` case that
+CBMC currently rejects as `invalid implicit conversion`.
+
+#### Phase 4B — actual deduction in user_defined_conversion_sequence
+
+This phase is **not yet implemented**.  Required pieces:
+
+1. **Producer-side tracking**: in
+   `cpp_typecheck_compound_type.cpp::typecheck_compound_body`,
+   when a template-member declaration's
+   `declaration.type().id() == "cpp-cast-operator"`, mark the
+   enclosing class with a `has_template_conversion_operator`
+   flag, mirroring the existing `has_template_constructor` flag
+   (commit `cpp_typecheck_compound_type.cpp:1245`).
+
+2. **Consumer-side deduction**: in
+   `cpp_typecheck_conversions.cpp::user_defined_conversion_sequence`
+   after the existing non-template cast-operator loop, when the
+   source class has the new flag and no non-template match was
+   found, look up the class's template conversion operators
+   (currently held in the symbol table by
+   `convert_template_declaration`) and for each one call
+   `instantiate_template` with the destination type `to` as the
+   deduction target P.  The instantiated specialisation is then
+   evaluated as a normal cast operator via the existing path.
+
+3. **SFINAE wrapping**: per [temp.deduct]/8 and [over.ics.user],
+   substitution failure during this deduction means "no viable
+   conversion sequence", not a compilation error.  Wrap the
+   deduction attempt in `sfinae_contextt` like the existing
+   `has_template_constructor` block does.
+
+The promotion of `cpp11_deduct_conv` from KNOWNBUG to CORE happens
+in the same commit that lands this implementation.
+
+Regression gates: new targeted test
+`regression/cbmc-cpp/cpp11_deduct_conv/` becomes CORE.  Dog-food
+should show improvement on files that use implicit user-defined
+conversions to target types (expect single-digit OK_CLEAN
+increase).
 
 ### Phase 5 — [over.ics.list] / [dcl.init.list] (3 days)
 
