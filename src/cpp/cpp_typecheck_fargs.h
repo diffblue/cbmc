@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/expr.h>
 
+#include "cpp_target_type.h"
+
 class code_typet;
 class cpp_typecheckt;
 class side_effect_expr_function_callt;
@@ -24,11 +26,26 @@ public:
   bool in_use, has_object;
   exprt::operandst operands;
 
+  /// Optional target type for the enclosing context, propagated to
+  /// the resolver so that template-argument deduction has access to
+  /// the call site's context-driven type ([temp.deduct.funcaddr]/1,
+  /// [temp.deduct.conv]/1).  An empty (default) instance carries no
+  /// constraint; this matches the pre-target-type-threading
+  /// behaviour.  See `cpp_target_type.h` and
+  /// `doc/architectural/cpp-frontend-plan-target-type-threading.md`.
+  ///
+  /// Phase 1C of the refactor: the field is in place but the
+  /// resolver does not yet read it; subsequent phases add the
+  /// consumption sites.
+  target_typet target;
+
   // has_object indicates that the first element of
   // 'operands' is the 'this' pointer (with the object type,
   // not pointer to object type)
 
-  cpp_typecheck_fargst():in_use(false), has_object(false) { }
+  cpp_typecheck_fargst() : in_use(false), has_object(false)
+  {
+  }
 
   bool has_class_type() const;
 
