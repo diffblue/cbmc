@@ -4539,6 +4539,16 @@ void cpp_typecheckt::typecheck_expr_function_identifier(exprt &expr)
   c_typecheck_baset::typecheck_expr_function_identifier(expr);
 }
 
+void cpp_typecheckt::typecheck_expr(exprt &expr, const target_typet &target)
+{
+  // Phase 1 of the target-type-threading refactor: the API surface is
+  // in place but the target is not yet consumed.  Forward to the
+  // existing isolated implementation so behaviour is unchanged.
+  // See `doc/architectural/cpp-frontend-plan-target-type-threading.md`.
+  (void)target;
+  typecheck_expr(expr);
+}
+
 void cpp_typecheckt::typecheck_expr(exprt &expr)
 {
   bool override_constantness = expr.get_bool(ID_C_override_constantness);

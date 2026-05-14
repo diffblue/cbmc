@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_parse_tree.h"
 #include "cpp_scopes.h"
+#include "cpp_target_type.h"
 #include "cpp_typecheck_resolve.h"
 #include "template_map.h"
 
@@ -86,6 +87,18 @@ public:
   }
 
   void typecheck_expr(exprt &) override;
+
+  /// Variant of \ref typecheck_expr that propagates an optional target
+  /// type for use by deduction and conversion paths
+  /// ([temp.deduct.funcaddr]/1, [temp.deduct.conv]/1,
+  /// [over.ics.list], [dcl.init.list]).  See `cpp_target_type.h`.
+  ///
+  /// Phase 1 of the target-type-threading refactor: the parameter is
+  /// accepted but unused — every callee sees the existing isolated
+  /// typecheck.  Subsequent phases consume the target in the relevant
+  /// per-kind handlers.  See
+  /// `doc/architectural/cpp-frontend-plan-target-type-threading.md`.
+  void typecheck_expr(exprt &expr, const target_typet &target);
 
   bool cpp_is_pod(const typet &type) const;
 
