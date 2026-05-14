@@ -2536,17 +2536,26 @@ exprt cpp_typecheckt::deduce_funcaddr_against_target(
   return nil_exprt{};
 }
 
-/// Phase 2 target-typet overload — currently forwards to the
-/// no-target implementation; per-argument funcaddr deduction is
-/// driven from inside that implementation via
-/// `typecheck_expr(arg, target_typet{...})` per Phase 2F.  This
-/// overload is the carrier for [temp.deduct.conv]/1 in Phase 4.
+/// Phase 4 target-typet overload — pushes the target on the
+/// call-target stack so that the no-target body's `fargs` carries
+/// it through to the resolver and the conversion paths.
+/// `fargs.target` is consulted by Phase 4B's [temp.deduct.conv]/1
+/// implementation in `user_defined_conversion_sequence`.
 void cpp_typecheckt::typecheck_side_effect_function_call(
   side_effect_expr_function_callt &expr,
   const target_typet &target)
 {
-  (void)target;
-  typecheck_side_effect_function_call(expr);
+  call_target_stack.push_back(target);
+  try
+  {
+    typecheck_side_effect_function_call(expr);
+  }
+  catch(...)
+  {
+    call_target_stack.pop_back();
+    throw;
+  }
+  call_target_stack.pop_back();
 }
 
 // This function is currently 900+ lines.  Splitting it along the
@@ -2739,7 +2748,16 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     }
   }
 
-  typecheck_function_expr(expr.function(), cpp_typecheck_fargst(expr));
+  // Build fargs for overload resolution.  Carry the active target
+  // type from the call-target stack so the resolver and conversion
+  // paths can use it to drive [temp.deduct.conv]/1 deduction (see
+  // Phase 4B in the target-type-threading plan).  The stack is set
+  // by the `typecheck_side_effect_function_call(exprt &,
+  // const target_typet &)` overload.
+  cpp_typecheck_fargst call_fargs(expr);
+  if(!call_target_stack.empty())
+    call_fargs.target = call_target_stack.back();
+  typecheck_function_expr(expr.function(), call_fargs);
 
   if(expr.function().id() == ID_pod_constructor)
   {
