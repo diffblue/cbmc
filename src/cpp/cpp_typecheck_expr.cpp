@@ -2750,9 +2750,54 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   }
 
   // Forward-deduce template-function-address arguments against
-  // target parameter types per [temp.deduct.funcaddr]/1 — see the
-  // helper's class-header comment for the rationale.
-  deduce_function_address_args_from_target(expr);
+  // target parameter types per [temp.deduct.funcaddr]/1.  Probe the
+  // callee to obtain its parameter types (when resolvable without
+  // fargs); for each deferred argument that's a `cpp_name` /
+  // `&cpp_name`, retry the typecheck with the matching parameter as
+  // the target, which routes to `deduce_funcaddr_against_target`
+  // via `typecheck_expr(exprt &, const target_typet &)`.
+  if(expr.function().id() == ID_cpp_name && !expr.arguments().empty())
+  {
+    bool any_deferred = false;
+    for(const auto &a : expr.arguments())
+      if(a.type().is_nil() || a.type().id().empty())
+      {
+        any_deferred = true;
+        break;
+      }
+
+    if(any_deferred)
+    {
+      cpp_typecheck_fargst probe_fargs;
+      exprt probe_fn = expr.function();
+      try
+      {
+        probe_fn = resolve(
+          to_cpp_name(probe_fn),
+          cpp_typecheck_resolvet::wantt::VAR,
+          probe_fargs,
+          /*fail_with_exception=*/false);
+      }
+      catch(...)
+      {
+        probe_fn.make_nil();
+      }
+
+      if(probe_fn.is_not_nil() && probe_fn.type().id() == ID_code)
+      {
+        const auto &params = to_code_type(probe_fn.type()).parameters();
+        for(std::size_t i = 0; i < params.size() && i < expr.arguments().size();
+            ++i)
+        {
+          exprt &arg = expr.arguments()[i];
+          if(!arg.type().is_nil() && !arg.type().id().empty())
+            continue;
+
+          typecheck_expr(arg, target_typet{params[i].type()});
+        }
+      }
+    }
+  }
 
   typecheck_function_expr(expr.function(), cpp_typecheck_fargst(expr));
 
@@ -4604,31 +4649,33 @@ void cpp_typecheckt::typecheck_expr(exprt &expr, const target_typet &target)
 {
   // Phase 2 of the target-type-threading refactor.
   //
-  // [temp.deduct.funcaddr]/1: a plain cpp_name argument bound to a
-  // pointer-to-function parameter is an implicit function-to-pointer
-  // ([conv.func]/1) of a deduced template specialisation.  If the
-  // target is a pointer-to-function and the source is a cpp_name,
-  // try to deduce template arguments forward; on success swap in
-  // the typed `address_of(specialisation)`.
-  //
-  // The same machinery is reachable via `typecheck_expr_address_of`
-  // when the source is `&cpp_name`; here we only handle the bare
-  // form so the main dispatch sees the operand-list machinery for
-  // the `address_of` case.
-  if(target.has_target() && expr.id() == ID_cpp_name)
+  // [temp.deduct.funcaddr]/1: a cpp_name argument bound to a
+  // pointer-to-function parameter — either as a bare cpp_name
+  // (implicit function-to-pointer per [conv.func]/1) or as an
+  // explicit `&cpp_name` — drives template-argument deduction
+  // forward from the target.  On success, swap in the typed
+  // `address_of(specialisation)`; on failure, fall through to the
+  // isolated path so real mismatches surface as user-visible
+  // errors.
+  if(target.has_target())
   {
-    exprt deduced = deduce_funcaddr_against_target(expr, *target.get());
-    if(deduced.is_not_nil())
+    const bool is_funcaddr_shape =
+      expr.id() == ID_cpp_name ||
+      (expr.id() == ID_address_of && expr.operands().size() == 1 &&
+       to_unary_expr(expr).op().id() == ID_cpp_name);
+
+    if(is_funcaddr_shape)
     {
-      expr.swap(deduced);
-      return;
+      exprt deduced = deduce_funcaddr_against_target(expr, *target.get());
+      if(deduced.is_not_nil())
+      {
+        expr.swap(deduced);
+        return;
+      }
     }
   }
 
-  // Fall through to the no-target implementation.  Note this is
-  // also the path for the `address_of` case: the operands-then-main
-  // recursion will land in `typecheck_expr_address_of(exprt &,
-  // const target_typet &)` once Phase 2 wires the dispatcher.
+  // Fall through to the no-target implementation.
   typecheck_expr(expr);
 }
 
