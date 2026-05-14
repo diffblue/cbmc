@@ -51,6 +51,18 @@ bool cpp_typecheckt::find_parent(
   return false;
 }
 
+/// Phase 1B target-typet overload — currently forwards to the
+/// no-target implementation.  Subsequent phases consume the target
+/// to drive [temp.deduct.funcaddr]/1 deduction at the address-of
+/// and cpp_name layers.
+void cpp_typecheckt::typecheck_expr_main(
+  exprt &expr,
+  const target_typet &target)
+{
+  (void)target;
+  typecheck_expr_main(expr);
+}
+
 /// Called after the operands are done
 void cpp_typecheckt::typecheck_expr_main(exprt &expr)
 {
@@ -1415,6 +1427,18 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
   return false;
 }
 
+/// Phase 1B target-typet overload — currently forwards to the
+/// no-target implementation.  Phase 2 will use the target to
+/// drive [temp.deduct.funcaddr]/1 forward when the target is a
+/// pointer-to-function.
+void cpp_typecheckt::typecheck_expr_address_of(
+  exprt &expr,
+  const target_typet &target)
+{
+  (void)target;
+  typecheck_expr_address_of(expr);
+}
+
 void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
 {
   if(expr.operands().size()!=1)
@@ -2546,6 +2570,20 @@ void cpp_typecheckt::deduce_function_address_args_from_target(
       // and let the default resolve path report the mismatch.
     }
   }
+}
+
+/// Phase 1B target-typet overload — currently forwards to the
+/// no-target implementation.  Phase 2 will use the target to drive
+/// per-argument deduction for arguments whose parameter is a
+/// pointer-to-function ([temp.deduct.funcaddr]/1) or whose
+/// parameter is a class with a conversion-function-template
+/// ([temp.deduct.conv]/1).
+void cpp_typecheckt::typecheck_side_effect_function_call(
+  side_effect_expr_function_callt &expr,
+  const target_typet &target)
+{
+  (void)target;
+  typecheck_side_effect_function_call(expr);
 }
 
 // This function is currently 900+ lines.  Splitting it along the
