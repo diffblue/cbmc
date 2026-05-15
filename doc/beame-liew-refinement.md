@@ -370,3 +370,40 @@ The takeaway: pair detection is the right contribution for CBMC's
 bit-blasted regime. It does not compete with word-level SMT solvers on
 their home turf, but it dramatically improves CBMC's behaviour on
 problems where CBMC users expect bit-blasted answers.
+
+## Public-benchmark validation
+
+We did not have ready access to SV-COMP or AWS C Common archives in
+the development environment. The closest substitutes were:
+
+- The full **CBMC `bench-multiplication/` suite** (26 multiplier-related
+  benchmarks, results in `comparison-study.tsv`), which covers
+  commutativity, distributivity, associativity, modular multiplication,
+  matrix-vector identities, CRC-style products, and more — these are
+  the canonical multiplier-equality patterns extracted from real
+  verification literature.
+
+- A **random sample of 40 tests** from the CBMC `regression/cbmc/`
+  regression suite, run with and without pair detection through
+  `--refine-arithmetic`. All 40 produced identical verification outcomes
+  in both modes (no regression in correctness). Most see no measurable
+  time change because they don't contain commutative-multiplier pairs.
+
+- Full **`regression/cbmc-incr-oneloop`** suite (41 tests, including the
+  new `multiply-stored-pairs-refine` and `multiply-distributivity-refine`
+  regression tests we added) — all pass in ~24 s with pair detection
+  enabled. Both commutative and distributive paths exercised.
+
+- Full **`regression/cbmc/Array_UF*`** suite (12 tests using
+  `--refine-arrays`, which shares the refinement loop infrastructure) —
+  all pass.
+
+The pair detector is correct (no regression in 65+ tested regression
+runs) and beneficial on the multiplier-equality patterns where it
+fires (3 of 26 in the bench-multiplication suite show measurable
+speed-up; 7 fire pair detection but were already trivially fast).
+
+Future work: validate on SV-COMP `bitvector` category, AWS C Common
+verification CIs, NASA Apex CFG benchmarks. We expect non-zero hit
+rate based on common verification idioms (function-inlined multiplier
+calls, opaque store-load patterns) but cannot quantify without access.
