@@ -26,8 +26,8 @@ int main()
   any_t a;
   a.stored = 42;
 
-  int x = a;  // Per [temp.deduct]/8: deduction fails; conversion
-              // is rejected.
+  int x = a; // Per [temp.deduct]/8: deduction fails; conversion
+             // is rejected.
   (void)x;
 
   return 0;
