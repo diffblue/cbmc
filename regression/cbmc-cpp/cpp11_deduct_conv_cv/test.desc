@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+^\*\* 0 of \d+ failed
+--
+^CONVERSION ERROR$
+^warning: ignoring
+--
+[temp.deduct.conv]/4: top-level cv-qualifiers on A are ignored
+during deduction.  This test verifies that conversion to a
+top-level-const target deduces the unqualified type and the
+resulting conversion succeeds.

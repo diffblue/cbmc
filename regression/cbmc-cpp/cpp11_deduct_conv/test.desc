@@ -1,45 +1,28 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
+^\*\* 0 of \d+ failed
 --
 ^CONVERSION ERROR$
 ^warning: ignoring
 --
 [temp.deduct.conv]/1: deducing template arguments for a
-conversion-function template.
+conversion-function template by matching the template's return
+type (P) against the destination conversion-type-id (A).
 
-The class `any_t` has a single `template <class T> operator T()
-const` template conversion operator.  Per [temp.deduct.conv]/1, T
-should be deduced from the destination type of each conversion:
-T = int for `int as_int = a;`, T = long for `long as_long = a;`.
+Phase 4B-2 of the target-type-threading refactor (commit
+introducing `deduce_conversion_template` in
+`cpp_typecheck_conversions.cpp`) implements this for the
+single-template-parameter form `template<class T> operator T()`.
 
-CBMC currently rejects both with `invalid implicit conversion from
-'struct any_t' to ...`, because `user_defined_conversion_sequence`
-in `cpp_typecheck_conversions.cpp` only iterates `components()`
-for non-template cast operators.  Template conversion operators
-are stored separately by `convert_template_declaration` and never
-considered.
+The class `any_t` has a `template <class T> operator T() const`
+template conversion operator.  Per [temp.deduct.conv]/1, T is
+deduced from the destination type at the point of conversion:
 
-Phase 4B of the target-type-threading refactor (see
-`doc/architectural/cpp-frontend-plan-target-type-threading.md`)
-will:
+  int  as_int  = a;  // deduces T = int
+  long as_long = a;  // deduces T = long
 
-* mark classes containing template conversion operators with a
-  `has_template_conversion_operator` flag, mirroring the existing
-  `has_template_constructor`;
-
-* extend `user_defined_conversion_sequence` to look up the
-  source class's template cast operators when no non-template
-  match is found, then deduce T against the destination type via
-  `instantiate_template` with `fargs.target` driving deduction.
-
-The Phase 4A target-type carrier (commit a62079307f) already
-threads the target through `fargs.target`; what remains is the
-producer-side template-conversion-operator tracking and the
-consumer-side deduction call.
-
-Promote this test to CORE in the same commit that lands the
-implementation.
+Both `__CPROVER_assert(as_*  == 42, ...)` checks must succeed.

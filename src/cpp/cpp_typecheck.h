@@ -629,6 +629,28 @@ public:
   bool user_defined_conversion_sequence(
     const exprt &expr, const typet &type, exprt &new_expr, unsigned &rank);
 
+  /// Phase 4B: per [temp.deduct.conv]/1, attempt to deduce template
+  /// arguments for a conversion-function template by unifying the
+  /// template's return type (P) with the destination type (A).
+  /// Called from `user_defined_conversion_sequence` after the
+  /// non-template cast-operator loop.  Iterates template cast
+  /// operators of the source class, runs SFINAE-guarded deduction
+  /// per [temp.deduct]/8, instantiates the matching specialization,
+  /// then builds the same kind of member-function call expression as
+  /// the non-template path.  Per [over.ics.user]/3 the second
+  /// standard conversion sequence must be Exact Match.
+  ///
+  /// Returns `true` on a successful unambiguous deduction, with
+  /// `new_expr` set to the typechecked conversion expression and
+  /// `rank` incremented by the second standard conversion's rank.
+  /// Returns `false` if no candidate is found, deduction fails for
+  /// every candidate, or multiple candidates succeed (ambiguity).
+  bool deduce_conversion_template(
+    const exprt &expr,
+    const typet &to,
+    exprt &new_expr,
+    unsigned &rank);
+
   bool reference_related(const exprt &expr, const reference_typet &type) const;
 
   bool reference_compatible(
