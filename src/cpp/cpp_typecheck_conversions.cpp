@@ -874,14 +874,135 @@ bool cpp_typecheckt::standard_conversion_sequence(
 /// (set by `typecheck_compound_body` in
 /// `cpp_typecheck_compound_type.cpp`).  Iterates template cast
 /// operators of the source class, runs SFINAE-guarded deduction per
-/// [temp.deduct]/8, instantiates the matching specialization, then
-/// builds the same kind of member-function call expression as the
-/// non-template path.
+/// [temp.deduct]/8, applies [temp.deduct.partial]/3.2 partial
+/// ordering to disambiguate when multiple specialisations would
+/// be viable for the same destination type, instantiates the
+/// most-specialised (or unique) match, then builds the same kind
+/// of member-function call expression as the non-template path.
 ///
 /// Per [over.ics.user]/3 the second standard conversion sequence
 /// after the user-defined conversion shall have Exact Match rank,
 /// which is enforced here by requiring the post-deduction standard
 /// conversion to add zero rank.
+///
+/// Returns `true` on a successful unambiguous deduction (after
+/// partial ordering), with `new_expr` set to the typechecked
+/// conversion expression and `rank` incremented by the second
+/// standard conversion's rank.  Returns `false` if no candidate is
+/// found, deduction fails for every candidate, or partial ordering
+/// cannot pick a unique most-specialised candidate (genuine
+/// ambiguity).
+namespace
+{
+/// Result of [temp.deduct.conv]/1 deduction for a single template
+/// cast operator candidate.  Used in two phases: first a deduction-
+/// only collection pass, then partial ordering across the survivors,
+/// then instantiation of the unique winner.
+struct conversion_deduction_resultt
+{
+  /// The template symbol that survived deduction.
+  const symbolt *cand_sym;
+  /// The deduced specialisation arguments.
+  cpp_template_args_tct guessed_args;
+  /// The candidate's return-type pattern (P), already with
+  /// [temp.deduct.conv]/2 reference-stripping applied so it can be
+  /// compared via [temp.deduct.partial]/5 + /7.
+  typet P_for_partial_ordering;
+};
+} // namespace
+
+/// [temp.deduct.partial]/3.2: in conversion-function context, the
+/// types used for partial ordering are the return types of the two
+/// conversion function templates.  Returns `true` if F is at-least-
+/// as-specialised as G under this rule.
+///
+/// Per [temp.deduct.partial]/2 + /8: deduction uses F's *transformed*
+/// type as the argument (A) and G's *original* type as the parameter
+/// (P).  If deduction of G's template parameters succeeds against
+/// F's transformed pattern, then F's type is at-least-as-specialised
+/// as G's type.  In CBMC, since template parameters carry their
+/// containing scope's prefix in their identifier, F's and G's
+/// parameters never collide in `template_map`, so the
+/// "transformation" reduces to "treat F's parameters as concrete
+/// inert types, deduce G's parameters only".
+///
+/// /5 (drop reference) and /7 (drop top-level cv) are applied to
+/// both P and A before the deduction.
+bool cpp_typecheckt::conversion_template_at_least_as_specialised(
+  const cpp_declarationt &F,
+  const cpp_declarationt &G,
+  const irep_idt &F_scope_id,
+  const irep_idt &G_scope_id)
+{
+  if(F.declarators().empty() || G.declarators().empty())
+    return false;
+  const cpp_declaratort &F_dcl = F.declarators()[0];
+  const cpp_declaratort &G_dcl = G.declarators()[0];
+  if(F_dcl.name().get_sub().size() < 2 || G_dcl.name().get_sub().size() < 2)
+    return false;
+
+  // Per /2 + /8: A = F's transformed, P = G's original; the
+  // deduction binds G's parameters.  In CBMC's representation we
+  // can use the original return types directly because F's and G's
+  // parameter symbols are disjoint (different scope prefixes).
+  typet A = static_cast<const typet &>(F_dcl.name().get_sub()[1]);
+  typet P = static_cast<const typet &>(G_dcl.name().get_sub()[1]);
+
+  // [temp.deduct.partial]/5: drop reference on both.
+  if(is_reference(P))
+    P = to_reference_type(P).base_type();
+  if(is_reference(A))
+    A = to_reference_type(A).base_type();
+
+  // [temp.deduct.partial]/7: drop top-level cv on both.
+  auto drop_top_cv = [](typet &t)
+  {
+    c_qualifierst q;
+    q.read(t);
+    if(q.is_constant || q.is_volatile || q.is_restricted || q.is_atomic)
+    {
+      c_qualifierst empty;
+      empty.write(t);
+    }
+  };
+  drop_top_cv(P);
+  drop_top_cv(A);
+
+  cpp_save_scopet save_scope{cpp_scopes};
+  cpp_saved_template_mapt saved_map{template_map};
+
+  try
+  {
+    sfinae_contextt sfinae_guard{*this};
+    template_map.clear();
+    // Mark only G's parameters as deducible — that's whose pattern
+    // sits in P.  F's parameters appear in A but are not in
+    // template_map, so the deduction treats them as concrete
+    // (the "transformed type" trick).
+    template_map.build_unassigned(G.template_type());
+
+    // Move into G's template scope so cpp_name lookup of G's
+    // parameters during deduction resolves correctly.
+    auto scope_it = cpp_scopes.id_map.find(G_scope_id);
+    if(scope_it != cpp_scopes.id_map.end())
+      cpp_scopes.go_to(static_cast<cpp_scopet &>(*scope_it->second));
+
+    cpp_typecheck_resolvet resolver{*this};
+    resolver.guess_template_args(P, A);
+
+    cpp_template_args_tct guessed =
+      template_map.build_template_args(G.template_type());
+    return !guessed.has_unassigned();
+  }
+  catch(...)
+  {
+    return false;
+  }
+
+  (void)F_scope_id; // currently unused; reserved for future
+                    // synthetic-type substitution into F's pattern.
+}
+
 bool cpp_typecheckt::deduce_conversion_template(
   const exprt &expr,
   const typet &to,
@@ -936,15 +1057,15 @@ bool cpp_typecheckt::deduce_conversion_template(
   if(candidate_names.empty())
     return false;
 
-  bool found = false;
-  exprt best_expr = nil_exprt{};
-  unsigned best_rank = 0;
-
+  // Phase 1: deduce-only pass.  For each candidate, run [temp.deduct.conv]/1
+  // deduction and remember successful candidates.  Instantiation is
+  // deferred until after partial ordering picks a unique winner, so
+  // we don't pollute the symbol table with side-effects of losing
+  // candidates.
+  std::vector<conversion_deduction_resultt> survivors;
+  std::vector<irep_idt> survivor_scope_ids; // parallel: F_scope_id per survivor
   for(const irep_idt &cand_name : candidate_names)
   {
-    // The template symbol is fetched fresh on each iteration since
-    // an earlier instantiate_template may have invalidated the
-    // symbol_table::symbols reference.
     const symbolt *cand_sym = symbol_table.lookup(cand_name);
     if(cand_sym == nullptr)
       continue;
@@ -1009,12 +1130,12 @@ bool cpp_typecheckt::deduce_conversion_template(
       }
     }
 
-    // SFINAE-guarded deduction + instantiation per [temp.deduct]/8.
+    // SFINAE-guarded deduction per [temp.deduct]/8.
     cpp_save_scopet save_scope{cpp_scopes};
     cpp_saved_template_mapt saved_map{template_map};
 
-    const symbolt *instance = nullptr;
     cpp_template_args_tct guessed_args;
+    bool deduction_ok = false;
 
     try
     {
@@ -1034,104 +1155,173 @@ bool cpp_typecheckt::deduce_conversion_template(
       guessed_args =
         template_map.build_template_args(cand_decl.template_type());
 
-      if(guessed_args.has_unassigned())
-        continue; // [temp.deduct]/8: deduction failed silently.
-
-      instance = &instantiate_template(
-        expr.source_location(), *cand_sym, guessed_args, guessed_args);
+      if(!guessed_args.has_unassigned())
+        deduction_ok = true;
     }
     catch(...)
     {
       // [temp.deduct]/8: SFINAE — substitution failure in the
       // immediate context is a deduction failure, not an error.
-      continue;
     }
 
-    if(instance == nullptr)
+    if(!deduction_ok)
       continue;
 
-    // The instantiated symbol's type is `code_typet` with one
-    // implicit `this` parameter (a pointer).
-    if(instance->type.id() != ID_code)
-      continue;
-    const code_typet &inst_code = to_code_type(instance->type);
-    if(inst_code.parameters().size() != 1)
-      continue;
-    if(!inst_code.parameters().front().get_this())
-      continue;
+    conversion_deduction_resultt res;
+    res.cand_sym = cand_sym;
+    res.guessed_args = std::move(guessed_args);
+    res.P_for_partial_ordering = P;
+    survivors.push_back(std::move(res));
+    survivor_scope_ids.push_back(cand_name);
+  }
 
-    // Mark the instantiated cast-operator component (added to the
-    // class's components vector by `instantiate_template` ->
-    // `typecheck_compound_declarator`) so the non-template branch of
-    // `user_defined_conversion_sequence` skips it on subsequent
-    // calls.  Otherwise it would shadow a fresh deduction for a
-    // different destination type ([over.ics.user]/3 + [over.match.conv]):
-    // a previous deduction for `int` should not satisfy a later
-    // request for `long` via the non-template int->long path.
+  if(survivors.empty())
+    return false;
+
+  // Phase 2: [temp.deduct.partial]/3.2 + [over.match.best]/2.
+  // Find the unique most-specialised survivor.  When there are
+  // multiple survivors, run the at-least-as-specialised check
+  // pairwise; a candidate "dominates" if it is at-least-as-
+  // specialised as every other and *not* every other is at-
+  // least-as-specialised as it.
+  std::size_t winner_idx = 0;
+  if(survivors.size() > 1)
+  {
+    auto more_specialised_than = [&](std::size_t i, std::size_t j) -> bool
     {
-      symbolt *class_sym_w = symbol_table.get_writeable(class_id_with_tag);
-      if(class_sym_w != nullptr && class_sym_w->type.id() == ID_struct)
+      // i is more-specialised than j iff
+      //   i at-least-as-specialised as j AND not (j at-least-as-
+      //   specialised as i).
+      const cpp_declarationt &Fi =
+        to_cpp_declaration(survivors[i].cand_sym->type);
+      const cpp_declarationt &Fj =
+        to_cpp_declaration(survivors[j].cand_sym->type);
+      const bool i_aas_j = conversion_template_at_least_as_specialised(
+        Fi, Fj, survivor_scope_ids[i], survivor_scope_ids[j]);
+      const bool j_aas_i = conversion_template_at_least_as_specialised(
+        Fj, Fi, survivor_scope_ids[j], survivor_scope_ids[i]);
+      return i_aas_j && !j_aas_i;
+    };
+
+    // Find a candidate that is more-specialised than every other.
+    bool unique_winner = false;
+    for(std::size_t i = 0; i < survivors.size(); ++i)
+    {
+      bool dominates_all = true;
+      for(std::size_t j = 0; j < survivors.size(); ++j)
       {
-        struct_typet &cls_struct = to_struct_type(class_sym_w->type);
-        for(auto &component : cls_struct.components())
+        if(i == j)
+          continue;
+        if(!more_specialised_than(i, j))
         {
-          if(component.get_name() == instance->name)
-          {
-            component.set("#is_template_specialization", true);
-            break;
-          }
+          dominates_all = false;
+          break;
         }
+      }
+      if(dominates_all)
+      {
+        winner_idx = i;
+        unique_winner = true;
+        break;
       }
     }
 
-    // Build the conversion expression as a direct call to the
-    // instantiated symbol.  We bypass the cpp_name-driven member-
-    // call resolver because the freshly-instantiated cast operator,
-    // although registered as a component of the source class by
-    // `instantiate_template`, is *not* registered in the class
-    // cpp_scope under a base_name lookup-friendly key.  Building the
-    // call from `cpp_symbol_expr(*instance)` with the source object
-    // as the implicit `this` argument is direct and avoids the
-    // resolver.
-    address_of_exprt this_arg{expr};
-    {
-      const typet &this_param_type = inst_code.parameters().front().type();
-      // The cast operator's `this` parameter is a (possibly
-      // cv-qualified) pointer to the source class.  Adopt that
-      // exact type for the address-of so subsequent equality and
-      // qualification checks succeed.
-      this_arg.type() = this_param_type;
-    }
-
-    side_effect_expr_function_callt func_expr{
-      cpp_symbol_expr(*instance),
-      {this_arg},
-      inst_code.return_type(),
-      expr.source_location()};
-
-    // [over.ics.user]/3: the second standard conversion sequence
-    // shall have Exact Match rank.  In CBMC's encoding, Exact Match
-    // adds zero rank (identity / qualification conversion).
-    unsigned post_rank = 0;
-    exprt post_expr;
-    if(!standard_conversion_sequence(func_expr, to, post_expr, post_rank))
-      continue;
-    if(post_rank > 0)
-      continue;
-
-    if(found)
-      return false; // ambiguous — multiple viable specialisations.
-
-    found = true;
-    best_expr.swap(post_expr);
-    best_rank = post_rank;
+    if(!unique_winner)
+      return false; // genuine ambiguity — no most-specialised candidate.
   }
 
-  if(!found)
+  // Phase 3: instantiate the unique winner and validate the second
+  // standard conversion sequence (Exact Match per [over.ics.user]/3).
+  const symbolt *cand_sym = survivors[winner_idx].cand_sym;
+  cpp_template_args_tct guessed_args =
+    std::move(survivors[winner_idx].guessed_args);
+
+  const symbolt *instance = nullptr;
+  try
+  {
+    sfinae_contextt sfinae_guard{*this};
+    instance = &instantiate_template(
+      expr.source_location(), *cand_sym, guessed_args, guessed_args);
+  }
+  catch(...)
+  {
+    return false;
+  }
+
+  if(instance == nullptr)
     return false;
 
-  rank += best_rank;
-  new_expr.swap(best_expr);
+  // The instantiated symbol's type is `code_typet` with one
+  // implicit `this` parameter (a pointer).
+  if(instance->type.id() != ID_code)
+    return false;
+  const code_typet &inst_code = to_code_type(instance->type);
+  if(inst_code.parameters().size() != 1)
+    return false;
+  if(!inst_code.parameters().front().get_this())
+    return false;
+
+  // Mark the instantiated cast-operator component (added to the
+  // class's components vector by `instantiate_template` ->
+  // `typecheck_compound_declarator`) so the non-template branch of
+  // `user_defined_conversion_sequence` skips it on subsequent
+  // calls.  Otherwise it would shadow a fresh deduction for a
+  // different destination type ([over.ics.user]/3 + [over.match.conv]):
+  // a previous deduction for `int` should not satisfy a later
+  // request for `long` via the non-template int->long path.
+  {
+    symbolt *class_sym_w = symbol_table.get_writeable(class_id_with_tag);
+    if(class_sym_w != nullptr && class_sym_w->type.id() == ID_struct)
+    {
+      struct_typet &cls_struct = to_struct_type(class_sym_w->type);
+      for(auto &component : cls_struct.components())
+      {
+        if(component.get_name() == instance->name)
+        {
+          component.set("#is_template_specialization", true);
+          break;
+        }
+      }
+    }
+  }
+
+  // Build the conversion expression as a direct call to the
+  // instantiated symbol.  We bypass the cpp_name-driven member-
+  // call resolver because the freshly-instantiated cast operator,
+  // although registered as a component of the source class by
+  // `instantiate_template`, is *not* registered in the class
+  // cpp_scope under a base_name lookup-friendly key.  Building the
+  // call from `cpp_symbol_expr(*instance)` with the source object
+  // as the implicit `this` argument is direct and avoids the
+  // resolver.
+  address_of_exprt this_arg{expr};
+  {
+    const typet &this_param_type = inst_code.parameters().front().type();
+    // The cast operator's `this` parameter is a (possibly
+    // cv-qualified) pointer to the source class.  Adopt that
+    // exact type for the address-of so subsequent equality and
+    // qualification checks succeed.
+    this_arg.type() = this_param_type;
+  }
+
+  side_effect_expr_function_callt func_expr{
+    cpp_symbol_expr(*instance),
+    {this_arg},
+    inst_code.return_type(),
+    expr.source_location()};
+
+  // [over.ics.user]/3: the second standard conversion sequence
+  // shall have Exact Match rank.  In CBMC's encoding, Exact Match
+  // adds zero rank (identity / qualification conversion).
+  unsigned post_rank = 0;
+  exprt post_expr;
+  if(!standard_conversion_sequence(func_expr, to, post_expr, post_rank))
+    return false;
+  if(post_rank > 0)
+    return false;
+
+  rank += post_rank;
+  new_expr.swap(post_expr);
   return true;
 }
 
