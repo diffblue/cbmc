@@ -865,6 +865,276 @@ bool cpp_typecheckt::standard_conversion_sequence(
   return true;
 }
 
+/// Phase 4B: per [temp.deduct.conv]/1, deduce template arguments
+/// for a conversion-function template by unifying the template's
+/// return type (P) with the destination type (A).
+///
+/// Called from `user_defined_conversion_sequence` for the case where
+/// the source class has a `has_template_conversion_operator` flag
+/// (set by `typecheck_compound_body` in
+/// `cpp_typecheck_compound_type.cpp`).  Iterates template cast
+/// operators of the source class, runs SFINAE-guarded deduction per
+/// [temp.deduct]/8, instantiates the matching specialization, then
+/// builds the same kind of member-function call expression as the
+/// non-template path.
+///
+/// Per [over.ics.user]/3 the second standard conversion sequence
+/// after the user-defined conversion shall have Exact Match rank,
+/// which is enforced here by requiring the post-deduction standard
+/// conversion to add zero rank.
+bool cpp_typecheckt::deduce_conversion_template(
+  const exprt &expr,
+  const typet &to,
+  exprt &new_expr,
+  unsigned &rank)
+{
+  if(expr.type().id() != ID_struct_tag)
+    return false;
+
+  const struct_typet &from_followed =
+    follow_tag(to_struct_tag_type(expr.type()));
+
+  if(!from_followed.get_bool("has_template_conversion_operator"))
+    return false;
+
+  // Determine the class scope prefix used for member symbols.  The
+  // symbol_table keys members with the class's `pretty_name`-style
+  // prefix (e.g., `any_t::`), not the struct-tag identifier
+  // (`tag-any_t`).  Get the prefix from the tag symbol's pretty_name.
+  const irep_idt &class_id_with_tag =
+    to_struct_tag_type(expr.type()).get_identifier();
+  const symbolt *class_sym = symbol_table.lookup(class_id_with_tag);
+  if(class_sym == nullptr)
+    return false;
+  const std::string class_prefix = id2string(class_sym->pretty_name) + "::";
+
+  // Collect candidate template-cast-operator symbols up front: the
+  // symbol_table grows during instantiation, which would invalidate
+  // an in-place iterator.
+  std::vector<irep_idt> candidate_names;
+  for(const auto &name_sym : symbol_table.symbols)
+  {
+    const symbolt &sym = name_sym.second;
+
+    const std::string sym_name = id2string(sym.name);
+    if(sym_name.compare(0, class_prefix.size(), class_prefix) != 0)
+      continue;
+
+    if(sym.type.id() != ID_cpp_declaration)
+      continue;
+    const cpp_declarationt &decl = to_cpp_declaration(sym.type);
+    if(!decl.is_template())
+      continue;
+    if(decl.type().id() != "cpp-cast-operator")
+      continue;
+    if(decl.declarators().empty())
+      continue;
+
+    candidate_names.push_back(sym.name);
+  }
+
+  if(candidate_names.empty())
+    return false;
+
+  bool found = false;
+  exprt best_expr = nil_exprt{};
+  unsigned best_rank = 0;
+
+  for(const irep_idt &cand_name : candidate_names)
+  {
+    // The template symbol is fetched fresh on each iteration since
+    // an earlier instantiate_template may have invalidated the
+    // symbol_table::symbols reference.
+    const symbolt *cand_sym = symbol_table.lookup(cand_name);
+    if(cand_sym == nullptr)
+      continue;
+
+    const cpp_declarationt cand_decl = to_cpp_declaration(cand_sym->type);
+    const cpp_declaratort &declarator = cand_decl.declarators()[0];
+
+    // P = return type of the conversion-function template per
+    // [temp.deduct.conv]/1.  For a template cast operator, the
+    // return type is stored in the second sub-element of the
+    // declarator name (parsed from `operator <type-id>()`).  The
+    // stored representation is unprocessed, with template
+    // parameters embedded as cpp_names — exactly the input shape
+    // `guess_template_args` expects.
+    if(declarator.name().get_sub().size() < 2)
+      continue;
+    typet P = static_cast<const typet &>(declarator.name().get_sub()[1]);
+    typet A = to;
+
+    // [temp.deduct.conv]/2: P-reference -> use referred type.
+    if(is_reference(P))
+      P = to_reference_type(P).base_type();
+
+    // [temp.deduct.conv]/4: A-reference -> use referred type.
+    const bool A_was_reference = is_reference(A);
+    if(A_was_reference)
+      A = to_reference_type(A).base_type();
+
+    // [temp.deduct.conv]/3: A non-reference -> P array→pointer,
+    // function→pointer, drop top-level cv from P.
+    if(!A_was_reference)
+    {
+      if(P.id() == ID_array)
+      {
+        const typet element = to_array_type(P).element_type();
+        P = pointer_type(element);
+      }
+      else if(P.id() == ID_code)
+      {
+        P = pointer_type(P);
+      }
+      else
+      {
+        c_qualifierst pq;
+        pq.read(P);
+        if(pq.is_constant || pq.is_volatile || pq.is_restricted || pq.is_atomic)
+        {
+          c_qualifierst empty;
+          empty.write(P);
+        }
+      }
+    }
+
+    // [temp.deduct.conv]/4 cont.: A cv-qualified -> drop top-level cv.
+    {
+      c_qualifierst aq;
+      aq.read(A);
+      if(aq.is_constant || aq.is_volatile || aq.is_restricted || aq.is_atomic)
+      {
+        c_qualifierst empty;
+        empty.write(A);
+      }
+    }
+
+    // SFINAE-guarded deduction + instantiation per [temp.deduct]/8.
+    cpp_save_scopet save_scope{cpp_scopes};
+    cpp_saved_template_mapt saved_map{template_map};
+
+    const symbolt *instance = nullptr;
+    cpp_template_args_tct guessed_args;
+
+    try
+    {
+      sfinae_contextt sfinae_guard{*this};
+
+      template_map.build_unassigned(cand_decl.template_type());
+
+      // Move into the template's spec scope so cpp_name lookup
+      // during deduction finds the template parameters.
+      auto scope_it = cpp_scopes.id_map.find(cand_name);
+      if(scope_it != cpp_scopes.id_map.end())
+        cpp_scopes.go_to(static_cast<cpp_scopet &>(*scope_it->second));
+
+      cpp_typecheck_resolvet resolver{*this};
+      resolver.guess_template_args(P, A);
+
+      guessed_args =
+        template_map.build_template_args(cand_decl.template_type());
+
+      if(guessed_args.has_unassigned())
+        continue; // [temp.deduct]/8: deduction failed silently.
+
+      instance = &instantiate_template(
+        expr.source_location(), *cand_sym, guessed_args, guessed_args);
+    }
+    catch(...)
+    {
+      // [temp.deduct]/8: SFINAE — substitution failure in the
+      // immediate context is a deduction failure, not an error.
+      continue;
+    }
+
+    if(instance == nullptr)
+      continue;
+
+    // The instantiated symbol's type is `code_typet` with one
+    // implicit `this` parameter (a pointer).
+    if(instance->type.id() != ID_code)
+      continue;
+    const code_typet &inst_code = to_code_type(instance->type);
+    if(inst_code.parameters().size() != 1)
+      continue;
+    if(!inst_code.parameters().front().get_this())
+      continue;
+
+    // Mark the instantiated cast-operator component (added to the
+    // class's components vector by `instantiate_template` ->
+    // `typecheck_compound_declarator`) so the non-template branch of
+    // `user_defined_conversion_sequence` skips it on subsequent
+    // calls.  Otherwise it would shadow a fresh deduction for a
+    // different destination type ([over.ics.user]/3 + [over.match.conv]):
+    // a previous deduction for `int` should not satisfy a later
+    // request for `long` via the non-template int->long path.
+    {
+      symbolt *class_sym_w = symbol_table.get_writeable(class_id_with_tag);
+      if(class_sym_w != nullptr && class_sym_w->type.id() == ID_struct)
+      {
+        struct_typet &cls_struct = to_struct_type(class_sym_w->type);
+        for(auto &component : cls_struct.components())
+        {
+          if(component.get_name() == instance->name)
+          {
+            component.set("#is_template_specialization", true);
+            break;
+          }
+        }
+      }
+    }
+
+    // Build the conversion expression as a direct call to the
+    // instantiated symbol.  We bypass the cpp_name-driven member-
+    // call resolver because the freshly-instantiated cast operator,
+    // although registered as a component of the source class by
+    // `instantiate_template`, is *not* registered in the class
+    // cpp_scope under a base_name lookup-friendly key.  Building the
+    // call from `cpp_symbol_expr(*instance)` with the source object
+    // as the implicit `this` argument is direct and avoids the
+    // resolver.
+    address_of_exprt this_arg{expr};
+    {
+      const typet &this_param_type = inst_code.parameters().front().type();
+      // The cast operator's `this` parameter is a (possibly
+      // cv-qualified) pointer to the source class.  Adopt that
+      // exact type for the address-of so subsequent equality and
+      // qualification checks succeed.
+      this_arg.type() = this_param_type;
+    }
+
+    side_effect_expr_function_callt func_expr{
+      cpp_symbol_expr(*instance),
+      {this_arg},
+      inst_code.return_type(),
+      expr.source_location()};
+
+    // [over.ics.user]/3: the second standard conversion sequence
+    // shall have Exact Match rank.  In CBMC's encoding, Exact Match
+    // adds zero rank (identity / qualification conversion).
+    unsigned post_rank = 0;
+    exprt post_expr;
+    if(!standard_conversion_sequence(func_expr, to, post_expr, post_rank))
+      continue;
+    if(post_rank > 0)
+      continue;
+
+    if(found)
+      return false; // ambiguous — multiple viable specialisations.
+
+    found = true;
+    best_expr.swap(post_expr);
+    best_rank = post_rank;
+  }
+
+  if(!found)
+    return false;
+
+  rank += best_rank;
+  new_expr.swap(best_expr);
+  return true;
+}
+
 /// User-defined conversion sequence
 /// \par parameters: A typechecked expression 'expr', a destination
 /// type 'type'.
@@ -1134,6 +1404,18 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
       if(!component.get_bool(ID_is_cast_operator))
         continue;
 
+      // Skip cast operators that originated from a template
+      // specialisation: per [over.match.conv] the candidate set
+      // for a given destination type is the *non-template* cast
+      // operators plus freshly-deduced specialisations.  A
+      // specialisation that exists only because an *earlier*
+      // user-defined conversion already deduced and instantiated
+      // it must not shadow a fresh deduction for a different
+      // destination type.  Mark applied below in
+      // `deduce_conversion_template`.
+      if(component.get_bool("#is_template_specialization"))
+        continue;
+
       const code_typet &comp_type = to_code_type(component.type());
       DATA_INVARIANT(
         comp_type.parameters().size() == 1, "expected exactly one parameter");
@@ -1178,6 +1460,20 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
     }
     if(found)
       return true;
+
+    // No non-template cast operator matched.  If the source class
+    // has template conversion operators, try [temp.deduct.conv]/1
+    // deduction against the destination type.
+    {
+      unsigned tmpl_rank = 0;
+      exprt tmpl_expr;
+      if(deduce_conversion_template(expr, to, tmpl_expr, tmpl_rank))
+      {
+        rank += tmpl_rank;
+        new_expr.swap(tmpl_expr);
+        return true;
+      }
+    }
   }
 
   return new_expr.is_not_nil();
