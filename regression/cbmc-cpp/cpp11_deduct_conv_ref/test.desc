@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+^\*\* 0 of \d+ failed
+--
+^CONVERSION ERROR$
+^bad reference initializer$
+^warning: ignoring
+^.*FAILURE$
+--
+[temp.deduct.conv]/2 + /4 + [over.match.ref]: template
+conversion-operator deduction for reference targets.  When the
+parameter's return type is a reference, /2 strips it; when the
+destination is a reference, /4 strips it.  Deduction then runs on
+the unwrapped types.  After instantiation the resulting reference
+must bind directly to the source object (verified by mutating
+through the reference and observing the change in the source).
