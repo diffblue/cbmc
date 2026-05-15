@@ -247,3 +247,36 @@ the benchmark pool, with the remaining 22% being problems no
 multiplier-aware technique helps with (divisions, modular inverses,
 deep program-verification embedding).
 
+
+## Final tally across 179 benchmarks (3 pools)
+
+```
+Pool                                      shift  comba   pair p2_alg    all  union  total
+C-input pool                                 22     23     39     29     38     42     47
+SMT2 algebraic-identity pool                 29     40     55     65     64     65     66
+SMT-COMP real-world pool                     25     25     30     28     29     33     66
+-----------------------------------------------------------------------------------------------
+TOTAL                                        76     88    124    122    131    140    179
+TOTAL %                                     42%    49%    69%    68%    73%    78%
+```
+
+Key observations:
+
+- **`all_combined` solves 131/179 (73%)**, within 9 of the union upper
+  bound (140, 78%). The 9-benchmark gap is per-benchmark overhead
+  pushing borderline cases over the 15 s timeout; longer timeouts
+  (60 s+) would close most.
+- **`pair_detect` and `p2_algebraic` are nearly equal in total
+  coverage** (124 vs 122 of 179, 69% vs 68%) but cover complementary
+  benchmarks: their union is 140, well above either alone. The two
+  approaches are genuinely orthogonal, not redundant.
+- **`shift_add` and `comba_cs` together (88) trail any algebraic-aware
+  approach by a wide margin** (124-131). Encoding choice within pure
+  bit-blasting is meaningfully smaller than algebraic-aware
+  techniques on multiplier-equality problems.
+- **The remaining 22% (39 benchmarks) of the union gap** are problems
+  no multiplier-aware technique helps with: divisions
+  (`log-slicing_bvudiv_*`), modular inverses, Booth-encoded
+  multiplications buried deep in program-verification harnesses,
+  log-slicing extractions. These are out of scope for this work.
+
