@@ -653,6 +653,35 @@ public:
     exprt &new_expr,
     unsigned &rank);
 
+  /// Phase 4B: companion to `deduce_conversion_template` for
+  /// reference-binding contexts ([dcl.init.ref], handled in
+  /// `reference_binding`).  When the destination type is a
+  /// reference, the shared deduction helper is invoked with the
+  /// reference type as `to`; [temp.deduct.conv]/2 + /4 strip the
+  /// references on P and A before deduction.  After instantiation
+  /// the post-conversion check is `reference_compatible` rather
+  /// than `standard_conversion_sequence` per [over.match.ref].
+  bool deduce_conversion_template_for_reference(
+    const exprt &expr,
+    const reference_typet &reference_type,
+    exprt &new_expr,
+    unsigned &rank);
+
+  /// Phase 4B core helper.  Iterates template cast operators of the
+  /// source class of `expr`, runs SFINAE-guarded [temp.deduct.conv]
+  /// deduction against `to`, applies partial ordering across
+  /// survivors, and instantiates the unique most-specialised
+  /// candidate.  Both value and reference destination types are
+  /// accepted; the deduction transformations handle the difference.
+  ///
+  /// Returns the instantiated function symbol on success, or
+  /// `nullptr` on no-candidate / total deduction failure / genuine
+  /// ambiguity.  The caller is responsible for building the call
+  /// expression and validating the post-instantiation conversion
+  /// sequence appropriate to the calling context.
+  const symbolt *
+  find_template_conversion_specialisation(const exprt &expr, const typet &to);
+
   /// [temp.deduct.partial]/3.2: in conversion-function context,
   /// returns `true` iff conversion-function template F is at-least-
   /// as-specialised as G when their return types serve as the P/A
