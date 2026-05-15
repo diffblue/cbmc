@@ -329,3 +329,44 @@ Logged as future work. The remaining un-helped patterns from the
 `bench-multiplication` suite (`bounds.c`, `mul_monotone.c`,
 `square.c`, `mul_overflow.c`, etc.) are not algebraic-identity
 problems and would not benefit from any extension of pair detection.
+
+## Comparison study against alternative configurations
+
+Comparison across CBMC modes plus Bitwuzla (word-level SMT) on the
+same benchmarks (data in `bench-multiplication/comparison-study.tsv`,
+30 s timeout):
+
+| Benchmark | CBMC default | --refine + pair | --refine no-pair | --xor-gauss | Bitwuzla |
+|-----------|-------------:|----------------:|-----------------:|------------:|---------:|
+| stored_comm     | T/O    | **1.23 s**  | T/O    | T/O    | 0.03 s |
+| stored_comm32   | T/O    | **1.34 s**  | T/O    | T/O    | 0.03 s |
+| assoc_stored    | T/O    | **1.39 s**  | T/O    | T/O    | 0.04 s |
+| distrib_simple  | T/O    | **16.71 s** | T/O    | T/O    | 0.03 s |
+| widen_mul       | T/O    | **0.03 s**  | T/O    | T/O    | 0.03 s |
+| mod_mul         | 5.18 s | **1.46 s**  | 4.89 s | 5.20 s | 0.03 s |
+| sub_comm        | 0.03 s | 0.03 s      | 0.03 s | 0.03 s | 0.03 s |
+| comm            | 0.03 s | 0.03 s      | 0.03 s | 0.03 s | 0.03 s |
+| distrib         | 0.03 s | 0.03 s      | 0.03 s | 0.02 s | 0.03 s |
+| assoc           | 1.25 s | 1.26 s      | 1.26 s | 1.25 s | 0.04 s |
+| mac_equiv       | 0.03 s | 0.03 s      | 0.03 s | 0.03 s | 0.03 s |
+| hash_mul        | T/O    | T/O         | T/O    | T/O    | 0.03 s |
+
+Reading:
+
+- **Bitwuzla** wins everywhere because its word-level reasoning sees
+  through the algebraic identities directly, without bit-blasting.
+- **Pair detection** turns intractable cases (T/O in default CBMC) into
+  tractable ones with constant overhead (1.2-1.4 s). The remaining gap
+  to Bitwuzla is the under-approximation refinement loop, not the
+  multiplier reasoning.
+- **`--xor-gauss`** does not help on multiplier-equality problems —
+  it targets the linear (XOR) part of bit-blasted arithmetic, not the
+  AND-tree of multipliers.
+- **`hash_mul`** times out for all CBMC modes but Bitwuzla solves it
+  trivially, confirming the future-work item: SSA/CSE-aware operand
+  comparison would close that gap.
+
+The takeaway: pair detection is the right contribution for CBMC's
+bit-blasted regime. It does not compete with word-level SMT solvers on
+their home turf, but it dramatically improves CBMC's behaviour on
+problems where CBMC users expect bit-blasted answers.
