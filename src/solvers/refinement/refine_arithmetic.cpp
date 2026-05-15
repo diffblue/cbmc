@@ -1011,19 +1011,27 @@ void bv_refinementt::detect_algebraic_pairs()
     mult_flats.emplace_back(m, std::move(factors));
   }
 
+  // Group approximations by (type, flat factor multiset). For each
+  // equivalence class with n members, assert (n-1) equalities chaining
+  // them together — quadratic in n is wasteful (the SAT solver
+  // recovers the rest by transitivity). On benchmarks like varscale_k6
+  // with ~700 same-multiset multiplications, the pairwise version
+  // produced 250,000+ equality clauses that overwhelmed CaDiCaL.
+  std::map<std::pair<typet, std::vector<factor_kind>>, approximationt *>
+    canonical_rep;
   std::size_t pairs_found = 0;
-  for(std::size_t i = 0; i < mult_flats.size(); ++i)
+  for(auto &entry : mult_flats)
   {
-    for(std::size_t j = i + 1; j < mult_flats.size(); ++j)
+    auto key = std::make_pair(entry.first->expr.type(), entry.second);
+    auto it = canonical_rep.find(key);
+    if(it == canonical_rep.end())
     {
-      if(mult_flats[i].first->expr.type() != mult_flats[j].first->expr.type())
-        continue;
-      if(mult_flats[i].second == mult_flats[j].second)
-      {
-        bv_utils.set_equal(
-          mult_flats[i].first->result_bv, mult_flats[j].first->result_bv);
-        ++pairs_found;
-      }
+      canonical_rep.emplace(std::move(key), entry.first);
+    }
+    else
+    {
+      bv_utils.set_equal(it->second->result_bv, entry.first->result_bv);
+      ++pairs_found;
     }
   }
 

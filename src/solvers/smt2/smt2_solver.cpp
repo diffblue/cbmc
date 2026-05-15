@@ -9,11 +9,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message.h>
 #include <util/namespace.h>
 #include <util/simplify_expr.h>
-#include <cstdlib>
 #include <util/symbol_table.h>
 
 #include <solvers/flattening/boolbv.h>
+#include <solvers/refinement/bv_refinement.h>
 #include <solvers/sat/satcheck.h>
+
+#include <cstdlib>
 #ifdef SATCHECK_CADICAL
 #  include <solvers/sat/satcheck_cadical.h>
 #endif
@@ -464,7 +466,8 @@ int solver(
   bool use_cadical,
   bool use_cryptominisat,
   const std::string &multiplier_encoding_arg,
-  const std::string &adder_encoding_str)
+  const std::string &adder_encoding_str,
+  bool refine_arithmetic)
 {
   // Default to comba-cs (carry-save Comba), matching cbmc's default.
   const std::string multiplier_encoding =
@@ -516,6 +519,39 @@ int solver(
     }
   };
 
+  // Helper: run the SMT2 solving loop given a configured boolbvt.
+  auto run_loop = [&](boolbvt &boolbv) -> int
+  {
+    smt2_solvert smt2_solver{in, boolbv};
+    bool error_found = false;
+    while(!smt2_solver.exit)
+    {
+      try
+      {
+        smt2_solver.parse();
+      }
+      catch(const smt2_tokenizert::smt2_errort &error)
+      {
+        smt2_solver.skip_to_end_of_list();
+        error_found = true;
+      }
+    }
+    return error_found ? 1 : 0;
+  };
+
+  // Helper: build a bv_refinementt::infot for refine-arithmetic mode.
+  auto make_refine_info =
+    [&](const namespacet &ns_ref, propt &prop_ref, message_handlert &mh_ref)
+  {
+    bv_refinementt::infot info;
+    info.ns = &ns_ref;
+    info.prop = &prop_ref;
+    info.message_handler = &mh_ref;
+    info.refine_arithmetic = true;
+    info.refine_arrays = false; // arithmetic-only refinement
+    return info;
+  };
+
   symbol_tablet symbol_table;
   namespacet ns(symbol_table);
 
@@ -535,55 +571,44 @@ int solver(
       cadical_satcheck.enable_xor_gauss();
     if(reorder_vars)
       cadical_satcheck.enable_variable_renumbering();
+    if(refine_arithmetic)
+    {
+      auto info = make_refine_info(ns, cadical_satcheck, message_handler);
+      bv_refinementt boolbv{info};
+      configure_encodings(boolbv);
+      return run_loop(boolbv);
+    }
     boolbvt boolbv{ns, cadical_satcheck, message_handler};
     configure_encodings(boolbv);
-    smt2_solvert smt2_solver{in, boolbv};
-    bool error_found = false;
-    while(!smt2_solver.exit)
-    {
-      try
-      {
-        smt2_solver.parse();
-      }
-      catch(const smt2_tokenizert::smt2_errort &error)
-      {
-        smt2_solver.skip_to_end_of_list();
-        error_found = true;
-      }
-    }
-    if(error_found)
-      return 1;
-    return 0;
+    return run_loop(boolbv);
   }
 #endif
 #ifdef SATCHECK_CRYPTOMINISAT
   if(use_cryptominisat)
   {
     satcheck_cryptominisatt cms_satcheck{message_handler};
+    if(refine_arithmetic)
+    {
+      auto info = make_refine_info(ns, cms_satcheck, message_handler);
+      bv_refinementt boolbv{info};
+      configure_encodings(boolbv);
+      return run_loop(boolbv);
+    }
     boolbvt boolbv{ns, cms_satcheck, message_handler};
     configure_encodings(boolbv);
-    smt2_solvert smt2_solver{in, boolbv};
-    bool error_found = false;
-    while(!smt2_solver.exit)
-    {
-      try
-      {
-        smt2_solver.parse();
-      }
-      catch(const smt2_tokenizert::smt2_errort &error)
-      {
-        smt2_solver.skip_to_end_of_list();
-        error_found = true;
-      }
-    }
-    if(error_found)
-      return 1;
-    return 0;
+    return run_loop(boolbv);
   }
 #endif
   (void)xor_gauss;
   (void)reorder_vars;
   (void)use_cryptominisat;
+  if(refine_arithmetic)
+  {
+    auto info = make_refine_info(ns, satcheck, message_handler);
+    bv_refinementt boolbv{info};
+    configure_encodings(boolbv);
+    return run_loop(boolbv);
+  }
   boolbvt boolbv{ns, satcheck, message_handler};
   configure_encodings(boolbv);
 
@@ -623,6 +648,7 @@ int main(int argc, const char *argv[])
   bool reorder_vars = false;
   bool use_cadical = false;
   bool use_cryptominisat = false;
+  bool refine_arithmetic = false;
   std::string multiplier_encoding;
   std::string adder_encoding;
   const char *filename = nullptr;
@@ -637,6 +663,8 @@ int main(int argc, const char *argv[])
       use_cadical = true;
     else if(std::string{argv[i]} == "--cryptominisat")
       use_cryptominisat = true;
+    else if(std::string{argv[i]} == "--refine-arithmetic")
+      refine_arithmetic = true;
     else if(std::string{argv[i]} == "--multiplier-encoding" && i + 1 < argc)
       multiplier_encoding = argv[++i];
     else if(std::string{argv[i]} == "--adder-encoding" && i + 1 < argc)
@@ -646,8 +674,9 @@ int main(int argc, const char *argv[])
     else
     {
       std::cerr << "usage: smt2_solver [--cadical] [--cryptominisat] "
-                   "[--multiplier-encoding ENC] [--adder-encoding ENC] "
-                   "[--xor-gauss] [--reorder-vars] [file]\n";
+                   "[--refine-arithmetic] [--multiplier-encoding ENC] "
+                   "[--adder-encoding ENC] [--xor-gauss] "
+                   "[--reorder-vars] [file]\n";
       return 1;
     }
   }
@@ -660,7 +689,8 @@ int main(int argc, const char *argv[])
       use_cadical,
       use_cryptominisat,
       multiplier_encoding,
-      adder_encoding);
+      adder_encoding,
+      refine_arithmetic);
 
   std::ifstream in(filename);
   if(!in)
@@ -676,5 +706,6 @@ int main(int argc, const char *argv[])
     use_cadical,
     use_cryptominisat,
     multiplier_encoding,
-    adder_encoding);
+    adder_encoding,
+    refine_arithmetic);
 }

@@ -59,27 +59,24 @@ protected:
   bvt convert_mod(const mod_exprt &expr) override;
   bvt convert_floatbv_op(const ieee_float_op_exprt &) override;
 
-  // Skip Paper 2's algebraic layer when --refine-arithmetic is the
-  // user's chosen path: detect_algebraic_pairs (called once at the
-  // start of dec_solve) covers the same algebraic-identity patterns
-  // for the cases that survive bit-blasting (e.g. multiplications
-  // laundered through opaque calls), with constant-size hint
-  // clauses. Letting the algebraic layer run anyway costs ~1 s on
-  // benchmarks where its Gröbner basis attempt does not converge,
-  // for no benefit (pair detection then closes the proof in a
-  // single iteration).
+  // Composition of pair detection (this layer) with Paper 2's
+  // algebraic Gröbner-basis layer (in boolbvt::try_algebraic_solve):
+  // by default both run. Pair detection is cheap (one walk of the
+  // approximation list); the algebraic layer can solve cleanly
+  // polynomial-shaped problems (e.g. SMT-LIB varscale at high k)
+  // faster than refinement with pair detection alone. The combined
+  // pipeline is a strict superset.
   //
-  // Override returns false to skip the layer; the env var
-  // CBMC_DISABLE_REFINE_ALG_SKIP=1 reverts to the previous
-  // behaviour (algebraic + refinement both run).
+  // Users who know their input is laundered through opaque
+  // computation (e.g. C-input multiplications through store/load)
+  // can set CBMC_REFINE_SKIP_ALG=1 to skip the algebraic layer and
+  // save its failed-attempt overhead (~1 s in those cases).
   bool try_algebraic_solve() override
   {
     if(config_.refine_arithmetic)
     {
-      const char *override_env = std::getenv("CBMC_DISABLE_REFINE_ALG_SKIP");
-      if(
-        override_env == nullptr || override_env[0] == '\0' ||
-        override_env[0] == '0')
+      const char *skip_env = std::getenv("CBMC_REFINE_SKIP_ALG");
+      if(skip_env != nullptr && skip_env[0] != '\0' && skip_env[0] != '0')
       {
         return false;
       }
