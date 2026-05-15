@@ -635,21 +635,36 @@ public:
   /// Called from `user_defined_conversion_sequence` after the
   /// non-template cast-operator loop.  Iterates template cast
   /// operators of the source class, runs SFINAE-guarded deduction
-  /// per [temp.deduct]/8, instantiates the matching specialization,
-  /// then builds the same kind of member-function call expression as
-  /// the non-template path.  Per [over.ics.user]/3 the second
-  /// standard conversion sequence must be Exact Match.
+  /// per [temp.deduct]/8, applies [temp.deduct.partial]/3.2 partial
+  /// ordering across deduction survivors when more than one is
+  /// viable, then instantiates the unique most-specialised match.
+  /// Per [over.ics.user]/3 the second standard conversion sequence
+  /// must be Exact Match.
   ///
   /// Returns `true` on a successful unambiguous deduction, with
   /// `new_expr` set to the typechecked conversion expression and
   /// `rank` incremented by the second standard conversion's rank.
   /// Returns `false` if no candidate is found, deduction fails for
-  /// every candidate, or multiple candidates succeed (ambiguity).
+  /// every candidate, or partial ordering cannot pick a unique
+  /// most-specialised candidate (genuine ambiguity).
   bool deduce_conversion_template(
     const exprt &expr,
     const typet &to,
     exprt &new_expr,
     unsigned &rank);
+
+  /// [temp.deduct.partial]/3.2: in conversion-function context,
+  /// returns `true` iff conversion-function template F is at-least-
+  /// as-specialised as G when their return types serve as the P/A
+  /// pair.  Implemented as: deduce F's parameters from G's
+  /// (transformed) return type and require all parameters to be
+  /// bound.  /5 (drop reference) and /7 (drop top-level cv) are
+  /// applied first.
+  bool conversion_template_at_least_as_specialised(
+    const cpp_declarationt &F,
+    const cpp_declarationt &G,
+    const irep_idt &F_scope_id,
+    const irep_idt &G_scope_id);
 
   bool reference_related(const exprt &expr, const reference_typet &type) const;
 
