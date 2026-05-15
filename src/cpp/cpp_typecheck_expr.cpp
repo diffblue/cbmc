@@ -1452,9 +1452,9 @@ void cpp_typecheckt::typecheck_expr_address_of(
 
 void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
 {
-  if(expr.operands().size()!=1)
+  if(expr.operands().size() != 1)
   {
-    error().source_location=expr.find_source_location();
+    error().source_location = expr.find_source_location();
     error() << "address_of expects one operand" << eom;
     throw 0;
   }
@@ -1467,9 +1467,9 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
   if(is_reference(op.type()))
     add_implicit_dereference(op);
 
-  if(!op.get_bool(ID_C_lvalue) && expr.type().id()==ID_code)
+  if(!op.get_bool(ID_C_lvalue) && expr.type().id() == ID_code)
   {
-    error().source_location=expr.source_location();
+    error().source_location = expr.source_location();
     error() << "expr not an lvalue" << eom;
     throw 0;
   }
@@ -2472,8 +2472,8 @@ exprt cpp_typecheckt::deduce_funcaddr_against_target(
   }
   if(target_fn_pointer_type.get_sub().empty())
     return nil_exprt{};
-  const typet &target_fn = static_cast<const typet &>(
-    target_fn_pointer_type.get_sub().front());
+  const typet &target_fn =
+    static_cast<const typet &>(target_fn_pointer_type.get_sub().front());
   if(target_fn.id() != ID_code)
     return nil_exprt{};
 
