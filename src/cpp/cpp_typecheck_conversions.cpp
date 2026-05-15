@@ -948,11 +948,20 @@ bool cpp_typecheckt::conversion_template_at_least_as_specialised(
   typet A = static_cast<const typet &>(F_dcl.name().get_sub()[1]);
   typet P = static_cast<const typet &>(G_dcl.name().get_sub()[1]);
 
-  // [temp.deduct.partial]/5: drop reference on both.
-  if(is_reference(P))
-    P = to_reference_type(P).base_type();
-  if(is_reference(A))
-    A = to_reference_type(A).base_type();
+  // [temp.deduct.partial]/5: drop reference on both.  Handle both
+  // post-typecheck (ID_pointer + ID_C_reference) and pre-typecheck
+  // (ID_frontend_pointer + ID_C_reference) representations.
+  auto strip_top_reference = [](typet &t)
+  {
+    if(
+      (t.id() == ID_pointer || t.id() == ID_frontend_pointer) &&
+      t.get_bool(ID_C_reference))
+    {
+      t = static_cast<const typet &>(to_type_with_subtype(t).subtype());
+    }
+  };
+  strip_top_reference(P);
+  strip_top_reference(A);
 
   // [temp.deduct.partial]/7: drop top-level cv on both.
   auto drop_top_cv = [](typet &t)
@@ -1003,20 +1012,20 @@ bool cpp_typecheckt::conversion_template_at_least_as_specialised(
                     // synthetic-type substitution into F's pattern.
 }
 
-bool cpp_typecheckt::deduce_conversion_template(
+/// Phase 4B core helper: deduction + partial ordering + instantiation
+/// for template conversion operators.  See header for the contract.
+const symbolt *cpp_typecheckt::find_template_conversion_specialisation(
   const exprt &expr,
-  const typet &to,
-  exprt &new_expr,
-  unsigned &rank)
+  const typet &to)
 {
   if(expr.type().id() != ID_struct_tag)
-    return false;
+    return nullptr;
 
   const struct_typet &from_followed =
     follow_tag(to_struct_tag_type(expr.type()));
 
   if(!from_followed.get_bool("has_template_conversion_operator"))
-    return false;
+    return nullptr;
 
   // Determine the class scope prefix used for member symbols.  The
   // symbol_table keys members with the class's `pretty_name`-style
@@ -1026,13 +1035,14 @@ bool cpp_typecheckt::deduce_conversion_template(
     to_struct_tag_type(expr.type()).get_identifier();
   const symbolt *class_sym = symbol_table.lookup(class_id_with_tag);
   if(class_sym == nullptr)
-    return false;
+    return nullptr;
   const std::string class_prefix = id2string(class_sym->pretty_name) + "::";
 
   // Collect candidate template-cast-operator symbols up front: the
   // symbol_table grows during instantiation, which would invalidate
   // an in-place iterator.
-  std::vector<irep_idt> candidate_names;
+  std::vector<const symbolt *> candidate_syms;
+  std::vector<irep_idt> candidate_scope_ids;
   for(const auto &name_sym : symbol_table.symbols)
   {
     const symbolt &sym = name_sym.second;
@@ -1051,11 +1061,12 @@ bool cpp_typecheckt::deduce_conversion_template(
     if(decl.declarators().empty())
       continue;
 
-    candidate_names.push_back(sym.name);
+    candidate_syms.push_back(&sym);
+    candidate_scope_ids.push_back(sym.name);
   }
 
-  if(candidate_names.empty())
-    return false;
+  if(candidate_syms.empty())
+    return nullptr;
 
   // Phase 1: deduce-only pass.  For each candidate, run [temp.deduct.conv]/1
   // deduction and remember successful candidates.  Instantiation is
@@ -1064,9 +1075,10 @@ bool cpp_typecheckt::deduce_conversion_template(
   // candidates.
   std::vector<conversion_deduction_resultt> survivors;
   std::vector<irep_idt> survivor_scope_ids; // parallel: F_scope_id per survivor
-  for(const irep_idt &cand_name : candidate_names)
+  for(std::size_t cand_i = 0; cand_i < candidate_syms.size(); ++cand_i)
   {
-    const symbolt *cand_sym = symbol_table.lookup(cand_name);
+    const symbolt *cand_sym = candidate_syms[cand_i];
+    const irep_idt &cand_name = candidate_scope_ids[cand_i];
     if(cand_sym == nullptr)
       continue;
 
@@ -1085,14 +1097,28 @@ bool cpp_typecheckt::deduce_conversion_template(
     typet P = static_cast<const typet &>(declarator.name().get_sub()[1]);
     typet A = to;
 
+    // The template cast operator's return type comes straight from
+    // the parser, so its top-level reference may be encoded with
+    // `ID_frontend_pointer` rather than `ID_pointer`.  Treat both as
+    // references for the purposes of [temp.deduct.conv]/2.
+    auto strip_top_reference = [](typet &t)
+    {
+      if(
+        (t.id() == ID_pointer || t.id() == ID_frontend_pointer) &&
+        t.get_bool(ID_C_reference))
+      {
+        t = static_cast<const typet &>(to_type_with_subtype(t).subtype());
+      }
+    };
+
     // [temp.deduct.conv]/2: P-reference -> use referred type.
-    if(is_reference(P))
-      P = to_reference_type(P).base_type();
+    strip_top_reference(P);
 
     // [temp.deduct.conv]/4: A-reference -> use referred type.
-    const bool A_was_reference = is_reference(A);
-    if(A_was_reference)
-      A = to_reference_type(A).base_type();
+    const bool A_was_reference =
+      is_reference(A) ||
+      (A.id() == ID_frontend_pointer && A.get_bool(ID_C_reference));
+    strip_top_reference(A);
 
     // [temp.deduct.conv]/3: A non-reference -> P array→pointer,
     // function→pointer, drop top-level cv from P.
@@ -1176,14 +1202,10 @@ bool cpp_typecheckt::deduce_conversion_template(
   }
 
   if(survivors.empty())
-    return false;
+    return nullptr;
 
   // Phase 2: [temp.deduct.partial]/3.2 + [over.match.best]/2.
-  // Find the unique most-specialised survivor.  When there are
-  // multiple survivors, run the at-least-as-specialised check
-  // pairwise; a candidate "dominates" if it is at-least-as-
-  // specialised as every other and *not* every other is at-
-  // least-as-specialised as it.
+  // Find the unique most-specialised survivor.
   std::size_t winner_idx = 0;
   if(survivors.size() > 1)
   {
@@ -1203,7 +1225,6 @@ bool cpp_typecheckt::deduce_conversion_template(
       return i_aas_j && !j_aas_i;
     };
 
-    // Find a candidate that is more-specialised than every other.
     bool unique_winner = false;
     for(std::size_t i = 0; i < survivors.size(); ++i)
     {
@@ -1227,11 +1248,10 @@ bool cpp_typecheckt::deduce_conversion_template(
     }
 
     if(!unique_winner)
-      return false; // genuine ambiguity — no most-specialised candidate.
+      return nullptr; // genuine ambiguity — no most-specialised candidate.
   }
 
-  // Phase 3: instantiate the unique winner and validate the second
-  // standard conversion sequence (Exact Match per [over.ics.user]/3).
+  // Phase 3: instantiate the unique winner.
   const symbolt *cand_sym = survivors[winner_idx].cand_sym;
   cpp_template_args_tct guessed_args =
     std::move(survivors[winner_idx].guessed_args);
@@ -1245,30 +1265,29 @@ bool cpp_typecheckt::deduce_conversion_template(
   }
   catch(...)
   {
-    return false;
+    return nullptr;
   }
 
   if(instance == nullptr)
-    return false;
+    return nullptr;
 
   // The instantiated symbol's type is `code_typet` with one
   // implicit `this` parameter (a pointer).
   if(instance->type.id() != ID_code)
-    return false;
+    return nullptr;
   const code_typet &inst_code = to_code_type(instance->type);
   if(inst_code.parameters().size() != 1)
-    return false;
+    return nullptr;
   if(!inst_code.parameters().front().get_this())
-    return false;
+    return nullptr;
 
   // Mark the instantiated cast-operator component (added to the
   // class's components vector by `instantiate_template` ->
-  // `typecheck_compound_declarator`) so the non-template branch of
-  // `user_defined_conversion_sequence` skips it on subsequent
-  // calls.  Otherwise it would shadow a fresh deduction for a
-  // different destination type ([over.ics.user]/3 + [over.match.conv]):
-  // a previous deduction for `int` should not satisfy a later
-  // request for `long` via the non-template int->long path.
+  // `typecheck_compound_declarator`) so the non-template branches
+  // of `user_defined_conversion_sequence` and `reference_binding`
+  // skip it on subsequent calls.  Otherwise it would shadow a
+  // fresh deduction for a different destination type
+  // ([over.ics.user]/3 + [over.match.conv]).
   {
     symbolt *class_sym_w = symbol_table.get_writeable(class_id_with_tag);
     if(class_sym_w != nullptr && class_sym_w->type.id() == ID_struct)
@@ -1285,6 +1304,21 @@ bool cpp_typecheckt::deduce_conversion_template(
     }
   }
 
+  return instance;
+}
+
+bool cpp_typecheckt::deduce_conversion_template(
+  const exprt &expr,
+  const typet &to,
+  exprt &new_expr,
+  unsigned &rank)
+{
+  const symbolt *instance = find_template_conversion_specialisation(expr, to);
+  if(instance == nullptr)
+    return false;
+
+  const code_typet &inst_code = to_code_type(instance->type);
+
   // Build the conversion expression as a direct call to the
   // instantiated symbol.  We bypass the cpp_name-driven member-
   // call resolver because the freshly-instantiated cast operator,
@@ -1295,14 +1329,7 @@ bool cpp_typecheckt::deduce_conversion_template(
   // as the implicit `this` argument is direct and avoids the
   // resolver.
   address_of_exprt this_arg{expr};
-  {
-    const typet &this_param_type = inst_code.parameters().front().type();
-    // The cast operator's `this` parameter is a (possibly
-    // cv-qualified) pointer to the source class.  Adopt that
-    // exact type for the address-of so subsequent equality and
-    // qualification checks succeed.
-    this_arg.type() = this_param_type;
-  }
+  this_arg.type() = inst_code.parameters().front().type();
 
   side_effect_expr_function_callt func_expr{
     cpp_symbol_expr(*instance),
@@ -1322,6 +1349,86 @@ bool cpp_typecheckt::deduce_conversion_template(
 
   rank += post_rank;
   new_expr.swap(post_expr);
+  return true;
+}
+
+bool cpp_typecheckt::deduce_conversion_template_for_reference(
+  const exprt &expr,
+  const reference_typet &reference_type,
+  exprt &new_expr,
+  unsigned &rank)
+{
+  const symbolt *instance =
+    find_template_conversion_specialisation(expr, reference_type);
+  if(instance == nullptr)
+    return false;
+
+  const code_typet &inst_code = to_code_type(instance->type);
+
+  // The cast operator must return a reference type for direct
+  // reference binding ([over.match.ref]).
+  if(!is_reference(inst_code.return_type()))
+    return false;
+
+  // Build the call as a direct symbol-driven function-call expr,
+  // mirroring the value-target path.
+  address_of_exprt this_arg{expr};
+  this_arg.type() = inst_code.parameters().front().type();
+
+  side_effect_expr_function_callt func_expr{
+    cpp_symbol_expr(*instance),
+    {this_arg},
+    inst_code.return_type(),
+    expr.source_location()};
+
+  // The returned value of a reference-returning function is an
+  // lvalue (the dereferenced pointer-to-reference).  Mirror the
+  // shape that the non-template path in `reference_binding`
+  // expects: take the address of the returned value via the
+  // standard `add_implicit_dereference` plus reference_compatible
+  // dance.  See the analogous block in `reference_binding`.
+  exprt returned_value = func_expr;
+  add_implicit_dereference(returned_value);
+
+  unsigned ref_rank = 0;
+  if(!returned_value.get_bool(ID_C_lvalue))
+    return false;
+  if(!reference_compatible(returned_value, reference_type, ref_rank))
+    return false;
+
+  // [over.ics.user]/3: when the user-defined conversion is by a
+  // template specialisation the second standard conversion
+  // sequence is required to have Exact Match rank.  For reference
+  // binding the analogous requirement is that
+  // `reference_compatible` succeed without adding any rank beyond
+  // the identity (i.e., `ref_rank == 0`).
+  if(ref_rank > 0)
+    return false;
+
+  // Returned values are lvalues only via references; the inner
+  // operand is the pointer-to-reference whose dereference produced
+  // the lvalue.
+  if(returned_value.id() != ID_dereference)
+    return false;
+  if(!is_reference(to_dereference_expr(returned_value).op().type()))
+    return false;
+
+  exprt addr = to_multi_ary_expr(returned_value).op0();
+
+  if(returned_value.type() != reference_type.base_type())
+  {
+    c_qualifierst qual_from;
+    qual_from.read(returned_value.type());
+    make_ptr_typecast(addr, reference_type);
+    qual_from.write(to_reference_type(addr.type()).base_type());
+  }
+
+  // [over.ics.user] gives a user-defined conversion an extra rank
+  // bump of 4 to dominate any standard conversion sequence; the
+  // existing non-template reference-conversion path uses the same
+  // constant.  Stay consistent with it.
+  rank += 4 + ref_rank;
+  new_expr.swap(addr);
   return true;
 }
 
@@ -1924,6 +2031,15 @@ bool cpp_typecheckt::reference_binding(
       if(!component.get_bool(ID_is_cast_operator))
         continue;
 
+      // Skip components that are template-conversion-operator
+      // specialisations from a previous deduction; their
+      // counterpart for *this* destination type (which may be a
+      // different reference) is found below by
+      // `deduce_conversion_template_for_reference`.
+      // ([over.ics.user]/3 + [over.match.conv])
+      if(component.get_bool("#is_template_specialization"))
+        continue;
+
       const code_typet &component_type = to_code_type(component.type());
 
       // otherwise it cannot bind directly (not an lvalue)
@@ -1985,6 +2101,23 @@ bool cpp_typecheckt::reference_binding(
           rank += 4 + tmp_rank;
           return true;
         }
+      }
+    }
+
+    // No non-template reference-returning cast operator matched.
+    // Per [temp.deduct.conv]/1 + [over.match.ref], try template
+    // conversion-function specialisations whose return type
+    // (after [temp.deduct.conv]/2 reference-stripping) deduces a
+    // reference-compatible match against `reference_type`.
+    {
+      unsigned tmpl_rank = 0;
+      exprt tmpl_expr;
+      if(deduce_conversion_template_for_reference(
+           expr, reference_type, tmpl_expr, tmpl_rank))
+      {
+        rank += tmpl_rank;
+        new_expr.swap(tmpl_expr);
+        return true;
       }
     }
   }
