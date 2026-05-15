@@ -6,7 +6,7 @@ set -u
 ROOT=$(realpath "$(dirname "$0")/..")
 cd "$ROOT"
 CBMC=$ROOT/build/bin/cbmc
-TIMEOUT=30
+TIMEOUT=15
 OUTFILE=$ROOT/bench-multiplication/three-approach-comparison.tsv
 
 ulimit -v 57591731 2>/dev/null || true

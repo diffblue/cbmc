@@ -181,7 +181,7 @@ protected:
   std::vector<exprt> algebraic_disequalities;
   bool algebraic_solved = false;
   std::vector<literalt> algebraic_assumptions;
-  bool try_algebraic_solve();
+  virtual bool try_algebraic_solve();
 
   // uninterpreted functions
   functionst functions;

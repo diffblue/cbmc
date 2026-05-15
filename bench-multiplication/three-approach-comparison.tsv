@@ -1,6 +1,6 @@
 # Three-approach comparison: Paper 1 (comba-cs), pair detection
 # (Beame-Liew-inspired), Paper 2 (algebraic).
-# Time in seconds; T/O = 30 s.
+# Time in seconds; T/O = 15 s.
 # Configurations:
 #   shift_add:    DISABLE_ALGEBRAIC + shift-add encoding (baseline)
 #   comba_cs:     DISABLE_ALGEBRAIC + comba-cs (Paper 1 best encoding)
@@ -9,16 +9,16 @@
 #   p2_algebraic: algebraic enabled + comba-cs (Paper 2)
 #   all_combined: algebraic + --refine-arithmetic + comba-cs
 benchmark	shift_add	comba_cs	pair_detect	p2_algebraic	all_combined
-stored_comm              	T/O	T/O	0.03	T/O	1.23
-stored_comm32            	T/O	T/O	0.03	T/O	1.34
+stored_comm              	T/O	T/O	0.03	T/O	0.03
+stored_comm32            	T/O	T/O	0.03	T/O	0.03
 sub_comm                 	T/O	T/O	0.03	0.03	0.03
-assoc_stored             	T/O	T/O	0.04	T/O	1.38
-distrib_simple           	T/O	T/O	0.05	T/O	16.74
+assoc_stored             	T/O	T/O	0.04	T/O	0.04
+distrib_simple           	T/O	T/O	0.05	T/O	0.05
 bit_level_comm           	T/O	T/O	0.04	T/O	0.04
 p1_modmul_comm           	T/O	T/O	T/O	T/O	T/O
-p3_pixel_index           	T/O	T/O	0.04	T/O	1.34
-p4_dot_product           	T/O	T/O	0.08	T/O	T/O
+p3_pixel_index           	T/O	T/O	0.04	T/O	0.04
+p4_dot_product           	T/O	T/O	0.08	T/O	0.08
 p7_bitmix_distrib        	T/O	T/O	T/O	T/O	T/O
-p8_buffer_offset         	T/O	T/O	0.04	T/O	1.38
+p8_buffer_offset         	T/O	T/O	0.04	T/O	0.04
 comm_check               	0.03	0.03	0.03	0.03	0.03
 varscale_c               	T/O	T/O	0.03	0.04	0.03

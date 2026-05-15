@@ -1,0 +1,55 @@
+# Wide three-approach comparison
+# Time in seconds; T/O = 15 s
+# shift_add:    DISABLE_ALGEBRAIC + shift-add
+# comba_cs:     DISABLE_ALGEBRAIC + comba-cs (Paper 1)
+# pair_detect:  DISABLE_ALGEBRAIC + --refine-arithmetic + comba-cs (Beame-Liew-inspired)
+# p2_algebraic: algebraic + comba-cs (Paper 2)
+# all_combined: algebraic + --refine-arithmetic + comba-cs (now optimised)
+benchmark	shift_add	comba_cs	pair_detect	p2_algebraic	all_combined
+assoc                         	0.05	0.05	0.05	1.25	0.05
+bounds                        	0.04	0.04	0.04	0.03	0.04
+comm                          	6.59	6.68	0.03	0.03	0.03
+const3                        	0.03	0.03	0.03	0.03	0.03
+distrib                       	0.03	0.03	0.03	0.02	0.03
+div_roundtrip                 	0.99	1.01	1.07	0.99	1.07
+factor                        	0.36	0.36	0.04	0.36	0.04
+hash_mul                      	T/O	T/O	T/O	T/O	T/O
+mac_equiv                     	T/O	T/O	0.04	0.03	0.04
+matrix_mul                    	T/O	12.11	0.10	0.03	0.10
+matrix_trace_16               	T/O	T/O	0.91	0.04	0.91
+mod_mul                       	5.22	5.27	1.48	5.26	1.48
+mul_bounds                    	3.58	6.46	3.18	6.46	3.17
+mul_double                    	0.66	1.16	0.03	0.03	0.03
+mul_monotone                  	6.51	6.51	T/O	6.52	T/O
+mul_negation                  	0.03	0.03	0.03	0.03	0.03
+mul_overflow                  	T/O	T/O	T/O	0.03	T/O
+mul_shift                     	0.03	0.03	0.03	0.03	0.03
+mul_square_nonneg             	0.03	0.03	0.03	0.03	0.03
+mul_zero_factor               	0.03	0.03	0.03	0.03	0.03
+overflow_check                	T/O	T/O	T/O	0.03	T/O
+overflow_mul_unsigned         	0.20	0.21	0.19	0.21	0.19
+poly_eval                     	0.04	0.04	0.04	0.03	0.04
+square                        	0.06	0.06	11.82	0.09	11.79
+strength_reduce               	0.18	0.18	0.08	0.18	0.08
+widen_mul                     	T/O	T/O	0.03	T/O	0.03
+p1_modmul_comm                	T/O	T/O	T/O	T/O	T/O
+p2_crc_chain                  	T/O	T/O	T/O	T/O	T/O
+p3_pixel_index                	T/O	T/O	0.04	T/O	0.04
+p4_dot_product                	T/O	T/O	0.08	T/O	0.08
+p5_polynomial                 	T/O	T/O	0.08	T/O	0.08
+p6_overflow_pair              	0.03	0.03	0.03	0.03	0.03
+p7_bitmix_distrib             	T/O	T/O	T/O	T/O	T/O
+p8_buffer_offset              	T/O	T/O	0.04	T/O	0.04
+stored_comm                   	T/O	T/O	0.03	T/O	0.03
+stored_comm32                 	T/O	T/O	0.03	T/O	0.03
+sub_comm                      	T/O	T/O	0.03	0.03	0.03
+assoc_stored                  	T/O	T/O	0.04	T/O	0.04
+distrib_simple                	T/O	T/O	0.05	T/O	0.05
+bit_level_comm                	T/O	T/O	0.04	T/O	0.04
+comm_check                    	0.03	0.03	0.03	0.03	0.03
+varscale_c                    	T/O	T/O	0.03	0.04	0.03
+b1_modular                    	T/O	T/O	T/O	T/O	T/O
+b3_index                      	0.04	0.04	0.04	1.03	0.04
+b4_polynomial                 	T/O	T/O	0.05	T/O	0.05
+b5_three_way                  	T/O	T/O	0.05	T/O	0.05
+b7_three_term                 	T/O	T/O	0.17	T/O	0.16

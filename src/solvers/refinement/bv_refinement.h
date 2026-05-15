@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/flattening/bv_pointers.h>
 
+#include <cstdlib>
+
 #define MAX_STATE 10000
 
 class bv_refinementt:public bv_pointerst
@@ -56,6 +58,34 @@ protected:
   bvt convert_div(const div_exprt &expr) override;
   bvt convert_mod(const mod_exprt &expr) override;
   bvt convert_floatbv_op(const ieee_float_op_exprt &) override;
+
+  // Skip Paper 2's algebraic layer when --refine-arithmetic is the
+  // user's chosen path: detect_algebraic_pairs (called once at the
+  // start of dec_solve) covers the same algebraic-identity patterns
+  // for the cases that survive bit-blasting (e.g. multiplications
+  // laundered through opaque calls), with constant-size hint
+  // clauses. Letting the algebraic layer run anyway costs ~1 s on
+  // benchmarks where its Gröbner basis attempt does not converge,
+  // for no benefit (pair detection then closes the proof in a
+  // single iteration).
+  //
+  // Override returns false to skip the layer; the env var
+  // CBMC_DISABLE_REFINE_ALG_SKIP=1 reverts to the previous
+  // behaviour (algebraic + refinement both run).
+  bool try_algebraic_solve() override
+  {
+    if(config_.refine_arithmetic)
+    {
+      const char *override_env = std::getenv("CBMC_DISABLE_REFINE_ALG_SKIP");
+      if(
+        override_env == nullptr || override_env[0] == '\0' ||
+        override_env[0] == '0')
+      {
+        return false;
+      }
+    }
+    return boolbvt::try_algebraic_solve();
+  }
 
 private:
   // the list of operator approximations
