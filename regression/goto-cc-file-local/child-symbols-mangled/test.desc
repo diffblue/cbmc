@@ -1,0 +1,9 @@
+CORE
+file1.c
+final-link show-symbol-table
+^EXIT=0$
+^SIGNAL=0$
+__CPROVER_file_local_lib_h_helper::x
+__CPROVER_file_local_lib_h_helper::1::t
+--
+^warning: ignoring
