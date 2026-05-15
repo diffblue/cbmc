@@ -1,0 +1,8 @@
+CORE
+nested1.c
+
+^EXIT=0$
+^SIGNAL=0$
+^\[caller\.assertion\.1\] line \d+ property 1: SUCCESS$
+^\[caller\.precondition\.1\] line \d+ callee precondition .*: SUCCESS$
+--

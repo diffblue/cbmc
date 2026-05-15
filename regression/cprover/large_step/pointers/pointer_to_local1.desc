@@ -1,0 +1,7 @@
+CORE
+pointer_to_local1.c
+
+^EXIT=0$
+^SIGNAL=0$
+^\[foo\.assertion\.1\] line \d+ property 1: SUCCESS$
+--

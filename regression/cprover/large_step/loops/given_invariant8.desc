@@ -1,0 +1,9 @@
+CORE
+given_invariant8.c
+--safety
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.invariant\.1\] line \d+ loop invariant: SUCCESS$
+^\[main\.array_bounds\.1\] line \d+ array bounds in array\[.*i\]: SUCCESS$
+--
+--

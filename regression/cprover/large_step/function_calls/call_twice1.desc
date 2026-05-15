@@ -1,0 +1,8 @@
+CORE
+call_twice1.c
+
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ property 1: SUCCESS$
+^\[main\.assertion\.2\] line \d+ property 2: SUCCESS$
+--

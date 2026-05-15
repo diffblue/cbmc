@@ -1,0 +1,8 @@
+KNOWNBUG
+trace_nondet1.c
+--trace
+^EXIT=10$
+^SIGNAL=0$
+^Trace for main\.assertion\.1:$
+^   6 x := 20$
+--
