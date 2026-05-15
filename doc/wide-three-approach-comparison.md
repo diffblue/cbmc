@@ -177,3 +177,73 @@ Data:
 
 Pinned commits: this commit and `cc11c82069` (initial three-approach
 comparison) document the development trajectory.
+
+## SMT-COMP 2024 real-world sample (added pool)
+
+The third pool of the wide comparison: 66 SMT-COMP 2024 QF_BV benchmarks
+from third-party submitters (BuchwaldFried, Goel-hwbench, Noetzli,
+UltimateAutomizer, Favaro, Sage2, VS3, brummayerbiere, calypto, galois,
+Wienand-CAV2008, etc.). These are the benchmarks Paper 2 §4.2 already
+evaluates for 3 configurations; we now extend to all 5.
+
+Data: `bench-multiplication/wide-smt-comp-five-approach.tsv`. Runner:
+`bench-multiplication/run-wide-smt-comp-comparison.sh`. 15 s timeout.
+
+| Configuration | Solved | % |
+|---------------|-------:|--:|
+| shift_add | 25 | 38% |
+| comba_cs | 25 | 38% |
+| **pair_detect** | **30** | **45%** |
+| p2_algebraic | 28 | 42% |
+| all_combined | 29 | 44% |
+| Union | 33 | 50% |
+
+Lower solve rates than the synthetic pools because half the benchmarks
+have non-multiplier obstacles (divisions, log-slicing, modular
+inverses) that none of our approaches address.
+
+### Notable real-world wins for pair_detect
+
+These third-party benchmarks were not constructed with pair detection in
+mind, but contain the laundered-multiplier patterns it targets:
+
+| Benchmark | shift_add | comba_cs | pair_detect | p2_algebraic |
+|-----------|----------:|---------:|------------:|-------------:|
+| `wienand-cav2008_Commute_commute08` | T/O | T/O | **0.00 s** | T/O |
+| `wienand-cav2008_Commute_commute16` | T/O | T/O | **0.00 s** | T/O |
+| `wienand-cav2008_Commute_commute32` | T/O | T/O | **0.01 s** | T/O |
+| `wienand-cav2008_Booth_mult_ub_8x8_1` | 6.76 s | 6.77 s | **0.50 s** | 6.76 s |
+| `tacas07_s-40-50-bv` | 5.36 s | 5.29 s | **1.53 s** | 2.90 s |
+| `Sage2_bench_1351` | T/O | T/O | **8.43 s** | T/O |
+| `spear_wget_v1.10.2_src_wget_vc18190` | 1.70 s | 1.70 s | **0.79 s** | 1.70 s |
+| `spear_zebra_v0.95a_bgpd_bgpd_vc75772` | 0.29 s | 0.29 s | **0.09 s** | 0.29 s |
+| `UltimateAutomizerSvcomp2019_s3_srvr_1_alt_*` | 3.87 s | 3.89 s | **0.82 s** | T/O |
+
+The `wienand-cav2008_Commute_*` family is exactly Paper 2's home turf
+(commutativity at varying bitwidths) — yet `p2_algebraic` times out on
+all three while `pair_detect` solves them in milliseconds. Inspection
+shows these benchmarks use SMT-LIB's `define-fun` with intermediate
+let-bindings that obscure the polynomial structure from the algebraic
+extractor, exactly the laundering pattern pair detection handles.
+
+`Sage2_bench_1351` is a Sage-generated benchmark from a different
+domain entirely; that pair detection helps here suggests the technique's
+applicability extends beyond toy commutativity.
+
+### Combined picture across all three pools
+
+| Pool | Total | Best alone | all_combined | Union |
+|------|------:|-----------:|-------------:|------:|
+| C-input (synthetic + realistic) | 47 | pair_detect 39 (83%) | 38 (81%) | 42 (89%) |
+| SMT2 algebraic-identity | 66 | p2_algebraic 65 (98.5%) | 64 (97%) | 65 (98.5%) |
+| SMT-COMP 2024 real-world | 66 | pair_detect 30 (45%) | 29 (44%) | 33 (50%) |
+| **Total** | **179** | — | **131 (73%)** | **140 (78%)** |
+
+Across all 179 benchmarks, `all_combined` solves 131 (73%), within
+9 of the union upper bound (140, 78%). The union upper bound itself
+is a strong claim about the joint capability of bit-blasting plus pair
+detection plus algebraic reasoning — they collectively cover 78% of
+the benchmark pool, with the remaining 22% being problems no
+multiplier-aware technique helps with (divisions, modular inverses,
+deep program-verification embedding).
+
