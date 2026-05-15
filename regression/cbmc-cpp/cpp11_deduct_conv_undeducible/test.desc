@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=6$
+^SIGNAL=0$
+^CONVERSION ERROR$
+--
+^VERIFICATION SUCCESSFUL$
+^warning: ignoring
+--
+[temp.deduct]/8 + [temp.deduct.conv]: when the conversion-function
+template's return type does not mention the template parameter,
+deduction fails, so the template is not a viable candidate for
+implicit conversion.  This test verifies that CBMC correctly
+rejects the conversion in this case (matching standard-conforming
+compilers).
