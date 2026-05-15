@@ -1,6 +1,6 @@
 CORE libcxx
 main.cpp
---cpp11 --stdlib libc++ --unwind 5 --no-unwinding-assertions
+--cpp11 --stdlib libc++ --unwind 5 --no-unwinding-assertions --object-bits 12
 ^VERIFICATION
 ^EXIT=(0|10)$
 ^SIGNAL=0$
