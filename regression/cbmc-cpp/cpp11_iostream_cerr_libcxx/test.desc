@@ -1,6 +1,6 @@
 CORE libcxx
 main.cpp
---cpp11 --stdlib libc++ --object-bits 10
+--cpp11 --stdlib libc++ --object-bits 12 --depth 1000
 ^VERIFICATION
 ^EXIT=(0|10)$
 ^SIGNAL=0$
