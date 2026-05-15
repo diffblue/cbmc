@@ -1,0 +1,6 @@
+# SV-COMP sample results: pair detection hit rate
+# Sampled with --refine-arithmetic --no-standard-checks
+category	files_sampled	pairs_fired	helped	hurt	same
+bitvector	30	0	0	0	30
+loops	30	0	0	0	30
+float-newlib	20	0	0	0	20

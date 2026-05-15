@@ -1,0 +1,13 @@
+# Distributivity scaling: a*(b+c) == a*b + a*c through stored intermediates
+# Time in seconds; TIMEOUT = 180 s
+w	with_s	with_dist_triples	without_s	ratio
+4	15.85	1	16.12	1.0
+6	15.84	1	133.90	8.4
+8	15.93	1	TIMEOUT	-
+10	16.09	1	TIMEOUT	-
+12	16.07	1	TIMEOUT	-
+14	16.14	1	TIMEOUT	-
+16	16.12	1	TIMEOUT	-
+20	16.66	1	TIMEOUT	-
+24	16.71	1	TIMEOUT	-
+32	16.70	1	TIMEOUT	-

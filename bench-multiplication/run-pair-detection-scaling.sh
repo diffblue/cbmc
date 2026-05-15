@@ -5,7 +5,7 @@ TMP=/tmp/scaling_final
 mkdir -p $TMP
 CBMC=/home/ubuntu/cbmc-github.git/build/bin/cbmc
 TIMEOUT=180
-OUT=/home/ubuntu/cbmc-github.git/bench-multiplication/scaling-pair-detection.tsv
+OUTFILE=/home/ubuntu/cbmc-github.git/bench-multiplication/scaling-pair-detection.tsv
 
 ulimit -v 57591731 2>/dev/null
 
@@ -89,7 +89,7 @@ run_one() {
 }
 
 # Header
-echo -e "pattern\tw\twith_s\twith_pairs\twithout_s\tratio" | tee $OUT
+echo -e "pattern\tw\twith_s\twith_pairs\twithout_s\tratio" | tee $OUTFILE
 
 for emit_fn in emit_widen_mul emit_stored_widen emit_three_term_widen emit_assoc_widen; do
   pattern=${emit_fn#emit_}
@@ -107,7 +107,7 @@ for emit_fn in emit_widen_mul emit_stored_widen emit_three_term_widen emit_assoc
     without=${without_info%|*}
     if [[ "$without" == "TIMEOUT" || "$with" == "TIMEOUT" ]]; then ratio="-"
     else ratio=$(echo "scale=1; $without / $with" | bc 2>/dev/null || echo "-"); fi
-    echo -e "${pattern}\t${W}\t${with}\t${pairs}\t${without}\t${ratio}" | tee -a $OUT
+    echo -e "${pattern}\t${W}\t${with}\t${pairs}\t${without}\t${ratio}" | tee -a $OUTFILE
   done
 done
 echo "Saved to scaling-pair-detection.tsv"
