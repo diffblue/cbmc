@@ -279,3 +279,53 @@ The N3 polynomial-proof generator
 remains valuable for offline DRAT-certificate production for
 multiplier-equality problems verified by other means; it has no
 direct integration role in `--refine-arithmetic`.
+
+## Investigation: `hash_mul.c` and unhelped patterns
+
+The `bench-multiplication/hash_mul.c` benchmark times out under both
+modes:
+
+```c
+uint32_t hash(uint32_t key) {
+  key = ((key >> 16) ^ key) * 0x45d9f3b;
+  key = ((key >> 16) ^ key) * 0x45d9f3b;
+  key = (key >> 16) ^ key;
+  return key;
+}
+int main() {
+  uint32_t a;
+  uint32_t h1 = hash(a);
+  uint32_t h2 = hash(a);
+  __CPROVER_assert(h1 == h2, "deterministic");
+}
+```
+
+Pair detection does not fire here, even though the two `hash(a)`
+calls obviously produce identical results, because:
+
+- After SSA, the two inlined copies of `hash` introduce SSA copies
+  `hash::1::key` and `hash::2::key`, both equal to `a`. The
+  multiplications' operand expressions are syntactically distinct
+  (`((hash::1::key >> 16) ^ hash::1::key) * 0x45d9f3b` versus the
+  `hash::2::key` analogue).
+- At the bit-vector level the operand BVs are also distinct because
+  CBMC bit-blasts each shift+xor sequence into fresh aux variables.
+- Pair detection's BV-level operand resolution recovers links via
+  another approximation's `result_bv`, but shifts and xors are not
+  approximations under `--refine-arithmetic`; they are bit-blasted
+  directly and produce fresh BVs.
+
+To catch this, pair detection would need to compare operand
+expressions semantically, walking through SSA assignments and
+recognising that two distinct SSA names refer to the same value.
+Equivalently, the bit-blast layer would need a cache so that
+identical sub-expressions produce identical BVs. Both are
+substantial extensions outside the scope of the current
+algebraic-pair detector. The bit-blast cache is the more
+fundamental fix because it generalises to all deterministic
+computation (not just multiplication).
+
+Logged as future work. The remaining un-helped patterns from the
+`bench-multiplication` suite (`bounds.c`, `mul_monotone.c`,
+`square.c`, `mul_overflow.c`, etc.) are not algebraic-identity
+problems and would not benefit from any extension of pair detection.
