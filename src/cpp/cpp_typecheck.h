@@ -239,6 +239,28 @@ protected:
     const source_locationt &source_location,
     const struct_tag_typet &type);
 
+  /// Lazy class-body elaboration primitive per N5008 [temp.inst]/3.
+  /// Resolves the type of a class-scope member that was registered
+  /// without a fully-elaborated type.  Idempotent on already-complete
+  /// members.  See
+  /// `doc/architectural/cpp-frontend-plan-lazy-elaboration.md`.
+  ///
+  /// Phase 1 of the lazy-elaboration refactor (this commit) installs
+  /// the API; no caller marks a component lazy yet, so the helper is
+  /// a fast no-op that returns the existing component pointer when
+  /// found.
+  ///
+  /// \param struct_type the class whose member is being completed.
+  ///        Must be mutable because completion updates the component
+  ///        in place.
+  /// \param base_name the unqualified name of the member to complete.
+  /// \return pointer to the (now-complete) component, or nullptr if
+  ///         no component with that base_name exists, or if a lazy
+  ///         component's source genuinely fails to resolve.
+  struct_union_typet::componentt *ensure_member_complete(
+    struct_union_typet &struct_type,
+    const irep_idt &base_name);
+
   unsigned template_counter;
   unsigned anon_counter;
 

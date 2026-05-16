@@ -437,6 +437,14 @@ IREP_ID_ONE(template_parameters)
 IREP_ID_TWO(C_template, #template)
 IREP_ID_TWO(C_template_arguments, #template_arguments)
 IREP_ID_TWO(C_template_case, #template_case)
+// Lazy class-body elaboration per N5008 [temp.inst]/3 — see
+// doc/architectural/cpp-frontend-plan-lazy-elaboration.md.
+// `#lazy_member_type` flags a struct/union component whose type
+// has not yet been resolved; `lazy_type_source` carries the original
+// `cpp_declaration` / `cpp_declarator` pair for on-demand resolution
+// by `cpp_typecheckt::ensure_member_complete`.
+IREP_ID_TWO(C_lazy_member_type, #lazy_member_type)
+IREP_ID_ONE(lazy_type_source)
 IREP_ID_ONE(typename)
 IREP_ID_ONE(C)
 IREP_ID_ONE(cpp)
