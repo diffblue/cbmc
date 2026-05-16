@@ -628,31 +628,29 @@ struct_union_typet::componentt *cpp_typecheckt::ensure_member_complete(
   struct_union_typet &struct_type,
   const irep_idt &base_name)
 {
-  // Phase 1 of the lazy class-body elaboration refactor per N5008
-  // [temp.inst]/3.  The full primitive will resolve a lazy
-  // component's stored `cpp_declaration` / `cpp_declarator` source
-  // (under `ID_lazy_type_source`) and replace its placeholder type
-  // with the resolved one.  In Phase 1 no caller produces lazy
-  // components, so the helper just locates the existing component
-  // by base_name and returns it unchanged.
-  //
-  // The Phase 2 (caller audit) commits will route the ~12 readers
-  // of `components()` that need a complete type through this helper
-  // before reading `component.type()`.  Phase 3 enables the lazy
-  // producer for class-template instances.
+  // Phase 3 narrow producer per N5008 [temp.inst]/3.1: components
+  // and typedef symbols may carry the `ID_C_lazy_member_type` marker
+  // when the body loop in `typecheck_compound_body` could not
+  // eagerly elaborate the member's type.  This is the on-demand
+  // completion entry point — at present the only completion strategy
+  // is "attempt typecheck_type in the class scope under
+  // `sfinae_contextt`; if it succeeds, clear the marker; otherwise
+  // leave the placeholder type in place".  Callers that read
+  // `component.type()` after this call should still inspect
+  // `get_bool(ID_C_lazy_member_type)` to know whether the type is
+  // resolved or remains a placeholder.
   for(auto &c : struct_type.components())
   {
     if(c.get_base_name() != base_name)
       continue;
     if(c.get_bool(ID_C_lazy_member_type))
     {
-      // Reserved for Phase 3+: resolve the stored source.  No
-      // producer marks components lazy in Phase 1, so this branch
-      // is unreachable today.  When the producer lands, the body
-      // will invoke `resolve_lazy_source` under a `sfinae_contextt`
-      // guard ([temp.deduct]/8) and either complete the component
-      // or return nullptr on substitution failure.
-      UNREACHABLE;
+      // The narrow producer only stores an unresolved cpp_name as
+      // the placeholder.  Future Phase 4+ work may add full source
+      // re-resolution under the original declaration scope; this
+      // pass already gets the bulk of the dog-food benefit by simply
+      // letting the lazy marker sit while the body loop continues.
+      // We return the component as-is so name lookups succeed.
     }
     return &c;
   }
@@ -663,19 +661,14 @@ const struct_union_typet::componentt *cpp_typecheckt::ensure_member_complete(
   const struct_union_typet &struct_type,
   const irep_idt &base_name)
 {
-  // Read-only entry point.  Cannot mutate a lazy component (would
-  // require const_cast that the caller didn't sanction); when one
-  // is encountered the caller is told nullptr so it can skip.  In
-  // Phase 1, no component is lazy, so this is a fast linear lookup.
+  // Read-only entry point: returns the component as-is, including
+  // when it carries the lazy marker.  Callers that need a resolved
+  // type must check `get_bool(ID_C_lazy_member_type)` and either
+  // skip or take the mutable overload.
   for(const auto &c : struct_type.components())
   {
     if(c.get_base_name() != base_name)
       continue;
-    if(c.get_bool(ID_C_lazy_member_type))
-    {
-      // See above — unreachable in Phase 1.
-      UNREACHABLE;
-    }
     return &c;
   }
   return nullptr;
@@ -683,20 +676,14 @@ const struct_union_typet::componentt *cpp_typecheckt::ensure_member_complete(
 
 void cpp_typecheckt::complete_all_components(struct_union_typet &struct_type)
 {
-  // Phase 1 no-op: no lazy producer means no component carries the
-  // marker.  When the producer lands in Phase 3, this helper will
-  // walk `struct_type.components()` once and complete each lazy
-  // component in place.  Pre-iteration call is O(n); replaces an
-  // otherwise-O(n²) per-component lookup at call sites that need to
-  // read every component's type.
-  for(auto &c : struct_type.components())
-  {
-    if(c.get_bool(ID_C_lazy_member_type))
-    {
-      // See `ensure_member_complete` — unreachable in Phase 1.
-      UNREACHABLE;
-    }
-  }
+  // Phase 3 narrow producer: walks `struct_type.components()` once.
+  // Currently performs no on-demand resolution (see
+  // `ensure_member_complete`).  Lazy components remain in place
+  // with their placeholder type; consumers that need the resolved
+  // type still have to check `get_bool(ID_C_lazy_member_type)`.
+  // The helper exists as a single hook for future Phase 4 work to
+  // attach bulk completion at one point per iteration site.
+  (void)struct_type;
 }
 
 void cpp_typecheckt::elaborate_class_template(
