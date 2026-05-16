@@ -772,12 +772,18 @@ membership would coincide with functional equivalence, and a
 separate vanishing test would be unnecessary.
 
 We implemented this experimentally and found it impractical. On the
-custom suite, replacing the falling-factorial test of
-Section~\ref{sec:vanishing} with ZFP injection \emph{loses} 5 of 22
-benchmarks (the DSP datapaths and \texttt{overflow\_detect\_16}) and
-slows benchmarks that don't need ZFPs at all (e.g.\
-\texttt{mul\_no\_overflow\_16}: $0.01\,$s $\to$ $18.1\,$s) by three
-orders of magnitude. Two failure modes:
+full 39-benchmark custom suite, replacing the falling-factorial test
+of Section~\ref{sec:vanishing} with ZFP injection \emph{loses} 9 of
+39 benchmarks, including 7 (\texttt{overflow\_detect\_16},
+\texttt{add\_overflow\_16}, \texttt{checked\_mul\_16},
+\texttt{equiv\_unsat\_8add\_16}, \texttt{crypto\_square\_mod},
+\texttt{mul\_ineq\_12}, \texttt{fixedpoint\_mul\_16}) that don't
+need ZFPs at all and solve trivially without the vanishing test.
+Adding ZFP injection on \emph{top} of the working vanishing test
+causes 2 further regressions
+(\texttt{div\_mul\_roundtrip\_12}: $3.97\,$s $\to$ T/O,
+\texttt{fixedpoint\_mul\_16}: $0.02\,$s $\to$ T/O). Two failure
+modes:
 (i) For $d = 8$, SF$(2^d) = 10$, so 9 generators per variable are
 added; their pairwise S-polynomials bloat Buchberger's worklist
 even when ZFPs are not needed, hitting the 100\,000-step reduction

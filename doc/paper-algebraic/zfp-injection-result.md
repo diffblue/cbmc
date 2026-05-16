@@ -29,8 +29,9 @@ falling factorial.
 
 ## Experimental setup
 
-39-benchmark custom suite (Paper 2 Table 1), 25 actually present in
-the repo at the time of writing. Four configurations:
+Full 39-benchmark custom suite (Paper 2 Table 1, canonical list
+from `doc/paper-algebraic/data/paper2-suite-results.tsv`). Four
+configurations:
 
 | Config         | Vanishing (§3) | ZFP injection |
 |----------------|:---:|:---:|
@@ -45,39 +46,69 @@ algebraic layer enabled.
 ## Results
 
 ```
-default      : 22/22  <-- Paper 2 baseline
-vanish_off   : 18/22  (loses 4: §3 needed for these)
-zfp_only     : 17/22  <-- WORSE than vanish_off
-zfp_plus_van : 22/22  (recovers default's coverage)
+default      : 39/39  <-- Paper 2 baseline
+vanish_off   : 36/39  (loses 3: §3 needed for these)
+zfp_only     : 30/39  <-- WORSE than vanish_off, loses 9
+zfp_plus_van : 37/39  (REGRESSES on 2 vs default)
 ```
 
-### Per-benchmark regressions caused by ZFP injection
+### Vanishing test is essential for 3 benchmarks
+
+Three benchmarks T/O without the §3 vanishing test, regardless of
+whether ZFP injection is on or off:
+
+- `dsp_image_reject` (DSP datapath)
+- `dsp_horner_16` (DSP datapath)
+- `dsp_vanishing_mv` (multi-variate ZFP)
+
+### ZFP injection causes 9 regressions
+
+Compared to `default`, `zfp_only` *loses* 9 benchmarks. 6 of these
+are benchmarks that don't even need the vanishing test (they solve
+trivially without it):
 
 | Benchmark            | default | vanish_off | zfp_only | zfp_plus_van |
 |----------------------|---------|------------|----------|--------------|
 | overflow_detect_16   | 0.00 s  | 0.00 s     | **T/O**  | 0.00 s       |
 | add_overflow_16      | 0.00 s  | 0.00 s     | **11.4 s** | 0.00 s     |
-| mul_no_overflow_16   | 0.01 s  | 0.01 s     | **18.1 s** | **18.0 s** |
+| checked_mul_16       | 0.00 s  | 0.00 s     | **T/O**  | 0.00 s       |
+| equiv_unsat_8add_16  | 0.00 s  | 0.00 s     | **T/O**  | 0.00 s       |
+| crypto_square_mod    | 0.01 s  | 0.01 s     | **1.9 s** | **1.9 s**    |
+| fixedpoint_mul_16    | 0.02 s  | 0.02 s     | **T/O**  | **T/O**      |
+| mul_ineq_12          | 0.50 s  | 0.50 s     | **10.3 s** | **10.2 s** |
 | dsp_image_reject     | 0.01 s  | T/O        | T/O      | 0.01 s       |
-| dsp_horner_8         | 0.00 s  | T/O        | 15.85 s  | 0.00 s       |
 | dsp_horner_16        | 0.00 s  | T/O        | T/O      | 0.01 s       |
-| dsp_vanishing_poly_8 | 0.00 s  | 20.93 s    | T/O      | 0.00 s       |
+| dsp_vanishing_poly_8 | 0.00 s  | 20.89 s    | **T/O**  | 0.00 s       |
 | dsp_vanishing_mv     | 0.00 s  | T/O        | T/O      | 0.00 s       |
+| div_mul_roundtrip_12 | 3.97 s  | 3.98 s     | **T/O**  | **T/O**      |
 
-**Most striking**: `mul_no_overflow_16` and `add_overflow_16` don't
-need vanishing at all (they solve in 0.00-0.01 s with vanishing
-*off*), yet ZFP injection makes them 1000-1800× slower. The extra
-generators bloat Buchberger.
+**Most striking**: `add_overflow_16`, `checked_mul_16`,
+`equiv_unsat_8add_16`, `crypto_square_mod`, `mul_ineq_12`,
+`fixedpoint_mul_16`, `div_mul_roundtrip_12` are all benchmarks
+that don't need ZFPs at all — they solve in milliseconds with
+vanishing *off*. ZFP injection makes them 100×–unboundedly slower
+or causes outright timeouts.
 
-`dsp_image_reject`, `dsp_horner_16`, `dsp_vanishing_poly_8`,
-`dsp_vanishing_mv` all rely on §3: they fail without vanishing
-*and* fail with ZFP injection alone.
+### `zfp_plus_van` regresses on 2 benchmarks vs `default`
+
+Even adding ZFP injection on *top* of the working §3 test causes
+new failures:
+
+- `div_mul_roundtrip_12`: 3.97 s → T/O.
+- `fixedpoint_mul_16`: 0.02 s → T/O.
+
+These are not solvable by the §3 test alone (it doesn't apply); the
+default behaviour relies on the standard Buchberger run. ZFP
+injection bloats that basis enough that Buchberger now exceeds the
+100k-step budget and the queries fall through to bit-blasting,
+where they time out.
 
 ### Where ZFP injection helps
 
-Only `dsp_horner_8`, where ZFP injection (15.85 s) beats `vanish_off`
-T/O. Even there, it's vastly slower than the §3 vanishing test
-(0.00 s).
+Zero benchmarks. There is no benchmark in the suite where
+`zfp_only > vanish_off`. The only benchmark where
+`vanish_off` T/Os and `zfp_only` solves… does not exist on the
+custom suite.
 
 ## Why does Martin's hypothesis fail?
 
@@ -113,9 +144,11 @@ intrinsically more efficient because:
 ## Conclusion
 
 **The hypothesis is empirically refuted.** ZFP injection does not
-subsume the §3 vanishing-polynomial test; on the 39-benchmark suite,
-it loses 5 benchmarks and slows down 3 others by 1000×. The §3 test
-remains essential.
+subsume the §3 vanishing-polynomial test; on the full
+39-benchmark suite, it loses 9 benchmarks vs the default
+configuration, including 7 benchmarks that don't even need ZFPs
+to solve. Adding ZFP injection on *top* of the working vanishing
+test causes 2 new regressions. The §3 test remains essential.
 
 This is itself a useful contribution to Paper 2: it justifies the
 two-phase architecture (Gröbner basis + §3 vanishing test) over the

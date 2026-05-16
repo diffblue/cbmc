@@ -36,18 +36,19 @@ cat > "$OUTFILE" <<HEADER
 benchmark	default	vanish_off	zfp_only	zfp_plus_van
 HEADER
 
-# 39-benchmark custom suite (from Paper 2 Table 1)
+# 39-benchmark custom suite (canonical list from paper2-suite-results.tsv)
 benchmarks=(
-  comm_8 comm_16 comm_24 comm_32
-  assoc_8 assoc_16 assoc_32
-  distrib_8 distrib_16 distrib_32
-  overflow_detect_16 add_overflow_16 mul_no_overflow_16 mul_ineq_12
-  swap_xor3_16
-  dsp_image_reject dsp_image_reject_inline dsp_horner_8 dsp_horner_16
-  dsp_vanishing_8 dsp_vanishing_poly_8 dsp_vanishing_mv dsp_coeff_scale_8 dsp_mac_comm_16
-  div_test_8 div_roundtrip_8 mod_basic_8 div_simple_4
-  bf16_mul_comm bf16_mul_comm_v2 bf16_mul_assoc bf16_mul_assoc_v2
-  bf16_mul_zero bf16_neg_zero bf16_signed_zero bf16_inf_handling bf16_nan_check bf16_subnormal
+  comm_8 comm_10 comm_11 comm_12 comm_13 comm_14 comm_15 comm_16
+  comm_18 comm_20 comm_24 comm_32
+  assoc_8 distrib_8
+  overflow_detect_16 add_overflow_16 checked_mul_16 add_chain_16 add_chain_32
+  add_sub_cancel_16 equiv_unsat_8add_16
+  bf16_mul_comm bf16_mul_comm_v2 bf16_mul_const bf16_mul_mono
+  strength_chain_16 strength_16_15 strength_16_31
+  mul_ineq_12 div_mul_roundtrip_12 gf256_mul_assoc crypto_square_mod
+  barrett_red_8 fixedpoint_mul_16
+  dsp_image_reject dsp_horner_16 dsp_vanishing_poly_8 dsp_vanishing_mv
+  dsp_coeff_scale_8
 )
 
 i=0
