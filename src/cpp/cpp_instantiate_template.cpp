@@ -659,6 +659,46 @@ struct_union_typet::componentt *cpp_typecheckt::ensure_member_complete(
   return nullptr;
 }
 
+const struct_union_typet::componentt *cpp_typecheckt::ensure_member_complete(
+  const struct_union_typet &struct_type,
+  const irep_idt &base_name)
+{
+  // Read-only entry point.  Cannot mutate a lazy component (would
+  // require const_cast that the caller didn't sanction); when one
+  // is encountered the caller is told nullptr so it can skip.  In
+  // Phase 1, no component is lazy, so this is a fast linear lookup.
+  for(const auto &c : struct_type.components())
+  {
+    if(c.get_base_name() != base_name)
+      continue;
+    if(c.get_bool(ID_C_lazy_member_type))
+    {
+      // See above — unreachable in Phase 1.
+      UNREACHABLE;
+    }
+    return &c;
+  }
+  return nullptr;
+}
+
+void cpp_typecheckt::complete_all_components(struct_union_typet &struct_type)
+{
+  // Phase 1 no-op: no lazy producer means no component carries the
+  // marker.  When the producer lands in Phase 3, this helper will
+  // walk `struct_type.components()` once and complete each lazy
+  // component in place.  Pre-iteration call is O(n); replaces an
+  // otherwise-O(n²) per-component lookup at call sites that need to
+  // read every component's type.
+  for(auto &c : struct_type.components())
+  {
+    if(c.get_bool(ID_C_lazy_member_type))
+    {
+      // See `ensure_member_complete` — unreachable in Phase 1.
+      UNREACHABLE;
+    }
+  }
+}
+
 void cpp_typecheckt::elaborate_class_template(
   const typet &type)
 {
