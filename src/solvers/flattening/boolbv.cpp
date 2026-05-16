@@ -22,13 +22,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string_constant.h>
 
 #include <solvers/algebraic/groebner.h>
-#include <solvers/algebraic/vanishing.h>
 #include <solvers/algebraic/poly_extract.h>
+#include <solvers/algebraic/vanishing.h>
 #include <solvers/floatbv/float_utils.h>
 
 #include "literal_vector_expr.h"
 
 #include <algorithm>
+#include <cstdlib>
 
 endianness_mapt boolbvt::endianness_map(const typet &type) const
 {
@@ -802,6 +803,47 @@ bool boolbvt::try_algebraic_solve()
     // Add Rabinowitsch last (ordering matters for Gröbner basis)
     single_eqs.push_back(std::move(rab));
 
+    // Optional: inject ZFP generators for variables.
+    // Behind ENABLE_ZFP_INJECTION env var. If on, this is intended
+    // to subsume the §3 vanishing polynomial test (set
+    // DISABLE_VANISHING=1 to skip the separate test).
+    if(std::getenv("ENABLE_ZFP_INJECTION") != nullptr)
+    {
+      // Optional cap on max k (default = full SF). Keeps the basis
+      // small for ablation experiments.
+      unsigned max_k_cap = 0;
+      unsigned min_k_cap = 2;
+      if(const char *cap = std::getenv("ZFP_MAX_K"))
+        max_k_cap = std::atoi(cap);
+      if(const char *cap = std::getenv("ZFP_MIN_K"))
+        min_k_cap = std::atoi(cap);
+      const auto &rev_map_d = single_extractor.get_reverse_var_map();
+      for(const auto &[var_idx, name] : rev_map_d)
+      {
+        const std::string name_str = id2string(name);
+        if(name_str.substr(0, 2) == "__")
+          continue;
+
+        unsigned in_w = single_bw;
+        auto it = single_extractor.var_input_widths.find(var_idx);
+        if(it != single_extractor.var_input_widths.end() && it->second > 0)
+          in_w = it->second;
+
+        auto zfps = generate_zfp_generators(single_bw, var_idx, in_w);
+        for(auto &zfp : zfps)
+        {
+          if(zfp.is_zero())
+            continue;
+          unsigned deg = zfp.leading_monomial().total_degree();
+          if(max_k_cap > 0 && deg > max_k_cap)
+            continue;
+          if(deg < min_k_cap)
+            continue;
+          single_eqs.push_back(std::move(zfp));
+        }
+      }
+    }
+
     if(single_eqs.size() >= 2)
     {
       strong_groebner_basist single_gb{100000};
@@ -856,6 +898,55 @@ bool boolbvt::try_algebraic_solve()
         ordered.push_back(std::move(eq));
     }
     equations = std::move(ordered);
+  }
+
+  // Optional: inject ZFP generators for input-tracked variables.
+  // Behind ENABLE_ZFP_INJECTION env var. Set DISABLE_VANISHING=1 in
+  // combination if you want to test the hypothesis that ZFP injection
+  // subsumes the §3 vanishing polynomial test.
+  if(std::getenv("ENABLE_ZFP_INJECTION") != nullptr)
+  {
+    unsigned bw = extractor.get_bitwidth();
+    if(bw > 0)
+    {
+      unsigned max_k_cap = 0;
+      unsigned min_k_cap = 2;
+      if(const char *cap = std::getenv("ZFP_MAX_K"))
+        max_k_cap = std::atoi(cap);
+      if(const char *cap = std::getenv("ZFP_MIN_K"))
+        min_k_cap = std::atoi(cap);
+      const auto &rev_map = extractor.get_reverse_var_map();
+      for(const auto &[var_idx, name] : rev_map)
+      {
+        // Skip auxiliary variables (Rabinowitsch, fresh product
+        // decomposition vars). These are only constrained by the
+        // ring's natural ZFPs (which apply automatically); adding
+        // ZFP generators for them just bloats the basis.
+        const std::string name_str = id2string(name);
+        if(name_str.substr(0, 2) == "__")
+          continue;
+
+        // Use recorded input width if known (set by zero_extend), else
+        // the polynomial ring's bitwidth.
+        unsigned in_w = bw;
+        auto it = extractor.var_input_widths.find(var_idx);
+        if(it != extractor.var_input_widths.end() && it->second > 0)
+          in_w = it->second;
+
+        auto zfps = generate_zfp_generators(bw, var_idx, in_w);
+        for(auto &zfp : zfps)
+        {
+          if(zfp.is_zero())
+            continue;
+          unsigned deg = zfp.leading_monomial().total_degree();
+          if(max_k_cap > 0 && deg > max_k_cap)
+            continue;
+          if(deg < min_k_cap)
+            continue;
+          equations.push_back(std::move(zfp));
+        }
+      }
+    }
   }
 
   strong_groebner_basist gb{100000};

@@ -85,6 +85,23 @@ because ZFP reductions are now first-class moves.
 benchmarks. If they still solve in <15 ms, the simplification is a
 clean replacement. If timings degrade, document the tradeoff.
 
+**STATUS (2026-05-16): empirically refuted**. Prototype implemented in
+`vanishing.{h,cpp}` and `boolbv.cpp` behind `ENABLE_ZFP_INJECTION=1`.
+On 22 benchmarks of the custom suite:
+- `default` (Paper 2 baseline, §3 test on, no ZFP): 22/22.
+- `zfp_only` (§3 test off, ZFPs in basis): **17/22, loses 5**.
+- Severe regressions on benchmarks that don't need ZFPs at all
+  (`mul_no_overflow_16`: 0.01 s → 18.1 s).
+- Root causes: (i) basis bloat — 9 ZFP generators per variable for
+  d=8 cause too many S-polynomial pairs; (ii) SSA indirection —
+  Buchberger cannot reduce polynomials over intermediate SSA
+  variables (`x2, x3, …, x10`) back to a polynomial in `x` alone
+  within the 100k-step budget.
+- The §3 falling-factorial test sidesteps both: it substitutes SSA
+  definitions, then converts directly to factorial basis.
+- Full writeup in `doc/paper-algebraic/zfp-injection-result.md`;
+  paper §3 amended with a paragraph documenting the negative result.
+
 ### 5. "Overflow detection encoding — I don't immediately see it."
 
 **Context**: Martin asks how overflow detection reduces to a

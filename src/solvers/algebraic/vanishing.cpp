@@ -277,3 +277,65 @@ bool is_vanishing_polynomial(
 
   return u.empty();
 }
+
+/// Build the univariate falling factorial $x^{\underline{k}}$ as a
+/// polynomial in variable \p var_idx over $\mathbb{Z}_{2^d}$, scaled
+/// by an integer \p coeff.
+///
+/// $x^{\underline{k}} = x \cdot (x-1) \cdot (x-2) \cdots (x-k+1)$.
+/// $x^{\underline{0}} = 1$ by convention.
+static polynomialt build_falling_factorial(
+  unsigned d,
+  std::size_t var_idx,
+  unsigned k,
+  const mp_integer &coeff)
+{
+  polynomialt result{d, coeff};
+  for(unsigned i = 0; i < k; ++i)
+  {
+    polynomialt factor{d, mp_integer{1}, var_idx};
+    factor = factor - polynomialt{d, mp_integer{i}};
+    result = result * factor;
+  }
+  result.normalize();
+  return result;
+}
+
+std::vector<polynomialt>
+generate_zfp_generators(unsigned d, std::size_t var_idx, unsigned input_width)
+{
+  std::vector<polynomialt> result;
+
+  // Smarandache function SF(2^d) gives the smallest k with nu2(k!) >= d.
+  unsigned sf = smarandache_function(d);
+
+  // Effective max k for the standard generators.
+  unsigned max_k = sf;
+
+  // If input is narrower than d, x ranges over {0, ..., 2^n - 1}.
+  // Then x^{\underline{2^n}} = x(x-1)...(x-(2^n-1)) is identically
+  // zero on the input range. Use this if it is smaller than SF.
+  if(input_width > 0 && input_width < 30)
+  {
+    unsigned input_range = 1u << input_width;
+    if(input_range < max_k)
+      max_k = input_range;
+  }
+
+  // Skip k=1: 2^d * x = 0 mod 2^d, vacuous.
+  for(unsigned k = 2; k <= max_k; ++k)
+  {
+    unsigned val_k = nu2_factorial(k);
+    mp_integer coeff;
+    if(val_k >= d)
+      coeff = mp_integer{1};
+    else
+      coeff = power(mp_integer{2}, mp_integer{d - val_k});
+
+    polynomialt zfp = build_falling_factorial(d, var_idx, k, coeff);
+    if(!zfp.is_zero())
+      result.push_back(std::move(zfp));
+  }
+
+  return result;
+}

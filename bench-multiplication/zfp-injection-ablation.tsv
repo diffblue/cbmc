@@ -1,0 +1,29 @@
+# 39-benchmark custom suite ablation: vanishing test vs ZFP injection
+# default     = vanishing test enabled, no ZFP injection (Paper 2 baseline)
+# vanish_off  = vanishing test disabled, no ZFP injection
+# zfp_only    = vanishing test disabled, ZFP injection enabled
+# zfp_plus_van= both vanishing test and ZFP injection enabled
+# Time in seconds; T/O = 30 s
+benchmark	default	vanish_off	zfp_only	zfp_plus_van
+comm_8	0.00	0.00	0.00	0.00
+comm_16	0.00	0.00	0.00	0.00
+comm_24	0.00	0.00	0.00	0.00
+comm_32	0.00	0.00	0.00	0.00
+assoc_8	0.00	0.00	0.00	0.00
+distrib_8	0.00	0.00	0.00	0.00
+distrib_16	0.00	0.00	0.00	0.00
+overflow_detect_16	0.00	0.00	T/O	0.00
+add_overflow_16	0.00	0.00	11.37	0.00
+mul_no_overflow_16	0.01	0.01	18.09	18.04
+mul_ineq_12	0.50	0.50	10.26	10.25
+dsp_image_reject	0.01	T/O	T/O	0.01
+dsp_image_reject_inline	0.00	0.00	0.00	0.00
+dsp_horner_8	0.00	T/O	15.85	0.00
+dsp_horner_16	0.00	T/O	T/O	0.01
+dsp_vanishing_8	0.00	0.00	0.00	0.00
+dsp_vanishing_poly_8	0.00	20.93	T/O	0.00
+dsp_vanishing_mv	0.00	T/O	T/O	0.00
+dsp_coeff_scale_8	0.00	0.00	0.00	0.00
+dsp_mac_comm_16	0.00	0.00	0.00	0.00
+bf16_mul_comm	0.00	0.00	0.00	0.00
+bf16_mul_comm_v2	11.01	11.04	11.09	11.09
