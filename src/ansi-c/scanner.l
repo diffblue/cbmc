@@ -981,7 +981,15 @@ enable_or_disable ("enable"|"disable")
 "__is_base_of"      { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
 "__is_class"        { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
 "__is_convertible_to" { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
-"__is_convertible" { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
+  /* libc++14 has `struct __is_convertible` as an internal type-trait
+     helper; libc++14's `struct __is_referenceable` is also a struct
+     name.  When these identifiers appear NOT followed by `(`, treat
+     them as plain identifiers so the C++ parser can accept the libc++
+     declarations.  When followed by `(` (with optional whitespace),
+     they are still recognised as the GCC type-predicate built-ins
+     used by `regression/cpp/is_convertible_builtin/` and friends. */
+"__is_convertible"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
+"__is_convertible" { return make_identifier(); }
 "__is_delegate"     { return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
 "__is_empty"        { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
 "__is_enum"         { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
@@ -1038,7 +1046,8 @@ enable_or_disable ("enable"|"disable")
 "__add_lvalue_reference" { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_GCC_BUILTIN_ADD_LVALUE_REFERENCE); }
 "__add_rvalue_reference" { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_GCC_BUILTIN_ADD_RVALUE_REFERENCE); }
 "__add_pointer"       { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_GCC_BUILTIN_ADD_POINTER); }
-"__is_referenceable"  { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
+"__is_referenceable"/[ \t\r\n]*\(  { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
+"__is_referenceable"  { return make_identifier(); }
 "__is_trivially_destructible" { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
 "__is_destructible"       { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
 "__is_nothrow_destructible" { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
@@ -1378,10 +1387,11 @@ enable_or_disable ("enable"|"disable")
                     TOK_GCC_BUILTIN_REMOVE_CVREF);
                 }
 
-"__decay" { return conditional_keyword(
+"__decay"/[ \t\r\n]*\( { return conditional_keyword(
                     PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor),
                     TOK_GCC_BUILTIN_REMOVE_CVREF);
                 }
+"__decay" { return make_identifier(); }
 
 "__forceinline" { return conditional_keyword(
                     PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO ||
