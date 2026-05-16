@@ -209,6 +209,20 @@ algebraic layer's reach into bit-level reasoning.
    patterns. Add to Paper 2's evaluation pool. Re-run the wider
    five-approach comparison on these.
 
+   **Martin has already generated benchmarks** at
+   <https://github.com/martin-cs/subpolynomial-encoding/tree/main/benchmarks>.
+   Cloned to `/tmp/subpolynomial-encoding`. Two seed archives
+   (`seed-23.tar.xz`, `seed-42.tar.xz`) with ~2,500 benchmarks each.
+   Pattern: random degree-10 polynomials over Z_{2^16} testing
+   `p(x) + q(x) = (p+q)(x)`, bounding, correctness, etc., in two
+   encodings (native vs subpolynomial). Categories include:
+   - `addition` (polynomial sum identity)
+   - `bounding` (degree bounds)
+   - `correctness` (equivalence of encodings)
+   - `original` vs `reduced` polynomials
+   These are stronger and more varied than what we'd generate
+   ourselves; using them gives Paper 2 a broader empirical case.
+
 ### Research directions (substantial)
 
 6. **ZFP injection into Gröbner basis**: implement a prototype that adds
