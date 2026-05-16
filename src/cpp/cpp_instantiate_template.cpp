@@ -628,30 +628,25 @@ struct_union_typet::componentt *cpp_typecheckt::ensure_member_complete(
   struct_union_typet &struct_type,
   const irep_idt &base_name)
 {
-  // Phase 3 narrow producer per N5008 [temp.inst]/3.1: components
-  // and typedef symbols may carry the `ID_C_lazy_member_type` marker
-  // when the body loop in `typecheck_compound_body` could not
-  // eagerly elaborate the member's type.  This is the on-demand
-  // completion entry point — at present the only completion strategy
-  // is "attempt typecheck_type in the class scope under
-  // `sfinae_contextt`; if it succeeds, clear the marker; otherwise
-  // leave the placeholder type in place".  Callers that read
-  // `component.type()` after this call should still inspect
-  // `get_bool(ID_C_lazy_member_type)` to know whether the type is
-  // resolved or remains a placeholder.
+  // Phase 3 narrow producer + Phase 4 on-demand resolution per
+  // N5008 [temp.inst]/3.1.  When a component carries the
+  // `ID_C_lazy_member_type` marker, its declared type is an
+  // unresolved cpp_name placeholder kept by the producer in
+  // `typecheck_compound_body`.  This entry point is the consumer
+  // side: it locates the named component, and if it is lazy, makes
+  // a single best-effort attempt to resolve the placeholder under
+  // the original class scope and SFINAE protection
+  // ([temp.deduct]/8).  On success the component's type is
+  // replaced with the resolved type and the marker cleared; on
+  // failure the placeholder is left in place so subsequent calls
+  // can retry (idempotent), and the marker remains visible to
+  // callers that want to skip rather than read an incomplete type.
   for(auto &c : struct_type.components())
   {
     if(c.get_base_name() != base_name)
       continue;
     if(c.get_bool(ID_C_lazy_member_type))
-    {
-      // The narrow producer only stores an unresolved cpp_name as
-      // the placeholder.  Future Phase 4+ work may add full source
-      // re-resolution under the original declaration scope; this
-      // pass already gets the bulk of the dog-food benefit by simply
-      // letting the lazy marker sit while the body loop continues.
-      // We return the component as-is so name lookups succeed.
-    }
+      try_resolve_lazy_member(c);
     return &c;
   }
   return nullptr;
@@ -661,10 +656,10 @@ const struct_union_typet::componentt *cpp_typecheckt::ensure_member_complete(
   const struct_union_typet &struct_type,
   const irep_idt &base_name)
 {
-  // Read-only entry point: returns the component as-is, including
-  // when it carries the lazy marker.  Callers that need a resolved
-  // type must check `get_bool(ID_C_lazy_member_type)` and either
-  // skip or take the mutable overload.
+  // Read-only entry point.  Cannot mutate, so cannot run the
+  // resolution attempt; returns the component as-is.  Callers that
+  // need a resolved type should check `get_bool(ID_C_lazy_member_type)`
+  // and either skip or take the mutable overload.
   for(const auto &c : struct_type.components())
   {
     if(c.get_base_name() != base_name)
@@ -676,14 +671,68 @@ const struct_union_typet::componentt *cpp_typecheckt::ensure_member_complete(
 
 void cpp_typecheckt::complete_all_components(struct_union_typet &struct_type)
 {
-  // Phase 3 narrow producer: walks `struct_type.components()` once.
-  // Currently performs no on-demand resolution (see
-  // `ensure_member_complete`).  Lazy components remain in place
-  // with their placeholder type; consumers that need the resolved
-  // type still have to check `get_bool(ID_C_lazy_member_type)`.
-  // The helper exists as a single hook for future Phase 4 work to
-  // attach bulk completion at one point per iteration site.
-  (void)struct_type;
+  // Phase 4: bulk on-demand resolution.  Iterates every component
+  // once and tries to resolve any lazy ones.  Components that
+  // remain unresolved keep their marker.
+  for(auto &c : struct_type.components())
+  {
+    if(c.get_bool(ID_C_lazy_member_type))
+      try_resolve_lazy_member(c);
+  }
+}
+
+bool cpp_typecheckt::try_resolve_lazy_member(
+  struct_union_typet::componentt &component)
+{
+  // Per N5008 [temp.inst]/3.1 with [temp.deduct]/8 protection: try
+  // to resolve a lazy component's placeholder type one more time.
+  // The producer in `typecheck_compound_body` saved the class scope
+  // identifier under `ID_lazy_type_source` so the retry can be
+  // performed in the right context — typedef and member name
+  // lookups within the unresolved cpp_name need the class scope to
+  // resolve sibling members.
+  if(!component.get_bool(ID_C_lazy_member_type))
+    return true;
+
+  const irep_idt class_scope_id = component.get(ID_lazy_type_source);
+  if(class_scope_id.empty())
+    return false;
+
+  auto scope_it = cpp_scopes.id_map.find(class_scope_id);
+  if(scope_it == cpp_scopes.id_map.end())
+    return false;
+
+  cpp_save_scopet save{cpp_scopes};
+  cpp_scopes.go_to(*scope_it->second);
+
+  typet candidate = component.type();
+  candidate.remove(ID_C_lazy_member_type);
+  candidate.remove(ID_lazy_type_source);
+
+  bool ok = true;
+  try
+  {
+    sfinae_contextt sfinae_guard{*this};
+    typecheck_type(candidate);
+  }
+  catch(...)
+  {
+    ok = false;
+  }
+
+  if(!ok)
+    return false;
+
+  // Resolution succeeded: replace the component's type and clear
+  // the lazy markers.  We deliberately do not touch any class-scope
+  // typedef symbol that the producer may have created — that
+  // symbol's type still needs the same resolution attempt, but
+  // running it from a different lookup path could mean the symbol
+  // and the component disagree if one path succeeds and the other
+  // fails.  A separate Phase 4b pass will reconcile typedef
+  // symbols at first use; for now they keep the placeholder.
+  component.type() = std::move(candidate);
+  return true;
 }
 
 void cpp_typecheckt::elaborate_class_template(

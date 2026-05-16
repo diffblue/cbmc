@@ -1580,6 +1580,17 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
             if(base_name.empty())
               throw;
 
+            // Capture the class-scope identifier for later
+            // re-resolution by `ensure_member_complete`: the helper
+            // needs to switch into this scope to give member-typedef
+            // resolution a chance.  Also capture the unresolved
+            // cpp_name so the source survives the `declaration.type()`
+            // being mutated by other declarators in the same
+            // declaration list.
+            const irep_idt class_scope_id =
+              cpp_scopes.current_scope().identifier;
+            typet lazy_source = declaration.type();
+
             if(is_typedef)
             {
               // Lazy typedef registration.  Build the symbol the
@@ -1597,8 +1608,9 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
                 typedef_sym.name = sym_name;
                 typedef_sym.base_name = base_name;
                 typedef_sym.pretty_name = base_name;
-                typedef_sym.type = declaration.type();
+                typedef_sym.type = lazy_source;
                 typedef_sym.type.set(ID_C_lazy_member_type, true);
+                typedef_sym.type.set(ID_lazy_type_source, class_scope_id);
                 typedef_sym.location = declarator.source_location();
                 typedef_sym.mode = ID_cpp;
                 typedef_sym.module = module;
@@ -1612,17 +1624,18 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
                 }
               }
 
-              struct_typet::componentt comp(base_name, declaration.type());
+              struct_typet::componentt comp(base_name, lazy_source);
               comp.set_base_name(base_name);
               comp.set(ID_access, access);
               comp.set(ID_is_type, true);
               comp.set(ID_C_lazy_member_type, true);
+              comp.set(ID_lazy_type_source, class_scope_id);
               comp.add_source_location() = declarator.source_location();
               components.push_back(std::move(comp));
             }
             else
             {
-              struct_typet::componentt comp(base_name, declaration.type());
+              struct_typet::componentt comp(base_name, lazy_source);
               comp.set_base_name(base_name);
               comp.set(ID_access, access);
               if(is_static)
@@ -1630,6 +1643,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
               if(is_mutable)
                 comp.set(ID_is_mutable, true);
               comp.set(ID_C_lazy_member_type, true);
+              comp.set(ID_lazy_type_source, class_scope_id);
               comp.add_source_location() = declarator.source_location();
               components.push_back(std::move(comp));
             }
