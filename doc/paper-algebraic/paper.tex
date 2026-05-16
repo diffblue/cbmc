@@ -1417,6 +1417,30 @@ broaden applicability. Third, post-quantum cryptographic
 implementations (e.g., SABER) use polynomial ring multiplication
 that our techniques could verify.
 
+\paragraph{Towards a true theory solver for bit-vector arithmetic.}
+Our current architecture treats the algebraic layer as a
+preprocessor: it runs once, decides what it can, and the residual
+goes to bit-blasting. A natural next step is to make the layer a
+full theory solver in the SMT(LRA/UF/$\ldots$)\ tradition,
+exchanging information bidirectionally with the SAT search.
+Two concrete sub-directions:
+\emph{(a) Expression-level normalisation.} After Buchberger, reduce
+arbitrary polynomial expressions in the residual w.r.t.\ the
+computed basis. If the reduction produces a constant or a shorter
+polynomial form, communicate it to the bit-blast layer as a
+SAT-level equality, propagating the algebraic insight. This
+generalises our existing \texttt{extract\_candidate} (which finds
+univariate-linear basis elements only) to arbitrary expressions.
+\emph{(b) Bit-level partial information as polynomial constraints.}
+SAT-level partial assignments often determine specific bits of
+intermediate values. Encoding these via fresh bit-decomposition
+variables $b_{x,i}$ over $\mathbb{Z}_{2^d}$, with idempotency
+$b_{x,i}^2 = b_{x,i}$ and the sum-decomposition
+$x = \sum_i 2^i b_{x,i}$, allows the algebraic layer to
+incorporate bit-level facts and to discover bit-level consequences.
+Together these would close the equation-vs-expression compositional
+gap that Section~\ref{sec:algebraic} introduced.
+
 \paragraph{Declaration on Generative AI.}
 During preparation, the authors used an AI coding assistant to
 assist with implementation, experimentation, and drafting. All

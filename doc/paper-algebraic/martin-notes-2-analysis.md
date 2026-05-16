@@ -158,6 +158,15 @@ intermediate normalization step.
 Compositionally interesting; would benefit from Arnau's interpolation
 work (point 8 below).
 
+**STATUS (2026-05-16): designed, not implemented**. Detailed design in
+`doc/paper-algebraic/expression-normalisation-design.md`. Concrete
+CBMC integration points identified (post-Buchberger hook in
+`boolbvt::try_algebraic_solve`, generalising `extract_candidate`
+to arbitrary expressions). Empirical hypothesis: helps on benchmarks
+that produce non-trivial GBs but currently return UNKNOWN. Effort
+estimate: 1-2 days for prototype, 1-2 weeks for full ablation.
+Mentioned in paper §6 (Future Work) as the natural next step.
+
 ### 7. "Equations vs expressions"
 
 **Context**: Martin's pithy framing: "Gröbner bases work with equations,
@@ -199,6 +208,18 @@ per bit (one per bit position, with `b_i ∈ {0, 1}` constraints) or
 
 **Action**: future work. Mention in discussion as a way to extend the
 algebraic layer's reach into bit-level reasoning.
+
+**STATUS (2026-05-16): designed, not implemented**. Detailed design in
+`doc/paper-algebraic/bit-level-polynomial-design.md`. Encoding A
+(bit-decomposition variables with idempotency $b^2 = b$ and
+sum-decomposition $x = \sum 2^i b_i$) is the recommended approach.
+Naive eager bit-decomposition would multiply basis size by ~$d$ and
+make Buchberger ~$d^3 \approx 32{,}000\times$ slower on 32-bit; a
+targeted variant (introduce bit vars only for bits referenced by
+explicit `extractbit` operations in the input) is more practical.
+Effort estimate: 2-3 weeks for targeted variant, 2 months for full
+incremental theory-solver integration. Mentioned in paper §6
+(Future Work).
 
 ## Prioritised action items
 
