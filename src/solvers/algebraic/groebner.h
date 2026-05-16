@@ -36,6 +36,25 @@ public:
   static std::map<std::size_t, mp_integer>
   extract_candidate(const std::vector<polynomialt> &basis, unsigned bw);
 
+  /// Reduce a polynomial \p f by a (strong) Gr\"obner basis without
+  /// any state mutation. Used by item 7's expression normalisation
+  /// (see doc/paper-algebraic/expression-normalisation-design.md):
+  /// after compute() has produced a basis, an arbitrary polynomial
+  /// expression can be simplified by reducing it w.r.t.\ the basis,
+  /// potentially yielding a constant or a shorter polynomial form
+  /// that propagates algebraic insight to the bit-blast layer.
+  ///
+  /// \param f polynomial to reduce.
+  /// \param basis the (strong) Gr\"obner basis to reduce against.
+  /// \param max_steps step budget; reduction returns the partially
+  ///   reduced polynomial if exceeded.
+  /// \return the reduced polynomial $r$ such that $f \equiv r
+  ///   \pmod{\langle \mathit{basis} \rangle}$.
+  static polynomialt reduce_by_basis(
+    const polynomialt &f,
+    const std::vector<polynomialt> &basis,
+    std::size_t max_steps = 10000);
+
 private:
   std::size_t max_steps;
   std::size_t steps_taken = 0;

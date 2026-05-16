@@ -175,6 +175,96 @@ The benchmark categories most likely to benefit from (a):
   structure: the polynomial sub-fragment normalises, then the
   residual non-polynomial portion goes to bit-blast unchanged.
 
+## Empirical evaluation (2026-05-16)
+
+We implemented the simplest variant: post-Buchberger, for each
+disequality `lhs != rhs` in `algebraic_disequalities`, reduce the
+polynomial form `lhs - rhs` w.r.t.\ the global Gr\"obner basis. If
+the reduction yields 0, the basis implies `lhs = rhs`, contradicting
+the disequality. Behind `ENABLE_GB_EXPR_NORMALISE=1`. New static
+method `strong_groebner_basist::reduce_by_basis` exposed in
+`src/solvers/algebraic/groebner.{h,cpp}`.
+
+### Results
+
+**Custom suite (39 benchmarks):**
+
+```
+default      : 39/39
+expr_norm    : 39/39   (no change)
+```
+
+Every benchmark has identical timing with and without expression
+normalisation. The check fires (we verified by adding debug output)
+but never finds a `diff` that reduces to 0 by the basis post-Buchberger.
+
+**Martin's subpolynomial sample (210 benchmarks):**
+
+```
+default      : 119/210
+expr_norm    : 119/210   (no change)
+```
+
+Zero benchmarks helped, zero benchmarks hurt. Total runtime difference
+on commonly-solved benchmarks: $+0.04$ s (i.e., 0.0%) — well below noise.
+
+### Why doesn't this variant fire?
+
+The condition for item 7's check to find UNSAT is:
+1. Per-disequality Buchberger with Rabinowitsch returned UNKNOWN.
+2. Global Buchberger returned UNKNOWN.
+3. Some disequality's `lhs - rhs` polynomial reduces to 0 by the
+   global basis.
+
+If condition 3 holds with the per-disequality basis (SSA equalities
+$\cup$ {$(\textit{lhs} - \textit{rhs}) \cdot e - 1$}), then the
+per-disequality Gröbner pass already returns UNSAT (the Rabinowitsch
+polynomial reduces to $-1$, a unit constant). So condition 3 must
+hold *only with the global basis* (which adds Rabinowitsch
+polynomials for *other* disequalities).
+
+This is rare in practice because CBMC's typical SMT query has a
+single top-level disequality (the negated assertion). The
+`algebraic_disequalities` vector usually has exactly one element,
+so global basis = per-disequality basis, and the simple variant
+provides no new reductions.
+
+### What variant might work
+
+The simple disequality-reduction variant is empirically null. More
+sophisticated variants worth trying in future work:
+
+1. **Compound multiplication constant folding.** For each
+   `bvmul(a, b)` sub-expression that survives to bit-blasting,
+   compute polynomial form and reduce by basis. If reduces to a
+   constant, emit `bvmul = constant` at the SAT level.
+
+2. **Pairwise variable equality discovery.** For each pair $(a, b)$
+   of input symbols, reduce $a - b$ by basis. If 0, emit bit-vector
+   equality between $a$ and $b$. Generally fires only when input
+   symbols are constrained to be equal — uncommon in well-formed
+   queries.
+
+3. **Generalised candidate extraction.** Walk through every variable
+   in the basis, not just univariate-linear ones; use
+   reduce_by_basis to discover constants for compound monomials too.
+
+Variants 1 and 3 require non-trivial engineering (polynomial-to-expr
+conversion, walking the basis structure). Variant 2 is simple but
+unlikely to fire empirically.
+
+## Conclusion (2026-05-16)
+
+The simplest variant of item 7 (post-Buchberger disequality
+reduction) is **empirically null** on both the custom suite and
+Martin's subpolynomial sample. The CBMC pipeline's per-disequality
+Rabinowitsch + Gröbner pass already catches what this variant
+could catch.
+
+A useful variant of item 7 would need to operate on compound
+expressions or pairs of variables, not on the disequality
+polynomials directly. This remains a research direction.
+
 ## Implementation effort estimate
 
 - 1-2 days: implementation + initial empirical validation.

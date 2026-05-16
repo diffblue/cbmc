@@ -1,0 +1,44 @@
+# Item 7 (expression normalisation via Gröbner basis) ablation
+# default  = standard pipeline (algebraic layer + bit-blast)
+# expr_norm= default + post-Buchberger expression normalisation
+# Time in seconds; T/O = 30 s
+benchmark	default	expr_norm
+comm_8	0.00	0.00
+comm_10	0.00	0.00
+comm_11	0.00	0.00
+comm_12	0.00	0.00
+comm_13	0.00	0.00
+comm_14	0.00	0.00
+comm_15	0.00	0.00
+comm_16	0.00	0.00
+comm_18	0.00	0.00
+comm_20	0.00	0.00
+comm_24	0.00	0.00
+comm_32	0.00	0.00
+assoc_8	0.00	0.00
+distrib_8	0.00	0.00
+overflow_detect_16	0.00	0.00
+add_overflow_16	0.00	0.00
+checked_mul_16	0.00	0.00
+add_chain_16	0.00	0.00
+add_chain_32	0.00	0.00
+add_sub_cancel_16	0.00	0.00
+equiv_unsat_8add_16	0.00	0.00
+bf16_mul_comm	0.00	0.00
+bf16_mul_comm_v2	10.84	10.83
+bf16_mul_const	0.02	0.02
+bf16_mul_mono	28.17	28.22
+strength_chain_16	1.42	1.42
+strength_16_15	0.00	0.00
+strength_16_31	0.00	0.00
+mul_ineq_12	0.49	0.50
+div_mul_roundtrip_12	3.92	3.95
+gf256_mul_assoc	0.05	0.05
+crypto_square_mod	0.01	0.01
+barrett_red_8	0.01	0.01
+fixedpoint_mul_16	0.02	0.02
+dsp_image_reject	0.01	0.01
+dsp_horner_16	0.00	0.00
+dsp_vanishing_poly_8	0.00	0.00
+dsp_vanishing_mv	0.00	0.00
+dsp_coeff_scale_8	0.00	0.00

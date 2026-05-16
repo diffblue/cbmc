@@ -371,3 +371,16 @@ std::map<std::size_t, mp_integer> strong_groebner_basist::extract_candidate(
 
   return assignment;
 }
+
+polynomialt strong_groebner_basist::reduce_by_basis(
+  const polynomialt &f,
+  const std::vector<polynomialt> &basis,
+  std::size_t max_steps)
+{
+  // Delegate to the instance method strong_reduce, using a fresh
+  // instance so we don't mutate any external state. The instance
+  // tracks step counts via its members; we use the requested
+  // max_steps as the budget.
+  strong_groebner_basist instance{max_steps};
+  return instance.strong_reduce(f, basis);
+}

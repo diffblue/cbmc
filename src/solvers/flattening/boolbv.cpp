@@ -959,6 +959,46 @@ bool boolbvt::try_algebraic_solve()
     return true;
   }
 
+  // Item 7 prototype: expression normalisation via the Gröbner basis.
+  // After Buchberger, even when the basis didn't decide UNSAT
+  // outright, it may now contain enough information to prove
+  // individual disequalities false via expression-level reduction.
+  // For each disequality (lhs != rhs), reduce its polynomial form
+  // (lhs - rhs) w.r.t. the basis. If the reduction yields 0, the
+  // basis implies lhs = rhs, contradicting the disequality.
+  //
+  // This complements the per-disequality Rabinowitsch+Gröbner pass
+  // (which runs earlier with each disequality's basis in isolation):
+  // the global basis here includes Rabinowitsch polynomials for ALL
+  // disequalities simultaneously, so S-polynomials between them can
+  // produce reductions no per-disequality pass alone catches.
+  //
+  // Behind ENABLE_GB_EXPR_NORMALISE for ablation.
+  if(std::getenv("ENABLE_GB_EXPR_NORMALISE") != nullptr)
+  {
+    for(const auto &diseq : algebraic_disequalities)
+    {
+      if(diseq.id() != ID_equal || diseq.operands().size() != 2)
+        continue;
+      auto lhs_p = extractor.to_polynomial(to_equal_expr(diseq).lhs());
+      auto rhs_p = extractor.to_polynomial(to_equal_expr(diseq).rhs());
+      if(!lhs_p || !rhs_p)
+        continue;
+      polynomialt diff = *lhs_p - *rhs_p;
+      diff.normalize();
+      if(diff.is_zero())
+        continue; // syntactic equality, would be caught by simplifier
+      polynomialt reduced =
+        strong_groebner_basist::reduce_by_basis(diff, equations, 10000);
+      if(reduced.is_zero())
+      {
+        // The basis implies lhs = rhs, contradicting the disequality.
+        prop.l_set_to_true(const_literal(false));
+        return true;
+      }
+    }
+  }
+
   // Level 3: when UNKNOWN, extract candidate assignment and use it
   // to add unit propagation clauses that guide the SAT solver.
   unsigned bw = extractor.get_bitwidth();
