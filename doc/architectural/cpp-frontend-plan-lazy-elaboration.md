@@ -269,6 +269,20 @@ Regression: bit-identical behaviour, 26/26 MSVC, dog-food 10/4/103/0
 unchanged.  If any of these three commits moves any number, that's
 a latent bug we caught early.
 
+**2026-05-16 status.** Phases 1A (`5444441ce2`) and 2A
+(`c9aa0a996c`) landed:
+
+* Phase 1A — `ID_C_lazy_member_type` + `ID_lazy_type_source` ireps;
+  `ensure_member_complete(struct, base_name)` primitive declared and
+  stub-implemented.
+* Phase 2A — added `const`-overload of `ensure_member_complete` for
+  read-only iteration sites, plus `complete_all_components(struct)`
+  for bulk pre-iteration completion.  Both are no-ops in Phase 1.
+
+Both commits are bit-identical behaviour changes (no caller marks
+components lazy yet); regression suite green; dog-food unchanged at
+10/4/103/0.
+
 ### Phase 2 — caller audit (~1 week)
 
 - One commit per call site (so each can be reverted independently
@@ -291,6 +305,37 @@ a latent bug we caught early.
     new diagnostic referring to an incomplete type).
 - Expected dog-food: step up from 12% to ~25–35% OK_CLEAN as the
   top-level template-class-instance failures stop cascading.
+
+**2026-05-16 attempt notes (second attempt, after Phase 1A/2A).**
+A targeted producer was tried: when `typecheck_compound_body`'s
+existing `kept_unresolved_cpp_name` mitigation fires (top-level
+class member of the form `template<…> m;` whose template
+instantiation cannot complete), and the subsequent
+`typecheck_compound_declarator` then throws, register the
+component lazily (mark `ID_C_lazy_member_type`, keep
+`declaration.type()` as the unresolved cpp_name placeholder).
+
+Result: dog-food regressed from 10 OK_CLEAN to 8 OK_CLEAN —
+`validate_expressions.cpp` and `validate_types.cpp` went from OK
+to FAIL.  Identical to the May-13 finding: registering the member
+*name* without resolving the *type* surfaces previously-suppressed
+"member of incomplete type" diagnostics in sibling method bodies
+that previously bailed out at the original throw.
+
+The lesson generalises the May-13 lesson: **`ensure_member_complete`
+must perform on-demand resolution before lazy components are
+exposed to use sites**, not just preserve the unresolved cpp_name.
+That means Phase 3 cannot be a one-line producer opt-in; it
+requires Phase 4's `resolve_lazy_source` work first, where the
+helper retries `typecheck_type` with the appropriate scope context
+and SFINAE guard, and only on success exposes the resolved type.
+The order in §"Phased migration" should therefore be Phase 1 →
+Phase 4 (resolve_lazy_source) → Phase 3 (narrow producer with
+working resolution) → Phase 2 (caller audit).
+
+The current state (as of `c9aa0a996c`) is the right Phase 1A+2A
+foundation: API surface present, dog-food unchanged at baseline,
+no caller produces lazy components.
 
 ### Phase 4 — wider opt-in (~1–2 weeks)
 
