@@ -64,7 +64,16 @@ This paper presents algebraic techniques that complement bit-blasting
 for arithmetic bit-vector reasoning. The key insight is that many
 SMT queries reduce to polynomial equations over $\mathbb{Z}_{2^d}$
 (the ring of integers modulo $2^d$), where algebraic methods scale
-with polynomial degree rather than bitwidth. We address two classes:
+with polynomial degree rather than bitwidth.
+
+Architecturally, the contribution adds an \emph{equation-level}
+solver alongside the existing \emph{expression-level} bit-blast
+layer. Gr\"obner-basis reasoning operates on equations among
+polynomials; bit-blasting operates on expressions over individual
+bits. The two layers compose: the algebraic solver decides queries
+that reduce cleanly to polynomial ideal membership, and queries it
+cannot decide fall through to the bit-blast layer in their original
+form. We address two classes of polynomial query:
 
 \begin{enumerate}
 \item \textbf{Polynomial ideal membership} (commutativity,
@@ -173,6 +182,20 @@ The defining property is stronger than the field-case condition
 (which requires only monomial divisibility). Song et al.\ show that
 strong Gr\"obner bases exist over $\mathbb{Z}_{2^d}$ and can be
 computed by an extended Buchberger algorithm.
+
+\paragraph{Uniqueness.}
+Over a field, the reduced Gr\"obner basis is unique once the
+monomial order is fixed. Over $\mathbb{Z}_{2^d}$ (a principal-ideal
+ring with zero divisors) the situation is weaker: the basis is
+unique up to multiplication of each generator by a unit, i.e.\ by
+an odd element of $\mathbb{Z}_{2^d}$. Two reduced strong Gr\"obner
+bases of the same ideal differ at most by such unit-rescalings, and
+the membership test (does an ideal element reduce to zero?) is
+invariant under them. Empirically, our equation-ordering ablation
+(Table~\ref{tab:ordering}) confirms that timings vary within noise
+across orderings; the underlying bases are equivalent up to
+unit-rescaling and the algorithm's termination behaviour is
+unaffected.
 
 \subsection{Buchberger with Progress-Based Termination}
 \label{sec:algebraic-algo}
@@ -558,7 +581,22 @@ when the basis contains only even constants (non-units in
 $\mathbb{Z}_{2^d}$). This occurs for polynomials that vanish as
 \emph{functions} but are non-zero as \emph{polynomials}---e.g.,
 $4x^2 + 4x \equiv 0 \pmod{8}$ for all $x$, but has non-zero
-coefficients.
+coefficients. We refer to such polynomials as
+\emph{zero-function polynomials} (ZFPs). Their existence reflects
+that $\mathbb{Z}_{2^d}[x]$ has more polynomials than there are
+distinct $\mathbb{Z}_{2^d}$-valued functions on
+$\mathbb{Z}_{2^d}$, so polynomial identity is strictly stronger
+than functional equivalence.
+
+This gap is missed by the Gr\"obner-basis-only treatment of
+Song et al.~\cite{song2024equational}: their procedure decides the
+\emph{equational} theory (polynomial identity in
+$\mathbb{Z}_{2^d}[x_1, \ldots, x_n]$), not the \emph{functional}
+theory (equivalence as functions on
+$\mathbb{Z}_{2^d}^n \to \mathbb{Z}_{2^d}$). For SMT queries the
+functional theory is the right one --- a verification engineer
+asking whether $a \cdot b = b \cdot a$ over 16-bit integers means
+``for all 16-bit values of $a, b$'', not ``as polynomials''.
 
 Such vanishing polynomials arise in DSP datapath verification where
 coefficient scaling causes overflow cancellation. We implement the
@@ -743,6 +781,45 @@ $4 \cdot 4 + 4 \cdot 2 = 24 \equiv 0$, and so on.
 In the DSP context this is important because a Horner-form filter
 and its expanded form typically differ by terms of this shape
 (low-order bits cancel through overflow).
+
+\subsection{How Overflow Detection Becomes a Polynomial Query}
+\label{sec:overflow-encoding}
+
+Readers may wonder how overflow-detection benchmarks become amenable
+to polynomial reasoning, since ``$x$ overflows $N$ bits'' is
+quintessentially a non-polynomial bit-level predicate. The mechanism
+is structural: overflow-detection benchmarks typically assert a
+\emph{disequality} between two values that, modulo $2^N$, are
+necessarily equal --- so the disequality reduces to a polynomial
+identity in $\mathbb{Z}_{2^N}$ regardless of whether overflow occurs.
+
+Consider \texttt{overflow\_detect\_16}:
+\begin{verbatim}
+(define-fun wide_prod   () (_ BitVec 32) (bvmul wa wb))
+(define-fun narrow_prod () (_ BitVec 16) (bvmul a b))
+(assert (not (= narrow_prod ((_ extract 15 0) wide_prod))))
+\end{verbatim}
+The assertion is unsatisfiable not because of any reasoning about
+the high 16 bits of \texttt{wide\_prod}, but because
+$\texttt{narrow\_prod} = a\cdot b \bmod 2^{16}$ and
+$\texttt{extract}(15,0)(\texttt{wide\_prod})
+= (\texttt{zero\_extend}(a) \cdot \texttt{zero\_extend}(b)) \bmod 2^{16}
+= a\cdot b \bmod 2^{16}$. The Gr\"obner basis recognises the polynomial
+identity in $\mathbb{Z}_{2^{16}}$. The ``overflow'' part of the query
+acts as an unconstrained assumption that the algebraic layer accepts
+without analysing.
+
+This is the typical encoding: an overflow predicate is paired with a
+disequality whose two sides reduce to the same polynomial in the
+narrow ring. Where an overflow predicate appears as the \emph{primary}
+constraint --- e.g.\ ``prove that $a\cdot b$ overflows iff
+$a > 2^N / b$'' --- our extractor cannot turn the high-bit extraction
+\texttt{(extract $2N{-}1$ $N$)} into a polynomial directly (the
+non-zero low index is a shift, which is non-polynomial); the query
+falls through to the bit-blast layer. Such cases (e.g.\ the
+no-overflow assumptions in \texttt{mul\_ineq\_12}) still benefit
+indirectly: the Gr\"obner basis simplifies the multiplication-related
+sub-queries, leaving the bit-blast layer with a smaller search.
 
 \subsection{Worked Example: Gr\"obner Basis for Commutativity at BW=3}
 \label{sec:grobner-example}
