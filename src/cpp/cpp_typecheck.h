@@ -282,6 +282,17 @@ protected:
   /// further refactoring at the call sites.
   void complete_all_components(struct_union_typet &struct_type);
 
+  /// Phase 4 on-demand resolution per N5008 [temp.inst]/3.1: attempt
+  /// to resolve a lazy component's placeholder type by re-running
+  /// `typecheck_type` in the class scope recorded under
+  /// `ID_lazy_type_source`.  The retry is wrapped in
+  /// `sfinae_contextt` ([temp.deduct]/8) so substitution failure
+  /// does not produce user-visible diagnostics or pollute the error
+  /// counter.  Returns true if the component is (or becomes)
+  /// resolved; false if it could not be resolved.  Idempotent:
+  /// already-resolved components return true immediately.
+  bool try_resolve_lazy_member(struct_union_typet::componentt &component);
+
   unsigned template_counter;
   unsigned anon_counter;
 
