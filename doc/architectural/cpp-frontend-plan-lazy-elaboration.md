@@ -322,20 +322,69 @@ to FAIL.  Identical to the May-13 finding: registering the member
 "member of incomplete type" diagnostics in sibling method bodies
 that previously bailed out at the original throw.
 
-The lesson generalises the May-13 lesson: **`ensure_member_complete`
-must perform on-demand resolution before lazy components are
-exposed to use sites**, not just preserve the unresolved cpp_name.
-That means Phase 3 cannot be a one-line producer opt-in; it
-requires Phase 4's `resolve_lazy_source` work first, where the
-helper retries `typecheck_type` with the appropriate scope context
-and SFINAE guard, and only on success exposes the resolved type.
-The order in §"Phased migration" should therefore be Phase 1 →
-Phase 4 (resolve_lazy_source) → Phase 3 (narrow producer with
-working resolution) → Phase 2 (caller audit).
+**2026-05-16 follow-up (third attempt, working).**  The
+above analysis turned out to be slightly misleading: the
+regression was caused specifically by **typedef** declarators,
+not data members.  Tracing showed the catch handler ran on
+`typedef std::unordered_map<…> hash_tablet;` declarators —
+where the type couldn't elaborate eagerly, the throw escaped
+`typecheck_compound_declarator`, and the lazy fallback added
+the typedef as a struct **component** but never as a class-
+scope **typedef symbol**.  Subsequent declarators that
+referenced the typedef (`hash_tablet hash_table;`) then
+failed with `symbol 'hash_tablet' is unknown`, which leaked
+through the error suppression because it occurred *outside*
+the catch.
 
-The current state (as of `c9aa0a996c`) is the right Phase 1A+2A
-foundation: API surface present, dog-food unchanged at baseline,
-no caller produces lazy components.
+The fix has two parts, landed as `77307e32b2` (Phase 3
+producer) and `41e614892c` (Phase 4 on-demand resolution):
+
+* **Phase 3 producer** (commit `77307e32b2`).  When the
+  declarator throws under `kept_unresolved_cpp_name` and the
+  declarator is a typedef, register a typedef *symbol* in the
+  class scope (the way `cpp_declarator_convertert` would,
+  with `is_type=true, is_macro=true`, put_into_scope as
+  `cpp_idt::id_classt::TYPEDEF`) — the symbol's aliased type
+  is the unresolved cpp_name, marked `ID_C_lazy_member_type`.
+  Sibling lookups by name find the symbol; users of the
+  resolved type fail at the use site only.  For non-typedef
+  data-member declarators, the lazy struct component is
+  still registered as before.
+
+  Dog-food: 10/4/103/0 → **14/5/98/0** — four files newly
+  OK_CLEAN (`dstring.cpp`, `irep_ids.cpp`, `options.cpp`,
+  `string_container.cpp`), one newly OK_NOISY
+  (`xml_irep.cpp`), zero regressions, cbmc-cpp regression
+  675/0/83.
+
+* **Phase 4 on-demand resolution** (commit `41e614892c`).
+  `try_resolve_lazy_member` does the real work:
+
+    1. Read the class-scope identifier from
+       `ID_lazy_type_source` (stamped by Phase 3's producer).
+    2. `cpp_save_scopet`, then
+       `cpp_scopes.go_to(class_scope)` so member-typedef
+       lookups inside the placeholder work.
+    3. Run `typecheck_type` on a scrubbed copy of the type,
+       under `sfinae_contextt` ([temp.deduct]/8), so failure
+       is silently absorbed.
+    4. On success, replace `component.type()` with the
+       resolved type — markers gone, component now normal.
+    5. On failure, leave the placeholder + marker; later
+       calls or different scopes can retry.
+
+  No dog-food change yet because no caller of
+  `ensure_member_complete` exists in the tree.  Phase 2
+  caller-audit is now the unblock to expose more files to
+  the resolution capability; the helper itself is correct
+  and ready.
+
+The original lesson still stands: lazy registration without
+typedef-symbol registration is harmful.  The amended fix
+matches the lesson exactly — Phase 3's producer registers
+both the symbol and the component, and Phase 4 wires up
+on-demand resolution so the symbol's type can actually be
+completed when something looks at it.
 
 ### Phase 4 — wider opt-in (~1–2 weeks)
 
