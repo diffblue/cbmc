@@ -624,6 +624,41 @@ exprt try_evaluate_constexpr(
   return nil_exprt();
 }
 
+struct_union_typet::componentt *cpp_typecheckt::ensure_member_complete(
+  struct_union_typet &struct_type,
+  const irep_idt &base_name)
+{
+  // Phase 1 of the lazy class-body elaboration refactor per N5008
+  // [temp.inst]/3.  The full primitive will resolve a lazy
+  // component's stored `cpp_declaration` / `cpp_declarator` source
+  // (under `ID_lazy_type_source`) and replace its placeholder type
+  // with the resolved one.  In Phase 1 no caller produces lazy
+  // components, so the helper just locates the existing component
+  // by base_name and returns it unchanged.
+  //
+  // The Phase 2 (caller audit) commits will route the ~12 readers
+  // of `components()` that need a complete type through this helper
+  // before reading `component.type()`.  Phase 3 enables the lazy
+  // producer for class-template instances.
+  for(auto &c : struct_type.components())
+  {
+    if(c.get_base_name() != base_name)
+      continue;
+    if(c.get_bool(ID_C_lazy_member_type))
+    {
+      // Reserved for Phase 3+: resolve the stored source.  No
+      // producer marks components lazy in Phase 1, so this branch
+      // is unreachable today.  When the producer lands, the body
+      // will invoke `resolve_lazy_source` under a `sfinae_contextt`
+      // guard ([temp.deduct]/8) and either complete the component
+      // or return nullptr on substitution failure.
+      UNREACHABLE;
+    }
+    return &c;
+  }
+  return nullptr;
+}
+
 void cpp_typecheckt::elaborate_class_template(
   const typet &type)
 {
