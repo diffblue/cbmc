@@ -261,6 +261,27 @@ protected:
     struct_union_typet &struct_type,
     const irep_idt &base_name);
 
+  /// Const overload of \ref ensure_member_complete.  Used at read-only
+  /// component iteration sites (e.g. the resolver's constructor-
+  /// candidate filter).  When called on a struct that contains a lazy
+  /// component, this overload **cannot** complete it (which would
+  /// require mutating the type) and returns nullptr in that case so
+  /// the caller can skip rather than read an unresolved type.  When
+  /// no lazy markers exist (always true in Phase 1) this is a fast
+  /// linear lookup that returns the existing pointer.
+  const struct_union_typet::componentt *ensure_member_complete(
+    const struct_union_typet &struct_type,
+    const irep_idt &base_name);
+
+  /// Bulk-complete every lazy member of a struct in one pass.  Useful
+  /// at sites that iterate `struct_type.components()` and read each
+  /// component's type — a single pre-iteration call is O(n) instead
+  /// of the O(n²) cost of one `ensure_member_complete` per
+  /// component.  No-op in Phase 1 (no lazy producer); the helper
+  /// exists so Phase 2's caller audit can switch to it without
+  /// further refactoring at the call sites.
+  void complete_all_components(struct_union_typet &struct_type);
+
   unsigned template_counter;
   unsigned anon_counter;
 
