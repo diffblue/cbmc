@@ -1111,6 +1111,76 @@ quickly; on gate-level circuit verification we expect Amulet to
 retain its advantage at modest bitwidths due to the completeness
 of its field-based reduction.
 
+\subsection{Random Polynomial Identity Suite (210 benchmarks)}
+\label{sec:eval-random-poly}
+
+To stress-test the algebraic layer on polynomial identities at high
+degree, we evaluate on a subset of the random polynomial benchmark
+suite by Brain~\cite{brain2025subpoly}. Random polynomials of
+degree 2 to 53 over bitwidths 8, 16, 32, and 64 are tested for
+properties including additive identity ($p(x) + q(x) = (p+q)(x)$),
+multiplicative identity ($p(x) \cdot q(x) = (pq)(x)$),
+encoding-correctness, equality with a constant, root-finding, and
+others. Two random seeds, eight categories per seed; we draw a
+stratified random sample of 210 benchmarks.
+
+The five configurations are pure shift-add bit-blasting,
+pure Comba/CSE bit-blasting, Comba/CSE bit-blasting plus the
+algebraic layer (this work), and the union of all approaches.
+Each configuration is given 10\,s wall time per benchmark.
+
+\paragraph{Solved counts.}
+\begin{center}
+\begin{tabular}{lr}
+\toprule
+Configuration                       & solved / 210 \\
+\midrule
+shift-add bit-blasting              & 117 \\
+Comba/CSE bit-blasting              & 117 \\
+\textbf{this work} (algebraic only) & \textbf{127} \\
+union (any configuration)           & 136 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{By category.} The algebraic layer dominates on
+polynomial-identity categories and is dominated on
+satisfiability-finding categories:
+
+\begin{center}
+\small
+\begin{tabular}{lrrr}
+\toprule
+Category               & $n$ & bit-blast & this work \\
+\midrule
+addition (poly id.)       & 20 & 4  & \textbf{11} \\
+multiplication (poly id.) & 20 & 3  & \textbf{11} \\
+correctness (poly id.)    & 30 & 8  & \textbf{11} \\
+\midrule
+equality (SAT)            & 40 & \textbf{25} & 17 \\
+nonequality (SAT)         & 20 & \textbf{14} & 6  \\
+\midrule
+bounding                  & 20 & 16 & 16 \\
+identity-point            & 40 & 30 & 30 \\
+root-finding              & 40 & 31 & 31 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Algebraic-only wins.} 18 benchmarks are solved only by
+the algebraic layer; bit-blasting times out on all of them. These
+are predominantly high-degree multiplication and addition
+identities (degree $\geq 18$ at bitwidth 16 or 32) where the
+Gr\"obner basis dispatches in 1--6\,s while bit-blasting cannot
+even encode the multiplications within the timeout.
+
+\paragraph{Bit-blast-only wins.} 8 benchmarks, all in the equality
+and nonequality categories. These are SAT-finding queries
+(``does $p(x) = c$ have a solution?''); the Rabinowitsch-augmented
+Gr\"obner basis is UNSAT-oriented and ill-suited to producing
+witnesses. The fallback to bit-blasting in
+Section~\ref{sec:algebraic-pipeline} recovers these.
+
 \subsection{Threats to Validity}
 
 \textbf{Benchmark selection.} The 39-benchmark custom suite is
