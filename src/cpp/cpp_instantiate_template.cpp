@@ -735,6 +735,74 @@ bool cpp_typecheckt::try_resolve_lazy_member(
   return true;
 }
 
+bool cpp_typecheckt::try_resolve_lazy_typedef_symbol(symbolt &sym)
+{
+  // Sibling of `try_resolve_lazy_member` for the class-scope
+  // typedef *symbols* registered by the producer.  The original
+  // declaration's class scope is stamped under `ID_lazy_type_source`
+  // on the alias type itself.  Stripping the markers from a working
+  // copy and running `typecheck_type` under `sfinae_contextt` lets
+  // the retry happen at the use site without leaking diagnostics or
+  // mutating the symbol on failure.  On success the symbol's type
+  // becomes the resolved type and subsequent lookups (resolver,
+  // callers of `typecheck_type`) see a normal complete type.
+  //
+  // Guard against re-entering the class while it is itself being
+  // typechecked: if the current scope (or any nested scope) is the
+  // lazy class itself, we are still inside that class's body or a
+  // nested scope of it.  Defer the retry — the class is
+  // mid-construction and triggering elaboration here would loop
+  // back into the in-progress class body.  The retry is only safe
+  // at use sites *outside* the declaring class's body, where
+  // method-body typechecking has started and the class scope is
+  // fully populated.
+  if(!sym.type.get_bool(ID_C_lazy_member_type))
+    return true;
+
+  const irep_idt class_scope_id = sym.type.get(ID_lazy_type_source);
+  if(class_scope_id.empty())
+    return false;
+
+  auto cls_scope_it = cpp_scopes.id_map.find(class_scope_id);
+  if(cls_scope_it == cpp_scopes.id_map.end())
+    return false;
+
+  // The cpp scope prefix encodes nesting: the class scope's prefix
+  // is a prefix of any nested scope's prefix.
+  const std::string &cur_prefix = cpp_scopes.current_scope().prefix;
+  const std::string &cls_prefix = cls_scope_it->second->prefix;
+  if(
+    !cls_prefix.empty() &&
+    cur_prefix.compare(0, cls_prefix.size(), cls_prefix) == 0)
+  {
+    return false;
+  }
+
+  cpp_save_scopet save{cpp_scopes};
+  cpp_scopes.go_to(*cls_scope_it->second);
+
+  typet candidate = sym.type;
+  candidate.remove(ID_C_lazy_member_type);
+  candidate.remove(ID_lazy_type_source);
+
+  bool ok = true;
+  try
+  {
+    sfinae_contextt sfinae_guard{*this};
+    typecheck_type(candidate);
+  }
+  catch(...)
+  {
+    ok = false;
+  }
+
+  if(!ok)
+    return false;
+
+  sym.type = std::move(candidate);
+  return true;
+}
+
 void cpp_typecheckt::elaborate_class_template(
   const typet &type)
 {

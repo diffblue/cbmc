@@ -293,6 +293,15 @@ protected:
   /// already-resolved components return true immediately.
   bool try_resolve_lazy_member(struct_union_typet::componentt &component);
 
+  /// Sibling of \ref try_resolve_lazy_member for class-scope typedef
+  /// *symbols* registered by the producer in `typecheck_compound_body`.
+  /// The mechanic is the same: switch into the class scope recorded
+  /// under `ID_lazy_type_source`, retry `typecheck_type` under
+  /// `sfinae_contextt`, and on success replace the symbol's type
+  /// with the resolved one.  Used by the resolver and any other
+  /// caller that reads `symbol.type` for a possibly-lazy typedef.
+  bool try_resolve_lazy_typedef_symbol(symbolt &sym);
+
   unsigned template_counter;
   unsigned anon_counter;
 
