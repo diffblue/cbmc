@@ -302,6 +302,13 @@ protected:
   /// caller that reads `symbol.type` for a possibly-lazy typedef.
   bool try_resolve_lazy_typedef_symbol(symbolt &sym);
 
+  /// Type-only sibling of the symbol/component helpers.  Operates
+  /// directly on a `typet` carrying `ID_C_lazy_member_type`.  Useful
+  /// at sites that have a copy of the type but not a back-pointer
+  /// to the originating symbol or component (e.g. after the
+  /// resolver hands back a typedef expansion).
+  bool try_resolve_lazy_type(typet &type);
+
   unsigned template_counter;
   unsigned anon_counter;
 

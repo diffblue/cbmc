@@ -767,16 +767,21 @@ bool cpp_typecheckt::try_resolve_lazy_typedef_symbol(symbolt &sym)
   if(cls_scope_it == cpp_scopes.id_map.end())
     return false;
 
-  // The cpp scope prefix encodes nesting: the class scope's prefix
-  // is a prefix of any nested scope's prefix.
+  // Re-entry guard: defer the retry only when we are *currently*
+  // inside the lazy class scope itself — that is the case where
+  // `typecheck_compound_body` is still constructing the class and
+  // a recursive `typecheck_type` would loop.  Method-body scopes
+  // nested inside the class (e.g. `C::method::`) are safe: the
+  // class is fully populated by then and member-typedef references
+  // can legitimately drive resolution.  An exact-prefix check
+  // distinguishes the two: class body construction reaches the
+  // typedef-resolution path with `current_scope().prefix` equal to
+  // the class's prefix; method-body typechecking has a longer
+  // prefix.
   const std::string &cur_prefix = cpp_scopes.current_scope().prefix;
   const std::string &cls_prefix = cls_scope_it->second->prefix;
-  if(
-    !cls_prefix.empty() &&
-    cur_prefix.compare(0, cls_prefix.size(), cls_prefix) == 0)
-  {
+  if(!cls_prefix.empty() && cur_prefix == cls_prefix)
     return false;
-  }
 
   cpp_save_scopet save{cpp_scopes};
   cpp_scopes.go_to(*cls_scope_it->second);
@@ -800,6 +805,57 @@ bool cpp_typecheckt::try_resolve_lazy_typedef_symbol(symbolt &sym)
     return false;
 
   sym.type = std::move(candidate);
+  return true;
+}
+
+bool cpp_typecheckt::try_resolve_lazy_type(typet &type)
+{
+  // Type-only on-demand resolution.  Same mechanic as
+  // `try_resolve_lazy_typedef_symbol` and `try_resolve_lazy_member`
+  // but operates directly on a typet — useful at sites that have a
+  // copy of the type but not a back-pointer to the originating
+  // symbol or component.
+  if(!type.get_bool(ID_C_lazy_member_type))
+    return true;
+
+  const irep_idt class_scope_id = type.get(ID_lazy_type_source);
+  if(class_scope_id.empty())
+    return false;
+
+  auto cls_scope_it = cpp_scopes.id_map.find(class_scope_id);
+  if(cls_scope_it == cpp_scopes.id_map.end())
+    return false;
+
+  // Re-entry guard: defer if the current scope IS the lazy class
+  // (mid-construction).  Method-body or other nested scopes are
+  // safe.
+  const std::string &cur_prefix = cpp_scopes.current_scope().prefix;
+  const std::string &cls_prefix = cls_scope_it->second->prefix;
+  if(!cls_prefix.empty() && cur_prefix == cls_prefix)
+    return false;
+
+  cpp_save_scopet save{cpp_scopes};
+  cpp_scopes.go_to(*cls_scope_it->second);
+
+  typet candidate = type;
+  candidate.remove(ID_C_lazy_member_type);
+  candidate.remove(ID_lazy_type_source);
+
+  bool ok = true;
+  try
+  {
+    sfinae_contextt sfinae_guard{*this};
+    typecheck_type(candidate);
+  }
+  catch(...)
+  {
+    ok = false;
+  }
+
+  if(!ok)
+    return false;
+
+  type = std::move(candidate);
   return true;
 }
 
