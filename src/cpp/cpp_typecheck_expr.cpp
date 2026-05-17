@@ -2049,6 +2049,23 @@ void cpp_typecheckt::typecheck_expr_member(
     cpp_namet component_cpp_name=
       to_cpp_name(expr.find(ID_component_cpp_name));
 
+    // Per N5008 [class.access]/4 + the lazy class-body elaboration
+    // discipline: if the struct has no `ID_name` set, it is a
+    // residual placeholder from a failed instantiation that wasn't
+    // cleanly excluded upstream.  Without this guard,
+    // `cpp_scopes.set_scope("")` aborts in the lookup with
+    // "id '' not found" and crashes goto-cc.  Emit a localized
+    // error and throw the conventional throw-0 signal instead so
+    // the failure stays a user-visible compile error in the
+    // calling translation unit rather than a CBMC abort.
+    if(struct_identifier.empty())
+    {
+      error().source_location = expr.find_source_location();
+      error() << "member operator on unnamed/incomplete struct "
+              << "(typically from a failed template instantiation)" << eom;
+      throw 0;
+    }
+
     // go to the scope of the struct/union
     cpp_save_scopet save_scope(cpp_scopes);
     cpp_scopes.set_scope(struct_identifier);
