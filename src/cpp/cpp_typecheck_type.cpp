@@ -108,6 +108,16 @@ void cpp_typecheckt::typecheck_type(typet &type)
     type=symbol_expr.type();
     PRECONDITION(type.is_not_nil());
 
+    // Phase 2 audit per N5008 [temp.inst]/3.1: when a lazy typedef
+    // symbol's alias type just propagated through here, drive
+    // on-demand resolution.  The type itself carries the lazy
+    // markers and class-scope identifier, so the type-only helper
+    // can resolve it without needing back-pointers to the symbol.
+    // The helper guards against re-entry into a class still being
+    // typechecked.
+    if(type.get_bool(ID_C_lazy_member_type))
+      try_resolve_lazy_type(type);
+
     if(type.get_bool(ID_C_constant))
       qualifiers.is_constant = true;
 
