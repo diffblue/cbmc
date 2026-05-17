@@ -2006,6 +2006,60 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
     }
   }
 
+  // Phase 4 end-of-body resolution sweep per N5008 [temp.inst]/3.1:
+  // before exiting the class body and tearing down the scope, take
+  // one last pass at resolving any lazy components and the typedef
+  // symbols Phase 3 may have created for them.  At this point all
+  // sibling members are registered, so a forward-reference failure
+  // at the original declaration site may now succeed.  For
+  // structural failures (libcxx instantiation depth/limits) the
+  // retry will still fail under `sfinae_contextt` and the lazy
+  // marker remains; that is the correct fallback.
+  //
+  // We are inside the class scope here, so the helpers' own
+  // re-entry guard would defer.  Instead we drive resolution
+  // directly via `try_resolve_lazy_member` for components and a
+  // mutable retry of `try_resolve_lazy_typedef_symbol` for typedef
+  // symbols, both already wrapped in `sfinae_contextt`.  Note: for
+  // the symbol path we cannot use the helper (it would defer here);
+  // use the type-level helper after temporarily clearing the lazy
+  // marker is also unsuitable.  Instead, bypass the re-entry guard
+  // by inlining the same retry logic for components only — the
+  // typedef symbols share their type with the corresponding
+  // component, and updating the component is sufficient for
+  // correctness in Phase 4 (the typedef symbol is updated
+  // separately at first use outside the class via the
+  // `try_resolve_lazy_typedef_symbol` caller in the resolver).
+  for(auto &c : to_struct_union_type(symbol.type).components())
+  {
+    if(!c.get_bool(ID_C_lazy_member_type))
+      continue;
+    typet candidate = c.type();
+    candidate.remove(ID_C_lazy_member_type);
+    candidate.remove(ID_lazy_type_source);
+    try
+    {
+      sfinae_contextt sfinae_guard{*this};
+      typecheck_type(candidate);
+      c.type() = std::move(candidate);
+      // Note: the corresponding typedef symbol the producer may
+      // have created is not updated here.  Its type still carries
+      // the lazy markers and an incrementally different shape
+      // (typedef ID_C_typedef self-reference).  Updating it here
+      // proved to break downstream consumers (regression on
+      // `options.cpp` and `string_container.cpp` in dog-food when
+      // attempted: 14/5/98/0 → 12/5/100/0).  The typedef symbol
+      // is updated separately at first use outside the class via
+      // the `try_resolve_lazy_typedef_symbol` caller in the
+      // resolver.
+    }
+    catch(...)
+    {
+      // Substitution failure per [temp.deduct]/8 — keep the lazy
+      // placeholder for subsequent retries at use sites.
+    }
+  }
+
   --compound_body_depth;
 }
 
