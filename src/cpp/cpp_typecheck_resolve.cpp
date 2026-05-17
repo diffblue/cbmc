@@ -919,6 +919,19 @@ exprt cpp_typecheck_resolvet::convert_identifier(
 
       if(symbol.is_macro) // includes typedefs
       {
+        // Phase 4 caller for typedef symbols per N5008
+        // [temp.inst]/3.1: when the resolver hands a typedef back
+        // out, drive on-demand resolution of the typedef's alias
+        // type if the producer marked it lazy.  The helper itself
+        // guards against re-entry into a class still being
+        // typechecked, so calling it unconditionally is safe.
+        if(symbol.type.get_bool(ID_C_lazy_member_type))
+        {
+          symbolt *writeable_sym =
+            cpp_typecheck.symbol_table.get_writeable(symbol.name);
+          if(writeable_sym != nullptr)
+            cpp_typecheck.try_resolve_lazy_typedef_symbol(*writeable_sym);
+        }
         e = type_exprt(symbol.type);
         PRECONDITION(symbol.type.is_not_nil());
       }
