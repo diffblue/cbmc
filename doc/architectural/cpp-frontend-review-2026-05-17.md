@@ -405,6 +405,82 @@ readiness target of ≥80% OK_CLEAN set in
   libc++, MSVC STL, and historic GCC versions that customers
   may use.
 
+## 2026-05-18 follow-up: Category A is gated on Category C
+
+After committing the Category A step 1 fix (`a65e4b4362`,
+hoisting `set(ID_name, symbol.name)` above
+`typecheck_compound_bases` so the class name is visible even
+when base elaboration throws), an attempt at the full Category
+A recovery — wrapping the substitution-prone calls in
+`typecheck_compound_bases` (`resolve` and
+`elaborate_class_template`) in a top-level try/catch so a
+failed base just sets the inheritance edge to nil and lets the
+body continue — empirically REGRESSED dog-food from 14/5/98/0
+to 11/4/102/0 by exposing four previously-OK files
+(`options.cpp`, `validate_expressions.cpp`, `validate_types.cpp`,
+`xml_irep.cpp`) to a class with body=present, ID_name set, but
+inherited typedefs missing.
+
+The specific failure mode in `irep.h` is illuminating:
+
+```cpp
+class irept : public non_sharing_treet<irept, std::map<...>>
+{
+public:
+  using baset = tree_implementationt;   // ← fails: inherited typedef
+                                        //   from the failed base
+  ...
+};
+```
+
+When base elaboration is recovered (so the class body is
+processed), the very first member-typedef `using baset =
+tree_implementationt;` references `tree_implementationt`, an
+inherited typedef from the failed base.  The lookup throws,
+the class body is again abandoned, and the symbol's state is
+worse than before (more partial registrations expose
+downstream consumers to inconsistent state).
+
+**Trace of the underlying failure**: the `std::map<irep_idt,
+irept>` instantiation fails at:
+
+```
+instantiating 'std::optional' with <struct basic_string>
+  → 'std::_Optional_base' with <struct basic_string, TRUE, TRUE>
+    → 'std::is_trivially_destructible_v' with <struct basic_string>
+      → ...
+        → invalid implicit conversion from '<<type:>>' to 'bool'
+```
+
+The variable-template instance `is_trivially_destructible_v<T>`
+returns a `symbol_exprt` whose type-irep has empty `id()` (so
+`expr2c.cpp` prints it as `<<type:>>`).  Substituting it where
+`bool` is expected (in another `enable_if` chain) trips
+`implicit_typecast_helper`'s validator.
+
+**This means Category A's full fix is gated on Category C.**
+Until variable-template `_v` traits evaluate cleanly, fixing
+the base-elaboration cascade in isolation just shifts the
+failure into the body of the affected class.
+
+**Revised priority ordering** (compared to the table at the
+top of this document):
+
+| rank | item | est | dog-food impact | risk |
+|---|---|---|---|---|
+| 1 | **C: variable templates (`_v` traits)** | 2-4 d | 6 + unblocks A | low |
+| 2 | A: base-class elaboration recovery (full) | 2-3 d AFTER C | up to 62 → clean | medium |
+| 2 (also) | A step 1: `set(ID_name)` hoist | DONE (`a65e4b4362`) | diagnostic improvement | none |
+| 3 | D: range-based for over member begin/end | 2-3 d | 3 + STL idioms | low |
+| 4 | B: SFINAE viability for unrestricted templates | 1-2 d | 11 files | low |
+| 5 | F/G/H: per-file diagnosis | 1 d each | 1 file each | low |
+
+The change of ordering is the architectural lesson from
+2026-05-18: the Category A *symptom* (62 files with "unnamed
+struct" / now "specific member unknown" diagnostics) is real,
+but Category C is the mechanical CAUSE.  Fix C and most of A
+clears with it.
+
 ## Status of this PR
 
 15 commits ahead of pushed `ef662777b0`, all behaviour-change
