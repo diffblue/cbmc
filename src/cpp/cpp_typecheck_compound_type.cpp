@@ -1196,6 +1196,22 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
 
   struct_union_typet &type = to_struct_union_type(symbol.type);
 
+  // Per N5008 [class.name]/1: "the class-name is also inserted into
+  // the scope of the class itself; this is known as the
+  // injected-class-name" — the class name is in scope from the
+  // declarative-region of its definition.  Set `ID_name` (and
+  // collapse the parser's cpp_name `ID_tag` into the resolved
+  // symbol name) BEFORE doing any base or member elaboration.  If
+  // base resolution then throws (e.g. a base-class template
+  // instantiation can't complete), downstream consumers can at
+  // least recognise the struct by its `ID_name` rather than
+  // crashing on an empty identifier in
+  // `cpp_scopes.set_scope("")`.  This is the architectural
+  // ordering fix for Category A in the 2026-05-17 review.
+  symbol.type.set(ID_name, symbol.name);
+  if(symbol.type.find(ID_tag).id() == ID_cpp_name)
+    symbol.type.set(ID_tag, symbol.base_name);
+
   // pull the base types in
   if(!type.find(ID_bases).get_sub().empty())
   {
@@ -1212,7 +1228,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
   exprt &body = static_cast<exprt &>(type.add(ID_body));
   struct_union_typet::componentst &components = type.components();
 
-  symbol.type.set(ID_name, symbol.name);
+  // (`set(ID_name, symbol.name)` already done above before bases.)
 
   // default access
   irep_idt access = type.default_access();
