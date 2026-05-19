@@ -481,6 +481,126 @@ struct" / now "specific member unknown" diagnostics) is real,
 but Category C is the mechanical CAUSE.  Fix C and most of A
 clears with it.
 
+## 2026-05-19 follow-up: Category C is mostly a warning, not a blocker
+
+The 2026-05-18 finding was that "Category A is gated on Category C
+(variable template `_v` traits)".  Today's investigation flips that
+conclusion: **Category C as defined is largely a benign warning,
+not the dog-food blocker it was thought to be.**
+
+**Empirical trace of `is_trivially_destructible_v<basic_string>`**:
+
+1. The variable-template instantiator returns a `symbolt` whose
+   `value.id` is `cpp_name` (the unresolved expression
+   `is_trivially_destructible<basic_string>::value`) and whose
+   `value.is_constant` is false.
+2. That value is consumed as a non-type template argument in
+   `_Optional_base<basic_string, X, Y>`.
+3. Inside `cpp_typecheck_conversions.cpp::implicit_typecast_helper`,
+   the converter sees the cpp_name with empty `e.type().id()` and
+   target type `c_bool`.
+4. The pre-existing "downgrade to non-fatal when the target type is
+   malformed" branch issues a *warning* ("invalid implicit
+   conversion from '<<type:>>' to 'bool'"), inserts a
+   `typecast_exprt`, and returns.
+5. Compilation continues.  The optional<basic_string> template
+   instance is registered.
+
+**Of the 5 dog-food OK_NOISY files, only 1 (`xml_irep.cpp`) emits
+the variable-template warning.** The other four
+(`help_formatter.cpp`, `signal_catcher.cpp`, `string2int.cpp`,
+`union_find.cpp`) emit Category B (`found no match for 'swap'` /
+`'invariant_violated_string'`) misses.
+
+**Of the dog-food FAIL files**, only six emit the variable-template
+warning at all:
+
+```
+src/util/cmdline.cpp           WARN=1 ERR=2 GB=no
+src/util/expr_initializer.cpp  WARN=3 ERR=6 GB=no
+src/util/interval_union.cpp    WARN=2 ERR=4 GB=no
+src/util/parse_options.cpp     WARN=1 ERR=2 GB=no
+src/util/xml.cpp               WARN=1 ERR=1 GB=no
+src/util/xml_irep.cpp          WARN=1 ERR=1 GB=yes
+```
+
+In each case the *errors* trace to other root causes:
+
+* `cmdline.cpp` fails at `symbol 'value_or' is unknown` — a
+  member-function-template (`std::optional<T>::value_or<U>`) lookup
+  miss.  The class is registered, but its template-method
+  declarations didn't propagate into the instantiated class scope.
+  This is a Category A-deep issue (partial registration of class
+  members).
+* `expr_initializer.cpp` and `interval_union.cpp` fail at
+  `bad assignment operator 'assign_mod'` in `bigint.hh:308` —
+  CBMC's compound-assignment-operator handling for `BigInt operator%`.
+  Unrelated to variable templates.
+* The remaining files fail with similar downstream issues.
+
+**The "deep" Category C fix would be**: when the resolver hands back
+a variable-template instance with `value.id == ID_cpp_name`, drive
+`typecheck_expr` on the value to resolve the qualified
+class-member-access (`Class<T>::value`).  An attempt at this fix
+showed:
+
+* `typecheck_expr` *throws* on the cpp_name silently because it
+  cannot follow the inheritance chain.  In libstdc++,
+  `is_trivially_destructible<T>::value` is inherited from
+  `__and_<__is_destructible_safe<T>, __bool_constant<__has_trivial_destructor(T)>>::type`,
+  itself a metafunction-typedef.  CBMC's qualified-name lookup at
+  the instantiation point doesn't follow `::type`-metafunction
+  bases recursively.
+
+The real architectural item is **multi-level template inheritance
+with `::type` metafunction bases** — the same pattern shows up in
+many libstdc++ traits.  Fixing that probably involves making the
+resolver follow `typename Base::type` recursively when looking up
+inherited static members.  This is genuinely 3–5 days of focused
+work and is what Category C should have been re-named to.
+
+**Revised Category C definition**: "qualified-name lookup of an
+inherited static member through a chain of `::type` metafunction
+bases".
+
+**Revised priority** (this is the fourth iteration of the table —
+the symptom-based ranking has been misleading throughout, and each
+session has refined the actual lever):
+
+| rank | item | est | dog-food impact | risk |
+|---|---|---|---|---|
+| 1 | A-deep: partial class registration (member-function templates not propagating into instantiated class scope) | 5-7 d | 62+ files | high |
+| 2 | D: range-based for over member begin/end | 2-3 d | 3 + STL idioms | low |
+| 3 | B: SFINAE viability for unrestricted `swap<T*>` | 1-2 d | 11 files | low |
+| 4 | C-revised: multi-level metafunction inheritance lookup | 3-5 d | unblocks A-deep partly | medium |
+| 5 | A step 1 (set ID_name hoist) — DONE (`a65e4b4362`) | done | diagnostic improvement | none |
+| 6 | F/G/H: per-file diagnosis | 1 d each | 1 file each | low |
+
+The architectural lesson from May 17 → 18 → 19 is that the
+dog-food failure cascade has THREE distinct root causes that the
+symptom histogram doesn't separate:
+
+1. **Architectural ordering** (Category A step 1, FIXED): class
+   names must be in scope before sub-elaboration.
+2. **Member-template registration** (newly identified A-deep):
+   when a class template is instantiated, its template member
+   functions need to register in the instantiated class's scope.
+   Currently they don't, and consumers see "symbol X is unknown"
+   for valid class members.
+3. **Multi-level metafunction lookup** (revised Category C):
+   `Class<T>::inherited_value` where `inherited_value` traverses
+   multiple `::type` typedefs requires the resolver to follow
+   metafunction-typedef bases.
+
+The original 2026-05-17 review's symptom-based table conflated
+these.  The 2026-05-18 attempt at base-class recovery hit issue
+(2) and (3) cascading in the body of `irept`.  The 2026-05-19
+attempt at variable-template fixing showed (3) is a deep
+architectural issue beyond a single-session fix.
+
+**No code changes today.**  Dog-food unchanged at 14/5/98/0.
+The review's priority table is updated to reflect the lessons.
+
 ## Status of this PR
 
 15 commits ahead of pushed `ef662777b0`, all behaviour-change
