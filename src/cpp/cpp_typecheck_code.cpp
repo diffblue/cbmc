@@ -297,6 +297,252 @@ void cpp_typecheckt::typecheck_code(codet &code)
 
     if(range_type.id() != ID_array)
     {
+      // Per N5008 [stmt.ranged]/1.3.2: if the type of `range` is a
+      // class type C and lookups in the scope of C find both
+      // `begin` and `end`, the desugaring is
+      //   auto && __range = for-range-initializer;
+      //   auto __begin = __range.begin();
+      //   auto __end   = __range.end();
+      //   for(; __begin != __end; ++__begin) {
+      //     for-range-declaration = *__begin;
+      //     statement
+      //   }
+      // and operator overload resolution handles `!=`, `++` and
+      // `*`.  Construct the equivalent code via cpp_name/member
+      // expressions and let `typecheck_expr` resolve the overloads.
+      if(
+        range_type.id() == ID_struct_tag || range_type.id() == ID_struct ||
+        range_type.id() == ID_union_tag || range_type.id() == ID_union)
+      {
+        const std::string scope_prefix =
+          id2string(cpp_scopes.current_scope().prefix);
+
+        // Materialise the range into an auxiliary symbol so that
+        // `__range.begin()` and `__range.end()` are well-formed
+        // expressions (the original `range_op` may be a temporary
+        // function-call result that we don't want to evaluate
+        // twice).
+        const std::string range_id = scope_prefix + "__for_range";
+        {
+          auxiliary_symbolt sym;
+          sym.name = range_id;
+          sym.base_name = "__for_range";
+          sym.type = range_type;
+          sym.mode = ID_cpp;
+          sym.module = module;
+          sym.location = loc;
+          sym.is_file_local = true;
+          sym.is_thread_local = true;
+          sym.is_lvalue = true;
+          symbol_table.insert(std::move(sym));
+
+          // Register in cpp_scopes so cpp_name lookup finds it.
+          cpp_idt &id =
+            cpp_scopes.put_into_scope(symbol_table.lookup_ref(range_id));
+          id.id_class = cpp_idt::id_classt::SYMBOL;
+        }
+        symbol_exprt range_sym_expr(range_id, range_type);
+
+        codet range_init(ID_assign);
+        range_init.copy_to_operands(range_sym_expr);
+        range_init.copy_to_operands(range_op);
+        range_init.add_source_location() = loc;
+
+        // Build __range.begin() and __range.end() calls.  The
+        // overload resolution + member lookup happens in
+        // typecheck_side_effect_function_call →
+        // typecheck_function_expr → typecheck_expr_member.  The
+        // pattern matches the existing `obj.operator->()`
+        // construction in `cpp_typecheck_expr.cpp`: wrap the
+        // receiver in `already_typechecked_exprt` so the receiver
+        // name isn't re-resolved, and call
+        // `typecheck_side_effect_function_call` directly (not
+        // `typecheck_expr`).
+        // Build __range.begin() and __range.end() calls.  The
+        // overload resolution + member lookup happens in
+        // typecheck_side_effect_function_call →
+        // typecheck_function_expr → typecheck_expr_member.
+        // Receiver is a cpp_namet so the typechecker takes the
+        // standard name-lookup path (synthesised symbol_exprts
+        // miss some annotations the resolver relies on).
+        auto build_member_call = [&](const irep_idt &member_base_name)
+          -> side_effect_expr_function_callt
+        {
+          cpp_namet member_name{member_base_name, loc};
+          cpp_namet receiver_name{
+            symbol_table.lookup_ref(range_id).base_name, loc};
+
+          exprt member_expr(ID_member);
+          member_expr.add(ID_component_cpp_name) = member_name;
+          member_expr.copy_to_operands(static_cast<const exprt &>(
+            static_cast<const irept &>(receiver_name)));
+
+          side_effect_expr_function_callt call(
+            std::move(member_expr), {}, uninitialized_typet{}, loc);
+          typecheck_side_effect_function_call(call);
+          return call;
+        };
+
+        side_effect_expr_function_callt begin_call_se =
+          build_member_call("begin");
+        side_effect_expr_function_callt end_call_se = build_member_call("end");
+        exprt begin_call{std::move(begin_call_se)};
+        exprt end_call{std::move(end_call_se)};
+
+        // Iterator types — deduce from the calls' result types.
+        const typet iter_type = begin_call.type();
+
+        // Auxiliary symbols for __begin and __end.
+        const std::string begin_id = scope_prefix + "__for_begin";
+        {
+          auxiliary_symbolt sym;
+          sym.name = begin_id;
+          sym.base_name = "__for_begin";
+          sym.type = iter_type;
+          sym.mode = ID_cpp;
+          sym.module = module;
+          sym.location = loc;
+          sym.is_file_local = true;
+          sym.is_thread_local = true;
+          sym.is_lvalue = true;
+          symbol_table.insert(std::move(sym));
+          cpp_idt &id =
+            cpp_scopes.put_into_scope(symbol_table.lookup_ref(begin_id));
+          id.id_class = cpp_idt::id_classt::SYMBOL;
+        }
+        const std::string end_id = scope_prefix + "__for_end";
+        {
+          auxiliary_symbolt sym;
+          sym.name = end_id;
+          sym.base_name = "__for_end";
+          sym.type = end_call.type();
+          sym.mode = ID_cpp;
+          sym.module = module;
+          sym.location = loc;
+          sym.is_file_local = true;
+          sym.is_thread_local = true;
+          sym.is_lvalue = true;
+          symbol_table.insert(std::move(sym));
+          cpp_idt &id =
+            cpp_scopes.put_into_scope(symbol_table.lookup_ref(end_id));
+          id.id_class = cpp_idt::id_classt::SYMBOL;
+        }
+
+        symbol_exprt begin_sym_expr(begin_id, iter_type);
+        symbol_exprt end_sym_expr(end_id, end_call.type());
+
+        // Helper that produces a cpp_namet referring to a given
+        // auxiliary symbol's base name.  Pre-typechecked symbol
+        // expressions are missing some lvalue/scope annotations
+        // that the parser-emitted form has, which causes the
+        // operator-overload resolver to silently miss matches.
+        // Building a `cpp_namet` and letting `typecheck_expr_main`
+        // resolve it through the standard name-lookup path
+        // restores the annotations.
+        auto sym_use = [&](const irep_idt &sym_id) -> exprt
+        {
+          cpp_namet n{symbol_table.lookup_ref(sym_id).base_name, loc};
+          return static_cast<const exprt &>(static_cast<const irept &>(n));
+        };
+
+        codet begin_init(ID_assign);
+        begin_init.copy_to_operands(begin_sym_expr);
+        begin_init.copy_to_operands(begin_call);
+        begin_init.add_source_location() = loc;
+
+        codet end_init(ID_assign);
+        end_init.copy_to_operands(end_sym_expr);
+        end_init.copy_to_operands(end_call);
+        end_init.add_source_location() = loc;
+
+        // Loop body: var = *__begin; body;
+        // Resolve the user-side declaration the same way the
+        // array path does: extract its base name and type
+        // (deducing `auto` from `*__begin`).
+        cpp_declarationt &cpp_decl = static_cast<cpp_declarationt &>(decl_op);
+        PRECONDITION(!cpp_decl.declarators().empty());
+        cpp_declaratort &declarator = cpp_decl.declarators().front();
+        const irep_idt &var_base_name =
+          declarator.name().get_sub().front().get(ID_identifier);
+
+        // Compute *__begin to deduce auto.  Pass the receiver as
+        // a cpp_namet referring to the auxiliary symbol; the
+        // typechecker's standard cpp_name resolution path produces
+        // the same symbol_exprt as the parser would for
+        // `*__for_begin`, with all the lvalue/scope annotations
+        // intact.  (Constructing a symbol_exprt directly skips
+        // some of those annotations, causing operator overload
+        // resolution to silently miss matches.)
+        exprt deref_expr(ID_dereference);
+        deref_expr.copy_to_operands(sym_use(begin_id));
+        typecheck_expr(deref_expr);
+
+        typet var_type = cpp_decl.type();
+        if(var_type.id() == ID_auto)
+          var_type = deref_expr.type();
+        else
+          typecheck_type(var_type);
+
+        const std::string var_id = scope_prefix + id2string(var_base_name);
+        {
+          auxiliary_symbolt sym;
+          sym.name = var_id;
+          sym.base_name = var_base_name;
+          sym.type = var_type;
+          sym.mode = ID_cpp;
+          sym.module = module;
+          sym.location = loc;
+          sym.is_file_local = true;
+          sym.is_thread_local = true;
+          sym.is_lvalue = true;
+          symbol_table.insert(std::move(sym));
+
+          cpp_idt &scope_id =
+            cpp_scopes.put_into_scope(symbol_table.lookup_ref(var_id));
+          scope_id.id_class = cpp_idt::id_classt::SYMBOL;
+        }
+        symbol_exprt var_expr(var_id, var_type);
+
+        codet assign_elem(ID_assign);
+        assign_elem.copy_to_operands(var_expr);
+        assign_elem.copy_to_operands(deref_expr);
+        assign_elem.add_source_location() = loc;
+
+        // Loop condition: __begin != __end (operator!= resolution)
+        exprt cond(ID_notequal);
+        cond.copy_to_operands(sym_use(begin_id));
+        cond.copy_to_operands(sym_use(end_id));
+        typecheck_expr(cond);
+
+        // Loop iter: ++__begin (operator++ resolution)
+        exprt iter(ID_side_effect);
+        iter.set(ID_statement, ID_preincrement);
+        iter.copy_to_operands(sym_use(begin_id));
+        typecheck_expr(iter);
+
+        // Type-check the body
+        typecheck_code(body);
+
+        code_blockt loop_body;
+        loop_body.add(std::move(assign_elem));
+        loop_body.add(std::move(body));
+        loop_body.add_source_location() = loc;
+
+        code_fort for_code(
+          code_skipt{}, std::move(cond), std::move(iter), std::move(loop_body));
+        for_code.add_source_location() = loc;
+
+        code_blockt outer;
+        outer.add(std::move(range_init));
+        outer.add(std::move(begin_init));
+        outer.add(std::move(end_init));
+        outer.add(std::move(for_code));
+        outer.add_source_location() = loc;
+
+        code = std::move(outer);
+        return;
+      }
+
       error().source_location = loc;
       error() << "range-based for requires an array type" << eom;
       throw 0;
