@@ -118,7 +118,11 @@ smt2_convt::smt2_convt(
 
   case solvert::Z3:
     use_array_of_bool = true;
-    use_as_const = true;
+    // `as const` is disabled because of a soundness issue in Z3,
+    // see https://github.com/Z3Prover/z3/issues/9550. Revisit once
+    // the upstream bug is fixed and we can bump the minimum Z3
+    // version accordingly.
+    use_as_const = false;
     use_check_sat_assuming = true;
     use_lambda_for_array = true;
     emit_set_logic = false;
