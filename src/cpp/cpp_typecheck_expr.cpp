@@ -176,8 +176,16 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   }
   else if(expr.id()=="__is_base_of")
   {
-    // an MS extension
-    // http://msdn.microsoft.com/en-us/library/ms177194(v=vs.80).aspx
+    // an MS extension, also a Clang/GCC built-in.  Per N5008
+    // [meta.rel] table: `is_base_of<Base, Derived>::value` is
+    // true iff `Base` is a base class of `Derived` (or the same
+    // class).  Both `class` and `struct` declarations produce
+    // class types per [class]/1; CBMC stores `struct` as a
+    // `struct_typet` without `ID_C_class`, while `class` sets
+    // `ID_C_class`.  `to_class_type` requires `ID_C_class`, so
+    // call `to_struct_type` here — a struct is a class-key for
+    // base-class purposes regardless of the `class`/`struct`
+    // keyword.
 
     typet base=static_cast<const typet &>(expr.find("type_arg1"));
     typet deriv=static_cast<const typet &>(expr.find("type_arg2"));
@@ -190,10 +198,13 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     else
     {
       irep_idt base_name = follow_tag(to_struct_tag_type(base)).get(ID_name);
-      const class_typet &class_type =
-        to_class_type(follow_tag(to_struct_tag_type(deriv)));
+      const struct_typet &struct_type =
+        follow_tag(to_struct_tag_type(deriv));
+      irep_idt deriv_name = struct_type.get(ID_name);
 
-      if(class_type.has_base(base_name))
+      // Per N5008 [meta.rel] / Cpp17BaseOfRequirement: a type is
+      // a base of itself for the purposes of `is_base_of`.
+      if(base_name == deriv_name || struct_type.has_base(base_name))
         expr=true_exprt();
       else
         expr=false_exprt();
