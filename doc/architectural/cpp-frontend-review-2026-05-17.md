@@ -812,6 +812,181 @@ This is the recommended next focused effort, with realistic
 unblock but at higher risk.  Both should be tackled in
 dedicated focused sessions, not interleaved with other work.
 
+## 2026-05-22 Group 2 investigation — invariant_violated_string failures share root cause with B-arch/C-revised
+
+After Category A-deep step 1 landed (`c050302afe`), the
+dominant residual dog-food cluster (15/22/80/0) is 30 files
+failing at the first PRECONDITION call inside libstdc++'s
+`basic_string::sharing_treet` constructor:
+
+```
+src/util/irep.h:177:1: error: found no match for symbol
+  'invariant_violated_string', candidates are:
+  symbol void ...
+  (const struct basic_string &, const struct basic_string &,
+   const signed int, const struct basic_string &,
+   const struct basic_string &) ...
+argument types:
+  char [16l]  char [14l]  signed int  char [21l]  char [13l]
+```
+
+The argument types `char[N]` should convert to `const std::string &`
+via the standard implicit user-defined conversion sequence:
+
+1. `char[N] → const char *`  ([conv.array])
+2. `const char * → std::string`  via converting constructor
+3. bind to `const std::string &`  ([dcl.init.ref])
+
+### Bug localized
+
+Tracing `user_defined_conversion_sequence` for
+`char[N] → basic_string<char>`:
+
+* `basic_string<char>` has 189 components, including 7
+  constructors with various signatures.
+* The 4-param converting ctor
+  `basic_string(const _CharT*, size_type, const _Alloc& = _Alloc())`
+  is registered with sig
+  `[pointer, &pointer, unsignedbv, &pointer(default)]`.
+  Param 2 (size_type) has no default, so
+  `all_extras_have_default = false` and the candidate is
+  skipped.
+* The 3-param converting ctor
+  `basic_string(const _CharT*, const _Alloc& = _Alloc())` is
+  **not registered as a non-template constructor** at all.
+  It would have shape `[pointer, &pointer, &pointer(default)]`
+  — that signature is missing from CBMC's components list for
+  `basic_string<char>`.
+
+Why is the 3-param converting ctor missing?  Look at libstdc++:
+
+```cpp
+#if __cpp_deduction_guides && ! defined _GLIBCXX_DEFINING_STRING_INSTANTIATIONS
+      // 3076. basic_string CTAD ambiguity
+      template<typename = _RequireAllocator<_Alloc>>
+#endif
+      _GLIBCXX20_CONSTEXPR
+      basic_string(const _CharT* __s, const _Alloc& __a = _Alloc())
+```
+
+In C++17 mode, the converting ctor is wrapped by a defaulted
+template parameter
+`template<typename = _RequireAllocator<_Alloc>>`.  That makes
+the ctor a **function template**, not a regular member
+function.  CBMC's `user_defined_conversion_sequence` does
+iterate template ctors via the
+`has_template_constructor` fallback (in
+`cpp_typecheck_conversions.cpp:1709`), which calls
+`new_temporary` → `cpp_constructor` → ctor overload resolution
+including template ctors.
+
+Empirical trace: that fallback is reached **59 times** for
+`char[] → basic_string<char>` in a single dog-food compile.
+**All 59 calls throw** during `guess_function_template_args`'s
+substitution.
+
+### Same root cause as Category B-arch / C-revised
+
+`_RequireAllocator<_Alloc>` is defined in libstdc++ as
+
+```cpp
+template<typename _Alloc>
+  using _RequireAllocator
+    = typename enable_if<__is_allocator<_Alloc>::value, _Alloc>::type;
+```
+
+This is **exactly the same SFINAE pattern** as the C-revised
+swap deduction:
+`enable_if<__and_<__not_<__is_tuple_like<T>>,
+                 is_move_constructible<T>,
+                 is_move_assignable<T>>::value>::type`.
+
+CBMC's `cpp_typecheck.typecheck_type(function_type)` (in
+`guess_function_template_args` at line ~5432) cannot evaluate
+`__is_allocator<_Alloc>::value` and throws.  The catch block
+treats this as deduction failure → the candidate is dropped →
+no converting ctor is found → "found no match" cascade.
+
+So **Group 1 (36 files: swap + sharing_treet + __and_) and
+Group 2 (30 files: invariant_violated_string) share a single
+root cause**: SFINAE substitution failing during template
+function/constructor deduction because CBMC cannot evaluate
+libstdc++'s trait wrapper class templates.
+
+That's **66 of 80 dog-food failures (82%)** with ONE
+architectural fix.
+
+### Recommended fix paths (3-5 day items)
+
+#### Path 1: Trait intrinsic emulation (least invasive, most
+focused)
+
+Recognise specific libstdc++ trait class templates by
+qualified name and short-circuit their evaluation to known
+constants:
+
+* `__is_allocator<allocator<T>>::value` → `true`
+* `__is_allocator<X>::value` for non-allocator X → `false`
+* `is_move_constructible<T>::value` →
+  `__is_constructible(T, T&&)` (CBMC's existing builtin)
+* `is_move_assignable<T>::value` →
+  `__is_assignable(T&, T&&)` (CBMC's existing builtin)
+* `__is_tuple_like<T>::value` for scalar/pointer T → `false`
+* `__not_<X>::value` → `!X::value`
+* `__and_<X, Y, ...>::value` → AND of values
+* `__or_<X, Y, ...>::value` → OR of values
+* `enable_if<true, T>::type` → `T`
+* `enable_if<false, T>::type` → throws (no member)
+* `_RequireAllocator<X>` (alias) → expand inline
+* `_RequireNotAllocator<X>` → expand inline
+
+CBMC already has builtin `__is_constructible` and
+`__is_assignable` (at `cpp_typecheck_expr.cpp:211`).  The new
+work is to recognise the libstdc++ wrappers and route them
+to those builtins.
+
+Intercept point: `instantiate_template` for class templates
+matching the known trait names — bypass the standard
+substitution, build the result directly.
+
+Estimated 3-5 days, unblocks 66 of 80 dog-food failures.
+
+#### Path 2: Architectural multi-level metafunction lookup (5-7 days)
+
+Implement proper `Class<T>::value` lookup that walks
+inherited static members through `typename Base::type`
+typedef chains per [class.member.lookup].  This is the
+correct fix per the standard but requires deeper rework of
+`cpp_typecheck_resolve.cpp`.
+
+#### Path 3: Permissive substitution catch (1-2 days, may be unsafe)
+
+In `guess_function_template_args`'s substitution catch block,
+when the throw came from a defaulted template parameter that
+is a SFINAE alias, ASSUME the deduction succeeds and
+continue with the function-arg deduction.  Empirically it
+should usually be true; if false, downstream type-check will
+catch the mismatch.
+
+This was tried at the C-revised level for the function
+return type and didn't work because the cpp_name had been
+"shelled" by partial substitution.  Worth re-trying at the
+defaulted-template-parameter level specifically.
+
+### State at end of session
+
+* Investigation: complete.  Bug localized.  Group 2 = same
+  root cause as Group 1.
+* Fix: not landed.  All paths require multi-day focused work
+  outside this session's budget.
+* No code changes from this investigation; instrumentation
+  reverted, working tree clean.
+
+Recommended next session: pursue Path 1 (trait intrinsic
+emulation) as a 3-5 day focused project.  This is the
+single highest-leverage architectural fix remaining for
+dog-food unblocking — 66 of 80 failures (82%).
+
 ## Status of this PR
 
 15 commits ahead of pushed `ef662777b0`, all behaviour-change
