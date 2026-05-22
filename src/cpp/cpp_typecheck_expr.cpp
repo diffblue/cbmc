@@ -1477,7 +1477,24 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
   if(op.type().id() == ID_code)
   {
     // we take the address of the method.
-    DATA_INVARIANT(op.id() == ID_member, "address-of code must be a member");
+    // Per N5008 [conv.func]/1 + [over.over]/1: in lvalue-to-rvalue
+    // conversion of a function-typed lvalue, take its address.
+    // The implementation here assumes the lvalue arrived as a
+    // member-access expression (ID_member); when overload
+    // resolution arrives via a synthesised user-defined
+    // conversion sequence (e.g. lambda → `std::function`
+    // construction), the operand may be a different shape.
+    // Emit a graceful error instead of aborting on the
+    // DATA_INVARIANT — the caller's catch block then drops the
+    // problematic candidate and overload resolution can
+    // continue or report a localized "no viable conversion".
+    if(op.id() != ID_member)
+    {
+      error().source_location = expr.source_location();
+      error() << "address-of code requires a member expression "
+              << "(operand id=" << op.id() << ")" << eom;
+      throw 0;
+    }
     exprt symb = cpp_symbol_expr(lookup(op.get(ID_component_name)));
     address_of_exprt address(symb, pointer_type(symb.type()));
     address.set(ID_C_implicit, true);
