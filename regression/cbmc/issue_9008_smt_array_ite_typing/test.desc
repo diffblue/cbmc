@@ -1,0 +1,29 @@
+CORE smt-backend no-new-smt
+main.c
+--smt2 --no-array-field-sensitivity --no-bounds-check --no-pointer-check
+^\[main\.assertion\.1\] line \d+ may fail: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+select expects array operand
+^VERIFICATION ERROR$
+--
+This test exercises the SMT2 back-end's handling of an if_exprt that has
+array type and whose two branches are encoded as bit-vectors.  Without
+the fix associated with issue #9008, CBMC emits an ill-typed (select
+<bit-vector> <index>) form, which the bundled smt2_solver (cprover-smt2)
+flags with "select expects array operand", causing CBMC to report
+VERIFICATION ERROR.  With the fix, the if_exprt is correctly recognised
+as a bit-vector ITE and the index access is encoded as bvlshr/extract,
+so the assertion is checked normally and reported as FAILURE.
+
+The bug only manifests for SMT2 solvers that strictly enforce SMT-LIB 2
+type checking (the bundled smt2_solver, Bitwuzla, cvc5).  Z3 silently
+accepts the malformed formula, so this regression is detected by CI in
+the test-cprover-smt2 makefile target.
+
+--no-array-field-sensitivity is required because field sensitivity
+splits array-of-struct accesses into per-field SMT arrays, which avoids
+the buggy code path; --no-bounds-check and --no-pointer-check trim the
+property set down to the assertion of interest.

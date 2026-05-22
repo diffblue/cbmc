@@ -5957,6 +5957,36 @@ bool smt2_convt::use_array_theory(const exprt &expr)
   // arrays inside structs get flattened, unless we have datatypes
   if(expr.id() == ID_with)
     return use_array_theory(to_with_expr(expr).old());
+  else if(expr.id() == ID_if)
+  {
+    // For an array-typed if-then-else, the SMT sort produced by
+    // convert_expr (see the ID_if branch above) is determined by the
+    // sorts chosen for its two operands:
+    // - if both branches are bit-vector-encoded, i.e. neither uses array
+    //   theory (typically because both are array-typed members of a
+    //   struct that has been flattened to a bit-vector), the resulting
+    //   ite is a bit-vector;
+    // - if both branches use array theory, the ite is an SMT array;
+    // - if exactly one branch uses array theory, the ID_if handler in
+    //   convert_expr unflattens the bit-vector branch back to an SMT
+    //   array (see the wheret::BEGIN/wheret::END unflatten calls), so
+    //   the ite is again an SMT array.
+    // The ite therefore "uses array theory" iff at least one branch
+    // does. Without this clause, the fall-through below would
+    // unconditionally return true for ID_if (since ID_if != ID_member),
+    // which is wrong in the symmetric bit-vector case: callers like
+    // convert_index, convert_with, flatten2bv, and the array-typed
+    // define-fun path would then emit array-theory operators -- e.g.
+    // (select <ite> ...) or (store <ite> ...) -- on a bit-vector
+    // operand, producing ill-typed SMT-LIB 2 that is rejected by
+    // conforming solvers (cf. issue #9008). The asymmetric case was
+    // already handled, for ID_with branches, in the ID_if conversion
+    // logic of convert_expr; the present clause makes use_array_theory
+    // consistent with that conversion in all four combinations.
+    const if_exprt &if_expr = to_if_expr(expr);
+    return use_array_theory(if_expr.true_case()) ||
+           use_array_theory(if_expr.false_case());
+  }
   else
     return use_datatypes || expr.id() != ID_member;
 }
