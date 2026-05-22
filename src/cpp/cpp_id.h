@@ -99,6 +99,29 @@ public:
   void print(std::ostream &out, unsigned indent=0) const;
   void print_fields(std::ostream &out, unsigned indent=0) const;
 
+  /// Number of registered base/`using` scope links on this scope.
+  /// Used by the Category A-deep recovery in
+  /// `cpp_typecheckt::typecheck_compound_body` to roll back partial
+  /// additions if `typecheck_compound_bases` throws midway.
+  std::size_t secondary_scopes_size() const
+  {
+    return secondary_scopes.size();
+  }
+  std::size_t using_scopes_size() const
+  {
+    return using_scopes.size();
+  }
+  void truncate_secondary_scopes(std::size_t n)
+  {
+    PRECONDITION(n <= secondary_scopes.size());
+    secondary_scopes.resize(n);
+  }
+  void truncate_using_scopes(std::size_t n)
+  {
+    PRECONDITION(n <= using_scopes.size());
+    using_scopes.resize(n);
+  }
+
 protected:
   typedef std::multimap<irep_idt, cpp_idt> cpp_id_mapt;
   cpp_id_mapt sub;
