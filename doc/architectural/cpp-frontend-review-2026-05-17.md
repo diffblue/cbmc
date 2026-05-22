@@ -987,6 +987,114 @@ emulation) as a 3-5 day focused project.  This is the
 single highest-leverage architectural fix remaining for
 dog-food unblocking — 66 of 80 failures (82%).
 
+## 2026-05-22 Trait intrinsic emulation attempt — diagnostic-only change landed; full emulation deferred
+
+### What landed
+
+`__is_base_of: accept struct types, not only class types` (commit
+`43fa4ecfe7`).  Two corrections to CBMC's existing
+`__is_base_of` builtin that were exposed during Group 2
+investigation and are independently standard-conforming:
+
+1. **Use `to_struct_type` instead of `to_class_type`.**  Per
+   N5008 [class]/1, the `class` and `struct` keywords differ
+   only in default member access — both produce class types
+   for inheritance purposes.  CBMC stored `struct` declarations
+   as `struct_typet` without `ID_C_class`; the
+   `to_class_type` cast preconditioned on `ID_C_class` and so
+   crashed on user code where `struct B {}; struct D : B {};`
+   was passed to `std::is_base_of`.
+2. **Self-base check.**  Per N5008 [meta.rel] table:
+   `is_base_of<T, T>::value` is true for any class type T
+   (a class is a base of itself for the purpose of this trait,
+   per the Cpp17BaseOfRequirement).  CBMC's `has_base` only
+   walked actual bases.
+
+Regression test `cpp17_is_base_of_struct` exercises both
+fixes.
+
+### Diagnostic side-effect
+
+The self-base fix correctly makes `is_base_of<X, X>::value`
+return true.  3 dog-food files (`run.cpp`, `console.cpp`,
+`irep_ids.cpp`) move from OK_CLEAN to OK_NOISY because the
+SFINAE-gated function template
+`invariant_violated_structured<ET, ...>` now goes through
+deduction (its return-type SFINAE
+`enable_if<is_base_of<invariant_failedt, ET>::value>::type`
+correctly succeeds for `ET = invariant_failedt`).  The
+function-template body's instantiation then fails downstream
+with one context message.  The files still produce valid goto
+binaries — only the diagnostic-cleanliness count regresses.
+
+This is a strictly conforming improvement: the code now
+matches normative behavior.  The downstream instantiation
+failure is a pre-existing, separate issue (parameter pack
+expansion in `invariant_violated_structured`'s body) that
+SFINAE was previously masking.
+
+### Trait intrinsic emulation — attempted, reverted
+
+Tried implementing intrinsic emulation for the four
+[meta.unary.prop] referenceable traits in `instantiate_template`:
+
+* `is_move_constructible<T>` → routed to `__is_constructible(T, T&&)`
+* `is_copy_constructible<T>` → `__is_constructible(T, const T&)`
+* `is_move_assignable<T>` → `__is_assignable(T&, T&&)`
+* `is_copy_assignable<T>` → `__is_assignable(T&, const T&)`
+
+Approach: at top of `instantiate_template`, recognize known
+trait class templates by qualified name; synthesize a struct
+symbol with one static constexpr bool `value` member set via
+the existing CBMC builtins; return early.
+
+**Result**: 8 new dog-food crashes, 3 fewer OK_CLEAN, only -3
+FAIL.  Net regression.
+
+**Root cause of the regression**: my synthesized struct has
+ONLY `value` as a member.  libstdc++'s `is_move_constructible`
+inherits from `integral_constant<bool, V>`, which provides
+`value`, `value_type` typedef, `type` typedef
+(self-reference), `operator value_type()`, and
+`operator()()`.  Downstream code (e.g.,
+`__and_<...>::value` evaluation, structural metafunction
+matching) accesses these other members.  When my synth
+shadows the libstdc++ definition with a partial struct, those
+accesses fail.
+
+**Two correct paths forward** (both 2-3 days):
+
+1. **Synthesize the FULL `integral_constant<bool, V>`
+   interface.**  Build the struct with `value`, `value_type`,
+   `type`, the conversion operator, and the call operator —
+   either by inheriting from `std::integral_constant<bool, V>`
+   directly (via a synthesised base) or by replicating its
+   members.  The synthesized struct must look indistinguishable
+   from a properly elaborated libstdc++ `is_move_constructible`
+   to all downstream consumers.
+
+2. **Intercept at resolve time, not instantiate time.**
+   Instead of synthesising a class symbol, intercept at
+   `cpp_typecheck_resolvet::resolve` when the cpp_name has the
+   shape `Class<args>::value` and `Class` is a known trait.
+   Return the boolean constant directly, never instantiating
+   the class.  Doesn't conflict with libstdc++'s class
+   definition.  Disadvantages: doesn't help cases that need
+   `Class<args>::type` or the conversion operator.
+
+Path 2 is simpler but partial; Path 1 is fuller-fidelity but
+more code.  Either is the next focused multi-day effort.
+
+### Empirical state at end of session
+
+* dog-food: 12 OK_CLEAN / 25 OK_NOISY / 80 FAIL / 0 CRASH
+  (vs baseline 15/22/80/0 — 3 files moved OK_CLEAN→OK_NOISY
+  due to `is_base_of` standard-conforming fix exposing
+  downstream pre-existing diagnostic; net same total useful
+  outputs).
+* regressions: 675/0/83 — all green.
+* 28 commits ahead of pushed `ef662777b0`.
+
 ## Status of this PR
 
 15 commits ahead of pushed `ef662777b0`, all behaviour-change
