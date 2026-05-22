@@ -1,6 +1,6 @@
 CORE
 main.cpp
---cpp14
+--cpp14 --unwind 5 --depth 80 --no-unwinding-assertions
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$

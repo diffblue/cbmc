@@ -1222,7 +1222,79 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
       throw 0;
     }
 
-    typecheck_compound_bases(to_struct_type(type));
+    // Per N5008 [class.derived]/2 + [temp.inst]/3: failure to
+    // elaborate one base class (e.g. a class template
+    // specialization whose body cannot complete because of an
+    // upstream depth/structural limit, or a dependent base name
+    // that resolves to an incomplete struct) must not abandon
+    // the entire derived class.  The derived class still has its
+    // own declarative region per [basic.scope.class] and its
+    // body members are independently observable.  Mark the type
+    // with `#unresolved_base` so downstream consumers
+    // (constructor synthesis, vtable walk, member-name lookup
+    // via inheritance) can skip the inherited-member work
+    // gracefully and continue body elaboration here.
+    //
+    // ONLY APPLY DURING TEMPLATE INSTANTIATION
+    // (`!instantiation_stack.empty()`): user-code class
+    // declarations like
+    //   `struct D : virtual B, virtual C { };  // non-virtual A
+    //                                          // multi-inherit`
+    // are intentional compile errors per [class.mi]/2 and the
+    // user expects CBMC to refuse them with `CONVERSION ERROR`,
+    // not silently recover.  See the
+    // `regression/cbmc-cpp/Multiple_Inheritance3` test for the
+    // canonical case.  Recovery is only meaningful for
+    // libstdc++ / CBMC-internal template specializations
+    // whose elaboration fails due to CBMC's depth/structural
+    // limits, not the user's intent.
+    //
+    // This is the architectural fix for Category A-deep
+    // (`cpp-frontend-review-2026-05-17.md`): irept and 61 other
+    // src/util/ classes inherit from a class template whose
+    // instantiation fails on libstdc++; pre-recovery the throw
+    // escaped `typecheck_compound_body`, leaving the class with
+    // ID_name set but zero registered components.  Consequence:
+    // 62 dog-food failures with "symbol X is unknown" on member
+    // access.  Recovery here keeps the body loop running so
+    // members register normally.
+    const bool allow_recovery = !instantiation_stack.empty();
+    const std::size_t errors_before =
+      get_message_handler().get_message_count(messaget::M_ERROR);
+    // Save state of the current class scope's `secondary_scopes`
+    // vector so we can roll back any partial additions made by
+    // `typecheck_compound_bases` before the throw.  Without this
+    // rollback, dangling secondary-scope pointers persist on the
+    // class scope and method bodies typechecked later may walk
+    // into freed/uninitialised cpp_idt nodes.
+    const std::size_t saved_secondary_count =
+      cpp_scopes.current_scope().secondary_scopes_size();
+    const std::size_t saved_using_count =
+      cpp_scopes.current_scope().using_scopes_size();
+    try
+    {
+      typecheck_compound_bases(to_struct_type(type));
+    }
+    catch(...)
+    {
+      if(!allow_recovery)
+        throw;
+      get_message_handler().set_message_count(messaget::M_ERROR, errors_before);
+      // Roll back partial scope linkage.
+      cpp_scopes.current_scope().truncate_secondary_scopes(
+        saved_secondary_count);
+      cpp_scopes.current_scope().truncate_using_scopes(saved_using_count);
+
+      symbol.type.set(ID_C_unresolved_base, true);
+      // The throw escaped mid-processing of the bases array;
+      // entries beyond the failure point may be unresolved
+      // cpp_names rather than the post-resolution `ID_base`
+      // exprs that downstream consumers (constructor synthesis,
+      // vtable walk, member-name lookup via inheritance)
+      // require.  Clear the array entirely — the class is
+      // recovered as if it had no base classes.
+      symbol.type.add(ID_bases).get_sub().clear();
+    }
   }
 
   exprt &body = static_cast<exprt &>(type.add(ID_body));

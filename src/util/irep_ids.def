@@ -445,6 +445,20 @@ IREP_ID_TWO(C_template_case, #template_case)
 // by `cpp_typecheckt::ensure_member_complete`.
 IREP_ID_TWO(C_lazy_member_type, #lazy_member_type)
 IREP_ID_ONE(lazy_type_source)
+// Marker on a struct type whose base-class elaboration threw
+// during `typecheck_compound_body`.  Per the architectural plan
+// in `doc/architectural/cpp-frontend-review-2026-05-17.md`
+// (Category A-deep recovery), the throw is caught and the body
+// processed regardless, so the class still registers its own
+// members; consumers that depend on inherited members
+// (constructor synthesis, vtable walk, member-name resolution
+// via inheritance) check this flag and either skip the
+// inherited-member work or emit a focused diagnostic.  N5008
+// [class.derived]/2: a class-or-decltype shall denote a class
+// type that is not an incompletely defined class; recovery
+// preserves the [basic.scope.class] declarative region for the
+// derived class itself even when the base couldn't elaborate.
+IREP_ID_TWO(C_unresolved_base, #unresolved_base)
 IREP_ID_ONE(typename)
 IREP_ID_ONE(C)
 IREP_ID_ONE(cpp)
