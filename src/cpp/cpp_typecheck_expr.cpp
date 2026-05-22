@@ -4401,6 +4401,8 @@ void cpp_typecheckt::typecheck_side_effect_assignment(side_effect_exprt &expr)
     strop += "*=";
   else if(statement==ID_assign_div)
     strop += "/=";
+  else if(statement == ID_assign_mod)
+    strop += "%=";
   else if(statement==ID_assign_bitand)
     strop += "&=";
   else if(statement==ID_assign_bitor)
