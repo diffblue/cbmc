@@ -693,6 +693,125 @@ the `<ios>`-poisoned swap deduction.  A-deep remains the largest
 single dog-food unblock but is high-risk; C-revised is medium-risk
 with broad reach (B-arch and many libstdc++-internal traits).
 
+## 2026-05-22 Category C-revised investigation
+
+Goal: implement multi-level metafunction inheritance lookup so
+SFINAE chains of the form
+`enable_if<__and_<...>::value>::type` can resolve cleanly when
+the inner `::value` is inherited from a base class via
+`typename Base::type` chains.
+
+### Where exactly the throw happens
+
+Empirical tracing in
+`cpp_typecheck_resolvet::guess_function_template_args`
+identifies the failure point: line ~5437 (catch block after
+`cpp_typecheck.typecheck_type(function_type)`).  The `function_type`
+after substitution has `id == ID_code` and
+`return_type().id() == ID_cpp_name`.  When `typecheck_type`
+processes that return type, evaluating the inherited `::value`
+through the `__and_<...>::type` chain throws.  The catch
+silently drops the candidate per [temp.deduct]/8 SFINAE.
+
+Trace from the dog-food repro (
+`exception_ptr` swap + `<string>` + `std::swap(unsigned int *, …)`):
+4 distinct `swap<Type0>` candidates fail at this catch:
+
+1. The `_Require<...>` C++20 concept-style swap (alias).
+2. The unconstrained `enable_if<__and_<__not_<__is_tuple_like<_Tp>>,
+   is_move_constructible<_Tp>, is_move_assignable<_Tp>>::value>::type`
+   from `bits/move.h:189` — the one that should match
+   `unsigned int *`.
+3-4. Tuple swap variants with `enable_if<__and_<...>::value>::type`.
+
+After `_Tp = unsigned int *` substitution, the return type is
+`enable_if<__and_<__not_<__is_tuple_like<unsigned int *>>,
+is_move_constructible<unsigned int *>,
+is_move_assignable<unsigned int *>>::value>::type`.
+Static-asserting that exact `__and_<...>::value` evaluates to
+`true` for `unsigned int *` works (verified at user-side).
+But during *deduction substitution*, the same evaluation
+throws.
+
+### Why the obvious targeted fix doesn't work
+
+Tried: in the catch block, when the return type is a SFINAE-
+shaped `cpp_name`, fall back to `void` (keeping the candidate
+viable).  The minimal swap test still failed — when
+substitution throws, the return type stored in the
+`function_type` is not the rich SFINAE-shaped cpp_name we'd
+look for.  Empirical trace:
+`ret.id=cpp_name sub_count=0 named_sub_count=0`.  The cpp_name
+appears to have been "shelled" by partial substitution before
+the throw, leaving no detectable shape we can pattern-match
+against.
+
+### Why user-side reproductions all pass
+
+Multiple user-side reproductions of the SFINAE chain
+(including 4-level metafunction inheritance, `__and_<>`
+variants, and the exact libcxx pattern) all pass cleanly in
+CBMC.  This suggests the failure is not in the SFINAE
+machinery itself but in some *symbol-table* / *template_map*
+state that builds up only in libcxx's deeply-included context
+(specifically:
+`<bits/exception_ptr.h>` ∪ `<bits/basic_string.h>` triggers
+the failure but each alone works).
+
+The bisection narrowed it to: when both
+`std::__exception_ptr::swap(exception_ptr&, exception_ptr&)`
+(brought into `std::` via `using __exception_ptr::swap`) AND
+the `swap` template family (move.h:189 + basic_string.h's
+template + tuple/array/etc. specializations) coexist, **all
+swap template deductions silently fail**, even for argument
+types that should be trivially compatible.
+
+### Conclusion: this is a multi-day item, not a single-session fix
+
+Both candidate fix paths require deeper rework:
+
+1. **Targeted: relax the substitution-failure catch when the
+   thrown expression carries the substitution-failure shape.**
+   Doesn't work as observed because the thrown state doesn't
+   preserve the shape.  Would need to instrument the
+   substitution path at a deeper level — capture the exact
+   substitution failure reason from inside the typecheck_type
+   call, not from the post-throw inspection.
+
+2. **Architectural: implement multi-level metafunction
+   inheritance lookup.**  When evaluating
+   `Class<T>::value` and `value` is inherited via `typename
+   Base::type` chains, walk the inheritance recursively and
+   evaluate inherited static members.  This is the proper fix
+   per N5008 [class.member.lookup] and would correctly evaluate
+   `__and_<...>::value` to `true` rather than throwing.
+
+Both are 3-5 days of careful work.  Today's investigation
+confirms the diagnosis but stops short of landing a fix.
+
+### Final priority (6th iteration)
+
+| rank | item | est | status |
+|---|---|---|---|
+| 1 | A-deep: member-function-template registration | 5-7 d | unstarted |
+| 2 | C-revised: multi-level metafunction lookup | 3-5 d | diagnosis confirmed; not landed |
+| 3 | D: range-based for over member begin/end | done | DONE (`1363eeaaca`) |
+| 4 | A step 1: `set(ID_name)` hoist | done | DONE (`a65e4b4362`) |
+| 5 | B-bug: `ID_assign_mod` operator overload | done | DONE (`9ef2f87307`) |
+| 6 | B-arch: deduction with `<ios>` in scope | downstream of C-revised | (this section) |
+| 7 | F/G/H per-file | 1 d each | unstarted |
+
+The architectural lever for both Category B-arch and Category
+C-revised is the same: make CBMC's class-member-access lookup
+follow `typename Base::type` typedef chains during template
+substitution.  This unblocks the `_v` traits AND the
+`<ios>`-poisoned swap deduction in one piece of work.
+
+This is the recommended next focused effort, with realistic
+3-5 days of scope.  A-deep remains the largest single dog-food
+unblock but at higher risk.  Both should be tackled in
+dedicated focused sessions, not interleaved with other work.
+
 ## Status of this PR
 
 15 commits ahead of pushed `ef662777b0`, all behaviour-change
