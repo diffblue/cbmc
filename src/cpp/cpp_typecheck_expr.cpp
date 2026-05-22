@@ -4927,9 +4927,20 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
     typet ptype = pdecl.type();
     typecheck_type(ptype);
     irep_idt pname;
+    // Per N5008 [dcl.fct]/16: a lambda parameter may be unnamed
+    // (e.g. `[](std::size_t) { ... }`).  Probe the declarator
+    // structure defensively before reading the identifier.
     if(!pdecl.declarators().empty())
-      pname =
-        pdecl.declarators().front().name().get_sub().front().get(ID_identifier);
+    {
+      const auto &name_sub = pdecl.declarators().front().name().get_sub();
+      if(!name_sub.empty())
+        pname = name_sub.front().get(ID_identifier);
+    }
+    // Synthesise a unique base_name for unnamed parameters: the
+    // downstream scope/parameter machinery requires a non-empty
+    // base_name (cpp_scopes.cpp:30 `put_into_scope` precondition).
+    if(pname.empty())
+      pname = "__unnamed_param_" + std::to_string(func_params.size());
     code_typet::parametert param(ptype);
     param.set_identifier(func_sym_name + "::" + id2string(pname));
     param.set_base_name(pname);
