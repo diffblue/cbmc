@@ -601,6 +601,98 @@ architectural issue beyond a single-session fix.
 **No code changes today.**  Dog-food unchanged at 14/5/98/0.
 The review's priority table is updated to reflect the lessons.
 
+## 2026-05-22 Category B investigation
+
+The dog-food failure category labelled "B: SFINAE viability for
+unrestricted `swap<T*>`" turns out to have two separate root
+causes, not one.  Today's investigation found and fixed one
+(latent-bug); the other (architectural) is a deeper deduction
+issue that triggers only when `<ios>` (or its transitive
+includers `<sstream>`, `<iostream>`) is in scope.
+
+### Latent bug: `ID_assign_mod` missing from operator-overload switch
+
+`bigint.hh:308`'s `inline BigInt operator% (...) { return BigInt(lhs) %= rhs; }`
+trips on `BigInt::operator%=` overload resolution.  The switch
+in `cpp_typecheckt::typecheck_side_effect_assignment` mapping
+the statement id to an operator name handled all compound
+assignments EXCEPT `%=` (`ID_assign_mod`).  Any non-POD class
+type using `%=` would emit "bad assignment operator
+'assign_mod'" and abort.
+
+Fixed in commit `9ef2f87307`.  Regression test
+`regression/cbmc-cpp/cpp_compound_assign_mod` covers it.
+13 dog-food files (`algebraic_number.cpp`, `arith_tools.cpp`,
+`bv_arithmetic.cpp`, `config.cpp`, `expr.cpp`,
+`expr_initializer.cpp`, `fixedbv.cpp`, `ieee_float.cpp`,
+`interval_constraint.cpp`, `interval_union.cpp`,
+`lower_byte_operators.cpp`, `mp_arith.cpp`, `rational.cpp`)
+no longer hit this error, but each surfaces a downstream
+issue (operator< on BigInt not finding the user-defined free
+overload, the `swap` deduction issue below, etc.) so the
+totals don't change.
+
+### Architectural issue: `<ios>` poisons template deduction for swap
+
+Empirical bisection:
+
+| header included | swap on `unsigned int *` |
+|---|---|
+| `<utility>` only | ✓ works |
+| `<vector>` | ✓ works |
+| `<string>` | ✓ works |
+| `<tuple>` | ✓ works |
+| `<optional>` | ✓ works |
+| `<unordered_map>` | ✓ works |
+| `<iosfwd>` | ✓ works |
+| `<ios>` | ✗ "found no match for symbol 'swap'" |
+| `<streambuf>`, `<iostream>`, `<istream>`, `<ostream>`, `<locale>`, `<sstream>` | ✗ same |
+
+With `<ios>` in scope, `cpp_typecheck_resolvet::guess_function_template_args`
+returns `nil_exprt()` for ALL 13 swap template candidates,
+including move.h:189's unrestricted `swap<_Tp>(_Tp&, _Tp&)`
+that should match `unsigned int *`.  Without `<ios>`, the same
+candidate succeeds.
+
+Without further deep tracing, the most likely cause is that
+including `<ios>` brings in template-class specialisations
+(or registered scopes) that pollute `template_map` state or
+make some intermediate substitution fail during the SFINAE
+return-type check (specifically `enable_if<__and_<...>::value>::type`
+where the chain has to evaluate `is_move_constructible<unsigned int *>::value`
+through multi-level inheritance).
+
+This is the same family as the **C-revised** issue in this
+review (multi-level metafunction inheritance lookup).  The
+underlying lever is the same: `Class<T>::value` lookup needs
+to traverse `typename Base::type` typedef bases.
+
+### Why the dog-food count didn't move
+
+Both Category B sub-issues are present in the 13 files that
+were attributed to "B".  Fixing one (`assign_mod`) just
+exposes the other (`swap` deduction).  Fixing the deduction
+would need the C-revised work — they share the same lever.
+
+### Revised priority (5th iteration)
+
+| rank | item | est | status |
+|---|---|---|---|
+| 1 | A-deep: member-function-template registration | 5-7 d | unstarted |
+| 2 | C-revised: multi-level metafunction inheritance | 3-5 d | this would unblock B's deduction issue too |
+| 3 | D: range-based for over member begin/end | 2-3 d | DONE (`1363eeaaca`) |
+| 4 | A step 1: `set(ID_name)` hoist | done | DONE (`a65e4b4362`) |
+| 5 | B-bug: `ID_assign_mod` operator overload | done | DONE (`9ef2f87307`) |
+| 6 | B-arch: deduction with `<ios>` poisoned scope | 3-5 d | downstream of C-revised |
+| 7 | F/G/H per-file | 1 d each | unstarted |
+
+Concrete recommendation for the next session: **Category C-revised**
+(multi-level metafunction inheritance lookup) is now identified as
+the real lever — it would unblock both the `_v` trait warnings AND
+the `<ios>`-poisoned swap deduction.  A-deep remains the largest
+single dog-food unblock but is high-risk; C-revised is medium-risk
+with broad reach (B-arch and many libstdc++-internal traits).
+
 ## Status of this PR
 
 15 commits ahead of pushed `ef662777b0`, all behaviour-change
