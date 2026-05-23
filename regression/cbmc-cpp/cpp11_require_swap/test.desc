@@ -1,0 +1,8 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=10$
+^SIGNAL=0$
+--
+found no match for symbol 'swap'
+unexpected expression: struct_tag

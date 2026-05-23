@@ -581,6 +581,49 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
       throw 0;
     }
   }
+  else if(expr.id() == ID_struct_tag)
+  {
+    // A struct_tag expression can appear when a C++ qualified name
+    // like `__and_<T>::value` is partially resolved: the class part
+    // resolves to a struct_tag but the `::value` member access hasn't
+    // been applied yet.  Look up the static `value` member in the
+    // class and replace the expression with its constant value.
+    const irep_idt &tag_id = expr.get(ID_identifier);
+    if(!tag_id.empty())
+    {
+      // Try to find a static `value` member
+      std::string scope = id2string(tag_id);
+      if(scope.compare(0, 4, "tag-") == 0)
+        scope.erase(0, 4);
+      const auto *val_sym = symbol_table.lookup(scope + "::value");
+      if(val_sym && val_sym->value.is_not_nil() && val_sym->value.is_constant())
+      {
+        expr = val_sym->value;
+        return;
+      }
+      // Also check the struct's components for an inherited value
+      const auto *class_sym = symbol_table.lookup(tag_id);
+      if(class_sym && class_sym->type.id() == ID_struct)
+      {
+        for(const auto &comp : to_struct_type(class_sym->type).components())
+        {
+          if(comp.get_base_name() == "value" && comp.get_bool(ID_is_static))
+          {
+            const auto *vs = symbol_table.lookup(comp.get_name());
+            if(vs && vs->value.is_not_nil() && vs->value.is_constant())
+            {
+              expr = vs->value;
+              return;
+            }
+            break;
+          }
+        }
+      }
+    }
+    error().source_location = expr.source_location();
+    error() << "unexpected expression: " << expr.pretty() << eom;
+    throw 0;
+  }
   else
   {
     error().source_location = expr.source_location();
