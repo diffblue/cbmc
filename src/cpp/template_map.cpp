@@ -339,6 +339,44 @@ void template_mapt::apply(typet &type) const
               }
             }
           }
+          // Per [temp.variadic]/5: a pack expansion `_Cond...` in a
+          // template argument list may be represented as an
+          // `ambiguous` node whose type is a `cpp_name` with
+          // `ellipsis=true`.  Expand by matching the identifier
+          // against pack_args_map entries (suffix match).
+          if(
+            !was_pack && arg.id() == "ambiguous" &&
+            static_cast<const exprt &>(arg).type().id() == ID_cpp_name &&
+            static_cast<const exprt &>(arg).type().get_bool(ID_ellipsis))
+          {
+            const typet &cname = static_cast<const exprt &>(arg).type();
+            const irept::subt &csub = cname.get_sub();
+            if(!csub.empty() && csub.front().id() == ID_name)
+            {
+              irep_idt ident = csub.front().get(ID_identifier);
+              for(const auto &pack_entry : pack_args_map)
+              {
+                const std::string &key = id2string(pack_entry.first);
+                auto p = key.rfind("::");
+                std::string suffix =
+                  p != std::string::npos ? key.substr(p + 2) : key;
+                if(suffix == id2string(ident))
+                {
+                  for(const auto &pack_type : pack_entry.second)
+                  {
+                    // Wrap as ambiguous(type=T) to match the format
+                    // expected by downstream template arg processing.
+                    exprt wrapped{"ambiguous"};
+                    wrapped.type() = pack_type;
+                    expanded_args.push_back(
+                      static_cast<const irept &>(std::move(wrapped)));
+                  }
+                  was_pack = true;
+                  break;
+                }
+              }
+            }
+          }
           if(!was_pack)
             expanded_args.push_back(arg);
         }
