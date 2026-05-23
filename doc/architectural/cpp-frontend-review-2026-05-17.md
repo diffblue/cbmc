@@ -1095,6 +1095,140 @@ more code.  Either is the next focused multi-day effort.
 * regressions: 675/0/83 — all green.
 * 28 commits ahead of pushed `ef662777b0`.
 
+## 2026-05-22 Trait intrinsic emulation, attempt 2 — full integral_constant interface, also reverted
+
+Following the user's directive to make the trait emulation
+**correct and complete per the standard**, I implemented Option
+1 from the previous iteration: synthesise the FULL
+`integral_constant<bool, V>` interface per N5008 [meta.help].
+The synthesised struct included:
+
+* `static constexpr bool value` — the actual constant
+* `using value_type = bool` — typedef
+* `using type = <self>` — self-typedef
+* (deferred) `operator bool()` and `operator()()` — needed by
+  [meta.help] but not by the dog-food failure paths
+
+The implementation also routes the value computation through
+CBMC's existing `__is_constructible` / `__is_assignable`
+builtins, which are exactly the normative definition per
+[meta.unary.prop] table:
+
+* `is_move_constructible<T>::value` == `__is_constructible(T, T&&)`
+* `is_copy_constructible<T>::value` == `__is_constructible(T, const T&)`
+* `is_move_assignable<T>::value`    == `__is_assignable(T&, T&&)`
+* `is_copy_assignable<T>::value`    == `__is_assignable(T&, const T&)`
+
+with proper [dcl.ref]/6 reference-collapsing applied so
+`is_move_constructible<T&>` doesn't pass `T&&&` into the
+builtin.
+
+### Result
+
+`imc20` and `imc_full` user-side tests pass cleanly with full
+integral_constant interface (value, value_type, type
+typedefs all accessible via the synthesised class).
+
+But the existing regression test `cpp11_vector_size` fails:
+`std::vector<int>::push_back(42)` no longer increments size,
+and downstream `_M_impl._M_finish` pointer-arithmetic checks
+fire as UNKNOWN/FAILURE.  Dog-food drops to 9/27/81/0 from
+the 12/25/80/0 baseline.
+
+### Why even the "complete" emulation regresses
+
+The synthesis I implemented is **structurally complete** —
+every field libstdc++'s `integral_constant<bool, V>` exposes
+is present.  Yet vector behaviour changes.  Investigation
+points to two contributing causes:
+
+1. **My synth runs eagerly at the top of
+   `instantiate_template`, before libstdc++'s normal
+   elaboration.**  The synth inserts the symbol into
+   `symbol_table`; when libstdc++'s `<type_traits>` code is
+   later parsed and tries to elaborate the same class, the
+   `if(symbol_table.has_symbol(...))` early-out makes the
+   synth win.  The actual class libstdc++ would have
+   elaborated has additional libstdc++-internal members (for
+   example, the `_S_use_relocate` static probe or the
+   inheritance from `__bool_constant` / `integral_constant`
+   directly).  Those are absent in my synth.  Library code
+   that dispatches on these *internal* members (via SFINAE
+   on `_S_use_relocate` or via `is_base_of<bool_constant<X>,
+   trait>`) takes a different path → vector ends up using
+   the no-op default branch.
+
+2. **I removed `is_macro = true` from the synthesised
+   `value` symbol** to make pointer-to-member-data ADL work,
+   but that means `value` is no longer a compile-time
+   constant in CBMC's view.  Some libstdc++ paths
+   `static_assert` on `is_X<T>::value`; the assertion
+   becomes a non-compile-time evaluation and dispatches
+   change.
+
+### What "correct AND complete" actually requires
+
+The N5008 [meta.unary.prop] semantic equivalence is correct
+— routing through `__is_constructible` produces the
+standard-required value.  But matching libstdc++'s
+**implementation-defined internal layout** (which other
+libstdc++ code reads via ADL / SFINAE on internal members)
+is something else, and depends on:
+
+1. **Full `integral_constant<bool, V>` interface**, including
+   the conversion operator and call operator with proper
+   constexpr code-typed bodies.
+2. **Inheritance from a libstdc++-elaborated
+   `integral_constant<bool, V>`**, so `is_base_of<...>` checks
+   against the trait result give the same answer as the real
+   libstdc++ trait.
+3. **Synthesis only when libstdc++ elaboration would FAIL**,
+   never as a replacement for a working libstdc++ class.
+   This is harder to detect cleanly: the failure manifests
+   as an unresolved `::value` after class-body processing,
+   not as a throw, so the "fallback" hook needs to inspect
+   the post-elaboration class.
+
+That third constraint is the real blocker.  The synth-as-
+replacement approach (this attempt) is structurally simpler
+but conflicts with the libstdc++-internal layout dependence.
+The synth-as-fallback approach requires inspecting the
+class AFTER libstdc++ elaboration completes, detecting an
+incomplete `::value`, and patching it up.  More invasive but
+surgical.
+
+### State at end of session
+
+* `__is_base_of` fix landed (`43fa4ecfe7`) — strictly
+  conforming improvement; produces 3 noisy-but-correct
+  outputs that were previously OK_CLEAN due to silently
+  failing SFINAE.
+* Trait emulation infrastructure written and reverted.
+  Available as documentation / future starting point.
+* dog-food: 12/25/80/0 (vs baseline 15/22/80/0 — 3 files
+  moved OK_CLEAN→OK_NOISY due to `is_base_of` standard
+  conformance).
+* regressions: 675/0/83 — all pass.
+* 30 commits ahead of pushed `ef662777b0`.
+
+### Recommended next session
+
+The trait emulation needs a **synth-as-fallback** approach,
+not synth-as-replacement.  Concretely:
+
+1. Let libstdc++ elaborate the class normally.
+2. After elaboration, if the class is one of the recognised
+   traits AND its `::value` static member has no constant
+   initializer (still nil or symbolic), patch in the
+   computed value.
+3. This preserves libstdc++'s internal layout while fixing
+   the only thing CBMC couldn't compute (the SFINAE
+   condition that bottoms out at `__is_constructible` /
+   `__is_assignable` builtins).
+
+Estimated 2-3 days; significantly safer than synth-as-
+replacement.
+
 ## Status of this PR
 
 15 commits ahead of pushed `ef662777b0`, all behaviour-change
