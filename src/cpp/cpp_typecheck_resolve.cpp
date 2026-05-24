@@ -3216,6 +3216,22 @@ exprt cpp_typecheck_resolvet::resolve(
           return type_expr;
         }
       }
+      // If `base_name` already looks like a fully-qualified tag
+      // identifier (contains `tag-`), look it up directly.  This
+      // happens when pack expansion substitutes a struct_tag's full
+      // identifier into a name node (see cpp_instantiate_template.cpp).
+      if(id2string(base_name).find("tag-") != std::string::npos)
+      {
+        const symbolt *tag_sym = cpp_typecheck.symbol_table.lookup(base_name);
+        if(tag_sym && tag_sym->is_type)
+        {
+          struct_tag_typet tag_type(base_name);
+          exprt type_expr(ID_type);
+          type_expr.type() = tag_type;
+          type_expr.add_source_location() = source_location;
+          return type_expr;
+        }
+      }
       // Fallback: the name may be a template parameter that's out
       // of scope (e.g., a method template parameter referenced via
       // a qualified call where resolve_scope has shifted to the
