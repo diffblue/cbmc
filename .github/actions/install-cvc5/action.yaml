@@ -1,0 +1,55 @@
+name: 'Install cvc5'
+description: |
+  Download and install a static cvc5 release binary, auto-detecting the
+  runner platform from runner.os and runner.arch. Supported runners:
+  Linux (x86_64, arm64), macOS (x86_64, arm64), Windows (x86_64).
+
+  After this action runs, `cvc5` is on PATH for subsequent steps. Note
+  that on Windows the PATH update only takes effect from the *next*
+  step onward (a GitHub Actions limitation of $env:GITHUB_PATH); the
+  action verifies the binary in-place via its absolute path.
+
+inputs:
+  version:
+    description: 'cvc5 version (without the "cvc5-" tag prefix), e.g. 1.3.4'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Install cvc5 (Linux / macOS)
+      if: runner.os != 'Windows'
+      shell: bash
+      run: |
+        set -euo pipefail
+        case "${{ runner.os }}-${{ runner.arch }}" in
+          Linux-X64)    asset=cvc5-Linux-x86_64-static ;;
+          Linux-ARM64)  asset=cvc5-Linux-arm64-static ;;
+          macOS-X64)    asset=cvc5-macOS-x86_64-static ;;
+          macOS-ARM64)  asset=cvc5-macOS-arm64-static ;;
+          *)
+            echo "::error ::install-cvc5 does not support ${{ runner.os }}-${{ runner.arch }}"
+            exit 1
+            ;;
+        esac
+        url="https://github.com/cvc5/cvc5/releases/download/cvc5-${{ inputs.version }}/${asset}.zip"
+        wget --quiet "${url}"
+        unzip -j -d /usr/local/bin "${asset}.zip" "${asset}/bin/cvc5"
+        rm "${asset}.zip"
+        cvc5 --version
+
+    - name: Install cvc5 (Windows)
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        $ErrorActionPreference = 'Stop'
+        $asset = 'cvc5-Win64-x86_64-static'
+        $url = "https://github.com/cvc5/cvc5/releases/download/cvc5-${{ inputs.version }}/$asset.zip"
+        Invoke-WebRequest -Uri $url -OutFile ".\$asset.zip"
+        New-Item -ItemType Directory -Force -Path 'C:\tools\cvc5' | Out-Null
+        Expand-Archive -LiteralPath ".\$asset.zip" -DestinationPath '.\cvc5-extract' -Force
+        Move-Item -Force ".\cvc5-extract\$asset\bin\cvc5.exe" 'C:\tools\cvc5\cvc5.exe'
+        Remove-Item -Recurse -Force '.\cvc5-extract'
+        Remove-Item ".\$asset.zip"
+        echo 'C:\tools\cvc5' >> $env:GITHUB_PATH
+        & 'C:\tools\cvc5\cvc5.exe' --version

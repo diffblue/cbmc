@@ -20,12 +20,10 @@ jobs:
           sudo apt-get install --no-install-recommends -y g++ gdb flex bison cmake ninja-build maven jq libxml2-utils dpkg-dev ccache z3
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
-      - name: Download cvc-5 from the releases page and make sure it can be deployed
-        run: |
-          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux-x86_64-static.zip
-          unzip -j -d /usr/local/bin cvc5-Linux-x86_64-static.zip cvc5-Linux-x86_64-static/bin/cvc5
-          rm cvc5-Linux-x86_64-static.zip
-          cvc5 --version
+      - name: Install cvc5
+        uses: ./.github/actions/install-cvc5
+        with:
+          version: ${{ env.cvc5-version }}
       - name: Prepare ccache
         uses: actions/cache@v5
         with:
@@ -87,12 +85,10 @@ jobs:
           sudo apt-get install --no-install-recommends -y g++ gdb flex bison cmake ninja-build maven jq libxml2-utils dpkg-dev ccache z3
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
-      - name: Download cvc-5 from the releases page and make sure it can be deployed
-        run: |
-          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux-arm64-static.zip
-          unzip -j -d /usr/local/bin cvc5-Linux-arm64-static.zip cvc5-Linux-arm64-static/bin/cvc5
-          rm cvc5-Linux-arm64-static.zip
-          cvc5 --version
+      - name: Install cvc5
+        uses: ./.github/actions/install-cvc5
+        with:
+          version: ${{ env.cvc5-version }}
       - name: Prepare ccache
         uses: actions/cache@v5
         with:
@@ -154,12 +150,10 @@ jobs:
           sudo apt-get install --no-install-recommends -y g++ gdb flex bison cmake ninja-build maven jq libxml2-utils dpkg-dev ccache z3
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
-      - name: Download cvc-5 from the releases page and make sure it can be deployed
-        run: |
-          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux-x86_64-static.zip
-          unzip -j -d /usr/local/bin cvc5-Linux-x86_64-static.zip cvc5-Linux-x86_64-static/bin/cvc5
-          rm cvc5-Linux-x86_64-static.zip
-          cvc5 --version
+      - name: Install cvc5
+        uses: ./.github/actions/install-cvc5
+        with:
+          version: ${{ env.cvc5-version }}
       - name: Prepare ccache
         uses: actions/cache@v5
         with:

@@ -6,6 +6,7 @@ on:
     branches: [ develop ]
 env:
   cvc5-version: "1.3.4"
+  z3-version: "4.8.10"
   linux-vcpus: 4
   windows-vcpus: 4
 
@@ -27,12 +28,10 @@ jobs:
           sudo apt-get install --no-install-recommends -yq gcc gdb g++ maven jq flex bison libxml2-utils ccache cmake z3
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
-      - name: Download cvc-5 from the releases page and make sure it can be deployed
-        run: |
-          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux-x86_64-static.zip
-          unzip -j -d /usr/local/bin cvc5-Linux-x86_64-static.zip cvc5-Linux-x86_64-static/bin/cvc5
-          rm cvc5-Linux-x86_64-static.zip
-          cvc5 --version
+      - name: Install cvc5
+        uses: ./.github/actions/install-cvc5
+        with:
+          version: ${{ env.cvc5-version }}
       - name: Prepare ccache
         uses: actions/cache@v5
         with:
@@ -114,12 +113,10 @@ jobs:
           cpanm Thread::Pool::Simple
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
-      - name: Download cvc-5 from the releases page and make sure it can be deployed
-        run: |
-          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux-x86_64-static.zip
-          unzip -j -d /usr/local/bin cvc5-Linux-x86_64-static.zip cvc5-Linux-x86_64-static/bin/cvc5
-          rm cvc5-Linux-x86_64-static.zip
-          cvc5 --version
+      - name: Install cvc5
+        uses: ./.github/actions/install-cvc5
+        with:
+          version: ${{ env.cvc5-version }}
       - name: Prepare ccache
         uses: actions/cache@v5
         with:
@@ -225,12 +222,10 @@ jobs:
           sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen graphviz z3
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
-      - name: Download cvc-5 from the releases page and make sure it can be deployed
-        run: |
-          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux-x86_64-static.zip
-          unzip -j -d /usr/local/bin cvc5-Linux-x86_64-static.zip cvc5-Linux-x86_64-static/bin/cvc5
-          rm cvc5-Linux-x86_64-static.zip
-          cvc5 --version
+      - name: Install cvc5
+        uses: ./.github/actions/install-cvc5
+        with:
+          version: ${{ env.cvc5-version }}
       - name: Prepare ccache
         uses: actions/cache@v5
         with:
@@ -304,12 +299,10 @@ jobs:
           cpanm Thread::Pool::Simple
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
-      - name: Download cvc-5 from the releases page and make sure it can be deployed
-        run: |
-          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux-x86_64-static.zip
-          unzip -j -d /usr/local/bin cvc5-Linux-x86_64-static.zip cvc5-Linux-x86_64-static/bin/cvc5
-          rm cvc5-Linux-x86_64-static.zip
-          cvc5 --version
+      - name: Install cvc5
+        uses: ./.github/actions/install-cvc5
+        with:
+          version: ${{ env.cvc5-version }}
       - name: Prepare ccache
         uses: actions/cache@v5
         with:
@@ -371,12 +364,10 @@ jobs:
           sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen graphviz z3
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
-      - name: Download cvc-5 from the releases page and make sure it can be deployed
-        run: |
-          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux-x86_64-static.zip
-          unzip -j -d /usr/local/bin cvc5-Linux-x86_64-static.zip cvc5-Linux-x86_64-static/bin/cvc5
-          rm cvc5-Linux-x86_64-static.zip
-          cvc5 --version
+      - name: Install cvc5
+        uses: ./.github/actions/install-cvc5
+        with:
+          version: ${{ env.cvc5-version }}
       - name: Prepare ccache
         uses: actions/cache@v5
         with:
@@ -431,12 +422,10 @@ jobs:
           sudo ln -sf cpp-14 /usr/bin/cpp
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
-      - name: Download cvc-5 from the releases page and make sure it can be deployed
-        run: |
-          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux-x86_64-static.zip
-          unzip -j -d /usr/local/bin cvc5-Linux-x86_64-static.zip cvc5-Linux-x86_64-static/bin/cvc5
-          rm cvc5-Linux-x86_64-static.zip
-          cvc5 --version
+      - name: Install cvc5
+        uses: ./.github/actions/install-cvc5
+        with:
+          version: ${{ env.cvc5-version }}
       - name: Prepare ccache
         uses: actions/cache@v5
         with:
@@ -478,12 +467,10 @@ jobs:
           sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen graphviz z3
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
-      - name: Download cvc-5 from the releases page and make sure it can be deployed
-        run: |
-          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux-arm64-static.zip
-          unzip -j -d /usr/local/bin cvc5-Linux-arm64-static.zip cvc5-Linux-arm64-static/bin/cvc5
-          rm cvc5-Linux-arm64-static.zip
-          cvc5 --version
+      - name: Install cvc5
+        uses: ./.github/actions/install-cvc5
+        with:
+          version: ${{ env.cvc5-version }}
       - name: Prepare ccache
         uses: actions/cache@v5
         with:
@@ -532,12 +519,10 @@ jobs:
           sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils ccache doxygen z3 g++-multilib
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
-      - name: Download cvc-5 from the releases page and make sure it can be deployed
-        run: |
-          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux-x86_64-static.zip
-          unzip -j -d /usr/local/bin cvc5-Linux-x86_64-static.zip cvc5-Linux-x86_64-static/bin/cvc5
-          rm cvc5-Linux-x86_64-static.zip
-          cvc5 --version
+      - name: Install cvc5
+        uses: ./.github/actions/install-cvc5
+        with:
+          version: ${{ env.cvc5-version }}
       - name: Prepare ccache
         uses: actions/cache@v5
         with:
@@ -662,12 +647,10 @@ jobs:
           brew install flex bison parallel ccache z3
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
-      - name: Download cvc5 binary and make sure it can be deployed
-        run: |
-          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-macOS-x86_64-static.zip
-          unzip -j -d /usr/local/bin cvc5-macOS-x86_64-static.zip cvc5-macOS-x86_64-static/bin/cvc5
-          rm cvc5-macOS-x86_64-static.zip
-          cvc5 --version
+      - name: Install cvc5
+        uses: ./.github/actions/install-cvc5
+        with:
+          version: ${{ env.cvc5-version }}
       - name: Prepare ccache
         uses: actions/cache@v5
         with:
@@ -716,12 +699,10 @@ jobs:
         run: brew install ninja maven flex bison ccache z3
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
-      - name: Download cvc5 binary and make sure it can be deployed
-        run: |
-          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-macOS-arm64-static.zip
-          unzip -j -d /usr/local/bin cvc5-macOS-arm64-static.zip cvc5-macOS-arm64-static/bin/cvc5
-          rm cvc5-macOS-arm64-static.zip
-          cvc5 --version
+      - name: Install cvc5
+        uses: ./.github/actions/install-cvc5
+        with:
+          version: ${{ env.cvc5-version }}
       - name: Prepare ccache
         uses: actions/cache@v5
         with:
@@ -790,14 +771,14 @@ jobs:
           Require-Tool win_bison
           nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
           echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
-          Invoke-WebRequest -Uri https://github.com/Z3Prover/z3/releases/download/z3-4.8.10/z3-4.8.10-x64-win.zip -OutFile .\z3.zip
-          Expand-Archive -LiteralPath '.\z3.Zip' -DestinationPath C:\tools
-          echo "c:\tools\z3-4.8.10-x64-win\bin;" >> $env:GITHUB_PATH
-          New-Item -ItemType directory "C:\tools\cvc5"
-          Invoke-WebRequest -Uri https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Win64-x86_64-static.zip -OutFile .\cvc5-Win64-x86_64-static.zip
-          Expand-Archive -LiteralPath '.\cvc5-Win64-x86_64-static.Zip'
-          Move-Item -Path .\cvc5-Win64-x86_64-static\cvc5-Win64-x86_64-static\bin\cvc5.exe c:\tools\cvc5\cvc5.exe
-          echo "c:\tools\cvc5;" >> $env:GITHUB_PATH
+      - name: Install Z3
+        uses: ./.github/actions/install-z3
+        with:
+          version: ${{ env.z3-version }}
+      - name: Install cvc5
+        uses: ./.github/actions/install-cvc5
+        with:
+          version: ${{ env.cvc5-version }}
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
       - name: Confirm cvc5 solver is available and log the version installed
@@ -875,14 +856,14 @@ jobs:
           nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
           echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
           echo "c:\Strawberry\" >> $env:GITHUB_PATH
-          Invoke-WebRequest -Uri https://github.com/Z3Prover/z3/releases/download/z3-4.8.10/z3-4.8.10-x64-win.zip -OutFile .\z3.zip
-          Expand-Archive -LiteralPath '.\z3.Zip' -DestinationPath C:\tools
-          echo "c:\tools\z3-4.8.10-x64-win\bin;" >> $env:GITHUB_PATH
-          New-Item -ItemType directory "C:\tools\cvc5"
-          Invoke-WebRequest -Uri https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Win64-x86_64-static.zip -OutFile .\cvc5-Win64-x86_64-static.zip
-          Expand-Archive -LiteralPath '.\cvc5-Win64-x86_64-static.Zip'
-          Move-Item -Path .\cvc5-Win64-x86_64-static\cvc5-Win64-x86_64-static\bin\cvc5.exe c:\tools\cvc5\cvc5.exe
-          echo "c:\tools\cvc5;" >> $env:GITHUB_PATH
+      - name: Install Z3
+        uses: ./.github/actions/install-z3
+        with:
+          version: ${{ env.z3-version }}
+      - name: Install cvc5
+        uses: ./.github/actions/install-cvc5
+        with:
+          version: ${{ env.cvc5-version }}
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
       - name: Confirm cvc5 solver is available and log the version installed
