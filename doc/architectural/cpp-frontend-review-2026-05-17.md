@@ -1250,3 +1250,149 @@ absolute change is structural, with zero regressions across
 
 The architectural items in this review are the next set of
 levers, in the order recommended above.
+
+
+## 2026-05-24 Pack-substitution fix + reconfirmation of trait root cause
+
+### Two fixes landed this session
+
+1. **`template_map`: variadic pack substitution for nested template
+   types** (commit `44ab8dee05`).  The pack-substitution code in
+   `cpp_instantiate_template.cpp` (lines 2218 / 3754) and
+   `cpp_typecheck_method_bodies.cpp` (line 96) used naive
+   `tag.rfind("::")` to strip the namespace from a struct-tag
+   identifier when substituting a pack parameter name.  For a nested
+   template like
+   `std::__cxx11::tag-basic_string<char,std::tag-allocator<char>>`,
+   the `rfind` lands inside the inner `<...>` template arguments and
+   yields the corrupted name `tag-allocator<char>>` (with a stray `>`
+   inherited from the outer template's closing bracket).  This name
+   was then injected into the `Params` parameter type of any function
+   template instantiated with `std::string` arguments — most visibly
+   `invariant_violated_structured<invariant_failedt, std::string>` —
+   producing the cascade error
+   `symbol 'tag-allocator<char>>' is unknown`.
+
+   Fix: substitute with the **full** struct-tag identifier (including
+   namespace prefix and `tag-` markers).  `resolve_scope` already
+   knows how to find this directly via `id_map`/`symbol_table`.  Also
+   added a fallback in `cpp_typecheck_resolvet::resolve` for
+   single-name cpp_names whose identifier already contains `tag-`.
+
+   Impact: eliminated all 60 `invariant_violated_structured`-style
+   dog-food failures.  The 80-file FAIL count itself didn't change
+   (the same files have other downstream failures, see below) but
+   3 files moved from OK_NOISY to OK_CLEAN.
+
+2. **`expr2c`: `id_shorthand` should prefer base_name and use
+   depth-aware `::`** (commit `2bb468a367`).  Cosmetic but important
+   for diagnostics.  The display path used `rfind("::")` to extract a
+   shorthand from a symbol's full identifier; for any symbol with a
+   `std::string` parameter, the mangled name contains
+   `ref_struct_tag(identifier=std::tag-basic_string<...>)`, and the
+   naive `rfind` produces fragments like
+   `tag-allocator<char>>,#constant=1_1))` instead of the actual
+   function name.  Two fixes:
+   - When the symbol is in the symbol table and has a non-empty
+     `base_name`, use it directly (the previous suffix check failed
+     for function symbols whose mangled identifier ends with `)`).
+   - For the `rfind` fallback, walk the string tracking
+     angle-bracket depth so only depth-zero `::` separators are
+     considered.
+
+   With this fix, dog-food error candidates that previously displayed
+   as `tag-allocator<char>>,#constant=1_1))(...)` now correctly show
+   as `invariant_violated_string(...)`, exposing the real overload
+   resolution failure (`char[N]` → `const std::string&` conversion
+   not happening).
+
+### Confirmed: invariant_violated_string failures = missing
+### `basic_string(const char*, const Allocator&)` constructor
+
+With clear error messages from fix #2, the surviving 22
+`invariant_violated_string` dog-food failures point at one specific
+diagnostic:
+
+```
+src/util/irep.h:177:1: error: found no match for symbol
+  'invariant_violated_string', candidates are:
+  symbol void invariant_violated_string(
+    const struct basic_string &, const struct basic_string &,
+    const signed int, const struct basic_string &,
+    const struct basic_string &) (file src/util/invariant.h line 275)
+
+argument types:
+  char [16l]
+  char [14l]
+  signed int
+  char [21l]
+  char [13l]
+```
+
+The `PRECONDITION` macro passes 4 string literals + 1 line number.
+Implicit conversion `char[N]` → `const std::string&` requires routing
+through `std::basic_string`'s `(const char*, const Allocator&)`
+converting constructor.  Direct comparison of basic_string component
+lists between a working TU (`<string>` only) and a failing TU
+(`<string>` plus CBMC's headers) confirms:
+
+| Constructor | Simple TU | Dog-food TU |
+|---|---|---|
+| `(this, const char*, allocator=default)` — 3 params | **PRESENT** | **MISSING** |
+| `(this, const char*, size_t, allocator=default)` — 4 params | present | present |
+| ... 8 other ctors ... | identical | identical |
+
+The missing 3-param constructor is the only one whose libstdc++
+declaration is wrapped in
+`template<typename = _RequireAllocator<_Alloc>>`, exactly as
+documented in the previous "Group 2" investigation.  When CBMC
+elaborates `basic_string<char>` in a TU with many template
+instantiations, the SFINAE wrapper's substitution
+(`enable_if<__is_allocator<_Alloc>::value, _Alloc>::type`) fails to
+evaluate, the constructor is dropped, and downstream `char[N]` →
+`std::string` conversion has no path.
+
+This empirically reconfirms the previous review's analysis: the same
+trait-evaluation root cause underlies both:
+- 37 `sharing_treet`-instantiation failures (swap deduction's
+  `_Require<__not_, is_move_constructible, is_move_assignable>`).
+- 22 `invariant_violated_string`-call failures (constructor
+  conversion's `_RequireAllocator<_Alloc>`).
+
+### Recommended next session: Path 2 from 2026-05-22 review
+
+The previous attempt at trait emulation (full struct synthesis at
+`instantiate_template` time) failed because synthesised structs were
+incomplete (`value` only, missing `value_type`/`type`/operators).
+The recommended path forward — **intercept at resolve time** — has
+not yet been tried:
+
+When `cpp_typecheck_resolvet::resolve` is invoked on a cpp_name with
+the shape `KnownTrait<args>::value`:
+- Compute the constant directly (without instantiating the trait).
+- Return a `from_integer(value, bool_typet{})` expression.
+- Skip the partial-specialisation matching that's failing.
+
+Known traits with mechanical evaluation:
+- `__is_allocator<std::allocator<...>>::value` → `true`
+- `__is_allocator<X>::value` for non-allocator X → `false`
+- `is_move_constructible<T>::value` → `__is_constructible(T, T&&)`
+- `is_move_assignable<T>::value` → `__is_assignable(T&, T&&)`
+- `__not_<X>::value` → `!X::value` (recurse)
+- `__and_<X, Y, ...>::value` → `X::value && Y::value && ...`
+
+This avoids the synth-as-replacement pitfall: we never produce a
+struct symbol that competes with libstdc++'s integral_constant
+hierarchy.  The interception happens purely at the constant-value
+evaluation level.
+
+Estimated effort: 2-3 days, focused.  Highest-leverage remaining
+unblocker (66 of 80 dog-food failures = 82%).
+
+## Status as of 2026-05-24
+
+35 commits ahead of pushed `ef662777b0`.  cbmc-cpp regression suite
+green at 675 / 0 / 83.  Dog-food: 15 OK_CLEAN / 22 OK_NOISY / 80 FAIL
+/ 0 CRASH (up from session-start 12 / 25 / 80 / 0 — variadic
+pack-substitution fix moved 3 files from OK_NOISY to OK_CLEAN by
+eliminating the cascade caused by the pack-name corruption).
