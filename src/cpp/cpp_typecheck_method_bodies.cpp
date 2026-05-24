@@ -89,16 +89,10 @@ void cpp_typecheckt::typecheck_method_bodies()
         const typet &t = pa.second.front();
         if(t.id() == ID_struct_tag)
         {
-          std::string tag = id2string(to_struct_tag_type(t).get_identifier());
-          if(tag.substr(0, 4) == "tag-")
-            tag = tag.substr(4);
-          auto tag_pos = tag.find("tag-");
-          if(tag_pos != std::string::npos)
-            tag = tag.substr(0, tag_pos) + tag.substr(tag_pos + 4);
-          auto last_sep = tag.rfind("::");
-          if(last_sep != std::string::npos)
-            tag = tag.substr(last_sep + 2);
-          pack_subst[sn] = tag;
+          // Use the full struct_tag identifier; resolve_scope can find
+          // it directly via id_map / symbol_table.  Naive string-based
+          // stripping breaks for nested template types.
+          pack_subst[sn] = to_struct_tag_type(t).get_identifier();
         }
       }
       if(!pack_subst.empty())
