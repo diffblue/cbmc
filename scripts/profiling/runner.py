@@ -150,6 +150,17 @@ def run_benchmark(cbmc, bench, output_dir, timeout, memory_mb, skip_solver):
         if m:
             timings["sliced_assignments"] = int(m.group(1))
 
+    # The regexes above are coupled to what CBMC currently emits via
+    # log.statistics() / log.status(). If a future change reroutes a
+    # timing line to log.progress() or log.debug(), or renames a prefix,
+    # they would silently drop everything. Surface that loudly when we
+    # have CBMC output (i.e., the run was not a timeout) but parsed
+    # nothing, so a maintainer notices and updates the parser.
+    if cbmc_stdout and not timings:
+        warn(f"[{name}] No timing lines parsed from CBMC output; "
+             f"the regexes in run_benchmark may have drifted from "
+             f"CBMC's log.statistics() / log.status() output.")
+
     return {
         "name": name,
         "elapsed": elapsed,
