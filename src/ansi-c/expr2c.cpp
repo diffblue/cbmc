@@ -75,15 +75,44 @@ Precedences are as follows. Higher values mean higher precedence.
 irep_idt expr2ct::id_shorthand(const irep_idt &identifier) const
 {
   const symbolt *symbol;
+  bool found = !ns.lookup(identifier, symbol);
 
-  if(!ns.lookup(identifier, symbol) &&
-     !symbol->base_name.empty() &&
-      has_suffix(id2string(identifier), id2string(symbol->base_name)))
+  if(
+    found && !symbol->base_name.empty() &&
+    has_suffix(id2string(identifier), id2string(symbol->base_name)))
+    return symbol->base_name;
+
+  // If the symbol is in the symbol table and has a non-empty base_name,
+  // prefer it over `rfind("::")`-based extraction.  C++ mangled names
+  // can contain `::` inside template arguments (e.g.,
+  // `f(ref_struct_tag(identifier=std::tag-X<...>))`) which would
+  // otherwise produce confusing shorthand fragments.
+  if(found && !symbol->base_name.empty())
     return symbol->base_name;
 
   std::string sh=id2string(identifier);
 
-  std::string::size_type pos=sh.rfind("::");
+  // Use depth-aware separator: don't pick `::` inside angle brackets.
+  // Without depth-awareness, identifiers containing template arg lists
+  // such as `ref_struct_tag(identifier=std::tag-X<std::tag-Y<...>>)`
+  // would yield malformed shorthands.
+  std::string::size_type pos = std::string::npos;
+  {
+    int depth = 0;
+    for(std::string::size_type i = 0; i + 1 < sh.size(); ++i)
+    {
+      const char c = sh[i];
+      if(c == '<')
+        ++depth;
+      else if(c == '>' && depth > 0)
+        --depth;
+      else if(depth == 0 && c == ':' && sh[i + 1] == ':')
+      {
+        pos = i;
+        ++i; // skip the second ':'
+      }
+    }
+  }
   if(pos!=std::string::npos)
     sh.erase(0, pos+2);
 
