@@ -117,6 +117,60 @@ ui_message_handlert::~ui_message_handlert()
   }
 }
 
+std::string ui_message_handlert::command(unsigned c) const
+{
+  // quote_begin / quote_end render as a single quote on every currently
+  // supported UI. Handled before the message_handler null-check so this
+  // also applies when the handler is constructed via the cmdlinet ctor,
+  // which leaves message_handler null for XML_UI / JSON_UI. We
+  // considered emitting `<quote>` / `</quote>` tags for XML output (see
+  // PR #5696 discussion) but kept single quotes for backwards
+  // compatibility; messages reach the XML serialiser through xmlt::data
+  // and would be escaped, so any tag-based quoting would have to bypass
+  // the message-text plumbing entirely.
+  if(c == '<' || c == '>')
+    return "'";
+
+  if(!message_handler)
+    return std::string();
+
+  // SGR (Select Graphic Rendition) style codes carry no useful
+  // information for machine-consumable output, so the structured UIs
+  // strip them entirely. Centralised here so future additions or
+  // removals of formatting commands only need to be made in one place.
+  if((_ui == uit::XML_UI || _ui == uit::JSON_UI) && is_sgr_style_command(c))
+    return std::string();
+
+  return message_handler->command(c);
+}
+
+bool ui_message_handlert::is_sgr_style_command(unsigned c)
+{
+  switch(c)
+  {
+  case 0:  // reset
+  case 1:  // bold
+  case 2:  // faint
+  case 3:  // italic
+  case 4:  // underline
+  case 31: // red
+  case 32: // green
+  case 33: // yellow
+  case 34: // blue
+  case 35: // magenta
+  case 36: // cyan
+  case 91: // bright_red
+  case 92: // bright_green
+  case 93: // bright_yellow
+  case 94: // bright_blue
+  case 95: // bright_magenta
+  case 96: // bright_cyan
+    return true;
+  default:
+    return false;
+  }
+}
+
 const char *ui_message_handlert::level_string(unsigned level)
 {
   if(level==1)

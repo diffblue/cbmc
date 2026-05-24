@@ -88,3 +88,52 @@ TEST_CASE(
   CHECK(mh.command('<') == "'");
   CHECK(mh.command('>') == "'");
 }
+
+/// is_sgr_style_command must return true for every messaget styling
+/// command and false for the quote commands and arbitrary other codes.
+/// The point of the helper is to be the single source of truth for
+/// "which commands are SGR-style"; this test pins the helper's output
+/// against the messaget::commandt constants so that adding or
+/// removing a styling command in messaget without updating the helper
+/// (or vice versa) is caught at unit-test time.
+TEST_CASE(
+  "ui_message_handlert::is_sgr_style_command matches messaget styling codes",
+  "[core][util][ui_message]")
+{
+  // Every styling command on messaget should be classified as SGR.
+  for(const auto &cmd :
+      {messaget::reset,
+       messaget::bold,
+       messaget::faint,
+       messaget::italic,
+       messaget::underline,
+       messaget::red,
+       messaget::green,
+       messaget::yellow,
+       messaget::blue,
+       messaget::magenta,
+       messaget::cyan,
+       messaget::bright_red,
+       messaget::bright_green,
+       messaget::bright_yellow,
+       messaget::bright_blue,
+       messaget::bright_magenta,
+       messaget::bright_cyan})
+  {
+    CHECK(ui_message_handlert::is_sgr_style_command(cmd.command));
+  }
+
+  // quote_begin / quote_end are commands but NOT SGR-style.
+  CHECK_FALSE(
+    ui_message_handlert::is_sgr_style_command(messaget::quote_begin.command));
+  CHECK_FALSE(
+    ui_message_handlert::is_sgr_style_command(messaget::quote_end.command));
+
+  // Arbitrary non-styling codes outside the SGR ranges should be rejected.
+  CHECK_FALSE(ui_message_handlert::is_sgr_style_command(5));
+  CHECK_FALSE(ui_message_handlert::is_sgr_style_command(30));
+  CHECK_FALSE(ui_message_handlert::is_sgr_style_command(37));
+  CHECK_FALSE(ui_message_handlert::is_sgr_style_command(90));
+  CHECK_FALSE(ui_message_handlert::is_sgr_style_command(97));
+  CHECK_FALSE(ui_message_handlert::is_sgr_style_command(256));
+}
