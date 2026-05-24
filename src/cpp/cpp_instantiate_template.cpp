@@ -2210,16 +2210,14 @@ const symbolt &cpp_typecheckt::instantiate_template(
         const typet &t = pa.second.front();
         if(t.id() == ID_struct_tag)
         {
-          std::string tag = id2string(to_struct_tag_type(t).get_identifier());
-          if(tag.substr(0, 4) == "tag-")
-            tag = tag.substr(4);
-          auto tag_pos = tag.find("tag-");
-          if(tag_pos != std::string::npos)
-            tag = tag.substr(0, tag_pos) + tag.substr(tag_pos + 4);
-          auto last_sep = tag.rfind("::");
-          if(last_sep != std::string::npos)
-            tag = tag.substr(last_sep + 2);
-          pack_subst[sn] = tag;
+          // Use the full struct_tag identifier (including namespace
+          // prefix and `tag-` markers).  resolve_scope can find this
+          // directly via id_map.  Stripping the namespace with naive
+          // string operations breaks for nested template types like
+          // `std::__cxx11::tag-basic_string<char,std::tag-allocator<char>>`
+          // because the `::` and `tag-` substrings inside template
+          // arguments confuse the parsing.
+          pack_subst[sn] = to_struct_tag_type(t).get_identifier();
         }
       }
       if(!pack_subst.empty() && !new_decl.declarators().empty())
@@ -3745,16 +3743,8 @@ skip_pack_removal_ft:
           const typet &t = pa.second.front();
           if(t.id() == ID_struct_tag)
           {
-            std::string tag = id2string(to_struct_tag_type(t).get_identifier());
-            if(tag.substr(0, 4) == "tag-")
-              tag = tag.substr(4);
-            auto tag_pos = tag.find("tag-");
-            if(tag_pos != std::string::npos)
-              tag = tag.substr(0, tag_pos) + tag.substr(tag_pos + 4);
-            auto last_sep = tag.rfind("::");
-            if(last_sep != std::string::npos)
-              tag = tag.substr(last_sep + 2);
-            pack_subst[sn] = tag;
+            // Use the full struct_tag identifier (see comment above).
+            pack_subst[sn] = to_struct_tag_type(t).get_identifier();
           }
         }
         if(!pack_subst.empty())
