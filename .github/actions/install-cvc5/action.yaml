@@ -1,0 +1,105 @@
+name: 'Install cvc5'
+description: |
+  Download and install a static cvc5 release binary, auto-detecting the
+  runner platform from runner.os and runner.arch. Supported runners:
+  Linux (x86_64, arm64), macOS (x86_64, arm64), Windows (x86_64).
+
+  Downloaded archives are verified against a hard-coded SHA-256 hash
+  table embedded in this action; an unknown (version, platform) pair
+  causes the step to fail. To support a new cvc5 version, append a
+  row to the case statement in the "Resolve cvc5 asset and hash" step
+  below. Hashes can be obtained from the GitHub release API:
+    curl -sL "https://api.github.com/repos/cvc5/cvc5/releases/tags/cvc5-<VERSION>" \
+      | jq -r '.assets[] | select(.name | test("static\\.zip$")) | "\(.name) \(.digest)"'
+
+  After this action runs, `cvc5` is on PATH for subsequent steps. Note
+  that on Windows the PATH update only takes effect from the *next*
+  step onward (a GitHub Actions limitation of $env:GITHUB_PATH); the
+  action verifies the binary in-place via its absolute path.
+
+inputs:
+  version:
+    description: 'cvc5 version (without the "cvc5-" tag prefix), e.g. 1.3.4'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Resolve cvc5 asset and hash
+      id: meta
+      shell: bash
+      run: |
+        set -euo pipefail
+        case "${{ inputs.version }}-${{ runner.os }}-${{ runner.arch }}" in
+          1.3.4-Linux-X64)
+            asset=cvc5-Linux-x86_64-static
+            sha256=dcdbfada0ce493ee98259c0816e0daafc561c223aadb3af298c2968e73ea39c6 ;;
+          1.3.4-Linux-ARM64)
+            asset=cvc5-Linux-arm64-static
+            sha256=2a4c108367f20b0c8990abd6b9535a5d62e08908d471d4671c00734e408f85bc ;;
+          1.3.4-macOS-X64)
+            asset=cvc5-macOS-x86_64-static
+            sha256=5a7976affaf37dcf03ee44c3d0297c8e0ba08afd44ac832dab97400da726b852 ;;
+          1.3.4-macOS-ARM64)
+            asset=cvc5-macOS-arm64-static
+            sha256=3840aa53f6ee6fc357415dcfe291d7f5ffec6cfb1ccca6fef64120a0d2be4cb6 ;;
+          1.3.4-Windows-X64)
+            asset=cvc5-Win64-x86_64-static
+            sha256=279fe7e95810cfb62433fcfc2932f35325a665f32d3697ff33f75e31d5c6a179 ;;
+          *)
+            echo "::error ::install-cvc5 has no SHA-256 entry for cvc5 ${{ inputs.version }} on ${{ runner.os }}-${{ runner.arch }}; add a case to .github/actions/install-cvc5/action.yaml"
+            exit 1
+            ;;
+        esac
+        echo "asset=${asset}" >> "$GITHUB_OUTPUT"
+        echo "sha256=${sha256}" >> "$GITHUB_OUTPUT"
+
+    - name: Install cvc5 (Linux / macOS)
+      if: runner.os != 'Windows'
+      shell: bash
+      env:
+        ASSET: ${{ steps.meta.outputs.asset }}
+        EXPECTED_SHA256: ${{ steps.meta.outputs.sha256 }}
+        VERSION: ${{ inputs.version }}
+      run: |
+        set -euo pipefail
+        url="https://github.com/cvc5/cvc5/releases/download/cvc5-${VERSION}/${ASSET}.zip"
+        wget --quiet "${url}"
+        if command -v sha256sum >/dev/null; then
+          actual=$(sha256sum "${ASSET}.zip" | cut -d' ' -f1)
+        else
+          actual=$(shasum -a 256 "${ASSET}.zip" | cut -d' ' -f1)
+        fi
+        if [ "${actual}" != "${EXPECTED_SHA256}" ]; then
+          echo "::error ::SHA-256 mismatch for ${ASSET}.zip"
+          echo "  expected: ${EXPECTED_SHA256}"
+          echo "  actual:   ${actual}"
+          exit 1
+        fi
+        unzip -j -d /usr/local/bin "${ASSET}.zip" "${ASSET}/bin/cvc5"
+        rm "${ASSET}.zip"
+        cvc5 --version
+
+    - name: Install cvc5 (Windows)
+      if: runner.os == 'Windows'
+      shell: pwsh
+      env:
+        ASSET: ${{ steps.meta.outputs.asset }}
+        EXPECTED_SHA256: ${{ steps.meta.outputs.sha256 }}
+        VERSION: ${{ inputs.version }}
+      run: |
+        $ErrorActionPreference = 'Stop'
+        $url = "https://github.com/cvc5/cvc5/releases/download/cvc5-$env:VERSION/$env:ASSET.zip"
+        Invoke-WebRequest -Uri $url -OutFile ".\$env:ASSET.zip"
+        $actual = (Get-FileHash -Algorithm SHA256 ".\$env:ASSET.zip").Hash.ToLower()
+        if ($actual -ne $env:EXPECTED_SHA256) {
+          Write-Error "SHA-256 mismatch for $env:ASSET.zip`n  expected: $env:EXPECTED_SHA256`n  actual:   $actual"
+          exit 1
+        }
+        New-Item -ItemType Directory -Force -Path 'C:\tools\cvc5' | Out-Null
+        Expand-Archive -LiteralPath ".\$env:ASSET.zip" -DestinationPath '.\cvc5-extract' -Force
+        Move-Item -Force ".\cvc5-extract\$env:ASSET\bin\cvc5.exe" 'C:\tools\cvc5\cvc5.exe'
+        Remove-Item -Recurse -Force '.\cvc5-extract'
+        Remove-Item ".\$env:ASSET.zip"
+        echo 'C:\tools\cvc5' >> $env:GITHUB_PATH
+        & 'C:\tools\cvc5\cvc5.exe' --version
