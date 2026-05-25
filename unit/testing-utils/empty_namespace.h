@@ -22,7 +22,7 @@ Author: Michael Tautschnig
 class empty_namespacet : private symbol_tablet, public namespacet
 {
 public:
-  empty_namespacet() : namespacet{*static_cast<symbol_tablet *>(this)}
+  empty_namespacet() : namespacet{static_cast<symbol_tablet &>(*this)}
   {
   }
 
