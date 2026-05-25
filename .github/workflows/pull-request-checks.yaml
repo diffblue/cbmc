@@ -604,6 +604,11 @@ jobs:
   # This job takes approximately 2 to 24 minutes
   check-ubuntu-24_04-cmake-gcc-KNOWNBUG:
     runs-on: ubuntu-24.04
+    # Sequenced after check-ubuntu-24_04-cmake-gcc so that this job benefits
+    # from the matching ccache produced in the same workflow run. The cmake
+    # configure flags below must stay in sync with that job's so the compile
+    # commands hash identically and ccache hits in full.
+    needs: check-ubuntu-24_04-cmake-gcc
     steps:
       - uses: actions/checkout@v6
         with:
@@ -617,7 +622,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ maven flex bison libxml2-utils ccache z3
       - name: Restore ccache
-        id: restore-ccache
         uses: actions/cache/restore@v5
         with:
           path: .ccache
@@ -630,7 +634,7 @@ jobs:
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
           echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
       - name: Configure using CMake
-        run: cmake -H. -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
+        run: cmake -H. -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -Dsat_impl="minisat2;cadical"
       - name: Zero ccache stats and limit in size
         run: ccache -z --max-size=500M
       - name: Build with Ninja
@@ -648,15 +652,16 @@ jobs:
           git checkout -- memory_allocation1 printf1 printf3 union12 va_list3
           ../test.pl -c "cbmc --cprover-smt2" -I broken-smt-backend -K
 
-      - name: Save ccache
-        if: always()
-        uses: actions/cache/save@v5
-        with:
-          path: .ccache
-          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
+      # No "Save ccache" step here: the cache is produced by
+      # check-ubuntu-24_04-cmake-gcc, which this job depends on.
   # This job takes approximately 7 to 30 minutes
   check-ubuntu-24_04-cmake-gcc-THOROUGH:
     runs-on: ubuntu-24.04
+    # Sequenced after check-ubuntu-24_04-cmake-gcc so that this job benefits
+    # from the matching ccache produced in the same workflow run. The cmake
+    # configure flags below must stay in sync with that job's so the compile
+    # commands hash identically and ccache hits in full.
+    needs: check-ubuntu-24_04-cmake-gcc
     steps:
       - uses: actions/checkout@v6
         with:
@@ -670,7 +675,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ maven flex bison libxml2-utils ccache z3
       - name: Restore ccache
-        id: restore-ccache
         uses: actions/cache/restore@v5
         with:
           path: .ccache
@@ -693,12 +697,8 @@ jobs:
       - name: Run tests
         run: cd build; ctest . -V -L THOROUGH -j${{env.linux-vcpus}}
 
-      - name: Save ccache
-        if: always()
-        uses: actions/cache/save@v5
-        with:
-          path: .ccache
-          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
+      # No "Save ccache" step here: the cache is produced by
+      # check-ubuntu-24_04-cmake-gcc, which this job depends on.
   # This job takes approximately 39 to 69 minutes
   check-macos-15-intel-make-clang:
     runs-on: macos-15-intel
