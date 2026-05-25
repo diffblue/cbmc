@@ -58,6 +58,7 @@ jobs:
           sudo sysctl kernel.perf_event_paranoid=-1
 
       - name: Restore ccache
+        id: restore-ccache
         uses: actions/cache/restore@v5
         with:
           path: .ccache
@@ -156,7 +157,7 @@ jobs:
         uses: actions/cache/save@v5
         with:
           path: .ccache
-          key: ${{ runner.os }}-24.04-Release-profile-${{ github.sha }}
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
 
   # ── Develop job: profile and publish flamegraphs to GitHub Pages ─────
   profile-develop:
@@ -186,6 +187,7 @@ jobs:
           sudo sysctl kernel.perf_event_paranoid=-1
 
       - name: Restore ccache
+        id: restore-ccache
         uses: actions/cache/restore@v5
         with:
           path: .ccache
@@ -280,4 +282,4 @@ jobs:
         uses: actions/cache/save@v5
         with:
           path: .ccache
-          key: ${{ runner.os }}-24.04-Release-profile-${{ github.sha }}
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}

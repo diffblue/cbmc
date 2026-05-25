@@ -25,6 +25,7 @@ jobs:
         with:
           version: ${{ env.cvc5-version }}
       - name: Restore ccache
+        id: restore-ccache
         uses: actions/cache/restore@v5
         with:
           path: .ccache
@@ -75,7 +76,7 @@ jobs:
         uses: actions/cache/save@v5
         with:
           path: .ccache
-          key: ${{ runner.os }}-24.04-Release-${{ github.ref }}-${{ github.sha }}-RELEASEPKG
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   ubuntu-24_04-arm-package:
     runs-on: ubuntu-24.04-arm
     env:
@@ -95,6 +96,7 @@ jobs:
         with:
           version: ${{ env.cvc5-version }}
       - name: Restore ccache
+        id: restore-ccache
         uses: actions/cache/restore@v5
         with:
           path: .ccache
@@ -145,7 +147,7 @@ jobs:
         uses: actions/cache/save@v5
         with:
           path: .ccache
-          key: ${{ runner.os }}-24.04-Arm-Release-${{ github.ref }}-${{ github.sha }}-RELEASEPKG
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   ubuntu-22_04-package:
     runs-on: ubuntu-22.04
     env:
@@ -165,6 +167,7 @@ jobs:
         with:
           version: ${{ env.cvc5-version }}
       - name: Restore ccache
+        id: restore-ccache
         uses: actions/cache/restore@v5
         with:
           path: .ccache
@@ -215,7 +218,7 @@ jobs:
         uses: actions/cache/save@v5
         with:
           path: .ccache
-          key: ${{ runner.os }}-22.04-Release-${{ github.ref }}-${{ github.sha }}-RELEASEPKG
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   homebrew-pr:
     runs-on: macos-15-intel
     steps:
@@ -293,6 +296,7 @@ jobs:
           dotnet tool install --global AzureSignTool --version 5.0.0
           echo "$(Split-Path -Path $(Get-ChildItem -Path "${env:ProgramFiles(x86)}\Windows Kits\10\App Certification Kit\signtool.exe"))" >> $env:GITHUB_PATH
       - name: Restore ccache
+        id: restore-ccache
         uses: actions/cache/restore@v5
         with:
           path: .ccache
@@ -366,7 +370,7 @@ jobs:
         uses: actions/cache/save@v5
         with:
           path: .ccache
-          key: ${{ runner.os }}-msbuild-${{ github.ref }}-${{ github.sha }}-RELEASEPKG
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   push-docker-image-dockerhub:
     runs-on: ubuntu-24.04
     steps:

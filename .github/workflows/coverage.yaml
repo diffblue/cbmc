@@ -39,6 +39,7 @@ jobs:
         with:
           version: ${{ env.cvc5-version }}
       - name: Restore ccache
+        id: restore-ccache
         uses: actions/cache/restore@v5
         with:
           path: .ccache
@@ -74,4 +75,4 @@ jobs:
         uses: actions/cache/save@v5
         with:
           path: .ccache
-          key: ${{ runner.os }}-24.04-Coverage-${{ github.ref }}-${{ github.sha }}-PR
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}

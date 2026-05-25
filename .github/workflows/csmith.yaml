@@ -23,6 +23,7 @@ jobs:
           sudo apt-get install --no-install-recommends -y csmith libcsmith-dev
           make -C src minisat2-download
       - name: Restore ccache
+        id: restore-ccache
         uses: actions/cache/restore@v5
         with:
           path: .ccache
@@ -50,4 +51,4 @@ jobs:
         uses: actions/cache/save@v5
         with:
           path: .ccache
-          key: ${{ runner.os }}-24.04-make-clang-${{ github.ref }}-${{ github.sha }}-CSMITH
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}

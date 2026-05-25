@@ -33,6 +33,7 @@ jobs:
       - name: Log cargo/rust version
         run: cargo --version
       - name: Restore ccache
+        id: restore-ccache
         uses: actions/cache/restore@v5
         with:
           path: .ccache
@@ -73,7 +74,7 @@ jobs:
         uses: actions/cache/save@v5
         with:
           path: .ccache
-          key: ${{ runner.os }}-22.04-cmake-clang-${{ github.ref }}-${{ github.sha }}-PR
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   check-macos-15-intel-cmake-clang-rust:
     runs-on: macos-15-intel
     steps:
@@ -85,6 +86,7 @@ jobs:
       - name: Log cargo/rust version
         run: cargo --version
       - name: Restore ccache
+        id: restore-ccache
         uses: actions/cache/restore@v5
         with:
           path: .ccache
@@ -118,4 +120,4 @@ jobs:
         uses: actions/cache/save@v5
         with:
           path: .ccache
-          key: ${{ runner.os }}-Release-Minisat-${{ github.ref }}-${{ github.sha }}-PR-Rust-API
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
