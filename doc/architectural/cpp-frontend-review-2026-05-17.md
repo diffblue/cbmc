@@ -1539,3 +1539,134 @@ intercept there.
 Reverted all in-progress changes (no commit).  Working tree
 clean.  35 commits ahead of pushed `ef662777b0` (unchanged).
 Documentation updated.
+
+
+## 2026-05-25 brace-init in ctor calls — investigation deferred
+
+### What's broken
+
+31 dog-food files (the same 31 previously blocked by
+`with_source_location`, now unblocked) hit the next error in
+their chain at `src/util/type.h:38`:
+
+```cpp
+typet(irep_idt _id, typet _subtype)
+  : irept(std::move(_id), {}, {std::move(_subtype)})
+{}
+```
+
+CBMC reports:
+
+```
+found no match for symbol 'irept', candidates are:
+  irept(struct irept *, const struct dstringt &, const struct
+        forward_list_as_mapt &, const struct vector &)
+  ...
+argument types:
+  struct dstringt
+  <<type:>>
+  <<type:>>
+```
+
+The `<<type:>>` strings come from `expr2c` printing a type with
+empty `id()`.  Tracing the candidates and operands shows that
+the brace-init args `{}` and `{std::move(_subtype)}` reach
+overload resolution as
+
+```
+op[2].id=initializer_list type.id=  operands=0
+op[3].id=initializer_list type.id=  operands=1
+```
+
+— `initializer_list` expressions whose `type.id()` is empty.
+The candidate parameters are `pointer` types (CBMC's
+representation of `const T &`) with class-tag base types.
+
+`cpp_typecheck_fargst::match` only accepts brace-init operands
+when the parameter type is exactly `tag-initializer_list<...>`.
+For any other class-typed reference parameter, match returns
+false and the candidate is rejected.
+
+A 3-line reproducer:
+
+```cpp
+struct dstringt { dstringt() {} };
+struct irept {
+  using subt = std::vector<irept>;
+  using named_subt = std::vector<irept>;
+  irept() {}
+  irept(const dstringt&) {}
+  irept(const dstringt&, const named_subt&, const subt&) {}
+  irept(const irept&) {}
+};
+struct typet : irept {
+  typet() {}
+  typet(dstringt _id, typet _subtype)
+    : irept(std::move(_id), {}, {std::move(_subtype)}) {}
+};
+```
+
+CBMC produces the same `found no match` cascade.
+
+### Why a naïve fix doesn't work
+
+Two attempts were made and reverted:
+
+1. **Relax `match` to accept brace-init for class-typed
+   parameters.**  Adding a fallback at distance 4 — viability
+   only, dispatching the actual conversion to
+   `implicit_typecast` later — made the reproducer report a
+   secondary `invalid implicit conversion from '<<type:>>' to
+   'const struct vector &'` (the actual conversion still has
+   no path), but more critically broke
+   `regression/cbmc-cpp/cpp11_future_header` — a clean
+   `#include <future>` + empty main — with a stack overflow.
+   GDB shows ~13 000 stack frames in
+   `sharing_treet::remove_ref` destruction.
+
+   The relaxation must be allowing some deeply nested ctor
+   chain to be selected somewhere in `<future>`'s template
+   machinery; the resulting expression tree is so deep that
+   destructor recursion blows the stack.  The match
+   relaxation is correct in shape but unsafe in practice
+   without changing the recursive `sharing_treet::remove_ref`
+   to an iterative form, or somehow guarding against
+   pathological expression depth.
+
+2. **Add `empty-brace-{} → reference-to-class` handler in
+   `implicit_typecast`.**  Synthesises a default-constructed
+   temporary and binds the reference.  This handler alone
+   (without the match relaxation) was safe — it didn't break
+   anything — but didn't help because `match` still rejects
+   the candidate before `implicit_typecast` is reached.
+
+### Options for the next attempt
+
+* **Make `sharing_treet::remove_ref` iterative.**  This is the
+  precondition for almost any future overload-resolution
+  relaxation.  The destructor recursion depth is bounded by
+  the depth of the irept tree, which can grow arbitrarily
+  large in pathological CBMC-internal trees produced during
+  C++ template machinery typecheck.
+
+* **Type the brace-init-list lazily based on the candidate
+  parameter type.**  Inside `match()` (or earlier, inside
+  `cpp_typecheck_fargst::build`), recognise `initializer_list`
+  operands and synthesise a typecheck of them against each
+  candidate parameter type before measuring viability.  This
+  matches list-initialization semantics (per [dcl.init.list])
+  and would avoid the "untyped operand" symptom entirely.
+
+* **Ship the `empty-brace-{}-to-reference` handler in
+  `implicit_typecast`** as a stand-alone improvement.  It
+  doesn't fix the dog-food failures by itself but is a
+  correct, safe change that future work can build on.
+
+The third option is small and safe; the first two are 2-3 day
+projects.
+
+### Status
+
+Reverted all in-progress changes.  Working tree clean.
+Documentation updated.  Dog-food unchanged at 19 / 18 / 80 / 0;
+cbmc-cpp regression suite green at 678 / 0 / 83.
