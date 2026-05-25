@@ -56,7 +56,11 @@ sub run($$$$$$) {
       # timeout, then exec the test command.
       setpgrp(0, 0);
       # see https://github.com/git-for-windows/msys2-runtime/pull/11/files
-      exec("bash", "-c", "cd '$name' ; MSYS_NO_PATHCONV=1 $cmdline");
+      my $memlimit_prefix = "";
+      if($ENV{CBMC_TEST_MEMLIMIT}) {
+        $memlimit_prefix = "ulimit -v $ENV{CBMC_TEST_MEMLIMIT} ; ";
+      }
+      exec("bash", "-c", "${memlimit_prefix}cd '$name' ; MSYS_NO_PATHCONV=1 $cmdline");
       die "exec failed: $!";
     }
 
@@ -78,7 +82,11 @@ sub run($$$$$$) {
   } else {
     # Windows or no timeout: use simple system() call.
     # see https://github.com/git-for-windows/msys2-runtime/pull/11/files
-    system("bash", "-c", "cd '$name' ; MSYS_NO_PATHCONV=1 $cmdline");
+    my $memlimit_prefix = "";
+    if($ENV{CBMC_TEST_MEMLIMIT}) {
+      $memlimit_prefix = "ulimit -v $ENV{CBMC_TEST_MEMLIMIT} ; ";
+    }
+    system("bash", "-c", "${memlimit_prefix}cd '$name' ; MSYS_NO_PATHCONV=1 $cmdline");
   }
 
   $exit_value = $? >> 8;

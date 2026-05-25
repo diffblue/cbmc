@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+--
+Verifies [temp.variadic]/5,7: empty pack expansion in a constructor
+template removes the pack-expanded parameter; non-empty pack expansion
+produces the expected element sequence in member initializer lists
+and recursive calls.  Regression for the pack removal/substitution
+work in cpp_instantiate_template.cpp.

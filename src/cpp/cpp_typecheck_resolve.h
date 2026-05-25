@@ -12,8 +12,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_CPP_TYPECHECK_RESOLVE_H
 #define CPROVER_CPP_CPP_TYPECHECK_RESOLVE_H
 
-#include <util/std_types.h>
-
 #include "cpp_template_args.h"
 #include "cpp_scopes.h"
 
@@ -42,6 +40,17 @@ public:
     cpp_template_args_non_tct &template_args);
 
   cpp_scopet &resolve_namespace(const cpp_namet &cpp_name);
+
+  /// Clear the static resolve_scope cache. Must be called between
+  /// type-checking different translation units.
+
+  void guess_template_args(
+    const typet &template_parameter,
+    const typet &desired_type);
+
+  void guess_template_args(
+    const exprt &template_parameter,
+    const exprt &desired_expr);
 
 protected:
   cpp_typecheckt &cpp_typecheck;
@@ -74,7 +83,12 @@ protected:
     resolve_identifierst &identifiers,
     const wantt want);
 
-  struct_tag_typet disambiguate_template_classes(
+  typet disambiguate_template_classes(
+    const irep_idt &base_name,
+    const cpp_scopest::id_sett &id_set,
+    const cpp_template_args_non_tct &template_args);
+
+  typet resolve_template_alias(
     const irep_idt &base_name,
     const cpp_scopest::id_sett &id_set,
     const cpp_template_args_non_tct &template_args);
@@ -106,14 +120,6 @@ protected:
     const exprt &expr,
     const cpp_typecheck_fargst &fargs);
 
-  void guess_template_args(
-    const typet &template_parameter,
-    const typet &desired_type);
-
-  void guess_template_args(
-    const exprt &template_parameter,
-    const exprt &desired_expr);
-
   bool disambiguate_functions(
     const exprt &expr,
     unsigned &args_distance,
@@ -144,23 +150,37 @@ protected:
   struct matcht
   {
     std::size_t cost;
+    std::size_t constrained_args;
+    std::size_t repeated_params;
     cpp_template_args_tct specialization_args;
     cpp_template_args_tct full_args;
     irep_idt id;
     matcht(
       cpp_template_args_tct _s_args,
       cpp_template_args_tct _f_args,
-      irep_idt _id):
-      cost(_s_args.arguments().size()),
-      specialization_args(_s_args),
-      full_args(_f_args),
-      id(_id)
+      irep_idt _id,
+      std::size_t _constrained = 0,
+      std::size_t _repeated = 0)
+      : cost(_s_args.arguments().size()),
+        constrained_args(_constrained),
+        repeated_params(_repeated),
+        specialization_args(_s_args),
+        full_args(_f_args),
+        id(_id)
     {
     }
 
     bool operator<(const matcht &other) const
     {
-      return cost<other.cost;
+      if(cost != other.cost)
+        return cost < other.cost;
+      // Prefer more constrained specializations (more non-trivial
+      // patterns in the partial specialization arguments).
+      if(constrained_args != other.constrained_args)
+        return constrained_args > other.constrained_args;
+      // Prefer specializations with repeated parameters (equality
+      // constraints like <T, T>) over concrete arguments (<T, int>).
+      return repeated_params > other.repeated_params;
     }
   };
 };

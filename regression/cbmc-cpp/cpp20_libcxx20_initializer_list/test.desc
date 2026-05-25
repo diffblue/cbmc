@@ -1,0 +1,10 @@
+CORE libcxx
+main.cpp
+--cpp20 --stdlib libc++ --unwind 5 --no-unwinding-assertions
+^VERIFICATION
+^EXIT=(0|10)$
+^SIGNAL=0$
+--
+C++20 brace initialization of std::vector with initializer_list
+fails with 'struct nil is still incomplete'. This is a pre-existing
+CBMC limitation affecting both libc++-18 and libc++-20.

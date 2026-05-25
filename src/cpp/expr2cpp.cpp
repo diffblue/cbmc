@@ -5,8 +5,8 @@ Module:
 Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
-
 #include "expr2cpp.h"
+#include <ansi-c/expr2c_class.h>
 
 #include <util/c_types.h>
 #include <util/lispexpr.h>
@@ -14,10 +14,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
+#include <util/symbol.h>
 
 #include <ansi-c/c_misc.h>
 #include <ansi-c/c_qualifiers.h>
-#include <ansi-c/expr2c_class.h>
 
 #include "cpp_name.h"
 #include "cpp_template_type.h"
@@ -63,8 +63,17 @@ std::string expr2cppt::convert_struct(
   const struct_typet::componentst &components=
     struct_type.components();
 
+  // C++ struct types may include method members (code-type components)
+  // that are not present in struct expressions; count only data members.
+  std::size_t data_components = 0;
+  for(const auto &c : components)
+  {
+    if(c.type().id() != ID_code)
+      ++data_components;
+  }
+
   DATA_INVARIANT(
-    components.size() == src.operands().size(), "component count mismatch");
+    data_components == src.operands().size(), "component count mismatch");
 
   exprt::operandst::const_iterator o_it=src.operands().begin();
 
@@ -104,7 +113,8 @@ std::string expr2cppt::convert_struct(
       dest+=tmp;
     }
 
-    o_it++;
+    if(c.type().id() != ID_code)
+      o_it++;
   }
 
   dest+=" }";
@@ -142,13 +152,13 @@ std::string expr2cppt::convert_rec(
   const std::string q=
     new_qualifiers.as_string();
 
-  if(is_reference(src))
-  {
-    return q + convert(to_reference_type(src).base_type()) + " &" + d;
-  }
-  else if(is_rvalue_reference(src))
+  if(is_rvalue_reference(src))
   {
     return q + convert(to_pointer_type(src).base_type()) + " &&" + d;
+  }
+  else if(is_reference(src))
+  {
+    return q + convert(to_reference_type(src).base_type()) + " &" + d;
   }
   else if(!src.get(ID_C_c_type).empty())
   {
@@ -176,6 +186,16 @@ std::string expr2cppt::convert_rec(
   }
   else if(src.id() == ID_struct_tag)
   {
+    const irep_idt &id = to_struct_tag_type(src).get_identifier();
+    const symbolt &symbol = ns.lookup(id);
+
+    // The tag might refer to an enum (e.g., MSVC's scoped enums
+    // like __std_win_error can end up with struct_tag_typet).
+    if(symbol.type.id() == ID_c_enum)
+    {
+      return q + "enum " + id2string(id);
+    }
+
     const struct_typet &struct_type = ns.follow_tag(to_struct_tag_type(src));
 
     std::string dest = q;

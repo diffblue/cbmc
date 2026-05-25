@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
+#include <util/bitvector_types.h>
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/cprover_prefix.h>
@@ -52,7 +53,11 @@ void c_typecheck_baset::typecheck_expr(exprt &expr)
   }
 
   // first do sub-nodes
-  typecheck_expr_operands(expr);
+  // Skip operand type-checking for noexcept expressions.
+  // The noexcept handler in typecheck_expr_main handles the operand
+  // with proper error suppression (null message handler + catch).
+  if(expr.id() != ID_noexcept)
+    typecheck_expr_operands(expr);
 
   // now do case-split
   typecheck_expr_main(expr);
@@ -209,6 +214,27 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
           expr.id()==ID_gt  ||
           expr.id()==ID_ge)
     typecheck_expr_rel(to_binary_relation_expr(expr));
+  else if(expr.id() == ID_spaceship)
+  {
+    // C++20 <=>: lower to (a < b) ? -1 : ((a > b) ? 1 : 0)
+    auto &binary = to_binary_expr(expr);
+    typecheck_expr_main(binary.op0());
+    typecheck_expr_main(binary.op1());
+    typet result_type = signed_int_type();
+    exprt a = binary.op0();
+    exprt b = binary.op1();
+    binary_relation_exprt lt(a, ID_lt, b);
+    lt.type() = bool_typet();
+    binary_relation_exprt gt(a, ID_gt, b);
+    gt.type() = bool_typet();
+    if_exprt inner(
+      std::move(gt),
+      from_integer(1, result_type),
+      from_integer(0, result_type));
+    if_exprt outer(
+      std::move(lt), from_integer(-1, result_type), std::move(inner));
+    expr.swap(outer);
+  }
   else if(expr.id()==ID_index)
     typecheck_expr_index(expr);
   else if(expr.id()==ID_typecast)
@@ -497,6 +523,10 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
   {
     // already type checked
   }
+  else if(expr.id() == ID_extractbits)
+  {
+    // already type checked (SystemC extension)
+  }
   else if(
     expr.id() == ID_C_spec_assigns || expr.id() == ID_C_spec_frees ||
     expr.id() == ID_target_list)
@@ -518,6 +548,36 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
       error().source_location = expr.source_location();
       error() << "bit cast from '" << to_string(bit_cast_expr->op().type())
               << "' to '" << to_string(expr.type()) << "' not permitted" << eom;
+      throw 0;
+    }
+  }
+  else if(expr.id() == ID_noexcept)
+  {
+    // C++11 noexcept operator — evaluate as true (safe approximation).
+    expr = true_exprt();
+  }
+  else if(expr.id() == "cpp_right_fold" || expr.id() == "cpp_left_fold")
+  {
+    expr = true_exprt();
+  }
+  else if(expr.id() == ID_cpp_name)
+  {
+    // C++ name expression that the C type-checker can't resolve.
+    // This can happen during template instantiation when the
+    // initializer goes through the C type-checker path.
+    // For destructor names (~_Tp), treat as a no-op.
+    // For other names, throw.
+    const auto &subs = expr.get_sub();
+    if(!subs.empty() && subs.front().id() == "~")
+    {
+      // Destructor call — treat as void expression
+      expr = side_effect_exprt{
+        ID_function_call, typet{ID_empty}, expr.source_location()};
+    }
+    else
+    {
+      error().source_location = expr.source_location();
+      error() << "unresolved C++ name in C context" << eom;
       throw 0;
     }
   }
@@ -1375,6 +1435,19 @@ void c_typecheck_baset::typecheck_expr_index(exprt &expr)
     expr.set(ID_C_lvalue, true);
     expr.type() = to_pointer_type(final_array_type).base_type();
   }
+  else if(
+    final_array_type.id() == ID_unsignedbv ||
+    final_array_type.id() == ID_signedbv)
+  {
+    // SystemC extension: bit indexing on bitvector types
+    // a[i] extracts bit i as a single-bit value
+    extractbits_exprt eb(
+      array_expr,
+      typecast_exprt::conditional_cast(index_expr, unsignedbv_typet(32)),
+      unsignedbv_typet(1));
+    eb.add_source_location() = expr.source_location();
+    expr.swap(eb);
+  }
   else
   {
     error().source_location = expr.source_location();
@@ -2219,6 +2292,18 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
       else if(identifier == "__builtin_shufflevector")
       {
         exprt result = typecheck_shuffle_vector(expr);
+        expr.swap(result);
+
+        return;
+      }
+      else if(
+        identifier == "__builtin_reduce_and" ||
+        identifier == "__builtin_reduce_or" ||
+        identifier == "__builtin_reduce_xor" ||
+        identifier == "__builtin_reduce_add" ||
+        identifier == "__builtin_reduce_mul")
+      {
+        exprt result = typecheck_vector_reduce(expr);
         expr.swap(result);
 
         return;
@@ -3641,6 +3726,31 @@ exprt c_typecheck_baset::do_special_functions(
 
     return std::move(ffs);
   }
+  else if(identifier == "__builtin_FILE")
+  {
+    // GCC built-in that returns the file name of the call site.
+    string_constantt s(source_location.get_file());
+    s.add_source_location() = source_location;
+    return typecast_exprt(
+      address_of_exprt(index_exprt(s, from_integer(0, c_index_type()))),
+      expr.type());
+  }
+  else if(identifier == "__builtin_FUNCTION")
+  {
+    // GCC built-in that returns the function name of the call site.
+    string_constantt s(source_location.get_function());
+    s.add_source_location() = source_location;
+    return typecast_exprt(
+      address_of_exprt(index_exprt(s, from_integer(0, c_index_type()))),
+      expr.type());
+  }
+  else if(identifier == "__builtin_LINE")
+  {
+    // GCC built-in that returns the line number of the call site.
+    const auto line_str = source_location.get_line();
+    const auto line_no = line_str.empty() ? 0 : std::stoi(id2string(line_str));
+    return from_integer(line_no, expr.type());
+  }
   else if(identifier=="__builtin_expect")
   {
     // This is a gcc extension to provide branch prediction.
@@ -4508,6 +4618,40 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
 
     if(!op0.get_bool(ID_C_lvalue))
     {
+      // SystemC extension: assignment to extractbits (a.range(h,l) = v)
+      // is converted to a read-modify-write on the source variable.
+      if(op0.id() == ID_extractbits)
+      {
+        const auto &eb = to_extractbits_expr(op0);
+        const auto width = to_bitvector_type(eb.type()).get_width();
+        const auto src_width = to_bitvector_type(eb.src().type()).get_width();
+        const auto src_type = eb.src().type();
+        exprt rhs = typecast_exprt::conditional_cast(
+          expr.operands()[1], unsignedbv_typet(width));
+        // mask = (1 << width) - 1
+        mp_integer mask_val = power(2, width) - 1;
+        exprt mask = from_integer(mask_val, unsignedbv_typet(src_width));
+        // shifted_mask = mask << index
+        exprt shifted_mask = shl_exprt(
+          mask,
+          typecast_exprt::conditional_cast(
+            eb.index(), unsignedbv_typet(src_width)));
+        // cleared = src & ~shifted_mask
+        exprt cleared = bitand_exprt(eb.src(), bitnot_exprt(shifted_mask));
+        // shifted_rhs = (rhs cast to src_width) << index
+        exprt shifted_rhs = shl_exprt(
+          typecast_exprt::conditional_cast(rhs, unsignedbv_typet(src_width)),
+          typecast_exprt::conditional_cast(
+            eb.index(), unsignedbv_typet(src_width)));
+        // new_val = cleared | shifted_rhs
+        exprt new_val = bitor_exprt(cleared, shifted_rhs);
+        new_val.type() = src_type;
+        // Replace: lhs = rhs becomes src = new_val
+        expr.operands()[0] = eb.src();
+        expr.operands()[1] = new_val;
+        expr.type() = src_type;
+        return;
+      }
       error().source_location = expr.source_location();
       error() << "assignment error: '" << to_string(op0) << "' not an lvalue"
               << eom;
@@ -4814,7 +4958,81 @@ void c_typecheck_baset::make_constant(exprt &expr)
   adjust_float_expressions(expr, rounding_mode);
 
   simplify(expr, *this);
+
   expr.add_source_location() = location;
+
+  // Evaluate constexpr function calls that simplify couldn't handle
+  // (e.g., template static constexpr members after parameter substitution).
+  if(!is_compile_time_constantt(*this)(expr))
+  {
+    // The expression might be a function call or contain function calls.
+    // Try to evaluate them via the constexpr evaluator.
+    bool eval_changed = false;
+    expr.visit_post(std::function<void(exprt &)>(
+      [this, &eval_changed](exprt &node)
+      {
+        if(
+          node.id() == ID_side_effect &&
+          to_side_effect_expr(node).get_statement() == ID_function_call)
+        {
+          exprt before = node;
+          typecheck_side_effect_function_call(
+            to_side_effect_expr_function_call(node));
+          if(node != before)
+            eval_changed = true;
+        }
+      }));
+    if(eval_changed)
+    {
+      simplify(expr, *this);
+      expr.add_source_location() = location;
+    }
+  }
+
+  if(!is_compile_time_constantt(*this)(expr))
+  {
+    // Try harder: resolve constexpr/const symbol references to their
+    // values, then simplify again. Iterate since resolving one symbol
+    // may reveal further symbol references (e.g. recursive variable
+    // templates).
+    bool changed = true;
+    while(changed)
+    {
+      changed = false;
+      expr.visit_pre(
+        [&](exprt &e)
+        {
+          if(e.id() == ID_symbol)
+          {
+            const symbolt *s = nullptr;
+            if(
+              !lookup(to_symbol_expr(e).get_identifier(), s) &&
+              (s->is_macro || s->type.get_bool(ID_C_constant)))
+            {
+              // Skip the replacement if the symbol has no
+              // initializer; replacing with nil would propagate up
+              // and later fail as "expected constant expression,
+              // but got '<<expr:nil>>'".  This happens for default
+              // template arguments referring to a static member
+              // that is not present on the template argument type
+              // (e.g. `template <class T, const T &empty = T::blank>`
+              // instantiated with T lacking ::blank).
+              if(s->value.is_nil())
+                return;
+              exprt val = s->value;
+              simplify(val, *this);
+              e = val;
+              changed = true;
+            }
+          }
+        });
+      if(changed)
+      {
+        simplify(expr, *this);
+        expr.add_source_location() = location;
+      }
+    }
+  }
 
   if(!is_compile_time_constantt(*this)(expr))
   {

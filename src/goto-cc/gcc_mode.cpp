@@ -673,6 +673,19 @@ int gcc_modet::doit()
 
     if(std_string == "gnu++17" || std_string == "c++17")
       config.cpp.set_cpp17();
+
+    if(
+      std_string == "gnu++20" || std_string == "c++20" ||
+      std_string == "gnu++2a" || std_string == "c++2a")
+      config.cpp.set_cpp20();
+
+    if(std_string == "gnu++23" || std_string == "c++23")
+      config.cpp.set_cpp23();
+
+    if(
+      std_string == "gnu++26" || std_string == "c++26" ||
+      std_string == "gnu++2c" || std_string == "c++2c")
+      config.cpp.set_cpp26();
   }
   else
   {
@@ -703,6 +716,14 @@ int gcc_modet::doit()
 
   if(cmdline.isset("nostdinc"))
     config.ansi_c.preprocessor_options.push_back("-nostdinc");
+
+  if(cmdline.isset("-stdlib"))
+  {
+    const std::string stdlib = cmdline.get_value("-stdlib");
+    config.ansi_c.preprocessor_options.push_back("-stdlib=" + stdlib);
+    if(stdlib == "libc++")
+      config.ansi_c.preprocessor = configt::ansi_ct::preprocessort::CLANG;
+  }
 
   if(cmdline.isset('L'))
     compiler.library_paths=cmdline.get_values('L');
@@ -875,6 +896,18 @@ int gcc_modet::preprocess(
     }
     else
       new_argv.push_back(it->arg);
+  }
+
+  // C++26 is not yet widely supported by preprocessors; fall back to
+  // C++23 for preprocessing.
+  for(auto &arg : new_argv)
+  {
+    if(
+      arg == "-std=c++26" || arg == "-std=c++2c" || arg == "-std=gnu++26" ||
+      arg == "-std=gnu++2c")
+    {
+      arg = "-std=gnu++23";
+    }
   }
 
   // We just want to preprocess.

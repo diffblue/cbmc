@@ -18,12 +18,14 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_parse_tree.h"
 #include "cpp_scopes.h"
+#include "cpp_target_type.h"
 #include "cpp_typecheck_resolve.h"
 #include "template_map.h"
 
 #include <list>
 #include <set>
 #include <unordered_set>
+#include <vector>
 
 class pointer_typet;
 class reference_typet;
@@ -65,6 +67,12 @@ public:
   std::string to_string(const typet &) override;
   std::string to_string(const exprt &) override;
 
+  /// In C++ the empty braced-init-list `{}` value-initializes a scalar
+  /// per [dcl.init.list]/3.10.  Strictly this is a C++11 feature, but
+  /// CBMC's earlier `--cppNN` modes already accept many C++11
+  /// constructs as permissive extensions, so we always return true.
+  bool empty_brace_value_initializes_scalar() const override;
+
   friend class cpp_typecheck_resolvet;
   friend class cpp_declarator_convertert;
 
@@ -81,6 +89,18 @@ public:
 
   void typecheck_expr(exprt &) override;
 
+  /// Variant of \ref typecheck_expr that propagates an optional target
+  /// type for use by deduction and conversion paths
+  /// ([temp.deduct.funcaddr]/1, [temp.deduct.conv]/1,
+  /// [over.ics.list], [dcl.init.list]).  See `cpp_target_type.h`.
+  ///
+  /// Phase 1 of the target-type-threading refactor: the parameter is
+  /// accepted but unused — every callee sees the existing isolated
+  /// typecheck.  Subsequent phases consume the target in the relevant
+  /// per-kind handlers.  See
+  /// `doc/architectural/cpp-frontend-plan-target-type-threading.md`.
+  void typecheck_expr(exprt &expr, const target_typet &target);
+
   bool cpp_is_pod(const typet &type) const;
 
   std::optional<codet> cpp_constructor(
@@ -90,6 +110,12 @@ public:
 
 protected:
   cpp_scopest cpp_scopes;
+
+  // SFINAE alternative declarations: when two function templates differ
+  // only in their SFINAE constraints, the second is stored here (keyed
+  // by the primary's symbol name) rather than in the symbol table, to
+  // avoid triggering extra instantiations during symbol table iteration.
+  std::map<irep_idt, symbolt> sfinae_alternatives;
 
   cpp_parse_treet &cpp_parse_tree;
   irep_idt current_linkage_spec;
@@ -134,6 +160,10 @@ protected:
   void typecheck_class_template(cpp_declarationt &declaration);
 
   void typecheck_function_template(cpp_declarationt &declaration);
+  void typecheck_variable_template(cpp_declarationt &declaration);
+  void convert_variable_template_specialization(cpp_declarationt &declaration);
+
+  void typecheck_template_alias(cpp_declarationt &declaration);
 
   void typecheck_class_template_member(cpp_declarationt &declaration);
 
@@ -163,6 +193,7 @@ protected:
 
   typedef std::list<instantiationt> instantiation_stackt;
   instantiation_stackt instantiation_stack;
+  bool had_template_instantiation = false;
 
   void show_instantiation_stack(std::ostream &);
 
@@ -170,10 +201,13 @@ protected:
   {
   public:
     instantiation_levelt(
-      instantiation_stackt &_instantiation_stack):
-      instantiation_stack(_instantiation_stack)
+      instantiation_stackt &_instantiation_stack,
+      bool &_had_template_instantiation)
+      : instantiation_stack(_instantiation_stack),
+        had_template_instantiation(_had_template_instantiation)
     {
       instantiation_stack.push_back(instantiationt());
+      had_template_instantiation = true;
     }
 
     ~instantiation_levelt()
@@ -183,6 +217,7 @@ protected:
 
   private:
     instantiation_stackt &instantiation_stack;
+    bool &had_template_instantiation;
   };
 
   const symbolt &class_template_symbol(
@@ -191,8 +226,7 @@ protected:
     const cpp_template_args_tct &specialization_template_args,
     const cpp_template_args_tct &full_template_args);
 
-  void elaborate_class_template(
-    const typet &type);
+  void elaborate_class_template(const typet &type) override;
 
   const symbolt &instantiate_template(
     const source_locationt &source_location,
@@ -249,7 +283,8 @@ protected:
   void check_member_initializers(
     const struct_typet::basest &bases,
     const struct_typet::componentst &components,
-    const irept &initializers);
+    const irept &initializers,
+    const irep_idt &class_identifier = irep_idt());
 
   bool check_component_access(
     const struct_union_typet::componentt &component,
@@ -287,6 +322,7 @@ protected:
   void static_and_dynamic_initialization();
   void do_not_typechecked();
   void clean_up();
+  void provide_stdlib_bodies();
 
   void add_base_components(
         const struct_typet &from,
@@ -326,7 +362,25 @@ protected:
   std::set<irep_idt> methods_seen;
   method_bodiest method_bodies;
 
+  // Deferred method bodies for lazy template elaboration.
+  std::map<irep_idt, method_bodyt> deferred_method_bodies;
+
   void add_method_body(symbolt *_method_symbol);
+
+  /// Static member symbols whose initializers are deferred until
+  /// after the class body is fully declared.
+  std::vector<irep_idt> deferred_static_initializers;
+
+  /// Depth of typecheck_compound_body nesting, used to track
+  /// recursive template elaboration.
+  unsigned compound_body_depth = 0;
+  bool suppress_elaborate = false;
+
+  /// When true, suppress_elaborate is ignored. Used during constexpr
+  /// member evaluation to ensure referenced templates can be
+  /// instantiated even when nested typecheck_compound_body calls
+  /// set suppress_elaborate=true.
+  bool force_elaborate = false;
 
   bool builtin_factory(const irep_idt &) override;
 
@@ -370,6 +424,7 @@ protected:
   }
   void typecheck_enum_body(symbolt &symbol);
   void typecheck_method_bodies();
+  void typecheck_contracts();
   void typecheck_compound_bases(struct_typet &type);
   void add_anonymous_members_to_scope(const symbolt &struct_union_symbol);
 
@@ -405,6 +460,7 @@ protected:
 
   // code conversion
   void typecheck_code(codet &) override;
+  void typecheck_return(code_frontend_returnt &) override;
   void typecheck_try_catch(codet &);
   void typecheck_member_initializer(codet &);
   void typecheck_decl(codet &) override;
@@ -415,12 +471,18 @@ protected:
 
   const struct_typet &this_struct_type();
 
-  std::optional<codet>
-  cpp_destructor(const source_locationt &source_location, const exprt &object);
+  std::optional<codet> cpp_destructor(
+    const source_locationt &source_location,
+    const exprt &object,
+    bool force_direct = true);
 
   // expressions
   void explicit_typecast_ambiguity(exprt &);
   void typecheck_expr_main(exprt &) override;
+  /// Phase 1B target-typet overload of \ref typecheck_expr_main; the
+  /// target is currently discarded.  See
+  /// `doc/architectural/cpp-frontend-plan-target-type-threading.md`.
+  void typecheck_expr_main(exprt &, const target_typet &);
   void typecheck_expr_member(exprt &) override;
   void typecheck_expr_ptrmember(exprt &) override;
   void typecheck_expr_throw(exprt &);
@@ -434,12 +496,18 @@ protected:
   void typecheck_expr_explicit_typecast(exprt &);
   void typecheck_expr_explicit_constructor_call(exprt &);
   void typecheck_expr_address_of(exprt &) override;
+  /// Phase 1B target-typet overload of \ref typecheck_expr_address_of;
+  /// the target is currently discarded.  Phase 2 of the target-type-
+  /// threading refactor will use this to deduce
+  /// [temp.deduct.funcaddr]/1 template arguments forward.
+  void typecheck_expr_address_of(exprt &, const target_typet &);
   void typecheck_expr_dereference(exprt &) override;
   void typecheck_expr_function_identifier(exprt &) override;
   void typecheck_expr_reference_to(exprt &);
   void typecheck_expr_this(exprt &);
   void typecheck_expr_new(exprt &);
   void typecheck_expr_sizeof(exprt &) override;
+  void typecheck_expr_lambda(exprt &);
   void typecheck_expr_delete(exprt &);
   void typecheck_expr_side_effect(side_effect_exprt &) override;
   void typecheck_side_effect_assignment(side_effect_exprt &) override;
@@ -452,6 +520,8 @@ protected:
   void
   typecheck_function_call_arguments(side_effect_expr_function_callt &) override;
 
+  void instantiate_generic_lambda(side_effect_expr_function_callt &);
+
   bool operator_is_overloaded(exprt &);
   bool overloadable(const exprt &);
 
@@ -459,6 +529,56 @@ protected:
 
   void typecheck_side_effect_function_call(
     side_effect_expr_function_callt &) override;
+
+  /// Phase 1B target-typet overload of
+  /// \ref typecheck_side_effect_function_call; the target is
+  /// currently discarded.  Phase 2 will use this to thread the
+  /// target through to per-argument deduction.
+  void typecheck_side_effect_function_call(
+    side_effect_expr_function_callt &,
+    const target_typet &);
+
+  /// Deduce template-function arguments from the target function type
+  /// per N5008 [temp.deduct.funcaddr]/1:
+  ///
+  ///   > Template arguments can be deduced from the type specified
+  ///   > when taking the address of an overload set.  If there is
+  ///   > a target, the function template's function type and the
+  ///   > target type are used as the types of P and A, and the
+  ///   > deduction is done as described in 13.10.3.6.
+  ///
+  /// Context: overload resolution for a function call whose callee
+  /// is a non-template ordinary function and whose corresponding
+  /// parameter type is a pointer-to-function.  Any argument of the
+  /// form `&f` or plain `f` (implicit function-to-pointer per
+  /// [conv.func]) where `f` names a function template is deduced
+  /// against the parameter's pointed-to code type, so that the
+  /// template argument is determined by the target rather than by
+  /// the argument alone (the argument alone has no fargs to
+  /// deduce from and would fail in the default resolve path).
+  ///
+  /// The function is a no-op when every argument is already
+  /// typed; it runs as a "probe + retry" because CBMC's overall
+  /// pipeline typechecks arguments before resolving the callee.
+  /// Once a proper target-type threading is in place (roadmap
+  /// §3.3), the probe step becomes redundant and this helper
+  /// collapses into the main path.
+  ///
+  /// [temp.deduct.funcaddr]/1: deduce template arguments for a
+  /// function-template name being matched against a target
+  /// pointer-to-function type.  Returns a typed `address_of` expr
+  /// on success, or nil on substitution failure
+  /// (silent per [temp.deduct]/8).  The \p source_location is
+  /// attached to the synthesised `address_of`.
+  ///
+  /// \p name_or_addressof is the source argument: either a bare
+  /// `cpp_name` (implicit function-to-pointer per [conv.func]/1)
+  /// or an explicit `&cpp_name` `address_of`.  In either case the
+  /// resulting expression is a typed `address_of` that the caller
+  /// can substitute for the original.
+  exprt deduce_funcaddr_against_target(
+    const exprt &name_or_addressof,
+    const typet &target_fn_pointer_type);
 
   void typecheck_method_application(side_effect_expr_function_callt &);
 
@@ -509,6 +629,72 @@ public:
   bool user_defined_conversion_sequence(
     const exprt &expr, const typet &type, exprt &new_expr, unsigned &rank);
 
+  /// Phase 4B: per [temp.deduct.conv]/1, attempt to deduce template
+  /// arguments for a conversion-function template by unifying the
+  /// template's return type (P) with the destination type (A).
+  /// Called from `user_defined_conversion_sequence` after the
+  /// non-template cast-operator loop.  Iterates template cast
+  /// operators of the source class, runs SFINAE-guarded deduction
+  /// per [temp.deduct]/8, applies [temp.deduct.partial]/3.2 partial
+  /// ordering across deduction survivors when more than one is
+  /// viable, then instantiates the unique most-specialised match.
+  /// Per [over.ics.user]/3 the second standard conversion sequence
+  /// must be Exact Match.
+  ///
+  /// Returns `true` on a successful unambiguous deduction, with
+  /// `new_expr` set to the typechecked conversion expression and
+  /// `rank` incremented by the second standard conversion's rank.
+  /// Returns `false` if no candidate is found, deduction fails for
+  /// every candidate, or partial ordering cannot pick a unique
+  /// most-specialised candidate (genuine ambiguity).
+  bool deduce_conversion_template(
+    const exprt &expr,
+    const typet &to,
+    exprt &new_expr,
+    unsigned &rank);
+
+  /// Phase 4B: companion to `deduce_conversion_template` for
+  /// reference-binding contexts ([dcl.init.ref], handled in
+  /// `reference_binding`).  When the destination type is a
+  /// reference, the shared deduction helper is invoked with the
+  /// reference type as `to`; [temp.deduct.conv]/2 + /4 strip the
+  /// references on P and A before deduction.  After instantiation
+  /// the post-conversion check is `reference_compatible` rather
+  /// than `standard_conversion_sequence` per [over.match.ref].
+  bool deduce_conversion_template_for_reference(
+    const exprt &expr,
+    const reference_typet &reference_type,
+    exprt &new_expr,
+    unsigned &rank);
+
+  /// Phase 4B core helper.  Iterates template cast operators of the
+  /// source class of `expr`, runs SFINAE-guarded [temp.deduct.conv]
+  /// deduction against `to`, applies partial ordering across
+  /// survivors, and instantiates the unique most-specialised
+  /// candidate.  Both value and reference destination types are
+  /// accepted; the deduction transformations handle the difference.
+  ///
+  /// Returns the instantiated function symbol on success, or
+  /// `nullptr` on no-candidate / total deduction failure / genuine
+  /// ambiguity.  The caller is responsible for building the call
+  /// expression and validating the post-instantiation conversion
+  /// sequence appropriate to the calling context.
+  const symbolt *
+  find_template_conversion_specialisation(const exprt &expr, const typet &to);
+
+  /// [temp.deduct.partial]/3.2: in conversion-function context,
+  /// returns `true` iff conversion-function template F is at-least-
+  /// as-specialised as G when their return types serve as the P/A
+  /// pair.  Implemented as: deduce F's parameters from G's
+  /// (transformed) return type and require all parameters to be
+  /// bound.  /5 (drop reference) and /7 (drop top-level cv) are
+  /// applied first.
+  bool conversion_template_at_least_as_specialised(
+    const cpp_declarationt &F,
+    const cpp_declarationt &G,
+    const irep_idt &F_scope_id,
+    const irep_idt &G_scope_id);
+
   bool reference_related(const exprt &expr, const reference_typet &type) const;
 
   bool reference_compatible(
@@ -541,7 +727,9 @@ public:
   void get_virtual_bases(const struct_typet &type,
      std::list<irep_idt> &vbases) const;
 
-  bool subtype_typecast(
+  bool subtype_typecast(const struct_typet &from, const struct_typet &to) const;
+
+  bool base_publicly_accessible(
     const struct_typet &from,
     const struct_typet &to) const;
 
@@ -577,8 +765,22 @@ private:
   typedef std::list<irep_idt> dynamic_initializationst;
   dynamic_initializationst dynamic_initializations;
   bool disable_access_control;           // Disable protect and private
+  bool in_template_conversion = false;   // Prevent recursion in conversion
+  bool skip_typechecking_elaborate = false;
   std::unordered_set<irep_idt> deferred_typechecking;
+  std::unordered_set<irep_idt> functions_being_typechecked;
+  std::map<irep_idt, exprt> generic_lambda_map;
   bool support_float16_type;
+
+  /// Stack of currently-active target types for nested calls; pushed
+  /// by `typecheck_side_effect_function_call(exprt &,
+  /// const target_typet &)` and read by
+  /// `typecheck_function_expr` when constructing `fargs`.  The
+  /// resolver and conversion paths consult `fargs.target` to drive
+  /// [temp.deduct.conv]/1 deduction.  See
+  /// `doc/architectural/cpp-frontend-plan-target-type-threading.md`
+  /// Phase 4.
+  std::vector<target_typet> call_target_stack;
 };
 
 #endif // CPROVER_CPP_CPP_TYPECHECK_H

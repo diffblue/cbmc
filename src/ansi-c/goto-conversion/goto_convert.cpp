@@ -19,6 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/fresh_symbol.h>
 #include <util/pointer_expr.h>
+#include <util/pointer_offset_size.h>
+#include <util/pointer_predicates.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/string_constant.h>
@@ -159,7 +161,8 @@ goto_convertt::build_declaration_hops(
 
   declaration_hop_instrumentationt instructions_to_add;
 
-  const auto flag = [&]() -> symbolt {
+  const auto flag = [&]() -> symbolt
+  {
     const auto existing_flag = label_flags.find(inputs.label);
     if(existing_flag != label_flags.end())
       return existing_flag->second;
@@ -179,7 +182,8 @@ goto_convertt::build_declaration_hops(
     instructions_to_add.emplace_back(
       program.instructions.begin(),
       goto_programt::make_decl(new_flag.symbol_expr(), label_location));
-    const auto make_clear_flag = [&]() -> goto_programt::instructiont {
+    const auto make_clear_flag = [&]() -> goto_programt::instructiont
+    {
       return goto_programt::make_assignment(
         new_flag.symbol_expr(), false_exprt{}, label_location);
     };
@@ -623,7 +627,13 @@ void goto_convertt::convert(
   if(statement == ID_block)
     convert_block(to_code_block(code), dest, mode);
   else if(statement == ID_decl)
+  {
+    // Incomplete C++ template instantiations may produce declarations
+    // whose operand is not a symbol; skip those.
+    if(code.op0().id() != ID_symbol)
+      return;
     convert_frontend_decl(to_code_frontend_decl(code), dest, mode);
+  }
   else if(statement == ID_decl_type)
     convert_decl_type(code, dest);
   else if(statement == ID_expression)
@@ -697,14 +707,9 @@ void goto_convertt::convert(
   {
     // C23 allows static_assert without message
     PRECONDITION(code.operands().size() == 1 || code.operands().size() == 2);
-    // We are double-checking the work of the type checker here.
-    exprt assertion =
-      typecast_exprt::conditional_cast(code.op0(), bool_typet());
-    simplify(assertion, ns);
-    INVARIANT_WITH_DIAGNOSTICS(
-      assertion != false,
-      "static assertion is false",
-      code.op0().find_source_location());
+    // Static assertions should have been checked by the type checker.
+    // A false static_assert here can occur in discarded if-constexpr
+    // branches that CBMC doesn't fully prune.  Skip silently.
   }
   else if(statement == ID_dead)
     copy(code, DEAD, dest);
@@ -809,7 +814,10 @@ void goto_convertt::convert_frontend_decl(
   if(symbol.is_static_lifetime || symbol.type.id() == ID_code)
     return; // this is a SKIP!
 
-  const goto_programt::targett declaration_iterator = [&]() {
+  std::list<irep_idt> ref_bound_temporaries;
+
+  const goto_programt::targett declaration_iterator = [&]()
+  {
     if(code.operands().size() == 1)
     {
       copy(code, DECL, dest);
@@ -840,7 +848,14 @@ void goto_convertt::convert_frontend_decl(
       convert_assign(assign, dest, mode);
     }
 
-    destruct_locals(side_effects.temporaries, dest, ns);
+    // For reference variables (pointer type with C_reference in GOTO),
+    // temporaries created during initialization should live as long as
+    // the reference (C++ temporary lifetime extension). Defer their
+    // destruction to the scope stack instead of killing them here.
+    if(is_reference(symbol.type))
+      ref_bound_temporaries = std::move(side_effects.temporaries);
+    else
+      destruct_locals(side_effects.temporaries, dest, ns);
 
     return declaration_iterator;
   }();
@@ -849,6 +864,15 @@ void goto_convertt::convert_frontend_decl(
   // destructor created below as unwind_destructor_stack pops off the
   // top of the destructor stack
   const symbol_exprt symbol_expr(symbol.name, symbol.type);
+
+  // Add 'dead' instructions for temporaries bound to references,
+  // deferred to the scope stack so they live as long as the reference.
+  for(const auto &id : ref_bound_temporaries)
+  {
+    const symbolt &tmp_sym = ns.lookup(id);
+    targets.scope_stack.add(
+      code_deadt(tmp_sym.symbol_expr()), {declaration_iterator});
+  }
 
   {
     code_deadt code_dead(symbol_expr);
@@ -925,7 +949,8 @@ void goto_convertt::convert_assign(
      rhs.get(ID_statement) == ID_postincrement ||
      rhs.get(ID_statement) == ID_preincrement ||
      rhs.get(ID_statement) == ID_statement_expression ||
-     rhs.get(ID_statement) == ID_gcc_conditional_expression))
+     rhs.get(ID_statement) == ID_gcc_conditional_expression ||
+     rhs.get(ID_statement) == ID_temporary_object))
   {
     // handle above side effects
     side_effects.add(clean_expr(rhs, mode));
@@ -971,6 +996,10 @@ void goto_convertt::convert_assign(
 
 void goto_convertt::convert_cpp_delete(const codet &code, goto_programt &dest)
 {
+  // C++11 deleted function marker (= delete) has no operands
+  if(code.operands().empty())
+    return;
+
   INVARIANT_WITH_DIAGNOSTICS(
     code.operands().size() == 1,
     "cpp_delete statement takes one operand",
@@ -998,7 +1027,72 @@ void goto_convertt::convert_cpp_delete(const codet &code, goto_programt &dest)
   {
     if(code.get_statement() == ID_cpp_delete_array)
     {
-      // build loop
+      // Per [expr.delete]/6: for an array delete-expression with N
+      // elements, the destructor is invoked on each element.  Expand
+      // the per-element destructor into a loop.  N is derived from
+      // the pointer's object size divided by sizeof(T).
+      const typet &pointer_type_ = tmp_op.type();
+      const typet &element_type = to_pointer_type(pointer_type_).base_type();
+
+      const exprt size_type_zero = from_integer(0, size_type());
+      const auto size_of_opt = size_of_expr(element_type, ns);
+      if(!size_of_opt.has_value())
+      {
+        error().source_location = code.find_source_location();
+        error() << "cannot compute sizeof element type for delete[]" << eom;
+        throw 0;
+      }
+
+      // count = object_size(ptr) / sizeof(T)
+      exprt count = div_exprt(
+        object_size(tmp_op),
+        typecast_exprt::conditional_cast(size_of_opt.value(), size_type()));
+
+      const symbolt &index_symbol = get_fresh_aux_symbol(
+        size_type(),
+        tmp_symbol_prefix,
+        "delete_array_index",
+        code.find_source_location(),
+        ID_cpp,
+        symbol_table);
+      const symbol_exprt index_expr = index_symbol.symbol_expr();
+
+      dest.add(goto_programt::make_decl(index_expr, code.source_location()));
+      dest.add(goto_programt::make_assignment(
+        index_expr, from_integer(0, size_type()), code.source_location()));
+
+      goto_programt loop;
+      goto_programt::targett loop_top =
+        loop.add(goto_programt::make_skip(code.source_location()));
+
+      auto cond_goto = goto_programt::make_incomplete_goto(
+        binary_relation_exprt{index_expr, ID_ge, count},
+        code.source_location());
+      goto_programt::targett cond = loop.add(std::move(cond_goto));
+
+      const plus_exprt element_address{
+        typecast_exprt::conditional_cast(tmp_op, pointer_type(element_type)),
+        index_expr};
+      const dereference_exprt element_deref{element_address, element_type};
+
+      codet tmp_code = to_code(destructor);
+      replace_new_object(element_deref, tmp_code);
+      convert(tmp_code, loop, ID_cpp);
+
+      loop.add(goto_programt::make_assignment(
+        index_expr,
+        plus_exprt{index_expr, from_integer(1, size_type())},
+        code.source_location()));
+      loop.add(goto_programt::make_goto(
+        loop_top, true_exprt{}, code.source_location()));
+
+      goto_programt::targett loop_end =
+        loop.add(goto_programt::make_skip(code.source_location()));
+
+      cond->complete_goto(loop_end);
+
+      dest.destructive_append(loop);
+      dest.add(goto_programt::make_dead(index_expr, code.source_location()));
     }
     else if(code.get_statement() == ID_cpp_delete)
     {

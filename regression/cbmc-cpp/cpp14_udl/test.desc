@@ -1,0 +1,9 @@
+CORE
+main.cpp
+--cpp14
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+User-defined literals in C++14.

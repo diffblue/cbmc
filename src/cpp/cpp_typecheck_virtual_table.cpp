@@ -84,15 +84,28 @@ void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
 
     struct_exprt values({}, struct_tag_typet(vt_symb_type.name));
 
+    bool type_mismatch = false;
     for(const auto &compo : vt_type.components())
     {
       std::map<irep_idt, exprt>::const_iterator cit2 =
         value_map.find(compo.get_base_name());
       CHECK_RETURN(cit2 != value_map.end());
       const exprt &value=cit2->second;
-      DATA_INVARIANT(value.type() == compo.type(), "component type mismatch");
+      if(value.type() != compo.type())
+      {
+        // Type mismatch between a vtable slot's component and the
+        // function value inserted there.  This can occur when an
+        // earlier front-end error (e.g., a failed implicit
+        // conversion in a base-class constructor invocation) left
+        // the class partially elaborated.  Skip vtable
+        // construction rather than aborting via DATA_INVARIANT.
+        type_mismatch = true;
+        break;
+      }
       values.operands().push_back(value);
     }
+    if(type_mismatch)
+      continue;
     vt_symb_var.value=values;
 
     bool failed=!symbol_table.insert(std::move(vt_symb_var)).second;

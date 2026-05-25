@@ -1,0 +1,10 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+Invariant violation: lhs/rhs type mismatch in assignment from
+(void)-1 in numeric_traits.h. The (void) cast produces a void
+type that cannot be assigned to int.

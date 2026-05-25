@@ -23,8 +23,19 @@ void ansi_c_convert_typet::read_rec(const typet &type)
 {
   if(type.id()==ID_merged_type)
   {
+    // Per [dcl.spec]/1: cv-qualifiers in a decl-specifier-seq apply
+    // to the type. When template substitution places cv-qualifier
+    // attributes on struct_tag/union_tag subtypes within a merged_type
+    // (instead of inserting ID_const/ID_volatile sub-nodes), we must
+    // still recognize those as cv-qualifiers on the final declaration.
     for(const typet &subtype : to_type_with_subtypes(type).subtypes())
+    {
+      if(subtype.get_bool(ID_C_constant))
+        c_qualifiers.is_constant = true;
+      if(subtype.get_bool(ID_C_volatile))
+        c_qualifiers.is_volatile = true;
       read_rec(subtype);
+    }
   }
   else if(type.id()==ID_signed)
     signed_cnt++;
@@ -249,6 +260,9 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     const irep_idt typedef_identifier=type.get(ID_C_typedef);
     if(!typedef_identifier.empty())
       tmp.set(ID_C_typedef, typedef_identifier);
+    // Preserve pointer-to-member attribute (C++)
+    if(type.find(ID_to_member).is_not_nil())
+      tmp.add(ID_to_member, type.find(ID_to_member));
     other.push_back(tmp);
   }
   else if(type.id()==ID_pointer)
@@ -284,7 +298,9 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     c_ensures.push_back(to_unary_expr(as_expr).op());
   }
   else
+  {
     other.push_back(type);
+  }
 }
 
 void ansi_c_convert_typet::write(typet &type)

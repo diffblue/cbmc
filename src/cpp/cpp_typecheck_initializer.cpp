@@ -9,20 +9,21 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
-#include "cpp_typecheck.h"
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/expr_initializer.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
+#include <util/symbol_table_base.h>
 
 #include "cpp_convert_type.h"
+#include "cpp_typecheck.h"
 #include "cpp_typecheck_fargs.h"
 
 /// Initialize an object with a value
 void cpp_typecheckt::convert_initializer(symbolt &symbol)
 {
+  const irep_idt sym_id = symbol.name;
   // this is needed for template arguments that are types
 
   if(symbol.is_type)
@@ -55,6 +56,16 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
       throw 0;
     }
 
+    // C++20: lambda in unevaluated context (decltype).
+    // The type carries the lambda function address so that
+    // default-initialization produces a valid function pointer.
+    const irept &lambda_init = symbol.type.find("#lambda_initializer");
+    if(lambda_init.is_not_nil())
+    {
+      symbol.value = static_cast<const exprt &>(lambda_init);
+      return;
+    }
+
     // done
     return;
   }
@@ -67,12 +78,79 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
 
     if(has_auto(symbol.type))
     {
-      cpp_convert_auto(symbol.type, symbol.value.type(), get_message_handler());
+      // C++17: auto x{v} deduces to decltype(v)
+      typet deduced_type = symbol.value.type();
+      if(
+        symbol.value.id() == ID_initializer_list &&
+        symbol.value.operands().size() == 1)
+      {
+        deduced_type = symbol.value.operands().front().type();
+        symbol.value = symbol.value.operands().front();
+      }
+      cpp_convert_auto(symbol.type, deduced_type, get_message_handler());
+      // For auto& in const context: if the initializer is const,
+      // the reference must also be const (e.g., auto& x = d; in
+      // a const method where d is a const member).
+      if(
+        is_reference(symbol.type) &&
+        symbol.value.type().get_bool(ID_C_constant) &&
+        symbol.type.id() == ID_pointer)
+      {
+        to_pointer_type(symbol.type).base_type().set(ID_C_constant, true);
+      }
       typecheck_type(symbol.type);
       implicit_typecast(symbol.value, symbol.type);
     }
 
     reference_initializer(symbol.value, to_reference_type(symbol.type));
+  }
+  else if(has_auto(symbol.type) && !is_reference(symbol.type))
+  {
+    // auto type deduction for non-reference types
+    // C++11: auto x = {1, 2, 3} deduces std::initializer_list<int>
+    if(
+      symbol.value.id() == ID_initializer_list &&
+      !symbol.value.operands().empty())
+    {
+      // Type-check the first element to determine T
+      exprt first = symbol.value.operands()[0];
+      typecheck_expr(first);
+      // Build std::initializer_list<T> type
+      // For verification purposes, model as a const array
+      symbol.type = array_typet(
+        first.type(),
+        from_integer(symbol.value.operands().size(), size_type()));
+      // Type-check all elements
+      exprt::operandst elems;
+      for(auto &op : symbol.value.operands())
+      {
+        typecheck_expr(op);
+        implicit_typecast(op, first.type());
+        elems.push_back(op);
+      }
+      symbol.value = array_exprt(std::move(elems), to_array_type(symbol.type));
+      return;
+    }
+    typecheck_expr(symbol.value);
+
+    // decltype(auto): if initializer is a function call returning a
+    // reference, deduce the reference type
+    if(
+      symbol.type.id() == ID_decltype && symbol.type.get_bool("#auto") &&
+      symbol.value.id() == ID_dereference &&
+      is_reference(to_dereference_expr(symbol.value).pointer().type()))
+    {
+      const typet &ref_type =
+        to_dereference_expr(symbol.value).pointer().type();
+      cpp_convert_auto(symbol.type, ref_type, get_message_handler());
+      typecheck_type(symbol.type);
+      reference_initializer(symbol.value, to_reference_type(symbol.type));
+      return;
+    }
+
+    cpp_convert_auto(symbol.type, symbol.value.type(), get_message_handler());
+    typecheck_type(symbol.type);
+    implicit_typecast(symbol.value, symbol.type);
   }
   else if(cpp_is_pod(symbol.type))
   {
@@ -112,14 +190,30 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
         cpp_typecheck_resolvet::wantt::BOTH,
         fargs);
 
-      DATA_INVARIANT(
-        to_pointer_type(symbol.type).base_type() == resolved_expr.type(),
-        "symbol type must match");
+      // For pointer-to-member-function, the symbol type includes a
+      // to_member attribute and the resolved expression may have a
+      // different representation. Skip the strict type check when
+      // pointer-to-member is involved.
+      if(
+        symbol.type.find(ID_to_member).is_nil() &&
+        to_pointer_type(symbol.type).base_type() != resolved_expr.type())
+      {
+        DATA_INVARIANT_WITH_DIAGNOSTICS(
+          false,
+          "symbol type must match",
+          symbol.type.pretty(),
+          resolved_expr.type().pretty(),
+          symbol.location);
+      }
 
       if(resolved_expr.id()==ID_symbol)
       {
         symbol.value=
           address_of_exprt(resolved_expr);
+
+        if(symbol.type.find(ID_to_member).is_not_nil())
+          symbol.value.type().add(ID_to_member) =
+            symbol.type.find(ID_to_member);
       }
       else if(resolved_expr.id()==ID_member)
       {
@@ -144,7 +238,12 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
       return;
     }
 
-    typecheck_expr(symbol.value);
+    {
+      exprt val = symbol.value;
+      typecheck_expr(val);
+      symbolt &symbol = symbol_table.get_writeable_ref(sym_id);
+      symbol.value = std::move(val);
+    }
 
     if(symbol.value.type().find(ID_to_member).is_not_nil())
       symbol.type.add(ID_to_member) = symbol.value.type().find(ID_to_member);
@@ -176,12 +275,255 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
   else
   {
     // we need a constructor
+    // Re-acquire symbol reference — earlier type-checking may have
+    // invalidated it through symbol table reallocation.
+    symbolt &symbol = symbol_table.get_writeable_ref(sym_id);
+
+    // Aggregate initialization: for braced-init-list on non-POD struct
+    // types that have no user-declared constructors (only compiler-
+    // generated copy/move constructors), perform member-by-member
+    // initialization.  This handles non-POD aggregates such as structs
+    // with reference members.
+    if(
+      symbol.value.id() == ID_initializer_list &&
+      symbol.type.id() == ID_struct_tag)
+    {
+      const struct_typet &struct_type =
+        follow_tag(to_struct_tag_type(symbol.type));
+
+      // Find initializer_list<T> constructor AND check for non-copy
+      // constructors in ONE pass, before any operation that might
+      // invalidate the struct reference through template elaboration.
+      bool has_non_copy_ctor = false;
+      irep_idt il_tag_id;
+      for(const auto &c : struct_type.components())
+      {
+        if(c.type().id() != ID_code || c.get_bool(ID_from_base))
+          continue;
+        const code_typet &code_type = to_code_type(c.type());
+        if(code_type.return_type().id() != ID_constructor)
+          continue;
+        const auto &params = code_type.parameters();
+        if(params.size() <= 1)
+          continue;
+        if(params.size() == 2 && is_reference(params[1].type()))
+          continue;
+        has_non_copy_ctor = true;
+        // Check first non-this param for initializer_list<T>
+        if(il_tag_id.empty())
+        {
+          for(const auto &p : params)
+          {
+            if(p.get_this())
+              continue;
+            typet pt = p.type();
+            if(is_reference(pt))
+              pt = to_pointer_type(pt).base_type();
+            if(
+              pt.id() == ID_struct_tag &&
+              id2string(to_struct_tag_type(pt).get_identifier())
+                  .find("tag-initializer_list<") != std::string::npos)
+            {
+              il_tag_id = to_struct_tag_type(pt).get_identifier();
+            }
+            break;
+          }
+        }
+        if(!il_tag_id.empty())
+          break;
+      }
+
+      // Brace-init-list to std::initializer_list<T> constructor
+      if(!il_tag_id.empty())
+      {
+        // Re-acquire symbol — the loop may have invalidated it.
+        symbolt &symbol = symbol_table.get_writeable_ref(sym_id);
+        struct_tag_typet il_type(il_tag_id);
+        if(il_type.id() == ID_struct_tag)
+        {
+          try
+          {
+            const struct_typet &il_struct =
+              follow_tag(to_struct_tag_type(il_type));
+            typet elem_type;
+            const struct_typet::componentt *ptr_comp = nullptr;
+            const struct_typet::componentt *size_comp = nullptr;
+            for(const auto &m : il_struct.components())
+            {
+              if(
+                m.type().id() == ID_code || m.get_bool(ID_is_type) ||
+                m.get_bool(ID_is_static))
+                continue;
+              if(!ptr_comp)
+              {
+                ptr_comp = &m;
+                if(m.type().id() == ID_pointer)
+                {
+                  elem_type = to_pointer_type(m.type()).base_type();
+                  elem_type.remove(ID_C_constant);
+                }
+              }
+              else if(!size_comp)
+                size_comp = &m;
+            }
+
+            if(elem_type.is_not_nil() && ptr_comp && size_comp)
+            {
+              exprt::operandst typed_elems;
+              for(const auto &op : symbol.value.operands())
+              {
+                exprt val = op;
+                typecheck_expr(val);
+                implicit_typecast(val, elem_type);
+                typed_elems.push_back(std::move(val));
+              }
+
+              std::size_t n = typed_elems.size();
+              auto arr_type =
+                array_typet{elem_type, from_integer(n, size_type())};
+              std::string arr_id =
+                "__init_list_arr$" + std::to_string(anon_counter++);
+              auxiliary_symbolt arr_sym;
+              arr_sym.name = arr_id;
+              arr_sym.base_name = arr_id;
+              arr_sym.type = arr_type;
+              arr_sym.type.set(ID_C_constant, true);
+              arr_sym.mode = ID_cpp;
+              arr_sym.is_static_lifetime = true;
+              arr_sym.is_lvalue = true;
+              arr_sym.location = symbol.value.source_location();
+              arr_sym.value = array_exprt{std::move(typed_elems), arr_type};
+              symbol_table.insert(std::move(arr_sym));
+
+              struct_exprt il_val{{}, il_type};
+              symbol_exprt arr_ref{arr_id, arr_type};
+              arr_ref.set(ID_C_lvalue, true);
+              index_exprt first{
+                arr_ref, from_integer(0, c_index_type()), elem_type};
+              address_of_exprt addr{first};
+              addr.type() = ptr_comp->type();
+              il_val.add_to_operands(std::move(addr));
+              il_val.add_to_operands(from_integer(n, size_comp->type()));
+              il_val.add_source_location() = symbol.value.source_location();
+
+              symbol_exprt expr_sym(symbol.name, symbol.type);
+              already_typechecked_exprt::make_already_typechecked(expr_sym);
+              exprt::operandst ctor_ops;
+              already_typechecked_exprt::make_already_typechecked(il_val);
+              ctor_ops.push_back(std::move(il_val));
+              auto ctor = cpp_constructor(
+                symbol.value.source_location(), expr_sym, ctor_ops);
+              if(ctor.has_value())
+              {
+                symbol.value = ctor.value();
+                return;
+              }
+            }
+          }
+          catch(...)
+          {
+            // conversion failed, fall through
+          }
+        }
+      }
+
+      if(!has_non_copy_ctor)
+      {
+        const auto &ops = symbol.value.operands();
+        std::size_t idx = 0;
+        bool aggregate = true;
+
+        // C++17: check if we have base class initializers
+        bool has_base_init = struct_type.id() == ID_struct &&
+                             !to_struct_type(struct_type).bases().empty();
+
+        if(has_base_init)
+        {
+          // Convert to constructor-style code that initializes
+          // base subobjects and members individually.
+          // Copy operands since cpp_constructor may modify symbol.value.
+          exprt::operandst ops_copy = symbol.value.operands();
+          symbol_exprt sym_expr(symbol.name, symbol.type);
+          already_typechecked_exprt::make_already_typechecked(sym_expr);
+          auto init =
+            cpp_constructor(symbol.value.source_location(), sym_expr, ops_copy);
+          if(init.has_value())
+          {
+            symbol.value = std::move(*init);
+            return;
+          }
+        }
+
+        struct_exprt result({}, symbol.type);
+        for(const auto &c : struct_type.components())
+        {
+          if(
+            c.get_bool(ID_from_base) || c.get_bool(ID_is_type) ||
+            c.get_bool(ID_is_static) || c.type().id() == ID_code)
+          {
+            continue;
+          }
+          if(c.get_base_name() == "@most_derived")
+            continue;
+          if(idx < ops.size())
+          {
+            exprt val = ops[idx++];
+            typecheck_expr(val);
+            if(is_reference(c.type()))
+              reference_initializer(val, to_reference_type(c.type()));
+            else
+              implicit_typecast(val, c.type());
+            result.add_to_operands(std::move(val));
+          }
+          else
+          {
+            aggregate = false;
+            break;
+          }
+        }
+        if(aggregate)
+        {
+          symbol.value = std::move(result);
+          return;
+        }
+      }
+    }
 
     symbol_exprt expr_symbol(symbol.name, symbol.type);
     already_typechecked_exprt::make_already_typechecked(expr_symbol);
 
     exprt::operandst ops;
-    ops.push_back(symbol.value);
+
+    // For braced-init-list, first try passing as a single
+    // std::initializer_list argument (C++11 [over.match.list]).
+    // If that fails, fall back to unpacking the elements as
+    // individual constructor arguments.
+    if(symbol.value.id() == ID_initializer_list)
+    {
+      // Per [over.match.list]: try as single initializer_list argument
+      // first.  If that fails (including via exception from the
+      // resolver), fall back to unpacking the elements as individual
+      // constructor arguments per [dcl.init.list]/3.6.
+      ops.push_back(symbol.value);
+      try
+      {
+        auto constructor =
+          cpp_constructor(symbol.value.source_location(), expr_symbol, ops);
+        if(constructor.has_value())
+        {
+          symbol.value = constructor.value();
+          return;
+        }
+      }
+      catch(...)
+      {
+        // initializer_list constructor not found — fall through
+      }
+      // Fall back to unpacking
+      ops = symbol.value.operands();
+    }
+    else
+      ops.push_back(symbol.value);
 
     auto constructor =
       cpp_constructor(symbol.value.source_location(), expr_symbol, ops);

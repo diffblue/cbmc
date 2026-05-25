@@ -9,12 +9,22 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
+#include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/config.h>
+#include <util/pointer_expr.h>
+#include <util/std_code.h>
+#include <util/std_expr.h>
 #include <util/symbol_table_base.h>
 
+#include "cpp_convert_type.h"
+#include "cpp_name.h"
+#include "cpp_sfinae_context.h"
 #include "cpp_template_type.h"
 #include "cpp_type2name.h"
 #include "cpp_typecheck.h"
+
+#include <optional>
 
 void cpp_typecheckt::convert_parameter(
   const irep_idt &current_mode,
@@ -81,6 +91,12 @@ void cpp_typecheckt::convert_parameters(
 
 void cpp_typecheckt::convert_function(symbolt &symbol)
 {
+  // Guard against recursive type-checking (e.g., constexpr functions
+  // that call themselves).
+  if(functions_being_typechecked.count(symbol.name))
+    return;
+  functions_being_typechecked.insert(symbol.name);
+
   code_typet &function_type=
     to_code_type(template_subtype(symbol.type));
 
@@ -96,12 +112,34 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     throw 0;
   }
 
+  // C++11 deleted functions: = delete
+  if(to_code(symbol.value).get_statement() == ID_cpp_delete)
+  {
+    symbol.value.make_nil();
+    return;
+  }
+
   // enter appropriate scope
   cpp_save_scopet saved_scope(cpp_scopes);
   cpp_scopet &function_scope=cpp_scopes.set_scope(symbol.name);
 
   // fix the scope's prefix
   function_scope.prefix=id2string(symbol.name)+"::";
+
+  // For friend functions defined inside a class, add the class scope
+  // as a secondary scope so that class-scope names are visible.
+  // Also disable access control since friend functions can access
+  // private/protected members of the befriending class.
+  const irep_idt &friend_class = symbol.type.get(ID_C_class);
+  bool saved_access_control = disable_access_control;
+  if(!friend_class.empty())
+  {
+    auto it = cpp_scopes.id_map.find(friend_class);
+    if(it != cpp_scopes.id_map.end())
+      function_scope.add_secondary_scope(
+        static_cast<cpp_scopet &>(*it->second));
+    disable_access_control = true;
+  }
 
   // genuine function definition -- do the parameter declarations
   convert_parameters(symbol.mode, function_type);
@@ -124,14 +162,33 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   {
     const symbolt &msymb = lookup(symbol.type.get(ID_C_member_name));
 
-    PRECONDITION(symbol.value.id() == ID_code);
-    PRECONDITION(symbol.value.get(ID_statement) == ID_block);
+    // Under normal operation a destructor body arrives here as a
+    // code_blockt.  However, under error-recovery conditions (for
+    // example after a prior CONVERSION ERROR has produced a
+    // partially-elaborated class) we may see a destructor symbol
+    // whose value is nil or not a block.  Skip the implicit-code
+    // insertion in that case rather than aborting via a
+    // PRECONDITION violation.
+    if(
+      symbol.value.id() != ID_code ||
+      symbol.value.get(ID_statement) != ID_block)
+    {
+      return;
+    }
+
+    // Skip adding destructor code for virtual function thunks — the
+    // thunk just calls the real destructor which already has the code.
+    const auto &this_param_type =
+      to_pointer_type(function_type.parameters().front().type());
+    bool is_thunk =
+      this_param_type.base_type().get(ID_identifier) != msymb.name;
 
     if(
-      !symbol.value.has_operands() ||
-      !to_multi_ary_expr(symbol.value).op0().has_operands() ||
-      to_multi_ary_expr(to_multi_ary_expr(symbol.value).op0()).op0().id() !=
-        ID_already_typechecked)
+      !is_thunk &&
+      (!symbol.value.has_operands() ||
+       !to_multi_ary_expr(symbol.value).op0().has_operands() ||
+       to_multi_ary_expr(to_multi_ary_expr(symbol.value).op0()).op0().id() !=
+         ID_already_typechecked))
     {
       symbol.value.copy_to_operands(
         dtor(msymb, to_symbol_expr(function_scope.this_expr)));
@@ -139,6 +196,13 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   }
 
   // do the function body
+  // Save and restore break/continue/case flags, because convert_function
+  // may be called recursively (e.g., during constexpr evaluation or
+  // template instantiation triggered by type-checking an expression
+  // inside another function body).
+  bool old_break_is_allowed = break_is_allowed;
+  bool old_continue_is_allowed = continue_is_allowed;
+  bool old_case_is_allowed = case_is_allowed;
   start_typecheck_code();
 
   // save current return type
@@ -150,13 +214,380 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   if(return_type.id() == ID_constructor || return_type.id() == ID_destructor)
     return_type = void_type();
 
-  typecheck_code(to_code(symbol.value));
+  // C++14: auto return type deduction
+  bool defer_auto_return = false;
+  if(has_auto(return_type))
+  {
+    // Find the first return statement and deduce the type.
+    // If the body contains if constexpr, the return expression may be
+    // in a discarded branch and fail to type-check. In that case,
+    // defer deduction to after body type-checking.
+    std::function<const exprt *(const codet &)> find_return =
+      [&](const codet &code) -> const exprt *
+    {
+      if(code.get_statement() == ID_return)
+      {
+        const auto &ret = to_code_frontend_return(code);
+        if(ret.has_return_value())
+          return &ret.return_value();
+      }
+      for(const auto &op : code.operands())
+      {
+        if(op.id() == ID_code)
+        {
+          const exprt *r = find_return(to_code(op));
+          if(r != nullptr)
+            return r;
+        }
+      }
+      return nullptr;
+    };
+
+    const exprt *ret_expr = find_return(to_code(symbol.value));
+    if(ret_expr != nullptr)
+    {
+      const std::size_t saved_errors =
+        get_message_handler().get_message_count(messaget::M_ERROR);
+      const unsigned saved_verbosity = get_message_handler().get_verbosity();
+      get_message_handler().set_verbosity(0);
+
+      try
+      {
+        exprt tmp = *ret_expr;
+        typecheck_expr(tmp);
+        typet deduced = tmp.type();
+        // C++14 decltype(auto): if the return expression is a
+        // parenthesized lvalue, deduce a reference type
+        if(
+          return_type.id() == ID_decltype && return_type.get_bool("#auto") &&
+          tmp.get_bool(ID_C_lvalue))
+        {
+          deduced = reference_typet(deduced, config.ansi_c.pointer_width);
+        }
+        cpp_convert_auto(
+          function_type.return_type(), deduced, get_message_handler());
+        typecheck_type(function_type.return_type());
+        return_type = function_type.return_type();
+      }
+      catch(...)
+      {
+        // Return expression failed to type-check (likely in a discarded
+        // if constexpr branch). Defer deduction to after body type-checking.
+        get_message_handler().set_message_count(
+          messaget::M_ERROR, saved_errors);
+        defer_auto_return = true;
+      }
+
+      get_message_handler().set_verbosity(saved_verbosity);
+    }
+    else
+    {
+      // No return statement — deduce void
+      function_type.return_type() = void_type();
+      return_type = void_type();
+    }
+  }
+
+  // C++20: generate body for defaulted operator<=>
+  if(
+    symbol.base_name == "operator<=>" && symbol.value.id() == ID_code &&
+    to_code(symbol.value).get_statement() == ID_block &&
+    !to_code_block(to_code(symbol.value)).has_operands())
+  {
+    const irep_idt &class_id = symbol.type.get(ID_C_member_name);
+    if(!class_id.empty())
+    {
+      const symbolt &class_sym = lookup(class_id);
+      const auto &fn_params = to_code_type(symbol.type).parameters();
+      // Find the parameter name (second param after this)
+      irep_idt arg_name;
+      if(fn_params.size() >= 2)
+        arg_name = fn_params[1].get_base_name();
+      if(arg_name.empty())
+        arg_name = "#anon_arg0";
+
+      source_locationt loc = symbol.location;
+      code_blockt body;
+      body.add_source_location() = loc;
+
+      for(const auto &c : to_struct_type(class_sym.type).components())
+      {
+        if(
+          c.get_bool(ID_from_base) || c.get_bool(ID_is_type) ||
+          c.get_bool(ID_is_static) || c.type().id() == ID_code)
+          continue;
+        if(c.get_base_name() == "@most_derived")
+          continue;
+
+        const irep_idt &mem = c.get_base_name();
+        cpp_namet lhs(mem, loc);
+        exprt rhs(ID_member);
+        rhs.add(ID_component_cpp_name, cpp_namet(mem, loc));
+        rhs.copy_to_operands(cpp_namet(arg_name, loc).as_expr());
+        rhs.add_source_location() = loc;
+
+        typet int_type = signed_int_type();
+        binary_relation_exprt lt(lhs.as_expr(), ID_lt, rhs);
+        lt.add_source_location() = loc;
+        binary_relation_exprt gt(lhs.as_expr(), ID_gt, rhs);
+        gt.add_source_location() = loc;
+        if_exprt inner(
+          std::move(gt), from_integer(1, int_type), from_integer(0, int_type));
+        inner.add_source_location() = loc;
+        if_exprt cmp(
+          std::move(lt), from_integer(-1, int_type), std::move(inner));
+        cmp.add_source_location() = loc;
+
+        notequal_exprt ne(cmp, from_integer(0, int_type));
+        ne.add_source_location() = loc;
+        code_frontend_returnt ret(cmp);
+        ret.add_source_location() = loc;
+        code_ifthenelset ifs(std::move(ne), std::move(ret));
+        ifs.add_source_location() = loc;
+        body.add(std::move(ifs));
+      }
+
+      code_frontend_returnt ret0(from_integer(0, signed_int_type()));
+      ret0.add_source_location() = loc;
+      body.add(std::move(ret0));
+
+      symbol.value = std::move(body);
+    }
+  }
+
+  // C++20: generate body for defaulted operator==
+  if(
+    symbol.base_name == "operator==" && symbol.value.id() == ID_code &&
+    to_code(symbol.value).get_statement() == ID_block &&
+    !to_code_block(to_code(symbol.value)).has_operands())
+  {
+    irep_idt class_id = symbol.type.get(ID_C_member_name);
+    // For friend operator==, use the friend class instead
+    if(class_id.empty())
+      class_id = symbol.type.get(ID_C_class);
+    if(!class_id.empty())
+    {
+      const symbolt &class_sym = lookup(class_id);
+      const auto &fn_params = to_code_type(symbol.type).parameters();
+      bool is_friend_op = symbol.type.get(ID_C_member_name).empty();
+      irep_idt lhs_name, rhs_name;
+      if(is_friend_op && fn_params.size() >= 2)
+      {
+        lhs_name = fn_params[0].get_base_name();
+        rhs_name = fn_params[1].get_base_name();
+      }
+      else if(fn_params.size() >= 2)
+      {
+        rhs_name = fn_params[1].get_base_name();
+      }
+      if(is_friend_op && lhs_name.empty())
+        lhs_name = "#anon_arg0";
+      if(rhs_name.empty())
+        rhs_name = "#anon_arg1";
+
+      source_locationt loc = symbol.location;
+
+      // Build conjunction: m1==rhs.m1 && m2==rhs.m2 && ...
+      exprt result = true_exprt();
+      for(const auto &c : to_struct_type(class_sym.type).components())
+      {
+        if(
+          c.get_bool(ID_from_base) || c.get_bool(ID_is_type) ||
+          c.get_bool(ID_is_static) || c.type().id() == ID_code)
+          continue;
+        if(c.get_base_name() == "@most_derived")
+          continue;
+
+        const irep_idt &mem = c.get_base_name();
+        exprt lhs_expr;
+        if(is_friend_op)
+        {
+          lhs_expr = exprt(ID_member);
+          lhs_expr.add(ID_component_cpp_name, cpp_namet(mem, loc));
+          lhs_expr.copy_to_operands(cpp_namet(lhs_name, loc).as_expr());
+          lhs_expr.add_source_location() = loc;
+        }
+        else
+        {
+          lhs_expr = cpp_namet(mem, loc).as_expr();
+        }
+        exprt rhs_expr(ID_member);
+        rhs_expr.add(ID_component_cpp_name, cpp_namet(mem, loc));
+        rhs_expr.copy_to_operands(cpp_namet(rhs_name, loc).as_expr());
+        rhs_expr.add_source_location() = loc;
+
+        equal_exprt eq(std::move(lhs_expr), std::move(rhs_expr));
+        eq.add_source_location() = loc;
+
+        if(result.is_true())
+          result = std::move(eq);
+        else
+        {
+          and_exprt conj(std::move(result), std::move(eq));
+          conj.add_source_location() = loc;
+          result = std::move(conj);
+        }
+      }
+
+      code_blockt body;
+      body.add_source_location() = loc;
+      code_frontend_returnt ret(std::move(result));
+      ret.add_source_location() = loc;
+      body.add(std::move(ret));
+
+      symbol.value = std::move(body);
+    }
+  }
+
+  // C++20: generate body for defaulted operator!=
+  if(
+    symbol.base_name == "operator!=" && symbol.value.id() == ID_code &&
+    to_code(symbol.value).get_statement() == ID_block &&
+    !to_code_block(to_code(symbol.value)).has_operands())
+  {
+    const irep_idt &class_id = symbol.type.get(ID_C_member_name);
+    if(!class_id.empty())
+    {
+      const symbolt &class_sym = lookup(class_id);
+      const auto &fn_params = to_code_type(symbol.type).parameters();
+      irep_idt arg_name;
+      if(fn_params.size() >= 2)
+        arg_name = fn_params[1].get_base_name();
+      if(arg_name.empty())
+        arg_name = "#anon_arg0";
+
+      source_locationt loc = symbol.location;
+
+      // Build: !(m1==rhs.m1 && m2==rhs.m2 && ...)
+      exprt eq_result = true_exprt();
+      for(const auto &c : to_struct_type(class_sym.type).components())
+      {
+        if(
+          c.get_bool(ID_from_base) || c.get_bool(ID_is_type) ||
+          c.get_bool(ID_is_static) || c.type().id() == ID_code)
+          continue;
+        if(c.get_base_name() == "@most_derived")
+          continue;
+
+        const irep_idt &mem = c.get_base_name();
+        cpp_namet lhs(mem, loc);
+        exprt rhs(ID_member);
+        rhs.add(ID_component_cpp_name, cpp_namet(mem, loc));
+        rhs.copy_to_operands(cpp_namet(arg_name, loc).as_expr());
+        rhs.add_source_location() = loc;
+
+        equal_exprt eq(lhs.as_expr(), rhs);
+        eq.add_source_location() = loc;
+
+        if(eq_result.is_true())
+          eq_result = std::move(eq);
+        else
+        {
+          and_exprt conj(std::move(eq_result), std::move(eq));
+          conj.add_source_location() = loc;
+          eq_result = std::move(conj);
+        }
+      }
+
+      not_exprt neg(std::move(eq_result));
+      neg.add_source_location() = loc;
+
+      code_blockt body;
+      body.add_source_location() = loc;
+      code_frontend_returnt ret(std::move(neg));
+      ret.add_source_location() = loc;
+      body.add(std::move(ret));
+
+      symbol.value = std::move(body);
+    }
+  }
+
+  // [temp.deduct]/8 and the system-header analogue: when the
+  // function whose body we are elaborating lives in a system
+  // header, any typecheck failure is treated as SFINAE rather
+  // than a user-visible compilation error.  This matches what
+  // conforming implementations do when a non-template system
+  // header function happens to be ill-formed against CBMC's
+  // (deliberately incomplete) model of system headers — the
+  // caller gets a "no usable body" symbol rather than a
+  // diagnostic attributed to the header.
+  //
+  // User-code bodies use normal error propagation below.
+  const std::string body_file = id2string(symbol.location.get_file());
+  const bool is_system_header_body =
+    body_file.find("/usr/include/") == 0 || body_file.find("/usr/lib/") == 0;
+
+  std::optional<sfinae_contextt> syshdr_guard;
+  if(is_system_header_body)
+    syshdr_guard.emplace(*this);
+
+  try
+  {
+    typecheck_code(to_code(symbol.value));
+  }
+  catch(int)
+  {
+    // For system headers, clear the broken body and return.
+    // For user code, re-throw.  The `syshdr_guard` destructor (if
+    // engaged) runs on the way out and restores handler/error
+    // count; the user-code rethrow keeps going to the caller.
+    if(is_system_header_body)
+    {
+      symbol.value.make_nil();
+      functions_being_typechecked.erase(symbol.name);
+      return;
+    }
+    throw;
+  }
+
+  // Deferred auto return type deduction: the initial attempt failed
+  // (e.g., if constexpr with type-dependent discarded branch).
+  // Now that the body is type-checked, find a return statement in the
+  // surviving branches.
+  if(defer_auto_return)
+  {
+    std::function<const typet *(const codet &)> find_return_type =
+      [&](const codet &code) -> const typet *
+    {
+      if(code.get_statement() == ID_return && code.operands().size() == 1)
+      {
+        return &code.op0().type();
+      }
+      for(const auto &op : code.operands())
+      {
+        if(op.id() == ID_code)
+        {
+          const typet *r = find_return_type(to_code(op));
+          if(r != nullptr)
+            return r;
+        }
+      }
+      return nullptr;
+    };
+
+    const typet *deduced = find_return_type(to_code(symbol.value));
+    if(deduced != nullptr)
+    {
+      function_type.return_type() = *deduced;
+      return_type = *deduced;
+    }
+    else
+    {
+      function_type.return_type() = void_type();
+      return_type = void_type();
+    }
+  }
 
   symbol.value.type()=symbol.type;
 
   return_type = old_return_type;
+  break_is_allowed = old_break_is_allowed;
+  continue_is_allowed = old_continue_is_allowed;
+  case_is_allowed = old_case_is_allowed;
+  disable_access_control = saved_access_control;
 
   deferred_typechecking.erase(symbol.name);
+  functions_being_typechecked.erase(symbol.name);
 }
 
 /// for function overloading
@@ -203,7 +634,16 @@ irep_idt cpp_typecheckt::function_identifier(const typet &type)
     else
       result+=',';
     typet tmp_type=it->type();
-    result+=cpp_type2name(it->type());
+    // C/C++ function parameters of function type decay to
+    // pointer-to-function.  Normalise here so that the identifier
+    // is the same regardless of declaration style.
+    if(tmp_type.id() == ID_code)
+      tmp_type = pointer_type(tmp_type);
+    // Top-level const/volatile on parameters does not affect the
+    // function signature per [dcl.fct]/5.
+    tmp_type.remove(ID_C_constant);
+    tmp_type.remove(ID_C_volatile);
+    result += cpp_type2name(tmp_type);
   }
 
   result+=')';

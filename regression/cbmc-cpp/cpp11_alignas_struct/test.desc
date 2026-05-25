@@ -1,0 +1,8 @@
+CORE
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+Test that alignas specifier on struct/class/union declarations works.

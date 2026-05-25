@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+--
+Verifies [expr.unary.noexcept]/3: the noexcept operator correctly
+returns true for non-throwing expressions (builtins, literals, noexcept
+functions, destructors) and false for throw-expressions and non-noexcept
+function calls.  Historic entry in STANDARD_COVERAGE.md claimed the
+operator "always evaluates to false" but the implementation actually
+follows the standard.

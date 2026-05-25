@@ -11,11 +11,12 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_type2name.h"
 
-#include <string>
-
 #include <util/cprover_prefix.h>
 #include <util/pointer_expr.h>
+#include <util/std_types.h>
 #include <util/type.h>
+
+#include <string>
 
 static std::string do_prefix(const std::string &s)
 {
@@ -72,7 +73,8 @@ static std::string irep2name(const irept &irep)
   {
     if(
       named_sub.first == ID_C_constant || named_sub.first == ID_C_volatile ||
-      named_sub.first == ID_C_restricted)
+      named_sub.first == ID_C_restricted ||
+      named_sub.first == ID_C_ref_qualifier || named_sub.first == "#C_noexcept")
     {
       if(first)
         first=false;
@@ -119,10 +121,10 @@ std::string cpp_type2name(const typet &type)
     result += CPROVER_PREFIX "bool";
   else if(type.id()==ID_pointer)
   {
-    if(is_reference(type))
-      result += "ref_" + cpp_type2name(to_reference_type(type).base_type());
-    else if(is_rvalue_reference(type))
+    if(is_rvalue_reference(type))
       result += "rref_" + cpp_type2name(to_pointer_type(type).base_type());
+    else if(is_reference(type))
+      result += "ref_" + cpp_type2name(to_reference_type(type).base_type());
     else
       result += "ptr_" + cpp_type2name(to_pointer_type(type).base_type());
   }
@@ -163,13 +165,29 @@ std::string cpp_type2name(const typet &type)
     {
       if(arg_it!=parameters.begin())
         result+=',';
-      result+=cpp_type2name(arg_it->type());
+      result += irep2name(*arg_it);
     }
 
     result+=')';
     result+="->(";
     result+=cpp_type2name(return_type);
     result+=')';
+
+    if(to_code_type(type).has_ellipsis())
+      result += "_ellipsis";
+
+    const irep_idt &ref_qualifier = type.get(ID_C_ref_qualifier);
+    if(ref_qualifier == "&")
+      result += "_lref";
+    else if(ref_qualifier == "&&")
+      result += "_rref";
+
+    if(type.get_bool(ID_noexcept) || type.get_bool("#C_noexcept"))
+      result += "_noexcept";
+  }
+  else if(type.id() == ID_complex)
+  {
+    result += "complex_" + cpp_type2name(to_complex_type(type).subtype());
   }
   else
   {

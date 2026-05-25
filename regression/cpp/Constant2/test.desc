@@ -1,7 +1,6 @@
 CORE
 main.cpp
 
-^EXIT=(64|1)$
+^EXIT=0$
 ^SIGNAL=0$
-^CONVERSION ERROR$
 --

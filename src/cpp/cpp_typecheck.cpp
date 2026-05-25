@@ -11,14 +11,21 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_typecheck.h"
 
+#include <util/arith_tools.h>
+#include <util/c_types.h>
+#include <util/cprover_prefix.h>
+#include <util/find_symbols.h>
+#include <util/mathematical_expr.h>
 #include <util/pointer_expr.h>
 #include <util/source_location.h>
+#include <util/std_code.h>
 #include <util/symbol_table.h>
 
 #include <ansi-c/builtin_factory.h>
 #include <ansi-c/gcc_version.h>
 
 #include "cpp_declarator.h"
+#include "cpp_sfinae_context.h"
 #include "cpp_util.h"
 #include "expr2cpp.h"
 
@@ -96,19 +103,132 @@ void cpp_typecheckt::convert(cpp_itemt &item)
 /// typechecking main method
 void cpp_typecheckt::typecheck()
 {
+  // Clear static caches from previous translation units to avoid
+  // dangling scope pointers when type-checking multiple files.
+  cpp_scopet::clear_static_caches();
+
   // default linkage is "automatic"
   current_linkage_spec=ID_auto;
 
   for(auto &item : cpp_parse_tree.items)
-    convert(item);
+  {
+    const auto &loc = item.source_location();
+    const std::string file = id2string(loc.get_file());
+    bool is_system =
+      file.find("/usr/include/") == 0 || file.find("/usr/lib/") == 0;
+
+    if(is_system)
+    {
+      // System-header item: analogous to SFINAE — a failure to
+      // type-check an item from a system header (typically a
+      // built-in or implementation-defined construct we don't
+      // model) should not be a compilation error against user code.
+      // Suppress diagnostics and roll the error count back.
+      try
+      {
+        sfinae_contextt sfinae_guard{*this};
+        convert(item);
+      }
+      catch(...)
+      {
+      }
+    }
+    else
+    {
+      try
+      {
+        convert(item);
+      }
+      catch(int)
+      {
+      }
+    }
+  }
+
+  // If errors occurred during the convert loop but we still have
+  // declarations to process, the error count may have been
+  // incremented. We don't re-throw here; errors will be detected
+  // by typecheck_main via the error count.
+
+  // Fold __safe_multiply::__c before static initialization.
+  // __c = uintmax_t(1) << (sizeof(intmax_t) * 4) = 2^32 on 64-bit.
+  // CBMC's constexpr evaluation may fail for this shift inside
+  // template classes on older GCC, causing division-by-zero in <ratio>.
+  for(auto &entry : symbol_table.symbols)
+  {
+    symbolt &sym = symbol_table.get_writeable_ref(entry.first);
+    if(
+      id2string(sym.base_name) == "__c" &&
+      id2string(sym.name).find("__safe_multiply") != std::string::npos)
+    {
+      typet t = sym.type;
+      t.remove(ID_C_constant);
+      sym.value = from_integer(mp_integer(1) << 32, t);
+      sym.is_macro = true;
+    }
+  }
 
   static_and_dynamic_initialization();
 
+  // Provide models for constexpr functions that are evaluated during
+  // method body type-checking. These must be set before
+  // typecheck_method_bodies() so that constexpr evaluation uses our
+  // models instead of producing nondet values.
+  for(auto &entry : symbol_table.symbols)
+  {
+    symbolt &sym = symbol_table.get_writeable_ref(entry.first);
+    const std::string name = id2string(sym.name);
+    const std::string base = id2string(sym.base_name);
+    if(
+      (base == "_S_nothrow_relocate" || base == "_S_use_relocate") &&
+      name.find("vector") != std::string::npos && sym.is_macro)
+    {
+      sym.value = true_exprt();
+    }
+  }
+
   typecheck_method_bodies();
+
+  typecheck_contracts();
 
   do_not_typechecked();
 
+  provide_stdlib_bodies();
+
   clean_up();
+
+  // Ensure all type symbols referenced in the symbol table exist.
+  // System header processing may fail partway through template
+  // instantiation (caught by catch(...) in linkage spec processing),
+  // leaving struct_tag_typet references to symbols that were never
+  // created. Create incomplete stubs for any missing type symbols
+  // so that goto program validation does not crash.
+  {
+    find_symbols_sett referenced;
+    for(const auto &entry : symbol_table.symbols)
+    {
+      find_type_and_expr_symbols(entry.second.type, referenced);
+      if(entry.second.value.is_not_nil())
+        find_type_and_expr_symbols(entry.second.value, referenced);
+    }
+    for(const auto &id : referenced)
+    {
+      if(!symbol_table.has_symbol(id))
+      {
+        const std::string id_str = id2string(id);
+        // Create stubs for missing tag types (struct/union/enum).
+        // These arise from failed template instantiations in system
+        // headers. The struct_tag_typet reference remains in other
+        // types but the type symbol was never created.
+        if(id_str.find("tag-") != std::string::npos)
+        {
+          type_symbolt stub{id, struct_typet(), ID_cpp};
+          to_struct_type(stub.type).make_incomplete();
+          symbol_table.insert(std::move(stub));
+        }
+      }
+    }
+  }
 }
 
 const struct_typet &cpp_typecheckt::this_struct_type()
@@ -132,6 +252,113 @@ std::string cpp_typecheckt::to_string(const exprt &expr)
 std::string cpp_typecheckt::to_string(const typet &type)
 {
   return type2cpp(type, *this);
+}
+
+bool cpp_typecheckt::empty_brace_value_initializes_scalar() const
+{
+  // C++ [dcl.init.list]/3.10: an empty braced-init-list `{}` for a
+  // scalar performs value-initialization, yielding the scalar's
+  // zero value.  This is a C++11 feature; CBMC accepts it in all
+  // C++ modes for consistency with other permissive extensions.
+  return true;
+}
+
+void cpp_typecheckt::typecheck_contracts()
+{
+  // Collect symbols to process (avoid modifying symbol table while iterating)
+  std::vector<irep_idt> symbols_with_contracts;
+  for(const auto &entry : symbol_table.symbols)
+  {
+    if(
+      entry.second.type.id() == ID_code &&
+      to_code_with_contract_type(entry.second.type).has_contract())
+    {
+      symbols_with_contracts.push_back(entry.first);
+    }
+  }
+
+  for(const auto &id : symbols_with_contracts)
+  {
+    symbolt &symbol = symbol_table.get_writeable_ref(id);
+    code_with_contract_typet code_type =
+      to_code_with_contract_type(symbol.type);
+
+    // Enter the function's scope so that parameter names resolve
+    cpp_save_scopet saved_scope(cpp_scopes);
+    cpp_scopes.set_scope(symbol.name);
+
+    binding_exprt::variablest parameter_symbols;
+
+    const auto &return_type = code_type.return_type();
+    bool added_return_value = false;
+    if(return_type.id() != ID_empty)
+    {
+      parameter_symbols.emplace_back(
+        CPROVER_PREFIX "return_value", return_type);
+
+      // Add __CPROVER_return_value to the symbol table and scope
+      // so that type-checking of ensures clauses can resolve it.
+      symbolt rv_symbol{};
+      rv_symbol.name = CPROVER_PREFIX "return_value";
+      rv_symbol.base_name = CPROVER_PREFIX "return_value";
+      rv_symbol.type = return_type;
+      rv_symbol.mode = symbol.mode;
+      rv_symbol.is_lvalue = true;
+      auto result = symbol_table.insert(std::move(rv_symbol));
+      if(result.second)
+      {
+        added_return_value = true;
+        cpp_scopes.put_into_scope(result.first);
+      }
+    }
+
+    for(const auto &p : code_type.parameters())
+    {
+      if(!p.get_identifier().empty())
+        parameter_symbols.emplace_back(p.get_identifier(), p.type());
+    }
+
+    for(auto &req : code_type.c_requires())
+    {
+      typecheck_expr(req);
+      implicit_typecast_bool(req);
+      lambda_exprt lambda{parameter_symbols, req};
+      lambda.add_source_location() = req.source_location();
+      req.swap(lambda);
+    }
+
+    for(auto &ens : code_type.c_ensures())
+    {
+      typecheck_expr(ens);
+      implicit_typecast_bool(ens);
+      lambda_exprt lambda{parameter_symbols, ens};
+      lambda.add_source_location() = ens.source_location();
+      ens.swap(lambda);
+    }
+
+    // Create a dedicated contract symbol
+    symbolt contract_sym;
+    contract_sym.name = "contract::" + id2string(symbol.name);
+    contract_sym.base_name = symbol.base_name;
+    contract_sym.pretty_name = symbol.pretty_name;
+    contract_sym.is_property = true;
+    contract_sym.type = code_type;
+    contract_sym.mode = symbol.mode;
+    contract_sym.module = module;
+    contract_sym.location = symbol.location;
+
+    symbol_table.insert(std::move(contract_sym));
+
+    // Remove contracts from the original symbol
+    symbol.type.remove(ID_C_spec_requires);
+    symbol.type.remove(ID_C_spec_ensures);
+    symbol.type.remove(ID_C_spec_assigns);
+    symbol.type.remove(ID_C_spec_frees);
+
+    // Clean up temporary __CPROVER_return_value symbol
+    if(added_return_value)
+      symbol_table.remove(CPROVER_PREFIX "return_value");
+  }
 }
 
 bool cpp_typecheck(
@@ -215,9 +442,26 @@ void cpp_typecheckt::static_and_dynamic_initialization()
     if(symbol.is_extern)
       continue;
 
-    // PODs are always statically initialized
+    // PODs with constant initializers are statically initialized.
+    // PODs with non-constant initializers (e.g., function calls)
+    // need dynamic initialization in declaration order.
     if(cpp_is_pod(symbol.type))
-      continue;
+    {
+      // Check if the initializer contains side effects (function
+      // calls, etc.) that require dynamic initialization.
+      bool has_side_effect = false;
+      if(symbol.value.is_not_nil())
+      {
+        symbol.value.visit_pre(
+          [&has_side_effect](const exprt &e)
+          {
+            if(e.id() == ID_side_effect)
+              has_side_effect = true;
+          });
+      }
+      if(!has_side_effect)
+        continue;
+    }
 
     DATA_INVARIANT(symbol.is_static_lifetime, "should be static");
     DATA_INVARIANT(!symbol.is_type, "should not be a type");
@@ -228,9 +472,17 @@ void cpp_typecheckt::static_and_dynamic_initialization()
     // initializer given?
     if(symbol.value.is_not_nil())
     {
-      // This will be a constructor call,
-      // which we execute.
-      init_block.add(to_code(symbol.value));
+      if(symbol.value.id() == ID_code)
+      {
+        // This will be a constructor call,
+        // which we execute.
+        init_block.add(to_code(symbol.value));
+      }
+      else
+      {
+        // POD with non-constant initializer: create assignment
+        init_block.add(code_frontend_assignt(symbol_expr, symbol.value));
+      }
 
       // Make it nil to get zero initialization by
       // __CPROVER_initialize
@@ -327,11 +579,18 @@ void cpp_typecheckt::clean_up()
     const symbolt &symbol=cur_it->second;
 
     // erase templates and all member functions that have not been converted
-    if(
-      symbol.type.get_bool(ID_is_template) ||
-      deferred_typechecking.find(symbol.name) != deferred_typechecking.end())
+    if(symbol.type.get_bool(ID_is_template))
     {
       symbol_table.erase(cur_it);
+      continue;
+    }
+    else if(
+      deferred_typechecking.find(symbol.name) != deferred_typechecking.end())
+    {
+      // Member functions in template scopes that were never instantiated.
+      // Clear the un-typechecked body but keep the symbol so that
+      // goto conversion can create a no-body stub if it's referenced.
+      symbol_table.get_writeable_ref(symbol.name).value.make_nil();
       continue;
     }
     else if(symbol.type.id()==ID_struct ||

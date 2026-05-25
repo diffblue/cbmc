@@ -63,8 +63,6 @@ void cpp_convert_typet::read_rec(const typet &type)
     ++char16_t_count;
   else if(type.id()==ID_char32_t)
     ++char32_t_count;
-  else if(type.id()==ID_constexpr)
-    c_qualifiers.is_constant = true;
   else if(type.id()==ID_function_type)
   {
     read_function_type(type);
@@ -101,6 +99,9 @@ void cpp_convert_typet::read_rec(const typet &type)
     const irep_idt typedef_identifier = type.get(ID_C_typedef);
     if(!typedef_identifier.empty())
       tmp.set(ID_C_typedef, typedef_identifier);
+    // Preserve pointer-to-member attribute
+    if(type.find(ID_to_member).is_not_nil())
+      tmp.add(ID_to_member, type.find(ID_to_member));
     other.push_back(tmp);
   }
   else if(type.id()==ID_pointer)
@@ -110,6 +111,12 @@ void cpp_convert_typet::read_rec(const typet &type)
   }
   else if(type.id() == ID_frontend_vector)
     vector_size = static_cast<const exprt &>(type.find(ID_size));
+  else if(type.id() == ID_auto)
+  {
+    // In C++11, auto is a type specifier (not a storage class).
+    // Add to other so that cpp_convert_auto can find and replace it.
+    other.push_back(type);
+  }
   else
   {
     ansi_c_convert_typet::read_rec(type);
@@ -330,7 +337,8 @@ void cpp_convert_plain_type(typet &type, message_handlert &message_handler)
     type.id() == ID_unsignedbv || type.id() == ID_signedbv ||
     type.id() == ID_bool || type.id() == ID_floatbv || type.id() == ID_empty ||
     type.id() == ID_constructor || type.id() == ID_destructor ||
-    type.id() == ID_c_enum)
+    type.id() == ID_c_enum || type.id() == ID_struct_tag ||
+    type.id() == ID_union_tag || type.id() == ID_complex)
   {
   }
   else if(type.id() == ID_c_bool)
@@ -353,6 +361,13 @@ void cpp_convert_auto(
   {
     cpp_convert_auto(
       to_type_with_subtype(dest).subtype(), src, message_handler);
+    return;
+  }
+
+  // C++14: decltype(auto) — replace the entire type with src
+  if(dest.id() == ID_decltype && dest.get_bool("#auto"))
+  {
+    dest = src;
     return;
   }
 

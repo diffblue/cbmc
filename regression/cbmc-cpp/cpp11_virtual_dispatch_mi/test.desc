@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+Virtual dispatch with multiple inheritance: qualified call into a
+non-primary base's method which calls a pure virtual on 'this'.
+Tests that the this-pointer adjustment thunk correctly subtracts
+the base class offset for non-primary bases.

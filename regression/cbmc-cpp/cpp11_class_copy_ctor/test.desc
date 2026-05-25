@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+--
+Verifies [class.copy.ctor]/1,7,8: implicitly-declared copy constructor
+copies each subobject; user-defined copy constructor actually runs on
+copy-initialisation and runs exactly once per copy.  Regression for
+204a77d84c ("Fix implicit copy constructor with move constructors
+[class.copy]/p2, [dcl.init.ref]/p5").

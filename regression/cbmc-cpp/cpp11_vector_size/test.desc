@@ -1,0 +1,9 @@
+CORE gcc-only
+main.cpp
+--cpp11 --unwind 2 --no-unwinding-assertions
+\[main\.assertion\.1\] line 7 size after push_back: SUCCESS
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$

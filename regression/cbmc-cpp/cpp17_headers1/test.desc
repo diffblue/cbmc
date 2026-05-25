@@ -1,0 +1,9 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^PARSING ERROR$
+All 29 C++17 standard library headers type-check and verify successfully.

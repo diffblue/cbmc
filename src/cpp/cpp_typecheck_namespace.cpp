@@ -12,21 +12,47 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/source_location.h>
 #include <util/symbol_table_base.h>
 
+#include "cpp_sfinae_context.h"
 #include "cpp_typecheck.h"
 
 void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
 {
   // save the scope
   cpp_save_scopet saved_scope(cpp_scopes);
+  cpp_scopet &parent_scope = cpp_scopes.current_scope();
 
   const irep_idt &name=namespace_spec.get_namespace();
 
   if(name.empty())
   {
-    // "unique namespace"
-    error().source_location=namespace_spec.source_location();
-    error() << "unique namespace not supported yet" << eom;
-    throw 0;
+    // Anonymous (unique) namespace — generate a unique name.
+    // libc++ uses these in headers like <tuple>.
+    static unsigned anon_ns_counter = 0;
+    irep_idt anon_name("#anon_ns_" + std::to_string(anon_ns_counter++));
+
+    std::string identifier =
+      cpp_scopes.current_scope().prefix + id2string(anon_name);
+
+    if(symbol_table.symbols.find(identifier) == symbol_table.symbols.end())
+    {
+      symbolt symbol;
+      symbol.name = identifier;
+      symbol.base_name = anon_name;
+      symbol.value.make_nil();
+      symbol.type = typet(ID_namespace);
+      symbol.mode = ID_cpp;
+      symbol.module = module;
+      symbol.location = namespace_spec.source_location();
+      symbol_table.add(symbol);
+    }
+
+    cpp_scopet &ns_scope = cpp_scopes.new_namespace(anon_name);
+    ns_scope.prefix = identifier + "::";
+    cpp_scopes.go_to(ns_scope);
+    // Make the anonymous namespace visible in the parent scope
+    // (inline namespace semantics)
+    parent_scope.add_using_scope(ns_scope);
+    return;
   }
 
   irep_idt final_name(name);
@@ -88,6 +114,38 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
   {
     // do the declarations
     for(auto &item : namespace_spec.items())
-      convert(item);
+    {
+      const auto &loc = item.source_location();
+      std::string file = id2string(loc.get_file());
+      // Fall back to namespace location when item has no source location
+      if(file.empty())
+        file = id2string(namespace_spec.source_location().get_file());
+      bool is_system = file.find("/include/") != std::string::npos ||
+                       file.find("\\include\\") != std::string::npos ||
+                       file.find("/usr/lib/") == 0 ||
+                       file.find("/Applications/") == 0;
+
+      if(is_system)
+      {
+        // System-header item inside a namespace: treat as SFINAE
+        // (see cpp_typecheck.cpp for the sibling code path).
+        try
+        {
+          sfinae_contextt sfinae_guard{*this};
+          convert(item);
+        }
+        catch(...)
+        {
+        }
+      }
+      else
+      {
+        convert(item);
+      }
+    }
+
+    // C++11: inline namespaces make their names visible in the parent
+    if(namespace_spec.get_is_inline())
+      parent_scope.add_using_scope(cpp_scopes.current_scope());
   }
 }

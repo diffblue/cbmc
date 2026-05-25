@@ -132,15 +132,58 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
 
     if(has_body)
     {
-      error().source_location=type.source_location();
-      error() << "enum symbol '" << base_name << "' declared previously\n"
-              << "location of previous definition: " << symbol.location << eom;
-      throw 0;
+      // Allow defining an enum that was previously forward-declared
+      if(
+        symbol.type.id() == ID_c_enum_tag ||
+        symbol.type.get(ID_C_incomplete) == "1" ||
+        !symbol.type.find(ID_body).is_not_nil())
+      {
+        // Replace the forward declaration with the full definition.
+        symbolt &writable = symbol_table.get_writeable_ref(symbol_name);
+        writable.type = enum_type;
+
+        if(writable.type.add_subtype().is_nil())
+          writable.type.add_subtype() = signed_int_type();
+        else
+          typecheck_type(to_type_with_subtype(writable.type).subtype());
+
+        // Find the existing scope entry for this enum
+        cpp_scopet::id_sett id_set =
+          cpp_scopes.current_scope().lookup(base_name, cpp_scopet::SCOPE_ONLY);
+        cpp_idt *scope_id = nullptr;
+        for(auto *id : id_set)
+        {
+          if(id->identifier == symbol_name)
+          {
+            scope_id = &*id;
+            break;
+          }
+        }
+
+        if(scope_id)
+        {
+          cpp_save_scopet save2(cpp_scopes);
+          if(writable.type.get_bool(ID_C_class))
+            cpp_scopes.go_to(*scope_id);
+          typecheck_enum_body(writable);
+        }
+      }
+      else
+      {
+        error().source_location = type.source_location();
+        error() << "enum symbol '" << base_name << "' declared previously\n"
+                << "location of previous definition: " << symbol.location
+                << eom;
+        throw 0;
+      }
     }
   }
   else if(
     has_body ||
-    config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
+    config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO ||
+    type.add_subtype()
+      .is_not_nil() ||         // forward-declared enum with underlying type
+    type.get_bool(ID_C_class)) // C++11: forward-declared `enum class`
   {
     std::string pretty_name=
       cpp_scopes.current_scope().prefix+id2string(base_name);

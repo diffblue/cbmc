@@ -1,0 +1,19 @@
+KNOWNBUG libcxx
+main.cpp
+--cpp17 --stdlib libc++
+^\[main\.assertion\.1\].*: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+After the 2026 "template-only no-match silently throws" fix
+(resolve: silently discard template-only no-match per [temp.deduct]/8),
+the surface symptom changed: std::apply's
+`decltype(auto)` tuple-based forwarding path that previously failed
+with CONVERSION ERROR is now caught by the enclosing convert_function
+catch, leaving an empty main() that verifies vacuously (the
+__CPROVER_assert(r == 3, "apply") never makes it into the goto
+program).  Expected-when-fixed now requires the main assertion line
+to be SUCCESS in the output; until the libc++ tuple deduction path
+actually completes, this test stays on the KNOWNBUG list.

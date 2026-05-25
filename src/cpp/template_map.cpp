@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "template_map.h"
 
+#include <util/arith_tools.h>
 #include <util/invariant.h>
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
@@ -24,8 +25,41 @@ void template_mapt::apply(typet &type) const
 {
   if(type.id()==ID_array)
   {
+    // C++26 pack indexing: Ts...[N] is parsed as array[N](Ts).
+    // Before applying substitution, check if the element type is a
+    // cpp_name matching a pack parameter and the size is a constant.
+    if(
+      to_array_type(type).element_type().id() == ID_cpp_name &&
+      to_array_type(type).size().id() == ID_constant)
+    {
+      const auto &elem = to_array_type(type).element_type();
+      const auto &sub = elem.get_sub();
+      if(!sub.empty() && sub.front().id() == ID_name)
+      {
+        irep_idt base = sub.front().get(ID_identifier);
+        for(const auto &entry : pack_args_map)
+        {
+          const std::string &key = id2string(entry.first);
+          auto pos = key.rfind("::");
+          std::string suffix =
+            pos != std::string::npos ? key.substr(pos + 2) : key;
+          if(suffix == id2string(base))
+          {
+            const auto &pack_types = entry.second;
+            auto idx = numeric_cast_v<mp_integer>(
+              to_constant_expr(to_array_type(type).size()));
+            if(idx >= 0 && idx < pack_types.size())
+            {
+              type = pack_types[numeric_cast_v<std::size_t>(idx)];
+              return;
+            }
+          }
+        }
+      }
+    }
     apply(to_array_type(type).element_type());
-    apply(to_array_type(type).size());
+    if(!to_array_type(type).size().is_nil())
+      apply(to_array_type(type).size());
   }
   else if(type.id()==ID_pointer)
   {
@@ -38,6 +72,78 @@ void template_mapt::apply(typet &type) const
     {
       typet &subtype = c.type();
       apply(subtype);
+    }
+
+    // also apply to base classes
+    if(type.id() == ID_struct)
+    {
+      irept::subt &bases = type.add(ID_bases).get_sub();
+      for(auto &base : bases)
+      {
+        apply(static_cast<typet &>(base.add(ID_type)));
+        // Base class specifiers store the class name in ID_name
+        // (as a cpp_name).  Expand pack parameters in the base
+        // class template arguments.  We only touch the
+        // template_args sub-nodes to avoid disturbing other
+        // name components.
+        if(!pack_args_map.empty() && base.find(ID_name).id() == ID_cpp_name)
+        {
+          for(auto &s : base.add(ID_name).get_sub())
+          {
+            if(s.id() == ID_template_args)
+            {
+              irept::subt &args = s.add(ID_arguments).get_sub();
+              // Expand pack parameters
+              irept::subt expanded;
+              for(auto &arg : args)
+              {
+                bool was_pack = false;
+                if(arg.id() == ID_type)
+                {
+                  const typet &at = static_cast<const exprt &>(arg).type();
+                  if(at.id() == ID_template_parameter_symbol_type)
+                  {
+                    const irep_idt &pid =
+                      to_template_parameter_symbol_type(at).get_identifier();
+                    for(const auto &pe : pack_args_map)
+                    {
+                      if(pe.first == pid)
+                      {
+                        for(const auto &pt : pe.second)
+                          expanded.push_back(
+                            static_cast<const irept &>(type_exprt{pt}));
+                        was_pack = true;
+                        break;
+                      }
+                    }
+                  }
+                }
+                if(!was_pack)
+                {
+                  apply(static_cast<exprt &>(arg));
+                  if(!(arg.id() == ID_type &&
+                       static_cast<const exprt &>(arg).type().id() == ID_empty))
+                    expanded.push_back(arg);
+                }
+              }
+              args = expanded;
+            }
+          }
+        }
+      }
+    }
+
+    // Traverse the body sub-tree (member declarations).
+    // This handles template template parameter substitution in
+    // using declarations within template bodies.
+    if(type.find(ID_body).is_not_nil())
+    {
+      for(auto &op : type.add(ID_body).get_sub())
+      {
+        irept &decl_type = op.add(ID_type);
+        for(auto &sub : decl_type.get_sub())
+          apply(static_cast<typet &>(sub));
+      }
     }
   }
   else if(type.id() == ID_template_parameter_symbol_type)
@@ -63,16 +169,260 @@ void template_mapt::apply(typet &type) const
         apply(static_cast<typet &>(parameter.add(ID_type)));
     }
   }
+  else if(type.id() == ID_function_type)
+  {
+    // Pre-conversion function type: apply to return type subtype
+    // and to parameter declaration types.
+    if(type.has_subtypes())
+    {
+      for(auto &st : to_type_with_subtypes(type).subtypes())
+        apply(st);
+    }
+    irept::subt &parameters = type.add(ID_parameters).get_sub();
+    for(auto &parameter : parameters)
+    {
+      if(parameter.id() == ID_cpp_declaration)
+        apply(static_cast<typet &>(parameter.add(ID_type)));
+    }
+  }
   else if(type.id()==ID_merged_type)
   {
     for(typet &subtype : to_type_with_subtypes(type).subtypes())
       apply(subtype);
+  }
+  else if(type.id() == ID_cpp_name)
+  {
+    // Check if the cpp_name is a simple template type parameter
+    irept::subt &sub = type.get_sub();
+    if(!sub.empty() && sub.front().id() == ID_name)
+    {
+      irep_idt base = sub.front().get(ID_identifier);
+
+      // Check for template template parameter usage like C<T>
+      bool has_targs = false;
+      for(const auto &s : sub)
+        if(s.id() == ID_template_args)
+          has_targs = true;
+
+      // Try to match against type_map entries
+      for(const auto &entry : type_map)
+      {
+        const std::string &key = id2string(entry.first);
+        auto pos = key.rfind("::");
+        std::string suffix =
+          pos != std::string::npos ? key.substr(pos + 2) : key;
+        if(
+          suffix == id2string(base) && entry.second.id() != ID_unassigned &&
+          entry.second.id() != ID_nil)
+        {
+          if(has_targs || sub.size() == 1)
+          {
+            // For template template parameters: when the mapped type
+            // is a template_parameter_symbol_type and the cpp_name has
+            // template_args, replace only the name (preserving args).
+            // Per C++ standard, template template parameter substitution
+            // replaces the template name, not the template arguments.
+            if(
+              has_targs &&
+              entry.second.id() == ID_template_parameter_symbol_type)
+            {
+              const irep_idt &tmpl_id =
+                to_template_parameter_symbol_type(entry.second)
+                  .get_identifier();
+              // Extract base name from the template identifier
+              std::string tmpl_str = id2string(tmpl_id);
+              auto last_sep = tmpl_str.rfind("::");
+              std::string tmpl_base = last_sep != std::string::npos
+                                        ? tmpl_str.substr(last_sep + 2)
+                                        : tmpl_str;
+              // Remove template suffix if present
+              auto angle = tmpl_base.find('<');
+              if(angle != std::string::npos)
+                tmpl_base = tmpl_base.substr(0, angle);
+              // Strip 'template.' prefix if present
+              if(tmpl_base.substr(0, 9) == "template.")
+                tmpl_base = tmpl_base.substr(9);
+              // Build a qualified name from the full identifier.
+              // E.g., Tester::template._Apply<Type0> becomes
+              // Tester::_Apply with template_args preserved.
+              if(last_sep != std::string::npos)
+              {
+                std::string prefix = tmpl_str.substr(0, last_sep);
+                irept::subt new_subs;
+                std::size_t pos2 = 0;
+                while(pos2 < prefix.size())
+                {
+                  auto next = prefix.find("::", pos2);
+                  std::string part;
+                  if(next == std::string::npos)
+                  {
+                    part = prefix.substr(pos2);
+                    pos2 = prefix.size();
+                  }
+                  else
+                  {
+                    part = prefix.substr(pos2, next - pos2);
+                    pos2 = next + 2;
+                  }
+                  if(!part.empty())
+                  {
+                    irept name_sub{ID_name};
+                    name_sub.set(ID_identifier, part);
+                    new_subs.push_back(std::move(name_sub));
+                    new_subs.push_back(irept{"::"});
+                  }
+                }
+                irept base_sub{ID_name};
+                base_sub.set(ID_identifier, tmpl_base);
+                new_subs.push_back(std::move(base_sub));
+                for(std::size_t si = 1; si < sub.size(); si++)
+                  new_subs.push_back(sub[si]);
+                sub = std::move(new_subs);
+              }
+              else
+              {
+                sub.front() = irept{ID_name};
+                sub.front().set(ID_identifier, tmpl_base);
+              }
+              return;
+            }
+            type = entry.second;
+            return;
+          }
+          // Qualified name like _Up::X where _Up maps to a struct:
+          // replace _Up with the struct_tag identifier so scope
+          // resolution can find the member via id_map or symbol table.
+          if(sub.size() > 1 && entry.second.id() == ID_struct_tag)
+          {
+            irep_idt tag = to_struct_tag_type(entry.second).get_identifier();
+            sub.front() = irept{ID_name};
+            sub.front().set(ID_identifier, tag);
+            return;
+          }
+        }
+      }
+    }
+
+    // apply to template arguments within cpp_name
+    for(auto &s : sub)
+    {
+      if(s.id() == ID_template_args)
+      {
+        irept::subt &args = s.add(ID_arguments).get_sub();
+        // Expand parameter packs in template arguments.
+        // Before applying substitutions, check if any arg is a
+        // pack parameter and replace it with all pack args.
+        irept::subt expanded_args;
+        for(auto &arg : args)
+        {
+          bool was_pack = false;
+          if(arg.id() == ID_type)
+          {
+            const typet &arg_type = static_cast<const exprt &>(arg).type();
+            if(arg_type.id() == ID_template_parameter_symbol_type)
+            {
+              const irep_idt &param_id =
+                to_template_parameter_symbol_type(arg_type).get_identifier();
+              for(const auto &pack_entry : pack_args_map)
+              {
+                if(pack_entry.first == param_id)
+                {
+                  // Replace with all pack args
+                  for(const auto &pack_type : pack_entry.second)
+                  {
+                    expanded_args.push_back(
+                      static_cast<const irept &>(type_exprt{pack_type}));
+                  }
+                  was_pack = true;
+                  break;
+                }
+              }
+            }
+          }
+          if(!was_pack)
+            expanded_args.push_back(arg);
+        }
+        args = expanded_args;
+
+        for(auto &arg : args)
+          apply(static_cast<exprt &>(arg));
+        // Remove empty-type arguments produced by empty parameter
+        // packs.  Without this, an empty pack expands to a void
+        // argument that poisons downstream template instantiations.
+        args.erase(
+          std::remove_if(
+            args.begin(),
+            args.end(),
+            [](const irept &arg)
+            {
+              return arg.id() == ID_type &&
+                     static_cast<const exprt &>(arg).type().id() == ID_empty;
+            }),
+          args.end());
+      }
+    }
+
+    // Substitute template parameters used as scope qualifiers
+    // (e.g., _Next::value where _Next is mapped to a concrete type).
+    // Replace the name component with the mapped type's identifier.
+    if(sub.size() >= 3 && sub[0].id() == ID_name && sub[1].id() == "::")
+    {
+      irep_idt scope_base = sub[0].get(ID_identifier);
+      for(const auto &entry : type_map)
+      {
+        const std::string &key = id2string(entry.first);
+        auto p = key.rfind("::");
+        std::string suffix = p != std::string::npos ? key.substr(p + 2) : key;
+        if(
+          suffix == id2string(scope_base) &&
+          entry.second.id() != ID_unassigned && entry.second.id() != ID_nil)
+        {
+          if(entry.second.id() == ID_struct_tag)
+          {
+            sub[0].set(
+              ID_identifier, to_struct_tag_type(entry.second).get_identifier());
+          }
+          break;
+        }
+      }
+    }
   }
 }
 
 void template_mapt::apply(exprt &expr) const
 {
   apply(expr.type());
+
+  // Recursively apply to ALL named sub-nodes to handle deeply
+  // nested template parameters (e.g., inside decltype expressions).
+  for(auto &named : expr.get_named_sub())
+  {
+    if(named.first == irep_idt{"operands"} || named.first == "#source_location")
+      continue; // handled separately or not relevant
+    if(named.second.id() == ID_nil)
+      continue;
+    apply(static_cast<typet &>(named.second));
+  }
+
+  // Also apply to all sub-nodes (the unnamed children)
+  for(auto &sub : expr.get_sub())
+    apply(static_cast<typet &>(sub));
+
+  // Handle sizeof...(Pack) — replace with pack size constant
+  if(expr.id() == ID_sizeof)
+  {
+    irept &type_arg = expr.add(ID_type_arg);
+    if(type_arg.is_not_nil())
+      apply(static_cast<typet &>(type_arg));
+  }
+
+  // Apply to type predicate arguments (type_arg, type_arg1, type_arg2)
+  if(expr.find(ID_type_arg).is_not_nil() && expr.id() != ID_sizeof)
+    apply(static_cast<typet &>(expr.add(ID_type_arg)));
+  if(expr.find("type_arg1").is_not_nil())
+    apply(static_cast<typet &>(expr.add("type_arg1")));
+  if(expr.find("type_arg2").is_not_nil())
+    apply(static_cast<typet &>(expr.add("type_arg2")));
 
   if(expr.id()==ID_symbol)
   {
@@ -86,8 +436,49 @@ void template_mapt::apply(exprt &expr) const
     }
   }
 
-  Forall_operands(it, expr)
-    apply(*it);
+  // Substitute non-type template parameters inside cpp_name
+  // template arguments. These appear as "ambiguous" nodes with
+  // a type containing a cpp_name whose identifier matches an
+  // expr_map entry (e.g., _Num in __static_abs<_Num>::value).
+  std::function<void(irept &)> subst_params = [&](irept &node)
+  {
+    if(node.id() == ID_template_args)
+    {
+      irept &args = node.add(ID_arguments);
+      for(auto &arg : args.get_sub())
+      {
+        if(arg.id() != ID_ambiguous)
+          continue;
+        // The ambiguous node stores the cpp_name in its "type" field
+        const irept &inner = arg.find(ID_type);
+        if(inner.id() != ID_cpp_name)
+          continue;
+        // Check if the cpp_name is a single identifier
+        if(inner.get_sub().size() != 1 || inner.get_sub()[0].id() != ID_name)
+          continue;
+        const std::string target =
+          id2string(inner.get_sub()[0].get(ID_identifier));
+        for(const auto &entry : expr_map)
+        {
+          const std::string &key = id2string(entry.first);
+          if(
+            key == target ||
+            (key.size() > target.size() + 2 &&
+             key.substr(key.size() - target.size()) == target &&
+             key[key.size() - target.size() - 1] == ':'))
+          {
+            arg = entry.second;
+            break;
+          }
+        }
+      }
+    }
+    for(auto &sub : node.get_sub())
+      subst_params(sub);
+    for(auto &named : node.get_named_sub())
+      subst_params(named.second);
+  };
+  subst_params(expr);
 }
 
 exprt template_mapt::lookup(const irep_idt &identifier) const
@@ -133,6 +524,34 @@ exprt template_mapt::lookup_expr(const irep_idt &identifier) const
   return static_cast<const exprt &>(get_nil_irep());
 }
 
+exprt template_mapt::lookup_by_suffix(const std::string &suffix) const
+{
+  const std::string match = "::" + suffix;
+  for(const auto &entry : type_map)
+  {
+    const std::string key = id2string(entry.first);
+    if(
+      key.size() >= match.size() &&
+      key.compare(key.size() - match.size(), match.size(), match) == 0)
+    {
+      exprt e(ID_type);
+      e.type() = entry.second;
+      return e;
+    }
+  }
+  for(const auto &entry : expr_map)
+  {
+    const std::string key = id2string(entry.first);
+    if(
+      key.size() >= match.size() &&
+      key.compare(key.size() - match.size(), match.size(), match) == 0)
+    {
+      return entry.second;
+    }
+  }
+  return static_cast<const exprt &>(get_nil_irep());
+}
+
 void template_mapt::print(std::ostream &out) const
 {
   for(const auto &mapping : type_map)
@@ -152,9 +571,6 @@ void template_mapt::build(
   cpp_template_args_tct::argumentst instance=
     template_args.arguments();
 
-  template_typet::template_parameterst::const_iterator t_it=
-    template_parameters.begin();
-
   if(instance.size()<template_parameters.size())
   {
     // check for default parameters
@@ -172,16 +588,55 @@ void template_mapt::build(
   }
 
   // these should have been typechecked before
-  DATA_INVARIANT(
-    instance.size() == template_parameters.size(),
-    "template instantiation expected to match declaration");
-
-  for(cpp_template_args_tct::argumentst::const_iterator
-      i_it=instance.begin();
-      i_it!=instance.end();
-      i_it++, t_it++)
+  bool has_pack = !template_parameters.empty() &&
+                  template_parameters.back().get_bool(ID_ellipsis);
+  if(
+    instance.size() != template_parameters.size() &&
+    !(has_pack && instance.size() >= template_parameters.size() - 1))
   {
-    set(*t_it, *i_it);
+    return; // mismatched template arguments — skip
+  }
+
+  std::size_t i = 0;
+  for(cpp_template_args_tct::argumentst::const_iterator i_it = instance.begin();
+      i_it != instance.end();
+      i_it++, i++)
+  {
+    if(i < template_parameters.size())
+    {
+      set(template_parameters[i], *i_it);
+    }
+    // Extra arguments for variadic packs are not mapped to individual
+    // parameters; they are passed through in the template args.
+  }
+
+  // Record pack sizes for sizeof...(Pack)
+  if(has_pack)
+  {
+    const auto &pack_param = template_parameters.back();
+    irep_idt pack_id = pack_param.id() == ID_type
+                         ? pack_param.type().get(ID_identifier)
+                         : pack_param.get(ID_identifier);
+    std::size_t non_pack = template_parameters.size() - 1;
+    std::size_t pack_sz =
+      instance.size() >= non_pack ? instance.size() - non_pack : 0;
+    pack_size_map[pack_id] = pack_sz;
+
+    // Store all pack argument types for pack indexing (C++26)
+    std::vector<typet> pack_types;
+    for(std::size_t j = non_pack; j < instance.size(); ++j)
+    {
+      if(instance[j].id() == ID_type)
+        pack_types.push_back(instance[j].type());
+    }
+    if(!pack_types.empty())
+    {
+      pack_args_map[pack_id] = std::move(pack_types);
+      // Per [temp.variadic]/7: for single-element packs, also add
+      // the type to type_map so template_map.apply() can substitute.
+      if(pack_args_map[pack_id].size() == 1)
+        type_map[pack_id] = pack_args_map[pack_id].front();
+    }
   }
 }
 
@@ -197,7 +652,27 @@ void template_mapt::set(
     typet tmp=value.type();
 
     irep_idt identifier=parameter.type().get(ID_identifier);
-    type_map[identifier]=tmp;
+
+    // Skip template_parameter_symbol_typet values with numeric
+    // scope IDs — these are unresolved template template parameters.
+    if(tmp.id() == ID_template_parameter_symbol_type)
+    {
+      const irep_idt &ttp_id =
+        to_template_parameter_symbol_type(tmp).get_identifier();
+      std::string ttp_str = id2string(ttp_id);
+      auto ttp_pos = ttp_str.rfind("::");
+      std::string ttp_suffix =
+        ttp_pos != std::string::npos ? ttp_str.substr(ttp_pos + 2) : ttp_str;
+      if(!ttp_suffix.empty() && std::isdigit(ttp_suffix[0]))
+      {
+        // Don't store — the value is an unresolved scope ID.
+        // A later set() call will provide the correct value.
+      }
+      else
+        type_map[identifier] = tmp;
+    }
+    else
+      type_map[identifier] = tmp;
   }
   else
   {

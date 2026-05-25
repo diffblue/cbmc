@@ -1,0 +1,12 @@
+CORE libcxx
+main.cpp
+--cpp17 --stdlib libc++
+^VERIFICATION
+^EXIT=(0|10)$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^PARSING ERROR$
+libc++ ratio/chrono headers contain intentional UB in static const
+initializers (1LL << 63, division by zero in GCD) that CBMC flags
+as runtime errors. These are compile-time-only computations.

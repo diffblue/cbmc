@@ -1,0 +1,9 @@
+CORE
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Lambda in unevaluated context (decltype): using F = decltype([]{});

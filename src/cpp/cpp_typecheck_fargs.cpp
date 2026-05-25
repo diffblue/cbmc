@@ -46,8 +46,9 @@ bool cpp_typecheck_fargst::match(
   if(parameters.size()>ops.size())
   {
     // Check for default values.
-    ops.reserve(parameters.size());
-
+    // Don't push the actual default value expressions into ops —
+    // they may contain unresolved template parameters. Just verify
+    // that default values exist for the extra parameters.
     for(std::size_t i=ops.size(); i<parameters.size(); i++)
     {
       const exprt &default_value=
@@ -55,8 +56,6 @@ bool cpp_typecheck_fargst::match(
 
       if(default_value.is_nil())
         return false;
-
-      ops.push_back(default_value);
     }
   }
   else if(parameters.size()<ops.size())
@@ -69,6 +68,8 @@ bool cpp_typecheck_fargst::match(
   exprt::operandst::iterator it=ops.begin();
   for(const auto &parameter : parameters)
   {
+    if(it == ops.end())
+      break; // remaining parameters have default values
     // read
     // http://publib.boulder.ibm.com/infocenter/comphelp/v8v101/topic/
     //   com.ibm.xlcpp8a.doc/language/ref/implicit_conversion_sequences.htm
@@ -79,7 +80,6 @@ bool cpp_typecheck_fargst::match(
     // * User-defined conversion sequences
     // * Ellipsis conversion sequences
 
-    DATA_INVARIANT(it != ops.end(), "arguments and parameters must match");
     const exprt &operand=*it;
     typet type=parameter.type();
 
@@ -126,11 +126,16 @@ bool cpp_typecheck_fargst::match(
     {
       distance += rank;
     }
+    else if(
+      operand.id() == ID_initializer_list && type.id() == ID_struct_tag &&
+      id2string(to_struct_tag_type(type).get_identifier())
+          .find("tag-initializer_list<") != std::string::npos)
+    {
+      // Brace-init-list to std::initializer_list<T> conversion
+      distance += 1;
+    }
     else
     {
-      #if 0
-      std::cout << "NOT OK\n";
-      #endif
       return false; // no conversion possible
     }
 

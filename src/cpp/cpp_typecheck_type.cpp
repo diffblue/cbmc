@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/mathematical_types.h>
 #include <util/simplify_expr.h>
 #include <util/source_location.h>
+#include <util/symbol_table_base.h>
 
 #include <ansi-c/c_qualifiers.h>
 #include <ansi-c/merged_type.h>
@@ -24,8 +25,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 void cpp_typecheckt::typecheck_type(typet &type)
 {
-  PRECONDITION(!type.id().empty());
-  PRECONDITION(type.is_not_nil());
+  // GCC 16+ headers may produce types with empty IDs from
+  // constructs CBMC's parser doesn't fully handle (e.g.,
+  // nested requires clauses). Skip rather than crash.
+  if(type.id().empty() || type.is_nil())
+    return;
 
   try
   {
@@ -44,6 +48,42 @@ void cpp_typecheckt::typecheck_type(typet &type)
     error().source_location=type.source_location();
     error() << err << eom;
     throw 0;
+  }
+
+  if(type.id() == ID_template_parameter_symbol_type)
+  {
+    // Per [temp.arg]/2: if this template parameter is bound
+    // in the enclosing template_map, resolve it to the bound type.
+    // Per [temp.arg]/2: if this template parameter is bound
+    // in the enclosing template_map, resolve it to the bound type.
+    {
+      typet resolved = type;
+      template_map.apply(resolved);
+      if(resolved.id() != ID_template_parameter_symbol_type)
+      {
+        type = resolved;
+        return;
+      }
+    }
+    const irep_idt &id =
+      to_template_parameter_symbol_type(type).get_identifier();
+    const symbolt *ttp_sym = symbol_table.lookup(id);
+    if(ttp_sym && ttp_sym->type.get_bool(ID_is_template))
+    {
+      std::string bn = id2string(ttp_sym->base_name);
+      if(bn.substr(0, 9) == "template.")
+        bn = bn.substr(9);
+      cpp_namet cpp_name{bn};
+      type = static_cast<typet &>(static_cast<irept &>(cpp_name));
+      // Fall through to cpp_name handler
+    }
+    else if(ttp_sym && ttp_sym->is_type)
+    {
+      type = ttp_sym->type;
+      return;
+    }
+    else
+      return;
   }
 
   if(type.id()==ID_cpp_name)
@@ -98,6 +138,22 @@ void cpp_typecheckt::typecheck_type(typet &type)
     // the pointer/reference might have a qualifier,
     // but do subtype first
     typecheck_type(to_pointer_type(type).base_type());
+
+    // C++11 reference collapsing: if this is a reference/rvalue reference
+    // and the base type is also a reference, collapse them.
+    if(
+      type.get_bool(ID_C_reference) &&
+      to_pointer_type(type).base_type().id() == ID_pointer &&
+      to_pointer_type(type).base_type().get_bool(ID_C_reference))
+    {
+      // The result is an lvalue reference unless both are rvalue references
+      bool both_rvalue =
+        type.get_bool(ID_C_rvalue_reference) &&
+        to_pointer_type(type).base_type().get_bool(ID_C_rvalue_reference);
+      type = to_pointer_type(type).base_type();
+      if(!both_rvalue)
+        type.remove(ID_C_rvalue_reference);
+    }
 
     // Check if it is a pointer-to-member
     if(type.find(ID_to_member).is_not_nil())
@@ -174,6 +230,10 @@ void cpp_typecheckt::typecheck_type(typet &type)
     for(auto &param : parameters)
     {
       typecheck_type(param.type());
+
+      // C/C++ function parameters of function or array type decay to
+      // pointer type (C99 6.7.5.3, C++11 [dcl.fct] p5).
+      adjust_function_parameter(param.type());
 
       // see if there is a default value
       if(param.has_default_value())
@@ -257,17 +317,119 @@ void cpp_typecheckt::typecheck_type(typet &type)
   }
   else if(type.id()==ID_decltype)
   {
+    // C++14: decltype(auto) — deduced from initializer, handled
+    // during declarator conversion (like auto).
+    if(type.get_bool("#auto"))
+      return;
+
     exprt e=static_cast<const exprt &>(type.find(ID_expr_arg));
     typecheck_expr(e);
 
     if(e.type().id() == ID_c_bit_field)
       type = to_c_bit_field_type(e.type()).underlying_type();
+    else if(
+      e.id() == ID_dereference && e.get_bool(ID_C_implicit) &&
+      e.operands().size() == 1)
+    {
+      // The expression was implicitly dereferenced from a reference type.
+      // decltype preserves the reference: decltype(f()) is T& if f returns T&.
+      type = e.operands().front().type();
+    }
     else
       type = e.type();
+
+    // If the expression is a lambda (address_of a function symbol),
+    // store the lambda address so that default-initialization of
+    // variables of this type can point to the lambda function.
+    if(
+      e.id() == ID_address_of &&
+      to_address_of_expr(e).object().id() == ID_symbol)
+    {
+      type.set("#lambda_initializer", e);
+    }
   }
   else if(type.id()==ID_unassigned)
   {
     // ignore, for template parameter guessing
+  }
+  else if(
+    type.id() == ID_remove_cv || type.id() == ID_remove_reference ||
+    type.id() == ID_remove_cvref || type.id() == ID_remove_pointer ||
+    type.id() == ID_remove_extent || type.id() == ID_remove_all_extents ||
+    type.id() == ID_add_lvalue_reference ||
+    type.id() == ID_add_rvalue_reference || type.id() == ID_add_pointer)
+  {
+    typet tmp_type = static_cast<const typet &>(type.find(ID_type_arg));
+    typecheck_type(tmp_type);
+
+    if(type.id() == ID_remove_cv || type.id() == ID_remove_cvref)
+    {
+      tmp_type.remove(ID_C_constant);
+      tmp_type.remove(ID_C_volatile);
+    }
+
+    if(type.id() == ID_remove_reference || type.id() == ID_remove_cvref)
+    {
+      if(
+        tmp_type.id() == ID_pointer &&
+        (tmp_type.get_bool(ID_C_reference) ||
+         tmp_type.get_bool(ID_C_rvalue_reference)))
+      {
+        tmp_type = to_pointer_type(tmp_type).base_type();
+      }
+    }
+
+    if(type.id() == ID_remove_pointer)
+    {
+      if(
+        tmp_type.id() == ID_pointer && !tmp_type.get_bool(ID_C_reference) &&
+        !tmp_type.get_bool(ID_C_rvalue_reference))
+      {
+        tmp_type = to_pointer_type(tmp_type).base_type();
+      }
+    }
+
+    if(type.id() == ID_remove_extent || type.id() == ID_remove_all_extents)
+    {
+      if(tmp_type.id() == ID_array)
+      {
+        tmp_type = to_array_type(tmp_type).element_type();
+        // remove_all_extents: keep stripping array layers
+        if(type.id() == ID_remove_all_extents)
+        {
+          while(tmp_type.id() == ID_array)
+            tmp_type = to_array_type(tmp_type).element_type();
+        }
+      }
+    }
+
+    if(type.id() == ID_add_lvalue_reference)
+    {
+      // void stays void; otherwise add lvalue reference
+      if(tmp_type.id() != ID_empty)
+        tmp_type = ::reference_type(tmp_type);
+    }
+
+    if(type.id() == ID_add_rvalue_reference)
+    {
+      // void stays void; lvalue ref stays lvalue ref (ref collapsing)
+      if(tmp_type.id() != ID_empty && !is_reference(tmp_type))
+      {
+        pointer_typet rref = pointer_type(tmp_type);
+        rref.set(ID_C_rvalue_reference, true);
+        tmp_type = std::move(rref);
+      }
+    }
+
+    if(type.id() == ID_add_pointer)
+    {
+      // add_pointer<T&> = T*, add_pointer<T> = T*
+      if(is_reference(tmp_type) || is_rvalue_reference(tmp_type))
+        tmp_type = to_pointer_type(tmp_type).base_type();
+      tmp_type = pointer_type(tmp_type);
+    }
+
+    type = tmp_type;
   }
   else if(type.id()==ID_template_class_instance)
   {
@@ -302,6 +464,25 @@ void cpp_typecheckt::typecheck_type(typet &type)
   else if(type.id() == ID_complex)
   {
     // already done
+  }
+  else if(type.id() == ID_msc_underlying_type)
+  {
+    typet &type_arg = static_cast<typet &>(type.add(ID_type_arg));
+    typecheck_type(type_arg);
+    if(type_arg.id() == ID_c_enum_tag)
+    {
+      type = follow_tag(to_c_enum_tag_type(type_arg)).underlying_type();
+    }
+    else
+    {
+      // conservatively return int
+      type = signed_int_type();
+    }
+  }
+  else if(type.id() == ID_auto)
+  {
+    // C++11/14 auto type: leave as-is for deduction later.
+    // For non-type template parameters, default to signed int.
   }
   else
   {

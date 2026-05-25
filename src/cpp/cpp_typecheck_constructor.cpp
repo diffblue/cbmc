@@ -100,8 +100,8 @@ static void copy_array(
   member.copy_to_operands(cpp_namet(arg_name, source_location).as_expr());
 
   side_effect_expr_assignt assign(
-    index_exprt(array.as_expr(), constant),
-    index_exprt(member, constant),
+    binary_exprt(array.as_expr(), ID_index, constant, typet()),
+    binary_exprt(member, ID_index, constant, typet()),
     typet(),
     source_location);
 
@@ -184,10 +184,6 @@ void cpp_typecheckt::default_cpctor(
   irept &initializers=decl0.add(ID_member_initializers);
   initializers.id(ID_member_initializers);
 
-  cpp_declaratort &declarator =
-    static_cast<cpp_declaratort &>(to_multi_ary_expr(cpctor).op0());
-  exprt &block=declarator.value();
-
   // First, we need to call the parent copy constructors
   for(const auto &b : to_struct_type(symbol.type).bases())
   {
@@ -196,7 +192,27 @@ void cpp_typecheckt::default_cpctor(
     const symbolt &parsymb = lookup(b.type());
 
     if(cpp_is_pod(parsymb.type))
-      copy_parent(source_location, parsymb.base_name, param_identifier, block);
+    {
+      // For POD bases, generate a direct assignment as an initializer
+      // so it runs before member copies (correct C++ init order).
+      exprt op0(
+        "explicit-typecast",
+        pointer_type(cpp_namet(parsymb.base_name, source_location).as_type()));
+      op0.copy_to_operands(exprt("cpp-this"));
+      op0.add_source_location() = source_location;
+
+      exprt op1(
+        "explicit-typecast",
+        pointer_type(cpp_namet(parsymb.base_name, source_location).as_type()));
+      op1.type().set(ID_C_reference, true);
+      to_pointer_type(op1.type()).base_type().set(ID_C_constant, true);
+      op1.get_sub().push_back(cpp_namet(param_identifier, source_location));
+      op1.add_source_location() = source_location;
+
+      code_frontend_assignt assign_code(dereference_exprt(op0), op1);
+      assign_code.add_source_location() = source_location;
+      initializers.move_to_sub(assign_code);
+    }
     else
     {
       irep_idt ctor_name=parsymb.base_name;
@@ -223,14 +239,20 @@ void cpp_typecheckt::default_cpctor(
     {
       const cpp_namet cppname(mem_c.get_base_name(), source_location);
 
-      const symbolt &virtual_table_symbol_type =
-        lookup(to_pointer_type(mem_c.type()).base_type().get(ID_identifier));
+      const symbolt *virtual_table_symbol_type;
+      if(lookup(
+           to_pointer_type(mem_c.type()).base_type().get(ID_identifier),
+           virtual_table_symbol_type))
+        continue;
 
-      const symbolt &virtual_table_symbol_var = lookup(
-        id2string(virtual_table_symbol_type.name) + "@" +
-        id2string(symbol.name));
+      const symbolt *virtual_table_symbol_var;
+      if(lookup(
+           id2string(virtual_table_symbol_type->name) + "@" +
+             id2string(symbol.name),
+           virtual_table_symbol_var))
+        continue;
 
-      exprt var=virtual_table_symbol_var.symbol_expr();
+      exprt var = virtual_table_symbol_var->symbol_expr();
       address_of_exprt address(var);
       CHECK_RETURN(address.type() == mem_c.type());
 
@@ -363,6 +385,30 @@ void cpp_typecheckt::default_assignop_value(
 
     const symbolt &symb = lookup(b.type());
 
+    // Check that the base class's copy assignment operator is accessible
+    // from the derived class.
+    const struct_typet &base_struct = to_struct_type(symb.type);
+    cpp_scopet *saved_scope = cpp_scopes.current_scope_ptr;
+    cpp_scopes.current_scope_ptr = &cpp_scopes.get_scope(symbol.name);
+    for(const auto &comp : base_struct.components())
+    {
+      if(
+        comp.get_base_name() == "operator=" && !comp.get_bool(ID_is_static) &&
+        !comp.get_bool(ID_from_base) && comp.type().id() == ID_code)
+      {
+        if(check_component_access(comp, base_struct))
+        {
+          cpp_scopes.current_scope_ptr = saved_scope;
+          error().source_location = source_location;
+          error() << "base class '" << symb.base_name
+                  << "' has inaccessible copy assignment operator" << eom;
+          throw 0;
+        }
+        break;
+      }
+    }
+    cpp_scopes.current_scope_ptr = saved_scope;
+
     copy_parent(source_location, symb.base_name, arg_name, block);
   }
 
@@ -392,7 +438,7 @@ void cpp_typecheckt::default_assignop_value(
       }
 
       const auto size = numeric_cast<mp_integer>(size_expr);
-      CHECK_RETURN(!size.has_value());
+      CHECK_RETURN(size.has_value());
       CHECK_RETURN(*size >= 0);
 
       for(mp_integer i = 0; i < *size; ++i)
@@ -417,10 +463,12 @@ void cpp_typecheckt::default_assignop_value(
 /// \param bases: the parents of the class
 /// \param components: the components of the class
 /// \param initializers: the constructor initializers
+/// \param class_identifier: the identifier of the class being constructed
 void cpp_typecheckt::check_member_initializers(
   const struct_typet::basest &bases,
   const struct_typet::componentst &components,
-  const irept &initializers)
+  const irept &initializers,
+  const irep_idt &class_identifier)
 {
   PRECONDITION(initializers.id() == ID_member_initializers);
 
@@ -464,6 +512,26 @@ void cpp_typecheckt::check_member_initializers(
 
     irep_idt base_name=member_name.get_base_name();
     bool ok=false;
+
+    // First check if it matches a direct base class by name.
+    // This handles the case where the base class name is not in scope
+    // during template instantiation (e.g., out-of-class constructor
+    // definition for a template class with a nested base class).
+    for(const auto &b : bases)
+    {
+      if(b.type().id() != ID_struct_tag)
+        continue;
+      const irep_idt &base_id = to_struct_tag_type(b.type()).get_identifier();
+      const symbolt &base_sym = lookup(base_id);
+      if(base_sym.base_name == base_name)
+      {
+        ok = true;
+        break;
+      }
+    }
+
+    if(ok)
+      continue;
 
     for(const auto &c : components)
     {
@@ -524,6 +592,54 @@ void cpp_typecheckt::check_member_initializers(
         }
         break;
       }
+
+      // Delegating constructor (C++11): the initializer names the
+      // class's own constructor
+      if(
+        !c.get_bool(ID_from_base) && !c.get_bool(ID_is_type) &&
+        !c.get_bool(ID_is_static) && c.type().id() == ID_code &&
+        to_code_type(c.type()).return_type().id() == ID_constructor)
+      {
+        ok = true;
+        break;
+      }
+    }
+
+    if(!ok)
+    {
+      // Try resolving as a type name
+      typet member_type = (typet &)initializer.find(ID_member);
+      try
+      {
+        typecheck_type(member_type);
+      }
+      catch(...)
+      {
+        member_type.make_nil();
+      }
+
+      if(member_type.id() == ID_struct_tag)
+      {
+        // Delegating constructor (C++11): the initializer names the
+        // class's own type.
+        if(
+          !class_identifier.empty() &&
+          to_struct_tag_type(member_type).get_identifier() == class_identifier)
+        {
+          ok = true;
+        }
+
+        for(const auto &b : bases)
+        {
+          if(
+            to_struct_tag_type(member_type).get_identifier() ==
+            to_struct_tag_type(b.type()).get_identifier())
+          {
+            ok = true;
+            break;
+          }
+        }
+      }
     }
 
     if(!ok)
@@ -550,6 +666,79 @@ void cpp_typecheckt::full_member_initialization(
     struct_union_type.components();
 
   PRECONDITION(initializers.id() == ID_member_initializers);
+
+  // Per [temp.variadic]/7: remove empty pack expansion
+  // expressions from member initializer arguments.
+  if(!template_map.pack_size_map.empty())
+  {
+    std::set<std::string> ep_names;
+    for(const auto &ps : template_map.pack_size_map)
+      if(ps.second == 0)
+      {
+        const std::string f = id2string(ps.first);
+        auto p = f.rfind("::");
+        ep_names.insert(p != std::string::npos ? f.substr(p + 2) : f);
+      }
+    if(!ep_names.empty())
+    {
+      std::function<bool(const irept &)> refs_empty_pack =
+        [&](const irept &n) -> bool
+      {
+        if(n.id() == ID_template_parameter_symbol_type)
+        {
+          const std::string f = id2string(n.get(ID_identifier));
+          auto p = f.rfind("::");
+          if(ep_names.count(p != std::string::npos ? f.substr(p + 2) : f))
+            return true;
+        }
+        if(n.id() == ID_name && ep_names.count(id2string(n.get(ID_identifier))))
+          return true;
+        for(const auto &s : n.get_sub())
+          if(refs_empty_pack(s))
+            return true;
+        for(const auto &ns : n.get_named_sub())
+          if(refs_empty_pack(ns.second))
+            return true;
+        return false;
+      };
+      for(auto &init : initializers.get_sub())
+      {
+        auto &subs = init.get_sub();
+        subs.erase(
+          std::remove_if(
+            subs.begin(),
+            subs.end(),
+            [&](const irept &s) { return refs_empty_pack(s); }),
+          subs.end());
+      }
+    }
+  }
+
+  // Delegating constructors (C++11) delegate to another constructor of the
+  // same class. No base class or member initialization should be added.
+  if(struct_union_type.id() == ID_struct)
+  {
+    for(const auto &initializer : initializers.get_sub())
+    {
+      const cpp_namet &member_name = to_cpp_name(initializer.find(ID_member));
+      if(!member_name.has_template_args())
+      {
+        irep_idt base_name = member_name.get_base_name();
+        for(const auto &c : to_struct_type(struct_union_type).components())
+        {
+          if(
+            c.get_base_name() == base_name && !c.get_bool(ID_from_base) &&
+            !c.get_bool(ID_is_type) && !c.get_bool(ID_is_static) &&
+            c.type().id() == ID_code &&
+            to_code_type(c.type()).return_type().id() == ID_constructor)
+          {
+            // The initializer names the class's own constructor.
+            return;
+          }
+        }
+      }
+    }
+  }
 
   irept final_initializers(ID_member_initializers);
 
@@ -632,6 +821,20 @@ void cpp_typecheckt::full_member_initialization(
         typet member_type=
           static_cast<const typet&>(initializer.find(ID_member));
 
+        // First try matching by base class name directly — this
+        // avoids type resolution failures during template instantiation
+        // when the base class name is not in scope.
+        {
+          irep_idt init_base_name =
+            to_cpp_name(initializer.find(ID_member)).get_base_name();
+          if(ctorsymb.base_name == init_base_name)
+          {
+            final_initializers.move_to_sub(initializer);
+            found = true;
+            break;
+          }
+        }
+
         typecheck_type(member_type);
 
         if(member_type.id() != ID_struct_tag)
@@ -678,14 +881,20 @@ void cpp_typecheckt::full_member_initialization(
     {
       const cpp_namet cppname(c.get_base_name(), c.source_location());
 
-      const symbolt &virtual_table_symbol_type =
-        lookup(to_pointer_type(c.type()).base_type().get(ID_identifier));
+      const symbolt *virtual_table_symbol_type;
+      if(lookup(
+           to_pointer_type(c.type()).base_type().get(ID_identifier),
+           virtual_table_symbol_type))
+        continue;
 
-      const symbolt &virtual_table_symbol_var  =
-        lookup(id2string(virtual_table_symbol_type.name) + "@" +
-            id2string(struct_union_type.get(ID_name)));
+      const symbolt *virtual_table_symbol_var;
+      if(lookup(
+           id2string(virtual_table_symbol_type->name) + "@" +
+             id2string(struct_union_type.get(ID_name)),
+           virtual_table_symbol_var))
+        continue;
 
-      exprt var=virtual_table_symbol_var.symbol_expr();
+      exprt var = virtual_table_symbol_var->symbol_expr();
       address_of_exprt address(var);
       CHECK_RETURN(address.type() == c.type());
 
@@ -732,14 +941,14 @@ void cpp_typecheckt::full_member_initialization(
     }
 
     // If the data member is a reference, it must be explicitly
-    // initialized
+    // initialized. In template classes, the default constructor
+    // is implicitly deleted when a member is a reference.
+    // Don't throw — just skip the default initialization.
     if(
       !found && c.type().id() == ID_pointer &&
       c.type().get_bool(ID_C_reference))
     {
-      error().source_location = c.source_location();
-      error() << "reference must be explicitly initialized" << eom;
-      throw 0;
+      continue;
     }
 
     // If the data member is not POD and is not explicitly initialized,
@@ -750,6 +959,19 @@ void cpp_typecheckt::full_member_initialization(
 
       codet mem_init(ID_member_initializer);
       mem_init.set(ID_member, cppname);
+      final_initializers.move_to_sub(mem_init);
+    }
+
+    // C++11: apply default member initializer if not explicitly initialized
+    if(!found && c.find(ID_C_default_value).is_not_nil())
+    {
+      const exprt &default_val =
+        static_cast<const exprt &>(c.find(ID_C_default_value));
+      cpp_namet cppname(mem_name);
+
+      codet mem_init(ID_member_initializer);
+      mem_init.set(ID_member, cppname);
+      mem_init.add_to_operands(default_val);
       final_initializers.move_to_sub(mem_init);
     }
   }
@@ -786,6 +1008,12 @@ bool cpp_typecheckt::find_cpctor(const symbolt &symbol) const
     const typet &parameter1_type=parameter1.type();
 
     if(!is_reference(parameter1_type))
+      continue;
+
+    // [class.copy] p2: A copy constructor has a first parameter of
+    // type X&, const X&, volatile X&, or const volatile X&.
+    // Rvalue references (X&&) are move constructors, not copy constructors.
+    if(is_rvalue_reference(parameter1_type))
       continue;
 
     if(

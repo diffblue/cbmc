@@ -1177,6 +1177,14 @@ bool configt::set(const cmdlinet &cmdline)
   if(cmdline.isset("no-library"))
     ansi_c.lib=configt::ansi_ct::libt::LIB_NONE;
 
+  if(cmdline.isset("stdlib"))
+  {
+    const std::string stdlib = cmdline.get_value("stdlib");
+    ansi_c.preprocessor_options.push_back("-stdlib=" + stdlib);
+    if(stdlib == "libc++")
+      ansi_c.preprocessor = ansi_ct::preprocessort::CLANG;
+  }
+
   if(cmdline.isset("little-endian"))
     ansi_c.endianness=configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN;
 
@@ -1252,6 +1260,38 @@ bool configt::set(const cmdlinet &cmdline)
 
   if(cmdline.isset("cpp11"))
     cpp.set_cpp11();
+
+  if(cmdline.isset("cpp14"))
+    cpp.set_cpp14();
+
+  if(cmdline.isset("cpp17"))
+    cpp.set_cpp17();
+
+  if(cmdline.isset("cpp20"))
+    cpp.set_cpp20();
+
+  if(cmdline.isset("cpp23"))
+    cpp.set_cpp23();
+
+  if(cmdline.isset("cpp26"))
+    cpp.set_cpp26();
+
+  // MSVC's STL requires at least C++14 (uses enable_if_t, etc.)
+  // Clang/libc++ also defaults to C++14+. Upgrade to C++14 for these
+  // preprocessors since their standard library headers won't parse
+  // in older modes. Only upgrade the default; respect explicit flags.
+  bool explicit_cpp_standard =
+    cmdline.isset("cpp98") || cmdline.isset("cpp03") ||
+    cmdline.isset("cpp11") || cmdline.isset("cpp14") ||
+    cmdline.isset("cpp17") || cmdline.isset("cpp20") ||
+    cmdline.isset("cpp23") || cmdline.isset("cpp26") || cmdline.isset("std");
+  if(
+    !explicit_cpp_standard && cpp.cpp_standard < cppt::cpp_standardt::CPP14 &&
+    (ansi_c.preprocessor == ansi_ct::preprocessort::VISUAL_STUDIO ||
+     ansi_c.preprocessor == ansi_ct::preprocessort::CLANG))
+  {
+    cpp.set_cpp14();
+  }
 
   // set the upper bound for argc
   if(os == "windows")

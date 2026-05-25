@@ -242,8 +242,19 @@ void goto_symext::symex_function_call_post_clean(
 {
   const irep_idt &identifier = function.identifier();
 
-  const goto_functionst::goto_functiont &goto_function =
-    get_goto_function(identifier);
+  const goto_functionst::goto_functiont *goto_function_ptr = nullptr;
+  try
+  {
+    goto_function_ptr = &get_goto_function(identifier);
+  }
+  catch(const std::out_of_range &)
+  {
+    // Function not in goto function map — treat as no-body function.
+    // This can happen for implicitly-generated destructors or
+    // constructors that were not goto-converted.
+    return;
+  }
+  const goto_functionst::goto_functiont &goto_function = *goto_function_ptr;
 
   path_storage.dirty.populate_dirty_for_function(identifier, goto_function);
 

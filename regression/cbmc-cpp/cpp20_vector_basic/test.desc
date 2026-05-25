@@ -1,0 +1,7 @@
+CORE
+main.cpp
+--cpp20 --unwind 5 --no-unwinding-assertions
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--

@@ -28,8 +28,12 @@ public:
   // this maps template parameters to their instantiated value
   typedef std::map<irep_idt, typet> type_mapt;
   typedef std::map<irep_idt, exprt> expr_mapt;
+  typedef std::map<irep_idt, std::size_t> pack_size_mapt;
+  typedef std::map<irep_idt, std::vector<typet>> pack_args_mapt;
   type_mapt type_map;
   expr_mapt expr_map;
+  pack_size_mapt pack_size_map;
+  pack_args_mapt pack_args_map;
 
   void apply(exprt &dest) const;
   void apply(typet &dest) const;
@@ -38,11 +42,18 @@ public:
   {
     type_map.swap(template_map.type_map);
     expr_map.swap(template_map.expr_map);
+    pack_size_map.swap(template_map.pack_size_map);
+    pack_args_map.swap(template_map.pack_args_map);
   }
 
   exprt lookup(const irep_idt &identifier) const;
   typet lookup_type(const irep_idt &identifier) const;
   exprt lookup_expr(const irep_idt &identifier) const;
+
+  /// Look up a template parameter by its base name suffix (after the last
+  /// "::"). This handles the case where a template parameter was registered
+  /// under a different scope prefix (e.g., forward declaration vs definition).
+  exprt lookup_by_suffix(const std::string &suffix) const;
 
   void print(std::ostream &out) const;
 
@@ -50,6 +61,8 @@ public:
   {
     type_map.clear();
     expr_map.clear();
+    pack_size_map.clear();
+    pack_args_map.clear();
   }
 
   void set(

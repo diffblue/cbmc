@@ -10,10 +10,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// C++ Language Type Checking
 
 #include "cpp_typecheck.h"
-
-#include <set>
-
 #include "cpp_typecheck_fargs.h"
+
+#include <algorithm>
+#include <set>
 
 void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
 {
@@ -26,13 +26,86 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
 
   for(auto &base : bases_irep)
   {
-    const cpp_namet &name = to_cpp_name(base.find(ID_name));
+    cpp_namet &name = static_cast<cpp_namet &>(base.add(ID_name));
 
-    exprt base_symbol_expr=
-      resolve(
-        name,
-        cpp_typecheck_resolvet::wantt::TYPE,
-        cpp_typecheck_fargst());
+    // Apply template_map to substitute template parameters in the
+    // base class template arguments (e.g., _Tp in integral_constant<bool,
+    // noexcept(declval<_Tp>().~_Tp())>). Only apply when both type_map
+    // and expr_map are non-empty (indicating a partial specialization
+    // with both type and non-type parameters).
+    if(!template_map.type_map.empty())
+    {
+      // Check if any template arg contains a template parameter
+      // from the current type_map before applying substitution.
+      bool has_param = false;
+      for(const auto &sub : name.get_sub())
+      {
+        if(sub.id() != ID_template_args)
+          continue;
+        const auto &args = sub.find(ID_arguments).get_sub();
+        for(const auto &arg : args)
+        {
+          // Check recursively for cpp_name nodes that match type_map
+          std::function<bool(const irept &)> contains_param =
+            [&](const irept &node) -> bool
+          {
+            if(node.id() == ID_name)
+            {
+              irep_idt id = node.get(ID_identifier);
+              for(const auto &entry : template_map.type_map)
+              {
+                const std::string &key = id2string(entry.first);
+                auto p = key.rfind("::");
+                std::string suffix =
+                  p != std::string::npos ? key.substr(p + 2) : key;
+                if(suffix == id2string(id))
+                  return true;
+              }
+            }
+            for(const auto &s : node.get_sub())
+              if(contains_param(s))
+                return true;
+            for(const auto &n : node.get_named_sub())
+              if(contains_param(n.second))
+                return true;
+            return false;
+          };
+          if(contains_param(arg))
+          {
+            has_param = true;
+            break;
+          }
+        }
+        if(has_param)
+          break;
+      }
+      if(has_param)
+      {
+        for(auto &sub : name.get_sub())
+        {
+          if(sub.id() == ID_template_args)
+          {
+            irept::subt &args = sub.add(ID_arguments).get_sub();
+            for(auto &arg : args)
+              template_map.apply(static_cast<exprt &>(arg));
+          }
+        }
+      }
+    }
+
+    // C++11: decltype(expr) as base specifier
+    exprt base_symbol_expr;
+    if(name.get_sub().size() == 1 && name.get_sub().front().id() == ID_decltype)
+    {
+      typet t = static_cast<const typet &>(name.get_sub().front());
+      typecheck_type(t);
+      base_symbol_expr = type_exprt(t);
+    }
+    else
+    {
+      base_symbol_expr = resolve(
+        name, cpp_typecheck_resolvet::wantt::TYPE, cpp_typecheck_fargst());
+    }
 
     if(base_symbol_expr.id()!=ID_type)
     {
@@ -46,9 +119,10 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
 
     if(base_symbol_expr.type().id() != ID_struct_tag)
     {
-      error().source_location=name.source_location();
-      error() << "expected type symbol as struct/class base" << eom;
-      throw 0;
+      // Base type resolution failed (e.g., template instantiation
+      // failed in system headers). Remove this base and continue.
+      base = get_nil_irep();
+      continue;
     }
 
     const symbolt &base_symbol =
@@ -56,17 +130,14 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
 
     if(base_symbol.type.id() != ID_struct)
     {
-      error().source_location=name.source_location();
-      error() << "expected struct or class as base, but got '"
-              << to_string(base_symbol.type) << "'" << eom;
-      throw 0;
+      base = get_nil_irep();
+      continue;
     }
 
     if(to_struct_type(base_symbol.type).is_incomplete())
     {
-      error().source_location=name.source_location();
-      error() << "base type is incomplete" << eom;
-      throw 0;
+      base = get_nil_irep();
+      continue;
     }
 
     bool virtual_base = base.get_bool(ID_virtual);
@@ -98,6 +169,14 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
       vbases,
       virtual_base);
   }
+
+  // Remove bases that were invalidated (set to nil) during validation.
+  bases_irep.erase(
+    std::remove_if(
+      bases_irep.begin(),
+      bases_irep.end(),
+      [](const irept &b) { return b.is_nil(); }),
+    bases_irep.end());
 
   if(!vbases.empty())
   {
@@ -145,6 +224,10 @@ void cpp_typecheckt::add_base_components(
   // look at the the parents of the base type
   for(const auto &b : from.bases())
   {
+    // Skip bases with invalid types from failed template instantiations.
+    if(static_cast<const exprt &>(b).type().id() != ID_struct_tag)
+      continue;
+
     irep_idt sub_access = b.get(ID_access);
 
     if(access==ID_private)
@@ -153,6 +236,9 @@ void cpp_typecheckt::add_base_components(
       sub_access=ID_protected;
 
     const symbolt &symb = lookup(b.type());
+
+    if(symb.type.id() != ID_struct)
+      continue;
 
     const bool is_virtual_base = b.get_bool(ID_virtual);
 

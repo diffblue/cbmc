@@ -45,17 +45,32 @@ cpp_idt &cpp_scopest::put_into_scope(
     }
   }
 
-  // should go away, and be replaced by the 'tag only declaration' rule
   if(is_friend)
   {
-    cpp_save_scopet saved_scope(*this);
-    go_to(scope);
+    if(scope.is_class())
+    {
+      // Qualified friend function (e.g., friend ... C::f(...)): the
+      // symbol is a member of the target class.  Use a hidden name to
+      // avoid ambiguity with the actual class component during name
+      // resolution; the id_map entry (from the block scope above)
+      // suffices for access checking.
+      if(id_map.find(symbol.name) == id_map.end())
+      {
+        cpp_idt &id = scope.insert(
+          irep_idt(std::string("$friend:") + id2string(symbol.base_name)));
+        id.identifier = symbol.name;
+        id.id_class = cpp_idt::id_classt::SYMBOL;
+        id_map[symbol.name] = &id;
+        return id;
+      }
+      return *id_map[symbol.name];
+    }
 
-    cpp_idt &id=current_scope().insert(symbol.base_name);
-    id.identifier=symbol.name;
+    cpp_idt &id = scope.insert(symbol.base_name);
+    id.identifier = symbol.name;
     id.id_class = cpp_idt::id_classt::SYMBOL;
-    if(id_map.find(symbol.name)==id_map.end())
-      id_map[symbol.name]=&id;
+    if(id_map.find(symbol.name) == id_map.end())
+      id_map[symbol.name] = &id;
     return id;
   }
   else

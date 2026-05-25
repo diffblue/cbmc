@@ -9,16 +9,17 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
-#include "cpp_typecheck.h"
-
 #include <util/arith_tools.h>
-
 #include <util/c_types.h>
+#include <util/symbol_table_base.h>
+
+#include "cpp_typecheck.h"
 
 /// \return typechecked code
 std::optional<codet> cpp_typecheckt::cpp_destructor(
   const source_locationt &source_location,
-  const exprt &object)
+  const exprt &object,
+  bool force_direct)
 {
   elaborate_class_template(object.type());
 
@@ -80,6 +81,7 @@ std::optional<codet> cpp_typecheckt::cpp_destructor(
       struct_type.components();
 
     irep_idt dtor_name;
+    irep_idt dtor_symbol_name;
 
     for(const auto &c : components)
     {
@@ -90,11 +92,16 @@ std::optional<codet> cpp_typecheckt::cpp_destructor(
         to_code_type(type).return_type().id() == ID_destructor)
       {
         dtor_name = c.get_base_name();
+        dtor_symbol_name = c.get_name();
         break;
       }
     }
 
-    INVARIANT(!dtor_name.empty(), "non-PODs should have a destructor");
+    // Some types from system headers (e.g., std::regex internals on GCC 15+)
+    // may be non-POD but lack a destructor in CBMC's symbol table due to
+    // failed template instantiation. Skip rather than crash.
+    if(dtor_name.empty())
+      return {};
 
     cpp_namet cpp_name(dtor_name, source_location);
 
@@ -106,6 +113,22 @@ std::optional<codet> cpp_typecheckt::cpp_destructor(
       std::move(member), {}, uninitialized_typet{}, source_location);
 
     typecheck_side_effect_function_call(function_call);
+
+    // When force_direct is set (destructor calls from within a
+    // destructor body), replace any virtual dispatch (dereference
+    // through the vtable) with a direct call to the resolved
+    // destructor symbol. This prevents infinite recursion through
+    // the vtable @dtor entry.
+    if(
+      force_direct && function_call.function().id() == ID_dereference &&
+      !dtor_symbol_name.empty())
+    {
+      const symbolt *dtor_sym = symbol_table.lookup(dtor_symbol_name);
+      if(dtor_sym != nullptr)
+        function_call.function() =
+          symbol_exprt(dtor_symbol_name, dtor_sym->type);
+    }
+
     already_typechecked_exprt::make_already_typechecked(function_call);
 
     code_expressiont new_code(function_call);

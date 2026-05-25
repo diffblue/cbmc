@@ -101,6 +101,13 @@ protected:
     const typet &type,
     bool force_constant);
 
+  /// Whether the empty braced-init-list `{}` value-initializes a scalar
+  /// at the current language level.  Per C [dcl.init]/11 this requires
+  /// C23+; per C++ [dcl.init.list]/3.10 (C++11+) this is permitted.
+  /// Default implementation covers the C side; cpp_typecheckt overrides
+  /// for C++.
+  virtual bool empty_brace_value_initializes_scalar() const;
+
   virtual exprt::operandst::const_iterator do_designated_initializer(
     exprt &result,
     designatort &designator,
@@ -241,6 +248,7 @@ protected:
   typecheck_shadow_memory_builtin(const side_effect_expr_function_callt &expr);
   virtual exprt
   typecheck_shuffle_vector(const side_effect_expr_function_callt &expr);
+  exprt typecheck_vector_reduce(const side_effect_expr_function_callt &expr);
   void disallow_subexpr_by_id(
     const exprt &,
     const irep_idt &,
@@ -300,6 +308,9 @@ protected:
   void add_parameters_to_symbol_table(symbolt &symbol);
 
   virtual void do_initializer(symbolt &symbol);
+  virtual void elaborate_class_template(const typet &)
+  {
+  }
 
   static bool is_numeric_type(const typet &src)
   {

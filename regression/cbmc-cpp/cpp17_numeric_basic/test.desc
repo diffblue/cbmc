@@ -1,0 +1,9 @@
+CORE
+main.cpp
+--cpp17 --unwind 10 --no-unwinding-assertions
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+std::accumulate in C++17 mode. KNOWNBUG due to validation issues.

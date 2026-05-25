@@ -24,6 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/rational_tools.h>
 #include <util/simplify_expr.h>
 #include <util/symbol.h>
+#include <util/symbol_table_base.h>
 
 #include <langapi/language_util.h>
 
@@ -518,7 +519,75 @@ void goto_convertt::cpp_new_initializer(
   {
     if(rhs.get_statement() == "cpp_new[]")
     {
-      // build loop
+      // Per [expr.new]/24: for an array new-expression with N elements,
+      // the constructor is invoked on each element in turn.  Expand the
+      // per-element initializer into a loop over the N elements:
+      //
+      //   size_t __i = 0;
+      // top: if(__i >= count) goto done;
+      //   <initializer on *(lhs + __i)>
+      //   __i = __i + 1;
+      //   goto top;
+      // done:
+      const pointer_typet &ptr_type = to_pointer_type(rhs.type());
+      const typet &element_type = ptr_type.base_type();
+
+      exprt count = static_cast<const exprt &>(rhs.find(ID_size));
+      if(count.is_nil())
+        UNREACHABLE;
+
+      const typet count_type = count.type();
+
+      const symbolt &index_symbol = get_fresh_aux_symbol(
+        count_type,
+        tmp_symbol_prefix,
+        "new_array_index",
+        rhs.find_source_location(),
+        ID_cpp,
+        symbol_table);
+      const symbol_exprt index_expr = index_symbol.symbol_expr();
+
+      dest.add(goto_programt::make_decl(index_expr, rhs.source_location()));
+      dest.add(goto_programt::make_assignment(
+        index_expr, from_integer(0, count_type), rhs.source_location()));
+
+      // Pre-create the targets of the loop
+      goto_programt loop;
+      goto_programt::targett loop_top =
+        loop.add(goto_programt::make_skip(rhs.source_location()));
+
+      // condition: if(__i >= count) goto done
+      auto cond_goto = goto_programt::make_incomplete_goto(
+        binary_relation_exprt{index_expr, ID_ge, count}, rhs.source_location());
+      goto_programt::targett cond = loop.add(std::move(cond_goto));
+
+      // body: <initializer on *(lhs + __i)>
+      const plus_exprt element_address{
+        typecast_exprt::conditional_cast(lhs, pointer_type(element_type)),
+        index_expr};
+      const dereference_exprt element_deref{element_address, element_type};
+
+      exprt per_element = initializer;
+      replace_new_object(element_deref, per_element);
+      if(per_element.id() == ID_code)
+        convert(to_code(per_element), loop, ID_cpp);
+
+      // ++__i; goto loop_top
+      loop.add(goto_programt::make_assignment(
+        index_expr,
+        plus_exprt{index_expr, from_integer(1, count_type)},
+        rhs.source_location()));
+      loop.add(goto_programt::make_goto(
+        loop_top, true_exprt{}, rhs.source_location()));
+
+      goto_programt::targett loop_end =
+        loop.add(goto_programt::make_skip(rhs.source_location()));
+
+      // now rewire the conditional jump to loop_end
+      cond->complete_goto(loop_end);
+
+      dest.destructive_append(loop);
+      dest.add(goto_programt::make_dead(index_expr, rhs.source_location()));
     }
     else if(rhs.get_statement() == ID_cpp_new)
     {
@@ -527,7 +596,8 @@ void goto_convertt::cpp_new_initializer(
         lhs, to_pointer_type(rhs.type()).base_type());
 
       replace_new_object(deref_lhs, initializer);
-      convert(to_code(initializer), dest, ID_cpp);
+      if(initializer.id() == ID_code)
+        convert(to_code(initializer), dest, ID_cpp);
     }
     else
       UNREACHABLE;
@@ -834,9 +904,23 @@ void goto_convertt::do_function_call_symbol(
   const symbolt *symbol;
   if(ns.lookup(identifier, symbol))
   {
-    error().source_location = function.find_source_location();
-    error() << "function '" << identifier << "' not found" << eom;
-    throw 0;
+    // For C++ template instantiations, the function may not have been
+    // instantiated. Create a stub symbol with an empty body.
+    if(function.type().id() == ID_code)
+    {
+      symbolt new_symbol{identifier, function.type(), mode};
+      new_symbol.base_name = function.get(ID_C_base_name);
+      new_symbol.location = function.find_source_location();
+      new_symbol.type.set(ID_C_incomplete, true);
+      symbol_table.insert(std::move(new_symbol));
+      symbol = symbol_table.lookup(identifier);
+    }
+    else
+    {
+      error().source_location = function.find_source_location();
+      error() << "function '" << identifier << "' not found" << eom;
+      throw 0;
+    }
   }
 
   if(symbol->type.id() != ID_code)
@@ -867,6 +951,19 @@ void goto_convertt::do_function_call_symbol(
       lhs.is_not_nil() &&
       to_code_type(symbol->type).return_type().id() == ID_empty)
     {
+      function_call.lhs().make_nil();
+    }
+
+    // For constructor calls used as values (e.g., return Foo(args)),
+    // the lhs is the temporary object. Transform to:
+    // constructor(address_of(lhs), args) with nil lhs.
+    if(
+      lhs.is_not_nil() &&
+      to_code_type(symbol->type).return_type().id() == ID_constructor)
+    {
+      exprt this_arg = address_of_exprt(function_call.lhs());
+      function_call.arguments().insert(
+        function_call.arguments().begin(), std::move(this_arg));
       function_call.lhs().make_nil();
     }
 

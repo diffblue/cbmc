@@ -1,0 +1,10 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+Invariant violation: std::less<std::_V2::error_category>::~less
+destructor symbol not found. Triggered by <system_error> header
+on some g++ 13 header versions (Ubuntu 24.04 CI).

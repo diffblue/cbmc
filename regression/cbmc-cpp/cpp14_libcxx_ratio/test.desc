@@ -1,0 +1,12 @@
+CORE libcxx
+main.cpp
+--cpp14 --stdlib libc++
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^PARSING ERROR$
+libc++ std::ratio fails because the self-referential typedef
+(typedef ratio<num, den> type) triggers recursive instantiation
+that overwrites constexpr static member values. See
+cpp11_constexpr_self_referential_typedef for minimal reproducer.

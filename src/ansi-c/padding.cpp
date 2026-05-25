@@ -11,8 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "padding.h"
 
-#include <algorithm>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
@@ -20,7 +18,42 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 
+#include <algorithm>
+#include <set>
+
+// Recursion guard for `alignment`.  The public entry wraps a call
+// to `alignment_rec` with an initially empty set; `alignment_rec`
+// inserts the identifier of every ID_struct_tag / ID_union_tag /
+// ID_c_enum_tag it dereferences and refuses to recurse into a tag
+// it is already in the process of resolving.
+//
+// Why this matters: if the C/C++ front-end produces an ill-formed
+// type graph in which a struct appears to contain itself by value
+// (for example, after a failed template substitution leaves a
+// partially-resolved type behind), the naive recursion in
+// `alignment` blows the stack.  Hit during dog-fooding goto-cc on
+// `src/util/ref_expr_set.cpp` and `src/util/output_file.cpp`: a
+// front-end error cascade left `struct basic_string` with a
+// self-referential component, and `alignment` recursed until
+// SIGSEGV.  Per [basic.type]/1 a type is either complete or
+// incomplete; an incomplete type has no alignment, so returning 1
+// (the minimum alignment) for a cyclic tag is a safe
+// approximation.
+static mp_integer alignment_rec(
+  const typet &type,
+  const namespacet &ns,
+  std::set<irep_idt> &in_progress);
+
 mp_integer alignment(const typet &type, const namespacet &ns)
+{
+  std::set<irep_idt> in_progress;
+  return alignment_rec(type, ns, in_progress);
+}
+
+static mp_integer alignment_rec(
+  const typet &type,
+  const namespacet &ns,
+  std::set<irep_idt> &in_progress)
 {
   // we need to consider a number of different cases:
   // - alignment specified in the source, which will be recorded in
@@ -58,7 +91,7 @@ mp_integer alignment(const typet &type, const namespacet &ns)
   mp_integer result;
 
   if(type.id()==ID_array)
-    result = alignment(to_array_type(type).element_type(), ns);
+    result = alignment_rec(to_array_type(type).element_type(), ns, in_progress);
   else if(type.id()==ID_struct || type.id()==ID_union)
   {
     result=1;
@@ -66,7 +99,7 @@ mp_integer alignment(const typet &type, const namespacet &ns)
     // get the max
     // (should really be the smallest common denominator)
     for(const auto &c : to_struct_union_type(type).components())
-      result = std::max(result, alignment(c.type(), ns));
+      result = std::max(result, alignment_rec(c.type(), ns, in_progress));
   }
   else if(type.id()==ID_unsignedbv ||
           type.id()==ID_signedbv ||
@@ -78,17 +111,40 @@ mp_integer alignment(const typet &type, const namespacet &ns)
     result = *pointer_offset_size(type, ns);
   }
   else if(type.id()==ID_c_enum)
-    result = alignment(to_c_enum_type(type).underlying_type(), ns);
+    result =
+      alignment_rec(to_c_enum_type(type).underlying_type(), ns, in_progress);
   else if(type.id()==ID_c_enum_tag)
-    result=alignment(ns.follow_tag(to_c_enum_tag_type(type)), ns);
+  {
+    const irep_idt &id = to_c_enum_tag_type(type).get_identifier();
+    if(!in_progress.insert(id).second)
+      return 1; // cycle: conservative min alignment
+    result =
+      alignment_rec(ns.follow_tag(to_c_enum_tag_type(type)), ns, in_progress);
+    in_progress.erase(id);
+  }
   else if(type.id() == ID_struct_tag)
-    result = alignment(ns.follow_tag(to_struct_tag_type(type)), ns);
+  {
+    const irep_idt &id = to_struct_tag_type(type).get_identifier();
+    if(!in_progress.insert(id).second)
+      return 1; // cycle: conservative min alignment
+    result =
+      alignment_rec(ns.follow_tag(to_struct_tag_type(type)), ns, in_progress);
+    in_progress.erase(id);
+  }
   else if(type.id() == ID_union_tag)
-    result = alignment(ns.follow_tag(to_union_tag_type(type)), ns);
+  {
+    const irep_idt &id = to_union_tag_type(type).get_identifier();
+    if(!in_progress.insert(id).second)
+      return 1; // cycle: conservative min alignment
+    result =
+      alignment_rec(ns.follow_tag(to_union_tag_type(type)), ns, in_progress);
+    in_progress.erase(id);
+  }
   else if(type.id()==ID_c_bit_field)
   {
     // we align these according to the 'underlying type'
-    result = alignment(to_c_bit_field_type(type).underlying_type(), ns);
+    result = alignment_rec(
+      to_c_bit_field_type(type).underlying_type(), ns, in_progress);
   }
   else
     result=1;

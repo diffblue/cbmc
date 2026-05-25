@@ -1,0 +1,8 @@
+CORE
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+C++20 aggregate initialization with base class
