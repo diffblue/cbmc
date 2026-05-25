@@ -1685,6 +1685,137 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
           in_template_conversion = false;
         }
       }
+
+      // libstdc++ basic_string fallback: when both the regular and
+      // template constructor paths fail, recognise the
+      // char-array/char-pointer → basic_string<char> case and
+      // synthesise a call to the 4-arg
+      //   basic_string(const _CharT*, size_type, const _Alloc& = _Alloc())
+      // constructor (basic_string.h:619), which is *not* template-
+      // gated and is reliably present in the components list.  The
+      // 3-arg
+      //   basic_string(const _CharT*, const _Alloc& = _Alloc())
+      // constructor (basic_string.h:641) is the natural conversion
+      // path but is wrapped in a member template with a SFINAE
+      // guard `template<typename = _RequireAllocator<_Alloc>>` —
+      // CBMC's class elaboration fails to specialise the wrapper
+      // in some translation-unit states (notably after
+      // <bits/locale_classes.h> participates), and the constructor
+      // disappears from the components list.
+      //
+      // This mirrors the workaround in `implicit_typecast` for
+      // explicit casts; here we extend it to argument conversions
+      // and reference bindings so calls like
+      //   void f(const std::string&);  f("hello");
+      // succeed regardless of the missing converting constructor.
+      if(
+        id2string(to_struct_tag_type(to).get_identifier())
+          .find("tag-basic_string<") != std::string::npos)
+      {
+        const typet &src_t = expr.type();
+        bool src_is_char_array =
+          src_t.id() == ID_array &&
+          (to_array_type(src_t).element_type().id() == ID_signedbv ||
+           to_array_type(src_t).element_type().id() == ID_unsignedbv) &&
+          to_bitvector_type(to_array_type(src_t).element_type()).get_width() ==
+            config.ansi_c.char_width;
+        bool src_is_char_ptr =
+          src_t.id() == ID_pointer &&
+          (to_pointer_type(src_t).base_type().id() == ID_signedbv ||
+           to_pointer_type(src_t).base_type().id() == ID_unsignedbv) &&
+          to_bitvector_type(to_pointer_type(src_t).base_type()).get_width() ==
+            config.ansi_c.char_width;
+        if(src_is_char_array || src_is_char_ptr)
+        {
+          exprt char_ptr = expr;
+          if(src_is_char_array)
+          {
+            pointer_typet ptr_type =
+              pointer_type(to_array_type(src_t).element_type());
+            ptr_type.base_type().set(ID_C_constant, true);
+            char_ptr = typecast_exprt(
+              address_of_exprt(index_exprt(
+                expr,
+                from_integer(0, c_index_type()),
+                to_array_type(src_t).element_type())),
+              ptr_type);
+          }
+          // Determine the source string length: for a literal we
+          // can compute it exactly; otherwise leave it
+          // non-deterministic.
+          exprt length_expr;
+          if(
+            char_ptr.id() == ID_typecast &&
+            to_typecast_expr(char_ptr).op().id() == ID_address_of &&
+            to_address_of_expr(to_typecast_expr(char_ptr).op()).object().id() ==
+              ID_index &&
+            to_index_expr(
+              to_address_of_expr(to_typecast_expr(char_ptr).op()).object())
+                .array()
+                .id() == ID_string_constant)
+          {
+            const irep_idt &raw =
+              to_string_constant(
+                to_index_expr(
+                  to_address_of_expr(to_typecast_expr(char_ptr).op()).object())
+                  .array())
+                .value();
+            length_expr = from_integer(id2string(raw).size(), size_type());
+          }
+          else
+          {
+            length_expr =
+              side_effect_expr_nondett{size_type(), expr.source_location()};
+          }
+          // Find the 4-arg `basic_string(const _CharT*, size_type,
+          // const _Alloc& = _Alloc())` ctor in components.
+          for(const auto &component : struct_type_to.components())
+          {
+            if(component.get_bool(ID_from_base))
+              continue;
+            const typet &comp_type = component.type();
+            if(comp_type.id() != ID_code)
+              continue;
+            if(to_code_type(comp_type).return_type().id() != ID_constructor)
+              continue;
+            const auto &parameters = to_code_type(comp_type).parameters();
+            if(parameters.size() != 4)
+              continue;
+            const typet &p1 = parameters[1].type();
+            if(p1.id() != ID_pointer)
+              continue;
+            const typet &p1_base = to_pointer_type(p1).base_type();
+            if(p1_base.id() != ID_signedbv && p1_base.id() != ID_unsignedbv)
+              continue;
+            const typet &p2 = parameters[2].type();
+            if(p2.id() != ID_unsignedbv && p2.id() != ID_signedbv)
+              continue;
+            // Build the constructor call.
+            exprt func_symb = cpp_symbol_expr(lookup(component.get_name()));
+            func_symb.type() = comp_type;
+            already_typechecked_exprt::make_already_typechecked(func_symb);
+            side_effect_expr_function_callt ctor_expr(
+              std::move(func_symb),
+              {char_ptr, length_expr},
+              uninitialized_typet{},
+              expr.source_location());
+            try
+            {
+              typecheck_side_effect_function_call(ctor_expr);
+              if(ctor_expr.get(ID_statement) == ID_temporary_object)
+              {
+                new_expr.swap(ctor_expr);
+                return true;
+              }
+            }
+            catch(...)
+            {
+              // Fall through; conversion fails as before.
+            }
+            break;
+          }
+        }
+      }
     }
   }
 
