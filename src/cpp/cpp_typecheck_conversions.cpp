@@ -1509,6 +1509,22 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
     else
     {
       bool found = false;
+      // Per [over.match.best]: when multiple converting
+      // constructors are viable for a given source, pick the one
+      // with the best conversion rank.  Ambiguity is only reported
+      // when two or more candidates are *equally best*.  The
+      // straightforward `found = true; if(found) return false;`
+      // pattern below treats *any* second viable candidate as
+      // ambiguous, which incorrectly rejects calls like
+      // `power(2, size_t{})` on a class with overloaded
+      // `BigInt(int)` / `BigInt(unsigned)` / `BigInt(long)` /
+      // `BigInt(unsigned long)` constructors — the int argument
+      // matches `BigInt(int)` exactly and should win unambiguously.
+      // Track the best rank seen so far and the result expression
+      // for the best candidate; flag ambiguity only on a tie.
+      unsigned best_rank = 0;
+      exprt best_expr = nil_exprt{};
+      bool best_is_ambiguous = false;
       const auto &struct_type_to = follow_tag(to_struct_tag_type(to));
 
       for(const auto &component : struct_type_to.components())
@@ -1570,11 +1586,6 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
           exprt tmp_expr;
           if(standard_conversion_sequence(expr, arg1_type, tmp_expr, tmp_rank))
           {
-            // check if it's ambiguous
-            if(found)
-              return false;
-            found = true;
-
             if(expr.get_bool(ID_C_lvalue))
               tmp_expr.set(ID_C_lvalue, true);
 
@@ -1593,12 +1604,23 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
             typecheck_side_effect_function_call(ctor_expr);
             CHECK_RETURN(ctor_expr.get(ID_statement) == ID_temporary_object);
 
-            new_expr.swap(ctor_expr);
-
             if(struct_type_to.get_bool(ID_C_constant))
-              new_expr.type().set(ID_C_constant, true);
+              ctor_expr.type().set(ID_C_constant, true);
 
-            rank += tmp_rank;
+            // Track the best-ranked viable candidate per
+            // [over.match.best].  A strictly lower rank replaces
+            // the current best; an equal rank flags ambiguity.
+            if(!found || tmp_rank < best_rank)
+            {
+              found = true;
+              best_rank = tmp_rank;
+              best_expr = std::move(ctor_expr);
+              best_is_ambiguous = false;
+            }
+            else if(tmp_rank == best_rank)
+            {
+              best_is_ambiguous = true;
+            }
           }
         }
         else if(from.id() == ID_struct_tag && arg1_type.id() == ID_struct_tag)
@@ -1611,13 +1633,6 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
           tmp_rank = 0;
           if(standard_conversion_sequence(expr_pfrom, pto, expr_ptmp, tmp_rank))
           {
-            // check if it's ambiguous
-            if(found)
-              return false;
-            found = true;
-
-            rank += tmp_rank;
-
             // create temporary object
             dereference_exprt expr_deref(expr_ptmp);
             // [basic.lval] p1, [expr.static.cast] p3: if the original
@@ -1642,19 +1657,39 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
               expr.source_location());
             typecheck_side_effect_function_call(ctor_expr);
 
-            new_expr.swap(ctor_expr);
-
             INVARIANT(
-              new_expr.get(ID_statement) == ID_temporary_object,
+              ctor_expr.get(ID_statement) == ID_temporary_object,
               "statement ID");
 
             if(struct_type_to.get_bool(ID_C_constant))
-              new_expr.type().set(ID_C_constant, true);
+              ctor_expr.type().set(ID_C_constant, true);
+
+            // Track best candidate as above.
+            if(!found || tmp_rank < best_rank)
+            {
+              found = true;
+              best_rank = tmp_rank;
+              best_expr = std::move(ctor_expr);
+              best_is_ambiguous = false;
+            }
+            else if(tmp_rank == best_rank)
+            {
+              best_is_ambiguous = true;
+            }
           }
         }
       }
+      // [over.match.best]: ambiguity is only an error when two or
+      // more candidates are equally best.  If we found a unique
+      // best, commit to it.
+      if(found && best_is_ambiguous)
+        return false;
       if(found)
+      {
+        new_expr.swap(best_expr);
+        rank += best_rank;
         return true;
+      }
 
       // No non-template converting constructor found. Try template
       // constructors via the full constructor resolution path, but

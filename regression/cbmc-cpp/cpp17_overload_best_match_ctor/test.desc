@@ -1,0 +1,29 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+found no match for symbol 'power'
+--
+Regression for overload resolution among multiple converting
+constructors per [over.match.best].
+
+Previously cpp_typecheck_conversions::user_defined_conversion_sequence
+returned false on the first non-unique viable candidate, even
+when one candidate was strictly better-ranked.  That caused
+calls like
+
+    BigInt power(const BigInt&, const BigInt&);
+    power(2, size_t{});
+
+to be rejected with
+
+    found no match for symbol 'power'
+
+despite `BigInt(int)` being an exact match for the int argument
+and `BigInt(unsigned long)` being an exact match for the size_t
+argument.  Fixed by tracking the best rank seen so far and
+flagging ambiguity only on a tie at the best rank.
