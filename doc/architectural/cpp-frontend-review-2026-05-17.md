@@ -1396,3 +1396,146 @@ green at 675 / 0 / 83.  Dog-food: 15 OK_CLEAN / 22 OK_NOISY / 80 FAIL
 / 0 CRASH (up from session-start 12 / 25 / 80 / 0 — variadic
 pack-substitution fix moved 3 files from OK_NOISY to OK_CLEAN by
 eliminating the cascade caused by the pack-name corruption).
+
+
+## 2026-05-24 (continued) Path 2 trait intercept attempt — refined diagnosis
+
+### Approach attempted
+
+Implemented Path 2 (resolve-time trait interception) by adding two
+hooks:
+
+1. `try_intercept_trait` at the entry to `cpp_typecheck_resolvet::resolve`,
+   matching cpp_names with the shape `[std::]Trait<args>::value` and
+   short-circuiting them to `from_integer(value, bool_typet{})`.
+2. An alias-template intercept at the `apply_template_args`
+   default-argument evaluation site (around line 5187 in
+   `cpp_typecheck_resolve.cpp`), recognising
+   `_RequireAllocator<X>` / `_RequireInputIter<X>` /
+   `_RequireNotAllocator<X>` and synthesising the result type
+   directly from the first template argument.
+
+Both hooks were exercised correctly via tracing (`CBMC_TRAIT_TRACE`
+and `CBMC_DEFAULT_TRACE` env vars) and matched the expected
+patterns.  The hooks were correctly invoked — but did not fix the
+original missing-constructor symptom.
+
+### Diagnosis of why both hooks didn't help
+
+**Hook 1 — `__is_allocator<X>::value` never appears in resolve():**
+Tracing showed CBMC processes ~500 distinct trait cpp_names per
+dog-food file (`is_const`, `is_convertible`,
+`is_trivially_destructible`, `__and_`, `__or_`, …) but
+**zero** `__is_allocator` cpp_names.  That trait is never resolved
+through `cpp_typecheck_resolvet::resolve` in the failing TU.
+
+This refutes the previous review's hypothesis that
+`__is_allocator<_Alloc>::value` evaluation is the failure point.
+Instead the SFINAE wraps fail much earlier, before the inner
+`__is_allocator<...>::value` cpp_name is even visited.
+
+**Hook 2 — alias intercept fires but the ctor is still dropped:**
+Direct empirical test with a minimal reproducer
+(`#include <string>\n#include <bits/locale_classes.h>`) confirms
+the const_char ctor count for `basic_string<char>` drops from 2
+to 1 even when the alias intercept fires successfully on every
+`_RequireAllocator<_Alloc>` default-arg evaluation.
+
+Cause: `apply_template_args` is called during
+**conversion-time overload resolution**, not during
+**class-elaboration** member instantiation.  The 3-arg
+`basic_string(const char*, const Allocator& = Allocator())`
+constructor is dropped while `basic_string<char>`'s class members
+are being added to its components list — and that elaboration
+path bypasses `apply_template_args` entirely.
+
+### Reproducer pinned to a specific include
+
+A 3-line reproducer triggers the bug:
+
+```cpp
+#include <string>
+#include <bits/locale_classes.h>
+void f() { std::string s = "hello"; }
+```
+
+With this TU, `basic_string<char>`'s components list contains the
+4-arg `(const char*, size_type, allocator)` ctor but is missing
+the 3-arg `(const char*, allocator)` ctor.  Removing
+`<bits/locale_classes.h>` (or replacing it with `<iosfwd>`)
+restores the missing ctor.
+
+This narrows the problem from "dog-food TU vs simple TU" to
+"`<string>`-only TU vs `<string>` + `<bits/locale_classes.h>` TU"
+— a much more tractable A/B for further investigation.
+
+### Key trace observation
+
+With debug instrumentation in `apply_template_args`
+default-argument evaluation, the trace for the broken case
+shows `_RequireAllocator<...>` defaults entering with
+`first_arg.id == cpp_name::_Alloc` (still a template parameter
+reference) — i.e., `template_map.apply` does **not** substitute
+`_Alloc` to the concrete allocator type at this call site.  In
+the simple case, the same code path is **not entered** for
+`_RequireAllocator` at all — the constructor must be elaborated
+through a different mechanism that doesn't reach here.
+
+### Where the actual failure lives
+
+The 3-arg ctor's silent dropping happens during
+`typecheck_compound_body` member processing, specifically in
+the path that "instantiates with defaults" template constructors
+that have all-defaultable template parameters (e.g.,
+`template<typename = X>`).  When `typecheck_type(X)` throws
+during this elaboration step, the constructor symbol is not
+added to the class's components list.
+
+The throwing call path goes through `resolve_template_alias` for
+`_RequireAllocator<_Alloc>`, which then attempts to
+**instantiate** the alias body
+`enable_if<__is_allocator<_Alloc>::value, _Alloc>::type`.  The
+instantiation fails before `__is_allocator<_Alloc>::value` is
+reached as a cpp_name.  Likely failure: `enable_if` or
+`__is_allocator` partial-specialisation matching fails in the
+post-`<bits/locale_classes.h>` elaboration state because some
+intermediate template (e.g., `__is_allocator`'s primary
+template's `__void_t<...>` argument) is in a different state in
+the polluted scope.
+
+### Refined recommendation for the next session
+
+The right intercept point is **not** `resolve()` and **not**
+`apply_template_args` default-arg evaluation.  It is during
+`typecheck_compound_body`'s template-constructor processing,
+when all-defaultable template parameters are evaluated to
+"specialise" the template ctor into a regular components-list
+ctor.  Specifically:
+
+1. Find the code that calls `typecheck_type` on a class
+   template's defaultable template parameter during
+   `typecheck_compound_body`.
+2. At that site, recognise libstdc++'s SFINAE-only alias
+   templates by name (`_RequireAllocator`, `_RequireInputIter`,
+   `_RequireNotAllocator`, possibly more) and synthesise the
+   result without instantiating the alias.
+3. Verify that the synthesised result causes the constructor
+   to be added to the class's components.
+4. Verify on the dog-food TU.
+
+This is where Hook 2 should live.  The infrastructure code
+landed in this session's working tree is reusable — only the
+call site needs to be moved from `apply_template_args` to
+`typecheck_compound_body`'s template-member elaboration.
+
+This is still a 1-2 day focused project, but with the bug now
+pinned to a 3-line reproducer and the intercept logic
+prototyped, the remaining work is identifying the exact call
+site in `typecheck_compound_body` and re-running the same
+intercept there.
+
+### Status
+
+Reverted all in-progress changes (no commit).  Working tree
+clean.  35 commits ahead of pushed `ef662777b0` (unchanged).
+Documentation updated.
