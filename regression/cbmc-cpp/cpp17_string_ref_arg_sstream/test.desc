@@ -1,0 +1,23 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+found no match for symbol 'take'
+invalid implicit conversion from 'char \[6l\]' to 'struct basic_string'
+--
+Regression for `char[N]` -> `const std::string&` implicit
+conversion in argument position, when `<sstream>` (or any header
+that fully elaborates `std::basic_string`) is in the translation
+unit.  Sister test to cpp11_string_default_arg_sstream.
+
+Without the fallback, CBMC reports
+  found no match for symbol 'take'
+because no viable converting constructor for `char[N]` ->
+`std::string` exists in the components list.  Fixed by
+extending the existing implicit_typecast workaround to
+user_defined_conversion_sequence so reference bindings benefit
+from the same fallback.
