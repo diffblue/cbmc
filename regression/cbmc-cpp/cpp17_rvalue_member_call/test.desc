@@ -1,0 +1,22 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+found no match for symbol 'with_source_location'
+--
+Regression for rvalue-receiver member call dispatch.
+
+Without the fix, `std::move(receiver).method()` against an
+`&&`-qualified `method()` is rejected with
+
+    found no match for symbol 'method'
+
+because cpp_typecheck_conversions::reference_binding
+incorrectly applied the C++11 "xvalue cannot bind to non-const
+lvalue ref" rule to the implicit `this` parameter (internally
+encoded as an lvalue ref to a pointer).  Fixed by skipping that
+check when `reference_type.get_bool(ID_C_this)` is true.

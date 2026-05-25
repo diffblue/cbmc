@@ -2129,10 +2129,21 @@ bool cpp_typecheckt::reference_binding(
   // bind to non-const lvalue references. Named rvalue reference variables
   // are lvalues, so only reject unnamed rvalue references (e.g., from
   // static_cast or function return values).
+  //
+  // Exception: the implicit object parameter of a member function call
+  // (`reference_type.get_bool(ID_C_this)`) is special — it is not a
+  // user-visible lvalue reference parameter but the result of CBMC's
+  // internal pointer-to-`this`-as-reference conversion.  An xvalue
+  // receiver (e.g. `std::move(*this).method()`) must be allowed to
+  // bind to it for `&&`-qualified member functions to be callable at
+  // all.  Without this exception, every `std::move(receiver).method()`
+  // fails overload resolution because the candidate's implicit `this`
+  // is interpreted as a non-const lvalue ref.
   if(
     !is_rvalue_reference(reference_type) &&
     !reference_type.base_type().get_bool(ID_C_constant) &&
-    expr.id() == ID_dereference && expr.get_bool(ID_C_implicit) &&
+    !reference_type.get_bool(ID_C_this) && expr.id() == ID_dereference &&
+    expr.get_bool(ID_C_implicit) &&
     is_rvalue_reference(to_dereference_expr(expr).pointer().type()) &&
     to_dereference_expr(expr).pointer().id() != ID_symbol)
     return false;
