@@ -33,7 +33,7 @@ SCENARIO(
       vsd_configt::constant_domain())};
   environment.make_top(); // Domains are bottom on construction
 
-  auto &ns = empty_namespace;
+  const namespacet &ns = empty_namespace;
 
   GIVEN("An array of {1, 2, 3}")
   {

@@ -35,7 +35,6 @@ SCENARIO(
     variable_sensitivity_object_factoryt::configured_with(config);
   abstract_environmentt environment{object_factory};
   environment.make_top();
-  auto &ns = empty_namespace;
 
   GIVEN("constant_pointer_abstract_object")
   {
@@ -55,7 +54,7 @@ SCENARIO(
     {
       const auto address_of = address_of_exprt(val2_symbol);
       auto obj = std::make_shared<constant_pointer_abstract_objectt>(
-        address_of, environment, ns);
+        address_of, environment, empty_namespace);
       THEN_PREDICATE(obj, "x == &val2");
     }
   }

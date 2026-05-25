@@ -25,7 +25,7 @@ TEST_CASE("Build subexpression to access element at offset into array")
   cmdlinet cmdline;
   config.set(cmdline);
 
-  auto &ns = empty_namespace;
+  const namespacet &ns = empty_namespace;
 
   const signedbv_typet t(32);
 
@@ -83,7 +83,7 @@ TEST_CASE("Build subexpression to access element at offset into struct")
   cmdlinet cmdline;
   config.set(cmdline);
 
-  auto &ns = empty_namespace;
+  const namespacet &ns = empty_namespace;
 
   const signedbv_typet t(32);
 

@@ -19,8 +19,6 @@ SCENARIO(
 {
   const typet type = signedbv_typet(32);
 
-  const auto &ns = empty_namespace;
-
   const std::vector<mp_integer> input_values = {
     0, 1, 10, 15, 999, 1000000001, -1, -21111111, -1234567890};
   const std::vector<int> oracles_for_base_10 = {1, 1, 2, 2, 3, 10, 2, 9, 11};
@@ -38,7 +36,8 @@ SCENARIO(
         THEN("length expression is " << oracle)
         {
           const int actual_int =
-            numeric_cast<int>(to_constant_expr(simplify_expr(actual, ns)))
+            numeric_cast<int>(
+              to_constant_expr(simplify_expr(actual, empty_namespace)))
               .value();
           REQUIRE(actual_int == oracle);
         }
@@ -57,8 +56,8 @@ SCENARIO(
         const int oracle = oracles_for_base_16[i];
         THEN("length expression is " << oracle)
         {
-          const int actual_int =
-            *numeric_cast<int>(to_constant_expr(simplify_expr(actual, ns)));
+          const int actual_int = *numeric_cast<int>(
+            to_constant_expr(simplify_expr(actual, empty_namespace)));
           REQUIRE(actual_int == oracle);
         }
       }

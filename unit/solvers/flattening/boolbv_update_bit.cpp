@@ -31,8 +31,7 @@ SCENARIO(
   GIVEN("A satisfiable bit-vector formula f with update_bit")
   {
     satcheckt satcheck{message_handler};
-    auto &ns = empty_namespace;
-    boolbvt boolbv{ns, satcheck, message_handler};
+    boolbvt boolbv{empty_namespace, satcheck, message_handler};
 
     unsignedbv_typet u32{32};
     boolbv << equal_exprt(

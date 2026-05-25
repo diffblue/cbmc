@@ -469,11 +469,11 @@ TEST_CASE(
   {
     // (int32_t *)a + 2
     const auto pointer_arith_expr = plus_exprt{pointer_a, two_bvint_32bit};
-    const auto &ns = empty_namespace;
-    track_expression_objects(pointer_arith_expr, ns, test.object_map);
+    track_expression_objects(
+      pointer_arith_expr, empty_namespace, test.object_map);
     associate_pointer_sizes(
       pointer_arith_expr,
-      ns,
+      empty_namespace,
       test.pointer_sizes,
       test.object_map,
       test.object_size_function.make_application,
@@ -544,11 +544,11 @@ TEST_CASE(
     // (int *)a - 2 is coming to us as (int *)a + (-2), so a design decision
     // was made to handle only that form.
     const auto pointer_arith_expr = plus_exprt{pointer_a, minus_two_bvint};
-    const auto &ns = empty_namespace;
-    track_expression_objects(pointer_arith_expr, ns, test.object_map);
+    track_expression_objects(
+      pointer_arith_expr, empty_namespace, test.object_map);
     associate_pointer_sizes(
       pointer_arith_expr,
-      ns,
+      empty_namespace,
       test.pointer_sizes,
       test.object_map,
       test.object_size_function.make_application,
@@ -575,11 +575,11 @@ TEST_CASE(
     const auto two_bvint = from_integer(2, signedbv_typet{pointer_width});
     const auto pointer_arith_expr = minus_exprt{pointer_a, two_bvint};
 
-    const auto &ns = empty_namespace;
-    track_expression_objects(pointer_arith_expr, ns, test.object_map);
+    track_expression_objects(
+      pointer_arith_expr, empty_namespace, test.object_map);
     associate_pointer_sizes(
       pointer_arith_expr,
-      ns,
+      empty_namespace,
       test.pointer_sizes,
       test.object_map,
       test.object_size_function.make_application,
@@ -612,11 +612,11 @@ TEST_CASE(
   {
     // (int32_t *)a - (int32_t *)b
     const auto pointer_subtraction = minus_exprt{pointer_b, pointer_a};
-    const auto &ns = empty_namespace;
-    track_expression_objects(pointer_subtraction, ns, test.object_map);
+    track_expression_objects(
+      pointer_subtraction, empty_namespace, test.object_map);
     associate_pointer_sizes(
       pointer_subtraction,
-      ns,
+      empty_namespace,
       test.pointer_sizes,
       test.object_map,
       test.object_size_function.make_application,
@@ -1467,7 +1467,7 @@ TEST_CASE(
 {
   auto test =
     expr_to_smt_conversion_test_environmentt::make(test_archt::x86_64);
-  const auto &ns = empty_namespace;
+  const namespacet &ns = empty_namespace;
   const symbol_exprt foo{"foo", unsignedbv_typet{32}};
   const symbol_exprt bar{"bar", unsignedbv_typet{32}};
   SECTION("Address of symbol")
@@ -1669,11 +1669,10 @@ TEST_CASE(
 {
   auto test =
     expr_to_smt_conversion_test_environmentt::make(test_archt::x86_64);
-  const auto &ns = empty_namespace;
   const symbol_exprt foo{"foo", unsignedbv_typet{32}};
   const object_size_exprt object_size{
     address_of_exprt{foo}, unsignedbv_typet{64}};
-  track_expression_objects(object_size, ns, test.object_map);
+  track_expression_objects(object_size, empty_namespace, test.object_map);
   const auto foo_id = 2;
   CHECK(test.object_map.at(foo).unique_id == foo_id);
   const auto object_bits = config.bv_encoding.object_bits;
@@ -1693,10 +1692,9 @@ TEST_CASE(
 {
   auto test =
     expr_to_smt_conversion_test_environmentt::make(test_archt::x86_64);
-  const auto &ns = empty_namespace;
   const symbol_exprt foo{"foo", unsignedbv_typet{32}};
   const is_dynamic_object_exprt is_dynamic_object{address_of_exprt{foo}};
-  track_expression_objects(is_dynamic_object, ns, test.object_map);
+  track_expression_objects(is_dynamic_object, empty_namespace, test.object_map);
   const auto foo_id = 2;
   CHECK(test.object_map.at(foo).unique_id == foo_id);
   const auto object_bits = config.bv_encoding.object_bits;
@@ -1716,7 +1714,6 @@ TEST_CASE(
 {
   auto test =
     expr_to_smt_conversion_test_environmentt::make(test_archt::x86_64);
-  const auto &ns = empty_namespace;
   const typet value_type = signedbv_typet{8};
   const exprt array = symbol_exprt{
     "my_array", array_typet{value_type, from_integer(10, signed_size_type())}};
@@ -1748,10 +1745,10 @@ TEST_CASE(
   {
     const symbol_exprt symbol{"a_symbol", address_of_expr.type()};
     const equal_exprt assignment{symbol, address_of_expr};
-    track_expression_objects(assignment, ns, test.object_map);
+    track_expression_objects(assignment, empty_namespace, test.object_map);
     associate_pointer_sizes(
       assignment,
-      ns,
+      empty_namespace,
       test.pointer_sizes,
       test.object_map,
       test.object_size_function.make_application,

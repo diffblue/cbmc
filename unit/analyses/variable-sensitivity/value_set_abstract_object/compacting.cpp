@@ -51,7 +51,7 @@ SCENARIO(
     variable_sensitivity_object_factoryt::configured_with(config);
   auto environment = abstract_environmentt{object_factory};
   environment.make_top();
-  auto &ns = empty_namespace;
+  const namespacet &ns = empty_namespace;
 
   GIVEN("compact values into existing interval")
   {

@@ -81,7 +81,7 @@ SCENARIO(
     variable_sensitivity_object_factoryt::configured_with(config);
   abstract_environmentt environment{object_factory};
   environment.make_top();
-  auto &ns = empty_namespace;
+  const namespacet &ns = empty_namespace;
 
   auto type = signedbv_typet(32);
   auto val0 = from_integer(0, type);

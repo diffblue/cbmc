@@ -76,7 +76,7 @@ SCENARIO(
 
   abstract_environmentt environment{object_factory};
   environment.make_top();
-  auto &ns = empty_namespace;
+  const namespacet &ns = empty_namespace;
 
   GIVEN("meeting two value_sets")
   {

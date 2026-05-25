@@ -28,8 +28,7 @@ SCENARIO("boolbvt", "[core][solvers][flattening][boolbvt]")
   GIVEN("A satisfiable bit-vector formula f")
   {
     satcheckt satcheck(message_handler);
-    auto &ns = empty_namespace;
-    boolbvt boolbv(ns, satcheck, message_handler);
+    boolbvt boolbv(empty_namespace, satcheck, message_handler);
 
     unsignedbv_typet u32(32);
     boolbv << equal_exprt(symbol_exprt("x", u32), from_integer(10, u32));

@@ -30,7 +30,7 @@ SCENARIO(
     vsd_configt::constant_domain());
   abstract_environmentt env{object_factory};
   env.make_top();
-  auto &ns = empty_namespace;
+  const namespacet &ns = empty_namespace;
 
   GIVEN("an integer constant has an index_range")
   {
@@ -94,7 +94,7 @@ SCENARIO(
     vsd_configt::intervals());
   abstract_environmentt env{object_factory};
   env.make_top();
-  auto &ns = empty_namespace;
+  const namespacet &ns = empty_namespace;
   auto type = signedbv_typet(32);
 
   GIVEN("a top intervals's range is empty")
@@ -194,7 +194,7 @@ SCENARIO(
     vsd_configt::intervals());
   abstract_environmentt env{object_factory};
   env.make_top();
-  auto &ns = empty_namespace;
+  const namespacet &ns = empty_namespace;
   auto type = signedbv_typet(32);
 
   GIVEN("a TOP value_set is empty")

@@ -16,14 +16,12 @@ Author: Diffblue Ltd.
 
 SCENARIO("goto-symex-is-constant", "[core][goto-symex][is_constant]")
 {
-  auto &ns = empty_namespace;
-
   signedbv_typet int_type(32);
   constant_exprt sizeof_constant("4", int_type);
   sizeof_constant.set(ID_C_c_sizeof_type, int_type);
   symbol_exprt non_constant("x", int_type);
 
-  goto_symex_can_forward_propagatet is_constant(ns);
+  goto_symex_can_forward_propagatet is_constant(empty_namespace);
 
   GIVEN("Sizeof expression multiplied by a non-constant")
   {

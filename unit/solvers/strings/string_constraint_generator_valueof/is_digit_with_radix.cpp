@@ -23,12 +23,11 @@ static exprt actual(
 {
   const typet char_type = unsignedbv_typet(16);
   const constant_exprt chr = from_integer(int_value, char_type);
-  const auto &ns = empty_namespace;
 
   return simplify_expr(
     is_digit_with_radix(
       std::move(chr), strict_formatting, radix_as_char, radix_ul),
-    ns);
+    empty_namespace);
 }
 
 /// Get the simplified return value of is_digit_with_radix called with a radix

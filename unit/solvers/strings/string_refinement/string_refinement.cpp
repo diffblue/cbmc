@@ -27,8 +27,7 @@ SCENARIO("string refinement", "[core][solvers][strings][string_refinement]")
   null_message_handlert log{};
   info.message_handler = &log;
 
-  auto &ns = empty_namespace;
-  info.ns = &ns;
+  info.ns = &empty_namespace;
 
   satcheckt sat_solver{log};
   info.prop = &sat_solver;

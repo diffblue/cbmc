@@ -93,12 +93,11 @@ SCENARIO(
       variable_sensitivity_object_factoryt::configured_with(config);
     abstract_environmentt environment{object_factory};
     environment.make_top();
-    auto &ns = empty_namespace;
 
     WHEN("merging TOP with 1")
     {
       auto top1 = make_top_object();
-      auto op2 = make_constant(val1, environment, ns);
+      auto op2 = make_constant(val1, environment, empty_namespace);
 
       auto result = abstract_objectt::merge(top1, op2, widen_modet::no);
 
@@ -137,7 +136,7 @@ SCENARIO(
     WHEN("merging BOTTOM with 1")
     {
       auto op1 = make_bottom_object();
-      auto op2 = make_constant(val1, environment, ns);
+      auto op2 = make_constant(val1, environment, empty_namespace);
 
       auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 

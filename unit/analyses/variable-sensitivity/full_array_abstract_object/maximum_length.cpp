@@ -52,7 +52,7 @@ SCENARIO(
       variable_sensitivity_object_factoryt::configured_with(configuration);
     abstract_environmentt environment(object_factory);
     environment.make_top();
-    auto &ns = empty_namespace;
+    const namespacet &ns = empty_namespace;
     WHEN("maximum size is " + std::to_string(max_array_index))
     {
       WHEN("array = {1, 2, 3}, writes under maximum size")

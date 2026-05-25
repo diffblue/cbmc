@@ -25,8 +25,7 @@ TEST_CASE("onehot flattening", "[core][solvers][flattening][boolbvt][onehot]")
   console_message_handlert message_handler;
   message_handler.set_verbosity(0);
   satcheckt satcheck{message_handler};
-  auto &ns = empty_namespace;
-  boolbvt boolbv{ns, satcheck, message_handler};
+  boolbvt boolbv{empty_namespace, satcheck, message_handler};
   unsignedbv_typet u8{8};
 
   GIVEN("A bit-vector that is one-hot")

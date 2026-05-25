@@ -29,7 +29,7 @@ TEST_CASE("byte extract and bits", "[core][util][lowering][byte_extract]")
   cmdlinet cmdline;
   config.set(cmdline);
 
-  const auto &ns = empty_namespace;
+  const namespacet &ns = empty_namespace;
 
   const unsignedbv_typet u16{16};
   const exprt sixteen_bits = from_integer(0x1234, u16);
@@ -98,7 +98,7 @@ SCENARIO("byte_extract_lowering", "[core][util][lowering][byte_extract]")
   cmdlinet cmdline;
   config.set(cmdline);
 
-  const auto &ns = empty_namespace;
+  const namespacet &ns = empty_namespace;
 
   GIVEN("A byte_extract over a POD")
   {
@@ -365,7 +365,7 @@ SCENARIO("byte_update_lowering", "[core][util][lowering][byte_update]")
   cmdlinet cmdline;
   config.set(cmdline);
 
-  const auto &ns = empty_namespace;
+  const namespacet &ns = empty_namespace;
 
   GIVEN("A byte_update of a POD")
   {

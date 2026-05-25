@@ -64,7 +64,7 @@ TEST_CASE("Simplify byte extract", "[core][util]")
 
 TEST_CASE("expr2bits and bits2expr respect bit order", "[core][util]")
 {
-  auto &ns = empty_namespace;
+  const namespacet &ns = empty_namespace;
 
   exprt deadbeef = from_integer(0xdeadbeef, unsignedbv_typet(32));
 
@@ -116,8 +116,6 @@ TEST_CASE("Simplify extractbit", "[core][util]")
   const cmdlinet cmdline;
   config.set(cmdline);
 
-  auto &ns = empty_namespace;
-
   // binary: 1101 1110 1010 1101 1011 1110 1110 1111
   //         ^MSB                               LSB^
   //              bit23^                  bit4^
@@ -126,13 +124,13 @@ TEST_CASE("Simplify extractbit", "[core][util]")
   const exprt deadbeef = from_integer(0xdeadbeef, unsignedbv_typet(32));
 
   exprt eb1 = extractbit_exprt(deadbeef, 4);
-  bool unmodified = simplify(eb1, ns);
+  bool unmodified = simplify(eb1, empty_namespace);
 
   REQUIRE(!unmodified);
   REQUIRE(eb1 == false_exprt());
 
   exprt eb2 = extractbit_exprt(deadbeef, 23);
-  unmodified = simplify(eb2, ns);
+  unmodified = simplify(eb2, empty_namespace);
 
   REQUIRE(!unmodified);
   REQUIRE(eb2 == true_exprt());
@@ -156,7 +154,7 @@ TEST_CASE("Simplify extractbits", "[core][util]")
 
 TEST_CASE("Simplify shift", "[core][util]")
 {
-  auto &ns = empty_namespace;
+  const namespacet &ns = empty_namespace;
 
   REQUIRE(
     simplify_expr(shl_exprt(from_integer(5, signedbv_typet(8)), 1), ns) ==
@@ -181,7 +179,7 @@ TEST_CASE("Simplify shift", "[core][util]")
 
 TEST_CASE("Simplify dynamic object comparison", "[core][util]")
 {
-  auto &ns = empty_namespace;
+  const namespacet &ns = empty_namespace;
 
   dynamic_object_exprt dynamic_object(signedbv_typet(8));
   dynamic_object.set_instance(1);
@@ -238,7 +236,7 @@ TEST_CASE("Simplify pointer_object equality", "[core][util]")
 
 TEST_CASE("Simplify cast from bool", "[core][util]")
 {
-  auto &ns = empty_namespace;
+  const namespacet &ns = empty_namespace;
 
   {
     // this checks that ((int)B)==1 turns into B
@@ -291,7 +289,7 @@ TEST_CASE("Simplify cast from bool", "[core][util]")
 
 TEST_CASE("simplify_expr boolean expressions", "[core][util]")
 {
-  auto &ns = empty_namespace;
+  const namespacet &ns = empty_namespace;
 
   SECTION("Binary boolean operations")
   {
@@ -515,8 +513,6 @@ TEST_CASE("Simplify bitor", "[core][util]")
 
 TEST_CASE("Simplify inequality", "[core][util]")
 {
-  auto &ns = empty_namespace;
-
   {
     // This checks that 3 < (B ? 4 : 5) simplifies to true, just like (B ? 4 :
     // 5) > 3 simplifies to true.
@@ -525,12 +521,12 @@ TEST_CASE("Simplify inequality", "[core][util]")
     if_exprt if_b{b, from_integer(4, sbv), from_integer(5, sbv)};
 
     binary_relation_exprt comparison_gt{if_b, ID_gt, from_integer(3, sbv)};
-    exprt simp = simplify_expr(comparison_gt, ns);
+    exprt simp = simplify_expr(comparison_gt, empty_namespace);
 
     REQUIRE(simp == true_exprt{});
 
     binary_relation_exprt comparison_lt{from_integer(3, sbv), ID_lt, if_b};
-    simp = simplify_expr(comparison_lt, ns);
+    simp = simplify_expr(comparison_lt, empty_namespace);
 
     REQUIRE(simp == true_exprt{});
   }
@@ -568,8 +564,6 @@ TEST_CASE("Simplify pointer cast of pointer arithmetic", "[core][util]")
 {
   config.set_arch("none");
 
-  auto &ns = empty_namespace;
-
   SECTION("Same element size: (char*)(unsigned_char_ptr + 1)")
   {
     // (char*)(ptr + 1) where ptr is unsigned char* should push the cast inside
@@ -579,7 +573,7 @@ TEST_CASE("Simplify pointer cast of pointer arithmetic", "[core][util]")
     plus_exprt ptr_plus_1{ptr, from_integer(1, pointer_diff_type())};
     typecast_exprt cast{ptr_plus_1, char_ptr_type};
 
-    exprt result = simplify_expr(cast, ns);
+    exprt result = simplify_expr(cast, empty_namespace);
 
     // Expected: (char*)ptr + 1
     plus_exprt expected{
@@ -596,7 +590,7 @@ TEST_CASE("Simplify pointer cast of pointer arithmetic", "[core][util]")
     plus_exprt ptr_plus_1{ptr, from_integer(1, pointer_diff_type())};
     typecast_exprt cast{ptr_plus_1, char_ptr_type};
 
-    exprt result = simplify_expr(cast, ns);
+    exprt result = simplify_expr(cast, empty_namespace);
 
     // Expected: (char*)ptr + 4
     plus_exprt expected{
@@ -607,7 +601,7 @@ TEST_CASE("Simplify pointer cast of pointer arithmetic", "[core][util]")
 
 TEST_CASE("Simplify quantifier", "[core][util]")
 {
-  auto &ns = empty_namespace;
+  const namespacet &ns = empty_namespace;
 
   SECTION("Simplification for exists")
   {

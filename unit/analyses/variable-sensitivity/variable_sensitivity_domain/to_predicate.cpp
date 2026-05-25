@@ -26,7 +26,7 @@ SCENARIO(
   config.context_tracking.last_write_context = false;
   auto object_factory =
     variable_sensitivity_object_factoryt::configured_with(config);
-  auto &ns = empty_namespace;
+  const namespacet &ns = empty_namespace;
 
   GIVEN("to_predicate()")
   {

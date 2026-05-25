@@ -34,7 +34,6 @@ SCENARIO(
     variable_sensitivity_object_factoryt::configured_with(config);
   abstract_environmentt environment{object_factory};
   environment.make_top();
-  auto &ns = empty_namespace;
 
   GIVEN("constant_abstract_value")
   {
@@ -50,13 +49,14 @@ SCENARIO(
     }
     WHEN("x = 2")
     {
-      auto obj = make_constant(val2, environment, ns);
+      auto obj = make_constant(val2, environment, empty_namespace);
       THEN_PREDICATE(obj, "x == 2");
     }
     WHEN("(1 + 2) = 3")
     {
       auto val1 = from_integer(1, type);
-      auto c3 = make_constant(from_integer(3, type), environment, ns);
+      auto c3 =
+        make_constant(from_integer(3, type), environment, empty_namespace);
 
       auto pred = c3->to_predicate(plus_exprt(val1, val2));
       THEN("predicate is (1 + 2) = 3")

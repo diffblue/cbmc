@@ -48,7 +48,7 @@ SCENARIO(
   const std::size_t pointer_width = 16;
   const auto pointer_type = pointer_typet(char_type, pointer_width);
 
-  const auto &ns = empty_namespace;
+  const namespacet &ns = empty_namespace;
   symbol_generatort fresh_symbol;
   array_poolt array_pool{fresh_symbol};
 

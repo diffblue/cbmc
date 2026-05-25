@@ -46,7 +46,7 @@ SCENARIO(
     variable_sensitivity_object_factoryt::configured_with(config);
   abstract_environmentt environment{object_factory};
   environment.make_top();
-  auto &ns = empty_namespace;
+  const namespacet &ns = empty_namespace;
 
   GIVEN("value_set_abstract_object")
   {

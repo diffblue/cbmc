@@ -23,7 +23,7 @@ SCENARIO("get extreme exprt value", "[core][analyses][interval][get_extreme]")
 {
   GIVEN("A selection of constant_exprts in a std::vector and map")
   {
-    auto &ns = empty_namespace;
+    const namespacet &ns = empty_namespace;
 
     std::vector<exprt> ve;
 

@@ -71,7 +71,7 @@ SCENARIO("ai_domain_baset::ai_simplify_lhs",
 {
   ansi_c_languaget language;
 
-  auto &ns = empty_namespace;
+  const namespacet &ns = empty_namespace;
 
   constant_simplification_mockt mock_ai_domain;
 

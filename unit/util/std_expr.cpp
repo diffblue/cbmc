@@ -40,7 +40,7 @@ TEST_CASE("object descriptor expression", "[unit][util][std_expr]")
 {
   config.ansi_c.set_LP64();
 
-  const auto &ns = empty_namespace;
+  const namespacet &ns = empty_namespace;
 
   array_typet array_type(signed_int_type(), from_integer(2, size_type()));
   struct_typet struct_type({{"foo", array_type}});

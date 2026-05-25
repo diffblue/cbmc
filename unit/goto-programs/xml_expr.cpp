@@ -20,10 +20,8 @@ TEST_CASE("Constant expression to XML")
 {
   config.set_arch("none");
 
-  const auto &ns = empty_namespace;
-
   const constant_exprt number_ubv = from_integer(0xFF, unsignedbv_typet(8));
-  const xmlt x_ubv = xml(number_ubv, ns);
+  const xmlt x_ubv = xml(number_ubv, empty_namespace);
 
   REQUIRE(x_ubv.get_attribute("binary") == "11111111");
 
@@ -32,7 +30,7 @@ TEST_CASE("Constant expression to XML")
   fixedbv_type.set_integer_bits(6);
 
   const constant_exprt number_fbv = from_integer(0x3, fixedbv_type);
-  const xmlt x_fbv = xml(number_fbv, ns);
+  const xmlt x_fbv = xml(number_fbv, empty_namespace);
 
   REQUIRE(x_fbv.get_attribute("binary") == "00001100");
 }

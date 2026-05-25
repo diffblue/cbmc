@@ -23,8 +23,7 @@ TEST_CASE(
   console_message_handlert message_handler;
   message_handler.set_verbosity(0);
   satcheckt satcheck{message_handler};
-  auto &ns = empty_namespace;
-  boolbvt boolbv{ns, satcheck, message_handler};
+  boolbvt boolbv{empty_namespace, satcheck, message_handler};
   enumeration_typet enumeration;
   enumeration.elements().push_back(irept{"A"});
   enumeration.elements().push_back(irept{"B"});

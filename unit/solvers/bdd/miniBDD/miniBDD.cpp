@@ -201,10 +201,9 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
 
   GIVEN("A bdd for x&!x==0")
   {
-    auto &ns = empty_namespace;
     mini_bdd_mgrt bdd_mgr;
     bdd_propt bdd_prop(bdd_mgr);
-    boolbvt boolbv(ns, bdd_prop, null_message_handler);
+    boolbvt boolbv(empty_namespace, bdd_prop, null_message_handler);
 
     unsignedbv_typet type(2);
     symbol_exprt var("x", type);
@@ -218,10 +217,9 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
 
   GIVEN("A bdd for x+x==1")
   {
-    auto &ns = empty_namespace;
     mini_bdd_mgrt bdd_mgr;
     bdd_propt bdd_prop(bdd_mgr);
-    boolbvt boolbv(ns, bdd_prop, null_message_handler);
+    boolbvt boolbv(empty_namespace, bdd_prop, null_message_handler);
 
     unsignedbv_typet type(32);
     symbol_exprt var("x", type);
@@ -234,10 +232,9 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
 
   GIVEN("A bdd for x*y==y*x")
   {
-    auto &ns = empty_namespace;
     mini_bdd_mgrt bdd_mgr;
     bdd_propt bdd_prop(bdd_mgr);
-    boolbvt boolbv(ns, bdd_prop, null_message_handler);
+    boolbvt boolbv(empty_namespace, bdd_prop, null_message_handler);
 
     unsignedbv_typet type(4);
     symbol_exprt var_x("x", type);
@@ -251,10 +248,9 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
 
   GIVEN("A bdd for x*x==2")
   {
-    auto &ns = empty_namespace;
     mini_bdd_mgrt bdd_mgr;
     bdd_propt bdd_prop(bdd_mgr);
-    boolbvt boolbv(ns, bdd_prop, null_message_handler);
+    boolbvt boolbv(empty_namespace, bdd_prop, null_message_handler);
 
     unsignedbv_typet type(8);
     symbol_exprt var_x("x", type);
@@ -267,10 +263,9 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
 
   GIVEN("A bdd for x*x==4")
   {
-    auto &ns = empty_namespace;
     mini_bdd_mgrt bdd_mgr;
     bdd_propt bdd_prop(bdd_mgr);
-    boolbvt boolbv(ns, bdd_prop, null_message_handler);
+    boolbvt boolbv(empty_namespace, bdd_prop, null_message_handler);
 
     unsignedbv_typet type(8);
     symbol_exprt var_x("x", type);

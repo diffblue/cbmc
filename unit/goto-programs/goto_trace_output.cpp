@@ -20,7 +20,6 @@ SCENARIO(
   "Output trace with nil lhs object",
   "[core][goto-programs][goto_trace]")
 {
-  auto &ns = empty_namespace;
   goto_programt::instructionst instructions;
   instructions.emplace_back(goto_program_instruction_typet::OTHER);
   goto_trace_stept step;
@@ -28,7 +27,7 @@ SCENARIO(
   step.type = goto_trace_stept::typet::ATOMIC_BEGIN;
 
   std::ostringstream oss;
-  step.output(ns, oss);
+  step.output(empty_namespace, oss);
 
   std::istringstream iss(oss.str());
   std::string line;

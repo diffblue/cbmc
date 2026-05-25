@@ -44,7 +44,6 @@ SCENARIO(
     variable_sensitivity_object_factoryt::configured_with(config);
   abstract_environmentt environment{object_factory};
   environment.make_top();
-  auto &ns = empty_namespace;
 
   GIVEN("interval_abstract_value")
   {
@@ -60,12 +59,12 @@ SCENARIO(
     }
     WHEN("[ 2 ]")
     {
-      auto obj = make_interval(val2, val2, environment, ns);
+      auto obj = make_interval(val2, val2, environment, empty_namespace);
       THEN_PREDICATE(obj, "x == 2");
     }
     WHEN("[ 0, 2 ]")
     {
-      auto obj = make_interval(val0, val2, environment, ns);
+      auto obj = make_interval(val0, val2, environment, empty_namespace);
       THEN_PREDICATE(obj, "0 <= x && x <= 2");
     }
   }

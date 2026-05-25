@@ -24,11 +24,10 @@ static exprt actual(
   const unsigned long radix_ul)
 {
   const constant_exprt chr = from_integer(character, char_type);
-  const auto &ns = empty_namespace;
   return simplify_expr(
     get_numeric_value_from_character(
       chr, char_type, int_type, strict_formatting, radix_ul),
-    ns);
+    empty_namespace);
 }
 
 SCENARIO(

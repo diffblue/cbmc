@@ -45,7 +45,7 @@ SCENARIO(
       vsd_configt::constant_domain());
     abstract_environmentt environment(object_factory);
     environment.make_top();
-    auto &ns = empty_namespace;
+    const namespacet &ns = empty_namespace;
 
     WHEN("Merging two constant struct AOs with the same contents")
     {

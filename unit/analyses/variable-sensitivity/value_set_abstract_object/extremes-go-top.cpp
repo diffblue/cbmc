@@ -27,7 +27,7 @@ SCENARIO(
 
   auto environment = abstract_environmentt{object_factory};
   environment.make_top();
-  auto &ns = empty_namespace;
+  const namespacet &ns = empty_namespace;
 
   GIVEN("{FALSE, TRUE} goes TOP")
   {
