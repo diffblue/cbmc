@@ -11,14 +11,12 @@ Author: Diffblue Ltd.
 
 #include <util/c_types.h>
 #include <util/mathematical_types.h>
-#include <util/namespace.h>
 
 #include <goto-programs/goto_program.h>
 
 #include <analyses/does_remove_const.h>
 #include <analyses/does_remove_const/does_remove_const_util.h>
 #include <ansi-c/c_qualifiers.h>
-#include <testing-utils/empty_namespace.h>
 #include <testing-utils/use_catch.h>
 
 SCENARIO("is_type_at_least_as_const",

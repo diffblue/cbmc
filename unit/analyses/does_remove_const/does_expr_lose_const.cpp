@@ -11,7 +11,6 @@ Author: Diffblue Ltd.
 
 #include <util/c_types.h>
 #include <util/mathematical_types.h>
-#include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
 
@@ -20,7 +19,6 @@ Author: Diffblue Ltd.
 #include <analyses/does_remove_const.h>
 #include <analyses/does_remove_const/does_remove_const_util.h>
 #include <ansi-c/c_qualifiers.h>
-#include <testing-utils/empty_namespace.h>
 #include <testing-utils/use_catch.h>
 
 SCENARIO("does_expr_lose_const",
