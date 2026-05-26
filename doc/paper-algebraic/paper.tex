@@ -1524,88 +1524,107 @@ All proofs compile with zero \texttt{sorry}.
 
 \section{Related Work}
 
-\paragraph{Gr\"obner bases in verification.}
-Bryant~\cite{bryant1991complexity} showed BDD-based multiplication
-verification requires exponential size, motivating non-BDD
-approaches. Clegg et al.~\cite{clegg1996groebner} proved that the
-Gr\"obner proof system can be exponentially more powerful than
-resolution, providing the theoretical ground for algebraic methods
-on multiplication.
+We organise related work by which corner of the four-classes
+taxonomy (Table~\ref{tab:taxonomy}) each line of work attacks.
 
-\paragraph{Gate-level algebraic multiplier verification.}
-Biere, Kauers, and Ritirc~\cite{biere2017challenges} observed that
-gate polynomials form a Gr\"obner basis under reverse topological
-ordering, yielding polynomial-time multiplier verification.
-Kaufmann~\cite{kaufmann2020thesis} and
-Kaufmann and Biere~\cite{kaufmann2021amulet} extended this to
-the Amulet2 tool with XOR slicing and proof certificates
-(PAC/LPAC). Yu et al.~\cite{yu2016arithmetic} achieve linear-time
-gate-level verification via function extraction.
-A key difference from our work: their approach works
-over $\mathbb{Q}$ with field polynomials $x^2 - x = 0$ to model
-Booleans, while ours works directly over $\mathbb{Z}_{2^d}$,
-avoiding the exponential polynomial blowup caused by field
-polynomials at the cost of incompleteness for non-unit constants.
-They verify a specific multiplier circuit; we verify SMT queries
-that may contain multiple \texttt{bvmul} calls in a larger
-program-verification context
-(see Section~\ref{sec:eval-amulet}).
-
-\paragraph{Equational theory of bit-vectors.}
+\paragraph{Universal-equational, ideal membership.}
 Song et al.~\cite{song2024equational} prove that strong Gr\"obner
 bases over $\mathbb{Z}_{2^d}$ solve the equational theory of
-bit-vectors: their theorems give the algebraic foundation for
-any such procedure. Our contribution is end-to-end integration
-with a bit-vector SMT solver, including the Rabinowitsch trick for
-disequalities, SSA-aware decomposition, progress-based
-termination, and mechanised soundness in Lean 4
+bit-vectors --- the theoretical foundation we build on.
+Bryant~\cite{bryant1991complexity} earlier showed that BDD-based
+multiplication verification requires exponential size, motivating
+non-BDD algebraic approaches. Clegg
+et al.~\cite{clegg1996groebner} proved the Gr\"obner proof system
+can be exponentially more powerful than resolution, giving the
+proof-theoretic justification for algebraic methods on
+multiplication. Our contribution beyond Song et al.\ is the SMT
+integration: SSA-aware decomposition of nested multiplications,
+the Rabinowitsch trick for disequalities, progress-based
+termination, and mechanised soundness
 (Section~\ref{sec:algebraic-contrib}).
 
-\paragraph{Vanishing polynomials and normalisation.}
+\paragraph{Universal-equational, function equivalence.}
 Shekhar et al.~\cite{shekhar2007equivalence} characterise the
 vanishing ideal of $\mathbb{Z}_{2^{n_1}} \times \cdots \times
-\mathbb{Z}_{2^{n_d}} \to \mathbb{Z}_{2^m}$ using falling factorials
-and give a complete decision procedure for polynomial equivalence.
-G\`amez-Montolio et al.~\cite{gamez2024efficient} give efficient
-normalisation via Stirling numbers and Kronecker products; their
-Algorithm~3 is what we implement.
-Howe et al.~\cite{howe2025subpolynomial} decompose univariate
-polynomials into subpolynomials for compact bit-blasting; the
-technique is orthogonal to the vanishing-polynomial test but could
-be combined with it for problems that fall through the algebraic
-layer.
+\mathbb{Z}_{2^{n_d}} \to \mathbb{Z}_{2^m}$ using falling
+factorials and give a complete decision procedure for polynomial
+equivalence in this setting; G\`amez-Montolio
+et al.~\cite{gamez2024efficient} give the efficient normalisation
+algorithm (via Stirling numbers and Kronecker products) that we
+implement. Howe et al.~\cite{howe2025subpolynomial} decompose
+univariate polynomials into subpolynomials for compact
+bit-blasting; the technique is orthogonal to our
+vanishing-polynomial test but could combine with it on queries
+that fall through to the bit-blast layer.
 
-\paragraph{Finite-field decision procedures.}
-cvc5~\cite{Ozdemir23cvc5} (\texttt{--ff} option for QF\_FF)
-integrates CoCoALib~\cite{abbott:cocoalib} for
-Gr\"obner-basis reasoning over prime-order finite fields, targeting
-cryptographic circuit verification (e.g., zkSNARK constraint
-systems). Our setting is different: bit-vectors are naturally
-elements of the ring $\mathbb{Z}_{2^d}$, which is not a field,
-and our procedure extends the approach to the non-field ring
-case. The two are complementary: finite-field methods excel on
-curve-based cryptography; our approach excels on bit-vector
-arithmetic identities.
+\paragraph{Universal-equational on gate-level circuits.}
+Gate-level algebraic verification is a related but distinct line:
+the input is an AIG circuit, not an SMT query. Biere, Kauers, and
+Ritirc~\cite{biere2017challenges} observed that gate polynomials
+form a Gr\"obner basis under reverse topological ordering,
+yielding polynomial-time multiplier verification.
+Kaufmann~\cite{kaufmann2020thesis} and Kaufmann and
+Biere~\cite{kaufmann2021amulet} extended this to the Amulet2 tool
+with XOR slicing and proof certificates (PAC/LPAC).
+Yu et al.~\cite{yu2016arithmetic} achieve linear-time gate-level
+verification via function extraction. These approaches work over
+$\mathbb{Q}$ with field polynomials $x^2 - x = 0$ to model
+Booleans; ours works directly over $\mathbb{Z}_{2^d}$, avoiding
+the exponential polynomial blowup field polynomials cause but
+losing field structure. Section~\ref{sec:eval-amulet} compares
+in detail.
 
-\paragraph{Word-level SMT solvers.}
-Niemetz et al.~\cite{niemetz2023bitwuzla} implement word-level
-rewriting in Bitwuzla that avoids bit-blasting for a large class
-of arithmetic identities. Our approach is complementary: for
-polynomial equations, the Gr\"obner-basis procedure reaches the
-identity through algebraic reasoning (which gives a structural
-reason why the equation holds) rather than syntactic rewriting.
-On the 66-benchmark SMT-COMP sample
-(Section~\ref{sec:eval-smtcomp}) the two approaches solve
-overlapping subsets; neither subsumes the other.
+\paragraph{Existential-equational and finite-field
+generalisations.}
+\v{O}zdemir et al.~\cite{Ozdemir23cvc5}
+integrate CoCoALib~\cite{abbott:cocoalib} into cvc5 for
+Gr\"obner-basis reasoning over prime-order finite fields,
+targeting QF\_FF queries (e.g., zkSNARK constraint systems);
+their procedure handles both UNSAT and SAT directions via root
+finding. The setting is different: prime-order fields admit
+field structure and complete univariate root finding, while
+$\mathbb{Z}_{2^d}$ does not. The two procedures are complementary
+on cryptographic verification: finite-field methods excel on
+curve-based cryptography, our approach on bit-vector arithmetic
+identities. The cvc5 \texttt{--ff} flag activates this only for
+QF\_FF logic; QF\_BV queries do not invoke it.
+
+\paragraph{Heuristic word-level rewriting (covers all four
+classes).}
+Niemetz et al.~\cite{niemetz2023bitwuzla} implement occurrence-map
+canonicalisation in Bitwuzla that handles commutativity and
+associativity via syntactic rewriting; cvc5's QF\_BV pipeline
+applies pattern-matched rewrites and a Gaussian-elimination
+preprocessor for linear systems modulo $2^d$. Both approaches are
+\emph{heuristic} in our sense: they decide the queries that match
+their pattern set or admit a linear reduction, and fall through
+to bit-blasting on queries that escape. They cover all four
+taxonomy classes when the rewriter has matching patterns; on
+queries with high-degree polynomial structure or vanishing
+polynomials they fall through. Our procedure is complementary:
+on the universal-equational class with polynomial expressions in
+$\mathbb{Z}_{2^d}$, it is a decision procedure rather than a
+heuristic; on the other three classes it falls through to
+bit-blasting in turn.
+
+\paragraph{Relational classes.}
+The bit-blasting companion paper~\cite{companion-bitblasting}
+addresses the universal-relational and existential-relational
+classes more uniformly than our procedure does. Its
+multiplier-encoding contributions are orthogonal to the present
+work: the algebraic procedure decides queries that escape any
+multiplier encoding, while the bit-blasting companion paper
+improves the encoding for queries that reach the SAT solver.
 
 \paragraph{Proof complexity.}
 The extended Frege proof system (including Gr\"obner-basis
-reasoning) has polynomial proofs of arithmetic identities such as
-commutativity~\cite{buss1995bounded}, a fact we rely on implicitly:
-our algebraic procedure can be viewed as constructing such a proof.
-Whether resolution also has polynomial proofs of these identities
-is open~\cite{biere2017challenges}; the bit-blasting companion
-paper~\cite{companion-bitblasting} provides empirical evidence that it does not (integer
+reasoning) has polynomial proofs of arithmetic identities such
+as commutativity~\cite{buss1995bounded}, a fact we rely on
+implicitly: our algebraic procedure can be viewed as constructing
+such a proof. Whether resolution also has polynomial proofs of
+these identities is open~\cite{biere2017challenges}; the
+bit-blasting companion paper~\cite{companion-bitblasting}
+provides empirical evidence that it does not (integer
 commutativity is $1000\times$ harder than GF(2) in CDCL).
 
 
