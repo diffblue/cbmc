@@ -57,6 +57,8 @@ public:
   /// array theory. For unbounded-array-typed bindings this connects the
   /// two expressions in the union-find so that element-wise constraints
   /// propagate correctly.
+  /// \pre \p value must be free of byte_update operators; lower them at the
+  ///   call site (collect_arrays otherwise fails a DATA_INVARIANT).
   void record_array_let_binding(const symbol_exprt &symbol, const exprt &value);
 
 protected:
