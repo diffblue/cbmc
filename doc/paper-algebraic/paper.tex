@@ -1008,7 +1008,7 @@ consequences. Predicates like ``high bit of $x \cdot y$ is 1''
 become polynomial constraints, bringing relational queries
 (bounds, overflow witnesses) into reach of the same Gr\"obner
 infrastructure. This is the direction in which a future revision
-might take the algebraic procedure beyond its current
+takes the algebraic procedure beyond its current
 universal-equational scope.
 
 \section{Evaluation}
@@ -1505,13 +1505,15 @@ handle on every instance; understanding the remaining gap is
 future work.
 
 \textbf{Gate-level equivalence is a gap.} Our procedure is
-complete for the polynomial ideal-membership fragment, but
-\emph{gate-level} multiplier equivalence checking---the problem
-Amulet2 (Section~\ref{sec:eval-amulet}) solves---sits just outside
-our coverage. A natural way to encode a gate-level circuit in our
-setting is to add a field polynomial $x \cdot (x - 1) = 0$ for
-every bit variable, forcing it to be Boolean, and then to check
-that the circuit's output polynomial equals the specification. We
+complete for the universal-equational fragment with polynomial
+expressions in $\mathbb{Z}_{2^d}$, but \emph{gate-level}
+multiplier equivalence checking---the problem
+Amulet2 (Section~\ref{sec:eval-amulet}) solves---sits outside
+this fragment. A natural way to encode a gate-level circuit in
+our setting is to add a field polynomial $x \cdot (x - 1) = 0$
+for every bit variable, forcing it to be Boolean, and then to
+check that the circuit's output polynomial equals the
+specification. We
 tested this on a small hardware-multiplier-equivalence benchmark
 (\texttt{hw\_mul\_equiv}): at BW=2 the augmented system has
 a strong Gr\"obner basis of 23 elements including a unit constant,
@@ -1664,8 +1666,8 @@ improves the encoding for queries that reach the SAT solver.
 The extended Frege proof system (including Gr\"obner-basis
 reasoning) has polynomial proofs of arithmetic identities such
 as commutativity~\cite{buss1995bounded}, a fact we rely on
-implicitly: our algebraic procedure can be viewed as constructing
-such a proof. Whether resolution also has polynomial proofs of
+implicitly: our algebraic procedure constructs such a proof.
+Whether resolution also has polynomial proofs of
 these identities is open~\cite{biere2017challenges}; the
 bit-blasting companion paper~\cite{companion-bitblasting}
 provides empirical evidence that it does not (integer
