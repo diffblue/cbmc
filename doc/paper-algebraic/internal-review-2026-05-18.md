@@ -15,18 +15,18 @@
 | #4 ZFP terminology inconsistent | **FIXED** | (current session) |
 | #5 Completeness claim vs §6 future-work line | **FIXED** | (current session) — implementation already supports mixed widths; §6 line removed; §3.2 strengthened with explicit "Mixed input widths" paragraph documenting the capability and citing two benchmarks (dsp_image_reject and dsp_vanishing_mv) |
 | #6 §3 completeness claim vs §4.5 SAT-finding losses | **FIXED** | (current session) — added "Direction of completeness" paragraph in §3 explicitly stating the algebraic layer is UNSAT-oriented |
-| #7 Table 1 shows only 11/39 benchmarks | TODO | — |
-| #8 §2.6 5-layer pipeline table confusing | TODO | — |
+| #7 Table 1 shows only 11/39 benchmarks | **FIXED** | (current session) — replaced with full 39-row table organised by category; re-measured Bitwuzla which revealed the previous "Bitwuzla 39/39" claim was outdated (current build excludes bf16 by default). Honest count now: CBMC 39/39, Bitwuzla 35/39, cvc5 35/39 |
+| #8 §2.6 5-layer pipeline table confusing | **FIXED** | (current session) — dropped CBMC column with its 0.000s entries and dashes, kept smt2 only; folded footnote markers into prose |
 | #9 §2.7 shift-add comparison unfair | **FIXED** | (current session) — added Bitwuzla column to Table 2; rephrased framing to acknowledge mature word-level reasoners also handle these identities; updated abstract and §1 opener to remove the misleading "four orders of magnitude" claim |
 | #10 §2.3 contribution list awkward | **FIXED** | (current session) — consolidated 6 points into 3 grouped contributions: SMT integration, algorithmic refinements, mechanised soundness |
 | #11 Methodology inconsistency (median of 3 vs 5) | **FIXED** | (current session) — re-measured both scaling experiments with median-of-4-warm-runs (5 total, first discarded) consistent with §2.7 |
-| #12 'Honest reading' paragraphs scattered | TODO | — |
-| #13 §1 four-classes taxonomy too long | TODO | — |
-| #14 §6 conclusion repeats abstract | TODO | — |
-| #15 Tables 4+5 should be one figure | **FIXED** | (current session) — replaced both tables with Figure scaling-figure.pdf (matplotlib-generated, 2-panel), reducing two paragraphs+tables to one paragraph+figure |
-| #16 §5 Mechanised Soundness Lean technical detail | TODO | — |
-| #17 Table footnote markers in LNCS | TODO | — |
-| #18 §4.5 'n' header clashes with §3 'n' | TODO | — |
+| #12 'Honest reading' paragraphs scattered | **FIXED** | (current session) — trimmed §4.1, §4.2, §4.3 of redundant meta-commentary; consolidated into §4.6 (Threats to Validity, now \label{sec:threats}); per-section paragraphs now keep data and point to §4.6 |
+| #13 §1 four-classes taxonomy too long | **FIXED** | (current session) — compressed from 24 to 13 lines, removed redundant formal definitions |
+| #14 §6 conclusion repeats abstract | **FIXED** | (current session) — trimmed paragraph 1 to remove specific numbers; now a brief synthesis pointing to §4 for details |
+| #15 Tables 4+5 should be one figure | **FIXED** | (last session) — replaced both tables with Figure scaling-figure.pdf |
+| #16 §5 Mechanised Soundness Lean technical detail | **FIXED** | (current session) — removed ZMod numeral-elaboration paragraph, belongs in artifact not paper |
+| #17 Table footnote markers in LNCS | **FIXED** | (current session, merged with #8) — only Table 2 had markers; restructured table eliminates them |
+| #18 §4.5 'n' header clashes with §3 'n' | **FIXED** | (current session) — renamed column header to "size" |
 
 ## Overall assessment
 
