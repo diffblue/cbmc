@@ -27,30 +27,36 @@
 \maketitle
 
 \begin{abstract}
-We present algebraic techniques for verifying arithmetic properties
-of fixed-width bit-vector programs without bit-blasting. A strong
-Gr\"obner basis solver over $\mathbb{Z}_{2^d}$ resolves polynomial
-equations (commutativity, associativity, overflow checking) in under
-5\,ms regardless of bitwidth---matching mature word-level
-reasoners on simple identities and outpacing pure bit-blasting,
-which times out already at 16-bit commutativity. For DSP
-datapath equivalence, where symbolically distinct
-polynomials become equivalent due to overflow cancellation, a
-vanishing polynomial test based on falling factorial
-decomposition~\cite{shekhar2007equivalence,gamez2024efficient}
-provides a complete decision procedure, solving benchmarks in
-$<$15\,ms that previously timed out. On our 39-benchmark
-arithmetic-identity suite, \cbmc~\cite{clarke2004tool} solves all
-39 instances; Bitwuzla and cvc5 each solve 35/39, with the four
-unsolved benchmarks involving bfloat16 multiplication, which
-neither solver supports out of the box. A 66-benchmark
-stratified SMT-COMP 2024 sample shows our combined approach
-matches mature word-level reasoners on broader QF\_BV ($<$1
-benchmark gap to shift-add bit-blasting; cvc5 leads by 5),
-confirming the techniques are a complementary fast path for
-polynomial structure rather than a general replacement. Soundness
-is verified by 25 mechanised theorems in Lean~4 (zero
-\texttt{sorry}).
+Bitwuzla and cvc5 dispatch arithmetic identities via
+pattern-matched rewriting and occurrence-map canonicalisation,
+complete for commutativity and associativity but not for richer
+polynomial identities; cvc5 additionally applies Gaussian
+elimination modulo $2^d$ for linear equation systems. Neither
+tool implements a decision procedure for nonlinear polynomial
+identities over $\mathbb{Z}_{2^d}$, and on high-degree identities
+and on DSP datapath equivalences with overflow cancellation both
+rewriting and bit-blasting time out.
+
+We give the first SMT integration of a complete decision
+procedure for universally-quantified equalities of polynomial
+expressions in $\mathbb{Z}_{2^d}$, combining a strong Gr\"obner
+basis solver (ideal membership) with a vanishing-polynomial test
+using falling factorials and Kronecker-product Stirling matrices
+(function equivalence). On the 210-benchmark random-polynomial
+sample of Brain~\cite{brain2025subpoly} the procedure decides 4
+benchmarks at degree $\geq 13$ that Bitwuzla, cvc5, and every
+bit-blasting configuration we evaluated time out on within
+10\,s; on 5 DSP datapath equivalences with overflow
+cancellation~\cite{shekhar2007equivalence,gamez2024efficient}
+it solves in $<$15\,ms (cvc5 takes 1.84\,s on
+\texttt{dsp\_horner\_16}, a 184$\times$ gap); on commutativity,
+associativity, and overflow checking it is bitwidth-independent
+(BW=8 to 256, 2--5\,ms throughout) and matches Bitwuzla's
+word-level rewriting. Soundness is mechanised in
+Lean~4 with 25 theorems and zero \texttt{sorry}, including a
+contribution to Mathlib (under review); the formalisation effort
+exposed and removed a 2000$\times$ ordering sensitivity in the C++
+implementation that empirical testing did not catch.
 
 \keywords{Gr\"obner basis \and bit-vector arithmetic \and
 vanishing polynomials \and bit-vector SMT \and Lean 4.}
@@ -58,79 +64,124 @@ vanishing polynomials \and bit-vector SMT \and Lean 4.}
 
 \section{Introduction}
 
-Consider verifying that 16-bit multiplication commutes: does
-$a \times b = b \times a$ hold for all 16-bit inputs? A pure
-bit-blasting decision procedure must encode two multiplier circuits
-and prove their outputs equal---a problem that times out on
-shift-add bit-blasting at 16-bit and beyond. But $ab - ba = 0$ is
-a polynomial identity over $\mathbb{Z}_{2^{16}}$: it holds by the
-commutativity of ring multiplication, regardless of bitwidth.
-Mature word-level SMT solvers (e.g., Bitwuzla) recognise this
-syntactically; our contribution is to recognise it
-\emph{algebraically} via a Gr\"obner basis over
-$\mathbb{Z}_{2^{16}}$, in $\sim$2\,ms without generating any SAT
-clauses, and to extend the same machinery to a class of
-function-equivalence queries (e.g., DSP datapath identities) where
-syntactic rewriting alone is insufficient.
+A bit-vector SMT solver verifying
+$\forall a, b \in \mathbb{Z}_{2^{16}}.\ a \cdot b = b \cdot a$ has
+two operational options: recognise the identity \emph{syntactically}
+via word-level rewriting (the approach taken by both
+Bitwuzla~\cite{niemetz2023bitwuzla} and cvc5), or bit-blast both
+sides into a SAT formula and refute the negation. The first is
+fast when the rewriter has a matching pattern; the second is slow
+but general. Both fail when the polynomial identity escapes the
+rewriter's pattern set --- on
+$(a + b)^{18} = \sum_{i=0}^{18} \binom{18}{i} a^i b^{18-i}$ over
+$\mathbb{Z}_{2^{16}}$ no current SMT solver we tested closes the
+goal within 10\,s, and on DSP datapath equivalences whose two
+sides differ by a vanishing polynomial under modular overflow,
+rewriting falls through to a bit-blasted formula that all four
+SAT solvers we evaluated time out on.
 
-This paper presents algebraic techniques that complement bit-blasting
-for arithmetic bit-vector reasoning. The key insight is that many
-SMT queries reduce to polynomial equations over $\mathbb{Z}_{2^d}$
-(the ring of integers modulo $2^d$), where algebraic methods scale
-with polynomial degree rather than bitwidth.
+We give a third path: a \emph{decision procedure} for
+universally-quantified equalities of polynomial expressions in
+$\mathbb{Z}_{2^d}$, complete in two senses (ideal membership and
+function equivalence) and integrated as a pre-pass in
+\cbmc~\cite{clarke2004tool}. The procedure decides such queries
+in milliseconds, regardless of bitwidth.
 
-Architecturally, the contribution adds an \emph{equation-level}
-solver alongside the existing \emph{expression-level} bit-blast
-layer. Gr\"obner-basis reasoning operates on equations among
-polynomials; bit-blasting operates on expressions over individual
-bits. The two layers compose: the algebraic solver decides queries
-that reduce cleanly to polynomial ideal membership, and queries it
-cannot decide fall through to the bit-blast layer in their original
-form. We address two classes of polynomial query:
+\paragraph{Scope: four classes of bit-vector arithmetic query.}
+Bit-vector queries with multiplication split by quantification
+(universal vs.\ existential) and connective (equality vs.\ a
+relation $\bowtie \in \{<, \leq, \neq\}$) into four classes. The
+two papers in this development cover them as follows
+(Table~\ref{tab:taxonomy}); this paper addresses the
+universal-equational class with polynomial expressions in
+$\mathbb{Z}_{2^d}$, and the bit-blasting companion
+paper~\cite{companion-bitblasting} addresses the
+universal-relational and existential-relational classes.
+Existential-equational queries are split by direction:
+SAT-direction (witness construction) is handled by bit-blasting
+in both papers; UNSAT-direction (refutation) is handled in this
+paper via the Rabinowitsch trick.
 
+\begin{table}[ht]
+\caption{Four classes of bit-vector arithmetic query, with the
+example of multiplication, and the technique that decides each.
+Existential-equational is split by direction: SAT (find a
+witness) vs.\ UNSAT (no witness exists).}
+\label{tab:taxonomy}
+\centering
+\small
+\begin{tabular}{llll}
+\toprule
+Quantifier & Connective & Example & Decided by \\
+\midrule
+universal   & equational ($=$)        & $a \cdot b = b \cdot a$    & \textbf{this paper} (Gr\"obner / vanishing) \\
+universal   & relational ($\bowtie$)  & $|a \cdot b| < 2^{30}$     & companion paper (bit-blasting) \\
+existential & equational, UNSAT-dir.  & $\neg \exists x.\ p(x) = c$ & \textbf{this paper} (Rabinowitsch) \\
+existential & equational, SAT-dir.    & $\exists x.\ p(x) = c$     & bit-blasting (witness) \\
+existential & relational              & overflow witness           & companion paper (bit-blasting) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Contributions.}
 \begin{enumerate}
-\item \textbf{Polynomial ideal membership} (commutativity,
-  associativity, overflow): A strong Gr\"obner basis computation
-  over $\mathbb{Z}_{2^d}$ with the Rabinowitsch trick for
-  disequalities. Solves in $\sim$2\,ms regardless of bitwidth
+\item \textbf{A decision procedure for ideal membership in
+  $\mathbb{Z}_{2^d}$.}
+  A strong Gr\"obner basis solver over $\mathbb{Z}_{2^d}$, built
+  on the theoretical foundation of
+  Song et al.~\cite{song2024equational}. We add an SMT-grade
+  implementation: SSA-aware decomposition of nested
+  multiplications, the Rabinowitsch trick for disequalities, and
+  a progress-based termination rule that eliminates
+  equation-ordering sensitivity
   (Section~\ref{sec:algebraic}).
 
-\item \textbf{Polynomial function equivalence} (DSP datapaths):
-  A vanishing polynomial test using Stirling numbers and falling
-  factorial decomposition. Complete for the equivalence fragment,
-  handling cases where $f - g \neq 0$ as a polynomial but vanishes
-  as a function (Section~\ref{sec:vanishing}).
+\item \textbf{A decision procedure for function equivalence over
+  $\mathbb{Z}_{2^d}$.}
+  Ideal membership in $\mathbb{Z}_{2^d}[x_1,\ldots,x_n]$ is not
+  the right question for SMT: an SMT user verifying
+  $\forall a, b.\ f(a,b) = g(a,b)$ wants \emph{function}
+  equivalence, and over $\mathbb{Z}_{2^d}$ the two notions
+  diverge --- e.g., $4x^2 + 4x \equiv 0 \pmod 8$ as a function
+  but is non-zero as a polynomial. We give a vanishing-polynomial
+  test using falling-factorial decomposition and Kronecker-product
+  Stirling matrices, complete for the function-equivalence
+  semantics, that decides such cases in microseconds
+  (Section~\ref{sec:vanishing}).
+
+\item \textbf{Mechanised soundness with formalisation-driven
+  refinement.}
+  25 theorems in Lean~4 with zero \texttt{sorry}; the unit
+  characterisation of $\mathbb{Z}_{2^d}$ is contributed to
+  Mathlib (under review). The Lean termination proof forced us
+  to isolate a ``progress'' invariant that, when ported back to
+  the C++ implementation, eliminated a 2000$\times$ ordering
+  sensitivity that empirical testing had not exposed
+  (Section~\ref{sec:algebraic-algo}).
 \end{enumerate}
 
-Algebraic techniques scale well with bitwidth (commutativity at
-BW=32 takes the same 0.3\,ms as BW=16) but are limited to
-polynomial operations---problems involving bitwise operations,
-shifts, or inequalities fall through to bit-blasting.
+\paragraph{Empirical results.}
+On the 210-benchmark random-polynomial sample of
+Brain~\cite{brain2025subpoly}, the procedure decides 4
+benchmarks at degree $\geq 13$ that Bitwuzla 0.9.0-dev,
+cvc5 1.3.3, and every bit-blasting configuration we tested time
+out on within 10\,s (Section~\ref{sec:eval-random-poly}). On 5
+DSP datapath equivalences with overflow
+cancellation~\cite{shekhar2007equivalence}, the procedure solves
+all five in $<$15\,ms; cvc5 takes 1.84\,s on
+\texttt{dsp\_horner\_16}, a 184$\times$ gap
+(Section~\ref{sec:eval-custom}). On commutativity, associativity,
+and overflow checking the procedure is bitwidth-independent
+(2--5\,ms from BW=8 to 256), matching Bitwuzla's word-level
+rewriting and outpacing pure bit-blasting (which times out at
+BW=16). On a broader 66-benchmark SMT-COMP stratified sample our
+procedure trails Bitwuzla in solved count: the heuristic-rewriting
+approach wins this volume contest, while the four wins above and
+the DSP datapath equivalences are queries it cannot decide at all
+(Section~\ref{sec:eval-smtcomp}).
 
-Bit-vector SMT queries involving multiplication split by
-quantification (universal vs.\ existential) and connective
-($=$ vs.\ a relation $\bowtie \in \{<, \leq, \neq\}$) into four
-classes; commutativity is universal-equational, factoring is
-existential-equational, bounds checking is universal-relational,
-and overflow detection is existential-relational. Algebraic
-techniques excel on universal-equational queries because they
-prove identities without enumerating inputs, but they are
-UNSAT-oriented (unable to construct witnesses) and so do not
-replace bit-blasting on the other three classes. This paper
-focuses on the algebraic side; the bit-blasting companion
-paper~\cite{companion-bitblasting} contributes encoding
-improvements targeting the other three classes.
-
-On 39 custom QF\_BV benchmarks designed to exercise arithmetic
-identities, \cbmc solves all 39 instances;
-Bitwuzla~\cite{niemetz2023bitwuzla} (SMT-COMP 2024 QF\_BV winner)
-and cvc5 each solve 35/39 in default mode. The four they do not
-solve all involve bfloat16 multiplication, a non-standard
-floating-point type that neither solver supports out of the box;
-both can be rebuilt with experimental floating-point flags to
-add support, but the off-the-shelf builds error out on these
-inputs. We introduce zero correctness regressions across 691
-existing tests.
+We introduce zero correctness regressions across \cbmc's 691
+existing regression tests.
 
 \section{Algebraic Solving via Gr\"obner Bases}
 \label{sec:algebraic}
