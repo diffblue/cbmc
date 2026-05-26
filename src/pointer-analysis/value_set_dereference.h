@@ -71,7 +71,7 @@ public:
   static bool should_ignore_value(
     const exprt &what,
     bool exclude_null_derefs,
-    const irep_idt &language_mode);
+    irep_idt language_mode);
 
   static valuet build_reference_to(
     const exprt &what,

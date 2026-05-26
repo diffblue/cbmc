@@ -423,7 +423,7 @@ bool value_set_dereferencet::dereference_type_compare(
 bool value_set_dereferencet::should_ignore_value(
   const exprt &what,
   bool exclude_null_derefs,
-  const irep_idt &language_mode)
+  irep_idt language_mode)
 {
   if(what.id() == ID_unknown || what.id() == ID_invalid)
   {

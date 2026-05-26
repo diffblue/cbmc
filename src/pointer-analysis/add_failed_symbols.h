@@ -24,7 +24,7 @@ void add_failed_symbols(symbol_table_baset &symbol_table);
 void add_failed_symbol_if_needed(
   const symbolt &symbol, symbol_table_baset &symbol_table);
 
-irep_idt failed_symbol_id(const irep_idt &identifier);
+irep_idt failed_symbol_id(irep_idt identifier);
 
 /// Get the failed-dereference symbol for the given symbol
 /// \param expr: symbol expression to get a failed symbol for

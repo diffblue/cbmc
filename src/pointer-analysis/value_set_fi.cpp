@@ -1319,7 +1319,7 @@ void value_set_fit::assign_rec(
 }
 
 void value_set_fit::do_function_call(
-  const irep_idt &function,
+  irep_idt function,
   const exprt::operandst &arguments,
   const namespacet &ns)
 {

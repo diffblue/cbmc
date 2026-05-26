@@ -87,7 +87,7 @@ void value_set_analysis_fit::get_entries(
 }
 
 void value_set_analysis_fit::get_entries_rec(
-  const irep_idt &identifier,
+  irep_idt identifier,
   const std::string &suffix,
   const typet &type,
   std::list<value_set_fit::entryt> &dest)
@@ -207,7 +207,7 @@ bool value_set_analysis_fit::check_type(const typet &type)
 }
 
 std::vector<exprt> value_set_analysis_fit::get_values(
-  const irep_idt &function_id,
+  irep_idt function_id,
   flow_insensitive_analysis_baset::locationt l,
   const exprt &expr)
 {
