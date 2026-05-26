@@ -17,7 +17,7 @@ Author: Diffblue Ltd.
 class java_string_literal_exprt : public exprt
 {
 public:
-  explicit java_string_literal_exprt(const irep_idt &literal)
+  explicit java_string_literal_exprt(irep_idt literal)
     : exprt(ID_java_string_literal)
   {
     set(ID_value, literal);

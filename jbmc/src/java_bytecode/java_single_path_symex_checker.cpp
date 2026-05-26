@@ -26,7 +26,7 @@ goto_tracet java_single_path_symex_checkert::build_shortest_trace() const
 }
 
 goto_tracet
-java_single_path_symex_checkert::build_trace(const irep_idt &property_id) const
+java_single_path_symex_checkert::build_trace(irep_idt property_id) const
 {
   goto_tracet goto_trace = single_path_symex_checkert::build_trace(property_id);
   check_trace_assumptions(

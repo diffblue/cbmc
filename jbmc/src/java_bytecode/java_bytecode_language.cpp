@@ -305,9 +305,8 @@ void java_bytecode_languaget::initialize_class_loader(
   {
     string_preprocess.initialize_known_type_table();
 
-    auto get_string_base_classes = [this](const irep_idt &id) {
-      return string_preprocess.get_string_type_base_classes(id);
-    };
+    auto get_string_base_classes = [this](irep_idt id)
+    { return string_preprocess.get_string_type_base_classes(id); };
 
     java_class_loader.set_extra_class_refs_function(get_string_base_classes);
   }
@@ -511,7 +510,7 @@ static void infer_opaque_type_fields(
 /// \param symbol_table: global symbol table; a symbol may be added
 /// \return java.lang.Class typed symbol expression
 static symbol_exprt get_or_create_class_literal_symbol(
-  const irep_idt &class_id,
+  irep_idt class_id,
   symbol_table_baset &symbol_table)
 {
   struct_tag_typet java_lang_Class("java::java.lang.Class");
@@ -635,10 +634,10 @@ static void generate_constant_global_variables(
 ///   to be created later.
 static void create_stub_global_symbol(
   symbol_table_baset &symbol_table,
-  const irep_idt &symbol_id,
-  const irep_idt &symbol_basename,
+  irep_idt symbol_id,
+  irep_idt symbol_basename,
   const typet &symbol_type,
-  const irep_idt &class_id,
+  irep_idt class_id,
   bool force_nondet_init)
 {
   symbolt new_symbol{symbol_id, symbol_type, ID_java};
@@ -675,7 +674,7 @@ static void create_stub_global_symbol(
 /// \return first incomplete ancestor encountered,
 ///   including start_class_id itself.
 static irep_idt get_any_incomplete_ancestor_for_stub_static_field(
-  const irep_idt &start_class_id,
+  irep_idt start_class_id,
   const symbol_table_baset &symbol_table,
   const class_hierarchyt &class_hierarchy)
 {
@@ -1120,15 +1119,15 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
 
   const method_convertert method_converter =
     [this, &symbol_table_builder, &class_to_declared_symbols, &message_handler](
-      const irep_idt &function_id,
-      ci_lazy_methods_neededt lazy_methods_needed) {
-      return convert_single_method(
-        function_id,
-        symbol_table_builder,
-        std::move(lazy_methods_needed),
-        class_to_declared_symbols,
-        message_handler);
-    };
+      irep_idt function_id, ci_lazy_methods_neededt lazy_methods_needed)
+  {
+    return convert_single_method(
+      function_id,
+      symbol_table_builder,
+      std::move(lazy_methods_needed),
+      class_to_declared_symbols,
+      message_handler);
+  };
 
   ci_lazy_methodst method_gather(
     symbol_table,
@@ -1182,7 +1181,7 @@ void java_bytecode_languaget::methods_provided(
 /// \param symtab: global symbol table
 /// \param message_handler: message handler
 void java_bytecode_languaget::convert_lazy_method(
-  const irep_idt &function_id,
+  irep_idt function_id,
   symbol_table_baset &symtab,
   message_handlert &message_handler)
 {
@@ -1280,7 +1279,7 @@ static void notify_static_method_calls(
 ///   they declare.
 /// \param message_handler: message handler
 bool java_bytecode_languaget::convert_single_method(
-  const irep_idt &function_id,
+  irep_idt function_id,
   symbol_table_baset &symbol_table,
   std::optional<ci_lazy_methods_neededt> needed_lazy_methods,
   lazy_class_to_declared_symbols_mapt &class_to_declared_symbols,
@@ -1339,7 +1338,7 @@ bool java_bytecode_languaget::convert_single_method(
 ///   they declare.
 /// \param message_handler: message handler
 bool java_bytecode_languaget::convert_single_method_code(
-  const irep_idt &function_id,
+  irep_idt function_id,
   symbol_table_baset &symbol_table,
   std::optional<ci_lazy_methods_neededt> needed_lazy_methods,
   lazy_class_to_declared_symbols_mapt &class_to_declared_symbols,

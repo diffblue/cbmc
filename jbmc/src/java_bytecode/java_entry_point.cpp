@@ -547,7 +547,7 @@ static codet record_exception(
 
 main_function_resultt get_main_symbol(
   const symbol_table_baset &symbol_table,
-  const irep_idt &main_class,
+  irep_idt main_class,
   message_handlert &message_handler)
 {
   messaget message(message_handler);
@@ -601,7 +601,7 @@ main_function_resultt get_main_symbol(
 
 bool java_entry_point(
   symbol_table_baset &symbol_table,
-  const irep_idt &main_class,
+  irep_idt main_class,
   message_handlert &message_handler,
   bool assume_init_pointers_not_null,
   bool assert_uncaught_exceptions,

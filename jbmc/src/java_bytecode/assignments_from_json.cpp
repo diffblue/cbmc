@@ -914,7 +914,7 @@ code_with_references_listt assign_from_json_rec(
 code_with_references_listt assign_from_json(
   const exprt &expr,
   const jsont &json,
-  const irep_idt &function_id,
+  irep_idt function_id,
   symbol_table_baset &symbol_table,
   std::optional<ci_lazy_methods_neededt> &needed_lazy_methods,
   size_t max_user_array_length,

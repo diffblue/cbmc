@@ -34,11 +34,11 @@ public:
   }
 
   // Lower instanceof for a single function
-  bool lower_instanceof(const irep_idt &function_identifier, goto_programt &);
+  bool lower_instanceof(irep_idt function_identifier, goto_programt &);
 
   // Lower instanceof for a single instruction
   bool lower_instanceof(
-    const irep_idt &function_identifier,
+    irep_idt function_identifier,
     goto_programt &,
     goto_programt::targett);
 
@@ -49,7 +49,7 @@ protected:
   message_handlert &message_handler;
 
   bool lower_instanceof(
-    const irep_idt &function_identifier,
+    irep_idt function_identifier,
     exprt &,
     goto_programt &,
     goto_programt::targett);
@@ -66,7 +66,7 @@ protected:
 /// \return disjunction of the possible matched subtypes
 static exprt subtype_expr(
   const exprt &classid_field,
-  const irep_idt &target_type,
+  irep_idt target_type,
   const class_hierarchyt &class_hierarchy)
 {
   std::vector<irep_idt> children =
@@ -75,9 +75,9 @@ static exprt subtype_expr(
   // Sort alphabetically to make order of generated disjuncts
   // independent of class loading order
   std::sort(
-    children.begin(), children.end(), [](const irep_idt &a, const irep_idt &b) {
-      return a.compare(b) < 0;
-    });
+    children.begin(),
+    children.end(),
+    [](irep_idt a, irep_idt b) { return a.compare(b) < 0; });
 
   exprt::operandst or_ops;
   for(const auto &class_name : children)
@@ -99,7 +99,7 @@ static exprt subtype_expr(
 /// \param this_inst: instruction the expression is found at
 /// \return true if any instanceof instructionw was replaced
 bool remove_instanceoft::lower_instanceof(
-  const irep_idt &function_identifier,
+  irep_idt function_identifier,
   exprt &expr,
   goto_programt &goto_program,
   goto_programt::targett this_inst)
@@ -237,7 +237,7 @@ static bool contains_instanceof(const exprt &e)
 /// \param target: instruction to check for instanceof expressions
 /// \return true if an instanceof has been replaced
 bool remove_instanceoft::lower_instanceof(
-  const irep_idt &function_identifier,
+  irep_idt function_identifier,
   goto_programt &goto_program,
   goto_programt::targett target)
 {
@@ -276,7 +276,7 @@ bool remove_instanceoft::lower_instanceof(
 /// \param goto_program: The function body to work on.
 /// \return true if one or more instanceof expressions have been replaced
 bool remove_instanceoft::lower_instanceof(
-  const irep_idt &function_identifier,
+  irep_idt function_identifier,
   goto_programt &goto_program)
 {
   bool changed=false;
@@ -304,7 +304,7 @@ bool remove_instanceoft::lower_instanceof(
 /// \param class_hierarchy: class hierarchy analysis of symbol_table
 /// \param message_handler: logging output
 void remove_instanceof(
-  const irep_idt &function_identifier,
+  irep_idt function_identifier,
   goto_programt::targett target,
   goto_programt &goto_program,
   symbol_table_baset &symbol_table,
@@ -324,7 +324,7 @@ void remove_instanceof(
 /// \param class_hierarchy: class hierarchy analysis of symbol_table
 /// \param message_handler: logging output
 void remove_instanceof(
-  const irep_idt &function_identifier,
+  irep_idt function_identifier,
   goto_functionst::goto_functiont &function,
   symbol_table_baset &symbol_table,
   const class_hierarchyt &class_hierarchy,

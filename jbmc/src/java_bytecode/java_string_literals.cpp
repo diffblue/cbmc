@@ -184,7 +184,7 @@ symbol_exprt get_or_create_string_literal_symbol(
 }
 
 symbol_exprt get_or_create_string_literal_symbol(
-  const irep_idt &string_value,
+  irep_idt string_value,
   symbol_table_baset &symbol_table,
   bool string_refinement_enabled)
 {

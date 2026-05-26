@@ -41,7 +41,7 @@ void java_root_class(symbolt &class_symbol)
 void java_root_class_init(
   struct_exprt &jlo,
   const struct_typet &root_type,
-  const irep_idt &class_identifier)
+  irep_idt class_identifier)
 {
   jlo.operands().resize(root_type.components().size());
 
