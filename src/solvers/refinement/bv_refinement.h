@@ -126,7 +126,22 @@ private:
   void get_values(approximationt &approximation);
   void check_SAT();
   void check_UNSAT();
-  void detect_algebraic_pairs();
+  /// Find commutative/associative/distributive multiplier
+  /// equivalences and assert result equality at the bit level.
+  /// Returns the total number of equality constraints emitted
+  /// (commutative pairs plus distributive triples). Callers can use
+  /// the return value to decide whether the refinement-loop
+  /// architecture is justified for the query: when zero
+  /// equivalences are found, \ref dec_solve falls back to direct
+  /// bit-blasting via \ref eagerly_complete_approximations rather
+  /// than entering the refinement loop.
+  std::size_t detect_algebraic_pairs();
+  /// Assert exact bit-blasted multiplication semantics for every
+  /// approximation. After this call the refinement loop is
+  /// effectively bypassed because no over/under-approximation can
+  /// contradict the exact constraint. Used as a fallback when
+  /// pair detection finds no useful equivalences.
+  void eagerly_complete_approximations();
   void arrays_overapproximated();
   void freeze_lazy_constraints();
 

@@ -43,7 +43,7 @@ collects:
 
 | File | Severity | Status |
 |---|---|---|
-| `refine-arithmetic-bypass-investigation.md` | High | Diagnosed but **not fixed** (initial). Will be fixed in this session per the user's request — the fix changes CBMC's behaviour but does NOT change submitted Paper 1 text. |
+| `refine-arithmetic-bypass-investigation.md` | High | **Fixed** in this session. The fix bit-blasts multiplications eagerly under `--refine-arithmetic` rather than lazily, eliminating the refinement loop's per-iteration SAT overhead while preserving pair detection's equality constraints. The submitted Paper 1 reflects the *pre-fix* behaviour. |
 
 ### Post-submission data
 

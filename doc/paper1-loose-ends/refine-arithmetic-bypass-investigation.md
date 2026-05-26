@@ -117,11 +117,50 @@ that helps on benchmarks with pair-detection opportunities but
 hurts on benchmarks without them. Fixing this with Option A would
 make `--refine-arithmetic` a strict superset of pure bit-blasting.
 
-## Status (2026-05-16)
+## Status (2026-05-26)
 
-Diagnosed but not fixed. Documented as a Paper 1 issue separate
-from the Paper 2 work. Out of scope for the current Paper 2
-hardening session.
+**Fixed** in commit forthcoming. The fix turned out to be different
+from the original Option-A diagnosis: the Martin regressions
+*do* trigger pair detection (verified with default verbosity --- the
+earlier `--verbosity 7` test misled me by suppressing or
+overwhelming the relevant log lines). The slowdown is the
+refinement loop's lazy-multiplication architecture itself, not the
+"no pairs detected" case.
+
+The fix unconditionally bit-blasts every multiplication eagerly
+under `--refine-arithmetic`, then enters the loop. The loop
+converges in one iteration because there is nothing left to
+refine; pair detection's emitted equality constraints are
+preserved and continue to provide the SAT solver shortcuts they
+were designed to provide.
+
+`CBMC_DISABLE_REFINE_BYPASS=1` keeps the legacy lazy behaviour for
+benchmarking.
+
+Empirical impact on the three Martin regressions (10\,s timeout):
+
+| Benchmark | shift-add | pair_detect (legacy) | pair_detect (fixed) |
+|---|---|---|---|
+| bw-8 deg-5 addition | 0.11\,s | T/O | **0.05\,s** |
+| bw-8 deg-8 addition | 0.22\,s | T/O | **0.08\,s** |
+| bw-8 deg-12 addition | 0.56\,s | T/O | **0.12\,s** |
+
+Pair_detect with the fix is *faster* than shift-add bit-blasting
+on all three, because pair detection's added equality constraints
+let the SAT solver short-circuit that pure bit-blasting cannot.
+
+**The submitted Paper 1 reflects the pre-fix (legacy) behaviour.**
+Any post-peer-review revision to Paper 1 should re-run the wide
+three-pool comparison with the fix to update headline numbers.
+
+## Diagnosis (initial; superseded)
+
+Earlier I had thought the Martin regressions were the "no pairs
+detected" case (Option A in the original investigation below).
+That was wrong --- pair detection does fire, but the refinement
+loop's overhead masks any benefit. The fix is therefore broader
+than originally proposed: bypass the loop unconditionally under
+\texttt{--refine-arithmetic}.
 
 ## Reproduce
 

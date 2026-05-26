@@ -918,16 +918,16 @@ bv_refinementt::add_approximation(
 /// equality to give the SAT solver a polynomial-size proof witness
 /// for the equality, useful when the equality is propagated through
 /// further opaque computation.
-void bv_refinementt::detect_algebraic_pairs()
+std::size_t bv_refinementt::detect_algebraic_pairs()
 {
   if(!config_.refine_arithmetic)
-    return;
+    return 0;
 
   // Allow disabling pair detection at runtime for benchmarking/A-B
   // comparison (CBMC_DISABLE_REFINE_PAIR_DETECTION=1).
   if(const char *env = std::getenv("CBMC_DISABLE_REFINE_PAIR_DETECTION");
      env != nullptr && env[0] != '\0' && env[0] != '0')
-    return;
+    return 0;
 
   // Map result_bv -> approximation iterator, for BV-level operand
   // resolution.
@@ -1114,6 +1114,47 @@ void bv_refinementt::detect_algebraic_pairs()
   {
     log.status() << "BV-Refinement: detected " << dist_found
                  << " distributive multiplier triple(s)" << messaget::eom;
+  }
+
+  return pairs_found + dist_found;
+}
+
+void bv_refinementt::eagerly_complete_approximations()
+{
+  // For each multiplication approximation, assert the exact
+  // bit-blasted product as a hard constraint and clear the
+  // initial under/over-approximation assumptions. The refinement
+  // loop will then converge in a single iteration: there are no
+  // approximations left to refine.
+  //
+  // Used by dec_solve when detect_algebraic_pairs found no useful
+  // equivalences --- in that case the refinement loop's overhead
+  // (multiple SAT calls as the under-approximation is widened) is
+  // pure cost. Direct bit-blasting via the standard multiplier
+  // encoding is faster.
+  //
+  // Clearing under_assumptions in particular is crucial: by default
+  // \ref initialize sets them to ``operands are zero'', which gives
+  // the first iteration a spurious UNSAT and triggers the
+  // refinement loop. With an exact constraint in place, the
+  // ``operands are zero'' under-approximation is just a wrong hint.
+  for(auto &a : approximations)
+  {
+    if(a.expr.id() != ID_mult || a.no_operands != 2)
+      continue;
+    const typet &t = a.expr.type();
+    bvt exact;
+    if(t.id() == ID_unsignedbv)
+      exact = bv_utils.unsigned_multiplier(a.op0_bv, a.op1_bv);
+    else if(t.id() == ID_signedbv)
+      exact = bv_utils.signed_multiplier(a.op0_bv, a.op1_bv);
+    else
+      continue;
+    bv_utils.set_equal(exact, a.result_bv);
+    a.over_assumptions.clear();
+    a.under_assumptions.clear();
+    a.over_state = MAX_STATE;
+    a.under_state = MAX_STATE;
   }
 }
 
