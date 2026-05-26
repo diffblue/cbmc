@@ -14,11 +14,11 @@
 | #3 Abstract is misleading (missing SMT-COMP datapoint) | **FIXED** | (current session) |
 | #4 ZFP terminology inconsistent | **FIXED** | (current session) |
 | #5 Completeness claim vs §6 future-work line | **FIXED** | (current session) — implementation already supports mixed widths; §6 line removed; §3.2 strengthened with explicit "Mixed input widths" paragraph documenting the capability and citing two benchmarks (dsp_image_reject and dsp_vanishing_mv) |
-| #6 §3 completeness claim vs §4.5 SAT-finding losses | TODO | — |
+| #6 §3 completeness claim vs §4.5 SAT-finding losses | **FIXED** | (current session) — added "Direction of completeness" paragraph in §3 explicitly stating the algebraic layer is UNSAT-oriented |
 | #7 Table 1 shows only 11/39 benchmarks | TODO | — |
 | #8 §2.6 5-layer pipeline table confusing | TODO | — |
-| #9 §2.7 shift-add comparison unfair | TODO | — |
-| #10 §2.3 contribution list awkward | TODO | — |
+| #9 §2.7 shift-add comparison unfair | **FIXED** | (current session) — added Bitwuzla column to Table 2; rephrased framing to acknowledge mature word-level reasoners also handle these identities; updated abstract and §1 opener to remove the misleading "four orders of magnitude" claim |
+| #10 §2.3 contribution list awkward | **FIXED** | (current session) — consolidated 6 points into 3 grouped contributions: SMT integration, algorithmic refinements, mechanised soundness |
 | #11 Methodology inconsistency (median of 3 vs 5) | TODO | — |
 | #12 'Honest reading' paragraphs scattered | TODO | — |
 | #13 §1 four-classes taxonomy too long | TODO | — |

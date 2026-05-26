@@ -31,8 +31,9 @@ We present algebraic techniques for verifying arithmetic properties
 of fixed-width bit-vector programs without bit-blasting. A strong
 Gr\"obner basis solver over $\mathbb{Z}_{2^d}$ resolves polynomial
 equations (commutativity, associativity, overflow checking) in under
-5\,ms regardless of bitwidth---at least four orders of magnitude
-faster than SAT solving once bit-blasting times out. For DSP
+5\,ms regardless of bitwidth---matching mature word-level
+reasoners on simple identities and outpacing pure bit-blasting,
+which times out already at 16-bit commutativity. For DSP
 datapath equivalence, where symbolically distinct
 polynomials become equivalent due to overflow cancellation, a
 vanishing polynomial test based on falling factorial
@@ -57,13 +58,19 @@ vanishing polynomials \and bit-vector SMT \and Lean 4.}
 \section{Introduction}
 
 Consider verifying that 16-bit multiplication commutes: does
-$a \times b = b \times a$ hold for all 16-bit inputs? A SAT-based
-bit-vector SMT solver must encode two multiplier circuits and prove
-their outputs equal---a problem that grows exponentially with
-bitwidth. But $ab - ba = 0$ is a polynomial identity over
-$\mathbb{Z}_{2^{16}}$: it holds by the commutativity of ring
-multiplication, regardless of bitwidth. Our Gr\"obner basis solver
-recognises this in 0.009\,s without generating any SAT clauses.
+$a \times b = b \times a$ hold for all 16-bit inputs? A pure
+bit-blasting decision procedure must encode two multiplier circuits
+and prove their outputs equal---a problem that times out on
+shift-add bit-blasting at 16-bit and beyond. But $ab - ba = 0$ is
+a polynomial identity over $\mathbb{Z}_{2^{16}}$: it holds by the
+commutativity of ring multiplication, regardless of bitwidth.
+Mature word-level SMT solvers (e.g., Bitwuzla) recognise this
+syntactically; our contribution is to recognise it
+\emph{algebraically} via a Gr\"obner basis over
+$\mathbb{Z}_{2^{16}}$, in $\sim$2\,ms without generating any SAT
+clauses, and to extend the same machinery to a class of
+function-equivalence queries (e.g., DSP datapath identities) where
+syntactic rewriting alone is insufficient.
 
 This paper presents algebraic techniques that complement bit-blasting
 for arithmetic bit-vector reasoning. The key insight is that many
@@ -84,7 +91,7 @@ form. We address two classes of polynomial query:
 \item \textbf{Polynomial ideal membership} (commutativity,
   associativity, overflow): A strong Gr\"obner basis computation
   over $\mathbb{Z}_{2^d}$ with the Rabinowitsch trick for
-  disequalities. Solves in $<$1\,ms regardless of bitwidth
+  disequalities. Solves in $\sim$2\,ms regardless of bitwidth
   (Section~\ref{sec:algebraic}).
 
 \item \textbf{Polynomial function equivalence} (DSP datapaths):
@@ -306,46 +313,41 @@ implementation.
 Song et al.~\cite{song2024equational} established that strong
 Gr\"obner bases over $\mathbb{Z}_{2^d}$ solve the equational theory
 of bit-vectors, and provided a paper-and-pencil proof of this
-result. Our contributions sit at the next layer: integrating the
-algebraic procedure into a bit-vector SMT solver and making the
-combined system robust and reproducible.
+result. We translate that foundation into a working SMT
+component along three axes:
 
 \begin{enumerate}
-\item \textbf{End-to-end integration in an SMT solver.} We
-  implement the strong
-  Gr\"obner basis inside \cbmc's post-SSA pipeline so it runs
-  transparently on every bit-vector query; no user annotation
-  is required.
-\item \textbf{Rabinowitsch trick for disequalities.} Song et
-  al.\ consider the equational theory; SMT queries also
-  include disequalities ($c \neq d$). We model these with an
-  auxiliary polynomial $(c - d) \cdot e - 1 = 0$
-  (Rabinowitsch), reducing disequation satisfiability to
-  unit-constant detection.
-\item \textbf{Fresh-variable decomposition of inline terms in SSA
-  form.} Verification conditions written in SSA contain deeply
-  nested multiplications; we introduce fresh variables per
-  product so the Gr\"obner basis operates on a flat, uniform
-  polynomial set.
-\item \textbf{Progress-based termination (Section~\ref{sec:algebraic-algo}).}
-  Eliminates equation-ordering sensitivity.
-\item \textbf{Candidate extraction with assumption-gated SAT hints.}
-  When the algebraic layer is inconclusive (non-unit basis) we
-  extract a partial model and pass it as SAT hints to the
-  bit-blasting layer, avoiding duplicated exploration.
-\item \textbf{Mechanised soundness in Lean 4.} 25 theorems with
-  zero \texttt{sorry}, including a new Mathlib contribution
-  (PR \#38628) on the unit characterisation of
-  $\mathbb{Z}_{2^d}$.
+\item \textbf{End-to-end SMT integration.} The strong Gr\"obner
+  basis is wired into \cbmc's post-SSA pipeline so it runs
+  transparently on every bit-vector query, with no user
+  annotation. SMT queries contain disequalities and deeply nested
+  inline multiplications that fall outside the equational theory
+  Song et al.\ analyse: we handle disequalities via the
+  Rabinowitsch trick (an auxiliary polynomial
+  $(c - d) \cdot e - 1 = 0$ that reduces disequation
+  satisfiability to unit-constant detection) and decompose nested
+  multiplications into fresh variables with defining equations,
+  giving Buchberger a flat, uniform polynomial set.
+
+\item \textbf{Algorithmic refinements for SMT-scale problems.}
+  Standard Buchberger is sensitive to equation ordering and can
+  diverge before reaching a unit constant. We add
+  progress-based termination
+  (Section~\ref{sec:algebraic-algo}) that eliminates the
+  ordering sensitivity, and candidate extraction with
+  assumption-gated SAT hints: when the algebraic layer is
+  inconclusive (non-unit basis), we extract a partial model and
+  pass it as soft hints to the bit-blasting layer, avoiding
+  duplicated exploration.
+
+\item \textbf{Mechanised soundness.} 25 theorems in Lean 4 with
+  zero \texttt{sorry}, including a Mathlib contribution (under
+  review) on the unit characterisation of $\mathbb{Z}_{2^d}$.
 \end{enumerate}
 
-None of the six individually is a standalone research result;
-together they are what makes algebraic solving practical inside a
-general-purpose bit-vector SMT solver. The empirical evidence in
-Section~\ref{sec:external}
-shows that the combined procedure solves all 39 benchmarks in our
-custom suite, including all the polynomial-equation benchmarks that
-bit-blasting alone times out on.
+The combined procedure solves all 39 benchmarks in our custom
+suite, including all polynomial-equation benchmarks that
+bit-blasting alone times out on; details in Section~\ref{sec:external}.
 
 \subsection{Solver Pipeline}
 \label{sec:algebraic-pipeline}
@@ -536,30 +538,57 @@ when they do not apply.
 
 A distinctive property of the algebraic procedure is that its
 running time is essentially independent of the bit-vector width.
-We verify this empirically by measuring the Gr\"obner-basis
-running time on commutativity and associativity benchmarks at
-bitwidths from 8 to 256 (mean of 5 runs each, discarding the first
-``cold'' run; \cbmc \texttt{smt2\_solver} with \cadical).
+We verify this empirically on commutativity and associativity
+benchmarks at bitwidths 8 to 256 and compare against
+Bitwuzla~\cite{niemetz2023bitwuzla}, the SMT-COMP 2024 QF\_BV
+winner, which uses word-level rewriting. We also show \cbmc's
+shift-add bit-blasting baseline as a reference for what naive
+encoding would do (median of 4 warm runs, 5 runs total with the
+first discarded).
 
 \begin{table}[ht]
-\caption{Bitwidth scaling of the Gr\"obner-basis solver
-  (ms; mean of 4 warm runs; 5 runs total with the first discarded).
-  At BW$=$256 the Gr\"obner-basis check remains below 5\,ms, while
-  the bit-blasting solver times out already at BW$=$16 for
-  commutativity with the default shift-add encoding.}
+\caption{Bitwidth scaling on the commutativity and associativity
+  family (ms; median of 4 warm runs; 60\,s timeout). Both the
+  Gr\"obner-basis solver and Bitwuzla's word-level rewriting are
+  bitwidth-independent; \cbmc's shift-add bit-blasting baseline
+  times out at BW$=$16 and beyond.}
 \label{tab:scaling}
 \centering
 \begin{tabular}{lrrrrrr}
 \toprule
-Benchmark & BW$=$8 & BW$=$16 & BW$=$32 & BW$=$64 & BW$=$128 & BW$=$256 \\
+Configuration & BW$=$8 & BW$=$16 & BW$=$32 & BW$=$64 & BW$=$128 & BW$=$256 \\
 \midrule
-comm (algebraic)    & 5.01 & 4.68 & 4.67 & 4.86 & 4.70 & 4.66 \\
-assoc (algebraic)   & 4.68 & 4.72 & 4.71 & 4.68 & 4.68 & 4.70 \\
+\multicolumn{7}{l}{\emph{commutativity}} \\
+\cbmc (algebraic)        & 2.37 & 2.18 & 2.14 & 2.13 & 2.02 & 2.13 \\
+Bitwuzla (word-level)    & 1.59 & 1.51 & 1.62 & 1.48 & 1.56 & 1.59 \\
+\cbmc (SAT, shift-add)   & 684 & T/O & T/O & T/O & T/O & T/O \\
 \midrule
-comm (SAT, shift-add) & 0.72 s & T/O & T/O & T/O & T/O & T/O \\
+\multicolumn{7}{l}{\emph{associativity}} \\
+\cbmc (algebraic)        & 2.11 & 2.06 & 2.05 & 2.07 & 2.07 & 2.09 \\
+Bitwuzla (word-level)    & 1.67 & 1.74 & 1.67 & 1.66 & 1.69 & 1.68 \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+The algebraic solver and Bitwuzla both exhibit bitwidth-independent
+behaviour, reaching the same answer in 2--3\,ms regardless of
+operand width. The mechanisms differ: our procedure recognises the
+identity through Gr\"obner-basis reduction of the
+Rabinowitsch-augmented polynomial system, while Bitwuzla performs
+syntactic word-level rewriting that recognises commutativity and
+associativity directly. Both approaches give a structural reason
+why the equation holds; both avoid bit-blasting entirely. The
+practical implication is that on simple polynomial-equation
+queries, mature word-level reasoners already do the right thing,
+and our algebraic procedure is most useful when the polynomial
+structure is harder to recognise syntactically (Sections~\ref{sec:vanishing},
+\ref{sec:eval-random-poly}).
+
+The shift-add bit-blasting baseline is included for reference: it
+shows that an SMT solver without word-level reasoning would face
+exponential blow-up in bitwidth on these queries. This is a
+property of the pure-bit-blasting approach, not of bit-vector
+reasoning in general.
 
 The Gr\"obner-basis solver's time is dominated by (a) equation
 collection, (b) polynomial normalisation over $\mathbb{Z}_{2^d}$,
@@ -567,15 +596,7 @@ and (c) a small number of S-polynomial reductions until the unit
 constant appears. None of these scales with $d$: coefficient
 arithmetic uses arbitrary-precision integers (via \cbmc's
 \texttt{mp\_integer}), and the polynomial structure is determined
-by the problem shape, not the bitwidth. The mild BW$=$8 outlier
-(5.01\,ms) reflects the very first JIT/cache-warm run; runs 2--5
-all fall at $4.7 \pm 0.1$\,ms.
-
-For comparison, the bit-blasting solver's running time grows
-super-exponentially with bitwidth: commutativity at BW$=$16 already
-times out at 120\,s under shift-add, and a speedup of over
-$2.6 \times 10^4$ from bit-blasting to the algebraic procedure is
-conservative on any sufficiently non-trivial case.
+by the problem shape, not the bitwidth.
 
 
 \section{Vanishing Polynomial Test}
@@ -610,6 +631,20 @@ coefficient scaling causes overflow cancellation. We implement the
 algebraic test of Shekhar et al.~\cite{shekhar2007equivalence},
 extended with the efficient normalisation algorithm of
 G\`amez-Montolio et al.~\cite{gamez2024efficient}.
+
+\paragraph{Direction of completeness.}
+The vanishing-polynomial test, and the Gr\"obner-basis solver
+of Section~\ref{sec:algebraic} more broadly, decide UNSAT-direction
+queries: they prove that two polynomials are equal as functions
+(equivalently, that a disequality is unsatisfiable) but cannot
+construct a witness when they differ. SAT-finding queries
+(``does $p(x) = c$ have a solution?'', root-finding, factoring)
+require the bit-blast layer instead. Section~\ref{sec:eval-random-poly}
+quantifies this: on random polynomial-identity benchmarks our
+algebraic procedure dominates on UNSAT-oriented categories
+(addition / multiplication / encoding-correctness identities) but
+loses to bit-blasting on equality and nonequality SAT-finding
+queries.
 
 \subsection{Falling Factorials and Stirling Numbers}
 \label{sec:vanishing-falling}
