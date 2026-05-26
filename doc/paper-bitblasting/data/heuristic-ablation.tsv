@@ -1,8 +1,0 @@
-# Adaptive heuristic ablation (algebraic layers disabled, CaDiCaL)
-# bench	adaptive	popcount_always	shiftadd_always
-comm_8	0.089	0.088	0.683
-comm_10	0.194	0.194	17.083
-comm_11	0.422	0.421	91.535
-comm_12	1.042	1.040	T/O
-assoc_8	26.885	26.724	26.738
-distrib_8	70.949	70.961	70.852

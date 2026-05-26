@@ -14,7 +14,7 @@ singleton baseline) completed. Headline findings:
 - Integrated into Paper 1 as new Section~\ref{sec:multi-encoding}
   ("Multi-Encoding Combinations") after the Alternative Encodings section.
 
-Raw data: `doc/paper-bitblasting/data/multi-encoding-results.tsv`
+Raw data: `doc/paper1-loose-ends/data/multi-encoding-results.tsv`
 (216 measurements).
 
 ## Goal

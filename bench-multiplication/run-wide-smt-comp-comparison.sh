@@ -9,7 +9,7 @@ ROOT=$(realpath "$(dirname "$0")/..")
 cd "$ROOT"
 SMT2=$ROOT/build/bin/smt2_solver
 TIMEOUT=15
-DIR=$ROOT/doc/paper-bitblasting/data/smt-comp-sample
+DIR=$ROOT/bench-multiplication/smt-comp-sample
 OUTFILE=$ROOT/bench-multiplication/wide-smt-comp-five-approach.tsv
 
 ulimit -v 57591731 2>/dev/null || true
@@ -43,7 +43,7 @@ run_cell() {
 cat > "$OUTFILE" <<HEADER
 # SMT-COMP 2024 sample: real-world third-party submitters (66 benchmarks)
 # Time in seconds; T/O = ${TIMEOUT} s
-# Source: doc/paper-bitblasting/data/smt-comp-sample/*.smt2
+# Source: bench-multiplication/smt-comp-sample/*.smt2
 benchmark	shift_add	comba_cs	pair_detect	p2_algebraic	all_combined
 HEADER
 

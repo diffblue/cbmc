@@ -58,7 +58,7 @@ done
 
 ### Table (layer ablation, §3)
 
-Raw data: `../paper-bitblasting/data/layer-ablation.tsv` (shared with Paper 1).
+Raw data: `data/layer-ablation.tsv` (mirror of Paper 1 data; authoritative copy in `~/multiplier-encodings.git/paper-bitblasting/data/`).
 
 ### Table (custom suite, §4.1)
 
@@ -66,8 +66,8 @@ Raw data: `data/cvc5-custom-results.tsv` for cvc5 column; CBMC/Bitwuzla columns 
 
 ### Table (SMT-COMP QF_BV community sample, §4.2)
 
-Raw data: `data/cvc5-smt-comp-results.tsv` for cvc5; `../paper-bitblasting/data/smt-comp-results.tsv` for CBMC.
-Benchmarks: `../paper-bitblasting/data/smt-comp-sample/*.smt2`.
+Raw data: `data/cvc5-smt-comp-results.tsv` for cvc5; `data/smt-comp-results.tsv` for CBMC (mirror of Paper 1 data).
+Benchmarks: `../../bench-multiplication/smt-comp-sample/*.smt2`.
 
 ### Table (SMT-LIB community set, §4.3)
 

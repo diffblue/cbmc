@@ -36,7 +36,7 @@ Reproduction: comm_16 default 5.5 ms, reverse 5.5 ms, reorder-vars
 5.5 ms, both 5.5 ms. Reproduces (within noise).
 
 ### §3 Layer ablation (Table: paper.tex line 430, data in
-`doc/paper-bitblasting/data/layer-ablation.tsv`)
+`doc/paper-algebraic/data/layer-ablation.tsv`)
 
 Paper claim: algebraic layers turn 29 s assoc_8 into 5 ms.
 Reproduction:

@@ -41,9 +41,9 @@ decomposition~\cite{shekhar2007equivalence,gamez2024efficient}
 provides a complete decision procedure, solving benchmarks in
 $<$15\,ms that previously timed out. On our 39-benchmark
 arithmetic-identity suite, \cbmc~\cite{clarke2004tool} solves all
-39 instances; Bitwuzla and cvc5 each solve 35/39, declining the
-same 4 bfloat16 benchmarks whose 8-bit exponent / 8-bit mantissa
-format their default SymFPU configuration excludes. A 66-benchmark
+39 instances; Bitwuzla and cvc5 each solve 35/39, with the four
+unsolved benchmarks involving bfloat16 multiplication, which
+neither solver supports out of the box. A 66-benchmark
 stratified SMT-COMP 2024 sample shows our combined approach
 matches mature word-level reasoners on broader QF\_BV ($<$1
 benchmark gap to shift-add bit-blasting; cvc5 leads by 5),
@@ -124,11 +124,12 @@ improvements targeting the other three classes.
 On 39 custom QF\_BV benchmarks designed to exercise arithmetic
 identities, \cbmc solves all 39 instances;
 Bitwuzla~\cite{niemetz2023bitwuzla} (SMT-COMP 2024 QF\_BV winner)
-and cvc5 each solve 35/39 in default mode, declining the same 4
-bfloat16 benchmarks whose 8-bit exponent / 8-bit mantissa format
-their default SymFPU configuration excludes; experimental
-floating-point builds of either solver would presumably handle
-those four. We introduce zero correctness regressions across 691
+and cvc5 each solve 35/39 in default mode. The four they do not
+solve all involve bfloat16 multiplication, a non-standard
+floating-point type that neither solver supports out of the box;
+both can be rebuilt with experimental floating-point flags to
+add support, but the off-the-shelf builds error out on these
+inputs. We introduce zero correctness regressions across 691
 existing tests.
 
 \section{Algebraic Solving via Gr\"obner Bases}
