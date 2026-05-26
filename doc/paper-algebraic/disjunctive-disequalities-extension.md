@@ -1,9 +1,59 @@
 # Procedure-level extension: disjunctive disequalities via Rabinowitsch-on-each-branch
 
 *Date: 2026-05-26*
-*Status: tracked, not yet implemented.*
-*Related: SABER experiment (Re 6) at
-`doc/paper-algebraic/saber/saber-experiment-2026-05-26.md`.*
+*Status: **IMPLEMENTED** at commit 448bb10923 (features/adder).*
+*Originally tracked here as a deferred extension; superseded by
+the live implementation in `src/solvers/flattening/boolbv.cpp`.*
+
+The original tracking notes are preserved below for context.
+
+## Implementation result
+
+Empirical effect on SABER's natural disjunctive form
+$\bigvee_i (\text{A\_res}_i \neq \text{B\_res}_i)$ at $q = 2^{16}$:
+
+| $N$ | Before (T/O at 60s) | After (this implementation) |
+|---|---|---|
+| 4 | T/O | 0.02 s |
+| 8 | T/O | 0.10 s |
+| 16 | T/O | 0.38 s |
+| 32 | T/O | 1.54 s |
+| 64 | T/O | 6.37 s |
+
+Same speed as the per-coefficient workaround. Per-coefficient
+queries (--single-coeff) still work and are kept for
+fine-grained reproducibility.
+
+## Implementation summary
+
+In `src/solvers/flattening/boolbv.cpp`:
+
+- Added `algebraic_disjunctive_disequalities` field
+  (vector-of-vectors of equality expressions).
+- `set_to()` pattern-matches `(or D1 D2 ... Dk)` where each `Di`
+  is `notequal_exprt` or `not_exprt(equal_exprt(...))`. Mixed
+  disjunctions (with non-disequality branches) are skipped and
+  fall through to bit-blasting.
+- `try_algebraic_solve()` adds a parallel loop over disjunctions:
+  for each branch, runs the same per-disequality pipeline as the
+  existing per-disequality loop, with vanishing-polynomial test
+  first then Rabinowitsch + Buchberger. If all branches refute,
+  the formula is reported UNSAT.
+- The early-return gate is updated to also consider the
+  disjunctive list.
+
+A subtle detail learned during implementation: **the
+vanishing-polynomial test must be replicated in each branch**.
+Initially I omitted it, thinking SABER's polynomial-identity
+diffs would be solved by Buchberger directly. They aren't —
+they're solved by the vanishing test (the diff is literally zero
+after SSA inlining, the most degenerate vanishing case). Without
+the per-branch vanishing test, the per-branch Buchberger never
+terminates within 30s on N=4 SABER queries.
+
+---
+
+## Original tracking notes (preserved for context)
 
 ## The gap
 
