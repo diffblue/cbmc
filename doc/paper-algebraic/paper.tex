@@ -170,15 +170,18 @@ DSP datapath equivalences with overflow
 cancellation~\cite{shekhar2007equivalence}, the procedure solves
 all five in $<$15\,ms; cvc5 takes 1.84\,s on
 \texttt{dsp\_horner\_16}, a 184$\times$ gap
-(Section~\ref{sec:eval-custom}). On commutativity, associativity,
+(Section~\ref{sec:eval-dsp}). On commutativity, associativity,
 and overflow checking the procedure is bitwidth-independent
 (2--5\,ms from BW=8 to 256), matching Bitwuzla's word-level
 rewriting and outpacing pure bit-blasting (which times out at
-BW=16). On a broader 66-benchmark SMT-COMP stratified sample our
-procedure trails Bitwuzla in solved count: the heuristic-rewriting
-approach wins this volume contest, while the four wins above and
-the DSP datapath equivalences are queries it cannot decide at all
-(Section~\ref{sec:eval-smtcomp}).
+BW=16). On the same random-polynomial sample, Bitwuzla
+solves 184/210 to our 128/210: its
+occurrence-map canonicalisation closes most queries
+syntactically and constructs witnesses for the
+existential-equational SAT-direction queries that our
+UNSAT-oriented Rabinowitsch encoding cannot. The four wins above
+and the DSP datapath equivalences are the queries Bitwuzla
+cannot decide at all.
 
 We introduce zero correctness regressions across \cbmc's 691
 existing regression tests.
