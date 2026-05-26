@@ -136,21 +136,77 @@ a public artefact pointer. Options:
 > "Did you check CryptoMiniSat for the lack of inprocessing you
 > mentioned (my knowledge is rusty, I assumed it's there)."
 
-**Verify before next revision.** §7.3 says:
+**Verified at the source level (2026-05-26):** the co-author's
+intuition is correct. CryptoMiniSat **does have inprocessing
+BVE**. Paper 1's §7.3 claim is incorrect.
 
-> cryptominisat is consistently the slowest on multiplication, as
-> its native XOR handling provides no benefit … and it lacks both
+Source check on `~/cryptominisat/` (cloned from
+github.com/msoos/cryptominisat, current `master`, version
+matches CryptoMiniSat 5.11.15 installed on this system):
+
+- `src/occsimplifier.h` declares `class OccSimplifier`
+  documented as "Handles subsumption, self-subsuming
+  resolution, variable elimination, and related algorithms".
+- `BVEStats` struct (lines 72–110) tracks `numVarsElimed`,
+  `triedToElimVars`, etc. — explicit BVE accounting.
+- Output strings include "c [occ-bve]" and "c v-elimed".
+- `src/solver.cpp` invokes `occsimplifier->simplify(...)` from
+  the main solve loop (line 1727: gated on
+  `conf.perform_occur_based_simp`).
+- `src/main.cpp` exposes `--nextm` ("Global multiplier when the
+  next inprocessing should take place"), `--memoutmult`
+  ("Multiplier for memory-out checks on inprocessing
+  functions"), and `--maxsimp` ("Maximum number of
+  simplifications to perform for every solve() call. After
+  this, no more inprocessing will take place"). All three are
+  on by default in CryptoMiniSat's default config.
+
+**Required revision in Paper 1 §7.3.** The current paragraph
+says:
+
+> cryptominisat is consistently the slowest on multiplication,
+> as its native XOR handling provides no benefit (confirmed
+> with and without XOR constraints) and it lacks both
 > inprocessing BVE and congruence closure.
 
-The reviewer's intuition is that CryptoMiniSat does have
-inprocessing. **This is a factual claim we should verify in the
-source** before submission. If wrong, the §7.3 explanation needs
-to be re-thought (perhaps the issue is that CryptoMiniSat's
-inprocessing is configured differently, or that congruence
-closure is the missing piece on its own, not BVE).
+The "lacks both inprocessing BVE and congruence closure" part is
+false. The correct re-attribution depends on what we actually
+believe about CryptoMiniSat's behaviour on multiplication
+benchmarks. Two candidates:
 
-Effort: ~1 hour to inspect CryptoMiniSat's source / docs /
-default configuration.
+1. **CryptoMiniSat has inprocessing BVE but it's not as
+   aggressive as cadical's.** This is plausible if Paper 1's
+   benchmark numbers for cadical-with-BVE-disabled match
+   CryptoMiniSat's numbers; we'd want to re-run the
+   `--cadical-no-bve` configuration on the same benchmarks to
+   verify. Worth a quick experiment.
+
+2. **CryptoMiniSat lacks congruence closure on the multiplier
+   gates,** which could explain the gap on commutativity-style
+   queries where two identical multipliers should be matched up.
+   This is consistent with the "different solver feature" framing
+   that the paragraph already uses for cadical vs minisat.
+
+Recommendation: rewrite the §7.3 sentence as something like:
+
+> cryptominisat is consistently the slowest on multiplication.
+> Its native XOR handling provides no benefit (confirmed with
+> and without XOR constraints), and although it has
+> inprocessing BVE (via OccSimplifier), it lacks the
+> congruence-closure step that cadical applies to the gates
+> between two identical multiplier circuits — the mechanism
+> Section~\ref{sec:cross-solver} identifies as decisive on
+> commutativity benchmarks.
+
+Verifying the congruence-closure claim is a separate fact-check
+item: cadical 3.0.0's congruence-closure-on-AIG step is
+documented in Biere's CaDiCaL repository; CryptoMiniSat's
+absence of an analogous step would need source-level
+confirmation. That's a smaller follow-up than C7 itself.
+
+**Status: BVE claim verified false; congruence-closure
+sub-claim still needs verification before the §7.3 revision can
+be finalised.**
 
 ### Item C8 — SMT-COMP QF\_BV sample as reference
 
