@@ -29,9 +29,8 @@ arrayst::arrayst(
   const namespacet &_ns,
   propt &_prop,
   message_handlert &_message_handler,
-  bool _get_constraints)
-  : mapst(_ns, _prop, _message_handler, _get_constraints),
-    message_handler(_message_handler)
+  bool _collect_constraint_stats)
+  : mapst(_ns, _prop, _message_handler, _collect_constraint_stats)
 {
 }
 
@@ -147,7 +146,7 @@ void arrayst::add_array_constraints()
       add_array_constraints(domain_map[maps.find_number(i)], a);
 
       // we have to update before it gets used in the next add_* call
-      for(const std::size_t u : update_keys)
+      for(const std::size_t u : dirty_classes)
         updated_roots.insert(maps.find_number(u));
       update_domain_map(false);
     }

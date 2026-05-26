@@ -356,10 +356,10 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
 {
   auto sat_solver = get_sat_solver(message_handler, options);
 
-  bool get_array_constraints =
+  bool collect_constraint_stats =
     options.get_bool_option("show-array-constraints");
   auto bv_pointers = std::make_unique<bv_pointerst>(
-    ns, *sat_solver, message_handler, get_array_constraints);
+    ns, *sat_solver, message_handler, collect_constraint_stats);
 
   if(options.get_option("arrays-uf") == "never")
     bv_pointers->unbounded_array = bv_pointerst::unbounded_arrayt::U_NONE;

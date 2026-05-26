@@ -18,8 +18,8 @@ Author: Michael Tautschnig
 #include "equality.h"
 
 #include <list>
+#include <map>
 #include <set>
-#include <unordered_set>
 
 class equal_exprt;
 class index_exprt;
@@ -36,13 +36,13 @@ public:
   /// \param _ns: namespace for type lookups
   /// \param _prop: propositional solver backend
   /// \param _message_handler: message handler for logging
-  /// \param _get_constraints: when true, collect and display constraint
-  ///   statistics after eager conversion
+  /// \param _collect_constraint_stats: when true, collect and display
+  ///   constraint statistics after eager conversion
   mapst(
     const namespacet &_ns,
     propt &_prop,
     message_handlert &_message_handler,
-    bool _get_constraints = false);
+    bool _collect_constraint_stats = false);
 
   ~mapst() override = default;
 
@@ -59,7 +59,7 @@ public:
   /// generates the appropriate read-over-write and Ackermann constraints for
   /// it.  The key is recorded against the map's equivalence-class
   /// representative in \ref domain_map.
-  virtual void record_key(const index_exprt &expr);
+  void record_key(const index_exprt &expr);
 
 protected:
   const namespacet &ns;
@@ -87,16 +87,16 @@ protected:
   domain_mapt domain_map;
   /// Equivalence-class numbers whose key sets have been modified since the
   /// last call to \ref update_domain_map.
-  std::set<std::size_t> update_keys;
+  std::set<std::size_t> dirty_classes;
 
   /// Recursively traverse a map expression \p a, unifying it with its
   /// sub-maps in the union-find and recording any keys that appear.
   /// \param a: a map-typed expression (with, if, update, typecast, …)
-  virtual void collect_maps(const exprt &a);
+  void collect_maps(const exprt &a);
 
   /// Merge key sets of non-root equivalence classes into their roots.
   /// When \p update_all is true every class is processed; otherwise only
-  /// the classes listed in \ref update_keys are processed.
+  /// the classes listed in \ref dirty_classes are processed.
   /// \param update_all: if true, process all classes; otherwise only dirty ones
   void update_domain_map(bool update_all);
 
@@ -133,16 +133,12 @@ protected:
   std::list<lazy_constraintt> lazy_constraints;
   /// When true, constraints passed to \ref add_map_constraint with
   /// refine=true are deferred rather than added eagerly.
-  bool lazy_dispatch;
-  /// When true, duplicate lazy constraints are suppressed via \ref expr_map.
-  bool incremental_cache;
+  bool defer_constraints;
   /// When true, constraint statistics are collected and displayed after
   /// eager conversion.
-  bool get_constraints;
-  /// Cache used by incremental mode to suppress duplicate lazy constraints.
-  std::map<exprt, bool> expr_map;
+  bool collect_constraint_stats;
 
-  /// Add a map-theory constraint.  When \ref lazy_dispatch is true and
+  /// Add a map-theory constraint.  When \ref defer_constraints is true and
   /// \p refine is true the constraint is deferred; otherwise it is
   /// converted and asserted immediately.
   /// \param lazy: the constraint to add
@@ -177,7 +173,8 @@ protected:
     MAP_LET
   };
   typedef std::map<constraint_typet, size_t> map_constraint_countt;
-  /// Per-type constraint counts, populated when \ref get_constraints is true.
+  /// Per-type constraint counts, populated when \ref collect_constraint_stats
+  /// is true.
   map_constraint_countt constraint_count;
 
   /// Return a human-readable string for a constraint type enum value.
@@ -192,7 +189,7 @@ protected:
   {
     finish_eager_conversion_maps();
     equalityt::finish_eager_conversion();
-    if(get_constraints)
+    if(collect_constraint_stats)
       display_constraint_count();
   }
 

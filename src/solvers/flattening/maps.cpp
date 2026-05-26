@@ -2,7 +2,7 @@
 
 Module: Map Theory (base class for array theory)
 
-Author: Daniel Kroening, kroening@kroening.com
+Author: Michael Tautschnig
 
 \*******************************************************************/
 
@@ -27,13 +27,12 @@ mapst::mapst(
   const namespacet &_ns,
   propt &_prop,
   message_handlert &_message_handler,
-  bool _get_constraints)
+  bool _collect_constraint_stats)
   : equalityt(_prop, _message_handler),
     ns(_ns),
     log(_message_handler),
-    lazy_dispatch(false),
-    incremental_cache(false),
-    get_constraints(_get_constraints)
+    defer_constraints(false),
+    collect_constraint_stats(_collect_constraint_stats)
 {
 }
 
@@ -44,7 +43,7 @@ void mapst::record_key(const index_exprt &index)
   //   because this map is accessed during building the error trace
   std::size_t number = maps.number(index.array());
   if(domain_map[number].insert(index.index()).second)
-    update_keys.insert(number);
+    dirty_classes.insert(number);
 }
 
 void mapst::collect_maps(const exprt &a)
@@ -168,21 +167,10 @@ void mapst::collect_maps(const exprt &a)
 /// adds map constraints (refine=true...lazily for the refinement loop)
 void mapst::add_map_constraint(const lazy_constraintt &lazy, bool refine)
 {
-  if(lazy_dispatch && refine)
+  if(defer_constraints && refine)
   {
     // lazily add the constraint
-    if(incremental_cache)
-    {
-      if(expr_map.find(lazy.lazy) == expr_map.end())
-      {
-        lazy_constraints.push_back(lazy);
-        expr_map[lazy.lazy] = true;
-      }
-    }
-    else
-    {
-      lazy_constraints.push_back(lazy);
-    }
+    lazy_constraints.push_back(lazy);
   }
   else
   {
@@ -279,10 +267,10 @@ void mapst::update_domain_map(bool update_all)
   }
   else
   {
-    for(const auto &key : update_keys)
+    for(const auto &key : dirty_classes)
       update_domain_map(key);
 
-    update_keys.clear();
+    dirty_classes.clear();
   }
 
 #ifdef DEBUG
@@ -375,8 +363,8 @@ void mapst::display_constraint_count()
   map_constraint_countt::iterator it = constraint_count.begin();
   while(it != constraint_count.end())
   {
-    std::string contraint_type_string = enum_to_string(it->first);
-    json_array_theory[contraint_type_string] =
+    std::string constraint_type_string = enum_to_string(it->first);
+    json_array_theory[constraint_type_string] =
       json_numbert(std::to_string(it->second));
 
     num_constraints += it->second;

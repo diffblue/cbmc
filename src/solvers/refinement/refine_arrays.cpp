@@ -27,7 +27,7 @@ void bv_refinementt::finish_eager_conversion_maps()
   update_domain_map(true);
 
   // we don't actually add any constraints
-  lazy_dispatch = config_.refine_arrays;
+  defer_constraints = config_.refine_arrays;
   add_array_constraints();
   freeze_lazy_constraints();
 }
@@ -122,7 +122,7 @@ void bv_refinementt::arrays_overapproximated()
 /// freeze symbols for incremental solving
 void bv_refinementt::freeze_lazy_constraints()
 {
-  if(!lazy_dispatch)
+  if(!defer_constraints)
     return;
 
   for(const auto &constraint : lazy_constraints)

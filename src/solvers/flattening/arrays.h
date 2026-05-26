@@ -32,7 +32,7 @@ public:
     const namespacet &_ns,
     propt &_prop,
     message_handlert &message_handler,
-    bool get_constraints = false);
+    bool collect_constraint_stats = false);
 
   // NOLINTNEXTLINE(readability/identifiers)
   typedef mapst SUB;
@@ -49,8 +49,6 @@ public:
   record_let_binding(const symbol_exprt &symbol, const exprt &value) override;
 
 protected:
-  message_handlert &message_handler;
-
   /// Identifiers of array-comprehension bound variables, used to avoid
   /// recording comprehension parameters as concrete keys.
   std::unordered_set<irep_idt> array_comprehension_args;
