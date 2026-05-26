@@ -1,0 +1,29 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+found no match for symbol 'ireptish'
+unexpected expression: struct
+invalid implicit conversion
+--
+Regression for [over.match.list]-conforming brace-init in
+class-typed constructor arguments.
+
+Tests both:
+  * Empty `{}` for a class type with default ctor — must
+    synthesise a default-constructed temporary.
+  * Non-empty `{x}` for a class type with `initializer_list<U>`
+    ctor — must build the initializer_list and dispatch to the
+    init_list ctor.
+
+Without the fix, `cpp_typecheck_fargst::match` rejects the
+brace-init operands and reports "found no match for symbol
+'ireptish'" at the delegating-ctor call site.  Even after a
+match-only fix, `implicit_typecast` would either fail to
+synthesise the conversion ("invalid implicit conversion") or
+produce a `struct_exprt` that subsequent typechecking rejects
+("unexpected expression: struct").
