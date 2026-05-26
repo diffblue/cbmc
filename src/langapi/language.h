@@ -101,7 +101,7 @@ public:
   /// advertised the given `function_id` could be provided by this `languaget`
   /// instance.
   virtual void convert_lazy_method(
-    const irep_idt &function_id,
+    irep_idt function_id,
     symbol_table_baset &symbol_table,
     message_handlert &message_handler)
   {

@@ -48,7 +48,7 @@ void register_language(language_factoryt factory)
 /// Get the language corresponding to the given mode
 /// \param mode: the mode, e.g. `ID_C`
 /// \return the language or `nullptr` if the language has not been registered
-std::unique_ptr<languaget> get_language_from_mode(const irep_idt &mode)
+std::unique_ptr<languaget> get_language_from_mode(irep_idt mode)
 {
   for(const auto &language : languages)
     if(mode == language.mode)
@@ -63,7 +63,7 @@ std::unique_ptr<languaget> get_language_from_mode(const irep_idt &mode)
 /// \return the mode, e.g. `ID_C`, if the identifier is in the given
 ///   symbol table, or `ID_unknown` otherwise
 const irep_idt &
-get_mode_from_identifier(const namespacet &ns, const irep_idt &identifier)
+get_mode_from_identifier(const namespacet &ns, irep_idt identifier)
 {
   if(identifier.empty())
     return ID_unknown;
@@ -81,7 +81,7 @@ get_mode_from_identifier(const namespacet &ns, const irep_idt &identifier)
 /// Note: It is assumed as an invariant that languages of symbols in the symbol
 ///   table have been registered.
 std::unique_ptr<languaget>
-get_language_from_identifier(const namespacet &ns, const irep_idt &identifier)
+get_language_from_identifier(const namespacet &ns, irep_idt identifier)
 {
   const irep_idt mode = get_mode_from_identifier(ns, identifier);
   if(mode == ID_unknown)

@@ -17,11 +17,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 class languaget;
 class namespacet;
 
-std::unique_ptr<languaget> get_language_from_mode(const irep_idt &mode);
+std::unique_ptr<languaget> get_language_from_mode(irep_idt mode);
 const irep_idt &
-get_mode_from_identifier(const namespacet &ns, const irep_idt &identifier);
+get_mode_from_identifier(const namespacet &ns, irep_idt identifier);
 std::unique_ptr<languaget>
-get_language_from_identifier(const namespacet &ns, const irep_idt &identifier);
+get_language_from_identifier(const namespacet &ns, irep_idt identifier);
 std::unique_ptr<languaget> get_language_from_filename(
   const std::string &filename);
 std::unique_ptr<languaget> get_default_language();
