@@ -67,7 +67,7 @@ void shadow_memoryt::initialize_shadow_memory(
 const symbol_exprt &shadow_memoryt::add_field(
   goto_symex_statet &state,
   const exprt &expr,
-  const irep_idt &field_name,
+  irep_idt field_name,
   const typet &field_type)
 {
   const auto &function_symbol = ns.lookup(state.source.function_id);

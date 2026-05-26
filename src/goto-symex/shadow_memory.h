@@ -128,7 +128,7 @@ private:
   const symbol_exprt &add_field(
     goto_symex_statet &state,
     const exprt &expr,
-    const irep_idt &field_name,
+    irep_idt field_name,
     const typet &field_type);
 
 private:

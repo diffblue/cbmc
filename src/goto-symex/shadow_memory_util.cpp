@@ -32,7 +32,7 @@ Author: Peter Schrammel
 void shadow_memory_log_set_field(
   const namespacet &ns,
   const messaget &log,
-  const irep_idt &field_name,
+  irep_idt field_name,
   const exprt &expr,
   const exprt &value)
 {
@@ -49,7 +49,7 @@ void shadow_memory_log_set_field(
 void shadow_memory_log_get_field(
   const namespacet &ns,
   const messaget &log,
-  const irep_idt &field_name,
+  irep_idt field_name,
   const exprt &expr)
 {
 #ifdef DEBUG_SHADOW_MEMORY
@@ -297,7 +297,7 @@ void replace_invalid_object_by_null(exprt &expr)
 }
 
 const exprt &
-get_field_init_expr(const irep_idt &field_name, const goto_symex_statet &state)
+get_field_init_expr(irep_idt field_name, const goto_symex_statet &state)
 {
   auto field_type_it = state.shadow_memory.fields.local_fields.find(field_name);
   if(field_type_it != state.shadow_memory.fields.local_fields.end())
@@ -310,7 +310,7 @@ get_field_init_expr(const irep_idt &field_name, const goto_symex_statet &state)
 }
 
 const typet &
-get_field_init_type(const irep_idt &field_name, const goto_symex_statet &state)
+get_field_init_type(irep_idt field_name, const goto_symex_statet &state)
 {
   return get_field_init_expr(field_name, state).type();
 }

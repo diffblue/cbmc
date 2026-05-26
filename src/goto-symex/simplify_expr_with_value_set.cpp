@@ -31,7 +31,7 @@ Author: Michael Tautschnig
 /// \return If we were able to evaluate the condition as true or false then we
 ///   return that, otherwise we return an empty std::optional
 static std::optional<exprt> try_evaluate_pointer_comparison(
-  const irep_idt &operation,
+  irep_idt operation,
   const symbol_exprt &symbol_expr,
   const exprt &other_operand,
   const value_sett &value_set,

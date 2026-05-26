@@ -89,8 +89,7 @@ public:
   /// \remarks
   /// This allows goto_symext to be divorced from the particular type of
   /// goto_modelt that provides the function bodies
-  typedef
-    std::function<const goto_functionst::goto_functiont &(const irep_idt &)>
+  typedef std::function<const goto_functionst::goto_functiont &(irep_idt)>
     get_goto_functiont;
 
   /// Return a function to get/load a goto function from the given goto model
@@ -179,7 +178,7 @@ public:
   /// \param loop_id: the loop identifier
   /// \param unwind: current unwinding counter
   /// \return true if the symbolic execution is to be interrupted for checking
-  virtual bool check_break(const irep_idt &loop_id, unsigned unwind);
+  virtual bool check_break(irep_idt loop_id, unsigned unwind);
 
 protected:
   /// The configuration to use for this symbolic execution
@@ -397,7 +396,7 @@ protected:
   /// \param state: Symbolic execution state for current instruction
   virtual void vcc(
     const exprt &cond,
-    const irep_idt &property_id,
+    irep_idt property_id,
     const std::string &msg,
     statet &state);
 
@@ -460,7 +459,7 @@ protected:
   /// \param state The current state
   /// \param goto_function The goto function
   virtual void locality(
-    const irep_idt &function_identifier,
+    irep_idt function_identifier,
     goto_symext::statet &state,
     const goto_functionst::goto_functiont &goto_function);
 
@@ -502,7 +501,7 @@ protected:
     const exprt::operandst &cleaned_arguments);
 
   virtual bool get_unwind_recursion(
-    const irep_idt &identifier,
+    irep_idt identifier,
     unsigned thread_nr,
     unsigned unwind);
 
@@ -513,7 +512,7 @@ protected:
   /// \param [out] state: state of the goto program
   /// \param arguments: arguments that are passed to the function
   void parameter_assignments(
-    const irep_idt &function_identifier,
+    irep_idt function_identifier,
     const goto_functionst::goto_functiont &goto_function,
     statet &state,
     const exprt::operandst &arguments);
