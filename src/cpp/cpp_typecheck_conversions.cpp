@@ -2869,6 +2869,17 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
 
     // Brace-init {a, b, ...} to aggregate struct: assign members
     // in order. Used by MSVC's <ratio> _Big_multiply return statement.
+    //
+    // Skip type-alias components (`first_type` / `second_type` on
+    // std::pair etc.), static data members, and from-base
+    // components in addition to padding and code so the
+    // operands map to the actual non-static data members.
+    // Without this filter, e.g. a brace-init `{x, y}` for
+    // `std::pair<T1, T2>` assigns to `first_type` and
+    // `second_type` (the public typedefs) and never reaches
+    // `first` / `second`, causing the recursive
+    // `implicit_typecast(val, struct_tag(typedef))` call to
+    // fail with "invalid implicit conversion".
     if(
       orig_expr.id() == ID_initializer_list && !orig_expr.operands().empty() &&
       (type.id() == ID_struct_tag || type.id() == ID_struct) &&
@@ -2885,7 +2896,10 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
       bool ok = true;
       for(const auto &c : comps)
       {
-        if(c.get_is_padding() || c.type().id() == ID_code)
+        if(
+          c.get_is_padding() || c.type().id() == ID_code ||
+          c.get_bool(ID_is_type) || c.get_bool(ID_is_static) ||
+          c.get_bool(ID_from_base))
           continue;
         if(i < orig_expr.operands().size())
         {
