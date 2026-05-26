@@ -142,3 +142,36 @@ TEST_CASE("onehot expression lowering", "[core][util][expr]")
     }
   }
 }
+
+TEMPLATE_TEST_CASE(
+  "reduction expression sub classes",
+  "[core][util][expr]",
+  reduction_and_exprt,
+  reduction_or_exprt,
+  reduction_nand_exprt,
+  reduction_nor_exprt,
+  reduction_xor_exprt,
+  reduction_xnor_exprt)
+{
+  const symbol_exprt sym{"x", unsignedbv_typet{4}};
+  const TestType red{sym};
+
+  SECTION("can_cast_expr true for matching expression")
+  {
+    REQUIRE(can_cast_expr<TestType>(red));
+  }
+
+  SECTION("can_cast_expr false for non-matching expression")
+  {
+    const plus_exprt binary{sym, sym};
+    REQUIRE_FALSE(can_cast_expr<TestType>(binary));
+  }
+
+  SECTION("expr_try_dynamic_cast round-trip")
+  {
+    const exprt &base = red;
+    auto *p = expr_try_dynamic_cast<TestType>(base);
+    REQUIRE(p != nullptr);
+    REQUIRE(p->op() == sym);
+  }
+}
