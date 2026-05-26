@@ -136,8 +136,7 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
 
   implicit_typecast(expr.op0(), bool_typet());
 
-  if(expr.op1().type().id()==ID_empty ||
-     expr.op1().type().id()==ID_empty)
+  if(expr.op1().type().id() == ID_empty || expr.op2().type().id() == ID_empty)
   {
     if(expr.op1().get_bool(ID_C_lvalue))
     {

@@ -1,0 +1,10 @@
+CORE
+main.cpp
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+^.*types are incompatible.*$
