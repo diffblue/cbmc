@@ -73,6 +73,53 @@ void arrayst::record_let_binding(const symbol_exprt &symbol, const exprt &value)
   prop.l_set_to_true(eq_lit);
 }
 
+void arrayst::collect_keys()
+{
+  for(std::size_t i = 0; i < maps.size(); i++)
+  {
+    collect_keys(maps[i]);
+  }
+}
+
+void arrayst::collect_keys(const exprt &expr)
+{
+  if(expr.id() != ID_index)
+  {
+    if(expr.id() == ID_array_comprehension)
+      array_comprehension_args.insert(
+        to_array_comprehension_expr(expr).arg().get_identifier());
+
+    for(const auto &op : expr.operands())
+      collect_keys(op);
+  }
+  else
+  {
+    const index_exprt &e = to_index_expr(expr);
+
+    if(
+      e.index().id() == ID_symbol &&
+      array_comprehension_args.count(
+        to_symbol_expr(e.index()).get_identifier()) != 0)
+    {
+      return;
+    }
+
+    collect_keys(e.index()); // necessary?
+
+    const typet &array_op_type = e.array().type();
+
+    if(array_op_type.id() == ID_array)
+    {
+      const array_typet &array_type = to_array_type(array_op_type);
+
+      if(is_unbounded_array(array_type))
+      {
+        record_key(e);
+      }
+    }
+  }
+}
+
 void arrayst::add_array_constraints()
 {
   collect_keys();

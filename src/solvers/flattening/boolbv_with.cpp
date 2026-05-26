@@ -115,7 +115,7 @@ void boolbvt::convert_with_array(
 {
   // can't do this
   DATA_INVARIANT_WITH_DIAGNOSTICS(
-    !is_unbounded_map(type),
+    !is_unbounded_array(type),
     "convert_with_array called for unbounded array",
     irep_pretty_diagnosticst{type});
 

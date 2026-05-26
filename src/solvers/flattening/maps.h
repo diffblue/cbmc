@@ -88,17 +88,6 @@ protected:
   /// Equivalence-class numbers whose key sets have been modified since the
   /// last call to \ref update_domain_map.
   std::set<std::size_t> update_keys;
-  /// Identifiers of array-comprehension bound variables, used to avoid
-  /// recording comprehension parameters as concrete keys.
-  std::unordered_set<irep_idt> array_comprehension_args;
-
-  /// Walk every map expression in \ref maps and collect all keys that appear
-  /// in sub-expressions.
-  void collect_keys();
-
-  /// Recursively collect keys from the sub-expressions of \p a.
-  /// \param a: expression to scan for index sub-expressions
-  void collect_keys(const exprt &a);
 
   /// Recursively traverse a map expression \p a, unifying it with its
   /// sub-maps in the union-find and recording any keys that appear.
@@ -114,10 +103,6 @@ protected:
   /// Merge the key set of equivalence class \p i into its root's key set.
   /// \param i: equivalence-class number to merge
   void update_domain_map(std::size_t i);
-
-  /// Return true if \p type is an unbounded (variable-length) map type.
-  /// Implemented by the derived class.
-  virtual bool is_unbounded_map(const typet &type) const = 0;
 
   /// Classification of lazily deferred constraints.
   enum class lazy_typet
@@ -211,13 +196,12 @@ protected:
       display_constraint_count();
   }
 
-  /// Collect all keys and build the initial domain map.  Overridden by
-  /// \ref arrayst to also add array-specific constraints.
-  virtual void finish_eager_conversion_maps()
-  {
-    collect_keys();
-    update_domain_map(true);
-  }
+  /// Collect all keys, build the initial domain map, and add any
+  /// theory-specific constraints. The default of "collect_keys then
+  /// update_domain_map" cannot live here anymore because key collection is
+  /// theory-specific (e.g. \ref arrayst skips bounded-array operands), so
+  /// derived classes are required to provide their own implementation.
+  virtual void finish_eager_conversion_maps() = 0;
 };
 
 #endif // CPROVER_SOLVERS_FLATTENING_MAPS_H

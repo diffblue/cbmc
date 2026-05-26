@@ -267,7 +267,7 @@ protected:
   exprt get_value(const exprt &expr) const;
 
   // unbounded arrays
-  bool is_unbounded_map(const typet &type) const override;
+  bool is_unbounded_array(const typet &type) const override;
 
   // quantifier instantiations
   class quantifiert

@@ -34,7 +34,7 @@ bvt boolbvt::convert_index(const index_exprt &expr)
 
     // see if the array size is constant
 
-    if(is_unbounded_map(array_type))
+    if(is_unbounded_array(array_type))
     {
       // use array decision procedure
 

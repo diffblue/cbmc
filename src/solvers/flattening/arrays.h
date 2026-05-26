@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "maps.h"
 
+#include <unordered_set>
+
 class array_comprehension_exprt;
 class array_exprt;
 class array_of_exprt;
@@ -48,6 +50,25 @@ public:
 
 protected:
   message_handlert &message_handler;
+
+  /// Identifiers of array-comprehension bound variables, used to avoid
+  /// recording comprehension parameters as concrete keys.
+  std::unordered_set<irep_idt> array_comprehension_args;
+
+  /// Walk every map expression in \ref maps and collect all keys that appear
+  /// in sub-expressions.
+  void collect_keys();
+
+  /// Recursively collect keys from the sub-expressions of \p a.
+  /// \param a: expression to scan for index sub-expressions
+  void collect_keys(const exprt &a);
+
+  /// Return true if \p type is an unbounded (variable-length) array type.
+  /// Implemented by the derived class \ref boolbvt. A map is unbounded by
+  /// definition; this hook is only meaningful for arrays, where bounded
+  /// (fixed-size) instances are bit-blasted directly without going through
+  /// the array theory.
+  virtual bool is_unbounded_array(const typet &type) const = 0;
 
   void finish_eager_conversion_maps() override
   {

@@ -34,7 +34,7 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
 {
   // array logic does not handle byte operators, thus lower when operating on
   // unbounded arrays
-  if(is_unbounded_map(expr.op().type()))
+  if(is_unbounded_array(expr.op().type()))
   {
     return convert_bv(lower_byte_extract(expr, ns));
   }

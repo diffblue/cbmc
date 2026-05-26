@@ -75,7 +75,7 @@ bvt boolbvt::convert_let(const let_exprt &expr)
   {
     if(
       pair.first.type().id() == ID_array &&
-      is_unbounded_map(to_array_type(pair.first.type())))
+      is_unbounded_array(to_array_type(pair.first.type())))
     {
       const exprt lowered_value = has_byte_operator(pair.second)
                                     ? lower_byte_operators(pair.second, ns)

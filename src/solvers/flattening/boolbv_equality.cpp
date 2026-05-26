@@ -22,7 +22,7 @@ literalt boolbvt::convert_equality(const equal_exprt &expr)
     irep_pretty_diagnosticst{expr.rhs()});
 
   // see if it is an unbounded array
-  if(is_unbounded_map(expr.lhs().type()))
+  if(is_unbounded_array(expr.lhs().type()))
   {
     // flatten byte_update/byte_extract operators if needed
 

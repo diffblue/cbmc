@@ -108,7 +108,7 @@ exprt boolbvt::bv_get_rec(const exprt &expr, const bvt &bv, std::size_t offset)
     {
       const auto &array_type = to_array_type(type);
 
-      if(is_unbounded_map(type))
+      if(is_unbounded_array(type))
         return bv_get_unbounded_array(expr);
 
       const typet &subtype = array_type.element_type();

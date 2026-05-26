@@ -20,7 +20,7 @@ bvt boolbvt::convert_array_of(const array_of_exprt &expr)
 
   const array_typet &array_type = expr.type();
 
-  if(is_unbounded_map(array_type))
+  if(is_unbounded_array(array_type))
     return conversion_failed(expr);
 
   std::size_t width=boolbv_width(array_type);
