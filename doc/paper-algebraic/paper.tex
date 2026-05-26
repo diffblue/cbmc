@@ -1467,7 +1467,7 @@ timeout.
 \caption{SMT-COMP QF\_BV stratified sample (66 benchmarks, 60\,s T/O).
   cvc5 run with default settings (its QF\_BV pipeline; the \texttt{--ff}
   flag applies only to the QF\_FF logic and does not activate on
-  QF\_BV).}
+  QF\_BV). Bitwuzla 0.9.0-dev added 2026-05-26.}
 \label{tab:smtcomp-sample}
 \centering
 \begin{tabular}{lrr}
@@ -1476,29 +1476,38 @@ Configuration & Solved & PAR-2 (s/benchmark) \\
 \midrule
 shift-add (bit-blasting only) & 34/66 & 63.1 \\
 \cbmc default (algebraic + \combacs) & 33/66 & 63.5 \\
-cvc5 default & \textbf{38/66} & \textbf{52.6} \\
+cvc5 default & 38/66 & 52.6 \\
+Bitwuzla default & \textbf{52/66} & \textbf{28.7} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-On the stratified sample cvc5 solves the most benchmarks (38),
-followed by shift-add \cbmc (34) and default \cbmc (33) at
-essentially the same level. Three benchmarks where default
-\cbmc times out but shift-add succeeds are all
-\texttt{bvudiv}/\texttt{bvsdiv}-dominated: the algebraic layer's
-GCD-based division-by-constant rewriting expands the formula on
-these instances. Two further benchmarks are solved by default
-\cbmc but not by shift-add (a rewrite-rule family and
-\texttt{brummayerbiere3\_isqrtadd}); on three more, default is
-${\geq}$3$\times$ faster than shift-add (up to 3226$\times$ on the
-rewrite-rule family). No benchmark in the sample is
-${\geq}$3$\times$ slower with default than with shift-add.
+On the stratified sample Bitwuzla solves the most benchmarks
+(52), followed by cvc5 (38), shift-add \cbmc (34) and default
+\cbmc (33). Bitwuzla's lead is consistent with its dominance on
+the random-polynomial sample (Section~\ref{sec:eval-random-poly}):
+its occurrence-map canonicalisation handles broad QF\_BV
+queries that the algebraic pre-solver does not target.
 
-cvc5's advantage on this broader sample reflects its mature
-word-level rewriting and its NIA integer reasoning on queries
-that contain multiplication as part of a richer structure;
-the algebraic technique developed here is pattern-specific and
-does not replace mature SMT solvers on general QF\_BV community
+Three benchmarks where default \cbmc times out but shift-add
+succeeds are all \texttt{bvudiv}/\texttt{bvsdiv}-dominated: the
+algebraic layer's GCD-based division-by-constant rewriting
+expands the formula on these instances. Two further benchmarks
+are solved by default \cbmc but not by shift-add (a rewrite-rule
+family and \texttt{brummayerbiere3\_isqrtadd}); on three more,
+default is ${\geq}$3$\times$ faster than shift-add (up to
+3226$\times$ on the rewrite-rule family). No benchmark in the
+sample is ${\geq}$3$\times$ slower with default than with
+shift-add.
+
+The relative ordering Bitwuzla $>$ cvc5 $>$ \cbmc on this
+broader sample reflects mature word-level rewriting on queries
+where multiplication is part of a richer structure
+(non-polynomial operations, embedded multiplications); the
+algebraic technique developed here is pattern-specific (the
+universal-equational class with polynomial expressions in
+$\mathbb{Z}_{2^d}$) and does not aim to replace mature SMT
+solvers on general QF\_BV community
 benchmarks (Section~\ref{sec:threats}).
 
 \subsection{SMT-LIB Community Benchmarks (26 benchmarks)}
