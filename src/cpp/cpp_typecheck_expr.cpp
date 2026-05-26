@@ -34,7 +34,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 bool cpp_typecheckt::find_parent(
   const symbolt &symb,
-  const irep_idt &base_name,
+  irep_idt base_name,
   irep_idt &identifier)
 {
   for(const auto &b : to_struct_type(symb.type).bases())

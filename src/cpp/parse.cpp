@@ -220,9 +220,9 @@ protected:
   new_scopet root_scope;
   new_scopet *current_scope;
   new_scopet &add_id(const irept &name, new_scopet::kindt);
-  new_scopet &add_id(const irep_idt &, new_scopet::kindt);
+  new_scopet &add_id(irep_idt, new_scopet::kindt);
   void make_sub_scope(const irept &name, new_scopet::kindt);
-  void make_sub_scope(const irep_idt &, new_scopet::kindt);
+  void make_sub_scope(irep_idt, new_scopet::kindt);
 
   enum DeclKind { kDeclarator, kArgDeclarator, kCastDeclarator };
   enum TemplateDeclKind { tdk_unknown, tdk_decl, tdk_instantiation,
@@ -436,7 +436,7 @@ new_scopet &Parser::add_id(const irept &cpp_name, new_scopet::kindt kind)
   return add_id(id, kind);
 }
 
-new_scopet &Parser::add_id(const irep_idt &id, new_scopet::kindt kind)
+new_scopet &Parser::add_id(irep_idt id, new_scopet::kindt kind)
 {
   new_scopet &s=current_scope->id_map[id];
 
@@ -453,7 +453,7 @@ void Parser::make_sub_scope(const irept &cpp_name, new_scopet::kindt kind)
   current_scope=&s;
 }
 
-void Parser::make_sub_scope(const irep_idt &id, new_scopet::kindt kind)
+void Parser::make_sub_scope(irep_idt id, new_scopet::kindt kind)
 {
   new_scopet &s=add_id(id, kind);
   current_scope=&s;
