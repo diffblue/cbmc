@@ -748,77 +748,38 @@ The test is complete for polynomial equivalence over
 $\mathbb{Z}_{2^{n_1}} \times \cdots \times \mathbb{Z}_{2^{n_d}}
 \to \mathbb{Z}_{2^m}$.
 
-\paragraph{Empirical degree scaling.}
-We measured the end-to-end solver time on a family of binomial
-identities of the form $(a + b)^k = \sum_{i=0}^k \binom{k}{i}
-a^i b^{k-i}$ for $k \in \{2,3,4,5,6\}$ at bitwidths 8 and 16
-(median of 3 runs; \cadical).
+\paragraph{Empirical scaling.}
+Figure~\ref{fig:scaling} reports two scaling experiments: degree
+scaling on a family of binomial identities $(a + b)^k =
+\sum_{i=0}^k \binom{k}{i} a^i b^{k-i}$ for
+$k \in \{2,\ldots,6\}$ at bitwidths 8 and 16, and variables
+scaling on a permutation family
+$\sum_{\sigma \in S_k} \prod_i x_{\sigma(i)} \equiv
+k! \cdot \prod_i x_i \pmod{2^{16}}$ for $k \in \{2,\ldots,6\}$ (the
+LHS contains $k \cdot k!$ multiplications). All measurements use
+median of 4 warm runs (5 runs total, first discarded), consistent
+with Section~\ref{sec:scaling}.
 
-\begin{table}[ht]
-\caption{Binomial-identity degree scaling (median of 3, seconds).
-  The Gr\"obner-basis solver handles degree up to $6$ (two
-  variables) with only mild polynomial growth.}
-\label{tab:degree}
-\centering
-\small
-\begin{tabular}{lrrrrr}
-\toprule
-BW & $k=2$ & $k=3$ & $k=4$ & $k=5$ & $k=6$ \\
-\midrule
-8  & 0.0067 & 0.0073 & 0.0080 & 0.0092 & 0.0103 \\
-16 & 0.0105 & 0.0140 & 0.0177 & 0.0225 & 0.0258 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Empirically the solver's wall time grows by only $1.5$--$2.5\times$
-as $k$ increases from 2 to 6 (log--log slope
-$\approx 0.4$--$0.8$). The theoretical $O(d_w^{2k})$ bound is
-dominated here by the fixed overhead of SMT parsing, SSA
-construction, and Buchberger setup; the actual Gr\"obner-basis
-reductions contribute a small fraction of the total time on these
-low-degree instances. For much higher $k$ or more variables, the
-exponential dependence would dominate (as the theoretical bound
-predicts); our empirical regime ($k \leq 6$, two variables) is
-well inside the polynomial-overhead range.
-
-\paragraph{Empirical scaling in number of variables.}
-We measured the solver on a variables-scaling family where $k$
-variables $x_1, \ldots, x_k$ have the identity
-$\sum_{\sigma \in S_k} \prod_i x_{\sigma(i)} \equiv k! \cdot \prod_i x_i \pmod{2^{16}}$
-(the sum over all $k!$ permutations of a $k$-fold product equals
-$k!$ times the canonical product, by commutativity). The LHS
-contains $k \cdot k!$ multiplications.
-
-\begin{table}[ht]
-\caption{Variables-scaling (median of 3, seconds). As $k$ grows,
-  the LHS has $k!$ terms, stressing the Gr\"obner basis's ability
-  to identify all orderings as equal.}
-\label{tab:varscale}
-\centering
-\small
-\begin{tabular}{rrrrrr}
-\toprule
-$k$ & perms ($k!$) & muls on LHS & time (s) & ratio to $k{-}1$ & log-log slope \\
-\midrule
-2 & 2   & 4     & 0.009 & --- & \multirow{5}{*}{$\approx$4.9} \\
-3 & 6   & 18    & 0.018 & $1.97\times$ & \\
-4 & 24  & 96    & 0.064 & $3.59\times$ & \\
-5 & 120 & 600   & 0.346 & $5.44\times$ & \\
-6 & 720 & 4320  & 2.254 & $6.51\times$ & \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-The running time grows as approximately $k^5$
-(log--log slope 4.9) and sub-factorially when measured against $k \log k$
-(slope 0.6, whereas factorial growth would give slope 1.0). This
-is consistent with the Gr\"obner basis recognising equivalent
-monomials by the commutativity relations in the ideal, rather than
-enumerating all $k!$ perm\-ut\-ations separately.
-The slowdown at $k = 6$ (2.25\,s) is dominated by the $720$
-reductions required to unify the permutation terms, not by the
-polynomial arithmetic itself.
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.95\textwidth]{scaling-figure.pdf}
+  \caption{Algebraic-solver scaling. (a) On the binomial-identity
+    family $(a+b)^k$, wall time grows by $2.1\times$ at BW=8 and
+    $3.1\times$ at BW=16 as $k$ goes from 2 to 6 --- well below
+    the theoretical $O(d_w^{2k})$ bound, since fixed overhead
+    (SMT parsing, SSA construction, Buchberger setup) dominates
+    these short solves. (b) On the permutation family
+    $\sum_{\sigma \in S_k} \prod_i x_{\sigma(i)}$, wall time grows
+    as approximately $k^5$ (log--log slope 4.9), driven by the
+    $k \cdot k!$ multiplications on the LHS. The Gr\"obner basis
+    recognises equivalent monomials via commutativity in the
+    ideal, rather than enumerating all $k!$ permutations
+    separately; growth is sub-factorial against $k \log k$
+    (slope 0.6 versus 1.0 for factorial). At $k=6$ the 2.2\,s is
+    dominated by the 720 reductions required to unify the
+    permutation terms, not by polynomial arithmetic itself.}
+  \label{fig:scaling}
+\end{figure}
 
 \paragraph{Why a separate test, instead of adding vanishing
 polynomials to the Gr\"obner basis?}

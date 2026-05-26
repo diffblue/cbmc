@@ -1,0 +1,18 @@
+# Binomial scaling and variables-scaling data
+# Median of 4 warm runs (5 total, first discarded), ms
+benchmark	k	time_ms
+binomial_deg2_bw8	2	3.64
+binomial_deg3_bw8	3	4.68
+binomial_deg4_bw8	4	5.22
+binomial_deg5_bw8	5	6.43
+binomial_deg6_bw8	6	7.74
+binomial_deg2_bw16	2	7.42
+binomial_deg3_bw16	3	11.40
+binomial_deg4_bw16	4	14.72
+binomial_deg5_bw16	5	19.52
+binomial_deg6_bw16	6	23.34
+varscale_k2_bw16	2	5.63
+varscale_k3_bw16	3	14.70
+varscale_k4_bw16	4	60.61
+varscale_k5_bw16	5	340.62
+varscale_k6_bw16	6	2229.35

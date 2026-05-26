@@ -19,11 +19,11 @@
 | #8 §2.6 5-layer pipeline table confusing | TODO | — |
 | #9 §2.7 shift-add comparison unfair | **FIXED** | (current session) — added Bitwuzla column to Table 2; rephrased framing to acknowledge mature word-level reasoners also handle these identities; updated abstract and §1 opener to remove the misleading "four orders of magnitude" claim |
 | #10 §2.3 contribution list awkward | **FIXED** | (current session) — consolidated 6 points into 3 grouped contributions: SMT integration, algorithmic refinements, mechanised soundness |
-| #11 Methodology inconsistency (median of 3 vs 5) | TODO | — |
+| #11 Methodology inconsistency (median of 3 vs 5) | **FIXED** | (current session) — re-measured both scaling experiments with median-of-4-warm-runs (5 total, first discarded) consistent with §2.7 |
 | #12 'Honest reading' paragraphs scattered | TODO | — |
 | #13 §1 four-classes taxonomy too long | TODO | — |
 | #14 §6 conclusion repeats abstract | TODO | — |
-| #15 Tables 4+5 should be one figure | TODO | — |
+| #15 Tables 4+5 should be one figure | **FIXED** | (current session) — replaced both tables with Figure scaling-figure.pdf (matplotlib-generated, 2-panel), reducing two paragraphs+tables to one paragraph+figure |
 | #16 §5 Mechanised Soundness Lean technical detail | TODO | — |
 | #17 Table footnote markers in LNCS | TODO | — |
 | #18 §4.5 'n' header clashes with §3 'n' | TODO | — |
