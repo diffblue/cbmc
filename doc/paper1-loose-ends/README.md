@@ -50,6 +50,7 @@ collects:
 | File | Description |
 |---|---|
 | `internal-review-2026-05-26.md` | Forward-looking senior-reviewer pass on the submitted Paper 1. 15 items at three severities. **Highest priority: item #1** (the §8 `--refine-arithmetic` overhead claim is now contradicted by the post-submission fix and must be updated in any revision). **Item #2**: §7.7 SMT-COMP framing understates a 33-vs-41 regression. **Item #3**: 21 pages is on the long side for PoS; cut list ready. The full list is the workbook for integrating peer-review feedback. |
+| `coauthor-feedback-2026-05-26.md` | Co-author read-through (translated from German) plus the Beame & Sun 2026 citation update. 10 items C1–C10 covering: full encoding spec, parenthetical style, proof-core distinction, DRAT table extension, 4-bit-block reference, classifier scope, CryptoMiniSat-inprocessing fact-check, SMT-COMP sample defence, appendix order, and table introductory sentences. Plus: the Beame & Sun "Extending CDCL to disjunctions of parity equations" paper (now arXiv:2605.15002) is publicly citable; should be added alongside Danner 2025 in §10's "Escaping resolution hardness in CDCL" paragraph. |
 
 ### Post-submission data
 
