@@ -2603,10 +2603,204 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
     // Used by MSVC's <exception> header: void* ptr = {};
     if(
       orig_expr.id() == ID_initializer_list && orig_expr.operands().empty() &&
-      type.id() == ID_pointer)
+      type.id() == ID_pointer && !is_reference(type))
     {
       expr = null_pointer_exprt(to_pointer_type(type));
       return;
+    }
+
+    // C++11 [dcl.init.list]/3: list-initialization with an empty
+    // brace-init list `{}` value-initializes the destination.
+    // For a class type (or reference to a class type) with an
+    // accessible default constructor, this synthesises a default-
+    // constructed temporary; for a reference target the caller
+    // binds the reference via the address of the temporary.
+    //
+    // The match in `cpp_typecheck_fargst::match` (via
+    // `brace_init_is_viable`) accepts `{}` as a viable conversion
+    // for class types and class-reference types; this branch
+    // performs the corresponding actual conversion so the
+    // overall implicit-typecast succeeds rather than reaching
+    // the "invalid implicit conversion" error path below.
+    if(
+      orig_expr.id() == ID_initializer_list && orig_expr.operands().empty() &&
+      (type.id() == ID_struct_tag || type.id() == ID_struct ||
+       (type.id() == ID_pointer && is_reference(type))))
+    {
+      typet base_type = type;
+      bool target_is_reference = false;
+      if(type.id() == ID_pointer && is_reference(type))
+      {
+        base_type = to_reference_type(type).base_type();
+        target_is_reference = true;
+      }
+      if(base_type.id() == ID_struct_tag || base_type.id() == ID_struct)
+      {
+        // Skip std::initializer_list itself — the dedicated
+        // brace-to-initializer_list block below handles those.
+        const std::string base_id_str =
+          base_type.id() == ID_struct_tag
+            ? id2string(to_struct_tag_type(base_type).get_identifier())
+            : std::string{};
+        if(base_id_str.find("tag-initializer_list<") == std::string::npos)
+        {
+          try
+          {
+            // Default-construct via cpp_constructor on a marker
+            // new_object so any user-defined default ctor (or the
+            // POD zero-init path) is honoured uniformly.
+            exprt temp;
+            new_temporary(
+              orig_expr.source_location(), base_type, exprt::operandst{}, temp);
+            if(target_is_reference)
+            {
+              address_of_exprt addr{temp, pointer_type(base_type)};
+              addr.type().set(ID_C_reference, true);
+              if(is_rvalue_reference(type))
+                addr.type().set(ID_C_rvalue_reference, true);
+              expr = std::move(addr);
+            }
+            else
+            {
+              expr = std::move(temp);
+            }
+            return;
+          }
+          catch(...)
+          {
+            // Fall through to standard error path.
+          }
+        }
+      }
+    }
+
+    // C++11 [dcl.init.list]/3.5: non-empty brace-init list to a
+    // class (or reference-to-class) type with an accessible
+    // `initializer_list<U>` constructor.
+    //
+    // Algorithm:
+    //   1. Locate the `initializer_list<U>` ctor on the class and
+    //      extract `U`.
+    //   2. Recurse via `implicit_typecast` to materialise the
+    //      brace-init as a value of type `std::initializer_list<U>`
+    //      (handled by the existing brace-to-initializer_list block
+    //      below — that block produces a `struct_exprt` of the
+    //      `tag-initializer_list<U>` struct).
+    //   3. Mark the synthesised initializer_list value as
+    //      `already_typechecked` so that `cpp_constructor`'s
+    //      argument-typecheck step doesn't reject it as
+    //      `unexpected expression: struct`.
+    //   4. Call `new_temporary` to construct the destination class
+    //      temporary with the initializer_list as its argument.
+    //   5. For a reference-typed target, bind the reference via
+    //      `address_of` of the temporary.
+    if(
+      orig_expr.id() == ID_initializer_list && !orig_expr.operands().empty() &&
+      (type.id() == ID_struct_tag || type.id() == ID_struct ||
+       (type.id() == ID_pointer && is_reference(type))))
+    {
+      typet base_type = type;
+      bool target_is_reference = false;
+      if(type.id() == ID_pointer && is_reference(type))
+      {
+        base_type = to_reference_type(type).base_type();
+        target_is_reference = true;
+      }
+      if(base_type.id() == ID_struct_tag || base_type.id() == ID_struct)
+      {
+        const std::string base_id_str =
+          base_type.id() == ID_struct_tag
+            ? id2string(to_struct_tag_type(base_type).get_identifier())
+            : std::string{};
+        // Skip std::initializer_list itself — the dedicated
+        // brace-to-initializer_list block below handles those.
+        if(base_id_str.find("tag-initializer_list<") == std::string::npos)
+        {
+          const struct_typet &class_type =
+            base_type.id() == ID_struct_tag
+              ? follow_tag(to_struct_tag_type(base_type))
+              : to_struct_type(base_type);
+          // Locate `initializer_list<U>` ctor and extract U.
+          typet init_list_param_type;
+          bool found_il_ctor = false;
+          for(const auto &c : class_type.components())
+          {
+            if(c.type().id() != ID_code)
+              continue;
+            if(to_code_type(c.type()).return_type().id() != ID_constructor)
+              continue;
+            if(c.get_bool(ID_is_explicit))
+              continue;
+            const auto &params = to_code_type(c.type()).parameters();
+            if(params.size() < 2)
+              continue;
+            typet p1_type = params[1].type();
+            if(is_reference(p1_type))
+              p1_type = to_reference_type(p1_type).base_type();
+            if(p1_type.id() != ID_struct_tag)
+              continue;
+            if(
+              id2string(to_struct_tag_type(p1_type).get_identifier())
+                .find("tag-initializer_list<") == std::string::npos)
+              continue;
+            bool all_extras_default = true;
+            for(std::size_t i = 2; i < params.size(); ++i)
+            {
+              if(!params[i].has_default_value())
+              {
+                all_extras_default = false;
+                break;
+              }
+            }
+            if(!all_extras_default)
+              continue;
+            init_list_param_type = p1_type;
+            found_il_ctor = true;
+            break;
+          }
+          if(found_il_ctor)
+          {
+            try
+            {
+              // Recurse: convert the brace-init to
+              // std::initializer_list<U>.  This dispatches to
+              // the existing brace-to-initializer_list handler
+              // below, which produces a `struct_exprt` of the
+              // initializer-list struct.
+              exprt init_list_value = orig_expr;
+              implicit_typecast(init_list_value, init_list_param_type);
+              // Mark it as already typechecked so that
+              // `cpp_constructor`'s `typecheck_expr(op)` call on
+              // the argument does not re-traverse into the raw
+              // `struct_exprt` (which would trip the
+              // "unexpected expression: struct" path in
+              // `c_typecheck_baset::typecheck_expr_main`).
+              already_typechecked_exprt::make_already_typechecked(
+                init_list_value);
+              exprt temp;
+              new_temporary(
+                orig_expr.source_location(), base_type, init_list_value, temp);
+              if(target_is_reference)
+              {
+                address_of_exprt addr{temp, pointer_type(base_type)};
+                addr.type().set(ID_C_reference, true);
+                if(is_rvalue_reference(type))
+                  addr.type().set(ID_C_rvalue_reference, true);
+                expr = std::move(addr);
+              }
+              else
+              {
+                expr = std::move(temp);
+              }
+              return;
+            }
+            catch(...)
+            {
+              // Fall through to the standard error path.
+            }
+          }
+        }
+      }
     }
 
     // Brace-init {a, b, ...} to aggregate struct: assign members
@@ -2721,6 +2915,14 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
 
           symbol_exprt arr_ref(arr_id, arr_type);
           arr_ref.add_source_location() = orig_expr.source_location();
+          // The backing array symbol is created with
+          // `is_lvalue = true`; carry that through the symbol_exprt
+          // so callers (in particular the `address_of_exprt &arr[0]`
+          // built below) see a proper lvalue and downstream uses
+          // such as recursive `implicit_typecast` from the brace-
+          // init-to-class-with-init_list-ctor handler don't trip
+          // the "address_of: not an lvalue" path.
+          arr_ref.set(ID_C_lvalue, true);
 
           // Build struct { &arr[0], n }
           // Find the two data members (pointer and size)
