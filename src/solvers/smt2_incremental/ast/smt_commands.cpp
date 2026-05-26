@@ -179,7 +179,7 @@ const smt_optiont &smt_set_option_commandt::option() const
 }
 
 template <typename visitort>
-void accept(const smt_commandt &command, const irep_idt &id, visitort &&visitor)
+void accept(const smt_commandt &command, irep_idt id, visitort &&visitor)
 {
 #define COMMAND_ID(the_id)                                                     \
   if(id == ID_smt_##the_id##_command)                                          \

@@ -35,7 +35,7 @@ bool smt_option_produce_modelst::setting() const
 }
 
 template <typename visitort>
-void accept(const smt_optiont &option, const irep_idt &id, visitort &&visitor)
+void accept(const smt_optiont &option, irep_idt id, visitort &&visitor)
 {
 #define OPTION_ID(the_id)                                                      \
   if(id == ID_smt_option_##the_id)                                             \

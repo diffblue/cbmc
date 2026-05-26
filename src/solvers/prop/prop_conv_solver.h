@@ -120,7 +120,7 @@ protected:
   // symbols
   symbolst symbols;
 
-  virtual literalt get_literal(const irep_idt &symbol);
+  virtual literalt get_literal(irep_idt symbol);
 
   // cache
   cachet cache;

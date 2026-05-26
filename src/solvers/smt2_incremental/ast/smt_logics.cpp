@@ -20,7 +20,7 @@ bool smt_logict::operator!=(const smt_logict &other) const
 }
 
 template <typename visitort>
-void accept(const smt_logict &logic, const irep_idt &id, visitort &&visitor)
+void accept(const smt_logict &logic, irep_idt id, visitort &&visitor)
 {
 #define LOGIC_ID(the_id, the_name)                                             \
   if(id == ID_smt_logic_##the_id)                                              \
