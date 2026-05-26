@@ -103,23 +103,51 @@ revision gives:
 
 ### Open caveats
 
-- **1-level Karatsuba, not multi-level.** SABER's actual
-  implementation uses Toom-Cook 4-way + Karatsuba (a 2-level
-  decomposition). We verified 1-level Karatsuba equivalence;
-  multi-level would verify the same algebraic identity at higher
-  syntactic complexity. Worth doing if we want to claim
-  "verifies SABER's full algorithmic structure" rather than
-  "verifies a SABER-shaped polynomial-multiplication identity".
-  Effort: extend `make-saber-query.py` with a Toom-Cook 4-way
-  mode (~half a day).
+- **2-level Karatsuba implemented; full Toom-Cook 4-way deferred.**
+  SABER's actual `poly_mul_acc` uses Toom-Cook 4-way as the outer
+  decomposition and Karatsuba as the inner kernel. We have
+  implemented two variants in the generator
+  (`make-saber-query.py --algo-b karatsuba2`):
+
+  - **1-level Karatsuba**: schoolbook on half-sized inputs.
+  - **2-level Karatsuba**: Karatsuba on half-sized inputs, with
+    schoolbook on quarter-sized sub-products (9 schoolbook
+    quarter-mults total). Multi-level decomposition mirroring
+    SABER's structural depth.
+
+  Times for 2-level are within ~5% of 1-level across the whole
+  sweep:
+
+  | $N$ | us 1-level | us 2-level |
+  |---|---|---|
+  | 4 | 0.02 s | 0.03 s |
+  | 16 | 0.37 s | 0.39 s |
+  | 64 | 6.15 s | 6.41 s |
+  | 256 | 109.35 s | 108.68 s |
+
+  Buchberger normalises through the layers — the polynomial
+  identity is the same, just with different intermediate
+  decomposition.
+
+  **Full Toom-Cook 4-way as in SABER** uses interpolation
+  formulas with shifts (`>> 1`, `>> 3`) and modular inverses
+  (`inv3`, `inv9`, `inv15`). The shifts are *exact divisions*:
+  partial operations on $\mathbb{Z}_{2^d}$ that are valid only
+  when divisibility is guaranteed by the algorithm's invariants.
+  Implementing them faithfully in SMT-LIB requires extractor
+  support for `bvshr` as exact division (related to Re 2,
+  extractor coverage extension). Deferred; 2-level Karatsuba
+  is the multi-level variant we can verify today without
+  extractor extensions.
+
 - **Per-coefficient, not whole-polynomial.** The SABER reduction
   step `res[i] = c[i] - c[i+N]` is verified implicitly because
   each coefficient query includes it. A whole-polynomial query
-  would require either (a) avoiding the disjunction-bit-blasting
-  blowup (requires a procedure-level extension to handle
-  disjunctions of disequalities via Rabinowitsch on each branch
-  — non-trivial), or (b) keeping per-coefficient and reporting
-  total runtime as the sum.
+  would require either (a) a procedure-level extension to handle
+  disjunctions of disequalities (tracked at
+  `disjunctive-disequalities-extension.md`), or (b) keeping
+  per-coefficient and reporting total runtime as the sum.
+
 - **Worst-case `bvmul` arity.** `make-saber-query.py` emits
   expressions like
   `(bvadd (bvadd (bvadd (bvmul a0 b3) (bvmul a1 b2)) (bvmul a2 b1)) (bvmul a3 b0))`.

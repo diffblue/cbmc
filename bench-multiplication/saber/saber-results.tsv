@@ -22,3 +22,11 @@ n	q	coeff	us	bitwuzla	cvc5
 128	16	32	25.31	0.06	T/O
 128	16	64	25.26	0.06	T/O
 256	16	0	109.35	0.26	T/O
+# 2-level Karatsuba (mirrors SABER's Toom-4 + Karatsuba multi-level structure)
+4	16	0	0.03	0.00	T/O
+8	16	0	0.10	0.00	T/O
+16	16	0	0.39	0.00	T/O
+32	16	0	1.59	0.01	T/O
+64	16	0	6.41	0.02	T/O
+128	16	0	26.25	0.06	T/O
+256	16	0	108.68	0.26	T/O
