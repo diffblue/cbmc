@@ -1,47 +1,59 @@
 <map id="unary_predicate_exprt" name="unary_predicate_exprt">
-<area shape="rect" id="Node000001" title="A base class for expressions that are predicates, i.e., Boolean&#45;typed, and that take exactly one argu..." alt="" coords="1177,367,1345,392"/>
+<area shape="rect" id="Node000001" title="A base class for expressions that are predicates, i.e., Boolean&#45;typed, and that take exactly one argu..." alt="" coords="1177,515,1345,540"/>
 <area shape="rect" id="Node000008" href="$classenum__is__in__range__exprt.html" title="A Boolean expression returning true, iff the value of an enum&#45;typed symbol equals one of the enum&#39;s d..." alt="" coords="1396,5,1577,31"/>
-<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1262,353,1271,289,1293,204,1310,159,1332,115,1359,75,1393,40,1411,29,1414,33,1396,44,1363,78,1336,118,1315,161,1298,205,1276,290,1267,354"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1265,501,1301,329,1331,214,1367,97,1375,66,1381,53,1393,40,1411,29,1414,33,1396,44,1385,56,1380,68,1372,99,1336,215,1306,331,1270,502"/>
 <area shape="rect" id="Node000009" href="$classinitial__state__exprt.html" title=" " alt="" coords="1417,55,1557,80"/>
-<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1264,353,1277,298,1301,226,1318,189,1338,152,1363,119,1393,89,1415,76,1418,81,1396,93,1367,122,1343,155,1322,191,1306,228,1282,299,1269,354"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1259,501,1261,419,1267,365,1277,307,1294,247,1318,188,1350,135,1393,89,1415,76,1418,81,1396,93,1355,138,1323,191,1299,248,1283,308,1272,366,1267,419,1264,501"/>
 <area shape="rect" id="Node000010" href="$classis__cstring__exprt.html" title="A predicate that indicates that a zero&#45;terminated string starts at the given address." alt="" coords="1424,104,1549,129"/>
-<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1267,352,1283,306,1308,248,1345,189,1367,162,1393,138,1422,123,1425,128,1396,143,1371,166,1349,192,1313,251,1288,308,1272,354"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1260,501,1266,428,1286,330,1302,277,1325,226,1355,179,1393,139,1422,123,1425,127,1396,143,1359,182,1330,229,1307,279,1291,331,1272,429,1266,501"/>
 <area shape="rect" id="Node000011" href="$classis__dynamic__object__exprt.html" title="Evaluates to true if the operand is a pointer to a dynamic object." alt="" coords="1395,153,1579,179"/>
-<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="1271,353,1290,316,1316,272,1351,227,1393,189,1418,176,1420,181,1396,194,1355,231,1321,275,1294,319,1276,355"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="1263,500,1273,437,1295,353,1312,309,1333,265,1360,225,1393,189,1413,177,1416,181,1396,193,1364,228,1338,268,1317,311,1300,355,1278,438,1268,501"/>
 <area shape="rect" id="Node000012" href="$classis__invalid__pointer__exprt.html" title=" " alt="" coords="1418,203,1555,243"/>
-<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="1280,355,1328,304,1359,277,1393,253,1417,241,1419,246,1396,258,1363,281,1332,308,1284,358"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="1266,501,1280,449,1305,383,1342,314,1366,282,1393,253,1416,238,1419,243,1396,257,1370,285,1347,317,1310,385,1285,451,1271,502"/>
 <area shape="rect" id="Node000013" href="$classisfinite__exprt.html" title="Evaluates to true if the operand is finite." alt="" coords="1433,268,1540,293"/>
-<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="1292,357,1339,329,1394,302,1432,289,1434,295,1396,307,1341,334,1294,362"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="1268,501,1285,458,1311,404,1346,349,1368,324,1393,302,1412,292,1432,285,1434,290,1414,297,1396,307,1372,328,1351,352,1315,406,1289,460,1273,503"/>
 <area shape="rect" id="Node000014" href="$classisinf__exprt.html" title="Evaluates to true if the operand is infinite." alt="" coords="1441,317,1532,343"/>
-<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="1333,361,1441,337,1442,342,1334,366"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="1273,501,1292,467,1319,427,1353,386,1393,352,1416,340,1440,333,1442,338,1418,345,1396,356,1356,390,1323,430,1296,470,1277,504"/>
 <area shape="rect" id="Node000015" href="$classisnan__exprt.html" title="Evaluates to true if the operand is NaN." alt="" coords="1437,367,1536,392"/>
-<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="1359,377,1437,377,1437,382,1359,382"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="1279,502,1327,451,1359,424,1393,401,1436,385,1438,390,1396,406,1362,428,1331,455,1283,506"/>
 <area shape="rect" id="Node000016" href="$classisnormal__exprt.html" title="Evaluates to true if the operand is a normal number." alt="" coords="1427,416,1547,441"/>
-<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="1334,392,1428,413,1427,419,1333,398"/>
+<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="1292,505,1339,477,1394,450,1427,439,1429,444,1396,455,1341,482,1294,510"/>
 <area shape="rect" id="Node000017" href="$classlive__object__exprt.html" title="A predicate that indicates that the object pointed to is live." alt="" coords="1419,465,1554,491"/>
-<area shape="poly" id="edge16_Node000001_Node000017" title=" " alt="" coords="1294,397,1341,425,1396,452,1429,463,1427,468,1394,456,1339,430,1292,402"/>
+<area shape="poly" id="edge16_Node000001_Node000017" title=" " alt="" coords="1333,509,1427,488,1428,493,1334,514"/>
 <area shape="rect" id="Node000018" href="$classonehot0__exprt.html" title="A Boolean expression returning true iff the given operand consists of exactly one &#39;0&#39; and &#39;1&#39; otherwi..." alt="" coords="1429,515,1545,540"/>
-<area shape="poly" id="edge17_Node000001_Node000018" title=" " alt="" coords="1283,401,1331,452,1362,478,1396,501,1430,514,1428,519,1393,506,1359,483,1327,456,1279,404"/>
+<area shape="poly" id="edge17_Node000001_Node000018" title=" " alt="" coords="1359,525,1428,525,1428,530,1359,530"/>
 <area shape="rect" id="Node000019" href="$classonehot__exprt.html" title="A Boolean expression returning true iff the given operand consists of exactly one &#39;1&#39; and &#39;0&#39; otherwi..." alt="" coords="1433,564,1541,589"/>
-<area shape="poly" id="edge18_Node000001_Node000019" title=" " alt="" coords="1277,403,1296,437,1323,477,1356,517,1396,550,1434,566,1431,571,1393,555,1353,521,1319,480,1292,440,1273,406"/>
-<area shape="rect" id="Node000020" href="$classsign__exprt.html" title="Sign of an expression Predicate is true if _op is negative, false otherwise." alt="" coords="1441,613,1532,639"/>
-<area shape="poly" id="edge19_Node000001_Node000020" title=" " alt="" coords="1273,404,1289,447,1315,500,1351,554,1372,579,1396,600,1418,612,1442,619,1440,624,1416,617,1393,604,1368,582,1346,558,1311,503,1285,449,1268,406"/>
-<area shape="rect" id="Node000021" href="$classunary__overflow__exprt.html" title="A Boolean expression returning true, iff operation kind would result in an overflow when applied to t..." alt="" coords="1405,663,1568,688"/>
-<area shape="poly" id="edge20_Node000001_Node000021" title=" " alt="" coords="1270,405,1284,457,1308,523,1345,591,1369,622,1396,649,1415,660,1412,665,1393,653,1365,626,1341,594,1303,525,1279,459,1265,406"/>
-<area shape="rect" id="Node000023" href="$classwriteable__object__exprt.html" title="A predicate that indicates that the object pointed to is writeable." alt="" coords="1401,712,1572,737"/>
-<area shape="poly" id="edge22_Node000001_Node000023" title=" " alt="" coords="1268,405,1279,466,1301,545,1318,587,1339,628,1365,666,1396,699,1413,710,1411,714,1393,703,1361,669,1335,631,1313,589,1296,547,1274,467,1263,406"/>
-<area shape="rect" id="Node000002" href="$classunary__exprt.html" title="Generic base class for unary expressions." alt="" coords="1028,367,1128,392"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1142,377,1177,377,1177,382,1142,382"/>
-<area shape="rect" id="Node000003" href="$classexpr__protectedt.html" title="Base class for all expressions." alt="" coords="853,367,979,392"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="992,377,1028,377,1028,382,992,382"/>
-<area shape="rect" id="Node000004" href="$classexprt.html" title="Base class for all expressions." alt="" coords="748,367,804,392"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="818,377,853,377,853,382,818,382"/>
-<area shape="rect" id="Node000005" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="647,367,699,392"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="712,377,748,377,748,382,712,382"/>
-<area shape="rect" id="Node000006" href="$classsharing__treet.html" title=" " alt="" coords="431,352,597,407"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="611,377,647,377,647,382,611,382"/>
-<area shape="rect" id="Node000007" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="5,359,187,399"/>
-<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="200,377,431,377,431,382,200,382"/>
-<area shape="rect" id="Node000022" href="$classunary__minus__overflow__exprt.html" title="A Boolean expression returning true, iff negation would result in an overflow when applied to the (si..." alt="" coords="1628,655,1797,695"/>
-<area shape="poly" id="edge21_Node000021_Node000022" title=" " alt="" coords="1582,673,1628,673,1628,678,1582,678"/>
+<area shape="poly" id="edge18_Node000001_Node000019" title=" " alt="" coords="1334,540,1433,562,1432,568,1333,546"/>
+<area shape="rect" id="Node000020" href="$classreduction__and__exprt.html" title="Boolean reduction: true iff every bit of the operand is 1." alt="" coords="1409,613,1564,639"/>
+<area shape="poly" id="edge19_Node000001_Node000020" title=" " alt="" coords="1294,545,1341,573,1396,600,1429,611,1427,616,1394,604,1339,578,1292,550"/>
+<area shape="rect" id="Node000021" href="$classreduction__nand__exprt.html" title="Boolean reduction: negation of reduction_and_exprt." alt="" coords="1405,663,1568,688"/>
+<area shape="poly" id="edge20_Node000001_Node000021" title=" " alt="" coords="1283,549,1331,600,1362,626,1396,649,1422,660,1420,665,1393,654,1359,631,1327,604,1279,552"/>
+<area shape="rect" id="Node000022" href="$classreduction__nor__exprt.html" title="Boolean reduction: negation of reduction_or_exprt." alt="" coords="1411,712,1563,737"/>
+<area shape="poly" id="edge21_Node000001_Node000022" title=" " alt="" coords="1277,551,1296,585,1323,625,1356,665,1396,698,1418,709,1416,714,1393,703,1353,669,1319,628,1292,588,1273,554"/>
+<area shape="rect" id="Node000023" href="$classreduction__or__exprt.html" title="Boolean reduction: true iff any bit of the operand is 1." alt="" coords="1415,761,1559,787"/>
+<area shape="poly" id="edge22_Node000001_Node000023" title=" " alt="" coords="1273,552,1289,595,1315,648,1351,702,1372,727,1396,748,1416,759,1413,763,1393,752,1368,730,1346,706,1311,651,1285,597,1268,554"/>
+<area shape="rect" id="Node000024" href="$classreduction__xnor__exprt.html" title="Boolean reduction: negation of reduction_xor_exprt." alt="" coords="1407,811,1567,836"/>
+<area shape="poly" id="edge23_Node000001_Node000024" title=" " alt="" coords="1270,553,1284,605,1308,671,1345,739,1369,770,1396,797,1415,808,1412,813,1393,801,1365,774,1341,742,1303,673,1279,607,1265,554"/>
+<area shape="rect" id="Node000025" href="$classreduction__xor__exprt.html" title="Boolean reduction: XOR (parity) of all bits in the operand." alt="" coords="1411,860,1562,885"/>
+<area shape="poly" id="edge24_Node000001_Node000025" title=" " alt="" coords="1268,553,1279,614,1301,693,1318,735,1339,776,1365,814,1396,847,1413,858,1411,862,1393,851,1361,817,1335,779,1313,737,1296,695,1274,615,1263,554"/>
+<area shape="rect" id="Node000026" href="$classsign__exprt.html" title="Sign of an expression Predicate is true if _op is negative, false otherwise." alt="" coords="1441,909,1532,935"/>
+<area shape="poly" id="edge25_Node000001_Node000026" title=" " alt="" coords="1267,554,1274,623,1295,715,1311,764,1334,813,1362,857,1396,896,1418,909,1442,916,1440,921,1415,914,1393,900,1357,860,1329,815,1307,766,1290,717,1269,623,1261,554"/>
+<area shape="rect" id="Node000027" href="$classunary__overflow__exprt.html" title="A Boolean expression returning true, iff operation kind would result in an overflow when applied to t..." alt="" coords="1405,959,1568,984"/>
+<area shape="poly" id="edge26_Node000001_Node000027" title=" " alt="" coords="1265,554,1270,631,1276,682,1287,737,1304,794,1327,850,1357,901,1396,945,1413,956,1410,961,1393,949,1353,904,1322,852,1299,796,1282,739,1271,683,1264,632,1260,554"/>
+<area shape="rect" id="Node000029" href="$classwriteable__object__exprt.html" title="A predicate that indicates that the object pointed to is writeable." alt="" coords="1401,1008,1572,1033"/>
+<area shape="poly" id="edge28_Node000001_Node000029" title=" " alt="" coords="1269,553,1285,651,1313,785,1331,852,1351,913,1373,962,1397,995,1413,1006,1410,1010,1393,999,1368,965,1346,915,1325,854,1308,786,1280,652,1264,554"/>
+<area shape="rect" id="Node000002" href="$classunary__exprt.html" title="Generic base class for unary expressions." alt="" coords="1028,515,1128,540"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1142,525,1177,525,1177,530,1142,530"/>
+<area shape="rect" id="Node000003" href="$classexpr__protectedt.html" title="Base class for all expressions." alt="" coords="853,515,979,540"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="992,525,1028,525,1028,530,992,530"/>
+<area shape="rect" id="Node000004" href="$classexprt.html" title="Base class for all expressions." alt="" coords="748,515,804,540"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="818,525,853,525,853,530,818,530"/>
+<area shape="rect" id="Node000005" href="$classirept.html" title="There are a large number of kinds of tree structured or tree&#45;like data in CPROVER." alt="" coords="647,515,699,540"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="712,525,748,525,748,530,712,530"/>
+<area shape="rect" id="Node000006" href="$classsharing__treet.html" title=" " alt="" coords="431,500,597,555"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="611,525,647,525,647,530,611,530"/>
+<area shape="rect" id="Node000007" href="$classsharing__treet.html" title="Base class for tree&#45;like data structures with sharing." alt="" coords="5,507,187,547"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="200,525,431,525,431,530,200,530"/>
+<area shape="rect" id="Node000028" href="$classunary__minus__overflow__exprt.html" title="A Boolean expression returning true, iff negation would result in an overflow when applied to the (si..." alt="" coords="1628,951,1797,991"/>
+<area shape="poly" id="edge27_Node000027_Node000028" title=" " alt="" coords="1582,969,1628,969,1628,974,1582,974"/>
 </map>

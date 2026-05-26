@@ -1727,6 +1727,12 @@ var hierarchy =
                 [ "live_object_exprt", "classlive__object__exprt.html", null ],
                 [ "onehot0_exprt", "classonehot0__exprt.html", null ],
                 [ "onehot_exprt", "classonehot__exprt.html", null ],
+                [ "reduction_and_exprt", "classreduction__and__exprt.html", null ],
+                [ "reduction_nand_exprt", "classreduction__nand__exprt.html", null ],
+                [ "reduction_nor_exprt", "classreduction__nor__exprt.html", null ],
+                [ "reduction_or_exprt", "classreduction__or__exprt.html", null ],
+                [ "reduction_xnor_exprt", "classreduction__xnor__exprt.html", null ],
+                [ "reduction_xor_exprt", "classreduction__xor__exprt.html", null ],
                 [ "sign_exprt", "classsign__exprt.html", null ],
                 [ "unary_overflow_exprt", "classunary__overflow__exprt.html", [
                   [ "unary_minus_overflow_exprt", "classunary__minus__overflow__exprt.html", null ]

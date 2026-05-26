@@ -230,6 +230,24 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonehot0__exprt.html">onehot0_exprt</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A Boolean expression returning true iff the given operand consists of exactly one '0' and '1' otherwise.  <a href="classonehot0__exprt.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classreduction__and__exprt.html">reduction_and_exprt</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Boolean reduction: true iff every bit of the operand is <code>1</code>.  <a href="classreduction__and__exprt.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classreduction__or__exprt.html">reduction_or_exprt</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Boolean reduction: true iff any bit of the operand is <code>1</code>.  <a href="classreduction__or__exprt.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classreduction__nor__exprt.html">reduction_nor_exprt</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Boolean reduction: negation of <a class="el" href="classreduction__or__exprt.html">reduction_or_exprt</a>.  <a href="classreduction__nor__exprt.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classreduction__nand__exprt.html">reduction_nand_exprt</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Boolean reduction: negation of <a class="el" href="classreduction__and__exprt.html">reduction_and_exprt</a>.  <a href="classreduction__nand__exprt.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classreduction__xor__exprt.html">reduction_xor_exprt</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Boolean reduction: XOR (parity) of all bits in the operand.  <a href="classreduction__xor__exprt.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classreduction__xnor__exprt.html">reduction_xnor_exprt</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Boolean reduction: negation of <a class="el" href="classreduction__xor__exprt.html">reduction_xor_exprt</a>.  <a href="classreduction__xnor__exprt.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -543,6 +561,60 @@ Functions</h2></td></tr>
 <tr class="memitem:a520fc7c1f474762c79ab2f9eba5695f7" id="r_a520fc7c1f474762c79ab2f9eba5695f7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classonehot0__exprt.html">onehot0_exprt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitvector__expr_8h.html#a520fc7c1f474762c79ab2f9eba5695f7">to_onehot0_expr</a> (<a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
 <tr class="memdesc:a520fc7c1f474762c79ab2f9eba5695f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cast an exprt to a <a class="el" href="classonehot0__exprt.html">onehot0_exprt</a>.    <br /></td></tr>
 <tr class="separator:a520fc7c1f474762c79ab2f9eba5695f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a463cf8e58bb754b7400f9b46be11c010" id="r_a463cf8e58bb754b7400f9b46be11c010"><td class="memItemLeft" align="right" valign="top">template&lt;&gt; </td></tr>
+<tr class="memitem:a463cf8e58bb754b7400f9b46be11c010"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classait.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="bitvector__expr_8h.html#a463cf8e58bb754b7400f9b46be11c010">can_cast_expr&lt; reduction_and_exprt &gt;</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
+<tr class="separator:a463cf8e58bb754b7400f9b46be11c010"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d9e22d165f15934d4fd1926937977cd" id="r_a2d9e22d165f15934d4fd1926937977cd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">const</a> <a class="el" href="classreduction__and__exprt.html">reduction_and_exprt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitvector__expr_8h.html#a2d9e22d165f15934d4fd1926937977cd">to_reduction_and_expr</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
+<tr class="memdesc:a2d9e22d165f15934d4fd1926937977cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cast an exprt to a <a class="el" href="classreduction__and__exprt.html">reduction_and_exprt</a>.  <br /></td></tr>
+<tr class="separator:a2d9e22d165f15934d4fd1926937977cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9250c347049ece88e5cacb7efe303019" id="r_a9250c347049ece88e5cacb7efe303019"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classreduction__and__exprt.html">reduction_and_exprt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitvector__expr_8h.html#a9250c347049ece88e5cacb7efe303019">to_reduction_and_expr</a> (<a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
+<tr class="memdesc:a9250c347049ece88e5cacb7efe303019"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cast an exprt to a <a class="el" href="classreduction__and__exprt.html">reduction_and_exprt</a>.    <br /></td></tr>
+<tr class="separator:a9250c347049ece88e5cacb7efe303019"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d0a1eb0922457122f7173b36ff05fb7" id="r_a9d0a1eb0922457122f7173b36ff05fb7"><td class="memItemLeft" align="right" valign="top">template&lt;&gt; </td></tr>
+<tr class="memitem:a9d0a1eb0922457122f7173b36ff05fb7"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classait.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="bitvector__expr_8h.html#a9d0a1eb0922457122f7173b36ff05fb7">can_cast_expr&lt; reduction_or_exprt &gt;</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
+<tr class="separator:a9d0a1eb0922457122f7173b36ff05fb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f2413203378f762e40280cc89c64aa8" id="r_a2f2413203378f762e40280cc89c64aa8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">const</a> <a class="el" href="classreduction__or__exprt.html">reduction_or_exprt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitvector__expr_8h.html#a2f2413203378f762e40280cc89c64aa8">to_reduction_or_expr</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
+<tr class="memdesc:a2f2413203378f762e40280cc89c64aa8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cast an exprt to a <a class="el" href="classreduction__or__exprt.html">reduction_or_exprt</a>.  <br /></td></tr>
+<tr class="separator:a2f2413203378f762e40280cc89c64aa8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed1620a30923ef4db0a9cbe45a5f7dc9" id="r_aed1620a30923ef4db0a9cbe45a5f7dc9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classreduction__or__exprt.html">reduction_or_exprt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitvector__expr_8h.html#aed1620a30923ef4db0a9cbe45a5f7dc9">to_reduction_or_expr</a> (<a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
+<tr class="memdesc:aed1620a30923ef4db0a9cbe45a5f7dc9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cast an exprt to a <a class="el" href="classreduction__or__exprt.html">reduction_or_exprt</a>.    <br /></td></tr>
+<tr class="separator:aed1620a30923ef4db0a9cbe45a5f7dc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6beb242c3852fb6a4ac3d6b06264d907" id="r_a6beb242c3852fb6a4ac3d6b06264d907"><td class="memItemLeft" align="right" valign="top">template&lt;&gt; </td></tr>
+<tr class="memitem:a6beb242c3852fb6a4ac3d6b06264d907"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classait.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="bitvector__expr_8h.html#a6beb242c3852fb6a4ac3d6b06264d907">can_cast_expr&lt; reduction_nor_exprt &gt;</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
+<tr class="separator:a6beb242c3852fb6a4ac3d6b06264d907"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af3d7dea84e9f4073b082c3334783dd99" id="r_af3d7dea84e9f4073b082c3334783dd99"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">const</a> <a class="el" href="classreduction__nor__exprt.html">reduction_nor_exprt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitvector__expr_8h.html#af3d7dea84e9f4073b082c3334783dd99">to_reduction_nor_expr</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
+<tr class="memdesc:af3d7dea84e9f4073b082c3334783dd99"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cast an exprt to a <a class="el" href="classreduction__nor__exprt.html">reduction_nor_exprt</a>.  <br /></td></tr>
+<tr class="separator:af3d7dea84e9f4073b082c3334783dd99"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6b8f856013e92a7da495f885ac391174" id="r_a6b8f856013e92a7da495f885ac391174"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classreduction__nor__exprt.html">reduction_nor_exprt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitvector__expr_8h.html#a6b8f856013e92a7da495f885ac391174">to_reduction_nor_expr</a> (<a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
+<tr class="memdesc:a6b8f856013e92a7da495f885ac391174"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cast an exprt to a <a class="el" href="classreduction__nor__exprt.html">reduction_nor_exprt</a>.    <br /></td></tr>
+<tr class="separator:a6b8f856013e92a7da495f885ac391174"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d510a5d8d6f7b8994659545a03877af" id="r_a4d510a5d8d6f7b8994659545a03877af"><td class="memItemLeft" align="right" valign="top">template&lt;&gt; </td></tr>
+<tr class="memitem:a4d510a5d8d6f7b8994659545a03877af"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classait.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="bitvector__expr_8h.html#a4d510a5d8d6f7b8994659545a03877af">can_cast_expr&lt; reduction_nand_exprt &gt;</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
+<tr class="separator:a4d510a5d8d6f7b8994659545a03877af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a19d6075fe04a692fb591f8717030aea5" id="r_a19d6075fe04a692fb591f8717030aea5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">const</a> <a class="el" href="classreduction__nand__exprt.html">reduction_nand_exprt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitvector__expr_8h.html#a19d6075fe04a692fb591f8717030aea5">to_reduction_nand_expr</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
+<tr class="memdesc:a19d6075fe04a692fb591f8717030aea5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cast an exprt to a <a class="el" href="classreduction__nand__exprt.html">reduction_nand_exprt</a>.  <br /></td></tr>
+<tr class="separator:a19d6075fe04a692fb591f8717030aea5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a39660bc1fec372018a6d1813cc2ed730" id="r_a39660bc1fec372018a6d1813cc2ed730"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classreduction__nand__exprt.html">reduction_nand_exprt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitvector__expr_8h.html#a39660bc1fec372018a6d1813cc2ed730">to_reduction_nand_expr</a> (<a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
+<tr class="memdesc:a39660bc1fec372018a6d1813cc2ed730"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cast an exprt to a <a class="el" href="classreduction__nand__exprt.html">reduction_nand_exprt</a>.    <br /></td></tr>
+<tr class="separator:a39660bc1fec372018a6d1813cc2ed730"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a32315d18403c0c0c69a31dfa712beed3" id="r_a32315d18403c0c0c69a31dfa712beed3"><td class="memItemLeft" align="right" valign="top">template&lt;&gt; </td></tr>
+<tr class="memitem:a32315d18403c0c0c69a31dfa712beed3"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classait.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="bitvector__expr_8h.html#a32315d18403c0c0c69a31dfa712beed3">can_cast_expr&lt; reduction_xor_exprt &gt;</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
+<tr class="separator:a32315d18403c0c0c69a31dfa712beed3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac2686a9fc6c66da8697ff58d69419d4d" id="r_ac2686a9fc6c66da8697ff58d69419d4d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">const</a> <a class="el" href="classreduction__xor__exprt.html">reduction_xor_exprt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitvector__expr_8h.html#ac2686a9fc6c66da8697ff58d69419d4d">to_reduction_xor_expr</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
+<tr class="memdesc:ac2686a9fc6c66da8697ff58d69419d4d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cast an exprt to a <a class="el" href="classreduction__xor__exprt.html">reduction_xor_exprt</a>.  <br /></td></tr>
+<tr class="separator:ac2686a9fc6c66da8697ff58d69419d4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab6776a6268a5f79f87a7827a5b44aa4b" id="r_ab6776a6268a5f79f87a7827a5b44aa4b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classreduction__xor__exprt.html">reduction_xor_exprt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitvector__expr_8h.html#ab6776a6268a5f79f87a7827a5b44aa4b">to_reduction_xor_expr</a> (<a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
+<tr class="memdesc:ab6776a6268a5f79f87a7827a5b44aa4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cast an exprt to a <a class="el" href="classreduction__xor__exprt.html">reduction_xor_exprt</a>.    <br /></td></tr>
+<tr class="separator:ab6776a6268a5f79f87a7827a5b44aa4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a806041315ecc4fc6ee21013a156a664e" id="r_a806041315ecc4fc6ee21013a156a664e"><td class="memItemLeft" align="right" valign="top">template&lt;&gt; </td></tr>
+<tr class="memitem:a806041315ecc4fc6ee21013a156a664e"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classait.html">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="bitvector__expr_8h.html#a806041315ecc4fc6ee21013a156a664e">can_cast_expr&lt; reduction_xnor_exprt &gt;</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
+<tr class="separator:a806041315ecc4fc6ee21013a156a664e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a153c96ccb5110689c255229e517ec89b" id="r_a153c96ccb5110689c255229e517ec89b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">const</a> <a class="el" href="classreduction__xnor__exprt.html">reduction_xnor_exprt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitvector__expr_8h.html#a153c96ccb5110689c255229e517ec89b">to_reduction_xnor_expr</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
+<tr class="memdesc:a153c96ccb5110689c255229e517ec89b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cast an exprt to a <a class="el" href="classreduction__xnor__exprt.html">reduction_xnor_exprt</a>.  <br /></td></tr>
+<tr class="separator:a153c96ccb5110689c255229e517ec89b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f482c52ef2e09da8d2be8ce88a0acaa" id="r_a7f482c52ef2e09da8d2be8ce88a0acaa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classreduction__xnor__exprt.html">reduction_xnor_exprt</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitvector__expr_8h.html#a7f482c52ef2e09da8d2be8ce88a0acaa">to_reduction_xnor_expr</a> (<a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
+<tr class="memdesc:a7f482c52ef2e09da8d2be8ce88a0acaa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cast an exprt to a <a class="el" href="classreduction__xnor__exprt.html">reduction_xnor_exprt</a>.    <br /></td></tr>
+<tr class="separator:a7f482c52ef2e09da8d2be8ce88a0acaa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>API to expression classes for bitvectors. </p>
@@ -1236,6 +1308,186 @@ template&lt;&gt; </div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="bitvector__expr_8h_source.html#l01021">1021</a> of file <a class="el" href="bitvector__expr_8h_source.html">bitvector_expr.h</a>.</p>
+
+</div>
+</div>
+<a id="a463cf8e58bb754b7400f9b46be11c010" name="a463cf8e58bb754b7400f9b46be11c010"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a463cf8e58bb754b7400f9b46be11c010">&#9670;&#160;</a></span>can_cast_expr&lt; reduction_and_exprt &gt;()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">bool</a> <a class="el" href="expr__cast_8h.html#a42363d1890db7dd905e72b2db8e336e7">can_cast_expr</a>&lt; <a class="el" href="classreduction__and__exprt.html">reduction_and_exprt</a> &gt; </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="bitvector__expr_8h_source.html#l01984">1984</a> of file <a class="el" href="bitvector__expr_8h_source.html">bitvector_expr.h</a>.</p>
+
+</div>
+</div>
+<a id="a4d510a5d8d6f7b8994659545a03877af" name="a4d510a5d8d6f7b8994659545a03877af"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4d510a5d8d6f7b8994659545a03877af">&#9670;&#160;</a></span>can_cast_expr&lt; reduction_nand_exprt &gt;()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">bool</a> <a class="el" href="expr__cast_8h.html#a42363d1890db7dd905e72b2db8e336e7">can_cast_expr</a>&lt; <a class="el" href="classreduction__nand__exprt.html">reduction_nand_exprt</a> &gt; </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="bitvector__expr_8h_source.html#l02095">2095</a> of file <a class="el" href="bitvector__expr_8h_source.html">bitvector_expr.h</a>.</p>
+
+</div>
+</div>
+<a id="a6beb242c3852fb6a4ac3d6b06264d907" name="a6beb242c3852fb6a4ac3d6b06264d907"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6beb242c3852fb6a4ac3d6b06264d907">&#9670;&#160;</a></span>can_cast_expr&lt; reduction_nor_exprt &gt;()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">bool</a> <a class="el" href="expr__cast_8h.html#a42363d1890db7dd905e72b2db8e336e7">can_cast_expr</a>&lt; <a class="el" href="classreduction__nor__exprt.html">reduction_nor_exprt</a> &gt; </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="bitvector__expr_8h_source.html#l02058">2058</a> of file <a class="el" href="bitvector__expr_8h_source.html">bitvector_expr.h</a>.</p>
+
+</div>
+</div>
+<a id="a9d0a1eb0922457122f7173b36ff05fb7" name="a9d0a1eb0922457122f7173b36ff05fb7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9d0a1eb0922457122f7173b36ff05fb7">&#9670;&#160;</a></span>can_cast_expr&lt; reduction_or_exprt &gt;()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">bool</a> <a class="el" href="expr__cast_8h.html#a42363d1890db7dd905e72b2db8e336e7">can_cast_expr</a>&lt; <a class="el" href="classreduction__or__exprt.html">reduction_or_exprt</a> &gt; </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="bitvector__expr_8h_source.html#l02021">2021</a> of file <a class="el" href="bitvector__expr_8h_source.html">bitvector_expr.h</a>.</p>
+
+</div>
+</div>
+<a id="a806041315ecc4fc6ee21013a156a664e" name="a806041315ecc4fc6ee21013a156a664e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a806041315ecc4fc6ee21013a156a664e">&#9670;&#160;</a></span>can_cast_expr&lt; reduction_xnor_exprt &gt;()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">bool</a> <a class="el" href="expr__cast_8h.html#a42363d1890db7dd905e72b2db8e336e7">can_cast_expr</a>&lt; <a class="el" href="classreduction__xnor__exprt.html">reduction_xnor_exprt</a> &gt; </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="bitvector__expr_8h_source.html#l02169">2169</a> of file <a class="el" href="bitvector__expr_8h_source.html">bitvector_expr.h</a>.</p>
+
+</div>
+</div>
+<a id="a32315d18403c0c0c69a31dfa712beed3" name="a32315d18403c0c0c69a31dfa712beed3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a32315d18403c0c0c69a31dfa712beed3">&#9670;&#160;</a></span>can_cast_expr&lt; reduction_xor_exprt &gt;()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">bool</a> <a class="el" href="expr__cast_8h.html#a42363d1890db7dd905e72b2db8e336e7">can_cast_expr</a>&lt; <a class="el" href="classreduction__xor__exprt.html">reduction_xor_exprt</a> &gt; </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="bitvector__expr_8h_source.html#l02132">2132</a> of file <a class="el" href="bitvector__expr_8h_source.html">bitvector_expr.h</a>.</p>
 
 </div>
 </div>
@@ -3086,6 +3338,462 @@ template&lt;&gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classpopcount__exprt.html">popcount_exprt</a>   </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="bitvector__expr_8h_source.html#l01046">1046</a> of file <a class="el" href="bitvector__expr_8h_source.html">bitvector_expr.h</a>.</p>
+
+</div>
+</div>
+<a id="a2d9e22d165f15934d4fd1926937977cd" name="a2d9e22d165f15934d4fd1926937977cd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d9e22d165f15934d4fd1926937977cd">&#9670;&#160;</a></span>to_reduction_and_expr() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">const</a> <a class="el" href="classreduction__and__exprt.html">reduction_and_exprt</a> &amp; to_reduction_and_expr </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Cast an exprt to a <a class="el" href="classreduction__and__exprt.html">reduction_and_exprt</a>. </p>
+<p><em>expr</em> must be known to be <a class="el" href="classreduction__and__exprt.html">reduction_and_exprt</a>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">expr</td><td>Source expression </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classreduction__and__exprt.html">reduction_and_exprt</a> </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="bitvector__expr_8h_source.html#l01995">1995</a> of file <a class="el" href="bitvector__expr_8h_source.html">bitvector_expr.h</a>.</p>
+
+</div>
+</div>
+<a id="a9250c347049ece88e5cacb7efe303019" name="a9250c347049ece88e5cacb7efe303019"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9250c347049ece88e5cacb7efe303019">&#9670;&#160;</a></span>to_reduction_and_expr() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classreduction__and__exprt.html">reduction_and_exprt</a> &amp; to_reduction_and_expr </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Cast an exprt to a <a class="el" href="classreduction__and__exprt.html">reduction_and_exprt</a>.   </p>
+<p><em>expr</em> must be known to be <a class="el" href="classreduction__and__exprt.html">reduction_and_exprt</a>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">expr</td><td>Source expression </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classreduction__and__exprt.html">reduction_and_exprt</a>   </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="bitvector__expr_8h_source.html#l02003">2003</a> of file <a class="el" href="bitvector__expr_8h_source.html">bitvector_expr.h</a>.</p>
+
+</div>
+</div>
+<a id="a19d6075fe04a692fb591f8717030aea5" name="a19d6075fe04a692fb591f8717030aea5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a19d6075fe04a692fb591f8717030aea5">&#9670;&#160;</a></span>to_reduction_nand_expr() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">const</a> <a class="el" href="classreduction__nand__exprt.html">reduction_nand_exprt</a> &amp; to_reduction_nand_expr </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Cast an exprt to a <a class="el" href="classreduction__nand__exprt.html">reduction_nand_exprt</a>. </p>
+<p><em>expr</em> must be known to be <a class="el" href="classreduction__nand__exprt.html">reduction_nand_exprt</a>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">expr</td><td>Source expression </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classreduction__nand__exprt.html">reduction_nand_exprt</a> </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="bitvector__expr_8h_source.html#l02106">2106</a> of file <a class="el" href="bitvector__expr_8h_source.html">bitvector_expr.h</a>.</p>
+
+</div>
+</div>
+<a id="a39660bc1fec372018a6d1813cc2ed730" name="a39660bc1fec372018a6d1813cc2ed730"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a39660bc1fec372018a6d1813cc2ed730">&#9670;&#160;</a></span>to_reduction_nand_expr() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classreduction__nand__exprt.html">reduction_nand_exprt</a> &amp; to_reduction_nand_expr </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Cast an exprt to a <a class="el" href="classreduction__nand__exprt.html">reduction_nand_exprt</a>.   </p>
+<p><em>expr</em> must be known to be <a class="el" href="classreduction__nand__exprt.html">reduction_nand_exprt</a>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">expr</td><td>Source expression </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classreduction__nand__exprt.html">reduction_nand_exprt</a>   </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="bitvector__expr_8h_source.html#l02114">2114</a> of file <a class="el" href="bitvector__expr_8h_source.html">bitvector_expr.h</a>.</p>
+
+</div>
+</div>
+<a id="af3d7dea84e9f4073b082c3334783dd99" name="af3d7dea84e9f4073b082c3334783dd99"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af3d7dea84e9f4073b082c3334783dd99">&#9670;&#160;</a></span>to_reduction_nor_expr() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">const</a> <a class="el" href="classreduction__nor__exprt.html">reduction_nor_exprt</a> &amp; to_reduction_nor_expr </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Cast an exprt to a <a class="el" href="classreduction__nor__exprt.html">reduction_nor_exprt</a>. </p>
+<p><em>expr</em> must be known to be <a class="el" href="classreduction__nor__exprt.html">reduction_nor_exprt</a>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">expr</td><td>Source expression </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classreduction__nor__exprt.html">reduction_nor_exprt</a> </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="bitvector__expr_8h_source.html#l02069">2069</a> of file <a class="el" href="bitvector__expr_8h_source.html">bitvector_expr.h</a>.</p>
+
+</div>
+</div>
+<a id="a6b8f856013e92a7da495f885ac391174" name="a6b8f856013e92a7da495f885ac391174"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6b8f856013e92a7da495f885ac391174">&#9670;&#160;</a></span>to_reduction_nor_expr() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classreduction__nor__exprt.html">reduction_nor_exprt</a> &amp; to_reduction_nor_expr </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Cast an exprt to a <a class="el" href="classreduction__nor__exprt.html">reduction_nor_exprt</a>.   </p>
+<p><em>expr</em> must be known to be <a class="el" href="classreduction__nor__exprt.html">reduction_nor_exprt</a>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">expr</td><td>Source expression </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classreduction__nor__exprt.html">reduction_nor_exprt</a>   </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="bitvector__expr_8h_source.html#l02077">2077</a> of file <a class="el" href="bitvector__expr_8h_source.html">bitvector_expr.h</a>.</p>
+
+</div>
+</div>
+<a id="a2f2413203378f762e40280cc89c64aa8" name="a2f2413203378f762e40280cc89c64aa8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2f2413203378f762e40280cc89c64aa8">&#9670;&#160;</a></span>to_reduction_or_expr() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">const</a> <a class="el" href="classreduction__or__exprt.html">reduction_or_exprt</a> &amp; to_reduction_or_expr </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Cast an exprt to a <a class="el" href="classreduction__or__exprt.html">reduction_or_exprt</a>. </p>
+<p><em>expr</em> must be known to be <a class="el" href="classreduction__or__exprt.html">reduction_or_exprt</a>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">expr</td><td>Source expression </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classreduction__or__exprt.html">reduction_or_exprt</a> </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="bitvector__expr_8h_source.html#l02032">2032</a> of file <a class="el" href="bitvector__expr_8h_source.html">bitvector_expr.h</a>.</p>
+
+</div>
+</div>
+<a id="aed1620a30923ef4db0a9cbe45a5f7dc9" name="aed1620a30923ef4db0a9cbe45a5f7dc9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aed1620a30923ef4db0a9cbe45a5f7dc9">&#9670;&#160;</a></span>to_reduction_or_expr() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classreduction__or__exprt.html">reduction_or_exprt</a> &amp; to_reduction_or_expr </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Cast an exprt to a <a class="el" href="classreduction__or__exprt.html">reduction_or_exprt</a>.   </p>
+<p><em>expr</em> must be known to be <a class="el" href="classreduction__or__exprt.html">reduction_or_exprt</a>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">expr</td><td>Source expression </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classreduction__or__exprt.html">reduction_or_exprt</a>   </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="bitvector__expr_8h_source.html#l02040">2040</a> of file <a class="el" href="bitvector__expr_8h_source.html">bitvector_expr.h</a>.</p>
+
+</div>
+</div>
+<a id="a153c96ccb5110689c255229e517ec89b" name="a153c96ccb5110689c255229e517ec89b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a153c96ccb5110689c255229e517ec89b">&#9670;&#160;</a></span>to_reduction_xnor_expr() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">const</a> <a class="el" href="classreduction__xnor__exprt.html">reduction_xnor_exprt</a> &amp; to_reduction_xnor_expr </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Cast an exprt to a <a class="el" href="classreduction__xnor__exprt.html">reduction_xnor_exprt</a>. </p>
+<p><em>expr</em> must be known to be <a class="el" href="classreduction__xnor__exprt.html">reduction_xnor_exprt</a>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">expr</td><td>Source expression </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classreduction__xnor__exprt.html">reduction_xnor_exprt</a> </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="bitvector__expr_8h_source.html#l02180">2180</a> of file <a class="el" href="bitvector__expr_8h_source.html">bitvector_expr.h</a>.</p>
+
+</div>
+</div>
+<a id="a7f482c52ef2e09da8d2be8ce88a0acaa" name="a7f482c52ef2e09da8d2be8ce88a0acaa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7f482c52ef2e09da8d2be8ce88a0acaa">&#9670;&#160;</a></span>to_reduction_xnor_expr() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classreduction__xnor__exprt.html">reduction_xnor_exprt</a> &amp; to_reduction_xnor_expr </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Cast an exprt to a <a class="el" href="classreduction__xnor__exprt.html">reduction_xnor_exprt</a>.   </p>
+<p><em>expr</em> must be known to be <a class="el" href="classreduction__xnor__exprt.html">reduction_xnor_exprt</a>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">expr</td><td>Source expression </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classreduction__xnor__exprt.html">reduction_xnor_exprt</a>   </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="bitvector__expr_8h_source.html#l02188">2188</a> of file <a class="el" href="bitvector__expr_8h_source.html">bitvector_expr.h</a>.</p>
+
+</div>
+</div>
+<a id="ac2686a9fc6c66da8697ff58d69419d4d" name="ac2686a9fc6c66da8697ff58d69419d4d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac2686a9fc6c66da8697ff58d69419d4d">&#9670;&#160;</a></span>to_reduction_xor_expr() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">const</a> <a class="el" href="classreduction__xor__exprt.html">reduction_xor_exprt</a> &amp; to_reduction_xor_expr </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Cast an exprt to a <a class="el" href="classreduction__xor__exprt.html">reduction_xor_exprt</a>. </p>
+<p><em>expr</em> must be known to be <a class="el" href="classreduction__xor__exprt.html">reduction_xor_exprt</a>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">expr</td><td>Source expression </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classreduction__xor__exprt.html">reduction_xor_exprt</a> </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="bitvector__expr_8h_source.html#l02143">2143</a> of file <a class="el" href="bitvector__expr_8h_source.html">bitvector_expr.h</a>.</p>
+
+</div>
+</div>
+<a id="ab6776a6268a5f79f87a7827a5b44aa4b" name="ab6776a6268a5f79f87a7827a5b44aa4b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab6776a6268a5f79f87a7827a5b44aa4b">&#9670;&#160;</a></span>to_reduction_xor_expr() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classreduction__xor__exprt.html">reduction_xor_exprt</a> &amp; to_reduction_xor_expr </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Cast an exprt to a <a class="el" href="classreduction__xor__exprt.html">reduction_xor_exprt</a>.   </p>
+<p><em>expr</em> must be known to be <a class="el" href="classreduction__xor__exprt.html">reduction_xor_exprt</a>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">expr</td><td>Source expression </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Object of type <a class="el" href="classreduction__xor__exprt.html">reduction_xor_exprt</a>   </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="bitvector__expr_8h_source.html#l02151">2151</a> of file <a class="el" href="bitvector__expr_8h_source.html">bitvector_expr.h</a>.</p>
 
 </div>
 </div>
