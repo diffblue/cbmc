@@ -865,6 +865,19 @@ void cpp_typecheckt::elaborate_class_template(
   if(type.id() != ID_struct_tag && type.id() != ID_union_tag)
     return;
 
+  // The tag-typed argument may carry an empty identifier when the
+  // caller derived it from a partially-elaborated template instance
+  // whose name resolution in turn produced a malformed struct_tag.
+  // The downstream `lookup(to_tag_type(type))` enforces a precondition
+  // that the identifier is in the symbol table, which an empty
+  // identifier always violates.  A SFINAE-style early return mirrors
+  // the existing "type isn't a tag" early return above and keeps
+  // recovery code paths in callers (e.g. resolve / typecheck_type)
+  // from tripping a hard invariant when they pass through here on
+  // their error-recovery branch.
+  if(to_tag_type(type).get_identifier().empty())
+    return;
+
   if(suppress_elaborate && !force_elaborate)
   {
     if(type.id() == ID_struct_tag || type.id() == ID_union_tag)
