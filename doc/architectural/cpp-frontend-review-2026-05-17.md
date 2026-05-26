@@ -1670,3 +1670,115 @@ projects.
 Reverted all in-progress changes.  Working tree clean.
 Documentation updated.  Dog-food unchanged at 19 / 18 / 80 / 0;
 cbmc-cpp regression suite green at 678 / 0 / 83.
+
+
+## 2026-05-26 Option 2 attempt — proper [over.match.list] viability and conversion
+
+### Approach
+
+Implemented [over.match.list]-conforming brace-init viability in
+`cpp_typecheck_fargst::match` plus the corresponding conversion
+in `cpp_typecheckt::implicit_typecast`.  Three viability paths,
+matching [dcl.init.list]/3:
+
+1. Empty `{}` — viable iff the destination class type has an
+   accessible default constructor (or is an aggregate).  The
+   conversion synthesises a `temporary_object` wrapped in
+   `address_of` for reference targets.
+2. Non-empty `{x_1, ..., x_n}` — viable iff the class has an
+   accessible `initializer_list<U>` constructor.  The
+   conversion recurses through `implicit_typecast` to first
+   build an `initializer_list<U>` value (via the existing
+   brace-to-initializer_list handler), then calls
+   `new_temporary` to construct the destination class.
+3. Non-empty for an aggregate type with matching field count —
+   already handled by the existing aggregate-init block; the
+   match viability check defers to it.
+
+### What worked
+
+* Empty `{}` viability and conversion: the
+  `cpp11_future_header` regression continues to pass (after
+  filtering out `std::chrono::` / `std::tag-ratio<` /
+  `std::__detail::` whose default-construction triggers
+  pathological constexpr ratio reduction in CBMC's elaboration).
+* All 678 cbmc-cpp regression tests stay green.
+
+### What blocked Option 2
+
+The non-empty-brace path runs the recursive `implicit_typecast`
+to build an `initializer_list<U>` value, then calls
+`new_temporary(class_type, initializer_list_value)` to invoke
+the destination class's `initializer_list<U>` ctor.  Two issues:
+
+1. The intermediate value is a `struct_exprt` (id `ID_struct`)
+   whose downstream typecheck cannot accept it (hits the
+   `unexpected expression: struct` path in
+   `c_typecheck_baset::typecheck_expr_main`).
+
+2. `new_temporary`'s constructor resolution does not reliably
+   pick the `initializer_list<U>` ctor when the argument is a
+   `struct_exprt` of `initializer_list<U>` — `cpp_constructor`
+   expects argument expressions whose categories (rvalue/lvalue,
+   temporary_object marker) match what reference-binding
+   produces in normal call flow, not what
+   brace-to-initializer_list synthesises.
+
+Both issues are fixable in principle but require either:
+
+* Wrapping the synthesised initializer_list in a `temporary_object`
+  marker so reference binding accepts it, **and**
+* Auditing the brace-to-initializer_list handler to ensure the
+  array-symbol address-of is produced as an lvalue throughout
+  (the array symbol uses `is_lvalue=true` in the symbol_table
+  but the wrapping `symbol_exprt` doesn't carry the flag, which
+  surfaced the `not an lvalue` error during the recursion).
+
+### Empirical state with full Option 2 implementation
+
+The full implementation (with both empty and non-empty paths)
+**advanced** all 31 dog-food files past the
+`found no match for symbol 'irept'` error, but they all hit the
+same downstream `unexpected expression: struct` error because of
+the issue described above.  Net dog-food file-count change: 0.
+The empty-only partial implementation also doesn't move the
+count, because every dog-food irept ctor call pairs an empty
+`{}` with a non-empty `{x}` argument and the candidate is
+rejected for the non-empty arg.
+
+### Forward path
+
+A correct Option 2 implementation needs the brace-to-class
+non-empty-brace conversion to produce a usable `temporary_object`
+that subsequent typechecking accepts.  The simplest sketch:
+
+```cpp
+// In implicit_typecast, after recursing to build init_list<U>:
+// wrap the struct_exprt in a temporary_object so it presents
+// as an rvalue of class type.
+side_effect_exprt il_temp{
+  ID_temporary_object, {std::move(init_list_value)},
+  init_list_param_type, src_loc};
+il_temp.set(ID_mode, ID_cpp);
+il_temp.set(ID_C_lvalue, true);
+new_temporary(src_loc, base_type, il_temp, temp);
+```
+
+plus making the array-symbol-expr inside the brace-to-init_list
+handler properly carry `ID_C_lvalue` end-to-end so the recursive
+case is robust.
+
+This is a 1-2 day focused project.  The key risk is that the
+recursion through `implicit_typecast` and `new_temporary` opens
+new paths in `<chrono>`/`<future>`/`<thread>` template
+machinery, which has historically tripped pathological
+elaboration depth — so any final implementation needs both the
+allowlist filter (already present in the empty-`{}` path here)
+**and** integration testing on a broad set of standard headers,
+not just `cpp11_future_header`.
+
+### Status
+
+Reverted all source changes.  Working tree clean.  Documentation
+updated.  Dog-food unchanged at 19/18/80/0; cbmc-cpp regression
+suite green at 678/0/83.
