@@ -1,0 +1,24 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+does not uniquely resolve
+--
+Regression for [class.conv.ctor] / [over.match.copy] in the
+template-constructor fallback of
+`user_defined_conversion_sequence`.
+
+The trigger is a class with both an explicit single-arg ctor
+and one or more template ctors (and therefore the
+`has_template_constructor` flag).  Before the fix, an arg type
+that the explicit ctor would accept (here `char[6]`) is admitted
+as implicitly convertible to the class through the fallback
+calling `new_temporary` (which uses direct-initialisation
+semantics and accepts explicit ctors).  Reference-binding the
+arg to `const T&` then succeeds, putting the implicit copy ctor
+into the candidate set alongside the explicit `(std::string)`
+ctor and triggering "does not uniquely resolve".
