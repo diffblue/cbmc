@@ -572,6 +572,61 @@ void boolbvt::set_to(const exprt &expr, bool value)
     }
   }
 
+  // Disjunction of disequalities, set to true.
+  // Pattern: (or (distinct e1 e2) (distinct e3 e4) ... (distinct e_{2k-1} e_{2k}))
+  // SMT-LIB's (distinct a b) becomes ID_notequal; (not (= a b)) is also
+  // accepted. The whole disjunction is UNSAT iff every branch is UNSAT
+  // (each branch refuted independently via Rabinowitsch + Buchberger).
+  // Branches that don't pattern-match (e.g., non-disequality predicates,
+  // expressions involving __CPROVER internals) cause the disjunction to
+  // be left to bit-blasting.
+  if(
+    !algebraic_solved && expr.id() == ID_or && value &&
+    expr.operands().size() >= 2)
+  {
+    auto is_internal = [](const exprt &e)
+    {
+      return e.id() == ID_symbol &&
+             id2string(to_symbol_expr(e).get_identifier()).find("__CPROVER") !=
+               std::string::npos;
+    };
+    std::vector<exprt> branch_diseqs;
+    bool all_diseqs = true;
+    for(const auto &op : expr.operands())
+    {
+      // Two equivalent shapes: (distinct a b) → notequal_exprt with
+      // id ID_notequal; (not (= a b)) → not_exprt over equal_exprt.
+      if(
+        op.id() == ID_notequal && op.operands().size() == 2 &&
+        !is_internal(op.operands()[0]) && !is_internal(op.operands()[1]))
+      {
+        // Construct an equal_exprt (the diseq's negation), the same
+        // form algebraic_disequalities holds: this lets us reuse the
+        // same per-disequality processing pipeline.
+        branch_diseqs.push_back(
+          equal_exprt{op.operands()[0], op.operands()[1]});
+      }
+      else if(
+        op.id() == ID_not && op.operands().size() == 1 &&
+        op.operands()[0].id() == ID_equal &&
+        op.operands()[0].operands().size() == 2 &&
+        !is_internal(op.operands()[0].operands()[0]) &&
+        !is_internal(op.operands()[0].operands()[1]))
+      {
+        branch_diseqs.push_back(op.operands()[0]);
+      }
+      else
+      {
+        all_diseqs = false;
+        break;
+      }
+    }
+    if(all_diseqs && !branch_diseqs.empty())
+    {
+      algebraic_disjunctive_disequalities.push_back(std::move(branch_diseqs));
+    }
+  }
+
   // Count symbolic multiplications for adaptive encoding
   expr.visit_pre(
     [this](const exprt &e)
@@ -654,7 +709,9 @@ bool boolbvt::try_algebraic_solve()
 {
   if(algebraic_solved)
     return false;
-  if(algebraic_disequalities.empty())
+  if(
+    algebraic_disequalities.empty() &&
+    algebraic_disjunctive_disequalities.empty())
     return false;
   // For layer ablation experiments: disable entire algebraic solving
   if(std::getenv("DISABLE_ALGEBRAIC"))
@@ -853,6 +910,152 @@ bool boolbvt::try_algebraic_solve()
         prop.l_set_to_true(const_literal(false));
         return true;
       }
+    }
+  }
+
+  // Disjunctive disequalities: (or D1 D2 ... Dk) set to true is
+  // unsatisfiable iff every Di is unsatisfiable. Reuse the
+  // per-disequality machinery: for each Di in the disjunction,
+  // run Buchberger with SSA equalities + Rabinowitsch for Di
+  // alone. If ALL branches are UNSAT, the disjunction is UNSAT,
+  // and so is the whole formula. If any branch is inconclusive,
+  // we cannot conclude UNSAT for the disjunction (some other
+  // branch might be satisfiable), and we leave the assertion to
+  // bit-blasting.
+  for(const auto &disjunction : algebraic_disjunctive_disequalities)
+  {
+    bool all_branches_unsat = true;
+    for(const auto &diseq : disjunction)
+    {
+      // Per-branch processing mirrors the per-disequality loop above
+      // (vanishing-polynomial test + Rabinowitsch + Buchberger).
+      poly_extractort branch_extractor;
+      auto lhs = branch_extractor.to_polynomial(to_equal_expr(diseq).lhs());
+      auto rhs = branch_extractor.to_polynomial(to_equal_expr(diseq).rhs());
+      if(!lhs || !rhs)
+      {
+        all_branches_unsat = false;
+        break;
+      }
+      unsigned branch_bw = branch_extractor.get_bitwidth();
+      if(branch_bw == 0)
+      {
+        all_branches_unsat = false;
+        break;
+      }
+      polynomialt diff = *lhs - *rhs;
+
+      // Vanishing-polynomial test on the diff with SSA-inlined
+      // expansion. If the diff is a vanishing polynomial as a
+      // function on the bit-vector domain, the disequality is
+      // refuted regardless of the rest of the basis. This is the
+      // path that decides SABER-style schoolbook-vs-Karatsuba
+      // queries: the two implementations produce literally
+      // identical polynomials, so the diff polynomial is zero
+      // after SSA inlining and the test fires immediately.
+      bool branch_refuted_by_vanishing = false;
+      {
+        std::map<irep_idt, exprt> subst_map;
+        for(const auto &eq : algebraic_equalities)
+        {
+          if(eq.id() == ID_equal)
+          {
+            const auto &eqe = to_equal_expr(eq);
+            if(eqe.lhs().id() == ID_symbol)
+              subst_map[to_symbol_expr(eqe.lhs()).get_identifier()] = eqe.rhs();
+            else if(eqe.rhs().id() == ID_symbol)
+              subst_map[to_symbol_expr(eqe.rhs()).get_identifier()] = eqe.lhs();
+          }
+        }
+        std::function<void(exprt &)> substitute = [&](exprt &e)
+        {
+          for(auto &op : e.operands())
+            substitute(op);
+          if(e.id() == ID_symbol)
+          {
+            auto it = subst_map.find(to_symbol_expr(e).get_identifier());
+            if(it != subst_map.end())
+            {
+              e = it->second;
+              substitute(e);
+            }
+          }
+        };
+        exprt expanded = diseq;
+        substitute(expanded);
+        if(expanded.id() == ID_equal)
+        {
+          poly_extractort inline_extractor;
+          inline_extractor.inline_products = true;
+          auto ilhs =
+            inline_extractor.to_polynomial(to_equal_expr(expanded).lhs());
+          auto irhs =
+            inline_extractor.to_polynomial(to_equal_expr(expanded).rhs());
+          if(ilhs && irhs)
+          {
+            polynomialt idiff = *ilhs - *irhs;
+            std::vector<unsigned> input_widths(
+              inline_extractor.var_input_widths.empty()
+                ? 0
+                : inline_extractor.var_input_widths.rbegin()->first + 1,
+              0);
+            for(const auto &[var, w] : inline_extractor.var_input_widths)
+              input_widths[var] = w;
+            const bool van_disabled =
+              std::getenv("DISABLE_VANISHING") != nullptr;
+            if(!van_disabled && is_vanishing_polynomial(idiff, input_widths))
+              branch_refuted_by_vanishing = true;
+          }
+        }
+      }
+      if(branch_refuted_by_vanishing)
+        continue; // this branch is UNSAT; try the next branch
+
+      // Fall through to Rabinowitsch + Buchberger.
+      std::size_t e_idx = branch_extractor.get_var_index("__rab_disj");
+      polynomialt e_var{branch_bw, mp_integer{1}, e_idx};
+      polynomialt rab = (diff * e_var) - polynomialt{branch_bw, mp_integer{1}};
+      rab.normalize();
+      if(rab.is_zero())
+      {
+        all_branches_unsat = false;
+        break;
+      }
+
+      std::vector<polynomialt> branch_eqs;
+      for(const auto &eq : algebraic_equalities)
+      {
+        auto poly = branch_extractor.extract_equation(eq);
+        if(poly.has_value() && !poly->is_zero())
+          branch_eqs.push_back(std::move(*poly));
+      }
+      for(auto &se : branch_extractor.side_equations)
+      {
+        se.normalize();
+        if(!se.is_zero())
+          branch_eqs.push_back(std::move(se));
+      }
+      branch_eqs.push_back(std::move(rab));
+
+      if(branch_eqs.size() < 2)
+      {
+        all_branches_unsat = false;
+        break;
+      }
+
+      strong_groebner_basist branch_gb{100000};
+      if(
+        branch_gb.compute(branch_eqs) != strong_groebner_basist::resultt::UNSAT)
+      {
+        all_branches_unsat = false;
+        break;
+      }
+    }
+    if(all_branches_unsat)
+    {
+      // Every branch refuted ⇒ disjunction is UNSAT ⇒ formula is UNSAT.
+      prop.l_set_to_true(const_literal(false));
+      return true;
     }
   }
 

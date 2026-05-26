@@ -179,6 +179,11 @@ protected:
   // Algebraic solving via Gröbner basis
   std::vector<exprt> algebraic_equalities;
   std::vector<exprt> algebraic_disequalities;
+  // Disjunctions of disequalities: each entry is a vector of equality
+  // expressions (interpreted as disequalities — i.e., the disjunction
+  // says at least one of them must be a disequality). The whole
+  // assertion is unsatisfiable iff every branch is unsatisfiable.
+  std::vector<std::vector<exprt>> algebraic_disjunctive_disequalities;
   bool algebraic_solved = false;
   std::vector<literalt> algebraic_assumptions;
   virtual bool try_algebraic_solve();
