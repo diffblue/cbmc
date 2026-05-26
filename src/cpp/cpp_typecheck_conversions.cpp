@@ -26,6 +26,8 @@ Author:
 #include "cpp_typecheck.h"
 #include "cpp_util.h"
 
+#include <functional>
+
 /// Lvalue-to-rvalue conversion
 ///
 ///  An lvalue (3.10) of a non-function, non-array type T can be
@@ -1712,8 +1714,70 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
           ops.push_back(expr);
           new_temporary(expr.source_location(), to, ops, tmp_expr);
           in_template_conversion = false;
-          new_expr.swap(tmp_expr);
-          return true;
+          // [class.conv.ctor]/2 + [over.match.copy]: only
+          // non-explicit constructors participate in a user-
+          // defined conversion sequence.  `new_temporary` runs
+          // *direct*-initialisation semantics, which allow
+          // explicit constructors — this is wrong for a UDCS.
+          // Furthermore, a UDCS may use only standard conversions
+          // for the constructor's argument; chaining a second
+          // user-defined conversion ([over.best.ics]) is
+          // forbidden.  Both errors manifest the same way: the
+          // ctor selected by `new_temporary` is a non-template
+          // explicit ctor that the regular loop above already
+          // rejected.  The regular loop has already considered
+          // every non-template, non-explicit converting ctor; if
+          // it didn't find a match, the template fallback may
+          // only legitimately succeed by selecting a *template*
+          // specialisation.  Reject any non-template ctor here.
+          //
+          // Find the called ctor symbol inside `tmp_expr` and
+          // check whether it carries `ID_specialization_of` (set
+          // on template-instantiated symbols by
+          // `cpp_typecheck_template.cpp:550`).
+          std::function<const symbolt *(const exprt &)> find_ctor =
+            [&](const exprt &e) -> const symbolt *
+          {
+            if(
+              e.id() == ID_side_effect &&
+              e.get(ID_statement) == ID_function_call)
+            {
+              const auto &fc = to_side_effect_expr_function_call(e);
+              if(fc.function().id() == ID_symbol)
+              {
+                return symbol_table.lookup(
+                  to_symbol_expr(fc.function()).get_identifier());
+              }
+            }
+            for(const auto &op : e.operands())
+            {
+              if(const symbolt *r = find_ctor(op))
+                return r;
+            }
+            const auto &init = e.find(ID_initializer);
+            if(init.is_not_nil() && init.id() == ID_code)
+            {
+              if(const symbolt *r = find_ctor(static_cast<const exprt &>(init)))
+                return r;
+            }
+            return nullptr;
+          };
+          const symbolt *ctor_sym = find_ctor(tmp_expr);
+          if(
+            ctor_sym != nullptr &&
+            ctor_sym->type.find(ID_specialization_of).is_nil())
+          {
+            // Non-template ctor selected — the regular loop
+            // either already rejected it or it is `explicit`.
+            // Either way, this is not a valid user-defined
+            // conversion.  Drop the result and continue to the
+            // basic_string fallback / final `return false`.
+          }
+          else
+          {
+            new_expr.swap(tmp_expr);
+            return true;
+          }
         }
         catch(...)
         {
