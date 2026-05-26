@@ -42,7 +42,12 @@ $<$15\,ms that previously timed out. On our 39-benchmark
 arithmetic-identity suite, \cbmc~\cite{clarke2004tool} solves all
 39 instances; cvc5 solves 35/39 (failing only on bfloat16
 benchmarks whose floating-point types cvc5 does not support by
-default). Soundness is verified by 25 mechanised theorems in
+default). A 66-benchmark stratified SMT-COMP 2024 sample shows our
+combined approach matches mature word-level reasoners on broader
+QF\_BV ($<$1 benchmark gap to shift-add bit-blasting; cvc5 leads
+by 5), confirming the techniques are a complementary fast path
+for polynomial structure rather than a general replacement.
+Soundness is verified by 25 mechanised theorems in
 Lean~4 (zero \texttt{sorry}).
 
 \keywords{Gr\"obner basis \and bit-vector arithmetic \and
@@ -582,7 +587,9 @@ $\mathbb{Z}_{2^d}$). This occurs for polynomials that vanish as
 \emph{functions} but are non-zero as \emph{polynomials}---e.g.,
 $4x^2 + 4x \equiv 0 \pmod{8}$ for all $x$, but has non-zero
 coefficients. We refer to such polynomials as
-\emph{zero-function polynomials} (ZFPs). Their existence reflects
+\emph{vanishing polynomials} (also called zero-function
+polynomials in the literature~\cite{shekhar2007equivalence}).
+Their existence reflects
 that $\mathbb{Z}_{2^d}[x]$ has more polynomials than there are
 distinct $\mathbb{Z}_{2^d}$-valued functions on
 $\mathbb{Z}_{2^d}$, so polynomial identity is strictly stronger
@@ -660,6 +667,24 @@ The vanishing criterion extends: $p$ is identically zero as a
 function iff every multivariate falling-factorial coefficient
 $c_{j_1, \ldots, j_k}$ satisfies the divisibility
 $2^{m - \min(\nu_2(\prod_i j_i!), m)} \mid c_{j_1, \ldots, j_k}$.
+
+\paragraph{Mixed input widths.}
+Variables in the same polynomial ring $R[x_1, \ldots, x_k]$ may have
+different effective input widths $n_i \leq d$ (e.g., when narrower
+operands are zero-extended into a wider product). The criterion
+above is incomplete for that setting: the falling factorial
+$x_i^{\underline{k}}$ is identically zero on
+$\{0, 1, \ldots, 2^{n_i} - 1\}$ once $k \geq 2^{n_i}$, so terms
+exceeding that bound vanish on the input range without contributing
+a divisibility constraint. Our implementation tracks the input width
+of each variable through the polynomial extractor and adjusts the
+per-variable degree bound to $\mu_i = \min(2^{n_i}, \mathrm{SF}(2^d))$.
+Two of our DSP benchmarks exercise this mixed-width form:
+\texttt{dsp\_image\_reject}
+($\mathbb{Z}_{2^{12}} \times \mathbb{Z}_{2^8} \to \mathbb{Z}_{2^{16}}$,
+solved in 14\,ms) and \texttt{dsp\_vanishing\_mv}
+($\mathbb{Z}_2 \times \mathbb{Z}_{2^2} \to \mathbb{Z}_{2^3}$,
+solved in 5\,ms).
 
 \subsection{Algorithm and Complexity}
 
@@ -760,37 +785,38 @@ The slowdown at $k = 6$ (2.25\,s) is dominated by the $720$
 reductions required to unify the permutation terms, not by the
 polynomial arithmetic itself.
 
-\paragraph{Why a separate test, instead of adding ZFPs to the
-Gr\"obner basis?}
+\paragraph{Why a separate test, instead of adding vanishing
+polynomials to the Gr\"obner basis?}
 A natural alternative one might consider is to add the generators
-of the ZFP ideal --- the polynomials
+of the vanishing ideal --- the polynomials
 $2^{\max(d - \nu_2(k!),\ 0)} \cdot x^{\underline{k}}$ for
 $k = 2, \ldots, \mathrm{SF}(2^d)$, per input variable --- directly
 to the input basis of Buchberger's algorithm. The resulting strong
-Gr\"obner basis would automatically reduce ZFPs to zero, so ideal
-membership would coincide with functional equivalence, and a
-separate vanishing test would be unnecessary.
+Gr\"obner basis would automatically reduce vanishing polynomials to
+zero, so ideal membership would coincide with functional
+equivalence, and a separate vanishing test would be unnecessary.
 
 We implemented this experimentally and found it impractical. On the
 full 39-benchmark custom suite, replacing the falling-factorial test
-of Section~\ref{sec:vanishing} with ZFP injection \emph{loses} 9 of
-39 benchmarks, including 7 (\texttt{overflow\_detect\_16},
+of Section~\ref{sec:vanishing} with vanishing-polynomial injection
+\emph{loses} 9 of 39 benchmarks, including 7
+(\texttt{overflow\_detect\_16},
 \texttt{add\_overflow\_16}, \texttt{checked\_mul\_16},
 \texttt{equiv\_unsat\_8add\_16}, \texttt{crypto\_square\_mod},
-\texttt{mul\_ineq\_12}, \texttt{fixedpoint\_mul\_16}) that don't
-need ZFPs at all and solve trivially without the vanishing test.
-Adding ZFP injection on \emph{top} of the working vanishing test
-causes 2 further regressions
+\texttt{mul\_ineq\_12}, \texttt{fixedpoint\_mul\_16}) that do not
+need vanishing reasoning at all and solve trivially without the
+test. Adding the injection on \emph{top} of the working vanishing
+test causes 2 further regressions
 (\texttt{div\_mul\_roundtrip\_12}: $3.97\,$s $\to$ T/O,
 \texttt{fixedpoint\_mul\_16}: $0.02\,$s $\to$ T/O). Two failure
 modes:
 (i) For $d = 8$, SF$(2^d) = 10$, so 9 generators per variable are
 added; their pairwise S-polynomials bloat Buchberger's worklist
-even when ZFPs are not needed, hitting the 100\,000-step reduction
-budget.
+even when not needed, hitting the 100\,000-step reduction budget.
 (ii) The DSP benchmarks introduce intermediate variables for nested
 multiplications via SSA (\texttt{x2 = x*x}, \texttt{x3 = x*x2},
-$\ldots$, up to \texttt{x10}). To use a degree-10 ZFP in $x$,
+$\ldots$, up to \texttt{x10}). To use a degree-10 vanishing
+polynomial in $x$,
 Buchberger must first reduce the polynomial back to a polynomial
 in $x$ alone, an S-polynomial chain that exceeds the step budget.
 The falling-factorial test sidesteps both issues by substituting
@@ -1415,11 +1441,7 @@ not a replacement for mature word-level reasoning.
 
 Several directions remain open. First, the Gr\"obner basis is
 incomplete for non-polynomial constraints; theory combination could
-close this gap. Second, the vanishing polynomial test currently
-handles same-width inputs; extending to mixed widths
-($\mathbb{Z}_{2^{n_1}} \times \cdots \times \mathbb{Z}_{2^{n_d}}
-\to \mathbb{Z}_{2^m}$) as in~\cite{shekhar2007equivalence} would
-broaden applicability. Third, post-quantum cryptographic
+close this gap. Second, post-quantum cryptographic
 implementations (e.g., SABER) use polynomial ring multiplication
 that our techniques could verify.
 

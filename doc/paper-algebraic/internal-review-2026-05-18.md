@@ -5,6 +5,29 @@
 *Reading mode: end-to-front, multi-pass*
 *Paper version reviewed: commit `b2a801665a` (23 pages)*
 
+## Status of items (updated 2026-05-26)
+
+| Item | Status | Commit |
+|---|---|---|
+| #1 Anonymisation breaks (Mathlib PR #38628) | TODO | — |
+| #2 Length: 23 pages → cut 5–7 pages | TODO | — |
+| #3 Abstract is misleading (missing SMT-COMP datapoint) | **FIXED** | (current session) |
+| #4 ZFP terminology inconsistent | **FIXED** | (current session) |
+| #5 Completeness claim vs §6 future-work line | **FIXED** | (current session) — implementation already supports mixed widths; §6 line removed; §3.2 strengthened with explicit "Mixed input widths" paragraph documenting the capability and citing two benchmarks (dsp_image_reject and dsp_vanishing_mv) |
+| #6 §3 completeness claim vs §4.5 SAT-finding losses | TODO | — |
+| #7 Table 1 shows only 11/39 benchmarks | TODO | — |
+| #8 §2.6 5-layer pipeline table confusing | TODO | — |
+| #9 §2.7 shift-add comparison unfair | TODO | — |
+| #10 §2.3 contribution list awkward | TODO | — |
+| #11 Methodology inconsistency (median of 3 vs 5) | TODO | — |
+| #12 'Honest reading' paragraphs scattered | TODO | — |
+| #13 §1 four-classes taxonomy too long | TODO | — |
+| #14 §6 conclusion repeats abstract | TODO | — |
+| #15 Tables 4+5 should be one figure | TODO | — |
+| #16 §5 Mechanised Soundness Lean technical detail | TODO | — |
+| #17 Table footnote markers in LNCS | TODO | — |
+| #18 §4.5 'n' header clashes with §3 'n' | TODO | — |
+
 ## Overall assessment
 
 A solid paper with two clear technical contributions (Gröbner over
