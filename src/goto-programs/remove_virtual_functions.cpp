@@ -43,19 +43,16 @@ private:
 
   const class_hierarchyt &class_hierarchy;
 
-  typedef std::function<
-    std::optional<resolve_inherited_componentt::inherited_componentt>(
-      const irep_idt &,
-      const irep_idt &)>
+  typedef std::function<std::optional<
+    resolve_inherited_componentt::inherited_componentt>(irep_idt, irep_idt)>
     function_call_resolvert;
   void get_child_functions_rec(
-    const irep_idt &,
+    irep_idt,
     const std::optional<symbol_exprt> &,
-    const irep_idt &,
+    irep_idt,
     dispatch_table_entriest &,
     dispatch_table_entries_mapt &) const;
-  exprt
-  get_method(const irep_idt &class_id, const irep_idt &component_name) const;
+  exprt get_method(irep_idt class_id, irep_idt component_name) const;
 };
 
 class remove_virtual_functionst
@@ -72,9 +69,8 @@ public:
 
   void operator()(goto_functionst &functions);
 
-  bool remove_virtual_functions(
-    const irep_idt &function_id,
-    goto_programt &goto_program);
+  bool
+  remove_virtual_functions(irep_idt function_id, goto_programt &goto_program);
 
 private:
   const class_hierarchyt &class_hierarchy;
@@ -82,7 +78,7 @@ private:
   namespacet ns;
 
   goto_programt::targett remove_virtual_function(
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_programt &goto_program,
     goto_programt::targett target);
 };
@@ -201,7 +197,7 @@ static goto_programt analyse_checks_directly_preceding_function_call(
 ///   used for new instructions that are added
 /// \param [out] new_code_for_this_argument: New instructions are added here
 static void process_this_argument(
-  const irep_idt &function_id,
+  irep_idt function_id,
   const goto_programt &goto_program,
   const goto_programt::targett target,
   exprt &argument_for_this,
@@ -264,7 +260,7 @@ static void process_this_argument(
 ///   program after replaced function call
 static goto_programt::targett replace_virtual_function_with_dispatch_table(
   symbol_table_baset &symbol_table,
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt &goto_program,
   goto_programt::targett target,
   const dispatch_table_entriest &functions,
@@ -464,7 +460,7 @@ static goto_programt::targett replace_virtual_function_with_dispatch_table(
 /// \return Returns a pointer to the statement in the supplied GOTO
 ///   program after replaced function call
 goto_programt::targett remove_virtual_functionst::remove_virtual_function(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt &goto_program,
   goto_programt::targett target)
 {
@@ -504,9 +500,9 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
 ///   -> [{"C", C.f}, {"B", C.f}, {"A", A.f}]
 /// \param entry_map: map of class identifiers to dispatch table entries
 void get_virtual_calleest::get_child_functions_rec(
-  const irep_idt &this_id,
+  irep_idt this_id,
   const std::optional<symbol_exprt> &last_method_defn,
-  const irep_idt &component_name,
+  irep_idt component_name,
   dispatch_table_entriest &functions,
   dispatch_table_entries_mapt &entry_map) const
 {
@@ -637,8 +633,8 @@ void get_virtual_calleest::get_functions(
 /// \return nil_exprt instance on error and a symbol_exprt pointing to
 ///   the method on success
 exprt get_virtual_calleest::get_method(
-  const irep_idt &class_id,
-  const irep_idt &component_name) const
+  irep_idt class_id,
+  irep_idt component_name) const
 {
   const irep_idt &id=
     resolve_inherited_componentt::build_full_component_identifier(
@@ -655,7 +651,7 @@ exprt get_virtual_calleest::get_method(
 /// them with calls to their most derived implementations. Returns
 /// true if at least one function has been replaced.
 bool remove_virtual_functionst::remove_virtual_functions(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt &goto_program)
 {
   bool did_something=false;
@@ -807,7 +803,7 @@ void remove_virtual_functions(
 ///   program after replaced function call
 goto_programt::targett remove_virtual_function(
   symbol_table_baset &symbol_table,
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt &goto_program,
   goto_programt::targett instruction,
   const dispatch_table_entriest &dispatch_table,
@@ -828,7 +824,7 @@ goto_programt::targett remove_virtual_function(
 
 goto_programt::targett remove_virtual_function(
   goto_modelt &goto_model,
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt &goto_program,
   goto_programt::targett instruction,
   const dispatch_table_entriest &dispatch_table,

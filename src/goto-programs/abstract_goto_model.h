@@ -29,7 +29,7 @@ public:
   /// \param id: function ID to query
   /// \return true if we can produce a function body, or false if we would leave
   ///   it a bodyless stub.
-  virtual bool can_produce_function(const irep_idt &id) const = 0;
+  virtual bool can_produce_function(irep_idt id) const = 0;
 
   /// Get a GOTO function by name, or throw if no such function exists.
   /// May have side-effects on the GOTO function map provided by
@@ -37,8 +37,8 @@ public:
   /// so iterators pointing into either may be invalidated.
   /// \param id: function to get
   /// \return goto function
-  virtual const goto_functionst::goto_functiont &get_goto_function(
-    const irep_idt &id) = 0;
+  virtual const goto_functionst::goto_functiont &
+  get_goto_function(irep_idt id) = 0;
 
   /// Accessor to get a raw goto_functionst. Concurrent use of get_goto_function
   /// may invalidate iterators or otherwise surprise users by modifying the map

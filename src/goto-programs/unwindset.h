@@ -42,8 +42,7 @@ public:
     message_handlert &message_handler);
 
   // queries
-  std::optional<unsigned>
-  get_limit(const irep_idt &loop, unsigned thread_id) const;
+  std::optional<unsigned> get_limit(irep_idt loop, unsigned thread_id) const;
 
   // read unwindset directives from a file
   void parse_unwindset_file(

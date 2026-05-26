@@ -75,7 +75,7 @@ static exprt simplify_json_expr(const exprt &src)
 /// \param ns: a namespace
 /// \param mode: language in which the code was written
 /// \return a json object
-json_objectt json(const typet &type, const namespacet &ns, const irep_idt &mode)
+json_objectt json(const typet &type, const namespacet &ns, irep_idt mode)
 {
   json_objectt result;
 
@@ -200,7 +200,7 @@ static std::string binary(const constant_exprt &src)
 /// \param ns: a namespace
 /// \param mode: language in which the code was written
 /// \return a json object
-json_objectt json(const exprt &expr, const namespacet &ns, const irep_idt &mode)
+json_objectt json(const exprt &expr, const namespacet &ns, irep_idt mode)
 {
   json_objectt result;
 

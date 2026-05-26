@@ -32,7 +32,7 @@ Author: Daniel Kroening
 #include "goto_trace.h"
 
 static std::string
-expr_to_string(const namespacet &ns, const irep_idt &id, const exprt &expr)
+expr_to_string(const namespacet &ns, irep_idt id, const exprt &expr)
 {
   if(get_mode_from_identifier(ns, id) == ID_C)
     return expr2c(expr, ns, expr2c_configurationt::clean_configuration);
@@ -72,7 +72,7 @@ void graphml_witnesst::remove_l0_l1(exprt &expr)
 }
 
 std::string graphml_witnesst::convert_assign_rec(
-  const irep_idt &identifier,
+  irep_idt identifier,
   const code_assignt &assign)
 {
   const auto cit = cache.find({identifier.get_no(), &assign.read()});
@@ -276,9 +276,8 @@ static bool contains_symbol_prefix(const exprt &expr, const std::string &prefix)
 
 /// Check if a function is built-in (CPROVER library), has no body,
 /// or does not exist in the symbol table
-static bool is_function_built_in_or_extern(
-  const namespacet &ns,
-  const irep_idt &function_id)
+static bool
+is_function_built_in_or_extern(const namespacet &ns, irep_idt function_id)
 {
   const symbolt *symbol_ptr = nullptr;
   if(ns.lookup(function_id, symbol_ptr))
@@ -300,7 +299,7 @@ static bool is_function_built_in_or_extern(
 /// Note: scope is determined by the prefix before the first "::". This is
 /// correct for CBMC's C front-end where locals are named "function::N::var"
 /// and function_id is "function". JBMC does not use graphml witnesses.
-static bool all_symbols_in_scope(const exprt &expr, const irep_idt &function_id)
+static bool all_symbols_in_scope(const exprt &expr, irep_idt function_id)
 {
   find_symbols_sett symbols;
   find_symbols(expr, symbols);

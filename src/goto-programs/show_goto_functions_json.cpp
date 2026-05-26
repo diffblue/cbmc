@@ -53,7 +53,7 @@ json_objectt show_goto_functions_jsont::convert(
       make_range(
         function.parameter_identifiers.begin(),
         function.parameter_identifiers.end())
-        .map([](const irep_idt &id) { return json_stringt{id}; });
+        .map([](irep_idt id) { return json_stringt{id}; });
     json_function["parameterIdentifiers"] = json_arrayt{
       json_parameter_id_range.begin(), json_parameter_id_range.end()};
 
@@ -117,7 +117,7 @@ json_objectt show_goto_functions_jsont::convert(
         {
           auto json_label_range =
             make_range(instruction.labels.begin(), instruction.labels.end())
-              .map([](const irep_idt &id) { return json_stringt{id}; });
+              .map([](irep_idt id) { return json_stringt{id}; });
           instruction_entry["labels"] =
             json_arrayt{json_label_range.begin(), json_label_range.end()};
         }

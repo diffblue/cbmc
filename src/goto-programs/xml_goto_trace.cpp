@@ -41,7 +41,7 @@ static void replace_string_constants_rec(exprt &expr)
 /// printable in XML 1.0. Produces an empty string if no valid XML 1.0 string
 /// representing \p expr can be generated.
 static std::string
-get_printable_xml(const namespacet &ns, const irep_idt &id, const exprt &expr)
+get_printable_xml(const namespacet &ns, irep_idt id, const exprt &expr)
 {
   std::string result = from_expr(ns, id, expr);
 

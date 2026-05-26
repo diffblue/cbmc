@@ -30,7 +30,7 @@ code_inputt::code_inputt(
 }
 
 code_inputt::code_inputt(
-  const irep_idt &description,
+  irep_idt description,
   exprt expression,
   std::optional<source_locationt> location)
   : code_inputt{
@@ -59,7 +59,7 @@ code_outputt::code_outputt(
 }
 
 code_outputt::code_outputt(
-  const irep_idt &description,
+  irep_idt description,
   exprt expression,
   std::optional<source_locationt> location)
   : code_outputt{
