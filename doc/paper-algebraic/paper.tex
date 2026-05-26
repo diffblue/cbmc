@@ -49,10 +49,13 @@ bit-blasting configuration we evaluated time out on within
 10\,s; on 5 DSP datapath equivalences with overflow
 cancellation~\cite{shekhar2007equivalence,gamez2024efficient}
 it solves in $<$15\,ms (cvc5 takes 1.84\,s on
-\texttt{dsp\_horner\_16}, a 184$\times$ gap); on commutativity,
-associativity, and overflow checking it is bitwidth-independent
-(BW=8 to 256, 2--5\,ms throughout) and matches Bitwuzla's
-word-level rewriting. Soundness is mechanised in
+\texttt{dsp\_horner\_16}, a 184$\times$ gap); on
+SABER~\cite{daemen2018saber} polynomial multiplication
+(post-quantum cryptography) the procedure scales to SABER's
+actual $N=256$ parameter, with cvc5 timing out at every
+$N \geq 4$; on commutativity, associativity, and overflow
+checking it is bitwidth-independent (BW=8 to 256, 2--5\,ms
+throughout) and matches Bitwuzla's word-level rewriting. Soundness is mechanised in
 Lean~4 with 25 theorems and zero \texttt{sorry}, including a
 contribution to Mathlib (under review); the formalisation effort
 exposed and removed a 2000$\times$ ordering sensitivity in the C++
@@ -170,7 +173,13 @@ DSP datapath equivalences with overflow
 cancellation~\cite{shekhar2007equivalence}, the procedure solves
 all five in $<$15\,ms; cvc5 takes 1.84\,s on
 \texttt{dsp\_horner\_16}, a 184$\times$ gap
-(Section~\ref{sec:eval-dsp}). On commutativity, associativity,
+(Section~\ref{sec:eval-dsp}). On
+SABER~\cite{daemen2018saber} polynomial multiplication ---
+a post-quantum cryptography application --- the procedure
+scales to SABER's actual $N = 256$ parameter, deciding each
+output-coefficient equivalence in $\sim$109\,s, while cvc5
+times out at every $N \geq 4$
+(Section~\ref{sec:eval-saber}). On commutativity, associativity,
 and overflow checking the procedure is bitwidth-independent
 (2--5\,ms from BW=8 to 256), matching Bitwuzla's word-level
 rewriting and outpacing pure bit-blasting (which times out at
@@ -179,9 +188,10 @@ solves 184/210 to our 128/210: its
 occurrence-map canonicalisation closes most queries
 syntactically and constructs witnesses for the
 existential-equational SAT-direction queries that our
-UNSAT-oriented Rabinowitsch encoding cannot. The four wins above
-and the DSP datapath equivalences are the queries Bitwuzla
-cannot decide at all.
+UNSAT-oriented Rabinowitsch encoding cannot. Our wins are the
+queries Bitwuzla cannot decide (the four random-polynomial
+high-degree wins) or that cvc5 cannot decide (DSP datapath
+equivalences and SABER polynomial multiplication).
 
 We introduce zero correctness regressions across \cbmc's 691
 existing regression tests.
@@ -1230,6 +1240,117 @@ test is \emph{a complete decision procedure for this fragment};
 the absolute timings on these particular five benchmarks would
 not differ markedly under a future word-level rewriter that
 added the appropriate rules.
+
+\subsection{SABER Polynomial Multiplication (Post-Quantum Cryptography)}
+\label{sec:eval-saber}
+
+SABER~\cite{daemen2018saber} is a lattice-based key encapsulation
+mechanism (NIST PQC Round 3 finalist). Its inner operation is
+polynomial multiplication in the ring $R_q = \mathbb{Z}_q[x] / (x^N + 1)$
+with $q = 2^{13}$ and $N = 256$ in the standard parameter set,
+stored in 16-bit words. SABER's reference
+implementation~\cite{KULeuvenSABER} uses Toom-Cook 4-way
+decomposition with Karatsuba as the inner kernel, then reduces
+the $2N$-coefficient product modulo $x^N + 1$ via the
+SABER-specific reduction step
+\texttt{res[i] = c[i] - c[i+N]}.
+
+We verify the equivalence of two implementations of the
+polynomial product, mirroring SABER's algorithmic structure at
+scaled-down $N$ and at the implementation bitwidth $q = 2^{16}$:
+
+\begin{itemize}
+\item \emph{Schoolbook}: direct $O(N^2)$ multiplication.
+\item \emph{Karatsuba (1-level)}: split inputs into halves; 3
+  schoolbook half-products combined via the Karatsuba
+  identity.
+\item \emph{Karatsuba (2-level)}: split inputs into halves and
+  then quarters; 9 schoolbook quarter-products. Mirrors SABER's
+  multi-level structural decomposition.
+\end{itemize}
+
+Each query asserts equivalence per output coefficient. The
+natural framing
+$\bigvee_{i=0}^{N-1} (\text{A\_res}_i \neq \text{B\_res}_i)$
+exposes a current procedure-level limitation we discuss below;
+we split into $N$ per-coefficient queries as a workaround.
+
+\begin{table}[ht]
+\caption{SABER polynomial-multiplication equivalence at scaled
+$N$ and SABER's storage bitwidth $q = 2^{16}$. Per output
+coefficient; 60\,s timeout for $N \leq 128$, 300\,s for $N = 256$.
+The 1-level / 2-level columns differ only in inner Karatsuba
+recursion; both verify the same algebraic identity.
+$N = 256$ is SABER's actual parameter.}
+\label{tab:saber-scaling}
+\centering
+\small
+\begin{tabular}{lrrrr}
+\toprule
+$N$ & this paper (1-level) & this paper (2-level) & Bitwuzla & cvc5 \\
+\midrule
+4   & 0.02\,s   & 0.03\,s   & 0.00\,s & T/O \\
+8   & 0.09\,s   & 0.10\,s   & 0.00\,s & T/O \\
+16  & 0.37\,s   & 0.40\,s   & 0.00\,s & T/O \\
+32  & 1.52\,s   & 1.59\,s   & 0.01\,s & T/O \\
+64  & 6.15\,s   & 6.41\,s   & 0.02\,s & T/O \\
+128 & 25.27\,s  & 26.15\,s  & 0.06\,s & T/O \\
+256 & 109.35\,s & 108.68\,s & 0.27\,s & T/O \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The procedure scales to SABER's actual $N = 256$ parameter,
+deciding each output-coefficient equivalence in $\sim$109\,s
+regardless of whether the alternative implementation is 1-level
+or 2-level Karatsuba: Buchberger normalises through the
+recursion levels because the underlying polynomial identity is
+the same. Bitwuzla solves each in 0.27\,s by occurrence-map
+canonicalisation, since both schoolbook and Karatsuba expand
+to the same canonical sum-of-monomials form. cvc5 times out
+at every benchmark in this family at every $N \geq 4$ --- its
+QF\_BV pipeline does not perform the polynomial-distributivity
+expansion that Bitwuzla's occurrence-map canonicaliser does.
+
+The win pattern matches the random-polynomial result of
+Section~\ref{sec:eval-random-poly}: completeness on the
+universal-equational class with polynomial expressions in
+$\mathbb{Z}_{2^d}$ is a procedural guarantee, while heuristic
+word-level rewriting wins or loses depending on whether the
+rewriter has matching patterns. Our procedure decides where
+cvc5 cannot.
+
+\paragraph{Procedure-level limitation: disjunctive disequalities.}
+The natural framing of ``all output coefficients agree'' is the
+disjunctive disequality
+$\bigvee_i (\text{A\_res}_i \neq \text{B\_res}_i)$. Our
+Rabinowitsch handling addresses single disequalities; the
+disjunctive structure currently bypasses the algebraic pre-solver
+and the bit-blasted form times out at $N = 4$ already. We split
+into per-coefficient queries as a workaround. Extending the
+procedure to handle disjunctions of disequalities via
+Rabinowitsch-on-each-branch is straightforward (the disjunction
+is unsatisfiable iff every branch is); we defer the
+implementation to a future revision.
+
+\paragraph{Toom-Cook 4-way and faithful SABER alignment.}
+SABER's actual implementation uses Toom-Cook 4-way at the
+outermost level with interpolation steps that include $\gg 1$
+and $\gg 3$ shifts and modular inverses of $3$, $9$, $15$. The
+shifts are exact divisions: partial operations on
+$\mathbb{Z}_{2^d}$ valid only when divisibility is guaranteed
+by the algorithm's invariants. Faithful translation to SMT-LIB
+requires the polynomial extractor to recognise \texttt{bvshr}
+as exact division when divisibility is provable; this is an
+extractor-coverage extension we have not implemented. The
+2-level Karatsuba results above verify SABER's structural depth
+without this extension.
+
+\paragraph{Reproducibility.}
+Queries are mechanically generated from
+\texttt{bench-multiplication/saber/make-saber-query.py}. SABER
+reference code from the KU Leuven submission to NIST
+PQC~\cite{KULeuvenSABER}.
 
 \subsection{Custom Suite (39 benchmarks)}
 \label{sec:eval-custom}
