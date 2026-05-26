@@ -1908,3 +1908,112 @@ The 18 `'reserve' is unknown` failures stay open.
 
 The two proper next-step paths above are tracked but neither
 fits this session's scope safely.
+
+
+## 2026-05-26 (continued) Path-1 vs path-2 attempts and the `baset::type()` precondition trap
+
+### Summary
+
+Two follow-up sessions on `'reserve' is unknown` explored both:
+- **Path 1**: fix the iter-5 throw at its source.
+- **Path 2**: audit downstream consumers to tolerate partial elaboration.
+
+Path 1 traced cleanly into the cascade:
+
+```
+unordered_map iter 5: typedef typename _Hashtable::key_type key_type;
+  → typecheck_type(`_Hashtable::key_type`) throws
+  → resolve(`__hashtable_alloc::__node_ptr`) throws inside `_Hashtable<...>` scope
+  → resolve(`__base_type::value_type`) throws inside `_Insert<...>` scope
+  → resolve(`_Hashtable_alloc<...>`) throws inside `_Insert_base<...>` scope
+  → resolve(`__node_alloc_traits::rebind_traits<...>`) throws inside
+    `_Hashtable_alloc<...>` scope
+  → resolve(`__get_value_type<X>::type`) throws inside
+    `_Hashtable_alloc<...>` scope
+```
+
+The chain bottoms out at `__get_value_type<_Hash_node<_Val,
+_Cache_hash_code>>::type`, a class-template **specialization** match
+inside `std::__detail::_Hashtable_alloc<...>` that CBMC's template
+machinery does not resolve while the enclosing class is mid-body.
+
+Path-1 fix would need to teach CBMC to either eagerly elaborate
+`__get_value_type<...>` specializations during body processing of the
+enclosing template, or to defer the typedef and resolve it on first
+use.  Both are larger-scope template-machinery changes than fits this
+session.
+
+### Path 2 findings
+
+Three attempts at making downstream consumers tolerate partial
+elaboration:
+
+1. **Body-loop recovery, broad (catch all `int`)**.  Lets every
+   throwing body iteration recover, gated on
+   `!instantiation_stack.empty() && template_class_instance`.
+   Requires preserving `ID_template_class_instance` across the
+   incomplete-to-complete `type.swap()`.  Crashes
+   `cpp20_vector_basic` and `cpp11_future_header` on `to_struct_tag_type`
+   precondition violations once the recovery path drives downstream
+   code into partially-elaborated structures.
+
+2. **Body-loop recovery, typedef-only**.  Same shape as (1) but
+   restricted to `decl.is_typedef() && !decl.is_template()`.  Vector
+   passes (with hardening from this commit's safety guards), but
+   `cpp20_span_basic` regresses to a `'__it' is unknown` CONVERSION
+   ERROR.  `__it` is a parameter inside C++20
+   `requires(_Iter __it) { ... }` clauses; the recovery lets span's
+   body proceed far enough to start instantiating
+   `std::__detail::__cpp17_iterator<...>`'s requires-clause body,
+   which CBMC's parser/elaborator does not fully model, hence the
+   "is unknown" error.
+
+3. **Lazy typedef registration during instantiation**.  When a
+   typedef whose aliased type is a qualified `cpp_name` throws,
+   restore the unresolved cpp_name and route through the existing
+   `kept_unresolved_cpp_name` lazy-typedef registration path.
+   Sibling members no longer see "unknown typedef" errors on use,
+   but methods that resolve the lazy typedef in their parameter or
+   return type still throw.  Net effect on dog-food: 8 files move
+   `clean → noisy` (lazy uses surface as warnings) without reducing
+   the 80 fails.  Reverted.
+
+### `baset::type()` precondition trap
+
+A subtle issue that delayed the get_base fix:
+`struct_typet::baset::type()` returns a `struct_tag_typet&` and is
+implemented as `return to_struct_tag_type(exprt::type());`.  The
+`to_struct_tag_type` precondition lets the compiler conclude (under
+optimisation) that `b.type().id() == ID_struct_tag` always, which
+silently elides any `can_cast_type<struct_tag_typet>(b.type())` guard
+written *in front of* a `to_struct_tag_type` call inside the loop —
+the guard simply doesn't appear in the emitted code.  The fix has to
+bypass `baset::type()` and read the type field directly via
+`irept::find(ID_type)` to keep the guard alive.  This is what the
+`ed2c374384` commit's `get_base` rewrite does.
+
+### Two safety guards landed (commit `ed2c374384`)
+
+* `struct_typet::get_base(id)` reads its base's type through
+  `irept::find` so it can skip non-`struct_tag` entries instead of
+  triggering `to_struct_tag_type`'s PRECONDITION.
+* `cpp_typecheckt::elaborate_class_template(type)` early-returns on
+  empty tag identifier instead of triggering
+  `lookup(to_tag_type(type))`'s namespace-lookup invariant.
+
+Both are reached from sites that already have try/catch or SFINAE
+recovery — the previous abort defeated that recovery, turning a
+recoverable diagnostic into a hard crash.
+
+Full cbmc-cpp regressions (678/0/83) pass.  Dog-food unchanged at
+20 / 17 / 80 / 0.
+
+### Open status
+
+The 18 `'reserve' is unknown` failures stay open.  A safe landing
+needs the path-1 deep fix (teach the template machinery to handle
+metafunction specialization match during enclosing-class body
+elaboration), or a path-3 mechanism not yet identified that would
+register `unordered_map`'s public methods (`reserve`, `insert`,
+`find`, ...) without requiring the typedefs in iters 5–11 of its body
+to resolve.
