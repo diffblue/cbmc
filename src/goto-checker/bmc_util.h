@@ -41,8 +41,7 @@ void convert_symex_target_equation(
 
 /// Returns a function that checks whether an SSA step is an assertion
 /// with \p property_id. Usually used for `build_goto_trace`.
-ssa_step_predicatet
-ssa_step_matches_failing_property(const irep_idt &property_id);
+ssa_step_predicatet ssa_step_matches_failing_property(irep_idt property_id);
 
 /// Outputs a message that an error trace is being built
 void message_building_error_trace(messaget &);

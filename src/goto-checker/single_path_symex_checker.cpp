@@ -158,8 +158,7 @@ goto_tracet single_path_symex_checkert::build_shortest_trace() const
   return goto_trace;
 }
 
-goto_tracet
-single_path_symex_checkert::build_trace(const irep_idt &property_id) const
+goto_tracet single_path_symex_checkert::build_trace(irep_idt property_id) const
 {
   goto_tracet goto_trace;
   build_goto_trace(

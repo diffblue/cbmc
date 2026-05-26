@@ -124,9 +124,8 @@ operator()(propertiest &properties)
       }
 
       property_decider.add_constraint_from_goals(
-        [&properties](const irep_idt &property_id) {
-          return is_property_to_check(properties.at(property_id).status);
-        });
+        [&properties](irep_idt property_id)
+        { return is_property_to_check(properties.at(property_id).status); });
 
       log.status()
         << "Running "
@@ -218,8 +217,8 @@ goto_tracet single_loop_incremental_symex_checkert::build_shortest_trace() const
   return goto_trace;
 }
 
-goto_tracet single_loop_incremental_symex_checkert::build_trace(
-  const irep_idt &property_id) const
+goto_tracet
+single_loop_incremental_symex_checkert::build_trace(irep_idt property_id) const
 {
   goto_tracet goto_trace;
   build_goto_trace(

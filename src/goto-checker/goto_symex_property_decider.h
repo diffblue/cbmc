@@ -39,7 +39,7 @@ public:
 
   /// Add disjunction of negated selected properties to the equation
   void add_constraint_from_goals(
-    std::function<bool(const irep_idt &property_id)> select_property);
+    std::function<bool(irep_idt property_id)> select_property);
 
   /// Calls solve() on the solver instance
   decision_proceduret::resultt solve();

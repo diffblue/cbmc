@@ -36,8 +36,7 @@ class fault_localization_providert
 public:
   /// Returns the most likely fault locations
   /// for the given FAILed \p property_id
-  virtual fault_location_infot
-  localize_fault(const irep_idt &property_id) const = 0;
+  virtual fault_location_infot localize_fault(irep_idt property_id) const = 0;
 
   virtual ~fault_localization_providert() = default;
 };

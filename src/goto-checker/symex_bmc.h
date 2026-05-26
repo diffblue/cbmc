@@ -51,7 +51,7 @@ public:
   /// information for the user (e.g. "unwinding iteration N, max M"),
   /// and is not enforced. They return true to halt unwinding, false to
   /// authorise unwinding, or Unknown to indicate they have no opinion.
-  typedef std::function<tvt(const irep_idt &, unsigned, unsigned &)>
+  typedef std::function<tvt(irep_idt, unsigned, unsigned &)>
     recursion_unwind_handlert;
 
   /// Add a callback function that will be called to determine whether to unwind
@@ -105,7 +105,7 @@ protected:
     unsigned unwind) override;
 
   bool get_unwind_recursion(
-    const irep_idt &identifier,
+    irep_idt identifier,
     unsigned thread_nr,
     unsigned unwind) override;
 
