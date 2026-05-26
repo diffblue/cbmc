@@ -45,6 +45,12 @@ collects:
 |---|---|---|
 | `refine-arithmetic-bypass-investigation.md` | High | **Fixed** in this session. The fix bit-blasts multiplications eagerly under `--refine-arithmetic` rather than lazily, eliminating the refinement loop's per-iteration SAT overhead while preserving pair detection's equality constraints. The submitted Paper 1 reflects the *pre-fix* behaviour. |
 
+### Senior-reviewer report
+
+| File | Description |
+|---|---|
+| `internal-review-2026-05-26.md` | Forward-looking senior-reviewer pass on the submitted Paper 1. 15 items at three severities. **Highest priority: item #1** (the §8 `--refine-arithmetic` overhead claim is now contradicted by the post-submission fix and must be updated in any revision). **Item #2**: §7.7 SMT-COMP framing understates a 33-vs-41 regression. **Item #3**: 21 pages is on the long side for PoS; cut list ready. The full list is the workbook for integrating peer-review feedback. |
+
 ### Post-submission data
 
 | File | Description |
