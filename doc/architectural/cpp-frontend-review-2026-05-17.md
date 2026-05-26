@@ -1782,3 +1782,129 @@ not just `cpp11_future_header`.
 Reverted all source changes.  Working tree clean.  Documentation
 updated.  Dog-food unchanged at 19/18/80/0; cbmc-cpp regression
 suite green at 678/0/83.
+
+
+## 2026-05-26 std::unordered_map / std::vector member-access elaboration
+
+### Symptom
+
+18 dog-food files fail with
+
+    src/util/std_types.h:757:1: error: symbol 'reserve' is unknown
+        parameter_indices.reserve(params.size());
+
+at the call site
+
+    parameter_indicest pi;     // typedef of unordered_map<irep_idt, std::size_t>
+    pi.reserve(params.size());
+
+A standalone reproducer (`/tmp/reserve_repro11.cpp`):
+
+```cpp
+#include <unordered_map>
+#include <string>
+
+struct code_typet
+{
+  typedef std::unordered_map<std::string, std::size_t> parameter_indicest;
+
+  void f() const
+  {
+    parameter_indicest pi;
+    pi.reserve(16);   // "symbol 'reserve' is unknown"
+  }
+};
+
+int main() { code_typet ct; ct.f(); return 0; }
+```
+
+triggers it.  The same construct without the typedef (using
+`std::unordered_map<...>` directly in the method body) works.
+
+### Root cause
+
+`cpp_typecheckt::typecheck_compound_body`'s body loop iterates
+the 126 sub-elements of libstdc++'s `std::unordered_map<...>`
+declaration body.  Iteration 5 (somewhere in the public-section
+declarations — could not narrow further without a deep trace
+across the chain of helper calls) throws `int 0`.  The throw
+escapes the body loop, leaving only the private `_Hashtable`
+typedef and `_M_h` data member registered as components.
+`reserve` and all other public methods of `unordered_map` never
+register.
+
+The first call site (e.g. `pi.reserve(16)` after the typedef
+has been processed) calls `elaborate_class_template`, which
+sees the symbol is "complete" (`is_incomplete=false`,
+`components > 0`) and skips re-elaboration.  Member lookup for
+`reserve` then fails because the only components are
+`_Hashtable` and `_M_h`.
+
+A secondary issue: in `typecheck_compound_type`'s "previously
+incomplete becomes complete" path at line ~218,
+`writeable_symbol.type.swap(type)` replaces the symbol's type
+with the parser's complete type and loses the
+`ID_template_class_instance` flag set by
+`cpp_instantiate_template.cpp:372`.  Two adjacent flags
+(`ID_C_template`, `ID_C_template_arguments`) are explicitly
+preserved across the swap; `ID_template_class_instance` is not.
+After the swap, downstream consumers see
+`template_class_instance=false` even though the symbol *is* a
+template instance.
+
+### Two-part fix attempted
+
+1. Preserve `ID_template_class_instance` across the
+   `writeable_symbol.type.swap(type)` (one-liner addition next
+   to the existing two preserve calls).
+2. Wrap each body-loop iteration in `try { ... } catch(int) { ... }`
+   gated on
+   `!instantiation_stack.empty() && template_class_instance`,
+   matching the recovery pattern already in use for
+   `convert_template_declaration` and base-class elaboration.
+
+### Why it didn't land
+
+The recovery makes the `reserve_repro11` case compile —
+`unordered_map`'s components fully register and `reserve`
+resolves.  But it also exposes a cascade of downstream bugs
+that invariant-violate or crash in other tests:
+
+* `cpp20_vector_basic` regression: hits "symbol '__it' is
+  unknown" inside concept evaluation at C++20 vector iterator
+  elaboration once the body loop continues past the iter-5
+  throw.
+* `cpp11_future_header` and the `reserve_repro11` reproducer
+  itself: subsequent template elaboration walks a
+  partially-elaborated `<chrono>` / `<future>` class structure
+  and trips
+  `Invariant ... can_cast_type<struct_tag_typet>(type)` in
+  `to_struct_tag_type` at `src/util/std_types.h:519`.
+
+The throw isolation is correct in principle but the rest of the
+typecheck / elaboration pipeline assumes an "all-or-nothing"
+result from class instantiation.  Once the body loop is allowed
+to recover, code paths that walk struct components, look up
+members, or inspect iterator types encounter partially-
+elaborated structures they were never designed to tolerate.
+
+A safe landing of this fix needs either:
+
+* Identifying the specific declaration in iteration 5 of
+  `unordered_map`'s body that throws `int 0`, fixing it in-place
+  (so the body loop completes cleanly without recovery), and
+  *then* the swap-preservation alone (no try/catch) suffices.
+* Or auditing every downstream consumer of class-template
+  components / member lookup to handle partial elaboration
+  gracefully — this is a much larger architectural project,
+  comparable in scope to the original "throw escapes body loop
+  in template instantiation" recovery added for
+  `typecheck_compound_bases`.
+
+### Status
+
+Reverted; documented here.  Dog-food remains at 20 / 17 / 80 / 0.
+The 18 `'reserve' is unknown` failures stay open.
+
+The two proper next-step paths above are tracked but neither
+fits this session's scope safely.
