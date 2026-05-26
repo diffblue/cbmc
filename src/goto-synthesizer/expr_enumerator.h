@@ -217,7 +217,7 @@ class binary_functional_enumeratort : public non_leaf_enumeratort
 {
 public:
   binary_functional_enumeratort(
-    const irep_idt &op,
+    irep_idt op,
     const enumerator_baset &enumerator_1,
     const enumerator_baset &enumerator_2,
     const std::function<bool(const partitiont &)> partition_check,
@@ -230,7 +230,7 @@ public:
   }
 
   binary_functional_enumeratort(
-    const irep_idt &op,
+    irep_idt op,
     const enumerator_baset &enumerator_1,
     const enumerator_baset &enumerator_2,
     const std::function<bool(const partitiont &)> partition_check,
@@ -246,7 +246,7 @@ public:
   }
 
   binary_functional_enumeratort(
-    const irep_idt &op,
+    irep_idt op,
     const enumerator_baset &enumerator_1,
     const enumerator_baset &enumerator_2,
     const namespacet &ns)
@@ -259,7 +259,7 @@ public:
   {
   }
 
-  bool is_commutative(const irep_idt &op) const;
+  bool is_commutative(irep_idt op) const;
 
   /// Determine whether a tuple of expressions is the representation of some
   /// equivalence class.
@@ -273,7 +273,7 @@ protected:
   // set of expressions.
   const bool is_exchangeable = false;
 
-  const irep_idt &op_id;
+  irep_idt op_id;
 };
 
 /// Enumerators that enumerates expressions in the union of enumerated

@@ -81,7 +81,7 @@ private:
   exprt synthesize_strengthening_clause(
     const std::vector<exprt> terminal_symbols,
     const loop_idt &cause_loop_id,
-    const irep_idt &violation_id,
+    irep_idt violation_id,
     const std::vector<cext> &cexs);
 
   /// Synthesize assigns target and update assigns_map.
