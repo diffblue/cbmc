@@ -104,8 +104,10 @@ protected:
   /// \param i: equivalence-class number to merge
   void update_domain_map(std::size_t i);
 
-  /// Classification of lazily deferred constraints.
-  enum class lazy_typet
+  /// Classification of map-theory constraints. Used both for lazy dispatch
+  /// of refinement-loop constraints (\ref lazy_constraints) and for
+  /// per-kind statistics (\ref constraint_count).
+  enum class map_constraint_kindt
   {
     MAP_ACKERMANN,
     MAP_WITH,
@@ -114,16 +116,17 @@ protected:
     MAP_TYPECAST,
     MAP_CONSTANT,
     MAP_COMPREHENSION,
+    MAP_EQUALITY,
     MAP_LET
   };
 
   /// A constraint together with its classification, used for lazy dispatch.
   struct lazy_constraintt
   {
-    lazy_typet type;
+    map_constraint_kindt type;
     exprt lazy;
 
-    lazy_constraintt(lazy_typet _type, const exprt &_lazy)
+    lazy_constraintt(map_constraint_kindt _type, const exprt &_lazy)
       : type(_type), lazy(_lazy)
     {
     }
@@ -145,6 +148,23 @@ protected:
   /// \param refine: if true and lazy mode is active, defer the constraint
   void add_map_constraint(const lazy_constraintt &lazy, bool refine = true);
 
+  /// Convenience wrapper that adds a constraint of the given \p kind and
+  /// bumps the per-kind counter in a single call. Equivalent to
+  ///     add_map_constraint(lazy_constraintt(kind, body), refine);
+  ///     ++constraint_count[kind];
+  /// Use this in preference to spelling out both calls at every site.
+  /// \param kind: classification of the constraint being added
+  /// \param body: the constraint expression
+  /// \param refine: if true and lazy mode is active, defer the constraint
+  void add_constraint(
+    map_constraint_kindt kind,
+    const exprt &body,
+    bool refine = false)
+  {
+    add_map_constraint(lazy_constraintt{kind, body}, refine);
+    ++constraint_count[kind];
+  }
+
   /// Add Ackermann constraints for every pair of keys in each equivalence
   /// class: if two keys are equal then the corresponding map lookups must
   /// yield equal values.  Complexity is quadratic in the size of each key
@@ -159,26 +179,13 @@ protected:
     const key_sett &key_set,
     const map_equalityt &equality);
 
-  /// Classification of constraints for statistics reporting.
-  enum class constraint_typet
-  {
-    MAP_ACKERMANN,
-    MAP_WITH,
-    MAP_IF,
-    MAP_OF,
-    MAP_TYPECAST,
-    MAP_CONSTANT,
-    MAP_COMPREHENSION,
-    MAP_EQUALITY,
-    MAP_LET
-  };
-  typedef std::map<constraint_typet, size_t> map_constraint_countt;
+  typedef std::map<map_constraint_kindt, size_t> map_constraint_countt;
   /// Per-type constraint counts, populated when \ref collect_constraint_stats
   /// is true.
   map_constraint_countt constraint_count;
 
-  /// Return a human-readable string for a constraint type enum value.
-  std::string enum_to_string(constraint_typet type);
+  /// Return a human-readable string for a constraint kind enum value.
+  std::string enum_to_string(map_constraint_kindt kind);
 
   /// Emit the collected constraint counts as a JSON object to the status log.
   void display_constraint_count();

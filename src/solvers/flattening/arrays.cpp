@@ -36,8 +36,8 @@ arrayst::arrayst(
 
 literalt arrayst::record_equality(const equal_exprt &equality)
 {
-  const exprt &op0=equality.op0();
-  const exprt &op1=equality.op1();
+  const exprt &op0 = equality.op0();
+  const exprt &op1 = equality.op1();
 
   DATA_INVARIANT_WITH_DIAGNOSTICS(
     op0.type() == op1.type(),
@@ -170,13 +170,13 @@ void arrayst::add_array_constraints()
 
 void arrayst::add_array_constraints(const key_sett &key_set, const exprt &expr)
 {
-  if(expr.id()==ID_with)
+  if(expr.id() == ID_with)
     return add_array_constraints_with(key_set, to_with_expr(expr));
-  else if(expr.id()==ID_update)
+  else if(expr.id() == ID_update)
     return add_array_constraints_update(key_set, to_update_expr(expr));
-  else if(expr.id()==ID_if)
+  else if(expr.id() == ID_if)
     return add_array_constraints_if(key_set, to_if_expr(expr));
-  else if(expr.id()==ID_array_of)
+  else if(expr.id() == ID_array_of)
     return add_array_constraints_array_of(key_set, to_array_of_expr(expr));
   else if(expr.id() == ID_array)
     return add_array_constraints_array_constant(key_set, to_array_expr(expr));
@@ -197,12 +197,13 @@ void arrayst::add_array_constraints(const key_sett &key_set, const exprt &expr)
      to_member_expr(expr).struct_op().id() == ID_nondet_symbol))
   {
   }
-  else if(expr.id()==ID_byte_update_little_endian ||
-          expr.id()==ID_byte_update_big_endian)
+  else if(
+    expr.id() == ID_byte_update_little_endian ||
+    expr.id() == ID_byte_update_big_endian)
   {
     INVARIANT(false, "byte_update should be removed before arrayst");
   }
-  else if(expr.id()==ID_typecast)
+  else if(expr.id() == ID_typecast)
   {
     // we got a=(type[])b
     const auto &expr_typecast_op = to_typecast_expr(expr).op();
@@ -215,17 +216,16 @@ void arrayst::add_array_constraints(const key_sett &key_set, const exprt &expr)
       index_exprt index_expr2(expr_typecast_op, key, element_type);
 
       DATA_INVARIANT(
-        index_expr1.type()==index_expr2.type(),
+        index_expr1.type() == index_expr2.type(),
         "array elements should all have same type");
 
       // add constraint
-      lazy_constraintt lazy(
-        lazy_typet::MAP_TYPECAST, equal_exprt(index_expr1, index_expr2));
-      add_map_constraint(lazy, false); // added immediately
-      constraint_count[constraint_typet::MAP_TYPECAST]++;
+      add_constraint(
+        map_constraint_kindt::MAP_TYPECAST,
+        equal_exprt(index_expr1, index_expr2));
     }
   }
-  else if(expr.id()==ID_index)
+  else if(expr.id() == ID_index)
   {
   }
   else if(auto let_expr = expr_try_dynamic_cast<let_exprt>(expr))
@@ -248,11 +248,8 @@ void arrayst::add_array_constraints(const key_sett &key_set, const exprt &expr)
       index_exprt where_indexed{where, key};
 
       // add constraint
-      lazy_constraintt lazy{
-        lazy_typet::MAP_LET, equal_exprt{index_expr, where_indexed}};
-
-      add_map_constraint(lazy, false); // added immediately
-      constraint_count[constraint_typet::MAP_LET]++;
+      add_constraint(
+        map_constraint_kindt::MAP_LET, equal_exprt{index_expr, where_indexed});
     }
   }
   else
@@ -280,10 +277,8 @@ void arrayst::add_array_constraints_with(
     "with-expression operand should match array element type",
     irep_pretty_diagnosticst{expr});
 
-  lazy_constraintt lazy(
-    lazy_typet::MAP_WITH, equal_exprt(index_expr, expr.new_value()));
-  add_map_constraint(lazy, false); // added immediately
-  constraint_count[constraint_typet::MAP_WITH]++;
+  add_constraint(
+    map_constraint_kindt::MAP_WITH, equal_exprt(index_expr, expr.new_value()));
 
   updated_keys.insert(expr.where());
 
@@ -306,7 +301,7 @@ void arrayst::add_array_constraints_with(
 
       literalt guard_lit = convert(disjunction(disjuncts));
 
-      if(guard_lit!=const_literal(true))
+      if(guard_lit != const_literal(true))
       {
         const typet &element_type = to_array_type(expr.type()).element_type();
         index_exprt index_expr1(expr, other_key, element_type);
@@ -315,12 +310,9 @@ void arrayst::add_array_constraints_with(
         equal_exprt equality_expr(index_expr1, index_expr2);
 
         // add constraint
-        lazy_constraintt lazy(
-          lazy_typet::MAP_WITH,
+        add_constraint(
+          map_constraint_kindt::MAP_WITH,
           or_exprt(equality_expr, literal_exprt(guard_lit)));
-
-        add_map_constraint(lazy, false); // added immediately
-        constraint_count[constraint_typet::MAP_WITH]++;
 
 #if 0 // old code for adding, not significantly faster
         {
@@ -413,10 +405,8 @@ void arrayst::add_array_constraints_array_of(
       "array_of operand type should match array element type");
 
     // add constraint
-    lazy_constraintt lazy(
-      lazy_typet::MAP_OF, equal_exprt(index_expr, expr.what()));
-    add_map_constraint(lazy, false); // added immediately
-    constraint_count[constraint_typet::MAP_OF]++;
+    add_constraint(
+      map_constraint_kindt::MAP_OF, equal_exprt(index_expr, expr.what()));
   }
 }
 
@@ -449,10 +439,8 @@ void arrayst::add_array_constraints_array_constant(
         "array operand type should match array element type");
 
       // add constraint
-      lazy_constraintt lazy{
-        lazy_typet::MAP_CONSTANT, equal_exprt{index_expr, v}};
-      add_map_constraint(lazy, false); // added immediately
-      constraint_count[constraint_typet::MAP_CONSTANT]++;
+      add_constraint(
+        map_constraint_kindt::MAP_CONSTANT, equal_exprt{index_expr, v});
     }
     else
     {
@@ -490,12 +478,11 @@ void arrayst::add_array_constraints_array_constant(
               key, ID_le, from_integer(range.second, key.type())}};
         }
 
-        lazy_constraintt lazy{
-          lazy_typet::MAP_CONSTANT,
+        add_constraint(
+          map_constraint_kindt::MAP_CONSTANT,
           implies_exprt{
-            index_constraint, equal_exprt{index_expr, operands[range.first]}}};
-        add_map_constraint(lazy, true); // added lazily
-        constraint_count[constraint_typet::MAP_CONSTANT]++;
+            index_constraint, equal_exprt{index_expr, operands[range.first]}},
+          true); // added lazily
       }
     }
   }
@@ -516,12 +503,9 @@ void arrayst::add_array_constraints_comprehension(
     replace_expr(expr.arg(), key, comprehension_body);
 
     // add constraint
-    lazy_constraintt lazy(
-      lazy_typet::MAP_COMPREHENSION,
+    add_constraint(
+      map_constraint_kindt::MAP_COMPREHENSION,
       equal_exprt(index_expr, comprehension_body));
-
-    add_map_constraint(lazy, false); // added immediately
-    constraint_count[constraint_typet::MAP_COMPREHENSION]++;
   }
 }
 
@@ -530,7 +514,7 @@ void arrayst::add_array_constraints_if(
   const if_exprt &expr)
 {
   // we got x=(c?a:b)
-  literalt cond_lit=convert(expr.cond());
+  literalt cond_lit = convert(expr.cond());
 
   // get other array index applications
   // and add c => x[i]=a[i]
@@ -545,12 +529,10 @@ void arrayst::add_array_constraints_if(
     index_exprt index_expr2(expr.true_case(), key, element_type);
 
     // add implication
-    lazy_constraintt lazy(
-      lazy_typet::MAP_IF,
+    add_constraint(
+      map_constraint_kindt::MAP_IF,
       or_exprt(
         literal_exprt(!cond_lit), equal_exprt(index_expr1, index_expr2)));
-    add_map_constraint(lazy, false); // added immediately
-    constraint_count[constraint_typet::MAP_IF]++;
 
 #if 0 // old code for adding, not significantly faster
     prop.lcnf(!cond_lit, convert(equal_exprt(index_expr1, index_expr2)));
@@ -565,11 +547,9 @@ void arrayst::add_array_constraints_if(
     index_exprt index_expr2(expr.false_case(), key, element_type);
 
     // add implication
-    lazy_constraintt lazy(
-      lazy_typet::MAP_IF,
+    add_constraint(
+      map_constraint_kindt::MAP_IF,
       or_exprt(literal_exprt(cond_lit), equal_exprt(index_expr1, index_expr2)));
-    add_map_constraint(lazy, false); // added immediately
-    constraint_count[constraint_typet::MAP_IF]++;
 
 #if 0 // old code for adding, not significantly faster
     prop.lcnf(cond_lit, convert(equal_exprt(index_expr1, index_expr2)));

@@ -222,11 +222,10 @@ void mapst::add_Ackermann_constraints()
             equal_exprt values_equal(index_expr1, index_expr2);
 
             // add constraint
-            lazy_constraintt lazy(
-              lazy_typet::MAP_ACKERMANN,
-              implies_exprt(literal_exprt(indices_equal_lit), values_equal));
-            add_map_constraint(lazy, true); // added lazily
-            constraint_count[constraint_typet::MAP_ACKERMANN]++;
+            add_constraint(
+              map_constraint_kindt::MAP_ACKERMANN,
+              implies_exprt(literal_exprt(indices_equal_lit), values_equal),
+              true); // added lazily
 
 #if 0 // old code for adding, not significantly faster
             prop.lcnf(!indices_equal_lit, convert(values_equal));
@@ -315,11 +314,11 @@ void mapst::add_map_equality_constraints(
     // equality constraints are not added lazily
     // convert must be done to guarantee correct update of the key_set
     prop.lcnf(!equality.l, convert(equality_expr));
-    constraint_count[constraint_typet::MAP_EQUALITY]++;
+    constraint_count[map_constraint_kindt::MAP_EQUALITY]++;
   }
 }
 
-std::string mapst::enum_to_string(constraint_typet type)
+std::string mapst::enum_to_string(map_constraint_kindt type)
 {
   // The internal enum tags are MAP_X, but the JSON strings are kept as
   // arrayX/arrayConstraints because the constraints reported by
@@ -329,23 +328,23 @@ std::string mapst::enum_to_string(constraint_typet type)
   // consumers of --show-array-constraints --json-ui output.
   switch(type)
   {
-  case constraint_typet::MAP_ACKERMANN:
+  case map_constraint_kindt::MAP_ACKERMANN:
     return "arrayAckermann";
-  case constraint_typet::MAP_WITH:
+  case map_constraint_kindt::MAP_WITH:
     return "arrayWith";
-  case constraint_typet::MAP_IF:
+  case map_constraint_kindt::MAP_IF:
     return "arrayIf";
-  case constraint_typet::MAP_OF:
+  case map_constraint_kindt::MAP_OF:
     return "arrayOf";
-  case constraint_typet::MAP_TYPECAST:
+  case map_constraint_kindt::MAP_TYPECAST:
     return "arrayTypecast";
-  case constraint_typet::MAP_CONSTANT:
+  case map_constraint_kindt::MAP_CONSTANT:
     return "arrayConstant";
-  case constraint_typet::MAP_COMPREHENSION:
+  case map_constraint_kindt::MAP_COMPREHENSION:
     return "arrayComprehension";
-  case constraint_typet::MAP_EQUALITY:
+  case map_constraint_kindt::MAP_EQUALITY:
     return "arrayEquality";
-  case constraint_typet::MAP_LET:
+  case map_constraint_kindt::MAP_LET:
     return "arrayLet";
   default:
     UNREACHABLE;
