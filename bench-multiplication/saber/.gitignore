@@ -1,0 +1,3 @@
+# SMT2 queries are regenerated from make-saber-query.py; don't track
+*.smt2
+!sanity-*.smt2
