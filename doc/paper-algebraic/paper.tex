@@ -186,12 +186,19 @@ existing regression tests.
 \section{Algebraic Solving via Gr\"obner Bases}
 \label{sec:algebraic}
 
-We implement a strong Gr\"obner basis computation over
-$\mathbb{Z}_{2^d}$ for arithmetic bit-vector reasoning. This section
-defines the underlying algebraic objects
-(Section~\ref{sec:algebraic-def}), presents the Buchberger-style
+This section presents the \emph{ideal-membership} half of our
+universal-equational decision procedure: a strong Gr\"obner basis
+solver over $\mathbb{Z}_{2^d}$ that decides whether a polynomial
+expression equals another \emph{as polynomials} in
+$\mathbb{Z}_{2^d}[x_1, \ldots, x_n]$. Section~\ref{sec:vanishing}
+gives the function-equivalence half, which extends ideal membership
+to the question SMT users actually want answered: are the two
+polynomials equal as functions on the bit-vector domain?
+
+We define the underlying algebraic objects
+(Section~\ref{sec:algebraic-def}), present the Buchberger-style
 computation with our progress-based termination
-criterion (Section~\ref{sec:algebraic-algo}), and states our
+criterion (Section~\ref{sec:algebraic-algo}), and state our
 contributions beyond the framework of
 Song et al.~\cite{song2024equational}
 (Section~\ref{sec:algebraic-contrib}).
@@ -305,12 +312,25 @@ commutativity and associativity. This 2{,}000$\times$ sensitivity
 was eliminated by the progress-based termination rule
 (line~17): once all pairs that could contribute to the unit constant
 are explored, further pairs cannot help, and the algorithm
-terminates regardless of the initial order. This is a concrete
-instance of a formalisation-informed improvement: the need to
-prove termination in Lean forced us to isolate the
-``progress'' notion, which in turn showed that the ordering
-sensitivity was a symptom rather than a necessity. We returned to
-the C++ code and removed the sensitivity.
+terminates regardless of the initial order.
+
+\paragraph{Formalisation-driven refinement.}
+We did not discover the progress invariant by tuning the C++
+implementation; we discovered it while attempting to prove
+termination in Lean~4. Buchberger's standard termination argument
+appeals to the ascending chain condition on Noetherian rings, which
+guarantees the basis stabilises but says nothing about \emph{when}.
+Mechanising the proof forced us to articulate a weaker, operational
+property: a step is ``progressive'' if it adds a polynomial whose
+leading term is not already divisible by some basis element.
+Termination then follows from the finite number of distinct
+leading-term ideals, regardless of pair ordering. With this
+invariant in hand, we returned to the C++ code and implemented
+the early-stop rule: terminate when no progressive step has been
+made for $\tau$ iterations. The 2{,}000$\times$ sensitivity that
+six months of empirical tuning had not exposed evaporated. We
+report this not as a methodological claim but as a concrete
+instance of mechanisation paying back into the implementation.
 
 \begin{table}[ht]
 \caption{Equation-ordering ablation on the algebraic solver with
@@ -382,9 +402,13 @@ component along three axes:
   pass it as soft hints to the bit-blasting layer, avoiding
   duplicated exploration.
 
-\item \textbf{Mechanised soundness.} 25 theorems in Lean 4 with
-  zero \texttt{sorry}, including a Mathlib contribution (under
-  review) on the unit characterisation of $\mathbb{Z}_{2^d}$.
+\item \textbf{Formalisation-driven refinement.} 25 theorems in
+  Lean 4 with zero \texttt{sorry}, including a Mathlib contribution
+  (under review) on the unit characterisation of $\mathbb{Z}_{2^d}$.
+  The Lean termination proof exposed an operational invariant
+  (Section~\ref{sec:algebraic-algo}) that, when ported back to
+  the C++ implementation, eliminated a 2{,}000$\times$ ordering
+  sensitivity that empirical tuning had not caught.
 \end{enumerate}
 
 The combined procedure solves all 39 benchmarks in our custom
@@ -632,35 +656,78 @@ by the problem shape, not the bitwidth.
 \section{Vanishing Polynomial Test}
 \label{sec:vanishing}
 
-The Gr\"obner basis solver is incomplete: it returns inconclusive
-when the basis contains only even constants (non-units in
-$\mathbb{Z}_{2^d}$). This occurs for polynomials that vanish as
-\emph{functions} but are non-zero as \emph{polynomials}---e.g.,
-$4x^2 + 4x \equiv 0 \pmod{8}$ for all $x$, but has non-zero
-coefficients. We refer to such polynomials as
-\emph{vanishing polynomials} (also called zero-function
-polynomials in the literature~\cite{shekhar2007equivalence}).
-Their existence reflects
-that $\mathbb{Z}_{2^d}[x]$ has more polynomials than there are
-distinct $\mathbb{Z}_{2^d}$-valued functions on
-$\mathbb{Z}_{2^d}$, so polynomial identity is strictly stronger
-than functional equivalence.
+Ideal membership in $\mathbb{Z}_{2^d}[x_1, \ldots, x_n]$ is not the
+question an SMT user is asking. A verification engineer querying
+$\forall a, b. \, f(a, b) = g(a, b)$ over 16-bit integers means
+``for all 16-bit values of $a$ and $b$'' --- they want
+\emph{function equivalence} on the bit-vector domain. Over a field,
+the two coincide; over $\mathbb{Z}_{2^d}$ they do not. Some
+polynomials are non-zero in $\mathbb{Z}_{2^d}[x]$ but vanish as
+functions on $\mathbb{Z}_{2^d}$: the canonical example is
+$4x^2 + 4x \equiv 0 \pmod{8}$ for all
+$x \in \{0, 1, \ldots, 7\}$, even though the polynomial has
+non-zero coefficients. We refer to such polynomials as
+\emph{vanishing polynomials}~\cite{shekhar2007equivalence}; they
+exist because $\mathbb{Z}_{2^d}[x]$ has more polynomials than
+there are distinct $\mathbb{Z}_{2^d}$-valued functions on
+$\mathbb{Z}_{2^d}$.
 
-This gap is missed by the Gr\"obner-basis-only treatment of
-Song et al.~\cite{song2024equational}: their procedure decides the
-\emph{equational} theory (polynomial identity in
-$\mathbb{Z}_{2^d}[x_1, \ldots, x_n]$), not the \emph{functional}
-theory (equivalence as functions on
+The Gr\"obner-basis-only treatment of
+Song et al.~\cite{song2024equational} decides the equational
+theory (polynomial identity in $\mathbb{Z}_{2^d}[x_1, \ldots,
+x_n]$), not the functional theory (equivalence as functions on
 $\mathbb{Z}_{2^d}^n \to \mathbb{Z}_{2^d}$). For SMT queries the
-functional theory is the right one --- a verification engineer
-asking whether $a \cdot b = b \cdot a$ over 16-bit integers means
-``for all 16-bit values of $a, b$'', not ``as polynomials''.
+gap matters: it surfaces in DSP datapath verification where
+coefficient scaling causes overflow cancellation, and the two
+sides of an equivalence query differ as polynomials but agree as
+functions.
 
-Such vanishing polynomials arise in DSP datapath verification where
-coefficient scaling causes overflow cancellation. We implement the
-algebraic test of Shekhar et al.~\cite{shekhar2007equivalence},
-extended with the efficient normalisation algorithm of
+This section gives a decision procedure for function equivalence
+over $\mathbb{Z}_{2^{n_1}} \times \cdots \times
+\mathbb{Z}_{2^{n_k}} \to \mathbb{Z}_{2^m}$, complete in that
+sense. We adapt the algebraic test of
+Shekhar et al.~\cite{shekhar2007equivalence}, with the efficient
+falling-factorial / Stirling-number / Kronecker-product
+normalisation algorithm of
 G\`amez-Montolio et al.~\cite{gamez2024efficient}.
+
+\paragraph{Why a separate test, instead of adding vanishing
+polynomials to the Gr\"obner basis?}
+A natural alternative is to add the generators of the vanishing
+ideal --- the polynomials
+$2^{\max(d - \nu_2(k!),\ 0)} \cdot x^{\underline{k}}$ for
+$k = 2, \ldots, \mathrm{SF}(2^d)$, per input variable --- directly
+to the input basis of Buchberger's algorithm. The resulting strong
+Gr\"obner basis would automatically reduce vanishing polynomials to
+zero, so ideal membership would coincide with functional
+equivalence and a separate test would be unnecessary.
+
+We implemented this experimentally and found it impractical. On
+the full 39-benchmark custom suite, replacing the falling-factorial
+test with vanishing-polynomial injection \emph{loses} 9 of 39
+benchmarks --- including 7
+(\texttt{overflow\_detect\_16}, \texttt{add\_overflow\_16},
+\texttt{checked\_mul\_16}, \texttt{equiv\_unsat\_8add\_16},
+\texttt{crypto\_square\_mod}, \texttt{mul\_ineq\_12},
+\texttt{fixedpoint\_mul\_16}) that do not need vanishing reasoning
+at all and solve trivially without the test. Adding the injection
+on \emph{top} of the working vanishing test causes 2 further
+regressions
+(\texttt{div\_mul\_roundtrip\_12}: $3.97\,$s $\to$ T/O,
+\texttt{fixedpoint\_mul\_16}: $0.02\,$s $\to$ T/O). Two failure modes:
+(i) For $d = 8$, $\mathrm{SF}(2^d) = 10$, so 9 generators per
+variable are added; their pairwise S-polynomials bloat
+Buchberger's worklist even when not needed, hitting the
+100\,000-step reduction budget.
+(ii) The DSP benchmarks introduce intermediate variables for
+nested multiplications via SSA (\texttt{x2 = x*x}, \texttt{x3 =
+x*x2}, $\ldots$, up to \texttt{x10}). To use a degree-10 vanishing
+polynomial in $x$, Buchberger must first reduce the polynomial
+back to a polynomial in $x$ alone, an S-polynomial chain that
+exceeds the step budget. The falling-factorial test sidesteps
+both issues by substituting SSA definitions before testing and
+converting directly to the factorial basis. Full data in the
+supplementary material.
 
 \paragraph{Direction of completeness.}
 The vanishing-polynomial test, and the Gr\"obner-basis solver
@@ -810,44 +877,6 @@ with Section~\ref{sec:scaling}.
     permutation terms, not by polynomial arithmetic itself.}
   \label{fig:scaling}
 \end{figure}
-
-\paragraph{Why a separate test, instead of adding vanishing
-polynomials to the Gr\"obner basis?}
-A natural alternative one might consider is to add the generators
-of the vanishing ideal --- the polynomials
-$2^{\max(d - \nu_2(k!),\ 0)} \cdot x^{\underline{k}}$ for
-$k = 2, \ldots, \mathrm{SF}(2^d)$, per input variable --- directly
-to the input basis of Buchberger's algorithm. The resulting strong
-Gr\"obner basis would automatically reduce vanishing polynomials to
-zero, so ideal membership would coincide with functional
-equivalence, and a separate vanishing test would be unnecessary.
-
-We implemented this experimentally and found it impractical. On the
-full 39-benchmark custom suite, replacing the falling-factorial test
-of Section~\ref{sec:vanishing} with vanishing-polynomial injection
-\emph{loses} 9 of 39 benchmarks, including 7
-(\texttt{overflow\_detect\_16},
-\texttt{add\_overflow\_16}, \texttt{checked\_mul\_16},
-\texttt{equiv\_unsat\_8add\_16}, \texttt{crypto\_square\_mod},
-\texttt{mul\_ineq\_12}, \texttt{fixedpoint\_mul\_16}) that do not
-need vanishing reasoning at all and solve trivially without the
-test. Adding the injection on \emph{top} of the working vanishing
-test causes 2 further regressions
-(\texttt{div\_mul\_roundtrip\_12}: $3.97\,$s $\to$ T/O,
-\texttt{fixedpoint\_mul\_16}: $0.02\,$s $\to$ T/O). Two failure
-modes:
-(i) For $d = 8$, SF$(2^d) = 10$, so 9 generators per variable are
-added; their pairwise S-polynomials bloat Buchberger's worklist
-even when not needed, hitting the 100\,000-step reduction budget.
-(ii) The DSP benchmarks introduce intermediate variables for nested
-multiplications via SSA (\texttt{x2 = x*x}, \texttt{x3 = x*x2},
-$\ldots$, up to \texttt{x10}). To use a degree-10 vanishing
-polynomial in $x$,
-Buchberger must first reduce the polynomial back to a polynomial
-in $x$ alone, an S-polynomial chain that exceeds the step budget.
-The falling-factorial test sidesteps both issues by substituting
-SSA definitions before testing and converting directly to the
-factorial basis. Full data in the supplementary material.
 
 \subsection{Worked Example: $4x^2 + 4x \equiv 0 \pmod{8}$}
 \label{sec:vanishing-example}
