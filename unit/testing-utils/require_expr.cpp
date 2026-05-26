@@ -52,8 +52,8 @@ index_exprt require_expr::require_top_index(const exprt &expr)
 /// \param component_identifier: The name of the component that should be being
 ///   accessed.
 /// \return The expr cast to a member_exprt.
-member_exprt require_expr::require_member(
-  const exprt &expr, const irep_idt &component_identifier)
+member_exprt
+require_expr::require_member(const exprt &expr, irep_idt component_identifier)
 {
   REQUIRE(expr.id()==ID_member);
   const member_exprt &member_expr=to_member_expr(expr);
@@ -66,8 +66,8 @@ member_exprt require_expr::require_member(
 /// \param expr: The expression.
 /// \param symbol_name: The intended identifier of the symbol
 /// \return The expr cast to a symbol_exprt
-symbol_exprt require_expr::require_symbol(
-  const exprt &expr, const irep_idt &symbol_name)
+symbol_exprt
+require_expr::require_symbol(const exprt &expr, irep_idt symbol_name)
 {
   const symbol_exprt &symbol_expr = require_symbol(expr);
   REQUIRE(symbol_expr.identifier() == symbol_name);
@@ -98,7 +98,7 @@ typecast_exprt require_expr::require_typecast(const exprt &expr)
 /// \return The expr cast to a side_effect_exprt
 side_effect_exprt require_expr::require_side_effect_expr(
   const exprt &expr,
-  const irep_idt &side_effect_statement)
+  irep_idt side_effect_statement)
 {
   REQUIRE(expr.id() == ID_side_effect);
   const side_effect_exprt &side_effect_expr = to_side_effect_expr(expr);

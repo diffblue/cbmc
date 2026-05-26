@@ -335,15 +335,14 @@ SCENARIO(
 class java_bytecode_convert_method_unit_testt
 {
 public:
-  static exprt
-  convert_aload(const irep_idt &statement, const exprt::operandst &op)
+  static exprt convert_aload(irep_idt statement, const exprt::operandst &op)
   {
     return java_bytecode_convert_methodt::convert_aload(statement, op);
   }
 
   static code_blockt convert_astore(
     java_bytecode_convert_methodt &converter,
-    const irep_idt &statement,
+    irep_idt statement,
     const exprt::operandst &op,
     const source_locationt &location)
   {
@@ -383,7 +382,7 @@ public:
 
   static code_blockt convert_store(
     java_bytecode_convert_methodt &converter,
-    const irep_idt &statement,
+    irep_idt statement,
     const exprt &arg0,
     const exprt::operandst &op,
     const java_bytecode_convert_methodt::method_offsett address,
