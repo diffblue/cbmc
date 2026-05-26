@@ -26,7 +26,7 @@ typedef std::unordered_set<irep_idt> find_symbols_sett;
 /// \p include_bound_symbols is true, then bindings are included in the search.
 bool has_symbol_expr(
   const exprt &src,
-  const irep_idt &identifier,
+  irep_idt identifier,
   bool include_bound_symbols);
 
 /// Add to the set \p dest the sub-expressions of \p src with id ID_symbol, for

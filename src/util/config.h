@@ -251,14 +251,14 @@ public:
 
     void set_arch_spec_i386();
     void set_arch_spec_x86_64();
-    void set_arch_spec_power(const irep_idt &subarch);
-    void set_arch_spec_arm(const irep_idt &subarch);
+    void set_arch_spec_power(irep_idt subarch);
+    void set_arch_spec_arm(irep_idt subarch);
     void set_arch_spec_alpha();
-    void set_arch_spec_mips(const irep_idt &subarch);
+    void set_arch_spec_mips(irep_idt subarch);
     void set_arch_spec_riscv64();
     void set_arch_spec_s390();
     void set_arch_spec_s390x();
-    void set_arch_spec_sparc(const irep_idt &subarch);
+    void set_arch_spec_sparc(irep_idt subarch);
     void set_arch_spec_ia64();
     void set_arch_spec_x32();
     void set_arch_spec_v850();
@@ -389,7 +389,7 @@ public:
   // this is the function to start executing
   std::optional<std::string> main;
 
-  void set_arch(const irep_idt &);
+  void set_arch(irep_idt);
 
   void set_from_symbol_table(const symbol_table_baset &);
 

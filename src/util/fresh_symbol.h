@@ -31,7 +31,7 @@ get_fresh_aux_symbol(
   const std::string &name_prefix,
   const std::string &basename_prefix,
   const source_locationt &source_location,
-  const irep_idt &symbol_mode,
+  irep_idt symbol_mode,
   symbol_table_baset &symbol_table);
 
 #if defined(__GNUC__) && __GNUC__ >= 14
@@ -43,7 +43,7 @@ get_fresh_aux_symbol(
   const std::string &name_prefix,
   const std::string &basename_prefix,
   const source_locationt &source_location,
-  const irep_idt &symbol_mode,
+  irep_idt symbol_mode,
   const namespacet &ns,
   symbol_table_baset &symbol_table);
 

@@ -137,14 +137,17 @@ public:
 
   // ordering -- not the same as lexicographical ordering
 
-  bool operator< (const dstringt &b) const { return no<b.no; }
+  bool operator<(dstringt b) const
+  {
+    return no < b.no;
+  }
 
   // comparison with same type
 
-  bool operator==(const dstringt &b) const
+  bool operator==(dstringt b) const
   { return no==b.no; } // really fast equality testing
 
-  bool operator!=(const dstringt &b) const
+  bool operator!=(dstringt b) const
   { return no!=b.no; } // really fast equality testing
 
   // comparison with other types
@@ -159,7 +162,7 @@ public:
   bool operator<=(const std::string &b) const { return as_string()<=b; }
   bool operator>=(const std::string &b) const { return as_string()>=b; }
 
-  int compare(const dstringt &b) const
+  int compare(dstringt b) const
   {
     if(no==b.no)
       return 0; // equal
@@ -228,21 +231,24 @@ private:
 };
 
 // the reference returned is guaranteed to be stable
-inline const std::string &as_string(const dstringt &s)
+inline const std::string &as_string(dstringt s)
 { return get_string_container().get_string(s.get_no()); }
 
 // NOLINTNEXTLINE(readability/identifiers)
 struct dstring_hash
 {
-  size_t operator()(const dstringt &s) const { return s.hash(); }
+  size_t operator()(dstringt s) const
+  {
+    return s.hash();
+  }
 };
 
-inline size_t hash_string(const dstringt &s)
+inline size_t hash_string(dstringt s)
 {
   return s.hash();
 }
 
-inline std::ostream &operator<<(std::ostream &out, const dstringt &a)
+inline std::ostream &operator<<(std::ostream &out, dstringt a)
 {
   return a.operator<<(out);
 }

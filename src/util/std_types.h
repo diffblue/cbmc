@@ -60,7 +60,7 @@ public:
 class struct_union_typet:public typet
 {
 public:
-  explicit struct_union_typet(const irep_idt &_id):typet(_id)
+  explicit struct_union_typet(irep_idt _id) : typet(_id)
   {
   }
 
@@ -69,7 +69,7 @@ public:
   public:
     componentt() = default;
 
-    componentt(const irep_idt &_name, typet _type)
+    componentt(irep_idt _name, typet _type)
     {
       set_name(_name);
       type().swap(_type);
@@ -80,7 +80,7 @@ public:
       return get(ID_name);
     }
 
-    void set_name(const irep_idt &name)
+    void set_name(irep_idt name)
     {
       return set(ID_name, name);
     }
@@ -90,7 +90,7 @@ public:
       return get(ID_C_base_name);
     }
 
-    void set_base_name(const irep_idt &base_name)
+    void set_base_name(irep_idt base_name)
     {
       return set(ID_C_base_name, base_name);
     }
@@ -100,7 +100,7 @@ public:
       return get(ID_access);
     }
 
-    void set_access(const irep_idt &access)
+    void set_access(irep_idt access)
     {
       return set(ID_access, access);
     }
@@ -110,7 +110,7 @@ public:
       return get(ID_C_pretty_name);
     }
 
-    void set_pretty_name(const irep_idt &name)
+    void set_pretty_name(irep_idt name)
     {
       return set(ID_C_pretty_name, name);
     }
@@ -138,7 +138,7 @@ public:
 
   typedef std::vector<componentt> componentst;
 
-  struct_union_typet(const irep_idt &_id, componentst _components) : typet(_id)
+  struct_union_typet(irep_idt _id, componentst _components) : typet(_id)
   {
     components() = std::move(_components);
   }
@@ -153,19 +153,21 @@ public:
     return (componentst &)(add(ID_components).get_sub());
   }
 
-  bool has_component(const irep_idt &component_name) const
+  bool has_component(irep_idt component_name) const
   {
     return get_component(component_name).is_not_nil();
   }
 
-  const componentt &get_component(
-    const irep_idt &component_name) const;
+  const componentt &get_component(irep_idt component_name) const;
 
-  std::size_t component_number(const irep_idt &component_name) const;
-  const typet &component_type(const irep_idt &component_name) const;
+  std::size_t component_number(irep_idt component_name) const;
+  const typet &component_type(irep_idt component_name) const;
 
   irep_idt get_tag() const { return get(ID_tag); }
-  void set_tag(const irep_idt &tag) { set(ID_tag, tag); }
+  void set_tag(irep_idt tag)
+  {
+    set(ID_tag, tag);
+  }
 
   /// A struct may be a class, where members may have access restrictions.
   bool is_class() const
@@ -276,12 +278,12 @@ public:
   /// Return the base with the given name, if exists.
   /// \param id: The name of the base we are looking for.
   /// \return The base if exists.
-  std::optional<baset> get_base(const irep_idt &id) const;
+  std::optional<baset> get_base(irep_idt id) const;
 
   /// Test whether `id` is a base class/struct.
   /// \param id: symbol type name
   /// \return True if, and only if, the symbol type `id` is a base class/struct.
-  bool has_base(const irep_idt &id) const
+  bool has_base(irep_idt id) const
   {
     return get_base(id).has_value();
   }
@@ -394,14 +396,12 @@ inline class_typet &to_class_type(typet &type)
 class tag_typet:public typet
 {
 public:
-  explicit tag_typet(
-    const irep_idt &_id,
-    const irep_idt &identifier):typet(_id)
+  explicit tag_typet(irep_idt _id, irep_idt identifier) : typet(_id)
   {
     set_identifier(identifier);
   }
 
-  void set_identifier(const irep_idt &identifier)
+  void set_identifier(irep_idt identifier)
   {
     set(ID_identifier, identifier);
   }
@@ -449,7 +449,7 @@ inline tag_typet &to_tag_type(typet &type)
 class struct_or_union_tag_typet : public tag_typet
 {
 protected:
-  struct_or_union_tag_typet(const irep_idt &id, const irep_idt &identifier)
+  struct_or_union_tag_typet(irep_idt id, irep_idt identifier)
     : tag_typet(id, identifier)
   {
     PRECONDITION(id == ID_struct_tag || id == ID_union_tag);
@@ -491,7 +491,7 @@ inline struct_or_union_tag_typet &to_struct_or_union_tag_type(typet &type)
 class struct_tag_typet : public struct_or_union_tag_typet
 {
 public:
-  explicit struct_tag_typet(const irep_idt &identifier)
+  explicit struct_tag_typet(irep_idt identifier)
     : struct_or_union_tag_typet(ID_struct_tag, identifier)
   {
   }
@@ -620,12 +620,12 @@ public:
     // The following for methods will go away;
     // these should not be part of the signature of a function,
     // but rather part of the body.
-    void set_identifier(const irep_idt &identifier)
+    void set_identifier(irep_idt identifier)
     {
       set(ID_C_identifier, identifier);
     }
 
-    void set_base_name(const irep_idt &name)
+    void set_base_name(irep_idt name)
     {
       set(ID_C_base_name, name);
     }
@@ -720,7 +720,7 @@ public:
     return get(ID_access);
   }
 
-  void set_access(const irep_idt &access)
+  void set_access(irep_idt access)
   {
     return set(ID_access, access);
   }

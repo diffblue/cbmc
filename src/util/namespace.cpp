@@ -131,9 +131,7 @@ std::size_t namespacet::smallest_unused_suffix(const std::string &prefix) const
 /// \param symbol: The const pointer to the reference of the symbol
 ///   if it's found during lookup.
 /// \return False if the symbol was found, True otherwise.
-bool namespacet::lookup(
-  const irep_idt &name,
-  const symbolt *&symbol) const
+bool namespacet::lookup(irep_idt name, const symbolt *&symbol) const
 {
   symbol_table_baset::symbolst::const_iterator it;
 
@@ -182,9 +180,7 @@ multi_namespacet::smallest_unused_suffix(const std::string &prefix) const
 /// \param symbol: The const pointer to the reference of the symbol
 ///   if it's found during lookup.
 /// \return False if the symbol was found, True otherwise.
-bool multi_namespacet::lookup(
-  const irep_idt &name,
-  const symbolt *&symbol) const
+bool multi_namespacet::lookup(irep_idt name, const symbolt *&symbol) const
 {
   symbol_table_baset::symbolst::const_iterator s_it;
 

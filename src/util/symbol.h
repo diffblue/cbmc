@@ -84,7 +84,7 @@ public:
   {
   }
 
-  symbolt(const irep_idt &_name, typet _type, const irep_idt &_mode)
+  symbolt(irep_idt _name, typet _type, irep_idt _mode)
     : type(std::move(_type)),
       value(static_cast<const exprt &>(get_nil_irep())),
       location(source_locationt::nil()),
@@ -138,7 +138,7 @@ std::ostream &operator<<(std::ostream &out, const symbolt &symbol);
 class type_symbolt:public symbolt
 {
 public:
-  type_symbolt(const irep_idt &_name, typet _type, const irep_idt &_mode)
+  type_symbolt(irep_idt _name, typet _type, irep_idt _mode)
     : symbolt(_name, _type, _mode)
   {
     is_type = true;
@@ -161,7 +161,7 @@ public:
     is_auxiliary=true;
   }
 
-  auxiliary_symbolt(const irep_idt &name, typet type, const irep_idt &mode)
+  auxiliary_symbolt(irep_idt name, typet type, irep_idt mode)
     : symbolt(name, type, mode)
   {
     is_lvalue = true;

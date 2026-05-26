@@ -421,12 +421,12 @@ inline bitnand_exprt &to_bitnand_expr(exprt &expr)
 class shift_exprt : public binary_exprt
 {
 public:
-  shift_exprt(exprt _src, const irep_idt &_id, exprt _distance)
+  shift_exprt(exprt _src, irep_idt _id, exprt _distance)
     : binary_exprt(std::move(_src), _id, std::move(_distance))
   {
   }
 
-  shift_exprt(exprt _src, const irep_idt &_id, const std::size_t _distance);
+  shift_exprt(exprt _src, irep_idt _id, const std::size_t _distance);
 
   exprt &op()
   {
@@ -1056,7 +1056,7 @@ inline popcount_exprt &to_popcount_expr(exprt &expr)
 class binary_overflow_exprt : public binary_predicate_exprt
 {
 public:
-  binary_overflow_exprt(exprt _lhs, const irep_idt &kind, exprt _rhs)
+  binary_overflow_exprt(exprt _lhs, irep_idt kind, exprt _rhs)
     : binary_predicate_exprt(std::move(_lhs), make_id(kind), std::move(_rhs))
   {
     INVARIANT(
@@ -1090,14 +1090,14 @@ public:
   }
 
   /// Returns true iff \p id is a valid identifier of a `binary_overflow_exprt`.
-  static bool valid_id(const irep_idt &id)
+  static bool valid_id(irep_idt id)
   {
     return id == ID_overflow_plus || id == ID_overflow_mult ||
            id == ID_overflow_minus || id == ID_overflow_shl;
   }
 
 private:
-  static irep_idt make_id(const irep_idt &kind)
+  static irep_idt make_id(irep_idt kind)
   {
     if(valid_id(kind))
       return kind;
@@ -1223,7 +1223,7 @@ inline bool can_cast_expr<shl_overflow_exprt>(const exprt &base)
 class unary_overflow_exprt : public unary_predicate_exprt
 {
 public:
-  unary_overflow_exprt(const irep_idt &kind, exprt _op)
+  unary_overflow_exprt(irep_idt kind, exprt _op)
     : unary_predicate_exprt("overflow-" + id2string(kind), std::move(_op))
   {
   }
@@ -1656,7 +1656,7 @@ inline saturating_minus_exprt &to_saturating_minus_expr(exprt &expr)
 class overflow_result_exprt : public expr_protectedt
 {
 public:
-  overflow_result_exprt(exprt _lhs, const irep_idt &kind, exprt _rhs)
+  overflow_result_exprt(exprt _lhs, irep_idt kind, exprt _rhs)
     : expr_protectedt(
         make_id(kind),
         struct_typet{
@@ -1670,7 +1670,7 @@ public:
       "of expected valid kinds.");
   }
 
-  overflow_result_exprt(exprt _op, const irep_idt &kind)
+  overflow_result_exprt(exprt _op, irep_idt kind)
     : expr_protectedt(
         make_id(kind),
         struct_typet{
@@ -1721,7 +1721,7 @@ public:
   }
 
   /// Returns true iff \p id is a valid identifier of an `overflow_exprt`.
-  static bool valid_id(const irep_idt &id)
+  static bool valid_id(irep_idt id)
   {
     return id == ID_overflow_result_plus || id == ID_overflow_result_mult ||
            id == ID_overflow_result_minus || id == ID_overflow_result_shl ||
@@ -1729,7 +1729,7 @@ public:
   }
 
 private:
-  static irep_idt make_id(const irep_idt &kind)
+  static irep_idt make_id(irep_idt kind)
   {
     return "overflow_result-" + id2string(kind);
   }
