@@ -28,7 +28,7 @@ class value_setst;
 void race_check(
   value_setst &,
   class symbol_table_baset &,
-  const irep_idt &function_id,
+  irep_idt function_id,
 #ifdef LOCAL_MAY
   const goto_functionst::goto_functiont &goto_function,
 #endif

@@ -111,8 +111,7 @@ protected:
 class assert_criteriont:public slicing_criteriont
 {
 public:
-  virtual bool
-  operator()(const irep_idt &, goto_programt::const_targett target) const
+  virtual bool operator()(irep_idt, goto_programt::const_targett target) const
   {
     return target->is_assert();
   }
@@ -127,7 +126,7 @@ public:
   }
 
   virtual bool
-  operator()(const irep_idt &function_id, goto_programt::const_targett) const
+  operator()(irep_idt function_id, goto_programt::const_targett) const
   {
     return function_id == target_function;
   }
@@ -145,8 +144,7 @@ public:
   {
   }
 
-  virtual bool
-  operator()(const irep_idt &, goto_programt::const_targett target) const
+  virtual bool operator()(irep_idt, goto_programt::const_targett target) const
   {
     if(!target->is_assert())
       return false;

@@ -194,7 +194,7 @@ public:
   ///  \param _st symbol table of the goto_model
   ///  \param _message_handler used to output warning/error messages
   instrument_spec_assignst(
-    const irep_idt &_function_id,
+    irep_idt _function_id,
     const goto_functionst &_functions,
     cfg_infot &_cfg_info,
     symbol_table_baset &_st,
@@ -471,7 +471,7 @@ public:
 
 protected:
   /// Name of the instrumented function
-  const irep_idt &function_id;
+  irep_idt function_id;
 
   /// Other functions of the model
   const goto_functionst &functions;
@@ -489,7 +489,7 @@ protected:
   messaget log;
 
   /// Language mode
-  const irep_idt &mode;
+  irep_idt mode;
 
   /// Track and generate snaphsot instructions and target validity
   /// checking assertions for a conditional target group from an assigns clause
@@ -575,7 +575,7 @@ protected:
   /// passed C compiler checks, non-dirty locals can only be assigned to
   /// directly by name, cannot escape their lexical scope, and are always safe
   /// to assign. Hence, we only track dirty locals in the write set.
-  bool must_track_decl_or_dead(const irep_idt &ident) const;
+  bool must_track_decl_or_dead(irep_idt ident) const;
 
   /// Returns true iff an `ASSIGN lhs := rhs` instruction must be instrumented.
   bool must_check_assign(const goto_programt::const_targett &target);

@@ -46,7 +46,7 @@ protected:
   bool render_by_file;
   bool render_by_function;
 
-  bool inline local(const irep_idt &id);
+  bool inline local(irep_idt id);
 
   void inline add_instr_to_interleaving(
     goto_programt::instructionst::iterator it,
@@ -99,7 +99,7 @@ protected:
     unsigned coming_from;
 
     bool contains_shared_array(
-      const irep_idt &function_id,
+      irep_idt function_id,
       goto_programt::const_targett targ,
       goto_programt::const_targett i_it,
       value_setst &value_sets
@@ -107,13 +107,13 @@ protected:
       ,
       local_may_aliast local_may
 #endif
-      ) const; // NOLINT(whitespace/parens)
+    ) const; // NOLINT(whitespace/parens)
 
     /* transformers */
     void visit_cfg_thread() const;
     void visit_cfg_propagate(goto_programt::instructionst::iterator i_it);
     void visit_cfg_body(
-      const irep_idt &function_id,
+      irep_idt function_id,
       const goto_programt &goto_program,
       goto_programt::const_targett i_it,
       loop_strategyt replicate_body,
@@ -131,7 +131,7 @@ protected:
       goto_programt::const_targett i_it);
     void visit_cfg_assign(
       value_setst &value_sets,
-      const irep_idt &function_id,
+      irep_idt function_id,
       goto_programt::instructionst::iterator &i_it,
       bool no_dependencies
 #ifdef LOCAL_MAY
@@ -141,21 +141,21 @@ protected:
     ); // NOLINT(whitespace/parens)
     void visit_cfg_fence(
       goto_programt::instructionst::iterator i_it,
-      const irep_idt &function_id);
+      irep_idt function_id);
     void visit_cfg_skip(goto_programt::instructionst::iterator i_it);
     void visit_cfg_lwfence(
       goto_programt::instructionst::iterator i_it,
-      const irep_idt &function_id);
+      irep_idt function_id);
     void visit_cfg_asm_fence(
       goto_programt::instructionst::iterator i_it,
-      const irep_idt &function_id);
+      irep_idt function_id);
     void visit_cfg_function_call(value_setst &value_sets,
       goto_programt::instructionst::iterator i_it,
       memory_modelt model,
       bool no_dependenciess,
       loop_strategyt duplicate_body);
     void visit_cfg_goto(
-      const irep_idt &function_id,
+      irep_idt function_id,
       const goto_programt &goto_program,
       goto_programt::instructionst::iterator i_it,
       /* forces the duplication of all the loops, with array or not
@@ -244,14 +244,14 @@ protected:
       coming_from = 0;
     }
 
-    void inline enter_function(const irep_idt &function_id)
+    void inline enter_function(irep_idt function_id)
     {
       if(functions_met.find(function_id) != functions_met.end())
         throw "sorry, doesn't handle recursive function for the moment";
       functions_met.insert(function_id);
     }
 
-    void inline leave_function(const irep_idt &function_id)
+    void inline leave_function(irep_idt function_id)
     {
       functions_met.erase(function_id);
     }
@@ -261,7 +261,7 @@ protected:
       memory_modelt model,
       bool no_dependencies,
       loop_strategyt duplicate_body,
-      const irep_idt &function_id)
+      irep_idt function_id)
     {
       /* ignore recursive calls -- underapproximation */
       try
@@ -297,10 +297,10 @@ protected:
       memory_modelt model,
       bool no_dependencies,
       loop_strategyt duplicate_body,
-      const irep_idt &function_id,
+      irep_idt function_id,
       std::set<nodet> &ending_vertex);
 
-    bool inline local(const irep_idt &i);
+    bool inline local(irep_idt i);
   };
 
 public:

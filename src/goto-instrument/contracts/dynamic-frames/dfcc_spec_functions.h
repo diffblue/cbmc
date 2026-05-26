@@ -74,8 +74,8 @@ public:
   /// \param[in] havoc_function_id write set variable to havoc
   /// \param[out] nof_targets maximum number of targets to havoc
   void generate_havoc_function(
-    const irep_idt &function_id,
-    const irep_idt &havoc_function_id,
+    irep_idt function_id,
+    irep_idt havoc_function_id,
     std::size_t &nof_targets);
 
   /// Translates \p original_program that specifies assignable targets
@@ -100,7 +100,7 @@ public:
   /// \param[out] havoc_program destination program for havoc instructions
   /// \param[out] nof_targets max number of havoc targets discovered
   void generate_havoc_instructions(
-    const irep_idt &function_id,
+    irep_idt function_id,
     const goto_programt &original_program,
     const exprt &write_set_to_havoc,
     dfcc_ptr_havoc_modet ptr_havoc_mode,
@@ -128,9 +128,7 @@ public:
   /// \param function_id function to transform in place
   /// \param nof_targets receives the estimated size of the write set
   ///
-  void to_spec_assigns_function(
-    const irep_idt &function_id,
-    std::size_t &nof_targets);
+  void to_spec_assigns_function(irep_idt function_id, std::size_t &nof_targets);
 
   /// Rewrites in place \p program expressed in terms of built-ins specifying
   /// assignable targets declaratively using `__CPROVER_assignable`,
@@ -153,7 +151,7 @@ public:
   ///
   void to_spec_assigns_instructions(
     const exprt &write_set_to_fill,
-    const irep_idt &language_mode,
+    irep_idt language_mode,
     goto_programt &program,
     std::size_t &nof_targets);
 
@@ -180,8 +178,7 @@ public:
   /// \param function_id function to transform in place
   /// \param nof_targets receives the estimated size of the write set
   ///
-  void
-  to_spec_frees_function(const irep_idt &function_id, std::size_t &nof_targets);
+  void to_spec_frees_function(irep_idt function_id, std::size_t &nof_targets);
 
   /// Rewrites in place \p program expressed in terms of built-ins specifying
   /// freeable targets declaratively using `__CPROVER_freeable` into a program
@@ -202,7 +199,7 @@ public:
   ///
   void to_spec_frees_instructions(
     const exprt &write_set_to_fill,
-    const irep_idt &language_mode,
+    irep_idt language_mode,
     goto_programt &program,
     std::size_t &nof_targets);
 

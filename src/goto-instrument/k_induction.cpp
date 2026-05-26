@@ -24,7 +24,7 @@ class k_inductiont
 {
 public:
   k_inductiont(
-    const irep_idt &_function_id,
+    irep_idt _function_id,
     goto_functiont &_goto_function,
     bool _base_case,
     bool _step_case,
@@ -43,7 +43,7 @@ public:
   }
 
 protected:
-  const irep_idt &function_id;
+  irep_idt function_id;
   goto_functiont &goto_function;
   local_may_aliast local_may_alias;
   natural_loops_mutablet natural_loops;

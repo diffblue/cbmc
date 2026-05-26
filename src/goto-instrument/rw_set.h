@@ -49,7 +49,7 @@ public:
 
     entryt(
       const symbol_exprt &_symbol_expr,
-      const irep_idt &_object,
+      irep_idt _object,
       const exprt &_guard)
       : symbol_expr(_symbol_expr), object(_object), guard(_guard)
     {
@@ -130,7 +130,7 @@ public:
   _rw_set_loct(
     const namespacet &_ns,
     value_setst &_value_sets,
-    const irep_idt &_function_id,
+    irep_idt _function_id,
     goto_programt::const_targett _target,
     message_handlert &message_handler)
     : rw_set_baset(_ns, message_handler),
@@ -199,7 +199,7 @@ public:
   rw_set_loct(
     const namespacet &_ns,
     value_setst &_value_sets,
-    const irep_idt &_function_id,
+    irep_idt _function_id,
     goto_programt::const_targett _target,
     message_handlert &message_handler)
     : _rw_set_loct(_ns, _value_sets, _function_id, _target, message_handler)
@@ -270,7 +270,7 @@ public:
   rw_set_with_trackt(
     const namespacet &_ns,
     value_setst &_value_sets,
-    const irep_idt &_function_id,
+    irep_idt _function_id,
     goto_programt::const_targett _target,
     message_handlert &message_handler)
     : _rw_set_loct(_ns, _value_sets, _function_id, _target, message_handler),

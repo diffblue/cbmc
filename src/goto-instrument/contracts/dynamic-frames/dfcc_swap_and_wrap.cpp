@@ -42,8 +42,8 @@ std::map<
 void dfcc_swap_and_wrapt::swap_and_wrap(
   const dfcc_contract_modet contract_mode,
   const loop_contract_configt &loop_contract_config,
-  const irep_idt &function_id,
-  const irep_idt &contract_id,
+  irep_idt function_id,
+  irep_idt contract_id,
   std::set<irep_idt> &function_pointer_contracts,
   bool allow_recursive_calls)
 {
@@ -133,8 +133,8 @@ void dfcc_swap_and_wrapt::get_swapped_functions(std::set<irep_idt> &dest) const
 /// ```
 void dfcc_swap_and_wrapt::check_contract(
   const loop_contract_configt &loop_contract_config,
-  const irep_idt &function_id,
-  const irep_idt &contract_id,
+  irep_idt function_id,
+  irep_idt contract_id,
   std::set<irep_idt> &function_pointer_contracts,
   bool allow_recursive_calls)
 {
@@ -264,8 +264,8 @@ void dfcc_swap_and_wrapt::check_contract(
 }
 
 void dfcc_swap_and_wrapt::replace_with_contract(
-  const irep_idt &function_id,
-  const irep_idt &contract_id,
+  irep_idt function_id,
+  irep_idt contract_id,
   std::set<irep_idt> &function_pointer_contracts)
 {
   const irep_idt &wrapper_id = function_id;

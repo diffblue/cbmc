@@ -225,19 +225,19 @@ std::size_t dfcc_instrumentt::get_max_assigns_clause_size() const
 */
 
 /// True iff the symbol must not be instrumented
-bool dfcc_instrumentt::is_internal_symbol(const irep_idt &id) const
+bool dfcc_instrumentt::is_internal_symbol(irep_idt id) const
 {
   return internal_symbols.find(id) != internal_symbols.end();
 }
 
-bool dfcc_instrumentt::do_not_instrument(const irep_idt &id) const
+bool dfcc_instrumentt::do_not_instrument(irep_idt id) const
 {
   return !has_prefix(id2string(id), CPROVER_PREFIX "file_local") &&
          (dfcc_is_cprover_function_symbol(id) || is_internal_symbol(id));
 }
 
 void dfcc_instrumentt::instrument_harness_function(
-  const irep_idt &function_id,
+  irep_idt function_id,
   const loop_contract_configt &loop_contract_config,
   std::set<irep_idt> &function_pointer_contracts)
 {
@@ -296,8 +296,7 @@ void dfcc_instrumentt::instrument_harness_function(
   goto_model.goto_functions.update();
 }
 
-std::set<symbol_exprt>
-dfcc_instrumentt::get_local_statics(const irep_idt &function_id)
+std::set<symbol_exprt> dfcc_instrumentt::get_local_statics(irep_idt function_id)
 {
   std::set<symbol_exprt> local_statics;
   for(const auto &sym_pair : goto_model.symbol_table)
@@ -316,7 +315,7 @@ dfcc_instrumentt::get_local_statics(const irep_idt &function_id)
 }
 
 void dfcc_instrumentt::instrument_function(
-  const irep_idt &function_id,
+  irep_idt function_id,
   const loop_contract_configt &loop_contract_config,
   std::set<irep_idt> &function_pointer_contracts)
 {
@@ -351,8 +350,8 @@ void dfcc_instrumentt::instrument_function(
 }
 
 void dfcc_instrumentt::instrument_wrapped_function(
-  const irep_idt &wrapped_function_id,
-  const irep_idt &initial_function_id,
+  irep_idt wrapped_function_id,
+  irep_idt initial_function_id,
   const loop_contract_configt &loop_contract_config,
   std::set<irep_idt> &function_pointer_contracts)
 {
@@ -389,7 +388,7 @@ void dfcc_instrumentt::instrument_wrapped_function(
 }
 
 void dfcc_instrumentt::instrument_goto_program(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt &goto_program,
   const exprt &write_set,
   std::set<irep_idt> &function_pointer_contracts)
@@ -427,7 +426,7 @@ void dfcc_instrumentt::instrument_goto_program(
 }
 
 void dfcc_instrumentt::instrument_goto_function(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_functiont &goto_function,
   const exprt &write_set,
   const std::set<symbol_exprt> &local_statics,
@@ -519,7 +518,7 @@ void dfcc_instrumentt::instrument_goto_function(
 }
 
 void dfcc_instrumentt::instrument_instructions(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt &goto_program,
   goto_programt::targett first_instruction,
   const goto_programt::targett &last_instruction,
@@ -587,7 +586,7 @@ void dfcc_instrumentt::instrument_instructions(
 }
 
 void dfcc_instrumentt::insert_add_decl_call(
-  const irep_idt &function_id,
+  irep_idt function_id,
   const exprt &write_set,
   const symbol_exprt &symbol_expr,
   goto_programt::targett &target,
@@ -617,7 +616,7 @@ void dfcc_instrumentt::insert_add_decl_call(
 /// insert_add_decl_call(...);
 /// ```
 void dfcc_instrumentt::instrument_decl(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt::targett &target,
   goto_programt &goto_program,
   dfcc_cfg_infot &cfg_info)
@@ -634,7 +633,7 @@ void dfcc_instrumentt::instrument_decl(
 }
 
 void dfcc_instrumentt::insert_record_dead_call(
-  const irep_idt &function_id,
+  irep_idt function_id,
   const exprt &write_set,
   const symbol_exprt &symbol_expr,
   goto_programt::targett &target,
@@ -665,7 +664,7 @@ void dfcc_instrumentt::insert_record_dead_call(
 /// DEAD x;
 /// ```
 void dfcc_instrumentt::instrument_dead(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt::targett &target,
   goto_programt &goto_program,
   dfcc_cfg_infot &cfg_info)
@@ -680,7 +679,7 @@ void dfcc_instrumentt::instrument_dead(
 }
 
 void dfcc_instrumentt::instrument_lhs(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt::targett &target,
   const exprt &lhs,
   goto_programt &goto_program,
@@ -742,7 +741,7 @@ void dfcc_instrumentt::instrument_lhs(
 }
 
 void dfcc_instrumentt::instrument_assign(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt::targett &target,
   goto_programt &goto_program,
   dfcc_cfg_infot &cfg_info)
@@ -868,7 +867,7 @@ void dfcc_instrumentt::instrument_call_instruction(
 }
 
 void dfcc_instrumentt::instrument_deallocate_call(
-  const irep_idt &function_id,
+  irep_idt function_id,
   const exprt &write_set,
   goto_programt::targett &target,
   goto_programt &goto_program)
@@ -937,7 +936,7 @@ void dfcc_instrumentt::instrument_deallocate_call(
 }
 
 void dfcc_instrumentt::instrument_function_call(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt::targett &target,
   goto_programt &goto_program,
   dfcc_cfg_infot &cfg_info)
@@ -971,7 +970,7 @@ void dfcc_instrumentt::instrument_function_call(
 }
 
 void dfcc_instrumentt::instrument_other(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt::targett &target,
   goto_programt &goto_program,
   dfcc_cfg_infot &cfg_info)
@@ -1169,7 +1168,7 @@ void dfcc_instrumentt::instrument_other(
 }
 
 void dfcc_instrumentt::apply_loop_contracts(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_functiont &goto_function,
   dfcc_cfg_infot &cfg_info,
   const loop_contract_configt &loop_contract_config,

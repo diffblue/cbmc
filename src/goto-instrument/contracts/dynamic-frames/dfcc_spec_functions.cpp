@@ -42,8 +42,8 @@ const typet &dfcc_spec_functionst::get_target_type(const exprt &expr)
 }
 
 void dfcc_spec_functionst::generate_havoc_function(
-  const irep_idt &function_id,
-  const irep_idt &havoc_function_id,
+  irep_idt function_id,
+  irep_idt havoc_function_id,
   std::size_t &nof_targets)
 {
   INVARIANT(
@@ -143,7 +143,7 @@ void dfcc_spec_functionst::generate_havoc_function(
 }
 
 void dfcc_spec_functionst::generate_havoc_instructions(
-  const irep_idt &function_id,
+  irep_idt function_id,
   const goto_programt &original_program,
   const exprt &write_set_to_havoc,
   dfcc_ptr_havoc_modet ptr_havoc_mode,
@@ -277,7 +277,7 @@ void dfcc_spec_functionst::generate_havoc_instructions(
 }
 
 void dfcc_spec_functionst::to_spec_assigns_function(
-  const irep_idt &function_id,
+  irep_idt function_id,
   std::size_t &nof_targets)
 {
   auto &goto_function = goto_model.goto_functions.function_map.at(function_id);
@@ -304,7 +304,7 @@ void dfcc_spec_functionst::to_spec_assigns_function(
 
 void dfcc_spec_functionst::to_spec_assigns_instructions(
   const exprt &write_set_to_fill,
-  const irep_idt &language_mode,
+  irep_idt language_mode,
   goto_programt &program,
   std::size_t &nof_targets)
 {
@@ -360,7 +360,7 @@ void dfcc_spec_functionst::to_spec_assigns_instructions(
 }
 
 void dfcc_spec_functionst::to_spec_frees_function(
-  const irep_idt &function_id,
+  irep_idt function_id,
   std::size_t &nof_targets)
 {
   auto &goto_function = goto_model.goto_functions.function_map.at(function_id);
@@ -387,7 +387,7 @@ void dfcc_spec_functionst::to_spec_frees_function(
 
 void dfcc_spec_functionst::to_spec_frees_instructions(
   const exprt &write_set_to_fill,
-  const irep_idt &language_mode,
+  irep_idt language_mode,
   goto_programt &program,
   std::size_t &nof_targets)
 {

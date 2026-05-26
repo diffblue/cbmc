@@ -58,7 +58,7 @@ static bool potential_race_on_write(
 static void interrupt(
   value_setst &value_sets,
   const symbol_tablet &symbol_table,
-  const irep_idt &function_id,
+  irep_idt function_id,
 #ifdef LOCAL_MAY
   const goto_functionst::goto_functiont &goto_function,
 #endif
@@ -151,7 +151,7 @@ static void interrupt(
 }
 
 static symbol_exprt
-get_isr(const symbol_tablet &symbol_table, const irep_idt &interrupt_handler)
+get_isr(const symbol_tablet &symbol_table, irep_idt interrupt_handler)
 {
   std::list<symbol_exprt> matches;
 
@@ -188,7 +188,7 @@ get_isr(const symbol_tablet &symbol_table, const irep_idt &interrupt_handler)
 void interrupt(
   value_setst &value_sets,
   goto_modelt &goto_model,
-  const irep_idt &interrupt_handler,
+  irep_idt interrupt_handler,
   message_handlert &message_handler)
 {
   // look up the ISR

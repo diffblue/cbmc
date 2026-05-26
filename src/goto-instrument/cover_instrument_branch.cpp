@@ -14,7 +14,7 @@ Author: Daniel Kroening
 #include "cover_instrument.h"
 
 void cover_branch_instrumentert::instrument(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt &goto_program,
   goto_programt::targett &i_it,
   const cover_blocks_baset &basic_blocks,

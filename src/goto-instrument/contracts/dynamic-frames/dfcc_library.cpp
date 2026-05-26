@@ -195,13 +195,13 @@ dfcc_libraryt::dfcc_libraryt(
 }
 
 /// Returns the instrumentation function to use for a given front-end function
-bool dfcc_libraryt::is_front_end_builtin(const irep_idt &function_id) const
+bool dfcc_libraryt::is_front_end_builtin(irep_idt function_id) const
 {
   return dfcc_hook.find(function_id) != dfcc_hook.end();
 }
 
 /// Returns the instrumentation function to use for a given front-end function
-dfcc_funt dfcc_libraryt::get_hook(const irep_idt &function_id) const
+dfcc_funt dfcc_libraryt::get_hook(irep_idt function_id) const
 {
   PRECONDITION(is_front_end_builtin(function_id));
   return dfcc_hook.find(function_id)->second;
@@ -209,7 +209,7 @@ dfcc_funt dfcc_libraryt::get_hook(const irep_idt &function_id) const
 
 // Returns the havoc function to use for a given front-end function
 std::optional<dfcc_funt>
-dfcc_libraryt::get_havoc_hook(const irep_idt &function_id) const
+dfcc_libraryt::get_havoc_hook(irep_idt function_id) const
 {
   auto found = havoc_hook.find(function_id);
   if(found != havoc_hook.end())
@@ -368,7 +368,7 @@ void dfcc_libraryt::load(std::set<irep_idt> &to_instrument)
     goto_model.goto_functions.function_map.at(it.second.name).make_hidden();
 }
 
-std::optional<dfcc_funt> dfcc_libraryt::get_dfcc_fun(const irep_idt &id) const
+std::optional<dfcc_funt> dfcc_libraryt::get_dfcc_fun(irep_idt id) const
 {
   auto found = dfcc_name_to_fun.find(id);
   if(found != dfcc_name_to_fun.end())
@@ -377,7 +377,7 @@ std::optional<dfcc_funt> dfcc_libraryt::get_dfcc_fun(const irep_idt &id) const
     return {};
 }
 
-bool dfcc_libraryt::is_dfcc_library_symbol(const irep_idt &id) const
+bool dfcc_libraryt::is_dfcc_library_symbol(irep_idt id) const
 {
   return get_dfcc_fun(id).has_value();
 }

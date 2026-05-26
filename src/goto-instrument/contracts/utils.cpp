@@ -328,14 +328,14 @@ static const char ASSIGNS_CLAUSE_REPLACEMENT_TRACKING[] =
 
 irep_idt make_assigns_clause_replacement_tracking_comment(
   const exprt &target,
-  const irep_idt &function_id,
+  irep_idt function_id,
   const namespacet &ns)
 {
   return from_expr(ns, target.id(), target) +
          ASSIGNS_CLAUSE_REPLACEMENT_TRACKING + id2string(function_id) + ")";
 }
 
-bool is_assigns_clause_replacement_tracking_comment(const irep_idt &comment)
+bool is_assigns_clause_replacement_tracking_comment(irep_idt comment)
 {
   return id2string(comment).find(ASSIGNS_CLAUSE_REPLACEMENT_TRACKING) !=
          std::string::npos;
@@ -388,9 +388,9 @@ static void replace_history_parameter_rec(
   exprt &expr,
   std::unordered_map<exprt, symbol_exprt, irep_hash> &parameter2history,
   const source_locationt &location,
-  const irep_idt &mode,
+  irep_idt mode,
   goto_programt &history,
-  const irep_idt &history_id)
+  irep_idt history_id)
 {
   for(auto &op : expr.operands())
   {
@@ -457,7 +457,7 @@ replace_history_parametert replace_history_old(
   symbol_table_baset &symbol_table,
   const exprt &expr,
   const source_locationt &location,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   replace_history_parametert result;
   result.expression_after_replacement = expr;
@@ -476,7 +476,7 @@ replace_history_parametert replace_history_loop_entry(
   symbol_table_baset &symbol_table,
   const exprt &expr,
   const source_locationt &location,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   replace_history_parametert result;
   result.expression_after_replacement = expr;
@@ -494,7 +494,7 @@ replace_history_parametert replace_history_loop_entry(
 void generate_history_variables_initialization(
   symbol_table_baset &symbol_table,
   exprt &clause,
-  const irep_idt &mode,
+  irep_idt mode,
   goto_programt &program)
 {
   // Find and replace "old" expression in the "expression" variable

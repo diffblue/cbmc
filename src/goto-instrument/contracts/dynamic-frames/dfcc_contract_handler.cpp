@@ -43,7 +43,7 @@ dfcc_contract_handlert::dfcc_contract_handlert(
 }
 
 const dfcc_contract_functionst &
-dfcc_contract_handlert::get_contract_functions(const irep_idt &contract_id)
+dfcc_contract_handlert::get_contract_functions(irep_idt contract_id)
 {
   auto iter = dfcc_contract_handlert::contract_cache.find(contract_id);
 
@@ -67,16 +67,16 @@ dfcc_contract_handlert::get_contract_functions(const irep_idt &contract_id)
 }
 
 const std::size_t
-dfcc_contract_handlert::get_assigns_clause_size(const irep_idt &contract_id)
+dfcc_contract_handlert::get_assigns_clause_size(irep_idt contract_id)
 {
   return get_contract_functions(contract_id).get_nof_assigns_targets();
 }
 
 void dfcc_contract_handlert::add_contract_instructions(
   const dfcc_contract_modet contract_mode,
-  const irep_idt &wrapper_id,
-  const irep_idt &wrapped_id,
-  const irep_idt &contract_id,
+  irep_idt wrapper_id,
+  irep_idt wrapped_id,
+  irep_idt contract_id,
   const symbolt &wrapper_write_set_symbol,
   goto_programt &dest,
   std::set<irep_idt> &function_pointer_contracts)
@@ -96,7 +96,7 @@ void dfcc_contract_handlert::add_contract_instructions(
 }
 
 const symbolt &dfcc_contract_handlert::get_pure_contract_symbol(
-  const irep_idt &contract_id,
+  irep_idt contract_id,
   const std::optional<irep_idt> function_id_opt)
 {
   auto pure_contract_id = "contract::" + id2string(contract_id);
@@ -141,9 +141,9 @@ const symbolt &dfcc_contract_handlert::get_pure_contract_symbol(
 }
 
 void dfcc_contract_handlert::check_signature_compat(
-  const irep_idt &contract_id,
+  irep_idt contract_id,
   const code_typet &contract_type,
-  const irep_idt &pure_contract_id,
+  irep_idt pure_contract_id,
   const code_typet &pure_contract_type)
 {
   // can we turn a call to `contract` into a call to `pure_contract` ?

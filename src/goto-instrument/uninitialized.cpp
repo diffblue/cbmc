@@ -23,9 +23,7 @@ public:
   {
   }
 
-  void add_assertions(
-    const irep_idt &function_identifer,
-    goto_programt &goto_program);
+  void add_assertions(irep_idt function_identifer, goto_programt &goto_program);
 
 protected:
   symbol_table_baset &symbol_table;
@@ -61,7 +59,7 @@ void uninitializedt::get_tracking(goto_programt::const_targett i_it)
 }
 
 void uninitializedt::add_assertions(
-  const irep_idt &function_identifier,
+  irep_idt function_identifier,
   goto_programt &goto_program)
 {
   uninitialized_analysis(function_identifier, goto_program, ns);

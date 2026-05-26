@@ -117,7 +117,7 @@ public:
     const bool use_all_headers,
     const bool include_harness,
     const namespacet &_ns,
-    const irep_idt &mode,
+    irep_idt mode,
     const dump_c_configurationt config)
     : goto_functions(_goto_functions),
       copied_symbol_table(_ns.get_symbol_table()),
@@ -136,7 +136,7 @@ public:
     const bool use_all_headers,
     const bool include_harness,
     const namespacet &_ns,
-    const irep_idt &mode)
+    irep_idt mode)
     : dump_ct(
         _goto_functions,
         use_system_headers,
@@ -177,9 +177,7 @@ protected:
     bool early;
     std::unordered_set<irep_idt> dependencies;
 
-    explicit typedef_infot(const irep_idt &name):
-      typedef_name(name),
-      early(false)
+    explicit typedef_infot(irep_idt name) : typedef_name(name), early(false)
     {
     }
   };
@@ -196,9 +194,7 @@ protected:
     return std::string(2*n, ' ');
   }
 
-  std::string make_decl(
-      const irep_idt &identifier,
-      const typet &type)
+  std::string make_decl(irep_idt identifier, const typet &type)
   {
     symbol_exprt sym(identifier, type);
     code_frontend_declt d(sym);

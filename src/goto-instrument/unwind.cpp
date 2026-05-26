@@ -81,7 +81,7 @@ void goto_unwindt::copy_segment(
 }
 
 void goto_unwindt::unwind(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt &goto_program,
   const goto_programt::const_targett loop_head,
   const goto_programt::const_targett loop_exit,
@@ -100,7 +100,7 @@ void goto_unwindt::unwind(
 }
 
 void goto_unwindt::unwind(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt &goto_program,
   const goto_programt::const_targett loop_head,
   const goto_programt::const_targett loop_exit,
@@ -279,7 +279,7 @@ void goto_unwindt::unwind(
 }
 
 void goto_unwindt::unwind(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt &goto_program,
   const unwindsett &unwindset,
   const unwind_strategyt unwind_strategy)
