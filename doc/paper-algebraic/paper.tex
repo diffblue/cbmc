@@ -967,6 +967,47 @@ assignments. This takes three reductions, regardless of $d$. In
 our implementation the cost is ${\sim}$200\,$\mu$s independent of
 bitwidth.
 
+\subsection{Future Directions Within and Beyond the Universal-Equational Class}
+\label{sec:future-within-and-beyond}
+
+The procedure of Sections~\ref{sec:algebraic} and~\ref{sec:vanishing}
+treats the algebraic layer as a preprocessor: it runs once,
+decides what it can on the universal-equational class, and the
+residual goes to bit-blasting. Two extensions naturally arise.
+
+\paragraph{Within the universal-equational class: expression-level
+normalisation.}
+After Buchberger, reduce arbitrary polynomial expressions in the
+residual w.r.t.\ the computed basis. If the reduction produces a
+constant or a shorter polynomial form, communicate it to the
+bit-blast layer as a SAT-level equality, propagating the algebraic
+insight. This generalises our existing \texttt{extract\_candidate}
+(which finds univariate-linear basis elements only) to arbitrary
+expressions, making the algebraic layer a true theory solver in
+the SMT(LRA/UF/$\ldots$)\ tradition --- exchanging information
+bidirectionally with the SAT search rather than running once and
+stopping. The class boundary is unchanged; only the depth of
+interaction within it deepens.
+
+\paragraph{Toward the relational classes: bit-decomposition
+variables.}
+Our procedure does not address the universal-relational and
+existential-relational classes (Table~\ref{tab:taxonomy}); these
+are the bit-blasting companion paper's domain. Bit-decomposition
+gives a route to extend the algebraic layer's coverage:
+SAT-level partial assignments often determine specific bits of
+intermediate values. Encoding these via fresh bit-decomposition
+variables $b_{x,i}$ over $\mathbb{Z}_{2^d}$, with idempotency
+$b_{x,i}^2 = b_{x,i}$ and the sum-decomposition
+$x = \sum_i 2^i b_{x,i}$, allows the algebraic layer to
+incorporate bit-level facts and to discover bit-level
+consequences. Predicates like ``high bit of $x \cdot y$ is 1''
+become polynomial constraints, bringing relational queries
+(bounds, overflow witnesses) into reach of the same Gr\"obner
+infrastructure. This is the direction in which a future revision
+might take the algebraic procedure beyond its current
+universal-equational scope.
+
 \section{Evaluation}
 \label{sec:external}
 
@@ -1628,50 +1669,34 @@ provides empirical evidence that it does not (integer
 commutativity is $1000\times$ harder than GF(2) in CDCL).
 
 
-\section{Conclusion and Future Work}
+\section{Conclusion}
 
-We presented two algebraic techniques for bit-vector arithmetic
-verification: a strong Gr\"obner basis solver over
-$\mathbb{Z}_{2^d}$ for polynomial ideal membership, and a
-vanishing polynomial test for DSP datapath equivalence. Empirical
-evaluation across three benchmark pools (Section~\ref{sec:external})
-shows the techniques to be a complementary fast path for arithmetic
-identities --- matching mature word-level reasoners on simple
-identities, dispatching high-degree polynomial-identity benchmarks
-that bit-blasting alone cannot handle, and adding negligible
-overhead on queries they do not solve. They do not replace
-word-level reasoning on general QF\_BV benchmarks, where
-syntactic methods remain stronger.
+We presented a decision procedure for universally-quantified
+equalities of polynomial expressions in $\mathbb{Z}_{2^d}$,
+combining a strong Gr\"obner-basis solver for ideal membership
+with a vanishing-polynomial test for function equivalence over
+the bit-vector domain. The procedure is the first SMT integration
+of a complete decision procedure for this fragment; its
+contribution is not to replace mature word-level SMT solvers on
+volume but to decide queries those solvers cannot decide at all
+--- 4 random-polynomial benchmarks at degree $\geq 13$ that
+Bitwuzla, cvc5, and every bit-blasting configuration we tested
+time out on, and 5 DSP datapath equivalences with overflow
+cancellation that are decided in microseconds. Soundness is
+mechanised in Lean 4 with 25 theorems and zero \texttt{sorry};
+the formalisation effort exposed and removed a 2{,}000$\times$
+ordering sensitivity in the C++ implementation that empirical
+testing did not catch.
 
-Several directions remain open. First, the Gr\"obner basis is
-incomplete for non-polynomial constraints; theory combination could
-close this gap. Second, post-quantum cryptographic
-implementations (e.g., SABER) use polynomial ring multiplication
-that our techniques could verify.
-
-\paragraph{Towards a true theory solver for bit-vector arithmetic.}
-Our current architecture treats the algebraic layer as a
-preprocessor: it runs once, decides what it can, and the residual
-goes to bit-blasting. A natural next step is to make the layer a
-full theory solver in the SMT(LRA/UF/$\ldots$)\ tradition,
-exchanging information bidirectionally with the SAT search.
-Two concrete sub-directions:
-\emph{(a) Expression-level normalisation.} After Buchberger, reduce
-arbitrary polynomial expressions in the residual w.r.t.\ the
-computed basis. If the reduction produces a constant or a shorter
-polynomial form, communicate it to the bit-blast layer as a
-SAT-level equality, propagating the algebraic insight. This
-generalises our existing \texttt{extract\_candidate} (which finds
-univariate-linear basis elements only) to arbitrary expressions.
-\emph{(b) Bit-level partial information as polynomial constraints.}
-SAT-level partial assignments often determine specific bits of
-intermediate values. Encoding these via fresh bit-decomposition
-variables $b_{x,i}$ over $\mathbb{Z}_{2^d}$, with idempotency
-$b_{x,i}^2 = b_{x,i}$ and the sum-decomposition
-$x = \sum_i 2^i b_{x,i}$, allows the algebraic layer to
-incorporate bit-level facts and to discover bit-level consequences.
-Together these would close the equation-vs-expression compositional
-gap that Section~\ref{sec:algebraic} introduced.
+The procedure addresses the universal-equational class with
+polynomial expressions; queries with bitwise operations, shifts,
+or inequalities fall through to the bit-blasting companion
+paper~\cite{companion-bitblasting}. Two extensions are sketched
+in Section~\ref{sec:future-within-and-beyond}: expression-level
+normalisation deepens the procedure's interaction with the SAT
+search within the same class, while bit-decomposition variables
+give a route to extending the algebraic layer's coverage to the
+relational classes that currently fall through.
 
 \paragraph{Declaration on Generative AI.}
 During preparation, the authors used an AI coding assistant to
