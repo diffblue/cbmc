@@ -22,9 +22,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <set>
 
-static std::optional<codet> static_lifetime_init(
-  const irep_idt &identifier,
-  symbol_table_baset &symbol_table)
+static std::optional<codet>
+static_lifetime_init(irep_idt identifier, symbol_table_baset &symbol_table)
 {
   const namespacet ns(symbol_table);
   const symbolt &symbol = ns.lookup(identifier);
