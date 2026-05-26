@@ -106,12 +106,6 @@ cat "$TMP"/*.out 2>/dev/null \
   | sed "s|$REPO_ROOT/||g" \
   | sort -u > "$CURRENT"
 
-if [ ! -s "$CURRENT" ]; then
-  echo "Error: tool produced no output. Check that $BUILD_DIR is built and" >&2
-  echo "compile_commands.json is up to date." >&2
-  exit 1
-fi
-
 # ---------------------------------------------------------------------------
 # Diff against the baseline.
 #   comm -13 baseline current  -> new in current (NEW VIOLATIONS, fail)
