@@ -51,7 +51,7 @@ call_grapht::call_grapht(
 
 static void forall_callsites(
   const goto_programt &body,
-  std::function<void(goto_programt::const_targett, const irep_idt &)> call_task)
+  std::function<void(goto_programt::const_targett, irep_idt)> call_task)
 {
   forall_goto_program_instructions(i_it, body)
   {
@@ -74,9 +74,9 @@ static void forall_callsites(
 ///   the calling instruction recorded in `callsites` map.
 call_grapht::call_grapht(
   const goto_functionst &goto_functions,
-  const irep_idt &root,
-  bool collect_callsites):
-  collect_callsites(collect_callsites)
+  irep_idt root,
+  bool collect_callsites)
+  : collect_callsites(collect_callsites)
 {
   std::stack<irep_idt, std::vector<irep_idt>> pending_stack;
   pending_stack.push(root);
@@ -97,13 +97,12 @@ call_grapht::call_grapht(
 
     forall_callsites(
       goto_program,
-      [&](goto_programt::const_targett i_it, const irep_idt &callee)
+      [&](goto_programt::const_targett i_it, irep_idt callee)
       {
         add(function, callee, i_it);
         if(edges.find(callee)==edges.end())
           pending_stack.push(callee);
-      }
-    ); // NOLINT
+      }); // NOLINT
   }
 }
 
@@ -114,31 +113,24 @@ call_grapht::call_grapht(
 ///   the calling instruction recorded in `callsites` map.
 call_grapht::call_grapht(
   const goto_modelt &goto_model,
-  const irep_idt &root,
-  bool collect_callsites):
-  call_grapht(goto_model.goto_functions, root, collect_callsites)
+  irep_idt root,
+  bool collect_callsites)
+  : call_grapht(goto_model.goto_functions, root, collect_callsites)
 {
 }
 
-void call_grapht::add(
-  const irep_idt &function,
-  const goto_programt &body)
+void call_grapht::add(irep_idt function, const goto_programt &body)
 {
   forall_callsites(
     body,
-    [&](goto_programt::const_targett i_it, const irep_idt &callee)
-    {
-      add(function, callee, i_it);
-    }
-  ); // NOLINT
+    [&](goto_programt::const_targett i_it, irep_idt callee)
+    { add(function, callee, i_it); }); // NOLINT
 }
 
 /// Add edge
 /// \param caller: caller function
 /// \param callee: callee function
-void call_grapht::add(
-  const irep_idt &caller,
-  const irep_idt &callee)
+void call_grapht::add(irep_idt caller, irep_idt callee)
 {
   edges.insert({caller, callee});
   nodes.insert(caller);
@@ -150,10 +142,7 @@ void call_grapht::add(
 /// \param callee: callee function
 /// \param callsite: call instruction responsible for this edge. Note this is
 ///   only stored if `collect_callsites` was specified during construction.
-void call_grapht::add(
-  const irep_idt &caller,
-  const irep_idt &callee,
-  locationt callsite)
+void call_grapht::add(irep_idt caller, irep_idt callee, locationt callsite)
 {
   add(caller, callee);
   if(collect_callsites)
@@ -186,7 +175,7 @@ public:
   {
   }
 
-  node_indext operator[](const irep_idt &function)
+  node_indext operator[](irep_idt function)
   {
     auto findit=function_indices.insert({function, 0});
     if(findit.second)
@@ -297,7 +286,7 @@ void call_grapht::output_xml(std::ostream &out) const
 }
 
 std::optional<std::size_t>
-call_grapht::directed_grapht::get_node_index(const irep_idt &function) const
+call_grapht::directed_grapht::get_node_index(irep_idt function) const
 {
   auto findit=nodes_by_name.find(function);
   if(findit==nodes_by_name.end())

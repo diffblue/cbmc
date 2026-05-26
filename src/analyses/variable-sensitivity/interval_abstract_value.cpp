@@ -172,7 +172,7 @@ static inline constant_interval_exprt make_interval_expr(const exprt &expr)
   }
 }
 
-static inline irep_idt invert_relation(const irep_idt &relation)
+static inline irep_idt invert_relation(irep_idt relation)
 {
   PRECONDITION(
     relation == ID_le || relation == ID_lt || relation == ID_ge ||

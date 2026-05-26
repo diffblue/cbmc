@@ -27,18 +27,13 @@ class message_handlert;
 class rw_range_sett;
 
 void goto_rw(
-  const irep_idt &function,
+  irep_idt function,
   goto_programt::const_targett target,
   rw_range_sett &rw_set);
 
-void goto_rw(
-  const irep_idt &function,
-  const goto_programt &,
-  rw_range_sett &rw_set);
+void goto_rw(irep_idt function, const goto_programt &, rw_range_sett &rw_set);
 
-void goto_rw(const goto_functionst &,
-             const irep_idt &function,
-             rw_range_sett &rw_set);
+void goto_rw(const goto_functionst &, irep_idt function, rw_range_sett &rw_set);
 
 class range_domain_baset
 {
@@ -234,7 +229,7 @@ public:
   enum class get_modet { LHS_W, READ };
 
   virtual void get_objects_rec(
-    const irep_idt &,
+    irep_idt,
     goto_programt::const_targett,
     get_modet mode,
     const exprt &expr)
@@ -242,16 +237,14 @@ public:
     get_objects_rec(mode, expr);
   }
 
-  virtual void get_objects_rec(
-    const irep_idt &,
-    goto_programt::const_targett,
-    const typet &type)
+  virtual void
+  get_objects_rec(irep_idt, goto_programt::const_targett, const typet &type)
   {
     get_objects_rec(type);
   }
 
   virtual void get_array_objects(
-    const irep_idt &,
+    irep_idt,
     goto_programt::const_targett,
     get_modet,
     const exprt &);
@@ -348,7 +341,7 @@ protected:
 
   virtual void add(
     get_modet mode,
-    const irep_idt &identifier,
+    irep_idt identifier,
     const range_spect &range_start,
     const range_spect &range_end);
 };
@@ -375,7 +368,7 @@ public:
   }
 
   void get_objects_rec(
-    const irep_idt &_function,
+    irep_idt _function,
     goto_programt::const_targett _target,
     get_modet mode,
     const exprt &expr) override
@@ -387,7 +380,7 @@ public:
   }
 
   void get_objects_rec(
-    const irep_idt &_function,
+    irep_idt _function,
     goto_programt::const_targett _target,
     const typet &type) override
   {
@@ -398,7 +391,7 @@ public:
   }
 
   void get_array_objects(
-    const irep_idt &_function,
+    irep_idt _function,
     goto_programt::const_targett _target,
     get_modet mode,
     const exprt &pointer) override
@@ -478,7 +471,7 @@ public:
   }
 
   void get_objects_rec(
-    const irep_idt &_function,
+    irep_idt _function,
     goto_programt::const_targett _target,
     get_modet mode,
     const exprt &expr) override
@@ -489,7 +482,7 @@ public:
   }
 
   void get_objects_rec(
-    const irep_idt &function,
+    irep_idt function,
     goto_programt::const_targett target,
     const typet &type) override
   {
@@ -510,7 +503,7 @@ protected:
 
   void add(
     get_modet mode,
-    const irep_idt &identifier,
+    irep_idt identifier,
     const range_spect &range_start,
     const range_spect &range_end) override;
 };

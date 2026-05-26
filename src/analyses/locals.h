@@ -34,7 +34,7 @@ public:
   // Returns true for all procedure-local variables,
   // not including those with static storage duration,
   // but including the function parameters.
-  bool is_local(const irep_idt &identifier) const
+  bool is_local(irep_idt identifier) const
   {
     return locals.find(identifier) != locals.end();
   }

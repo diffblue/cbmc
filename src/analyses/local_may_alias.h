@@ -109,7 +109,7 @@ public:
     }
   }
 
-  local_may_aliast &operator()(const irep_idt &fkt)
+  local_may_aliast &operator()(irep_idt fkt)
   {
     PRECONDITION(goto_functions!=nullptr);
     fkt_mapt::iterator f_it=fkt_map.find(fkt);

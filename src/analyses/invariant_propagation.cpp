@@ -241,7 +241,7 @@ bool invariant_propagationt::check_type(const typet &type) const
 }
 
 void invariant_propagationt::initialize(
-  const irep_idt &function,
+  irep_idt function,
   const goto_programt &goto_program)
 {
   baset::initialize(function, goto_program);
