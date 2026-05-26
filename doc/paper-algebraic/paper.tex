@@ -1269,11 +1269,16 @@ scaled-down $N$ and at the implementation bitwidth $q = 2^{16}$:
   multi-level structural decomposition.
 \end{itemize}
 
-Each query asserts equivalence per output coefficient. The
-natural framing
-$\bigvee_{i=0}^{N-1} (\text{A\_res}_i \neq \text{B\_res}_i)$
-exposes a current procedure-level limitation we discuss below;
-we split into $N$ per-coefficient queries as a workaround.
+Each query asserts the equivalence of all $N$ output coefficients
+in a single disjunctive disequality
+$\bigvee_{i=0}^{N-1} (\text{A\_res}_i \neq \text{B\_res}_i)$.
+Our pre-solver pattern-matches this shape and refutes each
+branch via the per-disequality machinery: the disjunction is
+unsatisfiable iff every branch is, and each branch is decided
+by the vanishing-polynomial test (the diff polynomial is
+literally zero after SSA inlining). Per-coefficient queries are
+also supported via the \texttt{--single-coeff} flag of the
+generator, for fine-grained reproducibility.
 
 \begin{table}[ht]
 \caption{SABER polynomial-multiplication equivalence at scaled
@@ -1319,19 +1324,6 @@ $\mathbb{Z}_{2^d}$ is a procedural guarantee, while heuristic
 word-level rewriting wins or loses depending on whether the
 rewriter has matching patterns. Our procedure decides where
 cvc5 cannot.
-
-\paragraph{Procedure-level limitation: disjunctive disequalities.}
-The natural framing of ``all output coefficients agree'' is the
-disjunctive disequality
-$\bigvee_i (\text{A\_res}_i \neq \text{B\_res}_i)$. Our
-Rabinowitsch handling addresses single disequalities; the
-disjunctive structure currently bypasses the algebraic pre-solver
-and the bit-blasted form times out at $N = 4$ already. We split
-into per-coefficient queries as a workaround. Extending the
-procedure to handle disjunctions of disequalities via
-Rabinowitsch-on-each-branch is straightforward (the disjunction
-is unsatisfiable iff every branch is); we defer the
-implementation to a future revision.
 
 \paragraph{Toom-Cook 4-way and faithful SABER alignment.}
 SABER's actual implementation uses Toom-Cook 4-way at the
