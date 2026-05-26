@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 void goto_convertt::convert_function_call(
   const code_function_callt &function_call,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   do_function_call(
     function_call.lhs(),
@@ -35,7 +35,7 @@ void goto_convertt::do_function_call(
   const exprt &function,
   const exprt::operandst &arguments,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   // make it all side effect free
 
@@ -93,7 +93,7 @@ void goto_convertt::do_function_call_if(
   const if_exprt &function,
   const exprt::operandst &arguments,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   // case split
 

@@ -60,7 +60,7 @@ static symbol_exprt find_base_symbol(const exprt &expr)
 static exprt convert_statement_expression(
   const quantifier_exprt &qex,
   const code_expressiont &code,
-  const irep_idt &mode,
+  irep_idt mode,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler)
 {
@@ -278,7 +278,7 @@ static exprt convert_statement_expression(
 symbol_exprt goto_convertt::make_compound_literal(
   const exprt &expr,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   const source_locationt source_location = expr.find_source_location();
 
@@ -437,10 +437,8 @@ void goto_convertt::rewrite_boolean(exprt &expr)
   expr.swap(tmp);
 }
 
-goto_convertt::clean_expr_resultt goto_convertt::clean_expr(
-  exprt &expr,
-  const irep_idt &mode,
-  bool result_is_used)
+goto_convertt::clean_expr_resultt
+goto_convertt::clean_expr(exprt &expr, irep_idt mode, bool result_is_used)
 {
   // this cleans:
   //   && || ==> ?: comma (control-dependency)
@@ -754,7 +752,7 @@ goto_convertt::clean_expr_resultt goto_convertt::clean_expr(
 }
 
 goto_convertt::clean_expr_resultt
-goto_convertt::clean_expr_address_of(exprt &expr, const irep_idt &mode)
+goto_convertt::clean_expr_address_of(exprt &expr, irep_idt mode)
 {
   clean_expr_resultt side_effects;
 
@@ -827,9 +825,7 @@ goto_convertt::clean_expr_address_of(exprt &expr, const irep_idt &mode)
 }
 
 goto_convertt::clean_expr_resultt
-goto_convertt::remove_gcc_conditional_expression(
-  exprt &expr,
-  const irep_idt &mode)
+goto_convertt::remove_gcc_conditional_expression(exprt &expr, irep_idt mode)
 {
   clean_expr_resultt side_effects;
 

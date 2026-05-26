@@ -16,7 +16,7 @@
 /// \throws invalid_source_file_exceptiont if the typecheck fails.
 static symbol_exprt typecheck_field_decl(
   const side_effect_expr_function_callt &expr,
-  const irep_idt &identifier,
+  irep_idt identifier,
   const namespacet &ns)
 {
   // Check correct number of arguments
@@ -81,7 +81,7 @@ static symbol_exprt typecheck_field_decl(
 /// \throws invalid_source_file_exceptiont if the typecheck fails.
 static symbol_exprt typecheck_get_field(
   const side_effect_expr_function_callt &expr,
-  const irep_idt &identifier,
+  irep_idt identifier,
   const namespacet &ns)
 {
   // Check correct number of arguments
@@ -146,7 +146,7 @@ static symbol_exprt typecheck_get_field(
 /// \throws invalid_source_file_exceptiont if the typecheck fails.
 static symbol_exprt typecheck_set_field(
   const side_effect_expr_function_callt &expr,
-  const irep_idt &identifier,
+  irep_idt identifier,
   const namespacet &ns)
 {
   // Check correct number of arguments

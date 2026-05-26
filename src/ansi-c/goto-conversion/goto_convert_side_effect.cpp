@@ -28,7 +28,7 @@ goto_convertt::clean_expr_resultt goto_convertt::remove_assignment(
   side_effect_exprt &expr,
   bool result_is_used,
   bool address_taken,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   const irep_idt statement = expr.get_statement();
 
@@ -180,7 +180,7 @@ goto_convertt::clean_expr_resultt goto_convertt::remove_pre(
   side_effect_exprt &expr,
   bool result_is_used,
   bool address_taken,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   INVARIANT_WITH_DIAGNOSTICS(
     expr.operands().size() == 1,
@@ -273,7 +273,7 @@ goto_convertt::clean_expr_resultt goto_convertt::remove_pre(
 
 goto_convertt::clean_expr_resultt goto_convertt::remove_post(
   side_effect_exprt &expr,
-  const irep_idt &mode,
+  irep_idt mode,
   bool result_is_used)
 {
   goto_programt tmp1, tmp2;
@@ -360,7 +360,7 @@ goto_convertt::clean_expr_resultt goto_convertt::remove_post(
 
 goto_convertt::clean_expr_resultt goto_convertt::remove_function_call(
   side_effect_expr_function_callt &expr,
-  const irep_idt &mode,
+  irep_idt mode,
   bool result_is_used)
 {
   clean_expr_resultt side_effects;
@@ -476,7 +476,7 @@ goto_convertt::remove_cpp_delete(side_effect_exprt &expr)
 
 goto_convertt::clean_expr_resultt goto_convertt::remove_malloc(
   side_effect_exprt &expr,
-  const irep_idt &mode,
+  irep_idt mode,
   bool result_is_used)
 {
   clean_expr_resultt side_effects;
@@ -557,7 +557,7 @@ goto_convertt::remove_temporary_object(side_effect_exprt &expr)
 
 goto_convertt::clean_expr_resultt goto_convertt::remove_statement_expression(
   side_effect_exprt &expr,
-  const irep_idt &mode,
+  irep_idt mode,
   bool result_is_used)
 {
   clean_expr_resultt side_effects;
@@ -632,7 +632,7 @@ goto_convertt::clean_expr_resultt goto_convertt::remove_statement_expression(
 goto_convertt::clean_expr_resultt goto_convertt::remove_overflow(
   side_effect_expr_overflowt &expr,
   bool result_is_used,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   const irep_idt &statement = expr.get_statement();
   const exprt &lhs = expr.lhs();
@@ -710,7 +710,7 @@ goto_convertt::clean_expr_resultt goto_convertt::remove_overflow(
 
 goto_convertt::clean_expr_resultt goto_convertt::remove_side_effect(
   side_effect_exprt &expr,
-  const irep_idt &mode,
+  irep_idt mode,
   bool result_is_used,
   bool address_taken)
 {

@@ -249,7 +249,7 @@ Function: goto_convertt::finish_gotos
 
 \*******************************************************************/
 
-void goto_convertt::finish_gotos(goto_programt &dest, const irep_idt &mode)
+void goto_convertt::finish_gotos(goto_programt &dest, irep_idt mode)
 {
   std::unordered_map<irep_idt, symbolt, irep_id_hash> label_flags;
   declaration_hop_instrumentationt instructions_to_insert;
@@ -459,7 +459,7 @@ void goto_convertt::optimize_guarded_gotos(goto_programt &dest)
 void goto_convertt::goto_convert(
   const codet &code,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   goto_convert_rec(code, dest, mode);
 }
@@ -467,7 +467,7 @@ void goto_convertt::goto_convert(
 void goto_convertt::goto_convert_rec(
   const codet &code,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   convert(code, dest, mode);
 
@@ -489,7 +489,7 @@ void goto_convertt::copy(
 void goto_convertt::convert_label(
   const code_labelt &code,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   // grab the label
   const irep_idt &label = code.get_label();
@@ -535,7 +535,7 @@ void goto_convertt::convert_gcc_local_label(const codet &, goto_programt &)
 void goto_convertt::convert_switch_case(
   const code_switch_caset &code,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   goto_programt tmp;
   convert(code.code(), tmp, mode);
@@ -575,7 +575,7 @@ void goto_convertt::convert_switch_case(
 void goto_convertt::convert_gcc_switch_case_range(
   const code_gcc_switch_case_ranget &code,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   const auto lb = numeric_cast<mp_integer>(code.lower());
   const auto ub = numeric_cast<mp_integer>(code.upper());
@@ -616,7 +616,7 @@ void goto_convertt::convert_gcc_switch_case_range(
 void goto_convertt::convert(
   const codet &code,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   const irep_idt &statement = code.get_statement();
 
@@ -730,7 +730,7 @@ void goto_convertt::convert(
 void goto_convertt::convert_block(
   const code_blockt &code,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   const source_locationt &end_location = code.end_location();
 
@@ -759,7 +759,7 @@ void goto_convertt::convert_block(
 void goto_convertt::convert_expression(
   const code_expressiont &code,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   exprt expr = code.expression();
 
@@ -800,7 +800,7 @@ void goto_convertt::convert_expression(
 void goto_convertt::convert_frontend_decl(
   const code_frontend_declt &code,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   const irep_idt &identifier = code.get_identifier();
 
@@ -877,7 +877,7 @@ void goto_convertt::convert_decl_type(const codet &, goto_programt &)
 void goto_convertt::convert_assign(
   const code_assignt &code,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   exprt lhs = code.lhs(), rhs = code.rhs();
 
@@ -1035,7 +1035,7 @@ void goto_convertt::convert_cpp_delete(const codet &code, goto_programt &dest)
 void goto_convertt::convert_assert(
   const code_assertt &code,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   exprt cond = code.assertion();
 
@@ -1058,7 +1058,7 @@ void goto_convertt::convert_skip(const codet &code, goto_programt &dest)
 void goto_convertt::convert_assume(
   const code_assumet &code,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   exprt op = code.assumption();
 
@@ -1101,7 +1101,7 @@ void goto_convertt::convert_loop_contracts(
 void goto_convertt::convert_for(
   const code_fort &code,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   // turn for(A; c; B) { P } into
   //  A; while(c) { P; B; }
@@ -1199,7 +1199,7 @@ void goto_convertt::convert_for(
 void goto_convertt::convert_while(
   const code_whilet &code,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   const exprt &cond = code.cond();
   const source_locationt &source_location = code.source_location();
@@ -1255,7 +1255,7 @@ void goto_convertt::convert_while(
 void goto_convertt::convert_dowhile(
   const code_dowhilet &code,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   INVARIANT_WITH_DIAGNOSTICS(
     code.operands().size() == 2,
@@ -1363,7 +1363,7 @@ exprt goto_convertt::case_guard(
 void goto_convertt::convert_switch(
   const code_switcht &code,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   // switch(v) {
   //   case x: Px;
@@ -1503,7 +1503,7 @@ void goto_convertt::convert_switch(
 void goto_convertt::convert_break(
   const code_breakt &code,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   INVARIANT_WITH_DIAGNOSTICS(
     targets.break_set, "break without target", code.find_source_location());
@@ -1520,7 +1520,7 @@ void goto_convertt::convert_break(
 void goto_convertt::convert_return(
   const code_frontend_returnt &code,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   if(!targets.return_set)
   {
@@ -1580,7 +1580,7 @@ void goto_convertt::convert_return(
 void goto_convertt::convert_continue(
   const code_continuet &code,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   INVARIANT_WITH_DIAGNOSTICS(
     targets.continue_set,
@@ -1664,7 +1664,7 @@ void goto_convertt::convert_atomic_end(const codet &code, goto_programt &dest)
 void goto_convertt::convert_ifthenelse(
   const code_ifthenelset &code,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   DATA_INVARIANT(code.then_case().is_not_nil(), "cannot accept an empty body");
 
@@ -1728,7 +1728,7 @@ void goto_convertt::convert_ifthenelse(
 
 void goto_convertt::collect_operands(
   const exprt &expr,
-  const irep_idt &id,
+  irep_idt id,
   std::list<exprt> &dest)
 {
   if(expr.id() != id)
@@ -1761,7 +1761,7 @@ void goto_convertt::generate_ifthenelse(
   goto_programt &false_case,
   const source_locationt &else_end_location,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   if(is_empty(true_case) && is_empty(false_case))
   {
@@ -1938,7 +1938,7 @@ void goto_convertt::generate_conditional_branch(
   goto_programt::targett target_true,
   const source_locationt &source_location,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   if(has_and_or(guard) && needs_cleaning(guard))
   {
@@ -1978,7 +1978,7 @@ void goto_convertt::generate_conditional_branch(
   goto_programt::targett target_false,
   const source_locationt &source_location,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   if(guard.id() == ID_not)
   {
@@ -2143,7 +2143,7 @@ symbolt &goto_convertt::new_tmp_symbol(
   const std::string &suffix,
   goto_programt &dest,
   const source_locationt &source_location,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   PRECONDITION(!mode.empty());
   symbolt &new_symbol = get_fresh_aux_symbol(
@@ -2167,7 +2167,7 @@ irep_idt goto_convertt::make_temp_symbol(
   exprt &expr,
   const std::string &suffix,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   const source_locationt source_location = expr.find_source_location();
 
@@ -2191,7 +2191,7 @@ void goto_convert(
   symbol_table_baset &symbol_table,
   goto_programt &dest,
   message_handlert &message_handler,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   symbol_table_buildert symbol_table_builder =
     symbol_table_buildert::wrap(symbol_table);
@@ -2234,7 +2234,7 @@ void goto_convert(
 void goto_convertt::generate_thread_block(
   const code_blockt &thread_body,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   goto_programt preamble, body, postamble;
 
