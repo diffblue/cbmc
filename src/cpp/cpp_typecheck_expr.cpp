@@ -3278,7 +3278,19 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
             }
           }
           // Only replace the call with the result if it's fully
-          // evaluated (no remaining function calls or symbols).
+          // evaluated (no remaining function calls, unresolved
+          // names, or non-`code` symbols that haven't been folded
+          // to constants).  An unresolved `cpp_name` in the body
+          // means the function's body was substituted at this call
+          // site without first being type-checked in the function's
+          // own (class) scope; if we install it in the caller's
+          // scope, the cpp_name will be resolved there and likely
+          // fail with `symbol '...' is unknown`.  This shows up for
+          // class-scope `constexpr` member functions whose body
+          // references same-class members (e.g. a static
+          // `value`) when the call is used as a non-type template
+          // argument and the body hasn't been processed by
+          // `typecheck_method_bodies` yet.
           {
             bool has_calls = false;
             tmp.visit_pre(
@@ -3286,7 +3298,8 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
               {
                 if(
                   e.id() == ID_side_effect ||
-                  (e.id() == ID_symbol && e.type().id() != ID_code))
+                  (e.id() == ID_symbol && e.type().id() != ID_code) ||
+                  e.id() == ID_cpp_name)
                   has_calls = true;
               });
             if(has_calls)
