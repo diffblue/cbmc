@@ -2532,3 +2532,106 @@ irept-body abandonment).
 Total commits this session (so far): 7 source/test + 2 doc.
 The branch is now 60+ commits ahead of
 `tautschnig/cpp11-parser-rework-squashed`.
+
+
+## 2026-05-27 (continued) Constexpr-eval-with-class-scope fix landed
+
+Three commits implement the actual constexpr-eval-with-class-scope
+fix referenced by the previous stop point.
+
+### What landed
+
+| commit | summary |
+|---|---|
+| `c25c5a6e9d` | Don't replace function symbol references with their bodies in make_constant |
+| `dee70f78e0` | Mark constexpr member functions as is_macro for constexpr evaluation |
+| `152785c8de` | Eagerly type-check constexpr method body in class scope before folding |
+
+### Root cause
+
+The earlier "symbol 'value' is unknown" cascade had three
+intertwined defects:
+
+1. **make_constant's symbol substitution treated function
+   symbols like data symbols.**  In `c_typecheck_baset::make_constant`
+   and `cpp_typecheckt::template_suffix`, a `visit_pre` traversal
+   replaces every `symbol_exprt` with the symbol's `value` when
+   the symbol is `is_macro` or `ID_C_constant`.  For data symbols
+   that yields a constant.  For function symbols, whose `value`
+   field IS the function body (a `code_blockt`) and whose
+   `type.id()` is `ID_code`, it splices the BODY into the
+   call's `function()` field — and any unresolved `cpp_name`
+   nodes inside then get re-typechecked in the CALLER's scope,
+   where class-scope members like a static `value` are not
+   visible.
+
+2. **Constexpr member methods were never marked `is_macro`.**
+   `typecheck_compound_declarator` for non-virtual member
+   functions calls `typecheck_member_function` which never
+   propagates `storage_spec.is_constexpr()` from the
+   declaration to the symbol's `is_macro` flag.  As a result
+   the constexpr-function-call evaluator in
+   `typecheck_side_effect_function_call` (which gates on
+   `symbol_ptr->is_macro`) never saw constexpr methods as
+   candidates and the buggy `make_constant` substitution
+   above became the only "evaluator" — with the bug above as
+   the consequence.
+
+3. **The body wasn't type-checked at the moment of folding.**
+   Template-class member bodies are queued by
+   `add_method_body` and processed in `typecheck_method_bodies()`
+   at the END of typechecking.  When a non-type template
+   argument such as `gate<ic.get()>` needs constexpr-eval of
+   `ic.get()` *during* typecheck, the body is still in
+   parsed (cpp_name) form.  Even with the substitution bug
+   above prevented, the constexpr-evaluator's parameter
+   substitution + simplify produces an expression containing
+   unresolved cpp_names which cannot be folded.
+
+### The fixes
+
+1. In both substitution sites, `if(node.type().id() == ID_code) return;`.
+
+2. In `typecheck_compound_declarator`, after the non-virtual
+   `typecheck_member_function` call, set `is_macro=true` on
+   the freshly-created method symbol when
+   `declaration.storage_spec().is_constexpr()`.
+
+3. In the constexpr-eval block of
+   `typecheck_side_effect_function_call`, when the called
+   symbol is a class method whose body has not yet been
+   type-checked AND the body contains at least one cpp_name
+   AND the call's arguments are fully constant, eagerly call
+   `convert_function(method_symbol)` so the body gets
+   typechecked in the function's own (class) scope before
+   the substitute-and-fold logic reads it.  Sets up the
+   matching `template_map` from the class symbol's
+   `C_template_arguments` first; saves/restores via
+   `cpp_saved_template_mapt`.
+
+The args-are-constant pre-guard in (3) is essential for
+performance — without it, the eager typecheck cascades through
+deeply-templated stdlib code such as `std::sort`'s comparator
+family and OOMs in BMC.
+
+### Test coverage
+
+- `regression/cbmc-cpp/cpp17_constexpr_member_in_template`
+  (new) covers the specific `integral_constant<bool, true>::get()`
+  → `gate<ic.get()>` pattern.
+
+### Status
+
+cbmc-cpp regressions: 692/0/83 (one new test added).
+Dog-food unchanged at 20/17/80/0.
+
+`reserve_repro11.cpp` advances past the
+`symbol 'value' is unknown` layer (the constexpr eval now
+folds correctly) and stops at a different downstream issue:
+an `expr2cpp::convert_struct` invariant violation
+("component count mismatch") triggered while pretty-printing
+some struct value during error formatting.  That is a
+pre-existing pretty-print bug unrelated to constexpr eval —
+deferred to a future session.
+
+Total this session: 7 commits (6 source/test + 1 doc).
