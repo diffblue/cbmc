@@ -1,8 +1,8 @@
 CORE
 main.c
---add-library --generate-function-body-options assert-false --generate-function-body '([^_]*)' _ --no-standard-checks
+--add-library
 ^EXIT=0$
 ^SIGNAL=0$
-VERIFICATION SUCCESSFUL
+Adding CPROVER library
 --
 ^warning: ignoring

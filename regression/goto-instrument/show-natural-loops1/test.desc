@@ -1,0 +1,9 @@
+CORE
+main.c
+--show-natural-loops
+^EXIT=0$
+^SIGNAL=0$
+is head of
+backedge
+--
+^warning: ignoring

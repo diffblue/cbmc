@@ -1,0 +1,8 @@
+CORE
+a.c
+b.c --forward-impact
+^EXIT=0$
+^SIGNAL=0$
+\*\* compute \*\*
+--
+^warning: ignoring

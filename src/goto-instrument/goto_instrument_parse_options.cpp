@@ -502,6 +502,7 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("show-intervals"))
     {
       do_indirect_call_and_rtti_removal();
+      do_remove_returns();
 
       // recalculate numbers, etc.
       goto_model.goto_functions.update();
@@ -1529,6 +1530,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
      cmdline.isset("race-check") ||
      cmdline.isset("mm") ||
      cmdline.isset("isr") ||
+     cmdline.isset("mmio") ||
      cmdline.isset("concurrency"))
   {
     do_indirect_call_and_rtti_removal();
@@ -1940,7 +1942,7 @@ void goto_instrument_parse_optionst::help()
     HELP_UNINITIALIZED_CHECK
     " {y--stack-depth} {un} \t add check that call stack size of non-inlined"
     " functions never exceeds {un}\n"
-    " {y--race-check} \t add floating-point data race checks\n"
+    " {y--race-check} \t add data race checks for concurrent programs\n"
     "\n"
     "Semantic transformations:\n"
     HELP_NONDET_VOLATILE

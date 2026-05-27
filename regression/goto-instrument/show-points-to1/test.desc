@@ -1,0 +1,8 @@
+CORE
+main.c
+--show-points-to
+^EXIT=0$
+^SIGNAL=0$
+Pointer Analysis
+--
+^warning: ignoring

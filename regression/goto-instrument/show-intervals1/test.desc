@@ -1,0 +1,8 @@
+CORE
+main.c
+--show-intervals
+^EXIT=0$
+^SIGNAL=0$
+Interval Analysis
+--
+^warning: ignoring

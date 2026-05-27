@@ -1,0 +1,8 @@
+CORE
+main.c
+--skip-loops main.0
+^EXIT=0$
+^SIGNAL=0$
+Adding gotos to skip loops
+--
+^warning: ignoring

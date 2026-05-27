@@ -1,0 +1,8 @@
+CORE broken-smt-backend broken-cprover-smt-backend no-new-smt
+main.c
+--beautify
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring

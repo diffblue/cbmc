@@ -1,0 +1,8 @@
+CORE unix
+main.c
+--show-threaded
+^EXIT=0$
+^SIGNAL=0$
+Is threaded
+--
+^warning: ignoring

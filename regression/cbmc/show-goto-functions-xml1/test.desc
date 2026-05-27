@@ -1,0 +1,10 @@
+CORE
+main.c
+--show-goto-functions --xml-ui
+^EXIT=0$
+^SIGNAL=0$
+<functions>
+<function.*name="main"
+</functions>
+--
+^warning: ignoring
