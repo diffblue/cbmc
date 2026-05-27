@@ -1838,8 +1838,27 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
         }
         else
         {
+          // The walk through `resolve_scope` only enters this branch
+          // for non-final cpp_name components.  When that component
+          // is qualified by a leading `::` (recursive=false from
+          // here on), pass `qualified=true` so the fallback id_set
+          // lookup inside `disambiguate_template_classes` doesn't
+          // ascend to the root scope, which would otherwise gather
+          // every same-base-name template across the program and
+          // produce spurious ambiguity errors during deep stdlib
+          // partial-spec evaluation (notably for the
+          // `__allocator_traits_base::__rebind` chain that tests
+          // `_Tp::template rebind<_Up>::other`).
+          //
+          // For unqualified-first-component lookups (e.g.
+          // `__int_traits<_Tp>::__digits` where `__int_traits` was
+          // brought in via a `using` declaration), keep the
+          // original recursive-fallback behaviour.
           typet instance = disambiguate_template_classes(
-            final_base_name, id_set, template_args);
+            final_base_name,
+            id_set,
+            template_args,
+            /*qualified=*/!recursive);
 
           instance.add_source_location() = source_location;
 
@@ -2078,14 +2097,23 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
 typet cpp_typecheck_resolvet::disambiguate_template_classes(
   const irep_idt &base_name,
   const cpp_scopest::id_sett &id_set,
-  const cpp_template_args_non_tct &full_template_args)
+  const cpp_template_args_non_tct &full_template_args,
+  bool qualified)
 {
   cpp_scopest::id_sett effective_id_set = id_set;
 
-  if(effective_id_set.empty())
+  if(effective_id_set.empty() && !qualified)
   {
     // The template may not be visible in the current scope (e.g.,
     // during template instantiation). Search from the root scope.
+    //
+    // Skip this fallback when the lookup is qualified (`T::name`).
+    // Per [basic.lookup.qual] the search is restricted to T's scope
+    // and its base classes; ascending to the root scope here would
+    // collect every same-base-name template across the program
+    // (e.g. `rebind` from every `allocator<X>` instance), producing
+    // a spurious "template scope 'rebind' is ambiguous" error
+    // during deep stdlib partial-spec evaluation.
     effective_id_set = cpp_typecheck.cpp_scopes.get_root_scope().lookup(
       base_name, cpp_scopet::RECURSIVE, cpp_idt::id_classt::TEMPLATE);
   }
@@ -2094,7 +2122,7 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
   // with the matching base name. This handles cases where the class
   // template was not added to the scope tree (e.g., templates from
   // system headers that were parsed but not fully registered).
-  if(effective_id_set.empty())
+  if(effective_id_set.empty() && !qualified)
   {
     for(const auto &sym_pair : cpp_typecheck.symbol_table)
     {
@@ -3320,8 +3348,8 @@ resolved_after_strip:
     }
     else if(want == wantt::TYPE || have_classes)
     {
-      typet instance =
-        disambiguate_template_classes(base_name, id_set, template_args);
+      typet instance = disambiguate_template_classes(
+        base_name, id_set, template_args, qualified);
 
       if(!cpp_typecheck.skip_typechecking_elaborate)
         cpp_typecheck.elaborate_class_template(instance);

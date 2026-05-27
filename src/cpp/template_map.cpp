@@ -297,7 +297,31 @@ void template_mapt::apply(typet &type) const
             // Without this, `type = entry.second` replaces the entire
             // expression with `tag-allocator<tag-A>` and ignores the
             // cpp_name's template_args.
-            if(has_targs && entry.second.id() == ID_struct_tag)
+            //
+            // Only apply this rewrite when the cpp_name is purely the
+            // TT-param + its immediate template_args (no `::` in
+            // `sub` apart from the optional leading scope chain that
+            // resolves to the SAME entry).  When the cpp_name is a
+            // QUALIFIED form like `_Tp::rebind<_Up>::other`, the
+            // `_Tp` token is acting as a scope qualifier rather than
+            // as a TT-template-name; in that case the existing
+            // qualified-name fall-through (below, in the
+            // `if(sub.size() > 1 && entry.second.id() == ID_struct_tag)`
+            // branch) replaces `_Tp` with the full struct_tag
+            // identifier so the subsequent `::rebind<...>` lookup
+            // happens in the bound instance's scope.
+            bool has_scope_separator = false;
+            for(const auto &s : sub)
+            {
+              if(s.id() == "::")
+              {
+                has_scope_separator = true;
+                break;
+              }
+            }
+            if(
+              has_targs && !has_scope_separator &&
+              entry.second.id() == ID_struct_tag)
             {
               const std::string ident =
                 id2string(to_struct_tag_type(entry.second).get_identifier());
@@ -370,6 +394,27 @@ void template_mapt::apply(typet &type) const
               // expression.
               type = entry.second;
               return;
+            }
+            // Qualified-name case where the TT-param-bound `_Tp`
+            // appears as a scope and there ARE template_args
+            // somewhere in the sub-tree (e.g.
+            // `_Tp::template rebind<_Up>::other`).  The existing
+            // qualified-name handler below skips itself when
+            // `has_targs` is true, so handle it here: replace the
+            // leading `_Tp` name with the bound struct_tag's full
+            // identifier and let the args-substitution loop apply
+            // the rest.  Without this, the fall-through replaces the
+            // whole expression with the bound struct_tag, losing the
+            // `::rebind<...>::other` suffix.
+            if(has_scope_separator && entry.second.id() == ID_struct_tag)
+            {
+              irep_idt tag = to_struct_tag_type(entry.second).get_identifier();
+              sub.front() = irept{ID_name};
+              sub.front().set(ID_identifier, tag);
+              break; // exit type_map loop; fall through to the
+                     // args-substitution loop so any inner
+                     // `<_Up, _Types...>` references get
+                     // substituted.
             }
             type = entry.second;
             return;
