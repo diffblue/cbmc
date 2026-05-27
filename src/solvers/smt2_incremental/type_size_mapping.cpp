@@ -47,7 +47,8 @@ void associate_pointer_sizes(
         object_map,
         type_size_map,
         object_size,
-        is_dynamic_object);
+        is_dynamic_object,
+        ns);
       type_size_map.emplace_hint(
         find_result, pointer_type->base_type(), pointer_size_term);
     }

@@ -8,7 +8,9 @@
 #include <util/expr_cast.h>
 #include <util/floatbv_expr.h>
 #include <util/mathematical_expr.h>
+#include <util/namespace.h>
 #include <util/pointer_expr.h>
+#include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
 #include <util/range.h>
 #include <util/std_expr.h>
@@ -517,8 +519,16 @@ static smt_termt convert_expr_to_smt(
 
 static smt_termt convert_expr_to_smt(
   const equal_exprt &equal,
-  const sub_expression_mapt &converted)
+  const sub_expression_mapt &converted,
+  const namespacet &ns)
 {
+  // Equality of two zero-width-typed (typically void) operands is
+  // vacuously true. Mirrors smt2_conv.cpp:1604 (`convert_expr(true_exprt())`
+  // for the same case). The visitor filter in the entry-point
+  // `convert_expr_to_smt` ensures that the operands are *not* in
+  // `converted`, so we short-circuit before any lookup.
+  if(is_zero_width(equal.lhs().type(), ns))
+    return smt_bool_literal_termt{true};
   return smt_core_theoryt::equal(
     converted.at(equal.op0()), converted.at(equal.op1()));
 }
@@ -1497,7 +1507,8 @@ static smt_termt dispatch_expr_to_smt_conversion(
   const smt_object_mapt &object_map,
   const type_size_mapt &pointer_sizes,
   const smt_object_sizet::make_applicationt &call_object_size,
-  const smt_is_dynamic_objectt::make_applicationt &apply_is_dynamic_object)
+  const smt_is_dynamic_objectt::make_applicationt &apply_is_dynamic_object,
+  const namespacet &ns)
 {
   if(const auto symbol = expr_try_dynamic_cast<symbol_exprt>(expr))
   {
@@ -1587,7 +1598,7 @@ static smt_termt dispatch_expr_to_smt_conversion(
   }
   if(const auto equal = expr_try_dynamic_cast<equal_exprt>(expr))
   {
-    return convert_expr_to_smt(*equal, converted);
+    return convert_expr_to_smt(*equal, converted, ns);
   }
   if(const auto not_equal = expr_try_dynamic_cast<notequal_exprt>(expr))
   {
@@ -1934,7 +1945,8 @@ smt_termt convert_expr_to_smt(
   const smt_object_mapt &object_map,
   const type_size_mapt &pointer_sizes,
   const smt_object_sizet::make_applicationt &object_size,
-  const smt_is_dynamic_objectt::make_applicationt &is_dynamic_object)
+  const smt_is_dynamic_objectt::make_applicationt &is_dynamic_object,
+  const namespacet &ns)
 {
 #ifndef CPROVER_INVARIANT_DO_NOT_CHECK
   static bool in_conversion = false;
@@ -1950,17 +1962,29 @@ smt_termt convert_expr_to_smt(
   const auto lowered_expr = lower_address_of_array_index(expr);
   filtered_visit_post(
     lowered_expr,
-    [](const exprt &expr) {
+    [&](const exprt &expr)
+    {
       // Code values inside "address of" expressions do not need to be converted
       // as the "address of" conversion only depends on the object identifier.
       // Avoiding the conversion side steps a need to convert arbitrary code to
       // SMT terms.
       const auto address_of = expr_try_dynamic_cast<address_of_exprt>(expr);
-      if(!address_of)
-        return true;
-      return !can_cast_type<code_typet>(address_of->object().type());
+      if(address_of && can_cast_type<code_typet>(address_of->object().type()))
+        return false;
+      // Equality of two zero-width-typed (typically void) operands is
+      // vacuously true; the dedicated overload of convert_expr_to_smt for
+      // equal_exprt handles this case without consulting the converted
+      // operands. Skipping descent here avoids attempting
+      // convert_type_to_smt_sort on an empty type, which is unimplemented.
+      if(const auto equal = expr_try_dynamic_cast<equal_exprt>(expr))
+      {
+        if(is_zero_width(equal->lhs().type(), ns))
+          return false;
+      }
+      return true;
     },
-    [&](const exprt &expr) {
+    [&](const exprt &expr)
+    {
       const auto find_result = sub_expression_map.find(expr);
       if(find_result != sub_expression_map.cend())
         return;
@@ -1970,7 +1994,8 @@ smt_termt convert_expr_to_smt(
         object_map,
         pointer_sizes,
         object_size,
-        is_dynamic_object);
+        is_dynamic_object,
+        ns);
       sub_expression_map.emplace_hint(find_result, expr, std::move(term));
     });
   return std::move(sub_expression_map.at(lowered_expr));

@@ -62,6 +62,8 @@ struct expr_to_smt_conversion_test_environmentt
   smt_object_sizet object_size_function;
   smt_is_dynamic_objectt is_dynamic_object_function;
   type_size_mapt pointer_sizes;
+  symbol_tablet symbol_table;
+  namespacet ns{symbol_table};
 
 private:
   // This is private to ensure the above make() function is used to make
@@ -86,7 +88,9 @@ expr_to_smt_conversion_test_environmentt::make(test_archt arch)
   default:
     UNREACHABLE;
   }
-  return {initial_smt_object_map(), smt_object_sizet{}};
+  expr_to_smt_conversion_test_environmentt env;
+  env.object_map = initial_smt_object_map();
+  return env;
 }
 
 smt_termt
@@ -97,7 +101,8 @@ expr_to_smt_conversion_test_environmentt::convert(const exprt &expression) const
     object_map,
     pointer_sizes,
     object_size_function.make_application,
-    is_dynamic_object_function.make_application);
+    is_dynamic_object_function.make_application,
+    ns);
 }
 
 TEST_CASE("\"array_typet\" to smt sort conversion", "[core][smt2_incremental]")

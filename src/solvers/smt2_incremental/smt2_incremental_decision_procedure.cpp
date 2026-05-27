@@ -400,7 +400,8 @@ smt2_incremental_decision_proceduret::convert_expr_to_smt(const exprt &expr)
     object_map,
     pointer_sizes_map,
     object_size_function.make_application,
-    is_dynamic_object_function.make_application);
+    is_dynamic_object_function.make_application,
+    ns);
 }
 
 exprt smt2_incremental_decision_proceduret::handle(const exprt &expr)
@@ -456,7 +457,8 @@ std::optional<exprt> smt2_incremental_decision_proceduret::get_expr(
       object_map,
       pointer_sizes_map,
       object_size_function.make_application,
-      is_dynamic_object_function.make_application);
+      is_dynamic_object_function.make_application,
+      ns);
     auto element = get_expr(
       smt_array_theoryt::select(array, index_term), type.element_type());
     if(!element)
@@ -580,7 +582,8 @@ exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
         object_map,
         pointer_sizes_map,
         object_size_function.make_application,
-        is_dynamic_object_function.make_application);
+        is_dynamic_object_function.make_application,
+        ns);
     }
     return {};
   }();
@@ -624,30 +627,6 @@ void smt2_incremental_decision_proceduret::set_to(
           << in_expr.pretty(2, 0) << messaget::eom;
   });
   const exprt lowered_expr = lower(in_expr);
-  // Equality of two zero-width-typed (typically void) operands is
-  // vacuously true. For value == true we therefore have nothing to
-  // assert; for value == false we send `(assert false)` directly,
-  // matching the end-to-end behaviour of the non-incremental SMT2
-  // backend (smt2_conv.cpp), which converts `equal_exprt` over a
-  // zero-width type to `true_exprt` and then negates.
-  //
-  // Limitation: only the *top-level* equality is intercepted here.
-  // A nested case such as `set_to(and_exprt{equal_exprt{x_void,
-  // y_void}, other}, true)` would still descend into
-  // `convert_expr_to_smt`, which has no handling for void operands
-  // and would trip UNIMPLEMENTED_FEATURE in `convert_type_to_smt_sort`.
-  // CBMC's GOTO programs do not produce such nested shapes today,
-  // but a future refactor pushing this short-circuit into the
-  // `equal_exprt` overload of `convert_expr_to_smt` would handle the
-  // nested case for free.
-  if(
-    lowered_expr.id() == ID_equal &&
-    is_zero_width(to_equal_expr(lowered_expr).lhs().type(), ns))
-  {
-    if(!value)
-      solver_process->send(smt_assert_commandt{smt_bool_literal_termt{false}});
-    return;
-  }
   PRECONDITION(can_cast_type<bool_typet>(lowered_expr.type()));
 
   define_dependent_functions(lowered_expr);

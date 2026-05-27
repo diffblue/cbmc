@@ -1141,11 +1141,15 @@ TEST_CASE(
   "[core][smt2_incremental]")
 {
   // Equality of two empty-typed (void) operands is vacuously true. The
-  // decision procedure should therefore short-circuit set_to without
-  // descending into convert_expr_to_smt (which has no SMT sort for
-  // empty_typet) and without declaring the void-typed leaves: for
-  // value == true nothing extra is sent; for value == false a single
-  // `(assert false)` is sent.
+  // dedicated overload of convert_expr_to_smt for equal_exprt returns
+  // the boolean literal `true` directly without descending into the
+  // void operands (which have no SMT sort), so:
+  //  - set_to(equal_exprt{x, y}, true)  yields `(assert true)`.
+  //  - set_to(equal_exprt{x, y}, false) yields `(assert (not true))`,
+  //    i.e. a contradiction.
+  // This mirrors the end-to-end behaviour of the non-incremental SMT2
+  // backend (smt2_conv.cpp:1604), which converts equal_exprt over a
+  // zero-width type to true_exprt and then negates as needed.
   auto test = decision_procedure_test_environmentt::make();
   const symbolt x{"x", empty_typet{}, ID_C};
   test.symbol_table.insert(x);
@@ -1157,14 +1161,54 @@ TEST_CASE(
   CHECK(test.procedure() == decision_proceduret::resultt::D_SATISFIABLE);
   test.sent_commands.clear();
 
-  INFO("set_to(equal_exprt{x, y}, true) sends no extra commands");
+  INFO("set_to(equal_exprt{x, y}, true) emits `(assert true)`");
   test.procedure.set_to(equal_exprt{x.symbol_expr(), y.symbol_expr()}, true);
-  CHECK(test.sent_commands == std::vector<smt_commandt>{});
+  const std::vector<smt_commandt> expected_true_commands{
+    smt_assert_commandt{smt_bool_literal_termt{true}}};
+  CHECK(test.sent_commands == expected_true_commands);
+  test.sent_commands.clear();
 
-  INFO("set_to(equal_exprt{x, y}, false) sends a single `(assert false)`");
+  INFO("set_to(equal_exprt{x, y}, false) emits `(assert (not true))`");
   test.procedure.set_to(equal_exprt{x.symbol_expr(), y.symbol_expr()}, false);
+  const std::vector<smt_commandt> expected_false_commands{smt_assert_commandt{
+    smt_core_theoryt::make_not(smt_bool_literal_termt{true})}};
+  CHECK(test.sent_commands == expected_false_commands);
+}
+
+TEST_CASE(
+  "smt2_incremental_decision_proceduret set_to over nested empty-type "
+  "equality",
+  "[core][smt2_incremental]")
+{
+  // Nested equal_exprt over empty (void) operands -- e.g. as the lhs of
+  // an and_exprt -- is handled by convert_expr_to_smt's equal_exprt
+  // overload, which returns the boolean literal `true`. The enclosing
+  // and_exprt then converts normally. Without the convert-side
+  // short-circuit this case used to trip UNIMPLEMENTED_FEATURE in
+  // convert_type_to_smt_sort(empty_typet).
+  auto test = decision_procedure_test_environmentt::make();
+  const symbolt x{"x", empty_typet{}, ID_C};
+  test.symbol_table.insert(x);
+  const symbolt y{"y", empty_typet{}, ID_C};
+  test.symbol_table.insert(y);
+  const symbolt b{"b", bool_typet{}, ID_C};
+  test.symbol_table.insert(b);
+
+  INFO("Sanity checking decision procedure and flushing size definitions");
+  test.mock_responses.push_front(smt_check_sat_responset{smt_sat_responset{}});
+  CHECK(test.procedure() == decision_proceduret::resultt::D_SATISFIABLE);
+  test.sent_commands.clear();
+
+  INFO("set_to(and_exprt{equal_exprt{x, y}, b}, true) succeeds");
+  test.procedure.set_to(
+    and_exprt{equal_exprt{x.symbol_expr(), y.symbol_expr()}, b.symbol_expr()},
+    true);
+  const smt_identifier_termt expected_b{"b", smt_bool_sortt{}};
+  const smt_termt expected_and =
+    smt_core_theoryt::make_and(smt_bool_literal_termt{true}, expected_b);
   const std::vector<smt_commandt> expected_commands{
-    smt_assert_commandt{smt_bool_literal_termt{false}}};
+    smt_declare_function_commandt{expected_b, {}},
+    smt_assert_commandt{expected_and}};
   CHECK(test.sent_commands == expected_commands);
 }
 
