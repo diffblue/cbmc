@@ -37,7 +37,8 @@ gdb_value_extractort::memory_scopet::memory_scopet(
   const mp_integer &byte_size,
   const irep_idt &name)
   : // the address is given in hex, starting with 0x....
-    begin_int(safe_string2size_t(begin.address_string.substr(2), 16)),
+    begin_int(
+      safe_string2size_t(std::string_view{begin.address_string}.substr(2), 16)),
     byte_size(byte_size),
     name(name)
 {
@@ -49,7 +50,8 @@ size_t gdb_value_extractort::memory_scopet::address2size_t(
 {
   // the address is given in hex, starting with 0x....
   PRECONDITION(point.address_string.substr(0, 2) == "0x");
-  return safe_string2size_t(point.address_string.substr(2), 16);
+  return safe_string2size_t(
+    std::string_view{point.address_string}.substr(2), 16);
 }
 
 mp_integer gdb_value_extractort::memory_scopet::distance(

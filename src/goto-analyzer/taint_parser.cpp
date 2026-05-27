@@ -95,8 +95,8 @@ bool taint_parser(
     else if(std::string(where, 0, 9)=="parameter")
     {
       rule.where=taint_parse_treet::rulet::PARAMETER;
-      rule.parameter_number=
-        safe_string2unsigned(std::string(where, 9, std::string::npos));
+      rule.parameter_number =
+        safe_string2unsigned(std::string_view{where}.substr(9));
     }
     else
     {
