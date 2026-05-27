@@ -3164,11 +3164,101 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   if(auto sym_expr = expr_try_dynamic_cast<symbol_exprt>(expr.function()))
   {
     const auto *symbol_ptr = symbol_table.lookup(sym_expr->get_identifier());
-    if(
+    // The body is recognised as code either by `value.type().id() ==
+    // ID_code` (post-`convert_function`, when the body's TYPE is set
+    // to the function's code type) or by `value.id() == ID_code`
+    // (the parsed/queued state where the value IS a code block but
+    // its type field is empty).  Accept both — the second case
+    // matters when we are about to eagerly convert the body so it
+    // gets resolved in its own (class) scope.
+    bool body_is_code =
+      symbol_ptr != nullptr &&
+      (symbol_ptr->value.type().id() == ID_code ||
+       symbol_ptr->value.id() == ID_code);
+    bool eligible_constexpr =
       symbol_ptr != nullptr && symbol_ptr->is_macro &&
       !functions_being_typechecked.count(sym_expr->get_identifier()) &&
       !deferred_typechecking.count(sym_expr->get_identifier()) &&
-      symbol_ptr->value.type().id() == ID_code)
+      body_is_code;
+    if(eligible_constexpr)
+    {
+      // Pre-check whether the arguments are fully constant: if not,
+      // there is no way constexpr-eval can fold the call regardless
+      // of whether the body is resolved.  Skipping the eager-convert
+      // path in that case avoids unnecessary cascading instantiations
+      // for runtime-only invocations of constexpr methods.
+      bool args_are_constant_pre = true;
+      for(const auto &arg : expr.arguments())
+      {
+        arg.visit_pre(
+          [&args_are_constant_pre](const exprt &e) {
+            if(e.id() == ID_symbol)
+              args_are_constant_pre = false;
+          });
+        if(!args_are_constant_pre)
+          break;
+      }
+      // For constexpr methods of a template class whose body was
+      // queued by `add_method_body` but not yet processed, the body's
+      // expressions are still in cpp_name form.  Substituting and
+      // installing such a body at the call site would leave
+      // unresolved names in the caller's scope.  Eagerly process the
+      // body via convert_function so it is type-checked in the
+      // function's own (class) scope first.  We restrict this to
+      // class methods (have a `C_member_name`) where the body has
+      // not yet been type-checked (its type field is still empty)
+      // and where the body actually contains unresolved cpp_names.
+      // The cpp_name guard avoids unwanted cascading instantiations
+      // for already-resolved methods that just happen to lack a code
+      // type on their `value`.
+      bool needs_eager_convert = false;
+      if(
+        args_are_constant_pre &&
+        !symbol_ptr->type.get(ID_C_member_name).empty() &&
+        symbol_ptr->value.type().id() != ID_code)
+      {
+        symbol_ptr->value.visit_pre(
+          [&needs_eager_convert](const exprt &n) {
+            if(n.id() == ID_cpp_name)
+              needs_eager_convert = true;
+          });
+      }
+      if(needs_eager_convert)
+      {
+        symbolt &writeable =
+          symbol_table.get_writeable_ref(sym_expr->get_identifier());
+        const irep_idt class_id = writeable.type.get(ID_C_member_name);
+        const symbolt *class_sym = symbol_table.lookup(class_id);
+        cpp_saved_template_mapt saved_map(template_map);
+        if(
+          class_sym != nullptr &&
+          class_sym->type.find(ID_C_template).is_not_nil() &&
+          class_sym->type.find(ID_C_template_arguments).is_not_nil())
+        {
+          template_map.build(
+            static_cast<const template_typet &>(
+              class_sym->type.find(ID_C_template)),
+            static_cast<const cpp_template_args_tct &>(
+              class_sym->type.find(ID_C_template_arguments)));
+        }
+        methods_seen.insert(sym_expr->get_identifier());
+        try
+        {
+          convert_function(writeable);
+        }
+        catch(...)
+        {
+          // typecheck failure: leave value unchanged, fall through to
+          // the symbol_ptr->value check below which will see whatever
+          // state the body is in
+        }
+        symbol_ptr = symbol_table.lookup(sym_expr->get_identifier());
+        eligible_constexpr =
+          symbol_ptr != nullptr &&
+          symbol_ptr->value.type().id() == ID_code;
+      }
+    }
+    if(eligible_constexpr)
     {
       const auto &code_type = to_code_type(symbol_ptr->type);
       PRECONDITION(expr.arguments().size() == code_type.parameters().size());
