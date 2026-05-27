@@ -1036,11 +1036,10 @@ cancellation makes the vanishing-polynomial test necessary.
 \emph{Pool where the procedure validates correctness and bit-vector
 coverage:} the 39-benchmark custom suite
 (Section~\ref{sec:eval-custom}), which exercises the algebraic and
-vanishing layers across five categories. \emph{Pools where the
+vanishing layers across five categories. \emph{Pool where the
 procedure is a complement, not a replacement:} the 66-benchmark
 SMT-COMP 2024 stratified sample
-(Section~\ref{sec:eval-smtcomp}) and the 26-benchmark SMT-LIB
-2023 community submission (Section~\ref{sec:eval-community}),
+(Section~\ref{sec:eval-smtcomp}),
 where Bitwuzla's mature word-level rewriting wins the volume
 contest. \emph{Scope comparison:} the Amulet2 gate-level
 verifier (Section~\ref{sec:eval-amulet}). Threats to validity
@@ -1502,59 +1501,6 @@ $\mathbb{Z}_{2^d}$) and does not aim to replace mature SMT
 solvers on general QF\_BV community
 benchmarks (Section~\ref{sec:threats}).
 
-\subsection{SMT-LIB Community Benchmarks (26 benchmarks)}
-\label{sec:eval-community}
-
-We additionally evaluated on 26 QF\_BV benchmarks from the SMT-LIB
-2023 benchmark submission (GRS cryptographic signatures, p4dfa
-network protocols, and UltimateAutomizer program verification).
-
-\begin{table}[ht]
-\caption{SMT-LIB community benchmarks (26 benchmarks, 30\,s T/O).
-  Bitwuzla solves 7, \cbmc 6, cvc5 2. Bitwuzla's word-level
-  reasoning handles UltimateAutomizer's multiplication-in-context
-  patterns better than our layered approach.}
-\label{tab:community}
-\centering
-\begin{tabular}{lrrr}
-\toprule
-Category & Bitwuzla & \cbmc & cvc5 \\
-\midrule
-GRS cryptographic signatures & 4 & 3 & 0 \\
-p4dfa network protocols & 1 & 1 & 0 \\
-UltimateAutomizer program verification & 2 & 2 & 2 \\
-\midrule
-Total solved (of 26) & \textbf{7} & 6 & 2 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\textbf{Per-tool breakdown.} \cbmc is faster than Bitwuzla on GRS
-benchmarks with 32-bit operands (6.5\,s vs.\ 7.1\,s on grs-32-16)
-because the Gr\"obner basis shortcuts those polynomial queries,
-but slower on the UltimateAutomizer benchmarks that contain
-multiplication within larger program-verification problems
-(4.7\,s vs.\ 0.004\,s on cohencu), where Bitwuzla's word-level
-rewriting avoids bit-blasting entirely and our algebraic layer
-does not trigger because the multiplication is deeply embedded.
-At a 30\,s timeout (Table~\ref{tab:community} above), Bitwuzla
-uniquely solves grs-128-16. With an extended 60\,s budget the gap
-narrows: \cbmc and Bitwuzla each solve grs-128-16 (in
-37 and 27\,s respectively), and we solve grs-96-32 which Bitwuzla
-does not at 60\,s. At 60\,s the totals are CBMC 7/20, Bitwuzla 6/20,
-cvc5 1/20. The GRS improvement at extended timeout reflects
-general bit-blasting capability rather than our algebraic layer:
-GRS benchmarks consist of bit-shift and addition operations
-without \texttt{bvmul}, so the algebraic Gr\"obner-basis layer does
-not trigger (verified by running with the algebraic layer
-disabled: same solve time within $\pm 2\%$).
-The community-
-benchmark result delineates the scope of our technique
-(see Section~\ref{sec:threats}): strong on arithmetic-identity
-queries where polynomial structure is visible at the SMT level,
-weak on queries where the multiplication is deeply embedded in a
-larger program-verification problem.
-
 \subsection{Amulet2 Comparison}
 \label{sec:eval-amulet}
 
@@ -1613,11 +1559,9 @@ of its field-based reduction.
 biased toward multiplication-heavy arithmetic queries common in
 cryptography and DSP but rare in typical pointer-safety checking.
 We include the 66-benchmark SMT-COMP sample
-(Section~\ref{sec:eval-smtcomp}) and the 26-benchmark SMT-LIB
-community set (Section~\ref{sec:eval-community}) explicitly to
-counter this bias. The community sets are where our approach
-looks most neutral (matching shift-add on SMT-COMP sample; losing
-to Bitwuzla by one benchmark on SMT-LIB set).
+(Section~\ref{sec:eval-smtcomp}) explicitly to
+counter this bias. The community sample is where our approach
+looks most neutral (matching shift-add).
 
 \textbf{DSP benchmark design.} The 5 DSP datapath benchmarks in
 the custom suite were designed by us to exercise the
