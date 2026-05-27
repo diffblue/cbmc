@@ -531,11 +531,11 @@ poly_extractort::decompose_bits(const exprt &e)
         const polynomialt &y = (*next)[j];
         polynomialt bit{d};
         if(e.id() == ID_bitand)
-          bit = x * y;
+          bit = x.multiply(y, bit_vars);
         else if(e.id() == ID_bitor)
-          bit = (x + y) - (x * y);
+          bit = (x + y) - x.multiply(y, bit_vars);
         else // ID_bitxor
-          bit = (x + y) - (x * y) * mp_integer{2};
+          bit = (x + y) - x.multiply(y, bit_vars) * mp_integer{2};
         apply_frobenius_idempotency(bit, bit_vars);
         combined.push_back(std::move(bit));
       }

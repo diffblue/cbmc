@@ -80,7 +80,8 @@ strong_groebner_basist::s_polynomial(const polynomialt &f, const polynomialt &g)
   polynomialt term_g{bw};
   term_g.terms.emplace_back(lc_f, quot_g);
 
-  polynomialt result = (term_f * f) - (term_g * g);
+  polynomialt result =
+    (term_f.multiply(f, bit_vars)) - (term_g.multiply(g, bit_vars));
   result.normalize();
   apply_frobenius_idempotency(result, bit_vars);
   return result;
@@ -133,7 +134,7 @@ polynomialt strong_groebner_basist::strong_reduce(
         polynomialt mult_term{bw};
         mult_term.terms.emplace_back(q, quot_mon);
 
-        r = r - (mult_term * g);
+        r = r - mult_term.multiply(g, bit_vars);
         r.normalize();
         apply_frobenius_idempotency(r, bit_vars);
         changed = true;

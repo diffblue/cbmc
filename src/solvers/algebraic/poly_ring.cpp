@@ -208,6 +208,36 @@ polynomialt polynomialt::operator*(const polynomialt &other) const
   return result;
 }
 
+polynomialt polynomialt::multiply(
+  const polynomialt &other,
+  const std::set<std::size_t> &bit_vars) const
+{
+  PRECONDITION(bitwidth == other.bitwidth);
+  if(bit_vars.empty())
+    return *this * other;
+
+  polynomialt result{bitwidth};
+  for(const auto &[c0, m0] : terms)
+  {
+    for(const auto &[c1, m1] : other.terms)
+    {
+      monomialt prod_m = m0 * m1;
+      // Inline idempotency: clamp bit-variable exponents to 1 during
+      // monomial construction. Avoids materialising b_i^k terms for
+      // k >= 2; downstream normalize() then merges duplicate
+      // monomials more aggressively.
+      for(auto &[var, exp] : prod_m.vars)
+      {
+        if(exp > 1 && bit_vars.count(var) > 0)
+          exp = 1;
+      }
+      result.terms.emplace_back(reduce(c0 * c1), std::move(prod_m));
+    }
+  }
+  result.normalize();
+  return result;
+}
+
 // --- Utility functions ---
 
 mp_integer inverse_mod_2d(const mp_integer &a, unsigned d)

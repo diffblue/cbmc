@@ -81,6 +81,19 @@ public:
   polynomialt operator*(const polynomialt &other) const;
   polynomialt operator*(const mp_integer &scalar) const;
 
+  /// Multiplication with inline idempotency simplification.
+  /// Equivalent to (*this * other) followed by
+  /// apply_frobenius_idempotency(result, bit_vars), but performs
+  /// the clamping during the term-pair loop so that intermediate
+  /// b^2 terms are never materialised. This dramatically reduces
+  /// the term count carried through normalize() when the polynomial
+  /// product would otherwise produce many high-degree bit-monomials.
+  ///
+  /// If bit_vars is empty, behaves identically to operator*.
+  polynomialt multiply(
+    const polynomialt &other,
+    const std::set<std::size_t> &bit_vars) const;
+
   bool is_zero() const
   {
     return terms.empty();
