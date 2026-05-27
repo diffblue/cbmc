@@ -247,6 +247,17 @@ public:
       auto *Ctor = CE->getConstructor();
       if(Ctor && Ctor->isMoveConstructor())
         return;
+      // Restrict to a genuine same-type copy. A converting constructor such
+      // as address_of_exprt(const exprt &) or code_typet::parametert(const
+      // typet &) takes its argument by a const lvalue reference, so the
+      // rvalue produced by std::move would simply bind to that const
+      // reference and the underlying copy would still happen -- std::move
+      // there is a no-op. (And a non-irept conversion like
+      // unsignedbv_typet(size_t) duplicates no irept storage at all.) For a
+      // genuine same-type copy the move constructor exists, so suggesting
+      // std::move does avoid the copy.
+      if(Ctor && !Ctor->isCopyConstructor())
+        return;
       Init = CE->getArg(0)->IgnoreImplicit();
     }
     else
@@ -259,8 +270,20 @@ public:
     const auto *SrcVD = dyn_cast<VarDecl>(SrcRef->getDecl());
     if(!SrcVD || isa<ParmVarDecl>(SrcVD))
       return;
-    if(SrcVD->getType().isConstQualified())
-      return;
+    {
+      // Skip const sources: `std::move` of a const value silently
+      // copy-constructs (the rvalue has type `const T&&` which binds
+      // to the copy constructor) and would in any case be unsafe for
+      // a `const auto &` alias into someone else's data.  The check
+      // needs to look through references, since for `const auto &x`
+      // the variable's top-level type is a reference and is not
+      // itself const-qualified.
+      QualType SrcQT = SrcVD->getType();
+      if(SrcQT->isReferenceType())
+        SrcQT = SrcQT.getNonReferenceType();
+      if(SrcQT.isConstQualified())
+        return;
+    }
 
     // Check source not used after copy
     const auto *FD = dyn_cast_or_null<FunctionDecl>(VD->getDeclContext());
@@ -271,6 +294,37 @@ public:
     Finder.TraverseStmt(const_cast<Stmt *>(FD->getBody()));
     if(Finder.Found)
       return;
+
+    // Skip loop-reused sources: if `VD` is inside a loop body and
+    // `SrcVD` is declared outside that loop, then the loop will copy
+    // from `SrcVD` once per iteration; converting that copy to a move
+    // would leave a moved-from `SrcVD` for every subsequent iteration.
+    {
+      ASTContext &Ctx = *Result.Context;
+      const Stmt *EnclosingLoop = nullptr;
+      DynTypedNode Cur = DynTypedNode::create(*VD);
+      while(EnclosingLoop == nullptr)
+      {
+        const auto Parents = Ctx.getParents(Cur);
+        if(Parents.empty())
+          break;
+        Cur = Parents[0];
+        if(const auto *S = Cur.get<Stmt>())
+        {
+          if(
+            isa<ForStmt>(S) || isa<WhileStmt>(S) || isa<DoStmt>(S) ||
+            isa<CXXForRangeStmt>(S))
+          {
+            EnclosingLoop = S;
+            break;
+          }
+        }
+      }
+      if(
+        EnclosingLoop && SM.isBeforeInTranslationUnit(
+                           SrcVD->getBeginLoc(), EnclosingLoop->getBeginLoc()))
+        return;
+    }
 
     llvm::errs() << SM.getFilename(VD->getLocation()) << ":"
                  << SM.getSpellingLineNumber(VD->getLocation())
@@ -317,6 +371,26 @@ public:
     // If source is NOT a DeclRefExpr or MemberExpr, it's likely a temporary
     if(!isa<DeclRefExpr>(Src) && !isa<MemberExpr>(Src))
       return;
+    // Skip MemberExpr sources: the existing MutableUseChecker only
+    // tracks mutations of the destination VarDecl, so it cannot detect
+    // a `this->member = ...` between the copy and a later use of VD.
+    // Suggesting `const auto &` would alias to the post-mutation value
+    // -- not the snapshot the user intended.
+    if(isa<MemberExpr>(Src))
+      return;
+    // Skip reference-typed sources: a `T &alias` is often introduced
+    // precisely because the referee will be mutated, and a `const T &`
+    // copy would observe the post-mutation value rather than the
+    // snapshot the caller wants.  We can't tell without flow analysis
+    // whether that's the case here, so play it safe.
+    if(const auto *DRE = dyn_cast<DeclRefExpr>(Src))
+    {
+      if(const auto *SrcVD = dyn_cast<VarDecl>(DRE->getDecl()))
+      {
+        if(SrcVD->getType()->isReferenceType())
+          return;
+      }
+    }
     // Source type must match variable type (otherwise it's a conversion)
     if(Src->getType().getCanonicalType() != VD->getType().getCanonicalType())
       return;
