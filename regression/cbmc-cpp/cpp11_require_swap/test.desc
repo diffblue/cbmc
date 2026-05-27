@@ -1,8 +1,10 @@
 CORE
 main.cpp
 --cpp11
-^EXIT=10$
+^EXIT=0$
 ^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+^\[main\.assertion\.1\] line 26 swap worked: SUCCESS$
 --
 found no match for symbol 'swap'
 unexpected expression: struct_tag
