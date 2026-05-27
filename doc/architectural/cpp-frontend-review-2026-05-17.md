@@ -2017,3 +2017,140 @@ elaboration), or a path-3 mechanism not yet identified that would
 register `unordered_map`'s public methods (`reserve`, `insert`,
 `find`, ...) without requiring the typedefs in iters 5–11 of its body
 to resolve.
+
+
+## 2026-05-27 Template specialization matching with variadic packs (deep dive)
+
+Investigation of the deeper template-machinery work needed to unblock
+the `__get_value_type<_Hash_node<...>>::type` cascade that's behind
+the dog-food `'reserve' is unknown` failures (and most of the other
+stdlib-template categories).
+
+### Root-cause chain
+
+The failure is driven by `__alloc_rebind<_Alloc, T>` not resolving
+correctly.  In libstdc++:
+
+```cpp
+template <typename _Tp, typename _Up>
+  struct __replace_first_arg
+  { };
+
+template <template <typename, typename...> class _SomeTemplate,
+          typename _Up, typename _Tp, typename... _Types>
+  struct __replace_first_arg<_SomeTemplate<_Tp, _Types...>, _Up>
+  { using type = _SomeTemplate<_Up, _Types...>; };
+```
+
+For `__replace_first_arg<allocator<pair<...>>, _Hash_node<pair<...>>>`,
+the partial specialization should match (with
+`_SomeTemplate = allocator`, `_Tp = pair<...>`, `_Types = ()`,
+`_Up = _Hash_node<...>`) and yield
+`allocator<_Hash_node<pair<...>>>`.
+
+CBMC silently falls through to the primary template (which has no
+`type` member) and produces the *unrebound* `allocator<pair<...>>`,
+which then mismatches the inner `__get_value_type<_Hash_node<...>>`
+specialization.  That's how the dog-food failures bubble up to the
+visible `'reserve' is unknown` / `'iterator' is unknown` errors.
+
+### Three layered bugs in CBMC
+
+Built a standalone reproducer (`/tmp/specmatch_rebind4.cpp`) that
+mirrors the libstdc++ pattern.  Tracing through
+`disambiguate_template_classes`,
+`cpp_typecheck_resolvet::guess_template_args` and
+`template_mapt::apply` revealed three distinct bugs that all need
+fixing for the spec match to succeed:
+
+1. **Pack-parameter deduction loop**.  The deduction loop runs
+   `min(targs.size(), inst_arguments.size())` iterations.  When the
+   partial spec's args list contains a pack reference (`_Types...`)
+   represented as an `ambiguous(type=cpp_name(ellipsis=true))` and
+   the desired-type's args are shorter, the pack parameter never
+   gets a binding.  `has_unassigned()` rejects the spec.
+
+2. **`matcht::operator<` cost is wrong**.  `cost = _s_args.arguments().size()`.
+   For a partial spec with extra template parameters introduced by
+   a pack, the spec's cost exceeds the primary's cost (its argument
+   list is the full template-parameter list, not the partial-spec
+   pattern), so the primary wins on tie-break even when the spec
+   would otherwise have been the more specialised match.  Adding a
+   bare `is_primary` flag and letting any spec beat the primary on
+   ties resolves it.
+
+3. **TT-param substitution drops the template name**.  When a
+   template-template parameter `_SomeTemplate` is bound to a
+   struct_tag (e.g. `allocator<A>`, the whole instance — that's
+   how CBMC currently records TT-param bindings), and a spec body
+   refers to `_SomeTemplate<_Up, _Types...>`,
+   `template_mapt::apply` falls into
+   `if(has_targs || sub.size() == 1) { ... type = entry.second;
+   return; }` and replaces the whole `_SomeTemplate<...>`
+   expression with the bound `allocator<A>` instead of substituting
+   only the *name* and re-applying the args.  Net result:
+   `_SomeTemplate<_Up>` becomes `allocator<A>` instead of
+   `allocator<_Up>` (which after `_Up = B` substitution would be
+   `allocator<B>`).
+
+   A fix that extracts the bound template's `base_name` from the
+   `tag-<base><args>` form of the struct_tag identifier (no
+   symbol-table lookup needed since `template_mapt` is
+   stand-alone) and rewrites only the front-name of the cpp_name
+   correctly produces `allocator<_Up>`, leaving the existing
+   args-substitution loop to substitute `_Up = B` and expand the
+   empty `_Types...` pack.
+
+### Where the implementation hits a wall
+
+A four-file patch wiring up all three fixes (deduction-loop pack
+handling, `is_primary` tie-break, TT-param front-name rewrite, and
+`build_template_args` omitting empty pack args + `build` always
+recording empty `pack_args_map[id]`) makes the deduction find the
+spec and produces the correct `tag-allocator<tag-B>` for `R`.
+
+But two more issues surface:
+
+* **Nested-elaboration scope leak**.  Once `R = allocator<B>` is
+  produced, accessing `R::value_type` walks
+  `tag-allocator<tag-B>`'s body — which is left as an *incomplete*
+  shell because no caller forces its elaboration.  The fallback
+  path resolves `value_type = _Tp` against the *outer* (spec's)
+  template_map, where `_Tp = A`, and produces
+  `R::value_type = A`.  The reproducer confirms `y : struct tag-A`
+  in the GOTO output even though `R = allocator<tag-B>`.  Fixing
+  this requires triggering elaboration of nested instances on
+  member-access *and* ensuring the inner instance's template_map
+  isolates its `_Tp` from the outer scope.
+
+* **`build_template_args` regression**.  Omitting empty pack args
+  from the typechecked args list breaks
+  `cpp11_variadic_pack_short_name_collision`, which depends on
+  short-name-keyed `pack_size_map` entries persisting across the
+  instantiation stack so that nested templates with same-named
+  packs disambiguate correctly.  The fix would need to keep the
+  shared-name semantics intact while still avoiding `has_unassigned`
+  rejection of the spec.
+
+### Status
+
+Reverted; documented here.  The investigation is captured for the
+next iteration:
+
+* The deduction-loop pack-handling fix is the highest-value standalone
+  change and is independent of the other two.  It's also the one that
+  most directly maps to the `'reserve'` cascade root cause.
+* The TT-param fix in `template_mapt::apply` is the most surgically
+  contained but depends on (1) for the deduction to succeed in the
+  first place.
+* The `matcht::operator<` cost ordering is a pre-existing bug that
+  predates the variadic-pack issue — any partial spec that introduces
+  *any* extra template parameters (not just packs) hits it.
+
+A safe landing needs all three fixes, the nested-elaboration scoping
+fix, and a path through the `pack_size_map`-shared-name semantics
+that doesn't regress `cpp11_variadic_pack_short_name_collision`.
+That's a multi-day project and shouldn't be tackled as a single
+session's commit.
+
+Dog-food unchanged at 20 / 17 / 80 / 0.
