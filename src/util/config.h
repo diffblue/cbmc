@@ -168,6 +168,7 @@ public:
     bool bf16_type;               // __bf16 (Clang >= 15, GCC >= 13)
     bool fp16_type;               // __fp16 (GCC >= 4.5 on ARM, Clang >= 6)
     bool single_precision_constant;
+    bool allow_anonymous_struct_embedding; // -fms-extensions (partial)
     enum class c_standardt
     {
       C89,
