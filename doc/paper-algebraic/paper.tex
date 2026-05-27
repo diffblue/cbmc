@@ -1353,19 +1353,63 @@ architectures (e.g.\ specialised Toom-Cook structure
 recognition, or decomposition into evaluation, multiplication,
 and interpolation sub-lemmas).
 
-\paragraph{The $N = 256$ ceiling is memory-bound, not
-time-bound.}
-Our procedure decides $N = 256$ in $\sim$109\,s (per
-coefficient) but scaling further hits a memory wall in the
-polynomial-extraction stage rather than in Buchberger. With
-57\,GB of virtual memory, $N = 256$ has peak RSS of 29\,GB and
-solves; $N \geq 320$ aborts within 80--160\,s as the
-polynomial expansion exceeds the budget. Pushing beyond
-$N = 256$ therefore requires a memory-efficient polynomial
-representation (streaming product, sparse coefficients, or
-chunked extraction), not more time. We treat this as separable
-follow-on engineering rather than a fundamental limit of the
-procedure.
+\paragraph{Scaling beyond $N = 256$ via deferred bit-blasting.}
+The procedure decides $N = 256$ in $\sim$109\,s (per coefficient)
+in our default configuration. The reported time is dominated
+not by the algebraic procedure itself but by the bit-blasting
+of every SSA equality emitted by the SMT-LIB front-end into
+SAT clauses; at $N = 256$ this produces a peak RSS of
+$\sim$29\,GB and an effective ceiling at $N \geq 320$ where
+polynomial expansion exceeds 55\,GB of virtual memory.
+
+We resolve this by \emph{deferred bit-blasting}: the boolbv
+layer queues SSA equalities and skips bit-blasting until after
+the algebraic procedure has had a chance to refute. If the
+algebraic procedure succeeds (the universal-equational
+common case for SABER), the queued bit-blasting work is
+discarded and the SAT solver is invoked only with the
+algebraic-induced \texttt{false} clause. If the algebraic
+procedure does not refute, the queue is replayed through the
+parent set\_to before the SAT solver runs, recovering the
+default behaviour with no regression.
+
+\begin{table}[ht]
+\caption{SABER karatsuba2 with deferred bit-blasting (DEFER) vs the
+default configuration (DEFAULT). Per output coefficient via the
+all-coefficients disjunction; 600\,s timeout; 55\,GB virtual memory
+limit. The default ceiling at $N \geq 384$ is memory-bound (\textsc{oom});
+the deferred ceiling at $N \geq 1024$ is time-bound (\textsc{t/o}).}
+\label{tab:saber-defer}
+\centering
+\small
+\begin{tabular}{lrrrr}
+\toprule
+& \multicolumn{2}{c}{DEFAULT} & \multicolumn{2}{c}{DEFER} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+$N$ & RSS (GB) & wall (s) & RSS (MB) & wall (s) \\
+\midrule
+64   & 1.95  & 6.7    & 22   & 0.3 \\
+128  & 7.7   & 27.8   & 60   & 2.0 \\
+256  & 30.8  & 117.6  & 206  & 13.4 \\
+320  & 51.9  & 195.1  & 313  & 25.2 \\
+384  & \multicolumn{2}{c}{\textsc{oom}}  & 445  & 42.6 \\
+512  & \multicolumn{2}{c}{\textsc{oom}}  & 776  & 98.3 \\
+768  & \multicolumn{2}{c}{\textsc{oom}}  & 1717 & 324.3 \\
+1024 & \multicolumn{2}{c}{\textsc{oom}}  & 3030 & \textsc{t/o} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The deferral cuts memory by 100--165$\times$ and wall-clock time
+by 8--20$\times$ across $N \in \{64, \ldots, 320\}$ and pushes
+the verification ceiling from $N \geq 320$ (memory-bound) to
+$N \geq 1024$ (time-bound) at the same 55\,GB of virtual memory.
+At $N = 768$ the procedure decides each output coefficient in
+$\sim$5\,minutes with under 2\,GB peak memory; at $N = 1024$ the
+SAT-free Buchberger phase becomes the dominant cost. Pushing the
+ceiling further requires faster polynomial-arithmetic procedures
+(Toom-Cook style multiplication of polynomials, or specialised
+Buchberger orderings for SABER-shaped inputs), not more memory.
 
 \paragraph{Reproducibility.}
 Queries are mechanically generated from
