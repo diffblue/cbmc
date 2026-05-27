@@ -1925,8 +1925,19 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
     for(const auto &component :
         follow_tag(to_struct_tag_type(from)).components())
     {
-      if(component.get_bool(ID_from_base))
-        continue;
+      // Per [class.conv.fct]/1 + [class.member.lookup]/4: the set
+      // of viable conversion operators in `from`'s class scope
+      // includes those declared in `from` itself AND those
+      // inherited from base classes (subject to access
+      // resolution and potentially `using`-declaration hiding).
+      // Don't filter out `from_base` components here — that
+      // mirrors the standard's name-lookup rule.  Without this,
+      // an inherited `operator T()` (e.g. `operator bool()`
+      // inherited from `integral_constant<bool, V>` into
+      // `__and_<...>`) is silently invisible to
+      // user-defined-conversion search and the call site fails
+      // with "invalid implicit conversion from 'struct __and_'
+      // to 'bool'".
 
       if(!component.get_bool(ID_is_cast_operator))
         continue;
