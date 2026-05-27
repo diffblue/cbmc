@@ -1324,18 +1324,48 @@ word-level rewriting wins or loses depending on whether the
 rewriter has matching patterns. Our procedure decides where
 cvc5 cannot.
 
-\paragraph{Toom-Cook 4-way and faithful SABER alignment.}
+\paragraph{Toom-Cook 4-way: an open-challenge target.}
 SABER's actual implementation uses Toom-Cook 4-way at the
 outermost level with interpolation steps that include $\gg 1$
-and $\gg 3$ shifts and modular inverses of $3$, $9$, $15$. The
-shifts are exact divisions: partial operations on
-$\mathbb{Z}_{2^d}$ valid only when divisibility is guaranteed
-by the algorithm's invariants. Faithful translation to SMT-LIB
-requires the polynomial extractor to recognise \texttt{bvshr}
-as exact division when divisibility is provable; this is an
-extractor-coverage extension we have not implemented. The
-2-level Karatsuba results above verify SABER's structural depth
-without this extension.
+and $\gg 3$ shifts and modular inverses of $3$, $9$, $15$.
+With the bit-decomposition extension of
+Section~\ref{sec:eval-pbv}, our extractor can now produce a
+faithful polynomial encoding of these shifts, and we have
+implemented a Toom-Cook 4-way generator
+(\texttt{--algo-b toom4}) that matches the SABER C reference
+byte-for-byte on pinned inputs. However, the universal
+verification target ``schoolbook = Toom-Cook 4-way'' is
+intractable for state-of-the-art SMT solvers at any feasible
+budget. We measured 30-minute (1800\,s) timeouts on the
+smallest sensible case ($N = 4$, single output coefficient,
+comparison modulo $q = 2^{13}$): both Bitwuzla and our
+procedure time out. SABER's algorithm is provably correct
+modulo $q = 2^{13}$ but \emph{not} modulo $2^{16}$ (the
+storage type); the deviation is masked by SABER's downstream
+mod-$q$ reductions. The empirical reduction modulo $2^{13}$
+holds across 100 random uint16 inputs at every
+$N_{\mathrm{SB}} \in \{1, 2, 4, 8, 16, 32, 64\}$, but verifying
+this universally is, on present evidence, beyond current
+SMT capability. Faithful Toom-Cook 4-way SABER verification is
+therefore an open challenge that motivates further work, both
+in SMT-solver heuristics and in alternative procedure
+architectures (e.g.\ specialised Toom-Cook structure
+recognition, or decomposition into evaluation, multiplication,
+and interpolation sub-lemmas).
+
+\paragraph{The $N = 256$ ceiling is memory-bound, not
+time-bound.}
+Our procedure decides $N = 256$ in $\sim$109\,s (per
+coefficient) but scaling further hits a memory wall in the
+polynomial-extraction stage rather than in Buchberger. With
+57\,GB of virtual memory, $N = 256$ has peak RSS of 29\,GB and
+solves; $N \geq 320$ aborts within 80--160\,s as the
+polynomial expansion exceeds the budget. Pushing beyond
+$N = 256$ therefore requires a memory-efficient polynomial
+representation (streaming product, sparse coefficients, or
+chunked extraction), not more time. We treat this as separable
+follow-on engineering rather than a fundamental limit of the
+procedure.
 
 \paragraph{Reproducibility.}
 Queries are mechanically generated from
@@ -1500,6 +1530,163 @@ universal-equational class with polynomial expressions in
 $\mathbb{Z}_{2^d}$) and does not aim to replace mature SMT
 solvers on general QF\_BV community
 benchmarks (Section~\ref{sec:threats}).
+
+\subsection{Partial Bit-Vector Identities via Bit-Decomposition}
+\label{sec:eval-pbv}
+
+The procedure described in Sections~\ref{sec:algebraic}
+and~\ref{sec:vanishing} handles arithmetic operators
+($+$, $-$, $\cdot$) and a few low-level operations that admit
+direct polynomial encodings ($\mathtt{bvshl}\ a\ k$ for constant
+$k$ encodes as $a \cdot 2^k$). Other ``partial'' bit-vector
+operators---$\mathtt{bvlshr}$, $\mathtt{bvashr}$,
+$\mathtt{bvand}$, $\mathtt{bvor}$, $\mathtt{bvxor}$,
+$\mathtt{bvnot}$---do not admit such direct polynomial
+encodings in $\mathbb{Z}_{2^d}$ alone. Without further
+machinery, queries containing them fall through to bit-blasting
+and the algebraic layer sees nothing.
+
+We extend the procedure with \emph{bit-decomposition variables}:
+for any expression $a$ of bitwidth $d$, we introduce $d$
+auxiliary Boolean variables $b_{a,0}, \ldots, b_{a,d-1}$ with the
+constraints
+\begin{align*}
+\text{(idempotency)} \quad & b_{a,i}^2 - b_{a,i} = 0
+  \quad \text{for } i = 0, \ldots, d-1, \\
+\text{(sum-decomposition)} \quad & a - \sum_{i=0}^{d-1} 2^i b_{a,i} = 0.
+\end{align*}
+In $\mathbb{Z}_{2^d}$, $b(b-1) \equiv 0$ implies $b \equiv 0$ or
+$b \equiv 1$ (since $b$ and $b-1$ are coprime, one must be zero
+modulo $2^d$); idempotency therefore restricts $b_{a,i}$ to
+$\{0, 1\}$, and sum-decomposition forces it to be the $i$-th bit
+of $a$. With bit variables in scope, the partial operators become
+sound polynomial expressions, e.g.\
+$a \gg k = \sum_{i=k}^{d-1} 2^{i-k} b_{a,i}$,
+$\mathtt{bvand}(a, b) = \sum_i 2^i (b_{a,i} \cdot b_{b,i})$,
+and so on.
+
+\textbf{Implementation.} Bit-decomposition is applied
+on demand: when extraction encounters a partial-bit-vector
+operator, the operand is recursively bit-decomposed (with
+constants and recognised bit-ops such as $\mathtt{bvnot}$
+producing the bit polynomials directly without auxiliary
+variables; otherwise a fresh ``host'' variable is introduced and
+its bit decomposition added to the polynomial system). To keep
+Buchberger tractable on these augmented systems, we apply three
+optimisations: Frobenius-aware reduction (clamp $b^k$ to $b$ for
+any bit variable $b$ and $k \geq 1$ during S-polynomial and
+reduction steps); a polynomial-form host cache (compounds that
+normalise to the same polynomial share a host); and linear
+elimination of host variables (substitute $h \mapsto \sum_i 2^i b_i$
+across the basis before Buchberger).
+
+\textbf{Empirical evaluation.} We benchmark seven universal-
+equational identities involving partial bit-vector operators
+across bitwidths in $\{4, 16, 32, 64, 128\}$, comparing our
+procedure with bit-decomposition (``Algeb'') against our
+bit-blasting baseline (``BB''; same SMT2 entry, the algebraic
+layer disabled by environment variable) and against
+Bitwuzla. All queries are unsatisfiable; the assertion is that
+some output bit differs.
+
+\begin{table}[ht]
+\caption{Partial bit-vector identities; runtimes in seconds at
+60\,s timeout. ``Algeb'' is our procedure with bit-decomposition;
+``BB'' is the same procedure with the algebraic layer disabled
+(equivalent to bit-blasting alone); ``BW'' is Bitwuzla.}
+\label{tab:eval-pbv}
+\centering
+\begin{tabular}{lrrrr}
+\toprule
+Identity & bw & Algeb & BB & BW \\
+\midrule
+$(a \oplus b) \oplus b = a$ & 16 & 0.00 & 0.00 & 0.00 \\
+                            & 64 & 0.02 & 0.00 & 0.00 \\
+                            & 128 & 0.06 & 0.00 & 0.01 \\
+$\sim(a \wedge b) = \sim a \vee \sim b$ & 16 & 0.00 & 0.00 & 0.00 \\
+                            & 64 & 0.02 & 0.00 & 0.00 \\
+                            & 128 & 0.08 & 0.00 & 0.00 \\
+$\sim\sim a = a$            & 16 & 0.00 & 0.00 & 0.00 \\
+                            & 64 & 0.01 & 0.00 & 0.00 \\
+                            & 128 & 0.04 & 0.00 & 0.00 \\
+$(2x)\!\gg\!1 = x$ for $x < 2^{d-1}$ & 16 & 0.00 & 0.00 & 0.00 \\
+                            & 64 & 0.01 & 0.00 & 0.00 \\
+                            & 128 & 0.05 & 0.00 & 0.00 \\
+$((a{+}b)\!\gg\!1) = ((b{+}a)\!\gg\!1)$ & 16 & 0.00 & 0.00 & 0.00 \\
+                            & 64 & 0.01 & 0.01 & 0.00 \\
+                            & 128 & 0.05 & 0.02 & 0.00 \\
+$((a{+}b){-}(a{-}b))\!\gg\!1 = b$ for $b < 2^{d-1}$ & 16 & 0.39 & 0.04 & 0.00 \\
+                            & 64 & T/O & 0.29 & 0.00 \\
+                            & 128 & T/O & 0.61 & 1.24 \\
+$((a{+}b){+}(c{+}d))\!\gg\!2 = ((a{+}c){+}(b{+}d))\!\gg\!2$
+                            & 16 & 0.00 & 0.04 & 0.00 \\
+                            & 64 & \textbf{0.02} & 0.30 & 0.00 \\
+                            & 128 & \textbf{0.06} & 0.82 & 0.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Observations.} Three patterns emerge from
+Table~\ref{tab:eval-pbv}:
+
+\emph{(1) Linear scaling in bitwidth.} Across all queries our
+procedure scales linearly with $d$, consistent with the
+bit-decomposition adding $d$ idempotency relations and a single
+sum-decomposition equation per host. The cost of an additional
+bit position is $\approx 0.5$\,ms at these scales.
+
+\emph{(2) Bit-blasting is competitive at small bitwidths.} On
+simple identities ($\oplus$ cancellation, De~Morgan,
+involution), our bit-blasting baseline solves at any bitwidth in
+$\leq 0.02$\,s---including queries that are within the algebraic
+fragment with bit-decomposition. The algebraic procedure has
+overhead in extraction and Buchberger that bit-blasting avoids;
+on these queries the algebraic layer is correctly silent
+(the procedure is sound but does not improve over bit-blasting).
+Bitwuzla's word-level rewriting handles them in 0.00\,s as
+expected.
+
+\emph{(3) Bit-decomposition wins on toom-distrib.} The identity
+$((a{+}b){+}(c{+}d)) \gg 2 = ((a{+}c){+}(b{+}d)) \gg 2$ is a
+Toom-Cook-style algebraic re-arrangement under a shift. Here our
+algebraic procedure with bit-decomposition is 4--14$\times$
+faster than our bit-blasting baseline at $d \in \{64, 128\}$
+(0.02--0.06\,s vs.\ 0.30--0.82\,s). Bitwuzla still wins
+absolutely (0.00\,s) but the gap to our procedure is small
+($<\!0.1$\,s at $d = 128$). The reason is structural: linear
+elimination substitutes the inner sums $a{+}b$, $c{+}d$ with
+their bit-sum forms once each, and Buchberger derives the
+identity through bit-by-bit reduction without re-bit-blasting
+the entire structure.
+
+\textbf{Toom-scaled exposes a scope limit.} The identity
+$((a{+}b){-}(a{-}b)) \gg 1 = b$ holds only when $b < 2^{d-1}$
+(the precondition prevents overflow in the intermediate $2b$).
+The precondition is a $\mathtt{bvult}$ comparison, which our
+procedure currently does not extract into the polynomial system
+(the universal-equational fragment encompasses bvadd/bvsub/bvmul
+and the bit-decomposed partial operators, but not relational
+predicates). Without the precondition the diseq is genuinely SAT,
+and the algebraic procedure spends its step budget unable to
+refute it; bit-blasting solves the full formula in 0.04--0.61\,s
+because it sees the precondition. This case motivates the natural
+follow-on: extending bit-decomposition to relational predicates
+(a universal-relational fragment), discussed in
+Section~\ref{sec:future-within-and-beyond}.
+
+\textbf{Implications.} Bit-decomposition extends the algebraic
+procedure's \emph{capability} to partial bit-vector operators
+without changing its fundamental architecture. The
+\emph{performance} contribution is narrow at present: most simple
+identities are well-handled by bit-blasting alone, and Bitwuzla's
+word-level rewriting beats us absolutely on the queries tested.
+The wider value is foundational: bit-decomposition is the same
+machinery needed to extract relational predicates
+($\mathtt{bvult}$, $\mathtt{bvslt}$) into the polynomial system,
+which would unlock the universal-relational fragment as a
+genuine class extension---queries like $\forall a, b.\ a < b
+\implies a + 1 \leq b$ become decidable. The toom-scaled case
+above illustrates exactly this gap.
 
 \subsection{Amulet2 Comparison}
 \label{sec:eval-amulet}
