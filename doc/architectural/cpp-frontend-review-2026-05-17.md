@@ -2757,3 +2757,128 @@ necessary but not sufficient for the libstdc++ pair issue.
 Reproduction artifacts saved at `/tmp/std_dep_pair.cpp`,
 `/tmp/std_dep_mypair.cpp`, `/tmp/just_pair.cpp`,
 `/tmp/pair_min.cpp` (passes), `/tmp/reserve_min.cpp`.
+
+
+## 2026-05-27 (continued) Pair instantiation deep dive: pinpointed the silent-throw chain
+
+Continuing from the access-check fix, traced the libstdc++
+`std::pair` elaboration silent-failure to a precise chain.
+
+### The mechanism
+
+1. `main()` body has `std::pair<int, int> p;`
+2. `convert_function(main)` runs.  `typecheck_decl` on the
+   declaration calls `typecheck_type(std::pair<int, int>)`.
+3. That triggers `elaborate_class_template` →
+   `instantiate_template(std::pair<int,int>)` →
+   `convert_non_template_declaration` →
+   `typecheck_compound_type` → `typecheck_compound_body`
+   → `typecheck_compound_declarator` for some member of pair.
+4. `typecheck_compound_declarator` calls `typecheck_type` on
+   the member's type, which contains `pair<_U1, _U2>` (a
+   template constructor's parameter type referencing the
+   constructor's own template parameters, not the class's
+   `_T1`, `_T2`).
+5. Resolving `pair<_U1, _U2>` calls
+   `disambiguate_template_classes` →
+   `typecheck_template_args` → `typecheck_type` on `_U1` →
+   `convert_template_parameter`.
+6. `_U1` is not in `template_map` (the map has `_T1=int,
+   _T2=int` from the class instantiation; the constructor
+   template's own params aren't bound at this point).  
+   `convert_template_parameter` does a SILENT `throw 0` (no
+   error message, intended for SFINAE-style caller-recovery).
+7. The throw propagates up to
+   `typecheck_method_bodies`'s `catch(int)` for `main`.
+   Because `had_template_instantiation=true`, the error is
+   suppressed; main's body is left half-typechecked
+   (`code(decl, sub=cpp_declaration{...})` for `p`).
+8. Goto-conversion drops the un-typechecked `decl` statement
+   silently → main becomes `SET RETURN VALUE 0` only.
+9. `tag-std::pair<int,int>` IS created during instantiation,
+   but with no consumer in main's goto code, it gets removed
+   by `linking/remove_internal_symbols` as unused.
+
+### Reproducing trace (by line 595 of `/usr/include/c++/13/bits/stl_pair.h`)
+
+```cpp
+template<typename _U1, typename _U2, typename
+       enable_if<_PCCFP<_U1, _U2>::template
+                   _ConstructiblePair<_U1, _U2>()
+                 && !_PCCFP<_U1, _U2>::template
+                   _ImplicitlyConvertiblePair<_U1, _U2>(),
+                       bool>::type=false>
+  explicit constexpr pair(const pair<_U1, _U2>& __p)  // ← throw fires here
+```
+
+This is a SFINAE-guarded template constructor.  Its parameter
+type `pair<_U1, _U2>` references the constructor's own
+template params.
+
+### Why the typecheck_compound_declarator reached this path
+
+The trace shows `typecheck_compound_declarator` on the stack
+during pair's body elaboration.  `typecheck_compound_body`
+dispatches based on `declaration.is_template()`:
+
+- If template (constructor template), `convert_template_declaration`.
+- Else, `typecheck_compound_declarator`.
+
+Yet the stack has `typecheck_compound_declarator`.  Possible
+causes (not isolated):
+1. The constructor template's `is_template` bit isn't being
+   set correctly for some declarations.
+2. `convert_template_declaration` internally calls
+   `typecheck_compound_declarator` on a substituted form
+   without properly extending `template_map` first.
+
+### Attempted fixes (all reverted)
+
+1. **Return `template_parameter_symbol_type` instead of throwing
+   in `convert_template_parameter`.**  Made the minimal repro
+   `pair_min.cpp` work by leaving `_U1` unsubstituted, but
+   triggered SIGABRT (invariant violations) in many existing
+   regression tests that depend on the throw firing for SFINAE
+   recovery.  Pre-existing throw is load-bearing.
+
+2. **Save/restore `method_symbol.value` in `typecheck_method_bodies`'s
+   suppress-on-template-instantiation catch.**  Doesn't help —
+   the parsed-form `cpp_declaration` is still dropped by
+   goto-conversion.
+
+### Where the principled fix lives
+
+The fix needs to ensure that when a constructor template's
+signature is being typechecked during the parent class's body
+elaboration, the constructor's OWN template parameters are
+added to `template_map` as `template_parameter_symbol_type`
+placeholders.  That requires changes to either:
+
+- `convert_template_declaration` for function-template-in-class:
+  populate `template_map` with the function template's params
+  before calling typecheck_compound_declarator-equivalent.
+- OR `typecheck_compound_body`: detect template members and
+  set up the params correctly even on the non-template
+  fallback path.
+
+This is a non-trivial restructuring that risks the same
+cascade of regressions seen with attempt #1.  Deferred.
+
+### Status
+
+cbmc-cpp regressions: 693/0/83.  Dog-food unchanged at
+20/17/80/0.  No commits this iteration — the investigation
+clarified the failure mechanism but did not produce a
+non-regressing fix.
+
+The line-595 `enable_if<_PCCFP<_U1, _U2>::...>` SFINAE pattern
+is the smoking gun.  A future fix should either teach
+`convert_template_parameter` to return an unsubstituted
+`template_parameter_symbol_type` ONLY when the lookup happens
+in a SFINAE context, or extend `template_map` with the inner
+template's params when typechecking a member function template
+signature inside a class template's body.
+
+Reproduction artifacts saved at `/tmp/just_pair.cpp`,
+`/tmp/pair_min.cpp` (the minimal pattern that DOES work
+after the access-check fix from the previous iteration).
