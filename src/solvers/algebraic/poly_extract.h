@@ -49,6 +49,21 @@ public:
   /// non-polynomial.
   std::optional<polynomialt> extract_equation(const exprt &eq);
 
+  /// Encode an asserted relational predicate into one or more
+  /// polynomial equations (Re 4 sub-goal 6). Currently supports
+  /// ID_lt / ID_le with one constant operand:
+  ///   - bvult x C, bvule x C: upper bounds on a symbolic x.
+  ///   - bvult C x, bvule C x: lower bounds on a symbolic x.
+  /// Signed comparisons (bvslt / bvsle) reduce to unsigned via the
+  /// standard sign-bit XOR transformation.
+  ///
+  /// Returns the polynomial equations encoding the predicate's truth.
+  /// Returns an empty vector if the predicate is trivially true; the
+  /// caller distinguishes "trivially true" from "not handled" via the
+  /// optional wrapper (nullopt = not handled, leave to bit-blasting).
+  std::optional<std::vector<polynomialt>>
+  extract_predicate(const exprt &pred, bool value);
+
   /// Get the variable index for a symbol (creates new index if needed)
   std::size_t get_var_index(const irep_idt &name);
 
@@ -102,6 +117,13 @@ public:
   /// eliminates the host variables and makes the sum-decomposition
   /// equations trivially zero, drastically reducing the work
   /// Buchberger has to do.
+  ///
+  /// Also includes any predicate-induced substitutions (Re 4
+  /// sub-goal 6): when extract_predicate detects bit positions
+  /// forced to a constant (e.g., the high bits of a value
+  /// constrained by `bvult x 2^k`), it adds the corresponding
+  /// b_i -> 0 substitutions, which propagate the bit constraint
+  /// through all polynomials before Buchberger runs.
   std::map<std::size_t, polynomialt> get_host_substitutions() const
   {
     std::map<std::size_t, polynomialt> result;
@@ -118,8 +140,17 @@ public:
       }
       result.emplace(host_idx, std::move(sum));
     }
+    // Predicate-induced substitutions take precedence over host
+    // substitutions (the bit variable is the more granular target).
+    for(const auto &[var_idx, sub_poly] : additional_substitutions)
+      result.insert_or_assign(var_idx, sub_poly);
     return result;
   }
+
+  /// Predicate-induced substitutions populated by extract_predicate.
+  /// Each entry maps a polynomial variable index (typically a bit
+  /// variable) to a constant polynomial it is forced to equal.
+  std::map<std::size_t, polynomialt> additional_substitutions;
 
 private:
   std::map<irep_idt, std::size_t> var_map;

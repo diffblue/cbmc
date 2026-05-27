@@ -184,6 +184,13 @@ protected:
   // says at least one of them must be a disequality). The whole
   // assertion is unsatisfiable iff every branch is unsatisfiable.
   std::vector<std::vector<exprt>> algebraic_disjunctive_disequalities;
+  // Universal-relational predicates (Re 4 sub-goal 6): asserted
+  // bvult/bvule/bvugt/bvuge constraints. Each entry pairs the
+  // predicate expression (in CBMC's ID_lt / ID_le form, with operand
+  // signedness in the operand types) with its asserted truth value.
+  // Encoded into the polynomial system via bit-decomposition by
+  // poly_extractort::extract_predicate.
+  std::vector<std::pair<exprt, bool>> algebraic_predicates;
   bool algebraic_solved = false;
   std::vector<literalt> algebraic_assumptions;
   virtual bool try_algebraic_solve();

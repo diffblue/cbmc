@@ -233,29 +233,20 @@ std::optional<polynomialt> poly_extractort::to_polynomial(const exprt &e)
   // determines b_{a,i} given a, so the augmented system has the
   // same models as the original (extended by the bit witnesses).
   if(
-    e.id() == ID_lshr && e.operands().size() == 2 &&
+    (e.id() == ID_lshr || e.id() == ID_ashr) && e.operands().size() == 2 &&
     e.operands()[1].is_constant())
   {
     if(!set_bitwidth(e.type()))
       return std::nullopt;
-    auto shift_amt = numeric_cast<mp_integer>(e.operands()[1]);
-    if(!shift_amt || *shift_amt < 0)
-      return std::nullopt;
-    unsigned d = bitwidth;
-    if(*shift_amt >= mp_integer{d})
-    {
-      // a >> k for k >= d is 0 (in unsigned bit-vectors).
-      return polynomialt{d};
-    }
-    auto bits = decompose_bits(e.operands()[0]);
+    auto bits = decompose_bits(e);
     if(!bits)
       return std::nullopt;
-    unsigned k = static_cast<unsigned>(shift_amt->to_long());
+    unsigned d = bitwidth;
     polynomialt result{d};
     std::set<std::size_t> bit_vars = get_bit_var_indices();
-    for(unsigned i = k; i < d; ++i)
+    for(unsigned i = 0; i < d; ++i)
     {
-      mp_integer coeff = power(mp_integer{2}, mp_integer{i - k});
+      mp_integer coeff = power(mp_integer{2}, mp_integer{i});
       result = result + (*bits)[i] * coeff;
     }
     result.normalize();
@@ -400,6 +391,403 @@ std::optional<polynomialt> poly_extractort::extract_equation(const exprt &eq)
 }
 
 std::optional<std::vector<polynomialt>>
+poly_extractort::extract_predicate(const exprt &pred, bool value)
+{
+  // Re 4 sub-goal 6: encode universal-relational predicates
+  // (bvult, bvule, bvugt, bvuge, and signed variants) into the
+  // polynomial system via bit-decomposition.
+  //
+  // Strategy for the first cut: handle the most frequent and
+  // most useful patterns:
+  //   (bvult x C), (bvule x C): upper bound on a symbolic x.
+  //   (bvult C x), (bvule C x): lower bound on a symbolic x.
+  // Both with constant C. Symbol-symbol comparisons fall through
+  // to the bit-comparator chain encoding (also implemented below
+  // but more expensive).
+  //
+  // Signed comparisons (bvslt / bvsle, distinguished by the
+  // operand types being signedbv rather than unsignedbv) reduce
+  // to unsigned via the sign-bit XOR transformation:
+  //   bvslt(a, b) ⇔ bvult(a XOR 2^(d-1), b XOR 2^(d-1))
+  // For now signed support is deferred to a follow-on commit.
+
+  if(
+    pred.id() != ID_lt && pred.id() != ID_le && pred.id() != ID_gt &&
+    pred.id() != ID_ge)
+    return std::nullopt;
+  if(pred.operands().size() != 2)
+    return std::nullopt;
+
+  // Fail fast on signed operands until signed support lands.
+  const exprt &raw_lhs = pred.operands()[0];
+  const exprt &raw_rhs = pred.operands()[1];
+  if(raw_lhs.type().id() == ID_signedbv || raw_rhs.type().id() == ID_signedbv)
+    return std::nullopt;
+
+  if(!set_bitwidth(raw_lhs.type()))
+    return std::nullopt;
+  const unsigned d = bitwidth;
+  if(d == 0)
+    return std::nullopt;
+
+  // Normalise all four predicate forms into "lhs <_strict_or_not rhs":
+  //   ID_lt  : lhs <  rhs
+  //   ID_le  : lhs <= rhs
+  //   ID_gt  : lhs >  rhs  ⇔  rhs <  lhs
+  //   ID_ge  : lhs >= rhs  ⇔  rhs <= lhs
+  // Then absorb the asserted truth value: setting (a < b) to false
+  // is equivalent to (b <= a) being true, etc.
+  bool strict;
+  exprt lhs;
+  exprt rhs;
+  if(pred.id() == ID_lt)
+  {
+    strict = true;
+    lhs = raw_lhs;
+    rhs = raw_rhs;
+  }
+  else if(pred.id() == ID_le)
+  {
+    strict = false;
+    lhs = raw_lhs;
+    rhs = raw_rhs;
+  }
+  else if(pred.id() == ID_gt)
+  {
+    strict = true;
+    lhs = raw_rhs;
+    rhs = raw_lhs;
+  }
+  else
+  {
+    // ID_ge.
+    strict = false;
+    lhs = raw_rhs;
+    rhs = raw_lhs;
+  }
+  if(!value)
+  {
+    std::swap(lhs, rhs);
+    strict = !strict;
+  }
+
+  // Now we have a positive constraint: lhs <_strict_or_not rhs.
+  // Try the constant-on-the-right pattern first, then constant-on-
+  // the-left.
+
+  auto try_upper_bound = [&](const exprt &x, const exprt &c_expr)
+    -> std::optional<std::vector<polynomialt>>
+  {
+    // (bvult x C) or (bvule x C). x is a symbolic operand, C is
+    // a constant. Polynomial encoding via bit-decomposition.
+    if(!c_expr.is_constant())
+      return std::nullopt;
+    auto c_opt = numeric_cast<mp_integer>(c_expr);
+    if(!c_opt.has_value())
+      return std::nullopt;
+    mp_integer C = *c_opt;
+    if(C < 0)
+      C += power(mp_integer{2}, mp_integer{d});
+
+    // Convert "x <= C" into "x < C+1". Then "x < N" with N in
+    // [0, 2^d]. N = 2^d ⇒ tautology; encode as empty.
+    mp_integer N = strict ? C : (C + 1);
+    if(N <= 0)
+    {
+      // x < 0 (impossible in unsigned). Encode UNSAT explicitly:
+      // 1 = 0 (a unit polynomial that Buchberger refutes).
+      return std::vector<polynomialt>{polynomialt{d, mp_integer{1}}};
+    }
+    if(N >= power(mp_integer{2}, mp_integer{d}))
+    {
+      // x < 2^d is trivially true; no constraint.
+      return std::vector<polynomialt>{};
+    }
+
+    // Pure power-of-2 case: N = 2^k. Then x < 2^k ⇔ all bits of x
+    // at positions [k, d-1] are zero. Cleanest encoding: register
+    // each high bit as forced to zero via additional_substitutions
+    // (so linear elimination propagates the constraint through the
+    // whole basis before Buchberger runs).
+    {
+      mp_integer t = N;
+      unsigned k = 0;
+      while(t % 2 == 0)
+      {
+        t /= 2;
+        ++k;
+      }
+      if(t == 1)
+      {
+        // N = 2^k. Decompose x and zero out high bits.
+        auto bits = decompose_bits(x);
+        if(!bits.has_value())
+          return std::nullopt;
+        std::vector<polynomialt> result;
+        for(unsigned i = k; i < d; ++i)
+        {
+          // bits[i] is a polynomial of the form 1 * b_var.
+          // Extract the variable index and add b_var -> 0 as
+          // a substitution for linear elimination.
+          if(
+            (*bits)[i].terms.size() == 1 &&
+            (*bits)[i].terms.begin()->second.vars.size() == 1)
+          {
+            std::size_t bit_var_idx =
+              (*bits)[i].terms.begin()->second.vars.begin()->first;
+            additional_substitutions.insert_or_assign(
+              bit_var_idx, polynomialt{d, mp_integer{0}});
+          }
+          else
+          {
+            // Constant or already-substituted: emit a polynomial
+            // assertion in the conventional way.
+            polynomialt p = (*bits)[i];
+            p.normalize();
+            if(!p.is_zero())
+              result.push_back(std::move(p));
+          }
+        }
+        return result;
+      }
+    }
+
+    // General constant N: bit-comparator chain encoding.
+    // Let n_i be the i-th bit of N, x_i be the i-th bit of x.
+    // The condition x < N is equivalent to:
+    //   (x_{d-1} < n_{d-1}) ∨
+    //   (x_{d-1} = n_{d-1} ∧ x_{d-2} < n_{d-2}) ∨ ...
+    // Equivalently, define lt_i = "x[d-1..i] < N[d-1..i]" and
+    // eq_i = "x[d-1..i] = N[d-1..i]". Recurrence:
+    //   lt_d = 0,  eq_d = 1.
+    //   lt_i = lt_{i+1} + eq_{i+1} * (1 - x_i) * n_i.
+    //   eq_i = eq_{i+1} * (x_i * n_i + (1 - x_i) * (1 - n_i)).
+    // x < N is then lt_0 = 1.
+    //
+    // We encode lt_i and eq_i as polynomials in the bit variables
+    // of x, asserting lt_0 - 1 = 0. Each lt_i / eq_i is a fresh
+    // intermediate idempotent variable to keep the polynomial degree
+    // manageable, with idempotency b^2 - b = 0.
+
+    auto bits = decompose_bits(x);
+    if(!bits.has_value())
+      return std::nullopt;
+
+    std::vector<polynomialt> result;
+    auto fresh_bit_var = [&]() -> std::size_t
+    {
+      irep_idt name = "__pred_aux_" + std::to_string(next_fresh++);
+      std::size_t idx = get_var_index(name);
+      // Idempotency: b^2 - b = 0.
+      polynomialt b{d, mp_integer{1}, idx};
+      polynomialt b2 = b * b;
+      polynomialt idem = b2 - b;
+      idem.normalize();
+      result.push_back(std::move(idem));
+      return idx;
+    };
+
+    polynomialt lt_curr{d, mp_integer{0}}; // lt_d
+    polynomialt eq_curr{d, mp_integer{1}}; // eq_d
+
+    for(int i = static_cast<int>(d) - 1; i >= 0; --i)
+    {
+      bool n_i = (N / power(mp_integer{2}, mp_integer{i})) % 2 != 0;
+      polynomialt x_i = (*bits)[static_cast<unsigned>(i)];
+
+      // lt_{i} = lt_{i+1} + eq_{i+1} * (1 - x_i) * n_i.
+      polynomialt new_lt = lt_curr;
+      if(n_i)
+      {
+        polynomialt one_minus_x = polynomialt{d, mp_integer{1}} - x_i;
+        polynomialt term = eq_curr * one_minus_x;
+        new_lt = new_lt + term;
+      }
+      // Materialise as a fresh idempotent variable to avoid
+      // polynomial-degree blowup down the chain.
+      std::size_t lt_idx = fresh_bit_var();
+      polynomialt lt_var{d, mp_integer{1}, lt_idx};
+      polynomialt lt_def = new_lt - lt_var;
+      lt_def.normalize();
+      result.push_back(std::move(lt_def));
+
+      // eq_{i} = eq_{i+1} * (x_i * n_i + (1 - x_i) * (1 - n_i)).
+      // For n_i=0: factor is (1 - x_i). For n_i=1: factor is x_i.
+      polynomialt factor = n_i ? x_i : (polynomialt{d, mp_integer{1}} - x_i);
+      polynomialt new_eq = eq_curr * factor;
+      std::size_t eq_idx = fresh_bit_var();
+      polynomialt eq_var{d, mp_integer{1}, eq_idx};
+      polynomialt eq_def = new_eq - eq_var;
+      eq_def.normalize();
+      result.push_back(std::move(eq_def));
+
+      lt_curr = lt_var;
+      eq_curr = eq_var;
+    }
+
+    // Assert lt_0 = 1.
+    polynomialt assertion = lt_curr - polynomialt{d, mp_integer{1}};
+    assertion.normalize();
+    result.push_back(std::move(assertion));
+    return result;
+  };
+
+  auto try_lower_bound = [&](const exprt &c_expr, const exprt &x)
+    -> std::optional<std::vector<polynomialt>>
+  {
+    // (bvult C x) ⇔ (bvugt x C) ⇔ x > C ⇔ x >= C+1.
+    // (bvule C x) ⇔ (bvuge x C) ⇔ x >= C.
+    // For now, encode the general case by computing the negation
+    // of an upper bound and asserting via the bit-chain.
+    if(!c_expr.is_constant())
+      return std::nullopt;
+    auto c_opt = numeric_cast<mp_integer>(c_expr);
+    if(!c_opt.has_value())
+      return std::nullopt;
+    mp_integer C = *c_opt;
+    if(C < 0)
+      C += power(mp_integer{2}, mp_integer{d});
+
+    // x >= N where N = strict ? C+1 : C.
+    mp_integer N = strict ? (C + 1) : C;
+    if(N <= 0)
+      return std::vector<polynomialt>{}; // x >= 0 trivially true.
+    if(N >= power(mp_integer{2}, mp_integer{d}))
+    {
+      // x >= 2^d is impossible.
+      return std::vector<polynomialt>{polynomialt{d, mp_integer{1}}};
+    }
+
+    // Simple closed-form lower-bound shortcuts that produce a
+    // substitution-based encoding instead of the bit-comparator
+    // chain:
+    //
+    //   N = 2^(d-1)  ⇔ x >= 2^(d-1) ⇔ MSB of x is 1.
+    //   N = 2^d - 2^k (i.e., bits [k, d-1] all set) ⇔ x in the
+    //     "all-high-bits-on" segment ⇔ bits [k, d-1] of x are all 1.
+    //
+    // These cover the common "is-negative" / "saturates-high"
+    // preconditions that show up in shift-related identities.
+    {
+      mp_integer two_d = power(mp_integer{2}, mp_integer{d});
+      mp_integer m = two_d - N;
+      // Detect m = 2^k with 0 <= k < d. Then N = 2^d - 2^k, which
+      // is a string of 1s in bit positions [k, d-1] (ignoring
+      // high mod-out). x >= N ⇔ those bits are all 1.
+      mp_integer t = m;
+      unsigned k = 0;
+      while(t > 0 && t % 2 == 0)
+      {
+        t /= 2;
+        ++k;
+      }
+      if(t == 1 && k < d)
+      {
+        // N = 2^d - 2^k. Decompose x and force bits [k, d-1] to 1.
+        auto bits = decompose_bits(x);
+        if(!bits.has_value())
+          return std::nullopt;
+        std::vector<polynomialt> result;
+        for(unsigned i = k; i < d; ++i)
+        {
+          if(
+            (*bits)[i].terms.size() == 1 &&
+            (*bits)[i].terms.begin()->second.vars.size() == 1)
+          {
+            std::size_t bit_var_idx =
+              (*bits)[i].terms.begin()->second.vars.begin()->first;
+            additional_substitutions.insert_or_assign(
+              bit_var_idx, polynomialt{d, mp_integer{1}});
+          }
+          else
+          {
+            polynomialt p = (*bits)[i] - polynomialt{d, mp_integer{1}};
+            p.normalize();
+            if(!p.is_zero())
+              result.push_back(std::move(p));
+          }
+        }
+        return result;
+      }
+    }
+
+    // Pure power-of-2 lower bound x >= 2^k means bits [k, d-1]
+    // OR'd are nonzero — *not* expressible as a single bit
+    // equality. Fall through to the bit-chain general encoding,
+    // which handles it correctly (lt_0 = 0 instead of 1).
+
+    // Reuse the upper-bound chain machinery but assert lt_0 = 0
+    // (which is equivalent to x >= N).
+    auto bits = decompose_bits(x);
+    if(!bits.has_value())
+      return std::nullopt;
+
+    std::vector<polynomialt> result;
+    auto fresh_bit_var = [&]() -> std::size_t
+    {
+      irep_idt name = "__pred_aux_" + std::to_string(next_fresh++);
+      std::size_t idx = get_var_index(name);
+      polynomialt b{d, mp_integer{1}, idx};
+      polynomialt b2 = b * b;
+      polynomialt idem = b2 - b;
+      idem.normalize();
+      result.push_back(std::move(idem));
+      return idx;
+    };
+
+    polynomialt lt_curr{d, mp_integer{0}};
+    polynomialt eq_curr{d, mp_integer{1}};
+    for(int i = static_cast<int>(d) - 1; i >= 0; --i)
+    {
+      bool n_i = (N / power(mp_integer{2}, mp_integer{i})) % 2 != 0;
+      polynomialt x_i = (*bits)[static_cast<unsigned>(i)];
+
+      polynomialt new_lt = lt_curr;
+      if(n_i)
+      {
+        polynomialt one_minus_x = polynomialt{d, mp_integer{1}} - x_i;
+        polynomialt term = eq_curr * one_minus_x;
+        new_lt = new_lt + term;
+      }
+      std::size_t lt_idx = fresh_bit_var();
+      polynomialt lt_var{d, mp_integer{1}, lt_idx};
+      polynomialt lt_def = new_lt - lt_var;
+      lt_def.normalize();
+      result.push_back(std::move(lt_def));
+
+      polynomialt factor = n_i ? x_i : (polynomialt{d, mp_integer{1}} - x_i);
+      polynomialt new_eq = eq_curr * factor;
+      std::size_t eq_idx = fresh_bit_var();
+      polynomialt eq_var{d, mp_integer{1}, eq_idx};
+      polynomialt eq_def = new_eq - eq_var;
+      eq_def.normalize();
+      result.push_back(std::move(eq_def));
+
+      lt_curr = lt_var;
+      eq_curr = eq_var;
+    }
+
+    // Assert lt_0 = 0  ⇒  x >= N.
+    polynomialt assertion = lt_curr;
+    assertion.normalize();
+    result.push_back(std::move(assertion));
+    return result;
+  };
+
+  // Constant on the right: x <_strict C
+  if(rhs.is_constant())
+    return try_upper_bound(lhs, rhs);
+  // Constant on the left: C <_strict x  ⇔  x >_strict C
+  if(lhs.is_constant())
+    return try_lower_bound(lhs, rhs);
+
+  // Symmetric symbol-symbol: not supported in this first cut.
+  // Both operands symbolic ⇒ the bit-comparator chain would
+  // need bits of both. Defer to a follow-on commit.
+  return std::nullopt;
+}
+
+std::optional<std::vector<polynomialt>>
 poly_extractort::decompose_bits(const exprt &e)
 {
   // Determine the polynomial bitwidth d from the expression's type.
@@ -500,6 +888,41 @@ poly_extractort::decompose_bits(const exprt &e)
         result.push_back((*inner_bits)[i + k]);
       else
         result.push_back(zero);
+    }
+    return result;
+  }
+
+  // bvashr a k (constant k): arithmetic shift right by k.
+  // bit i for i+k < d is bit_a_{i+k}; bit i for i+k >= d is the sign
+  // bit (bit_a_{d-1}, replicated). Sound via bit-decomposition.
+  if(
+    e.id() == ID_ashr && e.operands().size() == 2 &&
+    e.operands()[1].is_constant())
+  {
+    auto shift_amt = numeric_cast<mp_integer>(e.operands()[1]);
+    if(!shift_amt || *shift_amt < 0)
+      return std::nullopt;
+    auto inner_bits = decompose_bits(e.operands()[0]);
+    if(!inner_bits)
+      return std::nullopt;
+    std::vector<polynomialt> result;
+    result.reserve(d);
+    if(*shift_amt >= mp_integer{d})
+    {
+      // ashr by >= d gives all sign bits.
+      const polynomialt &sign_bit = (*inner_bits).back();
+      for(unsigned i = 0; i < d; ++i)
+        result.push_back(sign_bit);
+      return result;
+    }
+    unsigned k = static_cast<unsigned>(shift_amt->to_long());
+    const polynomialt &sign_bit = (*inner_bits).back();
+    for(unsigned i = 0; i < d; ++i)
+    {
+      if(i + k < d)
+        result.push_back((*inner_bits)[i + k]);
+      else
+        result.push_back(sign_bit);
     }
     return result;
   }

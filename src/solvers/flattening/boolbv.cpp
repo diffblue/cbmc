@@ -627,6 +627,45 @@ void boolbvt::set_to(const exprt &expr, bool value)
     }
   }
 
+  // Universal-relational predicates (Re 4 sub-goal 6):
+  // recognise asserted bvult/bvule (and their negations) when the
+  // operands are not __CPROVER internals. The polynomial encoding
+  // is performed by poly_extractort::extract_predicate at the
+  // Buchberger-setup site, alongside extract_equation for the
+  // equational facts.
+  //
+  // We also handle (not (bvult ...)) / (not (bvule ...)) set to
+  // true, which is equivalent to bvuge / bvugt set to true.
+  auto is_relational = [](const irep_idt &id)
+  { return id == ID_lt || id == ID_le || id == ID_gt || id == ID_ge; };
+  auto is_internal_op = [](const exprt &e)
+  {
+    return e.id() == ID_symbol &&
+           id2string(to_symbol_expr(e).get_identifier()).find("__CPROVER") !=
+             std::string::npos;
+  };
+  if(!algebraic_solved && is_relational(expr.id()))
+  {
+    if(
+      expr.operands().size() == 2 && !is_internal_op(expr.operands()[0]) &&
+      !is_internal_op(expr.operands()[1]))
+    {
+      algebraic_predicates.emplace_back(expr, value);
+    }
+  }
+  if(
+    !algebraic_solved && expr.id() == ID_not && expr.operands().size() == 1 &&
+    value && is_relational(expr.operands()[0].id()))
+  {
+    const exprt &inner = expr.operands()[0];
+    if(
+      inner.operands().size() == 2 && !is_internal_op(inner.operands()[0]) &&
+      !is_internal_op(inner.operands()[1]))
+    {
+      algebraic_predicates.emplace_back(inner, false);
+    }
+  }
+
   // Count symbolic multiplications for adaptive encoding
   expr.visit_pre(
     [this](const exprt &e)
@@ -728,6 +767,23 @@ bool boolbvt::try_algebraic_solve()
     auto poly = extractor.extract_equation(eq);
     if(poly.has_value() && !poly->is_zero())
       equations.push_back(std::move(*poly));
+  }
+
+  // Extract universal-relational predicates (Re 4 sub-goal 6) into
+  // polynomial constraints. Each predicate may produce multiple
+  // polynomials (idempotency for fresh aux bits, recurrence relations,
+  // and a final assertion polynomial).
+  for(const auto &[pred_expr, pred_val] : algebraic_predicates)
+  {
+    auto polys = extractor.extract_predicate(pred_expr, pred_val);
+    if(!polys.has_value())
+      continue;
+    for(auto &p : *polys)
+    {
+      p.normalize();
+      if(!p.is_zero())
+        equations.push_back(std::move(p));
+    }
   }
 
   // Extract disequalities (negated assertions) via Rabinowitsch trick
@@ -869,6 +925,19 @@ bool boolbvt::try_algebraic_solve()
       auto poly = single_extractor.extract_equation(eq);
       if(poly.has_value() && !poly->is_zero())
         single_eqs.push_back(std::move(*poly));
+    }
+    // Universal-relational predicates (Re 4 sub-goal 6).
+    for(const auto &[pred_expr, pred_val] : algebraic_predicates)
+    {
+      auto polys = single_extractor.extract_predicate(pred_expr, pred_val);
+      if(!polys.has_value())
+        continue;
+      for(auto &p : *polys)
+      {
+        p.normalize();
+        if(!p.is_zero())
+          single_eqs.push_back(std::move(p));
+      }
     }
     // Add side equations from fresh variable decomposition
     for(auto &se : single_extractor.side_equations)
@@ -1051,6 +1120,19 @@ bool boolbvt::try_algebraic_solve()
         auto poly = branch_extractor.extract_equation(eq);
         if(poly.has_value() && !poly->is_zero())
           branch_eqs.push_back(std::move(*poly));
+      }
+      // Universal-relational predicates (Re 4 sub-goal 6).
+      for(const auto &[pred_expr, pred_val] : algebraic_predicates)
+      {
+        auto polys = branch_extractor.extract_predicate(pred_expr, pred_val);
+        if(!polys.has_value())
+          continue;
+        for(auto &p : *polys)
+        {
+          p.normalize();
+          if(!p.is_zero())
+            branch_eqs.push_back(std::move(p));
+        }
       }
       for(auto &se : branch_extractor.side_equations)
       {
