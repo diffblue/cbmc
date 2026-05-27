@@ -4028,8 +4028,22 @@ resolved_after_strip:
       // Check if the caller is in a derived class — derived class
       // constructors can call base class constructors even if private
       // (e.g., MSVC's bad_array_new_length calling bad_alloc(const char*)).
-      const irep_idt &current_class =
-        cpp_typecheck.cpp_scopes.current_scope().get_parent().identifier;
+      // The "current class" is the nearest class scope on the
+      // current-scope chain.  When the resolution happens from inside
+      // a method body, the scope chain is `method -> class -> ...`
+      // so the parent of the current scope is the class.  When the
+      // resolution happens from a class scope directly (e.g., during
+      // implicit destructor synthesis triggered while elaborating the
+      // derived class), the current scope IS the class.  Walk the
+      // chain and pick the first class scope.
+      const cpp_scopet *cls_scope = &cpp_typecheck.cpp_scopes.current_scope();
+      while(cls_scope != nullptr && !cls_scope->is_root_scope() &&
+            !cls_scope->is_class())
+        cls_scope = &cls_scope->get_parent();
+      const irep_idt current_class =
+        (cls_scope != nullptr && cls_scope->is_class())
+          ? cls_scope->identifier
+          : irep_idt{};
       irep_idt comp_name = result.get(ID_component_name);
       if(!comp_name.empty() && !current_class.empty())
       {
@@ -4037,7 +4051,20 @@ resolved_after_strip:
         auto pos = id_str.rfind("::");
         if(pos != std::string::npos)
         {
-          const std::string base_class = "tag-" + id_str.substr(0, pos);
+          // Build the expected struct_tag identifier for the
+          // class containing `comp_name`.  The `tag-` prefix
+          // attaches to the unqualified class name, AFTER any
+          // enclosing-namespace qualifier.  For example
+          // `std::__pair_base<...>::~...` → class identifier is
+          // `std::tag-__pair_base<...>` (not `tag-std::__pair_base<...>`).
+          const std::string class_qualified = id_str.substr(0, pos);
+          auto last_ns = class_qualified.rfind("::");
+          std::string base_class;
+          if(last_ns == std::string::npos)
+            base_class = "tag-" + class_qualified;
+          else
+            base_class = class_qualified.substr(0, last_ns + 2) + "tag-" +
+                         class_qualified.substr(last_ns + 2);
           // Check if current class inherits from the base class
           const symbolt *cur_sym =
             cpp_typecheck.symbol_table.lookup(current_class);
