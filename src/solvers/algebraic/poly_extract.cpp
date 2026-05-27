@@ -216,6 +216,50 @@ std::optional<polynomialt> poly_extractort::to_polynomial(const exprt &e)
     return *base * factor;
   }
 
+  // Right shift by constant: a >> k.
+  //
+  // bvlshr is not a polynomial operation in Z_{2^d}, but it becomes
+  // one once we expose the bit-level structure of a via
+  // bit-decomposition variables b_{a,0}, ..., b_{a,d-1}:
+  //
+  //   a >> k = sum_{i = k}^{d-1} 2^{i-k} b_{a,i}
+  //
+  // The bit variables and the side equations enforcing idempotency
+  // and sum-decomposition are managed by decompose_bits(), which
+  // caches per host-variable index to avoid duplicate constraints.
+  //
+  // Sound by construction: the bit-decomposition encoding uniquely
+  // determines b_{a,i} given a, so the augmented system has the
+  // same models as the original (extended by the bit witnesses).
+  if(
+    e.id() == ID_lshr && e.operands().size() == 2 &&
+    e.operands()[1].is_constant())
+  {
+    if(!set_bitwidth(e.type()))
+      return std::nullopt;
+    auto shift_amt = numeric_cast<mp_integer>(e.operands()[1]);
+    if(!shift_amt || *shift_amt < 0)
+      return std::nullopt;
+    unsigned d = bitwidth;
+    if(*shift_amt >= mp_integer{d})
+    {
+      // a >> k for k >= d is 0 (in unsigned bit-vectors).
+      return polynomialt{d};
+    }
+    auto bits = decompose_bits(e.operands()[0]);
+    if(!bits)
+      return std::nullopt;
+    unsigned k = static_cast<unsigned>(shift_amt->to_long());
+    polynomialt result{d};
+    for(unsigned i = k; i < d; ++i)
+    {
+      mp_integer coeff = power(mp_integer{2}, mp_integer{i - k});
+      result = result + (*bits)[i] * coeff;
+    }
+    result.normalize();
+    return result;
+  }
+
   // if-then-else: ite(cond, a, 0) = cond * a (when cond is 0/1)
   if(e.id() == ID_if && e.operands().size() == 3)
   {
@@ -300,4 +344,92 @@ std::optional<polynomialt> poly_extractort::extract_equation(const exprt &eq)
   polynomialt diff = *lhs - *rhs;
   diff.normalize();
   return diff;
+}
+
+std::optional<std::vector<polynomialt>>
+poly_extractort::decompose_bits(const exprt &e)
+{
+  // Determine the polynomial bitwidth d from the expression's type.
+  if(!set_bitwidth(e.type()))
+    return std::nullopt;
+  unsigned d = bitwidth;
+  if(d == 0)
+    return std::nullopt;
+
+  // Convert e to a polynomial. We need a single "host" variable that
+  // represents e's value so we can attach bit variables to it.
+  auto host_poly = to_polynomial(e);
+  if(!host_poly)
+    return std::nullopt;
+
+  // If the polynomial is a single variable (1 * x_v + 0), we use that
+  // variable as the host directly. Otherwise, introduce a fresh host
+  // variable and equate it with the polynomial.
+  std::size_t host_idx;
+  if(
+    host_poly->terms.size() == 1 &&
+    host_poly->terms.front().first == mp_integer{1} &&
+    host_poly->terms.front().second.vars.size() == 1 &&
+    host_poly->terms.front().second.vars.front().second == 1)
+  {
+    host_idx = host_poly->terms.front().second.vars.front().first;
+  }
+  else
+  {
+    host_idx = get_var_index("__bd_host_" + std::to_string(next_fresh++));
+    polynomialt host_var{d, mp_integer{1}, host_idx};
+    polynomialt host_eq = host_var - *host_poly;
+    host_eq.normalize();
+    if(!host_eq.is_zero())
+      side_equations.push_back(std::move(host_eq));
+  }
+
+  // Cache check: if the host has been decomposed already, return the
+  // cached bit polynomials without adding new side equations.
+  auto cache_it = bit_decomp_cache.find(host_idx);
+  if(cache_it != bit_decomp_cache.end())
+  {
+    std::vector<polynomialt> bits;
+    bits.reserve(cache_it->second.size());
+    for(std::size_t b_idx : cache_it->second)
+      bits.emplace_back(d, mp_integer{1}, b_idx);
+    return bits;
+  }
+
+  // Allocate d fresh bit variables and add side equations.
+  std::vector<std::size_t> bit_indices;
+  bit_indices.reserve(d);
+  std::vector<polynomialt> bits;
+  bits.reserve(d);
+  for(unsigned i = 0; i < d; ++i)
+  {
+    std::size_t b_idx = get_var_index(
+      "__bd_bit_" + std::to_string(host_idx) + "_" + std::to_string(i));
+    bit_indices.push_back(b_idx);
+    polynomialt b{d, mp_integer{1}, b_idx};
+
+    // Idempotency: b^2 - b = 0
+    polynomialt idem = (b * b) - b;
+    idem.normalize();
+    if(!idem.is_zero())
+      side_equations.push_back(std::move(idem));
+
+    bits.push_back(std::move(b));
+  }
+
+  // Sum-decomposition: host - sum_i 2^i * b_i = 0
+  polynomialt host_var{d, mp_integer{1}, host_idx};
+  polynomialt sum{d};
+  for(unsigned i = 0; i < d; ++i)
+  {
+    mp_integer coeff = power(mp_integer{2}, mp_integer{i});
+    sum = sum + bits[i] * coeff;
+  }
+  polynomialt sum_eq = host_var - sum;
+  sum_eq.normalize();
+  if(!sum_eq.is_zero())
+    side_equations.push_back(std::move(sum_eq));
+
+  bit_decomp_cache.emplace(host_idx, std::move(bit_indices));
+  return bits;
 }

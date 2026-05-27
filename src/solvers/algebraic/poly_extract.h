@@ -24,6 +24,25 @@ public:
   /// Returns nullopt if the expression contains non-polynomial operations.
   std::optional<polynomialt> to_polynomial(const exprt &e);
 
+  /// Decompose an expression into its bit variables, soundly.
+  ///
+  /// Returns a vector of polynomials [b_0, ..., b_{d-1}], where each
+  /// b_i is a polynomial of the form (1 * x_v) for a fresh bit
+  /// variable v_i. Side equations are added to enforce:
+  ///   - idempotency: b_i^2 - b_i = 0 (forces b_i in {0, 1})
+  ///   - sum-decomposition: e - sum_i 2^i b_i = 0
+  ///
+  /// In Z_{2^d}, idempotency b(b - 1) = 0 implies b = 0 or b = 1
+  /// (since b and b - 1 are coprime, one must be 0 mod 2^d). Combined
+  /// with sum-decomposition, the b_i are uniquely the bits of e.
+  ///
+  /// Caches per host-variable index so repeated decompositions of
+  /// the same variable reuse the same bit variables (and side
+  /// equations are added only once).
+  ///
+  /// Returns nullopt if e is non-polynomial or has unsupported type.
+  std::optional<std::vector<polynomialt>> decompose_bits(const exprt &e);
+
   /// Given an equality constraint (lhs == rhs), extract the polynomial
   /// equation lhs - rhs = 0. Returns nullopt if either side is
   /// non-polynomial.
@@ -63,6 +82,13 @@ private:
   std::size_t next_var_index = 0;
   std::size_t next_fresh = 0;
   unsigned bitwidth = 0;
+
+  /// Bit-decomposition cache: maps host variable index to the vector
+  /// of bit-variable indices [v_0, ..., v_{d-1}] for that host.
+  /// Each polynomial variable that gets bit-decomposed is decomposed
+  /// at most once per extractor instance; subsequent decompose_bits
+  /// calls return polynomials wrapping the cached bit variables.
+  std::map<std::size_t, std::vector<std::size_t>> bit_decomp_cache;
 
   /// Set bitwidth from a bitvector type. Returns false if incompatible.
   bool set_bitwidth(const typet &type);
