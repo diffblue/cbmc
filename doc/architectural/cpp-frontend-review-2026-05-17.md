@@ -2398,3 +2398,137 @@ cbmc-cpp regressions: 679/0/83 (one previously-failing test
 now properly verifies; two new regression tests added).  Dog-food
 unchanged at 20/17/80/0 (dominated by the unrelated Category-A
 irept-body issue).
+
+
+## 2026-05-27 (continued) Three more cascade layers: TT-param alias forward, inherited conversion operators, constexpr eval safety
+
+The previous landing pushed the cascade past the qualified-name
+lookup ambiguity.  This session's three follow-on fixes push
+through the next three layers; the cascade now stops at a
+deeper-nested template-class method-body issue.
+
+### What landed
+
+| commit | summary |
+|---|---|
+| `e54bcdd520` | (previous session, recapped) Qualified-name lookup for TT-param-bound qualifiers |
+| `3bae7b3527` | Forward already-resolved TT-param-bound TT-param argument |
+| `a5bfd7c4da` | Include inherited cast operators in user-defined-conversion search |
+| `2f3e2b37ca` | Reject un-resolved cpp_name in constexpr function-call eval result |
+
+### The three bugs
+
+#### Bug A: TT-param-alias-forward (3bae7b3527)
+
+`__detected_or_t<Default, Op, Args...>` (libstdc++'s
+"detect-or-default") forwards its `_Op` template-template
+parameter to inner `__detected_or<Default, _Op, Args...>`.  At
+the inner instantiation, the `_Op` argument arrives as an
+`ambiguous` / `type_exprt` whose type is already a
+`template_parameter_symbol_type` (the resolved binding from the
+outer scope).
+
+`typecheck_template_args`'s TT-param dispatch only handled
+`cpp_name`-typed arguments.  When the argument was
+already-resolved, the lookup branch was skipped and the function
+fell through to "expected template name for template template
+parameter".
+
+Fix: detect the already-resolved TPST case and forward it
+directly into `template_map`, normalising the args[i] entry from
+`ambiguous` to `type_exprt` so the downstream `template_suffix`
+invariant `expr.id() != ID_ambiguous` doesn't trip.
+
+Test: `regression/cbmc-cpp/cpp17_tt_param_alias_forward`.
+
+#### Bug B: inherited-conversion-operator (a5bfd7c4da)
+
+`user_defined_conversion_sequence` skipped any component with
+`from_base=true` when scanning for cast operators.  Per
+[class.conv.fct]/1 + [class.member.lookup]/4 inherited
+conversion operators are valid candidates in derived-class
+lookup.
+
+Concrete failure: libstdc++'s `__and_<Cs...>` inherits its
+`operator bool()` from `integral_constant<bool, V>`, and code
+such as `_Hashtable_enable_default_ctor<...>` has
+`__and_<...>{}` as a non-type template argument.  The unconditional
+skip silently filtered out the inherited operator and produced
+"invalid implicit conversion from 'struct __and_' to 'bool'".
+
+Fix: drop the `from_base` filter in the cast-operator scan
+loop.  Standard rules (access, using-declarations) already
+handle which inherited operators are visible.
+
+Test: `regression/cbmc-cpp/cpp17_inherited_conversion_op`.
+
+#### Bug C: constexpr-eval safety (2f3e2b37ca)
+
+`typecheck_side_effect_function_call`'s constexpr-evaluation
+block substitutes parameters in the function body and installs
+the result in place of the call when a `has_calls` check
+confirms the result is fully foldable.  The check rejected
+remaining side effects and non-`code` symbol references but
+missed unresolved `cpp_name` nodes.
+
+When a class-scope `constexpr` member function references
+same-class members (e.g. a static `value`) and the body hasn't
+been type-checked in its own class scope yet, the body is still
+in cpp_name form.  The substitute-and-install path then leaves
+unresolved cpp_names in the caller's scope, where the
+downstream typecheck of `value` fails with a "symbol 'value' is
+unknown" diagnostic at a source location pointing back into the
+function body — confusing because the actual lookup happens in
+the caller's scope.
+
+Fix: also reject `cpp_name` in the `has_calls` check.  This is
+a defensive narrowing that prevents corruption of caller scopes
+when an upstream body wasn't ready for constexpr folding.
+
+### New stopping point
+
+`/tmp/reserve_repro11.cpp` now stops at the chain that bug C
+documents but doesn't fully fix:
+
+```
+instantiating 'std::_Hashtable_enable_default_ctor'
+   with <struct equal_to, struct hash, struct allocator>
+   at file /usr/include/c++/13/bits/hashtable.h line 233
+symbol 'value' is unknown
+file /tmp/reserve_repro11.cpp line 12 function f:
+   symbol 'reserve' is unknown
+CONVERSION ERROR
+```
+
+The static member `value` in `integral_constant<bool, V>` is
+being looked up in `main`'s scope rather than in
+`tag-integral_constant<bool, true>`'s scope.  This happens
+because the template-class member function `get()` (or
+`operator bool()`) hasn't been processed by
+`typecheck_method_bodies` at the time the call result is needed
+as a non-type template argument; the body's unqualified
+`value` cpp_name reaches the caller without ever being resolved
+in the function's own (class) scope.
+
+The proper fix is to either:
+1. Eagerly typecheck a constexpr method body before constexpr-
+   evaluating it (so cpp_names get resolved in the function's
+   class scope), or
+2. Re-typecheck the body (or just the substituted result) in the
+   function's class scope before installing it at the caller, or
+3. Properly resolve the body's unqualified static-member
+   references at template-instantiation time so the body stored
+   in the symbol table is already fully resolved.
+
+Each is a non-trivial restructuring of the constexpr-function
+evaluation path; deferred to a future session.
+
+### Status
+
+cbmc-cpp regressions: 681/0/83 (two new tests added).
+Dog-food unchanged at 20/17/80/0 (still dominated by Category-A
+irept-body abandonment).
+
+Total commits this session (so far): 7 source/test + 2 doc.
+The branch is now 60+ commits ahead of
+`tautschnig/cpp11-parser-rework-squashed`.
