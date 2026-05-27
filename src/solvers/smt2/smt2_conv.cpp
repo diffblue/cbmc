@@ -243,38 +243,6 @@ void smt2_convt::write_footer()
       << "\n";
 }
 
-/// Returns true iff \p type has effective width of zero bits.
-static bool is_zero_width(const typet &type, const namespacet &ns)
-{
-  if(type.id() == ID_empty)
-    return true;
-  else if(type.id() == ID_struct_tag)
-    return is_zero_width(ns.follow_tag(to_struct_tag_type(type)), ns);
-  else if(type.id() == ID_union_tag)
-    return is_zero_width(ns.follow_tag(to_union_tag_type(type)), ns);
-  else if(type.id() == ID_struct || type.id() == ID_union)
-  {
-    for(const auto &comp : to_struct_union_type(type).components())
-    {
-      if(!is_zero_width(comp.type(), ns))
-        return false;
-    }
-    return true;
-  }
-  else if(auto array_type = type_try_dynamic_cast<array_typet>(type))
-  {
-    // we ignore array_type->size().is_zero() for now as there may be
-    // out-of-bounds accesses that we need to model
-    return is_zero_width(array_type->element_type(), ns);
-  }
-  else if(auto bv_type = type_try_dynamic_cast<bitvector_typet>(type))
-  {
-    return bv_type->width() == 0;
-  }
-  else
-    return false;
-}
-
 void smt2_convt::define_object_size(
   const irep_idt &id,
   const object_size_exprt &expr)
