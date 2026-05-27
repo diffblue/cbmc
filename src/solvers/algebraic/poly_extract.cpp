@@ -260,6 +260,85 @@ std::optional<polynomialt> poly_extractort::to_polynomial(const exprt &e)
     return result;
   }
 
+  // Bitwise NOT: ~a = sum_i 2^i (1 - b_{a,i}).
+  // Sound via bit-decomposition (same construction as bvlshr).
+  if(e.id() == ID_bitnot && e.operands().size() == 1)
+  {
+    if(!set_bitwidth(e.type()))
+      return std::nullopt;
+    auto bits = decompose_bits(e.operands()[0]);
+    if(!bits)
+      return std::nullopt;
+    unsigned d = bitwidth;
+    polynomialt one{d, mp_integer{1}};
+    polynomialt result{d};
+    for(unsigned i = 0; i < d; ++i)
+    {
+      mp_integer coeff = power(mp_integer{2}, mp_integer{i});
+      polynomialt not_bit = one - (*bits)[i];
+      result = result + not_bit * coeff;
+    }
+    result.normalize();
+    return result;
+  }
+
+  // Bitwise AND: a & b = sum_i 2^i (b_{a,i} * b_{b,i}).
+  // Sound via bit-decomposition. The product b_{a,i} * b_{b,i} is a
+  // degree-2 polynomial in the bit variables, faithfully modelling
+  // the bitwise AND of a and b.
+  if(
+    (e.id() == ID_bitand || e.id() == ID_bitor || e.id() == ID_bitxor) &&
+    e.operands().size() >= 2)
+  {
+    if(!set_bitwidth(e.type()))
+      return std::nullopt;
+    unsigned d = bitwidth;
+    // Decompose each operand. The semantics of multi-ary ops folds
+    // left-to-right; we only need pairwise bit decomp + recursive
+    // accumulation in the polynomial form.
+    auto acc_bits = decompose_bits(e.operands()[0]);
+    if(!acc_bits)
+      return std::nullopt;
+    for(std::size_t i = 1; i < e.operands().size(); ++i)
+    {
+      auto next_bits = decompose_bits(e.operands()[i]);
+      if(!next_bits)
+        return std::nullopt;
+      // Combine acc_bits and next_bits bitwise.
+      std::vector<polynomialt> combined;
+      combined.reserve(d);
+      for(unsigned j = 0; j < d; ++j)
+      {
+        const polynomialt &x = (*acc_bits)[j];
+        const polynomialt &y = (*next_bits)[j];
+        if(e.id() == ID_bitand)
+        {
+          // x AND y = x * y
+          combined.push_back(x * y);
+        }
+        else if(e.id() == ID_bitor)
+        {
+          // x OR y = x + y - x*y
+          combined.push_back((x + y) - (x * y));
+        }
+        else // ID_bitxor
+        {
+          // x XOR y = x + y - 2*x*y
+          combined.push_back((x + y) - (x * y) * mp_integer{2});
+        }
+      }
+      acc_bits = std::move(combined);
+    }
+    polynomialt result{d};
+    for(unsigned j = 0; j < d; ++j)
+    {
+      mp_integer coeff = power(mp_integer{2}, mp_integer{j});
+      result = result + (*acc_bits)[j] * coeff;
+    }
+    result.normalize();
+    return result;
+  }
+
   // if-then-else: ite(cond, a, 0) = cond * a (when cond is 0/1)
   if(e.id() == ID_if && e.operands().size() == 3)
   {
