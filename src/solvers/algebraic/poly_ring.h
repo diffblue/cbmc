@@ -155,4 +155,21 @@ void apply_frobenius_idempotency(
   polynomialt &p,
   const std::set<std::size_t> &bit_vars);
 
+/// Substitute variable \p v in polynomial \p p with polynomial
+/// \p q. Returns the polynomial p[v := q].
+///
+/// Used by Re 4 sub-goal 3 follow-on (linear elimination of host
+/// variables): for each host h with sum-decomposition
+/// h = sum_i 2^i b_i, substituting h -> sum_i 2^i b_i in every
+/// polynomial of the basis eliminates h as a variable. The sum-
+/// decomposition equation itself becomes 0 = 0 after substitution
+/// and is dropped.
+///
+/// Sound because substitution preserves the variety of the
+/// polynomial system: any model of the original system (including
+/// the constraint v = q) maps to a model of the substituted
+/// system, and vice versa (extending models with v = q).
+polynomialt
+substitute_variable(const polynomialt &p, std::size_t v, const polynomialt &q);
+
 #endif // CPROVER_SOLVERS_ALGEBRAIC_POLY_RING_H

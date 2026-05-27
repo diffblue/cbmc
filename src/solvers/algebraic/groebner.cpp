@@ -168,6 +168,21 @@ strong_groebner_basist::compute(std::vector<polynomialt> &polys)
 {
   steps_taken = 0;
 
+  // Apply host substitutions (linear elimination): replace each
+  // host variable h with its bit-sum polynomial in every input
+  // polynomial. This eliminates the host as a variable; the
+  // sum-decomposition equations (h - sum_i 2^i b_i = 0) become
+  // trivially zero and are dropped by the zero-removal step
+  // below.
+  if(!host_substitutions.empty())
+  {
+    for(auto &p : polys)
+    {
+      for(const auto &[host_idx, sub_poly] : host_substitutions)
+        p = substitute_variable(p, host_idx, sub_poly);
+    }
+  }
+
   // Apply Frobenius to all input polynomials so the initial basis
   // is already idempotency-reduced.
   if(!bit_vars.empty())

@@ -300,3 +300,39 @@ void apply_frobenius_idempotency(
     p.normalize();
   }
 }
+
+polynomialt
+substitute_variable(const polynomialt &p, std::size_t v, const polynomialt &q)
+{
+  polynomialt result{p.bitwidth};
+  for(const auto &[c, m] : p.terms)
+  {
+    // Split monomial m into m = v^k * m_rest.
+    unsigned k = 0;
+    monomialt m_rest;
+    for(const auto &[var, exp] : m.vars)
+    {
+      if(var == v)
+        k = exp;
+      else
+        m_rest.vars.emplace_back(var, exp);
+    }
+    if(k == 0)
+    {
+      // v not in m; copy term as-is.
+      result.terms.emplace_back(c, m);
+      continue;
+    }
+    // Compute c * m_rest * q^k.
+    polynomialt rest_term{p.bitwidth};
+    rest_term.terms.emplace_back(c, m_rest);
+    polynomialt q_power{p.bitwidth, mp_integer{1}};
+    for(unsigned i = 0; i < k; ++i)
+      q_power = q_power * q;
+    polynomialt term_result = rest_term * q_power;
+    for(auto &t : term_result.terms)
+      result.terms.emplace_back(std::move(t));
+  }
+  result.normalize();
+  return result;
+}

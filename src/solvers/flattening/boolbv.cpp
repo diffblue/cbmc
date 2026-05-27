@@ -816,6 +816,26 @@ bool boolbvt::try_algebraic_solve()
         if(ilhs && irhs)
         {
           polynomialt idiff = *ilhs - *irhs;
+          // Apply linear elimination of host variables (Re 4
+          // sub-goal 3 follow-on): if idiff contains a host h
+          // with sum-decomposition h = sum_i 2^i b_i, substitute
+          // h -> sum_i 2^i b_i. After substitution, idiff may
+          // collapse to zero (which is trivially vanishing) and
+          // we report UNSAT without running the (expensive on
+          // bit-decomp variables) vanishing-polynomial test.
+          {
+            auto host_subs = inline_extractor.get_host_substitutions();
+            for(const auto &[host_idx, sub_poly] : host_subs)
+              idiff = substitute_variable(idiff, host_idx, sub_poly);
+            // Apply Frobenius to keep bit-variable powers in check.
+            auto bit_vars = inline_extractor.get_bit_var_indices();
+            apply_frobenius_idempotency(idiff, bit_vars);
+          }
+          if(idiff.is_zero())
+          {
+            prop.l_set_to_true(const_literal(false));
+            return true;
+          }
           // Build input widths from zero_extend tracking
           std::vector<unsigned> input_widths(
             inline_extractor.var_input_widths.empty()
@@ -905,6 +925,8 @@ bool boolbvt::try_algebraic_solve()
     {
       strong_groebner_basist single_gb{100000};
       single_gb.set_bit_vars(single_extractor.get_bit_var_indices());
+      single_gb.set_host_substitutions(
+        single_extractor.get_host_substitutions());
       if(
         single_gb.compute(single_eqs) == strong_groebner_basist::resultt::UNSAT)
       {
@@ -1046,6 +1068,8 @@ bool boolbvt::try_algebraic_solve()
 
       strong_groebner_basist branch_gb{100000};
       branch_gb.set_bit_vars(branch_extractor.get_bit_var_indices());
+      branch_gb.set_host_substitutions(
+        branch_extractor.get_host_substitutions());
       if(
         branch_gb.compute(branch_eqs) != strong_groebner_basist::resultt::UNSAT)
       {
@@ -1156,6 +1180,7 @@ bool boolbvt::try_algebraic_solve()
 
   strong_groebner_basist gb{100000};
   gb.set_bit_vars(extractor.get_bit_var_indices());
+  gb.set_host_substitutions(extractor.get_host_substitutions());
   auto result = gb.compute(equations);
 
   if(result == strong_groebner_basist::resultt::UNSAT)

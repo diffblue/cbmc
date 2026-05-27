@@ -93,6 +93,34 @@ public:
     return result;
   }
 
+  /// Return the host substitutions for linear elimination
+  /// (Re 4 sub-goal 3 follow-on). For each host variable h with
+  /// bit decomposition [b_0, ..., b_{d-1}], the substitution maps
+  /// h -> sum_i 2^i b_i (a polynomial in the bit variables).
+  ///
+  /// Substituting these into all polynomials of the basis
+  /// eliminates the host variables and makes the sum-decomposition
+  /// equations trivially zero, drastically reducing the work
+  /// Buchberger has to do.
+  std::map<std::size_t, polynomialt> get_host_substitutions() const
+  {
+    std::map<std::size_t, polynomialt> result;
+    if(bitwidth == 0)
+      return result;
+    for(const auto &[host_idx, bit_indices] : bit_decomp_cache)
+    {
+      polynomialt sum{bitwidth};
+      for(unsigned i = 0; i < bit_indices.size(); ++i)
+      {
+        polynomialt bit_term{bitwidth, mp_integer{1}, bit_indices[i]};
+        mp_integer coeff = power(mp_integer{2}, mp_integer{i});
+        sum = sum + bit_term * coeff;
+      }
+      result.emplace(host_idx, std::move(sum));
+    }
+    return result;
+  }
+
 private:
   std::map<irep_idt, std::size_t> var_map;
   std::map<std::size_t, irep_idt> reverse_var_map;

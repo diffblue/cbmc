@@ -75,10 +75,31 @@ public:
     bit_vars = std::move(indices);
   }
 
+  /// Set host substitutions for linear elimination (Re 4 sub-goal 3
+  /// follow-on). Each entry maps a host variable index h to the
+  /// polynomial expression that should replace h in every
+  /// polynomial of the input basis. After substitution, the host
+  /// is eliminated from the system; sum-decomposition equations
+  /// (h = sum_i 2^i b_i) become trivial 0 = 0 and are dropped.
+  ///
+  /// Sound by construction: substitution replaces v with q in a
+  /// polynomial system; the resulting variety is the projection
+  /// of the original variety onto the v=q surface. The sum-
+  /// decomposition constraint guarantees v = q in every model, so
+  /// the projection preserves all original models.
+  ///
+  /// Applied at the start of compute(), before Frobenius
+  /// reduction.
+  void set_host_substitutions(std::map<std::size_t, polynomialt> subs)
+  {
+    host_substitutions = std::move(subs);
+  }
+
 private:
   std::size_t max_steps;
   std::size_t steps_taken = 0;
   std::set<std::size_t> bit_vars;
+  std::map<std::size_t, polynomialt> host_substitutions;
 
   /// S-polynomial of f and g
   polynomialt s_polynomial(const polynomialt &f, const polynomialt &g);
