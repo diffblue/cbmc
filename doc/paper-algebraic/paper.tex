@@ -1537,9 +1537,18 @@ multiplication within larger program-verification problems
 (4.7\,s vs.\ 0.004\,s on cohencu), where Bitwuzla's word-level
 rewriting avoids bit-blasting entirely and our algebraic layer
 does not trigger because the multiplication is deeply embedded.
-Bitwuzla uniquely solves grs-128-16 (128-bit operands, currently
-beyond our smt2 interface's practical limit, though in principle
-the Gr\"obner basis is bitwidth-independent). The community-
+At a 30\,s timeout (Table~\ref{tab:community} above), Bitwuzla
+uniquely solves grs-128-16. With an extended 60\,s budget the gap
+narrows: \cbmc and Bitwuzla each solve grs-128-16 (in
+37 and 27\,s respectively), and we solve grs-96-32 which Bitwuzla
+does not at 60\,s. At 60\,s the totals are CBMC 7/20, Bitwuzla 6/20,
+cvc5 1/20. The GRS improvement at extended timeout reflects
+general bit-blasting capability rather than our algebraic layer:
+GRS benchmarks consist of bit-shift and addition operations
+without \texttt{bvmul}, so the algebraic Gr\"obner-basis layer does
+not trigger (verified by running with the algebraic layer
+disabled: same solve time within $\pm 2\%$).
+The community-
 benchmark result delineates the scope of our technique
 (see Section~\ref{sec:threats}): strong on arithmetic-identity
 queries where polynomial structure is visible at the SMT level,
