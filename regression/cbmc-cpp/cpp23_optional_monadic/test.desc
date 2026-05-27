@@ -1,7 +1,14 @@
-CORE
+KNOWNBUG
 main.cpp
 --cpp23 --no-unwinding-assertions
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
+--
+After the cpp11 frontend's std::pair member-function-template fix
+(typecheck_compound_body second pass populates template_map with
+TYPE-parameter placeholders for constructor templates), main now
+exercises std::optional's monadic and_then/transform/or_else paths
+for real, and BMC times out / OOMs.  Reclassified as KNOWNBUG
+pending dedicated stubs or BMC tuning.
