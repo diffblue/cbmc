@@ -1326,64 +1326,83 @@ void smt2_parsert::setup_expressions()
     return with_exprt(op[0], op[1], op[2]);
   };
 
-  expressions["fp.abs"] = [this] {
+  // Helper: parse and validate a single FloatingPoint operand.
+  auto fp_unary_operand = [this](const std::string &name)
+  {
     auto op = operands();
 
     if(op.size() != 1)
-      throw error("fp.abs takes one operand");
+      throw error(name + " takes one operand");
 
     if(op[0].type().id() != ID_floatbv)
-      throw error("fp.abs takes FloatingPoint operand");
+      throw error(name + " takes FloatingPoint operand");
 
-    return abs_exprt(op[0]);
+    return std::move(op[0]);
   };
 
-  expressions["fp.isNaN"] = [this] {
-    auto op = operands();
+  expressions["fp.abs"] = [fp_unary_operand]
+  { return abs_exprt{fp_unary_operand("fp.abs")}; };
 
-    if(op.size() != 1)
-      throw error("fp.isNaN takes one operand");
+  expressions["fp.isNaN"] = [fp_unary_operand]
+  { return isnan_exprt{fp_unary_operand("fp.isNaN")}; };
 
-    if(op[0].type().id() != ID_floatbv)
-      throw error("fp.isNaN takes FloatingPoint operand");
+  expressions["fp.isInfinite"] = [fp_unary_operand]
+  { return isinf_exprt{fp_unary_operand("fp.isInfinite")}; };
 
-    return unary_predicate_exprt(ID_isnan, op[0]);
+  expressions["fp.isNormal"] = [fp_unary_operand]
+  { return isnormal_exprt{fp_unary_operand("fp.isNormal")}; };
+
+  expressions["fp.isZero"] = [fp_unary_operand]
+  {
+    return not_exprt{
+      typecast_exprt{fp_unary_operand("fp.isZero"), bool_typet{}}};
   };
 
-  expressions["fp.isInfinite"] = [this] {
-    auto op = operands();
+  expressions["fp.isSubnormal"] = [fp_unary_operand]
+  {
+    auto op = fp_unary_operand("fp.isSubnormal");
 
-    if(op.size() != 1)
-      throw error("fp.isInfinite takes one operand");
-
-    if(op[0].type().id() != ID_floatbv)
-      throw error("fp.isInfinite takes FloatingPoint operand");
-
-    return unary_predicate_exprt(ID_isinf, op[0]);
+    // subnormal iff finite, non-zero, and not normal -- mirrors
+    // SMT-LIB's own definition of fp.isSubnormal (Theory of
+    // Floating-Point Numbers).
+    //
+    // Do *not* turn the third reference to `op` below into
+    // `std::move(op)` to avoid the extra copy. Although C++17
+    // [dcl.init.list]/4 mandates left-to-right evaluation of the
+    // initializer-clauses of a braced-init-list, MSVC's
+    // implementation has been unreliable for direct-list-init of a
+    // constructor (observed under cl.exe on the windows-2022 and
+    // windows-2025 GitHub Actions runners). With the move, the
+    // last clause is sequenced before the earlier clauses read
+    // `op`; the earlier clauses then see a moved-from `op` whose
+    // `type()` is `nil`, which trips
+    // `boolbv_widtht::get_entry(nil)` further down the conversion
+    // pipeline. Three copies are correct, portable, and cheap
+    // (irept uses sharing, so each copy is a refcount bump).
+    return and_exprt{
+      isfinite_exprt{op},
+      typecast_exprt{op, bool_typet{}}, // != 0
+      not_exprt{isnormal_exprt{op}}};
   };
 
-  expressions["fp.isNormal"] = [this] {
-    auto op = operands();
+  expressions["fp.isNegative"] = [fp_unary_operand]
+  {
+    auto op = fp_unary_operand("fp.isNegative");
 
-    if(op.size() != 1)
-      throw error("fp.isNormal takes one operand");
-
-    if(op[0].type().id() != ID_floatbv)
-      throw error("fp.isNormal takes FloatingPoint operand");
-
-    return isnormal_exprt(op[0]);
+    // negative iff sign bit is 1 and not NaN. The explicit
+    // not(isnan) is required: float_bvt::sign_bit returns the raw
+    // top bit of the bit-vector encoding (true for -NaN), whereas
+    // SMT-LIB's fp.isNegative is false for any NaN. Do not drop the
+    // NaN guard.
+    return and_exprt{not_exprt{isnan_exprt{op}}, sign_exprt{op}};
   };
 
-  expressions["fp.isZero"] = [this] {
-    auto op = operands();
+  expressions["fp.isPositive"] = [fp_unary_operand]
+  {
+    auto op = fp_unary_operand("fp.isPositive");
 
-    if(op.size() != 1)
-      throw error("fp.isZero takes one operand");
-
-    if(op[0].type().id() != ID_floatbv)
-      throw error("fp.isZero takes FloatingPoint operand");
-
-    return not_exprt(typecast_exprt(op[0], bool_typet()));
+    // positive iff sign bit is 0 and not NaN
+    return and_exprt{not_exprt{isnan_exprt{op}}, not_exprt{sign_exprt{op}}};
   };
 
   expressions["fp"] = [this] { return function_application_fp(operands()); };
