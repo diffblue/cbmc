@@ -24,13 +24,13 @@ jobs:
         uses: ./.github/actions/install-cvc5
         with:
           version: ${{ env.cvc5-version }}
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v5
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-24.04-Release-${{ github.ref }}-${{ github.sha }}-RELEASEPKG
-          restore-keys:
+          restore-keys: |
             ${{ runner.os }}-24.04-Release-${{ github.ref }}
             ${{ runner.os }}-24.04-Release
       - name: ccache environment
@@ -71,6 +71,12 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_MESSAGE: "${{ job.status == 'success' && 'Ubuntu 24.04 package built and uploaded successfully' || 'Ubuntu 24.04 package build failed' }}"
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v5
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   ubuntu-24_04-arm-package:
     runs-on: ubuntu-24.04-arm
     env:
@@ -89,13 +95,13 @@ jobs:
         uses: ./.github/actions/install-cvc5
         with:
           version: ${{ env.cvc5-version }}
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v5
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-24.04-Arm-Release-${{ github.ref }}-${{ github.sha }}-RELEASEPKG
-          restore-keys:
+          restore-keys: |
             ${{ runner.os }}-24.04-Arm-Release-${{ github.ref }}
             ${{ runner.os }}-24.04-Arm-Release
       - name: ccache environment
@@ -136,6 +142,12 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_MESSAGE: "${{ job.status == 'success' && 'Ubuntu 24.04 Arm package built and uploaded successfully' || 'Ubuntu 24.04 Arm package build failed' }}"
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v5
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   ubuntu-22_04-package:
     runs-on: ubuntu-22.04
     env:
@@ -154,13 +166,13 @@ jobs:
         uses: ./.github/actions/install-cvc5
         with:
           version: ${{ env.cvc5-version }}
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v5
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-22.04-Release-${{ github.ref }}-${{ github.sha }}-RELEASEPKG
-          restore-keys:
+          restore-keys: |
             ${{ runner.os }}-22.04-Release-${{ github.ref }}
             ${{ runner.os }}-22.04-Release
       - name: ccache environment
@@ -201,6 +213,12 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_MESSAGE: "${{ job.status == 'success' && 'Ubuntu 22.04 package built and uploaded successfully' || 'Ubuntu 22.04 package build failed' }}"
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v5
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   homebrew-pr:
     runs-on: macos-15-intel
     steps:
@@ -277,10 +295,10 @@ jobs:
         run: |
           dotnet tool install --global AzureSignTool --version 5.0.0
           echo "$(Split-Path -Path $(Get-ChildItem -Path "${env:ProgramFiles(x86)}\Windows Kits\10\App Certification Kit\signtool.exe"))" >> $env:GITHUB_PATH
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v5
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-msbuild-${{ github.ref }}-${{ github.sha }}-RELEASEPKG
           restore-keys: |
@@ -347,6 +365,12 @@ jobs:
           SLACK_MESSAGE: "${{ job.status == 'success' && 'Windows package built and uploaded successfully' || 'Windows package build failed' }}"
         run: go run scripts/slack_notification_action.go
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v5
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   push-docker-image-dockerhub:
     runs-on: ubuntu-24.04
     steps:

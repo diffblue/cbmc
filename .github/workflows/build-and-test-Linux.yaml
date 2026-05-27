@@ -24,10 +24,10 @@ jobs:
           sudo apt-get install --no-install-recommends -y libssl-dev libelf-dev libudev-dev libpci-dev libiberty-dev autoconf
           sudo apt-get install --no-install-recommends -y gawk jq
 
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v5
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-24.04-make-clang-${{ github.ref }}-${{ github.sha }}-KERNEL
           restore-keys: |
@@ -53,3 +53,9 @@ jobs:
         with:
           name: CPROVER-faultyInput
           path: CPROVER/faultyInput/*
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v5
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}

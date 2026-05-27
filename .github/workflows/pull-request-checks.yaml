@@ -32,10 +32,10 @@ jobs:
         uses: ./.github/actions/install-cvc5
         with:
           version: ${{ env.cvc5-version }}
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v5
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-24.04-make-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -91,6 +91,12 @@ jobs:
             exit 1
           fi
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v5
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 25 to 34 minutes
   check-ubuntu-24_04-make-clang:
     runs-on: ubuntu-24.04
@@ -117,10 +123,10 @@ jobs:
         uses: ./.github/actions/install-cvc5
         with:
           version: ${{ env.cvc5-version }}
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v5
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-24.04-make-clang-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -157,6 +163,12 @@ jobs:
           make -C regression/cbmc test-cprover-smt2
           make -C jbmc/regression test-parallel JOBS=${{env.linux-vcpus}}
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v5
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job has been copied from the one above it, and modified to only build CBMC
   # and run the `regression/cbmc/` regression tests against Z3. The rest of the tests
   # (unit/regression) have been stripped based on the rationale that they are going
@@ -183,10 +195,10 @@ jobs:
           cpanm Thread::Pool::Simple
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v5
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-24.04-make-clang-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -205,6 +217,12 @@ jobs:
       - name: Run regression/cbmc tests with z3 as the backend
         run: make -C regression/cbmc test-z3
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v5
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 17 to 42 minutes
   check-ubuntu-24_04-cmake-gcc:
     runs-on: ubuntu-24.04
@@ -226,10 +244,10 @@ jobs:
         uses: ./.github/actions/install-cvc5
         with:
           version: ${{ env.cvc5-version }}
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v5
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-24.04-Release-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -277,6 +295,12 @@ jobs:
             exit 1
           fi
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v5
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 20 to 38 minutes
   check-ubuntu-22_04-make-clang:
     runs-on: ubuntu-22.04
@@ -303,10 +327,10 @@ jobs:
         uses: ./.github/actions/install-cvc5
         with:
           version: ${{ env.cvc5-version }}
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v5
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-22.04-make-clang-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -347,6 +371,12 @@ jobs:
           make -C regression/cbmc test-cprover-smt2
           make -C jbmc/regression test-parallel JOBS=${{env.linux-vcpus}}
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v5
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 17 to 41 minutes
   check-ubuntu-22_04-cmake-gcc:
     runs-on: ubuntu-22.04
@@ -368,10 +398,10 @@ jobs:
         uses: ./.github/actions/install-cvc5
         with:
           version: ${{ env.cvc5-version }}
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v5
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-22.04-Release-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -399,6 +429,12 @@ jobs:
       - name: Run tests
         run: cd build; ctest . -V -L CORE -j${{env.linux-vcpus}}
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v5
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 14 to 46 minutes
   check-ubuntu-24_04-cmake-gcc-14:
     runs-on: ubuntu-24.04
@@ -426,10 +462,10 @@ jobs:
         uses: ./.github/actions/install-cvc5
         with:
           version: ${{ env.cvc5-version }}
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v5
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-24.04-Release-gcc-14-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -450,6 +486,12 @@ jobs:
       - name: Run tests
         run: cd build; ctest . -V -L CORE -j${{env.linux-vcpus}}
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v5
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 17 to 41 minutes
   check-ubuntu-24_04-arm-cmake-gcc:
     runs-on: ubuntu-24.04-arm
@@ -471,10 +513,10 @@ jobs:
         uses: ./.github/actions/install-cvc5
         with:
           version: ${{ env.cvc5-version }}
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v5
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-24.04-Arm-Release-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -502,6 +544,12 @@ jobs:
       - name: Run tests
         run: cd build; ctest . -V -L CORE -j${{env.linux-vcpus}}
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v5
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 14 to 60 minutes
   check-ubuntu-22_04-cmake-gcc-32bit:
     runs-on: ubuntu-22.04
@@ -523,10 +571,10 @@ jobs:
         uses: ./.github/actions/install-cvc5
         with:
           version: ${{ env.cvc5-version }}
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v5
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-22.04-Release-32-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -547,9 +595,20 @@ jobs:
       - name: Run tests
         run: cd build; ctest . -V -L CORE -j${{env.linux-vcpus}}
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v5
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 2 to 24 minutes
   check-ubuntu-24_04-cmake-gcc-KNOWNBUG:
     runs-on: ubuntu-24.04
+    # Sequenced after check-ubuntu-24_04-cmake-gcc so that this job benefits
+    # from the matching ccache produced in the same workflow run. The cmake
+    # configure flags below must stay in sync with that job's so the compile
+    # commands hash identically and ccache hits in full.
+    needs: check-ubuntu-24_04-cmake-gcc
     steps:
       - uses: actions/checkout@v6
         with:
@@ -562,10 +621,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ maven flex bison libxml2-utils ccache z3
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        uses: actions/cache/restore@v5
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-24.04-Release-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -576,7 +634,7 @@ jobs:
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
           echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
       - name: Configure using CMake
-        run: cmake -H. -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
+        run: cmake -H. -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -Dsat_impl="minisat2;cadical"
       - name: Zero ccache stats and limit in size
         run: ccache -z --max-size=500M
       - name: Build with Ninja
@@ -594,9 +652,16 @@ jobs:
           git checkout -- memory_allocation1 printf1 printf3 union12 va_list3
           ../test.pl -c "cbmc --cprover-smt2" -I broken-smt-backend -K
 
+      # No "Save ccache" step here: the cache is produced by
+      # check-ubuntu-24_04-cmake-gcc, which this job depends on.
   # This job takes approximately 7 to 30 minutes
   check-ubuntu-24_04-cmake-gcc-THOROUGH:
     runs-on: ubuntu-24.04
+    # Sequenced after check-ubuntu-24_04-cmake-gcc so that this job benefits
+    # from the matching ccache produced in the same workflow run. The cmake
+    # configure flags below must stay in sync with that job's so the compile
+    # commands hash identically and ccache hits in full.
+    needs: check-ubuntu-24_04-cmake-gcc
     steps:
       - uses: actions/checkout@v6
         with:
@@ -609,10 +674,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ maven flex bison libxml2-utils ccache z3
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        uses: actions/cache/restore@v5
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-24.04-Release-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -633,6 +697,8 @@ jobs:
       - name: Run tests
         run: cd build; ctest . -V -L THOROUGH -j${{env.linux-vcpus}}
 
+      # No "Save ccache" step here: the cache is produced by
+      # check-ubuntu-24_04-cmake-gcc, which this job depends on.
   # This job takes approximately 39 to 69 minutes
   check-macos-15-intel-make-clang:
     runs-on: macos-15-intel
@@ -651,10 +717,10 @@ jobs:
         uses: ./.github/actions/install-cvc5
         with:
           version: ${{ env.cvc5-version }}
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v5
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-make-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -688,6 +754,12 @@ jobs:
       - name: Run JBMC regression tests
         run: make -C jbmc/regression test-parallel JOBS=4
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v5
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 36 to 85 minutes
   check-macos-14-cmake-clang:
     runs-on: macos-14
@@ -703,10 +775,10 @@ jobs:
         uses: ./.github/actions/install-cvc5
         with:
           version: ${{ env.cvc5-version }}
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v5
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-Release-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -730,6 +802,12 @@ jobs:
       - name: Run CTest
         run: cd build; ctest -V -L CORE . -j3
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v5
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 49 to 70 minutes
   check-vs-2025-cmake-build-and-test:
     runs-on: windows-2025
@@ -783,10 +861,10 @@ jobs:
         run: z3 --version
       - name: Confirm cvc5 solver is available and log the version installed
         run: cvc5 --version
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v5
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-msbuild-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -812,6 +890,12 @@ jobs:
           Set-Location build
           ctest -V -L CORE -C Release . -j${{env.windows-vcpus}}
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v5
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 65 to 84 minutes
   check-vs-2022-make-build-and-test:
     runs-on: windows-2022
@@ -870,10 +954,10 @@ jobs:
         run: cvc5 --version
       - name: Initialise Developer Command Line
         uses: ilammy/msvc-dev-cmd@v1
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v5
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-msbuild-make-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -911,6 +995,12 @@ jobs:
       - name: Run CBMC regression tests
         run: make CXX=clcache BUILD_ENV=MSVC -j${{env.windows-vcpus}} -C regression test-parallel-jobs
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v5
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 7 to 32 minutes
   windows-msi-package:
     runs-on: windows-2025
@@ -952,10 +1042,10 @@ jobs:
           Require-Tool win_bison
           nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
           echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v5
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-msbuild-${{ github.ref }}-${{ github.sha }}-PKG
           restore-keys: |
@@ -983,6 +1073,12 @@ jobs:
           echo "msi_installer=build/$msi_name" >> $env:GITHUB_OUTPUT
           echo "msi_name=$msi_name" >> $env:GITHUB_OUTPUT
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v5
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 2 to 3 minutes
   check-string-table:
     runs-on: ubuntu-latest
