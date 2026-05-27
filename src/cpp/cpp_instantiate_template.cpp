@@ -91,6 +91,21 @@ std::string cpp_typecheckt::template_suffix(
           {
             if(node.id() == ID_symbol)
             {
+              // Don't replace function references with their bodies:
+              // the function field of a `side_effect_expr_function_call`
+              // is a `symbol_exprt` whose `type.id()` is `ID_code` and
+              // whose value is the function body.  Substituting that
+              // replaces the call's function operand with a code block
+              // and then any unresolved cpp_names in the body get
+              // re-typechecked in the caller's scope (where class-scope
+              // members like a constexpr `value` are not visible),
+              // producing spurious "symbol '...' is unknown" errors at
+              // source locations pointing back into the function body.
+              // `cpp_is_pod` returns true for `ID_code` via the
+              // "everything else is POD" default which is fine for data
+              // POD checks but wrong here.
+              if(node.type().id() == ID_code)
+                return;
               const symbolt &symbol = lookup(to_symbol_expr(node).identifier());
               if(symbol.value.is_not_nil() && cpp_is_pod(symbol.type))
               {
