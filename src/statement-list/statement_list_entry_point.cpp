@@ -52,8 +52,9 @@ static bool is_main_symbol_invalid(
       if(found)
       {
         messaget message(message_handler);
-        message.error() << "main symbol `" << main_symbol_name
-                        << "' is ambiguous" << messaget::eom;
+        message.error() << "main symbol " << messaget::quote_begin
+                        << main_symbol_name << messaget::quote_end
+                        << " is ambiguous" << messaget::eom;
         return true;
       }
       else
@@ -66,7 +67,8 @@ static bool is_main_symbol_invalid(
   else
   {
     messaget message(message_handler);
-    message.error() << "main symbol `" << main_symbol_name << "' not found"
+    message.error() << "main symbol " << messaget::quote_begin
+                    << main_symbol_name << messaget::quote_end << " not found"
                     << messaget::eom;
     return true;
   }
@@ -225,8 +227,9 @@ bool statement_list_entry_point(
   if(main.value.is_nil())
   {
     messaget message(message_handler);
-    message.error() << "main symbol `" << id2string(main_symbol_name)
-                    << "' has no body" << messaget::eom;
+    message.error() << "main symbol " << messaget::quote_begin
+                    << main_symbol_name << messaget::quote_end << " has no body"
+                    << messaget::eom;
     return true;
   }
 

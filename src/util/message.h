@@ -382,6 +382,16 @@ public:
   /// render underlined text
   static const commandt underline;
 
+  /// Start quoted text. Renders as a single `'` on the PLAIN, XML and
+  /// JSON UIs, and as `'` on the console handler. The structured UIs
+  /// deliberately do not emit "<quote>" / "</quote>" tags; see the
+  /// comment in `ui_message_handlert::command()` for the rationale.
+  static const commandt quote_begin;
+
+  /// End quoted text. Counterpart to \ref quote_begin; same per-UI
+  /// rendering.
+  static const commandt quote_end;
+
   mstreamt &get_mstream(unsigned message_level) const
   {
     mstream.message_level=message_level;
