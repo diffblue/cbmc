@@ -72,8 +72,15 @@ std::string expr2cppt::convert_struct(
       ++data_components;
   }
 
-  DATA_INVARIANT(
-    data_components == src.operands().size(), "component count mismatch");
+  // Pretty-printing must be defensive: this function is called from
+  // diagnostic paths (e.g. `make_constant` failing on a malformed
+  // expression).  If the expression's operands don't match the
+  // type's data members, fall back to the generic `convert_norep`
+  // representation rather than aborting via a `DATA_INVARIANT`.
+  // Aborting here would mask the underlying error and prevent it
+  // from propagating to the user.
+  if(data_components != src.operands().size())
+    return convert_norep(src, precedence);
 
   exprt::operandst::const_iterator o_it=src.operands().begin();
 
