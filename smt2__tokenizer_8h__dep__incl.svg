@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="Node000001" class="node">
 <title>Node1</title>
-<g id="a_Node000001"><a xlink:title=" ">
+<g id="a_Node000001"><a xlink:title="Tokenizer for the SMT&#45;LIB v2.6 syntax.">
 <polygon fill="#999999" stroke="#666666" points="372,-195 234,-195 234,-154 372,-154 372,-195"/>
 <text text-anchor="start" x="242" y="-183" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="242" y="-172" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/smt2</text>
@@ -62,7 +62,7 @@
 <!-- Node6 -->
 <g id="Node000006" class="node">
 <title>Node6</title>
-<g id="a_Node000006"><a xlink:href="smt2__tokenizer_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_Node000006"><a xlink:href="smt2__tokenizer_8cpp.html" target="_top" xlink:title="Implementation of the SMT&#45;LIB v2.6 tokenizer; see smt2_tokenizer.h for the corresponding interface.">
 <polygon fill="white" stroke="#666666" points="450,-118 312,-118 312,-77 450,-77 450,-118"/>
 <text text-anchor="start" x="320" y="-106" font-family="Helvetica,sans-Serif" font-size="10.00">/home/runner/work/cbmc</text>
 <text text-anchor="start" x="320" y="-95" font-family="Helvetica,sans-Serif" font-size="10.00">/cbmc/src/solvers/smt2</text>

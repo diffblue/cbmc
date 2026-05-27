@@ -1,5 +1,9 @@
 var NAVTREEINDEX70 =
 {
+"classupdate__bits__exprt.html#a059b5a9029b7d4674292ee7856983621":[7,0,1347,4],
+"classupdate__bits__exprt.html#a06c45572d7af5085986db295e062ea98":[7,0,1347,6],
+"classupdate__bits__exprt.html#a16db9b8c8e250c12184a311adc152f75":[7,0,1347,2],
+"classupdate__bits__exprt.html#a39228d4ecaa5228fae77c43604c3d6ee":[7,0,1347,8],
 "classupdate__bits__exprt.html#a54b95cbe5e44b8f752dcd5385d9db3bf":[7,0,1347,0],
 "classupdate__bits__exprt.html#a70d5ca752be7cb84fa226d97ca4d53d9":[7,0,1347,7],
 "classupdate__bits__exprt.html#a97664799f7d4f94b254573f092485be9":[7,0,1347,5],
@@ -245,9 +249,5 @@ var NAVTREEINDEX70 =
 "classvalue__set__fit_1_1object__map__dt.html#af9058904f1aafc73df583c354651a8e1":[7,0,1362,1,15],
 "classvalue__set__fit_1_1object__map__dt.html#af96a71b0c11d7e5865688cb7feef0196":[7,0,1362,1,14],
 "classvalue__set__fit_1_1object__map__dt.html#afba03dd3cfc140482eaf8cf47f1220af":[7,0,1362,1,2],
-"classvalue__set__index__ranget.html":[7,0,1363],
-"classvalue__set__index__ranget.html#a1b17ee3ba6fcaa9276301069cb5682c1":[7,0,1363,5],
-"classvalue__set__index__ranget.html#a248a9a9e5288299fd1016eb575d0dad8":[7,0,1363,4],
-"classvalue__set__index__ranget.html#a37e904fb1c3d12d98d617eb1ea879dfe":[7,0,1363,2],
-"classvalue__set__index__ranget.html#a444b647131c98084962bf263c2fa4f76":[7,0,1363,1]
+"classvalue__set__index__ranget.html":[7,0,1363]
 };

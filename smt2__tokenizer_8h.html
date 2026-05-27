@@ -102,14 +102,18 @@ $(document).ready(function(){initNavTree('smt2__tokenizer_8h.html',''); initResi
   <div class="headertitle"><div class="title">smt2_tokenizer.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;sstream&gt;</code><br />
+
+<p>Tokenizer for the SMT-LIB <a class="el" href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">v2.6</a> syntax.  
+<a href="#details">More...</a></p>
+<div class="textblock"><code>#include &lt;optional&gt;</code><br />
+<code>#include &lt;sstream&gt;</code><br />
 <code>#include &lt;string&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for smt2_tokenizer.h:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="smt2__tokenizer_8h__incl.svg" width="195" height="139"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="smt2__tokenizer_8h__incl.svg" width="267" height="139"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-1-trigger" src="closed.png" alt="+"/> This graph shows which files directly or indirectly include this file:</div>
@@ -126,6 +130,10 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsmt2__tokenizert.html">smt2_tokenizert</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsmt2__tokenizert_1_1smt2__errort.html">smt2_tokenizert::smt2_errort</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Exception thrown by the tokenizer (and the parser built on top of it) to report a syntactic error at a known source line.  <a href="classsmt2__tokenizert_1_1smt2__errort.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsmt2__tokenizert_1_1tokent.html">smt2_tokenizert::tokent</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">One SMT-LIB <a class="el" href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">v2.6</a> token.  <a href="classsmt2__tokenizert_1_1tokent.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
@@ -137,7 +145,12 @@ Functions</h2></td></tr>
 <tr class="memitem:aeacdf9f1f99731b759d8d7b356307010" id="r_aeacdf9f1f99731b759d8d7b356307010"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="smt2__tokenizer_8h.html#aeacdf9f1f99731b759d8d7b356307010">is_smt2_simple_symbol_character</a> (<a class="el" href="classait.html">char</a>)</td></tr>
 <tr class="separator:aeacdf9f1f99731b759d8d7b356307010"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Function Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Tokenizer for the SMT-LIB <a class="el" href="classait.html#acb910a3c8ab35d67a9a9a27c324e4992">v2.6</a> syntax. </p>
+<p>Splits an input stream into a sequence of <a class="el" href="classsmt2__tokenizert_1_1tokent.html">smt2_tokenizert::tokent</a> values that the parser consumes via <a class="el" href="classsmt2__tokenizert.html#a300418081bbd31a69f272201967cb77c">smt2_tokenizert::next_token</a> and <a class="el" href="classsmt2__tokenizert.html#a87c575049b0aafaac14a817115168559">smt2_tokenizert::peek</a>. </p>
+
+<p class="definition">Definition in file <a class="el" href="smt2__tokenizer_8h_source.html">smt2_tokenizer.h</a>.</p>
+</div><h2 class="groupheader">Function Documentation</h2>
 <a id="aeacdf9f1f99731b759d8d7b356307010" name="aeacdf9f1f99731b759d8d7b356307010"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aeacdf9f1f99731b759d8d7b356307010">&#9670;&#160;</a></span>is_smt2_simple_symbol_character()</h2>
 
@@ -154,7 +167,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="smt2__tokenizer_8cpp_source.html#l00011">11</a> of file <a class="el" href="smt2__tokenizer_8cpp_source.html">smt2_tokenizer.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt2__tokenizer_8cpp_source.html#l00015">15</a> of file <a class="el" href="smt2__tokenizer_8cpp_source.html">smt2_tokenizer.cpp</a>.</p>
 
 </div>
 </div>
@@ -188,7 +201,7 @@ template&lt;<a class="el" href="classait.html">typename</a> T &gt; </div>
 
 <p>add to the diagnostic information in the given smt2_tokenizer exception </p>
 
-<p class="definition">Definition at line <a class="el" href="smt2__tokenizer_8h_source.html#l00139">139</a> of file <a class="el" href="smt2__tokenizer_8h_source.html">smt2_tokenizer.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="smt2__tokenizer_8h_source.html#l00204">204</a> of file <a class="el" href="smt2__tokenizer_8h_source.html">smt2_tokenizer.h</a>.</p>
 
 </div>
 </div>

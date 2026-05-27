@@ -2136,6 +2136,7 @@ var hierarchy =
     ] ],
     [ "tinfl_decompressor_tag", "structtinfl__decompressor__tag.html", null ],
     [ "to_be_merged_irep_hash", "structto__be__merged__irep__hash.html", null ],
+    [ "smt2_tokenizert::tokent", "classsmt2__tokenizert_1_1tokent.html", null ],
     [ "trace_automatont", "classtrace__automatont.html", null ],
     [ "trace_optionst", "structtrace__optionst.html", null ],
     [ "propertyt::trace_statet", "structpropertyt_1_1trace__statet.html", null ],
