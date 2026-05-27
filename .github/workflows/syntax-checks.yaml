@@ -73,7 +73,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -yq \
-            cmake g++ flex bison clang-18 llvm-18-dev libclang-18-dev
+            cmake g++ flex bison clang-18 llvm-18-dev libclang-18-dev \
+            libclang-cpp18-dev
       - name: Configure
         run: cmake -S . -Bbuild -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
       - name: Check for unnecessary irept copies
