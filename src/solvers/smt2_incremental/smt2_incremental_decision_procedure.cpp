@@ -6,6 +6,7 @@
 #include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/pointer_offset_size.h>
 #include <util/range.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
@@ -70,7 +71,8 @@ get_problem_messages(const smt_responset &response)
 ///   returned by this`gather_dependent_expressions` function.
 /// \details `symbol_exprt`, `array_exprt` and `nondet_symbol_exprt` add
 ///   dependant expressions.
-static std::vector<exprt> gather_dependent_expressions(const exprt &root_expr)
+static std::vector<exprt>
+gather_dependent_expressions(const exprt &root_expr, const namespacet &ns)
 {
   std::vector<exprt> dependent_expressions;
 
@@ -88,7 +90,13 @@ static std::vector<exprt> gather_dependent_expressions(const exprt &root_expr)
       can_cast_expr<nondet_symbol_exprt>(expr_node) ||
       can_cast_expr<string_constantt>(expr_node))
     {
-      dependent_expressions.push_back(expr_node);
+      // Skip zero-width-typed leaves: they have no SMT representation
+      // (convert_type_to_smt_sort would hit UNIMPLEMENTED_FEATURE on
+      // empty_typet), and the only top-level consumer that could
+      // legitimately involve such a leaf -- equality of two void-typed
+      // operands -- is short-circuited in `set_to` below.
+      if(!is_zero_width(expr_node.type(), ns))
+        dependent_expressions.push_back(expr_node);
     }
     // The decision procedure does not depend on the values inside address of
     // code typed expressions. We can build the address without knowing the
@@ -192,7 +200,7 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
   std::stack<exprt> to_be_defined;
   const auto push_dependencies_needed = [&](const exprt &expr) {
     bool result = false;
-    for(const auto &dependency : gather_dependent_expressions(expr))
+    for(const auto &dependency : gather_dependent_expressions(expr, ns))
     {
       if(!seen_expressions.insert(dependency).second)
         continue;
@@ -561,7 +569,7 @@ exprt smt2_incremental_decision_proceduret::get(const exprt &expr) const
       return identifier_descriptor;
     }
     const exprt lowered = lower(expr);
-    if(gather_dependent_expressions(lowered).empty())
+    if(gather_dependent_expressions(lowered, ns).empty())
     {
       INVARIANT(
         objects_are_already_tracked(lowered, object_map),
@@ -616,6 +624,30 @@ void smt2_incremental_decision_proceduret::set_to(
           << in_expr.pretty(2, 0) << messaget::eom;
   });
   const exprt lowered_expr = lower(in_expr);
+  // Equality of two zero-width-typed (typically void) operands is
+  // vacuously true. For value == true we therefore have nothing to
+  // assert; for value == false we send `(assert false)` directly,
+  // matching the end-to-end behaviour of the non-incremental SMT2
+  // backend (smt2_conv.cpp), which converts `equal_exprt` over a
+  // zero-width type to `true_exprt` and then negates.
+  //
+  // Limitation: only the *top-level* equality is intercepted here.
+  // A nested case such as `set_to(and_exprt{equal_exprt{x_void,
+  // y_void}, other}, true)` would still descend into
+  // `convert_expr_to_smt`, which has no handling for void operands
+  // and would trip UNIMPLEMENTED_FEATURE in `convert_type_to_smt_sort`.
+  // CBMC's GOTO programs do not produce such nested shapes today,
+  // but a future refactor pushing this short-circuit into the
+  // `equal_exprt` overload of `convert_expr_to_smt` would handle the
+  // nested case for free.
+  if(
+    lowered_expr.id() == ID_equal &&
+    is_zero_width(to_equal_expr(lowered_expr).lhs().type(), ns))
+  {
+    if(!value)
+      solver_process->send(smt_assert_commandt{smt_bool_literal_termt{false}});
+    return;
+  }
   PRECONDITION(can_cast_type<bool_typet>(lowered_expr.type()));
 
   define_dependent_functions(lowered_expr);
