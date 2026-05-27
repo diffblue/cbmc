@@ -286,6 +286,90 @@ void template_mapt::apply(typet &type) const
               }
               return;
             }
+            // Template-template-parameter substitution where the
+            // binding is a class-template instance (struct_tag), e.g.
+            // `_SomeTemplate -> tag-allocator<tag-A>` from binding a
+            // TT-param to the WHOLE instance during deduction.  The
+            // cpp_name `_SomeTemplate<_Up, _Types...>` should yield
+            // `allocator<_Up, _Types...>` so the args-substitution
+            // loop below can substitute `_Up` and expand the pack.
+            // Without this, `type = entry.second` replaces the entire
+            // expression with `tag-allocator<tag-A>` and ignores the
+            // cpp_name's template_args.
+            if(has_targs && entry.second.id() == ID_struct_tag)
+            {
+              const std::string ident =
+                id2string(to_struct_tag_type(entry.second).get_identifier());
+              // Format: "<scope>tag-<base><args>" where <scope> is
+              // any (possibly empty) sequence of "name::"-style
+              // qualifiers and <args> is the bracketed template args
+              // (possibly empty).  `tag-` appears BEFORE base and
+              // again, possibly multiple times, INSIDE <args> (for
+              // nested instances).  Find the outermost `tag-` at
+              // depth 0 and the depth-0 `<` (if any) after it.
+              std::size_t tag_pos = std::string::npos;
+              std::size_t end_pos = ident.size();
+              int depth = 0;
+              for(std::size_t i = 0; i < ident.size();)
+              {
+                if(ident[i] == '<')
+                {
+                  if(depth == 0 && tag_pos != std::string::npos)
+                  {
+                    end_pos = i;
+                    break;
+                  }
+                  depth++;
+                  i++;
+                }
+                else if(ident[i] == '>')
+                {
+                  if(depth > 0)
+                    depth--;
+                  i++;
+                }
+                else if(
+                  depth == 0 && tag_pos == std::string::npos &&
+                  i + 4 <= ident.size() && ident.compare(i, 4, "tag-") == 0)
+                {
+                  tag_pos = i + 4;
+                  i += 4;
+                }
+                else
+                {
+                  i++;
+                }
+              }
+              if(tag_pos != std::string::npos && end_pos > tag_pos)
+              {
+                std::string base_name =
+                  ident.substr(tag_pos, end_pos - tag_pos);
+                if(!base_name.empty())
+                {
+                  // Rewrite ONLY the front name; preserve any leading
+                  // sub entries (scope qualifiers like `ns::`) and the
+                  // trailing template_args entries.  The
+                  // args-substitution loop later in `apply` will then
+                  // substitute references like `_Up`/`_Types...`
+                  // against the current template_map.
+                  //
+                  // For simple cpp_names with no scope chain in the
+                  // sub (sub = [name(_SomeTemplate), template_args]),
+                  // the result is sub = [name(<base>), template_args].
+                  sub.front() = irept{ID_name};
+                  sub.front().set(ID_identifier, base_name);
+                  break; // exit for(entry : type_map); fall through
+                         // to the args-substitution loop below.
+                }
+              }
+              // Fallback: identifier didn't have the expected
+              // `tag-<base>` form (shouldn't happen for instances
+              // produced by `class_template_symbol`); preserve the
+              // pre-existing behaviour by replacing the whole
+              // expression.
+              type = entry.second;
+              return;
+            }
             type = entry.second;
             return;
           }
