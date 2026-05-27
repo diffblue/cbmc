@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_typecheck.h"
 
+#include <memory>
+
 #ifdef DEBUG
 #  include <iostream>
 #endif
@@ -1954,6 +1956,54 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
 
       if(!declaration.is_constructor())
         continue;
+
+      // For constructor TEMPLATES, the signature may reference the
+      // function template's own parameters (e.g. libstdc++'s
+      // `pair(const pair<_U1, _U2>& __p)` in stl_pair.h, where _U1
+      // and _U2 belong to the constructor template, not to the
+      // enclosing class).  The first pass already registered the
+      // template via convert_template_declaration and added the
+      // template scope as a secondary scope of the class scope; that
+      // makes _U1 lookup-resolvable to a TEMPLATE_PARAMETER cpp_id.
+      // But `convert_template_parameter` also consults
+      // `template_map`, which only has the class's parameters bound
+      // (e.g. _T1=int, _T2=int).  Without an entry for _U1, the
+      // lookup falls through to a silent `throw 0`, which propagates
+      // out of `instantiate_template` and gets caught by the
+      // enclosing `typecheck_method_bodies`, leaving the user's
+      // function (e.g. `main`) half-typechecked and dropping the
+      // `std::pair<int, int> p;` declaration silently.
+      //
+      // Populate the function template's TYPE parameters as
+      // `unassigned`-typed placeholders for the duration of this
+      // declarator's typecheck.  `convert_template_parameter` will
+      // then return the placeholder rather than throwing.  We only
+      // populate type parameters; non-type parameters whose values
+      // are needed in the signature must be evaluated to actual
+      // constants by the caller of the template, so we leave them
+      // unbound and let the existing throw fire (and be caught) for
+      // those.
+      std::unique_ptr<cpp_saved_template_mapt> saved_map;
+      if(declaration.is_template())
+      {
+        saved_map = std::make_unique<cpp_saved_template_mapt>(template_map);
+        for(const auto &t : declaration.template_type().template_parameters())
+        {
+          if(t.id() == ID_type)
+          {
+            const irep_idt id = t.type().get(ID_identifier);
+            if(
+              !id.empty() &&
+              template_map.type_map.find(id) == template_map.type_map.end())
+            {
+              typet placeholder{ID_unassigned};
+              placeholder.set(ID_identifier, id);
+              placeholder.add_source_location() = t.source_location();
+              template_map.type_map[id] = placeholder;
+            }
+          }
+        }
+      }
 
       for(auto &declarator : declaration.declarators())
       {
