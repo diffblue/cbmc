@@ -1,0 +1,10 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+^\[main\.assertion\.1\] line 68 TT-param alias forwarding works: SUCCESS$
+--
+^CONVERSION ERROR$
+expected template name for template template parameter
