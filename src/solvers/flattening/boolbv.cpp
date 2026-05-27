@@ -676,6 +676,28 @@ void boolbvt::set_to(const exprt &expr, bool value)
         ++total_mult_count;
     });
 
+  // Memory-efficient extraction (Re 4 sub-goal 7): when DEFER_BITBLAST=1
+  // and the assertion is an equality between non-internal sides (i.e.,
+  // a candidate for algebraic_equalities), defer the bit-blasting until
+  // after try_algebraic_solve runs. If the algebraic procedure refutes,
+  // the bit-blasting work is skipped entirely; otherwise the assertion
+  // is replayed through the parent set_to in finish_eager_conversion.
+  if(std::getenv("DEFER_BITBLAST") != nullptr && expr.id() == ID_equal)
+  {
+    auto is_internal = [](const exprt &e)
+    {
+      return e.id() == ID_symbol &&
+             id2string(to_symbol_expr(e).get_identifier()).find("__CPROVER") !=
+               std::string::npos;
+    };
+    if(
+      expr.operands().size() == 2 && !is_internal(expr.operands()[0]) &&
+      !is_internal(expr.operands()[1]))
+    {
+      deferred_assertions.emplace_back(expr, value);
+      return;
+    }
+  }
   const auto equal_expr = expr_try_dynamic_cast<equal_exprt>(expr);
   if(value && equal_expr && !boolbv_set_equality_to_true(*equal_expr))
     return;

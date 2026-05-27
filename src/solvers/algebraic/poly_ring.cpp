@@ -200,11 +200,36 @@ polynomialt polynomialt::operator*(const mp_integer &scalar) const
 polynomialt polynomialt::operator*(const polynomialt &other) const
 {
   PRECONDITION(bitwidth == other.bitwidth);
-  polynomialt result{bitwidth};
+  // Streaming multiplication: accumulate term-pair products into a
+  // std::map keyed by monomial as we go, instead of materialising
+  // the full m*n term-pair vector and normalising afterwards.
+  // Peak memory is O(unique monomials in product) instead of
+  // O(m*n), which dominates SABER karatsuba2 extraction at large N.
+  mp_integer m = modulus();
+  std::map<monomialt, mp_integer> combined;
   for(const auto &[c0, m0] : terms)
+  {
     for(const auto &[c1, m1] : other.terms)
-      result.terms.emplace_back(reduce(c0 * c1), m0 * m1);
-  result.normalize();
+    {
+      mp_integer c = reduce(c0 * c1);
+      if(c == 0)
+        continue;
+      monomialt mon = m0 * m1;
+      mp_integer &slot = combined[mon];
+      slot = (slot + c) % m;
+      if(slot < 0)
+        slot += m;
+    }
+  }
+  polynomialt result{bitwidth};
+  result.terms.reserve(combined.size());
+  for(auto &[mon, c] : combined)
+  {
+    if(c != 0)
+      result.terms.emplace_back(c, mon);
+  }
+  // combined is sorted by monomialt::operator<; copy that order.
+  // No further sort required.
   return result;
 }
 
@@ -216,25 +241,36 @@ polynomialt polynomialt::multiply(
   if(bit_vars.empty())
     return *this * other;
 
-  polynomialt result{bitwidth};
+  // Streaming multiplication with inline idempotency clamping.
+  mp_integer m = modulus();
+  std::map<monomialt, mp_integer> combined;
   for(const auto &[c0, m0] : terms)
   {
     for(const auto &[c1, m1] : other.terms)
     {
+      mp_integer c = reduce(c0 * c1);
+      if(c == 0)
+        continue;
       monomialt prod_m = m0 * m1;
-      // Inline idempotency: clamp bit-variable exponents to 1 during
-      // monomial construction. Avoids materialising b_i^k terms for
-      // k >= 2; downstream normalize() then merges duplicate
-      // monomials more aggressively.
+      // Inline idempotency: clamp bit-variable exponents to 1.
       for(auto &[var, exp] : prod_m.vars)
       {
         if(exp > 1 && bit_vars.count(var) > 0)
           exp = 1;
       }
-      result.terms.emplace_back(reduce(c0 * c1), std::move(prod_m));
+      mp_integer &slot = combined[prod_m];
+      slot = (slot + c) % m;
+      if(slot < 0)
+        slot += m;
     }
   }
-  result.normalize();
+  polynomialt result{bitwidth};
+  result.terms.reserve(combined.size());
+  for(auto &[mon, c] : combined)
+  {
+    if(c != 0)
+      result.terms.emplace_back(c, mon);
+  }
   return result;
 }
 
