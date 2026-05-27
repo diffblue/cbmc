@@ -4,9 +4,8 @@ This document consolidates the future-direction state for the
 algebraic procedure as of 2026-05-27. It supersedes the ad-hoc
 "Re N" label scheme used across earlier per-experiment notes.
 
-*Last updated 2026-05-27 evening: A (Re 4 paper subsection) and
-B (§4.3 SABER context refresh) committed at `2049316564`. Paper
-now 31 pages.*
+*Last updated 2026-05-27 late-evening: D (Re 4 sub-goal 6) and
+C (memory-efficient extraction) both done. Paper now 33 pages.*
 
 ## Status table
 
@@ -15,7 +14,7 @@ now 31 pages.*
 | Re 1 | Disjunctive-disequalities procedure-level extension | **IMPLEMENTED** | Commit `448bb10923`. See `disjunctive-disequalities-extension.md`. |
 | Re 2 | Extractor coverage extensions ("C-narrow") | **FOLDED INTO Re 4** | bvshl with constant `k` already handled. bvlshr / exact division / bvand / bvor / bvxor cannot be extracted soundly without bit-decomposition. See "Why C-narrow is folded" below. |
 | Re 3 | Expression-level normalisation via Gröbner basis | Sanity-passed | `ENABLE_GB_EXPR_NORMALISE` prototype exists in CBMC. Lower priority than Re 4. See `expression-normalisation-design.md`. |
-| Re 4 | Bit-decomposition variables | **MVP IMPLEMENTED + sub-goal 3 essentially complete + paper subsection landed** | Commits `ea3bb94f11` (design), `00d943b133` (MVP: bvlshr), `8328f31d0a` (bvand/bvor/bvxor/bvnot), `d864305fbd` (Frobenius), `61faaf0f29` (structural bit-decomp + polynomial-form host cache), `50252003e4` (inline simplification), `a54fa27f04` (linear elimination of host variables), `2049316564` (paper §4.6 + §4.3 update). Linear scaling in bitwidth on 7 partial-bv identities. Foundational for sub-goal 6 (universal-relational); see §4.6 "toom-scaled exposes a scope limit". |
+| Re 4 | Bit-decomposition variables | **MVP IMPLEMENTED + sub-goal 3 essentially complete + sub-goal 6 IMPLEMENTED + paper subsection landed** | Commits `ea3bb94f11` (design), `00d943b133` (MVP: bvlshr), `8328f31d0a` (bvand/bvor/bvxor/bvnot), `d864305fbd` (Frobenius), `61faaf0f29` (structural bit-decomp + polynomial-form host cache), `50252003e4` (inline simplification), `a54fa27f04` (linear elimination of host variables), `2049316564` (paper §4.6 + §4.3 update), `3fbc1d9c6f` (sub-goal 6: universal-relational via bvult/bvule), `889efe9588` (paper §4.6 update with sub-goal 6 results), `c9f2f825ba` (memory-efficient extraction = sub-goal 7), `49178650da` (paper §4.3 update with deferred-bit-blasting wins). Linear scaling in bitwidth on partial-bv identities. Sub-goal 6 wins on at least one Bitwuzla-T/O case (x>=2^(d-1) -> XOR/sub at bw=64). Sub-goal 7 cuts SABER memory 100-165x (now N=768 at 1.7 GB; ceiling at N=1024 is time-bound). |
 | Re 5 | (reserved) | — | |
 | Re 6 | SABER Level A empirical study | **DONE** | Commits `b7057820c5`, `7fabd71ffc`, `5419a39767`, `5a5960d93a`, `624237a09b`, `37c5c7d781`, `a07f659cf5`. §4.3 of paper.tex. |
 | Re 7 | ZFP injection into Gröbner basis | Negative result | See `zfp-injection-result.md`. |
@@ -105,27 +104,42 @@ relational queries (sub-goal 6) still require a separate
   (Toom-Cook 4-way generator implemented; verification
   intractable, identified as open challenge), sub-goal 5
   attempt (GRS investigated, found not to exercise our
-  contribution; §4.6 of paper.tex dropped), Re 4 paper
-  subsection §4.6 written (commit 2049316564), §4.3 SABER
-  context refresh (commit 2049316564).
+  contribution; §4.6 of paper.tex dropped). A (Re 4 paper
+  subsection §4.6) committed at `2049316564`. B (§4.3 SABER
+  context refresh) committed at `2049316564`. **D (Re 4
+  sub-goal 6: universal-relational class via bvult/bvule)**
+  implemented at `3fbc1d9c6f`; paper §4.6 updated at
+  `889efe9588`. **C (memory-efficient extraction via deferred
+  bit-blasting + streaming polynomial multiplication)**
+  implemented at `c9f2f825ba`; paper §4.3 updated at
+  `49178650da`.
 - 2026-05-27 → 2026-06-02: holding pattern (peer review
   feedback on Paper 1).
-- 2026-06-02 → 2026-07-15 (~6 weeks): **Re 4 sub-goal 6
-  (universal-relational class)** — the natural follow-on. Adds
-  `bvult` / `bvslt` encoding via bit-decomposition; unlocks the
-  toom-scaled query (which currently TOs on our procedure
-  because the precondition is a bvult outside our universal-
-  equational fragment). Significant new contribution.
-- 2026-07-15 → 2026-08-15 (~4 weeks): **memory-efficient
-  extraction** — unblocks SABER karatsuba2 at $N \geq 320$
-  (currently aborts with std::bad\_alloc). Concrete engineering;
-  strengthens §4.3 N=256 ceiling. Optionally in parallel with
-  late-stage sub-goal 6 work.
+- 2026-06-02 → 2026-08-15 (~10 weeks): **post-D/C polish and
+  follow-on items**, in priority order:
+    1. **Make DEFER\_BITBLAST the default** after broader
+       regression testing (currently opt-in via env var).
+       Re 4 sub-goal 7 should be on by default.
+    2. **Bit-by-bit parity reasoning** for shift identities
+       (currently the toom-scaled query TOs because Buchberger
+       cannot align `2b mod 2^d = sum 2^i b_h_i` position-by-
+       position). Either parity-aware reduction ordering or
+       extractor-induced bit alignments. Could close §4.6's
+       remaining scope-limit caveat.
+    3. **Sub-goal 6 follow-ons**: signed comparisons (bvslt /
+       bvsle); symbol-symbol comparisons; chain-encoding
+       optimisation at bw=128 (currently TOs on the lower-bound
+       chain at bw=128).
+    4. **Faster polynomial multiplication for SABER >N=768**
+       (Toom-Cook style multiplication of polynomial-system
+       polynomials, or specialised Buchberger orderings). The
+       N=1024+ time-bound ceiling can be pushed.
 - 2026-08-15 → 2026-09-30 (~6 weeks): paper final pass.
 - 2026-10-15: TACAS 2027 deadline.
 
-Toom-Cook 4-way SABER verification and theory combination (Re
-8) remain post-paper future directions.
+Toom-Cook 4-way SABER verification (faithful schoolbook =
+Toom-Cook 4-way) remains a post-paper open challenge. Theory
+combination (Re 8) remains post-paper future direction.
 
 ## Why C-narrow is folded into Re 4
 
