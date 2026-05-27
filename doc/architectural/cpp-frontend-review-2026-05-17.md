@@ -2154,3 +2154,135 @@ That's a multi-day project and shouldn't be tackled as a single
 session's commit.
 
 Dog-food unchanged at 20 / 17 / 80 / 0.
+
+
+## 2026-05-27 (continued) Three-fix landing for the spec-matching cascade
+
+After the initial deep dive identified the three layered bugs in
+template-specialization matching with variadic packs, this section
+records the three fixes that landed (with their diagnostic refinements)
+and the new stopping point.
+
+### What landed
+
+| commit | fix |
+|---|---|
+| `ba9b288a45` | TT-param-to-instance substitution preserving args (`template_mapt::apply`) |
+| `752415ddfe` | Empty-pack sentinel handling in `template_mapt::build`/`apply` |
+| `3bed1dffee` | Same-named-param shadowing in `template_mapt::build` (nested elaboration scope leak) |
+| `fe24f929d5` | Regression tests `cpp17_replace_first_arg` and `cpp17_replace_first_arg_sizeof` |
+
+### How the three fixes compose
+
+For `__replace_first_arg<allocator<A>, B>::type`:
+
+1. `elaborate_class_template`'s spec-matching path
+   (`cpp_instantiate_template.cpp:1115+`) deduces the spec correctly
+   (this was already the case — the post-loop empty-pack workaround
+   at line 1213-1224 places an `empty_typet` sentinel for the
+   zero-element pack so `has_unassigned()` doesn't reject the spec).
+2. `instantiate_template` builds the template_map for the spec.
+   `752415ddfe` makes `build` recognise the `empty_typet` sentinel and
+   record a zero-size pack with no `pack_args_map` entry (instead of
+   `pack_args_map[_Types] = [empty_typet]` with size 1).
+3. The spec body's `using type = _SomeTemplate<_Up, _Types...>` is
+   substituted by `template_mapt::apply`.  `ba9b288a45` makes
+   `apply` rewrite only the front-name of the cpp_name when the
+   TT-parameter is bound to a struct_tag (extracting the bound
+   template's base name from the `tag-<base><args>` form), instead
+   of replacing the whole expression with the bound instance.  The
+   args-substitution loop then substitutes `_Up = B` and expands the
+   empty pack via `pack_size_map[_Types] = 0` (the `apply` companion
+   from `752415ddfe`).
+4. `R = allocator<B>` is created.  Accessing `R::value_type` triggers
+   nested elaboration of `tag-allocator<tag-B>`.  Without the
+   `3bed1dffee` shadow fix, the outer spec's `_Tp -> A` binding
+   (still in `type_map` because `cpp_saved_template_mapt` saves by
+   COPY rather than clearing) leaks into the suffix-match for
+   allocator's `_Tp` and `R::value_type` resolves to `A`.  With the
+   shadow fix, allocator's own `_Tp -> B` removes the outer's
+   same-suffix entry for the duration of the inner instantiation,
+   and `R::value_type = B`.
+
+### Test outcomes
+
+* Standalone `/tmp/specmatch_rebind4.cpp` (b_field positive test):
+  `R = allocator<B>`, `y = B`, `y.b_field = 42` succeeds.
+* Standalone `/tmp/specmatch_rebind5.cpp` (a_field negative test):
+  fails to typecheck `y.a_field = 42` because `R::value_type = B`
+  (which has no `a_field`).
+* Standalone `/tmp/scope_leak.cpp`/`scope_leak2.cpp` (no-pack
+  variants of the same shadowing test): produce the right inner
+  `_Tp` binding.
+* `cpp11_require_swap` regression: the partial-spec test that was
+  documenting the prior bug now actually verifies — `std::swap`
+  through libstdc++'s `_Require<__not_<...>, is_move_constructible,
+  is_move_assignable>` chain resolves successfully.
+* New regression tests `cpp17_replace_first_arg{,_sizeof}` cover the
+  fixed pattern.
+
+### Bugs from the deep-dive section that did NOT need fixing
+
+* **Bug #1 (pack-parameter deduction in `disambiguate_template_classes`)**:
+  the `elaborate_class_template`-based spec-matching path
+  (`cpp_instantiate_template.cpp:1115+`) is the one that actually
+  fires in our case.  It already had a post-loop workaround that
+  places `empty_typet` for unassigned pack params (line 1213-1224),
+  so the spec is accepted.  `disambiguate_template_classes`'s deduction
+  loop is reachable from other code paths but was not the blocker for
+  the `__alloc_rebind` cascade.  No fix landed here; if it becomes the
+  blocker for some other case, the same `empty_typet`-sentinel approach
+  used in `elaborate_class_template` could be ported.
+
+* **Bug #2 (`matcht::operator<` cost ordering)**: the same
+  `elaborate_class_template` spec-matching path uses its own
+  best-match selection (line 1632-1636: "first non-primary spec beats
+  primary") rather than `matcht::operator<`.  The `matcht`-based
+  scoring in `disambiguate_template_classes` may still be wrong for
+  some cases, but it's not on the path that handles the dog-food
+  cascade and didn't manifest in any current reproducer.
+
+### Where the cascade now stops
+
+`/tmp/reserve_repro11.cpp` (the headline reproducer for the
+`'reserve' is unknown` cascade) still fails.  The new failure mode
+is:
+
+```
+instantiating 'std::__alloc_rebind' with <struct allocator, struct _Hash_node>
+instantiating 'std::__allocator_traits_base::__rebind' with <struct allocator, struct _Hash_node, void>
+template scope 'rebind' is ambiguous
+  std::__new_allocator<char>::template.rebind<Type0>
+  std::allocator<char>::template.rebind<Type0>
+  __gnu_cxx::__alloc_traits<std::tag-allocator<char>,char>::template.rebind<Type0>
+  std::__new_allocator<char16_t>::template.rebind<Type0>
+  std::allocator<char16_t>::template.rebind<Type0>
+  ...
+```
+
+The `__alloc_rebind` chain progresses past `__replace_first_arg`
+correctly (the rebind that previously aliased to the original
+allocator now produces the rebound allocator), but resolution of
+`rebind::other` then hits an ambiguous-scope error: every
+already-instantiated `allocator<X>` has a member template `rebind`
+in its scope, and the qualified lookup `_Alloc::rebind<U>::other`
+finds all of them rather than just `_Alloc`'s own `rebind`.
+
+This is a SEPARATE bug — qualified-name lookup through a struct_tag
+should restrict to that one tag's members, not search across the
+template_scopes of every same-base-name instance.  It does not
+appear to be a regression introduced by the three fixes (the prior
+state never reached this point because `__replace_first_arg`
+silently aliased and the chain failed earlier).
+
+### Status
+
+cbmc-cpp regressions: 678/0/83 (one previously-failing test now
+passes correctly); dog-food: 20/17/80/0 (the dominant Category-A
+irept-body issue is unrelated and unaffected).
+
+The three fixes plus the regression tests are independent landings
+that don't depend on solving the `rebind`-ambiguity follow-up.  They
+unblock the partial-specialization layer of the cascade and provide
+a clean foundation for the next iteration to tackle the
+qualified-lookup ambiguity.
