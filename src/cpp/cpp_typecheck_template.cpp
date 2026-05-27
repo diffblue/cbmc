@@ -1797,6 +1797,32 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       // and store the template symbol identifier.
       if(parameter.get_bool(ID_is_template))
       {
+        // Forward an already-resolved template-template-parameter
+        // binding through this layer.  When the outer template's
+        // own TT-parameter is being passed as the inner template's
+        // TT-parameter (e.g. `__detected_or_t<D, _Op, As...>`
+        // forwarding `_Op` to `__detected_or<D, _Op, As...>`),
+        // the argument arrives here as a type_expr / ambiguous
+        // node whose type is already a `template_parameter_symbol_type`.
+        // Skip the cpp_name-based lookup and use it directly:
+        // `template_map.set` wires it up the same way as if we
+        // had just looked up the template in scope.
+        if(
+          (arg.id() == ID_ambiguous || arg.id() == ID_type) &&
+          arg.type().id() == ID_template_parameter_symbol_type)
+        {
+          exprt fwd = type_exprt(to_template_parameter_symbol_type(arg.type()));
+          fwd.type().add_source_location() = parameter.source_location();
+          template_map.set(parameter, fwd);
+          // Replace the original `ambiguous` arg in the args list
+          // with the normalised `type_exprt` so downstream
+          // `template_suffix` (which has a strict
+          // `expr.id() != ID_ambiguous` invariant) doesn't trip
+          // on the unconverted ambiguity node.
+          arg = std::move(fwd);
+          continue;
+        }
+
         irep_idt template_name;
         if(arg.id() == ID_ambiguous && arg.type().id() == ID_cpp_name)
           template_name = to_cpp_name(arg.type()).get_base_name();
