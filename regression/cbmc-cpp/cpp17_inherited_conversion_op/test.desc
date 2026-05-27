@@ -1,0 +1,10 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+^\[main\.assertion\.1\] line 31 inherited operator bool found and applied: SUCCESS$
+--
+^CONVERSION ERROR$
+invalid implicit conversion
