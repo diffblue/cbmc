@@ -4,6 +4,10 @@ This document consolidates the future-direction state for the
 algebraic procedure as of 2026-05-27. It supersedes the ad-hoc
 "Re N" label scheme used across earlier per-experiment notes.
 
+*Last updated 2026-05-27 evening: A (Re 4 paper subsection) and
+B (§4.3 SABER context refresh) committed at `2049316564`. Paper
+now 31 pages.*
+
 ## Status table
 
 | Label | Direction | Status | Notes |
@@ -11,7 +15,7 @@ algebraic procedure as of 2026-05-27. It supersedes the ad-hoc
 | Re 1 | Disjunctive-disequalities procedure-level extension | **IMPLEMENTED** | Commit `448bb10923`. See `disjunctive-disequalities-extension.md`. |
 | Re 2 | Extractor coverage extensions ("C-narrow") | **FOLDED INTO Re 4** | bvshl with constant `k` already handled. bvlshr / exact division / bvand / bvor / bvxor cannot be extracted soundly without bit-decomposition. See "Why C-narrow is folded" below. |
 | Re 3 | Expression-level normalisation via Gröbner basis | Sanity-passed | `ENABLE_GB_EXPR_NORMALISE` prototype exists in CBMC. Lower priority than Re 4. See `expression-normalisation-design.md`. |
-| Re 4 | Bit-decomposition variables | **MVP IMPLEMENTED + sub-goal 3 essentially complete** | Commits `ea3bb94f11` (design), `00d943b133` (MVP: bvlshr), `8328f31d0a` (bvand/bvor/bvxor/bvnot), `d864305fbd` (Frobenius), `61faaf0f29` (structural bit-decomp + polynomial-form host cache), `50252003e4` (inline simplification), `a54fa27f04` (linear elimination of host variables). 70-1000x and now linear scaling in bitwidth: bvxor cancellation 0.07s @ 128-bit; De Morgan 0.08s @ 128-bit. Sub-goals 4-6 (Toom-Cook 4-way SABER, GRS-128, universal-relational) reachable. |
+| Re 4 | Bit-decomposition variables | **MVP IMPLEMENTED + sub-goal 3 essentially complete + paper subsection landed** | Commits `ea3bb94f11` (design), `00d943b133` (MVP: bvlshr), `8328f31d0a` (bvand/bvor/bvxor/bvnot), `d864305fbd` (Frobenius), `61faaf0f29` (structural bit-decomp + polynomial-form host cache), `50252003e4` (inline simplification), `a54fa27f04` (linear elimination of host variables), `2049316564` (paper §4.6 + §4.3 update). Linear scaling in bitwidth on 7 partial-bv identities. Foundational for sub-goal 6 (universal-relational); see §4.6 "toom-scaled exposes a scope limit". |
 | Re 5 | (reserved) | — | |
 | Re 6 | SABER Level A empirical study | **DONE** | Commits `b7057820c5`, `7fabd71ffc`, `5419a39767`, `5a5960d93a`, `624237a09b`, `37c5c7d781`, `a07f659cf5`. §4.3 of paper.tex. |
 | Re 7 | ZFP injection into Gröbner basis | Negative result | See `zfp-injection-result.md`. |
@@ -93,17 +97,35 @@ complete, faithful Toom-Cook 4-way SABER and GRS-128 are
 relational queries (sub-goal 6) still require a separate
 `bvult` / `bvslt` encoding design.
 
-**Updated sequencing (2026-05-27):**
+**Updated sequencing (2026-05-27 evening):**
 
-- 2026-05-27 → 2026-06-02: holding pattern (peer review feedback).
-  Sub-goal 3 essentially complete; further optimisation only on
-  demand.
-- 2026-06-02 → 2026-07-15: Re 4 sub-goal 4 (faithful Toom-Cook
-  4-way SABER generator + verification) and sub-goal 5 (GRS-128).
-- 2026-07-15 → 2026-08-15: Re 4 sub-goal 6 (universal-relational
-  encoding design + implementation).
-- 2026-08-15 → 2026-09-30: paper final pass.
+- **DONE this session**: Re 4 MVP, sub-goal 3 (Frobenius +
+  structural decomp + polynomial-form cache + inline
+  simplification + linear elimination), sub-goal 4 attempt
+  (Toom-Cook 4-way generator implemented; verification
+  intractable, identified as open challenge), sub-goal 5
+  attempt (GRS investigated, found not to exercise our
+  contribution; §4.6 of paper.tex dropped), Re 4 paper
+  subsection §4.6 written (commit 2049316564), §4.3 SABER
+  context refresh (commit 2049316564).
+- 2026-05-27 → 2026-06-02: holding pattern (peer review
+  feedback on Paper 1).
+- 2026-06-02 → 2026-07-15 (~6 weeks): **Re 4 sub-goal 6
+  (universal-relational class)** — the natural follow-on. Adds
+  `bvult` / `bvslt` encoding via bit-decomposition; unlocks the
+  toom-scaled query (which currently TOs on our procedure
+  because the precondition is a bvult outside our universal-
+  equational fragment). Significant new contribution.
+- 2026-07-15 → 2026-08-15 (~4 weeks): **memory-efficient
+  extraction** — unblocks SABER karatsuba2 at $N \geq 320$
+  (currently aborts with std::bad\_alloc). Concrete engineering;
+  strengthens §4.3 N=256 ceiling. Optionally in parallel with
+  late-stage sub-goal 6 work.
+- 2026-08-15 → 2026-09-30 (~6 weeks): paper final pass.
 - 2026-10-15: TACAS 2027 deadline.
+
+Toom-Cook 4-way SABER verification and theory combination (Re
+8) remain post-paper future directions.
 
 ## Why C-narrow is folded into Re 4
 
