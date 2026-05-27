@@ -397,6 +397,31 @@ void template_mapt::apply(typet &type) const
         // Before applying substitutions, check if any arg is a
         // pack parameter and replace it with all pack args.
         irept::subt expanded_args;
+
+        // Helper: an empty-pack reference (a `_Pack...` whose pack
+        // resolved to zero elements) has no entry in `pack_args_map`
+        // (we only record non-empty packs there) but does have an
+        // entry of value `0` in `pack_size_map`.  When walking the
+        // arg list, expanding such a reference to "no args" is the
+        // correct behaviour; leaving it as the bare cpp_name causes
+        // downstream `typecheck_template_args` to fail with
+        // "too many template arguments".
+        auto matches_empty_pack = [this](irep_idt ident) -> bool
+        {
+          for(const auto &ps : pack_size_map)
+          {
+            if(ps.second != 0)
+              continue;
+            const std::string &key = id2string(ps.first);
+            auto p = key.rfind("::");
+            std::string suffix =
+              p != std::string::npos ? key.substr(p + 2) : key;
+            if(suffix == id2string(ident))
+              return true;
+          }
+          return false;
+        };
+
         for(auto &arg : args)
         {
           bool was_pack = false;
@@ -420,6 +445,17 @@ void template_mapt::apply(typet &type) const
                   was_pack = true;
                   break;
                 }
+              }
+              // Empty pack: drop the bare reference (zero-length
+              // expansion).
+              if(!was_pack)
+              {
+                const std::string &key = id2string(param_id);
+                auto p = key.rfind("::");
+                std::string suffix =
+                  p != std::string::npos ? key.substr(p + 2) : key;
+                if(matches_empty_pack(suffix))
+                  was_pack = true;
               }
             }
           }
@@ -459,6 +495,9 @@ void template_mapt::apply(typet &type) const
                   break;
                 }
               }
+              // Empty pack: drop the bare reference.
+              if(!was_pack && matches_empty_pack(ident))
+                was_pack = true;
             }
           }
           if(!was_pack)
@@ -742,15 +781,31 @@ void template_mapt::build(
     std::size_t non_pack = template_parameters.size() - 1;
     std::size_t pack_sz =
       instance.size() >= non_pack ? instance.size() - non_pack : 0;
-    pack_size_map[pack_id] = pack_sz;
 
     // Store all pack argument types for pack indexing (C++26)
     std::vector<typet> pack_types;
     for(std::size_t j = non_pack; j < instance.size(); ++j)
     {
       if(instance[j].id() == ID_type)
+      {
+        // Recognize the `empty_typet()` sentinel used by
+        // `elaborate_class_template`'s spec-matching path
+        // (cpp_instantiate_template.cpp) to encode "pack matched zero
+        // elements" in `guessed_args` (an unassigned pack param has no
+        // natural representation in `cpp_template_args_tct`'s
+        // arguments list, which is positional).  Treat it as a
+        // zero-length pack rather than as a literal `void`-typed
+        // pack element.
+        if(instance[j].type().id() == ID_empty)
+        {
+          if(pack_sz > 0)
+            --pack_sz;
+          continue;
+        }
         pack_types.push_back(instance[j].type());
+      }
     }
+    pack_size_map[pack_id] = pack_sz;
     if(!pack_types.empty())
     {
       pack_args_map[pack_id] = std::move(pack_types);
