@@ -246,6 +246,76 @@ which Buchberger should handle vastly faster.
 This is the next sub-goal-3 step: prototype Frobenius-aware
 reduction and re-measure the queries above.
 
+### Sub-goal 3 progress (2026-05-27, post-Frobenius)
+
+Three orthogonal optimisations applied (in order):
+
+**(a) Frobenius-aware reduction in Buchberger** (commit
+`d864305fbd`). Bit variables satisfy $b^2 = b$, so $b^k = b$
+for $k \geq 1$. Adding a step in `s_polynomial`,
+`strong_reduce`, and the 2-multiple step that clamps bit-
+variable exponents to 1 immediately after each polynomial
+operation gives 70–1000× speedup on bit-decomp queries that
+solve via incremental idempotency reduction.
+
+**(b) Structural bit-decomposition** (commit `61faaf0f29`,
+part 1 of 2). Refactor `decompose_bits()` to recursively
+compute bit polynomials directly for recognised bit-operations
+(`bvnot`, `bvshl`, `bvlshr`, `bvand`, `bvor`, `bvxor`,
+constants), without going through a fresh host. Eager
+Frobenius applied during construction keeps intermediate
+polynomials small.
+
+**(c) Polynomial-form host cache** (commit `61faaf0f29`,
+part 2 of 2). Two syntactically-different-but-semantically-
+equal compound expressions like $(a + b)$ and $(b + a)$
+normalise to the same polynomial. Without caching, each gets
+a distinct host with a distinct bit decomposition; with the
+new cache, they share a host. This eliminates a major class
+of redundant Buchberger work.
+
+**Combined effect:**
+
+| Query | Bitwidth | Pre-Frobenius | Post-(a)+(b)+(c) |
+|---|---|---|---|
+| `((a+b)>>1) = ((b+a)>>1)` | 16 | T/O 30 s | 0.00 s |
+| `((a+b)>>1) = ((b+a)>>1)` | 32 | T/O 30 s | 0.00 s |
+| `~(a & b) = ~a | ~b` (De Morgan) | 16 | T/O 30 s | 0.00 s |
+| `(a XOR b) XOR b = a` | 8 | T/O 30 s | 0.01 s |
+| `(a XOR b) XOR b = a` | 16 | T/O 30 s | 0.70 s |
+| `~~a = a` | 4 | 8.55 s | 0.00 s |
+| `((a+b)-(a-b))>>1 = b ∧ b<128` (8-bit) | 8 | (untested) | 0.04 s |
+| `((a+b)+(c+d))>>2 = ((a+c)+(b+d))>>2` | 16 | (untested) | 0.00 s |
+
+The last two queries are Toom-Cook-style identities — verifying
+that two algebraic re-arrangements with shifts produce identical
+results. These now decide cleanly, suggesting Re 4 sub-goals 4
+(faithful Toom-Cook 4-way SABER) is now reachable.
+
+**Remaining wall.** `bvxor` cancellation at 24+ bits still
+times out. The cost is in the polynomial multiplications during
+deeply-nested bit combination: bvxor expands each bit to a
+polynomial with degree-2 cross-terms, and chained xor multiplies
+these. Even with eager Frobenius, the term count grows. Further
+optimisation candidates (estimated 1–3 weeks each):
+
+- **Inline simplification during construction.** Apply $b_i^2
+  \to b_i$ during the polynomial multiplication operator, not
+  just after. Keeps intermediate term counts smaller.
+- **Linear elimination of host variables.** Sum-decomposition
+  $h - \sum_i 2^i b_i = 0$ is a degree-1 equation with $h$ as
+  leading term in lex order; using it as a substitution rule
+  eliminates $h$ everywhere it appears.
+- **Custom orderings.** Place bit variables and host variables
+  in the variable order to make Buchberger's reductions more
+  predictable.
+
+The remaining wall does not block Re 4 sub-goals 4 and 5 (faithful
+Toom-Cook 4-way SABER and GRS-128) — those exercise compound
+shifts on linear combinations, which now solve cleanly. Sub-goal
+6 (universal-relational queries with `bvult` / `bvslt`) is a
+separate encoding question still to be designed.
+
 ## Sub-goals 4–6 (deferred to follow-on sessions)
 
 - **Sub-goal 4** (faithful Toom-Cook 4-way SABER): write

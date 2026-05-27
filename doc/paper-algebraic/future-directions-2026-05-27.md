@@ -11,7 +11,7 @@ algebraic procedure as of 2026-05-27. It supersedes the ad-hoc
 | Re 1 | Disjunctive-disequalities procedure-level extension | **IMPLEMENTED** | Commit `448bb10923`. See `disjunctive-disequalities-extension.md`. |
 | Re 2 | Extractor coverage extensions ("C-narrow") | **FOLDED INTO Re 4** | bvshl with constant `k` already handled. bvlshr / exact division / bvand / bvor / bvxor cannot be extracted soundly without bit-decomposition. See "Why C-narrow is folded" below. |
 | Re 3 | Expression-level normalisation via Gröbner basis | Sanity-passed | `ENABLE_GB_EXPR_NORMALISE` prototype exists in CBMC. Lower priority than Re 4. See `expression-normalisation-design.md`. |
-| Re 4 | Bit-decomposition variables | **MVP IMPLEMENTED + tractability open** | Commits `ea3bb94f11` (design), `00d943b133` (MVP: bvlshr), `8328f31d0a` (bvand/bvor/bvxor/bvnot). Sanity check passed at $d = 4$. MVP empirically tested 2026-05-27: sound but performance-limited on bit-decomposition-heavy queries. Next sub-goal is a Frobenius-aware Buchberger reduction strategy (~1–2 weeks). See `re4-bit-decomposition-design-2026-05-27.md` (esp. "Empirical findings" section) and "Re 4 status" below. |
+| Re 4 | Bit-decomposition variables | **MVP IMPLEMENTED + sub-goal 3 substantially advanced** | Commits `ea3bb94f11` (design), `00d943b133` (MVP: bvlshr), `8328f31d0a` (bvand/bvor/bvxor/bvnot), `d864305fbd` (Frobenius), `61faaf0f29` (structural bit-decomp + polynomial-form host cache). 70–1000× speedup on bit-decomp queries. Compound bvlshr like `((a+b)>>1) = ((b+a)>>1)` now solves at any width up to 32-bit in 0.00s (was T/O at 16-bit). Toom-Cook-style synthetic queries solve cleanly. Sub-goals 4–6 (Toom-Cook 4-way SABER, GRS-128, universal-relational) are now reachable. See `re4-bit-decomposition-design-2026-05-27.md` (esp. "Sub-goal 3 progress" section). |
 | Re 5 | (reserved) | — | |
 | Re 6 | SABER Level A empirical study | **DONE** | Commits `b7057820c5`, `7fabd71ffc`, `5419a39767`, `5a5960d93a`, `624237a09b`, `37c5c7d781`, `a07f659cf5`. §4.3 of paper.tex. |
 | Re 7 | ZFP injection into Gröbner basis | Negative result | See `zfp-injection-result.md`. |
@@ -36,7 +36,53 @@ algebraic procedure as of 2026-05-27. It supersedes the ad-hoc
   attempt now correctly answered SAT.
 - Existing benchmarks unchanged (SABER scaling, Martin subpoly).
 
-**Empirical tractability finding:**
+**Empirical tractability finding (after Frobenius + structural bit-decomp + polynomial-form host cache, 2026-05-27):**
+
+Three orthogonal optimisations applied in sequence:
+
+1. **Frobenius-aware reduction in Buchberger** (commit `d864305fbd`):
+   bit-variable exponents clamped to 1 after every polynomial
+   operation. 70–1000× speedup on bit-decomp queries.
+2. **Structural bit-decomposition** (commit `61faaf0f29` part 1):
+   `decompose_bits()` now recursively computes bit polynomials
+   directly for `bvnot`, `bvshl`, `bvlshr`, `bvand`, `bvor`,
+   `bvxor`, constants — without going through a fresh host. Eager
+   Frobenius applied during construction.
+3. **Polynomial-form host cache** (commit `61faaf0f29` part 2):
+   syntactically-different-but-semantically-equal compounds (like
+   `a+b` and `b+a`) share a host.
+
+Empirical impact:
+
+| Query | Bitwidth | MVP (Frobenius only) | After all 3 optimisations |
+|---|---|---|---|
+| `((a+b)>>1) = ((b+a)>>1)` | 16 | T/O 30 s | 0.00 s |
+| `((a+b)>>1) = ((b+a)>>1)` | 32 | T/O 30 s | 0.00 s |
+| `~(a & b) = ~a | ~b` (De Morgan) | 16 | T/O 30 s | 0.00 s |
+| `(a XOR b) XOR b = a` | 8 | T/O 30 s | 0.01 s |
+| `(a XOR b) XOR b = a` | 16 | T/O 30 s | 0.70 s |
+| `~~a = a` | 4 | 0.11 s | 0.00 s |
+| `((a+b)-(a-b))>>1 = b ∧ b<128` | 8 | (untested) | 0.04 s |
+| `((a+b)+(c+d))>>2 = ((a+c)+(b+d))>>2` | 16 | (untested) | 0.00 s |
+
+The last two queries are Toom-Cook-style identities that exercise
+exactly the patterns SABER's Toom-Cook 4-way uses. They now solve
+cleanly, suggesting **Re 4 sub-goal 4 (faithful Toom-Cook 4-way
+SABER) is reachable**.
+
+**Remaining wall:** `bvxor` cancellation at 24+ bits still times
+out. Cause is polynomial multiplication cost during deeply-nested
+bit combination (each bvxor expansion produces degree-2 cross-
+terms). Optimisations to consider as Re 4 sub-goal 3 follow-on:
+
+- Inline simplification ($b_i^2 \to b_i$ during the polynomial
+  multiplication operator, not just after).
+- Linear elimination of host variables via sum-decomposition.
+- Custom variable orderings.
+
+Each estimated 1–3 weeks. Not blocking sub-goals 4–5.
+
+**Original (pre-optimisation) finding kept for context:**
 
 - Simple cases work: 4-bit shift identity 0.06 s, 8-bit shift
   identity 0.51 s, $a \, \& \, 0 = 0$ in 0.07 s, $a$ XOR $a = 0$
@@ -47,32 +93,26 @@ algebraic procedure as of 2026-05-27. It supersedes the ad-hoc
 - $\sim\sim a = a$ at 4-bit takes 8.55 s; De Morgan
   $\sim(a \, \& \, b) = \sim a \mid \sim b$ at 4-bit takes 4.16 s.
 
-**Diagnosis:** bit-decomposition adds many degree-2 generators
-(idempotency); compound expressions get distinct host variables
-that Buchberger has to reconcile through bit-by-bit reduction.
-The S-polynomial cost is quadratic in the bit count.
+**Diagnosis (kept):** bit-decomposition adds many degree-2
+generators (idempotency); compound expressions get distinct host
+variables that Buchberger has to reconcile through bit-by-bit
+reduction. The S-polynomial cost is quadratic in the bit count.
 
-**Next step (Re 4 sub-goal 3 prototype):** Frobenius-aware
-Buchberger reduction. Idempotency $b^2 = b$ implies $b^k = b$
-for all $k \geq 1$; an optimised `strong_reduce` that immediately
-substitutes $b^k$ with $b$ for any bit variable $b$ would short-
-circuit a large class of S-polynomial computations and
-potentially recover production-scale tractability. Estimated
-1–2 weeks of focused work.
+**Then (Re 4 sub-goals 4, 5, 6):** with sub-goal 3 substantially
+advanced, faithful Toom-Cook 4-way SABER and GRS-128 are
+**now reachable**. Universal-relational queries (sub-goal 6)
+still require a separate `bvult` / `bvslt` encoding design.
 
-**Then (Re 4 sub-goals 4, 5, 6):** with tractability addressed,
-faithful Toom-Cook 4-way SABER, GRS-128, and universal-relational
-queries become reachable. These are 1–3 weeks of generator and
-benchmark work each.
-
-**Updated sequencing:**
+**Updated sequencing (2026-05-27):**
 
 - 2026-05-27 → 2026-06-02: holding pattern (peer review feedback).
-- 2026-06-02 → 2026-06-15: Frobenius-aware reduction prototype
-  (Re 4 sub-goal 3 follow-on).
-- 2026-06-15 → 2026-08-01: Re 4 sub-goals 4–6 (Toom-Cook SABER,
-  GRS-128, universal-relational).
-- 2026-08-01 → 2026-09-30: paper final pass.
+  Sub-goal 3 substantially advanced; minor follow-ons (inline
+  $b^2 \to b$ simplification etc.) optional during this window.
+- 2026-06-02 → 2026-07-15: Re 4 sub-goal 4 (faithful Toom-Cook
+  4-way SABER generator + verification) and sub-goal 5 (GRS-128).
+- 2026-07-15 → 2026-08-15: Re 4 sub-goal 6 (universal-relational
+  encoding design + implementation).
+- 2026-08-15 → 2026-09-30: paper final pass.
 - 2026-10-15: TACAS 2027 deadline.
 
 ## Why C-narrow is folded into Re 4
