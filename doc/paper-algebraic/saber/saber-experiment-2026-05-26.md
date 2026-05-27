@@ -134,11 +134,39 @@ revision gives:
   (`inv3`, `inv9`, `inv15`). The shifts are *exact divisions*:
   partial operations on $\mathbb{Z}_{2^d}$ that are valid only
   when divisibility is guaranteed by the algorithm's invariants.
-  Implementing them faithfully in SMT-LIB requires extractor
-  support for `bvshr` as exact division (related to Re 2,
-  extractor coverage extension). Deferred; 2-level Karatsuba
-  is the multi-level variant we can verify today without
-  extractor extensions.
+
+  We attempted a flag-gated `bvlshr` extension (a fresh quotient
+  $q$ with side equation $2^k \cdot q = a$, see commit
+  `e79a8fbca5`, since reverted at `a085c50177`). The fundamental
+  obstacle: `bvlshr` is not a polynomial operation in
+  $\mathbb{Z}_{2^d}$, even when "divisible". Take $d = 4$,
+  $c = 9$: $2c \bmod 16 = 2$, so $(2c) \gg 1 = 1$, but the
+  polynomial form "$c$" with $c = 9$ yields $9$. Modular reduction
+  in $\mathbb{Z}_{2^d}$ has already happened by the time we see
+  the polynomial — pattern-matching divisibility on coefficients
+  cannot recover the lost information. The encoding is sound only
+  when the user externally guarantees divisibility, and a
+  configuration flag asserting this property is too easy to
+  misuse.
+
+  **The sound path is Re 4 (bit-decomposition variables).** With
+  bit variables $b_{a,i}$ satisfying idempotency
+  ($b_i^2 = b_i$) and sum-decomposition
+  ($a = \sum_i 2^i b_i$), `bvlshr` becomes a linear polynomial
+  expression in the $b_i$:
+  $a \gg k = \sum_{i=k}^{d-1} 2^{i-k} b_{a,i}$. This is sound and
+  exact, and naturally extends to other partial bit-vector
+  operations (`bvand`, `bvor`, `bvxor`, etc.). The Re 4 sanity
+  check below confirms idempotency + sum-decomposition keep
+  Buchberger tractable on commutativity. Toom-Cook 4-way SABER
+  is therefore deferred to Re 4 as a natural application; full
+  algorithmic-faithfulness in §4.3 is blocked on Re 4 landing.
+
+  In the meantime, 2-level Karatsuba already verifies SABER's
+  structural depth at the polynomial level (the polynomial
+  identity is the same regardless of decomposition layer count),
+  so the §4.3 paper section is not load-bearing on faithful
+  Toom-4.
 
 - **Per-coefficient, not whole-polynomial.** The SABER reduction
   step `res[i] = c[i] - c[i+N]` is verified implicitly because
@@ -202,6 +230,23 @@ termination.
 passes the basic tractability question. Effort estimate stands
 at 4–8 weeks for a working prototype that integrates
 bit-decomposition into the algebraic-pre-solver entry point.
+
+**Promoted to next-push status (2026-05-27).** Re 4 now subsumes
+what was previously scoped as a separate "C-narrow" extractor
+extension for `bvlshr` / exact-division shifts. The flag-gated
+attempt at narrow `bvlshr` extraction (commits `e79a8fbca5` and
+`80afdf3473`) was reverted at `a085c50177` and `7803a878e6`
+because the encoding is unsound without bit-decomposition
+machinery. With Re 4 in place, `bvlshr` (and the rest of the
+partial bit-vector operators) becomes a sound polynomial
+expression in the bit variables, simultaneously unlocking:
+
+- Toom-Cook 4-way faithful SABER for §4.3.
+- The universal-relational and existential-relational classes
+  (genuine class-coverage extension, see §4 future-direction
+  discussion).
+- A coherent path for `bvand` / `bvor` / `bvxor` and other
+  partial operators currently unrecognised by the extractor.
 
 ## Sanity check Re 3: expression-level normalisation
 
