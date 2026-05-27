@@ -140,7 +140,7 @@ static bool sort_and_join(exprt &expr, bool do_sort)
   if(!expr.has_operands())
     return true;
 
-  const struct saj_tablet &saj_entry =
+  const struct saj_tablet saj_entry =
     get_sort_and_join_table_entry(expr.id(), as_const(expr).type().id());
   if(saj_entry.id.empty())
     return true;

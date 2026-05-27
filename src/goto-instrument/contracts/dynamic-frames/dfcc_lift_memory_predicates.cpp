@@ -217,7 +217,7 @@ static std::optional<std::size_t> is_param_expr(
 void dfcc_lift_memory_predicatest::collect_parameters_to_lift(
   const irep_idt &function_id)
 {
-  const symbolt &function_symbol =
+  const symbolt function_symbol =
     dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id);
   // map of parameter name to its rank in the signature
   std::map<irep_idt, std::size_t> parameter_rank;

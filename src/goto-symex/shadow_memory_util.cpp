@@ -312,8 +312,7 @@ get_field_init_expr(const irep_idt &field_name, const goto_symex_statet &state)
 const typet &
 get_field_init_type(const irep_idt &field_name, const goto_symex_statet &state)
 {
-  const exprt &field_init_expr = get_field_init_expr(field_name, state);
-  return field_init_expr.type();
+  return get_field_init_expr(field_name, state).type();
 }
 
 bool contains_null_or_invalid(

@@ -158,7 +158,7 @@ void shadow_memoryt::symex_set_field(
     }
 
     // Get the type of the shadow memory for this field
-    const typet &sm_field_type = get_field_init_type(field_name, state);
+    const typet sm_field_type = get_field_init_type(field_name, state);
     // Add a conditional cast to the shadow memory field type if `rhs` is not of
     // the expected type
     const exprt casted_rhs =
@@ -222,7 +222,7 @@ void shadow_memoryt::symex_get_field(
   std::vector<std::pair<exprt, exprt>> rhs_conds_values;
   const null_pointer_exprt null_pointer(to_pointer_type(expr.type()));
   // Used to give a default value for invalid pointers and other usages
-  const exprt &field_init_expr = get_field_init_expr(field_name, state);
+  const exprt field_init_expr = get_field_init_expr(field_name, state);
 
   if(contains_null_or_invalid(value_set, null_pointer))
   {

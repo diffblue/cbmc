@@ -51,7 +51,7 @@ void dfcc_spec_functionst::generate_havoc_function(
     "DFCC: havoc function id '" + id2string(havoc_function_id) +
       "' already exists");
 
-  const auto &function_symbol =
+  const symbolt function_symbol =
     dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id);
 
   // create the code type that goes on the function symbol

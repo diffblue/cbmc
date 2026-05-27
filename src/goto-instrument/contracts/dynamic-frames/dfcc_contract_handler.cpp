@@ -106,7 +106,7 @@ const symbolt &dfcc_contract_handlert::get_pure_contract_symbol(
     if(function_id_opt.has_value())
     {
       auto function_id = function_id_opt.value();
-      const auto &function_symbol =
+      const symbolt function_symbol =
         dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id);
       check_signature_compat(
         function_id,

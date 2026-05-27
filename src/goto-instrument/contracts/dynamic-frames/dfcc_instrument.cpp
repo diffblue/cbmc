@@ -255,7 +255,7 @@ void dfcc_instrumentt::instrument_harness_function(
     to_pointer_type(library.dfcc_type[dfcc_typet::WRITE_SET_PTR]));
 
   // create a local write set symbol
-  const auto &function_symbol =
+  const symbolt function_symbol =
     dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id);
   const auto write_set = dfcc_utilst::create_symbol(
     goto_model.symbol_table,

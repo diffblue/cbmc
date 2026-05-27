@@ -83,7 +83,7 @@ get_mode_from_identifier(const namespacet &ns, const irep_idt &identifier)
 std::unique_ptr<languaget>
 get_language_from_identifier(const namespacet &ns, const irep_idt &identifier)
 {
-  const irep_idt &mode = get_mode_from_identifier(ns, identifier);
+  const irep_idt mode = get_mode_from_identifier(ns, identifier);
   if(mode == ID_unknown)
     return get_default_language();
 

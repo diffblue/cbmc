@@ -401,7 +401,7 @@ static void replace_history_parameter_rec(
   if(expr.id() != ID_old && expr.id() != ID_loop_entry)
     return;
 
-  const auto &parameter = to_history_expr(expr, history_id).expression();
+  const auto parameter = to_history_expr(expr, history_id).expression();
   const auto &id = parameter.id();
   DATA_INVARIANT_WITH_DIAGNOSTICS(
     id == ID_dereference || id == ID_member || id == ID_symbol ||

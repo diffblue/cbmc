@@ -147,7 +147,7 @@ void dfcc_swap_and_wrapt::check_contract(
   // wrapper body
   goto_programt body;
 
-  const auto &wrapper_symbol =
+  const symbolt wrapper_symbol =
     dfcc_utilst::get_function_symbol(goto_model.symbol_table, wrapper_id);
 
   auto check_started = dfcc_utilst::create_static_symbol(

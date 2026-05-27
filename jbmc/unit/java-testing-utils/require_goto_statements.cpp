@@ -329,7 +329,7 @@ const symbol_exprt *try_get_unique_symbol_assigned_to_symbol(
   const std::vector<codet> &entry_point_instructions,
   const irep_idt &symbol_identifier)
 {
-  const auto &expr = get_unique_non_null_expression_assigned_to_symbol(
+  const auto expr = get_unique_non_null_expression_assigned_to_symbol(
     entry_point_instructions, symbol_identifier);
 
   return expr_try_dynamic_cast<symbol_exprt>(skip_typecast(expr));
@@ -420,7 +420,7 @@ irep_idt require_goto_statements::require_struct_component_assignment(
   // right hand side, then we want to identify that the type
   // is the one we expect, e.g.:
   // struct java.lang.Integer *malloc_site$0;
-  const auto &component_declaration =
+  const auto component_declaration =
     require_goto_statements::require_declaration_of_name(
       symbol_identifier, entry_point_instructions);
   const typet &component_type =

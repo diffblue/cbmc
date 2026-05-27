@@ -85,7 +85,7 @@ symbol_exprt dfcc_utilst::create_symbol(
   const std::string &base_name,
   const source_locationt &source_location)
 {
-  const symbolt &function_symbol =
+  const symbolt function_symbol =
     get_function_symbol(symbol_table, function_id);
 
   symbolt &symbol = get_fresh_aux_symbol(
@@ -127,7 +127,7 @@ const symbolt &dfcc_utilst::create_new_parameter_symbol(
   const std::string &base_name,
   const typet &type)
 {
-  const symbolt &function_symbol =
+  const symbolt function_symbol =
     get_function_symbol(symbol_table, function_id);
 
   symbolt &symbol = get_fresh_aux_symbol(
@@ -254,7 +254,7 @@ static const symbolt &clone_and_rename_function(
   std::function<const typet(const typet &)> &trans_ret_type,
   std::function<const source_locationt(const source_locationt &)> &trans_loc)
 {
-  const symbolt &old_function_symbol =
+  const symbolt old_function_symbol =
     dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id);
   code_typet old_code_type = to_code_type(old_function_symbol.type);
 
