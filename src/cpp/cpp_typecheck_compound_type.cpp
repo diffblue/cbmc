@@ -212,9 +212,27 @@ void cpp_typecheckt::typecheck_compound_type(struct_union_typet &type)
         // Preserve template metadata across the type swap — the
         // incomplete type may carry ID_C_template set by
         // class_template_symbol, which the new complete type lacks.
+        // Same applies to ID_template_class_instance: the incomplete
+        // symbol created for a class-template instance by
+        // `cpp_instantiate_template.cpp:372` carries this flag, but
+        // the new complete type produced by the parser does not.
+        // Without explicit preservation, downstream consumers that
+        // gate on `template_class_instance` (e.g. the empty/
+        // incomplete-instance retry path inside
+        // `elaborate_class_template` and the un-elaborated-scope
+        // recovery path in `cpp_typecheck_resolve.cpp`) see the
+        // flag as false after the swap and treat partially
+        // elaborated instances as fully complete user classes.
+        // Concrete observed effect: members of stdlib containers
+        // (`std::vector<X>::clear`, `forward_list_as_mapt::swap`,
+        // `std::unordered_map<X>::iterator`, ...) accessed inside
+        // a sibling template's body fail to resolve because the
+        // container instance never gets re-elaborated.
         irept saved_c_template = writeable_symbol.type.find(ID_C_template);
         irept saved_c_template_arguments =
           writeable_symbol.type.find(ID_C_template_arguments);
+        const bool saved_template_class_instance =
+          writeable_symbol.type.get_bool(ID_template_class_instance);
         writeable_symbol.type.swap(type);
         if(
           writeable_symbol.type.find(ID_C_template).is_nil() &&
@@ -224,6 +242,8 @@ void cpp_typecheckt::typecheck_compound_type(struct_union_typet &type)
           writeable_symbol.type.set(
             ID_C_template_arguments, saved_c_template_arguments);
         }
+        if(saved_template_class_instance)
+          writeable_symbol.type.set(ID_template_class_instance, true);
         typecheck_compound_body(writeable_symbol);
       }
       else if(symbol.type.get_bool(ID_C_is_anonymous))

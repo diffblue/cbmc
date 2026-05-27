@@ -923,7 +923,18 @@ void cpp_typecheckt::elaborate_class_template(
       return;
     }
 
-    const symbolt &initial_template = lookup(t_type.get(ID_identifier));
+    const irep_idt initial_template_name = t_type.get(ID_identifier);
+    if(initial_template_name.empty())
+    {
+      // Defensive: if the template instance's underlying complete
+      // type lacks `ID_identifier` (e.g. because it was produced by
+      // an incomplete-to-complete swap that didn't set it), there is
+      // no primary template to look up.  Without this guard
+      // `lookup(initial_template_name)` would trip a
+      // namespace-base lookup invariant.
+      return;
+    }
+    const symbolt &initial_template = lookup(initial_template_name);
     // If the instance was created with a concept-constrained partial
     // specialization but is still empty, follow ID_specialization_of
     // to get the actual primary template. This re-does the
