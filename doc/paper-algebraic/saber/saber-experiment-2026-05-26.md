@@ -134,24 +134,11 @@ revision gives:
   (`inv3`, `inv9`, `inv15`). The shifts are *exact divisions*:
   partial operations on $\mathbb{Z}_{2^d}$ that are valid only
   when divisibility is guaranteed by the algorithm's invariants.
-
-  **Partial extractor support landed (2026-05-26).** The
-  polynomial extractor now handles `bvlshr a k` (with constant
-  `k`) under `ENABLE_BVLSHR_POLY=1`: it introduces a fresh
-  quotient variable $q$ with the side equation
-  $2^k \cdot q = a$, returning $q$ as the polynomial form. The
-  encoding is sound iff $a$ is divisible by $2^k$ in every
-  model — which holds by construction in Toom-Cook 4-way's
-  interpolation steps but not in general. See
-  `src/solvers/algebraic/poly_extract.cpp` and the commit
-  message of e79a8fbca5 for the soundness caveat.
-
-  Writing a Toom-Cook 4-way generator that exploits this is
-  deferred (estimated effort: 0.5–1 day to translate SABER's
-  interpolation formulas faithfully). With it, the §4.3 SABER
-  table would gain a fourth column showing Toom-4 verification
-  at SABER's actual algorithmic structure rather than the
-  2-level-Karatsuba approximation.
+  Implementing them faithfully in SMT-LIB requires extractor
+  support for `bvshr` as exact division (related to Re 2,
+  extractor coverage extension). Deferred; 2-level Karatsuba
+  is the multi-level variant we can verify today without
+  extractor extensions.
 
 - **Per-coefficient, not whole-polynomial.** The SABER reduction
   step `res[i] = c[i] - c[i+N]` is verified implicitly because
