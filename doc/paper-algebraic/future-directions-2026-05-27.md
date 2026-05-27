@@ -11,11 +11,69 @@ algebraic procedure as of 2026-05-27. It supersedes the ad-hoc
 | Re 1 | Disjunctive-disequalities procedure-level extension | **IMPLEMENTED** | Commit `448bb10923`. See `disjunctive-disequalities-extension.md`. |
 | Re 2 | Extractor coverage extensions ("C-narrow") | **FOLDED INTO Re 4** | bvshl with constant `k` already handled. bvlshr / exact division / bvand / bvor / bvxor cannot be extracted soundly without bit-decomposition. See "Why C-narrow is folded" below. |
 | Re 3 | Expression-level normalisation via Gröbner basis | Sanity-passed | `ENABLE_GB_EXPR_NORMALISE` prototype exists in CBMC. Lower priority than Re 4. See `expression-normalisation-design.md`. |
-| Re 4 | Bit-decomposition variables | **NEXT PUSH** | Sanity check passed (8-bit commutativity + 8 idempotency + 2 sum-decomposition still solves in 0.00s). Estimated 4–8 weeks for production. Subsumes Re 2 and unlocks the universal-relational and existential-relational classes. See `saber-experiment-2026-05-26.md` and "Re 4 scope and sub-goals" below. |
+| Re 4 | Bit-decomposition variables | **MVP IMPLEMENTED + tractability open** | Commits `ea3bb94f11` (design), `00d943b133` (MVP: bvlshr), `8328f31d0a` (bvand/bvor/bvxor/bvnot). Sanity check passed at $d = 4$. MVP empirically tested 2026-05-27: sound but performance-limited on bit-decomposition-heavy queries. Next sub-goal is a Frobenius-aware Buchberger reduction strategy (~1–2 weeks). See `re4-bit-decomposition-design-2026-05-27.md` (esp. "Empirical findings" section) and "Re 4 status" below. |
 | Re 5 | (reserved) | — | |
 | Re 6 | SABER Level A empirical study | **DONE** | Commits `b7057820c5`, `7fabd71ffc`, `5419a39767`, `5a5960d93a`, `624237a09b`, `37c5c7d781`, `a07f659cf5`. §4.3 of paper.tex. |
 | Re 7 | ZFP injection into Gröbner basis | Negative result | See `zfp-injection-result.md`. |
 | Re 8 | Theory combination (refactor bit-vector pipeline into theory-solver-style module) | Long-term | 2–4 months architectural work. Not in scope for the TACAS 2027 deadline. |
+
+## Re 4 status (post-MVP, 2026-05-27)
+
+**Completed in this session:**
+
+- Design doc `re4-bit-decomposition-design-2026-05-27.md`
+  (architecture + sub-goal scoping + soundness argument).
+- MVP implementation:
+  - `decompose_bits(e)` helper in `poly_extract.{h,cpp}`.
+  - `ID_lshr` extraction via bit-decomposition.
+  - `ID_bitand`, `ID_bitor`, `ID_bitxor`, `ID_bitnot`
+    extraction via bit-decomposition.
+- All extractions are sound by construction (idempotency
+  $b^2 = b$ + sum-decomposition $h = \sum_i 2^i b_i$ uniquely
+  determine bits given host value).
+- Synthetic tests pass: shift identities, bvand/bvor/bvxor/bvnot
+  identities, the over-refute case from the previous flag-gated
+  attempt now correctly answered SAT.
+- Existing benchmarks unchanged (SABER scaling, Martin subpoly).
+
+**Empirical tractability finding:**
+
+- Simple cases work: 4-bit shift identity 0.06 s, 8-bit shift
+  identity 0.51 s, $a \, \& \, 0 = 0$ in 0.07 s, $a$ XOR $a = 0$
+  in 0.00 s.
+- Multi-bit-decomposition compound queries hit a wall: 16-bit
+  $((a + b) \gg 1) = ((b + a) \gg 1)$ times out at 30 s, 4-bit
+  $(a \oplus b) \oplus b = a$ times out at 30 s.
+- $\sim\sim a = a$ at 4-bit takes 8.55 s; De Morgan
+  $\sim(a \, \& \, b) = \sim a \mid \sim b$ at 4-bit takes 4.16 s.
+
+**Diagnosis:** bit-decomposition adds many degree-2 generators
+(idempotency); compound expressions get distinct host variables
+that Buchberger has to reconcile through bit-by-bit reduction.
+The S-polynomial cost is quadratic in the bit count.
+
+**Next step (Re 4 sub-goal 3 prototype):** Frobenius-aware
+Buchberger reduction. Idempotency $b^2 = b$ implies $b^k = b$
+for all $k \geq 1$; an optimised `strong_reduce` that immediately
+substitutes $b^k$ with $b$ for any bit variable $b$ would short-
+circuit a large class of S-polynomial computations and
+potentially recover production-scale tractability. Estimated
+1–2 weeks of focused work.
+
+**Then (Re 4 sub-goals 4, 5, 6):** with tractability addressed,
+faithful Toom-Cook 4-way SABER, GRS-128, and universal-relational
+queries become reachable. These are 1–3 weeks of generator and
+benchmark work each.
+
+**Updated sequencing:**
+
+- 2026-05-27 → 2026-06-02: holding pattern (peer review feedback).
+- 2026-06-02 → 2026-06-15: Frobenius-aware reduction prototype
+  (Re 4 sub-goal 3 follow-on).
+- 2026-06-15 → 2026-08-01: Re 4 sub-goals 4–6 (Toom-Cook SABER,
+  GRS-128, universal-relational).
+- 2026-08-01 → 2026-09-30: paper final pass.
+- 2026-10-15: TACAS 2027 deadline.
 
 ## Why C-narrow is folded into Re 4
 

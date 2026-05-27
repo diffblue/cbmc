@@ -170,6 +170,82 @@ where only variables that appear directly under a partial operator
 get decomposed (vs. eager decomposition of all input variables).
 This is the natural fallback.
 
+### Empirical findings (2026-05-27, post-MVP)
+
+The MVP has been tested on a range of synthetic queries
+exercising bit-decomposition. Summary:
+
+| Query | Bitwidth | Bit-decomp count | Time (algebraic) | Time (bit-blast only) |
+|---|---|---|---|---|
+| `(2x)>>1 = x ∧ x < 8` | 4 | 1 | 0.06 s | 0.00 s |
+| `(2a)>>1 = a ∧ a < 128` | 8 | 1 | 0.51 s | 0.00 s |
+| `((a+b)>>1) = ((b+a)>>1)` | 16 | 2 (compound) | T/O 30 s | 0.00 s |
+| `a & 0 = 0` | 4 | 1 | 0.07 s | 0.00 s |
+| `a | 0 = a` | 4 | 1 | (bit-blast first) | 0.00 s |
+| `a XOR a = 0` | 4 | (cached share) | 0.00 s | 0.00 s |
+| `(a XOR b) XOR b = a` | 4 | 2 + compound | T/O 30 s | (n/a) |
+| `~~a = a` | 4 | 2 (a, then ~a host) | 8.55 s | (n/a) |
+| `a & a = a` | 4 | 1 (cached share) | 0.00 s | 0.00 s |
+| `~(a & b) = ~a | ~b` | 4 | 4 (compound) | 4.16 s | (n/a) |
+
+All UNSAT cases are answered correctly. The MVP is sound. Where
+the algebraic path is faster than bit-blasting: never (bit-blast
+is always 0.00 s on these tiny queries). Where the algebraic
+path takes seconds or times out: any compound bit-decomposition
+where the algebra has to derive the equality through Buchberger.
+
+**Diagnosis.** Bit-decomposition adds substantial Buchberger cost
+through three mechanisms:
+
+1. **Many degree-2 generators.** Each decomposed integer adds $d$
+   idempotency relations $b_i^2 - b_i = 0$. With $d = 16$ and 4
+   decomposed integers, that's 64 degree-2 generators. S-polynomial
+   computation between every pair grows quadratically in their
+   count.
+
+2. **Polynomial expansion in compound expressions.** When a
+   partial operator (e.g., bvlshr) is applied to a compound
+   expression like $(a + b)$, the encoding introduces a fresh host
+   variable $h$ with the equation $h - a - b = 0$ and decomposes
+   $h$ separately. Two syntactically-different-but-semantically-
+   equal compounds (like $a + b$ and $b + a$) get distinct hosts
+   with distinct bit decompositions; Buchberger then has to derive
+   $h_1 = h_2$ by reducing through the $a, b$ structure, multiplied
+   across all bit positions. The S-polynomial work is quadratic in
+   the bit count.
+
+3. **Incomplete cancellation.** Idempotency $b^2 = b$ is a strong
+   reduction rule, but our `strong_reduce` doesn't exploit it
+   specially — it treats $b^2 - b$ as a generic polynomial. A
+   Frobenius-aware reduction step would shortcut these reductions
+   significantly.
+
+**Implication.** The MVP unblocks the *soundness* concern that
+killed the flag-gated approach (the procedure is now sound by
+construction, no opt-in, no over-refutation). But the *performance*
+ceiling on bit-decomposition-heavy queries is low; production-scale
+applications (faithful Toom-4 SABER, GRS-128, complex relational
+queries) need either:
+
+- **a custom Buchberger reduction strategy** that recognises and
+  fast-paths idempotency, OR
+- **a different procedure architecture** for bit-decomposed bases
+  (e.g., DPLL(B) where bit-blasting handles the bit relations and
+  the algebraic procedure handles the integer relations, exchanging
+  via shared variables).
+
+Estimated effort for a custom reduction strategy: 1–2 weeks of
+focused work. The Frobenius observation
+($b^2 = b \Rightarrow b^k = b$ for $k \geq 1$) suggests a simple
+optimization: when reducing a polynomial $f$, immediately replace
+$b^k$ with $b$ for any decomposed $b$ before any S-polynomial
+computation. This converts the basis from "many high-degree
+relations" to "many degree-1 polynomials over Boolean variables",
+which Buchberger should handle vastly faster.
+
+This is the next sub-goal-3 step: prototype Frobenius-aware
+reduction and re-measure the queries above.
+
 ## Sub-goals 4–6 (deferred to follow-on sessions)
 
 - **Sub-goal 4** (faithful Toom-Cook 4-way SABER): write
