@@ -2286,3 +2286,115 @@ that don't depend on solving the `rebind`-ambiguity follow-up.  They
 unblock the partial-specialization layer of the cascade and provide
 a clean foundation for the next iteration to tackle the
 qualified-lookup ambiguity.
+
+
+## 2026-05-27 (continued) Qualified-name lookup for TT-param-bound qualifiers
+
+The previous landing pushed the cascade past the partial-
+specialization layer; the new stopping point in
+`/tmp/reserve_repro11.cpp` was an "ambiguous template scope
+'rebind'" error in libstdc++'s
+`__allocator_traits_base::__rebind` partial-spec evaluation.
+
+### What was happening
+
+For `__rebind<allocator<pair<...>>, _Hash_node<...>, void>`, the
+spec's third template arg is
+
+```cpp
+__void_t<typename _Tp::template rebind<_Up>::other>
+```
+
+Substituting `_Tp = allocator<pair<...>>`, this should look up
+`rebind` in the *specific* allocator instance's scope.  CBMC was
+instead reporting fifteen-plus candidates from across every
+`allocator<X>` and `__alloc_traits<X>` instantiation in the
+program.
+
+Two interacting bugs combined to produce that:
+
+1. **`template_mapt::apply`'s TT-param-with-args path was
+   over-applied.**  The 2026-05-27 fix `ba9b288a45` (TT-param
+   front-name rewrite) was correct for the original test case
+   `_SomeTemplate<_Up, _Types...>` (no `::` in the cpp_name) but
+   ran for any cpp_name with `has_targs=true`.  For a qualified
+   form like `_Tp::rebind<_Up>::other`, the rewrite replaced only
+   the front name with the bound template's bare base name —
+   e.g. `_Tp` → `allocator` — and dropped the bound instance's
+   own template arguments.  Net effect: the qualified lookup
+   moved through to `std::tag-allocator` (the base template
+   scope) instead of `std::tag-allocator<std::tag-pair<...>>`.
+
+2. **`disambiguate_template_classes` fell back to a root-scope-
+   recursive search for empty input id_sets.**  When the
+   qualified-lookup arrived at the base template scope (per bug
+   1) and found nothing, the fallback collected every same-base-
+   name template across the program.  For `rebind` this is every
+   member template of every `allocator<X>` instance.
+
+### The fix (commit `e54bcdd520`)
+
+* `template_mapt::apply` now distinguishes
+  `_Tp<args>` (no `::` in the cpp_name → existing front-name
+  rewrite) from `_Tp::name<args>::...` (`::` present → replace
+  the front name with the bound struct_tag's full identifier so
+  the qualified lookup happens in the right scope).
+* `disambiguate_template_classes` accepts a `qualified` parameter
+  (default false).  When true, both the root-scope-recursive
+  fallback and the symbol-table-walk fallback are skipped — per
+  [basic.lookup.qual] the lookup must be restricted to the
+  qualified target's scope and base classes.
+* The two call sites pass `qualified` accordingly:
+  - `resolve_scope` (mid-cpp_name component) passes
+    `qualified=!recursive` so unqualified-first-component
+    fallbacks (e.g. `__int_traits<_Tp>::__digits` after `using`)
+    keep their root-recursive behaviour.
+  - `resolve` (final cpp_name component) passes through the
+    existing `cpp_name.is_qualified()` flag.
+
+A new regression test
+`regression/cbmc-cpp/cpp17_alloc_traits_rebind` exercises the
+pattern with multiple `allocator<X>` instantiations to protect
+against re-introducing the ambiguity.
+
+### New stopping point
+
+`/tmp/reserve_repro11.cpp` now fails at:
+
+```
+file /usr/include/c++/13/type_traits line 2685:
+  expected template name for template template parameter
+```
+
+This is in libstdc++'s `__detected_or_t`:
+
+```cpp
+template<typename _Default, template<typename...> class _Op,
+         typename... _Args>
+  using __detected_or_t
+    = typename __detected_or<_Default, _Op, _Args...>::type;
+```
+
+The error suggests that the `template<typename...> class _Op`
+template-template-parameter binding fails when `_Op` is
+substituted with whatever the call site passes — likely a
+template alias rather than a class template.  This is a separate
+qualified-name / TT-param issue and is the next iteration's
+target.
+
+### Status
+
+Five-commit landing (this session):
+
+| commit | summary |
+|---|---|
+| `ba9b288a45` | TT-param-to-instance substitution preserving args (apply) |
+| `752415ddfe` | Empty-pack sentinel handling in build/apply |
+| `3bed1dffee` | Shadow same-named template params in build (nested elaboration) |
+| `fe24f929d5` | cpp17_replace_first_arg{,_sizeof} regression tests |
+| `e54bcdd520` | Qualified-name lookup for TT-param-bound qualifiers |
+
+cbmc-cpp regressions: 679/0/83 (one previously-failing test
+now properly verifies; two new regression tests added).  Dog-food
+unchanged at 20/17/80/0 (dominated by the unrelated Category-A
+irept-body issue).
