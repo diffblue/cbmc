@@ -24,7 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 smt2_tokenizert::tokent smt2_parsert::next_token()
 {
-  const auto token = smt2_tokenizer.next_token();
+  auto token = smt2_tokenizer.next_token();
 
   if(token == smt2_tokenizert::OPEN)
     parenthesis_level++;
@@ -56,13 +56,14 @@ void smt2_parsert::command_sequence()
     if(next_token() != smt2_tokenizert::OPEN)
       throw error("command must start with '('");
 
-    if(next_token() != smt2_tokenizert::SYMBOL)
+    auto cmd_token = next_token();
+    if(cmd_token != smt2_tokenizert::SYMBOL)
     {
       ignore_command();
       throw error("expected symbol as command");
     }
 
-    command(smt2_tokenizer.get_buffer());
+    command(cmd_token.text);
 
     switch(next_token())
     {
@@ -156,10 +157,11 @@ exprt smt2_parsert::let_expression()
   {
     next_token();
 
-    if(next_token() != smt2_tokenizert::SYMBOL)
+    auto binding_token = next_token();
+    if(binding_token != smt2_tokenizert::SYMBOL)
       throw error("expected symbol in binding");
 
-    irep_idt identifier = smt2_tokenizer.get_buffer();
+    irep_idt identifier = binding_token.text;
 
     // note that the previous bindings are _not_ visible yet
     exprt value=expression();
@@ -226,10 +228,11 @@ std::pair<binding_exprt::variablest, exprt> smt2_parsert::binding(irep_idt id)
   {
     next_token();
 
-    if(next_token() != smt2_tokenizert::SYMBOL)
+    auto binding_token = next_token();
+    if(binding_token != smt2_tokenizert::SYMBOL)
       throw error("expected symbol in binding");
 
-    irep_idt identifier = smt2_tokenizer.get_buffer();
+    irep_idt identifier = binding_token.text;
 
     typet type=sort();
 
@@ -487,27 +490,29 @@ exprt smt2_parsert::function_application_fp(const exprt::operandst &op)
 
 exprt smt2_parsert::function_application()
 {
-  switch(next_token())
+  auto token = next_token();
+
+  switch(token)
   {
   case smt2_tokenizert::SYMBOL:
-    if(smt2_tokenizer.get_buffer() == "_") // indexed identifier
+    if(token.text == "_") // indexed identifier
     {
       // indexed identifier
-      if(next_token() != smt2_tokenizert::SYMBOL)
+      auto id_token = next_token();
+      if(id_token != smt2_tokenizert::SYMBOL)
         throw error("expected symbol after '_'");
 
-      // copy, the reference won't be stable
-      const auto id = smt2_tokenizer.get_buffer();
+      const auto id = id_token.text;
 
       if(has_prefix(id, "bv"))
       {
-        mp_integer i = string2integer(
-          std::string(smt2_tokenizer.get_buffer(), 2, std::string::npos));
+        mp_integer i = string2integer(std::string(id, 2, std::string::npos));
 
-        if(next_token() != smt2_tokenizert::NUMERAL)
+        auto width_token = next_token();
+        if(width_token != smt2_tokenizert::NUMERAL)
           throw error("expected numeral as bitvector literal width");
 
-        auto width = std::stoll(smt2_tokenizer.get_buffer());
+        auto width = std::stoll(width_token.text);
 
         if(next_token() != smt2_tokenizert::CLOSE)
           throw error("expected ')' after bitvector literal");
@@ -518,15 +523,17 @@ exprt smt2_parsert::function_application()
       {
         // These are the "plus infinity", "minus infinity" and NaN
         // floating-point literals.
-        if(next_token() != smt2_tokenizert::NUMERAL)
+        auto e_token = next_token();
+        if(e_token != smt2_tokenizert::NUMERAL)
           throw error() << "expected number after " << id;
 
-        auto width_e = std::stoll(smt2_tokenizer.get_buffer());
+        auto width_e = std::stoll(e_token.text);
 
-        if(next_token() != smt2_tokenizert::NUMERAL)
+        auto f_token = next_token();
+        if(f_token != smt2_tokenizert::NUMERAL)
           throw error() << "expected second number after " << id;
 
-        auto width_f = std::stoll(smt2_tokenizer.get_buffer());
+        auto width_f = std::stoll(f_token.text);
 
         if(next_token() != smt2_tokenizert::CLOSE)
           throw error() << "expected ')' after " << id;
@@ -546,24 +553,24 @@ exprt smt2_parsert::function_application()
         throw error() << "unknown indexed identifier " << id;
       }
     }
-    else if(smt2_tokenizer.get_buffer() == "!")
+    else if(token.text == "!")
     {
       // these are "term attributes"
       const auto term = expression();
 
       while(smt2_tokenizer.peek() == smt2_tokenizert::KEYWORD)
       {
-        next_token(); // eat the keyword
-        if(smt2_tokenizer.get_buffer() == "named")
+        auto kw_token = next_token(); // eat the keyword
+        if(kw_token.text == "named")
         {
           // 'named terms' must be Boolean
           if(!term.is_boolean())
             throw error("named terms must be Boolean");
 
-          if(next_token() == smt2_tokenizert::SYMBOL)
+          auto name_token = next_token();
+          if(name_token == smt2_tokenizert::SYMBOL)
           {
-            const symbol_exprt symbol_expr(
-              smt2_tokenizer.get_buffer(), bool_typet());
+            const symbol_exprt symbol_expr(name_token.text, bool_typet());
             named_terms.emplace(
               symbol_expr.identifier(), named_termt(term, symbol_expr));
           }
@@ -582,7 +589,7 @@ exprt smt2_parsert::function_application()
     else
     {
       // non-indexed symbol, look up in expression table
-      const auto id = smt2_tokenizer.get_buffer();
+      const auto &id = token.text;
       const auto e_it = expressions.find(id);
       if(e_it != expressions.end())
         return e_it->second();
@@ -609,26 +616,29 @@ exprt smt2_parsert::function_application()
   case smt2_tokenizert::OPEN: // likely indexed identifier
     if(smt2_tokenizer.peek() == smt2_tokenizert::SYMBOL)
     {
-      next_token(); // eat symbol
-      if(smt2_tokenizer.get_buffer() == "_")
+      auto sym_token = next_token(); // eat symbol
+      if(sym_token.text == "_")
       {
         // indexed identifier
-        if(next_token() != smt2_tokenizert::SYMBOL)
+        auto id_token = next_token();
+        if(id_token != smt2_tokenizert::SYMBOL)
           throw error("expected symbol after '_'");
 
-        irep_idt id = smt2_tokenizer.get_buffer(); // hash it
+        irep_idt id = id_token.text; // hash it
 
         if(id=="extract")
         {
-          if(next_token() != smt2_tokenizert::NUMERAL)
+          auto upper_token = next_token();
+          if(upper_token != smt2_tokenizert::NUMERAL)
             throw error("expected numeral after extract");
 
-          auto upper = std::stoll(smt2_tokenizer.get_buffer());
+          auto upper = std::stoll(upper_token.text);
 
-          if(next_token() != smt2_tokenizert::NUMERAL)
+          auto lower_token = next_token();
+          if(lower_token != smt2_tokenizert::NUMERAL)
             throw error("expected two numerals after extract");
 
-          auto lower = std::stoll(smt2_tokenizer.get_buffer());
+          auto lower = std::stoll(lower_token.text);
 
           if(next_token() != smt2_tokenizert::CLOSE)
             throw error("expected ')' after extract");
@@ -653,10 +663,11 @@ exprt smt2_parsert::function_application()
                 id=="sign_extend" ||
                 id=="zero_extend")
         {
-          if(next_token() != smt2_tokenizert::NUMERAL)
+          auto index_token = next_token();
+          if(index_token != smt2_tokenizert::NUMERAL)
             throw error() << "expected numeral after " << id;
 
-          auto index = string2integer(smt2_tokenizer.get_buffer());
+          auto index = string2integer(index_token.text);
 
           if(next_token() != smt2_tokenizert::CLOSE)
             throw error() << "expected ')' after " << id << " index";
@@ -708,15 +719,17 @@ exprt smt2_parsert::function_application()
         }
         else if(id == "to_fp")
         {
-          if(next_token() != smt2_tokenizert::NUMERAL)
+          auto e_token = next_token();
+          if(e_token != smt2_tokenizert::NUMERAL)
             throw error("expected number after to_fp");
 
-          auto width_e = std::stoll(smt2_tokenizer.get_buffer());
+          auto width_e = std::stoll(e_token.text);
 
-          if(next_token() != smt2_tokenizert::NUMERAL)
+          auto f_token = next_token();
+          if(f_token != smt2_tokenizert::NUMERAL)
             throw error("expected second number after to_fp");
 
-          auto width_f = std::stoll(smt2_tokenizer.get_buffer());
+          auto width_f = std::stoll(f_token.text);
 
           if(next_token() != smt2_tokenizert::CLOSE)
             throw error("expected ')' after to_fp");
@@ -801,15 +814,17 @@ exprt smt2_parsert::function_application()
         }
         else if(id == "to_fp_unsigned")
         {
-          if(next_token() != smt2_tokenizert::NUMERAL)
+          auto e_token = next_token();
+          if(e_token != smt2_tokenizert::NUMERAL)
             throw error("expected number after to_fp_unsigned");
 
-          auto width_e = std::stoll(smt2_tokenizer.get_buffer());
+          auto width_e = std::stoll(e_token.text);
 
-          if(next_token() != smt2_tokenizert::NUMERAL)
+          auto f_token = next_token();
+          if(f_token != smt2_tokenizert::NUMERAL)
             throw error("expected second number after to_fp_unsigned");
 
-          auto width_f = std::stoll(smt2_tokenizer.get_buffer());
+          auto width_f = std::stoll(f_token.text);
 
           if(next_token() != smt2_tokenizert::CLOSE)
             throw error("expected ')' after to_fp_unsigned");
@@ -838,10 +853,11 @@ exprt smt2_parsert::function_application()
         else if(id == "fp.to_sbv" || id == "fp.to_ubv")
         {
           // These are indexed by the number of bits of the result.
-          if(next_token() != smt2_tokenizert::NUMERAL)
+          auto width_token = next_token();
+          if(width_token != smt2_tokenizert::NUMERAL)
             throw error() << "expected number after " << id;
 
-          auto width = std::stoll(smt2_tokenizer.get_buffer());
+          auto width = std::stoll(width_token.text);
 
           if(next_token() != smt2_tokenizert::CLOSE)
             throw error() << "expected ')' after " << id;
@@ -864,16 +880,15 @@ exprt smt2_parsert::function_application()
         }
         else
         {
-          throw error() << "unknown indexed identifier '"
-                        << smt2_tokenizer.get_buffer() << '\'';
+          throw error() << "unknown indexed identifier '" << id << '\'';
         }
       }
-      else if(smt2_tokenizer.get_buffer() == "as")
+      else if(sym_token.text == "as")
       {
         // This is an extension understood by Z3 and CVC4.
         if(
           smt2_tokenizer.peek() == smt2_tokenizert::SYMBOL &&
-          smt2_tokenizer.get_buffer() == "const")
+          smt2_tokenizer.peek().text == "const")
         {
           next_token(); // eat the "const"
           auto sort = this->sort();
@@ -886,7 +901,7 @@ exprt smt2_parsert::function_application()
 
           const auto &array_sort = to_array_type(sort);
 
-          if(smt2_tokenizer.next_token() != smt2_tokenizert::CLOSE)
+          if(next_token() != smt2_tokenizert::CLOSE)
             throw error() << "expecting ')' after sort in 'as const'";
 
           auto value = expression();
@@ -894,7 +909,7 @@ exprt smt2_parsert::function_application()
           if(value.type() != array_sort.element_type())
             throw error() << "unexpected 'as const' with wrong element type";
 
-          if(smt2_tokenizer.next_token() != smt2_tokenizert::CLOSE)
+          if(next_token() != smt2_tokenizert::CLOSE)
             throw error() << "expecting ')' at the end of 'as const'";
 
           return array_of_exprt(value, array_sort);
@@ -1010,34 +1025,36 @@ exprt smt2_parsert::bv_mod(const exprt::operandst &operands, bool is_signed)
 
 exprt smt2_parsert::expression()
 {
-  switch(next_token())
+  auto token = next_token();
+
+  switch(token)
   {
   case smt2_tokenizert::SYMBOL:
+  {
+    const auto &identifier = token.text;
+
+    // in the expression table?
+    const auto e_it = expressions.find(identifier);
+    if(e_it != expressions.end())
+      return e_it->second();
+
+    // rummage through id_map
+    auto id_it = id_map.find(identifier);
+    if(id_it != id_map.end())
     {
-      const auto &identifier = smt2_tokenizer.get_buffer();
-
-      // in the expression table?
-      const auto e_it = expressions.find(identifier);
-      if(e_it != expressions.end())
-        return e_it->second();
-
-      // rummage through id_map
-      auto id_it = id_map.find(identifier);
-      if(id_it != id_map.end())
-      {
-        symbol_exprt symbol_expr(identifier, id_it->second.type);
-        if(smt2_tokenizer.token_is_quoted_symbol())
-          symbol_expr.set(ID_C_quoted, true);
-        return std::move(symbol_expr);
-      }
-
-      // don't know, give up
-      throw error() << "unknown expression '" << identifier << '\'';
+      symbol_exprt symbol_expr(identifier, id_it->second.type);
+      if(token.quoted_symbol)
+        symbol_expr.set(ID_C_quoted, true);
+      return std::move(symbol_expr);
     }
+
+    // don't know, give up
+    throw error() << "unknown expression '" << identifier << '\'';
+  }
 
   case smt2_tokenizert::NUMERAL:
   {
-    const std::string &buffer = smt2_tokenizer.get_buffer();
+    const std::string &buffer = token.text;
     if(buffer.size() >= 2 && buffer[0] == '#' && buffer[1] == 'x')
     {
       mp_integer value =
@@ -1491,36 +1508,45 @@ typet smt2_parsert::sort()
   // SYMBOL
   // ( _ SYMBOL ...
   // ( SYMBOL ...
-  switch(next_token())
+  auto sort_token = next_token();
+
+  switch(sort_token)
   {
   case smt2_tokenizert::SYMBOL:
     break;
 
   case smt2_tokenizert::OPEN:
-    if(smt2_tokenizer.next_token() != smt2_tokenizert::SYMBOL)
+  {
+    auto inner_token = next_token();
+    if(inner_token != smt2_tokenizert::SYMBOL)
       throw error("expected symbol after '(' in a sort ");
 
-    if(smt2_tokenizer.get_buffer() == "_")
+    if(inner_token.text == "_")
     {
-      if(next_token() != smt2_tokenizert::SYMBOL)
+      sort_token = next_token();
+      if(sort_token != smt2_tokenizert::SYMBOL)
         throw error("expected symbol after '_' in a sort");
     }
+    else
+    {
+      sort_token = std::move(inner_token);
+    }
     break;
+  }
 
   case smt2_tokenizert::CLOSE:
   case smt2_tokenizert::NUMERAL:
   case smt2_tokenizert::STRING_LITERAL:
   case smt2_tokenizert::NONE:
   case smt2_tokenizert::KEYWORD:
-    throw error() << "unexpected token in a sort: '"
-                  << smt2_tokenizer.get_buffer() << '\'';
+    throw error() << "unexpected token in a sort: '" << sort_token.text << '\'';
 
   case smt2_tokenizert::END_OF_FILE:
     throw error() << "unexpected end-of-file in a sort";
   }
 
   // now we have a SYMBOL
-  const auto &token = smt2_tokenizer.get_buffer();
+  const auto &token = sort_token.text;
 
   const auto s_it = sorts.find(token);
 
@@ -1549,11 +1575,13 @@ void smt2_parsert::setup_sorts()
     return ieee_float_spect::quadruple_precision().to_type();
   };
 
-  sorts["BitVec"] = [this] {
-    if(next_token() != smt2_tokenizert::NUMERAL)
+  sorts["BitVec"] = [this]
+  {
+    auto width_token = next_token();
+    if(width_token != smt2_tokenizert::NUMERAL)
       throw error("expected numeral as bit-width");
 
-    auto width = std::stoll(smt2_tokenizer.get_buffer());
+    auto width = std::stoll(width_token.text);
 
     // eat the ')'
     if(next_token() != smt2_tokenizert::CLOSE)
@@ -1562,16 +1590,19 @@ void smt2_parsert::setup_sorts()
     return unsignedbv_typet(width);
   };
 
-  sorts["FloatingPoint"] = [this] {
-    if(next_token() != smt2_tokenizert::NUMERAL)
+  sorts["FloatingPoint"] = [this]
+  {
+    auto e_token = next_token();
+    if(e_token != smt2_tokenizert::NUMERAL)
       throw error("expected numeral as bit-width");
 
-    const auto width_e = std::stoll(smt2_tokenizer.get_buffer());
+    const auto width_e = std::stoll(e_token.text);
 
-    if(next_token() != smt2_tokenizert::NUMERAL)
+    auto f_token = next_token();
+    if(f_token != smt2_tokenizert::NUMERAL)
       throw error("expected numeral as bit-width");
 
-    const auto width_f = std::stoll(smt2_tokenizer.get_buffer());
+    const auto width_f = std::stoll(f_token.text);
 
     // consume the ')'
     if(next_token() != smt2_tokenizert::CLOSE)
@@ -1621,10 +1652,11 @@ smt2_parsert::function_signature_definition()
     if(next_token() != smt2_tokenizert::OPEN)
       throw error("expected '(' at beginning of parameter");
 
-    if(next_token() != smt2_tokenizert::SYMBOL)
+    auto param_token = next_token();
+    if(param_token != smt2_tokenizert::SYMBOL)
       throw error("expected symbol in parameter");
 
-    irep_idt id = smt2_tokenizer.get_buffer();
+    irep_idt id = param_token.text;
     domain.push_back(sort());
     parameters.push_back(id);
 
@@ -1677,13 +1709,13 @@ void smt2_parsert::command(const std::string &c)
 
 void smt2_parsert::setup_commands()
 {
-  commands["declare-const"] = [this]() {
-    const auto s = smt2_tokenizer.get_buffer();
+  commands["declare-const"] = [this]()
+  {
+    auto id_token = next_token();
+    if(id_token != smt2_tokenizert::SYMBOL)
+      throw error("expected a symbol after declare-const");
 
-    if(next_token() != smt2_tokenizert::SYMBOL)
-      throw error() << "expected a symbol after " << s;
-
-    irep_idt id = smt2_tokenizer.get_buffer();
+    irep_idt id = id_token.text;
     auto type = sort();
 
     add_unique_id(id, exprt(ID_nil, type));
@@ -1693,21 +1725,25 @@ void smt2_parsert::setup_commands()
   // accepted by Z3 and CVC4
   commands["declare-var"] = commands["declare-const"];
 
-  commands["declare-fun"] = [this]() {
-    if(next_token() != smt2_tokenizert::SYMBOL)
+  commands["declare-fun"] = [this]()
+  {
+    auto id_token = next_token();
+    if(id_token != smt2_tokenizert::SYMBOL)
       throw error("expected a symbol after declare-fun");
 
-    irep_idt id = smt2_tokenizer.get_buffer();
+    irep_idt id = id_token.text;
     auto type = function_signature_declaration();
 
     add_unique_id(id, exprt(ID_nil, type));
   };
 
-  commands["define-const"] = [this]() {
-    if(next_token() != smt2_tokenizert::SYMBOL)
+  commands["define-const"] = [this]()
+  {
+    auto id_token = next_token();
+    if(id_token != smt2_tokenizert::SYMBOL)
       throw error("expected a symbol after define-const");
 
-    const irep_idt id = smt2_tokenizer.get_buffer();
+    const irep_idt id = id_token.text;
 
     const auto type = sort();
     const auto value = expression();
@@ -1724,11 +1760,13 @@ void smt2_parsert::setup_commands()
     add_unique_id(id, value);
   };
 
-  commands["define-fun"] = [this]() {
-    if(next_token() != smt2_tokenizert::SYMBOL)
+  commands["define-fun"] = [this]()
+  {
+    auto id_token = next_token();
+    if(id_token != smt2_tokenizert::SYMBOL)
       throw error("expected a symbol after define-fun");
 
-    const irep_idt id = smt2_tokenizer.get_buffer();
+    const irep_idt id = id_token.text;
 
     const auto signature = function_signature_definition();
 

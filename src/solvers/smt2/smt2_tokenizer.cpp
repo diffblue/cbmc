@@ -6,6 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Implementation of the SMT-LIB v2.6 tokenizer; see
+/// `smt2_tokenizer.h` for the corresponding interface.
+
 #include "smt2_tokenizer.h"
 
 bool is_smt2_simple_symbol_character(char ch)
@@ -27,116 +31,110 @@ smt2_tokenizert::tokent smt2_tokenizert::get_simple_symbol()
   // ~ ! @ $ % ^ & * _ - + = < > . ? /
   // that does not start with a digit and is not a reserved word.
 
-  buffer.clear();
+  tokent t{SYMBOL};
 
   char ch;
   while(in->get(ch))
   {
     if(is_smt2_simple_symbol_character(ch))
     {
-      buffer+=ch;
+      t.text += ch;
     }
     else
     {
       in->unget(); // put back
-      quoted_symbol = false;
-      return SYMBOL;
+      t.line_no = line_no;
+      return t;
     }
   }
 
   // eof -- this is ok here
-  if(buffer.empty())
-    return END_OF_FILE;
-  else
-  {
-    quoted_symbol = false;
-    return SYMBOL;
-  }
+  t.line_no = line_no;
+  if(t.text.empty())
+    t.kind = END_OF_FILE;
+  return t;
 }
 
 smt2_tokenizert::tokent smt2_tokenizert::get_decimal_numeral()
 {
   // we accept any sequence of digits and dots
 
-  buffer.clear();
+  tokent t{NUMERAL};
 
   char ch;
   while(in->get(ch))
   {
     if(isdigit(ch) || ch=='.')
     {
-      buffer+=ch;
+      t.text += ch;
     }
     else
     {
       in->unget(); // put back
-      return NUMERAL;
+      t.line_no = line_no;
+      return t;
     }
   }
 
   // eof -- this is ok here
-  if(buffer.empty())
-    return END_OF_FILE;
-  else
-    return NUMERAL;
+  t.line_no = line_no;
+  if(t.text.empty())
+    t.kind = END_OF_FILE;
+  return t;
 }
 
 smt2_tokenizert::tokent smt2_tokenizert::get_bin_numeral()
 {
   // we accept any sequence of '0' or '1'
 
-  buffer.clear();
-  buffer+='#';
-  buffer+='b';
+  tokent t{NUMERAL};
+  t.text = "#b";
 
   char ch;
   while(in->get(ch))
   {
     if(ch=='0' || ch=='1')
     {
-      buffer+=ch;
+      t.text += ch;
     }
     else
     {
       in->unget(); // put back
-      return NUMERAL;
+      t.line_no = line_no;
+      return t;
     }
   }
 
   // eof -- this is ok here
-  if(buffer.empty())
-    return END_OF_FILE;
-  else
-    return NUMERAL;
+  t.line_no = line_no;
+  return t;
 }
 
 smt2_tokenizert::tokent smt2_tokenizert::get_hex_numeral()
 {
   // we accept any sequence of '0'-'9', 'a'-'f', 'A'-'F'
 
-  buffer.clear();
-  buffer+='#';
-  buffer+='x';
+  tokent t{NUMERAL};
+  t.text = "#x";
 
   char ch;
   while(in->get(ch))
   {
     if(isxdigit(ch))
     {
-      buffer+=ch;
+      t.text += ch;
     }
     else
     {
       in->unget(); // put back
-      return NUMERAL;
+      t.line_no = line_no;
+      return t;
     }
   }
 
   // eof -- this is ok here
-  if(buffer.empty())
-    return END_OF_FILE;
-  else
-    return NUMERAL;
+  t.line_no = line_no;
+  return t;
 }
 
 smt2_tokenizert::tokent smt2_tokenizert::get_quoted_symbol()
@@ -146,18 +144,19 @@ smt2_tokenizert::tokent smt2_tokenizert::get_quoted_symbol()
   // character \, that starts and ends with | and does not otherwise
   // contain |
 
-  buffer.clear();
+  tokent t{SYMBOL};
+  t.quoted_symbol = true;
 
   char ch;
   while(in->get(ch))
   {
     if(ch=='|')
     {
-      quoted_symbol = true;
-      return SYMBOL; // done
+      t.line_no = line_no;
+      return t;
     }
 
-    buffer+=ch;
+    t.text += ch;
 
     if(ch=='\n')
       line_no++;
@@ -169,7 +168,7 @@ smt2_tokenizert::tokent smt2_tokenizert::get_quoted_symbol()
 
 smt2_tokenizert::tokent smt2_tokenizert::get_string_literal()
 {
-  buffer.clear();
+  tokent t{STRING_LITERAL};
 
   char ch;
   while(in->get(ch))
@@ -185,13 +184,17 @@ smt2_tokenizert::tokent smt2_tokenizert::get_string_literal()
         else
         {
           in->unget();
-          return STRING_LITERAL; // done
+          t.line_no = line_no;
+          return t; // done
         }
       }
       else
-        return STRING_LITERAL; // done
+      {
+        t.line_no = line_no;
+        return t; // done
+      }
     }
-    buffer+=ch;
+    t.text += ch;
   }
 
   // Hmpf. Eof before end of string literal. This is an error.
@@ -200,15 +203,16 @@ smt2_tokenizert::tokent smt2_tokenizert::get_string_literal()
 
 smt2_tokenizert::tokent smt2_tokenizert::next_token()
 {
-  if(peeked)
-    peeked = false;
-  else
-    get_token_from_stream();
-
-  return token;
+  if(peeked.has_value())
+  {
+    tokent result = std::move(*peeked);
+    peeked.reset();
+    return result;
+  }
+  return read_token();
 }
 
-void smt2_tokenizert::get_token_from_stream()
+smt2_tokenizert::tokent smt2_tokenizert::read_token()
 {
   char ch;
 
@@ -240,46 +244,41 @@ void smt2_tokenizert::get_token_from_stream()
       break;
 
     case '(':
-      // produce sub-expression
-      token = OPEN;
-      return;
+    {
+      tokent t{OPEN};
+      t.line_no = line_no;
+      return t;
+    }
 
     case ')':
-      // done with sub-expression
-      token = CLOSE;
-      return;
+    {
+      tokent t{CLOSE};
+      t.line_no = line_no;
+      return t;
+    }
 
     case '|': // quoted symbol
-      token = get_quoted_symbol();
-      return;
+      return get_quoted_symbol();
 
     case '"': // string literal
-      token = get_string_literal();
-      return;
+      return get_string_literal();
 
     case ':': // keyword
-      token = get_simple_symbol();
-      if(token == SYMBOL)
-      {
-        token = KEYWORD;
-        return;
-      }
-      else
+    {
+      tokent t = get_simple_symbol();
+      if(t.kind != SYMBOL)
         throw error("expecting symbol after colon");
+      t.kind = KEYWORD;
+      return t;
+    }
 
     case '#':
       if(in->get(ch))
       {
         if(ch=='b')
-        {
-          token = get_bin_numeral();
-          return;
-        }
+          return get_bin_numeral();
         else if(ch=='x')
-        {
-          token = get_hex_numeral();
-          return;
-        }
+          return get_hex_numeral();
         else
           throw error("unknown numeral token");
       }
@@ -291,14 +290,12 @@ void smt2_tokenizert::get_token_from_stream()
       if(isdigit(ch))
       {
         in->unget();
-        token = get_decimal_numeral();
-        return;
+        return get_decimal_numeral();
       }
       else if(is_smt2_simple_symbol_character(ch))
       {
         in->unget();
-        token = get_simple_symbol();
-        return;
+        return get_simple_symbol();
       }
       else
       {
@@ -308,5 +305,7 @@ void smt2_tokenizert::get_token_from_stream()
     }
   }
 
-  token = END_OF_FILE;
+  tokent t{END_OF_FILE};
+  t.line_no = line_no;
+  return t;
 }
