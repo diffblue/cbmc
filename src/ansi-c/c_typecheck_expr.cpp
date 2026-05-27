@@ -5047,6 +5047,18 @@ void c_typecheck_baset::make_constant(exprt &expr)
         {
           if(e.id() == ID_symbol)
           {
+            // Don't replace function references with their bodies:
+            // the function field of a `side_effect_expr_function_call`
+            // is a `symbol_exprt` whose `type.id()` is `ID_code` and
+            // whose value is the function body.  Substituting that
+            // turns the call's function operand into a code block,
+            // and any unresolved cpp_names in the body then get
+            // re-typechecked in the caller's scope (where class-scope
+            // members are not visible), producing spurious
+            // "symbol '...' is unknown" errors that point back into
+            // the function body.
+            if(e.type().id() == ID_code)
+              return;
             const symbolt *s = nullptr;
             if(
               !lookup(to_symbol_expr(e).get_identifier(), s) &&
