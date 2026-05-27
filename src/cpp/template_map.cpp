@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_template_type.h"
 
 #include <ostream>
+#include <set>
 
 void template_mapt::apply(typet &type) const
 {
@@ -756,6 +757,63 @@ void template_mapt::build(
     !(has_pack && instance.size() >= template_parameters.size() - 1))
   {
     return; // mismatched template arguments — skip
+  }
+
+  // Per C++ name-lookup rules, the parameters of the template
+  // currently being instantiated SHADOW any same-named parameters
+  // from a textually-enclosing template that is also currently
+  // being instantiated.  CBMC keeps all enclosing template_map
+  // entries alive across nested `instantiate_template` calls
+  // (the saved-map mechanism captures and restores by COPY, so
+  // entries from outer scopes coexist with the inner scope's
+  // entries in `type_map` / `expr_map` / `pack_*_map`).  Without
+  // shadowing, `template_mapt::apply`'s short-name suffix-match
+  // can return the outer binding when an inner same-named
+  // parameter exists, which produces wrong substitutions for
+  // nested instantiations of unrelated class templates that
+  // happen to share parameter names (e.g. both `__replace_first_arg`
+  // and `allocator` having a parameter called `_Tp`).
+  //
+  // Shadow by removing any pre-existing entry whose short-name
+  // suffix matches one of THIS template's parameters but whose
+  // full identifier differs (so we don't drop our own to-be-set
+  // entry).  The `cpp_saved_template_mapt` of the enclosing
+  // `instantiate_template` will restore the removed entries when
+  // this scope exits.
+  {
+    auto short_name = [](const irep_idt &id) -> std::string
+    {
+      const std::string s = id2string(id);
+      auto p = s.rfind("::");
+      return p != std::string::npos ? s.substr(p + 2) : s;
+    };
+    std::set<std::string> new_short_names;
+    std::set<irep_idt> new_full_ids;
+    for(const auto &p : template_parameters)
+    {
+      irep_idt pid =
+        p.id() == ID_type ? p.type().get(ID_identifier) : p.get(ID_identifier);
+      if(pid.empty())
+        continue;
+      new_full_ids.insert(pid);
+      new_short_names.insert(short_name(pid));
+    }
+    auto shadow = [&](auto &m)
+    {
+      for(auto it = m.begin(); it != m.end();)
+      {
+        if(
+          new_full_ids.count(it->first) == 0 &&
+          new_short_names.count(short_name(it->first)) != 0)
+          it = m.erase(it);
+        else
+          ++it;
+      }
+    };
+    shadow(type_map);
+    shadow(expr_map);
+    shadow(pack_size_map);
+    shadow(pack_args_map);
   }
 
   std::size_t i = 0;
