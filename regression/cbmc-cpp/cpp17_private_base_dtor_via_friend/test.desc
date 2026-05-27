@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+^\[main\.assertion\.1\] line 43 pair-with-private-base-destructor elaborates: SUCCESS$
+--
+^CONVERSION ERROR$
+^.*' is not accessible$
+Implicit destructor synthesis on a derived class must honour the
+namespace-aware struct_tag form when checking inherited-base
+accessibility (`<ns>::tag-<class>`, not `tag-<ns>::<class>`).
