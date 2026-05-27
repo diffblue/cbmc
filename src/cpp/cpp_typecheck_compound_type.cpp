@@ -606,6 +606,20 @@ void cpp_typecheckt::typecheck_compound_declarator(
       typecheck_member_function(
         symbol, component, initializers, method_qualifier, value);
 
+      // C++11 [dcl.constexpr]: a `constexpr` member function is
+      // implicitly inline and may be evaluated at compile time.
+      // Mark the symbol with is_macro=true so the constexpr
+      // function-call-evaluator in typecheck_side_effect_function_call
+      // recognizes it as a candidate for compile-time folding.
+      // (`cpp_declarator_converter` does the same for non-member
+      // declarations.)
+      if(declaration.storage_spec().is_constexpr())
+      {
+        const irep_idt method_id = component.get_name();
+        if(symbolt *m = symbol_table.get_writeable(method_id))
+          m->is_macro = true;
+      }
+
       if(!value.is_nil() && !is_static)
       {
         error().source_location = cpp_name.source_location();
