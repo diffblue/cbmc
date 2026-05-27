@@ -39,6 +39,13 @@ pointer_offset_size(const typet &type, const namespacet &ns);
 std::optional<mp_integer>
 pointer_offset_bits(const typet &type, const namespacet &ns);
 
+/// Returns true iff \p type has effective width of zero bits.
+/// In addition to the obvious \c ID_empty, this recognises
+/// struct/union types whose components are all zero-width and arrays
+/// of zero-width elements, mirroring the semantics that the
+/// bit-blasting back-ends use to skip such types.
+bool is_zero_width(const typet &type, const namespacet &ns);
+
 std::optional<mp_integer>
 compute_pointer_offset(const exprt &expr, const namespacet &ns);
 
