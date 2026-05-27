@@ -216,58 +216,6 @@ std::optional<polynomialt> poly_extractort::to_polynomial(const exprt &e)
     return *base * factor;
   }
 
-  // Right shift by constant: a >> k.
-  //
-  // bvlshr is in general NOT a polynomial operation in Z_{2^d}: it
-  // computes floor(a / 2^k), which is not expressible by ring
-  // operations alone. We handle it by introducing a fresh quotient
-  // variable q with the side equation 2^k * q = a, and returning q
-  // as the polynomial form.
-  //
-  // SOUNDNESS CAVEAT: this encoding is sound iff a is divisible by
-  // 2^k in every model of the formula. When a is not divisible by
-  // 2^k, the original bvlshr would return floor(a / 2^k), but our
-  // encoding has no satisfying assignment for q (since 2^k * q can
-  // only produce values divisible by 2^k). The procedure may
-  // therefore over-refute formulas where a is not always divisible
-  // by 2^k.
-  //
-  // We use this restriction deliberately: it works correctly for
-  // verification queries whose algorithms guarantee divisibility
-  // by construction (e.g., SABER's Toom-Cook 4-way interpolation,
-  // where each >> k is on a value the algorithm guarantees is
-  // divisible by 2^k). For other queries, the over-refutation is
-  // unsound and the user must opt in via ENABLE_BVLSHR_POLY.
-  if(
-    std::getenv("ENABLE_BVLSHR_POLY") != nullptr && e.id() == ID_lshr &&
-    e.operands().size() == 2 && e.operands()[1].is_constant())
-  {
-    if(!set_bitwidth(e.type()))
-      return std::nullopt;
-    auto base = to_polynomial(e.operands()[0]);
-    if(!base)
-      return std::nullopt;
-    auto shift_amt = numeric_cast<mp_integer>(e.operands()[1]);
-    if(!shift_amt || *shift_amt < 0)
-      return std::nullopt;
-    if(*shift_amt == 0)
-      return base;
-
-    // Introduce fresh quotient variable q with side equation
-    // (2^k) * q - a = 0.
-    std::string q_name = "__shr_q" + std::to_string(next_var_index);
-    std::size_t q_idx = get_var_index(q_name);
-    polynomialt q{bitwidth, mp_integer{1}, q_idx};
-
-    mp_integer factor = power(mp_integer{2}, *shift_amt);
-    polynomialt side_eq = (q * factor) - *base;
-    side_eq.normalize();
-    if(!side_eq.is_zero())
-      side_equations.push_back(std::move(side_eq));
-
-    return q;
-  }
-
   // if-then-else: ite(cond, a, 0) = cond * a (when cond is 0/1)
   if(e.id() == ID_if && e.operands().size() == 3)
   {
