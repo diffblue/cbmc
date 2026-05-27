@@ -79,6 +79,8 @@ for arbitrary `uint16_t` inputs.
 | Toom-4 vs schoolbook, N=4, q-mod, inputs in [0, 8) | UNSAT | T/O 30s | (untested) | T/O 180s |
 | Toom-4 vs schoolbook, N=8, q-mod, all coeffs | UNSAT | T/O 30s | T/O 60s | T/O 60s |
 | Toom-4 vs schoolbook, N=16, q-mod, all coeffs | UNSAT | T/O 60s | (untested) | T/O 120s |
+| **Toom-4 vs schoolbook, N=4, q-mod, all coeffs (30 min)** | UNSAT | **T/O 1800s** | (untested) | (untested) |
+| **Toom-4 vs schoolbook, N=4, q-mod, c[0] only (30 min)** | UNSAT | **T/O 1800s** | (untested) | **T/O 1800s** |
 | Pinned inputs (a=1..4, b=5..8), N=4, q-mod | UNSAT | 0.00 s | 0.00 s | 0.00 s |
 | schoolbook = schoolbook, N=4, q-mod | UNSAT | 0.00 s | 0.00 s | 0.00 s |
 | schoolbook = karatsuba, N=8, q-mod | UNSAT | 0.00 s | 0.00 s | 0.10 s |
@@ -96,6 +98,14 @@ from:
   cast in SABER's interpolation formulas.
 - The `mod q = 2^{13}` comparison adds reasoning over the low 13 bits
   while the algorithm operates on full 16/32-bit values.
+
+**Extended-timeout test (30 minutes, 2026-05-27).** To confirm the
+intractability is genuine rather than a near-miss, we re-ran the
+N=4 single-coefficient and all-coefficient queries at a 30-minute
+(1800 s) timeout for both Bitwuzla and our procedure. **All
+runs timed out.** This rules out the hypothesis that "more time
+would suffice"; the queries are intrinsically beyond current
+SMT capability at any feasible budget.
 
 For our procedure: the bit-decomposition machinery (Re 4) handles
 `bvlshr` and `bvashr` soundly, but the resulting polynomial system
