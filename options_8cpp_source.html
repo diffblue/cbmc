@@ -173,7 +173,7 @@ $(document).ready(function(){initNavTree('options_8cpp_source.html',''); initRes
 <div class="line"><a id="l00056" name="l00056"></a><span class="lineno"><a class="line" href="classoptionst.html#a06b66db4c5f8af288bd6bebb68011191">   56</a></span><span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <a class="code hl_function" href="classoptionst.html#a06b66db4c5f8af288bd6bebb68011191">optionst::get_unsigned_int_option</a>(<span class="keyword">const</span> std::string &amp;option)<span class="keyword"> const</span></div>
 <div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span><span class="keyword"></span>{</div>
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>  <span class="keyword">const</span> std::string value=<a class="code hl_function" href="classoptionst.html#a8263832eff668d3872989ca954878ffd">get_option</a>(option);</div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>  <span class="keywordflow">return</span> value.empty()?0:<a class="code hl_function" href="string2int_8cpp.html#a84de42ad824073cff5f4f4850da021d6">safe_string2unsigned</a>(value);</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>  <span class="keywordflow">return</span> value.empty()?0:<a class="code hl_function" href="string2int_8cpp.html#a27237341811ac2e303ee55a90775f43a">safe_string2unsigned</a>(value);</div>
 <div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>}</div>
 </div>
 <div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
@@ -284,7 +284,7 @@ $(document).ready(function(){initNavTree('options_8cpp_source.html',''); initRes
 <div class="ttc" id="aoptions_8h_html"><div class="ttname"><a href="options_8h.html">options.h</a></div><div class="ttdoc">Options.</div></div>
 <div class="ttc" id="arange_8h_html"><div class="ttname"><a href="range_8h.html">range.h</a></div><div class="ttdoc">Ranges: pair of begin and end iterators, which can be initialized from containers,...</div></div>
 <div class="ttc" id="arange_8h_html_a062aef510f1b8bd8ba235bc5b2316e5e"><div class="ttname"><a href="range_8h.html#a062aef510f1b8bd8ba235bc5b2316e5e">make_range</a></div><div class="ttdeci">ranget&lt; iteratort &gt; make_range(iteratort begin, iteratort end)</div><div class="ttdef"><b>Definition</b> <a href="range_8h_source.html#l00522">range.h:522</a></div></div>
-<div class="ttc" id="astring2int_8cpp_html_a84de42ad824073cff5f4f4850da021d6"><div class="ttname"><a href="string2int_8cpp.html#a84de42ad824073cff5f4f4850da021d6">safe_string2unsigned</a></div><div class="ttdeci">unsigned safe_string2unsigned(const std::string &amp;str, int base)</div><div class="ttdef"><b>Definition</b> <a href="string2int_8cpp_source.html#l00016">string2int.cpp:16</a></div></div>
+<div class="ttc" id="astring2int_8cpp_html_a27237341811ac2e303ee55a90775f43a"><div class="ttname"><a href="string2int_8cpp.html#a27237341811ac2e303ee55a90775f43a">safe_string2unsigned</a></div><div class="ttdeci">unsigned safe_string2unsigned(std::string_view str, int base)</div><div class="ttdef"><b>Definition</b> <a href="string2int_8cpp_source.html#l00016">string2int.cpp:16</a></div></div>
 <div class="ttc" id="astring2int_8h_html"><div class="ttname"><a href="string2int_8h.html">string2int.h</a></div></div>
 <div class="ttc" id="axml_8h_html"><div class="ttname"><a href="xml_8h.html">xml.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
