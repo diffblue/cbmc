@@ -316,6 +316,59 @@ shifts on linear combinations, which now solve cleanly. Sub-goal
 6 (universal-relational queries with `bvult` / `bvslt`) is a
 separate encoding question still to be designed.
 
+### Sub-goal 3 final wins (2026-05-27, post-linear-elimination)
+
+Two further optimisations applied:
+
+**(d) Inline idempotency simplification in polynomial multiplication**
+(commit `50252003e4`). New `polynomialt::multiply(other,
+bit_vars)` clamps bit-variable exponents to 1 during the term-
+pair loop, avoiding materialisation of $b^2$ terms that would
+then be reduced. Empirical impact on the test suite: neutral
+(the bottleneck wasn't here). Kept as a clean infrastructure
+improvement.
+
+**(e) Linear elimination of host variables via substitution**
+(commit `a54fa27f04`). Substitutes each host variable $h$ with
+its bit-sum polynomial $\sum_i 2^i b_i$ in every polynomial of
+the basis BEFORE Buchberger and BEFORE the vanishing-polynomial
+test.
+
+The bottleneck was actually the **vanishing-polynomial test** on
+bit-decomp queries, not Buchberger. The vanishing test builds a
+Kronecker product over all variables; with both host $h$ and
+bit variables $b_i$ in the polynomial, the Kronecker product
+size grows exponentially in the bit count.
+
+With linear elimination, the diff polynomial collapses to zero
+immediately for queries like bvxor cancellation, the vanishing
+test recognises the trivial vanishing case, and we report UNSAT
+without any heavy computation.
+
+**Final empirical results:**
+
+| Query | bw | Before (a)(b)(c) | After (a)(b)(c)(d)(e) |
+|---|---|---|---|
+| `(a XOR b) XOR b = a` | 4 | 0.00 s | 0.00 s |
+| `(a XOR b) XOR b = a` | 16 | 0.70 s | **0.00 s** |
+| `(a XOR b) XOR b = a` | 24 | T/O 30 s | **0.00 s** |
+| `(a XOR b) XOR b = a` | 32 | T/O 30 s | **0.01 s** |
+| `(a XOR b) XOR b = a` | 64 | (untested) | **0.02 s** |
+| `(a XOR b) XOR b = a` | 128 | (untested) | **0.07 s** |
+| De Morgan | 128 | (untested) | **0.08 s** |
+
+**Linear scaling** in bitwidth, ~$O(d)$ on these queries.
+Re 4 sub-goal 3 is essentially complete: the algebraic procedure
+with bit-decomposition is tractable on production-scale bitwidths
+for queries with reasonable polynomial structure.
+
+**Remaining work:**
+
+- Re 4 sub-goal 4: faithful Toom-Cook 4-way SABER generator.
+- Re 4 sub-goal 5: GRS-128 community benchmark.
+- Re 4 sub-goal 6: universal-relational queries (`bvult`,
+  `bvslt`) — separate encoding design.
+
 ## Sub-goals 4–6 (deferred to follow-on sessions)
 
 - **Sub-goal 4** (faithful Toom-Cook 4-way SABER): write
