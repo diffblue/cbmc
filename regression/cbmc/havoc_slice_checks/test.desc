@@ -1,4 +1,4 @@
-CORE no-new-smt
+CORE
 main.c
 
 ^\[main\.assertion\.\d+\] line 9 assertion havoc_slice W_OK.*: FAILURE$
