@@ -82,6 +82,7 @@ strong_groebner_basist::s_polynomial(const polynomialt &f, const polynomialt &g)
 
   polynomialt result = (term_f * f) - (term_g * g);
   result.normalize();
+  apply_frobenius_idempotency(result, bit_vars);
   return result;
 }
 
@@ -134,6 +135,7 @@ polynomialt strong_groebner_basist::strong_reduce(
 
         r = r - (mult_term * g);
         r.normalize();
+        apply_frobenius_idempotency(r, bit_vars);
         changed = true;
         break;
       }
@@ -148,6 +150,7 @@ polynomialt strong_groebner_basist::strong_reduce(
       mp_integer factor = power(2, bw - v_r);
       polynomialt r2 = r * factor;
       r2.normalize();
+      apply_frobenius_idempotency(r2, bit_vars);
       if(!r2.is_zero() && r2.leading_monomial() != r.leading_monomial())
       {
         // The leading term changed — try reducing again
@@ -163,6 +166,14 @@ strong_groebner_basist::resultt
 strong_groebner_basist::compute(std::vector<polynomialt> &polys)
 {
   steps_taken = 0;
+
+  // Apply Frobenius to all input polynomials so the initial basis
+  // is already idempotency-reduced.
+  if(!bit_vars.empty())
+  {
+    for(auto &p : polys)
+      apply_frobenius_idempotency(p, bit_vars);
+  }
 
   // Remove zero polynomials
   polys.erase(
@@ -243,6 +254,7 @@ strong_groebner_basist::compute(std::vector<polynomialt> &polys)
         polynomialt h =
           polys[k] * power(mp_integer{2}, mp_integer{polys[k].bitwidth - v});
         h.normalize();
+        apply_frobenius_idempotency(h, bit_vars);
         polynomialt rh = strong_reduce(h, polys);
         if(!rh.is_zero())
         {

@@ -11,6 +11,7 @@
 
 #include <map>
 #include <optional>
+#include <set>
 #include <vector>
 
 /// Extracts polynomial equations over Z_{2^d} from CBMC expression trees.
@@ -75,6 +76,22 @@ public:
   /// Map from variable index to actual input bitwidth (may be smaller
   /// than the polynomial bitwidth due to zero_extend).
   std::map<std::size_t, unsigned> var_input_widths;
+
+  /// Return the set of polynomial variable indices that are bit
+  /// variables introduced by decompose_bits(). Used to enable
+  /// Frobenius-aware reduction in the Gröbner basis solver
+  /// (Re 4 sub-goal 3): bit variables satisfy b^2 = b in Z_{2^d},
+  /// so all higher powers reduce to b.
+  std::set<std::size_t> get_bit_var_indices() const
+  {
+    std::set<std::size_t> result;
+    for(const auto &[host_idx, bit_indices] : bit_decomp_cache)
+    {
+      for(std::size_t b_idx : bit_indices)
+        result.insert(b_idx);
+    }
+    return result;
+  }
 
 private:
   std::map<irep_idt, std::size_t> var_map;

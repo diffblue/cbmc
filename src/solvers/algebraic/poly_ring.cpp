@@ -243,3 +243,30 @@ unsigned val_2(const mp_integer &a, unsigned d)
   }
   return k;
 }
+
+void apply_frobenius_idempotency(
+  polynomialt &p,
+  const std::set<std::size_t> &bit_vars)
+{
+  if(bit_vars.empty())
+    return;
+  bool any_change = false;
+  for(auto &[coeff, mono] : p.terms)
+  {
+    for(auto &[var, exp] : mono.vars)
+    {
+      if(exp > 1 && bit_vars.count(var) > 0)
+      {
+        exp = 1;
+        any_change = true;
+      }
+    }
+  }
+  if(any_change)
+  {
+    // Clamping may have produced duplicate monomials (e.g., the
+    // sequence b^2 + b becomes b + b = 2b after clamping). Merge
+    // duplicates and re-sort by re-normalizing.
+    p.normalize();
+  }
+}

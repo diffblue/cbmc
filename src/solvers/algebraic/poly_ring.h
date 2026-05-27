@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <map>
+#include <set>
 #include <vector>
 
 /// A monomial x_1^{e_1} * ... * x_n^{e_n}, represented as a sorted
@@ -120,5 +121,25 @@ mp_integer inverse_mod_2d(const mp_integer &a, unsigned d);
 /// Valuation: largest k such that 2^k divides a.
 /// Returns d if a ≡ 0 (mod 2^d).
 unsigned val_2(const mp_integer &a, unsigned d);
+
+/// Idempotency-aware reduction (Re 4 sub-goal 3).
+///
+/// Given a polynomial p and a set of "bit variables" b (variables
+/// satisfying b^2 = b, i.e., b in {0, 1}), clamp every exponent of
+/// every bit variable in every monomial of p to at most 1. This
+/// directly implements the Frobenius-style reduction b^k -> b for
+/// k >= 1 without going through Buchberger's incremental
+/// reduction, which would otherwise spend many steps reducing
+/// each high-degree bit-monomial.
+///
+/// Sound because b^2 = b is a known identity in the polynomial
+/// system; the clamped polynomial differs from p only by elements
+/// of the ideal (b^2 - b) for each bit variable b.
+///
+/// After clamping, the polynomial is re-normalized to merge
+/// duplicate monomials produced by the clamping.
+void apply_frobenius_idempotency(
+  polynomialt &p,
+  const std::set<std::size_t> &bit_vars);
 
 #endif // CPROVER_SOLVERS_ALGEBRAIC_POLY_RING_H

@@ -904,6 +904,7 @@ bool boolbvt::try_algebraic_solve()
     if(single_eqs.size() >= 2)
     {
       strong_groebner_basist single_gb{100000};
+      single_gb.set_bit_vars(single_extractor.get_bit_var_indices());
       if(
         single_gb.compute(single_eqs) == strong_groebner_basist::resultt::UNSAT)
       {
@@ -1044,6 +1045,7 @@ bool boolbvt::try_algebraic_solve()
       }
 
       strong_groebner_basist branch_gb{100000};
+      branch_gb.set_bit_vars(branch_extractor.get_bit_var_indices());
       if(
         branch_gb.compute(branch_eqs) != strong_groebner_basist::resultt::UNSAT)
       {
@@ -1153,6 +1155,7 @@ bool boolbvt::try_algebraic_solve()
   }
 
   strong_groebner_basist gb{100000};
+  gb.set_bit_vars(extractor.get_bit_var_indices());
   auto result = gb.compute(equations);
 
   if(result == strong_groebner_basist::resultt::UNSAT)

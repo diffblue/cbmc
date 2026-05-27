@@ -55,9 +55,30 @@ public:
     const std::vector<polynomialt> &basis,
     std::size_t max_steps = 10000);
 
+  /// Set the bit-variable indices for Frobenius-aware idempotency
+  /// reduction (Re 4 sub-goal 3).
+  ///
+  /// Bit variables satisfy b^2 = b in Z_{2^d}, so all higher
+  /// powers reduce to b: b^k = b for k >= 1. When this set is
+  /// non-empty, every polynomial constructed by s_polynomial(),
+  /// strong_reduce(), or compute()'s 2-multiple step has its bit-
+  /// variable exponents clamped to 1 immediately, avoiding the
+  /// O(steps) cost of incrementally reducing high-degree
+  /// bit-monomials via the b^2 - b basis elements.
+  ///
+  /// Sound because the clamping uses an identity already implied
+  /// by the basis (idempotency); the result differs from the
+  /// non-clamped polynomial only by elements of the
+  /// (b^2 - b) ideal, all of which are zero in any model.
+  void set_bit_vars(std::set<std::size_t> indices)
+  {
+    bit_vars = std::move(indices);
+  }
+
 private:
   std::size_t max_steps;
   std::size_t steps_taken = 0;
+  std::set<std::size_t> bit_vars;
 
   /// S-polynomial of f and g
   polynomialt s_polynomial(const polynomialt &f, const polynomialt &g);
