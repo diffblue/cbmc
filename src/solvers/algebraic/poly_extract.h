@@ -107,6 +107,19 @@ private:
   /// calls return polynomials wrapping the cached bit variables.
   std::map<std::size_t, std::vector<std::size_t>> bit_decomp_cache;
 
+  /// Polynomial-form → host variable index cache. When
+  /// decompose_bits is called on a compound expression that
+  /// reduces to a polynomial that has been seen before (e.g.,
+  /// (a+b) and (b+a) both normalise to the same polynomial), we
+  /// reuse the same host variable rather than introducing a fresh
+  /// one. This avoids duplicating bit decompositions across
+  /// syntactically-different-but-semantically-equal polynomials.
+  ///
+  /// Key: a canonical string serialisation of the polynomial's
+  /// (term, monomial) sequence. Polynomials are normalised
+  /// before serialisation so that the key is order-invariant.
+  std::map<std::string, std::size_t> poly_host_cache;
+
   /// Set bitwidth from a bitvector type. Returns false if incompatible.
   bool set_bitwidth(const typet &type);
 };

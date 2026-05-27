@@ -6,6 +6,7 @@
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
+#include <util/mp_arith.h>
 #include <util/std_expr.h>
 
 bool poly_extractort::set_bitwidth(const typet &type)
@@ -251,12 +252,14 @@ std::optional<polynomialt> poly_extractort::to_polynomial(const exprt &e)
       return std::nullopt;
     unsigned k = static_cast<unsigned>(shift_amt->to_long());
     polynomialt result{d};
+    std::set<std::size_t> bit_vars = get_bit_var_indices();
     for(unsigned i = k; i < d; ++i)
     {
       mp_integer coeff = power(mp_integer{2}, mp_integer{i - k});
       result = result + (*bits)[i] * coeff;
     }
     result.normalize();
+    apply_frobenius_idempotency(result, bit_vars);
     return result;
   }
 
@@ -272,6 +275,7 @@ std::optional<polynomialt> poly_extractort::to_polynomial(const exprt &e)
     unsigned d = bitwidth;
     polynomialt one{d, mp_integer{1}};
     polynomialt result{d};
+    std::set<std::size_t> bit_vars = get_bit_var_indices();
     for(unsigned i = 0; i < d; ++i)
     {
       mp_integer coeff = power(mp_integer{2}, mp_integer{i});
@@ -279,6 +283,7 @@ std::optional<polynomialt> poly_extractort::to_polynomial(const exprt &e)
       result = result + not_bit * coeff;
     }
     result.normalize();
+    apply_frobenius_idempotency(result, bit_vars);
     return result;
   }
 
@@ -293,49 +298,18 @@ std::optional<polynomialt> poly_extractort::to_polynomial(const exprt &e)
     if(!set_bitwidth(e.type()))
       return std::nullopt;
     unsigned d = bitwidth;
-    // Decompose each operand. The semantics of multi-ary ops folds
-    // left-to-right; we only need pairwise bit decomp + recursive
-    // accumulation in the polynomial form.
-    auto acc_bits = decompose_bits(e.operands()[0]);
+    auto acc_bits = decompose_bits(e);
     if(!acc_bits)
       return std::nullopt;
-    for(std::size_t i = 1; i < e.operands().size(); ++i)
-    {
-      auto next_bits = decompose_bits(e.operands()[i]);
-      if(!next_bits)
-        return std::nullopt;
-      // Combine acc_bits and next_bits bitwise.
-      std::vector<polynomialt> combined;
-      combined.reserve(d);
-      for(unsigned j = 0; j < d; ++j)
-      {
-        const polynomialt &x = (*acc_bits)[j];
-        const polynomialt &y = (*next_bits)[j];
-        if(e.id() == ID_bitand)
-        {
-          // x AND y = x * y
-          combined.push_back(x * y);
-        }
-        else if(e.id() == ID_bitor)
-        {
-          // x OR y = x + y - x*y
-          combined.push_back((x + y) - (x * y));
-        }
-        else // ID_bitxor
-        {
-          // x XOR y = x + y - 2*x*y
-          combined.push_back((x + y) - (x * y) * mp_integer{2});
-        }
-      }
-      acc_bits = std::move(combined);
-    }
     polynomialt result{d};
+    std::set<std::size_t> bit_vars = get_bit_var_indices();
     for(unsigned j = 0; j < d; ++j)
     {
       mp_integer coeff = power(mp_integer{2}, mp_integer{j});
       result = result + (*acc_bits)[j] * coeff;
     }
     result.normalize();
+    apply_frobenius_idempotency(result, bit_vars);
     return result;
   }
 
@@ -435,15 +409,157 @@ poly_extractort::decompose_bits(const exprt &e)
   if(d == 0)
     return std::nullopt;
 
-  // Convert e to a polynomial. We need a single "host" variable that
-  // represents e's value so we can attach bit variables to it.
+  // Constants: the bits of a constant are computable directly.
+  if(e.is_constant())
+  {
+    auto val = numeric_cast<mp_integer>(e);
+    if(!val.has_value())
+      return std::nullopt;
+    std::vector<polynomialt> bits;
+    bits.reserve(d);
+    mp_integer v = *val;
+    if(v < 0)
+      v += power(mp_integer{2}, mp_integer{d});
+    for(unsigned i = 0; i < d; ++i)
+    {
+      bool bit_set = (v / power(mp_integer{2}, mp_integer{i})) % 2 != 0;
+      bits.emplace_back(d, mp_integer{bit_set ? 1 : 0});
+    }
+    return bits;
+  }
+
+  // bvnot a: bit i is (1 - bit_a_i). Avoids fresh host.
+  if(e.id() == ID_bitnot && e.operands().size() == 1)
+  {
+    auto inner_bits = decompose_bits(e.operands()[0]);
+    if(!inner_bits)
+      return std::nullopt;
+    std::vector<polynomialt> result;
+    result.reserve(d);
+    polynomialt one{d, mp_integer{1}};
+    for(const auto &b : *inner_bits)
+      result.push_back(one - b);
+    return result;
+  }
+
+  // bvshl a k (constant k): bit i is bit_a_{i-k} for i >= k, else 0.
+  if(
+    e.id() == ID_shl && e.operands().size() == 2 &&
+    e.operands()[1].is_constant())
+  {
+    auto shift_amt = numeric_cast<mp_integer>(e.operands()[1]);
+    if(!shift_amt || *shift_amt < 0)
+      return std::nullopt;
+    auto inner_bits = decompose_bits(e.operands()[0]);
+    if(!inner_bits)
+      return std::nullopt;
+    std::vector<polynomialt> result;
+    result.reserve(d);
+    polynomialt zero{d};
+    if(*shift_amt >= mp_integer{d})
+    {
+      for(unsigned i = 0; i < d; ++i)
+        result.push_back(zero);
+      return result;
+    }
+    unsigned k = static_cast<unsigned>(shift_amt->to_long());
+    for(unsigned i = 0; i < d; ++i)
+    {
+      if(i < k)
+        result.push_back(zero);
+      else
+        result.push_back((*inner_bits)[i - k]);
+    }
+    return result;
+  }
+
+  // bvlshr a k (constant k): bit i is bit_a_{i+k} for i < d-k, else 0.
+  if(
+    e.id() == ID_lshr && e.operands().size() == 2 &&
+    e.operands()[1].is_constant())
+  {
+    auto shift_amt = numeric_cast<mp_integer>(e.operands()[1]);
+    if(!shift_amt || *shift_amt < 0)
+      return std::nullopt;
+    auto inner_bits = decompose_bits(e.operands()[0]);
+    if(!inner_bits)
+      return std::nullopt;
+    std::vector<polynomialt> result;
+    result.reserve(d);
+    polynomialt zero{d};
+    if(*shift_amt >= mp_integer{d})
+    {
+      for(unsigned i = 0; i < d; ++i)
+        result.push_back(zero);
+      return result;
+    }
+    unsigned k = static_cast<unsigned>(shift_amt->to_long());
+    for(unsigned i = 0; i < d; ++i)
+    {
+      if(i + k < d)
+        result.push_back((*inner_bits)[i + k]);
+      else
+        result.push_back(zero);
+    }
+    return result;
+  }
+
+  // bvand / bvor / bvxor: combine bits pairwise without fresh host.
+  if(
+    (e.id() == ID_bitand || e.id() == ID_bitor || e.id() == ID_bitxor) &&
+    e.operands().size() >= 2)
+  {
+    auto acc = decompose_bits(e.operands()[0]);
+    if(!acc)
+      return std::nullopt;
+    // Snapshot bit-var set for eager Frobenius reduction. Each
+    // multiplication below can produce b_i^k for k >= 2; clamping
+    // immediately keeps polynomials small.
+    std::set<std::size_t> bit_vars = get_bit_var_indices();
+    for(std::size_t k = 1; k < e.operands().size(); ++k)
+    {
+      auto next = decompose_bits(e.operands()[k]);
+      if(!next)
+        return std::nullopt;
+      // Refresh bit-var set: decompose_bits may have added more.
+      bit_vars = get_bit_var_indices();
+      std::vector<polynomialt> combined;
+      combined.reserve(d);
+      for(unsigned j = 0; j < d; ++j)
+      {
+        const polynomialt &x = (*acc)[j];
+        const polynomialt &y = (*next)[j];
+        polynomialt bit{d};
+        if(e.id() == ID_bitand)
+          bit = x * y;
+        else if(e.id() == ID_bitor)
+          bit = (x + y) - (x * y);
+        else // ID_bitxor
+          bit = (x + y) - (x * y) * mp_integer{2};
+        apply_frobenius_idempotency(bit, bit_vars);
+        combined.push_back(std::move(bit));
+      }
+      acc = std::move(combined);
+    }
+    return acc;
+  }
+
+  // Fallback: convert to a polynomial via to_polynomial, attach a
+  // fresh host variable, and decompose that. This is the original
+  // implementation; it handles arbitrary polynomial expressions
+  // (sums, differences, products) by introducing a fresh host h
+  // with the equation h = poly and then decomposing h into bit
+  // variables.
   auto host_poly = to_polynomial(e);
   if(!host_poly)
     return std::nullopt;
 
   // If the polynomial is a single variable (1 * x_v + 0), we use that
-  // variable as the host directly. Otherwise, introduce a fresh host
-  // variable and equate it with the polynomial.
+  // variable as the host directly. Otherwise, check the polynomial-
+  // form cache: two syntactically-different-but-semantically-equal
+  // polynomials (e.g., a+b and b+a) normalise to the same polynomial
+  // and should share a host. Only if the polynomial form has not
+  // been seen before do we introduce a fresh host.
   std::size_t host_idx;
   if(
     host_poly->terms.size() == 1 &&
@@ -455,12 +571,30 @@ poly_extractort::decompose_bits(const exprt &e)
   }
   else
   {
-    host_idx = get_var_index("__bd_host_" + std::to_string(next_fresh++));
-    polynomialt host_var{d, mp_integer{1}, host_idx};
-    polynomialt host_eq = host_var - *host_poly;
-    host_eq.normalize();
-    if(!host_eq.is_zero())
-      side_equations.push_back(std::move(host_eq));
+    // Build a canonical key for this polynomial form.
+    std::string key;
+    for(const auto &[coeff, mono] : host_poly->terms)
+    {
+      key += integer2string(coeff) + ":";
+      for(const auto &[var, exp] : mono.vars)
+        key += std::to_string(var) + "^" + std::to_string(exp) + ",";
+      key += ";";
+    }
+    auto pit = poly_host_cache.find(key);
+    if(pit != poly_host_cache.end())
+    {
+      host_idx = pit->second;
+    }
+    else
+    {
+      host_idx = get_var_index("__bd_host_" + std::to_string(next_fresh++));
+      polynomialt host_var{d, mp_integer{1}, host_idx};
+      polynomialt host_eq = host_var - *host_poly;
+      host_eq.normalize();
+      if(!host_eq.is_zero())
+        side_equations.push_back(std::move(host_eq));
+      poly_host_cache.emplace(std::move(key), host_idx);
+    }
   }
 
   // Cache check: if the host has been decomposed already, return the
