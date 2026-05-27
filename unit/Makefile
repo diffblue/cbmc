@@ -207,10 +207,12 @@ SRC += analyses/ai/ai.cpp \
        util/string2int.cpp \
        util/structured_data.cpp \
        util/string_utils/capitalize.cpp \
+       util/string_utils/escape.cpp \
        util/string_utils/escape_non_alnum.cpp \
        util/string_utils/join_string.cpp \
        util/string_utils/split_string.cpp \
        util/string_utils/strip_string.cpp \
+       util/string_utils/trim_from_last_delimiter.cpp \
        util/string_utils/wrap_line.cpp \
        util/symbol_table.cpp \
        util/symbol.cpp \

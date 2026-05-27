@@ -9,8 +9,11 @@ Author: Diffblue Ltd.
 /// \file
 /// split_string Unit Tests
 
-#include <testing-utils/use_catch.h>
 #include <util/string_utils.h>
+
+#include <testing-utils/use_catch.h>
+
+#include <string_view>
 
 struct expected_resultst
 {
@@ -203,4 +206,16 @@ SCENARIO("split_string into two", "[core][utils][string_utils][split_string]")
     // TODO(tkiley): here we should check what happens when trying to enable
     // TODO(tkiley): strip, but currently the behaviour terminates the unit test
   }
+}
+
+TEST_CASE(
+  "split_string honours string_view length over a non-NUL-terminated buffer",
+  "[core][utils][string_utils][split_string]")
+{
+  // Without a trailing NUL: a regression where the implementation
+  // walked the buffer until '\0' would read past the end.
+  const char buf[] = {'a', ',', 'b', ',', 'c', 'X', 'Y'};
+  std::string_view sv{buf, 5};
+  std::vector<std::string> r = split_string(sv, ',');
+  REQUIRE(r == std::vector<std::string>{"a", "b", "c"});
 }

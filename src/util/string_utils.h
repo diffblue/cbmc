@@ -11,14 +11,15 @@ Author: Daniel Poetzl
 #define CPROVER_UTIL_STRING_UTILS_H
 
 #include <string>
+#include <string_view>
 #include <vector>
 
-std::string strip_string(const std::string &s);
+std::string strip_string(std::string_view s);
 
-std::string capitalize(const std::string &str);
+std::string capitalize(std::string_view s);
 
 void split_string(
-  const std::string &s,
+  std::string_view s,
   char delim,
   std::string &left,
   std::string &right,
@@ -34,14 +35,12 @@ void split_string(
 ///   This is applied after strip so whitespace only elements will be removed if
 ///   both are set to true.
 std::vector<std::string> split_string(
-  const std::string &s,
+  std::string_view s,
   char delim,
   bool strip = false,
   bool remove_empty = false);
 
-std::string trim_from_last_delimiter(
-  const std::string &s,
-  const char delim);
+std::string trim_from_last_delimiter(std::string_view s, const char delim);
 
 /// Prints items to an stream, separated by a constant delimiter
 /// \tparam It: An iterator type
@@ -97,13 +96,13 @@ join_strings(Stream &&os, const It b, const It e, const Delimiter &delimiter)
 
 /// Generic escaping of strings; this is not meant to be a particular
 /// programming language.
-std::string escape(const std::string &);
+std::string escape(std::string_view s);
 
 /// Replace non-alphanumeric characters with `_xx` escapes, where xx are hex
 /// digits. Underscores are replaced by `__`.
 /// \param to_escape: string to escape
 /// \return string with non-alphanumeric characters escaped
-std::string escape_non_alnum(const std::string &to_escape);
+std::string escape_non_alnum(std::string_view to_escape);
 
 /// Wrap line at spaces to not extend past the right margin, and include given
 /// padding with spaces to the left
