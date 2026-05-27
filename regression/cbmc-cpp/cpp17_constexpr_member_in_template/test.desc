@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+^\[main\.assertion\.1\] line 26 constexpr get\(\) resolved in class scope: SUCCESS$
+--
+^CONVERSION ERROR$
+^symbol 'value' is unknown$
+constexpr method body must resolve unqualified class-scope members
+in the class's own scope, not at the call site, when the call result
+is used as a non-type template argument.
