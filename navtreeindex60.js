@@ -1,5 +1,7 @@
 var NAVTREEINDEX60 =
 {
+"classsmall__mapt.html#ae21552aa20410da45f7d5fe013594581":[7,0,1105,26],
+"classsmall__mapt.html#ae3ea2d3849724f69277c1ac8e0827473":[7,0,1105,10],
 "classsmall__mapt.html#af35cd707106fdeeab0d2a43d0d9df61d":[7,0,1105,2],
 "classsmall__mapt.html#af3c7a220cea59019b45646ecf609f9c5":[7,0,1105,11],
 "classsmall__mapt_1_1const__iterator.html":[7,0,1105,0],
@@ -220,13 +222,13 @@ var NAVTREEINDEX60 =
 "classsmt2__dect.html#ab9c841fcf12f1a6e6315faa652d7c5ea":[7,0,1111,3],
 "classsmt2__dect.html#ae49fa23afe3eb63ef032412b6a8364d5":[7,0,1111,4],
 "classsmt2__encoding__targett.html":[7,0,1112],
-"classsmt2__encoding__targett.html#a2ea0a7b729657873046737b10b461e11":[7,0,1112,7],
 "classsmt2__encoding__targett.html#a2ea0a7b729657873046737b10b461e11":[7,0,1112,8],
+"classsmt2__encoding__targett.html#a2ea0a7b729657873046737b10b461e11":[7,0,1112,7],
 "classsmt2__encoding__targett.html#a3b544e909c64c975c47f20a08f4c9657":[7,0,1112,0],
 "classsmt2__encoding__targett.html#a3b544e909c64c975c47f20a08f4c9657":[7,0,1112,2],
 "classsmt2__encoding__targett.html#a6dace009ac6648183789af644913716a":[7,0,1112,4],
-"classsmt2__encoding__targett.html#a73c4618809cdacca240b75559336cf68":[7,0,1112,6],
 "classsmt2__encoding__targett.html#a73c4618809cdacca240b75559336cf68":[7,0,1112,5],
+"classsmt2__encoding__targett.html#a73c4618809cdacca240b75559336cf68":[7,0,1112,6],
 "classsmt2__encoding__targett.html#a8f1d3ca5d3eb6f0f1896d1c32570fec3":[7,0,1112,9],
 "classsmt2__encoding__targett.html#a9043a2837d27612018b4bcaacd5dc208":[7,0,1112,3],
 "classsmt2__encoding__targett.html#a9043a2837d27612018b4bcaacd5dc208":[7,0,1112,1],
@@ -247,7 +249,5 @@ var NAVTREEINDEX60 =
 "classsmt2__incremental__decision__proceduret.html#a4a9c51d367b9c96a09f0612416662121":[7,0,1114,16],
 "classsmt2__incremental__decision__proceduret.html#a4d0a2b50444bef7fa612f1326bc1684b":[7,0,1114,4],
 "classsmt2__incremental__decision__proceduret.html#a520ba106c8342662e8cf1b6292fc15da":[7,0,1114,34],
-"classsmt2__incremental__decision__proceduret.html#a52bb60c2493c6b7a4d75d0bd6f75b655":[7,0,1114,9],
-"classsmt2__incremental__decision__proceduret.html#a58e33e70ccca4c6de0f2fa4e4ec0db46":[7,0,1114,6],
-"classsmt2__incremental__decision__proceduret.html#a5c5e32b8c28122940ff53675ddcfb647":[7,0,1114,18]
+"classsmt2__incremental__decision__proceduret.html#a52bb60c2493c6b7a4d75d0bd6f75b655":[7,0,1114,9]
 };

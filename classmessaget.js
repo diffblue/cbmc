@@ -47,6 +47,8 @@ var classmessaget =
     [ "magenta", "classmessaget.html#a2215880b0660b1530efd3693c42f8e6e", null ],
     [ "message_handler", "classmessaget.html#a1970d9816bb720653f702077da0e719e", null ],
     [ "mstream", "classmessaget.html#ae6e4fdebf71f20d1d7a00fa79effa9af", null ],
+    [ "quote_begin", "classmessaget.html#a2b7f74fdf3a617a49736d38f84ccb98d", null ],
+    [ "quote_end", "classmessaget.html#a9271fda3c7e8971366894258e5441556", null ],
     [ "red", "classmessaget.html#ad8d8fcfdafc01bd9cb7aa8a5eb045c11", null ],
     [ "reset", "classmessaget.html#a3ab4781c71ad6641fddc140376a667ab", null ],
     [ "underline", "classmessaget.html#a7caca4bab66a0c6a837ceb54919f7d32", null ],

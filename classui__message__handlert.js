@@ -14,6 +14,7 @@ var classui__message__handlert =
     [ "flush", "classui__message__handlert.html#a944903587017b47640cd3ca2c9260f9e", null ],
     [ "get_json_stream", "classui__message__handlert.html#ad88f74028170b638a3242a69969e22e0", null ],
     [ "get_ui", "classui__message__handlert.html#a4919f7300bcf37134a46836b6061d8e5", null ],
+    [ "is_sgr_style_command", "classui__message__handlert.html#a60abc73bb59e0d17a4b31698c76fca9b", null ],
     [ "json_ui_msg", "classui__message__handlert.html#a1b9ec25f957b5a873c47f41e34914e2a", null ],
     [ "level_string", "classui__message__handlert.html#a25b6b3149bf17e382ea0631f56e912bb", null ],
     [ "print", "classui__message__handlert.html#ac16bc405642ea42dbbd97d58759ba050", null ],

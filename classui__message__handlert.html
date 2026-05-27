@@ -99,6 +99,7 @@ $(document).ready(function(){initNavTree('classui__message__handlert.html',''); 
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classui__message__handlert-members.html">List of all members</a>  </div>
@@ -159,6 +160,12 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:adcfadd749647c670c1c723d946ecfc6c inherit pub_methods_classmessage__handlert"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac4aef5d31c95455740d9d3270f89f045 inherit pub_methods_classmessage__handlert" id="r_ac4aef5d31c95455740d9d3270f89f045"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmessage__handlert.html#ac4aef5d31c95455740d9d3270f89f045">get_message_count</a> (<a class="el" href="classait.html">unsigned</a> level) <a class="el" href="classait.html">const</a></td></tr>
 <tr class="separator:ac4aef5d31c95455740d9d3270f89f045 inherit pub_methods_classmessage__handlert"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a60abc73bb59e0d17a4b31698c76fca9b" id="r_a60abc73bb59e0d17a4b31698c76fca9b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">static</a> <a class="el" href="classait.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classui__message__handlert.html#a60abc73bb59e0d17a4b31698c76fca9b">is_sgr_style_command</a> (<a class="el" href="classait.html">unsigned</a> <a class="el" href="classait.html">c</a>)</td></tr>
+<tr class="memdesc:a60abc73bb59e0d17a4b31698c76fca9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true iff <code>c</code> is a Select Graphic Rendition (SGR) parameter value used by messaget for terminal styling &ndash; 0..4 (reset/bold/ faint/italic/underline) and 31..36 / 91..96 (foreground colours and their bright variants).  <br /></td></tr>
+<tr class="separator:a60abc73bb59e0d17a4b31698c76fca9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -427,7 +434,7 @@ Protected Attributes</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -437,7 +444,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classmessage__handlert.html#aea33622c6fbcda8df1df29195f4e3920">message_handlert</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="ui__message_8h_source.html#l00097">97</a> of file <a class="el" href="ui__message_8h_source.html">ui_message.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ui__message_8cpp_source.html#l00120">120</a> of file <a class="el" href="ui__message_8cpp_source.html">ui_message.cpp</a>.</p>
 
 </div>
 </div>
@@ -467,7 +474,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classmessage__handlert.html#af1321e7ef80442ceb09fe0258d3e5268">message_handlert</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="ui__message_8cpp_source.html#l00302">302</a> of file <a class="el" href="ui__message_8cpp_source.html">ui_message.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ui__message_8cpp_source.html#l00356">356</a> of file <a class="el" href="ui__message_8cpp_source.html">ui_message.cpp</a>.</p>
 
 </div>
 </div>
@@ -525,6 +532,37 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a60abc73bb59e0d17a4b31698c76fca9b" name="a60abc73bb59e0d17a4b31698c76fca9b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a60abc73bb59e0d17a4b31698c76fca9b">&#9670;&#160;</a></span>is_sgr_style_command()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">bool</a> ui_message_handlert::is_sgr_style_command </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classait.html">unsigned</a>&#160;</td>
+          <td class="paramname"><em>c</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns true iff <code>c</code> is a Select Graphic Rendition (SGR) parameter value used by messaget for terminal styling &ndash; 0..4 (reset/bold/ faint/italic/underline) and 31..36 / 91..96 (foreground colours and their bright variants). </p>
+<p>The values listed here are kept in lock-step with the corresponding <code><a class="el" href="classmessaget_1_1commandt.html">messaget::commandt</a></code> constants in message.h / message.cpp; if a new styling command is added there, it should be added here too so it is suppressed on the structured UIs. </p>
+
+<p class="definition">Definition at line <a class="el" href="ui__message_8cpp_source.html#l00147">147</a> of file <a class="el" href="ui__message_8cpp_source.html">ui_message.cpp</a>.</p>
+
+</div>
+</div>
 <a id="a1b9ec25f957b5a873c47f41e34914e2a" name="a1b9ec25f957b5a873c47f41e34914e2a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1b9ec25f957b5a873c47f41e34914e2a">&#9670;&#160;</a></span>json_ui_msg()</h2>
 
@@ -565,7 +603,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ui__message_8cpp_source.html#l00283">283</a> of file <a class="el" href="ui__message_8cpp_source.html">ui_message.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ui__message_8cpp_source.html#l00337">337</a> of file <a class="el" href="ui__message_8cpp_source.html">ui_message.cpp</a>.</p>
 
 </div>
 </div>
@@ -593,7 +631,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ui__message_8cpp_source.html#l00120">120</a> of file <a class="el" href="ui__message_8cpp_source.html">ui_message.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ui__message_8cpp_source.html#l00174">174</a> of file <a class="el" href="ui__message_8cpp_source.html">ui_message.cpp</a>.</p>
 
 </div>
 </div>
@@ -633,7 +671,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classmessage__handlert.html#a624642154d2db2c2b539a4ac2ef7991f">message_handlert</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="ui__message_8cpp_source.html#l00185">185</a> of file <a class="el" href="ui__message_8cpp_source.html">ui_message.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ui__message_8cpp_source.html#l00239">239</a> of file <a class="el" href="ui__message_8cpp_source.html">ui_message.cpp</a>.</p>
 
 </div>
 </div>
@@ -673,7 +711,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classmessage__handlert.html#a5cfda5b7399a3c6d3fcce5b9058852ee">message_handlert</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="ui__message_8cpp_source.html#l00130">130</a> of file <a class="el" href="ui__message_8cpp_source.html">ui_message.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ui__message_8cpp_source.html#l00184">184</a> of file <a class="el" href="ui__message_8cpp_source.html">ui_message.cpp</a>.</p>
 
 </div>
 </div>
@@ -719,7 +757,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classmessage__handlert.html#a61f3d15a65c70aef54ac95ee7713e853">message_handlert</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="ui__message_8cpp_source.html#l00208">208</a> of file <a class="el" href="ui__message_8cpp_source.html">ui_message.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ui__message_8cpp_source.html#l00262">262</a> of file <a class="el" href="ui__message_8cpp_source.html">ui_message.cpp</a>.</p>
 
 </div>
 </div>
@@ -759,7 +797,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classmessage__handlert.html#ad08704c58ff9fa8a39f951990700fe36">message_handlert</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="ui__message_8cpp_source.html#l00316">316</a> of file <a class="el" href="ui__message_8cpp_source.html">ui_message.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ui__message_8cpp_source.html#l00370">370</a> of file <a class="el" href="ui__message_8cpp_source.html">ui_message.cpp</a>.</p>
 
 </div>
 </div>
@@ -799,7 +837,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classmessage__handlert.html#afa14b7a4f3ab9efce1d563e1921e51b8">message_handlert</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="ui__message_8cpp_source.html#l00163">163</a> of file <a class="el" href="ui__message_8cpp_source.html">ui_message.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ui__message_8cpp_source.html#l00217">217</a> of file <a class="el" href="ui__message_8cpp_source.html">ui_message.cpp</a>.</p>
 
 </div>
 </div>
@@ -843,7 +881,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ui__message_8cpp_source.html#l00241">241</a> of file <a class="el" href="ui__message_8cpp_source.html">ui_message.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ui__message_8cpp_source.html#l00295">295</a> of file <a class="el" href="ui__message_8cpp_source.html">ui_message.cpp</a>.</p>
 
 </div>
 </div>
@@ -887,7 +925,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ui__message_8cpp_source.html#l00261">261</a> of file <a class="el" href="ui__message_8cpp_source.html">ui_message.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ui__message_8cpp_source.html#l00315">315</a> of file <a class="el" href="ui__message_8cpp_source.html">ui_message.cpp</a>.</p>
 
 </div>
 </div>

@@ -1,5 +1,8 @@
 var NAVTREEINDEX112 =
 {
+"goto-program-transformations.html#required-transforms":[0,4,9,2,0],
+"goto-program-transformations.html#returns-transform":[0,4,9,2,0,5],
+"goto-program-transformations.html#slicing-transforms":[0,4,9,2,1,7],
 "goto-program-transformations.html#string-abstraction-transform":[0,4,9,2,1,3],
 "goto-program-transformations.html#string-instrument-transform":[0,4,9,2,1,0],
 "goto-program-transformations.html#unions-transform":[0,4,9,2,0,8],
@@ -246,8 +249,5 @@ var NAVTREEINDEX112 =
 "goto__program2code_8h.html":[8,0,2,15,52],
 "goto__program2code_8h_source.html":[8,0,2,15,52],
 "goto__program_8cpp.html":[8,0,2,16,27],
-"goto__program_8cpp.html#a05347f45452007ecfae3f2bd335f278d":[8,0,2,16,27,8],
-"goto__program_8cpp.html#a243fbeadf4d47b4da193cecba048ed83":[8,0,2,16,27,6],
-"goto__program_8cpp.html#a2bdfaeebeb2ab9ddaa660283ae52f4be":[8,0,2,16,27,2],
-"goto__program_8cpp.html#a66372d1a3f3860e0d156d7cd6c5ef740":[8,0,2,16,27,0]
+"goto__program_8cpp.html#a05347f45452007ecfae3f2bd335f278d":[8,0,2,16,27,8]
 };
