@@ -2635,3 +2635,125 @@ pre-existing pretty-print bug unrelated to constexpr eval —
 deferred to a future session.
 
 Total this session: 7 commits (6 source/test + 1 doc).
+
+
+## 2026-05-27 (continued) Dog-food failure audit + partial std::pair fix
+
+After the constexpr-eval-with-class-scope landing, dog-food
+remained at 20/17/80/0.  Audited the 80 FAIL files to identify
+shared root causes.
+
+### Bucket distribution (80 FAIL files)
+
+By first-error pattern:
+
+| bucket | count | first error pattern |
+|---|---|---|
+| A | 22 | `instantiating 'sharing_treet'` |
+| B | 18 | `symbol 'reserve' is unknown` |
+| C | 8 | `instantiating 'std::basic_streambuf'` |
+| D, E | 7 | `std::vector<dstringt>` / `std::unordered_map` |
+| F | 2 | `std::optional` |
+| G | 2 | `parse error` |
+| H | 3 | `'X' is unknown (clear/read/...)` |
+| I | 3 | `no match for symbol` |
+| J | 3 | `does not uniquely resolve` |
+| K | 2 | `invalid implicit conversion` |
+| L | 1 | bare `CONVERSION ERROR` |
+| misc | 9 | unique |
+
+### Root cause: `std::pair<K, V>` does not elaborate
+
+Buckets A, B, E, I, F (and pieces of D, J, H) — at least 47 of
+80 failures — share a single root cause: `std::pair<K, V>` and
+its base `std::__pair_base<K, V>` do not produce `tag-` symbols
+when instantiated from libstdc++ headers.
+
+Reproducible on a 6-line test:
+```cpp
+#include <utility>
+int main() { std::pair<int, int> p; return 0; }
+```
+
+`--show-symbol-table` shows pair's nested types get tags (e.g.
+`std::pair<...>::tag-__zero_as_null_pointer_constant`) but the
+pair class itself does NOT.  CBMC reports VERIFICATION SUCCESSFUL
+because `main()` collapses to a nondet stub when pair fails to
+elaborate.
+
+### First fix landed (2026-05-27 commit, partial)
+
+Identified one of the underlying mechanisms via reduced repros.
+`__pair_base` declares itself as a template-friend of `pair`,
+and its destructor is private (default for `class`).  When
+`pair`'s implicit destructor synthesis goes to call
+`__pair_base::~__pair_base`, an access-check fallback in
+`cpp_typecheck_resolve.cpp:resolve` had two defects that
+prevented the derived-class-access path from matching:
+
+1. The "current class" was taken as
+   `current_scope().get_parent().identifier`, which is the
+   ENCLOSING NAMESPACE when the resolution happens from a
+   class scope directly (during destructor synthesis triggered
+   by class elaboration).  The namespace symbol's
+   `type.id() != ID_struct` so the loop never ran.  Walk the
+   scope chain and pick the first class scope instead.
+2. The expected base struct_tag identifier was built as
+   `"tag-" + qualified_class_name` → e.g.
+   `tag-std::__pair_base<...>`.  The actual stored
+   identifier is `<namespace>::tag-<class_name>` →
+   `std::tag-__pair_base<...>`.  Mismatched comparison.
+
+With both fixed, a minimal pair-shaped test now elaborates:
+```cpp
+namespace ns {
+  template<typename _T1, typename _T2> struct pair;
+  template<typename U1, typename U2> class __pair_base {
+    template<typename _T1, typename _T2> friend struct pair;
+    ~__pair_base() = default;
+    /* ... = delete operator= ... */
+  };
+  template<typename _T1, typename _T2>
+  struct pair : public __pair_base<_T1, _T2> { /* first, second */ };
+}
+ns::pair<int, int> p;  // now creates tag-pair
+```
+
+Regression test `cpp17_private_base_dtor_via_friend` covers
+this case.
+
+### Why this didn't yet move dog-food
+
+The fix unblocks the access-check pathway that fails in
+`/tmp/`-located tests, but for files whose source location is
+under `/usr/include/` (libstdc++), an EARLIER silent-bypass in
+the same function sets `still_not_accessible = false` based on
+the path, never reaching the buggy fallback.  So libstdc++'s
+real `std::pair` instantiation still produces no tag — for a
+DIFFERENT reason that has yet to be isolated.
+
+The next investigation should:
+1. Trace exactly where libstdc++'s pair elaboration aborts
+   (despite the silent-bypass making access checks always
+   succeed).  Possibly an earlier failure during template
+   instantiation that sets `is_incomplete()` and prevents
+   tag registration.
+2. Test whether the issue is in `class_template_symbol`,
+   in `elaborate_class_template`, or in
+   `typecheck_compound_type` for pair specifically.
+
+### Other shared root causes (smaller)
+
+* **Bucket C (8 files)** — basic_streambuf SFINAE pollution
+  followed by class-member access in `ieee_floatt::is_zero`.
+* **~24 misc failures** — distinct one-off issues.
+
+### Status
+
+cbmc-cpp regressions: 693/0/83 (one new test added).
+Dog-food unchanged at 20/17/80/0 — the access-check fix is
+necessary but not sufficient for the libstdc++ pair issue.
+
+Reproduction artifacts saved at `/tmp/std_dep_pair.cpp`,
+`/tmp/std_dep_mypair.cpp`, `/tmp/just_pair.cpp`,
+`/tmp/pair_min.cpp` (passes), `/tmp/reserve_min.cpp`.
