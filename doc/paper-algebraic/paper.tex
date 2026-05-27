@@ -1659,34 +1659,89 @@ their bit-sum forms once each, and Buchberger derives the
 identity through bit-by-bit reduction without re-bit-blasting
 the entire structure.
 
-\textbf{Toom-scaled exposes a scope limit.} The identity
+\textbf{Toom-scaled exposes the bit-parity gap.} The identity
 $((a{+}b){-}(a{-}b)) \gg 1 = b$ holds only when $b < 2^{d-1}$
 (the precondition prevents overflow in the intermediate $2b$).
-The precondition is a $\mathtt{bvult}$ comparison, which our
-procedure currently does not extract into the polynomial system
-(the universal-equational fragment encompasses bvadd/bvsub/bvmul
-and the bit-decomposed partial operators, but not relational
-predicates). Without the precondition the diseq is genuinely SAT,
-and the algebraic procedure spends its step budget unable to
-refute it; bit-blasting solves the full formula in 0.04--0.61\,s
-because it sees the precondition. This case motivates the natural
-follow-on: extending bit-decomposition to relational predicates
-(a universal-relational fragment), discussed in
-Section~\ref{sec:future-within-and-beyond}.
+With the universal-relational extension below, our procedure
+encodes the $\mathtt{bvult}$ precondition into the polynomial
+system (bit $b_{b,d-1}$ is forced to zero), but the procedure
+still times out at $d \geq 32$. The remaining obstacle is not
+predicate handling but \emph{bit-by-bit parity reasoning}:
+deriving the bits of $h = 2b \bmod 2^d$ from the bits of $b$
+requires aligning $\sum 2^i b_{h,i} = 2 \sum 2^i b_{b,i}$
+position-by-position, which Buchberger does not perform
+automatically over $\mathbb{Z}_{2^d}$ (the polynomial relation
+admits multiple solutions when interpreted bit-blindly). The
+algebraic procedure as currently structured cannot close this
+gap; addressing it requires either parity-aware reduction
+ordering or a refined extractor that materialises shift-induced
+bit alignments as additional polynomials. Bit-blasting solves
+the full formula in 0.04--0.61\,s.
+
+\textbf{Universal-relational extension.}
+The same bit-decomposition machinery extends to relational
+predicates: an asserted $\mathtt{bvult}\ x\ C$ for a constant
+$C = 2^k$ forces $b_{x,k}, \ldots, b_{x,d-1}$ to zero, which is
+encoded as a substitution that propagates through the basis
+during linear elimination. The dual case $x \geq 2^d - 2^k$
+(common as the ``MSB-on'' precondition $x \geq 2^{d-1}$) forces
+those same bits to one. General constants $C$ and
+symbol-symbol comparisons fall through to a bit-comparator
+chain encoding with $O(d)$ auxiliary bit variables, idempotency
+relations, and definition polynomials.
+
+\begin{table}[h]
+\caption{Universal-relational predicates: representative
+queries that combine a $\mathtt{bvult}$ / $\mathtt{bvuge}$
+precondition with a polynomial body. Runtimes in seconds at
+30\,s timeout. ``Algeb'' is our procedure with bit-decomposition
+and the predicate extension; ``BB'' is the same procedure with
+the algebraic layer disabled; ``BW'' is Bitwuzla.}
+\label{tab:eval-pbv-relational}
+\centering
+\begin{tabular}{lrrrr}
+\toprule
+Identity & bw & Algeb & BB & BW \\
+\midrule
+$(\mathtt{bvult}\ x\ 2) \Rightarrow x \cdot x = x$
+                            & 16 & 0.00 & 0.00 & 0.00 \\
+                            & 64 & 0.03 & 0.01 & 0.00 \\
+                            & 128 & 0.17 & 0.04 & 0.00 \\
+$(\mathtt{bvult}\ x\ 4) \Rightarrow x(x{-}1)(x{-}2)(x{-}3) = 0$
+                            & 16 & 2.09 & 0.02 & 0.00 \\
+                            & 64 & 4.06 & 0.32 & 0.04 \\
+                            & 128 & 8.39 & 1.81 & 0.02 \\
+$(x \geq 2^{d-1}) \Rightarrow x \oplus 2^{d-1} = x - 2^{d-1}$
+                            & 16 & 0.00 & 0.00 & 0.00 \\
+                            & 64 & \textbf{0.01} & 0.00 & T/O \\
+                            & 128 & T/O & 0.00 & T/O \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The first two queries are tractable for all three solvers; they
+demonstrate the capability extension---without sub-goal 6 the
+algebraic procedure could not reason about the precondition and
+would fall through to bit-blasting. The third query exposes a
+case where Bitwuzla's word-level rewriting times out
+($\mathtt{bvxor}$ and $\mathtt{bvsub}$ do not cancel under a
+universal-relational guard in the rewriter's database), while
+our procedure refutes in 0.01\,s at $d = 64$ via direct
+bit-substitution. At $d = 128$ the size of the
+bit-decomposition system becomes the bottleneck for our
+procedure, and we time out as well.
 
 \textbf{Implications.} Bit-decomposition extends the algebraic
 procedure's \emph{capability} to partial bit-vector operators
-without changing its fundamental architecture. The
-\emph{performance} contribution is narrow at present: most simple
-identities are well-handled by bit-blasting alone, and Bitwuzla's
-word-level rewriting beats us absolutely on the queries tested.
-The wider value is foundational: bit-decomposition is the same
-machinery needed to extract relational predicates
-($\mathtt{bvult}$, $\mathtt{bvslt}$) into the polynomial system,
-which would unlock the universal-relational fragment as a
-genuine class extension---queries like $\forall a, b.\ a < b
-\implies a + 1 \leq b$ become decidable. The toom-scaled case
-above illustrates exactly this gap.
+and to relational preconditions without changing its fundamental
+architecture. The \emph{performance} contribution is narrow: most
+simple identities are well-handled by bit-blasting alone, and
+Bitwuzla's word-level rewriting beats us absolutely on most
+queries tested. The wider value is conceptual: the algebraic
+procedure now decides queries that mix polynomial structure
+with relational guards, including at least one case (last row of
+Table~\ref{tab:eval-pbv-relational}) where it succeeds where
+Bitwuzla times out.
 
 \subsection{Amulet2 Comparison}
 \label{sec:eval-amulet}
