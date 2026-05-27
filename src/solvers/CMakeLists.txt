@@ -9,7 +9,7 @@ set(chaff_source
 set(minisat_source
     ${CMAKE_CURRENT_SOURCE_DIR}/sat/satcheck_minisat.cpp
 )
-set(minisat2_source
+set(minisat2_mergesat_source
     ${CMAKE_CURRENT_SOURCE_DIR}/sat/satcheck_minisat2.cpp
 )
 set(glucose_source
@@ -44,7 +44,7 @@ file(GLOB_RECURSE sources "*.cpp" "*.h")
 list(REMOVE_ITEM sources
     ${chaff_source}
     ${minisat_source}
-    ${minisat2_source}
+    ${minisat2_mergesat_source}
     ${glucose_source}
     ${squolem2_source}
     ${cudd_source}
@@ -81,7 +81,7 @@ foreach(SOLVER ${sat_impl})
             SATCHECK_MINISAT2 HAVE_MINISAT2 __STDC_FORMAT_MACROS __STDC_LIMIT_MACROS
         )
 
-        target_sources(solvers PRIVATE ${minisat2_source})
+        target_sources(solvers PRIVATE ${minisat2_mergesat_source})
 
         target_link_libraries(solvers minisat2-condensed)
     elseif("${SOLVER}" STREQUAL "system-minisat2")
@@ -98,6 +98,25 @@ foreach(SOLVER ${sat_impl})
         else()
             message(FATAL_ERROR "Unable to find header file for preinstalled minisat2")
         endif()
+      elseif("${SOLVER}" STREQUAL "mergesat")
+        message(STATUS "Building solvers with MergeSat")
+
+        download_project(PROJ mergesat
+            URL https://github.com/conp-solutions/mergesat/archive/docker-solvers.tar.gz
+            PATCH_COMMAND true
+            COMMAND cmake -E copy ${CBMC_SOURCE_DIR}/../scripts/mergesat_CMakeLists.txt CMakeLists.txt
+            URL_MD5 1cef063f3255e86beef91f3cdd2eefb7
+        )
+
+        add_subdirectory(${mergesat_SOURCE_DIR} ${mergesat_BINARY_DIR})
+
+        target_compile_definitions(solvers PUBLIC
+            SATCHECK_MERGESAT HAVE_MERGESAT __STDC_FORMAT_MACROS __STDC_LIMIT_MACROS
+        )
+
+        target_sources(solvers PRIVATE ${minisat2_mergesat_source})
+
+        target_link_libraries(solvers mergesat-condensed)
     elseif("${SOLVER}" STREQUAL "glucose")
         message(STATUS "Building solvers with glucose")
 
