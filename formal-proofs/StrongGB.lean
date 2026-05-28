@@ -484,6 +484,97 @@ instance isLocalRing_ZMod_prime_pow {p : ℕ} (hp : Nat.Prime p) (n : ℕ) (hn :
 end MathlibCandidates
 
 
+/-! ## (7) Mod-2 reduction: connecting d > 1 to d = 1
+
+    Key insight: with `WellFormedEncoding` (idempotency on each
+    variable), the only valid assignments in `(ZMod (2^d))^n` are
+    in `{0, 1}^n`. This is because `x^2 = x` in `ZMod (2^d)` for
+    `d ≥ 1` forces `x ∈ {0, 1}` (proven below).
+
+    Consequence: "F unsat over `(ZMod (2^d))^n`" with idempotency
+    is equivalent to "F unsat over `{0, 1}^n`", which (via the
+    embedding `{0, 1} ↪ ZMod 2`) is equivalent to "F mod 2 unsat
+    over `(ZMod 2)^n`".
+-/
+
+/-- In `ZMod (2^d)` for `d ≥ 1`, `x^2 = x` implies `x = 0 ∨ x = 1`.
+
+    MATHLIB CANDIDATE. This generalises `eq_zero_or_one_of_sq_eq_self`
+    (which requires `CancelMonoidWithZero`, i.e., no zero divisors)
+    to the non-domain `ZMod (2^d)` for `d ≥ 2`.
+
+    Proof: `x(x-1) = 0` in `ZMod (2^d)` means `2^d | x.val*(x.val-1)`.
+    Since consecutive integers are coprime, `2^d` divides one factor.
+    Both factors are < 2^d, so the divisible one must be 0. -/
+theorem sq_eq_self_of_zmod_two_pow {d : ℕ} (hd : 0 < d) (x : ZMod (2 ^ d))
+    (hx : x ^ 2 = x) : x = 0 ∨ x = 1 := by
+  haveI : NeZero (2 ^ d) := ⟨by have := Nat.one_lt_pow (by omega : d ≠ 0)
+                                          (by norm_num : 1 < 2); omega⟩
+  haveI : Fact (1 < 2 ^ d) := ⟨Nat.one_lt_pow (by omega) (by norm_num)⟩
+  -- x^2 = x means x * (x - 1) = 0 in ZMod (2^d)
+  have h_prod : x * (x - 1) = 0 := by
+    have h2 : x * (x - 1) = x ^ 2 - x := by ring
+    rw [h2, sub_eq_zero.mpr hx]
+  by_cases hx_zero : x.val = 0
+  · left
+    rw [← ZMod.natCast_zmod_val x, hx_zero, Nat.cast_zero]
+  · right
+    have hx_pos : 0 < x.val := Nat.pos_of_ne_zero hx_zero
+    have hx_lt : x.val < 2 ^ d := ZMod.val_lt x
+    -- (x - 1).val = x.val - 1 (since 1 ≤ x.val < 2^d)
+    have h_sub_val : (x - 1).val = x.val - 1 := by
+      have h1_val : (1 : ZMod (2 ^ d)).val = 1 := ZMod.val_one _
+      have h1_le : (1 : ZMod (2 ^ d)).val ≤ x.val := by omega
+      have := ZMod.val_sub h1_le
+      rw [h1_val] at this
+      exact this
+    -- x * (x-1) = 0 means 2^d | x.val * (x.val - 1)
+    have h_prod_zero : (x.val * (x.val - 1)) % (2 ^ d) = 0 := by
+      have h_prod_val : (x * (x - 1)).val = (x.val * (x - 1).val) % (2 ^ d) :=
+        ZMod.val_mul x (x - 1)
+      rw [h_sub_val] at h_prod_val
+      have := congrArg ZMod.val h_prod
+      rw [h_prod_val, ZMod.val_zero] at this
+      exact this
+    have h_dvd_prod : 2 ^ d ∣ x.val * (x.val - 1) :=
+      Nat.dvd_of_mod_eq_zero h_prod_zero
+    -- Case split: 2 | x.val or not
+    by_cases h2x : 2 ∣ x.val
+    · -- 2 | x.val, so 2 ∤ (x.val - 1), so Coprime (2^d) (x.val - 1)
+      have h2_not_xm1 : ¬ 2 ∣ (x.val - 1) := by omega
+      have h_cop : Nat.Coprime (2 ^ d) (x.val - 1) := by
+        rw [Nat.coprime_iff_gcd_eq_one]
+        by_contra h_ne
+        have h_exists := Nat.exists_prime_and_dvd h_ne
+        obtain ⟨q, hq_prime, hq_dvd⟩ := h_exists
+        have hq_dvd_2d : q ∣ 2 ^ d := dvd_trans hq_dvd (Nat.gcd_dvd_left _ _)
+        have hq_dvd_xm1 : q ∣ x.val - 1 := dvd_trans hq_dvd (Nat.gcd_dvd_right _ _)
+        have hq_eq_2 : q = 2 :=
+          (Nat.Prime.eq_one_or_self_of_dvd (by norm_num : Nat.Prime 2) q
+            (hq_prime.dvd_of_dvd_pow hq_dvd_2d)).resolve_left hq_prime.one_lt.ne'
+        exact h2_not_xm1 (hq_eq_2 ▸ hq_dvd_xm1)
+      -- Coprime (2^d) (x.val-1) and 2^d | x.val * (x.val-1) → 2^d | x.val
+      have h_dvd_x : 2 ^ d ∣ x.val := h_cop.dvd_of_dvd_mul_right h_dvd_prod
+      -- But x.val < 2^d and x.val > 0, contradiction.
+      exact absurd (Nat.eq_zero_of_dvd_of_lt h_dvd_x hx_lt) hx_zero
+    · -- 2 ∤ x.val, so Coprime (2^d) x.val
+      have h_cop : Nat.Coprime (2 ^ d) x.val := by
+        rw [Nat.coprime_iff_gcd_eq_one]
+        by_contra h_ne
+        have h_exists := Nat.exists_prime_and_dvd h_ne
+        obtain ⟨q, hq_prime, hq_dvd⟩ := h_exists
+        have hq_dvd_2d : q ∣ 2 ^ d := dvd_trans hq_dvd (Nat.gcd_dvd_left _ _)
+        have hq_dvd_x : q ∣ x.val := dvd_trans hq_dvd (Nat.gcd_dvd_right _ _)
+        have hq_eq_2 : q = 2 :=
+          (Nat.Prime.eq_one_or_self_of_dvd (by norm_num : Nat.Prime 2) q
+            (hq_prime.dvd_of_dvd_pow hq_dvd_2d)).resolve_left hq_prime.one_lt.ne'
+        exact h2x (hq_eq_2 ▸ hq_dvd_x)
+      -- Coprime (2^d) x.val and 2^d | x.val * (x.val-1) → 2^d | (x.val-1)
+      have h_dvd_xm1 : 2 ^ d ∣ (x.val - 1) := h_cop.dvd_of_dvd_mul_left h_dvd_prod
+      have : x.val - 1 = 0 := Nat.eq_zero_of_dvd_of_lt h_dvd_xm1 (by omega)
+      rw [← ZMod.natCast_zmod_val x, show x.val = 1 from by omega]; simp
+
+
 /-! ## (6) The d = 1 (over GF(2)) case via maximal-ideal argument
 
     For F over `MvPolynomial _ (ZMod 2)` with idempotency on each
