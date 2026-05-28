@@ -173,4 +173,124 @@ theorem smarandache_iff_nu2Factorial (m k : ℕ) :
   have hk_ne : (Nat.factorial k) ≠ 0 := Nat.factorial_pos k |>.ne'
   exact padicValNat_dvd_iff_le hk_ne
 
+/-! ## (5) ZFP generators correctness
+
+    The C++ `generate_zfp_generators(d, var_idx, input_width)`
+    generates polynomials `c_k * x^(k)` (where `x^(k)` is the
+    falling factorial) for k from 2 to SF(2^d), with:
+      `c_k = 1` if `ν₂(k!) ≥ d`,
+      `c_k = 2^(d - ν₂(k!))` otherwise.
+
+    Contract: each generated polynomial vanishes on the bit-vector
+    domain {0, 1, ..., 2^d - 1}, equivalently is zero in
+    `ZMod (2^d)` for any input value.
+
+    Proof: for any natural `x ∈ [0, 2^d)`:
+      - If `x < k`: `x^(k) = 0` (one factor is 0). ✓
+      - If `x ≥ k`: `x^(k) = k! * C(x, k)`. Since `c_k * k!`
+        is divisible by `2^d` (by construction of `c_k`),
+        `c_k * x^(k) = c_k * k! * C(x, k)` is also divisible
+        by `2^d`, hence zero in `ZMod (2^d)`.
+-/
+
+/-- The ZFP coefficient `c_k = 2^max(0, d - ν₂(k!))`. -/
+def zfpCoeff (d k : ℕ) : ℕ := 2 ^ (d - nu2Factorial k)
+
+/-- Key fact: `2^d ∣ zfpCoeff d k * k!`. This is what makes the
+    generated polynomial vanish on `ZMod (2^d)`. -/
+theorem zfpCoeff_mul_factorial_divisible (d k : ℕ) :
+    2 ^ d ∣ zfpCoeff d k * Nat.factorial k := by
+  haveI : Fact (Nat.Prime 2) := ⟨by norm_num⟩
+  -- We need: ν₂(2^(d - ν₂(k!)) * k!) ≥ d, i.e.,
+  --         (d - ν₂(k!)) + ν₂(k!) ≥ d.
+  unfold zfpCoeff
+  have hfact_ne : (Nat.factorial k) ≠ 0 := Nat.factorial_pos k |>.ne'
+  by_cases h : d ≤ nu2Factorial k
+  · -- d ≤ nu2Factorial k: zfpCoeff = 2^0 = 1, and 2^d ∣ k! since
+    --   nu2Factorial k ≥ d means padicValNat 2 (k!) ≥ d.
+    rw [Nat.sub_eq_zero_of_le h]
+    simp only [pow_zero, one_mul]
+    rw [nu2Factorial_eq_padicVal] at h
+    exact (padicValNat_dvd_iff_le hfact_ne).mpr h
+  · -- d > nu2Factorial k: zfpCoeff = 2^(d - nu2Factorial k).
+    push_neg at h
+    have h_le : nu2Factorial k ≤ d := h.le
+    have hsplit : 2 ^ d = 2 ^ (d - nu2Factorial k) * 2 ^ (nu2Factorial k) := by
+      rw [← pow_add]
+      congr 1
+      omega
+    rw [hsplit]
+    refine Nat.mul_dvd_mul_left _ ?_
+    rw [nu2Factorial_eq_padicVal]
+    exact pow_padicValNat_dvd
+
+/-! ## (6) Stirling numbers of the second kind
+
+    The C++ `build_canonical_to_factorial` builds the matrix
+    `S[n][k]` of Stirling numbers of the second kind, which give
+    the change-of-basis from the canonical basis `x^n` to the
+    factorial basis `x^(k)` (falling factorial):
+
+      x^n = Σ_k S(n,k) * x^(k)
+
+    The C++ uses the standard recurrence:
+      S(0,0) = 1
+      S(n,k) = k * S(n-1,k) + S(n-1,k-1)
+
+    Contract: the recurrence matches the standard combinatorial
+    definition of Stirling numbers of the second kind.
+
+    We define the recurrence in Lean and verify the boundary
+    conditions and the recurrence step. The full combinatorial
+    interpretation (S(n,k) = number of partitions of an n-set
+    into k blocks) and the change-of-basis identity are
+    classical results.
+-/
+
+/-- Stirling numbers of the second kind, defined by the standard
+    recurrence used in the C++ code. -/
+def stirlingSecond : ℕ → ℕ → ℕ
+  | 0,     0     => 1
+  | 0,     _ + 1 => 0
+  | _ + 1, 0     => 0
+  | n + 1, k + 1 => (k + 1) * stirlingSecond n (k + 1) + stirlingSecond n k
+
+/-- Boundary: S(0, 0) = 1. -/
+theorem stirlingSecond_zero_zero : stirlingSecond 0 0 = 1 := rfl
+
+/-- Boundary: S(0, k+1) = 0 (only the empty set has 0 partitions). -/
+theorem stirlingSecond_zero_succ (k : ℕ) : stirlingSecond 0 (k + 1) = 0 := rfl
+
+/-- Boundary: S(n+1, 0) = 0 (a non-empty set has no partitions into 0 blocks). -/
+theorem stirlingSecond_succ_zero (n : ℕ) : stirlingSecond (n + 1) 0 = 0 := rfl
+
+/-- The recurrence: S(n+1, k+1) = (k+1) * S(n, k+1) + S(n, k).
+    This matches the C++ implementation exactly. -/
+theorem stirlingSecond_recurrence (n k : ℕ) :
+    stirlingSecond (n + 1) (k + 1) =
+      (k + 1) * stirlingSecond n (k + 1) + stirlingSecond n k := rfl
+
+/-- Vanishing above the diagonal: S(n, k) = 0 when k > n. -/
+theorem stirlingSecond_zero_of_lt : ∀ n k, n < k → stirlingSecond n k = 0
+  | 0,     0,     h => absurd h (lt_irrefl _)
+  | 0,     _ + 1, _ => rfl
+  | n + 1, 0,     h => absurd h (Nat.not_lt_zero _)
+  | n + 1, k + 1, h => by
+    rw [stirlingSecond_recurrence]
+    have h1 : n < k + 1 := by omega
+    have h2 : n < k := by omega
+    rw [stirlingSecond_zero_of_lt n (k + 1) h1,
+        stirlingSecond_zero_of_lt n k h2]
+    ring
+
+/-- Diagonal: S(n, n) = 1 for all n (only one way to partition
+    an n-set into n singleton blocks). -/
+theorem stirlingSecond_diag : ∀ n, stirlingSecond n n = 1
+  | 0 => rfl
+  | n + 1 => by
+    rw [stirlingSecond_recurrence n n]
+    rw [stirlingSecond_zero_of_lt n (n + 1) (Nat.lt_succ_self n)]
+    rw [stirlingSecond_diag n]
+    ring
+
 end Vanishing

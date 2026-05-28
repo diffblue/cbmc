@@ -77,6 +77,16 @@ using sparse_poly_t = std::map<mono_key_t, mp_integer>;
 /// The canonical→factorial conversion uses: u[k] = sum_n v[n] * S(n,k),
 /// i.e., the conversion matrix is the TRANSPOSE of the Stirling matrix.
 /// We return the transposed matrix directly: result[k][n] = S(n,k).
+// PROOF: formal-proofs/Vanishing.lean::stirlingSecond_recurrence
+//        The recurrence S(n+1, k+1) = (k+1) * S(n, k+1) + S(n, k)
+//        matches the C++ recurrence below exactly.
+// PROOF: formal-proofs/Vanishing.lean::stirlingSecond_zero_zero
+//        Boundary: S(0, 0) = 1.
+// PROOF: formal-proofs/Vanishing.lean::stirlingSecond_zero_of_lt
+//        Vanishing above the diagonal: S(n, k) = 0 when k > n
+//        (matches the matrix being upper-triangular by construction).
+// PROOF: formal-proofs/Vanishing.lean::stirlingSecond_diag
+//        Diagonal entries: S(n, n) = 1.
 static std::vector<std::vector<mp_integer>>
 build_canonical_to_factorial(unsigned d, const mp_integer &mod)
 {
@@ -319,6 +329,18 @@ static polynomialt build_falling_factorial(
   return result;
 }
 
+// PROOF: formal-proofs/Vanishing.lean::zfpCoeff_mul_factorial_divisible
+//        Soundness of the ZFP generator coefficient: 2^d divides
+//        zfpCoeff(d, k) * k!. Combined with the fact that the
+//        falling factorial x^(k) at integer x ∈ [0, 2^d) equals
+//        k! * C(x, k) (or 0 if x < k), this gives 2^d | c_k * x^(k)
+//        for all x ∈ [0, 2^d), i.e., the generated polynomial
+//        vanishes on the bit-vector domain.
+// PROOF: formal-proofs/Vanishing.lean::smarandache_iff_nu2Factorial
+//        Justifies the choice of upper bound max_k = SF(2^d):
+//        for k ≥ SF(2^d), nu2_factorial(k) ≥ d, so c_k = 1
+//        (the factorial alone is divisible). Generators beyond
+//        this provide no new vanishing information.
 std::vector<polynomialt>
 generate_zfp_generators(unsigned d, std::size_t var_idx, unsigned input_width)
 {
