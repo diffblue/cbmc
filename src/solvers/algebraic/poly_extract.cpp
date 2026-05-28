@@ -41,6 +41,15 @@ std::size_t poly_extractort::get_var_index(const irep_idt &name)
   return it->second;
 }
 
+// PROOF: formal-proofs/Encoding.lean::toPolynomial_eval
+//        Faithfulness: for the subset of CBMC expressions
+//        modelled as BVExpr (constants, variables, +, -, *, neg),
+//        the encoded polynomial evaluates to the same value as
+//        the original expression at any bit-vector environment.
+//        Specifically: MvPolynomial.eval env (toPolynomial e) =
+//        BVExpr.eval env e (in ZMod(2^d)). The C++ recursion on
+//        e.id() (constant, symbol, plus, minus, mult, etc.)
+//        directly mirrors the Lean inductive definition.
 std::optional<polynomialt> poly_extractort::to_polynomial(const exprt &e)
 {
   if(!set_bitwidth(e.type()))
@@ -374,6 +383,15 @@ std::optional<polynomialt> poly_extractort::to_polynomial(const exprt &e)
   return std::nullopt;
 }
 
+// PROOF: formal-proofs/Encoding.lean::extract_equation_iff
+//        Faithfulness: the equation lhs = rhs holds at env iff
+//        the polynomial (toPolynomial lhs - toPolynomial rhs)
+//        evaluates to 0 at env. This bridges bit-vector
+//        equational reasoning to polynomial root-finding.
+// PROOF: formal-proofs/Encoding.lean::encodeEquations_satisfiable_iff
+//        Soundness of system encoding: a set of equations is
+//        simultaneously satisfiable iff the encoded polynomial
+//        system has a common root.
 std::optional<polynomialt> poly_extractort::extract_equation(const exprt &eq)
 {
   if(eq.id() != ID_equal || eq.operands().size() != 2)

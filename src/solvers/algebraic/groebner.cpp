@@ -40,6 +40,15 @@ bool strong_groebner_basist::has_constant(
   return false;
 }
 
+// PROOF: formal-proofs/BuchbergerCorrectness.lean::s_poly_in_ideal
+//        Soundness: any linear combination a*f - b*g of two
+//        polynomials f, g in an ideal I is again in I. The
+//        S-polynomial here is the specific combination
+//        (lcm(LM(f), LM(g)) / LM(f)) * f - (lcm(LM(f), LM(g)) / LM(g)) * g
+//        (with appropriate coefficient handling for ZMod(2^bw)).
+//        polynomialt represents an element of MvPolynomial(Fin n,
+//        ZMod (2^bw)), a commutative ring, so the abstract theorem
+//        applies directly.
 polynomialt
 strong_groebner_basist::s_polynomial(const polynomialt &f, const polynomialt &g)
 {
@@ -98,6 +107,18 @@ strong_groebner_basist::s_polynomial(const polynomialt &f, const polynomialt &g)
   return result;
 }
 
+// PROOF: formal-proofs/BuchbergerCorrectness.lean::reduce_in_ideal
+//        Soundness: each reduction step h ↦ h - q*g preserves
+//        ideal membership when g is in the ideal. The strong
+//        reduction below performs a sequence of such steps,
+//        each of which preserves Ideal.span(basis).
+// PROOF: formal-proofs/BuchbergerCorrectness.lean::scale_in_ideal
+//        Soundness of the 2-trick: multiplying by a scalar
+//        preserves ideal membership (the inner if-block that
+//        multiplies r by 2^(d-v_r) when no reduction succeeded).
+// PROOF: formal-proofs/StrongGB.lean::two_trick_preserves_ideal
+//        Specific instance for ZMod(2^d): multiplying by 2^k
+//        preserves ideal membership.
 polynomialt strong_groebner_basist::strong_reduce(
   const polynomialt &f,
   const std::vector<polynomialt> &basis)
@@ -469,6 +490,14 @@ std::map<std::size_t, mp_integer> strong_groebner_basist::extract_candidate(
   return assignment;
 }
 
+// PROOF: formal-proofs/BuchbergerCorrectness.lean::reduce_in_ideal
+//        Soundness: reducing f by basis yields f' = f - q where
+//        q is in Ideal.span(basis). Hence f - f' is in the span,
+//        i.e., f and f' are in the same coset modulo the span.
+//        Crucial consequence used at the call site (boolbv.cpp::
+//        try_algebraic_solve): if reduce_by_basis returns 0,
+//        then f itself is in Ideal.span(basis), i.e., the
+//        equation f = 0 follows algebraically from the basis.
 polynomialt strong_groebner_basist::reduce_by_basis(
   const polynomialt &f,
   const std::vector<polynomialt> &basis,
