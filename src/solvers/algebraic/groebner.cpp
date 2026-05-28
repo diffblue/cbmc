@@ -5,6 +5,19 @@
 
 #include <set>
 
+// PROOF: formal-proofs/GroebnerSoundness.lean::ZMod.isUnit_of_odd_nat
+//        Soundness: an odd natural number is a unit in Z_{2^d}.
+// PROOF: formal-proofs/GroebnerSoundness.lean::ideal_eq_top_of_unit_mem
+//        Soundness: a unit in an ideal forces the ideal to equal
+//        the whole ring.
+// PROOF: formal-proofs/GroebnerSoundness.lean::ZMod.two_not_isUnit
+//        Soundness: 2 is not a unit in Z_{2^d}, so even nonzero
+//        constants do NOT trigger UNSAT (we correctly return
+//        false for them in has_constant).
+// PROOF: formal-proofs/GroebnerSoundness.lean::soundness_of_odd_constant_check
+//        Top-level soundness theorem for this exact predicate:
+//        if an odd constant c is in the ideal, the ideal is the
+//        whole ring, hence the polynomial system is unsatisfiable.
 bool strong_groebner_basist::has_constant(
   const std::vector<polynomialt> &basis) const
 {
@@ -15,12 +28,10 @@ bool strong_groebner_basist::has_constant(
       // In Z_{2^d}, an element is a unit iff it is odd (coprime to 2^d).
       // If an odd constant c is in the ideal I, then c^{-1} * c = 1 ∈ I,
       // so I = Z_{2^d}[x] (the whole ring), meaning the polynomial system
-      // has no solution. This is formally verified in GroebnerSoundness.lean
-      // (theorems ZMod.isUnit_of_odd_nat and ideal_eq_top_of_unit_mem).
+      // has no solution.
       //
       // Even nonzero constants (e.g., 2) are NON-units in Z_{2^d}, so we
-      // correctly return false for them. This is verified in
-      // ZMod.two_not_isUnit (GroebnerSoundness.lean).
+      // correctly return false for them.
       mp_integer c = p.terms.front().first;
       if(c % 2 != 0)
         return true;
@@ -218,6 +229,21 @@ strong_groebner_basist::compute(std::vector<polynomialt> &polys)
 
   // Apply Frobenius to all input polynomials so the initial basis
   // is already idempotency-reduced.
+  // PROOF: formal-proofs/Re4.lean::all_idempotent_to_bool
+  //        For bit_vars constrained by b_i^2 = b_i (idempotency),
+  //        every assignment satisfying the constraints lies in
+  //        {0,1}^k. This justifies treating bit_vars as Boolean.
+  // PROOF: formal-proofs/StrongGB.lean::sq_eq_self_of_zmod_two_pow
+  //        In Z_{2^d}, x^2 = x implies x in {0, 1} -- the
+  //        ring-level fact that powers idempotency to Boolean
+  //        even in the presence of zero divisors.
+  // PROOF: formal-proofs/StrongGB.lean::d_eq_one_completeness
+  //        Positive partial completeness: for d=1 (i.e., over
+  //        GF(2)) with idempotency on each variable, the
+  //        algorithm IS complete. So on Boolean-only inputs
+  //        compute() will not return UNKNOWN due to the
+  //        completeness gap (it may still return UNKNOWN if
+  //        max_steps is exhausted).
   if(!bit_vars.empty())
   {
     for(auto &p : polys)

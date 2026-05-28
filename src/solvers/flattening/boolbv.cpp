@@ -777,6 +777,14 @@ boolbvt::offset_mapt boolbvt::build_offset_map(const struct_typet &src)
 //        (defer_finish_eq_eager_finish, finish_eager_commutes)
 //        reflecting the implementation invariants below.
 //        See finish_eager_conversion in boolbv.h for the call site.
+// PROOF: formal-proofs/Defer.lean::defer_verdict_equivalence
+//        Corollary: not just states but verdicts (SAT/UNSAT
+//        decisions) agree between deferred and eager paths.
+//        This is what users actually observe.
+// PROOF: formal-proofs/Defer.lean::defer_verdict_from_empty
+//        Corollary: starting from the empty solver state, the
+//        deferred-then-replayed verdict equals the eager verdict.
+//        This matches the actual call pattern in the implementation.
 // PROOF: formal-proofs/StrongGB.lean::two_trick_unsat_sound
 //        Soundness: when this function returns true, the SAT
 //        propagator has been forced to UNSAT via the algebraic

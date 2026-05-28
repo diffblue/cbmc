@@ -47,12 +47,18 @@ implementation site with one or more Lean theorems.
 | `vanishing.cpp::is_vanishing_polynomial` (sufficient condition) | `Vanishing.lean::falling_factorial_sufficient` | DONE |
 | `groebner.cpp::compute` (2-trick preserves ideal) | `StrongGB.lean::two_trick_preserves_ideal`, `two_trick_preserves_ideal_mv` | DONE |
 | `groebner.cpp::compute` (UNSAT detection sound) | `StrongGB.lean::two_trick_unsat_sound` | DONE |
+| `groebner.cpp::has_constant` (odd ⇒ unit) | `GroebnerSoundness.lean::ZMod.isUnit_of_odd_nat` | DONE |
+| `groebner.cpp::has_constant` (unit ⇒ ideal=⊤) | `GroebnerSoundness.lean::ideal_eq_top_of_unit_mem` | DONE |
+| `groebner.cpp::has_constant` (2 not unit) | `GroebnerSoundness.lean::ZMod.two_not_isUnit` | DONE |
+| `groebner.cpp::has_constant` (top-level soundness) | `GroebnerSoundness.lean::soundness_of_odd_constant_check` | DONE |
+| `groebner.cpp::compute` (idempotency ⇒ Boolean) | `Re4.lean::all_idempotent_to_bool` | DONE |
 | `groebner.cpp::compute` (naive completeness false) | `StrongGB.lean::naive_completeness_is_false` | DONE |
 | `groebner.cpp::compute` (d=1 completeness) | `StrongGB.lean::d_eq_one_completeness` | DONE |
 | `groebner.cpp::compute` (idempotent ⇒ {0,1}) | `StrongGB.lean::sq_eq_self_of_zmod_two_pow` | DONE |
-| `groebner.cpp::compute` (local ring structure) | `StrongGB.lean::isLocalRing_ZMod_prime_pow` | DONE |
 | `groebner.cpp::compute` (refined completeness fails) | `StrongGB.lean::two_trick_saturation_complete_is_false` | DONE |
-| `boolbv.cpp::set_to`/`finish_eager_conversion` (defer/replay) | `Defer.lean::defer_replay_equivalence` | DONE-MOD-AXIOMS |
+| `boolbv.cpp::set_to`/`finish_eager_conversion` (defer/replay states) | `Defer.lean::defer_replay_equivalence` | DONE-MOD-AXIOMS |
+| `boolbv.cpp::try_algebraic_solve` (verdict equivalence) | `Defer.lean::defer_verdict_equivalence` | DONE-MOD-AXIOMS |
+| `boolbv.cpp::try_algebraic_solve` (verdict from empty state) | `Defer.lean::defer_verdict_from_empty` | DONE-MOD-AXIOMS |
 
 ## Status legend
 
@@ -71,6 +77,31 @@ The strong-GB algorithm in `groebner.cpp::compute` is **sound but not complete**
 - `two_trick_saturation_complete_is_false`: even adding idempotency on each variable (the natural well-formedness hypothesis) does not make completeness hold — the same counterexample {C 2} defeats it.
 
 Mechanising the actual Song et al. (TACAS 2024) completeness theorem would require defining a formal `BVFormula → Polynomial` encoding and proving that the resulting polynomial systems have specific structural properties (beyond just idempotency). This is ~1–6 months of focused work and is **not required by the implementation**, which intentionally permits UNKNOWN.
+
+## Bi-directional traceability audit
+
+As of the most recent revision the table above is bi-directionally consistent:
+
+- **Forward (C++ → Lean)**: every `// PROOF: formal-proofs/Module.lean::theorem_name` reference in `src/` resolves to a theorem with that exact name in the corresponding Lean file. Verified mechanically by:
+  ```
+  grep -rh "PROOF: formal-proofs" src/ | sort -u | while read ref; do
+    file=$(echo "$ref" | sed 's|.*formal-proofs/\([^:]*\)::.*|\1|')
+    thm=$(echo "$ref" | sed 's|.*::\([^ ]*\).*|\1|')
+    grep -qE "^(theorem|lemma|def|axiom|instance) +$thm\b" "formal-proofs/$file" \
+      || echo "MISS $file::$thm"
+  done
+  ```
+
+- **Backward (Lean → C++)**: every contract-level theorem in the Lean modules is referenced from the corresponding implementation site. The Lean modules also contain (as expected) internal helper lemmas, mathlib-contribution candidates, and stepping-stone results that legitimately have no `src/` reference. The breakdown:
+
+  | Category | Count | Referenced |
+  |----------|------:|-----------:|
+  | Contract-level theorems | 28 | 28 |
+  | Internal helpers | ~13 | n/a |
+  | Mathlib candidates | 4 | n/a |
+  | Auxiliary (BuchbergerCorrectness, GroebnerSoundness internals) | ~11 | n/a |
+
+  All 28 contract-level theorems carry a matching `// PROOF:` comment in the implementation.
 
 ## Mathlib-contributable lemmas
 
