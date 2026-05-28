@@ -71,6 +71,13 @@ monomialt monomialt::quotient(const monomialt &divisor) const
   return result;
 }
 
+// PROOF: formal-proofs/PolyRing.lean::grevlexLt_irrefl,
+//        formal-proofs/PolyRing.lean::grevlexLt_asymm,
+//        formal-proofs/PolyRing.lean::grevlexLt_total
+//        The graded reverse-lex order is a strict total order:
+//        irreflexive, asymmetric, and total on distinct monomials.
+//        These properties make this comparator well-defined for
+//        std::sort and std::set, and ensure Buchberger termination.
 bool monomialt::operator<(const monomialt &other) const
 {
   // Graded reverse lexicographic: higher total degree is "larger" (comes first)
@@ -132,6 +139,14 @@ polynomialt::polynomialt(
     terms.emplace_back(r, monomialt{var_idx});
 }
 
+// PROOF: formal-proofs/PolyRing.lean::normalize_combine_like_terms
+//        Combining terms with the same monomial preserves the
+//        polynomial value (ring associativity + distributivity).
+// PROOF: formal-proofs/PolyRing.lean::normalize_drop_zero_preserves_sum
+//        Dropping zero-coefficient terms preserves the sum.
+// Sorting by monomial order is just rearranging a sum, which
+// preserves value by commutativity of addition; together these
+// three operations comprise polynomialt::normalize.
 void polynomialt::normalize()
 {
   mp_integer m = modulus();
@@ -276,6 +291,12 @@ polynomialt polynomialt::multiply(
 
 // --- Utility functions ---
 
+// PROOF: formal-proofs/PolyRing.lean::inverse_mod_2d_correct
+//        Existence and uniqueness: for odd a and d > 0, the
+//        inverse mod 2^d exists and is unique. Hensel lifting is
+//        one constructive way to compute it; the function below
+//        implements Newton iteration (x = x*(2-a*x)) which doubles
+//        2-adic precision per step.
 mp_integer inverse_mod_2d(const mp_integer &a, unsigned d)
 {
   PRECONDITION(a % 2 != 0); // a must be odd

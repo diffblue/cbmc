@@ -28,6 +28,12 @@ static unsigned nu2(const mp_integer &n)
 }
 
 /// SF(2^m): smallest k such that 2^m divides k!
+// PROOF: formal-proofs/Vanishing.lean::smarandache_exists
+//        Existence: such a k exists (e.g., k = 2^m works).
+// PROOF: formal-proofs/Vanishing.lean::smarandache_iff_nu2Factorial
+//        Characterisation: 2^m ∣ k! iff m ≤ nu2Factorial k. The
+//        loop here returns the smallest k satisfying this, which
+//        is the Smarandache function value SF(2^m).
 static unsigned smarandache_function(unsigned m)
 {
   unsigned val = 0;
@@ -40,6 +46,12 @@ static unsigned smarandache_function(unsigned m)
 }
 
 /// nu2(k!)
+// PROOF: formal-proofs/Vanishing.lean::nu2Factorial_eq_padicVal
+//        Equals padicValNat 2 (k!), the standard 2-adic valuation
+//        of the factorial. The iterative sum implementation here
+//        matches the formal definition by induction (multiplicativity
+//        of padic valuation: padicValNat 2 (a*b) = padicValNat 2 a +
+//        padicValNat 2 b).
 static unsigned nu2_factorial(unsigned k)
 {
   unsigned val = 0;

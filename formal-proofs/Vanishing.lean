@@ -38,7 +38,8 @@
 
 import Re4
 import Mathlib.Data.ZMod.Basic
-import Mathlib.Data.Polynomial.Basic
+import Mathlib.Algebra.Polynomial.Basic
+import Mathlib.NumberTheory.Padics.PadicVal.Basic
 import Mathlib.Tactic
 
 namespace Vanishing
@@ -103,5 +104,73 @@ theorem falling_factorial_sufficient
   rw [hreduce]
   rw [fallingFactorial_zero_of_lt x n hx]
   ring
+
+/-! ## (3) `nu2` and `nu2_factorial` correctness
+
+    The C++ helpers in `vanishing.cpp`:
+      `nu2(n)` = 2-adic valuation of `n` (with convention `nu2(0) = 999`).
+      `nu2_factorial(k)` = Σ_{i=1}^k nu2(i).
+
+    Contract for `nu2_factorial`: equals `nu2(k!)`. This holds because
+    `nu2` is additive on multiplication (a fundamental property of
+    p-adic valuations), so `nu2(1·2·…·k) = nu2(1) + nu2(2) + … + nu2(k)`.
+-/
+
+/-- 2-adic valuation as defined in the C++ (returns 0 for n=1, etc.).
+    For n ≥ 1, equals the largest k with 2^k ∣ n. -/
+def nu2 : ℕ → ℕ
+  | 0 => 0  -- in C++ this is 999 (sentinel); for the lemma we use 0
+  | (n + 1) => padicValNat 2 (n + 1)
+
+/-- Iterative sum mirroring the C++ implementation. -/
+def nu2Factorial : ℕ → ℕ
+  | 0 => 0
+  | (k + 1) => nu2Factorial k + nu2 (k + 1)
+
+/-- Correctness: `nu2Factorial k = padicValNat 2 (k!)`.
+    This connects the iterative C++ computation to the standard
+    p-adic valuation of k!. -/
+theorem nu2Factorial_eq_padicVal (k : ℕ) :
+    nu2Factorial k = padicValNat 2 (Nat.factorial k) := by
+  haveI : Fact (Nat.Prime 2) := ⟨by norm_num⟩
+  induction k with
+  | zero => simp [nu2Factorial, Nat.factorial, padicValNat.one]
+  | succ n ih =>
+    have hfact : (Nat.factorial n) ≠ 0 := Nat.factorial_pos n |>.ne'
+    have hsucc : (n + 1 : ℕ) ≠ 0 := Nat.succ_ne_zero n
+    rw [nu2Factorial]
+    have hfact_eq : (n + 1).factorial = (n + 1) * n.factorial := rfl
+    rw [hfact_eq, padicValNat.mul hsucc hfact, ih]
+    -- Goal: padicValNat 2 n.factorial + nu2 (n + 1) =
+    --       padicValNat 2 (n + 1) + padicValNat 2 n.factorial
+    simp only [nu2]
+    ring
+
+/-! ## (4) `smarandache_function` correctness
+
+    The C++ `smarandache_function(m)` returns the smallest `k`
+    such that `2^m ∣ k!`. By construction (loop accumulates
+    `nu2(i)` until reaching `m`), this is the smallest `k` with
+    `nu2_factorial(k) ≥ m`, equivalently the smallest `k` with
+    `padicValNat 2 (k!) ≥ m`, equivalently `2^m ∣ k!`.
+
+    Contract: result `k = smarandacheFunction m` satisfies
+    `2^m ∣ k!` and `k` is minimal with this property.
+-/
+
+/-- The smallest `k` such that `2^m ∣ k!` exists. -/
+theorem smarandache_exists (m : ℕ) : ∃ k : ℕ, 2 ^ m ∣ Nat.factorial k := by
+  -- Witness: k = 2^m. Then 2^m | (2^m)! since 2^m is a factor.
+  refine ⟨2 ^ m, ?_⟩
+  have h_pos : 0 < 2 ^ m := Nat.one_le_iff_ne_zero.mpr (Nat.pow_eq_zero.not.mpr (by simp))
+  exact Nat.dvd_factorial h_pos (Nat.le_refl _)
+
+/-- Equivalent formulation: smallest k with `nu2Factorial k ≥ m`. -/
+theorem smarandache_iff_nu2Factorial (m k : ℕ) :
+    2 ^ m ∣ Nat.factorial k ↔ m ≤ nu2Factorial k := by
+  haveI : Fact (Nat.Prime 2) := ⟨by norm_num⟩
+  rw [nu2Factorial_eq_padicVal]
+  have hk_ne : (Nat.factorial k) ≠ 0 := Nat.factorial_pos k |>.ne'
+  exact padicValNat_dvd_iff_le hk_ne
 
 end Vanishing
