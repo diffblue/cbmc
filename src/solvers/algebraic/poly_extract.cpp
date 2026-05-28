@@ -392,10 +392,10 @@ std::optional<polynomialt> poly_extractort::extract_equation(const exprt &eq)
 
 // PROOF: formal-proofs/BitAlignment.lean::scalar_alignment_low_bits_zero
 //        Soundness of the b_(h,i) -> 0 substitutions for i < k
-//        when h = 2^k * x in Z_(2^d) (PARTIAL).
+//        when h = 2^k * x in Z_(2^d).
 // PROOF: formal-proofs/BitAlignment.lean::scalar_alignment_shifted_bits
 //        Soundness of the b_(h,i+k) -> b_(x,i) substitutions
-//        for i + k < d (PARTIAL).
+//        for i + k < d.
 std::vector<polynomialt> poly_extractort::materialise_bit_alignments(
   const std::vector<polynomialt> &equations)
 {
@@ -530,13 +530,14 @@ std::vector<polynomialt> poly_extractort::materialise_bit_alignments(
 //        the bits b_(x,k)..b_(x,d-1) are all zero, justifying the
 //        substitution registered in additional_substitutions.
 // PROOF: formal-proofs/SubgoalSix.lean::bvuge_2d_minus_2k_implies_high_bits_one
-//        Soundness of try_lower_bound's MSB-on shortcut (PARTIAL).
+//        Soundness of try_lower_bound's MSB-on shortcut: if
+//        2^d - 2^k <= x.val, the bits b_(x,k)..b_(x,d-1) are all one.
 // PROOF: formal-proofs/SubgoalSix.lean::chainLt_correctness
 //        Boolean-level statement of the bit-comparator chain
 //        encoding (STATEMENT-ONLY).
 // PROOF: formal-proofs/SubgoalSix.lean::bvslt_via_xor_msb
 //        Soundness of the signed -> unsigned XOR transformation
-//        for bvslt/bvsle (PARTIAL).
+//        for bvslt/bvsle.
 std::optional<std::vector<polynomialt>>
 poly_extractort::extract_predicate(const exprt &pred, bool value)
 {

@@ -1981,16 +1981,29 @@ covers the following modules:
   (\emph{i}) the constant power-of-2 upper bound: if
   $x.\mathit{val} < 2^k$ then bits $k..d-1$ of $x$ are zero
   (justifying the substitution emitted by
-  \texttt{try\_upper\_bound}); the lower-bound symmetric
-  ($N = 2^d - 2^k$) statement and the bvslt-via-XOR equivalence
-  are stated and partially mechanised (informal arguments are
-  given inline in the docstrings).
+  \texttt{try\_upper\_bound});
+  (\emph{ii}) the symmetric lower-bound case: if $x.\mathit{val} \ge 2^d - 2^k$
+  then bits $k..d-1$ of $x$ are all one (justifying \texttt{try\_lower\_bound}'s
+  MSB-on shortcut), proven by contradiction via bit-position
+  decomposition;
+  (\emph{iii}) the signed-via-XOR transformation: under the map
+  $x \mapsto (x + 2^{d-1}) \bmod 2^d$, the signed comparison
+  $\mathit{signedVal}\,a < \mathit{signedVal}\,b$ becomes the unsigned
+  comparison $(a + 2^{d-1}).\mathit{val} < (b + 2^{d-1}).\mathit{val}$,
+  proven by case analysis on whether $x.\mathit{val} < 2^{d-1}$. All
+  three with zero \texttt{sorry}. The bit-comparator chain
+  encoding (\texttt{chainLt}) is captured at the value level
+  (statement-only) — the recurrence-vs-chain soundness is
+  textbook material and is left for follow-on work.
 
 \item \textbf{Bit-alignment soundness} (\texttt{BitAlignment.lean}):
   for the substitutions emitted by \texttt{materialise\_bit\_alignments},
-  we state and partially mechanise that $h = 2^k \cdot x$ in
-  $\mathbb{Z}_{2^d}$ implies bits $0..k-1$ of $h$ are zero and
-  bit $i+k$ of $h$ equals bit $i$ of $x$ for $i + k < d$.
+  we prove that $h = 2^k \cdot x$ in $\mathbb{Z}_{2^d}$ implies
+  bits $0..k-1$ of $h$ are zero and bit $i+k$ of $h$ equals bit
+  $i$ of $x$ for $i + k < d$. The proofs reduce to
+  \texttt{Nat.testBit\_mod\_two\_pow} +
+  \texttt{Nat.testBit\_mul\_pow\_two} (the latter from Lean
+  core); both with zero \texttt{sorry}.
 
 \item \textbf{Vanishing polynomial test soundness}
   (\texttt{Vanishing.lean}): we prove that the falling factorial
@@ -2018,17 +2031,17 @@ covers the following modules:
 \paragraph{Traceability.} Each Lean theorem carries an
 \texttt{IMPL:} comment naming the source-file site whose soundness
 it witnesses; each implementation site carries a \texttt{PROOF:}
-comment naming the Lean theorem(s) that justify it, with status
-indicator (\textsc{done}, \textsc{partial}, or
-\textsc{statement-only}). The full mapping is in
+comment naming the Lean theorem(s) that justify it (with a
+\textsc{statement-only} marker for the three entries whose
+proofs are not yet fully mechanised). The full mapping is in
 \texttt{formal-proofs/TRACEABILITY.md}.
 
-\paragraph{Status summary.} Out of 16 mapping entries: 9 are fully
-mechanised (zero \texttt{sorry}); 4 have complete statements with
-informal arguments and an admitted proof; 3 are
-statement-only (the Lean definition exists; the encoding
-correctness theorem requires more infrastructure). All modules
-build cleanly with mathlib v4.18.0; CI integration is straightforward.
+\paragraph{Status summary.} Out of 16 mapping entries: 13 are fully
+mechanised (zero \texttt{sorry}); 3 are statement-only (a Lean
+definition or trivial unfolding exists; the full encoding
+correctness or operational-semantics formalisation is left for
+follow-on work). All modules build cleanly with mathlib v4.18.0; CI
+integration is straightforward.
 
 
 \section{Related Work}
