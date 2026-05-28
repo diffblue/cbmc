@@ -1937,22 +1937,98 @@ usefully.
 \section{Mechanised Soundness Proofs}
 \label{sec:lean4}
 
-We verified the soundness of the Gr\"obner basis solver with 25
-theorems in Lean~4 (Lean 4.18.0, Mathlib v4.18.0), covering:
+We verified the soundness of the algebraic Gr\"obner-basis solver
+in Lean~4 (Lean 4.18.0, Mathlib v4.18.0), with bi-directional
+traceability between the implementation and the proofs (recorded
+in \texttt{formal-proofs/TRACEABILITY.md}). The mechanisation
+covers the following modules:
 
 \begin{enumerate}
-\item \textbf{Unit characterisation in $\mathbb{Z}_{2^d}$}: odd
-  elements are units (coprime to $2^d$); 2 is not a unit for
-  $d \geq 1$. (Submitted to Mathlib as PR \#38628.)
-\item \textbf{Ideal preservation}: S-polynomial computation and
-  polynomial reduction preserve ideal membership.
-\item \textbf{Rabinowitsch soundness}: unit in ideal $\Rightarrow$
+
+\item \textbf{Unit characterisation in $\mathbb{Z}_{2^d}$}
+  (\texttt{GroebnerSoundness.lean}): odd elements are units
+  (coprime to $2^d$); 2 is not a unit for $d \geq 1$. (Submitted
+  to Mathlib as PR \#38628.)
+
+\item \textbf{Ideal preservation}
+  (\texttt{BuchbergerCorrectness.lean}): S-polynomial computation
+  and polynomial reduction preserve ideal membership; the basis
+  $G$ produced by the algorithm satisfies $\langle G \rangle =
+  \langle F \rangle$ for input $F$.
+
+\item \textbf{Rabinowitsch soundness}
+  (\texttt{GroebnerSoundness.lean}): unit in ideal $\Rightarrow$
   no solution, via ring homomorphism to a nontrivial ring.
-\item \textbf{Buchberger termination}: ascending chain condition
-  in Noetherian rings guarantees termination.
+
+\item \textbf{Buchberger termination}
+  (\texttt{BuchbergerTermination.lean}): the ascending chain
+  condition in Noetherian rings guarantees termination.
+
+\item \textbf{Bit-decomposition soundness} (\texttt{Re4.lean}):
+  the encoding emitted by \texttt{decompose\_bits} is sound. We
+  prove (\emph{i}) that idempotency $b \cdot b = b$ in
+  $\mathbb{Z}_{2^d}$ forces $b \in \{0, 1\}$; (\emph{ii}) the
+  Frobenius identity $b^k = b$ for any idempotent $b$ and
+  $k \geq 1$, justifying the exponent-clamping inside
+  \texttt{polynomialt::multiply}; (\emph{iii}) that the standard
+  binary expansion $\sum_i 2^i \,b_i = x$ satisfies the
+  sum-decomposition equation. All three with zero
+  \texttt{sorry}.
+
+\item \textbf{Sub-goal 6 (universal-relational) encoding
+  soundness} (\texttt{SubgoalSix.lean}): for the encoding
+  strategies in \texttt{extract\_predicate}, we prove
+  (\emph{i}) the constant power-of-2 upper bound: if
+  $x.\mathit{val} < 2^k$ then bits $k..d-1$ of $x$ are zero
+  (justifying the substitution emitted by
+  \texttt{try\_upper\_bound}); the lower-bound symmetric
+  ($N = 2^d - 2^k$) statement and the bvslt-via-XOR equivalence
+  are stated and partially mechanised (informal arguments are
+  given inline in the docstrings).
+
+\item \textbf{Bit-alignment soundness} (\texttt{BitAlignment.lean}):
+  for the substitutions emitted by \texttt{materialise\_bit\_alignments},
+  we state and partially mechanise that $h = 2^k \cdot x$ in
+  $\mathbb{Z}_{2^d}$ implies bits $0..k-1$ of $h$ are zero and
+  bit $i+k$ of $h$ equals bit $i$ of $x$ for $i + k < d$.
+
+\item \textbf{Vanishing polynomial test soundness}
+  (\texttt{Vanishing.lean}): we prove that the falling factorial
+  $(x)_n$ is zero on every $x \in [0, n)$, and that a polynomial
+  reducing to zero modulo the falling factorial vanishes on the
+  same range. Both with zero \texttt{sorry}.
+
+\item \textbf{Strong Gr\"obner basis 2-trick saturation}
+  (\texttt{StrongGB.lean}): we prove that scalar multiplication
+  preserves ideal membership (the 2-trick is sound), and re-export
+  the existing soundness chain (odd constant in basis
+  $\Rightarrow$ ideal $= \top \Rightarrow$ original system UNSAT).
+  Saturation completeness on the universal-equational class is
+  stated; full mechanisation is deferred.
+
+\item \textbf{Deferred bit-blasting equivalence}
+  (\texttt{Defer.lean}): the deferral mechanism in
+  \texttt{boolbv.cpp::set\_to} / \texttt{finish\_eager\_conversion}
+  is semantically equivalent to the eager path. Stated as a
+  meta-property (informal soundness argument inline in the
+  module's docstrings).
+
 \end{enumerate}
 
-All proofs compile with zero \texttt{sorry}.
+\paragraph{Traceability.} Each Lean theorem carries an
+\texttt{IMPL:} comment naming the source-file site whose soundness
+it witnesses; each implementation site carries a \texttt{PROOF:}
+comment naming the Lean theorem(s) that justify it, with status
+indicator (\textsc{done}, \textsc{partial}, or
+\textsc{statement-only}). The full mapping is in
+\texttt{formal-proofs/TRACEABILITY.md}.
+
+\paragraph{Status summary.} Out of 16 mapping entries: 9 are fully
+mechanised (zero \texttt{sorry}); 4 have complete statements with
+informal arguments and an admitted proof; 3 are
+statement-only (the Lean definition exists; the encoding
+correctness theorem requires more infrastructure). All modules
+build cleanly with mathlib v4.18.0; CI integration is straightforward.
 
 
 \section{Related Work}
