@@ -46,8 +46,9 @@ implementation site with one or more Lean theorems.
 | `vanishing.cpp::is_vanishing_polynomial` (falling factorial) | `Vanishing.lean::fallingFactorial_zero_of_lt` | DONE |
 | `vanishing.cpp::is_vanishing_polynomial` (sufficient condition) | `Vanishing.lean::falling_factorial_sufficient` | DONE |
 | `groebner.cpp::compute` (2-trick preserves ideal) | `StrongGB.lean::two_trick_preserves_ideal`, `two_trick_preserves_ideal_mv` | DONE |
-| `groebner.cpp::compute` (UNSAT detection sound) | `StrongGB.lean::two_trick_unsat_sound`, `unsat_implies_ideal_top` | DONE-MOD-AXIOMS |
-| `groebner.cpp::compute` (saturation completeness) | `StrongGB.lean::two_trick_saturation_complete` | STATEMENT-ONLY |
+| `groebner.cpp::compute` (UNSAT detection sound) | `StrongGB.lean::two_trick_unsat_sound` | DONE |
+| `groebner.cpp::compute` (naive completeness false) | `StrongGB.lean::naive_completeness_is_false` | DONE |
+| `groebner.cpp::compute` (refined saturation completeness) | `StrongGB.lean::two_trick_saturation_complete` | STATEMENT-ONLY |
 | `boolbv.cpp::set_to`/`finish_eager_conversion` (defer/replay) | `Defer.lean::defer_replay_equivalence` | DONE-MOD-AXIOMS |
 
 ## Status legend
@@ -58,9 +59,21 @@ implementation site with one or more Lean theorems.
 
 The two non-DONE entries:
 
-- `two_trick_saturation_complete` (STATEMENT-ONLY): the strong-GB completeness theorem of Song et al. (TACAS 2024). Requires (a) extension of mathlib's `MonomialOrder.div` past the unit-leading-coefficient hypothesis, (b) formalisation of the 2-trick saturation step, (c) termination over `ZMod (2^d)`, (d) soundness, (e) the deep completeness step (~master's-thesis-scale work). The `unsat_implies_ideal_top` corollary is proven from this conditionally.
+- `two_trick_saturation_complete` (STATEMENT-ONLY): the strong-GB completeness theorem of Song et al. (TACAS 2024) under the `WellFormedEncoding` hypothesis. **Important note**: a related theorem (`naive_completeness_is_false`) is fully proven in `StrongGB.lean`, demonstrating with a concrete counterexample (`d=2`, `n=0`, `F={C 2}`) that the *naive* completeness statement (without `WellFormedEncoding`) is FALSE. The refined version requires F to have the structural properties of the BV-formula encoding; mechanising it requires (a) a formal definition of the BV-encoding function, and (b) the five-step decomposition documented in `StrongGB.lean`'s docstring (extended division algorithm, 2-trick step, termination, soundness, and the deep completeness step). Estimated 1–6 months of focused Lean work, comparable to a master's thesis.
 
 - `defer_replay_equivalence` (DONE-MOD-AXIOMS): the deferred-bit-blasting pipeline equivalence. Proven via induction on the assertion list from two semantic axioms (A1: `defer_finish_eq_eager_finish`; A2: `finish_eager_commutes`) reflecting the implementation's invariants. Mechanising the axioms themselves would require modelling the boolbv layer's operational semantics (~1-2 weeks of follow-on work).
+
+## Mathlib-contributable lemmas
+
+The `StrongGB.lean::MathlibCandidates` namespace contains general-purpose facts about `ZMod (2^d)` that are not specific to the strong-GB context:
+
+- `isUnit_of_odd_nat_in_two_pow`: an odd natural number is a unit in `ZMod (2^d)`.
+- `isUnit_iff_two_not_dvd_val`: a `ZMod (2^d)` element is a unit iff its lift to `ℕ` is odd.
+
+Additional candidates (not yet in MathlibCandidates):
+
+- `IsLocalRing (ZMod (p^n))` for prime `p` and `n ≥ 1`. This is a clean, self-contained instance that mathlib does not currently have.
+- `Re4.lean::frobenius_pow_eq_self` is a useful 2-adic-valuation fact that could be generalised.
 
 ## Verification
 

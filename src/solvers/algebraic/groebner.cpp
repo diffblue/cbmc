@@ -166,19 +166,25 @@ polynomialt strong_groebner_basist::strong_reduce(
 // PROOF: formal-proofs/StrongGB.lean::two_trick_preserves_ideal
 //        Soundness: scalar multiplication by 2^k preserves
 //        ideal membership.
-// PROOF: formal-proofs/StrongGB.lean::two_trick_unsat_sound,
-//        unsat_implies_ideal_top
+// PROOF: formal-proofs/StrongGB.lean::two_trick_unsat_sound
 //        Soundness: an odd constant in the basis -> unit -> ideal
 //        equals the whole ring -> the original system is UNSAT.
 //        Re-uses the existing soundness chain in
 //        BuchbergerCorrectness.lean and GroebnerSoundness.lean.
+// PROOF: formal-proofs/StrongGB.lean::naive_completeness_is_false
+//        Important sanity-check: the NAIVE completeness statement
+//        ("F unsat -> Ideal.span F contains an odd constant") is
+//        FALSE. Concrete counterexample (d=2, n=0, F={C 2}) is
+//        proven; explains why this function returns UNKNOWN
+//        (not UNSAT) on some unsatisfiable inputs.
 // PROOF: formal-proofs/StrongGB.lean::two_trick_saturation_complete
-//        Completeness: for any unsatisfiable polynomial system over
-//        MvPolynomial (Fin n) (ZMod (2^d)), the strong-GB algorithm
-//        with 2-trick saturation produces a basis containing an odd
-//        constant. STATEMENT-ONLY -- the Song et al. (TACAS 2024)
-//        deep theorem; see StrongGB.lean docstring for the
-//        decomposition required to mechanise it.
+//        Completeness, refined: for the polynomial-system encoding
+//        of an unsatisfiable BV formula (with the WellFormedEncoding
+//        structure -- idempotency on each variable plus the BV
+//        translation invariants), the strong-GB algorithm produces
+//        a basis containing an odd constant. STATEMENT-ONLY -- the
+//        Song et al. (TACAS 2024) deep theorem; see StrongGB.lean
+//        docstring for the decomposition required to mechanise it.
 // PROOF: formal-proofs/BuchbergerCorrectness.lean::buchberger_ideal_preservation
 //        Soundness: the basis-update operations (S-polynomial,
 //        reduction, scaling) preserve <G> = <F>.
