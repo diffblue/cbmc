@@ -188,6 +188,10 @@ public:
   materialise_bit_alignments(const std::vector<polynomialt> &equations);
 
 private:
+  /// Inner implementation of `to_polynomial`. The public entry point
+  /// adds memoisation around this; do not call this directly.
+  std::optional<polynomialt> to_polynomial_impl(const exprt &e);
+
   std::map<irep_idt, std::size_t> var_map;
   std::map<std::size_t, irep_idt> reverse_var_map;
   std::size_t next_var_index = 0;
@@ -213,6 +217,17 @@ private:
   /// (term, monomial) sequence. Polynomials are normalised
   /// before serialisation so that the key is order-invariant.
   std::map<std::string, std::size_t> poly_host_cache;
+
+  /// to_polynomial result cache. CBMC's exprt uses irept-based
+  /// structural sharing, so identical subexpressions can appear
+  /// multiple times in a formula DAG. Caching avoids redundant
+  /// recursion on shared subexpressions.
+  ///
+  /// Soundness: the function's side effects (`var_input_widths`
+  /// updates) are idempotent ("first wins" via
+  /// `find(...) == end()`), so a cache hit need not re-apply them.
+  /// The polynomial result is purely a function of the expression.
+  std::map<exprt, std::optional<polynomialt>> to_polynomial_cache;
 
   /// Set bitwidth from a bitvector type. Returns false if incompatible.
   bool set_bitwidth(const typet &type);

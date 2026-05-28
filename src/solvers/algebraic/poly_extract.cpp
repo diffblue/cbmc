@@ -50,7 +50,33 @@ std::size_t poly_extractort::get_var_index(const irep_idt &name)
 //        BVExpr.eval env e (in ZMod(2^d)). The C++ recursion on
 //        e.id() (constant, symbol, plus, minus, mult, etc.)
 //        directly mirrors the Lean inductive definition.
+//
+// Caching wrapper. CBMC's exprt uses irept-based structural sharing,
+// so identical subexpressions can appear multiple times in a formula
+// DAG. Caching avoids recomputing the same result.
+//
+// Soundness: the function's side effects (`var_input_widths` updates)
+// are idempotent ("first wins" via `find(...) == end()`), so a cache
+// hit need not re-apply them. The polynomial result is purely a
+// function of the expression.
 std::optional<polynomialt> poly_extractort::to_polynomial(const exprt &e)
+{
+  // We must call set_bitwidth(e.type()) on every entry to preserve
+  // the post-condition that the member `bitwidth` reflects e.type()
+  // after the call. This must precede the cache lookup.
+  if(!set_bitwidth(e.type()))
+    return std::nullopt;
+
+  auto cache_it = to_polynomial_cache.find(e);
+  if(cache_it != to_polynomial_cache.end())
+    return cache_it->second;
+
+  auto result = to_polynomial_impl(e);
+  to_polynomial_cache.emplace(e, result);
+  return result;
+}
+
+std::optional<polynomialt> poly_extractort::to_polynomial_impl(const exprt &e)
 {
   if(!set_bitwidth(e.type()))
     return std::nullopt;

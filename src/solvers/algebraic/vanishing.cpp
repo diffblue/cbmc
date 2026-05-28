@@ -36,12 +36,23 @@ static unsigned nu2(const mp_integer &n)
 //        is the Smarandache function value SF(2^m).
 static unsigned smarandache_function(unsigned m)
 {
+  // Memoise: for an n-variable problem with the same d, this is
+  // called n times with the same m. Cache results keyed by m.
+  // The result is purely a function of m, so a static cache is sound.
+  static std::map<unsigned, unsigned> cache;
+  auto it = cache.find(m);
+  if(it != cache.end())
+    return it->second;
+
   unsigned val = 0;
   for(unsigned k = 1;; ++k)
   {
     val += nu2(mp_integer{k});
     if(val >= m)
+    {
+      cache[m] = k;
       return k;
+    }
   }
 }
 
