@@ -461,7 +461,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
         !float_utils.is_infinity(bv),
         !float_utils.is_NaN(bv));
     }
-    else if(op.id() == ID_fixedbv)
+    else if(op.type().id() == ID_fixedbv)
       return const_literal(true);
   }
   else if(expr.id()==ID_isinf)
