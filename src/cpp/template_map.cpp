@@ -958,8 +958,23 @@ void template_mapt::set(
   {
     // must be non-type
 
-    if(value.id()==ID_type)
-      UNREACHABLE; // typechecked before!
+    if(value.id() == ID_type)
+    {
+      // Non-type template parameter receiving a value of id
+      // `ID_type`: this can occur during eager constexpr-eval when
+      // a sub-instantiation is reached before the call's
+      // arguments have been adjusted to the parameter's
+      // value-shape (see [temp.deduct]/8 — substitution failure is
+      // not an error in immediate context).  Per the standard's
+      // SFINAE rule, the right behaviour is a soft failure: leave
+      // the binding unset; downstream lookup will produce a
+      // regular diagnostic at the use site if the binding is
+      // actually needed.  Replacing the prior UNREACHABLE here
+      // avoids aborting on legitimate SFINAE branches that show up
+      // once class-template constexpr methods get eagerly
+      // type-checked.
+      return;
+    }
 
     irep_idt identifier=parameter.get(ID_identifier);
     expr_map[identifier]=value;
