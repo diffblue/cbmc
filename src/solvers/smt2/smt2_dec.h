@@ -10,6 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_SMT2_SMT2_DEC_H
 #define CPROVER_SOLVERS_SMT2_SMT2_DEC_H
 
+#include <solvers/prop/solver_resource_limits.h>
+
 #include "smt2_conv.h"
 
 class message_handlert;
@@ -22,7 +24,9 @@ protected:
 
 /*! \brief Decision procedure interface for various SMT 2.x solvers
 */
-class smt2_dect : protected smt2_stringstreamt, public smt2_convt
+class smt2_dect : protected smt2_stringstreamt,
+                  public smt2_convt,
+                  public solver_resource_limitst
 {
 public:
   smt2_dect(
@@ -41,9 +45,18 @@ public:
 
   std::string decision_procedure_text() const override;
 
+  /// \copydoc solver_resource_limitst::set_time_limit_milliseconds
+  /// Honoured for solvers that accept a command-line timeout (Z3, cvc5); for
+  /// other SMT2 solvers a warning is logged and the limit is ignored.
+  void set_time_limit_milliseconds(uint32_t lim) override
+  {
+    time_limit_milliseconds = lim;
+  }
+
 protected:
   std::string solver_binary_or_empty;
   message_handlert &message_handler;
+  uint32_t time_limit_milliseconds = 0;
   resultt dec_solve(const exprt &) override;
 
   /// Everything except the footer is cached, so that output files can be

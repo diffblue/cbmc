@@ -1,0 +1,12 @@
+CORE smt-backend no-new-smt
+main.c
+--smt2 --z3 --solver-time-limit 60
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+The --solver-time-limit option is accepted and propagated to the SMT2 (z3)
+back-end (as a solver command-line timeout) without spurious diagnostics on
+a solve that finishes well within the budget.

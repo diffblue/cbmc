@@ -84,9 +84,14 @@ protected:
 
   smt2_dect::solvert get_smt2_solver_type() const;
 
-  /// Sets the timeout of \p decision_procedure if the `solver-time-limit`
+  /// Sets the time limit of \p decision_procedure if the `solver-time-limit`
   /// option has a positive value (in seconds).
-  /// \note Most solvers silently ignore the time limit at the moment.
+  /// \note Honoured by the MiniSat 2, IPASIR and CaDiCaL SAT back-ends (which
+  ///   have native interrupt support) and by the SMT2 back-end when invoking a
+  ///   solver that accepts a command-line timeout (Z3, cvc5). Other SAT
+  ///   back-ends (PicoSAT, Glucose, Lingeling, external-SAT, ...), the
+  ///   incremental SMT2 back-end and plain DIMACS/SMT2 output modes log a
+  ///   warning and ignore the limit.
   void set_decision_procedure_time_limit(
     solver_resource_limitst &decision_procedure);
 
@@ -119,7 +124,8 @@ void parse_solver_options(const cmdlinet &cmdline, optionst &options);
   "(refine-arithmetic)"                                                        \
   "(outfile):"                                                                 \
   "(dump-smt-formula):"                                                        \
-  "(write-solver-stats-to):"
+  "(write-solver-stats-to):"                                                   \
+  "(solver-time-limit):"
 
 #define HELP_SOLVER                                                            \
   " {y--sat-solver} {usolver} \t use specified SAT solver\n"                   \
@@ -151,6 +157,9 @@ void parse_solver_options(const cmdlinet &cmdline, optionst &options);
   " {y--dump-smt-formula} {ufilename} \t "                                     \
   "output smt incremental formula to the given file\n"                         \
   " {y--write-solver-stats-to} {ujson-file} \t "                               \
-  "collect the solver query complexity\n"
+  "collect the solver query complexity\n"                                      \
+  " {y--solver-time-limit} {uN} \t "                                           \
+  "abort the SAT/SMT solver after N seconds (best-effort; not all "            \
+  "back-ends honour this)\n"
 
 #endif // CPROVER_GOTO_CHECKER_SOLVER_FACTORY_H
