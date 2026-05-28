@@ -4,10 +4,10 @@ This document consolidates the future-direction state for the
 algebraic procedure as of 2026-05-27. It supersedes the ad-hoc
 "Re N" label scheme used across earlier per-experiment notes.
 
-*Last updated 2026-05-27 night: P1 done. DEFER_BITBLAST is now
-default-on. Paper still 33 pages; new SABER scaling numbers
-(headline N=256 from 109s -> 14s; N=768 newly reachable in
-5.8 minutes).*
+*Last updated 2026-05-27 night: P1 (DEFER default), P2 (parity
+reasoning), P3 (signed + symbol-symbol comparisons) all DONE.
+P4 (faster polynomial multiplication) partially explored;
+substantial speedup deferred. Paper now 34 pages.*
 
 ## Status table
 
@@ -124,20 +124,39 @@ relational queries (sub-goal 6) still require a separate
        default; DISABLE\_DEFER\_BITBLAST=1 opts out for
        ablation. 100+ smt-comp benchmark regression validates
        correctness.
-    2. **Bit-by-bit parity reasoning** for shift identities
-       (currently the toom-scaled query TOs because Buchberger
-       cannot align `2b mod 2^d = sum 2^i b_h_i` position-by-
-       position). Either parity-aware reduction ordering or
-       extractor-induced bit alignments. Could close §4.6's
-       remaining scope-limit caveat.
-    3. **Sub-goal 6 follow-ons**: signed comparisons (bvslt /
-       bvsle); symbol-symbol comparisons; chain-encoding
-       optimisation at bw=128 (currently TOs on the lower-bound
+    2. ~~**Bit-by-bit parity reasoning**~~ — DONE this session
+       at `2015035c34`. Closes the toom-scaled scope-limit
+       caveat; the identity now scales linearly to bw=128 in
+       0.07s (was T/O at bw>=32) and beats Bitwuzla 17x at
+       bw=128. Implementation: detect `h - c*x` patterns
+       (c power of 2, both bit-decomposed) and register bit-
+       alignment substitutions. Vanishing-test path also gets
+       predicate substitutions. Paper §4.6 updated at
+       `16e37684c1`.
+    3. ~~**Sub-goal 6 follow-ons**~~ — DONE this session.
+       Signed comparisons (bvslt/bvsle/bvsgt/bvsge) at
+       `40bf53c1af` via the standard sign-bit XOR transformation.
+       Symbol-symbol comparisons at `230c64d1c3` via
+       bit-comparator chain encoding. The bw=128 chain caveat
+       in §4.6 closed: Test B (`x>=2^(d-1) -> XOR=sub`) now
+       0.04s (was T/O). Paper §4.6 updated at `99044d473a`.
        chain at bw=128).
-    4. **Faster polynomial multiplication for SABER >N=768**
-       (Toom-Cook style multiplication of polynomial-system
-       polynomials, or specialised Buchberger orderings). The
-       N=1024+ time-bound ceiling can be pushed.
+    4. ~~**Faster polynomial multiplication for SABER >N=768**~~
+       — PARTIALLY EXPLORED this session. Hoisted the per-branch
+       SSA substitution map at `51d66955a6` (no measurable speedup
+       in our SABER tests since algebraic_equalities is small with
+       DEFER on, but a correctness-neutral cleanup matching the
+       cost model). Tried a polynomial-level SSA cache approach;
+       reverted because the pre-pass over all SSA defs materialised
+       huge intermediate polynomials that slowed branch processing.
+       The genuine win would require: (a) sparse polynomial
+       representation, (b) FFT/Toom-Cook for polynomial-poly
+       multiplication itself, or (c) lazy on-demand inlining.
+       Multi-week research effort, deferred to post-Paper-1.
+
+       Current SABER ceiling: N=768 in 5.8 minutes (with full
+       deferral + parity + sub-goal 6). N=1024 still T/O at 10
+       minutes; the algebraic Buchberger phase is the bottleneck.
 - 2026-08-15 → 2026-09-30 (~6 weeks): paper final pass.
 - 2026-10-15: TACAS 2027 deadline.
 
