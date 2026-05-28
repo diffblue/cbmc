@@ -3093,3 +3093,138 @@ resolution issue (in libstdc++'s `__detected_or_t` /
 `__has_load_factor`) and a *third* SFINAE noexcept evaluation
 issue (in std::swap) remain.  These need separate fixes and
 are independent of the constructor-template work.
+
+
+## 2026-05-28 (continued) Deeper investigation: TT-param + SFINAE bugs share a root cause
+
+Continuing the investigation of the next two dog-food blocking
+layers, with traces.
+
+### Common root cause
+
+Both bugs are manifestations of the SAME underlying issue:
+**CBMC's partial template substitution loses information when a
+template parameter is left unbound (encoded as
+`template_parameter_symbol_type`)**.
+
+Concretely, the `cpp17_tt_param_alias_forward` test established a
+codepath in `cpp_typecheck_template.cpp:1812-1827` that forwards
+TT-parameter args wrapped in `template_parameter_symbol_typet`
+through to `template_map`.  That codepath is the only encoding
+CBMC has for "this TT-arg is a template", and it conflates two
+semantically distinct things:
+
+1. **TT-parameter binding** — `_Op` in `template <template <typename>
+   class _Op>` is itself a template parameter; bind it as a
+   placeholder.
+
+2. **Class template alias bound to a TT-parameter** — e.g.
+   `__pointer` in `__detected_or_t<value_type*, __pointer, _Alloc>`
+   inside `allocator_traits<_Alloc>`.  `__pointer` is a real
+   class-scope template alias defined in
+   `__allocator_traits_base`; it's NOT a template parameter.
+
+Both arrive at the binding site (line 1953-1957) and get encoded
+as `template_parameter_symbol_typet(template_alias_symbol_name)`.
+Downstream consumers then can't distinguish "abstract placeholder
+needing later substitution" from "concrete reference to a real
+class template", and end up either:
+
+- Failing to expand the partial specialization of
+  `__detected_or<..., _Op, ...>` because the `requires` /
+  `void_t` SFINAE check on `_Op<_Args...>` doesn't know how to
+  instantiate the placeholder; this is the root of the
+  `reserve` issue.
+
+- Stripping the partial substitution arguments — e.g., `_Require<
+  __not_<__is_tuple_like<_Tp>>, is_move_constructible<_Tp>,
+  is_move_assignable<_Tp>>` becomes `_Require<__not_,
+  is_move_constructible, is_move_assignable>` (no template args)
+  when `_Tp` is left as `template_parameter_symbol_type`; this is
+  the root of the `sharing_treet` / `swap` issue.
+
+### Trace evidence
+
+Added a `[TT.fwd]` env-gated trace at the forwarding site
+(reverted afterwards).  Output for `std::unordered_map<int, int>
+m;`:
+
+```
+[TT.fwd] forwarding placeholder arg
+    std::__allocator_traits_base::template.__pointer<Type0>
+  for parameter std::template::403::_Op
+[TT.fwd] forwarding placeholder arg
+    std::__allocator_traits_base::template.__pointer<Type0>
+  for parameter std::template::401::_Op
+[TT.fwd] forwarding placeholder arg
+    std::__allocator_traits_base::template.__pocca<Type0>
+  for parameter std::template::403::_Op
+… (and __pocma, __pocs, __equal, __has_load_factor, etc.)
+```
+
+The arg identifier is the **class-template-alias's symbol name**
+(`__pointer<Type0>`, `__pocca<Type0>`, …).  These are real
+class-scope template aliases of `__allocator_traits_base`, but
+they're being forwarded through the same codepath designed for
+TT-parameter passes-through.
+
+### Why my minimal repros don't fail
+
+Tested `cpp17_tt_param_alias_forward`-style minimal repros
+including a deliberate nested-instantiation chain mirroring
+`_Hashtable_alloc<allocator_traits<_NodeAlloc>>`.  All passed
+verification.  The libstdc++ failure depends on:
+
+1. The `__detected_or` partial specialization being elaborated
+   under the `__cpp_concepts` codepath (with `requires { typename
+   _Op<_Args...>; }` constraint) rather than the void_t-based
+   pre-C++20 codepath.  CBMC's concept-constraint evaluator
+   doesn't fully handle the placeholder.
+
+2. Multiple chained `__detected_or_t` calls inside
+   `allocator_traits` (lines 117, 198, 207, 216, 225) hitting
+   `__pointer`, `__pocca`, `__pocma`, `__pocs`, `__equal`
+   in sequence; each leak compounds.
+
+3. A non-`main` method (e.g. `parameter_indices()` in
+   `std_types.h:757`) calling `m.reserve(10)` — when
+   `unordered_map`'s class body is left incomplete due to the
+   leak chain, `reserve` (a member of `_Rehash_base`'s partial
+   specialization) is never registered, so the lookup fails.
+
+Calling `reserve` from `main` instead of from a side method
+works (the elaboration finishes by the time main is typechecked
+last).
+
+### Fix scope
+
+A real fix needs ONE of:
+
+1. **Distinguish encodings**: introduce a new irep id for
+   "class-template-alias bound as TT-arg" separate from
+   `template_parameter_symbol_type` for "TT-parameter
+   placeholder".  Update `convert_template_parameter` and
+   `template_suffix` to handle each correctly.
+
+2. **Fix downstream expansion**: when expanding `_Op<_Args...>`
+   where `_Op` is encoded as `template_parameter_symbol_type`,
+   look up the identifier; if it resolves to a class template
+   alias symbol, instantiate that alias directly rather than
+   leaving the placeholder in place.
+
+3. **Implement the `__cpp_concepts` SFINAE check**: make
+   `requires { typename _Op<_Args...>; }` actually evaluate the
+   nested template instantiation under SFINAE guarding, so the
+   partial specialization of `__detected_or` is matched
+   correctly and the placeholder doesn't propagate through to
+   the suffix.
+
+Option 2 is probably the smallest and most targeted.  Option 3
+is the most "correct" but largest.  Option 1 is intermediate.
+
+All three are out of scope for the std::pair fix's iteration.
+Documented here so a future session can attack them.
+
+### Numbers (unchanged)
+
+cbmc-cpp regression: **691/0/86**.  Dog-food: **20/17/80/0**.
