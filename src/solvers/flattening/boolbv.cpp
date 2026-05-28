@@ -1069,6 +1069,25 @@ bool boolbvt::try_algebraic_solve()
   for(const auto &disjunction : algebraic_disjunctive_disequalities)
   {
     bool all_branches_unsat = true;
+    // P4: hoist the SSA substitution map and helper lambda out of
+    // the per-branch loop. The map is identical across branches and
+    // O(|algebraic_equalities|) to build; computing it once saves
+    // O(N * M) total work where N = branches and M = SSA defs.
+    std::map<irep_idt, exprt> shared_subst_map;
+    for(const auto &eq : algebraic_equalities)
+    {
+      if(eq.id() == ID_equal)
+      {
+        const auto &eqe = to_equal_expr(eq);
+        if(eqe.lhs().id() == ID_symbol)
+          shared_subst_map[to_symbol_expr(eqe.lhs()).get_identifier()] =
+            eqe.rhs();
+        else if(eqe.rhs().id() == ID_symbol)
+          shared_subst_map[to_symbol_expr(eqe.rhs()).get_identifier()] =
+            eqe.lhs();
+      }
+    }
+
     for(const auto &diseq : disjunction)
     {
       // Per-branch processing mirrors the per-disequality loop above
@@ -1099,26 +1118,15 @@ bool boolbvt::try_algebraic_solve()
       // after SSA inlining and the test fires immediately.
       bool branch_refuted_by_vanishing = false;
       {
-        std::map<irep_idt, exprt> subst_map;
-        for(const auto &eq : algebraic_equalities)
-        {
-          if(eq.id() == ID_equal)
-          {
-            const auto &eqe = to_equal_expr(eq);
-            if(eqe.lhs().id() == ID_symbol)
-              subst_map[to_symbol_expr(eqe.lhs()).get_identifier()] = eqe.rhs();
-            else if(eqe.rhs().id() == ID_symbol)
-              subst_map[to_symbol_expr(eqe.rhs()).get_identifier()] = eqe.lhs();
-          }
-        }
         std::function<void(exprt &)> substitute = [&](exprt &e)
         {
           for(auto &op : e.operands())
             substitute(op);
           if(e.id() == ID_symbol)
           {
-            auto it = subst_map.find(to_symbol_expr(e).get_identifier());
-            if(it != subst_map.end())
+            auto it =
+              shared_subst_map.find(to_symbol_expr(e).get_identifier());
+            if(it != shared_subst_map.end())
             {
               e = it->second;
               substitute(e);
