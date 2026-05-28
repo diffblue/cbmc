@@ -394,6 +394,96 @@ theorem isUnit_iff_two_not_dvd_val {d : ℕ} (hd : 0 < d) (x : ZMod (2 ^ d)) :
 
 end MathlibCandidates
 
+/-! ## (6) IsLocalRing (ZMod (p^n)) — mathlib contribution candidate
+
+    The ring `ZMod (p^n)` for prime `p` and `n ≥ 1` is a local ring.
+    The unique maximal ideal is `(p)`. Equivalently: for any
+    `a : ZMod (p^n)`, either `a` is a unit (coprime to `p^n`) or
+    `1 - a` is a unit.
+
+    Proof: if `a + b = 1` and neither is a unit, then `p | a.val`
+    and `p | b.val` (since non-units in `ZMod (p^n)` are exactly
+    the multiples of `p`). But then `p | (a.val + b.val) % p^n = 1`,
+    contradicting `p ≥ 2`.
+
+    This is NOT currently in mathlib (verified by grep). It is a
+    clean, self-contained instance suitable for contribution.
+-/
+
+namespace MathlibCandidates
+
+/-- In `ZMod (p^n)` for prime `p`, a non-unit has `p | val`. -/
+private lemma not_isUnit_iff_prime_dvd_val {p n : ℕ} (hp : Nat.Prime p) (_hn : 0 < n)
+    [NeZero (p ^ n)] (x : ZMod (p ^ n)) :
+    ¬ IsUnit x → p ∣ x.val := by
+  intro h_not_unit
+  -- Contrapositive: if ¬ (p | x.val) then x is a unit.
+  by_contra h_not_dvd
+  apply h_not_unit
+  -- ¬ (p | x.val) means x.val is coprime to p^n (since p is the only prime factor of p^n)
+  have h_coprime : Nat.Coprime x.val (p ^ n) := by
+    rw [Nat.coprime_iff_gcd_eq_one]
+    by_contra h_gcd
+    obtain ⟨q, hq_prime, hq_dvd⟩ := Nat.exists_prime_and_dvd h_gcd
+    have hq_dvd_x : q ∣ x.val := dvd_trans hq_dvd (Nat.gcd_dvd_left _ _)
+    have hq_dvd_pn : q ∣ p ^ n := dvd_trans hq_dvd (Nat.gcd_dvd_right _ _)
+    have hq_eq_p : q = p :=
+      (hp.eq_one_or_self_of_dvd q (hq_prime.dvd_of_dvd_pow hq_dvd_pn)).resolve_left
+        hq_prime.one_lt.ne'
+    exact h_not_dvd (hq_eq_p ▸ hq_dvd_x)
+  have h_cast : (x.val : ZMod (p ^ n)) = x := ZMod.natCast_zmod_val x
+  rw [← h_cast]
+  exact (ZMod.isUnit_iff_coprime x.val (p ^ n)).mpr h_coprime
+
+/-- `ZMod (p^n)` is a local ring for prime `p` and `n ≥ 1`.
+
+    MATHLIB CANDIDATE. The unique maximal ideal is `(p)`.
+    An element is a unit iff it is coprime to `p^n`, i.e., iff
+    `p` does not divide its representative. -/
+instance isLocalRing_ZMod_prime_pow {p : ℕ} (hp : Nat.Prime p) (n : ℕ) (hn : 0 < n) :
+    IsLocalRing (ZMod (p ^ n)) := by
+  haveI h_lt : Fact (1 < p ^ n) := ⟨Nat.one_lt_pow (by omega) hp.one_lt⟩
+  haveI : NeZero (p ^ n) := ⟨by
+    have := h_lt.1
+    omega⟩
+  exact {
+    exists_pair_ne := ⟨0, 1, by
+      intro h
+      have : (0 : ZMod (p ^ n)).val = (1 : ZMod (p ^ n)).val := congrArg ZMod.val h
+      simp [ZMod.val_one] at this⟩
+    isUnit_or_isUnit_of_add_one := by
+      intro a b hab
+      -- Either p ∤ a.val (so a is a unit) or p ∤ b.val (so b is a unit).
+      by_contra h_neither
+      push_neg at h_neither
+      obtain ⟨ha, hb⟩ := h_neither
+      have ha_dvd : p ∣ a.val := not_isUnit_iff_prime_dvd_val hp hn a ha
+      have hb_dvd : p ∣ b.val := not_isUnit_iff_prime_dvd_val hp hn b hb
+      -- From a + b = 1: (a.val + b.val) % p^n = 1
+      have h_one_val : (1 : ZMod (p ^ n)).val = 1 := ZMod.val_one (p ^ n)
+      have h_sum_val : (a + b).val = (a.val + b.val) % (p ^ n) := ZMod.val_add a b
+      rw [hab] at h_sum_val
+      -- So 1 = (a.val + b.val) % p^n, and p | a.val + b.val, so p | 1.
+      have h_p_dvd_sum : p ∣ a.val + b.val := Nat.dvd_add ha_dvd hb_dvd
+      have h_p_dvd_one : p ∣ 1 := by
+        have h_mod_eq : (a.val + b.val) % (p ^ n) = 1 := by omega
+        -- Key: p | (a.val + b.val) % (p^n)
+        -- Proof: write s = a.val + b.val. Then s % p^n = s - p^n * (s / p^n).
+        -- p | s (= h_p_dvd_sum) and p | p^n * (s / p^n) (since p | p^n).
+        -- So p | s - p^n * (s / p^n) = s % p^n.
+        suffices p ∣ (a.val + b.val) % (p ^ n) by rwa [h_mod_eq] at this
+        have h_eq : (a.val + b.val) % (p ^ n) =
+            (a.val + b.val) - (p ^ n) * ((a.val + b.val) / (p ^ n)) :=
+          Nat.mod_def _ _
+        rw [h_eq]
+        exact Nat.dvd_sub' h_p_dvd_sum
+          (dvd_mul_of_dvd_left (dvd_pow_self p (by omega : n ≠ 0)) _)
+      exact Nat.Prime.not_dvd_one hp h_p_dvd_one
+  }
+
+end MathlibCandidates
+
+
 /-! ## (6) The d = 1 (over GF(2)) case via maximal-ideal argument
 
     For F over `MvPolynomial _ (ZMod 2)` with idempotency on each
