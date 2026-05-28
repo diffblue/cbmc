@@ -166,11 +166,19 @@ polynomialt strong_groebner_basist::strong_reduce(
 // PROOF: formal-proofs/StrongGB.lean::two_trick_preserves_ideal
 //        Soundness: scalar multiplication by 2^k preserves
 //        ideal membership.
-// PROOF: formal-proofs/StrongGB.lean::two_trick_unsat_sound
+// PROOF: formal-proofs/StrongGB.lean::two_trick_unsat_sound,
+//        unsat_implies_ideal_top
 //        Soundness: an odd constant in the basis -> unit -> ideal
 //        equals the whole ring -> the original system is UNSAT.
 //        Re-uses the existing soundness chain in
 //        BuchbergerCorrectness.lean and GroebnerSoundness.lean.
+// PROOF: formal-proofs/StrongGB.lean::two_trick_saturation_complete
+//        Completeness: for any unsatisfiable polynomial system over
+//        MvPolynomial (Fin n) (ZMod (2^d)), the strong-GB algorithm
+//        with 2-trick saturation produces a basis containing an odd
+//        constant. STATEMENT-ONLY -- the Song et al. (TACAS 2024)
+//        deep theorem; see StrongGB.lean docstring for the
+//        decomposition required to mechanise it.
 // PROOF: formal-proofs/BuchbergerCorrectness.lean::buchberger_ideal_preservation
 //        Soundness: the basis-update operations (S-polynomial,
 //        reduction, scaling) preserve <G> = <F>.

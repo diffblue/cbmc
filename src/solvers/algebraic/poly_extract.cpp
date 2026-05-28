@@ -532,9 +532,11 @@ std::vector<polynomialt> poly_extractort::materialise_bit_alignments(
 // PROOF: formal-proofs/SubgoalSix.lean::bvuge_2d_minus_2k_implies_high_bits_one
 //        Soundness of try_lower_bound's MSB-on shortcut: if
 //        2^d - 2^k <= x.val, the bits b_(x,k)..b_(x,d-1) are all one.
-// PROOF: formal-proofs/SubgoalSix.lean::chainLt_correctness
-//        Boolean-level statement of the bit-comparator chain
-//        encoding (STATEMENT-ONLY).
+// PROOF: formal-proofs/SubgoalSix.lean::chainLtBool_correctness
+//        Soundness of the bit-comparator chain encoding: the
+//        Boolean recurrence chainLtBool computes
+//        (decide (x.val < y.val), decide (x.val = y.val)) on bit
+//        lists.
 // PROOF: formal-proofs/SubgoalSix.lean::bvslt_via_xor_msb
 //        Soundness of the signed -> unsigned XOR transformation
 //        for bvslt/bvsle.
