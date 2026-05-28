@@ -2882,3 +2882,100 @@ signature inside a class template's body.
 Reproduction artifacts saved at `/tmp/just_pair.cpp`,
 `/tmp/pair_min.cpp` (the minimal pattern that DOES work
 after the access-check fix from the previous iteration).
+
+
+## 2026-05-27 (continued, late) Fix landed: constructor templates' params bound during 2nd-pass body typecheck
+
+Following the 2026-05-27 deep-dive that pinpointed the silent
+throw at `convert_template_parameter` for `_U1` originating from
+`stl_pair.h:595` (the SFINAE-guarded copy-conversion constructor
+template), the principled fix landed.
+
+### Root cause (final understanding)
+
+`typecheck_compound_body` runs a TWO-PASS iteration over the
+class body's operands:
+
+- **Pass 1** (line 1347+): handles non-constructor members.  For
+  template members (like constructor templates), it dispatches
+  to `convert_template_declaration`, which sets up the template
+  scope and adds it as a SECONDARY scope on the enclosing class
+  scope.  This makes `_U1` lookup-resolvable to a
+  `TEMPLATE_PARAMETER` `cpp_id` from inside the secondary scope
+  (the ID has identifier
+  `std::pair<...>::template::N::_U1`).
+
+- **Pass 2** (line 1949+): re-iterates over operands, picks out
+  the constructors (regardless of `is_template`), wires up their
+  `member_initializers`, and calls `typecheck_compound_declarator`
+  directly.
+
+The bug: pass 2 calls `typecheck_compound_declarator` on
+constructor TEMPLATES without populating `template_map` with the
+function template's own parameters.  When the constructor's
+signature contains `pair<_U1, _U2>` (e.g. the libstdc++
+copy-conversion constructor), `typecheck_type` recurses into the
+arg, `resolve` finds `_U1` via the secondary scope (good), then
+`convert_template_parameter` looks up the identifier in
+`template_map` — and **misses**, because only the enclosing
+class's `_T1`, `_T2` are bound (from the class instantiation's
+`build` call).  The lookup falls through to a silent `throw 0`.
+
+### Fix
+
+`src/cpp/cpp_typecheck_compound_type.cpp` second-pass loop: when
+the declaration `is_template`, push a saved `template_map` and
+populate it with `unassigned`-typed placeholders for the
+function template's TYPE parameters before calling
+`typecheck_compound_declarator`.  After the loop, the
+`cpp_saved_template_mapt` RAII restores the prior map.
+
+We populate type parameters only.  Non-type parameters
+(`template<int N>`) need actual constants, and binding a
+placeholder for them would propagate into other class
+instantiations as malformed non-type args.
+
+### Diagnostic safety net
+
+`src/cpp/expr2cpp.cpp`'s `convert_struct` previously
+`DATA_INVARIANT`-ed on operand/component count mismatch.  This
+fires from diagnostic paths when an expression with a
+malformed/abstract struct value is being printed, masking the
+underlying error.  Replaced with a fallback to `convert_norep`.
+
+### Regression tests
+
+- New: `cpp17_std_pair_basic` — asserts `std::pair<int, int> p;`
+  produces a tag-pair AND a real DECL.
+- 3 reclassified to KNOWNBUG (`cpp11_map_insert`,
+  `cpp11_set_insert`, `cpp23_optional_monadic`): all 3 had been
+  passing because their `main` was vacuously empty after the
+  silent throw.  With the fix, they now actually exercise the
+  STL path and CBMC's BMC backend cannot complete them within
+  default limits.  Marked KNOWNBUG with explanatory comments.
+
+### Numbers
+
+- cbmc-cpp regression: 691/0/86 (was 693/0/83).  3 reclassified
+  to KNOWNBUG, none lost.
+- Dog-food: still 20/17/80/0.  The `std::pair` fix unblocks the
+  pair instance but the dog-food code paths through
+  `std::vector::reserve` and CBMC's own `sharing_treet`
+  template are now the blocking layers, with errors of the form
+  `symbol 'reserve' is unknown` and `instantiating
+  'sharing_treet' with <struct irept, struct
+  forward_list_…>`.  Different bugs, separate
+  investigations needed.
+
+### Commits
+
+- `80030aa86d` cpp: bind constructor template params during class
+  body 2nd-pass typecheck
+- `70f9e8c644` cpp: don't abort pretty-printing on
+  operand/component count mismatch
+- `28114b5b16` regression: reclassify std::map/set/optional STL
+  tests as KNOWNBUG
+
+The branch is now 70 commits ahead of
+`tautschnig/cpp11-parser-rework-squashed`.  Push remains
+permission-gated.
