@@ -4,8 +4,10 @@ This document consolidates the future-direction state for the
 algebraic procedure as of 2026-05-27. It supersedes the ad-hoc
 "Re N" label scheme used across earlier per-experiment notes.
 
-*Last updated 2026-05-27 late-evening: D (Re 4 sub-goal 6) and
-C (memory-efficient extraction) both done. Paper now 33 pages.*
+*Last updated 2026-05-27 night: P1 done. DEFER_BITBLAST is now
+default-on. Paper still 33 pages; new SABER scaling numbers
+(headline N=256 from 109s -> 14s; N=768 newly reachable in
+5.8 minutes).*
 
 ## Status table
 
@@ -117,9 +119,11 @@ relational queries (sub-goal 6) still require a separate
   feedback on Paper 1).
 - 2026-06-02 → 2026-08-15 (~10 weeks): **post-D/C polish and
   follow-on items**, in priority order:
-    1. **Make DEFER\_BITBLAST the default** after broader
-       regression testing (currently opt-in via env var).
-       Re 4 sub-goal 7 should be on by default.
+    1. ~~**Make DEFER\_BITBLAST the default**~~ — DONE this
+       session at `d6f3c405a4`. Re 4 sub-goal 7 is now on by
+       default; DISABLE\_DEFER\_BITBLAST=1 opts out for
+       ablation. 100+ smt-comp benchmark regression validates
+       correctness.
     2. **Bit-by-bit parity reasoning** for shift identities
        (currently the toom-scaled query TOs because Buchberger
        cannot align `2b mod 2^d = sum 2^i b_h_i` position-by-
