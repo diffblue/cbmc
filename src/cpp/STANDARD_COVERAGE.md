@@ -372,6 +372,54 @@ See section 4.4 above.
 | Three-way comparison (<=> full) | [expr.spaceship] | ⚠️ | Parsed; partial type support |
 | Virtual inheritance (full) | [class.mi] | ⚠️ | Basic support; diamond issues |
 | Multiple inheritance (full) | [class.mi] | ⚠️ | Basic vtable; complex cases may fail |
+| C++20 concepts grammar | [temp.concept], [temp.constr.constr] | ⚠️ | See "Concepts limitations" below |
+
+---
+
+## Concepts limitations [temp.concept], [temp.constr]
+
+CBMC's concepts support is partial.  Defining `__cpp_concepts`
+breaks parsing of some libstdc++ headers, so the macro is not
+defined by default and libstdc++ falls back to its pre-C++20
+SFINAE / `void_t` paths for detection idioms.  Specifically:
+
+- `parse.cpp:1418-1500` parses the requires-clause skeleton
+  (the `requires` keyword followed by a constraint expression),
+  but the secondary `requires requires { ... }` form used in
+  libstdc++'s `<type_traits>:2655` (positive case of
+  `__detected_or` under `__cpp_concepts`) is not parsed
+  correctly; pre-defining `__cpp_concepts 202002L` triggers
+  parse errors at `type_traits` line 2652 and many others.
+
+- The constraint evaluator in
+  `cpp_instantiate_template.cpp:1246-1305` handles
+  type/simple/compound/nested requirements when they ARE
+  parsed, but the requires-expression bodies that come from
+  libstdc++ headers reach it only when the user writes them
+  directly (because libstdc++ skips them under
+  `!__cpp_concepts`).
+
+- Concept-template-template parameters are not yet supported
+  ([temp.arg.template]/3.3 — "A denotes a concept and P is a
+  concept template parameter").
+
+- Subsumption ordering between constraints
+  ([temp.constr.order]) is implemented at the level of
+  primary-template comparison only; cross-specialization
+  ordering is not.
+
+The user-facing implication: until `__cpp_concepts` is fully
+supported, prefer the `void_t`-based detection idiom in any
+constraints CBMC needs to verify.  If you really need concept
+syntax in a test case, write the constraint at the user level
+(not inside libstdc++ headers) and the existing requires-clause
+machinery should evaluate it.
+
+Tracking: when fixing this, note that the strip-tag fix in
+`cpp_instantiate_template.cpp` (commit `b0561165bf`) made
+namespaced template constexpr eval work — that's a prerequisite
+for many concept-evaluation paths since `requires { typename
+T::N; }` needs the same eager-conversion machinery.
 
 ---
 
