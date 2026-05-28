@@ -532,17 +532,21 @@ constant_exprt smt2_convt::parse_literal(
   }
   else if(
     src.get_sub().size() == 3 &&
-    src.get_sub()[0].id() == "root-obj") // (root-obj (+ ...) 1)
+    src.get_sub()[0].id() == "root-obj") // (root-obj (+ ...) <index>)
   {
     // Z3 emits these while there isn't an agreed-upon standard for representing
     // algebraic numbers just yet. https://smt-comp.github.io/2023/model.html
     // gave some proposals, but these don't seem to have been implemented.
     // For now, we use DATA_INVARIANT as our parsing may be overly restrictive.
     // Eventually, these should become proper, user-facing exceptions.
+    //
+    // The third element is the 1-based index identifying which real root of
+    // the polynomial Z3 chose for its model. We do not constrain its value
+    // because algebraic_numbert tracks only the polynomial, not the specific
+    // root, so any root of the same polynomial maps to the same expression.
     DATA_INVARIANT_WITH_DIAGNOSTICS(
       src.get_sub()[1].id().empty() && src.get_sub()[1].get_sub().size() == 3 &&
-        src.get_sub()[1].get_sub()[0].id() == "+" &&
-        src.get_sub()[2].id() == "1",
+        src.get_sub()[1].get_sub()[0].id() == "+",
       "unexpected root-obj expression",
       src.pretty());
     irept sum_rhs = src.get_sub()[1].get_sub()[2];
