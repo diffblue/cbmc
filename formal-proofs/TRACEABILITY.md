@@ -34,17 +34,30 @@ implementation site with one or more Lean theorems.
 | Implementation Site | Formal Proof | Status |
 |---------------------|--------------|--------|
 | `poly_ring.cpp::apply_frobenius_idempotency` | `Re4.lean::frobenius_pow_eq_self` | DONE |
+| `poly_ring.cpp::inverse_mod_2d` | `PolyRing.lean::inverse_mod_2d_correct` | DONE |
+| `poly_ring.cpp::monomialt::operator<` | `PolyRing.lean::grevlexLt_irrefl`, `grevlexLt_asymm`, `grevlexLt_total` | DONE |
+| `poly_ring.cpp::polynomialt::normalize` | `PolyRing.lean::normalize_combine_like_terms`, `normalize_drop_zero_preserves_sum` | DONE |
 | `poly_extract.cpp::decompose_bits` (idempotency emission) | `Re4.lean::bit_idempotency_forces_zero_or_one` | DONE |
 | `poly_extract.cpp::decompose_bits` (sum-decomposition emission) | `Re4.lean::stdBit_sums_to_self`, `bit_decomp_existence` | DONE |
 | `poly_ring.cpp::polynomialt::multiply` (bit_vars overload) | `Re4.lean::frobenius_pow_eq_self` | DONE |
+| `poly_extract.cpp::to_polynomial` | `Encoding.lean::toPolynomial_eval` | DONE |
+| `poly_extract.cpp::extract_equation` | `Encoding.lean::extract_equation_iff`, `encodeEquations_satisfiable_iff` | DONE |
 | `poly_extract.cpp::extract_predicate` (power-of-2 upper bound) | `SubgoalSix.lean::bvult_pow2_implies_high_bits_zero` | DONE |
 | `poly_extract.cpp::extract_predicate` (lower bound 2^d - 2^k) | `SubgoalSix.lean::bvuge_2d_minus_2k_implies_high_bits_one` | DONE |
 | `poly_extract.cpp::extract_predicate` (bit-comparator chain) | `SubgoalSix.lean::chainLtBool_correctness` | DONE |
 | `poly_extract.cpp::extract_predicate` (signed via XOR) | `SubgoalSix.lean::bvslt_via_xor_msb` | DONE |
 | `poly_extract.cpp::materialise_bit_alignments` (low bits zero) | `BitAlignment.lean::scalar_alignment_low_bits_zero` | DONE |
 | `poly_extract.cpp::materialise_bit_alignments` (shifted bits) | `BitAlignment.lean::scalar_alignment_shifted_bits` | DONE |
+| `vanishing.cpp::nu2_factorial` | `Vanishing.lean::nu2Factorial_eq_padicVal` | DONE |
+| `vanishing.cpp::smarandache_function` | `Vanishing.lean::smarandache_iff_nu2Factorial`, `smarandache_exists` | DONE |
+| `vanishing.cpp::build_canonical_to_factorial` | `Vanishing.lean::stirlingSecond_recurrence`, `stirlingSecond_diag`, `stirlingSecond_zero_of_lt` | DONE |
+| `vanishing.cpp::generate_zfp_generators` | `Vanishing.lean::zfpCoeff_mul_factorial_divisible` | DONE |
 | `vanishing.cpp::is_vanishing_polynomial` (falling factorial) | `Vanishing.lean::fallingFactorial_zero_of_lt` | DONE |
 | `vanishing.cpp::is_vanishing_polynomial` (sufficient condition) | `Vanishing.lean::falling_factorial_sufficient` | DONE |
+| `groebner.cpp::s_polynomial` | `BuchbergerCorrectness.lean::s_poly_in_ideal` | DONE |
+| `groebner.cpp::strong_reduce` | `BuchbergerCorrectness.lean::reduce_in_ideal`, `scale_in_ideal`; `StrongGB.lean::two_trick_preserves_ideal` | DONE |
+| `groebner.cpp::reduce_by_basis` | `BuchbergerCorrectness.lean::reduce_in_ideal` | DONE |
+| `groebner.cpp::extract_candidate` | `ExtractCandidate.lean::extract_candidate_local_soundness`, `solve_univariate_linear_unit` | DONE |
 | `groebner.cpp::compute` (2-trick preserves ideal) | `StrongGB.lean::two_trick_preserves_ideal`, `two_trick_preserves_ideal_mv` | DONE |
 | `groebner.cpp::compute` (UNSAT detection sound) | `StrongGB.lean::two_trick_unsat_sound` | DONE |
 | `groebner.cpp::has_constant` (odd ⇒ unit) | `GroebnerSoundness.lean::ZMod.isUnit_of_odd_nat` | DONE |
