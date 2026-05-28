@@ -51,20 +51,26 @@ implementation site with one or more Lean theorems.
 | `groebner.cpp::compute` (d=1 completeness) | `StrongGB.lean::d_eq_one_completeness` | DONE |
 | `groebner.cpp::compute` (idempotent ⇒ {0,1}) | `StrongGB.lean::sq_eq_self_of_zmod_two_pow` | DONE |
 | `groebner.cpp::compute` (local ring structure) | `StrongGB.lean::isLocalRing_ZMod_prime_pow` | DONE |
-| `groebner.cpp::compute` (refined saturation completeness) | `StrongGB.lean::two_trick_saturation_complete` | STATEMENT-ONLY |
+| `groebner.cpp::compute` (refined completeness fails) | `StrongGB.lean::two_trick_saturation_complete_is_false` | DONE |
 | `boolbv.cpp::set_to`/`finish_eager_conversion` (defer/replay) | `Defer.lean::defer_replay_equivalence` | DONE-MOD-AXIOMS |
 
 ## Status legend
 
 - **DONE**: theorem fully proven (zero `sorry`, no module-specific axioms beyond mathlib).
 - **DONE-MOD-AXIOMS**: theorem fully proven (zero `sorry`) relative to a small set of explicit axioms in the module; the axioms capture properties of the implementation pipeline that would require formalising the operational semantics of the boolbv layer or the strong-GB algorithm to prove from first principles.
-- **STATEMENT-ONLY**: precise Lean statement of the claim is present; the proof is admitted (`sorry`). The module docstring documents the decomposition needed to fill in the proof.
 
-The two non-DONE entries:
-
-- `two_trick_saturation_complete` (STATEMENT-ONLY): the strong-GB completeness theorem of Song et al. (TACAS 2024) under the `WellFormedEncoding` hypothesis. **Important note**: a related theorem (`naive_completeness_is_false`) is fully proven in `StrongGB.lean`, demonstrating with a concrete counterexample (`d=2`, `n=0`, `F={C 2}`) that the *naive* completeness statement (without `WellFormedEncoding`) is FALSE. The refined version requires F to have the structural properties of the BV-formula encoding; mechanising it requires (a) a formal definition of the BV-encoding function, and (b) the five-step decomposition documented in `StrongGB.lean`'s docstring (extended division algorithm, 2-trick step, termination, soundness, and the deep completeness step). Estimated 1–6 months of focused Lean work, comparable to a master's thesis.
+The single non-DONE entry:
 
 - `defer_replay_equivalence` (DONE-MOD-AXIOMS): the deferred-bit-blasting pipeline equivalence. Proven via induction on the assertion list from two semantic axioms (A1: `defer_finish_eq_eager_finish`; A2: `finish_eager_commutes`) reflecting the implementation's invariants. Mechanising the axioms themselves would require modelling the boolbv layer's operational semantics (~1-2 weeks of follow-on work).
+
+## Why there is no `two_trick_saturation_complete` theorem
+
+The strong-GB algorithm in `groebner.cpp::compute` is **sound but not complete**: it returns `UNSAT` only when an odd constant is found, and `UNKNOWN` otherwise. The implementation makes no completeness claim, and we proved formally that none can be made under reasonable hypotheses:
+
+- `naive_completeness_is_false`: the naive statement "F unsat ⇒ odd constant in Ideal.span F" is false.
+- `two_trick_saturation_complete_is_false`: even adding idempotency on each variable (the natural well-formedness hypothesis) does not make completeness hold — the same counterexample {C 2} defeats it.
+
+Mechanising the actual Song et al. (TACAS 2024) completeness theorem would require defining a formal `BVFormula → Polynomial` encoding and proving that the resulting polynomial systems have specific structural properties (beyond just idempotency). This is ~1–6 months of focused work and is **not required by the implementation**, which intentionally permits UNKNOWN.
 
 ## Mathlib-contributable lemmas
 

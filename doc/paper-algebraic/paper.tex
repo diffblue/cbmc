@@ -2020,17 +2020,30 @@ covers the following modules:
   $\mathbb{Z}_{2^d}$ and for $\mathrm{MvPolynomial}\, \mathrm{Fin}\, n\, \mathbb{Z}_{2^d}$),
   and re-export the existing soundness chain (odd constant in
   basis $\Rightarrow$ ideal $= \top \Rightarrow$ original system
-  UNSAT). We also prove:
+  UNSAT). The implementation in \texttt{groebner.cpp} is
+  \emph{sound but not complete}: it returns \texttt{UNSAT} only
+  when an odd constant is found in the saturated basis, and
+  \texttt{UNKNOWN} otherwise. The formal model captures exactly
+  this contract. We also prove:
   \begin{itemize}
   \item \texttt{naive\_completeness\_is\_false}: the naive
     completeness statement (``$F$ unsat $\Rightarrow$ odd constant
     in $\langle F\rangle$'') is \emph{false}; concrete
     counterexample with $d=2$, $n=0$, $F=\{C\,2\}$.
+  \item \texttt{two\_trick\_saturation\_complete\_is\_false}:
+    a stronger negative result. Even adding the natural
+    well-formedness hypothesis (idempotency on each variable),
+    the refined completeness statement is \emph{still false};
+    the same counterexample defeats it (vacuously well-formed
+    for $n=0$). This formally explains why the implementation
+    correctly returns \texttt{UNKNOWN} on inputs where strong-GB
+    saturation cannot produce an odd constant.
   \item \texttt{d\_eq\_one\_completeness}: for $d=1$ (over
     $\mathrm{GF}(2)$) with idempotency on each variable, $F$
-    unsat implies $1 \in \langle F\rangle$. Proof via
+    unsat does imply $1 \in \langle F\rangle$. Proof via
     maximal-ideal argument + quotient field + idempotent
-    $\Rightarrow$ $\{0,1\}$.
+    $\Rightarrow$ $\{0,1\}$. So in this restricted setting
+    completeness holds.
   \item \texttt{sq\_eq\_self\_of\_zmod\_two\_pow}: $x^2 = x$ in
     $\mathbb{Z}_{2^d}$ implies $x \in \{0,1\}$. Generalises
     \texttt{eq\_zero\_or\_one\_of\_sq\_eq\_self} to non-domains.
@@ -2038,18 +2051,15 @@ covers the following modules:
     $\mathbb{Z}_{p^n}$ is a local ring for prime $p$, $n \geq 1$.
     Mathlib contribution candidate.
   \end{itemize}
-  The deep completeness theorem
-  (\texttt{two\_trick\_saturation\_complete}) is stated
-  precisely with a \texttt{WellFormedEncoding} hypothesis
-  (idempotency on each variable, placeholder for the full
-  BV-encoding structure) but admitted as \texttt{sorry}.
-  Two axioms (\texttt{strongGB} as
-  the algorithm interface, \texttt{strongGB\_ideal\_preserved}
-  as the soundness invariant) capture what the implementation
-  provides. Full mechanisation of completeness is the
-  Song et al.~\cite{song2024equational} contribution and
-  requires the five-step decomposition documented in the
-  \texttt{StrongGB.lean} module docstring.
+  Two axioms (\texttt{strongGB} as the algorithm interface,
+  \texttt{strongGB\_ideal\_preserved} as the soundness invariant)
+  capture what the implementation provides. The Song et
+  al.~\cite{song2024equational} completeness theorem holds for
+  a specific class of polynomial systems (those arising from a
+  faithful BV-formula encoding, beyond just idempotency); its
+  full mechanisation would require defining the encoding
+  formally and is not required by the implementation, which
+  intentionally permits \texttt{UNKNOWN}.
 
 \item \textbf{Deferred bit-blasting equivalence}
   (\texttt{Defer.lean}): the deferral mechanism in

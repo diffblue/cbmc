@@ -1,19 +1,37 @@
 /-
-  StrongGB.lean — Soundness and completeness of the strong Gröbner
-  basis 2-trick saturation in Z_{2^d}.
+  StrongGB.lean — Soundness of the strong Gröbner basis 2-trick
+  saturation in Z_{2^d}, plus negative results showing why
+  completeness is genuinely incomplete.
 
   TRACEABILITY: see formal-proofs/TRACEABILITY.md.
 
   Implementation reference: `src/solvers/algebraic/groebner.cpp`
   (`compute`, the 2-multiple step in particular).
 
-  ## Overview
+  ## What the C++ implementation actually does
 
-  This module captures the soundness and the completeness situation
-  of the strong-GB algorithm with 2-trick saturation as used in
-  `src/solvers/algebraic/groebner.cpp::compute`.
+  `groebner.cpp::compute` is a strong-GB **decision procedure
+  with three possible outcomes**:
 
-  Soundness (DONE, no sorry):
+    - `UNSAT`: returned only when an **odd constant** is found
+      in the saturated basis. Sound: when this happens, the
+      input system genuinely has no solution.
+
+    - `UNKNOWN`: returned when the algorithm exhausts its budget
+      or saturates without producing an odd constant. The input
+      may or may not have a solution; the algorithm is not making
+      a claim either way.
+
+    - (`SAT` is not currently produced by `compute` itself; it
+      would come from a different code path.)
+
+  **The implementation makes no completeness claim.** UNKNOWN is
+  by design a valid result. This module formalises exactly that
+  contract.
+
+  ## Overview of formal results
+
+  Soundness (DONE, no sorry, only standard axioms):
 
     1. (`two_trick_preserves_ideal`, `two_trick_preserves_ideal_mv`)
        Scalar multiplication preserves ideal membership; this
@@ -23,81 +41,66 @@
        implies the original ideal is the whole ring, i.e., UNSAT.
        Re-exported from `GroebnerSoundness.lean`.
 
-  Completeness situation (RESEARCH-LEVEL):
+  These two results together establish the soundness contract:
+  if `compute` returns UNSAT (i.e., produces an odd constant in
+  its saturated basis), then the input system is unsat.
 
-  ## Important finding: the naive completeness statement is FALSE.
+  Negative results (DONE, no sorry, only standard axioms +
+  algorithm axioms):
 
-  In an earlier draft of this module we stated:
+    3. (`naive_completeness_is_false`) The naive completeness
+       statement ("F unsat ⇒ odd constant in Ideal.span F") is
+       FALSE. Concrete counterexample: `d = 2, n = 0, F = {C 2}`.
 
-      For F unsatisfiable on `(ZMod (2^d))^n`, the strong-GB
-      algorithm produces a basis containing an odd constant.
+    4. (`two_trick_saturation_complete_is_false`) Even adding
+       the obvious well-formedness hypothesis (idempotency on
+       each variable) does NOT make the natural refined
+       completeness statement true. The same counterexample
+       `{C 2}` defeats it (vacuously well-formed for n=0).
 
-  This is **false** without further hypotheses. The
-  `naive_completeness_is_false` theorem below proves it with a
-  concrete counterexample (`d = 2`, `n = 0`, `F = {C 2}`):
+  These two results together show formally why UNKNOWN must be
+  a valid outcome of `compute`: the algorithm cannot generally
+  decide unsat, even with reasonable structural hypotheses.
 
-    - `F` is unsatisfiable (the constant `2 ≠ 0` in `ZMod 4`).
-    - `Ideal.span F` does not contain any odd constant (the ideal
-      is `(2) ⊆ ZMod 4 = {0, 2}`, which excludes the odd
-      elements `1, 3`).
+  Partial completeness (DONE for the d=1 case, no sorry):
 
-  Adding bit-variable idempotency does not fix the issue: e.g.,
-  `F = {C 2, b^2 - b}` over `MvPolynomial (Fin 1) (ZMod 4)` has
-  the same problem (every element of `Ideal.span F` has even
-  constant term).
+    5. (`d_eq_one_completeness`) For `d = 1` (i.e., over GF(2))
+       with idempotency on each variable, F unsat over
+       `(ZMod 2)^n` does imply `1 ∈ Ideal.span F`. So in this
+       restricted setting completeness holds.
 
-  ## What Song et al. actually prove
+  ## Why we do NOT have a `two_trick_saturation_complete` theorem
 
-  Song et al. (TACAS 2024) prove a more careful completeness
-  theorem: not for arbitrary polynomial systems, but for **the
-  specific polynomial-system encoding of a bit-vector formula**
-  produced by their (and our) translation. Their encoding has
-  additional structure beyond idempotency:
+  Song et al. (TACAS 2024) prove completeness for a specific
+  class of polynomial systems: those arising from a faithful
+  bit-vector formula encoding. Their hypothesis is much stronger
+  than just "idempotency on each variable" — it ties F to the
+  structure of an actual BV formula. Our `WellFormedEncoding`
+  predicate (just idempotency) is genuinely too weak: see
+  `two_trick_saturation_complete_is_false`.
 
-    - All polynomials arise from translating equational
-      bit-vector predicates.
-    - Coefficients have a 2-adic structure tied to the bit
-      positions.
-    - The combinatorial structure of the polynomials interacts
-      well with the 2-trick saturation rule.
+  Mechanising the full Song et al. theorem would require:
 
-  Without that structure, even unsatisfiable systems can have
-  ideals that don't contain a unit.
+    (a) A formal definition of bit-vector formulas and the
+        encoding `BVFormula → Finset (MvPolynomial _)`.
+    (b) Proof that the encoding is faithful in both directions.
+    (c) The deep completeness step: under the strong hypothesis
+        of (a)–(b), the strong-GB algorithm finds an odd constant.
 
-  Mechanising the actual Song et al. theorem requires:
+  This is a substantial research project comparable to a
+  master's thesis. It is **not** required by the implementation:
+  the implementation explicitly returns UNKNOWN on inputs where
+  it cannot conclude UNSAT.
 
-    (a) A formal definition of the bit-vector formula -> polynomial-
-        system encoding.
-    (b) The five-step mechanisation outlined in the
-        `two_trick_saturation_complete` docstring (extended
-        division algorithm, 2-trick step, termination,
-        soundness, completeness).
-    (c) The deep completeness step itself: a constructive proof
-        that the strong-GB algorithm finds an odd constant when
-        the encoding is unsatisfiable.
+  ## What this module provides
 
-  This is a substantial research project. We provide:
-
-    - A precise statement of the naive (false) version with a
-      counterexample.
-    - A precise statement of a refined version with strengthened
-      hypotheses (the implementation's encoding structure),
-      admitted as `sorry`.
-    - Several mathlib-contributable lemmas about `ZMod (2^d)`
-      that are used in the proof.
-
-  ## Mathlib-contributable lemmas
-
-  These results about `ZMod (2^d)` are general-purpose and
-  not specific to the strong-GB context:
-
-    - `IsLocalRing (ZMod (p^n))` for prime p (omitted for now;
-      candidate contribution).
-
-    - `ZMod.isUnit_iff_two_not_dvd_val` (specialised from
-      `ZMod.isUnit_iff_coprime`).
-
-  See the `MathlibCandidates` namespace below.
+    - Soundness of the algorithm (matches the implementation's
+      actual contract).
+    - Negative results explaining why UNKNOWN is necessary.
+    - The d=1 special case (a positive completeness result with
+      a concrete restriction).
+    - Several mathlib-contributable lemmas (see
+      MATHLIB_CANDIDATES.md).
 -/
 
 import GroebnerSoundness

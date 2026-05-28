@@ -171,20 +171,26 @@ polynomialt strong_groebner_basist::strong_reduce(
 //        equals the whole ring -> the original system is UNSAT.
 //        Re-uses the existing soundness chain in
 //        BuchbergerCorrectness.lean and GroebnerSoundness.lean.
+//        THIS IS THE CONTRACT THIS FUNCTION SATISFIES: when
+//        compute() returns UNSAT, the formal Lean theorem
+//        guarantees the input system has no solution. UNKNOWN
+//        is always a sound result (it commits to nothing).
 // PROOF: formal-proofs/StrongGB.lean::naive_completeness_is_false
 //        Important sanity-check: the NAIVE completeness statement
 //        ("F unsat -> Ideal.span F contains an odd constant") is
 //        FALSE. Concrete counterexample (d=2, n=0, F={C 2}) is
 //        proven; explains why this function returns UNKNOWN
 //        (not UNSAT) on some unsatisfiable inputs.
-// PROOF: formal-proofs/StrongGB.lean::two_trick_saturation_complete
-//        Completeness, refined: for the polynomial-system encoding
-//        of an unsatisfiable BV formula (with the WellFormedEncoding
-//        structure -- idempotency on each variable plus the BV
-//        translation invariants), the strong-GB algorithm produces
-//        a basis containing an odd constant. STATEMENT-ONLY -- the
-//        Song et al. (TACAS 2024) deep theorem; see StrongGB.lean
-//        docstring for the decomposition required to mechanise it.
+// PROOF: formal-proofs/StrongGB.lean::two_trick_saturation_complete_is_false
+//        STRONGER NEGATIVE RESULT: even adding the obvious
+//        well-formedness hypothesis (idempotency on each variable)
+//        does NOT make the algorithm complete -- the same
+//        counterexample {C 2} (vacuously well-formed for n=0)
+//        defeats the refined claim. Hence this function does NOT
+//        guarantee 'F unsat => UNSAT'; it only guarantees
+//        'UNSAT => F unsat' (soundness). UNKNOWN is the correct
+//        result on inputs where the strong-GB saturation cannot
+//        produce an odd constant.
 // PROOF: formal-proofs/BuchbergerCorrectness.lean::buchberger_ideal_preservation
 //        Soundness: the basis-update operations (S-polynomial,
 //        reduction, scaling) preserve <G> = <F>.
