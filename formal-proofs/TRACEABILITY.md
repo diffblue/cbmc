@@ -35,22 +35,23 @@ implementation site with one or more Lean theorems.
 |---------------------|--------------|--------|
 | `poly_ring.cpp::apply_frobenius_idempotency` | `Re4.lean::frobenius_pow_eq_self` | DONE |
 | `poly_extract.cpp::decompose_bits` (idempotency emission) | `Re4.lean::bit_idempotency_forces_zero_or_one` | DONE |
-| `poly_extract.cpp::decompose_bits` (sum-decomposition emission) | `Re4.lean::bit_decomp_unique` | DONE |
-| `poly_ring.cpp::polynomialt::multiply` (bit_vars overload) | `Re4.lean::frobenius_in_multiplication` | DONE |
-| `poly_extract.cpp::extract_predicate` (power-of-2 upper bound) | `SubgoalSix.lean::bvult_pow2_iff_high_bits_zero` | DONE |
-| `poly_extract.cpp::extract_predicate` (lower bound 2^d - 2^k) | `SubgoalSix.lean::bvuge_2d_minus_2k_iff_high_bits_one` | DONE |
-| `poly_extract.cpp::extract_predicate` (bit-comparator chain) | `SubgoalSix.lean::chain_encoding_correctness` | DONE |
-| `poly_extract.cpp::extract_predicate` (signed via XOR) | `SubgoalSix.lean::bvslt_via_xor_msb` | DONE |
-| `poly_extract.cpp::materialise_bit_alignments` | `BitAlignment.lean::scalar_alignment_consequence` | DONE |
-| `vanishing.cpp::is_vanishing_polynomial` | `Vanishing.lean::falling_factorial_sufficient` | DONE |
-| `groebner.cpp::compute` (2-trick saturation) | `StrongGB.lean::two_trick_saturation_complete` | DONE |
-| `boolbv.cpp::set_to` + `finish_eager_conversion` (deferral) | `Defer.lean::defer_replay_equivalence` | DONE |
+| `poly_extract.cpp::decompose_bits` (sum-decomposition emission) | `Re4.lean::stdBit_sums_to_self`, `bit_decomp_existence` | DONE |
+| `poly_ring.cpp::polynomialt::multiply` (bit_vars overload) | `Re4.lean::frobenius_pow_eq_self` | DONE |
+| `poly_extract.cpp::extract_predicate` (power-of-2 upper bound) | `SubgoalSix.lean::bvult_pow2_implies_high_bits_zero` | DONE |
+| `poly_extract.cpp::extract_predicate` (lower bound 2^d - 2^k) | `SubgoalSix.lean::bvuge_2d_minus_2k_implies_high_bits_one` | PARTIAL |
+| `poly_extract.cpp::extract_predicate` (bit-comparator chain) | `SubgoalSix.lean::chainLt_correctness` | STATEMENT-ONLY |
+| `poly_extract.cpp::extract_predicate` (signed via XOR) | `SubgoalSix.lean::bvslt_via_xor_msb` | PARTIAL |
+| `poly_extract.cpp::materialise_bit_alignments` | `BitAlignment.lean::scalar_alignment_consequence` | TODO |
+| `vanishing.cpp::is_vanishing_polynomial` | `Vanishing.lean::falling_factorial_sufficient` | TODO |
+| `groebner.cpp::compute` (2-trick saturation) | `StrongGB.lean::two_trick_saturation_complete` | TODO |
+| `boolbv.cpp::set_to` + `finish_eager_conversion` (deferral) | `Defer.lean::defer_replay_equivalence` | TODO |
 
 ## Status legend
 
 - **DONE**: theorem fully proven (zero `sorry`); cross-reference comment in implementation.
-- **PARTIAL**: lemma stated, proof in progress.
-- **GAP**: claim made by implementation, no proof yet.
+- **PARTIAL**: statement complete; proof contains `sorry`; informal argument in the theorem's docstring.
+- **STATEMENT-ONLY**: a non-trivial Lean definition exists but the soundness theorem is just a definitional unfolding; full encoding correctness is TODO.
+- **TODO**: mapping established but no Lean module yet.
 
 ## Verification
 
