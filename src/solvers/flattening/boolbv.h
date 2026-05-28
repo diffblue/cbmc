@@ -132,13 +132,18 @@ public:
   {
     finish_eager_conversion_quantifiers();
     functions.finish_eager_conversion();
-    try_algebraic_solve();
+    const bool refuted = try_algebraic_solve();
     // If algebraic refutation succeeded, the SAT propagator already
     // has 'false' set; we can skip replaying any deferred assertions
     // since the result is fixed UNSAT and bit-blasting them is wasted
     // work. Otherwise, replay them through the parent set_to so they
     // contribute clauses to the SAT solver.
-    if(!algebraic_solved)
+    //
+    // Note: try_algebraic_solve() returns true iff it asserted false
+    // on the propagator. The internal `algebraic_solved` flag means
+    // "do not retry"; it is set to true even when refutation failed,
+    // so we must use the return value here, not the flag.
+    if(!refuted)
     {
       for(auto &[expr, value] : deferred_assertions)
         SUB::set_to(expr, value);
@@ -202,12 +207,13 @@ protected:
   // Encoded into the polynomial system via bit-decomposition by
   // poly_extractort::extract_predicate.
   std::vector<std::pair<exprt, bool>> algebraic_predicates;
-  // Memory-efficient extraction (Re 4 sub-goal 7): when DEFER_BITBLAST=1,
-  // SSA equalities that go to algebraic_equalities also get queued
-  // here, and SUB::set_to is skipped for them. If try_algebraic_solve
-  // refutes, the bit-blasting cost is saved entirely. If it doesn't,
-  // we replay the queued assertions through SUB::set_to in
-  // finish_eager_conversion before falling through to the SAT solver.
+  // Memory-efficient extraction (Re 4 sub-goal 7): SSA equalities that
+  // go to algebraic_equalities also get queued here, and SUB::set_to
+  // is skipped for them. If try_algebraic_solve refutes, the bit-
+  // blasting cost is saved entirely. If it doesn't, we replay the queued
+  // assertions through SUB::set_to in finish_eager_conversion before
+  // falling through to the SAT solver. On by default; set
+  // DISABLE_DEFER_BITBLAST=1 to opt out for ablation experiments.
   std::vector<std::pair<exprt, bool>> deferred_assertions;
   bool algebraic_solved = false;
   std::vector<literalt> algebraic_assumptions;

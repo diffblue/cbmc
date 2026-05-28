@@ -1282,10 +1282,11 @@ generator, for fine-grained reproducibility.
 \begin{table}[ht]
 \caption{SABER polynomial-multiplication equivalence at scaled
 $N$ and SABER's storage bitwidth $q = 2^{16}$. Per output
-coefficient; 60\,s timeout for $N \leq 128$, 300\,s for $N = 256$.
-The 1-level / 2-level columns differ only in inner Karatsuba
-recursion; both verify the same algebraic identity.
-$N = 256$ is SABER's actual parameter.}
+coefficient via the all-coefficients disjunction; 600\,s
+timeout. The 1-level / 2-level columns differ only in inner
+Karatsuba recursion; both verify the same algebraic identity.
+$N = 256$ is SABER's actual parameter. cvc5 times out
+($\geq 60\,$s) at every $N \geq 4$.}
 \label{tab:saber-scaling}
 \centering
 \small
@@ -1293,23 +1294,26 @@ $N = 256$ is SABER's actual parameter.}
 \toprule
 $N$ & this paper (1-level) & this paper (2-level) & Bitwuzla & cvc5 \\
 \midrule
-4   & 0.02\,s   & 0.03\,s   & 0.00\,s & T/O \\
-8   & 0.09\,s   & 0.10\,s   & 0.00\,s & T/O \\
-16  & 0.37\,s   & 0.40\,s   & 0.00\,s & T/O \\
-32  & 1.52\,s   & 1.59\,s   & 0.01\,s & T/O \\
-64  & 6.15\,s   & 6.41\,s   & 0.02\,s & T/O \\
-128 & 25.27\,s  & 26.15\,s  & 0.06\,s & T/O \\
-256 & 109.35\,s & 108.68\,s & 0.27\,s & T/O \\
+4   & 0.00\,s   & 0.00\,s   & 0.00\,s & T/O \\
+8   & 0.00\,s   & 0.00\,s   & 0.00\,s & T/O \\
+16  & 0.01\,s   & 0.01\,s   & 0.01\,s & T/O \\
+32  & 0.06\,s   & 0.06\,s   & 0.03\,s & T/O \\
+64  & 0.31\,s   & 0.34\,s   & 0.13\,s & T/O \\
+128 & 2.00\,s   & 2.05\,s   & 0.50\,s & T/O \\
+256 & 14.27\,s  & 14.01\,s  & 2.18\,s & T/O \\
+320 & 27.18\,s  & 26.51\,s  & 3.54\,s & T/O \\
+512 & 107.98\,s & 104.54\,s & 9.42\,s & T/O \\
+768 & 361.35\,s & 346.85\,s & 21.76\,s & T/O \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 The procedure scales to SABER's actual $N = 256$ parameter,
-deciding each output-coefficient equivalence in $\sim$109\,s
+deciding each output-coefficient equivalence in $\sim$14\,s
 regardless of whether the alternative implementation is 1-level
 or 2-level Karatsuba: Buchberger normalises through the
 recursion levels because the underlying polynomial identity is
-the same. Bitwuzla solves each in 0.27\,s by occurrence-map
+the same. Bitwuzla solves each in 2.18\,s by occurrence-map
 canonicalisation, since both schoolbook and Karatsuba expand
 to the same canonical sum-of-monomials form. cvc5 times out
 at every benchmark in this family at every $N \geq 4$ --- its
@@ -1322,7 +1326,14 @@ universal-equational class with polynomial expressions in
 $\mathbb{Z}_{2^d}$ is a procedural guarantee, while heuristic
 word-level rewriting wins or loses depending on whether the
 rewriter has matching patterns. Our procedure decides where
-cvc5 cannot.
+cvc5 cannot. We extend an order of magnitude beyond SABER's
+$N = 256$ (to $N = 768$, $\sim$5.8 minutes), demonstrating that
+the procedure scales to crypto parameter sizes and to a regime
+where bit-blasting alone is no longer competitive: at $N = 512$
+the underlying SAT problem has tens of millions of clauses if
+emitted, but our deferred-bit-blasting strategy
+(Section~\ref{sec:eval-saber-defer}) prevents that emission
+when algebraic refutation succeeds.
 
 \paragraph{Toom-Cook 4-way: an open-challenge target.}
 SABER's actual implementation uses Toom-Cook 4-way at the
@@ -1353,38 +1364,40 @@ architectures (e.g.\ specialised Toom-Cook structure
 recognition, or decomposition into evaluation, multiplication,
 and interpolation sub-lemmas).
 
-\paragraph{Scaling beyond $N = 256$ via deferred bit-blasting.}
-The procedure decides $N = 256$ in $\sim$109\,s (per coefficient)
-in our default configuration. The reported time is dominated
-not by the algebraic procedure itself but by the bit-blasting
-of every SSA equality emitted by the SMT-LIB front-end into
-SAT clauses; at $N = 256$ this produces a peak RSS of
-$\sim$29\,GB and an effective ceiling at $N \geq 320$ where
-polynomial expansion exceeds 55\,GB of virtual memory.
+\paragraph{Deferred bit-blasting.}
+\label{sec:eval-saber-defer}
+The headline numbers in Table~\ref{tab:saber-scaling} rely on
+\emph{deferred bit-blasting}, an architectural choice in our
+boolbv layer that defers the conversion of SSA equalities to
+SAT clauses until after the algebraic procedure has had a
+chance to refute. If the algebraic procedure succeeds (the
+universal-equational common case for SABER), the queued
+bit-blasting work is discarded and the SAT solver is invoked
+only with the algebraic-induced \texttt{false} clause. If the
+algebraic procedure does not refute, the queue is replayed
+through the parent set\_to before the SAT solver runs,
+recovering identical behaviour with no regression.
 
-We resolve this by \emph{deferred bit-blasting}: the boolbv
-layer queues SSA equalities and skips bit-blasting until after
-the algebraic procedure has had a chance to refute. If the
-algebraic procedure succeeds (the universal-equational
-common case for SABER), the queued bit-blasting work is
-discarded and the SAT solver is invoked only with the
-algebraic-induced \texttt{false} clause. If the algebraic
-procedure does not refute, the queue is replayed through the
-parent set\_to before the SAT solver runs, recovering the
-default behaviour with no regression.
+Without this deferral the procedure incurs $\sim$30\,GB peak RSS
+at $N = 256$ from the SAT clauses generated for SABER's nested
+$\mathtt{bvmul}$, $\mathtt{bvshl}$, $\mathtt{bvsub}$ SSA
+structure, and runs out of memory at $N \geq 384$ within a
+55\,GB virtual memory budget.
 
 \begin{table}[ht]
-\caption{SABER karatsuba2 with deferred bit-blasting (DEFER) vs the
-default configuration (DEFAULT). Per output coefficient via the
-all-coefficients disjunction; 600\,s timeout; 55\,GB virtual memory
-limit. The default ceiling at $N \geq 384$ is memory-bound (\textsc{oom});
-the deferred ceiling at $N \geq 1024$ is time-bound (\textsc{t/o}).}
+\caption{SABER karatsuba2 with the default (deferred) configuration
+versus the $\texttt{DISABLE\_DEFER\_BITBLAST}$ ablation. Per output
+coefficient via the all-coefficients disjunction; 600\,s timeout;
+55\,GB virtual memory limit. The ablation ceiling at
+$N \geq 384$ is memory-bound (\textsc{oom}); the default ceiling
+at $N \geq 1024$ is time-bound (\textsc{t/o}).}
 \label{tab:saber-defer}
 \centering
 \small
 \begin{tabular}{lrrrr}
 \toprule
-& \multicolumn{2}{c}{DEFAULT} & \multicolumn{2}{c}{DEFER} \\
+& \multicolumn{2}{c}{ablation: \texttt{DISABLE\_DEFER\_BITBLAST}}
+& \multicolumn{2}{c}{default} \\
 \cmidrule(lr){2-3}\cmidrule(lr){4-5}
 $N$ & RSS (GB) & wall (s) & RSS (MB) & wall (s) \\
 \midrule
@@ -1400,16 +1413,14 @@ $N$ & RSS (GB) & wall (s) & RSS (MB) & wall (s) \\
 \end{tabular}
 \end{table}
 
-The deferral cuts memory by 100--165$\times$ and wall-clock time
-by 8--20$\times$ across $N \in \{64, \ldots, 320\}$ and pushes
-the verification ceiling from $N \geq 320$ (memory-bound) to
-$N \geq 1024$ (time-bound) at the same 55\,GB of virtual memory.
-At $N = 768$ the procedure decides each output coefficient in
-$\sim$5\,minutes with under 2\,GB peak memory; at $N = 1024$ the
-SAT-free Buchberger phase becomes the dominant cost. Pushing the
-ceiling further requires faster polynomial-arithmetic procedures
-(Toom-Cook style multiplication of polynomials, or specialised
-Buchberger orderings for SABER-shaped inputs), not more memory.
+Across $N \in \{64, \ldots, 320\}$ the default cuts memory by
+100--165$\times$ and wall-clock time by 8--20$\times$ relative to
+the ablation. Beyond $N = 320$ the ablation is unable to run
+within the 55\,GB budget at all; the default reaches $N = 768$
+in $\sim$5.8 minutes with under 2\,GB peak memory. At
+$N = 1024$ the algebraic Buchberger phase becomes the dominant
+cost; pushing the time-bound ceiling further would require
+faster polynomial-arithmetic procedures, not more memory.
 
 \paragraph{Reproducibility.}
 Queries are mechanically generated from

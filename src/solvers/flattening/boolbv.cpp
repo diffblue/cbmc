@@ -676,13 +676,16 @@ void boolbvt::set_to(const exprt &expr, bool value)
         ++total_mult_count;
     });
 
-  // Memory-efficient extraction (Re 4 sub-goal 7): when DEFER_BITBLAST=1
-  // and the assertion is an equality between non-internal sides (i.e.,
-  // a candidate for algebraic_equalities), defer the bit-blasting until
-  // after try_algebraic_solve runs. If the algebraic procedure refutes,
-  // the bit-blasting work is skipped entirely; otherwise the assertion
-  // is replayed through the parent set_to in finish_eager_conversion.
-  if(std::getenv("DEFER_BITBLAST") != nullptr && expr.id() == ID_equal)
+  // Memory-efficient extraction (Re 4 sub-goal 7): defer bit-blasting
+  // of SSA equalities until after try_algebraic_solve runs. If the
+  // algebraic procedure refutes, the bit-blasting work is skipped
+  // entirely. If it does not, the queue is replayed in
+  // finish_eager_conversion, recovering identical behaviour.
+  //
+  // On by default. Set DISABLE_DEFER_BITBLAST=1 to opt out for ablation
+  // experiments. See doc/paper-algebraic/paper.tex §4.3 for the SABER
+  // empirical impact (100--165× memory reduction).
+  if(std::getenv("DISABLE_DEFER_BITBLAST") == nullptr && expr.id() == ID_equal)
   {
     auto is_internal = [](const exprt &e)
     {
