@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+^\[main\.assertion\.1\] line 50 namespaced constexpr operator bool resolved: SUCCESS$
+--
+^CONVERSION ERROR$
+^expected constant expression, but got 'operator\(bool\)\(\(const struct integral_constant \*\)&.*'$
+--
+Companion to `cpp17_constexpr_member_in_template`.  That earlier
+test covers constexpr methods of GLOBAL class templates whose
+bodies must be eagerly type-checked in their own (class) scope
+before being installed at the call site as a non-type template
+argument.  This test covers the same pattern when the class
+template lives in a NAMESPACE, which prior to the strip-tag fix
+in `cpp_instantiate_template.cpp` failed to drain the operator
+out of `deferred_typechecking` and surfaced a misleading
+"expected constant expression" diagnostic at the use site.

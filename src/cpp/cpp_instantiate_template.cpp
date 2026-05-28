@@ -3242,8 +3242,20 @@ skip_pack_removal_ft:
     // processing because the parent scope is a template scope.
     {
       std::string class_name = id2string(new_symb_id);
-      if(class_name.substr(0, 4) == "tag-")
-        class_name = class_name.substr(4);
+      // Strip the "tag-" marker that precedes the unqualified
+      // class name in the symbol-table id of a class-template
+      // instantiation.  The id has the form
+      //   `[ns1::...::nsN::]tag-Name<args>`,
+      // so the `tag-` token sits after the last `::`, not at
+      // position 0.  The deferred method ids are stored without
+      // the `tag-` token (e.g. `ns::Name<args>::method(this)`),
+      // so we need a class_name in the same shape for the
+      // substring match below to succeed.
+      auto last_sep = class_name.rfind("::");
+      std::size_t tag_pos =
+        last_sep != std::string::npos ? last_sep + 2 : 0;
+      if(class_name.compare(tag_pos, 4, "tag-") == 0)
+        class_name.erase(tag_pos, 4);
       class_name += "::";
       std::vector<irep_idt> to_move;
       for(const auto &d : deferred_typechecking)
