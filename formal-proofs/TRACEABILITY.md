@@ -48,6 +48,9 @@ implementation site with one or more Lean theorems.
 | `groebner.cpp::compute` (2-trick preserves ideal) | `StrongGB.lean::two_trick_preserves_ideal`, `two_trick_preserves_ideal_mv` | DONE |
 | `groebner.cpp::compute` (UNSAT detection sound) | `StrongGB.lean::two_trick_unsat_sound` | DONE |
 | `groebner.cpp::compute` (naive completeness false) | `StrongGB.lean::naive_completeness_is_false` | DONE |
+| `groebner.cpp::compute` (d=1 completeness) | `StrongGB.lean::d_eq_one_completeness` | DONE |
+| `groebner.cpp::compute` (idempotent ⇒ {0,1}) | `StrongGB.lean::sq_eq_self_of_zmod_two_pow` | DONE |
+| `groebner.cpp::compute` (local ring structure) | `StrongGB.lean::isLocalRing_ZMod_prime_pow` | DONE |
 | `groebner.cpp::compute` (refined saturation completeness) | `StrongGB.lean::two_trick_saturation_complete` | STATEMENT-ONLY |
 | `boolbv.cpp::set_to`/`finish_eager_conversion` (defer/replay) | `Defer.lean::defer_replay_equivalence` | DONE-MOD-AXIOMS |
 
@@ -69,10 +72,13 @@ The `StrongGB.lean::MathlibCandidates` namespace contains general-purpose facts 
 
 - `isUnit_of_odd_nat_in_two_pow`: an odd natural number is a unit in `ZMod (2^d)`.
 - `isUnit_iff_two_not_dvd_val`: a `ZMod (2^d)` element is a unit iff its lift to `ℕ` is odd.
+- `not_isUnit_iff_prime_dvd_val`: in `ZMod (p^n)`, a non-unit has `p | val`.
+- `isLocalRing_ZMod_prime_pow`: `IsLocalRing (ZMod (p^n))` for prime `p` and `n ≥ 1`. The unique maximal ideal is `(p)`.
 
-Additional candidates (not yet in MathlibCandidates):
+Additionally, `StrongGB.lean::sq_eq_self_of_zmod_two_pow` (outside the namespace) proves that `x^2 = x` in `ZMod (2^d)` implies `x = 0 ∨ x = 1`. This generalises `eq_zero_or_one_of_sq_eq_self` (which requires `CancelMonoidWithZero`) to the non-domain `ZMod (2^d)`.
 
-- `IsLocalRing (ZMod (p^n))` for prime `p` and `n ≥ 1`. This is a clean, self-contained instance that mathlib does not currently have.
+Additional candidates (not yet formalised):
+
 - `Re4.lean::frobenius_pow_eq_self` is a useful 2-adic-valuation fact that could be generalised.
 
 ## Verification

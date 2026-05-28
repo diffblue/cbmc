@@ -2020,20 +2020,33 @@ covers the following modules:
   $\mathbb{Z}_{2^d}$ and for $\mathrm{MvPolynomial}\, \mathrm{Fin}\, n\, \mathbb{Z}_{2^d}$),
   and re-export the existing soundness chain (odd constant in
   basis $\Rightarrow$ ideal $= \top \Rightarrow$ original system
-  UNSAT). The deep completeness theorem
+  UNSAT). We also prove:
+  \begin{itemize}
+  \item \texttt{naive\_completeness\_is\_false}: the naive
+    completeness statement (``$F$ unsat $\Rightarrow$ odd constant
+    in $\langle F\rangle$'') is \emph{false}; concrete
+    counterexample with $d=2$, $n=0$, $F=\{C\,2\}$.
+  \item \texttt{d\_eq\_one\_completeness}: for $d=1$ (over
+    $\mathrm{GF}(2)$) with idempotency on each variable, $F$
+    unsat implies $1 \in \langle F\rangle$. Proof via
+    maximal-ideal argument + quotient field + idempotent
+    $\Rightarrow$ $\{0,1\}$.
+  \item \texttt{sq\_eq\_self\_of\_zmod\_two\_pow}: $x^2 = x$ in
+    $\mathbb{Z}_{2^d}$ implies $x \in \{0,1\}$. Generalises
+    \texttt{eq\_zero\_or\_one\_of\_sq\_eq\_self} to non-domains.
+  \item \texttt{isLocalRing\_ZMod\_prime\_pow}:
+    $\mathbb{Z}_{p^n}$ is a local ring for prime $p$, $n \geq 1$.
+    Mathlib contribution candidate.
+  \end{itemize}
+  The deep completeness theorem
   (\texttt{two\_trick\_saturation\_complete}) is stated
-  precisely over $\mathrm{MvPolynomial}$ but admitted as
-  \texttt{sorry}; the corollary \texttt{unsat\_implies\_ideal\_top}
-  is proven from the completeness statement plus the
-  mechanised soundness chain. Two axioms (\texttt{strongGB} as
+  precisely with a \texttt{WellFormedEncoding} hypothesis
+  (idempotency on each variable, placeholder for the full
+  BV-encoding structure) but admitted as \texttt{sorry}.
+  Two axioms (\texttt{strongGB} as
   the algorithm interface, \texttt{strongGB\_ideal\_preserved}
   as the soundness invariant) capture what the implementation
-  provides; mechanising the soundness invariant from first
-  principles requires extending the existing
-  \texttt{BuchbergerCorrectness.lean} chain to the saturation
-  step (the saturation step preserves ideals by
-  \texttt{two\_trick\_preserves\_ideal\_mv}, so this is mostly
-  bookkeeping). Full mechanisation of completeness is the
+  provides. Full mechanisation of completeness is the
   Song et al.~\cite{song2024equational} contribution and
   requires the five-step decomposition documented in the
   \texttt{StrongGB.lean} module docstring.
