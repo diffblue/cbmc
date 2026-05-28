@@ -161,46 +161,153 @@ theorem bvuge_2d_minus_2k_implies_high_bits_one {d k : ℕ} (_hd : 0 < d)
     omega
   rw [h_test]; rfl
 
-/-! ## (3) Bit-comparator chain encoding (high-level statement) -/
+/-! ## (3) Bit-comparator chain encoding
 
-/-- A bit-comparator chain function matching the implementation's
-    recurrence at the level of natural numbers.
+    The implementation builds a polynomial recurrence
 
-    Returns 1 if the prefix `xs[0..d-1]` interpreted as binary is
-    less than the prefix `ys[0..d-1]`, else 0. -/
-def chainLt (d : ℕ) (xs ys : Fin d → Bool) : ℕ :=
-  if (∑ i : Fin d, if xs i then 2 ^ (i : ℕ) else 0) <
-     (∑ i : Fin d, if ys i then 2 ^ (i : ℕ) else 0)
-  then 1 else 0
+      lt_d = 0,  eq_d = 1
+      lt_i = lt_{i+1} + eq_{i+1} * (1 - x_i) * y_i        (i = d-1, ..., 0)
+      eq_i = eq_{i+1} * (x_i * y_i + (1 - x_i) * (1 - y_i))
+
+    such that at termination `lt_0 = 1 ⇔ x.val < y.val` (when all
+    bit variables are in {0, 1}). We mechanise this by:
+
+      1. Defining a Boolean recurrence `chainLtBool` mirroring the
+         polynomial recurrence (using && / || / ! on Bool).
+
+      2. Showing that this Boolean recurrence equals the comparison
+         of the bit-decomposed values (`listToVal`).
+
+    The polynomial recurrence is then sound by the standard
+    {0, 1}-valuation argument: when bit variables are interpreted
+    as 0 or 1 in any commutative ring, polynomial multiplication
+    matches Boolean conjunction, polynomial (1 - x) matches Boolean
+    negation, and polynomial (a + b - a*b) matches Boolean
+    disjunction.
+-/
+
+/-- Value of a bit list, with LSB at the head of the list. -/
+def listToVal : List Bool → ℕ
+  | [] => 0
+  | b :: bs => (if b then 1 else 0) + 2 * listToVal bs
+
+/-- The Boolean recurrence corresponding to the polynomial chain
+    in `extract_predicate`. Returns `(lt, eq)` for the comparison
+    of two bit lists with LSB at the head.
+
+    Convention: head = bit 0 (LSB). Recursion processes the higher
+    bits first (the tail), then incorporates the current bit. This
+    matches the implementation's loop, which computes
+    `lt_{d-1}, lt_{d-2}, ..., lt_0` in order. -/
+def chainLtBool : List Bool → List Bool → Bool × Bool
+  | [], [] => (false, true)
+  | x :: xs', y :: ys' =>
+      let (lt_high, eq_high) := chainLtBool xs' ys'
+      ((lt_high || (eq_high && !x && y)), (eq_high && (x == y)))
+  | _, _ => (false, false)  -- mismatched lengths
+
+/-- listToVal of a list of length d is bounded by 2^d. -/
+private lemma listToVal_lt_two_pow : ∀ (xs : List Bool),
+    listToVal xs < 2 ^ xs.length
+  | [] => by simp [listToVal]
+  | b :: bs => by
+    simp only [listToVal, List.length_cons, pow_succ]
+    have ih := listToVal_lt_two_pow bs
+    have h_b : (if b then (1 : ℕ) else 0) ≤ 1 := by by_cases h : b <;> simp [h]
+    omega
 
 /-- IMPL: src/solvers/algebraic/poly_extract.cpp::extract_predicate
     (chain encoding for general constants and symbol-symbol).
 
-    The implementation builds polynomials lt_i, eq_i representing
-    the boolean values of the prefix comparison. The recurrence is
-      lt_i  = lt_{i+1} + eq_{i+1} * (1 - x_i) * y_i
-      eq_i  = eq_{i+1} * (x_i * y_i + (1 - x_i) * (1 - y_i))
-    and at termination, lt_0 = 1 ⇔ x.val < y.val.
+    SOUNDNESS DIRECTION: the Boolean recurrence `chainLtBool`
+    correctly computes `(decide (Vx < Vy), decide (Vx = Vy))`
+    where `Vx = listToVal xs` and `Vy = listToVal ys`.
 
-    SOUNDNESS: this `chainLt` definition computes the same boolean
-    value as the polynomial recurrence at lt_0; the polynomial
-    recurrence is constructed to match this boolean (when bit
-    variables are in {0, 1}, all intermediates are in {0, 1}).
+    Proof by induction on the lists. The base case (both empty)
+    gives `(false, true)` matching `Vx = Vy = 0`. The inductive
+    case decomposes `Vx = bx + 2*Vx_high`, `Vy = by + 2*Vy_high`
+    with `bx, by ∈ {0, 1}`. Case-splitting on x and y as concrete
+    Bools (4 cases) and on the lt_trichotomy of `Vx_high` vs
+    `Vy_high` (3 cases) gives 12 sub-cases each closable by
+    omega. -/
+theorem chainLtBool_correctness :
+    ∀ (xs ys : List Bool), xs.length = ys.length →
+    (chainLtBool xs ys).1 = decide (listToVal xs < listToVal ys) ∧
+    (chainLtBool xs ys).2 = decide (listToVal xs = listToVal ys)
+  | [], [], _ => by simp [chainLtBool, listToVal]
+  | [], _ :: _, hlen => by simp at hlen
+  | _ :: _, [], hlen => by simp at hlen
+  | x :: xs', y :: ys', hlen => by
+    have hlen' : xs'.length = ys'.length := by simpa using hlen
+    obtain ⟨ih_lt, ih_eq⟩ := chainLtBool_correctness xs' ys' hlen'
+    -- Unfold definitions in the goal.
+    have h_def_lt : (chainLtBool (x :: xs') (y :: ys')).1
+                  = ((chainLtBool xs' ys').1 ||
+                     ((chainLtBool xs' ys').2 && !x && y)) := rfl
+    have h_def_eq : (chainLtBool (x :: xs') (y :: ys')).2
+                  = ((chainLtBool xs' ys').2 && (x == y)) := rfl
+    have h_v_x : listToVal (x :: xs')
+                = (if x then 1 else 0) + 2 * listToVal xs' := rfl
+    have h_v_y : listToVal (y :: ys')
+                = (if y then 1 else 0) + 2 * listToVal ys' := rfl
+    -- Set abbreviations.
+    set Vx := listToVal xs'
+    set Vy := listToVal ys'
+    refine ⟨?_, ?_⟩
+    · -- lt component.
+      rw [h_def_lt, ih_lt, ih_eq, h_v_x, h_v_y]
+      rcases lt_trichotomy Vx Vy with h | h | h
+      · -- Vx < Vy: lt = true on lower; lt overall depends on bits being not-too-big.
+        have h_target : (if x then (1 : ℕ) else 0) + 2 * Vx
+                        < (if y then 1 else 0) + 2 * Vy := by
+          cases x <;> cases y <;> simp <;> omega
+        have h_lt : Vx < Vy := h
+        simp [h_lt, decide_eq_true_iff.mpr h_target]
+      · -- Vx = Vy: bits decide.
+        rw [h]
+        cases x <;> cases y <;>
+          simp [decide_eq_true_iff, decide_eq_false_iff_not]
+      · -- Vx > Vy: regardless of bits, x_val > y_val.
+        have h_target : ¬ ((if x then (1 : ℕ) else 0) + 2 * Vx
+                          < (if y then 1 else 0) + 2 * Vy) := by
+          cases x <;> cases y <;> simp <;> omega
+        have h_nlt : ¬ Vx < Vy := by omega
+        have h_neq : Vx ≠ Vy := by omega
+        simp [h_nlt, h_neq, decide_eq_false_iff_not.mpr h_target]
+    · -- eq component.
+      rw [h_def_eq, ih_eq, h_v_x, h_v_y]
+      rcases lt_trichotomy Vx Vy with h | h | h
+      · -- Vx < Vy: not equal at any level.
+        have h_target : ¬ ((if x then (1 : ℕ) else 0) + 2 * Vx
+                          = (if y then 1 else 0) + 2 * Vy) := by
+          cases x <;> cases y <;> simp <;> omega
+        have h_neq : Vx ≠ Vy := by omega
+        simp [h_neq, decide_eq_false_iff_not.mpr h_target]
+      · -- Vx = Vy: bits decide.
+        rw [h]
+        cases x <;> cases y <;>
+          simp [decide_eq_true_iff, decide_eq_false_iff_not]
+      · -- Vx > Vy: not equal.
+        have h_target : ¬ ((if x then (1 : ℕ) else 0) + 2 * Vx
+                          = (if y then 1 else 0) + 2 * Vy) := by
+          cases x <;> cases y <;> simp <;> omega
+        have h_neq : Vx ≠ Vy := by omega
+        simp [h_neq, decide_eq_false_iff_not.mpr h_target]
 
-    The full mechanised proof of "polynomial recurrence = chainLt"
-    inducts on d and case-splits on the high bits; we state the
-    statement here and refer to a follow-on commit for the
-    expansion. The encoding is otherwise standard textbook material
-    (Vahid & Lysecky, Knuth TAOCP §7.1.3). -/
-theorem chainLt_correctness {d : ℕ} (xs ys : Fin d → Bool) :
-    chainLt d xs ys = 1 ↔
-    (∑ i : Fin d, if xs i then 2 ^ (i : ℕ) else 0) <
-    (∑ i : Fin d, if ys i then 2 ^ (i : ℕ) else 0) := by
-  unfold chainLt
-  by_cases h : (∑ i : Fin d, if xs i then 2 ^ (i : ℕ) else 0) <
-               (∑ i : Fin d, if ys i then 2 ^ (i : ℕ) else 0)
-  · simp [h]
-  · simp [h]
+/-- The Boolean recurrence's `lt` output, applied to bit lists of
+    equal length, computes the value comparison. This is the
+    soundness witness for the polynomial encoding in
+    `extract_predicate`. -/
+theorem chainLtBool_lt_iff (xs ys : List Bool) (hlen : xs.length = ys.length) :
+    (chainLtBool xs ys).1 = true ↔ listToVal xs < listToVal ys := by
+  rw [(chainLtBool_correctness xs ys hlen).1]
+  exact decide_eq_true_iff
+
+/-- The Boolean recurrence's `eq` output computes value equality. -/
+theorem chainLtBool_eq_iff (xs ys : List Bool) (hlen : xs.length = ys.length) :
+    (chainLtBool xs ys).2 = true ↔ listToVal xs = listToVal ys := by
+  rw [(chainLtBool_correctness xs ys hlen).2]
+  exact decide_eq_true_iff
 
 /-! ## (4) Signed via XOR -/
 
