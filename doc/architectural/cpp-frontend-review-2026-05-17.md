@@ -2979,3 +2979,117 @@ underlying error.  Replaced with a fallback to `convert_norep`.
 The branch is now 70 commits ahead of
 `tautschnig/cpp11-parser-rework-squashed`.  Push remains
 permission-gated.
+
+
+## 2026-05-28 Next blocking layers: investigation findings (no fix)
+
+After the std::pair fix landed (`80030aa86d`), investigated the
+next two blocking layers in dog-food's 80 FAILs.  Both are
+PRE-EXISTING; the std::pair fix neither caused nor regressed them.
+
+### Layer 1: `symbol 'reserve' is unknown`
+
+Affects ~30+ dog-food files that include
+`src/util/std_types.h`'s `parameter_indices()` method:
+
+```cpp
+typedef std::unordered_map<irep_idt, std::size_t> parameter_indicest;
+parameter_indicest parameter_indices = ...;
+parameter_indices.reserve(params.size());  // <-- fails here
+```
+
+**Failure chain** (with the std::pair fix landed):
+
+1. Instantiating
+   `std::unordered_map<dstringt, size_t, hash, equal_to, allocator>`.
+2. Inside, instantiating `std::_Hashtable<...>` which inherits
+   from `_Rehash_base`.
+3. `_Rehash_base` (hashtable_policy.h:1152) has a default template
+   argument
+   `__detected_or_t<false_type, __has_load_factor, _RehashPolicy>`
+   (a TT-parameter forwarding pattern).
+4. `__has_load_factor` arrives in CBMC as a
+   `template_parameter_symbol_typet` placeholder rather than a
+   resolved class-template name.
+5. The placeholder propagates into `std::__detected_or_t`'s args
+   and the downstream `(bool)integral_constant{}` evaluation
+   fails: `expected constant expression, but got
+   'operator(bool)((const struct integral_constant *)&<<expr:struct>>)'`.
+6. The unordered_map class body elaboration aborts with
+   `unordered_map`'s primary base incomplete; `reserve` (a member
+   of `_Rehash_base` partial specialization) is never registered.
+7. User code's `parameter_indices.reserve(...)` then errors with
+   `symbol 'reserve' is unknown`.
+
+**Baseline behaviour**: a different invariant violation (the
+`expr2cpp::convert_struct` operand-count mismatch) crashes the
+program before reaching `reserve`.  The std::pair fix's
+diagnostic safety net replaces the crash with the visible
+`reserve unknown` error.
+
+**Attempted fix**: extending `cpp_template_args_tct::has_unassigned()`
+to also recognise `ID_template_parameter_symbol_type` as a
+"don't instantiate" signal.  Broke
+`cpp17_tt_param_alias_forward`: that test deliberately exercises
+the legitimate forwarding of a `template_parameter_symbol_type`
+through a TT-parameter alias, and refusing to instantiate kills
+the legitimate path.  Reverted.
+
+**Real fix direction**: the `__has_load_factor` arrival as a
+placeholder rather than a resolved class-template name suggests
+a missing TT-parameter binding step somewhere in
+`typecheck_template_args` / `convert_class_template_specialization`
+when the outer `_Rehash_base` is being defaulted.
+
+### Layer 2: `instantiating 'sharing_treet' …` →
+`found no match for symbol 'swap'`
+
+Affects ~15 dog-food files.  CBMC's own
+`sharing_treet<irept, forward_list_as_mapt<...>>` is the base
+of `irept`.  When elaborated, std::swap's SFINAE return type
+
+```cpp
+_Require<__not_<__is_tuple_like<_Tp>>,
+         is_move_constructible<_Tp>,
+         is_move_assignable<_Tp>>
+swap(_Tp&, _Tp&)
+noexcept(__and_<is_nothrow_move_constructible<_Tp>,
+                is_nothrow_move_assignable<_Tp>>::value);
+```
+
+at type_traits:2721-2727 fails to resolve.  Trace shows recursive
+re-entry into sharing_treet during the SFINAE evaluation —
+likely during `noexcept(__and_<...>::value)` constant-folding,
+which involves looking up `swap` again on the same type.
+
+The candidates are listed but no overload matches; the lookup
+returns "found no match".
+
+**Baseline behaviour**: same chain, same error (no crash here —
+unlike `reserve`, this fails cleanly even on baseline).  This is
+an independent SFINAE-evaluation bug.
+
+**Real fix direction**: probably in
+`cpp_typecheck_template.cpp`'s overload resolution or the
+SFINAE `noexcept` clause evaluation.  Without a deeper trace
+I can't pinpoint the exact code path that returns "no match"
+when the candidates are right there.
+
+### Numbers
+
+cbmc-cpp regression: 691/0/86 (unchanged from std::pair fix
+landing).  Dog-food: 20/17/80/0 (also unchanged).  These two
+layers are blockers for ~50% of dog-food FAILs but are
+fundamentally separate from the constructor-template signature
+typecheck fix.
+
+### Status
+
+Investigation complete; no fix landed for these layers.  The
+audit recorded in `a160d01c0c` predicted the std::pair fix
+would unblock ~47 of 80; in practice the fix unblocks the pair
+layer cleanly but a *second* template-template parameter
+resolution issue (in libstdc++'s `__detected_or_t` /
+`__has_load_factor`) and a *third* SFINAE noexcept evaluation
+issue (in std::swap) remain.  These need separate fixes and
+are independent of the constructor-template work.
