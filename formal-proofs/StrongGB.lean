@@ -428,9 +428,13 @@ end MathlibCandidates
 /-- The d = 1 case: for `F` over `MvPolynomial _ (ZMod 2)` with
     idempotency on each variable, F unsat implies `1 ∈ ⟨F⟩`.
 
-    PROOF STATUS: STATEMENT-ONLY. The proof outline (via maximal
-    ideal + characteristic-2 field argument) is in the docstring
-    above. -/
+    Proof via maximal-ideal argument:
+      1. By contradiction: assume `1 ∉ ⟨F⟩`, so `⟨F⟩ ≠ ⊤`.
+      2. Get maximal `M ⊇ ⟨F⟩`.
+      3. `K := MvPolynomial _ (ZMod 2) ⧸ M` is a field.
+      4. Idempotency forces each `X i`'s image in K to be 0 or 1.
+      5. Construct `φ' : Fin n → ZMod 2` from the images.
+      6. Show `eval φ' p = 0` for each `p ∈ F` (contradicts hunsat). -/
 theorem d_eq_one_completeness {n : ℕ}
     (F : Finset (MvPolynomial (Fin n) (ZMod 2)))
     (h_idemp : ∀ i : Fin n,
@@ -440,6 +444,7 @@ theorem d_eq_one_completeness {n : ℕ}
               ∃ p ∈ F, MvPolynomial.eval φ p ≠ 0) :
     (1 : MvPolynomial (Fin n) (ZMod 2))
       ∈ Ideal.span (α := MvPolynomial (Fin n) (ZMod 2)) F := by
+  classical
   by_contra h_not_in
   -- ⟨F⟩ ≠ ⊤
   have h_ne_top :
@@ -449,20 +454,97 @@ theorem d_eq_one_completeness {n : ℕ}
     rw [h_top]; trivial
   -- Get a maximal ideal M ⊇ ⟨F⟩
   obtain ⟨M, hM_max, hM_le⟩ := Ideal.exists_le_maximal _ h_ne_top
-  -- The quotient K := MvPolynomial _ (ZMod 2) ⧸ M is a field
-  -- (via Ideal.Quotient.field [hM_max]).
-  -- Define φ : Fin n → K via the canonical map. Each φ i satisfies
-  -- φ i ^ 2 = φ i (from idempotency in F ⊆ M), so φ i ∈ {0, 1} in K.
-  -- Map back to (ZMod 2)^n via the embedding ZMod 2 → K, getting
-  -- φ' : Fin n → ZMod 2 with eval φ' p = 0 for each p ∈ F.
-  -- This contradicts hunsat.
-  --
-  -- The full mechanisation requires:
-  --   - The Ideal.Quotient.field instance.
-  --   - ZMod 2 → K injective (ring hom from a field to nontrivial).
-  --   - Idempotency forcing φ i ∈ {0, 1} in K.
-  --   - Evaluation factoring through the quotient.
-  -- These are all standard but require careful manipulation in Lean.
-  sorry
+  -- K := MvPolynomial _ (ZMod 2) ⧸ M is a field
+  letI : M.IsMaximal := hM_max
+  letI K_field := Ideal.Quotient.field M
+  set K := MvPolynomial (Fin n) (ZMod 2) ⧸ M
+  set π : MvPolynomial (Fin n) (ZMod 2) →+* K := Ideal.Quotient.mk M
+  -- The image of X i in K satisfies x^2 = x (from idempotency in F ⊆ M)
+  have h_idemp_K : ∀ i : Fin n, π (MvPolynomial.X i) ^ 2 = π (MvPolynomial.X i) := by
+    intro i
+    have h_in_M : (MvPolynomial.X i ^ 2 - MvPolynomial.X i :
+        MvPolynomial (Fin n) (ZMod 2)) ∈ M := by
+      exact hM_le (Ideal.subset_span (h_idemp i))
+    have h_zero : π (MvPolynomial.X i ^ 2 - MvPolynomial.X i) = 0 :=
+      Ideal.Quotient.eq_zero_iff_mem.mpr h_in_M
+    simp only [map_sub, map_pow] at h_zero
+    exact sub_eq_zero.mp h_zero
+  -- In a field, x^2 = x implies x = 0 or x = 1
+  have h_zero_or_one : ∀ i : Fin n,
+      π (MvPolynomial.X i) = 0 ∨ π (MvPolynomial.X i) = 1 := by
+    intro i
+    exact eq_zero_or_one_of_sq_eq_self (h_idemp_K i)
+  -- Construct φ' : Fin n → ZMod 2 from the images
+  -- If π(X i) = 0, set φ' i = 0; if π(X i) = 1, set φ' i = 1.
+  set φ' : Fin n → ZMod 2 := fun i =>
+    if h : π (MvPolynomial.X i) = 0 then 0 else 1
+  -- Key: π(X i) = algebraMap (ZMod 2) K (φ' i)
+  have h_phi_eq : ∀ i : Fin n,
+      π (MvPolynomial.X i) = algebraMap (ZMod 2) K (φ' i) := by
+    intro i
+    rcases h_zero_or_one i with h | h
+    · -- π(X i) = 0, φ' i = 0
+      have hφ : φ' i = 0 := dif_pos h
+      rw [hφ, map_zero, h]
+    · -- π(X i) = 1, φ' i = 1
+      have h_ne : ¬ (π (MvPolynomial.X i) = 0) := by
+        rw [h]
+        -- 1 ≠ 0 in K (a field). Use that M is not the whole ring.
+        intro h_one_eq_zero
+        have : (1 : MvPolynomial (Fin n) (ZMod 2)) ∈ M := by
+          rw [← Ideal.Quotient.eq_zero_iff_mem]
+          exact h_one_eq_zero
+        exact hM_max.1.1 ((Ideal.eq_top_iff_one M).mpr this)
+      have hφ : φ' i = 1 := dif_neg h_ne
+      rw [hφ, map_one, h]
+  -- For any p ∈ F: π(p) = 0 (since p ∈ ⟨F⟩ ⊆ M)
+  have h_pi_zero : ∀ p ∈ F, π p = 0 := by
+    intro p hp
+    exact Ideal.Quotient.eq_zero_iff_mem.mpr (hM_le (Ideal.subset_span hp))
+  -- Key computation: π(p) = algebraMap (ZMod 2) K (eval φ' p)
+  -- This uses: π = eval₂Hom (algebraMap (ZMod 2) K) (π ∘ X)
+  -- and the fact that π(X i) = algebraMap (ZMod 2) K (φ' i).
+  have h_pi_eq_eval : ∀ p : MvPolynomial (Fin n) (ZMod 2),
+      π p = algebraMap (ZMod 2) K (MvPolynomial.eval φ' p) := by
+    intro p
+    -- π is a ring hom from MvPolynomial (Fin n) (ZMod 2) to K.
+    -- eval φ' is eval₂Hom (RingHom.id _) φ'.
+    -- We need: π p = (algebraMap (ZMod 2) K) (eval₂Hom (RingHom.id _) φ' p)
+    -- i.e., π p = eval₂Hom (algebraMap (ZMod 2) K) (algebraMap (ZMod 2) K ∘ φ') p
+    -- (by comp_eval₂Hom).
+    -- But also π = eval₂Hom (π.comp C) (π ∘ X) = eval₂Hom (algebraMap (ZMod 2) K) (π ∘ X)
+    -- (since π.comp C = algebraMap (ZMod 2) K for the quotient).
+    -- And π ∘ X = algebraMap (ZMod 2) K ∘ φ' (by h_phi_eq).
+    -- So π = eval₂Hom (algebraMap (ZMod 2) K) (algebraMap (ZMod 2) K ∘ φ')
+    --      = (algebraMap (ZMod 2) K).comp (eval₂Hom (RingHom.id _) φ')
+    --      = (algebraMap (ZMod 2) K) ∘ (eval φ').
+    have h_pi_ext : π = (algebraMap (ZMod 2) K).comp (MvPolynomial.eval φ') := by
+      apply MvPolynomial.ringHom_ext
+      · intro r
+        simp only [RingHom.comp_apply, MvPolynomial.eval_C]
+        -- π (C r) = algebraMap (ZMod 2) K r
+        -- π is the quotient map; C r is the image of r in MvPolynomial.
+        -- algebraMap (ZMod 2) K = π.comp (MvPolynomial.C)
+        -- So π (C r) = (π.comp C) r = algebraMap (ZMod 2) K r.
+        show π (MvPolynomial.C r) = algebraMap (ZMod 2) K r
+        rfl
+      · intro i
+        simp only [RingHom.comp_apply, MvPolynomial.eval_X]
+        -- π (X i) = algebraMap (ZMod 2) K (φ' i)
+        exact h_phi_eq i
+    exact congr_fun (congr_arg DFunLike.coe h_pi_ext) p
+  -- Now: for each p ∈ F, algebraMap (ZMod 2) K (eval φ' p) = 0
+  -- Since algebraMap (ZMod 2) K is injective (ring hom from a field),
+  -- eval φ' p = 0 for each p ∈ F.
+  have h_alg_inj : Function.Injective (algebraMap (ZMod 2) K) :=
+    (algebraMap (ZMod 2) K).injective
+  have h_eval_zero : ∀ p ∈ F, MvPolynomial.eval φ' p = 0 := by
+    intro p hp
+    have := h_pi_zero p hp
+    rw [h_pi_eq_eval p] at this
+    exact h_alg_inj (this.trans (map_zero _).symm)
+  -- This contradicts hunsat: φ' is a common zero of F.
+  obtain ⟨p, hp, hp_ne⟩ := hunsat φ'
+  exact hp_ne (h_eval_zero p hp)
 
 end StrongGB
