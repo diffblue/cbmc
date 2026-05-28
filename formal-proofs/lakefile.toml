@@ -36,3 +36,6 @@ name = "Defer"
 
 [[lean_lib]]
 name = "PolyRing"
+
+[[lean_lib]]
+name = "ExtractCandidate"

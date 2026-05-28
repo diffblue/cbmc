@@ -347,6 +347,16 @@ strong_groebner_basist::compute(std::vector<polynomialt> &polys)
   return has_constant(polys) ? resultt::UNSAT : resultt::UNKNOWN;
 }
 
+// PROOF: formal-proofs/ExtractCandidate.lean::extract_candidate_local_soundness
+//        Local soundness of the univariate-linear solve step:
+//        when c is a unit (odd in Z_{2^bw}), c*x + d = 0 has a
+//        unique solution x = -d * c^{-1}. The C++ algorithm
+//        constructs precisely this value (using inverse_mod_2d
+//        for the inverse and adjusting for the 2-adic valuation
+//        of c when c is not itself a unit).
+// PROOF: formal-proofs/ExtractCandidate.lean::solve_univariate_linear_unit
+//        Existence of a solution when the leading coefficient is
+//        a unit (odd). Same fact phrased existentially.
 std::map<std::size_t, mp_integer> strong_groebner_basist::extract_candidate(
   const std::vector<polynomialt> &basis,
   unsigned bw)
