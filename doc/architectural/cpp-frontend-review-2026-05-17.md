@@ -3228,3 +3228,240 @@ Documented here so a future session can attack them.
 ### Numbers (unchanged)
 
 cbmc-cpp regression: **691/0/86**.  Dog-food: **20/17/80/0**.
+
+
+## 2026-05-28 Deep dive on the three fix directions
+
+User asked for a much more detailed evaluation of the three fix
+options against the C++ standard (N5008).  Findings below revise
+the previous analysis.
+
+### Revised diagnosis: TT-parameter leak is COSMETIC
+
+The trace text `<<type:template_parameter_symbol_type>>` that shows
+up in dog-food output is not a fault — it is `to_string()` of a
+typet whose `id() == ID_template_parameter_symbol_type`, which is
+the encoding the existing `cpp17_tt_param_alias_forward` fix uses
+to pass class-template-alias names through TT-parameters
+(cpp_typecheck_template.cpp:1812-1827).  That encoding round-trips
+correctly through `template_map.cpp:194+` (the cpp_name reshaping
+that rewrites `_Op<_Args...>` to `__pointer<_Args...>` when
+`_Op` is bound to the alias).  The reason `cpp17_tt_param_alias_forward`
+verifies "successfully" is because the partial-spec body
+`using type = _Op<_Args...>` falls back to the primary template
+(giving `_Default`); the test happens to be a tautology
+(`__CPROVER_assert(sizeof(p) >= 0)`) so any pointer width is fine.
+For `__detected_or_t<value_type*, __pointer, _Alloc>` inside
+`allocator_traits` similar fall-through happens — `pointer`
+becomes `value_type*`, which is valid and matches what most users
+of `unordered_map` expect.
+
+The trace lines are noise, not failure cause.
+
+### Real diagnosis: namespaced-template constexpr eval
+
+The dog-food fatal error
+```
+expected constant expression, but got
+'operator(bool)((const struct integral_constant *)&...)'
+```
+at `hashtable.h:61` is a constexpr-evaluation failure for
+`_Hashtable_enable_default_ctor`'s bool template argument:
+```cpp
+_Enable_default_constructor<__and_<is_default_constructible<_Equal>,
+                                   is_default_constructible<_Hash>,
+                                   is_default_constructible<_Allocator>>{},
+                            __detail::_Hash_node_base>;
+```
+The `__and_<...>{}` is a value-initialized literal-type temporary
+that derives from `integral_constant<bool, true>` (or false).  Per
+[expr.const]/2-5, evaluating
+`static_cast<bool>(__and_<...>{})` at compile time is a valid
+constant expression: value-initialization of a literal type is
+constant, and `integral_constant<bool, X>::operator bool()` is
+constexpr, returning the static `value`.
+
+Reproduced minimally:
+```cpp
+namespace n {
+template<bool _v>
+struct integral_constant {
+  static constexpr bool value = _v;
+  constexpr operator bool() const noexcept { return value; }
+};
+using true_type = integral_constant<true>;
+}
+template <bool B> struct EnableIf {};
+EnableIf<n::true_type{}> e1;        // FAILS
+```
+Move the same code to the global namespace and it works.  The
+namespace + template combination is what triggers the failure.
+
+### Tracing the difference
+
+Instrumented `try_evaluate_constexpr` in
+`cpp_instantiate_template.cpp:422` and the eligibility check
+just below it (`cpp_typecheck_expr.cpp:3163-3266`).  The
+eligibility predicate
+```cpp
+bool eligible_constexpr =
+  symbol_ptr != nullptr && symbol_ptr->is_macro &&
+  !functions_being_typechecked.count(sym_expr->get_identifier()) &&
+  !deferred_typechecking.count(sym_expr->get_identifier()) &&
+  body_is_code;
+```
+fires `false` for the namespaced case because the operator's
+identifier is in `deferred_typechecking`.  For the global case it
+fires `true`.
+
+`deferred_typechecking` is populated in
+`cpp_typecheck_compound_type.cpp:2389` whenever a method is
+declared inside a class template.  Both global and namespaced
+operators are inserted.  The set is then drained per-class in
+`cpp_instantiate_template.cpp:3242-3252` once the class is
+instantiated:
+```cpp
+std::string class_name = id2string(new_symb_id);
+if(class_name.substr(0, 4) == "tag-")
+  class_name = class_name.substr(4);
+class_name += "::";
+for(const auto &d : deferred_typechecking)
+  if(id2string(d).find(class_name) != std::string::npos)
+    to_move.push_back(d);
+```
+
+The `class_name.substr(0, 4) == "tag-"` strip is the bug.
+- For `new_symb_id = "tag-integral_constant<1>"`: strips to
+  `integral_constant<1>::`, matches deferred entries
+  `integral_constant<1>::operator(bool)...`  → operator gets
+  drained, eligible_constexpr=true, constexpr eval succeeds.
+- For `new_symb_id = "n::tag-integral_constant<1>"`: does NOT
+  start with "tag-", so the strip is skipped.  class_name stays
+  `n::tag-integral_constant<1>::`.  The deferred entries are of
+  the form `n::integral_constant<1>::operator(bool)...` (no
+  `tag-` in the middle).  Substring match fails → operator stays
+  deferred → eligible_constexpr=false → constexpr eval skipped
+  → struct-to-bool conversion remains a runtime call → fails as
+  "expected constant expression".
+
+The `tag-` token marks struct-tag-typed identifiers and lives
+*after* every `::` in a fully-qualified name, not at position 0.
+The strip needs to be after the last `::`.
+
+### Re-evaluating the three fix directions
+
+**Option 1 — Distinguish encodings (irep id for class-template-
+alias TT-arg).**  Misframed.  The encoding via
+`template_parameter_symbol_type(class_template_alias_id)` IS
+correct and currently round-trips via the cpp_name reshaping in
+`template_map.cpp`.  The "leak" in the trace is the partial-spec
+match falling back to the primary template, which is ALLOWED per
+[temp.class.spec.match]/3 when SFINAE on the partial-spec args
+fails.  No new irep id needed.  Cost-benefit: medium effort, no
+benefit for the actual blocker.  **Reject.**
+
+**Option 2 — Downstream expansion of class-template-alias TT-arg
+in template_map.apply.**  Also misframed.  The expansion already
+happens correctly (in template_map.cpp:194+).  The remaining
+"leak" is at partial-spec match time when CBMC tries to satisfy
+`__detector<_Default, __void_t<_Op<_Args...>>, _Op, _Args...>`
+against actual args containing the placeholder.  Per
+[temp.alias]/2-3, alias substitution applies during dependent
+template-id resolution; per [temp.deduct]/8 substitution failure
+is SFINAE.  CBMC currently treats `__void_t<X>` as `void`
+unconditionally without trying to substitute X; the partial spec
+"matches" (because void↔void), then `using type = _Op<_Args...>`
+becomes the placeholder.  This IS technically wrong per the
+standard, but the resulting type `_Default` (when the placeholder
+later fails to resolve) is the same answer that the correct
+SFINAE evaluation would give for the "X not well-formed" branch.
+So Option 2 is standards-correct work that produces no
+behavioural change for this case.  Cost-benefit: high effort, no
+material benefit for the actual blocker.  **Defer.**
+
+**Option 3 — Implement `__cpp_concepts` SFINAE check for
+`requires { typename _Op<_Args...>; }`.**  Inapplicable.
+`__cpp_concepts` is NOT defined in CBMC's `--cpp17` (or even
+`--cpp20`) compilation, so libstdc++ uses the void_t-based path
+in `<type_traits>:2655-2680`, not the requires-clause-based one.
+Pre-defining `__cpp_concepts` causes parser failures because
+CBMC's `parse.cpp:1418-1500` only partially handles the C++20
+concepts grammar (the requires-clause skipper bails at the
+`requires requires { ... }` form used by libstdc++ and
+fundamental-types-tests).  Cost-benefit: very high effort
+(parser + typecheck + SFINAE all together); no benefit for this
+blocker since libstdc++ doesn't take the concepts path.
+**Reject.**
+
+### The real fix
+
+A new option not covered in the previous diagnosis:
+
+**Option 4 — Fix the `tag-` strip in
+`cpp_instantiate_template.cpp:3242-3244` to operate after the
+last `::`.**
+
+Concretely:
+```cpp
+std::string class_name = id2string(new_symb_id);
+auto last_sep = class_name.rfind("::");
+std::size_t tag_pos =
+  last_sep != std::string::npos ? last_sep + 2 : 0;
+if(class_name.compare(tag_pos, 4, "tag-") == 0)
+  class_name.erase(tag_pos, 4);
+class_name += "::";
+```
+
+Verified locally: with this fix, the minimal namespaced-template
+repro succeeds, `/tmp/uo_method.cpp` (the dog-food blocker)
+produces VERIFICATION SUCCESSFUL instead of CONVERSION ERROR,
+and `cpp17_constexpr_member_in_template` (the existing canary
+for this code path) keeps passing.
+
+### Why the fix is not (yet) ready to commit
+
+Applying it to the dog-food repository unblocks the dog-food
+blocker AND exposes three pre-existing latent bugs that the
+constexpr-eval / eager-convert path has been hiding because, for
+namespaced templates, that path was never being entered:
+
+1. **template_map.cpp:962 UNREACHABLE.**  Some path through
+   eager-convert reaches `template_map::set` for a non-type
+   parameter with an `ID_type` value.  The invariant says
+   "typechecked before!".  Triggered by base-class resolution
+   under name lookup during eager-convert (e.g. for `std::map`
+   instantiations).  Fixable by softening the invariant to a
+   silent no-op (the binding is just not installed; downstream
+   code produces a regular diagnostic at use site).  This change
+   alone restores most regressions but is conceptually a SFINAE
+   fall-through, which IS standards-conforming behaviour.
+
+2. **cpp20_optional_basic timeout.**  Eager-convert cascades
+   through `std::optional`'s constexpr method tree.  Each
+   eager-convert calls `convert_function`, which can recursively
+   trigger more eager-converts.  A static depth cap (e.g. 8)
+   bounds the recursion; tested values that fix uo_method without
+   excessive cost are still TBD.
+
+3. **cpp11_regex_match invariant.**  Different invariant
+   violation (pre-conditional on a struct cast); needs separate
+   investigation.
+
+Items 1 and 2 are local fixes; item 3 needs more digging.
+
+### Numbers (without any fix applied)
+
+Branch reverted to the state at commit `f931b7211a`.
+cbmc-cpp regressions: **691/0/86**.
+Dog-food: **20/17/80/0**.
+
+### Recommendation
+
+The principled fix is Option 4 (strip `tag-` after the last
+`::`).  It is correct per the standard and per the existing
+deferred-typechecking design.  Committing it requires also
+landing the three downstream fixes — those are what next session
+should focus on.  Options 1, 2 and 3 from the earlier diagnosis
+are not the right routes to take; document them as not-the-fix
+to avoid future investigators spending cycles re-evaluating
+them.
