@@ -962,10 +962,92 @@ poly_extractort::extract_predicate(const exprt &pred, bool value)
   if(lhs.is_constant())
     return try_lower_bound(lhs, rhs);
 
-  // Symmetric symbol-symbol: not supported in this first cut.
-  // Both operands symbolic ⇒ the bit-comparator chain would
-  // need bits of both. Defer to a follow-on commit.
-  return std::nullopt;
+  // Symbol-symbol comparison: bvult x y where both are symbolic.
+  // Encoding: bit-decompose both x and y, then build a comparator
+  // chain in the bit variables.
+  //
+  // Recurrence (highest-bit first):
+  //   lt_d = 0,  eq_d = 1.
+  //   lt_i  = lt_{i+1} + eq_{i+1} * (1 - x_i) * y_i.
+  //   eq_i  = eq_{i+1} * (x_i * y_i + (1 - x_i) * (1 - y_i)).
+  // Strict bvult: assert lt_0 = 1.
+  // Non-strict bvule: assert lt_0 + eq_0 = 1 (lt_0 = 1 OR eq_0 = 1).
+  //
+  // Each lt_i and eq_i is materialised as a fresh idempotent
+  // intermediate to keep polynomial degree manageable.
+  {
+    auto x_bits = decompose_bits(lhs);
+    auto y_bits = decompose_bits(rhs);
+    if(!x_bits.has_value() || !y_bits.has_value())
+      return std::nullopt;
+
+    std::vector<polynomialt> result;
+    auto fresh_bit_var = [&]() -> std::size_t
+    {
+      irep_idt name = "__pred_aux_" + std::to_string(next_fresh++);
+      std::size_t idx = get_var_index(name);
+      polynomialt b{d, mp_integer{1}, idx};
+      polynomialt b2 = b * b;
+      polynomialt idem = b2 - b;
+      idem.normalize();
+      result.push_back(std::move(idem));
+      return idx;
+    };
+
+    polynomialt lt_curr{d, mp_integer{0}};
+    polynomialt eq_curr{d, mp_integer{1}};
+    for(int i = static_cast<int>(d) - 1; i >= 0; --i)
+    {
+      polynomialt x_i = (*x_bits)[static_cast<unsigned>(i)];
+      polynomialt y_i = (*y_bits)[static_cast<unsigned>(i)];
+      polynomialt one{d, mp_integer{1}};
+
+      // new_lt = lt_curr + eq_curr * (1 - x_i) * y_i.
+      polynomialt one_minus_x = one - x_i;
+      polynomialt term = eq_curr * one_minus_x;
+      term = term * y_i;
+      polynomialt new_lt = lt_curr + term;
+      std::size_t lt_idx = fresh_bit_var();
+      polynomialt lt_var{d, mp_integer{1}, lt_idx};
+      polynomialt lt_def = new_lt - lt_var;
+      lt_def.normalize();
+      result.push_back(std::move(lt_def));
+
+      // new_eq = eq_curr * (x_i * y_i + (1 - x_i) * (1 - y_i))
+      //        = eq_curr * (1 - x_i - y_i + 2 x_i y_i)  (over Z)
+      // In Z_{2^d}: 2 x_i y_i still represents itself, but we keep
+      // the symmetric form.
+      polynomialt xi_yi = x_i * y_i;
+      polynomialt nox_noy = (one - x_i) * (one - y_i);
+      polynomialt factor = xi_yi + nox_noy;
+      polynomialt new_eq = eq_curr * factor;
+      std::size_t eq_idx = fresh_bit_var();
+      polynomialt eq_var{d, mp_integer{1}, eq_idx};
+      polynomialt eq_def = new_eq - eq_var;
+      eq_def.normalize();
+      result.push_back(std::move(eq_def));
+
+      lt_curr = lt_var;
+      eq_curr = eq_var;
+    }
+
+    if(strict)
+    {
+      // bvult x y: assert lt_0 = 1.
+      polynomialt assertion = lt_curr - polynomialt{d, mp_integer{1}};
+      assertion.normalize();
+      result.push_back(std::move(assertion));
+    }
+    else
+    {
+      // bvule x y: assert (lt_0 + eq_0) = 1.
+      polynomialt sum_le = lt_curr + eq_curr;
+      polynomialt assertion = sum_le - polynomialt{d, mp_integer{1}};
+      assertion.normalize();
+      result.push_back(std::move(assertion));
+    }
+    return result;
+  }
 }
 
 std::optional<std::vector<polynomialt>>
