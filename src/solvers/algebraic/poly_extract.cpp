@@ -547,11 +547,63 @@ poly_extractort::extract_predicate(const exprt &pred, bool value)
   if(pred.operands().size() != 2)
     return std::nullopt;
 
-  // Fail fast on signed operands until signed support lands.
-  const exprt &raw_lhs = pred.operands()[0];
-  const exprt &raw_rhs = pred.operands()[1];
-  if(raw_lhs.type().id() == ID_signedbv || raw_rhs.type().id() == ID_signedbv)
+  // Signed comparisons (bvslt / bvsle / bvsgt / bvsge): the operand
+  // types are signedbv. Reduce to unsigned via the sign-bit XOR
+  // transformation: bvslt(a, b) ⇔ bvult(a XOR 2^(d-1), b XOR 2^(d-1)).
+  //
+  // We rewrite the predicate to an unsigned-typed equivalent and
+  // continue. For a signed constant C the transformed constant is
+  // ((C + 2^(d-1)) mod 2^d), interpreted as unsigned. For a signed
+  // symbol the transformed operand is `bvxor(x, 2^(d-1))`, which the
+  // structural bit-decomposition handler resolves with no overhead.
+  exprt raw_lhs_t = pred.operands()[0];
+  exprt raw_rhs_t = pred.operands()[1];
+  const bool lhs_signed = raw_lhs_t.type().id() == ID_signedbv;
+  const bool rhs_signed = raw_rhs_t.type().id() == ID_signedbv;
+  if(lhs_signed != rhs_signed)
+    return std::nullopt; // mixed signedness is malformed; bail out.
+  if(lhs_signed)
+  {
+    // Determine bitwidth from the operand type and build 2^(d-1).
+    const unsigned d_local = to_signedbv_type(raw_lhs_t.type()).get_width();
+    if(d_local == 0)
+      return std::nullopt;
+    typet u_type = unsignedbv_typet{d_local};
+    constant_exprt half =
+      from_integer(power(mp_integer{2}, mp_integer{d_local - 1}), u_type);
+    auto transform = [&](exprt e) -> exprt
+    {
+      // Reinterpret the operand as unsigned and XOR with 2^(d-1).
+      e.type() = u_type;
+      if(e.is_constant())
+      {
+        // Constant: compute the new value directly.
+        auto cv = numeric_cast<mp_integer>(e);
+        if(cv.has_value())
+        {
+          mp_integer nv = *cv;
+          if(nv < 0)
+            nv += power(mp_integer{2}, mp_integer{d_local});
+          nv = (nv + power(mp_integer{2}, mp_integer{d_local - 1})) %
+               power(mp_integer{2}, mp_integer{d_local});
+          return from_integer(nv, u_type);
+        }
+      }
+      // Non-constant: build (bvxor e 2^(d-1)).
+      return bitxor_exprt{e, half};
+    };
+    raw_lhs_t = transform(raw_lhs_t);
+    raw_rhs_t = transform(raw_rhs_t);
+  }
+
+  // Fail fast if (after the signed -> unsigned rewrite) operand types
+  // are not unsignedbv. Should not happen in practice.
+  if(
+    raw_lhs_t.type().id() != ID_unsignedbv ||
+    raw_rhs_t.type().id() != ID_unsignedbv)
     return std::nullopt;
+  const exprt &raw_lhs = raw_lhs_t;
+  const exprt &raw_rhs = raw_rhs_t;
 
   if(!set_bitwidth(raw_lhs.type()))
     return std::nullopt;
