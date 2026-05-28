@@ -319,30 +319,92 @@ axiom strongGB_ideal_preserved {n d : ℕ}
     Ideal.span (α := MvPolynomial (Fin n) (ZMod (2 ^ d))) (strongGB F)
     = Ideal.span (α := MvPolynomial (Fin n) (ZMod (2 ^ d))) F
 
-/-- Refined completeness: for `F` arising from the bit-vector
-    encoding (a stronger hypothesis than just "F unsatisfiable
-    over `(ZMod (2^d))^n`"), the strong-GB algorithm produces a
-    basis containing an odd constant.
+/-- **NEGATIVE RESULT**: the "obvious" refined completeness statement
+    — adding only `WellFormedEncoding F` (idempotency on each
+    variable) — is **also FALSE**.
 
-    PROOF STATUS: STATEMENT-ONLY. The proof is the Song et al.
-    (TACAS 2024) theorem. See module docstring for the
-    decomposition required to mechanise it. The
-    `WellFormedEncoding` placeholder needs to be replaced with
-    the full structural predicate from the BV-encoding (which
-    requires a formal definition of bit-vector formulas and
-    their encoding into polynomial systems).
+    Concretely: `(d=2, n=0, F={C 2})` satisfies all hypotheses
+    (`WellFormedEncoding` is vacuously true for `n = 0`) but
+    has no odd constant in `Ideal.span F`, hence none in
+    `strongGB F` (since `strongGB_ideal_preserved` says
+    `Ideal.span (strongGB F) = Ideal.span F`).
 
-    The naive version without `hwf` is FALSE; see
-    `naive_completeness_is_false` above. -/
-theorem two_trick_saturation_complete {n d : ℕ} (hd : 0 < d)
-    (F : Finset (MvPolynomial (Fin n) (ZMod (2 ^ d))))
-    (hwf : WellFormedEncoding F)
-    (hunsat : ∀ φ : Fin n → ZMod (2 ^ d),
-              ∃ p ∈ F, MvPolynomial.eval φ p ≠ 0) :
-    ∃ c : ℕ, ¬ 2 ∣ c ∧
-      (MvPolynomial.C (c : ZMod (2 ^ d))
-        : MvPolynomial (Fin n) (ZMod (2 ^ d))) ∈ strongGB F := by
-  sorry
+    This shows that the `WellFormedEncoding` predicate as
+    currently defined is too weak to capture the structural
+    requirements of an actual BV encoding. The Song et al.
+    completeness theorem requires a much stronger hypothesis:
+    `F` must arise from a genuine bit-vector formula encoding,
+    not just be a collection of polynomials with idempotency.
+
+    To turn this into a true theorem, `WellFormedEncoding` must
+    be strengthened to include enough of the BV-encoding
+    structure that it rules out trivial counterexamples like
+    `F = {C 2}`. A minimal example of a strengthening that
+    works: require that for every constant `C r ∈ F`, `r` is
+    a multiple of `2^d` (so adding constants forces ⟨F⟩ = ⟨0⟩
+    or contains `C 1`). But the actual Song et al. hypothesis
+    is more subtle and tied to the BV-formula structure. -/
+theorem two_trick_saturation_complete_is_false :
+    ¬ (∀ {n d : ℕ} (_hd : 0 < d)
+         (F : Finset (MvPolynomial (Fin n) (ZMod (2 ^ d))))
+         (_hwf : WellFormedEncoding F)
+         (_hunsat : ∀ φ : Fin n → ZMod (2 ^ d),
+                    ∃ p ∈ F, MvPolynomial.eval φ p ≠ 0),
+         ∃ c : ℕ, ¬ 2 ∣ c ∧
+           (MvPolynomial.C (c : ZMod (2 ^ d))
+             : MvPolynomial (Fin n) (ZMod (2 ^ d))) ∈ strongGB F) := by
+  intro h_universal
+  -- Apply to F = {C 2} ⊆ MvPoly (Fin 0) (ZMod (2^2)).
+  set F : Finset (MvPolynomial (Fin 0) (ZMod (2 ^ 2))) :=
+    {MvPolynomial.C 2} with hF_def
+  have h_unsat : ∀ φ : Fin 0 → ZMod (2 ^ 2),
+      ∃ p ∈ F, MvPolynomial.eval φ p ≠ 0 := by
+    intro φ
+    refine ⟨MvPolynomial.C 2, Finset.mem_singleton.mpr rfl, ?_⟩
+    show (MvPolynomial.eval φ) (MvPolynomial.C (2 : ZMod (2 ^ 2))) ≠ 0
+    rw [MvPolynomial.eval_C]
+    show (2 : ZMod (2 ^ 2)) ≠ 0
+    decide
+  have h_wf : WellFormedEncoding (n := 0) (d := 2) F := fun i => i.elim0
+  obtain ⟨c, hc_odd, hc_mem⟩ := h_universal (n := 0) (d := 2) (by norm_num) F h_wf h_unsat
+  -- C c ∈ strongGB F ⊆ Ideal.span (strongGB F) = Ideal.span F.
+  have hc_in_span : (MvPolynomial.C (c : ZMod (2 ^ 2))
+        : MvPolynomial (Fin 0) (ZMod (2 ^ 2)))
+        ∈ Ideal.span ((F : Set (MvPolynomial (Fin 0) (ZMod (2 ^ 2))))) := by
+    rw [← strongGB_ideal_preserved (n := 0) (d := 2) F]
+    exact Ideal.subset_span hc_mem
+  -- Apply the ring iso to reduce to ZMod 4.
+  let φ := MvPolynomial.isEmptyRingEquiv (ZMod (2 ^ 2)) (Fin 0)
+  have h_phi_C : ∀ r : ZMod (2 ^ 2), φ (MvPolynomial.C r) = r := by
+    intro r
+    show (MvPolynomial.isEmptyAlgEquiv (ZMod (2 ^ 2)) (Fin 0))
+            (MvPolynomial.C r) = r
+    simp [MvPolynomial.isEmptyAlgEquiv]
+  have h_F_set : (F : Set (MvPolynomial (Fin 0) (ZMod (2 ^ 2))))
+              = ({MvPolynomial.C 2}
+                : Set (MvPolynomial (Fin 0) (ZMod (2 ^ 2)))) := by
+    rw [hF_def]; simp
+  rw [h_F_set] at hc_in_span
+  have h_image : (c : ZMod (2 ^ 2))
+        ∈ Ideal.span ({(2 : ZMod (2 ^ 2))} : Set (ZMod (2 ^ 2))) := by
+    rw [show ((c : ZMod (2 ^ 2)) : ZMod (2 ^ 2))
+            = φ (MvPolynomial.C (c : ZMod (2 ^ 2))) from (h_phi_C _).symm,
+        show (2 : ZMod (2 ^ 2)) = φ (MvPolynomial.C 2) from (h_phi_C _).symm]
+    have h_iso : Ideal.map φ.toRingHom
+            (Ideal.span
+              ({MvPolynomial.C 2} : Set (MvPolynomial (Fin 0) (ZMod (2 ^ 2)))))
+          = Ideal.span ({φ (MvPolynomial.C 2)} : Set (ZMod (2 ^ 2))) := by
+      rw [Ideal.map_span]; simp
+    rw [← h_iso]
+    exact Ideal.mem_map_of_mem φ.toRingHom hc_in_span
+  -- Convert ZMod (2^2) to ZMod 4 numerically.
+  have h_image' : (c : ZMod 4) ∈ Ideal.span ({(2 : ZMod 4)} : Set (ZMod 4)) := by
+    convert h_image using 2
+  exact odd_not_in_two_ideal_zmod_four hc_odd h_image'
+
+
+
+
 
 /-! ## (5) Mathlib-contributable lemmas
 
