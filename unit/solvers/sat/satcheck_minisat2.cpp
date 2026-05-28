@@ -87,12 +87,13 @@ SCENARIO("satcheck_minisat2", "[core][solvers][sat][satcheck_minisat2]")
     }
   }
 
-  GIVEN("A pigeonhole formula PHP(20) and a 1-second time limit")
+  GIVEN("A pigeonhole formula PHP(20) and a 200-millisecond time limit")
   {
     // The pigeonhole principle: N+1 pigeons cannot all fit in N holes
     // (one pigeon per hole). For N=20 the resulting CNF is provably
     // exponentially hard for resolution-based SAT solvers (Haken,
-    // 1985), so a 1-second time limit is reliably blown through.
+    // 1985), so a 200-millisecond time limit is reliably blown
+    // through.
     satcheck_minisat_no_simplifiert satcheck(message_handler);
     constexpr std::size_t holes = 20;
     constexpr std::size_t pigeons = holes + 1;
@@ -120,7 +121,7 @@ SCENARIO("satcheck_minisat2", "[core][solvers][sat][satcheck_minisat2]")
           satcheck.lcnf(clause);
         }
 
-    satcheck.set_time_limit_seconds(1);
+    satcheck.set_time_limit_milliseconds(200);
 
     THEN("the solver returns P_ERROR (interrupted by the time limit)")
     {
@@ -130,9 +131,10 @@ SCENARIO("satcheck_minisat2", "[core][solvers][sat][satcheck_minisat2]")
         std::chrono::duration_cast<std::chrono::milliseconds>(
           std::chrono::steady_clock::now() - start)
           .count();
-      // The solver must report P_ERROR (it was interrupted by SIGALRM)
-      // and must not have run far past the 1-second budget. We allow a
-      // 5-second slack to be robust against very slow CI hardware.
+      // The solver must report P_ERROR (it was interrupted by the
+      // watchdog thread) and must not have run far past the
+      // 200-millisecond budget. The 5-second slack is for very slow
+      // CI hardware and any latency in joining the watchdog thread.
       REQUIRE(result == propt::resultt::P_ERROR);
       REQUIRE(elapsed_ms < 5000);
     }

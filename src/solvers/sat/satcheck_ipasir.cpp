@@ -135,17 +135,17 @@ propt::resultt satcheck_ipasirt::do_prop_solve(const bvt &assumptions)
         ipasir_assume(solver, literal.dimacs());
     }
 
-    if(time_limit_seconds != 0)
+    if(time_limit_milliseconds != 0)
     {
       deadline = std::chrono::steady_clock::now() +
-                 std::chrono::seconds(time_limit_seconds);
+                 std::chrono::milliseconds(time_limit_milliseconds);
       ipasir_set_terminate(solver, this, &terminate_callback);
     }
 
     // solve the formula, and handle the return code (10=SAT, 20=UNSAT)
     const int solver_state = ipasir_solve(solver);
 
-    if(time_limit_seconds != 0)
+    if(time_limit_milliseconds != 0)
       ipasir_set_terminate(solver, nullptr, nullptr);
 
     if(10 == solver_state)

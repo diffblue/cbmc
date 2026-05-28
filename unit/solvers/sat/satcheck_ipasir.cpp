@@ -8,7 +8,7 @@ Author: Diffblue Ltd.
 
 /// \file
 /// Unit tests for satcheck_ipasir, focusing on the time-limit
-/// (`set_time_limit_seconds`) plumbing that hooks into the IPASIR
+/// (`set_time_limit_milliseconds`) plumbing that hooks into the IPASIR
 /// `ipasir_set_terminate` mechanism.
 
 #ifdef HAVE_IPASIR
@@ -40,13 +40,13 @@ SCENARIO("satcheck_ipasir", "[core][solvers][sat][satcheck_ipasir]")
     }
   }
 
-  GIVEN("A pigeonhole formula PHP(20) and a 1-second time limit")
+  GIVEN("A pigeonhole formula PHP(20) and a 200-millisecond time limit")
   {
     // Same construction as the satcheck_minisat2 unit test: PHP(N) is
     // exponentially hard for resolution-based SAT solvers, so a
-    // 1-second time limit is reliably exceeded. Verifies that the
-    // IPASIR `ipasir_set_terminate` callback we install is honoured
-    // by the underlying solver.
+    // 200-millisecond time limit is reliably exceeded. Verifies that
+    // the IPASIR `ipasir_set_terminate` callback we install is
+    // honoured by the underlying solver.
     satcheck_ipasirt satcheck(message_handler);
     constexpr std::size_t holes = 20;
     constexpr std::size_t pigeons = holes + 1;
@@ -74,7 +74,7 @@ SCENARIO("satcheck_ipasir", "[core][solvers][sat][satcheck_ipasir]")
           satcheck.lcnf(clause);
         }
 
-    satcheck.set_time_limit_seconds(1);
+    satcheck.set_time_limit_milliseconds(200);
 
     THEN("the solver returns P_ERROR (interrupted by the time limit)")
     {
