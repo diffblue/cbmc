@@ -34,6 +34,12 @@ static unsigned nu2(const mp_integer &n)
 //        Characterisation: 2^m ∣ k! iff m ≤ nu2Factorial k. The
 //        loop here returns the smallest k satisfying this, which
 //        is the Smarandache function value SF(2^m).
+// PROOF: formal-proofs/Vanishing.lean::nu2Factorial_eq_padicVal
+//        Connection to Legendre's formula: nu2(k!) = padicValNat 2 (k!),
+//        which by Legendre equals k - s_2(k) where s_2(k) is the
+//        binary digit sum (popcount). The closed form below uses
+//        this to skip directly to k ≥ m and iterate at O(1) per step
+//        instead of the O(log k) of nu2(k).
 static unsigned smarandache_function(unsigned m)
 {
   // Memoise: for an n-variable problem with the same d, this is
@@ -44,11 +50,21 @@ static unsigned smarandache_function(unsigned m)
   if(it != cache.end())
     return it->second;
 
-  unsigned val = 0;
-  for(unsigned k = 1;; ++k)
+  // Closed-form via Legendre's formula: k - popcount(k) >= m. Since
+  // k - popcount(k) <= k, we have SF(2^m) >= m. We iterate from m
+  // upward. The number of iterations is O(log m) in the worst case
+  // because k - popcount(k) grows by at least 1 every two steps
+  // (each binary carry both increments k and decreases popcount
+  // by at least 1).
+  // Edge case: m = 0 is trivial — k = 0 satisfies 0! = 1 divisible by 1.
+  if(m == 0)
   {
-    val += nu2(mp_integer{k});
-    if(val >= m)
+    cache[m] = 0;
+    return 0;
+  }
+  for(unsigned k = m;; ++k)
+  {
+    if(k - static_cast<unsigned>(__builtin_popcount(k)) >= m)
     {
       cache[m] = k;
       return k;
