@@ -220,15 +220,84 @@ def signedVal {d : ℕ} (_ : 0 < d) (x : ZMod (2 ^ d)) : ℤ :=
     transformed values have the unsigned comparison matching the
     original signed comparison.
 
-    PROOF STATUS: statement complete; mechanised proof admitted as
-    `sorry` (the four-case ℤ/ℕ-subtraction dispatch is intricate
-    in Lean — see comments in the implementation file's
-    `try_match`). Informal proof: the map x ↦ x + 2^(d-1) mod 2^d
-    is the standard sign-bit XOR, mapping signed [-2^(d-1), 2^(d-1))
-    bijectively and order-preservingly to unsigned [0, 2^d). -/
+    Proof outline. Define `f x = (x + 2^(d-1)).val`. We show
+    `(f x : ℤ) = signedVal x + 2^(d-1)`. Two cases:
+
+      Case (i):  x.val < 2^(d-1).
+        Then `signedVal x = x.val` and `x.val + 2^(d-1) < 2^d`,
+        so `f x = x.val + 2^(d-1)`.
+
+      Case (ii): x.val ≥ 2^(d-1).
+        Then `signedVal x = x.val - 2^d` (in ℤ) and
+        `x.val + 2^(d-1) ∈ [2^d, 2^d + 2^(d-1))`,
+        so `f x = x.val + 2^(d-1) - 2^d`.
+
+    In both cases `(f x : ℤ) = signedVal x + 2^(d-1)`. The
+    iff then reduces to monotonicity of adding the same constant
+    on both sides. -/
 theorem bvslt_via_xor_msb {d : ℕ} (hd : 0 < d) (a b : ZMod (2 ^ d)) :
     signedVal hd a < signedVal hd b ↔
     (a + (2 ^ (d - 1) : ℕ)).val < (b + (2 ^ (d - 1) : ℕ)).val := by
-  sorry
+  haveI : NeZero (2 ^ d) := ⟨Nat.pos_iff_ne_zero.mp (Nat.two_pow_pos _)⟩
+  have h_pow_pos : 0 < 2 ^ d := Nat.two_pow_pos _
+  have h_dm1_pos : 0 < 2 ^ (d - 1) := Nat.two_pow_pos _
+  have h_pow_split : 2 ^ d = 2 * 2 ^ (d - 1) := by
+    have h_d_eq : 2 ^ d = 2 ^ ((d - 1) + 1) := by congr 1; omega
+    rw [h_d_eq, pow_succ]; ring
+  have h_2pdm1_lt : 2 ^ (d - 1) < 2 ^ d := by rw [h_pow_split]; omega
+  have h_val_2pdm1 : ((2 ^ (d - 1) : ℕ) : ZMod (2 ^ d)).val = 2 ^ (d - 1) := by
+    rw [ZMod.val_natCast]
+    exact Nat.mod_eq_of_lt h_2pdm1_lt
+  -- Key fact: (x + 2^(d-1)).val = signedVal x + 2^(d-1) (as integers).
+  have key : ∀ x : ZMod (2 ^ d),
+      ((x + ((2 ^ (d - 1) : ℕ) : ZMod (2 ^ d))).val : ℤ)
+        = signedVal hd x + (2 ^ (d - 1) : ℤ) := by
+    intro x
+    have h_xval_lt : x.val < 2 ^ d := ZMod.val_lt _
+    have h_sum_val : (x + ((2 ^ (d - 1) : ℕ) : ZMod (2 ^ d))).val
+                    = (x.val + 2 ^ (d - 1)) % 2 ^ d := by
+      rw [ZMod.val_add, h_val_2pdm1]
+    by_cases h : x.val < 2 ^ (d - 1)
+    · -- Case (i): x.val < 2^(d-1).
+      have h_sum_lt : x.val + 2 ^ (d - 1) < 2 ^ d := by omega
+      rw [h_sum_val, Nat.mod_eq_of_lt h_sum_lt]
+      unfold signedVal
+      simp only [if_pos h]
+      push_cast
+      ring
+    · -- Case (ii): x.val ≥ 2^(d-1).
+      push_neg at h
+      have h_sum_ge : 2 ^ d ≤ x.val + 2 ^ (d - 1) := by omega
+      have h_sum_lt' : x.val + 2 ^ (d - 1) - 2 ^ d < 2 ^ d := by omega
+      have h_sum_mod : (x.val + 2 ^ (d - 1)) % 2 ^ d
+                      = x.val + 2 ^ (d - 1) - 2 ^ d := by
+        rw [Nat.mod_eq_sub_mod h_sum_ge]
+        exact Nat.mod_eq_of_lt h_sum_lt'
+      rw [h_sum_val, h_sum_mod]
+      unfold signedVal
+      simp only [if_neg (Nat.not_lt.mpr h)]
+      have h_le : 2 ^ d ≤ x.val + 2 ^ (d - 1) := h_sum_ge
+      have : ((x.val + 2 ^ (d - 1) - 2 ^ d : ℕ) : ℤ)
+            = (x.val : ℤ) + (2 ^ (d - 1) : ℤ) - (2 ^ d : ℤ) := by
+        rw [Nat.cast_sub h_le]
+        push_cast
+        ring
+      rw [this]
+      ring
+  -- Apply key to a and b.
+  have ka := key a
+  have kb := key b
+  constructor
+  · intro hab
+    have hint : ((a + ((2 ^ (d - 1) : ℕ) : ZMod (2 ^ d))).val : ℤ)
+              < ((b + ((2 ^ (d - 1) : ℕ) : ZMod (2 ^ d))).val : ℤ) := by
+      rw [ka, kb]; linarith
+    exact_mod_cast hint
+  · intro hval
+    have hint : ((a + ((2 ^ (d - 1) : ℕ) : ZMod (2 ^ d))).val : ℤ)
+              < ((b + ((2 ^ (d - 1) : ℕ) : ZMod (2 ^ d))).val : ℤ) := by
+      exact_mod_cast hval
+    rw [ka, kb] at hint
+    linarith
 
 end SubgoalSix
