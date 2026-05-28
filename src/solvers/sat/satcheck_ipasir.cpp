@@ -135,8 +135,19 @@ propt::resultt satcheck_ipasirt::do_prop_solve(const bvt &assumptions)
         ipasir_assume(solver, literal.dimacs());
     }
 
+    if(time_limit_seconds != 0)
+    {
+      deadline = std::chrono::steady_clock::now() +
+                 std::chrono::seconds(time_limit_seconds);
+      ipasir_set_terminate(solver, this, &terminate_callback);
+    }
+
     // solve the formula, and handle the return code (10=SAT, 20=UNSAT)
-    int solver_state = ipasir_solve(solver);
+    const int solver_state = ipasir_solve(solver);
+
+    if(time_limit_seconds != 0)
+      ipasir_set_terminate(solver, nullptr, nullptr);
+
     if(10 == solver_state)
     {
       log.status() << "SAT checker: instance is SATISFIABLE" << messaget::eom;
@@ -149,15 +160,25 @@ propt::resultt satcheck_ipasirt::do_prop_solve(const bvt &assumptions)
     }
     else
     {
-      log.status() << "SAT checker: solving returned without solution"
+      // Solving was interrupted; this is the path taken when our
+      // terminate_callback signals that the configured time limit has
+      // passed. We return P_ERROR (matching the MiniSat 2 backend) so
+      // that callers can recognise a timeout, instead of throwing.
+      log.status() << "SAT checker: solving was interrupted (e.g. timeout)"
                    << messaget::eom;
-      throw analysis_exceptiont(
-        "solving inside IPASIR SAT solver has been interrupted");
+      status = statust::ERROR;
+      return resultt::P_ERROR;
     }
   }
 
   status=statust::UNSAT;
   return resultt::P_UNSATISFIABLE;
+}
+
+int satcheck_ipasirt::terminate_callback(void *data)
+{
+  const auto *self = static_cast<const satcheck_ipasirt *>(data);
+  return std::chrono::steady_clock::now() >= self->deadline ? 1 : 0;
 }
 
 void satcheck_ipasirt::set_assignment(literalt a, bool value)
