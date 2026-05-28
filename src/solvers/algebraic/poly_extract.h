@@ -184,8 +184,8 @@ public:
   ///
   /// Returns the new alignment polynomials. Modifies the extractor's
   /// additional_substitutions for the substitution-based encodings.
-  std::vector<polynomialt> materialise_bit_alignments(
-    const std::vector<polynomialt> &equations);
+  std::vector<polynomialt>
+  materialise_bit_alignments(const std::vector<polynomialt> &equations);
 
 private:
   std::map<irep_idt, std::size_t> var_map;
