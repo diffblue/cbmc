@@ -30,21 +30,28 @@ static unsigned nu2(const mp_integer &n)
 /// SF(2^m): smallest k such that 2^m divides k!
 // PROOF: formal-proofs/Vanishing.lean::smarandache_exists
 //        Existence: such a k exists (e.g., k = 2^m works).
-// PROOF: formal-proofs/Vanishing.lean::smarandache_iff_nu2Factorial
-//        Characterisation: 2^m ∣ k! iff m ≤ nu2Factorial k. The
-//        loop here returns the smallest k satisfying this, which
-//        is the Smarandache function value SF(2^m).
-// PROOF: formal-proofs/Vanishing.lean::nu2Factorial_eq_padicVal
-//        Connection to Legendre's formula: nu2(k!) = padicValNat 2 (k!),
-//        which by Legendre equals k - s_2(k) where s_2(k) is the
-//        binary digit sum (popcount). The closed form below uses
-//        this to skip directly to k ≥ m and iterate at O(1) per step
-//        instead of the O(log k) of nu2(k).
+// PROOF: formal-proofs/Vanishing.lean::smarandache_iff_legendre
+//        Closed-form characterisation via Legendre's formula:
+//        2^m ∣ k! iff m ≤ k - (Nat.digits 2 k).sum, where the
+//        right-hand side equals popcount(k) for base-2 digits.
+//        This is exactly the loop body's check below.
+// PROOF: formal-proofs/Vanishing.lean::padicValNat_two_factorial
+//        The underlying mathematical fact: padicValNat 2 (k!) =
+//        k - (Nat.digits 2 k).sum (Legendre's formula).
+// PROOF: formal-proofs/Vanishing.lean::smarandacheValue_unique
+//        Justifies the static memoisation cache: the smallest k
+//        with 2^m ∣ k! is uniquely determined by m, so caching
+//        results by m is sound.
+//   ASSUMES: __builtin_popcount(k) equals (Nat.digits 2 k).sum.
+//   MAINTAINED BY: this is the standard meaning of popcount —
+//   the count of set bits in the binary representation of k,
+//   which equals the sum of base-2 digits (each being 0 or 1).
 static unsigned smarandache_function(unsigned m)
 {
   // Memoise: for an n-variable problem with the same d, this is
   // called n times with the same m. Cache results keyed by m.
-  // The result is purely a function of m, so a static cache is sound.
+  // Soundness: smarandacheValue_unique above (the function is a
+  // mathematical function of m).
   static std::map<unsigned, unsigned> cache;
   auto it = cache.find(m);
   if(it != cache.end())

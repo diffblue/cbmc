@@ -49,6 +49,11 @@ bool strong_groebner_basist::has_constant(
 //        polynomialt represents an element of MvPolynomial(Fin n,
 //        ZMod (2^bw)), a commutative ring, so the abstract theorem
 //        applies directly.
+//   ASSUMES: this function returns some linear combination of f and g
+//            with coefficients in MvPolynomial(_, ZMod(2^bw)).
+//   MAINTAINED BY: the body below constructs the combination
+//            mult_term * f - mult_term2 * g via the existing
+//            polynomial multiply/subtract operations.
 polynomialt
 strong_groebner_basist::s_polynomial(const polynomialt &f, const polynomialt &g)
 {
@@ -119,6 +124,14 @@ strong_groebner_basist::s_polynomial(const polynomialt &f, const polynomialt &g)
 // PROOF: formal-proofs/StrongGB.lean::two_trick_preserves_ideal
 //        Specific instance for ZMod(2^d): multiplying by 2^k
 //        preserves ideal membership.
+//   ASSUMES: each iteration of the inner loop reduces r by exactly
+//            one of two operations: (a) r := r - q*g for some
+//            polynomial q and basis element g, or (b) r := r * 2^k
+//            for some k with 0 < k < bw. Both operations preserve
+//            the coset r + Ideal.span(basis).
+//   MAINTAINED BY: the if-branches below implement exactly these
+//            two operations on r, and no other update to r occurs
+//            between iterations.
 polynomialt strong_groebner_basist::strong_reduce(
   const polynomialt &f,
   const std::vector<polynomialt> &basis)
@@ -300,6 +313,13 @@ strong_groebner_basist::compute(std::vector<polynomialt> &polys)
   // PROOF: formal-proofs/BuchbergerTermination.lean::stable_implies_no_new
   //        Soundness of the termination criterion: at stability,
   //        every candidate new element is already in the ideal.
+  //        ASSUMES: every pair (i,j) with i < j < |polys| has been
+  //        processed (either by S-poly reduction or by being skipped
+  //        when a polynomial became zero).
+  //        MAINTAINED BY: the loop pops every pair from `pairs` and
+  //        the progress-tracking counters reset on any basis growth
+  //        (S-poly OR 2-trick), ensuring no pair is occluded by an
+  //        early exit.
   // PROOF: formal-proofs/BuchbergerCorrectness.lean::buchberger_unsat'
   //        Top-level UNSAT soundness: if G ⊇ F preserves the
   //        ideal and contains a unit, the input system is UNSAT.
@@ -532,6 +552,12 @@ std::map<std::size_t, mp_integer> strong_groebner_basist::extract_candidate(
 //        try_algebraic_solve): if reduce_by_basis returns 0,
 //        then f itself is in Ideal.span(basis), i.e., the
 //        equation f = 0 follows algebraically from the basis.
+//   ASSUMES: each iteration replaces the current `result` with
+//            `result - q*g` for some polynomial q and basis
+//            element g; no other update occurs.
+//   MAINTAINED BY: the inner loop's `result = result - mult.multiply(g, ...)`
+//            is the only update, and this is exactly the
+//            ideal-preserving form.
 polynomialt strong_groebner_basist::reduce_by_basis(
   const polynomialt &f,
   const std::vector<polynomialt> &basis,

@@ -173,6 +173,76 @@ theorem smarandache_iff_nu2Factorial (m k : ℕ) :
   have hk_ne : (Nat.factorial k) ≠ 0 := Nat.factorial_pos k |>.ne'
   exact padicValNat_dvd_iff_le hk_ne
 
+/-! ## Legendre's formula for 2-adic valuation of `k!`
+
+    The classical Legendre's formula: `ν_p(k!) = (k - s_p(k)) / (p - 1)`,
+    where `s_p(k)` is the sum of base-`p` digits of `k`. For `p = 2`,
+    this specialises to `ν_2(k!) = k - s_2(k) = k - popcount(k)`.
+
+    This is what justifies the closed-form computation
+    `k - __builtin_popcount(k) >= m` in the C++
+    `smarandache_function`: it sidesteps the iterative
+    `nu2(1) + nu2(2) + ... + nu2(k)` accumulation.
+-/
+
+/-- Legendre's formula specialised to `p = 2`:
+    `padicValNat 2 (k!) = k - (Nat.digits 2 k).sum`. -/
+theorem padicValNat_two_factorial (k : ℕ) :
+    padicValNat 2 (Nat.factorial k) = k - (Nat.digits 2 k).sum := by
+  -- (2 - 1) * multiplicity 2 (k!) = k - (Nat.digits 2 k).sum
+  -- from Nat.Prime.sub_one_mul_multiplicity_factorial.
+  -- And padicValNat 2 (k!) = multiplicity 2 (k!) (since k! ≠ 0).
+  have h_two_prime : (2 : ℕ).Prime := by norm_num
+  have h_pad_eq : padicValNat 2 (Nat.factorial k)
+                = multiplicity 2 (Nat.factorial k) :=
+    padicValNat_def' (by norm_num : (2 : ℕ) ≠ 1)
+      (Nat.factorial_pos k)
+  rw [h_pad_eq]
+  have := Nat.Prime.sub_one_mul_multiplicity_factorial (n := k) h_two_prime
+  -- this : (2 - 1) * multiplicity 2 k! = k - (2.digits k).sum
+  simp only [show (2 : ℕ) - 1 = 1 from rfl, one_mul] at this
+  exact this
+
+/-- Connection to the iterative form used in `nu2Factorial`:
+    `nu2Factorial k = k - (Nat.digits 2 k).sum`. -/
+theorem nu2Factorial_eq_legendre (k : ℕ) :
+    nu2Factorial k = k - (Nat.digits 2 k).sum := by
+  rw [nu2Factorial_eq_padicVal, padicValNat_two_factorial]
+
+/-- Smarandache function characterisation via Legendre's formula:
+    `2^m ∣ k!` iff `m ≤ k - (Nat.digits 2 k).sum`. This justifies the
+    C++ closed-form check `k - popcount(k) >= m` in
+    `smarandache_function`. -/
+theorem smarandache_iff_legendre (m k : ℕ) :
+    2 ^ m ∣ Nat.factorial k ↔ m ≤ k - (Nat.digits 2 k).sum := by
+  rw [smarandache_iff_nu2Factorial, nu2Factorial_eq_legendre]
+
+/-! ## Purity of `nu2Factorial` and `smarandacheFunction`
+
+    These are formal `Nat → Nat` functions. As such, they are
+    automatically deterministic ("equal inputs give equal
+    outputs") — `rfl` suffices. The C++ implementations
+    (`nu2_factorial`, `smarandache_function`) match these definitions,
+    and so caching their results by input is sound.
+-/
+
+/-- `nu2Factorial` is a function (deterministic). -/
+theorem nu2Factorial_deterministic (k₁ k₂ : ℕ) (h : k₁ = k₂) :
+    nu2Factorial k₁ = nu2Factorial k₂ := h ▸ rfl
+
+/-- The "smallest k such that 2^m ∣ k!" is uniquely determined by
+    `m`. This is what justifies caching `smarandache_function(m)`
+    by `m` alone in the C++ implementation. -/
+theorem smarandacheValue_unique {m : ℕ}
+    {k₁ k₂ : ℕ}
+    (h_min₁ : 2 ^ m ∣ Nat.factorial k₁ ∧ ∀ j < k₁, ¬ 2 ^ m ∣ Nat.factorial j)
+    (h_min₂ : 2 ^ m ∣ Nat.factorial k₂ ∧ ∀ j < k₂, ¬ 2 ^ m ∣ Nat.factorial j) :
+    k₁ = k₂ := by
+  rcases lt_trichotomy k₁ k₂ with h | h | h
+  · exact absurd h_min₁.1 (h_min₂.2 k₁ h)
+  · exact h
+  · exact absurd h_min₂.1 (h_min₁.2 k₂ h)
+
 /-! ## (5) ZFP generators correctness
 
     The C++ `generate_zfp_generators(d, var_idx, input_width)`

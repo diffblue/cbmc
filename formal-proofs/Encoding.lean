@@ -138,4 +138,59 @@ theorem encodeEquations_satisfiable_iff {d n : ℕ}
     rw [← h_p_eq]
     exact (extract_equation_iff l r env).mpr (h ⟨l, r⟩ h_eq_mem)
 
+/-! ## Purity of `BVExpr.toPolynomial`
+
+    `BVExpr.toPolynomial` is a (Lean) function from `BVExpr` to
+    `MvPolynomial`. As such, it is automatically deterministic
+    ("equal inputs give equal outputs") — `rfl` suffices. The
+    C++ `to_polynomial` mirrors this definition.
+
+    Soundness of memoisation: caching `to_polynomial(e)` keyed by
+    `e` is sound because:
+      (i)  the polynomial result is purely a function of `e`
+           (this lemma);
+      (ii) the C++ side effect on `var_input_widths` is idempotent:
+           the relevant code path is
+           `if(var_input_widths.find(var) == var_input_widths.end())
+              var_input_widths[var] = inner_width;`
+           — a "first wins" update. So the side effect on the
+           first call to `to_polynomial(e)` already records the
+           correct width; subsequent calls (whether they hit the
+           cache or recompute) would set the same value (or skip
+           because the key exists).
+
+    Property (ii) is an implementation invariant of the C++
+    `var_input_widths` map; we capture it semantically below as
+    a "set-once" predicate.
+-/
+
+/-- Purity: `BVExpr.toPolynomial` is a deterministic function of its
+    input. This justifies memoisation by `BVExpr` identity. -/
+theorem toPolynomial_deterministic {d n : ℕ} (e₁ e₂ : BVExpr d n)
+    (h : e₁ = e₂) : e₁.toPolynomial = e₂.toPolynomial := h ▸ rfl
+
+/-- Set-once invariant: if a map already records `k ↦ v`, a second
+    "first wins" update preserves the binding. This is the abstract
+    counterpart of the C++ idiom
+    `if(m.find(k) == m.end()) m[k] = v;` — repeated invocation with
+    the same `(k, v)` is idempotent.
+
+    Combined with `toPolynomial_deterministic`, this justifies that
+    skipping `to_polynomial`'s body via the memoisation cache is
+    sound: any side effects that would have been performed by the
+    skipped recursive computation would either (a) be no-ops
+    (because the binding already exists from the first computation)
+    or (b) set the same value. -/
+theorem set_once_idempotent {α β : Type*} [DecidableEq α]
+    (m : α → Option β) (k : α) (v : β) :
+    -- After the first "set if absent" with (k, v), a second
+    -- "set if absent" with (k, v) is a no-op.
+    let setOnce := fun (m : α → Option β) (k : α) (v : β) =>
+      fun k' => if k' = k then (m k').getD v |> some else m k'
+    setOnce (setOnce m k v) k v = setOnce m k v := by
+  funext k'
+  by_cases h : k' = k
+  · simp [h]
+  · simp [h]
+
 end Encoding

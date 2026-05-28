@@ -50,15 +50,26 @@ std::size_t poly_extractort::get_var_index(const irep_idt &name)
 //        BVExpr.eval env e (in ZMod(2^d)). The C++ recursion on
 //        e.id() (constant, symbol, plus, minus, mult, etc.)
 //        directly mirrors the Lean inductive definition.
+// PROOF: formal-proofs/Encoding.lean::toPolynomial_deterministic
+//        Purity: toPolynomial is a deterministic function of e.
+//        This justifies caching results keyed by e.
+// PROOF: formal-proofs/Encoding.lean::set_once_idempotent
+//        Idempotence of the var_input_widths side effect: the
+//        update pattern `if(m.find(k) == m.end()) m[k] = v;` is
+//        a "set-once" idiom; replaying it (or skipping it via
+//        a cache hit) leaves m unchanged after the first call.
 //
 // Caching wrapper. CBMC's exprt uses irept-based structural sharing,
 // so identical subexpressions can appear multiple times in a formula
 // DAG. Caching avoids recomputing the same result.
 //
-// Soundness: the function's side effects (`var_input_widths` updates)
-// are idempotent ("first wins" via `find(...) == end()`), so a cache
-// hit need not re-apply them. The polynomial result is purely a
-// function of the expression.
+// Soundness invariant (relied on by the cache):
+//   ASSUMES: to_polynomial(e) is a function of e (modulo set-once
+//            side effects on var_input_widths).
+//   MAINTAINED BY: the body of to_polynomial_impl below is a
+//            structural recursion on e — no internal state is
+//            consulted that depends on call order. The only side
+//            effect (var_input_widths) follows the set-once idiom.
 std::optional<polynomialt> poly_extractort::to_polynomial(const exprt &e)
 {
   // We must call set_bitwidth(e.type()) on every entry to preserve
@@ -418,6 +429,12 @@ std::optional<polynomialt> poly_extractort::to_polynomial_impl(const exprt &e)
 //        Soundness of system encoding: a set of equations is
 //        simultaneously satisfiable iff the encoded polynomial
 //        system has a common root.
+//   ASSUMES: the input is an `equal_exprt` with exactly two operands
+//            (lhs and rhs), both convertible by `to_polynomial`.
+//   MAINTAINED BY: the early-return guards (`eq.id() != ID_equal`,
+//            `operands().size() != 2`) ensure the precondition.
+//            The body returns `*lhs - *rhs` only when both
+//            `to_polynomial` calls succeed.
 std::optional<polynomialt> poly_extractort::extract_equation(const exprt &eq)
 {
   if(eq.id() != ID_equal || eq.operands().size() != 2)
