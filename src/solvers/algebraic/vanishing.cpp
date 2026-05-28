@@ -109,6 +109,12 @@ using mono_key_t = std::vector<unsigned>;
 /// Sparse multivariate polynomial
 using sparse_poly_t = std::map<mono_key_t, mp_integer>;
 
+// PROOF: formal-proofs/Vanishing.lean::fallingFactorial_zero_of_lt
+//        Soundness: (x)_n = 0 for x < n (the falling factorial
+//        vanishes on the integers up to its degree).
+// PROOF: formal-proofs/Vanishing.lean::falling_factorial_sufficient
+//        Soundness: a polynomial reducing to 0 modulo the falling
+//        factorial vanishes on [0, n).
 bool is_vanishing_polynomial(
   const polynomialt &poly,
   const std::vector<unsigned> &input_widths)

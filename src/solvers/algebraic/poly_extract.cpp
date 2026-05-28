@@ -390,6 +390,12 @@ std::optional<polynomialt> poly_extractort::extract_equation(const exprt &eq)
   return diff;
 }
 
+// PROOF: formal-proofs/BitAlignment.lean::scalar_alignment_low_bits_zero
+//        Soundness of the b_(h,i) -> 0 substitutions for i < k
+//        when h = 2^k * x in Z_(2^d) (PARTIAL).
+// PROOF: formal-proofs/BitAlignment.lean::scalar_alignment_shifted_bits
+//        Soundness of the b_(h,i+k) -> b_(x,i) substitutions
+//        for i + k < d (PARTIAL).
 std::vector<polynomialt> poly_extractort::materialise_bit_alignments(
   const std::vector<polynomialt> &equations)
 {
@@ -519,6 +525,18 @@ std::vector<polynomialt> poly_extractort::materialise_bit_alignments(
   return alignments;
 }
 
+// PROOF: formal-proofs/SubgoalSix.lean::bvult_pow2_implies_high_bits_zero
+//        Soundness of try_upper_bound's power-of-2 case: if x.val < 2^k,
+//        the bits b_(x,k)..b_(x,d-1) are all zero, justifying the
+//        substitution registered in additional_substitutions.
+// PROOF: formal-proofs/SubgoalSix.lean::bvuge_2d_minus_2k_implies_high_bits_one
+//        Soundness of try_lower_bound's MSB-on shortcut (PARTIAL).
+// PROOF: formal-proofs/SubgoalSix.lean::chainLt_correctness
+//        Boolean-level statement of the bit-comparator chain
+//        encoding (STATEMENT-ONLY).
+// PROOF: formal-proofs/SubgoalSix.lean::bvslt_via_xor_msb
+//        Soundness of the signed -> unsigned XOR transformation
+//        for bvslt/bvsle (PARTIAL).
 std::optional<std::vector<polynomialt>>
 poly_extractort::extract_predicate(const exprt &pred, bool value)
 {
@@ -1050,6 +1068,15 @@ poly_extractort::extract_predicate(const exprt &pred, bool value)
   }
 }
 
+// PROOF: formal-proofs/Re4.lean::bit_idempotency_forces_zero_or_one
+//        Soundness: idempotency b*b=b in Z_(2^d) forces b in {0,1}.
+// PROOF: formal-proofs/Re4.lean::stdBit_sums_to_self
+//        Soundness: the sum-decomposition equation is satisfied
+//        by the standard binary expansion (and uniquely so given
+//        idempotency on each bit).
+// PROOF: formal-proofs/Re4.lean::bit_decomp_existence
+//        Combines the above into existence of a valid bit
+//        assignment for any value in Z_(2^d).
 std::optional<std::vector<polynomialt>>
 poly_extractort::decompose_bits(const exprt &e)
 {

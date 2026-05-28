@@ -310,6 +310,9 @@ unsigned val_2(const mp_integer &a, unsigned d)
   return k;
 }
 
+// PROOF: formal-proofs/Re4.lean::frobenius_pow_eq_self
+//        Soundness: in any ring, idempotent b satisfies b^k = b
+//        for k >= 1, justifying the exponent-clamping below.
 void apply_frobenius_idempotency(
   polynomialt &p,
   const std::set<std::size_t> &bit_vars)

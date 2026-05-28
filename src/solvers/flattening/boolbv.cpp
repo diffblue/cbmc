@@ -769,6 +769,16 @@ boolbvt::offset_mapt boolbvt::build_offset_map(const struct_typet &src)
   return dest;
 }
 
+// PROOF: formal-proofs/Defer.lean::defer_replay_equivalence
+//        Soundness: deferring SSA equality bit-blasting and
+//        replaying-on-non-refutation is semantically equivalent to
+//        the eager bit-blasting path. Meta-property statement
+//        (STATEMENT-ONLY); informal argument in the docstring.
+//        See finish_eager_conversion in boolbv.h for the call site.
+// PROOF: formal-proofs/StrongGB.lean::two_trick_unsat_sound
+//        Soundness: when this function returns true, the SAT
+//        propagator has been forced to UNSAT via the algebraic
+//        refutation chain.
 bool boolbvt::try_algebraic_solve()
 {
   if(algebraic_solved)
