@@ -3850,7 +3850,7 @@ skip_pack_removal_ft:
     }
 
     const symbolt &method_sym =
-      lookup(to_struct_type(symb.type).components().back().get_name());
+      lookup(to_struct_union_type(symb.type).components().back().get_name());
 
     // The method was added to deferred_typechecking by
     // typecheck_compound_declarator (because the parent scope is a template
