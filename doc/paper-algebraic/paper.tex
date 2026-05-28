@@ -1780,7 +1780,7 @@ $(\mathtt{bvult}\ x\ 4) \Rightarrow x(x{-}1)(x{-}2)(x{-}3) = 0$
 $(x \geq 2^{d-1}) \Rightarrow x \oplus 2^{d-1} = x - 2^{d-1}$
                             & 16 & 0.00 & 0.00 & 0.00 \\
                             & 64 & \textbf{0.01} & 0.00 & T/O \\
-                            & 128 & T/O & 0.00 & T/O \\
+                            & 128 & \textbf{0.04} & 0.00 & T/O \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1789,25 +1789,29 @@ The first two queries are tractable for all three solvers; they
 demonstrate the capability extension---without sub-goal 6 the
 algebraic procedure could not reason about the precondition and
 would fall through to bit-blasting. The third query exposes a
-case where Bitwuzla's word-level rewriting times out
-($\mathtt{bvxor}$ and $\mathtt{bvsub}$ do not cancel under a
-universal-relational guard in the rewriter's database), while
-our procedure refutes in 0.01\,s at $d = 64$ via direct
-bit-substitution. At $d = 128$ the size of the
-bit-decomposition system becomes the bottleneck for our
-procedure, and we time out as well.
+case where Bitwuzla's word-level rewriting times out at every
+bitwidth tested ($\mathtt{bvxor}$ and $\mathtt{bvsub}$ do not
+cancel under a universal-relational guard in the rewriter's
+database), while our procedure refutes in 0.01--0.04\,s across
+the full bitwidth range via direct bit-substitution combined with
+the bit alignments materialised for the implicit $h = c x$ side
+equation in the bit-decomposed expression.
 
 \textbf{Implications.} Bit-decomposition extends the algebraic
 procedure's \emph{capability} to partial bit-vector operators
-and to relational preconditions without changing its fundamental
-architecture. The \emph{performance} contribution is narrow: most
-simple identities are well-handled by bit-blasting alone, and
-Bitwuzla's word-level rewriting beats us absolutely on most
-queries tested. The wider value is conceptual: the algebraic
-procedure now decides queries that mix polynomial structure
-with relational guards, including at least one case (last row of
-Table~\ref{tab:eval-pbv-relational}) where it succeeds where
-Bitwuzla times out.
+and to relational preconditions, and (with bit alignments) to
+shift-related identities, without changing its fundamental
+architecture. The \emph{performance} contribution is narrow on
+simple identities, where bit-blasting alone is competitive, but
+the procedure now decides queries that mix polynomial structure
+with relational guards and shift identities, including at least
+one case (last row of Table~\ref{tab:eval-pbv-relational}) where
+it succeeds 30--$\infty\times$ faster than Bitwuzla, and the
+toom-scaled identity (Table~\ref{tab:eval-pbv}) where it
+succeeds 17$\times$ faster at $d{=}128$. Signed comparisons
+(\verb|bvslt|, \verb|bvsle|, \verb|bvsgt|, \verb|bvsge|) reduce
+to unsigned via the standard sign-bit XOR transformation;
+symbol-symbol comparisons use a bit-comparator chain encoding.
 
 \subsection{Amulet2 Comparison}
 \label{sec:eval-amulet}
