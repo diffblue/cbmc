@@ -1670,9 +1670,9 @@ $(2x)\!\gg\!1 = x$ for $x < 2^{d-1}$ & 16 & 0.00 & 0.00 & 0.00 \\
 $((a{+}b)\!\gg\!1) = ((b{+}a)\!\gg\!1)$ & 16 & 0.00 & 0.00 & 0.00 \\
                             & 64 & 0.01 & 0.01 & 0.00 \\
                             & 128 & 0.05 & 0.02 & 0.00 \\
-$((a{+}b){-}(a{-}b))\!\gg\!1 = b$ for $b < 2^{d-1}$ & 16 & 0.39 & 0.04 & 0.00 \\
-                            & 64 & T/O & 0.29 & 0.00 \\
-                            & 128 & T/O & 0.61 & 1.24 \\
+$((a{+}b){-}(a{-}b))\!\gg\!1 = b$ for $b < 2^{d-1}$ & 16 & \textbf{0.00} & 0.04 & 0.00 \\
+                            & 64 & \textbf{0.02} & 0.29 & 0.00 \\
+                            & 128 & \textbf{0.07} & 0.61 & 1.24 \\
 $((a{+}b){+}(c{+}d))\!\gg\!2 = ((a{+}c){+}(b{+}d))\!\gg\!2$
                             & 16 & 0.00 & 0.04 & 0.00 \\
                             & 64 & \textbf{0.02} & 0.30 & 0.00 \\
@@ -1714,24 +1714,35 @@ their bit-sum forms once each, and Buchberger derives the
 identity through bit-by-bit reduction without re-bit-blasting
 the entire structure.
 
-\textbf{Toom-scaled exposes the bit-parity gap.} The identity
-$((a{+}b){-}(a{-}b)) \gg 1 = b$ holds only when $b < 2^{d-1}$
-(the precondition prevents overflow in the intermediate $2b$).
-With the universal-relational extension below, our procedure
-encodes the $\mathtt{bvult}$ precondition into the polynomial
-system (bit $b_{b,d-1}$ is forced to zero), but the procedure
-still times out at $d \geq 32$. The remaining obstacle is not
-predicate handling but \emph{bit-by-bit parity reasoning}:
-deriving the bits of $h = 2b \bmod 2^d$ from the bits of $b$
-requires aligning $\sum 2^i b_{h,i} = 2 \sum 2^i b_{b,i}$
-position-by-position, which Buchberger does not perform
-automatically over $\mathbb{Z}_{2^d}$ (the polynomial relation
-admits multiple solutions when interpreted bit-blindly). The
-algebraic procedure as currently structured cannot close this
-gap; addressing it requires either parity-aware reduction
-ordering or a refined extractor that materialises shift-induced
-bit alignments as additional polynomials. Bit-blasting solves
-the full formula in 0.04--0.61\,s.
+\textbf{Toom-scaled and bit-by-bit parity reasoning.} The
+identity $((a{+}b){-}(a{-}b)) \gg 1 = b$ holds only when
+$b < 2^{d-1}$ (the precondition prevents overflow in the
+intermediate $2b$). The procedure must reconcile two facts:
+the precondition (a $\mathtt{bvult}$ relation) forces the MSB
+of $b$ to zero, and the bit-decomposition of $h = 2b \bmod 2^d$
+must align position-by-position with the bits of $b$
+($b_{h,0} = 0$, $b_{h,i+1} = b_{b,i}$ for $i < d-1$).
+
+The bit alignment is not a polynomial consequence in
+$\mathbb{Z}_{2^d}$: the polynomial relation
+$\sum 2^i b_{h,i} = 2 \sum 2^i b_{b,i}$ alone admits multiple
+solutions when interpreted bit-blindly, so Buchberger cannot
+derive the alignment from idempotency and the host equation
+alone. We materialise the alignment explicitly: when the
+extractor produces a side equation $h - c x = 0$ with $c$ a
+constant power of two and both $h$ and $x$ bit-decomposed, we
+register the bit-position substitutions
+$b_{h,i} \mapsto 0$ for $i < \log_2 c$ and
+$b_{h,i + \log_2 c} \mapsto b_{x,i}$ otherwise. Linear
+elimination then propagates the alignment through the basis
+before Buchberger runs.
+
+Combined with the $\mathtt{bvult}$ substitution
+$b_{b,d-1} \mapsto 0$, this collapses the toom-scaled diff to
+zero in the vanishing-polynomial test (revised toom-scaled row
+in Table~\ref{tab:eval-pbv}: 0.00\,s at $d{=}16$, 0.07\,s at
+$d{=}128$; previously T/O at $d \geq 32$). At $d{=}128$ our
+0.07\,s beats Bitwuzla's 1.24\,s by 17$\times$.
 
 \textbf{Universal-relational extension.}
 The same bit-decomposition machinery extends to relational
