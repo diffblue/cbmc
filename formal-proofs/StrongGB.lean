@@ -394,4 +394,75 @@ theorem isUnit_iff_two_not_dvd_val {d : ℕ} (hd : 0 < d) (x : ZMod (2 ^ d)) :
 
 end MathlibCandidates
 
+/-! ## (6) The d = 1 (over GF(2)) case via maximal-ideal argument
+
+    For F over `MvPolynomial _ (ZMod 2)` with idempotency on each
+    variable, F unsat over `(ZMod 2)^n` implies `1 ∈ ⟨F⟩`.
+
+    Proof outline (via maximal ideal):
+      1. Suppose `1 ∉ ⟨F⟩`, so `⟨F⟩ ≠ ⊤`.
+      2. By `Ideal.exists_le_maximal`, get `M : Ideal _` maximal
+         containing `⟨F⟩`.
+      3. The quotient `K := MvPolynomial _ (ZMod 2) ⧸ M` is a
+         field (by `Ideal.Quotient.field`).
+      4. Define `φ : Fin n → K` by `φ i := Quotient.mk M (X i)`.
+      5. Idempotency on `X i` (in F ⊆ M) implies `φ i ^ 2 = φ i`
+         in K. Since K is a field, this forces `φ i ∈ {0, 1}`.
+      6. The map `ZMod 2 → K` is injective (ring hom from field
+         to nontrivial), and {0, 1} ⊆ K is exactly the image of
+         ZMod 2 (since char K = 2).
+      7. So define `φ' : Fin n → ZMod 2` corresponding to φ.
+      8. Then for each f ∈ F: `eval φ' f` maps to `eval φ f`
+         (i.e., 0 in K) under ZMod 2 → K. Since the map is
+         injective, `eval φ' f = 0` in ZMod 2.
+      9. So F has a zero at φ' in `(ZMod 2)^n`. Contradicts hunsat.
+
+    This proof would work for d = 1 but requires significant
+    Lean infrastructure (ZMod 2 → K embedding, characterisation
+    of {0, 1} in a char-2 field, evaluation factoring through the
+    quotient). We provide the proof sketch here as a STATEMENT-ONLY.
+    Mechanising it is a substantial sub-project of the full
+    Song et al. theorem.
+-/
+
+/-- The d = 1 case: for `F` over `MvPolynomial _ (ZMod 2)` with
+    idempotency on each variable, F unsat implies `1 ∈ ⟨F⟩`.
+
+    PROOF STATUS: STATEMENT-ONLY. The proof outline (via maximal
+    ideal + characteristic-2 field argument) is in the docstring
+    above. -/
+theorem d_eq_one_completeness {n : ℕ}
+    (F : Finset (MvPolynomial (Fin n) (ZMod 2)))
+    (h_idemp : ∀ i : Fin n,
+      (MvPolynomial.X i ^ 2 - MvPolynomial.X i :
+        MvPolynomial (Fin n) (ZMod 2)) ∈ F)
+    (hunsat : ∀ φ : Fin n → ZMod 2,
+              ∃ p ∈ F, MvPolynomial.eval φ p ≠ 0) :
+    (1 : MvPolynomial (Fin n) (ZMod 2))
+      ∈ Ideal.span (α := MvPolynomial (Fin n) (ZMod 2)) F := by
+  by_contra h_not_in
+  -- ⟨F⟩ ≠ ⊤
+  have h_ne_top :
+      Ideal.span (α := MvPolynomial (Fin n) (ZMod 2)) F ≠ ⊤ := by
+    intro h_top
+    apply h_not_in
+    rw [h_top]; trivial
+  -- Get a maximal ideal M ⊇ ⟨F⟩
+  obtain ⟨M, hM_max, hM_le⟩ := Ideal.exists_le_maximal _ h_ne_top
+  -- The quotient K := MvPolynomial _ (ZMod 2) ⧸ M is a field
+  -- (via Ideal.Quotient.field [hM_max]).
+  -- Define φ : Fin n → K via the canonical map. Each φ i satisfies
+  -- φ i ^ 2 = φ i (from idempotency in F ⊆ M), so φ i ∈ {0, 1} in K.
+  -- Map back to (ZMod 2)^n via the embedding ZMod 2 → K, getting
+  -- φ' : Fin n → ZMod 2 with eval φ' p = 0 for each p ∈ F.
+  -- This contradicts hunsat.
+  --
+  -- The full mechanisation requires:
+  --   - The Ideal.Quotient.field instance.
+  --   - ZMod 2 → K injective (ring hom from a field to nontrivial).
+  --   - Idempotency forcing φ i ∈ {0, 1} in K.
+  --   - Evaluation factoring through the quotient.
+  -- These are all standard but require careful manipulation in Lean.
+  sorry
+
 end StrongGB
