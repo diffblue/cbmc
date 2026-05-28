@@ -296,8 +296,13 @@ strong_groebner_basist::compute(std::vector<polynomialt> &polys)
 
   // Track progress: if a full round of S-polynomial processing
   // produces no new basis elements, the basis is complete
-  // (Buchberger criterion — verified in BuchbergerTermination.lean,
-  // theorem stable_implies_no_new).
+  // (Buchberger criterion).
+  // PROOF: formal-proofs/BuchbergerTermination.lean::stable_implies_no_new
+  //        Soundness of the termination criterion: at stability,
+  //        every candidate new element is already in the ideal.
+  // PROOF: formal-proofs/BuchbergerCorrectness.lean::buchberger_unsat'
+  //        Top-level UNSAT soundness: if G ⊇ F preserves the
+  //        ideal and contains a unit, the input system is UNSAT.
   std::size_t pairs_since_last_progress = 0;
   std::size_t pairs_at_last_progress = pairs.size();
 
