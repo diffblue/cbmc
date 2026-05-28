@@ -152,6 +152,41 @@ public:
   /// variable) to a constant polynomial it is forced to equal.
   std::map<std::size_t, polynomialt> additional_substitutions;
 
+  /// Materialise bit-level alignment polynomials for shift identities
+  /// (P2: parity-aware reasoning). Scans the supplied polynomial
+  /// equations for patterns of the form
+  ///
+  ///     h - c*x = 0   (or equivalently  c*x - h = 0)
+  ///
+  /// where h and x are bit-decomposed hosts and c is a constant
+  /// power of 2 in [2, 2^{d-1}]. Each match produces:
+  ///
+  ///     b_{h,i} = 0                  for i in [0, k-1]   (low bits zero)
+  ///     b_{h,i+k} = b_{x,i}          for i in [0, d-1-k] (shifted bits)
+  ///
+  /// where k = log2(c). These linear bit-equalities make the parity
+  /// structure of the multiplication explicit, which would otherwise
+  /// require Buchberger to deduce position-by-position and is
+  /// intractable on shift-related identities of width >= 32 (cf.
+  /// the toom-scaled case in §4.6).
+  ///
+  /// Soundness: in Z_{2^d} the polynomial h - 2^k x = 0 implies bit
+  /// b_{h,i} = bit b_{x,i-k} for i >= k and bit b_{h,i} = 0 for
+  /// i < k, modulo the Frobenius idempotency of the bit variables.
+  /// The alignment equations are valid consequences in the bit-
+  /// decomposed model.
+  ///
+  /// The alignments are written as substitutions
+  /// (additional_substitutions) rather than equations: substituting
+  /// b_{h, i+k} -> b_{x, i} eagerly through the basis avoids
+  /// generating O(d) extra polynomials in Buchberger and exposes the
+  /// shift structure during linear elimination.
+  ///
+  /// Returns the new alignment polynomials. Modifies the extractor's
+  /// additional_substitutions for the substitution-based encodings.
+  std::vector<polynomialt> materialise_bit_alignments(
+    const std::vector<polynomialt> &equations);
+
 private:
   std::map<irep_idt, std::size_t> var_map;
   std::map<std::size_t, irep_idt> reverse_var_map;

@@ -390,6 +390,135 @@ std::optional<polynomialt> poly_extractort::extract_equation(const exprt &eq)
   return diff;
 }
 
+std::vector<polynomialt> poly_extractort::materialise_bit_alignments(
+  const std::vector<polynomialt> &equations)
+{
+  std::vector<polynomialt> alignments;
+  if(bitwidth == 0 || bit_decomp_cache.empty())
+    return alignments;
+  const unsigned d = bitwidth;
+  const mp_integer modulus = power(mp_integer{2}, mp_integer{d});
+
+  // For each candidate equation `h - c*x = 0` (with h, x both in
+  // bit_decomp_cache and c a power of 2 in [2, 2^{d-1}]),
+  // emit the alignment polynomials:
+  //   b_{h, i} - 0           for i in [0, k-1]
+  //   b_{h, i+k} - b_{x, i}  for i in [0, d-1-k]
+  for(const auto &p : equations)
+  {
+    if(p.terms.size() != 2)
+      continue;
+
+    // Identify the two terms and their structure.
+    auto extract_singleton = [](const std::pair<mp_integer, monomialt> &term)
+      -> std::optional<std::pair<mp_integer, std::size_t>>
+    {
+      // Returns (coeff, var_idx) if monomial is a single variable
+      // raised to power 1; nullopt otherwise.
+      if(term.second.vars.size() != 1)
+        return std::nullopt;
+      if(term.second.vars.front().second != 1)
+        return std::nullopt;
+      return std::make_pair(term.first, term.second.vars.front().first);
+    };
+
+    auto t0 = extract_singleton(p.terms[0]);
+    auto t1 = extract_singleton(p.terms[1]);
+    if(!t0.has_value() || !t1.has_value())
+      continue;
+
+    // Normalise so that h has coefficient +1 (or -1, swap sign).
+    // We are looking for `c0*v0 + c1*v1 = 0`, which means
+    // `c0*v0 = -c1*v1`, equivalently `v0 = (-c1/c0) * v1` if c0 = ±1.
+    // We accept the case where one coefficient is ±1 and the other
+    // is ±2^k for k in [1, d-1].
+    auto [c0, v0] = *t0;
+    auto [c1, v1] = *t1;
+
+    auto try_match =
+      [&](mp_integer ch, std::size_t vh, mp_integer cx, std::size_t vx)
+      -> std::optional<unsigned>
+    {
+      // ch * vh + cx * vx = 0  with ch in {1, -1}
+      // => vh = -(cx/ch) * vx = -ch * cx * vx (since ch * ch = 1)
+      // We want effective_c = -ch * cx to be a positive power of 2.
+      if(ch != mp_integer{1} && ch != mp_integer{-1})
+        return std::nullopt;
+      mp_integer effective_c = -ch * cx;
+      // Reduce mod 2^d to canonical positive form.
+      effective_c = ((effective_c % modulus) + modulus) % modulus;
+      if(effective_c <= 1)
+        return std::nullopt;
+      // Detect power of 2.
+      mp_integer t = effective_c;
+      unsigned k = 0;
+      while(t > 0 && t % 2 == 0)
+      {
+        t /= 2;
+        ++k;
+      }
+      if(t != 1)
+        return std::nullopt;
+      if(k == 0 || k >= d)
+        return std::nullopt;
+      // Check that vh and vx are both bit-decomposed hosts.
+      if(bit_decomp_cache.find(vh) == bit_decomp_cache.end())
+        return std::nullopt;
+      if(bit_decomp_cache.find(vx) == bit_decomp_cache.end())
+        return std::nullopt;
+      // Self-alignment (vh == vx) is degenerate; skip.
+      if(vh == vx)
+        return std::nullopt;
+      return k;
+    };
+
+    std::optional<unsigned> k;
+    std::size_t vh, vx;
+    if(auto k_opt = try_match(c0, v0, c1, v1))
+    {
+      k = k_opt;
+      vh = v0;
+      vx = v1;
+    }
+    else if(auto k_opt = try_match(c1, v1, c0, v0))
+    {
+      k = k_opt;
+      vh = v1;
+      vx = v0;
+    }
+    else
+    {
+      continue;
+    }
+
+    const auto &h_bits = bit_decomp_cache.at(vh);
+    const auto &x_bits = bit_decomp_cache.at(vx);
+    INVARIANT(h_bits.size() == d, "bit decomposition of h has d bits");
+    INVARIANT(x_bits.size() == d, "bit decomposition of x has d bits");
+
+    // Substitution-based encoding: register the bit alignments in
+    // additional_substitutions so they propagate through the basis
+    // during linear elimination. This is dramatically more effective
+    // than emitting them as equations because Buchberger then sees a
+    // pre-substituted basis rather than having to derive the alignment
+    // position-by-position.
+    for(unsigned i = 0; i < *k && i < d; ++i)
+    {
+      // b_{h, i} = 0
+      additional_substitutions.insert_or_assign(
+        h_bits[i], polynomialt{d, mp_integer{0}});
+    }
+    for(unsigned i = 0; i + *k < d; ++i)
+    {
+      // b_{h, i+k} -> b_{x, i}
+      polynomialt sub_poly{d, mp_integer{1}, x_bits[i]};
+      additional_substitutions.insert_or_assign(
+        h_bits[i + *k], std::move(sub_poly));
+    }
+  }
+  return alignments;
+}
+
 std::optional<std::vector<polynomialt>>
 poly_extractort::extract_predicate(const exprt &pred, bool value)
 {

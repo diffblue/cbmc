@@ -897,6 +897,23 @@ bool boolbvt::try_algebraic_solve()
         if(ilhs && irhs)
         {
           polynomialt idiff = *ilhs - *irhs;
+          // Sub-goal 6: feed predicate substitutions (e.g.\ a
+          // bvult-induced bit-zeroing constraint) into the inline
+          // extractor so the vanishing test can use them. Without
+          // this the predicate is invisible to the vanishing path
+          // and queries with a relational precondition (e.g.\ the
+          // toom-scaled identity) cannot be refuted via vanishing.
+          for(const auto &[pred_expr, pred_val] : algebraic_predicates)
+            (void)inline_extractor.extract_predicate(pred_expr, pred_val);
+
+          // P2: bit-by-bit parity reasoning. Detect h = c*x patterns
+          // (c power of 2) in the inline_extractor's side equations
+          // and register the corresponding bit-alignment
+          // substitutions. After this the diff of a shift identity
+          // collapses under linear elimination.
+          (void)inline_extractor.materialise_bit_alignments(
+            inline_extractor.side_equations);
+
           // Apply linear elimination of host variables (Re 4
           // sub-goal 3 follow-on): if idiff contains a host h
           // with sum-decomposition h = sum_i 2^i b_i, substitute
@@ -1017,6 +1034,16 @@ bool boolbvt::try_algebraic_solve()
 
     if(single_eqs.size() >= 2)
     {
+      // P2: bit-by-bit parity reasoning. For each side equation of
+      // the form `h - c*x = 0` with c a constant power of 2 and
+      // both h, x bit-decomposed, materialise the bit alignments.
+      auto alignments = single_extractor.materialise_bit_alignments(single_eqs);
+      for(auto &p : alignments)
+      {
+        if(!p.is_zero())
+          single_eqs.push_back(std::move(p));
+      }
+
       strong_groebner_basist single_gb{100000};
       single_gb.set_bit_vars(single_extractor.get_bit_var_indices());
       single_gb.set_host_substitutions(
@@ -1173,6 +1200,15 @@ bool boolbvt::try_algebraic_solve()
         break;
       }
 
+      // P2: bit-by-bit parity reasoning.
+      auto branch_alignments =
+        branch_extractor.materialise_bit_alignments(branch_eqs);
+      for(auto &p : branch_alignments)
+      {
+        if(!p.is_zero())
+          branch_eqs.push_back(std::move(p));
+      }
+
       strong_groebner_basist branch_gb{100000};
       branch_gb.set_bit_vars(branch_extractor.get_bit_var_indices());
       branch_gb.set_host_substitutions(
@@ -1282,6 +1318,16 @@ bool boolbvt::try_algebraic_solve()
           equations.push_back(std::move(zfp));
         }
       }
+    }
+  }
+
+  // P2: bit-by-bit parity reasoning.
+  {
+    auto alignments = extractor.materialise_bit_alignments(equations);
+    for(auto &p : alignments)
+    {
+      if(!p.is_zero())
+        equations.push_back(std::move(p));
     }
   }
 
