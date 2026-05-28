@@ -5766,9 +5766,23 @@ void cpp_typecheck_resolvet::apply_template_args(
           const symbolt &type_symb = cpp_typecheck.lookup(
             fargs.operands.begin()->type().get(ID_identifier));
 
-          CHECK_RETURN(type_symb.type.id() == ID_struct);
+          // [class.member.lookup]/4: name lookup uses the class
+          // (or union) of the object expression.  Reject silently
+          // if the resolved type symbol is neither — this can
+          // happen when constexpr-eval reaches into a partially
+          // instantiated body whose argument types haven't yet
+          // been fully resolved.  Falling through to the
+          // non-member path lets the caller surface the right
+          // diagnostic at the use site.
+          if(
+            type_symb.type.id() != ID_struct &&
+            type_symb.type.id() != ID_union)
+          {
+            return;
+          }
 
-          const struct_typet &struct_type = to_struct_type(type_symb.type);
+          const struct_union_typet &struct_type =
+            to_struct_union_type(type_symb.type);
 
           // The method may be inherited from a base class template
           // (e.g., this->_Freenode() where _Freenode is in the base).
