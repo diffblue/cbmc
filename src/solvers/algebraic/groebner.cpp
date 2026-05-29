@@ -320,6 +320,21 @@ strong_groebner_basist::compute(std::vector<polynomialt> &polys)
   //        the progress-tracking counters reset on any basis growth
   //        (S-poly OR 2-trick), ensuring no pair is occluded by an
   //        early exit.
+  // PROOF: formal-proofs/BuchbergerTermination.lean::progress_invariant_preserved
+  //        The invariant `pairs_size + counter = baseline` is
+  //        preserved by every step of the corrected loop, where
+  //        a "step" is either a basis-growth iteration (resets
+  //        counter and baseline) or a non-growth iteration
+  //        (decrements pairs_size, increments counter).
+  //        Companion theorem buggy_step_breaks_invariant shows the
+  //        pre-fix step (grow via 2-trick without resetting) breaks
+  //        the invariant whenever the 2-trick adds polynomials,
+  //        which is exactly what allowed the early exit to fire.
+  //        ASSUMES: each iteration captures polys.size() before any
+  //        step, and resets counters iff polys grew across the full
+  //        iteration body.
+  //        MAINTAINED BY: `polys_size_at_iter_start` snapshot below
+  //        and the conditional reset at the end of the iteration.
   // PROOF: formal-proofs/BuchbergerCorrectness.lean::buchberger_unsat'
   //        Top-level UNSAT soundness: if G ⊇ F preserves the
   //        ideal and contains a unit, the input system is UNSAT.

@@ -60,6 +60,7 @@ implementation site with one or more Lean theorems.
 | `groebner.cpp::extract_candidate` | `ExtractCandidate.lean::extract_candidate_local_soundness`, `solve_univariate_linear_unit` | DONE |
 | `groebner.cpp::compute` (2-trick preserves ideal) | `StrongGB.lean::two_trick_preserves_ideal`, `two_trick_preserves_ideal_mv` | DONE |
 | `groebner.cpp::compute` (UNSAT detection sound) | `StrongGB.lean::two_trick_unsat_sound` | DONE |
+| `groebner.cpp::compute` (progress-tracking invariant) | `BuchbergerTermination.lean::progress_invariant_preserved`, `counter_exceeds_baseline_implies_empty`, `buggy_step_breaks_invariant` | DONE |
 | `groebner.cpp::has_constant` (odd ⇒ unit) | `GroebnerSoundness.lean::ZMod.isUnit_of_odd_nat` | DONE |
 | `groebner.cpp::has_constant` (unit ⇒ ideal=⊤) | `GroebnerSoundness.lean::ideal_eq_top_of_unit_mem` | DONE |
 | `groebner.cpp::has_constant` (2 not unit) | `GroebnerSoundness.lean::ZMod.two_not_isUnit` | DONE |
