@@ -1989,12 +1989,35 @@ $<$50\,ms is therefore best interpreted as validating that the
 test is correctly implemented rather than demonstrating a practical
 advantage.
 
-\textbf{Higher bitwidths.} The Gr\"obner-basis procedure scales
-independently of bitwidth in principle
-(Section~\ref{sec:scaling}). The community benchmarks include
-up to 512-bit operands which our implementation does not yet
-handle on every instance; understanding the remaining gap is
-future work.
+\textbf{Higher bitwidths.} Within the universal-equational class
+the algebraic procedure scales gracefully to operand widths well
+beyond what is practical for bit-blasting, but the scaling is
+not uniformly bitwidth-independent. Trivial syntactic identities
+($a \cdot b = b \cdot a$, $(a \cdot b) \cdot c = a \cdot (b \cdot c)$)
+are decided in 6\,ms at every bitwidth tested up to
+$d = 4096$ (CBMC's word-level simplifier canonicalises operand
+order before the algebraic procedure runs, so these reduce to
+syntactic equality). Non-trivial polynomial identities exhibit
+$O(d^2)$ scaling driven by multi-precision coefficient
+arithmetic during S-polynomial reduction:
+$(a+b)^2 = a^2 + 2ab + b^2$ takes
+$0.05$/$0.20$/$0.80$/$3.3$/$13.4$\,s at
+$d \in \{64, 128, 256, 512, 1024\}$ and times out at
+$d = 2048$ within a 120\,s budget; the difference-of-squares
+identity $(a-b)(a+b) = a^2 - b^2$ scales similarly and solves
+at $d = 2048$ in 40\,s. Bit-blasting alone times out at
+$d = 64$ on both. (Data:
+\texttt{doc/paper-algebraic/data/high-bitwidth-scaling.tsv}.)
+The five 512-bit community benchmarks of the SMT-COMP sample
+(Section~\ref{sec:eval-smtcomp}) on which our procedure does
+not succeed are heavy in $\mathtt{bvudiv}$ / $\mathtt{bvurem}$,
+which fall outside the polynomial fragment and through to
+bit-blasting; Bitwuzla's word-level rewriting recognises a
+divisor-cancellation pattern in two of the five (solving
+in ${<}1.5$\,s) but times out on the remaining three. Closing
+the remaining gap is therefore primarily a question of
+word-level rewriting for division and modulo, not of
+Gr\"obner-basis scaling.
 
 \textbf{Gate-level equivalence is a gap.} Our procedure is
 complete for the universal-equational fragment with polynomial

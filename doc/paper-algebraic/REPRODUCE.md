@@ -56,6 +56,16 @@ for bench in comm assoc; do
 done
 ```
 
+### High-bitwidth scaling for non-trivial polynomial identities (§Limitations)
+
+Raw data: `data/high-bitwidth-scaling.tsv`. To re-run:
+```bash
+bench-multiplication/run-high-bitwidth-scaling.sh
+```
+Tests commutativity, associativity, $(a+b)^2$, and $(a-b)(a+b)$ at
+$d \in \{64, 128, 256, 512, 1024, 2048, 4096\}$ with the algebraic
+procedure and (at $d \leq 256$) shift-add bit-blasting.
+
 ### Table (layer ablation, §3)
 
 Raw data: `data/layer-ablation.tsv` (mirror of Paper 1 data; authoritative copy in `~/multiplier-encodings.git/paper-bitblasting/data/`).
