@@ -208,6 +208,24 @@ expr_norm    : 119/210   (no change)
 Zero benchmarks helped, zero benchmarks hurt. Total runtime difference
 on commonly-solved benchmarks: $+0.04$ s (i.e., 0.0%) — well below noise.
 
+### Re-confirmation (2026-05-29)
+
+Re-ran the ablation on the current `features/adder` build (after
+the bit-decomposition, deferred-bit-blasting, high-bw scaling, and
+bvudiv/bvurem rewrite work). The empirical null result is robust:
+
+| Suite | Total | default | expr_norm |
+|---|---|---|---|
+| Custom (39, 30s) | 39 | 39/39 | 39/39 |
+| Martin subpoly (210, 10s) | 210 | 115/210 | 115/210 |
+| SMT-COMP sample (66, 30s) | 66 | 26/66 | 26/66 |
+| **Total** | **315** | **180** | **180** |
+
+Zero verdict differences anywhere in the 315-benchmark sample.
+Per-benchmark timing differences are within noise ($< 0.1$\,s).
+
+Data: `doc/paper-algebraic/data/expr-norm-evaluation.tsv`.
+
 ### Why doesn't this variant fire?
 
 The condition for item 7's check to find UNSAT is:

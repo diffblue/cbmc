@@ -100,3 +100,18 @@ of `ZMod (2^d)` is also submitted as [Mathlib PR #38628](https://github.com/lean
 
 - `features/adder` branch: paper, algebraic implementation, experiments
 - See `doc/paper-algebraic/data/` for raw data
+
+### Expression-level normalisation evaluation (§sec:future-within-and-beyond)
+
+Raw data: `data/expr-norm-evaluation.tsv` (consolidated across three suites).
+
+To re-run the simple-variant ablation:
+```bash
+bench-multiplication/run-expr-norm-ablation.sh    # custom suite (39, 30s)
+bench-multiplication/run-expr-norm-martin.sh      # Martin subpoly (210, 10s)
+# SMT-COMP sample (66, 30s) — inline loop, see commit history.
+```
+
+The variant is gated on `ENABLE_GB_EXPR_NORMALISE=1`; both runs use
+this env var for the `expr_norm` column and an empty environment for
+`default`.

@@ -1120,11 +1120,26 @@ is \emph{expression-level normalisation}, generalising
 \texttt{extract\_candidate} (currently univariate-linear only) to
 reduce arbitrary polynomial expressions w.r.t.\ the computed
 basis and emit any constant or shorter form as a SAT-level
-equality. We have a flag-gated prototype
-(\texttt{ENABLE\_GB\_EXPR\_NORMALISE}) that passes a sanity
-check; quantitative evaluation has lower priority than the
-deferred-bit-blasting and bit-decomposition work, both of which
-have produced larger empirical wins.
+equality. The simplest variant of this idea (post-Buchberger,
+reduce each disequality's $\textit{lhs} - \textit{rhs}$ by the
+global basis; if zero, the basis implies $\textit{lhs} =
+\textit{rhs}$ and the formula is unsat) is implemented behind
+\texttt{ENABLE\_GB\_EXPR\_NORMALISE} and \emph{empirically null}:
+on a 315-benchmark sample (the 39-benchmark custom suite,
+Martin's 210-benchmark subpolynomial sample, and the SMT-COMP
+QF\_BV 66-benchmark stratified sample) the variant changes the
+verdict on zero benchmarks. The analytical reason is that
+CBMC's typical SMT query has a single top-level disequality
+(the negated assertion); the global basis then equals the
+per-disequality basis, on which Rabinowitsch + Buchberger has
+already been run. More sophisticated variants (compound-
+multiplication constant folding, pairwise variable equality
+discovery, generalised candidate extraction over arbitrary
+monomials) require non-trivial additional machinery and are
+deferred to future work; we list them under the section's
+``research direction'' bullet rather than as imminent
+improvements. (Data:
+\texttt{doc/paper-algebraic/data/expr-norm-evaluation.tsv}.)
 
 \section{Evaluation}
 \label{sec:external}
