@@ -5098,11 +5098,9 @@ void smt2_convt::unflatten(
 
         std::size_t offset=0;
 
-        std::size_t i=0;
-        for(struct_typet::componentst::const_iterator
-            it=components.begin();
-            it!=components.end();
-            it++, i++)
+        for(struct_typet::componentst::const_iterator it = components.begin();
+            it != components.end();
+            it++)
         {
           if(is_zero_width(it->type(), ns))
             continue;
