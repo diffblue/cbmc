@@ -2024,15 +2024,24 @@ at $d = 2048$ in 40\,s. Bit-blasting alone times out at
 $d = 64$ on both. (Data:
 \texttt{doc/paper-algebraic/data/high-bitwidth-scaling.tsv}.)
 The five 512-bit community benchmarks of the SMT-COMP sample
-(Section~\ref{sec:eval-smtcomp}) on which our procedure does
-not succeed are heavy in $\mathtt{bvudiv}$ / $\mathtt{bvurem}$,
-which fall outside the polynomial fragment and through to
-bit-blasting; Bitwuzla's word-level rewriting recognises a
-divisor-cancellation pattern in two of the five (solving
-in ${<}1.5$\,s) but times out on the remaining three. Closing
-the remaining gap is therefore primarily a question of
-word-level rewriting for division and modulo, not of
-Gr\"obner-basis scaling.
+(Section~\ref{sec:eval-smtcomp}) are heavy in
+$\mathtt{bvudiv}$ / $\mathtt{bvurem}$, which fall outside the
+polynomial fragment and through to bit-blasting. We add a small
+suite of word-level rewrites for these operators in the SMT2
+parser ($x/x$, $0/x$, $x/0$, $x/1$, $x/{\sim}0$,
+$\mathtt{bvurem}\ x\ x$, $\mathtt{bvurem}\ 0\ x$, ite-distribution
+over the divisor, and cancellation
+$\mathtt{bvudiv}\ (\mathtt{bvurem}\ A\ y)\ y \to
+\mathtt{ite}(y = 0,\, {\sim}0,\, 0)$); each rewrite is
+formalised in \texttt{formal-proofs/DivisionRewrites.lean}.
+After these, our procedure solves two of the five 512-bit
+benchmarks --- the same two that Bitwuzla solves via its
+word-level preprocessor (1.18\,s and 3.43\,s on $\mathtt{bw512\_7}$
+and $\mathtt{bw512\_15}$ respectively, vs.\ Bitwuzla's 1.49\,s and
+0.12\,s). The remaining three benchmarks ($\mathtt{bw512\_1}$,
+$\mathtt{bw512\_12}$, $\mathtt{bw512\_14}$) time out for both
+solvers; closing that final gap is a research question for the
+SMT community rather than for Gr\"obner-basis scaling.
 
 \textbf{Gate-level equivalence is a gap.} Our procedure is
 complete for the universal-equational fragment with polynomial

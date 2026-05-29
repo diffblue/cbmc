@@ -147,4 +147,41 @@ theorem bvult_bvurem_self {n : ℕ} [NeZero n] (A y : ZMod n) :
       Nat.mod_eq_of_lt (lt_of_lt_of_le hbound (le_of_lt hyn))
     omega
 
+/-! ## Rewrite 6: ite-distribution and constant-divisor folding -/
+
+/-- ite-distribution: `bvudiv X (if c then Y else Z) =
+    if c then bvudiv X Y else bvudiv X Z`. Trivially sound by
+    case analysis on the if-condition. -/
+theorem bvudiv_ite_distribution {n : ℕ} [NeZero n]
+    (X Y Z : ZMod n) (c : Prop) [Decidable c] :
+    bvudiv X (if c then Y else Z) =
+    (if c then bvudiv X Y else bvudiv X Z) := by
+  by_cases h : c <;> simp [h]
+
+/-- ite-distribution for bvurem: same pattern. -/
+theorem bvurem_ite_distribution {n : ℕ} [NeZero n]
+    (X Y Z : ZMod n) (c : Prop) [Decidable c] :
+    bvurem X (if c then Y else Z) =
+    (if c then bvurem X Y else bvurem X Z) := by
+  by_cases h : c <;> simp [h]
+
+/-- (bvudiv (bvurem A y) y) = ite(= y 0, -1, 0).
+    Cancellation: when y ≠ 0, bvurem A y < y so dividing by y
+    gives 0; when y = 0, bvurem A 0 = A and bvudiv A 0 = -1. -/
+theorem bvudiv_bvurem_self {n : ℕ} [NeZero n] (A y : ZMod n) :
+    bvudiv (bvurem A y) y =
+    (if y = 0 then (-1 : ZMod n) else 0) := by
+  unfold bvudiv bvurem
+  by_cases h : y = 0
+  · simp [h]
+  · simp [h]
+    have hpos : 0 < y.val := by
+      rw [Nat.pos_iff_ne_zero, ZMod.val_ne_zero]; exact h
+    have hbound : A.val % y.val < y.val := Nat.mod_lt A.val hpos
+    have hyn : y.val < n := y.val_lt
+    have hmod : A.val % y.val % n = A.val % y.val :=
+      Nat.mod_eq_of_lt (lt_of_lt_of_le hbound (le_of_lt hyn))
+    rw [hmod, Nat.div_eq_of_lt hbound]
+    simp
+
 end DivisionRewrites

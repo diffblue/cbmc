@@ -57,4 +57,29 @@
 (assert (= (bvule (bvurem z z) z)
            (ite (= z (_ bv0 64)) (= z (_ bv0 64)) true)))
 
+; Rewrite 6: ite-distribution over bvudiv divisor.
+(assert (= (bvudiv x (ite (= y #x00) (_ bv7 8) (_ bv11 8)))
+           (ite (= y #x00) (bvudiv x (_ bv7 8)) (bvudiv x (_ bv11 8)))))
+
+; ite-distribution over bvurem divisor.
+(assert (= (bvurem x (ite (= y #x00) (_ bv7 8) (_ bv11 8)))
+           (ite (= y #x00) (bvurem x (_ bv7 8)) (bvurem x (_ bv11 8)))))
+
+; Constant-divisor folding: bvudiv X 0 = ~0
+(assert (= (bvudiv x #x00) #xff))
+
+; bvudiv X 1 = X
+(assert (= (bvudiv x #x01) x))
+
+; bvudiv X ~0 = ite(X = ~0, 1, 0)
+(assert (= (bvudiv x #xff) (ite (= x #xff) #x01 #x00)))
+
+; Rewrite 7: bvudiv-bvurem cancellation.
+(assert (= (bvudiv (bvurem x y) y)
+           (ite (= y #x00) #xff #x00)))
+
+; And the wider version.
+(assert (= (bvudiv (bvurem z z) z)
+           (ite (= z (_ bv0 64)) (bvnot (_ bv0 64)) (_ bv0 64))))
+
 (check-sat)

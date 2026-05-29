@@ -965,6 +965,11 @@ exprt smt2_parsert::function_application()
   UNREACHABLE;
 }
 
+/// Forward declaration: defined after `bv_mod` to keep the
+/// pattern-match helper near the construction sites.
+static std::optional<std::pair<exprt, exprt>>
+match_bvurem_letform(const exprt &e);
+
 exprt smt2_parsert::bv_division(
   const exprt::operandst &operands,
   bool is_signed)
@@ -1017,6 +1022,63 @@ exprt smt2_parsert::bv_division(
     auto num_value = numeric_cast<mp_integer>(operands[0]);
     if(num_value.has_value() && *num_value == 0)
       return if_exprt(divisor_is_zero, all_ones, zero);
+
+    // Cancellation: (bvudiv (bvurem A y) y).
+    // For y != 0, bvurem A y < y strictly, so dividing by y gives 0.
+    // For y = 0, bvurem A 0 = A and bvudiv A 0 = ~0 (SMT-LIB).
+    // Hence (bvudiv (bvurem A y) y) = ite(= y 0, ~0, 0).
+    // PROOF: formal-proofs/DivisionRewrites.lean::bvudiv_bvurem_self
+    //        Soundness over ZMod (2^d) by case analysis on y = 0,
+    //        using bvurem A y < y when y != 0.
+    if(auto bvurem_match = match_bvurem_letform(operands[0]))
+    {
+      if(bvurem_match->second == operands[1])
+        return if_exprt(divisor_is_zero, all_ones, zero);
+    }
+
+    // Constant-divisor folding (avoids constructing a divider at all
+    // for these special values).
+    auto divisor_value = numeric_cast<mp_integer>(operands[1]);
+    if(divisor_value.has_value())
+    {
+      const auto bw = to_bitvector_type(operands[0].type()).get_width();
+      const mp_integer max_val = power(mp_integer{2}, mp_integer{bw}) - 1;
+      // (bvudiv/bvsdiv X 0): SMT-LIB div-by-zero -> all-ones
+      if(*divisor_value == 0)
+        return all_ones;
+      // (bvudiv/bvsdiv X 1): division by 1 -> X
+      if(*divisor_value == 1)
+        return operands[0];
+      // (bvudiv/bvsdiv X ~0): unique unsigned divisor of max_val,
+      // result is 1 iff X = ~0 else 0.
+      if(*divisor_value == max_val)
+        return if_exprt(equal_exprt(operands[0], all_ones), one, zero);
+    }
+  }
+
+  // ite-distribution over the divisor: rewrite
+  //   (bvudiv X (ite c Y Z))
+  // to
+  //   (ite c (bvudiv X Y) (bvudiv X Z)).
+  // Sound by case analysis on the if-condition. The recursive call
+  // re-enters bv_division on each branch, so the trivial-pattern
+  // shortcuts above (x/x, 0/x, x/0) apply to each branch
+  // independently, often collapsing the entire bvudiv into a
+  // small ite-tree of constants. This pattern is what unlocks
+  // benchmarks where the divisor was already an ite (e.g.\ from
+  // an earlier (bvudiv 0 t) rewrite producing
+  // `ite (= t 0) ~0 0`, then a surrounding bvudiv distributes
+  // through it).
+  // PROOF: formal-proofs/DivisionRewrites.lean::bvudiv_ite_distribution
+  //        ite-distribution over the divisor: (bvudiv X (ite c Y Z))
+  //        = (ite c (bvudiv X Y) (bvudiv X Z)). Trivially sound by
+  //        case analysis on c.
+  if(operands[1].id() == ID_if && operands[1].operands().size() == 3)
+  {
+    const auto &if_e = to_if_expr(operands[1]);
+    auto true_div = bv_division({operands[0], if_e.true_case()}, is_signed);
+    auto false_div = bv_division({operands[0], if_e.false_case()}, is_signed);
+    return if_exprt(if_e.cond(), true_div, false_div);
   }
 
   // SMT-LIB2 defines the result of division by 0 to be 1....1
@@ -1076,6 +1138,23 @@ exprt smt2_parsert::bv_mod(const exprt::operandst &operands, bool is_signed)
     bool num_is_zero = num_value.has_value() && *num_value == 0;
     if(operands[0] == operands[1] || num_is_zero)
       return from_integer(0, operands[0].type());
+  }
+
+  // ite-distribution over the divisor: rewrite
+  //   (bvurem X (ite c Y Z))
+  // to
+  //   (ite c (bvurem X Y) (bvurem X Z)).
+  // Sound by case analysis. Same rationale as bv_division above.
+  // PROOF: formal-proofs/DivisionRewrites.lean::bvurem_ite_distribution
+  //        ite-distribution over the divisor: (bvurem X (ite c Y Z))
+  //        = (ite c (bvurem X Y) (bvurem X Z)). Trivially sound by
+  //        case analysis on c.
+  if(operands[1].id() == ID_if && operands[1].operands().size() == 3)
+  {
+    const auto &if_e = to_if_expr(operands[1]);
+    auto true_mod = bv_mod({operands[0], if_e.true_case()}, is_signed);
+    auto false_mod = bv_mod({operands[0], if_e.false_case()}, is_signed);
+    return if_exprt(if_e.cond(), true_mod, false_mod);
   }
 
   // SMT-LIB2 defines the result of "lhs modulo 0" to be "lhs"
