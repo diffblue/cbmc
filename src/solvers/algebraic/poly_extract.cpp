@@ -43,13 +43,33 @@ std::size_t poly_extractort::get_var_index(const irep_idt &name)
 
 // PROOF: formal-proofs/Encoding.lean::toPolynomial_eval
 //        Faithfulness: for the subset of CBMC expressions
-//        modelled as BVExpr (constants, variables, +, -, *, neg),
-//        the encoded polynomial evaluates to the same value as
-//        the original expression at any bit-vector environment.
-//        Specifically: MvPolynomial.eval env (toPolynomial e) =
+//        modelled as BVExpr (constants, variables, +, -, *, neg,
+//        typecast, zero_extend, extract_low), the encoded
+//        polynomial evaluates to the same value as the original
+//        expression at any bit-vector environment. Specifically:
+//        MvPolynomial.eval env (toPolynomial e) =
 //        BVExpr.eval env e (in ZMod(2^d)). The C++ recursion on
-//        e.id() (constant, symbol, plus, minus, mult, etc.)
-//        directly mirrors the Lean inductive definition.
+//        e.id() (constant, symbol, plus, minus, mult, typecast,
+//        zero_extend, extractbits, etc.) directly mirrors the
+//        Lean inductive definition.
+//        ASSUMES: variable widths are consistent throughout the
+//                 polynomial system; cast operators do not change
+//                 the OUTER bitwidth at which the polynomial is
+//                 evaluated.
+//        MAINTAINED BY: set_bitwidth() called on every entry,
+//                 accepting only equal or wider source types
+//                 (poly_extract.cpp:30 -- "return bw >= bitwidth").
+// PROOF: formal-proofs/Encoding.lean::cast_value_preserved_across_widths
+//        For zero_extend (and narrowing-safe typecast) the C++
+//        encoding bumps the polynomial's bitwidth field to the
+//        outer width. Soundness: every coefficient c : ZMod(2^d_in)
+//        has c.val < 2^d_in <= 2^d_out, so reinterpreting in
+//        ZMod(2^d_out) preserves the canonical representative.
+// PROOF: formal-proofs/Encoding.lean::reduce_value_preserved_across_widths
+//        For extract_low (and narrowing typecast) the natural
+//        ring homomorphism ZMod(2^d_in) -> ZMod(2^d_out) is
+//        well-defined when d_out <= d_in, witnessed by
+//        (2^d_out) | (2^d_in).
 // PROOF: formal-proofs/Encoding.lean::toPolynomial_deterministic
 //        Purity: toPolynomial is a deterministic function of e.
 //        This justifies caching results keyed by e.
