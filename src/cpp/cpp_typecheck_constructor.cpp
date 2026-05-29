@@ -857,6 +857,17 @@ void cpp_typecheckt::full_member_initialization(
 
         codet mem_init(ID_member_initializer);
         mem_init.set(ID_member, cppname);
+        // Record the specific base subobject's type so that
+        // `typecheck_member_initializer` can disambiguate among
+        // base constructors that share an unqualified `base_name`
+        // (e.g., a class deriving from two specializations of the
+        // same template — `_Hashtable_ebo_helper<0, _Hash>` and
+        // `_Hashtable_ebo_helper<1, _Equal>` — both produce
+        // candidates printed as `ebo(struct ebo *)`).  The
+        // resolve() call sees only the unqualified `ctor_name`
+        // and would fail with "symbol 'X' does not uniquely
+        // resolve" otherwise.
+        mem_init.add("#base_type") = b.type();
         final_initializers.move_to_sub(mem_init);
       }
 
