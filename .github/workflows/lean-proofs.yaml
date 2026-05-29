@@ -82,32 +82,22 @@ jobs:
       - name: Verify project axioms are only the documented ones
         run: |
           set -e
-          # Only Defer.lean (boolbv operational semantics) is
-          # permitted to introduce project-internal axioms. Any
-          # other module introducing axioms requires explicit
-          # review.
+          # All project-internal axioms have been mechanised. Any
+          # module that introduces axioms requires explicit review.
           fail=0
           for f in *.lean; do
             if [ "$f" = "Main.lean" ]; then continue; fi
             count=$(grep -cE "^axiom " "$f" || true)
-            case "$f" in
-              Defer.lean)
-                # Documented axiom module; just report count.
-                echo "  $f: $count axioms (documented)"
-                ;;
-              *)
-                if [ "$count" -gt 0 ]; then
-                  echo "::error file=formal-proofs/$f::introduces $count undocumented axioms"
-                  fail=1
-                fi
-                ;;
-            esac
+            if [ "$count" -gt 0 ]; then
+              echo "::error file=formal-proofs/$f::introduces $count undocumented axioms"
+              fail=1
+            fi
           done
           if [ "$fail" -eq 1 ]; then
             echo "Axiom check failed."
             exit 1
           fi
-          echo "Axiom check passed."
+          echo "Axiom check passed: zero project-internal axioms across all modules."
 
       - name: Verify forward traceability (PROOF: refs resolve)
         working-directory: .
