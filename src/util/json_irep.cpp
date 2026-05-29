@@ -185,11 +185,10 @@ json_objectt json(const source_locationt &location)
   const auto &pragmas = location.get_pragmas();
   if(!pragmas.empty())
   {
-    auto json_pragma_range = make_range(pragmas.begin(), pragmas.end())
-                               .map([](const std::pair<irep_idt, irept> &entry)
-                                    { return json_stringt{entry.first}; });
-    result["pragma"] =
-      json_arrayt{json_pragma_range.begin(), json_pragma_range.end()};
+    json_arrayt json_pragmas;
+    for(const auto &pragma : pragmas)
+      json_pragmas.push_back(json_stringt{pragma.first});
+    result["pragma"] = std::move(json_pragmas);
   }
 
   return result;
