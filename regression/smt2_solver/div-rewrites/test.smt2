@@ -40,4 +40,21 @@
 ; (bvurem y y) within a multiplication
 (assert (= (bvmul x (bvurem y y)) #x00))
 
+; Rewrite 5: (bvule (bvurem A y) y) — always TRUE when y != 0,
+; equals (= A 0) when y = 0. Composite case: ite form.
+(assert (= (bvule (bvurem x y) y)
+           (ite (= y #x00) (= x #x00) true)))
+
+; (bvult (bvurem A y) y) — equals (not (= y 0)) regardless of A.
+(assert (= (bvult (bvurem x y) y) (not (= y #x00))))
+
+; Symmetric: (bvuge y (bvurem A y)) and (bvugt y (bvurem A y)).
+(assert (= (bvuge y (bvurem x y))
+           (ite (= y #x00) (= x #x00) true)))
+(assert (= (bvugt y (bvurem x y)) (not (= y #x00))))
+
+; Wider bitwidth: avoid building a full divider at bw=64.
+(assert (= (bvule (bvurem z z) z)
+           (ite (= z (_ bv0 64)) (= z (_ bv0 64)) true)))
+
 (check-sat)

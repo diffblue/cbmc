@@ -84,4 +84,67 @@ theorem bvurem_zero_left {n : ℕ} [NeZero n] (x : ZMod n) :
   · simp [h]
   · simp [h, ZMod.val_zero, Nat.zero_mod]
 
+/-! ## Rewrite 5: bvule / bvult relations with bvurem
+
+    SMT-LIB's `bvule (bvurem A y) y` is defined on canonical
+    representatives `.val`. We capture the soundness of the
+    parse-time rewrites:
+
+      bvule (bvurem A y) y = ite (= y 0) (= A 0) true
+      bvult (bvurem A y) y = ¬(= y 0)
+
+    The first is conditional: when y = 0, bvurem A 0 = A, so
+    bvule A 0 holds iff A = 0; when y ≠ 0, bvurem A y < y
+    strictly so bvule holds. The second is similar but stricter:
+    when y = 0, bvult A 0 is false (no unsigned value is < 0).
+-/
+
+@[simp] lemma bvurem_zero_right {n : ℕ} [NeZero n] (A : ZMod n) :
+    bvurem A 0 = A := by
+  unfold bvurem; simp
+
+/-- Soundness of the parse-time rewrite
+    `bvule (bvurem A y) y → ite (= y 0) (= A 0) true`. -/
+theorem bvule_bvurem_self {n : ℕ} [NeZero n] (A y : ZMod n) :
+    ((bvurem A y).val ≤ y.val) ↔
+    (if y = 0 then A = 0 else True) := by
+  by_cases h : y = 0
+  · -- y = 0: bvurem A 0 = A, val_zero gives goal A.val ≤ 0 ↔ A = 0
+    rw [if_pos h]
+    constructor
+    · intro hle
+      rw [h, bvurem_zero_right, ZMod.val_zero] at hle
+      exact ZMod.val_eq_zero A |>.mp (Nat.le_zero.mp hle)
+    · intro hA
+      rw [h, bvurem_zero_right, hA, ZMod.val_zero]
+  · -- y ≠ 0: bvurem A y < y strictly, so ≤ holds
+    rw [if_neg h]
+    apply iff_of_true _ trivial
+    -- Now prove (bvurem A y).val ≤ y.val
+    unfold bvurem
+    simp [h]
+    have hpos : 0 < y.val := by
+      rw [Nat.pos_iff_ne_zero, ZMod.val_ne_zero]; exact h
+    have hbound : A.val % y.val < y.val := Nat.mod_lt A.val hpos
+    have hyn : y.val < n := y.val_lt
+    have hmod : A.val % y.val % n = A.val % y.val :=
+      Nat.mod_eq_of_lt (lt_of_lt_of_le hbound (le_of_lt hyn))
+    omega
+
+/-- Soundness of the parse-time rewrite
+    `bvult (bvurem A y) y → ¬(= y 0)`. -/
+theorem bvult_bvurem_self {n : ℕ} [NeZero n] (A y : ZMod n) :
+    ((bvurem A y).val < y.val) ↔ y ≠ 0 := by
+  unfold bvurem
+  by_cases h : y = 0
+  · simp [h]
+  · simp [h]
+    have hpos : 0 < y.val := by
+      rw [Nat.pos_iff_ne_zero, ZMod.val_ne_zero]; exact h
+    have hbound : A.val % y.val < y.val := Nat.mod_lt A.val hpos
+    have hyn : y.val < n := y.val_lt
+    have hmod : A.val % y.val % n = A.val % y.val :=
+      Nat.mod_eq_of_lt (lt_of_lt_of_le hbound (le_of_lt hyn))
+    omega
+
 end DivisionRewrites

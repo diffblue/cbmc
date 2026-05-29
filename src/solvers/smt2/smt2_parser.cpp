@@ -1102,6 +1102,143 @@ exprt smt2_parsert::bv_mod(const exprt::operandst &operands, bool is_signed)
     if_exprt(divisor_is_zero, dividend, mod_result));
 }
 
+/// Recognise the canonical let-wrapped form of an unsigned bvurem
+/// produced by `bv_mod` with `is_signed = false`:
+///
+///   let dividend = X, divisor = Y in
+///     if (= divisor 0) then dividend else mod(dividend, divisor)
+///
+/// On match, returns the original (X, Y) expressions; otherwise
+/// std::nullopt. The shape is brittle because the let binds two
+/// fresh symbols and the body references both --- we walk the AST
+/// piece-by-piece and bail at the first mismatch.
+static std::optional<std::pair<exprt, exprt>>
+match_bvurem_letform(const exprt &e)
+{
+  if(e.id() != ID_let)
+    return std::nullopt;
+  const auto &le = to_let_expr(e);
+  if(le.variables().size() != 2 || le.values().size() != 2)
+    return std::nullopt;
+  const auto &dividend_sym = le.variables()[0];
+  const auto &divisor_sym = le.variables()[1];
+  if(le.where().id() != ID_if)
+    return std::nullopt;
+  const auto &if_e = to_if_expr(le.where());
+  // condition: dividend_sym is irrelevant; we want
+  //   (= divisor_sym 0)
+  if(if_e.cond().id() != ID_equal || if_e.cond().operands().size() != 2)
+    return std::nullopt;
+  const auto &eq = to_equal_expr(if_e.cond());
+  if(eq.lhs() != divisor_sym)
+    return std::nullopt;
+  auto zero_val = numeric_cast<mp_integer>(eq.rhs());
+  if(!zero_val.has_value() || *zero_val != 0)
+    return std::nullopt;
+  // true case: dividend_sym
+  if(if_e.true_case() != exprt(dividend_sym))
+    return std::nullopt;
+  // false case: mod(dividend_sym, divisor_sym)
+  if(
+    if_e.false_case().id() != ID_mod ||
+    if_e.false_case().operands().size() != 2)
+    return std::nullopt;
+  if(
+    if_e.false_case().operands()[0] != exprt(dividend_sym) ||
+    if_e.false_case().operands()[1] != exprt(divisor_sym))
+    return std::nullopt;
+  return std::make_pair(le.values()[0], le.values()[1]);
+}
+
+/// Recognise (bv_u_rel (bvurem A y) y) and emit the simplified
+/// form. Sound under SMT-LIB-2 semantics (bvurem y 0 = y;
+/// otherwise bvurem A y < y strictly):
+///
+///   bvule (bvurem A y) y -> ite(= y 0, = A 0, true)
+///   bvult (bvurem A y) y -> not (= y 0)
+///   bvuge y (bvurem A y) -> ite(= y 0, = A 0, true)
+///   bvugt y (bvurem A y) -> not (= y 0)
+///
+/// At bw=512 this avoids constructing a full divider, which is
+/// the dominant cost in benchmarks like SMT-COMP's bw512_15.
+///
+/// PROOF: formal-proofs/DivisionRewrites.lean::bvule_bvurem_self
+///        Soundness of (bvule (bvurem A y) y) -> ite(=y 0, =A 0, true).
+///        The RHS is True when y != 0 because bvurem A y < y
+///        strictly; when y = 0 the bvurem result is A by SMT-LIB
+///        convention, and bvule A 0 holds iff A = 0.
+/// PROOF: formal-proofs/DivisionRewrites.lean::bvult_bvurem_self
+///        Soundness of (bvult (bvurem A y) y) -> not (= y 0).
+///        Strict version: when y = 0, bvurem result is A and
+///        bvult A 0 is false (no unsigned value < 0); when y != 0,
+///        bvurem A y < y strictly so bvult holds.
+///   ASSUMES: SMT-LIB-2 semantics (bvurem x 0 = x). Holds by
+///            construction of bv_mod above.
+///   MAINTAINED BY: match_bvurem_letform identifies the exact
+///            let-wrapped if-then-else structure produced by
+///            bv_mod (with is_signed=false). Mismatched structures
+///            (bvsrem, bvsmod, complex modifications) bail out
+///            and the original parse continues.
+std::optional<exprt> smt2_parsert::try_bvurem_relation_rewrite(
+  irep_idt rel,
+  const exprt::operandst &op)
+{
+  if(op.size() != 2)
+    return std::nullopt;
+  // Determine which operand is the bvurem and which is the divisor:
+  //   ID_le, ID_lt:  op[0] is bvurem, op[1] is divisor (urem result <= y)
+  //   ID_ge, ID_gt:  op[0] is divisor, op[1] is bvurem (y >= urem result)
+  bool strict; // ID_lt or ID_gt
+  std::size_t urem_idx, divisor_idx;
+  if(rel == ID_le)
+  {
+    strict = false;
+    urem_idx = 0;
+    divisor_idx = 1;
+  }
+  else if(rel == ID_lt)
+  {
+    strict = true;
+    urem_idx = 0;
+    divisor_idx = 1;
+  }
+  else if(rel == ID_ge)
+  {
+    strict = false;
+    urem_idx = 1;
+    divisor_idx = 0;
+  }
+  else if(rel == ID_gt)
+  {
+    strict = true;
+    urem_idx = 1;
+    divisor_idx = 0;
+  }
+  else
+  {
+    return std::nullopt;
+  }
+  auto match = match_bvurem_letform(op[urem_idx]);
+  if(!match.has_value())
+    return std::nullopt;
+  const auto &[A, y] = *match;
+  if(y != op[divisor_idx])
+    return std::nullopt;
+  // Pattern matched. Build the simplified form.
+  auto y_is_zero = equal_exprt(y, from_integer(0, y.type()));
+  if(strict)
+  {
+    // bvult (bvurem A y) y  =  (¬(= y 0))
+    return not_exprt(y_is_zero);
+  }
+  else
+  {
+    // bvule (bvurem A y) y  =  ite(= y 0, = A 0, true)
+    auto A_is_zero = equal_exprt(A, from_integer(0, A.type()));
+    return if_exprt(y_is_zero, A_is_zero, true_exprt());
+  }
+}
+
 exprt smt2_parsert::expression()
 {
   auto token = next_token();
@@ -1243,25 +1380,49 @@ void smt2_parsert::setup_expressions()
   expressions["<"] = [this] { return binary_predicate(ID_lt, operands()); };
   expressions[">"] = [this] { return binary_predicate(ID_gt, operands()); };
 
-  expressions["bvule"] = [this] { return binary_predicate(ID_le, operands()); };
+  expressions["bvule"] = [this]
+  {
+    auto op = operands();
+    if(auto rewritten = try_bvurem_relation_rewrite(ID_le, op))
+      return *rewritten;
+    return binary_predicate(ID_le, op);
+  };
 
   expressions["bvsle"] = [this] {
     return binary_predicate(ID_le, cast_bv_to_signed(operands()));
   };
 
-  expressions["bvuge"] = [this] { return binary_predicate(ID_ge, operands()); };
+  expressions["bvuge"] = [this]
+  {
+    auto op = operands();
+    if(auto rewritten = try_bvurem_relation_rewrite(ID_ge, op))
+      return *rewritten;
+    return binary_predicate(ID_ge, op);
+  };
 
   expressions["bvsge"] = [this] {
     return binary_predicate(ID_ge, cast_bv_to_signed(operands()));
   };
 
-  expressions["bvult"] = [this] { return binary_predicate(ID_lt, operands()); };
+  expressions["bvult"] = [this]
+  {
+    auto op = operands();
+    if(auto rewritten = try_bvurem_relation_rewrite(ID_lt, op))
+      return *rewritten;
+    return binary_predicate(ID_lt, op);
+  };
 
   expressions["bvslt"] = [this] {
     return binary_predicate(ID_lt, cast_bv_to_signed(operands()));
   };
 
-  expressions["bvugt"] = [this] { return binary_predicate(ID_gt, operands()); };
+  expressions["bvugt"] = [this]
+  {
+    auto op = operands();
+    if(auto rewritten = try_bvurem_relation_rewrite(ID_gt, op))
+      return *rewritten;
+    return binary_predicate(ID_gt, op);
+  };
 
   expressions["bvsgt"] = [this] {
     return binary_predicate(ID_gt, cast_bv_to_signed(operands()));

@@ -46,6 +46,8 @@ implementation site with one or more Lean theorems.
 | `smt2_parser.cpp::bv_division` (0/x rewrite) | `DivisionRewrites.lean::bvudiv_zero_left` | DONE |
 | `smt2_parser.cpp::bv_mod` (x%x rewrite) | `DivisionRewrites.lean::bvurem_self` | DONE |
 | `smt2_parser.cpp::bv_mod` (0%x rewrite) | `DivisionRewrites.lean::bvurem_zero_left` | DONE |
+| `smt2_parser.cpp::try_bvurem_relation_rewrite` (bvule rewrite) | `DivisionRewrites.lean::bvule_bvurem_self` | DONE |
+| `smt2_parser.cpp::try_bvurem_relation_rewrite` (bvult rewrite) | `DivisionRewrites.lean::bvult_bvurem_self` | DONE |
 | `poly_extract.cpp::extract_predicate` (power-of-2 upper bound) | `SubgoalSix.lean::bvult_pow2_implies_high_bits_zero` | DONE |
 | `poly_extract.cpp::extract_predicate` (lower bound 2^d - 2^k) | `SubgoalSix.lean::bvuge_2d_minus_2k_implies_high_bits_one` | DONE |
 | `poly_extract.cpp::extract_predicate` (bit-comparator chain) | `SubgoalSix.lean::chainLtBool_correctness` | DONE |

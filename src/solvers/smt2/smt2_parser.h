@@ -165,6 +165,11 @@ protected:
   exprt unary(irep_idt, const exprt::operandst &);
   exprt bv_division(const exprt::operandst &, bool is_signed);
   exprt bv_mod(const exprt::operandst &, bool is_signed);
+  /// Recognise (bv_u_rel (bvurem A y) y) for rel in {<, <=, >=, >}
+  /// and emit the simplified ite form. Returns the simplified expr
+  /// when the pattern matches, std::nullopt otherwise.
+  std::optional<exprt>
+  try_bvurem_relation_rewrite(irep_idt rel, const exprt::operandst &op);
 
   std::pair<binding_exprt::variablest, exprt> binding(irep_idt);
   exprt lambda_expression();
