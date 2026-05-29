@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+^.*does not uniquely resolve.*$
+--
+Verifies that [temp.deduct.partial] forwarding-reference partial
+ordering correctly prefers the lvalue-reference overload over a
+forwarding-reference (rvalue-reference) overload when the call
+argument is an lvalue.  This is the libstdc++ idiom of using
+`T&& = delete` to forbid xvalue arguments to `std::as_const`,
+`std::ranges::ref_view`, etc.  Without partial ordering, both
+overloads are equally viable for an lvalue argument (both deduce
+`T&` parameter type after reference collapsing) and the resolve
+returns
+  symbol 'as_const' does not uniquely resolve
+breaking every TU that includes `<utility>`.
