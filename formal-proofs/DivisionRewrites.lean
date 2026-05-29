@@ -184,4 +184,24 @@ theorem bvudiv_bvurem_self {n : ℕ} [NeZero n] (A y : ZMod n) :
     rw [hmod, Nat.div_eq_of_lt hbound]
     simp
 
+/-! ## Rewrite 7: bvmul ite-distribution and constant folding -/
+
+/-- ite-distribution for bvmul: (X * (ite c Y Z)) = ite c (X*Y) (X*Z).
+    Trivially sound by case analysis. -/
+theorem bvmul_ite_distribution {n : ℕ}
+    (X Y Z : ZMod n) (c : Prop) [Decidable c] :
+    X * (if c then Y else Z) = (if c then X * Y else X * Z) := by
+  by_cases h : c <;> simp [h]
+
+/-- Constant folding: X * 0 = 0. -/
+theorem bvmul_zero_right {n : ℕ} (X : ZMod n) : X * 0 = 0 := mul_zero X
+
+/-- Constant folding: X * 1 = X. -/
+theorem bvmul_one_right {n : ℕ} (X : ZMod n) : X * 1 = X := mul_one X
+
+/-- Constant folding: X * (-1) = -X. In SMT-LIB unsigned BV
+    semantics, the all-ones constant equals -1 in ZMod (2^d). -/
+theorem bvmul_neg_one_right {n : ℕ} (X : ZMod n) : X * (-1) = -X := by
+  rw [mul_neg_one]
+
 end DivisionRewrites

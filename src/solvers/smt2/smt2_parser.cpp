@@ -1229,6 +1229,62 @@ match_bvurem_letform(const exprt &e)
   return std::make_pair(le.values()[0], le.values()[1]);
 }
 
+/// Build a bvmul expression with parse-time simplifications:
+///   X * 0  -> 0
+///   X * 1  -> X
+///   X * ~0 -> bvneg X (since ~0 = -1 in 2's complement)
+///   X * (ite c Y Z) -> ite c (X*Y) (X*Z)  -- ite-distribution
+/// Recursive: each ite-distribution branch goes through the same
+/// simplifications, so X * (ite c 1 ~0) -> ite c X (bvneg X). At
+/// the binary boundary we fall through to multi_ary(ID_mult, op).
+///
+/// PROOF: formal-proofs/DivisionRewrites.lean::bvmul_ite_distribution
+///        Trivially sound by case analysis on the if-condition. The
+///        constant folds are sound by the standard ZMod arithmetic
+///        identities for 0, 1, and -1 in ZMod (2^d).
+exprt smt2_parsert::bvmul_with_simplifications(const exprt::operandst &op)
+{
+  if(op.size() == 2)
+  {
+    auto fold_const = [](const exprt &x, const exprt &c) -> std::optional<exprt>
+    {
+      auto cv = numeric_cast<mp_integer>(c);
+      if(!cv.has_value())
+        return std::nullopt;
+      const auto bw = to_bitvector_type(x.type()).get_width();
+      const mp_integer max_val = power(mp_integer{2}, mp_integer{bw}) - 1;
+      if(*cv == 0)
+        return from_integer(0, x.type());
+      if(*cv == 1)
+        return x;
+      if(*cv == max_val)
+        return (exprt)unary_minus_exprt{x, x.type()};
+      return std::nullopt;
+    };
+    if(auto rewritten = fold_const(op[0], op[1]))
+      return *rewritten;
+    if(auto rewritten = fold_const(op[1], op[0]))
+      return *rewritten;
+    auto try_distrib =
+      [this](const exprt &x, const exprt &y) -> std::optional<exprt>
+    {
+      if(y.id() == ID_if && y.operands().size() == 3)
+      {
+        const auto &if_e = to_if_expr(y);
+        auto true_mul = bvmul_with_simplifications({x, if_e.true_case()});
+        auto false_mul = bvmul_with_simplifications({x, if_e.false_case()});
+        return if_exprt(if_e.cond(), true_mul, false_mul);
+      }
+      return std::nullopt;
+    };
+    if(auto rewritten = try_distrib(op[0], op[1]))
+      return *rewritten;
+    if(auto rewritten = try_distrib(op[1], op[0]))
+      return *rewritten;
+  }
+  return multi_ary(ID_mult, op);
+}
+
 /// Recognise (bv_u_rel (bvurem A y) y) and emit the simplified
 /// form. Sound under SMT-LIB-2 semantics (bvurem y 0 = y;
 /// otherwise bvurem A y < y strictly):
@@ -1533,7 +1589,8 @@ void smt2_parsert::setup_expressions()
   expressions["bvadd"] = [this] { return multi_ary(ID_plus, operands()); };
   expressions["+"] = [this] { return multi_ary(ID_plus, operands()); };
   expressions["bvsub"] = [this] { return binary(ID_minus, operands()); };
-  expressions["bvmul"] = [this] { return multi_ary(ID_mult, operands()); };
+  expressions["bvmul"] = [this]
+  { return bvmul_with_simplifications(operands()); };
   expressions["*"] = [this] { return multi_ary(ID_mult, operands()); };
 
   expressions["-"] = [this] {

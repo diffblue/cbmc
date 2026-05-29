@@ -82,4 +82,19 @@
 (assert (= (bvudiv (bvurem z z) z)
            (ite (= z (_ bv0 64)) (bvnot (_ bv0 64)) (_ bv0 64))))
 
+; Rewrite 8: bvmul constant folding.
+; bvmul X 0 = 0
+(assert (= (bvmul x #x00) #x00))
+; bvmul X 1 = X
+(assert (= (bvmul x #x01) x))
+; bvmul X ~0 = bvneg X
+(assert (= (bvmul x #xff) (bvneg x)))
+; symmetric
+(assert (= (bvmul #x01 x) x))
+(assert (= (bvmul #x00 x) #x00))
+
+; Rewrite 9: bvmul ite-distribution.
+(assert (= (bvmul x (ite (= y #x00) #x01 #x02))
+           (ite (= y #x00) x (bvmul x #x02))))
+
 (check-sat)
