@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+^.* does not uniquely resolve:
+--
+Verifies that an unqualified call to a static member function from
+inside a derived class resolves to the derived-class member when the
+inherited base-class member has the same signature, even if one of the
+arguments has a class type whose declaring class also defines the same
+name.  This is [class.member.lookup]/4 (name hiding by derived class)
+applied after CBMC's broad ADL gather step in `resolve_with_arguments`.
