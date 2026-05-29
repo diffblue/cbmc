@@ -33,7 +33,7 @@ public:
 
 private:
   std::unique_ptr<boolbv_widtht> boolbv_width;
-  std::reference_wrapper<const namespacet> ns;
+  const namespacet &ns;
 
   exprt encode_member(const member_exprt &member_expr) const;
 };
