@@ -1,0 +1,19 @@
+CORE broken-cprover-smt-backend no-new-smt
+main.i
+--arch x86_64 --os linux --floatbv
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Verifies that casting a finite `double` to `long double` and back yields
+the original `double` bit-for-bit, and that sign is preserved across
+the promotion.  Exercises both the constant-folding path (compile-time)
+and the symbolic path (nondet input).  The SMT backends do not yet
+encode the x86-extended layout; the test is therefore restricted to the
+SAT backend.
+
+The source is provided as a pre-processed `main.i` so CBMC parses it
+without invoking the host preprocessor; combined with `--arch x86_64
+--os linux`, this lets the test run on any host.

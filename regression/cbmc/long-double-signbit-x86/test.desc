@@ -1,0 +1,18 @@
+CORE broken-cprover-smt-backend no-new-smt
+main.i
+--arch x86_64 --os linux --floatbv --no-simplify
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Replicates the signbit() pattern from the macOS SDK's <math.h> for
+`long double`.  Without proper x86 80-bit extended layout this returned
+0 for negative values, defeating the SDK's branch.  The SMT backends do
+not yet encode the x86-extended layout; the test is therefore restricted
+to the SAT backend.
+
+The source is provided as a pre-processed `main.i` so CBMC parses it
+without invoking the host preprocessor; combined with `--arch x86_64
+--os linux`, this lets the test run on any host.
