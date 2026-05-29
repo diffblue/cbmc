@@ -42,3 +42,6 @@ name = "ExtractCandidate"
 
 [[lean_lib]]
 name = "Encoding"
+
+[[lean_lib]]
+name = "DivisionRewrites"

@@ -42,6 +42,10 @@ implementation site with one or more Lean theorems.
 | `poly_ring.cpp::polynomialt::multiply` (bit_vars overload) | `Re4.lean::frobenius_pow_eq_self` | DONE |
 | `poly_extract.cpp::to_polynomial` | `Encoding.lean::toPolynomial_eval`, `cast_value_preserved_across_widths`, `reduce_value_preserved_across_widths` | DONE |
 | `poly_extract.cpp::extract_equation` | `Encoding.lean::extract_equation_iff`, `encodeEquations_satisfiable_iff` | DONE |
+| `smt2_parser.cpp::bv_division` (x/x rewrite) | `DivisionRewrites.lean::bvudiv_self` | DONE |
+| `smt2_parser.cpp::bv_division` (0/x rewrite) | `DivisionRewrites.lean::bvudiv_zero_left` | DONE |
+| `smt2_parser.cpp::bv_mod` (x%x rewrite) | `DivisionRewrites.lean::bvurem_self` | DONE |
+| `smt2_parser.cpp::bv_mod` (0%x rewrite) | `DivisionRewrites.lean::bvurem_zero_left` | DONE |
 | `poly_extract.cpp::extract_predicate` (power-of-2 upper bound) | `SubgoalSix.lean::bvult_pow2_implies_high_bits_zero` | DONE |
 | `poly_extract.cpp::extract_predicate` (lower bound 2^d - 2^k) | `SubgoalSix.lean::bvuge_2d_minus_2k_implies_high_bits_one` | DONE |
 | `poly_extract.cpp::extract_predicate` (bit-comparator chain) | `SubgoalSix.lean::chainLtBool_correctness` | DONE |

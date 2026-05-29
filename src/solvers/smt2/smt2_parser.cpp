@@ -992,6 +992,16 @@ exprt smt2_parsert::bv_division(
   // Two of the five 512-bit "rw_rule_candidate" benchmarks in the
   // SMT-COMP QF_BV stratified sample reduce to trivial after this
   // rewrite (matching Bitwuzla's word-level simplification).
+  //
+  // PROOF: formal-proofs/DivisionRewrites.lean::bvudiv_self
+  //        Soundness of (bvudiv x x) -> (ite (= x 0) -1 1) over
+  //        ZMod (2^d) under SMT-LIB div-by-zero convention.
+  // PROOF: formal-proofs/DivisionRewrites.lean::bvudiv_zero_left
+  //        Soundness of (bvudiv 0 x) -> (ite (= x 0) -1 0).
+  //   ASSUMES: SMT-LIB-2 semantics (bvudiv x 0 = ~0); this is how
+  //            CBMC interprets bvudiv (see the let-binding below).
+  //   MAINTAINED BY: the early-return below uses the exact ite
+  //            structure proved sound in the Lean theorems.
   {
     const auto all_ones = to_unsignedbv_type(operands[0].type()).largest_expr();
     const auto zero = from_integer(0, operands[0].type());
@@ -1052,6 +1062,15 @@ exprt smt2_parsert::bv_mod(const exprt::operandst &operands, bool is_signed)
   // Recognising these patterns at parse time avoids constructing
   // a full divider/remainder in the downstream bit-blasted form,
   // matching the rewrite story for bv_division above.
+  //
+  // PROOF: formal-proofs/DivisionRewrites.lean::bvurem_self
+  //        Soundness of (bvurem x x) -> 0 over ZMod (2^d) under
+  //        SMT-LIB rem-by-zero convention (bvurem x 0 = x).
+  // PROOF: formal-proofs/DivisionRewrites.lean::bvurem_zero_left
+  //        Soundness of (bvurem 0 x) -> 0.
+  //   ASSUMES: SMT-LIB-2 semantics (bvurem x 0 = x).
+  //   MAINTAINED BY: the early-return below emits the constant 0
+  //            in both cases, matching the Lean theorems.
   {
     auto num_value = numeric_cast<mp_integer>(operands[0]);
     bool num_is_zero = num_value.has_value() && *num_value == 0;
