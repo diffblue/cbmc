@@ -9,8 +9,10 @@ Author: Diffblue Ltd.
 #include <testing-utils/use_catch.h>
 
 #include <util/json.h>
+#include <util/json_irep.h>
 #include <util/optional_utils.h>
 #include <util/range.h>
+#include <util/source_location.h>
 
 #include <algorithm>
 #include <iterator>
@@ -102,5 +104,32 @@ SCENARIO(
       REQUIRE(output["3"].kind == jsont::kindt::J_STRING);
       REQUIRE(output["3"].value == "3");
     };
+  }
+}
+
+SCENARIO(
+  "Test that source location pragmas are converted to JSON arrays.",
+  "[core][util][json]")
+{
+  GIVEN("A source location with pragmas.")
+  {
+    source_locationt location;
+    location.add_pragma("disable:pointer-check");
+    location.add_pragma("disable:bounds-check");
+
+    THEN("The pragmas are emitted as strings.")
+    {
+      const json_objectt output = json(location);
+      const json_arrayt &pragmas = to_json_array(output["pragma"]);
+
+      auto pragma_it = pragmas.begin();
+      REQUIRE(pragma_it->kind == jsont::kindt::J_STRING);
+      REQUIRE(pragma_it->value == "disable:bounds-check");
+      ++pragma_it;
+      REQUIRE(pragma_it->kind == jsont::kindt::J_STRING);
+      REQUIRE(pragma_it->value == "disable:pointer-check");
+      ++pragma_it;
+      REQUIRE(pragma_it == pragmas.end());
+    }
   }
 }

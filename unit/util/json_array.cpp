@@ -7,11 +7,9 @@ Author: Diffblue Ltd.
 \*******************************************************************/
 
 #include <testing-utils/use_catch.h>
-#include <util/constructor_of.h>
 #include <util/json.h>
 #include <util/range.h>
 
-#include <string>
 #include <vector>
 
 SCENARIO(
@@ -43,16 +41,13 @@ SCENARIO(
   "Test that json_arrayt can be constructed using `ranget`",
   "[core][util][json]")
 {
-  GIVEN("A vector of strings.")
+  GIVEN("A vector of json strings.")
   {
-    const std::vector<std::string> input{"foo", "bar"};
-    THEN(
-      "A json_arrayt can be constructed from the vector of strings using range "
-      "and map.")
+    const std::vector<json_stringt> input{
+      json_stringt{"foo"}, json_stringt{"bar"}};
+    THEN("A json_arrayt can be constructed from the vector using range.")
     {
-      const json_arrayt array = make_range(input)
-                                  .map(constructor_of<json_stringt>())
-                                  .collect<json_arrayt>();
+      const json_arrayt array = make_range(input).collect<json_arrayt>();
       auto it = array.begin();
       REQUIRE(it->kind == jsont::kindt::J_STRING);
       REQUIRE(it->value == "foo");
