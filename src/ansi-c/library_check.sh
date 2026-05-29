@@ -30,6 +30,12 @@ perl -p -i -e 's/^__CPROVER_jsa_synthesise\n//' __functions
 perl -p -i -e 's/^java::java.io.InputStream.read:\(\)I\n//' __functions
 perl -p -i -e 's/^__CPROVER_contracts_library\n//' __functions
 
+# Internal long-double helpers shared between the x86-extended fast-math
+# models (expl, logl, log2l, log10l, powl, __builtin_powil); they have no
+# user-visible name and are exercised transitively by those tests.
+perl -p -i -e 's/^__cprover_x86ld_from_schraudolph\n//' __functions
+perl -p -i -e 's/^__cprover_x86ld_to_schraudolph\n//' __functions
+
 # Some functions are implicitly covered by running on different operating
 # systems:
 perl -p -i -e 's/^_creat\n//' __functions # creat, macOS

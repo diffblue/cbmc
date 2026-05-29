@@ -241,6 +241,11 @@ floatbv_typet long_double_type()
   return result;
 }
 
+bool long_double_is_x86_extended()
+{
+  return long_double_type().get_bool(ID_x86_extended);
+}
+
 signedbv_typet pointer_diff_type()
 {
   // The pointer-diff type varies. This is signed int on some systems,
