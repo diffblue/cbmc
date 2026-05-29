@@ -20,6 +20,8 @@ Author: Kiro
 #include <solvers/algebraic/poly_ring.h>
 #include <testing-utils/use_catch.h>
 
+#include <random>
+
 TEST_CASE(
   "strong Gröbner basis: commutativity of multiplication is UNSAT",
   "[core][solvers][algebraic][groebner]")
@@ -140,4 +142,261 @@ TEST_CASE(
   bool sound = result == strong_groebner_basist::resultt::UNSAT
             || result == strong_groebner_basist::resultt::UNKNOWN;
   REQUIRE(sound);
+}
+
+/// Abstract progress-tracking state: mirrors `ComputeState` in
+/// formal-proofs/BuchbergerTermination.lean. The Lean theorems
+/// (progress_invariant_preserved, counter_exceeds_baseline_implies_empty,
+/// buggy_step_breaks_invariant) prove these properties on the
+/// abstract state machine; the tests below cross-check the same
+/// invariants empirically on random transitions, in the spirit of
+/// "explicit invariant + property-based test" methodology
+/// (see formal-proofs/IMPLEMENTATION_FINDINGS.md).
+struct compute_statet
+{
+  std::size_t basis_size;
+  std::size_t pairs_size;
+  std::size_t counter;  // pairs_since_last_progress
+  std::size_t baseline; // pairs_at_last_progress
+};
+
+/// The progress invariant maintained by the corrected loop:
+/// `pairs_size + counter == baseline`. See
+/// BuchbergerTermination.lean::progress_invariant_preserved.
+static bool invariant_holds(const compute_statet &s)
+{
+  return s.pairs_size + s.counter == s.baseline;
+}
+
+/// Corrected step: pops one pair (`pairs_size > 0` precondition);
+/// if the basis grew (added > 0 or other reason), reset counter and
+/// baseline. Mirrors the C++ loop in groebner.cpp::compute.
+static compute_statet
+step(const compute_statet &s, bool grew, std::size_t added_pairs)
+{
+  REQUIRE(s.pairs_size > 0);
+  compute_statet next = s;
+  // Pop one pair.
+  next.pairs_size = s.pairs_size - 1 + added_pairs;
+  if(grew)
+  {
+    next.basis_size = s.basis_size + 1;
+    next.counter = 0;
+    next.baseline = next.pairs_size;
+  }
+  else
+  {
+    // No growth: counter increments.
+    REQUIRE(added_pairs == 0); // by construction in the C++ loop
+    next.counter = s.counter + 1;
+    next.baseline = s.baseline;
+  }
+  return next;
+}
+
+/// Pre-fix buggy step: basis grew via the 2-trick step but the
+/// counter was incremented rather than reset. This is the exact
+/// behaviour formalised as `BuggyStep` in Lean.
+static compute_statet
+buggy_step(const compute_statet &s, std::size_t added_pairs)
+{
+  REQUIRE(s.pairs_size > 0);
+  REQUIRE(added_pairs > 0);
+  compute_statet next = s;
+  next.basis_size = s.basis_size + 1;
+  next.pairs_size = s.pairs_size - 1 + added_pairs;
+  next.counter = s.counter + 1; // bug: should reset
+  next.baseline = s.baseline;   // bug: should update
+  return next;
+}
+
+TEST_CASE(
+  "progress invariant: corrected step preserves invariant",
+  "[core][solvers][algebraic][groebner][progress-invariant]")
+{
+  // Mirror BuchbergerTermination.lean::progress_invariant_preserved
+  // empirically: generate random initial states and random sequences
+  // of `step` transitions, verify the invariant `pairs_size +
+  // counter == baseline` holds throughout.
+  std::mt19937 gen{0x42};
+  std::uniform_int_distribution<std::size_t> initial_pairs{1, 50};
+  std::uniform_int_distribution<int> grew_dist{0, 1};
+  std::uniform_int_distribution<std::size_t> added_dist{1, 20};
+
+  for(int trial = 0; trial < 1000; ++trial)
+  {
+    const std::size_t initial = initial_pairs(gen);
+    compute_statet s{0, initial, 0, initial};
+    REQUIRE(invariant_holds(s));
+
+    // Run a random walk of up to 200 steps or until queue is empty.
+    for(int i = 0; i < 200 && s.pairs_size > 0; ++i)
+    {
+      const bool grew = grew_dist(gen) != 0;
+      const std::size_t added = grew ? added_dist(gen) : 0;
+      s = step(s, grew, added);
+      REQUIRE(invariant_holds(s));
+      // The C++ termination check counter > baseline must be
+      // unreachable while the queue is non-empty (corollary of
+      // the invariant: counter > baseline would force pairs_size
+      // < 0 in ℕ, which is impossible).
+      if(s.counter > s.baseline)
+        REQUIRE(s.pairs_size == 0);
+    }
+  }
+}
+
+TEST_CASE(
+  "progress invariant: buggy step breaks invariant when 2-trick adds",
+  "[core][solvers][algebraic][groebner][progress-invariant]")
+{
+  // Mirror BuchbergerTermination.lean::buggy_step_breaks_invariant:
+  // the pre-fix step that grows via the 2-trick without resetting
+  // counters violates the invariant whenever pairs were added.
+  std::mt19937 gen{0xdead};
+  std::uniform_int_distribution<std::size_t> initial_pairs{1, 50};
+  std::uniform_int_distribution<std::size_t> added_dist{1, 20};
+
+  for(int trial = 0; trial < 1000; ++trial)
+  {
+    const std::size_t initial = initial_pairs(gen);
+    compute_statet s{0, initial, 0, initial};
+    REQUIRE(invariant_holds(s));
+
+    const std::size_t added = added_dist(gen);
+    const compute_statet next = buggy_step(s, added);
+
+    // The buggy step must NOT preserve the invariant.
+    REQUIRE_FALSE(invariant_holds(next));
+
+    // Specifically: the deviation equals the number of pairs added
+    // that the buggy code failed to track.
+    REQUIRE(next.pairs_size + next.counter == next.baseline + added);
+  }
+}
+
+TEST_CASE(
+  "progress invariant: queue-empty exit, never the early-termination check",
+  "[core][solvers][algebraic][groebner][progress-invariant]")
+{
+  // Concrete corollary: in the corrected loop, if we run until the
+  // queue empties, the early-termination check `counter > baseline`
+  // never fires. Empirical witness for
+  // BuchbergerTermination.lean::counter_exceeds_baseline_implies_empty.
+  std::mt19937 gen{0xbeef};
+  std::uniform_int_distribution<std::size_t> initial_pairs{1, 100};
+  std::uniform_int_distribution<int> grew_dist{0, 1};
+  std::uniform_int_distribution<std::size_t> added_dist{1, 10};
+
+  bool early_check_ever_fired_with_nonempty_queue = false;
+
+  for(int trial = 0; trial < 500; ++trial)
+  {
+    const std::size_t initial = initial_pairs(gen);
+    compute_statet s{0, initial, 0, initial};
+
+    int iterations = 0;
+    while(s.pairs_size > 0 && iterations < 1000)
+    {
+      // Check the C++ termination condition.
+      if(s.counter > s.baseline)
+      {
+        // By the invariant, if we hit this, pairs_size must be 0.
+        // If we ever observe pairs_size > 0 here, the invariant is
+        // broken (which would indicate a bug).
+        early_check_ever_fired_with_nonempty_queue = true;
+        break;
+      }
+      const bool grew = grew_dist(gen) != 0;
+      const std::size_t added = grew ? added_dist(gen) : 0;
+      s = step(s, grew, added);
+      ++iterations;
+    }
+  }
+
+  REQUIRE_FALSE(early_check_ever_fired_with_nonempty_queue);
+}
+
+/// A "buggy" step variant for the failure-mode demonstration:
+/// every iteration, pop a pair; with probability `2trick_grow_prob`
+/// the 2-trick step adds new pairs but the buggy code DOES NOT
+/// reset the counters (mirrors the pre-fix behaviour); with
+/// probability `1 - 2trick_grow_prob` no growth happens and the
+/// counter increments normally.
+static compute_statet buggy_loop_step(
+  const compute_statet &s,
+  bool two_trick_grew,
+  std::size_t added_pairs)
+{
+  REQUIRE(s.pairs_size > 0);
+  compute_statet next = s;
+  if(two_trick_grew)
+  {
+    next.basis_size = s.basis_size + 1;
+    next.pairs_size = s.pairs_size - 1 + added_pairs;
+    // Bug: counter still increments, baseline unchanged.
+    next.counter = s.counter + 1;
+    next.baseline = s.baseline;
+  }
+  else
+  {
+    next.pairs_size = s.pairs_size - 1;
+    next.counter = s.counter + 1;
+    next.baseline = s.baseline;
+  }
+  return next;
+}
+
+TEST_CASE(
+  "progress invariant: buggy loop fires early-termination while queue is "
+  "non-empty",
+  "[core][solvers][algebraic][groebner][progress-invariant]")
+{
+  // Concrete failure-mode demonstration of the bug: in the
+  // pre-fix loop, the early-termination check `counter > baseline`
+  // CAN fire while pairs_size > 0, dropping pending pairs from
+  // the 2-trick step and leading to a premature UNKNOWN. This is
+  // exactly the soundness-affecting (for completeness) behaviour
+  // BuchbergerTermination.lean::buggy_step_breaks_invariant
+  // captures abstractly. Here we run the buggy state machine on
+  // many random trajectories and confirm that the bug fires at
+  // least once.
+  std::mt19937 gen{0xbabe};
+  std::uniform_int_distribution<std::size_t> initial_pairs{5, 30};
+  std::uniform_int_distribution<int> two_trick_dist{0, 4}; // ~20% of iters
+  std::uniform_int_distribution<std::size_t> added_dist{1, 3};
+
+  int trials_with_bug_observed = 0;
+  const int total_trials = 200;
+
+  for(int trial = 0; trial < total_trials; ++trial)
+  {
+    const std::size_t initial = initial_pairs(gen);
+    compute_statet s{0, initial, 0, initial};
+
+    int iterations = 0;
+    while(s.pairs_size > 0 && iterations < 500)
+    {
+      if(s.counter > s.baseline)
+      {
+        // Bug fires: queue still has pending pairs but the loop
+        // would exit at this point.
+        ++trials_with_bug_observed;
+        break;
+      }
+      const bool two_trick_grew = two_trick_dist(gen) == 0;
+      const std::size_t added = two_trick_grew ? added_dist(gen) : 0;
+      s = buggy_loop_step(s, two_trick_grew, added);
+      ++iterations;
+    }
+  }
+
+  // The bug must fire on a non-trivial fraction of trajectories.
+  // (Empirically, ~25% with the parameters above.) If this
+  // assertion ever fails, the bug-condition argument needs review.
+  INFO(
+    "Buggy loop fired the early-termination check while queue "
+    "was non-empty in "
+    << trials_with_bug_observed << " of " << total_trials << " trials");
+  REQUIRE(trials_with_bug_observed > 0);
 }
