@@ -1,5 +1,8 @@
 name: Publish CBMC documentation
-on: [push, pull_request]
+on:
+  workflow_dispatch:
+  # Temporarily disabled while debugging long-double layout issue on PR 9020.
+  # [push, pull_request]
 
 jobs:
   # This job takes approximately 3 minutes
