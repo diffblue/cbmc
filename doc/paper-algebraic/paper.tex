@@ -60,8 +60,11 @@ Lean~4 with 79 theorems and zero \texttt{sorry} (out of which 39
 are contract-level theorems referenced directly from the
 implementation source), including four candidates for Mathlib
 contribution; the formalisation effort
-exposed and removed a 2000$\times$ ordering sensitivity in the C++
-implementation that empirical testing did not catch.
+exposed and removed two implementation bugs that empirical testing
+did not catch (a 2{,}000$\times$ ordering sensitivity in the
+Buchberger loop and a 2-trick progress-tracking gap that could
+turn UNSAT into UNKNOWN), and surfaced a methodological lesson
+about explicit-invariant cross-references.
 
 \keywords{Gr\"obner basis \and bit-vector arithmetic \and
 vanishing polynomials \and bit-vector SMT \and Lean 4.}
@@ -163,11 +166,18 @@ existential & relational              & overflow witness           & companion p
   are contributed to Mathlib (the unit characterisation of
   $\mathbb{Z}_{2^d}$, idempotents in $\mathbb{Z}_{2^d}$ are
   $\{0, 1\}$, $\mathbb{Z}_{p^n}$ is a local ring, and a non-unit
-  characterisation). The Lean termination proof forced us
-  to isolate a ``progress'' invariant that, when ported back to
-  the C++ implementation, eliminated a 2000$\times$ ordering
-  sensitivity that empirical testing had not exposed
-  (Section~\ref{sec:algebraic-algo}).
+  characterisation). The mechanisation exposed and removed two
+  implementation bugs that empirical testing had not caught:
+  (i) a 2{,}000$\times$ ordering sensitivity, isolated via the
+  termination proof and removed by adding a ``progress''
+  early-stop rule; and (ii) a 2-trick progress-tracking gap in
+  the Buchberger loop, surfaced when we tried to make the
+  cross-reference to \texttt{stable\_implies\_no\_new}
+  rigorous and discovered the C++ encoding did not maintain
+  the abstract assumption (Section~\ref{sec:algebraic-algo}).
+  The second bug crystallised an explicit-invariant pattern for
+  cross-references (\texttt{ASSUMES:} / \texttt{MAINTAINED BY:})
+  that we now use throughout.
 \end{enumerate}
 
 \paragraph{Empirical results.}
@@ -389,6 +399,64 @@ experiments measured how bad the unordered version could be
 without the progress rule, not any sensitivity of the current
 implementation.
 
+\paragraph{A second bug, and a methodology evolution.}
+A later refinement of the cross-referencing process exposed a
+second implementation bug. While preparing direct
+\texttt{// PROOF:} comments linking
+\texttt{groebner.cpp::compute} to
+\texttt{BuchbergerCorrectness.lean::s\_poly\_in\_ideal},
+\texttt{reduce\_in\_ideal}, and
+\texttt{BuchbergerTermination.lean::stable\_implies\_no\_new},
+we noticed that the abstract termination theorem assumes
+``every pair $(i,j)$ with $i < j$ in the basis has been
+processed.'' Tracing this assumption through to the concrete
+loop revealed that the C++ progress-tracking counters
+(\texttt{pairs\_since\_last\_progress},
+\texttt{pairs\_at\_last\_progress}) were reset only when the
+S-polynomial step produced a new basis element, not when the
+2-trick saturation step did. With LIFO pair processing, the
+2-trick's newly-injected pairs were processed first but counted
+against the stale progress threshold, allowing the loop to exit
+with original pairs still in the queue. If any of those
+unprocessed pairs would have produced an odd unit constant via
+S-polynomial reduction, the algorithm returned \texttt{UNKNOWN}
+instead of \texttt{UNSAT}.
+
+The bug is a completeness issue, not soundness: \texttt{UNSAT}
+results remain correct, but the algorithm could give up earlier
+than it should. The fix captures the basis size at the start of
+each iteration and resets the counters whenever the basis grows
+(via either S-poly or 2-trick), which is a few-line change. We
+added a unit-test suite in
+\texttt{unit/solvers/algebraic/groebner.cpp} to lock in the fix.
+
+This second bug crystallised a methodological lesson. A
+\texttt{// PROOF:} comment that simply names a Lean theorem is a
+\emph{citation}, not a \emph{proof}. For trivial direct
+correspondences this is fine; for non-trivial loop invariants
+the citation can be technically correct (the Lean theorem does
+exist, with the cited statement) while the C++ encoding fails
+to maintain the assumed invariant. Having now caught two bugs
+this way, we adopted an explicit-invariant pattern in our
+cross-references:
+\begin{verbatim}
+// PROOF: formal-proofs/.../theorem_name
+//   ASSUMES: <invariant the abstract theorem requires>
+//   MAINTAINED BY: <how the C++ code preserves it>
+\end{verbatim}
+Writing this forces the reviewer to ask ``is the invariant
+actually maintained?'' --- the question that catches the bug.
+We retrofitted this pattern across the contract-level
+\texttt{PROOF:} cross-references in
+\texttt{src/solvers/algebraic/}, and now use it for all new
+ones. We also extended the formal proofs to cover assumptions
+introduced by later optimisations: a closed-form Legendre's
+formula in \texttt{Vanishing.lean::padicValNat\_two\_factorial}
+to justify the popcount-based smarandache function, and
+\texttt{Encoding.lean::toPolynomial\_deterministic} plus a
+set-once idempotence lemma to justify memoising
+\texttt{to\_polynomial}'s side-effecting recursion.
+
 \subsection{Contributions Beyond Song et al.\ 2024}
 \label{sec:algebraic-contrib}
 
@@ -427,10 +495,14 @@ component along three axes:
   Mathlib contribution candidates. Full bi-directional
   traceability to every algorithm in
   \texttt{src/solvers/algebraic/}.
-  The Lean termination proof exposed an operational invariant
-  (Section~\ref{sec:algebraic-algo}) that, when ported back to
-  the C++ implementation, eliminated a 2{,}000$\times$ ordering
-  sensitivity that empirical tuning had not caught.
+  The mechanisation exposed and removed two implementation bugs
+  empirical testing did not catch: a 2{,}000$\times$ ordering
+  sensitivity (the Lean termination proof's ``progress''
+  invariant) and a 2-trick progress-tracking gap (caught when
+  making the corresponding cross-reference rigorous), and led
+  us to adopt explicit-invariant cross-references
+  (\texttt{ASSUMES:} / \texttt{MAINTAINED BY:})
+  (Section~\ref{sec:algebraic-algo}).
 \end{enumerate}
 
 The combined procedure solves all 39 benchmarks in our custom

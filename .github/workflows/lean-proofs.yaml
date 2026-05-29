@@ -1,0 +1,142 @@
+name: Lean formal proofs
+
+on:
+  pull_request:
+    branches:
+      - '**'
+    paths:
+      - 'formal-proofs/**'
+      - '.github/workflows/lean-proofs.yaml'
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'formal-proofs/**'
+      - '.github/workflows/lean-proofs.yaml'
+
+jobs:
+  lean-build:
+    name: Build and verify Lean proofs
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: formal-proofs
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install elan (Lean version manager)
+        run: |
+          set -o pipefail
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/v4.0.1/elan-init.sh | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Show Lean toolchain
+        run: |
+          cat lean-toolchain
+          lean --version
+          lake --version
+
+      - name: Cache .lake (mathlib + build artifacts)
+        id: lake-cache
+        uses: actions/cache@v5
+        with:
+          path: formal-proofs/.lake
+          # Key on the lakefile + manifest + toolchain so that any
+          # dependency change invalidates the cache.
+          key: lake-${{ runner.os }}-${{ hashFiles('formal-proofs/lakefile.toml', 'formal-proofs/lake-manifest.json', 'formal-proofs/lean-toolchain') }}
+          restore-keys: |
+            lake-${{ runner.os }}-
+
+      - name: Fetch mathlib oleans from cache (if not in lake cache already)
+        run: |
+          # `lake exe cache get` downloads prebuilt mathlib oleans.
+          # This is much faster than building mathlib from source.
+          # Skip if the .lake cache already covers it.
+          if [ ! -f .lake/packages/mathlib/.lake/build/lib/lean/Mathlib.olean ]; then
+            lake exe cache get || true  # tolerated: failure means we will build from source
+          fi
+
+      - name: Build all modules
+        run: lake build
+
+      - name: Verify zero sorry across project modules
+        run: |
+          set -e
+          fail=0
+          for f in *.lean; do
+            if [ "$f" = "Main.lean" ]; then continue; fi
+            count=$(grep -E "^[[:space:]]*sorry[[:space:]]*$" "$f" | wc -l)
+            if [ "$count" -gt 0 ]; then
+              echo "::error file=formal-proofs/$f::contains $count sorry"
+              fail=1
+            fi
+          done
+          if [ "$fail" -eq 1 ]; then
+            echo "Sorry-check failed."
+            exit 1
+          fi
+          echo "Sorry-check passed: zero sorry across all project modules."
+
+      - name: Verify project axioms are only the documented ones
+        run: |
+          set -e
+          # Only Defer.lean (boolbv operational semantics) and
+          # StrongGB.lean (algorithm interface) are permitted to
+          # introduce project-internal axioms. Any other module
+          # introducing axioms requires explicit review.
+          fail=0
+          for f in *.lean; do
+            if [ "$f" = "Main.lean" ]; then continue; fi
+            count=$(grep -cE "^axiom " "$f" || true)
+            case "$f" in
+              Defer.lean|StrongGB.lean)
+                # Documented axiom modules; just report counts.
+                echo "  $f: $count axioms (documented)"
+                ;;
+              *)
+                if [ "$count" -gt 0 ]; then
+                  echo "::error file=formal-proofs/$f::introduces $count undocumented axioms"
+                  fail=1
+                fi
+                ;;
+            esac
+          done
+          if [ "$fail" -eq 1 ]; then
+            echo "Axiom check failed."
+            exit 1
+          fi
+          echo "Axiom check passed."
+
+      - name: Verify forward traceability (PROOF: refs resolve)
+        working-directory: .
+        run: |
+          set -e
+          fail=0
+          # Every PROOF: formal-proofs/<File>::<theorem> reference in src/
+          # must resolve to an existing theorem/lemma/instance in <File>.
+          grep -rh "PROOF: formal-proofs" src/ 2>/dev/null | sort -u | while read ref; do
+            file=$(echo "$ref" | sed "s|.*formal-proofs/\([^:]*\)::.*|\1|")
+            thm=$(echo "$ref" | sed "s|.*::\([a-zA-Z_][a-zA-Z0-9_'.]*\).*|\1|")
+            if [ -z "$thm" ] || [ "$thm" = "$ref" ]; then continue; fi
+            if [ ! -f "formal-proofs/$file" ]; then
+              echo "::error::missing file formal-proofs/$file (referenced as ::$thm)"
+              echo "fail" > /tmp/trace_fail
+              continue
+            fi
+            short=$(echo "$thm" | rev | cut -d. -f1 | rev)
+            if grep -qE "^(theorem|lemma|def|axiom|instance) +${thm}( |\$)" "formal-proofs/$file" 2>/dev/null; then
+              :
+            elif grep -qE "^(theorem|lemma|def|axiom|instance) +${short}( |\$)" "formal-proofs/$file" 2>/dev/null; then
+              :
+            else
+              echo "::error::unresolved PROOF: ref formal-proofs/$file::$thm"
+              echo "fail" > /tmp/trace_fail
+            fi
+          done
+          if [ -f /tmp/trace_fail ]; then
+            echo "Forward traceability check failed."
+            exit 1
+          fi
+          echo "Forward traceability check passed."
