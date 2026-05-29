@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+^.*does not uniquely resolve.*$
+--
+Verifies that the implicit destructor of a class derived from two
+specializations of the same template can be type-checked without
+hitting the spurious "symbol '~X' does not uniquely resolve"
+diagnostic.  Previously the dereference of the cast `this_expr` to
+each base-subobject type had its type overwritten back to the
+derived class's type by `typecheck_expr_dereference`, causing
+unqualified lookup of `~X` to walk every base's secondary scope and
+match more than one destructor whose `base_name` is identical.
