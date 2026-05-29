@@ -9,9 +9,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
-#include "cpp_typecheck.h"
-
+#include <util/c_types.h>
 #include <util/pointer_expr.h>
+
+#include "cpp_typecheck.h"
 
 bool cpp_typecheckt::find_dtor(const symbolt &symbol) const
 {
@@ -171,7 +172,29 @@ codet cpp_typecheckt::dtor(const symbolt &symbol, const symbol_exprt &this_expr)
   {
     DATA_INVARIANT(bit->id() == ID_base, "base class expression expected");
 
-    dereference_exprt object{this_expr, bit->type()};
+    // Cast `this_expr` to a `Base*` before dereferencing.  Without
+    // the explicit cast, `c_typecheck_baset::typecheck_expr_dereference`
+    // (called when `cpp_destructor` builds a member-call expression
+    // on `object`) overrides the dereference's type with the
+    // pointer's base-type — which is the DERIVED class, not this
+    // base subobject.  Subsequent unqualified lookup of `~Base`
+    // from the derived-class scope would then walk every base
+    // subobject's secondary scope and surface a spurious
+    // "symbol '~X' does not uniquely resolve" with siblings whose
+    // `base_name` matches but `tag` differs (e.g.,
+    // `_Hashtable_ebo_helper<0, _Hash>` vs
+    // `_Hashtable_ebo_helper<1, _Equal>` in libstdc++'s
+    // `_Hashtable_base`).
+    //
+    // The cast forces the dereference's type to remain the specific
+    // base subobject's class type, pinning member-access lookup to
+    // its own scope.  Mark the cast as already-type-checked so the
+    // operand walk doesn't undo it.
+    typecast_exprt cast_this{this_expr, pointer_type(bit->type())};
+    cast_this.add_source_location() = source_location;
+    already_typechecked_exprt::make_already_typechecked(cast_this);
+
+    dereference_exprt object{cast_this, bit->type()};
     object.add_source_location() = source_location;
 
     const bool disabled_access_control = disable_access_control;
