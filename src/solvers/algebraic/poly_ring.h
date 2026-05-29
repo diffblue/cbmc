@@ -81,6 +81,38 @@ public:
   polynomialt operator*(const polynomialt &other) const;
   polynomialt operator*(const mp_integer &scalar) const;
 
+  /// Schoolbook multiplication (O(m*n) term-pair products).
+  /// Internal helper for the recursive base case of
+  /// `karatsuba_multiply` and the public dispatch in `operator*`.
+  ///
+  /// Sound by the standard polynomial-product formula; mechanised
+  /// in `formal-proofs/PolyRing.lean::polynomial_mul_correct`.
+  polynomialt schoolbook_multiply(const polynomialt &other) const;
+
+  /// Karatsuba multiplication on a chosen main variable
+  /// `main_var`. Splits each operand at degree `m` in `main_var`
+  /// and computes the product via three recursive
+  /// sub-multiplications:
+  ///
+  /// ```
+  ///   f = f_lo + x_v^m * f_hi
+  ///   g = g_lo + x_v^m * g_hi
+  ///   P0 = f_lo * g_lo
+  ///   P2 = f_hi * g_hi
+  ///   P1 = (f_lo + f_hi) * (g_lo + g_hi) - P0 - P2
+  ///   f * g = P0 + x_v^m * P1 + x_v^{2m} * P2
+  /// ```
+  ///
+  /// At each recursive call, falls back to schoolbook when the
+  /// term count is below `KARATSUBA_THRESHOLD` or when no main
+  /// variable yields a useful split.
+  ///
+  /// Sound by polynomial-ring algebra (associativity, commutativity,
+  /// distributivity), mechanised in
+  /// `formal-proofs/Karatsuba.lean::karatsuba_multiply_correct`.
+  polynomialt
+  karatsuba_multiply(const polynomialt &other, std::size_t main_var) const;
+
   /// Multiplication with inline idempotency simplification.
   /// Equivalent to (*this * other) followed by
   /// apply_frobenius_idempotency(result, bit_vars), but performs

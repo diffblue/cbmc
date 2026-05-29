@@ -6,6 +6,8 @@
 #include <util/arith_tools.h>
 #include <util/invariant.h>
 
+#include <optional>
+
 // --- monomialt ---
 
 monomialt monomialt::operator*(const monomialt &other) const
@@ -212,7 +214,7 @@ polynomialt polynomialt::operator*(const mp_integer &scalar) const
   return result;
 }
 
-polynomialt polynomialt::operator*(const polynomialt &other) const
+polynomialt polynomialt::schoolbook_multiply(const polynomialt &other) const
 {
   PRECONDITION(bitwidth == other.bitwidth);
   // Streaming multiplication: accumulate term-pair products into a
@@ -246,6 +248,231 @@ polynomialt polynomialt::operator*(const polynomialt &other) const
   // combined is sorted by monomialt::operator<; copy that order.
   // No further sort required.
   return result;
+}
+
+namespace
+{
+/// Look up the exponent of variable `v` in monomial `m`, or 0 if
+/// `v` does not occur in `m`.
+unsigned exponent_of(const monomialt &m, std::size_t v)
+{
+  for(const auto &[var, e] : m.vars)
+  {
+    if(var == v)
+      return e;
+    if(var > v)
+      break; // vars sorted by index
+  }
+  return 0;
+}
+
+/// Maximum exponent of variable `v` across all monomials of `f`.
+unsigned max_degree_in(const polynomialt &f, std::size_t v)
+{
+  unsigned d = 0;
+  for(const auto &[c, mon] : f.terms)
+    d = std::max(d, exponent_of(mon, v));
+  return d;
+}
+
+/// Pick the variable whose total degree spread (deg_f + deg_g) is
+/// maximal, provided both f and g have positive degree in it.
+/// Returns nullopt if no variable is shared with positive degree.
+std::optional<std::size_t>
+pick_main_variable(const polynomialt &f, const polynomialt &g)
+{
+  std::map<std::size_t, unsigned> deg_f, deg_g;
+  for(const auto &[c, mon] : f.terms)
+    for(const auto &[var, e] : mon.vars)
+    {
+      auto &slot = deg_f[var];
+      slot = std::max(slot, static_cast<unsigned>(e));
+    }
+  for(const auto &[c, mon] : g.terms)
+    for(const auto &[var, e] : mon.vars)
+    {
+      auto &slot = deg_g[var];
+      slot = std::max(slot, static_cast<unsigned>(e));
+    }
+  std::optional<std::size_t> best;
+  unsigned best_score = 0;
+  for(const auto &[v, df] : deg_f)
+  {
+    auto it = deg_g.find(v);
+    if(it == deg_g.end())
+      continue;
+    unsigned dg = it->second;
+    // We need at least one half to be non-empty after splitting.
+    // That requires max(df, dg) >= 2 so that m = (max+1)/2 >= 1
+    // and at least some terms have exponent >= m in one of them.
+    if(df + dg < 2)
+      continue;
+    unsigned score = df + dg;
+    if(score > best_score)
+    {
+      best_score = score;
+      best = v;
+    }
+  }
+  return best;
+}
+
+/// Split `f` into `(f_lo, f_hi)` such that
+/// `f = f_lo + x_v^m * f_hi`, where `f_lo` collects terms with
+/// `v`-exponent `< m` (unchanged) and `f_hi` collects terms with
+/// `v`-exponent `>= m` with the `v`-exponent reduced by `m`.
+/// PROOF: trivial decomposition by case-splitting on the
+///        v-exponent in each monomial; mechanised in
+///        formal-proofs/Karatsuba.lean::split_by_var_correct.
+std::pair<polynomialt, polynomialt>
+split_by_var(const polynomialt &f, std::size_t v, unsigned m)
+{
+  polynomialt lo{f.bitwidth};
+  polynomialt hi{f.bitwidth};
+  lo.terms.reserve(f.terms.size());
+  hi.terms.reserve(f.terms.size());
+  for(const auto &[c, mon] : f.terms)
+  {
+    unsigned ev = exponent_of(mon, v);
+    if(ev < m)
+    {
+      lo.terms.emplace_back(c, mon);
+    }
+    else
+    {
+      monomialt new_mon;
+      new_mon.vars.reserve(mon.vars.size());
+      for(const auto &[var, e] : mon.vars)
+      {
+        if(var == v)
+        {
+          unsigned new_e = e - m;
+          if(new_e > 0)
+            new_mon.vars.emplace_back(var, new_e);
+        }
+        else
+        {
+          new_mon.vars.emplace_back(var, e);
+        }
+      }
+      hi.terms.emplace_back(c, new_mon);
+    }
+  }
+  // f_lo preserves the original sort order (terms with v-exponent
+  // < m can keep their relative order under grevlex). f_hi has had
+  // a uniform shift on the v-exponent and may need re-sorting.
+  hi.normalize();
+  return {std::move(lo), std::move(hi)};
+}
+
+/// Multiply every term of `f` by `x_v^k`. Preserves coefficients
+/// and the relative order of terms (a uniform shift in one
+/// variable's exponent does not flip pairs under grevlex among
+/// the input's monomials, but the resulting polynomial still
+/// goes through normalize() to be safe and to guarantee correctness
+/// regardless of the term ordering convention).
+polynomialt
+multiply_by_var_power(const polynomialt &f, std::size_t v, unsigned k)
+{
+  if(k == 0)
+    return f;
+  polynomialt result{f.bitwidth};
+  result.terms.reserve(f.terms.size());
+  for(const auto &[c, mon] : f.terms)
+  {
+    monomialt new_mon;
+    new_mon.vars.reserve(mon.vars.size() + 1);
+    bool inserted = false;
+    for(const auto &[var, e] : mon.vars)
+    {
+      if(!inserted && var > v)
+      {
+        new_mon.vars.emplace_back(v, k);
+        inserted = true;
+      }
+      if(var == v)
+      {
+        new_mon.vars.emplace_back(var, e + k);
+        inserted = true;
+      }
+      else
+      {
+        new_mon.vars.emplace_back(var, e);
+      }
+    }
+    if(!inserted)
+      new_mon.vars.emplace_back(v, k);
+    result.terms.emplace_back(c, new_mon);
+  }
+  result.normalize();
+  return result;
+}
+} // namespace
+
+/// Threshold below which Karatsuba's recursive overhead exceeds
+/// the schoolbook savings. Empirically tuned via the
+/// `bench-multiplication/karatsuba-microbench.cpp` benchmark on
+/// dense univariate polynomials over Z_{2^32}: at term count
+/// <= 64 the recursion overhead and `mp_integer` per-coefficient
+/// cost dominate; at <= 128 the two methods are roughly equal;
+/// above that Karatsuba pulls ahead, reaching ~2x speedup at
+/// 1024 terms. We set the threshold at 96 to leave a safety
+/// margin so that small cases never regress.
+constexpr std::size_t KARATSUBA_THRESHOLD = 96;
+
+polynomialt
+polynomialt::karatsuba_multiply(const polynomialt &other, std::size_t v) const
+{
+  PRECONDITION(bitwidth == other.bitwidth);
+  // PROOF: formal-proofs/Karatsuba.lean::karatsuba_identity,
+  //        karatsuba_multiply_correct.
+  // The Karatsuba combination
+  //   P0 = f_lo * g_lo
+  //   P2 = f_hi * g_hi
+  //   P1 = (f_lo + f_hi) * (g_lo + g_hi) - P0 - P2
+  //   result = P0 + x^m * P1 + x^{2m} * P2
+  // equals (f_lo + x^m * f_hi) * (g_lo + x^m * g_hi) = f * g
+  // by pure ring arithmetic, mechanised in Karatsuba.lean.
+  unsigned df = max_degree_in(*this, v);
+  unsigned dg = max_degree_in(other, v);
+  unsigned d = std::max(df, dg);
+  // m must divide both halves non-trivially.
+  unsigned m = (d + 1) / 2;
+  if(m == 0)
+    return schoolbook_multiply(other);
+
+  auto [f_lo, f_hi] = split_by_var(*this, v, m);
+  auto [g_lo, g_hi] = split_by_var(other, v, m);
+
+  // Karatsuba: 3 sub-multiplications.
+  polynomialt p0 = f_lo * g_lo;
+  polynomialt p2 = f_hi * g_hi;
+  polynomialt sum_f = f_lo + f_hi;
+  polynomialt sum_g = g_lo + g_hi;
+  polynomialt p1 = sum_f * sum_g;
+  p1 = p1 - p0 - p2;
+
+  // Combine: f*g = P0 + x_v^m * P1 + x_v^{2m} * P2.
+  polynomialt result = p0;
+  result = result + multiply_by_var_power(p1, v, m);
+  result = result + multiply_by_var_power(p2, v, 2 * m);
+  return result;
+}
+
+polynomialt polynomialt::operator*(const polynomialt &other) const
+{
+  PRECONDITION(bitwidth == other.bitwidth);
+  // Below the threshold, schoolbook is faster (recursion
+  // overhead dominates). Above it, try to find a main variable
+  // with sufficient degree spread to make Karatsuba worthwhile.
+  if(
+    terms.size() <= KARATSUBA_THRESHOLD ||
+    other.terms.size() <= KARATSUBA_THRESHOLD)
+    return schoolbook_multiply(other);
+  auto v = pick_main_variable(*this, other);
+  if(!v.has_value())
+    return schoolbook_multiply(other);
+  return karatsuba_multiply(other, *v);
 }
 
 polynomialt polynomialt::multiply(
