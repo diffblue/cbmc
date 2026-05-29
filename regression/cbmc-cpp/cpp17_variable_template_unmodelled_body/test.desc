@@ -1,0 +1,24 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+^.*invalid implicit conversion from '<<type:.*'.*$
+--
+Verifies that a variable template whose initializer body fails to
+type-check (because it depends on an unmodelled libstdc++ helper)
+falls through to a typed `symbol_exprt` at use sites instead of
+inlining a corrupted `cpp_name` body.  The libstdc++ pattern this
+mirrors is `is_trivially_destructible_v<T>` whose body
+`is_trivially_destructible<T>::value` cascades through
+`__is_destructible_safe<T>` and friends; for non-trivial class types
+like `std::basic_string` CBMC's typechecker can't always evaluate
+the chain to a bool constant.
+
+Before the fix the use site of the broken variable template
+produced
+  invalid implicit conversion from '<<type:>>' to 'bool'
+when the value was used as a non-type bool template argument.

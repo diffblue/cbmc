@@ -240,7 +240,39 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
 
     {
       exprt val = symbol.value;
-      typecheck_expr(val);
+      try
+      {
+        typecheck_expr(val);
+      }
+      catch(...)
+      {
+        // Type-check of the initializer failed.  This is most often
+        // a variable template whose body references an unmodeled
+        // libstdc++ helper — for example,
+        // `is_trivially_destructible_v<T>`'s body
+        // `is_trivially_destructible<T>::value` reaches
+        // `__is_destructible_safe<T>` whose
+        // `decltype(declval<_Tp&>().~_Tp())` SFINAE chain CBMC's
+        // type-checker can't always fully evaluate.
+        //
+        // Leaving `symbol.value` as the partially-converted cpp_name
+        // would corrupt every use of the variable template: the use
+        // site in `cpp_typecheck_resolvet::resolve` copies
+        // `symbol.value` directly into the resolved expression when
+        // `symbol.is_macro` is set (variable templates declared
+        // `inline constexpr` are macros in CBMC's representation).
+        // A cpp_name with no type then surfaces downstream as
+        //   `invalid implicit conversion from '<<type:>>' to 'bool'`.
+        //
+        // Reset the value to nil so the use site falls back to the
+        // `symbol_exprt(name, type)` branch instead of inlining the
+        // broken cpp_name.  This is a soft SFINAE-style failure: the
+        // symbol still exists with its declared type, but its value
+        // is opaque, and downstream uses get a typed symbol_expr.
+        symbolt &symbol_w = symbol_table.get_writeable_ref(sym_id);
+        symbol_w.value.make_nil();
+        throw;
+      }
       symbolt &symbol = symbol_table.get_writeable_ref(sym_id);
       symbol.value = std::move(val);
     }
