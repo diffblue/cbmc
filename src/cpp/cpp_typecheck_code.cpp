@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/string_constant.h>
 #include <util/symbol_table_base.h>
 
+#include "cpp_convert_type.h"
 #include "cpp_declarator_converter.h"
 #include "cpp_exception_id.h"
 #include "cpp_sfinae_context.h"
@@ -478,10 +479,18 @@ void cpp_typecheckt::typecheck_code(codet &code)
         typecheck_expr(deref_expr);
 
         typet var_type = cpp_decl.type();
-        if(var_type.id() == ID_auto)
-          var_type = deref_expr.type();
-        else
-          typecheck_type(var_type);
+        // If the declared type contains `auto` (bare `auto`,
+        // `const auto&`, `auto*`, `auto&`, etc.), deduce by
+        // substituting `auto` with the type of `*__begin`.
+        // The previous check `var_type.id() == ID_auto` only
+        // matched bare `auto`, leaving a `merged_type(const, auto)`
+        // for `const auto&` un-deduced, surfacing later as
+        //   member operator requires struct/union type on left
+        //   hand side but got '<<type:auto>>'
+        // when the loop variable is used.
+        if(has_auto(var_type))
+          cpp_convert_auto(var_type, deref_expr.type(), get_message_handler());
+        typecheck_type(var_type);
 
         const std::string var_id = scope_prefix + id2string(var_base_name);
         {
@@ -559,12 +568,13 @@ void cpp_typecheckt::typecheck_code(codet &code)
     const irep_idt &var_base_name =
       declarator.name().get_sub().front().get(ID_identifier);
 
-    // Resolve auto type
+    // Resolve auto type — handle bare `auto`, `const auto&`,
+    // `auto*`, `auto&`, etc. by substituting the array element
+    // type into any `auto` token within the declared type.
     typet var_type = cpp_decl.type();
-    if(var_type.id() == ID_auto)
-      var_type = elem_type;
-    else
-      typecheck_type(var_type);
+    if(has_auto(var_type))
+      cpp_convert_auto(var_type, elem_type, get_message_handler());
+    typecheck_type(var_type);
 
     // Create the loop variable via a normal declaration
     const std::string scope_prefix =
