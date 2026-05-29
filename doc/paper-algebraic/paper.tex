@@ -56,7 +56,7 @@ actual $N=256$ parameter, with cvc5 timing out at every
 $N \geq 4$; on commutativity, associativity, and overflow
 checking it is bitwidth-independent (BW=8 to 256, 2--5\,ms
 throughout) and matches Bitwuzla's word-level rewriting. Soundness is mechanised in
-Lean~4 with 105 theorems, zero \texttt{sorry}, and zero
+Lean~4 with 109 theorems, zero \texttt{sorry}, and zero
 project-internal axioms (out of which 39 are contract-level
 theorems referenced directly from the implementation source),
 including four candidates for Mathlib contribution; the
@@ -160,7 +160,7 @@ existential & relational              & overflow witness           & companion p
 
 \item \textbf{Mechanised soundness with formalisation-driven
   refinement.}
-  105 theorems in Lean~4 with zero \texttt{sorry} (39
+  109 theorems in Lean~4 with zero \texttt{sorry} (39
   contract-level, 40 helpers and lemmas), giving full
   bi-directional traceability to every algorithm in
   \texttt{src/solvers/algebraic/}. Four general-purpose results
@@ -491,7 +491,7 @@ component along three axes:
   pass it as soft hints to the bit-blasting layer, avoiding
   duplicated exploration.
 
-\item \textbf{Formalisation-driven refinement.} 105 theorems in
+\item \textbf{Formalisation-driven refinement.} 109 theorems in
   Lean 4 with zero \texttt{sorry} (39 contract-level), four
   Mathlib contribution candidates. Full bi-directional
   traceability to every algorithm in
@@ -552,7 +552,7 @@ would need to exist, but the polynomial $-1$ would be in $I$,
 triggering the unit check. The algorithm is sound (never falsely
 reports UNSAT) but incomplete (returns inconclusive when the basis
 contains only even constants).
-Full proof mechanised in Lean~4 (105 theorems, zero \texttt{sorry}),
+Full proof mechanised in Lean~4 (109 theorems, zero \texttt{sorry}),
 covering: (a)~unit characterisation in $\mathbb{Z}_{2^d}$ (odd
 $\Leftrightarrow$ unit, 2 is not a unit for $d \geq 1$),
 (b)~ideal preservation under S-polynomial computation and reduction,
@@ -2454,7 +2454,7 @@ volume but to decide queries those solvers cannot decide at all
 Bitwuzla, cvc5, and every bit-blasting configuration we tested
 time out on, and 5 DSP datapath equivalences with overflow
 cancellation that are decided in microseconds. Soundness is
-mechanised in Lean 4 with 105 theorems, zero \texttt{sorry},
+mechanised in Lean 4 with 109 theorems, zero \texttt{sorry},
 and zero project-internal axioms across 12 modules, with full
 bi-directional traceability to every algorithm in
 \texttt{src/solvers/algebraic/} and four contributions prepared
