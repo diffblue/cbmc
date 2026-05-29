@@ -1170,12 +1170,39 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
   fargs.in_use = true;
   fargs.operands = code.operands();
 
-  // We should only really resolve in qualified mode,
-  // no need to look into the parent.
-  // Plus, this should happen in class scope, not the scope of
-  // the constructor because of the constructor arguments.
-  exprt symbol_expr =
-    resolve(member, cpp_typecheck_resolvet::wantt::VAR, fargs);
+  // For implicit base-class initializers added by
+  // `full_member_initialization`, the `cpp_namet` is the unqualified
+  // base class `base_name` and resolve below would fail when the
+  // enclosing class derives from two specializations of the same
+  // template (e.g., `_Hashtable_ebo_helper<0, _Hash>` vs
+  // `<1, _Equal>`).  `full_member_initialization` records the
+  // specific base subobject's `struct_tag` type via
+  // `#base_type`; if present, scope the resolve to that struct
+  // (which uniquely determines the constructor we want) instead of
+  // the enclosing class scope.  Restore the original scope before
+  // accessing `this_expr` (which is bound to the constructor's
+  // class scope, not the base subobject's scope).
+  exprt symbol_expr;
+  {
+    cpp_save_scopet save_scope(cpp_scopes);
+    if(code.find("#base_type").is_not_nil())
+    {
+      const typet &base_type =
+        static_cast<const typet &>(code.find("#base_type"));
+      if(base_type.id() == ID_struct_tag)
+      {
+        const irep_idt &tag = to_struct_tag_type(base_type).get_identifier();
+        if(cpp_scopes.id_map.find(tag) != cpp_scopes.id_map.end())
+          cpp_scopes.set_scope(tag);
+      }
+    }
+
+    // We should only really resolve in qualified mode,
+    // no need to look into the parent.
+    // Plus, this should happen in class scope, not the scope of
+    // the constructor because of the constructor arguments.
+    symbol_expr = resolve(member, cpp_typecheck_resolvet::wantt::VAR, fargs);
+  }
 
   if(symbol_expr.type().id() == ID_code)
   {

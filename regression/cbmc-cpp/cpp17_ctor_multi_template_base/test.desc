@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+^.*does not uniquely resolve.*$
+--
+Verifies that the implicit default constructor of a class derived
+from two specializations of the same template can be type-checked
+without hitting the spurious "symbol 'X' does not uniquely resolve"
+diagnostic.  `full_member_initialization` synthesises a base-class
+member-initializer whose `cpp_namet` is the unqualified base
+`base_name`; when two bases share the same `base_name` (e.g.,
+both are specializations of the same template) the resolve in
+`typecheck_member_initializer` would otherwise return both
+candidates.  The fix scopes the resolve to the specific base
+subobject's struct via the `#base_type` codet attribute set by
+`full_member_initialization`.
