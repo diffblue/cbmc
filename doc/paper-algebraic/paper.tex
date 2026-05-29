@@ -1061,46 +1061,70 @@ assignments. This takes three reductions, regardless of $d$. In
 our implementation the cost is ${\sim}$200\,$\mu$s independent of
 bitwidth.
 
-\subsection{Future Directions Within and Beyond the Universal-Equational Class}
+\subsection{Beyond the Universal-Equational Class}
 \label{sec:future-within-and-beyond}
 
 The procedure of Sections~\ref{sec:algebraic} and~\ref{sec:vanishing}
-treats the algebraic layer as a preprocessor: it runs once,
-decides what it can on the universal-equational class, and the
-residual goes to bit-blasting. Two extensions naturally arise.
+treats the algebraic layer as a preprocessor on the
+universal-equational class with polynomial expressions; queries
+outside that fragment fall through to bit-blasting. Two
+mechanisms reduce that fall-through, both reported in the
+evaluation. \emph{Bit-decomposition variables}
+(Section~\ref{sec:eval-pbv}) introduce auxiliary boolean
+variables $b_{a,i} \in \{0, 1\}$ with idempotency
+$b_{a,i}^2 = b_{a,i}$ and sum-decomposition
+$a = \sum_i 2^i b_{a,i}$, making partial bit-vector operators
+($\mathtt{bvlshr}$, $\mathtt{bvand}$, $\mathtt{bvor}$,
+$\mathtt{bvxor}$, $\mathtt{bvnot}$) and relational predicates
+($\mathtt{bvult}$, $\mathtt{bvule}$, signed variants, plus
+symbol-symbol comparisons via bit-comparator chains) sound
+polynomial expressions. With Frobenius-aware reduction (clamp
+$b^k$ to $b$ during S-polynomial steps), structural
+bit-decomposition (compute bit polynomials directly for
+recognised bit-ops without auxiliary variables), a
+polynomial-form host cache, inline idempotency simplification,
+and linear elimination of host variables before Buchberger, the
+procedure scales linearly in bitwidth on the partial-bv
+identities tested up to $d = 128$
+(Table~\ref{tab:eval-pbv}), and beats Bitwuzla 17$\times$ on
+the toom-scaled identity at $d = 128$ and on the
+$\mathtt{bvxor}$-with-MSB-precondition case
+(Table~\ref{tab:eval-pbv-relational}).
+\emph{Deferred bit-blasting} (Section~\ref{sec:eval-saber-defer})
+queues SSA-to-SAT conversion until after the algebraic procedure
+has had a chance to refute, cutting peak memory by 100--165$\times$
+on SABER and unlocking $N = 768$ within a 1.7\,GB budget that
+otherwise OOMs at $N = 256$.
 
-\paragraph{Within the universal-equational class: expression-level
-normalisation.}
-After Buchberger, reduce arbitrary polynomial expressions in the
-residual w.r.t.\ the computed basis. If the reduction produces a
-constant or a shorter polynomial form, communicate it to the
-bit-blast layer as a SAT-level equality, propagating the algebraic
-insight. This generalises our existing \texttt{extract\_candidate}
-(which finds univariate-linear basis elements only) to arbitrary
-expressions, making the algebraic layer a true theory solver in
-the SMT(LRA/UF/$\ldots$)\ tradition --- exchanging information
-bidirectionally with the SAT search rather than running once and
-stopping. The class boundary is unchanged; only the depth of
-interaction within it deepens.
+Three extensions remain genuinely future. \emph{Faithful
+Toom-Cook 4-way SABER verification}
+(Section~\ref{sec:eval-saber}, ``open-challenge target''): we
+have a generator that matches the SABER C reference byte-for-byte
+on pinned inputs, but the universal verification target
+``schoolbook $=$ Toom-Cook 4-way'' times out at 30~minutes for
+both Bitwuzla and our procedure on the smallest non-trivial case
+($N = 4$). \emph{Faster polynomial multiplication} for
+SABER beyond $N = 768$, where the Buchberger phase becomes the
+bottleneck and would benefit from sparse polynomial
+representation, FFT/Toom-Cook for polynomial-on-polynomial
+multiplication, or lazy on-demand inlining; this is multi-week
+research effort. \emph{Theory combination}, i.e.\ refactoring
+the bit-vector pipeline into a true theory-solver-style module
+that exchanges information bidirectionally with the SAT search
+across multiple iterations rather than running once and stopping;
+this is multi-month architectural work and outside the scope
+of the present paper.
 
-\paragraph{Toward the relational classes: bit-decomposition
-variables.}
-Our procedure does not address the universal-relational and
-existential-relational classes (Table~\ref{tab:taxonomy}); these
-are the bit-blasting companion paper's domain. Bit-decomposition
-gives a route to extend the algebraic layer's coverage:
-SAT-level partial assignments often determine specific bits of
-intermediate values. Encoding these via fresh bit-decomposition
-variables $b_{x,i}$ over $\mathbb{Z}_{2^d}$, with idempotency
-$b_{x,i}^2 = b_{x,i}$ and the sum-decomposition
-$x = \sum_i 2^i b_{x,i}$, allows the algebraic layer to
-incorporate bit-level facts and to discover bit-level
-consequences. Predicates like ``high bit of $x \cdot y$ is 1''
-become polynomial constraints, bringing relational queries
-(bounds, overflow witnesses) into reach of the same Gr\"obner
-infrastructure. This is the direction in which a future revision
-takes the algebraic procedure beyond its current
-universal-equational scope.
+A complementary direction within the universal-equational class
+is \emph{expression-level normalisation}, generalising
+\texttt{extract\_candidate} (currently univariate-linear only) to
+reduce arbitrary polynomial expressions w.r.t.\ the computed
+basis and emit any constant or shorter form as a SAT-level
+equality. We have a flag-gated prototype
+(\texttt{ENABLE\_GB\_EXPR\_NORMALISE}) that passes a sanity
+check; quantitative evaluation has lower priority than the
+deferred-bit-blasting and bit-decomposition work, both of which
+have produced larger empirical wins.
 
 \section{Evaluation}
 \label{sec:external}
@@ -2396,13 +2420,19 @@ catch the same class of issue in other formalisation efforts.
 
 The procedure addresses the universal-equational class with
 polynomial expressions; queries with bitwise operations, shifts,
-or inequalities fall through to the bit-blasting companion
-paper~\cite{companion-bitblasting}. Two extensions are sketched
-in Section~\ref{sec:future-within-and-beyond}: expression-level
-normalisation deepens the procedure's interaction with the SAT
-search within the same class, while bit-decomposition variables
-give a route to extending the algebraic layer's coverage to the
-relational classes that currently fall through.
+or inequalities fall through to bit-blasting, which our
+boolbv companion handles. Two mechanisms reduce that fall-through
+in the present procedure: bit-decomposition variables, which
+make partial bit-vector operators and relational predicates
+sound polynomial expressions while scaling linearly in
+bitwidth (\S\ref{sec:eval-pbv}), and deferred bit-blasting,
+which cuts SABER peak memory by 100--165$\times$ and unlocks
+$N = 768$ (\S\ref{sec:eval-saber-defer}). The remaining future
+directions, sketched in Section~\ref{sec:future-within-and-beyond},
+are faithful Toom-Cook 4-way SABER verification (an open
+challenge for state-of-the-art SMT), faster polynomial
+multiplication beyond $N = 768$, and theory combination as a
+multi-month architectural extension.
 
 \paragraph{Declaration on Generative AI.}
 During preparation, the authors used an AI coding assistant to
