@@ -1083,6 +1083,121 @@ void cpp_typecheck_resolvet::disambiguate_functions(
 
   if(old_identifiers.size() > 1 && fargs.in_use)
   {
+    // [temp.deduct.partial]: when comparing two function templates,
+    // a forwarding-reference parameter `T&&` is less specialized than
+    // a lvalue-reference parameter `T&` when the corresponding
+    // argument is an lvalue.  Inspect each candidate's
+    // `C_template` field (the recorded original template signature)
+    // to detect this rvalue-vs-lvalue-reference asymmetry and
+    // dominate the forwarding-ref overload.  Without this, calls
+    // such as `as_const(s)` (with `as_const(T&)` AND
+    // `as_const(T&&) = delete` overloads — the libstdc++ pattern
+    // used to forbid xvalue arguments) report
+    //   symbol 'as_const' does not uniquely resolve
+    // because both deduce to a `T&` parameter type after
+    // reference-collapsing and CBMC's distance-based disambiguation
+    // can't tell them apart.
+    if(fargs.operands.size() >= 1)
+    {
+      // Helper to read a template parameter's reference-kind
+      // from the recorded `C_template` signature: returns
+      // 'L' for lvalue-ref, 'R' for rvalue-ref / forwarding-ref,
+      // 'V' for by-value, 'O' for other.
+      auto template_param_kind =
+        [](const exprt &cand, std::size_t param_idx) -> char
+      {
+        if(cand.type().id() != ID_code)
+          return 'O';
+        const irept &tmpl = cand.type().find(ID_C_template);
+        if(tmpl.id().empty())
+          return 'O';
+        // The template signature renders as
+        //   template.NAME<...>(parameter(type=KIND(...)))->(RET)
+        // where KIND is one of: reference, referencervalue_reference,
+        // rvalue_reference, or absent (by-value).
+        const std::string s = tmpl.pretty(0, 999);
+        std::size_t pos = 0;
+        for(std::size_t i = 0; i <= param_idx; ++i)
+        {
+          pos = s.find("parameter(type=", pos);
+          if(pos == std::string::npos)
+            return 'O';
+          if(i < param_idx)
+            pos += 1;
+        }
+        const std::size_t kind_start =
+          pos + std::string("parameter(type=").size();
+        const std::string head = s.substr(kind_start, 40);
+        // Order matters: "referencervalue_reference" prefix-overlaps
+        // with "reference"; check the longer variant first.
+        if(head.rfind("referencervalue_reference", 0) == 0)
+          return 'R';
+        if(head.rfind("rvalue_reference(", 0) == 0)
+          return 'R';
+        if(head.rfind("reference(", 0) == 0)
+          return 'L';
+        return 'V';
+      };
+
+      // For each pair, check if one's first-param kind dominates the
+      // other's per [temp.deduct.partial] when the call argument is
+      // an lvalue.
+      std::vector<bool> dominated_fwd(old_identifiers.size(), false);
+      for(std::size_t i = 0; i < old_identifiers.size(); ++i)
+      {
+        for(std::size_t j = 0; j < old_identifiers.size(); ++j)
+        {
+          if(i == j || dominated_fwd[i] || dominated_fwd[j])
+            continue;
+          if(old_identifiers[i].type().id() != ID_code)
+            continue;
+          if(old_identifiers[j].type().id() != ID_code)
+            continue;
+          const code_typet &fi = to_code_type(old_identifiers[i].type());
+          const code_typet &fj = to_code_type(old_identifiers[j].type());
+          if(fi.parameters().size() != fj.parameters().size())
+            continue;
+          if(fi.parameters().size() != fargs.operands.size())
+            continue;
+          // Compare per-parameter kinds.  i is dominated by j if
+          // for every parameter, i's kind is "forwarding ref" and
+          // j's kind is "lvalue ref" AND the argument is an lvalue
+          // — and at least one parameter has this asymmetry.
+          bool i_dominated = true;
+          bool any_diff = false;
+          for(std::size_t p = 0; p < fi.parameters().size(); ++p)
+          {
+            const char ki = template_param_kind(old_identifiers[i], p);
+            const char kj = template_param_kind(old_identifiers[j], p);
+            if(ki == kj)
+              continue;
+            // Argument must be an lvalue for the rvalue-ref vs
+            // lvalue-ref partial ordering to apply.
+            const bool arg_lvalue = p < fargs.operands.size() &&
+                                    fargs.operands[p].get_bool(ID_C_lvalue);
+            if(ki == 'R' && kj == 'L' && arg_lvalue)
+              any_diff = true;
+            else
+            {
+              i_dominated = false;
+              break;
+            }
+          }
+          if(i_dominated && any_diff)
+            dominated_fwd[i] = true;
+        }
+      }
+      if(std::count(dominated_fwd.begin(), dominated_fwd.end(), false) >= 1)
+      {
+        std::vector<exprt> survivors;
+        for(std::size_t i = 0; i < old_identifiers.size(); ++i)
+          if(!dominated_fwd[i])
+            survivors.push_back(old_identifiers[i]);
+        if(survivors.size() < old_identifiers.size() && !survivors.empty())
+          old_identifiers.swap(survivors);
+      }
+    }
+
     // Try to further disambiguate by partial ordering: a candidate is
     // "dominated" if another candidate has at least as specific
     // parameter types (via derived-to-base subtyping) for every
