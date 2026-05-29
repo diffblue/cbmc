@@ -554,6 +554,29 @@ void boolbvt::set_to(const exprt &expr, bool value)
         algebraic_disequalities.push_back(expr);
     }
   }
+  // Also catch (notequal a b) set to true and (notequal a b) set to
+  // false: SMT-LIB's `distinct` parses as `notequal_exprt`, which is
+  // semantically `not (equal)`. We translate to the same algebraic
+  // equality / disequality bucket as the `equal_exprt` path above.
+  if(!algebraic_solved && expr.id() == ID_notequal)
+  {
+    const auto &neq = to_notequal_expr(expr);
+    auto is_internal = [](const exprt &e)
+    {
+      return e.id() == ID_symbol &&
+             id2string(to_symbol_expr(e).get_identifier()).find("__CPROVER") !=
+               std::string::npos;
+    };
+    if(!is_internal(neq.lhs()) && !is_internal(neq.rhs()))
+    {
+      // (notequal a b) is the negation of (equal a b).
+      auto as_equal = equal_exprt(neq.lhs(), neq.rhs());
+      if(value)
+        algebraic_disequalities.push_back(as_equal);
+      else
+        algebraic_equalities.push_back(as_equal);
+    }
+  }
   // Also catch not(equal(...)) set to true = disequality
   if(
     !algebraic_solved && expr.id() == ID_not && expr.operands().size() == 1 &&
@@ -685,7 +708,9 @@ void boolbvt::set_to(const exprt &expr, bool value)
   // On by default. Set DISABLE_DEFER_BITBLAST=1 to opt out for ablation
   // experiments. See doc/paper-algebraic/paper.tex §4.3 for the SABER
   // empirical impact (100--165× memory reduction).
-  if(std::getenv("DISABLE_DEFER_BITBLAST") == nullptr && expr.id() == ID_equal)
+  if(
+    std::getenv("DISABLE_DEFER_BITBLAST") == nullptr &&
+    (expr.id() == ID_equal || expr.id() == ID_notequal))
   {
     auto is_internal = [](const exprt &e)
     {
