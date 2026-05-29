@@ -411,8 +411,15 @@ literalt boolbvt::convert_rest(const exprt &expr)
     const bvt &bv = convert_bv(op);
     CHECK_RETURN(!bv.empty());
     const irep_idt type_id = op.type().id();
-    if(type_id == ID_signedbv || type_id == ID_fixedbv || type_id == ID_floatbv)
+    if(type_id == ID_signedbv || type_id == ID_fixedbv)
       return bv_utils.sign_bit(bv);
+    if(type_id == ID_floatbv)
+    {
+      // For x86 80-bit extended in padded storage the sign bit lives at
+      // spec.value_width()-1, not at the top of the storage container.
+      const ieee_float_spect spec(to_floatbv_type(op.type()));
+      return bv[spec.value_width() - 1];
+    }
     if(type_id == ID_unsignedbv)
       return const_literal(false);
   }
