@@ -551,7 +551,7 @@ would need to exist, but the polynomial $-1$ would be in $I$,
 triggering the unit check. The algorithm is sound (never falsely
 reports UNSAT) but incomplete (returns inconclusive when the basis
 contains only even constants).
-Full proof mechanised in Lean~4 (25 theorems, zero \texttt{sorry}),
+Full proof mechanised in Lean~4 (79 theorems, zero \texttt{sorry}),
 covering: (a)~unit characterisation in $\mathbb{Z}_{2^d}$ (odd
 $\Leftrightarrow$ unit, 2 is not a unit for $d \geq 1$),
 (b)~ideal preservation under S-polynomial computation and reduction,
@@ -2028,8 +2028,8 @@ covers the following modules:
 
 \item \textbf{Unit characterisation in $\mathbb{Z}_{2^d}$}
   (\texttt{GroebnerSoundness.lean}): odd elements are units
-  (coprime to $2^d$); 2 is not a unit for $d \geq 1$. (Submitted
-  to Mathlib as PR \#38628.)
+  (coprime to $2^d$); 2 is not a unit for $d \geq 1$. (Prepared
+  as a standalone branch for contribution to Mathlib.)
 
 \item \textbf{Ideal preservation}
   (\texttt{BuchbergerCorrectness.lean}): S-polynomial computation
@@ -2383,10 +2383,16 @@ volume but to decide queries those solvers cannot decide at all
 Bitwuzla, cvc5, and every bit-blasting configuration we tested
 time out on, and 5 DSP datapath equivalences with overflow
 cancellation that are decided in microseconds. Soundness is
-mechanised in Lean 4 with 25 theorems and zero \texttt{sorry};
-the formalisation effort exposed and removed a 2{,}000$\times$
-ordering sensitivity in the C++ implementation that empirical
-testing did not catch.
+mechanised in Lean 4 with 79 theorems and zero \texttt{sorry}
+across 12 modules, with full bi-directional traceability to
+every algorithm in \texttt{src/solvers/algebraic/} and four
+contributions prepared for Mathlib. The mechanisation effort
+exposed and removed two implementation bugs that empirical
+testing did not catch (a 2{,}000$\times$ ordering sensitivity
+and a 2-trick progress-tracking gap), and led us to adopt an
+explicit-invariant pattern in cross-references
+(\texttt{ASSUMES:} / \texttt{MAINTAINED BY:}) that we expect to
+catch the same class of issue in other formalisation efforts.
 
 The procedure addresses the universal-equational class with
 polynomial expressions; queries with bitwise operations, shifts,
@@ -2411,8 +2417,12 @@ available in the artifact accompanying this paper, in
 \texttt{bench-multiplication/}, together with a Makefile that
 rebuilds the paper and a \texttt{REPRODUCE.md} that describes how
 to re-run each experiment. Mechanised Lean 4 proofs of soundness
-are distributed with the artifact and submitted as PR \#38628 to
-Mathlib.
+are distributed with the artifact, with four general-purpose
+results (the unit characterisation of $\mathbb{Z}_{2^d}$,
+idempotents in $\mathbb{Z}_{2^d}$ are $\{0, 1\}$,
+$\mathbb{Z}_{p^n}$ is a local ring, and a non-unit
+characterisation) prepared as standalone branches for
+contribution to Mathlib.
 
 \bibliographystyle{splncs04}
 \bibliography{references}
