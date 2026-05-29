@@ -57,7 +57,7 @@ $N \geq 4$; on commutativity, associativity, and overflow
 checking it is bitwidth-independent (BW=8 to 256, 2--5\,ms
 throughout) and matches Bitwuzla's word-level rewriting. Soundness is mechanised in
 Lean~4 with 109 theorems, zero \texttt{sorry}, and zero
-project-internal axioms (out of which 39 are contract-level
+project-internal axioms (out of which 62 are contract-level
 theorems referenced directly from the implementation source),
 including four candidates for Mathlib contribution; the
 formalisation effort exposed and removed two implementation bugs
@@ -160,8 +160,8 @@ existential & relational              & overflow witness           & companion p
 
 \item \textbf{Mechanised soundness with formalisation-driven
   refinement.}
-  109 theorems in Lean~4 with zero \texttt{sorry} (39
-  contract-level, 40 helpers and lemmas), giving full
+  109 theorems in Lean~4 with zero \texttt{sorry} (62
+  contract-level, 47 helpers and lemmas), giving full
   bi-directional traceability to every algorithm in
   \texttt{src/solvers/algebraic/}. Four general-purpose results
   are contributed to Mathlib (the unit characterisation of
@@ -428,8 +428,18 @@ results remain correct, but the algorithm could give up earlier
 than it should. The fix captures the basis size at the start of
 each iteration and resets the counters whenever the basis grows
 (via either S-poly or 2-trick), which is a few-line change. We
-added a unit-test suite in
-\texttt{unit/solvers/algebraic/groebner.cpp} to lock in the fix.
+locked the fix in at three levels: a unit-test suite in
+\texttt{unit/solvers/algebraic/groebner.cpp}; a Lean theorem
+\texttt{BuchbergerTermination.lean::progress\_invariant\_preserved}
+that proves \texttt{pairs\_size + counter = baseline} is
+preserved by every step of the corrected loop, with a companion
+\texttt{buggy\_step\_breaks\_invariant} witnessing that the
+pre-fix step violates the invariant whenever the 2-trick adds
+pairs; and a quartet of property-based tests (also in
+\texttt{groebner.cpp}) that check the invariant on randomised
+state-machine trajectories (1.24\,M assertions) and exhibit
+the bug condition firing on a non-trivial fraction of buggy
+trajectories.
 
 This second bug crystallised a methodological lesson. A
 \texttt{// PROOF:} comment that simply names a Lean theorem is a
@@ -492,7 +502,7 @@ component along three axes:
   duplicated exploration.
 
 \item \textbf{Formalisation-driven refinement.} 109 theorems in
-  Lean 4 with zero \texttt{sorry} (39 contract-level), four
+  Lean 4 with zero \texttt{sorry} (62 contract-level), four
   Mathlib contribution candidates. Full bi-directional
   traceability to every algorithm in
   \texttt{src/solvers/algebraic/}.
@@ -2029,20 +2039,30 @@ The five 512-bit community benchmarks of the SMT-COMP sample
 $\mathtt{bvudiv}$ / $\mathtt{bvurem}$, which fall outside the
 polynomial fragment and through to bit-blasting. We add a small
 suite of word-level rewrites for these operators in the SMT2
-parser ($x/x$, $0/x$, $x/0$, $x/1$, $x/{\sim}0$,
-$\mathtt{bvurem}\ x\ x$, $\mathtt{bvurem}\ 0\ x$, ite-distribution
-over the divisor, and cancellation
+parser: trivial folds ($x/x$, $0/x$, $x/0$, $x/1$, $x/{\sim}0$,
+$\mathtt{bvurem}\ x\ x$, $\mathtt{bvurem}\ 0\ x$); cancellation
 $\mathtt{bvudiv}\ (\mathtt{bvurem}\ A\ y)\ y \to
-\mathtt{ite}(y = 0,\, {\sim}0,\, 0)$); each rewrite is
-formalised in \texttt{formal-proofs/DivisionRewrites.lean}.
+\mathtt{ite}(y = 0,\, {\sim}0,\, 0)$; range relations
+$\mathtt{bvule}\ (\mathtt{bvurem}\ A\ y)\ y \to
+\mathtt{ite}(y = 0,\, A = 0,\, \top)$ and the strict variant;
+$\mathtt{bvmul}$ folds ($X \cdot 0$, $X \cdot 1$,
+$X \cdot {\sim}0$); and ite-distribution over the divisor of
+$\mathtt{bvudiv}$/$\mathtt{bvurem}$ and over either operand of
+$\mathtt{bvmul}$, with recursion so simplifications cascade
+through ite trees. Each rewrite is formalised in
+\texttt{formal-proofs/DivisionRewrites.lean}.
 After these, our procedure solves two of the five 512-bit
 benchmarks --- the same two that Bitwuzla solves via its
-word-level preprocessor (1.18\,s and 3.43\,s on $\mathtt{bw512\_7}$
+word-level preprocessor (1.18\,s and 0.02\,s on $\mathtt{bw512\_7}$
 and $\mathtt{bw512\_15}$ respectively, vs.\ Bitwuzla's 1.49\,s and
-0.12\,s). The remaining three benchmarks ($\mathtt{bw512\_1}$,
-$\mathtt{bw512\_12}$, $\mathtt{bw512\_14}$) time out for both
-solvers; closing that final gap is a research question for the
-SMT community rather than for Gr\"obner-basis scaling.
+0.12\,s; on $\mathtt{bw512\_15}$ we now beat Bitwuzla, the
+$\mathtt{bvmul}$ folds collapsing the ite tree from upstream
+rewrites into a constant formula that SAT presolve refutes
+immediately). The remaining three benchmarks
+($\mathtt{bw512\_1}$, $\mathtt{bw512\_12}$, $\mathtt{bw512\_14}$)
+time out for both solvers; closing that final gap is a research
+question for the SMT community rather than for Gr\"obner-basis
+scaling.
 
 \textbf{Gate-level equivalence is a gap.} Our procedure is
 complete for the universal-equational fragment with polynomial
@@ -2198,11 +2218,22 @@ covers the following modules:
   the foundational result that polynomial encoding faithfully
   captures bit-vector semantics. We define \texttt{BVExpr} (the
   subset of CBMC expressions handled by \texttt{to\_polynomial}:
-  constants, variables, $+$, $-$, $\times$, neg) and prove
+  constants, variables, $+$, $-$, $\times$, neg, plus the cast
+  operators \texttt{typecast} / \texttt{zero\_extend} /
+  \texttt{extract\_low} that the C++ encoding treats as
+  transparent at matching widths) and prove
   \texttt{toPolynomial\_eval}: for any environment $\varphi$,
   \texttt{MvPolynomial.eval} $\varphi$
   \texttt{(toPolynomial}\,$e\texttt{)} = e\texttt{.eval}\,\varphi$
-  in $\mathbb{Z}_{2^d}$. With \texttt{extract\_equation\_iff}
+  in $\mathbb{Z}_{2^d}$. The cross-width cases (zero-extend
+  from $d_\mathrm{in} \leq d_\mathrm{out}$; extract / narrowing
+  typecast from $d_\mathrm{out} \leq d_\mathrm{in}$) are handled
+  by a pair of preservation lemmas
+  (\texttt{cast\_value\_preserved\_across\_widths} and
+  \texttt{reduce\_value\_preserved\_across\_widths}) that show
+  the C++ \texttt{set\_bitwidth}-based bit-width bookkeeping
+  preserves the canonical representative. With
+  \texttt{extract\_equation\_iff}
   (an equation $\mathit{lhs} = \mathit{rhs}$ holds iff its
   encoded polynomial evaluates to $0$) and
   \texttt{encodeEquations\_satisfiable\_iff} (a system of
@@ -2295,8 +2326,8 @@ it witnesses; each implementation site carries a \texttt{PROOF:}
 comment naming the Lean theorem(s) that justify it. The full
 mapping is in \texttt{formal-proofs/TRACEABILITY.md}.
 
-\paragraph{Status summary.} Out of 39 mapping entries spanning
-12 Lean modules: all are fully mechanised with zero
+\paragraph{Status summary.} Out of 50 mapping entries spanning
+13 Lean modules: all are fully mechanised with zero
 \texttt{sorry} and zero project-internal axioms; the only
 axioms relied on are the standard mathlib trio
 (\texttt{propext}, \texttt{Classical.choice},
@@ -2455,7 +2486,7 @@ Bitwuzla, cvc5, and every bit-blasting configuration we tested
 time out on, and 5 DSP datapath equivalences with overflow
 cancellation that are decided in microseconds. Soundness is
 mechanised in Lean 4 with 109 theorems, zero \texttt{sorry},
-and zero project-internal axioms across 12 modules, with full
+and zero project-internal axioms across 13 modules, with full
 bi-directional traceability to every algorithm in
 \texttt{src/solvers/algebraic/} and four contributions prepared
 for Mathlib. The mechanisation effort
