@@ -51,3 +51,6 @@ name = "Karatsuba"
 
 [[lean_lib]]
 name = "BvDivPolyEncoding"
+
+[[lean_lib]]
+name = "IteCondPropagation"

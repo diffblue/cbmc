@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "smt2_parser.h"
 
-#include "smt2_format.h"
-
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
@@ -19,8 +17,50 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/mathematical_expr.h>
 #include <util/prefix.h>
 #include <util/range.h>
+#include <util/replace_symbol.h>
+
+#include "smt2_format.h"
 
 #include <numeric>
+
+/// Forward declaration: see definition near `bv_division`.
+static exprt apply_cond_eq_substitution(const exprt &cond, exprt expr);
+
+/// If `e` is a `let_exprt` whose body is an `if_exprt`, inline the
+/// let bindings into the body and return the resulting if_exprt;
+/// otherwise return `e` unchanged.
+///
+/// The smt2 parser wraps `bvudiv s t` and `bvurem s t` in
+/// `let_exprt({divisor}, t, if_exprt(eq(divisor, 0), all_ones,
+/// div_exprt(s, divisor)))` to avoid duplicating the divisor
+/// expression. For the parse-time push-through-ite rewrites
+/// (in `binary_predicate`) we want to see the let as transparent
+/// and distribute the surrounding equal/notequal/relational
+/// across the if branches. CBMC's bit-blaster has its own
+/// structural deduplication, so inlining the let at the top
+/// level does not duplicate work in the SAT layer.
+///
+/// Sound by alpha-equivalence: replacing each occurrence of a
+/// bound variable by its value preserves the expression's
+/// meaning in any model.
+static exprt unwrap_let_with_ite_body(const exprt &e)
+{
+  if(e.id() != ID_let || e.operands().size() != 2)
+    return e;
+  const auto &le = to_let_expr(e);
+  if(le.where().id() != ID_if || le.where().operands().size() != 3)
+    return e;
+  const auto &vars = le.binding().variables();
+  const auto &vals = le.values();
+  if(vars.size() != vals.size())
+    return e;
+  replace_symbolt rs;
+  for(std::size_t i = 0; i < vars.size(); ++i)
+    rs.set(vars[i], vals[i]);
+  exprt body = le.where();
+  rs(body);
+  return body;
+}
 
 smt2_tokenizert::tokent smt2_parsert::next_token()
 {
@@ -381,6 +421,70 @@ exprt smt2_parsert::binary_predicate(irep_idt id, const exprt::operandst &op)
     throw error("expression must have two operands");
 
   check_matching_operand_types(op);
+
+  // Push equal/notequal/relational through ite at parse time:
+  //   (= (ite c A B) X)        -> (ite c (= A X[c])      (= B X))
+  //   (= X (ite c A B))        -> (ite c (= X[c] A)      (= X B))
+  //   (distinct (ite c A B) X) -> (ite c (distinct A X[c]) (distinct B X))
+  //   (distinct X (ite c A B)) -> (ite c (distinct X[c] A) (distinct X B))
+  //   (le (ite c A B) X)       -> (ite c (le A X[c])     (le B X))
+  //   (le X (ite c A B))       -> (ite c (le X[c] A)     (le X B))
+  // and similarly for lt, ge, gt. X[c] is X with the if-condition's
+  // equalities substituted (apply_cond_eq_substitution). The
+  // substitution lets `bvudiv 0 t`, `bvmul t 0` and friends fire
+  // their parse-time rewrites in the true branch even when the
+  // equality came from the surrounding ite condition.
+  //
+  // Soundness: ite c T F equals T if c, F if ¬c, and the
+  // substitution is valid in the true branch where the equality
+  // holds. The relational predicates (le, lt, ge, gt) are
+  // pointwise: applying the predicate after the ite is the same
+  // as applying it inside both branches.
+  //
+  // Distribute only when exactly one side is an ite at the top
+  // level (avoid quadratic blow-up on (= ite ite)).
+  //
+  // PROOF: formal-proofs/IteCondPropagation.lean::eq_through_ite,
+  //        notequal_through_ite, le_through_ite, lt_through_ite.
+  if(
+    id == ID_equal || id == ID_notequal || id == ID_le || id == ID_lt ||
+    id == ID_ge || id == ID_gt)
+  {
+    // Unwrap any let-binding around an ite consistently on both
+    // sides, so that the LHS-else and RHS remain structurally
+    // comparable (distinct(X, X) -> FALSE) after distribution.
+    exprt op0_u = unwrap_let_with_ite_body(op[0]);
+    exprt op1_u = unwrap_let_with_ite_body(op[1]);
+    const bool lhs_is_ite = op0_u.id() == ID_if && op0_u.operands().size() == 3;
+    const bool rhs_is_ite = op1_u.id() == ID_if && op1_u.operands().size() == 3;
+    // Distribute on the lhs preferentially (and the rhs if the
+    // lhs is not an ite). When both sides are ites, the recursive
+    // call will distribute on the rhs in the inner predicates.
+    if(lhs_is_ite)
+    {
+      const auto &if_e = to_if_expr(op0_u);
+      auto true_rhs = apply_cond_eq_substitution(if_e.cond(), op1_u);
+      auto true_branch =
+        apply_cond_eq_substitution(if_e.cond(), if_e.true_case());
+      exprt::operandst true_op{true_branch, true_rhs};
+      exprt::operandst false_op{if_e.false_case(), op1_u};
+      auto true_eq = binary_predicate(id, true_op);
+      auto false_eq = binary_predicate(id, false_op);
+      return if_exprt(if_e.cond(), true_eq, false_eq);
+    }
+    if(rhs_is_ite)
+    {
+      const auto &if_e = to_if_expr(op1_u);
+      auto true_lhs = apply_cond_eq_substitution(if_e.cond(), op0_u);
+      auto true_branch =
+        apply_cond_eq_substitution(if_e.cond(), if_e.true_case());
+      exprt::operandst true_op{true_lhs, true_branch};
+      exprt::operandst false_op{op0_u, if_e.false_case()};
+      auto true_eq = binary_predicate(id, true_op);
+      auto false_eq = binary_predicate(id, false_op);
+      return if_exprt(if_e.cond(), true_eq, false_eq);
+    }
+  }
 
   return binary_predicate_exprt(op[0], id, op[1]);
 }
@@ -970,6 +1074,43 @@ exprt smt2_parsert::function_application()
 static std::optional<std::pair<exprt, exprt>>
 match_bvurem_letform(const exprt &e);
 
+/// If \p cond has the shape `(equal symbol constant)` (or its
+/// commuted form `(equal constant symbol)`), substitute occurrences
+/// of `symbol` in \p expr by `constant` and return the result.
+/// Otherwise return \p expr unchanged.
+///
+/// Used in the ite-distribution sites of `bv_division`, `bv_mod`,
+/// `bvmul_with_simplifications`, and the parse-time
+/// distinct/equal-through-ite rewrite to propagate the if-condition's
+/// equality into the true branch. Sound by ite semantics: when the
+/// condition holds, the true branch is selected and the equality
+/// holds at that point.
+///
+/// PROOF: formal-proofs/IteCondPropagation.lean::if_cond_propagation
+///        Soundness: ite c T F = ite c T[c] F where T[c] denotes
+///        T with the equalities entailed by c substituted into it.
+static exprt apply_cond_eq_substitution(const exprt &cond, exprt expr)
+{
+  if(cond.id() != ID_equal || cond.operands().size() != 2)
+    return expr;
+  const exprt &c0 = cond.operands()[0];
+  const exprt &c1 = cond.operands()[1];
+  auto try_sub = [&](const exprt &sym, const exprt &val) -> bool
+  {
+    if(sym.id() == ID_symbol && val.is_constant())
+    {
+      replace_symbolt rs;
+      rs.set(to_symbol_expr(sym), val);
+      rs(expr);
+      return true;
+    }
+    return false;
+  };
+  if(!try_sub(c0, c1))
+    try_sub(c1, c0);
+  return expr;
+}
+
 exprt smt2_parsert::bv_division(
   const exprt::operandst &operands,
   bool is_signed)
@@ -1076,7 +1217,13 @@ exprt smt2_parsert::bv_division(
   if(operands[1].id() == ID_if && operands[1].operands().size() == 3)
   {
     const auto &if_e = to_if_expr(operands[1]);
-    auto true_div = bv_division({operands[0], if_e.true_case()}, is_signed);
+    // Propagate the if-condition's equality into the true branch.
+    // E.g., `bvudiv s (ite (= s 0) X Y)` -> `ite (= s 0) (bvudiv 0 X) (bvudiv s Y)`,
+    // and the (bvudiv 0 X) sub-expression is then simplified by the
+    // 0/x rewrite at the recursive bv_division call.
+    auto true_op0 = apply_cond_eq_substitution(if_e.cond(), operands[0]);
+    auto true_op1 = apply_cond_eq_substitution(if_e.cond(), if_e.true_case());
+    auto true_div = bv_division({true_op0, true_op1}, is_signed);
     auto false_div = bv_division({operands[0], if_e.false_case()}, is_signed);
     return if_exprt(if_e.cond(), true_div, false_div);
   }
@@ -1152,7 +1299,9 @@ exprt smt2_parsert::bv_mod(const exprt::operandst &operands, bool is_signed)
   if(operands[1].id() == ID_if && operands[1].operands().size() == 3)
   {
     const auto &if_e = to_if_expr(operands[1]);
-    auto true_mod = bv_mod({operands[0], if_e.true_case()}, is_signed);
+    auto true_op0 = apply_cond_eq_substitution(if_e.cond(), operands[0]);
+    auto true_op1 = apply_cond_eq_substitution(if_e.cond(), if_e.true_case());
+    auto true_mod = bv_mod({true_op0, true_op1}, is_signed);
     auto false_mod = bv_mod({operands[0], if_e.false_case()}, is_signed);
     return if_exprt(if_e.cond(), true_mod, false_mod);
   }
@@ -1271,7 +1420,9 @@ exprt smt2_parsert::bvmul_with_simplifications(const exprt::operandst &op)
       if(y.id() == ID_if && y.operands().size() == 3)
       {
         const auto &if_e = to_if_expr(y);
-        auto true_mul = bvmul_with_simplifications({x, if_e.true_case()});
+        auto true_x = apply_cond_eq_substitution(if_e.cond(), x);
+        auto true_y = apply_cond_eq_substitution(if_e.cond(), if_e.true_case());
+        auto true_mul = bvmul_with_simplifications({true_x, true_y});
         auto false_mul = bvmul_with_simplifications({x, if_e.false_case()});
         return if_exprt(if_e.cond(), true_mul, false_mul);
       }

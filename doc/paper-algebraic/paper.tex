@@ -56,7 +56,7 @@ actual $N=256$ parameter, with cvc5 timing out at every
 $N \geq 4$; on commutativity, associativity, and overflow
 checking it is bitwidth-independent (BW=8 to 256, 2--5\,ms
 throughout) and matches Bitwuzla's word-level rewriting. Soundness is mechanised in
-Lean~4 with 117 theorems, zero \texttt{sorry}, and zero
+Lean~4 with 124 theorems, zero \texttt{sorry}, and zero
 project-internal axioms (out of which 64 are contract-level
 theorems referenced directly from the implementation source),
 including four candidates for Mathlib contribution; the
@@ -160,8 +160,8 @@ existential & relational              & overflow witness           & companion p
 
 \item \textbf{Mechanised soundness with formalisation-driven
   refinement.}
-  117 theorems in Lean~4 with zero \texttt{sorry} (62
-  contract-level, 53 helpers and lemmas), giving full
+  124 theorems in Lean~4 with zero \texttt{sorry} (62
+  contract-level, 58 helpers and lemmas), giving full
   bi-directional traceability to every algorithm in
   \texttt{src/solvers/algebraic/}. Four general-purpose results
   are contributed to Mathlib (the unit characterisation of
@@ -501,8 +501,8 @@ component along three axes:
   pass it as soft hints to the bit-blasting layer, avoiding
   duplicated exploration.
 
-\item \textbf{Formalisation-driven refinement.} 117 theorems in
-  Lean 4 with zero \texttt{sorry} (64 contract-level), four
+\item \textbf{Formalisation-driven refinement.} 124 theorems in
+  Lean 4 with zero \texttt{sorry} (66 contract-level), four
   Mathlib contribution candidates. Full bi-directional
   traceability to every algorithm in
   \texttt{src/solvers/algebraic/}.
@@ -562,7 +562,7 @@ would need to exist, but the polynomial $-1$ would be in $I$,
 triggering the unit check. The algorithm is sound (never falsely
 reports UNSAT) but incomplete (returns inconclusive when the basis
 contains only even constants).
-Full proof mechanised in Lean~4 (117 theorems, zero \texttt{sorry}),
+Full proof mechanised in Lean~4 (124 theorems, zero \texttt{sorry}),
 covering: (a)~unit characterisation in $\mathbb{Z}_{2^d}$ (odd
 $\Leftrightarrow$ unit, 2 is not a unit for $d \geq 1$),
 (b)~ideal preservation under S-polynomial computation and reduction,
@@ -2051,15 +2051,15 @@ $\mathtt{bvudiv}$/$\mathtt{bvurem}$ and over either operand of
 $\mathtt{bvmul}$, with recursion so simplifications cascade
 through ite trees. Each rewrite is formalised in
 \texttt{formal-proofs/DivisionRewrites.lean}.
-After these, our procedure solves three of the five 512-bit
+After these, our procedure solves four of the five 512-bit
 benchmarks. Two ($\mathtt{bw512\_7}$, $\mathtt{bw512\_15}$)
 share the rewrite-suite path with Bitwuzla's word-level
 preprocessor (1.18\,s and 0.02\,s vs.\ Bitwuzla's 1.49\,s and
 0.12\,s; on $\mathtt{bw512\_15}$ we now beat Bitwuzla, the
 $\mathtt{bvmul}$ folds collapsing the ite tree from upstream
 rewrites into a constant formula that SAT presolve refutes
-immediately). The third ($\mathtt{bw512\_1}$, 5.69\,s) lives in
-our \emph{algebraic} fragment after Phase 2: we extend
+immediately). Two ($\mathtt{bw512\_1}$, $\mathtt{bw512\_12}$)
+live in our \emph{algebraic} fragment after Phase 2: we extend
 \texttt{to\_polynomial} to recognise $\mathtt{bvudiv}$ and
 $\mathtt{bvurem}$ by introducing fresh polynomial variables
 $q$ and $r$ and adding the side equation
@@ -2069,18 +2069,24 @@ by the over-approximate polynomial system (when $t = 0$ the
 equation has $q$ free and $r = s$, matching the bit-level
 encoding for $\mathtt{bvurem}$ and over-approximating for
 $\mathtt{bvudiv}$, which is sound for UNSAT detection).
-Buchberger then refutes $\mathtt{bw512\_1}$ (the assertion
-$\mathtt{(bvadd}\ (\mathtt{bvnot}\ s)\ (\mathtt{bvurem}\ s\ t))$
-$\neq \mathtt{(bvnot}\ (\mathtt{bvmul}\ t\ (\mathtt{bvudiv}\ s\ t)))$
-reduces to $r + t \cdot q - s \neq 0$, which the side equation
-forces to $0$, and Rabinowitsch produces $-1 = 0$). Bitwuzla
-times out on this benchmark, so the polynomial encoding gives
-us a strict coverage advantage.
+Buchberger refutes $\mathtt{bw512\_1}$ in 5.69\,s. The fourth
+($\mathtt{bw512\_12}$, 0.12\,s) follows from a separate
+parse-time pipeline: pushing equality, disequality, and
+relational predicates through ite at parse time (with
+substitution of the if-condition's equality into the true
+branch), so that the assertion structurally collapses to a
+formula whose distinct argument is identical to its other
+operand and the SAT presolver refutes immediately. Bitwuzla
+times out on both $\mathtt{bw512\_1}$ and $\mathtt{bw512\_12}$,
+giving us a strict coverage advantage on those two.
 
-The remaining two benchmarks ($\mathtt{bw512\_12}$,
-$\mathtt{bw512\_14}$) time out for both solvers; closing that
-final gap is a research question for the SMT community rather
-than for Gr\"obner-basis scaling.
+The remaining benchmark ($\mathtt{bw512\_14}$) times out for
+both solvers; it has multiple chained $\mathtt{bvmul}$ /
+$\mathtt{bvudiv}$ nestings whose comparison structure
+($\mathtt{bvule}$ across overflow-sensitive products) requires
+QR-level reasoning beyond the polynomial-encoding scheme of
+Phase 2. Closing this final gap is a research question for the
+SMT community rather than for Gr\"obner-basis scaling.
 
 \textbf{Gate-level equivalence is a gap.} Our procedure is
 complete for the universal-equational fragment with polynomial
@@ -2344,8 +2350,8 @@ it witnesses; each implementation site carries a \texttt{PROOF:}
 comment naming the Lean theorem(s) that justify it. The full
 mapping is in \texttt{formal-proofs/TRACEABILITY.md}.
 
-\paragraph{Status summary.} Out of 53 mapping entries spanning
-16 Lean modules: all are fully mechanised with zero
+\paragraph{Status summary.} Out of 55 mapping entries spanning
+17 Lean modules: all are fully mechanised with zero
 \texttt{sorry} and zero project-internal axioms; the only
 axioms relied on are the standard mathlib trio
 (\texttt{propext}, \texttt{Classical.choice},
@@ -2503,8 +2509,8 @@ volume but to decide queries those solvers cannot decide at all
 Bitwuzla, cvc5, and every bit-blasting configuration we tested
 time out on, and 5 DSP datapath equivalences with overflow
 cancellation that are decided in microseconds. Soundness is
-mechanised in Lean 4 with 117 theorems, zero \texttt{sorry},
-and zero project-internal axioms across 16 modules, with full
+mechanised in Lean 4 with 124 theorems, zero \texttt{sorry},
+and zero project-internal axioms across 17 modules, with full
 bi-directional traceability to every algorithm in
 \texttt{src/solvers/algebraic/} and four contributions prepared
 for Mathlib. The mechanisation effort
