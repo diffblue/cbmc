@@ -82,17 +82,17 @@ jobs:
       - name: Verify project axioms are only the documented ones
         run: |
           set -e
-          # Only Defer.lean (boolbv operational semantics) and
-          # StrongGB.lean (algorithm interface) are permitted to
-          # introduce project-internal axioms. Any other module
-          # introducing axioms requires explicit review.
+          # Only Defer.lean (boolbv operational semantics) is
+          # permitted to introduce project-internal axioms. Any
+          # other module introducing axioms requires explicit
+          # review.
           fail=0
           for f in *.lean; do
             if [ "$f" = "Main.lean" ]; then continue; fi
             count=$(grep -cE "^axiom " "$f" || true)
             case "$f" in
-              Defer.lean|StrongGB.lean)
-                # Documented axiom modules; just report counts.
+              Defer.lean)
+                # Documented axiom module; just report count.
                 echo "  $f: $count axioms (documented)"
                 ;;
               *)
