@@ -205,6 +205,28 @@ private:
   /// calls return polynomials wrapping the cached bit variables.
   std::map<std::size_t, std::vector<std::size_t>> bit_decomp_cache;
 
+  /// bvudiv/bvurem polynomial encoding cache (Phase 2). Maps a
+  /// canonical (s, t) operand pair to the fresh polynomial-variable
+  /// indices `(q_idx, r_idx)` introduced for `bvudiv s t` and
+  /// `bvurem s t`. Both operations on the same operands share the
+  /// same q, r and the side equation `q*t + r - s = 0` is added
+  /// only once.
+  ///
+  /// Soundness: in any model of the SMT formula, setting
+  /// `q := bvudiv s t` and `r := bvurem s t` satisfies the
+  /// polynomial equation. When `t = 0` the equation `0 + r - s = 0`
+  /// forces `r = s` (matching SMT-LIB-2 `bvurem s 0 = s`) and `q`
+  /// is unconstrained at the polynomial level. The polynomial
+  /// abstraction is therefore over-approximate (the polynomial
+  /// system has more solutions than the SMT formula), which is
+  /// sound for UNSAT detection.
+  ///
+  /// PROOF: formal-proofs/BvDivPolyEncoding.lean::
+  ///        bvdiv_polynomial_correct,
+  ///        bvdiv_polynomial_overapprox.
+  std::map<std::pair<exprt, exprt>, std::pair<std::size_t, std::size_t>>
+    bvdiv_qr_cache;
+
   /// Polynomial-form → host variable index cache. When
   /// decompose_bits is called on a compound expression that
   /// reduces to a polynomial that has been seen before (e.g.,

@@ -53,6 +53,8 @@ implementation site with one or more Lean theorems.
 | `smt2_parser.cpp::bv_division` (cancellation: bvudiv (bvurem A y) y) | `DivisionRewrites.lean::bvudiv_bvurem_self` | DONE |
 | `smt2_parser.cpp::bvmul_with_simplifications` (ite-distribution + folding) | `DivisionRewrites.lean::bvmul_ite_distribution`, `bvmul_zero_right`, `bvmul_one_right`, `bvmul_neg_one_right` | DONE |
 | `poly_ring.cpp::karatsuba_multiply` (Karatsuba 3-mult identity) | `Karatsuba.lean::karatsuba_identity`, `karatsuba_multiply_correct` | DONE |
+| `poly_extract.cpp::to_polynomial` (bvudiv/bvurem polynomial encoding) | `BvDivPolyEncoding.lean::bvdiv_bvurem_polynomial_eq`, `bvurem_zero_polynomial_eq`, `bvdiv_polynomial_overapprox` | DONE |
+| `poly_extract.cpp::to_polynomial` (bvnot direct algebraic form) | `BvDivPolyEncoding.lean::bvnot_eq_neg_one_sub` | DONE |
 | `poly_extract.cpp::extract_predicate` (power-of-2 upper bound) | `SubgoalSix.lean::bvult_pow2_implies_high_bits_zero` | DONE |
 | `poly_extract.cpp::extract_predicate` (lower bound 2^d - 2^k) | `SubgoalSix.lean::bvuge_2d_minus_2k_implies_high_bits_one` | DONE |
 | `poly_extract.cpp::extract_predicate` (bit-comparator chain) | `SubgoalSix.lean::chainLtBool_correctness` | DONE |

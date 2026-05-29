@@ -7,6 +7,7 @@
 #include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
 #include <util/mp_arith.h>
+#include <util/replace_symbol.h>
 #include <util/std_expr.h>
 
 bool poly_extractort::set_bitwidth(const typet &type)
@@ -322,10 +323,38 @@ std::optional<polynomialt> poly_extractort::to_polynomial_impl(const exprt &e)
 
   // Bitwise NOT: ~a = sum_i 2^i (1 - b_{a,i}).
   // Sound via bit-decomposition (same construction as bvlshr).
+  //
+  // Algebraic shortcut: in ZMod (2^d), bvnot a = -1 - a holds as a
+  // ring identity (the all-ones constant equals -1 in the canonical
+  // representative). When `a` is itself polynomial we return the
+  // direct form `(2^d - 1) - to_polynomial(a)` and skip the bit
+  // decomposition; this avoids introducing 2*d extra equations
+  // (idempotency + sum decomposition for d bits) that Buchberger
+  // would otherwise have to reduce through, which empirically is
+  // the bottleneck for queries that mention bvnot only at the
+  // "top level" of an arithmetic expression (e.g. the bw=512
+  // VMCAI rewrite-rule candidate family).
+  //
+  // PROOF: formal-proofs/Encoding.lean::bvnot_eq_neg_one_sub
+  //        Soundness: in ZMod (2^d), `~a = (2^d - 1) - a` holds as
+  //        a ring identity for any `a`.
   if(e.id() == ID_bitnot && e.operands().size() == 1)
   {
     if(!set_bitwidth(e.type()))
       return std::nullopt;
+    if(auto inner = to_polynomial(e.operands()[0]))
+    {
+      // Re-anchor bitwidth (recursive call may have overwritten).
+      if(!set_bitwidth(e.type()))
+        return std::nullopt;
+      const unsigned d = bitwidth;
+      const mp_integer all_ones = power(mp_integer{2}, mp_integer{d}) - 1;
+      polynomialt result{d, all_ones};
+      result = result - *inner;
+      return result;
+    }
+    // Fall through to bit-decomposition only when the operand
+    // could not be expressed as a polynomial directly.
     auto bits = decompose_bits(e.operands()[0]);
     if(!bits)
       return std::nullopt;
@@ -435,6 +464,150 @@ std::optional<polynomialt> poly_extractort::to_polynomial_impl(const exprt &e)
   // (The 0/1 constraint is not added — the Gröbner basis treats it
   // as a free variable. This is sound for UNSAT checking because
   // if the system is UNSAT for free variables, it's UNSAT for 0/1.)
+
+  // let-binding: inline the bound symbols in the body, then recurse.
+  // Used to unwrap the SMT-LIB bvudiv/bvurem parse-shape, which the
+  // smt2 parser emits as
+  //
+  //   let_exprt({divisor}, t,
+  //     if_exprt(equal(divisor, 0), all_ones, div_exprt(s, divisor)))
+  //
+  // After inlining, the let-body is a syntactic if-tree with the
+  // div_exprt / mod_exprt visible at the leaf, which the
+  // bvudiv-via-fresh-variables encoding below can recognise.
+  //
+  // Sound by alpha-equivalence: replacing every occurrence of a
+  // bound variable by its bound value preserves the expression's
+  // value in any model.
+  if(e.id() == ID_let && e.operands().size() == 2)
+  {
+    const auto &le = to_let_expr(e);
+    const auto &vars = le.binding().variables();
+    const auto &vals = le.values();
+    if(vars.size() != vals.size())
+      return std::nullopt;
+    replace_symbolt rs;
+    for(std::size_t i = 0; i < vars.size(); ++i)
+      rs.set(vars[i], vals[i]);
+    exprt body = le.where();
+    rs(body);
+    return to_polynomial(body);
+  }
+
+  // bvudiv s t / bvurem s t: introduce fresh polynomial variables
+  // q (for the quotient) and r (for the remainder), share them
+  // across both operations on the same operands, and add the
+  // polynomial side equation
+  //
+  //     q * t + r - s = 0    in ZMod (2^d)
+  //
+  // No range constraint is added at the polynomial level: the SMT
+  // semantics enforces 0 <= r < t when t != 0 via the bit-blasted
+  // encoding of the original bvurem expression. The polynomial
+  // abstraction is over-approximate (when t = 0 the equation has
+  // q free, while the SMT-LIB semantics fixes bvudiv s 0 = ~0),
+  // which is sound for UNSAT detection.
+  //
+  // For the bw=512 family this is precisely what's needed: bw512_1
+  // asserts a polynomial identity in s, t, bvudiv s t, bvurem s t
+  // that is implied by `q*t + r - s = 0` and so reduces to 0 in
+  // the polynomial ideal. Buchberger refutes via Rabinowitsch in
+  // a single S-poly step.
+  //
+  // PROOF: formal-proofs/BvDivPolyEncoding.lean::
+  //        bvdiv_bvurem_polynomial_eq.
+  //        Soundness of the polynomial encoding: for any s, t in
+  //        ZMod (2^d), setting q = bvudiv s t and r = bvurem s t
+  //        satisfies q*t + r - s = 0 (with the SMT-LIB convention
+  //        bvurem s 0 = s, bvudiv s 0 = ~0).
+  if((e.id() == ID_div || e.id() == ID_mod) && e.operands().size() == 2)
+  {
+    if(!set_bitwidth(e.type()))
+      return std::nullopt;
+    const auto &s_expr = e.operands()[0];
+    const auto &t_expr = e.operands()[1];
+    auto s_poly = to_polynomial(s_expr);
+    auto t_poly = to_polynomial(t_expr);
+    if(!s_poly || !t_poly)
+      return std::nullopt;
+    // set_bitwidth may have been overwritten by the recursive
+    // calls above; re-anchor it to the outer expression's type.
+    if(!set_bitwidth(e.type()))
+      return std::nullopt;
+    const unsigned bw = bitwidth;
+    auto key = std::make_pair(s_expr, t_expr);
+    auto it = bvdiv_qr_cache.find(key);
+    std::size_t q_idx, r_idx;
+    if(it == bvdiv_qr_cache.end())
+    {
+      q_idx = get_var_index("__bvdiv_q_" + std::to_string(next_fresh++));
+      r_idx = get_var_index("__bvdiv_r_" + std::to_string(next_fresh++));
+      bvdiv_qr_cache.emplace(std::move(key), std::make_pair(q_idx, r_idx));
+      polynomialt q_var{bw, mp_integer{1}, q_idx};
+      polynomialt r_var{bw, mp_integer{1}, r_idx};
+      polynomialt qt = q_var * (*t_poly);
+      polynomialt eq = qt + r_var - *s_poly;
+      eq.normalize();
+      side_equations.push_back(std::move(eq));
+    }
+    else
+    {
+      q_idx = it->second.first;
+      r_idx = it->second.second;
+    }
+    return e.id() == ID_div ? polynomialt{bw, mp_integer{1}, q_idx}
+                            : polynomialt{bw, mp_integer{1}, r_idx};
+  }
+
+  // SMT-LIB bvudiv/bvurem parse-shape recogniser:
+  //   if_exprt(equal(t, 0), all_ones, div_exprt(s, t))    -> q
+  //   if_exprt(equal(t, 0), s,        mod_exprt(s, t))    -> r
+  // The smt2 parser emits this shape via a let-binding to avoid
+  // duplicating the divisor (the let is inlined above). The shape
+  // captures SMT-LIB's "div/rem by 0 returns ~0/dividend"
+  // convention, which the polynomial encoding does not need to
+  // model explicitly: at t = 0 the side equation
+  // q*t + r - s = 0 has q free and r = s (matching SMT-LIB
+  // bvurem 0 = dividend); at t != 0 the polynomial system pins
+  // q = bvudiv, r = bvurem.
+  if(e.id() == ID_if && e.operands().size() == 3)
+  {
+    const auto &if_e = to_if_expr(e);
+    const auto &cond = if_e.cond();
+    if(cond.id() == ID_equal && cond.operands().size() == 2)
+    {
+      // Identify which side is the constant 0.
+      const auto &c0 = cond.operands()[0];
+      const auto &c1 = cond.operands()[1];
+      auto v0 = numeric_cast<mp_integer>(c0);
+      auto v1 = numeric_cast<mp_integer>(c1);
+      bool is_eq_zero =
+        (v0.has_value() && *v0 == 0) || (v1.has_value() && *v1 == 0);
+      const exprt &t_expr = (v0.has_value() && *v0 == 0) ? c1 : c0;
+      if(is_eq_zero)
+      {
+        // bvudiv shape: true_case = all_ones, false_case = div(s, t).
+        const auto &false_case = if_e.false_case();
+        if(
+          false_case.id() == ID_div && false_case.operands().size() == 2 &&
+          false_case.operands()[1] == t_expr)
+        {
+          // Recurse on the div_exprt directly. The polynomial
+          // encoding does not depend on the t = 0 branch.
+          return to_polynomial(false_case);
+        }
+        // bvurem shape: true_case = s (the dividend),
+        //               false_case = mod(s, t).
+        if(
+          false_case.id() == ID_mod && false_case.operands().size() == 2 &&
+          false_case.operands()[1] == t_expr &&
+          if_e.true_case() == false_case.operands()[0])
+        {
+          return to_polynomial(false_case);
+        }
+      }
+    }
+  }
 
   // Anything else (bitwise ops, shifts, division, etc.) is non-polynomial
   return std::nullopt;

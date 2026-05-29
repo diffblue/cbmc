@@ -48,3 +48,6 @@ name = "DivisionRewrites"
 
 [[lean_lib]]
 name = "Karatsuba"
+
+[[lean_lib]]
+name = "BvDivPolyEncoding"
