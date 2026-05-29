@@ -158,14 +158,15 @@ bvt float_utilst::build_constant(const ieee_float_valuet &src)
 /// that method for the full algorithmic description). The two
 /// implementations are line-for-line translations between the `exprt` API
 /// and the `literalt`/`bvt` API; keep them in lockstep when changing the
-/// rounding tables.
+/// rounding logic.
 ///
-/// The encoding builds an `f`-deep `bv_utils.select` cascade where each
-/// branch contains an `f`-bit adder, giving an O(f^2) circuit size. For
-/// `double` (f=52) that is roughly a 25× growth in node count over the
-/// prior add-magic-subtract-magic formulation. A loop-free formulation
-/// using a single barrel-shifted mask plus a variable-position increment
-/// is plausible as a follow-up.
+/// The encoding builds an O(1)-deep computation at the bvt level — a
+/// constant number of variable-amount shifts, masks, and a single adder,
+/// all at width `spec.width()`. The bit-blasting layer expands the
+/// variable-amount shifts into O(log f)-depth circuits. This replaces an
+/// earlier formulation that built an f-deep `bv_utils.select` cascade
+/// (one branch per possible biased exponent), which was O(f^2) in
+/// circuit size.
 bvt float_utilst::round_to_integral(const bvt &src)
 {
   PRECONDITION(src.size() == spec.width());
@@ -175,7 +176,8 @@ bvt float_utilst::round_to_integral(const bvt &src)
     prop.lor({unpacked.zero, unpacked.NaN, unpacked.infinity});
 
   // If unbiased exponent >= f, the number is already integral.
-  const bvt f_const = bv_utils.build_constant(spec.f, unpacked.exponent.size());
+  const std::size_t exp_width = unpacked.exponent.size();
+  const bvt f_const = bv_utils.build_constant(spec.f, exp_width);
   const literalt exp_ge_f =
     !bv_utils.signed_less_than(unpacked.exponent, f_const);
 
@@ -204,7 +206,7 @@ bvt float_utilst::round_to_integral(const bvt &src)
   const literalt abs_gt_half = prop.land(exp_ge_bm1, !abs_eq_half);
 
   // clang-format off
-  const literalt round_up = prop.lselect(
+  const literalt round_up_lt1 = prop.lselect(
     rounding_mode_bits.round_to_even, abs_gt_half,
     prop.lselect(rounding_mode_bits.round_to_away,
       prop.lor(abs_gt_half, abs_eq_half),
@@ -215,52 +217,81 @@ bvt float_utilst::round_to_integral(const bvt &src)
       const_literal(false)))));
   // clang-format on
 
-  bvt result = bv_utils.select(round_up, signed_one, signed_zero);
+  const bvt result_lt1 = bv_utils.select(round_up_lt1, signed_one, signed_zero);
 
-  // For each unbiased exponent 0..f-1 (biased: bias..bias+f-1):
-  for(std::size_t eu = 0; eu < static_cast<std::size_t>(spec.f); eu++)
-  {
-    const mp_integer be = eu + spec.bias();
-    const std::size_t drop = spec.f - eu;
+  // |x| >= 1 branch: barrel-shifter formulation.
+  //
+  // drop = f - max(0, unbiased_exp). For unbiased_exp >= f, the result is
+  // overridden by `exp_ge_f -> src`; for unbiased_exp < 0, overridden by
+  // the |x| < 1 branch above. So in the path where this matters,
+  // drop ∈ [1, f].
+  const std::size_t width = spec.width();
+  const literalt unbiased_neg = bv_utils.signed_less_than(
+    unpacked.exponent, bv_utils.build_constant(0, exp_width));
+  const bvt unbiased_clamped_lo = bv_utils.select(
+    unbiased_neg, bv_utils.build_constant(0, exp_width), unpacked.exponent);
+  const bvt drop_exp_width = bv_utils.sub(
+    bv_utils.build_constant(spec.f, exp_width), unbiased_clamped_lo);
+  const bvt drop = bv_utils.zero_extension(drop_exp_width, width);
 
-    // Mask: clear bottom 'drop' bits
-    bvt masked = src;
-    for(std::size_t i = 0; i < drop; i++)
-      masked[i] = const_literal(false);
+  const bvt one_bv = bv_utils.build_constant(1, width);
 
-    // Round bit, sticky bit, least kept bit
-    const literalt rbit = src[drop - 1];
-    literalt sticky = const_literal(false);
-    for(std::size_t i = 0; i + 1 < drop; i++)
-      sticky = prop.lor(sticky, src[i]);
-    const literalt lsb = src[drop];
+  // masked = (src >> drop) << drop
+  const bvt shifted_right =
+    bv_utils.shift(src, bv_utilst::shiftt::SHIFT_LRIGHT, drop);
+  const bvt masked =
+    bv_utils.shift(shifted_right, bv_utilst::shiftt::SHIFT_LEFT, drop);
 
-    // clang-format off
-    const literalt inc = prop.lselect(
-      rounding_mode_bits.round_to_even,
-        prop.land(rbit, prop.lor(lsb, sticky)),
-      prop.lselect(rounding_mode_bits.round_to_away, rbit,
-      prop.lselect(rounding_mode_bits.round_to_plus_inf,
-        prop.land(!unpacked.sign, prop.lor(rbit, sticky)),
-      prop.lselect(rounding_mode_bits.round_to_minus_inf,
-        prop.land(unpacked.sign, prop.lor(rbit, sticky)),
-        const_literal(false)))));
-    // clang-format on
+  // rbit = bit (drop - 1) of src; obtained by shifting right by drop-1
+  // and reading the LSB. When drop == 0 (only on the exp_ge_f path) the
+  // value is irrelevant since the final select picks `src`.
+  const bvt drop_m1 = bv_utils.sub(drop, one_bv);
+  const bvt shifted_to_rbit =
+    bv_utils.shift(src, bv_utilst::shiftt::SHIFT_LRIGHT, drop_m1);
+  const literalt rbit = shifted_to_rbit[0];
 
-    // Increment: add 1 at position `drop`. The add runs on the full packed
-    // representation, so for the largest in-loop biased exponent
-    // (`bias + f - 1`) a fraction-bit carry can propagate into the exponent
-    // bits and bump the biased exponent to `bias + f`. That is intentional
-    // and bounded — `bias + f` stays well below the NaN/Inf range
-    // (`2*bias + 1`), so no saturation is needed.
-    const bvt inc_val = bv_utils.build_constant(power(2, drop), spec.width());
-    const bvt incremented = bv_utils.add(masked, inc_val);
-    const bvt branch = bv_utils.select(inc, incremented, masked);
+  // lsb = bit (drop) of src
+  const literalt lsb = shifted_right[0];
 
-    const bvt be_const = bv_utils.build_constant(be, spec.e);
-    const literalt match = bv_utils.equal(biased_exp, be_const);
-    result = bv_utils.select(match, branch, result);
-  }
+  // sticky = OR of bits 0..(drop-2) of src.
+  // Push those bits into the top of a width-bit value via a left shift
+  // by `width + 1 - drop`, then test for non-zero. The round bit
+  // (position drop-1) is shifted out; bits at and above drop are also
+  // out.
+  const bvt width_p1 = bv_utils.build_constant(width + 1, width);
+  const bvt sticky_shift_amount = bv_utils.sub(width_p1, drop);
+  const bvt sticky_pushed =
+    bv_utils.shift(src, bv_utilst::shiftt::SHIFT_LEFT, sticky_shift_amount);
+  const literalt sticky = !bv_utils.is_zero(sticky_pushed);
+
+  // clang-format off
+  const literalt inc = prop.lselect(
+    rounding_mode_bits.round_to_even,
+      prop.land(rbit, prop.lor(lsb, sticky)),
+    prop.lselect(rounding_mode_bits.round_to_away, rbit,
+    prop.lselect(rounding_mode_bits.round_to_plus_inf,
+      prop.land(!unpacked.sign, prop.lor(rbit, sticky)),
+    prop.lselect(rounding_mode_bits.round_to_minus_inf,
+      prop.land(unpacked.sign, prop.lor(rbit, sticky)),
+      const_literal(false)))));
+  // clang-format on
+
+  // Increment by `1 << drop`. The add runs on the full packed
+  // representation, so a fraction-bit carry can propagate into the
+  // exponent bits, bumping the biased exponent by one. That is
+  // intentional and bounded: at the largest relevant biased exponent
+  // (`bias + f - 1`), the result reaches `bias + f`, which still stays
+  // well below the NaN/Inf range (`2*bias + 1`), so no saturation is
+  // needed.
+  const bvt inc_val =
+    bv_utils.shift(one_bv, bv_utilst::shiftt::SHIFT_LEFT, drop);
+  const bvt incremented = bv_utils.add(masked, inc_val);
+  const bvt result_ge1 = bv_utils.select(inc, incremented, masked);
+
+  // Select between the two branches by exponent magnitude.
+  const bvt bias_e = bv_utils.build_constant(spec.bias(), spec.e);
+  const literalt abs_lt_1 = bv_utils.unsigned_less_than(biased_exp, bias_e);
+  const bvt result = bv_utils.select(abs_lt_1, result_lt1, result_ge1);
 
   return bv_utils.select(prop.lor(is_special, exp_ge_f), src, result);
 }
