@@ -972,6 +972,43 @@ exprt smt2_parsert::bv_division(
   if(operands.size() != 2)
     throw error() << "bitvector division expects two operands";
 
+  // Word-level simplifications recognised before bit-blasting:
+  //
+  //   (bvudiv/bvsdiv x x) =
+  //     (ite (= x 0) (bvnot 0) 1)
+  //   (bvudiv/bvsdiv 0 x) =
+  //     (ite (= x 0) (bvnot 0) 0)
+  //
+  // Both are correct under SMT-LIB-2 semantics (division by zero
+  // yields all-ones; otherwise standard division), and apply
+  // identically for signed and unsigned: x/x = 1 for x != 0 in
+  // 2's-complement (including x = MIN, since MIN/MIN = 1 with no
+  // overflow), and 0/x = 0 for x != 0 regardless of sign.
+  //
+  // Recognising these patterns at parse time avoids constructing
+  // a full divider in the downstream bit-blasted form: at high
+  // bitwidth the divider is the dominant cost, and the conditional
+  // form here is decided by the SAT solver in roughly constant time.
+  // Two of the five 512-bit "rw_rule_candidate" benchmarks in the
+  // SMT-COMP QF_BV stratified sample reduce to trivial after this
+  // rewrite (matching Bitwuzla's word-level simplification).
+  {
+    const auto all_ones = to_unsignedbv_type(operands[0].type()).largest_expr();
+    const auto zero = from_integer(0, operands[0].type());
+    const auto one = from_integer(1, operands[0].type());
+    const auto divisor_is_zero =
+      equal_exprt(operands[1], from_integer(0, operands[1].type()));
+
+    // (bvudiv/bvsdiv x x): syntactic identity check
+    if(operands[0] == operands[1])
+      return if_exprt(divisor_is_zero, all_ones, one);
+
+    // (bvudiv/bvsdiv 0 x): numerator is the constant 0
+    auto num_value = numeric_cast<mp_integer>(operands[0]);
+    if(num_value.has_value() && *num_value == 0)
+      return if_exprt(divisor_is_zero, all_ones, zero);
+  }
+
   // SMT-LIB2 defines the result of division by 0 to be 1....1
   auto divisor = symbol_exprt("divisor", operands[1].type());
   auto divisor_is_zero = equal_exprt(divisor, from_integer(0, divisor.type()));
@@ -998,6 +1035,29 @@ exprt smt2_parsert::bv_mod(const exprt::operandst &operands, bool is_signed)
 {
   if(operands.size() != 2)
     throw error() << "bitvector modulo expects two operands";
+
+  // Word-level simplifications recognised before bit-blasting:
+  //
+  //   (bvurem/bvsrem/bvsmod x x) = 0
+  //   (bvurem/bvsrem/bvsmod 0 x) = 0
+  //
+  // Both reduce to a constant 0:
+  //   - x mod x = 0 for x != 0; for x = 0, SMT-LIB defines
+  //     bvurem/bvsrem to return the dividend (here = x = 0).
+  //     bvsmod has different sign handling but still returns 0
+  //     when dividend = divisor.
+  //   - 0 mod x = 0 for x != 0; for x = 0, SMT-LIB returns the
+  //     dividend (here = 0).
+  //
+  // Recognising these patterns at parse time avoids constructing
+  // a full divider/remainder in the downstream bit-blasted form,
+  // matching the rewrite story for bv_division above.
+  {
+    auto num_value = numeric_cast<mp_integer>(operands[0]);
+    bool num_is_zero = num_value.has_value() && *num_value == 0;
+    if(operands[0] == operands[1] || num_is_zero)
+      return from_integer(0, operands[0].type());
+  }
 
   // SMT-LIB2 defines the result of "lhs modulo 0" to be "lhs"
   auto dividend = symbol_exprt("dividend", operands[0].type());
