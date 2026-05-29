@@ -3157,6 +3157,83 @@ exprt cpp_typecheck_resolvet::resolve(
   if(!qualified && !fargs.has_object)
     resolve_with_arguments(id_set, base_name, fargs);
 
+  // Apply the [class.member.lookup]/4 hiding rule to the combined
+  // candidate set: if the set contains members declared in distinct
+  // classes B and D, and D derives (directly or transitively) from B,
+  // then D's member hides B's same-named member — drop the B entry.
+  //
+  // CBMC's resolve_with_arguments above conservatively also adds
+  // members of associated classes to the ADL candidate set (which is
+  // not strictly correct per [basic.lookup.argdep] — only friends
+  // declared inside an associated class participate in ADL).  Once
+  // that conservative addition has happened, the same hiding rule
+  // applies and produces the answer the standard requires.
+  //
+  // Skip filtering when the lookup is qualified (`B::name`) — in that
+  // case the user has explicitly requested the base-class member.
+  if(!qualified && id_set.size() >= 2)
+  {
+    auto is_base_of =
+      [&](const irep_idt &base, const irep_idt &derived) -> bool
+    {
+      if(base.empty() || derived.empty() || base == derived)
+        return false;
+      std::set<irep_idt> visited;
+      std::vector<irep_idt> todo{derived};
+      while(!todo.empty())
+      {
+        irep_idt d = todo.back();
+        todo.pop_back();
+        if(!visited.insert(d).second)
+          continue;
+        const symbolt *sym = cpp_typecheck.symbol_table.lookup(d);
+        if(sym == nullptr)
+          continue;
+        const irept &bases = sym->type.find(ID_bases);
+        for(const auto &b : bases.get_sub())
+        {
+          const typet &bt = static_cast<const typet &>(b.find(ID_type));
+          if(bt.id() != ID_struct_tag)
+            continue;
+          const irep_idt &bid = to_struct_tag_type(bt).get_identifier();
+          if(bid == base)
+            return true;
+          todo.push_back(bid);
+        }
+      }
+      return false;
+    };
+    cpp_scopest::id_sett filtered;
+    for(auto *cand : id_set)
+    {
+      const irep_idt &cand_class = cand->class_identifier;
+      if(cand_class.empty())
+      {
+        filtered.insert(cand);
+        continue;
+      }
+      bool hidden = false;
+      for(auto *other : id_set)
+      {
+        if(other == cand)
+          continue;
+        const irep_idt &other_class = other->class_identifier;
+        if(other_class.empty() || other_class == cand_class)
+          continue;
+        // Drop `cand` if its declaring class is a base of `other`'s.
+        if(is_base_of(cand_class, other_class))
+        {
+          hidden = true;
+          break;
+        }
+      }
+      if(!hidden)
+        filtered.insert(cand);
+    }
+    if(!filtered.empty() && filtered.size() < id_set.size())
+      id_set.swap(filtered);
+  }
+
   if(id_set.empty() && qualified)
   {
     // The scope might be an un-elaborated template class instance.
