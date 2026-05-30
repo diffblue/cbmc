@@ -1140,14 +1140,14 @@ struct operator_entryt
   const char *op_name;
 } const operators[] = {
   {ID_plus, "+"},        {ID_minus, "-"},       {ID_mult, "*"},
-  {ID_div, "/"},         {ID_bitnot, "~"},      {ID_bitand, "&"},
-  {ID_bitor, "|"},       {ID_bitxor, "^"},      {ID_not, "!"},
-  {ID_unary_minus, "-"}, {ID_and, "&&"},        {ID_or, "||"},
-  {ID_not, "!"},         {ID_index, "[]"},      {ID_equal, "=="},
-  {ID_lt, "<"},          {ID_le, "<="},         {ID_gt, ">"},
-  {ID_ge, ">="},         {ID_spaceship, "<=>"}, {ID_shl, "<<"},
-  {ID_shr, ">>"},        {ID_notequal, "!="},   {ID_dereference, "*"},
-  {ID_ptrmember, "->"},  {irep_idt(), nullptr}};
+  {ID_div, "/"},         {ID_mod, "%"},         {ID_bitnot, "~"},
+  {ID_bitand, "&"},      {ID_bitor, "|"},       {ID_bitxor, "^"},
+  {ID_not, "!"},         {ID_unary_minus, "-"}, {ID_and, "&&"},
+  {ID_or, "||"},         {ID_not, "!"},         {ID_index, "[]"},
+  {ID_equal, "=="},      {ID_lt, "<"},          {ID_le, "<="},
+  {ID_gt, ">"},          {ID_ge, ">="},         {ID_spaceship, "<=>"},
+  {ID_shl, "<<"},        {ID_shr, ">>"},        {ID_notequal, "!="},
+  {ID_dereference, "*"}, {ID_ptrmember, "->"},  {irep_idt(), nullptr}};
 
 bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
 {
@@ -1260,61 +1260,96 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
         const irep_idt &struct_identifier =
           to_multi_ary_expr(expr).op0().type().get(ID_identifier);
 
-        // get that scope
-        cpp_save_scopet save_scope(cpp_scopes);
-        cpp_scopes.set_scope(struct_identifier);
-
-        // build fargs for resolver
-        cpp_typecheck_fargst fargs;
-        fargs.operands=expr.operands();
-        fargs.has_object=true;
-        fargs.in_use=true;
-
-        // should really be a qualified search
-        exprt resolve_result=resolve(
-          cpp_name, cpp_typecheck_resolvet::wantt::VAR, fargs, false);
-
-        if(resolve_result.is_not_nil())
+        // [over.match.oper]/3.2: the SET OF MEMBER CANDIDATES is
+        // the result of a qualified lookup of `T1::operator@`.
+        // CBMC's `resolve` performs RECURSIVE name lookup that
+        // walks parent scopes when no match is found in the struct
+        // scope, so a free `operator@` declared at file scope
+        // (e.g., `BigInt operator%(const BigInt &,
+        // const BigInt &)` in `bigint.hh`) would be returned here
+        // even though T1 (BigInt) does not declare it as a member.
+        // The downstream synthesis of `a.operator@(b)` then
+        // produces a malformed member-call and the 2nd-option
+        // (free-function) path is never reached, surfacing as
+        //   conversion from 'const struct BigInt' to 'struct BigInt':
+        //   implicit arithmetic conversion not permitted
+        // for any free `operator@` between two `BigInt` operands
+        // when one of them has a corresponding `operator@=` member
+        // (which is the typical ADT pattern).  Skip the 1st option
+        // entirely if T1 does not declare the operator as a member.
+        bool has_member_op = false;
+        const struct_typet &class_type =
+          follow_tag(struct_tag_typet{struct_identifier});
+        for(const auto &c : class_type.components())
         {
-          // Found! We turn op(a, b, ...) into a.op(b, ...)
-          exprt member(ID_member);
-          member.add(ID_component_cpp_name) = cpp_name;
-
-          member.copy_to_operands(
-            already_typechecked_exprt{to_multi_ary_expr(expr).op0()});
-
-          side_effect_expr_function_callt function_call(
-            std::move(member),
-            {},
-            uninitialized_typet{},
-            expr.source_location());
-          function_call.arguments().reserve(expr.operands().size());
-
-          if(expr.operands().size()>1)
+          if(c.get_bool(ID_from_base))
+            continue;
+          if(c.get_base_name() == op_name)
           {
-            // skip first
-            for(exprt::operandst::const_iterator
-                it=expr.operands().begin()+1;
-                it!=expr.operands().end();
-                it++)
-              function_call.arguments().push_back(*it);
+            has_member_op = true;
+            break;
           }
+        }
 
-          typecheck_side_effect_function_call(function_call);
+        if(has_member_op)
+        {
+          // get that scope
+          cpp_save_scopet save_scope(cpp_scopes);
+          cpp_scopes.set_scope(struct_identifier);
 
-          if(expr.id() == ID_ptrmember)
+          // build fargs for resolver
+          cpp_typecheck_fargst fargs;
+          fargs.operands = expr.operands();
+          fargs.has_object = true;
+          fargs.in_use = true;
+
+          // should really be a qualified search
+          exprt resolve_result =
+            resolve(cpp_name, cpp_typecheck_resolvet::wantt::VAR, fargs, false);
+
+          if(resolve_result.is_not_nil())
           {
-            add_implicit_dereference(function_call);
-            already_typechecked_exprt::make_already_typechecked(function_call);
-            to_multi_ary_expr(expr).op0().swap(function_call);
-            typecheck_expr(expr);
+            // Found! We turn op(a, b, ...) into a.op(b, ...)
+            exprt member(ID_member);
+            member.add(ID_component_cpp_name) = cpp_name;
+
+            member.copy_to_operands(
+              already_typechecked_exprt{to_multi_ary_expr(expr).op0()});
+
+            side_effect_expr_function_callt function_call(
+              std::move(member),
+              {},
+              uninitialized_typet{},
+              expr.source_location());
+            function_call.arguments().reserve(expr.operands().size());
+
+            if(expr.operands().size() > 1)
+            {
+              // skip first
+              for(exprt::operandst::const_iterator it =
+                    expr.operands().begin() + 1;
+                  it != expr.operands().end();
+                  it++)
+                function_call.arguments().push_back(*it);
+            }
+
+            typecheck_side_effect_function_call(function_call);
+
+            if(expr.id() == ID_ptrmember)
+            {
+              add_implicit_dereference(function_call);
+              already_typechecked_exprt::make_already_typechecked(
+                function_call);
+              to_multi_ary_expr(expr).op0().swap(function_call);
+              typecheck_expr(expr);
+              return true;
+            }
+
+            expr = function_call;
+
             return true;
           }
-
-          expr=function_call;
-
-          return true;
-        }
+        } // end if(has_member_op)
       }
 
       // 2nd option!
@@ -1326,6 +1361,87 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
 
         exprt resolve_result=resolve(
              cpp_name, cpp_typecheck_resolvet::wantt::VAR, fargs, false);
+
+        // [over.match.oper]/3.4 (last paragraph): if no operand
+        // has class type, the non-member candidate set is
+        // restricted to operators whose first parameter type is T1
+        // (or reference-to-T1) when T1 is an enumeration type, or
+        // whose second parameter type is T2 (or reference-to-T2)
+        // when T2 is an enumeration type.  Without this, a free
+        // operator on a class type whose constructors implicitly
+        // accept arithmetic operands (e.g.,
+        // `operator<<(const BigInt &, const BigInt &)` with
+        // `BigInt(unsigned long)` and `BigInt(int)`) silently wins
+        // over the built-in operator for an arithmetic operand
+        // pair like `1UL << enum_const`.  The built-in candidate
+        // (with at most an integral promotion) outranks the
+        // user-defined one (which requires a user-defined
+        // conversion sequence on each operand) per
+        // [over.ics.rank]/2; CBMC's `operator_is_overloaded` does
+        // not enumerate built-in candidates, so apply the
+        // [over.match.oper]/3.4 restriction here as a filter.
+        if(resolve_result.is_not_nil())
+        {
+          bool any_class_operand = false;
+          for(const auto &op : expr.operands())
+          {
+            typet t = op.type();
+            if(is_reference(t))
+              t = to_reference_type(t).base_type();
+            if(
+              t.id() == ID_struct || t.id() == ID_struct_tag ||
+              t.id() == ID_union || t.id() == ID_union_tag)
+            {
+              any_class_operand = true;
+              break;
+            }
+          }
+          if(!any_class_operand)
+          {
+            // Locate the resolved function's parameter types.
+            const code_typet *fn_type = nullptr;
+            if(resolve_result.type().id() == ID_code)
+              fn_type = &to_code_type(resolve_result.type());
+            if(fn_type != nullptr && fn_type->parameters().size() >= 1)
+            {
+              auto matches_enum_operand =
+                [this](const typet &param_type, const exprt &operand) -> bool
+              {
+                typet ot = operand.type();
+                if(is_reference(ot))
+                  ot = to_reference_type(ot).base_type();
+                if(ot.id() != ID_c_enum && ot.id() != ID_c_enum_tag)
+                  return false;
+                typet pt = param_type;
+                if(is_reference(pt))
+                  pt = to_reference_type(pt).base_type();
+                if(pt.id() != ot.id())
+                  return false;
+                if(
+                  pt.id() == ID_c_enum_tag &&
+                  to_c_enum_tag_type(pt).get_identifier() !=
+                    to_c_enum_tag_type(ot).get_identifier())
+                  return false;
+                return true;
+              };
+              const auto &params = fn_type->parameters();
+              const auto &ops = expr.operands();
+              bool restriction_ok = false;
+              if(!ops.empty() && params.size() >= 1)
+              {
+                if(matches_enum_operand(params[0].type(), ops[0]))
+                  restriction_ok = true;
+              }
+              if(!restriction_ok && ops.size() >= 2 && params.size() >= 2)
+              {
+                if(matches_enum_operand(params[1].type(), ops[1]))
+                  restriction_ok = true;
+              }
+              if(!restriction_ok)
+                resolve_result.make_nil();
+            }
+          }
+        }
 
         if(resolve_result.is_not_nil())
         {

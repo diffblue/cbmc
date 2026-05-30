@@ -6346,15 +6346,28 @@ void cpp_typecheck_resolvet::resolve_with_arguments(
     id_set.insert(tmp_set.begin(), tmp_set.end());
 
     // Search all enclosing namespaces (proper ADL, including
-    // inline namespaces like std::__cxx11)
-    for(cpp_scopet *ns = &scope; ns != nullptr && !ns->is_root_scope();
-        ns = &ns->get_parent())
+    // inline namespaces like std::__cxx11) AND the root namespace.
+    //
+    // [basic.lookup.argdep]/2 says the associated namespaces of a
+    // class type include the namespace of which the class is a
+    // member.  For a class declared at global scope (e.g.,
+    // `struct BigInt { ... };` in `bigint.hh`), that namespace is
+    // the root namespace.  An earlier termination at
+    // `is_root_scope()` would skip the root namespace, so a free
+    // operator declared at global scope (e.g.,
+    // `bool operator<(const BigInt &, const BigInt &)`) would not
+    // participate in ADL when an unqualified-but-shadowed lookup
+    // (e.g., inside the body of an unrelated `operator<` member
+    // function) failed to locate it via the regular scope walk.
+    for(cpp_scopet *ns = &scope; ns != nullptr; ns = &ns->get_parent())
     {
-      if(ns->is_namespace())
+      if(ns->is_namespace() || ns->is_root_scope())
       {
         tmp_set = ns->lookup(base_name, cpp_scopet::SCOPE_ONLY);
         id_set.insert(tmp_set.begin(), tmp_set.end());
       }
+      if(ns->is_root_scope())
+        break;
     }
   }
 }
