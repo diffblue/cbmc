@@ -1909,13 +1909,76 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
 
     // Direct-list-initialization: TYPE{a, b, c} should try to match
     // constructors with the individual elements of the braced-init-list.
+    //
+    // [over.match.list]/2 distinguishes two phases:
+    //   2.1: try initializer-list ctors first, with the brace-init-list
+    //        as a single argument.
+    //   2.2: if 2.1 finds no viable ctor, retry with all ctors and the
+    //        elements of the brace-init-list as the argument list.
+    //
+    // The previous unconditional expansion of `{e1, ..., en}` into
+    // operands `[e1, ..., en]` skipped phase 2.1, so e.g.
+    //   std::vector<X>{x1, x2}
+    // never matched the `vector(initializer_list<X>, alloc&)` ctor and
+    // failed when no `vector(X, X, ...)` ctor existed.  When the
+    // target class has a non-explicit `initializer_list<U>` ctor (the
+    // canonical phase-2.1 candidate), keep the brace-init-list as a
+    // single argument so overload resolution can find it.  Otherwise
+    // fall through to the existing phase-2.2 expansion.
     if(
       e.operands().size() == 1 &&
       e.operands().front().id() == ID_initializer_list &&
       !e.operands().front().operands().empty())
     {
-      exprt::operandst expanded = std::move(e.operands().front().operands());
-      e.operands() = std::move(expanded);
+      bool has_init_list_ctor = false;
+      if(e.type().id() == ID_struct_tag)
+      {
+        const struct_typet &class_type =
+          follow_tag(to_struct_tag_type(e.type()));
+        for(const auto &c : class_type.components())
+        {
+          if(c.type().id() != ID_code)
+            continue;
+          if(to_code_type(c.type()).return_type().id() != ID_constructor)
+            continue;
+          if(c.get_bool(ID_is_explicit))
+            continue;
+          const auto &params = to_code_type(c.type()).parameters();
+          if(params.size() < 2)
+            continue;
+          typet p1 = params[1].type();
+          if(is_reference(p1))
+            p1 = to_reference_type(p1).base_type();
+          if(p1.id() != ID_struct_tag)
+            continue;
+          if(
+            id2string(to_struct_tag_type(p1).get_identifier())
+              .find("tag-initializer_list<") != std::string::npos)
+          {
+            // Extras must be defaulted for the ctor to accept a
+            // bare brace-init-list.
+            bool extras_default = true;
+            for(std::size_t i = 2; i < params.size(); ++i)
+            {
+              if(!params[i].has_default_value())
+              {
+                extras_default = false;
+                break;
+              }
+            }
+            if(extras_default)
+            {
+              has_init_list_ctor = true;
+              break;
+            }
+          }
+        }
+      }
+      if(!has_init_list_ctor)
+      {
+        exprt::operandst expanded = std::move(e.operands().front().operands());
+        e.operands() = std::move(expanded);
+      }
     }
 
     new_temporary(e.source_location(), e.type(), e.operands(), expr);
