@@ -193,7 +193,138 @@ static bool brace_init_is_viable(
     return true;
   if(!has_user_ctor && data_field_count == operand.operands().size())
     return true;
+  // [over.match.list]/2.2 fallback: when no initializer-list ctor
+  // is viable, the brace-init-list is treated as the argument list
+  // for a regular constructor of T.  Declare the candidate viable
+  // if T has a non-explicit constructor whose required-argument
+  // count matches the size of the brace-init-list (extras may have
+  // defaults) AND each brace-init-list element has an
+  // implicit-conversion sequence to the corresponding parameter
+  // type.  The actual element-by-element conversion is performed
+  // in `cpp_typecheck_conversionst::implicit_typecast`'s
+  // brace-init-to-class branch, which materialises the result as
+  // a member-wise struct expression.
+  //
+  // We make TWO passes: one with `consider_explicit=false` (the
+  // standard requires implicit ctors only for copy-list-init), and
+  // a fallback pass with `consider_explicit=true` for libstdc++
+  // chains where SFINAE on the conditionally-explicit ctor pair
+  // (e.g., `pair(const T1&, const T2&)`) fails to retain the
+  // implicit version in CBMC's IR.  The fallback runs only when no
+  // implicit candidate matched: this preserves [over.match.list]/3
+  // semantics for genuinely explicit-only classes.
+  for(int pass = 0; pass < 2; ++pass)
+  {
+    const bool consider_explicit = (pass == 1);
+    const std::size_t n_args = operand.operands().size();
+    for(const auto &c : class_type.components())
+    {
+      if(c.type().id() != ID_code)
+        continue;
+      if(to_code_type(c.type()).return_type().id() != ID_constructor)
+        continue;
+      if(!consider_explicit && c.get_bool(ID_is_explicit))
+        continue;
+      const auto &params = to_code_type(c.type()).parameters();
+      if(params.size() < 2)
+        continue; // only `this`, would be the default ctor
+      const std::size_t formal_count = params.size() - 1;
+      if(n_args > formal_count)
+        continue;
+      // count required (non-defaulted) parameters from the front
+      std::size_t required = formal_count;
+      for(std::size_t i = params.size() - 1; i >= 1 && required > 0; --i)
+      {
+        if(params[i].has_default_value())
+          --required;
+        else
+          break;
+      }
+      if(n_args < required || n_args > formal_count)
+        continue;
+      // Check element-by-element ICS to parameter types.
+      bool args_compatible = true;
+      for(std::size_t i = 0; i < n_args; ++i)
+      {
+        exprt new_expr;
+        unsigned rank = 0;
+        exprt op_copy = operand.operands()[i];
+        if(!cpp_typecheck.implicit_conversion_sequence(
+             op_copy, params[i + 1].type(), new_expr, rank))
+        {
+          args_compatible = false;
+          break;
+        }
+      }
+      if(args_compatible)
+        return true;
+    }
+  }
   return false;
+}
+
+/// [over.ics.list]/4: a brace-init-list `{e1, ..., en}` has a viable
+/// implicit conversion sequence to `std::initializer_list<X>` iff
+/// every element `ei` has an implicit conversion sequence to `X`.
+/// The empty brace `{}` is always viable (yields an empty
+/// initializer-list).
+///
+/// This check is intentionally limited to standard ICS via
+/// `implicit_conversion_sequence`; it does not recurse into nested
+/// list-initializations of `X`.  That mirrors the conversion
+/// performed at the call site
+/// (`cpp_typecheck_conversionst::implicit_typecast`'s
+/// brace-to-initializer_list branch), which calls
+/// `implicit_typecast(val, elem_type)` per element.
+static bool brace_init_to_init_list_is_viable(
+  const exprt &operand,
+  const typet &target_type,
+  cpp_typecheckt &cpp_typecheck)
+{
+  if(operand.id() != ID_initializer_list)
+    return false;
+  if(target_type.id() != ID_struct_tag)
+    return false;
+  const std::string id_str =
+    id2string(to_struct_tag_type(target_type).get_identifier());
+  if(id_str.find("tag-initializer_list<") == std::string::npos)
+    return false;
+
+  // Empty brace is always viable.
+  if(operand.operands().empty())
+    return true;
+
+  // Locate the element type from the `_begin` / `_M_array` member.
+  const struct_typet &struct_type =
+    cpp_typecheck.follow_tag(to_struct_tag_type(target_type));
+  typet elem_type;
+  bool found = false;
+  for(const auto &c : struct_type.components())
+  {
+    if(
+      (c.get_base_name() == "_begin" || c.get_base_name() == "_M_array") &&
+      c.type().id() == ID_pointer)
+    {
+      elem_type = to_pointer_type(c.type()).base_type();
+      elem_type.remove(ID_C_constant);
+      found = true;
+      break;
+    }
+  }
+  if(!found)
+    return false;
+
+  // Each element must have an ICS to `elem_type`.
+  for(const auto &op : operand.operands())
+  {
+    exprt new_expr;
+    unsigned rank = 0;
+    exprt op_copy = op;
+    if(!cpp_typecheck.implicit_conversion_sequence(
+         op_copy, elem_type, new_expr, rank))
+      return false;
+  }
+  return true;
 }
 
 bool cpp_typecheck_fargst::match(
@@ -292,9 +423,18 @@ bool cpp_typecheck_fargst::match(
     else if(
       operand.id() == ID_initializer_list && type.id() == ID_struct_tag &&
       id2string(to_struct_tag_type(type).get_identifier())
-          .find("tag-initializer_list<") != std::string::npos)
+          .find("tag-initializer_list<") != std::string::npos &&
+      brace_init_to_init_list_is_viable(operand, type, cpp_typecheck))
     {
-      // Brace-init-list to std::initializer_list<T> conversion
+      // [over.ics.list]/4: brace-init-list to `std::initializer_list<X>`
+      // is a viable conversion only if every element of the list has
+      // an implicit-conversion sequence to `X`.  Without that
+      // element-by-element check, the overload appears viable for
+      // any 2+ -element list and beats more specific overloads
+      // such as `insert(const value_type&)` on a class type:
+      // for example `unordered_map<K,V>::insert({k, idx})` would
+      // pick `insert(initializer_list<pair<const K,V>>)` and fail
+      // because `k` is a `K`, not a `pair<const K, V>`.
       distance += 1;
     }
     else if(
@@ -310,8 +450,18 @@ bool cpp_typecheck_fargst::match(
       // the design notes on chrono/ratio/__detail narrowing.
       //
       // Use distance 4 (worse than a standard conversion but
-      // better than ellipsis).
+      // better than ellipsis).  For prvalue source (a temporary
+      // materialised from the brace-init-list), [over.ics.rank]/
+      // 3.3.4 prefers an rvalue-reference target over a (const)
+      // lvalue-reference target.  Bias the rank by -1 for an
+      // rvalue-ref target so that, when the same `brace_init_is_viable`
+      // candidate is otherwise equally viable, the rvalue-ref
+      // overload wins (otherwise CBMC reports
+      // `symbol 'X' does not uniquely resolve` between
+      // `f(const T&)` and `f(T&&)`).
       distance += 4;
+      if(is_rvalue_reference(type))
+        distance -= 1;
     }
     else
     {

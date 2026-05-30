@@ -1,0 +1,23 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+^.*invalid implicit conversion from .* to 'struct pair'.*$
+^.*invalid implicit conversion from .* to 'struct initializer_list'.*$
+^.*invalid implicit conversion from .* to 'struct _Node_handle.*$
+^.*does not uniquely resolve.*$
+--
+Verifies brace-init-list overload resolution for `std::pair`-typed
+parameters: by-value, by-const-lvalue-reference, and by-rvalue-
+reference.  All three list-initialise a `std::pair<K, V>` from
+`{k, idx}`.  The relevant standard rules are
+[over.match.list]/2.2, [over.ics.list]/4, and [over.ics.rank]/
+3.3.4.  Without the fix, CBMC's overload resolution would either
+prefer an `insert(initializer_list<value_type>)` overload (whose
+viability check skipped the per-element ICS to value_type) or
+report ambiguity between `(const value_type&)` and `(value_type&&)`
+for prvalue source.
