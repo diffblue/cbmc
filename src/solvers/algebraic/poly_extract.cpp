@@ -236,7 +236,12 @@ std::optional<polynomialt> poly_extractort::to_polynomial_impl(const exprt &e)
   {
     // extract(x, hi, lo): only handle when lo=0 (low-bit extraction).
     // extract(x, bw-1, 0) = x mod 2^bw, which is just x in our ring.
-    // extract with lo>0 is a shift, which is non-polynomial.
+    // extract with lo>0 is a shift; bit-decomposing the source in
+    // its (wider) ring and re-using its bits in our (narrower)
+    // ring would mix rings (the source's side equations live in
+    // 2^src_bw but our equations in 2^out_bw), which Buchberger
+    // does not handle. Returning nullopt forces bit-blasting,
+    // which is the safe path.
     const auto &eb = to_extractbits_expr(e);
     if(eb.index().is_constant())
     {
