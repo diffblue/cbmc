@@ -165,6 +165,7 @@ SRC = $(BOOLEFORCE_SRC) \
       flattening/c_bit_field_replacement_type.cpp \
       flattening/equality.cpp \
       flattening/pointer_logic.cpp \
+      flattening/tseitin_propagation.cpp \
       floatbv/float_bv.cpp \
       floatbv/float_utils.cpp \
       floatbv/float_approximation.cpp \

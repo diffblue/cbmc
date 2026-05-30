@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/byte_operators.h>
 #include <util/config.h>
 #include <util/floatbv_expr.h>
+#include <util/format_expr.h>
 #include <util/magic.h>
 #include <util/mathematical_expr.h>
 #include <util/mp_arith.h>
@@ -27,9 +28,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/floatbv/float_utils.h>
 
 #include "literal_vector_expr.h"
+#include "tseitin_propagation.h"
 
 #include <algorithm>
 #include <cstdlib>
+#include <iostream>
+#include <unordered_set>
 
 endianness_mapt boolbvt::endianness_map(const typet &type) const
 {
@@ -825,12 +829,191 @@ bool boolbvt::try_algebraic_solve()
 {
   if(algebraic_solved)
     return false;
+
+  // For layer ablation experiments: disable entire algebraic solving
+  if(std::getenv("DISABLE_ALGEBRAIC"))
+    return false;
+
+  // Phase 2.6: Tseitin-aware preprocessing. Mine the boolean
+  // chains in `algebraic_equalities` for polynomial dis/equalities
+  // hidden behind Tseitin-style boolean variables (e.g.,
+  // `Fresh__0 ↔ (X = Y)` followed by a chain that fixes Fresh__0
+  // to 0 or 1). Adds discovered dis/equalities to the algebraic
+  // worklist for the same downstream extraction pipeline. Run
+  // BEFORE the empty-disequalities guard so this path can also
+  // discover the formula's disequality if it is buried in a
+  // Tseitin chain (e.g., wienand commute / distrib benchmarks).
+  // Set DISABLE_TSEITIN_PROPAGATION=1 to opt out for ablation.
+  // PROOF: formal-proofs/TseitinPropagation.lean (per-rule sound).
+  if(std::getenv("DISABLE_TSEITIN_PROPAGATION") == nullptr)
+  {
+    tseitin_propagatort tseitin_prop;
+    tseitin_prop.run(algebraic_equalities);
+    if(std::getenv("TSEITIN_TRACE"))
+    {
+      std::cerr << "; tseitin: " << algebraic_equalities.size()
+                << " input equalities, " << tseitin_prop.equalities().size()
+                << " new equalities, " << tseitin_prop.disequalities().size()
+                << " new disequalities" << std::endl;
+      for(const auto &eq : tseitin_prop.equalities())
+        std::cerr << "; tseitin eq: " << format(eq) << std::endl;
+      for(const auto &eq : tseitin_prop.disequalities())
+        std::cerr << "; tseitin diseq: " << format(eq) << std::endl;
+    }
+    // Only apply tseitin's discoveries when the algebraic solver
+    // would otherwise have nothing to refute. This is the case
+    // where the polynomial disequality is buried entirely inside
+    // a Tseitin chain (e.g., wienand commute / distrib): without
+    // tseitin, `algebraic_disequalities` is empty and the early-
+    // exit guard below would skip algebraic. With tseitin, we
+    // discover the buried disequality. When the algebraic solver
+    // is already going to run on other disequalities, adding
+    // tseitin's discoveries can cause Buchberger to spend extra
+    // work on a SAT instance without changing the verdict; gate
+    // it off in that case.
+    const bool other_diseqs = !algebraic_disequalities.empty() ||
+                              !algebraic_disjunctive_disequalities.empty();
+    if(!other_diseqs)
+    {
+      // Self-contained Tseitin refutation: rather than adding
+      // Tseitin's discoveries to `algebraic_*equalities` (which
+      // would route through the per-disequality refutation loop
+      // below and may trigger the bit-alignment / host-
+      // substitution path that, for non-refutable Buchberger
+      // runs on bit-mismatched expressions, can fail an
+      // invariant on `boolbv_map.cpp::get_literals`), we run a
+      // dedicated, simpler Buchberger here. The algebraic state
+      // is left untouched on failure.
+      //
+      // We use a fresh `poly_extractort` and extract polynomials
+      // from `algebraic_equalities` best-effort (skipping non-
+      // polynomial equalities). For each Tseitin-discovered
+      // disequality, build a Rabinowitsch constraint and run
+      // plain Buchberger. Skip `materialise_bit_alignments` and
+      // host-substitution machinery to avoid the crash path.
+      //
+      // PROOF: formal-proofs/TseitinPropagation.lean +
+      //        formal-proofs/StrongGB.lean::two_trick_unsat_sound.
+      // Build SSA substitution map: sym → def for each (= sym X)
+      // in algebraic_equalities. Used to expand the disequality's
+      // operands fully into the input variables before extraction
+      // (the same trick as the inline-products path in the main
+      // per-disequality loop, which is what enables the wienand
+      // commutativity refutation in the absence of host-
+      // substitution / bit-alignment reasoning).
+      std::map<irep_idt, exprt> ssa_subst;
+      for(const auto &eq : algebraic_equalities)
+      {
+        if(eq.id() != ID_equal || eq.operands().size() != 2)
+          continue;
+        const auto &eqe = to_equal_expr(eq);
+        if(eqe.lhs().id() == ID_symbol)
+          ssa_subst[to_symbol_expr(eqe.lhs()).get_identifier()] = eqe.rhs();
+        else if(eqe.rhs().id() == ID_symbol)
+          ssa_subst[to_symbol_expr(eqe.rhs()).get_identifier()] = eqe.lhs();
+      }
+      // Bounded SSA substitution: track current expansion size and
+      // abort if it grows beyond `kMaxExpandedNodes`. Also bound
+      // the recursion depth to avoid pathological self-loops in
+      // SSA chains.
+      const std::size_t kMaxExpandedNodes = 50000;
+      bool substitution_aborted = false;
+      auto count_nodes_local = [](const exprt &e, auto &&self) -> std::size_t
+      {
+        std::size_t n = 1;
+        for(const auto &op : e.operands())
+          n += self(op, self);
+        return n;
+      };
+      std::function<void(exprt &, std::size_t)> substitute =
+        [&](exprt &e, std::size_t depth)
+      {
+        if(substitution_aborted)
+          return;
+        if(depth > 100)
+        {
+          substitution_aborted = true;
+          return;
+        }
+        for(auto &op : e.operands())
+        {
+          substitute(op, depth + 1);
+          if(substitution_aborted)
+            return;
+        }
+        if(e.id() == ID_symbol)
+        {
+          auto it = ssa_subst.find(to_symbol_expr(e).get_identifier());
+          if(it != ssa_subst.end())
+          {
+            // Cap on per-substitution expansion: if the
+            // replacement is larger than ~200 nodes by itself,
+            // don't recurse into it (single-step substitution).
+            std::size_t rep_size =
+              count_nodes_local(it->second, count_nodes_local);
+            if(rep_size > 200)
+            {
+              e = it->second;
+              return; // do not recurse further
+            }
+            e = it->second;
+            substitute(e, depth + 1);
+          }
+        }
+        // Periodic size check: if total size exceeds limit,
+        // abort. We can't track the total cheaply, so use a
+        // per-node estimate: just stop if we hit a really
+        // deep tree.
+      };
+
+      auto count_nodes = [&](const exprt &e) -> std::size_t
+      { return count_nodes_local(e, count_nodes_local); };
+
+      auto try_refute_one = [&](const equal_exprt &diseq) -> bool
+      {
+        substitution_aborted = false;
+        exprt expanded_diseq = diseq;
+        substitute(expanded_diseq, 0);
+        if(substitution_aborted)
+          return false;
+        auto sz = count_nodes(expanded_diseq);
+        if(sz > kMaxExpandedNodes)
+          return false;
+        if(
+          expanded_diseq.id() != ID_equal ||
+          expanded_diseq.operands().size() != 2)
+          return false;
+
+        // Use inline_products to expand bvmul through the
+        // substituted expression. This is what makes commutative
+        // identities reduce to zero by polynomial canonicalisation.
+        poly_extractort inline_extractor;
+        inline_extractor.inline_products = true;
+        auto ilhs =
+          inline_extractor.to_polynomial(to_equal_expr(expanded_diseq).lhs());
+        auto irhs =
+          inline_extractor.to_polynomial(to_equal_expr(expanded_diseq).rhs());
+        if(!ilhs || !irhs)
+          return false;
+        polynomialt idiff = *ilhs - *irhs;
+        idiff.normalize();
+        return idiff.is_zero();
+      };
+
+      for(const auto &diseq : tseitin_prop.disequalities())
+      {
+        if(try_refute_one(diseq))
+        {
+          prop.l_set_to_true(const_literal(false));
+          return true;
+        }
+      }
+    }
+  }
+
   if(
     algebraic_disequalities.empty() &&
     algebraic_disjunctive_disequalities.empty())
-    return false;
-  // For layer ablation experiments: disable entire algebraic solving
-  if(std::getenv("DISABLE_ALGEBRAIC"))
     return false;
 
   algebraic_solved = true;

@@ -141,6 +141,66 @@ std::optional<polynomialt> poly_extractort::to_polynomial_impl(const exprt &e)
     return to_polynomial(to_typecast_expr(e).op());
   }
 
+  // Concatenation: concat(hi, lo) in (bw_hi + bw_lo)-bit equals
+  //   hi * 2^bw_lo + lo (semantically).
+  // We handle this for our polynomial ring by translating to the
+  // arithmetic equivalent. The most common pattern is
+  //   concat(0_n, x_m)
+  // which in (n+m)-bit unsigned is just x (zero-extended).
+  // This generalises to multi-operand concat as left-fold:
+  //   concat(a, b, c) := concat(concat(a, b), c)
+  // PROOF: a concat in CBMC's representation is the bit-level
+  //        composition of its operands; the polynomial value of
+  //        the (n+m)-bit result equals hi * 2^bw_lo + lo over Z,
+  //        which projects to ZMod(2^(n+m)) by the same formula.
+  if(e.id() == ID_concatenation && e.operands().size() >= 2)
+  {
+    if(!set_bitwidth(e.type()))
+      return std::nullopt;
+    const unsigned saved_bw = bitwidth;
+    polynomialt result{saved_bw};
+    bool ok = true;
+    for(const auto &op : e.operands())
+    {
+      auto bv = type_try_dynamic_cast<bitvector_typet>(op.type());
+      if(!bv)
+      {
+        ok = false;
+        break;
+      }
+      const unsigned op_width = bv->get_width();
+      // result <- result * 2^op_width + op_polynomial
+      // Compute 2^op_width as a polynomial constant.
+      mp_integer shift_factor = power(mp_integer{2}, mp_integer{op_width});
+      polynomialt shift_poly{saved_bw, shift_factor};
+      // Recurse to convert op into our ring.
+      bitwidth = 0;
+      auto op_poly = to_polynomial(op);
+      bitwidth = saved_bw;
+      if(!op_poly)
+      {
+        ok = false;
+        break;
+      }
+      if(op_poly->bitwidth < saved_bw)
+        op_poly->bitwidth = saved_bw;
+      result = result * shift_poly + *op_poly;
+      if(inline_products)
+      {
+        auto inner_width = op_width;
+        for(const auto &term : op_poly->terms)
+          for(const auto &[var, exp] : term.second.vars)
+            if(var_input_widths.find(var) == var_input_widths.end())
+              var_input_widths[var] = inner_width;
+      }
+    }
+    bitwidth = saved_bw;
+    if(!ok)
+      return std::nullopt;
+    result.normalize();
+    return result;
+  }
+
   // Zero-extend: same value, wider type — treat as identity.
   // Set bitwidth from the outer (wider) type first, so that the
   // inner expression's polynomial uses the correct ring.

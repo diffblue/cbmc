@@ -57,6 +57,10 @@ implementation site with one or more Lean theorems.
 | `poly_extract.cpp::to_polynomial` (bvnot direct algebraic form) | `BvDivPolyEncoding.lean::bvnot_eq_neg_one_sub` | DONE |
 | `smt2_parser.cpp::apply_cond_eq_substitution` (if-condition propagation) | `IteCondPropagation.lean::if_cond_propagation` | DONE |
 | `smt2_parser.cpp::binary_predicate` (push equal/notequal/le/lt through ite) | `IteCondPropagation.lean::predicate_through_ite_left`, `eq_through_ite_left`, `notequal_through_ite_left`, `le_through_ite_left`, `lt_through_ite_left` | DONE |
+| `tseitin_propagation.cpp::tseitin_propagatort::enforce` (backward inversion through bitnot/bitor/bitand/bitxor/equal/notequal) | `TseitinPropagation.lean::bitnot_inversion`, `bitor_zero_inversion`, `bitand_one_inversion`, `bitxor_inversion`, `eq_true_inversion`, `eq_false_inversion` | DONE |
+| `tseitin_propagation.cpp::tseitin_propagatort::evaluate` (forward simplification of boolean atoms) | `TseitinPropagation.lean::bitor_eval`, `bitor_eval_both_false` | DONE |
+| `boolbv.cpp::try_algebraic_solve` (Tseitin-discovered bv-equality / bv-disequality emission) | `TseitinPropagation.lean::bv_eq_emission`, `bv_neq_emission` | DONE |
+| `poly_extract.cpp::to_polynomial` (concatenation polynomial encoding) | `TseitinPropagation.lean::concat_polynomial_encoding` | DONE |
 | `poly_extract.cpp::extract_predicate` (power-of-2 upper bound) | `SubgoalSix.lean::bvult_pow2_implies_high_bits_zero` | DONE |
 | `poly_extract.cpp::extract_predicate` (lower bound 2^d - 2^k) | `SubgoalSix.lean::bvuge_2d_minus_2k_implies_high_bits_one` | DONE |
 | `poly_extract.cpp::extract_predicate` (bit-comparator chain) | `SubgoalSix.lean::chainLtBool_correctness` | DONE |

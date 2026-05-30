@@ -56,7 +56,7 @@ actual $N=256$ parameter, with cvc5 timing out at every
 $N \geq 4$; on commutativity, associativity, and overflow
 checking it is bitwidth-independent (BW=8 to 256, 2--5\,ms
 throughout) and matches Bitwuzla's word-level rewriting. Soundness is mechanised in
-Lean~4 with 124 theorems, zero \texttt{sorry}, and zero
+Lean~4 with 135 theorems, zero \texttt{sorry}, and zero
 project-internal axioms (out of which 64 are contract-level
 theorems referenced directly from the implementation source),
 including four candidates for Mathlib contribution; the
@@ -160,7 +160,7 @@ existential & relational              & overflow witness           & companion p
 
 \item \textbf{Mechanised soundness with formalisation-driven
   refinement.}
-  124 theorems in Lean~4 with zero \texttt{sorry} (62
+  135 theorems in Lean~4 with zero \texttt{sorry} (62
   contract-level, 58 helpers and lemmas), giving full
   bi-directional traceability to every algorithm in
   \texttt{src/solvers/algebraic/}. Four general-purpose results
@@ -501,7 +501,7 @@ component along three axes:
   pass it as soft hints to the bit-blasting layer, avoiding
   duplicated exploration.
 
-\item \textbf{Formalisation-driven refinement.} 124 theorems in
+\item \textbf{Formalisation-driven refinement.} 135 theorems in
   Lean 4 with zero \texttt{sorry} (66 contract-level), four
   Mathlib contribution candidates. Full bi-directional
   traceability to every algorithm in
@@ -562,7 +562,7 @@ would need to exist, but the polynomial $-1$ would be in $I$,
 triggering the unit check. The algorithm is sound (never falsely
 reports UNSAT) but incomplete (returns inconclusive when the basis
 contains only even constants).
-Full proof mechanised in Lean~4 (124 theorems, zero \texttt{sorry}),
+Full proof mechanised in Lean~4 (135 theorems, zero \texttt{sorry}),
 covering: (a)~unit characterisation in $\mathbb{Z}_{2^d}$ (odd
 $\Leftrightarrow$ unit, 2 is not a unit for $d \geq 1$),
 (b)~ideal preservation under S-polynomial computation and reduction,
@@ -2350,8 +2350,8 @@ it witnesses; each implementation site carries a \texttt{PROOF:}
 comment naming the Lean theorem(s) that justify it. The full
 mapping is in \texttt{formal-proofs/TRACEABILITY.md}.
 
-\paragraph{Status summary.} Out of 55 mapping entries spanning
-17 Lean modules: all are fully mechanised with zero
+\paragraph{Status summary.} Out of 59 mapping entries spanning
+18 Lean modules: all are fully mechanised with zero
 \texttt{sorry} and zero project-internal axioms; the only
 axioms relied on are the standard mathlib trio
 (\texttt{propext}, \texttt{Classical.choice},
@@ -2509,8 +2509,8 @@ volume but to decide queries those solvers cannot decide at all
 Bitwuzla, cvc5, and every bit-blasting configuration we tested
 time out on, and 5 DSP datapath equivalences with overflow
 cancellation that are decided in microseconds. Soundness is
-mechanised in Lean 4 with 124 theorems, zero \texttt{sorry},
-and zero project-internal axioms across 17 modules, with full
+mechanised in Lean 4 with 135 theorems, zero \texttt{sorry},
+and zero project-internal axioms across 18 modules, with full
 bi-directional traceability to every algorithm in
 \texttt{src/solvers/algebraic/} and four contributions prepared
 for Mathlib. The mechanisation effort
