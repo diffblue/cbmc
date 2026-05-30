@@ -205,17 +205,17 @@ static bool brace_init_is_viable(
   // brace-init-to-class branch, which materialises the result as
   // a member-wise struct expression.
   //
-  // We make TWO passes: one with `consider_explicit=false` (the
-  // standard requires implicit ctors only for copy-list-init), and
-  // a fallback pass with `consider_explicit=true` for libstdc++
-  // chains where SFINAE on the conditionally-explicit ctor pair
-  // (e.g., `pair(const T1&, const T2&)`) fails to retain the
-  // implicit version in CBMC's IR.  The fallback runs only when no
-  // implicit candidate matched: this preserves [over.match.list]/3
-  // semantics for genuinely explicit-only classes.
-  for(int pass = 0; pass < 2; ++pass)
+  // [over.match.list]/3: in copy-list-initialization, if an
+  // explicit constructor is chosen, the program is ill-formed.
+  // `cpp_typecheck_fargst::match` is invoked when matching arguments
+  // to function parameters, which is copy-list-initialization;
+  // accordingly, explicit ctors are excluded here.  The standard
+  // technically requires explicit ctors to be in the candidate set
+  // (and the ill-formedness emerges only when one is selected), but
+  // CBMC's overload-resolution machinery does not distinguish
+  // "selected but ill-formed" from "selected".  Excluding explicit
+  // ctors here matches the practical outcome of the standard rule.
   {
-    const bool consider_explicit = (pass == 1);
     const std::size_t n_args = operand.operands().size();
     for(const auto &c : class_type.components())
     {
@@ -223,7 +223,7 @@ static bool brace_init_is_viable(
         continue;
       if(to_code_type(c.type()).return_type().id() != ID_constructor)
         continue;
-      if(!consider_explicit && c.get_bool(ID_is_explicit))
+      if(c.get_bool(ID_is_explicit))
         continue;
       const auto &params = to_code_type(c.type()).parameters();
       if(params.size() < 2)
