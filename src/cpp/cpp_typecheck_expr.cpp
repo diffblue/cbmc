@@ -2612,6 +2612,33 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 void cpp_typecheckt::typecheck_side_effect_function_call(
   side_effect_expr_function_callt &expr)
 {
+  // [expr.call] re-entrant guard: when typechecking resumes on an
+  // already-typechecked subexpression — e.g., when
+  // `cpp_constructor`'s operand loop calls `typecheck_expr` on an
+  // existing `*move(...)` and the operand walk descends back into
+  // the inner side-effect-call — the call has already had its
+  // function operand resolved (`expr.function()` is a `symbol_expr`
+  // pointing at the instantiated function template) and its
+  // return type set to a reference (`T&` / `T&&`).  Re-running the
+  // body would call `add_implicit_dereference(expr)` at the tail
+  // again, wrapping the call in a SECOND `*` and corrupting the
+  // parent dereference into `*(*call(...))`.
+  // `typecheck_expr_dereference` would then reject the outer
+  // dereference's operand as
+  //   operand of unary * is not a pointer, but got 'struct T'
+  // — which surfaces in libstdc++ chains as
+  //   *move<ref_struct_tag(identifier=tag-X)>(...)
+  // is not a pointer.  Detect this specific shape — a call already
+  // resolved to a symbol AND whose return type is a reference —
+  // and short-circuit.
+  if(
+    expr.function().id() == ID_symbol &&
+    expr.function().type().id() == ID_code &&
+    (is_reference(expr.type()) || is_rvalue_reference(expr.type())))
+  {
+    return;
+  }
+
   // __builtin_is_constant_evaluated() always returns false at runtime.
   if(expr.function().id() == ID_cpp_name)
   {
