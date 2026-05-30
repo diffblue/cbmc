@@ -174,6 +174,17 @@ void cpp_typecheckt::typecheck()
   // method body type-checking. These must be set before
   // typecheck_method_bodies() so that constexpr evaluation uses our
   // models instead of producing nondet values.
+  //
+  // Wrap the constant in a `code_block { return true; }` rather than
+  // assigning a bare `true_exprt()` to `sym.value`.  The latter form
+  // makes `convert_function` reject the symbol with
+  //   function 'X' is initialized with constant
+  // when the symbol is later visited by `typecheck_method_bodies`.
+  // The block-with-return form is what `provide_stdlib_bodies` uses
+  // for the same override at `do_not_typechecked` time, and it is
+  // semantically equivalent for the constexpr-eval consumer
+  // (`typecheck_side_effect_function_call` recognises
+  // `code_block { return <const> }` and uses the constant).
   for(auto &entry : symbol_table.symbols)
   {
     symbolt &sym = symbol_table.get_writeable_ref(entry.first);
@@ -183,7 +194,10 @@ void cpp_typecheckt::typecheck()
       (base == "_S_nothrow_relocate" || base == "_S_use_relocate") &&
       name.find("vector") != std::string::npos && sym.is_macro)
     {
-      sym.value = true_exprt();
+      code_blockt block;
+      block.add(code_frontend_returnt(true_exprt()));
+      sym.value = std::move(block);
+      sym.value.type() = sym.type;
     }
   }
 
