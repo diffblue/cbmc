@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+^.*operand of unary \* '\*move.*not a pointer.*$
+--
+Verifies that `add_implicit_dereference` doesn't fire twice on a
+function-call result whose return type is an rvalue reference
+(e.g., `std::move`).  Without the re-entrant guard in
+`typecheck_side_effect_function_call`, re-typechecking
+`*move(...)` (e.g., during `cpp_constructor`'s operand walk
+inside reference-binding for a copy-constructor temporary) would
+wrap the inner call in a second `*`, surfacing as
+  operand of unary * is not a pointer, but got 'struct T'
+breaking every TU that forwards `std::move(x)` results into
+non-trivial-class function parameters or brace-init-list members.
