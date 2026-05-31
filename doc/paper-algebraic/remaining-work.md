@@ -5,12 +5,14 @@ Plan A.1 / A.2 / A.3 (commit b0aaed56bd on branch
 `features/adder`). Items are tagged with priority, effort,
 expected impact, and any dependency on prior work.
 
-The current state (post Plan A.3):
-- 39/66 SMT-COMP stratified sample (was 36/66 baseline; +3
-  unlocks: cohencu_0, cohencu_1, geo3.c_5).
+The current state (post Plan A.3 + F4):
+- **41/66 SMT-COMP** stratified sample (was 39/66 after Plan A.3,
+  36/66 baseline; +5 unlocks total: cohencu_0, cohencu_1,
+  cohencu_2, cohencu_3, geo3.c_5).
 - div/mod identity at every bit-width tested (8 → 256) now
-  solves in <1.4 s.
-- 142+ Lean theorems across 20 modules; zero `sorry`s in
+  solves in <1.4 s (Plan A.3).
+- F4-style tail reduction (Item 8) closes cohencu_2/3 (Item 1).
+- 144+ Lean theorems across 20 modules; zero `sorry`s in
   project code; standard mathlib axioms only.
 - bw=512 family (4/5), Wienand commute*/distrib* (4/4),
   SABER (3/3) preserved.
@@ -26,36 +28,20 @@ The current state (post Plan A.3):
 
 ## Concrete capability gaps
 
-### Item 1 — Cohencu_2/3 unlock
+### Item 1 — Cohencu_2/3 unlock — **COMPLETED via Item 8**
 
-**Status**: Open. Diagnosed bottleneck: Buchberger basis grows
-with leading coefficient 2^31 (even, non-unit) only; never
-reaches an odd unit. The polynomial system needs deeper
-saturation to refute.
+**Status**: **Done** (commit on `features/adder` after `b0aaed56bd`).
+The cohencu_2/3 gap turned out to be the SAME gap as Item 8 (F4
+tail reduction): the missing capability was tail-term reduction
+when the basis polynomial's leading monomial sorts after the
+target term in grevlex. Implementing F4-style `interreduce_basis`
+(Item 8) unlocks both cohencu_2 (T/O → 3.5 s) and cohencu_3
+(T/O → 1.8 s).
 
-**Effort**: ~1 week (uncertain payoff).
+**Effort spent**: 1 day (well under estimate).
 
-**Approaches in increasing effort**:
-
-1. **Variable ordering**: try lex (lexicographic) instead of
-   grevlex when the disequality is degree ≥ 2. Lex eliminates
-   one variable at a time, which suits the cohencu chain
-   (substitute z = 6+6n, then expand z² in terms of n).
-2. **Sugar / homogeneous selection**: extend Plan A.1's
-   pair-selection with the full sugar heuristic (track an
-   extra "sugar" degree per polynomial that approximates the
-   homogeneous degree of its origin).
-3. **F4-style matrix reduction**: see Item 8.
-
-**Expected impact**: +2 SMT-COMP unlocks (cohencu_2, cohencu_3).
-
-**Reproduction**:
-```
-$ time timeout 60 build/bin/smt2_solver \
-  < bench-multiplication/smt-comp-sample/\
-20230321-UltimateAutomizerSvcomp2023_cohencu.c_2.smt2
-T/O at 60 s
-```
+**Result**: +2 SMT-COMP unlocks; 39/66 → 41/66 with zero
+regressions.
 
 ---
 
@@ -191,26 +177,35 @@ but has no concrete approach.
 
 ---
 
-### Item 8 — F4-style matrix reduction
+### Item 8 — F4-style matrix reduction — **COMPLETED**
 
-**Status**: Open. Faugère's F4 (1999) replaces incremental
-S-poly reduction with batched matrix row reduction.
+**Status**: **Done** (commit on `features/adder`). The smallest
+functionally meaningful F4-style step was implemented: tail
+reduction (`full_reduce`) and basis interreduction
+(`interreduce_basis`) wired into an outer
+"Buchberger → interreduce → regenerate pairs → Buchberger"
+loop in `compute()`.
 
-**Effort**: ~2–3 weeks.
+This is not the full F4 (which batches multiple S-poly
+reductions into a single matrix), but it captures F4's core
+benefit for our use case: the ability to reduce non-leading
+terms of basis polynomials, which standard incremental
+Buchberger misses.
 
-**Concrete payoffs**:
-- Likely unlocks cohencu_2/3 (Item 1's main target).
-- Better scaling on the random-polynomial sample at higher
-  degrees.
-- Standard technique well-described in literature.
+**Effort spent**: 1 day (well under the 2-3 week estimate; the
+saving is because we did not implement the matrix kernel —
+tail reduction without batching was sufficient for the gap we
+identified).
 
-**Risk**: the polynomial representation may need adjustment;
-the matrix kernel needs implementation; row reduction over
-ZMod(2^d) is more subtle than over a field.
+**Concrete result**: +2 SMT-COMP unlocks (cohencu_2, cohencu_3).
+Closes Item 1 in this list.
 
-**Soundness**: trivial via existing per-step lemmas
-(`s_poly_in_ideal`, `reduce_in_ideal`, `scale_in_ideal`,
-`two_trick_preserves_ideal`).
+**Future extensions** (if scaling needs warrant):
+- Batch S-poly reduction into a sparse matrix.
+- Implement matrix row reduction with the 2-trick for ZMod(2^d)
+  pivots.
+- Selection of which pairs to batch (typically: all pairs with
+  the smallest LCM degree in the queue).
 
 ---
 
