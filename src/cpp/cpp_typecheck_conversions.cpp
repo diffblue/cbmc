@@ -1628,7 +1628,32 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
         else if(from.id() == ID_struct_tag && arg1_type.id() == ID_struct_tag)
         {
           // try derived-to-base conversion
-          address_of_exprt expr_pfrom(expr, pointer_type(expr.type()));
+          //
+          // Per [class.copy.ctor]/1 and [dcl.init]/14: copy-initialization
+          // of an object of type `T` from an expression of type `T` (or
+          // `const T`) uses the copy constructor.  When `from == arg1_type`
+          // modulo cv-qualifiers, this is the SAME-TYPE copy-construction,
+          // not derived-to-base.  The address-of + standard-conversion
+          // path below would build `from* -> arg1*` via
+          // `standard_conversion_sequence`, which DROPS const-qualifiers
+          // on the pointee — that's not a valid implicit conversion
+          // (per [conv.qual]) so the path silently rejects the
+          // converting-ctor match for any `const T` source binding into a
+          // `T` parameter.  This shows up in CBMC's own
+          // `simplify_expr_*.cpp` files where simplification helpers
+          // return `const exprt&` into a class-typed `resultt<>`
+          // returned-value.  Fall through to the same-type path: strip
+          // cv-qualifiers from `from` before computing the
+          // address-of and let the standard-conversion sequence run on
+          // the unqualified pointer types.  The conversion is still a
+          // user-defined conversion (constructor call) so the rank
+          // adjustment is unchanged.
+          typet from_unqual = expr.type();
+          from_unqual.remove(ID_C_constant);
+          from_unqual.remove(ID_C_volatile);
+          exprt expr_for_addr = expr;
+          expr_for_addr.type() = from_unqual;
+          address_of_exprt expr_pfrom(expr_for_addr, pointer_type(from_unqual));
           pointer_typet pto = pointer_type(arg1_type);
 
           exprt expr_ptmp;
