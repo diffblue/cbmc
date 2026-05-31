@@ -530,7 +530,17 @@ void cpp_typecheckt::typecheck_code(codet &code)
         typecheck_expr(iter);
 
         // Type-check the body
+        // Per N5008 [stmt.ranged]: range-based for is a loop, so
+        // `break` and `continue` are permitted inside its body.
+        // Save and set the flags before recursing into the body so
+        // the inner `typecheck_continue` / `typecheck_break` accept
+        // the statements; restore on the way out.
+        const bool old_break_is_allowed = break_is_allowed;
+        const bool old_continue_is_allowed = continue_is_allowed;
+        break_is_allowed = continue_is_allowed = true;
         typecheck_code(body);
+        break_is_allowed = old_break_is_allowed;
+        continue_is_allowed = old_continue_is_allowed;
 
         code_blockt loop_body;
         loop_body.add(std::move(assign_elem));
@@ -640,7 +650,16 @@ void cpp_typecheckt::typecheck_code(codet &code)
     assign_elem.add_source_location() = loc;
 
     // Type-check the body
-    typecheck_code(body);
+    // Per N5008 [stmt.ranged]: range-based for is a loop, so
+    // `break` and `continue` are permitted inside its body.
+    {
+      const bool old_break_is_allowed = break_is_allowed;
+      const bool old_continue_is_allowed = continue_is_allowed;
+      break_is_allowed = continue_is_allowed = true;
+      typecheck_code(body);
+      break_is_allowed = old_break_is_allowed;
+      continue_is_allowed = old_continue_is_allowed;
+    }
 
     // Build: { var = range[__i]; body; }
     code_blockt loop_body;

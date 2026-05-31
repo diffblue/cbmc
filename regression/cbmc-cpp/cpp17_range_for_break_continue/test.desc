@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp17 --show-symbol-table
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^.*continue not allowed here.*$
+^.*break not allowed here.*$
+--
+Verifies that `break` and `continue` are permitted inside the
+body of a range-based `for` loop, per [stmt.ranged].  Without the
+fix, CBMC's range-for lowering type-checked the body without
+setting `break_is_allowed`/`continue_is_allowed` to true, and
+rejected `continue;` (and would also reject `break;`).
