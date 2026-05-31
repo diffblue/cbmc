@@ -312,6 +312,126 @@ polynomialt strong_groebner_basist::strong_reduce(
   return r;
 }
 
+// PROOF: formal-proofs/BuchbergerCorrectness.lean::reduce_in_ideal
+//        Tail reduction is a sequence of standard reduction steps
+//        r := r - q * g, each preserving ideal membership. This
+//        lemma applies regardless of which term of r we are
+//        reducing; the leading-vs-tail distinction is purely about
+//        WHICH term we choose to reduce, not about whether the step
+//        is sound. So full_reduce is sound by composition of
+//        per-step `reduce_in_ideal` applications.
+//   ASSUMES: each iteration of the inner loop reduces ONE term of r
+//            via the standard step `r := r - mult_term * g` for
+//            some basis element g. The polynomial multiplication
+//            and subtraction preserve ideal membership.
+//   MAINTAINED BY: the inner loop body implements exactly this
+//            reduction step, with `mult_term` constructed to
+//            cancel the targeted term's coefficient (via 2-adic
+//            quotient and inverse computation).
+polynomialt strong_groebner_basist::full_reduce(
+  const polynomialt &f,
+  const std::vector<polynomialt> &basis,
+  std::size_t skip_idx)
+{
+  polynomialt r = f;
+  unsigned bw = f.bitwidth;
+  mp_integer m = power(mp_integer{2}, mp_integer{bw});
+
+  bool changed = true;
+  while(changed && !r.is_zero())
+  {
+    changed = false;
+    if(++steps_taken > max_steps && max_steps > 0)
+      return r;
+
+    // Iterate over each term of r, looking for one we can reduce
+    // by some basis element.
+    for(std::size_t t = 0; t < r.terms.size(); ++t)
+    {
+      const mp_integer c_r = r.terms[t].first;
+      const monomialt m_r = r.terms[t].second;
+      const unsigned v_r = val_2(c_r, bw);
+
+      bool reduced_this_term = false;
+      for(std::size_t j = 0; j < basis.size(); ++j)
+      {
+        if(j == skip_idx || basis[j].is_zero())
+          continue;
+        const monomialt &lm_g = basis[j].leading_monomial();
+        if(!lm_g.divides(m_r))
+          continue;
+
+        const mp_integer lc_g = basis[j].leading_coefficient();
+        const unsigned v_g = val_2(lc_g, bw);
+
+        if(v_g > v_r)
+          continue; // lc_g does not divide c_r in the 2-adic sense.
+
+        // Compute the multiplier q such that q * lc_g ≡ c_r (mod 2^d).
+        // Same formula as strong_reduce's leading-term reduction.
+        mp_integer u_r = c_r / power(2, v_r);
+        mp_integer u_g = lc_g / power(2, v_g);
+        mp_integer inv_u_g = inverse_mod_2d(u_g, bw);
+        mp_integer q =
+          (power(mp_integer{2}, mp_integer{v_r - v_g}) * u_r % m * inv_u_g) % m;
+
+        monomialt quot_mon = m_r.quotient(lm_g);
+        polynomialt mult_term{bw};
+        mult_term.terms.emplace_back(q, quot_mon);
+
+        r = r - mult_term.multiply(basis[j], bit_vars);
+        r.normalize();
+        apply_frobenius_idempotency(r, bit_vars);
+        changed = true;
+        reduced_this_term = true;
+        break;
+      }
+      if(reduced_this_term)
+        break; // Restart from beginning since terms changed.
+    }
+  }
+  return r;
+}
+
+// PROOF: formal-proofs/BuchbergerCorrectness.lean::reduce_in_ideal
+//        Each individual full_reduce call preserves the ideal of
+//        the basis. Iterating across basis elements with skip_idx
+//        ensures no element reduces itself. The fixed-point loop
+//        terminates because each iteration either reduces a term
+//        (decreasing some monotone measure: the multiset of leading
+//        monomials of tail terms in basis elements, ordered by
+//        grevlex) or makes no progress and exits.
+//   ASSUMES: full_reduce is sound (above).
+//   MAINTAINED BY: the loop's exit condition is a fixed point;
+//            the basis is updated in place but each update
+//            preserves the ideal.
+bool strong_groebner_basist::interreduce_basis(std::vector<polynomialt> &basis)
+{
+  bool any_change = false;
+  bool round_change = true;
+  std::size_t round_cap = basis.size() * 4 + 16;
+  while(round_change && round_cap > 0)
+  {
+    round_change = false;
+    --round_cap;
+    for(std::size_t i = 0; i < basis.size(); ++i)
+    {
+      if(basis[i].is_zero())
+        continue;
+      polynomialt reduced = full_reduce(basis[i], basis, i);
+      if(reduced.terms != basis[i].terms)
+      {
+        basis[i] = std::move(reduced);
+        round_change = true;
+        any_change = true;
+        if(has_constant(basis))
+          return any_change;
+      }
+    }
+  }
+  return any_change;
+}
+
 // PROOF: formal-proofs/StrongGB.lean::two_trick_preserves_ideal
 //        Soundness: scalar multiplication by 2^k preserves
 //        ideal membership.
@@ -445,102 +565,139 @@ strong_groebner_basist::compute(std::vector<polynomialt> &polys)
   std::size_t pairs_since_last_progress = 0;
   std::size_t pairs_at_last_progress = pairs.size();
 
-  while(!pairs.empty())
+  // Outer loop: run Buchberger, interreduce, repeat if interreduce
+  // changed the basis. This is the F4-style "saturate then
+  // interreduce then re-saturate" pattern. Capped to a small
+  // number of outer iterations to prevent pathological cycles
+  // (interreduction terminates by a monotone measure, but the
+  // restart could in principle loop if poorly designed).
+  std::size_t outer_cap = 8;
+  while(outer_cap > 0)
   {
-    if(steps_taken > max_steps && max_steps > 0)
-      return resultt::UNKNOWN;
-
-    // If we've processed all pairs since the last new element
-    // without finding anything new, the basis is complete.
-    if(pairs_since_last_progress > pairs_at_last_progress)
-      return has_constant(polys) ? resultt::UNSAT : resultt::UNKNOWN;
-
-    auto pair_idx = select_next_pair(pairs, polys);
-    auto [i, j] = pairs[pair_idx];
-    // Swap-with-back removal: O(1) and order-independent for our purposes
-    // (FIFO ties handled by select_next_pair already).
-    pairs[pair_idx] = pairs.back();
-    pairs.pop_back();
-
-    // Capture the basis size at the start of this iteration. If it grows
-    // (due to either S-polynomial reduction or the 2-trick step below),
-    // we count this iteration as "progress" and reset the counters; this
-    // ensures the 2-trick's additions are not silently dropped from the
-    // termination criterion.
-    const std::size_t polys_size_at_iter_start = polys.size();
-
-    if(i >= polys.size() || j >= polys.size())
+    --outer_cap;
+    while(!pairs.empty())
     {
-      ++pairs_since_last_progress;
-      continue;
-    }
-    if(polys[i].is_zero() || polys[j].is_zero())
-    {
-      ++pairs_since_last_progress;
-      continue;
-    }
+      if(steps_taken > max_steps && max_steps > 0)
+        return resultt::UNKNOWN;
 
-    polynomialt s = s_polynomial(polys[i], polys[j]);
-    polynomialt r = strong_reduce(s, polys);
+      // If we've processed all pairs since the last new element
+      // without finding anything new, the basis is complete for
+      // this round. Exit the inner loop; the outer loop will run
+      // interreduce and decide whether to restart.
+      if(pairs_since_last_progress > pairs_at_last_progress)
+        break;
 
-    if(!r.is_zero())
-    {
-      std::size_t new_idx = polys.size();
-      polys.push_back(std::move(r));
+      auto pair_idx = select_next_pair(pairs, polys);
+      auto [i, j] = pairs[pair_idx];
+      // Swap-with-back removal: O(1) and order-independent for our purposes
+      // (FIFO ties handled by select_next_pair already).
+      pairs[pair_idx] = pairs.back();
+      pairs.pop_back();
 
-      if(has_constant(polys))
-        return resultt::UNSAT;
+      // Capture the basis size at the start of this iteration. If it grows
+      // (due to either S-polynomial reduction or the 2-trick step below),
+      // we count this iteration as "progress" and reset the counters; this
+      // ensures the 2-trick's additions are not silently dropped from the
+      // termination criterion.
+      const std::size_t polys_size_at_iter_start = polys.size();
 
-      for(std::size_t k = 0; k < new_idx; ++k)
-        pairs.emplace_back(k, new_idx);
-    }
-
-    // Also process 2-multiples of basis elements with non-unit lc
-    for(std::size_t k = 0; k < polys.size(); ++k)
-    {
-      if(polys[k].is_zero())
-        continue;
-      unsigned v = val_2(polys[k].leading_coefficient(), polys[k].bitwidth);
-      if(v > 0 && v < polys[k].bitwidth)
+      if(i >= polys.size() || j >= polys.size())
       {
-        polynomialt h =
-          polys[k] * power(mp_integer{2}, mp_integer{polys[k].bitwidth - v});
-        h.normalize();
-        apply_frobenius_idempotency(h, bit_vars);
-        polynomialt rh = strong_reduce(h, polys);
-        if(!rh.is_zero())
+        ++pairs_since_last_progress;
+        continue;
+      }
+      if(polys[i].is_zero() || polys[j].is_zero())
+      {
+        ++pairs_since_last_progress;
+        continue;
+      }
+
+      polynomialt s = s_polynomial(polys[i], polys[j]);
+      polynomialt r = strong_reduce(s, polys);
+
+      if(!r.is_zero())
+      {
+        std::size_t new_idx = polys.size();
+        polys.push_back(std::move(r));
+
+        if(has_constant(polys))
+          return resultt::UNSAT;
+
+        for(std::size_t k = 0; k < new_idx; ++k)
+          pairs.emplace_back(k, new_idx);
+      }
+
+      // Also process 2-multiples of basis elements with non-unit lc
+      for(std::size_t k = 0; k < polys.size(); ++k)
+      {
+        if(polys[k].is_zero())
+          continue;
+        unsigned v = val_2(polys[k].leading_coefficient(), polys[k].bitwidth);
+        if(v > 0 && v < polys[k].bitwidth)
         {
-          std::size_t new_idx = polys.size();
-          polys.push_back(std::move(rh));
-          if(has_constant(polys))
-            return resultt::UNSAT;
-          for(std::size_t l = 0; l < new_idx; ++l)
-            pairs.emplace_back(l, new_idx);
+          polynomialt h =
+            polys[k] * power(mp_integer{2}, mp_integer{polys[k].bitwidth - v});
+          h.normalize();
+          apply_frobenius_idempotency(h, bit_vars);
+          polynomialt rh = strong_reduce(h, polys);
+          if(!rh.is_zero())
+          {
+            std::size_t new_idx = polys.size();
+            polys.push_back(std::move(rh));
+            if(has_constant(polys))
+              return resultt::UNSAT;
+            for(std::size_t l = 0; l < new_idx; ++l)
+              pairs.emplace_back(l, new_idx);
+          }
         }
       }
-    }
 
-    // Update progress tracking. If the basis grew during this iteration
-    // (via S-polynomial reduction OR the 2-trick step above), reset the
-    // counters so that all newly-added pairs get a fresh window for
-    // processing. Otherwise count this iteration toward the stability
-    // threshold.
-    //
-    // An earlier version reset only after the S-polynomial step, which
-    // missed the case where the 2-trick adds elements but the S-poly
-    // does not, allowing the loop to exit before processing pairs
-    // generated by the 2-trick (and even original pairs occluded by
-    // the LIFO ordering). See formal-proofs/IMPLEMENTATION_FINDINGS.md.
-    if(polys.size() > polys_size_at_iter_start)
-    {
-      pairs_since_last_progress = 0;
-      pairs_at_last_progress = pairs.size();
-    }
-    else
-    {
-      ++pairs_since_last_progress;
-    }
-  }
+      // Update progress tracking. If the basis grew during this iteration
+      // (via S-polynomial reduction OR the 2-trick step above), reset the
+      // counters so that all newly-added pairs get a fresh window for
+      // processing. Otherwise count this iteration toward the stability
+      // threshold.
+      //
+      // An earlier version reset only after the S-polynomial step, which
+      // missed the case where the 2-trick adds elements but the S-poly
+      // does not, allowing the loop to exit before processing pairs
+      // generated by the 2-trick (and even original pairs occluded by
+      // the LIFO ordering). See formal-proofs/IMPLEMENTATION_FINDINGS.md.
+      if(polys.size() > polys_size_at_iter_start)
+      {
+        pairs_since_last_progress = 0;
+        pairs_at_last_progress = pairs.size();
+      }
+      else
+      {
+        ++pairs_since_last_progress;
+      }
+    } // end inner while
+
+    // Inner loop exited (pairs empty or stable). Try F4-style
+    // interreduction: tail reduction across the basis. If it
+    // changes anything, regenerate pairs and continue the outer
+    // loop. Otherwise break out.
+    if(std::getenv("DISABLE_INTERREDUCE") != nullptr)
+      break;
+    bool changed = interreduce_basis(polys);
+    if(has_constant(polys))
+      return resultt::UNSAT;
+    if(!changed)
+      break;
+    polys.erase(
+      std::remove_if(
+        polys.begin(),
+        polys.end(),
+        [](const polynomialt &p) { return p.is_zero(); }),
+      polys.end());
+    pairs.clear();
+    for(std::size_t i = 0; i < polys.size(); ++i)
+      for(std::size_t j = i + 1; j < polys.size(); ++j)
+        pairs.emplace_back(i, j);
+    pairs_since_last_progress = 0;
+    pairs_at_last_progress = pairs.size();
+  } // end outer while
 
   return has_constant(polys) ? resultt::UNSAT : resultt::UNKNOWN;
 }

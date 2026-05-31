@@ -7,6 +7,7 @@
 #include "poly_ring.h"
 
 #include <cstddef>
+#include <cstdint>
 
 /// Compute a strong Gröbner basis over Z_{2^d} and check for
 /// unsatisfiability of a system of polynomial equations.
@@ -108,6 +109,47 @@ private:
   /// Returns the remainder after dividing f by all elements of basis.
   polynomialt
   strong_reduce(const polynomialt &f, const std::vector<polynomialt> &basis);
+
+  /// F4-style full reduction (Phase A.3-extended; aka tail
+  /// reduction or auto-reduction). Unlike `strong_reduce`, which
+  /// only divides the leading term, this reduces EVERY term of
+  /// `f` against the basis when a basis element's leading monomial
+  /// divides the term's monomial. This catches reductions that
+  /// incremental Buchberger misses because they involve non-leading
+  /// terms.
+  ///
+  /// The textbook example (cohencu_2 / cohencu_3 in our SMT-COMP
+  /// sample) is a polynomial system where one basis element has
+  /// leading `x5 * x6` and tail `x6 + ...`, while another basis
+  /// element has leading `x6` (representing `x6 = x1^2`). The
+  /// `x6` in the tail can be reduced using the second polynomial,
+  /// which incremental Buchberger does not do because its leading-
+  /// monomial-divides rule only considers the leading term.
+  ///
+  /// The optional `skip_idx` parameter excludes one basis element
+  /// from consideration (used during interreduction so a polynomial
+  /// is not reduced by itself).
+  ///
+  /// PROOF: tail reduction is a sequence of standard reduction
+  /// steps `r := r - q * g` (with q a polynomial multiple of a
+  /// monomial), each of which preserves ideal membership.
+  /// `BuchbergerCorrectness.lean::reduce_in_ideal` covers this;
+  /// the same lemma applies regardless of which term we reduce.
+  polynomialt full_reduce(
+    const polynomialt &f,
+    const std::vector<polynomialt> &basis,
+    std::size_t skip_idx = SIZE_MAX);
+
+  /// Run full_reduce on every basis element to a fixed point.
+  /// Returns true if any basis element changed (or any was found
+  /// to be the constant 0). When the interreduction produces an
+  /// odd constant in the basis, the algorithm reports UNSAT;
+  /// otherwise the basis is left in interreduced form.
+  ///
+  /// Used as a finalising step at the end of `compute()` when
+  /// the standard Buchberger loop terminates without an odd
+  /// constant.
+  bool interreduce_basis(std::vector<polynomialt> &basis);
 
   /// Check if any element of the basis is a nonzero constant
   bool has_constant(const std::vector<polynomialt> &basis) const;

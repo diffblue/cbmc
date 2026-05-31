@@ -455,3 +455,62 @@ TEST_CASE(
     REQUIRE(gb.compute(polys) == strong_groebner_basist::resultt::UNSAT);
   }
 }
+
+TEST_CASE(
+  "strong Gröbner basis: cohencu_2 quadratic-in-z disequality at bw=8/16/32",
+  "[core][solvers][algebraic][groebner]")
+{
+  // The cohencu SMT-COMP benchmark variant cohencu_2 (and the
+  // symmetric cohencu_3) carries an IF-condition with z*z (a
+  // quadratic-in-z polynomial). After the Phase A.2 IF-rebuild +
+  // Plan A.3 if-case-elimination, the algebraic solver receives the
+  // disequality
+  //   (z*z + 12 - 6*z - 12*y) != 0
+  // alongside the cohencu polynomial equations
+  //   z + y = 7 + 3*n^2 + 9*n,   y = 1 + 3*n + 3*n^2.
+  // Mathematically, substituting z = 6 + 6*n (from the equations)
+  // and expanding z*z gives the disequality polynomial = 0, so
+  // its Rabinowitsch encoding e * (z*z + 12 - 6*z - 12*y) - 1
+  // reduces to -1, an odd unit, hence UNSAT.
+  //
+  // Standard incremental Buchberger MISSES this refutation because
+  // the substitution requires reducing a NON-LEADING term (z*z
+  // appears in tail of the Rabinowitsch polynomial; standard
+  // strong_reduce only divides the leading term). The F4-style
+  // tail-reduction step (interreduce_basis), interleaved with the
+  // main Buchberger loop via the outer "interreduce-then-restart"
+  // pattern, makes this refutation accessible.
+  //
+  // PROOF: BuchbergerCorrectness.lean::reduce_in_ideal applies
+  //        regardless of which term is reduced; tail reduction is
+  //        sound by composition of per-step reductions.
+  for(unsigned bw : {8u, 16u, 32u})
+  {
+    INFO("bitwidth " << bw);
+    polynomialt n{bw, 1, 0};
+    polynomialt y{bw, 1, 1};
+    polynomialt z{bw, 1, 2};
+    polynomialt e{bw, 1, 3};
+
+    polynomialt three{bw, 3};
+    polynomialt six{bw, 6};
+    polynomialt seven{bw, 7};
+    polynomialt nine{bw, 9};
+    polynomialt twelve{bw, 12};
+    polynomialt one{bw, 1};
+
+    polynomialt n_sq = n * n;
+    polynomialt z_sq = z * z;
+
+    std::vector<polynomialt> polys = {
+      // z + y - 7 - 3*n^2 - 9*n
+      (z + y) - seven - (three * n_sq) - (nine * n),
+      // y - 3*n - 3*n^2 - 1
+      y - (three * n) - (three * n_sq) - one,
+      // (z*z + 12 - 6*z - 12*y) * e - 1
+      ((z_sq + twelve - (six * z) - (twelve * y)) * e) - one};
+
+    strong_groebner_basist gb{100000};
+    REQUIRE(gb.compute(polys) == strong_groebner_basist::resultt::UNSAT);
+  }
+}

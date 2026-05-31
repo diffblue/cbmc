@@ -91,6 +91,8 @@ implementation site with one or more Lean theorems.
 | `groebner.cpp::compute` (idempotent ⇒ {0,1}) | `StrongGB.lean::sq_eq_self_of_zmod_two_pow` | DONE |
 | `groebner.cpp::compute` (refined completeness fails) | `StrongGB.lean::two_trick_saturation_complete_is_false` | DONE |
 | `groebner.cpp::select_next_pair` (pair selection orthogonal to soundness) | `StrongGB.lean::pair_selection_orthogonal` | DONE |
+| `groebner.cpp::full_reduce` (tail-reduction step preserves ideal) | `StrongGB.lean::tail_reduction_in_ideal` | DONE |
+| `groebner.cpp::interreduce_basis` (basis interreduction preserves ideal) | `StrongGB.lean::interreduce_preserves_ideal` | DONE |
 | `boolbv.cpp::walk_for_algebraic` (leaf implication soundness) | `AlgebraicTreeWalk.lean::leaf_implied_by_walk_and`, `leaf_implied_by_walk_not_or`, `leaf_implied_by_walk_not`, `walk_chain_sound` | DONE |
 | `boolbv.cpp::walk_for_algebraic` (IF-rebuild equivalence) | `AlgebraicTreeWalk.lean::if_rebuild_equivalence`, `if_rebuild_lr_equivalence` | DONE |
 | `boolbv.cpp::set_to`/`finish_eager_conversion` (defer/replay states) | `Defer.lean::defer_replay_equivalence` | DONE-MOD-AXIOMS |
