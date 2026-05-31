@@ -1,4 +1,4 @@
-CORE broken-cprover-smt-backend no-new-smt
+CORE broken-cprover-smt-backend thorough-paths no-new-smt
 main.c
 --smt2 --z3
 ^EXIT=0$
