@@ -219,6 +219,46 @@ protected:
   std::vector<literalt> algebraic_assumptions;
   virtual bool try_algebraic_solve();
 
+  /// Walk the boolean structure of an asserted expression to surface
+  /// equalities and disequalities buried under AND / OR (with polarity)
+  /// / NOT / LET / IF for algebraic solving.
+  ///
+  /// Phase A.2 (Plan A in doc/paper-algebraic). The direct handlers
+  /// at the top of `set_to` only catch equalities at the outermost
+  /// level; benchmarks like cohencu_0/geo3.c_5 wrap their polynomial
+  /// constraints inside `(let ... (and ... ...))`, so the algebraic
+  /// solver never sees them without this walk.
+  ///
+  /// Bounds (to keep the walk's per-formula cost bounded and avoid
+  /// pathological behaviour seen in earlier Phase 2.7 attempts):
+  ///   - depth ≤ tree_walk_max_depth (default 100)
+  ///   - leaves added by walk ≤ tree_walk_max_leaves per call
+  ///     (default 50)
+  ///   - cumulative algebraic_equalities + algebraic_disequalities
+  ///     ≤ tree_walk_max_total (default 200) across all calls
+  ///   - body-size for let-inlining ≤ tree_walk_max_body (default 500)
+  ///
+  /// Gating for non-IF-rebuild leaves:
+  ///   - require ID_mult to occur in the leaf's operands (avoids
+  ///     SAGE/SPEAR-style regressions where the walk would flood
+  ///     the algebraic solver with non-polynomial equalities).
+  ///
+  /// IF-rebuild: `(if c (= sym A) (= sym B))` collected at any depth
+  /// (with value=true) is rebuilt as `(= sym (if c A B))` and added
+  /// to algebraic_equalities. Soundness: the if-equality and the
+  /// rebuild are equivalent when the type of A matches the type of B
+  /// (the equality is well-typed in both forms).
+  /// PROOF: formal-proofs/AlgebraicTreeWalk.lean::if_rebuild_equivalence.
+  ///
+  /// Implication soundness: every leaf collected by walk is implied
+  /// by the parent assertion `(expr, value)`.
+  /// PROOF: formal-proofs/AlgebraicTreeWalk.lean::leaf_implied_by_walk.
+  virtual void walk_for_algebraic(
+    const exprt &expr,
+    bool value,
+    std::size_t depth,
+    std::size_t &leaf_count);
+
   // uninterpreted functions
   functionst functions;
 

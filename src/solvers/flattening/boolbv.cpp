@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/magic.h>
 #include <util/mathematical_expr.h>
 #include <util/mp_arith.h>
+#include <util/replace_symbol.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/string_constant.h>
@@ -540,6 +541,24 @@ void boolbvt::set_to(const exprt &expr, bool value)
 {
   PRECONDITION(expr.is_boolean());
 
+  // Phase A.2: walk into AND/OR/NOT/LET/IF wrappers to surface
+  // equalities for algebraic solving. The direct handlers below
+  // catch only top-level equalities; without this walk, benchmarks
+  // like cohencu_0/geo3.c_5 (which wrap their polynomial constraints
+  // in `(let ... (and ... ...))`) never reach the algebraic solver.
+  //
+  // The walk respects the env var DISABLE_ALGEBRAIC_TREE_WALK for
+  // ablation. The walk is purely additive: it contributes to
+  // `algebraic_equalities` / `algebraic_disequalities` but does not
+  // skip any of the existing direct handling.
+  //
+  // PROOF: formal-proofs/AlgebraicTreeWalk.lean::leaf_implied_by_walk.
+  if(!algebraic_solved && std::getenv("DISABLE_ALGEBRAIC_TREE_WALK") == nullptr)
+  {
+    std::size_t leaf_count = 0;
+    walk_for_algebraic(expr, value, 0, leaf_count);
+  }
+
   // Collect polynomial equations for algebraic solving
   if(!algebraic_solved && expr.id() == ID_equal)
   {
@@ -798,6 +817,222 @@ boolbvt::offset_mapt boolbvt::build_offset_map(const struct_typet &src)
   return dest;
 }
 
+// PROOF: formal-proofs/AlgebraicTreeWalk.lean::leaf_implied_by_walk
+//        Soundness: every leaf collected by walk_for_algebraic is
+//        a logical consequence of the parent assertion (expr, value).
+//        The walk descends through AND (with value=true), OR (with
+//        value=false, by De Morgan), NOT (flipping polarity), LET
+//        (inlining the binding), and IF (recognising the IF-rebuild
+//        pattern). For each operation, the leaves collected from the
+//        children are implied by the parent.
+// PROOF: formal-proofs/AlgebraicTreeWalk.lean::if_rebuild_equivalence
+//        Soundness of the IF-rebuild step: (if c (= sym A) (= sym B))
+//        is equivalent to (= sym (if c A B)) when A and B have the
+//        same type. The rebuilt equality is in the same ideal as
+//        the original IF expression at depth 0 (since we collected
+//        IT instead of recursing).
+//   ASSUMES: each leaf is a literal equality/disequality, not
+//            re-extracted into a polynomial twice. This is enforced
+//            by the bvmul-presence gate (non-IF leaves) and the
+//            cumulative leaf cap.
+//   MAINTAINED BY: the depth/leaf/total bounds and the polarity
+//            tracking through wrappers.
+void boolbvt::walk_for_algebraic(
+  const exprt &expr,
+  bool value,
+  std::size_t depth,
+  std::size_t &leaf_count)
+{
+  // Bounds.
+  static constexpr std::size_t tree_walk_max_depth = 100;
+  static constexpr std::size_t tree_walk_max_leaves = 50;
+  static constexpr std::size_t tree_walk_max_total = 200;
+  static constexpr std::size_t tree_walk_max_body = 500;
+
+  if(depth > tree_walk_max_depth)
+    return;
+  if(leaf_count > tree_walk_max_leaves)
+    return;
+  if(
+    algebraic_equalities.size() + algebraic_disequalities.size() >
+    tree_walk_max_total)
+    return;
+
+  if(!expr.is_boolean())
+    return;
+
+  auto is_internal = [](const exprt &e)
+  {
+    return e.id() == ID_symbol &&
+           id2string(to_symbol_expr(e).get_identifier()).find("__CPROVER") !=
+             std::string::npos;
+  };
+
+  // AND with value=true: every conjunct must hold.
+  // OR with value=false: every disjunct must be false (De Morgan).
+  if(expr.id() == ID_and && value)
+  {
+    for(const auto &op : expr.operands())
+      walk_for_algebraic(op, true, depth + 1, leaf_count);
+    return;
+  }
+  if(expr.id() == ID_or && !value)
+  {
+    for(const auto &op : expr.operands())
+      walk_for_algebraic(op, false, depth + 1, leaf_count);
+    return;
+  }
+
+  // NOT flips polarity.
+  if(expr.id() == ID_not && expr.operands().size() == 1)
+  {
+    walk_for_algebraic(expr.operands()[0], !value, depth + 1, leaf_count);
+    return;
+  }
+
+  // LET: inline the binding (size-bounded), then walk into the body.
+  // We use replace_symbolt to substitute let-bound variables with
+  // their values in the body. The body-size bound prevents
+  // pathological inlining on deeply-nested lets.
+  if(
+    expr.id() == ID_let && expr.operands().size() >= 2 &&
+    can_cast_expr<let_exprt>(expr))
+  {
+    const auto &le = to_let_expr(expr);
+    // Approximate body size by structural depth count (cheap).
+    std::size_t body_size = 0;
+    le.where().visit_pre([&](const exprt &) { ++body_size; });
+    if(body_size > tree_walk_max_body)
+      return;
+    replace_symbolt rs;
+    for(std::size_t i = 0; i < le.binding().variables().size(); ++i)
+      rs.set(le.binding().variables()[i], le.values()[i]);
+    exprt body = le.where();
+    rs(body);
+    walk_for_algebraic(body, value, depth + 1, leaf_count);
+    return;
+  }
+
+  // IF-rebuild: (if c (= sym A) (= sym B)) with value=true →
+  // (= sym (if c A B)). This is logically equivalent and exposes
+  // the polynomial structure that Phase 2.5's push-through-ite
+  // could not always normalise on its own (it requires both
+  // branches to have the same shape).
+  //
+  // We accept any of the four orderings of (sym, value) in the
+  // sub-equalities: (= sym A)/(= A sym) on each side.
+  if(
+    expr.id() == ID_if && expr.operands().size() == 3 && value &&
+    can_cast_expr<if_exprt>(expr))
+  {
+    const auto &ie = to_if_expr(expr);
+    const exprt &t = ie.true_case();
+    const exprt &f = ie.false_case();
+    if(
+      t.id() == ID_equal && f.id() == ID_equal && t.operands().size() == 2 &&
+      f.operands().size() == 2)
+    {
+      auto try_rebuild =
+        [&](const exprt &sym, const exprt &t_val, const exprt &f_val) -> bool
+      {
+        if(t_val.type() != f_val.type())
+          return false;
+        if(sym.type() != t_val.type())
+          return false;
+        if(is_internal(sym))
+          return false;
+        // Skip if either value involves an internal __CPROVER ref.
+        // These tend to produce noisy synthetic equalities.
+        if(is_internal(t_val) || is_internal(f_val))
+          return false;
+        equal_exprt rebuilt{sym, if_exprt{ie.cond(), t_val, f_val}};
+        algebraic_equalities.push_back(std::move(rebuilt));
+        ++leaf_count;
+        return true;
+      };
+      // Try matching: t.lhs == f.lhs (sym at lhs in both)
+      if(t.operands()[0] == f.operands()[0])
+      {
+        if(try_rebuild(t.operands()[0], t.operands()[1], f.operands()[1]))
+          return;
+      }
+      // sym at rhs in both
+      if(t.operands()[1] == f.operands()[1])
+      {
+        if(try_rebuild(t.operands()[1], t.operands()[0], f.operands()[0]))
+          return;
+      }
+      // Mixed orderings: sym lhs in t, rhs in f
+      if(t.operands()[0] == f.operands()[1])
+      {
+        if(try_rebuild(t.operands()[0], t.operands()[1], f.operands()[0]))
+          return;
+      }
+      // sym rhs in t, lhs in f
+      if(t.operands()[1] == f.operands()[0])
+      {
+        if(try_rebuild(t.operands()[1], t.operands()[0], f.operands()[1]))
+          return;
+      }
+    }
+    return;
+  }
+
+  // Leaves at depth > 0: equality/disequality buried under wrappers.
+  // (At depth 0 the existing direct handlers in set_to fire, so we
+  // skip to avoid double-counting.)
+  if(depth == 0)
+    return;
+
+  // Helper: does the expression contain ID_mult anywhere?
+  // Used to gate non-IF-rebuild leaves: the walk ONLY collects
+  // leaves whose operands include a multiplication, since algebraic
+  // refutation requires polynomial structure. SAGE/SPEAR-style
+  // benchmarks have many shift-and-or boolean equalities buried
+  // in ANDs that flooded the algebraic worklist in Phase 2.7's
+  // initial attempt.
+  std::function<bool(const exprt &)> contains_mult =
+    [&contains_mult](const exprt &e) -> bool
+  {
+    if(e.id() == ID_mult)
+      return true;
+    for(const auto &op : e.operands())
+      if(contains_mult(op))
+        return true;
+    return false;
+  };
+
+  if(expr.id() == ID_equal && expr.operands().size() == 2)
+  {
+    if(is_internal(expr.operands()[0]) || is_internal(expr.operands()[1]))
+      return;
+    if(!contains_mult(expr))
+      return;
+    if(value)
+      algebraic_equalities.push_back(expr);
+    else
+      algebraic_disequalities.push_back(expr);
+    ++leaf_count;
+    return;
+  }
+  if(expr.id() == ID_notequal && expr.operands().size() == 2)
+  {
+    const auto &ne = to_notequal_expr(expr);
+    if(is_internal(ne.lhs()) || is_internal(ne.rhs()))
+      return;
+    equal_exprt as_eq{ne.lhs(), ne.rhs()};
+    if(!contains_mult(as_eq))
+      return;
+    if(value)
+      algebraic_disequalities.push_back(std::move(as_eq));
+    else
+      algebraic_equalities.push_back(std::move(as_eq));
+    ++leaf_count;
+    return;
+  }
+  // Other leaf shapes: ignore (not within Plan A scope).
+}
+
 // PROOF: formal-proofs/Defer.lean::defer_replay_equivalence
 //        Soundness: deferring SSA equality bit-blasting and
 //        replaying-on-non-refutation is semantically equivalent
@@ -833,6 +1068,151 @@ bool boolbvt::try_algebraic_solve()
   // For layer ablation experiments: disable entire algebraic solving
   if(std::getenv("DISABLE_ALGEBRAIC"))
     return false;
+
+  // Phase A.2 case-elimination for IF-rebuild equalities.
+  //
+  // When the boolean tree walk produces `sym = (if c A B)` with A
+  // and B distinct constants, AND there is a disequality `sym = A`
+  // (set to false), we can derive that `c` must be false: the true
+  // branch (sym = A) contradicts the disequality, so the false
+  // branch (sym = B) must hold, which requires c to be false.
+  // Symmetrically, a disequality `sym = B` forces c to be true.
+  //
+  // If c is itself an equality `(= e f)`, emit the corresponding
+  // (dis)equality on (e, f). This bridges the IF-rebuild equality
+  // (which the polynomial extractor would otherwise drop, since it
+  // contains an ITE) to the polynomial system that needs e ≠ f or
+  // e = f.
+  //
+  // Concrete benchmarks where this fires: cohencu_0/1/2/3 in the
+  // SMT-COMP sample. There assert 1 has the form
+  //   (if (= bvadd(6,6n) z) (= sym 1) (= sym 0))
+  // and assert 3 has the form (not (= 1 sym)). The walk's
+  // IF-rebuild produces (= sym (if c 1 0)). The case-elimination
+  // here detects the disequality on sym matches the constant 1
+  // branch, and emits (= bvadd(6,6n) z) as a disequality. Combined
+  // with the polynomial equations from assert 2, Buchberger refutes.
+  //
+  // PROOF: by case analysis on the IF condition c.
+  // - If c, then sym = A by the IF equality, contradicting sym ≠ A.
+  //   So ¬c.
+  // - If ¬c, then sym = B by the IF equality, consistent with
+  //   sym ≠ A (provided A ≠ B, which we check).
+  // The emitted (dis)equality on c is a valid logical consequence.
+  if(std::getenv("DISABLE_IF_CASE_ELIM") == nullptr)
+  {
+    auto exprs_equal = [](const exprt &a, const exprt &b) { return a == b; };
+    auto extract_constant_int = [](const exprt &e, mp_integer &out) -> bool
+    {
+      if(e.id() != ID_constant)
+        return false;
+      return !to_integer(to_constant_expr(e), out);
+    };
+    std::vector<exprt> case_elim_eqs;
+    std::vector<exprt> case_elim_diseqs;
+    for(const auto &eq : algebraic_equalities)
+    {
+      if(eq.id() != ID_equal || eq.operands().size() != 2)
+        continue;
+      // Locate (sym, IF) by checking either side.
+      exprt sym, ifexpr;
+      if(eq.operands()[1].id() == ID_if)
+      {
+        sym = eq.operands()[0];
+        ifexpr = eq.operands()[1];
+      }
+      else if(eq.operands()[0].id() == ID_if)
+      {
+        sym = eq.operands()[1];
+        ifexpr = eq.operands()[0];
+      }
+      else
+      {
+        continue;
+      }
+      if(ifexpr.operands().size() != 3)
+        continue;
+      const exprt &c = ifexpr.operands()[0];
+      const exprt &A = ifexpr.operands()[1];
+      const exprt &B = ifexpr.operands()[2];
+      mp_integer A_val, B_val;
+      if(!extract_constant_int(A, A_val) || !extract_constant_int(B, B_val))
+        continue;
+      if(A_val == B_val)
+        continue; // Degenerate; no information.
+      if(c.id() != ID_equal || c.operands().size() != 2)
+        continue; // Only handle when c is itself an equality.
+      // Find a (dis)equality of (sym, constant) matching either branch.
+      bool found = false;
+      // Disequality case: sym ≠ A ⇒ ¬c; sym ≠ B ⇒ c.
+      for(const auto &diseq : algebraic_disequalities)
+      {
+        if(diseq.id() != ID_equal || diseq.operands().size() != 2)
+          continue;
+        const exprt &dlhs = diseq.operands()[0];
+        const exprt &drhs = diseq.operands()[1];
+        mp_integer dconst;
+        bool dlhs_const = extract_constant_int(dlhs, dconst);
+        bool drhs_const = extract_constant_int(drhs, dconst);
+        bool sym_dlhs = exprs_equal(dlhs, sym) && drhs_const;
+        bool sym_drhs = exprs_equal(drhs, sym) && dlhs_const;
+        if(!sym_dlhs && !sym_drhs)
+          continue;
+        if(dconst == A_val)
+        {
+          case_elim_diseqs.push_back(c);
+          found = true;
+          break;
+        }
+        else if(dconst == B_val)
+        {
+          case_elim_eqs.push_back(c);
+          found = true;
+          break;
+        }
+      }
+      if(found)
+        continue;
+      // Equality case: sym = A ⇒ c; sym = B ⇒ ¬c. (Mirror of the
+      // disequality case.) This handles benchmarks like cohencu_1
+      // whose assert 3 is `(not (not (= sym 0)))` ≡ `(= sym 0)`.
+      for(const auto &eqq : algebraic_equalities)
+      {
+        if(&eqq == &eq)
+          continue; // Skip the IF-rebuild equality itself.
+        if(eqq.id() != ID_equal || eqq.operands().size() != 2)
+          continue;
+        const exprt &elhs = eqq.operands()[0];
+        const exprt &erhs = eqq.operands()[1];
+        mp_integer econst;
+        bool elhs_const = extract_constant_int(elhs, econst);
+        bool erhs_const = extract_constant_int(erhs, econst);
+        bool sym_elhs = exprs_equal(elhs, sym) && erhs_const;
+        bool sym_erhs = exprs_equal(erhs, sym) && elhs_const;
+        if(!sym_elhs && !sym_erhs)
+          continue;
+        if(econst == A_val)
+        {
+          case_elim_eqs.push_back(c);
+          break;
+        }
+        else if(econst == B_val)
+        {
+          case_elim_diseqs.push_back(c);
+          break;
+        }
+      }
+    }
+    for(auto &e : case_elim_eqs)
+      algebraic_equalities.push_back(std::move(e));
+    for(auto &e : case_elim_diseqs)
+      algebraic_disequalities.push_back(std::move(e));
+    if(std::getenv("ALGEBRAIC_WALK_TRACE"))
+    {
+      std::cerr << "; if-case-elim: +" << case_elim_eqs.size() << " eq, +"
+                << case_elim_diseqs.size() << " diseq" << std::endl;
+    }
+  }
 
   // Phase 2.6: Tseitin-aware preprocessing. Mine the boolean
   // chains in `algebraic_equalities` for polynomial dis/equalities
