@@ -696,7 +696,103 @@ void boolbvt::set_to(const exprt &expr, bool value)
       expr.operands().size() == 2 && !is_internal_op(expr.operands()[0]) &&
       !is_internal_op(expr.operands()[1]))
     {
-      algebraic_predicates.emplace_back(expr, value);
+      // Phase A.3 fast-path for "x is non-zero" patterns.
+      //
+      // When the relational predicate is equivalent to `x != 0`,
+      // the standard `extract_predicate` machinery falls through
+      // to a bit-chain encoding (decompose x into bits, assert
+      // the disjunction "at least one bit is 1") which bloats
+      // the polynomial system substantially: at d=32 it adds 32+
+      // bit variables and a chain of comparison auxiliaries to
+      // each per-disequality basis, multiplying Buchberger's work
+      // even when the predicate is logically redundant for the
+      // refutation that a separate disequality already implies.
+      //
+      // The cleaner encoding for `x != 0` is to emit the equality
+      // `x = 0` to `algebraic_disequalities` and SKIP the
+      // predicate-handling pipeline. The per-disequality loop
+      // processes the disequality via Rabinowitsch with no
+      // bit-decomposition overhead.
+      //
+      // Patterns recognised:
+      //   bvult 0 x  set to true   (x > 0)
+      //   bvule 1 x  set to true   (x >= 1)
+      //   bvule x 0  set to false  (NOT x <= 0  ⇒  x > 0)
+      //
+      // PROOF: bvult 0 x (set to true)  ⇔  x > 0  ⇔  x != 0
+      //        in unsigned bit-vector semantics. Hence emitting
+      //        `(= x 0)` as a disequality is logically equivalent
+      //        to the original predicate.
+      //        Traceability anchor: BvDivPolyEncoding.lean.
+      const irep_idt &id = expr.id();
+      const exprt &lhs = expr.operands()[0];
+      const exprt &rhs = expr.operands()[1];
+      const bool unsigned_op =
+        lhs.type().id() == ID_unsignedbv && rhs.type().id() == ID_unsignedbv;
+      auto is_zero_const = [](const exprt &e) -> bool
+      {
+        if(!e.is_constant())
+          return false;
+        auto v = numeric_cast<mp_integer>(e);
+        return v.has_value() && *v == 0;
+      };
+      auto is_one_const = [](const exprt &e) -> bool
+      {
+        if(!e.is_constant())
+          return false;
+        auto v = numeric_cast<mp_integer>(e);
+        return v.has_value() && *v == 1;
+      };
+      bool fast_path = false;
+      const exprt *x_side = nullptr;
+      // Pattern 1: bvult 0 x  parses to  x >= 1  (ID_ge, lhs=x, rhs=1).
+      // Pattern 2: bvule 1 x  also parses to  x >= 1.
+      // Pattern 3: NOT (bvule x 0)  parses to  NOT (x <= 0)  (already
+      //            handled via the not-relational path below if needed).
+      // Pattern 4: bvult 0 x  set to false  ⇒  x <= 0  ⇒  x = 0
+      //            (parses to  x >= 1 with value=false).
+      if(unsigned_op && id == ID_ge && value && is_one_const(rhs))
+      {
+        // x >= 1 set to true  ⇒  x != 0
+        x_side = &lhs;
+        fast_path = true;
+      }
+      else if(unsigned_op && id == ID_lt && value && is_zero_const(lhs))
+      {
+        // 0 < x set to true (in case the parser leaves this form)
+        x_side = &rhs;
+        fast_path = true;
+      }
+      else if(unsigned_op && id == ID_le && value && is_one_const(lhs))
+      {
+        // 1 <= x set to true (in case the parser leaves this form)
+        x_side = &rhs;
+        fast_path = true;
+      }
+      if(
+        fast_path && x_side != nullptr && !is_internal_op(*x_side) &&
+        std::getenv("DISABLE_NONZERO_FAST_PATH") == nullptr)
+      {
+        // Defer the disequality: only promote to algebraic_disequalities
+        // when the formula also contains bvudiv/bvurem (gated in
+        // try_algebraic_solve). This prevents regressions on SAT
+        // benchmarks like Sage2_bench_15251/17485 which have hundreds
+        // of bvult predicates and no division — adding the full
+        // disequality there floods the algebraic worklist without
+        // helping the eventual SAT verdict.
+        nonzero_pending.push_back(
+          equal_exprt{*x_side, from_integer(mp_integer{0}, x_side->type())});
+        // Skip the bit-chain predicate path: the disequality is
+        // strictly more useful for the algebraic refutation pipeline
+        // and the bit-chain encoding's complexity outweighs any
+        // marginal benefit on this pattern. Note: we still fall
+        // through to SUB::set_to below so the predicate is
+        // bit-blasted normally for the SAT side.
+      }
+      else
+      {
+        algebraic_predicates.emplace_back(expr, value);
+      }
     }
   }
   if(
@@ -1068,6 +1164,49 @@ bool boolbvt::try_algebraic_solve()
   // For layer ablation experiments: disable entire algebraic solving
   if(std::getenv("DISABLE_ALGEBRAIC"))
     return false;
+
+  // Phase A.3: promote `x != 0` fast-path disequalities into
+  // algebraic_disequalities ONLY when the formula contains a
+  // bvudiv or bvurem somewhere. Without this gate, SAT benchmarks
+  // with many bvult predicates and no division (e.g.,
+  // Sage2_bench_15251/17485, with 218 / 182 bvult occurrences)
+  // would suffer because each added disequality runs an entire
+  // per-disequality Buchberger iteration without contributing to
+  // the eventual SAT verdict.
+  //
+  // The gate fires exactly when the formula contains division —
+  // the only case where the polynomial encoding's `q*t + r - s = 0`
+  // side equation makes the `x != 0` constraint relevant for
+  // refutation.
+  //
+  // PROOF: the disequality `(= x 0)` is a logical consequence of
+  //        the asserted predicate (`bvult 0 x` / `bvule 1 x` /
+  //        `NOT bvule x 0`), so promoting it preserves logical
+  //        equivalence regardless of whether bvudiv/bvurem is
+  //        present.
+  if(!nonzero_pending.empty())
+  {
+    bool has_div = false;
+    auto contains_div = [&has_div](const exprt &e)
+    {
+      e.visit_pre(
+        [&has_div](const exprt &x)
+        {
+          if(x.id() == ID_div || x.id() == ID_mod)
+            has_div = true;
+        });
+    };
+    for(const auto &eq : algebraic_equalities)
+      contains_div(eq);
+    for(const auto &eq : algebraic_disequalities)
+      contains_div(eq);
+    if(has_div)
+    {
+      for(auto &diseq : nonzero_pending)
+        algebraic_disequalities.push_back(std::move(diseq));
+    }
+    nonzero_pending.clear();
+  }
 
   // Phase A.2 case-elimination for IF-rebuild equalities.
   //

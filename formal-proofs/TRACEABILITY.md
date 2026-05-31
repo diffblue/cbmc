@@ -55,6 +55,7 @@ implementation site with one or more Lean theorems.
 | `poly_ring.cpp::karatsuba_multiply` (Karatsuba 3-mult identity) | `Karatsuba.lean::karatsuba_identity`, `karatsuba_multiply_correct` | DONE |
 | `poly_extract.cpp::to_polynomial` (bvudiv/bvurem polynomial encoding) | `BvDivPolyEncoding.lean::bvdiv_bvurem_polynomial_eq`, `bvurem_zero_polynomial_eq`, `bvdiv_polynomial_overapprox` | DONE |
 | `poly_extract.cpp::to_polynomial` (bvnot direct algebraic form) | `BvDivPolyEncoding.lean::bvnot_eq_neg_one_sub` | DONE |
+| `boolbv.cpp::set_to` (nonzero fast-path: bvult 0 x ⇒ algebraic_disequalities) | `BvDivPolyEncoding.lean::NonzeroFastPath::bvult_zero_iff_ne_zero`, `bvuge_one_iff_ne_zero` | DONE |
 | `smt2_parser.cpp::apply_cond_eq_substitution` (if-condition propagation) | `IteCondPropagation.lean::if_cond_propagation` | DONE |
 | `smt2_parser.cpp::binary_predicate` (push equal/notequal/le/lt through ite) | `IteCondPropagation.lean::predicate_through_ite_left`, `eq_through_ite_left`, `notequal_through_ite_left`, `le_through_ite_left`, `lt_through_ite_left` | DONE |
 | `tseitin_propagation.cpp::tseitin_propagatort::enforce` (backward inversion through bitnot/bitor/bitand/bitxor/equal/notequal) | `TseitinPropagation.lean::bitnot_inversion`, `bitor_zero_inversion`, `bitand_one_inversion`, `bitxor_inversion`, `eq_true_inversion`, `eq_false_inversion` | DONE |

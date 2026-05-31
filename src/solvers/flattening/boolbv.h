@@ -207,6 +207,14 @@ protected:
   // Encoded into the polynomial system via bit-decomposition by
   // poly_extractort::extract_predicate.
   std::vector<std::pair<exprt, bool>> algebraic_predicates;
+  // Phase A.3 fast-path: disequalities derived from "x is non-zero"
+  // patterns (bvult 0 x, bvule 1 x, etc.). These are gated to fire
+  // only when the formula also contains a bvudiv/bvurem (otherwise
+  // adding them as full disequalities floods the algebraic worklist
+  // for SAT benchmarks with many bvult predicates and no division
+  // — see Sage2_bench_*). Promoted to algebraic_disequalities at
+  // the start of try_algebraic_solve when the gate fires.
+  std::vector<exprt> nonzero_pending;
   // Memory-efficient extraction (Re 4 sub-goal 7): SSA equalities that
   // go to algebraic_equalities also get queued here, and SUB::set_to
   // is skipped for them. If try_algebraic_solve refutes, the bit-

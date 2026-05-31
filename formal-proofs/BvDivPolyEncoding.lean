@@ -112,3 +112,44 @@ theorem bvnot_eq_neg_one_sub
   rw [hpow, zero_sub]
 
 end BvNotEncoding
+
+/-! ## Phase A.3: nonzero fast-path soundness -/
+
+namespace NonzeroFastPath
+
+/-- The `x != 0` fast-path encoding (Phase A.3 in
+    `boolbv.cpp::set_to`): when the asserted predicate is
+    `bvult 0 x` (or `bvule 1 x`, or NOT (bvule x 0)), we emit
+    `(= x 0)` to `algebraic_disequalities` instead of routing
+    through `extract_predicate`'s bit-chain encoding.
+
+    This theorem captures the soundness in propositional terms
+    over `ZMod (2^d)`: `0 < x` is logically equivalent to
+    `x ≠ 0` (in unsigned bit-vector semantics, where `<` is
+    the natural-number ordering on the canonical
+    representatives, which agrees with `≠` away from 0). The
+    encoding therefore preserves the meaning of the assertion. -/
+theorem bvult_zero_iff_ne_zero
+    {d : ℕ} [NeZero (2^d)] (x : ZMod (2^d)) :
+    (0 : ZMod (2^d)).val < x.val ↔ x ≠ 0 := by
+  constructor
+  · intro h hx
+    rw [hx] at h
+    exact Nat.lt_irrefl _ h
+  · intro hx
+    rw [ZMod.val_zero]
+    exact Nat.pos_iff_ne_zero.mpr (fun hv => hx (ZMod.val_eq_zero x |>.mp hv))
+
+/-- Symmetric form: `x ≥ 1` is equivalent to `x ≠ 0` in unsigned
+    bit-vector semantics. Used for the `bvule 1 x` shape. -/
+theorem bvuge_one_iff_ne_zero
+    {d : ℕ} [NeZero (2^d)] (x : ZMod (2^d)) :
+    1 ≤ x.val ↔ x ≠ 0 := by
+  constructor
+  · intro h hx
+    rw [hx, ZMod.val_zero] at h
+    exact Nat.not_succ_le_zero 0 h
+  · intro hx
+    exact Nat.one_le_iff_ne_zero.mpr (fun hv => hx (ZMod.val_eq_zero x |>.mp hv))
+
+end NonzeroFastPath
