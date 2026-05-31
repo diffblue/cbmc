@@ -1,4 +1,4 @@
-CORE broken-cprover-smt-backend no-new-smt
+CORE
 main.i
 --i386-linux --floatbv
 ^EXIT=0$
@@ -9,9 +9,7 @@ main.i
 --
 Verifies the byte layout of x86 80-bit extended `long double` on i386
 (12-byte storage container).  The 80-bit value layout is identical to
-x86_64; only the storage container size differs.  The SMT backends do
-not yet encode the x86-extended layout; the test is therefore
-restricted to the SAT backend.
+x86_64; only the storage container size differs.
 
 The source is provided as a pre-processed `main.i` so CBMC parses it
 without invoking the host preprocessor; combined with `--i386-linux`,

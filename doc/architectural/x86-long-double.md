@@ -111,6 +111,62 @@ The `boolbvt::convert_rest` handler for `ID_sign` (in
 `src/solvers/flattening/boolbv.cpp`) similarly reads the sign from
 `value_width() - 1` for `floatbv` operands.
 
+# SMT2 back-ends
+
+The SMT-LIB FloatingPoint theory is *parameterized* by arbitrary
+exponent and significand widths: it provides a sort
+`(_ FloatingPoint eb sb)` for every `eb` and `sb`, not only the IEEE 754
+interchange sizes (`Float16/32/64/128` are merely abbreviations).  So
+the theory *can* represent the x87 extended **value** domain as
+`(_ FloatingPoint 15 64)`, and arithmetic on well-formed finite values
+would agree.  The obstacle here is therefore not arithmetic precision
+but the x87 **encoding**, which CBMC must reproduce bit-for-bit because
+programs type-pun `long double`:
+
+- **Explicit integer bit.**  Every SMT-LIB FloatingPoint sort (like the
+  IEEE interchange formats) uses an *implicit* leading integer bit,
+  whereas x87 stores that bit *explicitly* (the J-bit at position `f`).
+  `(_ FloatingPoint 15 64)` has no J-bit to place.
+- **Storage padding.**  The 80-bit value lives in a 96- or 128-bit
+  container whose high bits are padding; an FP sort has no padding bits.
+- **Pseudo-encodings.**  Because the integer bit is explicit, x87 admits
+  bit patterns with no IEEE counterpart -- pseudo-NaN, pseudo-infinity,
+  (pseudo-)denormals/unnormals -- which programs observe (see
+  `long-double-pseudo-encodings`) but an implicit-bit FP sort cannot
+  express.
+- **No float-to-bit-vector reinterpret.**  SMT-LIB FloatingPoint has no
+  bitcast operator (`fp.to_ubv` / `fp.to_sbv` are *value* conversions,
+  not bit reinterpretations), so even with `(_ FloatingPoint 15 64)` for
+  the value we could not model the union / byte-level reads that motivate
+  this work (most prominently the macOS SDK `signbit`).
+
+An `(_ FloatingPoint 15 64)` encoding would thus discard the explicit
+J-bit, the storage padding, and the pseudo-encodings, and still could
+not answer bit-level queries -- so it is not a faithful encoding, and we
+encode x86-extended `floatbv` as bit-vectors instead.  (A further
+practical point: such non-standard `(eb, sb)` sorts are unevenly
+supported across solvers compared with the standard widths.)
+
+`smt2_convt::use_FPA_for_type(typet)` (in
+`src/solvers/smt2/smt2_conv.cpp`) returns `false` for x86-extended
+`floatbv` types regardless of the global `use_FPA_theory` flag, and
+`true` otherwise (delegating to `use_FPA_theory`).  All dispatch sites
+in `smt2_conv.cpp` consult this helper, which means:
+
+- The SMT-LIB sort emitted for an x86-extended type is always
+  `(_ BitVec storage_width)` (128 on x86_64, 96 on i386).
+- All FP operations on x86-extended operands lower through the
+  existing `convert_floatbv` path, which emits the `float_bv.*` helper
+  functions defined elsewhere in the same module.
+- Other floating-point types (binary32, binary64, binary128) continue
+  to use the SMT-LIB FloatingPoint theory on solvers that support it
+  (currently Z3, CVC5, Bitwuzla, and the cprover-smt2 solver).
+
+The new SMT2 back-end (`--incremental-smt2-solver`, in
+`src/solvers/smt2_incremental/`) does not yet implement the
+byte-extract / concatenation lowerings the byte-layout regression
+tests rely on; those tests are therefore tagged `no-new-smt`.
+
 # Why this matters
 
 Before this change, CBMC modelled `long double` on x86_64 as IEEE
@@ -129,7 +185,7 @@ on these classifications.
 
 # Testing
 
-The fix is exercised from three angles:
+The fix is exercised from several angles:
 
 - `regression/cbmc/long-double-x86-bytes` and
   `regression/cbmc/long-double-i386-bytes` check the byte layout
@@ -138,6 +194,15 @@ The fix is exercised from three angles:
   signbit pattern.
 - `regression/cbmc/long-double-roundtrip-x86` exercises
   `double <-> long double` conversion, including the symbolic case.
+- `regression/cbmc/long-double-pseudo-encodings` checks that
+  `__CPROVER_isnanld` / `__CPROVER_isinfld` / `__CPROVER_isnormalld`
+  reject the x86 pseudo-encodings (pseudo-NaN, pseudo-Infinity,
+  pseudo-denormal-with-non-zero-exponent), in agreement with modern
+  Intel/AMD hardware.
+- `regression/cbmc-library/{expl,exp2l,logl,log2l,log10l,__builtin_powil}`
+  cover the long-double-only Schraudolph-style fast-math models in
+  `src/ansi-c/library/math.c`, which were updated in lockstep so that
+  the bit manipulations target the x86-extended layout when active.
 - `unit/util/ieee_float.cpp` covers the `ieee_float_spect` factories
   and `ieee_float_valuet::pack` / `unpack` against the same hardware
   references.

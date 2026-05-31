@@ -10,9 +10,30 @@ main.i
 Verifies that casting a finite `double` to `long double` and back yields
 the original `double` bit-for-bit, and that sign is preserved across
 the promotion.  Exercises both the constant-folding path (compile-time)
-and the symbolic path (nondet input).  The SMT backends do not yet
-encode the x86-extended layout; the test is therefore restricted to the
-SAT backend.
+and the symbolic path (nondet input).
+
+This test reads the bit pattern of a `double` via union aliasing
+(`union { double d; uint64_t i; }`) AND casts that `double` to a
+`long double` and back.  Two pre-existing limitations of the legacy
+cprover-smt2 backend in FPA mode (`use_FPA_theory == true`) currently
+block this test:
+
+  1. Binary64 union read: `convert_expr(... typecast double -> bv64 ...)`
+     reaches `flatten2bv`, which holds an invariant that floatbv
+     expressions are already flattened by an earlier pass when FPA is
+     in use.  No such pass exists for binary64 today.
+  2. Mixed FPA/BV typecast: casting an FPA-encoded `double` to a
+     BV-encoded `long double` (or back) routes through
+     `convert_floatbv`, whose `float_bv.*` helper expects bit-vector
+     operands -- the SMT-LIB emitted for the FPA-encoded source is
+     mistyped.  Also affects programs that mix `double` and `long
+     double` without the union read.  See the comment at the
+     `floatbv_typecast`/`typecast` dispatch sites in
+     `src/solvers/smt2/smt2_conv.cpp` for the implementation TODO.
+
+Once both limitations are lifted, the broken-cprover-smt-backend tag
+can be removed.  The new SMT2 backend has its own pre-existing
+limitations and is excluded via no-new-smt.
 
 The source is provided as a pre-processed `main.i` so CBMC parses it
 without invoking the host preprocessor; combined with `--arch x86_64
