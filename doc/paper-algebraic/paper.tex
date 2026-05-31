@@ -195,14 +195,14 @@ all five in $<$15\,ms; cvc5 takes 1.84\,s on
 SABER~\cite{daemen2018saber} polynomial multiplication ---
 a post-quantum cryptography application --- the procedure
 scales to SABER's actual $N = 256$ parameter, deciding each
-output-coefficient equivalence in $\sim$109\,s, while cvc5
+output-coefficient equivalence in $\sim$11\,s, while cvc5
 times out at every $N \geq 4$
 (Section~\ref{sec:eval-saber}). On commutativity, associativity,
 and overflow checking the procedure is bitwidth-independent
 (2--5\,ms from BW=8 to 256), matching Bitwuzla's word-level
 rewriting and outpacing pure bit-blasting (which times out at
 BW=16). On the same random-polynomial sample, Bitwuzla
-solves 184/210 to our 128/210: its
+solves 183/210 to our 133/210: its
 occurrence-map canonicalisation closes most queries
 syntactically and constructs witnesses for the
 existential-equational SAT-direction queries that our
@@ -1272,20 +1272,112 @@ needs the bridging disequality. It unlocks
 \texttt{cohencu.c\_0}, \texttt{cohencu.c\_1}, and
 \texttt{geo3.c\_5} from the SMT-COMP sample.
 
+\paragraph{(A.3) Nonzero fast-path for relational predicates.}
+The standard SMT-LIB div/mod identity
+$a = (a/b) \cdot b + (a \bmod b)$ guarded by $b > 0$ is a
+canonical universal-equational query, but with our previous
+implementation it timed out at every bitwidth $\geq 16$. The
+issue was the bvult predicate $\mathtt{bvult\ 0\ b}$ being
+encoded by \texttt{extract\_predicate} as a bit-chain
+constraint over the bits of $b$ (``at least one bit is 1''),
+which adds $d$ bit variables and a chain of comparison
+auxiliaries to every per-disequality basis, multiplying
+Buchberger's work even when the predicate is logically
+redundant for the disequality the system is trying to refute.
+
+The fast-path recognises ``$x$ is non-zero'' patterns
+($\mathtt{bvult\ 0\ x}$, $\mathtt{bvule\ 1\ x}$, the
+parser-normalised $\mathtt{bvuge\ x\ 1}$ form, NOT
+$\mathtt{bvule\ x\ 0}$) and emits $(= x\ 0)$ to a deferred
+\texttt{nonzero\_pending} vector. In
+\texttt{try\_algebraic\_solve}, these are promoted to
+\texttt{algebraic\_disequalities} only when the formula
+contains \texttt{bvudiv}/\texttt{bvurem} somewhere; otherwise
+they are skipped to avoid flooding the algebraic worklist on
+SAT benchmarks like \texttt{Sage2\_bench\_15251} (218 bvult
+occurrences and no division). Soundness is captured in
+\texttt{BvDivPolyEncoding.lean::NonzeroFastPath::
+bvult\_zero\_iff\_ne\_zero}.
+
+Concrete result on the div/mod identity:
+
+\begin{tabular}{lrr}
+\toprule
+$d$ (bitwidth) & before & after \\
+\midrule
+8 & 4.75 s & 0.007 s \\
+16 & T/O & 0.011 s \\
+32 & T/O & 0.025 s \\
+64 & T/O & 0.084 s \\
+128 & T/O & 0.331 s \\
+256 & T/O & 1.382 s \\
+\bottomrule
+\end{tabular}
+
+\paragraph{F4-style tail reduction.}
+Two further benchmarks from the SMT-COMP sample
+(\texttt{cohencu\_2}, \texttt{cohencu\_3}) carry an
+IF-condition with $z \cdot z$, a quadratic-in-$z$ polynomial.
+After the Phase~A.2 IF-rebuild and Phase~A.3 if-case-elimination,
+the algebraic disequality becomes
+$z^2 + 12 - 6z - 12y \neq 0$, whose Rabinowitsch encoding
+$e \cdot (z^2 + 12 - 6z - 12y) - 1 = 0$ should reduce to $-1$
+when combined with the cohencu polynomial equations. The
+substitution $z = 6 + 6n$ and $y = 1 + 3n + 3n^2$ flattens the
+inner expression to zero, leaving the odd unit $-1$.
+
+But this refutation requires reducing a \emph{non-leading}
+term: standard incremental Buchberger's leading-monomial-divides
+rule reduces only the leading term, and with grevlex ordering
+the basis polynomial $-z^2 + x_6$ has leading $z^2$ (degree 2),
+not $x_6$ (degree 1) --- so $x_6$ in tails of other polynomials
+is not rewritten.
+
+We add F4-style \emph{full reduction}: a polynomial is reduced
+by walking each of its terms, and any term whose monomial is
+divisible by a basis element's leading monomial is rewritten
+using that basis element. \texttt{interreduce\_basis} applies
+this fixed-point across the basis. Wired into the standard
+Buchberger via an outer ``Buchberger $\to$ interreduce $\to$
+regenerate pairs $\to$ Buchberger'' loop (capped at 8 outer
+rounds), this catches reductions that incremental Buchberger
+misses. Soundness reuses
+\texttt{BuchbergerCorrectness.lean::reduce\_in\_ideal}: tail
+reduction is a sequence of standard reduction steps, and the
+lemma applies regardless of which term we choose to reduce.
+The new \texttt{StrongGB.lean::tail\_reduction\_in\_ideal}
+formalises this orthogonality.
+
+This is not the full F4 algorithm of Faug\`ere~\cite{faugere1999f4}
+(which batches multiple S-polynomial reductions into a single
+matrix), but it captures F4's core benefit for our use case
+without requiring a matrix kernel implementation. The
+\texttt{cohencu\_2} unlock takes 3.5\,s, \texttt{cohencu\_3}
+1.8\,s. (Disable env var:
+\texttt{DISABLE\_INTERREDUCE=1}.)
+
 \paragraph{Combined effect.}
-The four steps preserve all previously-solved benchmarks
+The six steps (Phases~2.5, 2.6, A.1, A.2, A.3, F4) preserve all
+previously-solved benchmarks
 (zero regressions on the 691 existing regression tests, the
 210 random-polynomial sample, and the 66 SMT-COMP stratified
-sample) and unlock six new benchmarks on the SMT-COMP sample
-(33/66 to 39/66 in our prior measurement, see
-Table~\ref{tab:smtcomp-sample}; PAR-2 improves from
-$63.5$\,s/benchmark to $50.3$\,s/benchmark, the latter now
-ahead of cvc5's $52.6$). Each step is gated behind an
-environment variable for ablation
+sample) and unlock eight new benchmarks on the SMT-COMP sample
+($33/66 \to 41/66$, see Table~\ref{tab:smtcomp-sample}; PAR-2
+improves from $63.5$\,s/benchmark to $46.8$\,s/benchmark, the
+latter ahead of cvc5's $52.6$). On
+Brain's 210-benchmark random-polynomial sample, the algebraic
+configuration solves $133/210$ (was $128/210$ in our prior
+measurement, see Table~\ref{tab:random-poly-solved}). The four
+wins-beyond-all-current-solvers
+(Table~\ref{tab:random-poly-wins}) are decided $10\times$
+faster on average due to Phase~A.1's pair selection. Each step
+is gated behind an environment variable for ablation
 (\texttt{DISABLE\_TSEITIN\_PROPAGATION},
 \texttt{GB\_LIFO},
 \texttt{DISABLE\_ALGEBRAIC\_TREE\_WALK},
-\texttt{DISABLE\_IF\_CASE\_ELIM}) so that future implementations
+\texttt{DISABLE\_IF\_CASE\_ELIM},
+\texttt{DISABLE\_NONZERO\_FAST\_PATH},
+\texttt{DISABLE\_INTERREDUCE}) so that future implementations
 can disable any subset for measurement.
 
 \section{Evaluation}
@@ -1348,18 +1440,18 @@ sample, 10\,s wall-clock budget per benchmark.}
 \toprule
 Configuration                       & Solved / 210 \\
 \midrule
-shift-add bit-blasting              & 118 \\
-Comba/CS bit-blasting               & 118 \\
-\textbf{this paper} (algebraic)     & \textbf{128} \\
-Bitwuzla 0.9.0-dev                  & 184 \\
-cvc5 1.3.3                          & 168 \\
+shift-add bit-blasting              & 117 \\
+Comba/CS bit-blasting               & 117 \\
+\textbf{this paper} (algebraic)     & \textbf{133} \\
+Bitwuzla 0.9.0-dev                  & 183 \\
+cvc5 1.3.3                          & 167 \\
 \midrule
-union (any configuration)           & 188 \\
+union (any configuration)           & 189 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Bitwuzla wins the volume contest by 56 over our procedure: its
+Bitwuzla wins the volume contest by 50 over our procedure: its
 occurrence-map canonicalisation closes most universal-equational
 queries syntactically, and on the existential-equational
 SAT-direction queries (equality, nonequality) it constructs
@@ -1381,10 +1473,10 @@ configuration time out on within 10\,s. Times in seconds.}
 \toprule
 Benchmark (seed-23) & this paper \\
 \midrule
-\texttt{bw-16-deg-13-multiplication-reduced-native-encoding}    & 0.30 \\
-\texttt{bw-16-deg-23-correctness-original-vs-reduced-native-encoding} & 0.41 \\
-\texttt{bw-32-deg-19-multiplication-reduced-native-encoding}    & 3.73 \\
-\texttt{bw-32-deg-27-correctness-original-vs-reduced-native-encoding} & 2.87 \\
+\texttt{bw-16-deg-13-multiplication-reduced-native-encoding}    & 0.03 \\
+\texttt{bw-16-deg-23-correctness-original-vs-reduced-native-encoding} & 0.04 \\
+\texttt{bw-32-deg-19-multiplication-reduced-native-encoding}    & 0.20 \\
+\texttt{bw-32-deg-27-correctness-original-vs-reduced-native-encoding} & 0.15 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1561,13 +1653,13 @@ $N = 256$ is SABER's actual parameter. cvc5 times out
 \toprule
 $N$ & this paper (1-level) & this paper (2-level) & Bitwuzla & cvc5 \\
 \midrule
-4   & 0.00\,s   & 0.00\,s   & 0.00\,s & T/O \\
-8   & 0.00\,s   & 0.00\,s   & 0.00\,s & T/O \\
-16  & 0.01\,s   & 0.01\,s   & 0.01\,s & T/O \\
-32  & 0.06\,s   & 0.06\,s   & 0.03\,s & T/O \\
-64  & 0.31\,s   & 0.34\,s   & 0.13\,s & T/O \\
-128 & 2.00\,s   & 2.05\,s   & 0.50\,s & T/O \\
-256 & 14.27\,s  & 14.01\,s  & 2.18\,s & T/O \\
+4   & 0.01\,s   & 0.01\,s   & 0.00\,s & T/O \\
+8   & 0.01\,s   & 0.01\,s   & 0.00\,s & T/O \\
+16  & 0.02\,s   & 0.02\,s   & 0.01\,s & T/O \\
+32  & 0.05\,s   & 0.05\,s   & 0.03\,s & T/O \\
+64  & 0.26\,s   & 0.26\,s   & 0.13\,s & T/O \\
+128 & 1.63\,s   & 1.64\,s   & 0.50\,s & T/O \\
+256 & 11.25\,s  & 11.23\,s  & 2.18\,s & T/O \\
 320 & 27.18\,s  & 26.51\,s  & 3.54\,s & T/O \\
 512 & 107.98\,s & 104.54\,s & 9.42\,s & T/O \\
 768 & 361.35\,s & 346.85\,s & 21.76\,s & T/O \\
@@ -1576,7 +1668,7 @@ $N$ & this paper (1-level) & this paper (2-level) & Bitwuzla & cvc5 \\
 \end{table}
 
 The procedure scales to SABER's actual $N = 256$ parameter,
-deciding each output-coefficient equivalence in $\sim$14\,s
+deciding each output-coefficient equivalence in $\sim$11\,s
 regardless of whether the alternative implementation is 1-level
 or 2-level Karatsuba: Buchberger normalises through the
 recursion levels because the underlying polynomial identity is
@@ -1813,8 +1905,9 @@ timeout.
   QF\_BV). Bitwuzla 0.9.0-dev added 2026-05-26.
   \texttt{\cbmc default} updated 2026-05-31 with the techniques of
   Section~\ref{sec:algebraic-tuning} (Phase~2.5--2.6 boolean-structure
-  propagation and Phase~A.1--A.2 Buchberger pair selection plus
-  bounded boolean tree walk).}
+  propagation, Phase~A.1--A.3 Buchberger pair selection plus
+  bounded boolean tree walk and nonzero-fast-path, F4-style tail
+  reduction).}
 \label{tab:smtcomp-sample}
 \centering
 \begin{tabular}{lrr}
@@ -1822,7 +1915,7 @@ timeout.
 Configuration & Solved & PAR-2 (s/benchmark) \\
 \midrule
 shift-add (bit-blasting only) & 34/66 & 63.1 \\
-\cbmc default (algebraic + \combacs) & \textbf{39/66} & \textbf{50.3} \\
+\cbmc default (algebraic + \combacs) & \textbf{41/66} & \textbf{46.8} \\
 cvc5 default & 38/66 & 52.6 \\
 Bitwuzla default & \textbf{52/66} & \textbf{28.7} \\
 \bottomrule
@@ -1830,18 +1923,21 @@ Bitwuzla default & \textbf{52/66} & \textbf{28.7} \\
 \end{table}
 
 On the stratified sample Bitwuzla solves the most benchmarks
-(52), followed by \cbmc default (39), cvc5 (38), and shift-add
-\cbmc (34). \cbmc's default configuration now overtakes cvc5
-on this sample, primarily through the Phase~2.5/2.6 and~A.1/A.2
-boolean-structure techniques described in
+(52), followed by \cbmc default (41), cvc5 (38), and shift-add
+\cbmc (34). \cbmc's default configuration overtakes cvc5 on
+this sample, primarily through the Phase~2.5/2.6/A.1/A.2/A.3
+techniques and F4-style tail reduction described in
 Section~\ref{sec:algebraic-tuning} below: parse-time
 push-through-ite, Tseitin-aware preprocessing of boolean chains
 ahead of Buchberger, min-LCM-degree pair selection
-(``normal selection'') in the strong Gr\"obner basis, and a
+(``normal selection'') in the strong Gr\"obner basis, a
 bounded boolean tree walk in the bit-blaster's \texttt{set\_to}
 that surfaces equalities buried under \texttt{and}/\texttt{or}/
-\texttt{not}/\texttt{let}/\texttt{ite} wrappers for the
-algebraic refutation pipeline.
+\texttt{not}/\texttt{let}/\texttt{ite} wrappers, a nonzero-
+fast-path that recognises \texttt{bvult 0 x} as a polynomial
+disequality (avoiding the bit-chain encoding's overhead), and an
+F4-style basis interreduction that catches reductions involving
+non-leading terms.
 
 Bitwuzla's lead remains consistent with its dominance on
 the random-polynomial sample (Section~\ref{sec:eval-random-poly}):
@@ -2266,6 +2362,29 @@ shortcut without explicit circuit information. Bridging this gap
 is a promising direction for future work (one could, for example,
 extract and use the SSA topological order of \cbmc's bit-level
 decomposition).
+
+\textbf{Hybrid Z/ZMod overflow reasoning is not enough on its
+own.} The natural extension to handle overflow patterns
+(\texttt{(extract 2N-1 N) (bvmul (zext s) (zext t))}) is a
+hybrid where part of the system lives in $\mathbb{Z}_{2^d}$ and
+part in $\mathbb{Z}_{2^{2d}}$, with shared bit-decomposition
+between rings. We designed this and surveyed its candidate
+benchmarks (the Brummayer-Biere overflow detectors
+\texttt{*ulov*}, the log-slicing \texttt{bvudiv} equivalences,
+the Galois interleaved modular multiplications); on careful
+examination, all of these
+combine the high-half-of-product pattern with a deeply nested
+AND/OR/NOT bit-circuit that requires gate-level reasoning to
+check the equivalence. Synthetic high-half-of-product
+benchmarks where bit-blasting genuinely struggles are rare:
+modern bit-blasting plus canonicalisation handles bounded-
+overflow patterns very efficiently (e.g.\ a 256-bit
+single-multiplication overflow check refutes in 0.27\,s by
+shift-add). The hybrid Z/ZMod design therefore delivers $0$ to
+$2$ unlocks on the SMT-COMP sample (vs an initial projection of
+$+5$ to $+12$); the actual algebraic-vs-bit-blasting frontier
+is gate-level reasoning, not overflow reasoning. Recorded in
+\texttt{doc/paper-algebraic/plan-B-empirical-findings.md}.
 
 \textbf{No correctness regressions.} The 691 \cbmc regression
 tests (covering array bounds, pointer safety, floating-point, and
