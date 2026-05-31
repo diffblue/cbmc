@@ -1,0 +1,269 @@
+# Algebraic Pre-Solver — Remaining Work and Open Items
+
+This document lists work that is incomplete or unexplored after
+Plan A.1 / A.2 / A.3 (commit b0aaed56bd on branch
+`features/adder`). Items are tagged with priority, effort,
+expected impact, and any dependency on prior work.
+
+The current state (post Plan A.3):
+- 39/66 SMT-COMP stratified sample (was 36/66 baseline; +3
+  unlocks: cohencu_0, cohencu_1, geo3.c_5).
+- div/mod identity at every bit-width tested (8 → 256) now
+  solves in <1.4 s.
+- 142+ Lean theorems across 20 modules; zero `sorry`s in
+  project code; standard mathlib axioms only.
+- bw=512 family (4/5), Wienand commute*/distrib* (4/4),
+  SABER (3/3) preserved.
+
+**Status legend**:
+- **Open**: not yet started.
+- **Documented**: investigation complete, design captured, no
+  implementation.
+- **In progress**: actively being worked on.
+- **Deferred**: deliberately deprioritised (with rationale).
+
+---
+
+## Concrete capability gaps
+
+### Item 1 — Cohencu_2/3 unlock
+
+**Status**: Open. Diagnosed bottleneck: Buchberger basis grows
+with leading coefficient 2^31 (even, non-unit) only; never
+reaches an odd unit. The polynomial system needs deeper
+saturation to refute.
+
+**Effort**: ~1 week (uncertain payoff).
+
+**Approaches in increasing effort**:
+
+1. **Variable ordering**: try lex (lexicographic) instead of
+   grevlex when the disequality is degree ≥ 2. Lex eliminates
+   one variable at a time, which suits the cohencu chain
+   (substitute z = 6+6n, then expand z² in terms of n).
+2. **Sugar / homogeneous selection**: extend Plan A.1's
+   pair-selection with the full sugar heuristic (track an
+   extra "sugar" degree per polynomial that approximates the
+   homogeneous degree of its origin).
+3. **F4-style matrix reduction**: see Item 8.
+
+**Expected impact**: +2 SMT-COMP unlocks (cohencu_2, cohencu_3).
+
+**Reproduction**:
+```
+$ time timeout 60 build/bin/smt2_solver \
+  < bench-multiplication/smt-comp-sample/\
+20230321-UltimateAutomizerSvcomp2023_cohencu.c_2.smt2
+T/O at 60 s
+```
+
+---
+
+### Item 2 — Plan A.3 extension to other predicates
+
+**Status**: Open. Plan A.3 fast-paths `x != 0`. Same approach
+generalises:
+
+- `x != ~0`: emit as a disequality.
+- `x != C` for constant C: emit directly.
+- `bvult x (C+1)` parses as `bvule x C` and gets bit-chain-
+  encoded; could fast-path with bound + bit-decomposition only
+  when the bound is non-trivial.
+
+**Effort**: ~3 days.
+
+**Expected impact**: +0–2 SMT-COMP unlocks; the synthetic
+high-half-extract regression noted in
+`plan-B-empirical-findings.md` (default 4 s vs bit-blast 0.02 s
+on 64-bit single-mul) likely disappears.
+
+---
+
+### Item 3 — Constraint-system scalability for VS3 / Sage2
+
+**Status**: Open. Diagnosed: 100+ algebraic equalities cause
+the per-disequality Buchberger to repeatedly process a giant
+basis, choking on benchmarks like VS3_A11 (518 asserts) and
+VS3_S1 (336 asserts).
+
+**Effort**: ~1 week.
+
+**Targeted improvements**:
+- **SSA chain compression**: pre-process algebraic_equalities to
+  substitute non-recursive definitions before Buchberger sees
+  them (currently only partial substitution happens).
+- **Polynomial deduplication**: identical or trivially-related
+  polynomials get added multiple times after extraction.
+- **Per-disequality basis pruning**: skip equalities whose
+  support doesn't overlap with the disequality's support.
+
+**Expected impact**: +2–3 SMT-COMP unlocks (VS3_A11, VS3_S1,
+possibly Sage2_bench_9381).
+
+---
+
+## Engineering / methodology
+
+### Item 4 — Fresh paper evaluation
+
+**Status**: Open. The paper's tables predate Plan A.1/A.2/A.3.
+
+**Effort**: ~2 days.
+
+**Specific tasks**:
+- Re-run **Brain's 210-benchmark random-polynomial sample**.
+  The new pair selection (Plan A.1) may unlock additional
+  polynomials with quadratic disequalities.
+- Re-run the **39-benchmark custom suite**.
+- Re-run the **DSP datapath benchmarks** (5 benchmarks).
+- Update **PAR-2** numbers across all tables.
+- Verify **SABER at higher N** still scales (N=512 / N=1024
+  beyond the prior N=256 measurement).
+- Compare against fresh **Bitwuzla / cvc5** versions.
+
+**Currently updated**: only the SMT-COMP table (33 → 39, PAR-2
+63.5 → 50.3).
+
+---
+
+### Item 5 — Update paper with Plan A.3 + div/mod identity
+
+**Status**: Open. The paper's `sec:algebraic-tuning` section
+discusses Phases 2.5 / 2.6 / A.1 / A.2.
+
+**Effort**: ~1 day.
+
+**Additions needed**:
+- Phase A.3 narrative: the relational-predicate fast-path.
+- div/mod identity benchmark as a concrete demonstration (the
+  only paper-level benchmark where all bit-widths went from
+  T/O to <1.4 s).
+- Plan B negative finding: explain why we did NOT pursue
+  hybrid Z/ZMod, with reference to
+  `doc/paper-algebraic/plan-B-empirical-findings.md`.
+
+---
+
+### Item 6 — Synthetic regression cleanup
+
+**Status**: Documented. The high-half-extract pattern
+`(extract 2N-1 N) (bvmul (zext s) (zext t))` with a bvule
+bound is 200× slower in default than bit-blast-only on
+synthetic benchmarks.
+
+**Effort**: ~1–2 days.
+
+**Engineering polish**:
+- Detect the pattern in `set_to`.
+- Skip the algebraic processing for these disequalities (they
+  don't fit our fragment).
+- Let bit-blasting handle them directly.
+
+**Expected impact**: 0 SMT-COMP unlocks (pattern not in our
+sample), but cleaner pipeline behaviour.
+
+---
+
+## Scientific frontiers
+
+### Item 7 — Gate-level + algebraic hybrid
+
+**Status**: Documented frontier. The ~16 SMT-COMP benchmarks
+(brummayerbiere2_*ulov*, log-slicing_*, galois_*, calypto,
+BuchwaldFried, isqrtadd, Booth_mult) require AIG-aware
+polynomial reasoning of the kind in Biere-Kauers-Ritirc 2017
+and Kaufmann-Biere 2021.
+
+**Effort**: Multi-month follow-on paper.
+
+**Research directions**:
+- **Topological gate ordering**: extract polynomial relations
+  from CBMC's bit-level SSA in reverse topological order
+  (mimicking AIG-aware Gröbner solvers).
+- **Hybrid procedure**: when high-half-extract patterns are
+  detected AND a corresponding bit-level circuit exists,
+  dispatch to a specialised gate-level solver instead of
+  bit-blasting.
+- **AIG-multiplier equivalence**: the Amulet2 problem space.
+
+**Status quo**: paper's `sec:gate-level` acknowledges this gap
+but has no concrete approach.
+
+---
+
+### Item 8 — F4-style matrix reduction
+
+**Status**: Open. Faugère's F4 (1999) replaces incremental
+S-poly reduction with batched matrix row reduction.
+
+**Effort**: ~2–3 weeks.
+
+**Concrete payoffs**:
+- Likely unlocks cohencu_2/3 (Item 1's main target).
+- Better scaling on the random-polynomial sample at higher
+  degrees.
+- Standard technique well-described in literature.
+
+**Risk**: the polynomial representation may need adjustment;
+the matrix kernel needs implementation; row reduction over
+ZMod(2^d) is more subtle than over a field.
+
+**Soundness**: trivial via existing per-step lemmas
+(`s_poly_in_ideal`, `reduce_in_ideal`, `scale_in_ideal`,
+`two_trick_preserves_ideal`).
+
+---
+
+### Item 9 — Lean tightening (`DONE-MOD-AXIOMS` → `DONE`)
+
+**Status**: Open. Several Lean theorems are currently
+`DONE-MOD-AXIOMS`:
+
+- `Defer.lean::defer_replay_equivalence` (relies on
+  `defer_finish_eq_eager_finish`, `finish_eager_commutes`
+  axioms).
+- `Defer.lean::defer_verdict_equivalence` (same chain).
+- `boolbv.cpp::try_algebraic_solve` verdict soundness (relies
+  on operational-semantics axioms).
+
+**Effort**: ~1 week.
+
+**Approach**: mechanise the operational semantics of the
+boolbv layer or the strong-GB algorithm to a degree that lets
+the axioms be discharged.
+
+**Expected impact**: increases trust in the implementation;
+no SMT-COMP unlock.
+
+---
+
+## Recommended sequencing
+
+If chasing **incremental concrete payoffs**:
+- Items 4 (paper eval), 5 (paper update), 2 (predicate
+  fast-path extension). Total: 1–2 weeks.
+
+If chasing **bigger scientific impact** in the current paper:
+- Item 8 (F4 reduction). 2–3 weeks but likely unlocks
+  cohencu_2/3 and gives a clean scaling story.
+
+If chasing **a follow-on research direction**:
+- Item 7 (gate-level + algebraic hybrid). Multi-month
+  research project.
+
+The current state (Plan A.1+A.2+A.3) is a defensible paper
+artifact on its own. Items 4–5 alone would let us submit; the
+rest are improvements rather than necessities.
+
+---
+
+## Cross-references
+
+- Plan A design: `doc/paper-algebraic/plan-A-buchberger-tuning.md`
+- Plan B design (deferred): `doc/paper-algebraic/plan-B-hybrid-z-zmod.md`
+- Plan B empirical findings:
+  `doc/paper-algebraic/plan-B-empirical-findings.md`
+- Plan A/B synthesis:
+  `doc/paper-algebraic/plans-AB-synthesis.md`
+- Paper section on tuning: `paper.tex::sec:algebraic-tuning`
+- Lean traceability: `formal-proofs/TRACEABILITY.md`
