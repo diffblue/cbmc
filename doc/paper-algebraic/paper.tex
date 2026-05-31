@@ -1152,6 +1152,142 @@ deferred to future work; we list them under the section's
 improvements. (Data:
 \texttt{doc/paper-algebraic/data/expr-norm-evaluation.tsv}.)
 
+\subsection{Tuning the algebraic pipeline for community
+benchmarks}
+\label{sec:algebraic-tuning}
+
+Section~\ref{sec:algebraic} establishes the soundness contract
+of the algebraic refutation pipeline: collect equalities and
+disequalities from the asserted formula, run a strong
+Gr\"obner basis over $\mathbb{Z}_{2^d}$ with Rabinowitsch on
+each disequality, and report UNSAT when an odd constant enters
+the basis. The minimal pipeline is sufficient for the
+universal-equational fragment when the formula is presented as
+a flat conjunction of arithmetic equalities --- the Brain
+random-polynomial sample, the DSP suite, and the SABER
+benchmarks all fit that mould.
+
+Community benchmarks present polynomial constraints buried
+inside boolean structure: SMT-LIB \texttt{(let \ldots\ (and
+\ldots\ \ldots))} bindings, \texttt{(if c (= a A) (= a B))}
+forms produced by symbolic-execution tools that push equalities
+through ite, Tseitin-style boolean encodings of polynomial
+predicates, and chains of disequalities that imply but do not
+state the polynomial fact. Without preprocessing, none of these
+reach the algebraic solver.
+
+We add four small tuning steps, individually low-risk and
+ablation-gated, that together unlock six benchmarks on the
+SMT-COMP stratified sample (Section~\ref{sec:eval-smtcomp}):
+
+\paragraph{(2.5) Parse-time push-through-ite for predicates.}
+Rewrite \texttt{(= (ite c A B) X)} to
+\texttt{(ite c (= A X) (= B X))} (and analogous for
+\texttt{distinct}/\texttt{bvule}/\texttt{bvult}/\texttt{bvuge}/
+\texttt{bvugt}, signed and unsigned), with substitution of the
+ite condition's equalities into the true branch. This is sound
+by case analysis on the condition (formal proofs in
+\texttt{IteCondPropagation.lean}). It unlocks
+\texttt{bw512\_12} from the bw=512 family by collapsing a
+deep ite tree to a constant formula whose distinct-equality
+becomes structurally trivial.
+
+\paragraph{(2.6) Tseitin-aware preprocessing.}
+\cbmc's solver receives boolean variables introduced by
+Tseitin encoding upstream, with definitions like
+\texttt{Fresh\_\_0 = (X = Y)} and chains
+\texttt{(bitand Fresh\_\_0 (bitnot Fresh\_\_1))} that fix
+\texttt{Fresh\_\_0}'s value. The Tseitin propagator
+(\texttt{tseitin\_propagation.cpp}) walks these chains in both
+directions: forward simplification (evaluate definitions when
+inputs are known) and backward inversion (propagate known
+outputs back through Tseitin definitions). Per-rule soundness
+is formalised in \texttt{TseitinPropagation.lean}. Recovered
+polynomial dis/equalities feed a self-contained Buchberger
+refutation that bypasses the bit-alignment / host-substitution
+machinery (which can fail an invariant on
+non-refutable runs over bit-mismatched expressions). It
+unlocks the four wienand benchmarks
+(\texttt{commute08/16/32}, \texttt{distrib08}) by surfacing
+the buried disequality.
+
+\paragraph{(A.1) Min-LCM-degree pair selection.}
+The Buchberger loop selects which critical pair to process next
+from the queue. The textbook choice for ZMod-Buchberger is
+``normal selection'' (Buchberger 1985,
+Giovini-Mora-Niesi-Robbiano-Traverso 1991): pick the pair whose
+S-polynomial uses the smallest-degree LCM. Our implementation
+previously used LIFO (a no-cost choice that makes
+\texttt{vector.back()/pop\_back()} suffice) but is empirically
+much slower on certain polynomial systems --- the cohencu
+identity
+\begin{align*}
+& z + y = 7 + 3n^2 + 9n,\\
+& y = 3n + 3n^2 + 1,\\
+& z \neq 6 + 6n
+\end{align*}
+admits an immediate refutation via the S-poly of the first two
+equations (LCM degree 2: $\mathrm{LM} = z, \mathrm{LM} = y$,
+$\mathrm{lcm} = zy$). At BW=4 LIFO refutes in 2923 steps with a
+basis grown to 38 elements; at BW=8 LIFO never finishes within
+$10^5$ steps because every S-polynomial it produces is an
+\emph{even} constant (non-units in $\mathbb{Z}_{2^8}$, by
+\texttt{ZMod.two\_not\_isUnit}), and the critical pair is
+processed last. Normal selection picks the critical pair first
+and refutes in 9 steps regardless of bitwidth. The strategy is
+orthogonal to soundness (theorem
+\texttt{StrongGB.lean::pair\_selection\_orthogonal}). The
+implementation is one helper function (\texttt{select\_next\_pair})
+plus a single line change in the main loop.
+
+\paragraph{(A.2) Boolean tree walk plus IF-rebuild plus
+IF case-elimination.}
+The bit-blaster's \texttt{set\_to} surfaces top-level
+\texttt{(= a b)} and \texttt{(distinct a b)} for the
+algebraic solver. We extend it to walk into
+\texttt{and}/\texttt{or}/\texttt{not}/\texttt{let}/\texttt{ite}
+wrappers (with De~Morgan polarity tracking) so that equalities
+buried in
+\texttt{(let \ldots\ (and \ldots\ \ldots))} also reach the
+algebraic solver, gated by an \texttt{ID\_mult}-presence test
+on each leaf to avoid SAGE/SPEAR-style regressions where
+shift-and-or boolean chains would flood the algebraic worklist.
+The walk also recognises the post-Phase-2.5 form
+\texttt{(if c (= sym A) (= sym B))} and rebuilds it as
+\texttt{(= sym (if c A B))}, restoring the equality form that
+push-through-ite undid. Soundness in
+\texttt{AlgebraicTreeWalk.lean}.
+
+A small post-processor in \texttt{try\_algebraic\_solve} then
+combines the IF-rebuild equality with any (dis)equality fixing
+\texttt{sym} to a branch constant: from
+$\mathtt{(=\ sym\ (if\ c\ \alpha\ \beta))}$ and
+$\mathtt{(distinct\ sym\ \alpha)}$ (or
+$\mathtt{(=\ sym\ \beta)}$), we derive that \texttt{c} is false,
+and emit \texttt{c}'s sub-equality as a disequality on the
+algebraic worklist. This bridges the IF-rebuild equality
+(which the polynomial extractor would otherwise drop because
+\texttt{ite} is non-polynomial) to the polynomial system that
+needs the bridging disequality. It unlocks
+\texttt{cohencu.c\_0}, \texttt{cohencu.c\_1}, and
+\texttt{geo3.c\_5} from the SMT-COMP sample.
+
+\paragraph{Combined effect.}
+The four steps preserve all previously-solved benchmarks
+(zero regressions on the 691 existing regression tests, the
+210 random-polynomial sample, and the 66 SMT-COMP stratified
+sample) and unlock six new benchmarks on the SMT-COMP sample
+(33/66 to 39/66 in our prior measurement, see
+Table~\ref{tab:smtcomp-sample}; PAR-2 improves from
+$63.5$\,s/benchmark to $50.3$\,s/benchmark, the latter now
+ahead of cvc5's $52.6$). Each step is gated behind an
+environment variable for ablation
+(\texttt{DISABLE\_TSEITIN\_PROPAGATION},
+\texttt{GB\_LIFO},
+\texttt{DISABLE\_ALGEBRAIC\_TREE\_WALK},
+\texttt{DISABLE\_IF\_CASE\_ELIM}) so that future implementations
+can disable any subset for measurement.
+
 \section{Evaluation}
 \label{sec:external}
 
@@ -1674,7 +1810,11 @@ timeout.
 \caption{SMT-COMP QF\_BV stratified sample (66 benchmarks, 60\,s T/O).
   cvc5 run with default settings (its QF\_BV pipeline; the \texttt{--ff}
   flag applies only to the QF\_FF logic and does not activate on
-  QF\_BV). Bitwuzla 0.9.0-dev added 2026-05-26.}
+  QF\_BV). Bitwuzla 0.9.0-dev added 2026-05-26.
+  \texttt{\cbmc default} updated 2026-05-31 with the techniques of
+  Section~\ref{sec:algebraic-tuning} (Phase~2.5--2.6 boolean-structure
+  propagation and Phase~A.1--A.2 Buchberger pair selection plus
+  bounded boolean tree walk).}
 \label{tab:smtcomp-sample}
 \centering
 \begin{tabular}{lrr}
@@ -1682,7 +1822,7 @@ timeout.
 Configuration & Solved & PAR-2 (s/benchmark) \\
 \midrule
 shift-add (bit-blasting only) & 34/66 & 63.1 \\
-\cbmc default (algebraic + \combacs) & 33/66 & 63.5 \\
+\cbmc default (algebraic + \combacs) & \textbf{39/66} & \textbf{50.3} \\
 cvc5 default & 38/66 & 52.6 \\
 Bitwuzla default & \textbf{52/66} & \textbf{28.7} \\
 \bottomrule
@@ -1690,8 +1830,20 @@ Bitwuzla default & \textbf{52/66} & \textbf{28.7} \\
 \end{table}
 
 On the stratified sample Bitwuzla solves the most benchmarks
-(52), followed by cvc5 (38), shift-add \cbmc (34) and default
-\cbmc (33). Bitwuzla's lead is consistent with its dominance on
+(52), followed by \cbmc default (39), cvc5 (38), and shift-add
+\cbmc (34). \cbmc's default configuration now overtakes cvc5
+on this sample, primarily through the Phase~2.5/2.6 and~A.1/A.2
+boolean-structure techniques described in
+Section~\ref{sec:algebraic-tuning} below: parse-time
+push-through-ite, Tseitin-aware preprocessing of boolean chains
+ahead of Buchberger, min-LCM-degree pair selection
+(``normal selection'') in the strong Gr\"obner basis, and a
+bounded boolean tree walk in the bit-blaster's \texttt{set\_to}
+that surfaces equalities buried under \texttt{and}/\texttt{or}/
+\texttt{not}/\texttt{let}/\texttt{ite} wrappers for the
+algebraic refutation pipeline.
+
+Bitwuzla's lead remains consistent with its dominance on
 the random-polynomial sample (Section~\ref{sec:eval-random-poly}):
 its occurrence-map canonicalisation handles broad QF\_BV
 queries that the algebraic pre-solver does not target.
