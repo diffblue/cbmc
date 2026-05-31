@@ -400,3 +400,58 @@ TEST_CASE(
     << trials_with_bug_observed << " of " << total_trials << " trials");
   REQUIRE(trials_with_bug_observed > 0);
 }
+
+TEST_CASE(
+  "strong Gröbner basis: cohencu polynomial system at varying bitwidths",
+  "[core][solvers][algebraic][groebner]")
+{
+  // Identity from the cohencu SVCOMP benchmark:
+  //   z + y - 7 - 3*n^2 - 9*n = 0
+  //   y - 3*n - 3*n^2 - 1 = 0
+  //   (z - 6 - 6*n) * e - 1 = 0   (Rabinowitsch witness for the
+  //                                disequality z != 6 + 6n)
+  //
+  // The first two equations imply z = 6 + 6n (subtraction).
+  // Combined with Rabinowitsch's polynomial, this gives 0*e - 1 = -1,
+  // an odd unit in Z_{2^d}, hence UNSAT.
+  //
+  // This is a regression test for the pair-selection strategy: with
+  // LIFO (the previous strategy) the critical S-polynomial S(eq1, eq2)
+  // is processed last and the basis grows past the step limit before
+  // refutation. With min-LCM-degree (normal) selection, that pair is
+  // processed first and the system refutes in a small constant number
+  // of steps regardless of bitwidth.
+  //
+  // PROOF: pair-selection strategy is orthogonal to soundness; see
+  //        formal-proofs/StrongGB.lean::pair_selection_orthogonal.
+  for(unsigned bw : {4u, 8u, 16u, 32u})
+  {
+    INFO("bitwidth " << bw);
+    polynomialt n{bw, 1, 0};
+    polynomialt y{bw, 1, 1};
+    polynomialt z{bw, 1, 2};
+    polynomialt e{bw, 1, 3};
+
+    polynomialt three{bw, 3};
+    polynomialt six{bw, 6};
+    polynomialt seven{bw, 7};
+    polynomialt nine{bw, 9};
+    polynomialt one{bw, 1};
+
+    polynomialt n_sq = n * n;
+
+    std::vector<polynomialt> polys = {
+      // z + y - 7 - 3*n^2 - 9*n
+      (z + y) - seven - (three * n_sq) - (nine * n),
+      // y - 3*n - 3*n^2 - 1
+      y - (three * n) - (three * n_sq) - one,
+      // (z - 6 - 6*n) * e - 1
+      ((z - six - (six * n)) * e) - one};
+
+    // Use a small step budget to ensure the pair-selection
+    // strategy refutes quickly. With LIFO this would hit the
+    // limit; with normal selection it refutes in <100 steps.
+    strong_groebner_basist gb{1000};
+    REQUIRE(gb.compute(polys) == strong_groebner_basist::resultt::UNSAT);
+  }
+}

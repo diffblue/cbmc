@@ -3,7 +3,111 @@
 
 #include "groebner.h"
 
+#include <cstdlib>
 #include <set>
+
+/// Compute the total degree of LCM(LM(f), LM(g)).
+///
+/// Used by the pair-selection strategy in compute(): to favour the
+/// "normal selection" / "sugar" heuristic (Buchberger 1985,
+/// Giovini-Mora-Niesi-Robbiano-Traverso 1991), we prefer the pair
+/// whose S-polynomial uses the smallest-degree LCM, since it tends
+/// to produce reductions to small-degree polynomials early and
+/// avoid combinatorial explosion of the basis.
+///
+/// LIFO order (the previous strategy) is empirically much slower on
+/// some polynomial systems: e.g., cohencu's identity
+///   z + y - 7 - 3n^2 - 9n = 0
+///   y - 3n - 3n^2 - 1 = 0
+///   e * (z - 6 - 6n) - 1 = 0  (Rabinowitsch)
+/// admits an immediate refutation via S-poly of the first two
+/// equations (LCM degree 2), but with LIFO order this critical
+/// pair is processed last, by which time the basis has grown to
+/// 90+ elements (with even-only constants) and the step limit
+/// has been hit.
+///
+/// PROOF: pair-selection strategy is orthogonal to soundness; see
+///        formal-proofs/StrongGB.lean::pair_selection_orthogonal.
+///        The basic Buchberger soundness theorems
+///        (s_poly_in_ideal, reduce_in_ideal) hold regardless of
+///        which pair is selected next from the queue.
+static unsigned lcm_degree(const polynomialt &f, const polynomialt &g)
+{
+  if(f.is_zero() || g.is_zero())
+    return ~0u;
+  const monomialt &lm_f = f.leading_monomial();
+  const monomialt &lm_g = g.leading_monomial();
+
+  unsigned d = 0;
+  auto it1 = lm_f.vars.begin();
+  auto it2 = lm_g.vars.begin();
+  while(it1 != lm_f.vars.end() && it2 != lm_g.vars.end())
+  {
+    if(it1->first < it2->first)
+    {
+      d += it1->second;
+      ++it1;
+    }
+    else if(it1->first > it2->first)
+    {
+      d += it2->second;
+      ++it2;
+    }
+    else
+    {
+      d += std::max(it1->second, it2->second);
+      ++it1;
+      ++it2;
+    }
+  }
+  while(it1 != lm_f.vars.end())
+  {
+    d += it1->second;
+    ++it1;
+  }
+  while(it2 != lm_g.vars.end())
+  {
+    d += it2->second;
+    ++it2;
+  }
+  return d;
+}
+
+/// Select the index of the next pair to process, using min-LCM-degree
+/// (normal selection / sugar). Returns the index in `pairs`.
+///
+/// If the env var GB_LIFO is set, falls back to LIFO selection
+/// (the last index) for ablation experiments.
+///
+/// Ties are broken by FIFO order (earliest pair wins among equal
+/// LCM degrees). This makes the algorithm slightly more predictable
+/// when many pairs share the same minimum degree.
+static std::size_t select_next_pair(
+  const std::vector<std::pair<std::size_t, std::size_t>> &pairs,
+  const std::vector<polynomialt> &polys)
+{
+  PRECONDITION(!pairs.empty());
+
+  static const bool use_lifo = std::getenv("GB_LIFO") != nullptr;
+  if(use_lifo)
+    return pairs.size() - 1;
+
+  unsigned best_deg = ~0u;
+  std::size_t best_idx = 0;
+  for(std::size_t k = 0; k < pairs.size(); ++k)
+  {
+    const auto &[i, j] = pairs[k];
+    if(i >= polys.size() || j >= polys.size())
+      continue;
+    unsigned d = lcm_degree(polys[i], polys[j]);
+    if(d < best_deg)
+    {
+      best_deg = d;
+      best_idx = k;
+    }
+  }
+  return best_idx;
+}
 
 // PROOF: formal-proofs/GroebnerSoundness.lean::ZMod.isUnit_of_odd_nat
 //        Soundness: an odd natural number is a unit in Z_{2^d}.
@@ -351,7 +455,11 @@ strong_groebner_basist::compute(std::vector<polynomialt> &polys)
     if(pairs_since_last_progress > pairs_at_last_progress)
       return has_constant(polys) ? resultt::UNSAT : resultt::UNKNOWN;
 
-    auto [i, j] = pairs.back();
+    auto pair_idx = select_next_pair(pairs, polys);
+    auto [i, j] = pairs[pair_idx];
+    // Swap-with-back removal: O(1) and order-independent for our purposes
+    // (FIFO ties handled by select_next_pair already).
+    pairs[pair_idx] = pairs.back();
     pairs.pop_back();
 
     // Capture the basis size at the start of this iteration. If it grows

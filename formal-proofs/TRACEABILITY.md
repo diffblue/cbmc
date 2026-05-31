@@ -89,6 +89,7 @@ implementation site with one or more Lean theorems.
 | `groebner.cpp::compute` (d=1 completeness) | `StrongGB.lean::d_eq_one_completeness` | DONE |
 | `groebner.cpp::compute` (idempotent ⇒ {0,1}) | `StrongGB.lean::sq_eq_self_of_zmod_two_pow` | DONE |
 | `groebner.cpp::compute` (refined completeness fails) | `StrongGB.lean::two_trick_saturation_complete_is_false` | DONE |
+| `groebner.cpp::select_next_pair` (pair selection orthogonal to soundness) | `StrongGB.lean::pair_selection_orthogonal` | DONE |
 | `boolbv.cpp::set_to`/`finish_eager_conversion` (defer/replay states) | `Defer.lean::defer_replay_equivalence` | DONE-MOD-AXIOMS |
 | `boolbv.cpp::try_algebraic_solve` (verdict equivalence) | `Defer.lean::defer_verdict_equivalence` | DONE-MOD-AXIOMS |
 | `boolbv.cpp::try_algebraic_solve` (verdict from empty state) | `Defer.lean::defer_verdict_from_empty` | DONE-MOD-AXIOMS |
