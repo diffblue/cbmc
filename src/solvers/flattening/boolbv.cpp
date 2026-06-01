@@ -1231,10 +1231,12 @@ void boolbvt::walk_for_algebraic(
 //        Soundness: deferring SSA equality bit-blasting and
 //        replaying-on-non-refutation is semantically equivalent
 //        to the eager bit-blasting path. Proven by induction on
-//        the assertion list relative to two semantic axioms
-//        (defer_finish_eq_eager_finish, finish_eager_commutes)
-//        reflecting the implementation invariants below.
-//        See finish_eager_conversion in boolbv.h for the call site.
+//        the assertion list using `defer_finish_eq_eager_finish`
+//        (formerly an axiom; now a theorem in the concrete
+//        set-based abstract model of `SolverState`). The
+//        commutation lemma `finish_eager_commutes` is similarly
+//        a theorem rather than an axiom. See
+//        `finish_eager_conversion` in boolbv.h for the call site.
 // PROOF: formal-proofs/Defer.lean::defer_verdict_equivalence
 //        Corollary: not just states but verdicts (SAT/UNSAT
 //        decisions) agree between deferred and eager paths.

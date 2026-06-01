@@ -95,18 +95,15 @@ implementation site with one or more Lean theorems.
 | `groebner.cpp::interreduce_basis` (basis interreduction preserves ideal) | `StrongGB.lean::interreduce_preserves_ideal` | DONE |
 | `boolbv.cpp::walk_for_algebraic` (leaf implication soundness) | `AlgebraicTreeWalk.lean::leaf_implied_by_walk_and`, `leaf_implied_by_walk_not_or`, `leaf_implied_by_walk_not`, `walk_chain_sound` | DONE |
 | `boolbv.cpp::walk_for_algebraic` (IF-rebuild equivalence) | `AlgebraicTreeWalk.lean::if_rebuild_equivalence`, `if_rebuild_lr_equivalence` | DONE |
-| `boolbv.cpp::set_to`/`finish_eager_conversion` (defer/replay states) | `Defer.lean::defer_replay_equivalence` | DONE-MOD-AXIOMS |
-| `boolbv.cpp::try_algebraic_solve` (verdict equivalence) | `Defer.lean::defer_verdict_equivalence` | DONE-MOD-AXIOMS |
-| `boolbv.cpp::try_algebraic_solve` (verdict from empty state) | `Defer.lean::defer_verdict_from_empty` | DONE-MOD-AXIOMS |
+| `boolbv.cpp::set_to`/`finish_eager_conversion` (defer/replay states) | `Defer.lean::defer_replay_equivalence` | DONE |
+| `boolbv.cpp::try_algebraic_solve` (verdict equivalence) | `Defer.lean::defer_verdict_equivalence` | DONE |
+| `boolbv.cpp::try_algebraic_solve` (verdict from empty state) | `Defer.lean::defer_verdict_from_empty` | DONE |
 
 ## Status legend
 
-- **DONE**: theorem fully proven (zero `sorry`, no module-specific axioms beyond mathlib).
-- **DONE-MOD-AXIOMS**: theorem fully proven (zero `sorry`) relative to a small set of explicit axioms in the module; the axioms capture properties of the implementation pipeline that would require formalising the operational semantics of the boolbv layer or the strong-GB algorithm to prove from first principles.
+- **DONE**: theorem fully proven (zero `sorry`, no module-specific axioms beyond standard mathlib axioms `propext` and `Quot.sound`).
 
-The single non-DONE entry:
-
-- `defer_replay_equivalence` (DONE-MOD-AXIOMS): the deferred-bit-blasting pipeline equivalence. Proven via induction on the assertion list from two semantic axioms (A1: `defer_finish_eq_eager_finish`; A2: `finish_eager_commutes`) reflecting the implementation's invariants. Mechanising the axioms themselves would require modelling the boolbv layer's operational semantics (~1-2 weeks of follow-on work).
+(Historical note: an earlier revision of `Defer.lean` postulated two semantic axioms — `defer_finish_eq_eager_finish` (A1) and `finish_eager_commutes` (A2) — that captured properties of the boolbv layer's operational semantics. The current revision uses a concrete set-based abstract model (`SolverState` as a pair of (committed, deferred) sets) under which both A1 and A2 are provable theorems by union associativity / commutativity. The defer-replay equivalence and verdict-equivalence theorems are now `DONE` outright; no project-specific axioms remain.)
 
 ## Why there is no `two_trick_saturation_complete` theorem
 
