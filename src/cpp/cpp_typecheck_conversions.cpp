@@ -1788,12 +1788,55 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
             return nullptr;
           };
           const symbolt *ctor_sym = find_ctor(tmp_expr);
+          // A constructor selected here is acceptable only if it is
+          // a template specialization — the regular loop above has
+          // already considered every non-template, non-explicit
+          // converting ctor, so a non-template ctor selected here
+          // is one it already rejected (e.g., `explicit`).
+          //
+          // CBMC tags template instantiations two different ways:
+          //   * CLASS template specializations carry
+          //     `ID_specialization_of`
+          //     (cpp_typecheck_template.cpp).
+          //   * FUNCTION template instantiations (which a member
+          //     converting constructor template such as
+          //     `optional(_Up&&)` becomes once `_Up` is deduced)
+          //     carry `#fn_template_args`
+          //     (cpp_instantiate_template.cpp).
+          // The previous check only looked at `ID_specialization_of`
+          // and therefore wrongly rejected a perfectly valid
+          // function-template converting-constructor instantiation,
+          // which has `#fn_template_args` set but
+          // `ID_specialization_of` nil.  The visible symptom was
+          //   invalid implicit conversion from 'T' to 'struct optional'
+          // for any `return v;` (or other copy-initialization via
+          // `implicit_typecast`) where the target is a class whose
+          // only viable converting constructor is a template — e.g.,
+          // `std::optional<T>`'s `optional(_Up&&)`.  Four files in
+          // CBMC's own source (`c_types.cpp`, `pointer_offset_size.cpp`,
+          // `source_location.cpp`, `substitute_symbols.cpp`) hit this
+          // when returning a `T` into a `std::optional<T>`.
+          //
+          // Treat the ctor as a template specialization (accept it)
+          // when EITHER tag is present.  A function-template ctor
+          // instantiation must additionally be non-explicit:
+          // [over.match.copy]/1 + [class.conv.ctor]/2 admit only
+          // non-explicit constructors into a user-defined conversion
+          // sequence (copy-initialization), and `new_temporary` runs
+          // direct-initialization semantics that would otherwise let
+          // an explicit template ctor through.
+          const bool ctor_is_template_specialization =
+            ctor_sym != nullptr &&
+            (ctor_sym->type.find(ID_specialization_of).is_not_nil() ||
+             ctor_sym->type.find(irep_idt{"#fn_template_args"}).is_not_nil());
+          const bool ctor_is_explicit =
+            ctor_sym != nullptr && ctor_sym->type.get_bool(ID_is_explicit);
           if(
             ctor_sym != nullptr &&
-            ctor_sym->type.find(ID_specialization_of).is_nil())
+            (!ctor_is_template_specialization || ctor_is_explicit))
           {
-            // Non-template ctor selected — the regular loop
-            // either already rejected it or it is `explicit`.
+            // Non-template (or explicit) ctor selected — the regular
+            // loop either already rejected it or it is `explicit`.
             // Either way, this is not a valid user-defined
             // conversion.  Drop the result and continue to the
             // basic_string fallback / final `return false`.
