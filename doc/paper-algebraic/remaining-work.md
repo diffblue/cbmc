@@ -358,6 +358,49 @@ analysis would produce:
   basis. In our setting the analogous information is what
   Tseitin propagation already extracts; making this precise
   would clarify the relationship.
+- *SBIF-style equivalence/antivalence pre-substitution* (Scholl
+  & Konrad DAC 2020) is the most directly portable: before
+  Buchberger sees a polynomial, run a SAT check on each pair
+  of "candidate equivalent" variables (identified by simulation
+  or by Tseitin chains) within a small window depth, and unify
+  the equivalence classes by replacing all members with a
+  unique representative. In their experiments a window depth
+  of 4 sufficed. This attacks Gate D by reducing intermediate
+  polynomial size *before* Buchberger does any work; on bw=512
+  it could plausibly avoid the term-count explosion.
+- *Don't-care ILP optimisation of polynomials* (Scholl, Konrad,
+  Mahzoon et al., DATE 2021) is the next-step generalisation:
+  for a polynomial $P$ with detected don't-care cubes
+  $dc_1, \dots, dc_n$, introduce integer variables $v_i$,
+  add $\sum v_i \cdot dc_i$ to $P$, multiply out, and solve an
+  ILP to minimise the number of non-zero coefficients. Their
+  reported overhead is acceptable on dividers up to 512 bits.
+  In our setting the don't-care cubes can come from
+  unsat-core analysis on the boolean atoms or from the
+  `walk_for_algebraic` IF-rebuild structure (Phase A.2 already
+  records IF-condition assumptions). Implementation cost is
+  high (need an ILP solver dependency, e.g.\ Gurobi or CBC),
+  so this ranks below SBIF as a candidate.
+- *SAT-based local vanishing-monomial removal* (Mahzoon, Große,
+  Konrad, Scholl, Drechsler, DAC 2022) is a cheap drop-in: for
+  each multi-variable monomial $xy$ in the current polynomial,
+  query SAT (with the formula's boolean constraints as
+  background) for "is $x \wedge y$ satisfiable?". If UNSAT,
+  replace $xy$ with $0$. Cost per query is small because the
+  query is tiny relative to the formula. This could attack
+  Gate D directly on benchmarks where vanishing monomials
+  drive growth (the "16-bit divider hits MEMOUT at $5\times 10^6$
+  terms" pattern in their data). The Tseitin propagator has
+  a similar effect via boolean-atom inference but does not
+  inspect polynomial monomials directly; bridging the two
+  layers is a clean low-risk extension.
+- *Coefficient correction modulo $m$* (Mahzoon et al. DAC 2022)
+  is automatic for us. They work in $\mathbb{Z}$ and need a
+  separate normalisation pass when an HA/FA appears with
+  mismatched coefficients $kS, pC$ where $p \equiv 2k \pmod m$;
+  we work in $\mathbb{Z}_{2^d}$ from the start so this
+  identification is automatic. Worth noting in the paper as a
+  benefit of our coefficient-ring choice.
 
 **Expected concrete impact**:
 - Paper-side: a "fragment characterisation" paragraph or
@@ -365,11 +408,27 @@ analysis would produce:
   gates, the corresponding Lean predicates, and an explicit
   classification of unsolved benchmarks. This is the kind of
   *honest scope* that reviewers reward.
-- Engineering-side: 1–2 new gate-extensions, each defended by
-  a Lean theorem, each potentially worth a handful of unlocks.
-  Specifically, lifting Gate B for constant-amount shifts is
-  cheap (a few hours of code + a 1-page Lean proof) and the
-  most likely to pay off.
+- Engineering-side, ranked by cost/risk/payoff (best first):
+  1. **SBIF-style equivalence pre-substitution** (DAC 2020):
+     ${\sim}1$ week of code, low risk, plausible payoff on
+     bw=512 family. Doesn't change soundness theorems (it's a
+     pre-processing pass on the polynomial system).
+  2. **SAT-based local vanishing-monomial removal** (DAC 2022):
+     ${\sim}3$ days of code, very low risk (each replacement
+     is justified by a small SAT query), plausible payoff on
+     polynomial-explosion benchmarks. Could be the smallest
+     net-positive engineering change in the whole list.
+  3. **Constant-amount shifts in poly_extract** (Gate B):
+     ${\sim}2$ days of code + 1-page Lean proof, very low
+     risk, plausible payoff on log-slicing benchmarks.
+  4. **High-LO extract of zext-concat** (Gate B): similar
+     scope to #3.
+  5. **Phase optimisation** (FMSD 2026): ${\sim}1{-}2$ weeks,
+     medium risk (different ring needs careful adaptation),
+     potentially big payoff on circuit-shaped formulas.
+  6. **Don't-care ILP** (DATE 2021): ${\sim}3{-}4$ weeks
+     including ILP-solver integration; high cost. Defer until
+     a concrete benchmark family demands it.
 
 **Cross-references**: existing artefacts to compose:
 
@@ -492,26 +551,68 @@ later.
   polynomials) but the technique is general: greedy
   negate-and-test to shrink intermediate polynomials.
 
-**Other Konrad papers we have NOT yet read** (would request
-copies if relevant work proceeds):
+**Other Konrad papers** (delivered after the initial review,
+2026-06-01 follow-up):
 
-- Scholl & Konrad, DAC 2020, *"Symbolic computer algebra and
-  SAT-based information forwarding for fully automatic divider
-  verification"* — the SBIF foundational paper. The KSM 2024
-  journal extension [27] cites it heavily; we have the
-  derivative content but not the original.
-- Scholl, Konrad, Mahzoon, Große, Drechsler, DATE 2021,
-  *"Verifying dividers using symbolic computer algebra and
-  don't care optimization"* — predecessor of KSM 2024 [28].
-  Same content, but might have additional design discussion.
-- Mahzoon, Große, Scholl, Konrad, Drechsler, DAC 2022,
-  *"Formal verification of modular multipliers using symbolic
-  computer algebra and Boolean satisfiability"* — modular
-  multipliers are closer to our setting (residue arithmetic)
-  than the standard integer multipliers, so this is the most
-  promising of the unread items for our line of work.
+- `~/SK_2020.pdf` — Scholl & Konrad, DAC 2020, *"Symbolic
+  computer algebra and SAT-based information forwarding for
+  fully automatic divider verification"* — the SBIF foundational
+  paper. **Key technical contribution**: SBIF computes
+  equivalence/antivalence classes of signals by SAT, then
+  uses unique representative variables in the polynomial
+  *before* substitution. The "vanishing" effect: e.g.\ for
+  the OR-tree `c0 = h2 ∨ h3` example with downstream
+  derivation `b1 = a1`, simplifying the gate polynomial
+  $h_4 = a_1 + b_1 - 2 a_1 b_1$ from 3 terms to 1 *before* it
+  enters the global polynomial keeps Buchberger memory
+  bounded. Without SBIF, the 16-bit divider hits MEMOUT at
+  62 GiB after producing $5{,}363{,}443$-term intermediate
+  polynomials; with SBIF, the 128-bit divider verifies in
+  ${<}4$ CPU min with peak size $16{,}774$ terms. Algorithm 1
+  processes signals in topological order, uses
+  windowed-SAT (`d_max = 4` worked) to prove
+  equivalence/antivalence on candidate pairs identified by
+  random simulation.
+- `~/2021DATE_*.pdf` — Scholl, Konrad, Mahzoon, Große,
+  Drechsler, DATE 2021. **Generalises SBIF** beyond equivalence/
+  antivalence to *general satisfiability don't cares*. For
+  each polynomial $P(x_1, \dots, x_n)$ with don't care
+  cubes $dc_1, \dots, dc_n$: introduce integer variable
+  $v_i$ per cube, add $v_i \cdot dc_i$ to $P$ (which is 0 on
+  the care set), multiply out and combine, then solve an
+  **ILP** that minimises the number of non-zero coefficients
+  in $P$. Worked example reduces a 7-term polynomial to a
+  4-term polynomial. Don't-care cubes themselves are computed
+  via BDD-based forward image computation through "slices"
+  of atomic blocks (windowed SAT alone failed at scale).
+  Solves optimised non-restoring dividers up to 512 bits
+  in ${<}162$ CPU min. Uses Gurobi as the ILP solver and
+  CUDD 3.0.0 for BDDs.
+- `~/2022DAC_*.pdf` — Mahzoon, Große, Konrad, Scholl,
+  Drechsler, DAC 2022, *"Formal verification of modular
+  multipliers using SCA and Boolean satisfiability"*.
+  **Three techniques** for $2^n \pm 1$ modular multipliers:
+  - **Coefficient correction**: when the polynomial has
+    HA/FA outputs $kS, pC$ with $p \neq 2k$ but
+    $p \equiv 2k \pmod{m}$ (where $m = 2^n \pm 1$), rewrite
+    $pC \to 2kC$ before substitution. This is conceptually
+    the *same trick* we exploit by working in
+    $\mathbb{Z}_{2^d}$ (we get it for free in our coefficient
+    ring; they apply it as a separate normalisation step
+    because they work in $\mathbb{Z}$).
+  - **SAT-based local vanishing removal**: for every
+    multi-variable monomial $xy$ in the polynomial, check
+    via SAT whether $x \wedge y$ is unsatisfiable under
+    input constraints. If yes, replace $xy$ with $0$ (or
+    $x$ or $y$ for one-sided cases). Operates *locally*
+    on fanout-free cones before global backward rewriting.
+  - **SAT-based output condition check**: prove $Z < m$ via
+    SAT after backward rewriting completes. Used to discharge
+    the second verification condition without bit-blasting
+    the entire output.
 
-### Roole / Roolean (Onderka, Biere, Fleury, FMCAD 2026 submission)
+  Solves $512 \times 512$ modular multipliers (3M+ AIG nodes)
+  in reasonable time.### Roole / Roolean (Onderka, Biere, Fleury, FMCAD 2026 submission)
 
 `fmcad26-submission.pdf` — Onderka, Biere, Fleury, *"Lean
 Certified Bitvector Solving without Bitblasting"*.
