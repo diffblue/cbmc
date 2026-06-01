@@ -270,14 +270,20 @@ void cpp_typecheckt::typecheck_code(codet &code)
       // Convert initializer_list to array expression for symex
       range_op.id(ID_array);
 
-      // Materialize into a temporary array variable
+      // Materialize into a temporary array variable.  Use a per-loop
+      // suffix so multiple range-based fors in the same function do
+      // not collide on `__range_arr` (see the comment by the
+      // class-range path below for details).
       const std::string scope_prefix =
         id2string(cpp_scopes.current_scope().prefix);
-      const std::string arr_id = scope_prefix + "__range_arr";
+      const std::string arr_id = scope_prefix + "__range_arr_" +
+                                 id2string(loc.get_line()) + "_" +
+                                 id2string(loc.get_column());
       {
         auxiliary_symbolt sym;
         sym.name = arr_id;
-        sym.base_name = "__range_arr";
+        sym.base_name = "__range_arr_" + id2string(loc.get_line()) + "_" +
+                        id2string(loc.get_column());
         sym.type = range_type;
         sym.mode = ID_cpp;
         sym.module = module;
@@ -318,16 +324,41 @@ void cpp_typecheckt::typecheck_code(codet &code)
         const std::string scope_prefix =
           id2string(cpp_scopes.current_scope().prefix);
 
+        // Each range-based for in the same function must use unique
+        // auxiliary symbol names for `__range`/`__begin`/`__end`.
+        // Without a per-loop suffix, the second range-for's
+        // `symbol_table.insert` of `<scope>::__for_begin` (etc.)
+        // silently fails because the first range-for already
+        // inserted a symbol with that name; the second loop then
+        // re-uses the FIRST loop's iterator type via
+        // `lookup_ref(begin_id)`, causing the iterator
+        // dereference and the loop variable `auto`-deduction to
+        // bind to the wrong element type.  Concrete symptom on
+        // CBMC's own source: `lispirep.cpp::irep2lisp` has two
+        // sequential range-fors,
+        //   for(const auto &irep : src.get_sub())          // vector<irept>
+        //   for(const auto &irep_entry : src.get_named_sub())  // map of pairs
+        // The second loop's `auto` was deduced as `irept` (from
+        // the first loop's `__for_begin`), surfacing as the
+        // spurious diagnostic
+        //   symbol 'first' is unknown
+        // when the body referenced `irep_entry.first`.  Use the
+        // source location's line and column as a unique
+        // per-instance suffix.
+        const std::string loc_suffix =
+          "_" + id2string(loc.get_line()) + "_" + id2string(loc.get_column());
+
         // Materialise the range into an auxiliary symbol so that
         // `__range.begin()` and `__range.end()` are well-formed
         // expressions (the original `range_op` may be a temporary
         // function-call result that we don't want to evaluate
         // twice).
-        const std::string range_id = scope_prefix + "__for_range";
+        const std::string range_id = scope_prefix + "__for_range" + loc_suffix;
+        const std::string range_base = "__for_range" + loc_suffix;
         {
           auxiliary_symbolt sym;
           sym.name = range_id;
-          sym.base_name = "__for_range";
+          sym.base_name = range_base;
           sym.type = range_type;
           sym.mode = ID_cpp;
           sym.module = module;
@@ -394,11 +425,12 @@ void cpp_typecheckt::typecheck_code(codet &code)
         const typet iter_type = begin_call.type();
 
         // Auxiliary symbols for __begin and __end.
-        const std::string begin_id = scope_prefix + "__for_begin";
+        const std::string begin_id = scope_prefix + "__for_begin" + loc_suffix;
+        const std::string begin_base = "__for_begin" + loc_suffix;
         {
           auxiliary_symbolt sym;
           sym.name = begin_id;
-          sym.base_name = "__for_begin";
+          sym.base_name = begin_base;
           sym.type = iter_type;
           sym.mode = ID_cpp;
           sym.module = module;
@@ -411,11 +443,12 @@ void cpp_typecheckt::typecheck_code(codet &code)
             cpp_scopes.put_into_scope(symbol_table.lookup_ref(begin_id));
           id.id_class = cpp_idt::id_classt::SYMBOL;
         }
-        const std::string end_id = scope_prefix + "__for_end";
+        const std::string end_id = scope_prefix + "__for_end" + loc_suffix;
+        const std::string end_base = "__for_end" + loc_suffix;
         {
           auxiliary_symbolt sym;
           sym.name = end_id;
-          sym.base_name = "__for_end";
+          sym.base_name = end_base;
           sym.type = end_call.type();
           sym.mode = ID_cpp;
           sym.module = module;
