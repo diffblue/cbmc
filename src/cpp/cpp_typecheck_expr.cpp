@@ -3423,11 +3423,39 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
         !symbol_ptr->type.get(ID_C_member_name).empty() &&
         symbol_ptr->value.type().id() != ID_code)
       {
-        symbol_ptr->value.visit_pre(
-          [&needs_eager_convert](const exprt &n) {
+        // Walk the body's full irept tree (operands AND types and
+        // other named-sub fields).  exprt::visit_pre only walks
+        // operands, so a `cpp_name` appearing as the `type` field
+        // of an inner expression (e.g., the target type of a
+        // `static_cast<int_type>(...)`) is invisible to it.  Such
+        // cpp_names must still trigger eager-convert: when the
+        // body is later substituted into the caller's scope by
+        // the constexpr inliner, an unresolved `int_type`
+        // cpp_name in the substituted expression's type field
+        // surfaces as the spurious diagnostic
+        //
+        //   invalid implicit conversion from '<<type:cpp_name>>'
+        //   to 'signed int'
+        //
+        // even though `int_type` is a perfectly resolvable
+        // typedef in the function's own (class) scope.  Walk the
+        // full irept tree to detect any unresolved cpp_name
+        // anywhere in the body.
+        std::function<void(const irept &)> has_cpp_name =
+          [&](const irept &n) {
+            if(needs_eager_convert)
+              return;
             if(n.id() == ID_cpp_name)
+            {
               needs_eager_convert = true;
-          });
+              return;
+            }
+            for(const auto &s : n.get_sub())
+              has_cpp_name(s);
+            for(const auto &ns : n.get_named_sub())
+              has_cpp_name(ns.second);
+          };
+        has_cpp_name(symbol_ptr->value);
       }
       if(needs_eager_convert)
       {
