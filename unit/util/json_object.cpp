@@ -122,14 +122,18 @@ SCENARIO(
       const json_objectt output = json(location);
       const json_arrayt &pragmas = to_json_array(output["pragma"]);
 
-      auto pragma_it = pragmas.begin();
-      REQUIRE(pragma_it->kind == jsont::kindt::J_STRING);
-      REQUIRE(pragma_it->value == "disable:bounds-check");
-      ++pragma_it;
-      REQUIRE(pragma_it->kind == jsont::kindt::J_STRING);
-      REQUIRE(pragma_it->value == "disable:pointer-check");
-      ++pragma_it;
-      REQUIRE(pragma_it == pragmas.end());
+      std::vector<std::string> pragma_values;
+      for(const auto &pragma : pragmas)
+      {
+        REQUIRE(pragma.kind == jsont::kindt::J_STRING);
+        pragma_values.push_back(pragma.value);
+      }
+
+      std::sort(pragma_values.begin(), pragma_values.end());
+      REQUIRE(
+        pragma_values ==
+        std::vector<std::string>{
+          "disable:bounds-check", "disable:pointer-check"});
     }
   }
 }
