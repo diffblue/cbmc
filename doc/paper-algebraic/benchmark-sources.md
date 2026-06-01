@@ -10,6 +10,27 @@ Current state: our SMT-LIB sample is **66 benchmarks** in
 SMT-LIB releases) plus a 102-benchmark synthetic
 `bench-multiplication/smt-comp/` set crafted for the paper.
 
+## STATUS UPDATE (2026-06-01): acquisition done
+
+The file system was extended to 122 GB free, removing the disk
+constraint. We acquired:
+
+- **Tier A done**: full SMT-LIB 2024 QF\_BV extracted (35 GB,
+  46,191 benchmarks; 15,435 contain `bvmul` and are `unsat`).
+  Staged at `/home/ubuntu/bench-staging/non-incremental/QF_BV/`.
+- **Tier B downloaded but blocked**: all three Konrad archives
+  pulled and verified, but no AIG→SMT-LIB converter is present
+  (`abc`/`aigtoaig`/`yosys` absent). These are gate-level
+  (Item 7) material; deferred until a converter is installed.
+
+**Headline outcome**: triaging the full QF\_BV corpus revealed
+the **`float` family** (FP-as-BV, Haller-Griggio-Brain-Kroening
+FMCAD 2012) where our solver **dominates**: 68/75 solved vs
+Bitwuzla 51, cvc5 6, with **18 confirmed unique
+wins-beyond-all-solvers**. See
+`bench-multiplication/float-fp2bv/RESULTS.md`. This adds 18 to
+the paper's previous count of 4 wins-beyond-all-solvers.
+
 ## Tier A — SMT-LIB 2024 QF\_BV (highest priority)
 
 **Source**: SMT-LIB release 2024 non-incremental benchmarks,
