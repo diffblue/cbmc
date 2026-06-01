@@ -1705,6 +1705,24 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
   if(is_reference(op.type()))
     add_implicit_dereference(op);
 
+  // Per [conv.rval] + [class.temporary]: temporary materialization
+  // converts a prvalue to a glvalue denoting a temporary object.  CBMC
+  // represents such a materialized temporary as a `temporary_object`
+  // side effect, which the front end binds to reference parameters by
+  // taking its address (e.g. an rvalue argument bound to a `T&&`
+  // parameter).  That object has storage, so its address may be taken.
+  // The C base typecheck below does not know about `temporary_object`
+  // and would reject it as a non-lvalue; this matters when an already-
+  // typechecked call carrying such a binding is re-typechecked (as
+  // `cpp_constructor` does for constructor operands).  Mark it as an
+  // lvalue so the address-of typecheck is idempotent.
+  if(
+    op.id() == ID_side_effect && op.get(ID_statement) == ID_temporary_object &&
+    !op.get_bool(ID_C_lvalue))
+  {
+    op.set(ID_C_lvalue, true);
+  }
+
   if(!op.get_bool(ID_C_lvalue) && expr.type().id() == ID_code)
   {
     error().source_location = expr.source_location();
