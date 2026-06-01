@@ -3757,3 +3757,123 @@ bool cpp_typecheckt::static_typecast(
 
   return false;
 }
+
+/// Apply C++ user-defined conversions before falling through to C-style
+/// arithmetic typechecking.
+///
+/// Per N5008 [over.match.oper]/9: when a binary operator with no viable
+/// non-member or member operator overload is processed, the operator is
+/// treated as a built-in operator per [over.built]; the operands are then
+/// subject to standard or user-defined conversion sequences to the built-in
+/// operator's parameter types.
+///
+/// Concretely, for `T > 0` where `T` is a class with `operator long() const`
+/// (e.g., `std::fpos<mbstate_t>`), the conversion sequence
+/// `T -> long` (user-defined) followed by the built-in `long > int` must
+/// apply.  The C parent-class implementation of
+/// `implicit_typecast_arithmetic(exprt&, exprt&)` only knows about
+/// arithmetic standard conversions, so the struct operand reaches
+/// `c_typecastt::implicit_typecast_arithmetic` unchanged and surfaces as
+///
+///   conversion from 'struct fpos' to 'signed int':
+///   implicit arithmetic conversion not permitted
+///
+/// even though the user-defined conversion is unambiguous.  Visible
+/// symptom: `if(this->tellp() > 0)` in CBMC's own
+/// `src/util/message.h:250` — `tellp()` returns
+/// `std::fpos<mbstate_t>` whose `operator streamoff()` is the user-defined
+/// conversion to `long`.  Every translation unit that includes
+/// `<message.h>` (10+ files in the CBMC dog-food set) hit this on the
+/// rvalue path.
+///
+/// The fix: detect each operand whose type is a class with at least one
+/// arithmetic-typed user-defined conversion operator and apply
+/// `implicit_typecast(operand, conversion-target)` to materialise the
+/// conversion.  The C parent's `implicit_typecast_arithmetic(expr1, expr2)`
+/// then sees two arithmetic operands and proceeds normally.
+///
+/// Restrict to single-conversion-candidate cases: where multiple
+/// arithmetic conversion operators exist, the choice depends on the
+/// context (e.g., usual arithmetic conversions to a common type), which
+/// is already handled by the existing overload resolution machinery for
+/// any explicit cast.  The narrow case here is precisely
+/// `<class with one arithmetic conversion> RELOP <arithmetic>`.
+static bool single_arithmetic_conversion_target(
+  const cpp_typecheckt &cpp_typecheck,
+  const struct_union_typet &class_type,
+  typet &target)
+{
+  bool found = false;
+  for(const auto &c : class_type.components())
+  {
+    if(c.type().id() != ID_code)
+      continue;
+    const std::string base = id2string(c.get_base_name());
+    if(base.compare(0, 8, "operator") != 0)
+      continue;
+    // operator <ArithmeticType>() — return type is the conversion target.
+    const typet &rt = to_code_type(c.type()).return_type();
+    bool is_arith = rt.id() == ID_signedbv || rt.id() == ID_unsignedbv ||
+                    rt.id() == ID_floatbv || rt.id() == ID_fixedbv ||
+                    rt.id() == ID_bool || rt.id() == ID_c_bool;
+    if(!is_arith)
+      continue;
+    if(found && target != rt)
+      return false; // ambiguous: multiple distinct arithmetic targets
+    target = rt;
+    found = true;
+  }
+  (void)cpp_typecheck;
+  return found;
+}
+
+void cpp_typecheckt::implicit_typecast_arithmetic(exprt &expr1, exprt &expr2)
+{
+  auto try_class_to_arith = [this](exprt &op)
+  {
+    typet t = op.type();
+    if(is_reference(t))
+      t = to_reference_type(t).base_type();
+    if(t.id() != ID_struct_tag && t.id() != ID_union_tag)
+      return;
+    const struct_union_typet &class_type =
+      t.id() == ID_struct_tag
+        ? static_cast<const struct_union_typet &>(
+            follow_tag(to_struct_tag_type(t)))
+        : static_cast<const struct_union_typet &>(
+            follow_tag(to_union_tag_type(t)));
+    typet target;
+    if(!single_arithmetic_conversion_target(*this, class_type, target))
+      return;
+    // Apply the user-defined conversion via the C++ implicit-typecast
+    // path so that any required lvalue-to-rvalue / qualification
+    // adjustments are handled along the way.
+    implicit_typecast(op, target);
+  };
+
+  try_class_to_arith(expr1);
+  try_class_to_arith(expr2);
+
+  c_typecheck_baset::implicit_typecast_arithmetic(expr1, expr2);
+}
+
+void cpp_typecheckt::implicit_typecast_arithmetic(exprt &expr)
+{
+  typet t = expr.type();
+  if(is_reference(t))
+    t = to_reference_type(t).base_type();
+  if(t.id() == ID_struct_tag || t.id() == ID_union_tag)
+  {
+    const struct_union_typet &class_type =
+      t.id() == ID_struct_tag
+        ? static_cast<const struct_union_typet &>(
+            follow_tag(to_struct_tag_type(t)))
+        : static_cast<const struct_union_typet &>(
+            follow_tag(to_union_tag_type(t)));
+    typet target;
+    if(single_arithmetic_conversion_target(*this, class_type, target))
+      implicit_typecast(expr, target);
+  }
+
+  c_typecheck_baset::implicit_typecast_arithmetic(expr);
+}
