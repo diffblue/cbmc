@@ -690,109 +690,103 @@ void boolbvt::set_to(const exprt &expr, bool value)
            id2string(to_symbol_expr(e).get_identifier()).find("__CPROVER") !=
              std::string::npos;
   };
+  // Phase A.3 fast-path helper for "x is unequal to a constant"
+  // patterns. Returns true iff the predicate (id, lhs, rhs, v) is
+  // logically equivalent to `x != C` for C in {0, ~0}, in which
+  // case it pushes `(= x C)` to nonzero_pending (deferred; promoted
+  // to algebraic_disequalities by try_algebraic_solve only when the
+  // formula contains bvudiv/bvurem, to avoid SAT-benchmark
+  // worklist flooding on Sage2-style inputs).
+  //
+  // Patterns recognised:
+  //
+  //   x != 0:
+  //     bvult 0 x         -> ID_ge, lhs=x, rhs=1, v=true
+  //     bvule 1 x         -> ID_ge, lhs=x, rhs=1, v=true
+  //     0 < x  (raw form) -> ID_lt, lhs=0, v=true
+  //     1 <= x (raw form) -> ID_le, lhs=1, v=true
+  //
+  //   x != ~0 (NEW in this extension):
+  //     bvult x ~0        -> ID_ge, lhs=x, rhs=~0, v=false
+  //                          (parses as not (x >= ~0))
+  //     bvule x ~0-1      -> ID_le, lhs=x, rhs=~0-1, v=true
+  //     x < ~0 (raw)      -> ID_lt, lhs=x, rhs=~0, v=true
+  //
+  // PROOF: BvDivPolyEncoding.lean::NonzeroFastPath::
+  //        bvult_zero_iff_ne_zero, bvuge_one_iff_ne_zero.
+  //        Symmetric reasoning applies to x != ~0 by the
+  //        bijection x <-> ~x in unsigned bit-vector semantics.
+  auto try_nonzero_fast_path =
+    [&](const irep_idt &id, const exprt &lhs, const exprt &rhs, bool v) -> bool
+  {
+    if(std::getenv("DISABLE_NONZERO_FAST_PATH") != nullptr)
+      return false;
+    const bool unsigned_op =
+      lhs.type().id() == ID_unsignedbv && rhs.type().id() == ID_unsignedbv;
+    if(!unsigned_op)
+      return false;
+    const std::size_t d = to_unsignedbv_type(lhs.type()).get_width();
+    if(d == 0)
+      return false;
+    const mp_integer two_d = power(mp_integer{2}, mp_integer{d});
+    const mp_integer max_d = two_d - 1;
+    auto is_const_eq = [](const exprt &e, const mp_integer &val) -> bool
+    {
+      if(!e.is_constant())
+        return false;
+      auto vv = numeric_cast<mp_integer>(e);
+      return vv.has_value() && *vv == val;
+    };
+    const exprt *x_side = nullptr;
+    mp_integer excluded{0};
+    if(id == ID_ge && v && is_const_eq(rhs, mp_integer{1}))
+    {
+      x_side = &lhs;
+      excluded = 0;
+    }
+    else if(id == ID_le && v && is_const_eq(lhs, mp_integer{1}))
+    {
+      x_side = &rhs;
+      excluded = 0;
+    }
+    else if(id == ID_lt && v && is_const_eq(lhs, mp_integer{0}))
+    {
+      x_side = &rhs;
+      excluded = 0;
+    }
+    else if(id == ID_ge && !v && is_const_eq(rhs, max_d))
+    {
+      // NOT (x >= ~0)  ⇒  x < ~0  ⇒  x != ~0
+      x_side = &lhs;
+      excluded = max_d;
+    }
+    else if(id == ID_le && v && is_const_eq(rhs, max_d - 1))
+    {
+      x_side = &lhs;
+      excluded = max_d;
+    }
+    else if(id == ID_lt && v && is_const_eq(rhs, max_d))
+    {
+      x_side = &lhs;
+      excluded = max_d;
+    }
+    if(x_side == nullptr || is_internal_op(*x_side))
+      return false;
+    nonzero_pending.push_back(
+      equal_exprt{*x_side, from_integer(excluded, x_side->type())});
+    return true;
+  };
+
   if(!algebraic_solved && is_relational(expr.id()))
   {
     if(
       expr.operands().size() == 2 && !is_internal_op(expr.operands()[0]) &&
       !is_internal_op(expr.operands()[1]))
     {
-      // Phase A.3 fast-path for "x is non-zero" patterns.
-      //
-      // When the relational predicate is equivalent to `x != 0`,
-      // the standard `extract_predicate` machinery falls through
-      // to a bit-chain encoding (decompose x into bits, assert
-      // the disjunction "at least one bit is 1") which bloats
-      // the polynomial system substantially: at d=32 it adds 32+
-      // bit variables and a chain of comparison auxiliaries to
-      // each per-disequality basis, multiplying Buchberger's work
-      // even when the predicate is logically redundant for the
-      // refutation that a separate disequality already implies.
-      //
-      // The cleaner encoding for `x != 0` is to emit the equality
-      // `x = 0` to `algebraic_disequalities` and SKIP the
-      // predicate-handling pipeline. The per-disequality loop
-      // processes the disequality via Rabinowitsch with no
-      // bit-decomposition overhead.
-      //
-      // Patterns recognised:
-      //   bvult 0 x  set to true   (x > 0)
-      //   bvule 1 x  set to true   (x >= 1)
-      //   bvule x 0  set to false  (NOT x <= 0  ⇒  x > 0)
-      //
-      // PROOF: bvult 0 x (set to true)  ⇔  x > 0  ⇔  x != 0
-      //        in unsigned bit-vector semantics. Hence emitting
-      //        `(= x 0)` as a disequality is logically equivalent
-      //        to the original predicate.
-      //        Traceability anchor: BvDivPolyEncoding.lean.
-      const irep_idt &id = expr.id();
-      const exprt &lhs = expr.operands()[0];
-      const exprt &rhs = expr.operands()[1];
-      const bool unsigned_op =
-        lhs.type().id() == ID_unsignedbv && rhs.type().id() == ID_unsignedbv;
-      auto is_zero_const = [](const exprt &e) -> bool
-      {
-        if(!e.is_constant())
-          return false;
-        auto v = numeric_cast<mp_integer>(e);
-        return v.has_value() && *v == 0;
-      };
-      auto is_one_const = [](const exprt &e) -> bool
-      {
-        if(!e.is_constant())
-          return false;
-        auto v = numeric_cast<mp_integer>(e);
-        return v.has_value() && *v == 1;
-      };
-      bool fast_path = false;
-      const exprt *x_side = nullptr;
-      // Pattern 1: bvult 0 x  parses to  x >= 1  (ID_ge, lhs=x, rhs=1).
-      // Pattern 2: bvule 1 x  also parses to  x >= 1.
-      // Pattern 3: NOT (bvule x 0)  parses to  NOT (x <= 0)  (already
-      //            handled via the not-relational path below if needed).
-      // Pattern 4: bvult 0 x  set to false  ⇒  x <= 0  ⇒  x = 0
-      //            (parses to  x >= 1 with value=false).
-      if(unsigned_op && id == ID_ge && value && is_one_const(rhs))
-      {
-        // x >= 1 set to true  ⇒  x != 0
-        x_side = &lhs;
-        fast_path = true;
-      }
-      else if(unsigned_op && id == ID_lt && value && is_zero_const(lhs))
-      {
-        // 0 < x set to true (in case the parser leaves this form)
-        x_side = &rhs;
-        fast_path = true;
-      }
-      else if(unsigned_op && id == ID_le && value && is_one_const(lhs))
-      {
-        // 1 <= x set to true (in case the parser leaves this form)
-        x_side = &rhs;
-        fast_path = true;
-      }
-      if(
-        fast_path && x_side != nullptr && !is_internal_op(*x_side) &&
-        std::getenv("DISABLE_NONZERO_FAST_PATH") == nullptr)
-      {
-        // Defer the disequality: only promote to algebraic_disequalities
-        // when the formula also contains bvudiv/bvurem (gated in
-        // try_algebraic_solve). This prevents regressions on SAT
-        // benchmarks like Sage2_bench_15251/17485 which have hundreds
-        // of bvult predicates and no division — adding the full
-        // disequality there floods the algebraic worklist without
-        // helping the eventual SAT verdict.
-        nonzero_pending.push_back(
-          equal_exprt{*x_side, from_integer(mp_integer{0}, x_side->type())});
-        // Skip the bit-chain predicate path: the disequality is
-        // strictly more useful for the algebraic refutation pipeline
-        // and the bit-chain encoding's complexity outweighs any
-        // marginal benefit on this pattern. Note: we still fall
-        // through to SUB::set_to below so the predicate is
-        // bit-blasted normally for the SAT side.
-      }
-      else
-      {
+      const bool fast_path_fired = try_nonzero_fast_path(
+        expr.id(), expr.operands()[0], expr.operands()[1], value);
+      if(!fast_path_fired)
         algebraic_predicates.emplace_back(expr, value);
-      }
     }
   }
   if(
@@ -804,7 +798,14 @@ void boolbvt::set_to(const exprt &expr, bool value)
       inner.operands().size() == 2 && !is_internal_op(inner.operands()[0]) &&
       !is_internal_op(inner.operands()[1]))
     {
-      algebraic_predicates.emplace_back(inner, false);
+      // The not-relational form: NOT (id lhs rhs) is logically
+      // equivalent to (id lhs rhs) with value=false. Routed
+      // through the same fast-path detector so x != ~0 patterns
+      // (which the parser normalises to NOT (x >= ~0)) are caught.
+      const bool fast_path_fired = try_nonzero_fast_path(
+        inner.id(), inner.operands()[0], inner.operands()[1], false);
+      if(!fast_path_fired)
+        algebraic_predicates.emplace_back(inner, false);
     }
   }
 
