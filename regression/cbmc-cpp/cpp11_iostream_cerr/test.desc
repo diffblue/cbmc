@@ -1,6 +1,6 @@
 CORE
 main.cpp
---cpp11
+--cpp11 --object-bits 9
 ^VERIFICATION
 ^EXIT=(0|10)$
 ^SIGNAL=0$
