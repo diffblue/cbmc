@@ -1309,6 +1309,117 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
 
           if(resolve_result.is_not_nil())
           {
+            // Per N5008 [over.match.oper]/3 + [over.match.best]/2:
+            // member and non-member candidates form ONE combined
+            // overload set; when both have same-rank conversion
+            // sequences, a non-template specialization is preferred
+            // over a function template specialization.
+            //
+            // CBMC's previous behaviour returned the first viable
+            // member candidate without consulting the non-member
+            // (ADL/free) set.  When the member candidate is a
+            // function-template instantiation and a non-template
+            // free operator is also viable (typically a `friend`
+            // operator declared in the enclosing class with the
+            // exact same parameter types), the free one must win
+            // per [over.match.best]/2.
+            //
+            // Visible symptom on CBMC's own source:
+            //   class messaget {
+            //   public:
+            //     class mstreamt : public std::ostringstream {
+            //       template <class T> mstreamt &
+            //       operator<<(const T &x) {  // template member
+            //         static_cast<std::ostream &>(*this) << x;
+            //         return *this;
+            //       }
+            //     };
+            //     class eomt {};
+            //     friend mstreamt &operator<<(mstreamt &, eomt);
+            //   };
+            // For `m << eom` (eom: messaget::eomt), the friend
+            // non-template should win over the member template.
+            // CBMC instead instantiated the member template, whose
+            // body's `static_cast<std::ostream &>(*this) << eomt`
+            // then fails with "operator 'shl' not defined".
+            //
+            // Detect the case: if the member candidate is a
+            // function-template instantiation
+            // (`#fn_template_args` set on its type), also try the
+            // non-member candidate; if the non-member is
+            // non-template, prefer it.
+            bool member_is_template_specialization = false;
+            if(resolve_result.id() == ID_symbol)
+            {
+              const symbolt *sym = symbol_table.lookup(
+                to_symbol_expr(resolve_result).get_identifier());
+              if(
+                sym != nullptr &&
+                sym->type.find(irep_idt{"#fn_template_args"}).is_not_nil())
+              {
+                member_is_template_specialization = true;
+              }
+            }
+            if(member_is_template_specialization)
+            {
+              // Step out of the struct scope before doing the
+              // non-member lookup so ADL-discovered candidates
+              // (e.g., `friend operator@` declared in the
+              // enclosing class) participate.
+              save_scope.restore();
+
+              cpp_typecheck_fargst free_fargs;
+              free_fargs.operands = expr.operands();
+              free_fargs.has_object = false;
+              free_fargs.in_use = true;
+              exprt free_resolve = resolve(
+                cpp_name,
+                cpp_typecheck_resolvet::wantt::VAR,
+                free_fargs,
+                false);
+              if(free_resolve.is_not_nil())
+              {
+                bool free_is_non_template = true;
+                if(free_resolve.id() == ID_symbol)
+                {
+                  const symbolt *fsym = symbol_table.lookup(
+                    to_symbol_expr(free_resolve).get_identifier());
+                  if(
+                    fsym != nullptr &&
+                    fsym->type.find(irep_idt{"#fn_template_args"}).is_not_nil())
+                  {
+                    free_is_non_template = false;
+                  }
+                }
+                if(free_is_non_template)
+                {
+                  side_effect_expr_function_callt function_call(
+                    cpp_name.as_expr(),
+                    {},
+                    uninitialized_typet{},
+                    expr.source_location());
+                  function_call.arguments().reserve(expr.operands().size());
+                  for(const auto &op : as_const(expr).operands())
+                    function_call.arguments().push_back(op);
+                  typecheck_side_effect_function_call(function_call);
+                  if(expr.id() == ID_ptrmember)
+                  {
+                    add_implicit_dereference(function_call);
+                    already_typechecked_exprt::make_already_typechecked(
+                      function_call);
+                    to_multi_ary_expr(expr).op0() = function_call;
+                    typecheck_expr(expr);
+                    return true;
+                  }
+                  expr = function_call;
+                  return true;
+                }
+              }
+              // Fall back: re-enter struct scope so the member
+              // call below uses the right scope.
+              cpp_scopes.set_scope(struct_identifier);
+            }
+
             // Found! We turn op(a, b, ...) into a.op(b, ...)
             exprt member(ID_member);
             member.add(ID_component_cpp_name) = cpp_name;
