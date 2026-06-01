@@ -5,17 +5,24 @@ Plan A.1 / A.2 / A.3 (commit b0aaed56bd on branch
 `features/adder`). Items are tagged with priority, effort,
 expected impact, and any dependency on prior work.
 
-The current state (post Plan A.3 + F4):
-- **41/66 SMT-COMP** stratified sample (was 39/66 after Plan A.3,
-  36/66 baseline; +5 unlocks total: cohencu_0, cohencu_1,
-  cohencu_2, cohencu_3, geo3.c_5).
+The current state (post Plan A.3 + F4 + Items 2/4/5):
+- **41/66 SMT-COMP** stratified sample (was 36/66 baseline; +5
+  unlocks total: cohencu_0..3, geo3.c_5).
+- **133/210 Brain's random-polynomial sample** (was 128 in
+  paper; +5 vs paper, +14 vs `martin-subpoly-comparison-v2.tsv`).
 - div/mod identity at every bit-width tested (8 → 256) now
-  solves in <1.4 s (Plan A.3).
+  solves in <1.4 s (Plan A.3); also `b != ~0` form (Item 2
+  extension).
 - F4-style tail reduction (Item 8) closes cohencu_2/3 (Item 1).
+- 4 wins-beyond-all-current-solvers in Brain's 210 sample,
+  $10\times$ faster than prior measurement.
 - 144+ Lean theorems across 20 modules; zero `sorry`s in
   project code; standard mathlib axioms only.
 - bw=512 family (4/5), Wienand commute*/distrib* (4/4),
   SABER (3/3) preserved.
+- Paper updated: SMT-COMP, Brain's 210, SABER, custom-suite
+  tables; new sections on Phase A.3, F4, Plan B negative
+  finding.
 
 **Status legend**:
 - **Open**: not yet started.
@@ -45,23 +52,27 @@ regressions.
 
 ---
 
-### Item 2 — Plan A.3 extension to other predicates
+### Item 2 — Plan A.3 extension to other predicates — **COMPLETED**
 
-**Status**: Open. Plan A.3 fast-paths `x != 0`. Same approach
-generalises:
+**Status**: **Done** (commit on `features/adder` after F4 commit).
+Extended Plan A.3's `nonzero_fast_path` to also recognise
+`x != ~0` patterns. Refactored the pattern-detection logic into a
+single helper applied uniformly to direct-relational and
+not-relational set_to paths (the latter is essential because the
+parser rewrites `bvult x ~0` to `not (x >= ~0)`).
 
-- `x != ~0`: emit as a disequality.
-- `x != C` for constant C: emit directly.
-- `bvult x (C+1)` parses as `bvule x C` and gets bit-chain-
-  encoded; could fast-path with bound + bit-decomposition only
-  when the bound is non-trivial.
+**Effort spent**: half a day.
 
-**Effort**: ~3 days.
+**Result**: 0 new SMT-COMP unlocks (no benchmark in our sample
+exercises the `x != ~0` form alongside `bvudiv`/`bvurem`), but
+synthetic div/mod identity with `b != ~0` now solves at all
+bitwidths (was T/O at 16+ before). Regression test added.
 
-**Expected impact**: +0–2 SMT-COMP unlocks; the synthetic
-high-half-extract regression noted in
-`plan-B-empirical-findings.md` (default 4 s vs bit-blast 0.02 s
-on 64-bit single-mul) likely disappears.
+**Note on synthetic high-half regression**: the 4× slowdown on
+the `(extract 2N-1 N) (bvmul ...)` pattern noted in
+`plan-B-empirical-findings.md` was NOT addressed by this
+extension; it requires a different fix (skip algebraic
+processing for disequalities involving non-zero-LO extractbits).
 
 ---
 
@@ -90,43 +101,39 @@ possibly Sage2_bench_9381).
 
 ## Engineering / methodology
 
-### Item 4 — Fresh paper evaluation
+### Item 4 — Fresh paper evaluation — **COMPLETED**
 
-**Status**: Open. The paper's tables predate Plan A.1/A.2/A.3.
+**Status**: **Done** (commit on `features/adder`). Re-ran all
+benchmark suites with the post-F4 binary; updated paper tables.
 
-**Effort**: ~2 days.
+**Effort spent**: 1 day.
 
-**Specific tasks**:
-- Re-run **Brain's 210-benchmark random-polynomial sample**.
-  The new pair selection (Plan A.1) may unlock additional
-  polynomials with quadratic disequalities.
-- Re-run the **39-benchmark custom suite**.
-- Re-run the **DSP datapath benchmarks** (5 benchmarks).
-- Update **PAR-2** numbers across all tables.
-- Verify **SABER at higher N** still scales (N=512 / N=1024
-  beyond the prior N=256 measurement).
-- Compare against fresh **Bitwuzla / cvc5** versions.
-
-**Currently updated**: only the SMT-COMP table (33 → 39, PAR-2
-63.5 → 50.3).
+**Results**:
+- Brain's 210: 119 → **133** (`all_combined`; +14 unlocks vs
+  prior `martin-subpoly-comparison-v2.tsv`; 0 regressions).
+- Custom suite: 39/39 (preserved).
+- DSP: 5/5 in <0.015 s each (preserved).
+- SABER scaling: every measured N modestly faster
+  (e.g.\ N=256 from 14.27 s → 11.25 s).
+- 4 wins-beyond-all-current-solvers preserved with $10\times$
+  faster average runtime.
 
 ---
 
-### Item 5 — Update paper with Plan A.3 + div/mod identity
+### Item 5 — Update paper with Plan A.3 + div/mod identity — **COMPLETED**
 
-**Status**: Open. The paper's `sec:algebraic-tuning` section
-discusses Phases 2.5 / 2.6 / A.1 / A.2.
+**Status**: **Done** (commit `fc56bdd9bf` on `features/adder`).
 
-**Effort**: ~1 day.
+**Effort spent**: half a day.
 
-**Additions needed**:
-- Phase A.3 narrative: the relational-predicate fast-path.
-- div/mod identity benchmark as a concrete demonstration (the
-  only paper-level benchmark where all bit-widths went from
-  T/O to <1.4 s).
-- Plan B negative finding: explain why we did NOT pursue
-  hybrid Z/ZMod, with reference to
-  `doc/paper-algebraic/plan-B-empirical-findings.md`.
+**Additions made**:
+- Phase A.3 narrative paragraph (relational predicate fast-path).
+- div/mod identity benchmark (table at every bit-width).
+- F4 paragraph: tail reduction; cohencu_2/3 unlock.
+- 'Hybrid Z/ZMod overflow reasoning is not enough on its own'
+  paragraph in `sec:future-within-and-beyond` (Plan B negative
+  finding).
+- New citation: `faugere1999f4`.
 
 ---
 
