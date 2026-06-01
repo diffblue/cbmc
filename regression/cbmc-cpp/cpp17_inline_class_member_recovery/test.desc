@@ -1,0 +1,26 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^.*symbol 'value' is unknown.*$
+^.*symbol 'message_handler' is unknown.*$
+--
+Verifies that a sibling member-declaration following an inline
+class/struct/union/enum definition whose elaboration throws is
+NOT silently dropped from the enclosing class's body.
+
+C++ standard: [class.mem]/3 — "The member-specification in a class
+definition declares the full set of members of the class".  Per
+[temp.inst], a member-elaboration failure must remain local to that
+member; sibling members and access-specifier transitions are
+independently observable parts of the member-specification.
+
+Without the fix, the throw from elaborating `class inner : public
+my_template<char>` (where `my_template<char>` fails to instantiate
+because `char::nested` is undefined) abandons the body loop,
+dropping the `protected:` access transition and the `value` data
+member.  The method `set_value` then fails name lookup of `value`
+with the spurious "symbol 'value' is unknown" diagnostic.

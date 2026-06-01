@@ -1560,9 +1560,76 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
       }
       else
       {
-        typecheck_type(declaration.type());
-      }
+        // Per N5008 [class.mem]/3 + [temp.inst]: the
+        // member-specification declares the full set of members of
+        // the class.  A failure to elaborate one member's type must
+        // not silently drop sibling member-declarations or
+        // access-specifiers from the class body.  If the type is an
+        // inline class/struct/union/enum definition (i.e., a nested
+        // type whose definition is given here) and its elaboration
+        // throws — typically because a base-class template
+        // specialization in the inline definition fails to
+        // instantiate against CBMC's libstdc++ model — the existing
+        // unprotected call below would propagate the throw out of
+        // the body loop, causing every subsequent member declaration
+        // (and `cpp-public`/`cpp-protected` access specifiers) to be
+        // silently abandoned.  The visible symptom is the classic
+        // `symbol 'message_handler' is unknown` failure on CBMC's
+        // own `messaget` class: its `class mstreamt : public
+        // std::ostringstream` inline definition's elaboration aborts
+        // the body loop, so every later `protected:` plus its data
+        // members get dropped from the class scope.  Method bodies
+        // that reference the dropped data members then fail name
+        // lookup at typecheck-method-bodies time.
+        //
+        // Wrap the elaboration in a try/catch, mirroring the
+        // existing `kept_unresolved_cpp_name` pattern above: reset
+        // the error count and `continue;` to the next body item.
+        // The nested type is unusable downstream — references to it
+        // fail at their use site — but the body loop completes,
+        // sibling members register, and access transitions are
+        // preserved.
+        //
+        // Apply the recovery only when this is a NESTED inline
+        // definition AND it has a base-clause.  Inline definitions
+        // without bases (`class X { /* ... */ };`) cannot trigger
+        // the libstdc++ instantiation-chain failure that motivates
+        // the recovery, and keeping the strict behaviour for them
+        // means that genuine member-elaboration errors in plain
+        // user code still surface clearly.  This pattern matches
+        // the libstdc++ recovery use case (a nested class derived
+        // from a template specialization whose model is incomplete)
+        // without relaxing diagnostics for ordinary class members.
+        bool inline_def_with_base = false;
+        if(
+          declaration.type().id() == ID_struct ||
+          declaration.type().id() == ID_union)
+        {
+          const irept &bases = declaration.type().find(ID_bases);
+          if(!bases.get_sub().empty())
+            inline_def_with_base = true;
+        }
 
+        if(instantiation_stack.empty() && inline_def_with_base)
+        {
+          const std::size_t errors_before =
+            get_message_handler().get_message_count(messaget::M_ERROR);
+          try
+          {
+            typecheck_type(declaration.type());
+          }
+          catch(...)
+          {
+            get_message_handler().set_message_count(
+              messaget::M_ERROR, errors_before);
+            continue;
+          }
+        }
+        else
+        {
+          typecheck_type(declaration.type());
+        }
+      }
       bool is_static = declaration.storage_spec().is_static();
       bool is_mutable = declaration.storage_spec().is_mutable();
 
