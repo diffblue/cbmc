@@ -233,6 +233,34 @@ bool c_preprocess(
   return true;
 }
 
+std::vector<std::string> cprover_cxx_preprocessor_macro_flags()
+{
+  std::vector<std::string> flags;
+
+  if(config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP17)
+  {
+    // CBMC doesn't support deduction guides ([over.match.class.deduct]);
+    // undefine the feature macro so standard library headers don't use
+    // them (the parser would otherwise misclassify a deduction guide as
+    // a constructor).
+    flags.push_back("-U__cpp_deduction_guides");
+    // Prevent PSTL (Parallel STL) execution policy headers from being
+    // included; they cause infinite template recursion in CBMC.
+    flags.push_back("-D_PSTL_GLUE_MEMORY_DEFS_H=1");
+    flags.push_back("-D_PSTL_GLUE_ALGORITHM_DEFS_H=1");
+    flags.push_back("-D_PSTL_GLUE_NUMERIC_DEFS_H=1");
+  }
+
+  if(config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP20)
+  {
+    // CBMC treats char8_t as unsigned char, causing duplicate template
+    // specializations; undefine the feature macro to avoid this.
+    flags.push_back("-U__cpp_char8_t");
+  }
+
+  return flags;
+}
+
 /// ANSI-C preprocessing
 bool c_preprocess_visual_studio(
   const std::string &file,
@@ -566,14 +594,6 @@ bool c_preprocess_gcc_clang(
       else
 #endif
         argv.push_back("-std=gnu++17");
-      // CBMC doesn't support deduction guides; undefine the feature macro
-      // so that standard library headers don't use them.
-      argv.push_back("-U__cpp_deduction_guides");
-      // Prevent PSTL (Parallel STL) execution policy headers from being
-      // included; they cause infinite template recursion in CBMC.
-      argv.push_back("-D_PSTL_GLUE_MEMORY_DEFS_H=1");
-      argv.push_back("-D_PSTL_GLUE_ALGORITHM_DEFS_H=1");
-      argv.push_back("-D_PSTL_GLUE_NUMERIC_DEFS_H=1");
       break;
 
     case configt::cppt::cpp_standardt::CPP20:
@@ -594,13 +614,6 @@ bool c_preprocess_gcc_clang(
           argv.push_back("-std=gnu++20");
         }
       }
-      argv.push_back("-U__cpp_deduction_guides");
-      // CBMC treats char8_t as unsigned char, causing duplicate template
-      // specializations; undefine the feature macro to avoid this.
-      argv.push_back("-U__cpp_char8_t");
-      argv.push_back("-D_PSTL_GLUE_MEMORY_DEFS_H=1");
-      argv.push_back("-D_PSTL_GLUE_ALGORITHM_DEFS_H=1");
-      argv.push_back("-D_PSTL_GLUE_NUMERIC_DEFS_H=1");
       break;
 
     case configt::cppt::cpp_standardt::CPP23:
@@ -623,11 +636,6 @@ bool c_preprocess_gcc_clang(
             argv.push_back("-std=gnu++2a");
         }
       }
-      argv.push_back("-U__cpp_deduction_guides");
-      argv.push_back("-U__cpp_char8_t");
-      argv.push_back("-D_PSTL_GLUE_MEMORY_DEFS_H=1");
-      argv.push_back("-D_PSTL_GLUE_ALGORITHM_DEFS_H=1");
-      argv.push_back("-D_PSTL_GLUE_NUMERIC_DEFS_H=1");
       break;
 
     case configt::cppt::cpp_standardt::CPP26:
@@ -651,13 +659,15 @@ bool c_preprocess_gcc_clang(
             argv.push_back("-std=gnu++2a");
         }
       }
-      argv.push_back("-U__cpp_deduction_guides");
-      argv.push_back("-U__cpp_char8_t");
-      argv.push_back("-D_PSTL_GLUE_MEMORY_DEFS_H=1");
-      argv.push_back("-D_PSTL_GLUE_ALGORITHM_DEFS_H=1");
-      argv.push_back("-D_PSTL_GLUE_NUMERIC_DEFS_H=1");
       break;
     }
+
+    // Append CBMC-specific C++ feature-macro flags (deduction guides,
+    // char8_t, PSTL).  Shared with goto-cc's preprocessing pass via
+    // `cprover_cxx_preprocessor_macro_flags` so both produce identical
+    // preprocessed translation units.
+    for(const auto &flag : cprover_cxx_preprocessor_macro_flags())
+      argv.push_back(flag);
   }
   else
   {
