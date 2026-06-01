@@ -146,3 +146,73 @@ The audit's value: every "win" is now classified as genuine or
 artifact against an independent oracle, and the two soundness
 bugs would otherwise have shipped in the paper. This is the
 discipline that the float episode showed was missing.
+
+## ADDENDUM (2026-06-01, after the Item 13 fixes): broad
+## unsoundness scan reveals the problem is SYSTEMIC
+
+After committing the two targeted fixes (assoc, mul_zero), a
+broad scan ran the solver (algebra ON) on **4,361 SAT
+bvmul benchmarks** from the full QF\_BV corpus (declared
+`:status sat`) and flagged any returned `unsat` — the dangerous
+direction. Of the 3,677 under 2 MB, **76 were wrongly reported
+`unsat`**. Re-running each with `DISABLE_ALGEBRAIC=1` splits
+them:
+
+- **41 ALGEBRA-CAUSED** (Sage2 ×40, sage ×1): algebra-OFF does
+  not return `unsat`, so our algebraic pre-solver is the cause.
+  These are genuine unsoundness and are **NOT fixed** by the two
+  committed targeted guards. Lists:
+  `bench-multiplication/ablation-audit/sat-scan-algebra-unsound.txt`.
+- **35 PRE-EXISTING** (all `float`): algebra-OFF *also* returns
+  `unsat`, so the CBMC bit-blaster/SMT2 front-end itself
+  disagrees with z3 (which says `sat` on the ones it decides)
+  on these declared-sat FP-as-BV benchmarks. This is a separate,
+  pre-existing issue **outside the algebraic pre-solver** (it
+  reproduces with `DISABLE_ALGEBRAIC=1`) — flagged for separate
+  investigation, not part of Item 13. List:
+  `.../sat-scan-preexisting-bitblast.txt`.
+
+### Root cause is systemic, across ≥4 refutation paths
+
+The 41 algebra-caused failures are the **Rabinowitsch
+unit-trick over ZMod(2^d)**, the same root cause as Bug B but
+manifesting beyond the narrow zero-divisor pattern the committed
+guard detects. Encoding `diff != 0` as `diff*e - 1 = 0` asserts
+`diff` is a *unit*; over ZMod(2^d) a non-zero element need not be
+invertible, so `UNSAT_rabinowitsch` does NOT imply
+`UNSAT_original`. This trick is used at (at least) three call
+sites in `try_algebraic_solve` (`__rabinowitsch` main system,
+`__rab` per-disequality, `__rab_disj` disjunctive), plus there is
+a **second, distinct** unsound mechanism: 4 of the 41
+(`Sage2/bench_{12880,5552,13209,8135}`) remain wrongly `unsat`
+even with all three Rabinowitsch sites gated off — refuted by the
+`is_zero()` / gb-on-equalities path (normalisation reporting a
+spurious zero, or the predicate/equality ideal being found
+inconsistent unsoundly).
+
+### Feasibility data for a sound-only mode
+
+An experimental `DISABLE_RABINOWITSCH` gate (reverted; not
+committed) over the three unit-trick sites showed:
+
+- Fixes **37/41** algebra-caused failures.
+- **SABER and the 4 Brain wins survive** (they refute via the
+  sound vanishing/ideal-membership test, not Rabinowitsch).
+- **cohencu_0..3 and geo3.c_5 regress to timeout** — they
+  genuinely depend on the Rabinowitsch path. So a naive
+  sound-only mode costs ~5 SMT-COMP unlocks.
+- **4 residual** remain unsound (the second mechanism above),
+  so even gating all Rabinowitsch sites does not fully restore
+  soundness.
+
+### Status / consequence
+
+The two committed targeted fixes (assoc, mul_zero) are correct,
+tested, and harmless, but they are a **down payment**, not a
+resolution. The algebraic disequality refutation is **unsound by
+default over ZMod(2^d)** on ~41 real SMT-LIB benchmarks. This is
+a CRITICAL, submission-blocking issue requiring a proper
+redesign rather than per-site guards. Tracked as the expanded
+Item 13 + new Item 14 in `remaining-work.md`. The headline
+soundness claim of the paper cannot stand until this is
+resolved.

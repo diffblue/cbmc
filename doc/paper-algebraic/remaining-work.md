@@ -34,8 +34,14 @@ The current state (post Plan A.3 + F4 + Items 2/4/5/6/9):
   TWO SOUNDNESS BUGS** (`assoc.c`, `mul_zero_factor.c`): the
   algebraic path reports VERIFICATION SUCCESSFUL where the
   correct answer is FAILED (claims no-bug when a bug exists).
-  This is CRITICAL and blocks submission — tracked as Item 13.
-  See `doc/paper-algebraic/ablation-audit-2026-06-01.md`.
+  This is CRITICAL and blocks submission — two targeted fixes are
+  committed (Item 13: assoc, mul_zero), but a broad SAT-scan then
+  revealed the unsoundness is **systemic** (Rabinowitsch
+  unit-trick over ZMod(2^d)): **41 real SMT-LIB benchmarks are
+  wrongly reported `unsat`** by the algebraic pre-solver, not
+  fixed by the targeted guards. Tracked as Item 14 (the real
+  fix). The paper's soundness claim cannot stand until Item 14 is
+  resolved. See `doc/paper-algebraic/ablation-audit-2026-06-01.md`.
 - 65 Lean traceability entries across 20 modules, all status
   **DONE** (zero `sorry`, zero project-specific axioms; only
   standard mathlib axioms `propext`, `Classical.choice`,
@@ -569,84 +575,99 @@ correction block is the worked example of an artifact win.
 
 ---
 
-### Item 13 — Fix two algebraic soundness bugs — **NEW, CRITICAL (blocks submission)**
+### Item 13 — Fix two algebraic soundness bugs — **PARTIAL (committed); systemic issue remains**
 
-**Status**: Open. (Origin: Item 12 audit, 2026-06-01.)
+**Status**: Two targeted fixes **committed** (assoc, mul_zero;
+sound, tested, regression-protected). A subsequent broad scan
+showed the underlying issue is **systemic and NOT resolved** —
+see Item 14. Item 13 is the down payment; Item 14 is the real
+fix.
 
-The ablation audit found two custom-suite benchmarks where the
-algebraic path reports **VERIFICATION SUCCESSFUL when the correct
-answer is FAILED** — i.e.\ it claims no bug where a bug exists.
-Confirmed three ways (our bit-blaster, z3, and hand-computed
-witnesses). This is the most serious possible defect for a
-verification tool and **must be fixed before any submission**.
+**Committed (commit on `features/adder`):**
+- **Bug A (assoc)** — drop (dis)equalities where a widening
+  typecast of a *defined intermediate* symbol is a direct
+  arithmetic operand. Precise: preserves input-widening
+  (mul_overflow) and widen-then-narrow (matrix_mul); SMT-LIB
+  carries no typecasts. assoc.c (BW=9) now FAILED.
+- **Bug B (mul_zero)** — detect the canonical zero-divisor shape
+  (a product constrained to 0 whose two factors are each
+  separately constrained non-zero) and skip algebra.
+  mul_zero_factor.c (BW=8) now FAILED.
+- Regression tests under
+  `regression/cbmc/algebraic-soundness-{assoc,zero-divisor}/`.
+- Verified no regression: SMT-COMP 66 identical (10 unlocks
+  kept), SABER identical, 4 Brain wins kept, all genuine C wins
+  kept; groebner unit tests pass.
 
-**Bug A — integer promotion / cast width ignored** (`assoc.c`,
-BW=9). The C assertion `(a*b)*c == a*(b*c)` on
-`__CPROVER_bitvector[9]` is encoded by CBMC with operands
-`cast(..., signedbv[32])` (standard C integer promotion). The
-identity holds in Z/2⁹ but not at 32 bits (the 9-bit truncations
-of `ab`, `bc` lose bits that matter once multiplied at 32 bits).
-The poly_extractor reasons in the 9-bit ring and ignores the
-cast, "proving" a false identity.
+**Why this is only partial**: see Item 14. The Bug B guard
+catches one pattern of a much broader unsoundness.
 
-*Fix direction*: the extractor must treat a value as the same
-algebraic unknown across a width-changing cast **only** when the
-cast is provably non-truncating/non-promoting in context.
-Concretely: when collecting a multiplication whose result feeds
-a `cast` to a wider type, the narrow product is `x mod 2^w` and
-must be modelled as a fresh variable constrained to that
-residue, not identified with the wide product. Safest
-conservative fix: **refuse to polynomialise (fall back to
-bit-blasting) whenever an operand of a collected (dis)equality is
-a width-changing cast of an arithmetic subterm.** This is a
-Gate-B tightening (cf. Item 10) and is sound-by-construction.
+---
 
-**Bug B — zero divisors in Z/2ⁿ** (`mul_zero_factor.c`, BW=8).
-The system `{a·b = 0, a ≠ 0, b ≠ 0}` is satisfiable over Z/2⁸
-(16·16 ≡ 0), but the algebraic path refutes it — reasoning valid
-over an integral domain/field but invalid over a ring with zero
-divisors. The disequality handling effectively assumes
-`a·b = 0 ⇒ a = 0 ∨ b = 0`.
+### Item 14 — Systemic unsoundness of disequality refutation over ZMod(2^d) — **NEW, CRITICAL (blocks submission)**
 
-*Fix direction*: the disequality/refutation logic must not use
-zero-divisor-freeness. A product disequality `a·b ≠ 0` may be
-added to the ideal, but `a·b = 0` must NOT license concluding
-`a = 0 ∨ b = 0`. Audit `poly_extract` / the nonzero fast-path
-and the Groebner disequality saturation for any step that
-assumes the ring is a domain. Conservative fix: when a
-disequality `x ≠ 0` is combined with an equality `x·y = 0`, do
-not refute unless `y = 0` is independently derivable.
+**Status**: Open. (Origin: broad SAT-scan after the Item 13
+fixes, 2026-06-01. Full data:
+`doc/paper-algebraic/ablation-audit-2026-06-01.md` addendum;
+`bench-multiplication/ablation-audit/sat-scan-*.txt`.)
 
-**Verification of the fix**:
-1. Both `assoc.c` (BW=9) and `mul_zero_factor.c` (BW=8) must
-   return `VERIFICATION FAILED` with algebra ON (matching
-   bit-blast + z3).
-2. Re-run the full Item 12 audit to confirm no NEEDS_ALGEBRA
-   benchmark regresses to a wrong verdict and no new unsoundness
-   appears.
-3. Add both as regression tests (expected FAILED) under
-   `regression/` so this cannot silently return.
-4. Cross-check that the genuine wins (SABER, Brain, SMT-COMP
-   unlocks) still solve and still agree with z3/Bitwuzla.
+**The finding**: scanning 3,677 SAT bvmul benchmarks (algebra ON,
+flag any `unsat`) found **41 benchmarks our algebraic pre-solver
+wrongly reports `unsat`** (Sage2 ×40, sage ×1) — confirmed
+algebra-caused (`DISABLE_ALGEBRAIC=1` does not reproduce). The
+two committed Item-13 guards do not fix these. (A separate 35
+`float` benchmarks are wrongly `unsat` even with algebra OFF — a
+pre-existing CBMC bit-blaster/SMT2 front-end issue, tracked
+separately, NOT this item.)
 
-**Also**: the Lean soundness development (`GroebnerSoundness`,
-`StrongGB`) claims the refutation is sound. Either the
-mechanised model does not cover the disequality/zero-divisor
-step exercised here, or it covers an idealised ring. Reconcile:
-the Lean theorems likely assume the polynomial *is* in the ideal
-(the `ASSUMES` clause), and the bug is that the *implementation*
-adds a polynomial to the ideal that does not follow over Z/2ⁿ.
-Confirm the gap is in the C++ extraction, not the proof — and
-add a Lean note pinning down the zero-divisor caveat.
+**Root cause**: the **Rabinowitsch unit-trick is unsound over
+ZMod(2^d)**. Encoding `diff != 0` as `diff*e - 1 = 0` asserts
+`diff` is a unit; over ZMod(2^d) non-zero ≠ unit, so
+`UNSAT_rabinowitsch ⇏ UNSAT_original`. It is used at three sites
+(`__rabinowitsch`, `__rab`, `__rab_disj`). PLUS a **second,
+distinct** unsound mechanism: 4 of the 41 stay wrongly `unsat`
+even with all Rabinowitsch sites gated off (the
+`is_zero()`/gb-on-equalities path).
 
-**Effort**: 3–5 days (diagnosis + conservative fallback fix +
-regression tests + audit re-run). A complete fix (precise
-modelling rather than fallback) is larger.
+**Feasibility data** (experimental `DISABLE_RABINOWITSCH` gate,
+reverted):
+- Gating the three Rabinowitsch sites fixes 37/41.
+- SABER + 4 Brain wins survive (sound vanishing/ideal-membership
+  path).
+- **cohencu_0..3 + geo3.c_5 regress to timeout** — they depend
+  on Rabinowitsch. Naive sound-mode costs ~5 SMT-COMP unlocks.
+- 4 residual remain unsound (second mechanism).
 
-**Cross-references**:
-- `doc/paper-algebraic/ablation-audit-2026-06-01.md`
-- `bench-multiplication/ablation-audit/custom-c.tsv`
-- Item 10 (Gate B tightening shares the cast-handling fix).
+**Design options** (need a decision):
+1. **Sound-only mode**: replace the Rabinowitsch unit-trick with
+   sound ideal-membership refutation (refute `diff != 0` only
+   when `diff` reduces to 0 modulo the equality ideal — i.e.\
+   `diff` is in the ideal, so it vanishes on all solutions).
+   Sound over any ring. Cost: lose cohencu/geo3 (refutations
+   that needed radical/unit reasoning); must also fix the
+   `is_zero()` second mechanism. Likely the right answer; honest
+   headline becomes "10→5 SMT-COMP unlocks" unless the lost
+   cases can be recovered soundly.
+2. **Unit-aware Rabinowitsch**: only add `diff*e-1` when `diff`
+   is provably odd (a unit over ZMod(2^d)); otherwise use option
+   1's ideal-membership check. Recovers cohencu/geo3 iff their
+   `diff` is provably a unit (to be checked).
+3. **Reconcile with Lean**: the soundness development
+   (`GroebnerSoundness`, `StrongGB`) presumably proves
+   "odd constant in ideal ⇒ UNSAT". The bug is that the C++
+   adds `diff*e-1` to the ideal, which does NOT follow from
+   `diff != 0` over ZMod(2^d). The Lean `ASSUMES` clause
+   (polynomial is in the ideal) is satisfied vacuously by the
+   construction but the *encoding* is unfaithful. Add a Lean
+   theorem pinning the unit caveat; ensure the implementation
+   only adds ideal-faithful polynomials.
+
+**Effort**: 1–2 weeks (redesign disequality refutation + fix the
+second mechanism + full re-audit + Lean reconciliation).
+
+**Until resolved**: the algebraic pre-solver is unsound by
+default on ~41 real SMT-LIB benchmarks. The paper's soundness
+claim cannot stand. This is the single most important open item.
 
 ---
 
@@ -667,11 +688,16 @@ the headline-improvement it promised is gone. The corpus-widening
 exposed a more important gap: we had no ablation discipline.
 
 **Tier 0 — do first (defensive, essential before any submission):**
-- **Item 13** (fix the two soundness bugs). CRITICAL — an unsound
-  SUCCESSFUL verdict is disqualifying. Nothing else matters until
-  this is fixed and regression-tested. 3–5 days.
-- **Item 12** (ablation re-audit) — **DONE**; it produced Item 13
-  and validated the genuine wins.
+- **Item 14** (systemic disequality-refutation unsoundness over
+  ZMod(2^d)). CRITICAL — the algebraic pre-solver wrongly reports
+  `unsat` on ~41 real SMT-LIB benchmarks; an unsound verdict is
+  disqualifying. Nothing else ships until this is resolved
+  (redesign + re-audit). 1–2 weeks. Needs a design decision
+  (sound-only mode loses cohencu/geo3).
+- **Item 13** (targeted assoc/mul_zero fixes) — **DONE** (partial
+  down payment on Item 14).
+- **Item 12** (ablation re-audit) — **DONE**; it produced Items
+  13/14 and validated the genuine wins.
 
 **Tier 1 — strong follow-through (1–2 weeks):**
 - **Item 10 Phase 1** (fragment characterisation). The broad-
