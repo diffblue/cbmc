@@ -5,7 +5,7 @@ Plan A.1 / A.2 / A.3 (commit b0aaed56bd on branch
 `features/adder`). Items are tagged with priority, effort,
 expected impact, and any dependency on prior work.
 
-The current state (post Plan A.3 + F4 + Items 2/4/5):
+The current state (post Plan A.3 + F4 + Items 2/4/5/6/9):
 - **41/66 SMT-COMP** stratified sample (was 36/66 baseline; +5
   unlocks total: cohencu_0..3, geo3.c_5).
 - **133/210 Brain's random-polynomial sample** (was 128 in
@@ -14,10 +14,14 @@ The current state (post Plan A.3 + F4 + Items 2/4/5):
   solves in <1.4 s (Plan A.3); also `b != ~0` form (Item 2
   extension).
 - F4-style tail reduction (Item 8) closes cohencu_2/3 (Item 1).
+- Synthetic high-half-extract regression fixed (Item 6): 4.0 s
+  → 0.020 s on 64-bit overflow check.
 - 4 wins-beyond-all-current-solvers in Brain's 210 sample,
   $10\times$ faster than prior measurement.
-- 144+ Lean theorems across 20 modules; zero `sorry`s in
-  project code; standard mathlib axioms only.
+- 65 Lean traceability entries across 20 modules, all status
+  **DONE** (zero `sorry`, zero project-specific axioms; only
+  standard mathlib axioms `propext`, `Classical.choice`,
+  `Quot.sound`). Item 9 closed `DONE-MOD-AXIOMS` for `Defer.lean`.
 - bw=512 family (4/5), Wienand commute*/distrib* (4/4),
   SABER (3/3) preserved.
 - Paper updated: SMT-COMP, Brain's 210, SABER, custom-suite
@@ -137,23 +141,25 @@ benchmark suites with the post-F4 binary; updated paper tables.
 
 ---
 
-### Item 6 — Synthetic regression cleanup
+### Item 6 — Synthetic regression cleanup — **COMPLETED**
 
-**Status**: Documented. The high-half-extract pattern
-`(extract 2N-1 N) (bvmul (zext s) (zext t))` with a bvule
-bound is 200× slower in default than bit-blast-only on
-synthetic benchmarks.
+**Status**: **Done** (commit on `features/adder`).
 
-**Effort**: ~1–2 days.
+**Effort spent**: half a day.
 
-**Engineering polish**:
-- Detect the pattern in `set_to`.
-- Skip the algebraic processing for these disequalities (they
-  don't fit our fragment).
-- Let bit-blasting handle them directly.
+**Fix**: detect non-zero-LO extractbits in disequality LHS or
+RHS at the time we collect from `set_to`, and skip pushing to
+`algebraic_disequalities`. The disequality remains visible to
+`SUB::set_to` for bit-blasting; only the algebraic processing
+is skipped. The guard applies ONLY to disequalities, not to
+equalities, because the Tseitin propagator (Phase 2.6) uses
+extractbits-on-boolean-atom equalities for forward and backward
+chain propagation; an earlier draft that guarded equalities
+caused `wienand_Booth_mult_ub_8x8_1.sf` to regress.
 
-**Expected impact**: 0 SMT-COMP unlocks (pattern not in our
-sample), but cleaner pipeline behaviour.
+**Result**: synthetic 64-bit overflow check 4.0 s → 0.020 s
+(200×). 41/66 SMT-COMP preserved. 0 regressions. New regression
+test: `regression/smt2_solver/highhalf-extract-skip/`.
 
 ---
 
@@ -216,26 +222,31 @@ Closes Item 1 in this list.
 
 ---
 
-### Item 9 — Lean tightening (`DONE-MOD-AXIOMS` → `DONE`)
+### Item 9 — Lean tightening (`DONE-MOD-AXIOMS` → `DONE`) — **COMPLETED**
 
-**Status**: Open. Several Lean theorems are currently
-`DONE-MOD-AXIOMS`:
+**Status**: **Done** (commit on `features/adder`).
 
-- `Defer.lean::defer_replay_equivalence` (relies on
-  `defer_finish_eq_eager_finish`, `finish_eager_commutes`
-  axioms).
-- `Defer.lean::defer_verdict_equivalence` (same chain).
-- `boolbv.cpp::try_algebraic_solve` verdict soundness (relies
-  on operational-semantics axioms).
+**Effort spent**: half a day.
 
-**Effort**: ~1 week.
+**Result**: The three theorems in `Defer.lean`
+(`defer_replay_equivalence`, `defer_verdict_equivalence`,
+`defer_verdict_from_empty`) were marked `DONE-MOD-AXIOMS` in
+`TRACEABILITY.md`, but a previous revision of `Defer.lean` had
+already replaced the two semantic axioms
+(`defer_finish_eq_eager_finish`, `finish_eager_commutes`) with
+provable theorems under a concrete set-based abstract model of
+`SolverState`. The "mod-axioms" status was stale documentation.
+Verified mechanically with `#print axioms`: each of the three
+theorems depends only on the standard mathlib axioms `propext`
+and `Quot.sound`, no project-specific axioms.
 
-**Approach**: mechanise the operational semantics of the
-boolbv layer or the strong-GB algorithm to a degree that lets
-the axioms be discharged.
+Updates: `TRACEABILITY.md` 3 entries → DONE; status legend
+simplified (only DONE category remains); `boolbv.cpp` `PROOF:`
+comment rewritten to reflect that A1/A2 are now theorems.
 
-**Expected impact**: increases trust in the implementation;
-no SMT-COMP unlock.
+The repository now has **zero `DONE-MOD-AXIOMS`** entries; all
+65 traceability entries across 20 Lean modules are
+unconditional `DONE`.
 
 ---
 
