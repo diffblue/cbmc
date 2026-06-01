@@ -1,7 +1,25 @@
 CORE
 main.cpp
---cpp17
-^VERIFICATION SUCCESSFUL$
+--cpp17 --show-goto-functions
 ^EXIT=0$
 ^SIGNAL=0$
+^.*std::optional<signed_int>::optional\(this,rref_signed_int\).*$
 --
+^CONVERSION ERROR$
+^PARSING ERROR$
+--
+C++17 std::optional copy-initialization from a value
+(`std::optional<int> o = 42;`).
+
+This verifies the frontend selects `std::optional`'s converting
+constructor `optional(_Up&&)` and constructs the contained value.
+
+Verified at the goto-program level rather than via full BMC: a
+correctly-elaborated `std::optional<int>` pulls in the entire
+`_Optional_base`/`_Optional_payload` instantiation graph, which
+exceeds symbolic-execution memory limits.  (Before the
+function-template converting-constructor deduction was fixed, this
+construction silently failed and `main` was elided to a single
+nondet return — the BMC "SUCCESSFUL" was vacuous, verifying
+nothing.)  The goto-level check confirms the converting
+constructor is actually invoked with the `int&&` value.

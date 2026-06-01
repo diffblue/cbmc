@@ -1,0 +1,36 @@
+CORE
+main.cpp
+--cpp17 --show-goto-functions
+^EXIT=0$
+^SIGNAL=0$
+^.*std::optional<signed_int>::optional\(this,(ref|rref)_signed_int\).*$
+--
+^CONVERSION ERROR$
+^PARSING ERROR$
+^.*invalid implicit conversion.*to 'struct optional'.*$
+--
+Regression for member-converting-constructor template deduction in
+an instantiated namespaced class template (`std::optional<int>`).
+
+`return x;` into a `std::optional<int>` return type copy-initializes
+the optional from an `int` via its converting constructor
+`optional(_Up&&)`.  The deduction needs the class template
+parameter `_Tp` bound; that binding requires looking up the
+enclosing class's tag-type symbol.
+
+Without the fix, the tag-type name was reconstructed as
+`tag-std::optional<int>` (tag- at the front) instead of the actual
+`std::tag-optional<int>` (tag- after the namespace), so the lookup
+failed, `_Tp` was unbound, the converting constructor's SFINAE
+constraint `is_constructible<_Tp, _Up>` could not be evaluated, the
+deduction was rejected, and the conversion failed with "invalid
+implicit conversion from 'signed int' to 'struct optional'".
+
+Verified at the goto-program level (full BMC of std::optional
+exceeds symex memory limits): the goto program must contain the
+converting-constructor call with the int rvalue, and must NOT
+report the conversion error.
+
+Four files in CBMC's own source — `substitute_symbols.cpp`,
+`pointer_offset_size.cpp`, `source_location.cpp`, `c_types.cpp` —
+return a value into a `std::optional` and hit this.

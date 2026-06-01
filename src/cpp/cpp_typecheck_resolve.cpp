@@ -5068,7 +5068,44 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
       auto pos = tid.find("::template.");
       if(pos != std::string::npos)
       {
-        class_tag = "tag-" + tid.substr(0, pos);
+        // The enclosing class's qualified name is the prefix before
+        // "::template.".  The symbol-table name of a tag type is
+        // "<namespace-qualification>tag-<unqualified-name>", i.e.,
+        // the "tag-" prefix is inserted immediately before the
+        // unqualified class name, AFTER any namespace qualification
+        // (e.g., `std::tag-optional<int>`, not
+        // `tag-std::optional<int>`).  Inserting "tag-" at the very
+        // front only happens to be correct for a class in the global
+        // namespace; for any namespaced class template (such as
+        // every type in `std`), it produces a name that does not
+        // exist in the symbol table, so the class template
+        // arguments are never bound into the template map.  The
+        // converting constructor's SFINAE constraints that reference
+        // the class template parameter `_Tp` (e.g.,
+        // `is_constructible<_Tp, _Up>` in `std::optional`'s
+        // `optional(_Up&&)`) then fail to resolve, the deduction is
+        // rejected, and copy-initialization such as `return v;` into
+        // a `std::optional<T>` reports the spurious
+        //   invalid implicit conversion from 'T' to 'struct optional'.
+        //
+        // Insert "tag-" before the last "::"-separated component that
+        // sits at template-bracket depth 0 (so the "::" inside
+        // template arguments like `optional<a::b>` is ignored).
+        const std::string class_name = tid.substr(0, pos);
+        std::size_t insert_pos = 0;
+        int depth = 0;
+        for(std::size_t i = 0; i + 1 < class_name.size(); ++i)
+        {
+          const char c = class_name[i];
+          if(c == '<')
+            ++depth;
+          else if(c == '>')
+            --depth;
+          else if(depth == 0 && c == ':' && class_name[i + 1] == ':')
+            insert_pos = i + 2;
+        }
+        class_tag = class_name.substr(0, insert_pos) + "tag-" +
+                    class_name.substr(insert_pos);
       }
     }
 
