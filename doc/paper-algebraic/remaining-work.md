@@ -26,6 +26,16 @@ The current state (post Plan A.3 + F4 + Items 2/4/5/6/9):
   algebraic-win count remains **4, pending an ablation re-audit
   of even those** (new Item 12). See
   `bench-multiplication/float-fp2bv/RESULTS.md` correction block.
+- **Ablation audit (Item 12) completed 2026-06-01**: the 4 Brain
+  wins, 5 SMT-COMP unlocks, SABER (26/31), and DSP (mac_equiv)
+  are all confirmed GENUINE algebraic results (survive
+  `DISABLE_ALGEBRAIC=1`) and sound. The 41/66 figure decomposes
+  as 31 bit-blast + 10 algebra. **However, the audit also found
+  TWO SOUNDNESS BUGS** (`assoc.c`, `mul_zero_factor.c`): the
+  algebraic path reports VERIFICATION SUCCESSFUL where the
+  correct answer is FAILED (claims no-bug when a bug exists).
+  This is CRITICAL and blocks submission — tracked as Item 13.
+  See `doc/paper-algebraic/ablation-audit-2026-06-01.md`.
 - 65 Lean traceability entries across 20 modules, all status
   **DONE** (zero `sorry`, zero project-specific axioms; only
   standard mathlib axioms `propext`, `Classical.choice`,
@@ -488,7 +498,29 @@ retracted. The benchmarks/manifest/harness stay committed under
 
 ---
 
-### Item 12 — Ablation re-audit of ALL claimed algebraic wins — **NEW, HIGH PRIORITY**
+### Item 12 — Ablation re-audit of ALL claimed algebraic wins — **COMPLETED 2026-06-01**
+
+**Status**: **Done.** Full results in
+`doc/paper-algebraic/ablation-audit-2026-06-01.md`; raw data in
+`bench-multiplication/ablation-audit/`.
+
+**Outcome**:
+- **4 Brain wins**: all GENUINE (NEEDS_ALGEBRA), sound.
+- **5 SMT-COMP unlocks** (cohencu_0..3, geo3.c_5): all GENUINE.
+- **41/66**: honest split = 31 bit-blast + **10 algebra** (no
+  algebra-harmful cases). Restate in paper as 10/31, not "41 by
+  algebra".
+- **SABER**: 26/31 NEEDS_ALGEBRA + 1 ALGEBRA_FASTER — cleanest
+  genuine result.
+- **DSP (mac_equiv)**: GENUINE (ALGEBRA_FASTER, 0.14 s vs 45.8 s).
+- **div_roundtrip**: ARTIFACT (bit-blasting also fast).
+- **★ Two SOUNDNESS BUGS found** (`assoc.c`, `mul_zero_factor.c`)
+  — the audit's most important outcome. Tracked as Item 13.
+
+No unsoundness in the UNSAT direction (every genuine win that
+could be cross-checked agrees with z3/Bitwuzla/declared status).
+
+**Original plan (for reference):**
 
 **Status**: Open. (Origin: the Item 11 retraction, 2026-06-01.)
 
@@ -537,6 +569,87 @@ correction block is the worked example of an artifact win.
 
 ---
 
+### Item 13 — Fix two algebraic soundness bugs — **NEW, CRITICAL (blocks submission)**
+
+**Status**: Open. (Origin: Item 12 audit, 2026-06-01.)
+
+The ablation audit found two custom-suite benchmarks where the
+algebraic path reports **VERIFICATION SUCCESSFUL when the correct
+answer is FAILED** — i.e.\ it claims no bug where a bug exists.
+Confirmed three ways (our bit-blaster, z3, and hand-computed
+witnesses). This is the most serious possible defect for a
+verification tool and **must be fixed before any submission**.
+
+**Bug A — integer promotion / cast width ignored** (`assoc.c`,
+BW=9). The C assertion `(a*b)*c == a*(b*c)` on
+`__CPROVER_bitvector[9]` is encoded by CBMC with operands
+`cast(..., signedbv[32])` (standard C integer promotion). The
+identity holds in Z/2⁹ but not at 32 bits (the 9-bit truncations
+of `ab`, `bc` lose bits that matter once multiplied at 32 bits).
+The poly_extractor reasons in the 9-bit ring and ignores the
+cast, "proving" a false identity.
+
+*Fix direction*: the extractor must treat a value as the same
+algebraic unknown across a width-changing cast **only** when the
+cast is provably non-truncating/non-promoting in context.
+Concretely: when collecting a multiplication whose result feeds
+a `cast` to a wider type, the narrow product is `x mod 2^w` and
+must be modelled as a fresh variable constrained to that
+residue, not identified with the wide product. Safest
+conservative fix: **refuse to polynomialise (fall back to
+bit-blasting) whenever an operand of a collected (dis)equality is
+a width-changing cast of an arithmetic subterm.** This is a
+Gate-B tightening (cf. Item 10) and is sound-by-construction.
+
+**Bug B — zero divisors in Z/2ⁿ** (`mul_zero_factor.c`, BW=8).
+The system `{a·b = 0, a ≠ 0, b ≠ 0}` is satisfiable over Z/2⁸
+(16·16 ≡ 0), but the algebraic path refutes it — reasoning valid
+over an integral domain/field but invalid over a ring with zero
+divisors. The disequality handling effectively assumes
+`a·b = 0 ⇒ a = 0 ∨ b = 0`.
+
+*Fix direction*: the disequality/refutation logic must not use
+zero-divisor-freeness. A product disequality `a·b ≠ 0` may be
+added to the ideal, but `a·b = 0` must NOT license concluding
+`a = 0 ∨ b = 0`. Audit `poly_extract` / the nonzero fast-path
+and the Groebner disequality saturation for any step that
+assumes the ring is a domain. Conservative fix: when a
+disequality `x ≠ 0` is combined with an equality `x·y = 0`, do
+not refute unless `y = 0` is independently derivable.
+
+**Verification of the fix**:
+1. Both `assoc.c` (BW=9) and `mul_zero_factor.c` (BW=8) must
+   return `VERIFICATION FAILED` with algebra ON (matching
+   bit-blast + z3).
+2. Re-run the full Item 12 audit to confirm no NEEDS_ALGEBRA
+   benchmark regresses to a wrong verdict and no new unsoundness
+   appears.
+3. Add both as regression tests (expected FAILED) under
+   `regression/` so this cannot silently return.
+4. Cross-check that the genuine wins (SABER, Brain, SMT-COMP
+   unlocks) still solve and still agree with z3/Bitwuzla.
+
+**Also**: the Lean soundness development (`GroebnerSoundness`,
+`StrongGB`) claims the refutation is sound. Either the
+mechanised model does not cover the disequality/zero-divisor
+step exercised here, or it covers an idealised ring. Reconcile:
+the Lean theorems likely assume the polynomial *is* in the ideal
+(the `ASSUMES` clause), and the bug is that the *implementation*
+adds a polynomial to the ideal that does not follow over Z/2ⁿ.
+Confirm the gap is in the C++ extraction, not the proof — and
+add a Lean note pinning down the zero-divisor caveat.
+
+**Effort**: 3–5 days (diagnosis + conservative fallback fix +
+regression tests + audit re-run). A complete fix (precise
+modelling rather than fallback) is larger.
+
+**Cross-references**:
+- `doc/paper-algebraic/ablation-audit-2026-06-01.md`
+- `bench-multiplication/ablation-audit/custom-c.tsv`
+- Item 10 (Gate B tightening shares the cast-handling fix).
+
+---
+
 ### Item 11b — (placeholder, was float exploitation)
 
 Superseded by the retraction above. If a *genuine* FP-derived
@@ -554,10 +667,11 @@ the headline-improvement it promised is gone. The corpus-widening
 exposed a more important gap: we had no ablation discipline.
 
 **Tier 0 — do first (defensive, essential before any submission):**
-- **Item 12** (ablation re-audit of all claimed algebraic wins).
-  2–3 days. Until this passes, we do not actually know which of
-  our headline numbers are algebraic results vs bit-blasting
-  artifacts. This gates the credibility of everything else.
+- **Item 13** (fix the two soundness bugs). CRITICAL — an unsound
+  SUCCESSFUL verdict is disqualifying. Nothing else matters until
+  this is fixed and regression-tested. 3–5 days.
+- **Item 12** (ablation re-audit) — **DONE**; it produced Item 13
+  and validated the genuine wins.
 
 **Tier 1 — strong follow-through (1–2 weeks):**
 - **Item 10 Phase 1** (fragment characterisation). The broad-
