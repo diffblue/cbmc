@@ -23,13 +23,19 @@ constraint. We acquired:
   (`abc`/`aigtoaig`/`yosys` absent). These are gate-level
   (Item 7) material; deferred until a converter is installed.
 
-**Headline outcome**: triaging the full QF\_BV corpus revealed
-the **`float` family** (FP-as-BV, Haller-Griggio-Brain-Kroening
-FMCAD 2012) where our solver **dominates**: 68/75 solved vs
-Bitwuzla 51, cvc5 6, with **18 confirmed unique
-wins-beyond-all-solvers**. See
-`bench-multiplication/float-fp2bv/RESULTS.md`. This adds 18 to
-the paper's previous count of 4 wins-beyond-all-solvers.
+**Headline outcome (CORRECTED)**: triaging the full QF\_BV
+corpus surfaced the **`float` family** (FP-as-BV,
+Haller-Griggio-Brain-Kroening FMCAD 2012) where our *tool*
+solves 68/75 vs Bitwuzla 51, cvc5 6, with 18 benchmarks neither
+Bitwuzla nor cvc5 solve in 60 s. **However**, ablation
+(`DISABLE_ALGEBRAIC=1`) shows these are solved by CBMC
+bit-blasting + MiniSAT, **not** the algebraic method (which is
+net overhead on them). They are therefore **not**
+wins-beyond-all-solvers for our thesis and must not be counted
+as such. See the CORRECTION block in
+`bench-multiplication/float-fp2bv/RESULTS.md`. The headline
+algebraic-win count remains 4 (Brain's sample), pending the
+ablation re-audit of even those.
 
 ## Tier A — SMT-LIB 2024 QF\_BV (highest priority)
 

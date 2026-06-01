@@ -1,3 +1,56 @@
+## ⚠️ CORRECTION (2026-06-01, after ablation): NOT an algebraic win
+
+**The float "wins" are real for the tool but are NOT attributable
+to our algebraic method.** An ablation with `DISABLE_ALGEBRAIC=1`
+shows the algebraic path is irrelevant — and in fact net
+overhead — on every float benchmark tested:
+
+| benchmark | algebra ON | algebra OFF |
+|-----------|-----------|-------------|
+| pow5.smt2 | 1.28 s | 1.28 s |
+| mul_03_30_4.smt2 | 0.70 s | 0.64 s |
+| newton.3.3.i.smt2 | 8.25 s | 6.69 s |
+| test_v5_r10_vr10_c1_s15708 | 15.4 s | 11.2 s |
+| test_v7_r12_vr1_c1_s703 | 31.2 s | 15.3 s |
+
+With algebra disabled the benchmarks still solve (`unsat`),
+often *faster*, via plain CBMC bit-blasting + MiniSAT
+(e.g.\ pow5: 171 SAT conflicts). The win over Bitwuzla and cvc5
+is therefore a **SAT-backend artifact** — our MiniSAT-based
+bit-blasting happens to beat their SAT engines on these
+particular bit-blasted instances — **not** evidence for the
+$\mathbb{Z}_{2^d}$ algebraic procedure.
+
+Why no algebra fires: these benchmarks are **pure QF\_BV** (no
+`Float` sort, no `fp.*` operators — the `fp.iN` tokens are just
+variable names declared `(_ BitVec N)`). They originate from FP
+problems (Griggio's encoding of Haller et al. FMCAD 2012) but
+arrive already lowered to bit-vectors. The wide `bvmul`
+(53→106-bit) is present, but the surrounding formula is not an
+arithmetic *identity*; the algebraic extractor collects the
+multiplication equalities, runs Buchberger, finds no refuting
+unit constant, and falls back to bit-blasting — pure overhead.
+
+**These 18 must NOT be counted as wins-beyond-all-solvers for
+the algebraic method.** They do not belong in the paper as
+support for our thesis. The honest statement is: "our *tool*
+(CBMC bit-blaster + algebraic pre-solver) solves 18 float
+benchmarks that Bitwuzla and cvc5 time out on, but ablation
+attributes this to the bit-blasting/SAT backend, not the
+algebraic pre-solver, which is net overhead here."
+
+**Broader action triggered**: this caught a gap in our
+validation methodology. Every claimed algebraic win (the
+original 4 in Brain's sample, the SMT-COMP unlocks, the
+custom-suite results) must be re-validated with
+`DISABLE_ALGEBRAIC=1` to confirm the algebraic path is actually
+responsible. Tracked as a new audit item in `remaining-work.md`.
+
+The data below is retained as-is for the record, but read it
+through the correction above.
+
+---
+
 # Corpus widening results — SMT-LIB 2024 QF\_BV
 
 Date: 2026-06-01. Triggered by Armin's review (widen the
@@ -82,6 +135,12 @@ all-current-solvers (Brain's random-polynomial sample). The
 float family adds **18 more**, in a benchmark set published by a
 co-author (Brain) and entirely absent from our 66-benchmark
 SMT-COMP sample.
+
+> **RETRACTED** — see the CORRECTION block at the top of this
+> file. Ablation (`DISABLE_ALGEBRAIC=1`) shows these 18 are
+> solved by bit-blasting, not the algebraic method. They are
+> NOT wins-beyond-all-solvers for our thesis. The count stays
+> at 4.
 
 ## Methodological note: parallel contention
 
