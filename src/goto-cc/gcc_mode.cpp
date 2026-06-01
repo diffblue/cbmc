@@ -29,6 +29,8 @@ Author: CM Wintersteiger, 2006
 #include <util/tempdir.h>
 #include <util/version.h>
 
+#include <ansi-c/c_preprocess.h>
+
 #include "compile.h"
 #include "goto_cc_cmdline.h"
 #include "hybrid_binary.h"
@@ -912,6 +914,21 @@ int gcc_modet::preprocess(
 
   // We just want to preprocess.
   new_argv.push_back("-E");
+
+  // For C++ translation units, apply the same CBMC-specific feature-macro
+  // flags that `c_preprocess` applies when cbmc preprocesses a `.cpp`
+  // directly.  goto-cc preprocesses to a `.ii` file first and then feeds
+  // the already-preprocessed result to the front-end, so without these
+  // flags here the suppressed library features (notably CTAD deduction
+  // guides) would survive into the `.ii` and reach CBMC's parser — which
+  // does not implement them.  This is what made goto-cc and cbmc disagree
+  // on the same source.  C++ is indicated by a `.ii` destination (the
+  // caller uses `.ii` for C++ and `.i` for C).
+  if(has_suffix(dest, ".ii"))
+  {
+    for(const auto &flag : cprover_cxx_preprocessor_macro_flags())
+      new_argv.push_back(flag);
+  }
 
   // destination file
   std::string stdout_file;
