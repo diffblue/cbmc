@@ -559,6 +559,49 @@ void boolbvt::set_to(const exprt &expr, bool value)
     walk_for_algebraic(expr, value, 0, leaf_count);
   }
 
+  // Item 6 from doc/paper-algebraic/remaining-work.md: detect
+  // "clearly non-polynomial" expressions in DISEQUALITIES and skip
+  // pushing them to algebraic_disequalities. The narrow definition:
+  // contains an extractbits whose lower index is non-zero. The
+  // polynomial extractor's `to_polynomial` returns nullopt for
+  // these (a single-ring polynomial cannot represent a non-LSB
+  // bit slice), so adding such disequalities to
+  // algebraic_disequalities costs Buchberger setup time without
+  // any chance of refutation.
+  //
+  // Concrete benefit: synthetic high-half-of-product overflow
+  // benchmarks
+  // (`(extract 2N-1 N) (bvmul (concat 0 s) (concat 0 t)) != 0`)
+  // previously had `algebraic_disequalities` populated, which kept
+  // try_algebraic_solve running its predicate-extraction and
+  // main_gb setup for ~4 s on a 64-bit example before failing. With
+  // the early-out, the same benchmark short-circuits to bit-blasting
+  // in 0.02 s.
+  //
+  // We do NOT apply this guard to algebraic_equalities. The
+  // Tseitin propagator (Phase 2.6) uses equalities containing
+  // extractbits on boolean atoms (e.g.\ `(= bool_var ((_ extract 0 0)
+  // bv_var))`) for forward and backward chain propagation; such
+  // equalities are useful for Tseitin even though the polynomial
+  // extractor's `to_polynomial` returns nullopt for them.
+  std::function<bool(const exprt &)> contains_high_extract =
+    [&contains_high_extract](const exprt &e) -> bool
+  {
+    if(e.id() == ID_extractbits && e.operands().size() == 2)
+    {
+      auto idx = numeric_cast<mp_integer>(e.operands()[1]);
+      if(idx.has_value() && *idx > 0)
+        return true;
+    }
+    for(const auto &op : e.operands())
+      if(contains_high_extract(op))
+        return true;
+    return false;
+  };
+  auto is_diseq_polynomial_friendly =
+    [&contains_high_extract](const exprt &lhs, const exprt &rhs) -> bool
+  { return !contains_high_extract(lhs) && !contains_high_extract(rhs); };
+
   // Collect polynomial equations for algebraic solving
   if(!algebraic_solved && expr.id() == ID_equal)
   {
@@ -572,9 +615,16 @@ void boolbvt::set_to(const exprt &expr, bool value)
     if(!is_internal(eq.lhs()) && !is_internal(eq.rhs()))
     {
       if(value)
+      {
+        // Equalities: push regardless of polynomial-friendliness;
+        // Tseitin propagator can use boolean-atom equalities even
+        // when the polynomial extractor cannot.
         algebraic_equalities.push_back(expr);
-      else
+      }
+      else if(is_diseq_polynomial_friendly(eq.lhs(), eq.rhs()))
+      {
         algebraic_disequalities.push_back(expr);
+      }
     }
   }
   // Also catch (notequal a b) set to true and (notequal a b) set to
@@ -594,10 +644,14 @@ void boolbvt::set_to(const exprt &expr, bool value)
     {
       // (notequal a b) is the negation of (equal a b).
       auto as_equal = equal_exprt(neq.lhs(), neq.rhs());
-      if(value)
+      if(value && is_diseq_polynomial_friendly(neq.lhs(), neq.rhs()))
+      {
         algebraic_disequalities.push_back(as_equal);
-      else
+      }
+      else if(!value)
+      {
         algebraic_equalities.push_back(as_equal);
+      }
     }
   }
   // Also catch not(equal(...)) set to true = disequality
@@ -612,7 +666,9 @@ void boolbvt::set_to(const exprt &expr, bool value)
              id2string(to_symbol_expr(e).get_identifier()).find("__CPROVER") !=
                std::string::npos;
     };
-    if(!is_internal(eq.lhs()) && !is_internal(eq.rhs()))
+    if(
+      !is_internal(eq.lhs()) && !is_internal(eq.rhs()) &&
+      is_diseq_polynomial_friendly(eq.lhs(), eq.rhs()))
     {
       algebraic_disequalities.push_back(expr.operands()[0]);
     }
@@ -1099,6 +1155,27 @@ void boolbvt::walk_for_algebraic(
     return false;
   };
 
+  // Item 6: skip leaves whose operands contain a non-zero-LO
+  // extractbits, but ONLY for disequalities. The polynomial
+  // extractor's `to_polynomial` returns nullopt for such
+  // expressions, so they can't drive UNSAT refutation. Equalities,
+  // by contrast, are useful to the Tseitin propagator (Phase 2.6)
+  // even when not directly polynomial.
+  std::function<bool(const exprt &)> contains_high_extract =
+    [&contains_high_extract](const exprt &e) -> bool
+  {
+    if(e.id() == ID_extractbits && e.operands().size() == 2)
+    {
+      auto idx = numeric_cast<mp_integer>(e.operands()[1]);
+      if(idx.has_value() && *idx > 0)
+        return true;
+    }
+    for(const auto &op : e.operands())
+      if(contains_high_extract(op))
+        return true;
+    return false;
+  };
+
   if(expr.id() == ID_equal && expr.operands().size() == 2)
   {
     if(is_internal(expr.operands()[0]) || is_internal(expr.operands()[1]))
@@ -1106,9 +1183,19 @@ void boolbvt::walk_for_algebraic(
     if(!contains_mult(expr))
       return;
     if(value)
+    {
+      // Equalities: push regardless of polynomial-friendliness
+      // (Tseitin can use them).
       algebraic_equalities.push_back(expr);
+    }
     else
+    {
+      // Disequalities: skip non-polynomial slices to avoid futile
+      // Buchberger setup.
+      if(contains_high_extract(expr))
+        return;
       algebraic_disequalities.push_back(expr);
+    }
     ++leaf_count;
     return;
   }
@@ -1121,9 +1208,19 @@ void boolbvt::walk_for_algebraic(
     if(!contains_mult(as_eq))
       return;
     if(value)
+    {
+      // (distinct a b) set to true ⇒ disequality on (= a b).
+      // Apply the polynomial-friendly guard.
+      if(contains_high_extract(as_eq))
+        return;
       algebraic_disequalities.push_back(std::move(as_eq));
+    }
     else
+    {
+      // (distinct a b) set to false ⇒ equality (= a b).
+      // No guard (Tseitin can use it).
       algebraic_equalities.push_back(std::move(as_eq));
+    }
     ++leaf_count;
     return;
   }
