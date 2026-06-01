@@ -18,6 +18,13 @@ The current state (post Plan A.3 + F4 + Items 2/4/5/6/9):
   → 0.020 s on 64-bit overflow check.
 - 4 wins-beyond-all-current-solvers in Brain's 210 sample,
   $10\times$ faster than prior measurement.
+- **+18 wins-beyond-all-current-solvers in the SMT-LIB 2024
+  `float` family** (corpus-widening, 2026-06-01): on 75 FP-as-BV
+  bvmul-unsat benchmarks our solver solves 68 vs Bitwuzla 51,
+  cvc5 6, with 18 confirmed unique wins. See
+  `bench-multiplication/float-fp2bv/RESULTS.md`. This is the
+  most consequential empirical result since Plan A and
+  reshapes the priority list below (new Item 11).
 - 65 Lean traceability entries across 20 modules, all status
   **DONE** (zero `sorry`, zero project-specific axioms; only
   standard mathlib axioms `propext`, `Classical.choice`,
@@ -447,23 +454,117 @@ analysis would produce:
 
 ---
 
+### Item 11 — Exploit the `float` (FP-as-BV) family — **NEW, HIGH PRIORITY**
+
+**Status**: Open. (Origin: corpus widening, 2026-06-01.)
+
+**Why this jumped to the top**: widening to the full SMT-LIB
+2024 QF\_BV corpus revealed that our solver *dominates* the
+`float` family (FP arithmetic encoded as bit-vectors,
+Haller-Griggio-Brain-Kroening FMCAD 2012): 68/75 solved vs
+Bitwuzla 51, cvc5 6, with **18 confirmed unique
+wins-beyond-all-solvers** (see
+`bench-multiplication/float-fp2bv/RESULTS.md`). This is a real,
+SMT-LIB-canonical benchmark family — not a synthetic suite we
+authored — and it quadruples our headline wins count (4 → 22).
+It is also poetically apt: Brain co-authored both these
+benchmarks and the random-polynomial sample we already cite.
+
+The wins come from **wide multipliers**: double-precision FP
+multiply encodes as a 53×53→106-bit `bvmul`, whose bit-blasting
+is quadratic in width while our $\mathbb{Z}_{2^d}$ reduction
+stays compact. This is precisely the structural sweet spot the
+paper argues for, now demonstrated on third-party benchmarks.
+
+**Effort**: 1 week. Sub-tasks:
+
+1. **Adopt `float` into the standard evaluation corpus**
+   (~half day). Add the 75 float bvmul-unsat benchmarks (or a
+   curated subset) as a first-class evaluation set alongside the
+   66-sample, Brain's 210, SABER, and the custom suite. The
+   manifest + harness are already committed under
+   `bench-multiplication/float-fp2bv/`.
+
+2. **Diagnose the 7 float benchmarks we miss** (~2 days). Of 75,
+   we solve 68. Classify the 7 failures against Item 10's gates
+   — almost certainly Gate D (Buchberger budget) on the largest
+   formulas, or Gate B (an FP operation we don't polynomialise,
+   e.g.\ rounding via variable shift). Each diagnosed failure
+   either yields a gate extension (shared with Item 10) or a
+   documented limitation.
+
+3. **Write the float result into the paper** (~2 days). A new
+   evaluation subsection: "FP-as-BV multiplication
+   (Haller et al.)" with the 68/51/6 table and the 18-win list.
+   Position it as the strongest third-party evidence for the
+   wide-multiplier thesis. Cross-reference the Brain co-authorship
+   honestly (it is published SMT-LIB data, not curated by us).
+
+4. **Probe the rest of FP** (~2 days). The `float` directory has
+   benchmarks we filtered out (sat, or no `bvmul`). Check whether
+   the FP *sat* instances or the non-multiplication FP instances
+   show any signal. Also check `QF_FP`/`QF_BVFP` logics in the
+   2024 release (not in our QF\_BV scope but adjacent).
+
+**Expected impact**: paper headline strengthens from "4 wins
+beyond all solvers (our random sample)" to "22 wins beyond all
+solvers, 18 of them on a canonical third-party FP benchmark
+family". This is the single highest-leverage writing change
+available. Engineering payoff (the 7 misses) is secondary but
+feeds Item 10.
+
+**Dependency**: none for sub-tasks 1 and 3 (data already
+collected). Sub-task 2 overlaps Item 10's gate analysis.
+
+**Cross-references**:
+- `bench-multiplication/float-fp2bv/RESULTS.md` — full data.
+- `bench-multiplication/float-fp2bv/MANIFEST.tsv` — re-fetch.
+- Item 10 — the 7 misses are Item-10 gate-classification inputs.
+
+---
+
 ## Recommended sequencing
 
-If chasing **incremental concrete payoffs**:
-- Items 4 (paper eval), 5 (paper update), 2 (predicate
-  fast-path extension). Total: 1–2 weeks.
+**Revised 2026-06-01 after corpus widening.** The `float`-family
+discovery (Item 11) changes the optimal order. New ranking:
 
-If chasing **bigger scientific impact** in the current paper:
-- Item 8 (F4 reduction). 2–3 weeks but likely unlocks
-  cohencu_2/3 and gives a clean scaling story.
+**Tier 1 — do now (highest leverage, data already in hand):**
+- **Item 11 sub-tasks 1 + 3**: adopt the `float` family into the
+  evaluation corpus and write the 68/51/6 result + 18-win list
+  into the paper. ~2.5 days. This is the single biggest headline
+  improvement available and requires no new code — the data is
+  collected and committed.
 
-If chasing **a follow-on research direction**:
-- Item 7 (gate-level + algebraic hybrid). Multi-month
-  research project.
+**Tier 2 — strong follow-through (1–2 weeks):**
+- **Item 11 sub-task 2** (diagnose the 7 float misses) feeding
+  **Item 10 Phase 1** (fragment characterisation). These overlap:
+  the float misses are concrete Gate-D/Gate-B instances. Doing
+  them together yields both the honest-scope paragraph and 1–2
+  gate extensions.
+- **Item 3** (VS3/Sage2 scalability) — the broad-corpus run
+  confirmed Sage2 is a major unique-failure family (24 in the
+  stratified sample), so Item 3's payoff is now better
+  quantified.
 
-The current state (Plan A.1+A.2+A.3) is a defensible paper
-artifact on its own. Items 4–5 alone would let us submit; the
-rest are improvements rather than necessities.
+**Tier 3 — opportunistic engineering (from Item 10 Phase 2):**
+- SBIF-style equivalence pre-substitution and SAT-based
+  vanishing-monomial removal (both low-risk, ~1 week each),
+  prioritised by whether the float-miss / Sage2 diagnosis
+  points at them.
+
+**Tier 4 — follow-on research:**
+- Item 7 (gate-level + algebraic hybrid). The Tier B Konrad AIG
+  archives are downloaded and waiting; needs an AIG→SMT-LIB
+  converter (`abc`/`yosys`) installed first.
+
+**What changed vs the old ranking**: previously Items 4–5 (paper
+eval/update) were "enough to submit". They still are, but Item
+11 now offers a materially stronger paper for ~2.5 days of
+writing against already-collected data. It moves to the front.
+
+The current state (Plan A.1+A.2+A.3 + float finding) is a
+markedly stronger paper artifact than before the corpus
+widening.
 
 ---
 
