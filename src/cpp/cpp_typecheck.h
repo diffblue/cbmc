@@ -791,6 +791,10 @@ public:
 
   void implicit_typecast(exprt &expr, const typet &type) override;
 
+  void implicit_typecast_arithmetic(exprt &expr1, exprt &expr2) override;
+
+  void implicit_typecast_arithmetic(exprt &expr) override;
+
   void get_bases(const struct_typet &type,
      std::set<irep_idt> &set_bases) const;
 

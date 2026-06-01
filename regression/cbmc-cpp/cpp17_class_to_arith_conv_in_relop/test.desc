@@ -1,0 +1,23 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^.*implicit arithmetic conversion not permitted.*$
+--
+Verifies that a class operand with a single arithmetic-typed
+user-defined conversion operator is converted via that operator
+when used with a built-in binary arithmetic operator and an
+arithmetic operand.
+
+Per [over.match.oper]/9 + [over.built]: when no operator overload
+is selected, the operator is treated as built-in, and operands
+are subject to user-defined conversion sequences to the built-in
+operator's parameter types.
+
+Without the fix, the struct operand reaches the C-style
+arithmetic typecheck unchanged and surfaces the spurious
+"implicit arithmetic conversion not permitted" diagnostic on both
+lvalue (named local) and rvalue (function return) operands.
