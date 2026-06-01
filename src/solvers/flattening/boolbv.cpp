@@ -1265,6 +1265,200 @@ bool boolbvt::try_algebraic_solve()
   if(std::getenv("DISABLE_ALGEBRAIC"))
     return false;
 
+  // Item 13 / Bug A (soundness): refuse (dis)equalities that widen a
+  // DEFINED INTERMEDIATE across a typecast.
+  //
+  // C integer promotion encodes e.g.\ `(a*b)*c` on 9-bit operands as
+  //   cast(ab, signedbv[32]) * cast(c, signedbv[32])
+  // where `ab` is the SSA symbol defined by `ab = a*b` (truncated to
+  // 9 bits). The polynomial extractor reasons in a single ZMod(2^w)
+  // ring; pinning that ring to 9 bits (from the defining equations)
+  // and then absorbing the widening cast silently treats `ab` as the
+  // exact 9-bit product inside a 32-bit multiplication. That is
+  // unsound: `ab = a*b mod 2^9`, so `ab*c` at 32 bits is NOT
+  // `a*b*c` (the high bits dropped by the 9-bit truncation matter at
+  // 32 bits). The associativity assertion is then wrongly "proved".
+  //
+  // We detect the unsound shape precisely — a widening typecast of a
+  // symbol that is a defined intermediate (the bare-symbol side of an
+  // algebraic equality whose other side is a non-trivial expression)
+  // — and drop the offending (dis)equality so the formula falls back
+  // to bit-blasting. This preserves the sound cases: widening a
+  // primary INPUT (e.g.\ mul_overflow's `cast(a,32)*cast(b,32)` where
+  // a, b have no defining equation) is a faithful zero/sign extension
+  // and is kept; SMT-LIB benchmarks carry no ID_typecast at all and
+  // are unaffected.
+  {
+    std::set<irep_idt> defined_syms;
+    auto note_def = [&defined_syms](const exprt &lhs, const exprt &rhs)
+    {
+      if(
+        lhs.id() == ID_symbol && rhs.id() != ID_symbol &&
+        rhs.id() != ID_constant)
+        defined_syms.insert(to_symbol_expr(lhs).get_identifier());
+    };
+    for(const auto &eq : algebraic_equalities)
+      if(eq.id() == ID_equal && eq.operands().size() == 2)
+      {
+        note_def(eq.operands()[0], eq.operands()[1]);
+        note_def(eq.operands()[1], eq.operands()[0]);
+      }
+
+    auto bv_width = [](const typet &t) -> unsigned
+    {
+      if(const auto bv = type_try_dynamic_cast<bitvector_typet>(t))
+        return bv->get_width();
+      return 0;
+    };
+    // A widening cast of a defined intermediate is unsound ONLY when
+    // its (wide) result is consumed by wide arithmetic. If the
+    // widening is immediately re-narrowed (e.g.\ matrix_mul's
+    // `cast(cast(c00, 32), 8)`), the net value is the original
+    // narrow value and the algebra is faithful. So we fire only when
+    // a widening `cast(defined_sym, W)` appears as a DIRECT operand
+    // of an arithmetic node (* + - unary-). In assoc the mult
+    // `cast(ab,32) * cast(c,32)` matches (ab is defined); in
+    // matrix_mul the widening cast is the operand of the narrowing
+    // outer cast, not of the `+`, so it does not match.
+    auto is_widening_cast_of_defined = [&](const exprt &x) -> bool
+    {
+      if(x.id() != ID_typecast || x.operands().size() != 1)
+        return false;
+      const exprt &op = to_typecast_expr(x).op();
+      if(op.id() != ID_symbol)
+        return false;
+      if(!defined_syms.count(to_symbol_expr(op).get_identifier()))
+        return false;
+      const unsigned out_w = bv_width(x.type());
+      const unsigned in_w = bv_width(op.type());
+      return in_w != 0 && out_w > in_w;
+    };
+    auto widens_defined = [&](const exprt &e) -> bool
+    {
+      bool found = false;
+      e.visit_pre(
+        [&](const exprt &x)
+        {
+          if(
+            x.id() != ID_mult && x.id() != ID_plus && x.id() != ID_minus &&
+            x.id() != ID_unary_minus)
+            return;
+          for(const auto &op : x.operands())
+            if(is_widening_cast_of_defined(op))
+              found = true;
+        });
+      return found;
+    };
+    auto drop_if = [&](std::vector<exprt> &v)
+    { v.erase(std::remove_if(v.begin(), v.end(), widens_defined), v.end()); };
+    drop_if(algebraic_equalities);
+    drop_if(algebraic_disequalities);
+  }
+
+  // Item 13 / Bug B (soundness): do not refute a zero-divisor system.
+  //
+  // A disequality `x != 0` is encoded for refutation via the
+  // Rabinowitsch trick as `x*e - 1 = 0`, which asserts that x is a
+  // UNIT. Over a field that is equivalent to `x != 0`, but over
+  // ZMod(2^d) it is strictly stronger: a non-zero element need not be
+  // invertible (e.g.\ 16 is non-zero but 16*e = 1 is unsatisfiable
+  // mod 256). Consequently the refutation can wrongly conclude UNSAT
+  // for a system that is in fact SAT via zero divisors, e.g.
+  //   { a*b = 0, a != 0, b != 0 }
+  // which holds for a = b = 16 over ZMod(2^8). Reporting UNSAT here
+  // makes the solver claim a property holds when it does not.
+  //
+  // We detect exactly this shape — a product constrained to zero
+  // whose two factors are each separately constrained to be non-zero
+  // — and skip algebraic solving (fall back to bit-blasting, which
+  // models zero divisors correctly). Genuinely-unsat refutations
+  // (e.g.\ cohencu) carry no such pattern and are unaffected.
+  {
+    std::function<const exprt &(const exprt &)> strip_casts =
+      [&strip_casts](const exprt &e) -> const exprt &
+    {
+      if(e.id() == ID_typecast && e.operands().size() == 1)
+        return strip_casts(to_typecast_expr(e).op());
+      return e;
+    };
+    auto is_zero_const = [&](const exprt &e)
+    {
+      const exprt &s = strip_casts(e);
+      if(s.id() != ID_constant)
+        return false;
+      mp_integer v;
+      return !to_integer(to_constant_expr(s), v) && v == 0;
+    };
+    // Symbols asserted non-zero (disequalities store equal(X, 0)).
+    std::set<irep_idt> nonzero;
+    for(const auto &d : algebraic_disequalities)
+    {
+      if(d.id() != ID_equal || d.operands().size() != 2)
+        continue;
+      const exprt *other = nullptr;
+      if(is_zero_const(d.operands()[0]))
+        other = &d.operands()[1];
+      else if(is_zero_const(d.operands()[1]))
+        other = &d.operands()[0];
+      if(other)
+      {
+        const exprt &s = strip_casts(*other);
+        if(s.id() == ID_symbol)
+          nonzero.insert(to_symbol_expr(s).get_identifier());
+      }
+    }
+    // SSA definitions: symbol -> defining expression.
+    std::map<irep_idt, exprt> def;
+    for(const auto &eq : algebraic_equalities)
+    {
+      if(eq.id() != ID_equal || eq.operands().size() != 2)
+        continue;
+      const exprt &l = strip_casts(eq.operands()[0]);
+      const exprt &r = strip_casts(eq.operands()[1]);
+      if(l.id() == ID_symbol && r.id() != ID_symbol)
+        def.emplace(to_symbol_expr(l).get_identifier(), r);
+      else if(r.id() == ID_symbol && l.id() != ID_symbol)
+        def.emplace(to_symbol_expr(r).get_identifier(), l);
+    }
+    // Both factors of a product separately non-zero?
+    auto both_factors_nonzero = [&](const exprt &prod) -> bool
+    {
+      const exprt &p = strip_casts(prod);
+      if(p.id() != ID_mult || p.operands().size() != 2)
+        return false;
+      const exprt &f0 = strip_casts(p.operands()[0]);
+      const exprt &f1 = strip_casts(p.operands()[1]);
+      return f0.id() == ID_symbol && f1.id() == ID_symbol &&
+             nonzero.count(to_symbol_expr(f0).get_identifier()) &&
+             nonzero.count(to_symbol_expr(f1).get_identifier());
+    };
+    // A product (directly, or via an SSA symbol) is constrained to 0.
+    bool zero_divisor = false;
+    for(const auto &eq : algebraic_equalities)
+    {
+      if(eq.id() != ID_equal || eq.operands().size() != 2)
+        continue;
+      const exprt *nz = nullptr;
+      if(is_zero_const(eq.operands()[0]))
+        nz = &eq.operands()[1];
+      else if(is_zero_const(eq.operands()[1]))
+        nz = &eq.operands()[0];
+      if(!nz)
+        continue;
+      const exprt &z = strip_casts(*nz);
+      if(both_factors_nonzero(z))
+        zero_divisor = true;
+      else if(z.id() == ID_symbol)
+      {
+        auto it = def.find(to_symbol_expr(z).get_identifier());
+        if(it != def.end() && both_factors_nonzero(it->second))
+          zero_divisor = true;
+      }
+    }
+    if(zero_divisor)
+      return false; // unsound to refute; defer to bit-blasting
+  }
+
   // Phase A.3: promote `x != 0` fast-path disequalities into
   // algebraic_disequalities ONLY when the formula contains a
   // bvudiv or bvurem somewhere. Without this gate, SAT benchmarks
