@@ -6,13 +6,13 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <testing-utils/use_catch.h>
-
 #include <util/json.h>
 #include <util/json_irep.h>
 #include <util/optional_utils.h>
 #include <util/range.h>
 #include <util/source_location.h>
+
+#include <testing-utils/use_catch.h>
 
 #include <algorithm>
 #include <iterator>

@@ -6,9 +6,10 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <testing-utils/use_catch.h>
 #include <util/json.h>
 #include <util/range.h>
+
+#include <testing-utils/use_catch.h>
 
 #include <vector>
 
