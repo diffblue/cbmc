@@ -1682,7 +1682,27 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
               {expr_deref},
               uninitialized_typet{},
               expr.source_location());
-            typecheck_side_effect_function_call(ctor_expr);
+            // [over.match.viable]: trying this constructor candidate may
+            // fail to bind the argument — for example an rvalue argument
+            // against a non-const lvalue-reference parameter of a member
+            // converting-constructor template that was instantiated with
+            // `_Up=T&` during the class's own elaboration (from an
+            // lvalue payload access).  A candidate with no implicit
+            // conversion sequence for an argument is simply non-viable
+            // and must be excluded, not reported as a hard error; the
+            // forwarding-reference constructor template is re-deduced
+            // for this argument's value category in the
+            // template-constructor fallback below.  Guard with a SFINAE
+            // context so the failed trial's diagnostics are suppressed.
+            try
+            {
+              sfinae_contextt sfinae_guard{*this};
+              typecheck_side_effect_function_call(ctor_expr);
+            }
+            catch(...)
+            {
+              continue;
+            }
 
             INVARIANT(
               ctor_expr.get(ID_statement) == ID_temporary_object,
