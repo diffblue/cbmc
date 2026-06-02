@@ -1,0 +1,19 @@
+CORE
+main.cpp
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^.*found no match for symbol 'operator\(\)'.*$
+^CONVERSION ERROR$
+^PARSING ERROR$
+--
+Regression for function-template overload resolution: the body of a
+named template specialization must not be instantiated while forming a
+call's candidate set.  Only the selected overload's body is instantiated
+([temp.inst]/2, [over.match]).  This is the arith_tools `numeric_cast_v`
+pattern, where the non-selected `numeric_cast_v(const mp_integer&)`
+overload has a body that is ill-formed for Target=mp_integer; eagerly
+instantiating it reported a spurious "found no match for symbol
+'operator()'".
