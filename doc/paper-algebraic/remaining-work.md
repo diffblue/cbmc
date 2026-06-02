@@ -692,6 +692,39 @@ places and must be revised by the authors:
 This is the last submission blocker for the algebraic-soundness
 story.
 
+**Provenance of the Rabinowitsch trick (for the rewrite).** We did
+NOT invent it. It is a classical device (J.L. Rabinowitsch, 1929)
+for the Nullstellensatz, encoding `f != 0` as `∃y. y·f = 1`, valid
+**over a field** (where non-zero ⟺ unit). We adopted it directly
+from the explicit future-work suggestion in the paper we build on,
+Song et al. 2024 (`song2024equational`, §7 Conclusion and Future
+Work): *"extend our methods to more bit-vector arithmetics, such as
+bitwise operations and inequalities by, e.g., the Rabinowitsch trick
+[19, Ch. 4.2, Prop. 8], [29]."* Both citations there are **field**
+settings: [19] = Cox–Little–O'Shea, *Ideals, Varieties, and
+Algorithms*, Ch. 4 (Nullstellensatz over an algebraically closed
+field) = `cox2015ideals`; [29] = Hader–Kaufmann–Kovács, *SMT solving
+over finite field arithmetic* = `hader2023finitefield` (finite
+fields; cf. also Ozdemir et al. `Ozdemir23cvc5`, finite fields).
+
+**So the paper should make a scholarly CORRECTION, not just a
+disclaimer.** We are the first to actually implement that suggested
+extension in the finite-ring setting `ZMod(2^d)`, and we show it is
+**unsound there**: `ZMod(2^d)` is not a field, so the trick encodes
+"`f` is a unit" rather than "`f != 0`", and a non-zero non-unit
+(e.g. `2 ∈ Z_4`: `2 != 0` but `∄ e. 2e = 1`) breaks it
+(`DisequalityRefutation.lean::rabinowitsch_unsound_over_zmod`). This
+is not refuting a proven theorem — the cited results are correct
+over fields — but it corrects Song et al.'s suggested extension to
+their own ring `ZMod(2^d)`, and cautions against importing the
+field-based Rabinowitsch / finite-field SMT results to finite rings.
+The sound alternative we use (reduce the goal modulo the Gröbner
+basis of the equalities; ideal membership / vanishing) is exactly
+what the SCA multiplier-verification literature does (e.g. Konrad et
+al.; "P_final != 0 ⇒ buggy"). Suggested place: a short "Soundness
+caveat over `ZMod(2^d)`" remark in the disequality section + a
+sentence in related work.
+
 ---
 
 ### Item 11b — (placeholder, was float exploitation)
