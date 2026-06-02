@@ -1576,6 +1576,23 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
         exprt curr_arg1 = parameters[1];
         typet arg1_type = curr_arg1.type();
 
+        // [dcl.init.ref]/5, [over.ics.ref]: an rvalue-reference
+        // parameter cannot bind to an lvalue argument, so such a
+        // converting-constructor candidate is not viable for an lvalue.
+        // Skipping it prevents a spurious ambiguity between the two
+        // instantiations of std::optional<T>'s member converting
+        // constructor `optional(_Up&&)` — `optional(const T&)` and
+        // `optional(T&&)` — once both have been instantiated: when
+        // copy-initializing an optional<T> from an lvalue T (e.g.
+        // `return out;` with `out` an lvalue `mp_integer` in
+        // numeric_castt<mp_integer>::operator()), both otherwise tie at
+        // the same rank and the conversion is wrongly rejected as
+        // ambiguous.
+        if(
+          arg1_type.get_bool(ID_C_rvalue_reference) &&
+          expr.get_bool(ID_C_lvalue))
+          continue;
+
         if(is_reference(arg1_type))
         {
           typet tmp = to_reference_type(arg1_type).base_type();
