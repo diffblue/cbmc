@@ -56,8 +56,8 @@ actual $N=256$ parameter, with cvc5 timing out at every
 $N \geq 4$; on commutativity, associativity, and overflow
 checking it is bitwidth-independent (BW=8 to 256, 2--5\,ms
 throughout) and matches Bitwuzla's word-level rewriting. Soundness is mechanised in
-Lean~4 with 135 theorems, zero \texttt{sorry}, and zero
-project-internal axioms (out of which 64 are contract-level
+Lean~4 with over 150 theorems, zero \texttt{sorry}, and zero
+project-internal axioms (including contract-level
 theorems referenced directly from the implementation source),
 including four candidates for Mathlib contribution; the
 formalisation effort exposed and removed two implementation bugs
@@ -109,7 +109,7 @@ universal-relational and existential-relational classes.
 Existential-equational queries are split by direction:
 SAT-direction (witness construction) is handled by bit-blasting
 in both papers; UNSAT-direction (refutation) is handled in this
-paper via the Rabinowitsch trick.
+paper via Song et al.'s $2^{d-1}$ disequality encoding.
 
 \begin{table}[ht]
 \caption{Four classes of bit-vector arithmetic query, with the
@@ -125,7 +125,7 @@ Quantifier & Connective & Example & Decided by \\
 \midrule
 universal   & equational ($=$)        & $a \cdot b = b \cdot a$    & \textbf{this paper} (Gr\"obner / vanishing) \\
 universal   & relational ($\bowtie$)  & $|a \cdot b| < 2^{30}$     & companion paper (bit-blasting) \\
-existential & equational, UNSAT-dir.  & $\neg \exists x.\ p(x) = c$ & \textbf{this paper} (Rabinowitsch) \\
+existential & equational, UNSAT-dir.  & $\neg \exists x.\ p(x) = c$ & \textbf{this paper} (Song $2^{d-1}$ encoding) \\
 existential & equational, SAT-dir.    & $\exists x.\ p(x) = c$     & bit-blasting (witness) \\
 existential & relational              & overflow witness           & companion paper (bit-blasting) \\
 \bottomrule
@@ -140,7 +140,10 @@ existential & relational              & overflow witness           & companion p
   on the theoretical foundation of
   Song et al.~\cite{song2024equational}. We add an SMT-grade
   implementation: SSA-aware decomposition of nested
-  multiplications, the Rabinowitsch trick for disequalities, and
+  multiplications, Song et al.'s sound $2^{d-1}$ disequality
+  encoding (a prototype using the textbook field Rabinowitsch
+  trick was unsound over $\mathbb{Z}_{2^d}$; see the remark in
+  Section~\ref{sec:algebraic-pipeline}), and
   a progress-based termination rule that eliminates
   equation-ordering sensitivity
   (Section~\ref{sec:algebraic}).
@@ -160,8 +163,8 @@ existential & relational              & overflow witness           & companion p
 
 \item \textbf{Mechanised soundness with formalisation-driven
   refinement.}
-  135 theorems in Lean~4 with zero \texttt{sorry} (62
-  contract-level, 58 helpers and lemmas), giving full
+  over 150 theorems in Lean~4 with zero \texttt{sorry},
+  giving full
   bi-directional traceability to every algorithm in
   \texttt{src/solvers/algebraic/}. Four general-purpose results
   are contributed to Mathlib (the unit characterisation of
@@ -206,7 +209,7 @@ solves 183/210 to our 133/210: its
 occurrence-map canonicalisation closes most queries
 syntactically and constructs witnesses for the
 existential-equational SAT-direction queries that our
-UNSAT-oriented Rabinowitsch encoding cannot. Our wins are the
+UNSAT-oriented $2^{d-1}$ encoding cannot. Our wins are the
 queries Bitwuzla cannot decide (the four random-polynomial
 high-degree wins) or that cvc5 cannot decide (DSP datapath
 equivalences and SABER polynomial multiplication).
@@ -314,14 +317,14 @@ $G \leftarrow F$; $P \leftarrow \{(f_i, f_j) : i < j\}$;
   $\mathit{steps} \leftarrow 0$\;
 \While{$P \neq \emptyset$ \textbf{and} $\mathit{steps} < L$}{
   select pair $(p, q) \in P$ (we use: definitions first, then
-    Rabinowitsch equations, then coefficient S-pairs)\;
+    disequality equations, then coefficient S-pairs)\;
   $P \leftarrow P \setminus \{(p,q)\}$\;
   $r \leftarrow \mathrm{reduce}(S(p,q), G)$
     \tcp*{S-polynomial reduction}
   $\mathit{steps} \leftarrow \mathit{steps} + 1$\;
   \If{$r = 0$}{\textbf{continue}\;}
-  \If{$r$ is a constant $c \in R$ \textbf{and} $c$ is odd}{
-    \Return{\textbf{UNSAT}} \tcp*{$c$ is a unit; $\langle G \rangle = R$}
+  \If{$r$ is a constant $c \in R$ \textbf{and} $c \neq 0$}{
+    \Return{\textbf{UNSAT}} \tcp*{$c$ has no zero, so $V(\langle G \rangle) = \emptyset$}
   }
   add pairs $\{(r, g) : g \in G\}$ to $P$\;
   $G \leftarrow G \cup \{r\}$\;
@@ -336,9 +339,9 @@ $G \leftarrow F$; $P \leftarrow \{(f_i, f_j) : i < j\}$;
 \end{algorithm}
 
 The pair-selection strategy at line~3 was originally equation-order
-sensitive: a naive ordering (Rabinowitsch equations before
+sensitive: a naive ordering (disequality equations before
 definitions) required up to 2{,}000 times more steps than
-``definitions before Rabinowitsch'' on benchmarks such as
+``definitions before disequality equations'' on benchmarks such as
 commutativity and associativity. This 2{,}000$\times$ sensitivity
 was eliminated by the progress-based termination rule
 (line~17): once all pairs that could contribute to the unit constant
@@ -483,10 +486,10 @@ component along three axes:
   transparently on every bit-vector query, with no user
   annotation. SMT queries contain disequalities and deeply nested
   inline multiplications that fall outside the equational theory
-  Song et al.\ analyse: we handle disequalities via the
-  Rabinowitsch trick (an auxiliary polynomial
-  $(c - d) \cdot e - 1 = 0$ that reduces disequation
-  satisfiability to unit-constant detection) and decompose nested
+  Song et al.\ analyse: we handle disequalities via Song et al.'s
+  $2^{d-1}$ encoding (an auxiliary polynomial
+  $z \cdot (c - d) - 2^{d-1} = 0$ that reduces disequation
+  satisfiability to non-zero-constant detection) and decompose nested
   multiplications into fresh variables with defining equations,
   giving Buchberger a flat, uniform polynomial set.
 
@@ -501,8 +504,8 @@ component along three axes:
   pass it as soft hints to the bit-blasting layer, avoiding
   duplicated exploration.
 
-\item \textbf{Formalisation-driven refinement.} 135 theorems in
-  Lean 4 with zero \texttt{sorry} (66 contract-level), four
+\item \textbf{Formalisation-driven refinement.} Over 150 theorems in
+  Lean 4 with zero \texttt{sorry}, four
   Mathlib contribution candidates. Full bi-directional
   traceability to every algorithm in
   \texttt{src/solvers/algebraic/}.
@@ -525,51 +528,77 @@ bit-blasting alone times out on; details in Section~\ref{sec:external}.
 
 The solver runs before bit-blasting. Polynomial equations are
 collected during SSA conversion: each \texttt{c = a*b} becomes
-$c - a \cdot b = 0$,
-and negated assertions use the Rabinowitsch trick ($c \neq d$
-becomes $(c-d) \cdot e - 1 = 0$). A vanishing polynomial
+$c - a \cdot b = 0$. A negated equality $c \neq d$ is encoded, following
+Song et al.~\cite{song2024equational}, by the \emph{ring-aware}
+constraint $z \cdot (c-d) - 2^{d-1} = 0$ with a fresh $z$: over
+$\mathbb{Z}_{2^d}$ an element is non-zero iff it can be scaled to the
+maximal-valuation element $2^{d-1}$, so this is equisatisfiable with
+$c \neq d$ (Theorem~\ref{thm:song-equisat}). A vanishing polynomial
 test~\cite{shekhar2007equivalence} runs first, checking whether the
-difference polynomial vanishes as a function over
-$\mathbb{Z}_{2^d}$ (complete for polynomial equivalence). If
-inconclusive, the Gr\"obner basis handles the full system including
-the Rabinowitsch equation. If the Gr\"obner basis contains
-a unit constant, the system is unsatisfiable. In $\mathbb{Z}_{2^d}$,
-the units are precisely the odd elements (those coprime to $2^d$),
-so the check reduces to testing whether any constant in the basis
-is odd. When this holds, the system
-is unsatisfiable and no bit-blasting is needed. The computation
-uses a step limit of 100,000; all polynomial equation benchmarks
-converge within 1,000 steps. When the step limit is reached, the
-solver returns inconclusive and falls through to bit-blasting; we
-have not encountered this on any benchmark in our suite.
+difference polynomial vanishes as a function over $\mathbb{Z}_{2^d}$
+(complete for function equivalence). If inconclusive, the Gr\"obner
+basis handles the augmented system. If it contains \emph{any} non-zero
+constant, the system is unsatisfiable: a constant evaluates to itself
+under every assignment, yet every ideal element must evaluate to $0$,
+so a non-zero constant admits no solution
+(Theorem~\ref{thm:song-equisat}). The computation uses a step limit of
+100,000; when it is reached, the solver returns inconclusive and falls
+through to bit-blasting.
 
-\begin{theorem}[Soundness]
-If the strong Gr\"obner basis of
-$\{f_1, \ldots, f_k, (a{-}b) \cdot e - 1\}$ over
-$\mathbb{Z}_{2^d}$ contains an odd constant, then $a = b$ for all
-solutions of $\{f_1 = 0, \ldots, f_k = 0\}$.
+We stress that the \emph{textbook} Rabinowitsch trick --- encoding
+$c \neq d$ as $(c-d)\cdot e - 1 = 0$ --- is \textbf{unsound} over
+$\mathbb{Z}_{2^d}$ (see the remark below); Song et al.'s
+$2^{d-1}$ construction is the correct ring-aware replacement, and is
+what we implement.
+
+\begin{theorem}[Disequality encoding; Song et al.\ Prop.~5/6]
+\label{thm:song-equisat}
+Let $u \in \mathbb{Z}_{2^d}$ with $d \geq 1$. Then $u \neq 0$ iff
+there exists $z \in \mathbb{Z}_{2^d}$ with $z \cdot u = 2^{d-1}$.
+Consequently $\{f_1 = 0, \ldots, f_k = 0,\ a \neq b\}$ is satisfiable
+iff $\{f_1 = 0, \ldots, f_k = 0,\ z\,(a{-}b) - 2^{d-1} = 0\}$ is; and
+if the strong Gr\"obner basis of the latter contains any non-zero
+constant, then both are unsatisfiable.
 \end{theorem}
 
 \begin{proof}[Proof sketch]
-An odd element of $\mathbb{Z}_{2^d}$ is a unit (coprime to $2^d$).
-A unit in an ideal $I$ implies $1 \in I$, hence $I$ is the whole
-ring. But if a solution $\sigma$ existed with $f_i(\sigma) = 0$ for
-all $i$, the evaluation homomorphism $\phi_\sigma$ would send every
-element of $I$ to $0$, contradicting $\phi_\sigma(1) = 1 \neq 0$.
-The Rabinowitsch polynomial $(a{-}b) \cdot e - 1$ ensures that any
-solution must satisfy $a = b$: if $a \neq b$ then $e = (a{-}b)^{-1}$
-would need to exist, but the polynomial $-1$ would be in $I$,
-triggering the unit check. The algorithm is sound (never falsely
-reports UNSAT) but incomplete (returns inconclusive when the basis
-contains only even constants).
-Full proof mechanised in Lean~4 (135 theorems, zero \texttt{sorry}),
-covering: (a)~unit characterisation in $\mathbb{Z}_{2^d}$ (odd
-$\Leftrightarrow$ unit, 2 is not a unit for $d \geq 1$),
-(b)~ideal preservation under S-polynomial computation and reduction,
-(c)~soundness of the Rabinowitsch trick (unit in ideal $\Rightarrow$
-no solution via ring homomorphism), and (d)~Buchberger termination
-via the ascending chain condition in Noetherian rings.
+For the forward direction, write $u = 2^{\alpha} w$ with $w$ odd and
+$\alpha = \nu_2(u) \leq d-1$ (as $u \neq 0$); since $w$ is a unit
+($\gcd(w, 2^d) = 1$), $z = 2^{d-1-\alpha} w^{-1}$ gives
+$z\,u = 2^{d-1}$. Conversely, if $u = 0$ then $z\,u = 0 \neq 2^{d-1}$.
+For the refutation: under any solution $\sigma$ the evaluation
+homomorphism $\phi_\sigma$ sends every ideal element to $0$; a
+non-zero constant $c$ in the ideal would give $\phi_\sigma(c) = c \neq
+0$, a contradiction --- so no solution exists. Unlike the unit
+characterisation, the witnessing constant need not be odd, which is
+why the implementation refutes on \emph{any} non-zero constant. Fully
+mechanised in Lean~4 (zero \texttt{sorry}):
+\texttt{DisequalityRefutation.lean::song\_encoding\_equisat} (the
+equisatisfiability, forward direction via the 2-adic valuation
+argument) and \texttt{nonzero\_constant\_no\_solution} (any non-zero
+constant in the ideal $\Rightarrow$ no solution); ideal preservation
+under S-polynomials/reduction and Buchberger termination are covered
+by the surrounding development.
 \end{proof}
+
+\begin{remark}[The textbook Rabinowitsch trick is field-only]
+A natural way to encode $c \neq d$ for a purely equational solver is
+the classical Rabinowitsch trick: a fresh $e$ with
+$(c-d)\cdot e - 1 = 0$, refuting when the augmented system is
+unsatisfiable. This is sound \emph{over a field}, where $c \neq d$ is
+equivalent to $c - d$ being invertible --- as in the
+Nullstellensatz~\cite[Ch.~4]{cox2015ideals} and in finite-field SMT
+solving~\cite{hader2023finitefield,Ozdemir23cvc5}, and as suggested
+for the inequality extension in~\cite[\S7]{song2024equational}. It is
+\emph{unsound over $\mathbb{Z}_{2^d}$}, which is not a field: the
+polynomial $(c-d)\cdot e - 1$ asserts that $c-d$ is a \emph{unit}, not
+merely non-zero. For instance over $\mathbb{Z}_4$ we have $2 \neq 0$
+yet $2 \cdot e = 1$ has no solution, so the trick would wrongly report
+the satisfiable $2 \neq 0$ as unsatisfiable
+(\texttt{DisequalityRefutation.lean::rabinowitsch\_unsound\_over\_zmod}).
+A prototype of our solver used this trick and was unsound on real
+SMT-LIB benchmarks before we adopted Song et al.'s $2^{d-1}$ encoding.
+\end{remark}
 
 \begin{table}[ht]
 \caption{Five-layer arithmetic-solving pipeline in \cbmc with
@@ -733,7 +762,7 @@ The algebraic solver and Bitwuzla both exhibit bitwidth-independent
 behaviour, reaching the same answer in 2--3\,ms regardless of
 operand width. The mechanisms differ: our procedure recognises the
 identity through Gr\"obner-basis reduction of the
-Rabinowitsch-augmented polynomial system, while Bitwuzla performs
+$2^{d-1}$-augmented polynomial system, while Bitwuzla performs
 syntactic word-level rewriting that recognises commutativity and
 associativity directly. Both approaches give a structural reason
 why the equation holds; both avoid bit-blasting entirely. The
@@ -1048,26 +1077,28 @@ sub-queries, leaving the bit-blast layer with a smaller search.
 \label{sec:grobner-example}
 
 Consider $a \cdot b = b \cdot a$ over $\mathbb{Z}_8$ ($d = 3$).
-The Rabinowitsch-augmented polynomial system is
+The disequality-augmented polynomial system (Song et al.'s
+$2^{d-1}$ encoding) is
 \[
   \{\; p_1 = z_1 - a \cdot b, \quad
        p_2 = z_2 - b \cdot a, \quad
-       p_3 = (z_1 - z_2) \cdot e - 1 \;\},
+       p_3 = z \cdot (z_1 - z_2) - 2^{d-1} \;\},
 \]
-with lex order $e > z_1 > z_2 > a > b$.
+with lex order $z > z_1 > z_2 > a > b$.
 
 Step 1. Reduce $p_3$ by $p_1$: substitute $z_1 \mapsto a \cdot b$
 (modulo the sign of the S-polynomial), giving
-$p_3' = (a \cdot b - z_2) \cdot e - 1$.
+$p_3' = z \cdot (a \cdot b - z_2) - 2^{d-1}$.
 
 Step 2. Reduce $p_3'$ by $p_2$: substitute $z_2 \mapsto b \cdot a$,
-giving $p_3'' = (a \cdot b - b \cdot a) \cdot e - 1$.
+giving $p_3'' = z \cdot (a \cdot b - b \cdot a) - 2^{d-1}$.
 
-Step 3. In $\mathbb{Z}_8[a, b, e]$, $a \cdot b = b \cdot a$ holds as
+Step 3. In $\mathbb{Z}_8[a, b, z]$, $a \cdot b = b \cdot a$ holds as
 a polynomial identity (commutativity of the ring), so
-$p_3'' = 0 \cdot e - 1 = -1$. The constant $-1 \equiv 7 \pmod{8}$ is
-odd, hence a unit: the Gr\"obner basis contains a unit, so the
-original system is unsatisfiable, proving $z_1 = z_2$ for all
+$p_3'' = z \cdot 0 - 2^{d-1} = -2^{d-1}$. For $d = 3$ the constant
+$-2^{d-1} \equiv 4 \pmod 8$ is non-zero: the Gr\"obner basis
+contains a non-zero constant, so the original system is
+unsatisfiable, proving $z_1 = z_2$ for all
 assignments. This takes three reductions, regardless of $d$. In
 our implementation the cost is ${\sim}$200\,$\mu$s independent of
 bitwidth.
@@ -1142,7 +1173,7 @@ QF\_BV 66-benchmark stratified sample) the variant changes the
 verdict on zero benchmarks. The analytical reason is that
 CBMC's typical SMT query has a single top-level disequality
 (the negated assertion); the global basis then equals the
-per-disequality basis, on which Rabinowitsch + Buchberger has
+per-disequality basis, on which the $2^{d-1}$ encoding + Buchberger has
 already been run. More sophisticated variants (compound-
 multiplication constant folding, pairwise variable equality
 discovery, generalised candidate extraction over arbitrary
@@ -1159,8 +1190,8 @@ benchmarks}
 Section~\ref{sec:algebraic} establishes the soundness contract
 of the algebraic refutation pipeline: collect equalities and
 disequalities from the asserted formula, run a strong
-Gr\"obner basis over $\mathbb{Z}_{2^d}$ with Rabinowitsch on
-each disequality, and report UNSAT when an odd constant enters
+Gr\"obner basis over $\mathbb{Z}_{2^d}$ with the $2^{d-1}$ encoding on
+each disequality, and report UNSAT when any non-zero constant enters
 the basis. The minimal pipeline is sufficient for the
 universal-equational fragment when the formula is presented as
 a flat conjunction of arithmetic equalities --- the Brain
@@ -1320,11 +1351,12 @@ Two further benchmarks from the SMT-COMP sample
 IF-condition with $z \cdot z$, a quadratic-in-$z$ polynomial.
 After the Phase~A.2 IF-rebuild and Phase~A.3 if-case-elimination,
 the algebraic disequality becomes
-$z^2 + 12 - 6z - 12y \neq 0$, whose Rabinowitsch encoding
-$e \cdot (z^2 + 12 - 6z - 12y) - 1 = 0$ should reduce to $-1$
-when combined with the cohencu polynomial equations. The
+$z^2 + 12 - 6z - 12y \neq 0$, whose $2^{d-1}$ encoding
+$z' \cdot (z^2 + 12 - 6z - 12y) - 2^{d-1} = 0$ should reduce to the
+non-zero constant $-2^{d-1}$ when combined with the cohencu
+polynomial equations. The
 substitution $z = 6 + 6n$ and $y = 1 + 3n + 3n^2$ flattens the
-inner expression to zero, leaving the odd unit $-1$.
+inner expression to zero, leaving the non-zero constant $-2^{d-1}$.
 
 But this refutation requires reducing a \emph{non-leading}
 term: standard incremental Buchberger's leading-monomial-divides
@@ -1455,7 +1487,7 @@ Bitwuzla wins the volume contest by 50 over our procedure: its
 occurrence-map canonicalisation closes most universal-equational
 queries syntactically, and on the existential-equational
 SAT-direction queries (equality, nonequality) it constructs
-witnesses that our UNSAT-oriented Rabinowitsch encoding cannot.
+witnesses that our UNSAT-oriented $2^{d-1}$ encoding cannot.
 The contribution we claim, however, is not volume but
 \emph{completeness}: the algebraic procedure decides 4 benchmarks
 that no current SMT solver and no bit-blasting configuration
@@ -1503,8 +1535,8 @@ options available.
 The win pattern is structured by the four-classes taxonomy
 (Table~\ref{tab:taxonomy}). Algebraic reasoning dominates on
 universal-equational categories (addition, multiplication,
-correctness identities) where the Rabinowitsch trick reduces
-the question to unit-constant detection; it is dominated on
+correctness identities) where the $2^{d-1}$ encoding reduces
+the question to non-zero-constant detection; it is dominated on
 existential-equational SAT-direction (equality, nonequality)
 where witness construction is the goal; on the
 non-strictly-equational categories (bounding, identity-point,
@@ -2424,9 +2456,13 @@ covers the following modules:
   $G$ produced by the algorithm satisfies $\langle G \rangle =
   \langle F \rangle$ for input $F$.
 
-\item \textbf{Rabinowitsch soundness}
-  (\texttt{GroebnerSoundness.lean}): unit in ideal $\Rightarrow$
-  no solution, via ring homomorphism to a nontrivial ring.
+\item \textbf{Disequality-encoding soundness}
+  (\texttt{DisequalityRefutation.lean}): Song et al.'s $2^{d-1}$
+  encoding is equisatisfiable with the disequality
+  (\texttt{song\_encoding\_equisat}), and any non-zero constant in
+  the ideal $\Rightarrow$ no solution
+  (\texttt{nonzero\_constant\_no\_solution}), via ring homomorphism
+  to a nontrivial ring.
 
 \item \textbf{Buchberger termination}
   (\texttt{BuchbergerTermination.lean}): the ascending chain
@@ -2677,7 +2713,7 @@ can be exponentially more powerful than resolution, giving the
 proof-theoretic justification for algebraic methods on
 multiplication. Our contribution beyond Song et al.\ is the SMT
 integration: SSA-aware decomposition of nested multiplications,
-the Rabinowitsch trick for disequalities, progress-based
+Song et al.'s $2^{d-1}$ disequality encoding, progress-based
 termination, and mechanised soundness
 (Section~\ref{sec:algebraic-contrib}).
 
@@ -2711,6 +2747,27 @@ Booleans; ours works directly over $\mathbb{Z}_{2^d}$, avoiding
 the exponential polynomial blowup field polynomials cause but
 losing field structure. Section~\ref{sec:eval-amulet} compares
 in detail.
+
+\paragraph{Scaling to large bitwidths.}
+Recent gate-level work addresses the large-integer-arithmetic
+bottleneck that arises for $64$-bit-and-wider multipliers, whose
+specification coefficients reach $2^{127}$. Hofstadler, Kaufmann, and
+Chen~\cite{hofstadler2026} avoid arbitrary-precision arithmetic by
+computing homomorphic images modulo several machine-word primes in
+parallel and recombining via the Chinese remainder theorem, combined
+with linear rewriting and guess-and-prove
+linearisation~\cite{kaufmann2019,ritirc2017,ritirc2018}. Large word
+sizes are a genuine limitation of our approach as well: they induce
+coefficient and monomial growth in the strong Gr\"obner basis, and
+queries that exceed the step limit are deferred to bit-blasting.
+Multimodular reasoning does \emph{not}, however, transfer to our
+setting: we reason natively over the finite ring $\mathbb{Z}_{2^d}$,
+whose modulus $2^d$ is a prime power and therefore cannot be factored
+into the coprime moduli the Chinese remainder theorem requires, and
+their model-equivalence over $\mathbb{Z}$ relies on Boolean gate
+variables that our word-level variables lack. Reconciling word-level
+$\mathbb{Z}_{2^d}$ reasoning with multimodular scaling is an open
+problem.
 
 \paragraph{Existential-equational and finite-field
 generalisations.}
@@ -2780,7 +2837,7 @@ volume but to decide queries those solvers cannot decide at all
 Bitwuzla, cvc5, and every bit-blasting configuration we tested
 time out on, and 5 DSP datapath equivalences with overflow
 cancellation that are decided in microseconds. Soundness is
-mechanised in Lean 4 with 135 theorems, zero \texttt{sorry},
+mechanised in Lean 4 with over 150 theorems, zero \texttt{sorry},
 and zero project-internal axioms across 18 modules, with full
 bi-directional traceability to every algorithm in
 \texttt{src/solvers/algebraic/} and four contributions prepared
