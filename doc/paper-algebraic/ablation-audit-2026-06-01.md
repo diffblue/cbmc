@@ -216,3 +216,30 @@ redesign rather than per-site guards. Tracked as the expanded
 Item 13 + new Item 14 in `remaining-work.md`. The headline
 soundness claim of the paper cannot stand until this is
 resolved.
+
+### RESOLUTION (Item 14, 2026-06-01)
+
+Fixed. The Rabinowitsch unit-trick was **removed** at all three
+sites; disequalities are now refuted only by the sound routes
+(per-disequality vanishing test, and reduction of `diff` modulo
+the Gröbner basis of the equalities — `diff ∈ ⟨F⟩`). A residual
+third mechanism was diagnosed: a single tree-walk leaf equality
+containing bit-decomposition operators (`bitand`/`lshr`) was
+overconstraining the equality system `F` and tripping the
+equality-system-inconsistency check on 3 SAT benchmarks
+(`Sage2/bench_{12880,13209,5552}`); a `contains_bit_decomp`
+filter excludes such equalities from `F` (sound — underconstraint
+never turns SAT into UNSAT).
+
+Re-running the **broad SAT scan** after the fix: **0 non-float
+wrong-unsat** (down from 41). The 35 `float` wrong-unsat persist
+and are confirmed pre-existing (reproduce with
+`DISABLE_ALGEBRAIC=1`) — a separate CBMC bit-blaster/SMT2
+front-end issue, not the algebraic pre-solver. Genuine wins:
+SABER 4/4 and Brain 4/4 preserved; cohencu_0/1 preserved via the
+sound ideal-membership path (Bitwuzla confirms unsat). **Lost:
+cohencu_2, cohencu_3, geo3.c_5** (3 SMT-COMP unlocks) — the
+accepted soundness cost. The proof gap is closed by
+`formal-proofs/DisequalityRefutation.lean` and the coverage check
+`scripts/check_proof_traceability.py`. Remaining: rewrite the
+paper's Rabinowitsch methodology (Item 14b).

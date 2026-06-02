@@ -34,14 +34,19 @@ The current state (post Plan A.3 + F4 + Items 2/4/5/6/9):
   TWO SOUNDNESS BUGS** (`assoc.c`, `mul_zero_factor.c`): the
   algebraic path reports VERIFICATION SUCCESSFUL where the
   correct answer is FAILED (claims no-bug when a bug exists).
-  This is CRITICAL and blocks submission — two targeted fixes are
-  committed (Item 13: assoc, mul_zero), but a broad SAT-scan then
-  revealed the unsoundness is **systemic** (Rabinowitsch
-  unit-trick over ZMod(2^d)): **41 real SMT-LIB benchmarks are
-  wrongly reported `unsat`** by the algebraic pre-solver, not
-  fixed by the targeted guards. Tracked as Item 14 (the real
-  fix). The paper's soundness claim cannot stand until Item 14 is
-  resolved. See `doc/paper-algebraic/ablation-audit-2026-06-01.md`.
+  This was CRITICAL — two targeted fixes were committed (Item 13:
+  assoc, mul_zero), and a broad SAT-scan then revealed the
+  unsoundness was **systemic** (Rabinowitsch unit-trick over
+  ZMod(2^d)): 41 real SMT-LIB benchmarks wrongly reported `unsat`.
+  **Item 14 now FIXES this**: the Rabinowitsch trick is removed and
+  disequalities are refuted only by sound ideal-membership /
+  vanishing routes; broad scan re-run shows **0 non-float
+  wrong-unsat** (35 remaining are a pre-existing, separate float
+  bit-blaster issue). Cost: 3 SMT-COMP unlocks lost (cohencu_2/3,
+  geo3.c_5). **Remaining submission blocker: Item 14b** — rewrite
+  the paper's now-incorrect Rabinowitsch methodology/soundness
+  section. See `doc/paper-algebraic/ablation-audit-2026-06-01.md`
+  and `proof-gap-analysis-2026-06-01.md`.
 - 65 Lean traceability entries across 20 modules, all status
   **DONE** (zero `sorry`, zero project-specific axioms; only
   standard mathlib axioms `propext`, `Classical.choice`,
@@ -604,70 +609,88 @@ catches one pattern of a much broader unsoundness.
 
 ---
 
-### Item 14 — Systemic unsoundness of disequality refutation over ZMod(2^d) — **NEW, CRITICAL (blocks submission)**
+### Item 14 — Systemic unsoundness of disequality refutation over ZMod(2^d) — **FIXED (code/proofs/tests); paper rewrite outstanding**
 
-**Status**: Open. (Origin: broad SAT-scan after the Item 13
-fixes, 2026-06-01. Full data:
-`doc/paper-algebraic/ablation-audit-2026-06-01.md` addendum;
-`bench-multiplication/ablation-audit/sat-scan-*.txt`.)
+**Status**: Code fix **done and verified**. The unsound Rabinowitsch
+unit-trick is removed; disequalities are refuted only by sound
+routes. A residual third mechanism (tree-walk leaf equalities with
+bit-decomposition operators overconstraining the equality system)
+was diagnosed and fixed. The Lean obligation and a traceability
+coverage check close the proof gap. **Outstanding: the paper's
+methodology/soundness section must be rewritten (see Item 14b).**
 
-**The finding**: scanning 3,677 SAT bvmul benchmarks (algebra ON,
-flag any `unsat`) found **41 benchmarks our algebraic pre-solver
-wrongly reports `unsat`** (Sage2 ×40, sage ×1) — confirmed
-algebra-caused (`DISABLE_ALGEBRAIC=1` does not reproduce). The
-two committed Item-13 guards do not fix these. (A separate 35
-`float` benchmarks are wrongly `unsat` even with algebra OFF — a
-pre-existing CBMC bit-blaster/SMT2 front-end issue, tracked
-separately, NOT this item.)
+**What was done (commit on `features/adder`):**
+1. **Removed the Rabinowitsch unit-trick** at all three sites in
+   `boolbv.cpp::try_algebraic_solve` (`__rabinowitsch` push to the
+   combined system, single `__rab`, disjunctive `__rab_disj`). It is
+   unsound over ZMod(2^d): `diff*e-1=0` asserts `diff` is a unit, but
+   non-zero ≠ unit, so `UNSAT_rabinowitsch ⇏ UNSAT_original`.
+2. **Promoted sound ideal-membership refutation to default-on**:
+   after Buchberger, reduce each `diff = lhs-rhs` modulo the Gröbner
+   basis of the equalities `F`; remainder 0 ⇒ `diff ∈ ⟨F⟩` ⇒ `diff=0`
+   on every model ⇒ the disequality is UNSAT. Sound over any ring.
+   The per-disequality vanishing test is retained (also sound).
+3. **Fixed the third mechanism**: a tree-walk leaf equality
+   containing bit-decomposition operators (`bitand`/`lshr`/…) was
+   overconstraining `F` (mixed-width host equations), making the
+   equality-system-inconsistency check spuriously fire on 3 SAT
+   benchmarks. Added a `contains_bit_decomp` filter so such
+   equalities are not fed into `F` (sound: underconstraining `F`
+   never turns SAT into UNSAT).
+4. **Lean obligation** `formal-proofs/DisequalityRefutation.lean`
+   (zero `sorry`): `diseq_refutation_sound`/`diseq_refutation_unsat`
+   (ideal membership ⇒ sound refutation) and
+   `rabinowitsch_unsound_over_zmod` (concrete Z_4 counterexample:
+   `2` is non-zero but `∄e. 2e=1`). Plus inline `// PROOF:`
+   annotations on every UNSAT-conclusion site.
+5. **Coverage check** `scripts/check_proof_traceability.py`: fails CI
+   if any `// PROOF:` reference does not resolve to a real Lean
+   theorem, or if any UNSAT conclusion in `try_algebraic_solve` lacks
+   a `// PROOF:` annotation. (It immediately caught four pre-existing
+   drifted references, now fixed.)
 
-**Root cause**: the **Rabinowitsch unit-trick is unsound over
-ZMod(2^d)**. Encoding `diff != 0` as `diff*e - 1 = 0` asserts
-`diff` is a unit; over ZMod(2^d) non-zero ≠ unit, so
-`UNSAT_rabinowitsch ⇏ UNSAT_original`. It is used at three sites
-(`__rabinowitsch`, `__rab`, `__rab_disj`). PLUS a **second,
-distinct** unsound mechanism: 4 of the 41 stay wrongly `unsat`
-even with all Rabinowitsch sites gated off (the
-`is_zero()`/gb-on-equalities path).
+**Verification:**
+- Broad SAT scan (3,677 SAT bvmul benchmarks): **0 non-float
+  wrong-unsat** (was 41). The 35 `float` wrong-unsat are pre-existing
+  (reproduce with `DISABLE_ALGEBRAIC=1`) — separate issue, not ours.
+- SABER 4/4 and the 4 Brain wins preserved; cohencu_0/1 preserved via
+  the sound ideal-membership path (Bitwuzla confirms unsat; declared
+  status `unknown`; z3 times out).
+- **Lost: cohencu_2, cohencu_3, geo3.c_5** (3 SMT-COMP unlocks) — the
+  accepted soundness cost. SMT-COMP NEEDS_ALGEBRA 10 → 6.
+- assoc/mul_zero still correctly FAILED; groebner unit tests 11/11;
+  new regression tests pass; coverage check passes; build clean.
 
-**Feasibility data** (experimental `DISABLE_RABINOWITSCH` gate,
-reverted):
-- Gating the three Rabinowitsch sites fixes 37/41.
-- SABER + 4 Brain wins survive (sound vanishing/ideal-membership
-  path).
-- **cohencu_0..3 + geo3.c_5 regress to timeout** — they depend
-  on Rabinowitsch. Naive sound-mode costs ~5 SMT-COMP unlocks.
-- 4 residual remain unsound (second mechanism).
+---
 
-**Design options** (need a decision):
-1. **Sound-only mode**: replace the Rabinowitsch unit-trick with
-   sound ideal-membership refutation (refute `diff != 0` only
-   when `diff` reduces to 0 modulo the equality ideal — i.e.\
-   `diff` is in the ideal, so it vanishes on all solutions).
-   Sound over any ring. Cost: lose cohencu/geo3 (refutations
-   that needed radical/unit reasoning); must also fix the
-   `is_zero()` second mechanism. Likely the right answer; honest
-   headline becomes "10→5 SMT-COMP unlocks" unless the lost
-   cases can be recovered soundly.
-2. **Unit-aware Rabinowitsch**: only add `diff*e-1` when `diff`
-   is provably odd (a unit over ZMod(2^d)); otherwise use option
-   1's ideal-membership check. Recovers cohencu/geo3 iff their
-   `diff` is provably a unit (to be checked).
-3. **Reconcile with Lean**: the soundness development
-   (`GroebnerSoundness`, `StrongGB`) presumably proves
-   "odd constant in ideal ⇒ UNSAT". The bug is that the C++
-   adds `diff*e-1` to the ideal, which does NOT follow from
-   `diff != 0` over ZMod(2^d). The Lean `ASSUMES` clause
-   (polynomial is in the ideal) is satisfied vacuously by the
-   construction but the *encoding* is unfaithful. Add a Lean
-   theorem pinning the unit caveat; ensure the implementation
-   only adds ideal-faithful polynomials.
+### Item 14b — Rewrite the paper's disequality methodology — **NEW, CRITICAL (blocks submission)**
 
-**Effort**: 1–2 weeks (redesign disequality refutation + fix the
-second mechanism + full re-audit + Lean reconciliation).
+**Status**: Open. The code no longer uses Rabinowitsch, so
+`doc/paper-algebraic/paper.tex` is now **factually wrong** in several
+places and must be revised by the authors:
 
-**Until resolved**: the algebraic pre-solver is unsound by
-default on ~41 real SMT-LIB benchmarks. The paper's soundness
-claim cannot stand. This is the single most important open item.
+- **The soundness Theorem proof sketch (~line 559-569)** claims the
+  Rabinowitsch trick is "sound (never falsely reports UNSAT)". This
+  is FALSE over ZMod(2^d) and is exactly the bug. The mechanised
+  point (c) ("unit in ideal ⇒ no solution") proves only that the
+  *augmented* system has no solution, NOT that the *original*
+  disequality query is UNSAT — the missing (and false) bridge.
+  Replace with the ideal-membership criterion and cite
+  `DisequalityRefutation.lean`.
+- **Contributions / technique table (~line 128)** lists
+  "this paper (Rabinowitsch)" for the UNSAT-disequality direction;
+  re-describe as sound ideal-membership refutation.
+- **Disequality-handling prose (~lines 487, 529-535, 559, 1051,
+  1145)** describes adding the Rabinowitsch equation; rewrite.
+- **Numbers**: SMT-COMP unlocks drop by 3 (lose cohencu_2/3,
+  geo3.c_5). Update any "10 unlocks" / headline counts. The
+  ordering-sensitivity discussion (~lines 317-341) about
+  "definitions before Rabinowitsch" is now moot.
+- Add the proof-gap lesson (`proof-gap-analysis-2026-06-01.md`) and
+  the coverage check as a methodological strengthening.
+
+This is the last submission blocker for the algebraic-soundness
+story.
 
 ---
 
@@ -688,12 +711,16 @@ the headline-improvement it promised is gone. The corpus-widening
 exposed a more important gap: we had no ablation discipline.
 
 **Tier 0 — do first (defensive, essential before any submission):**
+- **Item 14b** (rewrite the paper's Rabinowitsch methodology /
+  soundness section). CRITICAL — the code no longer uses
+  Rabinowitsch, so the paper's soundness Theorem and technique
+  description are now factually wrong. This is the last
+  submission blocker for the soundness story.
 - **Item 14** (systemic disequality-refutation unsoundness over
-  ZMod(2^d)). CRITICAL — the algebraic pre-solver wrongly reports
-  `unsat` on ~41 real SMT-LIB benchmarks; an unsound verdict is
-  disqualifying. Nothing else ships until this is resolved
-  (redesign + re-audit). 1–2 weeks. Needs a design decision
-  (sound-only mode loses cohencu/geo3).
+  ZMod(2^d)) — **DONE**. Rabinowitsch removed; sound
+  ideal-membership / vanishing refutation only; broad scan shows 0
+  non-float wrong-unsat; Lean obligation + coverage check added.
+  Cost: 3 SMT-COMP unlocks lost.
 - **Item 13** (targeted assoc/mul_zero fixes) — **DONE** (partial
   down payment on Item 14).
 - **Item 12** (ablation re-audit) — **DONE**; it produced Items

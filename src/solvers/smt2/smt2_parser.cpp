@@ -444,8 +444,9 @@ exprt smt2_parsert::binary_predicate(irep_idt id, const exprt::operandst &op)
   // Distribute only when exactly one side is an ite at the top
   // level (avoid quadratic blow-up on (= ite ite)).
   //
-  // PROOF: formal-proofs/IteCondPropagation.lean::eq_through_ite,
-  //        notequal_through_ite, le_through_ite, lt_through_ite.
+  // PROOF: formal-proofs/IteCondPropagation.lean::eq_through_ite_left,
+  //        notequal_through_ite_left, le_through_ite_left,
+  //        lt_through_ite_left.
   if(
     id == ID_equal || id == ID_notequal || id == ID_le || id == ID_lt ||
     id == ID_ge || id == ID_gt)

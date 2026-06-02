@@ -400,7 +400,7 @@ std::optional<polynomialt> poly_extractort::to_polynomial_impl(const exprt &e)
   // "top level" of an arithmetic expression (e.g. the bw=512
   // VMCAI rewrite-rule candidate family).
   //
-  // PROOF: formal-proofs/Encoding.lean::bvnot_eq_neg_one_sub
+  // PROOF: formal-proofs/BvDivPolyEncoding.lean::bvnot_eq_neg_one_sub
   //        Soundness: in ZMod (2^d), `~a = (2^d - 1) - a` holds as
   //        a ring identity for any `a`.
   if(e.id() == ID_bitnot && e.operands().size() == 1)

@@ -149,3 +149,35 @@ mechanising the disequality encoding, (b) enforce the
 width assumption the proofs depend on, and (c) make
 "every soundness-critical step is annotated" a checked invariant
 rather than an aspiration.
+
+## Update: the gap is now closed (Item 14, 2026-06-01)
+
+All three corrective steps are implemented:
+
+1. **Disequality encoding mechanised.**
+   `formal-proofs/DisequalityRefutation.lean` (zero `sorry`) states
+   the sound obligation `diseq_refutation_sound` (ideal membership ⇒
+   refutation sound, over any commutative ring) and proves the unit
+   trick unsound over ZMod(2^d) by a concrete `Z_4` witness
+   (`rabinowitsch_unsound_over_zmod`: `2 ≠ 0` yet `∄ e. 2e = 1`).
+   The implementation now refutes a disequality only when
+   `diff ∈ ⟨F⟩` (or vanishes), discharging that obligation; the
+   Rabinowitsch trick is gone.
+
+2. **Single-width assumption enforced.** Bug A's committed guard plus
+   the new `contains_bit_decomp` filter stop width-changing /
+   bit-decomposition equalities from poisoning the polynomial system.
+
+3. **Coverage is now a checked invariant.**
+   `scripts/check_proof_traceability.py` fails if any `// PROOF:`
+   reference does not resolve to a real Lean theorem, or if any
+   UNSAT conclusion in `try_algebraic_solve` lacks a `// PROOF:`
+   annotation. Run on the fixed tree it passes — and on first run it
+   immediately caught four pre-existing *drifted* references (renamed
+   theorems / wrong file), which the old manual audit had missed.
+   This converts "every soundness-critical step is annotated" from an
+   aspiration into a CI-enforceable invariant.
+
+The remaining task is editorial, not technical: the paper's
+methodology section still presents (and claims soundness for) the
+Rabinowitsch trick and must be rewritten (Item 14b).

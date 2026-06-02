@@ -552,7 +552,7 @@ void boolbvt::set_to(const exprt &expr, bool value)
   // `algebraic_equalities` / `algebraic_disequalities` but does not
   // skip any of the existing direct handling.
   //
-  // PROOF: formal-proofs/AlgebraicTreeWalk.lean::leaf_implied_by_walk.
+  // PROOF: formal-proofs/AlgebraicTreeWalk.lean::leaf_implied_by_walk_and.
   if(!algebraic_solved && std::getenv("DISABLE_ALGEBRAIC_TREE_WALK") == nullptr)
   {
     std::size_t leaf_count = 0;
@@ -970,7 +970,7 @@ boolbvt::offset_mapt boolbvt::build_offset_map(const struct_typet &src)
   return dest;
 }
 
-// PROOF: formal-proofs/AlgebraicTreeWalk.lean::leaf_implied_by_walk
+// PROOF: formal-proofs/AlgebraicTreeWalk.lean::leaf_implied_by_walk_and
 //        Soundness: every leaf collected by walk_for_algebraic is
 //        a logical consequence of the parent assertion (expr, value).
 //        The walk descends through AND (with value=true), OR (with
@@ -1176,6 +1176,31 @@ void boolbvt::walk_for_algebraic(
     return false;
   };
 
+  // Item 14 (soundness): does the expression contain a bit-level
+  // operator whose polynomial extraction proceeds by bit-decomposition
+  // (fresh per-bit variables with a host sum-decomposition equation)?
+  // Such equalities are UNSAFE to feed into the equality system F used
+  // for the Gröbner inconsistency check: decomposing the same host at
+  // different widths emits conflicting sum-decomposition equations,
+  // which can make F spuriously inconsistent and yield a wrong UNSAT
+  // (observed on Sage2/bench_{12880,13209,5552}, all genuinely SAT).
+  // Excluding them from F is sound (it only weakens completeness of
+  // the inconsistency check; underconstraining F never turns a SAT
+  // query UNSAT). The genuine algebraic wins refute disequalities via
+  // the vanishing / ideal-membership routes and do not depend on these.
+  std::function<bool(const exprt &)> contains_bit_decomp =
+    [&contains_bit_decomp](const exprt &e) -> bool
+  {
+    if(
+      e.id() == ID_bitand || e.id() == ID_bitor || e.id() == ID_bitxor ||
+      e.id() == ID_lshr || e.id() == ID_ashr || e.id() == ID_bitnot)
+      return true;
+    for(const auto &op : e.operands())
+      if(contains_bit_decomp(op))
+        return true;
+    return false;
+  };
+
   if(expr.id() == ID_equal && expr.operands().size() == 2)
   {
     if(is_internal(expr.operands()[0]) || is_internal(expr.operands()[1]))
@@ -1185,7 +1210,11 @@ void boolbvt::walk_for_algebraic(
     if(value)
     {
       // Equalities: push regardless of polynomial-friendliness
-      // (Tseitin can use them).
+      // (Tseitin can use them) — but only when free of bit-level
+      // operators that bit-decomposition extraction cannot encode
+      // soundly into the shared polynomial ring (see above).
+      if(contains_bit_decomp(expr))
+        return;
       algebraic_equalities.push_back(expr);
     }
     else
@@ -1817,6 +1846,11 @@ bool boolbvt::try_algebraic_solve()
       {
         if(try_refute_one(diseq))
         {
+          // PROOF: formal-proofs/DisequalityRefutation.lean::
+          //   diseq_refutation_sound. try_refute_one substitutes SSA
+          //   definitions and accepts only when the diff reduces to
+          //   the zero polynomial (diff in <F>), so the disequality
+          //   is UNSAT.
           prop.l_set_to_true(const_literal(false));
           return true;
         }
@@ -1859,26 +1893,19 @@ bool boolbvt::try_algebraic_solve()
     }
   }
 
-  // Extract disequalities (negated assertions) via Rabinowitsch trick
-  for(const auto &eq : algebraic_disequalities)
-  {
-    if(eq.id() != ID_equal || eq.operands().size() != 2)
-      continue;
-    auto lhs = extractor.to_polynomial(to_equal_expr(eq).lhs());
-    auto rhs = extractor.to_polynomial(to_equal_expr(eq).rhs());
-    if(!lhs || !rhs)
-      continue;
-    unsigned bw = extractor.get_bitwidth();
-    if(bw == 0)
-      continue;
-    polynomialt diff = *lhs - *rhs;
-    std::size_t e_idx = extractor.get_var_index("__rabinowitsch");
-    polynomialt e{bw, mp_integer{1}, e_idx};
-    polynomialt constraint = (diff * e) - polynomialt{bw, mp_integer{1}};
-    constraint.normalize();
-    if(!constraint.is_zero())
-      equations.push_back(std::move(constraint));
-  }
+  // Item 14 (soundness): the Rabinowitsch unit-trick (encoding
+  // `diff != 0` as `diff*e - 1 = 0`) is UNSOUND over ZMod(2^d).
+  // It asserts `diff` is a *unit* (invertible), but over ZMod(2^d)
+  // a non-zero element need not be invertible (e.g.\ 16 mod 256).
+  // Hence UNSAT of the Rabinowitsch system does NOT imply UNSAT of
+  // the original disequality query, and the solver wrongly reported
+  // `unsat` on ~41 real SMT-LIB benchmarks. Disequalities are now
+  // refuted only by the SOUND ideal-membership routes: the vanishing
+  // polynomial test (per disequality, below) and reduction of `diff`
+  // modulo the Gröbner basis of the equalities (after gb.compute).
+  // PROOF: formal-proofs/DisequalityRefutation.lean::
+  //   diseq_refutation_sound (diff in <F> => F=0 and diff!=0 UNSAT);
+  //   rabinowitsch_unsound_over_zmod (the unit-trick is unsound).
 
   // Try each disequality independently: if any single disequality
   // is provably UNSAT (regardless of other constraints), the whole
@@ -1888,15 +1915,6 @@ bool boolbvt::try_algebraic_solve()
   {
     if(diseq.id() != ID_equal || diseq.operands().size() != 2)
       continue;
-    poly_extractort single_extractor;
-    auto lhs = single_extractor.to_polynomial(to_equal_expr(diseq).lhs());
-    auto rhs = single_extractor.to_polynomial(to_equal_expr(diseq).rhs());
-    if(!lhs || !rhs)
-      continue;
-    unsigned single_bw = single_extractor.get_bitwidth();
-    if(single_bw == 0)
-      continue;
-    polynomialt diff = *lhs - *rhs;
 
     // Try vanishing polynomial test (complete for polynomial equivalence).
     // Substitute SSA definitions to get the polynomial in input variables.
@@ -1979,6 +1997,10 @@ bool boolbvt::try_algebraic_solve()
           }
           if(idiff.is_zero())
           {
+            // PROOF: formal-proofs/DisequalityRefutation.lean::
+            //   diseq_refutation_sound. After substituting the SSA
+            //   definitions, diff reduces to the zero polynomial, so
+            //   lhs = rhs on every model; the disequality is UNSAT.
             prop.l_set_to_true(const_literal(false));
             return true;
           }
@@ -1993,114 +2015,14 @@ bool boolbvt::try_algebraic_solve()
           const bool van_disabled = std::getenv("DISABLE_VANISHING") != nullptr;
       if(!van_disabled && is_vanishing_polynomial(idiff, input_widths))
           {
+            // PROOF: formal-proofs/Vanishing.lean::
+            //   falling_factorial_sufficient. idiff vanishes as a
+            //   function on the bit-vector domain, so lhs = rhs on
+            //   every model; the disequality is UNSAT.
             prop.l_set_to_true(const_literal(false));
             return true;
           }
         }
-      }
-    }
-
-    std::size_t e_idx = single_extractor.get_var_index("__rab");
-    polynomialt e_var{single_bw, mp_integer{1}, e_idx};
-    polynomialt rab = (diff * e_var) - polynomialt{single_bw, mp_integer{1}};
-    rab.normalize();
-    if(rab.is_zero())
-      continue;
-
-    std::vector<polynomialt> single_eqs;
-    // Also extract equalities (SSA definitions) using the same extractor
-    // so that define-fun equations are included.
-    for(const auto &eq : algebraic_equalities)
-    {
-      auto poly = single_extractor.extract_equation(eq);
-      if(poly.has_value() && !poly->is_zero())
-        single_eqs.push_back(std::move(*poly));
-    }
-    // Universal-relational predicates (Re 4 sub-goal 6).
-    for(const auto &[pred_expr, pred_val] : algebraic_predicates)
-    {
-      auto polys = single_extractor.extract_predicate(pred_expr, pred_val);
-      if(!polys.has_value())
-        continue;
-      for(auto &p : *polys)
-      {
-        p.normalize();
-        if(!p.is_zero())
-          single_eqs.push_back(std::move(p));
-      }
-    }
-    // Add side equations from fresh variable decomposition
-    for(auto &se : single_extractor.side_equations)
-    {
-      se.normalize();
-      if(!se.is_zero())
-        single_eqs.push_back(std::move(se));
-    }
-    // Add Rabinowitsch last (ordering matters for Gröbner basis)
-    single_eqs.push_back(std::move(rab));
-
-    // Optional: inject ZFP generators for variables.
-    // Behind ENABLE_ZFP_INJECTION env var. If on, this is intended
-    // to subsume the §3 vanishing polynomial test (set
-    // DISABLE_VANISHING=1 to skip the separate test).
-    if(std::getenv("ENABLE_ZFP_INJECTION") != nullptr)
-    {
-      // Optional cap on max k (default = full SF). Keeps the basis
-      // small for ablation experiments.
-      unsigned max_k_cap = 0;
-      unsigned min_k_cap = 2;
-      if(const char *cap = std::getenv("ZFP_MAX_K"))
-        max_k_cap = std::atoi(cap);
-      if(const char *cap = std::getenv("ZFP_MIN_K"))
-        min_k_cap = std::atoi(cap);
-      const auto &rev_map_d = single_extractor.get_reverse_var_map();
-      for(const auto &[var_idx, name] : rev_map_d)
-      {
-        const std::string name_str = id2string(name);
-        if(name_str.substr(0, 2) == "__")
-          continue;
-
-        unsigned in_w = single_bw;
-        auto it = single_extractor.var_input_widths.find(var_idx);
-        if(it != single_extractor.var_input_widths.end() && it->second > 0)
-          in_w = it->second;
-
-        auto zfps = generate_zfp_generators(single_bw, var_idx, in_w);
-        for(auto &zfp : zfps)
-        {
-          if(zfp.is_zero())
-            continue;
-          unsigned deg = zfp.leading_monomial().total_degree();
-          if(max_k_cap > 0 && deg > max_k_cap)
-            continue;
-          if(deg < min_k_cap)
-            continue;
-          single_eqs.push_back(std::move(zfp));
-        }
-      }
-    }
-
-    if(single_eqs.size() >= 2)
-    {
-      // P2: bit-by-bit parity reasoning. For each side equation of
-      // the form `h - c*x = 0` with c a constant power of 2 and
-      // both h, x bit-decomposed, materialise the bit alignments.
-      auto alignments = single_extractor.materialise_bit_alignments(single_eqs);
-      for(auto &p : alignments)
-      {
-        if(!p.is_zero())
-          single_eqs.push_back(std::move(p));
-      }
-
-      strong_groebner_basist single_gb{100000};
-      single_gb.set_bit_vars(single_extractor.get_bit_var_indices());
-      single_gb.set_host_substitutions(
-        single_extractor.get_host_substitutions());
-      if(
-        single_gb.compute(single_eqs) == strong_groebner_basist::resultt::UNSAT)
-      {
-        prop.l_set_to_true(const_literal(false));
-        return true;
       }
     }
   }
@@ -2138,32 +2060,8 @@ bool boolbvt::try_algebraic_solve()
 
     for(const auto &diseq : disjunction)
     {
-      // Per-branch processing mirrors the per-disequality loop above
-      // (vanishing-polynomial test + Rabinowitsch + Buchberger).
-      poly_extractort branch_extractor;
-      auto lhs = branch_extractor.to_polynomial(to_equal_expr(diseq).lhs());
-      auto rhs = branch_extractor.to_polynomial(to_equal_expr(diseq).rhs());
-      if(!lhs || !rhs)
-      {
-        all_branches_unsat = false;
-        break;
-      }
-      unsigned branch_bw = branch_extractor.get_bitwidth();
-      if(branch_bw == 0)
-      {
-        all_branches_unsat = false;
-        break;
-      }
-      polynomialt diff = *lhs - *rhs;
-
-      // Vanishing-polynomial test on the diff with SSA-inlined
-      // expansion. If the diff is a vanishing polynomial as a
-      // function on the bit-vector domain, the disequality is
-      // refuted regardless of the rest of the basis. This is the
-      // path that decides SABER-style schoolbook-vs-Karatsuba
-      // queries: the two implementations produce literally
-      // identical polynomials, so the diff polynomial is zero
-      // after SSA inlining and the test fires immediately.
+      // Per-branch: sound vanishing-polynomial test only (Item 14:
+      // the Rabinowitsch unit-trick is unsound over ZMod(2^d)).
       bool branch_refuted_by_vanishing = false;
       {
         std::function<void(exprt &)> substitute = [&](exprt &e)
@@ -2211,74 +2109,21 @@ bool boolbvt::try_algebraic_solve()
       if(branch_refuted_by_vanishing)
         continue; // this branch is UNSAT; try the next branch
 
-      // Fall through to Rabinowitsch + Buchberger.
-      std::size_t e_idx = branch_extractor.get_var_index("__rab_disj");
-      polynomialt e_var{branch_bw, mp_integer{1}, e_idx};
-      polynomialt rab = (diff * e_var) - polynomialt{branch_bw, mp_integer{1}};
-      rab.normalize();
-      if(rab.is_zero())
-      {
-        all_branches_unsat = false;
-        break;
-      }
-
-      std::vector<polynomialt> branch_eqs;
-      for(const auto &eq : algebraic_equalities)
-      {
-        auto poly = branch_extractor.extract_equation(eq);
-        if(poly.has_value() && !poly->is_zero())
-          branch_eqs.push_back(std::move(*poly));
-      }
-      // Universal-relational predicates (Re 4 sub-goal 6).
-      for(const auto &[pred_expr, pred_val] : algebraic_predicates)
-      {
-        auto polys = branch_extractor.extract_predicate(pred_expr, pred_val);
-        if(!polys.has_value())
-          continue;
-        for(auto &p : *polys)
-        {
-          p.normalize();
-          if(!p.is_zero())
-            branch_eqs.push_back(std::move(p));
-        }
-      }
-      for(auto &se : branch_extractor.side_equations)
-      {
-        se.normalize();
-        if(!se.is_zero())
-          branch_eqs.push_back(std::move(se));
-      }
-      branch_eqs.push_back(std::move(rab));
-
-      if(branch_eqs.size() < 2)
-      {
-        all_branches_unsat = false;
-        break;
-      }
-
-      // P2: bit-by-bit parity reasoning.
-      auto branch_alignments =
-        branch_extractor.materialise_bit_alignments(branch_eqs);
-      for(auto &p : branch_alignments)
-      {
-        if(!p.is_zero())
-          branch_eqs.push_back(std::move(p));
-      }
-
-      strong_groebner_basist branch_gb{100000};
-      branch_gb.set_bit_vars(branch_extractor.get_bit_var_indices());
-      branch_gb.set_host_substitutions(
-        branch_extractor.get_host_substitutions());
-      if(
-        branch_gb.compute(branch_eqs) != strong_groebner_basist::resultt::UNSAT)
-      {
-        all_branches_unsat = false;
-        break;
-      }
+      // Item 14 (soundness): the Rabinowitsch unit-trick is unsound
+      // over ZMod(2^d), so a branch the vanishing test cannot refute
+      // has no sound polynomial refutation here. We cannot conclude
+      // this branch is UNSAT, so the disjunction is inconclusive and
+      // is left to bit-blasting.
+      all_branches_unsat = false;
+      break;
     }
     if(all_branches_unsat)
     {
       // Every branch refuted ⇒ disjunction is UNSAT ⇒ formula is UNSAT.
+      // PROOF: formal-proofs/Vanishing.lean::falling_factorial_sufficient
+      //   (each branch refuted by the sound vanishing test) plus the
+      //   propositional fact that (or D_1 .. D_k) is UNSAT when every
+      //   D_i is UNSAT under the shared equalities.
       prop.l_set_to_true(const_literal(false));
       return true;
     }
@@ -2394,27 +2239,29 @@ bool boolbvt::try_algebraic_solve()
 
   if(result == strong_groebner_basist::resultt::UNSAT)
   {
+    // The equality system F is itself inconsistent (Buchberger found
+    // an odd constant / unit in the ideal ⟨F⟩), so F = 0 has no
+    // solution and the whole query is UNSAT.
+    // PROOF: formal-proofs/GroebnerSoundness.lean::
+    //   soundness_of_odd_constant_check (odd constant in the ideal ⇒
+    //   ideal = ⊤ ⇒ no solution over ZMod(2^d)).
     // Add empty clause to make SAT solver return UNSAT
     prop.l_set_to_true(const_literal(false));
     return true;
   }
 
-  // Item 7 prototype: expression normalisation via the Gröbner basis.
-  // After Buchberger, even when the basis didn't decide UNSAT
-  // outright, it may now contain enough information to prove
-  // individual disequalities false via expression-level reduction.
-  // For each disequality (lhs != rhs), reduce its polynomial form
-  // (lhs - rhs) w.r.t. the basis. If the reduction yields 0, the
-  // basis implies lhs = rhs, contradicting the disequality.
-  //
-  // This complements the per-disequality Rabinowitsch+Gröbner pass
-  // (which runs earlier with each disequality's basis in isolation):
-  // the global basis here includes Rabinowitsch polynomials for ALL
-  // disequalities simultaneously, so S-polynomials between them can
-  // produce reductions no per-disequality pass alone catches.
-  //
-  // Behind ENABLE_GB_EXPR_NORMALISE for ablation.
-  if(std::getenv("ENABLE_GB_EXPR_NORMALISE") != nullptr)
+  // Item 14 (sound disequality refutation via ideal membership).
+  // After Buchberger, `equations` holds the strong Gröbner basis of
+  // the equalities F. For each disequality (lhs != rhs), reduce its
+  // polynomial form diff = lhs - rhs modulo the basis. If the
+  // remainder is 0 then diff ∈ ⟨F⟩, so diff = 0 holds on EVERY
+  // common zero of F; the disequality diff != 0 is therefore
+  // unsatisfiable and the whole query is UNSAT. This is sound over
+  // any commutative ring (no unit assumption), unlike the removed
+  // Rabinowitsch unit-trick.
+  // PROOF: formal-proofs/DisequalityRefutation.lean::
+  //   diseq_refutation_sound; ideal membership preserved by the
+  //   Gröbner basis (GroebnerSoundness.lean ideal-preservation lemmas).
   {
     for(const auto &diseq : algebraic_disequalities)
     {

@@ -323,7 +323,7 @@ pick_main_variable(const polynomialt &f, const polynomialt &g)
 /// `v`-exponent `>= m` with the `v`-exponent reduced by `m`.
 /// PROOF: trivial decomposition by case-splitting on the
 ///        v-exponent in each monomial; mechanised in
-///        formal-proofs/Karatsuba.lean::split_by_var_correct.
+///        formal-proofs/Karatsuba.lean::karatsuba_split_correct.
 std::pair<polynomialt, polynomialt>
 split_by_var(const polynomialt &f, std::size_t v, unsigned m)
 {
