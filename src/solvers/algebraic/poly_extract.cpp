@@ -1009,6 +1009,15 @@ poly_extractort::extract_predicate(const exprt &pred, bool value)
     mp_integer C = *c_opt;
     if(C < 0)
       C += power(mp_integer{2}, mp_integer{d});
+    // Item 14 (soundness): the constant must fit the ring width d. A
+    // larger value means the predicate's operands are width-inconsistent
+    // (e.g. a signed comparison whose sign-bit XOR transform used a
+    // different width than the ring); emitting an "impossible" constant
+    // would be unsound, so defer to bit-blasting.
+    // PROOF: formal-proofs/SubgoalSix.lean::bvslt_via_xor_msb assumes a
+    //   single fixed width d; this guard enforces that precondition.
+    if(C >= power(mp_integer{2}, mp_integer{d}))
+      return std::nullopt;
 
     // Convert "x <= C" into "x < C+1". Then "x < N" with N in
     // [0, 2^d]. N = 2^d ⇒ tautology; encode as empty.
@@ -1168,6 +1177,15 @@ poly_extractort::extract_predicate(const exprt &pred, bool value)
     mp_integer C = *c_opt;
     if(C < 0)
       C += power(mp_integer{2}, mp_integer{d});
+    // Item 14 (soundness): the constant must fit the ring width d. A
+    // larger value means the predicate's operands are width-inconsistent
+    // (e.g. a signed comparison whose sign-bit XOR transform used a
+    // different width than the ring); emitting an "impossible" constant
+    // would be unsound, so defer to bit-blasting.
+    // PROOF: formal-proofs/SubgoalSix.lean::bvslt_via_xor_msb assumes a
+    //   single fixed width d; this guard enforces that precondition.
+    if(C >= power(mp_integer{2}, mp_integer{d}))
+      return std::nullopt;
 
     // x >= N where N = strict ? C+1 : C.
     mp_integer N = strict ? (C + 1) : C;

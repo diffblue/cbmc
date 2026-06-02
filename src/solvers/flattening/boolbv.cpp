@@ -1893,19 +1893,19 @@ bool boolbvt::try_algebraic_solve()
     }
   }
 
-  // Item 14 (soundness): the Rabinowitsch unit-trick (encoding
-  // `diff != 0` as `diff*e - 1 = 0`) is UNSOUND over ZMod(2^d).
-  // It asserts `diff` is a *unit* (invertible), but over ZMod(2^d)
-  // a non-zero element need not be invertible (e.g.\ 16 mod 256).
-  // Hence UNSAT of the Rabinowitsch system does NOT imply UNSAT of
-  // the original disequality query, and the solver wrongly reported
-  // `unsat` on ~41 real SMT-LIB benchmarks. Disequalities are now
-  // refuted only by the SOUND ideal-membership routes: the vanishing
-  // polynomial test (per disequality, below) and reduction of `diff`
-  // modulo the Gröbner basis of the equalities (after gb.compute).
+  // Item 14 (soundness): the textbook Rabinowitsch unit-trick
+  // (encoding `diff != 0` as `diff*e - 1 = 0`) is UNSOUND over
+  // ZMod(2^d): it asserts `diff` is a *unit*, but a non-zero element
+  // need not be invertible (e.g. 2 mod 4). It is sound only over a
+  // field (Nullstellensatz, cox2015ideals; finite-field SMT,
+  // hader2023finitefield). We instead refute disequalities by two
+  // SOUND routes: the vanishing polynomial test (per disequality,
+  // below) and Song et al.'s ring-aware encoding `z*diff - 2^{d-1}`,
+  // which is equisatisfiable with `diff != 0` over ZMod(2^d) (Song et
+  // al. Prop. 5/6) and hence sound AND complete.
   // PROOF: formal-proofs/DisequalityRefutation.lean::
-  //   diseq_refutation_sound (diff in <F> => F=0 and diff!=0 UNSAT);
-  //   rabinowitsch_unsound_over_zmod (the unit-trick is unsound).
+  //   song_encoding_equisat, nonzero_constant_no_solution;
+  //   rabinowitsch_unsound_over_zmod documents the unsound trick.
 
   // Try each disequality independently: if any single disequality
   // is provably UNSAT (regardless of other constraints), the whole
@@ -2025,6 +2025,92 @@ bool boolbvt::try_algebraic_solve()
         }
       }
     }
+
+    // Song et al.'s sound+complete disequality encoding over
+    // ZMod(2^d): a != b is satisfiable (together with the equalities)
+    // iff there is a fresh z with z*(a-b) = 2^{d-1}, because in
+    // ZMod(2^d) an element is non-zero iff it can be scaled to the
+    // maximal-valuation element 2^{d-1} (Song et al. Prop. 5/6). We
+    // add z*(a-b) - 2^{d-1} to the equality system and refute when the
+    // strong Gröbner basis contains any non-zero constant. This is the
+    // sound replacement for the (field-only) Rabinowitsch unit-trick.
+    // PROOF: formal-proofs/DisequalityRefutation.lean::
+    //   song_encoding_equisat (equisatisfiability of the encoding) and
+    //   nonzero_constant_no_solution (a non-zero constant in the ideal
+    //   ⇒ no solution).
+    {
+      poly_extractort single_extractor;
+      auto lhs = single_extractor.to_polynomial(to_equal_expr(diseq).lhs());
+      auto rhs = single_extractor.to_polynomial(to_equal_expr(diseq).rhs());
+      if(!lhs || !rhs)
+        continue;
+      unsigned single_bw = single_extractor.get_bitwidth();
+      if(single_bw == 0)
+        continue;
+      polynomialt diff = *lhs - *rhs;
+
+      std::size_t z_idx = single_extractor.get_var_index("__song_z");
+      polynomialt z_var{single_bw, mp_integer{1}, z_idx};
+      polynomialt song =
+        (diff * z_var) -
+        polynomialt{single_bw, power(mp_integer{2}, mp_integer{single_bw - 1})};
+      song.normalize();
+      if(song.is_zero())
+        continue;
+
+      std::vector<polynomialt> single_eqs;
+      for(const auto &eq : algebraic_equalities)
+      {
+        auto poly = single_extractor.extract_equation(eq);
+        if(poly.has_value() && !poly->is_zero())
+          single_eqs.push_back(std::move(*poly));
+      }
+      for(const auto &[pred_expr, pred_val] : algebraic_predicates)
+      {
+        auto polys = single_extractor.extract_predicate(pred_expr, pred_val);
+        if(!polys.has_value())
+          continue;
+        for(auto &p : *polys)
+        {
+          p.normalize();
+          if(!p.is_zero())
+            single_eqs.push_back(std::move(p));
+        }
+      }
+      for(auto &se : single_extractor.side_equations)
+      {
+        se.normalize();
+        if(!se.is_zero())
+          single_eqs.push_back(std::move(se));
+      }
+      single_eqs.push_back(std::move(song));
+
+      if(single_eqs.size() >= 2)
+      {
+        auto alignments =
+          single_extractor.materialise_bit_alignments(single_eqs);
+        for(auto &p : alignments)
+          if(!p.is_zero())
+            single_eqs.push_back(std::move(p));
+
+        strong_groebner_basist single_gb{100000};
+        single_gb.set_bit_vars(single_extractor.get_bit_var_indices());
+        single_gb.set_host_substitutions(
+          single_extractor.get_host_substitutions());
+        if(
+          single_gb.compute(single_eqs) ==
+          strong_groebner_basist::resultt::UNSAT)
+        {
+          // PROOF: formal-proofs/DisequalityRefutation.lean::
+          //   song_encoding_equisat + nonzero_constant_no_solution
+          //   (Song's 2^{d-1} encoding is equisatisfiable with the
+          //   disequality, and a non-zero constant in the basis ⇒ the
+          //   augmented system, hence the query, is UNSAT).
+          prop.l_set_to_true(const_literal(false));
+          return true;
+        }
+      }
+    }
   }
 
   // Disjunctive disequalities: (or D1 D2 ... Dk) set to true is
@@ -2109,11 +2195,73 @@ bool boolbvt::try_algebraic_solve()
       if(branch_refuted_by_vanishing)
         continue; // this branch is UNSAT; try the next branch
 
-      // Item 14 (soundness): the Rabinowitsch unit-trick is unsound
-      // over ZMod(2^d), so a branch the vanishing test cannot refute
-      // has no sound polynomial refutation here. We cannot conclude
-      // this branch is UNSAT, so the disjunction is inconclusive and
-      // is left to bit-blasting.
+      // Song et al.'s sound+complete encoding for this branch: refute
+      // via z*(a-b) - 2^{d-1} = 0 (as in the single-disequality loop).
+      // PROOF: formal-proofs/DisequalityRefutation.lean::
+      //   song_encoding_equisat, nonzero_constant_no_solution.
+      bool branch_refuted_by_song = false;
+      {
+        poly_extractort be;
+        auto blhs = be.to_polynomial(to_equal_expr(diseq).lhs());
+        auto brhs = be.to_polynomial(to_equal_expr(diseq).rhs());
+        unsigned bbw = be.get_bitwidth();
+        if(blhs && brhs && bbw != 0)
+        {
+          polynomialt bdiff = *blhs - *brhs;
+          std::size_t z_idx = be.get_var_index("__song_z");
+          polynomialt z_var{bbw, mp_integer{1}, z_idx};
+          polynomialt song =
+            (bdiff * z_var) -
+            polynomialt{bbw, power(mp_integer{2}, mp_integer{bbw - 1})};
+          song.normalize();
+          if(!song.is_zero())
+          {
+            std::vector<polynomialt> beqs;
+            for(const auto &eq : algebraic_equalities)
+            {
+              auto poly = be.extract_equation(eq);
+              if(poly.has_value() && !poly->is_zero())
+                beqs.push_back(std::move(*poly));
+            }
+            for(const auto &[pred_expr, pred_val] : algebraic_predicates)
+            {
+              auto polys = be.extract_predicate(pred_expr, pred_val);
+              if(!polys.has_value())
+                continue;
+              for(auto &p : *polys)
+              {
+                p.normalize();
+                if(!p.is_zero())
+                  beqs.push_back(std::move(p));
+              }
+            }
+            for(auto &se : be.side_equations)
+            {
+              se.normalize();
+              if(!se.is_zero())
+                beqs.push_back(std::move(se));
+            }
+            beqs.push_back(std::move(song));
+            if(beqs.size() >= 2)
+            {
+              auto al = be.materialise_bit_alignments(beqs);
+              for(auto &p : al)
+                if(!p.is_zero())
+                  beqs.push_back(std::move(p));
+              strong_groebner_basist bgb{100000};
+              bgb.set_bit_vars(be.get_bit_var_indices());
+              bgb.set_host_substitutions(be.get_host_substitutions());
+              if(bgb.compute(beqs) == strong_groebner_basist::resultt::UNSAT)
+                branch_refuted_by_song = true;
+            }
+          }
+        }
+      }
+      if(branch_refuted_by_song)
+        continue; // this branch is UNSAT; try the next branch
+
+      // No sound refutation for this branch: the disjunction is
+      // inconclusive and is left to bit-blasting.
       all_branches_unsat = false;
       break;
     }

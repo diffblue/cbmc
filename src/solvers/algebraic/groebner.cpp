@@ -109,19 +109,18 @@ static std::size_t select_next_pair(
   return best_idx;
 }
 
-// PROOF: formal-proofs/GroebnerSoundness.lean::ZMod.isUnit_of_odd_nat
-//        Soundness: an odd natural number is a unit in Z_{2^d}.
-// PROOF: formal-proofs/GroebnerSoundness.lean::ideal_eq_top_of_unit_mem
-//        Soundness: a unit in an ideal forces the ideal to equal
-//        the whole ring.
-// PROOF: formal-proofs/GroebnerSoundness.lean::ZMod.two_not_isUnit
-//        Soundness: 2 is not a unit in Z_{2^d}, so even nonzero
-//        constants do NOT trigger UNSAT (we correctly return
-//        false for them in has_constant).
-// PROOF: formal-proofs/GroebnerSoundness.lean::soundness_of_odd_constant_check
-//        Top-level soundness theorem for this exact predicate:
-//        if an odd constant c is in the ideal, the ideal is the
-//        whole ring, hence the polynomial system is unsatisfiable.
+// PROOF: formal-proofs/GroebnerSoundness.lean::ideal_ne_top_of_has_solution
+//        Soundness: if the system has a solution, the evaluation
+//        homomorphism sends every ideal element to 0, so no nonzero
+//        constant can lie in the ideal.
+// PROOF: formal-proofs/DisequalityRefutation.lean::nonzero_constant_no_solution
+//        Top-level soundness theorem for this exact predicate: if ANY
+//        nonzero constant c is in the ideal, then under any assignment
+//        the homomorphism maps c (a constant) to itself yet must map it
+//        to 0, a contradiction; hence the system is unsatisfiable. This
+//        generalises the odd/unit case (soundness_of_odd_constant_check)
+//        and is needed for completeness of Song et al.'s 2^{d-1}
+//        disequality encoding, whose refutation witness may be even.
 bool strong_groebner_basist::has_constant(
   const std::vector<polynomialt> &basis) const
 {
@@ -129,16 +128,12 @@ bool strong_groebner_basist::has_constant(
   {
     if(!p.is_zero() && p.is_constant())
     {
-      // In Z_{2^d}, an element is a unit iff it is odd (coprime to 2^d).
-      // If an odd constant c is in the ideal I, then c^{-1} * c = 1 ∈ I,
-      // so I = Z_{2^d}[x] (the whole ring), meaning the polynomial system
-      // has no solution.
-      //
-      // Even nonzero constants (e.g., 2) are NON-units in Z_{2^d}, so we
-      // correctly return false for them.
-      mp_integer c = p.terms.front().first;
-      if(c % 2 != 0)
-        return true;
+      // ANY nonzero constant in the ideal proves unsatisfiability over
+      // Z_{2^d} (not only odd/unit constants): a constant evaluates to
+      // itself under every assignment, but every ideal element must
+      // evaluate to 0, so a nonzero constant admits no solution. The
+      // is_zero() guard above already ensures c != 0.
+      return true;
     }
   }
   return false;

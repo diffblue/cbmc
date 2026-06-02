@@ -90,18 +90,23 @@ TEST_CASE(
 }
 
 TEST_CASE(
-  "strong Gröbner basis: even-only system is UNKNOWN",
+  "strong Gröbner basis: even-only system is UNSAT",
   "[core][solvers][algebraic][groebner]")
 {
-  // F = {C 2} over ZMod 4. F is unsat (the constant 2 ≠ 0 in ZMod 4),
-  // but Ideal.span F = (2) doesn't contain odd constants. The
-  // algorithm correctly returns UNKNOWN.
-  // (See formal-proofs/StrongGB.lean::naive_completeness_is_false.)
+  // F = {C 2} over ZMod 4. F is unsat (the constant 2 ≠ 0 in ZMod 4).
+  // has_constant now refutes on ANY non-zero constant (not only odd
+  // ones): a constant evaluates to itself under every assignment, yet
+  // every ideal element must evaluate to 0, so a non-zero constant
+  // admits no solution. This is the completeness improvement needed
+  // for Song et al.'s 2^{d-1} disequality encoding, whose refutation
+  // witness may be even.
+  // PROOF: formal-proofs/DisequalityRefutation.lean::
+  //   nonzero_constant_no_solution.
   const unsigned bw = 2;
   std::vector<polynomialt> polys = {polynomialt{bw, 2}};
 
   strong_groebner_basist gb{100000};
-  REQUIRE(gb.compute(polys) == strong_groebner_basist::resultt::UNKNOWN);
+  REQUIRE(gb.compute(polys) == strong_groebner_basist::resultt::UNSAT);
 }
 
 TEST_CASE(

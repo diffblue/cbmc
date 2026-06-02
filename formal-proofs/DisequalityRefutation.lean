@@ -25,7 +25,31 @@
 
 import Mathlib.Data.ZMod.Basic
 import Mathlib.RingTheory.Ideal.Basic
+import Mathlib.Algebra.MvPolynomial.Basic
+import Mathlib.Algebra.MvPolynomial.Eval
 import Mathlib.Tactic
+
+/-! ## Any non-zero constant in the ideal ⇒ no solution
+
+This backs `groebner.cpp::has_constant`, which now reports UNSAT when
+the strong Gröbner basis contains ANY non-zero constant (not only an
+odd/unit one). Over `ZMod (2^d)` an assignment is `MvPolynomial.eval`
+at a point; a constant polynomial evaluates to that constant, but
+every element of the ideal must evaluate to zero, so a non-zero
+constant in the ideal admits no solution. This generalises the
+odd/unit case and is needed for completeness of the `2^{d-1}`
+disequality encoding (whose refutation witness may be even). -/
+
+/-- A non-zero constant in the ideal rules out all solutions. -/
+theorem nonzero_constant_no_solution {d n : ℕ}
+    (I : Ideal (MvPolynomial (Fin n) (ZMod (2 ^ d))))
+    {c : ZMod (2 ^ d)} (hc : c ≠ 0) (hmem : MvPolynomial.C c ∈ I) :
+    ¬ ∃ v : Fin n → ZMod (2 ^ d), ∀ f ∈ I, MvPolynomial.eval v f = 0 := by
+  rintro ⟨v, hv⟩
+  have h := hv _ hmem
+  rw [MvPolynomial.eval_C] at h
+  exact hc h
+
 
 /-! ## Soundness of ideal-membership refutation
 
@@ -86,3 +110,66 @@ theorem ideal_membership_declines_witness :
     (2 : ZMod 4) ∉ (⊥ : Ideal (ZMod 4)) := by
   rw [Ideal.mem_bot]
   decide
+
+/-! ## Song et al.'s `2^{d-1}` disequality encoding (Prop. 5/6)
+
+Over `ZMod (2^d)`, `u ≠ 0` iff `u` can be scaled to the
+maximal-2-adic-valuation element `2^{d-1}`. This is the soundness +
+completeness justification for refuting `a ≠ b` via the augmented
+constraint `z·(a-b) - 2^{d-1} = 0` (with `u = a - b`). -/
+
+/-- An odd natural is a unit in `ZMod (2^d)` (as in GroebnerSoundness). -/
+private theorem isUnit_of_odd {d m : ℕ} (hm : ¬ 2 ∣ m) :
+    IsUnit ((m : ℕ) : ZMod (2 ^ d)) := by
+  rw [ZMod.isUnit_iff_coprime]
+  exact (Nat.Prime.coprime_iff_not_dvd Nat.prime_two |>.mpr hm).symm.pow_right d
+
+/-- Song et al. Prop. 5/6: over `ZMod (2^d)`, `u ≠ 0` iff `u` can be
+    scaled to `2^{d-1}`. Forward is the 2-adic valuation argument
+    (`u = 2^α · odd`, `α < d`); backward holds because `2^{d-1} ≠ 0`. -/
+theorem song_encoding_equisat {d : ℕ} (hd : 0 < d) (u : ZMod (2 ^ d)) :
+    u ≠ 0 ↔ ∃ z : ZMod (2 ^ d), z * u = 2 ^ (d - 1) := by
+  have hpos : 0 < 2 ^ d := by positivity
+  haveI : NeZero (2 ^ d) := ⟨hpos.ne'⟩
+  have hconst : (2 : ZMod (2 ^ d)) ^ (d - 1) ≠ 0 := by
+    have h0 : ((2 ^ (d - 1) : ℕ) : ZMod (2 ^ d)) ≠ 0 := by
+      rw [Ne, ZMod.natCast_zmod_eq_zero_iff_dvd]
+      intro h
+      have hle := Nat.le_of_dvd (by positivity) h
+      have : d ≤ d - 1 := (Nat.pow_le_pow_iff_right (by norm_num)).1 hle
+      omega
+    simpa using h0
+  refine ⟨fun hu => ?_, ?_⟩
+  · have hval : ((u.val : ℕ) : ZMod (2 ^ d)) = u := ZMod.natCast_rightInverse u
+    have hn0 : u.val ≠ 0 := by
+      intro h
+      exact hu (by rw [← hval, h, Nat.cast_zero])
+    set n := u.val with hn
+    set α := n.factorization 2 with hα
+    have hsplit : 2 ^ α * (n / 2 ^ α) = n :=
+      Nat.ordProj_mul_ordCompl_eq_self n 2
+    have hodd : ¬ 2 ∣ (n / 2 ^ α) := Nat.not_dvd_ordCompl Nat.prime_two hn0
+    have hαd : α < d := by
+      have hdvd : 2 ^ α ∣ n := Nat.ordProj_dvd n 2
+      have h1 : 2 ^ α ≤ n := Nat.le_of_dvd (Nat.pos_of_ne_zero hn0) hdvd
+      have h2 : 2 ^ α < 2 ^ d := lt_of_le_of_lt h1 (ZMod.val_lt u)
+      exact (Nat.pow_lt_pow_iff_right (by norm_num)).1 h2
+    have hu_eq : u = (2 : ZMod (2 ^ d)) ^ α * ((n / 2 ^ α : ℕ) : ZMod (2 ^ d)) := by
+      have h2 : u = ((2 ^ α * (n / 2 ^ α) : ℕ) : ZMod (2 ^ d)) := by
+        rw [hsplit, hval]
+      rw [h2]; push_cast; ring
+    obtain ⟨w, hw⟩ := (isUnit_of_odd (d := d) hodd).exists_right_inv
+    refine ⟨(2 : ZMod (2 ^ d)) ^ (d - 1 - α) * w, ?_⟩
+    have hpow : (2 : ZMod (2 ^ d)) ^ (d - 1 - α) * (2 : ZMod (2 ^ d)) ^ α
+        = 2 ^ (d - 1) := by
+      rw [← pow_add]; congr 1; omega
+    rw [hu_eq]
+    calc
+      (2 ^ (d - 1 - α) * w) * (2 ^ α * ((n / 2 ^ α : ℕ) : ZMod (2 ^ d)))
+          = (2 ^ (d - 1 - α) * 2 ^ α)
+              * (((n / 2 ^ α : ℕ) : ZMod (2 ^ d)) * w) := by ring
+      _ = 2 ^ (d - 1) * 1 := by rw [hpow, hw]
+      _ = 2 ^ (d - 1) := by ring
+  · rintro ⟨z, hz⟩ hu0
+    rw [hu0, mul_zero] at hz
+    exact hconst hz.symm
