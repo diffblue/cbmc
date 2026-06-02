@@ -43,6 +43,16 @@ extern exprt try_evaluate_constexpr(
 #include <algorithm>
 #include <set>
 
+/// \return true if any template parameter of \p template_type is a
+///   variadic pack (an ellipsis parameter, [temp.variadic]).
+static bool has_variadic_template_parameter(const template_typet &template_type)
+{
+  for(const auto &p : template_type.template_parameters())
+    if(p.get_bool(ID_ellipsis))
+      return true;
+  return false;
+}
+
 cpp_typecheck_resolvet::cpp_typecheck_resolvet(cpp_typecheckt &_cpp_typecheck)
   : cpp_typecheck(_cpp_typecheck),
     original_scope(nullptr) // set in resolve_scope()
@@ -5974,6 +5984,30 @@ void cpp_typecheck_resolvet::apply_template_args(
 
     expr = type_exprt(struct_tag_typet(new_symbol.name));
     expr.add_source_location() = source_location;
+  }
+  else if(
+    fargs.in_use && cpp_declaration.declarators().size() == 1 &&
+    cpp_declaration.declarators().front().type().id() == ID_function_type &&
+    !has_variadic_template_parameter(cpp_declaration.template_type()))
+  {
+    // [temp.inst]/2 and [over.match]: in a function-call context,
+    // overload resolution uses only the signature of each candidate;
+    // a specialization's definition is instantiated only when that
+    // specialization is used (i.e. selected and called).  Defer
+    // instantiation by storing the explicit template arguments and
+    // letting guess_function_template_args form the signature; the
+    // body of the *selected* overload alone is then instantiated via
+    // the ID_template_function_instance path after disambiguation.
+    // Eagerly instantiating every named candidate's body here turned a
+    // body error in a non-selected overload (e.g. the
+    // `numeric_cast_v(const mp_integer&)` overload, whose body is
+    // ill-formed for Target=mp_integer) into a spurious hard error
+    // during resolution of `numeric_cast_v<mp_integer>(constant_exprt)`.
+    // Variadic templates are left on the eager path: their pack
+    // expansion is performed by instantiate_template, not by
+    // guess_function_template_args.
+    expr.add(ID_C_template_arguments) = template_args_tc;
+    return;
   }
   else
   {
