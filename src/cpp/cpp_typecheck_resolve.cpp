@@ -1061,11 +1061,25 @@ void cpp_typecheck_resolvet::disambiguate_functions(
                               .get_sub()
                               .size();
 
-      // we give strong preference to functions that have
-      // fewer template arguments
+      // [over.match.best]/1 + [over.ics.rank]: ranking is primarily by
+      // the quality of the argument implicit-conversion sequences
+      // (`args_distance`); preferring a non-template / fewer-template-
+      // argument candidate ([over.match.best]/1, last bullet) is only a
+      // tie-breaker that applies when the conversion sequences are
+      // otherwise indistinguishable.  Order lexicographically with
+      // `args_distance` as the high-order key and `template_distance` as
+      // the low-order key, so a candidate with a strictly better ICS
+      // wins regardless of template-ness.  Without this, a non-template
+      // copy constructor `optional(const optional<T>&)` whose argument
+      // needs a (second) user-defined conversion `T -> optional<T>`
+      // (args_distance 4, template_distance 0) would beat the direct
+      // converting constructor `optional(_Up&&)` with `_Up=T` (a perfect
+      // match, args_distance 0, but template_distance >= 1) — violating
+      // [over.best.ics] (an implicit conversion sequence contains at
+      // most one user-defined conversion).
       std::size_t total_distance =
         // NOLINTNEXTLINE(whitespace/operators)
-        1000 * template_distance + args_distance;
+        1000000 * args_distance + template_distance;
 
       distance_map.insert({total_distance, old_id});
     }
