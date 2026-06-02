@@ -664,6 +664,22 @@ methodology/soundness section must be rewritten (see Item 14b).**
 ---
 
 ### Item 14b — Rewrite the paper's disequality methodology — **NEW, CRITICAL (blocks submission)**
+### Item 14b — Rewrite the paper's disequality methodology — **DONE**
+
+**Status**: Done (commit `03b51eced8`). `paper.tex` now adopts Song
+et al.'s `z*(a-b) - 2^{d-1}` encoding throughout; the false
+"Soundness" theorem is replaced by Song Prop. 5/6 (mechanised in
+`DisequalityRefutation.lean::song_encoding_equisat` +
+`nonzero_constant_no_solution`), a remark documents that the textbook
+field Rabinowitsch trick is unsound over ZMod(2^d), the Buchberger
+pseudocode refutes on ANY non-zero constant, the contributions
+table/list, worked examples, evaluation prose, Lean-soundness item and
+conclusion are all updated, a "Scaling to large bitwidths"
+related-work paragraph cites Hofstadler et al. + the SCA line with the
+prime-power/multimodular limitation, the bib entries are added, and
+the stale Lean theorem count is corrected. Paper compiles cleanly (no
+undefined refs/citations). Original open description retained below for
+the record.
 
 **Status**: Open. The code no longer uses Rabinowitsch, so
 `doc/paper-algebraic/paper.tex` is now **factually wrong** in several
