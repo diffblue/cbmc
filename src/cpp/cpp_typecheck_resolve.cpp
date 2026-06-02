@@ -2578,8 +2578,37 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
 
     const cpp_declarationt &cpp_declaration = to_cpp_declaration(s.type);
 
-    const cpp_template_args_non_tct &partial_specialization_args =
+    cpp_template_args_non_tct partial_specialization_args =
       cpp_declaration.partial_specialization_args();
+
+    // [temp.class.spec.match], [temp.arg]/2: a specialization's
+    // argument list is completed with the primary template's default
+    // arguments.  A full specialization `template<> struct C<X>` of a
+    // primary template with a defaulted parameter
+    // (`template<class T, class = void> struct C`) has the written
+    // argument list <X>, but its effective argument list is <X, void>;
+    // a use `C<X>` likewise resolves to <X, void>.  Pad the written
+    // arguments with the primary's default arguments so the size check
+    // and matching below operate on the completed list.  An incorrect
+    // padding cannot cause a spurious match: the exact-equality check
+    // against `full_template_args_tc` further below is the final
+    // arbiter.
+    for(std::size_t i = partial_specialization_args.arguments().size();
+        i < full_template_args_tc.arguments().size();
+        ++i)
+    {
+      const auto &primary_params =
+        to_cpp_declaration(primary_template_symbol.type)
+          .template_type()
+          .template_parameters();
+      if(i >= primary_params.size())
+        break;
+      const template_parametert &p =
+        static_cast<const template_parametert &>(primary_params[i]);
+      if(!p.has_default_argument())
+        break;
+      partial_specialization_args.arguments().push_back(p.default_argument());
+    }
 
     // alright, set up template arguments as 'unassigned'
 
