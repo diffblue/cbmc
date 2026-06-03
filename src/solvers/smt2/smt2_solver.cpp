@@ -219,6 +219,14 @@ void smt2_solvert::setup_commands()
       if(next_token() != smt2_tokenizert::CLOSE)
         throw error("check-sat-assuming expects ')' at end of list");
 
+      // Encode all deferred assertions, exactly as check-sat does.
+      // Without this the regular assertion stack is ignored, and
+      // check-sat-assuming wrongly reports sat (e.g. for an asserted
+      // false) regardless of the actual assertions.
+      for(const auto &e : deferred_assertions)
+        solver.set_to_true(e);
+      deferred_assertions.clear();
+
       // add constant definitions as constraints
       define_constants();
 
