@@ -2443,14 +2443,47 @@ bool boolbvt::try_algebraic_solve()
     if(!candidate.empty())
     {
       const auto &rev_map = extractor.get_reverse_var_map();
+
+      // Map each variable identifier to its real type, taken from the
+      // collected (typed) equation expressions. The reverse var map only
+      // stores identifiers, not types. Reconstructing the hint symbol with
+      // the ring width `bw` (as was done previously) creates a
+      // width-inconsistent boolbv_map entry for any variable whose real
+      // width differs from bw, which later trips the get_literals width
+      // invariant when the assertion is converted normally. The candidate
+      // assignment is only a soft, gate-retractable hint, so it is sound to
+      // reconstruct with the real type and to skip variables whose width
+      // does not match the ring width.
+      std::map<irep_idt, typet> id_type;
+      auto collect = [&id_type](const exprt &root)
+      {
+        root.visit_pre(
+          [&id_type](const exprt &e)
+          {
+            if(e.id() == ID_symbol)
+              id_type.emplace(to_symbol_expr(e).get_identifier(), e.type());
+          });
+      };
+      for(const auto &e : algebraic_equalities)
+        collect(e);
+      for(const auto &e : algebraic_disequalities)
+        collect(e);
+      for(const auto &grp : algebraic_disjunctive_disequalities)
+        for(const auto &e : grp)
+          collect(e);
+
       for(const auto &[var_idx, val] : candidate)
       {
         auto name_it = rev_map.find(var_idx);
         if(name_it == rev_map.end())
           continue;
 
+        auto type_it = id_type.find(name_it->second);
+        if(type_it == id_type.end() || boolbv_width(type_it->second) != bw)
+          continue;
+
         // Look up the bit-vector for this symbol in boolbvt's cache
-        symbol_exprt sym(name_it->second, unsignedbv_typet(bw));
+        symbol_exprt sym(name_it->second, type_it->second);
         const bvt &bv = convert_bv(sym);
 
         // Add implications: for each bit, if the candidate value
