@@ -97,6 +97,10 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     return;
   functions_being_typechecked.insert(symbol.name);
 
+  // A function body is a run-time context: suspend any enclosing
+  // constant-expression context so its statements are not folded.
+  non_constant_expression_contextt non_constant_guard{*this};
+
   code_typet &function_type=
     to_code_type(template_subtype(symbol.type));
 

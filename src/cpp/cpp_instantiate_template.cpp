@@ -78,6 +78,9 @@ std::string cpp_typecheckt::template_suffix(
     }
     else // expression
     {
+      // [temp.arg.nontype]: a non-type template argument is a
+      // converted constant expression; fold constexpr calls in it.
+      constant_expression_contextt constant_expression_guard{*this};
       exprt e=expr;
 
       // Recursively resolve constant symbols to their values, so that
@@ -2012,6 +2015,13 @@ const symbolt &cpp_typecheckt::instantiate_template(
   instantiation_stack.back().source_location=source_location;
   instantiation_stack.back().identifier=template_symbol.name;
   instantiation_stack.back().full_template_args=full_template_args;
+
+  // [temp.inst]: instantiating a template is not itself a constant
+  // evaluation.  Suspend any enclosing constant-expression context so
+  // the instantiated declarations/definitions (e.g. constructor SFINAE
+  // constraints) are not eagerly folded; constant-required
+  // sub-expressions re-establish the context via their own guards.
+  non_constant_expression_contextt non_constant_guard{*this};
 
 #ifdef DEBUG
   std::cout << "L: " << source_location << '\n';

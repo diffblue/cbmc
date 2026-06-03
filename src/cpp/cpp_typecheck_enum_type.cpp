@@ -37,6 +37,8 @@ void cpp_typecheckt::typecheck_enum_body(symbolt &enum_symbol)
     if(component.find(ID_value).is_not_nil())
     {
       exprt &value = static_cast<exprt &>(component.add(ID_value));
+      // [dcl.enum]: an enumerator value is a constant expression.
+      constant_expression_contextt constant_expression_guard{*this};
       typecheck_expr(value);
       implicit_typecast(value, c_enum_type.underlying_type());
       make_constant(value);

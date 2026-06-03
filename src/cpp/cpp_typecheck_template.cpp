@@ -2042,6 +2042,10 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
     }
     else // expression
     {
+      // [temp.arg.nontype]: a non-type template argument is a
+      // converted constant expression, so constexpr calls in it must
+      // be folded ([expr.const]).
+      constant_expression_contextt constant_expression_guard{*this};
       // Ambiguous args in non-type parameter context: treat as expression.
       // The parser stores noexcept(...) and other expressions as
       // ambiguous nodes with a cpp_name type interpretation.
