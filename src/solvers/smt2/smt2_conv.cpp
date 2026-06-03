@@ -1196,17 +1196,16 @@ std::string smt2_convt::floatbv_suffix(const exprt &expr) const
 void smt2_convt::convert_floatbv(const exprt &expr)
 {
   // `convert_floatbv` lowers FP operations to their bit-vector encoding
-  // (via the `float_bv.<id>` helper functions defined elsewhere).  Two
-  // shapes occur:
-  //   - floatbv result type: only legal when that type is encoded as a
-  //     bit-vector (FPA theory disabled globally or operand is x86 80-bit
-  //     extended; see `use_FPA_for_type`).
-  //   - non-floatbv result type (typically bool for isnan/isinf/...,
-  //     or signed/unsigned int for fp.to_sbv/fp.to_ubv lowerings):
-  //     always legal -- the bit-vector lowering of these predicates does
-  //     not produce a floatbv value.
-  PRECONDITION(
-    expr.type().id() != ID_floatbv || !use_FPA_for_type(expr.type()));
+  // (via the `float_bv.<id>` helper functions defined elsewhere).  The
+  // helper's return sort matches `convert_type(expr.type())`, so an
+  // FPA-encoded float result is already produced as an FPA value by the
+  // helper body -- no reinterpretation is needed here.  Operands that
+  // are FPA-encoded floats, however, must be flattened to their IEEE
+  // bit pattern (the bvfromfloat reinterpret) so the bit-vector helper
+  // body sees bit-vector inputs.  This only matters for boundary-
+  // crossing floatbv_typecast (e.g. (long double)d, (double)long_double);
+  // for homogeneous ops the operands are already in the helper's
+  // encoding.
 
   if(expr.id()==ID_symbol)
   {
@@ -1232,7 +1231,12 @@ void smt2_convt::convert_floatbv(const exprt &expr)
   for(const auto &op : expr.operands())
   {
     out << ' ';
-    convert_expr(op);
+    // FPA-encoded float operands must be presented to the bit-vector
+    // helper as their IEEE bit pattern (the bvfromfloat reinterpret).
+    if(op.type().id() == ID_floatbv && use_FPA_for_type(op.type()))
+      convert_expr(typecast_exprt{op, bv_typet{boolbv_width(op.type())}});
+    else
+      convert_expr(op);
   }
 
   out << ')';
@@ -3406,8 +3410,9 @@ void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
 
       const floatbv_typet &dst=to_floatbv_type(dest_type);
 
-      if(use_FPA_for_type(dst))
+      if(use_FPA_for_type(dst) && use_FPA_for_type(src_type))
       {
+        // Both sides FPA-encoded: native FPA value conversion.
         out << "((_ to_fp " << dst.get_e() << " "
             << dst.get_f() + 1 << ") ";
         convert_rounding_mode_FPA(expr.op1());
@@ -3417,21 +3422,11 @@ void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
       }
       else
       {
-        // KNOWN LIMITATION: when the destination is x86 80-bit extended
-        // (BV-encoded) and the source is binary{32,64} (FPA-encoded
-        // under cprover-smt2/Z3/CVC5/Bitwuzla), the bit-vector lowering
-        // emitted by `convert_floatbv` calls a `float_bv.*` helper that
-        // expects bit-vector operands, but `convert_expr(src)` here
-        // would emit the FPA-typed source.  The resulting SMT-LIB is
-        // mistyped.  An explicit FP->BV flatten on the source operand
-        // is needed; this is tracked separately and currently masked
-        // by the `broken-cprover-smt-backend` tag on the
-        // `long-double-roundtrip-x86` regression test.  The reverse
-        // direction (BV-encoded x86-extended source, FPA-encoded
-        // destination) above is similarly affected: `(_ to_fp ...)`
-        // expects an IEEE-encoded bit-vector operand, not an
-        // x86-extended pattern with explicit J-bit and storage
-        // padding.
+        // At least one side is bit-vector-encoded (x86 80-bit extended
+        // long double).  Lower the value-preserving conversion through
+        // the bit-vector float_bv helper; convert_floatbv flattens any
+        // FPA-encoded operand to its IEEE bit pattern and unflattens an
+        // FPA-encoded result via (_ to_fp ...).
         convert_floatbv(expr);
       }
     }
@@ -5746,7 +5741,17 @@ void smt2_convt::find_symbols(const exprt &expr)
   }
   // clang-format off
   else if(expr.operands().size() >= 1 &&
-          !use_FPA_for_type(to_multi_ary_expr(expr).op0().type()) &&
+          (!use_FPA_for_type(to_multi_ary_expr(expr).op0().type()) ||
+           // boundary-crossing floatbv_typecast: src and dst floats use
+           // different encodings (one FPA, one bit-vector x86-extended),
+           // so the conversion is lowered via the bit-vector float_bv
+           // helper with the FPA side flattened/unflattened (see below
+           // and convert_floatbv).
+           (expr.id() == ID_floatbv_typecast &&
+            expr.type().id() == ID_floatbv &&
+            to_multi_ary_expr(expr).op0().type().id() == ID_floatbv &&
+            use_FPA_for_type(to_multi_ary_expr(expr).op0().type()) !=
+              use_FPA_for_type(expr.type()))) &&
           (expr.id() == ID_floatbv_plus ||
            expr.id() == ID_floatbv_minus ||
            expr.id() == ID_floatbv_mult ||
@@ -5768,8 +5773,31 @@ void smt2_convt::find_symbols(const exprt &expr)
              expr.id() == ID_typecast ||
              expr.id() == ID_abs) &&
              to_multi_ary_expr(expr).op0().type().id() == ID_floatbv)))
-  // clang-format on
   {
+    // clang-format on
+    // Helper-function parameters and return value are bit-vectors.  For
+    // an FPA-encoded float operand or result we use the bit-vector sort
+    // of the corresponding IEEE encoding and flatten/unflatten at the
+    // call site (see convert_floatbv); the float_bv body operates on the
+    // bit pattern regardless.
+    const auto bv_lowered_sort = [this](const typet &t)
+    {
+      if(t.id() == ID_floatbv && use_FPA_for_type(t))
+        out << "(_ BitVec " << boolbv_width(t) << ")";
+      else
+        convert_type(t);
+    };
+
+    // Pre-register the bit-vector reinterpretation of any FPA-encoded
+    // float operand so its bvfromfloat declaration is emitted before the
+    // call site references it.  This is done per occurrence (independent
+    // of whether the shared helper body is defined below).
+    for(const auto &op : expr.operands())
+    {
+      if(op.type().id() == ID_floatbv && use_FPA_for_type(op.type()))
+        find_symbols(typecast_exprt{op, bv_typet{boolbv_width(op.type())}});
+    }
+
     irep_idt function =
       convert_identifier("float_bv." + expr.id_string() + floatbv_suffix(expr));
 
@@ -5785,11 +5813,17 @@ void smt2_convt::find_symbols(const exprt &expr)
         if(i!=0)
           out << " ";
         out << "(op" << i << ' ';
-        convert_type(expr.operands()[i].type());
+        bv_lowered_sort(expr.operands()[i].type());
         out << ')';
       }
 
       out << ") ";
+      // The return sort is the natural sort of the result type: a
+      // bit-vector for x86-extended (BV-encoded) results, the FPA sort
+      // for an FPA-encoded result.  float_bv's lowering produces a
+      // value of the result type, which convert_expr renders in exactly
+      // that encoding (emitting (_ to_fp ...) over the packed bits for
+      // an FPA result), so no parameter-style flattening applies here.
       convert_type(expr.type()); // return type
       out << ' ';
 
@@ -5799,6 +5833,32 @@ void smt2_convt::find_symbols(const exprt &expr)
           smt2_symbolt("op"+std::to_string(i), tmp1.operands()[i].type());
 
       exprt tmp2=float_bv(tmp1);
+
+      // For FPA-encoded float operands the parameter is declared as a
+      // bit-vector (see bv_lowered_sort) and the call site passes the
+      // flattened IEEE bit pattern.  float_bv's lowering, however, emits
+      // bit operations on the original floatbv-typed `op_i` symbol; left
+      // as-is, convert_expr would try to flatten2bv that FPA value (which
+      // is forbidden).  Retype those operand symbols to the matching
+      // bit-vector so the body operates on the bit pattern directly.
+      for(std::size_t i = 0; i < expr.operands().size(); i++)
+      {
+        const typet &op_type = expr.operands()[i].type();
+        if(op_type.id() == ID_floatbv && use_FPA_for_type(op_type))
+        {
+          const smt2_symbolt fpa_sym{"op" + std::to_string(i), op_type};
+          const smt2_symbolt bv_sym{
+            "op" + std::to_string(i), bv_typet{boolbv_width(op_type)}};
+          for(auto it = tmp2.depth_begin(), itend = tmp2.depth_end();
+              it != itend;
+              ++it)
+          {
+            if(*it == fpa_sym)
+              it.mutate() = bv_sym;
+          }
+        }
+      }
+
       tmp2=letify(tmp2);
       CHECK_RETURN(!tmp2.is_nil());
 
