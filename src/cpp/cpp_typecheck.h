@@ -846,6 +846,64 @@ private:
   std::map<irep_idt, exprt> generic_lambda_map;
   bool support_float16_type;
 
+  /// Counter that is non-zero while type-checking an expression that
+  /// is required to be a constant expression ([expr.const]): non-type
+  /// template arguments, array bounds, enumerator and bit-field
+  /// values, `static_assert` operands, `case` labels, and `constexpr`
+  /// initializers (and inside `make_constant`).  The constexpr
+  /// evaluator in `typecheck_side_effect_function_call` only folds
+  /// calls while this is non-zero; ordinary run-time elaboration -- by
+  /// far the bulk of the work -- therefore skips the (expensive)
+  /// folding, which is unnecessary outside a constant-required
+  /// context because such calls denote ordinary run-time invocations.
+  unsigned constant_expression_context = 0;
+  friend class sfinae_contextt;
+
+  /// RAII guard marking a constant-expression context for its lifetime.
+  class constant_expression_contextt
+  {
+  public:
+    explicit constant_expression_contextt(cpp_typecheckt &_cpp_typecheck)
+      : cpp_typecheck(_cpp_typecheck)
+    {
+      ++cpp_typecheck.constant_expression_context;
+    }
+    ~constant_expression_contextt()
+    {
+      --cpp_typecheck.constant_expression_context;
+    }
+
+  private:
+    cpp_typecheckt &cpp_typecheck;
+  };
+
+  /// RAII guard that suspends any constant-expression context for its
+  /// lifetime.  Used while type-checking a function body: a constexpr
+  /// call appearing as an ordinary statement/sub-expression of a body
+  /// is a run-time invocation, even when the body is reached (e.g. via
+  /// template instantiation) from within a constant-required context.
+  /// The evaluator's own nested folding stays enabled because it
+  /// recurses through `typecheck_side_effect_function_call` directly,
+  /// not through `convert_function`.
+  class non_constant_expression_contextt
+  {
+  public:
+    explicit non_constant_expression_contextt(cpp_typecheckt &_cpp_typecheck)
+      : cpp_typecheck(_cpp_typecheck),
+        saved(_cpp_typecheck.constant_expression_context)
+    {
+      cpp_typecheck.constant_expression_context = 0;
+    }
+    ~non_constant_expression_contextt()
+    {
+      cpp_typecheck.constant_expression_context = saved;
+    }
+
+  private:
+    cpp_typecheckt &cpp_typecheck;
+    unsigned saved;
+  };
+
   /// Stack of currently-active target types for nested calls; pushed
   /// by `typecheck_side_effect_function_call(exprt &,
   /// const target_typet &)` and read by
