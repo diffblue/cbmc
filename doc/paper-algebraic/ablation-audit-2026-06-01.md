@@ -172,6 +172,18 @@ them:
   investigation, not part of Item 13. List:
   `.../sat-scan-preexisting-bitblast.txt`.
 
+  > **CORRECTION (2026-06-03):** the "pre-existing" / "the CBMC
+  > bit-blaster itself" characterisation here is **wrong**. These
+  > `float` (and `mcm`) wrong-`unsat` results reproduce with
+  > `DISABLE_ALGEBRAIC=1` because they are *not* in the algebraic
+  > layer — but they are **not** pre-existing upstream either. A
+  > merge-base baseline build returns the correct `sat`, and
+  > `git bisect` identified them as **branch-introduced** by
+  > commit `d06d50c678` (an unsound "adjacent equality
+  > implications" SAT-encoding optimisation in
+  > `bv_utils::equal()`). Fixed in commit `8a6f7b2ef1`. See
+  > `soundness-sweep-findings-2026-06-03.md`.
+
 ### Root cause is systemic, across ≥4 refutation paths
 
 The 41 algebra-caused failures are the **Rabinowitsch
@@ -235,7 +247,13 @@ Re-running the **broad SAT scan** after the fix: **0 non-float
 wrong-unsat** (down from 41). The 35 `float` wrong-unsat persist
 and are confirmed pre-existing (reproduce with
 `DISABLE_ALGEBRAIC=1`) — a separate CBMC bit-blaster/SMT2
-front-end issue, not the algebraic pre-solver. Genuine wins:
+front-end issue, not the algebraic pre-solver.
+<!-- CORRECTION (2026-06-03): "pre-existing ... CBMC bit-blaster"
+is wrong; these float wrong-unsat are branch-introduced by commit
+d06d50c678 (unsound adjacent-equality clause in bv_utils::equal()),
+not upstream, and are fixed in 8a6f7b2ef1. See
+soundness-sweep-findings-2026-06-03.md. -->
+Genuine wins:
 SABER 4/4 and Brain 4/4 preserved; cohencu_0/1 preserved via the
 sound ideal-membership path (Bitwuzla confirms unsat). **Lost:
 cohencu_2, cohencu_3, geo3.c_5** (3 SMT-COMP unlocks) — the
