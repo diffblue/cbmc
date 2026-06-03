@@ -1658,12 +1658,6 @@ static smt_termt dispatch_expr_to_smt_conversion(
   {
     return convert_expr_to_smt(*multiply, converted);
   }
-#if 0
-  else if(expr.id() == ID_floatbv_rem)
-  {
-    convert_floatbv_rem(to_binary_expr(expr));
-  }
-#endif
   if(const auto address_of = expr_try_dynamic_cast<address_of_exprt>(expr))
   {
     return convert_expr_to_smt(*address_of, converted, object_map);
