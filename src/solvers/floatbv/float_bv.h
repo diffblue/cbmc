@@ -105,6 +105,13 @@ public:
 private:
   // helpers
   static ieee_float_spect get_spec(const exprt &);
+
+  // Integer-significand fmod, correct for arbitrarily large exponent
+  // differences.  Sets trunc_q_odd to the parity of the truncated
+  // quotient floor(x/y), used for IEEE remainder tie-breaking.
+  exprt fmod_via_significand(const exprt &x, const exprt &y, exprt &trunc_q_odd)
+    const;
+
   // still biased
   static exprt get_exponent(const exprt &, const ieee_float_spect &);
   // without hidden bit
