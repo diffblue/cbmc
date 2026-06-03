@@ -102,6 +102,7 @@ private:
   cpp_typecheckt &typecheck;
   message_handlert *saved_handler;
   std::size_t saved_error_count;
+  unsigned saved_constant_expression_context;
   null_message_handlert null_handler;
 };
 

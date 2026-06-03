@@ -210,6 +210,8 @@ void cpp_typecheckt::typecheck_type(typet &type)
 
     if(size_expr.is_not_nil())
     {
+      // [dcl.array]: an array bound is a converted constant expression.
+      constant_expression_contextt constant_expression_guard{*this};
       typecheck_expr(size_expr);
       simplify(size_expr, *this);
     }

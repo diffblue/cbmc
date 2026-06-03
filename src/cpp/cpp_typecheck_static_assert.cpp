@@ -37,7 +37,11 @@ propagate_constants(exprt &expr, const symbol_table_baset &symbol_table)
 
 void cpp_typecheckt::convert(cpp_static_assertt &cpp_static_assert)
 {
-  typecheck_expr(cpp_static_assert.op0());
+  {
+    // The static_assert condition is a constant expression ([dcl.pre]).
+    constant_expression_contextt constant_expression_guard{*this};
+    typecheck_expr(cpp_static_assert.op0());
+  }
   typecheck_expr(cpp_static_assert.op1());
 
   implicit_typecast_bool(cpp_static_assert.op0());

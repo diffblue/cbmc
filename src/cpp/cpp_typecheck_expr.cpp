@@ -3512,9 +3512,9 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
        symbol_ptr->value.id() == ID_code);
     bool eligible_constexpr =
       symbol_ptr != nullptr && symbol_ptr->is_macro &&
+      constant_expression_context != 0 &&
       !functions_being_typechecked.count(sym_expr->get_identifier()) &&
-      !deferred_typechecking.count(sym_expr->get_identifier()) &&
-      body_is_code;
+      !deferred_typechecking.count(sym_expr->get_identifier()) && body_is_code;
     if(eligible_constexpr)
     {
       // Pre-check whether the arguments are fully constant: if not,
