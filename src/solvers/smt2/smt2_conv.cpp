@@ -5726,7 +5726,7 @@ void smt2_convt::find_symbols(const exprt &expr)
       const auto &floatbv_type = to_floatbv_type(tc.op().type());
       out << "(assert (= ";
       out << "((_ to_fp " << floatbv_type.get_e() << " "
-          << floatbv_type.get_f() + 1 << ") " << id << ')';
+          << floatbv_type.get_f() + 1 << ") " << id << ") ";
       convert_expr(tc.op());
       out << ')'; // =
       out << ')' << '\n';
