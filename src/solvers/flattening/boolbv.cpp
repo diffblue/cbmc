@@ -21,6 +21,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/string_constant.h>
 
+#include <solvers/algebraic/groebner.h>
+#include <solvers/algebraic/poly_extract.h>
 #include <solvers/floatbv/float_utils.h>
 
 #include "literal_vector_expr.h"
@@ -42,7 +44,7 @@ const bvt &boolbvt::convert_bv(
   std::optional<std::size_t> expected_width)
 {
   // check cache first
-  std::pair<bv_cachet::iterator, bool> cache_result=
+  std::pair<bv_cachet::iterator, bool> cache_result =
     bv_cache.insert(std::make_pair(expr, bvt()));
 
   // get a reference to the cache entry
@@ -97,7 +99,7 @@ bvt boolbvt::conversion_failed(const exprt &expr)
   ignoring(expr);
 
   // try to make it free bits
-  std::size_t width=boolbv_width(expr.type());
+  std::size_t width = boolbv_width(expr.type());
   return prop.new_variables(width);
 }
 
@@ -111,42 +113,43 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
   if(expr.is_boolean())
     return {convert(expr)};
 
-  if(expr.id()==ID_index)
+  if(expr.id() == ID_index)
     return convert_index(to_index_expr(expr));
-  else if(expr.id()==ID_constraint_select_one)
+  else if(expr.id() == ID_constraint_select_one)
     return convert_constraint_select_one(expr);
-  else if(expr.id()==ID_member)
+  else if(expr.id() == ID_member)
     return convert_member(to_member_expr(expr));
-  else if(expr.id()==ID_with)
+  else if(expr.id() == ID_with)
     return convert_with(to_with_expr(expr));
-  else if(expr.id()==ID_update)
+  else if(expr.id() == ID_update)
     return convert_update(to_update_expr(expr));
   else if(expr.id() == ID_update_bit)
     return convert_update_bit(to_update_bit_expr(expr));
-  else if(expr.id()==ID_case)
+  else if(expr.id() == ID_case)
     return convert_case(to_case_expr(expr));
-  else if(expr.id()==ID_cond)
+  else if(expr.id() == ID_cond)
     return convert_cond(to_cond_expr(expr));
-  else if(expr.id()==ID_if)
+  else if(expr.id() == ID_if)
     return convert_if(to_if_expr(expr));
   else if(expr.is_constant())
     return convert_constant(to_constant_expr(expr));
-  else if(expr.id()==ID_typecast)
+  else if(expr.id() == ID_typecast)
     return convert_bv_typecast(to_typecast_expr(expr));
-  else if(expr.id()==ID_symbol)
+  else if(expr.id() == ID_symbol)
     return convert_symbol(to_symbol_expr(expr));
-  else if(expr.id()==ID_plus || expr.id()==ID_minus ||
-          expr.id()=="no-overflow-plus" ||
-          expr.id()=="no-overflow-minus")
+  else if(
+    expr.id() == ID_plus || expr.id() == ID_minus ||
+    expr.id() == "no-overflow-plus" || expr.id() == "no-overflow-minus")
     return convert_add_sub(expr);
   else if(expr.id() == ID_mult)
     return convert_mult(to_mult_expr(expr));
-  else if(expr.id()==ID_div)
+  else if(expr.id() == ID_div)
     return convert_div(to_div_expr(expr));
-  else if(expr.id()==ID_mod)
+  else if(expr.id() == ID_mod)
     return convert_mod(to_mod_expr(expr));
-  else if(expr.id()==ID_shl || expr.id()==ID_ashr || expr.id()==ID_lshr ||
-          expr.id()==ID_rol || expr.id()==ID_ror)
+  else if(
+    expr.id() == ID_shl || expr.id() == ID_ashr || expr.id() == ID_lshr ||
+    expr.id() == ID_rol || expr.id() == ID_ror)
     return convert_shift(to_shift_expr(expr));
   else if(
     expr.id() == ID_floatbv_plus || expr.id() == ID_floatbv_minus ||
@@ -162,85 +165,85 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
     return convert_floatbv_mod_rem(to_binary_expr(expr));
   else if(expr.id() == ID_floatbv_rem)
     return convert_floatbv_mod_rem(to_binary_expr(expr));
-  else if(expr.id()==ID_floatbv_typecast)
+  else if(expr.id() == ID_floatbv_typecast)
     return convert_floatbv_typecast(to_floatbv_typecast_expr(expr));
   else if(expr.id() == ID_floatbv_round_to_integral)
     return convert_floatbv_round_to_integral(
       to_floatbv_round_to_integral_expr(expr));
-  else if(expr.id()==ID_concatenation)
+  else if(expr.id() == ID_concatenation)
     return convert_concatenation(to_concatenation_expr(expr));
-  else if(expr.id()==ID_replication)
+  else if(expr.id() == ID_replication)
     return convert_replication(to_replication_expr(expr));
-  else if(expr.id()==ID_extractbits)
+  else if(expr.id() == ID_extractbits)
     return convert_extractbits(to_extractbits_expr(expr));
   else if(expr.id() == ID_zero_extend)
     return convert_bitvector(to_zero_extend_expr(expr).lower());
-  else if(expr.id()==ID_bitnot || expr.id()==ID_bitand ||
-          expr.id()==ID_bitor || expr.id()==ID_bitxor ||
-          expr.id()==ID_bitxnor || expr.id()==ID_bitnor ||
-          expr.id()==ID_bitnand)
+  else if(
+    expr.id() == ID_bitnot || expr.id() == ID_bitand || expr.id() == ID_bitor ||
+    expr.id() == ID_bitxor || expr.id() == ID_bitxnor ||
+    expr.id() == ID_bitnor || expr.id() == ID_bitnand)
     return convert_bitwise(expr);
   else if(expr.id() == ID_unary_minus)
     return convert_unary_minus(to_unary_minus_expr(expr));
-  else if(expr.id()==ID_unary_plus)
+  else if(expr.id() == ID_unary_plus)
   {
     return convert_bitvector(to_unary_plus_expr(expr).op());
   }
-  else if(expr.id()==ID_abs)
+  else if(expr.id() == ID_abs)
     return convert_abs(to_abs_expr(expr));
   else if(expr.id() == ID_bswap)
     return convert_bswap(to_bswap_expr(expr));
-  else if(expr.id()==ID_byte_extract_little_endian ||
-          expr.id()==ID_byte_extract_big_endian)
+  else if(
+    expr.id() == ID_byte_extract_little_endian ||
+    expr.id() == ID_byte_extract_big_endian)
     return convert_byte_extract(to_byte_extract_expr(expr));
-  else if(expr.id()==ID_byte_update_little_endian ||
-          expr.id()==ID_byte_update_big_endian)
+  else if(
+    expr.id() == ID_byte_update_little_endian ||
+    expr.id() == ID_byte_update_big_endian)
     return convert_byte_update(to_byte_update_expr(expr));
-  else if(expr.id()==ID_nondet_symbol ||
-          expr.id()=="quant_symbol")
+  else if(expr.id() == ID_nondet_symbol || expr.id() == "quant_symbol")
     return convert_symbol(expr);
-  else if(expr.id()==ID_struct)
+  else if(expr.id() == ID_struct)
     return convert_struct(to_struct_expr(expr));
-  else if(expr.id()==ID_union)
+  else if(expr.id() == ID_union)
     return convert_union(to_union_expr(expr));
   else if(expr.id() == ID_empty_union)
     return convert_empty_union(to_empty_union_expr(expr));
-  else if(expr.id()==ID_string_constant)
-    return convert_bitvector(
-      to_string_constant(expr).to_array_expr());
+  else if(expr.id() == ID_string_constant)
+    return convert_bitvector(to_string_constant(expr).to_array_expr());
   else if(expr.id() == ID_named_term)
   {
     const auto &named_term_expr = to_named_term_expr(expr);
     set_to_true(equal_exprt(named_term_expr.symbol(), named_term_expr.value()));
     return convert_symbol(named_term_expr.symbol());
   }
-  else if(expr.id()==ID_array)
+  else if(expr.id() == ID_array)
     return convert_array(expr);
-  else if(expr.id()==ID_complex)
+  else if(expr.id() == ID_complex)
     return convert_complex(to_complex_expr(expr));
-  else if(expr.id()==ID_complex_real)
+  else if(expr.id() == ID_complex_real)
     return convert_complex_real(to_complex_real_expr(expr));
-  else if(expr.id()==ID_complex_imag)
+  else if(expr.id() == ID_complex_imag)
     return convert_complex_imag(to_complex_imag_expr(expr));
   else if(expr.id() == ID_array_comprehension)
     return convert_array_comprehension(to_array_comprehension_expr(expr));
-  else if(expr.id()==ID_array_of)
+  else if(expr.id() == ID_array_of)
     return convert_array_of(to_array_of_expr(expr));
-  else if(expr.id()==ID_let)
+  else if(expr.id() == ID_let)
     return convert_let(to_let_expr(expr));
-  else if(expr.id()==ID_function_application)
-    return convert_function_application(
-      to_function_application_expr(expr));
-  else if(expr.id()==ID_reduction_or  || expr.id()==ID_reduction_and  ||
-          expr.id()==ID_reduction_nor || expr.id()==ID_reduction_nand ||
-          expr.id()==ID_reduction_xor || expr.id()==ID_reduction_xnor)
+  else if(expr.id() == ID_function_application)
+    return convert_function_application(to_function_application_expr(expr));
+  else if(
+    expr.id() == ID_reduction_or || expr.id() == ID_reduction_and ||
+    expr.id() == ID_reduction_nor || expr.id() == ID_reduction_nand ||
+    expr.id() == ID_reduction_xor || expr.id() == ID_reduction_xnor)
     return convert_bv_reduction(to_unary_expr(expr));
-  else if(expr.id()==ID_not)
+  else if(expr.id() == ID_not)
     return convert_not(to_not_expr(expr));
-  else if(expr.id()==ID_power)
+  else if(expr.id() == ID_power)
     return convert_power(to_power_expr(expr));
   else if(expr.id() == ID_popcount)
-     return convert_popcount(to_popcount_expr(expr));
+    return convert_popcount(to_popcount_expr(expr));
   else if(expr.id() == ID_count_leading_zeros)
   {
     return convert_bv(
@@ -271,7 +274,7 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
 
 bvt boolbvt::convert_array_comprehension(const array_comprehension_exprt &expr)
 {
-  std::size_t width=boolbv_width(expr.type());
+  std::size_t width = boolbv_width(expr.type());
 
   const exprt &array_size = expr.type().size();
 
@@ -284,7 +287,7 @@ bvt boolbvt::convert_array_comprehension(const array_comprehension_exprt &expr)
 
   for(mp_integer i = 0; i < size; ++i)
   {
-    exprt counter=from_integer(i, counter_type);
+    exprt counter = from_integer(i, counter_type);
 
     exprt body = expr.instantiate({counter});
 
@@ -297,8 +300,8 @@ bvt boolbvt::convert_array_comprehension(const array_comprehension_exprt &expr)
 
     std::size_t offset = numeric_cast_v<std::size_t>(i * tmp.size());
 
-    for(std::size_t j=0; j<tmp.size(); j++)
-      bv[offset+j]=tmp[j];
+    for(std::size_t j = 0; j < tmp.size(); j++)
+      bv[offset + j] = tmp[j];
   }
 
   return bv;
@@ -306,8 +309,8 @@ bvt boolbvt::convert_array_comprehension(const array_comprehension_exprt &expr)
 
 bvt boolbvt::convert_symbol(const exprt &expr)
 {
-  const typet &type=expr.type();
-  std::size_t width=boolbv_width(type);
+  const typet &type = expr.type();
+  std::size_t width = boolbv_width(type);
 
   const irep_idt &identifier = expr.get(ID_identifier);
   CHECK_RETURN(!identifier.empty());
@@ -318,15 +321,13 @@ bvt boolbvt::convert_symbol(const exprt &expr)
     std::all_of(
       bv.begin(),
       bv.end(),
-      [this](const literalt &l) {
-        return l.var_no() < prop.no_variables() || l.is_constant();
-      }),
+      [this](const literalt &l)
+      { return l.var_no() < prop.no_variables() || l.is_constant(); }),
     "variable number of non-constant literals should be within bounds",
     id2string(identifier));
 
   return bv;
 }
-
 
 bvt boolbvt::convert_function_application(
   const function_application_exprt &expr)
@@ -338,74 +339,75 @@ bvt boolbvt::convert_function_application(
   return prop.new_variables(boolbv_width(expr.type()));
 }
 
-
 literalt boolbvt::convert_rest(const exprt &expr)
 {
   PRECONDITION(expr.is_boolean());
 
-  if(expr.id()==ID_typecast)
+  if(expr.id() == ID_typecast)
     return convert_typecast(to_typecast_expr(expr));
-  else if(expr.id()==ID_equal)
+  else if(expr.id() == ID_equal)
     return convert_equality(to_equal_expr(expr));
-  else if(expr.id()==ID_verilog_case_equality ||
-          expr.id()==ID_verilog_case_inequality)
+  else if(
+    expr.id() == ID_verilog_case_equality ||
+    expr.id() == ID_verilog_case_inequality)
     return convert_verilog_case_equality(to_binary_relation_expr(expr));
-  else if(expr.id()==ID_notequal)
+  else if(expr.id() == ID_notequal)
   {
     const auto &notequal_expr = to_notequal_expr(expr);
     return !convert_equality(
       equal_exprt(notequal_expr.lhs(), notequal_expr.rhs()));
   }
-  else if(expr.id()==ID_ieee_float_equal ||
-          expr.id()==ID_ieee_float_notequal)
+  else if(
+    expr.id() == ID_ieee_float_equal || expr.id() == ID_ieee_float_notequal)
   {
     return convert_ieee_float_rel(to_binary_relation_expr(expr));
   }
-  else if(expr.id()==ID_le || expr.id()==ID_ge ||
-          expr.id()==ID_lt  || expr.id()==ID_gt)
+  else if(
+    expr.id() == ID_le || expr.id() == ID_ge || expr.id() == ID_lt ||
+    expr.id() == ID_gt)
   {
     return convert_bv_rel(to_binary_relation_expr(expr));
   }
-  else if(expr.id()==ID_extractbit)
+  else if(expr.id() == ID_extractbit)
     return convert_extractbit(to_extractbit_expr(expr));
-  else if(expr.id()==ID_forall)
+  else if(expr.id() == ID_forall)
     return convert_quantifier(to_quantifier_expr(expr));
-  else if(expr.id()==ID_exists)
+  else if(expr.id() == ID_exists)
     return convert_quantifier(to_quantifier_expr(expr));
-  else if(expr.id()==ID_let)
+  else if(expr.id() == ID_let)
   {
-    bvt bv=convert_let(to_let_expr(expr));
+    bvt bv = convert_let(to_let_expr(expr));
 
-    DATA_INVARIANT(bv.size()==1,
-      "convert_let must return 1-bit vector for boolean let");
+    DATA_INVARIANT(
+      bv.size() == 1, "convert_let must return 1-bit vector for boolean let");
 
     return bv[0];
   }
-  else if(expr.id()==ID_index)
+  else if(expr.id() == ID_index)
   {
-    bvt bv=convert_index(to_index_expr(expr));
+    bvt bv = convert_index(to_index_expr(expr));
     CHECK_RETURN(bv.size() == 1);
     return bv[0];
   }
-  else if(expr.id()==ID_member)
+  else if(expr.id() == ID_member)
   {
-    bvt bv=convert_member(to_member_expr(expr));
+    bvt bv = convert_member(to_member_expr(expr));
     CHECK_RETURN(bv.size() == 1);
     return bv[0];
   }
-  else if(expr.id()==ID_case)
+  else if(expr.id() == ID_case)
   {
     bvt bv = convert_case(to_case_expr(expr));
     CHECK_RETURN(bv.size() == 1);
     return bv[0];
   }
-  else if(expr.id()==ID_cond)
+  else if(expr.id() == ID_cond)
   {
     bvt bv = convert_cond(to_cond_expr(expr));
     CHECK_RETURN(bv.size() == 1);
     return bv[0];
   }
-  else if(expr.id()==ID_sign)
+  else if(expr.id() == ID_sign)
   {
     const auto &op = to_sign_expr(expr).op();
     const bvt &bv = convert_bv(op);
@@ -416,9 +418,10 @@ literalt boolbvt::convert_rest(const exprt &expr)
     if(type_id == ID_unsignedbv)
       return const_literal(false);
   }
-  else if(expr.id()==ID_reduction_or  || expr.id()==ID_reduction_and  ||
-          expr.id()==ID_reduction_nor || expr.id()==ID_reduction_nand ||
-          expr.id()==ID_reduction_xor || expr.id()==ID_reduction_xnor)
+  else if(
+    expr.id() == ID_reduction_or || expr.id() == ID_reduction_and ||
+    expr.id() == ID_reduction_nor || expr.id() == ID_reduction_nand ||
+    expr.id() == ID_reduction_xor || expr.id() == ID_reduction_xnor)
     return convert_reduction(to_unary_expr(expr));
   else if(expr.id() == ID_onehot)
     return convert_onehot(to_onehot_expr(expr));
@@ -436,7 +439,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
   {
     return convert_unary_overflow(*unary_overflow);
   }
-  else if(expr.id()==ID_isnan)
+  else if(expr.id() == ID_isnan)
   {
     const auto &op = to_unary_expr(expr).op();
     const bvt &bv = convert_bv(op);
@@ -449,7 +452,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
     else if(op.type().id() == ID_fixedbv)
       return const_literal(false);
   }
-  else if(expr.id()==ID_isfinite)
+  else if(expr.id() == ID_isfinite)
   {
     const auto &op = to_unary_expr(expr).op();
     const bvt &bv = convert_bv(op);
@@ -457,14 +460,12 @@ literalt boolbvt::convert_rest(const exprt &expr)
     if(op.type().id() == ID_floatbv)
     {
       float_utilst float_utils(prop, to_floatbv_type(op.type()));
-      return prop.land(
-        !float_utils.is_infinity(bv),
-        !float_utils.is_NaN(bv));
+      return prop.land(!float_utils.is_infinity(bv), !float_utils.is_NaN(bv));
     }
     else if(op.type().id() == ID_fixedbv)
       return const_literal(true);
   }
-  else if(expr.id()==ID_isinf)
+  else if(expr.id() == ID_isinf)
   {
     const auto &op = to_unary_expr(expr).op();
     const bvt &bv = convert_bv(op);
@@ -477,7 +478,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
     else if(op.type().id() == ID_fixedbv)
       return const_literal(false);
   }
-  else if(expr.id()==ID_isnormal)
+  else if(expr.id() == ID_isnormal)
   {
     const auto &op = to_unary_expr(expr).op();
 
@@ -514,7 +515,7 @@ bool boolbvt::boolbv_set_equality_to_true(const equal_exprt &expr)
     if(is_unbounded_array(type))
       return true;
 
-    const bvt &bv1=convert_bv(expr.rhs());
+    const bvt &bv1 = convert_bv(expr.rhs());
 
     const irep_idt &identifier = to_symbol_expr(expr.lhs()).identifier();
 
@@ -533,6 +534,35 @@ void boolbvt::set_to(const exprt &expr, bool value)
 {
   PRECONDITION(expr.is_boolean());
 
+  // Collect polynomial equations for algebraic solving
+  if(!algebraic_solved && expr.id() == ID_equal)
+  {
+    const auto &eq = to_equal_expr(expr);
+    auto is_internal = [](const exprt &e)
+    {
+      return e.id() == ID_symbol &&
+             id2string(to_symbol_expr(e).get_identifier()).find("__CPROVER") !=
+               std::string::npos;
+    };
+    if(!is_internal(eq.lhs()) && !is_internal(eq.rhs()))
+    {
+      if(value)
+        algebraic_equalities.push_back(expr);
+      else
+        algebraic_disequalities.push_back(expr);
+    }
+  }
+
+  // Count symbolic multiplications for adaptive encoding
+  expr.visit_pre(
+    [this](const exprt &e)
+    {
+      if(
+        e.id() == ID_mult && e.operands().size() == 2 &&
+        !e.operands()[0].is_constant() && !e.operands()[1].is_constant())
+        ++total_mult_count;
+    });
+
   const auto equal_expr = expr_try_dynamic_cast<equal_exprt>(expr);
   if(value && equal_expr && !boolbv_set_equality_to_true(*equal_expr))
     return;
@@ -541,17 +571,17 @@ void boolbvt::set_to(const exprt &expr, bool value)
 
 bool boolbvt::is_unbounded_array(const typet &type) const
 {
-  if(type.id()!=ID_array)
+  if(type.id() != ID_array)
     return false;
 
-  if(unbounded_array==unbounded_arrayt::U_ALL)
+  if(unbounded_array == unbounded_arrayt::U_ALL)
     return true;
 
   const auto &size_opt = bv_width.get_width_opt(type);
   if(!size_opt.has_value())
     return true;
 
-  if(unbounded_array==unbounded_arrayt::U_AUTO)
+  if(unbounded_array == unbounded_arrayt::U_AUTO)
     if(*size_opt > MAX_FLATTENED_ARRAY_SIZE)
       return true;
 
@@ -599,4 +629,61 @@ boolbvt::offset_mapt boolbvt::build_offset_map(const struct_typet &src)
     offset += boolbv_width(comp.type());
   }
   return dest;
+}
+
+bool boolbvt::try_algebraic_solve()
+{
+  if(algebraic_solved)
+    return false;
+  if(algebraic_disequalities.empty())
+    return false;
+
+  algebraic_solved = true; // only try once
+
+  poly_extractort extractor;
+  std::vector<polynomialt> equations;
+
+  // Extract polynomial equations from SSA definitions
+  for(const auto &eq : algebraic_equalities)
+  {
+    auto poly = extractor.extract_equation(eq);
+    if(poly.has_value() && !poly->is_zero())
+      equations.push_back(std::move(*poly));
+  }
+
+  // Extract disequalities (negated assertions) via Rabinowitsch trick
+  for(const auto &eq : algebraic_disequalities)
+  {
+    if(eq.id() != ID_equal || eq.operands().size() != 2)
+      continue;
+    auto lhs = extractor.to_polynomial(to_equal_expr(eq).lhs());
+    auto rhs = extractor.to_polynomial(to_equal_expr(eq).rhs());
+    if(!lhs || !rhs)
+      continue;
+    unsigned bw = extractor.get_bitwidth();
+    if(bw == 0)
+      continue;
+    polynomialt diff = *lhs - *rhs;
+    std::size_t e_idx = extractor.get_var_index("__rabinowitsch");
+    polynomialt e{bw, mp_integer{1}, e_idx};
+    polynomialt constraint = (diff * e) - polynomialt{bw, mp_integer{1}};
+    constraint.normalize();
+    if(!constraint.is_zero())
+      equations.push_back(std::move(constraint));
+  }
+
+  if(equations.size() < 2)
+    return false;
+
+  strong_groebner_basist gb{100000};
+  auto result = gb.compute(equations);
+
+  if(result == strong_groebner_basist::resultt::UNSAT)
+  {
+    // Add empty clause to make SAT solver return UNSAT
+    prop.l_set_to_true(const_literal(false));
+    return true;
+  }
+
+  return false;
 }

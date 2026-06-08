@@ -116,6 +116,7 @@ public:
   {
     finish_eager_conversion_quantifiers();
     functions.finish_eager_conversion();
+    try_algebraic_solve();
     SUB::finish_eager_conversion();
   }
 
@@ -155,6 +156,15 @@ public:
 protected:
   boolbv_widtht bv_width;
   bv_utilst bv_utils;
+
+  // Count symbolic multiplications for adaptive encoding
+  std::size_t total_mult_count = 0;
+
+  // Algebraic solving via Gröbner basis
+  std::vector<exprt> algebraic_equalities;
+  std::vector<exprt> algebraic_disequalities;
+  bool algebraic_solved = false;
+  bool try_algebraic_solve();
 
   // uninterpreted functions
   functionst functions;

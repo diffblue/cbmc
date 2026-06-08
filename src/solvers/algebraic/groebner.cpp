@@ -26,9 +26,8 @@ bool strong_groebner_basist::has_constant(
   return false;
 }
 
-polynomialt strong_groebner_basist::s_polynomial(
-  const polynomialt &f,
-  const polynomialt &g)
+polynomialt
+strong_groebner_basist::s_polynomial(const polynomialt &f, const polynomialt &g)
 {
   PRECONDITION(!f.is_zero() && !g.is_zero());
   PRECONDITION(f.bitwidth == g.bitwidth);
@@ -46,8 +45,9 @@ polynomialt strong_groebner_basist::s_polynomial(
     auto it0 = lm_f.vars.begin(), it1 = lm_g.vars.begin();
     while(it0 != lm_f.vars.end() || it1 != lm_g.vars.end())
     {
-      if(it1 == lm_g.vars.end() ||
-         (it0 != lm_f.vars.end() && it0->first < it1->first))
+      if(
+        it1 == lm_g.vars.end() ||
+        (it0 != lm_f.vars.end() && it0->first < it1->first))
       {
         lcm_mon.vars.push_back(*it0++);
       }
@@ -122,7 +122,8 @@ polynomialt strong_groebner_basist::strong_reduce(
         mp_integer u_r = lc_r / power(2, v_r);
         mp_integer u_g = lc_g / power(2, v_g);
         mp_integer inv_u_g = inverse_mod_2d(u_g, bw);
-        mp_integer q = (power(mp_integer{2}, mp_integer{v_r - v_g}) * u_r % m * inv_u_g) % m;
+        mp_integer q =
+          (power(mp_integer{2}, mp_integer{v_r - v_g}) * u_r % m * inv_u_g) % m;
 
         monomialt quot_mon = lm_r.quotient(lm_g);
         polynomialt mult_term{bw};
@@ -163,9 +164,9 @@ strong_groebner_basist::compute(std::vector<polynomialt> &polys)
   // Remove zero polynomials
   polys.erase(
     std::remove_if(
-      polys.begin(), polys.end(), [](const polynomialt &p) {
-        return p.is_zero();
-      }),
+      polys.begin(),
+      polys.end(),
+      [](const polynomialt &p) { return p.is_zero(); }),
     polys.end());
 
   if(polys.empty())
@@ -219,7 +220,8 @@ strong_groebner_basist::compute(std::vector<polynomialt> &polys)
       unsigned v = val_2(polys[k].leading_coefficient(), polys[k].bitwidth);
       if(v > 0 && v < polys[k].bitwidth)
       {
-        polynomialt h = polys[k] * power(mp_integer{2}, mp_integer{polys[k].bitwidth - v});
+        polynomialt h =
+          polys[k] * power(mp_integer{2}, mp_integer{polys[k].bitwidth - v});
         h.normalize();
         polynomialt rh = strong_reduce(h, polys);
         if(!rh.is_zero())

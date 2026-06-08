@@ -39,8 +39,9 @@ bool monomialt::divides(const monomialt &other) const
   {
     while(it1 != other.vars.end() && it1->first < it0->first)
       ++it1;
-    if(it1 == other.vars.end() || it1->first != it0->first ||
-       it1->second < it0->second)
+    if(
+      it1 == other.vars.end() || it1->first != it0->first ||
+      it1->second < it0->second)
       return false;
     ++it0;
     ++it1;
@@ -150,9 +151,10 @@ void polynomialt::normalize()
       terms.emplace_back(c, mon);
   }
   // Sort by monomial ordering (leading term first)
-  std::sort(terms.begin(), terms.end(), [](const auto &a, const auto &b) {
-    return a.second < b.second;
-  });
+  std::sort(
+    terms.begin(),
+    terms.end(),
+    [](const auto &a, const auto &b) { return a.second < b.second; });
 }
 
 polynomialt polynomialt::operator+(const polynomialt &other) const

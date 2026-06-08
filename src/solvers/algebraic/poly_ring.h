@@ -42,9 +42,15 @@ public:
   /// Graded reverse lexicographic ordering
   bool operator<(const monomialt &other) const;
   bool operator==(const monomialt &other) const;
-  bool operator!=(const monomialt &other) const { return !(*this == other); }
+  bool operator!=(const monomialt &other) const
+  {
+    return !(*this == other);
+  }
 
-  bool is_constant() const { return vars.empty(); }
+  bool is_constant() const
+  {
+    return vars.empty();
+  }
 };
 
 /// A polynomial over Z_{2^d}[x_1, ..., x_n].
@@ -59,7 +65,9 @@ public:
   /// Terms sorted by monomial ordering (leading = front)
   std::vector<std::pair<mp_integer, monomialt>> terms;
 
-  explicit polynomialt(unsigned bw) : bitwidth{bw} {}
+  explicit polynomialt(unsigned bw) : bitwidth{bw}
+  {
+  }
 
   /// Construct a constant polynomial
   polynomialt(unsigned bw, const mp_integer &c);
@@ -72,21 +80,33 @@ public:
   polynomialt operator*(const polynomialt &other) const;
   polynomialt operator*(const mp_integer &scalar) const;
 
-  bool is_zero() const { return terms.empty(); }
+  bool is_zero() const
+  {
+    return terms.empty();
+  }
   bool is_constant() const
   {
     return terms.empty() ||
            (terms.size() == 1 && terms.front().second.is_constant());
   }
 
-  const monomialt &leading_monomial() const { return terms.front().second; }
-  mp_integer leading_coefficient() const { return terms.front().first; }
+  const monomialt &leading_monomial() const
+  {
+    return terms.front().second;
+  }
+  mp_integer leading_coefficient() const
+  {
+    return terms.front().first;
+  }
 
   /// Remove zero terms and reduce coefficients mod 2^d
   void normalize();
 
   /// The modulus 2^d
-  mp_integer modulus() const { return power(mp_integer{2}, mp_integer{bitwidth}); }
+  mp_integer modulus() const
+  {
+    return power(mp_integer{2}, mp_integer{bitwidth});
+  }
 
 private:
   mp_integer reduce(const mp_integer &val) const;
