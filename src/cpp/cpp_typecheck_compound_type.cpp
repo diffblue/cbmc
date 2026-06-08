@@ -2732,19 +2732,59 @@ bool cpp_typecheckt::check_component_access(
 
   const irep_idt &struct_identifier = struct_union_type.get(ID_name);
 
+  // A member inherited from a base class is, in addition to being
+  // accessible as named in the type of the object through which it is
+  // used ([class.access.base]/5.2-5.3, handled via struct_identifier
+  // below), accessible from the class that *declares* it and -- for a
+  // protected member -- from classes derived from that declaring class
+  // ([class.access.base]/5.4): a member function of the declaring base
+  // may name the member on an object of any derived type.  Resolve that
+  // declaring class (the unique base carrying the member without
+  // ID_from_base) so it can be consulted alongside the object's type.
+  const struct_typet *declaring_type = nullptr;
+  if(component.get_bool(ID_from_base) && struct_union_type.id() == ID_struct)
+  {
+    const irep_idt &component_name = component.get_name();
+    std::set<irep_idt> bases;
+    get_bases(to_struct_type(struct_union_type), bases);
+    for(const auto &base_name : bases)
+    {
+      const symbolt &base_symbol = lookup(base_name);
+      if(base_symbol.type.id() != ID_struct)
+        continue;
+      const struct_typet &base_struct = to_struct_type(base_symbol.type);
+      for(const auto &c : base_struct.components())
+      {
+        if(c.get_name() == component_name && !c.get_bool(ID_from_base))
+        {
+          declaring_type = &base_struct;
+          break;
+        }
+      }
+      if(declaring_type != nullptr)
+        break;
+    }
+  }
+
   for(cpp_scopet *pscope = &(cpp_scopes.current_scope());
       !(pscope->is_root_scope());
       pscope = &(pscope->get_parent()))
   {
     if(pscope->is_class())
     {
-      if(pscope->identifier == struct_identifier)
+      if(
+        pscope->identifier == struct_identifier ||
+        (declaring_type != nullptr &&
+         pscope->identifier == declaring_type->get(ID_name)))
         return false; // ok
 
       const struct_typet &scope_struct =
         to_struct_type(lookup(pscope->identifier).type);
 
-      if(subtype_typecast(scope_struct, to_struct_type(struct_union_type)))
+      if(
+        subtype_typecast(scope_struct, to_struct_type(struct_union_type)) ||
+        (declaring_type != nullptr &&
+         subtype_typecast(scope_struct, *declaring_type)))
       {
         // Derived classes can access protected members but not private.
         // Exception: compiler-generated members (e.g., vtable pointers)
