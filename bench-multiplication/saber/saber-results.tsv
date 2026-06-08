@@ -1,0 +1,32 @@
+# SABER schoolbook-vs-Karatsuba equivalence; q=16 (SABER storage bw)
+# Per-coefficient queries; 60s timeout for n<=128, 300s for n=256
+# T/O = solver did not produce sat/unsat within budget
+n	q	coeff	us	bitwuzla	cvc5
+4	16	0	0.02	0.00	T/O
+4	16	1	0.02	0.00	0.00
+4	16	2	0.02	0.00	T/O
+4	16	3	0.02	0.00	T/O
+8	16	0	0.09	0.00	T/O
+8	16	2	0.09	0.00	T/O
+8	16	4	0.09	0.00	T/O
+16	16	0	0.37	0.00	T/O
+16	16	4	0.37	0.00	T/O
+16	16	8	0.37	0.00	T/O
+32	16	0	1.52	0.00	T/O
+32	16	8	1.53	0.00	T/O
+32	16	16	1.51	0.00	T/O
+64	16	0	6.15	0.02	T/O
+64	16	16	6.15	0.02	T/O
+64	16	32	6.13	0.01	T/O
+128	16	0	25.27	0.06	T/O
+128	16	32	25.31	0.06	T/O
+128	16	64	25.26	0.06	T/O
+256	16	0	109.35	0.26	T/O
+# 2-level Karatsuba (mirrors SABER's Toom-4 + Karatsuba multi-level structure)
+4	16	0	0.03	0.00	T/O
+8	16	0	0.10	0.00	T/O
+16	16	0	0.39	0.00	T/O
+32	16	0	1.59	0.01	T/O
+64	16	0	6.41	0.02	T/O
+128	16	0	26.25	0.06	T/O
+256	16	0	108.68	0.26	T/O

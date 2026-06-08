@@ -1,0 +1,135 @@
+--- a/src/cadical.hpp
++++ b/src/cadical.hpp
+@@ -xxx,6 +xxx,8 @@
+   bool flip (int lit);
+   bool flippable (int lit);
+ 
++  void add_xor (const std::vector<int> &lits, bool rhs);
++
+   // ====== END IPASIR-UP ==================================================
+ 
+--- a/src/internal.hpp
++++ b/src/internal.hpp
+@@ -xxx,6 +xxx,7 @@
+ #include "arena.hpp"
++#include "gauss_propagator.hpp"
+ 
+ // ... in class Internal:
++  Clause *gauss_reason;           // used as reason for Gauss propagations
++  GaussPropagator *gauss = nullptr;
++  size_t gauss_notified = 0;
++  Clause *learn_gauss_reason_clause(int ilit);
+ 
+--- a/src/internal.cpp
++++ b/src/internal.cpp
+@@ constructor
++static Clause gauss_reason_clause;
+ // In constructor initializer list:
++      gauss_reason (&gauss_reason_clause),
+ // In destructor:
++  delete gauss;
+
+--- a/src/solver.cpp
++++ b/src/solver.cpp
+@@ end of file
++void Solver::add_xor(const std::vector<int> &lits, bool rhs) {
++  if (!internal->gauss)
++    internal->gauss = new GaussPropagator();
++  std::vector<unsigned> vars;
++  bool adjusted_rhs = rhs;
++  for (int lit : lits) {
++    vars.push_back(static_cast<unsigned>(abs(lit)));
++    if (lit < 0) adjusted_rhs = !adjusted_rhs;
++  }
++  internal->gauss->add_xor(vars, adjusted_rhs);
++}
+
+--- a/src/propagate.cpp
++++ b/src/propagate.cpp
+@@ in propagate(), after trail assignment
++    if (gauss) {
++      int aidx = vidx(-lit);
++      if (aidx > 0 && aidx <= max_var && (size_t)aidx < i2e.size()) {
++        int evar = i2e[aidx];
++        if (evar > 0 && gauss->has_var((unsigned)evar))
++          gauss->assign((unsigned)evar, -lit > 0);
++      }
++    }
+@@ after BCP fixpoint, before return
++    // Gauss propagation after BCP fixpoint
++    if (!gauss || conflict) break;
++    int glit = gauss->propagate();
++    if (!glit) break;
++    int geidx = abs(glit);
++    if ((size_t)geidx >= external->e2i.size()) break;
++    int gilit = external->e2i[geidx];
++    if (glit < 0) gilit = -gilit;
++    if (!gilit || val(gilit)) continue;
++    search_assign(gilit, gauss_reason);
+@@ end of file
++Clause *Internal::learn_gauss_reason_clause(int ilit) {
++  if (!gauss) return nullptr;
++  int elit = externalize(ilit);
++  auto reason = gauss->get_reason(elit);
++  if (reason.size() <= 1) return nullptr;
++  auto clause_save = std::move(clause);
++  clause.clear();
++  for (int el : reason) {
++    int eidx2 = abs(el);
++    if ((size_t)eidx2 >= external->e2i.size()) continue;
++    int il = external->e2i[eidx2];
++    if (el < 0) il = -il;
++    if (!il) continue;
++    clause.push_back(il);
++  }
++  if (clause.size() <= 1) { clause = std::move(clause_save); return nullptr; }
++  int best = 1, best_lev = var(clause[1]).level;
++  for (size_t k = 2; k < clause.size(); k++) {
++    int lev = var(clause[k]).level;
++    if (lev > best_lev) { best_lev = lev; best = k; }
++  }
++  if (best != 1) std::swap(clause[1], clause[best]);
++  Clause *c = new_clause(true, 1);
++  watch_clause(c);
++  clause = std::move(clause_save);
++  return c;
++}
+
+--- a/src/backtrack.cpp
++++ b/src/backtrack.cpp
+@@ in unassign loop
++      if (gauss) {
++        int uidx = vidx(lit);
++        if (uidx > 0 && uidx <= max_var && (size_t)uidx < i2e.size()) {
++          int uevar = i2e[uidx];
++          if (uevar > 0 && gauss->has_var((unsigned)uevar))
++            gauss->unassign((unsigned)uevar);
++        }
++      }
+
+--- a/src/analyze.cpp
++++ b/src/analyze.cpp
+@@ where external_reason is checked
++  if (v.reason == gauss_reason) {
++    v.reason = learn_gauss_reason_clause(-lit);
++    // ... same pattern as external_reason handling
++  }
+@@ assertions
+-  assert (reason != external_reason);
++  assert (reason != external_reason && reason != gauss_reason);
+
+--- a/src/collect.cpp
++++ b/src/collect.cpp
+@@ where external_reason is checked
+-    if (reason == external_reason)
++    if (reason == external_reason || reason == gauss_reason)
+
+--- a/src/elim.cpp
++++ b/src/elim.cpp
+@@ before elimination
++  if (gauss && gauss->has_var((unsigned)abs(pivot))) return;
+
+--- a/src/elimfast.cpp
++++ b/src/elimfast.cpp
+@@ before elimination
++  if (gauss && gauss->has_var((unsigned)abs(pivot))) return;

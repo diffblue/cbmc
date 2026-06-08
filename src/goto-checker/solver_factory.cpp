@@ -21,6 +21,7 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <goto-symex/solver_hardness.h>
 #include <solvers/flattening/bv_dimacs.h>
+#include <solvers/flattening/bv_utils.h>
 #include <solvers/prop/prop.h>
 #include <solvers/prop/solver_resource_limits.h>
 #include <solvers/refinement/bv_refinement.h>
@@ -245,14 +246,19 @@ get_sat_solver(message_handlert &message_handler, const optionst &options)
 #if defined SATCHECK_MINISAT2
       if(no_simplifier)
       {
-        // simplifier won't work with beautification
-        return make_satcheck_prop<satcheck_minisat_no_simplifiert>(
+        auto solver = make_satcheck_prop<satcheck_minisat_no_simplifiert>(
           message_handler, options);
+        if(options.is_set("reorder-vars"))
+          solver->enable_variable_reordering();
+        return solver;
       }
       else // with simplifier
       {
-        return make_satcheck_prop<satcheck_minisat_simplifiert>(
+        auto solver = make_satcheck_prop<satcheck_minisat_simplifiert>(
           message_handler, options);
+        if(options.is_set("reorder-vars"))
+          solver->enable_variable_reordering();
+        return solver;
       }
 #else
       emit_solver_warning(message_handler, "minisat2");
@@ -303,10 +309,31 @@ get_sat_solver(message_handlert &message_handler, const optionst &options)
     else if(solver_option == "cadical")
     {
 #if defined SATCHECK_CADICAL
-      return make_satcheck_prop<satcheck_cadical_no_preprocessingt>(
+      auto solver = make_satcheck_prop<satcheck_cadical_no_preprocessingt>(
         message_handler, options);
+      if(options.get_bool_option("xor-gauss"))
+        solver->enable_xor_gauss();
+      if(options.is_set("reorder-vars"))
+      {
+        solver->enable_variable_renumbering();
+        std::string rv = options.get_option("reorder-vars");
+        if(!rv.empty() && rv != "1" && rv != "true")
+          solver->reorder_strategy = std::stoi(rv);
+      }
+      if(options.is_set("sat-phase"))
+        solver->set_phase(std::stoi(options.get_option("sat-phase")));
+      return solver;
 #else
       emit_solver_warning(message_handler, "cadical");
+#endif
+    }
+    else if(solver_option == "cryptominisat")
+    {
+#if defined SATCHECK_CRYPTOMINISAT
+      return make_satcheck_prop<satcheck_cryptominisatt>(
+        message_handler, options);
+#else
+      emit_solver_warning(message_handler, "cryptominisat");
 #endif
     }
     else
@@ -366,7 +393,153 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
   else if(options.get_option("arrays-uf") == "always")
     bv_pointers->unbounded_array = bv_pointerst::unbounded_arrayt::U_ALL;
 
+  // Set multiplier encoding
+  if(options.is_set("multiplier-encoding"))
+  {
+    const std::string &menc = options.get_option("multiplier-encoding");
+    if(menc == "comba")
+      bv_pointers->set_comba(true);
+    else if(menc == "comba-cs")
+      bv_pointers->set_comba_carry_save(true);
+    else if(menc == "dadda-cs")
+      bv_pointers->set_dadda_carry_save(true);
+    else if(menc == "dadda")
+      bv_pointers->set_dadda(true);
+    else if(menc == "wallace")
+      bv_pointers->set_wallace_tree(true);
+    else if(menc == "shift-add")
+    {
+      // Explicitly selected shift-add: don't set any flag
+    }
+    // else: unknown encoding, ignore
+  }
+  else
+  {
+    // Default: comba-cs (carry-save Comba)
+    // Validated on 4 solvers (MiniSat, MergeSat, CaDiCaL, CryptoMiniSat)
+    // with consistent improvement on multi-multiplication benchmarks
+    // (3.9-77x) and zero regressions on 691 regression tests.
+    bv_pointers->set_comba_carry_save(true);
+  }
+
+  // Set multiplier-internal adder encoding
+  if(options.is_set("multiplier-adder"))
+  {
+    const std::string &ma = options.get_option("multiplier-adder");
+    if(ma == "ripple-carry")
+      bv_pointers->set_multiplier_adder_encoding(
+        bv_utilst::adder_encodingt::RIPPLE_CARRY);
+    else if(ma == "simple-ripple")
+      bv_pointers->set_multiplier_adder_encoding(
+        bv_utilst::adder_encodingt::SIMPLE_RIPPLE_CARRY);
+    else if(ma == "brent-kung")
+      bv_pointers->set_multiplier_adder_encoding(
+        bv_utilst::adder_encodingt::BRENT_KUNG);
+    else if(ma == "g-only")
+      bv_pointers->set_multiplier_adder_encoding(
+        bv_utilst::adder_encodingt::ADAPTIVE);
+  }
+
   set_decision_procedure_time_limit(*bv_pointers);
+
+  // Set adder encoding if specified
+  if(options.is_set("adder-encoding"))
+  {
+    const std::string &enc = options.get_option("adder-encoding");
+    if(enc == "brent-kung")
+      bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::BRENT_KUNG);
+    else if(enc == "kogge-stone")
+      bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::KOGGE_STONE);
+    else if(enc == "bk-ripple-mult")
+    {
+      bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::BRENT_KUNG);
+      bv_pointers->set_multiplier_adder_encoding(
+        bv_utilst::adder_encodingt::RIPPLE_CARRY);
+    }
+    else if(enc == "simple-ripple")
+      bv_pointers->set_adder_encoding(
+        bv_utilst::adder_encodingt::SIMPLE_RIPPLE_CARRY);
+    else if(enc == "bk-simple-mult")
+    {
+      bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::BRENT_KUNG);
+      bv_pointers->set_multiplier_adder_encoding(
+        bv_utilst::adder_encodingt::SIMPLE_RIPPLE_CARRY);
+    }
+    else if(enc == "sbk-simple-mult")
+    {
+      bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::SPARSE_BK);
+      bv_pointers->set_multiplier_adder_encoding(
+        bv_utilst::adder_encodingt::SIMPLE_RIPPLE_CARRY);
+    }
+    else if(enc == "sbk-ripple-mult")
+    {
+      bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::SPARSE_BK);
+      bv_pointers->set_multiplier_adder_encoding(
+        bv_utilst::adder_encodingt::RIPPLE_CARRY);
+    }
+    else if(enc == "ladner-fischer")
+      bv_pointers->set_adder_encoding(
+        bv_utilst::adder_encodingt::LADNER_FISCHER);
+    else if(enc == "han-carlson")
+      bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::HAN_CARLSON);
+    else if(enc == "minimal-ripple")
+      bv_pointers->set_adder_encoding(
+        bv_utilst::adder_encodingt::MINIMAL_RIPPLE);
+    else if(enc == "comba")
+      bv_pointers->set_comba(true);
+    else if(enc == "dadda")
+      bv_pointers->set_dadda(true);
+    else if(enc == "wallace")
+      bv_pointers->set_wallace_tree(true);
+    else if(enc == "bk-carry-save")
+    {
+      bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::BRENT_KUNG);
+      bv_pointers->set_carry_save(true);
+    }
+    else if(enc == "bk-wallace")
+    {
+      bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::BRENT_KUNG);
+      bv_pointers->set_wallace_tree(true);
+    }
+    else if(enc == "g-mult")
+    {
+      bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::ADAPTIVE);
+      bv_pointers->set_multiplier_adder_encoding(
+        bv_utilst::adder_encodingt::ADAPTIVE);
+    }
+    else if(enc == "bk-g-mult")
+    {
+      bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::BRENT_KUNG);
+      bv_pointers->set_multiplier_adder_encoding(
+        bv_utilst::adder_encodingt::ADAPTIVE);
+    }
+    else if(enc == "bk-minimal-mult")
+    {
+      bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::BRENT_KUNG);
+      bv_pointers->set_multiplier_adder_encoding(
+        bv_utilst::adder_encodingt::MINIMAL_RIPPLE);
+    }
+    else if(enc == "sparse-bk")
+      bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::SPARSE_BK);
+    else if(enc == "cla")
+      bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::CLA);
+    else if(enc == "adaptive")
+      bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::ADAPTIVE);
+    else if(enc == "sklansky")
+      bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::SKLANSKY);
+    else if(enc == "ripple")
+    {
+      // Explicitly selected ripple-carry: don't set any encoding
+    }
+  }
+  else
+  {
+    // Default: g-only (ADAPTIVE) top-level adder encoding.
+    // Adds redundant AND gates that enable BVE polarity alignment
+    // cascades on equality checks and explicit additions.
+    // Safe across all 4 solvers with no regressions on hard benchmarks.
+    bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::ADAPTIVE);
+  }
 
   std::unique_ptr<boolbvt> boolbv = std::move(bv_pointers);
   return std::make_unique<solvert>(std::move(boolbv), std::move(sat_solver));
@@ -623,6 +796,25 @@ static void parse_sat_options(const cmdlinet &cmdline, optionst &options)
 
   if(cmdline.isset("sat-solver"))
     options.set_option("sat-solver", cmdline.get_value("sat-solver"));
+
+  if(cmdline.isset("xor-gauss"))
+    options.set_option("xor-gauss", true);
+
+  if(cmdline.isset("reorder-vars"))
+    options.set_option(
+      "reorder-vars",
+      cmdline.isset("reorder-vars") ? cmdline.get_value("reorder-vars") : "0");
+
+  if(cmdline.isset("adder-encoding"))
+    options.set_option("adder-encoding", cmdline.get_value("adder-encoding"));
+  if(cmdline.isset("multiplier-encoding"))
+    options.set_option(
+      "multiplier-encoding", cmdline.get_value("multiplier-encoding"));
+  if(cmdline.isset("multiplier-adder"))
+    options.set_option(
+      "multiplier-adder", cmdline.get_value("multiplier-adder"));
+  if(cmdline.isset("sat-phase"))
+    options.set_option("sat-phase", cmdline.get_value("sat-phase"));
 }
 
 static void parse_smt2_options(const cmdlinet &cmdline, optionst &options)

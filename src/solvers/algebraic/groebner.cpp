@@ -1,0 +1,847 @@
+/// \file
+/// Strong Gröbner basis computation over Z_{2^d}
+
+#include "groebner.h"
+
+#include <cstdlib>
+#include <set>
+
+/// Compute the total degree of LCM(LM(f), LM(g)).
+///
+/// Used by the pair-selection strategy in compute(): to favour the
+/// "normal selection" / "sugar" heuristic (Buchberger 1985,
+/// Giovini-Mora-Niesi-Robbiano-Traverso 1991), we prefer the pair
+/// whose S-polynomial uses the smallest-degree LCM, since it tends
+/// to produce reductions to small-degree polynomials early and
+/// avoid combinatorial explosion of the basis.
+///
+/// LIFO order (the previous strategy) is empirically much slower on
+/// some polynomial systems: e.g., cohencu's identity
+///   z + y - 7 - 3n^2 - 9n = 0
+///   y - 3n - 3n^2 - 1 = 0
+///   e * (z - 6 - 6n) - 1 = 0  (Rabinowitsch)
+/// admits an immediate refutation via S-poly of the first two
+/// equations (LCM degree 2), but with LIFO order this critical
+/// pair is processed last, by which time the basis has grown to
+/// 90+ elements (with even-only constants) and the step limit
+/// has been hit.
+///
+/// PROOF: pair-selection strategy is orthogonal to soundness; see
+///        formal-proofs/StrongGB.lean::pair_selection_orthogonal.
+///        The basic Buchberger soundness theorems
+///        (s_poly_in_ideal, reduce_in_ideal) hold regardless of
+///        which pair is selected next from the queue.
+static unsigned lcm_degree(const polynomialt &f, const polynomialt &g)
+{
+  if(f.is_zero() || g.is_zero())
+    return ~0u;
+  const monomialt &lm_f = f.leading_monomial();
+  const monomialt &lm_g = g.leading_monomial();
+
+  unsigned d = 0;
+  auto it1 = lm_f.vars.begin();
+  auto it2 = lm_g.vars.begin();
+  while(it1 != lm_f.vars.end() && it2 != lm_g.vars.end())
+  {
+    if(it1->first < it2->first)
+    {
+      d += it1->second;
+      ++it1;
+    }
+    else if(it1->first > it2->first)
+    {
+      d += it2->second;
+      ++it2;
+    }
+    else
+    {
+      d += std::max(it1->second, it2->second);
+      ++it1;
+      ++it2;
+    }
+  }
+  while(it1 != lm_f.vars.end())
+  {
+    d += it1->second;
+    ++it1;
+  }
+  while(it2 != lm_g.vars.end())
+  {
+    d += it2->second;
+    ++it2;
+  }
+  return d;
+}
+
+/// Select the index of the next pair to process, using min-LCM-degree
+/// (normal selection / sugar). Returns the index in `pairs`.
+///
+/// If the env var GB_LIFO is set, falls back to LIFO selection
+/// (the last index) for ablation experiments.
+///
+/// Ties are broken by FIFO order (earliest pair wins among equal
+/// LCM degrees). This makes the algorithm slightly more predictable
+/// when many pairs share the same minimum degree.
+static std::size_t select_next_pair(
+  const std::vector<std::pair<std::size_t, std::size_t>> &pairs,
+  const std::vector<polynomialt> &polys)
+{
+  PRECONDITION(!pairs.empty());
+
+  static const bool use_lifo = std::getenv("GB_LIFO") != nullptr;
+  if(use_lifo)
+    return pairs.size() - 1;
+
+  unsigned best_deg = ~0u;
+  std::size_t best_idx = 0;
+  for(std::size_t k = 0; k < pairs.size(); ++k)
+  {
+    const auto &[i, j] = pairs[k];
+    if(i >= polys.size() || j >= polys.size())
+      continue;
+    unsigned d = lcm_degree(polys[i], polys[j]);
+    if(d < best_deg)
+    {
+      best_deg = d;
+      best_idx = k;
+    }
+  }
+  return best_idx;
+}
+
+// PROOF: formal-proofs/GroebnerSoundness.lean::ideal_ne_top_of_has_solution
+//        Soundness: if the system has a solution, the evaluation
+//        homomorphism sends every ideal element to 0, so no nonzero
+//        constant can lie in the ideal.
+// PROOF: formal-proofs/DisequalityRefutation.lean::nonzero_constant_no_solution
+//        Top-level soundness theorem for this exact predicate: if ANY
+//        nonzero constant c is in the ideal, then under any assignment
+//        the homomorphism maps c (a constant) to itself yet must map it
+//        to 0, a contradiction; hence the system is unsatisfiable. This
+//        generalises the odd/unit case (soundness_of_odd_constant_check)
+//        and is needed for completeness of Song et al.'s 2^{d-1}
+//        disequality encoding, whose refutation witness may be even.
+bool strong_groebner_basist::has_constant(
+  const std::vector<polynomialt> &basis) const
+{
+  for(const auto &p : basis)
+  {
+    if(!p.is_zero() && p.is_constant())
+    {
+      // ANY nonzero constant in the ideal proves unsatisfiability over
+      // Z_{2^d} (not only odd/unit constants): a constant evaluates to
+      // itself under every assignment, but every ideal element must
+      // evaluate to 0, so a nonzero constant admits no solution. The
+      // is_zero() guard above already ensures c != 0.
+      return true;
+    }
+  }
+  return false;
+}
+
+// PROOF: formal-proofs/BuchbergerCorrectness.lean::s_poly_in_ideal
+//        Soundness: any linear combination a*f - b*g of two
+//        polynomials f, g in an ideal I is again in I. The
+//        S-polynomial here is the specific combination
+//        (lcm(LM(f), LM(g)) / LM(f)) * f - (lcm(LM(f), LM(g)) / LM(g)) * g
+//        (with appropriate coefficient handling for ZMod(2^bw)).
+//        polynomialt represents an element of MvPolynomial(Fin n,
+//        ZMod (2^bw)), a commutative ring, so the abstract theorem
+//        applies directly.
+//   ASSUMES: this function returns some linear combination of f and g
+//            with coefficients in MvPolynomial(_, ZMod(2^bw)).
+//   MAINTAINED BY: the body below constructs the combination
+//            mult_term * f - mult_term2 * g via the existing
+//            polynomial multiply/subtract operations.
+polynomialt
+strong_groebner_basist::s_polynomial(const polynomialt &f, const polynomialt &g)
+{
+  PRECONDITION(!f.is_zero() && !g.is_zero());
+  PRECONDITION(f.bitwidth == g.bitwidth);
+
+  const monomialt &lm_f = f.leading_monomial();
+  const monomialt &lm_g = g.leading_monomial();
+  mp_integer lc_f = f.leading_coefficient();
+  mp_integer lc_g = g.leading_coefficient();
+  unsigned bw = f.bitwidth;
+  mp_integer m = power(mp_integer{2}, mp_integer{bw});
+
+  // LCM of leading monomials
+  monomialt lcm_mon;
+  {
+    auto it0 = lm_f.vars.begin(), it1 = lm_g.vars.begin();
+    while(it0 != lm_f.vars.end() || it1 != lm_g.vars.end())
+    {
+      if(
+        it1 == lm_g.vars.end() ||
+        (it0 != lm_f.vars.end() && it0->first < it1->first))
+      {
+        lcm_mon.vars.push_back(*it0++);
+      }
+      else if(
+        it0 == lm_f.vars.end() ||
+        (it1 != lm_g.vars.end() && it1->first < it0->first))
+      {
+        lcm_mon.vars.push_back(*it1++);
+      }
+      else
+      {
+        lcm_mon.vars.emplace_back(
+          it0->first, std::max(it0->second, it1->second));
+        ++it0;
+        ++it1;
+      }
+    }
+  }
+
+  monomialt quot_f = lcm_mon.quotient(lm_f);
+  monomialt quot_g = lcm_mon.quotient(lm_g);
+
+  // S-poly = lc_g * (lcm/lm_f) * f - lc_f * (lcm/lm_g) * g
+  // This cancels the leading terms.
+  polynomialt term_f{bw};
+  term_f.terms.emplace_back(lc_g, quot_f);
+  polynomialt term_g{bw};
+  term_g.terms.emplace_back(lc_f, quot_g);
+
+  polynomialt result =
+    (term_f.multiply(f, bit_vars)) - (term_g.multiply(g, bit_vars));
+  result.normalize();
+  apply_frobenius_idempotency(result, bit_vars);
+  return result;
+}
+
+// PROOF: formal-proofs/BuchbergerCorrectness.lean::reduce_in_ideal
+//        Soundness: each reduction step h ↦ h - q*g preserves
+//        ideal membership when g is in the ideal. The strong
+//        reduction below performs a sequence of such steps,
+//        each of which preserves Ideal.span(basis).
+// PROOF: formal-proofs/BuchbergerCorrectness.lean::scale_in_ideal
+//        Soundness of the 2-trick: multiplying by a scalar
+//        preserves ideal membership (the inner if-block that
+//        multiplies r by 2^(d-v_r) when no reduction succeeded).
+// PROOF: formal-proofs/StrongGB.lean::two_trick_preserves_ideal
+//        Specific instance for ZMod(2^d): multiplying by 2^k
+//        preserves ideal membership.
+//   ASSUMES: each iteration of the inner loop reduces r by exactly
+//            one of two operations: (a) r := r - q*g for some
+//            polynomial q and basis element g, or (b) r := r * 2^k
+//            for some k with 0 < k < bw. Both operations preserve
+//            the coset r + Ideal.span(basis).
+//   MAINTAINED BY: the if-branches below implement exactly these
+//            two operations on r, and no other update to r occurs
+//            between iterations.
+polynomialt strong_groebner_basist::strong_reduce(
+  const polynomialt &f,
+  const std::vector<polynomialt> &basis)
+{
+  polynomialt r = f;
+  unsigned bw = f.bitwidth;
+  mp_integer m = power(mp_integer{2}, mp_integer{bw});
+
+  bool changed = true;
+  while(changed && !r.is_zero())
+  {
+    changed = false;
+    if(++steps_taken > max_steps && max_steps > 0)
+      return r; // step limit reached
+
+    mp_integer lc_r = r.leading_coefficient();
+    const monomialt &lm_r = r.leading_monomial();
+    unsigned v_r = val_2(lc_r, bw);
+
+    // Try to reduce by a basis element
+    for(const auto &g : basis)
+    {
+      if(g.is_zero())
+        continue;
+      const monomialt &lm_g = g.leading_monomial();
+      if(!lm_g.divides(lm_r))
+        continue;
+
+      mp_integer lc_g = g.leading_coefficient();
+      unsigned v_g = val_2(lc_g, bw);
+
+      if(v_g <= v_r)
+      {
+        // lc_g divides lc_r in the 2-adic sense.
+        // Compute quotient: lc_r / lc_g mod 2^d
+        // lc_r = 2^v_r * u_r, lc_g = 2^v_g * u_g (u_r, u_g odd)
+        // lc_r / lc_g = 2^(v_r - v_g) * u_r * inverse(u_g)
+        mp_integer u_r = lc_r / power(2, v_r);
+        mp_integer u_g = lc_g / power(2, v_g);
+        mp_integer inv_u_g = inverse_mod_2d(u_g, bw);
+        mp_integer q =
+          (power(mp_integer{2}, mp_integer{v_r - v_g}) * u_r % m * inv_u_g) % m;
+
+        monomialt quot_mon = lm_r.quotient(lm_g);
+        polynomialt mult_term{bw};
+        mult_term.terms.emplace_back(q, quot_mon);
+
+        r = r - mult_term.multiply(g, bit_vars);
+        r.normalize();
+        apply_frobenius_idempotency(r, bit_vars);
+        changed = true;
+        break;
+      }
+    }
+
+    // If no basis element reduced r, try the "2-trick":
+    // Multiply r by 2^(d - v_r) to kill the leading term
+    // (since lc_r * 2^(d-v_r) = 2^d * ... ≡ 0 mod 2^d)
+    // This produces a polynomial with a smaller leading term.
+    if(!changed && !r.is_zero() && v_r > 0)
+    {
+      mp_integer factor = power(2, bw - v_r);
+      polynomialt r2 = r * factor;
+      r2.normalize();
+      apply_frobenius_idempotency(r2, bit_vars);
+      if(!r2.is_zero() && r2.leading_monomial() != r.leading_monomial())
+      {
+        // The leading term changed — try reducing again
+        r = r2;
+        changed = true;
+      }
+    }
+  }
+  return r;
+}
+
+// PROOF: formal-proofs/BuchbergerCorrectness.lean::reduce_in_ideal
+//        Tail reduction is a sequence of standard reduction steps
+//        r := r - q * g, each preserving ideal membership. This
+//        lemma applies regardless of which term of r we are
+//        reducing; the leading-vs-tail distinction is purely about
+//        WHICH term we choose to reduce, not about whether the step
+//        is sound. So full_reduce is sound by composition of
+//        per-step `reduce_in_ideal` applications.
+//   ASSUMES: each iteration of the inner loop reduces ONE term of r
+//            via the standard step `r := r - mult_term * g` for
+//            some basis element g. The polynomial multiplication
+//            and subtraction preserve ideal membership.
+//   MAINTAINED BY: the inner loop body implements exactly this
+//            reduction step, with `mult_term` constructed to
+//            cancel the targeted term's coefficient (via 2-adic
+//            quotient and inverse computation).
+polynomialt strong_groebner_basist::full_reduce(
+  const polynomialt &f,
+  const std::vector<polynomialt> &basis,
+  std::size_t skip_idx)
+{
+  polynomialt r = f;
+  unsigned bw = f.bitwidth;
+  mp_integer m = power(mp_integer{2}, mp_integer{bw});
+
+  bool changed = true;
+  while(changed && !r.is_zero())
+  {
+    changed = false;
+    if(++steps_taken > max_steps && max_steps > 0)
+      return r;
+
+    // Iterate over each term of r, looking for one we can reduce
+    // by some basis element.
+    for(std::size_t t = 0; t < r.terms.size(); ++t)
+    {
+      const mp_integer c_r = r.terms[t].first;
+      const monomialt m_r = r.terms[t].second;
+      const unsigned v_r = val_2(c_r, bw);
+
+      bool reduced_this_term = false;
+      for(std::size_t j = 0; j < basis.size(); ++j)
+      {
+        if(j == skip_idx || basis[j].is_zero())
+          continue;
+        const monomialt &lm_g = basis[j].leading_monomial();
+        if(!lm_g.divides(m_r))
+          continue;
+
+        const mp_integer lc_g = basis[j].leading_coefficient();
+        const unsigned v_g = val_2(lc_g, bw);
+
+        if(v_g > v_r)
+          continue; // lc_g does not divide c_r in the 2-adic sense.
+
+        // Compute the multiplier q such that q * lc_g ≡ c_r (mod 2^d).
+        // Same formula as strong_reduce's leading-term reduction.
+        mp_integer u_r = c_r / power(2, v_r);
+        mp_integer u_g = lc_g / power(2, v_g);
+        mp_integer inv_u_g = inverse_mod_2d(u_g, bw);
+        mp_integer q =
+          (power(mp_integer{2}, mp_integer{v_r - v_g}) * u_r % m * inv_u_g) % m;
+
+        monomialt quot_mon = m_r.quotient(lm_g);
+        polynomialt mult_term{bw};
+        mult_term.terms.emplace_back(q, quot_mon);
+
+        r = r - mult_term.multiply(basis[j], bit_vars);
+        r.normalize();
+        apply_frobenius_idempotency(r, bit_vars);
+        changed = true;
+        reduced_this_term = true;
+        break;
+      }
+      if(reduced_this_term)
+        break; // Restart from beginning since terms changed.
+    }
+  }
+  return r;
+}
+
+// PROOF: formal-proofs/BuchbergerCorrectness.lean::reduce_in_ideal
+//        Each individual full_reduce call preserves the ideal of
+//        the basis. Iterating across basis elements with skip_idx
+//        ensures no element reduces itself. The fixed-point loop
+//        terminates because each iteration either reduces a term
+//        (decreasing some monotone measure: the multiset of leading
+//        monomials of tail terms in basis elements, ordered by
+//        grevlex) or makes no progress and exits.
+//   ASSUMES: full_reduce is sound (above).
+//   MAINTAINED BY: the loop's exit condition is a fixed point;
+//            the basis is updated in place but each update
+//            preserves the ideal.
+bool strong_groebner_basist::interreduce_basis(std::vector<polynomialt> &basis)
+{
+  bool any_change = false;
+  bool round_change = true;
+  std::size_t round_cap = basis.size() * 4 + 16;
+  while(round_change && round_cap > 0)
+  {
+    round_change = false;
+    --round_cap;
+    for(std::size_t i = 0; i < basis.size(); ++i)
+    {
+      if(basis[i].is_zero())
+        continue;
+      polynomialt reduced = full_reduce(basis[i], basis, i);
+      if(reduced.terms != basis[i].terms)
+      {
+        basis[i] = std::move(reduced);
+        round_change = true;
+        any_change = true;
+        if(has_constant(basis))
+          return any_change;
+      }
+    }
+  }
+  return any_change;
+}
+
+// PROOF: formal-proofs/StrongGB.lean::two_trick_preserves_ideal
+//        Soundness: scalar multiplication by 2^k preserves
+//        ideal membership.
+// PROOF: formal-proofs/StrongGB.lean::two_trick_unsat_sound
+//        Soundness: an odd constant in the basis -> unit -> ideal
+//        equals the whole ring -> the original system is UNSAT.
+//        Re-uses the existing soundness chain in
+//        BuchbergerCorrectness.lean and GroebnerSoundness.lean.
+//        THIS IS THE CONTRACT THIS FUNCTION SATISFIES: when
+//        compute() returns UNSAT, the formal Lean theorem
+//        guarantees the input system has no solution. UNKNOWN
+//        is always a sound result (it commits to nothing).
+// PROOF: formal-proofs/StrongGB.lean::naive_completeness_is_false
+//        Important sanity-check: the NAIVE completeness statement
+//        ("F unsat -> Ideal.span F contains an odd constant") is
+//        FALSE. Concrete counterexample (d=2, n=0, F={C 2}) is
+//        proven; explains why this function returns UNKNOWN
+//        (not UNSAT) on some unsatisfiable inputs.
+// PROOF: formal-proofs/StrongGB.lean::two_trick_saturation_complete_is_false
+//        STRONGER NEGATIVE RESULT: even adding the obvious
+//        well-formedness hypothesis (idempotency on each variable)
+//        does NOT make the algorithm complete -- the same
+//        counterexample {C 2} (vacuously well-formed for n=0)
+//        defeats the refined claim. Hence this function does NOT
+//        guarantee 'F unsat => UNSAT'; it only guarantees
+//        'UNSAT => F unsat' (soundness). UNKNOWN is the correct
+//        result on inputs where the strong-GB saturation cannot
+//        produce an odd constant.
+// PROOF: formal-proofs/BuchbergerCorrectness.lean::buchberger_ideal_preservation
+//        Soundness: the basis-update operations (S-polynomial,
+//        reduction, scaling) preserve <G> = <F>.
+// PROOF: formal-proofs/BuchbergerTermination.lean::buchberger_terminates
+//        Termination: the algorithm halts in any Noetherian ring.
+strong_groebner_basist::resultt
+strong_groebner_basist::compute(std::vector<polynomialt> &polys)
+{
+  steps_taken = 0;
+
+  // Apply host substitutions (linear elimination): replace each
+  // host variable h with its bit-sum polynomial in every input
+  // polynomial. This eliminates the host as a variable; the
+  // sum-decomposition equations (h - sum_i 2^i b_i = 0) become
+  // trivially zero and are dropped by the zero-removal step
+  // below.
+  if(!host_substitutions.empty())
+  {
+    for(auto &p : polys)
+    {
+      for(const auto &[host_idx, sub_poly] : host_substitutions)
+        p = substitute_variable(p, host_idx, sub_poly);
+    }
+  }
+
+  // Apply Frobenius to all input polynomials so the initial basis
+  // is already idempotency-reduced.
+  // PROOF: formal-proofs/Re4.lean::all_idempotent_to_bool
+  //        For bit_vars constrained by b_i^2 = b_i (idempotency),
+  //        every assignment satisfying the constraints lies in
+  //        {0,1}^k. This justifies treating bit_vars as Boolean.
+  // PROOF: formal-proofs/StrongGB.lean::sq_eq_self_of_zmod_two_pow
+  //        In Z_{2^d}, x^2 = x implies x in {0, 1} -- the
+  //        ring-level fact that powers idempotency to Boolean
+  //        even in the presence of zero divisors.
+  // PROOF: formal-proofs/StrongGB.lean::d_eq_one_completeness
+  //        Positive partial completeness: for d=1 (i.e., over
+  //        GF(2)) with idempotency on each variable, the
+  //        algorithm IS complete. So on Boolean-only inputs
+  //        compute() will not return UNKNOWN due to the
+  //        completeness gap (it may still return UNKNOWN if
+  //        max_steps is exhausted).
+  if(!bit_vars.empty())
+  {
+    for(auto &p : polys)
+      apply_frobenius_idempotency(p, bit_vars);
+  }
+
+  // Remove zero polynomials
+  polys.erase(
+    std::remove_if(
+      polys.begin(),
+      polys.end(),
+      [](const polynomialt &p) { return p.is_zero(); }),
+    polys.end());
+
+  if(polys.empty())
+    return resultt::UNKNOWN;
+
+  if(has_constant(polys))
+    return resultt::UNSAT;
+
+  // Buchberger-like algorithm
+  // Track which pairs have been processed
+  std::set<std::pair<std::size_t, std::size_t>> processed;
+  std::vector<std::pair<std::size_t, std::size_t>> pairs;
+
+  for(std::size_t i = 0; i < polys.size(); ++i)
+    for(std::size_t j = i + 1; j < polys.size(); ++j)
+      pairs.emplace_back(i, j);
+
+  // Track progress: if a full round of S-polynomial processing
+  // produces no new basis elements, the basis is complete
+  // (Buchberger criterion).
+  // PROOF: formal-proofs/BuchbergerTermination.lean::stable_implies_no_new
+  //        Soundness of the termination criterion: at stability,
+  //        every candidate new element is already in the ideal.
+  //        ASSUMES: every pair (i,j) with i < j < |polys| has been
+  //        processed (either by S-poly reduction or by being skipped
+  //        when a polynomial became zero).
+  //        MAINTAINED BY: the loop pops every pair from `pairs` and
+  //        the progress-tracking counters reset on any basis growth
+  //        (S-poly OR 2-trick), ensuring no pair is occluded by an
+  //        early exit.
+  // PROOF: formal-proofs/BuchbergerTermination.lean::progress_invariant_preserved
+  //        The invariant `pairs_size + counter = baseline` is
+  //        preserved by every step of the corrected loop, where
+  //        a "step" is either a basis-growth iteration (resets
+  //        counter and baseline) or a non-growth iteration
+  //        (decrements pairs_size, increments counter).
+  //        Companion theorem buggy_step_breaks_invariant shows the
+  //        pre-fix step (grow via 2-trick without resetting) breaks
+  //        the invariant whenever the 2-trick adds polynomials,
+  //        which is exactly what allowed the early exit to fire.
+  //        ASSUMES: each iteration captures polys.size() before any
+  //        step, and resets counters iff polys grew across the full
+  //        iteration body.
+  //        MAINTAINED BY: `polys_size_at_iter_start` snapshot below
+  //        and the conditional reset at the end of the iteration.
+  // PROOF: formal-proofs/BuchbergerCorrectness.lean::buchberger_unsat'
+  //        Top-level UNSAT soundness: if G ⊇ F preserves the
+  //        ideal and contains a unit, the input system is UNSAT.
+  std::size_t pairs_since_last_progress = 0;
+  std::size_t pairs_at_last_progress = pairs.size();
+
+  // Outer loop: run Buchberger, interreduce, repeat if interreduce
+  // changed the basis. This is the F4-style "saturate then
+  // interreduce then re-saturate" pattern. Capped to a small
+  // number of outer iterations to prevent pathological cycles
+  // (interreduction terminates by a monotone measure, but the
+  // restart could in principle loop if poorly designed).
+  std::size_t outer_cap = 8;
+  while(outer_cap > 0)
+  {
+    --outer_cap;
+    while(!pairs.empty())
+    {
+      if(steps_taken > max_steps && max_steps > 0)
+        return resultt::UNKNOWN;
+
+      // If we've processed all pairs since the last new element
+      // without finding anything new, the basis is complete for
+      // this round. Exit the inner loop; the outer loop will run
+      // interreduce and decide whether to restart.
+      if(pairs_since_last_progress > pairs_at_last_progress)
+        break;
+
+      auto pair_idx = select_next_pair(pairs, polys);
+      auto [i, j] = pairs[pair_idx];
+      // Swap-with-back removal: O(1) and order-independent for our purposes
+      // (FIFO ties handled by select_next_pair already).
+      pairs[pair_idx] = pairs.back();
+      pairs.pop_back();
+
+      // Capture the basis size at the start of this iteration. If it grows
+      // (due to either S-polynomial reduction or the 2-trick step below),
+      // we count this iteration as "progress" and reset the counters; this
+      // ensures the 2-trick's additions are not silently dropped from the
+      // termination criterion.
+      const std::size_t polys_size_at_iter_start = polys.size();
+
+      if(i >= polys.size() || j >= polys.size())
+      {
+        ++pairs_since_last_progress;
+        continue;
+      }
+      if(polys[i].is_zero() || polys[j].is_zero())
+      {
+        ++pairs_since_last_progress;
+        continue;
+      }
+
+      polynomialt s = s_polynomial(polys[i], polys[j]);
+      polynomialt r = strong_reduce(s, polys);
+
+      if(!r.is_zero())
+      {
+        std::size_t new_idx = polys.size();
+        polys.push_back(std::move(r));
+
+        if(has_constant(polys))
+          return resultt::UNSAT;
+
+        for(std::size_t k = 0; k < new_idx; ++k)
+          pairs.emplace_back(k, new_idx);
+      }
+
+      // Also process 2-multiples of basis elements with non-unit lc
+      for(std::size_t k = 0; k < polys.size(); ++k)
+      {
+        if(polys[k].is_zero())
+          continue;
+        unsigned v = val_2(polys[k].leading_coefficient(), polys[k].bitwidth);
+        if(v > 0 && v < polys[k].bitwidth)
+        {
+          polynomialt h =
+            polys[k] * power(mp_integer{2}, mp_integer{polys[k].bitwidth - v});
+          h.normalize();
+          apply_frobenius_idempotency(h, bit_vars);
+          polynomialt rh = strong_reduce(h, polys);
+          if(!rh.is_zero())
+          {
+            std::size_t new_idx = polys.size();
+            polys.push_back(std::move(rh));
+            if(has_constant(polys))
+              return resultt::UNSAT;
+            for(std::size_t l = 0; l < new_idx; ++l)
+              pairs.emplace_back(l, new_idx);
+          }
+        }
+      }
+
+      // Update progress tracking. If the basis grew during this iteration
+      // (via S-polynomial reduction OR the 2-trick step above), reset the
+      // counters so that all newly-added pairs get a fresh window for
+      // processing. Otherwise count this iteration toward the stability
+      // threshold.
+      //
+      // An earlier version reset only after the S-polynomial step, which
+      // missed the case where the 2-trick adds elements but the S-poly
+      // does not, allowing the loop to exit before processing pairs
+      // generated by the 2-trick (and even original pairs occluded by
+      // the LIFO ordering). See formal-proofs/IMPLEMENTATION_FINDINGS.md.
+      if(polys.size() > polys_size_at_iter_start)
+      {
+        pairs_since_last_progress = 0;
+        pairs_at_last_progress = pairs.size();
+      }
+      else
+      {
+        ++pairs_since_last_progress;
+      }
+    } // end inner while
+
+    // Inner loop exited (pairs empty or stable). Try F4-style
+    // interreduction: tail reduction across the basis. If it
+    // changes anything, regenerate pairs and continue the outer
+    // loop. Otherwise break out.
+    if(std::getenv("DISABLE_INTERREDUCE") != nullptr)
+      break;
+    bool changed = interreduce_basis(polys);
+    if(has_constant(polys))
+      return resultt::UNSAT;
+    if(!changed)
+      break;
+    polys.erase(
+      std::remove_if(
+        polys.begin(),
+        polys.end(),
+        [](const polynomialt &p) { return p.is_zero(); }),
+      polys.end());
+    pairs.clear();
+    for(std::size_t i = 0; i < polys.size(); ++i)
+      for(std::size_t j = i + 1; j < polys.size(); ++j)
+        pairs.emplace_back(i, j);
+    pairs_since_last_progress = 0;
+    pairs_at_last_progress = pairs.size();
+  } // end outer while
+
+  return has_constant(polys) ? resultt::UNSAT : resultt::UNKNOWN;
+}
+
+// PROOF: formal-proofs/ExtractCandidate.lean::extract_candidate_local_soundness
+//        Local soundness of the univariate-linear solve step:
+//        when c is a unit (odd in Z_{2^bw}), c*x + d = 0 has a
+//        unique solution x = -d * c^{-1}. The C++ algorithm
+//        constructs precisely this value (using inverse_mod_2d
+//        for the inverse and adjusting for the 2-adic valuation
+//        of c when c is not itself a unit).
+// PROOF: formal-proofs/ExtractCandidate.lean::solve_univariate_linear_unit
+//        Existence of a solution when the leading coefficient is
+//        a unit (odd). Same fact phrased existentially.
+std::map<std::size_t, mp_integer> strong_groebner_basist::extract_candidate(
+  const std::vector<polynomialt> &basis,
+  unsigned bw)
+{
+  std::map<std::size_t, mp_integer> assignment;
+  mp_integer m = power(mp_integer{2}, mp_integer{bw});
+
+  bool progress = true;
+  while(progress)
+  {
+    progress = false;
+    for(const auto &p : basis)
+    {
+      if(p.is_zero() || p.is_constant())
+        continue;
+
+      // Substitute known assignments
+      polynomialt reduced = p;
+      for(const auto &[var, val] : assignment)
+      {
+        polynomialt subst{bw};
+        for(const auto &[coeff, mon] : reduced.terms)
+        {
+          mp_integer new_coeff = coeff;
+          monomialt new_mon;
+          for(const auto &[vi, exp] : mon.vars)
+          {
+            if(vi == var)
+            {
+              mp_integer v = val;
+              for(unsigned e = 0; e < exp; ++e)
+                new_coeff = (new_coeff * v) % m;
+            }
+            else
+              new_mon.vars.emplace_back(vi, exp);
+          }
+          subst.terms.emplace_back(new_coeff, new_mon);
+        }
+        subst.normalize();
+        reduced = subst;
+      }
+
+      if(reduced.is_zero())
+        continue;
+
+      // Check if univariate linear: c*x + d = 0
+      if(reduced.terms.size() > 2)
+        continue;
+
+      std::size_t var_idx = 0;
+      mp_integer coeff_x{0}, coeff_const{0};
+      bool is_univariate_linear = true;
+
+      for(const auto &[c, mon] : reduced.terms)
+      {
+        if(mon.is_constant())
+        {
+          coeff_const = c;
+        }
+        else if(mon.vars.size() == 1 && mon.vars[0].second == 1)
+        {
+          if(coeff_x != 0)
+          {
+            is_univariate_linear = false;
+            break;
+          }
+          var_idx = mon.vars[0].first;
+          coeff_x = c;
+        }
+        else
+        {
+          is_univariate_linear = false;
+          break;
+        }
+      }
+
+      if(!is_univariate_linear || coeff_x == 0)
+        continue;
+      if(assignment.count(var_idx))
+        continue;
+
+      // x = -coeff_const / coeff_x mod 2^bw
+      // If coeff_x = 2^k * u (u odd), we can solve if coeff_const
+      // is also divisible by 2^k: divide both by 2^k, then
+      // x = -coeff_const' * inverse(u) mod 2^(bw-k).
+      unsigned v_x = val_2(coeff_x, bw);
+      unsigned v_c = val_2(coeff_const, bw);
+      if(v_x > 0 && v_c < v_x)
+        continue; // coeff_const not divisible by 2^v_x, no solution
+
+      mp_integer cx = coeff_x;
+      mp_integer cc = coeff_const;
+      unsigned effective_bw = bw;
+      if(v_x > 0)
+      {
+        mp_integer divisor = power(mp_integer{2}, mp_integer{v_x});
+        cx = cx / divisor;
+        cc = cc / divisor;
+        effective_bw = bw - v_x;
+      }
+      mp_integer eff_m = power(mp_integer{2}, mp_integer{effective_bw});
+      mp_integer inv = inverse_mod_2d(cx, effective_bw);
+      mp_integer val = (eff_m - ((cc * inv) % eff_m)) % eff_m;
+      // The solution is x ≡ val (mod 2^(bw-k)), pick the smallest
+      assignment[var_idx] = val % m;
+      progress = true;
+    }
+  }
+
+  return assignment;
+}
+
+// PROOF: formal-proofs/BuchbergerCorrectness.lean::reduce_in_ideal
+//        Soundness: reducing f by basis yields f' = f - q where
+//        q is in Ideal.span(basis). Hence f - f' is in the span,
+//        i.e., f and f' are in the same coset modulo the span.
+//        Crucial consequence used at the call site (boolbv.cpp::
+//        try_algebraic_solve): if reduce_by_basis returns 0,
+//        then f itself is in Ideal.span(basis), i.e., the
+//        equation f = 0 follows algebraically from the basis.
+//   ASSUMES: each iteration replaces the current `result` with
+//            `result - q*g` for some polynomial q and basis
+//            element g; no other update occurs.
+//   MAINTAINED BY: the inner loop's `result = result - mult.multiply(g, ...)`
+//            is the only update, and this is exactly the
+//            ideal-preserving form.
+polynomialt strong_groebner_basist::reduce_by_basis(
+  const polynomialt &f,
+  const std::vector<polynomialt> &basis,
+  std::size_t max_steps)
+{
+  // Delegate to the instance method strong_reduce, using a fresh
+  // instance so we don't mutate any external state. The instance
+  // tracks step counts via its members; we use the requested
+  // max_steps as the budget.
+  strong_groebner_basist instance{max_steps};
+  return instance.strong_reduce(f, basis);
+}

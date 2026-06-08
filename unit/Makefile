@@ -99,6 +99,7 @@ SRC += analyses/ai/ai.cpp \
        json_symbol_table.cpp \
        path_strategies.cpp \
        pointer-analysis/value_set.cpp \
+       solvers/algebraic/groebner.cpp \
        solvers/bdd/miniBDD/miniBDD.cpp \
        solvers/flattening/boolbv.cpp \
        solvers/flattening/boolbv_enumeration.cpp \

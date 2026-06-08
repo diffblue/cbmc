@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "smt2_parser.h"
 
-#include "smt2_format.h"
-
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
@@ -19,8 +17,50 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/mathematical_expr.h>
 #include <util/prefix.h>
 #include <util/range.h>
+#include <util/replace_symbol.h>
+
+#include "smt2_format.h"
 
 #include <numeric>
+
+/// Forward declaration: see definition near `bv_division`.
+static exprt apply_cond_eq_substitution(const exprt &cond, exprt expr);
+
+/// If `e` is a `let_exprt` whose body is an `if_exprt`, inline the
+/// let bindings into the body and return the resulting if_exprt;
+/// otherwise return `e` unchanged.
+///
+/// The smt2 parser wraps `bvudiv s t` and `bvurem s t` in
+/// `let_exprt({divisor}, t, if_exprt(eq(divisor, 0), all_ones,
+/// div_exprt(s, divisor)))` to avoid duplicating the divisor
+/// expression. For the parse-time push-through-ite rewrites
+/// (in `binary_predicate`) we want to see the let as transparent
+/// and distribute the surrounding equal/notequal/relational
+/// across the if branches. CBMC's bit-blaster has its own
+/// structural deduplication, so inlining the let at the top
+/// level does not duplicate work in the SAT layer.
+///
+/// Sound by alpha-equivalence: replacing each occurrence of a
+/// bound variable by its value preserves the expression's
+/// meaning in any model.
+static exprt unwrap_let_with_ite_body(const exprt &e)
+{
+  if(e.id() != ID_let || e.operands().size() != 2)
+    return e;
+  const auto &le = to_let_expr(e);
+  if(le.where().id() != ID_if || le.where().operands().size() != 3)
+    return e;
+  const auto &vars = le.binding().variables();
+  const auto &vals = le.values();
+  if(vars.size() != vals.size())
+    return e;
+  replace_symbolt rs;
+  for(std::size_t i = 0; i < vars.size(); ++i)
+    rs.set(vars[i], vals[i]);
+  exprt body = le.where();
+  rs(body);
+  return body;
+}
 
 smt2_tokenizert::tokent smt2_parsert::next_token()
 {
@@ -381,6 +421,71 @@ exprt smt2_parsert::binary_predicate(irep_idt id, const exprt::operandst &op)
     throw error("expression must have two operands");
 
   check_matching_operand_types(op);
+
+  // Push equal/notequal/relational through ite at parse time:
+  //   (= (ite c A B) X)        -> (ite c (= A X[c])      (= B X))
+  //   (= X (ite c A B))        -> (ite c (= X[c] A)      (= X B))
+  //   (distinct (ite c A B) X) -> (ite c (distinct A X[c]) (distinct B X))
+  //   (distinct X (ite c A B)) -> (ite c (distinct X[c] A) (distinct X B))
+  //   (le (ite c A B) X)       -> (ite c (le A X[c])     (le B X))
+  //   (le X (ite c A B))       -> (ite c (le X[c] A)     (le X B))
+  // and similarly for lt, ge, gt. X[c] is X with the if-condition's
+  // equalities substituted (apply_cond_eq_substitution). The
+  // substitution lets `bvudiv 0 t`, `bvmul t 0` and friends fire
+  // their parse-time rewrites in the true branch even when the
+  // equality came from the surrounding ite condition.
+  //
+  // Soundness: ite c T F equals T if c, F if ¬c, and the
+  // substitution is valid in the true branch where the equality
+  // holds. The relational predicates (le, lt, ge, gt) are
+  // pointwise: applying the predicate after the ite is the same
+  // as applying it inside both branches.
+  //
+  // Distribute only when exactly one side is an ite at the top
+  // level (avoid quadratic blow-up on (= ite ite)).
+  //
+  // PROOF: formal-proofs/IteCondPropagation.lean::eq_through_ite_left,
+  //        notequal_through_ite_left, le_through_ite_left,
+  //        lt_through_ite_left.
+  if(
+    id == ID_equal || id == ID_notequal || id == ID_le || id == ID_lt ||
+    id == ID_ge || id == ID_gt)
+  {
+    // Unwrap any let-binding around an ite consistently on both
+    // sides, so that the LHS-else and RHS remain structurally
+    // comparable (distinct(X, X) -> FALSE) after distribution.
+    exprt op0_u = unwrap_let_with_ite_body(op[0]);
+    exprt op1_u = unwrap_let_with_ite_body(op[1]);
+    const bool lhs_is_ite = op0_u.id() == ID_if && op0_u.operands().size() == 3;
+    const bool rhs_is_ite = op1_u.id() == ID_if && op1_u.operands().size() == 3;
+    // Distribute on the lhs preferentially (and the rhs if the
+    // lhs is not an ite). When both sides are ites, the recursive
+    // call will distribute on the rhs in the inner predicates.
+    if(lhs_is_ite)
+    {
+      const auto &if_e = to_if_expr(op0_u);
+      auto true_rhs = apply_cond_eq_substitution(if_e.cond(), op1_u);
+      auto true_branch =
+        apply_cond_eq_substitution(if_e.cond(), if_e.true_case());
+      exprt::operandst true_op{true_branch, true_rhs};
+      exprt::operandst false_op{if_e.false_case(), op1_u};
+      auto true_eq = binary_predicate(id, true_op);
+      auto false_eq = binary_predicate(id, false_op);
+      return if_exprt(if_e.cond(), true_eq, false_eq);
+    }
+    if(rhs_is_ite)
+    {
+      const auto &if_e = to_if_expr(op1_u);
+      auto true_lhs = apply_cond_eq_substitution(if_e.cond(), op0_u);
+      auto true_branch =
+        apply_cond_eq_substitution(if_e.cond(), if_e.true_case());
+      exprt::operandst true_op{true_lhs, true_branch};
+      exprt::operandst false_op{op0_u, if_e.false_case()};
+      auto true_eq = binary_predicate(id, true_op);
+      auto false_eq = binary_predicate(id, false_op);
+      return if_exprt(if_e.cond(), true_eq, false_eq);
+    }
+  }
 
   return binary_predicate_exprt(op[0], id, op[1]);
 }
@@ -965,12 +1070,164 @@ exprt smt2_parsert::function_application()
   UNREACHABLE;
 }
 
+/// Forward declaration: defined after `bv_mod` to keep the
+/// pattern-match helper near the construction sites.
+static std::optional<std::pair<exprt, exprt>>
+match_bvurem_letform(const exprt &e);
+
+/// If \p cond has the shape `(equal symbol constant)` (or its
+/// commuted form `(equal constant symbol)`), substitute occurrences
+/// of `symbol` in \p expr by `constant` and return the result.
+/// Otherwise return \p expr unchanged.
+///
+/// Used in the ite-distribution sites of `bv_division`, `bv_mod`,
+/// `bvmul_with_simplifications`, and the parse-time
+/// distinct/equal-through-ite rewrite to propagate the if-condition's
+/// equality into the true branch. Sound by ite semantics: when the
+/// condition holds, the true branch is selected and the equality
+/// holds at that point.
+///
+/// PROOF: formal-proofs/IteCondPropagation.lean::if_cond_propagation
+///        Soundness: ite c T F = ite c T[c] F where T[c] denotes
+///        T with the equalities entailed by c substituted into it.
+static exprt apply_cond_eq_substitution(const exprt &cond, exprt expr)
+{
+  if(cond.id() != ID_equal || cond.operands().size() != 2)
+    return expr;
+  const exprt &c0 = cond.operands()[0];
+  const exprt &c1 = cond.operands()[1];
+  auto try_sub = [&](const exprt &sym, const exprt &val) -> bool
+  {
+    if(sym.id() == ID_symbol && val.is_constant())
+    {
+      replace_symbolt rs;
+      rs.set(to_symbol_expr(sym), val);
+      rs(expr);
+      return true;
+    }
+    return false;
+  };
+  if(!try_sub(c0, c1))
+    try_sub(c1, c0);
+  return expr;
+}
+
 exprt smt2_parsert::bv_division(
   const exprt::operandst &operands,
   bool is_signed)
 {
   if(operands.size() != 2)
     throw error() << "bitvector division expects two operands";
+
+  // Word-level simplifications recognised before bit-blasting:
+  //
+  //   (bvudiv/bvsdiv x x) =
+  //     (ite (= x 0) (bvnot 0) 1)
+  //   (bvudiv/bvsdiv 0 x) =
+  //     (ite (= x 0) (bvnot 0) 0)
+  //
+  // Both are correct under SMT-LIB-2 semantics (division by zero
+  // yields all-ones; otherwise standard division), and apply
+  // identically for signed and unsigned: x/x = 1 for x != 0 in
+  // 2's-complement (including x = MIN, since MIN/MIN = 1 with no
+  // overflow), and 0/x = 0 for x != 0 regardless of sign.
+  //
+  // Recognising these patterns at parse time avoids constructing
+  // a full divider in the downstream bit-blasted form: at high
+  // bitwidth the divider is the dominant cost, and the conditional
+  // form here is decided by the SAT solver in roughly constant time.
+  // Two of the five 512-bit "rw_rule_candidate" benchmarks in the
+  // SMT-COMP QF_BV stratified sample reduce to trivial after this
+  // rewrite (matching Bitwuzla's word-level simplification).
+  //
+  // PROOF: formal-proofs/DivisionRewrites.lean::bvudiv_self
+  //        Soundness of (bvudiv x x) -> (ite (= x 0) -1 1) over
+  //        ZMod (2^d) under SMT-LIB div-by-zero convention.
+  // PROOF: formal-proofs/DivisionRewrites.lean::bvudiv_zero_left
+  //        Soundness of (bvudiv 0 x) -> (ite (= x 0) -1 0).
+  //   ASSUMES: SMT-LIB-2 semantics (bvudiv x 0 = ~0); this is how
+  //            CBMC interprets bvudiv (see the let-binding below).
+  //   MAINTAINED BY: the early-return below uses the exact ite
+  //            structure proved sound in the Lean theorems.
+  {
+    const auto all_ones = to_unsignedbv_type(operands[0].type()).largest_expr();
+    const auto zero = from_integer(0, operands[0].type());
+    const auto one = from_integer(1, operands[0].type());
+    const auto divisor_is_zero =
+      equal_exprt(operands[1], from_integer(0, operands[1].type()));
+
+    // (bvudiv/bvsdiv x x): syntactic identity check
+    if(operands[0] == operands[1])
+      return if_exprt(divisor_is_zero, all_ones, one);
+
+    // (bvudiv/bvsdiv 0 x): numerator is the constant 0
+    auto num_value = numeric_cast<mp_integer>(operands[0]);
+    if(num_value.has_value() && *num_value == 0)
+      return if_exprt(divisor_is_zero, all_ones, zero);
+
+    // Cancellation: (bvudiv (bvurem A y) y).
+    // For y != 0, bvurem A y < y strictly, so dividing by y gives 0.
+    // For y = 0, bvurem A 0 = A and bvudiv A 0 = ~0 (SMT-LIB).
+    // Hence (bvudiv (bvurem A y) y) = ite(= y 0, ~0, 0).
+    // PROOF: formal-proofs/DivisionRewrites.lean::bvudiv_bvurem_self
+    //        Soundness over ZMod (2^d) by case analysis on y = 0,
+    //        using bvurem A y < y when y != 0.
+    if(auto bvurem_match = match_bvurem_letform(operands[0]))
+    {
+      if(bvurem_match->second == operands[1])
+        return if_exprt(divisor_is_zero, all_ones, zero);
+    }
+
+    // Constant-divisor folding (avoids constructing a divider at all
+    // for these special values).
+    auto divisor_value = numeric_cast<mp_integer>(operands[1]);
+    if(divisor_value.has_value())
+    {
+      const auto bw = to_bitvector_type(operands[0].type()).get_width();
+      const mp_integer max_val = power(mp_integer{2}, mp_integer{bw}) - 1;
+      // (bvudiv/bvsdiv X 0): SMT-LIB div-by-zero -> all-ones
+      if(*divisor_value == 0)
+        return all_ones;
+      // (bvudiv/bvsdiv X 1): division by 1 -> X
+      if(*divisor_value == 1)
+        return operands[0];
+      // (bvudiv/bvsdiv X ~0): unique unsigned divisor of max_val,
+      // result is 1 iff X = ~0 else 0.
+      if(*divisor_value == max_val)
+        return if_exprt(equal_exprt(operands[0], all_ones), one, zero);
+    }
+  }
+
+  // ite-distribution over the divisor: rewrite
+  //   (bvudiv X (ite c Y Z))
+  // to
+  //   (ite c (bvudiv X Y) (bvudiv X Z)).
+  // Sound by case analysis on the if-condition. The recursive call
+  // re-enters bv_division on each branch, so the trivial-pattern
+  // shortcuts above (x/x, 0/x, x/0) apply to each branch
+  // independently, often collapsing the entire bvudiv into a
+  // small ite-tree of constants. This pattern is what unlocks
+  // benchmarks where the divisor was already an ite (e.g.\ from
+  // an earlier (bvudiv 0 t) rewrite producing
+  // `ite (= t 0) ~0 0`, then a surrounding bvudiv distributes
+  // through it).
+  // PROOF: formal-proofs/DivisionRewrites.lean::bvudiv_ite_distribution
+  //        ite-distribution over the divisor: (bvudiv X (ite c Y Z))
+  //        = (ite c (bvudiv X Y) (bvudiv X Z)). Trivially sound by
+  //        case analysis on c.
+  if(operands[1].id() == ID_if && operands[1].operands().size() == 3)
+  {
+    const auto &if_e = to_if_expr(operands[1]);
+    // Propagate the if-condition's equality into the true branch.
+    // E.g., `bvudiv s (ite (= s 0) X Y)` -> `ite (= s 0) (bvudiv 0 X) (bvudiv s Y)`,
+    // and the (bvudiv 0 X) sub-expression is then simplified by the
+    // 0/x rewrite at the recursive bv_division call.
+    auto true_op0 = apply_cond_eq_substitution(if_e.cond(), operands[0]);
+    auto true_op1 = apply_cond_eq_substitution(if_e.cond(), if_e.true_case());
+    auto true_div = bv_division({true_op0, true_op1}, is_signed);
+    auto false_div = bv_division({operands[0], if_e.false_case()}, is_signed);
+    return if_exprt(if_e.cond(), true_div, false_div);
+  }
 
   // SMT-LIB2 defines the result of division by 0 to be 1....1
   auto divisor = symbol_exprt("divisor", operands[1].type());
@@ -999,6 +1256,57 @@ exprt smt2_parsert::bv_mod(const exprt::operandst &operands, bool is_signed)
   if(operands.size() != 2)
     throw error() << "bitvector modulo expects two operands";
 
+  // Word-level simplifications recognised before bit-blasting:
+  //
+  //   (bvurem/bvsrem/bvsmod x x) = 0
+  //   (bvurem/bvsrem/bvsmod 0 x) = 0
+  //
+  // Both reduce to a constant 0:
+  //   - x mod x = 0 for x != 0; for x = 0, SMT-LIB defines
+  //     bvurem/bvsrem to return the dividend (here = x = 0).
+  //     bvsmod has different sign handling but still returns 0
+  //     when dividend = divisor.
+  //   - 0 mod x = 0 for x != 0; for x = 0, SMT-LIB returns the
+  //     dividend (here = 0).
+  //
+  // Recognising these patterns at parse time avoids constructing
+  // a full divider/remainder in the downstream bit-blasted form,
+  // matching the rewrite story for bv_division above.
+  //
+  // PROOF: formal-proofs/DivisionRewrites.lean::bvurem_self
+  //        Soundness of (bvurem x x) -> 0 over ZMod (2^d) under
+  //        SMT-LIB rem-by-zero convention (bvurem x 0 = x).
+  // PROOF: formal-proofs/DivisionRewrites.lean::bvurem_zero_left
+  //        Soundness of (bvurem 0 x) -> 0.
+  //   ASSUMES: SMT-LIB-2 semantics (bvurem x 0 = x).
+  //   MAINTAINED BY: the early-return below emits the constant 0
+  //            in both cases, matching the Lean theorems.
+  {
+    auto num_value = numeric_cast<mp_integer>(operands[0]);
+    bool num_is_zero = num_value.has_value() && *num_value == 0;
+    if(operands[0] == operands[1] || num_is_zero)
+      return from_integer(0, operands[0].type());
+  }
+
+  // ite-distribution over the divisor: rewrite
+  //   (bvurem X (ite c Y Z))
+  // to
+  //   (ite c (bvurem X Y) (bvurem X Z)).
+  // Sound by case analysis. Same rationale as bv_division above.
+  // PROOF: formal-proofs/DivisionRewrites.lean::bvurem_ite_distribution
+  //        ite-distribution over the divisor: (bvurem X (ite c Y Z))
+  //        = (ite c (bvurem X Y) (bvurem X Z)). Trivially sound by
+  //        case analysis on c.
+  if(operands[1].id() == ID_if && operands[1].operands().size() == 3)
+  {
+    const auto &if_e = to_if_expr(operands[1]);
+    auto true_op0 = apply_cond_eq_substitution(if_e.cond(), operands[0]);
+    auto true_op1 = apply_cond_eq_substitution(if_e.cond(), if_e.true_case());
+    auto true_mod = bv_mod({true_op0, true_op1}, is_signed);
+    auto false_mod = bv_mod({operands[0], if_e.false_case()}, is_signed);
+    return if_exprt(if_e.cond(), true_mod, false_mod);
+  }
+
   // SMT-LIB2 defines the result of "lhs modulo 0" to be "lhs"
   auto dividend = symbol_exprt("dividend", operands[0].type());
   auto divisor = symbol_exprt("divisor", operands[1].type());
@@ -1021,6 +1329,201 @@ exprt smt2_parsert::bv_mod(const exprt::operandst &operands, bool is_signed)
     {dividend, divisor},
     {operands[0], operands[1]},
     if_exprt(divisor_is_zero, dividend, mod_result));
+}
+
+/// Recognise the canonical let-wrapped form of an unsigned bvurem
+/// produced by `bv_mod` with `is_signed = false`:
+///
+///   let dividend = X, divisor = Y in
+///     if (= divisor 0) then dividend else mod(dividend, divisor)
+///
+/// On match, returns the original (X, Y) expressions; otherwise
+/// std::nullopt. The shape is brittle because the let binds two
+/// fresh symbols and the body references both --- we walk the AST
+/// piece-by-piece and bail at the first mismatch.
+static std::optional<std::pair<exprt, exprt>>
+match_bvurem_letform(const exprt &e)
+{
+  if(e.id() != ID_let)
+    return std::nullopt;
+  const auto &le = to_let_expr(e);
+  if(le.variables().size() != 2 || le.values().size() != 2)
+    return std::nullopt;
+  const auto &dividend_sym = le.variables()[0];
+  const auto &divisor_sym = le.variables()[1];
+  if(le.where().id() != ID_if)
+    return std::nullopt;
+  const auto &if_e = to_if_expr(le.where());
+  // condition: dividend_sym is irrelevant; we want
+  //   (= divisor_sym 0)
+  if(if_e.cond().id() != ID_equal || if_e.cond().operands().size() != 2)
+    return std::nullopt;
+  const auto &eq = to_equal_expr(if_e.cond());
+  if(eq.lhs() != divisor_sym)
+    return std::nullopt;
+  auto zero_val = numeric_cast<mp_integer>(eq.rhs());
+  if(!zero_val.has_value() || *zero_val != 0)
+    return std::nullopt;
+  // true case: dividend_sym
+  if(if_e.true_case() != exprt(dividend_sym))
+    return std::nullopt;
+  // false case: mod(dividend_sym, divisor_sym)
+  if(
+    if_e.false_case().id() != ID_mod ||
+    if_e.false_case().operands().size() != 2)
+    return std::nullopt;
+  if(
+    if_e.false_case().operands()[0] != exprt(dividend_sym) ||
+    if_e.false_case().operands()[1] != exprt(divisor_sym))
+    return std::nullopt;
+  return std::make_pair(le.values()[0], le.values()[1]);
+}
+
+/// Build a bvmul expression with parse-time simplifications:
+///   X * 0  -> 0
+///   X * 1  -> X
+///   X * ~0 -> bvneg X (since ~0 = -1 in 2's complement)
+///   X * (ite c Y Z) -> ite c (X*Y) (X*Z)  -- ite-distribution
+/// Recursive: each ite-distribution branch goes through the same
+/// simplifications, so X * (ite c 1 ~0) -> ite c X (bvneg X). At
+/// the binary boundary we fall through to multi_ary(ID_mult, op).
+///
+/// PROOF: formal-proofs/DivisionRewrites.lean::bvmul_ite_distribution
+///        Trivially sound by case analysis on the if-condition. The
+///        constant folds are sound by the standard ZMod arithmetic
+///        identities for 0, 1, and -1 in ZMod (2^d).
+exprt smt2_parsert::bvmul_with_simplifications(const exprt::operandst &op)
+{
+  if(op.size() == 2)
+  {
+    auto fold_const = [](const exprt &x, const exprt &c) -> std::optional<exprt>
+    {
+      auto cv = numeric_cast<mp_integer>(c);
+      if(!cv.has_value())
+        return std::nullopt;
+      const auto bw = to_bitvector_type(x.type()).get_width();
+      const mp_integer max_val = power(mp_integer{2}, mp_integer{bw}) - 1;
+      if(*cv == 0)
+        return from_integer(0, x.type());
+      if(*cv == 1)
+        return x;
+      if(*cv == max_val)
+        return (exprt)unary_minus_exprt{x, x.type()};
+      return std::nullopt;
+    };
+    if(auto rewritten = fold_const(op[0], op[1]))
+      return *rewritten;
+    if(auto rewritten = fold_const(op[1], op[0]))
+      return *rewritten;
+    auto try_distrib =
+      [this](const exprt &x, const exprt &y) -> std::optional<exprt>
+    {
+      if(y.id() == ID_if && y.operands().size() == 3)
+      {
+        const auto &if_e = to_if_expr(y);
+        auto true_x = apply_cond_eq_substitution(if_e.cond(), x);
+        auto true_y = apply_cond_eq_substitution(if_e.cond(), if_e.true_case());
+        auto true_mul = bvmul_with_simplifications({true_x, true_y});
+        auto false_mul = bvmul_with_simplifications({x, if_e.false_case()});
+        return if_exprt(if_e.cond(), true_mul, false_mul);
+      }
+      return std::nullopt;
+    };
+    if(auto rewritten = try_distrib(op[0], op[1]))
+      return *rewritten;
+    if(auto rewritten = try_distrib(op[1], op[0]))
+      return *rewritten;
+  }
+  return multi_ary(ID_mult, op);
+}
+
+/// Recognise (bv_u_rel (bvurem A y) y) and emit the simplified
+/// form. Sound under SMT-LIB-2 semantics (bvurem y 0 = y;
+/// otherwise bvurem A y < y strictly):
+///
+///   bvule (bvurem A y) y -> ite(= y 0, = A 0, true)
+///   bvult (bvurem A y) y -> not (= y 0)
+///   bvuge y (bvurem A y) -> ite(= y 0, = A 0, true)
+///   bvugt y (bvurem A y) -> not (= y 0)
+///
+/// At bw=512 this avoids constructing a full divider, which is
+/// the dominant cost in benchmarks like SMT-COMP's bw512_15.
+///
+/// PROOF: formal-proofs/DivisionRewrites.lean::bvule_bvurem_self
+///        Soundness of (bvule (bvurem A y) y) -> ite(=y 0, =A 0, true).
+///        The RHS is True when y != 0 because bvurem A y < y
+///        strictly; when y = 0 the bvurem result is A by SMT-LIB
+///        convention, and bvule A 0 holds iff A = 0.
+/// PROOF: formal-proofs/DivisionRewrites.lean::bvult_bvurem_self
+///        Soundness of (bvult (bvurem A y) y) -> not (= y 0).
+///        Strict version: when y = 0, bvurem result is A and
+///        bvult A 0 is false (no unsigned value < 0); when y != 0,
+///        bvurem A y < y strictly so bvult holds.
+///   ASSUMES: SMT-LIB-2 semantics (bvurem x 0 = x). Holds by
+///            construction of bv_mod above.
+///   MAINTAINED BY: match_bvurem_letform identifies the exact
+///            let-wrapped if-then-else structure produced by
+///            bv_mod (with is_signed=false). Mismatched structures
+///            (bvsrem, bvsmod, complex modifications) bail out
+///            and the original parse continues.
+std::optional<exprt> smt2_parsert::try_bvurem_relation_rewrite(
+  irep_idt rel,
+  const exprt::operandst &op)
+{
+  if(op.size() != 2)
+    return std::nullopt;
+  // Determine which operand is the bvurem and which is the divisor:
+  //   ID_le, ID_lt:  op[0] is bvurem, op[1] is divisor (urem result <= y)
+  //   ID_ge, ID_gt:  op[0] is divisor, op[1] is bvurem (y >= urem result)
+  bool strict; // ID_lt or ID_gt
+  std::size_t urem_idx, divisor_idx;
+  if(rel == ID_le)
+  {
+    strict = false;
+    urem_idx = 0;
+    divisor_idx = 1;
+  }
+  else if(rel == ID_lt)
+  {
+    strict = true;
+    urem_idx = 0;
+    divisor_idx = 1;
+  }
+  else if(rel == ID_ge)
+  {
+    strict = false;
+    urem_idx = 1;
+    divisor_idx = 0;
+  }
+  else if(rel == ID_gt)
+  {
+    strict = true;
+    urem_idx = 1;
+    divisor_idx = 0;
+  }
+  else
+  {
+    return std::nullopt;
+  }
+  auto match = match_bvurem_letform(op[urem_idx]);
+  if(!match.has_value())
+    return std::nullopt;
+  const auto &[A, y] = *match;
+  if(y != op[divisor_idx])
+    return std::nullopt;
+  // Pattern matched. Build the simplified form.
+  auto y_is_zero = equal_exprt(y, from_integer(0, y.type()));
+  if(strict)
+  {
+    // bvult (bvurem A y) y  =  (¬(= y 0))
+    return not_exprt(y_is_zero);
+  }
+  else
+  {
+    // bvule (bvurem A y) y  =  ite(= y 0, = A 0, true)
+    auto A_is_zero = equal_exprt(A, from_integer(0, A.type()));
+    return if_exprt(y_is_zero, A_is_zero, true_exprt());
+  }
 }
 
 exprt smt2_parsert::expression()
@@ -1164,25 +1667,49 @@ void smt2_parsert::setup_expressions()
   expressions["<"] = [this] { return binary_predicate(ID_lt, operands()); };
   expressions[">"] = [this] { return binary_predicate(ID_gt, operands()); };
 
-  expressions["bvule"] = [this] { return binary_predicate(ID_le, operands()); };
+  expressions["bvule"] = [this]
+  {
+    auto op = operands();
+    if(auto rewritten = try_bvurem_relation_rewrite(ID_le, op))
+      return *rewritten;
+    return binary_predicate(ID_le, op);
+  };
 
   expressions["bvsle"] = [this] {
     return binary_predicate(ID_le, cast_bv_to_signed(operands()));
   };
 
-  expressions["bvuge"] = [this] { return binary_predicate(ID_ge, operands()); };
+  expressions["bvuge"] = [this]
+  {
+    auto op = operands();
+    if(auto rewritten = try_bvurem_relation_rewrite(ID_ge, op))
+      return *rewritten;
+    return binary_predicate(ID_ge, op);
+  };
 
   expressions["bvsge"] = [this] {
     return binary_predicate(ID_ge, cast_bv_to_signed(operands()));
   };
 
-  expressions["bvult"] = [this] { return binary_predicate(ID_lt, operands()); };
+  expressions["bvult"] = [this]
+  {
+    auto op = operands();
+    if(auto rewritten = try_bvurem_relation_rewrite(ID_lt, op))
+      return *rewritten;
+    return binary_predicate(ID_lt, op);
+  };
 
   expressions["bvslt"] = [this] {
     return binary_predicate(ID_lt, cast_bv_to_signed(operands()));
   };
 
-  expressions["bvugt"] = [this] { return binary_predicate(ID_gt, operands()); };
+  expressions["bvugt"] = [this]
+  {
+    auto op = operands();
+    if(auto rewritten = try_bvurem_relation_rewrite(ID_gt, op))
+      return *rewritten;
+    return binary_predicate(ID_gt, op);
+  };
 
   expressions["bvsgt"] = [this] {
     return binary_predicate(ID_gt, cast_bv_to_signed(operands()));
@@ -1214,7 +1741,8 @@ void smt2_parsert::setup_expressions()
   expressions["bvadd"] = [this] { return multi_ary(ID_plus, operands()); };
   expressions["+"] = [this] { return multi_ary(ID_plus, operands()); };
   expressions["bvsub"] = [this] { return binary(ID_minus, operands()); };
-  expressions["bvmul"] = [this] { return multi_ary(ID_mult, operands()); };
+  expressions["bvmul"] = [this]
+  { return bvmul_with_simplifications(operands()); };
   expressions["*"] = [this] { return multi_ary(ID_mult, operands()); };
 
   expressions["-"] = [this] {

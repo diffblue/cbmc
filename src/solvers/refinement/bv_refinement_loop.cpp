@@ -6,9 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <util/xml.h>
+
 #include "bv_refinement.h"
 
-#include <util/xml.h>
+#include <cstdlib>
 
 bv_refinementt::bv_refinementt(const infot &info)
   : bv_pointerst(*info.ns, *info.prop, *info.message_handler),
@@ -26,6 +28,37 @@ decision_proceduret::resultt bv_refinementt::dec_solve(const exprt &assumption)
   // do the usual post-processing
   log.progress() << "BV-Refinement: post-processing" << messaget::eom;
   finish_eager_conversion();
+
+  // Find commutative pairs of approximations and assert result equality.
+  // For two approximations m1 = a*b and m2 = b*a (operands swapped),
+  // the results must be equal even though their bit-blastings would
+  // not be syntactically related. Asserting equality is sound and
+  // gives the SAT solver a shortcut whenever the wider context
+  // prevented expression-level simplification (e.g., results stored
+  // through opaque calls or array elements).
+  detect_algebraic_pairs();
+
+  // The legacy refinement loop's lazy-multiplication architecture
+  // is the empirical bottleneck of \texttt{--refine-arithmetic}: on
+  // benchmarks where pair detection's equality assertions are not
+  // enough to close the formula, the loop spends multiple SAT calls
+  // widening the under-approximation, and each iteration re-runs
+  // CaDiCaL on a slightly different formula. Pair detection itself
+  // does not depend on the lazy architecture --- the equality
+  // constraints it emits are sound regardless of whether
+  // multiplications are bit-blasted eagerly or lazily.
+  //
+  // We therefore eagerly bit-blast every multiplication using the
+  // standard multiplier encoding before entering the loop. The loop
+  // then converges in a single iteration because there are no
+  // approximations left to refine. CBMC_DISABLE_REFINE_BYPASS=1
+  // restores the legacy lazy behaviour for benchmarking.
+  if(config_.refine_arithmetic)
+  {
+    const char *env = std::getenv("CBMC_DISABLE_REFINE_BYPASS");
+    if(env == nullptr || env[0] == '\0' || env[0] == '0')
+      eagerly_complete_approximations();
+  }
 
   log.debug() << "Solving with " << prop.solver_text() << messaget::eom;
 

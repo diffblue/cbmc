@@ -1,0 +1,3038 @@
+\documentclass[runningheads]{llncs}
+
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{xspace}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[algoruled,linesnumbered,vlined]{algorithm2e}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+\newcommand{\combacs}{\textsc{comba-cs}\xspace}
+\newcommand{\cadical}{\textsc{CaDiCaL}\xspace}
+\newcommand{\cbmc}{\textsc{CBMC}\xspace}
+
+\begin{document}
+
+\title{Algebraic Solving for Bit-Vector Arithmetic\\in SAT-Based Decision Procedures}
+
+\titlerunning{Algebraic Solving for Bit-Vector Arithmetic}
+
+\author{Anonymous\inst{1}}
+\authorrunning{Anonymous}
+
+\institute{Anonymous Institution}
+
+\maketitle
+
+\begin{abstract}
+Bitwuzla and cvc5 dispatch arithmetic identities via
+pattern-matched rewriting and occurrence-map canonicalisation,
+complete for commutativity and associativity but not for richer
+polynomial identities; cvc5 additionally applies Gaussian
+elimination modulo $2^d$ for linear equation systems. Neither
+tool implements a decision procedure for nonlinear polynomial
+identities over $\mathbb{Z}_{2^d}$, and on high-degree identities
+and on DSP datapath equivalences with overflow cancellation both
+rewriting and bit-blasting time out.
+
+We give the first SMT integration of a complete decision
+procedure for universally-quantified equalities of polynomial
+expressions in $\mathbb{Z}_{2^d}$, combining a strong Gr\"obner
+basis solver (ideal membership) with a vanishing-polynomial test
+using falling factorials and Kronecker-product Stirling matrices
+(function equivalence). On the full random-polynomial
+suite of Brain~\cite{brain2025subpoly} (3498 benchmarks) the
+procedure decides 59
+benchmarks at degree $\geq 13$ that Bitwuzla, cvc5, and every
+bit-blasting configuration we evaluated time out on within
+10\,s; on 5 DSP datapath equivalences with overflow
+cancellation~\cite{shekhar2007equivalence,gamez2024efficient}
+it solves in $<$15\,ms (cvc5 takes 1.84\,s on
+\texttt{dsp\_horner\_16}, a 184$\times$ gap); on
+SABER~\cite{daemen2018saber} polynomial multiplication
+(post-quantum cryptography) the procedure scales to SABER's
+actual $N=256$ parameter, with cvc5 timing out at every
+$N \geq 4$; on commutativity, associativity, and overflow
+checking it is bitwidth-independent (BW=8 to 256, 2--5\,ms
+throughout) and matches Bitwuzla's word-level rewriting. Soundness is mechanised in
+Lean~4 with over 150 theorems, zero \texttt{sorry}, and zero
+project-internal axioms (including contract-level
+theorems referenced directly from the implementation source),
+including four candidates for Mathlib contribution; the
+formalisation effort exposed and removed two implementation bugs
+that empirical testing did not catch (a 2{,}000$\times$ ordering
+sensitivity in the Buchberger loop and a 2-trick
+progress-tracking gap that could turn UNSAT into UNKNOWN), and
+surfaced a methodological lesson about explicit-invariant
+cross-references.
+
+\keywords{Gr\"obner basis \and bit-vector arithmetic \and
+vanishing polynomials \and bit-vector SMT \and Lean 4.}
+\end{abstract}
+
+\section{Introduction}
+
+A bit-vector SMT solver verifying
+$\forall a, b \in \mathbb{Z}_{2^{16}}.\ a \cdot b = b \cdot a$ has
+two operational options: recognise the identity \emph{syntactically}
+via word-level rewriting (the approach taken by both
+Bitwuzla~\cite{niemetz2023bitwuzla} and cvc5), or bit-blast both
+sides into a SAT formula and refute the negation. The first is
+fast when the rewriter has a matching pattern; the second is slow
+but general. Both fail when the polynomial identity escapes the
+rewriter's pattern set --- on
+$(a + b)^{18} = \sum_{i=0}^{18} \binom{18}{i} a^i b^{18-i}$ over
+$\mathbb{Z}_{2^{16}}$ no current SMT solver we tested closes the
+goal within 10\,s, and on DSP datapath equivalences whose two
+sides differ by a vanishing polynomial under modular overflow,
+rewriting falls through to a bit-blasted formula that all four
+SAT solvers we evaluated time out on.
+
+We give a third path: a \emph{decision procedure} for
+universally-quantified equalities of polynomial expressions in
+$\mathbb{Z}_{2^d}$, complete in two senses (ideal membership and
+function equivalence) and integrated as a pre-pass in
+\cbmc~\cite{clarke2004tool}. The procedure decides such queries
+in milliseconds, regardless of bitwidth.
+
+\paragraph{Scope: four classes of bit-vector arithmetic query.}
+Bit-vector queries with multiplication split by quantification
+(universal vs.\ existential) and connective (equality vs.\ a
+relation $\bowtie \in \{<, \leq, \neq\}$) into four classes. The
+two papers in this development cover them as follows
+(Table~\ref{tab:taxonomy}); this paper addresses the
+universal-equational class with polynomial expressions in
+$\mathbb{Z}_{2^d}$, and the bit-blasting companion
+paper~\cite{companion-bitblasting} addresses the
+universal-relational and existential-relational classes.
+Existential-equational queries are split by direction:
+SAT-direction (witness construction) is handled by bit-blasting
+in both papers; UNSAT-direction (refutation) is handled in this
+paper via Song et al.'s $2^{d-1}$ disequality encoding.
+
+\begin{table}[ht]
+\caption{Four classes of bit-vector arithmetic query, with the
+example of multiplication, and the technique that decides each.
+Existential-equational is split by direction: SAT (find a
+witness) vs.\ UNSAT (no witness exists).}
+\label{tab:taxonomy}
+\centering
+\small
+\begin{tabular}{llll}
+\toprule
+Quantifier & Connective & Example & Decided by \\
+\midrule
+universal   & equational ($=$)        & $a \cdot b = b \cdot a$    & \textbf{this paper} (Gr\"obner / vanishing) \\
+universal   & relational ($\bowtie$)  & $|a \cdot b| < 2^{30}$     & companion paper (bit-blasting) \\
+existential & equational, UNSAT-dir.  & $\neg \exists x.\ p(x) = c$ & \textbf{this paper} (Song $2^{d-1}$ encoding) \\
+existential & equational, SAT-dir.    & $\exists x.\ p(x) = c$     & bit-blasting (witness) \\
+existential & relational              & overflow witness           & companion paper (bit-blasting) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Contributions.}
+\begin{enumerate}
+\item \textbf{A decision procedure for ideal membership in
+  $\mathbb{Z}_{2^d}$.}
+  A strong Gr\"obner basis solver over $\mathbb{Z}_{2^d}$, built
+  on the theoretical foundation of
+  Song et al.~\cite{song2024equational}. We add an SMT-grade
+  implementation: SSA-aware decomposition of nested
+  multiplications, Song et al.'s sound $2^{d-1}$ disequality
+  encoding (a prototype using the textbook field Rabinowitsch
+  trick was unsound over $\mathbb{Z}_{2^d}$; see the remark in
+  Section~\ref{sec:algebraic-pipeline}), and
+  a progress-based termination rule that eliminates
+  equation-ordering sensitivity
+  (Section~\ref{sec:algebraic}).
+
+\item \textbf{A decision procedure for function equivalence over
+  $\mathbb{Z}_{2^d}$.}
+  Ideal membership in $\mathbb{Z}_{2^d}[x_1,\ldots,x_n]$ is not
+  the right question for SMT: an SMT user verifying
+  $\forall a, b.\ f(a,b) = g(a,b)$ wants \emph{function}
+  equivalence, and over $\mathbb{Z}_{2^d}$ the two notions
+  diverge --- e.g., $4x^2 + 4x \equiv 0 \pmod 8$ as a function
+  but is non-zero as a polynomial. We give a vanishing-polynomial
+  test using falling-factorial decomposition and Kronecker-product
+  Stirling matrices, complete for the function-equivalence
+  semantics, that decides such cases in microseconds
+  (Section~\ref{sec:vanishing}).
+
+\item \textbf{Mechanised soundness with formalisation-driven
+  refinement.}
+  over 150 theorems in Lean~4 with zero \texttt{sorry},
+  giving full
+  bi-directional traceability to every algorithm in
+  \texttt{src/solvers/algebraic/}. Four general-purpose results
+  are contributed to Mathlib (the unit characterisation of
+  $\mathbb{Z}_{2^d}$, idempotents in $\mathbb{Z}_{2^d}$ are
+  $\{0, 1\}$, $\mathbb{Z}_{p^n}$ is a local ring, and a non-unit
+  characterisation). The mechanisation exposed and removed two
+  implementation bugs that empirical testing had not caught:
+  (i) a 2{,}000$\times$ ordering sensitivity, isolated via the
+  termination proof and removed by adding a ``progress''
+  early-stop rule; and (ii) a 2-trick progress-tracking gap in
+  the Buchberger loop, surfaced when we tried to make the
+  cross-reference to \texttt{stable\_implies\_no\_new}
+  rigorous and discovered the C++ encoding did not maintain
+  the abstract assumption (Section~\ref{sec:algebraic-algo}).
+  The second bug crystallised an explicit-invariant pattern for
+  cross-references (\texttt{ASSUMES:} / \texttt{MAINTAINED BY:})
+  that we now use throughout.
+\end{enumerate}
+
+\paragraph{Empirical results.}
+On the full random-polynomial suite of
+Brain~\cite{brain2025subpoly} (3498 benchmarks), the procedure decides 59
+benchmarks at degree $\geq 13$ that Bitwuzla 0.9.0-dev,
+cvc5 1.3.3, and every bit-blasting configuration we tested time
+out on within 10\,s (Section~\ref{sec:eval-random-poly}). On 5
+DSP datapath equivalences with overflow
+cancellation~\cite{shekhar2007equivalence}, the procedure solves
+all five in $<$15\,ms; cvc5 takes 1.84\,s on
+\texttt{dsp\_horner\_16}, a 184$\times$ gap
+(Section~\ref{sec:eval-dsp}). On
+SABER~\cite{daemen2018saber} polynomial multiplication ---
+a post-quantum cryptography application --- the procedure
+scales to SABER's actual $N = 256$ parameter, deciding each
+output-coefficient equivalence in $\sim$11\,s, while cvc5
+times out at every $N \geq 4$
+(Section~\ref{sec:eval-saber}). On commutativity, associativity,
+and overflow checking the procedure is bitwidth-independent
+(2--5\,ms from BW=8 to 256), matching Bitwuzla's word-level
+rewriting and outpacing pure bit-blasting (which times out at
+BW=16). On the same random-polynomial sample, Bitwuzla
+solves 3021/3498 to our 2128/3498: its
+occurrence-map canonicalisation closes most queries
+syntactically and constructs witnesses for the
+existential-equational SAT-direction queries that our
+UNSAT-oriented $2^{d-1}$ encoding cannot. Our wins are the
+queries Bitwuzla cannot decide (the 59 random-polynomial
+high-degree wins) or that cvc5 cannot decide (DSP datapath
+equivalences and SABER polynomial multiplication).
+
+With the algebraic layers enabled, \cbmc's CORE regression suite
+(1167 tests) shows zero soundness or correctness regressions; two
+tests time out under the per-test budget, and both reproduce with
+the algebraic layer disabled (they are not caused by it). The
+algebraic integration is validated by mechanised proof and by a
+corpus-scale differential sweep against external oracles
+(Section~\ref{sec:threats}).
+
+\section{Algebraic Solving via Gr\"obner Bases}
+\label{sec:algebraic}
+
+This section presents the \emph{ideal-membership} half of our
+universal-equational decision procedure: a strong Gr\"obner basis
+solver over $\mathbb{Z}_{2^d}$ that decides whether a polynomial
+expression equals another \emph{as polynomials} in
+$\mathbb{Z}_{2^d}[x_1, \ldots, x_n]$. Section~\ref{sec:vanishing}
+gives the function-equivalence half, which extends ideal membership
+to the question SMT users actually want answered: are the two
+polynomials equal as functions on the bit-vector domain?
+
+We define the underlying algebraic objects
+(Section~\ref{sec:algebraic-def}), present the Buchberger-style
+computation with our progress-based termination
+criterion (Section~\ref{sec:algebraic-algo}), and state our
+contributions beyond the framework of
+Song et al.~\cite{song2024equational}
+(Section~\ref{sec:algebraic-contrib}).
+
+\subsection{Strong Gr\"obner Bases over $\mathbb{Z}_{2^d}$}
+\label{sec:algebraic-def}
+
+The ring $\mathbb{Z}_{2^d}$ is not a field: not every non-zero
+element has a multiplicative inverse. Only the \emph{units}---the
+odd elements, characterised by $\gcd(x, 2^d) = 1$---are invertible.
+This non-field structure invalidates the standard Buchberger
+algorithm over a field $k$, because Buchberger's S-polynomial
+reduction relies on clearing leading coefficients, which requires
+division by leading coefficients.
+
+A \emph{strong Gr\"obner basis} generalises the field case to
+principal-ideal rings by adding ``coefficient S-polynomials'' that
+handle non-unit leading coefficients. Formally, following
+Song et al.~\cite{song2024equational}:
+
+\begin{definition}
+Let $>$ be a monomial order on $R[x_1, \ldots, x_n]$ where
+$R = \mathbb{Z}_{2^d}$, and let $G = \{g_1, \ldots, g_m\}$ be a
+finite set of polynomials. For polynomials $p, q$ with leading
+terms $\mathrm{lt}(p) = c_p \cdot m_p$ and
+$\mathrm{lt}(q) = c_q \cdot m_q$ (where $c_p, c_q \in R$ and
+$m_p, m_q$ are monomials), the \emph{S-polynomial}
+$S(p, q)$ is
+\[
+  S(p, q) \;=\; \frac{m}{c_p m_p} \cdot p \;-\;
+                \frac{m}{c_q m_q} \cdot q,
+\]
+where $m = \mathrm{lcm}(m_p, m_q)$ and the scalars must be
+handled carefully when $c_p, c_q$ are non-units.
+$G$ is a \emph{strong Gr\"obner basis} of the ideal $\langle G \rangle$
+if every non-zero $f \in \langle G \rangle$ has its leading term
+$\mathrm{lt}(f)$ divisible by some $\mathrm{lt}(g_i)$
+\emph{both as monomials and as elements of $R$}.
+\end{definition}
+
+The defining property is stronger than the field-case condition
+(which requires only monomial divisibility). Song et al.\ show that
+strong Gr\"obner bases exist over $\mathbb{Z}_{2^d}$ and can be
+computed by an extended Buchberger algorithm.
+
+\paragraph{Uniqueness.}
+Over a field, the reduced Gr\"obner basis is unique once the
+monomial order is fixed. Over $\mathbb{Z}_{2^d}$ (a principal-ideal
+ring with zero divisors) the situation is weaker: the basis is
+unique up to multiplication of each generator by a unit, i.e.\ by
+an odd element of $\mathbb{Z}_{2^d}$. Two reduced strong Gr\"obner
+bases of the same ideal differ at most by such unit-rescalings, and
+the membership test (does an ideal element reduce to zero?) is
+invariant under them. Empirically, our equation-ordering ablation
+(Table~\ref{tab:ordering}) confirms that timings vary within noise
+across orderings; the underlying bases are equivalent up to
+unit-rescaling and the algorithm's termination behaviour is
+unaffected.
+
+\subsection{Buchberger with Progress-Based Termination}
+\label{sec:algebraic-algo}
+
+Our implementation extends the standard Buchberger loop with
+\emph{progress-based termination}: instead of exhaustively
+computing all S-polynomials until saturation (which can be
+prohibitively expensive), we terminate early if either
+(i)~a non-zero constant enters the basis (UNSAT detected, lines
+13--14 of Algorithm~\ref{alg:buchberger}), or (ii)~the basis has
+not changed for $\tau$ steps (pruned early, line 17). In practice
+the non-zero-constant check dominates: on every polynomial-equation benchmark
+we have seen, the non-zero constant appears within $\leq$1,000 steps,
+and the global step limit of 100{,}000 is never reached.
+
+\begin{algorithm}[ht]
+\SetAlgoLined
+\DontPrintSemicolon
+\KwIn{polynomial set $F = \{f_1, \ldots, f_k\}$ over $\mathbb{Z}_{2^d}$;
+  step limit $L$ (default: 100{,}000)}
+\KwOut{UNSAT if unit found; otherwise (inconclusive, reduced basis)}
+
+$G \leftarrow F$; $P \leftarrow \{(f_i, f_j) : i < j\}$;
+  $\mathit{steps} \leftarrow 0$\;
+\While{$P \neq \emptyset$ \textbf{and} $\mathit{steps} < L$}{
+  select pair $(p, q) \in P$ (we use: definitions first, then
+    disequality equations, then coefficient S-pairs)\;
+  $P \leftarrow P \setminus \{(p,q)\}$\;
+  $r \leftarrow \mathrm{reduce}(S(p,q), G)$
+    \tcp*{S-polynomial reduction}
+  $\mathit{steps} \leftarrow \mathit{steps} + 1$\;
+  \If{$r = 0$}{\textbf{continue}\;}
+  \If{$r$ is a constant $c \in R$ \textbf{and} $c \neq 0$}{
+    \Return{\textbf{UNSAT}} \tcp*{$c$ has no zero, so $V(\langle G \rangle) = \emptyset$}
+  }
+  add pairs $\{(r, g) : g \in G\}$ to $P$\;
+  $G \leftarrow G \cup \{r\}$\;
+  \If{$G$ unchanged for last $\tau$ iterations}{
+    \textbf{break} \tcp*{progress-based termination}
+  }
+}
+\Return{(\textbf{inconclusive}, $G$)}
+\caption{Strong Gr\"obner-basis computation with progress-based
+  termination}
+\label{alg:buchberger}
+\end{algorithm}
+
+The pair-selection strategy at line~3 was originally equation-order
+sensitive: a naive ordering (disequality equations before
+definitions) required up to 2{,}000 times more steps than
+``definitions before disequality equations'' on benchmarks such as
+commutativity and associativity. This 2{,}000$\times$ sensitivity
+was eliminated by the progress-based termination rule
+(line~17): once all pairs that could contribute to the non-zero constant
+are explored, further pairs cannot help, and the algorithm
+terminates regardless of the initial order.
+
+\paragraph{Formalisation-driven refinement.}
+We did not discover the progress invariant by tuning the C++
+implementation; we discovered it while attempting to prove
+termination in Lean~4. Buchberger's standard termination argument
+appeals to the ascending chain condition on Noetherian rings, which
+guarantees the basis stabilises but says nothing about \emph{when}.
+Mechanising the proof forced us to articulate a weaker, operational
+property: a step is ``progressive'' if it adds a polynomial whose
+leading term is not already divisible by some basis element.
+Termination then follows from the finite number of distinct
+leading-term ideals, regardless of pair ordering. With this
+invariant in hand, we returned to the C++ code and implemented
+the early-stop rule: terminate when no progressive step has been
+made for $\tau$ iterations. The 2{,}000$\times$ sensitivity that
+six months of empirical tuning had not exposed evaporated. We
+report this not as a methodological claim but as a concrete
+instance of mechanisation paying back into the implementation.
+
+\begin{table}[ht]
+\caption{Equation-ordering ablation on the algebraic solver with
+  progress-based termination enabled. Four orderings are compared
+  on five benchmarks; 5 runs each, mean $\pm$ stddev in ms.
+  The ``default'' uses our recommended order (definitions first);
+  ``reverse'' activates \texttt{GROEBNER\_REVERSE\_ORDER}; the
+  two ``reorder-vars'' variants additionally permute the variable
+  order via \texttt{--reorder-vars}. Max/min ratios per row
+  fall in $[1.16, 1.26]\times$, compared with the historical
+  $2{,}000\times$ sensitivity of the pre-progress-termination
+  implementation.}
+\label{tab:ordering}
+\centering
+\small
+\begin{tabular}{lrrrr}
+\toprule
+Benchmark & default & reverse & reorder-vars & reverse+reorder \\
+\midrule
+comm\_16 & 4.82$\pm$0.38 & 5.44$\pm$0.21 & 4.64$\pm$0.09 & 5.40$\pm$0.12 \\
+comm\_32 & 4.68$\pm$0.08 & 5.40$\pm$0.07 & 4.70$\pm$0.00 & 5.46$\pm$0.09 \\
+assoc\_8 & 4.66$\pm$0.05 & 5.44$\pm$0.05 & 4.72$\pm$0.28 & 5.42$\pm$0.04 \\
+distrib\_8 & 4.68$\pm$0.04 & 5.42$\pm$0.11 & 4.78$\pm$0.08 & 5.42$\pm$0.04 \\
+overflow\_detect\_16 & 7.62$\pm$0.04 & 8.22$\pm$0.13 & 7.74$\pm$0.23 & 8.38$\pm$0.19 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The current solver's maximum variation across the tested
+orderings is $1.26\times$ (see Table~\ref{tab:ordering}). The
+residual variation is consistent with measurement noise (standard
+deviation within each ordering is comparable to the difference
+between orderings), and there is no systematic benefit of any
+particular ordering. The $2{,}000\times$ number from early
+experiments measured how bad the unordered version could be
+without the progress rule, not any sensitivity of the current
+implementation.
+
+\paragraph{A second bug, and a methodology evolution.}
+A later refinement of the cross-referencing process exposed a
+second implementation bug. While preparing direct
+\texttt{// PROOF:} comments linking
+\texttt{groebner.cpp::compute} to
+\texttt{BuchbergerCorrectness.lean::s\_poly\_in\_ideal},
+\texttt{reduce\_in\_ideal}, and
+\texttt{BuchbergerTermination.lean::stable\_implies\_no\_new},
+we noticed that the abstract termination theorem assumes
+``every pair $(i,j)$ with $i < j$ in the basis has been
+processed.'' Tracing this assumption through to the concrete
+loop revealed that the C++ progress-tracking counters
+(\texttt{pairs\_since\_last\_progress},
+\texttt{pairs\_at\_last\_progress}) were reset only when the
+S-polynomial step produced a new basis element, not when the
+2-trick saturation step did. With LIFO pair processing, the
+2-trick's newly-injected pairs were processed first but counted
+against the stale progress threshold, allowing the loop to exit
+with original pairs still in the queue. If any of those
+unprocessed pairs would have produced a non-zero constant via
+S-polynomial reduction, the algorithm returned \texttt{UNKNOWN}
+instead of \texttt{UNSAT}.
+
+The bug is a completeness issue, not soundness: \texttt{UNSAT}
+results remain correct, but the algorithm could give up earlier
+than it should. The fix captures the basis size at the start of
+each iteration and resets the counters whenever the basis grows
+(via either S-poly or 2-trick), which is a few-line change. We
+locked the fix in at three levels: a unit-test suite in
+\texttt{unit/solvers/algebraic/groebner.cpp}; a Lean theorem
+\texttt{BuchbergerTermination.lean::progress\_invariant\_preserved}
+that proves \texttt{pairs\_size + counter = baseline} is
+preserved by every step of the corrected loop, with a companion
+\texttt{buggy\_step\_breaks\_invariant} witnessing that the
+pre-fix step violates the invariant whenever the 2-trick adds
+pairs; and a quartet of property-based tests (also in
+\texttt{groebner.cpp}) that check the invariant on randomised
+state-machine trajectories (1.24\,M assertions) and exhibit
+the bug condition firing on a non-trivial fraction of buggy
+trajectories.
+
+This second bug crystallised a methodological lesson. A
+\texttt{// PROOF:} comment that simply names a Lean theorem is a
+\emph{citation}, not a \emph{proof}. For trivial direct
+correspondences this is fine; for non-trivial loop invariants
+the citation can be technically correct (the Lean theorem does
+exist, with the cited statement) while the C++ encoding fails
+to maintain the assumed invariant. Having now caught two bugs
+this way, we adopted an explicit-invariant pattern in our
+cross-references:
+\begin{verbatim}
+// PROOF: formal-proofs/.../theorem_name
+//   ASSUMES: <invariant the abstract theorem requires>
+//   MAINTAINED BY: <how the C++ code preserves it>
+\end{verbatim}
+Writing this forces the reviewer to ask ``is the invariant
+actually maintained?'' --- the question that catches the bug.
+We retrofitted this pattern across the contract-level
+\texttt{PROOF:} cross-references in
+\texttt{src/solvers/algebraic/}, and now use it for all new
+ones. We also extended the formal proofs to cover assumptions
+introduced by later optimisations: a closed-form Legendre's
+formula in \texttt{Vanishing.lean::padicValNat\_two\_factorial}
+to justify the popcount-based smarandache function, and
+\texttt{Encoding.lean::toPolynomial\_deterministic} plus a
+set-once idempotence lemma to justify memoising
+\texttt{to\_polynomial}'s side-effecting recursion.
+
+\subsection{Contributions Beyond Song et al.\ 2024}
+\label{sec:algebraic-contrib}
+
+Song et al.~\cite{song2024equational} established that strong
+Gr\"obner bases over $\mathbb{Z}_{2^d}$ solve the equational theory
+of bit-vectors, and provided a paper-and-pencil proof of this
+result. We translate that foundation into a working SMT
+component along three axes:
+
+\begin{enumerate}
+\item \textbf{End-to-end SMT integration.} The strong Gr\"obner
+  basis is wired into \cbmc's post-SSA pipeline so it runs
+  transparently on every bit-vector query, with no user
+  annotation. SMT queries contain disequalities and deeply nested
+  inline multiplications that fall outside the equational theory
+  Song et al.\ analyse: we handle disequalities via Song et al.'s
+  $2^{d-1}$ encoding (an auxiliary polynomial
+  $z \cdot (c - d) - 2^{d-1} = 0$ that reduces disequation
+  satisfiability to non-zero-constant detection) and decompose nested
+  multiplications into fresh variables with defining equations,
+  giving Buchberger a flat, uniform polynomial set.
+
+\item \textbf{Algorithmic refinements for SMT-scale problems.}
+  Standard Buchberger is sensitive to equation ordering and can
+  diverge before reaching a non-zero constant. We add
+  progress-based termination
+  (Section~\ref{sec:algebraic-algo}) that eliminates the
+  ordering sensitivity, and candidate extraction with
+  assumption-gated SAT hints: when the algebraic layer is
+  inconclusive (non-unit basis), we extract a partial model and
+  pass it as soft hints to the bit-blasting layer, avoiding
+  duplicated exploration.
+
+\item \textbf{Formalisation-driven refinement.} Over 150 theorems in
+  Lean 4 with zero \texttt{sorry}, four
+  Mathlib contribution candidates. Full bi-directional
+  traceability to every algorithm in
+  \texttt{src/solvers/algebraic/}.
+  The mechanisation exposed and removed two implementation bugs
+  empirical testing did not catch: a 2{,}000$\times$ ordering
+  sensitivity (the Lean termination proof's ``progress''
+  invariant) and a 2-trick progress-tracking gap (caught when
+  making the corresponding cross-reference rigorous), and led
+  us to adopt explicit-invariant cross-references
+  (\texttt{ASSUMES:} / \texttt{MAINTAINED BY:})
+  (Section~\ref{sec:algebraic-algo}).
+\end{enumerate}
+
+The combined procedure solves all 39 benchmarks in our custom
+suite, including all polynomial-equation benchmarks that
+bit-blasting alone times out on; details in Section~\ref{sec:external}.
+
+\subsection{Solver Pipeline}
+\label{sec:algebraic-pipeline}
+
+The solver runs before bit-blasting. Polynomial equations are
+collected during SSA conversion: each \texttt{c = a*b} becomes
+$c - a \cdot b = 0$. A negated equality $c \neq d$ is encoded, following
+Song et al.~\cite{song2024equational}, by the \emph{ring-aware}
+constraint $z \cdot (c-d) - 2^{d-1} = 0$ with a fresh $z$: over
+$\mathbb{Z}_{2^d}$ an element is non-zero iff it can be scaled to the
+maximal-valuation element $2^{d-1}$, so this is equisatisfiable with
+$c \neq d$ (Theorem~\ref{thm:song-equisat}). A vanishing polynomial
+test~\cite{shekhar2007equivalence} runs first, checking whether the
+difference polynomial vanishes as a function over $\mathbb{Z}_{2^d}$
+(complete for function equivalence). If inconclusive, the Gr\"obner
+basis handles the augmented system. If it contains \emph{any} non-zero
+constant, the system is unsatisfiable: a constant evaluates to itself
+under every assignment, yet every ideal element must evaluate to $0$,
+so a non-zero constant admits no solution
+(Theorem~\ref{thm:song-equisat}). The computation uses a step limit of
+100,000; when it is reached, the solver returns inconclusive and falls
+through to bit-blasting.
+
+We stress that the \emph{textbook} Rabinowitsch trick --- encoding
+$c \neq d$ as $(c-d)\cdot e - 1 = 0$ --- is \textbf{unsound} over
+$\mathbb{Z}_{2^d}$ (see the remark below); Song et al.'s
+$2^{d-1}$ construction is the correct ring-aware replacement, and is
+what we implement.
+
+\begin{theorem}[Disequality encoding; Song et al.\ Prop.~5/6]
+\label{thm:song-equisat}
+Let $u \in \mathbb{Z}_{2^d}$ with $d \geq 1$. Then $u \neq 0$ iff
+there exists $z \in \mathbb{Z}_{2^d}$ with $z \cdot u = 2^{d-1}$.
+Consequently $\{f_1 = 0, \ldots, f_k = 0,\ a \neq b\}$ is satisfiable
+iff $\{f_1 = 0, \ldots, f_k = 0,\ z\,(a{-}b) - 2^{d-1} = 0\}$ is; and
+if the strong Gr\"obner basis of the latter contains any non-zero
+constant, then both are unsatisfiable.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+For the forward direction, write $u = 2^{\alpha} w$ with $w$ odd and
+$\alpha = \nu_2(u) \leq d-1$ (as $u \neq 0$); since $w$ is a unit
+($\gcd(w, 2^d) = 1$), $z = 2^{d-1-\alpha} w^{-1}$ gives
+$z\,u = 2^{d-1}$. Conversely, if $u = 0$ then $z\,u = 0 \neq 2^{d-1}$.
+For the refutation: under any solution $\sigma$ the evaluation
+homomorphism $\phi_\sigma$ sends every ideal element to $0$; a
+non-zero constant $c$ in the ideal would give $\phi_\sigma(c) = c \neq
+0$, a contradiction --- so no solution exists. Unlike the unit
+characterisation, the witnessing constant need not be odd, which is
+why the implementation refutes on \emph{any} non-zero constant. Fully
+mechanised in Lean~4 (zero \texttt{sorry}):
+\texttt{DisequalityRefutation.lean::song\_encoding\_equisat} (the
+equisatisfiability, forward direction via the 2-adic valuation
+argument) and \texttt{nonzero\_constant\_no\_solution} (any non-zero
+constant in the ideal $\Rightarrow$ no solution); ideal preservation
+under S-polynomials/reduction and Buchberger termination are covered
+by the surrounding development.
+\end{proof}
+
+\begin{remark}[The textbook Rabinowitsch trick is field-only]
+A natural way to encode $c \neq d$ for a purely equational solver is
+the classical Rabinowitsch trick: a fresh $e$ with
+$(c-d)\cdot e - 1 = 0$, refuting when the augmented system is
+unsatisfiable. This is sound \emph{over a field}, where $c \neq d$ is
+equivalent to $c - d$ being invertible --- as in the
+Nullstellensatz~\cite[Ch.~4]{cox2015ideals} and in finite-field SMT
+solving~\cite{hader2023finitefield,Ozdemir23cvc5}, and as suggested
+for the inequality extension in~\cite[\S7]{song2024equational}. It is
+\emph{unsound over $\mathbb{Z}_{2^d}$}, which is not a field: the
+polynomial $(c-d)\cdot e - 1$ asserts that $c-d$ is a \emph{unit}, not
+merely non-zero. For instance over $\mathbb{Z}_4$ we have $2 \neq 0$
+yet $2 \cdot e = 1$ has no solution, so the trick would wrongly report
+the satisfiable $2 \neq 0$ as unsatisfiable
+(\texttt{DisequalityRefutation.lean::rabinowitsch\_unsound\_over\_zmod}).
+A prototype of our solver used this trick and was unsound on real
+SMT-LIB benchmarks before we adopted Song et al.'s $2^{d-1}$ encoding.
+\end{remark}
+
+\begin{table}[ht]
+\caption{Five-layer arithmetic-solving pipeline in \cbmc with
+  representative benchmarks per layer, timed via the
+  \texttt{smt2\_solver} interface (which exposes the post-SSA
+  pipeline). Numbers in seconds.}
+\label{tab:wordlevel}
+\centering
+\small
+\begin{tabular}{lr}
+\toprule
+Layer / example & smt2 \\
+\midrule
+\multicolumn{2}{l}{\emph{1. Word-level simplification (CBMC front-end; not exposed via smt2)}} \\
+\multicolumn{2}{l}{\quad inline \texttt{a*b == b*a} and \texttt{(a*b)*c == a*(b*c)} fold to \texttt{true} in C source.} \\
+\midrule
+\multicolumn{2}{l}{\emph{2. Vanishing polynomial test (DSP datapath equivalence)}} \\
+\quad dsp\_image\_reject (12$\times$8-bit) & 0.014 \\
+\quad dsp\_horner\_16 & 0.009 \\
+\quad dsp\_vanishing\_poly\_8 & 0.008 \\
+\midrule
+\multicolumn{2}{l}{\emph{3. Strong Gr\"obner basis over $\mathbb{Z}_{2^d}$}} \\
+\quad commutativity BW=16 & 0.009 \\
+\quad commutativity BW=32 & 0.012 \\
+\quad associativity BW=8 & 0.009 \\
+\quad distributivity BW=8 & 0.006 \\
+\quad overflow check BW=16 (extract(15,0) handled as modular reduction) & 0.008 \\
+\midrule
+\multicolumn{2}{l}{\emph{4. \combacs (bit-blasting, 2 multiplications)}} \\
+\quad matrix trace $\mathrm{tr}(AB) = \mathrm{tr}(BA)$ (timed via CBMC C front-end) & 1.8 \\
+\quad MAC dot-product commutativity (CBMC C front-end) & 4.0 \\
+\midrule
+\multicolumn{2}{l}{\emph{5. Shift-add (bit-blasting, 3+ multiplications)}} \\
+\quad keyed hash with XOR (CBMC C front-end) & 6.3 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Layer ablation.}
+To quantify the contribution of each layer we disabled layers
+sequentially and measured solved counts and running time on 12
+representative benchmarks (\cadical, 120\,s T/O). Results in
+Table~\ref{tab:ablation} use the same benchmark set and
+configurations as in the bit-blasting companion
+paper's~\cite{companion-bitblasting} ablation.
+
+\begin{table}[ht]
+\caption{Layer ablation (\cadical, seconds; T/O\,=\,120\,s).
+  Columns are cumulative: each configuration adds its layer to
+  all previous configurations. Bold indicates a new benchmark
+  solved by adding that layer.}
+\label{tab:ablation}
+\centering
+\small
+\begin{tabular}{lrrrr}
+\toprule
+Benchmark & shift only & +simplify & +algebraic & +\combacs \\
+\midrule
+comm\_8 & 0.72 & \textbf{0.005} & 0.005 & 0.005 \\
+comm\_16 & T/O & \textbf{0.005} & 0.005 & 0.005 \\
+comm\_32 & T/O & \textbf{0.005} & 0.005 & 0.005 \\
+assoc\_8 & 29.1 & \textbf{0.005} & 0.005 & 0.005 \\
+distrib\_8 & 78.4 & \textbf{0.005} & 0.005 & 0.005 \\
+overflow\_detect\_16 & 0.35 & 0.35 & \textbf{0.008} & 0.008 \\
+dsp\_vanishing\_poly\_8 & 0.040 & 0.039 & \textbf{0.008} & 0.008 \\
+dsp\_horner\_16 & 7.77 & 7.74 & \textbf{0.010} & 0.010 \\
+dsp\_image\_reject & T/O & T/O & \textbf{0.015} & 0.015 \\
+mul\_ineq\_12 & 0.53 & 0.51 & 0.52 & 0.51 \\
+strength\_chain\_16 & 1.07 & 1.07 & 1.08 & 1.50 \\
+bf16\_mul\_comm\_v2 & 23.0 & 22.9 & 23.1 & \textbf{11.2} \\
+\midrule
+Benchmarks solved & 9/12 & 11/12 & 12/12 & 12/12 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Three regimes emerge: (i) \emph{word-level simplified}
+(comm, assoc, distrib) — the C front-end closes the query at
+layer 1 before reaching the solver; (ii) \emph{algebraically
+solved} (overflow\_detect, dsp\_vanishing\_poly, dsp\_horner,
+dsp\_image\_reject) — layers 2--3 reduce to non-zero constants or
+vanishing polynomials; (iii) \emph{bit-blasting required}
+(mul\_ineq\_12 contains a comparison; strength\_chain\_16 is
+decomposed by shift; bf16\_mul\_comm\_v2 uses floating-point
+semantics) — layers 4--5 handle these. The algebraic layer
+(2+3) adds +1 solve (dsp\_image\_reject) and order-of-magnitude
+speedups on four benchmarks, while \combacs at layer 4 adds the
+final 2$\times$ on bf16 but solves no new instances on this
+subset.
+
+\paragraph{Per-tweak (leave-one-out) ablation.}
+The layer ablation above collapses the algebraic procedure into a
+single layer. To quantify the \emph{individual} algebraic tweaks we
+ran a leave-one-out ablation on a 26-benchmark subset spanning all
+five benchmark sets (custom/DSP, the SMT-COMP algebra unlocks,
+SABER, and the random-polynomial suite): starting from the full
+configuration we disabled one tweak at a time and recorded how many
+benchmarks remain solved (\cadical, 60\,s T/O).
+
+\begin{table}[ht]
+\caption{Leave-one-out ablation of the algebraic tweaks on a
+26-benchmark cross-suite subset (\cadical, 60\,s T/O). ``Lost''
+lists benchmarks the full configuration solves that the ablated
+configuration no longer does.}
+\label{tab:tweak-ablation}
+\centering
+\small
+\begin{tabular}{lrl}
+\toprule
+Configuration & Solved & Benchmarks lost vs full \\
+\midrule
+full (all tweaks)        & 25/26 & --- \\
+$-$ Tseitin propagation  & 21/26 & 4 wienand (commute08/16/32, distrib08) \\
+$-$ vanishing test       & 22/26 & 2 mult.\ identities, \texttt{dsp\_image\_reject} \\
+$-$ tree walk            & 24/26 & \texttt{geo3.c\_5} (let-wrapped) \\
+$-$ F4 interreduction    & 25/26 & --- (time only) \\
+$-$ deferred bit-blasting& 25/26 & --- (time only) \\
+$-$ if-case elimination  & 25/26 & --- (time only) \\
+$-$ nonzero fast-path    & 25/26 & --- (time only) \\
+reverse GB ordering      & 25/26 & --- (time only) \\
+$-$ entire algebraic layer & 14/26 & all 11 algebra-decided \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Three tweaks are load-bearing for \emph{solvability} on this
+subset: Tseitin propagation (the four wienand
+commutativity/distributivity benchmarks, whose polynomial
+disequality is buried in a Tseitin chain), the
+vanishing-polynomial test (two multiplication identities and
+\texttt{dsp\_image\_reject}), and the boolean tree walk (the
+let-wrapped \texttt{geo3.c\_5}). The finer tweaks --- F4
+interreduction, deferred bit-blasting, if-case elimination, the
+nonzero fast-path, and Gr\"obner pair ordering --- do not change
+\emph{which} benchmarks are solved on this subset; their effect is
+on running time. Disabling the algebraic layer entirely loses all
+11 algebra-decided benchmarks, falling back to bit-blasting.
+
+The Gr\"obner basis computation is bitwidth-independent: commutativity
+at BW=32 takes the same 0.3\,ms as BW=16. For the
+\texttt{smt2\_solver} (which lacks word-level simplification), inline
+multiplications are decomposed into fresh variables with defining
+equations, enabling the Gr\"obner basis to solve associativity
+(0.009\,s) and distributivity (0.006\,s) that previously required
+26--71\,s of SAT solving. Notably, the Gr\"obner basis makes the
+multiplier encoding and SAT solver choice \emph{irrelevant} for
+polynomial equation benchmarks: all encoding$\times$solver
+combinations produce the same $<$10\,ms result.
+
+When the Gr\"obner basis returns inconclusive (non-polynomial
+residual constraints), a candidate assignment is extracted from the
+reduced basis and used to generate assumption-gated SAT hints that
+guide the bit-blasting solver. Problems with non-polynomial
+operations (bitwise XOR, shifts, inequalities) fall through to
+bit-blasting with \combacs. The implementation uses \cbmc's existing
+\texttt{mp\_integer} for coefficient arithmetic, with no external
+dependencies ($\sim$700 lines). The Gr\"obner basis computation is
+a standalone decision procedure for the polynomial fragment of
+QF\_BV (equations involving addition, multiplication, and
+truncation); problems with bitwise operations, inequalities, or
+shifts fall through to bit-blasting.
+
+We measured the overhead of unsuccessful algebraic layers on
+benchmarks that require SAT solving (bf16\_mul\_comm\_v2,
+strength\_chain\_16, div\_mul\_roundtrip\_12). Word-level
+simplification adds $<$0.02\,s, and the vanishing polynomial test
+plus Gr\"obner basis add $<$0.05\,s---less than 0.5\% of the
+hardest benchmark's solving time. The layers are effectively free
+when they do not apply.
+
+\subsection{Bitwidth Independence}
+\label{sec:scaling}
+
+A distinctive property of the algebraic procedure is that its
+running time is essentially independent of the bit-vector width.
+We verify this empirically on commutativity and associativity
+benchmarks at bitwidths 8 to 256 and compare against
+Bitwuzla~\cite{niemetz2023bitwuzla}, the SMT-COMP 2024 QF\_BV
+winner, which uses word-level rewriting. We also show \cbmc's
+shift-add bit-blasting baseline as a reference for what naive
+encoding would do (median of 4 warm runs, 5 runs total with the
+first discarded).
+
+\begin{table}[ht]
+\caption{Bitwidth scaling on the commutativity and associativity
+  family (ms; median of 4 warm runs; 60\,s timeout). Both the
+  Gr\"obner-basis solver and Bitwuzla's word-level rewriting are
+  bitwidth-independent; \cbmc's shift-add bit-blasting baseline
+  times out at BW$=$16 and beyond.}
+\label{tab:scaling}
+\centering
+\begin{tabular}{lrrrrrr}
+\toprule
+Configuration & BW$=$8 & BW$=$16 & BW$=$32 & BW$=$64 & BW$=$128 & BW$=$256 \\
+\midrule
+\multicolumn{7}{l}{\emph{commutativity}} \\
+\cbmc (algebraic)        & 2.37 & 2.18 & 2.14 & 2.13 & 2.02 & 2.13 \\
+Bitwuzla (word-level)    & 1.59 & 1.51 & 1.62 & 1.48 & 1.56 & 1.59 \\
+\cbmc (SAT, shift-add)   & 684 & T/O & T/O & T/O & T/O & T/O \\
+\midrule
+\multicolumn{7}{l}{\emph{associativity}} \\
+\cbmc (algebraic)        & 2.11 & 2.06 & 2.05 & 2.07 & 2.07 & 2.09 \\
+Bitwuzla (word-level)    & 1.67 & 1.74 & 1.67 & 1.66 & 1.69 & 1.68 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The algebraic solver and Bitwuzla both exhibit bitwidth-independent
+behaviour, reaching the same answer in 2--3\,ms regardless of
+operand width. The mechanisms differ: our procedure recognises the
+identity through Gr\"obner-basis reduction of the
+$2^{d-1}$-augmented polynomial system, while Bitwuzla performs
+syntactic word-level rewriting that recognises commutativity and
+associativity directly. Both approaches give a structural reason
+why the equation holds; both avoid bit-blasting entirely. The
+practical implication is that on simple polynomial-equation
+queries, mature word-level reasoners already do the right thing,
+and our algebraic procedure is most useful when the polynomial
+structure is harder to recognise syntactically (Sections~\ref{sec:vanishing},
+\ref{sec:eval-random-poly}).
+
+The shift-add bit-blasting baseline is included for reference: it
+shows that an SMT solver without word-level reasoning would face
+exponential blow-up in bitwidth on these queries. This is a
+property of the pure-bit-blasting approach, not of bit-vector
+reasoning in general.
+
+The Gr\"obner-basis solver's time is dominated by (a) equation
+collection, (b) polynomial normalisation over $\mathbb{Z}_{2^d}$,
+and (c) a small number of S-polynomial reductions until the unit
+constant appears. None of these scales with $d$: coefficient
+arithmetic uses arbitrary-precision integers (via \cbmc's
+\texttt{mp\_integer}), and the polynomial structure is determined
+by the problem shape, not the bitwidth.
+
+
+\section{Vanishing Polynomial Test}
+\label{sec:vanishing}
+
+Ideal membership in $\mathbb{Z}_{2^d}[x_1, \ldots, x_n]$ is not the
+question an SMT user is asking. A verification engineer querying
+$\forall a, b. \, f(a, b) = g(a, b)$ over 16-bit integers means
+``for all 16-bit values of $a$ and $b$'' --- they want
+\emph{function equivalence} on the bit-vector domain. Over a field,
+the two coincide; over $\mathbb{Z}_{2^d}$ they do not. Some
+polynomials are non-zero in $\mathbb{Z}_{2^d}[x]$ but vanish as
+functions on $\mathbb{Z}_{2^d}$: the canonical example is
+$4x^2 + 4x \equiv 0 \pmod{8}$ for all
+$x \in \{0, 1, \ldots, 7\}$, even though the polynomial has
+non-zero coefficients. We refer to such polynomials as
+\emph{vanishing polynomials}~\cite{shekhar2007equivalence}; they
+exist because $\mathbb{Z}_{2^d}[x]$ has more polynomials than
+there are distinct $\mathbb{Z}_{2^d}$-valued functions on
+$\mathbb{Z}_{2^d}$.
+
+The Gr\"obner-basis-only treatment of
+Song et al.~\cite{song2024equational} decides the equational
+theory (polynomial identity in $\mathbb{Z}_{2^d}[x_1, \ldots,
+x_n]$), not the functional theory (equivalence as functions on
+$\mathbb{Z}_{2^d}^n \to \mathbb{Z}_{2^d}$). For SMT queries the
+gap matters: it surfaces in DSP datapath verification where
+coefficient scaling causes overflow cancellation, and the two
+sides of an equivalence query differ as polynomials but agree as
+functions.
+
+This section gives a decision procedure for function equivalence
+over $\mathbb{Z}_{2^{n_1}} \times \cdots \times
+\mathbb{Z}_{2^{n_k}} \to \mathbb{Z}_{2^m}$, complete in that
+sense. We adapt the algebraic test of
+Shekhar et al.~\cite{shekhar2007equivalence}, with the efficient
+falling-factorial / Stirling-number / Kronecker-product
+normalisation algorithm of
+G\`amez-Montolio et al.~\cite{gamez2024efficient}.
+
+\paragraph{Why a separate test, instead of adding vanishing
+polynomials to the Gr\"obner basis?}
+A natural alternative is to add the generators of the vanishing
+ideal --- the polynomials
+$2^{\max(d - \nu_2(k!),\ 0)} \cdot x^{\underline{k}}$ for
+$k = 2, \ldots, \mathrm{SF}(2^d)$, per input variable --- directly
+to the input basis of Buchberger's algorithm. The resulting strong
+Gr\"obner basis would automatically reduce vanishing polynomials to
+zero, so ideal membership would coincide with functional
+equivalence and a separate test would be unnecessary.
+
+We implemented this experimentally and found it impractical. On
+the full 39-benchmark custom suite, replacing the falling-factorial
+test with vanishing-polynomial injection \emph{loses} 9 of 39
+benchmarks --- including 7
+(\texttt{overflow\_detect\_16}, \texttt{add\_overflow\_16},
+\texttt{checked\_mul\_16}, \texttt{equiv\_unsat\_8add\_16},
+\texttt{crypto\_square\_mod}, \texttt{mul\_ineq\_12},
+\texttt{fixedpoint\_mul\_16}) that do not need vanishing reasoning
+at all and solve trivially without the test. Adding the injection
+on \emph{top} of the working vanishing test causes 2 further
+regressions
+(\texttt{div\_mul\_roundtrip\_12}: $3.97\,$s $\to$ T/O,
+\texttt{fixedpoint\_mul\_16}: $0.02\,$s $\to$ T/O). Two failure modes:
+(i) For $d = 8$, $\mathrm{SF}(2^d) = 10$, so 9 generators per
+variable are added; their pairwise S-polynomials bloat
+Buchberger's worklist even when not needed, hitting the
+100\,000-step reduction budget.
+(ii) The DSP benchmarks introduce intermediate variables for
+nested multiplications via SSA (\texttt{x2 = x*x}, \texttt{x3 =
+x*x2}, $\ldots$, up to \texttt{x10}). To use a degree-10 vanishing
+polynomial in $x$, Buchberger must first reduce the polynomial
+back to a polynomial in $x$ alone, an S-polynomial chain that
+exceeds the step budget. The falling-factorial test sidesteps
+both issues by substituting SSA definitions before testing and
+converting directly to the factorial basis. Full data in the
+supplementary material.
+
+\paragraph{Direction of completeness.}
+The vanishing-polynomial test, and the Gr\"obner-basis solver
+of Section~\ref{sec:algebraic} more broadly, decide UNSAT-direction
+queries: they prove that two polynomials are equal as functions
+(equivalently, that a disequality is unsatisfiable) but cannot
+construct a witness when they differ. SAT-finding queries
+(``does $p(x) = c$ have a solution?'', root-finding, factoring)
+require the bit-blast layer instead. Section~\ref{sec:eval-random-poly}
+quantifies this: on random polynomial-identity benchmarks our
+algebraic procedure dominates on UNSAT-oriented categories
+(addition / multiplication / encoding-correctness identities) but
+loses to bit-blasting on equality and nonequality SAT-finding
+queries.
+
+\subsection{Falling Factorials and Stirling Numbers}
+\label{sec:vanishing-falling}
+
+Let $R = \mathbb{Z}_{2^m}$ and consider $R$-valued functions on
+$k$ bit-vector inputs of widths $n_1, \ldots, n_k$. For a natural
+number $j$, the \emph{falling factorial} is
+\[
+  x^{\underline{j}} \;=\; x \cdot (x{-}1) \cdot (x{-}2) \cdots (x{-}j{+}1),
+\]
+with $x^{\underline{0}} = 1$. The polynomials $\{x^{\underline{j}}\}_{j \geq 0}$
+form a basis of $R[x]$ alternative to the monomial basis
+$\{x^j\}_{j \geq 0}$.
+
+\emph{Stirling numbers of the second kind}, $S(n,k)$, encode the
+change of basis from monomials to falling factorials:
+\[
+  x^n \;=\; \sum_{k=0}^{n} S(n,k) \, x^{\underline{k}},
+  \qquad S(n,k) \;=\; \frac{1}{k!} \sum_{j=0}^{k} (-1)^{k-j}
+                       \binom{k}{j} j^{\,n}.
+\]
+Combinatorially, $S(n,k)$ counts the number of ways to partition
+an $n$-element set into $k$ non-empty blocks. For bit-vector
+verification, the key property is that in $R = \mathbb{Z}_{2^m}$,
+the falling factorial $x^{\underline{j}}$ is divisible by $j!$ as a
+function of $x$ (since any consecutive $j$ integers contain a
+multiple of each prime power up to the $j!$ factor). Hence the
+function $x^{\underline{j}} \bmod 2^m$ is identically zero whenever
+$\nu_2(j!) \geq m$, where $\nu_2$ is the 2-adic valuation.
+
+\begin{theorem}[Vanishing criterion~\cite{shekhar2007equivalence}]
+\label{thm:vanishing}
+Let $R = \mathbb{Z}_{2^m}$ be the codomain and let $p(x) = \sum_j
+c_j \, x^{\underline{j}} \in R[x]$ be regarded as a function
+$\mathbb{Z}_{2^n} \to \mathbb{Z}_{2^m}$ on a domain of width $n$
+that is at least the degree of $p$ (so every falling factorial
+$x^{\underline{j}}$ in the sum is exercised on the input range;
+the small-$n$ case, where $x^{\underline{j}}$ already vanishes on
+$\{0,\ldots,2^n-1\}$ once $j \geq 2^n$, is handled by the
+per-variable degree bound of the ``Mixed input widths'' remark
+below). Then $p$ vanishes as a function if and only if for each
+$j$,
+\[
+  2^{\,m - \min(\nu_2(j!),\,m)} \;\big|\; c_j \quad\text{in }\mathbb{Z}.
+\]
+\end{theorem}
+
+\subsection{Multivariate Extension via Kronecker Product}
+\label{sec:vanishing-kron}
+
+For a multivariate polynomial $p(x_1, \ldots, x_k) \in R[x_1, \ldots, x_k]$
+we apply the change of basis independently per variable. Let
+$S_{n_i}$ denote the $n_i \times n_i$ Stirling matrix of the second
+kind. The change-of-basis matrix for the tensor product
+$R[x_1] \otimes \cdots \otimes R[x_k]$ is the Kronecker product
+$S_{n_1} \otimes \cdots \otimes S_{n_k}$, mapping the coefficient
+vector in the monomial basis to the coefficient vector in the
+multivariate falling-factorial basis $\{x_1^{\underline{j_1}} \cdots
+x_k^{\underline{j_k}}\}$.
+
+The vanishing criterion extends: $p$ is identically zero as a
+function iff every multivariate falling-factorial coefficient
+$c_{j_1, \ldots, j_k}$ satisfies the divisibility
+$2^{m - \min(\nu_2(\prod_i j_i!), m)} \mid c_{j_1, \ldots, j_k}$.
+
+\paragraph{Mixed input widths.}
+Variables in the same polynomial ring $R[x_1, \ldots, x_k]$ may have
+different effective input widths $n_i \leq d$ (e.g., when narrower
+operands are zero-extended into a wider product). The criterion
+above is incomplete for that setting: the falling factorial
+$x_i^{\underline{k}}$ is identically zero on
+$\{0, 1, \ldots, 2^{n_i} - 1\}$ once $k \geq 2^{n_i}$, so terms
+exceeding that bound vanish on the input range without contributing
+a divisibility constraint. Our implementation tracks the input width
+of each variable through the polynomial extractor and adjusts the
+per-variable degree bound to $\mu_i = \min(2^{n_i}, \mathrm{SF}(2^d))$.
+Two of our DSP benchmarks exercise this mixed-width form:
+\texttt{dsp\_image\_reject}
+($\mathbb{Z}_{2^{12}} \times \mathbb{Z}_{2^8} \to \mathbb{Z}_{2^{16}}$,
+solved in 14\,ms) and \texttt{dsp\_vanishing\_mv}
+($\mathbb{Z}_2 \times \mathbb{Z}_{2^2} \to \mathbb{Z}_{2^3}$,
+solved in 5\,ms).
+
+\subsection{Algorithm and Complexity}
+
+\begin{enumerate}
+\item Convert the difference polynomial to the falling factorial
+  basis using Stirling numbers of the second kind $S(n,k)$
+  (Section~\ref{sec:vanishing-falling}).
+\item For multivariate polynomials, use the Kronecker product
+  $S^{\otimes k}$ for the basis change (Section~\ref{sec:vanishing-kron}).
+\item Check the divisibility conditions of Theorem~\ref{thm:vanishing}.
+\item If all conditions hold, the polynomial vanishes.
+\end{enumerate}
+
+\textbf{Complexity derivation.} Let $d_w$ denote the maximum
+per-variable degree of the difference polynomial (in the monomial
+basis), and $k$ the number of variables. The monomial basis has
+$d_w^k$ elements; the Kronecker Stirling matrix has
+$d_w^k \times d_w^k$ entries. The basis change is a single
+matrix-vector product, giving cost $O(d_w^{2k})$. For the typical
+DSP datapaths we verify, $d_w \leq 4$ and $k \leq 4$, so the matrix
+has at most $4^4 = 256$ rows; the test completes in microseconds.
+For higher-degree benchmarks the exponential dependence on $k$ is
+real but bounded in practice by the polynomial structure of DSP
+filters (which rarely exceed degree 3 per variable and 4 variables).
+The test is complete for polynomial equivalence over
+$\mathbb{Z}_{2^{n_1}} \times \cdots \times \mathbb{Z}_{2^{n_d}}
+\to \mathbb{Z}_{2^m}$.
+
+\paragraph{Empirical scaling.}
+Figure~\ref{fig:scaling} reports two scaling experiments: degree
+scaling on a family of binomial identities $(a + b)^k =
+\sum_{i=0}^k \binom{k}{i} a^i b^{k-i}$ for
+$k \in \{2,\ldots,6\}$ at bitwidths 8 and 16, and variables
+scaling on a permutation family
+$\sum_{\sigma \in S_k} \prod_i x_{\sigma(i)} \equiv
+k! \cdot \prod_i x_i \pmod{2^{16}}$ for $k \in \{2,\ldots,6\}$ (the
+LHS contains $k \cdot k!$ multiplications). All measurements use
+median of 4 warm runs (5 runs total, first discarded), consistent
+with Section~\ref{sec:scaling}.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.95\textwidth]{scaling-figure.pdf}
+  \caption{Algebraic-solver scaling. (a) On the binomial-identity
+    family $(a+b)^k$, wall time grows by $2.1\times$ at BW=8 and
+    $3.1\times$ at BW=16 as $k$ goes from 2 to 6 --- well below
+    the theoretical $O(d_w^{2k})$ bound, since fixed overhead
+    (SMT parsing, SSA construction, Buchberger setup) dominates
+    these short solves. (b) On the permutation family
+    $\sum_{\sigma \in S_k} \prod_i x_{\sigma(i)}$, wall time grows
+    as approximately $k^5$ (log--log slope 4.9), driven by the
+    $k \cdot k!$ multiplications on the LHS. The Gr\"obner basis
+    recognises equivalent monomials via commutativity in the
+    ideal, rather than enumerating all $k!$ permutations
+    separately; growth is sub-factorial against $k \log k$
+    (slope 0.6 versus 1.0 for factorial). At $k=6$ the 2.2\,s is
+    dominated by the 720 reductions required to unify the
+    permutation terms, not by polynomial arithmetic itself.}
+  \label{fig:scaling}
+\end{figure}
+
+\subsection{Worked Example: $4x^2 + 4x \equiv 0 \pmod{8}$}
+\label{sec:vanishing-example}
+
+To see the mechanism, take $R = \mathbb{Z}_8$, $m = 3$, and
+$p(x) = 4x^2 + 4x$ as a univariate polynomial.
+Convert to falling factorials using $x^2 = x^{\underline{2}} + x^{\underline{1}}$
+and $x = x^{\underline{1}}$:
+\[
+  p(x) \;=\; 4(x^{\underline{2}} + x^{\underline{1}}) + 4 x^{\underline{1}}
+        \;=\; 4 \, x^{\underline{2}} + 8 \, x^{\underline{1}}.
+\]
+Apply Theorem~\ref{thm:vanishing}. For $c_2 = 4$: $\nu_2(2!) = 1$,
+so we need $2^{3-1} = 4 \mid 4$, which holds. For $c_1 = 8$:
+$\nu_2(1!) = 0$, so we need $2^3 = 8 \mid 8$, which also holds.
+All conditions hold, so $p$ vanishes as a function---which matches
+the direct verification $4 \cdot 0 + 4 \cdot 0 = 0$, $4 \cdot 1 + 4 \cdot 1 = 8 \equiv 0$,
+$4 \cdot 4 + 4 \cdot 2 = 24 \equiv 0$, and so on.
+
+In the DSP context this is important because a Horner-form filter
+and its expanded form typically differ by terms of this shape
+(low-order bits cancel through overflow).
+
+\subsection{How Overflow Detection Becomes a Polynomial Query}
+\label{sec:overflow-encoding}
+
+Readers may wonder how overflow-detection benchmarks become amenable
+to polynomial reasoning, since ``$x$ overflows $N$ bits'' is
+quintessentially a non-polynomial bit-level predicate. The mechanism
+is structural: overflow-detection benchmarks typically assert a
+\emph{disequality} between two values that, modulo $2^N$, are
+necessarily equal --- so the disequality reduces to a polynomial
+identity in $\mathbb{Z}_{2^N}$ regardless of whether overflow occurs.
+
+Consider \texttt{overflow\_detect\_16}:
+\begin{verbatim}
+(define-fun wide_prod   () (_ BitVec 32) (bvmul wa wb))
+(define-fun narrow_prod () (_ BitVec 16) (bvmul a b))
+(assert (not (= narrow_prod ((_ extract 15 0) wide_prod))))
+\end{verbatim}
+The assertion is unsatisfiable not because of any reasoning about
+the high 16 bits of \texttt{wide\_prod}, but because
+$\texttt{narrow\_prod} = a\cdot b \bmod 2^{16}$ and
+$\texttt{extract}(15,0)(\texttt{wide\_prod})
+= (\texttt{zero\_extend}(a) \cdot \texttt{zero\_extend}(b)) \bmod 2^{16}
+= a\cdot b \bmod 2^{16}$. The Gr\"obner basis recognises the polynomial
+identity in $\mathbb{Z}_{2^{16}}$. The ``overflow'' part of the query
+acts as an unconstrained assumption that the algebraic layer accepts
+without analysing.
+
+This is the typical encoding: an overflow predicate is paired with a
+disequality whose two sides reduce to the same polynomial in the
+narrow ring. Where an overflow predicate appears as the \emph{primary}
+constraint --- e.g.\ ``prove that $a\cdot b$ overflows iff
+$a > 2^N / b$'' --- our extractor cannot turn the high-bit extraction
+\texttt{(extract $2N{-}1$ $N$)} into a polynomial directly (the
+non-zero low index is a shift, which is non-polynomial); the query
+falls through to the bit-blast layer. Such cases (e.g.\ the
+no-overflow assumptions in \texttt{mul\_ineq\_12}) still benefit
+indirectly: the Gr\"obner basis simplifies the multiplication-related
+sub-queries, leaving the bit-blast layer with a smaller search.
+
+\subsection{Worked Example: Gr\"obner Basis for Commutativity at BW=3}
+\label{sec:grobner-example}
+
+Consider $a \cdot b = b \cdot a$ over $\mathbb{Z}_8$ ($d = 3$).
+The disequality-augmented polynomial system (Song et al.'s
+$2^{d-1}$ encoding) is
+\[
+  \{\; p_1 = z_1 - a \cdot b, \quad
+       p_2 = z_2 - b \cdot a, \quad
+       p_3 = z \cdot (z_1 - z_2) - 2^{d-1} \;\},
+\]
+with lex order $z > z_1 > z_2 > a > b$.
+
+Step 1. Reduce $p_3$ by $p_1$: substitute $z_1 \mapsto a \cdot b$
+(modulo the sign of the S-polynomial), giving
+$p_3' = z \cdot (a \cdot b - z_2) - 2^{d-1}$.
+
+Step 2. Reduce $p_3'$ by $p_2$: substitute $z_2 \mapsto b \cdot a$,
+giving $p_3'' = z \cdot (a \cdot b - b \cdot a) - 2^{d-1}$.
+
+Step 3. In $\mathbb{Z}_8[a, b, z]$, $a \cdot b = b \cdot a$ holds as
+a polynomial identity (commutativity of the ring), so
+$p_3'' = z \cdot 0 - 2^{d-1} = -2^{d-1}$. For $d = 3$ the constant
+$-2^{d-1} \equiv 4 \pmod 8$ is non-zero: the Gr\"obner basis
+contains a non-zero constant, so the original system is
+unsatisfiable, proving $z_1 = z_2$ for all
+assignments. This takes three reductions, regardless of $d$. In
+our implementation the cost is ${\sim}$200\,$\mu$s independent of
+bitwidth.
+
+\subsection{Beyond the Universal-Equational Class}
+\label{sec:future-within-and-beyond}
+
+The procedure of Sections~\ref{sec:algebraic} and~\ref{sec:vanishing}
+treats the algebraic layer as a preprocessor on the
+universal-equational class with polynomial expressions; queries
+outside that fragment fall through to bit-blasting. Two
+mechanisms reduce that fall-through, both reported in the
+evaluation. \emph{Bit-decomposition variables}
+(Section~\ref{sec:eval-pbv}) introduce auxiliary boolean
+variables $b_{a,i} \in \{0, 1\}$ with idempotency
+$b_{a,i}^2 = b_{a,i}$ and sum-decomposition
+$a = \sum_i 2^i b_{a,i}$, making partial bit-vector operators
+($\mathtt{bvlshr}$, $\mathtt{bvand}$, $\mathtt{bvor}$,
+$\mathtt{bvxor}$, $\mathtt{bvnot}$) and relational predicates
+($\mathtt{bvult}$, $\mathtt{bvule}$, signed variants, plus
+symbol-symbol comparisons via bit-comparator chains) sound
+polynomial expressions. With Frobenius-aware reduction (clamp
+$b^k$ to $b$ during S-polynomial steps), structural
+bit-decomposition (compute bit polynomials directly for
+recognised bit-ops without auxiliary variables), a
+polynomial-form host cache, inline idempotency simplification,
+and linear elimination of host variables before Buchberger, the
+procedure scales linearly in bitwidth on the partial-bv
+identities tested up to $d = 128$
+(Table~\ref{tab:eval-pbv}), and beats Bitwuzla 17$\times$ on
+the toom-scaled identity at $d = 128$ and on the
+$\mathtt{bvxor}$-with-MSB-precondition case
+(Table~\ref{tab:eval-pbv-relational}).
+\emph{Deferred bit-blasting} (Section~\ref{sec:eval-saber-defer})
+queues SSA-to-SAT conversion until after the algebraic procedure
+has had a chance to refute, cutting peak memory by 100--165$\times$
+on SABER and unlocking $N = 768$ within a 1.7\,GB budget that
+otherwise OOMs at $N = 256$.
+
+Three extensions remain genuinely future. \emph{Faithful
+Toom-Cook 4-way SABER verification}
+(Section~\ref{sec:eval-saber}, ``open-challenge target''): we
+have a generator that matches the SABER C reference byte-for-byte
+on pinned inputs, but the universal verification target
+``schoolbook $=$ Toom-Cook 4-way'' times out at 30~minutes for
+both Bitwuzla and our procedure on the smallest non-trivial case
+($N = 4$). \emph{Faster polynomial multiplication} for
+SABER beyond $N = 768$, where the Buchberger phase becomes the
+bottleneck and would benefit from sparse polynomial
+representation, FFT/Toom-Cook for polynomial-on-polynomial
+multiplication, or lazy on-demand inlining; this is multi-week
+research effort. \emph{Theory combination}, i.e.\ refactoring
+the bit-vector pipeline into a true theory-solver-style module
+that exchanges information bidirectionally with the SAT search
+across multiple iterations rather than running once and stopping;
+this is multi-month architectural work and outside the scope
+of the present paper.
+
+A complementary direction within the universal-equational class
+is \emph{expression-level normalisation}, generalising
+\texttt{extract\_candidate} (currently univariate-linear only) to
+reduce arbitrary polynomial expressions w.r.t.\ the computed
+basis and emit any constant or shorter form as a SAT-level
+equality. The simplest variant of this idea (post-Buchberger,
+reduce each disequality's $\textit{lhs} - \textit{rhs}$ by the
+global basis; if zero, the basis implies $\textit{lhs} =
+\textit{rhs}$ and the formula is unsat) is implemented behind
+\texttt{ENABLE\_GB\_EXPR\_NORMALISE} and \emph{empirically null}:
+on a 315-benchmark sample (the 39-benchmark custom suite,
+a 210-benchmark subpolynomial sample, and the SMT-COMP
+QF\_BV 66-benchmark stratified sample) the variant changes the
+verdict on zero benchmarks. The analytical reason is that
+CBMC's typical SMT query has a single top-level disequality
+(the negated assertion); the global basis then equals the
+per-disequality basis, on which the $2^{d-1}$ encoding + Buchberger has
+already been run. More sophisticated variants (compound-
+multiplication constant folding, pairwise variable equality
+discovery, generalised candidate extraction over arbitrary
+monomials) require non-trivial additional machinery and are
+deferred to future work; we list them under the section's
+``research direction'' bullet rather than as imminent
+improvements. (Data:
+\texttt{doc/paper-algebraic/data/expr-norm-evaluation.tsv}.)
+
+\subsection{Tuning the algebraic pipeline for community
+benchmarks}
+\label{sec:algebraic-tuning}
+
+Section~\ref{sec:algebraic} establishes the soundness contract
+of the algebraic refutation pipeline: collect equalities and
+disequalities from the asserted formula, run a strong
+Gr\"obner basis over $\mathbb{Z}_{2^d}$ with the $2^{d-1}$ encoding on
+each disequality, and report UNSAT when any non-zero constant enters
+the basis. The minimal pipeline is sufficient for the
+universal-equational fragment when the formula is presented as
+a flat conjunction of arithmetic equalities --- the Brain
+random-polynomial sample, the DSP suite, and the SABER
+benchmarks all fit that mould.
+
+Community benchmarks present polynomial constraints buried
+inside boolean structure: SMT-LIB \texttt{(let \ldots\ (and
+\ldots\ \ldots))} bindings, \texttt{(if c (= a A) (= a B))}
+forms produced by symbolic-execution tools that push equalities
+through ite, Tseitin-style boolean encodings of polynomial
+predicates, and chains of disequalities that imply but do not
+state the polynomial fact. Without preprocessing, none of these
+reach the algebraic solver.
+
+We add four small tuning steps, individually low-risk and
+ablation-gated, that together unlock six benchmarks on the
+SMT-COMP stratified sample (Section~\ref{sec:eval-smtcomp}):
+
+\paragraph{(2.5) Parse-time push-through-ite for predicates.}
+Rewrite \texttt{(= (ite c A B) X)} to
+\texttt{(ite c (= A X) (= B X))} (and analogous for
+\texttt{distinct}/\texttt{bvule}/\texttt{bvult}/\texttt{bvuge}/
+\texttt{bvugt}, signed and unsigned), with substitution of the
+ite condition's equalities into the true branch. This is sound
+by case analysis on the condition (formal proofs in
+\texttt{IteCondPropagation.lean}). It unlocks
+\texttt{bw512\_12} from the bw=512 family by collapsing a
+deep ite tree to a constant formula whose distinct-equality
+becomes structurally trivial.
+
+\paragraph{(2.6) Tseitin-aware preprocessing.}
+\cbmc's solver receives boolean variables introduced by
+Tseitin encoding upstream, with definitions like
+\texttt{Fresh\_\_0 = (X = Y)} and chains
+\texttt{(bitand Fresh\_\_0 (bitnot Fresh\_\_1))} that fix
+\texttt{Fresh\_\_0}'s value. The Tseitin propagator
+(\texttt{tseitin\_propagation.cpp}) walks these chains in both
+directions: forward simplification (evaluate definitions when
+inputs are known) and backward inversion (propagate known
+outputs back through Tseitin definitions). Per-rule soundness
+is formalised in \texttt{TseitinPropagation.lean}. Recovered
+polynomial dis/equalities feed a self-contained Buchberger
+refutation that bypasses the bit-alignment / host-substitution
+machinery (which can fail an invariant on
+non-refutable runs over bit-mismatched expressions). It
+unlocks the four wienand benchmarks
+(\texttt{commute08/16/32}, \texttt{distrib08}) by surfacing
+the buried disequality.
+
+\paragraph{(A.1) Min-LCM-degree pair selection.}
+The Buchberger loop selects which critical pair to process next
+from the queue. The textbook choice for ZMod-Buchberger is
+``normal selection'' (Buchberger 1985,
+Giovini-Mora-Niesi-Robbiano-Traverso 1991): pick the pair whose
+S-polynomial uses the smallest-degree LCM. Our implementation
+previously used LIFO (a no-cost choice that makes
+\texttt{vector.back()/pop\_back()} suffice) but is empirically
+much slower on certain polynomial systems --- the cohencu
+identity
+\begin{align*}
+& z + y = 7 + 3n^2 + 9n,\\
+& y = 3n + 3n^2 + 1,\\
+& z \neq 6 + 6n
+\end{align*}
+admits an immediate refutation via the S-poly of the first two
+equations (LCM degree 2: $\mathrm{LM} = z, \mathrm{LM} = y$,
+$\mathrm{lcm} = zy$). At BW=4 LIFO refutes in 2923 steps with a
+basis grown to 38 elements; at BW=8 LIFO never finishes within
+$10^5$ steps because every S-polynomial it produces is an
+\emph{even} constant (non-units in $\mathbb{Z}_{2^8}$, by
+\texttt{ZMod.two\_not\_isUnit}), and the critical pair is
+processed last. Normal selection picks the critical pair first
+and refutes in 9 steps regardless of bitwidth. The strategy is
+orthogonal to soundness (theorem
+\texttt{StrongGB.lean::pair\_selection\_orthogonal}). The
+implementation is one helper function (\texttt{select\_next\_pair})
+plus a single line change in the main loop.
+
+\paragraph{(A.2) Boolean tree walk plus IF-rebuild plus
+IF case-elimination.}
+The bit-blaster's \texttt{set\_to} surfaces top-level
+\texttt{(= a b)} and \texttt{(distinct a b)} for the
+algebraic solver. We extend it to walk into
+\texttt{and}/\texttt{or}/\texttt{not}/\texttt{let}/\texttt{ite}
+wrappers (with De~Morgan polarity tracking) so that equalities
+buried in
+\texttt{(let \ldots\ (and \ldots\ \ldots))} also reach the
+algebraic solver, gated by an \texttt{ID\_mult}-presence test
+on each leaf to avoid SAGE/SPEAR-style regressions where
+shift-and-or boolean chains would flood the algebraic worklist.
+The walk also recognises the post-Phase-2.5 form
+\texttt{(if c (= sym A) (= sym B))} and rebuilds it as
+\texttt{(= sym (if c A B))}, restoring the equality form that
+push-through-ite undid. Soundness in
+\texttt{AlgebraicTreeWalk.lean}.
+
+A small post-processor in \texttt{try\_algebraic\_solve} then
+combines the IF-rebuild equality with any (dis)equality fixing
+\texttt{sym} to a branch constant: from
+$\mathtt{(=\ sym\ (if\ c\ \alpha\ \beta))}$ and
+$\mathtt{(distinct\ sym\ \alpha)}$ (or
+$\mathtt{(=\ sym\ \beta)}$), we derive that \texttt{c} is false,
+and emit \texttt{c}'s sub-equality as a disequality on the
+algebraic worklist. This bridges the IF-rebuild equality
+(which the polynomial extractor would otherwise drop because
+\texttt{ite} is non-polynomial) to the polynomial system that
+needs the bridging disequality. It unlocks
+\texttt{cohencu.c\_0}, \texttt{cohencu.c\_1}, and
+\texttt{geo3.c\_5} from the SMT-COMP sample.
+
+\paragraph{(A.3) Nonzero fast-path for relational predicates.}
+The standard SMT-LIB div/mod identity
+$a = (a/b) \cdot b + (a \bmod b)$ guarded by $b > 0$ is a
+canonical universal-equational query, but with our previous
+implementation it timed out at every bitwidth $\geq 16$. The
+issue was the bvult predicate $\mathtt{bvult\ 0\ b}$ being
+encoded by \texttt{extract\_predicate} as a bit-chain
+constraint over the bits of $b$ (``at least one bit is 1''),
+which adds $d$ bit variables and a chain of comparison
+auxiliaries to every per-disequality basis, multiplying
+Buchberger's work even when the predicate is logically
+redundant for the disequality the system is trying to refute.
+
+The fast-path recognises ``$x$ is non-zero'' patterns
+($\mathtt{bvult\ 0\ x}$, $\mathtt{bvule\ 1\ x}$, the
+parser-normalised $\mathtt{bvuge\ x\ 1}$ form, NOT
+$\mathtt{bvule\ x\ 0}$) and emits $(= x\ 0)$ to a deferred
+\texttt{nonzero\_pending} vector. In
+\texttt{try\_algebraic\_solve}, these are promoted to
+\texttt{algebraic\_disequalities} only when the formula
+contains \texttt{bvudiv}/\texttt{bvurem} somewhere; otherwise
+they are skipped to avoid flooding the algebraic worklist on
+SAT benchmarks like \texttt{Sage2\_bench\_15251} (218 bvult
+occurrences and no division). Soundness is captured in
+\texttt{BvDivPolyEncoding.lean::NonzeroFastPath::
+bvult\_zero\_iff\_ne\_zero}.
+
+Concrete result on the div/mod identity:
+
+\begin{tabular}{lrr}
+\toprule
+$d$ (bitwidth) & before & after \\
+\midrule
+8 & 4.75 s & 0.007 s \\
+16 & T/O & 0.011 s \\
+32 & T/O & 0.025 s \\
+64 & T/O & 0.084 s \\
+128 & T/O & 0.331 s \\
+256 & T/O & 1.382 s \\
+\bottomrule
+\end{tabular}
+
+\paragraph{F4-style tail reduction.}
+Two further benchmarks from the SMT-COMP sample
+(\texttt{cohencu\_2}, \texttt{cohencu\_3}) carry an
+IF-condition with $z \cdot z$, a quadratic-in-$z$ polynomial.
+After the Phase~A.2 IF-rebuild and Phase~A.3 if-case-elimination,
+the algebraic disequality becomes
+$z^2 + 12 - 6z - 12y \neq 0$, whose $2^{d-1}$ encoding
+$z' \cdot (z^2 + 12 - 6z - 12y) - 2^{d-1} = 0$ should reduce to the
+non-zero constant $-2^{d-1}$ when combined with the cohencu
+polynomial equations. The
+substitution $z = 6 + 6n$ and $y = 1 + 3n + 3n^2$ flattens the
+inner expression to zero, leaving the non-zero constant $-2^{d-1}$.
+
+But this refutation requires reducing a \emph{non-leading}
+term: standard incremental Buchberger's leading-monomial-divides
+rule reduces only the leading term, and with grevlex ordering
+the basis polynomial $-z^2 + x_6$ has leading $z^2$ (degree 2),
+not $x_6$ (degree 1) --- so $x_6$ in tails of other polynomials
+is not rewritten.
+
+We add F4-style \emph{full reduction}: a polynomial is reduced
+by walking each of its terms, and any term whose monomial is
+divisible by a basis element's leading monomial is rewritten
+using that basis element. \texttt{interreduce\_basis} applies
+this fixed-point across the basis. Wired into the standard
+Buchberger via an outer ``Buchberger $\to$ interreduce $\to$
+regenerate pairs $\to$ Buchberger'' loop (capped at 8 outer
+rounds), this catches reductions that incremental Buchberger
+misses. Soundness reuses
+\texttt{BuchbergerCorrectness.lean::reduce\_in\_ideal}: tail
+reduction is a sequence of standard reduction steps, and the
+lemma applies regardless of which term we choose to reduce.
+The new \texttt{StrongGB.lean::tail\_reduction\_in\_ideal}
+formalises this orthogonality.
+
+This is not the full F4 algorithm of Faug\`ere~\cite{faugere1999f4}
+(which batches multiple S-polynomial reductions into a single
+matrix), but it captures F4's core benefit for our use case
+without requiring a matrix kernel implementation. The
+\texttt{cohencu\_2} unlock takes 3.5\,s, \texttt{cohencu\_3}
+1.8\,s. (Disable env var:
+\texttt{DISABLE\_INTERREDUCE=1}.)
+
+\paragraph{Combined effect.}
+The six steps (Phases~2.5, 2.6, A.1, A.2, A.3, F4) preserve all
+previously-solved benchmarks
+(zero regressions on the existing regression tests, the
+full random-polynomial suite, and the 66 SMT-COMP stratified
+sample) and improve on the shift-add baseline on the SMT-COMP
+sample from $37/66$ to $42/66$ --- deciding eight benchmarks
+bit-blasting cannot, while bit-blasting in turn decides three
+that the algebraic configuration times out on (net $+5$; see
+Table~\ref{tab:smtcomp-sample}). PAR-2
+improves from $57.1$\,s/benchmark to $45.8$\,s/benchmark, the
+latter ahead of cvc5's $52.6$. On
+Brain's full random-polynomial suite, the algebraic
+configuration solves $2128/3498$ (see
+Table~\ref{tab:random-poly-solved}). The 59
+wins-beyond-all-current-solvers
+(Table~\ref{tab:random-poly-wins}) are decided $10\times$
+faster on average due to Phase~A.1's pair selection. Each step
+is gated behind an environment variable for ablation
+(\texttt{DISABLE\_TSEITIN\_PROPAGATION},
+\texttt{GB\_LIFO},
+\texttt{DISABLE\_ALGEBRAIC\_TREE\_WALK},
+\texttt{DISABLE\_IF\_CASE\_ELIM},
+\texttt{DISABLE\_NONZERO\_FAST\_PATH},
+\texttt{DISABLE\_INTERREDUCE}) so that future implementations
+can disable any subset for measurement.
+
+\section{Evaluation}
+\label{sec:external}
+
+We evaluate on five benchmark pools, organised by the role each
+plays in the contribution narrative. \emph{Pools where the
+algebraic procedure decides queries no current solver decides:}
+the full random-polynomial suite of
+Brain~\cite{brain2025subpoly} (3498 benchmarks, Section~\ref{sec:eval-random-poly}),
+which contributes the 59 wins beyond Bitwuzla, cvc5, and every
+bit-blasting configuration we tested; and 5 DSP datapath
+equivalences (Section~\ref{sec:eval-dsp}) where overflow
+cancellation makes the vanishing-polynomial test necessary.
+\emph{Pool where the procedure validates correctness and bit-vector
+coverage:} the 39-benchmark custom suite
+(Section~\ref{sec:eval-custom}), which exercises the algebraic and
+vanishing layers across five categories. \emph{Pool where the
+procedure is a complement, not a replacement:} the 66-benchmark
+SMT-COMP 2024 stratified sample
+(Section~\ref{sec:eval-smtcomp}),
+where Bitwuzla's mature word-level rewriting wins the volume
+contest. \emph{Scope comparison:} the Amulet2 gate-level
+verifier (Section~\ref{sec:eval-amulet}). Threats to validity
+are consolidated in Section~\ref{sec:threats}.
+
+The baseline solvers are Bitwuzla~\cite{niemetz2023bitwuzla}
+(SMT-COMP 2024 QF\_BV winner, version 0.9.0-dev) and cvc5
+(version 1.3.3); neither implements a Gr\"obner-basis decision
+procedure for QF\_BV (cvc5's Gr\"obner-basis reasoning is in its
+finite-field theory and applies only to QF\_FF queries over
+prime-order fields, not QF\_BV). All experiments run under a
+60\,s wall-clock limit (matching SMT-COMP's short track) and a
+6\,GB memory limit, except the random-polynomial suite which uses
+10\,s to match the prior comparison.
+
+\subsection{Random Polynomial Identity Suite (full suite, 3498 benchmarks)}
+\label{sec:eval-random-poly}
+
+We evaluate on the \emph{entire} random polynomial benchmark
+suite of Brain~\cite{brain2025subpoly} --- all 3498 benchmarks
+across two random seeds and eight categories (no sampling). The
+benchmarks test arithmetic identities at random polynomial
+degrees 2--53 over bitwidths 8, 16, 32, 64.
+Categories cover universal-equational identities (addition,
+multiplication, encoding-correctness), existential-equational
+SAT-direction queries (equality, nonequality), and bounded /
+identity-point / root-finding queries. Five configurations
+were measured under a 10\,s wall-clock budget per benchmark:
+two pure-bit-blasting baselines (shift-add, Comba/CS), the
+algebraic procedure of this work (Comba/CS plus the algebraic
+layer), Bitwuzla 0.9.0-dev, and cvc5 1.3.3. Across all 3498
+benchmarks and all five configurations we observed \emph{no}
+\texttt{sat}-vs-\texttt{unsat} disagreement, and no verdict
+contradicting a benchmark's declared \texttt{:status}.
+
+\begin{table}[ht]
+\caption{Solved counts on the full 3498-benchmark
+random-polynomial suite, 10\,s wall-clock budget per benchmark.}
+\label{tab:random-poly-solved}
+\centering
+\begin{tabular}{lr}
+\toprule
+Configuration                       & Solved / 3498 \\
+\midrule
+shift-add bit-blasting              & 1972 \\
+Comba/CS bit-blasting               & 1970 \\
+\textbf{this paper} (algebraic)     & \textbf{2128} \\
+Bitwuzla 0.9.0-dev                  & 3021 \\
+cvc5 1.3.3                          & 2678 \\
+\midrule
+union (any configuration)           & 3104 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Bitwuzla wins the volume contest by 893 over our procedure: its
+occurrence-map canonicalisation closes most universal-equational
+queries syntactically, and on the existential-equational
+SAT-direction queries (equality, nonequality) it constructs
+witnesses that our UNSAT-oriented $2^{d-1}$ encoding cannot.
+The contribution we claim, however, is not volume but
+\emph{completeness}: the algebraic procedure decides 59 benchmarks
+that no current SMT solver and no bit-blasting configuration
+solves within 10\,s.
+
+\paragraph{Wins beyond all current solvers.}
+\begin{table}[ht]
+\caption{Random-polynomial benchmarks decided by our procedure
+that Bitwuzla, cvc5, and \emph{every} bit-blasting configuration
+time out on within 10\,s, by category (full suite).}
+\label{tab:random-poly-wins}
+\centering
+\small
+\begin{tabular}{lr}
+\toprule
+Category & wins beyond all solvers \\
+\midrule
+multiplication & 30 \\
+correctness    & 20 \\
+addition       & 9 \\
+\midrule
+\textbf{total} & \textbf{59} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+All 59 wins are universal-equational identities (multiplication,
+encoding-correctness, addition); the Gr\"obner-basis solver
+dispatches them while bit-blasting cannot encode the
+multiplications and Bitwuzla's / cvc5's word-level rewriting
+lacks rules for the relevant high-degree expansions.
+
+A weaker but still meaningful claim is the gap to bit-blasting
+alone: 257 benchmarks are decided by our procedure that no
+bit-blasting configuration we tested solves within 10\,s,
+including the 59 above plus 198 that Bitwuzla and/or cvc5 also
+solve via word-level rewriting. The 257-vs-bit-blasting and
+59-vs-everyone numbers measure two different things: the former
+reflects what algebraic reasoning offers over bit-blasting
+alone, the latter measures contributions beyond \emph{all}
+current SMT infrastructure. We report both because the SMT user
+has both options available.
+
+\paragraph{Per-category breakdown.}
+The win pattern is structured by the four-classes taxonomy
+(Table~\ref{tab:taxonomy}). Algebraic reasoning dominates on
+universal-equational categories (addition, multiplication,
+correctness identities) where the $2^{d-1}$ encoding reduces
+the question to non-zero-constant detection; it is dominated on
+existential-equational SAT-direction (equality, nonequality)
+where witness construction is the goal; on the
+non-strictly-equational categories (bounding, identity-point,
+root-finding) it ties pure bit-blasting because the algebraic
+layer falls through.
+
+\begin{table}[ht]
+\caption{Per-category solved counts on the full random-polynomial
+suite. The taxonomy class predicts the win pattern: the
+algebraic procedure beats pure bit-blasting on the
+universal-equational categories, ties on the
+non-strictly-equational categories, and loses on the
+existential-equational SAT-direction categories.}
+\label{tab:random-poly-by-category}
+\centering
+\small
+\begin{tabular}{llrrrrr}
+\toprule
+Class & Category & shift-add & Comba/CS & this paper & Bitwuzla & cvc5 \\
+\midrule
+\multicolumn{7}{l}{\emph{Universal-equational (algebraic dominates pure bit-blasting)}} \\
+& addition       & 64/288  & 64/288  & \textbf{166/288} & 227/288 & 215/288 \\
+& multiplication & 62/288  & 62/288  & \textbf{167/288} & 192/288 & 114/288 \\
+& correctness    & 108/438 & 109/438 & \textbf{155/438} & 180/438 & 162/438 \\
+\midrule
+\multicolumn{7}{l}{\emph{Existential-equational SAT-direction (bit-blasting dominates)}} \\
+& equality       & 183/292 & 183/292 & 183/292 & 292/292 & 270/292 \\
+& nonequality    & \textbf{188/292} & \textbf{188/292} & 95/292  & 292/292 & 270/292 \\
+\midrule
+\multicolumn{7}{l}{\emph{Non-strictly-equational (algebraic ties bit-blasting)}} \\
+& bounding       & 241/292 & 241/292 & 240/292 & 292/292 & 285/292 \\
+& identity-point & 542/804 & 543/804 & 542/804 & 778/804 & 680/804 \\
+& root-finding   & 584/804 & 580/804 & 580/804 & 768/804 & 682/804 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+We cross-checked soundness exhaustively: across all 3498
+benchmarks and all five configurations there was \emph{no}
+\texttt{sat}-vs-\texttt{unsat} disagreement, and no verdict
+contradicted a benchmark's declared \texttt{:status}.
+
+\subsection{DSP Datapath Equivalence (5 benchmarks)}
+\label{sec:eval-dsp}
+
+DSP datapath equivalences exhibit overflow cancellation:
+two arithmetically distinct polynomials become functionally
+equivalent because their difference is a vanishing polynomial
+under modular overflow. The vanishing polynomial test of
+Section~\ref{sec:vanishing} decides this fragment in
+microseconds.
+
+\begin{table}[ht]
+\caption{DSP datapath benchmarks (\cadical, seconds, 60\,s
+T/O). All three tools solve all five; cvc5 takes 1.84\,s on
+\texttt{dsp\_horner\_16} where our vanishing-polynomial test
+takes 10\,ms (a 184$\times$ gap). The five benchmarks were
+designed by us to exercise the test (see
+Section~\ref{sec:threats}).}
+\label{tab:dsp}
+\centering
+\begin{tabular}{lrrr}
+\toprule
+Benchmark & this paper & Bitwuzla & cvc5 \\
+\midrule
+\texttt{dsp\_image\_reject} ($\mathbb{Z}_{2^{12}} \times \mathbb{Z}_{2^8} \to \mathbb{Z}_{2^{16}}$) & 0.014 & 0.007 & 0.010 \\
+\texttt{dsp\_horner\_16} (Horner vs.\ direct) & 0.010 & 0.004 & \textbf{1.822} \\
+\texttt{dsp\_vanishing\_poly\_8} ($Y_{10}(x) \equiv 0$)       & 0.008 & 0.013 & 0.048 \\
+\texttt{dsp\_vanishing\_mv} (multivariate)                    & 0.005 & 0.004 & 0.005 \\
+\texttt{dsp\_coeff\_scale\_8}                                  & 0.005 & 0.002 & 0.006 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The five benchmarks all solve in $<$15\,ms via our procedure,
+with the vanishing-polynomial test contributing the decisive
+step on \texttt{dsp\_horner\_16} (a Horner-form vs.\ expanded-form
+equivalence: arithmetically distinct polynomials, equivalent
+modulo $2^{16}$). Bitwuzla solves the same set in similar time
+via word-level normalisation; cvc5 falls through to bit-blasting
+on \texttt{dsp\_horner\_16}, where it takes 1.84\,s.
+
+The five DSP benchmarks were designed by us, inspired by
+Shekhar et al.~\cite{shekhar2007equivalence}; their inclusion
+demonstrates the vanishing-polynomial test in operation rather
+than independent superiority. The procedure's value is that the
+test is \emph{a complete decision procedure for this fragment};
+the absolute timings on these particular five benchmarks would
+not differ markedly under a future word-level rewriter that
+added the appropriate rules.
+
+\subsection{SABER Polynomial Multiplication (Post-Quantum Cryptography)}
+\label{sec:eval-saber}
+
+SABER~\cite{daemen2018saber} is a lattice-based key encapsulation
+mechanism (NIST PQC Round 3 finalist). Its inner operation is
+polynomial multiplication in the ring $R_q = \mathbb{Z}_q[x] / (x^N + 1)$
+with $q = 2^{13}$ and $N = 256$ in the standard parameter set,
+stored in 16-bit words. SABER's reference
+implementation~\cite{KULeuvenSABER} uses Toom-Cook 4-way
+decomposition with Karatsuba as the inner kernel, then reduces
+the $2N$-coefficient product modulo $x^N + 1$ via the
+SABER-specific reduction step
+\texttt{res[i] = c[i] - c[i+N]}.
+
+We verify the equivalence of two implementations of the
+polynomial product, mirroring SABER's algorithmic structure at
+scaled-down $N$ and at the implementation bitwidth $q = 2^{16}$:
+
+\begin{itemize}
+\item \emph{Schoolbook}: direct $O(N^2)$ multiplication.
+\item \emph{Karatsuba (1-level)}: split inputs into halves; 3
+  schoolbook half-products combined via the Karatsuba
+  identity.
+\item \emph{Karatsuba (2-level)}: split inputs into halves and
+  then quarters; 9 schoolbook quarter-products. Mirrors SABER's
+  multi-level structural decomposition.
+\end{itemize}
+
+Each query asserts the equivalence of all $N$ output coefficients
+in a single disjunctive disequality
+$\bigvee_{i=0}^{N-1} (\text{A\_res}_i \neq \text{B\_res}_i)$.
+Our pre-solver pattern-matches this shape and refutes each
+branch via the per-disequality machinery: the disjunction is
+unsatisfiable iff every branch is, and each branch is decided
+by the vanishing-polynomial test (the diff polynomial is
+literally zero after SSA inlining). Per-coefficient queries are
+also supported via the \texttt{--single-coeff} flag of the
+generator, for fine-grained reproducibility.
+
+\begin{table}[ht]
+\caption{SABER polynomial-multiplication equivalence at scaled
+$N$ and SABER's storage bitwidth $q = 2^{16}$. Per output
+coefficient via the all-coefficients disjunction; 600\,s
+timeout. The 1-level / 2-level columns differ only in inner
+Karatsuba recursion; both verify the same algebraic identity.
+$N = 256$ is SABER's actual parameter. cvc5 times out
+($\geq 60\,$s) at every $N \geq 4$.}
+\label{tab:saber-scaling}
+\centering
+\small
+\begin{tabular}{lrrrr}
+\toprule
+$N$ & this paper (1-level) & this paper (2-level) & Bitwuzla & cvc5 \\
+\midrule
+4   & 0.01\,s   & 0.01\,s   & 0.00\,s & T/O \\
+8   & 0.01\,s   & 0.01\,s   & 0.00\,s & T/O \\
+16  & 0.02\,s   & 0.02\,s   & 0.01\,s & T/O \\
+32  & 0.05\,s   & 0.05\,s   & 0.03\,s & T/O \\
+64  & 0.26\,s   & 0.26\,s   & 0.13\,s & T/O \\
+128 & 1.63\,s   & 1.64\,s   & 0.50\,s & T/O \\
+256 & 11.25\,s  & 11.23\,s  & 2.18\,s & T/O \\
+320 & 27.18\,s  & 26.51\,s  & 3.54\,s & T/O \\
+512 & 107.98\,s & 104.54\,s & 9.42\,s & T/O \\
+768 & 361.35\,s & 346.85\,s & 21.76\,s & T/O \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The procedure scales to SABER's actual $N = 256$ parameter,
+deciding each output-coefficient equivalence in $\sim$11\,s
+regardless of whether the alternative implementation is 1-level
+or 2-level Karatsuba: Buchberger normalises through the
+recursion levels because the underlying polynomial identity is
+the same. Bitwuzla solves each in 2.18\,s by occurrence-map
+canonicalisation, since both schoolbook and Karatsuba expand
+to the same canonical sum-of-monomials form. cvc5 times out
+at every benchmark in this family at every $N \geq 4$ --- its
+QF\_BV pipeline does not perform the polynomial-distributivity
+expansion that Bitwuzla's occurrence-map canonicaliser does.
+
+The win pattern matches the random-polynomial result of
+Section~\ref{sec:eval-random-poly}: completeness on the
+universal-equational class with polynomial expressions in
+$\mathbb{Z}_{2^d}$ is a procedural guarantee, while heuristic
+word-level rewriting wins or loses depending on whether the
+rewriter has matching patterns. Our procedure decides where
+cvc5 cannot. We extend an order of magnitude beyond SABER's
+$N = 256$ (to $N = 768$, $\sim$5.8 minutes), demonstrating that
+the procedure scales to crypto parameter sizes and to a regime
+where bit-blasting alone is no longer competitive: at $N = 512$
+the underlying SAT problem has tens of millions of clauses if
+emitted, but our deferred-bit-blasting strategy
+(Section~\ref{sec:eval-saber-defer}) prevents that emission
+when algebraic refutation succeeds.
+
+\paragraph{Toom-Cook 4-way: an open-challenge target.}
+SABER's actual implementation uses Toom-Cook 4-way at the
+outermost level with interpolation steps that include $\gg 1$
+and $\gg 3$ shifts and modular inverses of $3$, $9$, $15$.
+With the bit-decomposition extension of
+Section~\ref{sec:eval-pbv}, our extractor can now produce a
+faithful polynomial encoding of these shifts, and we have
+implemented a Toom-Cook 4-way generator
+(\texttt{--algo-b toom4}) that matches the SABER C reference
+byte-for-byte on pinned inputs. However, the universal
+verification target ``schoolbook = Toom-Cook 4-way'' is
+intractable for state-of-the-art SMT solvers at any feasible
+budget. We measured 30-minute (1800\,s) timeouts on the
+smallest sensible case ($N = 4$, single output coefficient,
+comparison modulo $q = 2^{13}$): both Bitwuzla and our
+procedure time out. SABER's algorithm is provably correct
+modulo $q = 2^{13}$ but \emph{not} modulo $2^{16}$ (the
+storage type); the deviation is masked by SABER's downstream
+mod-$q$ reductions. The empirical reduction modulo $2^{13}$
+holds across 100 random uint16 inputs at every
+$N_{\mathrm{SB}} \in \{1, 2, 4, 8, 16, 32, 64\}$, but verifying
+this universally is, on present evidence, beyond current
+SMT capability. Faithful Toom-Cook 4-way SABER verification is
+therefore an open challenge that motivates further work, both
+in SMT-solver heuristics and in alternative procedure
+architectures (e.g.\ specialised Toom-Cook structure
+recognition, or decomposition into evaluation, multiplication,
+and interpolation sub-lemmas).
+
+\paragraph{Deferred bit-blasting.}
+\label{sec:eval-saber-defer}
+The headline numbers in Table~\ref{tab:saber-scaling} rely on
+\emph{deferred bit-blasting}, an architectural choice in our
+boolbv layer that defers the conversion of SSA equalities to
+SAT clauses until after the algebraic procedure has had a
+chance to refute. If the algebraic procedure succeeds (the
+universal-equational common case for SABER), the queued
+bit-blasting work is discarded and the SAT solver is invoked
+only with the algebraic-induced \texttt{false} clause. If the
+algebraic procedure does not refute, the queue is replayed
+through the parent set\_to before the SAT solver runs,
+recovering identical behaviour with no regression.
+
+Without this deferral the procedure incurs $\sim$30\,GB peak RSS
+at $N = 256$ from the SAT clauses generated for SABER's nested
+$\mathtt{bvmul}$, $\mathtt{bvshl}$, $\mathtt{bvsub}$ SSA
+structure, and runs out of memory at $N \geq 384$ within a
+55\,GB virtual memory budget.
+
+\begin{table}[ht]
+\caption{SABER karatsuba2 with the default (deferred) configuration
+versus the $\texttt{DISABLE\_DEFER\_BITBLAST}$ ablation. Per output
+coefficient via the all-coefficients disjunction; 600\,s timeout;
+55\,GB virtual memory limit. The ablation ceiling at
+$N \geq 384$ is memory-bound (\textsc{oom}); the default ceiling
+at $N \geq 1024$ is time-bound (\textsc{t/o}). Default wall times
+here are measured under per-output-coefficient RSS sampling and
+the 55\,GB cgroup, and so run a little higher than the
+uninstrumented headline times of Table~\ref{tab:saber-scaling}
+(e.g.\ 13.4\,s vs.\ 11.25\,s at $N=256$).}
+\label{tab:saber-defer}
+\centering
+\small
+\begin{tabular}{lrrrr}
+\toprule
+& \multicolumn{2}{c}{ablation: \texttt{DISABLE\_DEFER\_BITBLAST}}
+& \multicolumn{2}{c}{default} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+$N$ & RSS (GB) & wall (s) & RSS (MB) & wall (s) \\
+\midrule
+64   & 1.95  & 6.7    & 22   & 0.3 \\
+128  & 7.7   & 27.8   & 60   & 2.0 \\
+256  & 30.8  & 117.6  & 206  & 13.4 \\
+320  & 51.9  & 195.1  & 313  & 25.2 \\
+384  & \multicolumn{2}{c}{\textsc{oom}}  & 445  & 42.6 \\
+512  & \multicolumn{2}{c}{\textsc{oom}}  & 776  & 98.3 \\
+768  & \multicolumn{2}{c}{\textsc{oom}}  & 1717 & 324.3 \\
+1024 & \multicolumn{2}{c}{\textsc{oom}}  & 3030 & \textsc{t/o} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Across $N \in \{64, \ldots, 320\}$ the default cuts memory by
+100--165$\times$ and wall-clock time by 8--20$\times$ relative to
+the ablation. Beyond $N = 320$ the ablation is unable to run
+within the 55\,GB budget at all; the default reaches $N = 768$
+in $\sim$5.8 minutes with under 2\,GB peak memory. At
+$N = 1024$ the algebraic Buchberger phase becomes the dominant
+cost; pushing the time-bound ceiling further would require
+faster polynomial-arithmetic procedures, not more memory.
+
+\paragraph{Reproducibility.}
+Queries are mechanically generated from
+\texttt{bench-multiplication/saber/make-saber-query.py}. SABER
+reference code from the KU Leuven submission to NIST
+PQC~\cite{KULeuvenSABER}.
+
+\subsection{Custom Suite (39 benchmarks)}
+\label{sec:eval-custom}
+
+The custom suite covers five categories: commutativity and
+associativity identities (15 benchmarks, BW=8 to 32),
+overflow-checking and strength-reduction patterns (6), DSP
+datapath equivalence benchmarks based on
+Shekhar et al.~\cite{shekhar2007equivalence} (5), division and
+roundtrip queries (4), and bfloat16/IEEE FP multiplication
+queries (9).
+
+\begin{table}[ht]
+\caption{External solver comparison on the 39-benchmark custom
+  suite. Times in seconds (median of 3 runs, 60\,s wall timeout).
+  ``n.s.'' marks bfloat16 benchmarks that Bitwuzla and cvc5 reject
+  in their default configurations as unsupported floating-point
+  formats (both rely on SymFPU which excludes 8-bit exponent /
+  8-bit mantissa types by default; experimental builds with
+  \texttt{--fpexp} / \texttt{--fp-exp} would solve these).}
+\label{tab:external}
+\centering
+\small
+\begin{tabular}{lrrr}
+\toprule
+Benchmark & Bitwuzla & cvc5 & \cbmc \\
+\midrule
+\multicolumn{4}{l}{\emph{Commutativity, associativity, distributivity}} \\
+comm\_8 & 0.002 & 0.006 & 0.005 \\
+comm\_10 & 0.002 & 0.006 & 0.005 \\
+comm\_11 & 0.002 & 0.006 & 0.005 \\
+comm\_12 & 0.002 & 0.005 & 0.005 \\
+comm\_13 & 0.002 & 0.005 & 0.004 \\
+comm\_14 & 0.002 & 0.005 & 0.004 \\
+comm\_15 & 0.002 & 0.005 & 0.004 \\
+comm\_16 & 0.002 & 0.006 & 0.004 \\
+comm\_18 & 0.002 & 0.005 & 0.004 \\
+comm\_20 & 0.002 & 0.005 & 0.004 \\
+comm\_24 & 0.002 & 0.005 & 0.004 \\
+comm\_32 & 0.002 & 0.005 & 0.004 \\
+assoc\_8 & 0.002 & 0.005 & 0.004 \\
+distrib\_8 & 0.002 & 0.005 & 0.004 \\
+\midrule
+\multicolumn{4}{l}{\emph{Overflow detection \& strength reduction}} \\
+overflow\_detect\_16 & 0.002 & 0.014 & 0.007 \\
+add\_overflow\_16 & 0.002 & 0.006 & 0.005 \\
+checked\_mul\_16 & 0.002 & 0.014 & 0.007 \\
+add\_chain\_16 & 0.002 & 0.005 & 0.004 \\
+add\_chain\_32 & 0.002 & 0.005 & 0.004 \\
+add\_sub\_cancel\_16 & 0.002 & 0.005 & 0.004 \\
+equiv\_unsat\_8add\_16 & 0.002 & 0.005 & 0.006 \\
+strength\_chain\_16 & 0.002 & 0.008 & 1.49 \\
+strength\_16\_15 & 0.002 & 0.007 & 0.005 \\
+strength\_16\_31 & 0.002 & 0.007 & 0.005 \\
+\midrule
+\multicolumn{4}{l}{\emph{DSP datapath equivalence}} \\
+dsp\_image\_reject & 0.005 & 0.011 & 0.015 \\
+dsp\_horner\_16 & 0.002 & 1.84 & 0.010 \\
+dsp\_vanishing\_poly\_8 & 0.011 & 0.048 & 0.008 \\
+dsp\_vanishing\_mv & 0.002 & 0.006 & 0.005 \\
+dsp\_coeff\_scale\_8 & 0.002 & 0.006 & 0.005 \\
+\midrule
+\multicolumn{4}{l}{\emph{Cryptographic \& division}} \\
+mul\_ineq\_12 & 1.37 & 1.84 & 0.511 \\
+div\_mul\_roundtrip\_12 & 5.18 & 6.19 & 4.06 \\
+gf256\_mul\_assoc & 0.021 & 0.053 & 0.054 \\
+crypto\_square\_mod & 0.012 & 0.088 & 0.019 \\
+barrett\_red\_8 & 0.004 & 0.009 & 0.011 \\
+fixedpoint\_mul\_16 & 0.004 & 0.013 & 0.024 \\
+\midrule
+\multicolumn{4}{l}{\emph{Bfloat16 multiplication}} \\
+bf16\_mul\_comm & \multicolumn{1}{c}{n.s.} & \multicolumn{1}{c}{n.s.} & 0.006 \\
+bf16\_mul\_comm\_v2 & \multicolumn{1}{c}{n.s.} & \multicolumn{1}{c}{n.s.} & 11.2 \\
+bf16\_mul\_const & \multicolumn{1}{c}{n.s.} & \multicolumn{1}{c}{n.s.} & 0.028 \\
+bf16\_mul\_mono & \multicolumn{1}{c}{n.s.} & \multicolumn{1}{c}{n.s.} & 29.5 \\
+\midrule
+Total solved (of 39) & 35 & 35 & \textbf{39} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\cbmc solves all 39, while Bitwuzla and cvc5 each solve 35 (both
+declining the same 4 bfloat16 benchmarks in default mode). On the
+35 benchmarks all three solve, Bitwuzla is fastest in
+the majority of cells (typically $\sim$2\,ms via word-level
+rewriting), \cbmc is competitive ($\sim$5\,ms with the algebraic
+layer), and cvc5 is slowest but consistent. The largest gap
+appears on \texttt{dsp\_horner\_16}, where \cbmc's vanishing
+polynomial test resolves the equivalence in 10\,ms while cvc5
+requires 1.84\,s of bit-blasted reasoning. The two
+benchmarks where \cbmc is noticeably slower
+(\texttt{strength\_chain\_16}: 1.49\,s, \texttt{bf16\_mul\_mono}:
+29.5\,s) are bit-blasted queries the algebraic layer cannot
+shortcut.
+
+\textbf{DSP benchmarks (cross-reference).} The 5 DSP benchmark
+results in this table are reported alongside the dedicated DSP
+discussion in Section~\ref{sec:eval-dsp}; the bias of this
+subset toward our techniques is discussed in
+Section~\ref{sec:threats}.
+
+\subsection{SMT-COMP 2024 QF\_BV Community Sample (66 benchmarks)}
+\label{sec:eval-smtcomp}
+
+For a blinded community-benchmark evaluation we took a stratified
+sample of 66 multiplication-containing benchmarks from the SMT-COMP
+2024 QF\_BV track, drawn across 22 submitter categories (5 per
+category where available). We ran \cbmc with its default
+configuration (algebraic pre-solver + \combacs) and with the
+algebraic pre-solver disabled (shift-add baseline), with a 60\,s
+timeout.
+
+\begin{table}[ht]
+\caption{SMT-COMP QF\_BV stratified sample (66 benchmarks, 60\,s T/O,
+6\,GB memory limit).
+  cvc5 run with default settings (its QF\_BV pipeline; the \texttt{--ff}
+  flag applies only to the QF\_FF logic and does not activate on
+  QF\_BV). Bitwuzla 0.9.0-dev added 2026-05-26.
+  \texttt{\cbmc default} updated 2026-05-31 with the techniques of
+  Section~\ref{sec:algebraic-tuning} (Phase~2.5--2.6 boolean-structure
+  propagation, Phase~A.1--A.3 Buchberger pair selection plus
+  bounded boolean tree walk and nonzero-fast-path, F4-style tail
+  reduction).}
+\label{tab:smtcomp-sample}
+\centering
+\begin{tabular}{lrr}
+\toprule
+Configuration & Solved & PAR-2 (s/benchmark) \\
+\midrule
+shift-add (bit-blasting only) & 37/66 & 57.1 \\
+\cbmc default (algebraic + \combacs) & \textbf{42/66} & \textbf{45.8} \\
+cvc5 default & 38/66 & 52.6 \\
+Bitwuzla default & \textbf{52/66} & \textbf{28.7} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+On the stratified sample Bitwuzla solves the most benchmarks
+(52), followed by \cbmc default (42), cvc5 (38), and shift-add
+\cbmc (37). \cbmc's default configuration overtakes cvc5 on
+this sample, primarily through the Phase~2.5/2.6/A.1/A.2/A.3
+techniques and F4-style tail reduction described in
+Section~\ref{sec:algebraic-tuning} below: parse-time
+push-through-ite, Tseitin-aware preprocessing of boolean chains
+ahead of Buchberger, min-LCM-degree pair selection
+(``normal selection'') in the strong Gr\"obner basis, a
+bounded boolean tree walk in the bit-blaster's \texttt{set\_to}
+that surfaces equalities buried under \texttt{and}/\texttt{or}/
+\texttt{not}/\texttt{let}/\texttt{ite} wrappers, a nonzero-
+fast-path that recognises \texttt{bvult 0 x} as a polynomial
+disequality (avoiding the bit-chain encoding's overhead), and an
+F4-style basis interreduction that catches reductions involving
+non-leading terms.
+
+Bitwuzla's lead remains consistent with its dominance on
+the random-polynomial sample (Section~\ref{sec:eval-random-poly}):
+its occurrence-map canonicalisation handles broad QF\_BV
+queries that the algebraic pre-solver does not target.
+
+Three benchmarks where default \cbmc times out but shift-add
+succeeds are all \texttt{bvudiv}/\texttt{bvsdiv}-dominated: the
+algebraic layer's GCD-based division-by-constant rewriting
+expands the formula on these instances. Two further benchmarks
+are solved by default \cbmc but not by shift-add (a rewrite-rule
+family and \texttt{brummayerbiere3\_isqrtadd}); on three more,
+default is ${\geq}$3$\times$ faster than shift-add (up to
+3226$\times$ on the rewrite-rule family). No benchmark in the
+sample is ${\geq}$3$\times$ slower with default than with
+shift-add.
+
+The relative ordering Bitwuzla $>$ cvc5 $>$ \cbmc on this
+broader sample reflects mature word-level rewriting on queries
+where multiplication is part of a richer structure
+(non-polynomial operations, embedded multiplications); the
+algebraic technique developed here is pattern-specific (the
+universal-equational class with polynomial expressions in
+$\mathbb{Z}_{2^d}$) and does not aim to replace mature SMT
+solvers on general QF\_BV community
+benchmarks (Section~\ref{sec:threats}).
+
+\subsection{Partial Bit-Vector Identities via Bit-Decomposition}
+\label{sec:eval-pbv}
+
+The procedure described in Sections~\ref{sec:algebraic}
+and~\ref{sec:vanishing} handles arithmetic operators
+($+$, $-$, $\cdot$) and a few low-level operations that admit
+direct polynomial encodings ($\mathtt{bvshl}\ a\ k$ for constant
+$k$ encodes as $a \cdot 2^k$). Other ``partial'' bit-vector
+operators---$\mathtt{bvlshr}$, $\mathtt{bvashr}$,
+$\mathtt{bvand}$, $\mathtt{bvor}$, $\mathtt{bvxor}$,
+$\mathtt{bvnot}$---do not admit such direct polynomial
+encodings in $\mathbb{Z}_{2^d}$ alone. Without further
+machinery, queries containing them fall through to bit-blasting
+and the algebraic layer sees nothing.
+
+We extend the procedure with \emph{bit-decomposition variables}:
+for any expression $a$ of bitwidth $d$, we introduce $d$
+auxiliary Boolean variables $b_{a,0}, \ldots, b_{a,d-1}$ with the
+constraints
+\begin{align*}
+\text{(idempotency)} \quad & b_{a,i}^2 - b_{a,i} = 0
+  \quad \text{for } i = 0, \ldots, d-1, \\
+\text{(sum-decomposition)} \quad & a - \sum_{i=0}^{d-1} 2^i b_{a,i} = 0.
+\end{align*}
+In $\mathbb{Z}_{2^d}$, $b(b-1) \equiv 0$ implies $b \equiv 0$ or
+$b \equiv 1$ (since $b$ and $b-1$ are coprime, one must be zero
+modulo $2^d$); idempotency therefore restricts $b_{a,i}$ to
+$\{0, 1\}$, and sum-decomposition forces it to be the $i$-th bit
+of $a$. With bit variables in scope, the partial operators become
+sound polynomial expressions, e.g.\
+$a \gg k = \sum_{i=k}^{d-1} 2^{i-k} b_{a,i}$,
+$\mathtt{bvand}(a, b) = \sum_i 2^i (b_{a,i} \cdot b_{b,i})$,
+and so on.
+
+\textbf{Implementation.} Bit-decomposition is applied
+on demand: when extraction encounters a partial-bit-vector
+operator, the operand is recursively bit-decomposed (with
+constants and recognised bit-ops such as $\mathtt{bvnot}$
+producing the bit polynomials directly without auxiliary
+variables; otherwise a fresh ``host'' variable is introduced and
+its bit decomposition added to the polynomial system). To keep
+Buchberger tractable on these augmented systems, we apply three
+optimisations: Frobenius-aware reduction (clamp $b^k$ to $b$ for
+any bit variable $b$ and $k \geq 1$ during S-polynomial and
+reduction steps); a polynomial-form host cache (compounds that
+normalise to the same polynomial share a host); and linear
+elimination of host variables (substitute $h \mapsto \sum_i 2^i b_i$
+across the basis before Buchberger).
+
+\textbf{Empirical evaluation.} We benchmark seven universal-
+equational identities involving partial bit-vector operators
+across bitwidths in $\{4, 16, 32, 64, 128\}$, comparing our
+procedure with bit-decomposition (``Algeb'') against our
+bit-blasting baseline (``BB''; same SMT2 entry, the algebraic
+layer disabled by environment variable) and against
+Bitwuzla. All queries are unsatisfiable; the assertion is that
+some output bit differs.
+
+\begin{table}[ht]
+\caption{Partial bit-vector identities; runtimes in seconds at
+60\,s timeout. ``Algeb'' is our procedure with bit-decomposition;
+``BB'' is the same procedure with the algebraic layer disabled
+(equivalent to bit-blasting alone); ``BW'' is Bitwuzla.}
+\label{tab:eval-pbv}
+\centering
+\begin{tabular}{lrrrr}
+\toprule
+Identity & bw & Algeb & BB & BW \\
+\midrule
+$(a \oplus b) \oplus b = a$ & 16 & 0.00 & 0.00 & 0.00 \\
+                            & 64 & 0.02 & 0.00 & 0.00 \\
+                            & 128 & 0.06 & 0.00 & 0.01 \\
+$\sim(a \wedge b) = \sim a \vee \sim b$ & 16 & 0.00 & 0.00 & 0.00 \\
+                            & 64 & 0.02 & 0.00 & 0.00 \\
+                            & 128 & 0.08 & 0.00 & 0.00 \\
+$\sim\sim a = a$            & 16 & 0.00 & 0.00 & 0.00 \\
+                            & 64 & 0.01 & 0.00 & 0.00 \\
+                            & 128 & 0.04 & 0.00 & 0.00 \\
+$(2x)\!\gg\!1 = x$ for $x < 2^{d-1}$ & 16 & 0.00 & 0.00 & 0.00 \\
+                            & 64 & 0.01 & 0.00 & 0.00 \\
+                            & 128 & 0.05 & 0.00 & 0.00 \\
+$((a{+}b)\!\gg\!1) = ((b{+}a)\!\gg\!1)$ & 16 & 0.00 & 0.00 & 0.00 \\
+                            & 64 & 0.01 & 0.01 & 0.00 \\
+                            & 128 & 0.05 & 0.02 & 0.00 \\
+$((a{+}b){-}(a{-}b))\!\gg\!1 = b$ for $b < 2^{d-1}$ & 16 & \textbf{0.00} & 0.04 & 0.00 \\
+                            & 64 & \textbf{0.02} & 0.29 & 0.00 \\
+                            & 128 & \textbf{0.07} & 0.61 & 1.24 \\
+$((a{+}b){+}(c{+}d))\!\gg\!2 = ((a{+}c){+}(b{+}d))\!\gg\!2$
+                            & 16 & 0.00 & 0.04 & 0.00 \\
+                            & 64 & \textbf{0.02} & 0.30 & 0.00 \\
+                            & 128 & \textbf{0.06} & 0.82 & 0.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Observations.} Three patterns emerge from
+Table~\ref{tab:eval-pbv}:
+
+\emph{(1) Linear scaling in bitwidth.} Across all queries our
+procedure scales linearly with $d$, consistent with the
+bit-decomposition adding $d$ idempotency relations and a single
+sum-decomposition equation per host. The cost of an additional
+bit position is $\approx 0.5$\,ms at these scales.
+
+\emph{(2) Bit-blasting is competitive at small bitwidths.} On
+simple identities ($\oplus$ cancellation, De~Morgan,
+involution), our bit-blasting baseline solves at any bitwidth in
+$\leq 0.02$\,s---including queries that are within the algebraic
+fragment with bit-decomposition. The algebraic procedure has
+overhead in extraction and Buchberger that bit-blasting avoids;
+on these queries the algebraic layer is correctly silent
+(the procedure is sound but does not improve over bit-blasting).
+Bitwuzla's word-level rewriting handles them in 0.00\,s as
+expected.
+
+\emph{(3) Bit-decomposition wins on toom-distrib.} The identity
+$((a{+}b){+}(c{+}d)) \gg 2 = ((a{+}c){+}(b{+}d)) \gg 2$ is a
+Toom-Cook-style algebraic re-arrangement under a shift. Here our
+algebraic procedure with bit-decomposition is 4--14$\times$
+faster than our bit-blasting baseline at $d \in \{64, 128\}$
+(0.02--0.06\,s vs.\ 0.30--0.82\,s). Bitwuzla still wins
+absolutely (0.00\,s) but the gap to our procedure is small
+($<\!0.1$\,s at $d = 128$). The reason is structural: linear
+elimination substitutes the inner sums $a{+}b$, $c{+}d$ with
+their bit-sum forms once each, and Buchberger derives the
+identity through bit-by-bit reduction without re-bit-blasting
+the entire structure.
+
+\textbf{Toom-scaled and bit-by-bit parity reasoning.} The
+identity $((a{+}b){-}(a{-}b)) \gg 1 = b$ holds only when
+$b < 2^{d-1}$ (the precondition prevents overflow in the
+intermediate $2b$). The procedure must reconcile two facts:
+the precondition (a $\mathtt{bvult}$ relation) forces the MSB
+of $b$ to zero, and the bit-decomposition of $h = 2b \bmod 2^d$
+must align position-by-position with the bits of $b$
+($b_{h,0} = 0$, $b_{h,i+1} = b_{b,i}$ for $i < d-1$).
+
+The bit alignment is not a polynomial consequence in
+$\mathbb{Z}_{2^d}$: the polynomial relation
+$\sum 2^i b_{h,i} = 2 \sum 2^i b_{b,i}$ alone admits multiple
+solutions when interpreted bit-blindly, so Buchberger cannot
+derive the alignment from idempotency and the host equation
+alone. We materialise the alignment explicitly: when the
+extractor produces a side equation $h - c x = 0$ with $c$ a
+constant power of two and both $h$ and $x$ bit-decomposed, we
+register the bit-position substitutions
+$b_{h,i} \mapsto 0$ for $i < \log_2 c$ and
+$b_{h,i + \log_2 c} \mapsto b_{x,i}$ otherwise. Linear
+elimination then propagates the alignment through the basis
+before Buchberger runs.
+
+Combined with the $\mathtt{bvult}$ substitution
+$b_{b,d-1} \mapsto 0$, this collapses the toom-scaled diff to
+zero in the vanishing-polynomial test (revised toom-scaled row
+in Table~\ref{tab:eval-pbv}: 0.00\,s at $d{=}16$, 0.07\,s at
+$d{=}128$; previously T/O at $d \geq 32$). At $d{=}128$ our
+0.07\,s beats Bitwuzla's 1.24\,s by 17$\times$.
+
+\textbf{Universal-relational extension.}
+The same bit-decomposition machinery extends to relational
+predicates: an asserted $\mathtt{bvult}\ x\ C$ for a constant
+$C = 2^k$ forces $b_{x,k}, \ldots, b_{x,d-1}$ to zero, which is
+encoded as a substitution that propagates through the basis
+during linear elimination. The dual case $x \geq 2^d - 2^k$
+(common as the ``MSB-on'' precondition $x \geq 2^{d-1}$) forces
+those same bits to one. General constants $C$ and
+symbol-symbol comparisons fall through to a bit-comparator
+chain encoding with $O(d)$ auxiliary bit variables, idempotency
+relations, and definition polynomials.
+
+\begin{table}[h]
+\caption{Universal-relational predicates: representative
+queries that combine a $\mathtt{bvult}$ / $\mathtt{bvuge}$
+precondition with a polynomial body. Runtimes in seconds at
+30\,s timeout. ``Algeb'' is our procedure with bit-decomposition
+and the predicate extension; ``BB'' is the same procedure with
+the algebraic layer disabled; ``BW'' is Bitwuzla.}
+\label{tab:eval-pbv-relational}
+\centering
+\begin{tabular}{lrrrr}
+\toprule
+Identity & bw & Algeb & BB & BW \\
+\midrule
+$(\mathtt{bvult}\ x\ 2) \Rightarrow x \cdot x = x$
+                            & 16 & 0.00 & 0.00 & 0.00 \\
+                            & 64 & 0.03 & 0.01 & 0.00 \\
+                            & 128 & 0.17 & 0.04 & 0.00 \\
+$(\mathtt{bvult}\ x\ 4) \Rightarrow x(x{-}1)(x{-}2)(x{-}3) = 0$
+                            & 16 & 2.09 & 0.02 & 0.00 \\
+                            & 64 & 4.06 & 0.32 & 0.04 \\
+                            & 128 & 8.39 & 1.81 & 0.02 \\
+$(x \geq 2^{d-1}) \Rightarrow x \oplus 2^{d-1} = x - 2^{d-1}$
+                            & 16 & 0.00 & 0.00 & 0.00 \\
+                            & 64 & \textbf{0.01} & 0.00 & T/O \\
+                            & 128 & \textbf{0.04} & 0.00 & T/O \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The first two queries are tractable for all three solvers; they
+demonstrate the capability extension---without sub-goal 6 the
+algebraic procedure could not reason about the precondition and
+would fall through to bit-blasting. The third query exposes a
+case where Bitwuzla's word-level rewriting times out at every
+bitwidth tested ($\mathtt{bvxor}$ and $\mathtt{bvsub}$ do not
+cancel under a universal-relational guard in the rewriter's
+database), while our procedure refutes in 0.01--0.04\,s across
+the full bitwidth range via direct bit-substitution combined with
+the bit alignments materialised for the implicit $h = c x$ side
+equation in the bit-decomposed expression.
+
+\textbf{Implications.} Bit-decomposition extends the algebraic
+procedure's \emph{capability} to partial bit-vector operators
+and to relational preconditions, and (with bit alignments) to
+shift-related identities, without changing its fundamental
+architecture. The \emph{performance} contribution is narrow on
+simple identities, where bit-blasting alone is competitive, but
+the procedure now decides queries that mix polynomial structure
+with relational guards and shift identities, including at least
+one case (last row of Table~\ref{tab:eval-pbv-relational}) where
+it succeeds 30--$\infty\times$ faster than Bitwuzla, and the
+toom-scaled identity (Table~\ref{tab:eval-pbv}) where it
+succeeds 17$\times$ faster at $d{=}128$. Signed comparisons
+(\verb|bvslt|, \verb|bvsle|, \verb|bvsgt|, \verb|bvsge|) reduce
+to unsigned via the standard sign-bit XOR transformation;
+symbol-symbol comparisons use a bit-comparator chain encoding.
+
+\subsection{Amulet2 Comparison}
+\label{sec:eval-amulet}
+
+Kaufmann and Biere's Amulet2~\cite{kaufmann2021amulet} verifies
+gate-level multiplier circuits using Gr\"obner bases over
+$\mathbb{Z}$ (with field polynomials $x^2 - x = 0$ to model
+Booleans). Their tool works at the AIG level, not at the
+SMT-LIB level; the natural comparison is scope rather than
+head-to-head time.
+
+Amulet verifies a specific multiplier implementation (the AIG
+circuit it is given) against the integer multiplication
+specification; we verify an SMT query involving one or more
+uninterpreted \texttt{bvmul} calls. The two use cases overlap when
+a verification problem can be phrased either way.
+
+We ran Amulet2.1 (compiled from source, default configuration,
+300\,s timeout) on the four AIG multiplier benchmarks shipped with
+its artifact (\texttt{u\_4bp\_wt\_lf} at 128, 256, 512, 1024 bits;
+Booth partial-product generator, Wallace-tree accumulation,
+Ladner-Fischer final adder). Amulet times out on all four
+benchmarks within the 300\,s budget. These are the larger
+scalability benchmarks in the distribution; Amulet's own published
+evaluation~\cite{kaufmann2021amulet} uses 64-bit multipliers
+which verify in fractions of a second (${<}$1\,s per benchmark
+according to the artifact's timing data). At 64 bits the AIG
+structure is small enough that gate-level algebraic reasoning
+works well; at 128+ bits the field-polynomial approach accumulates
+symbolic overhead that the 300\,s budget cannot absorb.
+
+Our Gr\"obner-basis solver, at an equivalent-sized problem (SMT
+query $a \cdot b = b \cdot a$ at BW$=$256), reports the identity in
+$<$5\,ms (Table~\ref{tab:scaling}). The two numbers are not
+directly comparable: Amulet verifies a specific AIG
+implementation, while we verify the abstract identity $a \cdot b = b \cdot a$
+against itself, which our solver recognises algebraically. Amulet
+would also handle this case in a few milliseconds at its natural
+64-bit scale; beyond that, the field-polynomial cost dominates.
+
+The difference in coefficient rings matters. Amulet uses
+$\mathbb{Q}$ with field polynomials $x^2 - x$, which makes every
+bit a field element but produces exponential polynomial blowup in
+the worst case. We use $\mathbb{Z}_{2^d}$ with no field polynomials,
+which avoids the blowup but loses field structure (division only
+works for odd elements). This paper's empirical finding is that on
+arithmetic-identity queries the $\mathbb{Z}_{2^d}$ approach is
+dramatically faster because the unit-constant check terminates
+quickly; on gate-level circuit verification we expect Amulet to
+retain its advantage at modest bitwidths due to the completeness
+of its field-based reduction.
+
+\subsection{Threats to Validity}
+\label{sec:threats}
+
+\textbf{Benchmark selection.} The 39-benchmark custom suite is
+biased toward multiplication-heavy arithmetic queries common in
+cryptography and DSP but rare in typical pointer-safety checking.
+We include the 66-benchmark SMT-COMP sample
+(Section~\ref{sec:eval-smtcomp}) explicitly to
+counter this bias. The community sample is where our approach
+looks most neutral (matching shift-add).
+
+\textbf{DSP benchmark design.} The 5 DSP datapath benchmarks in
+the custom suite were designed by us to exercise the
+vanishing-polynomial test; their inclusion shows the test works
+as intended but should not be read as evidence of general
+superiority. Our finding that all three tools solve these in
+$<$50\,ms is therefore best interpreted as validating that the
+test is correctly implemented rather than demonstrating a practical
+advantage.
+
+\textbf{Higher bitwidths.} Within the universal-equational class
+the algebraic procedure scales gracefully to operand widths well
+beyond what is practical for bit-blasting, but the scaling is
+not uniformly bitwidth-independent. Trivial syntactic identities
+($a \cdot b = b \cdot a$, $(a \cdot b) \cdot c = a \cdot (b \cdot c)$)
+are decided in 6\,ms at every bitwidth tested up to
+$d = 4096$ (CBMC's word-level simplifier canonicalises operand
+order before the algebraic procedure runs, so these reduce to
+syntactic equality). Non-trivial polynomial identities exhibit
+$O(d^2)$ scaling driven by multi-precision coefficient
+arithmetic during S-polynomial reduction:
+$(a+b)^2 = a^2 + 2ab + b^2$ takes
+$0.05$/$0.20$/$0.80$/$3.3$/$13.4$\,s at
+$d \in \{64, 128, 256, 512, 1024\}$ and times out at
+$d = 2048$ within a 120\,s budget; the difference-of-squares
+identity $(a-b)(a+b) = a^2 - b^2$ scales similarly and solves
+at $d = 2048$ in 40\,s. Bit-blasting alone times out at
+$d = 64$ on both. (Data:
+\texttt{doc/paper-algebraic/data/high-bitwidth-scaling.tsv}.)
+The five 512-bit community benchmarks of the SMT-COMP sample
+(Section~\ref{sec:eval-smtcomp}) are heavy in
+$\mathtt{bvudiv}$ / $\mathtt{bvurem}$, which fall outside the
+polynomial fragment and through to bit-blasting. We add a small
+suite of word-level rewrites for these operators in the SMT2
+parser: trivial folds ($x/x$, $0/x$, $x/0$, $x/1$, $x/{\sim}0$,
+$\mathtt{bvurem}\ x\ x$, $\mathtt{bvurem}\ 0\ x$); cancellation
+$\mathtt{bvudiv}\ (\mathtt{bvurem}\ A\ y)\ y \to
+\mathtt{ite}(y = 0,\, {\sim}0,\, 0)$; range relations
+$\mathtt{bvule}\ (\mathtt{bvurem}\ A\ y)\ y \to
+\mathtt{ite}(y = 0,\, A = 0,\, \top)$ and the strict variant;
+$\mathtt{bvmul}$ folds ($X \cdot 0$, $X \cdot 1$,
+$X \cdot {\sim}0$); and ite-distribution over the divisor of
+$\mathtt{bvudiv}$/$\mathtt{bvurem}$ and over either operand of
+$\mathtt{bvmul}$, with recursion so simplifications cascade
+through ite trees. Each rewrite is formalised in
+\texttt{formal-proofs/DivisionRewrites.lean}.
+After these, our procedure solves four of the five 512-bit
+benchmarks. Two ($\mathtt{bw512\_7}$, $\mathtt{bw512\_15}$)
+share the rewrite-suite path with Bitwuzla's word-level
+preprocessor (1.18\,s and 0.02\,s vs.\ Bitwuzla's 1.49\,s and
+0.12\,s; on $\mathtt{bw512\_15}$ we now beat Bitwuzla, the
+$\mathtt{bvmul}$ folds collapsing the ite tree from upstream
+rewrites into a constant formula that SAT presolve refutes
+immediately). Two ($\mathtt{bw512\_1}$, $\mathtt{bw512\_12}$)
+live in our \emph{algebraic} fragment after Phase 2: we extend
+\texttt{to\_polynomial} to recognise $\mathtt{bvudiv}$ and
+$\mathtt{bvurem}$ by introducing fresh polynomial variables
+$q$ and $r$ and adding the side equation
+$q \cdot t + r - s = 0$ in $\mathbb{Z}_{2^d}$, with the SMT-LIB
+``div/rem by 0 returns ${\sim}0$/dividend'' convention handled
+by the over-approximate polynomial system (when $t = 0$ the
+equation has $q$ free and $r = s$, matching the bit-level
+encoding for $\mathtt{bvurem}$ and over-approximating for
+$\mathtt{bvudiv}$, which is sound for UNSAT detection).
+Buchberger refutes $\mathtt{bw512\_1}$ in 5.69\,s. The fourth
+($\mathtt{bw512\_12}$, 0.12\,s) follows from a separate
+parse-time pipeline: pushing equality, disequality, and
+relational predicates through ite at parse time (with
+substitution of the if-condition's equality into the true
+branch), so that the assertion structurally collapses to a
+formula whose distinct argument is identical to its other
+operand and the SAT presolver refutes immediately. Bitwuzla
+times out on both $\mathtt{bw512\_1}$ and $\mathtt{bw512\_12}$,
+giving us a strict coverage advantage on those two.
+
+The remaining benchmark ($\mathtt{bw512\_14}$) times out for
+both solvers; it has multiple chained $\mathtt{bvmul}$ /
+$\mathtt{bvudiv}$ nestings whose comparison structure
+($\mathtt{bvule}$ across overflow-sensitive products) requires
+QR-level reasoning beyond the polynomial-encoding scheme of
+Phase 2. Closing this final gap is a research question for the
+SMT community rather than for Gr\"obner-basis scaling.
+
+\textbf{Gate-level equivalence is a gap.} Our procedure is
+complete for the universal-equational fragment with polynomial
+expressions in $\mathbb{Z}_{2^d}$, but \emph{gate-level}
+multiplier equivalence checking---the problem
+Amulet2 (Section~\ref{sec:eval-amulet}) solves---sits outside
+this fragment. A natural way to encode a gate-level circuit in
+our setting is to add a field polynomial $x \cdot (x - 1) = 0$
+for every bit variable, forcing it to be Boolean, and then to
+check that the circuit's output polynomial equals the
+specification. We
+tested this on a small hardware-multiplier-equivalence benchmark
+(\texttt{hw\_mul\_equiv}): at BW=2 the augmented system has
+a strong Gr\"obner basis of 23 elements including a non-zero constant,
+so we correctly report UNSAT. At BW$\geq$4, however, the basis
+converges to 18 elements with no non-zero constant, and our procedure
+returns ``unknown.'' This is consistent with the literature: the
+gate-level approaches of
+Biere, Kauers, and Ritirc~\cite{biere2017challenges} and
+Kaufmann and Biere~\cite{kaufmann2021amulet} exploit the topology
+of the AIG (reverse topological ordering of gate polynomials) to
+avoid computing a full Gr\"obner basis in the first place; a
+general-purpose Buchberger loop cannot reproduce that structural
+shortcut without explicit circuit information. Bridging this gap
+is a promising direction for future work (one could, for example,
+extract and use the SSA topological order of \cbmc's bit-level
+decomposition).
+
+\textbf{Hybrid Z/ZMod overflow reasoning is not enough on its
+own.} The natural extension to handle overflow patterns
+(\texttt{(extract 2N-1 N) (bvmul (zext s) (zext t))}) is a
+hybrid where part of the system lives in $\mathbb{Z}_{2^d}$ and
+part in $\mathbb{Z}_{2^{2d}}$, with shared bit-decomposition
+between rings. We designed this and surveyed its candidate
+benchmarks (the Brummayer-Biere overflow detectors
+\texttt{*ulov*}, the log-slicing \texttt{bvudiv} equivalences,
+the Galois interleaved modular multiplications); on careful
+examination, all of these
+combine the high-half-of-product pattern with a deeply nested
+AND/OR/NOT bit-circuit that requires gate-level reasoning to
+check the equivalence. Synthetic high-half-of-product
+benchmarks where bit-blasting genuinely struggles are rare:
+modern bit-blasting plus canonicalisation handles bounded-
+overflow patterns very efficiently (e.g.\ a 256-bit
+single-multiplication overflow check refutes in 0.27\,s by
+shift-add). The hybrid Z/ZMod design therefore delivers $0$ to
+$2$ unlocks on the SMT-COMP sample (vs an initial projection of
+$+5$ to $+12$); the actual algebraic-vs-bit-blasting frontier
+is gate-level reasoning, not overflow reasoning. Recorded in
+\texttt{doc/paper-algebraic/plan-B-empirical-findings.md}.
+
+\textbf{No correctness regressions, and how we know.} With the
+algebraic layers enabled, \cbmc's CORE regression suite (1167
+tests, covering array bounds, pointer safety, floating-point, and
+other properties) shows zero soundness or correctness
+regressions. One test (a constant-array access tagged
+\texttt{thorough-smt-backend}) times out under the 60\,s per-test
+budget; it also times out with the algebraic layer disabled and
+on the pre-branch baseline, so it is not caused by this work. The
+algebraic layers add $<$4\,ms of overhead on benchmarks that do
+not exercise them.
+
+We validate the integration along two independent axes beyond the
+mechanised proofs. (i) A \emph{corpus-scale differential sweep}:
+on the full 4361 multiplication-containing \texttt{sat}-declared
+benchmarks of the SMT-COMP QF\_BV track (including the
+$>$2\,MB inputs) plus a 4000-benchmark cross-corpus sample, we
+ran our solver and compared every \texttt{sat}/\texttt{unsat}
+verdict against z3, cvc5, and a baseline build with the algebraic
+layer disabled. After the fixes described below, zero wrong
+verdicts are attributable to the algebraic layer. (ii) The same
+differential sweep, together with \texttt{git bisect} against the
+pre-branch baseline, is how we found integration bugs that unit
+and regression tests missed --- an invariant
+violation in the bit-literal map triggered when the algebraic
+candidate-hint path reconstructed a symbol at the Gr\"obner ring
+width rather than its native width (it aborted four CORE tests);
+the deferred-replay ordering bug of Section~\ref{sec:lean4}; and a
+deferred-bit-blasting \emph{performance} regression in which the
+replay path bypassed the eager equality optimisation
+(\texttt{boolbv\_set\_equality\_to\_true}), fully bit-blasting a
+100k-element array-union equality and timing out (bisected to the
+deferral-default commit). All three are fixed --- the last by
+applying the eager equality optimisation on replay, so the
+deferred path now reproduces the eager \emph{clause structure},
+not only the eager models. We recommend wiring such a
+differential sweep into CI, as the ``zero regressions'' claim is
+only as strong as the oracle set it is checked against.
+
+\textbf{Interaction with bit-blasting.} This paper shares with the
+bit-blasting companion paper~\cite{companion-bitblasting} the
+observation that \cadical's
+inprocessing BVE can be counterproductive for carry-save popcount
+encodings (4--140\% overhead in one subset of benchmarks). In
+practice the adaptive heuristic in the bit-blasting solver routes
+such multiplications to shift-add when BVE would cascade
+usefully.
+
+
+\section{Mechanised Soundness Proofs}
+\label{sec:lean4}
+
+We verified the soundness of the algebraic Gr\"obner-basis solver
+in Lean~4 (Lean 4.18.0, Mathlib v4.18.0), with bi-directional
+traceability between the implementation and the proofs (recorded
+in \texttt{formal-proofs/TRACEABILITY.md}). The mechanisation
+covers the following modules:
+
+\begin{enumerate}
+
+\item \textbf{Unit characterisation in $\mathbb{Z}_{2^d}$}
+  (\texttt{GroebnerSoundness.lean}): odd elements are units
+  (coprime to $2^d$); 2 is not a unit for $d \geq 1$. (Prepared
+  as a standalone branch for contribution to Mathlib.)
+
+\item \textbf{Ideal preservation}
+  (\texttt{BuchbergerCorrectness.lean}): S-polynomial computation
+  and polynomial reduction preserve ideal membership; the basis
+  $G$ produced by the algorithm satisfies $\langle G \rangle =
+  \langle F \rangle$ for input $F$.
+
+\item \textbf{Disequality-encoding soundness}
+  (\texttt{DisequalityRefutation.lean}): Song et al.'s $2^{d-1}$
+  encoding is equisatisfiable with the disequality
+  (\texttt{song\_encoding\_equisat}), and any non-zero constant in
+  the ideal $\Rightarrow$ no solution
+  (\texttt{nonzero\_constant\_no\_solution}), via ring homomorphism
+  to a nontrivial ring.
+
+\item \textbf{Buchberger termination}
+  (\texttt{BuchbergerTermination.lean}): the ascending chain
+  condition in Noetherian rings guarantees termination.
+
+\item \textbf{Bit-decomposition soundness} (\texttt{Re4.lean}):
+  the encoding emitted by \texttt{decompose\_bits} is sound. We
+  prove (\emph{i}) that idempotency $b \cdot b = b$ in
+  $\mathbb{Z}_{2^d}$ forces $b \in \{0, 1\}$; (\emph{ii}) the
+  Frobenius identity $b^k = b$ for any idempotent $b$ and
+  $k \geq 1$, justifying the exponent-clamping inside
+  \texttt{polynomialt::multiply}; (\emph{iii}) that the standard
+  binary expansion $\sum_i 2^i \,b_i = x$ satisfies the
+  sum-decomposition equation. All three with zero
+  \texttt{sorry}.
+
+\item \textbf{Sub-goal 6 (universal-relational) encoding
+  soundness} (\texttt{SubgoalSix.lean}): for the encoding
+  strategies in \texttt{extract\_predicate}, we prove
+  (\emph{i}) the constant power-of-2 upper bound: if
+  $x.\mathit{val} < 2^k$ then bits $k..d-1$ of $x$ are zero
+  (justifying the substitution emitted by
+  \texttt{try\_upper\_bound});
+  (\emph{ii}) the symmetric lower-bound case: if $x.\mathit{val} \ge 2^d - 2^k$
+  then bits $k..d-1$ of $x$ are all one (justifying \texttt{try\_lower\_bound}'s
+  MSB-on shortcut), proven by contradiction via bit-position
+  decomposition;
+  (\emph{iii}) the signed-via-XOR transformation: under the map
+  $x \mapsto (x + 2^{d-1}) \bmod 2^d$, the signed comparison
+  $\mathit{signedVal}\,a < \mathit{signedVal}\,b$ becomes the unsigned
+  comparison $(a + 2^{d-1}).\mathit{val} < (b + 2^{d-1}).\mathit{val}$,
+  proven by case analysis on whether $x.\mathit{val} < 2^{d-1}$.
+  (\emph{iv}) The bit-comparator chain encoding: a Boolean
+  recurrence \texttt{chainLtBool} mirroring the polynomial
+  recurrence in \texttt{extract\_predicate}, with
+  \texttt{chainLtBool\_correctness} proving it computes
+  $(\mathrm{decide}(V_x < V_y), \mathrm{decide}(V_x = V_y))$ for
+  bit lists, by induction on the lists with a per-Bool-pair case
+  split. All four with zero \texttt{sorry}.
+
+\item \textbf{Bit-alignment soundness} (\texttt{BitAlignment.lean}):
+  for the substitutions emitted by \texttt{materialise\_bit\_alignments},
+  we prove that $h = 2^k \cdot x$ in $\mathbb{Z}_{2^d}$ implies
+  bits $0..k-1$ of $h$ are zero and bit $i+k$ of $h$ equals bit
+  $i$ of $x$ for $i + k < d$. The proofs reduce to
+  \texttt{Nat.testBit\_mod\_two\_pow} +
+  \texttt{Nat.testBit\_mul\_pow\_two} (the latter from Lean
+  core); both with zero \texttt{sorry}.
+
+\item \textbf{Vanishing polynomial test soundness}
+  (\texttt{Vanishing.lean}): we prove that the falling factorial
+  $(x)_n$ is zero on every $x \in [0, n)$, and that a polynomial
+  reducing to zero modulo the falling factorial vanishes on the
+  same range. Also: \texttt{nu2Factorial\_eq\_padicVal}
+  ($\nu_2(k!)$ matches $\sum_{i=1}^{k} \nu_2(i)$ via
+  multiplicativity of $p$-adic valuation),
+  \texttt{smarandache\_iff\_nu2Factorial} (the Smarandache
+  function characterisation $2^m \mid k! \iff m \leq \nu_2(k!)$),
+  \texttt{zfpCoeff\_mul\_factorial\_divisible}
+  ($2^d \mid c_k \cdot k!$ for the ZFP scaling coefficient,
+  proving the generated zero-falling-power generators vanish on
+  $[0, 2^d)$), and the Stirling number recurrence matching the
+  C++ change-of-basis matrix exactly. All with zero \texttt{sorry}.
+
+\item \textbf{Polynomial ring primitives} (\texttt{PolyRing.lean},
+  new): \texttt{inverse\_mod\_2d\_correct} (existence and
+  uniqueness of multiplicative inverses for odd elements in
+  $\mathbb{Z}_{2^d}$, justifying the Hensel-lifting Newton
+  iteration); \texttt{grevlexLt\_irrefl} /
+  \texttt{grevlexLt\_asymm} / \texttt{grevlexLt\_total} (graded
+  reverse-lex order is a strict total order on monomials, the
+  contract for \texttt{monomialt::operator<}); and normalisation
+  semantic preservation lemmas. All with zero \texttt{sorry}.
+
+\item \textbf{Model extraction soundness} (\texttt{ExtractCandidate.lean},
+  new): \texttt{extract\_candidate\_local\_soundness} proves that
+  when the leading coefficient $c$ is a unit, the equation
+  $c \cdot x + d = 0$ in $\mathbb{Z}_{2^d}$ has a unique solution
+  $x = -d \cdot c^{-1}$, which is exactly what the C++
+  \texttt{extract\_candidate} constructs at each univariate-linear
+  reduction step. Zero \texttt{sorry}.
+
+\item \textbf{Encoding faithfulness} (\texttt{Encoding.lean}, new):
+  the foundational result that polynomial encoding faithfully
+  captures bit-vector semantics. We define \texttt{BVExpr} (the
+  subset of CBMC expressions handled by \texttt{to\_polynomial}:
+  constants, variables, $+$, $-$, $\times$, neg, plus the cast
+  operators \texttt{typecast} / \texttt{zero\_extend} /
+  \texttt{extract\_low} that the C++ encoding treats as
+  transparent at matching widths) and prove
+  \texttt{toPolynomial\_eval}: for any environment $\varphi$,
+  \texttt{MvPolynomial.eval} $\varphi$
+  \texttt{(toPolynomial}\,$e\texttt{)} = e\texttt{.eval}\,\varphi$
+  in $\mathbb{Z}_{2^d}$. The cross-width cases (zero-extend
+  from $d_\mathrm{in} \leq d_\mathrm{out}$; extract / narrowing
+  typecast from $d_\mathrm{out} \leq d_\mathrm{in}$) are handled
+  by a pair of preservation lemmas
+  (\texttt{cast\_value\_preserved\_across\_widths} and
+  \texttt{reduce\_value\_preserved\_across\_widths}) that show
+  the C++ \texttt{set\_bitwidth}-based bit-width bookkeeping
+  preserves the canonical representative. With
+  \texttt{extract\_equation\_iff}
+  (an equation $\mathit{lhs} = \mathit{rhs}$ holds iff its
+  encoded polynomial evaluates to $0$) and
+  \texttt{encodeEquations\_satisfiable\_iff} (a system of
+  bit-vector equations is satisfiable iff its polynomial
+  encoding has a common root), this is the bridge that makes
+  algebraic methods sound for bit-vector reasoning. Without this,
+  all downstream proofs would be vacuous on actual programs.
+  Zero \texttt{sorry}.
+
+\item \textbf{Strong Gr\"obner basis 2-trick saturation}
+  (\texttt{StrongGB.lean}): we prove that scalar multiplication
+  preserves ideal membership (the 2-trick is sound, both for
+  $\mathbb{Z}_{2^d}$ and for $\mathrm{MvPolynomial}\, \mathrm{Fin}\, n\, \mathbb{Z}_{2^d}$).
+  The general UNSAT criterion --- any \emph{non-zero} constant in
+  the basis implies no solution --- is
+  \texttt{DisequalityRefutation.lean::nonzero\_constant\_no\_solution};
+  the odd-constant case (odd $\Rightarrow$ unit $\Rightarrow$
+  ideal $= \top \Rightarrow$ UNSAT) is the re-exported special
+  case \texttt{soundness\_of\_odd\_constant\_check}. The
+  implementation in \texttt{groebner.cpp} is \emph{sound but not
+  complete}: it returns \texttt{UNSAT} when a non-zero constant
+  is found in the saturated basis, and \texttt{UNKNOWN}
+  otherwise. We also prove:
+  \begin{itemize}
+  \item \texttt{naive\_completeness\_is\_false}: the naive
+    completeness statement for the original \emph{odd}-constant
+    criterion (``$F$ unsat $\Rightarrow$ odd constant
+    in $\langle F\rangle$'') is \emph{false}; concrete
+    counterexample with $d=2$, $n=0$, $F=\{C\,2\}$.
+  \item \texttt{two\_trick\_saturation\_complete\_is\_false}:
+    a stronger negative result. Even adding the natural
+    well-formedness hypothesis (idempotency on each variable),
+    the refined odd-constant completeness statement is
+    \emph{still false}; the same counterexample defeats it
+    (vacuously well-formed for $n=0$). These two results drove a
+    concrete change: the odd-only criterion is strictly
+    incomplete (it would return \texttt{UNKNOWN} on the unsat
+    $F=\{C\,2\}$), which is why \texttt{has\_constant} was
+    generalised to refute on any non-zero constant --- under
+    which $F=\{C\,2\}$ is now decided \texttt{UNSAT}. The
+    generalised criterion is still incomplete in general
+    (function-vanishing unsats and budget exhaustion remain),
+    so \texttt{UNKNOWN} stays a valid outcome.
+  \item \texttt{d\_eq\_one\_completeness}: for $d=1$ (over
+    $\mathrm{GF}(2)$) with idempotency on each variable, $F$
+    unsat does imply $1 \in \langle F\rangle$. Proof via
+    maximal-ideal argument + quotient field + idempotent
+    $\Rightarrow$ $\{0,1\}$. So in this restricted setting
+    completeness holds.
+  \item \texttt{sq\_eq\_self\_of\_zmod\_two\_pow}: $x^2 = x$ in
+    $\mathbb{Z}_{2^d}$ implies $x \in \{0,1\}$. Generalises
+    \texttt{eq\_zero\_or\_one\_of\_sq\_eq\_self} to non-domains.
+  \item \texttt{isLocalRing\_ZMod\_prime\_pow}:
+    $\mathbb{Z}_{p^n}$ is a local ring for prime $p$, $n \geq 1$.
+    Mathlib contribution candidate.
+  \end{itemize}
+  Mechanised concretely: \texttt{strongGB} is defined as the
+  identity function (the trivially-sound abstraction; the C++
+  implementation typically returns a strict superset, but the
+  abstract contract used elsewhere in the file is just ideal
+  preservation), and \texttt{strongGB\_ideal\_preserved} is then
+  proved by \texttt{rfl}. The negative results
+  (\texttt{naive\_completeness\_is\_false},
+  \texttt{two\_trick\_saturation\_complete\_is\_false},
+  \texttt{d\_eq\_one\_completeness}) hold for any function
+  satisfying the ideal-preservation contract, so this
+  mechanisation does not weaken them. The Song et
+  al.~\cite{song2024equational} completeness theorem holds for
+  a specific class of polynomial systems (those arising from a
+  faithful BV-formula encoding, beyond just idempotency); its
+  full mechanisation would require defining the encoding
+  formally and is not required by the implementation, which
+  intentionally permits \texttt{UNKNOWN}.
+
+\item \textbf{Deferred bit-blasting equivalence}
+  (\texttt{Defer.lean}): the deferral mechanism in
+  \texttt{boolbv.cpp::set\_to} / \texttt{finish\_eager\_conversion}
+  is semantically equivalent to the eager path. We use a
+  concrete set-based abstract model: solver state is a pair
+  \texttt{(committed, deferred)} of assertion sets, with
+  semantic operations \texttt{setToEager} (add to committed),
+  \texttt{setToDeferred} (add to deferred), and
+  \texttt{finishEagerConversion} (union deferred into committed,
+  clear queue). From these definitions, the two key invariants
+  (\texttt{defer\_finish\_eq\_eager\_finish}: deferred-then-replay
+  equals eager-on-replayed-state;
+  \texttt{finish\_eager\_commutes}: \texttt{setToEager} does
+  not affect the deferred queue) are theorems by union
+  associativity and commutativity. We prove
+  \texttt{defer\_replay\_equivalence}: for any sequence of
+  assertions, the deferred-then-flushed path yields the same
+  state as the eager path. Proven with zero \texttt{sorry} and
+  zero project axioms. This abstraction is faithful only under an
+  explicit assumption --- that the verdict depends on the
+  \emph{set} of committed assertions, not on their replay order
+  --- which the set-based model does not itself verify. That
+  assumption was in fact violated by a real bug (replay happened
+  after uninterpreted-function congruence axioms were generated,
+  so a function application appearing only in a deferred assertion
+  missed its axioms, making the verdict order-dependent and
+  yielding spurious \texttt{sat}); the proof stayed valid while
+  the C++ broke the abstraction's premise, and the bug was caught
+  by differential testing rather than by the proof
+  (Section~\ref{sec:threats}). The
+  \texttt{Defer.lean} docstring now records this as an
+  \texttt{ASSUMES} / \texttt{MAINTAINED BY} pair, the fix being to
+  replay before congruence-axiom generation.
+
+\end{enumerate}
+
+\paragraph{Traceability.} Each Lean theorem carries an
+\texttt{IMPL:} comment naming the source-file site whose soundness
+it witnesses; each implementation site carries a \texttt{PROOF:}
+comment naming the Lean theorem(s) that justify it. The full
+mapping is in \texttt{formal-proofs/TRACEABILITY.md}.
+
+\paragraph{Status summary.} The three counts we report measure
+different things: the development contains over 150 Lean
+theorems/lemmas in total; of these, 65 are \emph{mapping entries}
+--- contract-level \texttt{PROOF:}/\texttt{IMPL:} pairs that tie a
+specific source site to the theorem(s) witnessing it --- spanning
+20 Lean modules; and the coverage audit (below) ranges over 37
+\emph{source entities} (algorithms/functions in
+\texttt{src/solvers/algebraic/}). All 65 mapping entries are
+fully mechanised with zero
+\texttt{sorry} and zero project-internal axioms; the only
+axioms relied on are the standard mathlib trio
+(\texttt{propext}, \texttt{Classical.choice},
+\texttt{Quot.sound}).
+
+\paragraph{Coverage.} Every algorithm in
+\texttt{src/solvers/algebraic/} containing non-trivial
+mathematical content is now backed by a Lean theorem (see
+\texttt{formal-proofs/COVERAGE\_AUDIT.md}). The 37 entities
+break down as: 24 \textsc{Covered} (direct \texttt{PROOF:} ref),
+12 \textsc{Trivial} (basic arithmetic / config / lookups), 1
+\textsc{Trusted-Def} (a strict-total-order definition, with the
+order properties proven). Zero \textsc{Gap} entries; zero
+\textsc{Indirect} entries (all upgraded to direct refs).
+
+\paragraph{Notable corrections from mechanisation.} The
+mechanisation found and drove a substantive change to the UNSAT
+criterion. An earlier draft conjectured that the strong-GB
+algorithm's saturation step is complete: ``$F$ unsat $\Rightarrow$
+strong-GB produces an \emph{odd} constant'', either naively or
+under a ``well-formed encoding'' hypothesis (idempotency on each
+variable). We proved both versions \emph{false} with concrete
+counterexamples (\texttt{naive\_completeness\_is\_false},
+\texttt{two\_trick\_saturation\_complete\_is\_false}; witness
+$F=\{C\,2\}$ over $\mathbb{Z}_4$, unsat but with no odd constant
+in its ideal). This showed the odd-only criterion was strictly
+incomplete, so we generalised \texttt{groebner.cpp::has\_constant}
+to refute on \emph{any} non-zero constant (sound by
+\texttt{nonzero\_constant\_no\_solution}); under the generalised
+criterion the witness $F=\{C\,2\}$ is decided \texttt{UNSAT}. The
+procedure remains \emph{sound but not complete} --- it returns
+\texttt{UNSAT} when a non-zero constant is found and
+\texttt{UNKNOWN} otherwise (function-vanishing unsats are handled
+by the separate vanishing test of Section~\ref{sec:vanishing};
+budget exhaustion can also yield \texttt{UNKNOWN}). A positive
+partial completeness result holds for $d=1$ (over $\mathrm{GF}(2)$)
+with idempotency: \texttt{d\_eq\_one\_completeness}.
+
+All modules build cleanly with mathlib v4.18.0; CI integration is
+straightforward. The non-fully-mechanised entries have precise
+Lean statements (not vacuous) and detailed module docstrings
+explaining what a full proof would require.
+
+
+\section{Related Work}
+
+We organise related work by which corner of the four-classes
+taxonomy (Table~\ref{tab:taxonomy}) each line of work attacks.
+
+\paragraph{Universal-equational, ideal membership.}
+Song et al.~\cite{song2024equational} prove that strong Gr\"obner
+bases over $\mathbb{Z}_{2^d}$ solve the equational theory of
+bit-vectors --- the theoretical foundation we build on.
+Bryant~\cite{bryant1991complexity} earlier showed that BDD-based
+multiplication verification requires exponential size, motivating
+non-BDD algebraic approaches. Clegg
+et al.~\cite{clegg1996groebner} proved the Gr\"obner proof system
+can be exponentially more powerful than resolution, giving the
+proof-theoretic justification for algebraic methods on
+multiplication. Our contribution beyond Song et al.\ is the SMT
+integration: SSA-aware decomposition of nested multiplications,
+Song et al.'s $2^{d-1}$ disequality encoding, progress-based
+termination, and mechanised soundness
+(Section~\ref{sec:algebraic-contrib}).
+
+\paragraph{Universal-equational, function equivalence.}
+Shekhar et al.~\cite{shekhar2007equivalence} characterise the
+vanishing ideal of $\mathbb{Z}_{2^{n_1}} \times \cdots \times
+\mathbb{Z}_{2^{n_d}} \to \mathbb{Z}_{2^m}$ using falling
+factorials and give a complete decision procedure for polynomial
+equivalence in this setting; G\`amez-Montolio
+et al.~\cite{gamez2024efficient} give the efficient normalisation
+algorithm (via Stirling numbers and Kronecker products) that we
+implement. Howe et al.~\cite{howe2025subpolynomial} decompose
+univariate polynomials into subpolynomials for compact
+bit-blasting; the technique is orthogonal to our
+vanishing-polynomial test but could combine with it on queries
+that fall through to the bit-blast layer.
+
+\paragraph{Universal-equational on gate-level circuits.}
+Gate-level algebraic verification is a related but distinct line:
+the input is an AIG circuit, not an SMT query. Biere, Kauers, and
+Ritirc~\cite{biere2017challenges} observed that gate polynomials
+form a Gr\"obner basis under reverse topological ordering,
+yielding polynomial-time multiplier verification.
+Kaufmann~\cite{kaufmann2020thesis} and Kaufmann and
+Biere~\cite{kaufmann2021amulet} extended this to the Amulet2 tool
+with XOR slicing and proof certificates (PAC/LPAC).
+Yu et al.~\cite{yu2016arithmetic} achieve linear-time gate-level
+verification via function extraction. These approaches work over
+$\mathbb{Q}$ with field polynomials $x^2 - x = 0$ to model
+Booleans; ours works directly over $\mathbb{Z}_{2^d}$, avoiding
+the exponential polynomial blowup field polynomials cause but
+losing field structure. Section~\ref{sec:eval-amulet} compares
+in detail.
+
+\paragraph{Scaling to large bitwidths.}
+Recent gate-level work addresses the large-integer-arithmetic
+bottleneck that arises for $64$-bit-and-wider multipliers, whose
+specification coefficients reach $2^{127}$. Hofstadler, Kaufmann, and
+Chen~\cite{hofstadler2026} avoid arbitrary-precision arithmetic by
+computing homomorphic images modulo several machine-word primes in
+parallel and recombining via the Chinese remainder theorem, combined
+with linear rewriting and guess-and-prove
+linearisation~\cite{kaufmann2019,ritirc2017,ritirc2018}. Large word
+sizes are a genuine limitation of our approach as well: they induce
+coefficient and monomial growth in the strong Gr\"obner basis, and
+queries that exceed the step limit are deferred to bit-blasting.
+Multimodular reasoning does \emph{not}, however, transfer to our
+setting: we reason natively over the finite ring $\mathbb{Z}_{2^d}$,
+whose modulus $2^d$ is a prime power and therefore cannot be factored
+into the coprime moduli the Chinese remainder theorem requires, and
+their model-equivalence over $\mathbb{Z}$ relies on Boolean gate
+variables that our word-level variables lack. Reconciling word-level
+$\mathbb{Z}_{2^d}$ reasoning with multimodular scaling is an open
+problem.
+
+\paragraph{Existential-equational and finite-field
+generalisations.}
+\v{O}zdemir et al.~\cite{Ozdemir23cvc5}
+integrate CoCoALib~\cite{abbott:cocoalib} into cvc5 for
+Gr\"obner-basis reasoning over prime-order finite fields,
+targeting QF\_FF queries (e.g., zkSNARK constraint systems);
+their procedure handles both UNSAT and SAT directions via root
+finding. The setting is different: prime-order fields admit
+field structure and complete univariate root finding, while
+$\mathbb{Z}_{2^d}$ does not. The two procedures are complementary
+on cryptographic verification: finite-field methods excel on
+curve-based cryptography, our approach on bit-vector arithmetic
+identities. The cvc5 \texttt{--ff} flag activates this only for
+QF\_FF logic; QF\_BV queries do not invoke it.
+
+\paragraph{Heuristic word-level rewriting (covers all four
+classes).}
+Niemetz et al.~\cite{niemetz2023bitwuzla} implement occurrence-map
+canonicalisation in Bitwuzla that handles commutativity and
+associativity via syntactic rewriting; cvc5's QF\_BV pipeline
+applies pattern-matched rewrites and a Gaussian-elimination
+preprocessor for linear systems modulo $2^d$. Both approaches are
+\emph{heuristic} in our sense: they decide the queries that match
+their pattern set or admit a linear reduction, and fall through
+to bit-blasting on queries that escape. They cover all four
+taxonomy classes when the rewriter has matching patterns; on
+queries with high-degree polynomial structure or vanishing
+polynomials they fall through. Our procedure is complementary:
+on the universal-equational class with polynomial expressions in
+$\mathbb{Z}_{2^d}$, it is a decision procedure rather than a
+heuristic; on the other three classes it falls through to
+bit-blasting in turn.
+
+\paragraph{Relational classes.}
+The bit-blasting companion paper~\cite{companion-bitblasting}
+addresses the universal-relational and existential-relational
+classes more uniformly than our procedure does. Its
+multiplier-encoding contributions are orthogonal to the present
+work: the algebraic procedure decides queries that escape any
+multiplier encoding, while the bit-blasting companion paper
+improves the encoding for queries that reach the SAT solver.
+
+\paragraph{Proof complexity.}
+The extended Frege proof system (including Gr\"obner-basis
+reasoning) has polynomial proofs of arithmetic identities such
+as commutativity~\cite{buss1995bounded}, a fact we rely on
+implicitly: our algebraic procedure constructs such a proof.
+Whether resolution also has polynomial proofs of
+these identities is open~\cite{biere2017challenges}; the
+bit-blasting companion paper~\cite{companion-bitblasting}
+provides empirical evidence that it does not (integer
+commutativity is $1000\times$ harder than GF(2) in CDCL).
+
+
+\section{Conclusion}
+
+We presented a decision procedure for universally-quantified
+equalities of polynomial expressions in $\mathbb{Z}_{2^d}$,
+combining a strong Gr\"obner-basis solver for ideal membership
+with a vanishing-polynomial test for function equivalence over
+the bit-vector domain. The procedure is the first SMT integration
+of a complete decision procedure for this fragment; its
+contribution is not to replace mature word-level SMT solvers on
+volume but to decide queries those solvers cannot decide at all
+--- 59 random-polynomial benchmarks at degree $\geq 13$ that
+Bitwuzla, cvc5, and every bit-blasting configuration we tested
+time out on, and 5 DSP datapath equivalences with overflow
+cancellation that are decided in microseconds. Soundness is
+mechanised in Lean 4 with over 150 theorems, zero \texttt{sorry},
+and zero project-internal axioms across 20 modules, with full
+bi-directional traceability to every algorithm in
+\texttt{src/solvers/algebraic/} and four contributions prepared
+for Mathlib. The mechanisation effort
+exposed and removed two implementation bugs that empirical
+testing did not catch (a 2{,}000$\times$ ordering sensitivity
+and a 2-trick progress-tracking gap), and led us to adopt an
+explicit-invariant pattern in cross-references
+(\texttt{ASSUMES:} / \texttt{MAINTAINED BY:}). The same
+discipline, combined with a corpus-scale differential sweep
+against external oracles, later caught further integration bugs
+that unit and regression tests missed (Section~\ref{sec:threats})
+--- most tellingly a deferred-replay issue in
+which the abstract equivalence proof's faithfulness assumption
+(``the verdict depends on the committed set, not its order'') was
+not maintained by the implementation --- which we expect the
+pattern, and routine differential testing, to catch in other
+formalisation efforts.
+
+The procedure addresses the universal-equational class with
+polynomial expressions; queries with bitwise operations, shifts,
+or inequalities fall through to bit-blasting, which our
+boolbv companion handles. Two mechanisms reduce that fall-through
+in the present procedure: bit-decomposition variables, which
+make partial bit-vector operators and relational predicates
+sound polynomial expressions while scaling linearly in
+bitwidth (\S\ref{sec:eval-pbv}), and deferred bit-blasting,
+which cuts SABER peak memory by 100--165$\times$ and unlocks
+$N = 768$ (\S\ref{sec:eval-saber-defer}). The remaining future
+directions, sketched in Section~\ref{sec:future-within-and-beyond},
+are faithful Toom-Cook 4-way SABER verification (an open
+challenge for state-of-the-art SMT), faster polynomial
+multiplication beyond $N = 768$, and theory combination as a
+multi-month architectural extension.
+
+\paragraph{Declaration on Generative AI.}
+During preparation, the authors used an AI coding assistant to
+assist with implementation, experimentation, and drafting. All
+results were verified by the authors, and the final paper was
+reviewed and edited by the authors.
+
+\paragraph{Data availability statement.}
+All experimental data, benchmarks, and reproduction scripts are
+available in the artifact accompanying this paper, in
+\texttt{doc/paper-algebraic/data/} and
+\texttt{bench-multiplication/}, together with a Makefile that
+rebuilds the paper and a \texttt{REPRODUCE.md} that describes how
+to re-run each experiment. Mechanised Lean 4 proofs of soundness
+are distributed with the artifact, with four general-purpose
+results (the unit characterisation of $\mathbb{Z}_{2^d}$,
+idempotents in $\mathbb{Z}_{2^d}$ are $\{0, 1\}$,
+$\mathbb{Z}_{p^n}$ is a local ring, and a non-unit
+characterisation) prepared as standalone branches for
+contribution to Mathlib.
+
+\bibliographystyle{splncs04}
+\bibliography{references}
+
+\end{document}

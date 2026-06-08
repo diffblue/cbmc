@@ -22,6 +22,21 @@ ifneq ($(MINISAT2),)
   CLEANFILES += $(MINISAT2_LIB) $(patsubst %$(OBJEXT), %$(DEPEXT), $(MINISAT2_LIB))
 endif
 
+ifneq ($(MERGESAT),)
+  # MergeSat is based on MiniSat2 and is invoked (with suitable defines/ifdefs)
+  # via satcheck_minisat2.{h,cpp}
+  MERGESAT_SRC=sat/satcheck_minisat2.cpp
+  MERGESAT_INCLUDE=-I $(MERGESAT)
+  MERGESAT_LIB=$(MERGESAT)/minisat/core/Lookahead$(OBJEXT) \
+               $(MERGESAT)/minisat/core/Solver$(OBJEXT) \
+               $(MERGESAT)/minisat/simp/SimpSolver$(OBJEXT) \
+               $(MERGESAT)/minisat/utils/ccnr$(OBJEXT) \
+               $(MERGESAT)/minisat/utils/Options$(OBJEXT) \
+               $(MERGESAT)/minisat/utils/System$(OBJEXT)
+  CP_CXXFLAGS += -DHAVE_MERGESAT -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS
+  CLEANFILES += $(MERGESAT_LIB) $(patsubst %$(OBJEXT), %$(DEPEXT), $(MERGESAT_LIB))
+endif
+
 ifneq ($(IPASIR),)
   IPASIR_SRC=sat/satcheck_ipasir.cpp
   IPASIR_INCLUDE=-I $(IPASIR)
@@ -62,11 +77,18 @@ ifneq ($(LINGELING),)
 endif
 
 ifneq ($(CADICAL),)
-  CADICAL_SRC=sat/satcheck_cadical.cpp
+  CADICAL_SRC=sat/satcheck_cadical.cpp sat/xor_gauss.cpp
   CADICAL_INCLUDE=-I $(CADICAL)/src
   CADICAL_LIB=$(CADICAL)/build/libcadical$(LIBEXT)
   CP_CXXFLAGS += -DHAVE_CADICAL
   CLEANFILES += $(CADICAL_LIB) $(patsubst %$(OBJEXT), %$(DEPEXT), $(CADICAL_LIB))
+endif
+
+ifneq ($(CRYPTOMINISAT),)
+  CRYPTOMINISAT_SRC=sat/satcheck_cryptominisat.cpp
+  CRYPTOMINISAT_INCLUDE=-I $(CRYPTOMINISAT)/build/include -I $(CRYPTOMINISAT)/src
+  CRYPTOMINISAT_LIB=$(CRYPTOMINISAT)/build/lib/libcryptominisat5$(LIBEXT)
+  CP_CXXFLAGS += -DHAVE_CRYPTOMINISAT
 endif
 
 SRC = $(BOOLEFORCE_SRC) \
@@ -75,11 +97,13 @@ SRC = $(BOOLEFORCE_SRC) \
       $(GLUCOSE_SRC) \
       $(LINGELING_SRC) \
       $(MINISAT2_SRC) \
+      $(MERGESAT_SRC) \
       $(IPASIR_SRC) \
       $(MINISAT_SRC) \
       $(PICOSAT_SRC) \
       $(SQUOLEM2_SRC) \
       $(CADICAL_SRC) \
+      $(CRYPTOMINISAT_SRC) \
       decision_procedure.cpp \
       flattening/arrays.cpp \
       flattening/boolbv.cpp \
@@ -141,6 +165,7 @@ SRC = $(BOOLEFORCE_SRC) \
       flattening/c_bit_field_replacement_type.cpp \
       flattening/equality.cpp \
       flattening/pointer_logic.cpp \
+      flattening/tseitin_propagation.cpp \
       floatbv/float_bv.cpp \
       floatbv/float_utils.cpp \
       floatbv/float_approximation.cpp \
@@ -236,6 +261,31 @@ $(MINISAT2)/minisat/core/Solver$(OBJEXT): $(MINISAT2)/minisat/core/Solver.cc
 endif
 endif
 
+ifneq ($(MERGESAT),)
+ifeq ($(BUILD_ENV_),MSVC)
+sat/satcheck_minisat2$(OBJEXT): sat/satcheck_minisat2.cpp
+	$(CXX) $(CP_CXXFLAGS) /w /nologo /c /EHsc $< /Fo$@
+
+$(MERGESAT)/minisat/core/Lookahead$(OBJEXT): $(MERGESAT)/minisat/core/Lookahead.cc
+	$(CXX) $(CP_CXXFLAGS) /w /nologo /c /EHsc $< /Fo$@
+
+$(MERGESAT)/minisat/core/Solver$(OBJEXT): $(MERGESAT)/minisat/core/Solver.cc
+	$(CXX) $(CP_CXXFLAGS) /w /nologo /c /EHsc $< /Fo$@
+
+$(MERGESAT)/minisat/simp/SimpSolver$(OBJEXT): $(MERGESAT)/minisat/simp/SimpSolver.cc
+	$(CXX) $(CP_CXXFLAGS) /w /nologo /c /EHsc $< /Fo$@
+
+$(MERGESAT)/minisat/utils/ccnr$(OBJEXT): $(MERGESAT)/minisat/utils/ccnr.cc
+	$(CXX) $(CP_CXXFLAGS) /w /nologo /c /EHsc $< /Fo$@
+
+$(MERGESAT)/minisat/utils/Options$(OBJEXT): $(MERGESAT)/minisat/utils/Options.cc
+	$(CXX) $(CP_CXXFLAGS) /w /nologo /c /EHsc $< /Fo$@
+
+$(MERGESAT)/minisat/utils/System$(OBJEXT): $(MERGESAT)/minisat/utils/System.cc
+	$(CXX) $(CP_CXXFLAGS) /w /nologo /c /EHsc $< /Fo$@
+endif
+endif
+
 ifneq ($(GLUCOSE),)
 ifeq ($(BUILD_ENV_),MSVC)
 sat/satcheck_glucose$(OBJEXT): sat/satcheck_glucose.cpp
@@ -251,9 +301,11 @@ endif
 
 INCLUDES += -I .. \
   $(CHAFF_INCLUDE) $(BOOLEFORCE_INCLUDE) $(MINISAT_INCLUDE) $(MINISAT2_INCLUDE) \
+  $(MERGESAT_INCLUDE) \
   $(IPASIR_INCLUDE) \
   $(SQUOLEM2_INC) $(CUDD_INCLUDE) $(GLUCOSE_INCLUDE) \
-	$(PICOSAT_INCLUDE) $(LINGELING_INCLUDE) $(CADICAL_INCLUDE)
+	$(PICOSAT_INCLUDE) $(LINGELING_INCLUDE) $(CADICAL_INCLUDE) \
+	$(CRYPTOMINISAT_INCLUDE)
 
 CLEANFILES += solvers$(LIBEXT) \
   smt2_solver$(EXEEXT) smt2/smt2_solver$(OBJEXT) smt2/smt2_solver$(DEPEXT)
@@ -269,8 +321,14 @@ endif
 endif
 
 SOLVER_LIB = $(CHAFF_LIB) $(BOOLEFORCE_LIB) $(MINISAT_LIB) \
+<<<<<<< HEAD
         $(MINISAT2_LIB) $(SQUOLEM2_LIB) $(CUDD_LIB) \
+        $(PICOSAT_LIB) $(LINGELING_LIB) $(GLUCOSE_LIB) $(CADICAL_LIB) \
+        $(CRYPTOMINISAT_LIB)
+=======
+        $(MINISAT2_LIB) $(MERGESAT_LIB) $(SQUOLEM2_LIB) $(CUDD_LIB) \
         $(PICOSAT_LIB) $(LINGELING_LIB) $(GLUCOSE_LIB) $(CADICAL_LIB)
+>>>>>>> 93cc3bb8b6 (Add support for MergeSat)
 
 SOLVER_OBJS = $(filter %$(OBJEXT), $(SOLVER_LIB))
 ifneq ($(SOLVER_OBJS),)

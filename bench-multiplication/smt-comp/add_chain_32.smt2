@@ -1,0 +1,10 @@
+; Addition chain equivalence at 32 bits
+(set-logic QF_BV)
+(declare-fun a () (_ BitVec 32))
+(declare-fun b () (_ BitVec 32))
+(declare-fun c () (_ BitVec 32))
+(declare-fun d () (_ BitVec 32))
+(assert (not (= (bvadd (bvadd a b) (bvadd c d))
+               (bvadd (bvadd a c) (bvadd b d)))))
+(check-sat)
+(exit)

@@ -1,0 +1,48 @@
+# High-bitwidth scaling experiment for the algebraic procedure
+# Date: 2026-05-29T08:18:09+00:00
+# Machine: x86_64, Intel(R) Xeon(R) Platinum 8124M CPU @ 3.00GHz
+# Memory: 68Gi
+# CBMC: 6.8.0 (cbmc-6.8.0-550-g85b66fdb87-dirty)
+# Timeout: 120s
+#
+kind	bw	config	time	result
+commutativity	64	default	0.007	unsat
+commutativity	128	default	0.006	unsat
+commutativity	256	default	0.006	unsat
+commutativity	512	default	0.006	unsat
+commutativity	1024	default	0.006	unsat
+commutativity	2048	default	0.006	unsat
+commutativity	4096	default	0.006	unsat
+associativity	64	default	0.006	unsat
+associativity	128	default	0.006	unsat
+associativity	256	default	0.006	unsat
+associativity	512	default	0.006	unsat
+associativity	1024	default	0.006	unsat
+associativity	2048	default	0.006	unsat
+associativity	4096	default	0.006	unsat
+quadratic	64	default	0.053	unsat
+quadratic	128	default	0.195	unsat
+quadratic	256	default	0.798	unsat
+quadratic	512	default	3.255	unsat
+quadratic	1024	default	13.405	unsat
+quadratic	2048	default	41.554	T/O
+quadratic	4096	default	41.725	T/O
+diffsquares	64	default	0.043	unsat
+diffsquares	128	default	0.147	unsat
+diffsquares	256	default	0.605	unsat
+diffsquares	512	default	2.459	unsat
+diffsquares	1024	default	9.963	unsat
+diffsquares	2048	default	40.745	unsat
+diffsquares	4096	default	41.936	T/O
+commutativity	64	shift-add	0.007	unsat
+commutativity	128	shift-add	0.006	unsat
+commutativity	256	shift-add	0.006	unsat
+associativity	64	shift-add	0.006	unsat
+associativity	128	shift-add	0.006	unsat
+associativity	256	shift-add	0.006	unsat
+quadratic	64	shift-add	120.023	T/O
+quadratic	128	shift-add	120.035	T/O
+quadratic	256	shift-add	120.049	T/O
+diffsquares	64	shift-add	120.022	T/O
+diffsquares	128	shift-add	120.033	T/O
+diffsquares	256	shift-add	120.047	T/O

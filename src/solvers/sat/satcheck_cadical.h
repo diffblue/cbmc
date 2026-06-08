@@ -6,18 +6,23 @@ Author: Michael Tautschnig
 
 \*******************************************************************/
 
-
 #ifndef CPROVER_SOLVERS_SAT_SATCHECK_CADICAL_H
 #define CPROVER_SOLVERS_SAT_SATCHECK_CADICAL_H
 
-#include "cnf.h"
-
 #include <solvers/hardness_collector.h>
+
+#include "cnf.h"
+#include "xor_propagator.h"
+
+#include <memory>
+#include <vector>
 
 namespace CaDiCaL // NOLINT(readability/namespace)
 {
-  class Solver; // NOLINT(readability/identifiers)
+class Solver; // NOLINT(readability/identifiers)
 }
+
+class cadical_xor_propagator_simplet;
 
 class satcheck_cadical_baset : public cnf_solvert, public hardness_collectort
 {
@@ -44,6 +49,35 @@ public:
   }
   bool is_in_conflict(literalt a) const override;
 
+  /// Record a XOR constraint for Gaussian elimination.
+  /// The constraint is: vars[0] XOR vars[1] XOR ... = rhs.
+  /// Variables are literalt values (using var_no()).
+  void add_xor_constraint(const std::vector<literalt> &lits, bool rhs);
+
+  void register_xor(const bvt &lits, bool rhs) override
+  {
+    add_xor_constraint(lits, rhs);
+  }
+
+  /// Enable XOR Gaussian elimination propagator.
+  void enable_xor_gauss();
+
+  void mark_input_variable(literalt lit) override
+  {
+    unsigned v = lit.var_no();
+    if(v >= input_variables.size())
+      input_variables.resize(v + 1, false);
+    input_variables[v] = true;
+  }
+
+  /// Enable aux-first variable renumbering for CaDiCaL.
+  void enable_variable_renumbering()
+  {
+    renumber_variables = true;
+  }
+
+  void set_phase(int p);
+
 #if 0
   literalt new_variable() override;
   bvt new_variables(std::size_t width) override;
@@ -55,6 +89,32 @@ protected:
   // NOLINTNEXTLINE(readability/identifiers)
   CaDiCaL::Solver *solver;
   int preprocessing_limit = 0, localsearch_limit = 0;
+  std::unique_ptr<cadical_xor_propagator_simplet> xor_propagator;
+  std::vector<xor_constraintt> pending_xors;
+  bool xor_gauss_enabled = false;
+  std::size_t xor_constraint_limit = 10000;
+  std::vector<bool> input_variables;
+  bool renumber_variables = false;
+
+public:
+  int reorder_strategy = 0;
+  int initial_phase = -1; // -1 = default
+  std::vector<literalt> control_variables;
+  void mark_control_variable(literalt lit) override
+  {
+    control_variables.push_back(lit);
+  }
+
+protected:
+  std::vector<unsigned> var_map;  // old var_no -> new var_no
+  std::vector<int> clause_buffer; // flat: lit lit ... 0 lit lit ... 0
+
+  /// Build the variable renumbering map: aux variables get low IDs,
+  /// input variables get high IDs.
+  void build_variable_map();
+
+  /// Remap a DIMACS literal through the variable map.
+  int remap_dimacs(int dimacs_lit) const;
 };
 
 class satcheck_cadical_no_preprocessingt : public satcheck_cadical_baset

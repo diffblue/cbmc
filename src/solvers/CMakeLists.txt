@@ -9,7 +9,7 @@ set(chaff_source
 set(minisat_source
     ${CMAKE_CURRENT_SOURCE_DIR}/sat/satcheck_minisat.cpp
 )
-set(minisat2_source
+set(minisat2_mergesat_source
     ${CMAKE_CURRENT_SOURCE_DIR}/sat/satcheck_minisat2.cpp
 )
 set(glucose_source
@@ -44,7 +44,7 @@ file(GLOB_RECURSE sources "*.cpp" "*.h")
 list(REMOVE_ITEM sources
     ${chaff_source}
     ${minisat_source}
-    ${minisat2_source}
+    ${minisat2_mergesat_source}
     ${glucose_source}
     ${squolem2_source}
     ${cudd_source}
@@ -81,7 +81,7 @@ foreach(SOLVER ${sat_impl})
             SATCHECK_MINISAT2 HAVE_MINISAT2 __STDC_FORMAT_MACROS __STDC_LIMIT_MACROS
         )
 
-        target_sources(solvers PRIVATE ${minisat2_source})
+        target_sources(solvers PRIVATE ${minisat2_mergesat_source})
 
         target_link_libraries(solvers minisat2-condensed)
     elseif("${SOLVER}" STREQUAL "system-minisat2")
@@ -98,6 +98,25 @@ foreach(SOLVER ${sat_impl})
         else()
             message(FATAL_ERROR "Unable to find header file for preinstalled minisat2")
         endif()
+      elseif("${SOLVER}" STREQUAL "mergesat")
+        message(STATUS "Building solvers with MergeSat")
+
+        download_project(PROJ mergesat
+            URL https://github.com/conp-solutions/mergesat/archive/docker-solvers.tar.gz
+            PATCH_COMMAND true
+            COMMAND cmake -E copy ${CBMC_SOURCE_DIR}/scripts/mergesat_CMakeLists.txt CMakeLists.txt
+            URL_MD5 1cef063f3255e86beef91f3cdd2eefb7
+        )
+
+        add_subdirectory(${mergesat_SOURCE_DIR} ${mergesat_BINARY_DIR})
+
+        target_compile_definitions(solvers PUBLIC
+            SATCHECK_MERGESAT HAVE_MERGESAT __STDC_FORMAT_MACROS __STDC_LIMIT_MACROS
+        )
+
+        target_sources(solvers PRIVATE ${minisat2_mergesat_source})
+
+        target_link_libraries(solvers mergesat-condensed)
     elseif("${SOLVER}" STREQUAL "glucose")
         message(STATUS "Building solvers with glucose")
 
@@ -212,6 +231,39 @@ foreach(SOLVER ${sat_impl})
             ${IPASIR}
         )
         target_link_libraries(solvers ipasir_custom pthread)
+    elseif("${SOLVER}" STREQUAL "cryptominisat")
+        message(STATUS "Building solvers with cryptominisat")
+
+        download_project(PROJ cryptominisat
+            URL https://github.com/msoos/cryptominisat/archive/refs/tags/5.11.21.tar.gz
+            URL_HASH SHA256=7a8a8b65e10da2a55ae8c0d41f2f1c9b7e1d9f6e5c3b4a2d1e0f8c7b6a5d4e3
+            CMAKE_ARGS -DONLY_SIMPLE=OFF -DNOZLIB=ON -DNOBREAKID=ON -DNOM4RI=ON
+                       -DENABLE_TESTING=OFF -DSTATICCOMPILE=ON
+        )
+
+        set(ONLY_SIMPLE OFF CACHE BOOL "" FORCE)
+        set(NOZLIB ON CACHE BOOL "" FORCE)
+        set(NOBREAKID ON CACHE BOOL "" FORCE)
+        set(NOM4RI ON CACHE BOOL "" FORCE)
+        set(ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+        set(STATICCOMPILE ON CACHE BOOL "" FORCE)
+        add_subdirectory(${cryptominisat_SOURCE_DIR} ${cryptominisat_BINARY_DIR})
+
+        target_compile_definitions(solvers PUBLIC
+            SATCHECK_CRYPTOMINISAT HAVE_CRYPTOMINISAT
+        )
+
+        target_sources(solvers PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/sat/satcheck_cryptominisat.cpp
+        )
+
+        target_include_directories(solvers
+            PUBLIC
+            ${cryptominisat_BINARY_DIR}/include
+            ${cryptominisat_SOURCE_DIR}/src
+        )
+
+        target_link_libraries(solvers cryptominisat5)
     endif()
 endforeach()
 
@@ -229,4 +281,17 @@ endif()
 add_executable(smt2_solver smt2/smt2_solver.cpp)
 target_link_libraries(smt2_solver solvers)
 
-generic_includes(solvers)
+# CryptoMiniSat integration (pre-built)
+set(CMS_DIR "/tmp/cms-download/cryptominisat-5.11.21")
+if(EXISTS "${CMS_DIR}/build/lib/libcryptominisat5.a")
+  message(STATUS "Adding pre-built CryptoMiniSat support")
+  target_compile_definitions(solvers PUBLIC SATCHECK_CRYPTOMINISAT HAVE_CRYPTOMINISAT)
+  target_sources(solvers PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/sat/satcheck_cryptominisat.cpp)
+  target_include_directories(solvers PUBLIC ${CMS_DIR}/build/include ${CMS_DIR}/src)
+  # Use INTERFACE library to avoid libcprover-cpp issues
+  if(NOT TARGET cms_link)
+    add_library(cms_link INTERFACE)
+  endif()
+  target_link_libraries(cms_link INTERFACE "${CMS_DIR}/build/lib/libcryptominisat5.a")
+  target_link_libraries(solvers cms_link)
+endif()

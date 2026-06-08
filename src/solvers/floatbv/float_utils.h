@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-
 #ifndef CPROVER_SOLVERS_FLOATBV_FLOAT_UTILS_H
 #define CPROVER_SOLVERS_FLOATBV_FLOAT_UTILS_H
 
@@ -44,19 +43,19 @@ public:
       switch(mode)
       {
       case ieee_floatt::ROUND_TO_EVEN:
-        round_to_even=const_literal(true);
+        round_to_even = const_literal(true);
         break;
 
       case ieee_floatt::ROUND_TO_MINUS_INF:
-        round_to_minus_inf=const_literal(true);
+        round_to_minus_inf = const_literal(true);
         break;
 
       case ieee_floatt::ROUND_TO_PLUS_INF:
-        round_to_plus_inf=const_literal(true);
+        round_to_plus_inf = const_literal(true);
         break;
 
       case ieee_floatt::ROUND_TO_ZERO:
-        round_to_zero=const_literal(true);
+        round_to_zero = const_literal(true);
         break;
 
       case ieee_floatt::ROUND_TO_AWAY:
@@ -72,16 +71,12 @@ public:
 
   rounding_mode_bitst rounding_mode_bits;
 
-  explicit float_utilst(propt &_prop):
-    prop(_prop),
-    bv_utils(_prop)
+  explicit float_utilst(propt &_prop) : prop(_prop), bv_utils(_prop)
   {
   }
 
-  float_utilst(propt &_prop, const floatbv_typet &type):
-    spec(ieee_float_spect(type)),
-    prop(_prop),
-    bv_utils(_prop)
+  float_utilst(propt &_prop, const floatbv_typet &type)
+    : spec(ieee_float_spect(type)), prop(_prop), bv_utils(_prop)
   {
   }
 
@@ -98,7 +93,7 @@ public:
   static inline literalt sign_bit(const bvt &src)
   {
     // this is the top bit
-    return src[src.size()-1];
+    return src[src.size() - 1];
   }
 
   // extraction
@@ -149,7 +144,14 @@ public:
   bvt round_to_integral(const bvt &);
 
   // relations
-  enum class relt { LT, LE, EQ, GT, GE };
+  enum class relt
+  {
+    LT,
+    LE,
+    EQ,
+    GT,
+    GE
+  };
   literalt relation(const bvt &src1, relt rel, const bvt &src2);
 
   // constants
@@ -163,6 +165,15 @@ public:
   // debugging hooks
   bvt debug1(const bvt &op0, const bvt &op1);
   bvt debug2(const bvt &op0, const bvt &op1);
+
+public:
+  void set_multiplier_encoding_from(const bv_utilst &src)
+  {
+    bv_utils.set_comba_carry_save(src.get_comba_carry_save());
+    bv_utils.set_comba(src.get_comba());
+    bv_utils.set_dadda(src.get_dadda());
+    bv_utils.set_dadda_carry_save(src.get_dadda_carry_save());
+  }
 
 protected:
   propt &prop;
@@ -182,24 +193,24 @@ protected:
     literalt sign, infinity, zero, NaN;
     bvt fraction, exponent;
 
-    unpacked_floatt():
-      sign(const_literal(false)),
-      infinity(const_literal(false)),
-      zero(const_literal(false)),
-      NaN(const_literal(false))
+    unpacked_floatt()
+      : sign(const_literal(false)),
+        infinity(const_literal(false)),
+        zero(const_literal(false)),
+        NaN(const_literal(false))
     {
     }
   };
 
   // this has a biased exponent
   // and an _implicit_ hidden bit
-  struct biased_floatt:public unpacked_floatt
+  struct biased_floatt : public unpacked_floatt
   {
   };
 
   // the hidden bit is explicit,
   // and the exponent is not biased
-  struct unbiased_floatt:public unpacked_floatt
+  struct unbiased_floatt : public unpacked_floatt
   {
   };
 
@@ -230,10 +241,7 @@ protected:
     const unbiased_floatt &src2);
 
   // computes the "sticky-bit"
-  bvt sticky_right_shift(
-    const bvt &op,
-    const bvt &dist,
-    literalt &sticky);
+  bvt sticky_right_shift(const bvt &op, const bvt &dist, literalt &sticky);
 };
 
 #endif // CPROVER_SOLVERS_FLOATBV_FLOAT_UTILS_H

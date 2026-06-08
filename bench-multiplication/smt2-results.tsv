@@ -1,0 +1,3474 @@
+# Multiplication encoding benchmark results
+# Date: 2026-04-22T09:05:42+00:00
+# Machine: Intel(R) Xeon(R) Platinum 8124M CPU @ 3.00GHz
+# Memory: 68Gi
+# OS: Ubuntu 24.04.4 LTS
+# GCC: gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+# CBMC: 6.8.0 (cbmc-6.8.0-238-ga9dec53064-dirty)
+# Runs: 3 (median), Timeout: 120s, Memlimit: 5GB, Jobs: 8
+# Solvers: CaDiCaL 3.0.0, MiniSat 2.2.1, CryptoMiniSat 5.11.21
+# Mul encodings: shift-add dadda comba comba-cs
+# Adder encodings: ripple brent-kung g-only
+# MergeSat: available (cbmc)
+# MergeSat: available (smt2_solver)
+#
+suite	solver	mul_enc	adder_enc	benchmark	time
+Starting (smt2, jobs=8, runs=3, timeout=120s)...
+# smt2 suite
+  [0] cadical/shift-add+ripple/add_chain_16 = .176670
+  [3] mergesat/shift-add+ripple/add_chain_16 = .373026
+  [2] minisat/shift-add+ripple/add_chain_16 = .496096
+  [1] cryptominisat/shift-add+ripple/add_chain_16 = .544835
+  [4] cadical/shift-add+brent-kung/add_chain_16 = .916193
+  [7] mergesat/shift-add+brent-kung/add_chain_16 = 1.786845
+  [6] minisat/shift-add+brent-kung/add_chain_16 = 2.619156
+  [5] cryptominisat/shift-add+brent-kung/add_chain_16 = 4.856381
+  [12] cadical/dadda+ripple/add_chain_16 = .176977
+  [8] cadical/shift-add+g-only/add_chain_16 = .179429
+  [10] minisat/shift-add+g-only/add_chain_16 = .355200
+  [15] mergesat/dadda+ripple/add_chain_16 = .372868
+  [11] mergesat/shift-add+g-only/add_chain_16 = .389120
+  [14] minisat/dadda+ripple/add_chain_16 = .496524
+  [13] cryptominisat/dadda+ripple/add_chain_16 = .543622
+  [9] cryptominisat/shift-add+g-only/add_chain_16 = .558355
+  [20] cadical/dadda+g-only/add_chain_16 = .179492
+  [22] minisat/dadda+g-only/add_chain_16 = .355335
+  [23] mergesat/dadda+g-only/add_chain_16 = .389858
+  [21] cryptominisat/dadda+g-only/add_chain_16 = .557471
+  [16] cadical/dadda+brent-kung/add_chain_16 = .916020
+  [19] mergesat/dadda+brent-kung/add_chain_16 = 1.792784
+  [18] minisat/dadda+brent-kung/add_chain_16 = 2.614943
+  [17] cryptominisat/dadda+brent-kung/add_chain_16 = 4.866600
+  [24] cadical/comba+ripple/add_chain_16 = .176580
+  [27] mergesat/comba+ripple/add_chain_16 = .372432
+  [26] minisat/comba+ripple/add_chain_16 = .495988
+  [25] cryptominisat/comba+ripple/add_chain_16 = .542160
+  [28] cadical/comba+brent-kung/add_chain_16 = .916149
+  [31] mergesat/comba+brent-kung/add_chain_16 = 1.792080
+  [30] minisat/comba+brent-kung/add_chain_16 = 2.618985
+  [29] cryptominisat/comba+brent-kung/add_chain_16 = 4.883233
+  [36] cadical/comba-cs+ripple/add_chain_16 = .176636
+  [32] cadical/comba+g-only/add_chain_16 = .179559
+  [34] minisat/comba+g-only/add_chain_16 = .356011
+  [39] mergesat/comba-cs+ripple/add_chain_16 = .371801
+  [35] mergesat/comba+g-only/add_chain_16 = .390309
+  [38] minisat/comba-cs+ripple/add_chain_16 = .496271
+  [37] cryptominisat/comba-cs+ripple/add_chain_16 = .543686
+  [33] cryptominisat/comba+g-only/add_chain_16 = .558743
+  [44] cadical/comba-cs+g-only/add_chain_16 = .179720
+  [46] minisat/comba-cs+g-only/add_chain_16 = .355258
+  [47] mergesat/comba-cs+g-only/add_chain_16 = .389899
+  [45] cryptominisat/comba-cs+g-only/add_chain_16 = .558719
+  [40] cadical/comba-cs+brent-kung/add_chain_16 = .917274
+  [43] mergesat/comba-cs+brent-kung/add_chain_16 = 1.790269
+  [42] minisat/comba-cs+brent-kung/add_chain_16 = 2.615049
+  [41] cryptominisat/comba-cs+brent-kung/add_chain_16 = 4.877706
+  [48] cadical/shift-add+ripple/add_chain_32 = .458482
+  [51] mergesat/shift-add+ripple/add_chain_32 = .980733
+  [52] cadical/shift-add+brent-kung/add_chain_32 = 1.695372
+  [49] cryptominisat/shift-add+ripple/add_chain_32 = 1.812877
+  [50] minisat/shift-add+ripple/add_chain_32 = 2.521558
+  [55] mergesat/shift-add+brent-kung/add_chain_32 = 3.259445
+  [54] minisat/shift-add+brent-kung/add_chain_32 = 10.150551
+  [53] cryptominisat/shift-add+brent-kung/add_chain_32 = 11.272314
+  [56] cadical/shift-add+g-only/add_chain_32 = .325643
+  [60] cadical/dadda+ripple/add_chain_32 = .459398
+  [59] mergesat/shift-add+g-only/add_chain_32 = .763646
+  [63] mergesat/dadda+ripple/add_chain_32 = .978968
+  [61] cryptominisat/dadda+ripple/add_chain_32 = 1.808854
+  [57] cryptominisat/shift-add+g-only/add_chain_32 = 1.891235
+  [62] minisat/dadda+ripple/add_chain_32 = 2.525192
+  [58] minisat/shift-add+g-only/add_chain_32 = 3.009741
+  [68] cadical/dadda+g-only/add_chain_32 = .326098
+  [71] mergesat/dadda+g-only/add_chain_32 = .766413
+  [64] cadical/dadda+brent-kung/add_chain_32 = 1.699537
+  [69] cryptominisat/dadda+g-only/add_chain_32 = 1.902662
+  [70] minisat/dadda+g-only/add_chain_32 = 3.009778
+  [67] mergesat/dadda+brent-kung/add_chain_32 = 3.258492
+  [66] minisat/dadda+brent-kung/add_chain_32 = 10.146409
+  [65] cryptominisat/dadda+brent-kung/add_chain_32 = 11.288294
+  [72] cadical/comba+ripple/add_chain_32 = .458430
+  [75] mergesat/comba+ripple/add_chain_32 = .981458
+  [76] cadical/comba+brent-kung/add_chain_32 = 1.695881
+  [73] cryptominisat/comba+ripple/add_chain_32 = 1.809016
+  [74] minisat/comba+ripple/add_chain_32 = 2.520462
+  [79] mergesat/comba+brent-kung/add_chain_32 = 3.250035
+  [78] minisat/comba+brent-kung/add_chain_32 = 10.145649
+  [77] cryptominisat/comba+brent-kung/add_chain_32 = 11.342933
+  [80] cadical/comba+g-only/add_chain_32 = .325475
+  [84] cadical/comba-cs+ripple/add_chain_32 = .458864
+  [83] mergesat/comba+g-only/add_chain_32 = .763463
+  [87] mergesat/comba-cs+ripple/add_chain_32 = .978153
+  [85] cryptominisat/comba-cs+ripple/add_chain_32 = 1.806412
+  [81] cryptominisat/comba+g-only/add_chain_32 = 1.889040
+  [86] minisat/comba-cs+ripple/add_chain_32 = 2.519327
+  [82] minisat/comba+g-only/add_chain_32 = 3.009301
+  [92] cadical/comba-cs+g-only/add_chain_32 = .326083
+  [95] mergesat/comba-cs+g-only/add_chain_32 = .763456
+  [88] cadical/comba-cs+brent-kung/add_chain_32 = 1.694323
+  [93] cryptominisat/comba-cs+g-only/add_chain_32 = 1.904089
+  [94] minisat/comba-cs+g-only/add_chain_32 = 3.009377
+  [91] mergesat/comba-cs+brent-kung/add_chain_32 = 3.253290
+  [90] minisat/comba-cs+brent-kung/add_chain_32 = 10.147836
+  [89] cryptominisat/comba-cs+brent-kung/add_chain_32 = 11.296133
+  [96] cadical/shift-add+ripple/add_overflow_16 = .007779
+  [98] minisat/shift-add+ripple/add_overflow_16 = .007884
+  [97] cryptominisat/shift-add+ripple/add_overflow_16 = .008587
+  [99] mergesat/shift-add+ripple/add_overflow_16 = .009456
+  [102] minisat/shift-add+brent-kung/add_overflow_16 = T/O
+  [101] cryptominisat/shift-add+brent-kung/add_overflow_16 = T/O
+  [100] cadical/shift-add+brent-kung/add_overflow_16 = T/O
+  [103] mergesat/shift-add+brent-kung/add_overflow_16 = T/O
+  [106] minisat/shift-add+g-only/add_overflow_16 = .008493
+  [104] cadical/shift-add+g-only/add_overflow_16 = .008557
+  [108] cadical/dadda+ripple/add_overflow_16 = .008094
+  [110] minisat/dadda+ripple/add_overflow_16 = .008456
+  [109] cryptominisat/dadda+ripple/add_overflow_16 = .008908
+  [105] cryptominisat/shift-add+g-only/add_overflow_16 = .009548
+  [107] mergesat/shift-add+g-only/add_overflow_16 = .010143
+  [111] mergesat/dadda+ripple/add_overflow_16 = .009986
+  [118] minisat/dadda+g-only/add_overflow_16 = .007770
+  [116] cadical/dadda+g-only/add_overflow_16 = .008013
+  [117] cryptominisat/dadda+g-only/add_overflow_16 = .008930
+  [119] mergesat/dadda+g-only/add_overflow_16 = .009394
+  [113] cryptominisat/dadda+brent-kung/add_overflow_16 = T/O
+  [115] mergesat/dadda+brent-kung/add_overflow_16 = T/O
+  [114] minisat/dadda+brent-kung/add_overflow_16 = T/O
+  [112] cadical/dadda+brent-kung/add_overflow_16 = T/O
+  [120] cadical/comba+ripple/add_overflow_16 = .008143
+  [122] minisat/comba+ripple/add_overflow_16 = .008348
+  [121] cryptominisat/comba+ripple/add_overflow_16 = .009067
+  [123] mergesat/comba+ripple/add_overflow_16 = .009947
+  [125] cryptominisat/comba+brent-kung/add_overflow_16 = T/O
+  [126] minisat/comba+brent-kung/add_overflow_16 = T/O
+  [127] mergesat/comba+brent-kung/add_overflow_16 = T/O
+  [124] cadical/comba+brent-kung/add_overflow_16 = T/O
+  [132] cadical/comba-cs+ripple/add_overflow_16 = .008240
+  [128] cadical/comba+g-only/add_overflow_16 = .008574
+  [130] minisat/comba+g-only/add_overflow_16 = .008309
+  [134] minisat/comba-cs+ripple/add_overflow_16 = .008455
+  [129] cryptominisat/comba+g-only/add_overflow_16 = .009587
+  [133] cryptominisat/comba-cs+ripple/add_overflow_16 = .009077
+  [131] mergesat/comba+g-only/add_overflow_16 = .010049
+  [135] mergesat/comba-cs+ripple/add_overflow_16 = .009984
+  [142] minisat/comba-cs+g-only/add_overflow_16 = .007768
+  [140] cadical/comba-cs+g-only/add_overflow_16 = .008087
+  [141] cryptominisat/comba-cs+g-only/add_overflow_16 = .008896
+  [143] mergesat/comba-cs+g-only/add_overflow_16 = .009610
+  [137] cryptominisat/comba-cs+brent-kung/add_overflow_16 = T/O
+  [138] minisat/comba-cs+brent-kung/add_overflow_16 = T/O
+  [139] mergesat/comba-cs+brent-kung/add_overflow_16 = T/O
+  [136] cadical/comba-cs+brent-kung/add_overflow_16 = T/O
+  [146] minisat/shift-add+ripple/add_sub_cancel_16 = .008332
+  [145] cryptominisat/shift-add+ripple/add_sub_cancel_16 = .008563
+  [144] cadical/shift-add+ripple/add_sub_cancel_16 = .009332
+  [149] cryptominisat/shift-add+brent-kung/add_sub_cancel_16 = .010604
+  [147] mergesat/shift-add+ripple/add_sub_cancel_16 = .011047
+  [150] minisat/shift-add+brent-kung/add_sub_cancel_16 = .011791
+  [148] cadical/shift-add+brent-kung/add_sub_cancel_16 = .015406
+  [151] mergesat/shift-add+brent-kung/add_sub_cancel_16 = .016628
+  [154] minisat/shift-add+g-only/add_sub_cancel_16 = .007520
+  [152] cadical/shift-add+g-only/add_sub_cancel_16 = .008295
+  [157] cryptominisat/dadda+ripple/add_sub_cancel_16 = .007909
+  [158] minisat/dadda+ripple/add_sub_cancel_16 = .007728
+  [153] cryptominisat/shift-add+g-only/add_sub_cancel_16 = .008499
+  [156] cadical/dadda+ripple/add_sub_cancel_16 = .008480
+  [159] mergesat/dadda+ripple/add_sub_cancel_16 = .010487
+  [155] mergesat/shift-add+g-only/add_sub_cancel_16 = .012526
+  [166] minisat/dadda+g-only/add_sub_cancel_16 = .007428
+  [164] cadical/dadda+g-only/add_sub_cancel_16 = .008228
+  [165] cryptominisat/dadda+g-only/add_sub_cancel_16 = .008296
+  [161] cryptominisat/dadda+brent-kung/add_sub_cancel_16 = .010345
+  [162] minisat/dadda+brent-kung/add_sub_cancel_16 = .011292
+  [167] mergesat/dadda+g-only/add_sub_cancel_16 = .012383
+  [160] cadical/dadda+brent-kung/add_sub_cancel_16 = .015202
+  [163] mergesat/dadda+brent-kung/add_sub_cancel_16 = .016393
+  [169] cryptominisat/comba+ripple/add_sub_cancel_16 = .007792
+  [170] minisat/comba+ripple/add_sub_cancel_16 = .007716
+  [168] cadical/comba+ripple/add_sub_cancel_16 = .008618
+  [171] mergesat/comba+ripple/add_sub_cancel_16 = .010399
+  [173] cryptominisat/comba+brent-kung/add_sub_cancel_16 = .010401
+  [174] minisat/comba+brent-kung/add_sub_cancel_16 = .011149
+  [172] cadical/comba+brent-kung/add_sub_cancel_16 = .014927
+  [175] mergesat/comba+brent-kung/add_sub_cancel_16 = .016269
+  [178] minisat/comba+g-only/add_sub_cancel_16 = .007517
+  [177] cryptominisat/comba+g-only/add_sub_cancel_16 = .008342
+  [176] cadical/comba+g-only/add_sub_cancel_16 = .008298
+  [182] minisat/comba-cs+ripple/add_sub_cancel_16 = .007590
+  [181] cryptominisat/comba-cs+ripple/add_sub_cancel_16 = .007885
+  [180] cadical/comba-cs+ripple/add_sub_cancel_16 = .008565
+  [183] mergesat/comba-cs+ripple/add_sub_cancel_16 = .010713
+  [179] mergesat/comba+g-only/add_sub_cancel_16 = .012472
+  [190] minisat/comba-cs+g-only/add_sub_cancel_16 = .007379
+  [188] cadical/comba-cs+g-only/add_sub_cancel_16 = .008230
+  [189] cryptominisat/comba-cs+g-only/add_sub_cancel_16 = .008247
+  [185] cryptominisat/comba-cs+brent-kung/add_sub_cancel_16 = .010316
+  [186] minisat/comba-cs+brent-kung/add_sub_cancel_16 = .011241
+  [191] mergesat/comba-cs+g-only/add_sub_cancel_16 = .012424
+  [184] cadical/comba-cs+brent-kung/add_sub_cancel_16 = .015207
+  [187] mergesat/comba-cs+brent-kung/add_sub_cancel_16 = .016268
+  [192] cadical/shift-add+ripple/assoc_8 = 27.156395
+  [196] cadical/shift-add+brent-kung/assoc_8 = 27.182469
+  [193] cryptominisat/shift-add+ripple/assoc_8 = 86.057674
+  [197] cryptominisat/shift-add+brent-kung/assoc_8 = 86.024839
+  [199] mergesat/shift-add+brent-kung/assoc_8 = 103.083049
+  [195] mergesat/shift-add+ripple/assoc_8 = 103.460495
+  [194] minisat/shift-add+ripple/assoc_8 = T/O
+  [198] minisat/shift-add+brent-kung/assoc_8 = T/O
+  [200] cadical/shift-add+g-only/assoc_8 = 27.147648
+  [201] cryptominisat/shift-add+g-only/assoc_8 = 86.353658
+  [203] mergesat/shift-add+g-only/assoc_8 = 103.728709
+  [206] minisat/dadda+ripple/assoc_8 = T/O
+  [202] minisat/shift-add+g-only/assoc_8 = T/O
+  [204] cadical/dadda+ripple/assoc_8 = T/O
+  [205] cryptominisat/dadda+ripple/assoc_8 = T/O
+  [207] mergesat/dadda+ripple/assoc_8 = T/O
+  [208] cadical/dadda+brent-kung/assoc_8 = T/O
+  [214] minisat/dadda+g-only/assoc_8 = T/O
+  [212] cadical/dadda+g-only/assoc_8 = T/O
+  [210] minisat/dadda+brent-kung/assoc_8 = T/O
+  [209] cryptominisat/dadda+brent-kung/assoc_8 = T/O
+  [213] cryptominisat/dadda+g-only/assoc_8 = T/O
+  [215] mergesat/dadda+g-only/assoc_8 = T/O
+  [211] mergesat/dadda+brent-kung/assoc_8 = T/O
+  [222] minisat/comba+brent-kung/assoc_8 = T/O
+  [220] cadical/comba+brent-kung/assoc_8 = T/O
+  [221] cryptominisat/comba+brent-kung/assoc_8 = T/O
+  [223] mergesat/comba+brent-kung/assoc_8 = T/O
+  [216] cadical/comba+ripple/assoc_8 = 119.152948
+  [218] minisat/comba+ripple/assoc_8 = T/O
+  [217] cryptominisat/comba+ripple/assoc_8 = T/O
+  [219] mergesat/comba+ripple/assoc_8 = T/O
+  [226] minisat/comba+g-only/assoc_8 = T/O
+  [224] cadical/comba+g-only/assoc_8 = T/O
+  [230] minisat/comba-cs+ripple/assoc_8 = T/O
+  [228] cadical/comba-cs+ripple/assoc_8 = T/O
+  [225] cryptominisat/comba+g-only/assoc_8 = T/O
+  [229] cryptominisat/comba-cs+ripple/assoc_8 = T/O
+  [231] mergesat/comba-cs+ripple/assoc_8 = T/O
+  [227] mergesat/comba+g-only/assoc_8 = T/O
+  [234] minisat/comba-cs+brent-kung/assoc_8 = T/O
+  [232] cadical/comba-cs+brent-kung/assoc_8 = T/O
+  [238] minisat/comba-cs+g-only/assoc_8 = T/O
+  [236] cadical/comba-cs+g-only/assoc_8 = T/O
+  [233] cryptominisat/comba-cs+brent-kung/assoc_8 = T/O
+  [237] cryptominisat/comba-cs+g-only/assoc_8 = T/O
+  [235] mergesat/comba-cs+brent-kung/assoc_8 = T/O
+  [239] mergesat/comba-cs+g-only/assoc_8 = T/O
+  [242] minisat/shift-add+ripple/barrett_red_8 = .006679
+  [241] cryptominisat/shift-add+ripple/barrett_red_8 = .007187
+  [246] minisat/shift-add+brent-kung/barrett_red_8 = .006777
+  [243] mergesat/shift-add+ripple/barrett_red_8 = .007750
+  [245] cryptominisat/shift-add+brent-kung/barrett_red_8 = .007458
+  [247] mergesat/shift-add+brent-kung/barrett_red_8 = .008917
+  [240] cadical/shift-add+ripple/barrett_red_8 = .012394
+  [244] cadical/shift-add+brent-kung/barrett_red_8 = .012892
+  [250] minisat/shift-add+g-only/barrett_red_8 = .006667
+  [254] minisat/dadda+ripple/barrett_red_8 = .006503
+  [249] cryptominisat/shift-add+g-only/barrett_red_8 = .007288
+  [253] cryptominisat/dadda+ripple/barrett_red_8 = .006969
+  [255] mergesat/dadda+ripple/barrett_red_8 = .007502
+  [251] mergesat/shift-add+g-only/barrett_red_8 = .007907
+  [248] cadical/shift-add+g-only/barrett_red_8 = .012610
+  [252] cadical/dadda+ripple/barrett_red_8 = .012340
+  [262] minisat/dadda+g-only/barrett_red_8 = .006626
+  [258] minisat/dadda+brent-kung/barrett_red_8 = .007267
+  [257] cryptominisat/dadda+brent-kung/barrett_red_8 = .007672
+  [261] cryptominisat/dadda+g-only/barrett_red_8 = .007713
+  [259] mergesat/dadda+brent-kung/barrett_red_8 = .008638
+  [263] mergesat/dadda+g-only/barrett_red_8 = .009044
+  [260] cadical/dadda+g-only/barrett_red_8 = .012559
+  [256] cadical/dadda+brent-kung/barrett_red_8 = .013593
+  [266] minisat/comba+ripple/barrett_red_8 = .008446
+  [267] mergesat/comba+ripple/barrett_red_8 = .012712
+  [264] cadical/comba+ripple/barrett_red_8 = .016211
+  [265] cryptominisat/comba+ripple/barrett_red_8 = .017672
+  [270] minisat/comba+brent-kung/barrett_red_8 = T/O
+  [268] cadical/comba+brent-kung/barrett_red_8 = T/O
+  [271] mergesat/comba+brent-kung/barrett_red_8 = T/O
+  [269] cryptominisat/comba+brent-kung/barrett_red_8 = T/O
+  [278] minisat/comba-cs+ripple/barrett_red_8 = .007028
+  [277] cryptominisat/comba-cs+ripple/barrett_red_8 = .007756
+  [279] mergesat/comba-cs+ripple/barrett_red_8 = .007936
+  [274] minisat/comba+g-only/barrett_red_8 = .009659
+  [276] cadical/comba-cs+ripple/barrett_red_8 = .012529
+  [275] mergesat/comba+g-only/barrett_red_8 = .014456
+  [272] cadical/comba+g-only/barrett_red_8 = .018117
+  [273] cryptominisat/comba+g-only/barrett_red_8 = .021173
+  [282] minisat/comba-cs+brent-kung/barrett_red_8 = .006766
+  [286] minisat/comba-cs+g-only/barrett_red_8 = .006592
+  [281] cryptominisat/comba-cs+brent-kung/barrett_red_8 = .007539
+  [285] cryptominisat/comba-cs+g-only/barrett_red_8 = .007228
+  [287] mergesat/comba-cs+g-only/barrett_red_8 = .007474
+  [283] mergesat/comba-cs+brent-kung/barrett_red_8 = .008083
+  [280] cadical/comba-cs+brent-kung/barrett_red_8 = .012588
+  [284] cadical/comba-cs+g-only/barrett_red_8 = .012309
+  [288] cadical/shift-add+ripple/bf16_mul_comm = .008658
+  [292] cadical/shift-add+brent-kung/bf16_mul_comm = .008623
+  [291] mergesat/shift-add+ripple/bf16_mul_comm = .042623
+  [295] mergesat/shift-add+brent-kung/bf16_mul_comm = .042689
+  [290] minisat/shift-add+ripple/bf16_mul_comm = .044499
+  [294] minisat/shift-add+brent-kung/bf16_mul_comm = .044541
+  [293] cryptominisat/shift-add+brent-kung/bf16_mul_comm = .275276
+  [289] cryptominisat/shift-add+ripple/bf16_mul_comm = .275403
+  [296] cadical/shift-add+g-only/bf16_mul_comm = .008643
+  [300] cadical/dadda+ripple/bf16_mul_comm = .008787
+  [303] mergesat/dadda+ripple/bf16_mul_comm = .030984
+  [302] minisat/dadda+ripple/bf16_mul_comm = .031347
+  [299] mergesat/shift-add+g-only/bf16_mul_comm = .042575
+  [298] minisat/shift-add+g-only/bf16_mul_comm = .044258
+  [301] cryptominisat/dadda+ripple/bf16_mul_comm = .044576
+  [297] cryptominisat/shift-add+g-only/bf16_mul_comm = .272874
+  [304] cadical/dadda+brent-kung/bf16_mul_comm = .008965
+  [308] cadical/dadda+g-only/bf16_mul_comm = .008737
+  [307] mergesat/dadda+brent-kung/bf16_mul_comm = .030832
+  [306] minisat/dadda+brent-kung/bf16_mul_comm = .031450
+  [311] mergesat/dadda+g-only/bf16_mul_comm = .030901
+  [310] minisat/dadda+g-only/bf16_mul_comm = .031294
+  [305] cryptominisat/dadda+brent-kung/bf16_mul_comm = .044500
+  [309] cryptominisat/dadda+g-only/bf16_mul_comm = .044270
+  [312] cadical/comba+ripple/bf16_mul_comm = .009563
+  [316] cadical/comba+brent-kung/bf16_mul_comm = .009609
+  [314] minisat/comba+ripple/bf16_mul_comm = .025001
+  [318] minisat/comba+brent-kung/bf16_mul_comm = .025073
+  [313] cryptominisat/comba+ripple/bf16_mul_comm = .044467
+  [317] cryptominisat/comba+brent-kung/bf16_mul_comm = .044514
+  [315] mergesat/comba+ripple/bf16_mul_comm = .057251
+  [319] mergesat/comba+brent-kung/bf16_mul_comm = .057903
+  [324] cadical/comba-cs+ripple/bf16_mul_comm = .008669
+  [320] cadical/comba+g-only/bf16_mul_comm = .009641
+  [322] minisat/comba+g-only/bf16_mul_comm = .024964
+  [327] mergesat/comba-cs+ripple/bf16_mul_comm = .031961
+  [326] minisat/comba-cs+ripple/bf16_mul_comm = .039518
+  [321] cryptominisat/comba+g-only/bf16_mul_comm = .044541
+  [323] mergesat/comba+g-only/bf16_mul_comm = .057374
+  [325] cryptominisat/comba-cs+ripple/bf16_mul_comm = .234729
+  [328] cadical/comba-cs+brent-kung/bf16_mul_comm = .008849
+  [332] cadical/comba-cs+g-only/bf16_mul_comm = .008920
+  [331] mergesat/comba-cs+brent-kung/bf16_mul_comm = .031854
+  [335] mergesat/comba-cs+g-only/bf16_mul_comm = .031674
+  [334] minisat/comba-cs+g-only/bf16_mul_comm = .039589
+  [330] minisat/comba-cs+brent-kung/bf16_mul_comm = .039621
+  [329] cryptominisat/comba-cs+brent-kung/bf16_mul_comm = .236786
+  [333] cryptominisat/comba-cs+g-only/bf16_mul_comm = .236562
+  [340] cadical/shift-add+brent-kung/bf16_mul_comm_v2 = 22.797217
+  [336] cadical/shift-add+ripple/bf16_mul_comm_v2 = 22.929060
+  [341] cryptominisat/shift-add+brent-kung/bf16_mul_comm_v2 = 51.271931
+  [337] cryptominisat/shift-add+ripple/bf16_mul_comm_v2 = 51.351984
+  [343] mergesat/shift-add+brent-kung/bf16_mul_comm_v2 = 86.631393
+  [339] mergesat/shift-add+ripple/bf16_mul_comm_v2 = 85.956574
+  [338] minisat/shift-add+ripple/bf16_mul_comm_v2 = T/O
+  [342] minisat/shift-add+brent-kung/bf16_mul_comm_v2 = T/O
+  [344] cadical/shift-add+g-only/bf16_mul_comm_v2 = 22.865233
+  [348] cadical/dadda+ripple/bf16_mul_comm_v2 = 27.980974
+  [345] cryptominisat/shift-add+g-only/bf16_mul_comm_v2 = 51.384647
+  [349] cryptominisat/dadda+ripple/bf16_mul_comm_v2 = 57.835478
+  [347] mergesat/shift-add+g-only/bf16_mul_comm_v2 = 86.583433
+  [350] minisat/dadda+ripple/bf16_mul_comm_v2 = 89.621089
+  [351] mergesat/dadda+ripple/bf16_mul_comm_v2 = 108.595685
+  [346] minisat/shift-add+g-only/bf16_mul_comm_v2 = T/O
+  [356] cadical/dadda+g-only/bf16_mul_comm_v2 = 27.892932
+  [352] cadical/dadda+brent-kung/bf16_mul_comm_v2 = 27.926345
+  [357] cryptominisat/dadda+g-only/bf16_mul_comm_v2 = 58.598716
+  [353] cryptominisat/dadda+brent-kung/bf16_mul_comm_v2 = 58.866503
+  [354] minisat/dadda+brent-kung/bf16_mul_comm_v2 = 89.649915
+  [358] minisat/dadda+g-only/bf16_mul_comm_v2 = 89.699249
+  [359] mergesat/dadda+g-only/bf16_mul_comm_v2 = 110.068379
+  [355] mergesat/dadda+brent-kung/bf16_mul_comm_v2 = 110.881880
+  [360] cadical/comba+ripple/bf16_mul_comm_v2 = 10.585161
+  [364] cadical/comba+brent-kung/bf16_mul_comm_v2 = 10.587547
+  [365] cryptominisat/comba+brent-kung/bf16_mul_comm_v2 = 42.546276
+  [361] cryptominisat/comba+ripple/bf16_mul_comm_v2 = 42.550413
+  [366] minisat/comba+brent-kung/bf16_mul_comm_v2 = T/O
+  [362] minisat/comba+ripple/bf16_mul_comm_v2 = T/O
+  [363] mergesat/comba+ripple/bf16_mul_comm_v2 = T/O
+  [367] mergesat/comba+brent-kung/bf16_mul_comm_v2 = T/O
+  [368] cadical/comba+g-only/bf16_mul_comm_v2 = 10.608800
+  [372] cadical/comba-cs+ripple/bf16_mul_comm_v2 = 11.176149
+  [369] cryptominisat/comba+g-only/bf16_mul_comm_v2 = 42.373249
+  [373] cryptominisat/comba-cs+ripple/bf16_mul_comm_v2 = 48.289205
+  [375] mergesat/comba-cs+ripple/bf16_mul_comm_v2 = 118.557100
+  [370] minisat/comba+g-only/bf16_mul_comm_v2 = T/O
+  [374] minisat/comba-cs+ripple/bf16_mul_comm_v2 = T/O
+  [371] mergesat/comba+g-only/bf16_mul_comm_v2 = T/O
+  [380] cadical/comba-cs+g-only/bf16_mul_comm_v2 = 11.166050
+  [376] cadical/comba-cs+brent-kung/bf16_mul_comm_v2 = 11.203537
+  [381] cryptominisat/comba-cs+g-only/bf16_mul_comm_v2 = 48.667565
+  [377] cryptominisat/comba-cs+brent-kung/bf16_mul_comm_v2 = 48.609554
+  [383] mergesat/comba-cs+g-only/bf16_mul_comm_v2 = 118.952461
+  [379] mergesat/comba-cs+brent-kung/bf16_mul_comm_v2 = 119.694567
+  [378] minisat/comba-cs+brent-kung/bf16_mul_comm_v2 = T/O
+  [382] minisat/comba-cs+g-only/bf16_mul_comm_v2 = T/O
+  [386] minisat/shift-add+ripple/bf16_mul_const = .019780
+  [390] minisat/shift-add+brent-kung/bf16_mul_const = .019721
+  [384] cadical/shift-add+ripple/bf16_mul_const = .030181
+  [388] cadical/shift-add+brent-kung/bf16_mul_const = .030245
+  [387] mergesat/shift-add+ripple/bf16_mul_const = .037845
+  [391] mergesat/shift-add+brent-kung/bf16_mul_const = .037901
+  [385] cryptominisat/shift-add+ripple/bf16_mul_const = .049193
+  [389] cryptominisat/shift-add+brent-kung/bf16_mul_const = .049412
+  [394] minisat/shift-add+g-only/bf16_mul_const = .019898
+  [398] minisat/dadda+ripple/bf16_mul_const = .022989
+  [396] cadical/dadda+ripple/bf16_mul_const = .028299
+  [392] cadical/shift-add+g-only/bf16_mul_const = .030125
+  [395] mergesat/shift-add+g-only/bf16_mul_const = .038183
+  [399] mergesat/dadda+ripple/bf16_mul_const = .037408
+  [397] cryptominisat/dadda+ripple/bf16_mul_const = .037937
+  [393] cryptominisat/shift-add+g-only/bf16_mul_const = .049301
+  [402] minisat/dadda+brent-kung/bf16_mul_const = .022933
+  [406] minisat/dadda+g-only/bf16_mul_const = .022907
+  [400] cadical/dadda+brent-kung/bf16_mul_const = .028444
+  [404] cadical/dadda+g-only/bf16_mul_const = .028292
+  [403] mergesat/dadda+brent-kung/bf16_mul_const = .037621
+  [401] cryptominisat/dadda+brent-kung/bf16_mul_const = .037839
+  [407] mergesat/dadda+g-only/bf16_mul_const = .037480
+  [405] cryptominisat/dadda+g-only/bf16_mul_const = .037876
+  [410] minisat/comba+ripple/bf16_mul_const = .022281
+  [414] minisat/comba+brent-kung/bf16_mul_const = .022243
+  [408] cadical/comba+ripple/bf16_mul_const = .032303
+  [412] cadical/comba+brent-kung/bf16_mul_const = .032220
+  [409] cryptominisat/comba+ripple/bf16_mul_const = .041665
+  [413] cryptominisat/comba+brent-kung/bf16_mul_const = .041614
+  [411] mergesat/comba+ripple/bf16_mul_const = .088370
+  [415] mergesat/comba+brent-kung/bf16_mul_const = .087998
+  [422] minisat/comba-cs+ripple/bf16_mul_const = .021297
+  [418] minisat/comba+g-only/bf16_mul_const = .022281
+  [420] cadical/comba-cs+ripple/bf16_mul_const = .028216
+  [416] cadical/comba+g-only/bf16_mul_const = .032308
+  [421] cryptominisat/comba-cs+ripple/bf16_mul_const = .032923
+  [417] cryptominisat/comba+g-only/bf16_mul_const = .041360
+  [423] mergesat/comba-cs+ripple/bf16_mul_const = .047681
+  [419] mergesat/comba+g-only/bf16_mul_const = .088084
+  [426] minisat/comba-cs+brent-kung/bf16_mul_const = .021373
+  [430] minisat/comba-cs+g-only/bf16_mul_const = .021350
+  [424] cadical/comba-cs+brent-kung/bf16_mul_const = .028354
+  [428] cadical/comba-cs+g-only/bf16_mul_const = .028410
+  [425] cryptominisat/comba-cs+brent-kung/bf16_mul_const = .033094
+  [429] cryptominisat/comba-cs+g-only/bf16_mul_const = .033069
+  [427] mergesat/comba-cs+brent-kung/bf16_mul_const = .047884
+  [431] mergesat/comba-cs+g-only/bf16_mul_const = .047899
+  [436] cadical/shift-add+brent-kung/bf16_mul_mono = 29.050125
+  [432] cadical/shift-add+ripple/bf16_mul_mono = 29.117275
+  [437] cryptominisat/shift-add+brent-kung/bf16_mul_mono = 52.931295
+  [433] cryptominisat/shift-add+ripple/bf16_mul_mono = 52.800567
+  [439] mergesat/shift-add+brent-kung/bf16_mul_mono = 96.169133
+  [435] mergesat/shift-add+ripple/bf16_mul_mono = 96.149046
+  [434] minisat/shift-add+ripple/bf16_mul_mono = T/O
+  [438] minisat/shift-add+brent-kung/bf16_mul_mono = T/O
+  [440] cadical/shift-add+g-only/bf16_mul_mono = 29.204834
+  [444] cadical/dadda+ripple/bf16_mul_mono = 32.473508
+  [441] cryptominisat/shift-add+g-only/bf16_mul_mono = 53.389295
+  [447] mergesat/dadda+ripple/bf16_mul_mono = 94.817867
+  [445] cryptominisat/dadda+ripple/bf16_mul_mono = 95.896065
+  [443] mergesat/shift-add+g-only/bf16_mul_mono = 96.090812
+  [442] minisat/shift-add+g-only/bf16_mul_mono = T/O
+  [446] minisat/dadda+ripple/bf16_mul_mono = T/O
+  [452] cadical/dadda+g-only/bf16_mul_mono = 32.609854
+  [448] cadical/dadda+brent-kung/bf16_mul_mono = 32.703891
+  [455] mergesat/dadda+g-only/bf16_mul_mono = 96.934341
+  [451] mergesat/dadda+brent-kung/bf16_mul_mono = 97.502971
+  [453] cryptominisat/dadda+g-only/bf16_mul_mono = 98.159066
+  [449] cryptominisat/dadda+brent-kung/bf16_mul_mono = 98.432958
+  [450] minisat/dadda+brent-kung/bf16_mul_mono = T/O
+  [454] minisat/dadda+g-only/bf16_mul_mono = T/O
+  [460] cadical/comba+brent-kung/bf16_mul_mono = 27.615887
+  [456] cadical/comba+ripple/bf16_mul_mono = 27.503640
+  [457] cryptominisat/comba+ripple/bf16_mul_mono = 88.645598
+  [461] cryptominisat/comba+brent-kung/bf16_mul_mono = 89.548114
+  [459] mergesat/comba+ripple/bf16_mul_mono = 102.923897
+  [463] mergesat/comba+brent-kung/bf16_mul_mono = 101.813147
+  [458] minisat/comba+ripple/bf16_mul_mono = T/O
+  [462] minisat/comba+brent-kung/bf16_mul_mono = T/O
+  [464] cadical/comba+g-only/bf16_mul_mono = 27.507965
+  [468] cadical/comba-cs+ripple/bf16_mul_mono = 29.040826
+  [469] cryptominisat/comba-cs+ripple/bf16_mul_mono = 73.193837
+  [465] cryptominisat/comba+g-only/bf16_mul_mono = 88.726199
+  [467] mergesat/comba+g-only/bf16_mul_mono = 102.657583
+  [471] mergesat/comba-cs+ripple/bf16_mul_mono = 111.449684
+  [466] minisat/comba+g-only/bf16_mul_mono = T/O
+  [470] minisat/comba-cs+ripple/bf16_mul_mono = T/O
+  [472] cadical/comba-cs+brent-kung/bf16_mul_mono = 28.985888
+  [476] cadical/comba-cs+g-only/bf16_mul_mono = 29.056239
+  [473] cryptominisat/comba-cs+brent-kung/bf16_mul_mono = 72.887522
+  [477] cryptominisat/comba-cs+g-only/bf16_mul_mono = 72.928225
+  [475] mergesat/comba-cs+brent-kung/bf16_mul_mono = 113.133927
+  [479] mergesat/comba-cs+g-only/bf16_mul_mono = 112.884395
+  [474] minisat/comba-cs+brent-kung/bf16_mul_mono = T/O
+  [478] minisat/comba-cs+g-only/bf16_mul_mono = T/O
+  [484] cadical/shift-add+brent-kung/checked_mul_16 = .389478
+  [480] cadical/shift-add+ripple/checked_mul_16 = .390099
+  [487] mergesat/shift-add+brent-kung/checked_mul_16 = 9.075156
+  [483] mergesat/shift-add+ripple/checked_mul_16 = 9.111964
+  [486] minisat/shift-add+brent-kung/checked_mul_16 = 21.887036
+  [482] minisat/shift-add+ripple/checked_mul_16 = 21.909478
+  [485] cryptominisat/shift-add+brent-kung/checked_mul_16 = 43.366389
+  [481] cryptominisat/shift-add+ripple/checked_mul_16 = 43.364260
+  [492] cadical/dadda+ripple/checked_mul_16 = .310908
+  [488] cadical/shift-add+g-only/checked_mul_16 = .390014
+  [491] mergesat/shift-add+g-only/checked_mul_16 = 9.161276
+  [494] minisat/dadda+ripple/checked_mul_16 = 9.579508
+  [495] mergesat/dadda+ripple/checked_mul_16 = 10.047379
+  [490] minisat/shift-add+g-only/checked_mul_16 = 21.911272
+  [493] cryptominisat/dadda+ripple/checked_mul_16 = 24.102250
+  [489] cryptominisat/shift-add+g-only/checked_mul_16 = 42.607949
+  [500] cadical/dadda+g-only/checked_mul_16 = .278867
+  [496] cadical/dadda+brent-kung/checked_mul_16 = .390056
+  [502] minisat/dadda+g-only/checked_mul_16 = 4.983060
+  [503] mergesat/dadda+g-only/checked_mul_16 = 5.633908
+  [499] mergesat/dadda+brent-kung/checked_mul_16 = 6.765176
+  [501] cryptominisat/dadda+g-only/checked_mul_16 = 19.242295
+  [498] minisat/dadda+brent-kung/checked_mul_16 = 22.883664
+  [497] cryptominisat/dadda+brent-kung/checked_mul_16 = 23.823434
+  [504] cadical/comba+ripple/checked_mul_16 = .608348
+  [511] mergesat/comba+brent-kung/checked_mul_16 = T/O
+  [509] cryptominisat/comba+brent-kung/checked_mul_16 = T/O
+  [510] minisat/comba+brent-kung/checked_mul_16 = T/O
+  [508] cadical/comba+brent-kung/checked_mul_16 = T/O
+  [507] mergesat/comba+ripple/checked_mul_16 = 15.016138
+  [505] cryptominisat/comba+ripple/checked_mul_16 = 44.799909
+  [506] minisat/comba+ripple/checked_mul_16 = T/O
+  [512] cadical/comba+g-only/checked_mul_16 = .627567
+  [515] mergesat/comba+g-only/checked_mul_16 = 12.093420
+  [516] cadical/comba-cs+ripple/checked_mul_16 = 14.100284
+  [514] minisat/comba+g-only/checked_mul_16 = 32.641392
+  [519] mergesat/comba-cs+ripple/checked_mul_16 = 43.121834
+  [513] cryptominisat/comba+g-only/checked_mul_16 = 49.387822
+  [518] minisat/comba-cs+ripple/checked_mul_16 = 56.394625
+  [517] cryptominisat/comba-cs+ripple/checked_mul_16 = 109.290428
+  [520] cadical/comba-cs+brent-kung/checked_mul_16 = 14.155003
+  [524] cadical/comba-cs+g-only/checked_mul_16 = 14.209253
+  [527] mergesat/comba-cs+g-only/checked_mul_16 = 44.327066
+  [523] mergesat/comba-cs+brent-kung/checked_mul_16 = 44.212831
+  [522] minisat/comba-cs+brent-kung/checked_mul_16 = 56.410634
+  [526] minisat/comba-cs+g-only/checked_mul_16 = 56.433080
+  [521] cryptominisat/comba-cs+brent-kung/checked_mul_16 = 111.652528
+  [525] cryptominisat/comba-cs+g-only/checked_mul_16 = 111.333421
+  [530] minisat/shift-add+ripple/comm_16 = T/O
+  [528] cadical/shift-add+ripple/comm_16 = T/O
+  [534] minisat/shift-add+brent-kung/comm_16 = T/O
+  [532] cadical/shift-add+brent-kung/comm_16 = T/O
+  [529] cryptominisat/shift-add+ripple/comm_16 = T/O
+  [533] cryptominisat/shift-add+brent-kung/comm_16 = T/O
+  [531] mergesat/shift-add+ripple/comm_16 = T/O
+  [535] mergesat/shift-add+brent-kung/comm_16 = T/O
+  [536] cadical/shift-add+g-only/comm_16 = T/O
+  [542] minisat/dadda+ripple/comm_16 = T/O
+  [538] minisat/shift-add+g-only/comm_16 = T/O
+  [540] cadical/dadda+ripple/comm_16 = T/O
+  [537] cryptominisat/shift-add+g-only/comm_16 = T/O
+  [541] cryptominisat/dadda+ripple/comm_16 = T/O
+  [539] mergesat/shift-add+g-only/comm_16 = T/O
+  [543] mergesat/dadda+ripple/comm_16 = T/O
+  [544] cadical/dadda+brent-kung/comm_16 = T/O
+  [546] minisat/dadda+brent-kung/comm_16 = T/O
+  [550] minisat/dadda+g-only/comm_16 = T/O
+  [548] cadical/dadda+g-only/comm_16 = T/O
+  [545] cryptominisat/dadda+brent-kung/comm_16 = T/O
+  [549] cryptominisat/dadda+g-only/comm_16 = T/O
+  [547] mergesat/dadda+brent-kung/comm_16 = T/O
+  [551] mergesat/dadda+g-only/comm_16 = T/O
+  [556] cadical/comba+brent-kung/comm_16 = T/O
+  [559] mergesat/comba+brent-kung/comm_16 = T/O
+  [557] cryptominisat/comba+brent-kung/comm_16 = T/O
+  [558] minisat/comba+brent-kung/comm_16 = T/O
+  [552] cadical/comba+ripple/comm_16 = 34.322177
+  [554] minisat/comba+ripple/comm_16 = T/O
+  [553] cryptominisat/comba+ripple/comm_16 = T/O
+  [555] mergesat/comba+ripple/comm_16 = T/O
+  [564] cadical/comba-cs+ripple/comm_16 = 5.462132
+  [567] mergesat/comba-cs+ripple/comm_16 = 12.643705
+  [560] cadical/comba+g-only/comm_16 = 24.564791
+  [562] minisat/comba+g-only/comm_16 = T/O
+  [566] minisat/comba-cs+ripple/comm_16 = T/O
+  [561] cryptominisat/comba+g-only/comm_16 = T/O
+  [565] cryptominisat/comba-cs+ripple/comm_16 = T/O
+  [563] mergesat/comba+g-only/comm_16 = T/O
+  [568] cadical/comba-cs+brent-kung/comm_16 = 5.463140
+  [572] cadical/comba-cs+g-only/comm_16 = 5.469673
+  [575] mergesat/comba-cs+g-only/comm_16 = 12.548246
+  [571] mergesat/comba-cs+brent-kung/comm_16 = 12.564734
+  [570] minisat/comba-cs+brent-kung/comm_16 = T/O
+  [574] minisat/comba-cs+g-only/comm_16 = T/O
+  [569] cryptominisat/comba-cs+brent-kung/comm_16 = T/O
+  [573] cryptominisat/comba-cs+g-only/comm_16 = T/O
+  [576] cadical/shift-add+ripple/comm_20 = T/O
+  [580] cadical/shift-add+brent-kung/comm_20 = T/O
+  [578] minisat/shift-add+ripple/comm_20 = T/O
+  [582] minisat/shift-add+brent-kung/comm_20 = T/O
+  [577] cryptominisat/shift-add+ripple/comm_20 = T/O
+  [581] cryptominisat/shift-add+brent-kung/comm_20 = T/O
+  [579] mergesat/shift-add+ripple/comm_20 = T/O
+  [583] mergesat/shift-add+brent-kung/comm_20 = T/O
+  [584] cadical/shift-add+g-only/comm_20 = T/O
+  [586] minisat/shift-add+g-only/comm_20 = T/O
+  [588] cadical/dadda+ripple/comm_20 = T/O
+  [590] minisat/dadda+ripple/comm_20 = T/O
+  [589] cryptominisat/dadda+ripple/comm_20 = T/O
+  [585] cryptominisat/shift-add+g-only/comm_20 = T/O
+  [587] mergesat/shift-add+g-only/comm_20 = T/O
+  [591] mergesat/dadda+ripple/comm_20 = T/O
+  [596] cadical/dadda+g-only/comm_20 = T/O
+  [592] cadical/dadda+brent-kung/comm_20 = T/O
+  [594] minisat/dadda+brent-kung/comm_20 = T/O
+  [598] minisat/dadda+g-only/comm_20 = T/O
+  [593] cryptominisat/dadda+brent-kung/comm_20 = T/O
+  [597] cryptominisat/dadda+g-only/comm_20 = T/O
+  [595] mergesat/dadda+brent-kung/comm_20 = T/O
+  [599] mergesat/dadda+g-only/comm_20 = T/O
+  [605] cryptominisat/comba+brent-kung/comm_20 = T/O
+  [604] cadical/comba+brent-kung/comm_20 = T/O
+  [606] minisat/comba+brent-kung/comm_20 = T/O
+  [607] mergesat/comba+brent-kung/comm_20 = T/O
+  [600] cadical/comba+ripple/comm_20 = T/O
+  [602] minisat/comba+ripple/comm_20 = T/O
+  [601] cryptominisat/comba+ripple/comm_20 = T/O
+  [603] mergesat/comba+ripple/comm_20 = T/O
+  [612] cadical/comba-cs+ripple/comm_20 = 35.206339
+  [615] mergesat/comba-cs+ripple/comm_20 = 48.497227
+  [608] cadical/comba+g-only/comm_20 = T/O
+  [610] minisat/comba+g-only/comm_20 = T/O
+  [614] minisat/comba-cs+ripple/comm_20 = T/O
+  [609] cryptominisat/comba+g-only/comm_20 = T/O
+  [613] cryptominisat/comba-cs+ripple/comm_20 = T/O
+  [611] mergesat/comba+g-only/comm_20 = T/O
+  [616] cadical/comba-cs+brent-kung/comm_20 = 35.040653
+  [620] cadical/comba-cs+g-only/comm_20 = 35.194252
+  [623] mergesat/comba-cs+g-only/comm_20 = 48.096192
+  [619] mergesat/comba-cs+brent-kung/comm_20 = 48.260716
+  [618] minisat/comba-cs+brent-kung/comm_20 = T/O
+  [622] minisat/comba-cs+g-only/comm_20 = T/O
+  [617] cryptominisat/comba-cs+brent-kung/comm_20 = T/O
+  [621] cryptominisat/comba-cs+g-only/comm_20 = T/O
+  [624] cadical/shift-add+ripple/comm_32 = T/O
+  [628] cadical/shift-add+brent-kung/comm_32 = T/O
+  [625] cryptominisat/shift-add+ripple/comm_32 = T/O
+  [626] minisat/shift-add+ripple/comm_32 = T/O
+  [630] minisat/shift-add+brent-kung/comm_32 = T/O
+  [629] cryptominisat/shift-add+brent-kung/comm_32 = T/O
+  [627] mergesat/shift-add+ripple/comm_32 = T/O
+  [631] mergesat/shift-add+brent-kung/comm_32 = T/O
+  [632] cadical/shift-add+g-only/comm_32 = T/O
+  [636] cadical/dadda+ripple/comm_32 = T/O
+  [633] cryptominisat/shift-add+g-only/comm_32 = T/O
+  [634] minisat/shift-add+g-only/comm_32 = T/O
+  [638] minisat/dadda+ripple/comm_32 = T/O
+  [637] cryptominisat/dadda+ripple/comm_32 = T/O
+  [635] mergesat/shift-add+g-only/comm_32 = T/O
+  [639] mergesat/dadda+ripple/comm_32 = T/O
+  [644] cadical/dadda+g-only/comm_32 = T/O
+  [640] cadical/dadda+brent-kung/comm_32 = T/O
+  [646] minisat/dadda+g-only/comm_32 = T/O
+  [641] cryptominisat/dadda+brent-kung/comm_32 = T/O
+  [642] minisat/dadda+brent-kung/comm_32 = T/O
+  [645] cryptominisat/dadda+g-only/comm_32 = T/O
+  [643] mergesat/dadda+brent-kung/comm_32 = T/O
+  [647] mergesat/dadda+g-only/comm_32 = T/O
+  [654] minisat/comba+brent-kung/comm_32 = T/O
+  [652] cadical/comba+brent-kung/comm_32 = T/O
+  [653] cryptominisat/comba+brent-kung/comm_32 = T/O
+  [655] mergesat/comba+brent-kung/comm_32 = T/O
+  [648] cadical/comba+ripple/comm_32 = T/O
+  [649] cryptominisat/comba+ripple/comm_32 = T/O
+  [650] minisat/comba+ripple/comm_32 = T/O
+  [651] mergesat/comba+ripple/comm_32 = T/O
+  [656] cadical/comba+g-only/comm_32 = T/O
+  [660] cadical/comba-cs+ripple/comm_32 = T/O
+  [662] minisat/comba-cs+ripple/comm_32 = T/O
+  [658] minisat/comba+g-only/comm_32 = T/O
+  [657] cryptominisat/comba+g-only/comm_32 = T/O
+  [661] cryptominisat/comba-cs+ripple/comm_32 = T/O
+  [659] mergesat/comba+g-only/comm_32 = T/O
+  [663] mergesat/comba-cs+ripple/comm_32 = T/O
+  [664] cadical/comba-cs+brent-kung/comm_32 = T/O
+  [668] cadical/comba-cs+g-only/comm_32 = T/O
+  [666] minisat/comba-cs+brent-kung/comm_32 = T/O
+  [670] minisat/comba-cs+g-only/comm_32 = T/O
+  [665] cryptominisat/comba-cs+brent-kung/comm_32 = T/O
+  [669] cryptominisat/comba-cs+g-only/comm_32 = T/O
+  [667] mergesat/comba-cs+brent-kung/comm_32 = T/O
+  [671] mergesat/comba-cs+g-only/comm_32 = T/O
+  [672] cadical/shift-add+ripple/comm_8 = .690885
+  [676] cadical/shift-add+brent-kung/comm_8 = .691803
+  [677] cryptominisat/shift-add+brent-kung/comm_8 = 1.651982
+  [673] cryptominisat/shift-add+ripple/comm_8 = 1.663031
+  [678] minisat/shift-add+brent-kung/comm_8 = 2.071197
+  [674] minisat/shift-add+ripple/comm_8 = 2.073609
+  [679] mergesat/shift-add+brent-kung/comm_8 = 2.643338
+  [675] mergesat/shift-add+ripple/comm_8 = 2.651595
+  [684] cadical/dadda+ripple/comm_8 = .147723
+  [686] minisat/dadda+ripple/comm_8 = .370014
+  [680] cadical/shift-add+g-only/comm_8 = .691794
+  [687] mergesat/dadda+ripple/comm_8 = .962544
+  [685] cryptominisat/dadda+ripple/comm_8 = 1.128911
+  [681] cryptominisat/shift-add+g-only/comm_8 = 1.644290
+  [682] minisat/shift-add+g-only/comm_8 = 2.073663
+  [683] mergesat/shift-add+g-only/comm_8 = 2.645744
+  [692] cadical/dadda+g-only/comm_8 = .161489
+  [688] cadical/dadda+brent-kung/comm_8 = .194973
+  [694] minisat/dadda+g-only/comm_8 = .399475
+  [690] minisat/dadda+brent-kung/comm_8 = .437170
+  [691] mergesat/dadda+brent-kung/comm_8 = .693864
+  [695] mergesat/dadda+g-only/comm_8 = 1.010531
+  [693] cryptominisat/dadda+g-only/comm_8 = 1.049013
+  [689] cryptominisat/dadda+brent-kung/comm_8 = 1.179381
+  [696] cadical/comba+ripple/comm_8 = .093848
+  [698] minisat/comba+ripple/comm_8 = .177712
+  [699] mergesat/comba+ripple/comm_8 = .384490
+  [697] cryptominisat/comba+ripple/comm_8 = .548660
+  [701] cryptominisat/comba+brent-kung/comm_8 = T/O
+  [700] cadical/comba+brent-kung/comm_8 = T/O
+  [703] mergesat/comba+brent-kung/comm_8 = T/O
+  [702] minisat/comba+brent-kung/comm_8 = T/O
+  [708] cadical/comba-cs+ripple/comm_8 = .088407
+  [704] cadical/comba+g-only/comm_8 = .091914
+  [706] minisat/comba+g-only/comm_8 = .210111
+  [707] mergesat/comba+g-only/comm_8 = .238943
+  [711] mergesat/comba-cs+ripple/comm_8 = .399685
+  [710] minisat/comba-cs+ripple/comm_8 = .453267
+  [705] cryptominisat/comba+g-only/comm_8 = .535451
+  [709] cryptominisat/comba-cs+ripple/comm_8 = 1.389884
+  [712] cadical/comba-cs+brent-kung/comm_8 = .088276
+  [716] cadical/comba-cs+g-only/comm_8 = .088307
+  [715] mergesat/comba-cs+brent-kung/comm_8 = .399073
+  [719] mergesat/comba-cs+g-only/comm_8 = .400141
+  [718] minisat/comba-cs+g-only/comm_8 = .452430
+  [714] minisat/comba-cs+brent-kung/comm_8 = .453494
+  [717] cryptominisat/comba-cs+g-only/comm_8 = 1.399805
+  [713] cryptominisat/comba-cs+brent-kung/comm_8 = 1.406364
+  [720] cadical/shift-add+ripple/crypto_square_mod = .017582
+  [724] cadical/shift-add+brent-kung/crypto_square_mod = .021169
+  [722] minisat/shift-add+ripple/crypto_square_mod = .035347
+  [725] cryptominisat/shift-add+brent-kung/crypto_square_mod = .038129
+  [726] minisat/shift-add+brent-kung/crypto_square_mod = .039795
+  [723] mergesat/shift-add+ripple/crypto_square_mod = .062094
+  [721] cryptominisat/shift-add+ripple/crypto_square_mod = .086679
+  [727] mergesat/shift-add+brent-kung/crypto_square_mod = .165133
+  [732] cadical/dadda+ripple/crypto_square_mod = .017496
+  [728] cadical/shift-add+g-only/crypto_square_mod = .018392
+  [733] cryptominisat/dadda+ripple/crypto_square_mod = .033741
+  [734] minisat/dadda+ripple/crypto_square_mod = .034319
+  [730] minisat/shift-add+g-only/crypto_square_mod = .035241
+  [735] mergesat/dadda+ripple/crypto_square_mod = .054072
+  [731] mergesat/shift-add+g-only/crypto_square_mod = .059090
+  [729] cryptominisat/shift-add+g-only/crypto_square_mod = .189340
+  [740] cadical/dadda+g-only/crypto_square_mod = .018619
+  [736] cadical/dadda+brent-kung/crypto_square_mod = .021851
+  [741] cryptominisat/dadda+g-only/crypto_square_mod = .033288
+  [742] minisat/dadda+g-only/crypto_square_mod = .035776
+  [738] minisat/dadda+brent-kung/crypto_square_mod = .040753
+  [739] mergesat/dadda+brent-kung/crypto_square_mod = .068105
+  [743] mergesat/dadda+g-only/crypto_square_mod = .102727
+  [737] cryptominisat/dadda+brent-kung/crypto_square_mod = .211491
+  [744] cadical/comba+ripple/crypto_square_mod = .019219
+  [746] minisat/comba+ripple/crypto_square_mod = .037279
+  [747] mergesat/comba+ripple/crypto_square_mod = .063116
+  [745] cryptominisat/comba+ripple/crypto_square_mod = .435311
+  [750] minisat/comba+brent-kung/crypto_square_mod = T/O
+  [751] mergesat/comba+brent-kung/crypto_square_mod = T/O
+  [748] cadical/comba+brent-kung/crypto_square_mod = T/O
+  [749] cryptominisat/comba+brent-kung/crypto_square_mod = T/O
+  [756] cadical/comba-cs+ripple/crypto_square_mod = .020108
+  [752] cadical/comba+g-only/crypto_square_mod = .021378
+  [758] minisat/comba-cs+ripple/crypto_square_mod = .037547
+  [754] minisat/comba+g-only/crypto_square_mod = .039925
+  [753] cryptominisat/comba+g-only/crypto_square_mod = .065287
+  [755] mergesat/comba+g-only/crypto_square_mod = .068166
+  [759] mergesat/comba-cs+ripple/crypto_square_mod = .070184
+  [757] cryptominisat/comba-cs+ripple/crypto_square_mod = .070916
+  [764] cadical/comba-cs+g-only/crypto_square_mod = .020329
+  [760] cadical/comba-cs+brent-kung/crypto_square_mod = .024365
+  [766] minisat/comba-cs+g-only/crypto_square_mod = .039635
+  [762] minisat/comba-cs+brent-kung/crypto_square_mod = .042613
+  [767] mergesat/comba-cs+g-only/crypto_square_mod = .062467
+  [763] mergesat/comba-cs+brent-kung/crypto_square_mod = .062798
+  [765] cryptominisat/comba-cs+g-only/crypto_square_mod = .114401
+  [761] cryptominisat/comba-cs+brent-kung/crypto_square_mod = .116585
+  [768] cadical/shift-add+ripple/distrib_16 = T/O
+  [772] cadical/shift-add+brent-kung/distrib_16 = T/O
+  [770] minisat/shift-add+ripple/distrib_16 = T/O
+  [769] cryptominisat/shift-add+ripple/distrib_16 = T/O
+  [774] minisat/shift-add+brent-kung/distrib_16 = T/O
+  [773] cryptominisat/shift-add+brent-kung/distrib_16 = T/O
+  [775] mergesat/shift-add+brent-kung/distrib_16 = T/O
+  [771] mergesat/shift-add+ripple/distrib_16 = T/O
+  [778] minisat/shift-add+g-only/distrib_16 = T/O
+  [776] cadical/shift-add+g-only/distrib_16 = T/O
+  [780] cadical/dadda+ripple/distrib_16 = T/O
+  [782] minisat/dadda+ripple/distrib_16 = T/O
+  [777] cryptominisat/shift-add+g-only/distrib_16 = T/O
+  [781] cryptominisat/dadda+ripple/distrib_16 = T/O
+  [783] mergesat/dadda+ripple/distrib_16 = T/O
+  [779] mergesat/shift-add+g-only/distrib_16 = T/O
+  [784] cadical/dadda+brent-kung/distrib_16 = T/O
+  [788] cadical/dadda+g-only/distrib_16 = T/O
+  [786] minisat/dadda+brent-kung/distrib_16 = T/O
+  [790] minisat/dadda+g-only/distrib_16 = T/O
+  [785] cryptominisat/dadda+brent-kung/distrib_16 = T/O
+  [789] cryptominisat/dadda+g-only/distrib_16 = T/O
+  [787] mergesat/dadda+brent-kung/distrib_16 = T/O
+  [791] mergesat/dadda+g-only/distrib_16 = T/O
+  [796] cadical/comba+brent-kung/distrib_16 = T/O
+  [797] cryptominisat/comba+brent-kung/distrib_16 = T/O
+  [798] minisat/comba+brent-kung/distrib_16 = T/O
+  [799] mergesat/comba+brent-kung/distrib_16 = T/O
+  [792] cadical/comba+ripple/distrib_16 = T/O
+  [794] minisat/comba+ripple/distrib_16 = T/O
+  [793] cryptominisat/comba+ripple/distrib_16 = T/O
+  [795] mergesat/comba+ripple/distrib_16 = T/O
+  [800] cadical/comba+g-only/distrib_16 = T/O
+  [804] cadical/comba-cs+ripple/distrib_16 = T/O
+  [806] minisat/comba-cs+ripple/distrib_16 = T/O
+  [802] minisat/comba+g-only/distrib_16 = T/O
+  [801] cryptominisat/comba+g-only/distrib_16 = T/O
+  [805] cryptominisat/comba-cs+ripple/distrib_16 = T/O
+  [803] mergesat/comba+g-only/distrib_16 = T/O
+  [807] mergesat/comba-cs+ripple/distrib_16 = T/O
+  [808] cadical/comba-cs+brent-kung/distrib_16 = T/O
+  [812] cadical/comba-cs+g-only/distrib_16 = T/O
+  [810] minisat/comba-cs+brent-kung/distrib_16 = T/O
+  [814] minisat/comba-cs+g-only/distrib_16 = T/O
+  [809] cryptominisat/comba-cs+brent-kung/distrib_16 = T/O
+  [813] cryptominisat/comba-cs+g-only/distrib_16 = T/O
+  [815] mergesat/comba-cs+g-only/distrib_16 = T/O
+  [811] mergesat/comba-cs+brent-kung/distrib_16 = T/O
+  [816] cadical/shift-add+ripple/distrib_8 = 83.275756
+  [818] minisat/shift-add+ripple/distrib_8 = T/O
+  [822] minisat/shift-add+brent-kung/distrib_8 = T/O
+  [820] cadical/shift-add+brent-kung/distrib_8 = T/O
+  [817] cryptominisat/shift-add+ripple/distrib_8 = T/O
+  [821] cryptominisat/shift-add+brent-kung/distrib_8 = T/O
+  [819] mergesat/shift-add+ripple/distrib_8 = T/O
+  [823] mergesat/shift-add+brent-kung/distrib_8 = T/O
+  [824] cadical/shift-add+g-only/distrib_8 = 72.728087
+  [826] minisat/shift-add+g-only/distrib_8 = T/O
+  [830] minisat/dadda+ripple/distrib_8 = T/O
+  [828] cadical/dadda+ripple/distrib_8 = T/O
+  [825] cryptominisat/shift-add+g-only/distrib_8 = T/O
+  [829] cryptominisat/dadda+ripple/distrib_8 = T/O
+  [827] mergesat/shift-add+g-only/distrib_8 = T/O
+  [831] mergesat/dadda+ripple/distrib_8 = T/O
+  [834] minisat/dadda+brent-kung/distrib_8 = T/O
+  [838] minisat/dadda+g-only/distrib_8 = T/O
+  [832] cadical/dadda+brent-kung/distrib_8 = T/O
+  [836] cadical/dadda+g-only/distrib_8 = T/O
+  [833] cryptominisat/dadda+brent-kung/distrib_8 = T/O
+  [837] cryptominisat/dadda+g-only/distrib_8 = T/O
+  [835] mergesat/dadda+brent-kung/distrib_8 = T/O
+  [839] mergesat/dadda+g-only/distrib_8 = T/O
+  [845] cryptominisat/comba+brent-kung/distrib_8 = T/O
+  [846] minisat/comba+brent-kung/distrib_8 = T/O
+  [847] mergesat/comba+brent-kung/distrib_8 = T/O
+  [844] cadical/comba+brent-kung/distrib_8 = T/O
+  [842] minisat/comba+ripple/distrib_8 = T/O
+  [840] cadical/comba+ripple/distrib_8 = T/O
+  [841] cryptominisat/comba+ripple/distrib_8 = T/O
+  [843] mergesat/comba+ripple/distrib_8 = T/O
+  [850] minisat/comba+g-only/distrib_8 = T/O
+  [848] cadical/comba+g-only/distrib_8 = T/O
+  [854] minisat/comba-cs+ripple/distrib_8 = T/O
+  [852] cadical/comba-cs+ripple/distrib_8 = T/O
+  [849] cryptominisat/comba+g-only/distrib_8 = T/O
+  [853] cryptominisat/comba-cs+ripple/distrib_8 = T/O
+  [851] mergesat/comba+g-only/distrib_8 = T/O
+  [855] mergesat/comba-cs+ripple/distrib_8 = T/O
+  [858] minisat/comba-cs+brent-kung/distrib_8 = T/O
+  [862] minisat/comba-cs+g-only/distrib_8 = T/O
+  [856] cadical/comba-cs+brent-kung/distrib_8 = T/O
+  [860] cadical/comba-cs+g-only/distrib_8 = T/O
+  [857] cryptominisat/comba-cs+brent-kung/distrib_8 = T/O
+  [861] cryptominisat/comba-cs+g-only/distrib_8 = T/O
+  [859] mergesat/comba-cs+brent-kung/distrib_8 = T/O
+  [863] mergesat/comba-cs+g-only/distrib_8 = T/O
+  [864] cadical/shift-add+ripple/div_mul_roundtrip_12 = 4.148011
+  [868] cadical/shift-add+brent-kung/div_mul_roundtrip_12 = 6.034574
+  [865] cryptominisat/shift-add+ripple/div_mul_roundtrip_12 = 9.168715
+  [867] mergesat/shift-add+ripple/div_mul_roundtrip_12 = 11.432951
+  [866] minisat/shift-add+ripple/div_mul_roundtrip_12 = 13.182310
+  [869] cryptominisat/shift-add+brent-kung/div_mul_roundtrip_12 = 13.899413
+  [871] mergesat/shift-add+brent-kung/div_mul_roundtrip_12 = 15.168715
+  [870] minisat/shift-add+brent-kung/div_mul_roundtrip_12 = 18.047794
+  [876] cadical/dadda+ripple/div_mul_roundtrip_12 = 3.849845
+  [872] cadical/shift-add+g-only/div_mul_roundtrip_12 = 3.943679
+  [877] cryptominisat/dadda+ripple/div_mul_roundtrip_12 = 9.373622
+  [873] cryptominisat/shift-add+g-only/div_mul_roundtrip_12 = 9.562391
+  [875] mergesat/shift-add+g-only/div_mul_roundtrip_12 = 10.319492
+  [879] mergesat/dadda+ripple/div_mul_roundtrip_12 = 11.329325
+  [874] minisat/shift-add+g-only/div_mul_roundtrip_12 = 11.858726
+  [878] minisat/dadda+ripple/div_mul_roundtrip_12 = 12.118052
+  [884] cadical/dadda+g-only/div_mul_roundtrip_12 = 4.169895
+  [880] cadical/dadda+brent-kung/div_mul_roundtrip_12 = 5.695551
+  [885] cryptominisat/dadda+g-only/div_mul_roundtrip_12 = 10.143396
+  [887] mergesat/dadda+g-only/div_mul_roundtrip_12 = 11.994233
+  [886] minisat/dadda+g-only/div_mul_roundtrip_12 = 13.324546
+  [881] cryptominisat/dadda+brent-kung/div_mul_roundtrip_12 = 14.182296
+  [883] mergesat/dadda+brent-kung/div_mul_roundtrip_12 = 15.572605
+  [882] minisat/dadda+brent-kung/div_mul_roundtrip_12 = 20.643593
+  [894] minisat/comba+brent-kung/div_mul_roundtrip_12 = T/O
+  [895] mergesat/comba+brent-kung/div_mul_roundtrip_12 = T/O
+  [892] cadical/comba+brent-kung/div_mul_roundtrip_12 = T/O
+  [888] cadical/comba+ripple/div_mul_roundtrip_12 = 4.092786
+  [893] cryptominisat/comba+brent-kung/div_mul_roundtrip_12 = T/O
+  [889] cryptominisat/comba+ripple/div_mul_roundtrip_12 = 9.950772
+  [891] mergesat/comba+ripple/div_mul_roundtrip_12 = 11.261020
+  [890] minisat/comba+ripple/div_mul_roundtrip_12 = 12.527876
+  [896] cadical/comba+g-only/div_mul_roundtrip_12 = 3.815284
+  [900] cadical/comba-cs+ripple/div_mul_roundtrip_12 = 3.917437
+  [897] cryptominisat/comba+g-only/div_mul_roundtrip_12 = 10.091882
+  [901] cryptominisat/comba-cs+ripple/div_mul_roundtrip_12 = 10.308402
+  [899] mergesat/comba+g-only/div_mul_roundtrip_12 = 12.017258
+  [898] minisat/comba+g-only/div_mul_roundtrip_12 = 12.742163
+  [903] mergesat/comba-cs+ripple/div_mul_roundtrip_12 = 13.336288
+  [902] minisat/comba-cs+ripple/div_mul_roundtrip_12 = 14.146099
+  [908] cadical/comba-cs+g-only/div_mul_roundtrip_12 = 3.980368
+  [904] cadical/comba-cs+brent-kung/div_mul_roundtrip_12 = 6.028286
+  [909] cryptominisat/comba-cs+g-only/div_mul_roundtrip_12 = 9.721551
+  [910] minisat/comba-cs+g-only/div_mul_roundtrip_12 = 10.813486
+  [911] mergesat/comba-cs+g-only/div_mul_roundtrip_12 = 11.271427
+  [905] cryptominisat/comba-cs+brent-kung/div_mul_roundtrip_12 = 13.724703
+  [907] mergesat/comba-cs+brent-kung/div_mul_roundtrip_12 = 16.310162
+  [906] minisat/comba-cs+brent-kung/div_mul_roundtrip_12 = 18.484834
+  [916] cadical/shift-add+brent-kung/equiv_unsat_8add_16 = .012473
+  [912] cadical/shift-add+ripple/equiv_unsat_8add_16 = .057475
+  [915] mergesat/shift-add+ripple/equiv_unsat_8add_16 = .070993
+  [914] minisat/shift-add+ripple/equiv_unsat_8add_16 = .071186
+  [918] minisat/shift-add+brent-kung/equiv_unsat_8add_16 = .101945
+  [919] mergesat/shift-add+brent-kung/equiv_unsat_8add_16 = .142606
+  [913] cryptominisat/shift-add+ripple/equiv_unsat_8add_16 = .391472
+  [917] cryptominisat/shift-add+brent-kung/equiv_unsat_8add_16 = .489351
+  [920] cadical/shift-add+g-only/equiv_unsat_8add_16 = .047531
+  [924] cadical/dadda+ripple/equiv_unsat_8add_16 = .057667
+  [922] minisat/shift-add+g-only/equiv_unsat_8add_16 = .059957
+  [926] minisat/dadda+ripple/equiv_unsat_8add_16 = .071177
+  [927] mergesat/dadda+ripple/equiv_unsat_8add_16 = .071128
+  [923] mergesat/shift-add+g-only/equiv_unsat_8add_16 = .080269
+  [921] cryptominisat/shift-add+g-only/equiv_unsat_8add_16 = .189332
+  [925] cryptominisat/dadda+ripple/equiv_unsat_8add_16 = .389844
+  [928] cadical/dadda+brent-kung/equiv_unsat_8add_16 = .012512
+  [932] cadical/dadda+g-only/equiv_unsat_8add_16 = .047350
+  [934] minisat/dadda+g-only/equiv_unsat_8add_16 = .059575
+  [935] mergesat/dadda+g-only/equiv_unsat_8add_16 = .080326
+  [930] minisat/dadda+brent-kung/equiv_unsat_8add_16 = .102222
+  [931] mergesat/dadda+brent-kung/equiv_unsat_8add_16 = .142572
+  [933] cryptominisat/dadda+g-only/equiv_unsat_8add_16 = .189586
+  [929] cryptominisat/dadda+brent-kung/equiv_unsat_8add_16 = .487134
+  [940] cadical/comba+brent-kung/equiv_unsat_8add_16 = .012374
+  [936] cadical/comba+ripple/equiv_unsat_8add_16 = .057837
+  [938] minisat/comba+ripple/equiv_unsat_8add_16 = .071135
+  [939] mergesat/comba+ripple/equiv_unsat_8add_16 = .071045
+  [942] minisat/comba+brent-kung/equiv_unsat_8add_16 = .102116
+  [943] mergesat/comba+brent-kung/equiv_unsat_8add_16 = .143017
+  [937] cryptominisat/comba+ripple/equiv_unsat_8add_16 = .391315
+  [941] cryptominisat/comba+brent-kung/equiv_unsat_8add_16 = .490284
+  [944] cadical/comba+g-only/equiv_unsat_8add_16 = .047396
+  [948] cadical/comba-cs+ripple/equiv_unsat_8add_16 = .057528
+  [946] minisat/comba+g-only/equiv_unsat_8add_16 = .059770
+  [951] mergesat/comba-cs+ripple/equiv_unsat_8add_16 = .071060
+  [950] minisat/comba-cs+ripple/equiv_unsat_8add_16 = .072009
+  [947] mergesat/comba+g-only/equiv_unsat_8add_16 = .080403
+  [945] cryptominisat/comba+g-only/equiv_unsat_8add_16 = .188915
+  [949] cryptominisat/comba-cs+ripple/equiv_unsat_8add_16 = .391546
+  [952] cadical/comba-cs+brent-kung/equiv_unsat_8add_16 = .012449
+  [956] cadical/comba-cs+g-only/equiv_unsat_8add_16 = .047537
+  [958] minisat/comba-cs+g-only/equiv_unsat_8add_16 = .059565
+  [959] mergesat/comba-cs+g-only/equiv_unsat_8add_16 = .080438
+  [954] minisat/comba-cs+brent-kung/equiv_unsat_8add_16 = .102221
+  [955] mergesat/comba-cs+brent-kung/equiv_unsat_8add_16 = .142812
+  [957] cryptominisat/comba-cs+g-only/equiv_unsat_8add_16 = .188693
+  [953] cryptominisat/comba-cs+brent-kung/equiv_unsat_8add_16 = .486119
+  [960] cadical/shift-add+ripple/factor_12 = .006220
+  [964] cadical/shift-add+brent-kung/factor_12 = .006141
+  [961] cryptominisat/shift-add+ripple/factor_12 = .006600
+  [965] cryptominisat/shift-add+brent-kung/factor_12 = .006579
+  [962] minisat/shift-add+ripple/factor_12 = .007061
+  [966] minisat/shift-add+brent-kung/factor_12 = .007024
+  [963] mergesat/shift-add+ripple/factor_12 = .011486
+  [967] mergesat/shift-add+brent-kung/factor_12 = .011634
+  [968] cadical/shift-add+g-only/factor_12 = .006248
+  [972] cadical/dadda+ripple/factor_12 = .006361
+  [969] cryptominisat/shift-add+g-only/factor_12 = .006702
+  [973] cryptominisat/dadda+ripple/factor_12 = .006714
+  [970] minisat/shift-add+g-only/factor_12 = .007079
+  [974] minisat/dadda+ripple/factor_12 = .007070
+  [975] mergesat/dadda+ripple/factor_12 = .009749
+  [971] mergesat/shift-add+g-only/factor_12 = .011690
+  [976] cadical/dadda+brent-kung/factor_12 = .006330
+  [980] cadical/dadda+g-only/factor_12 = .006138
+  [977] cryptominisat/dadda+brent-kung/factor_12 = .006981
+  [981] cryptominisat/dadda+g-only/factor_12 = .006797
+  [978] minisat/dadda+brent-kung/factor_12 = .007487
+  [982] minisat/dadda+g-only/factor_12 = .007131
+  [979] mergesat/dadda+brent-kung/factor_12 = .009671
+  [983] mergesat/dadda+g-only/factor_12 = .009724
+  [984] cadical/comba+ripple/factor_12 = .006651
+  [985] cryptominisat/comba+ripple/factor_12 = .007539
+  [986] minisat/comba+ripple/factor_12 = .007907
+  [987] mergesat/comba+ripple/factor_12 = .009834
+  [990] minisat/comba+brent-kung/factor_12 = T/O
+  [989] cryptominisat/comba+brent-kung/factor_12 = T/O
+  [991] mergesat/comba+brent-kung/factor_12 = T/O
+  [988] cadical/comba+brent-kung/factor_12 = T/O
+  [992] cadical/comba+g-only/factor_12 = .007316
+  [996] cadical/comba-cs+ripple/factor_12 = .007382
+  [994] minisat/comba+g-only/factor_12 = .008684
+  [997] cryptominisat/comba-cs+ripple/factor_12 = .008558
+  [993] cryptominisat/comba+g-only/factor_12 = .009109
+  [998] minisat/comba-cs+ripple/factor_12 = .008490
+  [995] mergesat/comba+g-only/factor_12 = .009519
+  [999] mergesat/comba-cs+ripple/factor_12 = .009765
+  [1000] cadical/comba-cs+brent-kung/factor_12 = .006955
+  [1004] cadical/comba-cs+g-only/factor_12 = .006769
+  [1001] cryptominisat/comba-cs+brent-kung/factor_12 = .008027
+  [1002] minisat/comba-cs+brent-kung/factor_12 = .008052
+  [1006] minisat/comba-cs+g-only/factor_12 = .008096
+  [1005] cryptominisat/comba-cs+g-only/factor_12 = .008213
+  [1003] mergesat/comba-cs+brent-kung/factor_12 = .009485
+  [1007] mergesat/comba-cs+g-only/factor_12 = .009519
+  [1008] cadical/shift-add+ripple/factor_16 = .006673
+  [1012] cadical/shift-add+brent-kung/factor_16 = .006654
+  [1009] cryptominisat/shift-add+ripple/factor_16 = .007687
+  [1013] cryptominisat/shift-add+brent-kung/factor_16 = .007568
+  [1010] minisat/shift-add+ripple/factor_16 = .008949
+  [1014] minisat/shift-add+brent-kung/factor_16 = .008985
+  [1011] mergesat/shift-add+ripple/factor_16 = .016928
+  [1015] mergesat/shift-add+brent-kung/factor_16 = .016926
+  [1016] cadical/shift-add+g-only/factor_16 = .006795
+  [1020] cadical/dadda+ripple/factor_16 = .006663
+  [1017] cryptominisat/shift-add+g-only/factor_16 = .007672
+  [1022] minisat/dadda+ripple/factor_16 = .008324
+  [1018] minisat/shift-add+g-only/factor_16 = .008909
+  [1021] cryptominisat/dadda+ripple/factor_16 = .009413
+  [1023] mergesat/dadda+ripple/factor_16 = .010145
+  [1019] mergesat/shift-add+g-only/factor_16 = .017180
+  [1024] cadical/dadda+brent-kung/factor_16 = .006860
+  [1028] cadical/dadda+g-only/factor_16 = .006794
+  [1030] minisat/dadda+g-only/factor_16 = .008356
+  [1026] minisat/dadda+brent-kung/factor_16 = .008676
+  [1025] cryptominisat/dadda+brent-kung/factor_16 = .009456
+  [1029] cryptominisat/dadda+g-only/factor_16 = .009275
+  [1027] mergesat/dadda+brent-kung/factor_16 = .010250
+  [1031] mergesat/dadda+g-only/factor_16 = .010210
+  [1032] cadical/comba+ripple/factor_16 = .007424
+  [1034] minisat/comba+ripple/factor_16 = .010404
+  [1033] cryptominisat/comba+ripple/factor_16 = .011511
+  [1035] mergesat/comba+ripple/factor_16 = .011894
+  [1036] cadical/comba+brent-kung/factor_16 = T/O
+  [1037] cryptominisat/comba+brent-kung/factor_16 = T/O
+  [1039] mergesat/comba+brent-kung/factor_16 = T/O
+  [1038] minisat/comba+brent-kung/factor_16 = T/O
+  [1040] cadical/comba+g-only/factor_16 = .008579
+  [1044] cadical/comba-cs+ripple/factor_16 = .008034
+  [1046] minisat/comba-cs+ripple/factor_16 = .010159
+  [1042] minisat/comba+g-only/factor_16 = .011088
+  [1045] cryptominisat/comba-cs+ripple/factor_16 = .011185
+  [1043] mergesat/comba+g-only/factor_16 = .011656
+  [1041] cryptominisat/comba+g-only/factor_16 = .012585
+  [1047] mergesat/comba-cs+ripple/factor_16 = .013488
+  [1048] cadical/comba-cs+brent-kung/factor_16 = .007695
+  [1052] cadical/comba-cs+g-only/factor_16 = .007472
+  [1050] minisat/comba-cs+brent-kung/factor_16 = .009668
+  [1054] minisat/comba-cs+g-only/factor_16 = .009687
+  [1049] cryptominisat/comba-cs+brent-kung/factor_16 = .010839
+  [1053] cryptominisat/comba-cs+g-only/factor_16 = .010574
+  [1051] mergesat/comba-cs+brent-kung/factor_16 = .012731
+  [1055] mergesat/comba-cs+g-only/factor_16 = .012585
+  [1056] cadical/shift-add+ripple/factor_20 = .007407
+  [1060] cadical/shift-add+brent-kung/factor_20 = .007156
+  [1057] cryptominisat/shift-add+ripple/factor_20 = .008444
+  [1061] cryptominisat/shift-add+brent-kung/factor_20 = .008314
+  [1058] minisat/shift-add+ripple/factor_20 = .009309
+  [1062] minisat/shift-add+brent-kung/factor_20 = .009178
+  [1059] mergesat/shift-add+ripple/factor_20 = .010487
+  [1063] mergesat/shift-add+brent-kung/factor_20 = .010381
+  [1064] cadical/shift-add+g-only/factor_20 = .007389
+  [1068] cadical/dadda+ripple/factor_20 = .007186
+  [1065] cryptominisat/shift-add+g-only/factor_20 = .008403
+  [1066] minisat/shift-add+g-only/factor_20 = .009167
+  [1069] cryptominisat/dadda+ripple/factor_20 = .009372
+  [1070] minisat/dadda+ripple/factor_20 = .010139
+  [1067] mergesat/shift-add+g-only/factor_20 = .010602
+  [1071] mergesat/dadda+ripple/factor_20 = .010646
+  [1072] cadical/dadda+brent-kung/factor_20 = .007552
+  [1076] cadical/dadda+g-only/factor_20 = .007258
+  [1074] minisat/dadda+brent-kung/factor_20 = .010297
+  [1077] cryptominisat/dadda+g-only/factor_20 = .009926
+  [1073] cryptominisat/dadda+brent-kung/factor_20 = .010477
+  [1078] minisat/dadda+g-only/factor_20 = .010184
+  [1079] mergesat/dadda+g-only/factor_20 = .010566
+  [1075] mergesat/dadda+brent-kung/factor_20 = .011346
+  [1080] cadical/comba+ripple/factor_20 = .008732
+  [1082] minisat/comba+ripple/factor_20 = .011754
+  [1081] cryptominisat/comba+ripple/factor_20 = .013643
+  [1083] mergesat/comba+ripple/factor_20 = .014235
+  [1084] cadical/comba+brent-kung/factor_20 = T/O
+  [1086] minisat/comba+brent-kung/factor_20 = T/O
+  [1085] cryptominisat/comba+brent-kung/factor_20 = T/O
+  [1087] mergesat/comba+brent-kung/factor_20 = T/O
+  [1088] cadical/comba+g-only/factor_20 = .009702
+  [1092] cadical/comba-cs+ripple/factor_20 = .009251
+  [1090] minisat/comba+g-only/factor_20 = .013021
+  [1093] cryptominisat/comba-cs+ripple/factor_20 = .013149
+  [1094] minisat/comba-cs+ripple/factor_20 = .013490
+  [1091] mergesat/comba+g-only/factor_20 = .015021
+  [1095] mergesat/comba-cs+ripple/factor_20 = .015064
+  [1089] cryptominisat/comba+g-only/factor_20 = .016088
+  [1100] cadical/comba-cs+g-only/factor_20 = .008595
+  [1096] cadical/comba-cs+brent-kung/factor_20 = .009141
+  [1097] cryptominisat/comba-cs+brent-kung/factor_20 = .012890
+  [1098] minisat/comba-cs+brent-kung/factor_20 = .013057
+  [1102] minisat/comba-cs+g-only/factor_20 = .013099
+  [1101] cryptominisat/comba-cs+g-only/factor_20 = .012880
+  [1099] mergesat/comba-cs+brent-kung/factor_20 = .014614
+  [1103] mergesat/comba-cs+g-only/factor_20 = .014394
+  [1105] cryptominisat/shift-add+ripple/fixedpoint_mul_16 = .011866
+  [1109] cryptominisat/shift-add+brent-kung/fixedpoint_mul_16 = .011878
+  [1106] minisat/shift-add+ripple/fixedpoint_mul_16 = .012476
+  [1110] minisat/shift-add+brent-kung/fixedpoint_mul_16 = .012481
+  [1107] mergesat/shift-add+ripple/fixedpoint_mul_16 = .014375
+  [1111] mergesat/shift-add+brent-kung/fixedpoint_mul_16 = .014189
+  [1104] cadical/shift-add+ripple/fixedpoint_mul_16 = .024941
+  [1108] cadical/shift-add+brent-kung/fixedpoint_mul_16 = .024352
+  [1113] cryptominisat/shift-add+g-only/fixedpoint_mul_16 = .011920
+  [1114] minisat/shift-add+g-only/fixedpoint_mul_16 = .012539
+  [1117] cryptominisat/dadda+ripple/fixedpoint_mul_16 = .013177
+  [1118] minisat/dadda+ripple/fixedpoint_mul_16 = .013137
+  [1115] mergesat/shift-add+g-only/fixedpoint_mul_16 = .014231
+  [1119] mergesat/dadda+ripple/fixedpoint_mul_16 = .014843
+  [1112] cadical/shift-add+g-only/fixedpoint_mul_16 = .024681
+  [1116] cadical/dadda+ripple/fixedpoint_mul_16 = .028515
+  [1125] cryptominisat/dadda+g-only/fixedpoint_mul_16 = .012531
+  [1126] minisat/dadda+g-only/fixedpoint_mul_16 = .012708
+  [1122] minisat/dadda+brent-kung/fixedpoint_mul_16 = .013277
+  [1127] mergesat/dadda+g-only/fixedpoint_mul_16 = .014805
+  [1123] mergesat/dadda+brent-kung/fixedpoint_mul_16 = .017275
+  [1121] cryptominisat/dadda+brent-kung/fixedpoint_mul_16 = .020331
+  [1124] cadical/dadda+g-only/fixedpoint_mul_16 = .028921
+  [1120] cadical/dadda+brent-kung/fixedpoint_mul_16 = .030502
+  [1130] minisat/comba+ripple/fixedpoint_mul_16 = .016329
+  [1129] cryptominisat/comba+ripple/fixedpoint_mul_16 = .018016
+  [1131] mergesat/comba+ripple/fixedpoint_mul_16 = .019155
+  [1128] cadical/comba+ripple/fixedpoint_mul_16 = .043374
+  [1134] minisat/comba+brent-kung/fixedpoint_mul_16 = T/O
+  [1133] cryptominisat/comba+brent-kung/fixedpoint_mul_16 = T/O
+  [1132] cadical/comba+brent-kung/fixedpoint_mul_16 = T/O
+  [1135] mergesat/comba+brent-kung/fixedpoint_mul_16 = T/O
+  [1140] cadical/comba-cs+ripple/fixedpoint_mul_16 = .010949
+  [1142] minisat/comba-cs+ripple/fixedpoint_mul_16 = .014981
+  [1141] cryptominisat/comba-cs+ripple/fixedpoint_mul_16 = .015352
+  [1138] minisat/comba+g-only/fixedpoint_mul_16 = .018224
+  [1143] mergesat/comba-cs+ripple/fixedpoint_mul_16 = .017768
+  [1137] cryptominisat/comba+g-only/fixedpoint_mul_16 = .019915
+  [1139] mergesat/comba+g-only/fixedpoint_mul_16 = .025133
+  [1136] cadical/comba+g-only/fixedpoint_mul_16 = .049034
+  [1144] cadical/comba-cs+brent-kung/fixedpoint_mul_16 = .010105
+  [1148] cadical/comba-cs+g-only/fixedpoint_mul_16 = .010136
+  [1146] minisat/comba-cs+brent-kung/fixedpoint_mul_16 = .014113
+  [1150] minisat/comba-cs+g-only/fixedpoint_mul_16 = .014168
+  [1145] cryptominisat/comba-cs+brent-kung/fixedpoint_mul_16 = .014722
+  [1149] cryptominisat/comba-cs+g-only/fixedpoint_mul_16 = .014830
+  [1147] mergesat/comba-cs+brent-kung/fixedpoint_mul_16 = .017158
+  [1151] mergesat/comba-cs+g-only/fixedpoint_mul_16 = .017283
+  [1152] cadical/shift-add+ripple/float_mul_comm = .021826
+  [1156] cadical/shift-add+brent-kung/float_mul_comm = .021533
+  [1154] minisat/shift-add+ripple/float_mul_comm = .050867
+  [1158] minisat/shift-add+brent-kung/float_mul_comm = .051022
+  [1159] mergesat/shift-add+brent-kung/float_mul_comm = .109566
+  [1155] mergesat/shift-add+ripple/float_mul_comm = .109935
+  [1153] cryptominisat/shift-add+ripple/float_mul_comm = .240732
+  [1157] cryptominisat/shift-add+brent-kung/float_mul_comm = .242469
+  [1160] cadical/shift-add+g-only/float_mul_comm = .021209
+  [1164] cadical/dadda+ripple/float_mul_comm = .021749
+  [1166] minisat/dadda+ripple/float_mul_comm = .047955
+  [1162] minisat/shift-add+g-only/float_mul_comm = .050874
+  [1163] mergesat/shift-add+g-only/float_mul_comm = .108939
+  [1165] cryptominisat/dadda+ripple/float_mul_comm = .121441
+  [1167] mergesat/dadda+ripple/float_mul_comm = .191979
+  [1161] cryptominisat/shift-add+g-only/float_mul_comm = .241918
+  [1168] cadical/dadda+brent-kung/float_mul_comm = .021701
+  [1172] cadical/dadda+g-only/float_mul_comm = .021498
+  [1170] minisat/dadda+brent-kung/float_mul_comm = .048146
+  [1174] minisat/dadda+g-only/float_mul_comm = .047878
+  [1169] cryptominisat/dadda+brent-kung/float_mul_comm = .121271
+  [1173] cryptominisat/dadda+g-only/float_mul_comm = .122610
+  [1175] mergesat/dadda+g-only/float_mul_comm = .191299
+  [1171] mergesat/dadda+brent-kung/float_mul_comm = .191512
+  [1176] cadical/comba+ripple/float_mul_comm = .030351
+  [1180] cadical/comba+brent-kung/float_mul_comm = .029857
+  [1177] cryptominisat/comba+ripple/float_mul_comm = .059979
+  [1181] cryptominisat/comba+brent-kung/float_mul_comm = .059810
+  [1182] minisat/comba+brent-kung/float_mul_comm = .091827
+  [1178] minisat/comba+ripple/float_mul_comm = .093683
+  [1179] mergesat/comba+ripple/float_mul_comm = .109736
+  [1183] mergesat/comba+brent-kung/float_mul_comm = .111155
+  [1188] cadical/comba-cs+ripple/float_mul_comm = .021479
+  [1184] cadical/comba+g-only/float_mul_comm = .029258
+  [1190] minisat/comba-cs+ripple/float_mul_comm = .051436
+  [1185] cryptominisat/comba+g-only/float_mul_comm = .058858
+  [1186] minisat/comba+g-only/float_mul_comm = .090875
+  [1187] mergesat/comba+g-only/float_mul_comm = .108450
+  [1191] mergesat/comba-cs+ripple/float_mul_comm = .109973
+  [1189] cryptominisat/comba-cs+ripple/float_mul_comm = .241506
+  [1192] cadical/comba-cs+brent-kung/float_mul_comm = .021719
+  [1196] cadical/comba-cs+g-only/float_mul_comm = .021229
+  [1194] minisat/comba-cs+brent-kung/float_mul_comm = .050934
+  [1198] minisat/comba-cs+g-only/float_mul_comm = .051191
+  [1195] mergesat/comba-cs+brent-kung/float_mul_comm = .109285
+  [1199] mergesat/comba-cs+g-only/float_mul_comm = .108905
+  [1197] cryptominisat/comba-cs+g-only/float_mul_comm = .242173
+  [1193] cryptominisat/comba-cs+brent-kung/float_mul_comm = .246746
+  [1204] cadical/shift-add+brent-kung/float_mul_comm_v2 = T/O
+  [1200] cadical/shift-add+ripple/float_mul_comm_v2 = T/O
+  [1201] cryptominisat/shift-add+ripple/float_mul_comm_v2 = T/O
+  [1205] cryptominisat/shift-add+brent-kung/float_mul_comm_v2 = T/O
+  [1206] minisat/shift-add+brent-kung/float_mul_comm_v2 = T/O
+  [1202] minisat/shift-add+ripple/float_mul_comm_v2 = T/O
+  [1203] mergesat/shift-add+ripple/float_mul_comm_v2 = T/O
+  [1207] mergesat/shift-add+brent-kung/float_mul_comm_v2 = T/O
+  [1208] cadical/shift-add+g-only/float_mul_comm_v2 = T/O
+  [1212] cadical/dadda+ripple/float_mul_comm_v2 = T/O
+  [1209] cryptominisat/shift-add+g-only/float_mul_comm_v2 = T/O
+  [1214] minisat/dadda+ripple/float_mul_comm_v2 = T/O
+  [1210] minisat/shift-add+g-only/float_mul_comm_v2 = T/O
+  [1213] cryptominisat/dadda+ripple/float_mul_comm_v2 = T/O
+  [1215] mergesat/dadda+ripple/float_mul_comm_v2 = T/O
+  [1211] mergesat/shift-add+g-only/float_mul_comm_v2 = T/O
+  [1216] cadical/dadda+brent-kung/float_mul_comm_v2 = T/O
+  [1220] cadical/dadda+g-only/float_mul_comm_v2 = T/O
+  [1218] minisat/dadda+brent-kung/float_mul_comm_v2 = T/O
+  [1222] minisat/dadda+g-only/float_mul_comm_v2 = T/O
+  [1221] cryptominisat/dadda+g-only/float_mul_comm_v2 = T/O
+  [1217] cryptominisat/dadda+brent-kung/float_mul_comm_v2 = T/O
+  [1219] mergesat/dadda+brent-kung/float_mul_comm_v2 = T/O
+  [1223] mergesat/dadda+g-only/float_mul_comm_v2 = T/O
+  [1224] cadical/comba+ripple/float_mul_comm_v2 = T/O
+  [1228] cadical/comba+brent-kung/float_mul_comm_v2 = T/O
+  [1226] minisat/comba+ripple/float_mul_comm_v2 = T/O
+  [1230] minisat/comba+brent-kung/float_mul_comm_v2 = T/O
+  [1225] cryptominisat/comba+ripple/float_mul_comm_v2 = T/O
+  [1229] cryptominisat/comba+brent-kung/float_mul_comm_v2 = T/O
+  [1227] mergesat/comba+ripple/float_mul_comm_v2 = T/O
+  [1231] mergesat/comba+brent-kung/float_mul_comm_v2 = T/O
+  [1232] cadical/comba+g-only/float_mul_comm_v2 = T/O
+  [1236] cadical/comba-cs+ripple/float_mul_comm_v2 = T/O
+  [1234] minisat/comba+g-only/float_mul_comm_v2 = T/O
+  [1237] cryptominisat/comba-cs+ripple/float_mul_comm_v2 = T/O
+  [1238] minisat/comba-cs+ripple/float_mul_comm_v2 = T/O
+  [1233] cryptominisat/comba+g-only/float_mul_comm_v2 = T/O
+  [1235] mergesat/comba+g-only/float_mul_comm_v2 = T/O
+  [1239] mergesat/comba-cs+ripple/float_mul_comm_v2 = T/O
+  [1240] cadical/comba-cs+brent-kung/float_mul_comm_v2 = T/O
+  [1244] cadical/comba-cs+g-only/float_mul_comm_v2 = T/O
+  [1245] cryptominisat/comba-cs+g-only/float_mul_comm_v2 = T/O
+  [1242] minisat/comba-cs+brent-kung/float_mul_comm_v2 = T/O
+  [1241] cryptominisat/comba-cs+brent-kung/float_mul_comm_v2 = T/O
+  [1246] minisat/comba-cs+g-only/float_mul_comm_v2 = T/O
+  [1243] mergesat/comba-cs+brent-kung/float_mul_comm_v2 = T/O
+  [1247] mergesat/comba-cs+g-only/float_mul_comm_v2 = T/O
+  [1249] cryptominisat/shift-add+ripple/gf256_mul_assoc = .032381
+  [1250] minisat/shift-add+ripple/gf256_mul_assoc = .032536
+  [1251] mergesat/shift-add+ripple/gf256_mul_assoc = .034123
+  [1254] minisat/shift-add+brent-kung/gf256_mul_assoc = .036159
+  [1248] cadical/shift-add+ripple/gf256_mul_assoc = .054050
+  [1253] cryptominisat/shift-add+brent-kung/gf256_mul_assoc = .058077
+  [1252] cadical/shift-add+brent-kung/gf256_mul_assoc = .061687
+  [1255] mergesat/shift-add+brent-kung/gf256_mul_assoc = .597602
+  [1262] minisat/dadda+ripple/gf256_mul_assoc = .022148
+  [1257] cryptominisat/shift-add+g-only/gf256_mul_assoc = .032280
+  [1258] minisat/shift-add+g-only/gf256_mul_assoc = .032363
+  [1259] mergesat/shift-add+g-only/gf256_mul_assoc = .033910
+  [1263] mergesat/dadda+ripple/gf256_mul_assoc = .034045
+  [1256] cadical/shift-add+g-only/gf256_mul_assoc = .054240
+  [1260] cadical/dadda+ripple/gf256_mul_assoc = .055325
+  [1261] cryptominisat/dadda+ripple/gf256_mul_assoc = .070554
+  [1269] cryptominisat/dadda+g-only/gf256_mul_assoc = .022713
+  [1270] minisat/dadda+g-only/gf256_mul_assoc = .026368
+  [1266] minisat/dadda+brent-kung/gf256_mul_assoc = .047299
+  [1271] mergesat/dadda+g-only/gf256_mul_assoc = .053377
+  [1268] cadical/dadda+g-only/gf256_mul_assoc = .055288
+  [1265] cryptominisat/dadda+brent-kung/gf256_mul_assoc = .061674
+  [1264] cadical/dadda+brent-kung/gf256_mul_assoc = .066606
+  [1267] mergesat/dadda+brent-kung/gf256_mul_assoc = 1.162169
+  [1274] minisat/comba+ripple/gf256_mul_assoc = .025134
+  [1275] mergesat/comba+ripple/gf256_mul_assoc = .042499
+  [1273] cryptominisat/comba+ripple/gf256_mul_assoc = .047292
+  [1272] cadical/comba+ripple/gf256_mul_assoc = .063179
+  [1278] minisat/comba+brent-kung/gf256_mul_assoc = T/O
+  [1277] cryptominisat/comba+brent-kung/gf256_mul_assoc = T/O
+  [1279] mergesat/comba+brent-kung/gf256_mul_assoc = T/O
+  [1276] cadical/comba+brent-kung/gf256_mul_assoc = T/O
+  [1282] minisat/comba+g-only/gf256_mul_assoc = .026838
+  [1287] mergesat/comba-cs+ripple/gf256_mul_assoc = .028676
+  [1286] minisat/comba-cs+ripple/gf256_mul_assoc = .029029
+  [1285] cryptominisat/comba-cs+ripple/gf256_mul_assoc = .031223
+  [1284] cadical/comba-cs+ripple/gf256_mul_assoc = .059004
+  [1281] cryptominisat/comba+g-only/gf256_mul_assoc = .061474
+  [1283] mergesat/comba+g-only/gf256_mul_assoc = .066243
+  [1280] cadical/comba+g-only/gf256_mul_assoc = .085230
+  [1295] mergesat/comba-cs+g-only/gf256_mul_assoc = .028591
+  [1294] minisat/comba-cs+g-only/gf256_mul_assoc = .028818
+  [1293] cryptominisat/comba-cs+g-only/gf256_mul_assoc = .030498
+  [1290] minisat/comba-cs+brent-kung/gf256_mul_assoc = .034204
+  [1292] cadical/comba-cs+g-only/gf256_mul_assoc = .058405
+  [1288] cadical/comba-cs+brent-kung/gf256_mul_assoc = .063277
+  [1289] cryptominisat/comba-cs+brent-kung/gf256_mul_assoc = .071811
+  [1291] mergesat/comba-cs+brent-kung/gf256_mul_assoc = .684393
+  [1296] cadical/shift-add+ripple/half_mul_comm = .009769
+  [1300] cadical/shift-add+brent-kung/half_mul_comm = .009715
+  [1298] minisat/shift-add+ripple/half_mul_comm = .018659
+  [1302] minisat/shift-add+brent-kung/half_mul_comm = .018563
+  [1299] mergesat/shift-add+ripple/half_mul_comm = .028783
+  [1303] mergesat/shift-add+brent-kung/half_mul_comm = .028501
+  [1297] cryptominisat/shift-add+ripple/half_mul_comm = .044204
+  [1301] cryptominisat/shift-add+brent-kung/half_mul_comm = .044424
+  [1304] cadical/shift-add+g-only/half_mul_comm = .009885
+  [1308] cadical/dadda+ripple/half_mul_comm = .009911
+  [1309] cryptominisat/dadda+ripple/half_mul_comm = .017450
+  [1310] minisat/dadda+ripple/half_mul_comm = .018048
+  [1306] minisat/shift-add+g-only/half_mul_comm = .018526
+  [1307] mergesat/shift-add+g-only/half_mul_comm = .028680
+  [1311] mergesat/dadda+ripple/half_mul_comm = .032014
+  [1305] cryptominisat/shift-add+g-only/half_mul_comm = .044402
+  [1312] cadical/dadda+brent-kung/half_mul_comm = .009954
+  [1316] cadical/dadda+g-only/half_mul_comm = .009979
+  [1313] cryptominisat/dadda+brent-kung/half_mul_comm = .017513
+  [1317] cryptominisat/dadda+g-only/half_mul_comm = .017413
+  [1314] minisat/dadda+brent-kung/half_mul_comm = .018111
+  [1318] minisat/dadda+g-only/half_mul_comm = .018224
+  [1315] mergesat/dadda+brent-kung/half_mul_comm = .032159
+  [1319] mergesat/dadda+g-only/half_mul_comm = .031895
+  [1320] cadical/comba+ripple/half_mul_comm = .011580
+  [1324] cadical/comba+brent-kung/half_mul_comm = .011392
+  [1321] cryptominisat/comba+ripple/half_mul_comm = .019372
+  [1325] cryptominisat/comba+brent-kung/half_mul_comm = .019142
+  [1322] minisat/comba+ripple/half_mul_comm = .020560
+  [1326] minisat/comba+brent-kung/half_mul_comm = .020537
+  [1323] mergesat/comba+ripple/half_mul_comm = .029745
+  [1327] mergesat/comba+brent-kung/half_mul_comm = .029606
+  [1332] cadical/comba-cs+ripple/half_mul_comm = .009974
+  [1328] cadical/comba+g-only/half_mul_comm = .011663
+  [1333] cryptominisat/comba-cs+ripple/half_mul_comm = .016631
+  [1329] cryptominisat/comba+g-only/half_mul_comm = .019260
+  [1330] minisat/comba+g-only/half_mul_comm = .020440
+  [1334] minisat/comba-cs+ripple/half_mul_comm = .023308
+  [1331] mergesat/comba+g-only/half_mul_comm = .029653
+  [1335] mergesat/comba-cs+ripple/half_mul_comm = .034182
+  [1336] cadical/comba-cs+brent-kung/half_mul_comm = .010046
+  [1340] cadical/comba-cs+g-only/half_mul_comm = .009911
+  [1337] cryptominisat/comba-cs+brent-kung/half_mul_comm = .016858
+  [1341] cryptominisat/comba-cs+g-only/half_mul_comm = .017087
+  [1338] minisat/comba-cs+brent-kung/half_mul_comm = .023289
+  [1342] minisat/comba-cs+g-only/half_mul_comm = .023495
+  [1339] mergesat/comba-cs+brent-kung/half_mul_comm = .034680
+  [1343] mergesat/comba-cs+g-only/half_mul_comm = .034417
+  [1344] cadical/shift-add+ripple/half_mul_comm_v2 = T/O
+  [1348] cadical/shift-add+brent-kung/half_mul_comm_v2 = T/O
+  [1346] minisat/shift-add+ripple/half_mul_comm_v2 = T/O
+  [1350] minisat/shift-add+brent-kung/half_mul_comm_v2 = T/O
+  [1345] cryptominisat/shift-add+ripple/half_mul_comm_v2 = T/O
+  [1349] cryptominisat/shift-add+brent-kung/half_mul_comm_v2 = T/O
+  [1347] mergesat/shift-add+ripple/half_mul_comm_v2 = T/O
+  [1351] mergesat/shift-add+brent-kung/half_mul_comm_v2 = T/O
+  [1352] cadical/shift-add+g-only/half_mul_comm_v2 = T/O
+  [1354] minisat/shift-add+g-only/half_mul_comm_v2 = T/O
+  [1358] minisat/dadda+ripple/half_mul_comm_v2 = T/O
+  [1356] cadical/dadda+ripple/half_mul_comm_v2 = T/O
+  [1353] cryptominisat/shift-add+g-only/half_mul_comm_v2 = T/O
+  [1357] cryptominisat/dadda+ripple/half_mul_comm_v2 = T/O
+  [1359] mergesat/dadda+ripple/half_mul_comm_v2 = T/O
+  [1355] mergesat/shift-add+g-only/half_mul_comm_v2 = T/O
+  [1362] minisat/dadda+brent-kung/half_mul_comm_v2 = T/O
+  [1360] cadical/dadda+brent-kung/half_mul_comm_v2 = T/O
+  [1364] cadical/dadda+g-only/half_mul_comm_v2 = T/O
+  [1366] minisat/dadda+g-only/half_mul_comm_v2 = T/O
+  [1361] cryptominisat/dadda+brent-kung/half_mul_comm_v2 = T/O
+  [1365] cryptominisat/dadda+g-only/half_mul_comm_v2 = T/O
+  [1367] mergesat/dadda+g-only/half_mul_comm_v2 = T/O
+  [1363] mergesat/dadda+brent-kung/half_mul_comm_v2 = T/O
+  [1372] cadical/comba+brent-kung/half_mul_comm_v2 = 116.272215
+  [1368] cadical/comba+ripple/half_mul_comm_v2 = 117.294782
+  [1370] minisat/comba+ripple/half_mul_comm_v2 = T/O
+  [1374] minisat/comba+brent-kung/half_mul_comm_v2 = T/O
+  [1369] cryptominisat/comba+ripple/half_mul_comm_v2 = T/O
+  [1373] cryptominisat/comba+brent-kung/half_mul_comm_v2 = T/O
+  [1371] mergesat/comba+ripple/half_mul_comm_v2 = T/O
+  [1375] mergesat/comba+brent-kung/half_mul_comm_v2 = T/O
+  [1376] cadical/comba+g-only/half_mul_comm_v2 = 117.151259
+  [1382] minisat/comba-cs+ripple/half_mul_comm_v2 = T/O
+  [1380] cadical/comba-cs+ripple/half_mul_comm_v2 = T/O
+  [1378] minisat/comba+g-only/half_mul_comm_v2 = T/O
+  [1377] cryptominisat/comba+g-only/half_mul_comm_v2 = T/O
+  [1381] cryptominisat/comba-cs+ripple/half_mul_comm_v2 = T/O
+  [1379] mergesat/comba+g-only/half_mul_comm_v2 = T/O
+  [1383] mergesat/comba-cs+ripple/half_mul_comm_v2 = T/O
+  [1384] cadical/comba-cs+brent-kung/half_mul_comm_v2 = T/O
+  [1388] cadical/comba-cs+g-only/half_mul_comm_v2 = T/O
+  [1386] minisat/comba-cs+brent-kung/half_mul_comm_v2 = T/O
+  [1390] minisat/comba-cs+g-only/half_mul_comm_v2 = T/O
+  [1385] cryptominisat/comba-cs+brent-kung/half_mul_comm_v2 = T/O
+  [1389] cryptominisat/comba-cs+g-only/half_mul_comm_v2 = T/O
+  [1387] mergesat/comba-cs+brent-kung/half_mul_comm_v2 = T/O
+  [1391] mergesat/comba-cs+g-only/half_mul_comm_v2 = T/O
+  [1392] cadical/shift-add+ripple/hw_mul_equiv_12 = 14.895049
+  [1396] cadical/shift-add+brent-kung/hw_mul_equiv_12 = 19.848041
+  [1395] mergesat/shift-add+ripple/hw_mul_equiv_12 = 34.730670
+  [1399] mergesat/shift-add+brent-kung/hw_mul_equiv_12 = 64.421350
+  [1393] cryptominisat/shift-add+ripple/hw_mul_equiv_12 = 68.991841
+  [1397] cryptominisat/shift-add+brent-kung/hw_mul_equiv_12 = 114.574951
+  [1394] minisat/shift-add+ripple/hw_mul_equiv_12 = T/O
+  [1398] minisat/shift-add+brent-kung/hw_mul_equiv_12 = T/O
+  [1400] cadical/shift-add+g-only/hw_mul_equiv_12 = 17.119141
+  [1403] mergesat/shift-add+g-only/hw_mul_equiv_12 = 35.077238
+  [1401] cryptominisat/shift-add+g-only/hw_mul_equiv_12 = 76.822985
+  [1402] minisat/shift-add+g-only/hw_mul_equiv_12 = 118.773517
+  [1406] minisat/dadda+ripple/hw_mul_equiv_12 = T/O
+  [1404] cadical/dadda+ripple/hw_mul_equiv_12 = T/O
+  [1405] cryptominisat/dadda+ripple/hw_mul_equiv_12 = T/O
+  [1407] mergesat/dadda+ripple/hw_mul_equiv_12 = T/O
+  [1410] minisat/dadda+brent-kung/hw_mul_equiv_12 = T/O
+  [1414] minisat/dadda+g-only/hw_mul_equiv_12 = T/O
+  [1408] cadical/dadda+brent-kung/hw_mul_equiv_12 = T/O
+  [1412] cadical/dadda+g-only/hw_mul_equiv_12 = T/O
+  [1409] cryptominisat/dadda+brent-kung/hw_mul_equiv_12 = T/O
+  [1413] cryptominisat/dadda+g-only/hw_mul_equiv_12 = T/O
+  [1411] mergesat/dadda+brent-kung/hw_mul_equiv_12 = T/O
+  [1415] mergesat/dadda+g-only/hw_mul_equiv_12 = T/O
+  [1420] cadical/comba+brent-kung/hw_mul_equiv_12 = T/O
+  [1421] cryptominisat/comba+brent-kung/hw_mul_equiv_12 = T/O
+  [1422] minisat/comba+brent-kung/hw_mul_equiv_12 = T/O
+  [1423] mergesat/comba+brent-kung/hw_mul_equiv_12 = T/O
+  [1418] minisat/comba+ripple/hw_mul_equiv_12 = T/O
+  [1416] cadical/comba+ripple/hw_mul_equiv_12 = T/O
+  [1417] cryptominisat/comba+ripple/hw_mul_equiv_12 = T/O
+  [1419] mergesat/comba+ripple/hw_mul_equiv_12 = T/O
+  [1428] cadical/comba-cs+ripple/hw_mul_equiv_12 = 103.294338
+  [1426] minisat/comba+g-only/hw_mul_equiv_12 = T/O
+  [1430] minisat/comba-cs+ripple/hw_mul_equiv_12 = T/O
+  [1424] cadical/comba+g-only/hw_mul_equiv_12 = T/O
+  [1425] cryptominisat/comba+g-only/hw_mul_equiv_12 = T/O
+  [1429] cryptominisat/comba-cs+ripple/hw_mul_equiv_12 = T/O
+  [1427] mergesat/comba+g-only/hw_mul_equiv_12 = T/O
+  [1431] mergesat/comba-cs+ripple/hw_mul_equiv_12 = T/O
+  [1434] minisat/comba-cs+brent-kung/hw_mul_equiv_12 = T/O
+  [1432] cadical/comba-cs+brent-kung/hw_mul_equiv_12 = T/O
+  [1438] minisat/comba-cs+g-only/hw_mul_equiv_12 = T/O
+  [1436] cadical/comba-cs+g-only/hw_mul_equiv_12 = T/O
+  [1433] cryptominisat/comba-cs+brent-kung/hw_mul_equiv_12 = T/O
+  [1437] cryptominisat/comba-cs+g-only/hw_mul_equiv_12 = T/O
+  [1435] mergesat/comba-cs+brent-kung/hw_mul_equiv_12 = T/O
+  [1439] mergesat/comba-cs+g-only/hw_mul_equiv_12 = T/O
+  [1446] minisat/shift-add+brent-kung/mixed_arith_8 = T/O
+  [1442] minisat/shift-add+ripple/mixed_arith_8 = T/O
+  [1440] cadical/shift-add+ripple/mixed_arith_8 = T/O
+  [1444] cadical/shift-add+brent-kung/mixed_arith_8 = T/O
+  [1441] cryptominisat/shift-add+ripple/mixed_arith_8 = T/O
+  [1445] cryptominisat/shift-add+brent-kung/mixed_arith_8 = T/O
+  [1443] mergesat/shift-add+ripple/mixed_arith_8 = T/O
+  [1447] mergesat/shift-add+brent-kung/mixed_arith_8 = T/O
+  [1450] minisat/shift-add+g-only/mixed_arith_8 = T/O
+  [1448] cadical/shift-add+g-only/mixed_arith_8 = T/O
+  [1454] minisat/dadda+ripple/mixed_arith_8 = T/O
+  [1452] cadical/dadda+ripple/mixed_arith_8 = T/O
+  [1449] cryptominisat/shift-add+g-only/mixed_arith_8 = T/O
+  [1453] cryptominisat/dadda+ripple/mixed_arith_8 = T/O
+  [1455] mergesat/dadda+ripple/mixed_arith_8 = T/O
+  [1451] mergesat/shift-add+g-only/mixed_arith_8 = T/O
+  [1458] minisat/dadda+brent-kung/mixed_arith_8 = T/O
+  [1456] cadical/dadda+brent-kung/mixed_arith_8 = T/O
+  [1460] cadical/dadda+g-only/mixed_arith_8 = T/O
+  [1462] minisat/dadda+g-only/mixed_arith_8 = T/O
+  [1457] cryptominisat/dadda+brent-kung/mixed_arith_8 = T/O
+  [1461] cryptominisat/dadda+g-only/mixed_arith_8 = T/O
+  [1463] mergesat/dadda+g-only/mixed_arith_8 = T/O
+  [1459] mergesat/dadda+brent-kung/mixed_arith_8 = T/O
+  [1468] cadical/comba+brent-kung/mixed_arith_8 = T/O
+  [1471] mergesat/comba+brent-kung/mixed_arith_8 = T/O
+  [1470] minisat/comba+brent-kung/mixed_arith_8 = T/O
+  [1469] cryptominisat/comba+brent-kung/mixed_arith_8 = T/O
+  [1466] minisat/comba+ripple/mixed_arith_8 = T/O
+  [1464] cadical/comba+ripple/mixed_arith_8 = T/O
+  [1465] cryptominisat/comba+ripple/mixed_arith_8 = T/O
+  [1467] mergesat/comba+ripple/mixed_arith_8 = T/O
+  [1472] cadical/comba+g-only/mixed_arith_8 = T/O
+  [1474] minisat/comba+g-only/mixed_arith_8 = T/O
+  [1476] cadical/comba-cs+ripple/mixed_arith_8 = T/O
+  [1478] minisat/comba-cs+ripple/mixed_arith_8 = T/O
+  [1473] cryptominisat/comba+g-only/mixed_arith_8 = T/O
+  [1477] cryptominisat/comba-cs+ripple/mixed_arith_8 = T/O
+  [1479] mergesat/comba-cs+ripple/mixed_arith_8 = T/O
+  [1475] mergesat/comba+g-only/mixed_arith_8 = T/O
+  [1480] cadical/comba-cs+brent-kung/mixed_arith_8 = T/O
+  [1482] minisat/comba-cs+brent-kung/mixed_arith_8 = T/O
+  [1484] cadical/comba-cs+g-only/mixed_arith_8 = T/O
+  [1486] minisat/comba-cs+g-only/mixed_arith_8 = T/O
+  [1481] cryptominisat/comba-cs+brent-kung/mixed_arith_8 = T/O
+  [1485] cryptominisat/comba-cs+g-only/mixed_arith_8 = T/O
+  [1483] mergesat/comba-cs+brent-kung/mixed_arith_8 = T/O
+  [1487] mergesat/comba-cs+g-only/mixed_arith_8 = T/O
+  [1490] minisat/shift-add+ripple/mul_ineq_12 = .341074
+  [1494] minisat/shift-add+brent-kung/mul_ineq_12 = .340631
+  [1488] cadical/shift-add+ripple/mul_ineq_12 = .521086
+  [1492] cadical/shift-add+brent-kung/mul_ineq_12 = .521291
+  [1495] mergesat/shift-add+brent-kung/mul_ineq_12 = .846137
+  [1491] mergesat/shift-add+ripple/mul_ineq_12 = .847475
+  [1493] cryptominisat/shift-add+brent-kung/mul_ineq_12 = .991706
+  [1489] cryptominisat/shift-add+ripple/mul_ineq_12 = .992762
+  [1498] minisat/shift-add+g-only/mul_ineq_12 = .341136
+  [1502] minisat/dadda+ripple/mul_ineq_12 = .392337
+  [1500] cadical/dadda+ripple/mul_ineq_12 = .470523
+  [1496] cadical/shift-add+g-only/mul_ineq_12 = .522080
+  [1503] mergesat/dadda+ripple/mul_ineq_12 = .822429
+  [1499] mergesat/shift-add+g-only/mul_ineq_12 = .847213
+  [1497] cryptominisat/shift-add+g-only/mul_ineq_12 = .990245
+  [1501] cryptominisat/dadda+ripple/mul_ineq_12 = 1.014224
+  [1510] minisat/dadda+g-only/mul_ineq_12 = .404185
+  [1506] minisat/dadda+brent-kung/mul_ineq_12 = .407365
+  [1508] cadical/dadda+g-only/mul_ineq_12 = .413404
+  [1504] cadical/dadda+brent-kung/mul_ineq_12 = .464375
+  [1511] mergesat/dadda+g-only/mul_ineq_12 = .851982
+  [1507] mergesat/dadda+brent-kung/mul_ineq_12 = .958332
+  [1509] cryptominisat/dadda+g-only/mul_ineq_12 = .968190
+  [1505] cryptominisat/dadda+brent-kung/mul_ineq_12 = 1.221007
+  [1512] cadical/comba+ripple/mul_ineq_12 = .476741
+  [1514] minisat/comba+ripple/mul_ineq_12 = .560497
+  [1515] mergesat/comba+ripple/mul_ineq_12 = 1.213074
+  [1513] cryptominisat/comba+ripple/mul_ineq_12 = 1.805679
+  [1519] mergesat/comba+brent-kung/mul_ineq_12 = T/O
+  [1516] cadical/comba+brent-kung/mul_ineq_12 = T/O
+  [1517] cryptominisat/comba+brent-kung/mul_ineq_12 = T/O
+  [1518] minisat/comba+brent-kung/mul_ineq_12 = T/O
+  [1524] cadical/comba-cs+ripple/mul_ineq_12 = .485972
+  [1520] cadical/comba+g-only/mul_ineq_12 = .488843
+  [1522] minisat/comba+g-only/mul_ineq_12 = .557103
+  [1526] minisat/comba-cs+ripple/mul_ineq_12 = .648978
+  [1523] mergesat/comba+g-only/mul_ineq_12 = .975052
+  [1527] mergesat/comba-cs+ripple/mul_ineq_12 = 1.237939
+  [1521] cryptominisat/comba+g-only/mul_ineq_12 = 1.529999
+  [1525] cryptominisat/comba-cs+ripple/mul_ineq_12 = 1.899996
+  [1528] cadical/comba-cs+brent-kung/mul_ineq_12 = .485384
+  [1532] cadical/comba-cs+g-only/mul_ineq_12 = .485083
+  [1530] minisat/comba-cs+brent-kung/mul_ineq_12 = .646424
+  [1534] minisat/comba-cs+g-only/mul_ineq_12 = .647157
+  [1535] mergesat/comba-cs+g-only/mul_ineq_12 = 1.243132
+  [1531] mergesat/comba-cs+brent-kung/mul_ineq_12 = 1.241420
+  [1529] cryptominisat/comba-cs+brent-kung/mul_ineq_12 = 1.904598
+  [1533] cryptominisat/comba-cs+g-only/mul_ineq_12 = 1.906163
+  [1536] cadical/shift-add+ripple/mul_no_overflow_16 = .009284
+  [1540] cadical/shift-add+brent-kung/mul_no_overflow_16 = .010894
+  [1538] minisat/shift-add+ripple/mul_no_overflow_16 = .014835
+  [1537] cryptominisat/shift-add+ripple/mul_no_overflow_16 = .016130
+  [1542] minisat/shift-add+brent-kung/mul_no_overflow_16 = .016860
+  [1541] cryptominisat/shift-add+brent-kung/mul_no_overflow_16 = .018856
+  [1539] mergesat/shift-add+ripple/mul_no_overflow_16 = .019976
+  [1543] mergesat/shift-add+brent-kung/mul_no_overflow_16 = .019646
+  [1544] cadical/shift-add+g-only/mul_no_overflow_16 = .009765
+  [1548] cadical/dadda+ripple/mul_no_overflow_16 = .009321
+  [1546] minisat/shift-add+g-only/mul_no_overflow_16 = .015165
+  [1550] minisat/dadda+ripple/mul_no_overflow_16 = .014974
+  [1545] cryptominisat/shift-add+g-only/mul_no_overflow_16 = .017770
+  [1551] mergesat/dadda+ripple/mul_no_overflow_16 = .019940
+  [1547] mergesat/shift-add+g-only/mul_no_overflow_16 = .020742
+  [1549] cryptominisat/dadda+ripple/mul_no_overflow_16 = .022796
+  [1556] cadical/dadda+g-only/mul_no_overflow_16 = .009704
+  [1552] cadical/dadda+brent-kung/mul_no_overflow_16 = .010916
+  [1558] minisat/dadda+g-only/mul_no_overflow_16 = .015300
+  [1554] minisat/dadda+brent-kung/mul_no_overflow_16 = .016989
+  [1555] mergesat/dadda+brent-kung/mul_no_overflow_16 = .020351
+  [1559] mergesat/dadda+g-only/mul_no_overflow_16 = .020322
+  [1553] cryptominisat/dadda+brent-kung/mul_no_overflow_16 = .023046
+  [1557] cryptominisat/dadda+g-only/mul_no_overflow_16 = .026712
+  [1560] cadical/comba+ripple/mul_no_overflow_16 = .010200
+  [1562] minisat/comba+ripple/mul_no_overflow_16 = .016126
+  [1563] mergesat/comba+ripple/mul_no_overflow_16 = .021260
+  [1561] cryptominisat/comba+ripple/mul_no_overflow_16 = .022567
+  [1565] cryptominisat/comba+brent-kung/mul_no_overflow_16 = T/O
+  [1566] minisat/comba+brent-kung/mul_no_overflow_16 = T/O
+  [1564] cadical/comba+brent-kung/mul_no_overflow_16 = T/O
+  [1567] mergesat/comba+brent-kung/mul_no_overflow_16 = T/O
+  [1572] cadical/comba-cs+ripple/mul_no_overflow_16 = .011004
+  [1568] cadical/comba+g-only/mul_no_overflow_16 = .011960
+  [1574] minisat/comba-cs+ripple/mul_no_overflow_16 = .016568
+  [1570] minisat/comba+g-only/mul_no_overflow_16 = .017823
+  [1573] cryptominisat/comba-cs+ripple/mul_no_overflow_16 = .020182
+  [1575] mergesat/comba-cs+ripple/mul_no_overflow_16 = .021928
+  [1571] mergesat/comba+g-only/mul_no_overflow_16 = .024807
+  [1569] cryptominisat/comba+g-only/mul_no_overflow_16 = .027119
+  [1580] cadical/comba-cs+g-only/mul_no_overflow_16 = .010832
+  [1576] cadical/comba-cs+brent-kung/mul_no_overflow_16 = .011741
+  [1582] minisat/comba-cs+g-only/mul_no_overflow_16 = .016544
+  [1578] minisat/comba-cs+brent-kung/mul_no_overflow_16 = .018289
+  [1579] mergesat/comba-cs+brent-kung/mul_no_overflow_16 = .023194
+  [1583] mergesat/comba-cs+g-only/mul_no_overflow_16 = .022798
+  [1577] cryptominisat/comba-cs+brent-kung/mul_no_overflow_16 = .030045
+  [1581] cryptominisat/comba-cs+g-only/mul_no_overflow_16 = .032079
+  [1584] cadical/shift-add+ripple/overflow_detect_16 = .343541
+  [1588] cadical/shift-add+brent-kung/overflow_detect_16 = .342713
+  [1591] mergesat/shift-add+brent-kung/overflow_detect_16 = 86.226971
+  [1587] mergesat/shift-add+ripple/overflow_detect_16 = 86.091775
+  [1586] minisat/shift-add+ripple/overflow_detect_16 = T/O
+  [1590] minisat/shift-add+brent-kung/overflow_detect_16 = T/O
+  [1585] cryptominisat/shift-add+ripple/overflow_detect_16 = T/O
+  [1589] cryptominisat/shift-add+brent-kung/overflow_detect_16 = T/O
+  [1596] cadical/dadda+ripple/overflow_detect_16 = .184411
+  [1592] cadical/shift-add+g-only/overflow_detect_16 = .342653
+  [1599] mergesat/dadda+ripple/overflow_detect_16 = 3.255930
+  [1597] cryptominisat/dadda+ripple/overflow_detect_16 = 8.004156
+  [1598] minisat/dadda+ripple/overflow_detect_16 = 16.404719
+  [1595] mergesat/shift-add+g-only/overflow_detect_16 = 82.194455
+  [1594] minisat/shift-add+g-only/overflow_detect_16 = T/O
+  [1593] cryptominisat/shift-add+g-only/overflow_detect_16 = T/O
+  [1604] cadical/dadda+g-only/overflow_detect_16 = .177289
+  [1600] cadical/dadda+brent-kung/overflow_detect_16 = .369833
+  [1603] mergesat/dadda+brent-kung/overflow_detect_16 = 1.844656
+  [1607] mergesat/dadda+g-only/overflow_detect_16 = 2.981395
+  [1605] cryptominisat/dadda+g-only/overflow_detect_16 = 6.484525
+  [1601] cryptominisat/dadda+brent-kung/overflow_detect_16 = 7.662547
+  [1602] minisat/dadda+brent-kung/overflow_detect_16 = 17.934108
+  [1606] minisat/dadda+g-only/overflow_detect_16 = 19.004902
+  [1608] cadical/comba+ripple/overflow_detect_16 = 1.183736
+  [1614] minisat/comba+brent-kung/overflow_detect_16 = T/O
+  [1612] cadical/comba+brent-kung/overflow_detect_16 = T/O
+  [1613] cryptominisat/comba+brent-kung/overflow_detect_16 = T/O
+  [1615] mergesat/comba+brent-kung/overflow_detect_16 = T/O
+  [1611] mergesat/comba+ripple/overflow_detect_16 = 25.121679
+  [1610] minisat/comba+ripple/overflow_detect_16 = T/O
+  [1609] cryptominisat/comba+ripple/overflow_detect_16 = T/O
+  [1616] cadical/comba+g-only/overflow_detect_16 = .733803
+  [1619] mergesat/comba+g-only/overflow_detect_16 = 28.708221
+  [1623] mergesat/comba-cs+ripple/overflow_detect_16 = 119.691282
+  [1620] cadical/comba-cs+ripple/overflow_detect_16 = 119.677992
+  [1622] minisat/comba-cs+ripple/overflow_detect_16 = T/O
+  [1618] minisat/comba+g-only/overflow_detect_16 = T/O
+  [1617] cryptominisat/comba+g-only/overflow_detect_16 = T/O
+  [1621] cryptominisat/comba-cs+ripple/overflow_detect_16 = T/O
+  [1624] cadical/comba-cs+brent-kung/overflow_detect_16 = T/O
+  [1626] minisat/comba-cs+brent-kung/overflow_detect_16 = T/O
+  [1628] cadical/comba-cs+g-only/overflow_detect_16 = T/O
+  [1630] minisat/comba-cs+g-only/overflow_detect_16 = T/O
+  [1627] mergesat/comba-cs+brent-kung/overflow_detect_16 = T/O
+  [1631] mergesat/comba-cs+g-only/overflow_detect_16 = T/O
+  [1625] cryptominisat/comba-cs+brent-kung/overflow_detect_16 = T/O
+  [1629] cryptominisat/comba-cs+g-only/overflow_detect_16 = T/O
+  [1632] cadical/shift-add+ripple/strength_chain_16 = .928003
+  [1636] cadical/shift-add+brent-kung/strength_chain_16 = 1.353335
+  [1634] minisat/shift-add+ripple/strength_chain_16 = 1.394232
+  [1638] minisat/shift-add+brent-kung/strength_chain_16 = 1.593032
+  [1633] cryptominisat/shift-add+ripple/strength_chain_16 = 2.595503
+  [1639] mergesat/shift-add+brent-kung/strength_chain_16 = 3.372194
+  [1637] cryptominisat/shift-add+brent-kung/strength_chain_16 = 3.374391
+  [1635] mergesat/shift-add+ripple/strength_chain_16 = 5.097272
+  [1640] cadical/shift-add+g-only/strength_chain_16 = 1.028029
+  [1642] minisat/shift-add+g-only/strength_chain_16 = 1.305183
+  [1646] minisat/dadda+ripple/strength_chain_16 = 1.416764
+  [1644] cadical/dadda+ripple/strength_chain_16 = 1.565649
+  [1645] cryptominisat/dadda+ripple/strength_chain_16 = 1.795338
+  [1643] mergesat/shift-add+g-only/strength_chain_16 = 2.075016
+  [1641] cryptominisat/shift-add+g-only/strength_chain_16 = 2.329052
+  [1647] mergesat/dadda+ripple/strength_chain_16 = 5.887276
+  [1652] cadical/dadda+g-only/strength_chain_16 = .708365
+  [1648] cadical/dadda+brent-kung/strength_chain_16 = .848768
+  [1654] minisat/dadda+g-only/strength_chain_16 = 1.472733
+  [1653] cryptominisat/dadda+g-only/strength_chain_16 = 1.891470
+  [1650] minisat/dadda+brent-kung/strength_chain_16 = 2.011959
+  [1655] mergesat/dadda+g-only/strength_chain_16 = 2.052034
+  [1649] cryptominisat/dadda+brent-kung/strength_chain_16 = 3.111562
+  [1651] mergesat/dadda+brent-kung/strength_chain_16 = 5.869520
+  [1656] cadical/comba+ripple/strength_chain_16 = 1.147324
+  [1658] minisat/comba+ripple/strength_chain_16 = 2.207202
+  [1662] minisat/comba+brent-kung/strength_chain_16 = T/O
+  [1659] mergesat/comba+ripple/strength_chain_16 = 3.351077
+  [1661] cryptominisat/comba+brent-kung/strength_chain_16 = T/O
+  [1660] cadical/comba+brent-kung/strength_chain_16 = T/O
+  [1663] mergesat/comba+brent-kung/strength_chain_16 = T/O
+  [1657] cryptominisat/comba+ripple/strength_chain_16 = 5.276198
+  [1668] cadical/comba-cs+ripple/strength_chain_16 = .972214
+  [1664] cadical/comba+g-only/strength_chain_16 = 1.455419
+  [1670] minisat/comba-cs+ripple/strength_chain_16 = 1.757880
+  [1671] mergesat/comba-cs+ripple/strength_chain_16 = 1.945151
+  [1669] cryptominisat/comba-cs+ripple/strength_chain_16 = 2.001666
+  [1666] minisat/comba+g-only/strength_chain_16 = 2.560004
+  [1665] cryptominisat/comba+g-only/strength_chain_16 = 5.568453
+  [1667] mergesat/comba+g-only/strength_chain_16 = 6.587532
+  [1676] cadical/comba-cs+g-only/strength_chain_16 = .845756
+  [1672] cadical/comba-cs+brent-kung/strength_chain_16 = 1.054323
+  [1677] cryptominisat/comba-cs+g-only/strength_chain_16 = 1.828952
+  [1675] mergesat/comba-cs+brent-kung/strength_chain_16 = 1.910121
+  [1678] minisat/comba-cs+g-only/strength_chain_16 = 1.961259
+  [1673] cryptominisat/comba-cs+brent-kung/strength_chain_16 = 2.352134
+  [1679] mergesat/comba-cs+g-only/strength_chain_16 = 2.477842
+  [1674] minisat/comba-cs+brent-kung/strength_chain_16 = 3.477617
+  [1682] minisat/shift-add+ripple/strength_red_16 = .012964
+  [1681] cryptominisat/shift-add+ripple/strength_red_16 = .017749
+  [1685] cryptominisat/shift-add+brent-kung/strength_red_16 = .024554
+  [1680] cadical/shift-add+ripple/strength_red_16 = .028512
+  [1686] minisat/shift-add+brent-kung/strength_red_16 = .028224
+  [1684] cadical/shift-add+brent-kung/strength_red_16 = .034372
+  [1687] mergesat/shift-add+brent-kung/strength_red_16 = .049694
+  [1683] mergesat/shift-add+ripple/strength_red_16 = .088353
+  [1690] minisat/shift-add+g-only/strength_red_16 = .013122
+  [1693] cryptominisat/dadda+ripple/strength_red_16 = .014147
+  [1694] minisat/dadda+ripple/strength_red_16 = .015491
+  [1692] cadical/dadda+ripple/strength_red_16 = .018966
+  [1689] cryptominisat/shift-add+g-only/strength_red_16 = .019400
+  [1688] cadical/shift-add+g-only/strength_red_16 = .021552
+  [1695] mergesat/dadda+ripple/strength_red_16 = .064991
+  [1691] mergesat/shift-add+g-only/strength_red_16 = .068149
+  [1702] minisat/dadda+g-only/strength_red_16 = .010982
+  [1700] cadical/dadda+g-only/strength_red_16 = .018765
+  [1701] cryptominisat/dadda+g-only/strength_red_16 = .019842
+  [1697] cryptominisat/dadda+brent-kung/strength_red_16 = .028238
+  [1696] cadical/dadda+brent-kung/strength_red_16 = .032157
+  [1698] minisat/dadda+brent-kung/strength_red_16 = .034972
+  [1703] mergesat/dadda+g-only/strength_red_16 = .052960
+  [1699] mergesat/dadda+brent-kung/strength_red_16 = .093371
+  [1705] cryptominisat/comba+ripple/strength_red_16 = .029003
+  [1706] minisat/comba+ripple/strength_red_16 = .029545
+  [1704] cadical/comba+ripple/strength_red_16 = .045418
+  [1707] mergesat/comba+ripple/strength_red_16 = .123568
+  [1711] mergesat/comba+brent-kung/strength_red_16 = T/O
+  [1710] minisat/comba+brent-kung/strength_red_16 = T/O
+  [1708] cadical/comba+brent-kung/strength_red_16 = T/O
+  [1709] cryptominisat/comba+brent-kung/strength_red_16 = T/O
+  [1718] minisat/comba-cs+ripple/strength_red_16 = .012425
+  [1716] cadical/comba-cs+ripple/strength_red_16 = .016048
+  [1717] cryptominisat/comba-cs+ripple/strength_red_16 = .018271
+  [1714] minisat/comba+g-only/strength_red_16 = .034646
+  [1713] cryptominisat/comba+g-only/strength_red_16 = .038622
+  [1719] mergesat/comba-cs+ripple/strength_red_16 = .038147
+  [1712] cadical/comba+g-only/strength_red_16 = .044452
+  [1715] mergesat/comba+g-only/strength_red_16 = .079624
+  [1726] minisat/comba-cs+g-only/strength_red_16 = .012000
+  [1725] cryptominisat/comba-cs+g-only/strength_red_16 = .015536
+  [1724] cadical/comba-cs+g-only/strength_red_16 = .016313
+  [1722] minisat/comba-cs+brent-kung/strength_red_16 = .019542
+  [1721] cryptominisat/comba-cs+brent-kung/strength_red_16 = .019993
+  [1720] cadical/comba-cs+brent-kung/strength_red_16 = .027189
+  [1723] mergesat/comba-cs+brent-kung/strength_red_16 = .077650
+  [1727] mergesat/comba-cs+g-only/strength_red_16 = .104522
+All 1728 jobs complete.
+smt2	cadical	comba	brent-kung	add_chain_16	.916149
+smt2	cadical	comba	g-only	add_chain_16	.179559
+smt2	cadical	comba	ripple	add_chain_16	.176580
+smt2	cadical	comba-cs	brent-kung	add_chain_16	.917274
+smt2	cadical	comba-cs	g-only	add_chain_16	.179720
+smt2	cadical	comba-cs	ripple	add_chain_16	.176636
+smt2	cadical	dadda	brent-kung	add_chain_16	.916020
+smt2	cadical	dadda	g-only	add_chain_16	.179492
+smt2	cadical	dadda	ripple	add_chain_16	.176977
+smt2	cadical	shift-add	brent-kung	add_chain_16	.916193
+smt2	cadical	shift-add	g-only	add_chain_16	.179429
+smt2	cadical	shift-add	ripple	add_chain_16	.176670
+smt2	cryptominisat	comba	brent-kung	add_chain_16	4.883233
+smt2	cryptominisat	comba	g-only	add_chain_16	.558743
+smt2	cryptominisat	comba	ripple	add_chain_16	.542160
+smt2	cryptominisat	comba-cs	brent-kung	add_chain_16	4.877706
+smt2	cryptominisat	comba-cs	g-only	add_chain_16	.558719
+smt2	cryptominisat	comba-cs	ripple	add_chain_16	.543686
+smt2	cryptominisat	dadda	brent-kung	add_chain_16	4.866600
+smt2	cryptominisat	dadda	g-only	add_chain_16	.557471
+smt2	cryptominisat	dadda	ripple	add_chain_16	.543622
+smt2	cryptominisat	shift-add	brent-kung	add_chain_16	4.856381
+smt2	cryptominisat	shift-add	g-only	add_chain_16	.558355
+smt2	cryptominisat	shift-add	ripple	add_chain_16	.544835
+smt2	mergesat	comba	brent-kung	add_chain_16	1.792080
+smt2	mergesat	comba	g-only	add_chain_16	.390309
+smt2	mergesat	comba	ripple	add_chain_16	.372432
+smt2	mergesat	comba-cs	brent-kung	add_chain_16	1.790269
+smt2	mergesat	comba-cs	g-only	add_chain_16	.389899
+smt2	mergesat	comba-cs	ripple	add_chain_16	.371801
+smt2	mergesat	dadda	brent-kung	add_chain_16	1.792784
+smt2	mergesat	dadda	g-only	add_chain_16	.389858
+smt2	mergesat	dadda	ripple	add_chain_16	.372868
+smt2	mergesat	shift-add	brent-kung	add_chain_16	1.786845
+smt2	mergesat	shift-add	g-only	add_chain_16	.389120
+smt2	mergesat	shift-add	ripple	add_chain_16	.373026
+smt2	minisat	comba	brent-kung	add_chain_16	2.618985
+smt2	minisat	comba	g-only	add_chain_16	.356011
+smt2	minisat	comba	ripple	add_chain_16	.495988
+smt2	minisat	comba-cs	brent-kung	add_chain_16	2.615049
+smt2	minisat	comba-cs	g-only	add_chain_16	.355258
+smt2	minisat	comba-cs	ripple	add_chain_16	.496271
+smt2	minisat	dadda	brent-kung	add_chain_16	2.614943
+smt2	minisat	dadda	g-only	add_chain_16	.355335
+smt2	minisat	dadda	ripple	add_chain_16	.496524
+smt2	minisat	shift-add	brent-kung	add_chain_16	2.619156
+smt2	minisat	shift-add	g-only	add_chain_16	.355200
+smt2	minisat	shift-add	ripple	add_chain_16	.496096
+smt2	cadical	comba	brent-kung	add_chain_32	1.695881
+smt2	cadical	comba	g-only	add_chain_32	.325475
+smt2	cadical	comba	ripple	add_chain_32	.458430
+smt2	cadical	comba-cs	brent-kung	add_chain_32	1.694323
+smt2	cadical	comba-cs	g-only	add_chain_32	.326083
+smt2	cadical	comba-cs	ripple	add_chain_32	.458864
+smt2	cadical	dadda	brent-kung	add_chain_32	1.699537
+smt2	cadical	dadda	g-only	add_chain_32	.326098
+smt2	cadical	dadda	ripple	add_chain_32	.459398
+smt2	cadical	shift-add	brent-kung	add_chain_32	1.695372
+smt2	cadical	shift-add	g-only	add_chain_32	.325643
+smt2	cadical	shift-add	ripple	add_chain_32	.458482
+smt2	cryptominisat	comba	brent-kung	add_chain_32	11.342933
+smt2	cryptominisat	comba	g-only	add_chain_32	1.889040
+smt2	cryptominisat	comba	ripple	add_chain_32	1.809016
+smt2	cryptominisat	comba-cs	brent-kung	add_chain_32	11.296133
+smt2	cryptominisat	comba-cs	g-only	add_chain_32	1.904089
+smt2	cryptominisat	comba-cs	ripple	add_chain_32	1.806412
+smt2	cryptominisat	dadda	brent-kung	add_chain_32	11.288294
+smt2	cryptominisat	dadda	g-only	add_chain_32	1.902662
+smt2	cryptominisat	dadda	ripple	add_chain_32	1.808854
+smt2	cryptominisat	shift-add	brent-kung	add_chain_32	11.272314
+smt2	cryptominisat	shift-add	g-only	add_chain_32	1.891235
+smt2	cryptominisat	shift-add	ripple	add_chain_32	1.812877
+smt2	mergesat	comba	brent-kung	add_chain_32	3.250035
+smt2	mergesat	comba	g-only	add_chain_32	.763463
+smt2	mergesat	comba	ripple	add_chain_32	.981458
+smt2	mergesat	comba-cs	brent-kung	add_chain_32	3.253290
+smt2	mergesat	comba-cs	g-only	add_chain_32	.763456
+smt2	mergesat	comba-cs	ripple	add_chain_32	.978153
+smt2	mergesat	dadda	brent-kung	add_chain_32	3.258492
+smt2	mergesat	dadda	g-only	add_chain_32	.766413
+smt2	mergesat	dadda	ripple	add_chain_32	.978968
+smt2	mergesat	shift-add	brent-kung	add_chain_32	3.259445
+smt2	mergesat	shift-add	g-only	add_chain_32	.763646
+smt2	mergesat	shift-add	ripple	add_chain_32	.980733
+smt2	minisat	comba	brent-kung	add_chain_32	10.145649
+smt2	minisat	comba	g-only	add_chain_32	3.009301
+smt2	minisat	comba	ripple	add_chain_32	2.520462
+smt2	minisat	comba-cs	brent-kung	add_chain_32	10.147836
+smt2	minisat	comba-cs	g-only	add_chain_32	3.009377
+smt2	minisat	comba-cs	ripple	add_chain_32	2.519327
+smt2	minisat	dadda	brent-kung	add_chain_32	10.146409
+smt2	minisat	dadda	g-only	add_chain_32	3.009778
+smt2	minisat	dadda	ripple	add_chain_32	2.525192
+smt2	minisat	shift-add	brent-kung	add_chain_32	10.150551
+smt2	minisat	shift-add	g-only	add_chain_32	3.009741
+smt2	minisat	shift-add	ripple	add_chain_32	2.521558
+smt2	cadical	comba	brent-kung	add_overflow_16	T/O
+smt2	cadical	comba	g-only	add_overflow_16	.008574
+smt2	cadical	comba	ripple	add_overflow_16	.008143
+smt2	cadical	comba-cs	brent-kung	add_overflow_16	T/O
+smt2	cadical	comba-cs	g-only	add_overflow_16	.008087
+smt2	cadical	comba-cs	ripple	add_overflow_16	.008240
+smt2	cadical	dadda	brent-kung	add_overflow_16	T/O
+smt2	cadical	dadda	g-only	add_overflow_16	.008013
+smt2	cadical	dadda	ripple	add_overflow_16	.008094
+smt2	cadical	shift-add	brent-kung	add_overflow_16	T/O
+smt2	cadical	shift-add	g-only	add_overflow_16	.008557
+smt2	cadical	shift-add	ripple	add_overflow_16	.007779
+smt2	cryptominisat	comba	brent-kung	add_overflow_16	T/O
+smt2	cryptominisat	comba	g-only	add_overflow_16	.009587
+smt2	cryptominisat	comba	ripple	add_overflow_16	.009067
+smt2	cryptominisat	comba-cs	brent-kung	add_overflow_16	T/O
+smt2	cryptominisat	comba-cs	g-only	add_overflow_16	.008896
+smt2	cryptominisat	comba-cs	ripple	add_overflow_16	.009077
+smt2	cryptominisat	dadda	brent-kung	add_overflow_16	T/O
+smt2	cryptominisat	dadda	g-only	add_overflow_16	.008930
+smt2	cryptominisat	dadda	ripple	add_overflow_16	.008908
+smt2	cryptominisat	shift-add	brent-kung	add_overflow_16	T/O
+smt2	cryptominisat	shift-add	g-only	add_overflow_16	.009548
+smt2	cryptominisat	shift-add	ripple	add_overflow_16	.008587
+smt2	mergesat	comba	brent-kung	add_overflow_16	T/O
+smt2	mergesat	comba	g-only	add_overflow_16	.010049
+smt2	mergesat	comba	ripple	add_overflow_16	.009947
+smt2	mergesat	comba-cs	brent-kung	add_overflow_16	T/O
+smt2	mergesat	comba-cs	g-only	add_overflow_16	.009610
+smt2	mergesat	comba-cs	ripple	add_overflow_16	.009984
+smt2	mergesat	dadda	brent-kung	add_overflow_16	T/O
+smt2	mergesat	dadda	g-only	add_overflow_16	.009394
+smt2	mergesat	dadda	ripple	add_overflow_16	.009986
+smt2	mergesat	shift-add	brent-kung	add_overflow_16	T/O
+smt2	mergesat	shift-add	g-only	add_overflow_16	.010143
+smt2	mergesat	shift-add	ripple	add_overflow_16	.009456
+smt2	minisat	comba	brent-kung	add_overflow_16	T/O
+smt2	minisat	comba	g-only	add_overflow_16	.008309
+smt2	minisat	comba	ripple	add_overflow_16	.008348
+smt2	minisat	comba-cs	brent-kung	add_overflow_16	T/O
+smt2	minisat	comba-cs	g-only	add_overflow_16	.007768
+smt2	minisat	comba-cs	ripple	add_overflow_16	.008455
+smt2	minisat	dadda	brent-kung	add_overflow_16	T/O
+smt2	minisat	dadda	g-only	add_overflow_16	.007770
+smt2	minisat	dadda	ripple	add_overflow_16	.008456
+smt2	minisat	shift-add	brent-kung	add_overflow_16	T/O
+smt2	minisat	shift-add	g-only	add_overflow_16	.008493
+smt2	minisat	shift-add	ripple	add_overflow_16	.007884
+smt2	cadical	comba	brent-kung	add_sub_cancel_16	.014927
+smt2	cadical	comba	g-only	add_sub_cancel_16	.008298
+smt2	cadical	comba	ripple	add_sub_cancel_16	.008618
+smt2	cadical	comba-cs	brent-kung	add_sub_cancel_16	.015207
+smt2	cadical	comba-cs	g-only	add_sub_cancel_16	.008230
+smt2	cadical	comba-cs	ripple	add_sub_cancel_16	.008565
+smt2	cadical	dadda	brent-kung	add_sub_cancel_16	.015202
+smt2	cadical	dadda	g-only	add_sub_cancel_16	.008228
+smt2	cadical	dadda	ripple	add_sub_cancel_16	.008480
+smt2	cadical	shift-add	brent-kung	add_sub_cancel_16	.015406
+smt2	cadical	shift-add	g-only	add_sub_cancel_16	.008295
+smt2	cadical	shift-add	ripple	add_sub_cancel_16	.009332
+smt2	cryptominisat	comba	brent-kung	add_sub_cancel_16	.010401
+smt2	cryptominisat	comba	g-only	add_sub_cancel_16	.008342
+smt2	cryptominisat	comba	ripple	add_sub_cancel_16	.007792
+smt2	cryptominisat	comba-cs	brent-kung	add_sub_cancel_16	.010316
+smt2	cryptominisat	comba-cs	g-only	add_sub_cancel_16	.008247
+smt2	cryptominisat	comba-cs	ripple	add_sub_cancel_16	.007885
+smt2	cryptominisat	dadda	brent-kung	add_sub_cancel_16	.010345
+smt2	cryptominisat	dadda	g-only	add_sub_cancel_16	.008296
+smt2	cryptominisat	dadda	ripple	add_sub_cancel_16	.007909
+smt2	cryptominisat	shift-add	brent-kung	add_sub_cancel_16	.010604
+smt2	cryptominisat	shift-add	g-only	add_sub_cancel_16	.008499
+smt2	cryptominisat	shift-add	ripple	add_sub_cancel_16	.008563
+smt2	mergesat	comba	brent-kung	add_sub_cancel_16	.016269
+smt2	mergesat	comba	g-only	add_sub_cancel_16	.012472
+smt2	mergesat	comba	ripple	add_sub_cancel_16	.010399
+smt2	mergesat	comba-cs	brent-kung	add_sub_cancel_16	.016268
+smt2	mergesat	comba-cs	g-only	add_sub_cancel_16	.012424
+smt2	mergesat	comba-cs	ripple	add_sub_cancel_16	.010713
+smt2	mergesat	dadda	brent-kung	add_sub_cancel_16	.016393
+smt2	mergesat	dadda	g-only	add_sub_cancel_16	.012383
+smt2	mergesat	dadda	ripple	add_sub_cancel_16	.010487
+smt2	mergesat	shift-add	brent-kung	add_sub_cancel_16	.016628
+smt2	mergesat	shift-add	g-only	add_sub_cancel_16	.012526
+smt2	mergesat	shift-add	ripple	add_sub_cancel_16	.011047
+smt2	minisat	comba	brent-kung	add_sub_cancel_16	.011149
+smt2	minisat	comba	g-only	add_sub_cancel_16	.007517
+smt2	minisat	comba	ripple	add_sub_cancel_16	.007716
+smt2	minisat	comba-cs	brent-kung	add_sub_cancel_16	.011241
+smt2	minisat	comba-cs	g-only	add_sub_cancel_16	.007379
+smt2	minisat	comba-cs	ripple	add_sub_cancel_16	.007590
+smt2	minisat	dadda	brent-kung	add_sub_cancel_16	.011292
+smt2	minisat	dadda	g-only	add_sub_cancel_16	.007428
+smt2	minisat	dadda	ripple	add_sub_cancel_16	.007728
+smt2	minisat	shift-add	brent-kung	add_sub_cancel_16	.011791
+smt2	minisat	shift-add	g-only	add_sub_cancel_16	.007520
+smt2	minisat	shift-add	ripple	add_sub_cancel_16	.008332
+smt2	cadical	comba	brent-kung	assoc_8	T/O
+smt2	cadical	comba	g-only	assoc_8	T/O
+smt2	cadical	comba	ripple	assoc_8	119.152948
+smt2	cadical	comba-cs	brent-kung	assoc_8	T/O
+smt2	cadical	comba-cs	g-only	assoc_8	T/O
+smt2	cadical	comba-cs	ripple	assoc_8	T/O
+smt2	cadical	dadda	brent-kung	assoc_8	T/O
+smt2	cadical	dadda	g-only	assoc_8	T/O
+smt2	cadical	dadda	ripple	assoc_8	T/O
+smt2	cadical	shift-add	brent-kung	assoc_8	27.182469
+smt2	cadical	shift-add	g-only	assoc_8	27.147648
+smt2	cadical	shift-add	ripple	assoc_8	27.156395
+smt2	cryptominisat	comba	brent-kung	assoc_8	T/O
+smt2	cryptominisat	comba	g-only	assoc_8	T/O
+smt2	cryptominisat	comba	ripple	assoc_8	T/O
+smt2	cryptominisat	comba-cs	brent-kung	assoc_8	T/O
+smt2	cryptominisat	comba-cs	g-only	assoc_8	T/O
+smt2	cryptominisat	comba-cs	ripple	assoc_8	T/O
+smt2	cryptominisat	dadda	brent-kung	assoc_8	T/O
+smt2	cryptominisat	dadda	g-only	assoc_8	T/O
+smt2	cryptominisat	dadda	ripple	assoc_8	T/O
+smt2	cryptominisat	shift-add	brent-kung	assoc_8	86.024839
+smt2	cryptominisat	shift-add	g-only	assoc_8	86.353658
+smt2	cryptominisat	shift-add	ripple	assoc_8	86.057674
+smt2	mergesat	comba	brent-kung	assoc_8	T/O
+smt2	mergesat	comba	g-only	assoc_8	T/O
+smt2	mergesat	comba	ripple	assoc_8	T/O
+smt2	mergesat	comba-cs	brent-kung	assoc_8	T/O
+smt2	mergesat	comba-cs	g-only	assoc_8	T/O
+smt2	mergesat	comba-cs	ripple	assoc_8	T/O
+smt2	mergesat	dadda	brent-kung	assoc_8	T/O
+smt2	mergesat	dadda	g-only	assoc_8	T/O
+smt2	mergesat	dadda	ripple	assoc_8	T/O
+smt2	mergesat	shift-add	brent-kung	assoc_8	103.083049
+smt2	mergesat	shift-add	g-only	assoc_8	103.728709
+smt2	mergesat	shift-add	ripple	assoc_8	103.460495
+smt2	minisat	comba	brent-kung	assoc_8	T/O
+smt2	minisat	comba	g-only	assoc_8	T/O
+smt2	minisat	comba	ripple	assoc_8	T/O
+smt2	minisat	comba-cs	brent-kung	assoc_8	T/O
+smt2	minisat	comba-cs	g-only	assoc_8	T/O
+smt2	minisat	comba-cs	ripple	assoc_8	T/O
+smt2	minisat	dadda	brent-kung	assoc_8	T/O
+smt2	minisat	dadda	g-only	assoc_8	T/O
+smt2	minisat	dadda	ripple	assoc_8	T/O
+smt2	minisat	shift-add	brent-kung	assoc_8	T/O
+smt2	minisat	shift-add	g-only	assoc_8	T/O
+smt2	minisat	shift-add	ripple	assoc_8	T/O
+smt2	cadical	comba	brent-kung	barrett_red_8	T/O
+smt2	cadical	comba	g-only	barrett_red_8	.018117
+smt2	cadical	comba	ripple	barrett_red_8	.016211
+smt2	cadical	comba-cs	brent-kung	barrett_red_8	.012588
+smt2	cadical	comba-cs	g-only	barrett_red_8	.012309
+smt2	cadical	comba-cs	ripple	barrett_red_8	.012529
+smt2	cadical	dadda	brent-kung	barrett_red_8	.013593
+smt2	cadical	dadda	g-only	barrett_red_8	.012559
+smt2	cadical	dadda	ripple	barrett_red_8	.012340
+smt2	cadical	shift-add	brent-kung	barrett_red_8	.012892
+smt2	cadical	shift-add	g-only	barrett_red_8	.012610
+smt2	cadical	shift-add	ripple	barrett_red_8	.012394
+smt2	cryptominisat	comba	brent-kung	barrett_red_8	T/O
+smt2	cryptominisat	comba	g-only	barrett_red_8	.021173
+smt2	cryptominisat	comba	ripple	barrett_red_8	.017672
+smt2	cryptominisat	comba-cs	brent-kung	barrett_red_8	.007539
+smt2	cryptominisat	comba-cs	g-only	barrett_red_8	.007228
+smt2	cryptominisat	comba-cs	ripple	barrett_red_8	.007756
+smt2	cryptominisat	dadda	brent-kung	barrett_red_8	.007672
+smt2	cryptominisat	dadda	g-only	barrett_red_8	.007713
+smt2	cryptominisat	dadda	ripple	barrett_red_8	.006969
+smt2	cryptominisat	shift-add	brent-kung	barrett_red_8	.007458
+smt2	cryptominisat	shift-add	g-only	barrett_red_8	.007288
+smt2	cryptominisat	shift-add	ripple	barrett_red_8	.007187
+smt2	mergesat	comba	brent-kung	barrett_red_8	T/O
+smt2	mergesat	comba	g-only	barrett_red_8	.014456
+smt2	mergesat	comba	ripple	barrett_red_8	.012712
+smt2	mergesat	comba-cs	brent-kung	barrett_red_8	.008083
+smt2	mergesat	comba-cs	g-only	barrett_red_8	.007474
+smt2	mergesat	comba-cs	ripple	barrett_red_8	.007936
+smt2	mergesat	dadda	brent-kung	barrett_red_8	.008638
+smt2	mergesat	dadda	g-only	barrett_red_8	.009044
+smt2	mergesat	dadda	ripple	barrett_red_8	.007502
+smt2	mergesat	shift-add	brent-kung	barrett_red_8	.008917
+smt2	mergesat	shift-add	g-only	barrett_red_8	.007907
+smt2	mergesat	shift-add	ripple	barrett_red_8	.007750
+smt2	minisat	comba	brent-kung	barrett_red_8	T/O
+smt2	minisat	comba	g-only	barrett_red_8	.009659
+smt2	minisat	comba	ripple	barrett_red_8	.008446
+smt2	minisat	comba-cs	brent-kung	barrett_red_8	.006766
+smt2	minisat	comba-cs	g-only	barrett_red_8	.006592
+smt2	minisat	comba-cs	ripple	barrett_red_8	.007028
+smt2	minisat	dadda	brent-kung	barrett_red_8	.007267
+smt2	minisat	dadda	g-only	barrett_red_8	.006626
+smt2	minisat	dadda	ripple	barrett_red_8	.006503
+smt2	minisat	shift-add	brent-kung	barrett_red_8	.006777
+smt2	minisat	shift-add	g-only	barrett_red_8	.006667
+smt2	minisat	shift-add	ripple	barrett_red_8	.006679
+smt2	cadical	comba	brent-kung	bf16_mul_comm	.009609
+smt2	cadical	comba	g-only	bf16_mul_comm	.009641
+smt2	cadical	comba	ripple	bf16_mul_comm	.009563
+smt2	cadical	comba-cs	brent-kung	bf16_mul_comm	.008849
+smt2	cadical	comba-cs	g-only	bf16_mul_comm	.008920
+smt2	cadical	comba-cs	ripple	bf16_mul_comm	.008669
+smt2	cadical	dadda	brent-kung	bf16_mul_comm	.008965
+smt2	cadical	dadda	g-only	bf16_mul_comm	.008737
+smt2	cadical	dadda	ripple	bf16_mul_comm	.008787
+smt2	cadical	shift-add	brent-kung	bf16_mul_comm	.008623
+smt2	cadical	shift-add	g-only	bf16_mul_comm	.008643
+smt2	cadical	shift-add	ripple	bf16_mul_comm	.008658
+smt2	cryptominisat	comba	brent-kung	bf16_mul_comm	.044514
+smt2	cryptominisat	comba	g-only	bf16_mul_comm	.044541
+smt2	cryptominisat	comba	ripple	bf16_mul_comm	.044467
+smt2	cryptominisat	comba-cs	brent-kung	bf16_mul_comm	.236786
+smt2	cryptominisat	comba-cs	g-only	bf16_mul_comm	.236562
+smt2	cryptominisat	comba-cs	ripple	bf16_mul_comm	.234729
+smt2	cryptominisat	dadda	brent-kung	bf16_mul_comm	.044500
+smt2	cryptominisat	dadda	g-only	bf16_mul_comm	.044270
+smt2	cryptominisat	dadda	ripple	bf16_mul_comm	.044576
+smt2	cryptominisat	shift-add	brent-kung	bf16_mul_comm	.275276
+smt2	cryptominisat	shift-add	g-only	bf16_mul_comm	.272874
+smt2	cryptominisat	shift-add	ripple	bf16_mul_comm	.275403
+smt2	mergesat	comba	brent-kung	bf16_mul_comm	.057903
+smt2	mergesat	comba	g-only	bf16_mul_comm	.057374
+smt2	mergesat	comba	ripple	bf16_mul_comm	.057251
+smt2	mergesat	comba-cs	brent-kung	bf16_mul_comm	.031854
+smt2	mergesat	comba-cs	g-only	bf16_mul_comm	.031674
+smt2	mergesat	comba-cs	ripple	bf16_mul_comm	.031961
+smt2	mergesat	dadda	brent-kung	bf16_mul_comm	.030832
+smt2	mergesat	dadda	g-only	bf16_mul_comm	.030901
+smt2	mergesat	dadda	ripple	bf16_mul_comm	.030984
+smt2	mergesat	shift-add	brent-kung	bf16_mul_comm	.042689
+smt2	mergesat	shift-add	g-only	bf16_mul_comm	.042575
+smt2	mergesat	shift-add	ripple	bf16_mul_comm	.042623
+smt2	minisat	comba	brent-kung	bf16_mul_comm	.025073
+smt2	minisat	comba	g-only	bf16_mul_comm	.024964
+smt2	minisat	comba	ripple	bf16_mul_comm	.025001
+smt2	minisat	comba-cs	brent-kung	bf16_mul_comm	.039621
+smt2	minisat	comba-cs	g-only	bf16_mul_comm	.039589
+smt2	minisat	comba-cs	ripple	bf16_mul_comm	.039518
+smt2	minisat	dadda	brent-kung	bf16_mul_comm	.031450
+smt2	minisat	dadda	g-only	bf16_mul_comm	.031294
+smt2	minisat	dadda	ripple	bf16_mul_comm	.031347
+smt2	minisat	shift-add	brent-kung	bf16_mul_comm	.044541
+smt2	minisat	shift-add	g-only	bf16_mul_comm	.044258
+smt2	minisat	shift-add	ripple	bf16_mul_comm	.044499
+smt2	cadical	comba	brent-kung	bf16_mul_comm_v2	10.587547
+smt2	cadical	comba	g-only	bf16_mul_comm_v2	10.608800
+smt2	cadical	comba	ripple	bf16_mul_comm_v2	10.585161
+smt2	cadical	comba-cs	brent-kung	bf16_mul_comm_v2	11.203537
+smt2	cadical	comba-cs	g-only	bf16_mul_comm_v2	11.166050
+smt2	cadical	comba-cs	ripple	bf16_mul_comm_v2	11.176149
+smt2	cadical	dadda	brent-kung	bf16_mul_comm_v2	27.926345
+smt2	cadical	dadda	g-only	bf16_mul_comm_v2	27.892932
+smt2	cadical	dadda	ripple	bf16_mul_comm_v2	27.980974
+smt2	cadical	shift-add	brent-kung	bf16_mul_comm_v2	22.797217
+smt2	cadical	shift-add	g-only	bf16_mul_comm_v2	22.865233
+smt2	cadical	shift-add	ripple	bf16_mul_comm_v2	22.929060
+smt2	cryptominisat	comba	brent-kung	bf16_mul_comm_v2	42.546276
+smt2	cryptominisat	comba	g-only	bf16_mul_comm_v2	42.373249
+smt2	cryptominisat	comba	ripple	bf16_mul_comm_v2	42.550413
+smt2	cryptominisat	comba-cs	brent-kung	bf16_mul_comm_v2	48.609554
+smt2	cryptominisat	comba-cs	g-only	bf16_mul_comm_v2	48.667565
+smt2	cryptominisat	comba-cs	ripple	bf16_mul_comm_v2	48.289205
+smt2	cryptominisat	dadda	brent-kung	bf16_mul_comm_v2	58.866503
+smt2	cryptominisat	dadda	g-only	bf16_mul_comm_v2	58.598716
+smt2	cryptominisat	dadda	ripple	bf16_mul_comm_v2	57.835478
+smt2	cryptominisat	shift-add	brent-kung	bf16_mul_comm_v2	51.271931
+smt2	cryptominisat	shift-add	g-only	bf16_mul_comm_v2	51.384647
+smt2	cryptominisat	shift-add	ripple	bf16_mul_comm_v2	51.351984
+smt2	mergesat	comba	brent-kung	bf16_mul_comm_v2	T/O
+smt2	mergesat	comba	g-only	bf16_mul_comm_v2	T/O
+smt2	mergesat	comba	ripple	bf16_mul_comm_v2	T/O
+smt2	mergesat	comba-cs	brent-kung	bf16_mul_comm_v2	119.694567
+smt2	mergesat	comba-cs	g-only	bf16_mul_comm_v2	118.952461
+smt2	mergesat	comba-cs	ripple	bf16_mul_comm_v2	118.557100
+smt2	mergesat	dadda	brent-kung	bf16_mul_comm_v2	110.881880
+smt2	mergesat	dadda	g-only	bf16_mul_comm_v2	110.068379
+smt2	mergesat	dadda	ripple	bf16_mul_comm_v2	108.595685
+smt2	mergesat	shift-add	brent-kung	bf16_mul_comm_v2	86.631393
+smt2	mergesat	shift-add	g-only	bf16_mul_comm_v2	86.583433
+smt2	mergesat	shift-add	ripple	bf16_mul_comm_v2	85.956574
+smt2	minisat	comba	brent-kung	bf16_mul_comm_v2	T/O
+smt2	minisat	comba	g-only	bf16_mul_comm_v2	T/O
+smt2	minisat	comba	ripple	bf16_mul_comm_v2	T/O
+smt2	minisat	comba-cs	brent-kung	bf16_mul_comm_v2	T/O
+smt2	minisat	comba-cs	g-only	bf16_mul_comm_v2	T/O
+smt2	minisat	comba-cs	ripple	bf16_mul_comm_v2	T/O
+smt2	minisat	dadda	brent-kung	bf16_mul_comm_v2	89.649915
+smt2	minisat	dadda	g-only	bf16_mul_comm_v2	89.699249
+smt2	minisat	dadda	ripple	bf16_mul_comm_v2	89.621089
+smt2	minisat	shift-add	brent-kung	bf16_mul_comm_v2	T/O
+smt2	minisat	shift-add	g-only	bf16_mul_comm_v2	T/O
+smt2	minisat	shift-add	ripple	bf16_mul_comm_v2	T/O
+smt2	cadical	comba	brent-kung	bf16_mul_const	.032220
+smt2	cadical	comba	g-only	bf16_mul_const	.032308
+smt2	cadical	comba	ripple	bf16_mul_const	.032303
+smt2	cadical	comba-cs	brent-kung	bf16_mul_const	.028354
+smt2	cadical	comba-cs	g-only	bf16_mul_const	.028410
+smt2	cadical	comba-cs	ripple	bf16_mul_const	.028216
+smt2	cadical	dadda	brent-kung	bf16_mul_const	.028444
+smt2	cadical	dadda	g-only	bf16_mul_const	.028292
+smt2	cadical	dadda	ripple	bf16_mul_const	.028299
+smt2	cadical	shift-add	brent-kung	bf16_mul_const	.030245
+smt2	cadical	shift-add	g-only	bf16_mul_const	.030125
+smt2	cadical	shift-add	ripple	bf16_mul_const	.030181
+smt2	cryptominisat	comba	brent-kung	bf16_mul_const	.041614
+smt2	cryptominisat	comba	g-only	bf16_mul_const	.041360
+smt2	cryptominisat	comba	ripple	bf16_mul_const	.041665
+smt2	cryptominisat	comba-cs	brent-kung	bf16_mul_const	.033094
+smt2	cryptominisat	comba-cs	g-only	bf16_mul_const	.033069
+smt2	cryptominisat	comba-cs	ripple	bf16_mul_const	.032923
+smt2	cryptominisat	dadda	brent-kung	bf16_mul_const	.037839
+smt2	cryptominisat	dadda	g-only	bf16_mul_const	.037876
+smt2	cryptominisat	dadda	ripple	bf16_mul_const	.037937
+smt2	cryptominisat	shift-add	brent-kung	bf16_mul_const	.049412
+smt2	cryptominisat	shift-add	g-only	bf16_mul_const	.049301
+smt2	cryptominisat	shift-add	ripple	bf16_mul_const	.049193
+smt2	mergesat	comba	brent-kung	bf16_mul_const	.087998
+smt2	mergesat	comba	g-only	bf16_mul_const	.088084
+smt2	mergesat	comba	ripple	bf16_mul_const	.088370
+smt2	mergesat	comba-cs	brent-kung	bf16_mul_const	.047884
+smt2	mergesat	comba-cs	g-only	bf16_mul_const	.047899
+smt2	mergesat	comba-cs	ripple	bf16_mul_const	.047681
+smt2	mergesat	dadda	brent-kung	bf16_mul_const	.037621
+smt2	mergesat	dadda	g-only	bf16_mul_const	.037480
+smt2	mergesat	dadda	ripple	bf16_mul_const	.037408
+smt2	mergesat	shift-add	brent-kung	bf16_mul_const	.037901
+smt2	mergesat	shift-add	g-only	bf16_mul_const	.038183
+smt2	mergesat	shift-add	ripple	bf16_mul_const	.037845
+smt2	minisat	comba	brent-kung	bf16_mul_const	.022243
+smt2	minisat	comba	g-only	bf16_mul_const	.022281
+smt2	minisat	comba	ripple	bf16_mul_const	.022281
+smt2	minisat	comba-cs	brent-kung	bf16_mul_const	.021373
+smt2	minisat	comba-cs	g-only	bf16_mul_const	.021350
+smt2	minisat	comba-cs	ripple	bf16_mul_const	.021297
+smt2	minisat	dadda	brent-kung	bf16_mul_const	.022933
+smt2	minisat	dadda	g-only	bf16_mul_const	.022907
+smt2	minisat	dadda	ripple	bf16_mul_const	.022989
+smt2	minisat	shift-add	brent-kung	bf16_mul_const	.019721
+smt2	minisat	shift-add	g-only	bf16_mul_const	.019898
+smt2	minisat	shift-add	ripple	bf16_mul_const	.019780
+smt2	cadical	comba	brent-kung	bf16_mul_mono	27.615887
+smt2	cadical	comba	g-only	bf16_mul_mono	27.507965
+smt2	cadical	comba	ripple	bf16_mul_mono	27.503640
+smt2	cadical	comba-cs	brent-kung	bf16_mul_mono	28.985888
+smt2	cadical	comba-cs	g-only	bf16_mul_mono	29.056239
+smt2	cadical	comba-cs	ripple	bf16_mul_mono	29.040826
+smt2	cadical	dadda	brent-kung	bf16_mul_mono	32.703891
+smt2	cadical	dadda	g-only	bf16_mul_mono	32.609854
+smt2	cadical	dadda	ripple	bf16_mul_mono	32.473508
+smt2	cadical	shift-add	brent-kung	bf16_mul_mono	29.050125
+smt2	cadical	shift-add	g-only	bf16_mul_mono	29.204834
+smt2	cadical	shift-add	ripple	bf16_mul_mono	29.117275
+smt2	cryptominisat	comba	brent-kung	bf16_mul_mono	89.548114
+smt2	cryptominisat	comba	g-only	bf16_mul_mono	88.726199
+smt2	cryptominisat	comba	ripple	bf16_mul_mono	88.645598
+smt2	cryptominisat	comba-cs	brent-kung	bf16_mul_mono	72.887522
+smt2	cryptominisat	comba-cs	g-only	bf16_mul_mono	72.928225
+smt2	cryptominisat	comba-cs	ripple	bf16_mul_mono	73.193837
+smt2	cryptominisat	dadda	brent-kung	bf16_mul_mono	98.432958
+smt2	cryptominisat	dadda	g-only	bf16_mul_mono	98.159066
+smt2	cryptominisat	dadda	ripple	bf16_mul_mono	95.896065
+smt2	cryptominisat	shift-add	brent-kung	bf16_mul_mono	52.931295
+smt2	cryptominisat	shift-add	g-only	bf16_mul_mono	53.389295
+smt2	cryptominisat	shift-add	ripple	bf16_mul_mono	52.800567
+smt2	mergesat	comba	brent-kung	bf16_mul_mono	101.813147
+smt2	mergesat	comba	g-only	bf16_mul_mono	102.657583
+smt2	mergesat	comba	ripple	bf16_mul_mono	102.923897
+smt2	mergesat	comba-cs	brent-kung	bf16_mul_mono	113.133927
+smt2	mergesat	comba-cs	g-only	bf16_mul_mono	112.884395
+smt2	mergesat	comba-cs	ripple	bf16_mul_mono	111.449684
+smt2	mergesat	dadda	brent-kung	bf16_mul_mono	97.502971
+smt2	mergesat	dadda	g-only	bf16_mul_mono	96.934341
+smt2	mergesat	dadda	ripple	bf16_mul_mono	94.817867
+smt2	mergesat	shift-add	brent-kung	bf16_mul_mono	96.169133
+smt2	mergesat	shift-add	g-only	bf16_mul_mono	96.090812
+smt2	mergesat	shift-add	ripple	bf16_mul_mono	96.149046
+smt2	minisat	comba	brent-kung	bf16_mul_mono	T/O
+smt2	minisat	comba	g-only	bf16_mul_mono	T/O
+smt2	minisat	comba	ripple	bf16_mul_mono	T/O
+smt2	minisat	comba-cs	brent-kung	bf16_mul_mono	T/O
+smt2	minisat	comba-cs	g-only	bf16_mul_mono	T/O
+smt2	minisat	comba-cs	ripple	bf16_mul_mono	T/O
+smt2	minisat	dadda	brent-kung	bf16_mul_mono	T/O
+smt2	minisat	dadda	g-only	bf16_mul_mono	T/O
+smt2	minisat	dadda	ripple	bf16_mul_mono	T/O
+smt2	minisat	shift-add	brent-kung	bf16_mul_mono	T/O
+smt2	minisat	shift-add	g-only	bf16_mul_mono	T/O
+smt2	minisat	shift-add	ripple	bf16_mul_mono	T/O
+smt2	cadical	comba	brent-kung	checked_mul_16	T/O
+smt2	cadical	comba	g-only	checked_mul_16	.627567
+smt2	cadical	comba	ripple	checked_mul_16	.608348
+smt2	cadical	comba-cs	brent-kung	checked_mul_16	14.155003
+smt2	cadical	comba-cs	g-only	checked_mul_16	14.209253
+smt2	cadical	comba-cs	ripple	checked_mul_16	14.100284
+smt2	cadical	dadda	brent-kung	checked_mul_16	.390056
+smt2	cadical	dadda	g-only	checked_mul_16	.278867
+smt2	cadical	dadda	ripple	checked_mul_16	.310908
+smt2	cadical	shift-add	brent-kung	checked_mul_16	.389478
+smt2	cadical	shift-add	g-only	checked_mul_16	.390014
+smt2	cadical	shift-add	ripple	checked_mul_16	.390099
+smt2	cryptominisat	comba	brent-kung	checked_mul_16	T/O
+smt2	cryptominisat	comba	g-only	checked_mul_16	49.387822
+smt2	cryptominisat	comba	ripple	checked_mul_16	44.799909
+smt2	cryptominisat	comba-cs	brent-kung	checked_mul_16	111.652528
+smt2	cryptominisat	comba-cs	g-only	checked_mul_16	111.333421
+smt2	cryptominisat	comba-cs	ripple	checked_mul_16	109.290428
+smt2	cryptominisat	dadda	brent-kung	checked_mul_16	23.823434
+smt2	cryptominisat	dadda	g-only	checked_mul_16	19.242295
+smt2	cryptominisat	dadda	ripple	checked_mul_16	24.102250
+smt2	cryptominisat	shift-add	brent-kung	checked_mul_16	43.366389
+smt2	cryptominisat	shift-add	g-only	checked_mul_16	42.607949
+smt2	cryptominisat	shift-add	ripple	checked_mul_16	43.364260
+smt2	mergesat	comba	brent-kung	checked_mul_16	T/O
+smt2	mergesat	comba	g-only	checked_mul_16	12.093420
+smt2	mergesat	comba	ripple	checked_mul_16	15.016138
+smt2	mergesat	comba-cs	brent-kung	checked_mul_16	44.212831
+smt2	mergesat	comba-cs	g-only	checked_mul_16	44.327066
+smt2	mergesat	comba-cs	ripple	checked_mul_16	43.121834
+smt2	mergesat	dadda	brent-kung	checked_mul_16	6.765176
+smt2	mergesat	dadda	g-only	checked_mul_16	5.633908
+smt2	mergesat	dadda	ripple	checked_mul_16	10.047379
+smt2	mergesat	shift-add	brent-kung	checked_mul_16	9.075156
+smt2	mergesat	shift-add	g-only	checked_mul_16	9.161276
+smt2	mergesat	shift-add	ripple	checked_mul_16	9.111964
+smt2	minisat	comba	brent-kung	checked_mul_16	T/O
+smt2	minisat	comba	g-only	checked_mul_16	32.641392
+smt2	minisat	comba	ripple	checked_mul_16	T/O
+smt2	minisat	comba-cs	brent-kung	checked_mul_16	56.410634
+smt2	minisat	comba-cs	g-only	checked_mul_16	56.433080
+smt2	minisat	comba-cs	ripple	checked_mul_16	56.394625
+smt2	minisat	dadda	brent-kung	checked_mul_16	22.883664
+smt2	minisat	dadda	g-only	checked_mul_16	4.983060
+smt2	minisat	dadda	ripple	checked_mul_16	9.579508
+smt2	minisat	shift-add	brent-kung	checked_mul_16	21.887036
+smt2	minisat	shift-add	g-only	checked_mul_16	21.911272
+smt2	minisat	shift-add	ripple	checked_mul_16	21.909478
+smt2	cadical	comba	brent-kung	comm_16	T/O
+smt2	cadical	comba	g-only	comm_16	24.564791
+smt2	cadical	comba	ripple	comm_16	34.322177
+smt2	cadical	comba-cs	brent-kung	comm_16	5.463140
+smt2	cadical	comba-cs	g-only	comm_16	5.469673
+smt2	cadical	comba-cs	ripple	comm_16	5.462132
+smt2	cadical	dadda	brent-kung	comm_16	T/O
+smt2	cadical	dadda	g-only	comm_16	T/O
+smt2	cadical	dadda	ripple	comm_16	T/O
+smt2	cadical	shift-add	brent-kung	comm_16	T/O
+smt2	cadical	shift-add	g-only	comm_16	T/O
+smt2	cadical	shift-add	ripple	comm_16	T/O
+smt2	cryptominisat	comba	brent-kung	comm_16	T/O
+smt2	cryptominisat	comba	g-only	comm_16	T/O
+smt2	cryptominisat	comba	ripple	comm_16	T/O
+smt2	cryptominisat	comba-cs	brent-kung	comm_16	T/O
+smt2	cryptominisat	comba-cs	g-only	comm_16	T/O
+smt2	cryptominisat	comba-cs	ripple	comm_16	T/O
+smt2	cryptominisat	dadda	brent-kung	comm_16	T/O
+smt2	cryptominisat	dadda	g-only	comm_16	T/O
+smt2	cryptominisat	dadda	ripple	comm_16	T/O
+smt2	cryptominisat	shift-add	brent-kung	comm_16	T/O
+smt2	cryptominisat	shift-add	g-only	comm_16	T/O
+smt2	cryptominisat	shift-add	ripple	comm_16	T/O
+smt2	mergesat	comba	brent-kung	comm_16	T/O
+smt2	mergesat	comba	g-only	comm_16	T/O
+smt2	mergesat	comba	ripple	comm_16	T/O
+smt2	mergesat	comba-cs	brent-kung	comm_16	12.564734
+smt2	mergesat	comba-cs	g-only	comm_16	12.548246
+smt2	mergesat	comba-cs	ripple	comm_16	12.643705
+smt2	mergesat	dadda	brent-kung	comm_16	T/O
+smt2	mergesat	dadda	g-only	comm_16	T/O
+smt2	mergesat	dadda	ripple	comm_16	T/O
+smt2	mergesat	shift-add	brent-kung	comm_16	T/O
+smt2	mergesat	shift-add	g-only	comm_16	T/O
+smt2	mergesat	shift-add	ripple	comm_16	T/O
+smt2	minisat	comba	brent-kung	comm_16	T/O
+smt2	minisat	comba	g-only	comm_16	T/O
+smt2	minisat	comba	ripple	comm_16	T/O
+smt2	minisat	comba-cs	brent-kung	comm_16	T/O
+smt2	minisat	comba-cs	g-only	comm_16	T/O
+smt2	minisat	comba-cs	ripple	comm_16	T/O
+smt2	minisat	dadda	brent-kung	comm_16	T/O
+smt2	minisat	dadda	g-only	comm_16	T/O
+smt2	minisat	dadda	ripple	comm_16	T/O
+smt2	minisat	shift-add	brent-kung	comm_16	T/O
+smt2	minisat	shift-add	g-only	comm_16	T/O
+smt2	minisat	shift-add	ripple	comm_16	T/O
+smt2	cadical	comba	brent-kung	comm_20	T/O
+smt2	cadical	comba	g-only	comm_20	T/O
+smt2	cadical	comba	ripple	comm_20	T/O
+smt2	cadical	comba-cs	brent-kung	comm_20	35.040653
+smt2	cadical	comba-cs	g-only	comm_20	35.194252
+smt2	cadical	comba-cs	ripple	comm_20	35.206339
+smt2	cadical	dadda	brent-kung	comm_20	T/O
+smt2	cadical	dadda	g-only	comm_20	T/O
+smt2	cadical	dadda	ripple	comm_20	T/O
+smt2	cadical	shift-add	brent-kung	comm_20	T/O
+smt2	cadical	shift-add	g-only	comm_20	T/O
+smt2	cadical	shift-add	ripple	comm_20	T/O
+smt2	cryptominisat	comba	brent-kung	comm_20	T/O
+smt2	cryptominisat	comba	g-only	comm_20	T/O
+smt2	cryptominisat	comba	ripple	comm_20	T/O
+smt2	cryptominisat	comba-cs	brent-kung	comm_20	T/O
+smt2	cryptominisat	comba-cs	g-only	comm_20	T/O
+smt2	cryptominisat	comba-cs	ripple	comm_20	T/O
+smt2	cryptominisat	dadda	brent-kung	comm_20	T/O
+smt2	cryptominisat	dadda	g-only	comm_20	T/O
+smt2	cryptominisat	dadda	ripple	comm_20	T/O
+smt2	cryptominisat	shift-add	brent-kung	comm_20	T/O
+smt2	cryptominisat	shift-add	g-only	comm_20	T/O
+smt2	cryptominisat	shift-add	ripple	comm_20	T/O
+smt2	mergesat	comba	brent-kung	comm_20	T/O
+smt2	mergesat	comba	g-only	comm_20	T/O
+smt2	mergesat	comba	ripple	comm_20	T/O
+smt2	mergesat	comba-cs	brent-kung	comm_20	48.260716
+smt2	mergesat	comba-cs	g-only	comm_20	48.096192
+smt2	mergesat	comba-cs	ripple	comm_20	48.497227
+smt2	mergesat	dadda	brent-kung	comm_20	T/O
+smt2	mergesat	dadda	g-only	comm_20	T/O
+smt2	mergesat	dadda	ripple	comm_20	T/O
+smt2	mergesat	shift-add	brent-kung	comm_20	T/O
+smt2	mergesat	shift-add	g-only	comm_20	T/O
+smt2	mergesat	shift-add	ripple	comm_20	T/O
+smt2	minisat	comba	brent-kung	comm_20	T/O
+smt2	minisat	comba	g-only	comm_20	T/O
+smt2	minisat	comba	ripple	comm_20	T/O
+smt2	minisat	comba-cs	brent-kung	comm_20	T/O
+smt2	minisat	comba-cs	g-only	comm_20	T/O
+smt2	minisat	comba-cs	ripple	comm_20	T/O
+smt2	minisat	dadda	brent-kung	comm_20	T/O
+smt2	minisat	dadda	g-only	comm_20	T/O
+smt2	minisat	dadda	ripple	comm_20	T/O
+smt2	minisat	shift-add	brent-kung	comm_20	T/O
+smt2	minisat	shift-add	g-only	comm_20	T/O
+smt2	minisat	shift-add	ripple	comm_20	T/O
+smt2	cadical	comba	brent-kung	comm_32	T/O
+smt2	cadical	comba	g-only	comm_32	T/O
+smt2	cadical	comba	ripple	comm_32	T/O
+smt2	cadical	comba-cs	brent-kung	comm_32	T/O
+smt2	cadical	comba-cs	g-only	comm_32	T/O
+smt2	cadical	comba-cs	ripple	comm_32	T/O
+smt2	cadical	dadda	brent-kung	comm_32	T/O
+smt2	cadical	dadda	g-only	comm_32	T/O
+smt2	cadical	dadda	ripple	comm_32	T/O
+smt2	cadical	shift-add	brent-kung	comm_32	T/O
+smt2	cadical	shift-add	g-only	comm_32	T/O
+smt2	cadical	shift-add	ripple	comm_32	T/O
+smt2	cryptominisat	comba	brent-kung	comm_32	T/O
+smt2	cryptominisat	comba	g-only	comm_32	T/O
+smt2	cryptominisat	comba	ripple	comm_32	T/O
+smt2	cryptominisat	comba-cs	brent-kung	comm_32	T/O
+smt2	cryptominisat	comba-cs	g-only	comm_32	T/O
+smt2	cryptominisat	comba-cs	ripple	comm_32	T/O
+smt2	cryptominisat	dadda	brent-kung	comm_32	T/O
+smt2	cryptominisat	dadda	g-only	comm_32	T/O
+smt2	cryptominisat	dadda	ripple	comm_32	T/O
+smt2	cryptominisat	shift-add	brent-kung	comm_32	T/O
+smt2	cryptominisat	shift-add	g-only	comm_32	T/O
+smt2	cryptominisat	shift-add	ripple	comm_32	T/O
+smt2	mergesat	comba	brent-kung	comm_32	T/O
+smt2	mergesat	comba	g-only	comm_32	T/O
+smt2	mergesat	comba	ripple	comm_32	T/O
+smt2	mergesat	comba-cs	brent-kung	comm_32	T/O
+smt2	mergesat	comba-cs	g-only	comm_32	T/O
+smt2	mergesat	comba-cs	ripple	comm_32	T/O
+smt2	mergesat	dadda	brent-kung	comm_32	T/O
+smt2	mergesat	dadda	g-only	comm_32	T/O
+smt2	mergesat	dadda	ripple	comm_32	T/O
+smt2	mergesat	shift-add	brent-kung	comm_32	T/O
+smt2	mergesat	shift-add	g-only	comm_32	T/O
+smt2	mergesat	shift-add	ripple	comm_32	T/O
+smt2	minisat	comba	brent-kung	comm_32	T/O
+smt2	minisat	comba	g-only	comm_32	T/O
+smt2	minisat	comba	ripple	comm_32	T/O
+smt2	minisat	comba-cs	brent-kung	comm_32	T/O
+smt2	minisat	comba-cs	g-only	comm_32	T/O
+smt2	minisat	comba-cs	ripple	comm_32	T/O
+smt2	minisat	dadda	brent-kung	comm_32	T/O
+smt2	minisat	dadda	g-only	comm_32	T/O
+smt2	minisat	dadda	ripple	comm_32	T/O
+smt2	minisat	shift-add	brent-kung	comm_32	T/O
+smt2	minisat	shift-add	g-only	comm_32	T/O
+smt2	minisat	shift-add	ripple	comm_32	T/O
+smt2	cadical	comba	brent-kung	comm_8	T/O
+smt2	cadical	comba	g-only	comm_8	.091914
+smt2	cadical	comba	ripple	comm_8	.093848
+smt2	cadical	comba-cs	brent-kung	comm_8	.088276
+smt2	cadical	comba-cs	g-only	comm_8	.088307
+smt2	cadical	comba-cs	ripple	comm_8	.088407
+smt2	cadical	dadda	brent-kung	comm_8	.194973
+smt2	cadical	dadda	g-only	comm_8	.161489
+smt2	cadical	dadda	ripple	comm_8	.147723
+smt2	cadical	shift-add	brent-kung	comm_8	.691803
+smt2	cadical	shift-add	g-only	comm_8	.691794
+smt2	cadical	shift-add	ripple	comm_8	.690885
+smt2	cryptominisat	comba	brent-kung	comm_8	T/O
+smt2	cryptominisat	comba	g-only	comm_8	.535451
+smt2	cryptominisat	comba	ripple	comm_8	.548660
+smt2	cryptominisat	comba-cs	brent-kung	comm_8	1.406364
+smt2	cryptominisat	comba-cs	g-only	comm_8	1.399805
+smt2	cryptominisat	comba-cs	ripple	comm_8	1.389884
+smt2	cryptominisat	dadda	brent-kung	comm_8	1.179381
+smt2	cryptominisat	dadda	g-only	comm_8	1.049013
+smt2	cryptominisat	dadda	ripple	comm_8	1.128911
+smt2	cryptominisat	shift-add	brent-kung	comm_8	1.651982
+smt2	cryptominisat	shift-add	g-only	comm_8	1.644290
+smt2	cryptominisat	shift-add	ripple	comm_8	1.663031
+smt2	mergesat	comba	brent-kung	comm_8	T/O
+smt2	mergesat	comba	g-only	comm_8	.238943
+smt2	mergesat	comba	ripple	comm_8	.384490
+smt2	mergesat	comba-cs	brent-kung	comm_8	.399073
+smt2	mergesat	comba-cs	g-only	comm_8	.400141
+smt2	mergesat	comba-cs	ripple	comm_8	.399685
+smt2	mergesat	dadda	brent-kung	comm_8	.693864
+smt2	mergesat	dadda	g-only	comm_8	1.010531
+smt2	mergesat	dadda	ripple	comm_8	.962544
+smt2	mergesat	shift-add	brent-kung	comm_8	2.643338
+smt2	mergesat	shift-add	g-only	comm_8	2.645744
+smt2	mergesat	shift-add	ripple	comm_8	2.651595
+smt2	minisat	comba	brent-kung	comm_8	T/O
+smt2	minisat	comba	g-only	comm_8	.210111
+smt2	minisat	comba	ripple	comm_8	.177712
+smt2	minisat	comba-cs	brent-kung	comm_8	.453494
+smt2	minisat	comba-cs	g-only	comm_8	.452430
+smt2	minisat	comba-cs	ripple	comm_8	.453267
+smt2	minisat	dadda	brent-kung	comm_8	.437170
+smt2	minisat	dadda	g-only	comm_8	.399475
+smt2	minisat	dadda	ripple	comm_8	.370014
+smt2	minisat	shift-add	brent-kung	comm_8	2.071197
+smt2	minisat	shift-add	g-only	comm_8	2.073663
+smt2	minisat	shift-add	ripple	comm_8	2.073609
+smt2	cadical	comba	brent-kung	crypto_square_mod	T/O
+smt2	cadical	comba	g-only	crypto_square_mod	.021378
+smt2	cadical	comba	ripple	crypto_square_mod	.019219
+smt2	cadical	comba-cs	brent-kung	crypto_square_mod	.024365
+smt2	cadical	comba-cs	g-only	crypto_square_mod	.020329
+smt2	cadical	comba-cs	ripple	crypto_square_mod	.020108
+smt2	cadical	dadda	brent-kung	crypto_square_mod	.021851
+smt2	cadical	dadda	g-only	crypto_square_mod	.018619
+smt2	cadical	dadda	ripple	crypto_square_mod	.017496
+smt2	cadical	shift-add	brent-kung	crypto_square_mod	.021169
+smt2	cadical	shift-add	g-only	crypto_square_mod	.018392
+smt2	cadical	shift-add	ripple	crypto_square_mod	.017582
+smt2	cryptominisat	comba	brent-kung	crypto_square_mod	T/O
+smt2	cryptominisat	comba	g-only	crypto_square_mod	.065287
+smt2	cryptominisat	comba	ripple	crypto_square_mod	.435311
+smt2	cryptominisat	comba-cs	brent-kung	crypto_square_mod	.116585
+smt2	cryptominisat	comba-cs	g-only	crypto_square_mod	.114401
+smt2	cryptominisat	comba-cs	ripple	crypto_square_mod	.070916
+smt2	cryptominisat	dadda	brent-kung	crypto_square_mod	.211491
+smt2	cryptominisat	dadda	g-only	crypto_square_mod	.033288
+smt2	cryptominisat	dadda	ripple	crypto_square_mod	.033741
+smt2	cryptominisat	shift-add	brent-kung	crypto_square_mod	.038129
+smt2	cryptominisat	shift-add	g-only	crypto_square_mod	.189340
+smt2	cryptominisat	shift-add	ripple	crypto_square_mod	.086679
+smt2	mergesat	comba	brent-kung	crypto_square_mod	T/O
+smt2	mergesat	comba	g-only	crypto_square_mod	.068166
+smt2	mergesat	comba	ripple	crypto_square_mod	.063116
+smt2	mergesat	comba-cs	brent-kung	crypto_square_mod	.062798
+smt2	mergesat	comba-cs	g-only	crypto_square_mod	.062467
+smt2	mergesat	comba-cs	ripple	crypto_square_mod	.070184
+smt2	mergesat	dadda	brent-kung	crypto_square_mod	.068105
+smt2	mergesat	dadda	g-only	crypto_square_mod	.102727
+smt2	mergesat	dadda	ripple	crypto_square_mod	.054072
+smt2	mergesat	shift-add	brent-kung	crypto_square_mod	.165133
+smt2	mergesat	shift-add	g-only	crypto_square_mod	.059090
+smt2	mergesat	shift-add	ripple	crypto_square_mod	.062094
+smt2	minisat	comba	brent-kung	crypto_square_mod	T/O
+smt2	minisat	comba	g-only	crypto_square_mod	.039925
+smt2	minisat	comba	ripple	crypto_square_mod	.037279
+smt2	minisat	comba-cs	brent-kung	crypto_square_mod	.042613
+smt2	minisat	comba-cs	g-only	crypto_square_mod	.039635
+smt2	minisat	comba-cs	ripple	crypto_square_mod	.037547
+smt2	minisat	dadda	brent-kung	crypto_square_mod	.040753
+smt2	minisat	dadda	g-only	crypto_square_mod	.035776
+smt2	minisat	dadda	ripple	crypto_square_mod	.034319
+smt2	minisat	shift-add	brent-kung	crypto_square_mod	.039795
+smt2	minisat	shift-add	g-only	crypto_square_mod	.035241
+smt2	minisat	shift-add	ripple	crypto_square_mod	.035347
+smt2	cadical	comba	brent-kung	distrib_16	T/O
+smt2	cadical	comba	g-only	distrib_16	T/O
+smt2	cadical	comba	ripple	distrib_16	T/O
+smt2	cadical	comba-cs	brent-kung	distrib_16	T/O
+smt2	cadical	comba-cs	g-only	distrib_16	T/O
+smt2	cadical	comba-cs	ripple	distrib_16	T/O
+smt2	cadical	dadda	brent-kung	distrib_16	T/O
+smt2	cadical	dadda	g-only	distrib_16	T/O
+smt2	cadical	dadda	ripple	distrib_16	T/O
+smt2	cadical	shift-add	brent-kung	distrib_16	T/O
+smt2	cadical	shift-add	g-only	distrib_16	T/O
+smt2	cadical	shift-add	ripple	distrib_16	T/O
+smt2	cryptominisat	comba	brent-kung	distrib_16	T/O
+smt2	cryptominisat	comba	g-only	distrib_16	T/O
+smt2	cryptominisat	comba	ripple	distrib_16	T/O
+smt2	cryptominisat	comba-cs	brent-kung	distrib_16	T/O
+smt2	cryptominisat	comba-cs	g-only	distrib_16	T/O
+smt2	cryptominisat	comba-cs	ripple	distrib_16	T/O
+smt2	cryptominisat	dadda	brent-kung	distrib_16	T/O
+smt2	cryptominisat	dadda	g-only	distrib_16	T/O
+smt2	cryptominisat	dadda	ripple	distrib_16	T/O
+smt2	cryptominisat	shift-add	brent-kung	distrib_16	T/O
+smt2	cryptominisat	shift-add	g-only	distrib_16	T/O
+smt2	cryptominisat	shift-add	ripple	distrib_16	T/O
+smt2	mergesat	comba	brent-kung	distrib_16	T/O
+smt2	mergesat	comba	g-only	distrib_16	T/O
+smt2	mergesat	comba	ripple	distrib_16	T/O
+smt2	mergesat	comba-cs	brent-kung	distrib_16	T/O
+smt2	mergesat	comba-cs	g-only	distrib_16	T/O
+smt2	mergesat	comba-cs	ripple	distrib_16	T/O
+smt2	mergesat	dadda	brent-kung	distrib_16	T/O
+smt2	mergesat	dadda	g-only	distrib_16	T/O
+smt2	mergesat	dadda	ripple	distrib_16	T/O
+smt2	mergesat	shift-add	brent-kung	distrib_16	T/O
+smt2	mergesat	shift-add	g-only	distrib_16	T/O
+smt2	mergesat	shift-add	ripple	distrib_16	T/O
+smt2	minisat	comba	brent-kung	distrib_16	T/O
+smt2	minisat	comba	g-only	distrib_16	T/O
+smt2	minisat	comba	ripple	distrib_16	T/O
+smt2	minisat	comba-cs	brent-kung	distrib_16	T/O
+smt2	minisat	comba-cs	g-only	distrib_16	T/O
+smt2	minisat	comba-cs	ripple	distrib_16	T/O
+smt2	minisat	dadda	brent-kung	distrib_16	T/O
+smt2	minisat	dadda	g-only	distrib_16	T/O
+smt2	minisat	dadda	ripple	distrib_16	T/O
+smt2	minisat	shift-add	brent-kung	distrib_16	T/O
+smt2	minisat	shift-add	g-only	distrib_16	T/O
+smt2	minisat	shift-add	ripple	distrib_16	T/O
+smt2	cadical	comba	brent-kung	distrib_8	T/O
+smt2	cadical	comba	g-only	distrib_8	T/O
+smt2	cadical	comba	ripple	distrib_8	T/O
+smt2	cadical	comba-cs	brent-kung	distrib_8	T/O
+smt2	cadical	comba-cs	g-only	distrib_8	T/O
+smt2	cadical	comba-cs	ripple	distrib_8	T/O
+smt2	cadical	dadda	brent-kung	distrib_8	T/O
+smt2	cadical	dadda	g-only	distrib_8	T/O
+smt2	cadical	dadda	ripple	distrib_8	T/O
+smt2	cadical	shift-add	brent-kung	distrib_8	T/O
+smt2	cadical	shift-add	g-only	distrib_8	72.728087
+smt2	cadical	shift-add	ripple	distrib_8	83.275756
+smt2	cryptominisat	comba	brent-kung	distrib_8	T/O
+smt2	cryptominisat	comba	g-only	distrib_8	T/O
+smt2	cryptominisat	comba	ripple	distrib_8	T/O
+smt2	cryptominisat	comba-cs	brent-kung	distrib_8	T/O
+smt2	cryptominisat	comba-cs	g-only	distrib_8	T/O
+smt2	cryptominisat	comba-cs	ripple	distrib_8	T/O
+smt2	cryptominisat	dadda	brent-kung	distrib_8	T/O
+smt2	cryptominisat	dadda	g-only	distrib_8	T/O
+smt2	cryptominisat	dadda	ripple	distrib_8	T/O
+smt2	cryptominisat	shift-add	brent-kung	distrib_8	T/O
+smt2	cryptominisat	shift-add	g-only	distrib_8	T/O
+smt2	cryptominisat	shift-add	ripple	distrib_8	T/O
+smt2	mergesat	comba	brent-kung	distrib_8	T/O
+smt2	mergesat	comba	g-only	distrib_8	T/O
+smt2	mergesat	comba	ripple	distrib_8	T/O
+smt2	mergesat	comba-cs	brent-kung	distrib_8	T/O
+smt2	mergesat	comba-cs	g-only	distrib_8	T/O
+smt2	mergesat	comba-cs	ripple	distrib_8	T/O
+smt2	mergesat	dadda	brent-kung	distrib_8	T/O
+smt2	mergesat	dadda	g-only	distrib_8	T/O
+smt2	mergesat	dadda	ripple	distrib_8	T/O
+smt2	mergesat	shift-add	brent-kung	distrib_8	T/O
+smt2	mergesat	shift-add	g-only	distrib_8	T/O
+smt2	mergesat	shift-add	ripple	distrib_8	T/O
+smt2	minisat	comba	brent-kung	distrib_8	T/O
+smt2	minisat	comba	g-only	distrib_8	T/O
+smt2	minisat	comba	ripple	distrib_8	T/O
+smt2	minisat	comba-cs	brent-kung	distrib_8	T/O
+smt2	minisat	comba-cs	g-only	distrib_8	T/O
+smt2	minisat	comba-cs	ripple	distrib_8	T/O
+smt2	minisat	dadda	brent-kung	distrib_8	T/O
+smt2	minisat	dadda	g-only	distrib_8	T/O
+smt2	minisat	dadda	ripple	distrib_8	T/O
+smt2	minisat	shift-add	brent-kung	distrib_8	T/O
+smt2	minisat	shift-add	g-only	distrib_8	T/O
+smt2	minisat	shift-add	ripple	distrib_8	T/O
+smt2	cadical	comba	brent-kung	div_mul_roundtrip_12	T/O
+smt2	cadical	comba	g-only	div_mul_roundtrip_12	3.815284
+smt2	cadical	comba	ripple	div_mul_roundtrip_12	4.092786
+smt2	cadical	comba-cs	brent-kung	div_mul_roundtrip_12	6.028286
+smt2	cadical	comba-cs	g-only	div_mul_roundtrip_12	3.980368
+smt2	cadical	comba-cs	ripple	div_mul_roundtrip_12	3.917437
+smt2	cadical	dadda	brent-kung	div_mul_roundtrip_12	5.695551
+smt2	cadical	dadda	g-only	div_mul_roundtrip_12	4.169895
+smt2	cadical	dadda	ripple	div_mul_roundtrip_12	3.849845
+smt2	cadical	shift-add	brent-kung	div_mul_roundtrip_12	6.034574
+smt2	cadical	shift-add	g-only	div_mul_roundtrip_12	3.943679
+smt2	cadical	shift-add	ripple	div_mul_roundtrip_12	4.148011
+smt2	cryptominisat	comba	brent-kung	div_mul_roundtrip_12	T/O
+smt2	cryptominisat	comba	g-only	div_mul_roundtrip_12	10.091882
+smt2	cryptominisat	comba	ripple	div_mul_roundtrip_12	9.950772
+smt2	cryptominisat	comba-cs	brent-kung	div_mul_roundtrip_12	13.724703
+smt2	cryptominisat	comba-cs	g-only	div_mul_roundtrip_12	9.721551
+smt2	cryptominisat	comba-cs	ripple	div_mul_roundtrip_12	10.308402
+smt2	cryptominisat	dadda	brent-kung	div_mul_roundtrip_12	14.182296
+smt2	cryptominisat	dadda	g-only	div_mul_roundtrip_12	10.143396
+smt2	cryptominisat	dadda	ripple	div_mul_roundtrip_12	9.373622
+smt2	cryptominisat	shift-add	brent-kung	div_mul_roundtrip_12	13.899413
+smt2	cryptominisat	shift-add	g-only	div_mul_roundtrip_12	9.562391
+smt2	cryptominisat	shift-add	ripple	div_mul_roundtrip_12	9.168715
+smt2	mergesat	comba	brent-kung	div_mul_roundtrip_12	T/O
+smt2	mergesat	comba	g-only	div_mul_roundtrip_12	12.017258
+smt2	mergesat	comba	ripple	div_mul_roundtrip_12	11.261020
+smt2	mergesat	comba-cs	brent-kung	div_mul_roundtrip_12	16.310162
+smt2	mergesat	comba-cs	g-only	div_mul_roundtrip_12	11.271427
+smt2	mergesat	comba-cs	ripple	div_mul_roundtrip_12	13.336288
+smt2	mergesat	dadda	brent-kung	div_mul_roundtrip_12	15.572605
+smt2	mergesat	dadda	g-only	div_mul_roundtrip_12	11.994233
+smt2	mergesat	dadda	ripple	div_mul_roundtrip_12	11.329325
+smt2	mergesat	shift-add	brent-kung	div_mul_roundtrip_12	15.168715
+smt2	mergesat	shift-add	g-only	div_mul_roundtrip_12	10.319492
+smt2	mergesat	shift-add	ripple	div_mul_roundtrip_12	11.432951
+smt2	minisat	comba	brent-kung	div_mul_roundtrip_12	T/O
+smt2	minisat	comba	g-only	div_mul_roundtrip_12	12.742163
+smt2	minisat	comba	ripple	div_mul_roundtrip_12	12.527876
+smt2	minisat	comba-cs	brent-kung	div_mul_roundtrip_12	18.484834
+smt2	minisat	comba-cs	g-only	div_mul_roundtrip_12	10.813486
+smt2	minisat	comba-cs	ripple	div_mul_roundtrip_12	14.146099
+smt2	minisat	dadda	brent-kung	div_mul_roundtrip_12	20.643593
+smt2	minisat	dadda	g-only	div_mul_roundtrip_12	13.324546
+smt2	minisat	dadda	ripple	div_mul_roundtrip_12	12.118052
+smt2	minisat	shift-add	brent-kung	div_mul_roundtrip_12	18.047794
+smt2	minisat	shift-add	g-only	div_mul_roundtrip_12	11.858726
+smt2	minisat	shift-add	ripple	div_mul_roundtrip_12	13.182310
+smt2	cadical	comba	brent-kung	equiv_unsat_8add_16	.012374
+smt2	cadical	comba	g-only	equiv_unsat_8add_16	.047396
+smt2	cadical	comba	ripple	equiv_unsat_8add_16	.057837
+smt2	cadical	comba-cs	brent-kung	equiv_unsat_8add_16	.012449
+smt2	cadical	comba-cs	g-only	equiv_unsat_8add_16	.047537
+smt2	cadical	comba-cs	ripple	equiv_unsat_8add_16	.057528
+smt2	cadical	dadda	brent-kung	equiv_unsat_8add_16	.012512
+smt2	cadical	dadda	g-only	equiv_unsat_8add_16	.047350
+smt2	cadical	dadda	ripple	equiv_unsat_8add_16	.057667
+smt2	cadical	shift-add	brent-kung	equiv_unsat_8add_16	.012473
+smt2	cadical	shift-add	g-only	equiv_unsat_8add_16	.047531
+smt2	cadical	shift-add	ripple	equiv_unsat_8add_16	.057475
+smt2	cryptominisat	comba	brent-kung	equiv_unsat_8add_16	.490284
+smt2	cryptominisat	comba	g-only	equiv_unsat_8add_16	.188915
+smt2	cryptominisat	comba	ripple	equiv_unsat_8add_16	.391315
+smt2	cryptominisat	comba-cs	brent-kung	equiv_unsat_8add_16	.486119
+smt2	cryptominisat	comba-cs	g-only	equiv_unsat_8add_16	.188693
+smt2	cryptominisat	comba-cs	ripple	equiv_unsat_8add_16	.391546
+smt2	cryptominisat	dadda	brent-kung	equiv_unsat_8add_16	.487134
+smt2	cryptominisat	dadda	g-only	equiv_unsat_8add_16	.189586
+smt2	cryptominisat	dadda	ripple	equiv_unsat_8add_16	.389844
+smt2	cryptominisat	shift-add	brent-kung	equiv_unsat_8add_16	.489351
+smt2	cryptominisat	shift-add	g-only	equiv_unsat_8add_16	.189332
+smt2	cryptominisat	shift-add	ripple	equiv_unsat_8add_16	.391472
+smt2	mergesat	comba	brent-kung	equiv_unsat_8add_16	.143017
+smt2	mergesat	comba	g-only	equiv_unsat_8add_16	.080403
+smt2	mergesat	comba	ripple	equiv_unsat_8add_16	.071045
+smt2	mergesat	comba-cs	brent-kung	equiv_unsat_8add_16	.142812
+smt2	mergesat	comba-cs	g-only	equiv_unsat_8add_16	.080438
+smt2	mergesat	comba-cs	ripple	equiv_unsat_8add_16	.071060
+smt2	mergesat	dadda	brent-kung	equiv_unsat_8add_16	.142572
+smt2	mergesat	dadda	g-only	equiv_unsat_8add_16	.080326
+smt2	mergesat	dadda	ripple	equiv_unsat_8add_16	.071128
+smt2	mergesat	shift-add	brent-kung	equiv_unsat_8add_16	.142606
+smt2	mergesat	shift-add	g-only	equiv_unsat_8add_16	.080269
+smt2	mergesat	shift-add	ripple	equiv_unsat_8add_16	.070993
+smt2	minisat	comba	brent-kung	equiv_unsat_8add_16	.102116
+smt2	minisat	comba	g-only	equiv_unsat_8add_16	.059770
+smt2	minisat	comba	ripple	equiv_unsat_8add_16	.071135
+smt2	minisat	comba-cs	brent-kung	equiv_unsat_8add_16	.102221
+smt2	minisat	comba-cs	g-only	equiv_unsat_8add_16	.059565
+smt2	minisat	comba-cs	ripple	equiv_unsat_8add_16	.072009
+smt2	minisat	dadda	brent-kung	equiv_unsat_8add_16	.102222
+smt2	minisat	dadda	g-only	equiv_unsat_8add_16	.059575
+smt2	minisat	dadda	ripple	equiv_unsat_8add_16	.071177
+smt2	minisat	shift-add	brent-kung	equiv_unsat_8add_16	.101945
+smt2	minisat	shift-add	g-only	equiv_unsat_8add_16	.059957
+smt2	minisat	shift-add	ripple	equiv_unsat_8add_16	.071186
+smt2	cadical	comba	brent-kung	factor_12	T/O
+smt2	cadical	comba	g-only	factor_12	.007316
+smt2	cadical	comba	ripple	factor_12	.006651
+smt2	cadical	comba-cs	brent-kung	factor_12	.006955
+smt2	cadical	comba-cs	g-only	factor_12	.006769
+smt2	cadical	comba-cs	ripple	factor_12	.007382
+smt2	cadical	dadda	brent-kung	factor_12	.006330
+smt2	cadical	dadda	g-only	factor_12	.006138
+smt2	cadical	dadda	ripple	factor_12	.006361
+smt2	cadical	shift-add	brent-kung	factor_12	.006141
+smt2	cadical	shift-add	g-only	factor_12	.006248
+smt2	cadical	shift-add	ripple	factor_12	.006220
+smt2	cryptominisat	comba	brent-kung	factor_12	T/O
+smt2	cryptominisat	comba	g-only	factor_12	.009109
+smt2	cryptominisat	comba	ripple	factor_12	.007539
+smt2	cryptominisat	comba-cs	brent-kung	factor_12	.008027
+smt2	cryptominisat	comba-cs	g-only	factor_12	.008213
+smt2	cryptominisat	comba-cs	ripple	factor_12	.008558
+smt2	cryptominisat	dadda	brent-kung	factor_12	.006981
+smt2	cryptominisat	dadda	g-only	factor_12	.006797
+smt2	cryptominisat	dadda	ripple	factor_12	.006714
+smt2	cryptominisat	shift-add	brent-kung	factor_12	.006579
+smt2	cryptominisat	shift-add	g-only	factor_12	.006702
+smt2	cryptominisat	shift-add	ripple	factor_12	.006600
+smt2	mergesat	comba	brent-kung	factor_12	T/O
+smt2	mergesat	comba	g-only	factor_12	.009519
+smt2	mergesat	comba	ripple	factor_12	.009834
+smt2	mergesat	comba-cs	brent-kung	factor_12	.009485
+smt2	mergesat	comba-cs	g-only	factor_12	.009519
+smt2	mergesat	comba-cs	ripple	factor_12	.009765
+smt2	mergesat	dadda	brent-kung	factor_12	.009671
+smt2	mergesat	dadda	g-only	factor_12	.009724
+smt2	mergesat	dadda	ripple	factor_12	.009749
+smt2	mergesat	shift-add	brent-kung	factor_12	.011634
+smt2	mergesat	shift-add	g-only	factor_12	.011690
+smt2	mergesat	shift-add	ripple	factor_12	.011486
+smt2	minisat	comba	brent-kung	factor_12	T/O
+smt2	minisat	comba	g-only	factor_12	.008684
+smt2	minisat	comba	ripple	factor_12	.007907
+smt2	minisat	comba-cs	brent-kung	factor_12	.008052
+smt2	minisat	comba-cs	g-only	factor_12	.008096
+smt2	minisat	comba-cs	ripple	factor_12	.008490
+smt2	minisat	dadda	brent-kung	factor_12	.007487
+smt2	minisat	dadda	g-only	factor_12	.007131
+smt2	minisat	dadda	ripple	factor_12	.007070
+smt2	minisat	shift-add	brent-kung	factor_12	.007024
+smt2	minisat	shift-add	g-only	factor_12	.007079
+smt2	minisat	shift-add	ripple	factor_12	.007061
+smt2	cadical	comba	brent-kung	factor_16	T/O
+smt2	cadical	comba	g-only	factor_16	.008579
+smt2	cadical	comba	ripple	factor_16	.007424
+smt2	cadical	comba-cs	brent-kung	factor_16	.007695
+smt2	cadical	comba-cs	g-only	factor_16	.007472
+smt2	cadical	comba-cs	ripple	factor_16	.008034
+smt2	cadical	dadda	brent-kung	factor_16	.006860
+smt2	cadical	dadda	g-only	factor_16	.006794
+smt2	cadical	dadda	ripple	factor_16	.006663
+smt2	cadical	shift-add	brent-kung	factor_16	.006654
+smt2	cadical	shift-add	g-only	factor_16	.006795
+smt2	cadical	shift-add	ripple	factor_16	.006673
+smt2	cryptominisat	comba	brent-kung	factor_16	T/O
+smt2	cryptominisat	comba	g-only	factor_16	.012585
+smt2	cryptominisat	comba	ripple	factor_16	.011511
+smt2	cryptominisat	comba-cs	brent-kung	factor_16	.010839
+smt2	cryptominisat	comba-cs	g-only	factor_16	.010574
+smt2	cryptominisat	comba-cs	ripple	factor_16	.011185
+smt2	cryptominisat	dadda	brent-kung	factor_16	.009456
+smt2	cryptominisat	dadda	g-only	factor_16	.009275
+smt2	cryptominisat	dadda	ripple	factor_16	.009413
+smt2	cryptominisat	shift-add	brent-kung	factor_16	.007568
+smt2	cryptominisat	shift-add	g-only	factor_16	.007672
+smt2	cryptominisat	shift-add	ripple	factor_16	.007687
+smt2	mergesat	comba	brent-kung	factor_16	T/O
+smt2	mergesat	comba	g-only	factor_16	.011656
+smt2	mergesat	comba	ripple	factor_16	.011894
+smt2	mergesat	comba-cs	brent-kung	factor_16	.012731
+smt2	mergesat	comba-cs	g-only	factor_16	.012585
+smt2	mergesat	comba-cs	ripple	factor_16	.013488
+smt2	mergesat	dadda	brent-kung	factor_16	.010250
+smt2	mergesat	dadda	g-only	factor_16	.010210
+smt2	mergesat	dadda	ripple	factor_16	.010145
+smt2	mergesat	shift-add	brent-kung	factor_16	.016926
+smt2	mergesat	shift-add	g-only	factor_16	.017180
+smt2	mergesat	shift-add	ripple	factor_16	.016928
+smt2	minisat	comba	brent-kung	factor_16	T/O
+smt2	minisat	comba	g-only	factor_16	.011088
+smt2	minisat	comba	ripple	factor_16	.010404
+smt2	minisat	comba-cs	brent-kung	factor_16	.009668
+smt2	minisat	comba-cs	g-only	factor_16	.009687
+smt2	minisat	comba-cs	ripple	factor_16	.010159
+smt2	minisat	dadda	brent-kung	factor_16	.008676
+smt2	minisat	dadda	g-only	factor_16	.008356
+smt2	minisat	dadda	ripple	factor_16	.008324
+smt2	minisat	shift-add	brent-kung	factor_16	.008985
+smt2	minisat	shift-add	g-only	factor_16	.008909
+smt2	minisat	shift-add	ripple	factor_16	.008949
+smt2	cadical	comba	brent-kung	factor_20	T/O
+smt2	cadical	comba	g-only	factor_20	.009702
+smt2	cadical	comba	ripple	factor_20	.008732
+smt2	cadical	comba-cs	brent-kung	factor_20	.009141
+smt2	cadical	comba-cs	g-only	factor_20	.008595
+smt2	cadical	comba-cs	ripple	factor_20	.009251
+smt2	cadical	dadda	brent-kung	factor_20	.007552
+smt2	cadical	dadda	g-only	factor_20	.007258
+smt2	cadical	dadda	ripple	factor_20	.007186
+smt2	cadical	shift-add	brent-kung	factor_20	.007156
+smt2	cadical	shift-add	g-only	factor_20	.007389
+smt2	cadical	shift-add	ripple	factor_20	.007407
+smt2	cryptominisat	comba	brent-kung	factor_20	T/O
+smt2	cryptominisat	comba	g-only	factor_20	.016088
+smt2	cryptominisat	comba	ripple	factor_20	.013643
+smt2	cryptominisat	comba-cs	brent-kung	factor_20	.012890
+smt2	cryptominisat	comba-cs	g-only	factor_20	.012880
+smt2	cryptominisat	comba-cs	ripple	factor_20	.013149
+smt2	cryptominisat	dadda	brent-kung	factor_20	.010477
+smt2	cryptominisat	dadda	g-only	factor_20	.009926
+smt2	cryptominisat	dadda	ripple	factor_20	.009372
+smt2	cryptominisat	shift-add	brent-kung	factor_20	.008314
+smt2	cryptominisat	shift-add	g-only	factor_20	.008403
+smt2	cryptominisat	shift-add	ripple	factor_20	.008444
+smt2	mergesat	comba	brent-kung	factor_20	T/O
+smt2	mergesat	comba	g-only	factor_20	.015021
+smt2	mergesat	comba	ripple	factor_20	.014235
+smt2	mergesat	comba-cs	brent-kung	factor_20	.014614
+smt2	mergesat	comba-cs	g-only	factor_20	.014394
+smt2	mergesat	comba-cs	ripple	factor_20	.015064
+smt2	mergesat	dadda	brent-kung	factor_20	.011346
+smt2	mergesat	dadda	g-only	factor_20	.010566
+smt2	mergesat	dadda	ripple	factor_20	.010646
+smt2	mergesat	shift-add	brent-kung	factor_20	.010381
+smt2	mergesat	shift-add	g-only	factor_20	.010602
+smt2	mergesat	shift-add	ripple	factor_20	.010487
+smt2	minisat	comba	brent-kung	factor_20	T/O
+smt2	minisat	comba	g-only	factor_20	.013021
+smt2	minisat	comba	ripple	factor_20	.011754
+smt2	minisat	comba-cs	brent-kung	factor_20	.013057
+smt2	minisat	comba-cs	g-only	factor_20	.013099
+smt2	minisat	comba-cs	ripple	factor_20	.013490
+smt2	minisat	dadda	brent-kung	factor_20	.010297
+smt2	minisat	dadda	g-only	factor_20	.010184
+smt2	minisat	dadda	ripple	factor_20	.010139
+smt2	minisat	shift-add	brent-kung	factor_20	.009178
+smt2	minisat	shift-add	g-only	factor_20	.009167
+smt2	minisat	shift-add	ripple	factor_20	.009309
+smt2	cadical	comba	brent-kung	fixedpoint_mul_16	T/O
+smt2	cadical	comba	g-only	fixedpoint_mul_16	.049034
+smt2	cadical	comba	ripple	fixedpoint_mul_16	.043374
+smt2	cadical	comba-cs	brent-kung	fixedpoint_mul_16	.010105
+smt2	cadical	comba-cs	g-only	fixedpoint_mul_16	.010136
+smt2	cadical	comba-cs	ripple	fixedpoint_mul_16	.010949
+smt2	cadical	dadda	brent-kung	fixedpoint_mul_16	.030502
+smt2	cadical	dadda	g-only	fixedpoint_mul_16	.028921
+smt2	cadical	dadda	ripple	fixedpoint_mul_16	.028515
+smt2	cadical	shift-add	brent-kung	fixedpoint_mul_16	.024352
+smt2	cadical	shift-add	g-only	fixedpoint_mul_16	.024681
+smt2	cadical	shift-add	ripple	fixedpoint_mul_16	.024941
+smt2	cryptominisat	comba	brent-kung	fixedpoint_mul_16	T/O
+smt2	cryptominisat	comba	g-only	fixedpoint_mul_16	.019915
+smt2	cryptominisat	comba	ripple	fixedpoint_mul_16	.018016
+smt2	cryptominisat	comba-cs	brent-kung	fixedpoint_mul_16	.014722
+smt2	cryptominisat	comba-cs	g-only	fixedpoint_mul_16	.014830
+smt2	cryptominisat	comba-cs	ripple	fixedpoint_mul_16	.015352
+smt2	cryptominisat	dadda	brent-kung	fixedpoint_mul_16	.020331
+smt2	cryptominisat	dadda	g-only	fixedpoint_mul_16	.012531
+smt2	cryptominisat	dadda	ripple	fixedpoint_mul_16	.013177
+smt2	cryptominisat	shift-add	brent-kung	fixedpoint_mul_16	.011878
+smt2	cryptominisat	shift-add	g-only	fixedpoint_mul_16	.011920
+smt2	cryptominisat	shift-add	ripple	fixedpoint_mul_16	.011866
+smt2	mergesat	comba	brent-kung	fixedpoint_mul_16	T/O
+smt2	mergesat	comba	g-only	fixedpoint_mul_16	.025133
+smt2	mergesat	comba	ripple	fixedpoint_mul_16	.019155
+smt2	mergesat	comba-cs	brent-kung	fixedpoint_mul_16	.017158
+smt2	mergesat	comba-cs	g-only	fixedpoint_mul_16	.017283
+smt2	mergesat	comba-cs	ripple	fixedpoint_mul_16	.017768
+smt2	mergesat	dadda	brent-kung	fixedpoint_mul_16	.017275
+smt2	mergesat	dadda	g-only	fixedpoint_mul_16	.014805
+smt2	mergesat	dadda	ripple	fixedpoint_mul_16	.014843
+smt2	mergesat	shift-add	brent-kung	fixedpoint_mul_16	.014189
+smt2	mergesat	shift-add	g-only	fixedpoint_mul_16	.014231
+smt2	mergesat	shift-add	ripple	fixedpoint_mul_16	.014375
+smt2	minisat	comba	brent-kung	fixedpoint_mul_16	T/O
+smt2	minisat	comba	g-only	fixedpoint_mul_16	.018224
+smt2	minisat	comba	ripple	fixedpoint_mul_16	.016329
+smt2	minisat	comba-cs	brent-kung	fixedpoint_mul_16	.014113
+smt2	minisat	comba-cs	g-only	fixedpoint_mul_16	.014168
+smt2	minisat	comba-cs	ripple	fixedpoint_mul_16	.014981
+smt2	minisat	dadda	brent-kung	fixedpoint_mul_16	.013277
+smt2	minisat	dadda	g-only	fixedpoint_mul_16	.012708
+smt2	minisat	dadda	ripple	fixedpoint_mul_16	.013137
+smt2	minisat	shift-add	brent-kung	fixedpoint_mul_16	.012481
+smt2	minisat	shift-add	g-only	fixedpoint_mul_16	.012539
+smt2	minisat	shift-add	ripple	fixedpoint_mul_16	.012476
+smt2	cadical	comba	brent-kung	float_mul_comm	.029857
+smt2	cadical	comba	g-only	float_mul_comm	.029258
+smt2	cadical	comba	ripple	float_mul_comm	.030351
+smt2	cadical	comba-cs	brent-kung	float_mul_comm	.021719
+smt2	cadical	comba-cs	g-only	float_mul_comm	.021229
+smt2	cadical	comba-cs	ripple	float_mul_comm	.021479
+smt2	cadical	dadda	brent-kung	float_mul_comm	.021701
+smt2	cadical	dadda	g-only	float_mul_comm	.021498
+smt2	cadical	dadda	ripple	float_mul_comm	.021749
+smt2	cadical	shift-add	brent-kung	float_mul_comm	.021533
+smt2	cadical	shift-add	g-only	float_mul_comm	.021209
+smt2	cadical	shift-add	ripple	float_mul_comm	.021826
+smt2	cryptominisat	comba	brent-kung	float_mul_comm	.059810
+smt2	cryptominisat	comba	g-only	float_mul_comm	.058858
+smt2	cryptominisat	comba	ripple	float_mul_comm	.059979
+smt2	cryptominisat	comba-cs	brent-kung	float_mul_comm	.246746
+smt2	cryptominisat	comba-cs	g-only	float_mul_comm	.242173
+smt2	cryptominisat	comba-cs	ripple	float_mul_comm	.241506
+smt2	cryptominisat	dadda	brent-kung	float_mul_comm	.121271
+smt2	cryptominisat	dadda	g-only	float_mul_comm	.122610
+smt2	cryptominisat	dadda	ripple	float_mul_comm	.121441
+smt2	cryptominisat	shift-add	brent-kung	float_mul_comm	.242469
+smt2	cryptominisat	shift-add	g-only	float_mul_comm	.241918
+smt2	cryptominisat	shift-add	ripple	float_mul_comm	.240732
+smt2	mergesat	comba	brent-kung	float_mul_comm	.111155
+smt2	mergesat	comba	g-only	float_mul_comm	.108450
+smt2	mergesat	comba	ripple	float_mul_comm	.109736
+smt2	mergesat	comba-cs	brent-kung	float_mul_comm	.109285
+smt2	mergesat	comba-cs	g-only	float_mul_comm	.108905
+smt2	mergesat	comba-cs	ripple	float_mul_comm	.109973
+smt2	mergesat	dadda	brent-kung	float_mul_comm	.191512
+smt2	mergesat	dadda	g-only	float_mul_comm	.191299
+smt2	mergesat	dadda	ripple	float_mul_comm	.191979
+smt2	mergesat	shift-add	brent-kung	float_mul_comm	.109566
+smt2	mergesat	shift-add	g-only	float_mul_comm	.108939
+smt2	mergesat	shift-add	ripple	float_mul_comm	.109935
+smt2	minisat	comba	brent-kung	float_mul_comm	.091827
+smt2	minisat	comba	g-only	float_mul_comm	.090875
+smt2	minisat	comba	ripple	float_mul_comm	.093683
+smt2	minisat	comba-cs	brent-kung	float_mul_comm	.050934
+smt2	minisat	comba-cs	g-only	float_mul_comm	.051191
+smt2	minisat	comba-cs	ripple	float_mul_comm	.051436
+smt2	minisat	dadda	brent-kung	float_mul_comm	.048146
+smt2	minisat	dadda	g-only	float_mul_comm	.047878
+smt2	minisat	dadda	ripple	float_mul_comm	.047955
+smt2	minisat	shift-add	brent-kung	float_mul_comm	.051022
+smt2	minisat	shift-add	g-only	float_mul_comm	.050874
+smt2	minisat	shift-add	ripple	float_mul_comm	.050867
+smt2	cadical	comba	brent-kung	float_mul_comm_v2	T/O
+smt2	cadical	comba	g-only	float_mul_comm_v2	T/O
+smt2	cadical	comba	ripple	float_mul_comm_v2	T/O
+smt2	cadical	comba-cs	brent-kung	float_mul_comm_v2	T/O
+smt2	cadical	comba-cs	g-only	float_mul_comm_v2	T/O
+smt2	cadical	comba-cs	ripple	float_mul_comm_v2	T/O
+smt2	cadical	dadda	brent-kung	float_mul_comm_v2	T/O
+smt2	cadical	dadda	g-only	float_mul_comm_v2	T/O
+smt2	cadical	dadda	ripple	float_mul_comm_v2	T/O
+smt2	cadical	shift-add	brent-kung	float_mul_comm_v2	T/O
+smt2	cadical	shift-add	g-only	float_mul_comm_v2	T/O
+smt2	cadical	shift-add	ripple	float_mul_comm_v2	T/O
+smt2	cryptominisat	comba	brent-kung	float_mul_comm_v2	T/O
+smt2	cryptominisat	comba	g-only	float_mul_comm_v2	T/O
+smt2	cryptominisat	comba	ripple	float_mul_comm_v2	T/O
+smt2	cryptominisat	comba-cs	brent-kung	float_mul_comm_v2	T/O
+smt2	cryptominisat	comba-cs	g-only	float_mul_comm_v2	T/O
+smt2	cryptominisat	comba-cs	ripple	float_mul_comm_v2	T/O
+smt2	cryptominisat	dadda	brent-kung	float_mul_comm_v2	T/O
+smt2	cryptominisat	dadda	g-only	float_mul_comm_v2	T/O
+smt2	cryptominisat	dadda	ripple	float_mul_comm_v2	T/O
+smt2	cryptominisat	shift-add	brent-kung	float_mul_comm_v2	T/O
+smt2	cryptominisat	shift-add	g-only	float_mul_comm_v2	T/O
+smt2	cryptominisat	shift-add	ripple	float_mul_comm_v2	T/O
+smt2	mergesat	comba	brent-kung	float_mul_comm_v2	T/O
+smt2	mergesat	comba	g-only	float_mul_comm_v2	T/O
+smt2	mergesat	comba	ripple	float_mul_comm_v2	T/O
+smt2	mergesat	comba-cs	brent-kung	float_mul_comm_v2	T/O
+smt2	mergesat	comba-cs	g-only	float_mul_comm_v2	T/O
+smt2	mergesat	comba-cs	ripple	float_mul_comm_v2	T/O
+smt2	mergesat	dadda	brent-kung	float_mul_comm_v2	T/O
+smt2	mergesat	dadda	g-only	float_mul_comm_v2	T/O
+smt2	mergesat	dadda	ripple	float_mul_comm_v2	T/O
+smt2	mergesat	shift-add	brent-kung	float_mul_comm_v2	T/O
+smt2	mergesat	shift-add	g-only	float_mul_comm_v2	T/O
+smt2	mergesat	shift-add	ripple	float_mul_comm_v2	T/O
+smt2	minisat	comba	brent-kung	float_mul_comm_v2	T/O
+smt2	minisat	comba	g-only	float_mul_comm_v2	T/O
+smt2	minisat	comba	ripple	float_mul_comm_v2	T/O
+smt2	minisat	comba-cs	brent-kung	float_mul_comm_v2	T/O
+smt2	minisat	comba-cs	g-only	float_mul_comm_v2	T/O
+smt2	minisat	comba-cs	ripple	float_mul_comm_v2	T/O
+smt2	minisat	dadda	brent-kung	float_mul_comm_v2	T/O
+smt2	minisat	dadda	g-only	float_mul_comm_v2	T/O
+smt2	minisat	dadda	ripple	float_mul_comm_v2	T/O
+smt2	minisat	shift-add	brent-kung	float_mul_comm_v2	T/O
+smt2	minisat	shift-add	g-only	float_mul_comm_v2	T/O
+smt2	minisat	shift-add	ripple	float_mul_comm_v2	T/O
+smt2	cadical	comba	brent-kung	gf256_mul_assoc	T/O
+smt2	cadical	comba	g-only	gf256_mul_assoc	.085230
+smt2	cadical	comba	ripple	gf256_mul_assoc	.063179
+smt2	cadical	comba-cs	brent-kung	gf256_mul_assoc	.063277
+smt2	cadical	comba-cs	g-only	gf256_mul_assoc	.058405
+smt2	cadical	comba-cs	ripple	gf256_mul_assoc	.059004
+smt2	cadical	dadda	brent-kung	gf256_mul_assoc	.066606
+smt2	cadical	dadda	g-only	gf256_mul_assoc	.055288
+smt2	cadical	dadda	ripple	gf256_mul_assoc	.055325
+smt2	cadical	shift-add	brent-kung	gf256_mul_assoc	.061687
+smt2	cadical	shift-add	g-only	gf256_mul_assoc	.054240
+smt2	cadical	shift-add	ripple	gf256_mul_assoc	.054050
+smt2	cryptominisat	comba	brent-kung	gf256_mul_assoc	T/O
+smt2	cryptominisat	comba	g-only	gf256_mul_assoc	.061474
+smt2	cryptominisat	comba	ripple	gf256_mul_assoc	.047292
+smt2	cryptominisat	comba-cs	brent-kung	gf256_mul_assoc	.071811
+smt2	cryptominisat	comba-cs	g-only	gf256_mul_assoc	.030498
+smt2	cryptominisat	comba-cs	ripple	gf256_mul_assoc	.031223
+smt2	cryptominisat	dadda	brent-kung	gf256_mul_assoc	.061674
+smt2	cryptominisat	dadda	g-only	gf256_mul_assoc	.022713
+smt2	cryptominisat	dadda	ripple	gf256_mul_assoc	.070554
+smt2	cryptominisat	shift-add	brent-kung	gf256_mul_assoc	.058077
+smt2	cryptominisat	shift-add	g-only	gf256_mul_assoc	.032280
+smt2	cryptominisat	shift-add	ripple	gf256_mul_assoc	.032381
+smt2	mergesat	comba	brent-kung	gf256_mul_assoc	T/O
+smt2	mergesat	comba	g-only	gf256_mul_assoc	.066243
+smt2	mergesat	comba	ripple	gf256_mul_assoc	.042499
+smt2	mergesat	comba-cs	brent-kung	gf256_mul_assoc	.684393
+smt2	mergesat	comba-cs	g-only	gf256_mul_assoc	.028591
+smt2	mergesat	comba-cs	ripple	gf256_mul_assoc	.028676
+smt2	mergesat	dadda	brent-kung	gf256_mul_assoc	1.162169
+smt2	mergesat	dadda	g-only	gf256_mul_assoc	.053377
+smt2	mergesat	dadda	ripple	gf256_mul_assoc	.034045
+smt2	mergesat	shift-add	brent-kung	gf256_mul_assoc	.597602
+smt2	mergesat	shift-add	g-only	gf256_mul_assoc	.033910
+smt2	mergesat	shift-add	ripple	gf256_mul_assoc	.034123
+smt2	minisat	comba	brent-kung	gf256_mul_assoc	T/O
+smt2	minisat	comba	g-only	gf256_mul_assoc	.026838
+smt2	minisat	comba	ripple	gf256_mul_assoc	.025134
+smt2	minisat	comba-cs	brent-kung	gf256_mul_assoc	.034204
+smt2	minisat	comba-cs	g-only	gf256_mul_assoc	.028818
+smt2	minisat	comba-cs	ripple	gf256_mul_assoc	.029029
+smt2	minisat	dadda	brent-kung	gf256_mul_assoc	.047299
+smt2	minisat	dadda	g-only	gf256_mul_assoc	.026368
+smt2	minisat	dadda	ripple	gf256_mul_assoc	.022148
+smt2	minisat	shift-add	brent-kung	gf256_mul_assoc	.036159
+smt2	minisat	shift-add	g-only	gf256_mul_assoc	.032363
+smt2	minisat	shift-add	ripple	gf256_mul_assoc	.032536
+smt2	cadical	comba	brent-kung	half_mul_comm	.011392
+smt2	cadical	comba	g-only	half_mul_comm	.011663
+smt2	cadical	comba	ripple	half_mul_comm	.011580
+smt2	cadical	comba-cs	brent-kung	half_mul_comm	.010046
+smt2	cadical	comba-cs	g-only	half_mul_comm	.009911
+smt2	cadical	comba-cs	ripple	half_mul_comm	.009974
+smt2	cadical	dadda	brent-kung	half_mul_comm	.009954
+smt2	cadical	dadda	g-only	half_mul_comm	.009979
+smt2	cadical	dadda	ripple	half_mul_comm	.009911
+smt2	cadical	shift-add	brent-kung	half_mul_comm	.009715
+smt2	cadical	shift-add	g-only	half_mul_comm	.009885
+smt2	cadical	shift-add	ripple	half_mul_comm	.009769
+smt2	cryptominisat	comba	brent-kung	half_mul_comm	.019142
+smt2	cryptominisat	comba	g-only	half_mul_comm	.019260
+smt2	cryptominisat	comba	ripple	half_mul_comm	.019372
+smt2	cryptominisat	comba-cs	brent-kung	half_mul_comm	.016858
+smt2	cryptominisat	comba-cs	g-only	half_mul_comm	.017087
+smt2	cryptominisat	comba-cs	ripple	half_mul_comm	.016631
+smt2	cryptominisat	dadda	brent-kung	half_mul_comm	.017513
+smt2	cryptominisat	dadda	g-only	half_mul_comm	.017413
+smt2	cryptominisat	dadda	ripple	half_mul_comm	.017450
+smt2	cryptominisat	shift-add	brent-kung	half_mul_comm	.044424
+smt2	cryptominisat	shift-add	g-only	half_mul_comm	.044402
+smt2	cryptominisat	shift-add	ripple	half_mul_comm	.044204
+smt2	mergesat	comba	brent-kung	half_mul_comm	.029606
+smt2	mergesat	comba	g-only	half_mul_comm	.029653
+smt2	mergesat	comba	ripple	half_mul_comm	.029745
+smt2	mergesat	comba-cs	brent-kung	half_mul_comm	.034680
+smt2	mergesat	comba-cs	g-only	half_mul_comm	.034417
+smt2	mergesat	comba-cs	ripple	half_mul_comm	.034182
+smt2	mergesat	dadda	brent-kung	half_mul_comm	.032159
+smt2	mergesat	dadda	g-only	half_mul_comm	.031895
+smt2	mergesat	dadda	ripple	half_mul_comm	.032014
+smt2	mergesat	shift-add	brent-kung	half_mul_comm	.028501
+smt2	mergesat	shift-add	g-only	half_mul_comm	.028680
+smt2	mergesat	shift-add	ripple	half_mul_comm	.028783
+smt2	minisat	comba	brent-kung	half_mul_comm	.020537
+smt2	minisat	comba	g-only	half_mul_comm	.020440
+smt2	minisat	comba	ripple	half_mul_comm	.020560
+smt2	minisat	comba-cs	brent-kung	half_mul_comm	.023289
+smt2	minisat	comba-cs	g-only	half_mul_comm	.023495
+smt2	minisat	comba-cs	ripple	half_mul_comm	.023308
+smt2	minisat	dadda	brent-kung	half_mul_comm	.018111
+smt2	minisat	dadda	g-only	half_mul_comm	.018224
+smt2	minisat	dadda	ripple	half_mul_comm	.018048
+smt2	minisat	shift-add	brent-kung	half_mul_comm	.018563
+smt2	minisat	shift-add	g-only	half_mul_comm	.018526
+smt2	minisat	shift-add	ripple	half_mul_comm	.018659
+smt2	cadical	comba	brent-kung	half_mul_comm_v2	116.272215
+smt2	cadical	comba	g-only	half_mul_comm_v2	117.151259
+smt2	cadical	comba	ripple	half_mul_comm_v2	117.294782
+smt2	cadical	comba-cs	brent-kung	half_mul_comm_v2	T/O
+smt2	cadical	comba-cs	g-only	half_mul_comm_v2	T/O
+smt2	cadical	comba-cs	ripple	half_mul_comm_v2	T/O
+smt2	cadical	dadda	brent-kung	half_mul_comm_v2	T/O
+smt2	cadical	dadda	g-only	half_mul_comm_v2	T/O
+smt2	cadical	dadda	ripple	half_mul_comm_v2	T/O
+smt2	cadical	shift-add	brent-kung	half_mul_comm_v2	T/O
+smt2	cadical	shift-add	g-only	half_mul_comm_v2	T/O
+smt2	cadical	shift-add	ripple	half_mul_comm_v2	T/O
+smt2	cryptominisat	comba	brent-kung	half_mul_comm_v2	T/O
+smt2	cryptominisat	comba	g-only	half_mul_comm_v2	T/O
+smt2	cryptominisat	comba	ripple	half_mul_comm_v2	T/O
+smt2	cryptominisat	comba-cs	brent-kung	half_mul_comm_v2	T/O
+smt2	cryptominisat	comba-cs	g-only	half_mul_comm_v2	T/O
+smt2	cryptominisat	comba-cs	ripple	half_mul_comm_v2	T/O
+smt2	cryptominisat	dadda	brent-kung	half_mul_comm_v2	T/O
+smt2	cryptominisat	dadda	g-only	half_mul_comm_v2	T/O
+smt2	cryptominisat	dadda	ripple	half_mul_comm_v2	T/O
+smt2	cryptominisat	shift-add	brent-kung	half_mul_comm_v2	T/O
+smt2	cryptominisat	shift-add	g-only	half_mul_comm_v2	T/O
+smt2	cryptominisat	shift-add	ripple	half_mul_comm_v2	T/O
+smt2	mergesat	comba	brent-kung	half_mul_comm_v2	T/O
+smt2	mergesat	comba	g-only	half_mul_comm_v2	T/O
+smt2	mergesat	comba	ripple	half_mul_comm_v2	T/O
+smt2	mergesat	comba-cs	brent-kung	half_mul_comm_v2	T/O
+smt2	mergesat	comba-cs	g-only	half_mul_comm_v2	T/O
+smt2	mergesat	comba-cs	ripple	half_mul_comm_v2	T/O
+smt2	mergesat	dadda	brent-kung	half_mul_comm_v2	T/O
+smt2	mergesat	dadda	g-only	half_mul_comm_v2	T/O
+smt2	mergesat	dadda	ripple	half_mul_comm_v2	T/O
+smt2	mergesat	shift-add	brent-kung	half_mul_comm_v2	T/O
+smt2	mergesat	shift-add	g-only	half_mul_comm_v2	T/O
+smt2	mergesat	shift-add	ripple	half_mul_comm_v2	T/O
+smt2	minisat	comba	brent-kung	half_mul_comm_v2	T/O
+smt2	minisat	comba	g-only	half_mul_comm_v2	T/O
+smt2	minisat	comba	ripple	half_mul_comm_v2	T/O
+smt2	minisat	comba-cs	brent-kung	half_mul_comm_v2	T/O
+smt2	minisat	comba-cs	g-only	half_mul_comm_v2	T/O
+smt2	minisat	comba-cs	ripple	half_mul_comm_v2	T/O
+smt2	minisat	dadda	brent-kung	half_mul_comm_v2	T/O
+smt2	minisat	dadda	g-only	half_mul_comm_v2	T/O
+smt2	minisat	dadda	ripple	half_mul_comm_v2	T/O
+smt2	minisat	shift-add	brent-kung	half_mul_comm_v2	T/O
+smt2	minisat	shift-add	g-only	half_mul_comm_v2	T/O
+smt2	minisat	shift-add	ripple	half_mul_comm_v2	T/O
+smt2	cadical	comba	brent-kung	hw_mul_equiv_12	T/O
+smt2	cadical	comba	g-only	hw_mul_equiv_12	T/O
+smt2	cadical	comba	ripple	hw_mul_equiv_12	T/O
+smt2	cadical	comba-cs	brent-kung	hw_mul_equiv_12	T/O
+smt2	cadical	comba-cs	g-only	hw_mul_equiv_12	T/O
+smt2	cadical	comba-cs	ripple	hw_mul_equiv_12	103.294338
+smt2	cadical	dadda	brent-kung	hw_mul_equiv_12	T/O
+smt2	cadical	dadda	g-only	hw_mul_equiv_12	T/O
+smt2	cadical	dadda	ripple	hw_mul_equiv_12	T/O
+smt2	cadical	shift-add	brent-kung	hw_mul_equiv_12	19.848041
+smt2	cadical	shift-add	g-only	hw_mul_equiv_12	17.119141
+smt2	cadical	shift-add	ripple	hw_mul_equiv_12	14.895049
+smt2	cryptominisat	comba	brent-kung	hw_mul_equiv_12	T/O
+smt2	cryptominisat	comba	g-only	hw_mul_equiv_12	T/O
+smt2	cryptominisat	comba	ripple	hw_mul_equiv_12	T/O
+smt2	cryptominisat	comba-cs	brent-kung	hw_mul_equiv_12	T/O
+smt2	cryptominisat	comba-cs	g-only	hw_mul_equiv_12	T/O
+smt2	cryptominisat	comba-cs	ripple	hw_mul_equiv_12	T/O
+smt2	cryptominisat	dadda	brent-kung	hw_mul_equiv_12	T/O
+smt2	cryptominisat	dadda	g-only	hw_mul_equiv_12	T/O
+smt2	cryptominisat	dadda	ripple	hw_mul_equiv_12	T/O
+smt2	cryptominisat	shift-add	brent-kung	hw_mul_equiv_12	114.574951
+smt2	cryptominisat	shift-add	g-only	hw_mul_equiv_12	76.822985
+smt2	cryptominisat	shift-add	ripple	hw_mul_equiv_12	68.991841
+smt2	mergesat	comba	brent-kung	hw_mul_equiv_12	T/O
+smt2	mergesat	comba	g-only	hw_mul_equiv_12	T/O
+smt2	mergesat	comba	ripple	hw_mul_equiv_12	T/O
+smt2	mergesat	comba-cs	brent-kung	hw_mul_equiv_12	T/O
+smt2	mergesat	comba-cs	g-only	hw_mul_equiv_12	T/O
+smt2	mergesat	comba-cs	ripple	hw_mul_equiv_12	T/O
+smt2	mergesat	dadda	brent-kung	hw_mul_equiv_12	T/O
+smt2	mergesat	dadda	g-only	hw_mul_equiv_12	T/O
+smt2	mergesat	dadda	ripple	hw_mul_equiv_12	T/O
+smt2	mergesat	shift-add	brent-kung	hw_mul_equiv_12	64.421350
+smt2	mergesat	shift-add	g-only	hw_mul_equiv_12	35.077238
+smt2	mergesat	shift-add	ripple	hw_mul_equiv_12	34.730670
+smt2	minisat	comba	brent-kung	hw_mul_equiv_12	T/O
+smt2	minisat	comba	g-only	hw_mul_equiv_12	T/O
+smt2	minisat	comba	ripple	hw_mul_equiv_12	T/O
+smt2	minisat	comba-cs	brent-kung	hw_mul_equiv_12	T/O
+smt2	minisat	comba-cs	g-only	hw_mul_equiv_12	T/O
+smt2	minisat	comba-cs	ripple	hw_mul_equiv_12	T/O
+smt2	minisat	dadda	brent-kung	hw_mul_equiv_12	T/O
+smt2	minisat	dadda	g-only	hw_mul_equiv_12	T/O
+smt2	minisat	dadda	ripple	hw_mul_equiv_12	T/O
+smt2	minisat	shift-add	brent-kung	hw_mul_equiv_12	T/O
+smt2	minisat	shift-add	g-only	hw_mul_equiv_12	118.773517
+smt2	minisat	shift-add	ripple	hw_mul_equiv_12	T/O
+smt2	cadical	comba	brent-kung	mixed_arith_8	T/O
+smt2	cadical	comba	g-only	mixed_arith_8	T/O
+smt2	cadical	comba	ripple	mixed_arith_8	T/O
+smt2	cadical	comba-cs	brent-kung	mixed_arith_8	T/O
+smt2	cadical	comba-cs	g-only	mixed_arith_8	T/O
+smt2	cadical	comba-cs	ripple	mixed_arith_8	T/O
+smt2	cadical	dadda	brent-kung	mixed_arith_8	T/O
+smt2	cadical	dadda	g-only	mixed_arith_8	T/O
+smt2	cadical	dadda	ripple	mixed_arith_8	T/O
+smt2	cadical	shift-add	brent-kung	mixed_arith_8	T/O
+smt2	cadical	shift-add	g-only	mixed_arith_8	T/O
+smt2	cadical	shift-add	ripple	mixed_arith_8	T/O
+smt2	cryptominisat	comba	brent-kung	mixed_arith_8	T/O
+smt2	cryptominisat	comba	g-only	mixed_arith_8	T/O
+smt2	cryptominisat	comba	ripple	mixed_arith_8	T/O
+smt2	cryptominisat	comba-cs	brent-kung	mixed_arith_8	T/O
+smt2	cryptominisat	comba-cs	g-only	mixed_arith_8	T/O
+smt2	cryptominisat	comba-cs	ripple	mixed_arith_8	T/O
+smt2	cryptominisat	dadda	brent-kung	mixed_arith_8	T/O
+smt2	cryptominisat	dadda	g-only	mixed_arith_8	T/O
+smt2	cryptominisat	dadda	ripple	mixed_arith_8	T/O
+smt2	cryptominisat	shift-add	brent-kung	mixed_arith_8	T/O
+smt2	cryptominisat	shift-add	g-only	mixed_arith_8	T/O
+smt2	cryptominisat	shift-add	ripple	mixed_arith_8	T/O
+smt2	mergesat	comba	brent-kung	mixed_arith_8	T/O
+smt2	mergesat	comba	g-only	mixed_arith_8	T/O
+smt2	mergesat	comba	ripple	mixed_arith_8	T/O
+smt2	mergesat	comba-cs	brent-kung	mixed_arith_8	T/O
+smt2	mergesat	comba-cs	g-only	mixed_arith_8	T/O
+smt2	mergesat	comba-cs	ripple	mixed_arith_8	T/O
+smt2	mergesat	dadda	brent-kung	mixed_arith_8	T/O
+smt2	mergesat	dadda	g-only	mixed_arith_8	T/O
+smt2	mergesat	dadda	ripple	mixed_arith_8	T/O
+smt2	mergesat	shift-add	brent-kung	mixed_arith_8	T/O
+smt2	mergesat	shift-add	g-only	mixed_arith_8	T/O
+smt2	mergesat	shift-add	ripple	mixed_arith_8	T/O
+smt2	minisat	comba	brent-kung	mixed_arith_8	T/O
+smt2	minisat	comba	g-only	mixed_arith_8	T/O
+smt2	minisat	comba	ripple	mixed_arith_8	T/O
+smt2	minisat	comba-cs	brent-kung	mixed_arith_8	T/O
+smt2	minisat	comba-cs	g-only	mixed_arith_8	T/O
+smt2	minisat	comba-cs	ripple	mixed_arith_8	T/O
+smt2	minisat	dadda	brent-kung	mixed_arith_8	T/O
+smt2	minisat	dadda	g-only	mixed_arith_8	T/O
+smt2	minisat	dadda	ripple	mixed_arith_8	T/O
+smt2	minisat	shift-add	brent-kung	mixed_arith_8	T/O
+smt2	minisat	shift-add	g-only	mixed_arith_8	T/O
+smt2	minisat	shift-add	ripple	mixed_arith_8	T/O
+smt2	cadical	comba	brent-kung	mul_ineq_12	T/O
+smt2	cadical	comba	g-only	mul_ineq_12	.488843
+smt2	cadical	comba	ripple	mul_ineq_12	.476741
+smt2	cadical	comba-cs	brent-kung	mul_ineq_12	.485384
+smt2	cadical	comba-cs	g-only	mul_ineq_12	.485083
+smt2	cadical	comba-cs	ripple	mul_ineq_12	.485972
+smt2	cadical	dadda	brent-kung	mul_ineq_12	.464375
+smt2	cadical	dadda	g-only	mul_ineq_12	.413404
+smt2	cadical	dadda	ripple	mul_ineq_12	.470523
+smt2	cadical	shift-add	brent-kung	mul_ineq_12	.521291
+smt2	cadical	shift-add	g-only	mul_ineq_12	.522080
+smt2	cadical	shift-add	ripple	mul_ineq_12	.521086
+smt2	cryptominisat	comba	brent-kung	mul_ineq_12	T/O
+smt2	cryptominisat	comba	g-only	mul_ineq_12	1.529999
+smt2	cryptominisat	comba	ripple	mul_ineq_12	1.805679
+smt2	cryptominisat	comba-cs	brent-kung	mul_ineq_12	1.904598
+smt2	cryptominisat	comba-cs	g-only	mul_ineq_12	1.906163
+smt2	cryptominisat	comba-cs	ripple	mul_ineq_12	1.899996
+smt2	cryptominisat	dadda	brent-kung	mul_ineq_12	1.221007
+smt2	cryptominisat	dadda	g-only	mul_ineq_12	.968190
+smt2	cryptominisat	dadda	ripple	mul_ineq_12	1.014224
+smt2	cryptominisat	shift-add	brent-kung	mul_ineq_12	.991706
+smt2	cryptominisat	shift-add	g-only	mul_ineq_12	.990245
+smt2	cryptominisat	shift-add	ripple	mul_ineq_12	.992762
+smt2	mergesat	comba	brent-kung	mul_ineq_12	T/O
+smt2	mergesat	comba	g-only	mul_ineq_12	.975052
+smt2	mergesat	comba	ripple	mul_ineq_12	1.213074
+smt2	mergesat	comba-cs	brent-kung	mul_ineq_12	1.241420
+smt2	mergesat	comba-cs	g-only	mul_ineq_12	1.243132
+smt2	mergesat	comba-cs	ripple	mul_ineq_12	1.237939
+smt2	mergesat	dadda	brent-kung	mul_ineq_12	.958332
+smt2	mergesat	dadda	g-only	mul_ineq_12	.851982
+smt2	mergesat	dadda	ripple	mul_ineq_12	.822429
+smt2	mergesat	shift-add	brent-kung	mul_ineq_12	.846137
+smt2	mergesat	shift-add	g-only	mul_ineq_12	.847213
+smt2	mergesat	shift-add	ripple	mul_ineq_12	.847475
+smt2	minisat	comba	brent-kung	mul_ineq_12	T/O
+smt2	minisat	comba	g-only	mul_ineq_12	.557103
+smt2	minisat	comba	ripple	mul_ineq_12	.560497
+smt2	minisat	comba-cs	brent-kung	mul_ineq_12	.646424
+smt2	minisat	comba-cs	g-only	mul_ineq_12	.647157
+smt2	minisat	comba-cs	ripple	mul_ineq_12	.648978
+smt2	minisat	dadda	brent-kung	mul_ineq_12	.407365
+smt2	minisat	dadda	g-only	mul_ineq_12	.404185
+smt2	minisat	dadda	ripple	mul_ineq_12	.392337
+smt2	minisat	shift-add	brent-kung	mul_ineq_12	.340631
+smt2	minisat	shift-add	g-only	mul_ineq_12	.341136
+smt2	minisat	shift-add	ripple	mul_ineq_12	.341074
+smt2	cadical	comba	brent-kung	mul_no_overflow_16	T/O
+smt2	cadical	comba	g-only	mul_no_overflow_16	.011960
+smt2	cadical	comba	ripple	mul_no_overflow_16	.010200
+smt2	cadical	comba-cs	brent-kung	mul_no_overflow_16	.011741
+smt2	cadical	comba-cs	g-only	mul_no_overflow_16	.010832
+smt2	cadical	comba-cs	ripple	mul_no_overflow_16	.011004
+smt2	cadical	dadda	brent-kung	mul_no_overflow_16	.010916
+smt2	cadical	dadda	g-only	mul_no_overflow_16	.009704
+smt2	cadical	dadda	ripple	mul_no_overflow_16	.009321
+smt2	cadical	shift-add	brent-kung	mul_no_overflow_16	.010894
+smt2	cadical	shift-add	g-only	mul_no_overflow_16	.009765
+smt2	cadical	shift-add	ripple	mul_no_overflow_16	.009284
+smt2	cryptominisat	comba	brent-kung	mul_no_overflow_16	T/O
+smt2	cryptominisat	comba	g-only	mul_no_overflow_16	.027119
+smt2	cryptominisat	comba	ripple	mul_no_overflow_16	.022567
+smt2	cryptominisat	comba-cs	brent-kung	mul_no_overflow_16	.030045
+smt2	cryptominisat	comba-cs	g-only	mul_no_overflow_16	.032079
+smt2	cryptominisat	comba-cs	ripple	mul_no_overflow_16	.020182
+smt2	cryptominisat	dadda	brent-kung	mul_no_overflow_16	.023046
+smt2	cryptominisat	dadda	g-only	mul_no_overflow_16	.026712
+smt2	cryptominisat	dadda	ripple	mul_no_overflow_16	.022796
+smt2	cryptominisat	shift-add	brent-kung	mul_no_overflow_16	.018856
+smt2	cryptominisat	shift-add	g-only	mul_no_overflow_16	.017770
+smt2	cryptominisat	shift-add	ripple	mul_no_overflow_16	.016130
+smt2	mergesat	comba	brent-kung	mul_no_overflow_16	T/O
+smt2	mergesat	comba	g-only	mul_no_overflow_16	.024807
+smt2	mergesat	comba	ripple	mul_no_overflow_16	.021260
+smt2	mergesat	comba-cs	brent-kung	mul_no_overflow_16	.023194
+smt2	mergesat	comba-cs	g-only	mul_no_overflow_16	.022798
+smt2	mergesat	comba-cs	ripple	mul_no_overflow_16	.021928
+smt2	mergesat	dadda	brent-kung	mul_no_overflow_16	.020351
+smt2	mergesat	dadda	g-only	mul_no_overflow_16	.020322
+smt2	mergesat	dadda	ripple	mul_no_overflow_16	.019940
+smt2	mergesat	shift-add	brent-kung	mul_no_overflow_16	.019646
+smt2	mergesat	shift-add	g-only	mul_no_overflow_16	.020742
+smt2	mergesat	shift-add	ripple	mul_no_overflow_16	.019976
+smt2	minisat	comba	brent-kung	mul_no_overflow_16	T/O
+smt2	minisat	comba	g-only	mul_no_overflow_16	.017823
+smt2	minisat	comba	ripple	mul_no_overflow_16	.016126
+smt2	minisat	comba-cs	brent-kung	mul_no_overflow_16	.018289
+smt2	minisat	comba-cs	g-only	mul_no_overflow_16	.016544
+smt2	minisat	comba-cs	ripple	mul_no_overflow_16	.016568
+smt2	minisat	dadda	brent-kung	mul_no_overflow_16	.016989
+smt2	minisat	dadda	g-only	mul_no_overflow_16	.015300
+smt2	minisat	dadda	ripple	mul_no_overflow_16	.014974
+smt2	minisat	shift-add	brent-kung	mul_no_overflow_16	.016860
+smt2	minisat	shift-add	g-only	mul_no_overflow_16	.015165
+smt2	minisat	shift-add	ripple	mul_no_overflow_16	.014835
+smt2	cadical	comba	brent-kung	overflow_detect_16	T/O
+smt2	cadical	comba	g-only	overflow_detect_16	.733803
+smt2	cadical	comba	ripple	overflow_detect_16	1.183736
+smt2	cadical	comba-cs	brent-kung	overflow_detect_16	T/O
+smt2	cadical	comba-cs	g-only	overflow_detect_16	T/O
+smt2	cadical	comba-cs	ripple	overflow_detect_16	119.677992
+smt2	cadical	dadda	brent-kung	overflow_detect_16	.369833
+smt2	cadical	dadda	g-only	overflow_detect_16	.177289
+smt2	cadical	dadda	ripple	overflow_detect_16	.184411
+smt2	cadical	shift-add	brent-kung	overflow_detect_16	.342713
+smt2	cadical	shift-add	g-only	overflow_detect_16	.342653
+smt2	cadical	shift-add	ripple	overflow_detect_16	.343541
+smt2	cryptominisat	comba	brent-kung	overflow_detect_16	T/O
+smt2	cryptominisat	comba	g-only	overflow_detect_16	T/O
+smt2	cryptominisat	comba	ripple	overflow_detect_16	T/O
+smt2	cryptominisat	comba-cs	brent-kung	overflow_detect_16	T/O
+smt2	cryptominisat	comba-cs	g-only	overflow_detect_16	T/O
+smt2	cryptominisat	comba-cs	ripple	overflow_detect_16	T/O
+smt2	cryptominisat	dadda	brent-kung	overflow_detect_16	7.662547
+smt2	cryptominisat	dadda	g-only	overflow_detect_16	6.484525
+smt2	cryptominisat	dadda	ripple	overflow_detect_16	8.004156
+smt2	cryptominisat	shift-add	brent-kung	overflow_detect_16	T/O
+smt2	cryptominisat	shift-add	g-only	overflow_detect_16	T/O
+smt2	cryptominisat	shift-add	ripple	overflow_detect_16	T/O
+smt2	mergesat	comba	brent-kung	overflow_detect_16	T/O
+smt2	mergesat	comba	g-only	overflow_detect_16	28.708221
+smt2	mergesat	comba	ripple	overflow_detect_16	25.121679
+smt2	mergesat	comba-cs	brent-kung	overflow_detect_16	T/O
+smt2	mergesat	comba-cs	g-only	overflow_detect_16	T/O
+smt2	mergesat	comba-cs	ripple	overflow_detect_16	119.691282
+smt2	mergesat	dadda	brent-kung	overflow_detect_16	1.844656
+smt2	mergesat	dadda	g-only	overflow_detect_16	2.981395
+smt2	mergesat	dadda	ripple	overflow_detect_16	3.255930
+smt2	mergesat	shift-add	brent-kung	overflow_detect_16	86.226971
+smt2	mergesat	shift-add	g-only	overflow_detect_16	82.194455
+smt2	mergesat	shift-add	ripple	overflow_detect_16	86.091775
+smt2	minisat	comba	brent-kung	overflow_detect_16	T/O
+smt2	minisat	comba	g-only	overflow_detect_16	T/O
+smt2	minisat	comba	ripple	overflow_detect_16	T/O
+smt2	minisat	comba-cs	brent-kung	overflow_detect_16	T/O
+smt2	minisat	comba-cs	g-only	overflow_detect_16	T/O
+smt2	minisat	comba-cs	ripple	overflow_detect_16	T/O
+smt2	minisat	dadda	brent-kung	overflow_detect_16	17.934108
+smt2	minisat	dadda	g-only	overflow_detect_16	19.004902
+smt2	minisat	dadda	ripple	overflow_detect_16	16.404719
+smt2	minisat	shift-add	brent-kung	overflow_detect_16	T/O
+smt2	minisat	shift-add	g-only	overflow_detect_16	T/O
+smt2	minisat	shift-add	ripple	overflow_detect_16	T/O
+smt2	cadical	comba	brent-kung	strength_chain_16	T/O
+smt2	cadical	comba	g-only	strength_chain_16	1.455419
+smt2	cadical	comba	ripple	strength_chain_16	1.147324
+smt2	cadical	comba-cs	brent-kung	strength_chain_16	1.054323
+smt2	cadical	comba-cs	g-only	strength_chain_16	.845756
+smt2	cadical	comba-cs	ripple	strength_chain_16	.972214
+smt2	cadical	dadda	brent-kung	strength_chain_16	.848768
+smt2	cadical	dadda	g-only	strength_chain_16	.708365
+smt2	cadical	dadda	ripple	strength_chain_16	1.565649
+smt2	cadical	shift-add	brent-kung	strength_chain_16	1.353335
+smt2	cadical	shift-add	g-only	strength_chain_16	1.028029
+smt2	cadical	shift-add	ripple	strength_chain_16	.928003
+smt2	cryptominisat	comba	brent-kung	strength_chain_16	T/O
+smt2	cryptominisat	comba	g-only	strength_chain_16	5.568453
+smt2	cryptominisat	comba	ripple	strength_chain_16	5.276198
+smt2	cryptominisat	comba-cs	brent-kung	strength_chain_16	2.352134
+smt2	cryptominisat	comba-cs	g-only	strength_chain_16	1.828952
+smt2	cryptominisat	comba-cs	ripple	strength_chain_16	2.001666
+smt2	cryptominisat	dadda	brent-kung	strength_chain_16	3.111562
+smt2	cryptominisat	dadda	g-only	strength_chain_16	1.891470
+smt2	cryptominisat	dadda	ripple	strength_chain_16	1.795338
+smt2	cryptominisat	shift-add	brent-kung	strength_chain_16	3.374391
+smt2	cryptominisat	shift-add	g-only	strength_chain_16	2.329052
+smt2	cryptominisat	shift-add	ripple	strength_chain_16	2.595503
+smt2	mergesat	comba	brent-kung	strength_chain_16	T/O
+smt2	mergesat	comba	g-only	strength_chain_16	6.587532
+smt2	mergesat	comba	ripple	strength_chain_16	3.351077
+smt2	mergesat	comba-cs	brent-kung	strength_chain_16	1.910121
+smt2	mergesat	comba-cs	g-only	strength_chain_16	2.477842
+smt2	mergesat	comba-cs	ripple	strength_chain_16	1.945151
+smt2	mergesat	dadda	brent-kung	strength_chain_16	5.869520
+smt2	mergesat	dadda	g-only	strength_chain_16	2.052034
+smt2	mergesat	dadda	ripple	strength_chain_16	5.887276
+smt2	mergesat	shift-add	brent-kung	strength_chain_16	3.372194
+smt2	mergesat	shift-add	g-only	strength_chain_16	2.075016
+smt2	mergesat	shift-add	ripple	strength_chain_16	5.097272
+smt2	minisat	comba	brent-kung	strength_chain_16	T/O
+smt2	minisat	comba	g-only	strength_chain_16	2.560004
+smt2	minisat	comba	ripple	strength_chain_16	2.207202
+smt2	minisat	comba-cs	brent-kung	strength_chain_16	3.477617
+smt2	minisat	comba-cs	g-only	strength_chain_16	1.961259
+smt2	minisat	comba-cs	ripple	strength_chain_16	1.757880
+smt2	minisat	dadda	brent-kung	strength_chain_16	2.011959
+smt2	minisat	dadda	g-only	strength_chain_16	1.472733
+smt2	minisat	dadda	ripple	strength_chain_16	1.416764
+smt2	minisat	shift-add	brent-kung	strength_chain_16	1.593032
+smt2	minisat	shift-add	g-only	strength_chain_16	1.305183
+smt2	minisat	shift-add	ripple	strength_chain_16	1.394232
+smt2	cadical	comba	brent-kung	strength_red_16	T/O
+smt2	cadical	comba	g-only	strength_red_16	.044452
+smt2	cadical	comba	ripple	strength_red_16	.045418
+smt2	cadical	comba-cs	brent-kung	strength_red_16	.027189
+smt2	cadical	comba-cs	g-only	strength_red_16	.016313
+smt2	cadical	comba-cs	ripple	strength_red_16	.016048
+smt2	cadical	dadda	brent-kung	strength_red_16	.032157
+smt2	cadical	dadda	g-only	strength_red_16	.018765
+smt2	cadical	dadda	ripple	strength_red_16	.018966
+smt2	cadical	shift-add	brent-kung	strength_red_16	.034372
+smt2	cadical	shift-add	g-only	strength_red_16	.021552
+smt2	cadical	shift-add	ripple	strength_red_16	.028512
+smt2	cryptominisat	comba	brent-kung	strength_red_16	T/O
+smt2	cryptominisat	comba	g-only	strength_red_16	.038622
+smt2	cryptominisat	comba	ripple	strength_red_16	.029003
+smt2	cryptominisat	comba-cs	brent-kung	strength_red_16	.019993
+smt2	cryptominisat	comba-cs	g-only	strength_red_16	.015536
+smt2	cryptominisat	comba-cs	ripple	strength_red_16	.018271
+smt2	cryptominisat	dadda	brent-kung	strength_red_16	.028238
+smt2	cryptominisat	dadda	g-only	strength_red_16	.019842
+smt2	cryptominisat	dadda	ripple	strength_red_16	.014147
+smt2	cryptominisat	shift-add	brent-kung	strength_red_16	.024554
+smt2	cryptominisat	shift-add	g-only	strength_red_16	.019400
+smt2	cryptominisat	shift-add	ripple	strength_red_16	.017749
+smt2	mergesat	comba	brent-kung	strength_red_16	T/O
+smt2	mergesat	comba	g-only	strength_red_16	.079624
+smt2	mergesat	comba	ripple	strength_red_16	.123568
+smt2	mergesat	comba-cs	brent-kung	strength_red_16	.077650
+smt2	mergesat	comba-cs	g-only	strength_red_16	.104522
+smt2	mergesat	comba-cs	ripple	strength_red_16	.038147
+smt2	mergesat	dadda	brent-kung	strength_red_16	.093371
+smt2	mergesat	dadda	g-only	strength_red_16	.052960
+smt2	mergesat	dadda	ripple	strength_red_16	.064991
+smt2	mergesat	shift-add	brent-kung	strength_red_16	.049694
+smt2	mergesat	shift-add	g-only	strength_red_16	.068149
+smt2	mergesat	shift-add	ripple	strength_red_16	.088353
+smt2	minisat	comba	brent-kung	strength_red_16	T/O
+smt2	minisat	comba	g-only	strength_red_16	.034646
+smt2	minisat	comba	ripple	strength_red_16	.029545
+smt2	minisat	comba-cs	brent-kung	strength_red_16	.019542
+smt2	minisat	comba-cs	g-only	strength_red_16	.012000
+smt2	minisat	comba-cs	ripple	strength_red_16	.012425
+smt2	minisat	dadda	brent-kung	strength_red_16	.034972
+smt2	minisat	dadda	g-only	strength_red_16	.010982
+smt2	minisat	dadda	ripple	strength_red_16	.015491
+smt2	minisat	shift-add	brent-kung	strength_red_16	.028224
+smt2	minisat	shift-add	g-only	strength_red_16	.013122
+smt2	minisat	shift-add	ripple	strength_red_16	.012964

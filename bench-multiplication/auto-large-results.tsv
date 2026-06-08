@@ -1,0 +1,13 @@
+# CBMC's profile_cbmc auto-large benchmarks with --refine-arithmetic
+# Time in seconds; T/O = 60 s timeout
+benchmark	with_s	with_pairs	without_s
+bitvector	0.04	0	0.04
+dlinked_list	2.30	0	2.30
+tree	26.92	0	26.97
+linked_list	1.22	0	1.21
+structs	0.10	0	0.11
+func_ptrs	0.04	0	0.04
+array_ops	T/O	0	T/O
+matrix	1.71	0	1.74
+unions	0.07	0	0.07
+string_ops	0.33	0	0.34

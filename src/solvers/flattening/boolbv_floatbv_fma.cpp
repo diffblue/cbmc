@@ -16,6 +16,7 @@ Author: Michael Tautschnig
 bvt boolbvt::convert_floatbv_fma(const floatbv_fma_exprt &expr)
 {
   float_utilst float_utils(prop);
+  float_utils.set_multiplier_encoding_from(bv_utils);
 
   float_utils.set_rounding_mode(convert_bv(expr.rounding_mode()));
   float_utils.spec = ieee_float_spect(to_floatbv_type(expr.type()));

@@ -1,0 +1,67 @@
+name: Algebraic solver checks
+
+# Lightweight guards for the algebraic pre-solver:
+#  1. proof-traceability lint (no build) — every PROOF: reference resolves
+#     and every UNSAT conclusion in try_algebraic_solve is annotated;
+#  2. a soundness smoke test that runs the algebraic regression queries and
+#     cross-checks each verdict against z3 (the wrong-verdict guard that the
+#     standard output-matching regression harness does not provide).
+
+on:
+  pull_request:
+    branches:
+      - '**'
+    paths:
+      - 'src/solvers/algebraic/**'
+      - 'src/solvers/flattening/boolbv*'
+      - 'src/solvers/flattening/bv_utils*'
+      - 'src/solvers/smt2/**'
+      - 'formal-proofs/**'
+      - 'regression/smt2_solver/**'
+      - 'scripts/check_proof_traceability.py'
+      - 'scripts/algebraic_soundness_smoke.sh'
+      - '.github/workflows/algebraic-checks.yaml'
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  proof-traceability:
+    name: Proof-traceability lint
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - name: Run proof-traceability check
+        run: python3 scripts/check_proof_traceability.py
+
+  soundness-smoke:
+    name: Algebraic soundness smoke (vs z3)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: true
+      - name: Install dependencies
+        run: |
+          export DEBIAN_FRONTEND=noninteractive
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            clang-19 clang++-19 flex bison cmake ninja-build ccache z3
+      - name: Prepare ccache
+        uses: actions/cache@v5
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-algcheck-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-algcheck-
+      - name: ccache environment
+        run: echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
+      - name: Build smt2_solver
+        run: |
+          cmake -S . -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_CXX_COMPILER=clang++-19 \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DWITH_JBMC=OFF
+          cmake --build build --target smt2_solver -- -j4
+      - name: Run soundness smoke test
+        run: scripts/algebraic_soundness_smoke.sh build/bin/smt2_solver

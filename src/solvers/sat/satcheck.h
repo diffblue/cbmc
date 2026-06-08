@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 // #define SATCHECK_ZCHAFF
 // #define SATCHECK_MINISAT1
 // #define SATCHECK_MINISAT2
+// #define SATCHECK_MERGESAT
 // #define SATCHECK_GLUCOSE
 // #define SATCHECK_BOOLEFORCE
 // #define SATCHECK_PICOSAT
@@ -39,6 +40,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #define SATCHECK_MINISAT2
 #endif
 
+#if defined(HAVE_MERGESAT) && !defined(SATCHECK_MERGESAT)
+#  define SATCHECK_MERGESAT
+#endif
+
 #if defined(HAVE_GLUCOSE) && !defined(SATCHECK_GLUCOSE)
 #define SATCHECK_GLUCOSE
 #endif
@@ -59,6 +64,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #define SATCHECK_CADICAL
 #endif
 
+#if defined(HAVE_CRYPTOMINISAT) && !defined(SATCHECK_CRYPTOMINISAT)
+#define SATCHECK_CRYPTOMINISAT
+#endif
+
 #if defined SATCHECK_ZCHAFF
 #  include "satcheck_zchaff.h"
 #endif
@@ -71,7 +80,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #  include "satcheck_minisat.h"
 #endif
 
-#if defined SATCHECK_MINISAT2
+#if defined(SATCHECK_MINISAT2) || defined(SATCHECK_MERGESAT)
 #  include "satcheck_minisat2.h"
 #endif
 
@@ -95,6 +104,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #  include "satcheck_cadical.h"
 #endif
 
+#if defined SATCHECK_CRYPTOMINISAT
+#  include "satcheck_cryptominisat.h"
+#endif
+
 #if defined SATCHECK_ZCHAFF
 
 typedef satcheck_zchafft satcheckt;
@@ -110,7 +123,9 @@ typedef satcheck_booleforcet satcheck_no_simplifiert;
 typedef satcheck_minisat1t satcheckt;
 typedef satcheck_minisat1t satcheck_no_simplifiert;
 
-#elif defined SATCHECK_MINISAT2
+#elif defined SATCHECK_MINISAT2 || defined SATCHECK_MERGESAT
+// MergeSat is based on MiniSat2 and is invoked (with suitable defines/ifdefs)
+// via satcheck_minisat2.{h,cpp}
 
 typedef satcheck_minisat_simplifiert satcheckt;
 typedef satcheck_minisat_no_simplifiert satcheck_no_simplifiert;
@@ -139,6 +154,11 @@ typedef satcheck_glucose_no_simplifiert satcheck_no_simplifiert;
 
 typedef satcheck_cadical_no_preprocessingt satcheckt;
 typedef satcheck_cadical_no_preprocessingt satcheck_no_simplifiert;
+
+#elif defined SATCHECK_CRYPTOMINISAT
+
+typedef satcheck_cryptominisatt satcheckt;
+typedef satcheck_cryptominisatt satcheck_no_simplifiert;
 
 #endif
 

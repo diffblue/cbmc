@@ -1,0 +1,65 @@
+name = "GroebnerSoundness"
+version = "0.1.0"
+defaultTargets = ["GroebnerSoundness"]
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+rev = "v4.18.0"
+
+[[lean_lib]]
+name = "GroebnerSoundness"
+
+[[lean_lib]]
+name = "BuchbergerCorrectness"
+
+[[lean_lib]]
+name = "BuchbergerTermination"
+
+[[lean_lib]]
+name = "Re4"
+
+[[lean_lib]]
+name = "SubgoalSix"
+
+[[lean_lib]]
+name = "BitAlignment"
+
+[[lean_lib]]
+name = "Vanishing"
+
+[[lean_lib]]
+name = "StrongGB"
+
+[[lean_lib]]
+name = "Defer"
+
+[[lean_lib]]
+name = "PolyRing"
+
+[[lean_lib]]
+name = "ExtractCandidate"
+
+[[lean_lib]]
+name = "Encoding"
+
+[[lean_lib]]
+name = "DivisionRewrites"
+
+[[lean_lib]]
+name = "Karatsuba"
+
+[[lean_lib]]
+name = "BvDivPolyEncoding"
+
+[[lean_lib]]
+name = "IteCondPropagation"
+
+[[lean_lib]]
+name = "TseitinPropagation"
+
+[[lean_lib]]
+name = "AlgebraicTreeWalk"
+
+[[lean_lib]]
+name = "DisequalityRefutation"

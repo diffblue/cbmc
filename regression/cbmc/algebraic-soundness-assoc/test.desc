@@ -1,0 +1,9 @@
+CORE
+main.c
+--multiplier-encoding original --no-standard-checks
+^EXIT=10$
+^SIGNAL=0$
+^\[main.assertion.1\] line 12 associativity \(must be FAILED\): FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring

@@ -1,0 +1,20 @@
+Date: 2026-04-02T18:05:01+00:00
+Hostname: ip-172-31-37-0
+Kernel: 6.17.0-1009-aws
+CPU: Intel(R) Xeon(R) Platinum 8124M CPU @ 3.00GHz
+CPU cores: 36
+RAM: 68Gi
+CBMC: 6.8.0 (cbmc-6.8.0-148-ga9cdc08d0f-dirty)
+CBMC path: /home/ubuntu/cbmc-github.git/build/bin/cbmc
+CBMC git: a9cdc08d0f
+SAT solver: cadical
+Solver versions:
+  CaDiCaL: 2.0.0
+  MiniSat: 2.2.1 (CBMC bundled)
+  Kissat: 4.0.4
+  CryptoMiniSat: CMS SHA1: d1715c87aec5d617e78164aa7cf912f79a6de46d
+  smt2_solver: failed to open --version
+Config: rani
+Runs per benchmark: 2
+Timeout: 45s
+Memory limit: 4096MB

@@ -1,0 +1,15 @@
+(set-logic QF_BV)
+(declare-fun a () (_ BitVec 12))
+(declare-fun b () (_ BitVec 8))
+; F-G fully expanded in terms of a, b (with zero_extend)
+; F-G = 16384*(zext(a)^4 + zext(b)^4) + 32768*zext(a)^2*zext(b) + 32768*zext(a)*zext(b) + 49152*(zext(a)^2 + zext(b)^2)
+(assert (not (=
+  (bvadd
+    (bvmul (_ bv16384 16) (bvmul (bvmul ((_ zero_extend 4) a) ((_ zero_extend 4) a)) (bvmul ((_ zero_extend 4) a) ((_ zero_extend 4) a))))
+    (bvmul (_ bv16384 16) (bvmul (bvmul ((_ zero_extend 8) b) ((_ zero_extend 8) b)) (bvmul ((_ zero_extend 8) b) ((_ zero_extend 8) b))))
+    (bvmul (_ bv32768 16) (bvmul (bvmul ((_ zero_extend 4) a) ((_ zero_extend 4) a)) ((_ zero_extend 8) b)))
+    (bvmul (_ bv32768 16) (bvmul ((_ zero_extend 4) a) ((_ zero_extend 8) b)))
+    (bvmul (_ bv49152 16) (bvmul ((_ zero_extend 4) a) ((_ zero_extend 4) a)))
+    (bvmul (_ bv49152 16) (bvmul ((_ zero_extend 8) b) ((_ zero_extend 8) b))))
+  (_ bv0 16))))
+(check-sat)

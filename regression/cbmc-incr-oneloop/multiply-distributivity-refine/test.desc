@@ -1,0 +1,15 @@
+CORE
+main.c
+--no-standard-checks --refine-arithmetic
+\[main\.assertion\.1\].*distributivity.*SUCCESS
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Tests bv_refinementt::detect_algebraic_pairs' distributivity branch:
+mult(a, plus(b, c)) is recognised as equal to mult(a, b) + mult(a, c)
+even when the outer mult result is laundered through an opaque
+function call. Without this hint, the verification times out beyond
+6-8 bits.

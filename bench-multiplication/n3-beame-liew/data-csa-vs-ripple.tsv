@@ -1,0 +1,16 @@
+# CSA multiplier vs ripple-carry comparison
+# Columns: n, k, csa_drat_lemmas, ripple_drat_lemmas (diag variant)
+3	1	13	13
+3	3	85	85
+3	5	2135	143
+4	1	13	13
+4	3	225	225
+4	5	32371	675
+4	7	8431	2135
+5	1	13	13
+5	3	225	225
+5	9	108455	27587
+# CSA full-proof bytes
+# n, csa_full_bytes, csa_full_lemmas, ripple_full_bytes, ripple_full_lemmas
+# n=3: CSA 248KB / 4794 lem vs ripple 12.5KB / 408 lem
+# n=4: CSA 7.4MB / 95K lem vs ripple 331KB / 5.3K lem

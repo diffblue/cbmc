@@ -6,66 +6,67 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "boolbv.h"
-
 #include <util/bitvector_types.h>
+
+#include "boolbv.h"
 
 bvt boolbvt::convert_mult(const mult_exprt &expr)
 {
-  std::size_t width=boolbv_width(expr.type());
+  std::size_t width = boolbv_width(expr.type());
 
   bvt bv;
   bv.resize(width);
 
-  const exprt::operandst &operands=expr.operands();
+  const exprt::operandst &operands = expr.operands();
   DATA_INVARIANT(!operands.empty(), "multiplication must have operands");
 
-  const exprt &op0=expr.op0();
+  const exprt &op0 = expr.op0();
 
   DATA_INVARIANT(
     op0.type() == expr.type(),
     "multiplication operands should have same type as expression");
 
-  if(expr.type().id()==ID_fixedbv)
+  if(expr.type().id() == ID_fixedbv)
   {
     bv = convert_bv(op0, width);
 
-    std::size_t fraction_bits=
+    std::size_t fraction_bits =
       to_fixedbv_type(expr.type()).get_fraction_bits();
 
-    for(exprt::operandst::const_iterator it=operands.begin()+1;
-        it!=operands.end(); it++)
+    for(exprt::operandst::const_iterator it = operands.begin() + 1;
+        it != operands.end();
+        it++)
     {
       DATA_INVARIANT(
         it->type() == expr.type(),
         "multiplication operands should have same type as expression");
 
       // do a sign extension by fraction_bits bits
-      bv=bv_utils.sign_extension(bv, bv.size()+fraction_bits);
+      bv = bv_utils.sign_extension(bv, bv.size() + fraction_bits);
 
       bvt op = convert_bv(*it, width);
 
-      op=bv_utils.sign_extension(op, bv.size());
+      op = bv_utils.sign_extension(op, bv.size());
 
-      bv=bv_utils.signed_multiplier(bv, op);
+      bv = bv_utils.signed_multiplier(bv, op);
 
       // cut it down again
-      bv.erase(bv.begin(), bv.begin()+fraction_bits);
+      bv.erase(bv.begin(), bv.begin() + fraction_bits);
     }
 
     return bv;
   }
-  else if(expr.type().id()==ID_unsignedbv ||
-          expr.type().id()==ID_signedbv)
+  else if(expr.type().id() == ID_unsignedbv || expr.type().id() == ID_signedbv)
   {
-    bv_utilst::representationt rep=
-      expr.type().id()==ID_signedbv?bv_utilst::representationt::SIGNED:
-                                    bv_utilst::representationt::UNSIGNED;
+    bv_utilst::representationt rep = expr.type().id() == ID_signedbv
+                                       ? bv_utilst::representationt::SIGNED
+                                       : bv_utilst::representationt::UNSIGNED;
 
     bv = convert_bv(op0, width);
 
-    for(exprt::operandst::const_iterator it=operands.begin()+1;
-        it!=operands.end(); it++)
+    for(exprt::operandst::const_iterator it = operands.begin() + 1;
+        it != operands.end();
+        it++)
     {
       DATA_INVARIANT(
         it->type() == expr.type(),

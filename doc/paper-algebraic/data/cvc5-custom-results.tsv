@@ -1,0 +1,27 @@
+benchmark	time	result
+comm_8	.007	unsat
+comm_10	.006	unsat
+comm_11	.006	unsat
+comm_12	.006	unsat
+comm_13	.005	unsat
+comm_14	.005	unsat
+comm_15	.005	unsat
+comm_16	.005	unsat
+comm_18	.005	unsat
+comm_20	.005	unsat
+comm_24	.005	unsat
+comm_32	.005	unsat
+assoc_8	.005	unsat
+distrib_8	.005	unsat
+overflow_detect_16	.013	unsat
+bf16_mul_comm_v2	.027	T/O
+strength_chain_16	.007	unsat
+strength_16_15	.006	unsat
+strength_16_31	.006	unsat
+strength_16_63	.006	unsat
+mul_ineq_12	1.829	unsat
+div_mul_roundtrip_12	6.194	unsat
+dsp_image_reject	.011	unsat
+dsp_horner_16	1.833	unsat
+dsp_vanishing_poly_8	.049	unsat
+CVC5_CUSTOM_DONE

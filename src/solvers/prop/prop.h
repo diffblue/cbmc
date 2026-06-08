@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-
 #ifndef CPROVER_SOLVERS_PROP_PROP_H
 #define CPROVER_SOLVERS_PROP_PROP_H
 
@@ -28,21 +27,40 @@ public:
   {
   }
 
-  virtual ~propt() { }
+  virtual ~propt()
+  {
+  }
 
   // boolean operators
-  virtual literalt land(literalt a, literalt b)=0;
-  virtual literalt lor(literalt a, literalt b)=0;
-  virtual literalt land(const bvt &bv)=0;
-  virtual literalt lor(const bvt &bv)=0;
-  virtual literalt lxor(literalt a, literalt b)=0;
-  virtual literalt lxor(const bvt &bv)=0;
-  virtual literalt lnand(literalt a, literalt b)=0;
-  virtual literalt lnor(literalt a, literalt b)=0;
-  virtual literalt lequal(literalt a, literalt b)=0;
-  virtual literalt limplies(literalt a, literalt b)=0;
-  virtual literalt lselect(literalt a, literalt b, literalt c)=0; // a?b:c
+  virtual literalt land(literalt a, literalt b) = 0;
+  virtual literalt lor(literalt a, literalt b) = 0;
+  virtual literalt land(const bvt &bv) = 0;
+  virtual literalt lor(const bvt &bv) = 0;
+  virtual literalt lxor(literalt a, literalt b) = 0;
+  virtual literalt lxor(const bvt &bv) = 0;
+  virtual literalt lnand(literalt a, literalt b) = 0;
+  virtual literalt lnor(literalt a, literalt b) = 0;
+  virtual literalt lequal(literalt a, literalt b) = 0;
+  virtual literalt limplies(literalt a, literalt b) = 0;
+  virtual literalt lselect(literalt a, literalt b, literalt c) = 0; // a?b:c
   virtual void set_equal(literalt a, literalt b);
+
+  /// Register a XOR constraint for solvers that support Gaussian elimination.
+  /// Default implementation is a no-op.
+  /// \param lits: literals in the XOR (result XOR lits[0] XOR lits[1] ... = rhs)
+  /// \param rhs: parity of the XOR
+  virtual void register_xor(const bvt &lits, bool rhs)
+  {
+    (void)lits;
+    (void)rhs;
+  }
+
+  /// Mark a variable as an input (named program variable).
+  /// Solvers may use this for variable ordering heuristics.
+  virtual void mark_input_variable(literalt lit)
+  {
+    (void)lit;
+  }
 
   virtual void l_set_to(literalt a, bool value)
   {
@@ -50,39 +68,54 @@ public:
   }
 
   void l_set_to_true(literalt a)
-  { l_set_to(a, true); }
+  {
+    l_set_to(a, true);
+  }
   void l_set_to_false(literalt a)
-  { l_set_to(a, false); }
+  {
+    l_set_to(a, false);
+  }
 
   // constraints
   void lcnf(literalt l0, literalt l1)
-  { lcnf_bv.resize(2); lcnf_bv[0]=l0; lcnf_bv[1]=l1; lcnf(lcnf_bv); }
+  {
+    lcnf_bv.resize(2);
+    lcnf_bv[0] = l0;
+    lcnf_bv[1] = l1;
+    lcnf(lcnf_bv);
+  }
 
   void lcnf(literalt l0, literalt l1, literalt l2)
   {
     lcnf_bv.resize(3);
-    lcnf_bv[0]=l0;
-    lcnf_bv[1]=l1;
-    lcnf_bv[2]=l2;
+    lcnf_bv[0] = l0;
+    lcnf_bv[1] = l1;
+    lcnf_bv[2] = l2;
     lcnf(lcnf_bv);
   }
 
   void lcnf(literalt l0, literalt l1, literalt l2, literalt l3)
   {
     lcnf_bv.resize(4);
-    lcnf_bv[0]=l0;
-    lcnf_bv[1]=l1;
-    lcnf_bv[2]=l2;
-    lcnf_bv[3]=l3;
+    lcnf_bv[0] = l0;
+    lcnf_bv[1] = l1;
+    lcnf_bv[2] = l2;
+    lcnf_bv[3] = l3;
     lcnf(lcnf_bv);
   }
 
-  virtual void lcnf(const bvt &bv)=0;
-  virtual bool has_set_to() const { return true; }
+  virtual void lcnf(const bvt &bv) = 0;
+  virtual bool has_set_to() const
+  {
+    return true;
+  }
 
   // Some solvers (notably aig) prefer encodings that avoid raw CNF
   // They overload this to return false and thus avoid some optimisations
-  virtual bool cnf_handled_well() const { return true; }
+  virtual bool cnf_handled_well() const
+  {
+    return true;
+  }
 
   // solving with assumptions
   virtual bool has_assumptions() const
@@ -91,19 +124,26 @@ public:
   }
 
   // variables
-  virtual literalt new_variable()=0;
-  virtual void set_variable_name(literalt, const irep_idt &) { }
-  virtual size_t no_variables() const=0;
+  virtual literalt new_variable() = 0;
+  virtual void set_variable_name(literalt, const irep_idt &)
+  {
+  }
+  virtual size_t no_variables() const = 0;
   virtual bvt new_variables(std::size_t width);
 
   // solving
   virtual std::string solver_text() const = 0;
-  enum class resultt { P_SATISFIABLE, P_UNSATISFIABLE, P_ERROR };
+  enum class resultt
+  {
+    P_SATISFIABLE,
+    P_UNSATISFIABLE,
+    P_ERROR
+  };
   resultt prop_solve();
   resultt prop_solve(const bvt &assumptions);
 
   // satisfying assignment
-  virtual tvt l_get(literalt a) const=0;
+  virtual tvt l_get(literalt a) const = 0;
   virtual void set_assignment(literalt a, bool value) = 0;
 
   /// Returns true if an assumption is in the final conflict.
@@ -111,10 +151,18 @@ public:
   /// may be queried.
   /// \return true iff the given literal is part of the final conflict
   virtual bool is_in_conflict(literalt l) const = 0;
-  virtual bool has_is_in_conflict() const { return false; }
+  virtual bool has_is_in_conflict() const
+  {
+    return false;
+  }
 
   // an incremental solver may remove any variables that aren't frozen
-  virtual void set_frozen(literalt) { }
+  virtual void set_frozen(literalt)
+  {
+  }
+  virtual void mark_control_variable(literalt)
+  {
+  }
 
   // Resource limits:
   virtual void set_time_limit_seconds(uint32_t)

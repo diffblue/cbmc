@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-
 #ifndef CPROVER_SOLVERS_FLATTENING_BV_UTILS_H
 #define CPROVER_SOLVERS_FLATTENING_BV_UTILS_H
 
@@ -19,18 +18,50 @@ Author: Daniel Kroening, kroening@kroening.com
 // but seems to give a run-time penalty.
 // #define COMPACT_EQUAL_CONST
 
-
 class bv_utilst
 {
 public:
-  explicit bv_utilst(propt &_prop):prop(_prop) { }
+  enum class adder_encodingt
+  {
+    RIPPLE_CARRY,
+    SIMPLE_RIPPLE_CARRY,
+    BRENT_KUNG,
+    KOGGE_STONE,
+    SKLANSKY,
+    CLA,
+    SPARSE_BK,
+    LADNER_FISCHER,
+    HAN_CARLSON,
+    MINIMAL_RIPPLE,
+    ADAPTIVE
+  };
 
-  enum class representationt { SIGNED, UNSIGNED };
+  explicit bv_utilst(propt &_prop) : prop{_prop}
+  {
+  }
+
+  void set_adder_encoding(adder_encodingt e)
+  {
+    adder_encoding = e;
+  }
+  void set_multiplier_adder_encoding(adder_encodingt e)
+  {
+    multiplier_adder_encoding = e;
+  }
+
+  enum class representationt
+  {
+    SIGNED,
+    UNSIGNED
+  };
 
   static bvt build_constant(const mp_integer &i, std::size_t width);
 
   bvt incrementer(const bvt &op, literalt carry_in);
-  bvt inc(const bvt &op) { return incrementer(op, const_literal(true)); }
+  bvt inc(const bvt &op)
+  {
+    return incrementer(op, const_literal(true));
+  }
   void incrementer(bvt &op, literalt carry_in, literalt &carry_out);
 
   bvt negate(const bvt &op);
@@ -63,8 +94,14 @@ public:
     bool subtract,
     representationt rep);
 
-  bvt add(const bvt &op0, const bvt &op1) { return add_sub(op0, op1, false); }
-  bvt sub(const bvt &op0, const bvt &op1) { return add_sub(op0, op1, true); }
+  bvt add(const bvt &op0, const bvt &op1)
+  {
+    return add_sub(op0, op1, false);
+  }
+  bvt sub(const bvt &op0, const bvt &op1)
+  {
+    return add_sub(op0, op1, true);
+  }
 
   literalt overflow_add(const bvt &op0, const bvt &op1, representationt rep);
   literalt overflow_sub(const bvt &op0, const bvt &op1, representationt rep);
@@ -72,13 +109,21 @@ public:
 
   enum class shiftt
   {
-    SHIFT_LEFT, SHIFT_LRIGHT, SHIFT_ARIGHT, ROTATE_LEFT, ROTATE_RIGHT
+    SHIFT_LEFT,
+    SHIFT_LRIGHT,
+    SHIFT_ARIGHT,
+    ROTATE_LEFT,
+    ROTATE_RIGHT
   };
 
   static bvt shift(const bvt &op, const shiftt shift, std::size_t distance);
   bvt shift(const bvt &op, const shiftt shift, const bvt &distance);
 
   bvt unsigned_multiplier(const bvt &op0, const bvt &op1);
+  bvt unsigned_karatsuba_multiplier(const bvt &op0, const bvt &op1);
+  bvt unsigned_karatsuba_full_multiplier(const bvt &op0, const bvt &op1);
+  bvt unsigned_toom_cook_multiplier(const bvt &op0, const bvt &op1);
+  bvt unsigned_schoenhage_strassen_multiplier(const bvt &a, const bvt &b);
   bvt signed_multiplier(const bvt &op0, const bvt &op1);
   bvt multiplier(const bvt &op0, const bvt &op1, representationt rep);
   bvt multiplier_no_overflow(
@@ -107,19 +152,14 @@ public:
     bvt &rem,
     representationt rep);
 
-  void signed_divider(
-    const bvt &op0,
-    const bvt &op1,
-    bvt &res,
-    bvt &rem);
+  void signed_divider(const bvt &op0, const bvt &op1, bvt &res, bvt &rem);
 
-  void unsigned_divider(
-    const bvt &op0,
-    const bvt &op1,
-    bvt &res,
-    bvt &rem);
+  void
+  non_restoring_divider(const bvt &op0, const bvt &op1, bvt &res, bvt &rem);
+  void restoring_divider(const bvt &op0, const bvt &op1, bvt &res, bvt &rem);
+  void unsigned_divider(const bvt &op0, const bvt &op1, bvt &res, bvt &rem);
 
-  #ifdef COMPACT_EQUAL_CONST
+#ifdef COMPACT_EQUAL_CONST
   typedef std::set<bvt> equal_const_registeredt;
   equal_const_registeredt equal_const_registered;
   void equal_const_register(const bvt &var);
@@ -130,8 +170,7 @@ public:
 
   literalt equal_const_rec(bvt &var, bvt &constant);
   literalt equal_const(const bvt &var, const bvt &constant);
-  #endif
-
+#endif
 
   literalt equal(const bvt &op0, const bvt &op1);
 
@@ -141,35 +180,35 @@ public:
   }
 
   literalt is_zero(const bvt &op)
-  { return !prop.lor(op); }
+  {
+    return !prop.lor(op);
+  }
 
   literalt is_not_zero(const bvt &op)
-  { return prop.lor(op); }
+  {
+    return prop.lor(op);
+  }
 
   literalt is_int_min(const bvt &op)
   {
-    bvt tmp=op;
-    tmp[tmp.size()-1]=!tmp[tmp.size()-1];
+    bvt tmp = op;
+    tmp[tmp.size() - 1] = !tmp[tmp.size() - 1];
     return is_zero(tmp);
   }
 
   literalt is_one(const bvt &op);
 
   literalt is_all_ones(const bvt &op)
-  { return prop.land(op); }
+  {
+    return prop.land(op);
+  }
 
-  literalt lt_or_le(
-    bool or_equal,
-    const bvt &bv0,
-    const bvt &bv1,
-    representationt rep);
+  literalt
+  lt_or_le(bool or_equal, const bvt &bv0, const bvt &bv1, representationt rep);
 
   // id is one of ID_lt, le, gt, ge, equal, notequal
-  literalt rel(
-    const bvt &bv0,
-    irep_idt id,
-    const bvt &bv1,
-    representationt rep);
+  literalt
+  rel(const bvt &bv0, irep_idt id, const bvt &bv1, representationt rep);
 
   literalt unsigned_less_than(const bvt &bv0, const bvt &bv1);
   literalt signed_less_than(const bvt &bv0, const bvt &bv1);
@@ -223,14 +262,144 @@ public:
   /// \param bv: The bit vector to count 1s in
   /// \return A bit vector representing the count
   bvt popcount(const bvt &bv);
+  bvt popcount_fa_tree(const bvt &bv);
 
 protected:
   propt &prop;
+  adder_encodingt adder_encoding = adder_encodingt::RIPPLE_CARRY;
+  adder_encodingt multiplier_adder_encoding = adder_encodingt::RIPPLE_CARRY;
+  bool use_wallace_tree = false;
+  bool use_carry_save = false;
+  bool use_comba = false;
+  bool use_dadda = false;
+  bool use_comba_carry_save = false;
+  bool use_dadda_carry_save = false;
+  bool use_booth = false;
+  bool use_4bit_blocks = false;
+  bool use_sorting_network = false;
+  bool use_hybrid_divider = false;
 
+  // Secondary encoding for multi-encoding experiments (N4).
+  // When non-empty, unsigned_multiplier() computes the primary encoding
+  // (using the flags above), then additionally computes a second
+  // encoding named by secondary_encoding, and constrains the two
+  // outputs to be equal. This effectively ORs the proof power of the
+  // two encodings while sharing input and output variables.
+  std::string secondary_encoding;
+
+  // Track multiplications for adaptive popcount decisions
+  std::size_t mul_count = 0;
+  std::size_t first_mul_width = 0;
+  std::size_t first_mul_prop_vars = 0;
+  std::size_t last_mul_end_vars = 0;
+
+public:
+  void set_carry_save(bool b)
+  {
+    use_carry_save = b;
+  }
+  void set_wallace_tree(bool b)
+  {
+    use_wallace_tree = b;
+  }
+  void set_comba(bool b)
+  {
+    use_comba = b;
+  }
+  bool get_comba() const
+  {
+    return use_comba;
+  }
+  bool get_comba_carry_save() const
+  {
+    return use_comba_carry_save;
+  }
+  bool get_dadda() const
+  {
+    return use_dadda;
+  }
+  bool get_dadda_carry_save() const
+  {
+    return use_dadda_carry_save;
+  }
+  void set_dadda(bool b)
+  {
+    use_dadda = b;
+  }
+  void set_comba_carry_save(bool b)
+  {
+    use_comba_carry_save = b;
+  }
+  void set_dadda_carry_save(bool b)
+  {
+    use_dadda_carry_save = b;
+  }
+  void set_booth(bool b)
+  {
+    use_booth = b;
+  }
+  void set_4bit_blocks(bool b)
+  {
+    use_4bit_blocks = b;
+  }
+  void set_sorting_network(bool b)
+  {
+    use_sorting_network = b;
+  }
+  /// Set a secondary multiplication encoding. When non-empty, the
+  /// unsigned multiplier will compute both the primary encoding
+  /// (selected by the other flags) and this secondary encoding, then
+  /// constrain the outputs to be equal. Accepted names:
+  /// "shift-add", "comba", "comba-cs", "dadda", "dadda-cs",
+  /// "wallace", "booth", "block4", "sortnet". Empty string
+  /// disables the feature.
+  void set_secondary_encoding(const std::string &name)
+  {
+    secondary_encoding = name;
+  }
+  const std::string &get_secondary_encoding() const
+  {
+    return secondary_encoding;
+  }
+
+protected:
   /// Return the sum and carry-out when adding \p op0 and \p op1 under initial
   /// carry \p carry_in.
   [[nodiscard]] std::pair<bvt, literalt>
   adder(const bvt &op0, const bvt &op1, literalt carry_in);
+
+  [[nodiscard]] std::pair<bvt, literalt> optimized_ripple_carry_adder(
+    const bvt &op0,
+    const bvt &op1,
+    literalt carry_in);
+
+  [[nodiscard]] std::pair<bvt, literalt>
+  carry_lookahead_adder(const bvt &op0, const bvt &op1, literalt carry_in);
+
+  [[nodiscard]] std::pair<bvt, literalt>
+  simple_ripple_carry_adder(const bvt &op0, const bvt &op1, literalt carry_in);
+
+  [[nodiscard]] std::pair<bvt, literalt> carry_lookahead_4_bit_adder(
+    const bvt &op0,
+    const bvt &op1,
+    literalt carry_in);
+
+  [[nodiscard]] std::pair<bvt, literalt>
+  kogge_stone_adder(const bvt &op0, const bvt &op1, literalt carry_in);
+
+  [[nodiscard]] std::pair<bvt, literalt>
+  brent_kung_adder(const bvt &op0, const bvt &op1, literalt carry_in);
+  [[nodiscard]] std::pair<bvt, literalt>
+  sparse_brent_kung_adder(const bvt &op0, const bvt &op1, literalt carry_in);
+  [[nodiscard]] std::pair<bvt, literalt>
+  ladner_fischer_adder(const bvt &op0, const bvt &op1, literalt carry_in);
+  [[nodiscard]] std::pair<bvt, literalt>
+  han_carlson_adder(const bvt &op0, const bvt &op1, literalt carry_in);
+  [[nodiscard]] std::pair<bvt, literalt>
+  minimal_ripple_carry_adder(const bvt &op0, const bvt &op1, literalt carry_in);
+
+  [[nodiscard]] std::pair<bvt, literalt>
+  sklansky_adder(const bvt &op0, const bvt &op1, literalt carry_in);
 
   [[nodiscard]] bvt adder_no_overflow(
     const bvt &op0,
@@ -240,16 +409,20 @@ protected:
 
   [[nodiscard]] bvt adder_no_overflow(const bvt &op0, const bvt &op1);
 
-  bvt unsigned_multiplier_no_overflow(
-    const bvt &op0, const bvt &op1);
+  bvt unsigned_multiplier_no_overflow(const bvt &op0, const bvt &op1);
 
-  bvt signed_multiplier_no_overflow(
-    const bvt &op0, const bvt &op1);
+  bvt signed_multiplier_no_overflow(const bvt &op0, const bvt &op1);
 
   bvt cond_negate_no_overflow(const bvt &bv, const literalt cond);
 
   bvt wallace_tree(const std::vector<bvt> &pps);
   bvt dadda_tree(const std::vector<bvt> &pps);
+  bvt comba_column_wise(const std::vector<bvt> &pps);
+  bvt comba_carry_save(const std::vector<bvt> &pps);
+  bvt dadda_carry_save(const std::vector<bvt> &pps);
+  bvt booth_multiply(const bvt &op0, const bvt &op1);
+  bvt block4_multiply(const bvt &op0, const bvt &op1);
+  bvt sorting_network_multiply(const bvt &op0, const bvt &op1);
 };
 
 #endif // CPROVER_SOLVERS_FLATTENING_BV_UTILS_H

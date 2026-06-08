@@ -12,7 +12,19 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol_table.h>
 
 #include <solvers/flattening/boolbv.h>
+#include <solvers/refinement/bv_refinement.h>
 #include <solvers/sat/satcheck.h>
+
+#include <cstdlib>
+#ifdef SATCHECK_CADICAL
+#  include <solvers/sat/satcheck_cadical.h>
+#endif
+#ifdef SATCHECK_MINISAT2
+#  include <solvers/sat/satcheck_minisat2.h>
+#endif
+#ifdef SATCHECK_CRYPTOMINISAT
+#  include <solvers/sat/satcheck_cryptominisat.h>
+#endif
 
 #include "smt2_format.h"
 #include "smt2_parser.h"
@@ -20,7 +32,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream> // IWYU pragma: keep
 #include <iostream>
 
-class smt2_solvert:public smt2_parsert
+class smt2_solvert : public smt2_parsert
 {
 public:
   smt2_solvert(std::istream &_in, stack_decision_proceduret &_solver)
@@ -37,6 +49,7 @@ protected:
   void expand_function_applications(exprt &);
 
   std::set<irep_idt> constants_done;
+  std::vector<exprt> deferred_assertions;
 
   enum
   {
@@ -59,7 +72,7 @@ void smt2_solvert::define_constants()
     const irep_idt &identifier = id.first;
 
     // already done?
-    if(constants_done.find(identifier)!=constants_done.end())
+    if(constants_done.find(identifier) != constants_done.end())
       continue;
 
     constants_done.insert(identifier);
@@ -76,9 +89,9 @@ void smt2_solvert::expand_function_applications(exprt &expr)
   for(exprt &op : expr.operands())
     expand_function_applications(op);
 
-  if(expr.id()==ID_function_application)
+  if(expr.id() == ID_function_application)
   {
-    auto &app=to_function_application_expr(expr);
+    auto &app = to_function_application_expr(expr);
 
     if(app.function().id() == ID_symbol)
     {
@@ -119,16 +132,54 @@ void smt2_solvert::expand_function_applications(exprt &expr)
 void smt2_solvert::setup_commands()
 {
   {
-    commands["assert"] = [this]() {
+    commands["assert"] = [this]()
+    {
       exprt e = expression();
       if(e.is_not_nil())
       {
         expand_function_applications(e);
-        solver.set_to_true(e);
+        deferred_assertions.push_back(std::move(e));
       }
     };
 
-    commands["check-sat"] = [this]() {
+    commands["check-sat"] = [this]()
+    {
+      // Pre-scan: count symbolic multiplications in deferred assertions.
+      // If 3+, disable popcount so comba-cs uses shift-add for BVE.
+      {
+        std::size_t mult_count = 0;
+        for(const auto &e : deferred_assertions)
+          e.visit_pre(
+            [&mult_count](const exprt &sub)
+            {
+              if(
+                sub.id() == ID_mult && sub.operands().size() == 2 &&
+                !sub.operands()[0].is_constant() &&
+                !sub.operands()[1].is_constant())
+                ++mult_count;
+            });
+        if(mult_count > 2)
+        {
+          if(auto *bv = dynamic_cast<boolbvt *>(&solver))
+            bv->set_comba_carry_save(false);
+        }
+      }
+
+      // Simplify assertions (word-level: commutativity, distributivity)
+      // DISABLE_SIMPLIFY env var disables this for ablation experiments
+      if(!std::getenv("DISABLE_SIMPLIFY"))
+      {
+        const symbol_tablet empty_symbol_table;
+        const namespacet simplify_ns{empty_symbol_table};
+        for(auto &e : deferred_assertions)
+          e = simplify_expr(e, simplify_ns);
+      }
+
+      // Now encode all deferred assertions
+      for(const auto &e : deferred_assertions)
+        solver.set_to_true(e);
+      deferred_assertions.clear();
+
       // add constant definitions as constraints
       define_constants();
 
@@ -150,7 +201,8 @@ void smt2_solvert::setup_commands()
       }
     };
 
-    commands["check-sat-assuming"] = [this]() {
+    commands["check-sat-assuming"] = [this]()
+    {
       std::vector<exprt> assumptions;
 
       if(next_token() != smt2_tokenizert::OPEN)
@@ -166,6 +218,14 @@ void smt2_solvert::setup_commands()
 
       if(next_token() != smt2_tokenizert::CLOSE)
         throw error("check-sat-assuming expects ')' at end of list");
+
+      // Encode all deferred assertions, exactly as check-sat does.
+      // Without this the regular assertion stack is ignored, and
+      // check-sat-assuming wrongly reports sat (e.g. for an asserted
+      // false) regardless of the actual assertions.
+      for(const auto &e : deferred_assertions)
+        solver.set_to_true(e);
+      deferred_assertions.clear();
 
       // add constant definitions as constraints
       define_constants();
@@ -194,18 +254,19 @@ void smt2_solvert::setup_commands()
       solver.pop();
     };
 
-    commands["display"] = [this]() {
+    commands["display"] = [this]()
+    {
       // this is a command that Z3 appears to implement
       exprt e = expression();
       if(e.is_not_nil())
         std::cout << smt2_format(e) << '\n';
     };
 
-    commands["get-unsat-assumptions"] = [this]() {
-      throw error("not yet implemented");
-    };
+    commands["get-unsat-assumptions"] = [this]()
+    { throw error("not yet implemented"); };
 
-    commands["get-value"] = [this]() {
+    commands["get-value"] = [this]()
+    {
       std::vector<exprt> ops;
 
       if(next_token() != smt2_tokenizert::OPEN)
@@ -270,7 +331,8 @@ void smt2_solvert::setup_commands()
                 << '\n';
     };
 
-    commands["get-assignment"] = [this]() {
+    commands["get-assignment"] = [this]()
+    {
       // print satisfying assignment for all named expressions
 
       if(status != SAT)
@@ -300,7 +362,8 @@ void smt2_solvert::setup_commands()
       std::cout << ')' << '\n';
     };
 
-    commands["get-model"] = [this]() {
+    commands["get-model"] = [this]()
+    {
       // print a model for all identifiers
 
       if(status != SAT)
@@ -337,7 +400,8 @@ void smt2_solvert::setup_commands()
       std::cout << ')' << '\n';
     };
 
-    commands["simplify"] = [this]() {
+    commands["simplify"] = [this]()
+    {
       // this is a command that Z3 appears to implement
       exprt e = expression();
       if(e.is_not_nil())
@@ -403,8 +467,99 @@ public:
   }
 };
 
-int solver(std::istream &in)
+int solver(
+  std::istream &in,
+  bool xor_gauss,
+  bool reorder_vars,
+  bool use_cadical,
+  bool use_cryptominisat,
+  const std::string &multiplier_encoding_arg,
+  const std::string &adder_encoding_str,
+  bool refine_arithmetic)
 {
+  // Default to comba-cs (carry-save Comba), matching cbmc's default.
+  const std::string multiplier_encoding =
+    multiplier_encoding_arg.empty() ? "comba-cs" : multiplier_encoding_arg;
+
+  // Helper: apply multiplier and adder encoding to a boolbvt
+  auto configure_encodings = [&](boolbvt &boolbv)
+  {
+    if(multiplier_encoding == "comba")
+      boolbv.set_comba(true);
+    else if(multiplier_encoding == "dadda")
+      boolbv.set_dadda(true);
+    else if(multiplier_encoding == "wallace")
+      boolbv.set_wallace_tree(true);
+    else if(multiplier_encoding == "comba-cs")
+      boolbv.set_comba_carry_save(true);
+    else if(multiplier_encoding == "dadda-cs")
+      boolbv.set_dadda_carry_save(true);
+    else if(multiplier_encoding == "booth")
+      boolbv.set_booth(true);
+    else if(multiplier_encoding == "block4")
+      boolbv.set_4bit_blocks(true);
+    else if(multiplier_encoding == "sortnet")
+      boolbv.set_sorting_network(true);
+
+    // Multi-encoding (N4): if CBMC_MULTI_ENCODING is set, use its
+    // value as a secondary encoding name. The multiplier then
+    // produces both the primary encoding (selected above) and the
+    // secondary one, tying the output bitvectors.
+    if(const char *sec = std::getenv("CBMC_MULTI_ENCODING"))
+    {
+      boolbv.set_secondary_encoding(std::string(sec));
+    }
+
+    if(adder_encoding_str == "brent-kung")
+      boolbv.set_adder_encoding(bv_utilst::adder_encodingt::BRENT_KUNG);
+    else if(adder_encoding_str == "kogge-stone")
+      boolbv.set_adder_encoding(bv_utilst::adder_encodingt::KOGGE_STONE);
+    else if(adder_encoding_str == "g-only")
+      boolbv.set_adder_encoding(bv_utilst::adder_encodingt::ADAPTIVE);
+    else if(adder_encoding_str == "ripple")
+    {
+      // Explicitly selected ripple-carry
+    }
+    else
+    {
+      // Default: g-only (ADAPTIVE)
+      boolbv.set_adder_encoding(bv_utilst::adder_encodingt::ADAPTIVE);
+    }
+  };
+
+  // Helper: run the SMT2 solving loop given a configured boolbvt.
+  auto run_loop = [&](boolbvt &boolbv) -> int
+  {
+    smt2_solvert smt2_solver{in, boolbv};
+    bool error_found = false;
+    while(!smt2_solver.exit)
+    {
+      try
+      {
+        smt2_solver.parse();
+      }
+      catch(const smt2_tokenizert::smt2_errort &error)
+      {
+        smt2_solver.skip_to_end_of_list();
+        error_found = true;
+      }
+    }
+    return error_found ? 1 : 0;
+  };
+
+  // Helper: build a bv_refinementt::infot for refine-arithmetic mode.
+  auto make_refine_info =
+    [&](const namespacet &ns_ref, propt &prop_ref, message_handlert &mh_ref)
+  {
+    bv_refinementt::infot info;
+    info.ns = &ns_ref;
+    info.prop = &prop_ref;
+    info.message_handler = &mh_ref;
+    info.refine_arithmetic = true;
+    info.refine_arrays = false; // arithmetic-only refinement
+    return info;
+  };
+
   symbol_tablet symbol_table;
   namespacet ns(symbol_table);
 
@@ -415,7 +570,55 @@ int solver(std::istream &in)
   message_handler.set_verbosity(messaget::M_STATISTICS);
 
   satcheckt satcheck{message_handler};
+#ifdef SATCHECK_CADICAL
+  // Use CaDiCaL when requested or when xor-gauss is requested
+  if(use_cadical || xor_gauss)
+  {
+    satcheck_cadical_no_preprocessingt cadical_satcheck{message_handler};
+    if(xor_gauss)
+      cadical_satcheck.enable_xor_gauss();
+    if(reorder_vars)
+      cadical_satcheck.enable_variable_renumbering();
+    if(refine_arithmetic)
+    {
+      auto info = make_refine_info(ns, cadical_satcheck, message_handler);
+      bv_refinementt boolbv{info};
+      configure_encodings(boolbv);
+      return run_loop(boolbv);
+    }
+    boolbvt boolbv{ns, cadical_satcheck, message_handler};
+    configure_encodings(boolbv);
+    return run_loop(boolbv);
+  }
+#endif
+#ifdef SATCHECK_CRYPTOMINISAT
+  if(use_cryptominisat)
+  {
+    satcheck_cryptominisatt cms_satcheck{message_handler};
+    if(refine_arithmetic)
+    {
+      auto info = make_refine_info(ns, cms_satcheck, message_handler);
+      bv_refinementt boolbv{info};
+      configure_encodings(boolbv);
+      return run_loop(boolbv);
+    }
+    boolbvt boolbv{ns, cms_satcheck, message_handler};
+    configure_encodings(boolbv);
+    return run_loop(boolbv);
+  }
+#endif
+  (void)xor_gauss;
+  (void)reorder_vars;
+  (void)use_cryptominisat;
+  if(refine_arithmetic)
+  {
+    auto info = make_refine_info(ns, satcheck, message_handler);
+    bv_refinementt boolbv{info};
+    configure_encodings(boolbv);
+    return run_loop(boolbv);
+  }
   boolbvt boolbv{ns, satcheck, message_handler};
+  configure_encodings(boolbv);
 
   smt2_solvert smt2_solver{in, boolbv};
   bool error_found = false;
@@ -449,21 +652,68 @@ int solver(std::istream &in)
 
 int main(int argc, const char *argv[])
 {
-  if(argc==1)
-    return solver(std::cin);
+  bool xor_gauss = false;
+  bool reorder_vars = false;
+  bool use_cadical = false;
+  bool use_cryptominisat = false;
+  bool refine_arithmetic = false;
+  std::string multiplier_encoding;
+  std::string adder_encoding;
+  const char *filename = nullptr;
 
-  if(argc!=2)
+  for(int i = 1; i < argc; ++i)
   {
-    std::cerr << "usage: smt2_solver file\n";
-    return 1;
+    if(std::string{argv[i]} == "--xor-gauss")
+      xor_gauss = true;
+    else if(std::string{argv[i]} == "--reorder-vars")
+      reorder_vars = true;
+    else if(std::string{argv[i]} == "--cadical")
+      use_cadical = true;
+    else if(std::string{argv[i]} == "--cryptominisat")
+      use_cryptominisat = true;
+    else if(std::string{argv[i]} == "--refine-arithmetic")
+      refine_arithmetic = true;
+    else if(std::string{argv[i]} == "--multiplier-encoding" && i + 1 < argc)
+      multiplier_encoding = argv[++i];
+    else if(std::string{argv[i]} == "--adder-encoding" && i + 1 < argc)
+      adder_encoding = argv[++i];
+    else if(filename == nullptr)
+      filename = argv[i];
+    else
+    {
+      std::cerr << "usage: smt2_solver [--cadical] [--cryptominisat] "
+                   "[--refine-arithmetic] [--multiplier-encoding ENC] "
+                   "[--adder-encoding ENC] [--xor-gauss] "
+                   "[--reorder-vars] [file]\n";
+      return 1;
+    }
   }
 
-  std::ifstream in(argv[1]);
+  if(filename == nullptr)
+    return solver(
+      std::cin,
+      xor_gauss,
+      reorder_vars,
+      use_cadical,
+      use_cryptominisat,
+      multiplier_encoding,
+      adder_encoding,
+      refine_arithmetic);
+
+  std::ifstream in(filename);
   if(!in)
   {
-    std::cerr << "failed to open " << argv[1] << '\n';
+    std::cerr << "failed to open " << filename << '\n';
     return 1;
   }
 
-  return solver(in);
+  return solver(
+    in,
+    xor_gauss,
+    reorder_vars,
+    use_cadical,
+    use_cryptominisat,
+    multiplier_encoding,
+    adder_encoding,
+    refine_arithmetic);
 }

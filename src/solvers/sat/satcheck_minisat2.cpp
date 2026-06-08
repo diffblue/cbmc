@@ -13,21 +13,24 @@ Author: Daniel Kroening, kroening@kroening.com
 #  include <unistd.h>
 #endif
 
-#include <limits>
-
 #include <util/invariant.h>
 #include <util/threeval.h>
 
 #include <minisat/core/Solver.h>
 #include <minisat/simp/SimpSolver.h>
 
+#include <cstdlib>
+#include <limits>
+
 #ifndef l_False
 #  define l_False Minisat::l_False
 #  define l_True Minisat::l_True
 #endif
 
-#ifndef HAVE_MINISAT2
-#error "Expected HAVE_MINISAT2"
+// MergeSat is based on MiniSat2; variations in their API are handled via
+// #ifdefs
+#if !defined(HAVE_MINISAT2) && !defined(HAVE_MERGESAT)
+#  error "Expected HAVE_MINISAT2 or HAVE_MERGESAT"
 #endif
 
 void convert(const bvt &bv, Minisat::vec<Minisat::Lit> &dest)
@@ -57,7 +60,7 @@ void convert_assumptions(const bvt &bv, Minisat::vec<Minisat::Lit> &dest)
   }
 }
 
-template<typename T>
+template <typename T>
 tvt satcheck_minisat2_baset<T>::l_get(literalt a) const
 {
   if(a.is_true())
@@ -67,25 +70,25 @@ tvt satcheck_minisat2_baset<T>::l_get(literalt a) const
 
   tvt result;
 
-  if(a.var_no()>=(unsigned)solver->model.size())
+  if(a.var_no() >= (unsigned)solver->model.size())
     return tvt::unknown();
 
   using Minisat::lbool;
 
-  if(solver->model[a.var_no()]==l_True)
-    result=tvt(true);
-  else if(solver->model[a.var_no()]==l_False)
-    result=tvt(false);
+  if(solver->model[a.var_no()] == l_True)
+    result = tvt(true);
+  else if(solver->model[a.var_no()] == l_False)
+    result = tvt(false);
   else
     return tvt::unknown();
 
   if(a.sign())
-    result=!result;
+    result = !result;
 
   return result;
 }
 
-template<typename T>
+template <typename T>
 void satcheck_minisat2_baset<T>::set_polarity(literalt a, bool value)
 {
   PRECONDITION(!a.is_constant());
@@ -95,7 +98,11 @@ void satcheck_minisat2_baset<T>::set_polarity(literalt a, bool value)
   try
   {
     add_variables();
+#ifdef HAVE_MERGESAT
+    solver->setPolarity(a.var_no(), value);
+#else
     solver->setPolarity(a.var_no(), value ? l_True : l_False);
+#endif
   }
   catch(Minisat::OutOfMemoryException)
   {
@@ -105,13 +112,13 @@ void satcheck_minisat2_baset<T>::set_polarity(literalt a, bool value)
   }
 }
 
-template<typename T>
+template <typename T>
 void satcheck_minisat2_baset<T>::interrupt()
 {
   solver->interrupt();
 }
 
-template<typename T>
+template <typename T>
 void satcheck_minisat2_baset<T>::clear_interrupt()
 {
   solver->clearInterrupt();
@@ -119,22 +126,30 @@ void satcheck_minisat2_baset<T>::clear_interrupt()
 
 std::string satcheck_minisat_no_simplifiert::solver_text() const
 {
+#ifdef HAVE_MERGESAT
+  return "MergeSat 4.0-rc without simplifier";
+#else
   return "MiniSAT 2.2.1 without simplifier";
+#endif
 }
 
 std::string satcheck_minisat_simplifiert::solver_text() const
 {
+#ifdef HAVE_MERGESAT
+  return "MergeSat 4.0-rc4 with simplifier";
+#else
   return "MiniSAT 2.2.1 with simplifier";
+#endif
 }
 
-template<typename T>
+template <typename T>
 void satcheck_minisat2_baset<T>::add_variables()
 {
-  while((unsigned)solver->nVars()<no_variables())
+  while((unsigned)solver->nVars() < no_variables())
     solver->newVar();
 }
 
-template<typename T>
+template <typename T>
 void satcheck_minisat2_baset<T>::lcnf(const bvt &bv)
 {
   try
@@ -193,7 +208,7 @@ void satcheck_minisat2_baset<T>::lcnf(const bvt &bv)
 
 #ifndef _WIN32
 
-static Minisat::Solver *solver_to_interrupt=nullptr;
+static Minisat::Solver *solver_to_interrupt = nullptr;
 
 static void interrupt_solver(int signum)
 {
@@ -211,9 +226,43 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve(const bvt &assumptions)
   log.statistics() << (no_variables() - 1) << " variables, "
                    << solver->nClauses() << " clauses" << messaget::eom;
 
+  // Print pre-solve stats
+  {
+    log.statistics() << "MiniSat pre-solve: " << solver->nVars() << " vars, "
+                     << solver->nClauses() << " clauses, "
+                     << solver->nFreeVars() << " free vars" << messaget::eom;
+  }
+
   try
   {
     add_variables();
+
+    // Bump activity of auxiliary variables so VSIDS prioritizes them.
+    // Access protected members via a helper that inherits from Solver.
+    if(reorder_variables)
+    {
+      struct activity_helper : public T
+      {
+#ifdef HAVE_MERGESAT
+        using T::activity_CHB;
+#else
+        using T::activity;
+#endif
+        using T::rebuildOrderHeap;
+      };
+      auto *s = static_cast<activity_helper *>(solver.get());
+      for(unsigned v = 0; v < no_variables(); ++v)
+      {
+        bool is_input = v < input_variables.size() && input_variables[v];
+        if(!is_input)
+#ifdef HAVE_MERGESAT
+          s->activity_CHB[v] += 1.0;
+#else
+          s->activity[v] += 1.0;
+#endif
+      }
+      s->rebuildOrderHeap();
+    }
 
     if(!solver->okay())
     {
@@ -275,6 +324,22 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve(const bvt &assumptions)
 
 #endif
 
+    {
+      log.statistics() << "MiniSat post-solve:"
+                       << " conflicts=" << solver->conflicts
+                       << " decisions=" << solver->decisions
+                       << " propagations=" << solver->propagations
+                       << messaget::eom;
+    }
+#ifdef HAVE_MERGESAT
+    // We do not actually use MergeSat's "constrain" clauses at the moment, but
+    // MergeSat internally still uses them to track UNSAT. To make sure we
+    // aren't stuck with "UNSAT" in incremental calls the status needs to be
+    // reset.
+    // See also https://github.com/conp-solutions/mergesat/pull/124
+    ((Minisat::SimpSolver *)solver.get())->reset_constrain_clause();
+#endif
+
     if(solver_result == l_True)
     {
       log.status() << "SAT checker: instance is SATISFIABLE" << messaget::eom;
@@ -297,12 +362,12 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve(const bvt &assumptions)
   catch(const Minisat::OutOfMemoryException &)
   {
     log.error() << "SAT checker ran out of memory" << messaget::eom;
-    status=statust::ERROR;
+    status = statust::ERROR;
     return resultt::P_ERROR;
   }
 }
 
-template<typename T>
+template <typename T>
 void satcheck_minisat2_baset<T>::set_assignment(literalt a, bool value)
 {
   PRECONDITION(!a.is_constant());
@@ -332,18 +397,27 @@ satcheck_minisat2_baset<T>::satcheck_minisat2_baset(
     solver(std::make_unique<T>()),
     time_limit_seconds(0)
 {
+#ifdef HAVE_MERGESAT
+  if constexpr(std::is_same<T, Minisat::SimpSolver>::value)
+  {
+    solver->grow_iterations = false;
+    // limit the amount of work spent in simplification; the optimal value needs
+    // to be found via benchmarking
+    solver->nr_max_simp_cls = 1000000;
+  }
+#endif
 }
 
 template <typename T>
 satcheck_minisat2_baset<T>::~satcheck_minisat2_baset() = default;
 
-template<typename T>
+template <typename T>
 bool satcheck_minisat2_baset<T>::is_in_conflict(literalt a) const
 {
-  int v=a.var_no();
+  int v = a.var_no();
 
-  for(int i=0; i<solver->conflict.size(); i++)
-    if(var(solver->conflict[i])==v)
+  for(int i = 0; i < solver->conflict.size(); i++)
+    if(var(solver->conflict[i]) == v)
       return true;
 
   return false;

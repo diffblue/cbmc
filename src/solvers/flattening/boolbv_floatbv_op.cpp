@@ -16,16 +16,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bvt boolbvt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
 {
-  const exprt &op0=expr.op(); // number to convert
-  const exprt &op1=expr.rounding_mode(); // rounding mode
+  const exprt &op0 = expr.op();            // number to convert
+  const exprt &op1 = expr.rounding_mode(); // rounding mode
 
-  bvt bv0=convert_bv(op0);
-  bvt bv1=convert_bv(op1);
+  bvt bv0 = convert_bv(op0);
+  bvt bv1 = convert_bv(op1);
 
   const typet &src_type = expr.op0().type();
   const typet &dest_type = expr.type();
 
-  if(src_type==dest_type) // redundant type cast?
+  if(src_type == dest_type) // redundant type cast?
     return bv0;
 
   if(src_type.id() == ID_c_bit_field)
@@ -38,42 +38,36 @@ bvt boolbvt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
   }
 
   float_utilst float_utils(prop);
+  float_utils.set_multiplier_encoding_from(bv_utils);
 
   float_utils.set_rounding_mode(convert_bv(op1));
 
-  if(src_type.id()==ID_floatbv &&
-     dest_type.id()==ID_floatbv)
+  if(src_type.id() == ID_floatbv && dest_type.id() == ID_floatbv)
   {
-    float_utils.spec=ieee_float_spect(to_floatbv_type(src_type));
-    return
-      float_utils.conversion(
-        bv0,
-        ieee_float_spect(to_floatbv_type(dest_type)));
+    float_utils.spec = ieee_float_spect(to_floatbv_type(src_type));
+    return float_utils.conversion(
+      bv0, ieee_float_spect(to_floatbv_type(dest_type)));
   }
-  else if(src_type.id()==ID_signedbv &&
-          dest_type.id()==ID_floatbv)
+  else if(src_type.id() == ID_signedbv && dest_type.id() == ID_floatbv)
   {
-    float_utils.spec=ieee_float_spect(to_floatbv_type(dest_type));
+    float_utils.spec = ieee_float_spect(to_floatbv_type(dest_type));
     return float_utils.from_signed_integer(bv0);
   }
-  else if(src_type.id()==ID_unsignedbv &&
-          dest_type.id()==ID_floatbv)
+  else if(src_type.id() == ID_unsignedbv && dest_type.id() == ID_floatbv)
   {
-    float_utils.spec=ieee_float_spect(to_floatbv_type(dest_type));
+    float_utils.spec = ieee_float_spect(to_floatbv_type(dest_type));
     return float_utils.from_unsigned_integer(bv0);
   }
-  else if(src_type.id()==ID_floatbv &&
-          dest_type.id()==ID_signedbv)
+  else if(src_type.id() == ID_floatbv && dest_type.id() == ID_signedbv)
   {
-    std::size_t dest_width=to_signedbv_type(dest_type).get_width();
-    float_utils.spec=ieee_float_spect(to_floatbv_type(src_type));
+    std::size_t dest_width = to_signedbv_type(dest_type).get_width();
+    float_utils.spec = ieee_float_spect(to_floatbv_type(src_type));
     return float_utils.to_signed_integer(bv0, dest_width);
   }
-  else if(src_type.id()==ID_floatbv &&
-          dest_type.id()==ID_unsignedbv)
+  else if(src_type.id() == ID_floatbv && dest_type.id() == ID_unsignedbv)
   {
-    std::size_t dest_width=to_unsignedbv_type(dest_type).get_width();
-    float_utils.spec=ieee_float_spect(to_floatbv_type(src_type));
+    std::size_t dest_width = to_unsignedbv_type(dest_type).get_width();
+    float_utils.spec = ieee_float_spect(to_floatbv_type(src_type));
     return float_utils.to_unsigned_integer(bv0, dest_width);
   }
   else
@@ -86,6 +80,7 @@ bvt boolbvt::convert_floatbv_round_to_integral(
   if(expr.op().type().id() == ID_floatbv)
   {
     float_utilst float_utils(prop);
+    float_utils.set_multiplier_encoding_from(bv_utils);
 
     float_utils.set_rounding_mode(convert_bv(expr.rounding_mode()));
     float_utils.spec = ieee_float_spect{to_floatbv_type(expr.op().type())};
@@ -114,20 +109,21 @@ bvt boolbvt::convert_floatbv_op(const ieee_float_op_exprt &expr)
     irep_pretty_diagnosticst{expr});
 
   float_utilst float_utils(prop);
+  float_utils.set_multiplier_encoding_from(bv_utils);
 
   float_utils.set_rounding_mode(rounding_mode_as_bv);
 
   if(expr.type().id() == ID_floatbv)
   {
-    float_utils.spec=ieee_float_spect(to_floatbv_type(expr.type()));
+    float_utils.spec = ieee_float_spect(to_floatbv_type(expr.type()));
 
-    if(expr.id()==ID_floatbv_plus)
+    if(expr.id() == ID_floatbv_plus)
       return float_utils.add_sub(lhs_as_bv, rhs_as_bv, false);
-    else if(expr.id()==ID_floatbv_minus)
+    else if(expr.id() == ID_floatbv_minus)
       return float_utils.add_sub(lhs_as_bv, rhs_as_bv, true);
-    else if(expr.id()==ID_floatbv_mult)
+    else if(expr.id() == ID_floatbv_mult)
       return float_utils.mul(lhs_as_bv, rhs_as_bv);
-    else if(expr.id()==ID_floatbv_div)
+    else if(expr.id() == ID_floatbv_div)
       return float_utils.div(lhs_as_bv, rhs_as_bv);
     else
       UNREACHABLE;
@@ -136,12 +132,12 @@ bvt boolbvt::convert_floatbv_op(const ieee_float_op_exprt &expr)
   {
     const typet &subtype = to_type_with_subtype(expr.type()).subtype();
 
-    if(subtype.id()==ID_floatbv)
+    if(subtype.id() == ID_floatbv)
     {
-      float_utils.spec=ieee_float_spect(to_floatbv_type(subtype));
+      float_utils.spec = ieee_float_spect(to_floatbv_type(subtype));
 
       std::size_t width = boolbv_width(expr.type());
-      std::size_t sub_width=boolbv_width(subtype);
+      std::size_t sub_width = boolbv_width(subtype);
 
       DATA_INVARIANT(
         sub_width > 0 && width % sub_width == 0,

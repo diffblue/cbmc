@@ -1388,6 +1388,151 @@ simplify_exprt::simplify_inequality(const binary_relation_exprt &expr)
   if(tmp0.type() != tmp1.type())
     return unchanged(expr);
 
+  // Simplify equalities/inequalities involving commutative and
+  // associative operators.
+  if(expr.id() == ID_equal || expr.id() == ID_notequal)
+  {
+    auto is_commutative = [](const irep_idt &id)
+    {
+      return id == ID_mult || id == ID_plus || id == ID_bitand ||
+             id == ID_bitor || id == ID_bitxor;
+    };
+
+    // Commutativity: a op b == b op a
+    if(
+      tmp0.id() == tmp1.id() && tmp0.operands().size() == 2 &&
+      tmp1.operands().size() == 2 && is_commutative(tmp0.id()))
+    {
+      if(
+        tmp0.operands()[0] == tmp1.operands()[1] &&
+        tmp0.operands()[1] == tmp1.operands()[0])
+      {
+        if(expr.id() == ID_equal)
+          return true_exprt();
+        else
+          return false_exprt();
+      }
+    }
+
+    // Distributivity: a * (b + c) == a * b + a * c (and variants)
+    auto distribute_mult = [](const exprt &e) -> std::optional<exprt>
+    {
+      if(e.id() != ID_mult || e.operands().size() != 2)
+        return {};
+      for(int i = 0; i < 2; ++i)
+      {
+        const exprt &factor = e.operands()[i];
+        const exprt &sum = e.operands()[1 - i];
+        if(sum.id() == ID_plus && sum.operands().size() == 2)
+        {
+          mult_exprt prod0(factor, sum.operands()[0]);
+          prod0.type() = e.type();
+          mult_exprt prod1(factor, sum.operands()[1]);
+          prod1.type() = e.type();
+          plus_exprt result(std::move(prod0), std::move(prod1));
+          result.type() = e.type();
+          return std::move(result);
+        }
+      }
+      return {};
+    };
+
+    auto prod_equal = [](const exprt &p, const exprt &q)
+    {
+      if(p == q)
+        return true;
+      if(
+        p.id() == ID_mult && q.id() == ID_mult && p.operands().size() == 2 &&
+        q.operands().size() == 2)
+      {
+        return p.operands()[0] == q.operands()[1] &&
+               p.operands()[1] == q.operands()[0];
+      }
+      return false;
+    };
+
+    auto deep_comm_equal = [&prod_equal](const exprt &a, const exprt &b)
+    {
+      if(a == b)
+        return true;
+      if(
+        a.id() == ID_plus && b.id() == ID_plus && a.operands().size() == 2 &&
+        b.operands().size() == 2)
+      {
+        return (prod_equal(a.operands()[0], b.operands()[0]) &&
+                prod_equal(a.operands()[1], b.operands()[1])) ||
+               (prod_equal(a.operands()[0], b.operands()[1]) &&
+                prod_equal(a.operands()[1], b.operands()[0]));
+      }
+      return false;
+    };
+
+    {
+      auto expanded0 = distribute_mult(tmp0);
+      auto expanded1 = distribute_mult(tmp1);
+      bool dist_equal = false;
+      if(expanded0.has_value() && deep_comm_equal(*expanded0, tmp1))
+        dist_equal = true;
+      else if(expanded1.has_value() && deep_comm_equal(tmp0, *expanded1))
+        dist_equal = true;
+      else if(
+        expanded0.has_value() && expanded1.has_value() &&
+        deep_comm_equal(*expanded0, *expanded1))
+        dist_equal = true;
+
+      if(dist_equal)
+      {
+        if(expr.id() == ID_equal)
+          return true_exprt();
+        else
+          return false_exprt();
+      }
+    }
+
+    // Associativity: flatten nested applications of the same
+    // associative+commutative operator and compare sorted leaf multisets.
+    // E.g., (a*b)*c == a*(b*c) both flatten to {a, b, c}.
+    if(tmp0.id() == tmp1.id() && is_commutative(tmp0.id()))
+    {
+      const irep_idt &op_id = tmp0.id();
+      auto flatten = [&op_id](const exprt &e, std::vector<exprt> &leaves)
+      {
+        std::vector<const exprt *> worklist = {&e};
+        while(!worklist.empty())
+        {
+          const exprt *cur = worklist.back();
+          worklist.pop_back();
+          if(cur->id() == op_id)
+          {
+            for(const auto &op : cur->operands())
+              worklist.push_back(&op);
+          }
+          else
+            leaves.push_back(*cur);
+        }
+      };
+
+      std::vector<exprt> leaves0, leaves1;
+      flatten(tmp0, leaves0);
+      flatten(tmp1, leaves1);
+
+      if(
+        leaves0.size() == leaves1.size() && leaves0.size() >= 2 &&
+        leaves0.size() <= 8)
+      {
+        std::sort(leaves0.begin(), leaves0.end());
+        std::sort(leaves1.begin(), leaves1.end());
+        if(leaves0 == leaves1)
+        {
+          if(expr.id() == ID_equal)
+            return true_exprt();
+          else
+            return false_exprt();
+        }
+      }
+    }
+  }
+
   // if rhs is ID_if (and lhs is not), swap operands for == and !=
   if((expr.id()==ID_equal || expr.id()==ID_notequal) &&
      tmp0.id()!=ID_if &&
