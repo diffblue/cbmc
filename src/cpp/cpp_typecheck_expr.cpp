@@ -2409,11 +2409,17 @@ void cpp_typecheckt::typecheck_expr_member(
 
     // go to the scope of the struct/union
     cpp_save_scopet save_scope(cpp_scopes);
+    // Capture the genuine point of use ([class.access]) before navigating
+    // into the object's class scope, so that member accessibility is
+    // judged from the enclosing class/function rather than from the
+    // object's type.
+    cpp_scopet &naming_scope = cpp_scopes.current_scope();
     cpp_scopes.set_scope(struct_identifier);
 
     // resolve the member name in this scope
     cpp_typecheck_fargst new_fargs(fargs);
     new_fargs.add_object(op0);
+    new_fargs.naming_scope = &naming_scope;
 
     exprt symbol_expr=resolve(
                         component_cpp_name,

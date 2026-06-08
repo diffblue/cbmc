@@ -19,12 +19,23 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 class code_typet;
 class cpp_typecheckt;
 class side_effect_expr_function_callt;
+class cpp_scopet;
 
 class cpp_typecheck_fargst // for function overloading
 {
 public:
   bool in_use, has_object;
   exprt::operandst operands;
+
+  /// The scope of the point of use for access control ([class.access]):
+  /// the enclosing class/function in which the name being resolved
+  /// textually appears.  For an explicit-object member access
+  /// (`obj.member`) the resolver navigates into the object's class scope
+  /// before looking the member up, which would otherwise lose the
+  /// genuine point of use.  When set, this is the scope from which
+  /// member accessibility is judged; when null, the resolver falls back
+  /// to the scope active at resolution time.
+  cpp_scopet *naming_scope = nullptr;
 
   /// Optional target type for the enclosing context, propagated to
   /// the resolver so that template-argument deduction has access to
