@@ -1232,6 +1232,16 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
   fargs.in_use = true;
   fargs.operands = code.operands();
 
+  // Access to the base-class constructor is judged from the point of use
+  // ([class.base.init], [class.access.base]): the derived class whose
+  // constructor performs the base-class initialization.  For an implicit
+  // base initializer the resolve below scopes into the base subobject (to
+  // disambiguate the constructor, see `#base_type`), which would
+  // otherwise let the base's own (possibly private) constructor look
+  // accessible.  Record the enclosing scope so accessibility is decided
+  // from the derived class instead.
+  fargs.naming_scope = &cpp_scopes.current_scope();
+
   // For implicit base-class initializers added by
   // `full_member_initialization`, the `cpp_namet` is the unqualified
   // base class `base_name` and resolve below would fail when the

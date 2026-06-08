@@ -1,0 +1,12 @@
+CORE
+main.cpp
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+^.*' is not accessible$
+A protected base constructor is accessible to a derived class
+initializing its base subobject, per class.access.base: implicit base
+initialization must be accepted.

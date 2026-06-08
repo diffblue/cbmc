@@ -4298,9 +4298,18 @@ resolved_after_strip:
       if(!fail_with_exception)
         return nil_exprt();
 
+      // For ordinary members ID_component_name carries the name; for a
+      // constructor (and other synthesized references) it is empty, so
+      // fall back to the resolved identifier for a meaningful message.
+      irep_idt display_name = result.get(ID_component_name);
+      if(display_name.empty())
+        display_name = result.get(ID_identifier);
+      if(display_name.empty() && result.id() == ID_symbol)
+        display_name = to_symbol_expr(result).get_identifier();
+
       cpp_typecheck.error().source_location = result.source_location();
-      cpp_typecheck.error() << "member '" << result.get(ID_component_name)
-                            << "' is not accessible" << messaget::eom;
+      cpp_typecheck.error()
+        << "member '" << display_name << "' is not accessible" << messaget::eom;
       throw 0;
     }
   }

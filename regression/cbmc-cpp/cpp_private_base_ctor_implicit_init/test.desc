@@ -1,0 +1,12 @@
+CORE
+main.cpp
+
+^.*member '.*base::base.*' is not accessible$
+^CONVERSION ERROR$
+^EXIT=6$
+^SIGNAL=0$
+--
+^VERIFICATION
+Implicitly initializing a base subobject whose constructor is private
+must be rejected from the derived class's constructor, per class.base.init
+and class.access.base.
