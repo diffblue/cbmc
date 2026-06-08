@@ -4229,6 +4229,12 @@ resolved_after_strip:
     // resolve_scope() may have changed the current scope to the target
     // class, causing check_component_access to give a false positive.
     bool still_not_accessible = true;
+    // Whether the resolved member is a constructor or destructor.  The
+    // derived-class fallback below only applies to these special members
+    // (whose calls the compiler synthesizes between a derived class and
+    // its bases); it must not grant a derived class access to an
+    // otherwise-inaccessible ordinary base member ([class.access]).
+    bool is_special_member = false;
     if(original_scope != nullptr)
     {
       irep_idt comp_name = result.get(ID_component_name);
@@ -4255,6 +4261,13 @@ resolved_after_strip:
             {
               if(comp.get_name() == comp_name)
               {
+                if(comp.type().id() == ID_code)
+                {
+                  const irep_idt &rt =
+                    to_code_type(comp.type()).return_type().id();
+                  is_special_member =
+                    rt == ID_constructor || rt == ID_destructor;
+                }
                 cpp_scopet *saved = cpp_typecheck.cpp_scopes.current_scope_ptr;
                 cpp_typecheck.cpp_scopes.current_scope_ptr = original_scope;
                 still_not_accessible =
@@ -4268,7 +4281,18 @@ resolved_after_strip:
       }
     }
 
-    if(still_not_accessible)
+    // The fallback below permits a derived class to name an otherwise
+    // inaccessible inherited member.  This is only sound for the
+    // compiler-synthesized references the resolver performs while
+    // *elaborating* a class (constructor/destructor chaining, base
+    // sub-object handling) -- where the original scope is a class scope
+    // and the real point of use is checked separately -- or for special
+    // members.  For a genuine point of use in a function body, the
+    // access decision made above ([class.access]/[class.access.base])
+    // stands, so an ordinary inaccessible base member is rejected.
+    const bool elaboration_context =
+      original_scope != nullptr && original_scope->is_class();
+    if(still_not_accessible && (is_special_member || elaboration_context))
     {
       // Check if the caller is in a derived class — derived class
       // constructors can call base class constructors even if private
