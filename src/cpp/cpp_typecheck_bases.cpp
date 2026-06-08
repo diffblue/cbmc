@@ -255,10 +255,39 @@ void cpp_typecheckt::add_base_components(
   // add the components
   struct_typet::componentst &dest_c=to.components();
 
+  // Access of a base member, as inherited through an edge with the
+  // given protection ([class.access.base]/1), preserving inaccessible
+  // (noaccess) members.
+  auto inherited_access =
+    [](const irep_idt &edge, const irep_idt &member) -> irep_idt
+  {
+    if(member == ID_noaccess)
+      return ID_noaccess;
+    if(edge == ID_public)
+      return member == ID_private ? ID_noaccess : member;
+    // protected or private inheritance
+    return member == ID_private ? ID_noaccess : ID_private;
+  };
+
   for(const auto &c : from.components())
   {
+    const irep_idt new_access = inherited_access(access, c.get_access());
+
     if(c.get_bool(ID_from_base))
+    {
+      // The member is already flattened into `to` from its declaring
+      // class via the recursion above.  Propagate its access as seen in
+      // the immediate base `from` instead of keeping the declaring
+      // class's access: an intermediate base may have changed it with a
+      // using-declaration ([namespace.udecl]/19), e.g. binary_exprt's
+      // public `using exprt::op0;` republishing the protected op0.
+      for(auto &d : dest_c)
+      {
+        if(d.get_bool(ID_from_base) && d.get_name() == c.get_name())
+          d.set_access(new_access);
+      }
       continue;
+    }
 
     // copy the component
     dest_c.push_back(c);
@@ -266,30 +295,7 @@ void cpp_typecheckt::add_base_components(
     // now twiddle the copy
     struct_typet::componentt &component=dest_c.back();
     component.set(ID_from_base, true);
-
-    irep_idt comp_access=component.get_access();
-
-    if(access==ID_public)
-    {
-      if(comp_access==ID_private)
-        component.set_access(ID_noaccess);
-    }
-    else if(access == ID_protected)
-    {
-      if(comp_access==ID_private)
-        component.set_access(ID_noaccess);
-      else
-        component.set_access(ID_private);
-    }
-    else if(access == ID_private)
-    {
-      if(comp_access == ID_noaccess || comp_access == ID_private)
-        component.set_access(ID_noaccess);
-      else
-        component.set_access(ID_private);
-    }
-    else
-      UNREACHABLE;
+    component.set_access(new_access);
 
     // put into scope
   }

@@ -1911,7 +1911,34 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           }
         }
         if(!is_inheriting_ctor)
+        {
           convert(cpp_using);
+
+          // [namespace.udecl]/19: a using-declaration that names an
+          // inherited member makes that member accessible in the
+          // derived class with the access of the using-declaration,
+          // independent of the member's access in the base.  Adjust the
+          // access of the corresponding inherited (from_base)
+          // component(s) so member-access checking honours it -- e.g.
+          // binary_exprt's public `using exprt::op0;` republishes the
+          // protected exprt::op0 as public.
+          if(cpp_using.name().is_qualified() && !name_sub.empty())
+          {
+            const irep_idt &member_name = name_sub.back().get(ID_identifier);
+            if(!member_name.empty())
+            {
+              for(auto &comp : components)
+              {
+                if(
+                  comp.get_bool(ID_from_base) &&
+                  comp.get_base_name() == member_name)
+                {
+                  comp.set_access(access);
+                }
+              }
+            }
+          }
+        }
         else
         {
           // Import base class constructors as derived class constructors
