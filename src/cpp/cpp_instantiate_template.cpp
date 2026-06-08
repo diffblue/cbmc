@@ -1617,21 +1617,53 @@ void cpp_typecheckt::elaborate_class_template(
             }
           }
 
-          if(
-            partial_specialization_args_tc.arguments() ==
-            full_args_tc.arguments())
+          // A function-type template argument may carry a parameter's
+          // reference/pointer/array part either on the parameter
+          // declaration's type or on its declarator: the parser places
+          // it on the declarator, whereas substituting a deduced
+          // argument places it on the type.  Normalise both forms by
+          // merging each cpp_declaration parameter's declarator into its
+          // type, so structurally-equivalent function types (e.g. the
+          // requested `R(const T&)` and the deduced one) compare equal.
+          auto normalize_code_args =
+            [](cpp_template_args_tct args) -> cpp_template_args_tct
+          {
+            for(auto &arg : args.arguments())
+            {
+              if(arg.id() != ID_type || arg.type().id() != ID_code)
+                continue;
+              for(auto &param : arg.type().add(ID_parameters).get_sub())
+              {
+                if(param.id() != ID_cpp_declaration)
+                  continue;
+                auto &decl = static_cast<cpp_declarationt &>(param);
+                if(decl.declarators().empty())
+                  continue;
+                typet merged =
+                  decl.declarators().front().merge_type(decl.type());
+                decl.type() = merged;
+                decl.declarators().front().type().make_nil();
+              }
+            }
+            return args;
+          };
+
+          const cpp_template_args_tct norm_ps =
+            normalize_code_args(partial_specialization_args_tc);
+          const cpp_template_args_tct norm_full =
+            normalize_code_args(full_args_tc);
+
+          if(norm_ps.arguments() == norm_full.arguments())
           {
             // operator== on irept ignores #-prefixed attributes like
             // C_constant and C_volatile. Check them recursively on
             // the type tree so that e.g. const T* and T* partial
             // specializations are correctly distinguished.
             bool qualifiers_match = true;
-            for(std::size_t j = 0;
-                j < partial_specialization_args_tc.arguments().size();
-                j++)
+            for(std::size_t j = 0; j < norm_ps.arguments().size(); j++)
             {
-              const exprt &p = partial_specialization_args_tc.arguments()[j];
-              const exprt &f = full_args_tc.arguments()[j];
+              const exprt &p = norm_ps.arguments()[j];
+              const exprt &f = norm_full.arguments()[j];
               if(p.id() == ID_type)
               {
                 if(!qualifiers_match_recursively(p.type(), f.type()))
