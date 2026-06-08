@@ -932,7 +932,6 @@ exprt float_bvt::fma(
   // Sign
   exprt add_sub_sign = notequal_exprt(
     if_exprt(c_bigger, unpacked_add.sign, prod_sign), fraction_sign);
-  result.sign = add_sub_sign;
 
   // NaN
   exprt prod_inf = or_exprt(unpacked_lhs.infinity, unpacked_rhs.infinity);
@@ -949,6 +948,38 @@ exprt float_bvt::fma(
   // Infinity
   result.infinity =
     and_exprt(not_exprt(result.NaN), or_exprt(prod_inf, unpacked_add.infinity));
+
+  // Zero?
+  // Note that:
+  //  1. The zero flag isn't used apart from in divide and is only set on
+  //     unpack.
+  //  2. The wide-precision exact product means a non-zero true result has at
+  //     least one bit set in result.fraction; subnormals can't round to zero,
+  //     so this test is sound here.
+  //  3. The rules for sign are different for zero.
+  result.zero = and_exprt{
+    not_exprt{or_exprt{result.infinity, result.NaN}},
+    equal_exprt{result.fraction, from_integer(0, result.fraction.type())}};
+
+  // Sign. Keep in sync with the analogous block in float_bvt::add_sub.
+  // For an infinity result, use the product sign if the product itself is
+  // infinite, otherwise the addend sign. For a zero result, follow the
+  // signed-zero conventions: round-to-minus-inf yields a negative zero unless
+  // both contributing signs are positive; all other modes yield a positive
+  // zero unless both contributing signs are negative. Otherwise use the
+  // standard add/sub sign computed above.
+  exprt infinity_sign = if_exprt{prod_inf, prod_sign, unpacked_add.sign};
+
+  const rounding_mode_bitst rounding_mode_bits{rm};
+  exprt zero_sign = if_exprt{
+    rounding_mode_bits.round_to_minus_inf,
+    or_exprt{prod_sign, unpacked_add.sign},
+    and_exprt{prod_sign, unpacked_add.sign}};
+
+  result.sign = if_exprt{
+    result.infinity,
+    std::move(infinity_sign),
+    if_exprt{result.zero, std::move(zero_sign), add_sub_sign}};
 
   return rounder(result, rm, spec);
 }
