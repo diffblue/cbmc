@@ -167,3 +167,10 @@ dist/
 # auto generated documentation
 doc/html/
 scripts/adder-research/benchmarks/
+
+# Stray artifacts that were accidentally committed in the past
+# (build trees, coverage output, patch backups). See REPRODUCE.md.
+build-*/
+*.gcov
+*.gcno
+*.orig
