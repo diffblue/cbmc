@@ -1211,6 +1211,82 @@ void cpp_typecheckt::typecheck_switch(codet &code)
     c_typecheck_baset::typecheck_switch(code);
 }
 
+void cpp_typecheckt::check_member_default_ctor_access(
+  const typet &member_type,
+  const source_locationt &source_location,
+  cpp_scopet *naming_scope)
+{
+  if(disable_access_control || naming_scope == nullptr)
+    return;
+
+  // Arrays are initialized element-wise ([dcl.init.aggr]); check the
+  // element type.
+  const typet *element_type = &member_type;
+  while(element_type->id() == ID_array)
+    element_type = &to_array_type(*element_type).element_type();
+
+  if(element_type->id() != ID_struct_tag)
+    return;
+
+  // Resolve the tag to its definition.  During template instantiation a
+  // tag may still be incomplete or not (yet) a struct; in that case there
+  // is nothing to access-check here, so conservatively accept.
+  const symbolt *sym =
+    symbol_table.lookup(to_struct_tag_type(*element_type).get_identifier());
+  if(sym == nullptr || sym->type.id() != ID_struct)
+    return;
+
+  const struct_typet &struct_type = to_struct_type(sym->type);
+  if(struct_type.is_incomplete())
+    return;
+
+  // Locate the default constructor: the constructor whose only parameter
+  // is the implicit `this`.  If there is none, default-initialization
+  // does not select a user-provided constructor and there is nothing to
+  // access-check here.
+  for(const auto &comp : struct_type.components())
+  {
+    if(comp.type().id() != ID_code)
+      continue;
+    // Only the class's own constructors are candidates for selection;
+    // base-class constructors appear as inherited (from_base) components
+    // and are not what default-initialization of this member selects.
+    if(comp.get_bool(ID_from_base))
+      continue;
+    const code_typet &ctor_type = to_code_type(comp.type());
+    if(ctor_type.return_type().id() != ID_constructor)
+      continue;
+    if(ctor_type.parameters().size() != 1)
+      continue;
+
+    // Judge accessibility from the point of use (the enclosing class's
+    // constructor), not from the member's own class.
+    cpp_scopet *saved = cpp_scopes.current_scope_ptr;
+    cpp_scopes.current_scope_ptr = naming_scope;
+    const bool not_accessible = check_component_access(comp, struct_type);
+    cpp_scopes.current_scope_ptr = saved;
+
+    if(not_accessible)
+    {
+      // System headers may rely on friend/visibility modelling that CBMC
+      // does not fully reconstruct; do not reject there (mirrors the
+      // resolver's system-header tolerance).
+      const std::string file = id2string(source_location.get_file());
+      if(
+        !file.empty() && (file.find("/include/") != std::string::npos ||
+                          file.find("\\include\\") != std::string::npos))
+        return;
+
+      error().source_location = source_location;
+      error() << "default constructor of '" << to_string(*element_type)
+              << "' is not accessible" << eom;
+      throw 0;
+    }
+
+    return;
+  }
+}
+
 void cpp_typecheckt::typecheck_member_initializer(codet &code)
 {
   const cpp_namet &member = to_cpp_name(code.find(ID_member));
@@ -1428,6 +1504,23 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
       {
         // it's a data member
         already_typechecked_exprt::make_already_typechecked(symbol_expr);
+
+        // For default-initialization of a class-type member (no explicit
+        // initializer), the selected default constructor must be
+        // accessible in this constructor's context ([class.base.init]/12,
+        // [class.access.base]).  cpp_constructor resolves the member's
+        // constructor in the member's own class scope, which would let a
+        // private/inaccessible default constructor pass, so check here
+        // from the enclosing class (the point of use).
+        if(code.operands().empty())
+        {
+          const exprt &inner =
+            symbol_expr.id() == ID_already_typechecked
+              ? to_already_typechecked_expr(symbol_expr).get_expr()
+              : symbol_expr;
+          check_member_default_ctor_access(
+            inner.type(), code.source_location(), fargs.naming_scope);
+        }
 
         // Operands were already typechecked above; wrap them to prevent
         // cpp_constructor from typechecking them again.  Don't wrap

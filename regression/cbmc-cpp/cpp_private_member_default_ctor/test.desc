@@ -1,0 +1,12 @@
+CORE
+main.cpp
+
+^.*default constructor of '.*m.*' is not accessible$
+^CONVERSION ERROR$
+^EXIT=6$
+^SIGNAL=0$
+--
+^VERIFICATION
+Default-initializing a class-type data member whose default constructor
+is private must be rejected from the enclosing constructor, per
+class.base.init and class.access.base.
