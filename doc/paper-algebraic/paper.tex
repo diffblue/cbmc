@@ -1455,8 +1455,8 @@ previously-solved benchmarks
 (zero regressions on the existing regression tests, the
 full random-polynomial suite, and the 66 SMT-COMP stratified
 sample) and unlock eight new benchmarks on the SMT-COMP sample
-($37/66 \to 43/66$, see Table~\ref{tab:smtcomp-sample}; PAR-2
-improves from $57.1$\,s/benchmark to $44.8$\,s/benchmark, the
+($37/66 \to 42/66$, see Table~\ref{tab:smtcomp-sample}; PAR-2
+improves from $57.1$\,s/benchmark to $45.8$\,s/benchmark, the
 latter ahead of cvc5's $52.6$). On
 Brain's full random-polynomial suite, the algebraic
 configuration solves $2128/3498$ (see
@@ -1996,7 +1996,8 @@ algebraic pre-solver disabled (shift-add baseline), with a 60\,s
 timeout.
 
 \begin{table}[ht]
-\caption{SMT-COMP QF\_BV stratified sample (66 benchmarks, 60\,s T/O).
+\caption{SMT-COMP QF\_BV stratified sample (66 benchmarks, 60\,s T/O,
+6\,GB memory limit).
   cvc5 run with default settings (its QF\_BV pipeline; the \texttt{--ff}
   flag applies only to the QF\_FF logic and does not activate on
   QF\_BV). Bitwuzla 0.9.0-dev added 2026-05-26.
@@ -2012,7 +2013,7 @@ timeout.
 Configuration & Solved & PAR-2 (s/benchmark) \\
 \midrule
 shift-add (bit-blasting only) & 37/66 & 57.1 \\
-\cbmc default (algebraic + \combacs) & \textbf{43/66} & \textbf{44.8} \\
+\cbmc default (algebraic + \combacs) & \textbf{42/66} & \textbf{45.8} \\
 cvc5 default & 38/66 & 52.6 \\
 Bitwuzla default & \textbf{52/66} & \textbf{28.7} \\
 \bottomrule
@@ -2020,7 +2021,7 @@ Bitwuzla default & \textbf{52/66} & \textbf{28.7} \\
 \end{table}
 
 On the stratified sample Bitwuzla solves the most benchmarks
-(52), followed by \cbmc default (43), cvc5 (38), and shift-add
+(52), followed by \cbmc default (42), cvc5 (38), and shift-add
 \cbmc (37). \cbmc's default configuration overtakes cvc5 on
 this sample, primarily through the Phase~2.5/2.6/A.1/A.2/A.3
 techniques and F4-style tail reduction described in
