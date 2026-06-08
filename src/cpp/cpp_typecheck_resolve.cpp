@@ -4164,14 +4164,23 @@ resolved_after_strip:
 
   // we do some checks before we return
 
+  // The scope from which member accessibility is judged ([class.access]):
+  // the genuine point of use.  For an explicit-object member access the
+  // caller (typecheck_expr_member) records the enclosing class/function
+  // in fargs.naming_scope, because resolve_scope() has since moved the
+  // current scope into the object's class.  Otherwise the scope captured
+  // at resolution time (original_scope) already is the point of use.
+  cpp_scopet *access_scope =
+    fargs.naming_scope != nullptr ? fargs.naming_scope : original_scope;
+
   // Access control check for class members resolved via qualified names.
   // The get_component path sets ID_C_not_accessible, but qualified name
   // resolution bypasses get_component, so we check here.
   // resolve_scope() changed the current scope to the target class, so we
-  // must temporarily restore the original scope for check_component_access.
+  // must temporarily restore the access scope for check_component_access.
   if(
     !result.get_bool(ID_C_not_accessible) &&
-    !cpp_typecheck.disable_access_control && original_scope != nullptr)
+    !cpp_typecheck.disable_access_control && access_scope != nullptr)
   {
     irep_idt result_id = result.get(ID_identifier);
     if(result_id.empty() && result.id() == ID_symbol)
@@ -4193,9 +4202,9 @@ resolved_after_strip:
           {
             if(comp.get_name() == result_id)
             {
-              // Temporarily restore the caller's scope for access check.
+              // Temporarily restore the access scope for the access check.
               cpp_scopet *saved = cpp_typecheck.cpp_scopes.current_scope_ptr;
-              cpp_typecheck.cpp_scopes.current_scope_ptr = original_scope;
+              cpp_typecheck.cpp_scopes.current_scope_ptr = access_scope;
               bool not_ok =
                 cpp_typecheck.check_component_access(comp, struct_type);
               cpp_typecheck.cpp_scopes.current_scope_ptr = saved;
@@ -4225,17 +4234,12 @@ resolved_after_strip:
 
   if(result.get_bool(ID_C_not_accessible))
   {
-    // Re-check access from the original (caller's) scope, since
-    // resolve_scope() may have changed the current scope to the target
-    // class, causing check_component_access to give a false positive.
+    // Re-check access from the access scope (the genuine point of use),
+    // since resolve_scope() may have changed the current scope to the
+    // target class, causing check_component_access to give a false
+    // positive.
     bool still_not_accessible = true;
-    // Whether the resolved member is a constructor or destructor.  The
-    // derived-class fallback below only applies to these special members
-    // (whose calls the compiler synthesizes between a derived class and
-    // its bases); it must not grant a derived class access to an
-    // otherwise-inaccessible ordinary base member ([class.access]).
-    bool is_special_member = false;
-    if(original_scope != nullptr)
+    if(access_scope != nullptr)
     {
       irep_idt comp_name = result.get(ID_component_name);
       if(comp_name.empty())
@@ -4261,92 +4265,11 @@ resolved_after_strip:
             {
               if(comp.get_name() == comp_name)
               {
-                if(comp.type().id() == ID_code)
-                {
-                  const irep_idt &rt =
-                    to_code_type(comp.type()).return_type().id();
-                  is_special_member =
-                    rt == ID_constructor || rt == ID_destructor;
-                }
                 cpp_scopet *saved = cpp_typecheck.cpp_scopes.current_scope_ptr;
-                cpp_typecheck.cpp_scopes.current_scope_ptr = original_scope;
+                cpp_typecheck.cpp_scopes.current_scope_ptr = access_scope;
                 still_not_accessible =
                   cpp_typecheck.check_component_access(comp, struct_type);
                 cpp_typecheck.cpp_scopes.current_scope_ptr = saved;
-                break;
-              }
-            }
-          }
-        }
-      }
-    }
-
-    // The fallback below permits a derived class to name an otherwise
-    // inaccessible inherited member.  This is only sound for the
-    // compiler-synthesized references the resolver performs while
-    // *elaborating* a class (constructor/destructor chaining, base
-    // sub-object handling) -- where the original scope is a class scope
-    // and the real point of use is checked separately -- or for special
-    // members.  For a genuine point of use in a function body, the
-    // access decision made above ([class.access]/[class.access.base])
-    // stands, so an ordinary inaccessible base member is rejected.
-    const bool elaboration_context =
-      original_scope != nullptr && original_scope->is_class();
-    if(still_not_accessible && (is_special_member || elaboration_context))
-    {
-      // Check if the caller is in a derived class — derived class
-      // constructors can call base class constructors even if private
-      // (e.g., MSVC's bad_array_new_length calling bad_alloc(const char*)).
-      // The "current class" is the nearest class scope on the
-      // current-scope chain.  When the resolution happens from inside
-      // a method body, the scope chain is `method -> class -> ...`
-      // so the parent of the current scope is the class.  When the
-      // resolution happens from a class scope directly (e.g., during
-      // implicit destructor synthesis triggered while elaborating the
-      // derived class), the current scope IS the class.  Walk the
-      // chain and pick the first class scope.
-      const cpp_scopet *cls_scope = &cpp_typecheck.cpp_scopes.current_scope();
-      while(cls_scope != nullptr && !cls_scope->is_root_scope() &&
-            !cls_scope->is_class())
-        cls_scope = &cls_scope->get_parent();
-      const irep_idt current_class =
-        (cls_scope != nullptr && cls_scope->is_class())
-          ? cls_scope->identifier
-          : irep_idt{};
-      irep_idt comp_name = result.get(ID_component_name);
-      if(!comp_name.empty() && !current_class.empty())
-      {
-        const std::string id_str = id2string(comp_name);
-        auto pos = id_str.rfind("::");
-        if(pos != std::string::npos)
-        {
-          // Build the expected struct_tag identifier for the
-          // class containing `comp_name`.  The `tag-` prefix
-          // attaches to the unqualified class name, AFTER any
-          // enclosing-namespace qualifier.  For example
-          // `std::__pair_base<...>::~...` → class identifier is
-          // `std::tag-__pair_base<...>` (not `tag-std::__pair_base<...>`).
-          const std::string class_qualified = id_str.substr(0, pos);
-          auto last_ns = class_qualified.rfind("::");
-          std::string base_class;
-          if(last_ns == std::string::npos)
-            base_class = "tag-" + class_qualified;
-          else
-            base_class = class_qualified.substr(0, last_ns + 2) + "tag-" +
-                         class_qualified.substr(last_ns + 2);
-          // Check if current class inherits from the base class
-          const symbolt *cur_sym =
-            cpp_typecheck.symbol_table.lookup(current_class);
-          if(cur_sym != nullptr && cur_sym->type.id() == ID_struct)
-          {
-            for(const auto &base : to_struct_type(cur_sym->type).bases())
-            {
-              if(
-                base.type().id() == ID_struct_tag &&
-                id2string(to_struct_tag_type(base.type()).get_identifier()) ==
-                  base_class)
-              {
-                still_not_accessible = false;
                 break;
               }
             }
