@@ -1,0 +1,12 @@
+CORE
+main.cpp
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+^warning: ignoring
+std::function with a reference-typed parameter must select the
+function-type partial specialization, so its operator bool / operator()
+are available.

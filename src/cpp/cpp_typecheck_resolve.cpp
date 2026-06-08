@@ -4930,13 +4930,38 @@ void cpp_typecheck_resolvet::guess_template_args(
   }
   else if(template_type.id() == ID_code)
   {
-    // Both template and desired are already-converted code types.
+    // Both template and desired are code types; their parameters may
+    // still be in pre-conversion (cpp_declaration) form, in which case
+    // the parameter's reference/pointer/array part is carried by the
+    // declarator rather than by its `type()`.  Recover the full
+    // parameter type so e.g. a reference parameter is deduced as a
+    // reference ([temp.deduct.type] applied to function-type
+    // parameters), not as its bare referent.
     if(desired_type.id() == ID_code)
     {
       const code_typet &tmpl_code = to_code_type(template_type);
       const code_typet &desired_code = to_code_type(desired_type);
 
       guess_template_args(tmpl_code.return_type(), desired_code.return_type());
+
+      auto full_param_type = [](const exprt &param) -> typet
+      {
+        if(param.id() == ID_cpp_declaration)
+        {
+          const cpp_declarationt &decl = to_cpp_declaration(param);
+          if(!decl.declarators().empty())
+          {
+            // Merge the declarator (which carries the reference/pointer/
+            // array part) with the declaration's base type, keeping the
+            // result in frontend form: the desired argument it is later
+            // compared against during specialization matching is itself
+            // unconverted, so converting here would introduce a spurious
+            // frontend_pointer-vs-pointer mismatch.
+            return decl.declarators().front().merge_type(decl.type());
+          }
+        }
+        return param.type();
+      };
 
       const auto &tmpl_params = tmpl_code.parameters();
       const auto &desired_params = desired_code.parameters();
@@ -4945,7 +4970,7 @@ void cpp_typecheck_resolvet::guess_template_args(
       {
         if(d_it == desired_params.end())
           break;
-        guess_template_args(tp.type(), d_it->type());
+        guess_template_args(tp.type(), full_param_type(*d_it));
         ++d_it;
       }
     }
