@@ -49,6 +49,32 @@
   and the SAT verdict depends on the *set* of committed
   assertions, not on their order.
 
+  ASSUMES (faithfulness condition of this abstraction): the
+  verdict is a function of the *set* of committed assertions —
+  i.e. replaying the deferred assertions in any order, at any
+  point, yields the same verdict.
+
+  MAINTAINED BY: `finish_eager_conversion` replaying every
+  deferred assertion through `SUB::set_to` *before* the
+  downstream finalisation steps that derive lemmas from the set
+  of terms seen so far (uninterpreted-function congruence axioms,
+  array axioms). This ASSUMES condition is exactly what a real
+  bug violated: replay originally happened AFTER
+  `functions.finish_eager_conversion()`, so an
+  uninterpreted-function application occurring only inside a
+  deferred assertion (e.g. `m(zero_extend(x))`) was registered
+  too late to receive its congruence axioms, and the verdict then
+  depended on the replay ORDER, not just the committed set —
+  yielding spurious `sat`. The set-based abstraction here does NOT
+  model congruence-axiom generation, so its proof remained valid
+  while the C++ violated the abstraction's faithfulness
+  condition; the bug was caught by differential testing, not by
+  this proof. The fix (boolbv.h: replay before
+  `functions.finish_eager_conversion`) re-establishes the ASSUMES
+  condition. This is the third instance, after the 2000x ordering
+  sensitivity and the 2-trick progress gap, of the
+  ASSUMES/MAINTAINED-BY discipline being load-bearing.
+
   The verdict function is left as a parameter; the theorems show
   that for any verdict function, the deferred and eager pipelines
   produce identical states, hence identical verdicts.

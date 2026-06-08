@@ -211,12 +211,17 @@ occurrence-map canonicalisation closes most queries
 syntactically and constructs witnesses for the
 existential-equational SAT-direction queries that our
 UNSAT-oriented $2^{d-1}$ encoding cannot. Our wins are the
-queries Bitwuzla cannot decide (the four random-polynomial
+queries Bitwuzla cannot decide (the 59 random-polynomial
 high-degree wins) or that cvc5 cannot decide (DSP datapath
 equivalences and SABER polynomial multiplication).
 
-We introduce zero correctness regressions across \cbmc's 691
-existing regression tests.
+With the algebraic layers enabled, \cbmc's CORE regression suite
+(1167 tests) shows zero soundness or correctness regressions; two
+tests time out under the per-test budget, and both reproduce with
+the algebraic layer disabled (they are not caused by it). The
+algebraic integration is validated by mechanised proof and by a
+corpus-scale differential sweep against external oracles
+(Section~\ref{sec:threats}).
 
 \section{Algebraic Solving via Gr\"obner Bases}
 \label{sec:algebraic}
@@ -300,11 +305,11 @@ Our implementation extends the standard Buchberger loop with
 \emph{progress-based termination}: instead of exhaustively
 computing all S-polynomials until saturation (which can be
 prohibitively expensive), we terminate early if either
-(i)~a unit constant enters the basis (UNSAT detected, lines
+(i)~a non-zero constant enters the basis (UNSAT detected, lines
 13--14 of Algorithm~\ref{alg:buchberger}), or (ii)~the basis has
 not changed for $\tau$ steps (pruned early, line 17). In practice
-the unit check dominates: on every polynomial-equation benchmark
-we have seen, the unit constant appears within $\leq$1,000 steps,
+the non-zero-constant check dominates: on every polynomial-equation benchmark
+we have seen, the non-zero constant appears within $\leq$1,000 steps,
 and the global step limit of 100{,}000 is never reached.
 
 \begin{algorithm}[ht]
@@ -345,7 +350,7 @@ definitions) required up to 2{,}000 times more steps than
 ``definitions before disequality equations'' on benchmarks such as
 commutativity and associativity. This 2{,}000$\times$ sensitivity
 was eliminated by the progress-based termination rule
-(line~17): once all pairs that could contribute to the unit constant
+(line~17): once all pairs that could contribute to the non-zero constant
 are explored, further pairs cannot help, and the algorithm
 terminates regardless of the initial order.
 
@@ -423,7 +428,7 @@ S-polynomial step produced a new basis element, not when the
 2-trick's newly-injected pairs were processed first but counted
 against the stale progress threshold, allowing the loop to exit
 with original pairs still in the queue. If any of those
-unprocessed pairs would have produced an odd unit constant via
+unprocessed pairs would have produced a non-zero constant via
 S-polynomial reduction, the algorithm returned \texttt{UNKNOWN}
 instead of \texttt{UNSAT}.
 
@@ -496,7 +501,7 @@ component along three axes:
 
 \item \textbf{Algorithmic refinements for SMT-scale problems.}
   Standard Buchberger is sensitive to equation ordering and can
-  diverge before reaching a unit constant. We add
+  diverge before reaching a non-zero constant. We add
   progress-based termination
   (Section~\ref{sec:algebraic-algo}) that eliminates the
   ordering sensitivity, and candidate extraction with
@@ -680,7 +685,7 @@ Three regimes emerge: (i) \emph{word-level simplified}
 (comm, assoc, distrib) — the C front-end closes the query at
 layer 1 before reaching the solver; (ii) \emph{algebraically
 solved} (overflow\_detect, dsp\_vanishing\_poly, dsp\_horner,
-dsp\_image\_reject) — layers 2--3 reduce to unit constants or
+dsp\_image\_reject) — layers 2--3 reduce to non-zero constants or
 vanishing polynomials; (iii) \emph{bit-blasting required}
 (mul\_ineq\_12 contains a comparison; strength\_chain\_16 is
 decomposed by shift; bf16\_mul\_comm\_v2 uses floating-point
@@ -957,8 +962,15 @@ $\nu_2(j!) \geq m$, where $\nu_2$ is the 2-adic valuation.
 
 \begin{theorem}[Vanishing criterion~\cite{shekhar2007equivalence}]
 \label{thm:vanishing}
-A univariate polynomial $p(x) = \sum_j c_j \, x^{\underline{j}} \in R[x]$
-vanishes as a function on $\mathbb{Z}_{2^n}$ if and only if for each
+Let $R = \mathbb{Z}_{2^m}$ be the codomain and let $p(x) = \sum_j
+c_j \, x^{\underline{j}} \in R[x]$ be regarded as a function
+$\mathbb{Z}_{2^n} \to \mathbb{Z}_{2^m}$ on a domain of width $n$
+that is at least the degree of $p$ (so every falling factorial
+$x^{\underline{j}}$ in the sum is exercised on the input range;
+the small-$n$ case, where $x^{\underline{j}}$ already vanishes on
+$\{0,\ldots,2^n-1\}$ once $j \geq 2^n$, is handled by the
+per-variable degree bound of the ``Mixed input widths'' remark
+below). Then $p$ vanishes as a function if and only if for each
 $j$,
 \[
   2^{\,m - \min(\nu_2(j!),\,m)} \;\big|\; c_j \quad\text{in }\mathbb{Z}.
@@ -1830,7 +1842,11 @@ versus the $\texttt{DISABLE\_DEFER\_BITBLAST}$ ablation. Per output
 coefficient via the all-coefficients disjunction; 600\,s timeout;
 55\,GB virtual memory limit. The ablation ceiling at
 $N \geq 384$ is memory-bound (\textsc{oom}); the default ceiling
-at $N \geq 1024$ is time-bound (\textsc{t/o}).}
+at $N \geq 1024$ is time-bound (\textsc{t/o}). Default wall times
+here are measured under per-output-coefficient RSS sampling and
+the 55\,GB cgroup, and so run a little higher than the
+uninstrumented headline times of Table~\ref{tab:saber-scaling}
+(e.g.\ 13.4\,s vs.\ 11.25\,s at $N=256$).}
 \label{tab:saber-defer}
 \centering
 \small
@@ -2429,9 +2445,9 @@ check that the circuit's output polynomial equals the
 specification. We
 tested this on a small hardware-multiplier-equivalence benchmark
 (\texttt{hw\_mul\_equiv}): at BW=2 the augmented system has
-a strong Gr\"obner basis of 23 elements including a unit constant,
+a strong Gr\"obner basis of 23 elements including a non-zero constant,
 so we correctly report UNSAT. At BW$\geq$4, however, the basis
-converges to 18 elements with no unit constant, and our procedure
+converges to 18 elements with no non-zero constant, and our procedure
 returns ``unknown.'' This is consistent with the literature: the
 gate-level approaches of
 Biere, Kauers, and Ritirc~\cite{biere2017challenges} and
@@ -2467,11 +2483,34 @@ $+5$ to $+12$); the actual algebraic-vs-bit-blasting frontier
 is gate-level reasoning, not overflow reasoning. Recorded in
 \texttt{doc/paper-algebraic/plan-B-empirical-findings.md}.
 
-\textbf{No correctness regressions.} The 691 \cbmc regression
-tests (covering array bounds, pointer safety, floating-point, and
-other properties) all pass with the algebraic layers enabled. The
-algebraic layers add $<$4\,ms of overhead on benchmarks that do
-not exercise them.
+\textbf{No correctness regressions, and how we know.} With the
+algebraic layers enabled, \cbmc's CORE regression suite (1167
+tests, covering array bounds, pointer safety, floating-point, and
+other properties) shows zero soundness or correctness
+regressions. Two tests time out under the 60\,s per-test budget
+(\texttt{union\_large\_array} and a constant-array access); both
+reproduce with the algebraic layer disabled, so they are not
+caused by it. The algebraic layers add $<$4\,ms of overhead on
+benchmarks that do not exercise them.
+
+We validate the integration along two independent axes beyond the
+mechanised proofs. (i) A \emph{corpus-scale differential sweep}:
+on the full 4361 multiplication-containing \texttt{sat}-declared
+benchmarks of the SMT-COMP QF\_BV track (including the
+$>$2\,MB inputs) plus a 4000-benchmark cross-corpus sample, we
+ran our solver and compared every \texttt{sat}/\texttt{unsat}
+verdict against z3, cvc5, and a baseline build with the algebraic
+layer disabled. After the fixes described below, zero wrong
+verdicts are attributable to the algebraic layer. (ii) This
+differential sweep is also how we found integration bugs that
+unit and regression tests missed --- including an invariant
+violation in the bit-literal map triggered when the algebraic
+candidate-hint path reconstructed a symbol at the Gr\"obner ring
+width rather than its native width (it aborted four CORE tests),
+and the deferred-replay ordering bug of
+Section~\ref{sec:lean4}. Both are fixed; we recommend wiring such
+a differential sweep into CI, as the ``zero regressions'' claim is
+only as strong as the oracle set it is checked against.
 
 \textbf{Interaction with bit-blasting.} This paper shares with the
 bit-blasting companion paper~\cite{companion-bitblasting} the
@@ -2626,27 +2665,37 @@ covers the following modules:
 \item \textbf{Strong Gr\"obner basis 2-trick saturation}
   (\texttt{StrongGB.lean}): we prove that scalar multiplication
   preserves ideal membership (the 2-trick is sound, both for
-  $\mathbb{Z}_{2^d}$ and for $\mathrm{MvPolynomial}\, \mathrm{Fin}\, n\, \mathbb{Z}_{2^d}$),
-  and re-export the existing soundness chain (odd constant in
-  basis $\Rightarrow$ ideal $= \top \Rightarrow$ original system
-  UNSAT). The implementation in \texttt{groebner.cpp} is
-  \emph{sound but not complete}: it returns \texttt{UNSAT} only
-  when an odd constant is found in the saturated basis, and
-  \texttt{UNKNOWN} otherwise. The formal model captures exactly
-  this contract. We also prove:
+  $\mathbb{Z}_{2^d}$ and for $\mathrm{MvPolynomial}\, \mathrm{Fin}\, n\, \mathbb{Z}_{2^d}$).
+  The general UNSAT criterion --- any \emph{non-zero} constant in
+  the basis implies no solution --- is
+  \texttt{DisequalityRefutation.lean::nonzero\_constant\_no\_solution};
+  the odd-constant case (odd $\Rightarrow$ unit $\Rightarrow$
+  ideal $= \top \Rightarrow$ UNSAT) is the re-exported special
+  case \texttt{soundness\_of\_odd\_constant\_check}. The
+  implementation in \texttt{groebner.cpp} is \emph{sound but not
+  complete}: it returns \texttt{UNSAT} when a non-zero constant
+  is found in the saturated basis, and \texttt{UNKNOWN}
+  otherwise. We also prove:
   \begin{itemize}
   \item \texttt{naive\_completeness\_is\_false}: the naive
-    completeness statement (``$F$ unsat $\Rightarrow$ odd constant
+    completeness statement for the original \emph{odd}-constant
+    criterion (``$F$ unsat $\Rightarrow$ odd constant
     in $\langle F\rangle$'') is \emph{false}; concrete
     counterexample with $d=2$, $n=0$, $F=\{C\,2\}$.
   \item \texttt{two\_trick\_saturation\_complete\_is\_false}:
     a stronger negative result. Even adding the natural
     well-formedness hypothesis (idempotency on each variable),
-    the refined completeness statement is \emph{still false};
-    the same counterexample defeats it (vacuously well-formed
-    for $n=0$). This formally explains why the implementation
-    correctly returns \texttt{UNKNOWN} on inputs where strong-GB
-    saturation cannot produce an odd constant.
+    the refined odd-constant completeness statement is
+    \emph{still false}; the same counterexample defeats it
+    (vacuously well-formed for $n=0$). These two results drove a
+    concrete change: the odd-only criterion is strictly
+    incomplete (it would return \texttt{UNKNOWN} on the unsat
+    $F=\{C\,2\}$), which is why \texttt{has\_constant} was
+    generalised to refute on any non-zero constant --- under
+    which $F=\{C\,2\}$ is now decided \texttt{UNSAT}. The
+    generalised criterion is still incomplete in general
+    (function-vanishing unsats and budget exhaustion remain),
+    so \texttt{UNKNOWN} stays a valid outcome.
   \item \texttt{d\_eq\_one\_completeness}: for $d=1$ (over
     $\mathrm{GF}(2)$) with idempotency on each variable, $F$
     unsat does imply $1 \in \langle F\rangle$. Proof via
@@ -2696,7 +2745,21 @@ covers the following modules:
   \texttt{defer\_replay\_equivalence}: for any sequence of
   assertions, the deferred-then-flushed path yields the same
   state as the eager path. Proven with zero \texttt{sorry} and
-  zero project axioms.
+  zero project axioms. This abstraction is faithful only under an
+  explicit assumption --- that the verdict depends on the
+  \emph{set} of committed assertions, not on their replay order
+  --- which the set-based model does not itself verify. That
+  assumption was in fact violated by a real bug (replay happened
+  after uninterpreted-function congruence axioms were generated,
+  so a function application appearing only in a deferred assertion
+  missed its axioms, making the verdict order-dependent and
+  yielding spurious \texttt{sat}); the proof stayed valid while
+  the C++ broke the abstraction's premise, and the bug was caught
+  by differential testing rather than by the proof
+  (Section~\ref{sec:threats}). The
+  \texttt{Defer.lean} docstring now records this as an
+  \texttt{ASSUMES} / \texttt{MAINTAINED BY} pair, the fix being to
+  replay before congruence-axiom generation.
 
 \end{enumerate}
 
@@ -2706,8 +2769,15 @@ it witnesses; each implementation site carries a \texttt{PROOF:}
 comment naming the Lean theorem(s) that justify it. The full
 mapping is in \texttt{formal-proofs/TRACEABILITY.md}.
 
-\paragraph{Status summary.} Out of 65 mapping entries spanning
-20 Lean modules: all are fully mechanised with zero
+\paragraph{Status summary.} The three counts we report measure
+different things: the development contains over 150 Lean
+theorems/lemmas in total; of these, 65 are \emph{mapping entries}
+--- contract-level \texttt{PROOF:}/\texttt{IMPL:} pairs that tie a
+specific source site to the theorem(s) witnessing it --- spanning
+20 Lean modules; and the coverage audit (below) ranges over 37
+\emph{source entities} (algorithms/functions in
+\texttt{src/solvers/algebraic/}). All 65 mapping entries are
+fully mechanised with zero
 \texttt{sorry} and zero project-internal axioms; the only
 axioms relied on are the standard mathlib trio
 (\texttt{propext}, \texttt{Classical.choice},
@@ -2724,18 +2794,25 @@ order properties proven). Zero \textsc{Gap} entries; zero
 \textsc{Indirect} entries (all upgraded to direct refs).
 
 \paragraph{Notable corrections from mechanisation.} The
-mechanisation found and corrected one substantive specification
-issue. An earlier draft conjectured that the strong-GB
+mechanisation found and drove a substantive change to the UNSAT
+criterion. An earlier draft conjectured that the strong-GB
 algorithm's saturation step is complete: ``$F$ unsat $\Rightarrow$
-strong-GB produces an odd constant'', either naively or under a
-``well-formed encoding'' hypothesis (idempotency on each
+strong-GB produces an \emph{odd} constant'', either naively or
+under a ``well-formed encoding'' hypothesis (idempotency on each
 variable). We proved both versions \emph{false} with concrete
 counterexamples (\texttt{naive\_completeness\_is\_false},
-\texttt{two\_trick\_saturation\_complete\_is\_false}). The
-implementation in \texttt{groebner.cpp::compute} is intentionally
-\emph{sound but not complete}: \texttt{UNSAT} is only returned
-when an odd constant is found, and \texttt{UNKNOWN} otherwise.
-The formal model now reflects exactly this contract. A positive
+\texttt{two\_trick\_saturation\_complete\_is\_false}; witness
+$F=\{C\,2\}$ over $\mathbb{Z}_4$, unsat but with no odd constant
+in its ideal). This showed the odd-only criterion was strictly
+incomplete, so we generalised \texttt{groebner.cpp::has\_constant}
+to refute on \emph{any} non-zero constant (sound by
+\texttt{nonzero\_constant\_no\_solution}); under the generalised
+criterion the witness $F=\{C\,2\}$ is decided \texttt{UNSAT}. The
+procedure remains \emph{sound but not complete} --- it returns
+\texttt{UNSAT} when a non-zero constant is found and
+\texttt{UNKNOWN} otherwise (function-vanishing unsats are handled
+by the separate vanishing test of Section~\ref{sec:vanishing};
+budget exhaustion can also yield \texttt{UNKNOWN}). A positive
 partial completeness result holds for $d=1$ (over $\mathrm{GF}(2)$)
 with idempotency: \texttt{d\_eq\_one\_completeness}.
 
@@ -2882,12 +2959,12 @@ the bit-vector domain. The procedure is the first SMT integration
 of a complete decision procedure for this fragment; its
 contribution is not to replace mature word-level SMT solvers on
 volume but to decide queries those solvers cannot decide at all
---- 4 random-polynomial benchmarks at degree $\geq 13$ that
+--- 59 random-polynomial benchmarks at degree $\geq 13$ that
 Bitwuzla, cvc5, and every bit-blasting configuration we tested
 time out on, and 5 DSP datapath equivalences with overflow
 cancellation that are decided in microseconds. Soundness is
 mechanised in Lean 4 with over 150 theorems, zero \texttt{sorry},
-and zero project-internal axioms across 18 modules, with full
+and zero project-internal axioms across 20 modules, with full
 bi-directional traceability to every algorithm in
 \texttt{src/solvers/algebraic/} and four contributions prepared
 for Mathlib. The mechanisation effort
@@ -2895,8 +2972,13 @@ exposed and removed two implementation bugs that empirical
 testing did not catch (a 2{,}000$\times$ ordering sensitivity
 and a 2-trick progress-tracking gap), and led us to adopt an
 explicit-invariant pattern in cross-references
-(\texttt{ASSUMES:} / \texttt{MAINTAINED BY:}) that we expect to
-catch the same class of issue in other formalisation efforts.
+(\texttt{ASSUMES:} / \texttt{MAINTAINED BY:}). The same
+discipline, combined with a corpus-scale differential sweep,
+later caught a third bug --- a deferred-replay ordering issue in
+which the abstract equivalence proof's faithfulness assumption
+(``the verdict depends on the committed set, not its order'') was
+not maintained by the implementation --- which we expect the
+pattern to catch in other formalisation efforts.
 
 The procedure addresses the universal-equational class with
 polynomial expressions; queries with bitwise operations, shifts,

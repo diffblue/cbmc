@@ -13,14 +13,29 @@
   `groebner.cpp::compute` is a strong-GB **decision procedure
   with three possible outcomes**:
 
-    - `UNSAT`: returned only when an **odd constant** is found
-      in the saturated basis. Sound: when this happens, the
-      input system genuinely has no solution.
+    - `UNSAT`: returned when ANY non-zero constant is found in the
+      saturated basis. Sound: a non-zero constant in the ideal
+      evaluates to itself under every assignment while every ideal
+      element must evaluate to 0, so no solution exists. The
+      general soundness theorem is
+      `DisequalityRefutation.lean::nonzero_constant_no_solution`;
+      `soundness_of_odd_constant_check` below is the odd/unit
+      special case (odd ⇒ unit ⇒ ideal = ⊤). The implementation
+      originally checked only for an *odd* constant; the negative
+      result `naive_completeness_is_false` (below) showed that the
+      odd-only criterion is strictly incomplete — it misses, e.g.,
+      `F = {C 2}` over `Z_4`, which is unsat but whose only ideal
+      constants are even — which is exactly why `has_constant` was
+      generalised to any non-zero constant. Under the generalised
+      criterion `F = {C 2}` is decided UNSAT.
 
     - `UNKNOWN`: returned when the algorithm exhausts its budget
-      or saturates without producing an odd constant. The input
-      may or may not have a solution; the algorithm is not making
-      a claim either way.
+      or saturates without producing a non-zero constant. The
+      input may or may not have a solution; the algorithm is not
+      making a claim either way. Genuine residual incompleteness
+      remains (e.g. function-vanishing unsats such as
+      `4x^2+4x = 4` over `Z_8`, handled by the separate
+      vanishing-polynomial test, and budget exhaustion).
 
     - (`SAT` is not currently produced by `compute` itself; it
       would come from a different code path.)
@@ -42,25 +57,33 @@
        Re-exported from `GroebnerSoundness.lean`.
 
   These two results together establish the soundness contract:
-  if `compute` returns UNSAT (i.e., produces an odd constant in
-  its saturated basis), then the input system is unsat.
+  if `compute` returns UNSAT (it produces a non-zero constant in
+  its saturated basis; see `nonzero_constant_no_solution` for the
+  general case and `two_trick_unsat_sound` for the odd special
+  case), then the input system is unsat.
 
   Negative results (DONE, no sorry, only standard axioms +
   algorithm axioms):
 
     3. (`naive_completeness_is_false`) The naive completeness
-       statement ("F unsat ⇒ odd constant in Ideal.span F") is
-       FALSE. Concrete counterexample: `d = 2, n = 0, F = {C 2}`.
+       statement for the ODD-constant criterion ("F unsat ⇒ odd
+       constant in Ideal.span F") is FALSE. Concrete
+       counterexample: `d = 2, n = 0, F = {C 2}`.
 
     4. (`two_trick_saturation_complete_is_false`) Even adding
        the obvious well-formedness hypothesis (idempotency on
        each variable) does NOT make the natural refined
-       completeness statement true. The same counterexample
-       `{C 2}` defeats it (vacuously well-formed for n=0).
+       completeness statement (still for the odd criterion) true.
+       The same counterexample `{C 2}` defeats it (vacuously
+       well-formed for n=0).
 
-  These two results together show formally why UNKNOWN must be
-  a valid outcome of `compute`: the algorithm cannot generally
-  decide unsat, even with reasonable structural hypotheses.
+  These two results drove a concrete implementation change: they
+  show the odd-constant criterion is strictly incomplete, which
+  is why `has_constant` now refutes on ANY non-zero constant
+  (the `{C 2}` witness is then decided UNSAT). The generalised
+  criterion is still not complete in general — genuine
+  incompleteness remains for function-vanishing unsats and budget
+  exhaustion — so UNKNOWN remains a valid outcome of `compute`.
 
   Partial completeness (DONE for the d=1 case, no sorry):
 
