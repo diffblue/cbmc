@@ -5742,16 +5742,18 @@ void smt2_convt::find_symbols(const exprt &expr)
   // clang-format off
   else if(expr.operands().size() >= 1 &&
           (!use_FPA_for_type(to_multi_ary_expr(expr).op0().type()) ||
-           // boundary-crossing floatbv_typecast: src and dst floats use
-           // different encodings (one FPA, one bit-vector x86-extended),
-           // so the conversion is lowered via the bit-vector float_bv
-           // helper with the FPA side flattened/unflattened (see below
-           // and convert_floatbv).
+           // A floatbv_typecast whose *result* is a bit-vector-encoded
+           // float (x86 80-bit extended) is lowered through the bit-vector
+           // float_bv helper regardless of the operand's encoding (see
+           // convert_floatbv_typecast).  This covers conversions whose
+           // operand is not itself bit-vector-encoded -- an FPA-encoded
+           // float (e.g. double -> long double) or an integer (e.g. the
+           // Schraudolph exponent arithmetic, int -> long double).  The
+           // reverse directions have a bit-vector-encoded operand and are
+           // already covered by the clause above.
            (expr.id() == ID_floatbv_typecast &&
             expr.type().id() == ID_floatbv &&
-            to_multi_ary_expr(expr).op0().type().id() == ID_floatbv &&
-            use_FPA_for_type(to_multi_ary_expr(expr).op0().type()) !=
-              use_FPA_for_type(expr.type()))) &&
+            !use_FPA_for_type(expr.type()))) &&
           (expr.id() == ID_floatbv_plus ||
            expr.id() == ID_floatbv_minus ||
            expr.id() == ID_floatbv_mult ||

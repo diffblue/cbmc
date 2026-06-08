@@ -1,0 +1,25 @@
+CORE no-new-smt
+main.i
+--arch x86_64 --floatbv
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Exercises the conversion of an integer to x86 80-bit extended `long
+double`.  Under the SMT2 back-end this is a floatbv_typecast whose
+bit-vector lowering calls a `float_bv.floatbv_typecast_*` helper; that
+helper has to be registered by `smt2_convt::find_symbols` even though
+the operand is an integer (not a bit-vector-encoded float), which is the
+gap closed by registering the helper for bit-vector-encoded *results*.
+
+The test pins `--arch x86_64` so the x86 80-bit extended layout is
+selected on every target, and deliberately calls no library function, so
+CBMC never preprocesses the library for the x86_64 target.  It is
+therefore fully host-independent (no x86_64-capable system preprocessor
+needed) and is supplied pre-processed as `main.i`.
+
+It runs under the SAT, cprover-smt2, --z3 and paths-lifo back-ends.  The
+new SMT2 backend (--incremental-smt2-solver) is excluded via no-new-smt:
+it exhausts memory bit-blasting the 128-bit x86-extended conversion.
