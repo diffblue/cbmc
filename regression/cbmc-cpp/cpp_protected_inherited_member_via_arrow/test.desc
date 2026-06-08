@@ -1,0 +1,12 @@
+CORE
+main.cpp
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+^warning: ignoring
+Resolving an overloaded operator-> enters the operand's class scope; the
+member access on its result must be access-checked at the point of use,
+not from within the class that defines operator->.
