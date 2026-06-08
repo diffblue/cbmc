@@ -1,0 +1,12 @@
+CORE
+main.cpp
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+^warning: ignoring
+A using-declaration republishes an inherited member with the access of
+the using-declaration ([namespace.udecl]/19), and that access propagates
+through further public derivation.
