@@ -2722,13 +2722,8 @@ bool cpp_typecheckt::check_component_access(
 {
   const irep_idt &access = component.get(ID_access);
 
-  if(access == ID_noaccess)
-    return true; // not ok
-
   if(access == ID_public)
     return false; // ok
-
-  PRECONDITION(access == ID_private || access == ID_protected);
 
   const irep_idt &struct_identifier = struct_union_type.get(ID_name);
 
@@ -2737,11 +2732,14 @@ bool cpp_typecheckt::check_component_access(
   // used ([class.access.base]/5.2-5.3, handled via struct_identifier
   // below), accessible from the class that *declares* it and -- for a
   // protected member -- from classes derived from that declaring class
-  // ([class.access.base]/5.4): a member function of the declaring base
-  // may name the member on an object of any derived type.  Resolve that
-  // declaring class (the unique base carrying the member without
-  // ID_from_base) so it can be consulted alongside the object's type.
+  // ([class.access.base]/5.4): a member or friend of the declaring base
+  // may name the member on an object of any derived type, even when the
+  // member is inaccessible (noaccess) as named through that derived
+  // type.  Resolve the declaring class (the unique base carrying the
+  // member without ID_from_base) and the member's access there, so both
+  // can be consulted alongside the object's type.
   const struct_typet *declaring_type = nullptr;
+  irep_idt declaring_access;
   if(component.get_bool(ID_from_base) && struct_union_type.id() == ID_struct)
   {
     const irep_idt &component_name = component.get_name();
@@ -2758,6 +2756,7 @@ bool cpp_typecheckt::check_component_access(
         if(c.get_name() == component_name && !c.get_bool(ID_from_base))
         {
           declaring_type = &base_struct;
+          declaring_access = c.get(ID_access);
           break;
         }
       }
@@ -2766,36 +2765,54 @@ bool cpp_typecheckt::check_component_access(
     }
   }
 
+  // A non-inherited inaccessible member is genuinely inaccessible; an
+  // inherited one may still be reachable from its declaring class, so
+  // only bail out early when there is no declaring class to consult.
+  if(access == ID_noaccess && declaring_type == nullptr)
+    return true; // not ok
+
   for(cpp_scopet *pscope = &(cpp_scopes.current_scope());
       !(pscope->is_root_scope());
       pscope = &(pscope->get_parent()))
   {
     if(pscope->is_class())
     {
+      // The declaring class may always name its own member, whatever
+      // its access as seen through the object's (derived) type.
       if(
-        pscope->identifier == struct_identifier ||
-        (declaring_type != nullptr &&
-         pscope->identifier == declaring_type->get(ID_name)))
+        declaring_type != nullptr &&
+        pscope->identifier == declaring_type->get(ID_name))
+        return false; // ok
+
+      // Accessible as named through the object's own type (unless the
+      // member is inaccessible there).
+      if(access != ID_noaccess && pscope->identifier == struct_identifier)
         return false; // ok
 
       const struct_typet &scope_struct =
         to_struct_type(lookup(pscope->identifier).type);
 
+      const bool derived_from_object =
+        subtype_typecast(scope_struct, to_struct_type(struct_union_type));
+      const bool derived_from_declaring =
+        declaring_type != nullptr &&
+        subtype_typecast(scope_struct, *declaring_type);
+
+      // Protected members are accessible from classes derived from the
+      // class through which they are named, resp. that declares them.
       if(
-        subtype_typecast(scope_struct, to_struct_type(struct_union_type)) ||
-        (declaring_type != nullptr &&
-         subtype_typecast(scope_struct, *declaring_type)))
-      {
-        // Derived classes can access protected members but not private.
-        // Exception: compiler-generated members (e.g., vtable pointers)
-        // whose names contain '@' are always accessible.
-        if(access == ID_protected)
-          return false; // ok
-        const std::string comp_name = id2string(component.get_name());
-        if(comp_name.find('@') != std::string::npos)
-          return false; // ok — compiler-generated
-        // private members are not accessible from derived classes
-      }
+        (access == ID_protected && derived_from_object) ||
+        (declaring_access == ID_protected && derived_from_declaring))
+        return false; // ok
+
+      // Compiler-generated members (e.g. vtable pointers) whose names
+      // contain '@' are always accessible from derived classes.
+      if(
+        (derived_from_object || derived_from_declaring) &&
+        id2string(component.get_name()).find('@') != std::string::npos)
+        return false; // ok
+
+      // private members are not accessible from derived classes
 
       // C++11 (DR 45): nested classes have access to the enclosing
       // class's private and protected members.
