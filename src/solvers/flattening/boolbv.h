@@ -153,8 +153,22 @@ public:
     // so we must use the return value here, not the flag.
     if(!refuted)
     {
+      // Replay each deferred assertion through the SAME path the eager
+      // (non-deferred) tail of set_to uses, in particular the
+      // boolbv_set_equality_to_true optimisation for equalities. Calling
+      // SUB::set_to directly here would bypass that optimisation and
+      // fully bit-blast large equalities (e.g. a 100k-element array
+      // union), turning the replayed SAT instance far harder than the
+      // eager one and causing a timeout regression. We cannot recurse
+      // through boolbvt::set_to (it would re-defer), so we inline the
+      // post-deferral tail.
       for(auto &[expr, value] : deferred_assertions)
+      {
+        const auto equal_expr = expr_try_dynamic_cast<equal_exprt>(expr);
+        if(value && equal_expr && !boolbv_set_equality_to_true(*equal_expr))
+          continue;
         SUB::set_to(expr, value);
+      }
     }
     deferred_assertions.clear();
     functions.finish_eager_conversion();
