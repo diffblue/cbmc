@@ -2487,11 +2487,12 @@ is gate-level reasoning, not overflow reasoning. Recorded in
 algebraic layers enabled, \cbmc's CORE regression suite (1167
 tests, covering array bounds, pointer safety, floating-point, and
 other properties) shows zero soundness or correctness
-regressions. Two tests time out under the 60\,s per-test budget
-(\texttt{union\_large\_array} and a constant-array access); both
-reproduce with the algebraic layer disabled, so they are not
-caused by it. The algebraic layers add $<$4\,ms of overhead on
-benchmarks that do not exercise them.
+regressions. One test (a constant-array access tagged
+\texttt{thorough-smt-backend}) times out under the 60\,s per-test
+budget; it also times out with the algebraic layer disabled and
+on the pre-branch baseline, so it is not caused by this work. The
+algebraic layers add $<$4\,ms of overhead on benchmarks that do
+not exercise them.
 
 We validate the integration along two independent axes beyond the
 mechanised proofs. (i) A \emph{corpus-scale differential sweep}:
@@ -2501,15 +2502,23 @@ $>$2\,MB inputs) plus a 4000-benchmark cross-corpus sample, we
 ran our solver and compared every \texttt{sat}/\texttt{unsat}
 verdict against z3, cvc5, and a baseline build with the algebraic
 layer disabled. After the fixes described below, zero wrong
-verdicts are attributable to the algebraic layer. (ii) This
-differential sweep is also how we found integration bugs that
-unit and regression tests missed --- including an invariant
+verdicts are attributable to the algebraic layer. (ii) The same
+differential sweep, together with \texttt{git bisect} against the
+pre-branch baseline, is how we found integration bugs that unit
+and regression tests missed --- an invariant
 violation in the bit-literal map triggered when the algebraic
 candidate-hint path reconstructed a symbol at the Gr\"obner ring
-width rather than its native width (it aborted four CORE tests),
-and the deferred-replay ordering bug of
-Section~\ref{sec:lean4}. Both are fixed; we recommend wiring such
-a differential sweep into CI, as the ``zero regressions'' claim is
+width rather than its native width (it aborted four CORE tests);
+the deferred-replay ordering bug of Section~\ref{sec:lean4}; and a
+deferred-bit-blasting \emph{performance} regression in which the
+replay path bypassed the eager equality optimisation
+(\texttt{boolbv\_set\_equality\_to\_true}), fully bit-blasting a
+100k-element array-union equality and timing out (bisected to the
+deferral-default commit). All three are fixed --- the last by
+applying the eager equality optimisation on replay, so the
+deferred path now reproduces the eager \emph{clause structure},
+not only the eager models. We recommend wiring such a
+differential sweep into CI, as the ``zero regressions'' claim is
 only as strong as the oracle set it is checked against.
 
 \textbf{Interaction with bit-blasting.} This paper shares with the
