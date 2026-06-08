@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-
 #ifndef CPROVER_SOLVERS_FLATTENING_BOOLBV_H
 #define CPROVER_SOLVERS_FLATTENING_BOOLBV_H
 
@@ -46,22 +45,41 @@ class union_typet;
 class update_bit_exprt;
 class update_bits_exprt;
 
-class boolbvt:public arrayst
+class boolbvt : public arrayst
 {
 public:
-  void set_adder_encoding(bv_utilst::adder_encodingt e) { bv_utils.set_adder_encoding(e); }
-  void set_multiplier_adder_encoding(bv_utilst::adder_encodingt e) { bv_utils.set_multiplier_adder_encoding(e); }
-  void set_wallace_tree(bool b) { bv_utils.set_wallace_tree(b); }
-  void set_carry_save(bool b) { bv_utils.set_carry_save(b); }
-  void set_comba(bool b) { bv_utils.set_comba(b); }
-  void set_simple_full_adder(bool b) { bv_utils.set_simple_full_adder(b); }
-  void set_fa_g_only(bool b) { bv_utils.set_fa_g_only(b); }
-  void set_fa_tree_popcount(bool b) { bv_utils.set_fa_tree_popcount(b); }
-  void set_comba_carry_save(bool b) { bv_utils.set_comba_carry_save(b); }
-  void set_dadda_carry_save(bool b) { bv_utils.set_dadda_carry_save(b); }
-  void set_restoring_divider(bool b) { bv_utils.set_restoring_divider(b); }
-  void set_radix_multiplier(int r) { bv_utils.set_radix_multiplier(r); }
-  void set_dadda(bool b) { bv_utils.set_dadda(b); }
+  void set_adder_encoding(bv_utilst::adder_encodingt e)
+  {
+    bv_utils.set_adder_encoding(e);
+  }
+  void set_multiplier_adder_encoding(bv_utilst::adder_encodingt e)
+  {
+    bv_utils.set_multiplier_adder_encoding(e);
+  }
+  void set_wallace_tree(bool b)
+  {
+    bv_utils.set_wallace_tree(b);
+  }
+  void set_carry_save(bool b)
+  {
+    bv_utils.set_carry_save(b);
+  }
+  void set_comba(bool b)
+  {
+    bv_utils.set_comba(b);
+  }
+  void set_comba_carry_save(bool b)
+  {
+    bv_utils.set_comba_carry_save(b);
+  }
+  void set_dadda_carry_save(bool b)
+  {
+    bv_utils.set_dadda_carry_save(b);
+  }
+  void set_dadda(bool b)
+  {
+    bv_utils.set_dadda(b);
+  }
   boolbvt(
     const namespacet &_ns,
     propt &_prop,
@@ -101,7 +119,12 @@ public:
     SUB::finish_eager_conversion();
   }
 
-  enum class unbounded_arrayt { U_NONE, U_ALL, U_AUTO };
+  enum class unbounded_arrayt
+  {
+    U_NONE,
+    U_ALL,
+    U_AUTO
+  };
   unbounded_arrayt unbounded_array;
 
   mp_integer get_value(const bvt &bv)
@@ -152,8 +175,10 @@ protected:
   bv_cachet bv_cache;
 
   bool type_conversion(
-    const typet &src_type, const bvt &src,
-    const typet &dest_type, bvt &dest);
+    const typet &src_type,
+    const bvt &src,
+    const typet &dest_type,
+    bvt &dest);
 
   virtual literalt convert_bv_rel(const binary_relation_exprt &);
   virtual literalt convert_typecast(const typecast_exprt &expr);
@@ -163,8 +188,8 @@ protected:
   virtual literalt convert_binary_overflow(const binary_overflow_exprt &expr);
   virtual literalt convert_unary_overflow(const unary_overflow_exprt &expr);
   virtual literalt convert_equality(const equal_exprt &expr);
-  virtual literalt convert_verilog_case_equality(
-    const binary_relation_exprt &expr);
+  virtual literalt
+  convert_verilog_case_equality(const binary_relation_exprt &expr);
   virtual literalt convert_ieee_float_rel(const binary_relation_exprt &);
   virtual literalt convert_quantifier(const quantifier_exprt &expr);
 
@@ -215,8 +240,8 @@ protected:
   virtual bvt convert_bv_reduction(const unary_exprt &expr);
   virtual bvt convert_not(const not_exprt &expr);
   virtual bvt convert_power(const power_exprt &expr);
-  virtual bvt convert_function_application(
-    const function_application_exprt &expr);
+  virtual bvt
+  convert_function_application(const function_application_exprt &expr);
   virtual bvt convert_bitreverse(const bitreverse_exprt &expr);
   virtual bvt convert_saturating_add_sub(const binary_exprt &expr);
   virtual bvt convert_overflow_result(const overflow_result_exprt &expr);

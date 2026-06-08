@@ -60,7 +60,7 @@ void convert_assumptions(const bvt &bv, Minisat::vec<Minisat::Lit> &dest)
   }
 }
 
-template<typename T>
+template <typename T>
 tvt satcheck_minisat2_baset<T>::l_get(literalt a) const
 {
   if(a.is_true())
@@ -70,25 +70,25 @@ tvt satcheck_minisat2_baset<T>::l_get(literalt a) const
 
   tvt result;
 
-  if(a.var_no()>=(unsigned)solver->model.size())
+  if(a.var_no() >= (unsigned)solver->model.size())
     return tvt::unknown();
 
   using Minisat::lbool;
 
-  if(solver->model[a.var_no()]==l_True)
-    result=tvt(true);
-  else if(solver->model[a.var_no()]==l_False)
-    result=tvt(false);
+  if(solver->model[a.var_no()] == l_True)
+    result = tvt(true);
+  else if(solver->model[a.var_no()] == l_False)
+    result = tvt(false);
   else
     return tvt::unknown();
 
   if(a.sign())
-    result=!result;
+    result = !result;
 
   return result;
 }
 
-template<typename T>
+template <typename T>
 void satcheck_minisat2_baset<T>::set_polarity(literalt a, bool value)
 {
   PRECONDITION(!a.is_constant());
@@ -112,13 +112,13 @@ void satcheck_minisat2_baset<T>::set_polarity(literalt a, bool value)
   }
 }
 
-template<typename T>
+template <typename T>
 void satcheck_minisat2_baset<T>::interrupt()
 {
   solver->interrupt();
 }
 
-template<typename T>
+template <typename T>
 void satcheck_minisat2_baset<T>::clear_interrupt()
 {
   solver->clearInterrupt();
@@ -142,14 +142,14 @@ std::string satcheck_minisat_simplifiert::solver_text() const
 #endif
 }
 
-template<typename T>
+template <typename T>
 void satcheck_minisat2_baset<T>::add_variables()
 {
-  while((unsigned)solver->nVars()<no_variables())
+  while((unsigned)solver->nVars() < no_variables())
     solver->newVar();
 }
 
-template<typename T>
+template <typename T>
 void satcheck_minisat2_baset<T>::lcnf(const bvt &bv)
 {
   try
@@ -208,7 +208,7 @@ void satcheck_minisat2_baset<T>::lcnf(const bvt &bv)
 
 #ifndef _WIN32
 
-static Minisat::Solver *solver_to_interrupt=nullptr;
+static Minisat::Solver *solver_to_interrupt = nullptr;
 
 static void interrupt_solver(int signum)
 {
@@ -228,11 +228,9 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve(const bvt &assumptions)
 
   // Print pre-solve stats
   {
-    log.statistics() << "MiniSat pre-solve: "
-                     << solver->nVars() << " vars, "
+    log.statistics() << "MiniSat pre-solve: " << solver->nVars() << " vars, "
                      << solver->nClauses() << " clauses, "
-                     << solver->nFreeVars() << " free vars"
-                     << messaget::eom;
+                     << solver->nFreeVars() << " free vars" << messaget::eom;
   }
 
   try
@@ -364,12 +362,12 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve(const bvt &assumptions)
   catch(const Minisat::OutOfMemoryException &)
   {
     log.error() << "SAT checker ran out of memory" << messaget::eom;
-    status=statust::ERROR;
+    status = statust::ERROR;
     return resultt::P_ERROR;
   }
 }
 
-template<typename T>
+template <typename T>
 void satcheck_minisat2_baset<T>::set_assignment(literalt a, bool value)
 {
   PRECONDITION(!a.is_constant());
@@ -413,13 +411,13 @@ satcheck_minisat2_baset<T>::satcheck_minisat2_baset(
 template <typename T>
 satcheck_minisat2_baset<T>::~satcheck_minisat2_baset() = default;
 
-template<typename T>
+template <typename T>
 bool satcheck_minisat2_baset<T>::is_in_conflict(literalt a) const
 {
-  int v=a.var_no();
+  int v = a.var_no();
 
-  for(int i=0; i<solver->conflict.size(); i++)
-    if(var(solver->conflict[i])==v)
+  for(int i = 0; i < solver->conflict.size(); i++)
+    if(var(solver->conflict[i]) == v)
       return true;
 
   return false;

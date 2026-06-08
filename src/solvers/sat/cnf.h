@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/prop/prop.h>
 
-class cnft:public propt
+class cnft : public propt
 {
 public:
   // For CNF, we don't use index 0 as a matter of principle,
@@ -23,7 +23,9 @@ public:
     : propt(message_handler), _no_variables(1)
   {
   }
-  virtual ~cnft() { }
+  virtual ~cnft()
+  {
+  }
 
   virtual literalt land(literalt a, literalt b) override;
   virtual literalt lor(literalt a, literalt b) override;
@@ -39,9 +41,15 @@ public:
   virtual literalt lselect(literalt a, literalt b, literalt c) override;
   virtual literalt new_variable() override;
   bvt new_variables(std::size_t width) override;
-  virtual size_t no_variables() const override { return _no_variables; }
-  virtual void set_no_variables(size_t no) { _no_variables=no; }
-  virtual size_t no_clauses() const=0;
+  virtual size_t no_variables() const override
+  {
+    return _no_variables;
+  }
+  virtual void set_no_variables(size_t no)
+  {
+    _no_variables = no;
+  }
+  virtual size_t no_clauses() const = 0;
 
   void gate_and(literalt a, literalt b, literalt o);
   void gate_or(literalt a, literalt b, literalt o);
@@ -70,7 +78,7 @@ protected:
   }
 };
 
-class cnf_solvert:public cnft
+class cnf_solvert : public cnft
 {
 public:
   explicit cnf_solvert(message_handlert &message_handler)
@@ -84,7 +92,13 @@ public:
   }
 
 protected:
-  enum class statust { INIT, SAT, UNSAT, ERROR };
+  enum class statust
+  {
+    INIT,
+    SAT,
+    UNSAT,
+    ERROR
+  };
   statust status;
   size_t clause_counter;
 };

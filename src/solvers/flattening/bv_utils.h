@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-
 #ifndef CPROVER_SOLVERS_FLATTENING_BV_UTILS_H
 #define CPROVER_SOLVERS_FLATTENING_BV_UTILS_H
 
@@ -19,23 +18,50 @@ Author: Daniel Kroening, kroening@kroening.com
 // but seems to give a run-time penalty.
 // #define COMPACT_EQUAL_CONST
 
-
 class bv_utilst
 {
 public:
-  enum class adder_encodingt { RIPPLE_CARRY, SIMPLE_RIPPLE_CARRY, BRENT_KUNG, KOGGE_STONE, SKLANSKY, CLA, SPARSE_BK, LADNER_FISCHER, HAN_CARLSON, MINIMAL_RIPPLE, ADAPTIVE };
+  enum class adder_encodingt
+  {
+    RIPPLE_CARRY,
+    SIMPLE_RIPPLE_CARRY,
+    BRENT_KUNG,
+    KOGGE_STONE,
+    SKLANSKY,
+    CLA,
+    SPARSE_BK,
+    LADNER_FISCHER,
+    HAN_CARLSON,
+    MINIMAL_RIPPLE,
+    ADAPTIVE
+  };
 
-  explicit bv_utilst(propt &_prop):prop{_prop} { }
+  explicit bv_utilst(propt &_prop) : prop{_prop}
+  {
+  }
 
-  void set_adder_encoding(adder_encodingt e) { adder_encoding = e; }
-  void set_multiplier_adder_encoding(adder_encodingt e) { multiplier_adder_encoding = e; }
+  void set_adder_encoding(adder_encodingt e)
+  {
+    adder_encoding = e;
+  }
+  void set_multiplier_adder_encoding(adder_encodingt e)
+  {
+    multiplier_adder_encoding = e;
+  }
 
-  enum class representationt { SIGNED, UNSIGNED };
+  enum class representationt
+  {
+    SIGNED,
+    UNSIGNED
+  };
 
   static bvt build_constant(const mp_integer &i, std::size_t width);
 
   bvt incrementer(const bvt &op, literalt carry_in);
-  bvt inc(const bvt &op) { return incrementer(op, const_literal(true)); }
+  bvt inc(const bvt &op)
+  {
+    return incrementer(op, const_literal(true));
+  }
   void incrementer(bvt &op, literalt carry_in, literalt &carry_out);
 
   bvt negate(const bvt &op);
@@ -68,8 +94,14 @@ public:
     bool subtract,
     representationt rep);
 
-  bvt add(const bvt &op0, const bvt &op1) { return add_sub(op0, op1, false); }
-  bvt sub(const bvt &op0, const bvt &op1) { return add_sub(op0, op1, true); }
+  bvt add(const bvt &op0, const bvt &op1)
+  {
+    return add_sub(op0, op1, false);
+  }
+  bvt sub(const bvt &op0, const bvt &op1)
+  {
+    return add_sub(op0, op1, true);
+  }
 
   literalt overflow_add(const bvt &op0, const bvt &op1, representationt rep);
   literalt overflow_sub(const bvt &op0, const bvt &op1, representationt rep);
@@ -77,7 +109,11 @@ public:
 
   enum class shiftt
   {
-    SHIFT_LEFT, SHIFT_LRIGHT, SHIFT_ARIGHT, ROTATE_LEFT, ROTATE_RIGHT
+    SHIFT_LEFT,
+    SHIFT_LRIGHT,
+    SHIFT_ARIGHT,
+    ROTATE_LEFT,
+    ROTATE_RIGHT
   };
 
   static bvt shift(const bvt &op, const shiftt shift, std::size_t distance);
@@ -116,21 +152,14 @@ public:
     bvt &rem,
     representationt rep);
 
-  void signed_divider(
-    const bvt &op0,
-    const bvt &op1,
-    bvt &res,
-    bvt &rem);
+  void signed_divider(const bvt &op0, const bvt &op1, bvt &res, bvt &rem);
 
-  void non_restoring_divider(const bvt &op0, const bvt &op1, bvt &res, bvt &rem);
+  void
+  non_restoring_divider(const bvt &op0, const bvt &op1, bvt &res, bvt &rem);
   void restoring_divider(const bvt &op0, const bvt &op1, bvt &res, bvt &rem);
-  void unsigned_divider(
-    const bvt &op0,
-    const bvt &op1,
-    bvt &res,
-    bvt &rem);
+  void unsigned_divider(const bvt &op0, const bvt &op1, bvt &res, bvt &rem);
 
-  #ifdef COMPACT_EQUAL_CONST
+#ifdef COMPACT_EQUAL_CONST
   typedef std::set<bvt> equal_const_registeredt;
   equal_const_registeredt equal_const_registered;
   void equal_const_register(const bvt &var);
@@ -141,8 +170,7 @@ public:
 
   literalt equal_const_rec(bvt &var, bvt &constant);
   literalt equal_const(const bvt &var, const bvt &constant);
-  #endif
-
+#endif
 
   literalt equal(const bvt &op0, const bvt &op1);
 
@@ -152,35 +180,35 @@ public:
   }
 
   literalt is_zero(const bvt &op)
-  { return !prop.lor(op); }
+  {
+    return !prop.lor(op);
+  }
 
   literalt is_not_zero(const bvt &op)
-  { return prop.lor(op); }
+  {
+    return prop.lor(op);
+  }
 
   literalt is_int_min(const bvt &op)
   {
-    bvt tmp=op;
-    tmp[tmp.size()-1]=!tmp[tmp.size()-1];
+    bvt tmp = op;
+    tmp[tmp.size() - 1] = !tmp[tmp.size() - 1];
     return is_zero(tmp);
   }
 
   literalt is_one(const bvt &op);
 
   literalt is_all_ones(const bvt &op)
-  { return prop.land(op); }
+  {
+    return prop.land(op);
+  }
 
-  literalt lt_or_le(
-    bool or_equal,
-    const bvt &bv0,
-    const bvt &bv1,
-    representationt rep);
+  literalt
+  lt_or_le(bool or_equal, const bvt &bv0, const bvt &bv1, representationt rep);
 
   // id is one of ID_lt, le, gt, ge, equal, notequal
-  literalt rel(
-    const bvt &bv0,
-    irep_idt id,
-    const bvt &bv1,
-    representationt rep);
+  literalt
+  rel(const bvt &bv0, irep_idt id, const bvt &bv1, representationt rep);
 
   literalt unsigned_less_than(const bvt &bv0, const bvt &bv1);
   literalt signed_less_than(const bvt &bv0, const bvt &bv1);
@@ -244,33 +272,53 @@ protected:
   bool use_carry_save = false;
   bool use_comba = false;
   bool use_dadda = false;
-  bool use_simple_full_adder = false;
-  bool use_fa_g_only = false;
-  bool use_fa_tree_popcount = false;
   bool use_comba_carry_save = false;
   bool use_dadda_carry_save = false;
-  bool use_restoring_divider = false;
-  bool use_non_restoring_divider = false;
   bool use_hybrid_divider = false;
-  int radix_multiplier = 0; // 0=disabled, 4, 8, 16
-public:
-  void set_carry_save(bool b) { use_carry_save = b; }
-  void set_wallace_tree(bool b) { use_wallace_tree = b; }
-  void set_comba(bool b) { use_comba = b; }
-  bool get_comba() const { return use_comba; }
-  bool get_comba_carry_save() const { return use_comba_carry_save; }
-  bool get_dadda() const { return use_dadda; }
-  bool get_dadda_carry_save() const { return use_dadda_carry_save; }
-  void set_dadda(bool b) { use_dadda = b; }
-  void set_simple_full_adder(bool b) { use_simple_full_adder = b; }
-  void set_fa_g_only(bool b) { use_fa_g_only = b; }
-  void set_fa_tree_popcount(bool b) { use_fa_tree_popcount = b; }
-  void set_comba_carry_save(bool b) { use_comba_carry_save = b; }
-  void set_dadda_carry_save(bool b) { use_dadda_carry_save = b; }
-  void set_restoring_divider(bool b) { use_restoring_divider = b; }
-  void set_radix_multiplier(int r) { radix_multiplier = r; }
-protected:
 
+public:
+  void set_carry_save(bool b)
+  {
+    use_carry_save = b;
+  }
+  void set_wallace_tree(bool b)
+  {
+    use_wallace_tree = b;
+  }
+  void set_comba(bool b)
+  {
+    use_comba = b;
+  }
+  bool get_comba() const
+  {
+    return use_comba;
+  }
+  bool get_comba_carry_save() const
+  {
+    return use_comba_carry_save;
+  }
+  bool get_dadda() const
+  {
+    return use_dadda;
+  }
+  bool get_dadda_carry_save() const
+  {
+    return use_dadda_carry_save;
+  }
+  void set_dadda(bool b)
+  {
+    use_dadda = b;
+  }
+  void set_comba_carry_save(bool b)
+  {
+    use_comba_carry_save = b;
+  }
+  void set_dadda_carry_save(bool b)
+  {
+    use_dadda_carry_save = b;
+  }
+
+protected:
   /// Return the sum and carry-out when adding \p op0 and \p op1 under initial
   /// carry \p carry_in.
   [[nodiscard]] std::pair<bvt, literalt>
@@ -317,11 +365,9 @@ protected:
 
   [[nodiscard]] bvt adder_no_overflow(const bvt &op0, const bvt &op1);
 
-  bvt unsigned_multiplier_no_overflow(
-    const bvt &op0, const bvt &op1);
+  bvt unsigned_multiplier_no_overflow(const bvt &op0, const bvt &op1);
 
-  bvt signed_multiplier_no_overflow(
-    const bvt &op0, const bvt &op1);
+  bvt signed_multiplier_no_overflow(const bvt &op0, const bvt &op1);
 
   bvt cond_negate_no_overflow(const bvt &bv, const literalt cond);
 

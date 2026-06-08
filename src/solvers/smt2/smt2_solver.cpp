@@ -26,7 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream> // IWYU pragma: keep
 #include <iostream>
 
-class smt2_solvert:public smt2_parsert
+class smt2_solvert : public smt2_parsert
 {
 public:
   smt2_solvert(std::istream &_in, stack_decision_proceduret &_solver)
@@ -65,7 +65,7 @@ void smt2_solvert::define_constants()
     const irep_idt &identifier = id.first;
 
     // already done?
-    if(constants_done.find(identifier)!=constants_done.end())
+    if(constants_done.find(identifier) != constants_done.end())
       continue;
 
     constants_done.insert(identifier);
@@ -82,9 +82,9 @@ void smt2_solvert::expand_function_applications(exprt &expr)
   for(exprt &op : expr.operands())
     expand_function_applications(op);
 
-  if(expr.id()==ID_function_application)
+  if(expr.id() == ID_function_application)
   {
-    auto &app=to_function_application_expr(expr);
+    auto &app = to_function_application_expr(expr);
 
     if(app.function().id() == ID_symbol)
     {
@@ -125,7 +125,8 @@ void smt2_solvert::expand_function_applications(exprt &expr)
 void smt2_solvert::setup_commands()
 {
   {
-    commands["assert"] = [this]() {
+    commands["assert"] = [this]()
+    {
       exprt e = expression();
       if(e.is_not_nil())
       {
@@ -134,7 +135,8 @@ void smt2_solvert::setup_commands()
       }
     };
 
-    commands["check-sat"] = [this]() {
+    commands["check-sat"] = [this]()
+    {
       // add constant definitions as constraints
       define_constants();
 
@@ -156,7 +158,8 @@ void smt2_solvert::setup_commands()
       }
     };
 
-    commands["check-sat-assuming"] = [this]() {
+    commands["check-sat-assuming"] = [this]()
+    {
       std::vector<exprt> assumptions;
 
       if(next_token() != smt2_tokenizert::OPEN)
@@ -200,18 +203,19 @@ void smt2_solvert::setup_commands()
       solver.pop();
     };
 
-    commands["display"] = [this]() {
+    commands["display"] = [this]()
+    {
       // this is a command that Z3 appears to implement
       exprt e = expression();
       if(e.is_not_nil())
         std::cout << smt2_format(e) << '\n';
     };
 
-    commands["get-unsat-assumptions"] = [this]() {
-      throw error("not yet implemented");
-    };
+    commands["get-unsat-assumptions"] = [this]()
+    { throw error("not yet implemented"); };
 
-    commands["get-value"] = [this]() {
+    commands["get-value"] = [this]()
+    {
       std::vector<exprt> ops;
 
       if(next_token() != smt2_tokenizert::OPEN)
@@ -276,7 +280,8 @@ void smt2_solvert::setup_commands()
                 << '\n';
     };
 
-    commands["get-assignment"] = [this]() {
+    commands["get-assignment"] = [this]()
+    {
       // print satisfying assignment for all named expressions
 
       if(status != SAT)
@@ -306,7 +311,8 @@ void smt2_solvert::setup_commands()
       std::cout << ')' << '\n';
     };
 
-    commands["get-model"] = [this]() {
+    commands["get-model"] = [this]()
+    {
       // print a model for all identifiers
 
       if(status != SAT)
@@ -343,7 +349,8 @@ void smt2_solvert::setup_commands()
       std::cout << ')' << '\n';
     };
 
-    commands["simplify"] = [this]() {
+    commands["simplify"] = [this]()
+    {
       // this is a command that Z3 appears to implement
       exprt e = expression();
       if(e.is_not_nil())
@@ -525,22 +532,21 @@ int main(int argc, const char *argv[])
       reorder_vars = true;
     else if(std::string{argv[i]} == "--cadical")
       use_cadical = true;
-    else if(
-      std::string{argv[i]} == "--multiplier-encoding" && i + 1 < argc)
+    else if(std::string{argv[i]} == "--multiplier-encoding" && i + 1 < argc)
       multiplier_encoding = argv[++i];
     else if(filename == nullptr)
       filename = argv[i];
     else
     {
-      std::cerr
-        << "usage: smt2_solver [--cadical] [--multiplier-encoding ENC] "
-           "[--xor-gauss] [--reorder-vars] [file]\n";
+      std::cerr << "usage: smt2_solver [--cadical] [--multiplier-encoding ENC] "
+                   "[--xor-gauss] [--reorder-vars] [file]\n";
       return 1;
     }
   }
 
   if(filename == nullptr)
-    return solver(std::cin, xor_gauss, reorder_vars, use_cadical, multiplier_encoding);
+    return solver(
+      std::cin, xor_gauss, reorder_vars, use_cadical, multiplier_encoding);
 
   std::ifstream in(filename);
   if(!in)

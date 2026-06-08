@@ -6,21 +6,20 @@ Author: Michael Tautschnig
 
 \*******************************************************************/
 
-
 #ifndef CPROVER_SOLVERS_SAT_SATCHECK_CADICAL_H
 #define CPROVER_SOLVERS_SAT_SATCHECK_CADICAL_H
 
+#include <solvers/hardness_collector.h>
+
 #include "cnf.h"
 #include "xor_propagator.h"
-
-#include <solvers/hardness_collector.h>
 
 #include <memory>
 #include <vector>
 
 namespace CaDiCaL // NOLINT(readability/namespace)
 {
-  class Solver; // NOLINT(readability/identifiers)
+class Solver; // NOLINT(readability/identifiers)
 }
 
 class cadical_xor_propagator_simplet;
@@ -96,11 +95,16 @@ protected:
   std::size_t xor_constraint_limit = 10000;
   std::vector<bool> input_variables;
   bool renumber_variables = false;
-  public:
+
+public:
   int reorder_strategy = 0;
   int initial_phase = -1; // -1 = default
   std::vector<literalt> control_variables;
-  void mark_control_variable(literalt lit) override { control_variables.push_back(lit); }
+  void mark_control_variable(literalt lit) override
+  {
+    control_variables.push_back(lit);
+  }
+
 protected:
   std::vector<unsigned> var_map;  // old var_no -> new var_no
   std::vector<int> clause_buffer; // flat: lit lit ... 0 lit lit ... 0

@@ -112,12 +112,12 @@ void parse_solver_options(const cmdlinet &cmdline, optionst &options);
   "(external-sat-solver):"                                                     \
   "(no-sat-preprocessor)"                                                      \
   "(xor-gauss)"                                                                \
-  "(reorder-vars):"                                                             \
+  "(reorder-vars):"                                                            \
   "(adder-encoding):"                                                          \
-  "(multiplier-encoding):"                                                   \
-  "(comba-cs):"                                                              \
-  "(multiplier-adder):"                                                      \
-  "(sat-phase):"                                                             \
+  "(multiplier-encoding):"                                                     \
+  "(comba-cs):"                                                                \
+  "(multiplier-adder):"                                                        \
+  "(sat-phase):"                                                               \
   "(beautify)"                                                                 \
   "(dimacs)"                                                                   \
   "(refine)"                                                                   \

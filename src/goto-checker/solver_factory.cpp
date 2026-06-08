@@ -21,13 +21,13 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <goto-symex/solver_hardness.h>
 #include <solvers/flattening/bv_dimacs.h>
+#include <solvers/flattening/bv_utils.h>
 #include <solvers/prop/prop.h>
 #include <solvers/prop/solver_resource_limits.h>
 #include <solvers/refinement/bv_refinement.h>
 #include <solvers/sat/dimacs_cnf.h>
 #include <solvers/sat/external_sat.h>
 #include <solvers/sat/satcheck.h>
-#include <solvers/flattening/bv_utils.h>
 #include <solvers/smt2_incremental/smt2_incremental_decision_procedure.h>
 #include <solvers/smt2_incremental/smt_solver_process.h>
 #include <solvers/strings/string_refinement.h>
@@ -440,32 +440,6 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
         bv_utilst::adder_encodingt::ADAPTIVE);
   }
 
-  // Set simple full adder for reduction trees
-  if(options.is_set("multiplier-adder"))
-  {
-    const std::string &ma = options.get_option("multiplier-adder");
-    if(ma == "simple-fa")
-      bv_pointers->set_simple_full_adder(true);
-    else if(ma == "g-only-fa")
-      bv_pointers->set_fa_g_only(true);
-    else if(ma == "simple-fa+g")
-    {
-      bv_pointers->set_simple_full_adder(true);
-      bv_pointers->set_fa_g_only(true);
-    }
-    else if(ma == "radix4")
-      bv_pointers->set_radix_multiplier(4);
-    else if(ma == "radix8")
-      bv_pointers->set_radix_multiplier(8);
-    else if(ma == "fa-tree")
-      bv_pointers->set_fa_tree_popcount(true);
-    else if(ma == "fa-tree+g")
-    {
-      bv_pointers->set_fa_tree_popcount(true);
-      bv_pointers->set_fa_g_only(true);
-    }
-  }
-
   set_decision_procedure_time_limit(*bv_pointers);
 
   // Set adder encoding if specified
@@ -473,15 +447,12 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
   {
     const std::string &enc = options.get_option("adder-encoding");
     if(enc == "brent-kung")
-      bv_pointers->set_adder_encoding(
-        bv_utilst::adder_encodingt::BRENT_KUNG);
+      bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::BRENT_KUNG);
     else if(enc == "kogge-stone")
-      bv_pointers->set_adder_encoding(
-        bv_utilst::adder_encodingt::KOGGE_STONE);
+      bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::KOGGE_STONE);
     else if(enc == "bk-ripple-mult")
     {
-      bv_pointers->set_adder_encoding(
-        bv_utilst::adder_encodingt::BRENT_KUNG);
+      bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::BRENT_KUNG);
       bv_pointers->set_multiplier_adder_encoding(
         bv_utilst::adder_encodingt::RIPPLE_CARRY);
     }
@@ -490,22 +461,19 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
         bv_utilst::adder_encodingt::SIMPLE_RIPPLE_CARRY);
     else if(enc == "bk-simple-mult")
     {
-      bv_pointers->set_adder_encoding(
-        bv_utilst::adder_encodingt::BRENT_KUNG);
+      bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::BRENT_KUNG);
       bv_pointers->set_multiplier_adder_encoding(
         bv_utilst::adder_encodingt::SIMPLE_RIPPLE_CARRY);
     }
     else if(enc == "sbk-simple-mult")
     {
-      bv_pointers->set_adder_encoding(
-        bv_utilst::adder_encodingt::SPARSE_BK);
+      bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::SPARSE_BK);
       bv_pointers->set_multiplier_adder_encoding(
         bv_utilst::adder_encodingt::SIMPLE_RIPPLE_CARRY);
     }
     else if(enc == "sbk-ripple-mult")
     {
-      bv_pointers->set_adder_encoding(
-        bv_utilst::adder_encodingt::SPARSE_BK);
+      bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::SPARSE_BK);
       bv_pointers->set_multiplier_adder_encoding(
         bv_utilst::adder_encodingt::RIPPLE_CARRY);
     }
@@ -513,8 +481,7 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
       bv_pointers->set_adder_encoding(
         bv_utilst::adder_encodingt::LADNER_FISCHER);
     else if(enc == "han-carlson")
-      bv_pointers->set_adder_encoding(
-        bv_utilst::adder_encodingt::HAN_CARLSON);
+      bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::HAN_CARLSON);
     else if(enc == "minimal-ripple")
       bv_pointers->set_adder_encoding(
         bv_utilst::adder_encodingt::MINIMAL_RIPPLE);
@@ -526,49 +493,40 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
       bv_pointers->set_wallace_tree(true);
     else if(enc == "bk-carry-save")
     {
-      bv_pointers->set_adder_encoding(
-        bv_utilst::adder_encodingt::BRENT_KUNG);
+      bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::BRENT_KUNG);
       bv_pointers->set_carry_save(true);
     }
     else if(enc == "bk-wallace")
     {
-      bv_pointers->set_adder_encoding(
-        bv_utilst::adder_encodingt::BRENT_KUNG);
+      bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::BRENT_KUNG);
       bv_pointers->set_wallace_tree(true);
     }
     else if(enc == "g-mult")
     {
-      bv_pointers->set_adder_encoding(
-        bv_utilst::adder_encodingt::ADAPTIVE);
+      bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::ADAPTIVE);
       bv_pointers->set_multiplier_adder_encoding(
         bv_utilst::adder_encodingt::ADAPTIVE);
     }
     else if(enc == "bk-g-mult")
     {
-      bv_pointers->set_adder_encoding(
-        bv_utilst::adder_encodingt::BRENT_KUNG);
+      bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::BRENT_KUNG);
       bv_pointers->set_multiplier_adder_encoding(
         bv_utilst::adder_encodingt::ADAPTIVE);
     }
     else if(enc == "bk-minimal-mult")
     {
-      bv_pointers->set_adder_encoding(
-        bv_utilst::adder_encodingt::BRENT_KUNG);
+      bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::BRENT_KUNG);
       bv_pointers->set_multiplier_adder_encoding(
         bv_utilst::adder_encodingt::MINIMAL_RIPPLE);
     }
     else if(enc == "sparse-bk")
-      bv_pointers->set_adder_encoding(
-        bv_utilst::adder_encodingt::SPARSE_BK);
+      bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::SPARSE_BK);
     else if(enc == "cla")
-      bv_pointers->set_adder_encoding(
-        bv_utilst::adder_encodingt::CLA);
+      bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::CLA);
     else if(enc == "adaptive")
-      bv_pointers->set_adder_encoding(
-        bv_utilst::adder_encodingt::ADAPTIVE);
+      bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::ADAPTIVE);
     else if(enc == "sklansky")
-      bv_pointers->set_adder_encoding(
-        bv_utilst::adder_encodingt::SKLANSKY);
+      bv_pointers->set_adder_encoding(bv_utilst::adder_encodingt::SKLANSKY);
   }
 
   std::unique_ptr<boolbvt> boolbv = std::move(bv_pointers);
@@ -831,14 +789,18 @@ static void parse_sat_options(const cmdlinet &cmdline, optionst &options)
     options.set_option("xor-gauss", true);
 
   if(cmdline.isset("reorder-vars"))
-    options.set_option("reorder-vars", cmdline.isset("reorder-vars") ? cmdline.get_value("reorder-vars") : "0");
+    options.set_option(
+      "reorder-vars",
+      cmdline.isset("reorder-vars") ? cmdline.get_value("reorder-vars") : "0");
 
   if(cmdline.isset("adder-encoding"))
     options.set_option("adder-encoding", cmdline.get_value("adder-encoding"));
   if(cmdline.isset("multiplier-encoding"))
-    options.set_option("multiplier-encoding", cmdline.get_value("multiplier-encoding"));
+    options.set_option(
+      "multiplier-encoding", cmdline.get_value("multiplier-encoding"));
   if(cmdline.isset("multiplier-adder"))
-    options.set_option("multiplier-adder", cmdline.get_value("multiplier-adder"));
+    options.set_option(
+      "multiplier-adder", cmdline.get_value("multiplier-adder"));
   if(cmdline.isset("sat-phase"))
     options.set_option("sat-phase", cmdline.get_value("sat-phase"));
 }

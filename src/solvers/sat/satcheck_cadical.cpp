@@ -1,5 +1,5 @@
-#include <random>
 #include <algorithm>
+#include <random>
 /*******************************************************************\
 
 Module:
@@ -10,9 +10,8 @@ Author: Michael Tautschnig
 
 #ifdef HAVE_CADICAL
 
-#  include "satcheck_cadical.h"
-
 #  include "cadical_xor_propagator_simple.h"
+#  include "satcheck_cadical.h"
 // TEMP: using ExtProp
 #  include <cadical.hpp>
 // Native Gauss: uses // solver->add_xor() instead of ExternalPropagator
@@ -20,10 +19,10 @@ Author: Michael Tautschnig
 #  include <util/exception_utils.h>
 #  include <util/invariant.h>
 #  include <util/narrow.h>
-#  include <cstdlib>
 #  include <util/threeval.h>
 
 #  include <cadical.hpp>
+#  include <cstdlib>
 
 tvt satcheck_cadical_baset::l_get(literalt a) const
 {
@@ -40,9 +39,9 @@ tvt satcheck_cadical_baset::l_get(literalt a) const
     return tvt(tvt::tv_enumt::TV_UNKNOWN);
 
   const int val = solver->val(static_cast<int>(v), true);
-  if(val>0)
+  if(val > 0)
     result = tvt(!a.sign());
-  else if(val<0)
+  else if(val < 0)
     result = tvt(a.sign());
   else
     return tvt(tvt::tv_enumt::TV_UNKNOWN);
@@ -136,26 +135,9 @@ propt::resultt satcheck_cadical_baset::do_prop_solve(const bvt &assumptions)
     }
   }
 
-
   log.statistics() << (no_variables() - 1) << " variables, " << clause_counter
                    << " clauses" << messaget::eom;
 
-#if 0 // Requires custom CaDiCaL with decide_first
-  // Add priority decisions for control variables
-  for(const auto &lit : control_variables)
-  {
-    int d = lit.dimacs();
-    if(renumber_variables && !var_map.empty())
-    {
-      unsigned v = lit.var_no();
-      if(v < var_map.size())
-        d = lit.sign() ? -static_cast<int>(var_map[v])
-                       : static_cast<int>(var_map[v]);
-    }
-    solver->decide_first(d > 0 ? d : -d);
-  }
-
-#endif
   // if assumptions contains false, we need this to be UNSAT
   for(const auto &a : assumptions)
   {
@@ -183,8 +165,9 @@ propt::resultt satcheck_cadical_baset::do_prop_solve(const bvt &assumptions)
 
   // Connect XOR Gaussian elimination propagator if we have XOR constraints
   // and the feature is enabled via --xor-gauss (or CBMC_XOR_GAUSS env var).
-  if(!pending_xors.empty() &&
-     (std::getenv("CBMC_XOR_GAUSS") || xor_gauss_enabled))
+  if(
+    !pending_xors.empty() &&
+    (std::getenv("CBMC_XOR_GAUSS") || xor_gauss_enabled))
   {
     // Hybrid: native Gauss for fast propagation, ExternalPropagator for reasons
     // Using native CaDiCaL Gauss propagator
@@ -279,19 +262,24 @@ satcheck_cadical_baset::satcheck_cadical_baset(
   // enabled.
   solver->set("factor", 0);
   // Pass through CaDiCaL options from environment
-  if(const char *opts = std::getenv("CADICAL_OPTS")) {
+  if(const char *opts = std::getenv("CADICAL_OPTS"))
+  {
     std::string s(opts);
     size_t pos = 0;
-    while(pos < s.size()) {
+    while(pos < s.size())
+    {
       size_t eq = s.find('=', pos);
       size_t comma = s.find(',', pos);
-      if(eq != std::string::npos && (comma == std::string::npos || eq < comma)) {
+      if(eq != std::string::npos && (comma == std::string::npos || eq < comma))
+      {
         std::string key = s.substr(pos, eq - pos);
         size_t end = (comma != std::string::npos) ? comma : s.size();
         int val = std::stoi(s.substr(eq + 1, end - eq - 1));
         solver->set(key.c_str(), val);
         pos = (comma != std::string::npos) ? comma + 1 : s.size();
-      } else break;
+      }
+      else
+        break;
     }
   }
   // Phase will be set via set_phase() before solving
@@ -358,7 +346,8 @@ void satcheck_cadical_baset::build_variable_map()
       unsigned next_id = old_n; // continue from where we left off
       // Find actual max ID used
       for(unsigned v = 1; v < old_n; ++v)
-        if(var_map[v] > next_id) next_id = var_map[v];
+        if(var_map[v] > next_id)
+          next_id = var_map[v];
       next_id++;
       var_map.resize(n, 0);
       for(unsigned v = old_n; v < n; ++v)
@@ -378,12 +367,17 @@ void satcheck_cadical_baset::build_variable_map()
     for(unsigned v = 1; v < n; ++v)
     {
       bool is_input = v < input_variables.size() && input_variables[v];
-      if(!is_input) { var_map[v] = next_id++; ++num_aux; }
+      if(!is_input)
+      {
+        var_map[v] = next_id++;
+        ++num_aux;
+      }
     }
     for(unsigned v = 1; v < n; ++v)
     {
       bool is_input = v < input_variables.size() && input_variables[v];
-      if(is_input) var_map[v] = next_id++;
+      if(is_input)
+        var_map[v] = next_id++;
     }
   }
   else if(reorder_strategy == 1)
@@ -393,12 +387,17 @@ void satcheck_cadical_baset::build_variable_map()
     for(unsigned v = n - 1; v >= 1; --v)
     {
       bool is_input = v < input_variables.size() && input_variables[v];
-      if(!is_input) { var_map[v] = next_id++; ++num_aux; }
+      if(!is_input)
+      {
+        var_map[v] = next_id++;
+        ++num_aux;
+      }
     }
     for(unsigned v = 1; v < n; ++v)
     {
       bool is_input = v < input_variables.size() && input_variables[v];
-      if(is_input) var_map[v] = next_id++;
+      if(is_input)
+        var_map[v] = next_id++;
     }
   }
   else if(reorder_strategy == 2)
@@ -407,12 +406,19 @@ void satcheck_cadical_baset::build_variable_map()
     for(unsigned v = 1; v < n; ++v)
     {
       bool is_input = v < input_variables.size() && input_variables[v];
-      if(is_input) { var_map[v] = next_id++; }
+      if(is_input)
+      {
+        var_map[v] = next_id++;
+      }
     }
     for(unsigned v = 1; v < n; ++v)
     {
       bool is_input = v < input_variables.size() && input_variables[v];
-      if(!is_input) { var_map[v] = next_id++; ++num_aux; }
+      if(!is_input)
+      {
+        var_map[v] = next_id++;
+        ++num_aux;
+      }
     }
   }
   else if(reorder_strategy == 3)
@@ -421,7 +427,8 @@ void satcheck_cadical_baset::build_variable_map()
     for(unsigned v = 1; v < n; ++v)
     {
       bool is_input = v < input_variables.size() && input_variables[v];
-      if(is_input) var_map[v] = next_id++;
+      if(is_input)
+        var_map[v] = next_id++;
     }
   }
   else if(reorder_strategy == 4)
@@ -436,13 +443,14 @@ void satcheck_cadical_baset::build_variable_map()
     {
       var_map[v] = ids[v - 1];
       bool is_input = v < input_variables.size() && input_variables[v];
-      if(!is_input) ++num_aux;
+      if(!is_input)
+        ++num_aux;
     }
   }
 
   log.statistics() << "Variable renumbering (strategy " << reorder_strategy
-                   << "): " << num_aux << " aux, "
-                   << (n - 1 - num_aux) << " input" << messaget::eom;
+                   << "): " << num_aux << " aux, " << (n - 1 - num_aux)
+                   << " input" << messaget::eom;
 }
 
 int satcheck_cadical_baset::remap_dimacs(int dimacs_lit) const
