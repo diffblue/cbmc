@@ -1452,6 +1452,11 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
               already_typechecked_exprt::make_already_typechecked(
                 function_call);
               to_multi_ary_expr(expr).op0().swap(function_call);
+              // Leave operator->'s class scope before type-checking the
+              // ensuing member access, so it is access-checked at the
+              // actual point of use rather than from within the class
+              // that defines operator->.
+              save_scope.restore();
               typecheck_expr(expr);
               return true;
             }
