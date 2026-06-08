@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 
 #include <algorithm>
+#include <map>
 #include <set>
 
 // Recursion guard for `alignment`.  The public entry wraps a call
@@ -42,18 +43,21 @@ Author: Daniel Kroening, kroening@kroening.com
 static bytest alignment_rec(
   const typet &type,
   const namespacet &ns,
-  std::set<irep_idt> &in_progress);
+  std::set<irep_idt> &in_progress,
+  std::map<irep_idt, bytest> &done);
 
 bytest alignment(const typet &type, const namespacet &ns)
 {
   std::set<irep_idt> in_progress;
-  return alignment_rec(type, ns, in_progress);
+  std::map<irep_idt, bytest> done;
+  return alignment_rec(type, ns, in_progress, done);
 }
 
 static bytest alignment_rec(
   const typet &type,
   const namespacet &ns,
-  std::set<irep_idt> &in_progress)
+  std::set<irep_idt> &in_progress,
+  std::map<irep_idt, bytest> &done)
 {
   // we need to consider a number of different cases:
   // - alignment specified in the source, which will be recorded in
@@ -91,13 +95,14 @@ static bytest alignment_rec(
   bytest result{1};
 
   if(type.id()==ID_array)
-    result = alignment_rec(to_array_type(type).element_type(), ns, in_progress);
+    result =
+      alignment_rec(to_array_type(type).element_type(), ns, in_progress, done);
   else if(type.id()==ID_struct || type.id()==ID_union)
   {
     // get the max
     // (should really be the smallest common denominator)
     for(const auto &c : to_struct_union_type(type).components())
-      result = std::max(result, alignment_rec(c.type(), ns, in_progress));
+      result = std::max(result, alignment_rec(c.type(), ns, in_progress, done));
   }
   else if(type.id()==ID_unsignedbv ||
           type.id()==ID_signedbv ||
@@ -109,40 +114,65 @@ static bytest alignment_rec(
     result = *pointer_offset_size(type, ns);
   }
   else if(type.id()==ID_c_enum)
-    result =
-      alignment_rec(to_c_enum_type(type).underlying_type(), ns, in_progress);
+    result = alignment_rec(
+      to_c_enum_type(type).underlying_type(), ns, in_progress, done);
   else if(type.id()==ID_c_enum_tag)
   {
+    // The (per-use) alignment/packing adjustment below depends only on
+    // this node's ID_C_alignment/ID_C_packed, so memoize the tag's pure
+    // alignment to avoid re-following the same tag exponentially through
+    // a shared (DAG-shaped) type graph.
     const irep_idt &id = to_c_enum_tag_type(type).get_identifier();
-    if(!in_progress.insert(id).second)
+    auto cached = done.find(id);
+    if(cached != done.end())
+      result = cached->second;
+    else if(!in_progress.insert(id).second)
       return bytest{1}; // cycle: conservative min alignment
-    result =
-      alignment_rec(ns.follow_tag(to_c_enum_tag_type(type)), ns, in_progress);
-    in_progress.erase(id);
+    else
+    {
+      result = alignment_rec(
+        ns.follow_tag(to_c_enum_tag_type(type)), ns, in_progress, done);
+      in_progress.erase(id);
+      done.insert_or_assign(id, result);
+    }
   }
   else if(type.id() == ID_struct_tag)
   {
     const irep_idt &id = to_struct_tag_type(type).get_identifier();
-    if(!in_progress.insert(id).second)
+    auto cached = done.find(id);
+    if(cached != done.end())
+      result = cached->second;
+    else if(!in_progress.insert(id).second)
       return bytest{1}; // cycle: conservative min alignment
-    result =
-      alignment_rec(ns.follow_tag(to_struct_tag_type(type)), ns, in_progress);
-    in_progress.erase(id);
+    else
+    {
+      result = alignment_rec(
+        ns.follow_tag(to_struct_tag_type(type)), ns, in_progress, done);
+      in_progress.erase(id);
+      done.insert_or_assign(id, result);
+    }
   }
   else if(type.id() == ID_union_tag)
   {
     const irep_idt &id = to_union_tag_type(type).get_identifier();
-    if(!in_progress.insert(id).second)
+    auto cached = done.find(id);
+    if(cached != done.end())
+      result = cached->second;
+    else if(!in_progress.insert(id).second)
       return bytest{1}; // cycle: conservative min alignment
-    result =
-      alignment_rec(ns.follow_tag(to_union_tag_type(type)), ns, in_progress);
-    in_progress.erase(id);
+    else
+    {
+      result = alignment_rec(
+        ns.follow_tag(to_union_tag_type(type)), ns, in_progress, done);
+      in_progress.erase(id);
+      done.insert_or_assign(id, result);
+    }
   }
   else if(type.id()==ID_c_bit_field)
   {
     // we align these according to the 'underlying type'
     result = alignment_rec(
-      to_c_bit_field_type(type).underlying_type(), ns, in_progress);
+      to_c_bit_field_type(type).underlying_type(), ns, in_progress, done);
   }
 
   // if an alignment had been provided and packing was requested, take
