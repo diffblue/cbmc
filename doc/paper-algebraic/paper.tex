@@ -42,8 +42,9 @@ procedure for universally-quantified equalities of polynomial
 expressions in $\mathbb{Z}_{2^d}$, combining a strong Gr\"obner
 basis solver (ideal membership) with a vanishing-polynomial test
 using falling factorials and Kronecker-product Stirling matrices
-(function equivalence). On the 210-benchmark random-polynomial
-sample of Brain~\cite{brain2025subpoly} the procedure decides 4
+(function equivalence). On the full random-polynomial
+suite of Brain~\cite{brain2025subpoly} (3498 benchmarks) the
+procedure decides 59
 benchmarks at degree $\geq 13$ that Bitwuzla, cvc5, and every
 bit-blasting configuration we evaluated time out on within
 10\,s; on 5 DSP datapath equivalences with overflow
@@ -185,8 +186,8 @@ existential & relational              & overflow witness           & companion p
 \end{enumerate}
 
 \paragraph{Empirical results.}
-On the 210-benchmark random-polynomial sample of
-Brain~\cite{brain2025subpoly}, the procedure decides 4
+On the full random-polynomial suite of
+Brain~\cite{brain2025subpoly} (3498 benchmarks), the procedure decides 59
 benchmarks at degree $\geq 13$ that Bitwuzla 0.9.0-dev,
 cvc5 1.3.3, and every bit-blasting configuration we tested time
 out on within 10\,s (Section~\ref{sec:eval-random-poly}). On 5
@@ -205,7 +206,7 @@ and overflow checking the procedure is bitwidth-independent
 (2--5\,ms from BW=8 to 256), matching Bitwuzla's word-level
 rewriting and outpacing pure bit-blasting (which times out at
 BW=16). On the same random-polynomial sample, Bitwuzla
-solves 183/210 to our 133/210: its
+solves 3021/3498 to our 2128/3498: its
 occurrence-map canonicalisation closes most queries
 syntactically and constructs witnesses for the
 existential-equational SAT-direction queries that our
@@ -689,6 +690,54 @@ speedups on four benchmarks, while \combacs at layer 4 adds the
 final 2$\times$ on bf16 but solves no new instances on this
 subset.
 
+\paragraph{Per-tweak (leave-one-out) ablation.}
+The layer ablation above collapses the algebraic procedure into a
+single layer. To quantify the \emph{individual} algebraic tweaks we
+ran a leave-one-out ablation on a 26-benchmark subset spanning all
+five benchmark sets (custom/DSP, the SMT-COMP algebra unlocks,
+SABER, and the random-polynomial suite): starting from the full
+configuration we disabled one tweak at a time and recorded how many
+benchmarks remain solved (\cadical, 60\,s T/O).
+
+\begin{table}[ht]
+\caption{Leave-one-out ablation of the algebraic tweaks on a
+26-benchmark cross-suite subset (\cadical, 60\,s T/O). ``Lost''
+lists benchmarks the full configuration solves that the ablated
+configuration no longer does.}
+\label{tab:tweak-ablation}
+\centering
+\small
+\begin{tabular}{lrl}
+\toprule
+Configuration & Solved & Benchmarks lost vs full \\
+\midrule
+full (all tweaks)        & 25/26 & --- \\
+$-$ Tseitin propagation  & 21/26 & 4 wienand (commute08/16/32, distrib08) \\
+$-$ vanishing test       & 22/26 & 2 mult.\ identities, \texttt{dsp\_image\_reject} \\
+$-$ tree walk            & 24/26 & \texttt{geo3.c\_5} (let-wrapped) \\
+$-$ F4 interreduction    & 25/26 & --- (time only) \\
+$-$ deferred bit-blasting& 25/26 & --- (time only) \\
+$-$ if-case elimination  & 25/26 & --- (time only) \\
+$-$ nonzero fast-path    & 25/26 & --- (time only) \\
+reverse GB ordering      & 25/26 & --- (time only) \\
+$-$ entire algebraic layer & 14/26 & all 11 algebra-decided \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Three tweaks are load-bearing for \emph{solvability} on this
+subset: Tseitin propagation (the four wienand
+commutativity/distributivity benchmarks, whose polynomial
+disequality is buried in a Tseitin chain), the
+vanishing-polynomial test (two multiplication identities and
+\texttt{dsp\_image\_reject}), and the boolean tree walk (the
+let-wrapped \texttt{geo3.c\_5}). The finer tweaks --- F4
+interreduction, deferred bit-blasting, if-case elimination, the
+nonzero fast-path, and Gr\"obner pair ordering --- do not change
+\emph{which} benchmarks are solved on this subset; their effect is
+on running time. Disabling the algebraic layer entirely loses all
+11 algebra-decided benchmarks, falling back to bit-blasting.
+
 The Gr\"obner basis computation is bitwidth-independent: commutativity
 at BW=32 takes the same 0.3\,ms as BW=16. For the
 \texttt{smt2\_solver} (which lacks word-level simplification), inline
@@ -1168,7 +1217,7 @@ global basis; if zero, the basis implies $\textit{lhs} =
 \textit{rhs}$ and the formula is unsat) is implemented behind
 \texttt{ENABLE\_GB\_EXPR\_NORMALISE} and \emph{empirically null}:
 on a 315-benchmark sample (the 39-benchmark custom suite,
-Martin's 210-benchmark subpolynomial sample, and the SMT-COMP
+a 210-benchmark subpolynomial sample, and the SMT-COMP
 QF\_BV 66-benchmark stratified sample) the variant changes the
 verdict on zero benchmarks. The analytical reason is that
 CBMC's typical SMT query has a single top-level disequality
@@ -1391,15 +1440,15 @@ without requiring a matrix kernel implementation. The
 \paragraph{Combined effect.}
 The six steps (Phases~2.5, 2.6, A.1, A.2, A.3, F4) preserve all
 previously-solved benchmarks
-(zero regressions on the 691 existing regression tests, the
-210 random-polynomial sample, and the 66 SMT-COMP stratified
+(zero regressions on the existing regression tests, the
+full random-polynomial suite, and the 66 SMT-COMP stratified
 sample) and unlock eight new benchmarks on the SMT-COMP sample
-($33/66 \to 41/66$, see Table~\ref{tab:smtcomp-sample}; PAR-2
-improves from $63.5$\,s/benchmark to $46.8$\,s/benchmark, the
+($37/66 \to 43/66$, see Table~\ref{tab:smtcomp-sample}; PAR-2
+improves from $57.1$\,s/benchmark to $44.8$\,s/benchmark, the
 latter ahead of cvc5's $52.6$). On
-Brain's 210-benchmark random-polynomial sample, the algebraic
-configuration solves $133/210$ (was $128/210$ in our prior
-measurement, see Table~\ref{tab:random-poly-solved}). The four
+Brain's full random-polynomial suite, the algebraic
+configuration solves $2128/3498$ (see
+Table~\ref{tab:random-poly-solved}). The 59
 wins-beyond-all-current-solvers
 (Table~\ref{tab:random-poly-wins}) are decided $10\times$
 faster on average due to Phase~A.1's pair selection. Each step
@@ -1418,9 +1467,9 @@ can disable any subset for measurement.
 We evaluate on five benchmark pools, organised by the role each
 plays in the contribution narrative. \emph{Pools where the
 algebraic procedure decides queries no current solver decides:}
-the 210-benchmark random-polynomial sample of
-Brain~\cite{brain2025subpoly} (Section~\ref{sec:eval-random-poly}),
-which contributes the four wins beyond Bitwuzla, cvc5, and every
+the full random-polynomial suite of
+Brain~\cite{brain2025subpoly} (3498 benchmarks, Section~\ref{sec:eval-random-poly}),
+which contributes the 59 wins beyond Bitwuzla, cvc5, and every
 bit-blasting configuration we tested; and 5 DSP datapath
 equivalences (Section~\ref{sec:eval-dsp}) where overflow
 cancellation makes the vanishing-polynomial test necessary.
@@ -1446,14 +1495,14 @@ prime-order fields, not QF\_BV). All experiments run under a
 6\,GB memory limit, except the random-polynomial suite which uses
 10\,s to match the prior comparison.
 
-\subsection{Random Polynomial Identity Suite (210 benchmarks)}
+\subsection{Random Polynomial Identity Suite (full suite, 3498 benchmarks)}
 \label{sec:eval-random-poly}
 
-We evaluate on a stratified sample of 210 benchmarks from the
-random polynomial benchmark suite of
-Brain~\cite{brain2025subpoly}, drawn across two random seeds and
-eight categories. The benchmarks test arithmetic identities at
-random polynomial degrees 2--53 over bitwidths 8, 16, 32, 64.
+We evaluate on the \emph{entire} random polynomial benchmark
+suite of Brain~\cite{brain2025subpoly} --- all 3498 benchmarks
+across two random seeds and eight categories (no sampling). The
+benchmarks test arithmetic identities at random polynomial
+degrees 2--53 over bitwidths 8, 16, 32, 64.
 Categories cover universal-equational identities (addition,
 multiplication, encoding-correctness), existential-equational
 SAT-direction queries (equality, nonequality), and bounded /
@@ -1461,75 +1510,78 @@ identity-point / root-finding queries. Five configurations
 were measured under a 10\,s wall-clock budget per benchmark:
 two pure-bit-blasting baselines (shift-add, Comba/CS), the
 algebraic procedure of this work (Comba/CS plus the algebraic
-layer), Bitwuzla 0.9.0-dev, and cvc5 1.3.3.
+layer), Bitwuzla 0.9.0-dev, and cvc5 1.3.3. Across all 3498
+benchmarks and all five configurations we observed \emph{no}
+\texttt{sat}-vs-\texttt{unsat} disagreement, and no verdict
+contradicting a benchmark's declared \texttt{:status}.
 
 \begin{table}[ht]
-\caption{Solved counts on the 210-benchmark random-polynomial
-sample, 10\,s wall-clock budget per benchmark.}
+\caption{Solved counts on the full 3498-benchmark
+random-polynomial suite, 10\,s wall-clock budget per benchmark.}
 \label{tab:random-poly-solved}
 \centering
 \begin{tabular}{lr}
 \toprule
-Configuration                       & Solved / 210 \\
+Configuration                       & Solved / 3498 \\
 \midrule
-shift-add bit-blasting              & 117 \\
-Comba/CS bit-blasting               & 117 \\
-\textbf{this paper} (algebraic)     & \textbf{133} \\
-Bitwuzla 0.9.0-dev                  & 183 \\
-cvc5 1.3.3                          & 167 \\
+shift-add bit-blasting              & 1972 \\
+Comba/CS bit-blasting               & 1970 \\
+\textbf{this paper} (algebraic)     & \textbf{2128} \\
+Bitwuzla 0.9.0-dev                  & 3021 \\
+cvc5 1.3.3                          & 2678 \\
 \midrule
-union (any configuration)           & 189 \\
+union (any configuration)           & 3104 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Bitwuzla wins the volume contest by 50 over our procedure: its
+Bitwuzla wins the volume contest by 893 over our procedure: its
 occurrence-map canonicalisation closes most universal-equational
 queries syntactically, and on the existential-equational
 SAT-direction queries (equality, nonequality) it constructs
 witnesses that our UNSAT-oriented $2^{d-1}$ encoding cannot.
 The contribution we claim, however, is not volume but
-\emph{completeness}: the algebraic procedure decides 4 benchmarks
+\emph{completeness}: the algebraic procedure decides 59 benchmarks
 that no current SMT solver and no bit-blasting configuration
 solves within 10\,s.
 
 \paragraph{Wins beyond all current solvers.}
 \begin{table}[ht]
-\caption{Four random-polynomial benchmarks decided by our
-procedure that Bitwuzla, cvc5, and every bit-blasting
-configuration time out on within 10\,s. Times in seconds.}
+\caption{Random-polynomial benchmarks decided by our procedure
+that Bitwuzla, cvc5, and \emph{every} bit-blasting configuration
+time out on within 10\,s, by category (full suite).}
 \label{tab:random-poly-wins}
 \centering
 \small
 \begin{tabular}{lr}
 \toprule
-Benchmark (seed-23) & this paper \\
+Category & wins beyond all solvers \\
 \midrule
-\texttt{bw-16-deg-13-multiplication-reduced-native-encoding}    & 0.03 \\
-\texttt{bw-16-deg-23-correctness-original-vs-reduced-native-encoding} & 0.04 \\
-\texttt{bw-32-deg-19-multiplication-reduced-native-encoding}    & 0.20 \\
-\texttt{bw-32-deg-27-correctness-original-vs-reduced-native-encoding} & 0.15 \\
+multiplication & 30 \\
+correctness    & 20 \\
+addition       & 9 \\
+\midrule
+\textbf{total} & \textbf{59} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The four wins are universal-equational identities at degree
-13--27, two at BW=16 and two at BW=32. The Gr\"obner-basis
-solver dispatches them in 0.3--3.7\,s; bit-blasting cannot
-encode the multiplications, and Bitwuzla's / cvc5's word-level
-rewriting does not have rules for the relevant high-degree
-expansions.
+All 59 wins are universal-equational identities (multiplication,
+encoding-correctness, addition); the Gr\"obner-basis solver
+dispatches them while bit-blasting cannot encode the
+multiplications and Bitwuzla's / cvc5's word-level rewriting
+lacks rules for the relevant high-degree expansions.
 
 A weaker but still meaningful claim is the gap to bit-blasting
-alone: 18 benchmarks are decided by our procedure that no
+alone: 257 benchmarks are decided by our procedure that no
 bit-blasting configuration we tested solves within 10\,s,
-including the four above plus 14 that Bitwuzla also solves via
-word-level rewriting. The 18-vs-bit-blasting and 4-vs-everyone
-numbers measure two different things: the former reflects what
-algebraic reasoning offers over bit-blasting alone, the latter
-measures contributions beyond \emph{all} current SMT
-infrastructure. We report both because the SMT user has both
-options available.
+including the 59 above plus 198 that Bitwuzla and/or cvc5 also
+solve via word-level rewriting. The 257-vs-bit-blasting and
+59-vs-everyone numbers measure two different things: the former
+reflects what algebraic reasoning offers over bit-blasting
+alone, the latter measures contributions beyond \emph{all}
+current SMT infrastructure. We report both because the SMT user
+has both options available.
 
 \paragraph{Per-category breakdown.}
 The win pattern is structured by the four-classes taxonomy
@@ -1544,8 +1596,8 @@ root-finding) it ties pure bit-blasting because the algebraic
 layer falls through.
 
 \begin{table}[ht]
-\caption{Per-category solved counts on the random-polynomial
-sample. The taxonomy class predicts the win pattern: the
+\caption{Per-category solved counts on the full random-polynomial
+suite. The taxonomy class predicts the win pattern: the
 algebraic procedure beats pure bit-blasting on the
 universal-equational categories, ties on the
 non-strictly-equational categories, and loses on the
@@ -1558,29 +1610,26 @@ existential-equational SAT-direction categories.}
 Class & Category & shift-add & Comba/CS & this paper & Bitwuzla & cvc5 \\
 \midrule
 \multicolumn{7}{l}{\emph{Universal-equational (algebraic dominates pure bit-blasting)}} \\
-& addition       & 4/20  & 4/20  & \textbf{11/20} & 17/20 & 17/20 \\
-& multiplication & 3/20  & 3/20  & \textbf{11/20} & 14/20 & 8/20 \\
-& correctness    & 8/30  & 8/30  & \textbf{11/30} & 14/30 & 12/30 \\
+& addition       & 64/288  & 64/288  & \textbf{166/288} & 227/288 & 215/288 \\
+& multiplication & 62/288  & 62/288  & \textbf{167/288} & 192/288 & 114/288 \\
+& correctness    & 108/438 & 109/438 & \textbf{155/438} & 180/438 & 162/438 \\
 \midrule
 \multicolumn{7}{l}{\emph{Existential-equational SAT-direction (bit-blasting dominates)}} \\
-& equality       & \textbf{11/20} & \textbf{11/20} & \textbf{11/20} & 20/20 & 19/20 \\
-& nonequality    & \textbf{14/20} & \textbf{14/20} & 6/20  & 20/20 & 19/20 \\
+& equality       & 183/292 & 183/292 & 183/292 & 292/292 & 270/292 \\
+& nonequality    & \textbf{188/292} & \textbf{188/292} & 95/292  & 292/292 & 270/292 \\
 \midrule
 \multicolumn{7}{l}{\emph{Non-strictly-equational (algebraic ties bit-blasting)}} \\
-& bounding       & 16/20 & 16/20 & 16/20 & 20/20 & 20/20 \\
-& identity-point & 30/40 & 30/40 & 30/40 & 40/40 & 37/40 \\
-& root-finding   & 31/40 & 31/40 & 31/40 & 38/40 & 35/40 \\
+& bounding       & 241/292 & 241/292 & 240/292 & 292/292 & 285/292 \\
+& identity-point & 542/804 & 543/804 & 542/804 & 778/804 & 680/804 \\
+& root-finding   & 584/804 & 580/804 & 580/804 & 768/804 & 682/804 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-We sanity-checked correctness on three benchmarks (one
-\texttt{sat}, one \texttt{unsat}, one with mixed expected
-behaviour) by running all five configurations and confirming
-three-way agreement; we observed no \texttt{sat}-vs-\texttt{unsat}
-disagreements between our procedure and the external solvers
-across the 121 benchmarks both Bitwuzla and our procedure
-solved within budget.
+We cross-checked soundness exhaustively: across all 3498
+benchmarks and all five configurations there was \emph{no}
+\texttt{sat}-vs-\texttt{unsat} disagreement, and no verdict
+contradicted a benchmark's declared \texttt{:status}.
 
 \subsection{DSP Datapath Equivalence (5 benchmarks)}
 \label{sec:eval-dsp}
@@ -1946,8 +1995,8 @@ timeout.
 \toprule
 Configuration & Solved & PAR-2 (s/benchmark) \\
 \midrule
-shift-add (bit-blasting only) & 34/66 & 63.1 \\
-\cbmc default (algebraic + \combacs) & \textbf{41/66} & \textbf{46.8} \\
+shift-add (bit-blasting only) & 37/66 & 57.1 \\
+\cbmc default (algebraic + \combacs) & \textbf{43/66} & \textbf{44.8} \\
 cvc5 default & 38/66 & 52.6 \\
 Bitwuzla default & \textbf{52/66} & \textbf{28.7} \\
 \bottomrule
@@ -1955,8 +2004,8 @@ Bitwuzla default & \textbf{52/66} & \textbf{28.7} \\
 \end{table}
 
 On the stratified sample Bitwuzla solves the most benchmarks
-(52), followed by \cbmc default (41), cvc5 (38), and shift-add
-\cbmc (34). \cbmc's default configuration overtakes cvc5 on
+(52), followed by \cbmc default (43), cvc5 (38), and shift-add
+\cbmc (37). \cbmc's default configuration overtakes cvc5 on
 this sample, primarily through the Phase~2.5/2.6/A.1/A.2/A.3
 techniques and F4-style tail reduction described in
 Section~\ref{sec:algebraic-tuning} below: parse-time
