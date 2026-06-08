@@ -1454,10 +1454,13 @@ The six steps (Phases~2.5, 2.6, A.1, A.2, A.3, F4) preserve all
 previously-solved benchmarks
 (zero regressions on the existing regression tests, the
 full random-polynomial suite, and the 66 SMT-COMP stratified
-sample) and unlock eight new benchmarks on the SMT-COMP sample
-($37/66 \to 42/66$, see Table~\ref{tab:smtcomp-sample}; PAR-2
+sample) and improve on the shift-add baseline on the SMT-COMP
+sample from $37/66$ to $42/66$ --- deciding eight benchmarks
+bit-blasting cannot, while bit-blasting in turn decides three
+that the algebraic configuration times out on (net $+5$; see
+Table~\ref{tab:smtcomp-sample}). PAR-2
 improves from $57.1$\,s/benchmark to $45.8$\,s/benchmark, the
-latter ahead of cvc5's $52.6$). On
+latter ahead of cvc5's $52.6$. On
 Brain's full random-polynomial suite, the algebraic
 configuration solves $2128/3498$ (see
 Table~\ref{tab:random-poly-solved}). The 59
@@ -2983,12 +2986,15 @@ testing did not catch (a 2{,}000$\times$ ordering sensitivity
 and a 2-trick progress-tracking gap), and led us to adopt an
 explicit-invariant pattern in cross-references
 (\texttt{ASSUMES:} / \texttt{MAINTAINED BY:}). The same
-discipline, combined with a corpus-scale differential sweep,
-later caught a third bug --- a deferred-replay ordering issue in
+discipline, combined with a corpus-scale differential sweep
+against external oracles, later caught further integration bugs
+that unit and regression tests missed (Section~\ref{sec:threats})
+--- most tellingly a deferred-replay issue in
 which the abstract equivalence proof's faithfulness assumption
 (``the verdict depends on the committed set, not its order'') was
 not maintained by the implementation --- which we expect the
-pattern to catch in other formalisation efforts.
+pattern, and routine differential testing, to catch in other
+formalisation efforts.
 
 The procedure addresses the universal-equational class with
 polynomial expressions; queries with bitwise operations, shifts,
