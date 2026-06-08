@@ -360,6 +360,18 @@ protected:
     const struct_union_typet::componentt &component,
     const struct_union_typet &struct_union_type);
 
+  /// Check that the default constructor selected to default-initialize a
+  /// class-type non-static data member is accessible in the context of
+  /// the mem-initializer ([class.base.init]/12, [class.access.base]).
+  /// \p member_type is the member's declared type; arrays are checked
+  /// element-wise.  \p naming_scope is the point of use (the constructor's
+  /// class), from which accessibility is judged.  Throws a diagnostic if
+  /// the selected default constructor is inaccessible.
+  void check_member_default_ctor_access(
+    const typet &member_type,
+    const source_locationt &source_location,
+    cpp_scopet *naming_scope);
+
   void full_member_initialization(
     const struct_union_typet &struct_union_type,
     irept &initializers);

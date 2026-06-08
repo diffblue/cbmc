@@ -2816,8 +2816,21 @@ bool cpp_typecheckt::check_component_access(
       if(access != ID_noaccess && pscope->identifier == struct_identifier)
         return false; // ok
 
-      const struct_typet &scope_struct =
-        to_struct_type(lookup(pscope->identifier).type);
+      // The enclosing class may still be mid-elaboration (e.g. while
+      // instantiating its constructor); without a complete struct
+      // definition the derived-from relationships below cannot be
+      // evaluated, so move on to the enclosing scope.
+      const symbolt &scope_symbol = lookup(pscope->identifier);
+      if(
+        scope_symbol.type.id() != ID_struct ||
+        to_struct_type(scope_symbol.type).is_incomplete())
+      {
+        if(config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP11)
+          continue;
+        break;
+      }
+
+      const struct_typet &scope_struct = to_struct_type(scope_symbol.type);
 
       const bool derived_from_object =
         subtype_typecast(scope_struct, to_struct_type(struct_union_type));

@@ -1,0 +1,12 @@
+CORE
+main.cpp
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+^.*' is not accessible$
+A class that is a friend of the member's type may default-initialize a
+member whose default constructor is private (class.access.base): this
+must be accepted.
