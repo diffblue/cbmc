@@ -1,0 +1,7 @@
+CORE
+bit-to-fp-bad-width.smt2
+
+^EXIT=20$
+^SIGNAL=0$
+^\(error "line 7: to_fp bit-pattern reinterpretation expects a bit-vector operand of width 64"\)$
+--

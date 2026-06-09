@@ -737,7 +737,43 @@ exprt smt2_parsert::function_application()
           // width_f *includes* the hidden bit
           const ieee_float_spect spec(width_f - 1, width_e);
 
-          auto rounding_mode = expression();
+          auto first_operand = expression();
+
+          // The SMT-LIB FloatingPoint theory gives `to_fp` several
+          // overloads.  All but one take a rounding mode followed by a
+          // source operand; the exception is the bit-pattern
+          // reinterpretation
+          //   ((_ to_fp eb sb) (_ BitVec eb+sb))
+          // which takes a single bit-vector operand and no rounding mode,
+          // interpreting those bits directly as the IEEE-754 interchange
+          // encoding.  If the form closes after the first operand, this
+          // is what we just parsed; otherwise the first operand was the
+          // rounding mode (bound below) and a source operand follows.
+          if(smt2_tokenizer.peek() == smt2_tokenizert::CLOSE)
+          {
+            next_token(); // eat the ')'
+
+            if(
+              first_operand.type().id() != ID_unsignedbv ||
+              to_unsignedbv_type(first_operand.type()).get_width() !=
+                spec.width())
+            {
+              throw error() << "to_fp bit-pattern reinterpretation expects a "
+                               "bit-vector operand of width "
+                            << spec.width();
+            }
+
+            // Reinterpret the bits as a float.  Routing through a generic
+            // bit-vector type makes the conversion a bit-level reinterpret
+            // (see boolbv_typecastt) rather than a numeric integer-to-float
+            // conversion.
+            return typecast_exprt{
+              typecast_exprt{std::move(first_operand), bv_typet{spec.width()}},
+              spec.to_type()};
+          }
+
+          // The genuine rounding-mode + source-operand path.
+          const exprt &rounding_mode = first_operand;
 
           auto source_op = expression();
 
