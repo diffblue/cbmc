@@ -465,5 +465,19 @@ void cpp_typecheckt::convert_non_template_declaration(
       else
         symbol.value = nil_exprt();
     }
+    else if(
+      symbol.is_static_lifetime && !symbol.is_extern && symbol.value.is_nil() &&
+      !declarator.init_args().has_operands())
+    {
+      // A namespace-scope or static-storage object with no initializer is
+      // default-initialized.  Its construction is emitted later during
+      // static initialization with access control disabled, so verify
+      // here -- at the point of declaration, where the enclosing scope is
+      // the point of use -- that the selected default constructor is
+      // accessible ([dcl.init], [class.access]).  Block-scope automatic
+      // variables are checked at their declaration statement instead.
+      check_default_constructor_access(
+        symbol.type, symbol.location, &cpp_scopes.current_scope());
+    }
   }
 }
