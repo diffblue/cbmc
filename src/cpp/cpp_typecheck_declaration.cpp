@@ -244,7 +244,21 @@ void cpp_typecheckt::convert_non_template_declaration(
             psym.type = ptype;
             psym.mode = ID_cpp;
             psym.is_parameter = true;
-            symbol_table.insert(std::move(psym));
+            if(
+              symbol_table.symbols.find(sym_name) == symbol_table.symbols.end())
+              symbol_table.insert(std::move(psym));
+            else
+            {
+              // A temporary parameter symbol of this name persists from
+              // an earlier instantiation of the same template scope (the
+              // symbol-table entry is not removed when the scope is
+              // restored).  Refresh its type with the parameter type as
+              // resolved under the current template arguments, so the
+              // trailing-return decltype is deduced against THIS
+              // instantiation's parameters (e.g. const T vs T, which
+              // select different cv-qualified member overloads).
+              symbol_table.get_writeable_ref(sym_name).type = ptype;
+            }
             const symbolt &inserted = symbol_table.lookup_ref(sym_name);
             cpp_idt &id = cpp_scopes.put_into_scope(inserted);
             id.id_class = cpp_idt::id_classt::SYMBOL;
