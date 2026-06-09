@@ -528,6 +528,14 @@ protected:
 
   virtual void do_simplify(exprt &expr, const value_sett &value_set);
 
+  /// L2-rename \p expr in \p state and then value-set simplify it. This is the
+  /// common preparation applied to expressions before they are recorded as SSA
+  /// steps via the \ref symex_targett interface.
+  /// \param state: Symbolic execution state for the current instruction
+  /// \param expr: Expression to be renamed and simplified
+  /// \return The L2-renamed and value-set-simplified expression
+  exprt rename_and_simplify(statet &state, exprt expr);
+
   /// Symbolically execute an ASSIGN instruction or simulate such an execution
   /// for a synthetic assignment
   /// \param state: Symbolic execution state for current instruction

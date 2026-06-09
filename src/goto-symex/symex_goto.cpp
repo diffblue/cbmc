@@ -72,9 +72,7 @@ void goto_symext::symex_goto(statet &state)
 
   exprt new_guard = clean_expr(instruction.condition(), state, false);
 
-  renamedt<exprt, L2> renamed_guard = state.rename(std::move(new_guard), ns);
-  new_guard = renamed_guard.get();
-  do_simplify(new_guard, state.value_set);
+  new_guard = rename_and_simplify(state, std::move(new_guard));
 
   if(new_guard == false)
   {
