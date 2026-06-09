@@ -801,6 +801,18 @@ public:
   bool implicit_conversion_sequence(
     const exprt &expr, const typet &type, exprt &new_expr);
 
+  /// Whether direct-list-initialization of \p type from the
+  /// braced-init-list \p init_list (an ID_initializer_list expression)
+  /// should use an initializer-list constructor with the list as a single
+  /// argument ([over.match.list]/1 phase 1.1).  True iff the class has a
+  /// non-explicit initializer-list constructor (its remaining parameters
+  /// defaulted) that is *viable* for this list: every non-braced element
+  /// is convertible to the initializer_list's element type.  When false,
+  /// [over.match.list]/1 phase 1.2 applies (all constructors, with the
+  /// elements of the list as the arguments).
+  bool
+  has_viable_init_list_constructor(const typet &type, const exprt &init_list);
+
   void reference_initializer(exprt &expr, const reference_typet &type);
 
   void implicit_typecast(exprt &expr, const typet &type) override;

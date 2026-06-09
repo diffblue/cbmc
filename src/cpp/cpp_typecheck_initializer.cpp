@@ -365,8 +365,15 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
           break;
       }
 
-      // Brace-init-list to std::initializer_list<T> constructor
-      if(!il_tag_id.empty())
+      // Brace-init-list to std::initializer_list<T> constructor.  Only
+      // when this initializer-list constructor is viable for the list
+      // ([over.match.list]/1 phase 1.1): otherwise fall through so the
+      // elements become the constructor arguments (phase 1.2).  Attempting
+      // it when non-viable would emit a spurious element-conversion error
+      // (e.g. const char* -> char for `std::string s{p}`).
+      if(
+        !il_tag_id.empty() &&
+        has_viable_init_list_constructor(symbol.type, symbol.value))
       {
         // Re-acquire symbol — the loop may have invalidated it.
         symbolt &symbol = symbol_table.get_writeable_ref(sym_id);
@@ -532,27 +539,34 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
     // individual constructor arguments.
     if(symbol.value.id() == ID_initializer_list)
     {
-      // Per [over.match.list]: try as single initializer_list argument
-      // first.  If that fails (including via exception from the
-      // resolver), fall back to unpacking the elements as individual
-      // constructor arguments per [dcl.init.list]/3.6.
-      ops.push_back(symbol.value);
-      try
+      // Per [over.match.list]/1: use an initializer-list constructor with
+      // the braced-init-list as a single argument (phase 1.1) only if one
+      // is viable; otherwise use the elements of the list as the
+      // constructor arguments (phase 1.2).  Attempting a non-viable
+      // initializer-list constructor would emit a spurious conversion
+      // error (e.g. const char* -> char for `std::string s{p}`).
+      if(has_viable_init_list_constructor(symbol.type, symbol.value))
       {
-        auto constructor =
-          cpp_constructor(symbol.value.source_location(), expr_symbol, ops);
-        if(constructor.has_value())
+        ops.push_back(symbol.value);
+        try
         {
-          symbol.value = constructor.value();
-          return;
+          auto constructor =
+            cpp_constructor(symbol.value.source_location(), expr_symbol, ops);
+          if(constructor.has_value())
+          {
+            symbol.value = constructor.value();
+            return;
+          }
         }
+        catch(...)
+        {
+          // initializer_list constructor not found — fall through
+        }
+        // Fall back to unpacking
+        ops = symbol.value.operands();
       }
-      catch(...)
-      {
-        // initializer_list constructor not found — fall through
-      }
-      // Fall back to unpacking
-      ops = symbol.value.operands();
+      else
+        ops = symbol.value.operands();
     }
     else
       ops.push_back(symbol.value);
