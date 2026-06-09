@@ -3023,56 +3023,79 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
                                    ? follow_tag(to_struct_tag_type(base_type))
                                    : to_struct_type(base_type);
         const auto &comps = st.components();
-        struct_exprt result({}, base_type);
-        std::size_t i = 0;
-        bool ok = true;
+        // A class with base subobjects cannot be initialised by assigning
+        // the brace elements to its own data members in order: the base
+        // subobjects would be omitted, yielding a struct value with fewer
+        // operands than the type has components (which later aborts
+        // goto-symex's assign_from_struct).  Such a type is either a
+        // non-aggregate -- list-initialization selects a constructor
+        // ([dcl.init.list]/3) -- or a C++17 aggregate with bases (not
+        // handled here); defer to the constructor path below.
+        bool has_base_subobject = false;
         for(const auto &c : comps)
         {
           if(
-            c.get_is_padding() || c.type().id() == ID_code ||
-            c.get_bool(ID_is_type) || c.get_bool(ID_is_static) ||
-            c.get_bool(ID_from_base))
-            continue;
-          if(i < orig_expr.operands().size())
+            c.get_bool(ID_from_base) && !c.get_is_padding() &&
+            c.type().id() != ID_code && !c.get_bool(ID_is_type) &&
+            !c.get_bool(ID_is_static))
           {
-            exprt val = orig_expr.operands()[i++];
-            try
+            has_base_subobject = true;
+            break;
+          }
+        }
+        if(!has_base_subobject)
+        {
+          struct_exprt result({}, base_type);
+          std::size_t i = 0;
+          bool ok = true;
+          for(const auto &c : comps)
+          {
+            if(
+              c.get_is_padding() || c.type().id() == ID_code ||
+              c.get_bool(ID_is_type) || c.get_bool(ID_is_static) ||
+              c.get_bool(ID_from_base))
+              continue;
+            if(i < orig_expr.operands().size())
             {
-              implicit_typecast(val, c.type());
+              exprt val = orig_expr.operands()[i++];
+              try
+              {
+                implicit_typecast(val, c.type());
+              }
+              catch(...)
+              {
+                ok = false;
+                break;
+              }
+              result.operands().push_back(std::move(val));
             }
-            catch(...)
+            else
             {
               ok = false;
               break;
             }
-            result.operands().push_back(std::move(val));
           }
-          else
+          if(ok && i == orig_expr.operands().size())
           {
-            ok = false;
-            break;
-          }
-        }
-        if(ok && i == orig_expr.operands().size())
-        {
-          if(target_is_reference)
-          {
-            // Materialise a temporary, bind the reference via &temp.
-            exprt temp;
-            new_temporary(
-              orig_expr.source_location(),
-              base_type,
-              already_typechecked_exprt{std::move(result)},
-              temp);
-            address_of_exprt addr{temp, pointer_type(base_type)};
-            addr.type().set(ID_C_reference, true);
-            if(is_rvalue_reference(type))
-              addr.type().set(ID_C_rvalue_reference, true);
-            expr = std::move(addr);
+            if(target_is_reference)
+            {
+              // Materialise a temporary, bind the reference via &temp.
+              exprt temp;
+              new_temporary(
+                orig_expr.source_location(),
+                base_type,
+                already_typechecked_exprt{std::move(result)},
+                temp);
+              address_of_exprt addr{temp, pointer_type(base_type)};
+              addr.type().set(ID_C_reference, true);
+              if(is_rvalue_reference(type))
+                addr.type().set(ID_C_rvalue_reference, true);
+              expr = std::move(addr);
+              return;
+            }
+            expr = std::move(result);
             return;
           }
-          expr = std::move(result);
-          return;
         }
       }
     }
@@ -3083,46 +3106,66 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
     // initialization above -- e.g. because the class has base classes or
     // user-provided constructors, so its own data members do not line up
     // with the elements -- treat the elements as constructor arguments
-    // and construct a temporary.
-    if(
-      orig_expr.id() == ID_initializer_list && !orig_expr.operands().empty() &&
-      (type.id() == ID_struct_tag || type.id() == ID_struct) &&
-      !cpp_is_pod(type) &&
-      !(type.id() == ID_struct_tag &&
-        id2string(to_struct_tag_type(type).get_identifier())
-            .find("tag-initializer_list<") != std::string::npos))
+    // and construct a temporary.  Also handles a reference target (bind
+    // the reference to the materialised temporary).
     {
-      const struct_typet &st = type.id() == ID_struct_tag
-                                 ? follow_tag(to_struct_tag_type(type))
-                                 : to_struct_type(type);
-      bool has_constructor = false;
-      for(const auto &c : st.components())
+      typet ctor_target = type;
+      bool ctor_target_is_reference = false;
+      if(type.id() == ID_pointer && is_reference(type))
       {
-        if(
-          !c.get_bool(ID_from_base) && c.type().id() == ID_code &&
-          to_code_type(c.type()).return_type().id() == ID_constructor)
-        {
-          has_constructor = true;
-          break;
-        }
+        ctor_target = to_reference_type(type).base_type();
+        ctor_target_is_reference = true;
       }
-      if(has_constructor)
+      if(
+        orig_expr.id() == ID_initializer_list &&
+        !orig_expr.operands().empty() &&
+        (ctor_target.id() == ID_struct_tag || ctor_target.id() == ID_struct) &&
+        !cpp_is_pod(ctor_target) &&
+        !(ctor_target.id() == ID_struct_tag &&
+          id2string(to_struct_tag_type(ctor_target).get_identifier())
+              .find("tag-initializer_list<") != std::string::npos))
       {
-        exprt::operandst ops;
-        ops.reserve(orig_expr.operands().size());
-        for(const auto &op : orig_expr.operands())
-          ops.push_back(already_typechecked_exprt{op});
-        try
+        const struct_typet &st = ctor_target.id() == ID_struct_tag
+                                   ? follow_tag(to_struct_tag_type(ctor_target))
+                                   : to_struct_type(ctor_target);
+        bool has_constructor = false;
+        for(const auto &c : st.components())
         {
-          exprt temp;
-          new_temporary(orig_expr.source_location(), type, ops, temp);
-          expr = std::move(temp);
-          return;
+          if(
+            !c.get_bool(ID_from_base) && c.type().id() == ID_code &&
+            to_code_type(c.type()).return_type().id() == ID_constructor)
+          {
+            has_constructor = true;
+            break;
+          }
         }
-        catch(...)
+        if(has_constructor)
         {
-          // No viable constructor for these arguments; fall through to
-          // the diagnostics below.
+          exprt::operandst ops;
+          ops.reserve(orig_expr.operands().size());
+          for(const auto &op : orig_expr.operands())
+            ops.push_back(already_typechecked_exprt{op});
+          try
+          {
+            exprt temp;
+            new_temporary(orig_expr.source_location(), ctor_target, ops, temp);
+            if(ctor_target_is_reference)
+            {
+              address_of_exprt addr{temp, pointer_type(ctor_target)};
+              addr.type().set(ID_C_reference, true);
+              if(is_rvalue_reference(type))
+                addr.type().set(ID_C_rvalue_reference, true);
+              expr = std::move(addr);
+            }
+            else
+              expr = std::move(temp);
+            return;
+          }
+          catch(...)
+          {
+            // No viable constructor for these arguments; fall through to
+            // the diagnostics below.
+          }
         }
       }
     }
