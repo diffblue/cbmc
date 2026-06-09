@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_types.h"
 #include "endianness_map.h"
 #include "expr_util.h"
+#include "magic.h"
 #include "namespace.h"
 #include "narrow.h"
 #include "pointer_offset_size.h"
@@ -1112,7 +1113,13 @@ static exprt lower_byte_extract_array_vector(
   else
     num_elements = numeric_cast<std::size_t>(to_vector_type(src.type()).size());
 
-  if(num_elements.has_value())
+  // For large arrays, element-by-element expansion creates N expressions
+  // that are each recursively lowered and simplified, resulting in O(N^2)
+  // behaviour. Use array_comprehension_exprt (below) instead, which
+  // represents the same semantics with a single symbolic expression.
+  if(
+    num_elements.has_value() &&
+    (src.type().id() != ID_array || *num_elements <= MAX_FLATTENED_ARRAY_SIZE))
   {
     exprt::operandst operands;
     operands.reserve(*num_elements);
@@ -1797,8 +1804,8 @@ static exprt lower_byte_update_array_vector_non_const(
 
   // compute the number of bytes (from the update value) that are going to be
   // consumed for updating the first element
-  const exprt update_size =
-    from_integer(value_as_byte_array.operands().size(), subtype_size.type());
+  const exprt update_size = typecast_exprt::conditional_cast(
+    to_array_type(value_as_byte_array.type()).size(), subtype_size.type());
   exprt initial_bytes = minus_exprt{subtype_size, update_offset};
   exprt update_bound;
   if(non_const_update_bound.has_value())
@@ -1808,9 +1815,6 @@ static exprt lower_byte_update_array_vector_non_const(
   }
   else
   {
-    DATA_INVARIANT(
-      value_as_byte_array.id() == ID_array,
-      "value should be an array expression if the update bound is constant");
     update_bound = update_size;
   }
   initial_bytes = if_exprt{
@@ -1833,12 +1837,16 @@ static exprt lower_byte_update_array_vector_non_const(
 
   if(value_as_byte_array.id() != ID_array)
   {
+    exprt update_bound =
+      non_const_update_bound.has_value()
+        ? *non_const_update_bound
+        : to_array_type(value_as_byte_array.type()).size();
     return lower_byte_update_array_vector_unbounded(
       src,
       subtype,
       subtype_size,
       value_as_byte_array,
-      *non_const_update_bound,
+      update_bound,
       initial_bytes,
       first_index,
       first_update_value,
@@ -2333,11 +2341,12 @@ static exprt lower_byte_update(
     {
       if(value_as_byte_array.id() != ID_array)
       {
-        DATA_INVARIANT(
-          non_const_update_bound.has_value(),
-          "constant update bound should yield an array expression");
+        exprt update_bound =
+          non_const_update_bound.has_value()
+            ? *non_const_update_bound
+            : to_array_type(value_as_byte_array.type()).size();
         return lower_byte_update_byte_array_vector_non_const(
-          src, *subtype, value_as_byte_array, *non_const_update_bound, ns);
+          src, *subtype, value_as_byte_array, update_bound, ns);
       }
 
       return lower_byte_update_byte_array_vector(
