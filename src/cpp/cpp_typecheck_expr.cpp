@@ -2081,6 +2081,108 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
   }
 }
 
+bool cpp_typecheckt::has_viable_init_list_constructor(
+  const typet &type,
+  const exprt &init_list)
+{
+  if(type.id() != ID_struct_tag)
+    return false;
+
+  const struct_typet &class_type = follow_tag(to_struct_tag_type(type));
+  for(const auto &c : class_type.components())
+  {
+    if(c.type().id() != ID_code)
+      continue;
+    if(to_code_type(c.type()).return_type().id() != ID_constructor)
+      continue;
+    if(c.get_bool(ID_is_explicit))
+      continue;
+    const auto &params = to_code_type(c.type()).parameters();
+    if(params.size() < 2)
+      continue;
+    typet p1 = params[1].type();
+    if(is_reference(p1))
+      p1 = to_reference_type(p1).base_type();
+    if(p1.id() != ID_struct_tag)
+      continue;
+    if(
+      id2string(to_struct_tag_type(p1).get_identifier())
+        .find("tag-initializer_list<") == std::string::npos)
+      continue;
+
+    // The remaining parameters must be defaulted for the constructor to
+    // accept a bare braced-init-list as its initializer_list argument.
+    bool extras_default = true;
+    for(std::size_t i = 2; i < params.size(); ++i)
+    {
+      if(!params[i].has_default_value())
+      {
+        extras_default = false;
+        break;
+      }
+    }
+    if(!extras_default)
+      continue;
+
+    // [over.match.list]/1 phase 1.1 applies only if this initializer-list
+    // constructor is *viable* for the braced-init-list: each element must
+    // be convertible to the initializer_list's element type.  Otherwise
+    // phase 1.2 applies (e.g. `std::string{p}` for `const char *p` must
+    // select `string(const char *)`, not the non-viable
+    // `string(initializer_list<char>)`).
+    typet elem_u;
+    bool got_u = false;
+    for(const auto &ic : follow_tag(to_struct_tag_type(p1)).components())
+    {
+      if(
+        (ic.get_base_name() == "_begin" || ic.get_base_name() == "_M_array") &&
+        ic.type().id() == ID_pointer)
+      {
+        elem_u = to_pointer_type(ic.type()).base_type();
+        elem_u.remove(ID_C_constant);
+        got_u = true;
+        break;
+      }
+    }
+    // If the element type cannot be determined, keep the prior behaviour
+    // (treat the initializer-list constructor as applicable).
+    if(!got_u)
+      return true;
+
+    bool viable = true;
+    for(const auto &el : init_list.operands())
+    {
+      // A nested braced-init-list element list-initializes the element
+      // type; leave that to the constructor to validate
+      // (implicit_conversion_sequence does not model list-initialization).
+      // Only a non-braced element that is not convertible to the element
+      // type makes the initializer-list constructor non-viable.
+      if(el.id() == ID_initializer_list)
+        continue;
+      exprt tc = el;
+      unsigned rank = 0;
+      try
+      {
+        typecheck_expr(tc);
+      }
+      catch(...)
+      {
+        viable = false;
+        break;
+      }
+      if(!implicit_conversion_sequence(tc, elem_u, rank))
+      {
+        viable = false;
+        break;
+      }
+    }
+    if(viable)
+      return true;
+  }
+
+  return false;
+}
+
 void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
 {
   typecheck_type(expr.type());
@@ -2195,114 +2297,7 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
       e.operands().front().id() == ID_initializer_list &&
       !e.operands().front().operands().empty())
     {
-      bool has_init_list_ctor = false;
-      if(e.type().id() == ID_struct_tag)
-      {
-        const struct_typet &class_type =
-          follow_tag(to_struct_tag_type(e.type()));
-        for(const auto &c : class_type.components())
-        {
-          if(c.type().id() != ID_code)
-            continue;
-          if(to_code_type(c.type()).return_type().id() != ID_constructor)
-            continue;
-          if(c.get_bool(ID_is_explicit))
-            continue;
-          const auto &params = to_code_type(c.type()).parameters();
-          if(params.size() < 2)
-            continue;
-          typet p1 = params[1].type();
-          if(is_reference(p1))
-            p1 = to_reference_type(p1).base_type();
-          if(p1.id() != ID_struct_tag)
-            continue;
-          if(
-            id2string(to_struct_tag_type(p1).get_identifier())
-              .find("tag-initializer_list<") != std::string::npos)
-          {
-            // Extras must be defaulted for the ctor to accept a
-            // bare brace-init-list.
-            bool extras_default = true;
-            for(std::size_t i = 2; i < params.size(); ++i)
-            {
-              if(!params[i].has_default_value())
-              {
-                extras_default = false;
-                break;
-              }
-            }
-            if(extras_default)
-            {
-              // [over.match.list]/1.1 applies (keep the braced-init-list
-              // as a single initializer_list argument) only if a *viable*
-              // initializer-list constructor exists: the braced elements
-              // must be convertible to the initializer_list's element
-              // type.  Otherwise [over.match.list]/1.2 applies and the
-              // elements become the constructor arguments (e.g.
-              // `std::string{p}` for `const char *p` must select
-              // `string(const char *)`, not the non-viable
-              // `string(initializer_list<char>)`).
-              typet elem_u;
-              bool got_u = false;
-              for(const auto &ic :
-                  follow_tag(to_struct_tag_type(p1)).components())
-              {
-                if(
-                  (ic.get_base_name() == "_begin" ||
-                   ic.get_base_name() == "_M_array") &&
-                  ic.type().id() == ID_pointer)
-                {
-                  elem_u = to_pointer_type(ic.type()).base_type();
-                  elem_u.remove(ID_C_constant);
-                  got_u = true;
-                  break;
-                }
-              }
-              // If the element type cannot be determined, keep the prior
-              // behaviour (treat the init-list ctor as applicable).
-              bool viable = !got_u;
-              if(got_u)
-              {
-                viable = true;
-                for(const auto &el : e.operands().front().operands())
-                {
-                  // A nested braced-init-list element list-initializes
-                  // the element type; leave that to the constructor to
-                  // validate (implicit_conversion_sequence does not model
-                  // list-initialization).  Only a non-braced element that
-                  // is not convertible to the element type makes the
-                  // initializer-list constructor non-viable (e.g. a
-                  // `const char *` element with element type `char`).
-                  if(el.id() == ID_initializer_list)
-                    continue;
-                  exprt tc = el;
-                  unsigned rank = 0;
-                  try
-                  {
-                    typecheck_expr(tc);
-                  }
-                  catch(...)
-                  {
-                    viable = false;
-                    break;
-                  }
-                  if(!implicit_conversion_sequence(tc, elem_u, rank))
-                  {
-                    viable = false;
-                    break;
-                  }
-                }
-              }
-              if(viable)
-              {
-                has_init_list_ctor = true;
-                break;
-              }
-            }
-          }
-        }
-      }
-      if(!has_init_list_ctor)
+      if(!has_viable_init_list_constructor(e.type(), e.operands().front()))
       {
         exprt::operandst expanded = std::move(e.operands().front().operands());
         e.operands() = std::move(expanded);
