@@ -1282,9 +1282,13 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
           follow_tag(struct_tag_typet{struct_identifier});
         for(const auto &c : class_type.components())
         {
-          if(c.get_bool(ID_from_base))
-            continue;
-          if(c.get_base_name() == op_name)
+          // Inherited operators are member candidates too: the qualified
+          // lookup of `T1::operator@` ([over.match.oper]/3.2) finds
+          // members declared in base classes ([class.member.lookup]), so
+          // from_base components must not be skipped.  A free operator
+          // declared at file scope is not a component of T1, so this
+          // still excludes the non-member case the gate guards against.
+          if(c.get_base_name() == op_name && c.type().id() == ID_code)
           {
             has_member_op = true;
             break;
