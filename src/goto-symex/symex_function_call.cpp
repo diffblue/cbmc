@@ -281,7 +281,13 @@ void goto_symext::symex_function_call_post_clean(
   // read the arguments -- before the locality renaming
   const std::vector<exprt> renamed_arguments =
     make_range(cleaned_arguments)
-      .map([&](const exprt &a) { return state.rename(a, ns).get(); });
+      .map(
+        [&](const exprt &a)
+        {
+          exprt arg = state.rename(a, ns).get();
+          do_simplify(arg, state.value_set);
+          return arg;
+        });
 
   // we hide the call if the caller and callee are both hidden
   const bool hidden =

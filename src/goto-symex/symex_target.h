@@ -159,7 +159,7 @@ public:
   /// \param guard: Precondition for calling a function (L2-renamed)
   /// \param function_id: Name of the function
   /// \param ssa_function_arguments: Vector of arguments in SSA form
-  ///  (L2-renamed)
+  ///  (L2-renamed and value-set-simplified)
   /// \param source: Pointer to location in the input GOTO program of this
   ///  function call
   /// \param hidden: Should this step be recorded as hidden?
