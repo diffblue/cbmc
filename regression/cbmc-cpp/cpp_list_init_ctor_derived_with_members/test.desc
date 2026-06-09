@@ -1,0 +1,13 @@
+CORE
+main.cpp
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+^.*invalid implicit conversion.*$
+A braced-init-list for a base-derived non-aggregate class with its own
+data members selects a constructor (dcl.init.list, over.match.list); it
+must not be lowered to an incomplete aggregate value omitting the base
+subobject (which previously aborted goto-symex).
