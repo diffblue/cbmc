@@ -31,6 +31,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <unordered_set>
 
+/// \return the ID_C_alignment expression of \p t, or a nil expression when no
+/// alignment attribute is present. The cast is safe because exprt adds no data
+/// members to irept; centralising it here documents that assumption.
+static const exprt &alignment_of(const typet &t)
+{
+  return static_cast<const exprt &>(t.find(ID_C_alignment));
+}
+
 void c_typecheck_baset::typecheck_type(typet &type)
 {
   // we first convert, and then check
@@ -48,7 +56,7 @@ void c_typecheck_baset::typecheck_type(typet &type)
     c_qualifierst c_qualifiers(type);
     c_qualifiers += c_qualifierst(already_typechecked.get_type());
     bool packed=type.get_bool(ID_C_packed);
-    exprt alignment=static_cast<const exprt &>(type.find(ID_C_alignment));
+    exprt alignment = alignment_of(type);
     irept _typedef=type.find(ID_C_typedef);
 
     type = already_typechecked.get_type();
@@ -849,7 +857,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
   remove_qualifiers.write(type);
 
   bool is_packed = type.get_bool(ID_C_packed);
-  exprt alignment = static_cast<const exprt &>(type.find(ID_C_alignment));
+  exprt alignment = alignment_of(type);
 
   if(type.find(ID_tag).is_nil())
   {
@@ -941,9 +949,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
           << "redefinition of body of '" << s_it->second.pretty_name << "'";
       }
 
-      combine_alignments(
-        alignment,
-        static_cast<const exprt &>(s_it->second.type.find(ID_C_alignment)));
+      combine_alignments(alignment, alignment_of(s_it->second.type));
     }
   }
 
@@ -1727,7 +1733,7 @@ void c_typecheck_baset::typecheck_typedef_type(typet &type)
 
   c_qualifierst c_qualifiers(type);
   bool is_packed = type.get_bool(ID_C_packed);
-  exprt alignment = static_cast<const exprt &>(type.find(ID_C_alignment));
+  exprt alignment = alignment_of(type);
 
   c_qualifiers += c_qualifierst(symbol.type);
   type = symbol.type;
@@ -1744,8 +1750,7 @@ void c_typecheck_baset::typecheck_typedef_type(typet &type)
   else
     type.remove(ID_C_packed);
 
-  combine_alignments(
-    alignment, static_cast<const exprt &>(symbol.type.find(ID_C_alignment)));
+  combine_alignments(alignment, alignment_of(symbol.type));
   if(alignment.is_not_nil())
     type.set(ID_C_alignment, alignment);
 
