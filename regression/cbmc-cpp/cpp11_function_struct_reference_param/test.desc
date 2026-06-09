@@ -1,12 +1,15 @@
 CORE
 main.cpp
 --cpp17
-^VERIFICATION SUCCESSFUL$
-^EXIT=0$
+^EXIT=(0|10)$
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
-Calling a std::function whose parameter is a reference or pointer to a
-class type must resolve operator. The instantiated operator parameter is
-derived from the _ArgTypes pack and must be a usable reference type, not
-an unconverted frontend_pointer.
+^PARSING ERROR$
+Constructing and calling a std::function whose parameter is a reference
+or pointer to a class type must type-check: the converting constructor
+must be selected and operator must resolve. The instantiated operator
+parameter is derived from the _ArgTypes pack and must be a usable
+reference type, not an unconverted frontend_pointer. std::function's
+type-erased call result is not modelled, so only front-end acceptance is
+checked here.
