@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol.h>
 
 #include <analyses/natural_loops.h>
+#include <ansi-c/gcc_conditional_expression.h>
 
 #include "destructor.h"
 
@@ -834,18 +835,12 @@ goto_convertt::remove_gcc_conditional_expression(
   clean_expr_resultt side_effects;
 
   {
-    auto &binary_expr = to_binary_expr(expr);
-
     // first remove side-effects from condition
     side_effects = clean_expr(to_binary_expr(expr).op0(), mode);
 
     // now we can copy op0 safely
-    if_exprt if_expr(
-      typecast_exprt::conditional_cast(binary_expr.op0(), bool_typet()),
-      binary_expr.op0(),
-      binary_expr.op1(),
-      expr.type());
-    if_expr.add_source_location() = expr.source_location();
+    if_exprt if_expr =
+      lower_gcc_conditional_expression(to_side_effect_expr(expr));
 
     expr.swap(if_expr);
   }

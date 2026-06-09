@@ -1,0 +1,14 @@
+CORE gcc-only
+constant.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+GCC's `a ? : b` constant-folds in constant contexts (aligned attribute, array
+dimension, static assertion, enum value, bit-field width, case label), as used
+by the Linux kernel's cache-line alignment macros.  gcc-only for the aligned
+attribute.
