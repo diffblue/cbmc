@@ -359,8 +359,29 @@ void cpp_convert_auto(
 {
   if(dest.id() != ID_merged_type && dest.has_subtype())
   {
-    cpp_convert_auto(
-      to_type_with_subtype(dest).subtype(), src, message_handler);
+    // [temp.deduct]: the declared type is the deduction pattern P and
+    // \p src is the argument type A.  When the declarator contributes a
+    // pointer level (e.g. `auto *p`), the matching pointer must be
+    // peeled from A as well, so `auto *p = <T*>` deduces auto=T (giving
+    // p the type T*) rather than auto=T* (which would make p a T**).
+    // References are represented as pointers carrying #reference; they
+    // are deliberately NOT peeled, because for `auto &r = e` the
+    // placeholder must absorb the full type of e (e.g. `auto &r = p`
+    // with p of type T* deduces auto=T*).
+    if(
+      dest.id() == ID_pointer && !is_reference(dest) &&
+      src.id() == ID_pointer && !is_reference(src))
+    {
+      cpp_convert_auto(
+        to_type_with_subtype(dest).subtype(),
+        to_pointer_type(src).base_type(),
+        message_handler);
+    }
+    else
+    {
+      cpp_convert_auto(
+        to_type_with_subtype(dest).subtype(), src, message_handler);
+    }
     return;
   }
 
