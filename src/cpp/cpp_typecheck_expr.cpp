@@ -226,7 +226,9 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     expr.id() == "__is_nothrow_assignable" || expr.id() == "__is_same" ||
     expr.id() == "__is_layout_compatible" ||
     expr.id() == "__is_nothrow_convertible" ||
-    expr.id() == "__is_pointer_interconvertible_base_of")
+    expr.id() == "__is_pointer_interconvertible_base_of" ||
+    expr.id() == "__reference_constructs_from_temporary" ||
+    expr.id() == "__reference_converts_from_temporary")
   {
     // GCC/Clang built-in type traits
     typet t1 = static_cast<const typet &>(expr.find("type_arg1"));
