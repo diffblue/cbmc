@@ -1,0 +1,12 @@
+CORE
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring .*compound_literal
+^CONVERSION ERROR$
+--
+A compound literal with constant contents is a valid constant initializer
+for a static object (kernel DEFINE_RATELIMIT_STATE / pr_*_ratelimited).

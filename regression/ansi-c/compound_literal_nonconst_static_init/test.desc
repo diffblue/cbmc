@@ -1,0 +1,13 @@
+CORE
+main.c
+
+^EXIT=(64|1)$
+^SIGNAL=0$
+error: expected constant expression
+--
+^VERIFICATION SUCCESSFUL$
+--
+A static initializer embedding a non-constant value through a compound literal
+is not a constant expression and must be rejected.  Guards the operand
+recursion in is_constant from over-approximating compound-literal constancy
+(the accepting counterpart is regression/cbmc/compound_literal_static_init).
