@@ -1,9 +1,11 @@
 name: Codecov coverage report
 on:
-  push:
-    branches: [ develop ]
-  pull_request:
-    branches: [ develop ]
+  workflow_dispatch:
+  # Temporarily disabled while debugging long-double layout issue on PR 9020.
+  # push:
+  #   branches: [ develop ]
+  # pull_request:
+  #   branches: [ develop ]
 env:
   cvc5-version: "1.3.4"
   linux-vcpus: 4

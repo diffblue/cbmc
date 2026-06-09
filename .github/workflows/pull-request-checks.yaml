@@ -1,706 +1,27 @@
 name: Build and Test CBMC
+# Temporarily heavily trimmed while debugging long-double layout issue on
+# PR 9020.  The full file (with all other build matrix jobs) is preserved
+# at .github/workflows/pull-request-checks.yaml.full and will be restored
+# once the underlying x86_64 long double bug is fixed.
 on:
   push:
-    branches: [ develop ]
+    branches: [ '**' ]
   pull_request:
     branches: [ develop ]
 env:
   cvc5-version: "1.3.4"
   z3-version: "4.8.10"
-  linux-vcpus: 4
-  windows-vcpus: 4
 
 jobs:
-  # This job takes approximately 15 to 40 minutes
-  check-ubuntu-24_04-make-gcc:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          submodules: recursive
-      - name: Fetch dependencies
-        env:
-          # This is needed in addition to -yq to prevent apt-get from asking for
-          # user input
-          DEBIAN_FRONTEND: noninteractive
-        run: |
-          sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq gcc gdb g++ maven jq flex bison libxml2-utils ccache cmake z3
-      - name: Confirm z3 solver is available and log the version installed
-        run: z3 --version
-      - name: Install cvc5
-        uses: ./.github/actions/install-cvc5
-        with:
-          version: ${{ env.cvc5-version }}
-      - name: Restore ccache
-        id: restore-ccache
-        uses: actions/cache/restore@v5
-        with:
-          path: .ccache
-          key: ${{ runner.os }}-24.04-make-${{ github.ref }}-${{ github.sha }}-PR
-          restore-keys: |
-            ${{ runner.os }}-24.04-make-${{ github.ref }}
-            ${{ runner.os }}-24.04-make
-      - name: ccache environment
-        run: |
-          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
-          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
-      - name: Zero ccache stats and limit in size
-        run: ccache -z --max-size=500M
-      - name: Build with make
-        run: |
-          git clone https://github.com/conp-solutions/riss riss.git
-          cmake -Hriss.git -Briss.git/release -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5
-          make -C riss.git/release riss-coprocessor-lib-static -j${{env.linux-vcpus}}
-          make -C src -j${{env.linux-vcpus}} CXX="ccache g++" LIBS="$PWD/riss.git/release/lib/libriss-coprocessor.a -lpthread" IPASIR=$PWD/riss.git/riss
-          make -C jbmc/src -j${{env.linux-vcpus}} CXX="ccache g++" LIBS="$PWD/riss.git/release/lib/libriss-coprocessor.a -lpthread" IPASIR=$PWD/riss.git/riss
 
-          make -C unit -j${{env.linux-vcpus}} CXX="ccache g++" LIBS="$PWD/riss.git/release/lib/libriss-coprocessor.a -lpthread" IPASIR=$PWD/riss.git/riss
-
-          make -C jbmc/unit -j${{env.linux-vcpus}} CXX="ccache g++" LIBS="$PWD/riss.git/release/lib/libriss-coprocessor.a -lpthread" IPASIR=$PWD/riss.git/riss
-      - name: Print ccache stats
-        run: ccache -s
-      - name: Checking completeness of help output
-        run: scripts/check_help.sh g++
-      - name: Run unit tests
-        run: |
-          make -C unit test IPASIR=$PWD/riss.git/riss
-          make -C jbmc/unit test IPASIR=$PWD/riss.git/riss
-          echo "Running expected failure tests"
-          make TAGS="[!shouldfail]" -C unit test IPASIR=$PWD/riss.git/riss
-          make TAGS="[!shouldfail]" -C jbmc/unit test IPASIR=$PWD/riss.git/riss
-      - name: Run regression tests
-        run: |
-          export PATH=$PATH:`pwd`/src/solvers
-          make -C regression test-parallel JOBS=${{env.linux-vcpus}} LIBS="$PWD/riss.git/release/lib/libriss-coprocessor.a -lpthread" IPASIR=$PWD/riss.git/riss
-          make -C regression/cbmc test-paths-lifo
-          make -C regression/cbmc test-cprover-smt2
-          make -C jbmc/regression test-parallel JOBS=${{env.linux-vcpus}}
-      - name: Check cleanup
-        run: |
-          make -C src clean IPASIR=$PWD/riss.git/riss
-          make -C jbmc/src clean IPASIR=$PWD/riss.git/riss
-          rm -r riss.git
-          rm src/goto-cc/goto-ld
-          make -C unit clean
-          make -C regression clean
-          make -C jbmc/unit clean
-          make -C jbmc/regression clean
-          if [[ $(git status --ignored --porcelain | grep -v .ccache/) ]] ; then
-            git status --ignored
-            exit 1
-          fi
-
-      - name: Save ccache
-        if: always()
-        uses: actions/cache/save@v5
-        with:
-          path: .ccache
-          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
-  # This job takes approximately 25 to 34 minutes
-  check-ubuntu-24_04-make-clang:
-    runs-on: ubuntu-24.04
-    env:
-      CC: "ccache /usr/bin/clang"
-      CXX: "ccache /usr/bin/clang++"
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          submodules: recursive
-      - name: Fetch dependencies
-        env:
-          # This is needed in addition to -yq to prevent apt-get from asking for
-          # user input
-          DEBIAN_FRONTEND: noninteractive
-        run: |
-          sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq clang-19 clang++-19 gdb maven jq flex bison libxml2-utils cpanminus ccache z3
-          make -C src minisat2-download cadical-download
-          cpanm Thread::Pool::Simple
-      - name: Confirm z3 solver is available and log the version installed
-        run: z3 --version
-      - name: Install cvc5
-        uses: ./.github/actions/install-cvc5
-        with:
-          version: ${{ env.cvc5-version }}
-      - name: Restore ccache
-        id: restore-ccache
-        uses: actions/cache/restore@v5
-        with:
-          path: .ccache
-          key: ${{ runner.os }}-24.04-make-clang-${{ github.ref }}-${{ github.sha }}-PR
-          restore-keys: |
-            ${{ runner.os }}-24.04-make-clang-${{ github.ref }}
-            ${{ runner.os }}-24.04-make-clang
-      - name: ccache environment
-        run: |
-          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
-          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
-      - name: Zero ccache stats and limit in size
-        run: ccache -z --max-size=500M
-      - name: Build with make
-        run: |
-          make -C src       -j${{env.linux-vcpus}} MINISAT2=../../minisat-2.2.1 CADICAL=../../cadical
-          make -C unit      -j${{env.linux-vcpus}}
-          make -C jbmc/src  -j${{env.linux-vcpus}}
-          make -C jbmc/unit -j${{env.linux-vcpus}}
-      - name: Print ccache stats
-        run: ccache -s
-      - name: Run unit tests
-        run: |
-          make -C unit      test
-          make -C jbmc/unit test
-          make TAGS="[z3]" -C unit test
-      - name: Run expected failure unit tests
-        run: |
-          make TAGS="[!shouldfail]" -C unit test
-          make TAGS="[!shouldfail]" -C jbmc/unit test
-      - name: Run regression tests
-        run: |
-          export PATH=$PATH:`pwd`/src/solvers
-          make -C regression test-parallel JOBS=${{env.linux-vcpus}}
-          make -C regression/cbmc test-paths-lifo
-          make -C regression/cbmc test-cprover-smt2
-          make -C jbmc/regression test-parallel JOBS=${{env.linux-vcpus}}
-
-      - name: Save ccache
-        if: always()
-        uses: actions/cache/save@v5
-        with:
-          path: .ccache
-          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
-  # This job has been copied from the one above it, and modified to only build CBMC
-  # and run the `regression/cbmc/` regression tests against Z3. The rest of the tests
-  # (unit/regression) have been stripped based on the rationale that they are going
-  # to be run by the job above, which is basically the same, but more comprehensive.
-  # The reason we opted for a new job is that adding a `test-z3` step to the current
-  # jobs increases the job runtime to unacceptable levels (over 2hrs).
-  # This job takes approximately 3 to 18 minutes
-  check-ubuntu-24_04-make-clang-smt-z3:
-    runs-on: ubuntu-24.04
-    env:
-      CC: "ccache /usr/bin/clang"
-      CXX: "ccache /usr/bin/clang++"
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          submodules: recursive
-      - name: Fetch dependencies
-        env:
-          DEBIAN_FRONTEND: noninteractive
-        run: |
-          sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq clang-19 clang++-19 gdb maven jq flex bison libxml2-utils cpanminus ccache z3
-          make -C src minisat2-download
-          cpanm Thread::Pool::Simple
-      - name: Confirm z3 solver is available and log the version installed
-        run: z3 --version
-      - name: Restore ccache
-        id: restore-ccache
-        uses: actions/cache/restore@v5
-        with:
-          path: .ccache
-          key: ${{ runner.os }}-24.04-make-clang-${{ github.ref }}-${{ github.sha }}-PR
-          restore-keys: |
-            ${{ runner.os }}-24.04-make-clang-${{ github.ref }}
-            ${{ runner.os }}-24.04-make-clang
-      - name: ccache environment
-        run: |
-          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
-          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
-      - name: Zero ccache stats and limit in size
-        run: ccache -z --max-size=500M
-      - name: Build with make
-        run: make -C src -j${{env.linux-vcpus}}
-      - name: Print ccache stats
-        run: ccache -s
-      - name: Run regression/cbmc tests with z3 as the backend
-        run: make -C regression/cbmc test-z3
-
-      - name: Save ccache
-        if: always()
-        uses: actions/cache/save@v5
-        with:
-          path: .ccache
-          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
-  # This job takes approximately 17 to 42 minutes
-  check-ubuntu-24_04-cmake-gcc:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          submodules: recursive
-      - name: Fetch dependencies
-        env:
-          # This is needed in addition to -yq to prevent apt-get from asking for
-          # user input
-          DEBIAN_FRONTEND: noninteractive
-        run: |
-          sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen graphviz z3
-      - name: Confirm z3 solver is available and log the version installed
-        run: z3 --version
-      - name: Install cvc5
-        uses: ./.github/actions/install-cvc5
-        with:
-          version: ${{ env.cvc5-version }}
-      - name: Restore ccache
-        id: restore-ccache
-        uses: actions/cache/restore@v5
-        with:
-          path: .ccache
-          key: ${{ runner.os }}-24.04-Release-${{ github.ref }}-${{ github.sha }}-PR
-          restore-keys: |
-            ${{ runner.os }}-24.04-Release-${{ github.ref }}
-            ${{ runner.os }}-24.04-Release
-      - name: ccache environment
-        run: |
-          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
-          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
-      - name: Configure using CMake
-        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -Dsat_impl="minisat2;cadical"
-      - name: Check that doc task works
-        run: ninja -C build doc
-      - name: Zero ccache stats and limit in size
-        run: ccache -z --max-size=500M
-      - name: Build with Ninja
-        run: ninja -C build -j${{env.linux-vcpus}}
-      - name: Print ccache stats
-        run: ccache -s
-      - name: Checking completeness of help output
-        run: scripts/check_help.sh /usr/bin/g++ build/bin
-      - name: Check if package building works
-        run: |
-          cd build
-          ninja package
-          ls *.deb
-      - name: Run tests
-        run: cd build; ctest . -V -L CORE -j${{env.linux-vcpus}}
-      - name: Check cleanup
-        run: |
-          cmake --build build --target clean
-          rm -r build
-          find regression jbmc/regression \( -name '*.out' -o -name '*.gb' -o -name '*.dimacs' -o -name '*.obj' -o -name '*.o' -o -name '*.goto-cc-saved' \) -delete
-          find regression -not -path 'regression/goto-bmc/invalid-files/*' -name '*.goto' -delete
-          find regression/cbmc regression/cbmc-incr-smt2 regression/cbmc-sequentialization regression/cbmc-shadow-memory regression/book-examples regression/statement-list -name '*.smt2' -delete
-          find regression/snapshot-harness regression/solver-hardness -name '*.json' -delete
-          find regression/goto-harness -name '*-harness.c' -delete
-          find regression/goto-instrument-wmm-core -mindepth 2 \( -name '*.txt' -o -name '*.dot' \) -delete
-          rm -rf jbmc/regression/jbmc/classpath-class-incorrect-package/incorrect-classes
-          rm -rf jbmc/regression/jbmc/classpath-class-with-one-dir/default-classes
-          rm -rf jbmc/regression/jbmc/overlay-class/annotations jbmc/regression/jbmc/overlay-class/correct-overlay jbmc/regression/jbmc/overlay-class/ignored-method jbmc/regression/jbmc/overlay-class/unmarked-overlay
-          rm -f jbmc/regression/jbmc/overlay-class/Test.class
-          if [[ $(git status --ignored --porcelain | grep -v .ccache/) ]] ; then
-            git status --ignored
-            exit 1
-          fi
-
-      - name: Save ccache
-        if: always()
-        uses: actions/cache/save@v5
-        with:
-          path: .ccache
-          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
-  # This job takes approximately 20 to 38 minutes
-  check-ubuntu-22_04-make-clang:
-    runs-on: ubuntu-22.04
-    env:
-      CC: "ccache /usr/bin/clang"
-      CXX: "ccache /usr/bin/clang++"
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          submodules: recursive
-      - name: Fetch dependencies
-        env:
-          # This is needed in addition to -yq to prevent apt-get from asking for
-          # user input
-          DEBIAN_FRONTEND: noninteractive
-        run: |
-          sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq clang clang-14 gdb maven jq flex bison libxml2-utils cpanminus ccache z3
-          make -C src minisat2-download cadical-download
-          cpanm Thread::Pool::Simple
-      - name: Confirm z3 solver is available and log the version installed
-        run: z3 --version
-      - name: Install cvc5
-        uses: ./.github/actions/install-cvc5
-        with:
-          version: ${{ env.cvc5-version }}
-      - name: Restore ccache
-        id: restore-ccache
-        uses: actions/cache/restore@v5
-        with:
-          path: .ccache
-          key: ${{ runner.os }}-22.04-make-clang-${{ github.ref }}-${{ github.sha }}-PR
-          restore-keys: |
-            ${{ runner.os }}-22.04-make-clang-${{ github.ref }}
-            ${{ runner.os }}-22.04-make-clang
-      - name: ccache environment
-        run: |
-          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
-          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
-      - name: Zero ccache stats and limit in size
-        run: ccache -z --max-size=500M
-      - name: Perform C/C++ library syntax check
-        run: |
-          make -C src/ansi-c library_check
-          make -C src/cpp library_check
-      - name: Build with make
-        run: |
-          make -C src       -j${{env.linux-vcpus}} MINISAT2=../../minisat-2.2.1 CADICAL=../../cadical
-          make -C unit      -j${{env.linux-vcpus}}
-          make -C jbmc/src  -j${{env.linux-vcpus}}
-          make -C jbmc/unit -j${{env.linux-vcpus}}
-      - name: Print ccache stats
-        run: ccache -s
-      - name: Run unit tests
-        run: |
-          make -C unit      test
-          make -C jbmc/unit test
-          make TAGS="[z3]" -C unit test
-      - name: Run expected failure unit tests
-        run: |
-          make TAGS="[!shouldfail]" -C unit test
-          make TAGS="[!shouldfail]" -C jbmc/unit test
-      - name: Run regression tests
-        run: |
-          export PATH=$PATH:`pwd`/src/solvers
-          make -C regression test-parallel JOBS=${{env.linux-vcpus}}
-          make -C regression/cbmc test-paths-lifo
-          make -C regression/cbmc test-cprover-smt2
-          make -C jbmc/regression test-parallel JOBS=${{env.linux-vcpus}}
-
-      - name: Save ccache
-        if: always()
-        uses: actions/cache/save@v5
-        with:
-          path: .ccache
-          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
-  # This job takes approximately 17 to 41 minutes
-  check-ubuntu-22_04-cmake-gcc:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          submodules: recursive
-      - name: Fetch dependencies
-        env:
-          # This is needed in addition to -yq to prevent apt-get from asking for
-          # user input
-          DEBIAN_FRONTEND: noninteractive
-        run: |
-          sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen graphviz z3
-      - name: Confirm z3 solver is available and log the version installed
-        run: z3 --version
-      - name: Install cvc5
-        uses: ./.github/actions/install-cvc5
-        with:
-          version: ${{ env.cvc5-version }}
-      - name: Restore ccache
-        id: restore-ccache
-        uses: actions/cache/restore@v5
-        with:
-          path: .ccache
-          key: ${{ runner.os }}-22.04-Release-${{ github.ref }}-${{ github.sha }}-PR
-          restore-keys: |
-            ${{ runner.os }}-22.04-Release-${{ github.ref }}
-            ${{ runner.os }}-22.04-Release
-      - name: ccache environment
-        run: |
-          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
-          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
-      - name: Configure using CMake
-        run: cmake -S . -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -Dsat_impl="minisat2;cadical"
-      - name: Check that doc task works
-        run: ninja -C build doc
-      - name: Zero ccache stats and limit in size
-        run: ccache -z --max-size=500M
-      - name: Build with Ninja
-        run: ninja -C build -j${{env.linux-vcpus}}
-      - name: Print ccache stats
-        run: ccache -s
-      - name: Check if package building works
-        run: |
-          cd build
-          ninja package
-          ls *.deb
-      - name: Run tests
-        run: cd build; ctest . -V -L CORE -j${{env.linux-vcpus}}
-
-      - name: Save ccache
-        if: always()
-        uses: actions/cache/save@v5
-        with:
-          path: .ccache
-          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
-  # This job takes approximately 14 to 46 minutes
-  check-ubuntu-24_04-cmake-gcc-14:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          submodules: recursive
-      - name: Fetch dependencies
-        env:
-          # This is needed in addition to -yq to prevent apt-get from asking for
-          # user input
-          DEBIAN_FRONTEND: noninteractive
-        run: |
-          sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc-14 gdb g++-14 maven flex bison libxml2-utils dpkg-dev ccache doxygen z3
-          # Update symlinks so that any use of gcc (including our regression
-          # tests) will use GCC 14.
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 110 \
-            --slave /usr/bin/g++ g++ /usr/bin/g++-14 \
-            --slave /usr/bin/gcov gcov /usr/bin/gcov-14
-          sudo ln -sf cpp-14 /usr/bin/cpp
-      - name: Confirm z3 solver is available and log the version installed
-        run: z3 --version
-      - name: Install cvc5
-        uses: ./.github/actions/install-cvc5
-        with:
-          version: ${{ env.cvc5-version }}
-      - name: Restore ccache
-        id: restore-ccache
-        uses: actions/cache/restore@v5
-        with:
-          path: .ccache
-          key: ${{ runner.os }}-24.04-Release-gcc-14-${{ github.ref }}-${{ github.sha }}-PR
-          restore-keys: |
-            ${{ runner.os }}-24.04-Release-gcc-14-${{ github.ref }}
-            ${{ runner.os }}-24.04-Release-gcc-14
-      - name: ccache environment
-        run: |
-          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
-          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
-      - name: Configure using CMake
-        run: cmake -S . -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS=-Wp,-D_GLIBCXX_ASSERTIONS
-      - name: Zero ccache stats and limit in size
-        run: ccache -z --max-size=500M
-      - name: Build with Ninja
-        run: ninja -C build -j${{env.linux-vcpus}}
-      - name: Print ccache stats
-        run: ccache -s
-      - name: Run tests
-        run: cd build; ctest . -V -L CORE -j${{env.linux-vcpus}}
-
-      - name: Save ccache
-        if: always()
-        uses: actions/cache/save@v5
-        with:
-          path: .ccache
-          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
-  # This job takes approximately 17 to 41 minutes
-  check-ubuntu-24_04-arm-cmake-gcc:
-    runs-on: ubuntu-24.04-arm
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          submodules: recursive
-      - name: Fetch dependencies
-        env:
-          # This is needed in addition to -yq to prevent apt-get from asking for
-          # user input
-          DEBIAN_FRONTEND: noninteractive
-        run: |
-          sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen graphviz z3
-      - name: Confirm z3 solver is available and log the version installed
-        run: z3 --version
-      - name: Install cvc5
-        uses: ./.github/actions/install-cvc5
-        with:
-          version: ${{ env.cvc5-version }}
-      - name: Restore ccache
-        id: restore-ccache
-        uses: actions/cache/restore@v5
-        with:
-          path: .ccache
-          key: ${{ runner.os }}-24.04-Arm-Release-${{ github.ref }}-${{ github.sha }}-PR
-          restore-keys: |
-            ${{ runner.os }}-24.04-Arm-Release-${{ github.ref }}
-            ${{ runner.os }}-24.04-Arm-Release
-      - name: ccache environment
-        run: |
-          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
-          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
-      - name: Configure using CMake
-        run: cmake -S . -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -Dsat_impl="minisat2;cadical"
-      - name: Check that doc task works
-        run: ninja -C build doc
-      - name: Zero ccache stats and limit in size
-        run: ccache -z --max-size=500M
-      - name: Build with Ninja
-        run: ninja -C build -j${{env.linux-vcpus}}
-      - name: Print ccache stats
-        run: ccache -s
-      - name: Check if package building works
-        run: |
-          cd build
-          ninja package
-          ls *.deb
-      - name: Run tests
-        run: cd build; ctest . -V -L CORE -j${{env.linux-vcpus}}
-
-      - name: Save ccache
-        if: always()
-        uses: actions/cache/save@v5
-        with:
-          path: .ccache
-          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
-  # This job takes approximately 14 to 60 minutes
-  check-ubuntu-22_04-cmake-gcc-32bit:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          submodules: recursive
-      - name: Fetch dependencies
-        env:
-          # This is needed in addition to -yq to prevent apt-get from asking for
-          # user input
-          DEBIAN_FRONTEND: noninteractive
-        run: |
-          sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils ccache doxygen z3 g++-multilib
-      - name: Confirm z3 solver is available and log the version installed
-        run: z3 --version
-      - name: Install cvc5
-        uses: ./.github/actions/install-cvc5
-        with:
-          version: ${{ env.cvc5-version }}
-      - name: Restore ccache
-        id: restore-ccache
-        uses: actions/cache/restore@v5
-        with:
-          path: .ccache
-          key: ${{ runner.os }}-22.04-Release-32-${{ github.ref }}-${{ github.sha }}-PR
-          restore-keys: |
-            ${{ runner.os }}-22.04-Release-32-${{ github.ref }}
-            ${{ runner.os }}-22.04-Release-32
-      - name: ccache environment
-        run: |
-          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
-          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
-      - name: Configure using CMake
-        run: cmake -S . -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -Dsat_impl="minisat2;cadical" -DCMAKE_C_FLAGS=-m32 -DCMAKE_CXX_FLAGS=-m32
-      - name: Zero ccache stats and limit in size
-        run: ccache -z --max-size=500M
-      - name: Build with Ninja
-        run: ninja -C build -j${{env.linux-vcpus}}
-      - name: Print ccache stats
-        run: ccache -s
-      - name: Run tests
-        run: cd build; ctest . -V -L CORE -j${{env.linux-vcpus}}
-
-      - name: Save ccache
-        if: always()
-        uses: actions/cache/save@v5
-        with:
-          path: .ccache
-          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
-  # This job takes approximately 2 to 24 minutes
-  check-ubuntu-24_04-cmake-gcc-KNOWNBUG:
-    runs-on: ubuntu-24.04
-    # Sequenced after check-ubuntu-24_04-cmake-gcc so that this job benefits
-    # from the matching ccache produced in the same workflow run. The cmake
-    # configure flags below must stay in sync with that job's so the compile
-    # commands hash identically and ccache hits in full.
-    needs: check-ubuntu-24_04-cmake-gcc
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          submodules: recursive
-      - name: Fetch dependencies
-        env:
-          # This is needed in addition to -yq to prevent apt-get from asking for
-          # user input
-          DEBIAN_FRONTEND: noninteractive
-        run: |
-          sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ maven flex bison libxml2-utils ccache z3
-      - name: Restore ccache
-        uses: actions/cache/restore@v5
-        with:
-          path: .ccache
-          key: ${{ runner.os }}-24.04-Release-${{ github.ref }}-${{ github.sha }}-PR
-          restore-keys: |
-            ${{ runner.os }}-24.04-Release-${{ github.ref }}
-            ${{ runner.os }}-24.04-Release
-      - name: ccache environment
-        run: |
-          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
-          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
-      - name: Configure using CMake
-        run: cmake -H. -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -Dsat_impl="minisat2;cadical"
-      - name: Zero ccache stats and limit in size
-        run: ccache -z --max-size=500M
-      - name: Build with Ninja
-        run: ninja -C build -j${{env.linux-vcpus}}
-      - name: Print ccache stats
-        run: ccache -s
-      - name: Run tests
-        run: |
-          cd build
-          ctest . -V -L KNOWNBUG -j${{env.linux-vcpus}}
-          export PATH=$PWD/bin:$PATH
-          cd ../regression/cbmc
-          sed -i '1s/^CORE\(.*\)broken-smt-backend/KNOWNBUG\1broken-smt-backend/' */*.desc
-          # the following tests fail on Windows only
-          git checkout -- memory_allocation1 printf1 printf3 union12 va_list3
-          ../test.pl -c "cbmc --cprover-smt2" -I broken-smt-backend -K
-
-      # No "Save ccache" step here: the cache is produced by
-      # check-ubuntu-24_04-cmake-gcc, which this job depends on.
-  # This job takes approximately 7 to 30 minutes
-  check-ubuntu-24_04-cmake-gcc-THOROUGH:
-    runs-on: ubuntu-24.04
-    # Sequenced after check-ubuntu-24_04-cmake-gcc so that this job benefits
-    # from the matching ccache produced in the same workflow run. The cmake
-    # configure flags below must stay in sync with that job's so the compile
-    # commands hash identically and ccache hits in full.
-    needs: check-ubuntu-24_04-cmake-gcc
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          submodules: recursive
-      - name: Fetch dependencies
-        env:
-          # This is needed in addition to -yq to prevent apt-get from asking for
-          # user input
-          DEBIAN_FRONTEND: noninteractive
-        run: |
-          sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ maven flex bison libxml2-utils ccache z3
-      - name: Restore ccache
-        uses: actions/cache/restore@v5
-        with:
-          path: .ccache
-          key: ${{ runner.os }}-24.04-Release-${{ github.ref }}-${{ github.sha }}-PR
-          restore-keys: |
-            ${{ runner.os }}-24.04-Release-${{ github.ref }}
-            ${{ runner.os }}-24.04-Release
-      - name: ccache environment
-        run: |
-          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
-          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
-      - name: Configure using CMake
-        run: cmake -H. -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -Dsat_impl="minisat2;cadical"
-      - name: Zero ccache stats and limit in size
-        run: ccache -z --max-size=500M
-      - name: Build with Ninja
-        run: ninja -C build -j${{env.linux-vcpus}}
-      - name: Print ccache stats
-        run: ccache -s
-      - name: Run tests
-        run: cd build; ctest . -V -L THOROUGH -j${{env.linux-vcpus}}
-
-      # No "Save ccache" step here: the cache is produced by
-      # check-ubuntu-24_04-cmake-gcc, which this job depends on.
-  # This job takes approximately 39 to 69 minutes
-  check-macos-15-intel-make-clang:
+  # ────────────────────────────────────────────────────────────────────
+  # macOS 15 on Intel — the originally failing job.  We collect a set of
+  # diagnostic artifacts that pin down the SDK code path and the actual
+  # hardware byte layout of `long double`, then run only the signbit
+  # regression test (the rest of the suite is irrelevant for this debug
+  # iteration).
+  # ────────────────────────────────────────────────────────────────────
+  debug-macos-15-intel:
     runs-on: macos-15-intel
     steps:
       - uses: actions/checkout@v6
@@ -708,430 +29,246 @@ jobs:
           submodules: recursive
       - name: Fetch dependencies
         run: |
-          # maven is already installed and upgrading to a newer version yields
-          # symlink conflicts as previously reported in https://github.com/actions/runner-images/issues/4020
-          brew install flex bison parallel ccache z3
-      - name: Confirm z3 solver is available and log the version installed
-        run: z3 --version
-      - name: Install cvc5
-        uses: ./.github/actions/install-cvc5
-        with:
-          version: ${{ env.cvc5-version }}
-      - name: Restore ccache
-        id: restore-ccache
-        uses: actions/cache/restore@v5
-        with:
-          path: .ccache
-          key: ${{ runner.os }}-make-${{ github.ref }}-${{ github.sha }}-PR
-          restore-keys: |
-            ${{ runner.os }}-make-${{ github.ref }}
-            ${{ runner.os }}-make
-      - name: ccache environment
+          brew install flex bison ccache
+      - name: Build cbmc and goto-instrument with Make
         run: |
-          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
-          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
-      - name: Zero ccache stats and limit in size
-        run: ccache -z --max-size=500M
-      - name: Build using Make
-        run: |
-          make -C src minisat2-download cadical-download
-          make -C src -j4 CXX="ccache clang++" MINISAT2=../../minisat-2.2.1 CADICAL=../../cadical
-          make -C jbmc/src -j4 CXX="ccache clang++"
-          make -C unit "CXX=ccache clang++"
-          make -C jbmc/unit "CXX=ccache clang++"
-      - name: Print ccache stats
-        run: ccache -s
-      - name: Run unit tests
-        run: |
-          cd unit; ./unit_tests
-          ./unit_tests "[z3]"
-      - name: Run JBMC unit tests
-        run: cd jbmc/unit; ./unit_tests
-      - name: Run regression tests
-        run: |
-          export PATH=$PATH:`pwd`/src/solvers
-          make -C regression test-parallel JOBS=4
-      - name: Run JBMC regression tests
-        run: make -C jbmc/regression test-parallel JOBS=4
-
-      - name: Save ccache
+          make -C src minisat2-download
+          make -C src cbmc.dir goto-instrument.dir goto-cc.dir -j4 \
+            CXX="ccache clang++" MINISAT2=../../minisat-2.2.1
+      - name: Collect environment / SDK / hardware facts
         if: always()
-        uses: actions/cache/save@v5
+        run: |
+          mkdir -p debug-artifacts
+
+          # 1. uname / xcrun / clang version
+          {
+            echo '== uname -a =='
+            uname -a
+            echo
+            echo '== xcrun --show-sdk-path =='
+            xcrun --show-sdk-path
+            echo
+            echo '== clang --version =='
+            clang --version
+          } > debug-artifacts/01_environment.txt 2>&1
+
+          # 2. macOS deployment / availability macros
+          cat > /tmp/check_env.c <<'EOF'
+          #include <Availability.h>
+          #include <stdio.h>
+          int main(void) {
+          #ifdef __ENVIRONMENT_OS_VERSION_MIN_REQUIRED__
+            printf("__ENVIRONMENT_OS_VERSION_MIN_REQUIRED__ = %d\n",
+                   __ENVIRONMENT_OS_VERSION_MIN_REQUIRED__);
+          #else
+            printf("__ENVIRONMENT_OS_VERSION_MIN_REQUIRED__ = (undefined)\n");
+          #endif
+          #ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
+            printf("__MAC_OS_X_VERSION_MIN_REQUIRED        = %d\n",
+                   __MAC_OS_X_VERSION_MIN_REQUIRED);
+          #endif
+          #ifdef MAC_OS_X_VERSION_MIN_REQUIRED
+            printf("MAC_OS_X_VERSION_MIN_REQUIRED          = %d\n",
+                   MAC_OS_X_VERSION_MIN_REQUIRED);
+          #endif
+            printf("__LDBL_MANT_DIG__   = %d\n", __LDBL_MANT_DIG__);
+            printf("__LDBL_MIN_EXP__    = %d\n", __LDBL_MIN_EXP__);
+            printf("__LDBL_MAX_EXP__    = %d\n", __LDBL_MAX_EXP__);
+            printf("sizeof(long double) = %zu bytes\n", sizeof(long double));
+            return 0;
+          }
+          EOF
+          clang /tmp/check_env.c -o /tmp/check_env
+          /tmp/check_env > debug-artifacts/02_long_double_macros.txt
+
+          # 3. Native byte representation of -1.0L on real hardware
+          cat > /tmp/bytes.c <<'EOF'
+          #include <stdio.h>
+          int main(void) {
+            union {
+              long double ld;
+              unsigned char b[sizeof(long double)];
+            } u;
+            const long double values[] = { -1.0L, 1.0L, -2.0L, 0.0L, -0.0L };
+            const char *names[] = { "-1.0L", "1.0L", "-2.0L", "0.0L", "-0.0L" };
+            for (size_t i = 0; i < sizeof(values)/sizeof(values[0]); ++i) {
+              u.ld = values[i];
+              printf("%-6s bytes (LE):", names[i]);
+              for (size_t j = 0; j < sizeof(long double); ++j)
+                printf(" %02x", u.b[j]);
+              printf("\n");
+            }
+            return 0;
+          }
+          EOF
+          clang -O0 /tmp/bytes.c -o /tmp/bytes
+          /tmp/bytes > debug-artifacts/03_native_long_double_bytes.txt
+
+          # 4. Show real SDK signbit body via the same union the test uses.
+          cat > /tmp/native_signbit.c <<'EOF'
+          #include <math.h>
+          #include <stdio.h>
+          int main(void) {
+            long double x = -1.0L;
+            printf("signbit(-1.0L) on real hardware = %d (expected 1)\n",
+                   signbit(x));
+            x = 1.0L;
+            printf("signbit( 1.0L) on real hardware = %d (expected 0)\n",
+                   signbit(x));
+            return 0;
+          }
+          EOF
+          clang -O0 /tmp/native_signbit.c -o /tmp/native_signbit
+          /tmp/native_signbit > debug-artifacts/04_native_signbit.txt
+
+          # 5. Preprocessed regression test source (shows the SDK
+          # __inline_signbit* bodies after macro expansion).
+          clang -E regression/cbmc-library/signbit/main.c \
+            > debug-artifacts/05_signbit_preprocessed.c 2>&1 || true
+
+          # 6. Reproduce the cbmc behaviour and capture the trace.  Use the
+          # just-built make binary at src/cbmc/cbmc.
+          src/cbmc/cbmc regression/cbmc-library/signbit/main.c \
+            --floatbv --no-simplify --trace \
+            > debug-artifacts/06_cbmc_trace.txt 2>&1 || true
+
+          # 7. Show the goto-functions for the __inline_signbit* helpers.
+          src/cbmc/cbmc regression/cbmc-library/signbit/main.c \
+            --floatbv --no-simplify --show-goto-functions \
+            > debug-artifacts/07_goto_functions.txt 2>&1 || true
+
+          # 8. A direct CBMC repro that reads the union by hand, so the
+          # trace shows exactly what bytes CBMC stores for `-1.0L`.
+          cat > /tmp/repro.c <<'EOF'
+          int main(void) {
+            union {
+              long double __ld;
+              struct {
+                unsigned long long __m;
+                unsigned short __sexp;
+              } __p;
+            } __u;
+            __u.__ld = -1.0L;
+            __CPROVER_assert(__u.__p.__m == 0x8000000000000000ull,
+                             "__m == 0x8000000000000000 (explicit integer bit)");
+            __CPROVER_assert(__u.__p.__sexp == 0xBFFF,
+                             "__sexp == 0xBFFF (sign + biased exp for -1.0L)");
+            __CPROVER_assert((__u.__p.__sexp >> 15) == 1,
+                             "sign bit is 1 for -1.0L");
+            return 0;
+          }
+          EOF
+          src/cbmc/cbmc /tmp/repro.c \
+            --floatbv --no-simplify --trace \
+            > debug-artifacts/08_cbmc_layout_repro.txt 2>&1 || true
+      - name: Run signbit regression test only
+        if: always()
+        run: |
+          cd regression/cbmc-library
+          ../test.pl -e -p -c "../../../src/cbmc/cbmc --validate-goto-model --validate-ssa-equation" signbit \
+            > /tmp/signbit_test.log 2>&1 || true
+          cp /tmp/signbit_test.log ../../debug-artifacts/09_signbit_test_run.txt
+          cp signbit/test.out ../../debug-artifacts/10_signbit_test_out.txt 2>/dev/null || true
+      - name: Upload debug artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          path: .ccache
-          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
-  # This job takes approximately 36 to 85 minutes
-  check-macos-14-cmake-clang:
+          name: debug-macos-15-intel
+          path: debug-artifacts/
+
+  # ────────────────────────────────────────────────────────────────────
+  # macOS 14 on Apple Silicon — control case (long double is 64-bit
+  # double on this architecture; the test passes today).  Same set of
+  # diagnostic artifacts so we can compare against the Intel run.
+  # ────────────────────────────────────────────────────────────────────
+  debug-macos-14-arm:
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v6
         with:
           submodules: recursive
       - name: Fetch dependencies
-        run: brew install ninja maven flex bison ccache z3
-      - name: Confirm z3 solver is available and log the version installed
-        run: z3 --version
-      - name: Install cvc5
-        uses: ./.github/actions/install-cvc5
-        with:
-          version: ${{ env.cvc5-version }}
-      - name: Restore ccache
-        id: restore-ccache
-        uses: actions/cache/restore@v5
-        with:
-          path: .ccache
-          key: ${{ runner.os }}-Release-${{ github.ref }}-${{ github.sha }}-PR
-          restore-keys: |
-            ${{ runner.os }}-Release-${{ github.ref }}
-            ${{ runner.os }}-Release
-      - name: ccache environment
+        run: brew install ninja flex bison ccache
+      - name: Configure and build cbmc with CMake
         run: |
-          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
-          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
-      - name: Zero ccache stats and limit in size
-        run: ccache -z --max-size=500M
-      - name: Configure using CMake
-        run: |
-          mkdir build
-          cd build
-          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++ -Dsat_impl=cadical
-      - name: Build with Ninja
-        run: cd build; ninja -j3
-      - name: Print ccache stats
-        run: ccache -s
-      - name: Run CTest
-        run: cd build; ctest -V -L CORE . -j3
-
-      - name: Save ccache
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_C_COMPILER=/usr/bin/clang \
+            -DCMAKE_CXX_COMPILER=/usr/bin/clang++ \
+            -Dsat_impl=cadical
+          ninja -C build cbmc -j3
+      - name: Collect environment / SDK / hardware facts
         if: always()
-        uses: actions/cache/save@v5
-        with:
-          path: .ccache
-          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
-  # This job takes approximately 49 to 70 minutes
-  check-vs-2025-cmake-build-and-test:
-    runs-on: windows-2025
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          submodules: recursive
-      - name: Setup Visual Studio environment
-        uses: microsoft/setup-msbuild@v3
-      - name: Get current month for cache key
-        id: cache-key
-        run: echo "month=$(Get-Date -Format 'yyyy-MM')" >> $env:GITHUB_OUTPUT
-      - name: Cache Chocolatey packages
-        uses: actions/cache@v5
-        with:
-          path: |
-            C:\ProgramData\chocolatey\lib
-            C:\ProgramData\chocolatey\bin
-          key: ${{ runner.os }}-choco-${{ steps.cache-key.outputs.month }}-winflexbison3
-          restore-keys: |
-            ${{ runner.os }}-choco-${{ steps.cache-key.outputs.month }}
-      - name: Fetch dependencies
         run: |
-          function Require-Tool($Name) {
-            if (-not (Get-Command $Name -ErrorAction SilentlyContinue)) {
-              Write-Output "::error ::Required tool '$Name' not found in PATH after Chocolatey installation."
-              exit 1
-            }
-          }
-          choco install winflexbison3
-          if($LastExitCode -ne 0)
+          mkdir -p debug-artifacts
+
           {
-            Write-Output "::error ::Dependency installation via Chocolatey failed."
-            exit $LastExitCode
-          }
-          Require-Tool win_flex
-          Require-Tool win_bison
-          nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
-          echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
-      - name: Install Z3
-        uses: ./.github/actions/install-z3
-        with:
-          version: ${{ env.z3-version }}
-      - name: Install cvc5
-        uses: ./.github/actions/install-cvc5
-        with:
-          version: ${{ env.cvc5-version }}
-      - name: Confirm z3 solver is available and log the version installed
-        run: z3 --version
-      - name: Confirm cvc5 solver is available and log the version installed
-        run: cvc5 --version
-      - name: Restore ccache
-        id: restore-ccache
-        uses: actions/cache/restore@v5
-        with:
-          path: .ccache
-          key: ${{ runner.os }}-msbuild-${{ github.ref }}-${{ github.sha }}-PR
-          restore-keys: |
-            ${{ runner.os }}-msbuild-${{ github.ref }}
-            ${{ runner.os }}-msbuild
-      - name: ccache environment
-        run: |
-          echo "CLCACHE_BASEDIR=$((Get-Item -Path '.\').FullName)" >> $env:GITHUB_ENV
-          echo "CLCACHE_DIR=$pwd\.ccache" >> $env:GITHUB_ENV
-      - name: Configure with cmake
-        run: cmake -S . -B build
-      - name: Zero ccache stats and limit in size (2 GB)
-        run: |
-          clcache -z
-          clcache -M 2147483648
-      - name: Build Release
-        run: cmake --build build --config Release -- /p:UseMultiToolTask=true /p:CLToolExe=clcache
-      - name: Print ccache stats
-        run: clcache -s
-      - uses: ilammy/msvc-dev-cmd@v1
-      - name: Test cbmc
-        run: |
-          Set-Location build
-          ctest -V -L CORE -C Release . -j${{env.windows-vcpus}}
+            echo '== uname -a =='
+            uname -a
+            echo
+            echo '== xcrun --show-sdk-path =='
+            xcrun --show-sdk-path
+            echo
+            echo '== clang --version =='
+            clang --version
+          } > debug-artifacts/01_environment.txt 2>&1
 
-      - name: Save ccache
-        if: always()
-        uses: actions/cache/save@v5
-        with:
-          path: .ccache
-          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
-  # This job takes approximately 65 to 84 minutes
-  check-vs-2022-make-build-and-test:
-    runs-on: windows-2022
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          submodules: recursive
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v3
-      - name: Get current month for cache key
-        id: cache-key
-        run: echo "month=$(Get-Date -Format 'yyyy-MM')" >> $env:GITHUB_OUTPUT
-      - name: Cache Chocolatey packages
-        uses: actions/cache@v5
-        with:
-          path: |
-            C:\ProgramData\chocolatey\lib
-            C:\ProgramData\chocolatey\bin
-          key: ${{ runner.os }}-choco-${{ steps.cache-key.outputs.month }}-winflexbison3-strawberryperl-wget
-          restore-keys: |
-            ${{ runner.os }}-choco-${{ steps.cache-key.outputs.month }}
-      - name: Fetch dependencies
-        run: |
-          function Require-Tool($Name) {
-            if (-not (Get-Command $Name -ErrorAction SilentlyContinue)) {
-              Write-Output "::error ::Required tool '$Name' not found in PATH after Chocolatey installation."
-              exit 1
+          cat > /tmp/check_env.c <<'EOF'
+          #include <Availability.h>
+          #include <stdio.h>
+          int main(void) {
+          #ifdef __ENVIRONMENT_OS_VERSION_MIN_REQUIRED__
+            printf("__ENVIRONMENT_OS_VERSION_MIN_REQUIRED__ = %d\n",
+                   __ENVIRONMENT_OS_VERSION_MIN_REQUIRED__);
+          #endif
+          #ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
+            printf("__MAC_OS_X_VERSION_MIN_REQUIRED        = %d\n",
+                   __MAC_OS_X_VERSION_MIN_REQUIRED);
+          #endif
+            printf("__LDBL_MANT_DIG__   = %d\n", __LDBL_MANT_DIG__);
+            printf("__LDBL_MIN_EXP__    = %d\n", __LDBL_MIN_EXP__);
+            printf("__LDBL_MAX_EXP__    = %d\n", __LDBL_MAX_EXP__);
+            printf("sizeof(long double) = %zu bytes\n", sizeof(long double));
+            return 0;
+          }
+          EOF
+          clang /tmp/check_env.c -o /tmp/check_env
+          /tmp/check_env > debug-artifacts/02_long_double_macros.txt
+
+          cat > /tmp/bytes.c <<'EOF'
+          #include <stdio.h>
+          int main(void) {
+            union {
+              long double ld;
+              unsigned char b[sizeof(long double)];
+            } u;
+            const long double values[] = { -1.0L, 1.0L, -2.0L, 0.0L, -0.0L };
+            const char *names[] = { "-1.0L", "1.0L", "-2.0L", "0.0L", "-0.0L" };
+            for (size_t i = 0; i < sizeof(values)/sizeof(values[0]); ++i) {
+              u.ld = values[i];
+              printf("%-6s bytes (LE):", names[i]);
+              for (size_t j = 0; j < sizeof(long double); ++j)
+                printf(" %02x", u.b[j]);
+              printf("\n");
             }
+            return 0;
           }
-          choco install -y winflexbison3 strawberryperl wget
-          if($LastExitCode -ne 0)
-          {
-            Write-Output "::error ::Dependency installation via Chocolatey failed."
-            exit $LastExitCode
-          }
-          Require-Tool win_flex
-          Require-Tool win_bison
-          Require-Tool perl
-          Require-Tool wget.exe
-          nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
-          echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
-          echo "c:\Strawberry\" >> $env:GITHUB_PATH
-      - name: Install Z3
-        uses: ./.github/actions/install-z3
-        with:
-          version: ${{ env.z3-version }}
-      - name: Install cvc5
-        uses: ./.github/actions/install-cvc5
-        with:
-          version: ${{ env.cvc5-version }}
-      - name: Confirm z3 solver is available and log the version installed
-        run: z3 --version
-      - name: Confirm cvc5 solver is available and log the version installed
-        run: cvc5 --version
-      - name: Initialise Developer Command Line
-        uses: ilammy/msvc-dev-cmd@v1
-      - name: Restore ccache
-        id: restore-ccache
-        uses: actions/cache/restore@v5
-        with:
-          path: .ccache
-          key: ${{ runner.os }}-msbuild-make-${{ github.ref }}-${{ github.sha }}-PR
-          restore-keys: |
-            ${{ runner.os }}-msbuild-make-${{ github.ref }}
-            ${{ runner.os }}-msbuild-make
-      - name: ccache environment
-        run: |
-          echo "CLCACHE_BASEDIR=$((Get-Item -Path '.\').FullName)" >> $env:GITHUB_ENV
-          echo "CLCACHE_DIR=$pwd\.ccache" >> $env:GITHUB_ENV
-      - name: Zero ccache stats and limit in size (2 GB)
-        run: |
-          clcache -z
-          clcache -M 2147483648
-      - name: Download minisat with make
-        run: make -C src minisat2-download
-      - name: Build CBMC with make
-        run: |
-          make CXX=clcache BUILD_ENV=MSVC -j${{env.windows-vcpus}} -C src
-          echo "$pwd\src\solvers;" >> $env:GITHUB_PATH
-      - name: Build unit tests with make
-        run: make CXX=clcache BUILD_ENV=MSVC -j${{env.windows-vcpus}} -C unit all
-      - name: Build jbmc with make
-        run: |
-          make CXX=clcache -j${{env.windows-vcpus}} -C jbmc/src setup-submodules
-          make CXX=clcache BUILD_ENV=MSVC -j${{env.windows-vcpus}} -C jbmc/src
-      - name: Build JBMC unit tests
-        run: make CXX=clcache BUILD_ENV=MSVC -j${{env.windows-vcpus}} -C jbmc/unit all
-      - name: Print ccache stats
-        run: clcache -s
-      - name: Run CBMC and JBMC unit tests
-        run: |
-          make CXX=clcache BUILD_ENV=MSVC -C unit      test
-          make CXX=clcache BUILD_ENV=MSVC -C unit test TAGS="[z3]"
-          make CXX=clcache BUILD_ENV=MSVC -C jbmc/unit test
-      - name: Run CBMC regression tests
-        run: make CXX=clcache BUILD_ENV=MSVC -j${{env.windows-vcpus}} -C regression test-parallel-jobs
+          EOF
+          clang -O0 /tmp/bytes.c -o /tmp/bytes
+          /tmp/bytes > debug-artifacts/03_native_long_double_bytes.txt
 
-      - name: Save ccache
+          clang -E regression/cbmc-library/signbit/main.c \
+            > debug-artifacts/05_signbit_preprocessed.c 2>&1 || true
+
+          build/bin/cbmc regression/cbmc-library/signbit/main.c \
+            --floatbv --no-simplify --trace \
+            > debug-artifacts/06_cbmc_trace.txt 2>&1 || true
+
+          build/bin/cbmc regression/cbmc-library/signbit/main.c \
+            --floatbv --no-simplify --show-goto-functions \
+            > debug-artifacts/07_goto_functions.txt 2>&1 || true
+      - name: Upload debug artifacts
         if: always()
-        uses: actions/cache/save@v5
+        uses: actions/upload-artifact@v4
         with:
-          path: .ccache
-          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
-  # This job takes approximately 7 to 32 minutes
-  windows-msi-package:
-    runs-on: windows-2025
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          submodules: recursive
-      - name: Setup Visual Studio environment
-        uses: microsoft/setup-msbuild@v3
-      - name: Get current month for cache key
-        id: cache-key
-        run: echo "month=$(Get-Date -Format 'yyyy-MM')" >> $env:GITHUB_OUTPUT
-      - name: Cache Chocolatey packages
-        uses: actions/cache@v5
-        with:
-          path: |
-            C:\ProgramData\chocolatey\lib
-            C:\ProgramData\chocolatey\bin
-          key: ${{ runner.os }}-choco-${{ steps.cache-key.outputs.month }}-winflexbison3
-          restore-keys: |
-            ${{ runner.os }}-choco-${{ steps.cache-key.outputs.month }}
-      - name: Fetch dependencies
-        run: |
-          function Require-Tool($Name) {
-            if (-not (Get-Command $Name -ErrorAction SilentlyContinue)) {
-              Write-Output "::error ::Required tool '$Name' not found in PATH after Chocolatey installation."
-              exit 1
-            }
-          }
-          choco install winflexbison3
-          if($LastExitCode -ne 0)
-          {
-            Write-Output "::error ::Dependency installation via Chocolatey failed."
-            exit $LastExitCode
-          }
-          Require-Tool win_flex
-          Require-Tool win_bison
-          nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
-          echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
-      - name: Restore ccache
-        id: restore-ccache
-        uses: actions/cache/restore@v5
-        with:
-          path: .ccache
-          key: ${{ runner.os }}-msbuild-${{ github.ref }}-${{ github.sha }}-PKG
-          restore-keys: |
-            ${{ runner.os }}-msbuild-${{ github.ref }}
-            ${{ runner.os }}-msbuild
-      - name: ccache environment
-        run: |
-          echo "CLCACHE_BASEDIR=$((Get-Item -Path '.\').FullName)" >> $env:GITHUB_ENV
-          echo "CLCACHE_DIR=$pwd\.ccache" >> $env:GITHUB_ENV
-      - name: Configure with cmake
-        run: cmake -S . -B build
-      - name: Build Release
-        run: cmake --build build --config Release -- /p:UseMultiToolTask=true /p:CLToolExe=clcache
-      - name: Print ccache stats
-        run: clcache -s
-      - name: Create packages
-        id: create_packages
-        # We need to get the path to cpack because fascinatingly,
-        # chocolatey also includes a command called "cpack" which takes precedence
-        run: |
-          Set-Location build
-          $cpack = "$(Split-Path -Parent (Get-Command cmake).Source)\cpack.exe"
-          & $cpack . -C Release
-          $msi_name = (Get-ChildItem -name *.msi).Name
-          echo "msi_installer=build/$msi_name" >> $env:GITHUB_OUTPUT
-          echo "msi_name=$msi_name" >> $env:GITHUB_OUTPUT
-
-      - name: Save ccache
-        if: always()
-        uses: actions/cache/save@v5
-        with:
-          path: .ccache
-          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
-  # This job takes approximately 2 to 3 minutes
-  check-string-table:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - name: Check for unused irep ids
-        run: ./scripts/string_table_check.sh
-
-  # This job takes approximately 23 to 29 minutes
-  check-docker-image:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          submodules: recursive
-      - name: Download test dependencies
-        run: |
-          sudo apt update
-          sudo apt install openjdk-11-jdk-headless
-      - name: Build docker image
-        run: docker build -t cbmc .
-      - name: Smoke test goto-cc
-        run: docker run -v ${PWD}/.github/workflows/smoke_test_assets:/mnt/smoke -t cbmc goto-cc -o /mnt/smoke/test.goto /mnt/smoke/test.c
-      - name: Smoke test cbmc
-        run: docker run -v ${PWD}/.github/workflows/smoke_test_assets:/mnt/smoke -t cbmc cbmc /mnt/smoke/test.goto
-      - name: Smoke test jbmc
-        run: |
-          javac .github/workflows/smoke_test_assets/Test.java
-          docker run -v ${PWD}/.github/workflows/smoke_test_assets:/mnt/smoke -t cbmc jbmc --classpath /mnt/smoke Test
-      - name: Smoke test goto-analyzer
-        run: docker run -v ${PWD}/.github/workflows/smoke_test_assets:/mnt/smoke -t cbmc goto-analyzer /mnt/smoke/test.goto --unreachable-functions
-
-  # This job takes approximately 22 to 41 minutes
-  include-what-you-use:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          submodules: recursive
-      - name: Fetch dependencies
-        env:
-          # This is needed in addition to -yq to prevent apt-get from asking for
-          # user input
-          DEBIAN_FRONTEND: noninteractive
-        run: |
-          sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq cmake ninja-build clang-19 clang++-19 gdb maven flex bison iwyu
-      - name: Configure using CMake
-        run: cmake -S . -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++
-      - name: Run include-what-you-use
-        run: |
-          iwyu_tool -p build/compile_commands.json -j${{env.linux-vcpus}} | tee includes.txt
-          if sed '/minisat2-src/,/^--$/d' includes.txt | grep '^- ' -B1 ; then
-            echo "Unnecessary includes found. Use '// IWYU pragma: keep' to override this."
-            exit 1
-          fi
+          name: debug-macos-14-arm
+          path: debug-artifacts/

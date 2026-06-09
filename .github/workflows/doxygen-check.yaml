@@ -1,7 +1,9 @@
 name: Build Doxygen Documentation
 on:
-  pull_request:
-    branches: [ develop ]
+  workflow_dispatch:
+  # Temporarily disabled while debugging long-double layout issue on PR 9020.
+  # pull_request:
+  #   branches: [ develop ]
 
 jobs:
   # This job takes approximately 2 minutes

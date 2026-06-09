@@ -23,10 +23,12 @@
 
 name: Profiling
 on:
-  pull_request:
-    branches: [ develop ]
-  push:
-    branches: [ develop ]
+  workflow_dispatch:
+  # Temporarily disabled while debugging long-double layout issue on PR 9020.
+  # pull_request:
+  #   branches: [ develop ]
+  # push:
+  #   branches: [ develop ]
 
 jobs:
   # ── PR job: differential profiling (base vs PR) ──────────────────────
