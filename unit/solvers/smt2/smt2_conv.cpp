@@ -48,6 +48,48 @@ static std::string get_assert(const exprt &red_expr)
   return result.substr(pos, end - pos + 1);
 }
 
+TEST_CASE(
+  "smt2_convt::convert_expr extractbits with non-constant index",
+  "[core][solvers][smt2]")
+{
+  // Pin the SMT2 emission for an extractbits with a non-constant index.
+  // Encoding: ((_ extract result_width-1 0) (bvlshr src idx'))
+  // where idx' is zero-extended (narrower) or truncated (wider) to the
+  // source width. Without the fix, this branch used to throw
+  // SMT2_TODO("smt2: extractbits with non-constant index").
+  const unsignedbv_typet u4{4};
+  const unsignedbv_typet u8{8};
+  const unsignedbv_typet u16{16};
+  const unsignedbv_typet u32{32};
+  const symbol_exprt src{"src", u16};
+
+  SECTION("Same-width index")
+  {
+    const extractbits_exprt extract{src, symbol_exprt{"i16", u16}, u4};
+    REQUIRE(
+      get_assert(equal_exprt{extract, from_integer(0, u4)}) ==
+      "(assert (= ((_ extract 3 0) (bvlshr src i16)) (_ bv0 4)))");
+  }
+
+  SECTION("Narrower index requires zero_extend")
+  {
+    const extractbits_exprt extract{src, symbol_exprt{"idx", u8}, u4};
+    REQUIRE(
+      get_assert(equal_exprt{extract, from_integer(0, u4)}) ==
+      "(assert (= ((_ extract 3 0) "
+      "(bvlshr src ((_ zero_extend 8) idx))) (_ bv0 4)))");
+  }
+
+  SECTION("Wider index requires truncation")
+  {
+    const extractbits_exprt extract{src, symbol_exprt{"big", u32}, u4};
+    REQUIRE(
+      get_assert(equal_exprt{extract, from_integer(0, u4)}) ==
+      "(assert (= ((_ extract 3 0) "
+      "(bvlshr src ((_ extract 15 0) big))) (_ bv0 4)))");
+  }
+}
+
 TEST_CASE("smt2_convt reduction operators", "[core][solvers][smt2]")
 {
   unsignedbv_typet u2(2);
