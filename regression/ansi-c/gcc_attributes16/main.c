@@ -237,8 +237,7 @@ int32_t main()
 
   _Static_assert(sizeof(union U1) == 4, "");
   _Static_assert(_Alignof(union U1) == 1, "");
-  // CBMC does not add tail padding to a union to reach its alignment, so only
-  // the alignment (not the size) of an aligned union is asserted here.
+  _Static_assert(sizeof(union U1a) == 16, "");
   _Static_assert(_Alignof(union U1a) == 16, "");
 
   _Static_assert(_Alignof(struct Fwd) == 16, "");
