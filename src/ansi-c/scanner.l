@@ -659,6 +659,14 @@ enable_or_disable ("enable"|"disable")
                     TOK_GCC_BUILTIN_TYPES_COMPATIBLE_P);
                 }
 
+"__builtin_has_attribute" {
+                  return conditional_keyword(
+                    PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                    PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
+                    PARSER.mode==configt::ansi_ct::flavourt::ARM,
+                    TOK_GCC_BUILTIN_HAS_ATTRIBUTE);
+                }
+
 "__builtin_convertvector" {
                   return conditional_keyword(
                     PARSER.mode==configt::ansi_ct::flavourt::GCC ||
