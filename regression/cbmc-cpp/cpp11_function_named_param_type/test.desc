@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=(0|10)$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^PARSING ERROR$
+A std::function whose function-type argument names its parameter denotes
+the same specialization as the unnamed spelling and must elaborate its
+operator bool, so the contextual conversion to bool in ready compiles
+without a CONVERSION ERROR. This is a front-end type-checking regression
+test; std::function's runtime model is not the subject here.

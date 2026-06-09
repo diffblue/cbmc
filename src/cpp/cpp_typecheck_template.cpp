@@ -1962,6 +1962,31 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
           error() << "missing type in template argument" << eom;
           throw 0;
         }
+        // [dcl.fct]/3 + [temp.type]: parameter names are not part of a
+        // function type, so a function type used as a template argument
+        // denotes the same type — and hence the same specialization —
+        // whether or not its parameters are named.  Such an argument may
+        // arrive with its parameters still as unconverted cpp_
+        // declarations carrying the parameter names (e.g.
+        // `std::function<void(const T &id)>`).  Strip those names so the
+        // argument is identical to the unnamed spelling
+        // (`std::function<void(const T&)>`) and therefore denotes the
+        // same, fully elaborated specialization rather than a distinct,
+        // never-elaborated one.
+        if(arg.type().id() == ID_code)
+        {
+          irept &params = arg.type().add(ID_parameters);
+          for(auto &param : params.get_sub())
+          {
+            if(param.id() != ID_cpp_declaration)
+              continue;
+            for(auto &d : param.get_sub())
+            {
+              if(d.id() == ID_cpp_declarator)
+                d.add(ID_name).make_nil();
+            }
+          }
+        }
         // Skip typecheck_type for types that are already resolved
         // (e.g., struct_tag from a previous instantiation).
         // Re-typechecking can fail when the type references local
