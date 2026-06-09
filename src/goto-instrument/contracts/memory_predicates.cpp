@@ -138,7 +138,7 @@ void is_fresh_baset::update_ensures(goto_programt &ensures)
 
 array_typet is_fresh_baset::get_memmap_type()
 {
-  return array_typet(unsigned_char_type(), infinity_exprt(size_type()));
+  return array_typet(unsigned_char_type(), size_type().largest_expr());
 }
 
 void is_fresh_baset::add_memory_map_decl(goto_programt &program)

@@ -554,15 +554,7 @@ exprt interpretert::get_value(
     // Get size of array
     mp_integer subtype_size = get_size(to_array_type(type).element_type());
 
-    mp_integer count;
-    if(unbounded_size(type))
-    {
-      count=base_address_to_actual_size(offset)/subtype_size;
-    }
-    else
-    {
-      count = numeric_cast_v<mp_integer>(to_constant_expr(size_expr));
-    }
+    mp_integer count = numeric_cast_v<mp_integer>(to_constant_expr(size_expr));
 
     // Retrieve the value for each member in the array
     result.reserve_operands(numeric_cast_v<std::size_t>(count));
@@ -937,34 +929,12 @@ mp_integer interpretert::build_memory_map(const symbol_exprt &symbol_expr)
   return address;
 }
 
-bool interpretert::unbounded_size(const typet &type)
-{
-  if(type.id()==ID_array)
-  {
-    const exprt &size=to_array_type(type).size();
-    if(size.id()==ID_infinity)
-      return true;
-    return unbounded_size(to_array_type(type).element_type());
-  }
-  else if(type.id()==ID_struct)
-  {
-    const auto &st=to_struct_type(type);
-    if(st.components().empty())
-      return false;
-    return unbounded_size(st.components().back().type());
-  }
-  return false;
-}
-
 /// Retrieves the actual size of the provided structured type. Unbounded objects
 /// get allocated 2^(platform bit-width / 2 + 1) address space each.
 /// \param type: a structured type
 /// \return Size of the given type
 mp_integer interpretert::get_size(const typet &type)
 {
-  if(unbounded_size(type))
-    return mp_integer(2) << (sizeof(std::size_t) * CHAR_BIT / 2);
-
   if(type.id()==ID_struct)
   {
     const struct_typet::componentst &components=

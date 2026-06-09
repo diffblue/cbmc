@@ -99,7 +99,7 @@ SCENARIO("byte_extract_lowering", "[core][util][lowering][byte_extract]")
   cmdlinet cmdline;
   config.set(cmdline);
 
-  const symbol_tablet symbol_table;
+  symbol_tablet symbol_table;
   const namespacet ns(symbol_table);
 
   GIVEN("A byte_extract over a POD")
@@ -135,6 +135,8 @@ SCENARIO("byte_extract_lowering", "[core][util][lowering][byte_extract]")
   GIVEN("A an unbounded byte_extract over a bounded operand")
   {
     const exprt deadbeef = from_integer(0xdeadbeef, unsignedbv_typet(32));
+    symbolt array_size{"some_size", size_type(), ID_C};
+    symbol_table.insert(array_size);
     const byte_extract_exprt be1(
       ID_byte_extract_little_endian,
       deadbeef,
@@ -142,8 +144,7 @@ SCENARIO("byte_extract_lowering", "[core][util][lowering][byte_extract]")
       config.ansi_c.char_width,
       struct_typet(
         {{"unbounded_array",
-          array_typet(
-            unsignedbv_typet(16), exprt(ID_infinity, size_type()))}}));
+          array_typet(unsignedbv_typet(16), array_size.symbol_expr())}}));
 
     THEN("byte_extract lowering does not raise an exception")
     {
@@ -164,6 +165,8 @@ SCENARIO("byte_extract_lowering", "[core][util][lowering][byte_extract]")
   GIVEN("A an unbounded union byte_extract over a bounded operand")
   {
     const exprt deadbeef = from_integer(0xdeadbeef, unsignedbv_typet(32));
+    symbolt array_size{"some_size2", size_type(), ID_C};
+    symbol_table.insert(array_size);
     const byte_extract_exprt be1(
       ID_byte_extract_little_endian,
       deadbeef,
@@ -171,8 +174,7 @@ SCENARIO("byte_extract_lowering", "[core][util][lowering][byte_extract]")
       config.ansi_c.char_width,
       union_typet(
         {{"unbounded_array",
-          array_typet(
-            unsignedbv_typet(16), exprt(ID_infinity, size_type()))}}));
+          array_typet(unsignedbv_typet(16), array_size.symbol_expr())}}));
 
     THEN("byte_extract lowering does not raise an exception")
     {

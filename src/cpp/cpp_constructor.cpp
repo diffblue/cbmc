@@ -57,9 +57,6 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
 
     const exprt &size_expr = to_array_type(object_tc.type()).size();
 
-    if(size_expr.id() == ID_infinity)
-      return {}; // don't initialize
-
     exprt tmp_size=size_expr;
     make_constant_index(tmp_size);
 

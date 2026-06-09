@@ -195,7 +195,6 @@ protected:
   void build_memory_map(const symbolt &symbol);
   mp_integer build_memory_map(const symbol_exprt &symbol_expr);
   typet concretize_type(const typet &type);
-  bool unbounded_size(const typet &);
   mp_integer get_size(const typet &type);
 
   struct_typet::componentt

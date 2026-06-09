@@ -436,10 +436,8 @@ symbol_exprt string_abstractiont::add_dummy_symbol_and_value(
     new_symbol.value = struct_exprt(
       {build_unknown(whatt::IS_ZERO, false),
        build_unknown(whatt::LENGTH, false),
-       to_array_type(source_type).size().id() == ID_infinity
-         ? build_unknown(whatt::SIZE, false)
-         : typecast_exprt::conditional_cast(
-             to_array_type(source_type).size(), build_type(whatt::SIZE))},
+       typecast_exprt::conditional_cast(
+         to_array_type(source_type).size(), build_type(whatt::SIZE))},
       string_struct);
   }
   else

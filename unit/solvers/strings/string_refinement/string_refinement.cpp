@@ -40,7 +40,7 @@ SCENARIO("string refinement", "[core][solvers][strings][string_refinement]")
   {
     const signedbv_typet int_type{64};
     const unsignedbv_typet char_type{16};
-    const array_typet char_array_type{char_type, infinity_exprt{int_type}};
+    const array_typet char_array_type{char_type, int_type.largest_expr()};
     const refined_string_typet string_type{int_type, pointer_type(char_type)};
     const symbol_exprt array1{"array1", char_array_type};
     const symbol_exprt pointer1{"pointer1", pointer_type(char_type)};

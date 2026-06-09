@@ -19,7 +19,7 @@ SCENARIO("sparse_array", "[core][solvers][strings][string_refinement]")
   GIVEN("`ARRAY_OF(0) WITH [4:=x] WITH [1:=y] WITH [100:=z]`")
   {
     const typet char_type = unsignedbv_typet(16);
-    const typet int_type = signedbv_typet(32);
+    const auto int_type = signedbv_typet(32);
     const exprt index1 = from_integer(1, int_type);
     const exprt charx = from_integer('x', char_type);
     const exprt index4 = from_integer(4, int_type);
@@ -28,7 +28,7 @@ SCENARIO("sparse_array", "[core][solvers][strings][string_refinement]")
     const exprt char0 = from_integer('0', char_type);
     const exprt index2 = from_integer(2, int_type);
     const exprt charz = from_integer('z', char_type);
-    const array_typet array_type(char_type, infinity_exprt(int_type));
+    const array_typet array_type(char_type, int_type.largest_expr());
 
     const with_exprt input_expr(
       with_exprt(

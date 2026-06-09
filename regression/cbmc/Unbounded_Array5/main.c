@@ -1,4 +1,4 @@
-int mem[__CPROVER_constant_infinity_uint];
+int mem[(__CPROVER_size_t)1 << (sizeof(__CPROVER_size_t) * 8 - 2)];
 
 int main()
 {

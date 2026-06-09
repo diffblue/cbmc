@@ -18,7 +18,7 @@ bool ptr_ok(int *x)
 /*
 	Here are the meanings of the predicates: 
 
-static _Bool __foo_memory_map[__CPROVER_constant_infinity_uint]; 
+static _Bool __foo_memory_map[(__CPROVER_size_t)1 << (sizeof(__CPROVER_size_t) * 8 - 2)]; 
 
 bool __foo_requires_is_fresh(void **elem, size_t size) {
 	*elem = malloc(size);

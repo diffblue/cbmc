@@ -759,15 +759,6 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
   const typet &expr_type = expr.type();
   const typet &op_type = expr.op().type();
 
-  // eliminate casts of infinity
-  if(expr.op().id() == ID_infinity)
-  {
-    typet new_type=expr.type();
-    exprt tmp = expr.op();
-    tmp.type()=new_type;
-    return std::move(tmp);
-  }
-
   // casts from NULL to any integer
   if(
     op_type.id() == ID_pointer && expr.op().is_constant() &&

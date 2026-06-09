@@ -1,9 +1,9 @@
 #include <cassert>
-int a[__CPROVER::constant_infinity_uint];
+int a[(__CPROVER_size_t)1 << (sizeof(__CPROVER_size_t) * 8 - 2)];
 
 struct A
 {
-  int i[__CPROVER::constant_infinity_uint];
+  int i[(__CPROVER_size_t)1 << (sizeof(__CPROVER_size_t) * 8 - 2)];
 };
 
 A o;
