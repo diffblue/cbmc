@@ -1,0 +1,12 @@
+CORE
+main.cpp
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+^.*invalid implicit conversion.*$
+A member comparison operator inherited from a base class must be found
+when comparing derived-class objects (over.match.oper, class.member.lookup),
+not rejected as an invalid conversion to bool.
