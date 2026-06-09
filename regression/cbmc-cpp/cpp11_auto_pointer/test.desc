@@ -1,0 +1,12 @@
+CORE
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+C++11 auto deduction with pointer declarators.
+The declarator's pointer level is part of the deduction pattern, so
+`auto *p = <T*>` deduces auto=T (p has type T*), not auto=T*.
+References (auto&) are not pointer declarators and absorb the full type.
