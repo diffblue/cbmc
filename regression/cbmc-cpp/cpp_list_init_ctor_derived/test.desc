@@ -1,0 +1,12 @@
+CORE
+main.cpp
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+^.*invalid implicit conversion.*$
+List-initialization of a non-aggregate (here base-derived) class must
+select a constructor (dcl.init.list, over.match.list), not be rejected
+as an invalid conversion.
