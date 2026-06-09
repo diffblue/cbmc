@@ -20,6 +20,128 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck.h"
 #include "cpp_typecheck_fargs.h"
 
+std::optional<exprt> cpp_typecheckt::build_init_list_argument(
+  const typet &target_type,
+  const exprt &init_list)
+{
+  if(target_type.id() != ID_struct_tag)
+    return {};
+
+  if(!has_viable_init_list_constructor(target_type, init_list))
+    return {};
+
+  // Find the initializer_list<U> parameter type of the (non-explicit)
+  // initializer-list constructor.
+  const struct_typet &struct_type = follow_tag(to_struct_tag_type(target_type));
+  irep_idt il_tag_id;
+  for(const auto &c : struct_type.components())
+  {
+    if(c.type().id() != ID_code || c.get_bool(ID_from_base))
+      continue;
+    const code_typet &code_type = to_code_type(c.type());
+    if(code_type.return_type().id() != ID_constructor)
+      continue;
+    const auto &params = code_type.parameters();
+    if(params.size() <= 1)
+      continue;
+    for(const auto &p : params)
+    {
+      if(p.get_this())
+        continue;
+      typet pt = p.type();
+      if(is_reference(pt))
+        pt = to_pointer_type(pt).base_type();
+      if(
+        pt.id() == ID_struct_tag &&
+        id2string(to_struct_tag_type(pt).get_identifier())
+            .find("tag-initializer_list<") != std::string::npos)
+      {
+        il_tag_id = to_struct_tag_type(pt).get_identifier();
+      }
+      break;
+    }
+    if(!il_tag_id.empty())
+      break;
+  }
+
+  if(il_tag_id.empty())
+    return {};
+
+  struct_tag_typet il_type(il_tag_id);
+  const struct_typet &il_struct = follow_tag(il_type);
+
+  // The std::initializer_list<U> layout is modelled as a {begin pointer,
+  // size} pair; extract the element type U from the pointer member.
+  typet elem_type;
+  const struct_typet::componentt *ptr_comp = nullptr;
+  const struct_typet::componentt *size_comp = nullptr;
+  for(const auto &m : il_struct.components())
+  {
+    if(
+      m.type().id() == ID_code || m.get_bool(ID_is_type) ||
+      m.get_bool(ID_is_static))
+      continue;
+    if(!ptr_comp)
+    {
+      ptr_comp = &m;
+      if(m.type().id() == ID_pointer)
+      {
+        elem_type = to_pointer_type(m.type()).base_type();
+        elem_type.remove(ID_C_constant);
+      }
+    }
+    else if(!size_comp)
+      size_comp = &m;
+  }
+
+  if(elem_type.is_nil() || ptr_comp == nullptr || size_comp == nullptr)
+    return {};
+
+  try
+  {
+    exprt::operandst typed_elems;
+    for(const auto &op : init_list.operands())
+    {
+      exprt val = op;
+      typecheck_expr(val);
+      implicit_typecast(val, elem_type);
+      typed_elems.push_back(std::move(val));
+    }
+
+    const std::size_t n = typed_elems.size();
+    auto arr_type = array_typet{elem_type, from_integer(n, size_type())};
+    const std::string arr_id =
+      "__init_list_arr$" + std::to_string(anon_counter++);
+    auxiliary_symbolt arr_sym;
+    arr_sym.name = arr_id;
+    arr_sym.base_name = arr_id;
+    arr_sym.type = arr_type;
+    arr_sym.type.set(ID_C_constant, true);
+    arr_sym.mode = ID_cpp;
+    arr_sym.is_static_lifetime = true;
+    arr_sym.is_lvalue = true;
+    arr_sym.location = init_list.source_location();
+    arr_sym.value = array_exprt{std::move(typed_elems), arr_type};
+    symbol_table.insert(std::move(arr_sym));
+
+    struct_exprt il_val{{}, il_type};
+    symbol_exprt arr_ref{arr_id, arr_type};
+    arr_ref.set(ID_C_lvalue, true);
+    index_exprt first{arr_ref, from_integer(0, c_index_type()), elem_type};
+    address_of_exprt addr{first};
+    addr.type() = ptr_comp->type();
+    il_val.add_to_operands(std::move(addr));
+    il_val.add_to_operands(from_integer(n, size_comp->type()));
+    il_val.add_source_location() = init_list.source_location();
+    return std::move(il_val);
+  }
+  catch(...)
+  {
+    // element conversion failed
+    return {};
+  }
+}
+
 /// Initialize an object with a value
 void cpp_typecheckt::convert_initializer(symbolt &symbol)
 {
@@ -377,91 +499,20 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
       {
         // Re-acquire symbol — the loop may have invalidated it.
         symbolt &symbol = symbol_table.get_writeable_ref(sym_id);
-        struct_tag_typet il_type(il_tag_id);
-        if(il_type.id() == ID_struct_tag)
+        auto il_val = build_init_list_argument(symbol.type, symbol.value);
+        if(il_val.has_value())
         {
-          try
+          symbol_exprt expr_sym(symbol.name, symbol.type);
+          already_typechecked_exprt::make_already_typechecked(expr_sym);
+          exprt::operandst ctor_ops;
+          already_typechecked_exprt::make_already_typechecked(*il_val);
+          ctor_ops.push_back(std::move(*il_val));
+          auto ctor =
+            cpp_constructor(symbol.value.source_location(), expr_sym, ctor_ops);
+          if(ctor.has_value())
           {
-            const struct_typet &il_struct =
-              follow_tag(to_struct_tag_type(il_type));
-            typet elem_type;
-            const struct_typet::componentt *ptr_comp = nullptr;
-            const struct_typet::componentt *size_comp = nullptr;
-            for(const auto &m : il_struct.components())
-            {
-              if(
-                m.type().id() == ID_code || m.get_bool(ID_is_type) ||
-                m.get_bool(ID_is_static))
-                continue;
-              if(!ptr_comp)
-              {
-                ptr_comp = &m;
-                if(m.type().id() == ID_pointer)
-                {
-                  elem_type = to_pointer_type(m.type()).base_type();
-                  elem_type.remove(ID_C_constant);
-                }
-              }
-              else if(!size_comp)
-                size_comp = &m;
-            }
-
-            if(elem_type.is_not_nil() && ptr_comp && size_comp)
-            {
-              exprt::operandst typed_elems;
-              for(const auto &op : symbol.value.operands())
-              {
-                exprt val = op;
-                typecheck_expr(val);
-                implicit_typecast(val, elem_type);
-                typed_elems.push_back(std::move(val));
-              }
-
-              std::size_t n = typed_elems.size();
-              auto arr_type =
-                array_typet{elem_type, from_integer(n, size_type())};
-              std::string arr_id =
-                "__init_list_arr$" + std::to_string(anon_counter++);
-              auxiliary_symbolt arr_sym;
-              arr_sym.name = arr_id;
-              arr_sym.base_name = arr_id;
-              arr_sym.type = arr_type;
-              arr_sym.type.set(ID_C_constant, true);
-              arr_sym.mode = ID_cpp;
-              arr_sym.is_static_lifetime = true;
-              arr_sym.is_lvalue = true;
-              arr_sym.location = symbol.value.source_location();
-              arr_sym.value = array_exprt{std::move(typed_elems), arr_type};
-              symbol_table.insert(std::move(arr_sym));
-
-              struct_exprt il_val{{}, il_type};
-              symbol_exprt arr_ref{arr_id, arr_type};
-              arr_ref.set(ID_C_lvalue, true);
-              index_exprt first{
-                arr_ref, from_integer(0, c_index_type()), elem_type};
-              address_of_exprt addr{first};
-              addr.type() = ptr_comp->type();
-              il_val.add_to_operands(std::move(addr));
-              il_val.add_to_operands(from_integer(n, size_comp->type()));
-              il_val.add_source_location() = symbol.value.source_location();
-
-              symbol_exprt expr_sym(symbol.name, symbol.type);
-              already_typechecked_exprt::make_already_typechecked(expr_sym);
-              exprt::operandst ctor_ops;
-              already_typechecked_exprt::make_already_typechecked(il_val);
-              ctor_ops.push_back(std::move(il_val));
-              auto ctor = cpp_constructor(
-                symbol.value.source_location(), expr_sym, ctor_ops);
-              if(ctor.has_value())
-              {
-                symbol.value = ctor.value();
-                return;
-              }
-            }
-          }
-          catch(...)
-          {
-            // conversion failed, fall through
+            symbol.value = ctor.value();
+            return;
           }
         }
       }

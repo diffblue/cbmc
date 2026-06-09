@@ -813,6 +813,18 @@ public:
   bool
   has_viable_init_list_constructor(const typet &type, const exprt &init_list);
 
+  /// Build the std::initializer_list<U> argument value for list-
+  /// initialization of \p target_type from the braced-init-list
+  /// \p init_list, per [over.match.list]/1 phase 1.1.  \p target_type
+  /// must have a viable initializer-list constructor (see
+  /// has_viable_init_list_constructor).  Returns a value (a struct_exprt
+  /// {begin_pointer, size} backed by a freshly created static array of
+  /// the converted elements) suitable as the single constructor
+  /// argument, or {} if \p target_type has no such constructor or the
+  /// element types could not be converted.
+  std::optional<exprt>
+  build_init_list_argument(const typet &target_type, const exprt &init_list);
+
   void reference_initializer(exprt &expr, const reference_typet &type);
 
   void implicit_typecast(exprt &expr, const typet &type) override;

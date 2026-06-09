@@ -50,7 +50,36 @@ void cpp_typecheckt::typecheck_return(code_frontend_returnt &code)
   // so the base class typecheck handles the conversion through
   // the normal constructor call path (which correctly handles
   // rvalue references for move constructors).
+  //
+  // Exception: if the return type has a *viable* initializer-list
+  // constructor for the braced-init-list ([over.match.list]/1 phase
+  // 1.1, e.g. `return {s};` for std::vector<std::string>), the whole
+  // list must be passed as a single std::initializer_list argument
+  // rather than unwrapped to its element.  Build that argument and
+  // construct the returned temporary explicitly.
   if(
+    code.has_return_value() &&
+    code.return_value().id() == ID_initializer_list &&
+    (return_type.id() == ID_struct_tag || return_type.id() == ID_union_tag) &&
+    !cpp_is_pod(return_type) &&
+    has_viable_init_list_constructor(return_type, code.return_value()))
+  {
+    auto il_val = build_init_list_argument(return_type, code.return_value());
+    if(il_val.has_value())
+    {
+      already_typechecked_exprt::make_already_typechecked(*il_val);
+      exprt::operandst ctor_args;
+      ctor_args.push_back(std::move(*il_val));
+      exprt temporary;
+      new_temporary(
+        code.return_value().source_location(),
+        return_type,
+        ctor_args,
+        temporary);
+      code.return_value() = std::move(temporary);
+    }
+  }
+  else if(
     code.has_return_value() &&
     code.return_value().id() == ID_initializer_list &&
     code.return_value().operands().size() == 1 &&
