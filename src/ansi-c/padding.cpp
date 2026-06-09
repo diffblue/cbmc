@@ -467,9 +467,30 @@ void add_padding(struct_typet &type, const namespacet &ns)
 
 void add_padding(union_typet &type, const namespacet &ns)
 {
-  mp_integer max_alignment_bits =
-    alignment(type, ns) * config.ansi_c.char_width;
-  mp_integer size_bits=0;
+  const bool is_packed = type.get_bool(ID_C_packed);
+
+  // The alignment of a union is the maximum alignment among its members; if the
+  // union is packed the members align to a single byte. An explicit aligned()
+  // attribute on the union raises the alignment regardless of packing. The
+  // union's size is then padded up to that alignment, matching GCC and Clang.
+  mp_integer max_alignment = 1;
+  if(!is_packed)
+  {
+    for(const auto &c : type.components())
+      max_alignment = std::max(max_alignment, alignment(c.type(), ns));
+  }
+
+  const exprt &given_alignment =
+    static_cast<const exprt &>(type.find(ID_C_alignment));
+  if(given_alignment.is_not_nil() && given_alignment.id() != ID_default)
+  {
+    const auto a = numeric_cast<mp_integer>(simplify_expr(given_alignment, ns));
+    if(a.has_value() && *a > max_alignment)
+      max_alignment = *a;
+  }
+
+  mp_integer max_alignment_bits = max_alignment * config.ansi_c.char_width;
+  mp_integer size_bits = 0;
 
   // check per component, and ignore those without fixed size
   for(const auto &c : type.components())
@@ -477,13 +498,6 @@ void add_padding(union_typet &type, const namespacet &ns)
     auto s = pointer_offset_bits(c.type(), ns);
     if(s.has_value())
       size_bits = std::max(size_bits, *s);
-  }
-
-  // Is the union packed?
-  if(type.get_bool(ID_C_packed))
-  {
-    // The size needs to be a multiple of 1 char only.
-    max_alignment_bits = config.ansi_c.char_width;
   }
 
   if(config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
