@@ -2233,8 +2233,71 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
             }
             if(extras_default)
             {
-              has_init_list_ctor = true;
-              break;
+              // [over.match.list]/1.1 applies (keep the braced-init-list
+              // as a single initializer_list argument) only if a *viable*
+              // initializer-list constructor exists: the braced elements
+              // must be convertible to the initializer_list's element
+              // type.  Otherwise [over.match.list]/1.2 applies and the
+              // elements become the constructor arguments (e.g.
+              // `std::string{p}` for `const char *p` must select
+              // `string(const char *)`, not the non-viable
+              // `string(initializer_list<char>)`).
+              typet elem_u;
+              bool got_u = false;
+              for(const auto &ic :
+                  follow_tag(to_struct_tag_type(p1)).components())
+              {
+                if(
+                  (ic.get_base_name() == "_begin" ||
+                   ic.get_base_name() == "_M_array") &&
+                  ic.type().id() == ID_pointer)
+                {
+                  elem_u = to_pointer_type(ic.type()).base_type();
+                  elem_u.remove(ID_C_constant);
+                  got_u = true;
+                  break;
+                }
+              }
+              // If the element type cannot be determined, keep the prior
+              // behaviour (treat the init-list ctor as applicable).
+              bool viable = !got_u;
+              if(got_u)
+              {
+                viable = true;
+                for(const auto &el : e.operands().front().operands())
+                {
+                  // A nested braced-init-list element list-initializes
+                  // the element type; leave that to the constructor to
+                  // validate (implicit_conversion_sequence does not model
+                  // list-initialization).  Only a non-braced element that
+                  // is not convertible to the element type makes the
+                  // initializer-list constructor non-viable (e.g. a
+                  // `const char *` element with element type `char`).
+                  if(el.id() == ID_initializer_list)
+                    continue;
+                  exprt tc = el;
+                  unsigned rank = 0;
+                  try
+                  {
+                    typecheck_expr(tc);
+                  }
+                  catch(...)
+                  {
+                    viable = false;
+                    break;
+                  }
+                  if(!implicit_conversion_sequence(tc, elem_u, rank))
+                  {
+                    viable = false;
+                    break;
+                  }
+                }
+              }
+              if(viable)
+              {
+                has_init_list_ctor = true;
+                break;
+              }
             }
           }
         }
