@@ -1880,6 +1880,17 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
     throw 0;
   }
 
+  // For a default-initialized new-expression (no initializer arguments),
+  // the selected default constructor must be accessible at the point of
+  // the new-expression ([expr.new], [class.access]); cpp_constructor
+  // resolves it in the object's own class scope, so check here from the
+  // enclosing scope.
+  if(initializer.operands().empty())
+    check_default_constructor_access(
+      to_pointer_type(expr.type()).base_type(),
+      expr.find_source_location(),
+      &cpp_scopes.current_scope());
+
   auto code = cpp_constructor(
     expr.find_source_location(), object_expr, initializer.operands());
 
