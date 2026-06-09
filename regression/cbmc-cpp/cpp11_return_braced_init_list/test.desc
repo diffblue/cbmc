@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+Returning a braced-init-list from a function whose return type has a
+viable initializer-list constructor must list-initialize the returned
+object with the whole list as a single std::initializer_list argument.
+Regression: a single-element return was unwrapped and the element was
+converted directly to the class type, rejecting valid code and crashing.
