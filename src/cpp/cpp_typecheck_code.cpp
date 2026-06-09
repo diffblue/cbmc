@@ -1211,8 +1211,8 @@ void cpp_typecheckt::typecheck_switch(codet &code)
     c_typecheck_baset::typecheck_switch(code);
 }
 
-void cpp_typecheckt::check_member_default_ctor_access(
-  const typet &member_type,
+void cpp_typecheckt::check_default_constructor_access(
+  const typet &object_type,
   const source_locationt &source_location,
   cpp_scopet *naming_scope)
 {
@@ -1221,7 +1221,7 @@ void cpp_typecheckt::check_member_default_ctor_access(
 
   // Arrays are initialized element-wise ([dcl.init.aggr]); check the
   // element type.
-  const typet *element_type = &member_type;
+  const typet *element_type = &object_type;
   while(element_type->id() == ID_array)
     element_type = &to_array_type(*element_type).element_type();
 
@@ -1518,7 +1518,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
             symbol_expr.id() == ID_already_typechecked
               ? to_already_typechecked_expr(symbol_expr).get_expr()
               : symbol_expr;
-          check_member_default_ctor_access(
+          check_default_constructor_access(
             inner.type(), code.source_location(), fargs.naming_scope);
         }
 
@@ -1841,6 +1841,15 @@ void cpp_typecheckt::typecheck_decl(codet &code)
       exprt object_expr = cpp_symbol_expr(symbol);
 
       already_typechecked_exprt::make_already_typechecked(object_expr);
+
+      // For a default-initialized local/block-scope variable (no
+      // initializer arguments), the selected default constructor must be
+      // accessible at the point of declaration ([dcl.init],
+      // [class.access]); cpp_constructor resolves it in the object's own
+      // class scope, so check here from the enclosing scope.
+      if(!declarator.init_args().has_operands())
+        check_default_constructor_access(
+          symbol.type, symbol.location, &cpp_scopes.current_scope());
 
       auto constructor_call = cpp_constructor(
         symbol.location, object_expr, declarator.init_args().operands());
