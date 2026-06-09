@@ -378,6 +378,27 @@ void cpp_typecheckt::typecheck_compound_declarator(
       throw;
     }
     suppress_elaborate = old_suppress;
+
+    // A finalised function type must not retain an unconverted
+    // `frontend_pointer` parameter.  This can happen for a member of a
+    // template class instantiation whose parameter type came from a
+    // substituted template parameter pack that was a reference/pointer —
+    // e.g. std::function<R(ArgTypes...)>::operator()(ArgTypes...) with a
+    // reference parameter.  Convert such parameters to their proper
+    // pointer/reference type so overload resolution can form the
+    // argument conversion ([over.match]); for ordinary, already-formed
+    // parameters this is a no-op.
+    if(is_function_member && final_type.id() == ID_code)
+    {
+      for(auto &param : to_code_type(final_type).parameters())
+      {
+        if(param.type().id() == ID_frontend_pointer)
+        {
+          cpp_convert_plain_type(param.type(), get_message_handler());
+          typecheck_type(param.type());
+        }
+      }
+    }
   }
 
   if(final_type.id() == ID_empty && !declaration.is_typedef())
