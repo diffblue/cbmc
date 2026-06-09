@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+Trailing-return decltype referencing a parameter must be deduced per
+instantiation following the argument's cv-qualification. A const and a
+non-const instantiation of the same template must not share the deduced
+return type. Regression: the const instance reused the non-const one's
+parameter type and rejected the const member overload.
