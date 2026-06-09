@@ -3077,6 +3077,56 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
       }
     }
 
+    // List-initialization of a non-aggregate class type selects a
+    // constructor ([dcl.init.list]/3, [over.match.list]).  When the
+    // braced-init-list was not consumed as aggregate member-
+    // initialization above -- e.g. because the class has base classes or
+    // user-provided constructors, so its own data members do not line up
+    // with the elements -- treat the elements as constructor arguments
+    // and construct a temporary.
+    if(
+      orig_expr.id() == ID_initializer_list && !orig_expr.operands().empty() &&
+      (type.id() == ID_struct_tag || type.id() == ID_struct) &&
+      !cpp_is_pod(type) &&
+      !(type.id() == ID_struct_tag &&
+        id2string(to_struct_tag_type(type).get_identifier())
+            .find("tag-initializer_list<") != std::string::npos))
+    {
+      const struct_typet &st = type.id() == ID_struct_tag
+                                 ? follow_tag(to_struct_tag_type(type))
+                                 : to_struct_type(type);
+      bool has_constructor = false;
+      for(const auto &c : st.components())
+      {
+        if(
+          !c.get_bool(ID_from_base) && c.type().id() == ID_code &&
+          to_code_type(c.type()).return_type().id() == ID_constructor)
+        {
+          has_constructor = true;
+          break;
+        }
+      }
+      if(has_constructor)
+      {
+        exprt::operandst ops;
+        ops.reserve(orig_expr.operands().size());
+        for(const auto &op : orig_expr.operands())
+          ops.push_back(already_typechecked_exprt{op});
+        try
+        {
+          exprt temp;
+          new_temporary(orig_expr.source_location(), type, ops, temp);
+          expr = std::move(temp);
+          return;
+        }
+        catch(...)
+        {
+          // No viable constructor for these arguments; fall through to
+          // the diagnostics below.
+        }
+      }
+    }
+
     // Brace-init-list to std::initializer_list<T> conversion (C++11):
     // {a, b, c} creates a backing array and constructs the
     // initializer_list with _begin and _size.
