@@ -221,6 +221,49 @@ void template_mapt::apply(typet &type) const
         irept &decl_type = op.add(ID_type);
         for(auto &sub : decl_type.get_sub())
           apply(static_cast<typet &>(sub));
+
+        // [temp.variadic]/5: expand a function parameter pack that names
+        // the enclosing class template's parameter pack in a member
+        // function declarator (e.g. `R operator()(A...)` of
+        // `std::function<R(A...)>`), whose function type is carried by
+        // the declarator rather than the declaration's type.
+        //
+        // Scope: only members whose declaration type is a return type
+        // (skip constructors/destructors, which have their own
+        // empty-pack handling in cpp_instantiate_template), and only
+        // packs recorded in pack_args_map/pack_size_map (the enclosing
+        // class pack) -- a member function template's own parameter
+        // pack is not recorded there and so is left untouched, to be
+        // deduced per call.
+        if(decl_type.id() == ID_constructor || decl_type.id() == ID_destructor)
+          continue;
+        // A member function template has its own parameter pack, which
+        // must be deduced per call rather than expanded with the
+        // enclosing class pack ([temp.variadic], [temp.deduct.call]);
+        // leave it untouched.
+        if(
+          op.get_bool(ID_is_template) || op.find(ID_template_type).is_not_nil())
+          continue;
+        for(auto &d : op.get_sub())
+        {
+          if(d.id() != ID_cpp_declarator)
+            continue;
+          typet &dt = static_cast<typet &>(d.add(ID_type));
+          if(dt.id() != ID_function_type && dt.id() != ID_code)
+            continue;
+          bool has_class_pack = false;
+          for(const auto &p : dt.find(ID_parameters).get_sub())
+          {
+            if(p.id() != ID_cpp_declaration && p.id() != ID_parameter)
+              continue;
+            if(
+              function_parameter_pack(
+                static_cast<const typet &>(p.find(ID_type))) != nullptr)
+              has_class_pack = true;
+          }
+          if(has_class_pack)
+            expand_parameter_packs(dt);
+        }
       }
     }
   }

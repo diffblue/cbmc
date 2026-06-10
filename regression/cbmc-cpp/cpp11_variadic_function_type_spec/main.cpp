@@ -3,8 +3,9 @@
 // (the std::function<R(A...)> pattern) must deduce the pack from the
 // argument's parameter list and expand it when the specialization is
 // instantiated.  Before the fix, a 0-arg or 2+-arg signature deduced an
-// empty (never-elaborated) instance, so e.g. sizeof...(A) was wrong and the
-// contextual conversion to bool was rejected.
+// empty (never-elaborated) instance, so e.g. sizeof...(A) was wrong, the
+// contextual conversion to bool was rejected, and a member function taking
+// the pack could not be called.
 
 template <typename>
 struct fn_traits;
@@ -17,6 +18,15 @@ struct fn_traits<R(A...)>
   // sizeof...(A) read at run time (a static const member initialised with
   // sizeof... is, independently, not constant-folded by CBMC).
   int arity() const
+  {
+    return sizeof...(A);
+  }
+
+  // A member function whose parameter list is the enclosing class
+  // parameter pack ([temp.variadic]/5): it must be expanded to the
+  // deduced arity so the member can be called.  (Returns the arity rather
+  // than R so the result is observable even when R is void.)
+  int call(A...) const
   {
     return sizeof...(A);
   }
@@ -53,6 +63,14 @@ int main()
   if(f2)
     n = 1;
   __CPROVER_assert(n == 0, "operator bool elaborated and engaged is false");
+
+  // A member function taking the class parameter pack must be callable
+  // with the deduced arity, including the empty pack and a reference
+  // parameter element.
+  __CPROVER_assert(f0.call() == 0, "call zero-length pack member");
+  __CPROVER_assert(f1.call(7) == 1, "call one-element pack member");
+  __CPROVER_assert(f2.call(7, 'z') == 2, "call two-element pack member");
+  __CPROVER_assert(fr.call(S{}) == 1, "call reference-parameter member");
 
   return 0;
 }
