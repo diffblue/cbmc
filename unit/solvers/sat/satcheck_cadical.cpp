@@ -11,11 +11,13 @@ Author: Peter Schrammel, Michael Tautschnig
 
 #ifdef HAVE_CADICAL
 
-#  include <testing-utils/use_catch.h>
+#  include <util/cout_message.h>
+#  include <util/invariant.h>
 
 #  include <solvers/prop/literal.h>
 #  include <solvers/sat/satcheck_cadical.h>
-#  include <util/cout_message.h>
+#  include <testing-utils/invariant.h>
+#  include <testing-utils/use_catch.h>
 
 SCENARIO("satcheck_cadical", "[core][solvers][sat][satcheck_cadical]")
 {
@@ -169,6 +171,58 @@ SCENARIO(
       // Adding a new variable transitions state back to UNKNOWN
       satcheck.new_variable();
       REQUIRE(satcheck.get_status() == propt::statust::UNKNOWN);
+    }
+  }
+}
+
+SCENARIO(
+  "propt state machine preconditions",
+  "[core][solvers][sat][satcheck_cadical][prop_state]")
+{
+  console_message_handlert message_handler;
+  const cbmc_invariants_should_throwt invariants_throw;
+
+  GIVEN("A solver with a variable but no solve performed (UNKNOWN state)")
+  {
+    satcheck_cadical_no_preprocessingt satcheck(message_handler);
+    const literalt v = satcheck.new_variable();
+    REQUIRE(satcheck.get_status() == propt::statust::UNKNOWN);
+
+    THEN("l_get() outside the SAT state fires its precondition")
+    {
+      REQUIRE_THROWS_AS(satcheck.l_get(v), invariant_failedt);
+    }
+    THEN("is_in_conflict() outside the UNSAT state fires its precondition")
+    {
+      REQUIRE_THROWS_AS(satcheck.is_in_conflict(v), invariant_failedt);
+    }
+  }
+
+  GIVEN("A solver that has produced a SAT result")
+  {
+    satcheck_cadical_no_preprocessingt satcheck(message_handler);
+    const literalt v = satcheck.new_variable();
+    satcheck.set_frozen(v);
+    satcheck.l_set_to_true(v);
+    REQUIRE(satcheck.prop_solve() == propt::resultt::P_SATISFIABLE);
+
+    THEN("is_in_conflict() (only valid in UNSAT) fires its precondition")
+    {
+      REQUIRE_THROWS_AS(satcheck.is_in_conflict(v), invariant_failedt);
+    }
+  }
+
+  GIVEN("A solver that has produced an UNSAT result")
+  {
+    satcheck_cadical_no_preprocessingt satcheck(message_handler);
+    const literalt v = satcheck.new_variable();
+    satcheck.set_frozen(v);
+    satcheck.l_set_to_true(satcheck.land(v, !v));
+    REQUIRE(satcheck.prop_solve() == propt::resultt::P_UNSATISFIABLE);
+
+    THEN("l_get() (only valid in SAT) fires its precondition")
+    {
+      REQUIRE_THROWS_AS(satcheck.l_get(v), invariant_failedt);
     }
   }
 }
