@@ -1246,6 +1246,37 @@ void cpp_typecheckt::elaborate_class_template(
           if(guessed_args.has_unassigned())
             continue;
 
+          // [temp.variadic]/5: expand a deduced function parameter pack
+          // in the guessed arguments into one positional argument per
+          // element, matching the layout that template_mapt::build
+          // expects when the specialization is instantiated (extra
+          // positional arguments beyond the non-pack parameters are
+          // collected into the pack).  Empty packs keep their existing
+          // zero-length sentinel and are handled by build().
+          {
+            const auto &tparams =
+              cpp_declaration.template_type().template_parameters();
+            cpp_template_args_tct::argumentst expanded;
+            for(std::size_t i = 0; i < guessed_args.arguments().size(); i++)
+            {
+              if(i < tparams.size() && tparams[i].get_bool(ID_ellipsis))
+              {
+                const irep_idt pid = tparams[i].id() == ID_type
+                                       ? tparams[i].type().get(ID_identifier)
+                                       : tparams[i].get(ID_identifier);
+                auto pa_it = template_map.pack_args_map.find(pid);
+                if(pa_it != template_map.pack_args_map.end())
+                {
+                  for(const auto &pt : pa_it->second)
+                    expanded.push_back(exprt(ID_type, pt));
+                  continue;
+                }
+              }
+              expanded.push_back(guessed_args.arguments()[i]);
+            }
+            guessed_args.arguments().swap(expanded);
+          }
+
           // Evaluate requires clause (if present) with substituted args.
           // If the clause evaluates to false, skip this specialization.
           {

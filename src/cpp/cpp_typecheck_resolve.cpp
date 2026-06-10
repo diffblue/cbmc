@@ -53,6 +53,8 @@ static bool has_variadic_template_parameter(const template_typet &template_type)
   return false;
 }
 
+static typet full_function_parameter_type(const exprt &param);
+
 cpp_typecheck_resolvet::cpp_typecheck_resolvet(cpp_typecheckt &_cpp_typecheck)
   : cpp_typecheck(_cpp_typecheck),
     original_scope(nullptr) // set in resolve_scope()
@@ -4900,37 +4902,131 @@ void cpp_typecheck_resolvet::guess_template_args(
 
       guess_template_args(tmpl_code.return_type(), desired_code.return_type());
 
-      auto full_param_type = [](const exprt &param) -> typet
-      {
-        if(param.id() == ID_cpp_declaration)
-        {
-          const cpp_declarationt &decl = to_cpp_declaration(param);
-          if(!decl.declarators().empty())
-          {
-            // Merge the declarator (which carries the reference/pointer/
-            // array part) with the declaration's base type, keeping the
-            // result in frontend form: the desired argument it is later
-            // compared against during specialization matching is itself
-            // unconverted, so converting here would introduce a spurious
-            // frontend_pointer-vs-pointer mismatch.
-            return decl.declarators().front().merge_type(decl.type());
-          }
-        }
-        return param.type();
-      };
-
       const auto &tmpl_params = tmpl_code.parameters();
       const auto &desired_params = desired_code.parameters();
-      auto d_it = desired_params.begin();
+      std::size_t d_index = 0;
       for(const auto &tp : tmpl_params)
       {
-        if(d_it == desired_params.end())
+        // [temp.deduct.type]/9-10: a function parameter pack `P...`
+        // is deduced by comparing the pattern P against each of the
+        // remaining argument types.  The deduced element types are
+        // collected so the pack can later be expanded.
+        bool is_pack = false;
+        if(tp.id() == ID_cpp_declaration)
+        {
+          const cpp_declarationt &decl = to_cpp_declaration(tp);
+          is_pack = !decl.declarators().empty() &&
+                    decl.declarators().front().get_has_ellipsis();
+        }
+
+        if(is_pack)
+        {
+          deduce_function_parameter_pack(
+            to_cpp_declaration(tp), desired_type, d_index);
+          // A function parameter pack is necessarily the last
+          // parameter ([temp.param]/11).
           break;
-        guess_template_args(tp.type(), full_param_type(*d_it));
-        ++d_it;
+        }
+
+        if(d_index >= desired_params.size())
+          break;
+        guess_template_args(
+          tp.type(), full_function_parameter_type(desired_params[d_index]));
+        ++d_index;
       }
     }
   }
+}
+
+/// Recover a function parameter's full (merged) type.
+///
+/// When a parameter is still in pre-conversion (cpp_declaration) form, the
+/// reference/pointer/array part is carried by the declarator rather than by
+/// its `type()`; merge them, keeping the result in frontend form so it
+/// compares equal to the (also unconverted) desired argument during
+/// specialization matching.
+static typet full_function_parameter_type(const exprt &param)
+{
+  if(param.id() == ID_cpp_declaration)
+  {
+    const cpp_declarationt &decl = to_cpp_declaration(param);
+    if(!decl.declarators().empty())
+      return decl.declarators().front().merge_type(decl.type());
+  }
+  return param.type();
+}
+
+void cpp_typecheck_resolvet::deduce_function_parameter_pack(
+  const cpp_declarationt &pack_decl,
+  const typet &desired_code_type,
+  std::size_t start_index)
+{
+  const code_typet::parameterst &desired_params =
+    to_code_type(desired_code_type).parameters();
+
+  // The element pattern is the declarator without its ellipsis flag
+  // merged with the declaration's base type.
+  cpp_declaratort elem_declarator = pack_decl.declarators().front();
+  elem_declarator.remove(ID_ellipsis);
+  const typet elem_pattern = elem_declarator.merge_type(pack_decl.type());
+
+  // Resolve the pack parameter's identifier from the declaration's
+  // base type (a bare cpp_name naming a template parameter pack).
+  irep_idt pack_id;
+  if(pack_decl.type().id() == ID_cpp_name)
+  {
+    const cpp_namet &pn = to_cpp_name(pack_decl.type());
+    if(!pn.is_qualified() && !pn.has_template_args())
+    {
+      const auto ids = cpp_typecheck.cpp_scopes.current_scope().lookup(
+        pn.get_base_name(), cpp_scopet::RECURSIVE);
+      for(const auto &id_ptr : ids)
+        if(id_ptr->id_class == cpp_idt::id_classt::TEMPLATE_PARAMETER)
+          pack_id = id_ptr->identifier;
+    }
+  }
+
+  std::vector<typet> pack_elems;
+  for(std::size_t i = start_index; i < desired_params.size(); ++i)
+  {
+    const typet desired_elem = full_function_parameter_type(desired_params[i]);
+    if(pack_id.empty())
+    {
+      // Could not identify the pack parameter; fall back to using the
+      // argument type directly (correct for a bare `A...` pattern).
+      pack_elems.push_back(desired_elem);
+      continue;
+    }
+
+    // Deduce one element by matching the element pattern against this
+    // argument, reading back the value bound to the pack parameter.
+    typet unassigned(ID_unassigned);
+    unassigned.set(ID_identifier, pack_id);
+    cpp_typecheck.template_map.type_map[pack_id] = unassigned;
+    guess_template_args(elem_pattern, desired_elem);
+    auto it = cpp_typecheck.template_map.type_map.find(pack_id);
+    if(
+      it != cpp_typecheck.template_map.type_map.end() &&
+      it->second.id() != ID_unassigned && it->second.id() != ID_nil)
+      pack_elems.push_back(it->second);
+    else
+      pack_elems.push_back(desired_elem);
+  }
+
+  if(pack_id.empty())
+    return;
+
+  cpp_typecheck.template_map.pack_size_map[pack_id] = pack_elems.size();
+  if(!pack_elems.empty())
+  {
+    cpp_typecheck.template_map.pack_args_map[pack_id] = pack_elems;
+    // Per [temp.variadic]/7: keep the pack parameter resolvable as a
+    // single type (the first element) so substitutions outside a pack
+    // expansion still work; build_template_args() emits the full pack.
+    cpp_typecheck.template_map.type_map[pack_id] = pack_elems.front();
+  }
+  // For a zero-length pack the parameter is left ID_unassigned so the
+  // caller's empty-pack handling encodes it as a zero-length expansion.
 }
 
 /// Deduce template arguments for a function template from a function call.

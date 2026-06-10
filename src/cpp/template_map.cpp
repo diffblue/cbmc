@@ -22,6 +22,83 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <ostream>
 #include <set>
 
+const std::vector<typet> *
+template_mapt::function_parameter_pack(const typet &param_type) const
+{
+  // A function parameter pack appears as a parameter whose type is a bare
+  // reference to a template parameter pack, e.g. `_ArgTypes` in
+  // `_Res(_ArgTypes...)`.  Match it by (suffix of) identifier against the
+  // deduced packs.  A bare cpp_name with a single `name` component is
+  // required so that qualified names or template-ids are not
+  // misinterpreted as packs.
+  if(param_type.id() != ID_cpp_name)
+    return nullptr;
+  const irept::subt &sub = param_type.get_sub();
+  if(sub.size() != 1 || sub.front().id() != ID_name)
+    return nullptr;
+  const std::string base = id2string(sub.front().get(ID_identifier));
+  for(const auto &entry : pack_args_map)
+  {
+    const std::string key = id2string(entry.first);
+    const auto p = key.rfind("::");
+    if((p != std::string::npos ? key.substr(p + 2) : key) == base)
+      return &entry.second;
+  }
+  // A pack deduced to zero elements has no pack_args_map entry, only a
+  // pack_size_map entry of value 0; expand it to an empty parameter list.
+  static const std::vector<typet> empty_pack;
+  for(const auto &entry : pack_size_map)
+  {
+    if(entry.second != 0)
+      continue;
+    const std::string key = id2string(entry.first);
+    const auto p = key.rfind("::");
+    if((p != std::string::npos ? key.substr(p + 2) : key) == base)
+      return &empty_pack;
+  }
+  return nullptr;
+}
+
+void template_mapt::expand_parameter_packs(typet &function_type) const
+{
+  if(function_type.id() != ID_code && function_type.id() != ID_function_type)
+    return;
+
+  irept::subt &parameters = function_type.add(ID_parameters).get_sub();
+  irept::subt new_parameters;
+  for(auto &parameter : parameters)
+  {
+    if(parameter.id() == ID_parameter || parameter.id() == ID_cpp_declaration)
+    {
+      const std::vector<typet> *pack = function_parameter_pack(
+        static_cast<const typet &>(parameter.find(ID_type)));
+      if(pack != nullptr)
+      {
+        // [temp.variadic]/5: replace the pack-expansion parameter with
+        // one parameter per deduced pack element.
+        for(const auto &pt : *pack)
+        {
+          irept expanded = parameter;
+          static_cast<typet &>(expanded.add(ID_type)) = pt;
+          // The element type already carries the full (merged)
+          // reference/pointer part; drop any declarator type and the
+          // ellipsis flag so the element is not mis-elaborated.
+          for(auto &d : expanded.get_sub())
+            if(d.id() == ID_cpp_declarator)
+            {
+              static_cast<typet &>(d.add(ID_type)).make_nil();
+              d.remove(ID_ellipsis);
+            }
+          new_parameters.push_back(expanded);
+        }
+        continue;
+      }
+    }
+    new_parameters.push_back(parameter);
+  }
+  parameters.swap(new_parameters);
+}
+
 void template_mapt::apply(typet &type) const
 {
   if(type.id()==ID_array)
