@@ -16,6 +16,7 @@ Date:   December 2014
 #include "remove_asm.h"
 
 #include <util/c_types.h>
+#include <util/message.h>
 #include <util/pointer_expr.h>
 #include <util/prefix.h>
 #include <util/range.h>
@@ -36,7 +37,8 @@ public:
     message_handlert &message_handler)
     : symbol_table(_symbol_table),
       goto_functions(_goto_functions),
-      message_handler(message_handler)
+      message_handler(message_handler),
+      log(message_handler)
   {
   }
 
@@ -50,6 +52,7 @@ protected:
   symbol_tablet &symbol_table;
   goto_functionst &goto_functions;
   message_handlert &message_handler;
+  messaget log;
 
   void process_function(const irep_idt &, goto_functionst::goto_functiont &);
 
@@ -402,7 +405,15 @@ void remove_asmt::process_instruction_gcc(
 
   if(unknown)
   {
-    // we give up; we should perhaps print a warning
+    // The entire inline-assembly statement is dropped (turned into skip below)
+    // when any of its instructions is not recognized; warn so that the user is
+    // not left silently relying on un-modeled assembly.
+    log.warning() << "dropping inline assembly statement at "
+                  << code.source_location()
+                  << ": it contains an instruction that is not modeled, so the "
+                     "whole statement (including any modeled instructions) is "
+                     "removed"
+                  << messaget::eom;
   }
   else
     dest.destructive_append(tmp_dest);
@@ -530,7 +541,15 @@ void remove_asmt::process_instruction_msc(
 
   if(unknown)
   {
-    // we give up; we should perhaps print a warning
+    // The entire inline-assembly statement is dropped (turned into skip below)
+    // when any of its instructions is not recognized; warn so that the user is
+    // not left silently relying on un-modeled assembly.
+    log.warning() << "dropping inline assembly statement at "
+                  << code.source_location()
+                  << ": it contains an instruction that is not modeled, so the "
+                     "whole statement (including any modeled instructions) is "
+                     "removed"
+                  << messaget::eom;
   }
   else
     dest.destructive_append(tmp_dest);
