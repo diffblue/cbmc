@@ -3,6 +3,7 @@ main.c
 --show-goto-functions
 ^EXIT=0$
 ^SIGNAL=0$
+dropping inline assembly statement at .*: it contains an instruction that is not modeled
 --
 ^warning: ignoring
 CALL __asm_

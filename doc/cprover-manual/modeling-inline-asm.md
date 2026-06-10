@@ -65,7 +65,8 @@ Clobber lists are parsed but do not affect verification.
   in its entirety, **including any recognized instructions in the same
   statement**. This can be unsound if the dropped assembly has side effects
   relevant to the property being verified.
-- No diagnostic is emitted for dropped assembly. Use
+- When an inline-assembly statement is dropped, CBMC emits a warning
+  identifying its source location. You can also use
   `goto-instrument --show-goto-functions` (or `cbmc --show-goto-functions`) to
   inspect whether an inline-assembly statement was translated or dropped.
 - For GCC-style inline assembly, complex atomic operations beyond the basic
