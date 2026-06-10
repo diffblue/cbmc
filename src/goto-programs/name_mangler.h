@@ -53,11 +53,29 @@ public:
     std::vector<symbolt> new_syms;
     std::vector<irep_idt> old_syms;
 
-    for(auto sym_it = model.symbol_table.symbols.begin();
-        sym_it != model.symbol_table.symbols.end();
-        ++sym_it)
+    collect_file_local_functions(rename, renamed_funs, new_syms, old_syms);
+    merge_into_symbol_table(new_syms, old_syms);
+    apply_rename_to_symbols(rename);
+    apply_rename_to_functions(rename);
+    merge_into_function_map(renamed_funs);
+  }
+
+private:
+  /// \brief Find all file-local functions and compute their mangled names
+  ///
+  /// Populates \p new_syms with the mangled symbols to be inserted, \p old_syms
+  /// with the names of the original symbols to be removed, \p rename with the
+  /// old-to-new symbol mapping, and \p renamed_funs with the old-to-new
+  /// function-map name mapping.
+  void collect_file_local_functions(
+    rename_symbolt &rename,
+    std::map<irep_idt, irep_idt> &renamed_funs,
+    std::vector<symbolt> &new_syms,
+    std::vector<irep_idt> &old_syms)
+  {
+    for(const auto &named_symbol : model.symbol_table.symbols)
     {
-      const symbolt &sym = sym_it->second;
+      const symbolt &sym = named_symbol.second;
 
       if(sym.type.id() != ID_code) // is not a function
         continue;
@@ -82,7 +100,19 @@ public:
 
       log.debug() << "Mangling: " << sym.name << " -> " << mangled << log.eom;
     }
+  }
 
+  /// \brief Insert the mangled symbols and remove the original ones
+  ///
+  /// If the mangled name already denotes a function declaration (no body), the
+  /// declaration is updated in place with the definition. Its module and
+  /// base_name are deliberately left untouched: both participate in
+  /// symbol_tablet's indices and must not change after insertion (see
+  /// symbol_tablet::validate()). Any other collision is reported as a warning.
+  void merge_into_symbol_table(
+    const std::vector<symbolt> &new_syms,
+    const std::vector<irep_idt> &old_syms)
+  {
     for(const auto &sym : new_syms)
     {
       auto result = model.symbol_table.insert(sym);
@@ -91,13 +121,6 @@ public:
         symbolt &existing = result.first;
         if(existing.value.is_nil() && existing.type.id() == ID_code)
         {
-          // The existing symbol is a function declaration (no body). This
-          // happens when user code forward-declares the mangled name. Replace
-          // it with the definition so that parameter identifiers and the full
-          // type are preserved. Do NOT touch existing.module or
-          // existing.base_name: both participate in symbol_tablet's indices
-          // (symbol_module_map / symbol_base_map) and must not change after a
-          // symbol has been inserted (see symbol_tablet::validate()).
           existing.type = sym.type;
           existing.value = sym.value;
           existing.is_file_local = sym.is_file_local;
@@ -116,7 +139,11 @@ public:
     }
     for(const auto &name : old_syms)
       model.symbol_table.remove(name);
+  }
 
+  /// \brief Apply the renaming to the value and type of every symbol
+  void apply_rename_to_symbols(const rename_symbolt &rename)
+  {
     for(auto it = model.symbol_table.begin(); it != model.symbol_table.end();
         ++it)
     {
@@ -131,7 +158,12 @@ public:
       new_sym.value = e;
       new_sym.type = t;
     }
+  }
 
+  /// \brief Apply the renaming to the bodies and parameter identifiers of all
+  ///   functions
+  void apply_rename_to_functions(const rename_symbolt &rename)
+  {
     for(auto &fun : model.goto_functions.function_map)
     {
       if(!fun.second.body_available())
@@ -149,8 +181,19 @@ public:
           rename(ins.condition_nonconst());
       }
     }
+  }
 
-    // Add goto-programs with new function names
+  /// \brief Move each renamed function's body to its mangled name in the
+  ///   function map
+  ///
+  /// If the mangled name already has an empty function-map entry (from a
+  /// forward declaration), the definition's body is swapped in via
+  /// goto_functiont::swap() (which also carries over function_is_hidden). The
+  /// entry is looked up before the emplace so that the definition is not left
+  /// moved-from on a colliding emplace; a pre-existing non-empty entry is
+  /// reported at debug verbosity.
+  void merge_into_function_map(const std::map<irep_idt, irep_idt> &renamed_funs)
+  {
     for(const auto &pair : renamed_funs)
     {
       auto found = model.goto_functions.function_map.find(pair.first);
@@ -168,11 +211,6 @@ public:
       }
       else if(existing->second.body.instructions.empty())
       {
-        // The mangled name already has a function map entry (from a forward
-        // declaration) with an empty body. Swap in the definition's body and
-        // parameter identifiers (goto_functiont::swap() also carries over
-        // function_is_hidden). We look the entry up rather than relying on a
-        // failed emplace, as the latter would leave found->second moved-from.
         existing->second.swap(found->second);
       }
       else
