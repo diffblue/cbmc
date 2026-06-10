@@ -1034,7 +1034,7 @@ literalt smt2_convt::convert(const exprt &expr)
   return l;
 }
 
-exprt smt2_convt::handle(const exprt &expr)
+exprt smt2_convt::do_handle(const exprt &expr)
 {
   // We can only improve Booleans.
   if(!expr.is_boolean())
@@ -5159,27 +5159,27 @@ void smt2_convt::unflatten(
   }
 }
 
-void smt2_convt::set_to(const exprt &expr, bool value)
+void smt2_convt::do_set_to(const exprt &expr, bool value)
 {
   PRECONDITION(expr.is_boolean());
 
   if(expr.id()==ID_and && value)
   {
     for(const auto &op : expr.operands())
-      set_to(op, true);
+      do_set_to(op, true);
     return;
   }
 
   if(expr.id()==ID_or && !value)
   {
     for(const auto &op : expr.operands())
-      set_to(op, false);
+      do_set_to(op, false);
     return;
   }
 
   if(expr.id()==ID_not)
   {
-    return set_to(to_not_expr(expr).op(), !value);
+    return do_set_to(to_not_expr(expr).op(), !value);
   }
 
   out << "\n";

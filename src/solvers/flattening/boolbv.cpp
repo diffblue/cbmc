@@ -81,10 +81,10 @@ const bvt &boolbvt::convert_bv(
   return cache_entry;
 }
 
-exprt boolbvt::handle(const exprt &expr)
+exprt boolbvt::do_handle(const exprt &expr)
 {
   if(expr.type().id() == ID_bool)
-    return prop_conv_solvert::handle(expr);
+    return prop_conv_solvert::do_handle(expr);
   auto bv = convert_bv(expr);
   set_frozen(bv); // for incremental usage
   return literal_vector_exprt{bv, expr.type()};
@@ -529,14 +529,14 @@ bool boolbvt::boolbv_set_equality_to_true(const equal_exprt &expr)
   return true;
 }
 
-void boolbvt::set_to(const exprt &expr, bool value)
+void boolbvt::do_set_to(const exprt &expr, bool value)
 {
   PRECONDITION(expr.is_boolean());
 
   const auto equal_expr = expr_try_dynamic_cast<equal_exprt>(expr);
   if(value && equal_expr && !boolbv_set_equality_to_true(*equal_expr))
     return;
-  SUB::set_to(expr, value);
+  SUB::do_set_to(expr, value);
 }
 
 bool boolbvt::is_unbounded_array(const typet &type) const

@@ -33,12 +33,26 @@ class exprt;
 /// Reading the satisfying assignment via \ref get is only valid in the
 /// D_SATISFIABLE state. Adding new constraints (\ref set_to, \ref handle)
 /// resets the status to D_ERROR.
+///
+/// Note that D_ERROR is overloaded: it denotes both "no solve has been
+/// performed yet" (the initial/post-mutation state) and "the last solve
+/// reported a genuine error". Consequently the only fully actionable answer
+/// from \ref get_status() is D_SATISFIABLE. Distinguishing the two would
+/// require an explicit UNKNOWN value mirroring \ref propt::statust (or
+/// std::optional<resultt>); this is left as a follow-up.
 class decision_proceduret
 {
 public:
   /// For a Boolean expression \p expr, add the constraint 'expr' if \p value
-  /// is `true`, otherwise add 'not expr'
-  virtual void set_to(const exprt &, bool value) = 0;
+  /// is `true`, otherwise add 'not expr'.
+  /// This is a non-virtual entry point that resets the status to D_ERROR
+  /// before dispatching to \ref do_set_to, so that the state-machine
+  /// invariant holds for every caller, including direct callers of \ref set_to.
+  void set_to(const exprt &expr, bool value)
+  {
+    latest_result = resultt::D_ERROR;
+    do_set_to(expr, value);
+  }
 
   /// For a Boolean expression \p expr, add the constraint 'expr'
   void set_to_true(const exprt &);
@@ -53,7 +67,9 @@ public:
   /// \ref set_to.
   /// The returned expression may be the expression itself or a more compact
   /// but solver-specific representation.
-  virtual exprt handle(const exprt &) = 0;
+  /// This is a non-virtual entry point that resets the status to D_ERROR
+  /// before dispatching to \ref do_handle.
+  exprt handle(const exprt &expr);
 
   /// Result of running the decision procedure
   enum class resultt
@@ -97,9 +113,21 @@ public:
   }
 
 protected:
+  /// Implementation of \ref set_to. Subclasses add the constraint here; the
+  /// public \ref set_to wrapper has already reset the status to D_ERROR.
+  virtual void do_set_to(const exprt &expr, bool value) = 0;
+
+  /// Implementation of \ref handle. Subclasses create the handle here; the
+  /// public \ref handle wrapper has already reset the status to D_ERROR.
+  virtual exprt do_handle(const exprt &expr) = 0;
+
   /// Implementation of the decision procedure.
   virtual resultt dec_solve(const exprt &assumption) = 0;
 
+  /// The result of the most recent \ref operator()() call, or D_ERROR if no
+  /// solve has been performed yet or new constraints have since been added.
+  /// D_ERROR therefore conflates "unsolved" and "error"; see the note in the
+  /// class-level documentation.
   resultt latest_result = resultt::D_ERROR;
 };
 
