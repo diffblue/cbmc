@@ -1,0 +1,13 @@
+CORE
+main.c
+--pointer-check --drop-unused-functions
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^\[unreachable\.
+--
+Dropping unused functions happens before property instrumentation, so the
+unreachable null dereference is never turned into a property. If the removal
+ever stopped happening before goto_check_c, a [unreachable.pointer_dereference.*]
+property would reappear and fail this test.

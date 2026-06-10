@@ -23,7 +23,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/process_goto_program.h>
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/remove_skip.h>
-#include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_properties.h>
@@ -918,13 +917,6 @@ bool cbmc_parse_optionst::process_goto_program(
   // add failed symbols
   // needs to be done before pointer analysis
   add_failed_symbols(goto_model.symbol_table);
-
-  if(options.get_bool_option("drop-unused-functions"))
-  {
-    // Entry point will have been set before and function pointers removed
-    log.status() << "Removing unused functions" << messaget::eom;
-    remove_unused_functions(goto_model, log.get_message_handler());
-  }
 
   // remove skips such that trivial GOTOs are deleted and not considered
   // for coverage annotation:
