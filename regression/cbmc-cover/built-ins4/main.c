@@ -1,4 +1,4 @@
-#include <string.h>
+__CPROVER_size_t strlen(const char *);
 
 int main()
 {
