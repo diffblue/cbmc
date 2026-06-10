@@ -347,6 +347,12 @@ struct tree_node {
 Using `__CPROVER_assume(__CPROVER_rw_ok(root, sizeof(*root)))` on a
 `struct tree_node *root` creates a nondeterministic tree bounded by `--unwind`.
 
+Chained dereferences such as `head->next->data` or `root->left->right` can be
+used directly: CBMC lifts the intermediate pointers into temporaries (see
+`--no-lift-nested-dereferences`), so a guarded access like
+`if(head->next) head->next->data` reads the intermediate pointer once and
+verifies.
+
 #### Soundness guarantees
 
 The `rw_ok`-in-assumptions feature is designed to not suppress genuine
@@ -387,16 +393,6 @@ memory-safety errors:
   assigned to the new array object, so that whole-array operations (such as
   `__CPROVER_array_copy` / `__CPROVER_array_equal`) resolve to a single target;
   this breaks such pre-existing aliases, and `b` keeps its old (nondet) value.
-
-- **Chained dereference expressions:** A lazily-created inductive structure can
-  be traversed to any depth (bounded by `--unwind`) using a loop or by binding
-  intermediate pointers to local variables -- e.g. `n = head->next;` and then
-  using `n->data`. A single chained dereference *expression* that walks through
-  a freshly-created node in one go, such as `head->next->data`, may instead
-  raise a spurious dereference failure on the intermediate pointer; assign the
-  intermediate pointer to a local variable first. This is a property of how
-  auto-objects are materialised on dereference, not a limit on the depth or the
-  kind of field being read.
 
 - **Pointer primitive checks:** The `--pointer-primitive-check` option may
   report failures for the `rw_ok` call itself when the pointer is

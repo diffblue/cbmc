@@ -8,6 +8,6 @@ main.c
 ^warning: ignoring
 --
 Tests that scalar fields of lazily-created inductive nodes can be read at depth
-when intermediate pointers are bound to local variables (the supported idiom;
-the chain is finite and bounded by --unwind). See GitHub issue
-diffblue/cbmc#7829.
+using inline chained dereferences (head->next->data); the nested-dereference
+lifting pass hoists the intermediate pointers so the reads verify. The chain is
+finite and bounded by --unwind. See GitHub issue diffblue/cbmc#7829.

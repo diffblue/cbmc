@@ -4,11 +4,11 @@ struct node
   struct node *next;
 };
 
-// Deep reads into a lazily-created inductive structure work when intermediate
-// pointers are bound to local variables (the inline expression head->next->data
-// does not -- see the "Chained dereference expressions" limitation in
-// doc/cprover-manual/memory-primitives.md). The chain is finite and bounded by
-// --unwind. See https://github.com/diffblue/cbmc/issues/7829
+// Chained dereferences into a lazily-created inductive structure can be used
+// directly: the nested-dereference lifting pass (on by default) hoists the
+// intermediate pointers into temporaries, so guarded reads such as
+// head->next->data verify. The chain is finite and bounded by --unwind.
+// See https://github.com/diffblue/cbmc/issues/7829
 int main()
 {
   struct node *head;
@@ -16,21 +16,17 @@ int main()
   __CPROVER_assume(head != 0);
 
   // First-level scalar read.
-  int d0 = head->data;
-  __CPROVER_assert(d0 == d0, "first-level read");
+  __CPROVER_assert(head->data == head->data, "first-level read");
 
-  // Second- and third-level scalar reads via intermediate variables.
-  struct node *second = head->next;
-  if(second != 0)
+  // Second- and third-level scalar reads via inline chained dereferences.
+  if(head->next != 0)
   {
-    int d1 = second->data;
-    __CPROVER_assert(d1 == d1, "second-level read");
+    __CPROVER_assert(head->next->data == head->next->data, "second-level read");
 
-    struct node *third = second->next;
-    if(third != 0)
+    if(head->next->next != 0)
     {
-      int d2 = third->data;
-      __CPROVER_assert(d2 == d2, "third-level read");
+      __CPROVER_assert(
+        head->next->next->data == head->next->next->data, "third-level read");
     }
   }
   return 0;
