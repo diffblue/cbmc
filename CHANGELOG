@@ -82,6 +82,7 @@ multi-dimensional arrays (via #8705).
 **Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-6.8.0...cbmc-6.9.0
 
 # CBMC 6.8.0
+
 This release extends the JSON interface to reading full GOTO functions (and not
 just symbol tables) (via #8713). Also included are various usability
 improvements around contracts instrumentation (see #8697, #8694).
@@ -123,6 +124,7 @@ improvements around contracts instrumentation (see #8697, #8694).
 **Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-6.7.1...cbmc-6.8.0
 
 # CBMC 6.7.1
+
 This release addresses bugs in our handling of array-update ("with") expressions
 (via #8674) and gaps in our C17/C23 support (via #8673).
 
@@ -136,6 +138,7 @@ This release addresses bugs in our handling of array-update ("with") expressions
 **Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-6.7.0...cbmc-6.7.1
 
 # CBMC 6.7.0
+
 This release adds aarch64 va_list support (via #8572), which makes all tests
 pass on aarch64 Linux. We reworked expression simplification during symbolic
 execution (via #8642, #8647, #8627) to produce smaller and quicker-to-solve
@@ -166,6 +169,7 @@ formulae for scenarios seen by our users.
 **Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-6.6.0...cbmc-6.7.0
 
 # CBMC 6.6.0
+
 This release adds C17 and C23 support to our C front-end (via #8620, #8623). We
 have no longer provide Ubuntu 20.04 pre-built binaries as security support for
 that distribution has ended.
@@ -196,6 +200,7 @@ that distribution has ended.
 **Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-6.5.0...cbmc-6.6.0
 
 # CBMC 6.5.0
+
 This release addresses both soundness (via #8562) and performance issues
 (via #8574, #8576) in our code contracts instrumentation, and includes a
 collection of bit-operator cleanup (such as #8524, #8531) and floating-point
@@ -257,6 +262,7 @@ via #8538) that aid EBMC/HW-CBMC.
 **Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-6.4.1...cbmc-6.5.0
 
 # CBMC 6.4.1
+
 This patch release addresses a hard-coding of C semantics in the back-end for
 pointer subtraction (via #8497).
 
@@ -277,6 +283,7 @@ pointer subtraction (via #8497).
 **Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-6.4.0...cbmc-6.4.1
 
 # CBMC 6.4.0
+
 This release improves upon automated assigns-clause inference for loop
 invariants, which should make manually adding assigns clauses to loops less
 frequent.
@@ -302,6 +309,7 @@ frequent.
 **Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-6.3.1...cbmc-6.4.0
 
 # CBMC 6.3.1
+
 This patch release addresses build failures on Apple Silicon (via PR #8461).
 
 ## Bug Fixes
@@ -310,6 +318,7 @@ This patch release addresses build failures on Apple Silicon (via PR #8461).
 **Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-6.3.0...cbmc-6.3.1
 
 # CBMC 6.3.0
+
 This release addresses build failures on aarch64 (64-bit ARM) platforms (via
 PR #8366) and for some CMake configurations (via PR #8435). Users of loop
 invariants with dynamic frames have two changes to their user experience:
@@ -343,6 +352,7 @@ invariants with dynamic frames have two changes to their user experience:
 **Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-6.2.0...cbmc-6.3.0
 
 # CBMC 6.2.0
+
 This release reduces noise from dynamic-frames contract checking by suppressing
 trivial properties (via #8413) and fixes several contract-related issues
 including do-while loop handling (via #8420) and skipped-loop write sets
@@ -373,6 +383,7 @@ including do-while loop handling (via #8420) and skipped-loop write sets
 **Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-6.1.1...cbmc-6.2.0
 
 # CBMC 6.1.1
+
 This patch release compiles CaDiCaL with -DNDEBUG for improved solver
 performance (via #8397) and adds flattening support for addition and subtraction
 on the range type (via #8396).
@@ -388,6 +399,7 @@ on the range type (via #8396).
 **Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-6.1.0...cbmc-6.1.1
 
 # CBMC 6.1.0
+
 This release adds support for building with GCC 14 (via #8368), adds
 documentation for loop contracts and __CPROVER_loop_entry (via #8377), and
 improves loop contracts instrumentation including side-effect checking
@@ -420,6 +432,7 @@ improves loop contracts instrumentation including side-effect checking
 **Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-6.0.1...cbmc-6.1.0
 
 # CBMC 6.0.1
+
 This patch release fixes a GOTO conversion bug where declaration hops could
 invalidate incomplete gotos (via #8349) and a union member handling issue
 (via #8347). It also reduces default verbosity of the cprover binary and runtime
@@ -440,6 +453,7 @@ messages (via #8352, #8354).
 **Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-6.0.0...cbmc-6.0.1
 
 # CBMC 6.0.0
+
 This major release requires C++17 to build (via #7989) and changes several
 defaults: malloc may now fail by default (via #8101), unwinding assertions are
 enabled by default (via #8274, #8273), pointer dereference, array bounds, and
@@ -678,6 +692,7 @@ additions (snprintf, dprintf, asprintf, and more).
 **Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-5.95.1...cbmc-6.0.0
 
 # CBMC 5.95.1
+
 This patch release improves multiplication encoding using the Dadda tree
 algorithm (via #7984) and fixes extraneous parameters in C library exp/logl
 models (via #7985).
@@ -691,6 +706,7 @@ models (via #7985).
 **Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-5.95.0...cbmc-5.95.1
 
 # CBMC 5.95.0
+
 This release adds C front-end support for vector expressions as compile-time
 constants (via #7947) and C library models for exp, log, and pow (via #7906).
 
@@ -708,6 +724,7 @@ constants (via #7947) and C library models for exp, log, and pow (via #7906).
 **Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-5.94.0...cbmc-5.95.0
 
 # CBMC 5.94.0
+
 This release adds documentation for CBMC Shadow Memory intrinsics (via #7913),
 models for C library functions getpwnam, getpwuid, and getopt
 (via #7919, #7916), and pointer-check support for shadow memory addresses
