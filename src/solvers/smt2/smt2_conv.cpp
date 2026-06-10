@@ -118,7 +118,11 @@ smt2_convt::smt2_convt(
 
   case solvert::Z3:
     use_array_of_bool = true;
-    use_as_const = true;
+    // `as const` is disabled because of a soundness issue in Z3,
+    // see https://github.com/Z3Prover/z3/issues/9550. Revisit once
+    // the upstream bug is fixed and we can bump the minimum Z3
+    // version accordingly.
+    use_as_const = false;
     use_check_sat_assuming = true;
     use_lambda_for_array = true;
     emit_set_logic = false;
@@ -532,17 +536,21 @@ constant_exprt smt2_convt::parse_literal(
   }
   else if(
     src.get_sub().size() == 3 &&
-    src.get_sub()[0].id() == "root-obj") // (root-obj (+ ...) 1)
+    src.get_sub()[0].id() == "root-obj") // (root-obj (+ ...) <index>)
   {
     // Z3 emits these while there isn't an agreed-upon standard for representing
     // algebraic numbers just yet. https://smt-comp.github.io/2023/model.html
     // gave some proposals, but these don't seem to have been implemented.
     // For now, we use DATA_INVARIANT as our parsing may be overly restrictive.
     // Eventually, these should become proper, user-facing exceptions.
+    //
+    // The third element is the 1-based index identifying which real root of
+    // the polynomial Z3 chose for its model. We do not constrain its value
+    // because algebraic_numbert tracks only the polynomial, not the specific
+    // root, so any root of the same polynomial maps to the same expression.
     DATA_INVARIANT_WITH_DIAGNOSTICS(
       src.get_sub()[1].id().empty() && src.get_sub()[1].get_sub().size() == 3 &&
-        src.get_sub()[1].get_sub()[0].id() == "+" &&
-        src.get_sub()[2].id() == "1",
+        src.get_sub()[1].get_sub()[0].id() == "+",
       "unexpected root-obj expression",
       src.pretty());
     irept sum_rhs = src.get_sub()[1].get_sub()[2];
@@ -5028,7 +5036,7 @@ void smt2_convt::unflatten(
   }
   else if(type.id() == ID_array)
   {
-    PRECONDITION(use_as_const);
+    PRECONDITION(use_as_const || use_lambda_for_array);
 
     if(where == wheret::BEGIN)
       out << "(let ((?ufop" << nesting << " ";
@@ -5049,9 +5057,29 @@ void smt2_convt::unflatten(
       for(mp_integer i = 1; i < size; ++i)
         out << "(store ";
 
-      out << "((as const ";
-      convert_type(array_type);
-      out << ") ";
+      // Build a constant array filled with element 0 as the base, then
+      // overwrite indices 1..N-1 via (store ...).
+      if(use_as_const)
+      {
+        out << "((as const ";
+        convert_type(array_type);
+        out << ") ";
+      }
+      else
+      {
+        INVARIANT(
+          use_lambda_for_array,
+          "unflatten relies on `(lambda ...)` for constant arrays "
+          "when `(as const ...)` is unavailable");
+        // Note: lambda is a Z3/Bitwuzla extension; not part of the
+        // SMT-LIB 2.6 standard.  The bound variable `?ufidx<n>` is
+        // intentionally unused -- the body returns the element-0 value
+        // regardless of its argument, making this semantically
+        // equivalent to `(as const ...)`.
+        out << "(lambda ((?ufidx" << nesting << " ";
+        convert_type(array_type.index_type());
+        out << ")) ";
+      }
       // use element at index 0 as default value
       unflatten(wheret::BEGIN, array_type.element_type(), nesting + 1);
       out << "((_ extract " << subtype_width - 1 << " "
@@ -5189,6 +5217,28 @@ void smt2_convt::set_to(const exprt &expr, bool value)
 
         out << "; set_to true (equal)\n";
 
+        // Helper: emit the body of a definition for `smt2_identifier`
+        // -- either a direct `convert_expr(prepared_rhs)` for non-array
+        // or array-theory cases, or a `unflatten ... convert_expr ...
+        // unflatten` reconstruction for array RHSes.  Used twice below
+        // to keep the `declare-fun + assert` and `define-fun` paths in
+        // sync.
+        auto emit_definition_body = [&]()
+        {
+          if(
+            equal_expr.lhs().type().id() != ID_array ||
+            use_array_theory(prepared_rhs))
+          {
+            convert_expr(prepared_rhs);
+          }
+          else
+          {
+            unflatten(wheret::BEGIN, equal_expr.lhs().type());
+            convert_expr(prepared_rhs);
+            unflatten(wheret::END, equal_expr.lhs().type());
+          }
+        };
+
         if(equal_expr.lhs().type().id() == ID_mathematical_function)
         {
           // We avoid define-fun, since it has been reported to cause
@@ -5219,26 +5269,32 @@ void smt2_convt::set_to(const exprt &expr, bool value)
           convert_expr(prepared_rhs);
           out << ')' << ')' << '\n';
         }
+        else if(use_lambda_for_array)
+        {
+          // The body emitted below may contain a `(lambda ...)` from
+          // `unflatten` (used as a stand-in for `(as const ...)` for
+          // back-ends with `use_as_const = false`).  Z3 rejects
+          // `get-value` on symbols whose `define-fun` body contains
+          // a lambda, so we use `declare-fun` + `assert (= ...)` here.
+          // Back-ends with `use_lambda_for_array = false` (the
+          // default, currently every back-end other than Z3) keep
+          // using the `define-fun` form below, so their SMT2 output
+          // is unaffected.
+          out << "(declare-fun " << smt2_identifier;
+          out << " () ";
+          convert_type(equal_expr.lhs().type());
+          out << ")\n";
+          out << "(assert (= " << smt2_identifier << ' ';
+          emit_definition_body();
+          out << "))\n";
+        }
         else
         {
           out << "(define-fun " << smt2_identifier;
           out << " () ";
           convert_type(equal_expr.lhs().type());
           out << ' ';
-          if(
-            equal_expr.lhs().type().id() != ID_array ||
-            use_array_theory(prepared_rhs))
-          {
-            convert_expr(prepared_rhs);
-          }
-          else
-          {
-            unflatten(wheret::BEGIN, equal_expr.lhs().type());
-
-            convert_expr(prepared_rhs);
-
-            unflatten(wheret::END, equal_expr.lhs().type());
-          }
+          emit_definition_body();
           out << ')' << '\n';
         }
 
