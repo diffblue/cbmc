@@ -13,9 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ostream>
 
-void cnf_clause_listt::lcnf(const bvt &bv)
+void cnf_clause_listt::do_lcnf(const bvt &bv)
 {
-  clear_status();
   bvt new_bv;
 
   if(process_clause(bv, new_bv))

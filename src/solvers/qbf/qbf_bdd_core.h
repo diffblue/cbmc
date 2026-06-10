@@ -54,7 +54,7 @@ public:
 
   literalt new_variable() override;
 
-  void lcnf(const bvt &bv) override;
+  void do_lcnf(const bvt &bv) override;
   literalt lor(literalt a, literalt b) override;
   literalt lor(const bvt &bv) override;
 

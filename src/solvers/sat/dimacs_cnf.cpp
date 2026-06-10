@@ -95,8 +95,7 @@ void dimacs_cnft::write_clauses(std::ostream &out) const
   out << output_block.str();
 }
 
-void dimacs_cnf_dumpt::lcnf(const bvt &bv)
+void dimacs_cnf_dumpt::do_lcnf(const bvt &bv)
 {
-  clear_status();
   dimacs_cnft::write_dimacs_clause(bv, out, true);
 }

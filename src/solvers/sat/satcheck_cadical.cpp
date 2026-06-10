@@ -19,9 +19,12 @@ Author: Michael Tautschnig
 
 tvt satcheck_cadical_baset::l_get(literalt a) const
 {
-  PRECONDITION(solver_state == propt::statust::SAT);
+  // Constant literals have a state-independent value; answer them before
+  // checking the solver state so that constant-folding callers are not
+  // subject to the SAT-state precondition.
   if(a.is_constant())
     return tvt(a.sign());
+  PRECONDITION(solver_state == propt::statust::SAT);
 
   tvt result;
 
@@ -44,10 +47,8 @@ std::string satcheck_cadical_baset::solver_text() const
   return std::string("CaDiCaL ") + solver->version();
 }
 
-void satcheck_cadical_baset::lcnf(const bvt &bv)
+void satcheck_cadical_baset::do_lcnf(const bvt &bv)
 {
-  clear_status();
-
   for(const auto &lit : bv)
   {
     if(lit.is_true())
