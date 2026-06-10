@@ -1987,6 +1987,38 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
             }
           }
         }
+        // [temp.variadic]/5: if a function-type template argument
+        // contains a function parameter pack (e.g. `_Res(_ArgTypes...)`
+        // in a partial specialization pattern), expand the pack using
+        // the deduced arguments and substitute the remaining template
+        // parameters via the template map, keeping the result in the
+        // same (unconverted) frontend form as a concrete function-type
+        // argument so the reconstructed type compares equal during
+        // specialization matching.  This bypasses typecheck_type, which
+        // would convert e.g. a reference parameter carried on the
+        // declaration type to a pointer.  Gated on the presence of a
+        // pack-expansion parameter so non-variadic arguments are
+        // unaffected.
+        bool pack_expanded = false;
+        if(arg.type().id() == ID_code || arg.type().id() == ID_function_type)
+        {
+          const irept &params = arg.type().find(ID_parameters);
+          bool has_pack = false;
+          for(const auto &param : params.get_sub())
+          {
+            if(param.id() != ID_cpp_declaration)
+              continue;
+            for(const auto &d : param.get_sub())
+              if(d.id() == ID_cpp_declarator && d.get_bool(ID_ellipsis))
+                has_pack = true;
+          }
+          if(has_pack)
+          {
+            template_map.expand_parameter_packs(arg.type());
+            template_map.apply(arg.type());
+            pack_expanded = true;
+          }
+        }
         // Skip typecheck_type for types that are already resolved
         // (e.g., struct_tag from a previous instantiation).
         // Re-typechecking can fail when the type references local
@@ -1997,7 +2029,8 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         // referenced via a qualified member access when scope has
         // been switched to the target class).
         if(
-          arg.type().id() == ID_cpp_name && arg.type().get_sub().size() == 1 &&
+          !pack_expanded && arg.type().id() == ID_cpp_name &&
+          arg.type().get_sub().size() == 1 &&
           arg.type().get_sub().front().id() == ID_name)
         {
           const irep_idt &nm = arg.type().get_sub().front().get(ID_identifier);
@@ -2015,7 +2048,9 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
             }
           }
         }
-        if(arg.type().id() != ID_struct_tag && arg.type().id() != ID_union_tag)
+        if(
+          !pack_expanded && arg.type().id() != ID_struct_tag &&
+          arg.type().id() != ID_union_tag)
         {
           // Per [temp.deduct]/7-8: substituting a default template
           // argument is part of the deduction process; failures there
@@ -2054,7 +2089,33 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
           error() << "missing type in template argument" << eom;
           throw 0;
         }
-        typecheck_type(arg.type());
+        // [temp.variadic]/5: expand a function parameter pack in a
+        // function-type argument (e.g. `_Res(_ArgTypes...)`) and
+        // substitute the remaining template parameters, keeping the
+        // result in unconverted frontend form (see the ID_type branch
+        // above) so it compares equal during specialization matching.
+        bool pack_expanded = false;
+        if(arg.type().id() == ID_code || arg.type().id() == ID_function_type)
+        {
+          const irept &params = arg.type().find(ID_parameters);
+          bool has_pack = false;
+          for(const auto &param : params.get_sub())
+          {
+            if(param.id() != ID_cpp_declaration)
+              continue;
+            for(const auto &d : param.get_sub())
+              if(d.id() == ID_cpp_declarator && d.get_bool(ID_ellipsis))
+                has_pack = true;
+          }
+          if(has_pack)
+          {
+            template_map.expand_parameter_packs(arg.type());
+            template_map.apply(arg.type());
+            pack_expanded = true;
+          }
+        }
+        if(!pack_expanded)
+          typecheck_type(arg.type());
         typet t=arg.type();
         arg=exprt(ID_type, t);
       }
