@@ -1,0 +1,13 @@
+CORE
+member_union.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+A constant static initializer that projects a member out of a compound literal
+(the kernel's _ddebug descriptor initialised from STATIC_KEY_FALSE_INIT) must
+be accepted, and the member must have the literal's value.

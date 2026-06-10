@@ -19,6 +19,7 @@ Author: Michael Tautschnig
 #include <util/pointer_predicates.h>
 #include <util/simplify_expr.h>
 #include <util/simplify_utils.h>
+#include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/string_expr.h>
 #include <util/symbol_table.h>
@@ -807,5 +808,71 @@ TEST_CASE(
     const auto index_of =
       application(ID_cprover_string_index_of_func, {s}, index_type);
     REQUIRE(simplify_expr(index_of, ns) == index_of);
+  }
+}
+
+TEST_CASE("Simplify member of compound literal", "[core][util]")
+{
+  // member(compound_literal(v), .m) folds like member(v, .m). Without the
+  // simplify_member compound-literal rule this does not fold, so this pins
+  // that rule independently of the front end.
+  const signedbv_typet int_type{32};
+  const struct_typet struct_type{{{"counter", int_type}, {"other", int_type}}};
+
+  SECTION("Struct literal")
+  {
+    const struct_exprt struct_value{
+      {from_integer(0, int_type), from_integer(1, int_type)}, struct_type};
+    const unary_exprt compound_literal{
+      ID_compound_literal, struct_value, struct_type};
+    const member_exprt member{compound_literal, "counter", int_type};
+
+    REQUIRE(
+      simplify_expr(member, empty_namespace) == from_integer(0, int_type));
+  }
+
+  SECTION("Struct literal of tag type")
+  {
+    symbol_tablet symbol_table;
+    type_symbolt struct_symbol{"tag-S", struct_type, ID_C};
+    symbol_table.insert(struct_symbol);
+    const namespacet ns{symbol_table};
+    const struct_tag_typet tag_type{"tag-S"};
+
+    const struct_exprt struct_value{
+      {from_integer(0, int_type), from_integer(1, int_type)}, tag_type};
+    const unary_exprt compound_literal{
+      ID_compound_literal, struct_value, tag_type};
+    const member_exprt member{compound_literal, "other", int_type};
+
+    REQUIRE(simplify_expr(member, ns) == from_integer(1, int_type));
+  }
+
+  SECTION("Union literal")
+  {
+    const union_typet union_type{{{"counter", int_type}}};
+    const union_exprt union_value{
+      "counter", from_integer(7, int_type), union_type};
+    const unary_exprt compound_literal{
+      ID_compound_literal, union_value, union_type};
+    const member_exprt member{compound_literal, "counter", int_type};
+
+    REQUIRE(
+      simplify_expr(member, empty_namespace) == from_integer(7, int_type));
+  }
+
+  SECTION("Literal with a side effect in another initializer")
+  {
+    // Folding to the selected member would lose the call.
+    const code_typet function_type{{}, int_type};
+    const side_effect_expr_function_callt call{
+      symbol_exprt{"g", function_type}, {}, int_type, source_locationt{}};
+    const struct_exprt struct_value{
+      {from_integer(0, int_type), call}, struct_type};
+    const unary_exprt compound_literal{
+      ID_compound_literal, struct_value, struct_type};
+    const member_exprt member{compound_literal, "counter", int_type};
+
+    REQUIRE(simplify_expr(member, empty_namespace) == member);
   }
 }
