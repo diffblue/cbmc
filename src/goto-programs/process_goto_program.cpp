@@ -18,6 +18,7 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/goto_model.h>
 #include <goto-programs/instrument_preconditions.h>
+#include <goto-programs/lift_nested_dereferences.h>
 #include <goto-programs/mm_io.h>
 #include <goto-programs/remove_complex.h>
 #include <goto-programs/remove_function_pointers.h>
@@ -84,6 +85,13 @@ bool process_goto_program(
     log.status() << "Removing unused functions" << messaget::eom;
     remove_unused_functions(goto_model, log.get_message_handler());
   }
+
+  // Lift chained dereferences (a->b->c) into temporaries so that the same
+  // pointer is not dereferenced repeatedly and intermediate pointers get their
+  // own object identity. On by default; can be disabled with
+  // --no-lift-nested-dereferences.
+  if(options.get_bool_option("lift-nested-dereferences"))
+    lift_nested_dereferences(goto_model);
 
   // add generic checks
   log.status() << "Generic Property Instrumentation" << messaget::eom;

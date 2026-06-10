@@ -4,7 +4,7 @@ main.c
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
-dereference failure: pointer invalid in p->next->data: FAILURE
+dereference failure: pointer invalid in .*->data: FAILURE
 --
 ^warning: ignoring
 --
