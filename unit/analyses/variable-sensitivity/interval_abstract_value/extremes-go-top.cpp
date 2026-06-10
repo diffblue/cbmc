@@ -8,8 +8,6 @@
 
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
-#include <util/namespace.h>
-#include <util/symbol_table.h>
 
 #include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
@@ -17,6 +15,7 @@
 // NOLINTNEXTLINE(whitespace/line_length)
 #include <analyses/variable-sensitivity/interval_abstract_value.h> // IWYU pragma: keep
 #include <analyses/variable-sensitivity/variable_sensitivity_test_helpers.h>
+#include <testing-utils/empty_namespace.h>
 #include <testing-utils/use_catch.h>
 
 static void verify_extreme_interval(
@@ -39,8 +38,7 @@ SCENARIO(
 
   auto environment = abstract_environmentt{object_factory};
   environment.make_top();
-  auto symbol_table = symbol_tablet{};
-  auto ns = namespacet{symbol_table};
+  const namespacet &ns = empty_namespace;
 
   GIVEN("[min-max] signed goes TOP")
   {

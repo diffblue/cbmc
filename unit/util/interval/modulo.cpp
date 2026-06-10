@@ -3,13 +3,11 @@
  Author: DiffBlue Limited
 \*******************************************************************/
 
-#include <testing-utils/use_catch.h>
-
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 #include <util/interval.h>
-#include <util/namespace.h>
-#include <util/symbol_table.h>
+
+#include <testing-utils/use_catch.h>
 
 #define V(X) (bvrep2integer(X.get(ID_value).c_str(), 32, true))
 #define V_(X) (bvrep2integer(X.c_str(), 32, true))
@@ -38,9 +36,6 @@ SCENARIO("modulo interval domain", "[core][analyses][interval][modulo]")
   }
   GIVEN("Two simple signed intervals")
   {
-    symbol_tablet symbol_table;
-    namespacet ns(symbol_table);
-
     WHEN("Positive RHS")
     {
       THEN("Ensure result is consistent.")

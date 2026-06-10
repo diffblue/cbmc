@@ -9,22 +9,19 @@ Author: Diffblue Ltd.
 #include <util/bitvector_types.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
-#include <util/symbol_table.h>
 
 #include <goto-symex/goto_symex_can_forward_propagate.h>
+#include <testing-utils/empty_namespace.h>
 #include <testing-utils/use_catch.h>
 
 SCENARIO("goto-symex-is-constant", "[core][goto-symex][is_constant]")
 {
-  symbol_tablet symbol_table;
-  namespacet ns{symbol_table};
-
   signedbv_typet int_type(32);
   constant_exprt sizeof_constant("4", int_type);
   sizeof_constant.set(ID_C_c_sizeof_type, int_type);
   symbol_exprt non_constant("x", int_type);
 
-  goto_symex_can_forward_propagatet is_constant(ns);
+  goto_symex_can_forward_propagatet is_constant(empty_namespace);
 
   GIVEN("Sizeof expression multiplied by a non-constant")
   {

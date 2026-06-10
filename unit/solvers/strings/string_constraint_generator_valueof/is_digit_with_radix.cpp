@@ -7,13 +7,12 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <testing-utils/use_catch.h>
-
-#include <solvers/strings/string_constraint_generator.h>
-
 #include <util/namespace.h>
 #include <util/simplify_expr.h>
-#include <util/symbol_table.h>
+
+#include <solvers/strings/string_constraint_generator.h>
+#include <testing-utils/empty_namespace.h>
+#include <testing-utils/use_catch.h>
 
 /// Get the simplified return value of is_digit_with_radix called with a radix
 static exprt actual(
@@ -24,13 +23,11 @@ static exprt actual(
 {
   const typet char_type = unsignedbv_typet(16);
   const constant_exprt chr = from_integer(int_value, char_type);
-  symbol_tablet symtab;
-  const namespacet ns(symtab);
 
   return simplify_expr(
     is_digit_with_radix(
       std::move(chr), strict_formatting, radix_as_char, radix_ul),
-    ns);
+    empty_namespace);
 }
 
 /// Get the simplified return value of is_digit_with_radix called with a radix

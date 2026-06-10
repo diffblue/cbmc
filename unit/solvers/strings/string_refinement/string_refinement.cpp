@@ -7,16 +7,16 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 \*******************************************************************/
 
-#include <testing-utils/use_catch.h>
-
-#include <solvers/sat/satcheck.h>
-#include <solvers/strings/string_refinement.h>
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/mathematical_types.h>
 #include <util/std_expr.h>
-#include <util/symbol_table.h>
+
+#include <solvers/sat/satcheck.h>
+#include <solvers/strings/string_refinement.h>
+#include <testing-utils/empty_namespace.h>
+#include <testing-utils/use_catch.h>
 
 SCENARIO("string refinement", "[core][solvers][strings][string_refinement]")
 {
@@ -27,9 +27,7 @@ SCENARIO("string refinement", "[core][solvers][strings][string_refinement]")
   null_message_handlert log{};
   info.message_handler = &log;
 
-  symbol_tablet symbol_table;
-  namespacet ns{symbol_table};
-  info.ns = &ns;
+  info.ns = &empty_namespace;
 
   satcheckt sat_solver{log};
   info.prop = &sat_solver;

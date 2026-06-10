@@ -9,20 +9,19 @@ Author: Diffblue Ltd.
 /// \file
 /// Unit tests for miniBDD
 
-#include <testing-utils/message.h>
-#include <testing-utils/use_catch.h>
-
-#include <solvers/bdd/miniBDD/miniBDD.h>
-#include <solvers/flattening/boolbv.h>
-#include <solvers/prop/bdd_expr.h>
-
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
 #include <util/expanding_vector.h>
 #include <util/format_expr.h>
 #include <util/namespace.h>
-#include <util/symbol_table.h>
+
+#include <solvers/bdd/miniBDD/miniBDD.h>
+#include <solvers/flattening/boolbv.h>
+#include <solvers/prop/bdd_expr.h>
+#include <testing-utils/empty_namespace.h>
+#include <testing-utils/message.h>
+#include <testing-utils/use_catch.h>
 
 class bdd_propt : public propt
 {
@@ -202,11 +201,9 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
 
   GIVEN("A bdd for x&!x==0")
   {
-    symbol_tablet symbol_table;
-    namespacet ns(symbol_table);
     mini_bdd_mgrt bdd_mgr;
     bdd_propt bdd_prop(bdd_mgr);
-    boolbvt boolbv(ns, bdd_prop, null_message_handler);
+    boolbvt boolbv(empty_namespace, bdd_prop, null_message_handler);
 
     unsignedbv_typet type(2);
     symbol_exprt var("x", type);
@@ -220,11 +217,9 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
 
   GIVEN("A bdd for x+x==1")
   {
-    symbol_tablet symbol_table;
-    namespacet ns(symbol_table);
     mini_bdd_mgrt bdd_mgr;
     bdd_propt bdd_prop(bdd_mgr);
-    boolbvt boolbv(ns, bdd_prop, null_message_handler);
+    boolbvt boolbv(empty_namespace, bdd_prop, null_message_handler);
 
     unsignedbv_typet type(32);
     symbol_exprt var("x", type);
@@ -237,11 +232,9 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
 
   GIVEN("A bdd for x*y==y*x")
   {
-    symbol_tablet symbol_table;
-    namespacet ns(symbol_table);
     mini_bdd_mgrt bdd_mgr;
     bdd_propt bdd_prop(bdd_mgr);
-    boolbvt boolbv(ns, bdd_prop, null_message_handler);
+    boolbvt boolbv(empty_namespace, bdd_prop, null_message_handler);
 
     unsignedbv_typet type(4);
     symbol_exprt var_x("x", type);
@@ -255,11 +248,9 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
 
   GIVEN("A bdd for x*x==2")
   {
-    symbol_tablet symbol_table;
-    namespacet ns(symbol_table);
     mini_bdd_mgrt bdd_mgr;
     bdd_propt bdd_prop(bdd_mgr);
-    boolbvt boolbv(ns, bdd_prop, null_message_handler);
+    boolbvt boolbv(empty_namespace, bdd_prop, null_message_handler);
 
     unsignedbv_typet type(8);
     symbol_exprt var_x("x", type);
@@ -272,11 +263,9 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
 
   GIVEN("A bdd for x*x==4")
   {
-    symbol_tablet symbol_table;
-    namespacet ns(symbol_table);
     mini_bdd_mgrt bdd_mgr;
     bdd_propt bdd_prop(bdd_mgr);
-    boolbvt boolbv(ns, bdd_prop, null_message_handler);
+    boolbvt boolbv(empty_namespace, bdd_prop, null_message_handler);
 
     unsignedbv_typet type(8);
     symbol_exprt var_x("x", type);
@@ -333,9 +322,6 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
     symbol_exprt b("b", bool_typet());
 
     or_exprt o(and_exprt(a, b), not_exprt(a));
-
-    symbol_tablet symbol_table;
-    namespacet ns(symbol_table);
 
     {
       std::ostringstream oss;

@@ -6,16 +6,15 @@
 
 \*******************************************************************/
 
-#include "array_builder.h"
+#include <util/arith_tools.h>
+#include <util/bitvector_types.h>
 
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_test_helpers.h>
-
+#include <testing-utils/empty_namespace.h>
 #include <testing-utils/use_catch.h>
 
-#include <util/arith_tools.h>
-#include <util/bitvector_types.h>
-#include <util/symbol_table.h>
+#include "array_builder.h"
 
 using abstract_object_ptrt = std::shared_ptr<const abstract_objectt>;
 
@@ -53,8 +52,7 @@ SCENARIO(
       variable_sensitivity_object_factoryt::configured_with(configuration);
     abstract_environmentt environment(object_factory);
     environment.make_top();
-    symbol_tablet symbol_table;
-    namespacet ns(symbol_table);
+    const namespacet &ns = empty_namespace;
     WHEN("maximum size is " + std::to_string(max_array_index))
     {
       WHEN("array = {1, 2, 3}, writes under maximum size")

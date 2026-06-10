@@ -7,20 +7,17 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <testing-utils/use_catch.h>
+#include <util/simplify_expr.h>
 
 #include <solvers/strings/string_format_builtin_function.h>
-#include <util/simplify_expr.h>
-#include <util/symbol_table.h>
+#include <testing-utils/empty_namespace.h>
+#include <testing-utils/use_catch.h>
 
 SCENARIO(
   "length_of_decimal_int",
   "[core][solvers][strings][string_format_builtin_function]")
 {
   const typet type = signedbv_typet(32);
-
-  const symbol_tablet symbol_table;
-  const namespacet ns{symbol_table};
 
   const std::vector<mp_integer> input_values = {
     0, 1, 10, 15, 999, 1000000001, -1, -21111111, -1234567890};
@@ -39,7 +36,8 @@ SCENARIO(
         THEN("length expression is " << oracle)
         {
           const int actual_int =
-            numeric_cast<int>(to_constant_expr(simplify_expr(actual, ns)))
+            numeric_cast<int>(
+              to_constant_expr(simplify_expr(actual, empty_namespace)))
               .value();
           REQUIRE(actual_int == oracle);
         }
@@ -58,8 +56,8 @@ SCENARIO(
         const int oracle = oracles_for_base_16[i];
         THEN("length expression is " << oracle)
         {
-          const int actual_int =
-            *numeric_cast<int>(to_constant_expr(simplify_expr(actual, ns)));
+          const int actual_int = *numeric_cast<int>(
+            to_constant_expr(simplify_expr(actual, empty_namespace)));
           REQUIRE(actual_int == oracle);
         }
       }

@@ -9,12 +9,12 @@
 #include <util/bitvector_types.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
-#include <util/symbol_table.h>
 
 #include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/constant_pointer_abstract_object.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_test_helpers.h>
+#include <testing-utils/empty_namespace.h>
 #include <testing-utils/use_catch.h>
 
 SCENARIO(
@@ -35,8 +35,6 @@ SCENARIO(
     variable_sensitivity_object_factoryt::configured_with(config);
   abstract_environmentt environment{object_factory};
   environment.make_top();
-  symbol_tablet symbol_table;
-  namespacet ns(symbol_table);
 
   GIVEN("constant_pointer_abstract_object")
   {
@@ -56,7 +54,7 @@ SCENARIO(
     {
       const auto address_of = address_of_exprt(val2_symbol);
       auto obj = std::make_shared<constant_pointer_abstract_objectt>(
-        address_of, environment, ns);
+        address_of, environment, empty_namespace);
       THEN_PREDICATE(obj, "x == &val2");
     }
   }
