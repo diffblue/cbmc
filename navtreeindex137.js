@@ -1,5 +1,17 @@
 var NAVTREEINDEX137 =
 {
+"struct_____c_p_r_o_v_e_r__jsa__abstract__range.html#a829c8b97cbdfb98687ad648e625c221d":[7,0,13,2],
+"struct_____c_p_r_o_v_e_r__jsa__abstract__range.html#aaee29a0235b09ba5caec95670d9675f0":[7,0,13,1],
+"struct_____c_p_r_o_v_e_r__jsa__abstract__range.html#abb5f70aee822c148ccf197fb1d849ee3":[7,0,13,0],
+"struct_____c_p_r_o_v_e_r__jsa__concrete__node.html":[7,0,14],
+"struct_____c_p_r_o_v_e_r__jsa__concrete__node.html#a7418c3ee9d0ca1e10808ac9564bf71d0":[7,0,14,0],
+"struct_____c_p_r_o_v_e_r__jsa__concrete__node.html#a8f923732f054959e792e137175f4b08a":[7,0,14,3],
+"struct_____c_p_r_o_v_e_r__jsa__concrete__node.html#a9c4891c5bc910d55659b52d584b3191a":[7,0,14,2],
+"struct_____c_p_r_o_v_e_r__jsa__concrete__node.html#aff3534f578b18ddbdd9f74460eea00c6":[7,0,14,1],
+"struct_____c_p_r_o_v_e_r__jsa__iterator.html":[7,0,15],
+"struct_____c_p_r_o_v_e_r__jsa__iterator.html#aad65f2fabf3f04d3b08882047840b8ce":[7,0,15,4],
+"struct_____c_p_r_o_v_e_r__jsa__iterator.html#ab0cd5d8b253927507874ed9a1023d64c":[7,0,15,1],
+"struct_____c_p_r_o_v_e_r__jsa__iterator.html#ada0fc3dbda43ceb0122fa4cd9266916f":[7,0,15,0],
 "struct_____c_p_r_o_v_e_r__jsa__iterator.html#aeb569fd2b416d42a400191b6f2219817":[7,0,15,3],
 "struct_____c_p_r_o_v_e_r__jsa__iterator.html#afbbfbcfea1f76a9e44979ec276235f2d":[7,0,15,2],
 "struct_____c_p_r_o_v_e_r__pipet.html":[7,0,16],
@@ -237,17 +249,5 @@ var NAVTREEINDEX137 =
 "structc__wranglert_1_1assertiont.html#ac63638e98e9c67e0e21a7044081ff3e6":[7,0,164,0,2],
 "structc__wranglert_1_1assertiont.html#ada10b5d2ad83401b3b7249046da81370":[7,0,164,0,1],
 "structc__wranglert_1_1function__contract__clauset.html":[7,0,164,1],
-"structc__wranglert_1_1function__contract__clauset.html#a8cb32fc84cc244e6dccc14ab99f14d45":[7,0,164,1,2],
-"structc__wranglert_1_1function__contract__clauset.html#adb5ca8c3e73d2f2a3fd65a3ce7e557d3":[7,0,164,1,0],
-"structc__wranglert_1_1function__contract__clauset.html#aed46383628acf6f93a9f51e596f135bb":[7,0,164,1,1],
-"structc__wranglert_1_1functiont.html":[7,0,164,2],
-"structc__wranglert_1_1functiont.html#a005d725c42100a68acab5eb862f7bda6":[7,0,164,2,2],
-"structc__wranglert_1_1functiont.html#a28efa1f2fb7a3d1c3a4d6f3715444cda":[7,0,164,2,3],
-"structc__wranglert_1_1functiont.html#a4e7338144d44692491079ee2c71dc187":[7,0,164,2,1],
-"structc__wranglert_1_1functiont.html#a691dbaeda8f5d892a73fa11d24a2a178":[7,0,164,2,0],
-"structc__wranglert_1_1functiont.html#ae884c567efe260f7b60d500262651aa5":[7,0,164,2,4],
-"structc__wranglert_1_1loop__contract__clauset.html":[7,0,164,3],
-"structc__wranglert_1_1loop__contract__clauset.html#a89bef6a1589d32c0f5a9e035c081795c":[7,0,164,3,2],
-"structc__wranglert_1_1loop__contract__clauset.html#a90a0d0ff0dafe2675e16926747516e13":[7,0,164,3,0],
-"structc__wranglert_1_1loop__contract__clauset.html#a97c5572e8c926dca44162151e1eee47f":[7,0,164,3,4]
+"structc__wranglert_1_1function__contract__clauset.html#a8cb32fc84cc244e6dccc14ab99f14d45":[7,0,164,1,2]
 };

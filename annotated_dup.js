@@ -450,6 +450,7 @@ var annotated_dup =
     [ "empty_cfg_nodet", "classempty__cfg__nodet.html", null ],
     [ "empty_edget", "classempty__edget.html", null ],
     [ "empty_index_ranget", "classempty__index__ranget.html", "classempty__index__ranget" ],
+    [ "empty_namespacet", "classempty__namespacet.html", "classempty__namespacet" ],
     [ "empty_typet", "classempty__typet.html", "classempty__typet" ],
     [ "empty_union_exprt", "classempty__union__exprt.html", "classempty__union__exprt" ],
     [ "empty_value_ranget", "classempty__value__ranget.html", "classempty__value__ranget" ],

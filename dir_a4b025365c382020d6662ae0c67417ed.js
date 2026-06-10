@@ -2,6 +2,8 @@ var dir_a4b025365c382020d6662ae0c67417ed =
 [
     [ "call_graph_test_utils.cpp", "call__graph__test__utils_8cpp.html", "call__graph__test__utils_8cpp" ],
     [ "call_graph_test_utils.h", "call__graph__test__utils_8h.html", "call__graph__test__utils_8h" ],
+    [ "empty_namespace.cpp", "empty__namespace_8cpp.html", "empty__namespace_8cpp" ],
+    [ "empty_namespace.h", "empty__namespace_8h.html", "empty__namespace_8h" ],
     [ "expr_query.h", "expr__query_8h.html", "expr__query_8h" ],
     [ "free_form_cmdline.cpp", "free__form__cmdline_8cpp.html", null ],
     [ "free_form_cmdline.h", "free__form__cmdline_8h.html", "free__form__cmdline_8h" ],

@@ -1175,6 +1175,7 @@ var hierarchy =
     [ "namespace_baset", "classnamespace__baset.html", [
       [ "namespacet", "classnamespacet.html", [
         [ "c_typecheck_baset", "classc__typecheck__baset.html", null ],
+        [ "empty_namespacet", "classempty__namespacet.html", null ],
         [ "multi_namespacet", "classmulti__namespacet.html", null ]
       ] ]
     ] ],
@@ -2088,7 +2089,9 @@ var hierarchy =
     [ "symbol_table_baset", "classsymbol__table__baset.html", [
       [ "journalling_symbol_tablet", "classjournalling__symbol__tablet.html", null ],
       [ "symbol_table_buildert", "classsymbol__table__buildert.html", null ],
-      [ "symbol_tablet", "classsymbol__tablet.html", null ]
+      [ "symbol_tablet", "classsymbol__tablet.html", [
+        [ "empty_namespacet", "classempty__namespacet.html", null ]
+      ] ]
     ] ],
     [ "symbolt", "classsymbolt.html", [
       [ "auxiliary_symbolt", "classauxiliary__symbolt.html", null ],
