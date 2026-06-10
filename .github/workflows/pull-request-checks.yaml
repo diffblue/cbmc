@@ -809,7 +809,12 @@ jobs:
           path: .ccache
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 49 to 70 minutes
-  check-vs-2025-cmake-build-and-test:
+  # Note: as of June 2026 the "windows-2025" runner label is being migrated to
+  # the Windows Server 2025 image that ships Visual Studio 2026 (MSVC 14.5x)
+  # instead of VS 2022/2025 (MSVC 14.4x); see actions/runner-images#14017.
+  # During the rollout both images are served under this label, so this job may
+  # run on either toolset.
+  check-vs-2026-cmake-build-and-test:
     runs-on: windows-2025
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

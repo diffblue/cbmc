@@ -1,8 +1,9 @@
-#include <string.h>
+void *memset(void *, int, __CPROVER_size_t);
 
 #define BUFLEN 100
 
-static void *(*const volatile memset_func)(void *, int, size_t) = memset;
+static void *(*const volatile memset_func)(void *, int, __CPROVER_size_t) =
+  memset;
 
 int main()
 {
