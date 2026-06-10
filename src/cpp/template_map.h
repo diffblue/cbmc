@@ -38,6 +38,21 @@ public:
   void apply(exprt &dest) const;
   void apply(typet &dest) const;
 
+  /// If \p param_type is a bare reference to a deduced template parameter
+  /// pack (recorded in pack_args_map), return the deduced element types so a
+  /// function parameter pack can be expanded ([temp.variadic]/5); else null.
+  const std::vector<typet> *
+  function_parameter_pack(const typet &param_type) const;
+
+  /// Expand any function parameter pack in the parameter list of the
+  /// function type \p function_type (ID_code or ID_function_type) into one
+  /// parameter per deduced pack element ([temp.variadic]/5).  Unlike apply(),
+  /// this performs only pack expansion and is used at the specific sites that
+  /// reconstruct a function type from a variadic pattern (e.g. matching a
+  /// `std::function<R(A...)>` partial specialization), so the general
+  /// substitution path is unaffected.
+  void expand_parameter_packs(typet &function_type) const;
+
   void swap(template_mapt &template_map)
   {
     type_map.swap(template_map.type_map);
