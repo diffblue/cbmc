@@ -1,19 +1,9 @@
-KNOWNBUG gcc-only
+CORE gcc-only
 main.cpp
 --cpp17
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-Reclassified as KNOWNBUG by the member-alias template-parameter identity fix
-(template_map.cpp: a member alias template's own parameter references are no
-longer captured by an unrelated enclosing template's argument, per
-[temp.local]/1).  That fix makes std::decay / std::__conditual resolve
-correctly, which reroutes std::any's _Manager_internal<T> instantiation through
-the lazy, ODR-use-driven path.  In that path the static member function
-_S_manage's body is not instantiated ("no body for callee
-std::any::_Manager_internal<int>::_S_manage"), so the any_cast assertion fails.
-This is a pre-existing gap in ODR-use-driven member-function instantiation
-([temp.inst]/4 + [basic.def.odr]) that the eager-substitution ("baking") path
-happened to hide; it is tracked as Part 2 of the std::decay fix work
-(.kiro/part2_findings.md).
+^CONVERSION ERROR$
+std::any construction and any_cast, verified functionally with typeid/RTTI support.

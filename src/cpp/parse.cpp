@@ -8491,11 +8491,10 @@ bool Parser::rTypeidExpr(exprt &exp)
     {
       if(lex.get_token(cp)==')')
       {
-        // exp=new PtreeTypeidExpr(new Leaf(tk),
-        //                        Ptree::List(new Leaf(op), tname,
-        //                        new Leaf(cp)));
-
+        // typeid(type-id): store the type-id so the type-checker can
+        // identify the type whose std::type_info is requested.
         exp = exprt(ID_typeid);
+        exp.add(ID_type_arg, tname);
         set_location(exp, tk);
         return true;
       }
@@ -8508,13 +8507,11 @@ bool Parser::rTypeidExpr(exprt &exp)
     {
       if(lex.get_token(cp)==')')
       {
-        // exp=new PtreeTypeidExpr(
-        //   new Leaf(tk),
-        //   Ptree::List(
-        //     Ptree::List(new Leaf(op), subexp, new Leaf(cp))
-        //   ));
-
+        // typeid(expression): store the operand expression.  Per
+        // [expr.typeid] a non-polymorphic operand is unevaluated and
+        // only its static type is used.
         exp = exprt(ID_typeid);
+        exp.add_to_operands(std::move(subexp));
         set_location(exp, tk);
         return true;
       }
