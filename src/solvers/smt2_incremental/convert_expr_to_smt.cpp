@@ -177,6 +177,12 @@ extension_for_type(const typet &type)
     return smt_bit_vector_theoryt::zero_extend;
   if(can_cast_type<pointer_typet>(type))
     return smt_bit_vector_theoryt::zero_extend;
+  if(const auto bit_field = type_try_dynamic_cast<c_bit_field_typet>(type))
+  {
+    // A C bit-field extends like its underlying integer type (i.e. sign-extend
+    // for a signed underlying type, zero-extend otherwise).
+    return extension_for_type(bit_field->underlying_type());
+  }
   UNREACHABLE;
 }
 
@@ -360,6 +366,42 @@ static smt_termt convert_expr_to_smt(const constant_exprt &constant_literal)
   return *converter.result;
 }
 
+/// Convert a single operand of a \ref concatenation_exprt to a bit-vector term.
+/// Bit-vector operands are passed through unchanged. An operand that is an
+/// array of bit-vectors (as produced, for example, by the byte-/bit-level
+/// encoding of unions) is flattened into a bit-vector by concatenating its
+/// elements, with the lowest-indexed element occupying the least-significant
+/// bits. This matches the flattening performed by \ref boolbvt.
+static smt_termt concatenation_operand_to_bit_vector(
+  const exprt &operand,
+  const sub_expression_mapt &converted)
+{
+  const smt_termt &operand_term = converted.at(operand);
+  if(can_cast_type<bitvector_typet>(operand.type()))
+    return operand_term;
+  const auto &array_type = to_array_type(operand.type());
+  const auto size = numeric_cast<std::size_t>(array_type.size());
+  INVARIANT(
+    size && *size != 0,
+    "concatenation over an array requires a constant, non-zero size");
+  const auto array_sort = operand_term.get_sort().cast<smt_array_sortt>();
+  INVARIANT(array_sort, "array-typed operand must have an array sort");
+  const auto index_sort = array_sort->index_sort().cast<smt_bit_vector_sortt>();
+  INVARIANT(index_sort, "array index sort must be a bit-vector sort");
+  const std::size_t index_width = index_sort->bit_width();
+  const auto select_element = [&](const std::size_t index)
+  {
+    return smt_array_theoryt::select(
+      operand_term, smt_bit_vector_constant_termt{index, index_width});
+  };
+  // Concatenate elements most-significant (highest index) first, so that
+  // element 0 ends up in the least-significant bits.
+  smt_termt result = select_element(*size - 1);
+  for(std::size_t index = *size - 1; index != 0; --index)
+    result = smt_bit_vector_theoryt::concat(result, select_element(index - 1));
+  return result;
+}
+
 static smt_termt convert_expr_to_smt(
   const concatenation_exprt &concatenation,
   const sub_expression_mapt &converted)
@@ -368,6 +410,32 @@ static smt_termt convert_expr_to_smt(
   {
     return convert_multiary_operator_to_terms(
       concatenation, converted, smt_bit_vector_theoryt::concat);
+  }
+  // The byte-/bit-level encoding of unions can concatenate bit-vector operands
+  // with arrays of bit-vectors; flatten any such array operands.
+  const auto is_bit_vector_or_array_thereof = [](const exprt &operand)
+  {
+    if(can_cast_type<bitvector_typet>(operand.type()))
+      return true;
+    const auto array_type = type_try_dynamic_cast<array_typet>(operand.type());
+    return array_type &&
+           can_cast_type<bitvector_typet>(array_type->element_type());
+  };
+  if(std::all_of(
+       concatenation.operands().begin(),
+       concatenation.operands().end(),
+       is_bit_vector_or_array_thereof))
+  {
+    PRECONDITION(!concatenation.operands().empty());
+    std::optional<smt_termt> result;
+    for(const auto &operand : concatenation.operands())
+    {
+      smt_termt operand_term =
+        concatenation_operand_to_bit_vector(operand, converted);
+      result = result ? smt_bit_vector_theoryt::concat(*result, operand_term)
+                      : std::move(operand_term);
+    }
+    return *result;
   }
   UNIMPLEMENTED_FEATURE(
     "Generation of SMT formula for concatenation expression: " +
@@ -1130,6 +1198,40 @@ static smt_termt convert_expr_to_smt(
 }
 
 static smt_termt convert_expr_to_smt(
+  const update_bits_exprt &update_bits,
+  const sub_expression_mapt &converted)
+{
+  // Replace the bits of `src` starting at the (least-significant) bit offset
+  // `index` with `new_value`, leaving the surrounding bits intact. The result
+  // is rebuilt by concatenating, from most- to least-significant: the unchanged
+  // high bits, the new value, and the unchanged low bits.
+  const smt_termt &src = converted.at(update_bits.src());
+  const smt_termt &new_value = converted.at(update_bits.new_value());
+  const auto src_sort = src.get_sort().cast<smt_bit_vector_sortt>();
+  const auto value_sort = new_value.get_sort().cast<smt_bit_vector_sortt>();
+  INVARIANT(
+    src_sort && value_sort,
+    "update_bits is expected to operate on bit-vector terms.");
+  const std::size_t src_width = src_sort->bit_width();
+  const std::size_t value_width = value_sort->bit_width();
+  const auto index = numeric_cast<std::size_t>(update_bits.index());
+  INVARIANT(index, "update_bits is expected to have a constant bit index.");
+  INVARIANT(
+    *index + value_width <= src_width,
+    "update_bits range must lie within the source bit-vector.");
+  std::optional<smt_termt> result;
+  if(*index + value_width < src_width)
+    result =
+      smt_bit_vector_theoryt::extract(src_width - 1, *index + value_width)(src);
+  result =
+    result ? smt_bit_vector_theoryt::concat(*result, new_value) : new_value;
+  if(*index != 0)
+    result = smt_bit_vector_theoryt::concat(
+      *result, smt_bit_vector_theoryt::extract(*index - 1, 0)(src));
+  return *result;
+}
+
+static smt_termt convert_expr_to_smt(
   const replication_exprt &replication,
   const sub_expression_mapt &converted)
 {
@@ -1728,6 +1830,10 @@ static smt_termt dispatch_expr_to_smt_conversion(
   if(const auto extract_bits = expr_try_dynamic_cast<extractbits_exprt>(expr))
   {
     return convert_expr_to_smt(*extract_bits, converted);
+  }
+  if(const auto update_bits = expr_try_dynamic_cast<update_bits_exprt>(expr))
+  {
+    return convert_expr_to_smt(*update_bits, converted);
   }
   if(const auto replication = expr_try_dynamic_cast<replication_exprt>(expr))
   {
