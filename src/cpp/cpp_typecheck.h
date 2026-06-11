@@ -589,6 +589,7 @@ protected:
   void typecheck_expr_function_identifier(exprt &) override;
   void typecheck_expr_reference_to(exprt &);
   void typecheck_expr_this(exprt &);
+  void typecheck_expr_typeid(exprt &);
   void typecheck_expr_new(exprt &);
   void typecheck_expr_sizeof(exprt &) override;
   void typecheck_expr_lambda(exprt &);
