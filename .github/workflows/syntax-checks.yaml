@@ -75,6 +75,8 @@ jobs:
           sudo apt-get install --no-install-recommends -yq \
             cmake g++ flex bison clang-18 llvm-18-dev libclang-18-dev \
             libclang-cpp18-dev
+      - name: Self-test the checker
+        run: ./regression/check-irep-copies/run_self_test.sh
       - name: Configure
         run: cmake -S . -Bbuild -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
       - name: Check for unnecessary irept copies
