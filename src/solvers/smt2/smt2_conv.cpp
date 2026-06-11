@@ -3363,6 +3363,17 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       UNEXPECTEDCASE(
         "Unknown typecast " + src_type.id_string() + " -> rational");
   }
+  else if(dest_type.id() == ID_union || dest_type.id() == ID_union_tag)
+  {
+    // A union is represented as a bit-vector of its (maximum member) width,
+    // just like the source bit-vector. Reinterpreting the bits as the union
+    // is therefore the identity at this level; this is the inverse of the
+    // union-to-bit-vector flattening handled above.
+    INVARIANT(
+      boolbv_width(src_type) == boolbv_width(dest_type),
+      "bit vector width of source and destination type shall be equal");
+    convert_expr(src); // nothing else to do!
+  }
   else
     UNEXPECTEDCASE(
       "TODO typecast8 "+src_type.id_string()+" -> "+dest_type.id_string());
