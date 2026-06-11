@@ -219,8 +219,95 @@ void template_mapt::apply(typet &type) const
       for(auto &op : type.add(ID_body).get_sub())
       {
         irept &decl_type = op.add(ID_type);
-        for(auto &sub : decl_type.get_sub())
-          apply(static_cast<typet &>(sub));
+
+        // [temp.local]/1 + [basic.scope.temp]: a member template's own
+        // parameters shadow same-named parameters of an enclosing
+        // template.  A member alias template's body stores parameter
+        // references as bare `cpp_name`s; for the canonical
+        // `template<class _Tp, ...> using type = _Tp;` form (libstdc++
+        // `__conditional`), `apply`'s short-name matching would bind the
+        // top-level body reference to an unrelated enclosing parameter
+        // of the same name that happens to be in scope (e.g.
+        // `std::decay<_Tp>`'s `_Tp` leaking into
+        // `std::__conditional<C>::type<_Tp,_>`), baking in the wrong
+        // type before the member alias is itself instantiated.
+        //
+        // Protect ONLY top-level bare references (direct children of the
+        // body), not references nested inside `decltype`/template
+        // arguments -- those are handled by existing machinery that
+        // other library code relies on.  Append a sentinel so the
+        // short-name match misses, substitute, then strip it so the
+        // member alias's own instantiation binds the reference by its
+        // own parameter identity ([temp.res] two-phase).
+        const bool is_member_alias = (op.get_bool(ID_is_template) ||
+                                      op.find(ID_template_type).is_not_nil()) &&
+                                     op.get_bool(ID_is_typedef);
+        std::set<std::string> own_param_names;
+        if(is_member_alias)
+        {
+          const auto short_name = [](const irep_idt &id) -> std::string
+          {
+            const std::string s = id2string(id);
+            const auto p = s.rfind("::");
+            return p != std::string::npos ? s.substr(p + 2) : s;
+          };
+          for(const auto &param :
+              op.find(ID_template_type).find(ID_template_parameters).get_sub())
+          {
+            for(const auto &d : param.get_sub())
+            {
+              if(d.id() != ID_cpp_declarator)
+                continue;
+              for(const auto &ns : d.find(ID_name).get_sub())
+                if(ns.id() == ID_name && !ns.get(ID_identifier).empty())
+                  own_param_names.insert(short_name(ns.get(ID_identifier)));
+            }
+          }
+        }
+        if(is_member_alias && !own_param_names.empty())
+        {
+          const std::string marker = "#tmpl_param_shadow";
+          const auto mark = [&](irept &n, bool restore)
+          {
+            if(
+              n.id() != ID_cpp_name || n.get_sub().size() != 1 ||
+              n.get_sub().front().id() != ID_name)
+              return;
+            irept &nm = n.get_sub().front();
+            const std::string s = id2string(nm.get(ID_identifier));
+            if(!restore)
+            {
+              const auto p = s.rfind("::");
+              const std::string nn =
+                p != std::string::npos ? s.substr(p + 2) : s;
+              if(own_param_names.count(nn) != 0)
+                nm.set(ID_identifier, s + marker);
+            }
+            else if(
+              s.size() >= marker.size() &&
+              s.compare(s.size() - marker.size(), marker.size(), marker) == 0)
+              nm.set(ID_identifier, s.substr(0, s.size() - marker.size()));
+          };
+          const auto each = [&](bool restore)
+          {
+            for(auto &sub : decl_type.get_sub())
+            {
+              mark(sub, restore);
+              if(sub.id() == ID_merged_type)
+                for(auto &ss : sub.get_sub())
+                  mark(ss, restore);
+            }
+          };
+          each(false);
+          for(auto &sub : decl_type.get_sub())
+            apply(static_cast<typet &>(sub));
+          each(true);
+        }
+        else
+        {
+          for(auto &sub : decl_type.get_sub())
+            apply(static_cast<typet &>(sub));
+        }
 
         // [temp.variadic]/5: expand a function parameter pack that names
         // the enclosing class template's parameter pack in a member

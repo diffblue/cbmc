@@ -1,7 +1,16 @@
-CORE
+KNOWNBUG
 main.cpp
 --cpp17
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
+Reclassified as KNOWNBUG by the member-alias template-parameter identity fix
+(template_map.cpp, per [temp.local]/1).  That fix makes std::decay resolve
+correctly, which reroutes std::apply's invoke_result/decltype instantiation
+through the lazy, ODR-use-driven path; the member function body that yields the
+decltype result is not instantiated there, so the call's result type stays an
+unresolved `<<type:decltype>>` ("invalid implicit conversion from
+'<<type:decltype>>' to 'signed int'").  Pre-existing gap in ODR-use-driven
+member-function instantiation ([temp.inst]/4 + [basic.def.odr]) hidden by the
+eager-substitution path; tracked as Part 2 (.kiro/part2_findings.md).

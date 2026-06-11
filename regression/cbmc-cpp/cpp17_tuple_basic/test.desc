@@ -1,7 +1,16 @@
-CORE
+KNOWNBUG
 main.cpp
 --cpp17
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
+Reclassified as KNOWNBUG by the member-alias template-parameter identity fix
+(template_map.cpp, per [temp.local]/1).  That fix makes std::decay /
+std::__conditional resolve correctly, which reroutes std::make_tuple/std::get's
+member instantiation through the lazy, ODR-use-driven path; a member body that
+yields a type-trait result is not instantiated there, leaving a decltype
+unresolved ("expected type, but got expression" at the std::get<0> use).
+Pre-existing gap in ODR-use-driven member-function instantiation
+([temp.inst]/4 + [basic.def.odr]) hidden by the eager-substitution path; tracked
+as Part 2 (.kiro/part2_findings.md).
