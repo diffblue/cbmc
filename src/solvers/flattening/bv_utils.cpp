@@ -24,6 +24,16 @@ bvt bv_utilst::build_constant(const mp_integer &n, std::size_t width)
   return result;
 }
 
+mp_integer bv_utilst::from_constant(const bvt &bv)
+{
+  PRECONDITION(is_constant(bv));
+  const std::size_t width = bv.size();
+  std::string s(width, '0');
+  for(std::size_t i = 0; i < width; i++)
+    s[width - i - 1] = bv[i].is_true() ? '1' : '0';
+  return binary2integer(s, false);
+}
+
 literalt bv_utilst::is_one(const bvt &bv)
 {
   PRECONDITION(!bv.empty());
@@ -1170,18 +1180,10 @@ void bv_utilst::unsigned_divider(
   // (non-deterministic) encoding below.
   if(is_constant(op0) && is_constant(op1))
   {
-    // Reconstruct each operand into mp_integer via binary2integer, mirroring
-    // the inverse used by build_constant (which calls integer2binary).
-    std::string s0(width, '0'), s1(width, '0');
-    for(std::size_t i = 0; i < width; i++)
-    {
-      s0[width - i - 1] = op0[i].is_true() ? '1' : '0';
-      s1[width - i - 1] = op1[i].is_true() ? '1' : '0';
-    }
-    const mp_integer n0 = binary2integer(s0, false);
-    const mp_integer n1 = binary2integer(s1, false);
+    const mp_integer n1 = from_constant(op1);
     if(n1 != 0)
     {
+      const mp_integer n0 = from_constant(op0);
       res = build_constant(n0 / n1, width);
       rem = build_constant(n0 % n1, width);
       return;
