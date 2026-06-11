@@ -683,6 +683,22 @@ void cpp_typecheckt::typecheck_class_template_member(
     }
     return;
   }
+  else if(
+    cpp_name.get_sub().size() == 6 && cpp_name.get_sub()[0].id() == ID_name &&
+    cpp_name.get_sub()[1].id() == "::" &&
+    cpp_name.get_sub()[2].id() == ID_name &&
+    cpp_name.get_sub()[3].id() == ID_template_args &&
+    cpp_name.get_sub()[4].id() == "::" && cpp_name.get_sub()[5].id() == ID_name)
+  {
+    // Out-of-line definition of a member of a NESTED class template:
+    //   Outer::Inner<args>::method
+    // (e.g. std::any::_Manager_internal<_Tp>::_S_manage).  Validated
+    // here; the nested class template Inner is resolved below so this
+    // definition is recorded in Inner's template_methods.  Per [temp.mem]
+    // an out-of-line definition defines the member of the class template;
+    // without recording it the member's body would exist nowhere and the
+    // member would be uninstantiable when ODR-used ([temp.inst]/4).
+  }
   else
   {
     return; // TODO
@@ -695,8 +711,27 @@ void cpp_typecheckt::typecheck_class_template_member(
   }
 
   // let's find the class template this function template belongs to.
-  auto id_set = cpp_scopes.current_scope().lookup(
-    cpp_name.get_sub().front().get(ID_identifier),
+  // For a nested out-of-line definition `Outer::Inner<args>::method`, the
+  // class template is the NESTED `Inner`, looked up in `Outer`'s scope; for
+  // the single-qualification forms it is the leading name in the current
+  // scope.
+  cpp_scopet *lookup_scope = &cpp_scopes.current_scope();
+  irep_idt class_tmpl_base_name = cpp_name.get_sub().front().get(ID_identifier);
+  if(
+    cpp_name.get_sub().size() == 6 && cpp_name.get_sub()[1].id() == "::" &&
+    cpp_name.get_sub()[3].id() == ID_template_args)
+  {
+    const irep_idt &outer_name = cpp_name.get_sub()[0].get(ID_identifier);
+    const auto outer_ids = cpp_scopes.current_scope().lookup(
+      outer_name, cpp_scopet::QUALIFIED, cpp_scopet::id_classt::CLASS);
+    if(!outer_ids.empty())
+    {
+      lookup_scope = &cpp_scopes.get_scope((*outer_ids.begin())->identifier);
+      class_tmpl_base_name = cpp_name.get_sub()[2].get(ID_identifier);
+    }
+  }
+  auto id_set = lookup_scope->lookup(
+    class_tmpl_base_name,
     cpp_scopet::QUALIFIED,            // search using-scopes (inline namespaces)
     cpp_scopet::id_classt::TEMPLATE); // must be template
 
