@@ -78,4 +78,4 @@ jobs:
       - name: Configure
         run: cmake -S . -Bbuild -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
       - name: Check for unnecessary irept copies
-        run: ./scripts/run_irep_copy_check.sh build
+        run: ./scripts/run_irep_copies_check.sh build

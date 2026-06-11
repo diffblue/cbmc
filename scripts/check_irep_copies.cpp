@@ -1,13 +1,13 @@
 // Detect irept copy-then-modify patterns that could use std::move.
 //
 // Build:
-//   clang++-18 -o check-irep-moves scripts/check_irep_moves.cpp \
+//   clang++-18 -o check-irep-copies scripts/check_irep_copies.cpp \
 //     $(llvm-config-18 --cxxflags | sed 's/-Werror//g') \
 //     -L/usr/lib/llvm-18/lib -lclang-cpp \
 //     $(llvm-config-18 --ldflags --libs --system-libs) -fno-rtti
 //
 // Usage:
-//   ./check-irep-moves -p build/compile_commands.json src/goto-symex/*.cpp
+//   ./check-irep-copies -p build/compile_commands.json src/goto-symex/*.cpp
 
 #include "clang/AST/RecursiveASTVisitor.h"
 #include "clang/ASTMatchers/ASTMatchFinder.h"
@@ -21,7 +21,7 @@ using namespace clang;
 using namespace clang::ast_matchers;
 using namespace clang::tooling;
 
-static llvm::cl::OptionCategory Cat("check-irep-moves");
+static llvm::cl::OptionCategory Cat("check-irep-copies");
 static llvm::cl::opt<bool>
   Debug("debug", llvm::cl::desc("Debug output"), llvm::cl::cat(Cat));
 

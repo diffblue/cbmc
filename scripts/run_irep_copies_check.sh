@@ -1,19 +1,19 @@
 #!/bin/bash
 # CI script: check for unnecessary irept copies
-# Requires: check-irep-moves binary (built from scripts/check_irep_moves.cpp)
+# Requires: check-irep-copies binary (built from scripts/check_irep_copies.cpp)
 # and a compile_commands.json in the build directory.
 #
-# Usage: scripts/run_irep_copy_check.sh [build-dir]
+# Usage: scripts/run_irep_copies_check.sh [build-dir]
 #
 # Returns non-zero if any findings are detected.
 
 set -euo pipefail
 
 BUILD_DIR="${1:-build}"
-TOOL="scripts/check-irep-moves"
+TOOL="scripts/check-irep-copies"
 
 if [ ! -x "$TOOL" ]; then
-  echo "Building check-irep-moves..."
+  echo "Building check-irep-copies..."
   LLVM_VER=$(llvm-config --version 2>/dev/null | cut -d. -f1 || echo "")
   if [ -z "$LLVM_VER" ]; then
     for v in 20 18 15; do
@@ -26,7 +26,7 @@ if [ ! -x "$TOOL" ]; then
     echo "Error: no LLVM installation found" >&2
     exit 1
   fi
-  clang++-$LLVM_VER -o "$TOOL" scripts/check_irep_moves.cpp \
+  clang++-$LLVM_VER -o "$TOOL" scripts/check_irep_copies.cpp \
     $(llvm-config-$LLVM_VER --cxxflags | sed 's/-Werror//g') \
     -L/usr/lib/llvm-$LLVM_VER/lib -lclang-cpp \
     $(llvm-config-$LLVM_VER --ldflags --libs --system-libs) \
