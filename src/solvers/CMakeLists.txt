@@ -158,6 +158,11 @@ foreach(SOLVER ${sat_impl})
         download_project(PROJ cadical
             URL https://github.com/arminbiere/cadical/archive/rel-3.0.0.tar.gz
             PATCH_COMMAND patch -p1 -i ${CBMC_SOURCE_DIR}/scripts/cadical-3.0.0-patch
+            # The patch makes CaDiCaL's make-build-header.sh read the version
+            # from VERSION.txt (rather than VERSION); provide that file so the
+            # native build below can generate build.hpp. The CMake-driven
+            # cadical build above avoids this via -DNBUILD instead.
+            COMMAND cmake -E copy_if_different VERSION VERSION.txt
             COMMAND ./configure
             URL_HASH SHA256=282b1c9422fde8631cb721b86450ae94df4e8de0545c17a69a301aaa4bf92fcf
         )
