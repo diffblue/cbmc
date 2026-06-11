@@ -35,6 +35,7 @@ var classbv__utilst =
     [ "extract", "classbv__utilst.html#aaf210723661b9a9b3e5fc6c86f75f137", null ],
     [ "extract_lsb", "classbv__utilst.html#aca583ddeaca8b2b4e6a56078649b27b4", null ],
     [ "extract_msb", "classbv__utilst.html#a5959de18f70e78a14d5ecd8df7fe7816", null ],
+    [ "from_constant", "classbv__utilst.html#a5977b70e3ca4b6df325425a34a6b7b47", null ],
     [ "full_adder", "classbv__utilst.html#aa601b9e7a16c18ace3a0420f3344c84d", null ],
     [ "inc", "classbv__utilst.html#ab113836351e1390d2b6886faeb3a0a42", null ],
     [ "incrementer", "classbv__utilst.html#ace6d16b8a5a315c798c89225b8dddc5a", null ],
