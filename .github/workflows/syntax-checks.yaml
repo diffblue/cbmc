@@ -60,7 +60,7 @@ jobs:
       - name: Run `cargo fmt` on top of Rust API project
         run: cd src/libcprover-rust; cargo fmt --all -- --check
 
-  # This job takes approximately 3 minutes
+  # This job scans every (non-test) translation unit and takes several minutes
   check-irep-copies:
     runs-on: ubuntu-24.04
     steps:
