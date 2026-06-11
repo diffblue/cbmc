@@ -21,9 +21,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/pointer_offset_size.h>
 #include <util/replace_symbol.h>
 #include <util/simplify_expr.h>
+#include <util/string_constant.h>
 #include <util/symbol_table_base.h>
 
 #include <ansi-c/c_qualifiers.h>
+#include <ansi-c/type2name.h>
 
 #include "cpp_exception_id.h"
 #include "cpp_sfinae_context.h"
@@ -217,6 +219,8 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     expr.type() = struct_tag_typet("tag-_GUID");
     expr.set(ID_C_lvalue, true);
   }
+  else if(expr.id() == ID_typeid)
+    typecheck_expr_typeid(expr);
   else if(
     expr.id() == "__is_constructible" || expr.id() == "__is_assignable" ||
     expr.id() == "__is_convertible_to" || expr.id() == "__is_convertible" ||
@@ -2308,6 +2312,144 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
 
     new_temporary(e.source_location(), e.type(), e.operands(), expr);
   }
+}
+
+/// Type-check a `typeid` expression ([expr.typeid]).
+///
+/// The result is an lvalue of type `const std::type_info` that refers to a
+/// unique-per-type object ([type.info]): two `type_info` objects compare
+/// equal if and only if they denote the same type.  We model this by mapping
+/// each type (after stripping references and top-level cv-qualifiers, per
+/// [expr.typeid]) to a single static `std::type_info` object whose `__name`
+/// member points at a distinct string, so that libstdc++'s
+/// `type_info::operator==` (which compares `__name`) yields type identity.
+///
+/// For the `typeid(expression)` form, the static type of the operand is used;
+/// a non-polymorphic operand is unevaluated.  The dynamic type of a
+/// polymorphic glvalue is not modelled and is approximated by its static
+/// type.
+void cpp_typecheckt::typecheck_expr_typeid(exprt &expr)
+{
+  // [expr.typeid]/4: the program is ill-formed unless <typeinfo> has been
+  // included before the use of typeid.
+  const struct_tag_typet ti_type{"std::tag-type_info"};
+  if(!symbol_table.has_symbol(ti_type.get_identifier()))
+  {
+    error().source_location = expr.find_source_location();
+    error() << "typeid requires <typeinfo> to be included" << eom;
+    throw 0;
+  }
+
+  const source_locationt source_location = expr.find_source_location();
+
+  // Determine the type T whose std::type_info is requested.
+  typet t;
+  if(expr.has_operands())
+  {
+    // typeid(expression): use the static type of the operand.  Per
+    // [expr.typeid]/3 a non-polymorphic operand is an unevaluated operand,
+    // so we only retain its type and discard the operand itself.
+    exprt &op = to_unary_expr(expr).op();
+    typecheck_expr(op);
+    t = op.type();
+  }
+  else
+  {
+    // typeid(type-id) -- but the operand may have been mis-parsed as a
+    // type when it is in fact an expression (e.g. typeid(x) where x is a
+    // variable).  Resolve a cpp_name to decide, as for sizeof.
+    typet type_arg = static_cast<const typet &>(expr.find(ID_type_arg));
+    if(type_arg.id() == ID_cpp_name)
+    {
+      cpp_typecheck_fargst fargs;
+      exprt resolved = resolve(
+        to_cpp_name(static_cast<const irept &>(type_arg)),
+        cpp_typecheck_resolvet::wantt::BOTH,
+        fargs);
+      // Whether `resolved` is a type or an (unevaluated) expression, its
+      // type is the static type whose std::type_info is requested.
+      t = resolved.type();
+    }
+    else
+    {
+      typecheck_type(type_arg);
+      t = type_arg;
+    }
+  }
+
+  // [expr.typeid]/5: typeid ignores top-level cv-qualifiers, and references
+  // are stripped to the referred-to type.  Types that differ only in these
+  // share the same type_info object.
+  if(is_reference(t))
+    t = to_reference_type(t).base_type();
+  t.remove(ID_C_constant);
+  t.remove(ID_C_volatile);
+
+  // Canonical key so that equal types share a single type_info object.
+  const std::string key = type2name(t, *this);
+  const irep_idt sym_id = "typeid$" + key;
+
+  if(!symbol_table.has_symbol(sym_id))
+  {
+    const struct_typet &ti_struct = follow_tag(ti_type);
+
+    // Build a value for the type_info object: the `__name` member points at
+    // a string that is distinct for distinct types (so libstdc++'s
+    // type_info::operator== yields type identity); all other members
+    // (notably the vtable pointer, which is never used since the modelled
+    // operations involve no virtual dispatch on type_info) are zero.
+    string_constantt name_str{key};
+    index_exprt first_char{name_str, from_integer(0, c_index_type())};
+
+    struct_exprt::operandst field_values;
+    for(const auto &comp : ti_struct.components())
+    {
+      // Skip non-data components (member functions, static members and
+      // member types): they are not part of the object's data layout.
+      if(
+        comp.type().id() == ID_code || comp.get_bool(ID_is_static) ||
+        comp.get_bool(ID_is_type))
+      {
+        continue;
+      }
+
+      if(comp.get_base_name() == "__name" && comp.type().id() == ID_pointer)
+      {
+        address_of_exprt name_addr{first_char};
+        name_addr.type() = to_pointer_type(comp.type());
+        field_values.push_back(std::move(name_addr));
+      }
+      else
+      {
+        auto zero = ::zero_initializer(comp.type(), source_location, *this);
+        CHECK_RETURN(zero.has_value());
+        field_values.push_back(std::move(*zero));
+      }
+    }
+
+    struct_exprt ti_value{std::move(field_values), ti_type};
+    ti_value.add_source_location() = source_location;
+
+    symbolt ti_symbol;
+    ti_symbol.name = sym_id;
+    ti_symbol.base_name = sym_id;
+    ti_symbol.type = ti_type;
+    ti_symbol.type.set(ID_C_constant, true);
+    ti_symbol.mode = ID_cpp;
+    ti_symbol.is_static_lifetime = true;
+    ti_symbol.is_lvalue = true;
+    ti_symbol.location = source_location;
+    ti_symbol.value = std::move(ti_value);
+    symbol_table.insert(std::move(ti_symbol));
+  }
+
+  // The result is a const lvalue referring to the type_info object.
+  typet const_ti_type = ti_type;
+  const_ti_type.set(ID_C_constant, true);
+  symbol_exprt result{sym_id, const_ti_type};
+  result.set(ID_C_lvalue, true);
+  result.add_source_location() = source_location;
+  expr = std::move(result);
 }
 
 void cpp_typecheckt::typecheck_expr_this(exprt &expr)
