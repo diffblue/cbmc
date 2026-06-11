@@ -40,12 +40,12 @@ int yyxmlerror(xml_parsert &xml_parser, void *scanner, const std::string &error)
 %union {char *s;}
 
 %token STARTXMLDECL
-%token VERSION ENDPI EQ SLASH CLOSE END
-%token <s> ENCODING NAME VALUE DATA COMMENT START STARTPI
+%token ENDPI EQ SLASH CLOSE END
+%token <s> NAME VALUE DATA COMMENT START STARTPI
 %type <s> name_opt
 
 // Memory management: ensure allocated string tokens are freed during error recovery
-%destructor { free($$); } ENCODING NAME VALUE DATA COMMENT START STARTPI name_opt
+%destructor { free($$); } NAME VALUE DATA COMMENT START STARTPI name_opt
 
 %%
 
