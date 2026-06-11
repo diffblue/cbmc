@@ -615,17 +615,22 @@ bvt float_utilst::div(const bvt &src1, const bvt &src2)
   const unbiased_floatt unpacked1=unpack(src1);
   const unbiased_floatt unpacked2=unpack(src2);
 
-  // Division width: we need enough bits below the round position so that
-  // `have_remainder` (used as a single sticky bit) survives the left-shift
-  // performed by the rounder's normalization step.  When the unpacked
-  // dividend is subnormal it has up to spec.f leading zeros, so the
-  // normalization shift is correspondingly larger and would otherwise move
-  // the sticky into the round position with all-zero bits below it; the
-  // extra spec.f bits give the sticky room to survive.
-  std::size_t div_width = unpacked1.fraction.size() * 2 + 1 + spec.f;
+  // Pre-normalize the dividend.  A subnormal dividend has leading zeros in
+  // its fraction (the hidden bit is 0); dividing it directly would give a
+  // quotient with too few significant bits, so the `have_remainder` sticky
+  // bit is lost during the rounder's normalization shift and ties round the
+  // wrong way (a 1-ULP error).  Left-aligning the fraction and decreasing the
+  // exponent by the same amount preserves the value but guarantees a
+  // normalized dividend, so the minimal division width suffices and
+  // normal/normal division pays no extra cost.
+  bvt dividend_fraction = unpacked1.fraction;
+  bvt dividend_exponent = unpacked1.exponent;
+  normalization_shift(dividend_fraction, dividend_exponent);
+
+  std::size_t div_width = dividend_fraction.size() * 2 + 1;
 
   // pad fraction1 with zeros
-  bvt fraction1=unpacked1.fraction;
+  bvt fraction1 = dividend_fraction;
   fraction1.reserve(div_width);
   while(fraction1.size()<div_width)
     fraction1.insert(fraction1.begin(), const_literal(false));
@@ -650,10 +655,12 @@ bvt float_utilst::div(const bvt &src1, const bvt &src2)
   // We will subtract the exponents;
   // to account for overflow, we add a bit.
   // we add a second bit for the adjust by extra fraction bits
-  const bvt exponent1=
-    bv_utils.sign_extension(unpacked1.exponent, unpacked1.exponent.size()+2);
-  const bvt exponent2=
-    bv_utils.sign_extension(unpacked2.exponent, unpacked2.exponent.size()+2);
+  // The dividend exponent may have grown during normalization; extend both
+  // exponents to a common width.
+  const std::size_t exp_width =
+    std::max(dividend_exponent.size(), unpacked2.exponent.size()) + 2;
+  const bvt exponent1 = bv_utils.sign_extension(dividend_exponent, exp_width);
+  const bvt exponent2 = bv_utils.sign_extension(unpacked2.exponent, exp_width);
 
   // subtract exponents
   bvt added_exponent=bv_utils.sub(exponent1, exponent2);
