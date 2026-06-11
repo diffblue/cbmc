@@ -1792,7 +1792,7 @@ tvt constant_interval_exprt::not_equal(
   const constant_interval_exprt &a,
   const constant_interval_exprt &b)
 {
-  return a.equal(b);
+  return a.not_equal(b);
 }
 
 constant_interval_exprt
