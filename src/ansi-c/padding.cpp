@@ -83,13 +83,6 @@ mp_integer alignment(const typet &type, const namespacet &ns)
   if(a_int == 0 && packed)
     return 1;
 
-  // an explicit alignment on a non-aggregate that is not packed is taken
-  // verbatim (it may even request an alignment smaller than the natural one,
-  // e.g. a typedef using aligned()). A packed non-aggregate is handled below,
-  // after its natural alignment is known, as packing caps the alignment.
-  if(a_int > 0 && !packed)
-    return a_int;
-
   // compute the natural alignment
   mp_integer result;
 
@@ -114,12 +107,22 @@ mp_integer alignment(const typet &type, const namespacet &ns)
   else
     result=1;
 
-  // A packed non-aggregate that also carries an explicit alignment is capped
-  // at the smaller of the requested alignment and its natural alignment. This
-  // is the "#pragma pack(n)" rule: the alignment of a member is "a multiple of
-  // n or a multiple of the size of the member, whichever is smaller".
-  if(a_int > 0 && a_int < result)
-    result = a_int;
+  // Apply an explicit alignment to the natural one:
+  // - packed: capped at the smaller of the two ("#pragma pack(n)": a multiple
+  //   of n or of the member's size, whichever is smaller);
+  // - increase-only (an alignment attribute on an object, field or tag): used
+  //   only if it raises the alignment, matching GCC/Clang;
+  // - otherwise (a type-level alignment, e.g. from a typedef): taken verbatim,
+  //   so it may legitimately reduce the alignment.
+  if(a_int > 0)
+  {
+    if(packed)
+      result = std::min(a_int, result);
+    else if(type.get_bool(ID_C_alignment_increase_only))
+      result = std::max(a_int, result);
+    else
+      result = a_int;
+  }
 
   return result;
 }
@@ -164,9 +167,15 @@ static mp_integer member_layout_alignment(
   if(container_is_packed)
     return given_int > 0 ? given_int : mp_integer{1};
 
-  // Without any packing, an explicit alignment can only increase the natural
-  // alignment of the component (GCC/Clang ignore a smaller request here).
-  return given_int > natural ? given_int : natural;
+  // Without any packing: an alignment attribute on the member's declarator
+  // (increase-only) can only raise the natural alignment, but a type-level
+  // alignment -- e.g. that of a reduced-alignment typedef used as the member's
+  // type -- is honoured verbatim and may lower it, matching GCC/Clang.
+  if(given_int == 0)
+    return natural;
+  if(comp_type.get_bool(ID_C_alignment_increase_only))
+    return std::max(given_int, natural);
+  return given_int;
 }
 
 static std::optional<std::size_t>

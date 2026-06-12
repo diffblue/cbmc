@@ -1,4 +1,4 @@
-KNOWNBUG gcc-only
+CORE gcc-only
 main.c
 
 ^EXIT=0$
@@ -7,9 +7,7 @@ main.c
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-A reduced-alignment typedef (int __attribute__((aligned(2)))) used as a struct
-member should keep its alignment, as GCC and Clang do. CBMC currently
-over-aligns it to the natural alignment because type-level and
-member-declarator alignment attributes are indistinguishable in the front-end
-IR. The _Static_asserts therefore fail today (CONVERSION ERROR); promote to
-CORE once alignment provenance is tracked.
+A reduced-alignment typedef used as a struct member keeps its alignment (as
+GCC/Clang/icx do), while a reducing alignment attribute on the member
+declarator is ignored. The two are distinguished by the
+C_alignment_increase_only provenance flag.

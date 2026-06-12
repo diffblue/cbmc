@@ -57,6 +57,7 @@ void c_typecheck_baset::typecheck_type(typet &type)
     c_qualifiers += c_qualifierst(already_typechecked.get_type());
     bool packed=type.get_bool(ID_C_packed);
     exprt alignment = alignment_of(type);
+    bool alignment_increase_only = type.get_bool(ID_C_alignment_increase_only);
     irept _typedef=type.find(ID_C_typedef);
 
     type = already_typechecked.get_type();
@@ -66,6 +67,8 @@ void c_typecheck_baset::typecheck_type(typet &type)
       type.set(ID_C_packed, true);
     if(alignment.is_not_nil())
       type.add(ID_C_alignment, alignment);
+    if(alignment_increase_only)
+      type.set(ID_C_alignment_increase_only, true);
     if(_typedef.is_not_nil())
       type.add(ID_C_typedef, _typedef);
 
@@ -1734,6 +1737,10 @@ void c_typecheck_baset::typecheck_typedef_type(typet &type)
   c_qualifierst c_qualifiers(type);
   bool is_packed = type.get_bool(ID_C_packed);
   exprt alignment = alignment_of(type);
+  // Whether the alignment supplied at the *use* site (e.g. a struct member
+  // declarator) is increase-only. A typedef's own alignment is verbatim, so
+  // only an alignment coming from this using declaration keeps that flag.
+  bool alignment_increase_only = type.get_bool(ID_C_alignment_increase_only);
 
   c_qualifiers += c_qualifierst(symbol.type);
   type = symbol.type;
@@ -1752,7 +1759,13 @@ void c_typecheck_baset::typecheck_typedef_type(typet &type)
 
   combine_alignments(alignment, alignment_of(symbol.type));
   if(alignment.is_not_nil())
+  {
     type.set(ID_C_alignment, alignment);
+    if(alignment_increase_only)
+      type.set(ID_C_alignment_increase_only, true);
+    else
+      type.remove(ID_C_alignment_increase_only);
+  }
 
   // CPROVER extensions
   if(symbol.base_name == CPROVER_PREFIX "rational")
