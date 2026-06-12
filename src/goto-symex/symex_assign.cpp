@@ -139,6 +139,13 @@ void symex_assignt::assign_rec(
 
     assign_rec(complex_imag_expr.op(), full_lhs, new_rhs, guard);
   }
+  else if(
+    (lhs.id() == ID_struct || lhs.id() == ID_array || lhs.id() == ID_union) &&
+    lhs.operands().empty())
+  {
+    // Assignment to an empty aggregate (e.g. copying a stateless/empty class
+    // held via the empty-base optimization) writes no fields: a no-op.
+  }
   else
     throw unsupported_operation_exceptiont(
       "assignment to '" + lhs.id_string() + "' not handled");
