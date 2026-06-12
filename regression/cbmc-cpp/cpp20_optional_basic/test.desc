@@ -1,25 +1,23 @@
-KNOWNBUG
+CORE
 main.cpp
---cpp20 --no-unwinding-assertions
-^VERIFICATION SUCCESSFUL$
+--cpp20 --show-goto-functions
 ^EXIT=0$
 ^SIGNAL=0$
+^.*std::optional<signed_int>::optional\(this,rref_signed_int\).*$
 --
-After the strip-tag fix in cpp_instantiate_template.cpp made
-constexpr-eval / eager-convert work for namespaced template
-methods, std::optional<int> o = 42; now triggers a much deeper
-class-instantiation cascade through libstdc++'s
-_Optional_base, _Optional_payload_base,
-is_trivially_destructible_v and the family of constexpr
-operator bool / star / arrow / value accessors.  The resulting
-goto program has many more functions to model than before
-(symbol table grows by roughly 50 percent) and the BMC solver
-runs out of memory at solve time on the CI box at the 6 GB
-ulimit.  Increasing the limit doesn't help; the problem is the
-per-symbol bookkeeping cost of the additional functions that
-are now generated even though most of them are unused at
-runtime.
+^CONVERSION ERROR$
+^PARSING ERROR$
+--
+C++20 std::optional copy-initialization from a value
+(`std::optional<int> o = 42;`).
 
-Reclassified as KNOWNBUG until the constexpr-eval path can be
-made cheaper or the goto-conversion path can drop unused
-constexpr-only methods.
+This verifies the frontend selects std::optional's converting
+constructor `optional(_Up&&)` and constructs the contained value.
+
+Verified at the goto-program level rather than via full BMC: a
+correctly-elaborated `std::optional<int>` pulls in the entire
+`_Optional_base`/`_Optional_payload` instantiation graph, which
+exceeds symbolic-execution memory limits (this is why the C++17
+counterpart, cpp17_optional_basic, is also checked at the goto
+level).  The goto-level check confirms the converting constructor
+is actually invoked with the `int&&` value.
