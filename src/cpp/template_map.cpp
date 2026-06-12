@@ -753,6 +753,76 @@ void template_mapt::apply(typet &type) const
                 was_pack = true;
             }
           }
+          // [temp.variadic]/4-5: a pack expansion whose pattern is not
+          // simply the bare pack (e.g. `typename W<E>::type...`, where the
+          // pack `E` is nested inside the pattern) must be expanded once
+          // per pack element, with that element substituted for the pack
+          // reference *inside* the pattern.  The cases above only handle a
+          // pattern that is itself the bare pack; without this a pattern
+          // like make_tuple's `tuple<typename __decay_and_strip<E>::__type
+          // ...>` collapses to a single element.
+          if(
+            !was_pack && arg.id() == "ambiguous" &&
+            static_cast<const exprt &>(arg).type().id() == ID_cpp_name &&
+            static_cast<const exprt &>(arg).type().get_bool(ID_ellipsis))
+          {
+            // Collect the parameter packs referenced anywhere in the
+            // pattern (suffix match against the recorded packs).
+            std::set<irep_idt> referenced_packs;
+            std::function<void(const irept &)> collect = [&](const irept &n)
+            {
+              const irep_idt id = n.get(ID_identifier);
+              if(!id.empty())
+              {
+                for(const auto &pe : pack_args_map)
+                {
+                  const std::string &key = id2string(pe.first);
+                  auto p = key.rfind("::");
+                  const std::string suffix =
+                    p != std::string::npos ? key.substr(p + 2) : key;
+                  if(suffix == id2string(id))
+                    referenced_packs.insert(pe.first);
+                }
+              }
+              for(const auto &c : n.get_named_sub())
+                collect(c.second);
+              for(const auto &c : n.get_sub())
+                collect(c);
+            };
+            collect(static_cast<const exprt &>(arg).type());
+
+            if(!referenced_packs.empty())
+            {
+              // All packs in a single expansion expand in lock-step and
+              // therefore must have the same length ([temp.variadic]/5).
+              const std::size_t n =
+                pack_args_map.at(*referenced_packs.begin()).size();
+              bool consistent = true;
+              for(const auto &pid : referenced_packs)
+                if(pack_args_map.at(pid).size() != n)
+                  consistent = false;
+              if(consistent)
+              {
+                for(std::size_t i = 0; i < n; i++)
+                {
+                  // Bind each referenced pack to its i-th element (as a
+                  // scalar) and substitute it inside a copy of the pattern.
+                  template_mapt element_map = *this;
+                  for(const auto &pid : referenced_packs)
+                  {
+                    element_map.type_map[pid] = pack_args_map.at(pid)[i];
+                    element_map.pack_args_map.erase(pid);
+                    element_map.pack_size_map.erase(pid);
+                  }
+                  exprt element = static_cast<const exprt &>(arg);
+                  element.type().remove(ID_ellipsis);
+                  element_map.apply(element.type());
+                  expanded_args.push_back(static_cast<const irept &>(element));
+                }
+                was_pack = true;
+              }
+            }
+          }
           if(!was_pack)
             expanded_args.push_back(arg);
         }
