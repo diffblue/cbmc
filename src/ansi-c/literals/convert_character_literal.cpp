@@ -52,8 +52,17 @@ exprt convert_character_literal(
     // the parser rejects empty character constants
     CHECK_RETURN(!value.empty());
 
-    // L is wchar_t, u is char16_t, U is char32_t
-    typet type=wchar_t_type();
+    // L is wchar_t, u is char16_t, U is char32_t ([lex.ccon]).
+    typet type;
+    if(src[0] == 'L')
+      type = wchar_t_type();
+    else if(src[0] == 'u')
+      type = char16_t_type();
+    else
+    {
+      PRECONDITION(src[0] == 'U');
+      type = char32_t_type();
+    }
 
     if(value.size() == 1)
     {
@@ -72,7 +81,8 @@ exprt convert_character_literal(
         x+=z;
       }
 
-      // always wchar_t
+      // use the prefix-selected wide type (L: wchar_t, u: char16_t,
+      // U: char32_t)
       result=from_integer(x, type);
     }
     else

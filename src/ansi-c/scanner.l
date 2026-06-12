@@ -315,7 +315,11 @@ enable_or_disable ("enable"|"disable")
 <GRAMMAR>{char_lit} {
                   loc();
                   source_locationt l=parser_stack(yyansi_clval).source_location();
-                  parser_stack(yyansi_clval)=convert_character_literal(yytext, true, l);
+                  // An ordinary character literal has type int in C but
+                  // type char in C++ ([lex.ccon]); wide/u/U literals carry
+                  // their own type regardless of language.
+                  parser_stack(yyansi_clval)=
+                    convert_character_literal(yytext, !PARSER.cpp98, l);
                   return TOK_CHARACTER;
                 }
 
