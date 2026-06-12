@@ -37,7 +37,9 @@ mp_integer alignment(const typet &type, const namespacet &ns)
   // (computed in the aggregate's own packing context), which an explicit
   // attribute can only raise. For a non-aggregate an explicit attribute is
   // taken verbatim, matching GCC/Clang where e.g. a typedef may request an
-  // alignment smaller than the natural one.
+  // alignment smaller than the natural one -- unless the type is also packed,
+  // in which case packing caps it at the smaller of the requested and the
+  // natural value.
 
   // follow tags to the underlying definition
   if(type.id() == ID_struct_tag)
@@ -81,9 +83,11 @@ mp_integer alignment(const typet &type, const namespacet &ns)
   if(a_int == 0 && packed)
     return 1;
 
-  // an explicit alignment on a non-aggregate is taken verbatim (it may even
-  // request an alignment smaller than the natural one)
-  if(a_int > 0)
+  // an explicit alignment on a non-aggregate that is not packed is taken
+  // verbatim (it may even request an alignment smaller than the natural one,
+  // e.g. a typedef using aligned()). A packed non-aggregate is handled below,
+  // after its natural alignment is known, as packing caps the alignment.
+  if(a_int > 0 && !packed)
     return a_int;
 
   // compute the natural alignment
@@ -109,6 +113,13 @@ mp_integer alignment(const typet &type, const namespacet &ns)
   }
   else
     result=1;
+
+  // A packed non-aggregate that also carries an explicit alignment is capped
+  // at the smaller of the requested alignment and its natural alignment. This
+  // is the "#pragma pack(n)" rule: the alignment of a member is "a multiple of
+  // n or a multiple of the size of the member, whichever is smaller".
+  if(a_int > 0 && a_int < result)
+    result = a_int;
 
   return result;
 }
