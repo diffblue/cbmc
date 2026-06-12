@@ -14,6 +14,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/std_code.h>
 #include <util/symbol_table_base.h>
 
+#include <functional>
+#include <set>
+
 extern exprt try_evaluate_constexpr(
   const exprt &expr,
   const symbol_table_baset &symbol_table,
@@ -1726,6 +1729,91 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
 
   cpp_template_args_tct::argumentst &args=
     result.arguments();
+
+  // [temp.variadic]/4-5: expand pack-expansion template arguments using the
+  // active template_map before matching arguments to parameters.  When a
+  // function-template body is type-checked during instantiation, a class
+  // template-id such as `Tup<E...>` (or one nesting the pack, e.g.
+  // `tuple<typename __decay_and_strip<E>::__type...>`) arrives here with the
+  // pack expansion UNEXPANDED -- a single `ambiguous` cpp_name argument with
+  // an ellipsis.  Without expanding it here, the pack is later resolved as
+  // its (scalar) type_map binding and collapses to a single element.
+  if(
+    !template_map.pack_args_map.empty() && !disable_template_arg_pack_expansion)
+  {
+    cpp_template_args_tct::argumentst expanded;
+    expanded.reserve(args.size());
+    for(auto &arg : args)
+    {
+      bool did_expand = false;
+      if(
+        arg.id() == ID_ambiguous && arg.type().id() == ID_cpp_name &&
+        arg.type().get_bool(ID_ellipsis))
+      {
+        // Collect the parameter packs referenced anywhere in the pattern
+        // (suffix match against the active packs).
+        std::set<irep_idt> referenced_packs;
+        std::function<void(const irept &)> collect = [&](const irept &n)
+        {
+          const irep_idt id = n.get(ID_identifier);
+          if(!id.empty())
+          {
+            for(const auto &pe : template_map.pack_args_map)
+            {
+              const std::string &key = id2string(pe.first);
+              auto p = key.rfind("::");
+              const std::string suffix =
+                p != std::string::npos ? key.substr(p + 2) : key;
+              if(suffix == id2string(id))
+                referenced_packs.insert(pe.first);
+            }
+          }
+          for(const auto &c : n.get_named_sub())
+            collect(c.second);
+          for(const auto &c : n.get_sub())
+            collect(c);
+        };
+        collect(arg.type());
+
+        if(!referenced_packs.empty())
+        {
+          const std::size_t n =
+            template_map.pack_args_map.at(*referenced_packs.begin()).size();
+          bool consistent = true;
+          for(const auto &pid : referenced_packs)
+            if(template_map.pack_args_map.at(pid).size() != n)
+              consistent = false;
+          if(consistent)
+          {
+            for(std::size_t i = 0; i < n; i++)
+            {
+              // Bind each referenced pack to its i-th element and substitute
+              // it inside a copy of the pattern.
+              template_mapt element_map = template_map;
+              for(const auto &pid : referenced_packs)
+              {
+                element_map.type_map[pid] =
+                  template_map.pack_args_map.at(pid)[i];
+                element_map.pack_args_map.erase(pid);
+                element_map.pack_size_map.erase(pid);
+              }
+              typet pattern = static_cast<const typet &>(arg.type());
+              pattern.remove(ID_ellipsis);
+              element_map.apply(pattern);
+              exprt type_arg(ID_type);
+              type_arg.type() = pattern;
+              type_arg.add_source_location() = arg.source_location();
+              expanded.push_back(type_arg);
+            }
+            did_expand = true;
+          }
+        }
+      }
+      if(!did_expand)
+        expanded.push_back(arg);
+    }
+    args.swap(expanded);
+  }
 
   const template_typet::template_parameterst &parameters=
     template_type.template_parameters();

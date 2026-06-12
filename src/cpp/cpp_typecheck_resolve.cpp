@@ -2688,14 +2688,17 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
             messaget::M_ERROR);
         try
         {
+          cpp_typecheck.disable_template_arg_pack_expansion = true;
           partial_specialization_args_tc =
             cpp_typecheck.typecheck_template_args(
               source_location,
               primary_template_symbol,
               partial_specialization_args);
+          cpp_typecheck.disable_template_arg_pack_expansion = false;
         }
         catch(...)
         {
+          cpp_typecheck.disable_template_arg_pack_expansion = false;
           sfinae_failed = true;
         }
         cpp_typecheck.get_message_handler().set_message_count(
@@ -2723,10 +2726,17 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
         }
       }
 
-      DATA_INVARIANT(
-        partial_specialization_args_tc.arguments().size() ==
-          full_template_args_tc.arguments().size(),
-        "argument numbers must match");
+      // If the argument counts differ (e.g. because a pack-expansion
+      // argument was expanded on one side but the partial specialization
+      // keeps an unexpanded pack), this partial specialization cannot match
+      // -- the equality check below requires equal arity.  Skip it rather
+      // than asserting.
+      if(
+        partial_specialization_args_tc.arguments().size() !=
+        full_template_args_tc.arguments().size())
+      {
+        continue;
+      }
 
       if(partial_specialization_args_tc == full_template_args_tc)
       {
