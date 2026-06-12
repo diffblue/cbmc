@@ -5012,11 +5012,29 @@ void smt2_convt::flatten2bv(const exprt &expr)
   }
   else if(type.id()==ID_floatbv)
   {
-    INVARIANT(
-      !use_FPA_theory,
-      "floatbv expressions should be flattened when using FPA theory");
-
-    convert_expr(expr);
+    if(use_FPA_theory)
+    {
+      // A floatbv constant's IEEE-754 interchange bit pattern is exactly its
+      // bit-vector representation, so it is emitted as a literal bit-vector.
+      // This is the only shape that reaches flatten2bv under FPA: a
+      // non-constant float whose bits are read is lowered by
+      // lower_byte_operators into a float typecast, which is handled by the
+      // bvfromfloat round-trip in find_symbols and never reaches here.
+      if(expr.is_constant())
+      {
+        const ieee_float_spect spec(to_floatbv_type(type));
+        const mp_integer value = bvrep2integer(
+          to_constant_expr(expr).get_value(), spec.width(), false);
+        out << "(_ bv" << value << " " << spec.width() << ")";
+      }
+      else
+      {
+        UNEXPECTEDCASE(
+          "flatten2bv of a non-constant FPA-encoded float is unsupported");
+      }
+    }
+    else
+      convert_expr(expr);
   }
   else
     convert_expr(expr);

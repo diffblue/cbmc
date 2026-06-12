@@ -6,6 +6,8 @@
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
+#include <util/c_types.h>
+#include <util/ieee_float.h>
 #include <util/mathematical_types.h>
 #include <util/message.h>
 #include <util/namespace.h>
@@ -155,4 +157,45 @@ TEST_CASE("smt2_convt range encoding", "[core][solvers][smt2]")
       REQUIRE(smt2_dec() == decision_proceduret::resultt::D_UNSATISFIABLE);
     }
   }
+}
+
+TEST_CASE(
+  "smt2_convt::flatten2bv FPA-encoded float constant",
+  "[core][solvers][smt2]")
+{
+  // Drive `flatten2bv` on a `floatbv` constant under a solver that
+  // enables the SMT-LIB FloatingPoint theory (use_FPA_theory == true).
+  // This pins the constant branch of the new flatten2bv handler:
+  // the constant's IEEE-754 interchange bit pattern is emitted as a
+  // bit-vector literal.  Without the fix, the back-end aborts here
+  // with `INVARIANT(!use_FPA_theory, ...)`.
+  symbol_tablet symbol_table;
+  namespacet ns{symbol_table};
+  std::ostringstream out;
+  // CPROVER_SMT2 sets use_FPA_theory = true at construction time.
+  smt2_convt conv{
+    ns, "test", "", "QF_AUFBV", smt2_convt::solvert::CPROVER_SMT2, out};
+
+  // double 1.0 -> 0x3FF0000000000000 = 4607182418800017408.
+  ieee_float_valuet f{ieee_float_spect::double_precision()};
+  f.from_double(1.0);
+  const constant_exprt fp_const = f.to_expr();
+
+  // Place the constant in a single-member union so that the back-end
+  // takes a flat-of-float path:
+  //   convert_typecast(union -> bv64)
+  //     -> convert_expr(union_exprt)
+  //     -> convert_union
+  //     -> flatten2bv(float)  <- exercises the new code
+  const union_typet u_type{
+    {struct_union_typet::componentt{"d", fp_const.type()}}};
+  const union_exprt u_expr{"d", fp_const, u_type};
+
+  const unsignedbv_typet u64{64};
+  const constant_exprt expected =
+    from_integer(mp_integer{"4607182418800017408"}, u64);
+
+  conv.set_to(equal_exprt{typecast_exprt{u_expr, u64}, expected}, true);
+
+  REQUIRE(out.str().find("(_ bv4607182418800017408 64)") != std::string::npos);
 }
