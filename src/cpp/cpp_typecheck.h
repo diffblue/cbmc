@@ -338,7 +338,9 @@ protected:
     cpp_declarationt &ctor) const;
 
   void default_cpctor(
-    const symbolt&, cpp_declarationt &cpctor) const;
+    const symbolt &,
+    cpp_declarationt &cpctor,
+    const irep_idt &param_identifier = "ref") const;
 
   void default_assignop(
       const symbolt &symbol, cpp_declarationt &cpctor);
