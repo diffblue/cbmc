@@ -688,5 +688,15 @@ void ansi_c_convert_typet::set_attributes(typet &type) const
     type.set(ID_C_packed, true);
 
   if(aligned)
+  {
     type.set(ID_C_alignment, alignment);
+
+    // An alignment attribute on an object, field or tag declaration can only
+    // *increase* the alignment (GCC/Clang ignore a request smaller than the
+    // natural alignment). Only a typedef may set a smaller alignment, which is
+    // then taken verbatim. Record the provenance so that padding can apply the
+    // right rule; see alignment() and member_layout_alignment in padding.cpp.
+    if(!c_storage_spec.is_typedef)
+      type.set(ID_C_alignment_increase_only, true);
+  }
 }
