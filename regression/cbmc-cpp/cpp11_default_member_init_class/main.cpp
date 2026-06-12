@@ -27,6 +27,23 @@ struct helper<N, T, false>
   T m{};
 };
 
+// A class whose own default member initializer is a scalar `{}` (the value
+// must be zero, not an indeterminate/ill-typed value).
+struct scalar_nsdmi
+{
+  int n{};
+};
+
+// A member with NO default member initializer whose TYPE has one: the
+// enclosing defaulted constructor must still default-construct it so the
+// member type's NSDMI takes effect ([class.base.init], [class.default.ctor]/3
+// — an NSDMI makes the default constructor non-trivial).
+struct holds_nsdmi_member
+{
+  holds_nsdmi_member() = default;
+  scalar_nsdmi s; // no initializer here; scalar_nsdmi::n{} must still apply
+};
+
 int main()
 {
   plain p;
@@ -34,6 +51,12 @@ int main()
 
   helper<0, inner, false> h;
   __CPROVER_assert(h.m.x == 0, "partial-spec member value-initialized");
+
+  scalar_nsdmi s;
+  __CPROVER_assert(s.n == 0, "scalar NSDMI value-initialized");
+
+  holds_nsdmi_member hn;
+  __CPROVER_assert(hn.s.n == 0, "member-type NSDMI applied via default ctor");
 
   return 0;
 }

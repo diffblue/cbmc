@@ -962,9 +962,37 @@ void cpp_typecheckt::full_member_initialization(
       continue;
     }
 
-    // If the data member is not POD and is not explicitly initialized,
-    // then its default constructor is called.
-    if(!found && !cpp_is_pod(c.type()))
+    // A class/array member whose type has a default member initializer
+    // (NSDMI) has a non-trivial default constructor ([class.default.ctor]/3)
+    // even when it is otherwise a POD-like aggregate, so it must be
+    // default-constructed for its NSDMIs to take effect.
+    bool member_type_has_nsdmi = false;
+    {
+      typet base_type = c.type();
+      while(base_type.id() == ID_array)
+        base_type = to_array_type(base_type).element_type();
+      if(base_type.id() == ID_struct_tag)
+      {
+        const struct_typet &member_struct =
+          follow_tag(to_struct_tag_type(base_type));
+        for(const auto &mc : member_struct.components())
+        {
+          if(
+            !mc.get_bool(ID_is_static) && !mc.get_bool(ID_is_type) &&
+            mc.type().id() != ID_code &&
+            mc.find(ID_C_default_value).is_not_nil())
+          {
+            member_type_has_nsdmi = true;
+            break;
+          }
+        }
+      }
+    }
+
+    // If the data member is not POD (or has a non-trivial default
+    // constructor because its type has a default member initializer) and is
+    // not explicitly initialized, then its default constructor is called.
+    if(!found && (!cpp_is_pod(c.type()) || member_type_has_nsdmi))
     {
       cpp_namet cppname(mem_name);
 

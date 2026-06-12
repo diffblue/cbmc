@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/expr_initializer.h>
 #include <util/pointer_expr.h>
 
 #include "cpp_typecheck.h"
@@ -148,18 +149,39 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
           const irept &default_val = comp.find(ID_C_default_value);
           if(default_val.is_not_nil())
           {
-            exprt val = static_cast<const exprt &>(default_val);
             // Type-check in the class scope so that using-declarations
             // (e.g., using enum) are visible.
             cpp_save_scopet save_scope(cpp_scopes);
             cpp_scopes.set_scope(
               to_struct_tag_type(object_tc.type()).get_identifier());
-            typecheck_expr(val);
-            if(val.type() != comp.type())
-              val = typecast_exprt(val, comp.type());
             member_exprt member(object_tc, comp.get_name(), comp.type());
             member.set(ID_C_lvalue, true);
-            block.add(code_frontend_assignt(std::move(member), std::move(val)));
+
+            // An empty brace initializer ({}) value-initializes the member
+            // ([dcl.init]).  Type-checking the bare empty initializer_list
+            // would otherwise yield a value with no determinate
+            // representation (e.g. an initializer_list cast to a scalar,
+            // which has no bit-width).  Use proper (zero-)value
+            // initialization for any member type instead.
+            if(
+              default_val.id() == ID_initializer_list &&
+              default_val.get_sub().empty())
+            {
+              auto zero =
+                ::zero_initializer(comp.type(), source_location, *this);
+              if(zero.has_value())
+                block.add(
+                  code_frontend_assignt(std::move(member), std::move(*zero)));
+            }
+            else
+            {
+              exprt val = static_cast<const exprt &>(default_val);
+              typecheck_expr(val);
+              if(val.type() != comp.type())
+                val = typecast_exprt(val, comp.type());
+              block.add(
+                code_frontend_assignt(std::move(member), std::move(val)));
+            }
           }
         }
         if(!block.statements().empty())
