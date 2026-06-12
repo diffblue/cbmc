@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ out-of-line member template body is used: SUCCESS$
+^\[main\.assertion\.2\] line \d+ member template body stored the value: SUCCESS$
+^\[main\.assertion\.3\] line \d+ member template body ran its statements: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^PARSING ERROR$
+--
+Out-of-line definition of a member function template of a class template
+whose parameter names differ from the in-class declaration ([dcl.fct]/3).
+The instantiated member must use the definition's parameter names for its
+body; otherwise the body is ill-formed and silently dropped, leaving the
+member with no body.
