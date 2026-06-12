@@ -1,0 +1,11 @@
+CORE
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+Pack expansion of a nested-pack pattern in a template argument list
+([temp.variadic]): Container<typename Trait<E>::member...> expands once per
+pack element rather than collapsing to a single element.
