@@ -24,6 +24,26 @@ macro(add_test_pl_profile name cmdline flag profile)
     endif()
 endmacro(add_test_pl_profile)
 
+# Register a test.pl profile split into <shard_count> shards (see test.pl's
+# --shard option) so a long-running suite runs as several parallel ctest
+# entries instead of one indivisible test. <base_flags> are the test.pl flags
+# shared by all shards (excluding -s and --shard, which are appended per
+# shard); each shard is named "<name>-<i>", logs to "<log_suffix>-<i>" and is
+# given the supplied TIMEOUT.
+function(add_sharded_test_pl_profile
+         name cmdline base_flags profile log_suffix shard_count timeout)
+    foreach(shard RANGE 1 ${shard_count})
+        add_test_pl_profile(
+            "${name}-${shard}"
+            "${cmdline}"
+            "${base_flags};--shard;${shard}/${shard_count};-s;${log_suffix}-${shard}"
+            "${profile}"
+        )
+        set_tests_properties("${name}-${shard}-${profile}" PROPERTIES
+            TIMEOUT ${timeout})
+    endforeach()
+endfunction(add_sharded_test_pl_profile)
+
 macro(add_test_pl_tests cmdline)
     get_filename_component(TEST_DIR_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
     message(STATUS "Adding tests in directory: ${TEST_DIR_NAME}")
