@@ -139,7 +139,8 @@ void cpp_typecheckt::default_ctor(
 /// Generate code for implicit default copy constructor
 void cpp_typecheckt::default_cpctor(
   const symbolt &symbol,
-  cpp_declarationt &cpctor) const
+  cpp_declarationt &cpctor,
+  const irep_idt &param_identifier_arg) const
 {
   source_locationt source_location=symbol.type.source_location();
 
@@ -152,7 +153,7 @@ void cpp_typecheckt::default_cpctor(
   default_ctor(source_location, symbol.base_name, cpctor);
   cpp_declaratort &decl0=cpctor.declarators()[0];
 
-  std::string param_identifier("ref");
+  std::string param_identifier(id2string(param_identifier_arg));
 
   // Compound name
   const cpp_namet cppcomp(symbol.base_name, source_location);

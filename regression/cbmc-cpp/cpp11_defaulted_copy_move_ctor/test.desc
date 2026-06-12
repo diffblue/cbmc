@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^PARSING ERROR$
+--
+An explicitly-defaulted (`= default`) copy/move constructor must memberwise
+copy/move the base subobjects and non-static data members, exactly like the
+implicitly-defined one ([dcl.fct.def.default], [class.copy.ctor]/14).  The
+memberwise body is generated at conversion time for trivially-copyable
+bases/members.  Covers class templates, a non-template class, and a class
+with a base subobject.

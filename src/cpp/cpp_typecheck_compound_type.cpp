@@ -585,6 +585,13 @@ void cpp_typecheckt::typecheck_compound_declarator(
       // empty body so that member initialization is generated
       value = codet(ID_block);
       value.add_source_location() = declaration.source_location();
+      // Mark this body as coming from an explicitly-defaulted special
+      // member.  For a defaulted copy/move constructor, convert_function
+      // uses this to generate the memberwise base/member copies lazily (at
+      // conversion time, when the class is complete and the ctor is
+      // actually being elaborated), per [dcl.fct.def.default] /
+      // [class.copy.ctor]/14.
+      value.set("#defaulted_function", true);
     }
 
     component.set(ID_is_inline, declaration.member_spec().is_inline());

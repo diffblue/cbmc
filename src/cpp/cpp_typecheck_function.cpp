@@ -506,6 +506,136 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     }
   }
 
+  // [dcl.fct.def.default], [class.copy.ctor]/14: an explicitly-defaulted
+  // copy or move constructor memberwise copies/moves the base subobjects and
+  // non-static data members.  Generate those initializers here, at
+  // conversion time: the class is fully formed (so base/member types are
+  // known) and this only runs for constructors actually being elaborated,
+  // avoiding eager instantiation pressure during class type-checking (which
+  // could otherwise perturb overload resolution in heavy system headers).
+  // The body was marked "#defaulted_function" and its sole reference
+  // parameter named "ref" when the `= default` definition was type-checked.
+  if(
+    symbol.value.id() == ID_code &&
+    symbol.value.get_bool("#defaulted_function") &&
+    to_code(symbol.value).get_statement() == ID_block &&
+    to_code_type(symbol.type).return_type().id() == ID_constructor)
+  {
+    const code_typet &ft = to_code_type(symbol.type);
+    const irep_idt class_id = symbol.type.get(ID_C_member_name);
+    // implicit this + exactly one reference parameter whose referent is the
+    // constructor's own class == the copy/move constructor
+    if(ft.parameters().size() == 2 && !class_id.empty())
+    {
+      const typet &pt = ft.parameters()[1].type();
+      const bool is_ref_to_self =
+        pt.id() == ID_pointer && pt.get_bool(ID_C_reference) &&
+        to_pointer_type(pt).base_type().id() == ID_struct_tag &&
+        to_struct_tag_type(to_pointer_type(pt).base_type()).get_identifier() ==
+          class_id;
+      const symbolt *class_symbol = symbol_table.lookup(class_id);
+      bool has_virtual_base = false;
+      if(class_symbol != nullptr && class_symbol->type.id() == ID_struct)
+      {
+        // Virtual bases require most-derived construction order
+        // ([class.base.init]/7,13); CBMC's virtual-base member handling is
+        // independently incomplete, so leave such (rare) defaulted ctors
+        // with an empty body rather than emitting unsound copies.
+        std::list<irep_idt> vbases;
+        get_virtual_bases(to_struct_type(class_symbol->type), vbases);
+        has_virtual_base = !vbases.empty();
+      }
+      // Only generate the memberwise copy when every base subobject and
+      // non-static data member is trivially copyable (a scalar, or a POD
+      // class/array of such).  Copying a non-trivial member would require
+      // its own (possibly not-yet-elaborated) copy constructor; CBMC's
+      // model of some standard library class copies (e.g. std::string's
+      // _S_copy_chars / _M_replace) is incomplete, so generating such
+      // copies here would reach unmodelled functions.  Restricting to
+      // trivially-copyable members keeps the generated copy sound while
+      // covering the cases that matter (e.g. std::pair of pointers).
+      bool all_members_trivial = true;
+      if(class_symbol != nullptr && class_symbol->type.id() == ID_struct)
+      {
+        const auto is_trivial_copy = [&](const typet &t) -> bool
+        {
+          typet ft = t;
+          while(ft.id() == ID_array)
+            ft = to_array_type(ft).element_type();
+          if(
+            ft.id() == ID_pointer || ft.id() == ID_signedbv ||
+            ft.id() == ID_unsignedbv || ft.id() == ID_floatbv ||
+            ft.id() == ID_fixedbv || ft.id() == ID_c_bool ||
+            ft.id() == ID_bool || ft.id() == ID_c_enum ||
+            ft.id() == ID_c_enum_tag)
+            return true;
+          if(ft.id() == ID_struct_tag)
+          {
+            const symbolt *s =
+              symbol_table.lookup(to_struct_tag_type(ft).get_identifier());
+            if(s == nullptr || s->type.id() != ID_struct)
+              return s != nullptr && cpp_is_pod(s->type);
+            // An empty class (no non-static data members) is trivially
+            // copyable regardless of declared/deleted special members
+            // (e.g. std::__pair_base).
+            bool has_data = false;
+            for(const auto &mc : to_struct_type(s->type).components())
+              if(
+                !mc.get_bool(ID_is_static) && !mc.get_bool(ID_is_type) &&
+                mc.type().id() != ID_code && !mc.get_bool(ID_is_vtptr))
+                has_data = true;
+            if(!has_data)
+              return true;
+            return cpp_is_pod(s->type);
+          }
+          return false;
+        };
+        const struct_typet &st = to_struct_type(class_symbol->type);
+        for(const auto &b : st.bases())
+          if(!is_trivial_copy(b.type()))
+            all_members_trivial = false;
+        for(const auto &c : st.components())
+        {
+          if(
+            c.get_bool(ID_is_static) || c.get_bool(ID_is_type) ||
+            c.type().id() == ID_code || c.get_bool(ID_from_base) ||
+            c.get_bool(ID_is_vtptr))
+            continue;
+          if(!is_trivial_copy(c.type()))
+            all_members_trivial = false;
+        }
+      }
+      if(
+        is_ref_to_self && class_symbol != nullptr && !has_virtual_base &&
+        all_members_trivial)
+      {
+        // default_cpctor emits initializers that refer to the source
+        // object by the parameter name "ref".  Make "ref" resolve to this
+        // constructor's actual parameter for the duration of body
+        // type-checking by aliasing it in the function scope.  (Done here,
+        // not by renaming the parameter at class-typecheck time, so that
+        // class elaboration / overload resolution is left untouched.)
+        cpp_idt &ref_id = function_scope.insert(irep_idt{"ref"});
+        ref_id.identifier = ft.parameters()[1].get_identifier();
+        ref_id.id_class = cpp_idt::id_classt::SYMBOL;
+        ref_id.is_member = false;
+
+        cpp_declarationt tmp_cpctor;
+        default_cpctor(*class_symbol, tmp_cpctor);
+        const irept &inits = tmp_cpctor.declarators()[0].member_initializers();
+        // Prepend the generated base/member initializers to the (empty)
+        // defaulted-constructor body, preserving their order.
+        auto &ops = symbol.value.operands();
+        std::size_t pos = 0;
+        for(const auto &init : inits.get_sub())
+        {
+          ops.insert(ops.begin() + pos, static_cast<const exprt &>(init));
+          ++pos;
+        }
+      }
+    }
+  }
+
   // [temp.deduct]/8 and the system-header analogue: when the
   // function whose body we are elaborating lives in a system
   // header, any typecheck failure is treated as SFINAE rather
