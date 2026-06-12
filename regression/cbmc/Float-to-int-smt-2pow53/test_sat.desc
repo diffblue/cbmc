@@ -1,0 +1,14 @@
+CORE no-new-smt
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+^\[main\.assertion\.1\] line \d+ u >= 2\^53: SUCCESS$
+--
+^warning: ignoring
+--
+Control for the SMT2 float-to-integer regression test (see test_smt2.desc): the
+default SAT/boolbv back-end converts doubles in [2^53, 2^54) correctly, because
+float_utilst::to_integer pre-pads the fraction before shifting.  This was the
+reference behaviour the SMT2 back-end was fixed to match.

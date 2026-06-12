@@ -1,0 +1,25 @@
+CORE smt-backend no-new-smt
+main.c
+--smt2
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+^\[main\.assertion\.1\] line \d+ u >= 2\^53: SUCCESS$
+--
+^warning: ignoring
+--
+Regression test for float-to-integer conversion in the SMT2 bit-blasting
+back-end (float_bvt::to_integer in src/solvers/floatbv/float_bv.cpp).
+
+CBMC has two encodings for floating-point: bit-blasting (the default, and
+also used by --smt2 without --fpa) and FP theory (--fpa, --cvc5,
+--bitwuzla).  The bug was in the bit-blasting path only: the unpacked
+fraction was not padded to dest_width before right-shifting, so for values
+with exponent > spec.f (i.e. doubles >= 2^53) the shift distance
+underflowed and the result was zero.
+
+Every double in [2^53, 2^54) is an integer >= 2^53, so the assertion holds
+for every concrete input, yet the unpatched --smt2 back-end reported
+VERIFICATION FAILED.  See main.c for a bit-level walkthrough, and
+test_sat.desc for the SAT/boolbv control, which already did the padding
+correctly.

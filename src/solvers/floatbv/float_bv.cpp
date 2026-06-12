@@ -388,10 +388,30 @@ exprt float_bvt::to_integer(
   // Right now hard-wired to round-to-zero, which is
   // the usual case in ANSI-C.
 
-  // if the exponent is positive, shift right
-  exprt offset = from_integer(spec.f, signedbv_typet(spec.e));
+  // Pad the fraction to dest_width so the hidden bit starts at position
+  // (shift_width-1); a right shift by (shift_width-1 - exponent) then lands
+  // it at bit position `exponent`, giving the correct integer value.  Without
+  // the padding, values with exponent > spec.f overflow the narrow fraction
+  // vector.  See regression/cbmc/Float-to-int-smt-2pow53/main.c for a
+  // bit-level walkthrough.
+  exprt fraction = unpacked.fraction;
+  const std::size_t fraction_bits = spec.f + 1;
+  std::size_t shift_width = fraction_bits;
+  if(dest_width > fraction_bits)
+  {
+    shift_width = dest_width;
+    fraction = concatenation_exprt(
+      fraction,
+      from_integer(0, unsignedbv_typet(dest_width - fraction_bits)),
+      unsignedbv_typet(shift_width));
+  }
+
+  // if the exponent is positive, shift right.  The hidden bit sits at
+  // position (shift_width-1), so the result is fraction>>(shift_width-1-e).
+  exprt offset =
+    from_integer(mp_integer(shift_width) - 1, signedbv_typet(spec.e));
   const minus_exprt distance(offset, unpacked.exponent);
-  const lshr_exprt shift_result(unpacked.fraction, distance);
+  const lshr_exprt shift_result(fraction, distance);
 
   // if the exponent is negative, we have zero anyways
   exprt result = shift_result;
