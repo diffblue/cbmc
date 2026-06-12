@@ -41,6 +41,67 @@ static const exprt &alignment_of(const typet &t)
   return static_cast<const exprt &>(t.find(ID_C_alignment));
 }
 
+/// \return the ID_C_declaration_alignment expression of \p t, or a nil
+/// expression when there is none
+static const exprt &declaration_alignment_of(const typet &t)
+{
+  return static_cast<const exprt &>(t.find(ID_C_declaration_alignment));
+}
+
+static void combine_alignments(exprt &alignment, const exprt &other_alignment);
+
+/// Apply \p f to each level of the declarator chain of \p type, i.e., array
+/// element types, pointer base types, function return types, and the
+/// underlying types of bit-fields, starting with \p type itself.
+template <typename F>
+static void for_each_declarator_level(typet &type, F f)
+{
+  for(typet *t = &type;;)
+  {
+    f(*t);
+
+    if(t->id() == ID_array)
+      t = &to_array_type(*t).element_type();
+    else if(t->id() == ID_pointer)
+      t = &to_pointer_type(*t).base_type();
+    else if(t->id() == ID_code)
+      t = &to_code_type(*t).return_type();
+    else if(t->id() == ID_c_bit_field)
+      t = &to_c_bit_field_type(*t).underlying_type();
+    else
+      break;
+  }
+}
+
+void c_typecheck_baset::apply_declaration_alignment(
+  typet &type,
+  bool is_typedef)
+{
+  exprt alignment = nil_exprt{};
+
+  for_each_declarator_level(
+    type,
+    [&alignment](typet &t)
+    {
+      combine_alignments(alignment, declaration_alignment_of(t));
+      t.remove(ID_C_declaration_alignment);
+    });
+
+  if(alignment.is_nil())
+    return;
+
+  if(is_typedef)
+    type.set(ID_C_alignment, alignment);
+  else
+    type.set(ID_C_declaration_alignment, alignment);
+}
+
+void c_typecheck_baset::remove_declaration_alignment(typet &type)
+{
+  for_each_declarator_level(
+    type, [](typet &t) { t.remove(ID_C_declaration_alignment); });
+}
+
 void c_typecheck_baset::typecheck_type(typet &type)
 {
   // we first convert, and then check
@@ -98,6 +159,9 @@ void c_typecheck_baset::typecheck_type(typet &type)
     exprt alignment = alignment_of(type);
     if(alignment.is_not_nil())
       typecheck_alignment(alignment, type.source_location());
+    exprt declaration_alignment = declaration_alignment_of(type);
+    if(declaration_alignment.is_not_nil())
+      typecheck_alignment(declaration_alignment, type.source_location());
     irept _typedef=type.find(ID_C_typedef);
 
     type = already_typechecked.get_type();
@@ -107,6 +171,13 @@ void c_typecheck_baset::typecheck_type(typet &type)
       type.set(ID_C_packed, true);
     if(alignment.is_not_nil())
       type.add(ID_C_alignment, alignment);
+    if(declaration_alignment.is_not_nil())
+    {
+      // the declaration may request alignments in several places, the
+      // strictest of which applies
+      combine_alignments(declaration_alignment, declaration_alignment_of(type));
+      type.add(ID_C_declaration_alignment, declaration_alignment);
+    }
     if(_typedef.is_not_nil())
       type.add(ID_C_typedef, _typedef);
 
@@ -114,12 +185,15 @@ void c_typecheck_baset::typecheck_type(typet &type)
   }
 
   // do we have alignment?
-  if(type.find(ID_C_alignment).is_not_nil())
+  for(const auto &id : {ID_C_alignment, ID_C_declaration_alignment})
   {
-    typecheck_alignment(
-      static_cast<exprt &>(type.add(ID_C_alignment)), type.source_location());
-    if(type.find(ID_C_alignment).is_nil())
-      type.remove(ID_C_alignment);
+    if(type.find(id).is_not_nil())
+    {
+      typecheck_alignment(
+        static_cast<exprt &>(type.add(id)), type.source_location());
+      if(type.find(id).is_nil())
+        type.remove(id);
+    }
   }
 
   if(type.id()==ID_code)
@@ -852,6 +926,14 @@ static void combine_alignments(exprt &alignment, const exprt &other_alignment)
     return;
   else if(alignment.is_nil())
     alignment = other_alignment;
+  else if(other_alignment.id() == ID_default)
+  {
+    // __attribute__((aligned)) requests the target's maximum alignment, which
+    // we do not determine (see padding.cpp), so retain any explicit value
+    return;
+  }
+  else if(alignment.id() == ID_default)
+    alignment = other_alignment;
   else
   {
     // Both alignments have already been through typecheck_type, so they are
@@ -891,7 +973,13 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
   remove_qualifiers.write(type);
 
   bool is_packed = type.get_bool(ID_C_packed);
+  // Alignment attributes in a declaration with body are attributes of the
+  // struct/union type. Otherwise, they apply to the declared entity.
   exprt alignment = alignment_of(type);
+  combine_alignments(alignment, declaration_alignment_of(type));
+  type.remove(ID_C_declaration_alignment);
+  if(have_body && alignment.is_not_nil())
+    type.set(ID_C_alignment, alignment);
 
   if(type.find(ID_tag).is_nil())
   {
@@ -983,8 +1071,6 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
         throw errort().with_location(type.source_location())
           << "redefinition of body of '" << s_it->second.pretty_name << "'";
       }
-
-      combine_alignments(alignment, alignment_of(s_it->second.type));
     }
   }
 
@@ -1002,10 +1088,16 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
 
   original_qualifiers.write(type);
 
-  if(is_packed)
-    type.set(ID_C_packed, true);
-  if(alignment.is_not_nil())
-    type.set(ID_C_alignment, alignment);
+  // Packing and alignment attributes of a definition are recorded with the
+  // type symbol. Those of a declaration without body apply to the declared
+  // entity.
+  if(!have_body)
+  {
+    if(is_packed)
+      type.set(ID_C_packed, true);
+    if(alignment.is_not_nil())
+      type.set(ID_C_declaration_alignment, alignment);
+  }
 }
 
 void c_typecheck_baset::typecheck_compound_body(
@@ -1061,6 +1153,7 @@ void c_typecheck_baset::typecheck_compound_body(
           new_component.add(ID_C_pragma_pack) = pragma_pack;
 
         typecheck_type(new_component.type());
+        apply_declaration_alignment(new_component.type(), false);
 
         // the rules for anonymous members depend on the type and the compiler,
         // just bit fields are accepted everywhere
@@ -1740,9 +1833,12 @@ void c_typecheck_baset::typecheck_typeof_type(typet &type)
     }
 
     type.swap(expr.type());
+
+    // the alignment of a declaration is not part of the type
+    remove_declaration_alignment(type);
   }
 
-  type.add_source_location()=source_location;
+  type.add_source_location() = source_location;
   c_qualifiers.write(type);
 }
 
@@ -1771,7 +1867,10 @@ void c_typecheck_baset::typecheck_typedef_type(typet &type)
 
   c_qualifierst c_qualifiers(type);
   bool is_packed = type.get_bool(ID_C_packed);
-  exprt alignment = alignment_of(type);
+  // The alignment of the typedef'd type is that of the symbol; an alignment
+  // supplied at the use site (e.g. a struct member declarator) applies to the
+  // declared entity.
+  const exprt declaration_alignment = declaration_alignment_of(type);
 
   c_qualifiers += c_qualifierst(symbol.type);
   type = symbol.type;
@@ -1788,9 +1887,8 @@ void c_typecheck_baset::typecheck_typedef_type(typet &type)
   else
     type.remove(ID_C_packed);
 
-  combine_alignments(alignment, alignment_of(symbol.type));
-  if(alignment.is_not_nil())
-    type.set(ID_C_alignment, alignment);
+  if(declaration_alignment.is_not_nil())
+    type.set(ID_C_declaration_alignment, declaration_alignment);
 
   // CPROVER extensions
   if(symbol.base_name == CPROVER_PREFIX "rational")

@@ -1,0 +1,13 @@
+CORE gcc-only broken-test-c++-front-end
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Alignment attributes of declarations apply to the declared entity; for members
+they can only increase its alignment, whereas those of typedefs and struct
+definitions are the alignment of the type, which packing overrides. GCC applies
+attributes following the '*' of a pointer declarator to the pointer type.
