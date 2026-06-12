@@ -80,7 +80,8 @@ static std::string pointer_offset_bits_as_string(
 }
 
 /// Encode the attributes of \p type (or a component) that affect the layout of
-/// an aggregate, i.e., packing, explicit alignment, and `#pragma pack`.
+/// an aggregate, i.e., packing, explicit alignment (of the type or the
+/// declaration), and `#pragma pack`.
 static std::string layout_attributes2name(const irept &src)
 {
   std::string result;
@@ -88,12 +89,15 @@ static std::string layout_attributes2name(const irept &src)
   if(src.get_bool(ID_C_packed))
     result += 'p';
 
-  for(const auto &id : {ID_C_alignment, ID_C_pragma_pack})
+  for(const auto &id :
+      {ID_C_alignment, ID_C_declaration_alignment, ID_C_pragma_pack})
   {
     const exprt &value = static_cast<const exprt &>(src.find(id));
     if(value.is_nil())
       continue;
-    result += id == ID_C_alignment ? 'a' : 'P';
+    result += id == ID_C_alignment               ? 'a'
+              : id == ID_C_declaration_alignment ? 'd'
+                                                 : 'P';
     const auto value_int = numeric_cast<mp_integer>(value);
     result += value_int.has_value() ? integer2string(*value_int) : "?";
   }

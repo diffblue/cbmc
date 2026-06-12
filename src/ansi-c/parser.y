@@ -1203,8 +1203,13 @@ type_qualifier_list:
 
 attribute_type_qualifier_list:
           attribute_or_type_qualifier
+        {
+          // these are the qualifiers and attributes of a pointer declarator
+          mark_pointer_declarator_attributes(parser_stack($1));
+        }
         | attribute_type_qualifier_list attribute_or_type_qualifier
         {
+          mark_pointer_declarator_attributes(parser_stack($2));
           $$=merge($1, $2);
         }
         ;
@@ -1684,7 +1689,10 @@ aggregate_name:
           gcc_type_attribute_opt
         {
           parser_stack($1).set(ID_components, ID_nil);
-          // type attributes
+          // GCC ignores packed and aligned attributes between the keyword and
+          // the tag of a declaration without body (and Clang warns about
+          // them), while those following the tag apply to the declared entity
+          strip_ignored_attributes(parser_stack($2), {ID_packed, ID_aligned});
           $$=merge($1, merge($2, $6));
         }
         ;

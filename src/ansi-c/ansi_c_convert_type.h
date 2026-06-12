@@ -41,6 +41,8 @@ public:
   typet gcc_attribute_mode;
 
   bool packed, aligned;
+  /// the alignment attribute follows the '*' of a pointer declarator
+  bool aligned_pointer_declarator;
   exprt vector_size, alignment, bv_width, fraction_width;
   exprt msc_based; // this is Visual Studio
   bool constructor, destructor;
@@ -106,6 +108,7 @@ protected:
       gcc_attribute_mode(static_cast<const typet &>(get_nil_irep())),
       packed(false),
       aligned(false),
+      aligned_pointer_declarator(false),
       vector_size(nil_exprt{}),
       alignment(nil_exprt{}),
       bv_width(nil_exprt{}),
