@@ -3687,6 +3687,47 @@ skip_pack_removal_ft:
             // with the proper template map.
             new_decl.declarators()[0].add(ID_value) =
               md.declarators()[0].find(ID_value);
+
+            // [dcl.fct]/3: parameter names are not part of the function
+            // type, so an out-of-line definition may name its parameters
+            // differently from the in-class declaration (e.g. libstdc++
+            // declares `_M_insert_unique(_Arg&& __x)` but defines it with
+            // `_Arg&& __v`).  The body we just adopted comes from the
+            // definition and refers to the definition's parameter names,
+            // whereas new_decl's signature was built from the declaration.
+            // Adopt the definition's parameter names so the body's
+            // references resolve when the body is type-checked; otherwise
+            // the unresolved names make the body ill-formed, and for a
+            // system-header body it would be silently dropped, leaving the
+            // member function with no body (so the call returns nondet).
+            {
+              typet &inst_type = new_decl.declarators()[0].type();
+              const typet &def_type = md.declarators()[0].type();
+              if(
+                inst_type.id() == ID_function_type &&
+                def_type.id() == ID_function_type)
+              {
+                auto &ip = inst_type.add(ID_parameters).get_sub();
+                const auto &dp = def_type.find(ID_parameters).get_sub();
+                std::size_t j = 0;
+                for(auto &pi : ip)
+                {
+                  if(pi.id() != ID_cpp_declaration)
+                    continue;
+                  while(j < dp.size() && dp[j].id() != ID_cpp_declaration)
+                    ++j;
+                  if(j >= dp.size())
+                    break;
+                  auto &ipd = static_cast<cpp_declarationt &>(pi);
+                  const auto &dpd =
+                    static_cast<const cpp_declarationt &>(dp[j]);
+                  ++j;
+                  if(!ipd.declarators().empty() && !dpd.declarators().empty())
+                    ipd.declarators().front().name() =
+                      dpd.declarators().front().name();
+                }
+              }
+            }
             goto body_found_is_tm;
           }
           continue;
