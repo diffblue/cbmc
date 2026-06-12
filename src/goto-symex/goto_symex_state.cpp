@@ -360,6 +360,17 @@ exprt goto_symex_statet::l2_rename_rvalues(exprt lvalue, const namespacet &ns)
     auto &complex_imag_lvalue = to_complex_imag_expr(lvalue);
     complex_imag_lvalue.op() = l2_rename_rvalues(complex_imag_lvalue.op(), ns);
   }
+  else if(
+    lvalue.id() == ID_struct || lvalue.id() == ID_array ||
+    lvalue.id() == ID_union)
+  {
+    // An aggregate used as an lvalue is a compound of sub-lvalues (e.g. the
+    // empty `struct{}` produced when copying a stateless/empty class held via
+    // the empty-base optimization).  Each operand is itself an lvalue; an
+    // empty aggregate has none, making this a no-op.
+    for(auto &op : lvalue.operands())
+      op = l2_rename_rvalues(op, ns);
+  }
   else
   {
     throw unsupported_operation_exceptiont(
