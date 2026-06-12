@@ -1534,6 +1534,21 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
         // it's a data member
         already_typechecked_exprt::make_already_typechecked(symbol_expr);
 
+        // A member initializer of the form `m{}` (an empty
+        // brace-or-equal-initializer) value-initializes the member
+        // ([dcl.init]/[class.base.init]).  It arrives here as a single
+        // empty initializer_list operand; treating it as "no operands"
+        // routes it through the value-initialization path below (default
+        // constructor for a class type, zero-initialization for a POD),
+        // instead of assigning an uninitialized temporary.
+        if(
+          code.operands().size() == 1 &&
+          code.op0().id() == ID_initializer_list &&
+          code.op0().operands().empty())
+        {
+          code.operands().clear();
+        }
+
         // For default-initialization of a class-type member (no explicit
         // initializer), the selected default constructor must be
         // accessible in this constructor's context ([class.base.init]/12,
