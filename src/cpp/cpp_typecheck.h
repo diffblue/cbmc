@@ -460,6 +460,14 @@ protected:
   unsigned compound_body_depth = 0;
   bool suppress_elaborate = false;
 
+  /// When true, typecheck_template_args does NOT expand pack-expansion
+  /// template arguments ([temp.variadic]).  Set while matching a partial
+  /// class-template specialization against actual arguments
+  /// (disambiguate_template_classes), where the specialization's own
+  /// parameter packs must be matched/deduced rather than substituted with an
+  /// (unrelated) enclosing instantiation's pack.
+  bool disable_template_arg_pack_expansion = false;
+
   /// When true, suppress_elaborate is ignored. Used during constexpr
   /// member evaluation to ensure referenced templates can be
   /// instantiated even when nested typecheck_compound_body calls
