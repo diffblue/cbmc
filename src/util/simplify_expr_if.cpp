@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "simplify_expr_class.h"
 
 #include "arith_tools.h"
+#include "expr_util.h"
 #include "range.h"
 #include "std_expr.h"
 
@@ -275,40 +276,34 @@ simplify_exprt::simplify_if_preorder(const if_exprt &expr)
     // individually false in the false branch.
     replace_mapt map_before(local_replace_map);
 
-    // True branch: condition (or its conjuncts) known to be true.
-    if(r_cond.expr.id() == ID_and)
+    // Express the true/false duality once: in the true branch the condition is
+    // known true, in the false branch known false; an AND/OR condition is
+    // split into its operands, and a `not` operand flips the polarity.
+    const auto populate = [this](const exprt &cond_expr, bool branch_value)
     {
-      for(const auto &op : r_cond.expr.operands())
+      const bool split = (branch_value && cond_expr.id() == ID_and) ||
+                         (!branch_value && cond_expr.id() == ID_or);
+      if(!split)
+      {
+        local_replace_map.insert({cond_expr, make_boolean_expr(branch_value)});
+        return;
+      }
+      for(const auto &op : cond_expr.operands())
       {
         if(op.id() == ID_not)
           local_replace_map.insert(
-            std::make_pair(to_not_expr(op).op(), false_exprt()));
+            {to_not_expr(op).op(), make_boolean_expr(!branch_value)});
         else
-          local_replace_map.insert(std::make_pair(op, true_exprt()));
+          local_replace_map.insert({op, make_boolean_expr(branch_value)});
       }
-    }
-    else
-      local_replace_map.insert(std::make_pair(r_cond.expr, true_exprt()));
+    };
 
+    populate(r_cond.expr, true);
     auto r_truevalue = simplify_rec(swap_branches ? falsevalue : truevalue);
 
     local_replace_map = map_before;
 
-    // False branch: condition (or its disjuncts) known to be false.
-    if(r_cond.expr.id() == ID_or)
-    {
-      for(const auto &op : r_cond.expr.operands())
-      {
-        if(op.id() == ID_not)
-          local_replace_map.insert(
-            std::make_pair(to_not_expr(op).op(), true_exprt()));
-        else
-          local_replace_map.insert(std::make_pair(op, false_exprt()));
-      }
-    }
-    else
-      local_replace_map.insert(std::make_pair(r_cond.expr, false_exprt()));
-
+    populate(r_cond.expr, false);
     auto r_falsevalue = simplify_rec(swap_branches ? truevalue : falsevalue);
 
     local_replace_map.swap(map_before);
