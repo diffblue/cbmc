@@ -1,0 +1,11 @@
+CORE
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+A defaulted default constructor value-initializes a class-typed member with an
+empty brace default member initializer (m{}), including in a partial
+specialization (the libstdc++ _Hashtable_ebo_helper shape).
