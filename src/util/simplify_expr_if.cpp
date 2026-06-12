@@ -264,7 +264,6 @@ simplify_exprt::simplify_if_preorder(const if_exprt &expr)
       swap_branches = true;
     }
 
-#ifdef USE_LOCAL_REPLACE_MAP
     // Populate local_replace_map so that sub-expressions matching the
     // condition are replaced by true/false during recursive simplification
     // of the respective branch. The map is consulted via O(1) exact-match
@@ -315,21 +314,6 @@ simplify_exprt::simplify_if_preorder(const if_exprt &expr)
       r_falsevalue.expr_changed = resultt<>::CHANGED;
     }
     return build_if_expr(expr, r_cond, r_truevalue, r_falsevalue);
-#else
-    if(!swap_branches)
-    {
-      return build_if_expr(
-        expr, r_cond, simplify_rec(truevalue), simplify_rec(falsevalue));
-    }
-    else
-    {
-      return build_if_expr(
-        expr,
-        r_cond,
-        changed(simplify_rec(falsevalue)),
-        changed(simplify_rec(truevalue)));
-    }
-#endif
   }
   else
   {

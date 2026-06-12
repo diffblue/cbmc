@@ -3343,7 +3343,6 @@ simplify_exprt::resultt<> simplify_exprt::simplify_rec(const exprt &expr)
       simplify_node_preorder_result.expr_changed;
   }
 
-#ifdef USE_LOCAL_REPLACE_MAP
   // The local_replace_map is populated by simplify_if_preorder: when
   // simplifying if(cond, T, F), the condition (or its conjuncts/disjuncts)
   // is mapped to true/false in the respective branch. Here we apply that
@@ -3359,7 +3358,6 @@ simplify_exprt::resultt<> simplify_exprt::simplify_rec(const exprt &expr)
     if(it != local_replace_map.end())
       simplify_node_result = changed(it->second);
   }
-#endif
 
   if(!simplify_node_result.has_changed())
   {
