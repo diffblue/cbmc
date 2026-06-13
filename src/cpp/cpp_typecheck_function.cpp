@@ -24,7 +24,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_type2name.h"
 #include "cpp_typecheck.h"
 
+#include <functional>
 #include <optional>
+#include <set>
 
 void cpp_typecheckt::convert_parameter(
   const irep_idt &current_mode,
@@ -524,12 +526,18 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     const code_typet &ft = to_code_type(symbol.type);
     const irep_idt class_id = symbol.type.get(ID_C_member_name);
     // implicit this + exactly one reference parameter whose referent is the
-    // constructor's own class == the copy/move constructor
+    // constructor's own class == the copy/move constructor.  Both the copy
+    // constructor (lvalue reference, T&) and the move constructor (rvalue
+    // reference, T&&) are handled: for the trivially-copyable members we
+    // restrict to below, a memberwise move is a memberwise copy
+    // ([class.copy.ctor]/15 -- scalar and pointer members are simply copied),
+    // so the same generated body is correct for either.
     if(ft.parameters().size() == 2 && !class_id.empty())
     {
       const typet &pt = ft.parameters()[1].type();
       const bool is_ref_to_self =
-        pt.id() == ID_pointer && pt.get_bool(ID_C_reference) &&
+        pt.id() == ID_pointer &&
+        (pt.get_bool(ID_C_reference) || pt.get_bool(ID_C_rvalue_reference)) &&
         to_pointer_type(pt).base_type().id() == ID_struct_tag &&
         to_struct_tag_type(to_pointer_type(pt).base_type()).get_identifier() ==
           class_id;
@@ -545,48 +553,58 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
         get_virtual_bases(to_struct_type(class_symbol->type), vbases);
         has_virtual_base = !vbases.empty();
       }
-      // Only generate the memberwise copy when every base subobject and
-      // non-static data member is trivially copyable (a scalar, or a POD
-      // class/array of such).  Copying a non-trivial member would require
-      // its own (possibly not-yet-elaborated) copy constructor; CBMC's
-      // model of some standard library class copies (e.g. std::string's
-      // _S_copy_chars / _M_replace) is incomplete, so generating such
-      // copies here would reach unmodelled functions.  Restricting to
-      // trivially-copyable members keeps the generated copy sound while
-      // covering the cases that matter (e.g. std::pair of pointers).
+      // Only generate the memberwise copy/move when every base subobject and
+      // non-static data member is trivially copyable: a scalar, an array of
+      // such, an empty class, or (recursively) a class all of whose own data
+      // members are trivially copyable.  A defaulted copy/move constructor is
+      // well-formed irrespective of the class's *other* user-declared
+      // constructors, so we deliberately do not gate on cpp_is_pod (which
+      // rejects e.g. std::_Rb_tree_iterator merely for having a user-provided
+      // converting constructor); we look only at the data members' types.
+      // For such members a memberwise move coincides with a memberwise copy
+      // ([class.copy.ctor]/15), so default_cpctor's copy initializers are
+      // correct for the move constructor too.  A class with a union member
+      // (e.g. std::basic_string's small-string buffer) is excluded, which
+      // also keeps us away from unmodelled library copies such as
+      // std::string's _S_copy_chars / _M_replace.
       bool all_members_trivial = true;
       if(class_symbol != nullptr && class_symbol->type.id() == ID_struct)
       {
-        const auto is_trivial_copy = [&](const typet &t) -> bool
+        std::set<irep_idt> visiting;
+        std::function<bool(const typet &)> is_trivial_copy =
+          [&](const typet &t) -> bool
         {
-          typet ft = t;
-          while(ft.id() == ID_array)
-            ft = to_array_type(ft).element_type();
+          typet et = t;
+          while(et.id() == ID_array)
+            et = to_array_type(et).element_type();
           if(
-            ft.id() == ID_pointer || ft.id() == ID_signedbv ||
-            ft.id() == ID_unsignedbv || ft.id() == ID_floatbv ||
-            ft.id() == ID_fixedbv || ft.id() == ID_c_bool ||
-            ft.id() == ID_bool || ft.id() == ID_c_enum ||
-            ft.id() == ID_c_enum_tag)
+            et.id() == ID_pointer || et.id() == ID_signedbv ||
+            et.id() == ID_unsignedbv || et.id() == ID_floatbv ||
+            et.id() == ID_fixedbv || et.id() == ID_c_bool ||
+            et.id() == ID_bool || et.id() == ID_c_enum ||
+            et.id() == ID_c_enum_tag)
             return true;
-          if(ft.id() == ID_struct_tag)
+          if(et.id() == ID_struct_tag)
           {
-            const symbolt *s =
-              symbol_table.lookup(to_struct_tag_type(ft).get_identifier());
+            const irep_idt tag = to_struct_tag_type(et).get_identifier();
+            const symbolt *s = symbol_table.lookup(tag);
             if(s == nullptr || s->type.id() != ID_struct)
               return s != nullptr && cpp_is_pod(s->type);
-            // An empty class (no non-static data members) is trivially
-            // copyable regardless of declared/deleted special members
-            // (e.g. std::__pair_base).
-            bool has_data = false;
-            for(const auto &mc : to_struct_type(s->type).components())
-              if(
-                !mc.get_bool(ID_is_static) && !mc.get_bool(ID_is_type) &&
-                mc.type().id() != ID_code && !mc.get_bool(ID_is_vtptr))
-                has_data = true;
-            if(!has_data)
+            // Guard against (pathological) recursive containment.
+            if(!visiting.insert(tag).second)
               return true;
-            return cpp_is_pod(s->type);
+            bool ok = true;
+            for(const auto &mc : to_struct_type(s->type).components())
+            {
+              if(
+                mc.get_bool(ID_is_static) || mc.get_bool(ID_is_type) ||
+                mc.type().id() == ID_code || mc.get_bool(ID_is_vtptr))
+                continue;
+              if(!is_trivial_copy(mc.type()))
+                ok = false;
+            }
+            visiting.erase(tag);
+            return ok;
           }
           return false;
         };
@@ -623,15 +641,20 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
         cpp_declarationt tmp_cpctor;
         default_cpctor(*class_symbol, tmp_cpctor);
         const irept &inits = tmp_cpctor.declarators()[0].member_initializers();
-        // Prepend the generated base/member initializers to the (empty)
-        // defaulted-constructor body, preserving their order.
+        // The defaulted constructor's body, at this point, consists solely of
+        // the member initializers that move_member_initializers inserted from
+        // the (empty) `= default` member-initializer list: for every base and
+        // non-static data member, a *default* initializer.  Replacing them
+        // wholesale with default_cpctor's memberwise *copy* initializers turns
+        // the body into the implicit copy/move constructor
+        // ([class.copy.ctor]/14): a default initializer left in place would
+        // run after the copy and overwrite it (this is why a plain prepend was
+        // not enough for class-typed members, which -- unlike scalars -- do
+        // get a default member initializer).
         auto &ops = symbol.value.operands();
-        std::size_t pos = 0;
+        ops.clear();
         for(const auto &init : inits.get_sub())
-        {
-          ops.insert(ops.begin() + pos, static_cast<const exprt &>(init));
-          ++pos;
-        }
+          ops.push_back(static_cast<const exprt &>(init));
       }
     }
   }

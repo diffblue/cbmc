@@ -5,9 +5,9 @@
 // rightmost) maintenance.  The red-black rebalancing is omitted as it does not
 // affect ordered-container semantics.
 //
-// The iterator overload erase(iterator) is exercised here; erase(key)
-// additionally goes through equal_range, which currently returns a pair by
-// value through a path CBMC does not yet model precisely.
+// Both the iterator overload erase(iterator) and the key overload erase(key)
+// are exercised; erase(key) additionally goes through equal_range, which
+// returns a std::pair<iterator, iterator> by value.
 #include <set>
 
 int main()
@@ -38,9 +38,14 @@ int main()
   __CPROVER_assert(
     *s.begin() == 30 && *s.rbegin() == 70, "min and max correct after erase");
 
-  // Erase a leaf, leaving a single element.
-  s.erase(s.find(30));
-  __CPROVER_assert(s.size() == 1, "size after leaf erase");
+  // Erase by key: goes through equal_range (which returns a pair by value).
+  std::set<int>::size_type n = s.erase(30);
+  __CPROVER_assert(n == 1, "erase(key) reports one element removed");
+  __CPROVER_assert(s.size() == 1, "size after erase(key)");
+  __CPROVER_assert(s.count(30) == 0, "erased key absent");
   __CPROVER_assert(*s.begin() == 70, "remaining element is 70");
+
+  // Erasing an absent key removes nothing.
+  __CPROVER_assert(s.erase(12345) == 0, "erase of absent key removes nothing");
   return 0;
 }
