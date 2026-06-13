@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp11 --unwind 8 --no-unwinding-assertions
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^no body for callee$
+--
+std::set erase uses std::_Rb_tree_rebalance_for_erase (a libstdc++
+compiled-library helper); CBMC models it as the binary-search-tree erase plus
+header maintenance, omitting the red-black rebalancing.  The iterator overload
+is exercised here (erase-by-key additionally relies on equal_range).
