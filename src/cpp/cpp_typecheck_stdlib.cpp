@@ -402,6 +402,98 @@ make_rb_insert_and_rebalance_body(const symbolt &symbol, const namespacet &ns)
   return block;
 }
 
+/// Synthesize a body for std::_Rb_tree_increment: the in-order successor over
+/// the binary-search-tree structure maintained by the insert model above.
+/// Used by std::set / std::map forward iteration.  This direction is
+/// colour-independent (unlike _Rb_tree_decrement, whose header special case
+/// inspects the node colour), so it is sound under the colour-free insert
+/// model.
+static code_blockt make_rb_increment_body(
+  const symbolt &symbol,
+  const namespacet &ns,
+  symbol_table_baset &symbol_table)
+{
+  const code_typet &fn_type = to_code_type(symbol.type);
+  const auto &params = fn_type.parameters();
+  if(params.size() != 1)
+    return code_blockt();
+  const typet ptr_type = params[0].type();
+  if(ptr_type.id() != ID_pointer)
+    return code_blockt();
+  const symbol_exprt x_expr(params[0].get_identifier(), ptr_type);
+  const typet &base_type = to_pointer_type(ptr_type).base_type();
+  const struct_typet &st = (base_type.id() == ID_struct_tag)
+                             ? ns.follow_tag(to_struct_tag_type(base_type))
+                             : to_struct_type(base_type);
+
+  irep_idt parent_name, left_name, right_name;
+  for(const auto &comp : st.components())
+  {
+    const std::string bn = id2string(comp.get_base_name());
+    if(bn == "_M_parent")
+      parent_name = comp.get_name();
+    else if(bn == "_M_left")
+      left_name = comp.get_name();
+    else if(bn == "_M_right")
+      right_name = comp.get_name();
+  }
+  if(parent_name.empty() || left_name.empty() || right_name.empty())
+    return code_blockt();
+
+  // A fresh local for the second cursor.
+  const irep_idt y_id = id2string(symbol.name) + "::__cbmc_y";
+  if(symbol_table.symbols.find(y_id) == symbol_table.symbols.end())
+  {
+    symbolt y_sym;
+    y_sym.name = y_id;
+    y_sym.base_name = "__cbmc_y";
+    y_sym.type = ptr_type;
+    y_sym.mode = symbol.mode;
+    y_sym.is_lvalue = true;
+    y_sym.is_thread_local = true;
+    y_sym.location = symbol.location;
+    symbol_table.insert(std::move(y_sym));
+  }
+  const symbol_exprt y_expr(y_id, ptr_type);
+
+  auto mem = [&](const exprt &obj, const irep_idt &cn)
+  { return member_exprt(obj, cn, ptr_type); };
+  auto deref = [&](const exprt &p) { return dereference_exprt(p); };
+  const auto null_ptr = null_pointer_exprt(to_pointer_type(ptr_type));
+
+  code_blockt block;
+  block.add(code_frontend_declt(y_expr));
+
+  // if (x->_M_right != 0) { x = x->_M_right;
+  //                         while (x->_M_left != 0) x = x->_M_left; }
+  code_blockt then_b;
+  then_b.add(code_frontend_assignt(x_expr, mem(deref(x_expr), right_name)));
+  then_b.add(code_whilet(
+    notequal_exprt(mem(deref(x_expr), left_name), null_ptr),
+    code_frontend_assignt(x_expr, mem(deref(x_expr), left_name))));
+
+  // else { y = x->_M_parent;
+  //        while (x == y->_M_right) { x = y; y = y->_M_parent; }
+  //        if (x->_M_right != y) x = y; }
+  code_blockt else_b;
+  else_b.add(code_frontend_assignt(y_expr, mem(deref(x_expr), parent_name)));
+  code_blockt loop_b;
+  loop_b.add(code_frontend_assignt(x_expr, y_expr));
+  loop_b.add(code_frontend_assignt(y_expr, mem(deref(y_expr), parent_name)));
+  else_b.add(code_whilet(
+    equal_exprt(x_expr, mem(deref(y_expr), right_name)), std::move(loop_b)));
+  else_b.add(code_ifthenelset(
+    notequal_exprt(mem(deref(x_expr), right_name), y_expr),
+    code_frontend_assignt(x_expr, y_expr)));
+
+  block.add(code_ifthenelset(
+    notequal_exprt(mem(deref(x_expr), right_name), null_ptr),
+    std::move(then_b),
+    std::move(else_b)));
+  block.add(code_frontend_returnt(x_expr));
+  return block;
+}
+
 void cpp_typecheckt::provide_stdlib_bodies()
 {
   namespacet ns(symbol_table);
@@ -754,6 +846,17 @@ void cpp_typecheckt::provide_stdlib_bodies()
     {
       ensure_parameter_symbols(symbol, symbol_table);
       auto body = make_rb_insert_and_rebalance_body(symbol, ns);
+      if(!body.statements().empty())
+      {
+        symbol.value = std::move(body);
+        symbol.value.type() = symbol.type;
+        deferred_typechecking.erase(symbol.name);
+      }
+    }
+    else if(base == "_Rb_tree_increment")
+    {
+      ensure_parameter_symbols(symbol, symbol_table);
+      auto body = make_rb_increment_body(symbol, ns, symbol_table);
       if(!body.statements().empty())
       {
         symbol.value = std::move(body);
