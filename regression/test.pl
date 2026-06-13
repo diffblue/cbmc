@@ -300,6 +300,11 @@ sub test($$$$$$$$$$$$) {
   return ($should_fail != $failed);
 }
 
+# Sharding state (set from --shard <index>/<count> during option parsing
+# below). Declared here, before dirs(), so dirs() can see them under strict.
+our $shard_index = 1;
+our $shard_count = 1;
+
 sub dirs() {
   my @list;
 
@@ -308,6 +313,21 @@ sub dirs() {
   closedir CWD;
 
   @list = sort @list;
+
+  # When sharding is enabled (--shard <index>/<count>), keep only the tests
+  # assigned to this shard. The sorted list is distributed round-robin (by
+  # position modulo <count>), which interleaves alphabetically adjacent --
+  # and hence often similarly sized -- tests across shards for a more even
+  # split than contiguous chunks would give. This lets a single large suite
+  # be registered as several independent ctest entries that run in parallel,
+  # reducing the suite's serial wall-clock contribution.
+  if($shard_count > 1) {
+    my @sharded;
+    for my $k (0 .. $#list) {
+      push @sharded, $list[$k] if($k % $shard_count == $shard_index - 1);
+    }
+    @list = @sharded;
+  }
 
   return @list;
 }
@@ -355,6 +375,9 @@ Usage: test.pl -c CMD [OPTIONS] [DIRECTORIES ...]
   --[no]color enable/disable color output; enabled by default unless
               TESTPL_COLOR_OUTPUT is set to 0, in which case it is
               disabled by default.
+  --shard <i>/<n> run only shard <i> (1-based) of <n>; the sorted test list is
+              partitioned round-robin so a heavy suite can be split across
+              several parallel runs
 
 test.pl expects a test.desc file in each subdirectory. The file test.desc
 follows the format specified below. Any line starting with // will be ignored.
@@ -399,9 +422,21 @@ if (exists $ENV{'TESTPL_COLOR_OUTPUT'}) {
   $color_output_enabled = $ENV{'TESTPL_COLOR_OUTPUT'};
 }
 
-GetOptions("D=s" => \%defines, "X=s" => \@exclude_tags, "I=s" => \@include_tags, 'color!' => \$color_output_enabled);
+GetOptions("D=s" => \%defines, "X=s" => \@exclude_tags, "I=s" => \@include_tags, 'color!' => \$color_output_enabled, "shard=s" => \my $shard);
 getopts('c:efi:j:nphCTFKs:S:t:') or &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
 $opt_c or &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
+
+# --shard <index>/<count>: run only the tests assigned to shard <index> (1-based)
+# out of <count> shards (see dirs() for the round-robin partitioning). Lets a
+# heavy suite be split across several parallel ctest registrations.
+if(defined($shard)) {
+  if($shard =~ m{^([0-9]+)/([0-9]+)$} && $1 >= 1 && $2 >= 1 && $1 <= $2) {
+    $shard_index = $1;
+    $shard_count = $2;
+  } else {
+    die "Invalid --shard '$shard'; expected <index>/<count> with 1 <= index <= count\n";
+  }
+}
 $opt_j = $opt_j || $ENV{'TESTPL_JOBS'} || 0;
 if($opt_j && $opt_j != 1 && !$has_thread_pool) {
   warn "Jobs set but thread pool module not found,\n"
