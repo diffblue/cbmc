@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^PARSING ERROR$
+--
+A functional/explicit type conversion from a reference-typed operand
+(`T(static_cast<A&&>(a))`, the std::forward construction form) must apply the
+usual reference-binding / lvalue-to-rvalue conversion to the operand before
+the cast ([expr.type.conv], [conv.lval]).

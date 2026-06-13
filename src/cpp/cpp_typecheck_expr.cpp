@@ -2060,6 +2060,16 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
       throw 0;
     }
 
+    // An operand of reference type (e.g. the result of
+    // `static_cast<T&&>(x)`, as produced by std::forward in a function
+    // template) denotes the referred object.  The cast helpers below
+    // operate on the (non-reference) referred value -- const_typecast even
+    // has a precondition to that effect -- and [expr.type.conv]/[conv.lval]
+    // require the usual reference-binding/lvalue-to-rvalue handling.  Strip
+    // the reference here so e.g. `T(static_cast<T&&>(x))` type-checks.
+    if(is_reference(op.type()))
+      add_implicit_dereference(op);
+
     exprt new_expr;
 
     if(
