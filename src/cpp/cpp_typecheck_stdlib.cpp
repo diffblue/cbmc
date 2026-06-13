@@ -285,6 +285,123 @@ static code_blockt make_return_first_param_body(const symbolt &symbol)
   return block;
 }
 
+/// Synthesize a body for std::_Rb_tree_insert_and_rebalance.
+///
+/// libstdc++ defines this (and the increment/decrement helpers below) in its
+/// compiled library (src/c++11/tree.cc); the headers only declare them, so
+/// CBMC sees no body.  For functional verification of std::set / std::map
+/// (find / count / size / iteration) only the binary-search-tree structure
+/// and the header bookkeeping (root = _M_parent, leftmost = _M_left,
+/// rightmost = _M_right of the header node) matter.  The red-black colouring
+/// and rotations only rebalance the tree; they do not change the ordered
+/// container semantics that find/count rely on ([associative.reqmts]).  So
+/// model insertion as the plain BST link plus header maintenance that the
+/// real routine performs before it rebalances, and omit the rotations.
+static code_blockt
+make_rb_insert_and_rebalance_body(const symbolt &symbol, const namespacet &ns)
+{
+  const code_typet &fn_type = to_code_type(symbol.type);
+  const auto &params = fn_type.parameters();
+  if(params.size() != 4)
+    return code_blockt();
+
+  const symbol_exprt insert_left(params[0].get_identifier(), params[0].type());
+  const symbol_exprt x_expr(params[1].get_identifier(), params[1].type());
+  const symbol_exprt p_expr(params[2].get_identifier(), params[2].type());
+  const symbol_exprt header_ref(params[3].get_identifier(), params[3].type());
+
+  const typet ptr_type = params[1].type(); // _Rb_tree_node_base*
+  if(ptr_type.id() != ID_pointer)
+    return code_blockt();
+  const typet &base_type = to_pointer_type(ptr_type).base_type();
+  const struct_typet &st = (base_type.id() == ID_struct_tag)
+                             ? ns.follow_tag(to_struct_tag_type(base_type))
+                             : to_struct_type(base_type);
+
+  irep_idt parent_name, left_name, right_name;
+  for(const auto &comp : st.components())
+  {
+    const std::string bn = id2string(comp.get_base_name());
+    if(bn == "_M_parent")
+      parent_name = comp.get_name();
+    else if(bn == "_M_left")
+      left_name = comp.get_name();
+    else if(bn == "_M_right")
+      right_name = comp.get_name();
+  }
+  if(parent_name.empty() || left_name.empty() || right_name.empty())
+    return code_blockt();
+
+  // `&__header`: a reference parameter holds the address of the header node;
+  // its pointer value is exactly that address.
+  const exprt header_ptr =
+    typecast_exprt::conditional_cast(header_ref, ptr_type);
+  const auto null_ptr = null_pointer_exprt(to_pointer_type(ptr_type));
+
+  const auto x_deref = dereference_exprt(x_expr);
+  const auto p_deref = dereference_exprt(p_expr);
+  const auto header_deref = dereference_exprt(header_ptr);
+
+  auto mem = [&](const exprt &obj, const irep_idt &cn)
+  { return member_exprt(obj, cn, ptr_type); };
+
+  code_blockt block;
+  block.add(code_assumet(notequal_exprt(x_expr, null_ptr)));
+  block.add(code_assumet(notequal_exprt(p_expr, null_ptr)));
+
+  // __x->_M_parent = __p;  __x->_M_left = 0;  __x->_M_right = 0;
+  // (The node colour is left as-is: it only affects rebalancing, which we do
+  // not model; find/count/size never inspect a non-header node's colour.)
+  block.add(code_frontend_assignt(mem(x_deref, parent_name), p_expr));
+  block.add(code_frontend_assignt(mem(x_deref, left_name), null_ptr));
+  block.add(code_frontend_assignt(mem(x_deref, right_name), null_ptr));
+
+  // if (__insert_left) {
+  //   __p->_M_left = __x;
+  //   if (__p == &__header) { __header._M_parent = __x; __header._M_right = __x; }
+  //   else if (__p == __header._M_left) __header._M_left = __x;
+  // } else {
+  //   __p->_M_right = __x;
+  //   if (__p == __header._M_right) __header._M_right = __x;
+  // }
+  code_blockt left_branch;
+  left_branch.add(code_frontend_assignt(mem(p_deref, left_name), x_expr));
+  {
+    code_blockt empty_tree;
+    empty_tree.add(
+      code_frontend_assignt(mem(header_deref, parent_name), x_expr));
+    empty_tree.add(
+      code_frontend_assignt(mem(header_deref, right_name), x_expr));
+    code_blockt update_leftmost;
+    update_leftmost.add(
+      code_frontend_assignt(mem(header_deref, left_name), x_expr));
+    left_branch.add(code_ifthenelset(
+      equal_exprt(p_expr, header_ptr),
+      std::move(empty_tree),
+      code_ifthenelset(
+        equal_exprt(p_expr, mem(header_deref, left_name)),
+        std::move(update_leftmost))));
+  }
+
+  code_blockt right_branch;
+  right_branch.add(code_frontend_assignt(mem(p_deref, right_name), x_expr));
+  {
+    code_blockt update_rightmost;
+    update_rightmost.add(
+      code_frontend_assignt(mem(header_deref, right_name), x_expr));
+    right_branch.add(code_ifthenelset(
+      equal_exprt(p_expr, mem(header_deref, right_name)),
+      std::move(update_rightmost)));
+  }
+
+  block.add(code_ifthenelset(
+    typecast_exprt::conditional_cast(insert_left, bool_typet()),
+    std::move(left_branch),
+    std::move(right_branch)));
+
+  return block;
+}
+
 void cpp_typecheckt::provide_stdlib_bodies()
 {
   namespacet ns(symbol_table);
@@ -626,6 +743,17 @@ void cpp_typecheckt::provide_stdlib_bodies()
     {
       ensure_parameter_symbols(symbol, symbol_table);
       auto body = make_list_unhook_body(symbol, ns);
+      if(!body.statements().empty())
+      {
+        symbol.value = std::move(body);
+        symbol.value.type() = symbol.type;
+        deferred_typechecking.erase(symbol.name);
+      }
+    }
+    else if(base == "_Rb_tree_insert_and_rebalance")
+    {
+      ensure_parameter_symbols(symbol, symbol_table);
+      auto body = make_rb_insert_and_rebalance_body(symbol, ns);
       if(!body.statements().empty())
       {
         symbol.value = std::move(body);

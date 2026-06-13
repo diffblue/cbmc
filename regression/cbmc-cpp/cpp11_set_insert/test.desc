@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11 --unwind 5 --no-unwinding-assertions
 ^EXIT=0$
@@ -7,10 +7,9 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-After the cpp11 frontend's std::pair member-function-template fix
-(typecheck_compound_body second pass populates template_map with
-TYPE-parameter placeholders for constructor templates), main now
-exercises std::set::insert, std::set::size, and std::set::count for
-real, and CBMC's libstdc++ red-black-tree implementation cannot be
-verified within the bounded model checker's default limits.
-Reclassified as KNOWNBUG pending dedicated stubs or BMC tuning.
+main exercises std::set::insert, std::set::size and std::set::count.  The
+libstdc++ red-black-tree insertion (std::_Rb_tree_insert_and_rebalance) is
+defined in the compiled library, not the headers, so CBMC provides a model
+for it (cpp_typecheck_stdlib.cpp) that performs the binary-search-tree link
+and header (root/leftmost/rightmost) maintenance -- sufficient for the
+ordered-container find/count/size semantics.
