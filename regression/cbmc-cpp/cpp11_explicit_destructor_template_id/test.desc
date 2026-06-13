@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^PARSING ERROR$
+^no body for callee$
+--
+An explicit/pseudo destructor call written with a template-id
+(`p->~Foo<T>()`) names Foo<T>'s destructor; the template arguments are not a
+template-id to instantiate ([expr.prim.id.dtor], [class.dtor]).  CBMC must
+not try to instantiate `~Foo` as a template.  This is the form used by
+libstdc++'s _Rb_tree::_M_construct_node.

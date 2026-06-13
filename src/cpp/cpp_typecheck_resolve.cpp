@@ -3238,6 +3238,16 @@ exprt cpp_typecheck_resolvet::resolve(
   // this changes the scope
   resolve_scope(cpp_name, base_name, template_args);
 
+  // A pseudo/explicit destructor written with a template-id, e.g.
+  // `p->~Foo<T>()` (as in libstdc++'s `__node->~_Rb_tree_node<_Val>()`),
+  // names the destructor of the class Foo<T>.  The template arguments only
+  // restate the class type; they are not a template-id to be instantiated
+  // ([expr.prim.id.dtor], [class.dtor]).  resolve_scope already reduced the
+  // base name to `~Foo`, so drop the arguments here too, otherwise
+  // resolution would try (and fail) to instantiate `~Foo` as a template.
+  if(!base_name.empty() && id2string(base_name)[0] == '~')
+    template_args.make_nil();
+
 #ifdef DEBUG
   std::cout << "base name: " << base_name << '\n';
   std::cout << "template args: " << template_args.pretty() << '\n';
