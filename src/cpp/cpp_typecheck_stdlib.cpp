@@ -318,11 +318,17 @@ make_rb_insert_and_rebalance_body(const symbolt &symbol, const namespacet &ns)
                              ? ns.follow_tag(to_struct_tag_type(base_type))
                              : to_struct_type(base_type);
 
-  irep_idt parent_name, left_name, right_name;
+  irep_idt color_name, parent_name, left_name, right_name;
+  typet color_type;
   for(const auto &comp : st.components())
   {
     const std::string bn = id2string(comp.get_base_name());
-    if(bn == "_M_parent")
+    if(bn == "_M_color")
+    {
+      color_name = comp.get_name();
+      color_type = comp.type();
+    }
+    else if(bn == "_M_parent")
       parent_name = comp.get_name();
     else if(bn == "_M_left")
       left_name = comp.get_name();
@@ -350,11 +356,29 @@ make_rb_insert_and_rebalance_body(const symbolt &symbol, const namespacet &ns)
   block.add(code_assumet(notequal_exprt(p_expr, null_ptr)));
 
   // __x->_M_parent = __p;  __x->_M_left = 0;  __x->_M_right = 0;
-  // (The node colour is left as-is: it only affects rebalancing, which we do
-  // not model; find/count/size never inspect a non-header node's colour.)
+  // __x->_M_parent = __p;  __x->_M_left = 0;  __x->_M_right = 0;
   block.add(code_frontend_assignt(mem(x_deref, parent_name), p_expr));
   block.add(code_frontend_assignt(mem(x_deref, left_name), null_ptr));
   block.add(code_frontend_assignt(mem(x_deref, right_name), null_ptr));
+  // Colour the node black.  The real routine inserts the node red and then
+  // rebalances; we omit the rebalancing, and the precise colours do not
+  // matter for find/count/size.  But _Rb_tree_decrement's header test relies
+  // on the header being the only red node whose grandparent is itself, so
+  // every ordinary node (in particular the root) must be non-red.  Black is a
+  // valid choice that keeps that test sound.
+  if(!color_name.empty() && color_type.is_not_nil())
+  {
+    typet underlying = color_type;
+    if(color_type.id() == ID_c_enum_tag)
+      underlying = to_c_enum_type(ns.follow_tag(to_c_enum_tag_type(color_type)))
+                     .underlying_type();
+    else if(color_type.id() == ID_c_enum)
+      underlying = to_c_enum_type(color_type).underlying_type();
+    if(underlying.id() == ID_signedbv || underlying.id() == ID_unsignedbv)
+      block.add(code_frontend_assignt(
+        member_exprt(x_deref, color_name, color_type),
+        typecast_exprt(from_integer(1, underlying), color_type))); // _S_black
+  }
 
   // if (__insert_left) {
   //   __p->_M_left = __x;
@@ -490,6 +514,128 @@ static code_blockt make_rb_increment_body(
     notequal_exprt(mem(deref(x_expr), right_name), null_ptr),
     std::move(then_b),
     std::move(else_b)));
+  block.add(code_frontend_returnt(x_expr));
+  return block;
+}
+
+/// Synthesize a body for std::_Rb_tree_decrement: the in-order predecessor
+/// over the BST.  Used by std::set / std::map reverse iteration and `--end()`.
+/// Mirrors _Rb_tree_increment but adds the header special case: decrementing
+/// the past-the-end (header) iterator yields the rightmost element.  libstdc++
+/// detects the header as the node that is red and whose grandparent is itself;
+/// the insert model colours every ordinary node black, leaving the header (red
+/// from _Rb_tree_header construction) as the only such node.
+static code_blockt make_rb_decrement_body(
+  const symbolt &symbol,
+  const namespacet &ns,
+  symbol_table_baset &symbol_table)
+{
+  const code_typet &fn_type = to_code_type(symbol.type);
+  const auto &params = fn_type.parameters();
+  if(params.size() != 1)
+    return code_blockt();
+  const typet ptr_type = params[0].type();
+  if(ptr_type.id() != ID_pointer)
+    return code_blockt();
+  const symbol_exprt x_expr(params[0].get_identifier(), ptr_type);
+  const typet &base_type = to_pointer_type(ptr_type).base_type();
+  const struct_typet &st = (base_type.id() == ID_struct_tag)
+                             ? ns.follow_tag(to_struct_tag_type(base_type))
+                             : to_struct_type(base_type);
+
+  irep_idt color_name, parent_name, left_name, right_name;
+  typet color_type;
+  for(const auto &comp : st.components())
+  {
+    const std::string bn = id2string(comp.get_base_name());
+    if(bn == "_M_color")
+    {
+      color_name = comp.get_name();
+      color_type = comp.type();
+    }
+    else if(bn == "_M_parent")
+      parent_name = comp.get_name();
+    else if(bn == "_M_left")
+      left_name = comp.get_name();
+    else if(bn == "_M_right")
+      right_name = comp.get_name();
+  }
+  if(
+    color_name.empty() || parent_name.empty() || left_name.empty() ||
+    right_name.empty())
+    return code_blockt();
+
+  // _S_red == 0
+  typet underlying = color_type;
+  if(color_type.id() == ID_c_enum_tag)
+    underlying = to_c_enum_type(ns.follow_tag(to_c_enum_tag_type(color_type)))
+                   .underlying_type();
+  else if(color_type.id() == ID_c_enum)
+    underlying = to_c_enum_type(color_type).underlying_type();
+  if(underlying.id() != ID_signedbv && underlying.id() != ID_unsignedbv)
+    return code_blockt();
+  const exprt red_const =
+    typecast_exprt(from_integer(0, underlying), color_type);
+
+  const irep_idt y_id = id2string(symbol.name) + "::__cbmc_y";
+  if(symbol_table.symbols.find(y_id) == symbol_table.symbols.end())
+  {
+    symbolt y_sym;
+    y_sym.name = y_id;
+    y_sym.base_name = "__cbmc_y";
+    y_sym.type = ptr_type;
+    y_sym.mode = symbol.mode;
+    y_sym.is_lvalue = true;
+    y_sym.is_thread_local = true;
+    y_sym.location = symbol.location;
+    symbol_table.insert(std::move(y_sym));
+  }
+  const symbol_exprt y_expr(y_id, ptr_type);
+
+  auto mem = [&](const exprt &obj, const irep_idt &cn)
+  { return member_exprt(obj, cn, ptr_type); };
+  auto deref = [&](const exprt &p) { return dereference_exprt(p); };
+  const auto null_ptr = null_pointer_exprt(to_pointer_type(ptr_type));
+
+  // header: x->_M_color == _S_red && x->_M_parent->_M_parent == x
+  const exprt is_header = and_exprt(
+    equal_exprt(member_exprt(deref(x_expr), color_name, color_type), red_const),
+    equal_exprt(
+      mem(deref(mem(deref(x_expr), parent_name)), parent_name), x_expr));
+
+  // header case: x = x->_M_right;  (rightmost)
+  code_blockt header_b;
+  header_b.add(code_frontend_assignt(x_expr, mem(deref(x_expr), right_name)));
+
+  // else if (x->_M_left != 0) { y = x->_M_left;
+  //   while (y->_M_right != 0) y = y->_M_right; x = y; }
+  code_blockt has_left_b;
+  has_left_b.add(code_frontend_assignt(y_expr, mem(deref(x_expr), left_name)));
+  has_left_b.add(code_whilet(
+    notequal_exprt(mem(deref(y_expr), right_name), null_ptr),
+    code_frontend_assignt(y_expr, mem(deref(y_expr), right_name))));
+  has_left_b.add(code_frontend_assignt(x_expr, y_expr));
+
+  // else { y = x->_M_parent;
+  //   while (x == y->_M_left) { x = y; y = y->_M_parent; } x = y; }
+  code_blockt up_b;
+  up_b.add(code_frontend_assignt(y_expr, mem(deref(x_expr), parent_name)));
+  code_blockt up_loop;
+  up_loop.add(code_frontend_assignt(x_expr, y_expr));
+  up_loop.add(code_frontend_assignt(y_expr, mem(deref(y_expr), parent_name)));
+  up_b.add(code_whilet(
+    equal_exprt(x_expr, mem(deref(y_expr), left_name)), std::move(up_loop)));
+  up_b.add(code_frontend_assignt(x_expr, y_expr));
+
+  code_blockt block;
+  block.add(code_frontend_declt(y_expr));
+  block.add(code_ifthenelset(
+    is_header,
+    std::move(header_b),
+    code_ifthenelset(
+      notequal_exprt(mem(deref(x_expr), left_name), null_ptr),
+      std::move(has_left_b),
+      std::move(up_b))));
   block.add(code_frontend_returnt(x_expr));
   return block;
 }
@@ -857,6 +1003,17 @@ void cpp_typecheckt::provide_stdlib_bodies()
     {
       ensure_parameter_symbols(symbol, symbol_table);
       auto body = make_rb_increment_body(symbol, ns, symbol_table);
+      if(!body.statements().empty())
+      {
+        symbol.value = std::move(body);
+        symbol.value.type() = symbol.type;
+        deferred_typechecking.erase(symbol.name);
+      }
+    }
+    else if(base == "_Rb_tree_decrement")
+    {
+      ensure_parameter_symbols(symbol, symbol_table);
+      auto body = make_rb_decrement_body(symbol, ns, symbol_table);
       if(!body.statements().empty())
       {
         symbol.value = std::move(body);
