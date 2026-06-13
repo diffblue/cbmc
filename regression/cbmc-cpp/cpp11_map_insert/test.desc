@@ -7,10 +7,23 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-After the cpp11 frontend's std::pair member-function-template fix
-(typecheck_compound_body second pass populates template_map with
-TYPE-parameter placeholders for constructor templates), main now
-contains the std::map operator[] call instead of an empty body, and
-the resulting BMC explores enough state in libstdc++ to time out
-(when previously this test was a no-op).  Reclassified as KNOWNBUG
-pending an STL stub or BMC tuning.
+The frontend now produces a real body for `m[1] = 42;`, so BMC explores the
+fully-inlined libstdc++ std::map::operator[] machinery.  Unlike set::insert
+(which takes the key directly and verifies in ~0.04s of symex), operator[]
+builds a std::pair<const Key, T> by piecewise construction (std::tuple /
+forward_as_tuple / piecewise_construct) and performs a lower_bound search plus
+node insertion -- all inline header code.  Unwinding that to the depth needed
+for correctness makes the SAT formula grow super-exponentially in the unwind
+bound: roughly 0.2M vars / 0.2M clauses at --unwind 3, 1.7M / 2.0M at 4, and
+19.8M / 57.2M (with 81k VCCs, ~24s symex + ~25s SSA conversion) at 5, after
+which the solver runs out of resources.  Disabling pointer/bounds checks does
+not help: the equation size comes from the unwound code itself, not the
+checks.
+
+This is a bounded-model-checking scaling limit on the inlined map machinery,
+independent of the std::_Rb_tree_* compiled-library models CBMC now provides
+(those cover the out-of-line functions; operator[]'s heavy machinery is all
+header/inline code).  Addressing it would need a lighter model/stub for the
+tuple/piecewise pair construction rather than solver tuning.  Kept as
+KNOWNBUG; std::set and std::map find/count/insert(node)/iteration/erase verify
+quickly.
