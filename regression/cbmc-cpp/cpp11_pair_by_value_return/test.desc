@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+Returning a class (here std::pair) by value move-constructs the result via the
+defaulted move constructor.  CBMC must generate the memberwise body for the
+defaulted *move* constructor (rvalue-reference parameter), not only the copy
+constructor, and for class-typed members, otherwise the returned object is left
+nondet.
