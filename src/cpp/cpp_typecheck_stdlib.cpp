@@ -640,6 +640,197 @@ static code_blockt make_rb_decrement_body(
   return block;
 }
 
+/// Synthesize a body for std::_Rb_tree_rebalance_for_erase: unlink node __z
+/// from the tree rooted at __header and return the node that should actually
+/// be deallocated.  Used by std::set / std::map erase (the iterator overload;
+/// erase-by-key additionally relies on equal_range, handled elsewhere).
+///
+/// This is the binary-search-tree erase that the real routine performs before
+/// it rebalances: the three structural cases (no left child, no right child,
+/// two children -> splice in the in-order successor) plus the header
+/// bookkeeping (root = _M_parent, leftmost = _M_left, rightmost = _M_right).
+/// The red-black rebalancing (recolouring / rotations) that follows in the
+/// library is omitted: it does not change the ordered-container semantics
+/// that find / count / iteration depend on ([associative.reqmts]).  The
+/// __x_parent tracking the real routine keeps solely for that rebalancing is
+/// likewise omitted.
+static code_blockt make_rb_rebalance_for_erase_body(
+  const symbolt &symbol,
+  const namespacet &ns,
+  symbol_table_baset &symbol_table)
+{
+  const code_typet &fn_type = to_code_type(symbol.type);
+  const auto &params = fn_type.parameters();
+  if(params.size() != 2)
+    return code_blockt();
+
+  const symbol_exprt z_expr(params[0].get_identifier(), params[0].type());
+  const symbol_exprt header_ref(params[1].get_identifier(), params[1].type());
+
+  const typet ptr_type = params[0].type(); // _Rb_tree_node_base*
+  if(ptr_type.id() != ID_pointer)
+    return code_blockt();
+  const typet &base_type = to_pointer_type(ptr_type).base_type();
+  const struct_typet &st = (base_type.id() == ID_struct_tag)
+                             ? ns.follow_tag(to_struct_tag_type(base_type))
+                             : to_struct_type(base_type);
+
+  irep_idt parent_name, left_name, right_name;
+  for(const auto &comp : st.components())
+  {
+    const std::string bn = id2string(comp.get_base_name());
+    if(bn == "_M_parent")
+      parent_name = comp.get_name();
+    else if(bn == "_M_left")
+      left_name = comp.get_name();
+    else if(bn == "_M_right")
+      right_name = comp.get_name();
+  }
+  if(parent_name.empty() || left_name.empty() || right_name.empty())
+    return code_blockt();
+
+  // Fresh locals: the surviving subtree root __x, the spliced node __y, and a
+  // scratch cursor __m for the leftmost/rightmost recomputation.
+  auto make_local = [&](const std::string &suffix) -> symbol_exprt
+  {
+    const irep_idt id = id2string(symbol.name) + "::" + suffix;
+    if(symbol_table.symbols.find(id) == symbol_table.symbols.end())
+    {
+      symbolt s;
+      s.name = id;
+      s.base_name = suffix;
+      s.type = ptr_type;
+      s.mode = symbol.mode;
+      s.is_lvalue = true;
+      s.is_thread_local = true;
+      s.location = symbol.location;
+      symbol_table.insert(std::move(s));
+    }
+    return symbol_exprt(id, ptr_type);
+  };
+  const symbol_exprt x_expr = make_local("__cbmc_x");
+  const symbol_exprt y_expr = make_local("__cbmc_y");
+  const symbol_exprt m_expr = make_local("__cbmc_m");
+
+  auto mem = [&](const exprt &obj, const irep_idt &cn)
+  { return member_exprt(obj, cn, ptr_type); };
+  auto deref = [&](const exprt &p) { return dereference_exprt(p); };
+  const auto null_ptr = null_pointer_exprt(to_pointer_type(ptr_type));
+  // `&__header`: a reference parameter holds the address of the header node.
+  const exprt header_ptr =
+    typecast_exprt::conditional_cast(header_ref, ptr_type);
+  const auto h = [&](const irep_idt &cn) { return mem(deref(header_ptr), cn); };
+
+  code_blockt block;
+  block.add(code_frontend_declt(x_expr));
+  block.add(code_frontend_declt(y_expr));
+  block.add(code_frontend_declt(m_expr));
+
+  // __y = __z;  __x = 0;
+  block.add(code_frontend_assignt(y_expr, z_expr));
+  block.add(code_frontend_assignt(x_expr, null_ptr));
+
+  // if (__z->_M_left == 0) __x = __z->_M_right;
+  // else if (__z->_M_right == 0) __x = __z->_M_left;
+  // else { __y = __z->_M_right; while (__y->_M_left != 0) __y = __y->_M_left;
+  //        __x = __y->_M_right; }
+  code_blockt two_child;
+  two_child.add(code_frontend_assignt(y_expr, mem(deref(z_expr), right_name)));
+  two_child.add(code_whilet(
+    notequal_exprt(mem(deref(y_expr), left_name), null_ptr),
+    code_frontend_assignt(y_expr, mem(deref(y_expr), left_name))));
+  two_child.add(code_frontend_assignt(x_expr, mem(deref(y_expr), right_name)));
+  block.add(code_ifthenelset(
+    equal_exprt(mem(deref(z_expr), left_name), null_ptr),
+    code_frontend_assignt(x_expr, mem(deref(z_expr), right_name)),
+    code_ifthenelset(
+      equal_exprt(mem(deref(z_expr), right_name), null_ptr),
+      code_frontend_assignt(x_expr, mem(deref(z_expr), left_name)),
+      std::move(two_child))));
+
+  // Replace __z's parent's link to __z with `repl` (= __y or __x).
+  auto relink_parent = [&](const exprt &repl) -> code_ifthenelset
+  {
+    return code_ifthenelset(
+      equal_exprt(h(parent_name), z_expr),
+      code_frontend_assignt(h(parent_name), repl),
+      code_ifthenelset(
+        equal_exprt(
+          mem(deref(mem(deref(z_expr), parent_name)), left_name), z_expr),
+        code_frontend_assignt(
+          mem(deref(mem(deref(z_expr), parent_name)), left_name), repl),
+        code_frontend_assignt(
+          mem(deref(mem(deref(z_expr), parent_name)), right_name), repl)));
+  };
+
+  // Two-child case: __y is __z's successor, splice it into __z's place.
+  code_blockt y_ne_z;
+  y_ne_z.add(code_frontend_assignt(
+    mem(deref(mem(deref(z_expr), left_name)), parent_name), y_expr));
+  y_ne_z.add(code_frontend_assignt(
+    mem(deref(y_expr), left_name), mem(deref(z_expr), left_name)));
+  // if (__y != __z->_M_right) { ... reattach __y's old position ... }
+  code_blockt y_ne_zr;
+  y_ne_zr.add(code_ifthenelset(
+    notequal_exprt(x_expr, null_ptr),
+    code_frontend_assignt(
+      mem(deref(x_expr), parent_name), mem(deref(y_expr), parent_name))));
+  y_ne_zr.add(code_frontend_assignt(
+    mem(deref(mem(deref(y_expr), parent_name)), left_name), x_expr));
+  y_ne_zr.add(code_frontend_assignt(
+    mem(deref(y_expr), right_name), mem(deref(z_expr), right_name)));
+  y_ne_zr.add(code_frontend_assignt(
+    mem(deref(mem(deref(z_expr), right_name)), parent_name), y_expr));
+  y_ne_z.add(code_ifthenelset(
+    notequal_exprt(y_expr, mem(deref(z_expr), right_name)),
+    std::move(y_ne_zr)));
+  y_ne_z.add(relink_parent(y_expr));
+  y_ne_z.add(code_frontend_assignt(
+    mem(deref(y_expr), parent_name), mem(deref(z_expr), parent_name)));
+  y_ne_z.add(code_frontend_assignt(y_expr, z_expr));
+
+  // 0/1-child case (__y == __z): __x replaces __z; fix leftmost/rightmost.
+  code_blockt y_eq_z;
+  y_eq_z.add(code_ifthenelset(
+    notequal_exprt(x_expr, null_ptr),
+    code_frontend_assignt(
+      mem(deref(x_expr), parent_name), mem(deref(z_expr), parent_name))));
+  y_eq_z.add(relink_parent(x_expr));
+  // if (leftmost == __z) leftmost = (__z->_M_right == 0) ? __z->_M_parent
+  //                                                      : minimum(__x);
+  code_blockt left_min;
+  left_min.add(code_frontend_assignt(m_expr, x_expr));
+  left_min.add(code_whilet(
+    notequal_exprt(mem(deref(m_expr), left_name), null_ptr),
+    code_frontend_assignt(m_expr, mem(deref(m_expr), left_name))));
+  left_min.add(code_frontend_assignt(h(left_name), m_expr));
+  y_eq_z.add(code_ifthenelset(
+    equal_exprt(h(left_name), z_expr),
+    code_ifthenelset(
+      equal_exprt(mem(deref(z_expr), right_name), null_ptr),
+      code_frontend_assignt(h(left_name), mem(deref(z_expr), parent_name)),
+      std::move(left_min))));
+  // if (rightmost == __z) rightmost = (__z->_M_left == 0) ? __z->_M_parent
+  //                                                       : maximum(__x);
+  code_blockt right_max;
+  right_max.add(code_frontend_assignt(m_expr, x_expr));
+  right_max.add(code_whilet(
+    notequal_exprt(mem(deref(m_expr), right_name), null_ptr),
+    code_frontend_assignt(m_expr, mem(deref(m_expr), right_name))));
+  right_max.add(code_frontend_assignt(h(right_name), m_expr));
+  y_eq_z.add(code_ifthenelset(
+    equal_exprt(h(right_name), z_expr),
+    code_ifthenelset(
+      equal_exprt(mem(deref(z_expr), left_name), null_ptr),
+      code_frontend_assignt(h(right_name), mem(deref(z_expr), parent_name)),
+      std::move(right_max))));
+
+  block.add(code_ifthenelset(
+    notequal_exprt(y_expr, z_expr), std::move(y_ne_z), std::move(y_eq_z)));
+  block.add(code_frontend_returnt(y_expr));
+  return block;
+}
+
 void cpp_typecheckt::provide_stdlib_bodies()
 {
   namespacet ns(symbol_table);
@@ -1014,6 +1205,17 @@ void cpp_typecheckt::provide_stdlib_bodies()
     {
       ensure_parameter_symbols(symbol, symbol_table);
       auto body = make_rb_decrement_body(symbol, ns, symbol_table);
+      if(!body.statements().empty())
+      {
+        symbol.value = std::move(body);
+        symbol.value.type() = symbol.type;
+        deferred_typechecking.erase(symbol.name);
+      }
+    }
+    else if(base == "_Rb_tree_rebalance_for_erase")
+    {
+      ensure_parameter_symbols(symbol, symbol_table);
+      auto body = make_rb_rebalance_for_erase_body(symbol, ns, symbol_table);
       if(!body.statements().empty())
       {
         symbol.value = std::move(body);
