@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\].*value preserved: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [temp.inst]/8 + /11: an unused, non-virtual, ill-formed-when-instantiated
+inline member must not cause an error.  Guards the lazy-instantiation property
+during the Option B (on-odr-use member instantiation) pivot.  See
+doc/architectural/cpp-extern-template-member-instantiation.md.
