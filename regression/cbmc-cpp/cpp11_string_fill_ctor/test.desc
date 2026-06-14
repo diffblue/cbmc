@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11 --unwind 6 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line 23 size\(\) == 3: SUCCESS$
@@ -9,24 +9,15 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-KNOWNBUG: std::string fill-construction std::string(n, c) is a no-op.
+Regression test for std::string fill construction std::string(n, c).
 
-The fill constructor dispatches to basic_string<char>::_M_construct(
-size_type, char), which for the explicitly-instantiated basic_string<char>
-(extern template) is defined OUT OF LINE (in bits/basic_string.tcc) and is
-realised as a declaration with a nil in-class body.
+The fill basic_string<char>::_M_construct(size_type, _CharT) out-of-line
+member used to be attached the wrong overload's body (the input-iterator
+_M_construct, which refers to `__beg`) by a base-name-only match, so its
+conversion failed and the constructor was a no-op.  convert_function now
+repairs the member by adopting the signature-matched out-of-line definition
+and its parameter names ([dcl.fct]/3), so both size() and the characters are
+correct.  Grounded in N5008 [over.match] + [dcl.fct]/3.  See
+doc/architectural/cpp-extern-template-member-instantiation.md.
 
-queue_deferred_methods_of_instance() (which fixed literal/range
-construction -- see cpp11_string_literal_char_access) deliberately handles
-only INLINE members.  Out-of-line member bodies are kept in a primary
-template's template_methods and would have to be fetched and substituted;
-matching them by base name alone is overload-ambiguous and converting them
-eagerly destabilises unrelated standard-library classes (std::unordered_map,
-std::regex), so the fill _M_construct body is not instantiated yet.  Both
-size() and the characters therefore remain wrong.
-
-Fixing this requires signature-aware out-of-line member instantiation; see
-doc/architectural/cpp-extern-template-member-instantiation.md.  When that
-lands, both assertions become SUCCESS and verification succeeds; reclassify
-to CORE.
-
+This test was previously KNOWNBUG; it became CORE once the fix landed.
