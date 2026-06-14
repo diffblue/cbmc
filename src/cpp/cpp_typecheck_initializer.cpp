@@ -194,6 +194,18 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
 
   // we do have an initializer
 
+  // Ensure a class type is fully elaborated before we decide how to
+  // initialize it.  In particular cpp_is_pod (used just below to choose
+  // between aggregate initialization and constructor invocation) inspects
+  // the class's members for user-provided constructors/destructors; a
+  // lazily-instantiated class template specialization (e.g.
+  // std::__allocated_ptr<A> used inside std::list's _M_create_node) may not
+  // yet have those members populated, which would misclassify it as a POD
+  // and wrongly route a braced-init-list to member-wise aggregate
+  // initialization instead of a constructor call ([dcl.init.list]/3).
+  if(symbol.type.id() == ID_struct_tag)
+    elaborate_class_template(symbol.type);
+
   if(is_reference(symbol.type))
   {
     typecheck_expr(symbol.value);
@@ -460,8 +472,23 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
         const auto &params = code_type.parameters();
         if(params.size() <= 1)
           continue;
+        // A copy/move constructor's sole parameter is a reference to the
+        // class's own type ([class.copy.ctor]/1).  Such a constructor does
+        // not, by itself, make the class a non-aggregate for member-wise
+        // initialization.  A two-parameter constructor whose parameter is a
+        // reference to some *other* type (e.g. a converting constructor
+        // `Wrap(int&)`) is a genuine user-provided constructor and must
+        // disable aggregate initialization.
         if(params.size() == 2 && is_reference(params[1].type()))
-          continue;
+        {
+          const typet &referent = to_pointer_type(params[1].type()).base_type();
+          if(
+            referent.id() == ID_struct_tag &&
+            symbol.type.id() == ID_struct_tag &&
+            to_struct_tag_type(referent).get_identifier() ==
+              to_struct_tag_type(symbol.type).get_identifier())
+            continue;
+        }
         has_non_copy_ctor = true;
         // Check first non-this param for initializer_list<T>
         if(il_tag_id.empty())
