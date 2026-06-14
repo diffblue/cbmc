@@ -2035,6 +2035,85 @@ void cpp_typecheckt::elaborate_class_template(
   }
 }
 
+/// Queue the already-bodied (inline) deferred member functions of a realized
+/// class-template instance for type-checking.
+///
+/// During class-body elaboration the inline member functions of a template
+/// instance are parked in `deferred_typechecking` because their parent scope
+/// is a template scope (see `typecheck_compound_declarator`).  Instances
+/// realized through `instantiate_template` drain that queue inline; but an
+/// instance completed through the incomplete-to-complete swap in
+/// `typecheck_compound_type` -- in particular the explicitly/extern-
+/// instantiated `std::__cxx11::basic_string<char>` shipped by libstdc++ --
+/// never reaches that loop, so its member bodies would otherwise be discarded
+/// (made nil) by `clean_up()`, turning the character-copy helpers
+/// `_S_copy_chars`/`_S_copy` into no-ops.
+///
+/// Each matching member that already carries a body is routed through
+/// `add_method_body`, which rebuilds the class template map from the
+/// instance's `ID_C_template` / `ID_C_template_arguments` and queues the body
+/// for `typecheck_method_bodies`.  Members with a nil in-class body
+/// (out-of-line definitions kept in a primary template's `template_methods`)
+/// are deliberately left untouched here: fetching them by base name is
+/// overload-ambiguous and converting them eagerly destabilises unrelated
+/// standard-library classes, so they continue to be handled by the existing
+/// odr-use-driven paths.
+///
+/// Grounded in N5008 [temp.inst]/4 and [temp.inst] Note 4: an inline member
+/// that is the subject of an explicit instantiation declaration is not a
+/// declared specialization and must still be implicitly instantiated when
+/// odr-used.  CBMC links no external library that could supply the
+/// definition, so it must instantiate it here.
+///
+/// The function is idempotent: it erases each handled name from
+/// `deferred_typechecking`, and `add_method_body` guards against double
+/// queuing via `methods_seen`.
+///
+/// \param class_id: symbol-table identifier of the realized class instance
+///   (the tag-prefixed name, e.g. `…::tag-basic_string<char,…>`)
+void cpp_typecheckt::queue_deferred_methods_of_instance(
+  const irep_idt &class_id)
+{
+  std::string class_name = id2string(class_id);
+  // Strip the "tag-" marker that precedes the class name in the symbol-table
+  // id of a class-template instantiation.  The id has the form
+  //   `[ns1::...::nsN::]tag-Name<args>`
+  // where `args` may themselves contain `::` (e.g. a namespaced argument such
+  // as `std::tag-char_traits<char>`).  The `tag-` to strip is therefore the
+  // token immediately after the last `::` that precedes the template-argument
+  // list (the first `<`), not after the last `::` in the whole string.  The
+  // deferred method ids store the class name without that `tag-` token (e.g.
+  // `ns::Name<args>::method(this)`), so we bring class_name into the same
+  // shape for the substring match below.
+  std::size_t lt = class_name.find('<');
+  std::size_t search_end = lt == std::string::npos ? std::string::npos : lt;
+  std::size_t sep = class_name.rfind("::", search_end);
+  std::size_t tag_pos = sep != std::string::npos ? sep + 2 : 0;
+  if(class_name.compare(tag_pos, 4, "tag-") == 0)
+    class_name.erase(tag_pos, 4);
+  class_name += "::";
+
+  std::vector<irep_idt> to_queue;
+  for(const auto &d : deferred_typechecking)
+  {
+    if(id2string(d).find(class_name) != std::string::npos)
+      to_queue.push_back(d);
+  }
+
+  for(const auto &d : to_queue)
+  {
+    auto *sym = symbol_table.get_writeable(d);
+    if(sym == nullptr || sym->type.id() != ID_code)
+      continue;
+    // Inline members only: skip members whose in-class body is nil
+    // (out-of-line, kept in template_methods).  See the doxygen note above.
+    if(sym->value.is_nil())
+      continue;
+    deferred_typechecking.erase(d);
+    add_method_body(sym);
+  }
+}
+
 /// Instantiate a template with the given arguments.
 ///
 /// Implements [temp.inst]: implicit instantiation of class and function

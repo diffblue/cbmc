@@ -247,6 +247,24 @@ void cpp_typecheckt::typecheck_compound_type(struct_union_typet &type)
         if(saved_template_class_instance)
           writeable_symbol.type.set(ID_template_class_instance, true);
         typecheck_compound_body(writeable_symbol);
+
+        // An instance completed here (through the incomplete-to-complete
+        // swap) rather than through instantiate_template -- e.g. the
+        // explicitly/extern-instantiated std::__cxx11::basic_string<char> --
+        // never has its deferred inline member bodies drained by
+        // instantiate_template, so clean_up() would discard them and members
+        // such as _S_copy_chars become no-ops.  Queue them here.  Per N5008
+        // [temp.inst]/4 + Note 4 an odr-used (inline) member must be
+        // implicitly instantiated, and CBMC links no library that could
+        // supply the definition.  Restricted to template instances; only
+        // inline (already-bodied) members are queued; idempotent.
+        if(
+          writeable_symbol.type.get_bool(ID_template_class_instance) &&
+          writeable_symbol.type.find(ID_C_template).is_not_nil() &&
+          writeable_symbol.type.find(ID_C_template_arguments).is_not_nil())
+        {
+          queue_deferred_methods_of_instance(writeable_symbol.name);
+        }
       }
       else if(symbol.type.get_bool(ID_C_is_anonymous))
       {

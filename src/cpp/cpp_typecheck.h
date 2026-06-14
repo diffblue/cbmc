@@ -235,6 +235,16 @@ protected:
     const cpp_template_args_tct &full_template_args,
     const typet &specialization = uninitialized_typet{});
 
+  /// Queue the already-bodied (inline) deferred member functions of a
+  /// realized class-template instance for type-checking.  Used at the
+  /// instance-completion site in `typecheck_compound_type` so that
+  /// explicitly/extern-instantiated class templates (e.g.
+  /// `std::__cxx11::basic_string<char>`), which are completed through the
+  /// incomplete-to-complete swap rather than through `instantiate_template`,
+  /// still have their inline member bodies instantiated per N5008
+  /// [temp.inst]/4 + Note 4 instead of being discarded by `clean_up()`.
+  void queue_deferred_methods_of_instance(const irep_idt &class_id);
+
   void elaborate_class_template(
     const source_locationt &source_location,
     const struct_tag_typet &type);
