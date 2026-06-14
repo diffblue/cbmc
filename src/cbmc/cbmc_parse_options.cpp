@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/unicode.h>
 #include <util/version.h>
 
+#include <goto-programs/if_conversion.h>
 #include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/process_goto_program.h>
@@ -94,6 +95,7 @@ void cbmc_parse_optionst::set_default_options(optionst &options)
   // Default true
   options.set_option("built-in-assertions", true);
   options.set_option("propagation", true);
+  options.set_option("if-conversion", true);
   options.set_option("simple-slice", true);
   options.set_option("simplify", true);
   options.set_option("show-goto-symex-steps", false);
@@ -374,6 +376,11 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   // constant propagation
   if(cmdline.isset("no-propagation"))
     options.set_option("propagation", false);
+
+  // if-conversion of side-effect-free conditional assignments (only used in
+  // --paths mode, to avoid forking the symbolic-execution path tree)
+  if(cmdline.isset("no-if-conversion"))
+    options.set_option("if-conversion", false);
 
   // transform self loops to assumptions
   options.set_option(
@@ -899,6 +906,17 @@ bool cbmc_parse_optionst::process_goto_program(
     link_to_library(
       goto_model, log.get_message_handler(), cprover_c_library_factory);
   }
+
+  // In --paths mode every GOTO branch forks the path tree. Replace simple
+  // conditional assignments (in the user program and the just-linked CPROVER
+  // library alike) with branch-free guarded assignments first. This must
+  // happen before goto_check (run by ::process_goto_program below) so that the
+  // safety checks of the generated conditional expressions stay guarded by the
+  // branch condition.
+  if(
+    options.get_bool_option("paths") &&
+    options.get_bool_option("if-conversion"))
+    if_conversion(goto_model, log.get_message_handler());
 
   // Common removal of types and complex constructs
   if(::process_goto_program(goto_model, options, log))

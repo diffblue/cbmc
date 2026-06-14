@@ -1,0 +1,13 @@
+CORE
+main.c
+--paths lifo
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Side-effect-free conditional assignments are linearised by if-conversion so
+that --paths mode does not fork at them. Without the pass the 16 independent
+branches here fork into 2^16 paths and the test times out; with it a single
+path remains. This pins the optimisation against accidental removal.
