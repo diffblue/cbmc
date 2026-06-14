@@ -690,6 +690,62 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     // count; the user-code rethrow keeps going to the caller.
     if(is_system_header_body)
     {
+      // Before giving up: a class-template instance member can be left with
+      // the WRONG overload's out-of-line body (attached by an earlier
+      // base-name-only match), e.g. the input-iterator basic_string::
+      // _M_construct body (which references `__beg`) ending up on the fill
+      // _M_construct(size_type, _CharT) member, so its conversion fails with
+      // "symbol '__beg' is unknown" and the member silently becomes a no-op.
+      // If a *unique* out-of-line definition whose signature (parameter
+      // arity) matches this member exists, and it is a different definition
+      // from the one currently attached (different source location), adopt
+      // that signature-matched body and the definition's parameter names and
+      // re-type-check.  Doing this only on failure leaves correctly-converting
+      // members untouched.  Per N5008 [over.match] the definition belonging to
+      // a member is the one whose signature matches it; per [dcl.fct]/3
+      // parameter names are not part of the type, so the body must use the
+      // definition's names.
+      if(!symbol.type.get(ID_C_member_name).empty())
+      {
+        std::vector<irep_idt> def_param_names;
+        const std::optional<exprt> matched =
+          instantiate_matching_member_body(symbol, def_param_names);
+        if(
+          matched.has_value() &&
+          !matched->source_location().get_line().empty() &&
+          matched->source_location().get_line() !=
+            symbol.value.source_location().get_line())
+        {
+          symbol.value = *matched;
+          code_typet::parameterst &params = function_type.parameters();
+          const std::size_t off =
+            (!params.empty() && params.front().get_this()) ? 1 : 0;
+          for(std::size_t i = 0;
+              i < def_param_names.size() && off + i < params.size();
+              ++i)
+          {
+            if(!def_param_names[i].empty())
+              params[off + i].set_base_name(def_param_names[i]);
+          }
+          // Re-type-check with the corrected body in a fresh scope.  The
+          // source-location guard above prevents this from looping: after the
+          // adoption the attached body's location equals the match's.  If the
+          // corrected body still cannot be converted (e.g. it transitively
+          // instantiates something CBMC cannot model), fall back to the
+          // no-body state exactly as if no repair had been attempted, so the
+          // repair can never make a system-header member worse.
+          functions_being_typechecked.erase(symbol.name);
+          try
+          {
+            convert_function(symbol);
+            return;
+          }
+          catch(...)
+          {
+            // fall through to the no-body state below
+          }
+        }
+      }
       symbol.value.make_nil();
       functions_being_typechecked.erase(symbol.name);
       return;
