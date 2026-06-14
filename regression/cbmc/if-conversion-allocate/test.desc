@@ -1,0 +1,11 @@
+CORE
+main.c
+--paths lifo --pointer-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+A conditional allocation must not be made unconditional by if-conversion (and
+symex does not support __CPROVER_allocate nested within an if-expression).

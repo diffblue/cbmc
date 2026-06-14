@@ -1,4 +1,4 @@
-CORE
+CORE paths-lifo-expected-failure
 test.c
 --reachability-slice --show-goto-functions --cover location
 ^EXIT=0$
@@ -10,3 +10,7 @@ test.c
 --
 --
 We do not include 1005 since it might or might not be present based on where the assertion is in the block.
+
+Tagged paths-lifo-expected-failure: under --paths the if-conversion pass
+removes branches, which changes the --cover location output; the slicing
+behaviour under test is unaffected.

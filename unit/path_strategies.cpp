@@ -387,6 +387,10 @@ void _check_with_strategy(
 
   optionst options;
   cbmc_parse_optionst::set_default_options(options);
+  // These tests exercise path-exploration strategies, which requires the
+  // conditional branches in the test programs to be preserved; disable the
+  // if-conversion pass that would otherwise linearise them away.
+  options.set_option("if-conversion", false);
   options.set_option("assertions", true);
   options.set_option("assumptions", true);
   options.set_option("paths", true);
