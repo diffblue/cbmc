@@ -5,7 +5,9 @@ Detailed plan: member instantiation for explicitly/extern-instantiated class tem
 # Detailed plan: member instantiation for explicitly-instantiated class templates (`extern template`)
 
 **Owner:** — (to be assigned)
-**Status:** Partially implemented (inline members done; out-of-line members pending)
+**Status:** Inline-member fix shipped (§9). Architecture pivoting to Option B
+(lazy on-odr-use) — see §10 (standard verdict) and §11 (scope). Sections 4–5
+(Option A) are retained for history but **superseded by §10–§11**.
 **Parent documents:**
 `doc/architectural/cpp-frontend-plan-lazy-elaboration.md` (lazy member realization),
 `doc/architectural/cpp-frontend-review.md` (frontend gaps).
@@ -244,6 +246,13 @@ independent of the main change:
 
 ## 5. Implementation steps (Option A)
 
+> **Superseded by §10–§11.** Option A (eager conversion at the
+> completion/instantiation site) was partially shipped for inline members
+> (§9), but [temp.inst]/11 establishes that eager instantiation of unused
+> non-virtual members is non-conforming, and experiments confirmed it
+> destabilises the standard library. The plan of record is now Option B
+> (§11). This section is kept for historical context.
+
 1. **Pin the metadata gap.** Add temporary instrumentation to confirm
    whether `basic_string<char>` reaches
    `typecheck_compound_type`'s incomplete→complete swap (~208) with
@@ -434,3 +443,156 @@ A first increment is implemented. Findings refined the design:
    showed the same destabilisation; both are deferred until the lazy /
    signature-aware paths above make them safe.
   follow-on tasks; they are independent of the instantiation mechanism.
+
+---
+
+## 10. Standard verdict: lazy on-odr-use instantiation is mandatory
+
+Re-reading N5008 settles the architecture: lazy, on-odr-use instantiation of
+member function *definitions* is not merely preferable, it is what the
+standard prescribes.
+
+- **[temp.inst]/3.1** — implicit instantiation of a class specialization
+  instantiates the *declarations*, **not the definitions**, of its member
+  functions.
+- **[temp.inst]/3.2** — the only member *definitions* instantiated together
+  with the class are deleted member functions, unscoped member enumerations,
+  and member anonymous unions.
+- **[temp.inst]/4, /5** — a member or function definition is implicitly
+  instantiated **when odr-used** (referenced in a context requiring the
+  definition to exist).
+- **[temp.inst]/8 (example)** — `Z<int>::g()` and `Z<char>::f()` are
+  explicitly **not** instantiated merely because `Z<int>`/`Z<char>` are.
+- **[temp.inst]/11** — the decisive normative rule:
+
+  > "An implementation **shall not** implicitly instantiate a function
+  > template, a variable template, a member template, a **non-virtual member
+  > function**, a member class or static data member of a templated class …
+  > **unless such instantiation is required.**"
+  >
+  > "It is **unspecified** whether or not an implementation implicitly
+  > instantiates a **virtual** member function of a class template if [it]
+  > would not otherwise be instantiated."
+
+So eager instantiation of unused **non-virtual** members is *non-conforming*;
+**virtual** members are the sole permitted-eager exception (an implementation
+may instantiate them, as is natural for the vtable / reachable dispatch).
+
+**Why this matters for CBMC (not pedantry).** A class-template member can be
+ill-formed when instantiated for a particular specialization yet the program
+is valid as long as the member is not used. Eagerly instantiating it forces
+type-checking of a body the program never needs — which is exactly what
+produced the earlier regressions (`unordered_map`'s ambiguous
+`_Hashtable_ebo_helper` CONVERSION ERROR; the `regex` crash). Those were not
+incidental: they are the predictable consequence of doing what [temp.inst]/11
+forbids. For a verifier, instantiating exactly the odr-used members is both
+standard-aligned and sufficient for soundness, and it removes a whole class of
+spurious errors.
+
+**Current state vs. the standard.** CBMC today over-instantiates:
+`instantiate_template`'s deferred-method loop converts *all* of an instance's
+deferred member bodies, and the shipped completion-site hook (§9) converts an
+instance's inline member bodies — both regardless of odr-use. The regression
+`cpp17_lazy_inst_unused_not_emitted` demonstrates this directly (an unused
+member's assertion enters the goto program). It is tolerated today only
+because the conversion error of an ill-formed unused member is usually
+*swallowed* (`typecheck_method_bodies` wraps `convert_function` in
+`try/catch`) — but swallowing fails for hard errors and cannot catch crashes.
+
+**Conclusion.** Option B (lazy on-odr-use, with eager virtuals) is the correct
+target. The completion-site inline-only hook and the eager deferred loop are
+stepping stones to be *retired into* Option B, not kept beside it.
+
+---
+
+## 11. Option B: scope and incremental plan
+
+### 11.1 Target behaviour
+
+- A member function definition is instantiated **the first time it is
+  odr-used**: a (non-dependent) call, taking its address, an explicit
+  instantiation definition, or being a defaulted/needed special member.
+- **Virtual** members of an instantiated class are instantiated when the class
+  is instantiated (reachable via dispatch; permitted by [temp.inst]/11).
+- Members never odr-used are **never** instantiated (no body, no error).
+- The instantiation reuses the existing machinery: build the class template
+  map from the instance's `ID_C_template` / `ID_C_template_arguments` (as
+  `add_method_body` already does), fetch the definition (in-class body, or
+  out-of-line from `template_methods` matched **by signature**), substitute,
+  and convert.
+
+### 11.2 Reusable core (the signature-aware helper)
+
+A standalone, trigger-agnostic routine:
+
+```
+maybe_instantiate_member_definition(symbolt &member, const symbolt &instance)
+```
+
+that, given a member with a nil/uninstantiated body belonging to a realized
+instance, (a) finds the unique signature-matching definition — in-class or
+out-of-line in a primary template's `template_methods`, matched by parameter
+signature after instance-map substitution, **not** by base name — (b)
+substitutes with the instance map (reusing the existing pack-expansion logic),
+and (c) attaches/queues the body. This is the piece that is identical whether
+driven eagerly or lazily; build it first.
+
+### 11.3 odr-use trigger sites
+
+- Direct calls: `typecheck_function_call_arguments` /
+  `typecheck_method_application` / `typecheck_expr_function_identifier`
+  (`cpp_typecheck_expr.cpp`). The existing deferred-typechecking hook at
+  `typecheck_expr_function_identifier` (which only fires for non-nil-value
+  members) is the natural extension point; it currently does **not** fire for
+  some member/static-member call shapes — closing that gap is the crux.
+- Address-of a member function.
+- Implicitly-called special members (constructors, destructors, assignment).
+- Virtual members: instantiate at class instantiation (separate from odr-use).
+
+### 11.4 Incremental steps (each gated by the §11.6 safety net)
+
+1. **Land the safety net** (done): the `cpp17_lazy_inst_*` tests plus the
+   existing string tests.
+2. **Build the signature-aware helper** (§11.2), unit-exercised against the
+   `std::string(n,c)` fill `_M_construct` overload set.
+3. **Add the lazy trigger additively**: instantiate on odr-use *in addition to*
+   the current eager paths. Nothing should regress; `cpp11_string_fill_ctor`
+   should begin to verify (flip to CORE).
+4. **Disable eager instantiation** of non-virtual members (the
+   `instantiate_template` deferred loop and the §9 completion hook), relying on
+   the lazy trigger. **This is the high-risk step**: tests that passed
+   spuriously (because an unused, would-fail member was being instantiated, or
+   because an assertion inside an unused body was vacuously satisfied) may flip.
+   `cpp17_lazy_inst_unused_not_emitted` should flip to passing here. Triage the
+   full suite; expect and investigate movement.
+5. **Eager virtuals**: ensure reachable virtual members are still instantiated
+   at class instantiation (`cpp17_lazy_inst_virtual` guards this).
+6. **Retire the completion-site hook** (§9) once the lazy path subsumes it;
+   re-confirm `cpp11_string_literal_char_access` via the lazy path.
+
+### 11.5 Risks
+
+- **Reachability gaps**: missing an odr-use site leaves a needed member
+  un-instantiated (no body → unsound). Mitigate by enumerating odr-use sites
+  (§11.3) and by a *fallback* late pass that instantiates any member still
+  referenced by an emitted call. Bias toward instantiating-when-in-doubt for
+  *referenced* members (never for unreferenced ones).
+- **Re-entrancy**: lazy instantiation mid-`convert_function` (a call inside a
+  body triggers another instantiation) must be safe; the existing
+  `method_bodies` worklist already supports this.
+- **Spurious-pass churn (step 4)**: the safety net is designed to localise it;
+  expect some existing tests to need reclassification (either they reveal a
+  real latent bug now correctly surfaced, or they were KNOWNBUG-worthy).
+
+### 11.6 Regression safety net (STL-independent, added with this write-up)
+
+| test | level | property |
+|---|---|---|
+| `cpp17_lazy_inst_unused_inline` | CORE | unused ill-formed inline member must not error ([temp.inst]/11) |
+| `cpp17_lazy_inst_unused_outofline` | CORE | same, out-of-line definition |
+| `cpp17_lazy_inst_extern_unused` | CORE | same, under `extern template` (explicit-instantiation path) |
+| `cpp17_lazy_inst_virtual` | CORE | virtual member instantiated + dispatched (permitted-eager carve-out) |
+| `cpp17_lazy_inst_unused_not_emitted` | KNOWNBUG → CORE | unused member body must not enter the goto program (precise lazy discriminator) |
+
+Plus the existing `cpp11_string_literal_char_access` (CORE) and
+`cpp11_string_fill_ctor` (KNOWNBUG → CORE at step 3).
