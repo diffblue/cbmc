@@ -95,11 +95,9 @@ inline void __delete(void *ptr)
   {
     __CPROVER_deallocate(ptr);
 
-    // detect memory leaks. Use a conditional expression rather than an
-    // `if` to avoid emitting a GOTO branch, which would fork the symex
-    // path tree in --paths mode.
-    __CPROVER_memory_leak =
-      (__CPROVER_memory_leak == ptr) ? 0 : __CPROVER_memory_leak;
+    // detect memory leaks
+    if(__CPROVER_memory_leak==ptr)
+      __CPROVER_memory_leak=0;
   }
 }
 
@@ -137,10 +135,7 @@ inline void __delete_array(void *ptr)
   {
     __CPROVER_deallocate(ptr);
 
-    // detect memory leaks. Use a conditional expression rather than an
-    // `if` to avoid emitting a GOTO branch, which would fork the symex
-    // path tree in --paths mode.
-    __CPROVER_memory_leak =
-      (__CPROVER_memory_leak == ptr) ? 0 : __CPROVER_memory_leak;
+    // detect memory leaks
+    if(__CPROVER_memory_leak==ptr) __CPROVER_memory_leak=0;
   }
 }
