@@ -572,10 +572,20 @@ driven eagerly or lazily; build it first.
    because an assertion inside an unused body was vacuously satisfied) may flip.
    `cpp17_lazy_inst_unused_not_emitted` should flip to passing here. Triage the
    full suite; expect and investigate movement.
+   **Done** — see §13.  The actual mechanism turned out to be simpler and more
+   localised than anticipated (a single force-drain in
+   `typecheck_method_bodies`, not the `instantiate_template` loop); the
+   reachability fallback (§11.5) is what makes it safe.
 5. **Eager virtuals**: ensure reachable virtual members are still instantiated
-   at class instantiation (`cpp17_lazy_inst_virtual` guards this).
+   at class instantiation (`cpp17_lazy_inst_virtual` guards this).  **Done** —
+   constructors, destructors, virtual members and operators are never deferred
+   by `add_method_body`, so they remain eager; `cpp17_lazy_inst_virtual` stays
+   CORE.
 6. **Retire the completion-site hook** (§9) once the lazy path subsumes it;
-   re-confirm `cpp11_string_literal_char_access` via the lazy path.
+   re-confirm `cpp11_string_literal_char_access` via the lazy path.  *Not yet
+   done* — the §9 inline-only completion hook still runs; the lazy change is
+   additive and the string accessors remain CORE.  Retiring it is follow-on
+   work (§13).
 
 ### 11.5 Risks
 
@@ -653,3 +663,91 @@ suite during development):
 `instantiate_matching_member_body()` is the reusable, signature-aware core
 that the lazy (Option B) work will also drive, but the repair itself is a
 contained downstream-conversion fix, not part of the Option B pivot.
+
+
+---
+
+## 13. Option B implementation outcome (2026-06)
+
+Lazy on-odr-use member instantiation ([temp.inst]/11) is implemented and
+validated. The change was smaller and more localised than §11.4 anticipated.
+
+### Where the eager instantiation actually was
+
+`add_method_body()` *already* implements the right policy at queue time: for a
+template-instance member that is **not** a constructor, destructor, virtual
+member or operator, it parks the body in `deferred_method_bodies` instead of
+the immediate `method_bodies` worklist. Constructors, destructors, virtual
+members and operators are queued eagerly — virtual is the [temp.inst]/11
+permitted-eager carve-out, and the others are pragmatic always-needed cases.
+
+The eager instantiation that violated the standard was a single site at the
+end of `typecheck_method_bodies()`: after the on-demand worklist drained, an
+**unconditional** loop force-moved *every* remaining `deferred_method_bodies`
+entry into `method_bodies` and converted it, justified by a comment that "we
+must still process them all because method body type-checking has side
+effects". That converted members the program never odr-uses, which is exactly
+what [temp.inst]/8 and /11 forbid, and is what admitted an unused member's
+assertion into the goto program (`cpp17_lazy_inst_unused_not_emitted`) and
+surfaced latent modelling gaps in unused library members (the earlier
+`unordered_map` / `regex` breakages).
+
+### The fix (reachability-gated drain)
+
+The unconditional force-drain is replaced by a reachability-gated fixpoint
+(`src/cpp/cpp_typecheck_method_bodies.cpp`):
+
+1. Scan every **converted** function body in the symbol table (skipping
+   bodies still parked in `deferred_method_bodies`, and `cpp_not_typechecked`
+   bodies) and collect the `ID_symbol` identifiers they reference.
+2. Emit (move to `method_bodies`) only those still-deferred members that are
+   referenced, then drain. The existing function-identifier hook
+   (`typecheck_expr_function_identifier`) pulls transitively-referenced
+   deferred members in during that drain.
+3. Re-scan to a fixpoint. Members that no converted body references are left
+   uninstantiated, as the standard requires.
+
+This *is* the §11.5 reachability safety net: a member referenced by emitted
+code is instantiated even if its reference shape did not flow through the
+odr-use hook, so no needed body is dropped; an unused — possibly ill-formed —
+member is never instantiated. Excluding references that originate from
+still-deferred (i.e. not-yet-reachable) bodies keeps the reachability set
+sound: an unused member that references another member does not keep the
+latter alive.
+
+### Why `instantiate_template`'s own loop did not need changing
+
+Members of a class instantiated through `instantiate_template` already reach
+`add_method_body` with the instance's `ID_C_template_arguments` set (by the
+block right after `convert_non_template_declaration`), so they are deferred
+correctly. No change to that loop, nor to the §9 completion hook, was needed;
+the fix is confined to the one force-drain.
+
+### Validation
+
+- `cpp17_lazy_inst_unused_not_emitted` flips KNOWNBUG → CORE: the unused
+  body's "must never appear" assertion no longer enters the goto program
+  (0 occurrences at `--cpp11`/`14`/`17`).
+- The rest of the `cpp17_lazy_inst_*` safety net stays CORE, including
+  `cpp17_lazy_inst_virtual` (virtuals remain eager and dispatch soundly).
+- Full `cbmc-cpp` suite (`-X libcxx`): all pass, no regressions; the string
+  literal/fill accessors, the dog-food STL probe, and the user-level
+  `extern template` cases (`extt{1,2,3}`) all remain SUCCESSFUL.
+- Reachability-scan overhead is negligible (a heavy `unordered_map` test
+  type-checks + verifies in ~1.1 s / ~87 MB).
+
+### Residual / follow-on
+
+- **Constructors, destructors and operators remain eager.** The standard does
+  not carve these out (only virtuals), so eagerly instantiating an *unused*
+  one is still technically non-conforming. In practice they are almost always
+  needed and the safety net does not exercise the unused case for them;
+  tightening this (defer non-virtual special members and operators too) is
+  follow-on work, gated by the same net.
+- **The §9 completion-site inline hook still runs** (step 6); the lazy change
+  is additive. Retiring it once the lazy path demonstrably subsumes it is
+  follow-on.
+- **Pre-existing, unrelated to Option B** (reproduced on the baseline by
+  stashing the single changed file): `std::string s = "ab"` fails C++20/23
+  constructor *resolution* (`char[3]` → `basic_string`), and a C++20/23
+  `std::string` BMC run can core-dump. Both are out of scope here.
