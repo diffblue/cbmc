@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^VERIFICATION SUCCESSFUL$
@@ -8,12 +8,13 @@ main.cpp
 must never appear
 --
 N5008 [temp.inst]/11: an unused non-virtual member function shall not be
-implicitly instantiated.  CBMC currently instantiates unused member bodies
-eagerly (instantiate_template's deferred-method loop), so unused()'s assertion
-"must never appear" enters the goto program (vacuously SUCCESS).  The forbidden
-pattern therefore matches today, so this test passes as KNOWNBUG.
+implicitly instantiated.  Under Option B (on-odr-use instantiation) unused()
+is never instantiated, so its assertion "must never appear" does not enter the
+goto program and the forbidden pattern must be absent.
 
-Under Option B (on-odr-use instantiation) unused() is never instantiated and
-the message disappears; the test then succeeds and should be reclassified to
-CORE.  Precise lazy-vs-eager discriminator.  See
+This is the precise lazy-vs-eager discriminator: unlike the other
+cpp17_lazy_inst_* guards (whose ill-formed bodies merely get their conversion
+error swallowed), here instantiation of the unused body would be observable in
+the output.  It was KNOWNBUG while CBMC instantiated unused member bodies
+eagerly; it became CORE once lazy on-odr-use instantiation landed.  See
 doc/architectural/cpp-extern-template-member-instantiation.md.
