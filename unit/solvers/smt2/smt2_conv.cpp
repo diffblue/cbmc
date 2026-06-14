@@ -227,24 +227,20 @@ TEST_CASE("smt2_convt quantifier definition encoding", "[core][solvers][smt2]")
     const std::string out = convert_handle(quantified, smt2_convt::solvert::Z3);
     INFO("SMT2 output:\n" << out);
 
-    THEN("it is declared and constrained by two implications, in order")
+    THEN("it is declared and constrained by a let-bound equivalence")
     {
       // A single `(assert (= B0 <quantifier>))` would be undone by Z3's
       // solve_eqs preprocessor (Z3Prover/z3#7743), so the equivalence is
-      // emitted as two implications, B0 => <q> followed by <q> => B0.
+      // emitted as two implications. A let-binding shares the quantified
+      // expression so that it is written only once.
       const std::string declare = "(declare-fun B0 () Bool)";
-      const std::string impl1 = "(assert (=> B0 " + quant + "))";
-      const std::string impl2 = "(assert (=> " + quant + " B0))";
+      const std::string assertion =
+        "(assert (let ((?def " + quant + ")) (and (=> B0 ?def) (=> ?def B0))))";
 
-      const auto p_declare = out.find(declare);
-      const auto p_impl1 = out.find(impl1);
-      const auto p_impl2 = out.find(impl2);
-
-      REQUIRE(p_declare != std::string::npos);
-      REQUIRE(p_impl1 != std::string::npos);
-      REQUIRE(p_impl2 != std::string::npos);
-      REQUIRE(p_declare < p_impl1);
-      REQUIRE(p_impl1 < p_impl2);
+      REQUIRE(out.find(declare) != std::string::npos);
+      REQUIRE(out.find(assertion) != std::string::npos);
+      // the quantified expression is emitted exactly once
+      REQUIRE(out.find(quant) == out.rfind(quant));
       // no plain equality definition
       REQUIRE(out.find("(assert (= B0 ") == std::string::npos);
     }

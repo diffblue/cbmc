@@ -990,19 +990,18 @@ literalt smt2_convt::convert(const exprt &expr)
       // preprocessor eliminates B by substituting the quantified <expr>, and
       // then hands the eliminated form back through get-value (see
       // Z3Prover/z3#7743). Asserting the equivalence as two implications
-      // instead prevents this. The underlying issue is fixed in Z3 >= 4.17
-      // (which also exposes (set-option :smt.solve_eqs.non_ground false)), but
-      // neither is widely available yet, so we keep the workaround for Z3.
-      out << "(assert (=> ";
-      convert_literal(l);
-      out << ' ';
+      // instead prevents this; a let-binding shares the (possibly large)
+      // quantified expression so that it is emitted only once. The underlying
+      // issue is fixed in Z3 >= 4.17 (which also exposes
+      // (set-option :smt.solve_eqs.non_ground false)), but neither is widely
+      // available yet, so we keep the workaround for Z3.
+      out << "(assert (let ((?def ";
       convert_expr(prepared_expr);
-      out << "))\n";
-      out << "(assert (=> ";
-      convert_expr(prepared_expr);
-      out << ' ';
+      out << ")) (and (=> ";
       convert_literal(l);
-      out << "))\n";
+      out << " ?def) (=> ?def ";
+      convert_literal(l);
+      out << "))))\n";
     }
     else
     {
