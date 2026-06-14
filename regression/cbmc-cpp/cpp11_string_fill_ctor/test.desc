@@ -1,0 +1,27 @@
+KNOWNBUG
+main.cpp
+--cpp11 --unwind 6 --no-unwinding-assertions
+^\[main\.assertion\.1\] line 23 size\(\) == 3: SUCCESS$
+^\[main\.assertion\.2\] line 24 s\[0\] == 'x': SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+KNOWNBUG: std::string fill-construction std::string(n, c) is a no-op.
+
+The fill constructor dispatches to basic_string<char>::_M_construct(
+size_type, char), which for the explicitly-instantiated basic_string<char>
+(extern template) is realised as a declaration only: its body is never
+instantiated and is discarded by cpp_typecheckt::clean_up().  Both the length
+and the character contents are therefore left wrong (size() == 3 already
+FAILS today, in addition to s[0]).
+
+Same underlying gap as cpp11_string_literal_char_access: the elaborate-only
+realisation path basic_string<char> takes does not convert deferred inline
+member bodies.  Grounded in N5008 [temp.inst]/4 and Note 4.  See
+doc/architectural/cpp-extern-template-member-instantiation.md.
+
+When the extern-template member-instantiation fix lands, both assertions
+become SUCCESS and verification succeeds; reclassify to CORE.
