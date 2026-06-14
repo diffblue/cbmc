@@ -1,30 +1,24 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11 --unwind 6 --no-unwinding-assertions
-^\[main\.assertion\.2\] line 35 s\[0\] == 'a': SUCCESS$
-^\[main\.assertion\.3\] line 36 s\[1\] == 'b': SUCCESS$
+^\[main\.assertion\.2\] line 26 s\[0\] == 'a': SUCCESS$
+^\[main\.assertion\.3\] line 27 s\[1\] == 'b': SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
 --
-KNOWNBUG: std::string character data is not initialised on construction.
+Regression test for character access on a literally-constructed std::string.
 
 libstdc++ provides std::__cxx11::basic_string<char> as an explicit
 instantiation declaration (extern template).  CBMC realises that class via
-the class_template_symbol / elaborate_class_template / parser-completion
-path, which (unlike instantiate_template) never runs the
-deferred-method-conversion loop for the instance's inline members.  The
-character-copy helpers basic_string<char>::_S_copy_chars -> _S_copy keep an
-un-converted body in deferred_typechecking and are then discarded (made nil)
-by cpp_typecheckt::clean_up(), so the copy becomes a no-op: size() is correct
-but the characters stay non-deterministic.
+the incomplete-to-complete swap in typecheck_compound_type rather than via
+instantiate_template, so its inline character-copy helpers
+_S_copy_chars/_S_copy used to keep an un-converted body that clean_up()
+discarded, making the copy a no-op (size() was correct but the characters
+were non-deterministic).
 
-Grounded in N5008 [temp.inst]/4 and [temp.inst] Note 4 (an inline member that
-is the subject of an explicit instantiation declaration must still be
-implicitly instantiated when odr-used).  See
-doc/architectural/cpp-extern-template-member-instantiation.md.
-
-When the extern-template member-instantiation fix lands, the two character
-assertions become SUCCESS and verification succeeds; reclassify to CORE.
+queue_deferred_methods_of_instance() now instantiates those inline member
+bodies at the instance-completion site, per N5008 [temp.inst]/4 and Note 4.
+This test was previously KNOWNBUG; it became CORE once the fix landed.
