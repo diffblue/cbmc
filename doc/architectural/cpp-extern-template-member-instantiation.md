@@ -5,13 +5,13 @@ Detailed plan: member instantiation for explicitly/extern-instantiated class tem
 # Detailed plan: member instantiation for explicitly-instantiated class templates (`extern template`)
 
 **Owner:** — (to be assigned)
-**Status:** Proposed
+**Status:** Partially implemented (inline members done; out-of-line members pending)
 **Parent documents:**
 `doc/architectural/cpp-frontend-plan-lazy-elaboration.md` (lazy member realization),
 `doc/architectural/cpp-frontend-review.md` (frontend gaps).
-**Regression anchors (KNOWNBUG, flip to CORE when fixed):**
-`regression/cbmc-cpp/cpp11_string_literal_char_access`,
-`regression/cbmc-cpp/cpp11_string_fill_ctor`.
+**Regression anchors:**
+`regression/cbmc-cpp/cpp11_string_literal_char_access` (now CORE),
+`regression/cbmc-cpp/cpp11_string_fill_ctor` (still KNOWNBUG — out-of-line).
 
 **Standard anchors (N5008):**
 
@@ -373,4 +373,64 @@ independent of the main change:
   correctness gap).
 - The two downstream member-body defects (anonymous-union lvalue;
   out-of-line member-template parameter name) beyond filing them as
+
+---
+
+## 9. Implementation outcome (2026-06)
+
+A first increment is implemented. Findings refined the design:
+
+- **The metadata is present.** `basic_string<char>` is completed through the
+  incomplete→complete swap in `typecheck_compound_type`, and at that point
+  the symbol *does* carry `ID_C_template` + `ID_C_template_arguments` +
+  `template_class_instance` (an earlier "no metadata" reading was a grep
+  artifact on the multi-line type dump). `add_method_body` already rebuilds
+  the class template map from those, so routing a deferred member through it
+  "just works" for inline members.
+
+- **`elaborate_class_template` is a dead end for this class.** It is called
+  hundreds of times for `basic_string<char>` but always returns early (the
+  class is already complete), so it never reaches its `instantiate_template`
+  call and the deferred-method loop never runs. The fix hooks the
+  **instance-completion site** in `typecheck_compound_type` instead.
+
+- **Eager conversion of *all* deferred members is unsafe.** Correcting the
+  member-matching inside `instantiate_template`'s own deferred loop (so it
+  also matches classes whose template arguments contain `::`, e.g.
+  `std::_Hashtable<…,std::__detail::…>`) regressed `std::unordered_map`
+  (ambiguous `_Hashtable_ebo_helper`, CONVERSION ERROR) and `std::regex`
+  (crash), and a completion-site hook that also fetched **out-of-line**
+  bodies by base name regressed `std::valarray` (`operator[]` returned a bad
+  pointer, from attaching the wrong overload's body). Converting member
+  bodies that are never odr-used surfaces latent frontend bugs.
+
+- **Shipped: the safe inline-only subset.** `instantiate_template` is left
+  unchanged. A new `queue_deferred_methods_of_instance(class_id)` is invoked
+  at the completion site and queues only the instance's **inline**
+  (already-bodied) deferred members via `add_method_body`. The `tag-`
+  stripping is corrected to cut the token before the **first `<`**, so
+  namespaced template arguments no longer fool it. This fixes literal/range
+  construction and every accessor (`[]`, `at`, `front`, `back`, `*begin`,
+  `c_str`, `data`) for `std::string` in C++11/14/17 with **no regressions**
+  across the full `cbmc-cpp` suite. `cpp11_string_literal_char_access` is now
+  CORE.
+
+### Remaining work
+
+1. **Out-of-line members (signature-aware fetch).** `std::string(n, c)`'s
+   `_M_construct(size_type, char)` and other out-of-line members are kept in
+   a primary template's `template_methods`; instantiating them requires
+   matching the correct overload by **signature** (not just base name) and
+   substituting with the instance map. This is the prerequisite to converting
+   nil-body deferred members without the overload-mismatch regressions seen
+   above. Tracked by the KNOWNBUG `cpp11_string_fill_ctor`.
+2. **C++20/23 `std::string s = "ab"`** currently fails earlier, in
+   constructor *resolution* (`CONVERSION ERROR: invalid implicit conversion
+   from 'char [3]' to 'struct basic_string'`). This is a pre-existing,
+   independent defect (confirmed on the baseline) unrelated to member
+   instantiation.
+3. **R1/R2 robustness (§4)** were *not* implemented: R2 in particular (making
+   `clean_up` convert rather than discard) is a form of eager conversion and
+   showed the same destabilisation; both are deferred until the lazy /
+   signature-aware paths above make them safe.
   follow-on tasks; they are independent of the instantiation mechanism.
