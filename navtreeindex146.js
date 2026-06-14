@@ -1,5 +1,6 @@
 var NAVTREEINDEX146 =
 {
+"structtrace__optionst.html#afa722051d21804cae6192a5124408700":[7,0,1303,9],
 "structunion__aggregate__typet.html":[7,0,1336],
 "structunion__aggregate__typet.html#a090fff6dad835408c5cde31d7a407354":[7,0,1336,2],
 "structunion__aggregate__typet.html#ac9e2696222ee952d6d7ba4330e8ed7bb":[7,0,1336,3],
@@ -248,6 +249,5 @@ var NAVTREEINDEX146 =
 "symex__target__equation_8h.html#a43f6f0e262f1a630f2c49d2a82544e43":[8,0,2,17,79,1],
 "symex__target__equation_8h_source.html":[8,0,2,17,79],
 "symex__throw_8cpp.html":[8,0,2,17,80],
-"symex__throw_8cpp_source.html":[8,0,2,17,80],
-"symtab2gb__main_8cpp.html":[8,0,2,29,0]
+"symex__throw_8cpp_source.html":[8,0,2,17,80]
 };

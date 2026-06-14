@@ -4,6 +4,7 @@ var pointer__offset__size_8cpp =
     [ "get_subexpression_at_offset", "pointer__offset__size_8cpp.html#a3eee02c79c70c103b3ab3f3c9034b7f9", null ],
     [ "get_subexpression_at_offset", "pointer__offset__size_8cpp.html#a36a0c243b014c516bc7b9b6919c4a34e", null ],
     [ "is_multiplication_by_constant", "pointer__offset__size_8cpp.html#aa9f7e803ab78a01445b13077e21d2b4f", null ],
+    [ "is_zero_width", "pointer__offset__size_8cpp.html#a7282ccf5ea29c71a118152874a5be786", null ],
     [ "member_offset", "pointer__offset__size_8cpp.html#ad6d5024452d59e310e2147c23fadab56", null ],
     [ "member_offset_bits", "pointer__offset__size_8cpp.html#a54b4e1e986410606a765fa65252f2568", null ],
     [ "member_offset_expr", "pointer__offset__size_8cpp.html#ad8a5367eca6a130461496e8984e8fe5e", null ],
