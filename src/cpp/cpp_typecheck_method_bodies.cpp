@@ -310,68 +310,124 @@ void cpp_typecheckt::typecheck_method_bodies()
     }
   }
 
-  // Process remaining deferred method bodies. Some deferred methods
-  // were triggered on-demand during the loop above; others were never
-  // referenced. We must still process them all because method body
-  // type-checking has side effects: it triggers elaboration of
-  // referenced classes (e.g., std::bad_alloc), creates parameter
-  // symbols, and may add further methods to the queue.
+  // [temp.inst]/11: "an implementation shall not implicitly instantiate ...
+  // a non-virtual member function ... unless such instantiation is required."
+  // Members that are odr-used were already moved out of deferred_method_bodies
+  // into method_bodies by the function-identifier hook as their referencing
+  // bodies were type-checked above (constructors, destructors, virtual members
+  // and operators are never deferred in the first place).  As a reachability
+  // safety net -- covering references that appeared before a member was
+  // deferred, or reference shapes that do not flow through that hook -- emit
+  // any still-deferred member that is referenced by an already-converted body,
+  // draining transitively, and re-scan to a fixpoint.  Members that no
+  // converted body references are left uninstantiated, as the standard
+  // requires; this is exactly what lets an unused, ill-formed member of a
+  // specialization remain harmless ([temp.inst]/8, /11).
+  std::function<void(const irept &, std::set<irep_idt> &)> gather_referenced =
+    [&](const irept &n, std::set<irep_idt> &referenced)
+  {
+    if(n.id() == ID_symbol)
+    {
+      const irep_idt id = n.get(ID_identifier);
+      if(!id.empty())
+        referenced.insert(id);
+    }
+    for(const auto &s : n.get_sub())
+      gather_referenced(s, referenced);
+    for(const auto &ns : n.get_named_sub())
+      gather_referenced(ns.second, referenced);
+  };
+
   while(!deferred_method_bodies.empty())
   {
-    auto it = deferred_method_bodies.begin();
-    method_bodies.push_back(std::move(it->second));
-    deferred_method_bodies.erase(it);
-  }
-
-  // Process any methods that were just moved from deferred,
-  // plus any new methods added as side effects.
-  while(!method_bodies.empty())
-  {
-    method_bodyt &method_body = *method_bodies.begin();
-    symbolt &method_symbol = *method_body.method_symbol;
-
-    template_map.swap(method_body.template_map);
-    instantiation_stack.swap(method_body.instantiation_stack);
-
-    method_bodies.erase(method_bodies.begin());
-
-    // Per [temp.variadic]/5: set pack_size_map for empty
-    // variadic function template parameters.
+    std::set<irep_idt> referenced;
+    for(const auto &s : symbol_table.symbols)
     {
-      const irept &c_tmpl = method_symbol.type.find(ID_C_template);
-      if(c_tmpl.is_not_nil())
+      // Only converted (reachable) bodies count as references; a body still
+      // parked in deferred_method_bodies is not itself instantiated, so its
+      // references must not keep other members alive ([temp.inst]/11).
+      if(
+        s.second.type.id() == ID_code && s.second.value.is_not_nil() &&
+        s.second.value.id() != ID_cpp_not_typechecked &&
+        deferred_method_bodies.find(s.first) == deferred_method_bodies.end())
+        gather_referenced(s.second.value, referenced);
+    }
+
+    std::vector<irep_idt> to_emit;
+    for(const auto &d : deferred_method_bodies)
+    {
+      if(referenced.count(d.first))
+        to_emit.push_back(d.first);
+    }
+
+    // Remaining deferred members are referenced by no converted body:
+    // do not instantiate them ([temp.inst]/11).
+    if(to_emit.empty())
+      break;
+
+    for(const auto &id : to_emit)
+    {
+      auto it = deferred_method_bodies.find(id);
+      if(it != deferred_method_bodies.end())
       {
-        for(const auto &p :
-            static_cast<const template_typet &>(c_tmpl).template_parameters())
-        {
-          if(p.get_bool(ID_ellipsis))
-          {
-            irep_idt pid = p.type().get(ID_identifier);
-            if(
-              !pid.empty() &&
-              template_map.type_map.find(pid) == template_map.type_map.end())
-              template_map.pack_size_map[pid] = 0;
-          }
-        }
+        method_bodies.push_back(std::move(it->second));
+        deferred_method_bodies.erase(it);
       }
     }
 
-    exprt &body = method_symbol.value;
-    if(body.id() == ID_cpp_not_typechecked)
-      continue;
-
-    if(body.is_not_nil() && body != 0)
+    // Process the just-emitted members plus any methods added as side
+    // effects.  The function-identifier hook may move further deferred
+    // members into method_bodies here; the enclosing loop re-scans to a
+    // fixpoint to pick up anything it misses.
+    while(!method_bodies.empty())
     {
-      const std::size_t errors_before =
-        get_message_handler().get_message_count(messaget::M_ERROR);
-      try
+      method_bodyt &method_body = *method_bodies.begin();
+      symbolt &method_symbol = *method_body.method_symbol;
+
+      template_map.swap(method_body.template_map);
+      instantiation_stack.swap(method_body.instantiation_stack);
+
+      method_bodies.erase(method_bodies.begin());
+
+      // Per [temp.variadic]/5: set pack_size_map for empty
+      // variadic function template parameters.
       {
-        convert_function(method_symbol);
+        const irept &c_tmpl = method_symbol.type.find(ID_C_template);
+        if(c_tmpl.is_not_nil())
+        {
+          for(const auto &p :
+              static_cast<const template_typet &>(c_tmpl).template_parameters())
+          {
+            if(p.get_bool(ID_ellipsis))
+            {
+              irep_idt pid = p.type().get(ID_identifier);
+              if(
+                !pid.empty() &&
+                template_map.type_map.find(pid) == template_map.type_map.end())
+                template_map.pack_size_map[pid] = 0;
+            }
+          }
+        }
       }
-      catch(...)
+
+      exprt &body = method_symbol.value;
+      if(body.id() == ID_cpp_not_typechecked)
+        continue;
+
+      if(body.is_not_nil() && body != 0)
       {
+        const std::size_t errors_before =
+          get_message_handler().get_message_count(messaget::M_ERROR);
+        try
+        {
+          convert_function(method_symbol);
+        }
+        catch(...)
+        {
+        }
+        get_message_handler().set_message_count(
+          messaget::M_ERROR, errors_before);
       }
-      get_message_handler().set_message_count(messaget::M_ERROR, errors_before);
     }
   }
 
