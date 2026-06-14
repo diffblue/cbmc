@@ -1,18 +1,18 @@
-// KNOWNBUG: std::string fill-construction is a complete no-op.
+// Regression test: std::string fill construction std::string(n, c).
 //
-// std::string s(3, 'x') dispatches to basic_string<char>::_M_construct(
-// size_type, char).  For the explicitly-instantiated basic_string<char>
-// (extern template), that member is realised as a *declaration only* — its
-// body is never instantiated (it sits in deferred_typechecking with a nil
-// body and is discarded by cpp_typecheckt::clean_up()).  The constructor
-// therefore neither sets the length nor fills the buffer, so BOTH size()
-// and the character contents are wrong (unlike the literal-construction
-// case, where only the characters are wrong).
+// std::string s(3, 'x') dispatches to
+// basic_string<char>::_M_construct(size_type, _CharT).  For the explicitly
+// instantiated basic_string<char>, that out-of-line member used to be
+// attached the *wrong* overload's body (the input-iterator _M_construct,
+// which refers to `__beg`) by a base-name-only match, so its conversion
+// failed and the constructor became a no-op (both size() and the characters
+// were wrong).
 //
-// This is the same underlying gap as cpp11_string_literal_char_access:
-// the elaborate-only realisation path that basic_string<char> takes does
-// not convert deferred inline member bodies.  Grounded in N5008
-// [temp.inst]/4 and Note 4.  When fixed, reclassify from KNOWNBUG to CORE.
+// convert_function now repairs such a member by adopting the out-of-line
+// definition whose signature (parameter arity) matches it, together with that
+// definition's parameter names ([dcl.fct]/3), so the fill constructor sets the
+// length and fills the buffer.  Grounded in N5008 [over.match] + [dcl.fct]/3.
+// See doc/architectural/cpp-extern-template-member-instantiation.md.
 
 #include <string>
 
