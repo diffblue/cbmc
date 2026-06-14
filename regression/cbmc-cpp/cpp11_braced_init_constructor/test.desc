@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+A class with a user-provided constructor is not an aggregate, so a
+braced-init-list invokes a constructor rather than member-wise aggregate
+initialization.  A converting constructor taking a reference to another type
+(e.g. Wrap(int&)) must not be treated as a copy/move constructor.

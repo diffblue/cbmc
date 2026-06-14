@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp11 --unwind 6 --no-unwinding-assertions
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+Exercises std::list, whose node creation constructs a
+std::__allocated_ptr RAII guard via a braced-init-list.  Such a class (with
+user-provided constructors) is not an aggregate, so the braced-init must call a
+constructor rather than perform member-wise aggregate initialization.
