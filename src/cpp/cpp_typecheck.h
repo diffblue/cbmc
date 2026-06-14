@@ -245,6 +245,14 @@ protected:
   /// [temp.inst]/4 + Note 4 instead of being discarded by `clean_up()`.
   void queue_deferred_methods_of_instance(const irep_idt &class_id);
 
+  /// Instantiate, by signature (parameter arity) rather than base name, the
+  /// out-of-line definition body of a class-template instance member.  Used to
+  /// repair a member that was attached the wrong overload's body.  See the
+  /// definition for the full rationale (N5008 [over.match], [dcl.fct]/3).
+  std::optional<exprt> instantiate_matching_member_body(
+    const symbolt &member,
+    std::vector<irep_idt> &param_names);
+
   void elaborate_class_template(
     const source_locationt &source_location,
     const struct_tag_typet &type);

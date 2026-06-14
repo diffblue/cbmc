@@ -2035,6 +2035,146 @@ void cpp_typecheckt::elaborate_class_template(
   }
 }
 
+/// Find and instantiate the out-of-line definition body of a class-template
+/// instance member function, selected by **signature** (parameter arity), not
+/// by base name.
+///
+/// libstdc++ overloads several members on the same name (e.g.
+/// `basic_string::_M_construct` has a `(size_type, _CharT)` fill overload and
+/// the `(_InputIterator, _InputIterator, tag)` range overloads).  The body of
+/// such a member is kept, in parsed form, in a primary template's
+/// `ID_template_methods`.  Matching it by base name alone can attach the
+/// **wrong** overload's body to a member symbol (observed: the input-iterator
+/// `_M_construct` body, which references `__beg`, ends up on the fill
+/// `_M_construct(size_type, char)` member, so its conversion fails with
+/// "symbol '__beg' is unknown" and the member silently becomes a no-op).
+///
+/// This routine returns the substituted body of the **unique** out-of-line
+/// definition whose (non-`this`) parameter count matches \p member, or an
+/// empty optional if there is no match or the match is ambiguous.  Only
+/// regular members (whose template parameters are exactly the enclosing
+/// class's) are handled; member function templates are left to their own
+/// instantiation path.
+///
+/// Grounded in N5008 [temp.over]/[over.match]: the definition that belongs to
+/// a member is the one whose function signature matches it, independent of
+/// the parameter *names* used in the out-of-line definition ([dcl.fct]/3).
+///
+/// \param member: the realized instance member function symbol
+/// \param [out] param_names: on success, the out-of-line definition's
+///   parameter base names (excluding `this`), to be adopted by the member so
+///   the body's parameter references resolve ([dcl.fct]/3)
+/// \return the substituted out-of-line body, or empty optional
+std::optional<exprt> cpp_typecheckt::instantiate_matching_member_body(
+  const symbolt &member,
+  std::vector<irep_idt> &param_names)
+{
+  if(member.type.id() != ID_code)
+    return {};
+  const irep_idt &class_id = member.type.get(ID_C_member_name);
+  if(class_id.empty())
+    return {};
+  const symbolt *class_sym = symbol_table.lookup(class_id);
+  if(class_sym == nullptr)
+    return {};
+  const irept &c_template = class_sym->type.find(ID_C_template);
+  const irept &c_args = class_sym->type.find(ID_C_template_arguments);
+  if(c_template.is_nil() || c_args.is_nil())
+    return {};
+  const auto &spec_args = static_cast<const cpp_template_args_tct &>(c_args);
+
+  // (non-this) parameter count of the member
+  const auto &mparams = to_code_type(member.type).parameters();
+  std::size_t member_param_count = mparams.size();
+  if(!mparams.empty() && mparams.front().get_this())
+    --member_param_count;
+
+  // Source line of the body currently attached to the member (the body comes
+  // from some out-of-line definition; this is used to identify which
+  // definition it originates from).
+  const irep_idt current_body_line = member.value.source_location().get_line();
+
+  const cpp_declarationt *match = nullptr;
+  bool current_def_found = false;
+  std::size_t current_def_param_count = 0;
+  for(const auto &tsp : symbol_table.symbols)
+  {
+    if(!tsp.second.type.get_bool(ID_is_template) || tsp.second.value.is_nil())
+      continue;
+    const exprt &tms =
+      static_cast<const exprt &>(tsp.second.value.find(ID_template_methods));
+    for(const auto &tm : tms.operands())
+    {
+      const cpp_declarationt &md =
+        static_cast<const cpp_declarationt &>(static_cast<const irept &>(tm));
+      if(md.declarators().empty())
+        continue;
+      if(md.declarators()[0].name().get_base_name() != member.base_name)
+        continue;
+      const exprt &md_value =
+        static_cast<const exprt &>(md.declarators()[0].find(ID_value));
+      if(md_value.is_nil())
+        continue;
+      const std::size_t md_param_count =
+        md.declarators()[0].type().find(ID_parameters).get_sub().size();
+      // Identify the definition the currently-attached body came from, by
+      // source line, to learn its parameter arity.
+      if(
+        !current_body_line.empty() &&
+        md_value.source_location().get_line() == current_body_line)
+      {
+        current_def_found = true;
+        current_def_param_count = md_param_count;
+      }
+      // Only regular members (template parameters == enclosing class's);
+      // member function templates are instantiated on their own path.
+      if(
+        md.template_type().template_parameters().size() >
+        spec_args.arguments().size())
+        continue;
+      // Signature match by (non-this) parameter arity.
+      if(md_param_count != member_param_count)
+        continue;
+      if(match != nullptr)
+        return {}; // ambiguous — do not guess
+      match = &md;
+    }
+  }
+
+  // Only repair a *genuine* wrong-overload attachment: the currently-attached
+  // body must be identifiable as coming from a definition whose parameter
+  // arity differs from this member's.  This distinguishes the fill
+  // _M_construct case (arity-3 input-iterator body wrongly attached to the
+  // arity-2 fill member) from a same-arity member whose own body merely fails
+  // to convert for an unrelated reason -- repairing the latter would convert
+  // a body that should be left alone and could surface latent modelling gaps.
+  if(!current_def_found || current_def_param_count == member_param_count)
+    return {};
+
+  if(match == nullptr)
+    return {};
+
+  // Collect the definition's parameter base names ([dcl.fct]/3): the body
+  // refers to these, so the member must adopt them.
+  param_names.clear();
+  for(const auto &p :
+      match->declarators()[0].type().find(ID_parameters).get_sub())
+  {
+    const auto &pd = static_cast<const cpp_declarationt &>(p);
+    if(pd.declarators().empty())
+      param_names.push_back(irep_idt{});
+    else
+      param_names.push_back(pd.declarators().front().name().get_base_name());
+  }
+
+  exprt body =
+    static_cast<const exprt &>(match->declarators()[0].find(ID_value));
+  cpp_saved_template_mapt saved_map(template_map);
+  template_map.build(match->template_type(), spec_args);
+  template_map.apply(body);
+  return body;
+}
+
 /// Queue the already-bodied (inline) deferred member functions of a realized
 /// class-template instance for type-checking.
 ///
