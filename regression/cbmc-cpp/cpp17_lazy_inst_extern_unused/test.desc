@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\].*value preserved: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [temp.inst]/11 + [temp.explicit]: an extern template (explicit
+instantiation declaration) must not force instantiation of an unused,
+ill-formed-when-instantiated non-virtual member.  Guards the
+explicit-instantiation/completion path during the Option B pivot.  See
+doc/architectural/cpp-extern-template-member-instantiation.md.
