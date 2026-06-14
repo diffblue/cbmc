@@ -13,7 +13,7 @@ Detailed plan: member instantiation for explicitly/extern-instantiated class tem
 `doc/architectural/cpp-frontend-review.md` (frontend gaps).
 **Regression anchors:**
 `regression/cbmc-cpp/cpp11_string_literal_char_access` (now CORE),
-`regression/cbmc-cpp/cpp11_string_fill_ctor` (still KNOWNBUG — out-of-line).
+`regression/cbmc-cpp/cpp11_string_fill_ctor` (now CORE — see §12).
 
 **Standard anchors (N5008):**
 
@@ -426,13 +426,14 @@ A first increment is implemented. Findings refined the design:
 
 ### Remaining work
 
-1. **Out-of-line members (signature-aware fetch).** `std::string(n, c)`'s
-   `_M_construct(size_type, char)` and other out-of-line members are kept in
-   a primary template's `template_methods`; instantiating them requires
-   matching the correct overload by **signature** (not just base name) and
-   substituting with the instance map. This is the prerequisite to converting
-   nil-body deferred members without the overload-mismatch regressions seen
-   above. Tracked by the KNOWNBUG `cpp11_string_fill_ctor`.
+1. **Out-of-line members (signature-aware fetch).** *Done for the
+   wrong-overload case* — see §12: `instantiate_matching_member_body()` selects
+   the out-of-line definition by signature (parameter arity) and the repair is
+   gated to genuine wrong-overload attachments, fixing `std::string(n, c)`
+   (`cpp11_string_fill_ctor` is now CORE).  Still open: members whose
+   *correct* out-of-line body cannot be converted because it transitively
+   instantiates something CBMC cannot model (e.g. the `_Hashtable_ebo_helper`
+   "does not uniquely resolve" gap) — these remain no-bodied.
 2. **C++20/23 `std::string s = "ab"`** currently fails earlier, in
    constructor *resolution* (`CONVERSION ERROR: invalid implicit conversion
    from 'char [3]' to 'struct basic_string'`). This is a pre-existing,
@@ -554,10 +555,16 @@ driven eagerly or lazily; build it first.
 1. **Land the safety net** (done): the `cpp17_lazy_inst_*` tests plus the
    existing string tests.
 2. **Build the signature-aware helper** (§11.2), unit-exercised against the
-   `std::string(n,c)` fill `_M_construct` overload set.
+   `std::string(n,c)` fill `_M_construct` overload set. **Done** — shipped as
+   `instantiate_matching_member_body()` (see §12).
 3. **Add the lazy trigger additively**: instantiate on odr-use *in addition to*
-   the current eager paths. Nothing should regress; `cpp11_string_fill_ctor`
-   should begin to verify (flip to CORE).
+   the current eager paths. Nothing should regress.
+   *(Correction: `cpp11_string_fill_ctor` is **not** an Option B item.
+   Investigation showed its fill `_M_construct` is already instantiated on
+   odr-use — the member-call path `typecheck_method_application` already builds
+   the class map and calls `add_method_body` — but was attached the **wrong
+   overload's** out-of-line body, a downstream conversion bug.  It is fixed
+   independently in §12 using the signature-aware helper, and is now CORE.)*
 4. **Disable eager instantiation** of non-virtual members (the
    `instantiate_template` deferred loop and the §9 completion hook), relying on
    the lazy trigger. **This is the high-risk step**: tests that passed
@@ -595,4 +602,54 @@ driven eagerly or lazily; build it first.
 | `cpp17_lazy_inst_unused_not_emitted` | KNOWNBUG → CORE | unused member body must not enter the goto program (precise lazy discriminator) |
 
 Plus the existing `cpp11_string_literal_char_access` (CORE) and
-`cpp11_string_fill_ctor` (KNOWNBUG → CORE at step 3).
+`cpp11_string_fill_ctor` (now CORE — fixed independently of Option B, see §12).
+
+---
+
+## 12. Downstream fix: signature-matched out-of-line member bodies (2026-06)
+
+`std::string(n, c)` fill construction was a no-op — **not** because of lazy
+instantiation, but because of a *wrong-overload body attachment*, which is
+independent of the Option B pivot:
+
+- The fill `basic_string<char>::_M_construct(size_type, _CharT)` instance
+  member **is** instantiated on odr-use (the member-call path
+  `typecheck_method_application` already builds the class template map and
+  calls `add_method_body`).
+- However it was attached the **input-iterator** `_M_construct` body
+  (`basic_string.tcc:173`, which refers to `__beg`), selected by an earlier
+  base-name-only match.  Converting that body fails with "symbol '__beg' is
+  unknown"; the failure is swallowed by the system-header SFINAE guard and the
+  member is left without a body, so the constructor does nothing.
+
+Fix (`instantiate_matching_member_body()` + a repair hook in
+`convert_function`): when a class-template instance member's out-of-line body
+fails to convert, look in the primary template's `template_methods` for the
+definition whose **signature (parameter arity)** matches the member, but only
+when the currently-attached body came from a definition of a **different**
+arity (a genuine wrong-overload).  Adopt that definition's body and its
+parameter names ([dcl.fct]/3) and re-type-check in a fresh scope; any residual
+failure falls back to the previous no-body state.  Grounded in N5008
+[over.match] and [dcl.fct]/3.
+
+Design points that proved necessary (each caught by the full `cbmc-cpp`
+suite during development):
+
+- **Failure-gated, not proactive.** A proactive "always re-fetch the
+  signature-matched body" replaced correctly-converting members' bodies and
+  regressed `set`, `regex`, `deque`, …  Repairing only on conversion *failure*
+  leaves correct members untouched.
+- **Different-arity gate.** Arity-only matching still mis-fired on
+  `std::_Hashtable` constructor / `operator=` overloads that share an arity;
+  converting their (correct-arity) bodies surfaced an unrelated modelling gap
+  (`_Hashtable_ebo_helper does not uniquely resolve`).  Restricting the repair
+  to members whose *current* body comes from a different-arity definition
+  confines it to genuine wrong-overload attachments.
+- **Parameter-name adoption.** Even with the right body, the in-class
+  declaration and the out-of-line definition may use different parameter names
+  (`__req` vs `__n`); the member must adopt the definition's names so the
+  body's references resolve.
+
+`instantiate_matching_member_body()` is the reusable, signature-aware core
+that the lazy (Option B) work will also drive, but the repair itself is a
+contained downstream-conversion fix, not part of the Option B pivot.
