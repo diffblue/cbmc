@@ -578,9 +578,11 @@ driven eagerly or lazily; build it first.
    reachability fallback (§11.5) is what makes it safe.
 5. **Eager virtuals**: ensure reachable virtual members are still instantiated
    at class instantiation (`cpp17_lazy_inst_virtual` guards this).  **Done** —
-   constructors, destructors and virtual members are never deferred by
-   `add_method_body`, so they remain eager; `cpp17_lazy_inst_virtual` stays
-   CORE.  (Operators were subsequently moved to the lazy path — see §13.)
+   virtual members are the only members `add_method_body` keeps eager;
+   `cpp17_lazy_inst_virtual` stays CORE.  Ordinary methods, operators and the
+   special members (constructors, destructors, assignment) are all deferred and
+   instantiated only on odr-use — see §13, including how destructor odr-use is
+   recovered from the constructed-class set ([class.dtor]/12).
 6. **Retire the completion-site hook** (§9) once the lazy path subsumes it;
    re-confirm `cpp11_string_literal_char_access` via the lazy path.
    **Assessed and kept** — disabling the hook makes `std::string` construction
@@ -612,8 +614,8 @@ driven eagerly or lazily; build it first.
 | `cpp17_lazy_inst_virtual` | CORE | virtual member instantiated + dispatched (permitted-eager carve-out) |
 | `cpp17_lazy_inst_unused_not_emitted` | KNOWNBUG → CORE | unused member body must not enter the goto program (precise lazy discriminator) |
 | `cpp17_lazy_inst_unused_operator` | CORE | unused non-virtual operator must not be instantiated (§13) |
-| `cpp17_lazy_inst_unused_ctor` | KNOWNBUG | unused non-virtual constructor must not be instantiated (ctors still eager, §13) |
-| `cpp17_lazy_inst_unused_dtor` | KNOWNBUG | unused non-virtual destructor must not be instantiated (dtors still eager, §13) |
+| `cpp17_lazy_inst_unused_ctor` | CORE | unused non-virtual constructor must not be instantiated (§13) |
+| `cpp17_lazy_inst_unused_dtor` | CORE | unused non-virtual destructor must not be instantiated; dtor odr-use recovered via [class.dtor]/12 (§13) |
 
 Plus the existing `cpp11_string_literal_char_access` (CORE) and
 `cpp11_string_fill_ctor` (now CORE — fixed independently of Option B, see §12).
@@ -742,31 +744,53 @@ the fix is confined to the one force-drain.
 
 ### Residual / follow-on
 
-- **Operators are now deferred too** (follow-on, done). Member operators are
-  no longer in the eager set; like ordinary member functions they are
-  instantiated only on odr-use. `cpp17_lazy_inst_unused_operator` (CORE)
-  guards this, and heavily-used operators such as `std::string::operator[]`
+- **Operators, constructors and destructors are now deferred too** (follow-on,
+  done). No non-virtual member is instantiated eagerly any more: ordinary
+  methods, operators and the special members all wait for odr-use, leaving
+  *virtual* members as the only eager instantiation ([temp.inst]/11). The
+  `cpp17_lazy_inst_unused_operator` / `_ctor` / `_dtor` discriminators (all
+  CORE) guard this, while heavily-used members such as
+  `std::string::operator[]` and a `std::vector`'s constructor/destructor
   remain instantiated because they are odr-used.
 
-- **Constructors and destructors remain eager** — a deliberate, characterised
-  residual. The standard does not carve these out (only virtuals), so eagerly
-  instantiating an *unused* one is still technically non-conforming, and the
-  `cpp17_lazy_inst_unused_ctor` / `cpp17_lazy_inst_unused_dtor` discriminators
-  (KNOWNBUG) record it. Deferring them along with everything else was
-  attempted and **reverted**: it left the safety net and the simple
-  discriminators green, but **destabilised container verification** — `std::
-  vector` and `std::map` probes that previously verified in well under a
-  second *diverged* in BMC (timeout), even though the resulting goto program
-  had *fewer* functions (≈298 vs ≈301 for the `vector` probe). That rules out
-  a closure explosion and points at a *needed* special member being
-  instantiated with a divergent body under the lazy path (most likely a
-  constructor whose member-initializer handling, or a wrong-overload body
-  repair, differs when the body is converted late rather than during
-  `instantiate_template`). Isolating that divergence is the prerequisite to
-  deferring the special members; until then keeping ctors/dtors eager is the
-  safe choice (they are almost always odr-used anyway).
+  Deferring the special members initially *destabilised container
+  verification* (`std::vector` / `std::map` probes timed out in BMC), which a
+  goto-program diff root-caused precisely: the lazy `vector` was missing
+  exactly its three **destructors** (`~vector`, `~_Vector_base`,
+  `~__normal_iterator`) — not a divergent body and not a closure explosion
+  (the lazy program had *fewer* functions). Destructor calls for automatic and
+  temporary objects are synthesised later, during **goto-conversion**, so the
+  destructor's symbol id never appears in the type-checked bodies that the
+  reachability scan inspects; the scan therefore could not see the odr-use and
+  left `~vector` body-less, which is what made BMC diverge.
+
+  The fix recovers destructor odr-use from the type system rather than from
+  body references, grounded in **[class.dtor]/12** (a destructor is
+  *potentially invoked* when an object of its class is created): the
+  reachability scan collects the set of classes whose **constructors** are
+  referenced (`constructed_classes`) and instantiates the destructor of any
+  such class. Subobject destructors (`~_Vector_base`, `~__normal_iterator`)
+  follow transitively once `~vector`'s body is converted, or via their own
+  constructor pairing. This keeps the discriminator sound: a class that is
+  only used through a static member (no object constructed, hence no
+  constructor odr-used) does not enter `constructed_classes`, so its
+  destructor stays uninstantiated.
 
 - **The §9 completion-site inline hook cannot yet be retired** (step 6;
+  assessed and **kept**). Disabling `queue_deferred_methods_of_instance`
+  makes `std::string` construction a no-op again (the string tests and
+  dog-food probes fail). The lazy odr-use path does **not** subsume it for
+  system-header *extern-template* instances such as
+  `std::__cxx11::basic_string<char>`: those are completed through the
+  incomplete→complete swap in `typecheck_compound_type`, so their inline
+  members are parked in `deferred_typechecking` (not `deferred_method_bodies`)
+  and are not reliably pulled in by the odr-use hook. Retiring the hook
+  therefore requires first routing those members through the same lazy
+  trigger; it remains follow-on.
+
+- **Pre-existing, unrelated to Option B** (reproduced on the baseline by
+  stashing the changed file): `std::string s = "ab"` fails C++20/23
+  constructor *resolution* (`char[3]` → `basic_string`), and a C++20/23
   assessed and **kept**). Disabling `queue_deferred_methods_of_instance`
   makes `std::string` construction a no-op again (the string tests and
   dog-food probes fail). The lazy odr-use path does **not** subsume it for
