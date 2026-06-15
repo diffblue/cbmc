@@ -1867,7 +1867,9 @@ void goto_check_ct::check_rec_logical_op(const exprt &expr, const guardt &guard)
     expr.is_boolean(),
     "'" + expr.id_string() + "' must be Boolean, but got " + expr.pretty());
 
-  exprt::operandst constraints;
+  // Build the conjunction of preceding operands incrementally to avoid
+  // reconstructing it from scratch for each operand.
+  exprt accumulated_constraint = true_exprt{};
 
   for(const auto &op : expr.operands())
   {
@@ -1876,13 +1878,15 @@ void goto_check_ct::check_rec_logical_op(const exprt &expr, const guardt &guard)
       "'" + expr.id_string() + "' takes Boolean operands only, but got " +
         op.pretty());
 
-    auto new_guard = [&guard, &constraints](exprt expr) {
-      return guard(implication(conjunction(constraints), expr));
-    };
+    auto new_guard = [&guard, &accumulated_constraint](exprt expr)
+    { return guard(implication(accumulated_constraint, expr)); };
 
     check_rec(op, new_guard, false);
 
-    constraints.push_back(expr.id() == ID_or ? boolean_negate(op) : op);
+    const exprt next = expr.id() == ID_or ? boolean_negate(op) : exprt{op};
+    accumulated_constraint = accumulated_constraint.is_true()
+                               ? next
+                               : and_exprt{accumulated_constraint, next};
   }
 }
 
