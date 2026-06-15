@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^.*error.*$
+--
+C++20 requires-expression soft-failure ([expr.prim.req.general]/5): a
+requirement whose expression is invalid in the immediate context makes the
+requires-expression evaluate to false rather than ill-forming the program, even
+when the invalid expression uses an overloaded operator on a class type
+(`a + a` with no operator+) or a member access on a non-class type
+(`a.foo()`).  Guards routing requirement nodes to SFINAE-guarded evaluation
+before the ordinary operand recursion can emit a hard diagnostic.  See
+doc/architectural/cpp-requires-expression-support.md.
