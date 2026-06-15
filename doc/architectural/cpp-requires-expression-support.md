@@ -399,33 +399,38 @@ Guarded by the CORE test `cpp20_concept_requires_eval`.
    audited similarly if a concept needs them, but `same_as<decltype((E)), …>`
    for the common forms now resolves.
 
-2. **Class-type operator / member-call requirements must soft-fail to `false`
-   (the gateway to `std::string`).** A requirement whose expression uses an
-   *overloaded* operator or member on a class type — `requires(T a){ a + a; }`
-   for a class without `operator+`, or `requires(T a){ a.foo(); }` — does **not**
-   reach the `simple_requirement` handler: the error (`implicit arithmetic
-   conversion not permitted`, `member operator requires struct/union type`)
-   escapes *before* the handler, so the concept errors instead of evaluating
-   `false`. Builtin-operator requirements over arithmetic types already
-   soft-fail correctly (CORE test `cpp20_concept_requires_eval`). This is the
-   key blocker for `std::string`: its `iterator_concept` evaluates
-   `random_access_iterator<__normal_iterator<char*, …>>` — a **class** iterator
-   whose requirements use overloaded operators — so until class-type operator
-   requirements soft-fail, `basic_string<char>` still truncates and
-   `std::string` construction fails at cpp20/23 (the `char[3]` → `basic_string`
-   error is unchanged). Fix: route operator/member resolution performed while
-   evaluating a requirement expression through SFINAE soft-failure (or wrap the
-   whole requires-expression evaluation so any escape becomes `false`), and/or
-   harden the parser (`parse.cpp` ~9880) to emit a clean `simple_requirement`
-   node for these forms instead of resolving them eagerly.
+2. **Class-type operator / member-call requirements soft-fail to `false`** —
+   **resolved** (commit: "soft-fail invalid requirement expressions on
+   class/member operations"; CORE test
+   `cpp20_concept_requirement_soft_failure`). Root cause: the requirement-node
+   handlers in `typecheck_expr_main` ran *after* the generic operand recursion
+   in `cpp_typecheckt::typecheck_expr`, which type-checked the requirement's
+   sub-expression (e.g. `a + a` on a class without `operator+`, or `a.foo()` on
+   a non-class type) as ordinary code and emitted a hard diagnostic *before* the
+   handler could soften it ([expr.prim.req.general]/5). Fix: intercept
+   `simple_/compound_/type_requirement` nodes in the `typecheck_expr` dispatcher
+   and route them straight to `typecheck_expr_main`, skipping the operand
+   recursion, so the sub-expression is checked only under the SFINAE-guarded
+   handler. With this, `Addable<NoPlus>` / `HasFoo<int>` correctly evaluate
+   `false` instead of erroring, and the libstdc++ iterator-concept chain over
+   `__normal_iterator` now progresses well past the previous truncation point
+   (see (3)).
 
-3. **Deep concept chain over class iterators.** Even with (2), evaluating
-   `random_access_iterator` over `__normal_iterator` exercises a deep chain
-   (`input/forward/bidirectional_iterator`, `same_as`, `convertible_to`,
-   `derived_from`, `totally_ordered`, `sized_sentinel_for`, `ITER_CONCEPT`,
-   `iter_difference_t`/`iter_reference_t`). Each must evaluate correctly; this
-   should be built up with a hand-written `random_access_iterator`-shaped chain
-   over a class iterator before turning to the libstdc++ headers.
+3. **Deep concept chain over class iterators (current blocker for
+   `std::string`).** With (2) the chain now evaluates much further: for
+   cpp20/23 `std::string`, `basic_string` instantiation drives
+   `reverse_iterator` → `iterator_traits` → `__cpp17_iterator` → `copyable` →
+   `movable` → `swappable` → `std::ranges::swap` (the `_Swap`
+   customization-point object and its `__adl_swap`) over `__normal_iterator`,
+   then still ends with the unchanged `char[3]` → `basic_string` conversion
+   error — i.e. the chain does not yet *complete*, so `basic_string` is still
+   truncated. Remaining chain work includes the customization-point objects
+   (`std::ranges::swap`/`__adl_swap`) and the rest of
+   `input/forward/bidirectional/random_access_iterator`, `same_as`,
+   `convertible_to`, `derived_from`, `totally_ordered`, `sized_sentinel_for`,
+   `ITER_CONCEPT`, `iter_difference_t`/`iter_reference_t`. Best built up with a
+   hand-written `random_access_iterator`-shaped chain over a class iterator
+   before the libstdc++ headers.
 
 4. **requires-clauses** (step 4 of §5) still only count constraints; not yet
    evaluated.
@@ -436,7 +441,11 @@ Guarded by the CORE test `cpp20_concept_requires_eval`.
   (materialisation + simple/compound handlers + robustness guard).
 - `cpp: pre-increment/decrement of arithmetic/pointer lvalue is an lvalue (C++)`
   (compound return-type value-category).
-- CORE tests `cpp20_concept_requires_eval`, `cpp20_concept_compound_requirement`.
+- `cpp: soft-fail invalid requirement expressions on class/member operations`
+  (intercept requirement nodes before operand recursion; class-operator and
+  member-call requirements now evaluate `false` instead of erroring).
+- CORE tests `cpp20_concept_requires_eval`, `cpp20_concept_compound_requirement`,
+  `cpp20_concept_requirement_soft_failure`.
 
 All gated by a green full `cbmc-cpp` suite (cpp20_ranges_basic no longer
 crashes).
