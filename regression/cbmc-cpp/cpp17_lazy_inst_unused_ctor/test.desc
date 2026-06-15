@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^VERIFICATION SUCCESSFUL$
@@ -9,14 +9,12 @@ must never appear
 --
 N5008 [temp.inst]/11: a non-virtual constructor of a class template shall not
 be implicitly instantiated unless odr-used.  The two-argument constructor here
-is never used, so under full lazy instantiation its assertion "must never
-appear" should not enter the goto program.
+is never used, so under lazy instantiation its assertion "must never appear"
+does not enter the goto program and the forbidden pattern must be absent.  The
+default constructor IS odr-used and is still instantiated (s.v is read).
 
-CBMC still instantiates constructors eagerly: deferring the special members
-(constructors/destructors) along with ordinary members and operators was
-attempted but destabilised container verification (e.g. std::vector / std::map
-runs diverged in BMC even though the goto program had fewer functions),
-pointing at a needed special member being instantiated with a divergent body
-under the lazy path.  Pending that investigation the forbidden message still
-appears, so this is KNOWNBUG.  Tracks the remaining [temp.inst]/11 work; see
+This became CORE once the special members (constructors/destructors) were
+deferred together with ordinary members and operators.  The destructor of a
+*constructed* class is recovered from the type system ([class.dtor]/12) so
+needed special members are still instantiated; see
 doc/architectural/cpp-extern-template-member-instantiation.md §13.
