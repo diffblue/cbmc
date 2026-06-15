@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/cprover_prefix.h>
+#include <util/expr_iterator.h>
 #include <util/expr_util.h>
 #include <util/find_symbols.h>
 #include <util/floatbv_expr.h>
@@ -28,6 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
+#include <util/prefix.h>
 #include <util/simplify_expr.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
@@ -2293,8 +2295,63 @@ void goto_check_ct::goto_check(
 
       check_shadow_memory_api_calls(i);
 
-      // the call might invalidate any assertion
-      assertions.clear();
+      // A function call can modify:
+      // 1. The LHS of the call (return value assignment)
+      // 2. Global state (__CPROVER_deallocated, __CPROVER_dead_object, etc.)
+      // 3. Heap contents reachable from its arguments (via dereferences)
+      // 4. Any local whose address is passed in (e.g. f(&p)): the callee
+      //    can write through that address and change the local's value.
+      //
+      // Arguments passed by value cannot otherwise modify the caller's
+      // locals, so assertions about such locals may be kept. We clear
+      // assertions that:
+      // - Reference a __CPROVER_ global (could be modified by the callee)
+      // - Reference the LHS symbol (overwritten by the return value)
+      // - Reference a symbol whose address is taken in an argument
+      {
+        find_symbols_sett lhs_syms;
+        if(i.call_lhs().is_not_nil())
+          find_symbols(i.call_lhs(), lhs_syms);
+
+        // Collect symbols whose address is taken in the call arguments; the
+        // callee may modify these through the passed-in address.
+        find_symbols_sett address_taken_syms;
+        for(const auto &arg : i.call_arguments())
+        {
+          for(auto a_it = arg.depth_begin(), a_end = arg.depth_end();
+              a_it != a_end;
+              ++a_it)
+          {
+            if(a_it->id() == ID_address_of)
+              find_symbols(
+                to_address_of_expr(*a_it).object(), address_taken_syms);
+          }
+        }
+
+        for(auto it = assertions.begin(); it != assertions.end();)
+        {
+          bool must_clear = false;
+
+          find_symbols_sett assertion_syms;
+          find_symbols(it->second, assertion_syms);
+
+          for(const auto &sym_id : assertion_syms)
+          {
+            if(
+              has_prefix(id2string(sym_id), CPROVER_PREFIX) ||
+              lhs_syms.count(sym_id) || address_taken_syms.count(sym_id))
+            {
+              must_clear = true;
+              break;
+            }
+          }
+
+          if(must_clear)
+            it = assertions.erase(it);
+          else
+            ++it;
+        }
+      }
     }
     else if(i.is_set_return_value())
     {
