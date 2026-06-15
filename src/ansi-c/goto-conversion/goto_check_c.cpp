@@ -78,6 +78,14 @@ public:
     error_labels = _options.get_list_option("error-label");
     enable_pointer_primitive_check =
       _options.get_bool_option("pointer-primitive-check");
+
+    // Pre-compute pragma strings to avoid repeated string concatenation.
+    for(const auto &entry : name_to_flag)
+    {
+      irep_idt pragma{"checked:" + id2string(entry.first)};
+      all_check_pragmas.emplace_back(pragma);
+      flag_pragma_pairs.emplace_back(entry.second, pragma);
+    }
   }
 
   typedef goto_functionst::goto_functiont goto_functiont;
@@ -317,6 +325,11 @@ protected:
 
   typedef optionst::value_listt error_labelst;
   error_labelst error_labels;
+
+  /// Pre-computed pragma strings.
+  std::vector<irep_idt> all_check_pragmas;
+  /// Pairs of (flag pointer, pragma string) for active check iteration.
+  std::vector<std::pair<bool *, irep_idt>> flag_pragma_pairs;
 
   // the first element of the pair is the base address,
   // and the second is the size of the region
@@ -2521,16 +2534,16 @@ void goto_check_c(
 void goto_check_ct::add_active_named_check_pragmas(
   source_locationt &source_location) const
 {
-  for(const auto &entry : name_to_flag)
-    if(*(entry.second))
-      source_location.add_pragma("checked:" + id2string(entry.first));
+  for(const auto &[flag, pragma] : flag_pragma_pairs)
+    if(*flag)
+      source_location.add_pragma(pragma);
 }
 
 void goto_check_ct::add_all_checked_named_check_pragmas(
   source_locationt &source_location) const
 {
-  for(const auto &entry : name_to_flag)
-    source_location.add_pragma("checked:" + id2string(entry.first));
+  for(const auto &pragma : all_check_pragmas)
+    source_location.add_pragma(pragma);
 }
 
 goto_check_ct::named_check_statust
