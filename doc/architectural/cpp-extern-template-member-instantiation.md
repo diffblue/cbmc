@@ -788,21 +788,38 @@ the fix is confined to the one force-drain.
   therefore requires first routing those members through the same lazy
   trigger; it remains follow-on.
 
-- **Pre-existing, unrelated to Option B** (reproduced on the baseline by
-  stashing the changed file): `std::string s = "ab"` fails C++20/23
-  constructor *resolution* (`char[3]` → `basic_string`), and a C++20/23
-  assessed and **kept**). Disabling `queue_deferred_methods_of_instance`
-  makes `std::string` construction a no-op again (the string tests and
-  dog-food probes fail). The lazy odr-use path does **not** subsume it for
-  system-header *extern-template* instances such as
-  `std::__cxx11::basic_string<char>`: those are completed through the
-  incomplete→complete swap in `typecheck_compound_type`, so their inline
-  members are parked in `deferred_typechecking` (not `deferred_method_bodies`)
-  and are not reliably pulled in by the odr-use hook. Retiring the hook
-  therefore requires first routing those members through the same lazy
-  trigger; it remains follow-on.
+- **Pre-existing C++20/23 `std::string` failure — root-caused, fix is
+  scoped future work.** At `-std=c++20`/`c++23` every `std::string` member
+  operation (`std::string s("ab")`, `s = "ab"`, `s.assign(...)`, etc.) fails
+  with `invalid implicit conversion from 'char [3]' to 'struct basic_string'`,
+  and a C++20/23 `std::string` BMC run can core-dump. This reproduces on the
+  baseline (independent of all the work above). Root cause, established by a
+  goto-/symbol-table diff:
 
-- **Pre-existing, unrelated to Option B** (reproduced on the baseline by
-  stashing the changed file): `std::string s = "ab"` fails C++20/23
-  constructor *resolution* (`char[3]` → `basic_string`), and a C++20/23
-  `std::string` BMC run can core-dump. Both are out of scope here.
+  - At C++20 the `basic_string<char>` symbol is *complete* but contains **only
+    its 13 member typedefs** (`value_type`, `iterator`, `const_iterator`, …) —
+    **no data members and no member functions** (zero constructors). At C++17
+    the full member set is present, which is why the conversion succeeds there.
+    With no constructors in the struct, overload resolution for any string
+    construction/assignment finds no candidate and falls back to the
+    "invalid implicit conversion" error; the downstream BMC core-dump is a
+    consequence of operating on this malformed string type.
+  - The class-body elaboration **truncates after the iterator typedefs**
+    (cpp17 processes ~401 member-declarations for `basic_string<char>`, cpp20
+    only ~118). The cut point is the `reverse_iterator` /
+    `const_reverse_iterator` typedefs (`std::reverse_iterator<iterator>`):
+    elaborating them recursively instantiates the **C++20 iterator machinery
+    (`iterator_concept`, the `operator<=>` / iterator-concept members)** that
+    CBMC does not yet model. The deep instantiation throws, the failure is
+    swallowed by the system-header guards, and the throw abandons the rest of
+    `basic_string`'s body.
+  - A contained "make class-body elaboration resilient" mitigation was
+    attempted (guard the member-type elaboration in `typecheck_compound_body`
+    under a SFINAE context and skip an unmodelable member instead of
+    abandoning the body). It did **not** resolve the failure — the C++20
+    iterator failure has multiple/deeper escape paths — and was reverted.
+
+  The correct fix is genuine C++20 iterator-concept support (the `<=>` /
+  `iterator_concept` model), a substantial piece of work; it is recommended as
+  a scoped follow-on rather than a rushed change, since CBMC's documented C++
+  support is C++98–C++17, which is fully functional here.
