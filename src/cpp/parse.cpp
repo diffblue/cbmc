@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_token_buffer.h"
 
 #include <map>
+#include <set>
 
 #ifdef DEBUG
 #include <iostream>
@@ -435,6 +436,13 @@ protected:
   const bool cpp11;
   const bool cpp20;
   const bool msvc_concepts;
+
+  // Base names of C++20 concepts seen so far (`template<...> concept Name =
+  // ...`).  Used to recognise a *qualified* concept name (e.g.
+  // `std::__detail::__dereferenceable`) as a type-constraint on a template
+  // parameter ([temp.param]/4), where the leading namespace would otherwise
+  // make the parameter look like a non-type parameter.
+  std::set<irep_idt> concept_names;
 };
 
 static bool is_identifier(int token)
@@ -1394,6 +1402,11 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
     if(!is_identifier(lex.get_token(name_tk)))
       return false;
 
+    // Remember the concept's base name so a later *qualified* use as a
+    // type-constraint (`ns::Name auto`/`template<ns::Name T>`) is recognised
+    // ([temp.param]/4).
+    concept_names.insert(name_tk.data.get(ID_C_base_name));
+
     if(lex.get_token(concept_tk) != '=')
       return false;
 
@@ -1779,9 +1792,65 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
     // For qualified names (id::), try non-type parameter first
     if(lex.LookAhead(1) == TOK_SCOPE)
     {
+      // If the qualified name's final component names a known concept, this is
+      // a concept-constrained TYPE parameter ([temp.param]/4) -- e.g.
+      // `template<std::__detail::__dereferenceable _Tp>` -- not a non-type
+      // parameter.  The leading namespace would otherwise make the parameter
+      // look like a non-type parameter of a qualified type, so detect the
+      // concept up front and take the concept path directly.
+      bool qualified_concept = false;
+      {
+        cpp_token_buffert::post peek = lex.Save();
+        irep_idt last_component;
+        bool scan_ok = true;
+        while(true)
+        {
+          cpp_tokent tk;
+          if(!is_identifier(lex.LookAhead(0)))
+          {
+            scan_ok = false;
+            break;
+          }
+          lex.get_token(tk);
+          last_component = tk.data.get(ID_C_base_name);
+          // Skip template arguments: Concept<Args...>
+          if(lex.LookAhead(0) == '<')
+          {
+            cpp_tokent lt;
+            lex.get_token(lt);
+            int depth = 1;
+            while(depth > 0)
+            {
+              int t = lex.get_token(lt);
+              if(t == '<')
+                ++depth;
+              else if(t == '>')
+                --depth;
+              else if(t == TOK_SHIFTRIGHT && depth >= 2)
+                depth -= 2;
+              else if(t == 0)
+              {
+                scan_ok = false;
+                break;
+              }
+            }
+          }
+          if(lex.LookAhead(0) == TOK_SCOPE)
+          {
+            cpp_tokent sc;
+            lex.get_token(sc);
+            continue;
+          }
+          break;
+        }
+        lex.Restore(peek);
+        if(scan_ok && concept_names.find(last_component) != concept_names.end())
+          qualified_concept = true;
+      }
+
       cpp_token_buffert::post nttp_pos = lex.Save();
       cpp_declarationt nttp_decl;
-      if(rArgDeclaration(nttp_decl))
+      if(!qualified_concept && rArgDeclaration(nttp_decl))
       {
         int next = lex.LookAhead(0);
         if(next == ',' || next == '>' || next == TOK_SHIFTRIGHT)
