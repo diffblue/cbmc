@@ -1134,6 +1134,51 @@ void cpp_typecheckt::elaborate_class_template(
       }
     }
 
+    // [temp.inst]/2: a class template specialization used as a template
+    // argument is implicitly instantiated when its completeness affects
+    // the semantics of the program.  Selecting a partial specialization
+    // here matches the partial-specialization argument pattern against
+    // these actual arguments ([temp.spec.partial.match]/2), which for a
+    // nested class-template-id argument (e.g. the `holder<int>` in
+    // `base<holder<int>>`, the libstdc++ `allocator_traits<allocator<T>>`
+    // shape) requires that argument to be elaborated.  A type-naming
+    // declaration of `base<holder<int>>` elaborates `holder<int>` as a
+    // side effect of resolving the full type, but a qualified-name use
+    // such as `base<holder<int>>::cp` reaches here with the argument
+    // still incomplete.  Elaborate any incomplete class-template-instance
+    // arguments up front so the specialization match (and the resulting
+    // instantiation) is the same regardless of which context first
+    // required the specialization ([temp.spec.general]/7: at most one
+    // point of instantiation per translation unit).
+    for(auto &arg : full_args_tc.arguments())
+    {
+      if(arg.id() != ID_type)
+        continue;
+      const typet &arg_type = arg.type();
+      if(arg_type.id() != ID_struct_tag && arg_type.id() != ID_union_tag)
+        continue;
+      if(to_tag_type(arg_type).get_identifier().empty())
+        continue;
+      const symbolt &arg_sym = lookup(to_tag_type(arg_type));
+      if(
+        (arg_sym.type.id() == ID_struct || arg_sym.type.id() == ID_union) &&
+        arg_sym.type.get_bool(ID_template_class_instance) &&
+        to_struct_union_type(arg_sym.type).is_incomplete())
+      {
+        // SFINAE-style guard: if the argument cannot be elaborated this
+        // is not necessarily fatal to the enclosing instantiation (the
+        // match may still fall back to another candidate), mirroring the
+        // recovery convention used elsewhere in this routine.
+        try
+        {
+          elaborate_class_template(arg_type);
+        }
+        catch(...)
+        {
+        }
+      }
+    }
+
     // Search for a better-matching partial specialization only if
     // the symbol was created with the primary template (not already
     // matched to a partial specialization).
