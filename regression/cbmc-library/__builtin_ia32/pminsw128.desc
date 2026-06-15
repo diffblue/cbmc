@@ -1,6 +1,6 @@
-KNOWNBUG
-main.c
---pointer-check --bounds-check
+CORE gcc-only
+pminsw128.c
+
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

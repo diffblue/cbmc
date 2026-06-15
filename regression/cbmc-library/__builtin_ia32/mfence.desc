@@ -1,5 +1,5 @@
 KNOWNBUG
-main.c
+mfence.c
 --pointer-check --bounds-check
 ^EXIT=0$
 ^SIGNAL=0$

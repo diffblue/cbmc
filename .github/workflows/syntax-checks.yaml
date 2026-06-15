@@ -59,3 +59,17 @@ jobs:
           rustup toolchain install stable --profile minimal --no-self-update -c clippy -c rustfmt
       - name: Run `cargo fmt` on top of Rust API project
         run: cd src/libcprover-rust; cargo fmt --all -- --check
+
+  # This job should take under a minute (est)
+  check-generated-intrinsic-models:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Fetch dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq clang-format-15
+      - name: Check x86 SIMD intrinsic models are in sync with their generator
+        run: ./scripts/check_intrinsic_models_sync.sh

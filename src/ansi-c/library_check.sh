@@ -101,7 +101,25 @@ perl -p -i -e 's/^_mm_setr_epi(16|32)\n//' __functions # cbmc/SIMD1
 perl -p -i -e 's/^_mm_setr_pi16\n//' __functions # cbmc/SIMD1
 perl -p -i -e 's/^_mm_subs_ep[iu]16\n//' __functions # cbmc/SIMD1
 
-ls ../../regression/cbmc-library/ | egrep -v '(Makefile|CMakeLists.txt)' | sort -u > __tests
+# Functions exercised by the aggregate regression/cbmc/SIMD* smoke tests are
+# covered there rather than by an individual cbmc-library test; treat them as
+# exempt.
+grep -rhoE '__builtin_(ia32|neon)_[A-Za-z0-9_]+' ../../regression/cbmc/SIMD* \
+  2>/dev/null | sort -u > __simd_covered
+comm -23 __functions __simd_covered > __functions.new
+mv __functions.new __functions
+rm __simd_covered
+
+# The __builtin_ia32_* and __builtin_neon_* tests are consolidated into a single
+# directory per family; a function is covered when a .c file underneath
+# references it (rather than by having a directory of its own).
+{
+  ls ../../regression/cbmc-library/ | \
+    egrep -v '(Makefile|CMakeLists.txt|tests.log|^__builtin_ia32$|^__builtin_neon$)'
+  grep -rhoE '__builtin_(ia32|neon)_[A-Za-z0-9_]+' --include='*.c' \
+    ../../regression/cbmc-library/__builtin_ia32 \
+    ../../regression/cbmc-library/__builtin_neon 2>/dev/null
+} | sort -u > __tests
 diff -u __tests __functions
 ec="${?}"
 rm __functions __tests
