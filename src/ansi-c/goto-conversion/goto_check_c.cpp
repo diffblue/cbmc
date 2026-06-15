@@ -2387,6 +2387,17 @@ goto_check_ct::get_pointer_points_to_valid_memory_conditions(
   const exprt in_bounds_of_some_explicit_allocation =
     is_in_bounds_of_some_explicit_allocation(address, size);
 
+  // When there are no explicit allocations,
+  // in_bounds_of_some_explicit_allocation is false_exprt, making
+  // or_exprt(false, X) redundant. Avoid constructing the or_exprt to skip
+  // the simplify_expr call that would just remove it.
+  auto or_alloc = [&](exprt check) -> exprt
+  {
+    if(allocations.empty())
+      return check;
+    return or_exprt{in_bounds_of_some_explicit_allocation, std::move(check)};
+  };
+
   const bool unknown = flags.is_unknown() || flags.is_uninitialized();
 
   if(unknown)
@@ -2398,19 +2409,14 @@ goto_check_ct::get_pointer_points_to_valid_memory_conditions(
   if(unknown || flags.is_dynamic_heap())
   {
     conditions.push_back(conditiont(
-      or_exprt(
-        in_bounds_of_some_explicit_allocation,
-        not_exprt(deallocated(address, ns))),
+      or_alloc(not_exprt(deallocated(address, ns))),
       "deallocated dynamic object"));
   }
 
   if(unknown || flags.is_dynamic_local())
   {
-    conditions.push_back(conditiont(
-      or_exprt(
-        in_bounds_of_some_explicit_allocation,
-        not_exprt(dead_object(address, ns))),
-      "dead object"));
+    conditions.push_back(
+      conditiont(or_alloc(not_exprt(dead_object(address, ns))), "dead object"));
   }
 
   if(flags.is_dynamic_heap())
@@ -2420,9 +2426,7 @@ goto_check_ct::get_pointer_points_to_valid_memory_conditions(
       object_upper_bound(address, size));
 
     conditions.push_back(conditiont(
-      or_exprt(
-        in_bounds_of_some_explicit_allocation,
-        not_exprt(object_bounds_violation)),
+      or_alloc(not_exprt(object_bounds_violation)),
       "pointer outside dynamic object bounds"));
   }
 
@@ -2433,9 +2437,7 @@ goto_check_ct::get_pointer_points_to_valid_memory_conditions(
       object_upper_bound(address, size));
 
     conditions.push_back(conditiont(
-      or_exprt(
-        in_bounds_of_some_explicit_allocation,
-        not_exprt(object_bounds_violation)),
+      or_alloc(not_exprt(object_bounds_violation)),
       "pointer outside object bounds"));
   }
 
