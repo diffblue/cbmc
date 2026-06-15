@@ -228,7 +228,8 @@ protected:
   get_pointer_is_null_condition(const exprt &address, const exprt &size);
   conditionst get_pointer_points_to_valid_memory_conditions(
     const exprt &address,
-    const exprt &size);
+    const exprt &size,
+    bool omit_integer_address_when_nullable = false);
   exprt is_in_bounds_of_some_explicit_allocation(
     const exprt &pointer,
     const exprt &size);
@@ -1578,8 +1579,8 @@ goto_check_ct::get_pointer_dereferenceable_conditions(
   const exprt &address,
   const exprt &size)
 {
-  auto conditions =
-    get_pointer_points_to_valid_memory_conditions(address, size);
+  auto conditions = get_pointer_points_to_valid_memory_conditions(
+    address, size, /*omit_integer_address_when_nullable=*/true);
   if(auto maybe_null_condition = get_pointer_is_null_condition(address, size))
   {
     conditions.push_front(*maybe_null_condition);
@@ -2379,7 +2380,8 @@ void goto_check_ct::check_shadow_memory_api_calls(
 goto_check_ct::conditionst
 goto_check_ct::get_pointer_points_to_valid_memory_conditions(
   const exprt &address,
-  const exprt &size)
+  const exprt &size,
+  bool omit_integer_address_when_nullable)
 {
   PRECONDITION(local_bitvector_analysis);
   PRECONDITION(address.type().id() == ID_pointer);
@@ -2437,11 +2439,23 @@ goto_check_ct::get_pointer_points_to_valid_memory_conditions(
       "pointer outside object bounds"));
   }
 
-  if(unknown || flags.is_integer_address())
+  // The integer-address check is redundant with the NULL check whenever the
+  // latter is generated: the NULL check (see get_pointer_is_null_condition) is
+  // emitted exactly when the pointer is nullable, and it implies the
+  // integer-address disjunct. Skip generating it in that case rather than
+  // generating and then filtering it out. Both decisions use the same flagst.
+  const bool nullable =
+    flags.is_unknown() || flags.is_uninitialized() || flags.is_null();
+
+  if(
+    (unknown || flags.is_integer_address()) &&
+    !(omit_integer_address_when_nullable && nullable))
   {
     conditions.push_back(conditiont(
-      implies_exprt(
-        integer_address(address), in_bounds_of_some_explicit_allocation),
+      allocations.empty()
+        ? exprt{not_exprt(integer_address(address))}
+        : exprt{implies_exprt(
+            integer_address(address), in_bounds_of_some_explicit_allocation)},
       "invalid integer address"));
   }
 
