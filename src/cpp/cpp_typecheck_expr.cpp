@@ -5349,6 +5349,14 @@ void cpp_typecheckt::typecheck_side_effect_inc_dec(
   {
     // standard stuff
     c_typecheck_baset::typecheck_expr_side_effect(expr);
+    // [expr.pre.incr]/1, [expr.pre.decr]/1: in C++ a pre-increment or
+    // pre-decrement of an lvalue of arithmetic or pointer type yields an
+    // lvalue (the shared C base does not set this because in C they are
+    // prvalues).  decltype((++x)) is therefore an lvalue-reference, which
+    // C++20 compound-requirements (`{ ++i } -> same_as<I&>`) depend on.
+    const irep_idt &st = expr.get(ID_statement);
+    if(st == ID_preincrement || st == ID_predecrement)
+      expr.set(ID_C_lvalue, true);
     return;
   }
 
