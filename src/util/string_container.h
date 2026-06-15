@@ -19,8 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "memory_units.h"
 #include "string_hash.h"
 
-class string_ptr_hasht;
-
 class string_ptrt
 {
 public:
@@ -37,22 +35,25 @@ public:
   // this compares the contents of the string, not the address
   bool operator==(const string_ptrt &other) const;
 
-protected:
+  size_t hash() const
+  {
+    return hash_string(s, len);
+  }
+
+private:
   // s/len are a (pointer, length) pair into externally-owned storage; the
   // referenced string need not be zero terminated (there is no c_str()).
   const char *s;
   size_t len;
-
-  friend string_ptr_hasht;
 };
 
 // NOLINTNEXTLINE(readability/identifiers)
 class string_ptr_hasht
 {
 public:
-  size_t operator()(const string_ptrt s) const
+  size_t operator()(const string_ptrt &s) const
   {
-    return hash_string(s.s, s.len);
+    return s.hash();
   }
 };
 
