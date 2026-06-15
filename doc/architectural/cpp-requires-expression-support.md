@@ -568,46 +568,54 @@ hand-minimised and bisected to a 7-line root cause (not cpp20-specific):
    This is grounded in [temp.class.spec.match]/2 (a partial specialization is
    used when its arguments can be deduced) — CBMC deduces but does not apply it.
 
-   **Status: open.** The fix touches partial-specialization selection /
-   instantiation (used pervasively), so it must be done carefully and gated on
-   the full suite; a too-broad change to the verification regresses other
-   partial-spec tests.  Minimal repros saved under `/tmp/red` during
-   investigation: `m3e.cpp` (the 7-line core above), `mdB.cpp` (a 36-line
-   `basic_string`-shaped reproduction through `__alloc_traits`/`rebind`).  When
-   fixed, both become CORE regression tests (the qualified-constraint cause
-   above is already guarded by `cpp20_concept_qualified_constraint`).
+   **Status: FIXED** (regression test
+   `regression/cbmc-cpp/template_partial_spec_nested_template_id`).  The fix
+   touches partial-specialization selection (used pervasively) and so was gated
+   on the full `cbmc-cpp` suite (all tests pass, 86 skipped).  Minimal repros
+   used during investigation: `m3e.cpp` (the 7-line core above), `mdB.cpp` (a
+   `basic_string`-shaped reproduction through `__alloc_traits`/`rebind`); both
+   now pass, and the `m3e` shape is the new CORE regression test.
 
-   **Deeper findings (2026-06, fix attempt).** The failure is
-   *context-dependent*, which narrows it from "partial-spec matching is broken"
-   to "instantiation during qualified-name resolution is broken":
-   - `base<holder<int>> obj; obj.field;` (object), `base<holder<int>>::cp x;`
-     inside a function body, and forcing a prior `base<holder<int>>` variable
-     all **work** — the partial specialization is selected and instantiated
-     (`ncomp` correct).  Only the namespace-scope qualified-name form
-     `typedef base<holder<int>>::cp X;` fails.
-   - Traced in `elaborate_class_template` (`cpp_instantiate_template.cpp`): in
-     the working contexts the partial-spec **verification re-typecheck**
-     (`typecheck_template_args` of the spec's argument pattern) succeeds; in the
-     failing context it throws a silent `throw 0` (deduction itself has already
-     succeeded — `guessed_args.has_unassigned()` is false).
-   - Even making the verification throw non-fatal (selecting the spec on the
-     successful deduction, per [temp.class.spec.match]/2) does **not** fix it:
-     the subsequent `instantiate_template(spec)` is entered with no unassigned
-     arguments but **also throws** while elaborating the specialization body,
-     leaving `base<holder<int>>` complete-but-empty (cached), so the member
-     typedef is still absent.
-   - So *two* layers throw in the qualified-name-resolution context that do not
-     throw when the same type is named in a declaration; the root is how
-     instantiation is driven during qualified-name resolution for a
-     nested-template-id key, not the partial-spec matcher.  Three targeted
-     attempts (substitute the deduced args into the pattern before
-     verification; instantiate the class-template-id actual arguments up front;
-     trust the successful deduction) were each insufficient on their own and
-     were reverted.  The next step is to make qualified-name resolution of
-     `T<args>::member` instantiate `T<args>` the same way a declaration of the
-     type does (a fuller instantiation than the current
-     `elaborate_class_template` call in `cpp_typecheck_resolve.cpp`), rather
-     than patching the verification.
+   **Root cause (resolved).** The failure was *context-dependent*:
+   - `base<holder<int>> obj;` (object declaration), `base<holder<int>>::cp x;`
+     inside a function body, and a forced prior `base<holder<int>>` variable all
+     **worked**; only the namespace-scope qualified-name form
+     `typedef base<holder<int>>::cp X;` failed.
+   - Instrumenting `elaborate_class_template` showed the decisive difference is
+     the **elaboration of the nested template-id argument** `holder<int>`.  A
+     type-naming declaration of `base<holder<int>>` resolves the full type and
+     elaborates `holder<int>` to completion as a side effect; the qualified-name
+     path (`cpp_typecheck_resolve.cpp`, the `::` handler that forms the `base`
+     tag and calls `elaborate_class_template`) reached partial-specialization
+     matching with `holder<int>` still incomplete.
+   - With `holder<int>` incomplete, matching `holder<T>` against it failed (the
+     verification re-typecheck threw), so `base<holder<int>>` fell back to the
+     body-less primary template and was cached as an empty (complete) class, so
+     `::cp` was unknown.  This violated [temp.spec.partial.match]/2 (deduction,
+     which succeeds, is the matching criterion) and [temp.spec.general]/7 (the
+     instantiation must be the same regardless of which context first required
+     it).
+
+   **Fix.** In `cpp_typecheckt::elaborate_class_template`
+   (`cpp_instantiate_template.cpp`), immediately before the partial-spec
+   matching loop and after `full_args_tc` is established, elaborate any template
+   *argument* that is itself an incomplete class-template instance
+   (`ID_struct_tag`/`ID_union_tag` with `template_class_instance` set and
+   `is_incomplete()`), inside a SFINAE-style `try/catch`.  This implements
+   [temp.inst]/2 (the argument's completeness affects the semantics of selecting
+   the specialization) at the point where the specialization is instantiated, so
+   the result is identical no matter which context first required it
+   ([temp.spec.general]/7) — rather than patching the verification or the
+   resolver.  Placing it *before* the matching loop (not inside the per-spec
+   verification, where an earlier attempt mistakenly put it) is what makes the
+   deduction-then-instantiation succeed.
+
+   **Remaining (separate) std::string causes.** With this fix, `std::string s;`
+   (default construction) elaborates and reaches BMC; `std::string s("ab")` and
+   copy-assignment still hit a *distinct* bug — `char[3]` → `basic_string`
+   conversion / constructor selection for a string-literal argument
+   (`CONVERSION ERROR: invalid implicit conversion from 'char [3]' to
+   'struct basic_string'`) — to be diagnosed separately.
 
 ### Landed this pass (commits)
 
