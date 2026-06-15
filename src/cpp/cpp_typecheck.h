@@ -595,6 +595,22 @@ protected:
   /// target is currently discarded.  See
   /// `doc/architectural/cpp-frontend-plan-target-type-threading.md`.
   void typecheck_expr_main(exprt &, const target_typet &);
+
+  /// C++20 [expr.prim.req.simple]: returns true iff \p op is a valid
+  /// expression for the current (substituted) requirement-parameters.  Any
+  /// failure -- including a typecheck error that is reported without throwing
+  /// (e.g. member access on a non-class type) -- is converted into a soft
+  /// `false` per [expr.prim.req.general]/5, and the error count is restored so
+  /// the enclosing translation unit is not failed.
+  bool requirement_expression_is_valid(exprt op);
+
+  /// C++20 [expr.prim.req.compound]/1: returns true iff the
+  /// compound-requirement \p expr (`{ E } noexcept_opt -> C_opt`) is
+  /// satisfied: \c E is a valid expression and, if a return-type-requirement
+  /// \c C is present, \c C is satisfied by `decltype((E))`.  Soft failure per
+  /// [expr.prim.req.general]/5.
+  bool compound_requirement_is_satisfied(const exprt &expr);
+
   void typecheck_expr_member(exprt &) override;
   void typecheck_expr_ptrmember(exprt &) override;
   void typecheck_expr_throw(exprt &);

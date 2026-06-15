@@ -65,6 +65,128 @@ void cpp_typecheckt::typecheck_expr_main(
   typecheck_expr_main(expr);
 }
 
+bool cpp_typecheckt::requirement_expression_is_valid(exprt op)
+{
+  // [expr.prim.req.general]/5: substitution into / semantic checking of a
+  // requirement that forms an invalid expression in the immediate context
+  // makes the requires-expression evaluate to false, not ill-formed.  Some
+  // typecheck paths report the failure by throwing (caught here); others emit
+  // a diagnostic and return without throwing (e.g. member access on a
+  // non-class type).  Capture and restore the error count so that either kind
+  // of failure becomes a soft `false` and does not fail the translation unit.
+  const std::size_t errors_before =
+    get_message_handler().get_message_count(messaget::M_ERROR);
+  bool valid = true;
+  try
+  {
+    sfinae_contextt sfinae_guard{*this};
+    typecheck_expr(op);
+  }
+  catch(...)
+  {
+    valid = false;
+  }
+  if(
+    get_message_handler().get_message_count(messaget::M_ERROR) != errors_before)
+    valid = false;
+  get_message_handler().set_message_count(messaget::M_ERROR, errors_before);
+  return valid;
+}
+
+bool cpp_typecheckt::compound_requirement_is_satisfied(const exprt &expr)
+{
+  const std::size_t errors_before =
+    get_message_handler().get_message_count(messaget::M_ERROR);
+  bool satisfied = true;
+  try
+  {
+    sfinae_contextt sfinae_guard{*this};
+    exprt op = to_unary_expr(expr).op();
+    typecheck_expr(op);
+
+    const irept &constraint = expr.find("#constraint");
+    if(constraint.is_not_nil())
+    {
+      // [expr.prim.req.compound]/1: the return-type-requirement names a
+      // type-constraint C; the requirement is satisfied only if
+      // C<decltype((E))> is satisfied.  decltype((E)) uses the
+      // parenthesised form: an lvalue E yields an lvalue-reference type
+      // ([dcl.type.decltype]/1).
+      typet result_type = op.type();
+      if(op.get_bool(ID_C_lvalue))
+        result_type = reference_type(result_type);
+
+      irep_idt concept_name;
+      const irept *constraint_args = nullptr;
+      for(const auto &sub : constraint.get_sub())
+      {
+        if(sub.id() == ID_name)
+          concept_name = sub.get(ID_identifier);
+        else if(sub.id() == ID_template_args)
+          constraint_args = &sub;
+      }
+
+      if(!concept_name.empty())
+      {
+        const auto cids = cpp_scopes.current_scope().lookup(
+          concept_name, cpp_scopet::RECURSIVE);
+        bool evaluated = false;
+        for(const auto *cid : cids)
+        {
+          const auto *csym = symbol_table.lookup(cid->identifier);
+          if(!csym || !csym->type.get_bool(ID_is_template))
+            continue;
+          const auto &cd = to_cpp_declaration(csym->type);
+          if(cd.declarators().empty())
+            continue;
+          exprt cbody = cd.declarators()[0].value();
+          if(cbody.is_nil())
+            continue;
+          // Build C's argument list: decltype((E)) prepended to the explicit
+          // type-constraint arguments ([temp.names]/9, [expr.prim.req.compound]).
+          cpp_template_args_tct check_args;
+          exprt prepended{ID_type};
+          prepended.type() = result_type;
+          check_args.arguments().push_back(std::move(prepended));
+          if(constraint_args != nullptr)
+          {
+            const irept &args_sub = constraint_args->find(ID_arguments);
+            for(const auto &a : args_sub.get_sub())
+            {
+              exprt arg_copy = static_cast<const exprt &>(a);
+              typecheck_type(arg_copy.type());
+              check_args.arguments().push_back(std::move(arg_copy));
+            }
+          }
+          template_mapt cmap;
+          cmap.build(cd.template_type(), check_args);
+          cmap.apply(cbody);
+          // Evaluate C's body recursively through typecheck_expr so nested
+          // requirements / concept-ids resolve via the same machinery.
+          typecheck_expr(cbody);
+          simplify(cbody, *this);
+          if(!cbody.is_true())
+            satisfied = false;
+          evaluated = true;
+          break;
+        }
+        // If the named concept could not be resolved at all, fall back to the
+        // validity of E (already established above): do not spuriously fail.
+        (void)evaluated;
+      }
+    }
+  }
+  catch(...)
+  {
+    satisfied = false;
+  }
+  if(
+    get_message_handler().get_message_count(messaget::M_ERROR) != errors_before)
+    satisfied = false;
+  get_message_handler().set_message_count(messaget::M_ERROR, errors_before);
+  return satisfied;
+}
+
 /// Called after the operands are done
 void cpp_typecheckt::typecheck_expr_main(exprt &expr)
 {
@@ -92,6 +214,45 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     typet &t = static_cast<typet &>(expr.add(ID_type_arg));
     typecheck_type(t);
     expr = typecast_exprt{true_exprt(), c_bool_type()};
+  }
+  else if(expr.id() == "simple_requirement")
+  {
+    // [expr.prim.req.simple]/1: a simple-requirement is satisfied iff the
+    // expression is valid.  [expr.prim.req.general]/5: an invalid expression
+    // in the immediate context makes the requires-expression evaluate to
+    // false, not ill-formed.  requirement_expression_is_valid converts any
+    // failure (including errors that do not throw, e.g. member access on a
+    // non-class type) into a soft `false`.
+    bool satisfied;
+    if(expr.operands().size() == 1)
+      satisfied = requirement_expression_is_valid(to_unary_expr(expr).op());
+    else
+      // Defensive: a malformed/empty requirement node (can arise from a
+      // requirement form the parser did not fully model, seen in the deep
+      // <ranges> concept chain).  Do not abort on it (to_unary_expr would
+      // trip an invariant); treat the unmodelled requirement as satisfied so
+      // it neither crashes nor spuriously fails the concept.
+      satisfied = true;
+    expr = typecast_exprt{
+      satisfied ? static_cast<exprt>(true_exprt())
+                : static_cast<exprt>(false_exprt()),
+      c_bool_type()};
+  }
+  else if(expr.id() == "compound_requirement")
+  {
+    // [expr.prim.req.compound]/1: { E } -> C is satisfied iff E is a valid
+    // expression and, when the return-type-requirement C is present,
+    // C<decltype((E))> is satisfied.  Substitution failure in the immediate
+    // context is a soft failure ([expr.prim.req.general]/5).
+    bool satisfied;
+    if(expr.operands().size() == 1)
+      satisfied = compound_requirement_is_satisfied(expr);
+    else
+      satisfied = true; // defensive: see simple_requirement above
+    expr = typecast_exprt{
+      satisfied ? static_cast<exprt>(true_exprt())
+                : static_cast<exprt>(false_exprt()),
+      c_bool_type()};
   }
   else if(expr.id() == "concept_check")
   {
