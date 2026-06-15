@@ -239,3 +239,126 @@ implementation; the per-requirement semantics are already written and cited.
   range adaptors).
 - The cpp20/23 `std::string` BMC-performance work (§7), which is downstream and
   independent of the front-end concept evaluation delivered here.
+
+---
+
+## 9. Implementation findings (2026-06, first pass)
+
+A first implementation pass refined the gap analysis and is recorded here so
+the next pass starts from facts rather than re-derivation. No source change was
+kept (the tree is at the §-8 baseline); the findings below are the deliverable
+of this pass.
+
+### What already works vs. fails (clean baseline, `--cpp20`)
+
+Minimal user-level probes (no STL):
+
+| probe | construct | result |
+|---|---|---|
+| type requirement | `requires { typename T::inner; }` via `static_assert` | **works** |
+| simple requirement | `requires(T a){ a + a; }` via `static_assert` | fails: `symbol 'a' is unknown` |
+| compound requirement | `requires(T a){ { ++a } -> SameAs<T&>; }` | fails: `symbol 'a' is unknown` |
+| concept-id as bool template arg | `cond<HasPlus<T>, …>` | fails: `symbol 'a' is unknown` |
+
+So `type_requirement` (no requirement-parameters) is fine; **every requirement
+that references a requirement-parameter fails uniformly with `symbol '<param>'
+is unknown`**, in *all* value contexts (`static_assert`, non-type bool template
+argument, etc.). The earlier belief that the template-argument context "worked"
+was a stale-binary reading; it does not.
+
+### Precise root cause
+
+The error is raised **while instantiating the concept** (the diagnostic is
+`instantiating 'HasPlus' with <signed int> … symbol 'a' is unknown`). A concept
+is a `constexpr bool` **variable template**; evaluating `HasPlus<int>`
+instantiates that variable template and type-checks its initializer (the
+requires-expression). At that point the requirement-parameter-list
+(`#requires_params`, e.g. `a`) is **not materialised into a scope/symbol**, so
+the requirement expressions that mention `a` fail name lookup.
+
+The existing requirement evaluator in `cpp_instantiate_template.cpp` (the
+partial-specialization-selection path) *does* materialise `#requires_params`
+before evaluating, which is why constraints attached to partial specializations
+work — but the **variable-template-body evaluation path does not**, and that is
+the path used for a concept-id used as a value.
+
+### What was tried, and the confirmed-working approach
+
+1. Added `simple_requirement` / `compound_requirement` handlers to
+   `typecheck_expr_main` (mirroring the existing `type_requirement` handler and
+   the partial-spec compound logic, SFINAE-guarded per [expr.prim.req.*]).
+   Necessary, but not sufficient alone: the parameters must first be in scope.
+2. Materialising `#requires_params` at the top of `typecheck_expr_main` did
+   **not** work — the parameters must be bound in the scope in which the
+   requirement sub-expressions are resolved during *variable-template
+   instantiation*, not the scope current at the requires-expression node.
+3. **Working approach (confirmed):** materialise `#requires_params` at the
+   **variable-template instantiation site** — binding each parameter as a
+   `requires_param::<name>` symbol in the instantiation `current_scope()`
+   immediately before `convert_non_template_declaration(new_decl)` converts the
+   concept body (the "Force elaboration during variable template body
+   processing" block in `cpp_instantiate_template.cpp`) — **combined with** the
+   `simple_requirement` handler from (1). With this, the user-level probes
+   behaved as:
+
+   | probe | result with (3) |
+   |---|---|
+   | `type_requirement` (`t_type`) | ✅ SUCCESSFUL |
+   | `simple_requirement` (`t_simple`) | ✅ SUCCESSFUL (was `symbol 'a' unknown`) |
+   | concept-id as bool template arg (`t_condarg`) | ✅ SUCCESSFUL |
+   | `compound_requirement` `{++a}->SameAs<T&>` (`t_compound`) | ❌ wrongly `false` |
+   | concept that must be **false** (`t_false`) | ❌ CONVERSION ERROR (should be `false`) |
+
+   So simple requirements, type requirements, and concept-ids-as-values now
+   evaluate correctly. **Two correctness bugs remain and are load-bearing for
+   the iterator concepts:**
+   - **Compound requirements** with a return-type-requirement mis-evaluate (the
+     `{ E } -> C` return-type check returns `false` for a case that should be
+     `true`). The iterator concepts are full of these
+     (`{ i += n } -> same_as<I&>`), so this must be correct.
+   - **A requirement that is invalid for the argument must make the concept
+     evaluate to `false`, not raise an error.** `requires(int a){ a.foo(); }`
+     produced `member operator requires struct/union type … got 'signed int'`
+     (CONVERSION ERROR) instead of `false`. The SFINAE guard suppressed the
+     *message* in some paths but this member-access error escaped — the soft-
+     failure conversion of [expr.prim.req.general]/5 is not yet uniform.
+
+4. **A partial landing is unsafe.** Building with (3) regressed exactly one
+   existing test, `cpp20_ranges_basic`, from passing to an **invariant
+   violation / core dump**: once concept evaluation is switched on, ranges'
+   deep concept chain reaches a path the partial implementation does not handle
+   and trips a CBMC invariant. The change was therefore **reverted** — concept
+   evaluation must be completed end-to-end (correct compound requirements,
+   uniform soft-failure, and robustness across the full concept chain) before
+   it can land without regressing.
+
+### Recommended next step (precise)
+
+Land approach (3) but only together with the two fixes it exposed, validated
+bottom-up:
+- **Uniform soft-failure:** ensure *every* requirement-evaluation path converts
+  a substitution/semantic failure to `false` ([expr.prim.req.general]/5). The
+  `member operator requires struct/union type` error indicates a typecheck path
+  that emits/escapes rather than throwing-and-being-suppressed under
+  `sfinae_contextt`; route it (and similar member/operator-resolution errors)
+  through the SFINAE soft-failure path, or wrap the whole requires-expression
+  evaluation so any escape becomes `false`.
+- **Compound requirement return-type check:** debug the `{ E } -> C` path so
+  `decltype((E))` is formed correctly (value vs. lvalue → reference per
+  [expr.prim.req.compound]/1) and `C<decltype((E)), …>` is evaluated through the
+  same recursive concept evaluator (so nested `same_as`/`convertible_to`
+  resolve), rather than the ad-hoc inline check.
+- **Robustness:** guard the evaluator so an unhandled node/shape yields `false`
+  (or a clean soft failure) rather than tripping an invariant — this is what
+  `cpp20_ranges_basic` needs.
+
+Validate against the four probes, a hand-written `random_access_iterator`-shaped
+chain, and the full `cbmc-cpp` suite (especially `cpp20_*`) before touching the
+libstdc++ headers.
+
+### Standing caveat (unchanged)
+
+Even once concept evaluation works, the C++20 `constexpr`-heavy libstdc++
+`std::string` still timed out in BMC in the earlier experiment (§7). Front-end
+concept support is necessary but likely not sufficient for cpp20/23
+`std::string` to *verify*; budget the separate symex/`constexpr` work item.
