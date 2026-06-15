@@ -227,8 +227,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     if(expr.operands().size() == 1)
       satisfied = requirement_expression_is_valid(to_unary_expr(expr).op());
     else
-      // Defensive: a malformed/empty requirement node (can arise from a
-      // requirement form the parser did not fully model, seen in the deep
+      // Defensive: a malformed/empty requirement node (can arise from a      // requirement form the parser did not fully model, seen in the deep
       // <ranges> concept chain).  Do not abort on it (to_unary_expr would
       // trip an invariant); treat the unmodelled requirement as satisfied so
       // it neither crashes nor spuriously fails the concept.
@@ -5610,6 +5609,23 @@ void cpp_typecheckt::typecheck_expr(exprt &expr)
         op.type().make_nil();
       }
     }
+  }
+  else if(
+    expr.id() == "simple_requirement" || expr.id() == "compound_requirement" ||
+    expr.id() == "type_requirement")
+  {
+    // [expr.prim.req.general]/5 with [expr.prim.req.simple]/1,
+    // [expr.prim.req.compound]/1 and [expr.prim.req.type]/1: the
+    // sub-expression (or type) named by a requirement is checked for
+    // *validity* in the immediate context -- an invalid expression or type
+    // makes the enclosing requires-expression evaluate to false, it is not an
+    // ill-formed program.  It must therefore not be typechecked by the
+    // ordinary operand recursion below (which would emit a hard error for,
+    // e.g., `a + a` on a class type without operator+, before the requirement
+    // handler can soften it).  Dispatch straight to typecheck_expr_main, which
+    // evaluates the requirement under an sfinae_contextt and converts any
+    // failure to a soft `false`.
+    typecheck_expr_main(expr);
   }
   else
   {
