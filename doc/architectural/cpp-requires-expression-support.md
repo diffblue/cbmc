@@ -416,24 +416,55 @@ Guarded by the CORE test `cpp20_concept_requires_eval`.
    `__normal_iterator` now progresses well past the previous truncation point
    (see (3)).
 
-3. **Deep concept chain over class iterators (current blocker for
-   `std::string`).** With (2) the chain now evaluates much further: for
-   cpp20/23 `std::string`, `basic_string` instantiation drives
-   `reverse_iterator` → `iterator_traits` → `__cpp17_iterator` → `copyable` →
-   `movable` → `swappable` → `std::ranges::swap` (the `_Swap`
-   customization-point object and its `__adl_swap`) over `__normal_iterator`,
-   then still ends with the unchanged `char[3]` → `basic_string` conversion
-   error — i.e. the chain does not yet *complete*, so `basic_string` is still
-   truncated. Remaining chain work includes the customization-point objects
-   (`std::ranges::swap`/`__adl_swap`) and the rest of
-   `input/forward/bidirectional/random_access_iterator`, `same_as`,
-   `convertible_to`, `derived_from`, `totally_ordered`, `sized_sentinel_for`,
-   `ITER_CONCEPT`, `iter_difference_t`/`iter_reference_t`. Best built up with a
-   hand-written `random_access_iterator`-shaped chain over a class iterator
-   before the libstdc++ headers.
+3. **Deep concept chain over class iterators** — **resolved** for the concept
+   evaluation itself (commit: "bind requires-expression parameters for conjoined
+   requires-expressions"; CORE tests `cpp20_concept_conjunction_requires_params`
+   and `cpp20_concept_iterator_chain`). Root cause: a requires-expression that
+   is only a *conjunct* of a larger constraint-expression — the shape of
+   `std::assignable_from`, `std::movable`, `std::copyable`
+   (`<concept-id> && requires(params){...}`) — carries its `#requires_params`
+   on an inner node, but the instantiation-site materialisation only read the
+   *top-level* value, so the parameters were never bound and the
+   requires-expression evaluated to a spurious `false`
+   ([expr.prim.req.general]/2). Fix: materialise the parameter-list of *every*
+   requires-expression in the constraint-expression (visit the body), not just
+   one at the top. With this, `assignable_from` / `movable` / `copyable`,
+   `swappable`, and the full iterator hierarchy
+   (`input_or_output`/`input`/`forward`/`bidirectional`/`random_access_iterator`)
+   evaluate correctly over a user-defined class iterator — verified both true
+   and false. Confirmed working over: a hand-written random-access class
+   iterator; a faithful `__normal_iterator` mimic (namespace-scoped template
+   wrapping a pointer, with the `enable_if` SFINAE converting constructor and
+   `iterator_category` from `iterator_traits`); the `reverse_iterator<It>`
+   adaptor; and the incomplete-container member-typedef pattern
+   (`reverse_iterator<normal_iter<C*, Self>>` formed while `Self` is still being
+   defined, as in `basic_string`). A constrained `operator()` with a
+   *disjunctive* requires-clause (`requires A || B`, the `_Swap` CPO shape) also
+   evaluates correctly (true and false). So the deep concept chain is no longer
+   the blocker.
 
-4. **requires-clauses** (step 4 of §5) still only count constraints; not yet
-   evaluated.
+4. **Real cpp20/23 `std::string` still fails — but not due to a remaining
+   concept-evaluation gap.** `std::string s("ab")` still ends with
+   `invalid implicit conversion from 'char [3]' to 'struct basic_string'`,
+   i.e. `basic_string<char>` does not acquire its `const char*` constructor.
+   The instantiation trace runs the iterator-concept chain over
+   `__normal_iterator` (driven additionally by the eagerly-processed
+   `operator""s` literal operators for `char16_t`/`char32_t`) and reaches
+   `swappable` → `std::ranges::swap` → `__adl_swap` before the conversion error.
+   However, **none of the increasingly faithful standalone mimics reproduce the
+   failure** — `random_access_iterator` and `reverse_iterator` over a
+   namespace-scoped `__normal_iterator`-shaped template, the incomplete-container
+   member typedef, the SFINAE converting constructor, and the disjunctive
+   `operator()` requires-clause all evaluate correctly. This indicates the
+   remaining failure is an *emergent interaction* in the full libstdc++
+   `basic_string` elaboration (many headers, the explicit `char16/char32`
+   instantiations, the complete instantiation graph), not an isolable
+   front-end concept-evaluation bug. Reducing it needs a delta-debugged
+   reduction from the actual headers rather than further bottom-up mimics.
+
+5. **requires-clauses** (step 5 of §5) are still only counted in some contexts;
+   constrained `operator()` requires-clauses (incl. disjunctions) *are* now
+   evaluated for viability inside a requires-expression (see (3)).
 
 ### Landed this pass (commits)
 
@@ -444,8 +475,12 @@ Guarded by the CORE test `cpp20_concept_requires_eval`.
 - `cpp: soft-fail invalid requirement expressions on class/member operations`
   (intercept requirement nodes before operand recursion; class-operator and
   member-call requirements now evaluate `false` instead of erroring).
+- `cpp: bind requires-expression parameters for conjoined requires-expressions`
+  (materialise params for every requires-expression in the constraint, not just
+  the top-level — fixes assignable_from/movable/copyable and the iterator chain).
 - CORE tests `cpp20_concept_requires_eval`, `cpp20_concept_compound_requirement`,
-  `cpp20_concept_requirement_soft_failure`.
+  `cpp20_concept_requirement_soft_failure`,
+  `cpp20_concept_conjunction_requires_params`, `cpp20_concept_iterator_chain`.
 
 All gated by a green full `cbmc-cpp` suite (cpp20_ranges_basic no longer
 crashes).
