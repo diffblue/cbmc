@@ -484,10 +484,13 @@ void cpp_typecheckt::add_method_body(symbolt *_method_symbol)
           bool is_ctor = return_type.id() == ID_constructor;
           bool is_dtor = return_type.id() == ID_destructor;
           bool is_virtual = _method_symbol->type.get_bool(ID_C_is_virtual);
-          bool is_operator =
-            id2string(_method_symbol->base_name).find("operator") !=
-            std::string::npos;
-          if(!is_ctor && !is_dtor && !is_virtual && !is_operator)
+          // N5008 [temp.inst]/11: only a *virtual* member function may be
+          // implicitly instantiated when not required; every other member --
+          // including operators -- must wait until odr-used.  Operators are
+          // deferred here and pulled in on odr-use (operator syntax resolves
+          // to a call of the operator function, which the function-identifier
+          // hook / reachability scan in typecheck_method_bodies() picks up).
+          if(!is_ctor && !is_dtor && !is_virtual)
             defer = true;
         }
       }
