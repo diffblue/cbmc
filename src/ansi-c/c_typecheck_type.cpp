@@ -715,6 +715,10 @@ void c_typecheck_baset::typecheck_vector_type(typet &type)
   exprt size = static_cast<const exprt &>(type.find(ID_size));
   const source_locationt source_location = size.find_source_location();
 
+  // neon_vector_type gives the size as a lane count, whereas vector_size (and
+  // hence the default below) gives it in bytes.
+  const bool vector_size_is_lanes = type.get_bool(ID_C_vector_size_is_lanes);
+
   typecheck_expr(size);
 
   typet subtype = to_type_with_subtype(type).subtype();
@@ -776,15 +780,29 @@ void c_typecheck_baset::typecheck_vector_type(typet &type)
       << "type had size 0: '" << to_string(subtype) << "'";
   }
 
-  // adjust by width of base type
-  if(s % *sub_size != 0)
+  if(vector_size_is_lanes)
   {
-    throw errort().with_location(source_location)
-      << "vector size (" << s << ") expected to be multiple of base type size ("
-      << *sub_size << ")";
+    // As Clang does, only accept the sizes of the NEON registers.
+    if(s * *sub_size != 8 && s * *sub_size != 16)
+    {
+      throw errort().with_location(source_location)
+        << "Neon vector size must be 64 or 128 bits, but got "
+        << s * *sub_size * 8 << " bits (" << s << " lanes of " << *sub_size
+        << " bytes)";
+    }
   }
+  else
+  {
+    // adjust by width of base type
+    if(s % *sub_size != 0)
+    {
+      throw errort().with_location(source_location)
+        << "vector size (" << s
+        << ") expected to be multiple of base type size (" << *sub_size << ")";
+    }
 
-  s /= *sub_size;
+    s /= *sub_size;
+  }
 
   // produce the type with ID_vector
   vector_typet new_type(

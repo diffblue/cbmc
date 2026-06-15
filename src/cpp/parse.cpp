@@ -2232,25 +2232,29 @@ bool Parser::rGCCAttribute(typet &t)
     }
 
   case TOK_GCC_ATTRIBUTE_VECTOR_SIZE:
-    {
-      cpp_tokent tk2, tk3;
+  case TOK_GCC_ATTRIBUTE_NEON_VECTOR_TYPE:
+  {
+    cpp_tokent tk2, tk3;
 
-      if(lex.get_token(tk2)!='(')
-        return false;
+    if(lex.get_token(tk2) != '(')
+      return false;
 
-      exprt exp;
-      if(!rCommaExpression(exp))
-        return false;
+    exprt exp;
+    if(!rCommaExpression(exp))
+      return false;
 
-      if(lex.get_token(tk3)!=')')
-        return false;
+    if(lex.get_token(tk3) != ')')
+      return false;
 
-      type_with_subtypet attr(ID_frontend_vector, uninitialized_typet{});
-      attr.set(ID_size, exp);
-      attr.add_source_location()=exp.source_location();
-      merge_types(attr, t);
-      break;
-    }
+    type_with_subtypet attr(ID_frontend_vector, uninitialized_typet{});
+    attr.set(ID_size, exp);
+    // neon_vector_type gives the size as a lane count rather than in bytes
+    if(tk.kind == TOK_GCC_ATTRIBUTE_NEON_VECTOR_TYPE)
+      attr.set(ID_C_vector_size_is_lanes, true);
+    attr.add_source_location() = exp.source_location();
+    merge_types(attr, t);
+    break;
+  }
 
   case TOK_GCC_ATTRIBUTE_ALIGNED:
     {

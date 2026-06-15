@@ -196,6 +196,8 @@ void ansi_c_convert_typet::read_rec(const typet &type)
   {
     // note that this is not yet a vector_typet -- this is a size only
     vector_size = static_cast<const constant_exprt &>(type.find(ID_size));
+    // neon_vector_type gives the size as a lane count rather than in bytes
+    vector_size_is_lanes = type.get_bool(ID_C_vector_size_is_lanes);
   }
   else if(type.id()==ID_void)
   {
@@ -659,6 +661,8 @@ void ansi_c_convert_typet::build_type_with_subtype(typet &type) const
   {
     type_with_subtypet new_type(ID_frontend_vector, type);
     new_type.set(ID_size, vector_size);
+    if(vector_size_is_lanes)
+      new_type.set(ID_C_vector_size_is_lanes, true);
     new_type.add_source_location()=vector_size.source_location();
     type=new_type;
   }

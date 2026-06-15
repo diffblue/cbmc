@@ -1,0 +1,11 @@
+CORE gcc-only test-c++-front-end
+not_register_size.c
+
+^EXIT=1$
+^SIGNAL=0$
+error: Neon vector size must be 64 or 128 bits, but got 96 bits \(3 lanes of 4 bytes\)$
+^CONVERSION ERROR$
+--
+^warning: ignoring
+--
+Clang rejects neon_vector_type attributes that do not yield 64 or 128 bits.
