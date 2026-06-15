@@ -362,3 +362,57 @@ Even once concept evaluation works, the C++20 `constexpr`-heavy libstdc++
 `std::string` still timed out in BMC in the earlier experiment (§7). Front-end
 concept support is necessary but likely not sufficient for cpp20/23
 `std::string` to *verify*; budget the separate symex/`constexpr` work item.
+
+---
+
+## 10. Landed (2026-06, second pass)
+
+The second pass **landed** the value-context concept evaluation for the
+tractable requirement kinds, with no regressions (full `cbmc-cpp` suite green):
+
+- **Requirement-parameter materialisation** at the variable-template
+  instantiation site (`cpp_instantiate_template.cpp`, before
+  `convert_non_template_declaration` converts the concept body), per
+  [expr.prim.req.general]/4 — fixes the `symbol '<p>' is unknown` failure.
+- **`simple_requirement` / `compound_requirement` handlers** in
+  `typecheck_expr_main` (alongside the existing `type_requirement`), with
+  `requirement_expression_is_valid` / `compound_requirement_is_satisfied`
+  converting failures to a soft `false` ([expr.prim.req.general]/5) and
+  restoring the error count (so a non-throwing diagnostic does not fail the TU).
+- **Robustness guard** against a malformed (non-unary) requirement node, so an
+  unmodelled requirement form no longer trips the `to_unary_expr` invariant —
+  this is what previously **aborted `cpp20_ranges_basic`**; it now passes.
+
+Now working: simple-requirements, type-requirements, and concept-ids used as
+values (`static_assert`, non-type bool template argument, `if constexpr`).
+Guarded by the CORE test `cpp20_concept_requires_eval`.
+
+### Remaining blockers (precise)
+
+1. **Compound-requirement return-type check** (`{ E } -> C`) is **blocked on
+   value-category tracking**. `decltype((E))` must be an lvalue-reference when
+   `E` is an lvalue ([dcl.type.decltype]/1, [expr.prim.req.compound]/1), but
+   CBMC does not flag `++a` (and other lvalue-yielding forms) as an lvalue —
+   `c_typecheck_baset::typecheck_expr_side_effect` sets the type of
+   pre-increment/decrement but not `ID_C_lvalue`. Per [expr.pre.incr]/1
+   pre-increment yields an lvalue (C++ only; in C it does not, so the fix must
+   be C++-specific). The iterator concepts need correct value categories for
+   `++i`/`--i` (lvalue), `i += n`/`i -= n` (lvalue), `i++`/`i--` (prvalue),
+   `j + n` (prvalue), `j[n]` (lvalue) before `same_as<decltype((E)), …>`
+   resolves correctly. This is a focused but cross-cutting value-category audit.
+2. **Member-call / parser-divergent requirements**: `requires(T a){ a.foo(); }`
+   does not reach the `simple_requirement` handler — the hand-rolled
+   requires-expression parser (`parse.cpp` ~9880) routes some forms (notably
+   member access) through a different path that type-checks eagerly and lets
+   the error escape (`member operator requires struct/union type`). Hardening
+   the parser to emit a clean `simple_requirement` node for every
+   simple-requirement form (and removing the "skip unknown requirement"
+   silent-drop) is required for uniform soft-failure (step 3 of §5).
+3. **requires-clauses** (step 4 of §5) still only count constraints; not yet
+   evaluated.
+
+### Standing caveat (unchanged)
+
+Even with full concept evaluation, the C++20 `constexpr`-heavy libstdc++
+`std::string` still timed out in BMC (§7); a separate symex/`constexpr` work
+item is expected before cpp20/23 `std::string` *verifies*.
