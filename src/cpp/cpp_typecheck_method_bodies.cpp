@@ -354,9 +354,44 @@ void cpp_typecheckt::typecheck_method_bodies()
     }
 
     std::vector<irep_idt> to_emit;
+
+    // [class.dtor]/12: a destructor is *potentially invoked* when an object of
+    // its class is created (e.g. at the end of a block or full-expression for
+    // an automatic or temporary object).  Destructor calls for such objects
+    // are synthesised later, during goto-conversion, so they are not visible
+    // as references in the type-checked bodies scanned above.  Recover that
+    // odr-use from the type system: a class's destructor is required exactly
+    // when the class is constructed, i.e. when one of its constructors is
+    // odr-used.  Collect the classes whose constructors are referenced.
+    std::set<irep_idt> constructed_classes;
+    for(const irep_idt &r : referenced)
+    {
+      const symbolt *rs = symbol_table.lookup(r);
+      if(
+        rs != nullptr && rs->type.id() == ID_code &&
+        to_code_type(rs->type).return_type().id() == ID_constructor)
+      {
+        const irep_idt cls = rs->type.get(ID_C_member_name);
+        if(!cls.empty())
+          constructed_classes.insert(cls);
+      }
+    }
+
     for(const auto &d : deferred_method_bodies)
     {
-      if(referenced.count(d.first))
+      bool required = referenced.count(d.first) != 0;
+      if(!required)
+      {
+        // A deferred destructor of a constructed class is potentially
+        // invoked and must be instantiated ([class.dtor]/12, [temp.inst]/4).
+        const symbolt *ds = symbol_table.lookup(d.first);
+        if(
+          ds != nullptr && ds->type.id() == ID_code &&
+          to_code_type(ds->type).return_type().id() == ID_destructor &&
+          constructed_classes.count(ds->type.get(ID_C_member_name)) != 0)
+          required = true;
+      }
+      if(required)
         to_emit.push_back(d.first);
     }
 
@@ -479,18 +514,18 @@ void cpp_typecheckt::add_method_body(symbolt *_method_symbol)
           class_sym->type.find(ID_C_template_arguments).is_not_nil();
         if(is_template_instance)
         {
-          const auto &return_type =
-            to_code_type(_method_symbol->type).return_type();
-          bool is_ctor = return_type.id() == ID_constructor;
-          bool is_dtor = return_type.id() == ID_destructor;
+          // N5008 [temp.inst]/11: "an implementation shall not implicitly
+          // instantiate ... a non-virtual member function ... unless such
+          // instantiation is required."  Only *virtual* members are the
+          // permitted-eager carve-out (second sentence of /11); every other
+          // member -- ordinary methods, operators and the special members
+          // (constructors, destructors, assignment) -- is deferred and pulled
+          // in only when odr-used.  Constructor odr-use is visible as a call
+          // in the type-checked body; destructor odr-use for automatic and
+          // temporary objects is recovered in typecheck_method_bodies() from
+          // the constructed-class set ([class.dtor]/12).
           bool is_virtual = _method_symbol->type.get_bool(ID_C_is_virtual);
-          // N5008 [temp.inst]/11: only a *virtual* member function may be
-          // implicitly instantiated when not required; every other member --
-          // including operators -- must wait until odr-used.  Operators are
-          // deferred here and pulled in on odr-use (operator syntax resolves
-          // to a call of the operator function, which the function-identifier
-          // hook / reachability scan in typecheck_method_bodies() picks up).
-          if(!is_ctor && !is_dtor && !is_virtual)
+          if(!is_virtual)
             defer = true;
         }
       }
