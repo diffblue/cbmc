@@ -527,6 +527,56 @@ the trigger is more specific (template instance, constexpr constructor, or
 list-init constructor matching) and needs its own delta-debugged reduction.
 Each remaining manifestation is a separate reduction+fix unit.
 
+## 12. Reduction campaign, second cause: partial-spec member access (open)
+
+Continuing the campaign, the `member designator index N out of bounds` (the
+`char16_t`/`char32_t` `operator""s`) manifestation was delta-debugged with the
+same `cvise` + g++-validity pipeline to a minimal **g++-valid** repro, then
+hand-minimised and bisected to a 7-line root cause (not cpp20-specific):
+
+   ```c++
+   template <typename> struct holder {};
+   template <typename> struct base;                       // primary: declared
+   template <typename T> struct base<holder<T>> { using cp = T; };   // partial spec
+   typedef base<holder<int>>::cp X;   // CBMC: "symbol 'X' is unknown"; g++: OK
+   X gv;
+   ```
+
+   This is the libstdc++ `allocator_traits<allocator<T>>` shape (a class-template
+   partial specialization keyed on a **nested class-template-id**).  CBMC fails
+   to use the partial specialization for `base<holder<int>>`, so the member
+   typedef `cp` is not found.  In `std::string` this is reached via
+   `__alloc_traits<...>::const_pointer` (the `const_iterator` member type): the
+   typedef fails to resolve, which truncates `basic_string`, drops its
+   constructor, makes it look like a POD/aggregate, and routes
+   `basic_string{ptr, len}` to aggregate initialisation → member-designator OOB.
+
+   **Mechanism, traced precisely** (`elaborate_class_template` /
+   `cpp_instantiate_template.cpp`):
+   1. Template-argument deduction for the partial specialization **succeeds** —
+      `holder<T>` is matched against `holder<int>`, `T = int`
+      (`guessed_args.has_unassigned()` is false).
+   2. The subsequent **verification re-typecheck** of the partial-spec argument
+      pattern — `typecheck_template_args(primary, [holder<T>])` — **throws**
+      (`sfinae_failed`), so the specialization is rejected (`continue`) and
+      `base<holder<int>>` silently falls back to the **incomplete primary**
+      template, which has no `cp`.  The throw occurs whether or not
+      `suppress_elaborate` is set, and even forcing `best_match` to the
+      specialization on `sfinae_failed` did not produce `cp`, so the failure is
+      deeper than the verification gate alone (the instantiation of the matched
+      specialization for a nested-template-id key is itself not completing).
+   This is grounded in [temp.class.spec.match]/2 (a partial specialization is
+   used when its arguments can be deduced) — CBMC deduces but does not apply it.
+
+   **Status: open.** The fix touches partial-specialization selection /
+   instantiation (used pervasively), so it must be done carefully and gated on
+   the full suite; a too-broad change to the verification regresses other
+   partial-spec tests.  Minimal repros saved under `/tmp/red` during
+   investigation: `m3e.cpp` (the 7-line core above), `mdB.cpp` (a 36-line
+   `basic_string`-shaped reproduction through `__alloc_traits`/`rebind`).  When
+   fixed, both become CORE regression tests (the qualified-constraint cause
+   above is already guarded by `cpp20_concept_qualified_constraint`).
+
 ### Landed this pass (commits)
 
 - `cpp: evaluate C++20 requires-expressions and concept-ids as constexpr bool`
