@@ -2421,23 +2421,15 @@ goto_check_ct::get_pointer_points_to_valid_memory_conditions(
 
   if(flags.is_dynamic_heap())
   {
-    const or_exprt object_bounds_violation(
-      object_lower_bound(address, nil_exprt()),
-      object_upper_bound(address, size));
-
     conditions.push_back(conditiont(
-      or_alloc(not_exprt(object_bounds_violation)),
+      or_alloc(object_in_bounds(address, size)),
       "pointer outside dynamic object bounds"));
   }
 
   if(unknown || flags.is_dynamic_local() || flags.is_static_lifetime())
   {
-    const or_exprt object_bounds_violation(
-      object_lower_bound(address, nil_exprt()),
-      object_upper_bound(address, size));
-
     conditions.push_back(conditiont(
-      or_alloc(not_exprt(object_bounds_violation)),
+      or_alloc(object_in_bounds(address, size)),
       "pointer outside object bounds"));
   }
 
