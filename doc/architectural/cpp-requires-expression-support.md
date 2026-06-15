@@ -466,6 +466,67 @@ Guarded by the CORE test `cpp20_concept_requires_eval`.
    constrained `operator()` requires-clauses (incl. disjunctions) *are* now
    evaluated for viability inside a requires-expression (see (3)).
 
+## 11. Delta-debugged reduction from `<string>` (2026-06, fourth pass)
+
+Rather than more bottom-up mimics (§10(4)), the cpp20 `std::string` failure was
+attacked by delta-debugging the preprocessed `<string>` translation unit with
+`cvise`, gated by an interestingness test that (a) requires `g++ -std=c++20
+-fsyntax-only` to *accept* the file — so every reduction step stays valid C++
+that g++ compiles but CBMC rejects — and (b) bans anonymous namespaces, which
+`clang_delta` introduces by stripping the `std` name and which expose an
+*unrelated* bug (CBMC fails to resolve a name declared in an unnamed namespace
+at the enclosing scope, `namespace { class A; } A a;` → "symbol 'A' is unknown",
+contrary to [namespace.unnamed]/1 — recorded here as a separate finding).
+
+This produced a 13-line g++-valid repro and pinned down a precise, faithful
+front-end bug, now **fixed** (commit "parse a qualified concept name as a
+template type-constraint"; CORE test `cpp20_concept_qualified_constraint`):
+
+   ```c++
+   namespace std {
+   namespace __detail { template<class _Tp> concept __dereferenceable = true; }
+   template<__detail::__dereferenceable _Tp> using iter_reference_t = _Tp;
+   template<class> struct basic_string {
+     iter_reference_t<int> m; basic_string(wchar_t*, long); };
+   basic_string<wchar_t> to_wstring();          // prior, declaration-context inst.
+   }
+   void op(){ std::basic_string<wchar_t>{&g_str, g_len}; }
+   ```
+
+   Root cause: a **qualified** concept name used as a type-constraint
+   (`__detail::__dereferenceable _Tp`, the libstdc++ `iter_reference_t` shape,
+   [temp.param]/4) was mis-parsed as a non-type parameter, because the parser
+   only fell back to the type-constraint path via a fragile heuristic (parameter
+   name reused as a type immediately after `>`), which fails for an alias
+   template. Instantiating the alias then failed ("expected expression, but got
+   type"); when the enclosing class was first instantiated in a
+   *declaration context* (a function signature), the failure truncated the
+   class and the truncated form was cached, so a later brace-construction fell
+   back to aggregate initialisation and went out of bounds. Fix: track concept
+   names and recognise a qualified concept constraint directly. Two essential
+   ingredients were confirmed by bisection (qualified-vs-unqualified concept;
+   with-vs-without the prior instantiation).
+
+   The fix removes the `expected expression, but got type` diagnostics from the
+   real `<string>` and is faithful to libstdc++ (`iter_reference_t` does use
+   `__detail::__dereferenceable`).
+
+### `std::string` is a multi-bug situation (current status)
+
+The qualified-constraint fix did **not** fully unblock `std::string`:
+`std::string s("ab")` still ends with the `char[3]` → `basic_string` conversion
+error, and the g++-preprocessed TU still shows `member designator index 13 out
+of bounds (struct has 13 components)` in the `char16_t`/`char32_t`
+`operator""s`. These are **distinct** remaining causes that share the
+truncation/aggregate-fallback symptom: brace-/paren-construction of
+`basic_string<...>` is treated as aggregate initialisation rather than resolving
+the `(const CharT*, size_type)` constructor (a class with user-declared
+constructors is not an aggregate, [dcl.init.aggr]/1), when that constructor is
+missing/unmatched. A simple base-class + constructor brace-init probe works, so
+the trigger is more specific (template instance, constexpr constructor, or
+list-init constructor matching) and needs its own delta-debugged reduction.
+Each remaining manifestation is a separate reduction+fix unit.
+
 ### Landed this pass (commits)
 
 - `cpp: evaluate C++20 requires-expressions and concept-ids as constexpr bool`
