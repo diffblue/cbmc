@@ -254,7 +254,22 @@ protected:
     const guardt &guard);
 
   goto_programt new_code;
-  typedef std::set<std::pair<exprt, exprt>> assertionst;
+  struct exprt_pair_hasht
+  {
+    std::size_t operator()(const std::pair<exprt, exprt> &p) const
+    {
+      return p.first.hash() ^ p.second.hash();
+    }
+  };
+  /// Dedup key is (src_expr, guarded_expr): two checks with distinct
+  /// source expressions but identical simplified guarded expressions
+  /// (e.g. both reducing to false_exprt) must remain distinct
+  /// assertions, otherwise we'd silently drop e.g. the int
+  /// division-by-zero check on `10 / 0` because an unrelated
+  /// conversion-overflow check at another line had already simplified
+  /// to false.
+  typedef std::unordered_set<std::pair<exprt, exprt>, exprt_pair_hasht>
+    assertionst;
   assertionst assertions;
 
   /// Remove all assertions containing the symbol in \p lhs as well as all
@@ -1781,7 +1796,7 @@ void goto_check_ct::add_guarded_property(
   // add the guard
   exprt guarded_expr = guard(simplified_expr);
 
-  if(assertions.insert(std::make_pair(src_expr, guarded_expr)).second)
+  if(assertions.insert({src_expr, guarded_expr}).second)
   {
     std::string source_expr_string;
     get_language_from_mode(mode)->from_expr(src_expr, source_expr_string, ns);
