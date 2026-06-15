@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^.*expected expression, but got type.*$
+^.*member designator index.*out of bounds.*$
+--
+C++20 qualified concept name as a template type-constraint
+([temp.param]/4, [temp.names]).  A constrained parameter
+`template <ns::Concept T>` (the libstdc++ iter_reference_t shape, where the
+concept lives in a nested namespace) must be parsed as a type-constraint, not as
+a non-type parameter of a qualified type.  Combined with a prior
+declaration-context instantiation of the enclosing class, the mis-parse
+truncated and cached the class, causing a downstream aggregate-init
+out-of-bounds.  See doc/architectural/cpp-requires-expression-support.md.
