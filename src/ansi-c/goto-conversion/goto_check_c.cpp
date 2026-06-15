@@ -1942,32 +1942,52 @@ bool goto_check_ct::check_rec_member(
   if(!enable_pointer_check)
     return true;
 
-  // we rewrite s->member into *(s+member_offset)
-  // to avoid requiring memory safety of the entire struct
+  // We split the checks into two groups:
+  // 1. Base pointer validity (NULL, invalid, deallocated, dead): these
+  //    depend only on the base pointer, not on which field is accessed.
+  //    By checking the base pointer directly, these checks are
+  //    deduplicated across different field accesses on the same pointer.
+  // 2. Bounds check: this depends on the field offset and size, so it
+  //    must use the offset pointer (s + member_offset).
+
+  const exprt &base_pointer = deref.pointer();
+
+  // Compute the size needed for the field access (offset + field size)
+  // to use as the size argument for the base pointer bounds check.
   auto member_offset_opt = member_offset_expr(member, ns);
 
-  if(member_offset_opt.has_value())
+  if(!member_offset_opt.has_value())
+    return false;
+
+  auto field_size_opt = size_of_expr(member.type(), ns);
+  if(!field_size_opt.has_value())
+    return false;
+
+  // Total size from base: offset + field_size
+  const exprt total_size = plus_exprt{
+    typecast_exprt::conditional_cast(member_offset_opt.value(), size_type()),
+    typecast_exprt::conditional_cast(field_size_opt.value(), size_type())};
+
+  // 1. Generate NULL/invalid/deallocated/dead checks on the BASE pointer.
+  //    Use total_size to ensure the object is large enough for this field.
+  //    These checks are identical across field accesses on the same pointer
+  //    (except for the bounds check which uses different sizes).
+  auto base_conditions =
+    get_pointer_dereferenceable_conditions(base_pointer, total_size);
+
+  for(const auto &c : base_conditions)
   {
-    pointer_typet new_pointer_type = to_pointer_type(deref.pointer().type());
-    new_pointer_type.base_type() = member.type();
-
-    const exprt char_pointer = typecast_exprt::conditional_cast(
-      deref.pointer(), pointer_type(char_type()));
-
-    const exprt new_address_casted = typecast_exprt::conditional_cast(
-      plus_exprt{
-        char_pointer,
-        typecast_exprt::conditional_cast(
-          member_offset_opt.value(), pointer_diff_type())},
-      new_pointer_type);
-
-    dereference_exprt new_deref{new_address_casted};
-    new_deref.add_source_location() = deref.source_location();
-    pointer_validity_check(new_deref, member, guard);
-
-    return true;
+    add_guarded_property(
+      c.assertion,
+      "dereference failure: " + c.description,
+      "pointer dereference",
+      true, // fatal
+      member.find_source_location(),
+      member,
+      guard);
   }
-  return false;
+
+  return true;
 }
 
 void goto_check_ct::check_rec_div(
