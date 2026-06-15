@@ -641,3 +641,90 @@ crashes).
 Even with full concept evaluation, the C++20 `constexpr`-heavy libstdc++
 `std::string` still timed out in BMC (§7); a separate symex/`constexpr` work
 item is expected before cpp20/23 `std::string` *verifies*.
+
+## 13. `std::string s("ab")` char-array conversion (open; root traced)
+
+After the §12 partial-spec fix landed, `std::string s;` (default construction)
+elaborates and reaches BMC, but `std::string s("ab")` (and `std::string s(p)`
+for a `const char *p`, and copy-assignment) still fail in the front end at
+**C++20 only** (C++11/14/17 all succeed):
+
+```
+invalid implicit conversion from 'const char *' to 'struct basic_string'
+CONVERSION ERROR
+```
+
+### Mechanism, traced precisely
+
+1. `std::string s(p)` is a local declaration -> `typecheck_decl` ->
+   `cpp_constructor(basic_string, [const char*])`.  `cpp_constructor` takes the
+   `cpp_is_pod(object_tc.type()) == true` branch and emits an **assignment**
+   `s = p`, which then calls `implicit_typecast(const char*, basic_string)` ->
+   no conversion -> fatal `CONVERSION ERROR`.  The correct path is the
+   non-POD struct branch (constructor overload resolution selecting
+   `basic_string(const char*)`).
+2. `cpp_is_pod(basic_string)` is `true` at C++20 because **`basic_string` is
+   truncated**: it elaborates to only its leading 13 *typedef* members
+   (`value_type` ... `iterator`, `const_iterator`) with **zero constructors /
+   methods**; at C++17 it has its full 191 components / 14 constructors.
+3. The body-elaboration loop in `typecheck_compound_body` stops exactly at the
+   member after `const_iterator`, namely
+   `typedef std::reverse_iterator<const_iterator> const_reverse_iterator;`.
+   Eagerly instantiating `reverse_iterator`'s definition at C++20 drives the
+   iterator-concept chain (`__cpp17_iterator` -> `copyable` -> `movable` ->
+   `swappable` / `assignable_from` -> `common_reference_with` ->
+   `common_reference` -> `__common_ref_impl` -> `__cond_res`), which **throws**,
+   and the unguarded member elaboration abandons the rest of the class body
+   (constructors included).  The same throw recurs for the sibling members
+   `reverse_iterator`, `rbegin`, `rend`, `crbegin`, `crend` (member functions
+   returning `reverse_iterator`), so it is not a single guardable point.
+
+### Confirmed root: `common_reference`/`__cond_res` substitution failure escapes its SFINAE boundary
+
+Instrumenting the ternary typecheck (`cpp_typecheck_expr.cpp`, the
+"types are incompatible" site) shows the `?:` operands are
+`__decay_t<const int&>` (i.e. `int`, the dereferenced/decayed `iter_value_t`)
+and `__normal_iterator` (the iterator itself).  So CBMC evaluates
+`common_reference<int, __normal_iterator>`, which **correctly** has no common
+reference -- `__common_ref_impl`'s `decltype(__cond_res<...>)` default template
+argument is a substitution failure ([temp.deduct]/8), and the `?:` raising
+`throw 0` is the right SFINAE signal.
+
+The bug is *containment*: this substitution failure is tolerated in most
+contexts (the working `cpp20_erase_if` baseline raises ~260 such failures and
+still verifies), but when it is reached through the **eager instantiation of
+`reverse_iterator` triggered by a member declaration** during `basic_string`
+body elaboration, the `throw 0` escapes the `__common_ref_impl` `decltype`
+immediate-context (SFINAE) boundary and aborts the enclosing class body.
+Separately, CBMC appears to mis-derive one `__cond_res` operand as the
+*dereferenced* `iter_value_t` (`int`) where the concept argument is the iterator
+type, so `common_reference<int, __normal_iterator>` is computed where the
+standard would compute `common_reference<const __normal_iterator&, const
+__normal_iterator&>`; this is what makes the `?:` fail in the first place.
+
+### What was tried (all reverted; none safe)
+
+- Skip / lazily-defer the failing *typedef* member during instantiation
+  ([temp.inst]/2: a member typedef declares the member but does not require the
+  aliased template's *definition*).  This fixes `std::string` but regresses
+  `cpp20_erase_if` / `cpp20_apple_libcxx_basic`: lazy deferral doubles the
+  `common_reference` instantiation work (re-resolution) -> BMC timeout, and
+  plain skip is whack-a-mole (the next member -- `rbegin` -- throws from
+  `typecheck_compound_declarator`, a different code path).
+- A `sfinae_contextt` immediate-context guard around the member-type
+  elaboration did not contain the `rbegin` declarator throw.
+
+### Recommended next step (precise)
+
+Fix the root rather than the symptom: (a) ensure CBMC derives the
+`common_reference`/`__cond_res` arguments from the concept's actual type
+arguments (the iterator), not the dereferenced `iter_value_t`, so the
+`?:` does not spuriously fail; and/or (b) make `__common_ref_impl`'s
+`decltype(__cond_res<...>)` default-argument evaluation a SFINAE
+immediate-context everywhere it is instantiated -- including when reached via
+eager class-template-id instantiation during member elaboration -- so the
+substitution failure is contained and `reverse_iterator` instantiates cleanly
+(the class is then never truncated and no per-member recovery is needed).
+Minimal probes: `/tmp/df/{s_direct,v_ptr,s_assign}.cpp`; the standing BMC
+out-of-memory/timeout caveat (§7) still applies even once the front end
+elaborates `std::string` fully.
