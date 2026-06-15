@@ -499,6 +499,21 @@ void goto_check_ct::invalidate(const exprt &lhs)
     invalidate(to_index_expr(lhs).array());
   else if(lhs.id() == ID_member)
     invalidate(to_member_expr(lhs).struct_op());
+  else if(lhs.id() == ID_dereference)
+  {
+    // Writing through a pointer (*p = ...) changes what p points to,
+    // but not p itself. Assertions that only check pointer validity
+    // (pointer_object, is_invalid_pointer, object_size on the pointer
+    // value) are not affected. Only assertions involving dereferences
+    // could be affected by aliasing.
+    for(auto it = assertions.begin(); it != assertions.end();)
+    {
+      if(has_subexpr(it->second, ID_dereference))
+        it = assertions.erase(it);
+      else
+        ++it;
+    }
+  }
   else if(lhs.id() == ID_symbol)
   {
     // clear all assertions about 'symbol'
