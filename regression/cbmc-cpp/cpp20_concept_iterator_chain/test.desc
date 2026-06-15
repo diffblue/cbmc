@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+C++20 iterator concepts evaluated over a user-defined *class* iterator: the deep
+concept chain random_access_iterator -> bidirectional -> forward -> input ->
+input_or_output_iterator, which descends through semiregular -> copyable ->
+movable -> swappable -> assignable_from and totally_ordered /
+sized_sentinel_for.  Depends on requirement-parameter binding for conjoined
+requires-expressions ([expr.prim.req.general]/2).  Includes the negative case
+(a non-incrementable type is not an iterator).  See
+doc/architectural/cpp-requires-expression-support.md.
