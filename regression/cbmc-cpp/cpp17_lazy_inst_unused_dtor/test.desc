@@ -1,0 +1,23 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+must never appear
+--
+N5008 [temp.inst]/11: a non-virtual destructor of a class template shall not
+be implicitly instantiated unless odr-used.  No S<int> object is created here
+(only the static member sval() is used), so ~S() is never odr-used and under
+full lazy instantiation its assertion "must never appear" should not enter the
+goto program.
+
+CBMC still instantiates destructors eagerly: deferring the special members
+(constructors/destructors) along with ordinary members and operators was
+attempted but destabilised container verification (e.g. std::vector / std::map
+runs diverged in BMC even though the goto program had fewer functions),
+pointing at a needed special member being instantiated with a divergent body
+under the lazy path.  Pending that investigation the forbidden message still
+appears, so this is KNOWNBUG.  Tracks the remaining [temp.inst]/11 work; see
+doc/architectural/cpp-extern-template-member-instantiation.md §13.

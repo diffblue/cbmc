@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+must never appear
+--
+N5008 [temp.inst]/11: a non-virtual member operator of a class template shall
+not be implicitly instantiated unless odr-used.  Under lazy on-odr-use
+instantiation the unused operator+ is never instantiated, so its assertion
+"must never appear" does not enter the goto program and the forbidden pattern
+must be absent.
+
+This became CORE once non-virtual operators were deferred together with
+ordinary member functions.  See
+doc/architectural/cpp-extern-template-member-instantiation.md §13.
