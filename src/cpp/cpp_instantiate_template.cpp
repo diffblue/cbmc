@@ -4446,6 +4446,50 @@ skip_pack_removal_ft:
     // so that nested type traits (e.g., is_nothrow_destructible<T>::value)
     // can be fully resolved.
     {
+      // C++20 [expr.prim.req.general]/4: if this variable template is a
+      // concept whose constraint-expression is a requires-expression, bind
+      // its requirement-parameter-list as local symbols in the current
+      // (instantiation) scope so the requirement sub-expressions that mention
+      // them resolve.  Without this, a concept like `requires(T a){ a + a; }`
+      // fails with `symbol 'a' is unknown` when its concept-id is evaluated as
+      // a value.  The parameters are notation only (no linkage/lifetime), so
+      // the marker is removed after binding.
+      exprt &init = new_decl.declarators()[0].value();
+      const irept &req_params = init.find("#requires_params");
+      if(req_params.is_not_nil() && !req_params.get_sub().empty())
+      {
+        for(const auto &param : req_params.get_sub())
+        {
+          const irep_idt pname = param.get(ID_name);
+          if(pname.empty())
+            continue;
+          typet ptype = static_cast<const typet &>(param.find(ID_type));
+          template_map.apply(ptype);
+          try
+          {
+            sfinae_contextt sfinae_guard{*this};
+            typecheck_type(ptype);
+          }
+          catch(...)
+          {
+          }
+          const irep_idt id = "requires_param::" + id2string(pname);
+          if(!symbol_table.has_symbol(id))
+          {
+            symbolt param_sym{id, ptype, ID_cpp};
+            param_sym.base_name = pname;
+            param_sym.is_lvalue = true;
+            symbol_table.add(param_sym);
+          }
+          else
+            symbol_table.get_writeable_ref(id).type = ptype;
+          cpp_idt &scope_id = cpp_scopes.current_scope().insert(pname);
+          scope_id.identifier = id;
+          scope_id.id_class = cpp_idt::id_classt::SYMBOL;
+        }
+        init.remove("#requires_params");
+      }
+
       bool old_suppress = suppress_elaborate;
       suppress_elaborate = false;
       convert_non_template_declaration(new_decl);
