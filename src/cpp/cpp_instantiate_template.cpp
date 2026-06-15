@@ -4446,18 +4446,28 @@ skip_pack_removal_ft:
     // so that nested type traits (e.g., is_nothrow_destructible<T>::value)
     // can be fully resolved.
     {
-      // C++20 [expr.prim.req.general]/4: if this variable template is a
-      // concept whose constraint-expression is a requires-expression, bind
-      // its requirement-parameter-list as local symbols in the current
-      // (instantiation) scope so the requirement sub-expressions that mention
-      // them resolve.  Without this, a concept like `requires(T a){ a + a; }`
-      // fails with `symbol 'a' is unknown` when its concept-id is evaluated as
-      // a value.  The parameters are notation only (no linkage/lifetime), so
-      // the marker is removed after binding.
+      // C++20 [expr.prim.req.general]/2 and /4: if this variable template is a
+      // concept one of whose constraint-expressions is a requires-expression,
+      // bind that requires-expression's requirement-parameter-list as local
+      // symbols in the current (instantiation) scope so the requirement
+      // sub-expressions that mention them resolve.  Without this, a concept
+      // like `requires(T a){ a + a; }` fails with `symbol 'a' is unknown` when
+      // its concept-id is evaluated as a value.  The parameters are notation
+      // only (no linkage/lifetime), so the marker is removed after binding.
+      //
+      // A requires-expression may be only a *conjunct* of a larger
+      // constraint-expression (e.g. `same_as<T,T> && requires(T a){...}`), in
+      // which case its `#requires_params` sits on an inner node rather than the
+      // top-level value.  Bind the parameters of every requires-expression in
+      // the body, not just one at the top, so conjoined requires-expressions
+      // (as in std::assignable_from, std::swappable, ...) resolve their
+      // parameters too.
       exprt &init = new_decl.declarators()[0].value();
-      const irept &req_params = init.find("#requires_params");
-      if(req_params.is_not_nil() && !req_params.get_sub().empty())
+      const auto bind_requires_params = [&](exprt &node)
       {
+        const irept &req_params = node.find("#requires_params");
+        if(req_params.is_nil() || req_params.get_sub().empty())
+          return;
         for(const auto &param : req_params.get_sub())
         {
           const irep_idt pname = param.get(ID_name);
@@ -4487,8 +4497,12 @@ skip_pack_removal_ft:
           scope_id.identifier = id;
           scope_id.id_class = cpp_idt::id_classt::SYMBOL;
         }
-        init.remove("#requires_params");
-      }
+        node.remove("#requires_params");
+      };
+      // Top-level requires-expression (whole concept body), then any
+      // requires-expressions nested as conjuncts of the constraint-expression.
+      bind_requires_params(init);
+      init.visit_pre(bind_requires_params);
 
       bool old_suppress = suppress_elaborate;
       suppress_elaborate = false;
