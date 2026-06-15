@@ -389,27 +389,57 @@ Guarded by the CORE test `cpp20_concept_requires_eval`.
 
 ### Remaining blockers (precise)
 
-1. **Compound-requirement return-type check** (`{ E } -> C`) is **blocked on
-   value-category tracking**. `decltype((E))` must be an lvalue-reference when
-   `E` is an lvalue ([dcl.type.decltype]/1, [expr.prim.req.compound]/1), but
-   CBMC does not flag `++a` (and other lvalue-yielding forms) as an lvalue —
-   `c_typecheck_baset::typecheck_expr_side_effect` sets the type of
-   pre-increment/decrement but not `ID_C_lvalue`. Per [expr.pre.incr]/1
-   pre-increment yields an lvalue (C++ only; in C it does not, so the fix must
-   be C++-specific). The iterator concepts need correct value categories for
-   `++i`/`--i` (lvalue), `i += n`/`i -= n` (lvalue), `i++`/`i--` (prvalue),
-   `j + n` (prvalue), `j[n]` (lvalue) before `same_as<decltype((E)), …>`
-   resolves correctly. This is a focused but cross-cutting value-category audit.
-2. **Member-call / parser-divergent requirements**: `requires(T a){ a.foo(); }`
-   does not reach the `simple_requirement` handler — the hand-rolled
-   requires-expression parser (`parse.cpp` ~9880) routes some forms (notably
-   member access) through a different path that type-checks eagerly and lets
-   the error escape (`member operator requires struct/union type`). Hardening
-   the parser to emit a clean `simple_requirement` node for every
-   simple-requirement form (and removing the "skip unknown requirement"
-   silent-drop) is required for uniform soft-failure (step 3 of §5).
-3. **requires-clauses** (step 4 of §5) still only count constraints; not yet
+1. **Compound-requirement return-type check** — **resolved** (commit:
+   "pre-increment/decrement of arithmetic/pointer lvalue is an lvalue (C++)").
+   `decltype((++a))` is now an lvalue-reference per [expr.pre.incr]/1, so
+   `{ ++a } -> same_as<T&>` evaluates correctly (CORE test
+   `cpp20_concept_compound_requirement`). The value-category fix currently
+   covers pre-increment/decrement of arithmetic/pointer operands; other
+   lvalue-yielding forms over **builtin** types (`i += n`, `j[n]`) should be
+   audited similarly if a concept needs them, but `same_as<decltype((E)), …>`
+   for the common forms now resolves.
+
+2. **Class-type operator / member-call requirements must soft-fail to `false`
+   (the gateway to `std::string`).** A requirement whose expression uses an
+   *overloaded* operator or member on a class type — `requires(T a){ a + a; }`
+   for a class without `operator+`, or `requires(T a){ a.foo(); }` — does **not**
+   reach the `simple_requirement` handler: the error (`implicit arithmetic
+   conversion not permitted`, `member operator requires struct/union type`)
+   escapes *before* the handler, so the concept errors instead of evaluating
+   `false`. Builtin-operator requirements over arithmetic types already
+   soft-fail correctly (CORE test `cpp20_concept_requires_eval`). This is the
+   key blocker for `std::string`: its `iterator_concept` evaluates
+   `random_access_iterator<__normal_iterator<char*, …>>` — a **class** iterator
+   whose requirements use overloaded operators — so until class-type operator
+   requirements soft-fail, `basic_string<char>` still truncates and
+   `std::string` construction fails at cpp20/23 (the `char[3]` → `basic_string`
+   error is unchanged). Fix: route operator/member resolution performed while
+   evaluating a requirement expression through SFINAE soft-failure (or wrap the
+   whole requires-expression evaluation so any escape becomes `false`), and/or
+   harden the parser (`parse.cpp` ~9880) to emit a clean `simple_requirement`
+   node for these forms instead of resolving them eagerly.
+
+3. **Deep concept chain over class iterators.** Even with (2), evaluating
+   `random_access_iterator` over `__normal_iterator` exercises a deep chain
+   (`input/forward/bidirectional_iterator`, `same_as`, `convertible_to`,
+   `derived_from`, `totally_ordered`, `sized_sentinel_for`, `ITER_CONCEPT`,
+   `iter_difference_t`/`iter_reference_t`). Each must evaluate correctly; this
+   should be built up with a hand-written `random_access_iterator`-shaped chain
+   over a class iterator before turning to the libstdc++ headers.
+
+4. **requires-clauses** (step 4 of §5) still only count constraints; not yet
    evaluated.
+
+### Landed this pass (commits)
+
+- `cpp: evaluate C++20 requires-expressions and concept-ids as constexpr bool`
+  (materialisation + simple/compound handlers + robustness guard).
+- `cpp: pre-increment/decrement of arithmetic/pointer lvalue is an lvalue (C++)`
+  (compound return-type value-category).
+- CORE tests `cpp20_concept_requires_eval`, `cpp20_concept_compound_requirement`.
+
+All gated by a green full `cbmc-cpp` suite (cpp20_ranges_basic no longer
+crashes).
 
 ### Standing caveat (unchanged)
 
