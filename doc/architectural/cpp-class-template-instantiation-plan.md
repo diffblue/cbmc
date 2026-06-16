@@ -270,13 +270,37 @@ Each step is independently testable; acceptance criteria reference the tests.
    to those two tests.  With the blanket lazy un-truncation the full `cbmc-cpp`
    suite no longer completes (timed out mid-run at `cpp20_map_basic`): every
    container test whose class has a `reverse_iterator` member typedef
-   un-truncates and its full header machinery is symexed.  So the blanket
-   un-truncation is **not viable** even with performance treated as second-tier:
-   the suite becomes untestable, not merely slower on a couple of tests.  It was
-   reverted; only the conformance KNOWNBUG `cpp20_string_construct_charptr` (which
-   documents the goal and the diagnosis) was kept.
+   un-truncates and its full header machinery is symexed.
 
-   **Conformant-AND-tractable approach (the way forward).** Per [temp.inst]/2,
+   **Resolved: the un-truncation is correct and was re-landed** (commits
+   `976bf25ea4` + `81cae27a21`).  A per-test-timeout suite run identified the
+   *exact* set affected -- only **4** tests (`cpp20_vector_basic`,
+   `cpp20_map_basic`, `cpp20_erase_if`, `cpp20_apple_libcxx_basic`), not the
+   whole suite (the earlier "untestable" impression was an artifact of running
+   with no per-test timeout, so one hung test blocked the rest).  Crucially, all
+   four were **unsound** before: with the truncated container symex executed
+   **zero** instructions of the real container, so the properties were vacuous --
+   `cpp20_erase_if` reports VERIFICATION SUCCESSFUL even for
+   `__CPROVER_assert(v.size() == 999)`.  And the now-executed code is exactly
+   what `g++ -O0` emits for the same program (diffed: the 99 `vector`/iterator/
+   allocator/algorithm template instantiations).  So un-truncation is both
+   **conformant** *and* **restores soundness**; the four tests were reclassified
+   to KNOWNBUG as a second-tier **verification-performance** matter (they return
+   to CORE once symex is tractable on real libstdc++ containers), and the suite
+   is green again.
+
+   **Why symex diverges on the real containers (measured, not loops).** With
+   `--unwind 1` the affected test still does not finish, and `--verbosity 10`
+   shows symex never reaches the equation/SAT phase: it is stuck *inside* symex.
+   "depth N" in the trace is the symex *step* count, and it is only ~495 after
+   90s -- i.e. ~5 steps/second.  So it is **pathologically slow per step**, not
+   loop-unwinding, recursion, or function-pointer fan-out (the only
+   function-pointer sites resolve to 0 targets).  The steps are genuine
+   libstdc++ code (`stl_vector.h`, `vector.tcc`, `stl_algobase.h`,
+   `stl_iterator.h`).  Finding and fixing that per-step cost is the second-tier
+   work item (profiling under way).
+
+   **(Historical) Conformant-AND-tractable approach considered.** Per [temp.inst]/2,
    implicitly instantiating a class template instantiates its member
    *declarations*, not the *definitions* of the entities they name (definitions
    are instantiated on ODR-use).  The conformant front end therefore needs the
