@@ -1599,6 +1599,49 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
             continue;
           }
         }
+        else if(is_typedef)
+        {
+          // Per [temp.inst]/1-2 and [dcl.typedef]: a member typedef
+          // aliasing a class-template-id (e.g.
+          // `typedef std::reverse_iterator<const_iterator>
+          //  const_reverse_iterator;` in libstdc++ `basic_string`)
+          // declares the member and forms the aliased type, but does
+          // not require that template's *definition* to be instantiated
+          // -- a typedef-name may denote an incomplete type.  Eagerly
+          // instantiating the definition here can throw (at C++20 the
+          // iterator-concept chain reached through `reverse_iterator`'s
+          // body does); an unguarded failure abandons the rest of the
+          // class body, dropping every later member including the
+          // constructors.  The class is then non-conformantly
+          // misclassified as a POD ([class.prop]: a class with
+          // user-declared constructors is not a POD), so e.g.
+          // `std::string s("ab")` is routed to a bogus `char[]` ->
+          // `basic_string` conversion instead of a constructor call.
+          //
+          // Recover by keeping the unresolved alias (a lazy typedef)
+          // rather than dropping it: a plain skip would leave later
+          // members that name the alias (e.g.
+          // `const_reverse_iterator rbegin() const;`) dangling and throw
+          // again, re-truncating the class.  Keeping the name lets the
+          // body -- and the constructors -- complete, so the class is
+          // conformantly non-POD with its full member set.  (The
+          // aliased template's definition is still instantiated later,
+          // on demand, when its completeness is actually required.)
+          const std::size_t errors_before =
+            get_message_handler().get_message_count(messaget::M_ERROR);
+          const typet saved_member_type = declaration.type();
+          try
+          {
+            typecheck_type(declaration.type());
+          }
+          catch(...)
+          {
+            get_message_handler().set_message_count(
+              messaget::M_ERROR, errors_before);
+            declaration.type() = saved_member_type; // keep unresolved alias
+            kept_unresolved_cpp_name = true;
+          }
+        }
         else
         {
           typecheck_type(declaration.type());
