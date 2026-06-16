@@ -169,6 +169,39 @@ Each step is independently testable; acceptance criteria reference the tests.
    same containment that already holds in the function-body / variable contexts.
    Acceptance: `cpp20_vector_iterator_namespace_typedef` flips to CORE.
 
+   **Course-correction (2026-06, investigated):** the
+   `cpp20_vector_iterator_namespace_typedef` divergence, on closer analysis, is
+   **orthogonal to the `std::string s("ab")` goal**.  gdb/instrumentation shows
+   the namespace alias `It` is created with a *deferred* underlying type;
+   `vector<int>` is instantiated only when `It` is *used* (`sizeof(It)` in
+   `main`, attributed to line 3), and the failure is specific to resolving a
+   *namespace-scope* type alias's underlying type at its point of use (the
+   identical alias declared *locally* in a function resolves eagerly and works).
+   The goal, by contrast, fails at line 2 in `main` (a function context): naming
+   `std::string s("ab")` instantiates `basic_string<char>`, whose **body**
+   elaboration truncates at the `const_reverse_iterator` member typedef
+   (`reverse_iterator<const_iterator>`, the member after `const_iterator`; 13
+   components, 0 constructors), so `cpp_is_pod(basic_string)` is wrongly true and
+   the `(const char*)` constructor is gone.  (`std::string s;` only "works"
+   *vacuously* -- the truncated POD is default-initialised to garbage.)
+
+   So the **goal-critical divergence is the class-member truncation**: a member
+   typedef aliasing a class-template-id whose eager definition-instantiation
+   throws (the `reverse_iterator`/iterator-concept chain) must not abort the
+   enclosing class's body ([temp.inst]/1-2: a member *declaration* does not
+   require the aliased template's *definition*).  A prior member-elaboration
+   containment attempt in `typecheck_compound_body` lifted basic_string from 13
+   to 65 components but did not restore the constructors, because a
+   class-template instance's member *functions* are populated through a
+   different instantiation route than the body-loop declarator path.  Both this
+   and the namespace-alias divergence share the `reverse_iterator<__normal_iterator>`
+   concept-chain root and resist self-contained reproduction (faithful
+   `__normal_iterator` mimics verify cleanly), so the remaining work is a
+   focused, dedicated effort on either (a) not eagerly instantiating
+   `reverse_iterator`'s definition for a member-typedef declaration, or
+   (b) containing the iterator-concept/CPO substitution failure at its source so
+   the chain never throws uncontained.
+
 3. **Re-test the libstdc++ chain.** With (1)+(2), confirm `std::vector<int>`'s
    `reverse_iterator` member and `std::basic_string`'s `const_reverse_iterator`
    member instantiate without truncation (basic_string regains its
