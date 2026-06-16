@@ -8,31 +8,40 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ssa_expr.h"
 
-#include <sstream>
-
 #include "pointer_expr.h"
 
 /// If \p expr is:
-/// - a symbol_exprt "s" add "s" to the stream \p os
+/// - a symbol_exprt "s" add "s" to the string \p os
 ///   - a member_exprt, apply recursively and add "..component_name"
 ///   - an index_exprt where the index is a constant, apply recursively on the
 ///     array and add "[[index]]"
-/// \return the stream \p os
-static std::ostream &
-initialize_ssa_identifier(std::ostream &os, const exprt &expr)
+///
+/// The identifier is assembled by plain string concatenation rather than via a
+/// `std::ostringstream`: this function is on symex's hot renaming path, and
+/// constructing a stream per call pays a substantial fixed cost (locale
+/// initialisation) for what is pure concatenation of already-formatted strings.
+static void initialize_ssa_identifier(std::string &os, const exprt &expr)
 {
   if(auto member = expr_try_dynamic_cast<member_exprt>(expr))
   {
-    return initialize_ssa_identifier(os, member->struct_op())
-           << ".." << member->get_component_name();
+    initialize_ssa_identifier(os, member->struct_op());
+    os += "..";
+    os += id2string(member->get_component_name());
+    return;
   }
   if(auto index = expr_try_dynamic_cast<index_exprt>(expr))
   {
-    const irep_idt &idx = to_constant_expr(index->index()).get_value();
-    return initialize_ssa_identifier(os, index->array()) << "[[" << idx << "]]";
+    initialize_ssa_identifier(os, index->array());
+    os += "[[";
+    os += id2string(to_constant_expr(index->index()).get_value());
+    os += "]]";
+    return;
   }
   if(auto symbol = expr_try_dynamic_cast<symbol_exprt>(expr))
-    return os << symbol->identifier();
+  {
+    os += id2string(symbol->identifier());
+    return;
+  }
 
   UNREACHABLE;
 }
@@ -42,9 +51,8 @@ ssa_exprt::ssa_exprt(const exprt &expr) : symbol_exprt(expr.type())
   set(ID_C_SSA_symbol, true);
   add(ID_expression, expr);
   with_source_location(expr.source_location());
-  std::ostringstream os;
-  initialize_ssa_identifier(os, expr);
-  const std::string id = os.str();
+  std::string id;
+  initialize_ssa_identifier(id, expr);
   identifier(id);
   set(ID_L1_object_identifier, id);
 }
@@ -53,57 +61,67 @@ ssa_exprt::ssa_exprt(const exprt &expr) : symbol_exprt(expr.type())
 /// "s!l0@l1".
 /// If \p expr is a member or index expression, recursively apply the procedure
 /// and add "..component_name" or "[[index]]" to \p os.
+///
+/// Uses `std::string` concatenation rather than `std::ostream`: see
+/// initialize_ssa_identifier above for the rationale (this is a symex hot path).
 static void build_ssa_identifier_rec(
   const exprt &expr,
   const irep_idt &l0,
   const irep_idt &l1,
   const irep_idt &l2,
-  std::ostream &os,
-  std::ostream &l1_object_os)
+  std::string &os,
+  std::string &l1_object_os)
 {
-  if(expr.id()==ID_member)
+  if(expr.id() == ID_member)
   {
-    const member_exprt &member=to_member_expr(expr);
+    const member_exprt &member = to_member_expr(expr);
 
     build_ssa_identifier_rec(member.struct_op(), l0, l1, l2, os, l1_object_os);
 
-    os << ".." << member.get_component_name();
-    l1_object_os << ".." << member.get_component_name();
+    const std::string component = ".." + id2string(member.get_component_name());
+    os += component;
+    l1_object_os += component;
   }
-  else if(expr.id()==ID_index)
+  else if(expr.id() == ID_index)
   {
-    const index_exprt &index=to_index_expr(expr);
+    const index_exprt &index = to_index_expr(expr);
 
     build_ssa_identifier_rec(index.array(), l0, l1, l2, os, l1_object_os);
 
-    const irep_idt &idx = to_constant_expr(index.index()).get_value();
-    os << "[[" << idx << "]]";
-    l1_object_os << "[[" << idx << "]]";
+    const std::string idx =
+      "[[" + id2string(to_constant_expr(index.index()).get_value()) + "]]";
+    os += idx;
+    l1_object_os += idx;
   }
-  else if(expr.id()==ID_symbol)
+  else if(expr.id() == ID_symbol)
   {
-    auto symid = to_symbol_expr(expr).identifier();
-    os << symid;
-    l1_object_os << symid;
+    const irep_idt &symid = to_symbol_expr(expr).identifier();
+    os += id2string(symid);
+    l1_object_os += id2string(symid);
 
     if(!l0.empty())
     {
       // Distinguish different threads of execution
-      os << '!' << l0;
-      l1_object_os << '!' << l0;
+      os += '!';
+      os += id2string(l0);
+      l1_object_os += '!';
+      l1_object_os += id2string(l0);
     }
 
     if(!l1.empty())
     {
       // Distinguish different calls to the same function (~stack frame)
-      os << '@' << l1;
-      l1_object_os << '@' << l1;
+      os += '@';
+      os += id2string(l1);
+      l1_object_os += '@';
+      l1_object_os += id2string(l1);
     }
 
     if(!l2.empty())
     {
       // Distinguish SSA steps for the same variable
-      os << '#' << l2;
+      os += '#';
+      os += id2string(l2);
     }
   }
   else
@@ -116,12 +134,12 @@ static std::pair<irep_idt, irep_idt> build_identifier(
   const irep_idt &l1,
   const irep_idt &l2)
 {
-  std::ostringstream oss;
-  std::ostringstream l1_object_oss;
+  std::string oss;
+  std::string l1_object_oss;
 
   build_ssa_identifier_rec(expr, l0, l1, l2, oss, l1_object_oss);
 
-  return std::make_pair(irep_idt(oss.str()), irep_idt(l1_object_oss.str()));
+  return std::make_pair(irep_idt{oss}, irep_idt{l1_object_oss});
 }
 
 static void update_identifier(ssa_exprt &ssa)
