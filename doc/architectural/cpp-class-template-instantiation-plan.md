@@ -300,6 +300,39 @@ Each step is independently testable; acceptance criteria reference the tests.
    `stl_iterator.h`).  Finding and fixing that per-step cost is the second-tier
    work item (profiling under way).
 
+   **Symex profiling (2026-06, gdb sampling -- `perf` is blocked by
+   `perf_event_paranoid`).** Sampling the stuck symex of un-truncated
+   `cpp20_erase_if` showed the hot path is renaming
+   (`renamedt` -> `goto_symex_statet::rename` -> `update_identifier`) and pointer
+   dereference (`clean_expr` -> `dereference` ->
+   `apply_to_objects_in_dereference`).  Two distinct costs:
+
+   1. **SSA identifier construction (fixed, commit `5d90c5ac69`).** The leaf
+      frames were `build_identifier` building identifier strings through two
+      `std::ostringstream`s per call -- each paying stream + *locale*
+      initialisation (`std::locale`, `std::ios_base::_M_init`) for pure string
+      concatenation.  Replaced with `std::string` append (byte-identical output;
+      `[ssa_expr]` + goto-symex unit tests green).  Measured **~21%** wall-clock
+      reduction (28.8s -> 22.8s) on a deep-nested member/index benchmark -- the
+      access shape STL produces (`v.._M_impl.._M_start[[i]]`) -- and neutral on
+      flat symbols.  This is a general symex win but does **not** by itself make
+      the containers tractable.
+
+   2. **Renaming huge expressions from dereference fan-out (the primary,
+      still-open bottleneck).** After (1), `renamedt` still dominates because the
+      *expressions being renamed are large*: each `vector` reallocation
+      (`_M_realloc_insert` -> allocator) creates a fresh dynamic object, so the
+      `begin`/`end`/iterator pointers' value-sets accumulate many candidate
+      objects; `apply_to_objects_in_dereference` then expands each dereference
+      into a wide nested-if over all candidates, and renaming/`irept`
+      construction walks the whole tree on every step.  RSS reaches ~11 GiB at
+      `--unwind 1` -- a state/expression-size blow-up, not loop unwinding.  This
+      is an architectural symex cost (value-set fan-out + renaming of large
+      terms), not a quick fix; candidate directions: shrink the dynamic-object
+      value-sets, share/cache renaming over unchanged subtrees, or provide
+      *sound* operational models for the allocator so reallocation does not mint
+      a new object per call.
+
    **(Historical) Conformant-AND-tractable approach considered.** Per [temp.inst]/2,
    implicitly instantiating a class template instantiates its member
    *declarations*, not the *definitions* of the entities they name (definitions
