@@ -1,0 +1,23 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+std::string s("ab") -- construction from a string literal.
+
+Front-end non-conformance: basic_string<char> is truncated at its
+const_reverse_iterator member typedef (reverse_iterator<const_iterator>, whose
+eager definition-instantiation throws via the C++20 iterator-concept chain),
+dropping its constructors, so it is misclassified as a POD and s("ab") fails with
+a char[3] -> basic_string CONVERSION ERROR.  N5008 [temp.inst]/1-2,
+[dcl.typedef], [class.prop].
+
+A demonstrated un-truncation fix makes this conformant (reaches BMC), but its
+blanket form makes many container tests' BMC intractable; the
+conformant-AND-tractable fix is the [temp.inst]/2 declarations-vs-definitions
+split (pending).  Reclassify to CORE once that lands and std::string
+construction is BMC-tractable.
+See doc/architectural/cpp-class-template-instantiation-plan.md.
