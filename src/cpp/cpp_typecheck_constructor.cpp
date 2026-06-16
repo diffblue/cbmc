@@ -974,6 +974,27 @@ void cpp_typecheckt::full_member_initialization(
         base_type = to_array_type(base_type).element_type();
       if(base_type.id() == ID_struct_tag)
       {
+        // [temp.inst]/2 + [class.default.ctor]/3: the member's type must be
+        // complete to determine whether its default construction is
+        // non-trivial (NSDMIs / a non-trivial default constructor).  A
+        // class-template-instance member may still be incomplete here because
+        // its elaboration was deferred -- notably the primary-template
+        // fallback selected after a conditional-SFINAE partial specialization
+        // was rejected (e.g. `cref<int,int*>` once
+        // `void_t<decltype(false ? a : b)>` removes the specialization, the
+        // libstdc++ common_reference shape).  A cleanly-matched member (e.g.
+        // the partial specialization `cref<int,int>`) is already complete
+        // here, so the two would otherwise be treated inconsistently and the
+        // incomplete member's NSDMIs would be silently dropped from the
+        // constructor.  Elaborate it first so its NSDMIs are visible; an
+        // elaboration failure is non-fatal (the member is left as-is).
+        try
+        {
+          elaborate_class_template(base_type);
+        }
+        catch(...)
+        {
+        }
         const struct_typet &member_struct =
           follow_tag(to_struct_tag_type(base_type));
         for(const auto &mc : member_struct.components())
