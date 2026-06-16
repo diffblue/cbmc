@@ -12,48 +12,21 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_STRING_CONTAINER_H
 #define CPROVER_UTIL_STRING_CONTAINER_H
 
-#include <list>
-#include <unordered_map>
-#include <vector>
-
 #include "memory_units.h"
 #include "string_hash.h"
 
-class string_ptrt
-{
-public:
-  explicit string_ptrt(const char *_s);
-
-  explicit string_ptrt(std::string_view _s) : s(_s.data()), len(_s.size())
-  {
-  }
-
-  explicit string_ptrt(const std::string &_s) : s(_s.data()), len(_s.size())
-  {
-  }
-
-  // this compares the contents of the string, not the address
-  bool operator==(const string_ptrt &other) const;
-
-  size_t hash() const
-  {
-    return hash_string(s, len);
-  }
-
-private:
-  // s/len are a (pointer, length) pair into externally-owned storage; the
-  // referenced string need not be zero terminated (there is no c_str()).
-  const char *s;
-  size_t len;
-};
+#include <list>
+#include <string_view>
+#include <unordered_map>
+#include <vector>
 
 // NOLINTNEXTLINE(readability/identifiers)
-class string_ptr_hasht
+class string_view_hasht
 {
 public:
-  size_t operator()(const string_ptrt &s) const
+  std::size_t operator()(std::string_view s) const
   {
-    return s.hash();
+    return hash_string(s);
   }
 };
 
@@ -99,8 +72,12 @@ public:
   string_container_statisticst compute_statistics() const;
 
 protected:
+  // The keys are std::string_views into the std::string objects owned by
+  // string_list below; std::list keeps those addresses stable and the interned
+  // strings are never mutated, so the keys remain valid for the lifetime of
+  // the map.
   // the 'unsigned' ought to be size_t
-  typedef std::unordered_map<string_ptrt, unsigned, string_ptr_hasht>
+  typedef std::unordered_map<std::string_view, unsigned, string_view_hasht>
     hash_tablet;
   hash_tablet hash_table;
 
