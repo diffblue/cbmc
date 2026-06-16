@@ -4821,7 +4821,21 @@ void cpp_typecheck_resolvet::guess_template_args(
     // type is used for type deduction.
     typet desired = desired_type;
     if(is_reference(desired) || is_rvalue_reference(desired))
+    {
+      // The reference qualifier of P is part of the pattern: an
+      // lvalue-reference pattern (`T&`) is matched only by an
+      // lvalue-reference argument and an rvalue-reference pattern (`T&&`)
+      // only by an rvalue-reference argument.  In CBMC an rvalue
+      // reference is a pointer carrying *both* C_reference and
+      // C_rvalue_reference, so the kinds are distinguished by the rvalue
+      // flag.  This matters for class-template partial-specialization
+      // matching ([temp.spec.partial.match], [temp.deduct.type]) of
+      // libstdc++'s reference-qualifier-keyed
+      // `__common_ref_impl<_Xp&, _Yp&&>` family.
+      if(is_rvalue_reference(template_type) != is_rvalue_reference(desired))
+        return; // reference kinds differ -> deduction failure
       desired = to_reference_type(desired).base_type();
+    }
     guess_template_args(to_reference_type(template_type).base_type(), desired);
   }
   else if(template_type.id() == ID_pointer)
@@ -4834,9 +4848,34 @@ void cpp_typecheck_resolvet::guess_template_args(
   else if(template_type.id() == ID_frontend_pointer)
   {
     if(desired_type.id() == ID_pointer)
+    {
+      // Reference-qualifier match, as in the reference branch above.
+      // Before type-checking, a reference pattern (`_Xp&` / `_Yp&&`) is a
+      // `frontend_pointer` flagged C_reference (and additionally
+      // C_rvalue_reference for `&&`); the argument is an already-checked
+      // pointer with the same flag convention.  An lvalue-reference
+      // pattern must not match an rvalue-reference argument or vice
+      // versa: conflating them lets the wrong libstdc++ `__common_ref_impl`
+      // partial specialization match, and for
+      // `__common_ref_impl<_Xp&, _Yp&&> : __common_ref_impl<_Yp&&, _Xp&>`
+      // the substituted base then equals the specialization itself --
+      // a self-inheriting class ([class.derived.general]/2), which aborts
+      // class-body elaboration and, via the C++20 iterator-concept chain,
+      // truncates `basic_string`.  [temp.spec.partial.match],
+      // [temp.deduct.type].
+      const bool pattern_is_ref = template_type.get_bool(ID_C_reference) ||
+                                  template_type.get_bool(ID_C_rvalue_reference);
+      const bool desired_is_ref = desired_type.get_bool(ID_C_reference) ||
+                                  desired_type.get_bool(ID_C_rvalue_reference);
+      if(
+        pattern_is_ref && desired_is_ref &&
+        template_type.get_bool(ID_C_rvalue_reference) !=
+          desired_type.get_bool(ID_C_rvalue_reference))
+        return; // reference kinds differ -> deduction failure
       guess_template_args(
         to_type_with_subtype(template_type).subtype(),
         to_pointer_type(desired_type).base_type());
+    }
   }
   else if(template_type.id() == ID_array)
   {
