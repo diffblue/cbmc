@@ -176,15 +176,19 @@ bool builtin_factory(
         return convert(identifier, s, symbol_table, mh);
 
     }
-    else if(config.ansi_c.arch=="arm64" ||
-            config.ansi_c.arch=="armel" ||
+    else if(config.ansi_c.arch=="arm64")
+    {
+      // AArch64 has its own NEON builtins and none of the 32-bit-only (e.g.
+      // iWMMXt) builtins, so search only the AArch64 header -- otherwise a
+      // 32-bit ARM signature could win for a NEON name shared by both.
+      if(find_pattern(pattern, gcc_builtin_headers_aarch64, s))
+        return convert(identifier, s, symbol_table, mh);
+    }
+    else if(config.ansi_c.arch=="armel" ||
             config.ansi_c.arch=="armhf" ||
             config.ansi_c.arch=="arm")
     {
       if(find_pattern(pattern, gcc_builtin_headers_arm, s))
-        return convert(identifier, s, symbol_table, mh);
-
-      if(find_pattern(pattern, gcc_builtin_headers_aarch64, s))
         return convert(identifier, s, symbol_table, mh);
     }
     else if(config.ansi_c.arch=="mips64el" ||

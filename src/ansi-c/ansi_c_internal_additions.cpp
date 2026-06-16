@@ -58,7 +58,6 @@ const char gcc_builtin_headers_arm[] =
   ; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_aarch64[] =
-  "#line 1 \"gcc_builtin_headers_aarch64.h\"\n"
 #include "compiler_headers/gcc_builtin_headers_aarch64.inc" // IWYU pragma: keep
   ; // NOLINT(whitespace/semicolon)
 
