@@ -131,15 +131,43 @@ Each step is independently testable; acceptance criteria reference the tests.
    still CORE and now forbids the `types are incompatible` line; full
    `cbmc-cpp` suite green.
 
-2. **Reconcile the two partial-spec SFINAE verifications.** The
-   `elaborate_class_template` loop must reach the *same* accept/reject decision
-   as `disambiguate_template_classes` for a conditional-`decltype` SFINAE
-   argument.  Investigate `suppress_elaborate = true` at
-   `cpp_instantiate_template.cpp` ~1641: it should not suppress the
-   well-formedness-determining evaluation of the specialization's SFINAE
-   arguments.  Acceptance: `cpp20_partial_spec_conditional_sfinae_member` flips
-   from KNOWNBUG to CORE (its `tag == 1` assertion holds — `cref<int,int*>` is
-   the primary).  Then promote its `test.desc` to `CORE`.
+2. **Reconcile the two partial-spec SFINAE verifications.** *(DONE, but turned
+   out to be a different root — commit `11725a980c`.)*  The actual divergence the
+   member KNOWNBUG isolated was not the SFINAE *decision* (both verifications
+   correctly reject the spec for `cref<int,int*>`) but the *timing* of the
+   primary fallback's elaboration: the primary `cref<int,int*>` was still
+   incomplete at the enclosing class's constructor-synthesis time, so the
+   default-ctor member-init loop saw no NSDMI and dropped the member's
+   initialisation (it read uninitialised), whereas the cleanly-matched spec
+   member `cref<int,int>` was already complete.  Fixed by elaborating a member's
+   class-template-instance type before deciding whether its default construction
+   is non-trivial ([class.default.ctor]/3 + [temp.inst]/2), in
+   `cpp_typecheck_constructor.cpp`.  Acceptance met:
+   `cpp20_partial_spec_conditional_sfinae_member` is now CORE.
+
+   **However**, this did *not* fix `std::string s("ab")`.  The synthetic member
+   test no longer reproduces the real libstdc++ failure, so the plan's premise
+   that the whole family reduces to that one divergence was incomplete.  The
+   remaining real-case divergence is captured by a new KNOWNBUG,
+   `cpp20_vector_iterator_namespace_typedef`: a **namespace-scope** typedef of
+   `std::vector<int>::iterator` fails (`symbol ... is unknown` / `CONVERSION
+   ERROR`) while the same use inside a function body, and a namespace-scope
+   `std::vector<int>` variable, both succeed.  Naming the member instantiates
+   `vector<int>`, whose `reverse_iterator` member drives the C++20
+   iterator-concept / `std::ranges::swap` CPO chain for `__normal_iterator`, and
+   in the namespace-scope qualified-name resolution context that evaluation
+   raises an *uncontained* failure that aborts resolution.  A self-contained
+   reproduction was not found: faithful hand mimics of `__normal_iterator`
+   (Container param + `iterator_traits` indirection + converting constructor) do
+   *not* trigger it, so it depends on some further detail of the real type.
+
+   **Next divergence to fix (was step 2's tail, now the live one):** contain the
+   `swappable` / `ranges::swap` CPO concept evaluation reached during
+   namespace-scope qualified-name elaboration of a class-template instance, so a
+   substitution failure there is an immediate-context SFINAE failure
+   ([temp.deduct]/8, [temp.constr.atomic]) rather than an escaping throw -- the
+   same containment that already holds in the function-body / variable contexts.
+   Acceptance: `cpp20_vector_iterator_namespace_typedef` flips to CORE.
 
 3. **Re-test the libstdc++ chain.** With (1)+(2), confirm `std::vector<int>`'s
    `reverse_iterator` member and `std::basic_string`'s `const_reverse_iterator`
@@ -159,9 +187,10 @@ Each step is independently testable; acceptance criteria reference the tests.
 
 | test | level | what it pins |
 |------|-------|--------------|
-| `cpp20_partial_spec_conditional_sfinae_member` | KNOWNBUG | the divergence (step 2 acceptance) |
+| `cpp20_partial_spec_conditional_sfinae_member` | CORE *(was KNOWNBUG; fixed by step 2)* | the member-NSDMI / primary-fallback elaboration divergence |
 | `cpp20_partial_spec_conditional_sfinae` | CORE | conditional SFINAE in a function body works (step 1 contrast) |
 | `cpp_partial_spec_void_t_sfinae` | CORE | `void_t` member-type / expression SFINAE works in member context (pins the divergence to the conditional operator) |
+| `cpp20_vector_iterator_namespace_typedef` | KNOWNBUG | the remaining real-case divergence: namespace-scope typedef of `std::vector<int>::iterator` (the `swappable`/`ranges::swap` CPO chain truncates in that context) |
 
 ## 7. Already landed (related, this branch)
 
