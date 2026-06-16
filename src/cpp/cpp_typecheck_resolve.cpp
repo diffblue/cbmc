@@ -2682,12 +2682,19 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
       cpp_template_args_tct partial_specialization_args_tc;
       bool sfinae_failed = false;
       {
-        // error count save/restore instead of null_handler
-        const std::size_t sfinae_err_0 =
-          cpp_typecheck.get_message_handler().get_message_count(
-            messaget::M_ERROR);
+        // [temp.deduct]/8: type-checking the partial specialization's
+        // argument list to decide whether it matches is a substitution
+        // in the immediate context; a failure here (e.g. an ill-formed
+        // `void_t<decltype(false ? a : b)>` SFINAE argument whose
+        // conditional has no common type, the libstdc++ common_reference
+        // shape) is a deduction failure that removes this specialization
+        // from consideration, NOT a diagnosable error.  Use an
+        // `sfinae_contextt` (null message handler) so the failure is
+        // silent, mirroring the partial-spec verification in
+        // `elaborate_class_template`.
         try
         {
+          sfinae_contextt sfinae_guard{cpp_typecheck};
           cpp_typecheck.disable_template_arg_pack_expansion = true;
           partial_specialization_args_tc =
             cpp_typecheck.typecheck_template_args(
@@ -2701,8 +2708,6 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
           cpp_typecheck.disable_template_arg_pack_expansion = false;
           sfinae_failed = true;
         }
-        cpp_typecheck.get_message_handler().set_message_count(
-          messaget::M_ERROR, sfinae_err_0);
       }
       if(sfinae_failed)
         continue;
