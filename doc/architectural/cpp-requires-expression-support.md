@@ -674,20 +674,48 @@ rvalue-reference flag of P and A to match in both the reference and
 `frontend_pointer` branches of `guess_template_args`) removes the
 self-inheritance.
 
-### Remaining blocker (precise)
+### Remaining blocker (precise; `__cond_res` ruled out as the cause)
 
-A second, independent failure remains: merely naming `std::vector<int>::iterator`
-at namespace scope (or `common_reference_t<const It&, const It&>` for that `It`)
-still fails with `symbol ... is unknown` / `CONVERSION ERROR`, and
-`std::string s("ab")` is still truncated.  Instantiating `vector`/`basic_string`
-eagerly instantiates its `reverse_iterator` typedef -> `iterator_traits` ->
-`__cpp17_iterator` -> `copyable`/`movable`/`swappable` -> the conditional in
-`__do_common_type_impl::__cond_t` (type_traits:2267) and `__cond_res`
-(type_traits:3665).  Instrumenting the ternary typecheck shows its two operands
-are consistently `__decay_t<iter_reference_t<It>>` (= `int`) and the iterator
-type `It` itself -- i.e. CBMC evaluates `common_type`/`common_reference` of
-`int` and `It`, which legitimately has no common type, so the `?:` `throw 0` is
-the correct SFINAE signal.  Two facets are still open:
+A second, independent failure remains, and a controlled experiment has now
+**ruled out `__cond_res`/`__cond_t` as its cause**: patching
+`typecheck_expr_trinary` to soft-succeed (pick a result type instead of
+`throw 0`) removes all the "types are incompatible" messages but leaves the
+fatal `symbol ... is unknown` / `CONVERSION ERROR` unchanged.  So the
+`common_type`/`common_reference` ternary failures are contained noise (caught at
+`guess_function_template_args`), not the blocker.
+
+The failure is **context-dependent**, and the matrix isolates it sharply:
+- `std::vector<int> v; v.push_back(1);` in a function body  -> OK
+- `std::vector<int> gv;` at **namespace scope**             -> OK
+- `using It = std::vector<int>::iterator;` **inside a function** -> OK
+- `using It = std::vector<int>::iterator;` at **namespace scope** -> FAILS
+  (`symbol 'It' is unknown`, `CONVERSION ERROR`)
+
+So `vector<int>` instantiates fine everywhere; only a **namespace-scope
+qualified-name member-typedef** of the vector iterator fails (the same
+context-dependence as §12).  With the `__cond_res` noise removed, the
+instantiation chain still climbs `iterator_traits` -> `__cpp17_iterator` ->
+`copyable` -> `movable` -> `swappable` ->
+`std::ranges::__cust_swap::_Swap::operator()` ->
+`std::ranges::__cust_swap::__adl_swap` (concepts:217), and then a throw escapes
+that aborts resolution of `vector<int>::iterator`, so the alias `It` is never
+created.  In the working contexts (function body / namespace variable) the same
+concept/CPO evaluation is contained; in the namespace-scope qualified-name path
+it is not.
+
+Next step: find the containment present in the function-body / variable path but
+missing in the namespace-scope qualified-name resolution path (the typedef of a
+dependent qualified member type), and apply it there so the `swappable` /
+`ranges::swap` CPO concept evaluation is a contained immediate-context failure
+([temp.constr.atomic], [temp.deduct]/8) rather than an escaping throw.  Minimal
+matrix above; probes `/tmp/cr/{it_only,vitfunc,vns,vfunc}.cpp`,
+`/tmp/df/{s_direct,v_ptr}.cpp`.
+
+### (Superseded) earlier `__cond_res` hypothesis
+
+The two facets below were the prior best guess; the soft-succeed experiment
+above shows `__cond_res` is not the determining cause, but they remain accurate
+observations about the (contained) ternary noise:
 - The throw is *contained* when reached through `guess_function_template_args`
   (the SFINAE try/catch around the deduced function type), which is why the
   passing `cpp20_erase_if` (vector used inside a function body) tolerates ~260
