@@ -654,7 +654,58 @@ invalid implicit conversion from 'const char *' to 'struct basic_string'
 CONVERSION ERROR
 ```
 
-### Mechanism, traced precisely
+### Progress (2026-06, fifth pass): one layer fixed
+
+A first root cause has been **fixed** (commit "cpp: match reference qualifier in
+template-argument deduction", regression
+`template_partial_spec_reference_qualifier`).  Template-argument deduction did
+not distinguish an lvalue-reference pattern (`T&`) from an rvalue-reference
+pattern (`T&&`): `guess_template_args` stripped a reference pattern to its
+referent without checking the reference *kind*.  libstdc++'s C++20
+`common_reference` machinery keys the partial-specialization family
+`std::__common_ref_impl<_Xp&, _Yp&>` / `<_Xp&&, _Yp&&>` / `<_Xp&&, _Yp&>` /
+`<_Xp&, _Yp&&>` solely on these qualifiers; conflating `&` and `&&` selected
+`__common_ref_impl<_Xp&, _Yp&&> : __common_ref_impl<_Yp&&, _Xp&>`, whose
+substituted base equals the specialization itself -- a self-inheriting class,
+forbidden by [class.derived.general]/2.  That hard "inherited multiple times"
+`throw 0` (in `add_base_components`) escaped during the eager iterator-concept
+instantiation and truncated `basic_string`.  The fix (require the
+rvalue-reference flag of P and A to match in both the reference and
+`frontend_pointer` branches of `guess_template_args`) removes the
+self-inheritance.
+
+### Remaining blocker (precise)
+
+A second, independent failure remains: merely naming `std::vector<int>::iterator`
+at namespace scope (or `common_reference_t<const It&, const It&>` for that `It`)
+still fails with `symbol ... is unknown` / `CONVERSION ERROR`, and
+`std::string s("ab")` is still truncated.  Instantiating `vector`/`basic_string`
+eagerly instantiates its `reverse_iterator` typedef -> `iterator_traits` ->
+`__cpp17_iterator` -> `copyable`/`movable`/`swappable` -> the conditional in
+`__do_common_type_impl::__cond_t` (type_traits:2267) and `__cond_res`
+(type_traits:3665).  Instrumenting the ternary typecheck shows its two operands
+are consistently `__decay_t<iter_reference_t<It>>` (= `int`) and the iterator
+type `It` itself -- i.e. CBMC evaluates `common_type`/`common_reference` of
+`int` and `It`, which legitimately has no common type, so the `?:` `throw 0` is
+the correct SFINAE signal.  Two facets are still open:
+- The throw is *contained* when reached through `guess_function_template_args`
+  (the SFINAE try/catch around the deduced function type), which is why the
+  passing `cpp20_erase_if` (vector used inside a function body) tolerates ~260
+  such failures; but it *escapes* when the iterator concept chain is driven by
+  eager class-template-id instantiation during a namespace-scope typedef /
+  member elaboration, where no immediate-context boundary wraps it.
+- One operand is the iterator `It` where an associated type (e.g.
+  `iter_value_t<It>` = `int`) is expected, suggesting an iterator
+  associated-type alias is left unresolved as the iterator in this path.
+
+The next step is to (a) make the `__cond_t`/`__cond_res` `decltype`
+substitution failure a SFINAE immediate-context wherever the iterator concept
+chain is instantiated (not only via `guess_function_template_args`), and/or
+(b) fix the associated-type resolution so the concept compares `int`/`int`
+rather than `int`/`It`.  Minimal probes: `/tmp/cr/{cr_cref,it_only,cr_int}.cpp`,
+`/tmp/df/{s_direct,v_ptr}.cpp`.
+
+### Original mechanism, traced precisely
 
 1. `std::string s(p)` is a local declaration -> `typecheck_decl` ->
    `cpp_constructor(basic_string, [const char*])`.  `cpp_constructor` takes the
