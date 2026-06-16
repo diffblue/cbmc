@@ -1,0 +1,21 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+Class-template partial specialization selected via a conditional-operator
+SFINAE check (`void_t<decltype(false ? declval<A>() : declval<B>())>`) when the
+specialization is a MEMBER of a class template.  N5008 [temp.spec.partial.match]/2,
+[temp.deduct]/8, [expr.cond]/4.  The minimal essence of libstdc++'s C++20
+`__common_ref_impl<_Xp&, _Yp&, void_t<__condres_cvref<_Xp,_Yp>>>` family.
+
+CBMC currently wrongly selects the specialization for `cref<int, int*>` (no
+common type -> the conditional `decltype` is ill-formed -> the specialization
+must be rejected) in the class-member-instantiation context; the same construct
+as a function-body local works (cpp20_partial_spec_conditional_sfinae).  So this
+is a context-dependent partial-spec/SFINAE evaluation divergence.  Reclassify to
+CORE when fixed.  See doc/architectural/cpp-requires-expression-support.md.
