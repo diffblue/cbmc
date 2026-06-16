@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^.*lvalue-reference specialization selected.*FAILURE.*$
+^.*rvalue-reference specialization selected.*FAILURE.*$
+--
+Class-template partial specialization keyed on the argument's reference
+qualifier (`S<T&>` vs `S<T&&>`), N5008 [temp.spec.partial.match] /
+[temp.deduct.type].  Template-argument deduction must distinguish an
+lvalue-reference pattern from an rvalue-reference pattern; previously CBMC
+matched either pattern against any reference argument, selecting the wrong
+specialization (and, for libstdc++'s `__common_ref_impl<_Xp&, _Yp&&>` family,
+producing a self-inheriting base).  See
+doc/architectural/cpp-requires-expression-support.md.
