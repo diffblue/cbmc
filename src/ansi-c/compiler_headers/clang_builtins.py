@@ -113,8 +113,8 @@ element_aliases = {
         'signed char': 'char',
         'int32_t': 'int',
         'unsigned int32_t': 'unsigned int',
-        'int64_t': 'long long int',
-        'unsigned int64_t': 'unsigned long long int',
+        'long long': 'long long int',
+        'unsigned long long': 'unsigned long long int',
         '__fp16': '_Float16',
         }
 
@@ -444,8 +444,6 @@ encoding_prefix_map = {
         'O': 'long long',
         'S': 'signed',
         'U': 'unsigned',
-        'W': 'int64_t',
-        'Z': 'int32_t',
         }
 
 encoding_typespec_map = {
@@ -466,21 +464,36 @@ encoding_modifier_map = {'C': 'const', 'D': 'volatile', 'R': 'restrict'}
 
 
 def parse_encoding_prefix(types, i):
+    # Collect sign/size prefixes.  The width-modified integer types Wi
+    # (64-bit), Zi (32-bit) and LLLi (128-bit) are *complete* types -- e.g.
+    # UWi is "unsigned long long", not "unsigned" + a following type -- so they
+    # terminate the prefix and set complete=True; the caller must then not
+    # append a base type.
     prefix = []
+    complete = False
     while i < len(types):
         p = types[i]
         if types[i:i + 4] == 'LLLi':
-            prefix.append('__int128_t')
+            prefix.append('__int128')
             i += 4
+            complete = True
+            break
+        elif types[i:i + 2] == 'Wi':
+            prefix.append('long long')
+            i += 2
+            complete = True
+            break
+        elif types[i:i + 2] == 'Zi':
+            prefix.append('int')
+            i += 2
+            complete = True
+            break
         elif types[i:i + 2] == 'LL':
             prefix.extend(['long', 'long'])
             i += 2
         elif p == 'L':
             prefix.append('long')
             i += 1
-        elif types[i:i + 2] in ('Wi', 'Zi'):
-            prefix.append(encoding_prefix_map[p])
-            i += 2
         elif encoding_prefix_map.get(p) is not None:
             mapped = encoding_prefix_map[p]
             if mapped:
@@ -488,13 +501,13 @@ def parse_encoding_prefix(types, i):
             i += 1
         else:
             break
-    return prefix, i
+    return prefix, i, complete
 
 
 def build_encoding_type_inner(types, i):
-    (typespec, i) = parse_encoding_prefix(types, i)
+    (typespec, i, complete) = parse_encoding_prefix(types, i)
 
-    if i < len(types):
+    if not complete and i < len(types):
         t = types[i]
         if t == 'V':
             m = re.match(r'(\d+)', types[i + 1:])
