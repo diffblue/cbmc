@@ -19,6 +19,25 @@ class-template instantiation conform to N5008 in the one place it currently
 diverges.  (BMC may still hit the standing symex/`constexpr` resource caveat;
 that is out of scope here — this plan is about the front end.)
 
+### Terminology and prioritisation
+
+Following a deliberate distinction:
+
+- **conformance / conformant** — the *front end* matches what N5008 mandates
+  (type-checking, name lookup, instantiation, POD/triviality classification,
+  overload resolution).  This is the **first-tier** goal.
+- **correct / correctness** — CBMC reaches the *right verification result*.
+  Together with verification *performance* (does BMC complete within resources)
+  this is **second-tier**: pursued only after conformance is established.
+
+Concretely: a fix that makes the front end conformant is preferred even if it
+regresses verification performance; conversely a change that merely "makes a
+test pass" via a non-conformant front end (e.g. relying on a truncated class
+plus library models) is *not* a conformance fix.  The `cpp20_erase_if` /
+`cpp20_apple_libcxx_basic` CORE tests, for instance, pass today with a
+*non-conformant* (truncated) `std::vector`; that is a verification result
+standing on a conformance gap.
+
 ## 2. What is already correct (locked in as CORE tests)
 
 The review confirmed CBMC is conforming for the surrounding machinery:
@@ -242,11 +261,36 @@ Each step is independently testable; acceptance criteria reference the tests.
    models were lightweight; the full header `vector` inlines heavy iterator code
    and the BMC blows up (front end still completes fast and reaches "Starting
    Bounded Model Checking" -- the timeout is purely in symex/SAT).  This exposes
-   a **front-end-correctness vs BMC-tractability tension**: un-truncating the
-   iterator-heavy classes is necessary for `std::string` construction but makes
-   the model-backed vector tests intractable.
+   a **conformance vs verification-performance tension**: un-truncating the
+   iterator-heavy classes is *conformant* (they have user-declared constructors
+   and are not PODs) and is necessary for `std::string` construction, but it
+   makes the model-backed container tests intractable.
 
-   Two ways forward:
+   **Scope of the performance impact (2026-06, measured):** it is **not** limited
+   to those two tests.  With the blanket lazy un-truncation the full `cbmc-cpp`
+   suite no longer completes (timed out mid-run at `cpp20_map_basic`): every
+   container test whose class has a `reverse_iterator` member typedef
+   un-truncates and its full header machinery is symexed.  So the blanket
+   un-truncation is **not viable** even with performance treated as second-tier:
+   the suite becomes untestable, not merely slower on a couple of tests.  It was
+   reverted; only the conformance KNOWNBUG `cpp20_string_construct_charptr` (which
+   documents the goal and the diagnosis) was kept.
+
+   **Conformant-AND-tractable approach (the way forward).** Per [temp.inst]/2,
+   implicitly instantiating a class template instantiates its member
+   *declarations*, not the *definitions* of the entities they name (definitions
+   are instantiated on ODR-use).  The conformant front end therefore needs the
+   class to carry all its member *declarations* (so it is non-POD with its
+   constructors -- the conformance property `std::string s("ab")` needs) while
+   keeping member-function *definitions* lazy, so BMC continues to use CBMC's
+   compiled library models / does not inline the heavy header bodies.  The
+   blanket lazy un-truncation over-instantiates (it pulls in the member-function
+   bodies via the `ID_template_methods` pass), which is what makes BMC
+   intractable.  The next step is to split these: keep the member-declaration
+   completion (conformance, the first-tier goal) but not the eager body
+   instantiation (which is the second-tier performance cost).
+
+   Two earlier-considered framings (superseded by the above):
    - (A) **Narrower front-end fix:** route `basic_string`'s `(const char*)`
      construction correctly *without* un-truncating -- i.e. stop misclassifying a
      truncated, model-backed `basic_string` as a POD in `cpp_constructor`
