@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^VERIFICATION SUCCESSFUL$
@@ -10,12 +10,16 @@ main.cpp
 Class-template partial specialization selected via a conditional-operator
 SFINAE check (`void_t<decltype(false ? declval<A>() : declval<B>())>`) when the
 specialization is a MEMBER of a class template.  N5008 [temp.spec.partial.match]/2,
-[temp.deduct]/8, [expr.cond]/4.  The minimal essence of libstdc++'s C++20
-`__common_ref_impl<_Xp&, _Yp&, void_t<__condres_cvref<_Xp,_Yp>>>` family.
+[temp.deduct]/8, [expr.cond]/4, [class.default.ctor]/3.  The minimal essence of
+libstdc++'s C++20 `__common_ref_impl<_Xp&, _Yp&, void_t<__condres_cvref<_Xp,_Yp>>>`
+family.
 
-CBMC currently wrongly selects the specialization for `cref<int, int*>` (no
-common type -> the conditional `decltype` is ill-formed -> the specialization
-must be rejected) in the class-member-instantiation context; the same construct
-as a function-body local works (cpp20_partial_spec_conditional_sfinae).  So this
-is a context-dependent partial-spec/SFINAE evaluation divergence.  Reclassify to
-CORE when fixed.  See doc/architectural/cpp-requires-expression-support.md.
+For `cref<int, int*>` the conditional has no common type, so the specialization
+is rejected and the primary is used (`tag == 1`).  Previously the primary
+fallback was still incomplete at the enclosing class's constructor-synthesis
+time, so its default member initializer was dropped from the constructor and the
+member read uninitialised, while a cleanly-matched member (`cref<int, int>`) was
+already complete -- an inconsistency.  Fixed by elaborating a member's
+class-template-instance type before deciding whether its default construction is
+non-trivial ([class.default.ctor]/3 + [temp.inst]/2).
+See doc/architectural/cpp-class-template-instantiation-plan.md.
