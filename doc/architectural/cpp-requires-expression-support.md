@@ -711,6 +711,43 @@ dependent qualified member type), and apply it there so the `swappable` /
 matrix above; probes `/tmp/cr/{it_only,vitfunc,vns,vfunc}.cpp`,
 `/tmp/df/{s_direct,v_ptr}.cpp`.
 
+### Member-elaboration containment attempt (2026-06, sixth pass; reverted)
+
+Tried, grounded in [temp.inst]/1-2 (instantiating a class template instantiates
+member *declarations*, not the *definitions* of the entities they name): in
+`typecheck_compound_body`, when a member's elaboration throws during
+instantiation (`!instantiation_stack.empty()`), skip that member and continue
+rather than aborting the class body.  Two guards were added -- one around the
+member-type elaboration of a class-template-id typedef (the non-self-reference
+`type_is_tpl_cpp_name` branch), and one around the main
+`typecheck_compound_declarator` call.
+
+Result and why it was reverted:
+- The member-type guard fires once for `basic_string` (skips
+  `const_reverse_iterator`) and lifts the elaborated component count from 13 to
+  **65** (now reaching `rbegin`), but the constructors are still absent
+  (`nctor == 0`) and `std::string s("ab")` still hits CONVERSION ERROR.
+- Instrumentation shows the constructors are **not** processed through the main
+  declarator path (`typecheck_compound_declarator` at the body-loop `else`); in
+  fact the ~65 components appear with only a *single* body-loop member-type
+  check firing.  So `basic_string<char>` is populated largely through a
+  *different* instantiation route (the instantiated body is not re-run
+  member-by-member through `typecheck_compound_body`'s declarator path), and the
+  constructors are added/dropped there.  Containing the body-loop paths is
+  therefore whack-a-mole and does not reach the constructors.
+- The two sensitive tests (`cpp20_erase_if`, `cpp20_apple_libcxx_basic`)
+  continued to pass with the guards (no timeout, unlike the earlier
+  lazy-deferral attempt), confirming *skip* containment is timeout-safe -- but
+  since it does not fix the goal it was reverted.
+
+Refined next step: identify the instantiation route that actually populates a
+class-template instance's member functions (the one that adds the 65 components
+without going through the body-loop declarator path) and where it drops the
+constructors; the uncontained `swappable` / `ranges::swap` CPO `throw 0` raised
+while forming the iterator-accessor members' signatures is what truncates the
+instance there.  Containing that throw at its source (so `reverse_iterator`
+instantiates cleanly) remains the cleanest fix.
+
 ### (Superseded) earlier `__cond_res` hypothesis
 
 The two facets below were the prior best guess; the soft-succeed experiment
