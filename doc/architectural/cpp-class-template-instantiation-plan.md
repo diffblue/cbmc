@@ -211,6 +211,52 @@ Each step is independently testable; acceptance criteria reference the tests.
    `std::string` construction once the front end elaborates it (BMC resource
    limits permitting; otherwise a front-end-only `goto-cc`/typecheck check).
 
+   **Major finding (2026-06, route mapped + front-end fix demonstrated, then
+   reverted).** The route that populates a class-template instance's members is
+   `typecheck_compound_body`'s member loop, run via `convert_non_template_declaration`
+   inside `instantiate_template`.  It has *two* passes over the body: the first
+   adds typedefs / data members / non-constructor methods (and **skips**
+   constructors, `if(declaration.is_constructor()) { found_ctor=true; continue; }`),
+   the second (clearly labelled "We now deal with the constructors") adds the
+   constructors.  For `basic_string<char>` the first pass aborts at member [26],
+   the `const_reverse_iterator` typedef (`reverse_iterator<const_iterator>`,
+   immediately after `const_iterator`): its eager `typecheck_type` drives the
+   C++20 iterator-concept chain and throws, so the loop never reaches the
+   *second* (constructor) pass -> 13 components, 0 constructors -> `cpp_is_pod`
+   wrongly true -> `char[3]`/`const char*` -> `basic_string` CONVERSION ERROR.
+
+   Containing that throw works, but **must lazily register the alias, not skip
+   it**: a plain skip leaves later members that name it (e.g.
+   `const_reverse_iterator rbegin() const;`, member [108]) dangling, which throws
+   again and re-aborts the first pass.  Keeping the unresolved cpp_name (the
+   `kept_unresolved_cpp_name` lazy-typedef path) lets the first pass complete,
+   the second pass run, and the constructors register.  With this, **the goal's
+   front end is fixed**: `std::string s("ab")` and `std::string s(p)` no longer
+   produce CONVERSION ERROR -- they reach Bounded Model Checking (then hit the
+   standing BMC resource limit: "Out of memory").
+
+   **But it was reverted because it regresses the vector tests via BMC timeout.**
+   The containment fires for `std::vector<int>` too (its `const_reverse_iterator`),
+   *un-truncating* vector.  `cpp20_erase_if` / `cpp20_apple_libcxx_basic`
+   previously passed *because* the truncated vector + CBMC's compiled library
+   models were lightweight; the full header `vector` inlines heavy iterator code
+   and the BMC blows up (front end still completes fast and reaches "Starting
+   Bounded Model Checking" -- the timeout is purely in symex/SAT).  This exposes
+   a **front-end-correctness vs BMC-tractability tension**: un-truncating the
+   iterator-heavy classes is necessary for `std::string` construction but makes
+   the model-backed vector tests intractable.
+
+   Two ways forward:
+   - (A) **Narrower front-end fix:** route `basic_string`'s `(const char*)`
+     construction correctly *without* un-truncating -- i.e. stop misclassifying a
+     truncated, model-backed `basic_string` as a POD in `cpp_constructor`
+     (`cpp_is_pod` / the assignment fallback) so the construction uses the
+     constructor / library model instead of an `implicit_typecast`.  This avoids
+     touching vector's elaboration entirely.
+   - (B) **BMC-tractability:** keep the (correct) un-truncation but provide
+     lighter models/stubs for the inlined iterator machinery so the vector tests
+     stay tractable (the same class of work as the `cpp11_map_insert` KNOWNBUG).
+
 4. **Watch for the two-selection-mechanism design smell.** If reconciling (2) is
    fragile, consider unifying the two partial-spec SFINAE verifications behind a
    single helper so they cannot diverge again; this is the structural fix and
