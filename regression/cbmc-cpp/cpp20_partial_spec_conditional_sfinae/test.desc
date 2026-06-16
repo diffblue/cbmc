@@ -6,6 +6,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+^.*types are incompatible.*$
 --
 Conditional-operator SFINAE partial-spec selection
 (`void_t<decltype(false ? declval<A>() : declval<B>())>`) with function-body
