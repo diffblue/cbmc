@@ -119,12 +119,17 @@ verification does not see the ill-formedness).
 Each step is independently testable; acceptance criteria reference the tests.
 
 1. **Make the conditional-operator substitution failure a clean, silent SFINAE
-   signal.** In `typecheck_expr_trinary`, when the operands have no common type,
-   do not emit a user-visible `error()` while inside a SFINAE/immediate context
-   (template-argument substitution, `decltype`); keep the `throw 0` as the
-   deduction-failure signal.  Acceptance: `cpp20_partial_spec_conditional_sfinae`
-   still CORE, and the leaked `types are incompatible` line disappears (can be
-   asserted by adding it to that test's forbidden-output block).
+   signal.** *(DONE — commits `f661171ad8` + `f008f35e65`.)* A substitution
+   failure while type-checking a candidate partial specialization's argument
+   list is a deduction failure, not a diagnosable error ([temp.deduct]/8).
+   `disambiguate_template_classes`' verification previously used only an error
+   *count* save/restore (which rolls back the count but does not unsend the
+   emitted message), leaking `types are incompatible` for an ill-formed
+   `void_t<decltype(false ? a : b)>` SFINAE argument; it now runs under an
+   `sfinae_contextt` (null handler), mirroring the `elaborate_class_template`
+   verification.  Acceptance met: `cpp20_partial_spec_conditional_sfinae` is
+   still CORE and now forbids the `types are incompatible` line; full
+   `cbmc-cpp` suite green.
 
 2. **Reconcile the two partial-spec SFINAE verifications.** The
    `elaborate_class_template` loop must reach the *same* accept/reject decision
