@@ -24,7 +24,7 @@
 <polygon fill="white" stroke="#666666" points="596.5,-178.31 465.5,-178.31 465.5,-137.31 596.5,-137.31 596.5,-178.31"/>
 <text text-anchor="start" x="473.5" y="-166.31" font-family="Helvetica,sans-Serif" font-size="10.00">std::unordered_map</text>
 <text text-anchor="start" x="473.5" y="-155.31" font-family="Helvetica,sans-Serif" font-size="10.00">&lt; string_ptrt, unsigned,</text>
-<text text-anchor="middle" x="531" y="-144.31" font-family="Helvetica,sans-Serif" font-size="10.00"> string_ptr_hash &gt;</text>
+<text text-anchor="middle" x="531" y="-144.31" font-family="Helvetica,sans-Serif" font-size="10.00"> string_ptr_hasht &gt;</text>
 </a>
 </g>
 </g>
@@ -41,7 +41,7 @@
 <!-- Node3 -->
 <g id="Node000003" class="node">
 <title>Node3</title>
-<g id="a_Node000003"><a xlink:href="structstring__ptrt.html" target="_top" xlink:title=" ">
+<g id="a_Node000003"><a xlink:href="classstring__ptrt.html" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="#666666" points="279.5,-211.31 212.5,-211.31 212.5,-192.31 279.5,-192.31 279.5,-211.31"/>
 <text text-anchor="middle" x="246" y="-199.31" font-family="Helvetica,sans-Serif" font-size="10.00">string_ptrt</text>
 </a>
@@ -76,7 +76,7 @@
 </a>
 </g>
 <text text-anchor="start" x="321" y="-170.81" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey"> &lt; string_ptrt, unsigned,</text>
-<text text-anchor="middle" x="380" y="-159.81" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey"> string_ptr_hash &gt;</text>
+<text text-anchor="middle" x="380" y="-159.81" font-family="Helvetica,sans-Serif" font-size="10.00" fill="grey"> string_ptr_hasht &gt;</text>
 </g>
 <!-- Node5 -->
 <g id="Node000005" class="node">

@@ -45,7 +45,7 @@ var searchData=
   ['leave_5ftarget_42',['leave_target',['../structgoto__convertt_1_1targetst.html#aac84a4919f37c16223cb13fae624a343',1,'goto_convertt::targetst::leave_target'],['../structgoto__convertt_1_1leave__targett.html#affe63c531dd9b445007ce59b4c36e7bd',1,'goto_convertt::leave_targett::leave_target']]],
   ['left_43',['left',['../structleft__and__right__valuest.html#af46efc8c03e7a8d2dcd3cbdc5dc44891',1,'left_and_right_valuest']]],
   ['left_5fdepth_5fbelow_5fcommon_5fancestor_44',['left_depth_below_common_ancestor',['../classancestry__resultt.html#a1b76445c581f9976dcfca66783246a06',1,'ancestry_resultt']]],
-  ['len_45',['len',['../structstring__ptrt.html#a9d971d40e645e8cd1eaad1bd7ffd9270',1,'string_ptrt']]],
+  ['len_45',['len',['../classstring__ptrt.html#a9d971d40e645e8cd1eaad1bd7ffd9270',1,'string_ptrt']]],
   ['length_46',['length',['../structjava__bytecode__parse__treet_1_1methodt_1_1local__variablet.html#a923a9cb8cc33d1de28fe2c6543946941',1,'java_bytecode_parse_treet::methodt::local_variablet::length'],['../structjava__bytecode__convert__methodt_1_1holet.html#a0b75805a4fb8c6a37265b817f57aae59',1,'java_bytecode_convert_methodt::holet::length'],['../classjava__bytecode__convert__methodt_1_1variablet.html#a9fdf0ac2032db62840627f1b909012c0',1,'java_bytecode_convert_methodt::variablet::length']]],
   ['length_5fmodifier_47',['length_modifier',['../classformat__tokent.html#acee98930944ba709c958277ba4a04afb',1,'format_tokent']]],
   ['length_5fof_5farray_48',['length_of_array',['../classarray__poolt.html#a5ef7c2f89b07ec4684ce2bf25cd3ff82',1,'array_poolt']]],

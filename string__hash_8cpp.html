@@ -110,53 +110,63 @@ $(document).ready(function(){initNavTree('string__hash_8cpp.html',''); initResiz
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="string__hash_8cpp__incl.svg" width="195" height="212"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="string__hash_8cpp__incl.svg" width="204" height="212"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div>
 <p><a href="string__hash_8cpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:acfedab89a08be359588021412998f1ef" id="r_acfedab89a08be359588021412998f1ef"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">size_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string__hash_8cpp.html#acfedab89a08be359588021412998f1ef">hash_string</a> (<a class="el" href="classait.html">const</a> std::string &amp;s)</td></tr>
-<tr class="separator:acfedab89a08be359588021412998f1ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1fd660cc65ae6f8dce1530149358e925" id="r_a1fd660cc65ae6f8dce1530149358e925"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">size_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string__hash_8cpp.html#a1fd660cc65ae6f8dce1530149358e925">hash_string</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classait.html">char</a> *s)</td></tr>
-<tr class="separator:a1fd660cc65ae6f8dce1530149358e925"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0ee8630c80395f0d71a14f0d80c5e01b" id="r_a0ee8630c80395f0d71a14f0d80c5e01b"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string__hash_8cpp.html#a0ee8630c80395f0d71a14f0d80c5e01b">hash_string</a> (std::string_view s)</td></tr>
+<tr class="separator:a0ee8630c80395f0d71a14f0d80c5e01b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54db98f5c898ceb5fe59a2fc78341a26" id="r_a54db98f5c898ceb5fe59a2fc78341a26"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string__hash_8cpp.html#a54db98f5c898ceb5fe59a2fc78341a26">hash_string</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classait.html">char</a> *s, std::size_t len)</td></tr>
+<tr class="separator:a54db98f5c898ceb5fe59a2fc78341a26"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>string hashing </p>
 
 <p class="definition">Definition in file <a class="el" href="string__hash_8cpp_source.html">string_hash.cpp</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="a1fd660cc65ae6f8dce1530149358e925" name="a1fd660cc65ae6f8dce1530149358e925"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1fd660cc65ae6f8dce1530149358e925">&#9670;&#160;</a></span>hash_string() <span class="overload">[1/2]</span></h2>
+<a id="a54db98f5c898ceb5fe59a2fc78341a26" name="a54db98f5c898ceb5fe59a2fc78341a26"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a54db98f5c898ceb5fe59a2fc78341a26">&#9670;&#160;</a></span>hash_string() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classait.html">size_t</a> hash_string </td>
+          <td class="memname">std::size_t hash_string </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classait.html">char</a> *&#160;</td>
-          <td class="paramname"><em>s</em></td><td>)</td>
+          <td class="paramname"><em>s</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>len</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="string__hash_8cpp_source.html#l00025">25</a> of file <a class="el" href="string__hash_8cpp_source.html">string_hash.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="string__hash_8cpp_source.html#l00019">19</a> of file <a class="el" href="string__hash_8cpp_source.html">string_hash.cpp</a>.</p>
 
 </div>
 </div>
-<a id="acfedab89a08be359588021412998f1ef" name="acfedab89a08be359588021412998f1ef"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acfedab89a08be359588021412998f1ef">&#9670;&#160;</a></span>hash_string() <span class="overload">[2/2]</span></h2>
+<a id="a0ee8630c80395f0d71a14f0d80c5e01b" name="a0ee8630c80395f0d71a14f0d80c5e01b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0ee8630c80395f0d71a14f0d80c5e01b">&#9670;&#160;</a></span>hash_string() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classait.html">size_t</a> hash_string </td>
+          <td class="memname">std::size_t hash_string </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classait.html">const</a> std::string &amp;&#160;</td>
+          <td class="paramtype">std::string_view&#160;</td>
           <td class="paramname"><em>s</em></td><td>)</td>
           <td></td>
         </tr>

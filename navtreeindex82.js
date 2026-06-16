@@ -1,11 +1,18 @@
 var NAVTREEINDEX82 =
 {
+"functions_k.html":[7,2,0,11],
+"functions_l.html":[7,2,0,12],
+"functions_m.html":[7,2,0,13],
+"functions_n.html":[7,2,0,14],
+"functions_o.html":[7,2,0,15],
+"functions_p.html":[7,2,0,16],
+"functions_q.html":[7,2,0,17],
 "functions_r.html":[7,2,0,18],
 "functions_rela.html":[7,2,6],
 "functions_s.html":[7,2,0,19],
 "functions_t.html":[7,2,0,20],
-"functions_type.html":[7,2,3,0],
 "functions_type.html":[7,2,3],
+"functions_type.html":[7,2,3,0],
 "functions_type_b.html":[7,2,3,1],
 "functions_type_c.html":[7,2,3,2],
 "functions_type_d.html":[7,2,3,3],
@@ -30,8 +37,8 @@ var NAVTREEINDEX82 =
 "functions_type_w.html":[7,2,3,22],
 "functions_u.html":[7,2,0,21],
 "functions_v.html":[7,2,0,22],
-"functions_vars.html":[7,2,2,0],
 "functions_vars.html":[7,2,2],
+"functions_vars.html":[7,2,2,0],
 "functions_vars_a.html":[7,2,2,1],
 "functions_vars_b.html":[7,2,2,2],
 "functions_vars_c.html":[7,2,2,3],
@@ -242,12 +249,5 @@ var NAVTREEINDEX82 =
 "gcc__builtin__headers__arm_8h.html#ab6b2f29151c62b6f9a37f320fda4aa7f":[8,0,2,1,0,4,123],
 "gcc__builtin__headers__arm_8h.html#ab7d5620fceddf33c1e327b028e13763f":[8,0,2,1,0,4,115],
 "gcc__builtin__headers__arm_8h.html#ab98fd708fe3989b1899d5c33ea4624ad":[8,0,2,1,0,4,69],
-"gcc__builtin__headers__arm_8h.html#abd07efc3449603a5a0793b491fed7c6c":[8,0,2,1,0,4,105],
-"gcc__builtin__headers__arm_8h.html#abf2de722c93008ec4b5c3ca2f927ed4f":[8,0,2,1,0,4,101],
-"gcc__builtin__headers__arm_8h.html#ac3327275a0cf73c877011ac05232a0c9":[8,0,2,1,0,4,3],
-"gcc__builtin__headers__arm_8h.html#ac3a4879d3dfec4999656b454088e6fca":[8,0,2,1,0,4,43],
-"gcc__builtin__headers__arm_8h.html#ac461a4c64cc3302d712285e49a2859eb":[8,0,2,1,0,4,63],
-"gcc__builtin__headers__arm_8h.html#ac85747141381cbdb9b7b8ed77597d61e":[8,0,2,1,0,4,77],
-"gcc__builtin__headers__arm_8h.html#acb6c00d58058788b70c259720f41106a":[8,0,2,1,0,4,78],
-"gcc__builtin__headers__arm_8h.html#accddfbc7a3754ec5d37faeefd152d6f1":[8,0,2,1,0,4,44]
+"gcc__builtin__headers__arm_8h.html#abd07efc3449603a5a0793b491fed7c6c":[8,0,2,1,0,4,105]
 };

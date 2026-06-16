@@ -117,22 +117,28 @@ $(document).ready(function(){initNavTree('string__hash_8h_source.html',''); init
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#define CPROVER_UTIL_STRING_HASH_H</span></div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &lt;string&gt;</span></div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="keywordtype">size_t</span> <a class="code hl_function" href="string__hash_8h.html#acfedab89a08be359588021412998f1ef">hash_string</a>(<span class="keyword">const</span> std::string &amp;s);</div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="keywordtype">size_t</span> <a class="code hl_function" href="string__hash_8h.html#acfedab89a08be359588021412998f1ef">hash_string</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *s);</div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span> </div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="comment">// NOLINTNEXTLINE(readability/identifiers)</span></div>
-<div class="foldopen" id="foldopen00021" data-start="{" data-end="};">
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno"><a class="line" href="structstring__hash.html">   21</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structstring__hash.html">string_hash</a></div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>{</div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="structstring__hash.html#a3b95830da79b5e58df9148ea7c482796">   23</a></span>  <span class="keywordtype">size_t</span> <a class="code hl_function" href="structstring__hash.html#a3b95830da79b5e58df9148ea7c482796">operator()</a>(<span class="keyword">const</span> std::string &amp;s)<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <a class="code hl_function" href="string__hash_8h.html#acfedab89a08be359588021412998f1ef">hash_string</a>(s); }</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>};</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#include &lt;string_view&gt;</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>std::size_t <a class="code hl_function" href="string__hash_8h.html#a36c62a2f0e7c1555e9384bf307b44067">hash_string</a>(std::string_view);</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>std::size_t <a class="code hl_function" href="string__hash_8h.html#a36c62a2f0e7c1555e9384bf307b44067">hash_string</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *s, std::size_t len);</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="comment">// NOLINTNEXTLINE(readability/identifiers)</span></div>
+<div class="foldopen" id="foldopen00022" data-start="{" data-end="};">
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno"><a class="line" href="structstring__hash.html">   22</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structstring__hash.html">string_hash</a></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>{</div>
+<div class="foldopen" id="foldopen00024" data-start="{" data-end="}">
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno"><a class="line" href="structstring__hash.html#a2c72f6176f41cb87c4a9b3991655ab1e">   24</a></span>  std::size_t <a class="code hl_function" href="structstring__hash.html#a2c72f6176f41cb87c4a9b3991655ab1e">operator()</a>(<span class="keyword">const</span> std::string &amp;s)<span class="keyword"> const</span></div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="keyword">  </span>{</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="string__hash_8h.html#a36c62a2f0e7c1555e9384bf307b44067">hash_string</a>(s);</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>  }</div>
 </div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="preprocessor">#endif </span><span class="comment">// CPROVER_UTIL_STRING_HASH_H</span></div>
-<div class="ttc" id="astring__hash_8h_html_acfedab89a08be359588021412998f1ef"><div class="ttname"><a href="string__hash_8h.html#acfedab89a08be359588021412998f1ef">hash_string</a></div><div class="ttdeci">size_t hash_string(const std::string &amp;s)</div><div class="ttdef"><b>Definition</b> <a href="string__hash_8cpp_source.html#l00014">string_hash.cpp:14</a></div></div>
-<div class="ttc" id="astructstring__hash_html"><div class="ttname"><a href="structstring__hash.html">string_hash</a></div><div class="ttdef"><b>Definition</b> <a href="string__hash_8h_source.html#l00021">string_hash.h:22</a></div></div>
-<div class="ttc" id="astructstring__hash_html_a3b95830da79b5e58df9148ea7c482796"><div class="ttname"><a href="structstring__hash.html#a3b95830da79b5e58df9148ea7c482796">string_hash::operator()</a></div><div class="ttdeci">size_t operator()(const std::string &amp;s) const</div><div class="ttdef"><b>Definition</b> <a href="string__hash_8h_source.html#l00023">string_hash.h:23</a></div></div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>};</div>
+</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span> </div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="preprocessor">#endif </span><span class="comment">// CPROVER_UTIL_STRING_HASH_H</span></div>
+<div class="ttc" id="astring__hash_8h_html_a36c62a2f0e7c1555e9384bf307b44067"><div class="ttname"><a href="string__hash_8h.html#a36c62a2f0e7c1555e9384bf307b44067">hash_string</a></div><div class="ttdeci">std::size_t hash_string(std::string_view)</div><div class="ttdef"><b>Definition</b> <a href="string__hash_8cpp_source.html#l00014">string_hash.cpp:14</a></div></div>
+<div class="ttc" id="astructstring__hash_html"><div class="ttname"><a href="structstring__hash.html">string_hash</a></div><div class="ttdef"><b>Definition</b> <a href="string__hash_8h_source.html#l00022">string_hash.h:23</a></div></div>
+<div class="ttc" id="astructstring__hash_html_a2c72f6176f41cb87c4a9b3991655ab1e"><div class="ttname"><a href="structstring__hash.html#a2c72f6176f41cb87c4a9b3991655ab1e">string_hash::operator()</a></div><div class="ttdeci">std::size_t operator()(const std::string &amp;s) const</div><div class="ttdef"><b>Definition</b> <a href="string__hash_8h_source.html#l00024">string_hash.h:24</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

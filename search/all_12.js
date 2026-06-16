@@ -155,7 +155,7 @@ var searchData=
   ['left_5finterval_152',['left_interval',['../structleft__and__right__valuest.html#a83958e95e17f70be35ed469a600fc61b',1,'left_and_right_valuest']]],
   ['left_5fshift_153',['left_shift',['../classconstant__interval__exprt.html#a41ed19940c3bad28cc85ee2f600a30cb',1,'constant_interval_exprt::left_shift(const constant_interval_exprt &amp;o) const'],['../classconstant__interval__exprt.html#af05214af62de62344f88580ad0cc882e',1,'constant_interval_exprt::left_shift(const constant_interval_exprt &amp;a, const constant_interval_exprt &amp;b)']]],
   ['legacy_20output_154',['CProver legacy output',['../group__util.html#CProver-legacy-output',1,'']]],
-  ['len_155',['len',['../structstring__ptrt.html#a9d971d40e645e8cd1eaad1bd7ffd9270',1,'string_ptrt']]],
+  ['len_155',['len',['../classstring__ptrt.html#a9d971d40e645e8cd1eaad1bd7ffd9270',1,'string_ptrt']]],
   ['len_5fh_156',['LEN_h',['../classformat__tokent.html#ad025d7dff05463e60306a35a31c90f4bab73fcc5224d497ac4caddae66301ccd9',1,'format_tokent']]],
   ['len_5fhh_157',['LEN_hh',['../classformat__tokent.html#ad025d7dff05463e60306a35a31c90f4bae229000fca90fe25d1dc463697ed4b5e',1,'format_tokent']]],
   ['len_5fj_158',['LEN_j',['../classformat__tokent.html#ad025d7dff05463e60306a35a31c90f4baeb673c06a187158fb56f9f41c1120314',1,'format_tokent']]],

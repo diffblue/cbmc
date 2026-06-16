@@ -2,6 +2,7 @@ var classdstringt =
 [
     [ "dstringt", "classdstringt.html#ade5eba4db4f60766407d39130c9c0761", null ],
     [ "dstringt", "classdstringt.html#a29d34783feedb870959dd1ac186e993c", null ],
+    [ "dstringt", "classdstringt.html#a420ee93c6d3b3954b9c015c577310214", null ],
     [ "dstringt", "classdstringt.html#a155fb760c5a86ddd1b5b7d4cb04ea3ad", null ],
     [ "dstringt", "classdstringt.html#a31ffaecf24c072a93a34cc8353ef2aaa", null ],
     [ "dstringt", "classdstringt.html#acf8b011a617d53aba96333db5268a429", null ],
@@ -33,7 +34,7 @@ var classdstringt =
     [ "operator[]", "classdstringt.html#ad351c090775c994bcff2dd9e6beae487", null ],
     [ "size", "classdstringt.html#aa1ffdeb71a3035dc8cd289066bc634bc", null ],
     [ "starts_with", "classdstringt.html#a1d8ed5d7f9cb92e42fdfa6ef7cdac022", null ],
-    [ "starts_with", "classdstringt.html#a27628fcb2a03f87ff068d9fe4f20b67b", null ],
+    [ "starts_with", "classdstringt.html#a26c91bf6df99e182eda07ce627c84cd0", null ],
     [ "swap", "classdstringt.html#a1969094925dd74c39194226419055dfd", null ],
     [ "no", "classdstringt.html#ae4fb067f04c5f3fa31dcebe08a649db8", null ]
 ];
