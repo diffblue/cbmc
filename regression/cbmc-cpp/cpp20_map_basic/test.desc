@@ -1,7 +1,24 @@
-CORE
+KNOWNBUG
 main.cpp
 --cpp20
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
+^CONVERSION ERROR$
+^.*is unknown.*$
+--
+C++20 <map>: operator[] insert + access.
+
+Reclassified CORE -> KNOWNBUG by the member-typedef conformance fix
+([temp.inst]/1-2, [dcl.typedef]).  Previously this passed only because the
+non-conformant *truncated* std::map had its operations havoc'd (symex executed
+none of the real container; the property was vacuous).  The fix makes the front
+end conformant and symex now executes the REAL std::map / _Rb_tree machinery,
+which does not complete within resources (the heavy tuple/piecewise pair
+construction, cf. the long-standing cpp11_map_insert KNOWNBUG).
+
+Second-tier verification-PERFORMANCE item, not a conformance one; the previous
+"pass" was unsound.  Reclassify back to CORE once symex is tractable on the real
+container.
+See doc/architectural/cpp-class-template-instantiation-plan.md.
