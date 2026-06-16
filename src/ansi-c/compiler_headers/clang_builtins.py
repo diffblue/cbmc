@@ -625,6 +625,52 @@ def merge(declaration_map, additions):
         declaration_map.setdefault(k, {}).update(v)
 
 
+def run_self_test():
+    """Exercise the TableGen and compact-encoding parsers on a handful of
+    inputs.  Nothing in CI runs this script, so this is a cheap regression
+    guard for the two parsers most likely to break when LLVM changes its
+    emitters.  Invoke with: clang_builtins.py --self-test"""
+    # process_td: a one-line X86Builtin def round-trips to a C declaration.
+    td = ('def paddd128 : X86Builtin<"_Vector<4, int>(_Vector<4, int>, '
+          '_Vector<4, int>)">;')
+    assert process_td(td, 'x86') == {
+            'x86': {'__builtin_ia32_paddd128':
+                    '__gcc_v4si __builtin_ia32_paddd128'
+                    '(__gcc_v4si, __gcc_v4si);'}}, 'process_td'
+
+    # decode_encoding: the compact .inc encodings, including the
+    # width-modified integer types (Wi/Zi/LLLi) and a half-float scalar.
+    cases = {
+            'V8ScV8ScV8Sc': '__gcc_v8qi foo(__gcc_v8qi, __gcc_v8qi);',
+            'WiWi': 'long long foo(long long);',
+            'UWiV4Ui': 'unsigned long long foo(__gcc_v4usi);',
+            'ULLLiULLLiULLLi':
+                'unsigned __int128 foo(unsigned __int128, '
+                'unsigned __int128);',
+            'hh': '_Float16 foo(_Float16);',
+            }
+    for encoding, expected in cases.items():
+        assert decode_encoding('foo', encoding) == expected, encoding
+
+    # A vector without a lane count is unmappable, not a hard crash.
+    try:
+        decode_encoding('foo', 'Vc')
+        assert False, 'expected UnmappableType for Vc'
+    except UnmappableType:
+        pass
+
+    # process_inc: a one-entry ..._BUILTIN_INFOS snippet.
+    inc = ('Builtin::Info{Builtin::Info::StrOffsets{1 /* vadd_s64 */, '
+           '2 /* WiWiWi */, 3 /* n */, 4 /* neon */}, '
+           'HeaderDesc::NO_HEADER, ALL_LANGUAGES},')
+    assert process_inc(inc, '__builtin_neon_') == {
+            'neon': {'__builtin_neon_vadd_s64':
+                     'long long __builtin_neon_vadd_s64'
+                     '(long long, long long);'}}, 'process_inc'
+
+    print('self-test: all checks passed')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -635,7 +681,14 @@ def main():
             help='parse a clang-tblgen-generated .inc file instead of the '
                  'TableGen .td databases, prepending PREFIX to each builtin '
                  'name (e.g. __builtin_neon_:neon_sema.inc)')
+    parser.add_argument(
+            '--self-test', action='store_true',
+            help='run built-in regression checks and exit')
     args = parser.parse_args()
+
+    if args.self_test:
+        run_self_test()
+        return
 
     known_declarations = read_declarations(args.headers)
     declaration_map = {}
