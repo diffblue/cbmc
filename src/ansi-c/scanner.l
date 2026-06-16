@@ -1672,6 +1672,9 @@ enable_or_disable ("enable"|"disable")
 "vector_size" |
 "__vector_size__"   { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_VECTOR_SIZE; }
 
+"neon_vector_type" |
+"__neon_vector_type__" { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_NEON_VECTOR_TYPE; }
+
 "mode" |
 "__mode__"          { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_MODE; }
 

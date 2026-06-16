@@ -89,6 +89,11 @@ const char gcc_builtin_headers_arm[] = "#line 1 \"gcc_builtin_headers_arm.h\"\n"
 #include "compiler_headers/gcc_builtin_headers_arm.inc" // IWYU pragma: keep
   ; // NOLINT(whitespace/semicolon)
 
+const char gcc_builtin_headers_aarch64[] =
+  "#line 1 \"gcc_builtin_headers_aarch64.h\"\n"
+#include "compiler_headers/gcc_builtin_headers_aarch64.inc" // IWYU pragma: keep
+  ; // NOLINT(whitespace/semicolon)
+
 const char gcc_builtin_headers_mips[] =
   "#line 1 \"gcc_builtin_headers_mips.h\"\n"
 #include "compiler_headers/gcc_builtin_headers_mips.inc" // IWYU pragma: keep

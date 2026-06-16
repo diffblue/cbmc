@@ -206,6 +206,9 @@ bool builtin_factory(
     {
       if(find_pattern(pattern, gcc_builtin_headers_arm, s))
         return convert(identifier, s, symbol_table, mh);
+
+      if(find_pattern(pattern, gcc_builtin_headers_aarch64, s))
+        return convert(identifier, s, symbol_table, mh);
     }
     else if(config.ansi_c.arch=="mips64el" ||
             config.ansi_c.arch=="mipsn32el" ||
