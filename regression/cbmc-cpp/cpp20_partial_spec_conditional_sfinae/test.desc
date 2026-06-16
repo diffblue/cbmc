@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+Conditional-operator SFINAE partial-spec selection
+(`void_t<decltype(false ? declval<A>() : declval<B>())>`) with function-body
+locals -- the working contrast to cpp20_partial_spec_conditional_sfinae_member.
+N5008 [temp.spec.partial.match]/2, [temp.deduct]/8, [expr.cond]/4.  The
+specialization is selected when a common type exists and rejected (primary used)
+when the conditional decltype is ill-formed.
