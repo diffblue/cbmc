@@ -11,6 +11,7 @@ Date: June 2003
 #include "goto_convert_functions.h"
 
 #include <util/expr_util.h>
+#include <util/prefix.h>
 #include <util/std_code.h>
 #include <util/symbol_table_builder.h>
 
@@ -159,34 +160,51 @@ void goto_convert_functionst::convert_function(
   if(symbol.value.is_nil() && symbol.type.id() == ID_code)
   {
     const std::string sname = id2string(identifier);
+    const auto &op_params = code_type.parameters();
+    // The placement forms operator new(size, void*) and
+    // operator delete(void*, void*) ([new.delete.placement]) take a trailing
+    // pointer argument and neither allocate nor deallocate; they must not be
+    // synthesised as (de)allocations.  All other allocation functions allocate
+    // their first (size) argument and all other deallocation functions
+    // deallocate their first (pointer) argument ([basic.stc.dynamic]); the
+    // optional size_t / align_val_t / nothrow_t arguments are not used.
+    const bool is_placement_form =
+      op_params.size() >= 2 && op_params.back().type().id() == ID_pointer;
     irep_idt impl;
-    if(
-      sname == "operatorcpp_new(unsigned_long_int)" ||
-      sname == "operatorcpp_new(unsigned_int)")
-      impl = "__new";
-    else if(
-      sname == "operatorcpp_new[](unsigned_long_int)" ||
-      sname == "operatorcpp_new[](unsigned_int)")
+    if(is_placement_form)
+    {
+      // leave to its own body
+    }
+    else if(has_prefix(sname, "operatorcpp_new[]("))
       impl = "__new_array";
-    else if(sname == "operatorcpp_delete(ptr_void)")
-      impl = "__delete";
-    else if(sname == "operatorcpp_delete[](ptr_void)")
+    else if(has_prefix(sname, "operatorcpp_new("))
+      impl = "__new";
+    else if(has_prefix(sname, "operatorcpp_delete[]("))
       impl = "__delete_array";
+    else if(has_prefix(sname, "operatorcpp_delete("))
+      impl = "__delete";
     if(!impl.empty() && symbol_table.has_symbol(impl))
     {
       const symbolt &impl_sym = symbol_table.lookup_ref(impl);
       const code_typet &impl_type = to_code_type(impl_sym.type);
       const auto &params = code_type.parameters();
-      // Ensure parameter symbol exists
-      irep_idt param_id =
-        params.empty() ? irep_idt() : params[0].get_identifier();
-      if(!params.empty() && param_id.empty())
+      // Ensure every parameter has an identifier.  operator new/delete (and
+      // their sized/aligned overloads) are frequently declared without
+      // parameter names, leaving empty identifiers; the synthesised body uses
+      // only the first parameter, but all parameters must be named for the
+      // goto function (an empty identifier triggers a namespace lookup
+      // failure downstream).
+      bool created_param = false;
+      for(std::size_t i = 0; i < params.size(); ++i)
       {
-        param_id = id2string(identifier) + "::size";
+        if(!params[i].get_identifier().empty())
+          continue;
+        const irep_idt pid =
+          id2string(identifier) + "::param" + std::to_string(i);
         symbolt param_sym;
-        param_sym.name = param_id;
-        param_sym.base_name = "size";
-        param_sym.type = params[0].type();
+        param_sym.name = pid;
+        param_sym.base_name = "param" + std::to_string(i);
+        param_sym.type = params[i].type();
         param_sym.mode = symbol.mode;
         param_sym.is_lvalue = true;
         param_sym.is_parameter = true;
@@ -194,13 +212,19 @@ void goto_convert_functionst::convert_function(
         param_sym.is_file_local = true;
         symbol_table.get_writeable_ref(identifier)
           .type.add(ID_parameters)
-          .get_sub()[0]
-          .set(ID_C_identifier, param_id);
+          .get_sub()[i]
+          .set(ID_C_identifier, pid);
         symbol_table.insert(std::move(param_sym));
-        // Re-read code_type after modification
+        created_param = true;
+      }
+      if(created_param)
         f.set_parameter_identifiers(
           to_code_type(symbol_table.lookup_ref(identifier).type));
-      }
+      const irep_idt param_id =
+        params.empty() ? irep_idt()
+                       : to_code_type(symbol_table.lookup_ref(identifier).type)
+                           .parameters()[0]
+                           .get_identifier();
       // Build goto program: call __new(param0) and return result
       if(impl_type.return_type().id() != ID_empty && !params.empty())
       {
