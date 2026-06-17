@@ -310,3 +310,61 @@ TEST_CASE(
   const irept bar{"bar"};
   REQUIRE(foo == bar);
 }
+
+TEST_CASE(
+  "Destroying a deeply nested irept does not overflow the stack",
+  "[core][utils][irept]")
+{
+  // A chain of ireps this deep, destroyed by naive recursion, overflows the
+  // call stack: a recursive destructor exceeds the default (~8 MiB) unit-test
+  // stack well below this depth. remove_ref must therefore bound its recursion
+  // (it caps recursive deletion at a depth sized for a small ~1 MiB stack) and
+  // collapse the deep remainder iteratively. The depth is kept far below what
+  // memory would allow, so the test stays cheap, while remaining well past
+  // both that recursion bound and the recursive-overflow depth on this stack.
+  const std::size_t depth = 100000;
+
+  SECTION("chain through positional sub")
+  {
+    irept root;
+    for(std::size_t i = 0; i < depth; ++i)
+    {
+      irept parent{ID_symbol};
+      parent.move_to_sub(root); // root becomes parent's child; root left nil
+      root.swap(parent);        // root is now the new outermost node
+    }
+
+    // The chain is `depth` deep (traversed iteratively, not recursively).
+    std::size_t measured = 0;
+    for(const irept *p = &root; !p->get_sub().empty();
+        p = &p->get_sub().front())
+      ++measured;
+    REQUIRE(measured == depth);
+
+    // Destroying the chain (freeing root's deep data) must not overflow the
+    // stack; reaching the next line without crashing is the test.
+    root = irept{};
+    REQUIRE(root.get_sub().empty());
+  }
+
+  SECTION("chain through named_sub")
+  {
+    // Exercises the named_sub branch of the iterative deletion path.
+    irept root;
+    for(std::size_t i = 0; i < depth; ++i)
+    {
+      irept parent{ID_symbol};
+      parent.move_to_named_sub("child", root);
+      root.swap(parent);
+    }
+
+    std::size_t measured = 0;
+    for(const irept *p = &root; !p->get_named_sub().empty();
+        p = &p->get_named_sub().begin()->second)
+      ++measured;
+    REQUIRE(measured == depth);
+
+    root = irept{};
+    REQUIRE(root.get_named_sub().empty());
+  }
+}
