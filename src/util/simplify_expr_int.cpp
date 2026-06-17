@@ -601,6 +601,15 @@ simplify_exprt::simplify_minus(const minus_exprt &expr)
     is_number(minus_expr.type()) && operands[0].type().id() == ID_pointer &&
     operands[1].type().id() == ID_pointer)
   {
+    // p - p == 0 for syntactically identical pointer operands (including two
+    // null pointers): the difference of a pointer with itself is zero whatever
+    // it points to.  This lets, for instance, an empty container's
+    // size() == _M_finish - _M_start (both null) fold to a constant rather than
+    // staying a symbolic pointer difference -- which in turn keeps a subsequent
+    // allocation size constant instead of symbolic.
+    if(operands[0] == operands[1])
+      return changed(from_integer(0, minus_expr.type()));
+
     exprt ptr_op0 = simplify_object(operands[0]).expr;
     exprt ptr_op1 = simplify_object(operands[1]).expr;
 
