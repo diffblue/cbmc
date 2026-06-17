@@ -249,9 +249,22 @@ void goto_symext::symex_function_call_post_clean(
   }
   catch(const std::out_of_range &)
   {
-    // Function not in goto function map — treat as no-body function.
-    // This can happen for implicitly-generated destructors or
-    // constructors that were not goto-converted.
+    // Function not in goto function map — treat it as a no-body function:
+    // havoc the return value and continue past the call.  This mirrors the
+    // handling of declared-but-undefined functions below.  Crucially, the
+    // program counter must be advanced (symex_transition): otherwise symex
+    // re-processes this very FUNCTION_CALL instruction indefinitely, never
+    // entering the (missing) callee and never returning to the caller, which
+    // manifests as non-termination (livelock) re-cleaning the call's
+    // arguments forever.
+    if(cleaned_lhs.is_not_nil())
+    {
+      const auto rhs = side_effect_expr_nondett(
+        cleaned_lhs.type(), state.source.pc->source_location());
+      symex_assign(state, cleaned_lhs, rhs);
+    }
+
+    symex_transition(state);
     return;
   }
   const goto_functionst::goto_functiont &goto_function = *goto_function_ptr;
