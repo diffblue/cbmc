@@ -1,0 +1,22 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ constrained partial specialization selected by requires-clause: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^.*is unknown.*$
+--
+C++20 constrained partial specialization selection ([temp.class.spec.match]/1-2,
+[temp.constr.order]): when several class-template partial specializations share
+the same template-argument pattern and differ only by their requires-clauses,
+the most-constrained satisfied one is selected.
+
+This is the minimal model of libstdc++'s std::__iterator_traits<_Iterator, void>
+specializations (distinguished by __iter_with_nested_types etc.).  Previously the
+front end kept whichever same-pattern specialization was matched first, ignoring
+the requires-clause; it now follows ID_specialization_of back to the primary and
+re-runs the constraint-aware selection for requires-clause-constrained
+specializations too.
