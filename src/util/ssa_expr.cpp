@@ -8,7 +8,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ssa_expr.h"
 
+#include "irep_hash.h"
 #include "pointer_expr.h"
+
+#include <unordered_map>
+#include <utility>
 
 /// If \p expr is:
 /// - a symbol_exprt "s" add "s" to the string \p os
@@ -134,12 +138,60 @@ static std::pair<irep_idt, irep_idt> build_identifier(
   const irep_idt &l1,
   const irep_idt &l2)
 {
+  // build_identifier is a pure function of its arguments and sits on symex's
+  // hottest path (renaming): it is called with an extremely high repeat rate
+  // -- measured >99.99% repeats (~20M calls but only a few hundred distinct
+  // results) on fully-elaborated libstdc++ container code.  Memoise it, storing
+  // the already-interned identifier pair, so a repeat avoids rebuilding the
+  // identifier string, interning it (a long string, the hot hash_string call),
+  // and allocating the result irepts.
+  struct cache_keyt
+  {
+    exprt expr;
+    irep_idt l0;
+    irep_idt l1;
+    irep_idt l2;
+
+    bool operator==(const cache_keyt &other) const
+    {
+      return l0 == other.l0 && l1 == other.l1 && l2 == other.l2 &&
+             expr == other.expr;
+    }
+  };
+  struct cache_key_hasht
+  {
+    std::size_t operator()(const cache_keyt &key) const
+    {
+      std::size_t result = irep_hash{}(key.expr);
+      result = hash_combine(result, key.l0.hash());
+      result = hash_combine(result, key.l1.hash());
+      result = hash_combine(result, key.l2.hash());
+      return result;
+    }
+  };
+
+  static thread_local std::
+    unordered_map<cache_keyt, std::pair<irep_idt, irep_idt>, cache_key_hasht>
+      cache;
+
+  const cache_keyt key{expr, l0, l1, l2};
+  const auto found = cache.find(key);
+  if(found != cache.end())
+    return found->second;
+
   std::string oss;
   std::string l1_object_oss;
-
   build_ssa_identifier_rec(expr, l0, l1, l2, oss, l1_object_oss);
+  std::pair<irep_idt, irep_idt> result{irep_idt{oss}, irep_idt{l1_object_oss}};
 
-  return std::make_pair(irep_idt{oss}, irep_idt{l1_object_oss});
+  // The distinct working set is small in practice (hundreds to tens of
+  // thousands of entries), but cap defensively so a pathological run cannot
+  // grow the cache without bound.
+  static const std::size_t max_cache_size = std::size_t{1} << 20;
+  if(cache.size() >= max_cache_size)
+    cache.clear();
+
+  return cache.emplace(key, std::move(result)).first->second;
 }
 
 static void update_identifier(ssa_exprt &ssa)
