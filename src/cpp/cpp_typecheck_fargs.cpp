@@ -30,7 +30,7 @@ bool cpp_typecheck_fargst::has_class_type() const
 void cpp_typecheck_fargst::build(
   const side_effect_expr_function_callt &function_call)
 {
-  in_use=true;
+  in_use = true;
   operands = function_call.arguments();
 }
 
@@ -332,34 +332,48 @@ bool cpp_typecheck_fargst::match(
   unsigned &distance,
   cpp_typecheckt &cpp_typecheck) const
 {
-  distance=0;
+  distance = 0;
 
-  exprt::operandst ops=operands;
-  const code_typet::parameterst &parameters=code_type.parameters();
+  exprt::operandst ops = operands;
+  const code_typet::parameterst &parameters = code_type.parameters();
 
-  if(parameters.size()>ops.size())
+  if(parameters.size() > ops.size())
   {
     // Check for default values.
     // Don't push the actual default value expressions into ops —
     // they may contain unresolved template parameters. Just verify
     // that default values exist for the extra parameters.
-    for(std::size_t i=ops.size(); i<parameters.size(); i++)
+    for(std::size_t i = ops.size(); i < parameters.size(); i++)
     {
-      const exprt &default_value=
-        parameters[i].default_value();
+      const exprt &default_value = parameters[i].default_value();
 
-      if(default_value.is_nil())
+      // [over.match.viable]/2.2: a candidate function with more
+      // parameters than there are arguments is viable only if each
+      // parameter without a corresponding argument has a default
+      // argument.  A genuine default argument is a proper expression;
+      // a nil or empty-id expression is not a default argument.  The
+      // latter can appear on the parameters of a function type that is
+      // synthesised during template argument deduction
+      // (`guess_function_template_args`), where a parameter with no
+      // default ends up carrying an empty `exprt` rather than a
+      // `nil_exprt`.  Treating that as a default argument would make,
+      // e.g., the four-parameter tag-dispatch overload
+      // `__find_if(_It, _It, _Pred, random_access_iterator_tag)`
+      // wrongly viable for the three-argument call
+      // `__find_if(first, last, pred)`, leaving the call ambiguous with
+      // the genuine three-parameter overload.
+      if(default_value.is_nil() || default_value.id().empty())
         return false;
     }
   }
-  else if(parameters.size()<ops.size())
+  else if(parameters.size() < ops.size())
   {
     // check for ellipsis
     if(!code_type.has_ellipsis())
       return false;
   }
 
-  exprt::operandst::iterator it=ops.begin();
+  exprt::operandst::iterator it = ops.begin();
   for(const auto &parameter : parameters)
   {
     if(it == ops.end())
@@ -374,16 +388,16 @@ bool cpp_typecheck_fargst::match(
     // * User-defined conversion sequences
     // * Ellipsis conversion sequences
 
-    const exprt &operand=*it;
-    typet type=parameter.type();
+    const exprt &operand = *it;
+    typet type = parameter.type();
 
-    #if 0
+#if 0
     // unclear, todo
     if(is_reference(operand.type()))
       std::cout << "O: " << operand.pretty() << '\n';
 
     assert(!is_reference(operand.type()));
-    #endif
+#endif
 
     // "this" is a special case -- we turn the pointer type
     // into a reference type to do the type matching
@@ -393,24 +407,24 @@ bool cpp_typecheck_fargst::match(
       type.set(ID_C_this, true);
     }
 
-    unsigned rank=0;
+    unsigned rank = 0;
     exprt new_expr;
 
-    #if 0
+#if 0
     std::cout << "C: " << cpp_typecheck.to_string(operand.type())
               << " -> " << cpp_typecheck.to_string(parameter.type())
               << '\n';
-    #endif
+#endif
 
     // can we do the standard conversion sequence?
     if(cpp_typecheck.implicit_conversion_sequence(
-        operand, type, new_expr, rank))
+         operand, type, new_expr, rank))
     {
       // ok
-      distance+=rank;
-      #if 0
+      distance += rank;
+#if 0
       std::cout << "OK " << rank << '\n';
-      #endif
+#endif
     }
     else if(
       operand.id() == ID_initializer_list && cpp_typecheck.cpp_is_pod(type) &&
@@ -472,9 +486,9 @@ bool cpp_typecheck_fargst::match(
   }
 
   // we may not have used all operands
-  for( ; it!=ops.end(); ++it)
+  for(; it != ops.end(); ++it)
     // Ellipsis is the 'worst' of the conversion sequences
-    distance+=1000;
+    distance += 1000;
 
   return true;
 }
