@@ -1184,7 +1184,31 @@ const symbolt *cpp_typecheckt::find_template_conversion_specialisation(
         template_map.build_template_args(cand_decl.template_type());
 
       if(!guessed_args.has_unassigned())
-        deduction_ok = true;
+      {
+        // [temp.deduct]/5 with [temp.constr.decl]/1: after successful
+        // argument deduction, the conversion-function template's
+        // associated constraints (its requires-clause) must be
+        // satisfied with the deduced arguments.  An unsatisfied
+        // constraint is a deduction failure ([temp.deduct]/5), so the
+        // candidate is removed rather than instantiated.  Without this
+        // check a non-viable deduction such as deducing the unsigned
+        // __max_size_type's `template<integral _Tp> operator _Tp()` for
+        // a class destination (e.g. __max_diff_type) would survive and
+        // be instantiated, producing a spurious "operator ... is
+        // unknown" error.
+        bool constraint_ok = true;
+        const exprt &req_clause = static_cast<const exprt &>(
+          cand_decl.template_type().find(ID_C_requires_clause));
+        if(req_clause.is_not_nil() && req_clause.id() != ID_nil)
+        {
+          exprt req_copy = req_clause;
+          template_map.apply(req_copy);
+          typecheck_expr(req_copy);
+          if(req_copy.is_false())
+            constraint_ok = false;
+        }
+        deduction_ok = constraint_ok;
+      }
     }
     catch(...)
     {
