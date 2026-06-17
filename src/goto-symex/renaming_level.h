@@ -58,8 +58,18 @@ struct symex_level1t
   /// Insert the content of \p other into this renaming
   void restore_from(const symex_level1t &other);
 
+  /// A counter that is incremented on every mutation of the level-1 frame
+  /// mapping.  It lets callers (e.g. a rename cache) cheaply detect whether the
+  /// mapping has changed: while the generation is unchanged, `operator()`
+  /// produces the same result for the same input.
+  std::size_t get_generation() const
+  {
+    return generation;
+  }
+
 private:
   symex_renaming_levelt current_names;
+  std::size_t generation = 0;
 };
 
 /// Functor to set the level 2 renaming of SSA expressions.
