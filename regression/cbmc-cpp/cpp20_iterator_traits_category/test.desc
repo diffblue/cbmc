@@ -7,26 +7,19 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
-^.*is unknown.*$
 --
-C++20 std::iterator_traits<__normal_iterator<...>>::iterator_category resolution.
+C++20 std::iterator_traits<__normal_iterator<...>>::iterator_category, end to end.
 
-KNOWNBUG: the C++20 std::__iterator_traits has three partial specializations
-sharing the template-argument pattern <_Iterator, void>, distinguished only by
-their requires-clauses (concept constraints __iter_with_nested_types /
-__iter_without_nested_types && __cpp17_*_iterator).  The front end does not yet
-select among same-pattern partial specializations by their associated
-constraints ([temp.class.spec.match]/1-2 with [temp.constr.order]), so
-iterator_traits<__normal_iterator<...>>::iterator_category does not resolve to
-the iterator's nested random_access_iterator_tag.
+The underlying root cause -- selecting the constrained __iterator_traits partial
+specialization by its requires-clause ([temp.class.spec.match]/[temp.constr.order])
+-- is now fixed (see cpp20_constrained_partial_spec), so
+iterator_traits<...>::iterator_category resolves to random_access_iterator_tag.
 
-Note: iterator_traits<int*>::iterator_category and
-std::vector<int>::iterator::iterator_category each resolve correctly in
-isolation; only the primary iterator_traits<It> (It a class) path -- which goes
-through the constrained __iterator_traits specialization -- fails.
+This end-to-end case via std::vector<int>::iterator remains KNOWNBUG: resolving
+the category now lets the full std::vector instantiation proceed, which hits a
+further (separate) front-end instantiation throw that truncates main, so the
+assertion is not yet reached.  That is the next cluster-#1 layer.
 
-This blocks the std::__find_if tag dispatch (and hence std::find / std::erase_if
-on real containers), which deduces the 4-argument overload from
-std::__iterator_category(first).
-
-Reclassify CORE once constrained partial specialization selection is supported.
+The minimal, genuine regression for the constrained-partial-specialization fix
+is cpp20_constrained_partial_spec (CORE).  Reclassify this end-to-end case CORE
+once the remaining std::vector-iterator instantiation issue is resolved.
