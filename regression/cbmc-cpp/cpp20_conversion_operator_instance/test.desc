@@ -1,0 +1,28 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ MD->MS then conversion-operator readback: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^.*is unknown.*$
+--
+[over.match.conv] with [temp.deduct]/8: an instantiated template conversion
+function is not a viable *non-template* conversion-operator candidate; failing
+to form its call is a soft non-viability handled by fresh template deduction,
+not a hard error.
+
+KNOWNBUG: for mutually-convertible class types each carrying a templated
+conversion operator, deducing a conversion (e.g. MD -> int) instantiates the
+source class's `operator(signed_int)` as a class component.  That instance is
+not registered in the class cpp_scope for name lookup, yet the non-template
+branch of user_defined_conversion_sequence iterated it and built a name-driven
+member call, throwing "symbol 'operator(signed_int)' is unknown" and aborting
+the enclosing statement (so the assertion is silently dropped -> vacuous
+SUCCESS).
+
+Minimal model of libstdc++'s std::ranges::__detail::__max_size_type /
+__max_diff_type.  Reclassify CORE once the non-template branch treats an
+unresolvable instantiated conversion operator as a soft skip.
