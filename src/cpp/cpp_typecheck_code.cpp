@@ -1119,7 +1119,13 @@ void cpp_typecheckt::typecheck_ifthenelse(code_ifthenelset &code)
     // C++17 if constexpr: evaluate condition at compile time and
     // discard the branch not taken so that ill-formed code in the
     // discarded branch does not cause errors.
-    typecheck_expr(code.cond());
+    {
+      // The condition of a constexpr if is manifestly constant-evaluated
+      // ([expr.const], [stmt.if]/2), so __builtin_is_constant_evaluated() is
+      // true within it ([meta.const.eval]/1).
+      constant_expression_contextt constant_expression_guard{*this};
+      typecheck_expr(code.cond());
+    }
     implicit_typecast_bool(code.cond());
     simplify(code.cond(), *this);
 
