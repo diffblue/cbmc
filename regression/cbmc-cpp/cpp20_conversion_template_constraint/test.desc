@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ constrained templated conversion operator: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^.*is unknown.*$
+--
+[temp.deduct]/5, [temp.deduct.conv], [temp.constr.decl]: a conversion-function
+template whose associated constraints (requires-clause) are not satisfied by the
+deduced arguments is removed from the candidate set.  Models libstdc++'s
+__max_size_type / __max_diff_type constrained templated conversion operators;
+without the constraint check the front end instantiated a bogus "operator
+<class>" and reported it unknown.
