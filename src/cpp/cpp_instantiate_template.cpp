@@ -970,6 +970,20 @@ void cpp_typecheckt::elaborate_class_template(
       for(const auto &p : tmpl_type.template_parameters())
         if(!p.get("#C_concept_constraint").empty())
           has_concept_constraint = true;
+      // A requires-clause on the partial specialization is an associated
+      // constraint ([temp.constr.decl]/1) just like a constrained
+      // template parameter.  When several partial specializations share
+      // the same argument pattern and differ only by their
+      // requires-clauses (e.g. libstdc++'s three __iterator_traits
+      // specializations), the most-constrained *satisfied* one must be
+      // selected ([temp.class.spec.match]/2 with [temp.constr.order]).
+      // Re-running the specialization search from the primary template
+      // (below) performs that constraint-aware selection, so trigger it
+      // for requires-clause-constrained specializations too -- otherwise
+      // the arbitrary specialization matched first is kept.
+      const irept &spec_req = tmpl_type.find(ID_C_requires_clause);
+      if(spec_req.is_not_nil() && spec_req.id() != ID_nil)
+        has_concept_constraint = true;
     }
     const symbolt &primary_template =
       has_concept_constraint
