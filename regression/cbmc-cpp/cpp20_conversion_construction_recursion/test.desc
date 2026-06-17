@@ -1,0 +1,28 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ MD->MS construction preserves value: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^.*is unknown.*$
+--
+[over.ics.user]/1 with [over.best.ics]/4: a user-defined conversion sequence
+contains at most one user-defined conversion; the argument/this conversions of
+a candidate constructor or conversion operator are standard conversion
+sequences and may not themselves require a user-defined conversion.
+
+KNOWNBUG: when resolving the construction of MS from an MD (a user-defined
+conversion), the front end realises a candidate's argument conversions by
+constructing temporaries and re-enters overload resolution without enforcing the
+"at most one user-defined conversion" rule.  For mutually-convertible class
+types -- each constructible from the other -- this recurses without bound
+(MS's copy/move constructor needs MD -> MS, which needs MD -> MS, ...),
+exhausting memory and crashing (SIGSEGV).
+
+Minimal model of libstdc++'s std::ranges::__detail::__max_size_type /
+__max_diff_type, reached when __to_unsigned_like constructs __max_size_type from
+__max_diff_type.  Reclassify CORE once the construction/overload-resolution path
+restricts candidate argument conversions to standard conversion sequences.
