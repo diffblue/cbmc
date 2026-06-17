@@ -121,7 +121,7 @@ Syntax</h1>
 <h1><a class="anchor" id="autotoc_md123"></a>
 Semantics</h1>
 <p>For <code>__CPROVER_forall</code> all <code>*type*</code> values for <code>*identifier*</code> must satisfy <code>*boolean expression*</code>.</p>
-<div class="fragment"><div class="line"><span class="keywordtype">int</span> <a class="code hl_class" href="classait.html">foo</a>(<span class="keywordtype">int</span> *<a class="code hl_class" href="classait.html">arr</a>, <span class="keywordtype">int</span> len)</div>
+<div class="fragment"><div class="line"><span class="keywordtype">int</span> <a class="code hl_class" href="classait.html">foo</a>(<span class="keywordtype">int</span> *<a class="code hl_class" href="classait.html">arr</a>, <span class="keywordtype">int</span> <a class="code hl_class" href="classait.html">len</a>)</div>
 <div class="line">  <span class="comment">/* ... */</span></div>
 <div class="line">  <a class="code hl_class" href="classait.html">__CPROVER_ensures</a>(<a class="code hl_class" href="classait.html">__CPROVER_forall</a> {</div>
 <div class="line">    <span class="keywordtype">int</span> i;</div>
@@ -131,17 +131,17 @@ Semantics</h1>
 <div class="line">  <span class="comment">/* every element in arr must be set to 0 */</span></div>
 <div class="line">}</div>
 </div><!-- fragment --><p>For <code>__CPROVER_exists</code> some (at least one) <code>*type*</code> value for <code>*identifier*</code> must satisfy <code>*boolean expression*</code>.</p>
-<div class="fragment"><div class="line"><span class="keywordtype">int</span> <a class="code hl_class" href="classait.html">bar</a>(<span class="keywordtype">int</span> *<a class="code hl_class" href="classait.html">arr</a>, <span class="keywordtype">int</span> len)</div>
+<div class="fragment"><div class="line"><span class="keywordtype">int</span> <a class="code hl_class" href="classait.html">bar</a>(<span class="keywordtype">int</span> *<a class="code hl_class" href="classait.html">arr</a>, <span class="keywordtype">int</span> <a class="code hl_class" href="classait.html">len</a>)</div>
 <div class="line">  <a class="code hl_class" href="classait.html">__CPROVER_requires</a>(<a class="code hl_class" href="classait.html">__CPROVER_exists</a> {</div>
 <div class="line">    <span class="keywordtype">int</span> i;</div>
-<div class="line">    (0 &lt;= i &amp;&amp; i &lt; len) &amp;&amp; <a class="code hl_class" href="classait.html">arr</a>[i] == 1</div>
+<div class="line">    (0 &lt;= i &amp;&amp; i &lt; <a class="code hl_class" href="classait.html">len</a>) &amp;&amp; <a class="code hl_class" href="classait.html">arr</a>[i] == 1</div>
 <div class="line">  })</div>
 <div class="line">  <span class="comment">/* ... */</span></div>
 <div class="line">{</div>
 <div class="line">  <span class="comment">/* at least one element in arr must be set to 1 */</span></div>
 <div class="line">}</div>
 </div><!-- fragment --><p>The examples above only work with the SMT backend, since <code>len</code> is not constant. However, if a constant maximum upper bound, say <code>MAX_LEN</code>, is known, then the following workaround may be used with the SAT backend:</p>
-<div class="fragment"><div class="line"><span class="keywordtype">int</span> <a class="code hl_class" href="classait.html">foo_sat</a>(<span class="keywordtype">int</span> *<a class="code hl_class" href="classait.html">arr</a>, <span class="keywordtype">int</span> len)</div>
+<div class="fragment"><div class="line"><span class="keywordtype">int</span> <a class="code hl_class" href="classait.html">foo_sat</a>(<span class="keywordtype">int</span> *<a class="code hl_class" href="classait.html">arr</a>, <span class="keywordtype">int</span> <a class="code hl_class" href="classait.html">len</a>)</div>
 <div class="line">  <span class="comment">/* ... */</span></div>
 <div class="line">  <a class="code hl_class" href="classait.html">__CPROVER_ensures</a>(<a class="code hl_class" href="classait.html">__CPROVER_forall</a> {</div>
 <div class="line">    <span class="keywordtype">int</span> i;</div>
@@ -152,11 +152,11 @@ Semantics</h1>
 <div class="line">  <span class="comment">/* every element in arr must be set to 0 */</span></div>
 <div class="line">}</div>
 <div class="line"> </div>
-<div class="line"><span class="keywordtype">int</span> <a class="code hl_class" href="classait.html">bar_sat</a>(<span class="keywordtype">int</span> *<a class="code hl_class" href="classait.html">arr</a>, <span class="keywordtype">int</span> len)</div>
+<div class="line"><span class="keywordtype">int</span> <a class="code hl_class" href="classait.html">bar_sat</a>(<span class="keywordtype">int</span> *<a class="code hl_class" href="classait.html">arr</a>, <span class="keywordtype">int</span> <a class="code hl_class" href="classait.html">len</a>)</div>
 <div class="line">  <a class="code hl_class" href="classait.html">__CPROVER_requires</a>(<a class="code hl_class" href="classait.html">__CPROVER_exists</a> {</div>
 <div class="line">    <span class="keywordtype">int</span> i;</div>
 <div class="line">    (0 &lt;= i &amp;&amp; i &lt; <a class="code hl_class" href="classait.html">MAX_LEN</a>) &amp;&amp;</div>
-<div class="line">      (i &lt; len &amp;&amp; <a class="code hl_class" href="classait.html">arr</a>[i] == 1)</div>
+<div class="line">      (i &lt; <a class="code hl_class" href="classait.html">len</a> &amp;&amp; <a class="code hl_class" href="classait.html">arr</a>[i] == 1)</div>
 <div class="line">  })</div>
 <div class="line">  <span class="comment">/* ... */</span></div>
 <div class="line">{</div>

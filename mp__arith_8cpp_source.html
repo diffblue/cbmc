@@ -187,9 +187,9 @@ $(document).ready(function(){initNavTree('mp__arith_8cpp_source.html',''); initR
 <div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    <a class="code hl_class" href="classait.html">a</a>=<a class="code hl_class" href="classait.html">a</a>-1;</div>
 <div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>  }</div>
 <div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span> </div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>  std::size_t len = <a class="code hl_class" href="classait.html">a</a>.digits(2) + 2;</div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>  std::vector&lt;char&gt; <a class="code hl_class" href="classait.html">buffer</a>(len);</div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>  <span class="keywordtype">char</span> *s = <a class="code hl_class" href="classait.html">a</a>.as_string(<a class="code hl_class" href="classait.html">buffer</a>.data(), len, 2);</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>  std::size_t <a class="code hl_class" href="classait.html">len</a> = <a class="code hl_class" href="classait.html">a</a>.digits(2) + 2;</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>  std::vector&lt;char&gt; <a class="code hl_class" href="classait.html">buffer</a>(<a class="code hl_class" href="classait.html">len</a>);</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>  <span class="keywordtype">char</span> *s = <a class="code hl_class" href="classait.html">a</a>.as_string(<a class="code hl_class" href="classait.html">buffer</a>.data(), <a class="code hl_class" href="classait.html">len</a>, 2);</div>
 <div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span> </div>
 <div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>  std::string result(s);</div>
 <div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span> </div>
@@ -215,9 +215,9 @@ $(document).ready(function(){initNavTree('mp__arith_8cpp_source.html',''); initR
 <div class="foldopen" id="foldopen00103" data-start="{" data-end="}">
 <div class="line"><a id="l00103" name="l00103"></a><span class="lineno"><a class="line" href="mp__arith_8cpp.html#a8ba48a3c9deb8ae1f6834b75d8e8157e">  103</a></span><span class="keyword">const</span> std::string <a class="code hl_function" href="mp__arith_8cpp.html#a8ba48a3c9deb8ae1f6834b75d8e8157e">integer2string</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;<a class="code hl_class" href="classait.html">n</a>, <span class="keywordtype">unsigned</span> base)</div>
 <div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>{</div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>  <span class="keywordtype">unsigned</span> len = <a class="code hl_class" href="classait.html">n</a>.digits(base) + 2;</div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>  std::vector&lt;char&gt; <a class="code hl_class" href="classait.html">buffer</a>(len);</div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>  <span class="keywordtype">char</span> *s = <a class="code hl_class" href="classait.html">n</a>.as_string(<a class="code hl_class" href="classait.html">buffer</a>.data(), len, base);</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>  <span class="keywordtype">unsigned</span> <a class="code hl_class" href="classait.html">len</a> = <a class="code hl_class" href="classait.html">n</a>.digits(base) + 2;</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>  std::vector&lt;char&gt; <a class="code hl_class" href="classait.html">buffer</a>(<a class="code hl_class" href="classait.html">len</a>);</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>  <span class="keywordtype">char</span> *s = <a class="code hl_class" href="classait.html">n</a>.as_string(<a class="code hl_class" href="classait.html">buffer</a>.data(), <a class="code hl_class" href="classait.html">len</a>, base);</div>
 <div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span> </div>
 <div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>  std::string result(s);</div>
 <div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span> </div>

@@ -1,13 +1,5 @@
 var NAVTREEINDEX137 =
 {
-"struct_____c_p_r_o_v_e_r__jsa__abstract__heap.html#ab93f1dd31ce9d52b18a43df608534080":[7,0,11,6],
-"struct_____c_p_r_o_v_e_r__jsa__abstract__heap.html#ad1b4929e90f296943b475244ff223f1c":[7,0,11,4],
-"struct_____c_p_r_o_v_e_r__jsa__abstract__heap.html#aee059d027898078d09dc6737877dd6ac":[7,0,11,1],
-"struct_____c_p_r_o_v_e_r__jsa__abstract__node.html":[7,0,12],
-"struct_____c_p_r_o_v_e_r__jsa__abstract__node.html#a5064ba87460e695a88effaff85460f61":[7,0,12,2],
-"struct_____c_p_r_o_v_e_r__jsa__abstract__node.html#a94e48f4591974d6b3f086b5415a27152":[7,0,12,3],
-"struct_____c_p_r_o_v_e_r__jsa__abstract__node.html#aae01b4a8d8e3f1caf849f9031778c729":[7,0,12,1],
-"struct_____c_p_r_o_v_e_r__jsa__abstract__node.html#ac4474cd3d5c90dad2dfda44c67444b43":[7,0,12,0],
 "struct_____c_p_r_o_v_e_r__jsa__abstract__range.html":[7,0,13],
 "struct_____c_p_r_o_v_e_r__jsa__abstract__range.html#a829c8b97cbdfb98687ad648e625c221d":[7,0,13,2],
 "struct_____c_p_r_o_v_e_r__jsa__abstract__range.html#aaee29a0235b09ba5caec95670d9675f0":[7,0,13,1],
@@ -249,5 +241,13 @@ var NAVTREEINDEX137 =
 "structc__wranglert.html#a9fc369b358ad718feb1054f4b28ddd9a":[7,0,164,5],
 "structc__wranglert.html#ab0ffe2ad05eeff74c1934ac7f0ff052d":[7,0,164,6],
 "structc__wranglert.html#ac21c3c6a7544f76c19551badfe7b0e91":[7,0,164,12],
-"structc__wranglert.html#adccb851511317c5c72b08e34dda94d01":[7,0,164,10]
+"structc__wranglert.html#adccb851511317c5c72b08e34dda94d01":[7,0,164,10],
+"structc__wranglert.html#af0a1eaed721b54c17bf5ef491ab5bcb9":[7,0,164,13],
+"structc__wranglert.html#af375a725ef3f16ac45b76defccc28a77":[7,0,164,11],
+"structc__wranglert.html#af9cfd1548e958645083ea2e4a982da16":[7,0,164,7],
+"structc__wranglert_1_1assertiont.html":[7,0,164,0],
+"structc__wranglert_1_1assertiont.html#a3a066111e93fdd7a1b6bfc6a3fa63acd":[7,0,164,0,0],
+"structc__wranglert_1_1assertiont.html#ac63638e98e9c67e0e21a7044081ff3e6":[7,0,164,0,2],
+"structc__wranglert_1_1assertiont.html#ada10b5d2ad83401b3b7249046da81370":[7,0,164,0,1],
+"structc__wranglert_1_1function__contract__clauset.html":[7,0,164,1]
 };

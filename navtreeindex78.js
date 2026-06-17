@@ -1,13 +1,5 @@
 var NAVTREEINDEX78 =
 {
-"dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57ca0c7dc71036b286cb40c89a96278edd79":[8,0,2,15,1,1,27,1,4],
-"dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57ca0d76f7fca152444eca8396f04e56323e":[8,0,2,15,1,1,27,1,0],
-"dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57ca14b9eb108773303ef4686acc671d5d6c":[8,0,2,15,1,1,27,1,27],
-"dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57ca273f34957eaf853e509e7e27c78b3780":[8,0,2,15,1,1,27,1,17],
-"dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57ca28862604b5c3de85da7cd7715caab021":[8,0,2,15,1,1,27,1,7],
-"dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57ca28bf3201ab67866b9a5794d8697748b4":[8,0,2,15,1,1,27,1,34],
-"dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57ca2920c74fa9cac391e894d2aef1f63623":[8,0,2,15,1,1,27,1,44],
-"dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57ca2b993f5042c5469e8b30dca8720dfe14":[8,0,2,15,1,1,27,1,6],
 "dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57ca37795e3e8a45428056029d9a0e62df93":[8,0,2,15,1,1,27,1,16],
 "dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57ca418e0ea29b1a407aa2a4dd5e18541519":[8,0,2,15,1,1,27,1,18],
 "dfcc__library_8h.html#a97b83fb2b0fd27b4146627b468ceb57ca4900a40db3c740023a8f26edcc4eabe7":[8,0,2,15,1,1,27,1,35],
@@ -249,5 +241,13 @@ var NAVTREEINDEX78 =
 "dir_e9678580bdac988aac1d79c6a2c6cbf9.html":[8,0,1,0,3],
 "dir_f05faa277b0629b18be13efb889125da.html":[8,0,2,27,6],
 "dir_f27efa9855da05acfb0caa0983180615.html":[8,0,2,27,4],
-"dir_f88182c44268ef6b082d02d66ccc5f99.html":[8,0,2,1]
+"dir_f88182c44268ef6b082d02d66ccc5f99.html":[8,0,2,1],
+"dir_fb43b298f453a3e0e36cbec7baf05559.html":[8,0,2,27,10],
+"dirty_8cpp.html":[8,0,2,0,21],
+"dirty_8cpp_source.html":[8,0,2,0,21],
+"dirty_8h.html":[8,0,2,0,22],
+"dirty_8h.html#a7decdce8c4fc1309ada2a017ef7b471d":[8,0,2,0,22,2],
+"dirty_8h_source.html":[8,0,2,0,22],
+"disjunctive__polynomial__acceleration_8cpp.html":[8,0,2,15,0,9],
+"disjunctive__polynomial__acceleration_8cpp_source.html":[8,0,2,15,0,9]
 };

@@ -208,13 +208,13 @@ Binary Search Unbounded Proof</h2>
 </div><!-- fragment --><p>The first command compiles the program to a GOTO binary, next we instrument the loops using the annotated loop contracts, and finally we verify the instrumented GOTO binary with desired checks.</p>
 <h2><a class="anchor" id="autotoc_md111"></a>
 Array Wipe Unbounded Proof</h2>
-<p>This example uses the <b>forall</b> quantifiers hence requires solving with the <code>--smt2</code> flag. </p><div class="fragment"><div class="line"><span class="keywordtype">void</span> <a class="code hl_class" href="classait.html">array_wipe</a>(<a class="code hl_class" href="classait.html">__CPROVER_size_t</a> len, <span class="keywordtype">char</span> * array)</div>
+<p>This example uses the <b>forall</b> quantifiers hence requires solving with the <code>--smt2</code> flag. </p><div class="fragment"><div class="line"><span class="keywordtype">void</span> <a class="code hl_class" href="classait.html">array_wipe</a>(<a class="code hl_class" href="classait.html">__CPROVER_size_t</a> <a class="code hl_class" href="classait.html">len</a>, <span class="keywordtype">char</span> * array)</div>
 <div class="line">{  </div>
 <div class="line">  <a class="code hl_function" href="cprover__builtin__headers_8h.html#ae5af07e274b573cd0f23ffb9d332bef2">__CPROVER_assume</a>(array != <a class="code hl_class" href="classait.html">NULL</a>); <span class="comment">// pre-condition</span></div>
 <div class="line"> </div>
-<div class="line">  <span class="keywordflow">for</span> (<a class="code hl_class" href="classait.html">__CPROVER_size_t</a> i = 0; i &lt; len; i++)</div>
-<div class="line">  <a class="code hl_class" href="classait.html">__CPROVER_assigns</a>(i, <a class="code hl_function" href="cprover__builtin__headers_8h.html#a2be80782db5f3cfb2a75f18530b2c992">__CPROVER_object_upto</a>(array, len))</div>
-<div class="line">  <a class="code hl_class" href="classait.html">__CPROVER_loop_invariant</a>(i &gt;= 0 &amp;&amp; i &lt;= len)</div>
+<div class="line">  <span class="keywordflow">for</span> (<a class="code hl_class" href="classait.html">__CPROVER_size_t</a> i = 0; i &lt; <a class="code hl_class" href="classait.html">len</a>; i++)</div>
+<div class="line">  <a class="code hl_class" href="classait.html">__CPROVER_assigns</a>(i, <a class="code hl_function" href="cprover__builtin__headers_8h.html#a2be80782db5f3cfb2a75f18530b2c992">__CPROVER_object_upto</a>(array, <a class="code hl_class" href="classait.html">len</a>))</div>
+<div class="line">  <a class="code hl_class" href="classait.html">__CPROVER_loop_invariant</a>(i &gt;= 0 &amp;&amp; i &lt;= <a class="code hl_class" href="classait.html">len</a>)</div>
 <div class="line">  <a class="code hl_class" href="classait.html">__CPROVER_loop_invariant</a>(<a class="code hl_class" href="classait.html">__CPROVER_forall</a> { <span class="keywordtype">size_t</span> j; (0 &lt;= j &amp;&amp; <a class="code hl_class" href="classait.html">j &lt; i) ==&gt;</a> array[j] == 0 } )</div>
 <div class="line">  {</div>
 <div class="line">      array[i] = 0; <span class="comment">//set all array indices to 0</span></div>

@@ -697,9 +697,9 @@ $(document).ready(function(){initNavTree('string_8c_source.html',''); initResiza
 <div class="line"><a id="l00566" name="l00566"></a><span class="lineno">  566</span>                         <span class="stringliteral">&quot;strlen zero-termination&quot;</span>);</div>
 <div class="line"><a id="l00567" name="l00567"></a><span class="lineno">  567</span>  <span class="keywordflow">return</span> <a class="code hl_function" href="cprover__builtin__headers_8h.html#a85d3c5a542e78b671377625ec9e0e42a">__CPROVER_zero_string_length</a>(s);</div>
 <div class="line"><a id="l00568" name="l00568"></a><span class="lineno">  568</span><span class="preprocessor">  #else</span></div>
-<div class="line"><a id="l00569" name="l00569"></a><span class="lineno">  569</span>  <a class="code hl_class" href="classait.html">__CPROVER_size_t</a> len=0;</div>
-<div class="line"><a id="l00570" name="l00570"></a><span class="lineno">  570</span>  <span class="keywordflow">while</span>(s[len]!=0) len++;</div>
-<div class="line"><a id="l00571" name="l00571"></a><span class="lineno">  571</span>  <span class="keywordflow">return</span> len;</div>
+<div class="line"><a id="l00569" name="l00569"></a><span class="lineno">  569</span>  <a class="code hl_class" href="classait.html">__CPROVER_size_t</a> <a class="code hl_class" href="classait.html">len</a>=0;</div>
+<div class="line"><a id="l00570" name="l00570"></a><span class="lineno">  570</span>  <span class="keywordflow">while</span>(s[<a class="code hl_class" href="classait.html">len</a>]!=0) <a class="code hl_class" href="classait.html">len</a>++;</div>
+<div class="line"><a id="l00571" name="l00571"></a><span class="lineno">  571</span>  <span class="keywordflow">return</span> <a class="code hl_class" href="classait.html">len</a>;</div>
 <div class="line"><a id="l00572" name="l00572"></a><span class="lineno">  572</span><span class="preprocessor">  #endif</span></div>
 <div class="line"><a id="l00573" name="l00573"></a><span class="lineno">  573</span>}</div>
 </div>

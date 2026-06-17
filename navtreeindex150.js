@@ -1,13 +1,5 @@
 var NAVTREEINDEX150 =
 {
-"windows__builtin__headers_8h.html":[8,0,2,1,0,23],
-"windows__builtin__headers_8h.html#a0a8dad26405aeed8b21bfd7dcd966a59":[8,0,2,1,0,23,0],
-"windows__builtin__headers_8h.html#a90432d5cda8bb2812a88e7ddec0ff1f0":[8,0,2,1,0,23,1],
-"windows__builtin__headers_8h.html#ace55a34951a334647bc953e8b67d5375":[8,0,2,1,0,23,2],
-"windows__builtin__headers_8h.html#adef577f2405b46237d2c721ff82e497c":[8,0,2,1,0,23,3],
-"windows__builtin__headers_8h_source.html":[8,0,2,1,0,23],
-"witness__provider_8h.html":[8,0,2,11,48],
-"witness__provider_8h_source.html":[8,0,2,11,48],
 "wmm_8h.html":[8,0,2,15,2,18],
 "wmm_8h.html#a658c2a0a6277ef45f721102f5a5293d9":[8,0,2,15,2,18,2],
 "wmm_8h.html#a658c2a0a6277ef45f721102f5a5293d9a4e81c184ac3ad48a389cd4454c4a05bb":[8,0,2,15,2,18,2,0],

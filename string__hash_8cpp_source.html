@@ -123,11 +123,11 @@ $(document).ready(function(){initNavTree('string__hash_8cpp_source.html',''); in
 </div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
 <div class="foldopen" id="foldopen00019" data-start="{" data-end="}">
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="string__hash_8cpp.html#a54db98f5c898ceb5fe59a2fc78341a26">   19</a></span>std::size_t <a class="code hl_function" href="string__hash_8cpp.html#a0ee8630c80395f0d71a14f0d80c5e01b">hash_string</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *s, std::size_t len)</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="string__hash_8cpp.html#a54db98f5c898ceb5fe59a2fc78341a26">   19</a></span>std::size_t <a class="code hl_function" href="string__hash_8cpp.html#a0ee8630c80395f0d71a14f0d80c5e01b">hash_string</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *s, std::size_t <a class="code hl_class" href="classait.html">len</a>)</div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>{</div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>  std::size_t <a class="code hl_class" href="classait.html">h</a> = 0;</div>
 <div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>  <span class="keywordflow">for</span>(; len != 0; --len, ++s)</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>  <span class="keywordflow">for</span>(; <a class="code hl_class" href="classait.html">len</a> != 0; --<a class="code hl_class" href="classait.html">len</a>, ++s)</div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    <a class="code hl_class" href="classait.html">h</a> = (<a class="code hl_class" href="classait.html">h</a> &lt;&lt; 5) - <a class="code hl_class" href="classait.html">h</a> + *s;</div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>  <span class="keywordflow">return</span> <a class="code hl_class" href="classait.html">h</a>;</div>
