@@ -1312,6 +1312,60 @@ void cpp_typecheckt::provide_stdlib_bodies()
     }
 
     else if(
+      base == "allocate" && name.find("std::allocator<") != std::string::npos)
+    {
+      // std::allocator<T>::allocate(n) — on GCC 13 this is the middle layer
+      // of the chain allocator_traits::allocate -> std::allocator::allocate ->
+      // __new_allocator::allocate.  Its constexpr body is dropped against
+      // CBMC's incomplete system-header model and it is flagged is_macro
+      // (constexpr), so without a model it is neither goto-converted nor
+      // callable.  Model it as allocating n * sizeof(T) bytes, exactly like
+      // the allocator_traits and __new_allocator cases, and clear is_macro so
+      // it is goto-converted and reachable at runtime.
+      const code_typet &fn_type = to_code_type(symbol.type);
+      const auto &ret_type = fn_type.return_type();
+      if(ret_type.id() == ID_pointer)
+      {
+        const auto &params = fn_type.parameters();
+        // params: this, n
+        if(params.size() >= 2)
+        {
+          const symbol_exprt n_expr(
+            params[1].get_identifier(), params[1].type());
+          const auto &elem_type = to_pointer_type(ret_type).base_type();
+          auto elem_size = size_of_expr(elem_type, ns);
+          if(elem_size.has_value())
+          {
+            auto total = mult_exprt(
+              typecast_exprt::conditional_cast(n_expr, elem_size->type()),
+              *elem_size);
+            side_effect_exprt alloc{
+              ID_allocate, {total, false_exprt()}, ret_type, symbol.location};
+            code_blockt block;
+            block.add(code_frontend_returnt(alloc));
+            ensure_parameter_symbols(symbol, symbol_table);
+            symbol.is_macro = false;
+            symbol.value = std::move(block);
+            symbol.value.type() = symbol.type;
+            deferred_typechecking.erase(symbol.name);
+          }
+        }
+      }
+    }
+    else if(
+      base == "deallocate" && name.find("std::allocator<") != std::string::npos)
+    {
+      // std::allocator<T>::deallocate — no-op for verification (mirrors the
+      // allocator_traits and __new_allocator deallocate models).
+      code_blockt block;
+      ensure_parameter_symbols(symbol, symbol_table);
+      symbol.is_macro = false;
+      symbol.value = std::move(block);
+      symbol.value.type() = symbol.type;
+      deferred_typechecking.erase(symbol.name);
+    }
+
+    else if(
       base == "__destroy" && name.find("_Destroy_aux") != std::string::npos)
     {
       // _Destroy_aux<false>::__destroy(first, last) — no-op for
