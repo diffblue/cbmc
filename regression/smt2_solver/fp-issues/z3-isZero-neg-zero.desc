@@ -1,0 +1,10 @@
+CORE
+z3-isZero-neg-zero.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+fp.isZero(-0) must be true: -0 equals +0 per IEEE 754, so the assertion
+not(fp.isZero(-0)) is unsatisfiable. This exercises the float -> bool cast,
+which must mask the sign bit rather than OR all bits together.
