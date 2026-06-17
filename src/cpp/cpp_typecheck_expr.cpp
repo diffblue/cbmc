@@ -3345,14 +3345,25 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     return;
   }
 
-  // __builtin_is_constant_evaluated() always returns false at runtime.
+  // [meta.const.eval]/1 with [expr.const]: __builtin_is_constant_evaluated()
+  // yields true if and only if it is evaluated within a manifestly
+  // constant-evaluated context, and false otherwise.  The front-end tracks
+  // such contexts with constant_expression_context (incremented while
+  // type-checking constant expressions / constexpr-required contexts, and
+  // reset to 0 by non_constant_expression_contextt while elaborating ordinary
+  // run-time function bodies).  Folding to that flag therefore makes the
+  // built-in true during constant evaluation (e.g. constexpr initialisers,
+  // static_assert conditions, the nested evaluation of a constexpr call) and
+  // false at run time -- which is what symex executes.
   if(expr.function().id() == ID_cpp_name)
   {
     const auto &name = to_cpp_name(expr.function());
     const irep_idt &bn = name.get_base_name();
     if(bn == "__builtin_is_constant_evaluated")
     {
-      exprt result = false_exprt();
+      exprt result = constant_expression_context > 0
+                       ? static_cast<exprt>(true_exprt{})
+                       : static_cast<exprt>(false_exprt{});
       result.add_source_location() = expr.source_location();
       expr.swap(result);
       return;
