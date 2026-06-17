@@ -20,6 +20,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck.h"
 #include "cpp_typecheck_fargs.h"
 
+#include <optional>
+
 std::optional<exprt> cpp_typecheckt::build_init_list_argument(
   const typet &target_type,
   const exprt &init_list)
@@ -153,9 +155,9 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
     if(symbol.value.is_nil())
       return;
 
-    if(symbol.value.id()!=ID_type)
+    if(symbol.value.id() != ID_type)
     {
-      error().source_location=symbol.location;
+      error().source_location = symbol.location;
       error() << "expected type as initializer for '" << symbol.base_name << "'"
               << eom;
       throw 0;
@@ -172,7 +174,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
     // do we need one?
     if(is_reference(symbol.type))
     {
-      error().source_location=symbol.location;
+      error().source_location = symbol.location;
       error() << "'" << symbol.base_name
               << "' is declared as reference but is not initialized" << eom;
       throw 0;
@@ -193,6 +195,16 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
   }
 
   // we do have an initializer
+
+  // [expr.const]: the initializer of a constexpr (or constinit) variable -- and
+  // of a const variable usable in constant expressions -- is manifestly
+  // constant-evaluated, so __builtin_is_constant_evaluated() is true within it
+  // ([meta.const.eval]/1).  Such variables are flagged is_macro by the
+  // declarator converter (constexpr storage); mark the context accordingly
+  // while the initializer is type-checked.
+  std::optional<constant_expression_contextt> constexpr_init_guard;
+  if(symbol.is_macro && !symbol.is_type)
+    constexpr_init_guard.emplace(*this);
 
   // Ensure a class type is fully elaborated before we decide how to
   // initialize it.  In particular cpp_is_pod (used just below to choose
@@ -340,20 +352,18 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
           symbol.location);
       }
 
-      if(resolved_expr.id()==ID_symbol)
+      if(resolved_expr.id() == ID_symbol)
       {
-        symbol.value=
-          address_of_exprt(resolved_expr);
+        symbol.value = address_of_exprt(resolved_expr);
 
         if(symbol.type.find(ID_to_member).is_not_nil())
           symbol.value.type().add(ID_to_member) =
             symbol.type.find(ID_to_member);
       }
-      else if(resolved_expr.id()==ID_member)
+      else if(resolved_expr.id() == ID_member)
       {
-        symbol.value =
-          address_of_exprt(
-            lookup(resolved_expr.get(ID_component_name)).symbol_expr());
+        symbol.value = address_of_exprt(
+          lookup(resolved_expr.get(ID_component_name)).symbol_expr());
 
         symbol.value.type().add(ID_to_member) =
           to_member_expr(resolved_expr).compound().type();
@@ -363,7 +373,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
 
       if(symbol.type != symbol.value.type())
       {
-        error().source_location=symbol.location;
+        error().source_location = symbol.location;
         error() << "conversion from '" << to_string(symbol.value.type())
                 << "' to '" << to_string(symbol.type) << "' " << eom;
         throw 0;
@@ -414,13 +424,14 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
     if(symbol.value.type().find(ID_to_member).is_not_nil())
       symbol.type.add(ID_to_member) = symbol.value.type().find(ID_to_member);
 
-    if(symbol.value.id()==ID_initializer_list ||
-       symbol.value.id()==ID_string_constant)
+    if(
+      symbol.value.id() == ID_initializer_list ||
+      symbol.value.id() == ID_string_constant)
     {
       do_initializer(symbol.value, symbol.type, true);
 
       if(symbol.type.find(ID_size).is_nil())
-        symbol.type=symbol.value.type();
+        symbol.type = symbol.value.type();
     }
     else if(has_auto(symbol.type))
     {
@@ -431,12 +442,12 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
     else
       implicit_typecast(symbol.value, symbol.type);
 
-    #if 0
+#if 0
     simplify_exprt simplify(*this);
     exprt tmp_value = symbol.value;
     if(!simplify.simplify(tmp_value))
       symbol.value.swap(tmp_value);
-    #endif
+#endif
   }
   else
   {
@@ -678,7 +689,7 @@ void cpp_typecheckt::zero_initializer(
 
     for(const auto &component : struct_type.components())
     {
-      if(component.type().id()==ID_code)
+      if(component.type().id() == ID_code)
         continue;
 
       if(component.get_bool(ID_is_type))
@@ -696,18 +707,18 @@ void cpp_typecheckt::zero_initializer(
   else if(
     type.id() == ID_array && !cpp_is_pod(to_array_type(type).element_type()))
   {
-    const array_typet &array_type=to_array_type(type);
-    const exprt &size_expr=array_type.size();
+    const array_typet &array_type = to_array_type(type);
+    const exprt &size_expr = array_type.size();
 
-    if(size_expr.id()==ID_infinity)
+    if(size_expr.id() == ID_infinity)
       return; // don't initialize
 
     const mp_integer size =
       numeric_cast_v<mp_integer>(to_constant_expr(size_expr));
-    CHECK_RETURN(size>=0);
+    CHECK_RETURN(size >= 0);
 
     exprt::operandst empty_operands;
-    for(mp_integer i=0; i<size; ++i)
+    for(mp_integer i = 0; i < size; ++i)
     {
       index_exprt index(
         object, from_integer(i, c_index_type()), array_type.element_type());
@@ -726,7 +737,7 @@ void cpp_typecheckt::zero_initializer(
     }
 
     // Select the largest component for zero-initialization
-    mp_integer max_comp_size=0;
+    mp_integer max_comp_size = 0;
 
     union_typet::componentt comp;
 
@@ -734,7 +745,7 @@ void cpp_typecheckt::zero_initializer(
     {
       DATA_INVARIANT(component.type().is_not_nil(), "missing component type");
 
-      if(component.type().id()==ID_code)
+      if(component.type().id() == ID_code)
         continue;
 
       auto component_size_opt = size_of_expr(component.type(), *this);
@@ -746,12 +757,12 @@ void cpp_typecheckt::zero_initializer(
         if(*size_int > max_comp_size)
         {
           max_comp_size = *size_int;
-          comp=component;
+          comp = component;
         }
       }
     }
 
-    if(max_comp_size>0)
+    if(max_comp_size > 0)
     {
       const cpp_namet cpp_name(comp.get_base_name(), source_location);
 
@@ -772,9 +783,9 @@ void cpp_typecheckt::zero_initializer(
     already_typechecked_exprt::make_already_typechecked(zero);
 
     code_frontend_assignt assign;
-    assign.lhs()=object;
-    assign.rhs()=zero;
-    assign.add_source_location()=source_location;
+    assign.lhs() = object;
+    assign.rhs() = zero;
+    assign.add_source_location() = source_location;
 
     typecheck_expr(assign.lhs());
     assign.lhs().type().set(ID_C_constant, false);
@@ -794,7 +805,7 @@ void cpp_typecheckt::zero_initializer(
     }
 
     code_frontend_assignt assign(object, *value);
-    assign.add_source_location()=source_location;
+    assign.add_source_location() = source_location;
 
     typecheck_expr(assign.lhs());
     assign.lhs().type().set(ID_C_constant, false);
