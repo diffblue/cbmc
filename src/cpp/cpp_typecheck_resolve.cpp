@@ -474,7 +474,166 @@ void cpp_typecheck_resolvet::guess_function_template_args(
         }
       }
 
-      if(concept_ok)
+      // [temp.deduct]/5 with [temp.constr.decl]/1: after deducing this
+      // function-template specialization, its associated constraints (the
+      // requires-clause) must be satisfied by the deduced arguments;
+      // otherwise the candidate is removed.  The concept_ok check above
+      // only handles a concept written on a template *parameter*
+      // (#C_concept_constraint, e.g. template<integral T>); it does not
+      // cover a requires-clause (template<typename T> requires C<T>), which
+      // is stored on the template_type.  Without this, e.g. a constrained
+      // templated constructor `C(T) requires integral<T>` would wrongly be
+      // viable with T deduced as a class type, yielding a bogus by-value
+      // `C(C)` whose argument materialisation re-invokes the same
+      // construction without bound (cf. libstdc++ __max_size_type /
+      // __max_diff_type).
+      bool requires_ok = true;
+      if(
+        concept_ok && e.id() == ID_template_function_instance &&
+        e.type().find(ID_C_template_arguments).is_not_nil())
+      {
+        const symbolt *tsym =
+          cpp_typecheck.symbol_table.lookup(e.type().get(ID_C_template));
+        if(tsym != nullptr && tsym->type.id() == ID_cpp_declaration)
+        {
+          const cpp_declarationt &tdecl = to_cpp_declaration(tsym->type);
+          const exprt &req_clause = static_cast<const exprt &>(
+            tdecl.template_type().find(ID_C_requires_clause));
+          if(req_clause.is_not_nil() && req_clause.id() != ID_nil)
+          {
+            // Evaluate the substituted constraint inside a SFINAE context
+            // ([temp.constr.atomic]/3): a failed/unsatisfied constraint is a
+            // soft failure, so any diagnostics emitted while typechecking it
+            // are suppressed and the error count is reset on exit.
+            sfinae_contextt sfinae_guard{cpp_typecheck};
+            try
+            {
+              // Map each (type) template parameter's short name to the
+              // deduced type.  The requires-clause is a raw parsed
+              // expression that still refers to the parameters by
+              // cpp_name (e.g. "T"); template_map.apply only rewrites
+              // typed parameter symbols, so substitute by name here.
+              const auto &params = tdecl.template_type().template_parameters();
+              const cpp_template_args_tct &targs =
+                to_cpp_template_args_tc(e.type().find(ID_C_template_arguments));
+              const auto &targ_v = targs.arguments();
+              std::map<irep_idt, typet> name_to_type;
+              for(std::size_t pi = 0; pi < params.size() && pi < targ_v.size();
+                  ++pi)
+              {
+                if(params[pi].id() != ID_type)
+                  continue;
+                const std::string pid =
+                  id2string(params[pi].type().get(ID_identifier));
+                const auto pos = pid.rfind("::");
+                const irep_idt sname =
+                  pos != std::string::npos ? pid.substr(pos + 2) : pid;
+                if(targ_v[pi].id() == ID_type)
+                  name_to_type[sname] = targ_v[pi].type();
+              }
+              exprt req_copy = req_clause;
+              std::function<void(irept &)> subst = [&](irept &n)
+              {
+                if(n.id() == ID_cpp_name)
+                {
+                  irep_idt only_name;
+                  bool single = true;
+                  for(const auto &s : n.get_sub())
+                  {
+                    if(s.id() == ID_name)
+                    {
+                      if(!only_name.empty())
+                        single = false;
+                      only_name = s.get(ID_identifier);
+                    }
+                    else
+                      single = false;
+                  }
+                  if(single)
+                  {
+                    auto it = name_to_type.find(only_name);
+                    if(it != name_to_type.end())
+                    {
+                      n = it->second;
+                      return;
+                    }
+                  }
+                }
+                for(auto &sub : n.get_sub())
+                  subst(sub);
+                for(auto &named : n.get_named_sub())
+                  subst(named.second);
+              };
+              subst(req_copy);
+              cpp_typecheck.typecheck_expr(req_copy);
+              // [temp.constr.op]: tri-state evaluation of the constraint's
+              // boolean structure (1 satisfied, 0 unsatisfied, -1 unknown).
+              // typecheck_expr folds atomic constraints to constants but
+              // leaves the &&/|| structure, so a single is_false() check
+              // misses e.g. or(false, false).  Reject only on a definite
+              // 'unsatisfied'; keep the candidate when unknown.
+              std::function<int(const exprt &)> eval =
+                [&](const exprt &x) -> int
+              {
+                if(x.is_true())
+                  return 1;
+                if(x.is_false())
+                  return 0;
+                if(x.id() == ID_and)
+                {
+                  int r = 1;
+                  for(const auto &o : x.operands())
+                  {
+                    const int v = eval(o);
+                    if(v == 0)
+                      return 0;
+                    if(v == -1)
+                      r = -1;
+                  }
+                  return r;
+                }
+                if(x.id() == ID_or)
+                {
+                  int r = 0;
+                  for(const auto &o : x.operands())
+                  {
+                    const int v = eval(o);
+                    if(v == 1)
+                      return 1;
+                    if(v == -1)
+                      r = -1;
+                  }
+                  return r;
+                }
+                if(x.id() == ID_not && x.operands().size() == 1)
+                {
+                  const int v = eval(to_not_expr(x).op());
+                  return v == -1 ? -1 : (v == 0 ? 1 : 0);
+                }
+                if(x.id() == ID_typecast && x.operands().size() == 1)
+                  return eval(to_typecast_expr(x).op());
+                if(x.id() == ID_symbol)
+                {
+                  const symbolt *s = cpp_typecheck.symbol_table.lookup(
+                    to_symbol_expr(x).get_identifier());
+                  if(
+                    s != nullptr && s->is_macro && s->value.is_not_nil() &&
+                    s->value.id() != ID_symbol)
+                    return eval(s->value);
+                }
+                return -1; // unknown -- conservatively keep the candidate
+              };
+              if(eval(req_copy) == 0)
+                requires_ok = false;
+            }
+            catch(...)
+            {
+            }
+          }
+        }
+      }
+
+      if(concept_ok && requires_ok)
         identifiers.push_back(e);
     }
     else if(old_id.id() == ID_symbol)
