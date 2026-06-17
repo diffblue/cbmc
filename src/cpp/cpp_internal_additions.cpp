@@ -245,12 +245,12 @@ void cpp_internal_additions(std::ostream &out)
   out << "template<typename _Tp> _Tp __builtin_reduce_mul(_Tp);\n";
 
   // GCC/Clang checked arithmetic builtins
-  out << "bool __builtin_add_overflow();\n";
-  out << "bool __builtin_sub_overflow();\n";
-  out << "bool __builtin_mul_overflow();\n";
-  out << "bool __builtin_add_overflow_p();\n";
-  out << "bool __builtin_sub_overflow_p();\n";
-  out << "bool __builtin_mul_overflow_p();\n";
+  out << "bool __builtin_add_overflow(...);\n";
+  out << "bool __builtin_sub_overflow(...);\n";
+  out << "bool __builtin_mul_overflow(...);\n";
+  out << "bool __builtin_add_overflow_p(...);\n";
+  out << "bool __builtin_sub_overflow_p(...);\n";
+  out << "bool __builtin_mul_overflow_p(...);\n";
 
   // GCC 13+ <type_traits> defines __and_/__or_ using decltype + SFINAE
   // on pack expansions, which CBMC cannot evaluate. Provide simple

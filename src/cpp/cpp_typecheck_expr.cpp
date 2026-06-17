@@ -4585,7 +4585,32 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   }
 
   // we will deal with some 'special' functions here
-  exprt tmp = do_special_functions(expr);
+  //
+  // do_special_functions (shared with the C front-end) recognises built-ins
+  // such as __builtin_*_overflow and the __CPROVER_* intrinsics by matching the
+  // function operand's identifier against plain names like
+  // "__builtin_mul_overflow".  In C++ the resolved function symbol's identifier
+  // additionally carries a parameter-signature suffix (e.g.
+  // "__builtin_mul_overflow()"), so those matches would never fire.  Try the
+  // shared handling on a copy whose function operand has been renamed to its
+  // base name, so that everything do_special_functions supports is also
+  // available in C++.  These built-ins are GCC/Clang extensions, not specified
+  // by N5008; their semantics follow the GCC documentation as implemented by
+  // do_special_functions.
+  exprt tmp = nil_exprt();
+  if(expr.function().id() == ID_symbol)
+  {
+    const irep_idt &fid = to_symbol_expr(expr.function()).get_identifier();
+    const symbolt *fsym = symbol_table.lookup(fid);
+    if(fsym != nullptr && fsym->base_name != fid)
+    {
+      side_effect_expr_function_callt normalized = expr;
+      to_symbol_expr(normalized.function()).set_identifier(fsym->base_name);
+      tmp = do_special_functions(normalized);
+    }
+  }
+  if(tmp.is_nil())
+    tmp = do_special_functions(expr);
   if(tmp.is_not_nil())
     expr.swap(tmp);
 } // NOLINT(readability/fn_size)
