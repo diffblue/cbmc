@@ -8,16 +8,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "cpp_internal_additions.h"
 
-#include <ostream>
-
 #include <util/c_types.h>
 #include <util/config.h>
 
-#include <ansi-c/ansi_c_internal_additions.h>
+#include <goto-programs/adjust_float_expressions.h>
 
+#include <ansi-c/ansi_c_internal_additions.h>
 #include <linking/static_lifetime_init.h>
 
-#include <goto-programs/adjust_float_expressions.h>
+#include <ostream>
 
 std::string c2cpp(const std::string &s)
 {
@@ -25,18 +24,18 @@ std::string c2cpp(const std::string &s)
 
   result.reserve(s.size());
 
-  for(std::size_t i=0; i<s.size(); i++)
+  for(std::size_t i = 0; i < s.size(); i++)
   {
-    char ch=s[i];
+    char ch = s[i];
 
-    if(ch=='_' && std::string(s, i, 5)=="_Bool")
+    if(ch == '_' && std::string(s, i, 5) == "_Bool")
     {
       result.append("bool");
-      i+=4;
+      i += 4;
       continue;
     }
 
-    result+=ch;
+    result += ch;
   }
 
   return result;
@@ -52,8 +51,7 @@ void cpp_internal_additions(std::ostream &out)
   // types
   out << "typedef __typeof__(sizeof(int)) __CPROVER::size_t;" << '\n';
   out << "typedef __CPROVER::size_t " CPROVER_PREFIX "size_t;" << '\n';
-  out << "typedef "
-      << c_type_as_string(signed_size_type().get(ID_C_c_type))
+  out << "typedef " << c_type_as_string(signed_size_type().get(ID_C_c_type))
       << " __CPROVER::ssize_t;" << '\n';
   out << "typedef __CPROVER::ssize_t " CPROVER_PREFIX "ssize_t;" << '\n';
 
@@ -179,7 +177,7 @@ void cpp_internal_additions(std::ostream &out)
   }
 
   // this is Visual C/C++ only
-  if(config.ansi_c.os==configt::ansi_ct::ost::OS_WIN)
+  if(config.ansi_c.os == configt::ansi_ct::ost::OS_WIN)
   {
     out << "int __noop(...);" << '\n';
     out << "int __assume(int);" << '\n';
@@ -243,6 +241,13 @@ void cpp_internal_additions(std::ostream &out)
   out << "template<typename _Tp> _Tp __builtin_reduce_xor(_Tp);\n";
   out << "template<typename _Tp> _Tp __builtin_reduce_add(_Tp);\n";
   out << "template<typename _Tp> _Tp __builtin_reduce_mul(_Tp);\n";
+
+  // __builtin_is_constant_evaluated(): provide a run-time definition returning
+  // false ([meta.const.eval]/1: false outside constant evaluation).  Calls in
+  // a manifestly constant-evaluated context are folded to true in
+  // typecheck_side_effect_function_call before this body would be used, so this
+  // body is only reached at run time.
+  out << "inline bool __builtin_is_constant_evaluated() { return false; }\n";
 
   // GCC/Clang checked arithmetic builtins
   out << "bool __builtin_add_overflow(...);\n";

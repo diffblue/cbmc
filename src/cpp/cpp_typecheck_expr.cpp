@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/mathematical_types.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
+#include <util/prefix.h>
 #include <util/replace_symbol.h>
 #include <util/simplify_expr.h>
 #include <util/string_constant.h>
@@ -190,9 +191,9 @@ bool cpp_typecheckt::compound_requirement_is_satisfied(const exprt &expr)
 /// Called after the operands are done
 void cpp_typecheckt::typecheck_expr_main(exprt &expr)
 {
-  if(expr.id()==ID_cpp_name)
+  if(expr.id() == ID_cpp_name)
     typecheck_expr_cpp_name(expr, cpp_typecheck_fargst());
-  else if(expr.id()=="cpp-this")
+  else if(expr.id() == "cpp-this")
     typecheck_expr_this(expr);
   else if(expr.id() == ID_pointer_to_member)
     convert_pmop(expr);
@@ -202,7 +203,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   else if(operator_is_overloaded(expr))
   {
   }
-  else if(expr.id()=="explicit-typecast")
+  else if(expr.id() == "explicit-typecast")
     typecheck_expr_explicit_typecast(expr);
   else if(expr.id() == ID_typecast && expr.type().id() == ID_cpp_name)
   {
@@ -288,9 +289,9 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       typecheck_type(expr.type());
     c_typecheck_baset::typecheck_expr_main(expr);
   }
-  else if(expr.id()=="explicit-constructor-call")
+  else if(expr.id() == "explicit-constructor-call")
     typecheck_expr_explicit_constructor_call(expr);
-  else if(expr.id()==ID_code)
+  else if(expr.id() == ID_code)
   {
     // The parser may produce ID_code for expressions like bool(x)
     // when it cannot distinguish a functional cast from a function type.
@@ -328,7 +329,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     error() << "unexpected ID_code expression" << eom;
     throw 0;
   }
-  else if(expr.id()==ID_symbol)
+  else if(expr.id() == ID_symbol)
   {
     // ignore here
 #ifdef DEBUG
@@ -336,7 +337,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     std::cerr << "cpp_typecheckt::typecheck_expr_main got symbol\n";
 #endif
   }
-  else if(expr.id()=="__is_base_of")
+  else if(expr.id() == "__is_base_of")
   {
     // an MS extension, also a Clang/GCC built-in.  Per N5008
     // [meta.rel] table: `is_base_of<Base, Derived>::value` is
@@ -349,30 +350,29 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     // base-class purposes regardless of the `class`/`struct`
     // keyword.
 
-    typet base=static_cast<const typet &>(expr.find("type_arg1"));
-    typet deriv=static_cast<const typet &>(expr.find("type_arg2"));
+    typet base = static_cast<const typet &>(expr.find("type_arg1"));
+    typet deriv = static_cast<const typet &>(expr.find("type_arg2"));
 
     typecheck_type(base);
     typecheck_type(deriv);
 
     if(base.id() != ID_struct_tag || deriv.id() != ID_struct_tag)
-      expr=false_exprt();
+      expr = false_exprt();
     else
     {
       irep_idt base_name = follow_tag(to_struct_tag_type(base)).get(ID_name);
-      const struct_typet &struct_type =
-        follow_tag(to_struct_tag_type(deriv));
+      const struct_typet &struct_type = follow_tag(to_struct_tag_type(deriv));
       irep_idt deriv_name = struct_type.get(ID_name);
 
       // Per N5008 [meta.rel] / Cpp17BaseOfRequirement: a type is
       // a base of itself for the purposes of `is_base_of`.
       if(base_name == deriv_name || struct_type.has_base(base_name))
-        expr=true_exprt();
+        expr = true_exprt();
       else
-        expr=false_exprt();
+        expr = false_exprt();
     }
   }
-  else if(expr.id()==ID_msc_uuidof)
+  else if(expr.id() == ID_msc_uuidof)
   {
     // these appear to have type "struct _GUID"
     // and they are lvalues!
@@ -643,7 +643,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     else
       expr = false_exprt();
   }
-  else if(expr.id()==ID_initializer_list)
+  else if(expr.id() == ID_initializer_list)
   {
     // Preserve the type if it was already set (e.g., from a
     // brace-init-list for aggregate initialization).
@@ -977,37 +977,36 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
 
   implicit_typecast(expr.op0(), bool_typet());
 
-  if(expr.op1().type().id()==ID_empty ||
-     expr.op1().type().id()==ID_empty)
+  if(expr.op1().type().id() == ID_empty || expr.op1().type().id() == ID_empty)
   {
     if(expr.op1().get_bool(ID_C_lvalue))
     {
       exprt e1(expr.op1());
       if(!standard_conversion_lvalue_to_rvalue(e1, expr.op1()))
       {
-        error().source_location=e1.find_source_location();
+        error().source_location = e1.find_source_location();
         error() << "lvalue to rvalue conversion" << eom;
         throw 0;
       }
     }
 
-    if(expr.op1().type().id()==ID_array)
+    if(expr.op1().type().id() == ID_array)
     {
       exprt e1(expr.op1());
       if(!standard_conversion_array_to_pointer(e1, expr.op1()))
       {
-        error().source_location=e1.find_source_location();
+        error().source_location = e1.find_source_location();
         error() << "array to pointer conversion" << eom;
         throw 0;
       }
     }
 
-    if(expr.op1().type().id()==ID_code)
+    if(expr.op1().type().id() == ID_code)
     {
       exprt e1(expr.op1());
       if(!standard_conversion_function_to_pointer(e1, expr.op1()))
       {
-        error().source_location=e1.find_source_location();
+        error().source_location = e1.find_source_location();
         error() << "function to pointer conversion" << eom;
         throw 0;
       }
@@ -1018,46 +1017,48 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
       exprt e2(expr.op2());
       if(!standard_conversion_lvalue_to_rvalue(e2, expr.op2()))
       {
-        error().source_location=e2.find_source_location();
+        error().source_location = e2.find_source_location();
         error() << "lvalue to rvalue conversion" << eom;
         throw 0;
       }
     }
 
-    if(expr.op2().type().id()==ID_array)
+    if(expr.op2().type().id() == ID_array)
     {
       exprt e2(expr.op2());
       if(!standard_conversion_array_to_pointer(e2, expr.op2()))
       {
-        error().source_location=e2.find_source_location();
+        error().source_location = e2.find_source_location();
         error() << "array to pointer conversion" << eom;
         throw 0;
       }
     }
 
-    if(expr.op2().type().id()==ID_code)
+    if(expr.op2().type().id() == ID_code)
     {
       exprt e2(expr.op2());
       if(!standard_conversion_function_to_pointer(e2, expr.op2()))
       {
-        error().source_location=expr.find_source_location();
+        error().source_location = expr.find_source_location();
         error() << "function to pointer conversion" << eom;
         throw 0;
       }
     }
 
-    if(expr.op1().get(ID_statement)==ID_throw &&
-       expr.op2().get(ID_statement)!=ID_throw)
-      expr.type()=expr.op2().type();
-    else if(expr.op2().get(ID_statement)==ID_throw &&
-            expr.op1().get(ID_statement)!=ID_throw)
-      expr.type()=expr.op1().type();
-    else if(expr.op1().type().id()==ID_empty &&
-            expr.op2().type().id()==ID_empty)
+    if(
+      expr.op1().get(ID_statement) == ID_throw &&
+      expr.op2().get(ID_statement) != ID_throw)
+      expr.type() = expr.op2().type();
+    else if(
+      expr.op2().get(ID_statement) == ID_throw &&
+      expr.op1().get(ID_statement) != ID_throw)
+      expr.type() = expr.op1().type();
+    else if(
+      expr.op1().type().id() == ID_empty && expr.op2().type().id() == ID_empty)
       expr.type() = void_type();
     else
     {
-      error().source_location=expr.find_source_location();
+      error().source_location = expr.find_source_location();
       error() << "bad types for operands" << eom;
       throw 0;
     }
@@ -1071,18 +1072,18 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
     qual2.read(expr.op2().type());
 
     if(qual1.is_subset_of(qual2))
-      expr.type()=expr.op1().type();
+      expr.type() = expr.op1().type();
     else
-      expr.type()=expr.op2().type();
+      expr.type() = expr.op2().type();
   }
   else
   {
-    exprt e1=expr.op1();
-    exprt e2=expr.op2();
+    exprt e1 = expr.op1();
+    exprt e2 = expr.op2();
 
     if(implicit_conversion_sequence(expr.op1(), expr.op2().type(), e1))
     {
-      expr.type()=e1.type();
+      expr.type() = e1.type();
       expr.op1().swap(e1);
       // Ensure op2 matches the result type (e.g., c_bit_field may
       // differ from the converted type).
@@ -1091,7 +1092,7 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
     }
     else if(implicit_conversion_sequence(expr.op2(), expr.op1().type(), e2))
     {
-      expr.type()=e2.type();
+      expr.type() = e2.type();
       expr.op2().swap(e2);
       if(expr.op1().type() != expr.type())
         expr.op1() = typecast_exprt::conditional_cast(expr.op1(), expr.type());
@@ -1111,14 +1112,14 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
       address_of_exprt addr1(index1);
       address_of_exprt addr2(index2);
 
-      expr.op1()=addr1;
-      expr.op2()=addr2;
-      expr.type()=addr1.type();
+      expr.op1() = addr1;
+      expr.op2() = addr2;
+      expr.type() = addr1.type();
       return;
     }
     else
     {
-      error().source_location=expr.find_source_location();
+      error().source_location = expr.find_source_location();
       error() << "types are incompatible.\n"
               << "I got '" << type2cpp(expr.op1().type(), *this) << "' and '"
               << type2cpp(expr.op2().type(), *this) << "'." << eom;
@@ -1126,8 +1127,7 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
     }
   }
 
-  if(expr.op1().get_bool(ID_C_lvalue) &&
-     expr.op2().get_bool(ID_C_lvalue))
+  if(expr.op1().get_bool(ID_C_lvalue) && expr.op2().get_bool(ID_C_lvalue))
     expr.set(ID_C_lvalue, true);
 
   return;
@@ -1135,9 +1135,7 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
 
 void cpp_typecheckt::typecheck_expr_member(exprt &expr)
 {
-  typecheck_expr_member(
-    expr,
-    cpp_typecheck_fargst());
+  typecheck_expr_member(expr, cpp_typecheck_fargst());
 }
 
 void cpp_typecheckt::typecheck_expr_sizeof(exprt &expr)
@@ -1147,10 +1145,9 @@ void cpp_typecheckt::typecheck_expr_sizeof(exprt &expr)
 
   if(expr.operands().empty())
   {
-    const typet &type=
-      static_cast<const typet &>(expr.find(ID_type_arg));
+    const typet &type = static_cast<const typet &>(expr.find(ID_type_arg));
 
-    if(type.id()==ID_cpp_name)
+    if(type.id() == ID_cpp_name)
     {
       // Check for sizeof...(Pack) — a parameter pack size query
       const cpp_namet &cpp_name = to_cpp_name(static_cast<const irept &>(type));
@@ -1185,18 +1182,18 @@ void cpp_typecheckt::typecheck_expr_sizeof(exprt &expr)
 
       cpp_typecheck_fargst fargs;
 
-      exprt symbol_expr=resolve(
+      exprt symbol_expr = resolve(
         to_cpp_name(static_cast<const irept &>(type)),
         cpp_typecheck_resolvet::wantt::BOTH,
         fargs);
 
-      if(symbol_expr.id()!=ID_type)
+      if(symbol_expr.id() != ID_type)
       {
         expr.copy_to_operands(symbol_expr);
         expr.remove(ID_type_arg);
       }
     }
-    else if(type.id()==ID_array)
+    else if(type.id() == ID_array)
     {
       // sizeof(expr[index]) can be parsed as an array type!
 
@@ -1210,7 +1207,7 @@ void cpp_typecheckt::typecheck_expr_sizeof(exprt &expr)
           cpp_typecheck_resolvet::wantt::BOTH,
           fargs);
 
-        if(symbol_expr.id()!=ID_type)
+        if(symbol_expr.id() != ID_type)
         {
           // _NOT_ a type
           index_exprt index_expr(symbol_expr, to_array_type(type).size());
@@ -1233,14 +1230,14 @@ void cpp_typecheckt::typecheck_function_expr(
   exprt &expr,
   const cpp_typecheck_fargst &fargs)
 {
-  if(expr.id()==ID_cpp_name)
+  if(expr.id() == ID_cpp_name)
     typecheck_expr_cpp_name(expr, fargs);
-  else if(expr.id()==ID_member)
+  else if(expr.id() == ID_member)
   {
     typecheck_expr_operands(expr);
     typecheck_expr_member(expr, fargs);
   }
-  else if(expr.id()==ID_ptrmember)
+  else if(expr.id() == ID_ptrmember)
   {
     typecheck_expr_operands(expr);
     add_implicit_dereference(to_unary_expr(expr).op());
@@ -1322,25 +1319,25 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
 
   if(!overloadable(expr))
     return false;
-  else if(expr.id()==ID_dereference &&
-          expr.get_bool(ID_C_implicit))
+  else if(expr.id() == ID_dereference && expr.get_bool(ID_C_implicit))
     return false;
 
   PRECONDITION(expr.operands().size() >= 1);
 
-  if(expr.id()=="explicit-typecast")
+  if(expr.id() == "explicit-typecast")
   {
     // the cast operator can be overloaded
 
-    typet t=expr.type();
+    typet t = expr.type();
     typecheck_type(t);
-    std::string op_name=std::string("operator")+"("+cpp_type2name(t)+")";
+    std::string op_name =
+      std::string("operator") + "(" + cpp_type2name(t) + ")";
 
     // turn this into a function call
     const cpp_namet cpp_name(op_name, expr.source_location());
 
     // See if the struct declares the cast operator as a member
-    bool found_in_struct=false;
+    bool found_in_struct = false;
     PRECONDITION(!expr.operands().empty());
     const typet &t0 = to_unary_expr(expr).op().type();
 
@@ -1350,7 +1347,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
       {
         if(!c.get_bool(ID_from_base) && c.get_base_name() == op_name)
         {
-          found_in_struct=true;
+          found_in_struct = true;
           break;
         }
       }
@@ -1369,18 +1366,17 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
       std::move(member), {}, uninitialized_typet{}, expr.source_location());
     function_call.arguments().reserve(expr.operands().size());
 
-    if(expr.operands().size()>1)
+    if(expr.operands().size() > 1)
     {
-      for(exprt::operandst::const_iterator
-          it=(expr.operands().begin()+1);
-          it!=(expr).operands().end();
+      for(exprt::operandst::const_iterator it = (expr.operands().begin() + 1);
+          it != (expr).operands().end();
           it++)
         function_call.arguments().push_back(*it);
     }
 
     typecheck_side_effect_function_call(function_call);
 
-    if(expr.id()==ID_ptrmember)
+    if(expr.id() == ID_ptrmember)
     {
       add_implicit_dereference(function_call);
       already_typechecked_exprt::make_already_typechecked(function_call);
@@ -1393,17 +1389,15 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
     return true;
   }
 
-  for(const operator_entryt *e=operators;
-      !e->id.empty();
-      e++)
+  for(const operator_entryt *e = operators; !e->id.empty(); e++)
   {
-    if(expr.id()==e->id)
+    if(expr.id() == e->id)
     {
       DATA_INVARIANT(
         expr.id() != ID_dereference || !expr.get_bool(ID_C_implicit),
         "no implicit dereference");
 
-      std::string op_name=std::string("operator")+e->op_name;
+      std::string op_name = std::string("operator") + e->op_name;
 
       // first do function/operator
       const cpp_namet cpp_name(op_name, expr.source_location());
@@ -1641,12 +1635,12 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
       // 2nd option!
       {
         cpp_typecheck_fargst fargs;
-        fargs.operands=expr.operands();
-        fargs.has_object=false;
-        fargs.in_use=true;
+        fargs.operands = expr.operands();
+        fargs.has_object = false;
+        fargs.in_use = true;
 
-        exprt resolve_result=resolve(
-             cpp_name, cpp_typecheck_resolvet::wantt::VAR, fargs, false);
+        exprt resolve_result =
+          resolve(cpp_name, cpp_typecheck_resolvet::wantt::VAR, fargs, false);
 
         // [over.match.oper]/3.4 (last paragraph): if no operand
         // has class type, the non-member candidate set is
@@ -1745,7 +1739,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
 
           typecheck_side_effect_function_call(function_call);
 
-          if(expr.id()==ID_ptrmember)
+          if(expr.id() == ID_ptrmember)
           {
             add_implicit_dereference(function_call);
             already_typechecked_exprt::make_already_typechecked(function_call);
@@ -1754,7 +1748,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
             return true;
           }
 
-          expr=function_call;
+          expr = function_call;
 
           return true;
         }
@@ -1938,7 +1932,7 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
     code_typet &code_type =
       to_code_type(to_pointer_type(op.type()).base_type());
 
-    code_typet::parameterst &args=code_type.parameters();
+    code_typet::parameterst &args = code_type.parameters();
     if(!args.empty() && args.front().get_this())
     {
       // it's a pointer to member function
@@ -1947,7 +1941,7 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
 
       if(code_type.get_bool(ID_C_is_virtual))
       {
-        error().source_location=expr.source_location();
+        error().source_location = expr.source_location();
         error() << "pointers to virtual methods"
                 << " are currently not implemented" << eom;
         throw 0;
@@ -1963,7 +1957,7 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
   }
 
   // the C front end does not know about references
-  const bool is_ref=is_reference(expr.type());
+  const bool is_ref = is_reference(expr.type());
   c_typecheck_baset::typecheck_expr_address_of(expr);
   if(is_ref)
     expr.type() = reference_type(to_pointer_type(expr.type()).base_type());
@@ -1975,7 +1969,7 @@ void cpp_typecheckt::typecheck_expr_throw(exprt &expr)
 
   PRECONDITION(expr.operands().size() == 1 || expr.operands().empty());
 
-  if(expr.operands().size()==1)
+  if(expr.operands().size() == 1)
   {
     // nothing really to do; one can throw _almost_ anything
     const typet &exception_type = to_unary_expr(expr).op().type();
@@ -1988,8 +1982,7 @@ void cpp_typecheckt::typecheck_expr_throw(exprt &expr)
     }
 
     // annotate the relevant exception IDs
-    expr.set(ID_exception_list,
-             cpp_exception_list(exception_type, *this));
+    expr.set(ID_exception_list, cpp_exception_list(exception_type, *this));
   }
 }
 
@@ -1997,16 +1990,16 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
 {
   // next, find out if we do an array
 
-  if(expr.type().id()==ID_array)
+  if(expr.type().id() == ID_array)
   {
     // first typecheck the element type
     typecheck_type(to_array_type(expr.type()).element_type());
 
     // typecheck the size
-    exprt &size=to_array_type(expr.type()).size();
+    exprt &size = to_array_type(expr.type()).size();
     typecheck_expr(size);
 
-    bool size_is_unsigned=(size.type().id()==ID_unsignedbv);
+    bool size_is_unsigned = (size.type().id() == ID_unsignedbv);
     bitvector_typet integer_type(
       size_is_unsigned ? ID_unsignedbv : ID_signedbv, config.ansi_c.int_width);
     implicit_typecast(size, integer_type);
@@ -2028,7 +2021,7 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
 
     expr.set(ID_statement, ID_cpp_new);
 
-    pointer_typet ptr_type=pointer_type(expr.type());
+    pointer_typet ptr_type = pointer_type(expr.type());
     expr.type().swap(ptr_type);
   }
 
@@ -2038,11 +2031,12 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
   already_typechecked_exprt::make_already_typechecked(object_expr);
 
   // not yet typechecked-stuff
-  exprt &initializer=static_cast<exprt &>(expr.add(ID_initializer));
+  exprt &initializer = static_cast<exprt &>(expr.add(ID_initializer));
 
   // arrays must not have an initializer
-  if(!initializer.operands().empty() &&
-     expr.get(ID_statement)==ID_cpp_new_array)
+  if(
+    !initializer.operands().empty() &&
+    expr.get(ID_statement) == ID_cpp_new_array)
   {
     error().source_location =
       to_multi_ary_expr(expr).op0().find_source_location();
@@ -2087,7 +2081,7 @@ static exprt collect_comma_expression(const exprt &src)
 {
   exprt result;
 
-  if(src.id()==ID_comma)
+  if(src.id() == ID_comma)
   {
     PRECONDITION(src.operands().size() == 2);
     result = collect_comma_expression(to_binary_expr(src).op0());
@@ -2130,7 +2124,7 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
     new_expr->add_source_location() = expr.source_location();
     expr = *new_expr;
   }
-  else if(expr.operands().size()==1)
+  else if(expr.operands().size() == 1)
   {
     auto &op = to_unary_expr(expr).op();
 
@@ -2140,19 +2134,19 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
     // This also exists with a "comma expression", e.g.,
     // (f)(1, 2, 3)
 
-    if(expr.type().id()==ID_cpp_name)
+    if(expr.type().id() == ID_cpp_name)
     {
       // try to resolve as type
       cpp_typecheck_fargst fargs;
 
-      exprt symbol_expr=resolve(
+      exprt symbol_expr = resolve(
         to_cpp_name(static_cast<const irept &>(expr.type())),
         cpp_typecheck_resolvet::wantt::TYPE,
         fargs,
         false); // fail silently
 
-      if(symbol_expr.id()==ID_type)
-        expr.type()=symbol_expr.type();
+      if(symbol_expr.id() == ID_type)
+        expr.type() = symbol_expr.type();
       else
       {
         // It's really a function call. Note that multiple arguments
@@ -2237,12 +2231,12 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
       static_typecast(op, expr.type(), new_expr, false) ||
       reinterpret_typecast(op, expr.type(), new_expr, false))
     {
-      expr=new_expr;
+      expr = new_expr;
       add_implicit_dereference(expr);
     }
     else
     {
-      error().source_location=expr.find_source_location();
+      error().source_location = expr.find_source_location();
       error() << "invalid explicit cast:\n"
               << "operand type: '" << to_string(op.type()) << "'\n"
               << "casting to: '" << to_string(expr.type()) << "'" << eom;
@@ -2251,7 +2245,7 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
   }
   else
   {
-    error().source_location=expr.find_source_location();
+    error().source_location = expr.find_source_location();
     error() << "explicit typecast expects 0 or 1 operands" << eom;
     throw 0;
   }
@@ -2631,8 +2625,8 @@ void cpp_typecheckt::typecheck_expr_this(exprt &expr)
     throw 0;
   }
 
-  const exprt &this_expr=cpp_scopes.current_scope().this_expr;
-  const source_locationt source_location=expr.find_source_location();
+  const exprt &this_expr = cpp_scopes.current_scope().this_expr;
+  const source_locationt source_location = expr.find_source_location();
 
   if(this_expr.is_nil())
   {
@@ -2642,25 +2636,25 @@ void cpp_typecheckt::typecheck_expr_this(exprt &expr)
   }
   PRECONDITION(this_expr.type().id() == ID_pointer);
 
-  expr=this_expr;
-  expr.add_source_location()=source_location;
+  expr = this_expr;
+  expr.add_source_location() = source_location;
 }
 
 void cpp_typecheckt::typecheck_expr_delete(exprt &expr)
 {
-  if(expr.operands().size()!=1)
+  if(expr.operands().size() != 1)
   {
-    error().source_location=expr.find_source_location();
+    error().source_location = expr.find_source_location();
     error() << "delete expects one operand" << eom;
     throw 0;
   }
 
-  const irep_idt statement=expr.get(ID_statement);
+  const irep_idt statement = expr.get(ID_statement);
 
-  if(statement==ID_cpp_delete)
+  if(statement == ID_cpp_delete)
   {
   }
-  else if(statement==ID_cpp_delete_array)
+  else if(statement == ID_cpp_delete_array)
   {
   }
   else
@@ -2668,9 +2662,9 @@ void cpp_typecheckt::typecheck_expr_delete(exprt &expr)
 
   typet pointer_type = to_unary_expr(expr).op().type();
 
-  if(pointer_type.id()!=ID_pointer)
+  if(pointer_type.id() != ID_pointer)
   {
-    error().source_location=expr.find_source_location();
+    error().source_location = expr.find_source_location();
     error() << "delete takes a pointer type operand, but got '"
             << to_string(pointer_type) << "'" << eom;
     throw 0;
@@ -2681,12 +2675,12 @@ void cpp_typecheckt::typecheck_expr_delete(exprt &expr)
   to_pointer_type(pointer_type).base_type().remove(ID_C_constant);
 
   // delete expressions are always void
-  expr.type()=typet(ID_empty);
+  expr.type() = typet(ID_empty);
 
   // we provide the right destructor, for the convenience
   // of later stages
   exprt new_object(ID_new_object, to_pointer_type(pointer_type).base_type());
-  new_object.add_source_location()=expr.source_location();
+  new_object.add_source_location() = expr.source_location();
   new_object.set(ID_C_lvalue, true);
 
   auto destructor_code =
@@ -2706,20 +2700,20 @@ void cpp_typecheckt::typecheck_expr_delete(exprt &expr)
 
 void cpp_typecheckt::typecheck_expr_typecast(exprt &)
 {
-  // should not be called
-  #if 0
+// should not be called
+#if 0
   std::cout << "E: " << expr.pretty() << '\n';
   UNREACHABLE;
-  #endif
+#endif
 }
 
 void cpp_typecheckt::typecheck_expr_member(
   exprt &expr,
   const cpp_typecheck_fargst &fargs)
 {
-  if(expr.operands().size()!=1)
+  if(expr.operands().size() != 1)
   {
-    error().source_location=expr.find_source_location();
+    error().source_location = expr.find_source_location();
     error() << "member operator expects one operand" << eom;
     throw 0;
   }
@@ -2738,7 +2732,7 @@ void cpp_typecheckt::typecheck_expr_member(
     op0.type().id() != ID_struct && op0.type().id() != ID_struct_tag)
   {
     exprt tmp(ID_cpp_dummy_destructor);
-    tmp.add_source_location()=expr.source_location();
+    tmp.add_source_location() = expr.source_location();
     expr.swap(tmp);
     return;
   }
@@ -2748,7 +2742,7 @@ void cpp_typecheckt::typecheck_expr_member(
 
   if(op0.type().id() != ID_struct_tag && op0.type().id() != ID_union_tag)
   {
-    error().source_location=expr.find_source_location();
+    error().source_location = expr.find_source_location();
     error() << "member operator requires struct/union type "
             << "on left hand side but got '" << to_string(op0.type()) << "'"
             << eom;
@@ -2770,11 +2764,11 @@ void cpp_typecheckt::typecheck_expr_member(
     throw 0;
   }
 
-  irep_idt struct_identifier=type.get(ID_name);
+  irep_idt struct_identifier = type.get(ID_name);
 
   if(expr.find(ID_component_cpp_name).is_not_nil())
   {
-    cpp_namet component_cpp_name=
+    cpp_namet component_cpp_name =
       to_cpp_name(expr.find(ID_component_cpp_name));
 
     // Per N5008 [class.access]/4 + the lazy class-body elaboration
@@ -2808,12 +2802,10 @@ void cpp_typecheckt::typecheck_expr_member(
     new_fargs.add_object(op0);
     new_fargs.naming_scope = &naming_scope;
 
-    exprt symbol_expr=resolve(
-                        component_cpp_name,
-                        cpp_typecheck_resolvet::wantt::VAR,
-                        new_fargs);
+    exprt symbol_expr = resolve(
+      component_cpp_name, cpp_typecheck_resolvet::wantt::VAR, new_fargs);
 
-    if(symbol_expr.id()==ID_dereference)
+    if(symbol_expr.id() == ID_dereference)
     {
       CHECK_RETURN(symbol_expr.get_bool(ID_C_implicit));
       exprt tmp = to_dereference_expr(symbol_expr).pointer();
@@ -2839,13 +2831,13 @@ void cpp_typecheckt::typecheck_expr_member(
     // Note: the resolver returns a symbol if the member
     // is static or if it is a constructor.
 
-    if(symbol_expr.id()==ID_symbol)
+    if(symbol_expr.id() == ID_symbol)
     {
       if(
         symbol_expr.type().id() == ID_code &&
         to_code_type(symbol_expr.type()).return_type().id() == ID_constructor)
       {
-        error().source_location=expr.find_source_location();
+        error().source_location = expr.find_source_location();
         error() << "member '"
                 << lookup(symbol_expr.get(ID_identifier)).base_name
                 << "' is a constructor" << eom;
@@ -2877,7 +2869,7 @@ void cpp_typecheckt::typecheck_expr_member(
 
         if(pcomp.is_nil())
         {
-          error().source_location=expr.find_source_location();
+          error().source_location = expr.find_source_location();
 
           error() << "'" << symbol_expr.get(ID_identifier)
                   << "' is not static member "
@@ -2886,22 +2878,22 @@ void cpp_typecheckt::typecheck_expr_member(
         }
       }
 
-      expr=symbol_expr;
+      expr = symbol_expr;
       return;
     }
     else if(symbol_expr.is_constant())
     {
-      expr=symbol_expr;
+      expr = symbol_expr;
       return;
     }
 
-    const irep_idt component_name=symbol_expr.get(ID_component_name);
+    const irep_idt component_name = symbol_expr.get(ID_component_name);
 
     expr.remove(ID_component_cpp_name);
     expr.set(ID_component_name, component_name);
   }
 
-  const irep_idt &component_name=expr.get(ID_component_name);
+  const irep_idt &component_name = expr.get(ID_component_name);
   INVARIANT(!component_name.empty(), "component name should not be empty");
 
   exprt component;
@@ -2920,7 +2912,7 @@ void cpp_typecheckt::typecheck_expr_member(
   }
   else
   {
-    error().source_location=expr.find_source_location();
+    error().source_location = expr.find_source_location();
     error() << "member '" << component_name << "' of '" << to_string(type)
             << "' not found" << eom;
     throw 0;
@@ -2928,7 +2920,7 @@ void cpp_typecheckt::typecheck_expr_member(
 
   add_implicit_dereference(expr);
 
-  if(expr.type().id()==ID_code)
+  if(expr.type().id() == ID_code)
   {
     // Check if the function body has to be typechecked
     symbolt &component_symbol = symbol_table.get_writeable_ref(component_name);
@@ -2944,9 +2936,9 @@ void cpp_typecheckt::typecheck_expr_ptrmember(
 {
   PRECONDITION(expr.id() == ID_ptrmember);
 
-  if(expr.operands().size()!=1)
+  if(expr.operands().size() != 1)
   {
-    error().source_location=expr.find_source_location();
+    error().source_location = expr.find_source_location();
     error() << "ptrmember operator expects one operand" << eom;
     throw 0;
   }
@@ -2993,7 +2985,7 @@ void cpp_typecheckt::typecheck_cast_expr(exprt &expr)
 {
   if(expr.operands().size() != 1)
   {
-    error().source_location=expr.find_source_location();
+    error().source_location = expr.find_source_location();
     error() << "cast expressions expect one operand" << eom;
     throw 0;
   }
@@ -3007,47 +2999,47 @@ void cpp_typecheckt::typecheck_cast_expr(exprt &expr)
   typet &type = expr.type();
   typecheck_type(type);
 
-  source_locationt source_location=expr.source_location();
+  source_locationt source_location = expr.source_location();
 
   exprt new_expr;
-  if(id==ID_const_cast)
+  if(id == ID_const_cast)
   {
     if(!const_typecast(cast_op, type, new_expr))
     {
-      error().source_location=cast_op.find_source_location();
+      error().source_location = cast_op.find_source_location();
       error() << "type mismatch on const_cast:\n"
               << "operand type: '" << to_string(cast_op.type()) << "'\n"
               << "cast type: '" << to_string(type) << "'" << eom;
       throw 0;
     }
   }
-  else if(id==ID_dynamic_cast)
+  else if(id == ID_dynamic_cast)
   {
     if(!dynamic_typecast(cast_op, type, new_expr))
     {
-      error().source_location=cast_op.find_source_location();
+      error().source_location = cast_op.find_source_location();
       error() << "type mismatch on dynamic_cast:\n"
               << "operand type: '" << to_string(cast_op.type()) << "'\n"
               << "cast type: '" << to_string(type) << "'" << eom;
       throw 0;
     }
   }
-  else if(id==ID_reinterpret_cast)
+  else if(id == ID_reinterpret_cast)
   {
     if(!reinterpret_typecast(cast_op, type, new_expr))
     {
-      error().source_location=cast_op.find_source_location();
+      error().source_location = cast_op.find_source_location();
       error() << "type mismatch on reinterpret_cast:\n"
               << "operand type: '" << to_string(cast_op.type()) << "'\n"
               << "cast type: '" << to_string(type) << "'" << eom;
       throw 0;
     }
   }
-  else if(id==ID_static_cast)
+  else if(id == ID_static_cast)
   {
     if(!static_typecast(cast_op, type, new_expr))
     {
-      error().source_location=cast_op.find_source_location();
+      error().source_location = cast_op.find_source_location();
       error() << "type mismatch on static_cast:\n"
               << "operand type: '" << to_string(cast_op.type()) << "'\n"
               << "cast type: '" << to_string(type) << "'" << eom;
@@ -3064,13 +3056,11 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
   exprt &expr,
   const cpp_typecheck_fargst &fargs)
 {
-  source_locationt source_location=
-    to_cpp_name(expr).source_location();
+  source_locationt source_location = to_cpp_name(expr).source_location();
 
-  if(expr.get_sub().size()==1 &&
-     expr.get_sub()[0].id()==ID_name)
+  if(expr.get_sub().size() == 1 && expr.get_sub()[0].id() == ID_name)
   {
-    const irep_idt identifier=expr.get_sub()[0].get(ID_identifier);
+    const irep_idt identifier = expr.get_sub()[0].get(ID_identifier);
 
     if(
       auto gcc_polymorphic = typecheck_gcc_polymorphic_builtin(
@@ -3081,33 +3071,30 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
     }
   }
 
-  for(std::size_t i=0; i<expr.get_sub().size(); i++)
+  for(std::size_t i = 0; i < expr.get_sub().size(); i++)
   {
-    if(expr.get_sub()[i].id()==ID_cpp_name)
+    if(expr.get_sub()[i].id() == ID_cpp_name)
     {
-      typet &type=static_cast<typet &>(expr.get_sub()[i]);
+      typet &type = static_cast<typet &>(expr.get_sub()[i]);
       typecheck_type(type);
 
-      std::string tmp="("+cpp_type2name(type)+")";
+      std::string tmp = "(" + cpp_type2name(type) + ")";
 
       typet name(ID_name);
       name.set(ID_identifier, tmp);
-      name.add_source_location()=source_location;
+      name.add_source_location() = source_location;
 
-      type=name;
+      type = name;
     }
   }
 
-  exprt symbol_expr=
-    resolve(
-      to_cpp_name(expr),
-      cpp_typecheck_resolvet::wantt::VAR,
-      fargs);
+  exprt symbol_expr =
+    resolve(to_cpp_name(expr), cpp_typecheck_resolvet::wantt::VAR, fargs);
 
   // we want VAR
   CHECK_RETURN(symbol_expr.id() != ID_type);
 
-  if(symbol_expr.id()==ID_member)
+  if(symbol_expr.id() == ID_member)
   {
     if(
       symbol_expr.operands().empty() ||
@@ -3117,9 +3104,9 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
       {
         if(cpp_scopes.current_scope().this_expr.is_nil())
         {
-          if(symbol_expr.type().id()!=ID_code)
+          if(symbol_expr.type().id() != ID_code)
           {
-            error().source_location=source_location;
+            error().source_location = source_location;
             error() << "object missing" << eom;
             throw 0;
           }
@@ -3130,12 +3117,11 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
         {
           // Try again
           exprt ptrmem(ID_ptrmember);
-          ptrmem.operands().push_back(
-            cpp_scopes.current_scope().this_expr);
+          ptrmem.operands().push_back(cpp_scopes.current_scope().this_expr);
 
-          ptrmem.add(ID_component_cpp_name)=expr;
+          ptrmem.add(ID_component_cpp_name) = expr;
 
-          ptrmem.add_source_location()=source_location;
+          ptrmem.add_source_location() = source_location;
           typecheck_expr_ptrmember(ptrmem, fargs);
           symbol_expr.swap(ptrmem);
         }
@@ -3171,10 +3157,10 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
     symbol_expr.swap(member);
   }
 
-  symbol_expr.add_source_location()=source_location;
-  expr=symbol_expr;
+  symbol_expr.add_source_location() = source_location;
+  expr = symbol_expr;
 
-  if(expr.id()==ID_symbol)
+  if(expr.id() == ID_symbol)
     typecheck_expr_function_identifier(expr);
   else if(expr.id() == ID_member)
   {
@@ -3200,7 +3186,7 @@ void cpp_typecheckt::add_implicit_dereference(exprt &expr)
     // add implicit dereference
     dereference_exprt tmp(expr);
     tmp.set(ID_C_implicit, true);
-    tmp.add_source_location()=expr.source_location();
+    tmp.add_source_location() = expr.source_location();
     tmp.set(ID_C_lvalue, true);
     expr.swap(tmp);
   }
@@ -3351,23 +3337,47 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   // such contexts with constant_expression_context (incremented while
   // type-checking constant expressions / constexpr-required contexts, and
   // reset to 0 by non_constant_expression_contextt while elaborating ordinary
-  // run-time function bodies).  Folding to that flag therefore makes the
-  // built-in true during constant evaluation (e.g. constexpr initialisers,
-  // static_assert conditions, the nested evaluation of a constexpr call) and
-  // false at run time -- which is what symex executes.
-  if(expr.function().id() == ID_cpp_name)
+  // run-time function bodies).
+  //
+  // While in a constant-evaluated context, fold to true.  Otherwise -- crucially
+  // -- do NOT fold to false here; leave the call in place.  Folding to false at
+  // type-check time would bake a run-time answer into any function body that
+  // forwards the built-in (e.g. std::is_constant_evaluated /
+  // std::__is_constant_evaluated, whose bodies are `return
+  // __builtin_is_constant_evaluated();`), making the wrapper non-context-
+  // dependent.  Left in place, the call is re-folded to true when such a body
+  // is nested-evaluated during constant evaluation, and otherwise falls through
+  // at run time to the built-in's definition (see cpp_internal_additions),
+  // which returns false -- exactly what symex must observe.  Both the
+  // unresolved (cpp_name) and resolved (symbol) forms are handled, the latter
+  // arising when a forwarding body is re-evaluated by the constexpr evaluator.
   {
-    const auto &name = to_cpp_name(expr.function());
-    const irep_idt &bn = name.get_base_name();
-    if(bn == "__builtin_is_constant_evaluated")
+    bool is_ice_builtin = false;
+    if(expr.function().id() == ID_cpp_name)
     {
-      exprt result = constant_expression_context > 0
-                       ? static_cast<exprt>(true_exprt{})
-                       : static_cast<exprt>(false_exprt{});
+      is_ice_builtin = to_cpp_name(expr.function()).get_base_name() ==
+                       "__builtin_is_constant_evaluated";
+    }
+    else if(expr.function().id() == ID_symbol)
+    {
+      is_ice_builtin = has_prefix(
+        id2string(to_symbol_expr(expr.function()).get_identifier()),
+        "__builtin_is_constant_evaluated");
+    }
+
+    if(is_ice_builtin && constant_expression_context > 0)
+    {
+      exprt result = true_exprt{};
       result.add_source_location() = expr.source_location();
       expr.swap(result);
       return;
     }
+  }
+
+  if(expr.function().id() == ID_cpp_name)
+  {
+    const auto &name = to_cpp_name(expr.function());
+    const irep_idt &bn = name.get_base_name();
     // GCC built-in floating-point classification
     if(
       (bn == "__builtin_isfinite" || bn == "__builtin_isinf" ||
@@ -3396,24 +3406,23 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   // the call is not virtual.
   bool is_qualified = false;
 
-  if(expr.function().id()==ID_member ||
-     expr.function().id()==ID_ptrmember)
+  if(expr.function().id() == ID_member || expr.function().id() == ID_ptrmember)
   {
-    if(expr.function().get(ID_component_cpp_name)==ID_cpp_name)
+    if(expr.function().get(ID_component_cpp_name) == ID_cpp_name)
     {
-      const cpp_namet &cpp_name=
+      const cpp_namet &cpp_name =
         to_cpp_name(expr.function().find(ID_component_cpp_name));
-      is_qualified=cpp_name.is_qualified();
+      is_qualified = cpp_name.is_qualified();
     }
   }
-  else if(expr.function().id()==ID_cpp_name)
+  else if(expr.function().id() == ID_cpp_name)
   {
-    const cpp_namet &cpp_name=to_cpp_name(expr.function());
-    is_qualified=cpp_name.is_qualified();
+    const cpp_namet &cpp_name = to_cpp_name(expr.function());
+    is_qualified = cpp_name.is_qualified();
   }
 
   // Backup of the original operand
-  exprt op0=expr.function();
+  exprt op0 = expr.function();
 
   // Pre-typecheck arguments to get their types for template argument
   // deduction. This is needed for function templates with partial
@@ -3583,8 +3592,8 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     if(expr.arguments().size() <= 1)
     {
       exprt typecast("explicit-typecast");
-      typecast.type()=pod;
-      typecast.add_source_location()=expr.source_location();
+      typecast.type() = pod;
+      typecast.add_source_location() = expr.source_location();
       if(!expr.arguments().empty())
         typecast.copy_to_operands(expr.arguments().front());
       typecheck_expr_explicit_typecast(typecast);
@@ -3592,7 +3601,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     }
     else
     {
-      error().source_location=expr.source_location();
+      error().source_location = expr.source_location();
       error() << "zero or one argument expected" << eom;
       throw 0;
     }
@@ -3609,7 +3618,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 
   // look at type of function
 
-  if(expr.function().type().id()==ID_pointer)
+  if(expr.function().type().id() == ID_pointer)
   {
     if(expr.function().type().find(ID_to_member).is_not_nil())
     {
@@ -3618,7 +3627,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 
       if(bound.is_nil())
       {
-        error().source_location=expr.source_location();
+        error().source_location = expr.source_location();
         error() << "pointer-to-member not bound" << eom;
         throw 0;
       }
@@ -3646,19 +3655,19 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       expr.function().swap(tmp);
     }
 
-    if(expr.function().type().id()!=ID_code)
+    if(expr.function().type().id() != ID_code)
     {
       error().source_location = expr.function().find_source_location();
       error() << "expecting code as argument" << eom;
       throw 0;
     }
   }
-  else if(expr.function().type().id()==ID_code)
+  else if(expr.function().type().id() == ID_code)
   {
     if(expr.function().type().get_bool(ID_C_is_virtual) && !is_qualified)
     {
       exprt vtptr_member;
-      if(op0.id()==ID_member || op0.id()==ID_ptrmember)
+      if(op0.id() == ID_member || op0.id() == ID_ptrmember)
       {
         vtptr_member.id(op0.id());
         vtptr_member.add_to_operands(std::move(to_unary_expr(op0).op()));
@@ -3716,8 +3725,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       // Typecheck the expression as if it was not virtual
       // (add the this pointer)
 
-      expr.type()=
-        to_code_type(expr.function().type()).return_type();
+      expr.type() = to_code_type(expr.function().type()).return_type();
 
       if(expr.function().id() == ID_member)
         typecheck_method_application(expr);
@@ -3758,21 +3766,20 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   }
   else
   {
-    error().source_location=expr.function().find_source_location();
+    error().source_location = expr.function().find_source_location();
     error() << "function call expects function or function "
             << "pointer as argument, but got '"
             << to_string(expr.function().type()) << "'" << eom;
     throw 0;
   }
 
-  expr.type()=
-    to_code_type(expr.function().type()).return_type();
+  expr.type() = to_code_type(expr.function().type()).return_type();
 
-  if(expr.type().id()==ID_constructor)
+  if(expr.type().id() == ID_constructor)
   {
     PRECONDITION(expr.function().id() == ID_symbol);
 
-    const code_typet::parameterst &parameters=
+    const code_typet::parameterst &parameters =
       to_code_type(expr.function().type()).parameters();
 
     DATA_INVARIANT(!parameters.empty(), "parameters expected");
@@ -3795,10 +3802,11 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 
     PRECONDITION(tmp_object_expr.type().id() == ID_struct_tag);
 
-    get_component(expr.source_location(),
-                  new_object,
-                  expr.function().get(ID_identifier),
-                  member);
+    get_component(
+      expr.source_location(),
+      new_object,
+      expr.function().get(ID_identifier),
+      member);
 
     // special case for the initialization of parents
     if(member.get_bool(ID_C_not_accessible))
@@ -3835,14 +3843,14 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     typecheck_function_call_arguments(expr);
 
     const code_expressiont new_code(expr);
-    tmp_object_expr.add(ID_initializer)=new_code;
+    tmp_object_expr.add(ID_initializer) = new_code;
     expr.swap(tmp_object_expr);
     return;
   }
 
   PRECONDITION(expr.operands().size() == 2);
 
-  if(expr.function().id()==ID_member)
+  if(expr.function().id() == ID_member)
   {
     typecheck_method_application(expr);
     // Update return type after method application — the method's auto
@@ -3875,8 +3883,8 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
         operand.type() == to_pointer_type(parameter.type()).base_type())
       {
         address_of_exprt tmp(operand, pointer_type(operand.type()));
-        tmp.add_source_location()=operand.source_location();
-        operand=tmp;
+        tmp.add_source_location() = operand.source_location();
+        operand = tmp;
       }
     }
   }
@@ -3916,9 +3924,8 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     // matters when we are about to eagerly convert the body so it
     // gets resolved in its own (class) scope.
     bool body_is_code =
-      symbol_ptr != nullptr &&
-      (symbol_ptr->value.type().id() == ID_code ||
-       symbol_ptr->value.id() == ID_code);
+      symbol_ptr != nullptr && (symbol_ptr->value.type().id() == ID_code ||
+                                symbol_ptr->value.id() == ID_code);
     bool eligible_constexpr =
       symbol_ptr != nullptr && symbol_ptr->is_macro &&
       constant_expression_context != 0 &&
@@ -3935,7 +3942,8 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       for(const auto &arg : expr.arguments())
       {
         arg.visit_pre(
-          [&args_are_constant_pre](const exprt &e) {
+          [&args_are_constant_pre](const exprt &e)
+          {
             if(e.id() == ID_symbol)
               args_are_constant_pre = false;
           });
@@ -3979,20 +3987,20 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
         // typedef in the function's own (class) scope.  Walk the
         // full irept tree to detect any unresolved cpp_name
         // anywhere in the body.
-        std::function<void(const irept &)> has_cpp_name =
-          [&](const irept &n) {
-            if(needs_eager_convert)
-              return;
-            if(n.id() == ID_cpp_name)
-            {
-              needs_eager_convert = true;
-              return;
-            }
-            for(const auto &s : n.get_sub())
-              has_cpp_name(s);
-            for(const auto &ns : n.get_named_sub())
-              has_cpp_name(ns.second);
-          };
+        std::function<void(const irept &)> has_cpp_name = [&](const irept &n)
+        {
+          if(needs_eager_convert)
+            return;
+          if(n.id() == ID_cpp_name)
+          {
+            needs_eager_convert = true;
+            return;
+          }
+          for(const auto &s : n.get_sub())
+            has_cpp_name(s);
+          for(const auto &ns : n.get_named_sub())
+            has_cpp_name(ns.second);
+        };
         has_cpp_name(symbol_ptr->value);
       }
       if(needs_eager_convert)
@@ -4026,8 +4034,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
         }
         symbol_ptr = symbol_table.lookup(sym_expr->get_identifier());
         eligible_constexpr =
-          symbol_ptr != nullptr &&
-          symbol_ptr->value.type().id() == ID_code;
+          symbol_ptr != nullptr && symbol_ptr->value.type().id() == ID_code;
       }
     }
     if(eligible_constexpr)
@@ -5188,7 +5195,7 @@ void cpp_typecheckt::typecheck_method_application(
 
   // build new function expression
   exprt new_function(cpp_symbol_expr(method_symbol));
-  new_function.add_source_location()=member_expr.source_location();
+  new_function.add_source_location() = member_expr.source_location();
   expr.function().swap(new_function);
 
   if(!expr.function().type().get_bool(ID_C_is_static))
@@ -5280,11 +5287,10 @@ void cpp_typecheckt::typecheck_method_application(
 
 void cpp_typecheckt::typecheck_side_effect_assignment(side_effect_exprt &expr)
 {
-  if(expr.operands().size()!=2)
+  if(expr.operands().size() != 2)
   {
-    error().source_location=expr.find_source_location();
-    error() << "assignment side effect expected to have two operands"
-            << eom;
+    error().source_location = expr.find_source_location();
+    error() << "assignment side effect expected to have two operands" << eom;
     throw 0;
   }
 
@@ -5311,35 +5317,35 @@ void cpp_typecheckt::typecheck_side_effect_assignment(side_effect_exprt &expr)
   // It's a non-POD.
   // Turn into an operator call
 
-  std::string strop="operator";
+  std::string strop = "operator";
 
-  const irep_idt statement=expr.get(ID_statement);
+  const irep_idt statement = expr.get(ID_statement);
 
-  if(statement==ID_assign)
+  if(statement == ID_assign)
     strop += "=";
-  else if(statement==ID_assign_shl)
+  else if(statement == ID_assign_shl)
     strop += "<<=";
-  else if(statement==ID_assign_shr)
+  else if(statement == ID_assign_shr)
     strop += ">>=";
-  else if(statement==ID_assign_plus)
+  else if(statement == ID_assign_plus)
     strop += "+=";
-  else if(statement==ID_assign_minus)
+  else if(statement == ID_assign_minus)
     strop += "-=";
-  else if(statement==ID_assign_mult)
+  else if(statement == ID_assign_mult)
     strop += "*=";
-  else if(statement==ID_assign_div)
+  else if(statement == ID_assign_div)
     strop += "/=";
   else if(statement == ID_assign_mod)
     strop += "%=";
-  else if(statement==ID_assign_bitand)
+  else if(statement == ID_assign_bitand)
     strop += "&=";
-  else if(statement==ID_assign_bitor)
+  else if(statement == ID_assign_bitor)
     strop += "|=";
-  else if(statement==ID_assign_bitxor)
+  else if(statement == ID_assign_bitxor)
     strop += "^=";
   else
   {
-    error().source_location=expr.find_source_location();
+    error().source_location = expr.find_source_location();
     error() << "bad assignment operator '" << statement << "'" << eom;
     throw 0;
   }
@@ -5359,15 +5365,14 @@ void cpp_typecheckt::typecheck_side_effect_assignment(side_effect_exprt &expr)
 
   typecheck_side_effect_function_call(new_expr);
 
-  expr=new_expr;
+  expr = new_expr;
 }
 
-void cpp_typecheckt::typecheck_side_effect_inc_dec(
-  side_effect_exprt &expr)
+void cpp_typecheckt::typecheck_side_effect_inc_dec(side_effect_exprt &expr)
 {
-  if(expr.operands().size()!=1)
+  if(expr.operands().size() != 1)
   {
-    error().source_location=expr.find_source_location();
+    error().source_location = expr.find_source_location();
     error() << "statement " << expr.get_statement()
             << " expected to have one operand" << eom;
     throw 0;
@@ -5379,8 +5384,7 @@ void cpp_typecheckt::typecheck_side_effect_inc_dec(
 
   const typet &tmp_type = op.type();
 
-  if(is_number(tmp_type) ||
-     tmp_type.id()==ID_pointer)
+  if(is_number(tmp_type) || tmp_type.id() == ID_pointer)
   {
     // standard stuff
     c_typecheck_baset::typecheck_expr_side_effect(expr);
@@ -5397,26 +5401,26 @@ void cpp_typecheckt::typecheck_side_effect_inc_dec(
 
   // Turn into an operator call
 
-  std::string str_op="operator";
-  bool post=false;
+  std::string str_op = "operator";
+  bool post = false;
 
-  if(expr.get(ID_statement)==ID_preincrement)
+  if(expr.get(ID_statement) == ID_preincrement)
     str_op += "++";
-  else if(expr.get(ID_statement)==ID_predecrement)
+  else if(expr.get(ID_statement) == ID_predecrement)
     str_op += "--";
-  else if(expr.get(ID_statement)==ID_postincrement)
+  else if(expr.get(ID_statement) == ID_postincrement)
   {
     str_op += "++";
-    post=true;
+    post = true;
   }
-  else if(expr.get(ID_statement)==ID_postdecrement)
+  else if(expr.get(ID_statement) == ID_postdecrement)
   {
     str_op += "--";
-    post=true;
+    post = true;
   }
   else
   {
-    error().source_location=expr.find_source_location();
+    error().source_location = expr.find_source_location();
     error() << "bad assignment operator '" << expr.get_statement() << "'"
             << eom;
     throw 0;
@@ -5442,9 +5446,9 @@ void cpp_typecheckt::typecheck_side_effect_inc_dec(
 
 void cpp_typecheckt::typecheck_expr_dereference(exprt &expr)
 {
-  if(expr.operands().size()!=1)
+  if(expr.operands().size() != 1)
   {
-    error().source_location=expr.find_source_location();
+    error().source_location = expr.find_source_location();
     error() << "unary operator * expects one operand" << eom;
     throw 0;
   }
@@ -5454,7 +5458,7 @@ void cpp_typecheckt::typecheck_expr_dereference(exprt &expr)
 
   if(op_type.id() == ID_pointer && op_type.find(ID_to_member).is_not_nil())
   {
-    error().source_location=expr.find_source_location();
+    error().source_location = expr.find_source_location();
     error() << "pointer-to-member must use "
             << "the .* or ->* operators" << eom;
     throw 0;
@@ -5473,7 +5477,7 @@ void cpp_typecheckt::convert_pmop(exprt &expr)
 
   if(op1.type().id() != ID_pointer || op1.type().find(ID_to_member).is_nil())
   {
-    error().source_location=expr.source_location();
+    error().source_location = expr.source_location();
     error() << "pointer-to-member expected" << eom;
     throw 0;
   }
@@ -5486,7 +5490,7 @@ void cpp_typecheckt::convert_pmop(exprt &expr)
 
   if(t0.id() != ID_struct_tag)
   {
-    error().source_location=expr.source_location();
+    error().source_location = expr.source_location();
     error() << "pointer-to-member type error" << eom;
     throw 0;
   }
@@ -5496,7 +5500,7 @@ void cpp_typecheckt::convert_pmop(exprt &expr)
 
   if(!subtype_typecast(from_struct, to_struct))
   {
-    error().source_location=expr.source_location();
+    error().source_location = expr.source_location();
     error() << "pointer-to-member type error" << eom;
     throw 0;
   }
@@ -5526,7 +5530,7 @@ void cpp_typecheckt::convert_pmop(exprt &expr)
 
 void cpp_typecheckt::typecheck_expr_function_identifier(exprt &expr)
 {
-  if(expr.id()==ID_symbol)
+  if(expr.id() == ID_symbol)
   {
     // Check if the function body has to be typechecked
     symbolt &function_symbol =
@@ -5601,7 +5605,7 @@ void cpp_typecheckt::typecheck_expr(exprt &expr)
   explicit_typecast_ambiguity(expr);
 
   // cpp_name uses get_sub, which can get confused with expressions.
-  if(expr.id()==ID_cpp_name)
+  if(expr.id() == ID_cpp_name)
     typecheck_expr_cpp_name(expr, cpp_typecheck_fargst());
   else if(expr.id() == "lambda")
     typecheck_expr_lambda(expr);
@@ -5683,7 +5687,7 @@ void cpp_typecheckt::explicit_typecast_ambiguity(exprt &expr)
   // We figure this out by resolving the type argument
   // and re-writing if needed
 
-  if(expr.id()!="explicit-typecast")
+  if(expr.id() != "explicit-typecast")
     return;
 
   PRECONDITION(expr.operands().size() == 1);
@@ -5696,13 +5700,12 @@ void cpp_typecheckt::explicit_typecast_ambiguity(exprt &expr)
     (op0_id == ID_unary_plus || op0_id == ID_unary_minus ||
      op0_id == ID_address_of || op0_id == ID_dereference))
   {
-    exprt resolve_result=
-      resolve(
-        to_cpp_name(expr.type()),
-        cpp_typecheck_resolvet::wantt::BOTH,
-        cpp_typecheck_fargst());
+    exprt resolve_result = resolve(
+      to_cpp_name(expr.type()),
+      cpp_typecheck_resolvet::wantt::BOTH,
+      cpp_typecheck_fargst());
 
-    if(resolve_result.id()!=ID_type)
+    if(resolve_result.id() != ID_type)
     {
       // need to re-write the expression
       // e.g., (ID) +expr  ->  ID+expr
@@ -5714,13 +5717,13 @@ void cpp_typecheckt::explicit_typecast_ambiguity(exprt &expr)
         .op1()
         .swap(to_unary_expr(to_unary_expr(expr).op()).op());
 
-      if(op0_id==ID_unary_plus)
+      if(op0_id == ID_unary_plus)
         new_binary_expr.id(ID_plus);
-      else if(op0_id==ID_unary_minus)
+      else if(op0_id == ID_unary_minus)
         new_binary_expr.id(ID_minus);
-      else if(op0_id==ID_address_of)
+      else if(op0_id == ID_address_of)
         new_binary_expr.id(ID_bitand);
-      else if(op0_id==ID_dereference)
+      else if(op0_id == ID_dereference)
         new_binary_expr.id(ID_mult);
 
       new_binary_expr.add_source_location() =
@@ -5732,9 +5735,9 @@ void cpp_typecheckt::explicit_typecast_ambiguity(exprt &expr)
 
 void cpp_typecheckt::typecheck_expr_binary_arithmetic(exprt &expr)
 {
-  if(expr.operands().size()!=2)
+  if(expr.operands().size() != 2)
   {
-    error().source_location=expr.find_source_location();
+    error().source_location = expr.find_source_location();
     error() << "operator '" << expr.id() << "' expects two operands" << eom;
     throw 0;
   }
@@ -5752,9 +5755,9 @@ void cpp_typecheckt::typecheck_expr_index(exprt &expr)
 
 void cpp_typecheckt::typecheck_expr_comma(exprt &expr)
 {
-  if(expr.operands().size()!=2)
+  if(expr.operands().size() != 2)
   {
-    error().source_location=expr.find_source_location();
+    error().source_location = expr.find_source_location();
     error() << "comma operator expects two operands" << eom;
     throw 0;
   }
