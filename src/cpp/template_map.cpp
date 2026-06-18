@@ -80,13 +80,32 @@ void template_mapt::expand_parameter_packs(typet &function_type) const
         {
           irept expanded = parameter;
           static_cast<typet &>(expanded.add(ID_type)) = pt;
-          // The element type already carries the full (merged)
-          // reference/pointer part; drop any declarator type and the
-          // ellipsis flag so the element is not mis-elaborated.
+          // [dcl.ref] reference collapsing: a forwarding-reference pack
+          // `A&&...` expands each element E to the reference formed by
+          // applying the declarator's reference to E.  When the deduced
+          // element type already carries a reference part -- as the
+          // forwarding-reference deduction in guess_function_template_args
+          // records it -- use that and drop the declarator reference to avoid
+          // doubling.  Otherwise (e.g. a class template partial specialization
+          // whose pack is bound to bare element types) keep the declarator's
+          // reference so the expanded parameter is `E&`/`E&&` and not a
+          // by-value `E` -- losing it makes e.g.
+          // `_Function_handler::_M_invoke(_Any_data&, _ArgTypes&&...)`'s type
+          // mismatch the function's `_M_invoker` pointer.
+          const bool element_is_reference =
+            (pt.id() == ID_frontend_pointer || pt.id() == ID_pointer) &&
+            (pt.get_bool(ID_C_reference) || pt.get_bool(ID_C_rvalue_reference));
           for(auto &d : expanded.get_sub())
             if(d.id() == ID_cpp_declarator)
             {
-              static_cast<typet &>(d.add(ID_type)).make_nil();
+              const typet &dtype = static_cast<const typet &>(d.find(ID_type));
+              const bool declarator_is_reference =
+                (dtype.id() == ID_frontend_pointer ||
+                 dtype.id() == ID_pointer) &&
+                (dtype.get_bool(ID_C_reference) ||
+                 dtype.get_bool(ID_C_rvalue_reference));
+              if(element_is_reference || !declarator_is_reference)
+                static_cast<typet &>(d.add(ID_type)).make_nil();
               d.remove(ID_ellipsis);
             }
           new_parameters.push_back(expanded);
