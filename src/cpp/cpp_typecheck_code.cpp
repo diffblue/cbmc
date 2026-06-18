@@ -1112,7 +1112,49 @@ void cpp_typecheckt::typecheck_ifthenelse(code_ifthenelset &code)
 
   if(code.cond().id() == ID_code)
   {
-    typecheck_code(to_code(code.cond()));
+    // C++ [stmt.select]/1-2, [stmt.if]: the condition may be a
+    // declaration.  The value of such a condition is the value of the
+    // declared variable contextually converted to bool, and the
+    // declaration is in scope throughout both substatements.  Rewrite
+    //   if(T v = init) S1 [else S2]
+    // into the equivalent
+    //   { T v = init; if(v) S1 [else S2] }
+    // mirroring the existing handling of declaration conditions in
+    // typecheck_while / typecheck_switch.  (Previously only the
+    // declaration was type-checked and the condition was left as the
+    // declaration code, so the branch was never taken -- e.g.
+    // libstdc++'s `if (size_type __n = _M_finish - __pos)` in
+    // vector::_M_erase_at_end, used by clear()/resize()/erase(first,
+    // last), silently behaved as a no-op.)
+    codet decl = to_code(code.cond());
+    typecheck_code(decl);
+
+    // The typechecked declaration may be wrapped in a decl_block.
+    codet actual_decl = decl;
+    if(actual_decl.get_statement() == ID_decl_block)
+    {
+      PRECONDITION(actual_decl.operands().size() == 1);
+      actual_decl = to_code(actual_decl.op0());
+    }
+
+    // Use the declared variable, contextually converted to bool, as
+    // the condition.
+    const auto &decl_symbol = to_code_frontend_decl(actual_decl).symbol();
+    exprt cond_expr = decl_symbol;
+    implicit_typecast_bool(cond_expr);
+    code.cond() = cond_expr;
+
+    // Type-check the condition and both branches as usual.
+    c_typecheck_baset::typecheck_ifthenelse(code);
+
+    // Wrap so the declaration executes before, and is in scope of, the
+    // if-statement.
+    code_ifthenelset if_stmt = code;
+    code_blockt new_block;
+    new_block.add(std::move(decl));
+    new_block.add(std::move(if_stmt));
+    new_block.add_source_location() = code.source_location();
+    static_cast<codet &>(code).swap(new_block);
   }
   else if(code.get_bool(ID_constexpr))
   {
