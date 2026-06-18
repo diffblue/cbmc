@@ -1328,6 +1328,16 @@ const symbolt *cpp_typecheckt::find_template_conversion_specialisation(
         }
       }
     }
+    // Also mark the instance *symbol* itself.  The component flag above
+    // lives on the class struct_type and is lost if the class is later
+    // re-elaborated (which happens for mutually-dependent class types),
+    // whereas the member symbol persists in the symbol table.  The
+    // non-template branch of user_defined_conversion_sequence /
+    // reference_binding consults this flag to skip an instantiated
+    // template conversion operator (it is not a non-template candidate
+    // and is not name-resolvable in the class cpp_scope).
+    if(symbolt *inst_w = symbol_table.get_writeable(instance->name))
+      inst_w->type.set("#instantiated_conversion_operator", true);
   }
 
   return instance;
@@ -2083,6 +2093,19 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
       if(component.get_bool("#is_template_specialization"))
         continue;
 
+      // The component flag above is lost when the class is re-elaborated
+      // (mutually-dependent class types), so also consult the persistent
+      // flag on the member symbol set by
+      // find_template_conversion_specialisation.  An instantiated
+      // template conversion operator is not a non-template candidate
+      // ([over.match.conv]) and is not name-resolvable in the class
+      // cpp_scope; the fresh template deduction handles it.
+      if(const symbolt *comp_sym = symbol_table.lookup(component.get_name()))
+      {
+        if(comp_sym->type.get_bool("#instantiated_conversion_operator"))
+          continue;
+      }
+
       const code_typet &comp_type = to_code_type(component.type());
       DATA_INVARIANT(
         comp_type.parameters().size() == 1, "expected exactly one parameter");
@@ -2420,6 +2443,19 @@ bool cpp_typecheckt::reference_binding(
       // ([over.ics.user]/3 + [over.match.conv])
       if(component.get_bool("#is_template_specialization"))
         continue;
+
+      // The component flag above is lost when the class is re-elaborated
+      // (mutually-dependent class types), so also consult the persistent
+      // flag on the member symbol set by
+      // find_template_conversion_specialisation.  An instantiated
+      // template conversion operator is not a non-template candidate
+      // ([over.match.conv]) and is not name-resolvable in the class
+      // cpp_scope; the fresh template deduction handles it.
+      if(const symbolt *comp_sym = symbol_table.lookup(component.get_name()))
+      {
+        if(comp_sym->type.get_bool("#instantiated_conversion_operator"))
+          continue;
+      }
 
       const code_typet &component_type = to_code_type(component.type());
 
