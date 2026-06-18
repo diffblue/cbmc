@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ sizeof\.\.\.\(T\) in static init is 3: SUCCESS$
@@ -9,10 +9,14 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-KNOWNBUG (sizeof... in a static data member initializer): [temp.variadic]/8
-`sizeof...(T)` must be the pack's element count.  In a member function body this
-is correct (works), but in a static data member initializer the pack is
-collapsed during class-template instantiation, so the count is wrong for both
-multi-element and empty packs.  Part of the unified pack-expansion rework
-documented in doc/architectural/cpp-variadic-pack-expansion-rework.md.
-Reclassify CORE once sizeof... is evaluated against the full pack here.
+[temp.variadic]/8 `sizeof...(T)` in a static data member initializer.  Fixed by
+the unified pack-expansion rework (Phase 0 + Phase 4,
+doc/architectural/cpp-variadic-pack-expansion-rework.md):
+  * template_mapt::build no longer scalar-binds a parameter pack to its first
+    argument (type_map[Pack] = <first element>), which had collapsed
+    sizeof...(Pack) and pack expansions to a single element; and
+  * static data member initializers are now type-checked with the C++
+    type-checker whenever a pack is bound (pack_args_map/pack_size_map), so
+    sizeof...(T) is evaluated from the pack size rather than mis-parsed as
+    sizeof(T).
+Covers a multi-element pack and an empty pack.
