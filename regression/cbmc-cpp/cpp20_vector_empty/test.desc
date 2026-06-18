@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ empty vector has size 0: SUCCESS$
@@ -13,16 +13,13 @@ main.cpp
 forms the aliased type but does not require the aliased template's definition to
 be instantiated; a typedef-name may denote an incomplete type.
 
-KNOWNBUG: instantiating std::vector<int> elaborates the self-referential member
-typedefs `iterator`/`const_iterator` (= __normal_iterator<pointer/const_pointer,
+Instantiating std::vector<int> elaborates the self-referential member typedefs
+`iterator`/`const_iterator` (= __normal_iterator<pointer/const_pointer,
 vector>), whose type names the still-incomplete enclosing `vector`.  They cannot
-be eagerly instantiated at that point, and the self-reference branch of
-typecheck_compound_body dropped them entirely.  The sibling typedef
-`const_reverse_iterator = reverse_iterator<const_iterator>` then failed with
-"symbol 'const_iterator' is unknown", aborting the enclosing statement and
-silently dropping the user assertion (vacuous SUCCESS -- the assertion is not
-present in --show-properties).
+be eagerly instantiated at that point; the self-reference branch of
+typecheck_compound_body now keeps them as lazy aliases (registered by name)
+rather than dropping them, so the sibling typedef
+`const_reverse_iterator = reverse_iterator<const_iterator>` and other uses
+resolve `const_iterator`, and the empty vector verifies genuinely (the assertion
+is present in --show-properties and checked).
 
-Reclassify CORE once a self-referential member typedef that cannot be eagerly
-instantiated is registered lazily (by name) rather than dropped, so siblings
-referring to it resolve and the empty vector verifies genuinely.
