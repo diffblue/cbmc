@@ -1,0 +1,23 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ member erase\(iterator->const_iterator\) in template body: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^.*found no match for symbol.*$
+^CONVERSION ERROR$
+--
+KNOWNBUG: a user-defined conversion (iterator -> const_iterator) via a
+converting constructor template whose parameter is a class-template-id
+(Iter<Q, C>) is not applied during member-call overload resolution inside an
+instantiated function template body.  The overloaded member erase() is found
+but its candidate is rejected before the argument's user-defined conversion is
+considered, so the call is dropped and the assertion fails (n stays 3).
+
+Direct initialization (`const_iterator c = it;`) resolves the same conversion
+correctly, so the converting constructor itself works; the gap is specifically
+in member-call overload resolution in this context.  This is the header-free
+analogue of std::erase_if's `__cont.erase(iterator, iterator)` (see
+cpp20_vector_erase_if).  Reclassify CORE once the conversion is applied.
