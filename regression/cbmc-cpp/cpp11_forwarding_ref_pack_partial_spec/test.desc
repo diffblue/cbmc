@@ -1,0 +1,24 @@
+CORE
+main.cpp
+--cpp20 --unwind 4 --object-bits 11 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ forwarding-ref pack member function address is assigned: SUCCESS$
+^\[main\.assertion\.2\] line \d+ type-erased call through the forwarding-ref pack: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^.*no body for callee.*$
+^.*invalid implicit conversion.*$
+^CONVERSION ERROR$
+--
+[temp.variadic]/5 + [dcl.ref]: a forwarding-reference parameter pack `A&&...`
+expands, for each element E, to the reference E&&/E& (reference collapsing), not
+to a by-value E.  expand_parameter_packs dropped the declarator's reference when
+expanding such a pack, so a partial-specialization static member like
+_Function_handler<R(A...), F>::_M_invoke(_Any_data&, A&&...) got type
+R(*)(_Any_data&, int) instead of R(*)(_Any_data&, int&&); that mismatched the
+std::function member `_M_invoker` of type R(*)(_Any_data&, int&&), the
+`_M_invoker = &_M_invoke` assignment was rejected, the constructor body was left
+empty, and std::function calls dereferenced a null function pointer.  Fixed by
+keeping the declarator's reference qualifier when the deduced element type does
+not already carry one.
