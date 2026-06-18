@@ -1071,9 +1071,20 @@ void template_mapt::build(
     }
   }
 
-  // these should have been typechecked before
-  bool has_pack = !template_parameters.empty() &&
-                  template_parameters.back().get_bool(ID_ellipsis);
+  // these should have been typechecked before.  A parameter pack need not be
+  // the last template parameter: a class template partial specialization may
+  // place it before further parameters, e.g.
+  // `template <class R, class... A, class F> struct H<R(A...), F>` (the shape
+  // of libstdc++'s _Function_handler).  Find the (single) pack at whatever
+  // position it occupies.
+  int pack_idx = -1;
+  for(std::size_t k = 0; k < template_parameters.size(); ++k)
+    if(template_parameters[k].get_bool(ID_ellipsis))
+    {
+      pack_idx = static_cast<int>(k);
+      break;
+    }
+  const bool has_pack = pack_idx >= 0;
   if(
     instance.size() != template_parameters.size() &&
     !(has_pack && instance.size() >= template_parameters.size() - 1))
@@ -1138,43 +1149,53 @@ void template_mapt::build(
     shadow(pack_args_map);
   }
 
-  std::size_t i = 0;
-  for(cpp_template_args_tct::argumentst::const_iterator i_it = instance.begin();
-      i_it != instance.end();
-      i_it++, i++)
+  // Bind each parameter to its argument(s).  With a parameter pack at index
+  // `pack_idx`, the parameters before the pack bind positionally from the
+  // front, the pack absorbs the `pack_count` middle arguments, and the
+  // parameters after the pack bind positionally from the back (shifted by
+  // `pack_count - 1`).  Without a pack this is the plain 1:1 binding.
+  const std::size_t nparams = template_parameters.size();
+  const std::size_t nargs = instance.size();
+  const std::size_t non_pack = has_pack ? nparams - 1 : nparams;
+  const std::size_t pack_count =
+    has_pack && nargs >= non_pack ? nargs - non_pack : 0;
+  for(std::size_t p = 0; p < nparams; ++p)
   {
-    if(i < template_parameters.size())
-    {
-      // A *type* parameter pack must not be scalar-bound to its first
-      // argument here: doing so records type_map[Pack] = <first element>,
-      // which then collapses pack expansions and `sizeof...(Pack)` to a single
-      // element.  Type packs are bound below via pack_args_map / pack_size_map
-      // (and, for a single-element pack, a type_map convenience entry) per
-      // [temp.variadic]/5,8.  Non-type packs are left to the existing scalar
-      // binding (the pack block records only type elements).
-      const bool is_type_pack = template_parameters[i].id() == ID_type &&
-                                template_parameters[i].get_bool(ID_ellipsis);
-      if(!is_type_pack)
-        set(template_parameters[i], *i_it);
-    }
-    // Extra arguments for variadic packs are not mapped to individual
-    // parameters; they are passed through in the template args.
+    // A *type* parameter pack must not be scalar-bound to its first
+    // argument here: doing so records type_map[Pack] = <first element>,
+    // which then collapses pack expansions and `sizeof...(Pack)` to a single
+    // element.  Type packs are bound below via pack_args_map / pack_size_map
+    // (and, for a single-element pack, a type_map convenience entry) per
+    // [temp.variadic]/5,8.  Non-type packs are left to the existing scalar
+    // binding (the pack block records only type elements).
+    const bool is_type_pack =
+      static_cast<int>(p) == pack_idx && template_parameters[p].id() == ID_type;
+    if(is_type_pack)
+      continue;
+    // The argument index for this parameter: parameters at or before the pack
+    // align from the front; parameters after the pack are shifted by the
+    // number of extra pack elements.
+    const std::size_t arg_idx =
+      (!has_pack || static_cast<int>(p) <= pack_idx) ? p : p + pack_count - 1;
+    if(arg_idx < nargs)
+      set(template_parameters[p], instance[arg_idx]);
   }
 
   // Record pack sizes for sizeof...(Pack)
   if(has_pack)
   {
-    const auto &pack_param = template_parameters.back();
+    const auto &pack_param = template_parameters[pack_idx];
     irep_idt pack_id = pack_param.id() == ID_type
                          ? pack_param.type().get(ID_identifier)
                          : pack_param.get(ID_identifier);
-    std::size_t non_pack = template_parameters.size() - 1;
-    std::size_t pack_sz =
-      instance.size() >= non_pack ? instance.size() - non_pack : 0;
+    std::size_t pack_sz = pack_count;
 
-    // Store all pack argument types for pack indexing (C++26)
+    // The pack absorbs the `pack_count` arguments starting at `pack_idx`
+    // (the parameters after the pack bind to the trailing arguments).
     std::vector<typet> pack_types;
-    for(std::size_t j = non_pack; j < instance.size(); ++j)
+    for(std::size_t j = static_cast<std::size_t>(pack_idx);
+        j < static_cast<std::size_t>(pack_idx) + pack_count && j < nargs;
+        ++j)
     {
       if(instance[j].id() == ID_type)
       {
