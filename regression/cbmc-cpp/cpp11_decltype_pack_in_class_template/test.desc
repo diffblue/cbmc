@@ -29,11 +29,22 @@ already-fixed [temp.deduct.call]/3 forwarding-reference pack deduction
 std::__invoke rely on, and hence what std::ref'd predicates and std::erase_if
 (cpp20_vector_erase_if) need.
 
-Likely root cause: template_mapt::apply(exprt&) (src/cpp/template_map.cpp)
-substitutes pack names but does not perform expression-level pack expansion --
-a call argument that is a pack expansion (declval<A>()...) is not expanded into
-one argument per pack element.  template_mapt::expand_parameter_packs handles
-only function *parameter lists*, not call-argument / decltype expressions, so a
-class-template member decltype that expands a pack is left mis-expanded.
-Reclassify CORE once expression-level pack expansion is applied during template
-substitution so the type is computed correctly.
+Refined root cause (investigated with the debug build): the member type is in
+fact computed *correctly* in isolation -- instantiating
+mini::invoke_result<F, int>::type for a lambda returning `long long` yields an
+8-byte type (sizeof confirms), and invoke_result IS instantiated.  The failure
+is in *nested function-template instantiation*: when `invoke` (whose return
+type is invoke_result<F, A...>::type) is called from inside another template
+(here count_matches), the nested instantiation of `invoke` does not complete and
+the *caller's body is silently discarded* (count_matches's instantiated body is
+empty, so it returns a nondet value -- e.g. 16384 -- and the assertion fails).
+A direct, non-nested call to `invoke` is constant-folded to the correct result,
+which is why the bug only surfaces through a template caller (or a loop that
+prevents folding).
+
+So the gap is not (only) expression-level pack expansion in template_mapt::apply
+-- it is that instantiating a function template with a pack-expansion-decltype
+class-trait return type during another template's body elaboration fails and
+the failure is swallowed, discarding the caller's body.  Reclassify CORE once
+the nested instantiation completes so std::ref'd predicates and std::erase_if
+work.
