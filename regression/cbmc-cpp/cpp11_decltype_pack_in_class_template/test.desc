@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20 --unwind 6 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ invoke via pack-expansion decltype trait counts 1: SUCCESS$
@@ -8,68 +8,24 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-KNOWNBUG: a class template member typedef computed as
-decltype(declval<F>()(declval<A>()...)) -- a decltype whose call expression
-contains a pack expansion -- yields the wrong type when the class template is
-instantiated with a parameter pack and that member type is used as a function's
-return type, corrupting the return value.
+[temp.deduct.call]/1 + [temp.variadic]/5: a class template member typedef
+computed as decltype(declval<F>()(declval<A>()...)) -- a decltype whose call
+expression contains a pack expansion -- is used as the return type of the
+function template `invoke`, which is itself called with a *deduced* parameter
+pack A from inside another template (count_matches).
 
-Isolation: the same decltype works inline in a function and as a trailing
-return type; a trivial member typedef works; a class-template decltype WITHOUT
-pack expansion works (even when the class is instantiated with a pack); and a
-class-template decltype WITH pack expansion works when the class is instantiated
-with an explicit (non-pack) argument.  Only the *combination* fails: a class
-template instantiated with a parameter pack <F, A...> whose member decltype
-*expands that pack* (declval<A>()...).  The inner pack expansion is not bound to
-the substituted pack arguments during class-template instantiation.
+Root cause (pack-expansion rework phase 3 / phase 5 mechanism): when
+guess_function_template_args deduced `invoke`'s parameter pack A, it recorded A
+only as a scalar binding in template_map.type_map and left pack_args_map /
+pack_size_map empty.  Elaborating the dependent return type
+invoke_result<F, A...>::type then substituted the single deduced type for `A`
+but left a dangling `...` expansion marker on it; the subsequent attempt to
+pack-expand a non-pack type failed, the failure was swallowed by the deduction's
+SFINAE guard, and the caller's body was silently discarded (returning nondet).
 
-This is the std::invoke_result / __result_of_other_impl path; together with the
-already-fixed [temp.deduct.call]/3 forwarding-reference pack deduction
-(cpp11_forwarding_ref_pack) it is what std::reference_wrapper::operator() and
-std::__invoke rely on, and hence what std::ref'd predicates and std::erase_if
-(cpp20_vector_erase_if) need.
-
-Refined root cause (investigated with the debug build): the member type is in
-fact computed *correctly* in isolation -- instantiating
-mini::invoke_result<F, int>::type for a lambda returning `long long` yields an
-8-byte type (sizeof confirms), and invoke_result IS instantiated.  The failure
-is in *nested function-template instantiation*: when `invoke` (whose return
-type is invoke_result<F, A...>::type) is called from inside another template
-(here count_matches), the nested instantiation of `invoke` does not complete and
-the *caller's body is silently discarded* (count_matches's instantiated body is
-empty, so it returns a nondet value -- e.g. 16384 -- and the assertion fails).
-A direct, non-nested call to `invoke` is constant-folded to the correct result,
-which is why the bug only surfaces through a template caller (or a loop that
-prevents folding).
-
-So the gap is not (only) expression-level pack expansion in template_mapt::apply
--- it is that instantiating a function template with a pack-expansion-decltype
-class-trait return type during another template's body elaboration fails and
-the failure is swallowed, discarding the caller's body.
-
-Deeper finding (debug-build, instrumented): when invoke's dependent return type
-`invoke_result<F, A...>::type` -> `decltype(declval<F>()(declval<A>()...))` is
-elaborated during the caller's body, the deduced parameter pack A is recorded
-ONLY as a scalar type_map entry (template_map.pack_args_map is empty), so it is
-not treated as a pack.  Three cooperating pieces are needed, and fixing any one
-alone is insufficient because CBMC's variadic support is built from several
-independent, single-element-oriented code paths that do not compose:
-  (1) expression-level pack expansion of a function-call argument marked as a
-      pack expansion (the parser can record the `...`; substitution/type-check
-      must expand declval<A>()... into one argument per pack element);
-  (2) recording a deduced parameter pack as a pack (pack_args_map /
-      pack_size_map), not merely a scalar type_map entry, so the pack-expansion
-      machinery (which is gated on pack_args_map) can fire; and
-  (3) routing the resolution of a dependent qualified-id with a pack-expansion
-      template argument -- `Trait<F, A...>::type` in a function's return type --
-      through the same template-argument pack-expansion path
-      (typecheck_template_args).  Instrumentation shows this `A...` argument
-      never reaches that path, so even with (1) and (2) in place the pack arg is
-      collapsed without per-element substitution.
-
-Each was prototyped and reverted: (1) and (2) compose but cannot help until (3)
-makes the return-type's `Trait<F, A...>` actually expand.  Properly fixing this
-is a focused rework that unifies pack-expansion handling across the
-template-argument, call-argument, decltype, and qualified-id resolution paths,
-rather than a localized change.  Reclassify CORE once all three are in place so
-std::ref'd predicates and std::erase_if work.
+Fixed by recording the deduced function parameter pack in pack_args_map /
+pack_size_map (in addition to type_map) before the return type is elaborated, so
+the pack-expansion machinery (gated on pack_args_map) expands declval<A>()... and
+Trait<F, A...> per element and drops the `...` marker.  Part of the unified
+pack-expansion rework documented in
+doc/architectural/cpp-variadic-pack-expansion-rework.md.
