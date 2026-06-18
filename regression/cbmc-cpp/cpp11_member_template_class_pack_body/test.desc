@@ -1,0 +1,22 @@
+KNOWNBUG
+main.cpp
+--cpp20 --unwind 4 --no-unwinding-assertions --object-bits 10
+^\[main\.assertion\.1\] line \d+ member-template ctor reconstructing the class pack has its body instantiated: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^.*dereference failure: pointer NULL in this->invoker.*$
+^.*no body for callee.*$
+^CONVERSION ERROR$
+--
+KNOWNBUG ([temp.variadic] + [temp.mem]): a member function template of a class
+template partial-specialized on a function type R(Args...) whose body uses the
+enclosing class's parameter pack Args... to form a template argument (e.g.
+reconstructing R(Args...) to instantiate another template) is left with an
+uninstantiated (empty) body.  This is std::function's converting constructor
+  typedef _Function_handler<_Res(_ArgTypes...), _Functor> _Handler;
+  _M_invoker = &_Handler::_M_invoke;
+so _M_invoker is never assigned and std::function calls dereference a null
+function pointer.  Reclassify CORE once the member template body is
+instantiated.
