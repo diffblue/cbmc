@@ -639,6 +639,12 @@ void smt2_convt::walk_array_tree(
     // Recurse
     walk_array_tree(operands_map, src.get_sub()[1], type);
     const auto index_expr = parse_rec(src.get_sub()[2], type.size().type());
+    if(!index_expr.is_constant())
+      // The index in a (store array index value) term is not necessarily a
+      // constant: models for unbounded or non-integer-keyed arrays can carry
+      // a symbolic/non-constant index. Such an entry cannot be placed in the
+      // index-keyed operands map, so skip it during model reconstruction.
+      return;
     const constant_exprt index_constant = to_constant_expr(index_expr);
     mp_integer tempint;
     bool failure = to_integer(index_constant, tempint);
