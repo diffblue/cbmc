@@ -1,0 +1,18 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ sizeof\.\.\.\(T\) in static init is 3: SUCCESS$
+^\[main\.assertion\.2\] line \d+ sizeof\.\.\.\(T\) in static init is 0 \(empty\): SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+KNOWNBUG (sizeof... in a static data member initializer): [temp.variadic]/8
+`sizeof...(T)` must be the pack's element count.  In a member function body this
+is correct (works), but in a static data member initializer the pack is
+collapsed during class-template instantiation, so the count is wrong for both
+multi-element and empty packs.  Part of the unified pack-expansion rework
+documented in doc/architectural/cpp-variadic-pack-expansion-rework.md.
+Reclassify CORE once sizeof... is evaluated against the full pack here.
