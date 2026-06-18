@@ -1,0 +1,21 @@
+KNOWNBUG
+main.cpp
+--cpp20 --unwind 4 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ first_type<A\.\.\.>::type resolves to long long \(8 bytes\): SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+KNOWNBUG (template-argument / qualified-id pack-expansion path): a deduced
+function-template parameter pack A used as a class-template argument
+(first_type<A...>) is not expanded into the class template's own parameter pack
+during nested instantiation, so the dependent qualified-id first_type<A...>::type
+does not resolve and the instantiated body is dropped (nondet return).
+
+Decltype-free, header-free isolation of the path also exercised (with a
+decltype-valued member) by cpp11_decltype_pack_in_class_template.  Part of the
+unified pack-expansion rework documented in
+doc/architectural/cpp-variadic-pack-expansion-rework.md.  Reclassify CORE once
+the deduced pack is expanded as a class-template argument.

@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp20 --unwind 4 --no-unwinding-assertions
+^\[main\.assertion\.\d+\] line \d+ value-pack call, 1 element: SUCCESS$
+^\[main\.assertion\.\d+\] line \d+ value-pack call, 3 elements: SUCCESS$
+^\[main\.assertion\.\d+\] line \d+ value-pack forward, two layers: SUCCESS$
+^\[main\.assertion\.\d+\] line \d+ type-pack class-template argument, 3 elements: SUCCESS$
+^\[main\.assertion\.\d+\] line \d+ sizeof\.\.\.\(T\) in a member function, 3 elements: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+Locks in the [temp.variadic] pack-expansion contexts CBMC already handles:
+value-pack expansion in a function-call argument list (1/3 elements, forwarded
+through two layers), a type pack forwarded as a class-template argument, and
+sizeof...(T) in a member function body.  Guards against regressions from the
+unified pack-expansion rework
+(doc/architectural/cpp-variadic-pack-expansion-rework.md).
