@@ -290,6 +290,21 @@ exprt field_sensitivityt::apply(
   return expr;
 }
 
+#ifdef ENABLE_ARRAY_FIELD_SENSITIVITY
+/// True if the array index type permits field-sensitive element enumeration
+/// via from_integer(i, index_type). Arrays keyed by a non-scalar type (e.g.
+/// Strata's `Map Ref _` heap, indexed by a struct reference) cannot be
+/// enumerated this way and must be handled monolithically. Boolean index types
+/// are deliberately excluded: from_integer(i, bool) collapses every i > 1 to
+/// `true`, so enumerating i = 0..size-1 would produce duplicate indices.
+static bool is_enumerable_array_index_type(const typet &index_type)
+{
+  const irep_idt &id = index_type.id();
+  return id == ID_unsignedbv || id == ID_signedbv || id == ID_bv ||
+         id == ID_integer || id == ID_c_enum || id == ID_c_enum_tag;
+}
+#endif // ENABLE_ARRAY_FIELD_SENSITIVITY
+
 exprt field_sensitivityt::get_fields(
   const namespacet &ns,
   goto_symex_statet &state,
@@ -350,6 +365,13 @@ exprt field_sensitivityt::get_fields(
       return ssa_expr;
 
     const array_typet &type = to_array_type(ssa_expr.type());
+    // Element enumeration below builds integer indices via from_integer(i,
+    // index_type), so it only applies to arrays with an enumerable index type;
+    // arrays keyed by a non-scalar type (e.g. a map keyed by a struct
+    // reference, as in Strata's heap model `Map Ref _`) are treated
+    // monolithically.
+    if(!is_enumerable_array_index_type(type.index_type()))
+      return ssa_expr;
     const std::size_t array_size = numeric_cast_v<std::size_t>(mp_array_size);
 
     array_exprt::operandst elements;
@@ -628,7 +650,12 @@ bool field_sensitivityt::is_divisible(
     numeric_cast_v<mp_integer>(to_constant_expr(
       to_array_type(expr.type()).size())) <= max_field_sensitivity_array_size)
   {
-    return true;
+    // Only field-decompose arrays whose index type is enumerable (element
+    // enumeration builds from_integer(i, index_type)). Arrays keyed by a
+    // non-scalar type (e.g. Strata's `Map Ref _` heap, indexed by a struct
+    // reference) must be handled monolithically.
+    if(is_enumerable_array_index_type(to_array_type(expr.type()).index_type()))
+      return true;
   }
 #endif
 
