@@ -1,0 +1,32 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ size is 2 after erase_if removes one element: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^.*invariant violation.*$
+^CONVERSION ERROR$
+--
+KNOWNBUG: std::erase_if over a populated std::vector is currently a no-op, so
+the size assertion fails (the vector keeps all three elements).
+
+The crash this call used to trigger (a convert_function return-type
+exception-safety bug) is fixed and separately regression-tested by
+cpp20_erase_if_return_type, so this test no longer aborts CBMC -- it now runs to
+a clean assertion FAILURE.
+
+Remaining functional gap: std::erase_if's body does
+`__cont.erase(std::__remove_if(__cont.begin(), __cont.end(), __pred),
+__cont.end())`.  While erase_if's (system-header) body is converted, member
+lookup of `erase` on the `vector<int>&` parameter resolves to an empty
+candidate set ("found no match for symbol 'erase'"), so the body throws and is
+discarded under the system-header guard, leaving erase_if a no-op.  Direct use
+of vector::erase(first, last) in user code (where the vector instance is fully
+elaborated at the point of lookup) works, so this is an ordering/availability
+gap in member-function visibility during a dependent template body's conversion
+([temp.inst]/2-4 on-demand member instantiation), not a missing model.
+
+Reclassify CORE once erase_if's body converts (vector::erase is found and
+instantiated on demand) so the populated vector shrinks and size() == 2 holds.

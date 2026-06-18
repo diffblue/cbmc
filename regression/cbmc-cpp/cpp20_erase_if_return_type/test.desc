@@ -1,0 +1,23 @@
+CORE
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^.*invariant violation.*$
+^.*lhs\.type\(\) == rhs\.type\(\).*$
+^CONVERSION ERROR$
+--
+Regression for a convert_function return-type exception-safety crash.
+Discarding the std::erase_if(...) result (vector::size_type) used to leave the
+type-checker's `return_type` stale (set to size_type by the nested
+convert_function of erase_if's body, whose throw was caught by the
+system-header guard before the non-exception-safe restore ran).  main's
+`return 0;` was then typed size_t while main's return slot stayed int, tripping
+the symex invariant lhs.type() == rhs.type() (goto_symex.cpp) and aborting CBMC.
+The fix restores `return_type` and the loop-context flags on every exit of
+convert_function (N5008 [stmt.return]/3: `return` converts to the *enclosing*
+function's return type).  The forbidden patterns guard against the crash's
+return (invariant violation / the specific condition) and against a conversion
+error.
