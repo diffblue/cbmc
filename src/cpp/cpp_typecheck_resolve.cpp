@@ -1472,6 +1472,50 @@ void cpp_typecheck_resolvet::disambiguate_functions(
       }
     }
 
+    // N5008 [temp.func.order] + [temp.deduct.partial]: deduction-based
+    // partial ordering between function-template candidates.  The subtyping
+    // pass above only orders concrete derived-to-base struct parameters; this
+    // orders the template parameter *patterns* themselves -- e.g. f(_Tp*) is
+    // more specialised than f(const _Ptr&), which is what disambiguates
+    // libstdc++ std::__to_address(_Tp*) from __to_address(const _Ptr&) for a
+    // pointer argument (and any equivalent overload pair).  Candidate i is
+    // dominated by j when j is at-least-as-specialised as i but not vice
+    // versa.
+    for(std::size_t i = 0; i < old_identifiers.size(); ++i)
+    {
+      if(dominated[i] || old_identifiers[i].type().id() != ID_code)
+        continue;
+      const irep_idt ti = old_identifiers[i].type().get(ID_C_template);
+      if(ti.empty())
+        continue;
+      const symbolt *si = cpp_typecheck.symbol_table.lookup(ti);
+      if(si == nullptr || si->type.id() != ID_cpp_declaration)
+        continue;
+
+      for(std::size_t j = 0; j < old_identifiers.size(); ++j)
+      {
+        if(i == j || dominated[i] || old_identifiers[j].type().id() != ID_code)
+          continue;
+        const irep_idt tj = old_identifiers[j].type().get(ID_C_template);
+        if(tj.empty() || tj == ti)
+          continue;
+        const symbolt *sj = cpp_typecheck.symbol_table.lookup(tj);
+        if(sj == nullptr || sj->type.id() != ID_cpp_declaration)
+          continue;
+
+        const cpp_declarationt &Di = to_cpp_declaration(si->type);
+        const cpp_declarationt &Dj = to_cpp_declaration(sj->type);
+        const bool j_aas_i =
+          cpp_typecheck.function_template_at_least_as_specialised(
+            Dj, Di, tj, ti);
+        const bool i_aas_j =
+          cpp_typecheck.function_template_at_least_as_specialised(
+            Di, Dj, ti, tj);
+        if(j_aas_i && !i_aas_j)
+          dominated[i] = true;
+      }
+    }
+
     for(std::size_t i = 0; i < old_identifiers.size(); ++i)
     {
       if(!dominated[i])
