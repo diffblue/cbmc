@@ -4690,6 +4690,40 @@ skip_pack_removal_ft:
         }
       }
     }
+    // The function parameter pack may already have been removed from the
+    // instantiated declaration (e.g. by parameter-pack expansion during
+    // substitution).  Recover its name from the original template so the body
+    // expansion below can still strip its (now empty) call-argument
+    // references.
+    if(pack_var_name.empty() && template_symbol.type.id() == ID_cpp_declaration)
+    {
+      const cpp_declarationt &orig_decl =
+        to_cpp_declaration(template_symbol.type);
+      if(!orig_decl.declarators().empty())
+      {
+        const typet &odt = orig_decl.declarators().front().type();
+        if(odt.id() == ID_function_type)
+        {
+          for(const auto &op : odt.find(ID_parameters).get_sub())
+          {
+            if(op.id() != ID_cpp_declaration)
+              continue;
+            const auto &od = to_cpp_declaration(op);
+            if(
+              !od.declarators().empty() &&
+              od.declarators().front().type().get_bool(ID_ellipsis))
+            {
+              for(const auto &s : od.declarators().front().name().get_sub())
+                if(s.id() == ID_name)
+                {
+                  pack_var_name = s.get(ID_identifier);
+                  break;
+                }
+            }
+          }
+        }
+      }
+    }
     // Strip pack variable references from function call arguments in body
     if(!pack_var_name.empty() && func_decl.value().is_not_nil())
     {
@@ -4742,18 +4776,36 @@ skip_pack_removal_ft:
     }
   }
 
-  // When a variadic template parameter pack has N>0 arguments, expand
-  // the pack parameter into N individual function parameters and expand
-  // pack references in the function body.
+  // [temp.variadic]/5: expand the trailing function parameter pack into its
+  // N elements and expand pack references in the function body.  N is the
+  // number of pack arguments excluding the empty-pack sentinel
+  // (an `ID_type` argument whose type is `ID_empty`, used to encode a pack
+  // that matched zero elements).  N >= 2 expands into individual parameters;
+  // N == 0 removes the pack parameter and its body call-argument references;
+  // N == 1 needs no expansion here (the single element already maps to the
+  // single parameter).
+  std::vector<exprt> pack_arguments;
   if(
-    full_template_args.arguments().size() >
-      template_type.template_parameters().size() &&
     !template_type.template_parameters().empty() &&
     template_type.template_parameters().back().get_bool(ID_ellipsis))
   {
-    const std::size_t non_pack = template_type.template_parameters().size() - 1;
-    const std::size_t pack_sz =
-      full_template_args.arguments().size() - non_pack;
+    const std::size_t non_pack0 =
+      template_type.template_parameters().size() - 1;
+    for(std::size_t j = non_pack0; j < full_template_args.arguments().size();
+        ++j)
+    {
+      const auto &pa = full_template_args.arguments()[j];
+      if(pa.id() == ID_type && pa.type().id() == ID_empty)
+        continue; // empty-pack sentinel
+      pack_arguments.push_back(pa);
+    }
+  }
+  if(
+    !template_type.template_parameters().empty() &&
+    template_type.template_parameters().back().get_bool(ID_ellipsis) &&
+    pack_arguments.size() != 1)
+  {
+    const std::size_t pack_sz = pack_arguments.size();
 
     auto &func_decl = new_decl.declarators()[0];
     irept &func_params = func_decl.type().add(ID_parameters);
@@ -4806,7 +4858,7 @@ skip_pack_removal_ft:
         expanded_names.push_back(irep_idt(new_name));
 
         // Set the parameter type from the k-th pack argument
-        const exprt &pack_arg = full_template_args.arguments()[non_pack + k];
+        const exprt &pack_arg = pack_arguments[k];
         if(pack_arg.id() == ID_type)
         {
           auto &d = static_cast<cpp_declarationt &>(param_copy);
