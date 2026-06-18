@@ -5893,12 +5893,29 @@ void smt2_convt::find_symbols(const exprt &expr)
       convert_type(array_type);
       out << ")" << "\n";
 
-      if(!is_zero_width(array_type.element_type(), ns))
+      // Per-element constraints enumerate indices via from_integer(i,
+      // index_type), so the index type must be one from_integer can build a
+      // constant for: an integer/bitvector type or a C enum. A c_enum_tag is
+      // followed to its underlying c_enum type (from_integer has no c_enum_tag
+      // branch). Arrays keyed by some other domain (e.g. Strata's `Map Ref _`,
+      // a struct or pointer key) are left unconstrained -- a sound
+      // over-approximation.
+      const typet &idx_t = array_type.index_type();
+      const typet &index_constant_type =
+        idx_t.id() == ID_c_enum_tag
+          ? static_cast<const typet &>(ns.follow_tag(to_c_enum_tag_type(idx_t)))
+          : idx_t;
+      const bool enumerable_index =
+        can_cast_type<integer_bitvector_typet>(index_constant_type) ||
+        index_constant_type.id() == ID_bv ||
+        index_constant_type.id() == ID_integer ||
+        index_constant_type.id() == ID_c_enum;
+      if(!is_zero_width(array_type.element_type(), ns) && enumerable_index)
       {
         for(std::size_t i = 0; i < expr.operands().size(); i++)
         {
           out << "(assert (= (select " << id << " ";
-          convert_expr(from_integer(i, array_type.index_type()));
+          convert_expr(from_integer(i, index_constant_type));
           out << ") "; // select
           if(array_type.element_type().id() == ID_bool && !use_array_of_bool)
           {

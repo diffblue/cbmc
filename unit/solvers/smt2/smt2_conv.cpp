@@ -615,3 +615,86 @@ TEST_CASE(
   REQUIRE(operands_map.size() == 1);
   REQUIRE(operands_map.count(-1) == 1);
 }
+
+/// Helper: the full SMT2 text emitted by set_to for \p expr (used to inspect
+/// the array-constructor substitute produced by find_symbols).
+static std::string set_to_output(const namespacet &ns, const exprt &expr)
+{
+  std::ostringstream out;
+  smt2_convt conv(
+    ns, "test", "", "QF_AUFBV", smt2_convt::solvert::GENERIC, out);
+  conv.set_to(expr, true);
+  return out.str();
+}
+
+TEST_CASE(
+  "smt2_convt array literal with an integer index is enumerated",
+  "[core][solvers][smt2]")
+{
+  symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+
+  const unsignedbv_typet element_type{8};
+  const array_typet array_type{element_type, from_integer(2, size_type())};
+  const array_exprt array_literal{
+    {from_integer(1, element_type), from_integer(2, element_type)}, array_type};
+  const symbol_exprt array_symbol{"arr", array_type};
+
+  const std::string output =
+    set_to_output(ns, equal_exprt{array_symbol, array_literal});
+
+  // an integer index type is enumerable: per-element select constraints emitted
+  REQUIRE(output.find("(select array.") != std::string::npos);
+}
+
+TEST_CASE(
+  "smt2_convt array literal with a c_enum_tag index is enumerated",
+  "[core][solvers][smt2]")
+{
+  symbol_tablet symbol_table;
+  const c_enum_typet enum_type{unsignedbv_typet{32}};
+  const type_symbolt enum_symbol{"my_enum", enum_type, ID_C};
+  symbol_table.insert(enum_symbol);
+  const namespacet ns{symbol_table};
+  const c_enum_tag_typet enum_tag{enum_symbol.name};
+
+  const unsignedbv_typet element_type{8};
+  array_typet array_type{element_type, from_integer(2, size_type())};
+  array_type.index_type_nonconst() = enum_tag;
+  const array_exprt array_literal{
+    {from_integer(1, element_type), from_integer(2, element_type)}, array_type};
+  const symbol_exprt array_symbol{"arr", array_type};
+
+  const std::string output =
+    set_to_output(ns, equal_exprt{array_symbol, array_literal});
+
+  // a c_enum_tag index is followed to its underlying c_enum and enumerated;
+  // before the fix from_integer aborts on c_enum_tag
+  REQUIRE(output.find("(select array.") != std::string::npos);
+}
+
+TEST_CASE(
+  "smt2_convt array literal with a non-scalar index is left unconstrained",
+  "[core][solvers][smt2]")
+{
+  symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+
+  const unsignedbv_typet element_type{8};
+  array_typet array_type{element_type, from_integer(2, size_type())};
+  // a struct (non-scalar) index type, as in Strata's `Map Ref _`
+  array_type.index_type_nonconst() = struct_typet{{{"x", unsignedbv_typet{8}}}};
+  const array_exprt array_literal{
+    {from_integer(1, element_type), from_integer(2, element_type)}, array_type};
+  const symbol_exprt array_symbol{"arr", array_type};
+
+  const std::string output =
+    set_to_output(ns, equal_exprt{array_symbol, array_literal});
+
+  // the array is still declared, but no per-element constraints are emitted:
+  // from_integer cannot build a constant of a struct index type, so the array
+  // is left unconstrained (a sound over-approximation)
+  REQUIRE(
+    output.find("substitute for an array constructor") != std::string::npos);
+  REQUIRE(output.find("(select array.") == std::string::npos);
+}
