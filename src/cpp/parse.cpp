@@ -8650,6 +8650,10 @@ bool Parser::rSizeofExpr(exprt &exp)
       {
         exp=exprt(ID_sizeof);
         exp.add(ID_type_arg).swap(tname);
+        // [expr.sizeof]/5: this is a sizeof... pack-size query, not a
+        // sizeof(type); mark it so type-checking counts the pack
+        // elements rather than computing a type size.
+        exp.set("#sizeof_pack", true);
         set_location(exp, tk);
         return true;
       }
@@ -8668,6 +8672,7 @@ bool Parser::rSizeofExpr(exprt &exp)
         {
           exp = exprt(ID_sizeof);
           exp.add_to_operands(std::move(pack_expr));
+          exp.set("#sizeof_pack", true);
           set_location(exp, tk);
           return true;
         }
