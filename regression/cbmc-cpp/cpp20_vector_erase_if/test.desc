@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20 --unwind 6 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ size is 2 after erase_if removes one element: SUCCESS$
@@ -10,37 +10,24 @@ main.cpp
 ^.*found no match for symbol.*$
 ^CONVERSION ERROR$
 --
-KNOWNBUG: std::erase_if over a populated std::vector still leaves the size
-assertion failing, but the remaining cause is now narrow and well isolated.
+End-to-end: std::erase_if over a populated std::vector (real libstdc++) removes
+the single element equal to 2 from {1,2,3}, leaving size() == 2.
 
-Layers already fixed (each independently regression-tested):
-  * convert_function return-type exception-safety crash
-    (cpp20_erase_if_return_type).
-  * iterator -> const_iterator user-defined conversion via a class-template-id
-    converting constructor during member-call overload resolution
-    (cpp20_member_overload_converting_ctor) -- std::erase_if's body now converts
-    and runs, there is no "found no match for symbol 'erase'".
-  * if-statement declaration conditions (cpp_if_declaration_condition) -- this
-    fixed libstdc++ vector::_M_erase_at_end's
-    `if (size_type __n = _M_finish - __pos)`, so clear(), resize() and the
-    two-iterator erase(first, last) now correctly shrink the vector.
+This is the culmination of the unified variadic pack-expansion rework
+(doc/architectural/cpp-variadic-pack-expansion-rework.md).  std::erase_if passes
+its predicate as std::ref(__pred) to std::__remove_if, so the predicate is
+invoked through reference_wrapper::operator() -- a variadic *member* template of
+a class template whose dependent return type is invoke_result_t<T&, _Args...>.
 
-Verified working now (header-free / <vector> probes): single-element and range
-vector::erase, clear(), resize(), pop_back(), iterator arithmetic, std::remove,
-and std::remove_if / std::count_if with the predicate passed *directly*.
+Two cooperating fixes made this work (both also covered by header-free tests):
+  * [temp.deduct.call]/1 + [temp.variadic]/5: a deduced function parameter pack
+    is recorded as a pack (pack_args_map / pack_size_map), not only as a scalar
+    type_map binding, so the dependent return type expands the pack and drops
+    the `...` marker (cpp11_decltype_pack_in_class_template).
+  * a non-constructor member template of a class template now binds its
+    enclosing class's template arguments -- both during deduction and, via
+    ID_C_class on the deduced function type, during instantiation -- so a
+    member whose signature depends on the class parameters (here `T` in
+    invoke_result<T&, _Args...>) resolves and instantiates.
 
-Remaining functional gap: std::erase_if passes its predicate as
-`std::ref(__pred)` to std::__remove_if.  Any standard algorithm invoked with a
-std::reference_wrapper callable fails (e.g. std::count_if(v.begin(), v.end(),
-std::ref(pred)) miscounts), so __remove_if removes nothing and erase_if is a
-no-op.  Localized further: std::addressof works and a hand-written
-"pointer-to-lambda + operator()" wrapper works, and a perfect-forwarding call
-`std::forward<F>(f)(args)` works, but std::invoke(callable, args) /
-std::__invoke does not actually invoke the callable.  The gap is therefore in
-std::__invoke's tag-dispatch / __invoke_result trait machinery for the
-callable-object case (the path reference_wrapper::operator() uses), not in
-overload resolution, addressof, or forwarding.
-
-Bounded with --unwind to keep this KNOWNBUG fast.  Reclassify CORE once
-std::__invoke invokes a callable object so std::ref'd predicates work and
-erase_if shrinks the populated vector to size() == 2.
+Bounded with --unwind to keep the test fast.
