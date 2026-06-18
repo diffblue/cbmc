@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ unsatisfied requires-clause removes the constrained ctor: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^.*operator '-' not defined.*$
+--
+A constructor template whose requires-clause is unsatisfied for the deduced
+arguments must be removed from overload resolution ([temp.constr.decl]/1).
+CBMC evaluated the requires-clause but left an atomic constraint written with a
+type trait (here !is_convertible_v<U, unsigned long>) as an unfolded comparison,
+so the tri-state evaluator returned "unknown" and kept the candidate.  The fix
+constant-folds (simplify) the substituted requires-clause before evaluating it.
+This is the header-free analogue of the libstdc++ std::span(ptr, count) vs
+span(_It, _End) selection (see cpp20_span / cpp20_span_basic).

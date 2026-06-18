@@ -26,10 +26,19 @@ With the iterator's `iterator_concept` alias kept lazy ([iterator.concepts.gener
 + [temp.inst]/1-2: it is an inert concept-dispatch member that nothing depends on
 structurally and a typedef-name may denote an incomplete type), the iterator's
 member functions are instantiated, main is no longer truncated, and both
-assertions are now genuinely generated.  They currently FAIL because std::span's
-own (pointer, size_type) constructor is mis-instantiated in CBMC (its body comes
-out empty, so _M_ptr/_M_extent are nondeterministic) -- a separate, genuine
-front-end bug now exposed rather than hidden.
+assertions are now genuinely generated.
 
-Reclassify CORE once std::span's constructor instantiates a correct body so the
-populated span verifies genuinely.
+Constructor *selection* is now also fixed: the constrained span(_It, _End)
+iterator-sentinel constructor's requires-clause `!is_convertible_v<_End,
+size_type>` is now enforced (its substituted atomic constraint is constant-
+folded before the tri-state evaluation), so span(arr, N) correctly selects
+span(pointer, size_type) and `span size` holds.
+
+`span element` still FAILS: span(pointer, size_type)'s body sets
+`_M_ptr = std::to_address(__first)`, but std::to_address<T>(T*)'s (system-header)
+body is itself discarded on a thrown exception during conversion, so _M_ptr is
+left nondeterministic and the element read fails -- a further, separate
+front-end gap ([temp.inst]/2-4 on-demand instantiation), now exposed.
+
+Reclassify CORE once std::to_address's body converts so _M_ptr is the supplied
+pointer and the populated span verifies genuinely.
