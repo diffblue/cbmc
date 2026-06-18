@@ -824,6 +824,21 @@ public:
     const irep_idt &F_scope_id,
     const irep_idt &G_scope_id);
 
+  /// N5008 [temp.func.order] + [temp.deduct.partial]/3.1: returns true if
+  /// function template F is at-least-as-specialised as G when their
+  /// function parameter-type-lists serve as the P/A pairs.  Implemented as:
+  /// deduce G's template parameters from F's (transformed) parameter types,
+  /// position by position, and require all of G's parameters to be bound.
+  /// /5 (drop reference) and /7 (drop top-level cv) are applied to each
+  /// pair first.  F's template parameters are inert during the deduction
+  /// because their identifiers carry F's scope prefix and are not in the
+  /// template_map (the "transformed type" device).
+  bool function_template_at_least_as_specialised(
+    const cpp_declarationt &F,
+    const cpp_declarationt &G,
+    const irep_idt &F_scope_id,
+    const irep_idt &G_scope_id);
+
   bool reference_related(const exprt &expr, const reference_typet &type) const;
 
   bool reference_compatible(

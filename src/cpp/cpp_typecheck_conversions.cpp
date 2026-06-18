@@ -22,6 +22,7 @@ Author:
 
 #include <ansi-c/c_qualifiers.h>
 
+#include "cpp_convert_type.h"
 #include "cpp_sfinae_context.h"
 #include "cpp_typecheck.h"
 #include "cpp_util.h"
@@ -1012,6 +1013,108 @@ bool cpp_typecheckt::conversion_template_at_least_as_specialised(
 
   (void)F_scope_id; // currently unused; reserved for future
                     // synthetic-type substitution into F's pattern.
+}
+
+/// N5008 [temp.func.order] + [temp.deduct.partial]/3.1: is function template
+/// F at-least-as-specialised as G?  The types used for partial ordering are
+/// the function parameter-type-lists.  Per /2 + /8, A = F's transformed
+/// parameter types, P = G's parameter types, and the deduction binds G's
+/// template parameters.  As in the conversion-operator case, F's and G's
+/// template parameters are disjoint (different scope prefixes), so F's
+/// parameters can be used directly as inert "transformed" types and we only
+/// mark G's parameters deducible.  /5 (drop reference) and /7 (drop
+/// top-level cv) are applied to each P/A pair.
+bool cpp_typecheckt::function_template_at_least_as_specialised(
+  const cpp_declarationt &F,
+  const cpp_declarationt &G,
+  const irep_idt &F_scope_id,
+  const irep_idt &G_scope_id)
+{
+  if(F.declarators().empty() || G.declarators().empty())
+    return false;
+
+  // [temp.deduct.partial]/3.1: use the function parameter-type-lists.
+  typet F_ft = F.declarators().front().merge_type(F.type());
+  typet G_ft = G.declarators().front().merge_type(G.type());
+  // merge_type yields a frontend ID_function_type; convert to a proper
+  // code type so the parameter list and (frontend) pointer/reference forms
+  // are in the shape guess_template_args and the strippers expect.  This is
+  // a structural conversion only; template-parameter cpp_names are left
+  // unresolved (resolved per-pair below under G's scope).
+  cpp_convert_plain_type(F_ft, get_message_handler());
+  cpp_convert_plain_type(G_ft, get_message_handler());
+  if(F_ft.id() != ID_code || G_ft.id() != ID_code)
+    return false;
+  const code_typet::parameterst &F_params = to_code_type(F_ft).parameters();
+  const code_typet::parameterst &G_params = to_code_type(G_ft).parameters();
+
+  // Only compare when the parameter-type-lists correspond (same arity).
+  // (Partial ordering across differing arities -- packs, default args --
+  // is out of scope here; such candidates are left to the other tie-
+  // breakers / reported as ambiguous, never wrongly ordered.)
+  if(F_params.empty() || F_params.size() != G_params.size())
+    return false;
+
+  auto strip_top_reference = [](typet &t)
+  {
+    if(
+      (t.id() == ID_pointer || t.id() == ID_frontend_pointer) &&
+      t.get_bool(ID_C_reference))
+      t = static_cast<const typet &>(to_type_with_subtype(t).subtype());
+  };
+  auto drop_top_cv = [](typet &t)
+  {
+    c_qualifierst q;
+    q.read(t);
+    if(q.is_constant || q.is_volatile || q.is_restricted || q.is_atomic)
+    {
+      c_qualifierst empty;
+      empty.write(t);
+    }
+  };
+
+  cpp_save_scopet save_scope{cpp_scopes};
+  cpp_saved_template_mapt saved_map{template_map};
+
+  try
+  {
+    sfinae_contextt sfinae_guard{*this};
+    template_map.clear();
+    // Mark only G's parameters as deducible -- that's whose pattern sits in
+    // P.  F's parameters appear in A but are not in template_map, so the
+    // deduction treats them as concrete (the "transformed type" device).
+    template_map.build_unassigned(G.template_type());
+
+    auto scope_it = cpp_scopes.id_map.find(G_scope_id);
+    if(scope_it != cpp_scopes.id_map.end())
+      cpp_scopes.go_to(static_cast<cpp_scopet &>(*scope_it->second));
+
+    cpp_typecheck_resolvet resolver{*this};
+    for(std::size_t i = 0; i < G_params.size(); ++i)
+    {
+      typet A = F_params[i].type();
+      typet P = G_params[i].type();
+      strip_top_reference(P);
+      strip_top_reference(A);
+      drop_top_cv(P);
+      drop_top_cv(A);
+      // Put A into a fully-converted form so structural patterns (e.g.
+      // pointer types) match guess_template_args' ID_pointer branch rather
+      // than its frontend variant.
+      cpp_convert_plain_type(A, get_message_handler());
+      resolver.guess_template_args(P, A);
+    }
+
+    cpp_template_args_tct guessed =
+      template_map.build_template_args(G.template_type());
+    return !guessed.has_unassigned();
+  }
+  catch(...)
+  {
+    return false;
+  }
+
+  (void)F_scope_id;
 }
 
 /// Phase 4B core helper: deduction + partial ordering + instantiation
