@@ -4538,6 +4538,36 @@ void smt2_convt::convert_floatbv_fma(const floatbv_fma_exprt &expr)
     convert_floatbv(expr);
 }
 
+/// Coerce \p index to the array's declared index type \p array_index_type when
+/// the array uses a fixed-width bitvector-like index sort and the index does
+/// not already have that type; otherwise (mathematical-integer or struct /
+/// map-key index sorts, which are expected to match already) emit it unchanged.
+/// convert_typecast coerces an integer or differently-sized bitvector source.
+static exprt cast_array_index(exprt index, const typet &array_index_type)
+{
+  const auto is_bv = [](const typet &t)
+  {
+    return t.id() == ID_unsignedbv || t.id() == ID_signedbv ||
+           t.id() == ID_c_bool || t.id() == ID_c_enum ||
+           t.id() == ID_c_enum_tag;
+  };
+
+  if(array_index_type != index.type() && is_bv(array_index_type))
+    return typecast_exprt(std::move(index), array_index_type);
+
+  // Emitting the index unchanged is only well-sorted when the sorts already
+  // match.  In particular a fixed-width bitvector index requires the array's
+  // index type to be a bitvector too; array_typet::index_type() falls back to
+  // c_index_type() (a bitvector) for arrays without an ID_C_index_type
+  // annotation, so an integer-sorted index into such an array is handled by
+  // the cast above rather than slipping through here.
+  DATA_INVARIANT(
+    array_index_type == index.type() || !is_bv(index.type()),
+    "a bitvector array index requires a bitvector array index type");
+
+  return index;
+}
+
 void smt2_convt::convert_with(const with_exprt &expr)
 {
   INVARIANT(
@@ -4552,10 +4582,13 @@ void smt2_convt::convert_with(const with_exprt &expr)
 
     if(use_array_theory(expr))
     {
+      const exprt where =
+        cast_array_index(expr.where(), array_type.index_type());
+
       out << "(store ";
       convert_expr(expr.old());
       out << " ";
-      convert_expr(typecast_exprt(expr.where(), array_type.index_type()));
+      convert_expr(where);
       out << " ";
       convert_expr(expr.new_value());
       out << ")";
@@ -4768,13 +4801,16 @@ void smt2_convt::convert_index(const index_exprt &expr)
 
     if(use_array_theory(expr.array()))
     {
+      const exprt index =
+        cast_array_index(expr.index(), array_type.index_type());
+
       if(expr.is_boolean() && !use_array_of_bool)
       {
         out << "(= ";
         out << "(select ";
         convert_expr(expr.array());
         out << " ";
-        convert_expr(typecast_exprt(expr.index(), array_type.index_type()));
+        convert_expr(index);
         out << ")";
         out << " #b1)";
       }
@@ -4783,7 +4819,7 @@ void smt2_convt::convert_index(const index_exprt &expr)
         out << "(select ";
         convert_expr(expr.array());
         out << " ";
-        convert_expr(typecast_exprt(expr.index(), array_type.index_type()));
+        convert_expr(index);
         out << ")";
       }
     }
