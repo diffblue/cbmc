@@ -1163,8 +1163,14 @@ std::string smt2_convt::type2id(const typet &type) const
   {
     return "A" + type2id(to_array_type(type).element_type());
   }
+  else if(type.id() == ID_c_enum)
+  {
+    // mirror convert_type, which uses the underlying bitvector type
+    return type2id(to_c_enum_type(type).underlying_type());
+  }
   else if(type.id() == ID_integer)
   {
+    // unbounded mathematical integers map to the SMT `Int` sort
     return "Int";
   }
   else if(type.id() == ID_real)
@@ -1246,6 +1252,18 @@ void smt2_convt::convert_string_literal(const std::string &s)
     out << ch;
   }
   out << '"';
+}
+
+/// True if \p type is an integer-sorted index type for which the
+/// element-address size/offset arithmetic can be carried out directly. This is
+/// the single source of truth shared by the application site (convert_expr) and
+/// the declaration site (find_symbols) for ID_element_address, so that the
+/// element-size argument sort cannot drift between the two.
+static bool is_integer_index_type(const typet &type)
+{
+  return type.id() == ID_unsignedbv || type.id() == ID_signedbv ||
+         type.id() == ID_bv || type.id() == ID_integer ||
+         type.id() == ID_c_enum || type.id() == ID_c_enum_tag;
 }
 
 void smt2_convt::convert_expr(const exprt &expr)
@@ -1956,15 +1974,31 @@ void smt2_convt::convert_expr(const exprt &expr)
 
     auto element_size_expr_opt =
       ::size_of_expr(element_address_expr.element_type(), ns);
-    CHECK_RETURN(element_size_expr_opt.has_value());
+    // The element-size argument must have an integer sort for the offset
+    // arithmetic to type-check. Two independent adjustments are made so that
+    // mathematical or non-integer-indexed heap arrays (as emitted by the
+    // Strata encoding) can still be expressed:
+    //   - the size *value* falls back to 1 when the element type has no
+    //     computable byte size (e.g. an incomplete or mathematical type);
+    //   - the size *sort* falls back to c_index_type() when the index type is
+    //     not itself an integer sort, rather than using the index type.
+    // Both adjustments are mirrored in the declaration in find_symbols().
+    const typet &idx_t = element_address_expr.index().type();
+    const typet size_target =
+      is_integer_index_type(idx_t) ? idx_t : c_index_type();
+    const exprt element_size_expr =
+      element_size_expr_opt.has_value()
+        ? *element_size_expr_opt
+        : static_cast<exprt>(from_integer(1, size_target));
 
-    out << "(element-address-" << type2id(expr.type()) << ' ';
+    out << "(element-address-" << type2id(expr.type()) << '_' << type2id(idx_t)
+        << ' ';
     convert_expr(element_address_expr.base());
     out << ' ';
     convert_expr(element_address_expr.index());
     out << ' ';
-    convert_expr(typecast_exprt::conditional_cast(
-      *element_size_expr_opt, element_address_expr.index().type()));
+    convert_expr(
+      typecast_exprt::conditional_cast(element_size_expr, size_target));
     out << ')';
   }
   else if(expr.id() == ID_field_address)
@@ -3504,6 +3538,40 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       out << "(ite ";
       convert_expr(src);
       out <<" 1 0)";
+    }
+    else if(
+      src_type.id() == ID_unsignedbv || src_type.id() == ID_c_bool ||
+      src_type.id() == ID_bv)
+    {
+      // unsigned bit-vector to integer: bv2nat gives the unsigned value
+      out << "(bv2nat ";
+      convert_expr(src);
+      out << ')';
+    }
+    else if(src_type.id() == ID_signedbv)
+    {
+      // signed bit-vector to integer: bv2nat gives the unsigned value; when
+      // the sign bit is set, subtract 2^width to obtain the signed value.
+      const std::size_t width = to_signedbv_type(src_type).get_width();
+      out << "(let ((?bvtoint ";
+      convert_expr(src);
+      out << ")) (- (bv2nat ?bvtoint) (* (bv2nat ((_ extract " << width - 1
+          << ' ' << width - 1 << ") ?bvtoint)) " << power(2, width) << ")))";
+    }
+    else if(src_type.id() == ID_c_enum)
+    {
+      // convert via the underlying (bit-vector) type
+      convert_typecast(typecast_exprt{
+        typecast_exprt{src, to_c_enum_type(src_type).underlying_type()},
+        dest_type});
+    }
+    else if(src_type.id() == ID_c_enum_tag)
+    {
+      // convert via the underlying (bit-vector) type
+      convert_typecast(typecast_exprt{
+        typecast_exprt{
+          src, ns.follow_tag(to_c_enum_tag_type(src_type)).underlying_type()},
+        dest_type});
     }
     else
       UNEXPECTEDCASE("Unknown typecast "+src_type.id_string()+" -> integer");
@@ -6250,7 +6318,8 @@ void smt2_convt::find_symbols(const exprt &expr)
   }
   else if(expr.id() == ID_element_address)
   {
-    irep_idt function = "element-address-" + type2id(expr.type());
+    irep_idt function = "element-address-" + type2id(expr.type()) + "_" +
+                        type2id(to_element_address_expr(expr).index().type());
 
     if(state_fkt_declared.insert(function).second)
     {
@@ -6259,7 +6328,13 @@ void smt2_convt::find_symbols(const exprt &expr)
       out << ' ';
       convert_type(to_element_address_expr(expr).index().type());
       out << ' '; // repeat, for the element size
-      convert_type(to_element_address_expr(expr).index().type());
+      // The element-size argument sort must match the one chosen at the
+      // application site in convert_expr(): for non-integer index types we
+      // emit c_index_type() rather than the index type itself.
+      convert_type(
+        is_integer_index_type(to_element_address_expr(expr).index().type())
+          ? to_element_address_expr(expr).index().type()
+          : c_index_type());
       out << ") ";
       convert_type(expr.type()); // return type
       out << ")\n";              // declare-fun
