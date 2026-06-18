@@ -1589,6 +1589,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           // Per [temp.inst]/3 + [temp.deduct]/8: elaborate under a
           // SFINAE immediate-context guard; on failure, skip the
           // declaration and let a later pass retry.
+          const typet saved_self_ref_type = declaration.type();
           try
           {
             sfinae_contextt sfinae_guard{*this};
@@ -1596,7 +1597,28 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           }
           catch(...)
           {
-            continue;
+            // [temp.inst]/1-2 + [dcl.typedef]: a member typedef declares
+            // the member and forms the aliased type but does not require
+            // the aliased template's *definition* to be instantiated -- a
+            // typedef-name may denote an incomplete type.  When the alias
+            // is self-referential and cannot be eagerly instantiated while
+            // the enclosing class is still incomplete (e.g. libstdc++
+            // vector's `typedef __normal_iterator<const_pointer, vector>
+            // const_iterator;`), keep the unresolved alias so the typedef
+            // NAME is still declared (lazily) and sibling members that
+            // refer to it -- such as
+            // `typedef reverse_iterator<const_iterator>
+            // const_reverse_iterator;` -- resolve, rather than dropping it
+            // and producing a spurious "symbol 'const_iterator' is
+            // unknown".  Non-typedef self-references keep the previous
+            // skip-and-retry behaviour.
+            if(is_typedef)
+            {
+              declaration.type() = saved_self_ref_type;
+              kept_unresolved_cpp_name = true;
+            }
+            else
+              continue;
           }
         }
         else if(is_typedef)
