@@ -202,19 +202,48 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   }
 
   // do the function body
-  // Save and restore break/continue/case flags, because convert_function
-  // may be called recursively (e.g., during constexpr evaluation or
-  // template instantiation triggered by type-checking an expression
-  // inside another function body).
-  bool old_break_is_allowed = break_is_allowed;
-  bool old_continue_is_allowed = continue_is_allowed;
-  bool old_case_is_allowed = case_is_allowed;
+  // Save and restore the return type and loop-context flags
+  // exception-safely.  convert_function may be called recursively (e.g. a
+  // template instantiation triggered while type-checking an expression in
+  // another function body).  If such a nested call throws and is caught
+  // upstream, a non-exception-safe restore would leave `return_type` set to
+  // the nested function's return type; the enclosing function's subsequent
+  // `return` statements would then be converted against the wrong type
+  // (N5008 [stmt.return]/3 requires the operand to be implicitly converted
+  // to the *enclosing* function's return type).  That produces a
+  // type-inconsistent assignment that later trips the symbolic-execution
+  // invariant lhs.type() == rhs.type().  A scope guard restores the saved
+  // values on every exit -- normal return, early return, or exception.
+  struct context_restoret
+  {
+    typet &return_type_ref;
+    bool &break_ref;
+    bool &continue_ref;
+    bool &case_ref;
+    const typet saved_return_type;
+    const bool saved_break;
+    const bool saved_continue;
+    const bool saved_case;
+    ~context_restoret()
+    {
+      return_type_ref = saved_return_type;
+      break_ref = saved_break;
+      continue_ref = saved_continue;
+      case_ref = saved_case;
+    }
+  } context_restore{
+    return_type,
+    break_is_allowed,
+    continue_is_allowed,
+    case_is_allowed,
+    return_type,
+    break_is_allowed,
+    continue_is_allowed,
+    case_is_allowed};
+
   start_typecheck_code();
 
-  // save current return type
-  typet old_return_type=return_type;
-
-  return_type=function_type.return_type();
+  return_type = function_type.return_type();
 
   // constructor, destructor?
   if(return_type.id() == ID_constructor || return_type.id() == ID_destructor)
@@ -793,10 +822,6 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
 
   symbol.value.type()=symbol.type;
 
-  return_type = old_return_type;
-  break_is_allowed = old_break_is_allowed;
-  continue_is_allowed = old_continue_is_allowed;
-  case_is_allowed = old_case_is_allowed;
   disable_access_control = saved_access_control;
 
   deferred_typechecking.erase(symbol.name);
