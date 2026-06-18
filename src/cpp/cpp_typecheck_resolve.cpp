@@ -5632,9 +5632,10 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
       // Per [temp.deduct.call]/3: detect forwarding references (T&&)
       // before type conversion, by checking if the declarator has
       // rvalue_reference type and the base is a template parameter.
+      // This applies to a forwarding-reference parameter pack
+      // (Args&&... args) as well as a single forwarding reference.
       bool is_forwarding_ref = false;
       if(
-        !is_pack &&
         (declarator.type().id() == ID_frontend_pointer ||
          declarator.type().id() == ID_pointer) &&
         declarator.type().get_bool(ID_C_rvalue_reference))
@@ -5686,6 +5687,34 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
         // Collect each argument's type for heterogeneous packs
         for(; it != fargs.operands.end(); ++it)
         {
+          // [temp.deduct.call]/3 applied per pack element: for a
+          // forwarding-reference pack (Args&&... args), an lvalue
+          // argument of type A deduces the corresponding pack element
+          // as "lvalue reference to A"; an rvalue argument deduces it
+          // as A.  Without this the element was deduced as a plain
+          // rvalue reference (Args&& with Args=A), so an lvalue
+          // argument bound through a dangling/garbage rvalue reference.
+          // This is the pack analogue of the single forwarding-
+          // reference case handled below.
+          if(is_forwarding_ref)
+          {
+            bool elem_is_lvalue = it->get_bool(ID_C_lvalue);
+            if(
+              elem_is_lvalue && it->id() == ID_dereference &&
+              it->operands().size() == 1 &&
+              it->operands().front().type().id() == ID_pointer &&
+              it->operands().front().type().get_bool(ID_C_rvalue_reference) &&
+              it->operands().front().id() != ID_symbol)
+            {
+              elem_is_lvalue = false;
+            }
+            typet deduced_type =
+              elem_is_lvalue ? ::reference_type(it->type()) : it->type();
+            pack_deduced_types.push_back(deduced_type);
+            guess_template_args(arg_declaration.type(), deduced_type);
+            continue;
+          }
+
           typet arg_actual_type = it->type();
           if(arg_type.id() == ID_cpp_name)
           {
