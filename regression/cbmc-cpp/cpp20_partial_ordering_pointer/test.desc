@@ -1,0 +1,22 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ f\(T\*\) is more specialized than f\(const U&\): SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^.*does not uniquely resolve.*$
+^CONVERSION ERROR$
+--
+N5008 [temp.func.order] partial ordering as a tie-breaker in overload
+resolution.  For an lvalue `int*` argument, f(T*) and f(const U&) have
+indistinguishable conversion sequences (both exact-match), so the call is
+resolved by partial ordering, under which f(T*) is more specialized (deducing U
+from a synthesized X* succeeds; deducing T* from a synthesized Y fails).
+
+disambiguate_functions now runs deduction-based partial ordering
+([temp.deduct.partial]) across function-template candidates that tie on
+conversion distance, via function_template_at_least_as_specialised.  This is the
+header-free analogue of the std::to_address(_Tp*) vs __to_address(const _Ptr&)
+ambiguity that previously blocked std::span's element access (cpp20_span).
