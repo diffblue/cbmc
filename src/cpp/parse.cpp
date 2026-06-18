@@ -6195,7 +6195,23 @@ bool Parser::rArgDeclList(irept &arglist)
       if(lex.LookAhead(0) == TOK_ELLIPSIS)
       {
         lex.get_token(tk);
-        list.get_sub().push_back(irept(ID_ellipsis));
+        // [temp.variadic]/3,5: a `...` immediately following a parameter
+        // declaration with no separating comma -- e.g. `f(Args...)` -- is a
+        // function parameter pack, not a C-style variadic ellipsis (which is
+        // written with a preceding comma, `f(T, ...)`, or alone, `f(...)`).
+        // Mark the parameter's declarator as a pack expansion so it is
+        // expanded to its elements during instantiation, rather than pushing a
+        // separate `...` parameter that read_function_type would turn into a
+        // spurious C-style ellipsis on the function type.  This is restricted
+        // to a parameter whose type is a (dependent) cpp_name -- the form a
+        // parameter pack takes -- so a genuine comma-less C variadic such as
+        // `f(int...)` keeps its ellipsis.
+        cpp_declarationt &decl =
+          to_cpp_declaration(static_cast<exprt &>(list.get_sub().back()));
+        if(!decl.declarators().empty() && decl.type().id() == ID_cpp_name)
+          decl.declarators().front().set_has_ellipsis();
+        else
+          list.get_sub().push_back(irept(ID_ellipsis));
       }
 
       t = lex.LookAhead(0);
