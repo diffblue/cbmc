@@ -49,16 +49,27 @@ the failure is swallowed, discarding the caller's body.
 
 Deeper finding (debug-build, instrumented): when invoke's dependent return type
 `invoke_result<F, A...>::type` -> `decltype(declval<F>()(declval<A>()...))` is
-elaborated during the caller's body, the deduced parameter pack A is NOT bound
-in the active substitution map (template_map.pack_args_map is empty and A is
-absent from type_map; only the non-pack parameters F and the caller's own
-parameters are bound).  The pack-expansion pattern declval<A>()... is therefore
-left referencing an unbound pack and throws.  Two cooperating fixes are needed:
+elaborated during the caller's body, the deduced parameter pack A is recorded
+ONLY as a scalar type_map entry (template_map.pack_args_map is empty), so it is
+not treated as a pack.  Three cooperating pieces are needed, and fixing any one
+alone is insufficient because CBMC's variadic support is built from several
+independent, single-element-oriented code paths that do not compose:
   (1) expression-level pack expansion of a function-call argument marked as a
-      pack expansion (parser currently records this; the substitution/typecheck
-      must expand declval<A>()... into one argument per pack element), and
-  (2) propagation of the deduced parameter pack into the substitution map used
-      to elaborate a function template's dependent return type during nested
-      instantiation (the actual blocker -- (1) cannot fire while A is unbound).
-Reclassify CORE once both are in place so std::ref'd predicates and
-std::erase_if work.
+      pack expansion (the parser can record the `...`; substitution/type-check
+      must expand declval<A>()... into one argument per pack element);
+  (2) recording a deduced parameter pack as a pack (pack_args_map /
+      pack_size_map), not merely a scalar type_map entry, so the pack-expansion
+      machinery (which is gated on pack_args_map) can fire; and
+  (3) routing the resolution of a dependent qualified-id with a pack-expansion
+      template argument -- `Trait<F, A...>::type` in a function's return type --
+      through the same template-argument pack-expansion path
+      (typecheck_template_args).  Instrumentation shows this `A...` argument
+      never reaches that path, so even with (1) and (2) in place the pack arg is
+      collapsed without per-element substitution.
+
+Each was prototyped and reverted: (1) and (2) compose but cannot help until (3)
+makes the return-type's `Trait<F, A...>` actually expand.  Properly fixing this
+is a focused rework that unifies pack-expansion handling across the
+template-argument, call-argument, decltype, and qualified-id resolution paths,
+rather than a localized change.  Reclassify CORE once all three are in place so
+std::ref'd predicates and std::erase_if work.
