@@ -18,15 +18,24 @@ cpp20_erase_if_return_type, so this test no longer aborts CBMC -- it now runs to
 a clean assertion FAILURE.
 
 Remaining functional gap: std::erase_if's body does
-`__cont.erase(std::__remove_if(__cont.begin(), __cont.end(), __pred),
-__cont.end())`.  While erase_if's (system-header) body is converted, member
-lookup of `erase` on the `vector<int>&` parameter resolves to an empty
-candidate set ("found no match for symbol 'erase'"), so the body throws and is
-discarded under the system-header guard, leaving erase_if a no-op.  Direct use
-of vector::erase(first, last) in user code (where the vector instance is fully
-elaborated at the point of lookup) works, so this is an ordering/availability
-gap in member-function visibility during a dependent template body's conversion
-([temp.inst]/2-4 on-demand member instantiation), not a missing model.
+`__cont.erase(__niter_wrap(__cont.begin(), __removed), __cont.end())`, i.e.
+vector::erase(const_iterator, const_iterator) called with `iterator` arguments.
+That requires the iterator -> const_iterator user-defined conversion (via
+__normal_iterator's converting constructor template, whose parameter is the
+class-template-id __normal_iterator<_Iter, _Container>).  During the member-call
+overload resolution for erase() the erase candidate is rejected before that
+user-defined conversion is applied, so the call is dropped and erase_if is a
+no-op (size stays 3).
 
-Reclassify CORE once erase_if's body converts (vector::erase is found and
-instantiated on demand) so the populated vector shrinks and size() == 2 holds.
+The converting constructor itself works for direct initialization
+(`const_iterator c = it;`), so the gap is specifically in applying this
+class-template-id converting-constructor conversion during member-call overload
+resolution.  Note that a *direct* `v.erase(v.begin(), v.end())` call hits the
+same unresolved overload and silently drops the call together with the rest of
+its full-expression, so such uses only appear to pass *vacuously* (the
+assertions after them are dropped and never checked).  A minimal header-free
+reproducer is cpp20_member_overload_converting_ctor.
+
+Reclassify CORE once the iterator -> const_iterator user-defined conversion is
+applied during vector::erase overload resolution so the populated vector shrinks
+and size() == 2 holds.
