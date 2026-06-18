@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ member erase\(iterator->const_iterator\) in template body: SUCCESS$
@@ -9,15 +9,24 @@ main.cpp
 ^.*found no match for symbol.*$
 ^CONVERSION ERROR$
 --
-KNOWNBUG: a user-defined conversion (iterator -> const_iterator) via a
-converting constructor template whose parameter is a class-template-id
-(Iter<Q, C>) is not applied during member-call overload resolution inside an
-instantiated function template body.  The overloaded member erase() is found
-but its candidate is rejected before the argument's user-defined conversion is
-considered, so the call is dropped and the assertion fails (n stays 3).
+A user-defined conversion (iterator -> const_iterator) via a converting
+constructor template whose parameter is a class-template-id (Iter<Q, C>) is
+applied during member-call overload resolution inside an instantiated function
+template body.  The overloaded member erase(const_iterator, const_iterator) is
+viable for iterator arguments, so the call runs and the assertion holds.
 
-Direct initialization (`const_iterator c = it;`) resolves the same conversion
-correctly, so the converting constructor itself works; the gap is specifically
-in member-call overload resolution in this context.  This is the header-free
-analogue of std::erase_if's `__cont.erase(iterator, iterator)` (see
-cpp20_vector_erase_if).  Reclassify CORE once the conversion is applied.
+Root cause and fix (cpp_typecheck_conversions.cpp,
+user_defined_conversion_sequence template-constructor fallback): when no
+non-template converting constructor matched, the fallback builds a temporary of
+the target type via new_temporary and inspects it for the constructor that
+performed the conversion.  The search (`find_ctor`) returned the *first*
+constructor anywhere in the result, which for a prvalue argument such as
+`c.begin()` was the source iterator's own materialisation constructor (a ctor
+of a *different* type), causing the valid conversion to be rejected.  The fix
+scopes `find_ctor` to constructors of the *target* type, so the source
+argument's materialisation constructor is ignored.  This matches the standard's
+[over.match.copy] / [class.conv.ctor]/2 (only the target's non-explicit
+converting constructor participates) and made `iterator -> const_iterator` work
+for prvalue arguments as it already did for lvalues (`const_iterator c = it;`).
+This is the header-free analogue of std::erase_if's
+`__cont.erase(iterator, iterator)` (see cpp20_vector_erase_if).

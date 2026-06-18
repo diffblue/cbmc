@@ -1,41 +1,43 @@
 KNOWNBUG
 main.cpp
---cpp20
+--cpp20 --unwind 6 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ size is 2 after erase_if removes one element: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
 ^.*invariant violation.*$
+^.*found no match for symbol.*$
 ^CONVERSION ERROR$
 --
-KNOWNBUG: std::erase_if over a populated std::vector is currently a no-op, so
-the size assertion fails (the vector keeps all three elements).
+KNOWNBUG: std::erase_if over a populated std::vector still leaves the size
+assertion failing (the vector keeps all three elements), but for a *different*
+reason than before -- the earlier overload-resolution gap is now fixed.
 
-The crash this call used to trigger (a convert_function return-type
-exception-safety bug) is fixed and separately regression-tested by
-cpp20_erase_if_return_type, so this test no longer aborts CBMC -- it now runs to
-a clean assertion FAILURE.
+Progress so far:
+  * The convert_function return-type exception-safety crash is fixed and
+    regression-tested by cpp20_erase_if_return_type.
+  * The iterator -> const_iterator user-defined conversion (via
+    __normal_iterator's converting constructor template, whose parameter is the
+    class-template-id __normal_iterator<_Iter, _Container>) is now applied
+    during member-call overload resolution, so std::erase_if's body
+    `__cont.erase(__niter_wrap(...), __cont.end())` converts and runs -- there
+    is no longer a "found no match for symbol 'erase'" error, and the
+    header-free analogue cpp20_member_overload_converting_ctor is now CORE.
+  * Single-element vector::erase(const_iterator) correctly shrinks a populated
+    vector (verified separately).
 
-Remaining functional gap: std::erase_if's body does
-`__cont.erase(__niter_wrap(__cont.begin(), __removed), __cont.end())`, i.e.
-vector::erase(const_iterator, const_iterator) called with `iterator` arguments.
-That requires the iterator -> const_iterator user-defined conversion (via
-__normal_iterator's converting constructor template, whose parameter is the
-class-template-id __normal_iterator<_Iter, _Container>).  During the member-call
-overload resolution for erase() the erase candidate is rejected before that
-user-defined conversion is applied, so the call is dropped and erase_if is a
-no-op (size stays 3).
+Remaining functional gap (newly exposed now that erase_if compiles and runs):
+the *two-iterator range* erase, vector::erase(const_iterator first,
+const_iterator last) -- which erase_if uses -- is a no-op.  A direct
+`v.erase(v.begin(), v.begin() + 1)` on {1,2,3} likewise leaves size() == 3,
+whereas single-element erase and iterator arithmetic (e.g.
+`(v.begin()+1) - v.begin() == 1`, `v.end() - v.begin() == 3`) are correct.  The
+gap is in the range _M_erase element-shift / _M_finish update (the std::move of
+[last, end) into first and the trailing size adjustment), independent of
+overload resolution.
 
-The converting constructor itself works for direct initialization
-(`const_iterator c = it;`), so the gap is specifically in applying this
-class-template-id converting-constructor conversion during member-call overload
-resolution.  Note that a *direct* `v.erase(v.begin(), v.end())` call hits the
-same unresolved overload and silently drops the call together with the rest of
-its full-expression, so such uses only appear to pass *vacuously* (the
-assertions after them are dropped and never checked).  A minimal header-free
-reproducer is cpp20_member_overload_converting_ctor.
-
-Reclassify CORE once the iterator -> const_iterator user-defined conversion is
-applied during vector::erase overload resolution so the populated vector shrinks
-and size() == 2 holds.
+Bounded with --unwind to keep this KNOWNBUG fast (the genuine erase_if is now
+heavy for BMC).  Reclassify CORE once the range vector::erase(first, last)
+shifts the tail and shrinks _M_finish so the populated vector shrinks and
+size() == 2 holds.
