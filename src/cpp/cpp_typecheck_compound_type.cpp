@@ -995,9 +995,19 @@ void cpp_typecheckt::typecheck_compound_declarator(
             // expressions like gcd<Y, X%Y>::value or Abs<N>::value.
             // Temporarily allow elaboration so that referenced templates
             // can be instantiated.
+            // Use the C++ type-checker (which resolves cpp_names, evaluates
+            // sizeof...(Pack) from pack_size_map per [temp.variadic]/8, etc.)
+            // whenever a template substitution is active.  A multi-element
+            // parameter pack populates only pack_args_map/pack_size_map (build
+            // records a scalar type_map entry only for single-element packs),
+            // so checking type_map/expr_map alone misses packs and falls back
+            // to the C type-checker, which mis-handles `sizeof...(T)` as
+            // `sizeof(T)`.
             bool use_cpp_typecheck = new_symbol->value.is_not_nil() &&
                                      (!template_map.expr_map.empty() ||
-                                      !template_map.type_map.empty());
+                                      !template_map.type_map.empty() ||
+                                      !template_map.pack_args_map.empty() ||
+                                      !template_map.pack_size_map.empty());
             if(use_cpp_typecheck)
             {
               bool saved_force = force_elaborate;

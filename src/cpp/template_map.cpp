@@ -1145,7 +1145,17 @@ void template_mapt::build(
   {
     if(i < template_parameters.size())
     {
-      set(template_parameters[i], *i_it);
+      // A *type* parameter pack must not be scalar-bound to its first
+      // argument here: doing so records type_map[Pack] = <first element>,
+      // which then collapses pack expansions and `sizeof...(Pack)` to a single
+      // element.  Type packs are bound below via pack_args_map / pack_size_map
+      // (and, for a single-element pack, a type_map convenience entry) per
+      // [temp.variadic]/5,8.  Non-type packs are left to the existing scalar
+      // binding (the pack block records only type elements).
+      const bool is_type_pack = template_parameters[i].id() == ID_type &&
+                                template_parameters[i].get_bool(ID_ellipsis);
+      if(!is_type_pack)
+        set(template_parameters[i], *i_it);
     }
     // Extra arguments for variadic packs are not mapped to individual
     // parameters; they are passed through in the template args.
