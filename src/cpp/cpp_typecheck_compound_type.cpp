@@ -1736,6 +1736,60 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
             continue;
           }
         }
+        else if(
+          is_typedef && !instantiation_stack.empty() &&
+          !declaration.declarators().empty() &&
+          declaration.declarators().front().name().get_base_name() ==
+            "iterator_concept")
+        {
+          // Per [iterator.concepts.general] + [iterator.traits]: among an
+          // iterator type's member typedefs, the C++20 `iterator_concept`
+          // member is used *solely* for concept-based algorithm dispatch
+          // (ITER_CONCEPT); unlike the five required associated types
+          // (value_type, difference_type, pointer, reference,
+          // iterator_category) no member function or sibling member depends
+          // on it structurally.  In libstdc++ it is
+          //   using iterator_concept = std::__detail::__iter_concept<_Iterator>;
+          // a `merged_type` alias-template result, so the cpp_name
+          // self-reference recovery above does not apply to it.
+          //
+          // Per [temp.inst]/1-2 + [dcl.typedef]: this member typedef declares
+          // the member and forms the aliased type but does not require the
+          // aliased template's *definition* to be instantiated; a typedef-name
+          // may denote an incomplete type.  While the enclosing iterator
+          // instance is still being completed, evaluating __iter_concept
+          // reaches back through this very (incomplete) iterator via the
+          // iterator-concept machinery and throws.  An unguarded failure here
+          // would abandon the rest of the class body, dropping every later
+          // member including the member *functions* (operator*, base,
+          // operator++, ...) and leaving the instance complete-looking but
+          // method-less, so a later odr-use of a method finds "no body".
+          // Keep this one inert concept-dispatch alias lazy and continue, so
+          // the sibling methods register; its definition is instantiated
+          // later, on demand, when its completeness is actually required.
+          //
+          // This recovery is deliberately limited to `iterator_concept`: a
+          // failure to form one of the *required* associated-type typedefs
+          // signals that the instance genuinely cannot be completed yet, and
+          // keeping such a type lazy would mis-instantiate the methods and
+          // constructors that depend on it (observed on std::span, whose
+          // iterator's required typedefs fail at this point) -- those retain
+          // the strict abandon-and-retry behaviour.
+          const std::size_t errors_before =
+            get_message_handler().get_message_count(messaget::M_ERROR);
+          const typet saved_member_type = declaration.type();
+          try
+          {
+            typecheck_type(declaration.type());
+          }
+          catch(...)
+          {
+            get_message_handler().set_message_count(
+              messaget::M_ERROR, errors_before);
+            declaration.type() = saved_member_type; // keep unresolved alias
+            kept_unresolved_cpp_name = true;
+          }
+        }
         else
         {
           typecheck_type(declaration.type());
