@@ -20,3 +20,26 @@ uninstantiated (empty) body.  This is std::function's converting constructor
 so _M_invoker is never assigned and std::function calls dereference a null
 function pointer.  Reclassify CORE once the member template body is
 instantiated.
+
+Investigation notes (for the fix):
+  * The member ctor body is deferred to typecheck_method_bodies() and elaborated
+    by convert_function (cpp_typecheck_method_bodies.cpp ~line 244), wrapped in a
+    try/catch that nils the body on failure ("no body for callee").
+  * At that point the template_map DOES contain the class pack (pack_args_map has
+    Args) and the class/member type params (type_map), so unbound parameters are
+    NOT the cause; add_method_body already rebuilds the enclosing class's args
+    from ID_C_member_name.
+  * handler<R(Args...), F> is instantiated correctly (Args expanded to the
+    concrete element types) but then removed as unused -- i.e. the ctor body that
+    should reference it is dropped, so the assignment `invoker = &handler<...>`
+    never makes it into the converted body (the body comes back empty without a
+    hard error in some paths).
+  * The member ctor is instantiated more than once and F is deduced as a
+    function pointer int(*)(int) (the captureless lambda decays) rather than the
+    closure type; the same lambda->function-pointer decay also affects the real
+    std::function constructor's _Functor deduction.
+  * Net: the gap is in elaborating/keeping the body of a member function
+    template (of a class-template partial specialization on a function type) when
+    that body reconstructs the class parameter pack into a template argument --
+    not in pack binding per se.
+
