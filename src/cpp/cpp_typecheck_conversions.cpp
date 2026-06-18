@@ -1944,8 +1944,46 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
               const auto &fc = to_side_effect_expr_function_call(e);
               if(fc.function().id() == ID_symbol)
               {
-                return symbol_table.lookup(
+                const symbolt *s = symbol_table.lookup(
                   to_symbol_expr(fc.function()).get_identifier());
+                // Only a constructor of the *target* type `to`
+                // realises this conversion.  `new_temporary`'s result
+                // may also contain constructor calls that merely
+                // materialise the source argument as a temporary —
+                // e.g. the source iterator's own copy constructor when
+                // the argument is a prvalue such as `c.begin()`.  Those
+                // construct a *different* type; mistaking one for the
+                // conversion's constructor spuriously rejects a valid
+                // user-defined conversion (the visible symptom was that
+                // `iterator -> const_iterator` worked for an lvalue
+                // argument but not for a prvalue argument).  Skip any
+                // call that is not a constructor of `to`, but keep
+                // searching the sub-expressions for the real one.
+                if(s != nullptr && s->type.id() == ID_code)
+                {
+                  const code_typet &ct = to_code_type(s->type);
+                  const irep_idt to_id =
+                    to_struct_tag_type(to).get_identifier();
+                  bool is_ctor_of_to =
+                    ct.return_type().id() == ID_constructor &&
+                    s->type.get(ID_C_member_name) == to_id;
+                  if(
+                    !is_ctor_of_to && ct.return_type().id() == ID_constructor &&
+                    !ct.parameters().empty() &&
+                    ct.parameters().front().get_this() &&
+                    ct.parameters().front().type().id() == ID_pointer)
+                  {
+                    const typet &base =
+                      to_pointer_type(ct.parameters().front().type())
+                        .base_type();
+                    if(
+                      base.id() == ID_struct_tag &&
+                      to_struct_tag_type(base).get_identifier() == to_id)
+                      is_ctor_of_to = true;
+                  }
+                  if(is_ctor_of_to)
+                    return s;
+                }
               }
             }
             for(const auto &op : e.operands())
@@ -2017,6 +2055,19 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
           }
           else
           {
+            // Either a non-explicit template-specialization
+            // constructor of `to` was selected (accept it), or no
+            // constructor of `to` was emitted at all.  The latter is
+            // the trivial/aggregate initialization CBMC performs for
+            // layout-compatible class types (e.g. converting between
+            // two specializations of the same iterator class template,
+            // `__normal_iterator<T*> -> __normal_iterator<const T*>`):
+            // the fallback is only entered when `to` has a non-explicit
+            // converting constructor template, so a successful trivial
+            // initialization from the source realises that
+            // constructor's effect as a single user-defined conversion
+            // ([over.match.copy], [class.conv.ctor]/2) with no explicit
+            // constructor and no second user-defined conversion.
             new_expr.swap(tmp_expr);
             return true;
           }
