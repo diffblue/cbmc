@@ -566,6 +566,18 @@ void cpp_typecheck_resolvet::guess_function_template_args(
               };
               subst(req_copy);
               cpp_typecheck.typecheck_expr(req_copy);
+              // Constant-fold the substituted constraint so atomic
+              // constraints written with type traits (e.g.
+              // `!is_convertible_v<U, size_type>`) collapse to a boolean
+              // constant.  typecheck_expr resolves the trait's `::value` to
+              // a comparison such as notequal(1, 0) but does not fold it;
+              // without this the tri-state eval below sees an opaque
+              // comparison, returns "unknown", and wrongly keeps a candidate
+              // whose requires-clause is actually unsatisfied (e.g. the
+              // libstdc++ span(_It, _End) iterator-sentinel constructor stays
+              // viable for span(ptr, count), is selected, and its `__last -
+              // __first` body is ill-formed).
+              simplify(req_copy, cpp_typecheck);
               // [temp.constr.op]: tri-state evaluation of the constraint's
               // boolean structure (1 satisfied, 0 unsatisfied, -1 unknown).
               // typecheck_expr folds atomic constraints to constants but
