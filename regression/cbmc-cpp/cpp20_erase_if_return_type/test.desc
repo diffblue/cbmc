@@ -1,6 +1,6 @@
 CORE
 main.cpp
---cpp20
+--cpp20 --unwind 4 --no-unwinding-assertions
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
@@ -21,3 +21,9 @@ convert_function (N5008 [stmt.return]/3: `return` converts to the *enclosing*
 function's return type).  The forbidden patterns guard against the crash's
 return (invariant violation / the specific condition) and against a conversion
 error.
+
+Now that the iterator->const_iterator converting-constructor conversion is
+applied during member-call overload resolution, std::erase_if's body no longer
+throws -- it converts and runs the genuine vector::erase -- so the call is no
+longer a no-op and the BMC is bounded with --unwind to keep this crash-only
+regression fast (its functional effect is not asserted here).
