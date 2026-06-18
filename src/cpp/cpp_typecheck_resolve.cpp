@@ -6100,6 +6100,35 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
     fparams = std::move(expanded);
   }
 
+  // [temp.deduct.call]/1 + [temp.variadic]/5: a deduced function parameter
+  // pack must be recorded as a pack (pack_args_map / pack_size_map), not only
+  // as a scalar type binding in type_map, so that a pack expansion in the
+  // (dependent) return type -- e.g. `typename invoke_result<F, A...>::type` --
+  // expands the pack's elements and drops the `...` expansion marker.  With a
+  // scalar binding alone, `apply` substitutes the single deduced type but
+  // leaves a dangling expansion marker on it, and the subsequent
+  // pack-expansion of a non-pack type fails (rejecting the deduction).  This
+  // recording is confined to the deduction by the saved_map guard above.
+  if(has_non_empty_pack && !pack_deduced_types.empty())
+  {
+    for(const auto &param :
+        cpp_declaration.template_type().template_parameters())
+    {
+      if(param.get_bool(ID_ellipsis) && param.id() == ID_type)
+      {
+        const irep_idt pack_id = param.type().get(ID_identifier);
+        if(!pack_id.empty())
+        {
+          cpp_typecheck.template_map.pack_args_map[pack_id] =
+            pack_deduced_types;
+          cpp_typecheck.template_map.pack_size_map[pack_id] =
+            pack_expansion_size;
+        }
+        break;
+      }
+    }
+  }
+
   // Type-check the function type in a SFINAE context: suppress error
   // count so that substitution failures (e.g., enable_if with false
   // condition in the return type) are silently discarded.
