@@ -5462,16 +5462,29 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   // If this is a template constructor inside an instantiated template class,
   // pre-populate the template map with the class template arguments so that
   // class template parameters (e.g., Alloc) are resolved.
+  // The enclosing class tag for a member template, used both to bind the
+  // class template arguments during deduction (below) and to propagate
+  // ID_C_class onto the deduced function type so that instantiate_template
+  // can rebuild the class template map when the member is instantiated.
+  irep_idt member_class_tag;
   {
     irep_idt class_tag = expr.get(ID_C_class);
 
     // If ID_C_class is not set, try to derive it from the template
-    // identifier for template constructors. Template constructors
-    // inside class templates have identifiers like
-    // "ClassName::template.CtorName<...>()->(constructor)".
-    // Only do this for constructors — member function templates have
-    // their own independent template parameters.
-    if(class_tag.empty() && cpp_declaration.is_constructor())
+    // identifier.  A member template (constructor or member function
+    // template) of a class template has an identifier of the form
+    // "ClassName<...>::template.MemberName<...>(...)->(...)".  The
+    // enclosing class's template arguments must be bound into the template
+    // map even for a non-constructor member template, because the member's
+    // signature may depend on the class's parameters -- e.g.
+    // `reference_wrapper<T>::operator()` whose dependent return type is
+    // `invoke_result_t<T&, _Args...>` (binding only the member's own
+    // parameter pack `_Args` leaves the class parameter `T` unresolved, so
+    // the dependent return type fails to elaborate and the deduction is
+    // rejected).  The member's own parameters are independent and are set up
+    // separately by build_unassigned above, so binding the (differently
+    // named) class parameters does not disturb them.
+    if(class_tag.empty())
     {
       const std::string &tid = id2string(template_identifier);
       auto pos = tid.find("::template.");
@@ -5532,6 +5545,7 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
           static_cast<const cpp_template_args_tct &>(
             class_sym->type.find(ID_C_template_arguments)));
       }
+      member_class_tag = class_tag;
     }
   }
 
@@ -6257,10 +6271,15 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   function_type.set(ID_C_template, template_symbol.name);
   function_type.set(ID_C_template_arguments, template_args);
 
-  // Propagate the class tag for template constructors in instantiated
-  // template classes, so that instantiate_template can build the class
-  // template map.
-  const irep_idt &class_tag = expr.get(ID_C_class);
+  // Propagate the class tag for member templates in instantiated template
+  // classes, so that instantiate_template can build the class template map.
+  // Prefer the tag carried on the resolved symbol; fall back to the tag
+  // derived from the member template's identifier above (which is what makes
+  // a non-constructor member template -- e.g. reference_wrapper::operator() --
+  // see its enclosing class's arguments at instantiation time).
+  const irep_idt expr_class_tag = expr.get(ID_C_class);
+  const irep_idt &class_tag =
+    !expr_class_tag.empty() ? expr_class_tag : member_class_tag;
   if(!class_tag.empty())
     function_type.set(ID_C_class, class_tag);
 
