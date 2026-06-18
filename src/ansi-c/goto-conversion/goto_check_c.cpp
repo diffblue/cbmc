@@ -1593,6 +1593,12 @@ void goto_check_ct::bounds_check_index(
     throw "bounds check expected array or vector type, got " +
       array_type.id_string();
 
+  // Skip bounds checking for unbounded arrays (no constant size).
+  if(
+    array_type.id() == ID_array &&
+    !to_array_type(array_type).size().is_constant())
+    return;
+
   std::string name = array_name(expr.array());
 
   const exprt &index = expr.index();
