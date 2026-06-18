@@ -1,8 +1,34 @@
-CORE
+KNOWNBUG
 main.cpp
 --cpp20
+^\[main\.assertion\.1\] line \d+ size: SUCCESS$
+^\[main\.assertion\.2\] line \d+ first: SUCCESS$
+^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
 --
 ^CONVERSION ERROR$
+--
+KNOWNBUG: this exposes a genuine std::span constructor bug, and the test was
+previously an UNSOUND vacuous pass.
+
+Before on-demand iterator member-function instantiation, instantiating
+std::span<int> failed to complete its iterator type (the C++20 member alias
+`iterator_concept = __iter_concept<_Iterator>` threw while the iterator was
+incomplete, abandoning the iterator's class body and dropping all its member
+functions).  That propagated into the elaboration of `std::span<int> s(arr, 3)`,
+truncating main right after the `int arr[]` declaration: the span object, the
+constructor call and BOTH __CPROVER_assert calls were dropped, so the old CORE
+test (which only matched `^VERIFICATION SUCCESSFUL$`) passed vacuously --
+`--show-properties` listed neither `size` nor `first`.
+
+With the iterator's `iterator_concept` alias kept lazy ([iterator.concepts.general]
++ [temp.inst]/1-2), the iterator's member functions are instantiated, main is no
+longer truncated, and both assertions are now genuinely generated.  They
+currently FAIL because std::span's own (pointer, size_type) constructor is
+mis-instantiated in CBMC (its body comes out empty, so _M_ptr/_M_extent are
+nondeterministic) -- a separate, genuine front-end bug now exposed rather than
+hidden.
+
+Reclassify CORE once std::span's constructor instantiates a correct body so the
+populated span verifies genuinely.
