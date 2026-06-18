@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ size: SUCCESS$
@@ -7,36 +7,18 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+^.*is unknown.*$
 ^CONVERSION ERROR$
+^.*does not uniquely resolve.*$
 --
-KNOWNBUG: this exposes a genuine std::span constructor bug, and the test was
-previously an UNSOUND vacuous pass.
+Genuine (non-vacuous) verification of a populated std::span<int> (size and
+first element).
 
-Before on-demand iterator member-function instantiation, instantiating
-std::span<int> failed to complete its iterator type (the C++20 member alias
-`iterator_concept = __iter_concept<_Iterator>` threw while the iterator was
-incomplete, abandoning the iterator's class body and dropping all its member
-functions).  That propagated into the elaboration of `std::span<int> s(arr, 3)`,
-truncating main right after the `int arr[]` declaration: the span object, the
-constructor call and BOTH __CPROVER_assert calls were dropped, so the old CORE
-test (which only matched `^VERIFICATION SUCCESSFUL$`) passed vacuously --
-`--show-properties` listed neither `size` nor `first`.
-
-With the iterator's `iterator_concept` alias kept lazy ([iterator.concepts.general]
-+ [temp.inst]/1-2), the iterator's member functions are instantiated, main is no
-longer truncated, and both assertions are now genuinely generated.
-
-Constructor *selection* is now also fixed: the constrained span(_It, _End)
-iterator-sentinel constructor's requires-clause `!is_convertible_v<_End,
-size_type>` is now enforced (its substituted atomic constraint is constant-
-folded before the tri-state evaluation), so span(arr, N) correctly selects
-span(pointer, size_type) and `size` holds.
-
-`first` still FAILS: span(pointer, size_type)'s body sets
-`_M_ptr = std::to_address(__first)`, but std::to_address<T>(T*)'s (system-header)
-body is itself discarded on a thrown exception during conversion, so _M_ptr is
-left nondeterministic and the element read fails -- a further, separate
-front-end gap ([temp.inst]/2-4 on-demand instantiation), now exposed.
-
-Reclassify CORE once std::to_address's body converts so _M_ptr is the supplied
-pointer and the populated span verifies genuinely.
+Previously KNOWNBUG: std::span(pointer, size_type)'s body sets
+`_M_ptr = std::to_address(__first)`, and std::to_address's call to
+__to_address(_Tp*) tied with __to_address(const _Ptr&) for the lvalue pointer
+argument ("does not uniquely resolve"), so the body was discarded and _M_ptr
+was nondeterministic.  Overload resolution now applies N5008 [temp.func.order]
+partial ordering (function_template_at_least_as_specialised), under which
+__to_address(_Tp*) is more specialized; to_address returns the pointer and the
+span verifies genuinely.
