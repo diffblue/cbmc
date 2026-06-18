@@ -45,6 +45,20 @@ prevents folding).
 So the gap is not (only) expression-level pack expansion in template_mapt::apply
 -- it is that instantiating a function template with a pack-expansion-decltype
 class-trait return type during another template's body elaboration fails and
-the failure is swallowed, discarding the caller's body.  Reclassify CORE once
-the nested instantiation completes so std::ref'd predicates and std::erase_if
-work.
+the failure is swallowed, discarding the caller's body.
+
+Deeper finding (debug-build, instrumented): when invoke's dependent return type
+`invoke_result<F, A...>::type` -> `decltype(declval<F>()(declval<A>()...))` is
+elaborated during the caller's body, the deduced parameter pack A is NOT bound
+in the active substitution map (template_map.pack_args_map is empty and A is
+absent from type_map; only the non-pack parameters F and the caller's own
+parameters are bound).  The pack-expansion pattern declval<A>()... is therefore
+left referencing an unbound pack and throws.  Two cooperating fixes are needed:
+  (1) expression-level pack expansion of a function-call argument marked as a
+      pack expansion (parser currently records this; the substitution/typecheck
+      must expand declval<A>()... into one argument per pack element), and
+  (2) propagation of the deduced parameter pack into the substitution map used
+      to elaborate a function template's dependent return type during nested
+      instantiation (the actual blocker -- (1) cannot fire while A is unbound).
+Reclassify CORE once both are in place so std::ref'd predicates and
+std::erase_if work.
