@@ -1,0 +1,31 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ size is 1 after one push_back: SUCCESS$
+^\[main\.assertion\.2\] line \d+ stored element value is exact: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^.*is unknown.*$
+^CONVERSION ERROR$
+^.*no body for callee.*$
+--
+[temp.inst]/1-2 with [dcl.typedef]: a member typedef declares the member and
+forms the aliased type but does not require the aliased template's definition to
+be instantiated; a typedef-name may denote an incomplete type.
+
+Populated std::vector<int>: push_back -> _M_realloc_insert computes its offset
+via __gnu_cxx::operator-(__normal_iterator, __normal_iterator), whose body needs
+the iterator instance's member functions (base(), ...).  While the iterator
+instance is completed during vector elaboration, the C++20 member alias
+`using iterator_concept = std::__detail::__iter_concept<_Iterator>;` (a
+merged_type alias-template result, not a bare cpp_name) cannot be elaborated
+because the iterator-concept machinery reaches back through the still-incomplete
+iterator.  typecheck_compound_body now keeps such a member alias lazy on failure
+instead of abandoning the rest of the class body, so the sibling member
+functions are instantiated and operator-'s body resolves base().  Before the
+fix the methods were dropped, operator-'s body was emptied to a nondet stub, and
+v.size() after push_back was nondeterministic (the assertions failed / were
+vacuous).  The forbidden patterns above (`is unknown`, `CONVERSION ERROR`,
+`no body for callee`) guard against the regression and against a vacuous pass.
