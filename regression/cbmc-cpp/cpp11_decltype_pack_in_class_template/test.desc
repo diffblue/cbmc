@@ -1,0 +1,39 @@
+KNOWNBUG
+main.cpp
+--cpp20 --unwind 6 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ invoke via pack-expansion decltype trait counts 1: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+KNOWNBUG: a class template member typedef computed as
+decltype(declval<F>()(declval<A>()...)) -- a decltype whose call expression
+contains a pack expansion -- yields the wrong type when the class template is
+instantiated with a parameter pack and that member type is used as a function's
+return type, corrupting the return value.
+
+Isolation: the same decltype works inline in a function and as a trailing
+return type; a trivial member typedef works; a class-template decltype WITHOUT
+pack expansion works (even when the class is instantiated with a pack); and a
+class-template decltype WITH pack expansion works when the class is instantiated
+with an explicit (non-pack) argument.  Only the *combination* fails: a class
+template instantiated with a parameter pack <F, A...> whose member decltype
+*expands that pack* (declval<A>()...).  The inner pack expansion is not bound to
+the substituted pack arguments during class-template instantiation.
+
+This is the std::invoke_result / __result_of_other_impl path; together with the
+already-fixed [temp.deduct.call]/3 forwarding-reference pack deduction
+(cpp11_forwarding_ref_pack) it is what std::reference_wrapper::operator() and
+std::__invoke rely on, and hence what std::ref'd predicates and std::erase_if
+(cpp20_vector_erase_if) need.
+
+Likely root cause: template_mapt::apply(exprt&) (src/cpp/template_map.cpp)
+substitutes pack names but does not perform expression-level pack expansion --
+a call argument that is a pack expansion (declval<A>()...) is not expanded into
+one argument per pack element.  template_mapt::expand_parameter_packs handles
+only function *parameter lists*, not call-argument / decltype expressions, so a
+class-template member decltype that expands a pack is left mis-expanded.
+Reclassify CORE once expression-level pack expansion is applied during template
+substitution so the type is computed correctly.
