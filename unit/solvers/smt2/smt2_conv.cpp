@@ -12,11 +12,215 @@
 #include <util/message.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
+#include <util/std_types.h>
 #include <util/symbol_table.h>
 
 #include <solvers/smt2/smt2_conv.h>
 #include <solvers/smt2/smt2_dec.h>
+#include <testing-utils/invariant.h>
 #include <testing-utils/use_catch.h>
+
+// Build a synthetic multi-constructor ADT struct_typet of the kind the Strata
+// front end produces: a leading $tag discriminant followed by the union of all
+// constructors' fields, plus a #adt_constructors annotation describing each
+// constructor's name and field list.
+static struct_typet build_adt_type()
+{
+  const unsignedbv_typet u32{32};
+  struct_typet::componentst components;
+  components.emplace_back("$tag", u32);
+  components.emplace_back("value", u32); // field of constructor from_int
+  struct_typet adt{std::move(components)};
+  adt.set_tag("myadt");
+
+  irept ctors;
+  // constructor 0: nil, no fields
+  irept ctor0;
+  ctor0.add(ID_name).id("nil");
+  ctor0.add(irep_idt("fields"));
+  // constructor 1: from_int, field "value"
+  irept ctor1;
+  ctor1.add(ID_name).id("from_int");
+  irept field_value;
+  field_value.id("value");
+  ctor1.add(irep_idt("fields")).get_sub().push_back(field_value);
+  ctors.get_sub().push_back(ctor0);
+  ctors.get_sub().push_back(ctor1);
+  adt.add(irep_idt("#adt_constructors")) = ctors;
+  return adt;
+}
+
+static std::string adt_smt2(const exprt &expr)
+{
+  symbol_tablet symbol_table;
+  namespacet ns(symbol_table);
+  std::ostringstream out;
+  // Z3 enables use_datatypes.
+  smt2_convt conv(ns, "test", "", "QF_AUFBV", smt2_convt::solvert::Z3, out);
+  conv.set_to(expr, true);
+  return out.str();
+}
+
+// Count the number of "(declare-datatypes" declarations in \p smt2.
+static std::size_t count_datatype_decls(const std::string &smt2)
+{
+  std::size_t count = 0;
+  const std::string marker = "(declare-datatypes";
+  for(std::size_t pos = smt2.find(marker); pos != std::string::npos;
+      pos = smt2.find(marker, pos + 1))
+    ++count;
+  return count;
+}
+
+// An ordinary (single-constructor) struct with a tag and a single array member,
+// used to exercise the same-tag datatype reuse in find_symbols_rec.
+static struct_typet make_tagged_array_struct(
+  const irep_idt &tag,
+  const typet &element,
+  std::size_t size)
+{
+  struct_typet::componentst components;
+  components.emplace_back(
+    "arr", array_typet{element, from_integer(size, size_type())});
+  struct_typet st{std::move(components)};
+  st.set_tag(tag);
+  return st;
+}
+
+TEST_CASE(
+  "smt2_convt multi-constructor ADT datatype encoding",
+  "[core][solvers][smt2]")
+{
+  const struct_typet adt = build_adt_type();
+  const unsignedbv_typet u32{32};
+  const symbol_exprt s{"s", adt};
+
+  SECTION("declaration and constant-tag construction")
+  {
+    const std::string out = adt_smt2(equal_exprt{
+      s, struct_exprt{{from_integer(1, u32), from_integer(7, u32)}, adt}});
+    CHECK(
+      out.find("(declare-datatypes ((struct.0 0)) (((nil) (from_int "
+               "(struct.0.value (_ BitVec 32))) )))") != std::string::npos);
+    CHECK(out.find("(from_int (_ bv7 32))") != std::string::npos);
+  }
+
+  SECTION("non-constant-tag construction uses a well-sorted tag comparison")
+  {
+    const symbol_exprt t{"t", u32};
+    const std::string out =
+      adt_smt2(equal_exprt{s, struct_exprt{{t, from_integer(7, u32)}, adt}});
+    // the tag is compared against a bit-vector literal, not a bare numeral
+    CHECK(out.find("(= t (_ bv0 32))") != std::string::npos);
+    CHECK(out.find("(= t 0)") == std::string::npos);
+  }
+
+  SECTION("$tag member access yields well-sorted index literals")
+  {
+    const std::string out =
+      adt_smt2(equal_exprt{member_exprt{s, "$tag", u32}, from_integer(1, u32)});
+    CHECK(
+      out.find("(ite ((_ is nil) s) (_ bv0 32) (_ bv1 32))") !=
+      std::string::npos);
+  }
+
+  SECTION("field member access uses the per-field selector")
+  {
+    const std::string out = adt_smt2(
+      equal_exprt{member_exprt{s, "value", u32}, from_integer(7, u32)});
+    CHECK(out.find("(struct.0.value s)") != std::string::npos);
+  }
+
+  SECTION("with on a field rebuilds each constructor")
+  {
+    exprt where{ID_member_name};
+    where.set(ID_component_name, "value");
+    const std::string out =
+      adt_smt2(equal_exprt{s, with_exprt{s, where, from_integer(9, u32)}});
+    CHECK(out.find("(from_int (_ bv9 32))") != std::string::npos);
+  }
+
+  SECTION("with on $tag is rejected")
+  {
+    exprt where{ID_member_name};
+    where.set(ID_component_name, "$tag");
+    const cbmc_invariants_should_throwt invariants_throw;
+    REQUIRE_THROWS_MATCHES(
+      adt_smt2(equal_exprt{s, with_exprt{s, where, from_integer(0, u32)}}),
+      invariant_failedt,
+      invariant_failure_containing("with on the constructor tag"));
+  }
+}
+
+TEST_CASE(
+  "smt2_convt ADT constructors must not share field names",
+  "[core][solvers][smt2]")
+{
+  const unsignedbv_typet u32{32};
+  struct_typet::componentst components;
+  components.emplace_back("$tag", u32);
+  components.emplace_back("v", u32);
+  struct_typet adt{std::move(components)};
+  adt.set_tag("dup");
+
+  irept ctors;
+  for(const auto name : {"C0", "C1"})
+  {
+    irept ctor;
+    ctor.add(ID_name).id(name);
+    irept field;
+    field.id("v"); // both constructors declare a field named "v"
+    ctor.add(irep_idt("fields")).get_sub().push_back(field);
+    ctors.get_sub().push_back(ctor);
+  }
+  adt.add(irep_idt("#adt_constructors")) = ctors;
+
+  const symbol_exprt s{"s", adt};
+  const cbmc_invariants_should_throwt invariants_throw;
+  REQUIRE_THROWS_MATCHES(
+    adt_smt2(equal_exprt{member_exprt{s, "v", u32}, from_integer(0, u32)}),
+    invariant_failedt,
+    invariant_failure_containing("must not share field names"));
+}
+
+TEST_CASE(
+  "smt2_convt same-tag struct datatype reuse compares component sorts",
+  "[core][solvers][smt2]")
+{
+  const signedbv_typet i32{32};
+  const signedbv_typet i64{64};
+
+  symbol_tablet symbol_table;
+  namespacet ns(symbol_table);
+
+  auto emit_two = [&](const struct_typet &a, const struct_typet &b)
+  {
+    std::ostringstream out;
+    smt2_convt conv(ns, "test", "", "QF_AUFBV", smt2_convt::solvert::Z3, out);
+    conv.set_to(
+      and_exprt{
+        equal_exprt{symbol_exprt{"a", a}, symbol_exprt{"a2", a}},
+        equal_exprt{symbol_exprt{"b", b}, symbol_exprt{"b2", b}}},
+      true);
+    return out.str();
+  };
+
+  SECTION("differing array sizes share one datatype")
+  {
+    const std::string out = emit_two(
+      make_tagged_array_struct("S", i32, 4),
+      make_tagged_array_struct("S", i32, 8));
+    CHECK(count_datatype_decls(out) == 1);
+  }
+
+  SECTION("differing element types use separate datatypes")
+  {
+    const std::string out = emit_two(
+      make_tagged_array_struct("S", i32, 4),
+      make_tagged_array_struct("S", i64, 4));
+    CHECK(count_datatype_decls(out) == 2);
+  }
+}
 
 TEST_CASE(
   "smt2_convt::convert_identifier character escaping.",

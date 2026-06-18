@@ -691,7 +691,49 @@ smt2_convt::parse_struct(const irept &src, const struct_typet &type)
 
   if(use_datatypes)
   {
-    // Structs look like:
+    // Check for multi-constructor ADT
+    const auto &adt_ctors = type.find(irep_idt("#adt_constructors"));
+    if(
+      adt_ctors.is_not_nil() && adt_ctors.get_sub().size() > 1 &&
+      !components.empty() && components[0].get_name() == "$tag")
+    {
+      // Parse multi-constructor value like (from_int 42)
+      // The first sub is the constructor name
+      const irep_idt &ctor_name =
+        src.get_sub().empty() ? src.id() : src.get_sub()[0].id();
+      // Find matching constructor to get tag value and field mapping
+      for(std::size_t ci = 0; ci < adt_ctors.get_sub().size(); ++ci)
+      {
+        const auto &ctor = adt_ctors.get_sub()[ci];
+        if(ctor.find(ID_name).id() == ctor_name)
+        {
+          // Set $tag
+          result.operands()[0] = from_integer(ci, components[0].type());
+          // Parse constructor fields
+          const auto &fields = ctor.find(irep_idt("fields")).get_sub();
+          std::size_t arg_idx = 1; // skip constructor name in src
+          for(const auto &field : fields)
+          {
+            for(std::size_t k = 0; k < components.size(); ++k)
+            {
+              if(
+                components[k].get_name() == field.id() &&
+                arg_idx < src.get_sub().size())
+              {
+                result.operands()[k] =
+                  parse_rec(src.get_sub()[arg_idx], components[k].type());
+                ++arg_idx;
+              }
+            }
+          }
+          return result;
+        }
+      }
+      // Constructor not found — return default
+      return result;
+    }
+
+    // Single-constructor: Structs look like:
     //  (mk-struct.1 <component0> <component1> ... <componentN>)
     std::size_t j = 1;
     for(std::size_t i=0; i<components.size(); i++)
@@ -3497,6 +3539,34 @@ void smt2_convt::convert_floatbv_round_to_integral(
     UNEXPECTEDCASE("TODO floatbv_round_to_integral without FPA");
 }
 
+void smt2_convt::convert_adt_constructor(
+  const irept &ctor,
+  const struct_union_typet::componentst &components,
+  const exprt::operandst &operands)
+{
+  const auto &fields = ctor.find(irep_idt("fields")).get_sub();
+  if(fields.empty())
+  {
+    // nullary constructor
+    out << ctor.find(ID_name).id();
+    return;
+  }
+
+  out << "(" << ctor.find(ID_name).id();
+  for(const auto &field : fields)
+  {
+    for(std::size_t j = 0; j < components.size(); ++j)
+    {
+      if(components[j].get_name() == field.id())
+      {
+        out << " ";
+        convert_expr(operands[j]);
+      }
+    }
+  }
+  out << ")";
+}
+
 void smt2_convt::convert_struct(const struct_exprt &expr)
 {
   const struct_typet &struct_type =
@@ -3518,7 +3588,52 @@ void smt2_convt::convert_struct(const struct_exprt &expr)
   {
     const std::string &smt_typename = datatype_map.at(struct_type);
 
-    // use the constructor for the Z3 datatype
+    const auto &adt_ctors_cs = struct_type.find(irep_idt("#adt_constructors"));
+    if(
+      adt_ctors_cs.is_not_nil() && adt_ctors_cs.get_sub().size() > 1 &&
+      !components.empty() && components[0].get_name() == "$tag")
+    {
+      const auto &tag_op = expr.operands()[0];
+      const typet &tag_type = components[0].type();
+      const auto &ctors = adt_ctors_cs.get_sub();
+      // Optimization: if the tag is a constant in range, directly emit the
+      // matching constructor.
+      mp_integer const_tag = -1;
+      if(tag_op.is_constant())
+      {
+        // a non-integer constant leaves const_tag at -1, falling through to
+        // the ite chain below
+        if(to_integer(to_constant_expr(tag_op), const_tag))
+          const_tag = -1;
+      }
+
+      if(const_tag >= 0 && const_tag < mp_integer(ctors.size()))
+      {
+        const std::size_t ci = numeric_cast_v<std::size_t>(const_tag);
+        convert_adt_constructor(ctors[ci], components, expr.operands());
+        return;
+      }
+      // Non-constant tag: emit an ite chain selecting the constructor by tag
+      // value. The tag literal is emitted in the tag's own sort (e.g. a
+      // bit-vector), not as a bare numeral, so the comparison is well-sorted.
+      for(std::size_t ci = 0; ci < ctors.size(); ++ci)
+      {
+        if(ci + 1 < ctors.size())
+        {
+          out << "(ite (= ";
+          convert_expr(tag_op);
+          out << " ";
+          convert_expr(from_integer(ci, tag_type));
+          out << ") ";
+        }
+        convert_adt_constructor(ctors[ci], components, expr.operands());
+        if(ci + 1 < ctors.size())
+          out << " ";
+      }
+      for(std::size_t ci = 0; ci + 1 < ctors.size(); ++ci)
+        out << ")";
+      return;
+    }
     out << "(mk-" << smt_typename;
 
     std::size_t i=0;
@@ -4624,11 +4739,63 @@ void smt2_convt::convert_with(const with_exprt &expr)
     {
       const std::string &smt_typename = datatype_map.at(expr_type);
 
-      out << "(update-" << smt_typename << "." << component_name << " ";
-      convert_expr(expr.old());
-      out << " ";
-      convert_expr(value);
-      out << ")";
+      const auto &adt_ctors_cw =
+        struct_type.find(irep_idt("#adt_constructors"));
+      if(adt_ctors_cw.is_not_nil() && adt_ctors_cw.get_sub().size() > 1)
+      {
+        // Updating $tag would change which constructor the value is built
+        // with, which is not expressible by rebuilding the existing
+        // constructor with an updated field (no constructor has a $tag field,
+        // so such an update would be silently discarded). Reject it rather
+        // than emit wrong-but-well-formed SMT.
+        INVARIANT(
+          component_name != "$tag",
+          "with on the constructor tag ($tag) of a multi-constructor ADT is "
+          "not supported");
+        const auto &ctors = adt_ctors_cw.get_sub();
+        for(std::size_t ci = 0; ci < ctors.size(); ++ci)
+        {
+          const auto &cn = ctors[ci].find(ID_name).id();
+          const auto &flds = ctors[ci].find(irep_idt("fields")).get_sub();
+          if(ci + 1 < ctors.size())
+          {
+            out << "(ite ((_ is " << cn << ") ";
+            convert_expr(expr.old());
+            out << ") ";
+          }
+          if(flds.empty())
+            out << cn;
+          else
+          {
+            out << "(" << cn;
+            for(const auto &fld : flds)
+            {
+              out << " ";
+              if(fld.id() == component_name)
+                convert_expr(value);
+              else
+              {
+                out << "(" << smt_typename << "." << fld.id() << " ";
+                convert_expr(expr.old());
+                out << ")";
+              }
+            }
+            out << ")";
+          }
+          if(ci + 1 < ctors.size())
+            out << " ";
+        }
+        for(std::size_t ci = 0; ci + 1 < ctors.size(); ++ci)
+          out << ")";
+      }
+      else
+      {
+        out << "(update-" << smt_typename << "." << component_name << " ";
+        convert_expr(expr.old());
+        out << " ";
+        convert_expr(value);
+        out << ")";
+      }
     }
     else
     {
@@ -4849,11 +5016,68 @@ void smt2_convt::convert_member(const member_exprt &expr)
     {
       const std::string &smt_typename = datatype_map.at(struct_type);
 
-      out << "(" << smt_typename << "."
-          << struct_type.get_component(name).get_name()
-          << " ";
-      convert_expr(struct_op);
-      out << ")";
+      const auto &adt_ctors_cm =
+        struct_type.find(irep_idt("#adt_constructors"));
+      if(
+        adt_ctors_cm.is_not_nil() && adt_ctors_cm.get_sub().size() > 1 &&
+        name == "$tag")
+      {
+        // The tag is the index of the value's constructor; emit it via an ite
+        // chain over the constructor tests. The index literals are emitted in
+        // the tag's own sort (e.g. a bit-vector), not as bare numerals.
+        const auto &ctors = adt_ctors_cm.get_sub();
+        for(std::size_t i = 0; i < ctors.size(); ++i)
+        {
+          if(i + 1 < ctors.size())
+          {
+            out << "(ite ((_ is " << ctors[i].find(ID_name).id() << ") ";
+            convert_expr(struct_op);
+            out << ") ";
+            convert_expr(from_integer(i, expr.type()));
+            out << " ";
+          }
+          else
+            convert_expr(from_integer(i, expr.type()));
+        }
+        for(std::size_t i = 0; i + 1 < ctors.size(); ++i)
+          out << ")";
+      }
+      else
+      {
+        if(adt_ctors_cm.is_not_nil() && adt_ctors_cm.get_sub().size() > 1)
+        {
+          // Multi-constructor ADT: the per-field selector struct.N.<field> is
+          // declared (in find_symbols_rec) for any field that appears in some
+          // constructor. Applying it to a value built with a different
+          // constructor is well-sorted but unspecified in SMT-LIB, which is a
+          // sound over-approximation. Guard against an undeclared selector
+          // (a field belonging to no constructor) to avoid emitting an
+          // unknown constant.
+          bool field_declared = false;
+          for(const auto &ctor : adt_ctors_cm.get_sub())
+          {
+            for(const auto &field : ctor.find(irep_idt("fields")).get_sub())
+            {
+              if(field.id() == name)
+              {
+                field_declared = true;
+                break;
+              }
+            }
+            if(field_declared)
+              break;
+          }
+          INVARIANT(
+            field_declared,
+            "member access on multi-constructor ADT must name a field that "
+            "has a declared selector (i.e. belongs to some constructor): " +
+              id2string(name));
+        }
+        out << "(" << smt_typename << "."
+            << struct_type.get_component(name).get_name() << " ";
+        convert_expr(struct_op);
+        out << ")";
+      }
     }
     else
     {
@@ -5426,6 +5650,7 @@ void smt2_convt::find_symbols(const exprt &expr)
     for(const auto &symbol : q_expr.variables())
     {
       const auto identifier = symbol.identifier();
+      find_symbols(symbol.type());
       auto id_entry =
         identifier_map.insert({identifier, identifiert{symbol.type(), true}});
       shadowed_syms.insert(
@@ -6175,6 +6400,21 @@ void smt2_convt::find_symbols(const typet &type)
   find_symbols_rec(type, recstack);
 }
 
+/// Conservative test for whether \p a and \p b are emitted as the same SMT
+/// sort. Array sizes are not part of an SMT array sort, so they are ignored;
+/// all other differences (element type, bit-width, ...) are treated as
+/// different sorts. Being conservative here is always sound: a false negative
+/// merely yields a separate (fresh) datatype.
+static bool same_smt_sort(const typet &a, const typet &b)
+{
+  if(a.id() != b.id())
+    return false;
+  if(a.id() == ID_array)
+    return same_smt_sort(
+      to_array_type(a).element_type(), to_array_type(b).element_type());
+  return a == b;
+}
+
 void smt2_convt::find_symbols_rec(
   const typet &type,
   std::set<irep_idt> &recstack)
@@ -6184,6 +6424,13 @@ void smt2_convt::find_symbols_rec(
     const array_typet &array_type=to_array_type(type);
     find_symbols(array_type.size());
     find_symbols_rec(array_type.element_type(), recstack);
+    // An array may carry a non-standard index type (e.g. an ADT/datatype used
+    // as a map key in the Strata encoding) as a #index_type annotation; that
+    // type needs its own symbol/datatype declarations, so recurse into it.
+    const typet &idx_type =
+      static_cast<const typet &>(type.find(ID_C_index_type));
+    if(idx_type.is_not_nil())
+      find_symbols_rec(idx_type, recstack);
   }
   else if(type.id()==ID_complex)
   {
@@ -6217,10 +6464,57 @@ void smt2_convt::find_symbols_rec(
     if(use_datatypes &&
        datatype_map.find(type)==datatype_map.end())
     {
-      const std::string smt_typename =
-        "struct." + std::to_string(datatype_map.size());
+      // Reuse an existing datatype for a struct with the same tag name only
+      // when its components match: same-tagged variants may differ in
+      // non-semantic annotations (e.g. array sizes), which is fine, but they
+      // may also genuinely differ in their fields (e.g. a forward-declared vs.
+      // a fully-defined struct, or a field with a different type).  Reusing
+      // across differing field sets or field sorts would emit member selectors
+      // (e.g. struct.N._flags) that the chosen datatype never declared, or with
+      // the wrong sort, which the solver rejects.
+      const irep_idt &tag = to_struct_type(type).get_tag();
+      const struct_typet::componentst &new_components =
+        to_struct_type(type).components();
+      const auto same_components = [&new_components](const struct_typet &other)
+      {
+        const struct_typet::componentst &other_components = other.components();
+        if(other_components.size() != new_components.size())
+          return false;
+        for(std::size_t i = 0; i < new_components.size(); ++i)
+        {
+          if(other_components[i].get_name() != new_components[i].get_name())
+            return false;
+          // Compare SMT sorts: array sizes are irrelevant (SMT arrays are
+          // unbounded), but element types and bit-widths are not. We use a
+          // conservative structural comparison (ignoring array sizes); when in
+          // doubt we fall back to a fresh datatype, which is always sound.
+          if(!same_smt_sort(
+               other_components[i].type(), new_components[i].type()))
+            return false;
+        }
+        return true;
+      };
+      std::string smt_typename;
+      if(!tag.empty())
+      {
+        for(const auto &entry : datatype_map)
+        {
+          if(
+            entry.first.id() == ID_struct &&
+            to_struct_type(entry.first).get_tag() == tag &&
+            same_components(to_struct_type(entry.first)))
+          {
+            smt_typename = entry.second;
+            break;
+          }
+        }
+      }
+      if(smt_typename.empty())
+      {
+        smt_typename = "struct." + std::to_string(datatype_map.size());
+        need_decl = true;
+      }
       datatype_map[type] = smt_typename;
-      need_decl=true;
     }
 
     const struct_typet::componentst &components =
@@ -6234,81 +6528,118 @@ void smt2_convt::find_symbols_rec(
     {
       const std::string &smt_typename = datatype_map.at(type);
 
-      // We're going to create a datatype named something like `struct.0'.
-      // It's going to have a single constructor named `mk-struct.0' with an
-      // argument for each member of the struct.  The declaration that
-      // creates this type looks like:
-      //
-      // (declare-datatypes ((struct.0 0)) (((mk-struct.0
-      //                                   (struct.0.component1 type1)
-      //                                   ...
-      //                                   (struct.0.componentN typeN)))))
-      out << "(declare-datatypes ((" << smt_typename << " 0)) "
-          << "(((mk-" << smt_typename << " ";
-
-      for(const auto &component : components)
+      const auto &adt_ctors =
+        to_struct_type(type).find(irep_idt("#adt_constructors"));
+      if(adt_ctors.is_not_nil() && adt_ctors.get_sub().size() > 1)
       {
-        if(is_zero_width(component.type(), ns))
-          continue;
-
-        out << "(" << smt_typename << "." << component.get_name()
-                      << " ";
-        convert_type(component.type());
-        out << ") ";
-      }
-
-      out << "))))" << "\n";
-
-      // Let's also declare convenience functions to update individual
-      // members of the struct whil we're at it.  The functions are
-      // named like `update-struct.0.component1'.  Their declarations
-      // look like:
-      //
-      // (declare-fun update-struct.0.component1
-      //         ((s struct.0)     ; first arg -- the struct to update
-      //          (v type1))       ; second arg -- the value to update
-      //         struct.0          ; the output type
-      //         (mk-struct.0      ; build the new struct...
-      //          v                ; the updated value
-      //          (struct.0.component2 s)  ; retain the other members
-      //          ...
-      //          (struct.0.componentN s)))
-
-      for(struct_union_typet::componentst::const_iterator
-          it=components.begin();
-          it!=components.end();
-          ++it)
-      {
-        if(is_zero_width(it->type(), ns))
-          continue;
-
-        const struct_union_typet::componentt &component=*it;
-        out << "(define-fun update-" << smt_typename << "."
-            << component.get_name() << " "
-            << "((s " << smt_typename << ") "
-            <<  "(v ";
-        convert_type(component.type());
-        out << ")) " << smt_typename << " "
-            << "(mk-" << smt_typename
-            << " ";
-
-        for(struct_union_typet::componentst::const_iterator
-            it2=components.begin();
-            it2!=components.end();
-            ++it2)
+        // Selectors are declared per constructor as struct.N.<field>. SMT-LIB
+        // requires selector names to be distinct within a datatype, so a field
+        // name shared by two constructors would emit a duplicate selector that
+        // the solver rejects. Detect this and fail loudly rather than emit
+        // ill-formed SMT. (Supporting overlapping field names would require
+        // disambiguating selector names across all read/write sites.)
+        std::set<irep_idt> declared_fields;
+        for(const auto &ctor : adt_ctors.get_sub())
         {
-          if(it==it2)
-            out << "v ";
-          else if(!is_zero_width(it2->type(), ns))
+          for(const auto &field : ctor.find(irep_idt("fields")).get_sub())
           {
-            out << "(" << smt_typename << "."
-                << it2->get_name() << " s) ";
+            INVARIANT(
+              declared_fields.insert(field.id()).second,
+              "ADT constructors must not share field names (selector name "
+              "would be declared more than once): " +
+                id2string(field.id()));
           }
         }
 
-        out << "))" << "\n";
+        out << "(declare-datatypes ((" << smt_typename << " 0)) ((";
+        for(const auto &ctor : adt_ctors.get_sub())
+        {
+          const auto &decl_fields = ctor.find(irep_idt("fields")).get_sub();
+          if(decl_fields.empty())
+            out << "(" << ctor.find(ID_name).id() << ") ";
+          else
+          {
+            out << "(" << ctor.find(ID_name).id();
+            for(const auto &field : decl_fields)
+              for(const auto &comp : components)
+                if(comp.get_name() == field.id())
+                {
+                  out << " (" << smt_typename << "." << field.id() << " ";
+                  convert_type(comp.type());
+                  out << ")";
+                }
+            out << ") ";
+          }
+        }
+        out << ")))\n";
+      }
+      else
+      {
+        out << "(declare-datatypes ((" << smt_typename << " 0)) "
+            << "(((mk-" << smt_typename << " ";
+        for(const auto &component : components)
+        {
+          if(is_zero_width(component.type(), ns))
+            continue;
+          out << "(" << smt_typename << "." << component.get_name() << " ";
+          convert_type(component.type());
+          out << ") ";
+        }
+        out << "))))"
+            << "\n";
       }
 
+      if(adt_ctors.is_nil() || adt_ctors.get_sub().size() <= 1)
+      {
+        // Let's also declare convenience functions to update individual
+        // members of the struct while we're at it.  The functions are
+        // named like `update-struct.0.component1'.  Their declarations
+        // look like:
+        //
+        // (declare-fun update-struct.0.component1
+        //         ((s struct.0)     ; first arg -- the struct to update
+        //          (v type1))       ; second arg -- the value to update
+        //         struct.0          ; the output type
+        //         (mk-struct.0      ; build the new struct...
+        //          v                ; the updated value
+        //          (struct.0.component2 s)  ; retain the other members
+        //          ...
+        //          (struct.0.componentN s)))
+
+        for(struct_union_typet::componentst::const_iterator it =
+              components.begin();
+            it != components.end();
+            ++it)
+        {
+          if(is_zero_width(it->type(), ns))
+            continue;
+
+          const struct_union_typet::componentt &component = *it;
+          out << "(define-fun update-" << smt_typename << "."
+              << component.get_name() << " "
+              << "((s " << smt_typename << ") "
+              << "(v ";
+          convert_type(component.type());
+          out << ")) " << smt_typename << " "
+              << "(mk-" << smt_typename << " ";
+
+          for(struct_union_typet::componentst::const_iterator it2 =
+                components.begin();
+              it2 != components.end();
+              ++it2)
+          {
+            if(it == it2)
+              out << "v ";
+            else if(!is_zero_width(it2->type(), ns))
+            {
+              out << "(" << smt_typename << "." << it2->get_name() << " s) ";
+            }
+          }
+
+          out << "))"
+              << "\n";
+        }
+      } // end skip update for multi-constructor
       out << "\n";
     }
   }
