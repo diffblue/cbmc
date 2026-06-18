@@ -1149,9 +1149,13 @@ void cpp_typecheckt::typecheck_expr_sizeof(exprt &expr)
 
     if(type.id() == ID_cpp_name)
     {
-      // Check for sizeof...(Pack) — a parameter pack size query
+      // [expr.sizeof]/5: a sizeof...(Pack) pack-size query.  Only a genuine
+      // `sizeof...` (marked by the parser) counts the pack's elements; a
+      // plain `sizeof(type)` whose type happens to be a cpp_name (e.g. a
+      // dependent qualified-id such as `first_type<A...>::type`) must compute
+      // the type's size, not the number of in-scope pack elements.
       const cpp_namet &cpp_name = to_cpp_name(static_cast<const irept &>(type));
-      if(!cpp_name.get_sub().empty())
+      if(expr.get_bool("#sizeof_pack") && !cpp_name.get_sub().empty())
       {
         const irep_idt &base_name =
           cpp_name.get_sub().front().get(ID_identifier);
