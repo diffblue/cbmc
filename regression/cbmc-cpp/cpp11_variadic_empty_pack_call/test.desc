@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ empty-pack call expands to base\(\): SUCCESS$
@@ -6,12 +6,13 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+^.*found no match for symbol.*$
 ^CONVERSION ERROR$
 --
-KNOWNBUG (empty pack expansion in a call): [temp.variadic]/5 -- expanding an
-empty parameter pack in a function-call argument list yields an empty argument
-list, so `base(a...)` with zero pack elements is the call `base()`.  CBMC
-instead reports "found no match for symbol 'base'".  Part of the unified
-pack-expansion rework documented in
-doc/architectural/cpp-variadic-pack-expansion-rework.md.  Reclassify CORE once
-an empty pack expansion produces an empty argument list.
+[temp.variadic]/5 -- expanding an empty parameter pack in a function-call
+argument list yields an empty argument list, so `base(a...)` with zero pack
+elements is the call `base()`.  Fixed by the unified pack-expansion rework
+(Phase 1): the empty-pack body call-argument stripping in instantiate_template
+now recovers the function parameter pack's name from the original template when
+the (empty) pack parameter has already been removed from the instantiated
+declaration, so its call-argument references are stripped.
