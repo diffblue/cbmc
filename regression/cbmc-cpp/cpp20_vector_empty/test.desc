@@ -1,0 +1,28 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ empty vector has size 0: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^.*is unknown.*$
+^CONVERSION ERROR$
+--
+[temp.inst]/1-2 with [dcl.typedef]: a member typedef declares the member and
+forms the aliased type but does not require the aliased template's definition to
+be instantiated; a typedef-name may denote an incomplete type.
+
+KNOWNBUG: instantiating std::vector<int> elaborates the self-referential member
+typedefs `iterator`/`const_iterator` (= __normal_iterator<pointer/const_pointer,
+vector>), whose type names the still-incomplete enclosing `vector`.  They cannot
+be eagerly instantiated at that point, and the self-reference branch of
+typecheck_compound_body dropped them entirely.  The sibling typedef
+`const_reverse_iterator = reverse_iterator<const_iterator>` then failed with
+"symbol 'const_iterator' is unknown", aborting the enclosing statement and
+silently dropping the user assertion (vacuous SUCCESS -- the assertion is not
+present in --show-properties).
+
+Reclassify CORE once a self-referential member typedef that cannot be eagerly
+instantiated is registered lazily (by name) rather than dropped, so siblings
+referring to it resolve and the empty vector verifies genuinely.
