@@ -435,3 +435,52 @@ static void adjust_KnR_parameters(
     }
   }
 }
+
+/*******************************************************************\
+
+Function: new_auto_type_declaration
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Build a declaration for a GCC `__auto_type` declarator.
+
+   `[<qualifiers>] __auto_type <declarator> <attributes> = <initializer>;`
+
+ is handled as
+
+   `[<qualifiers>] typeof(<initializer>) <declarator> = <initializer>;`
+
+ Shared by the unqualified and qualified `TOK_GCC_AUTO_TYPE` productions
+ in parser.y; keep those two productions in sync via this helper.
+
+\*******************************************************************/
+
+static void new_auto_type_declaration(
+  YYSTYPE &result,
+  YYSTYPE auto_type_node,
+  YYSTYPE declarator,
+  YYSTYPE attributes,
+  YYSTYPE initializer,
+  const YYSTYPE *qualifier_list)
+{
+  // turn the __auto_type node into typeof(initializer)
+  parser_stack(auto_type_node).id(ID_typeof);
+  parser_stack(auto_type_node).copy_to_operands(parser_stack(initializer));
+
+  // merge any qualifier list (const/volatile/...) into the typeof type
+  const YYSTYPE type_node = qualifier_list != nullptr
+                              ? merge(*qualifier_list, auto_type_node)
+                              : auto_type_node;
+
+  declarator = merge(attributes, declarator);
+
+  // the symbol has to be visible during initialization
+  init(result, ID_declaration);
+  parser_stack(result).type().swap(parser_stack(type_node));
+  PARSER.add_declarator(parser_stack(result), parser_stack(declarator));
+  // add the initializer
+  to_ansi_c_declaration(parser_stack(result))
+    .add_initializer(parser_stack(initializer));
+}
