@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp20 --object-bits 11 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ \[this\] reads the live member: SUCCESS$
+^\[main\.assertion\.2\] line \d+ \[=\] in member reads the live member: SUCCESS$
+^\[main\.assertion\.3\] line \d+ \[this\] modifies the live member: SUCCESS$
+^\[main\.assertion\.4\] line \d+ \[this\] observes the update: SUCCESS$
+^\[main\.assertion\.5\] line \d+ \[\*this\] snapshots at capture time: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+[expr.prim.lambda.capture] / [expr.prim.lambda.closure]: `[this]` and a
+capture-default that odr-uses members capture the enclosing object by reference
+(member odr-uses denote the live object and may modify it); `[*this]` captures
+it by copy (a snapshot at capture time).  Lambda rework Phase E models this as
+captures of the odr-used data members -- by reference for `this`/`[=]`/`[&]`, by
+copy for `[*this]`.
