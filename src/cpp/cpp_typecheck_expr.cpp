@@ -5831,14 +5831,16 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
   // Phase B handles explicit by-copy captures.  A mutable lambda
   // ([expr.prim.lambda.closure]: non-const operator()), a capture-default
   // (`[=]`/`[&]`, whose implicit captures need odr-use analysis), and any
-  // Phase B/C handle explicit by-copy and by-reference captures.  A mutable
-  // lambda ([expr.prim.lambda.closure]: non-const operator()), a capture-default
-  // (`[=]`/`[&]`, whose implicit captures need odr-use analysis), and a
-  // this/*this capture stay on the function-pointer lowering for now (later
-  // phases; see doc/architectural/cpp-lambda-closure-support.md).
+  // Phases B/C/D/E handle explicit by-copy/by-reference captures, mutable
+  // lambdas, and capture-defaults (`[=]`/`[&]`).  A this/*this capture, a
+  // lambda in a member-function context (whose capture-default or member
+  // odr-uses would capture *this), a C++23 deducing-this lambda, generic
+  // lambdas, and a body containing a nested lambda stay on the function-pointer
+  // lowering for now (later phases; see
+  // doc/architectural/cpp-lambda-closure-support.md).
   const bool lambda_is_mutable = expr.get_bool("mutable");
-  const bool lambda_capture_default_empty =
-    expr.find("lambda_capture").get("default").empty();
+  const bool lambda_in_member_context =
+    cpp_scopes.current_scope().this_expr.is_not_nil();
   bool lambda_has_this_capture = false;
   for(const auto &cap : expr.find("lambda_capture").get_sub())
     if(cap.get_bool("this"))
@@ -5928,6 +5930,76 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
       cap_expr.add_source_location() = loc;
       typecheck_expr(cap_expr);
       capture_values[cap_name] = cap_expr;
+    }
+  }
+
+  // Capture-default ([=] or [&]): [expr.prim.lambda.capture] -- each entity
+  // with automatic storage duration that is odr-used in the body and not
+  // explicitly captured is captured (by copy for '=', by reference for '&').
+  // We approximate odr-use by collecting the simple-identifier names appearing
+  // in the body and capturing those that resolve, in the lambda's enclosing
+  // scope, to an automatic local variable.  (Over-approximation -- e.g. a name
+  // shadowed by a body-local -- yields at worst an unused capture member.)
+  const irep_idt capture_default = capture_list.get("default");
+  if(!capture_default.empty())
+  {
+    const bool default_by_ref = capture_default == "&";
+
+    // The lambda's own parameters are not captures.
+    std::set<irep_idt> param_names;
+    for(const auto &p : expr.find(ID_parameters).get_sub())
+    {
+      if(p.id() != ID_cpp_declaration)
+        continue;
+      const auto &pd = to_cpp_declaration(static_cast<const exprt &>(p));
+      if(pd.declarators().empty())
+        continue;
+      const auto &ns = pd.declarators().front().name().get_sub();
+      if(!ns.empty())
+        param_names.insert(ns.front().get(ID_identifier));
+    }
+
+    std::set<irep_idt> candidates;
+    std::function<void(const irept &)> scan = [&](const irept &node)
+    {
+      if(
+        node.id() == ID_cpp_name && node.get_sub().size() == 1 &&
+        node.get_sub().front().id() == ID_name)
+        candidates.insert(node.get_sub().front().get(ID_identifier));
+      for(const auto &s : node.get_sub())
+        scan(s);
+      for(const auto &n : node.get_named_sub())
+        scan(n.second);
+    };
+    scan(saved_lambda_body);
+
+    for(const irep_idt &name : candidates)
+    {
+      if(name.empty() || capture_values.count(name) || param_names.count(name))
+        continue;
+      const auto ids =
+        cpp_scopes.current_scope().lookup(name, cpp_scopet::RECURSIVE);
+      for(const auto *id_ptr : ids)
+      {
+        if(id_ptr->id_class != cpp_idt::id_classt::SYMBOL)
+          continue;
+        const symbolt *sym = symbol_table.lookup(id_ptr->identifier);
+        if(
+          sym == nullptr || !sym->is_lvalue || sym->is_static_lifetime ||
+          sym->is_type || sym->type.id() == ID_code)
+          continue;
+        // An automatic local variable odr-used under a capture-default.
+        exprt cap_expr(ID_cpp_name);
+        irept name_node(ID_name);
+        name_node.set(ID_identifier, name);
+        cap_expr.get_sub().push_back(name_node);
+        cap_expr.add_source_location() = loc;
+        typecheck_expr(cap_expr);
+        capture_values[name] = cap_expr;
+        if(default_by_ref)
+          by_ref_captures.insert(name);
+        break;
+      }
     }
   }
 
@@ -6313,7 +6385,7 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
   // std::function) as well as a function pointer (via the conversion).
   if(
     !is_generic_lambda && !lambda_has_explicit_this &&
-    lambda_capture_default_empty && !lambda_has_this_capture &&
+    !lambda_has_this_capture && !lambda_in_member_context &&
     !lambda_body_has_nested_lambda)
   {
     // The closure type must be identical across repeated type-checks of the
