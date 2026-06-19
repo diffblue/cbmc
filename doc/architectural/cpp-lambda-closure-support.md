@@ -1,10 +1,9 @@
 # C++ Lambda / Closure Support Rework
 
 Status: scoping / design.  Phases A (captureless closure class), B (by-copy
-captures), C (by-reference captures), and D (mutable) are implemented, and
-Phase E is partially implemented (capture-defaults `[=]`/`[&]` for
-non-member-context lambdas; this/*this is still scoped).  The remaining work is
-scoped below.
+captures), C (by-reference captures), D (mutable), and E (capture-defaults and
+this/*this capture) are implemented.  The remaining work (Phase F, generic
+lambdas) is scoped below.
 
 Companion tests: `regression/cbmc-cpp/cpp11_lambda_closure_in_std_function`
 (CORE), `cpp11_lambda_captureless_closure` (CORE), and the capturing-lambda
@@ -173,17 +172,19 @@ green.
     therefore mutable and modifications persist in the closure object across
     calls.  Flipped `cpp11_lambda_mutable_state` to CORE; added
     `cpp11_lambda_mutable_counter_factory` (independent persistent counters).
-  * **Phase E — capture-defaults; this/*this; init-capture.**  PARTIAL.
-    Capture-defaults `[=]`/`[&]` are done for non-member-context lambdas: the
-    odr-used automatic locals are discovered (simple identifiers in the body
-    resolving to automatic locals in the enclosing scope) and captured per the
-    default (by copy = snapshot, by reference = live), with explicit captures
-    overriding; added `cpp11_lambda_capture_default` (CORE).  Init-capture
-    `[y = expr]` is handled by Phase B.  Still on the function-pointer lowering:
-    `this`/`*this` captures and any lambda in a member-function context (a
-    capture-default or member odr-use there would capture `*this`); `[*this]`
-    is not yet parsed.  Completing this means capturing `*this`/`this` as a
-    member and routing member odr-uses through it.
+  * **Phase E — capture-defaults; this/*this; init-capture.**  DONE.
+    Capture-defaults `[=]`/`[&]` are handled by odr-use discovery (simple
+    identifiers in the body resolving to automatic locals in the enclosing
+    scope) and captured per the default (by copy = snapshot, by reference =
+    live), with explicit captures overriding; init-capture `[y = expr]` is
+    handled by Phase B.  In a member-function context, `[this]`/`[=]`/`[&]` (and
+    `[*this]`, now parsed) are modelled as captures of the odr-used non-static
+    data members -- by reference for `this`/`[=]`/`[&]` (live, modifiable) or by
+    copy for `[*this]` (a snapshot at capture time).  Tests:
+    `cpp11_lambda_capture_default`, `cpp11_lambda_capture_this` (CORE).  Still on
+    the function-pointer lowering: a lambda that uses `this` explicitly or
+    odr-uses a member function (member-function calls within the lambda are not
+    yet modelled on the closure path).
   * **Phase F — generic lambdas as member function templates.**  Replace the
     bespoke generic-lambda call-site instantiation with a templated
     `operator()` on the closure class; integrate with template argument
