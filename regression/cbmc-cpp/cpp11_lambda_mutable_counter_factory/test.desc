@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp20 --unwind 4 --object-bits 11 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ first counter starts at 100: SUCCESS$
+^\[main\.assertion\.2\] line \d+ first counter increments: SUCCESS$
+^\[main\.assertion\.3\] line \d+ second counter is independent: SUCCESS$
+^\[main\.assertion\.4\] line \d+ first counter continues after second is used: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+[expr.prim.lambda.closure]/1 + [expr.prim.lambda.closure]: each closure is a
+distinct object with its own (mutable) by-copy capture members.  Lambda rework
+Phases B+D: a factory returning a mutable capturing lambda yields independent
+counters with persistent per-object state.
