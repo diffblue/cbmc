@@ -9659,6 +9659,14 @@ bool Parser::rLambdaExpr(exprt &exp)
         lex.get_token(tk);
         cap.set("this", true);
       }
+      else if(lex.LookAhead(0) == '*' && lex.LookAhead(1) == TOK_THIS)
+      {
+        // C++17 [*this]: by-copy capture of the enclosing object.
+        lex.get_token(tk); // '*'
+        lex.get_token(tk); // this
+        cap.set("this", true);
+        cap.set("star_this", true);
+      }
       else if(is_identifier(lex.LookAhead(0)))
       {
         lex.get_token(tk);

@@ -5828,23 +5828,21 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
   for(const auto &p : saved_lambda_parameters.get_sub())
     if(p.get_bool("explicit_this"))
       lambda_has_explicit_this = true;
-  // Phase B handles explicit by-copy captures.  A mutable lambda
-  // ([expr.prim.lambda.closure]: non-const operator()), a capture-default
-  // (`[=]`/`[&]`, whose implicit captures need odr-use analysis), and any
   // Phases B/C/D/E handle explicit by-copy/by-reference captures, mutable
-  // lambdas, and capture-defaults (`[=]`/`[&]`).  A this/*this capture, a
-  // lambda in a member-function context (whose capture-default or member
-  // odr-uses would capture *this), a C++23 deducing-this lambda, generic
-  // lambdas, and a body containing a nested lambda stay on the function-pointer
-  // lowering for now (later phases; see
-  // doc/architectural/cpp-lambda-closure-support.md).
+  // lambdas, capture-defaults (`[=]`/`[&]`), and -- in a member-function
+  // context -- this/*this capture modelled as captures of the odr-used data
+  // members (by reference for `this`/`[=]`/`[&]`, by copy for `[*this]`).  A
+  // member-function-context lambda that uses `this` explicitly or odr-uses a
+  // member function, a C++23 deducing-this lambda, generic lambdas, and a body
+  // containing a nested lambda stay on the function-pointer lowering for now
+  // (see doc/architectural/cpp-lambda-closure-support.md).
   const bool lambda_is_mutable = expr.get_bool("mutable");
-  const bool lambda_in_member_context =
-    cpp_scopes.current_scope().this_expr.is_not_nil();
-  bool lambda_has_this_capture = false;
+  const exprt lambda_enclosing_this = cpp_scopes.current_scope().this_expr;
+  const bool lambda_in_member_context = lambda_enclosing_this.is_not_nil();
+  bool lambda_has_star_this = false;
   for(const auto &cap : expr.find("lambda_capture").get_sub())
-    if(cap.get_bool("this"))
-      lambda_has_this_capture = true;
+    if(cap.get_bool("this") && cap.get_bool("star_this"))
+      lambda_has_star_this = true;
   // A lambda whose body returns/contains another lambda has a closure-typed
   // return; the function-pointer lowering's deduced return type is then not
   // usable for the synthesised operator().  Keep such a lambda on the
@@ -6001,6 +5999,93 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
         break;
       }
     }
+  }
+
+  // this/*this capture in a member-function context.  [expr.prim.lambda.capture]
+  // / [expr.prim.lambda.closure]: `[this]` (and a capture-default that odr-uses
+  // members) captures the enclosing object by reference; `[*this]` captures it
+  // by copy.  We model this as captures of the odr-used non-static data members
+  // of the enclosing class -- by reference for `this`/`[=]`/`[&]` (the live
+  // object) or by copy for `[*this]` (a snapshot) -- so the existing closure
+  // lowering handles them and the member odr-uses in the body resolve to the
+  // capture members.  An explicit use of `this` or an odr-use of a member
+  // function cannot be modelled this way; such lambdas stay on the
+  // function-pointer lowering.
+  bool member_context_unsupported = false;
+  if(lambda_in_member_context)
+  {
+    if(
+      lambda_enclosing_this.type().id() == ID_pointer &&
+      to_pointer_type(lambda_enclosing_this.type()).base_type().id() ==
+        ID_struct_tag)
+    {
+      std::set<irep_idt> candidates;
+      bool uses_explicit_this = false;
+      std::function<void(const irept &)> scan = [&](const irept &node)
+      {
+        if(node.id() == "cpp-this")
+          uses_explicit_this = true;
+        if(
+          node.id() == ID_cpp_name && node.get_sub().size() == 1 &&
+          node.get_sub().front().id() == ID_name)
+          candidates.insert(node.get_sub().front().get(ID_identifier));
+        for(const auto &s : node.get_sub())
+          scan(s);
+        for(const auto &n : node.get_named_sub())
+          scan(n.second);
+      };
+      scan(saved_lambda_body);
+
+      if(uses_explicit_this)
+        member_context_unsupported = true;
+
+      const struct_typet &enclosing_struct = this_struct_type();
+      std::vector<irep_idt> member_captures;
+      for(const irep_idt &name : candidates)
+      {
+        if(name.empty() || capture_values.count(name))
+          continue;
+        const struct_typet::componentt *comp = nullptr;
+        for(const auto &c : enclosing_struct.components())
+          if(c.get_base_name() == name)
+          {
+            comp = &c;
+            break;
+          }
+        if(comp == nullptr)
+          continue; // not a member of the enclosing class
+        if(comp->type().id() == ID_code)
+        {
+          // odr-use of a member function -- not modellable as a data-member
+          // capture.
+          member_context_unsupported = true;
+          continue;
+        }
+        member_captures.push_back(name);
+      }
+
+      // Only materialise the member captures if the whole lambda is modellable
+      // on the closure path (otherwise the function-pointer lowering is used,
+      // and capture_values must not be polluted with member accesses).
+      if(!member_context_unsupported)
+      {
+        const bool member_by_ref = !lambda_has_star_this;
+        for(const irep_idt &name : member_captures)
+        {
+          exprt cap_expr(ID_cpp_name);
+          irept name_node(ID_name);
+          name_node.set(ID_identifier, name);
+          cap_expr.get_sub().push_back(name_node);
+          cap_expr.add_source_location() = loc;
+          typecheck_expr(cap_expr);
+          capture_values[name] = cap_expr;
+          if(member_by_ref)
+            by_ref_captures.insert(name);
+        }
+      }
+    }
+    else
+      member_context_unsupported = true;
   }
 
   // Collect parameters
@@ -6385,8 +6470,7 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
   // std::function) as well as a function pointer (via the conversion).
   if(
     !is_generic_lambda && !lambda_has_explicit_this &&
-    !lambda_has_this_capture && !lambda_in_member_context &&
-    !lambda_body_has_nested_lambda)
+    !member_context_unsupported && !lambda_body_has_nested_lambda)
   {
     // The closure type must be identical across repeated type-checks of the
     // same lambda-expression (e.g. during auto return type deduction, which
@@ -6415,11 +6499,6 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
       closure_struct.add_source_location() = loc;
       auto &body = closure_struct.add(ID_body).get_sub();
 
-      // [expr.prim.lambda.capture]: for each entity captured by copy, an
-      // unnamed non-static data member is declared in the closure type,
-      // direct-initialised from the entity when the closure object is created.
-      // We name each member after the captured entity so that odr-uses of the
-      // entity in the body resolve to the member by ordinary member lookup.
       // [expr.prim.lambda.capture]: for each entity captured by copy, an
       // unnamed non-static data member is declared in the closure type,
       // direct-initialised from the entity when the closure object is created;
@@ -6470,7 +6549,6 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
         typet op_ftype(ID_function_type);
         op_ftype.add(ID_parameters) = saved_lambda_parameters;
         op_dtor.type() = op_ftype;
-        // [expr.prim.lambda.closure]: a non-mutable lambda's operator() is
         // [expr.prim.lambda.closure]: operator() is const unless the lambda is
         // declared mutable (in which case its by-copy capture members are
         // mutable and modifications persist in the closure object).
