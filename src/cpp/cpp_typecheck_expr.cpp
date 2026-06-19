@@ -6088,6 +6088,19 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
       member_context_unsupported = true;
   }
 
+  // A generic lambda is lowered to a closure with a member function template
+  // operator() (Phase F) unless it is in a member-function context, has an
+  // explicit object parameter, captures anything by reference, or its body
+  // contains a nested lambda -- those keep the call-site instantiation
+  // (function-pointer) lowering below.  (A template operator() needs a deduced
+  // `auto` return type, which mishandles a reference-member access, so a
+  // by-reference capture stays on the -- for the live/immediate case sound --
+  // function-pointer lowering.)
+  const bool generic_closure_eligible =
+    is_generic_lambda && !lambda_has_explicit_this &&
+    !member_context_unsupported && !lambda_body_has_nested_lambda &&
+    !lambda_in_member_context && by_ref_captures.empty();
+
   // Collect parameters
   const irept &params_irep = expr.find(ID_parameters);
   code_typet::parameterst func_params;
@@ -6157,8 +6170,9 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
   // For generic lambdas, try to type-check the body with the default int
   // parameters. If it succeeds, the lambda can be used as a function pointer.
   // If it fails (e.g., body uses struct members), defer to call-site
-  // instantiation.
-  if(is_generic_lambda)
+  // instantiation.  Closure-eligible generic lambdas (Phase F) skip this and
+  // are lowered to a closure with a template operator() below.
+  if(is_generic_lambda && !generic_closure_eligible)
   {
     codet default_body(ID_nil);
     bool body_ok = false;
@@ -6462,15 +6476,18 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
     fid.id_class = cpp_idt::id_classt::SYMBOL;
   }
 
-  // [expr.prim.lambda.closure]/1: for a captureless, non-generic lambda,
-  // synthesise the closure class -- a struct with operator() (the body) and a
-  // non-explicit conversion to pointer-to-function (returning the lowered
-  // function) -- and make the lambda expression a (stateless) object of that
-  // class.  This lets the lambda be used as an object (e.g. stored by value in
-  // std::function) as well as a function pointer (via the conversion).
+  // [expr.prim.lambda.closure]: synthesise the closure class -- a struct with
+  // operator() (the body) and, for a captureless non-generic lambda, a
+  // non-explicit conversion to pointer-to-function -- and make the lambda
+  // expression an object of that class.  This lets the lambda be used as an
+  // object (e.g. stored by value in std::function) as well as a function
+  // pointer (via the conversion).  A generic lambda's operator() is a member
+  // function template (Phase F); generic lambdas in a member-function context
+  // keep the function-pointer (call-site instantiation) lowering for now.
   if(
-    !is_generic_lambda && !lambda_has_explicit_this &&
-    !member_context_unsupported && !lambda_body_has_nested_lambda)
+    !lambda_has_explicit_this && !member_context_unsupported &&
+    !lambda_body_has_nested_lambda &&
+    !(is_generic_lambda && lambda_in_member_context))
   {
     // The closure type must be identical across repeated type-checks of the
     // same lambda-expression (e.g. during auto return type deduction, which
@@ -6530,24 +6547,93 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
       // <ret> operator()(<params>) const { <body> }
       {
         cpp_declarationt op_decl;
-        // The closure's operator() returns the lambda's return type: the
-        // explicit trailing return type if given, otherwise the type deduced
-        // for the lowered function.  (Lambdas whose body contains a nested
-        // lambda -- where that deduced type is not usable -- are excluded from
-        // this path above, so this deduced type is reliable here, and using it
-        // avoids re-deducing via `auto`, which double-type-checks the body and
-        // mishandles reference-member accesses of by-reference captures.)
-        if(saved_lambda_return_type.is_not_nil())
-          op_decl.type() = static_cast<const typet &>(saved_lambda_return_type);
-        else
-          op_decl.type() = func_type.return_type();
         cpp_declaratort op_dtor;
         cpp_namet op_name;
         op_name.get_sub().push_back(irept(ID_operator));
         op_name.get_sub().push_back(irept("()"));
         op_dtor.name() = op_name;
         typet op_ftype(ID_function_type);
-        op_ftype.add(ID_parameters) = saved_lambda_parameters;
+
+        if(is_generic_lambda)
+        {
+          // [expr.prim.lambda.closure]: a generic lambda's operator() is a
+          // member function template; each `auto` parameter introduces an
+          // invented template type parameter, and a C++20 `[]<typename T>(...)`
+          // template-parameter-list names the parameters explicitly.  Rewrite
+          // each generic parameter type to reference its type parameter, build
+          // the template-parameter list, and make operator() a template with a
+          // deduced (auto) return type unless one is given explicitly.
+          irept op_params = saved_lambda_parameters;
+          irept template_parameters;
+          std::set<irep_idt> seen_type_params;
+          std::size_t auto_index = 0;
+          auto add_type_param = [&](const irep_idt &tpname)
+          {
+            if(!seen_type_params.insert(tpname).second)
+              return;
+            cpp_declarationt tp;
+            tp.set(ID_is_type, true);
+            tp.type() = typet("cpp-template-type");
+            cpp_declaratort tp_dtor;
+            cpp_namet tp_name;
+            tp_name.get_sub().push_back(irept(ID_name));
+            tp_name.get_sub().back().set(ID_identifier, tpname);
+            tp_dtor.name() = tp_name;
+            tp.declarators().push_back(tp_dtor);
+            template_parameters.get_sub().push_back(irept());
+            template_parameters.get_sub().back().swap(tp);
+          };
+          for(auto &p : op_params.get_sub())
+          {
+            cpp_declarationt &pdecl = static_cast<cpp_declarationt &>(p);
+            if(pdecl.get_bool("explicit_this"))
+              continue;
+            if(has_auto(pdecl.type()) || pdecl.type().id() == ID_auto)
+            {
+              const irep_idt tpname =
+                "_lambda_tp_" + std::to_string(auto_index++);
+              add_type_param(tpname);
+              typet cn(ID_cpp_name);
+              irept nm(ID_name);
+              nm.set(ID_identifier, tpname);
+              cn.get_sub().push_back(nm);
+              pdecl.type() = cn;
+            }
+            else if(
+              pdecl.type().id() == ID_cpp_name &&
+              !pdecl.type().get_sub().empty())
+            {
+              add_type_param(pdecl.type().get_sub().front().get(ID_identifier));
+            }
+          }
+          op_ftype.add(ID_parameters) = op_params;
+          if(saved_lambda_return_type.is_not_nil())
+            op_decl.type() =
+              static_cast<const typet &>(saved_lambda_return_type);
+          else
+            op_decl.type() = typet(ID_auto);
+          typet template_type(ID_template);
+          template_type.add(ID_template_parameters).swap(template_parameters);
+          op_decl.add(ID_template_type).swap(template_type);
+          op_decl.set(ID_is_template, true);
+        }
+        else
+        {
+          // The closure's operator() returns the lambda's return type: the
+          // explicit trailing return type if given, otherwise the type deduced
+          // for the lowered function.  (Lambdas whose body contains a nested
+          // lambda -- where that deduced type is not usable -- are excluded
+          // from this path above, so this deduced type is reliable here, and
+          // using it avoids re-deducing via `auto`, which double-type-checks
+          // the body and mishandles reference-member accesses of by-reference
+          // captures.)
+          if(saved_lambda_return_type.is_not_nil())
+            op_decl.type() =
+              static_cast<const typet &>(saved_lambda_return_type);
+          else
+            op_decl.type() = func_type.return_type();
+          op_ftype.add(ID_parameters) = saved_lambda_parameters;
+        }
         op_dtor.type() = op_ftype;
         // [expr.prim.lambda.closure]: operator() is const unless the lambda is
         // declared mutable (in which case its by-copy capture members are
@@ -6561,8 +6647,10 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
 
       // §7.5.6.2: only a captureless lambda's closure type has a (non-explicit)
       // conversion to pointer-to-function.  Implement it as
-      // `operator <fp>() const { return <lowered function>; }`.
-      if(lambda_is_captureless)
+      // `operator <fp>() const { return <lowered function>; }`.  (For a generic
+      // captureless lambda this conversion is itself a template; not yet
+      // synthesised -- such lambdas are still usable as call targets.)
+      if(lambda_is_captureless && !is_generic_lambda)
       {
         cpp_declarationt conv_decl;
         conv_decl.type() = typet("cpp-cast-operator");
