@@ -1,0 +1,18 @@
+KNOWNBUG
+main.cpp
+--cpp20 --object-bits 11 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ inheriting constructor sets the flag: SUCCESS$
+^\[main\.assertion\.2\] line \d+ inheriting constructor forwards the value: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+KNOWNBUG: [class.inhctor.init] -- an inheriting constructor (`using Base::Base;`)
+should make the base constructors usable for the derived class.  CBMC detects
+the using-declaration but skips it (inheriting constructors are not
+implemented), so the derived class is constructed by (mistaken) aggregate
+initialisation and the constructor arguments (here a forwarded parameter pack)
+are dropped, leaving the object default-initialised.  Flip to CORE once
+inheriting constructors are supported.
