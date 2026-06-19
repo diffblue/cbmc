@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20 --object-bits 11 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ structured binding 0 uses get<0>: SUCCESS$
@@ -9,9 +9,12 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-KNOWNBUG: [dcl.struct.bind]/4 -- when std::tuple_size<E> is complete, a
-structured binding must bind each name to get<i>(e), not to the i-th data
-member.  CBMC decomposes by data member, which gives the wrong elements for a
-tuple-like type whose data-member order differs from its get<i> order (e.g.
-std::tuple).  This is why `auto [a,b] = std::tuple<int,long>(1,2)` binds b
-incorrectly.  Flip to CORE once the get-protocol is implemented.
+[dcl.struct.bind]/4: when std::tuple_size<E> is a complete type with a member
+`value`, a structured binding binds each name to get<i>(e) (typed
+std::tuple_element<i, E>::type), not to the i-th data member.  CBMC now detects
+std::tuple_size<E> and decomposes via get<i>(e); types without a tuple_size
+specialization keep the data-member decomposition.  (std::tuple itself is not
+yet detected -- its variadic tuple_size partial specialization does not resolve
+in the probe -- but std::pair and other tuple-like types with a resolvable
+tuple_size now decompose correctly.)
+
