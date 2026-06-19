@@ -5806,6 +5806,28 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
   const std::string func_sym_name =
     id2string(cpp_scopes.current_scope().prefix) + lambda_id;
 
+  // [expr.prim.lambda.closure]/1: a lambda has a unique closure *class* type.
+  // For a captureless, non-generic lambda we additionally synthesise that
+  // closure class (a struct with operator() and a conversion to function
+  // pointer) so the lambda can be used as an object -- e.g. stored by value in
+  // std::function -- not only as a function pointer.  Capture the
+  // pre-type-check parameters/body now, before the function-lowering below
+  // mutates the expression.  (Capturing and generic lambdas keep the
+  // function-pointer lowering for now; see
+  // doc/architectural/cpp-lambda-closure-support.md.)
+  const bool lambda_is_captureless =
+    expr.find("lambda_capture").get_sub().empty() &&
+    expr.find("lambda_capture").get("default").empty();
+  const irept saved_lambda_parameters = expr.find(ID_parameters);
+  const irept saved_lambda_body = expr.find("body");
+  // A C++23 deducing-this lambda has an explicit object parameter; keep it on
+  // the function-pointer lowering for now (Phase A is captureless,
+  // non-generic, implicit-object lambdas).
+  bool lambda_has_explicit_this = false;
+  for(const auto &p : saved_lambda_parameters.get_sub())
+    if(p.get_bool("explicit_this"))
+      lambda_has_explicit_this = true;
+
   // Check for C++14 generic lambda (auto parameters) or
   // C++20 template lambda (unresolved type name parameters)
   bool is_generic_lambda = false;
@@ -6247,6 +6269,95 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
     const symbolt &fsym = symbol_table.lookup_ref(func_sym_name);
     cpp_idt &fid = cpp_scopes.put_into_scope(fsym);
     fid.id_class = cpp_idt::id_classt::SYMBOL;
+  }
+
+  // [expr.prim.lambda.closure]/1: for a captureless, non-generic lambda,
+  // synthesise the closure class -- a struct with operator() (the body) and a
+  // non-explicit conversion to pointer-to-function (returning the lowered
+  // function) -- and make the lambda expression a (stateless) object of that
+  // class.  This lets the lambda be used as an object (e.g. stored by value in
+  // std::function) as well as a function pointer (via the conversion).
+  if(lambda_is_captureless && !is_generic_lambda && !lambda_has_explicit_this)
+  {
+    const std::string closure_tag = lambda_id + "_closure";
+
+    typet closure_struct(ID_struct);
+    cpp_namet closure_tag_name;
+    closure_tag_name.get_sub().push_back(irept(ID_name));
+    closure_tag_name.get_sub().back().set(ID_identifier, closure_tag);
+    closure_struct.add(ID_tag) = closure_tag_name;
+    closure_struct.add_source_location() = loc;
+    auto &body = closure_struct.add(ID_body).get_sub();
+
+    // <ret> operator()(<params>) const { <body> }
+    {
+      cpp_declarationt op_decl;
+      op_decl.type() = func_type.return_type();
+      cpp_declaratort op_dtor;
+      cpp_namet op_name;
+      op_name.get_sub().push_back(irept(ID_operator));
+      op_name.get_sub().push_back(irept("()"));
+      op_dtor.name() = op_name;
+      typet op_ftype(ID_function_type);
+      op_ftype.add(ID_parameters) = saved_lambda_parameters;
+      op_dtor.type() = op_ftype;
+      // [expr.prim.lambda.closure]: a non-mutable lambda's operator() is const.
+      typet const_qualifier(ID_const);
+      op_dtor.method_qualifier() = const_qualifier;
+      op_dtor.value() = static_cast<const exprt &>(saved_lambda_body);
+      op_decl.declarators().push_back(op_dtor);
+      body.push_back(op_decl);
+    }
+
+    // §7.5.6.2: a captureless non-generic lambda's closure type has a
+    // non-explicit conversion to pointer-to-function with the same signature.
+    // Implement it as `operator <fp>() const { return <lowered function>; }`
+    // (the lowered function is the static thunk with the lambda body).
+    {
+      cpp_declarationt conv_decl;
+      conv_decl.type() = typet("cpp-cast-operator");
+      cpp_declaratort conv_dtor;
+      cpp_namet conv_name;
+      conv_name.get_sub().push_back(irept(ID_operator));
+      typet fp_type = pointer_typet(func_type, config.ansi_c.pointer_width);
+      conv_name.get_sub().push_back(static_cast<const irept &>(fp_type));
+      conv_dtor.name() = conv_name;
+      typet conv_ftype(ID_function_type);
+      conv_ftype.add(ID_parameters);
+      conv_dtor.type() = conv_ftype;
+      conv_dtor.method_qualifier() = typet(ID_const);
+      // body: `return <lambda function>;` (function-to-pointer conversion)
+      exprt fn_ref(ID_cpp_name);
+      fn_ref.get_sub().push_back(irept(ID_name));
+      fn_ref.get_sub().back().set(ID_identifier, lambda_id);
+      codet ret_stmt(ID_return);
+      ret_stmt.add_to_operands(std::move(fn_ref));
+      code_blockt conv_body;
+      conv_body.add(std::move(ret_stmt));
+      conv_dtor.value() = conv_body;
+      conv_decl.declarators().push_back(conv_dtor);
+      body.push_back(conv_decl);
+    }
+
+    cpp_declarationt closure_declaration;
+    closure_declaration.type() = closure_struct;
+    convert(closure_declaration);
+
+    const std::string closure_sym_name =
+      id2string(cpp_scopes.current_scope().prefix) + "tag-" + closure_tag;
+    if(symbol_table.has_symbol(closure_sym_name))
+    {
+      // Materialise the (stateless) closure as a temporary object so its
+      // address can be formed -- e.g. when bound to std::function's
+      // `_Functor&&` parameter -- and so member calls can take `this`.
+      struct_tag_typet closure_tag_type(closure_sym_name);
+      side_effect_exprt tmp(ID_temporary_object, closure_tag_type, loc);
+      tmp.add_to_operands(struct_exprt({}, closure_tag_type));
+      tmp.set(ID_C_lvalue, true);
+      tmp.set(ID_mode, ID_cpp);
+      expr.swap(tmp);
+      return;
+    }
   }
 
   // Replace the lambda with a function pointer
