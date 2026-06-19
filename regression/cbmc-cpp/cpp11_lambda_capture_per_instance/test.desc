@@ -1,0 +1,16 @@
+KNOWNBUG
+main.cpp
+--cpp20 --object-bits 12 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ first closure keeps its own capture: SUCCESS$
+^\[main\.assertion\.2\] line \d+ second closure keeps its own capture: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+KNOWNBUG (unsound): [expr.prim.lambda.closure]/1 -- each closure is a distinct
+object with its own capture members.  CBMC stores a lambda's capture in a single
+shared file-local symbol, so two closures of the same lambda type share capture
+storage and the second construction overwrites the first.  See
+doc/architectural/cpp-lambda-closure-support.md.
