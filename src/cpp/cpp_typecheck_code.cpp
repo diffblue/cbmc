@@ -845,6 +845,196 @@ void cpp_typecheckt::typecheck_code(codet &code)
       return;
     }
 
+    // [dcl.struct.bind]/4: if std::tuple_size<E> is a complete type with a
+    // member named `value`, the structured binding uses the "tuple-like"
+    // protocol: the i-th name is bound to get<i>(e) (found by member lookup or
+    // ADL), with type std::tuple_element<i, E>::type.  The data members of E
+    // are not used in this case (their order may differ from the get<i> order,
+    // e.g. for std::tuple).  Probe for std::tuple_size<E>::value; if present,
+    // decompose via get<i>.
+    {
+      exprt ts_probe{ID_cpp_name};
+      {
+        auto &sub = ts_probe.get_sub();
+        sub.push_back(irept{ID_name});
+        sub.back().set(ID_identifier, "std");
+        sub.push_back(irept{"::"});
+        sub.push_back(irept{ID_name});
+        sub.back().set(ID_identifier, "tuple_size");
+        irept targs{ID_template_args};
+        targs.add(ID_arguments)
+          .get_sub()
+          .push_back(static_cast<const irept &>(type_exprt{init.type()}));
+        sub.push_back(targs);
+        sub.push_back(irept{"::"});
+        sub.push_back(irept{ID_name});
+        sub.back().set(ID_identifier, "value");
+      }
+      ts_probe.add_source_location() = loc;
+
+      bool has_tuple_size = false;
+      mp_integer ts_value = 0;
+      {
+        const std::size_t saved_errors =
+          get_message_handler().get_message_count(messaget::M_ERROR);
+        const unsigned saved_verbosity = get_message_handler().get_verbosity();
+        get_message_handler().set_verbosity(0);
+        try
+        {
+          cpp_save_scopet save_scope(cpp_scopes);
+          exprt probe = ts_probe;
+          typecheck_expr(probe);
+          make_constant(probe);
+          const auto v = numeric_cast<mp_integer>(probe);
+          if(v.has_value())
+          {
+            has_tuple_size = true;
+            ts_value = *v;
+          }
+        }
+        catch(...)
+        {
+          get_message_handler().set_message_count(
+            messaget::M_ERROR, saved_errors);
+        }
+        get_message_handler().set_verbosity(saved_verbosity);
+      }
+
+      if(has_tuple_size)
+      {
+        if(ts_value != binding_list.size())
+        {
+          error().source_location = loc;
+          error() << "structured binding count (" << binding_list.size()
+                  << ") does not match std::tuple_size (" << ts_value << ")"
+                  << eom;
+          throw 0;
+        }
+
+        const std::string scope_prefix =
+          id2string(cpp_scopes.current_scope().prefix);
+        const bool is_ref = code.get_bool(ID_C_reference);
+
+        // Hidden source object: a copy of the initialiser (auto [...]) or a
+        // reference to it (auto& [...]).
+        const std::string sb_id = scope_prefix + "__sb";
+        typet sb_type = init.type();
+        if(is_ref)
+        {
+          sb_type = pointer_type(init.type());
+          sb_type.set(ID_C_reference, true);
+        }
+        {
+          auxiliary_symbolt sym;
+          sym.name = sb_id;
+          sym.base_name = "__sb";
+          sym.type = sb_type;
+          sym.mode = ID_cpp;
+          sym.module = module;
+          sym.location = loc;
+          sym.is_file_local = true;
+          sym.is_thread_local = true;
+          sym.is_lvalue = true;
+          symbol_table.insert(std::move(sym));
+        }
+
+        code_blockt block;
+        block.add_source_location() = loc;
+
+        symbol_exprt sb_expr{sb_id, sb_type};
+        if(is_ref)
+        {
+          // auto& [...]: __sb is a reference (pointer) bound to the source.
+          codet sb_assign{ID_assign};
+          sb_assign.copy_to_operands(sb_expr);
+          sb_assign.copy_to_operands(address_of_exprt{init});
+          sb_assign.add_source_location() = loc;
+          block.add(std::move(sb_assign));
+        }
+        else
+        {
+          // auto [...]: __sb is a copy of the source.  Copy-construct it
+          // (invoking the copy constructor) so base subobjects of a class with
+          // base classes -- e.g. std::tuple's recursive storage -- are copied;
+          // a plain assignment would not.
+          exprt init_wrapped = already_typechecked_exprt{init};
+          auto cons = cpp_constructor(loc, sb_expr, {init_wrapped});
+          if(cons.has_value())
+            block.add(std::move(cons.value()));
+          else
+          {
+            codet sb_assign{ID_assign};
+            sb_assign.copy_to_operands(sb_expr);
+            sb_assign.copy_to_operands(init);
+            sb_assign.add_source_location() = loc;
+            block.add(std::move(sb_assign));
+          }
+        }
+
+        // The object passed to get<i> is __sb (by value) or *__sb (by ref).
+        exprt get_arg = sb_expr;
+        if(is_ref)
+          get_arg = dereference_exprt{sb_expr, init.type()};
+
+        for(std::size_t i = 0; i < binding_list.size(); ++i)
+        {
+          const irep_idt &name = binding_list[i].id();
+
+          // Build get<i>(<object>) -- unqualified, so ADL finds the namespace
+          // get (member lookup is not modelled separately here).
+          exprt get_name{ID_cpp_name};
+          {
+            auto &sub = get_name.get_sub();
+            sub.push_back(irept{ID_name});
+            sub.back().set(ID_identifier, "get");
+            irept targs{ID_template_args};
+            targs.add(ID_arguments)
+              .get_sub()
+              .push_back(from_integer(i, size_type()));
+            sub.push_back(targs);
+            get_name.add_source_location() = loc;
+          }
+          side_effect_expr_function_callt get_call{
+            get_name, {get_arg}, uninitialized_typet{}, loc};
+          typecheck_expr(get_call);
+
+          // The binding refers to the result of get<i>; a reference for an
+          // auto& binding, a copy for an auto binding.
+          typet binding_type = get_call.type();
+          if(!is_ref && is_reference(binding_type))
+            binding_type = to_reference_type(binding_type).base_type();
+
+          const std::string var_id = scope_prefix + id2string(name);
+          {
+            auxiliary_symbolt sym;
+            sym.name = var_id;
+            sym.base_name = name;
+            sym.type = binding_type;
+            sym.mode = ID_cpp;
+            sym.module = module;
+            sym.location = loc;
+            sym.is_file_local = true;
+            sym.is_thread_local = true;
+            sym.is_lvalue = true;
+            symbol_table.insert(std::move(sym));
+            cpp_idt &scope_id =
+              cpp_scopes.put_into_scope(symbol_table.lookup_ref(var_id));
+            scope_id.id_class = cpp_idt::id_classt::SYMBOL;
+          }
+
+          symbol_exprt var_expr{var_id, binding_type};
+          codet assign{ID_assign};
+          assign.copy_to_operands(var_expr);
+          assign.copy_to_operands(get_call);
+          assign.add_source_location() = loc;
+          block.add(std::move(assign));
+        }
+
+        code.swap(block);
+        return;
+      }
+    }
+
     const struct_typet &struct_type = to_struct_type(init_type);
     const auto &components = struct_type.components();
 
