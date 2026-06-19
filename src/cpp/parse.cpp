@@ -9760,7 +9760,11 @@ bool Parser::rLambdaExpr(exprt &exp)
 
     // optional mutable
     if(lex.LookAhead(0) == TOK_MUTABLE)
+    {
       lex.get_token(tk);
+      // [expr.prim.lambda.closure]: a mutable lambda's operator() is non-const.
+      exp.set("mutable", true);
+    }
 
     // optional constexpr (C++17)
     if(lex.LookAhead(0) == TOK_CONSTEXPR)

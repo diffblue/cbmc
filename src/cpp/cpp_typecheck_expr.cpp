@@ -5820,6 +5820,7 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
     expr.find("lambda_capture").get("default").empty();
   const irept saved_lambda_parameters = expr.find(ID_parameters);
   const irept saved_lambda_body = expr.find("body");
+  const irept saved_lambda_return_type = expr.find(ID_return_type);
   // A C++23 deducing-this lambda has an explicit object parameter; keep it on
   // the function-pointer lowering for now (Phase A is captureless,
   // non-generic, implicit-object lambdas).
@@ -5827,6 +5828,36 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
   for(const auto &p : saved_lambda_parameters.get_sub())
     if(p.get_bool("explicit_this"))
       lambda_has_explicit_this = true;
+  // Phase B handles explicit by-copy captures.  A mutable lambda
+  // ([expr.prim.lambda.closure]: non-const operator()), a capture-default
+  // (`[=]`/`[&]`, whose implicit captures need odr-use analysis), and any
+  // by-reference capture stay on the function-pointer lowering for now (later
+  // phases; see doc/architectural/cpp-lambda-closure-support.md).
+  const bool lambda_is_mutable = expr.get_bool("mutable");
+  const bool lambda_capture_default_empty =
+    expr.find("lambda_capture").get("default").empty();
+  bool lambda_has_by_ref_capture = false;
+  for(const auto &cap : expr.find("lambda_capture").get_sub())
+    if(cap.get_bool("by_ref") || cap.get_bool("this"))
+      lambda_has_by_ref_capture = true;
+  // A lambda whose body returns/contains another lambda has a closure-typed
+  // return; the function-pointer lowering's deduced return type is then not
+  // usable for the synthesised operator().  Keep such a lambda on the
+  // function-pointer lowering for now; the nested lambda itself still uses the
+  // closure path (later phases handle returned/escaping closures uniformly).
+  bool lambda_body_has_nested_lambda = false;
+  {
+    std::function<void(const irept &)> scan = [&](const irept &node)
+    {
+      if(node.id() == "lambda")
+        lambda_body_has_nested_lambda = true;
+      for(const auto &s : node.get_sub())
+        scan(s);
+      for(const auto &n : node.get_named_sub())
+        scan(n.second);
+    };
+    scan(saved_lambda_body);
+  }
 
   // Check for C++14 generic lambda (auto parameters) or
   // C++20 template lambda (unresolved type name parameters)
@@ -6277,82 +6308,140 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
   // function) -- and make the lambda expression a (stateless) object of that
   // class.  This lets the lambda be used as an object (e.g. stored by value in
   // std::function) as well as a function pointer (via the conversion).
-  if(lambda_is_captureless && !is_generic_lambda && !lambda_has_explicit_this)
+  if(
+    !is_generic_lambda && !lambda_has_explicit_this && !lambda_is_mutable &&
+    lambda_capture_default_empty && !lambda_has_by_ref_capture &&
+    !lambda_body_has_nested_lambda)
   {
-    const std::string closure_tag = lambda_id + "_closure";
+    // The closure type must be identical across repeated type-checks of the
+    // same lambda-expression (e.g. during auto return type deduction, which
+    // type-checks the body twice, possibly in different scopes).  Key it on the
+    // source location and create it only once.
+    const std::string loc_key = id2string(loc.get_file()) + ":" +
+                                id2string(loc.get_line()) + ":" +
+                                id2string(loc.get_column());
+    irep_idt closure_sym_name = lambda_closure_map[loc_key];
 
-    typet closure_struct(ID_struct);
-    cpp_namet closure_tag_name;
-    closure_tag_name.get_sub().push_back(irept(ID_name));
-    closure_tag_name.get_sub().back().set(ID_identifier, closure_tag);
-    closure_struct.add(ID_tag) = closure_tag_name;
-    closure_struct.add_source_location() = loc;
-    auto &body = closure_struct.add(ID_body).get_sub();
+    // Collect the by-copy captures in a fixed (sorted) order shared between the
+    // closure's data members and the closure object's initialiser.
+    std::vector<irep_idt> capture_members;
+    for(const auto &cap : capture_values)
+      capture_members.push_back(cap.first);
 
-    // <ret> operator()(<params>) const { <body> }
+    if(closure_sym_name.empty())
     {
-      cpp_declarationt op_decl;
-      op_decl.type() = func_type.return_type();
-      cpp_declaratort op_dtor;
-      cpp_namet op_name;
-      op_name.get_sub().push_back(irept(ID_operator));
-      op_name.get_sub().push_back(irept("()"));
-      op_dtor.name() = op_name;
-      typet op_ftype(ID_function_type);
-      op_ftype.add(ID_parameters) = saved_lambda_parameters;
-      op_dtor.type() = op_ftype;
-      // [expr.prim.lambda.closure]: a non-mutable lambda's operator() is const.
-      typet const_qualifier(ID_const);
-      op_dtor.method_qualifier() = const_qualifier;
-      op_dtor.value() = static_cast<const exprt &>(saved_lambda_body);
-      op_decl.declarators().push_back(op_dtor);
-      body.push_back(op_decl);
+      const std::string closure_tag = lambda_id + "_closure";
+
+      typet closure_struct(ID_struct);
+      cpp_namet closure_tag_name;
+      closure_tag_name.get_sub().push_back(irept(ID_name));
+      closure_tag_name.get_sub().back().set(ID_identifier, closure_tag);
+      closure_struct.add(ID_tag) = closure_tag_name;
+      closure_struct.add_source_location() = loc;
+      auto &body = closure_struct.add(ID_body).get_sub();
+
+      // [expr.prim.lambda.capture]: for each entity captured by copy, an
+      // unnamed non-static data member is declared in the closure type,
+      // direct-initialised from the entity when the closure object is created.
+      // We name each member after the captured entity so that odr-uses of the
+      // entity in the body resolve to the member by ordinary member lookup.
+      for(const auto &name : capture_members)
+      {
+        cpp_declarationt mem_decl;
+        mem_decl.type() = capture_values.at(name).type();
+        cpp_declaratort mem_dtor;
+        cpp_namet mem_name;
+        mem_name.get_sub().push_back(irept(ID_name));
+        mem_name.get_sub().back().set(ID_identifier, name);
+        mem_dtor.name() = mem_name;
+        mem_decl.declarators().push_back(mem_dtor);
+        body.push_back(mem_decl);
+      }
+
+      // <ret> operator()(<params>) const { <body> }
+      {
+        cpp_declarationt op_decl;
+        // The closure's operator() returns the lambda's return type: the
+        // explicit trailing return type if given, otherwise deduced from the
+        // body (`auto`) -- deducing it freshly here is robust for a lambda
+        // whose return type is itself a closure (e.g. a lambda returning a
+        // lambda), where the function-pointer lowering's deduced type is not
+        // usable.
+        if(saved_lambda_return_type.is_not_nil())
+          op_decl.type() = static_cast<const typet &>(saved_lambda_return_type);
+        else
+          op_decl.type() = typet(ID_auto);
+        cpp_declaratort op_dtor;
+        cpp_namet op_name;
+        op_name.get_sub().push_back(irept(ID_operator));
+        op_name.get_sub().push_back(irept("()"));
+        op_dtor.name() = op_name;
+        typet op_ftype(ID_function_type);
+        op_ftype.add(ID_parameters) = saved_lambda_parameters;
+        op_dtor.type() = op_ftype;
+        // [expr.prim.lambda.closure]: a non-mutable lambda's operator() is
+        // const.
+        op_dtor.method_qualifier() = typet(ID_const);
+        op_dtor.value() = static_cast<const exprt &>(saved_lambda_body);
+        op_decl.declarators().push_back(op_dtor);
+        body.push_back(op_decl);
+      }
+
+      // §7.5.6.2: only a captureless lambda's closure type has a (non-explicit)
+      // conversion to pointer-to-function.  Implement it as
+      // `operator <fp>() const { return <lowered function>; }`.
+      if(lambda_is_captureless)
+      {
+        cpp_declarationt conv_decl;
+        conv_decl.type() = typet("cpp-cast-operator");
+        cpp_declaratort conv_dtor;
+        cpp_namet conv_name;
+        conv_name.get_sub().push_back(irept(ID_operator));
+        typet fp_type = pointer_typet(func_type, config.ansi_c.pointer_width);
+        conv_name.get_sub().push_back(static_cast<const irept &>(fp_type));
+        conv_dtor.name() = conv_name;
+        typet conv_ftype(ID_function_type);
+        conv_ftype.add(ID_parameters);
+        conv_dtor.type() = conv_ftype;
+        conv_dtor.method_qualifier() = typet(ID_const);
+        exprt fn_ref(ID_cpp_name);
+        fn_ref.get_sub().push_back(irept(ID_name));
+        fn_ref.get_sub().back().set(ID_identifier, lambda_id);
+        codet ret_stmt(ID_return);
+        ret_stmt.add_to_operands(std::move(fn_ref));
+        code_blockt conv_body;
+        conv_body.add(std::move(ret_stmt));
+        conv_dtor.value() = conv_body;
+        conv_decl.declarators().push_back(conv_dtor);
+        body.push_back(conv_decl);
+      }
+
+      cpp_declarationt closure_declaration;
+      closure_declaration.type() = closure_struct;
+      convert(closure_declaration);
+
+      closure_sym_name =
+        id2string(cpp_scopes.current_scope().prefix) + "tag-" + closure_tag;
+      if(!symbol_table.has_symbol(closure_sym_name))
+        closure_sym_name.clear();
+      else
+        lambda_closure_map[loc_key] = closure_sym_name;
     }
 
-    // §7.5.6.2: a captureless non-generic lambda's closure type has a
-    // non-explicit conversion to pointer-to-function with the same signature.
-    // Implement it as `operator <fp>() const { return <lowered function>; }`
-    // (the lowered function is the static thunk with the lambda body).
+    if(!closure_sym_name.empty() && symbol_table.has_symbol(closure_sym_name))
     {
-      cpp_declarationt conv_decl;
-      conv_decl.type() = typet("cpp-cast-operator");
-      cpp_declaratort conv_dtor;
-      cpp_namet conv_name;
-      conv_name.get_sub().push_back(irept(ID_operator));
-      typet fp_type = pointer_typet(func_type, config.ansi_c.pointer_width);
-      conv_name.get_sub().push_back(static_cast<const irept &>(fp_type));
-      conv_dtor.name() = conv_name;
-      typet conv_ftype(ID_function_type);
-      conv_ftype.add(ID_parameters);
-      conv_dtor.type() = conv_ftype;
-      conv_dtor.method_qualifier() = typet(ID_const);
-      // body: `return <lambda function>;` (function-to-pointer conversion)
-      exprt fn_ref(ID_cpp_name);
-      fn_ref.get_sub().push_back(irept(ID_name));
-      fn_ref.get_sub().back().set(ID_identifier, lambda_id);
-      codet ret_stmt(ID_return);
-      ret_stmt.add_to_operands(std::move(fn_ref));
-      code_blockt conv_body;
-      conv_body.add(std::move(ret_stmt));
-      conv_dtor.value() = conv_body;
-      conv_decl.declarators().push_back(conv_dtor);
-      body.push_back(conv_decl);
-    }
-
-    cpp_declarationt closure_declaration;
-    closure_declaration.type() = closure_struct;
-    convert(closure_declaration);
-
-    const std::string closure_sym_name =
-      id2string(cpp_scopes.current_scope().prefix) + "tag-" + closure_tag;
-    if(symbol_table.has_symbol(closure_sym_name))
-    {
-      // Materialise the (stateless) closure as a temporary object so its
-      // address can be formed -- e.g. when bound to std::function's
-      // `_Functor&&` parameter -- and so member calls can take `this`.
+      // Materialise the closure as a temporary object so its address can be
+      // formed -- e.g. when bound to std::function's `_Functor&&` parameter --
+      // and so member calls can take `this`.  The by-copy capture members are
+      // direct-initialised, in member order, from the captured entities'
+      // values at this (capture) point.
       struct_tag_typet closure_tag_type(closure_sym_name);
+      exprt::operandst init;
+      init.reserve(capture_members.size());
+      for(const auto &name : capture_members)
+        init.push_back(capture_values.at(name));
       side_effect_exprt tmp(ID_temporary_object, closure_tag_type, loc);
-      tmp.add_to_operands(struct_exprt({}, closure_tag_type));
+      tmp.add_to_operands(struct_exprt(std::move(init), closure_tag_type));
       tmp.set(ID_C_lvalue, true);
       tmp.set(ID_mode, ID_cpp);
       expr.swap(tmp);
