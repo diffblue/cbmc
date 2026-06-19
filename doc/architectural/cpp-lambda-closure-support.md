@@ -1,9 +1,12 @@
 # C++ Lambda / Closure Support Rework
 
-Status: scoping / design. No behavioural changes are described as *done* here;
-this document scopes the work and records the empirical baseline.
+Status: scoping / design.  Phase A (captureless closure class) is implemented;
+the remaining phases are scoped below.
 
-Companion KNOWNBUG test: `regression/cbmc-cpp/cpp11_lambda_closure_in_std_function`.
+Companion tests: `regression/cbmc-cpp/cpp11_lambda_closure_in_std_function`
+(CORE), `cpp11_lambda_captureless_closure` (CORE), and the capturing-lambda
+soundness KNOWNBUGs (`cpp11_lambda_capture_by_value_snapshot`,
+`cpp11_lambda_capture_per_instance`, `cpp11_lambda_mutable_state`).
 
 ## 1. Motivation
 
@@ -134,14 +137,14 @@ Each phase: KNOWNBUG test first, flip to CORE on completion, gate **both**
 `regression/cbmc-cpp` and `regression/cbmc`, keep the existing ~31 lambda tests
 green.
 
-  * **Phase A — captureless closure class.**  Struct with `operator()`
-    (reusing the lowered body as the thunk) and conversion-to-function-pointer.
-    Lambda expr → stateless `struct_exprt`.  All current function-pointer use
-    sites keep working via the conversion.  Flips
-    `cpp11_lambda_closure_in_std_function`.  *Risk: the synthesised
-    `cpp_declaration` AST must be byte-exact for `convert()` (a first attempt
-    tripped a `to_cpp_name` precondition); the conversion-operator cast-name and
-    `const` method qualifier are the fiddly parts.*
+  * **Phase A — captureless closure class.**  DONE.  Struct with `operator()`
+    (body) and a non-explicit conversion to pointer-to-function (returning the
+    lowered function/thunk).  The lambda expression is a materialised
+    `temporary_object` of the closure type.  All current function-pointer use
+    sites keep working via the conversion; std::function stores and invokes a
+    captureless lambda.  Flipped `cpp11_lambda_closure_in_std_function`; added
+    `cpp11_lambda_captureless_closure`.  C++23 deducing-this (explicit object
+    parameter) lambdas keep the function-pointer lowering for now.
   * **Phase B — by-copy captures as members.**  Capture members initialised
     from the entity at capture time; body odr-uses rewritten to members.  Fixes
     `byval_snapshot`, `factory` (per-instance storage), and capture-default `=`.
