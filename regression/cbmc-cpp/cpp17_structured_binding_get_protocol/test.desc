@@ -1,0 +1,17 @@
+KNOWNBUG
+main.cpp
+--cpp20 --object-bits 11 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ structured binding 0 uses get<0>: SUCCESS$
+^\[main\.assertion\.2\] line \d+ structured binding 1 uses get<1>: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+KNOWNBUG: [dcl.struct.bind]/4 -- when std::tuple_size<E> is complete, a
+structured binding must bind each name to get<i>(e), not to the i-th data
+member.  CBMC decomposes by data member, which gives the wrong elements for a
+tuple-like type whose data-member order differs from its get<i> order (e.g.
+std::tuple).  This is why `auto [a,b] = std::tuple<int,long>(1,2)` binds b
+incorrectly.  Flip to CORE once the get-protocol is implemented.
