@@ -1,7 +1,8 @@
 # C++ Lambda / Closure Support Rework
 
-Status: scoping / design.  Phases A (captureless closure class) and B (by-copy
-captures) are implemented; the remaining phases are scoped below.
+Status: scoping / design.  Phases A (captureless closure class), B (by-copy
+captures), and C (by-reference captures) are implemented; the remaining phases
+are scoped below.
 
 Companion tests: `regression/cbmc-cpp/cpp11_lambda_closure_in_std_function`
 (CORE), `cpp11_lambda_captureless_closure` (CORE), and the capturing-lambda
@@ -157,9 +158,14 @@ green.
     function-pointer lowering: capture-defaults (`[=]`/`[&]`), by-reference
     captures, `mutable`, and lambdas whose body contains a nested lambda
     (closure-typed return).
-  * **Phase C — by-reference captures.**  Reference/pointer members; fixes
-    `[&]`/`[&x]` to observe the referenced entity (already coincidentally OK,
-    but make it principled and instance-correct).
+  * **Phase C — by-reference captures.**  DONE (explicit by-reference
+    captures).  A reference member per by-reference capture, bound at the
+    capture point to the entity (a reference is modelled as the entity's
+    address); body odr-uses resolve to it by member lookup and denote the
+    entity, and a const lambda may modify the referent through it.  Added
+    `cpp11_lambda_capture_by_reference` (CORE).  Still on the function-pointer
+    lowering: capture-defaults (`[=]`/`[&]`), this/*this captures, `mutable`,
+    and nested-lambda-returning bodies.
   * **Phase D — `mutable`.**  Non-`const` `operator()`; per-object mutable
     state.  Fixes `mut`, `counter_factory`.
   * **Phase E — init-capture, `this`/`*this`, capture-default normalisation.**
