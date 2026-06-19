@@ -1,8 +1,8 @@
 # C++ Lambda / Closure Support Rework
 
 Status: scoping / design.  Phases A (captureless closure class), B (by-copy
-captures), and C (by-reference captures) are implemented; the remaining phases
-are scoped below.
+captures), C (by-reference captures), and D (mutable) are implemented; the
+remaining phases are scoped below.
 
 Companion tests: `regression/cbmc-cpp/cpp11_lambda_closure_in_std_function`
 (CORE), `cpp11_lambda_captureless_closure` (CORE), and the capturing-lambda
@@ -166,8 +166,11 @@ green.
     `cpp11_lambda_capture_by_reference` (CORE).  Still on the function-pointer
     lowering: capture-defaults (`[=]`/`[&]`), this/*this captures, `mutable`,
     and nested-lambda-returning bodies.
-  * **Phase D — `mutable`.**  Non-`const` `operator()`; per-object mutable
-    state.  Fixes `mut`, `counter_factory`.
+  * **Phase D — `mutable`.**  DONE.  A mutable lambda is lowered to a closure
+    whose operator() is non-const; its by-copy capture members (Phase B) are
+    therefore mutable and modifications persist in the closure object across
+    calls.  Flipped `cpp11_lambda_mutable_state` to CORE; added
+    `cpp11_lambda_mutable_counter_factory` (independent persistent counters).
   * **Phase E — init-capture, `this`/`*this`, capture-default normalisation.**
   * **Phase F — generic lambdas as member function templates.**  Replace the
     bespoke generic-lambda call-site instantiation with a templated
