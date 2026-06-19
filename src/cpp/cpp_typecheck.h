@@ -942,6 +942,12 @@ private:
   std::unordered_set<irep_idt> deferred_typechecking;
   std::unordered_set<irep_idt> functions_being_typechecked;
   std::map<irep_idt, exprt> generic_lambda_map;
+  /// Maps a lambda-expression's source location to the symbol name of its
+  /// synthesised closure type ([expr.prim.lambda.closure]/1: each lambda has a
+  /// unique closure type).  A lambda may be type-checked more than once (e.g.
+  /// auto return type deduction), and the closure type must be identical each
+  /// time, so it is created once and reused.
+  std::map<std::string, irep_idt> lambda_closure_map;
   bool support_float16_type;
 
   /// Counter that is non-zero while type-checking an expression that
