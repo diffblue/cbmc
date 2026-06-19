@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 bool cpp_typecheckt::cpp_is_pod(const typet &type) const
 {
-  if(type.id()==ID_struct)
+  if(type.id() == ID_struct || type.id() == ID_union)
   {
     // Not allowed in PODs:
     // * Non-PODs
@@ -23,17 +23,23 @@ bool cpp_typecheckt::cpp_is_pod(const typet &type) const
     // * virtuals
     // * private/protected, unless static
     // * overloading assignment operator
+    //
+    // [class.union]/2: a union may have user-declared special member
+    // functions (constructors, destructor) and other member functions, in
+    // which case it is not a POD/trivial type and must be initialised via a
+    // constructor rather than by conversion.  The same component checks apply
+    // as for a struct; a union has no base classes.
 
     if(type.get_bool("has_template_constructor"))
       return false;
     // * Base classes
 
-    const struct_typet &struct_type=to_struct_type(type);
+    const struct_union_typet &struct_type = to_struct_union_type(type);
 
-    if(!struct_type.bases().empty())
+    if(type.id() == ID_struct && !to_struct_type(type).bases().empty())
       return false;
 
-    const struct_typet::componentst &components=
+    const struct_union_typet::componentst &components =
       struct_type.components();
 
     for(const auto &c : components)
