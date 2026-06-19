@@ -188,6 +188,28 @@ void cpp_typecheckt::default_cpctor(
   irept &initializers=decl0.add(ID_member_initializers);
   initializers.id(ID_member_initializers);
 
+  // [class.copy.ctor]/14: the implicit copy constructor of a union copies the
+  // object representation.  A union has no base classes and copying it
+  // member-by-member is not meaningful (at most one member is active), so emit
+  // a single whole-object copy `*this = other` and return.
+  if(symbol.type.id() == ID_union)
+  {
+    exprt op0("explicit-typecast", pointer_type(cppcomp.as_type()));
+    op0.copy_to_operands(exprt("cpp-this"));
+    op0.add_source_location() = source_location;
+
+    exprt op1("explicit-typecast", pointer_type(cppcomp.as_type()));
+    op1.type().set(ID_C_reference, true);
+    to_pointer_type(op1.type()).base_type().set(ID_C_constant, true);
+    op1.get_sub().push_back(cpp_namet(param_identifier, source_location));
+    op1.add_source_location() = source_location;
+
+    code_frontend_assignt assign_code(dereference_exprt(op0), op1);
+    assign_code.add_source_location() = source_location;
+    initializers.move_to_sub(assign_code);
+    return;
+  }
+
   // First, we need to call the parent copy constructors
   for(const auto &b : to_struct_type(symbol.type).bases())
   {
@@ -381,6 +403,27 @@ void cpp_typecheckt::default_assignop_value(
   code_blockt block;
 
   std::string arg_name("ref");
+
+  // [class.copy.assign]: the implicit copy-assignment operator of a union
+  // copies the object representation.  A union has no bases and member-by-member
+  // copy is not meaningful, so emit a single whole-object copy `*this = ref`
+  // and the return statement.  The dereferenced `this` and the parameter are
+  // typed during type-checking of the body (no explicit type name, which need
+  // not resolve in the lazily type-checked operator() body scope).
+  if(symbol.type.id() == ID_union)
+  {
+    side_effect_expr_assignt assign(
+      dereference_exprt(exprt("cpp-this"), uninitialized_typet{}),
+      cpp_namet(arg_name, source_location).as_expr(),
+      typet{},
+      source_location);
+    block.add(code_expressiont{std::move(assign)});
+    block.add(code_returnt(
+      dereference_exprt(exprt("cpp-this"), uninitialized_typet())));
+    declarator.value() = std::move(block);
+    declarator.value().add_source_location() = source_location;
+    return;
+  }
 
   // First, we copy the parents
   for(const auto &b : to_struct_type(symbol.type).bases())
@@ -1100,7 +1143,7 @@ void cpp_typecheckt::full_member_initialization(
 /// \return return true if a copy constructor is found
 bool cpp_typecheckt::find_cpctor(const symbolt &symbol) const
 {
-  for(const auto &component : to_struct_type(symbol.type).components())
+  for(const auto &component : to_struct_union_type(symbol.type).components())
   {
     // Skip non-ctor
     if(component.type().id()!=ID_code ||
@@ -1159,8 +1202,8 @@ bool cpp_typecheckt::find_cpctor(const symbolt &symbol) const
 
 bool cpp_typecheckt::find_assignop(const symbolt &symbol) const
 {
-  const struct_typet &struct_type=to_struct_type(symbol.type);
-  const struct_typet::componentst &components=struct_type.components();
+  const struct_union_typet &struct_type = to_struct_union_type(symbol.type);
+  const struct_union_typet::componentst &components = struct_type.components();
 
   for(const auto &component : components)
   {

@@ -3804,7 +3804,9 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     exprt new_object(ID_new_object, tmp_object_expr.type());
     new_object.set(ID_C_lvalue, true);
 
-    PRECONDITION(tmp_object_expr.type().id() == ID_struct_tag);
+    PRECONDITION(
+      tmp_object_expr.type().id() == ID_struct_tag ||
+      tmp_object_expr.type().id() == ID_union_tag);
 
     get_component(
       expr.source_location(),
@@ -3824,8 +3826,13 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     // will be available
     {
       // find name of destructor
-      const struct_typet::componentst &components =
-        follow_tag(to_struct_tag_type(tmp_object_expr.type())).components();
+      const struct_union_typet::componentst &components =
+        (tmp_object_expr.type().id() == ID_union_tag
+           ? static_cast<const struct_union_typet &>(
+               follow_tag(to_union_tag_type(tmp_object_expr.type())))
+           : static_cast<const struct_union_typet &>(
+               follow_tag(to_struct_tag_type(tmp_object_expr.type()))))
+          .components();
 
       for(const auto &c : components)
       {
