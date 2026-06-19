@@ -6312,7 +6312,7 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
   // class.  This lets the lambda be used as an object (e.g. stored by value in
   // std::function) as well as a function pointer (via the conversion).
   if(
-    !is_generic_lambda && !lambda_has_explicit_this && !lambda_is_mutable &&
+    !is_generic_lambda && !lambda_has_explicit_this &&
     lambda_capture_default_empty && !lambda_has_this_capture &&
     !lambda_body_has_nested_lambda)
   {
@@ -6399,8 +6399,11 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
         op_ftype.add(ID_parameters) = saved_lambda_parameters;
         op_dtor.type() = op_ftype;
         // [expr.prim.lambda.closure]: a non-mutable lambda's operator() is
-        // const.
-        op_dtor.method_qualifier() = typet(ID_const);
+        // [expr.prim.lambda.closure]: operator() is const unless the lambda is
+        // declared mutable (in which case its by-copy capture members are
+        // mutable and modifications persist in the closure object).
+        if(!lambda_is_mutable)
+          op_dtor.method_qualifier() = typet(ID_const);
         op_dtor.value() = static_cast<const exprt &>(saved_lambda_body);
         op_decl.declarators().push_back(op_dtor);
         body.push_back(op_decl);
