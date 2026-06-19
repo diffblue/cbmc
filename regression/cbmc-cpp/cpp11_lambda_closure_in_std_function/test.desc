@@ -1,0 +1,19 @@
+KNOWNBUG
+main.cpp
+--cpp20 --unwind 4 --object-bits 12 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ std::function holds a lambda closure and calls it: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+KNOWNBUG ([expr.prim.lambda]/3-7): a lambda expression has a unique closure
+*class* type with a public inline operator() (the body) and -- for a captureless
+lambda -- a non-explicit conversion to a pointer-to-function.  A closure is an
+object, not a function pointer, so it can be stored by value in a type-erasing
+wrapper such as std::function.  CBMC models a captureless lambda as a bare
+function pointer, so std::function constructed from a lambda stores a function
+pointer rather than a closure object and the type-erased call dereferences a
+null pointer.  Reclassify CORE once a lambda is a closure object that
+std::function stores and invokes.
