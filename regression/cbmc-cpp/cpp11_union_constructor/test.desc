@@ -2,8 +2,10 @@ CORE
 main.cpp
 --cpp20 --object-bits 11 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ direct construction via union constructor: SUCCESS$
-^\[main\.assertion\.2\] line \d+ wrapper engaged: SUCCESS$
-^\[main\.assertion\.3\] line \d+ union member constructed via union constructor: SUCCESS$
+^\[main\.assertion\.2\] line \d+ union copy construction: SUCCESS$
+^\[main\.assertion\.3\] line \d+ union copy assignment: SUCCESS$
+^\[main\.assertion\.4\] line \d+ wrapper engaged: SUCCESS$
+^\[main\.assertion\.5\] line \d+ union member constructed via union constructor: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
@@ -11,9 +13,7 @@ main.cpp
 ^CONVERSION ERROR$
 --
 [class.union]/2: a union may have a user-declared constructor and is then
-constructed via that constructor (not by conversion).  This is the storage
-shape of std::optional/std::variant (a union with a constructor that initialises
-one member).  Copy-assignment of such a (non-POD) union is a separate, still-open
-issue (the implicit operator= parameter type does not resolve); construction and
-copy-construction work.
-
+constructed via that constructor (not by conversion); its implicit copy
+constructor and copy assignment copy the object representation
+([class.copy.ctor]/14, [class.copy.assign]).  This is the storage shape of
+std::optional/std::variant (a union with a constructor initialising one member).
