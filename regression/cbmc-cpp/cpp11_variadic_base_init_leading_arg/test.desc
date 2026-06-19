@@ -1,0 +1,19 @@
+KNOWNBUG
+main.cpp
+--cpp20 --object-bits 11 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ pack forwarded to base initializer sets the flag: SUCCESS$
+^\[main\.assertion\.2\] line \d+ pack forwarded to base initializer sets value: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+KNOWNBUG: [temp.variadic] / [class.base.init] -- forwarding a function parameter
+pack to a base-class initializer that has a non-pack argument before the pack
+expansion (`Base(tag, args...)`) does not propagate the pack: the base subobject
+is left default-constructed.  A member initializer of the same shape works; only
+the base-class case is affected.  This is std::optional's construction shape
+(`_Optional_base(in_place, forward<Args>(args)...)`), and is why
+`std::optional<int> o = 5; o.value()` fails (the optional ends up disengaged).
+Flip to CORE once fixed.
