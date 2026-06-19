@@ -9,14 +9,17 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
-#include "cpp_typecheck.h"
-
-#include <goto-programs/goto_instruction_code.h>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
+#include <util/symbol_table_base.h>
+
+#include <goto-programs/goto_instruction_code.h>
+
+#include <ansi-c/anonymous_member.h>
+
+#include "cpp_typecheck.h"
 
 /// Generate code to copy the parent.
 /// \param source_location: location for generated code
@@ -606,6 +609,21 @@ void cpp_typecheckt::check_member_initializers(
       }
     }
 
+    // [class.union.anon]: a member of an anonymous union/struct member of this
+    // class may be named directly in the member-initializer list.  Recognise
+    // it before the type-name fallback below, which would otherwise emit a
+    // (caught, but error-count-bumping) "no match" diagnostic for the name.
+    if(!ok)
+    {
+      const namespacet ns(symbol_table);
+      const struct_tag_typet class_tag{class_identifier};
+      if(
+        !class_identifier.empty() &&
+        symbol_table.has_symbol(class_identifier) &&
+        has_component_rec(class_tag, base_name, ns))
+        ok = true;
+    }
+
     if(!ok)
     {
       // Try resolving as a type name
@@ -815,6 +833,27 @@ void cpp_typecheckt::full_member_initialization(
             }
           }
 
+          // [class.union.anon]: a member of an anonymous union/struct member
+          // is a member of this class, so an initializer naming one is a data
+          // initializer (not a base-class initializer) -- do not try to
+          // type-check the name as a base-class type below.
+          if(!is_data)
+          {
+            const namespacet ns(symbol_table);
+            for(const auto &c : components)
+            {
+              if(
+                c.get_anonymous() &&
+                (c.type().id() == ID_union_tag ||
+                 c.type().id() == ID_struct_tag) &&
+                has_component_rec(c.type(), base_name, ns))
+              {
+                is_data = true;
+                break;
+              }
+            }
+          }
+
           if(is_data)
             continue;
         }
@@ -949,6 +988,23 @@ void cpp_typecheckt::full_member_initialization(
         final_initializers.move_to_sub(initializer);
         found=true;
         break;
+      }
+
+      // [class.union.anon]: an initializer naming a member of this anonymous
+      // union/struct component initializes that subobject; route it to the
+      // body (typecheck_member_initializer builds the access through the
+      // unnamed subobject).
+      if(
+        c.get_anonymous() &&
+        (c.type().id() == ID_union_tag || c.type().id() == ID_struct_tag))
+      {
+        const namespacet ns(symbol_table);
+        if(has_component_rec(c.type(), base_name, ns))
+        {
+          final_initializers.move_to_sub(initializer);
+          found = true;
+          break;
+        }
       }
     }
 
