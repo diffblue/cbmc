@@ -332,7 +332,10 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
     // multiple operands are provided, do aggregate initialization.
     if(!struct_type.bases().empty() && operands_tc.size() >= 2)
     {
-      bool has_user_ctor = false;
+      // [dcl.init.aggr]/1: a class with a user-declared constructor is not an
+      // aggregate.  A template constructor is not stored as a regular component
+      // (so the scan below would miss it); the struct carries a flag instead.
+      bool has_user_ctor = struct_type.get_bool("has_template_constructor");
       for(const auto &c : struct_type.components())
       {
         if(c.type().id() != ID_code || c.get_bool(ID_from_base))
