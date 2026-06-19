@@ -69,15 +69,19 @@ std::optional<codet> cpp_typecheckt::cpp_destructor(
   }
   else
   {
-    const struct_typet &struct_type =
-      follow_tag(to_struct_tag_type(object.type()));
+    const struct_union_typet &struct_type =
+      object.type().id() == ID_struct_tag
+        ? static_cast<const struct_union_typet &>(
+            follow_tag(to_struct_tag_type(object.type())))
+        : static_cast<const struct_union_typet &>(
+            follow_tag(to_union_tag_type(object.type())));
 
     // enter struct scope
     cpp_save_scopet save_scope(cpp_scopes);
     cpp_scopes.set_scope(struct_type.get(ID_name));
 
     // find name of destructor
-    const struct_typet::componentst &components=
+    const struct_union_typet::componentst &components =
       struct_type.components();
 
     irep_idt dtor_name;

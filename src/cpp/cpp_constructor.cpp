@@ -240,7 +240,79 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
   }
   else if(object_tc.type().id() == ID_union_tag)
   {
-    UNREACHABLE; // Todo: union
+    // [class.union]/2: a (non-POD) union may have a user-declared constructor;
+    // construct it by an overload-resolved call to that constructor.  A union
+    // has no base classes, virtual tables or most-derived flag, so this is the
+    // constructor-call core of the struct case below.
+    exprt::operandst operands_tc = operands;
+    for(auto &op : operands_tc)
+    {
+      typecheck_expr(op);
+      add_implicit_dereference(op);
+    }
+
+    const union_typet &union_type =
+      follow_tag(to_union_tag_type(object_tc.type()));
+
+    cpp_save_scopet save_scope(cpp_scopes);
+    cpp_scopes.set_scope(union_type.get(ID_name));
+
+    irep_idt constructor_name;
+    for(const auto &c : union_type.components())
+    {
+      const typet &type = c.type();
+      if(
+        !c.get_bool(ID_from_base) && type.id() == ID_code &&
+        to_code_type(type).return_type().id() == ID_constructor)
+      {
+        constructor_name = c.get_base_name();
+        break;
+      }
+    }
+
+    if(constructor_name.empty())
+    {
+      if(operands.empty())
+        return code_expressiont{
+          side_effect_expr_nondett{object.type(), source_location}};
+      error().source_location = source_location;
+      error() << "non-POD union has no constructor" << eom;
+      throw 0;
+    }
+
+    side_effect_expr_function_callt function_call(
+      cpp_namet(constructor_name, source_location).as_expr(),
+      operands_tc,
+      uninitialized_typet(),
+      source_location);
+
+    typecheck_side_effect_function_call(function_call);
+
+    if(function_call.get(ID_statement) != ID_temporary_object)
+    {
+      error().source_location = source_location;
+      error() << "constructor call did not resolve to temporary object" << eom;
+      throw 0;
+    }
+
+    exprt &initializer =
+      static_cast<exprt &>(function_call.add(ID_initializer));
+
+    DATA_INVARIANT(
+      initializer.id() == ID_code &&
+        initializer.get(ID_statement) == ID_expression,
+      "initializer must be expression statement");
+
+    auto &statement_expr = to_code_expression(to_code(initializer));
+    side_effect_expr_function_callt &func_ini =
+      to_side_effect_expr_function_call(statement_expr.expression());
+    exprt &tmp_this = func_ini.arguments().front();
+    DATA_INVARIANT(
+      to_address_of_expr(tmp_this).object().id() == ID_new_object,
+      "expected new_object operand in address_of expression");
+    tmp_this = address_of_exprt(object_tc);
+
+    return to_code(initializer);
   }
   else if(object_tc.type().id() == ID_struct_tag)
   {
