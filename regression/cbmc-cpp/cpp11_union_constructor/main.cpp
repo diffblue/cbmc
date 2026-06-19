@@ -1,10 +1,10 @@
 // [class.union]/2 (C++11): a union may have user-defined member functions,
-// including constructors.  This is the storage shape libstdc++ uses for
+// including constructors.  Such a union is not a POD/trivial type and must be
+// constructed via its constructor.  Its implicit copy constructor and copy
+// assignment copy the object representation ([class.copy.ctor]/14,
+// [class.copy.assign]).  This is the storage shape libstdc++ uses for
 // std::optional / std::variant: a union with a constructor that initializes one
-// member, wrapped in a struct with an "engaged"/index discriminator.  CBMC does
-// not yet construct a union via its user-defined constructor (it attempts an
-// implicit conversion instead), which is why `std::optional<int> o = 5;`
-// followed by `o.value()` currently fails.
+// member, wrapped in a struct with an "engaged"/index discriminator.
 
 union U
 {
@@ -22,9 +22,20 @@ struct Opt
 
 int main()
 {
+  // direct construction via the union's constructor
   U u(5);
   __CPROVER_assert(u.value == 5, "direct construction via union constructor");
 
+  // copy construction copies the object representation
+  U c(u);
+  __CPROVER_assert(c.value == 5, "union copy construction");
+
+  // copy assignment copies the object representation
+  U d(0);
+  d = u;
+  __CPROVER_assert(d.value == 5, "union copy assignment");
+
+  // construction through a wrapper struct
   Opt o(7);
   __CPROVER_assert(o.engaged, "wrapper engaged");
   __CPROVER_assert(
