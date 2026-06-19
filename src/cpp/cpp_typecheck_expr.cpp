@@ -5831,15 +5831,18 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
   // Phase B handles explicit by-copy captures.  A mutable lambda
   // ([expr.prim.lambda.closure]: non-const operator()), a capture-default
   // (`[=]`/`[&]`, whose implicit captures need odr-use analysis), and any
-  // by-reference capture stay on the function-pointer lowering for now (later
+  // Phase B/C handle explicit by-copy and by-reference captures.  A mutable
+  // lambda ([expr.prim.lambda.closure]: non-const operator()), a capture-default
+  // (`[=]`/`[&]`, whose implicit captures need odr-use analysis), and a
+  // this/*this capture stay on the function-pointer lowering for now (later
   // phases; see doc/architectural/cpp-lambda-closure-support.md).
   const bool lambda_is_mutable = expr.get_bool("mutable");
   const bool lambda_capture_default_empty =
     expr.find("lambda_capture").get("default").empty();
-  bool lambda_has_by_ref_capture = false;
+  bool lambda_has_this_capture = false;
   for(const auto &cap : expr.find("lambda_capture").get_sub())
-    if(cap.get_bool("by_ref") || cap.get_bool("this"))
-      lambda_has_by_ref_capture = true;
+    if(cap.get_bool("this"))
+      lambda_has_this_capture = true;
   // A lambda whose body returns/contains another lambda has a closure-typed
   // return; the function-pointer lowering's deduced return type is then not
   // usable for the synthesised operator().  Keep such a lambda on the
@@ -6310,7 +6313,7 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
   // std::function) as well as a function pointer (via the conversion).
   if(
     !is_generic_lambda && !lambda_has_explicit_this && !lambda_is_mutable &&
-    lambda_capture_default_empty && !lambda_has_by_ref_capture &&
+    lambda_capture_default_empty && !lambda_has_this_capture &&
     !lambda_body_has_nested_lambda)
   {
     // The closure type must be identical across repeated type-checks of the
@@ -6345,6 +6348,13 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
       // direct-initialised from the entity when the closure object is created.
       // We name each member after the captured entity so that odr-uses of the
       // entity in the body resolve to the member by ordinary member lookup.
+      // [expr.prim.lambda.capture]: for each entity captured by copy, an
+      // unnamed non-static data member is declared in the closure type,
+      // direct-initialised from the entity when the closure object is created;
+      // an entity captured by reference is captured as a reference (a reference
+      // member that denotes the entity).  We name each member after the
+      // captured entity so that odr-uses of the entity in the body resolve to
+      // the member by ordinary member lookup.
       for(const auto &name : capture_members)
       {
         cpp_declarationt mem_decl;
@@ -6354,6 +6364,14 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
         mem_name.get_sub().push_back(irept(ID_name));
         mem_name.get_sub().back().set(ID_identifier, name);
         mem_dtor.name() = mem_name;
+        if(by_ref_captures.count(name))
+        {
+          // An entity captured by reference is a reference member: a `&` on
+          // the declarator over the entity's type.
+          typet ref_op(ID_frontend_pointer);
+          ref_op.set(ID_C_reference, true);
+          mem_dtor.type() = ref_op;
+        }
         mem_decl.declarators().push_back(mem_dtor);
         body.push_back(mem_decl);
       }
@@ -6362,15 +6380,16 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
       {
         cpp_declarationt op_decl;
         // The closure's operator() returns the lambda's return type: the
-        // explicit trailing return type if given, otherwise deduced from the
-        // body (`auto`) -- deducing it freshly here is robust for a lambda
-        // whose return type is itself a closure (e.g. a lambda returning a
-        // lambda), where the function-pointer lowering's deduced type is not
-        // usable.
+        // explicit trailing return type if given, otherwise the type deduced
+        // for the lowered function.  (Lambdas whose body contains a nested
+        // lambda -- where that deduced type is not usable -- are excluded from
+        // this path above, so this deduced type is reliable here, and using it
+        // avoids re-deducing via `auto`, which double-type-checks the body and
+        // mishandles reference-member accesses of by-reference captures.)
         if(saved_lambda_return_type.is_not_nil())
           op_decl.type() = static_cast<const typet &>(saved_lambda_return_type);
         else
-          op_decl.type() = typet(ID_auto);
+          op_decl.type() = func_type.return_type();
         cpp_declaratort op_dtor;
         cpp_namet op_name;
         op_name.get_sub().push_back(irept(ID_operator));
@@ -6439,7 +6458,19 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
       exprt::operandst init;
       init.reserve(capture_members.size());
       for(const auto &name : capture_members)
-        init.push_back(capture_values.at(name));
+      {
+        const exprt &entity = capture_values.at(name);
+        if(by_ref_captures.count(name))
+        {
+          // [expr.prim.lambda.capture]: bind the reference member to the
+          // captured entity (a reference is modelled as the entity's address).
+          address_of_exprt addr(entity);
+          addr.type() = reference_type(entity.type());
+          init.push_back(std::move(addr));
+        }
+        else
+          init.push_back(entity);
+      }
       side_effect_exprt tmp(ID_temporary_object, closure_tag_type, loc);
       tmp.add_to_operands(struct_exprt(std::move(init), closure_tag_type));
       tmp.set(ID_C_lvalue, true);
