@@ -1,0 +1,15 @@
+KNOWNBUG
+main.cpp
+--cpp20 --object-bits 11 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ mutable lambda keeps per-object capture state: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+KNOWNBUG (unsound): [expr.prim.lambda.closure] -- a mutable lambda's by-copy
+captures are mutable non-static data members of the closure object, so
+modifications persist across calls of the same closure.  CBMC has no per-object
+closure state, so the mutable counter does not persist.  See
+doc/architectural/cpp-lambda-closure-support.md.
