@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20 --object-bits 11 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ pack forwarded to base initializer sets the flag: SUCCESS$
@@ -9,11 +9,12 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-KNOWNBUG: [temp.variadic] / [class.base.init] -- forwarding a function parameter
-pack to a base-class initializer that has a non-pack argument before the pack
-expansion (`Base(tag, args...)`) does not propagate the pack: the base subobject
-is left default-constructed.  A member initializer of the same shape works; only
-the base-class case is affected.  This is std::optional's construction shape
-(`_Optional_base(in_place, forward<Args>(args)...)`), and is why
-`std::optional<int> o = 5; o.value()` fails (the optional ends up disengaged).
-Flip to CORE once fixed.
+[temp.variadic] / [class.base.init]: a constructor may forward a function
+parameter pack to a base-class initializer that has a non-pack argument before
+the pack expansion (`Base(tag, args...)`).  CBMC mis-classified a class with a
+base and a (template) constructor as an aggregate ([dcl.init.aggr]/1 -- a class
+with a user-declared constructor, including a template one, is not an
+aggregate), so it aggregate-initialised the base member-wise and dropped the
+pack.  This is std::optional's construction shape
+(`_Optional_base(in_place, forward<Args>(args)...)`).
+
