@@ -1,9 +1,10 @@
 # C++ Lambda / Closure Support Rework
 
-Status: scoping / design.  Phases A (captureless closure class), B (by-copy
-captures), C (by-reference captures), D (mutable), and E (capture-defaults and
-this/*this capture) are implemented.  The remaining work (Phase F, generic
-lambdas) is scoped below.
+Status: implemented.  Phases A (captureless closure class), B (by-copy
+captures), C (by-reference captures), D (mutable), E (capture-defaults and
+this/*this capture), and F (generic lambdas as member function templates) are
+all implemented.  Remaining function-pointer-lowering fallbacks (sound for their
+cases) are noted per phase below.
 
 Companion tests: `regression/cbmc-cpp/cpp11_lambda_closure_in_std_function`
 (CORE), `cpp11_lambda_captureless_closure` (CORE), and the capturing-lambda
@@ -185,10 +186,19 @@ green.
     the function-pointer lowering: a lambda that uses `this` explicitly or
     odr-uses a member function (member-function calls within the lambda are not
     yet modelled on the closure path).
-  * **Phase F — generic lambdas as member function templates.**  Replace the
-    bespoke generic-lambda call-site instantiation with a templated
-    `operator()` on the closure class; integrate with template argument
-    deduction.
+  * **Phase F — generic lambdas as member function templates.**  DONE.  A
+    closure-eligible generic lambda is lowered to its closure class with
+    operator() synthesised as a member function template: each `auto` parameter
+    becomes an invented template type parameter (a C++20 `[]<typename T>(...)`
+    names them), operator() has a deduced (`auto`) return type unless specified,
+    and calls instantiate the template as for any struct functor.  Its captures
+    are real closure members (Phases B/C/D/E), so a generic by-copy capture
+    snapshots at capture time and factory-produced closures have independent
+    state.  Added `cpp11_lambda_generic_closure` (CORE).  Generic lambdas that
+    capture by reference (a deduced return type mishandles a reference-member
+    access), are in a member-function context, have an explicit object
+    parameter, or whose body contains a nested lambda keep the call-site
+    instantiation (`generic_lambda_map`) lowering.
 
 ## 6. Risks and integration points
 
