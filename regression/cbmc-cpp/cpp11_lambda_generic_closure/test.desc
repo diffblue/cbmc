@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp20 --unwind 3 --object-bits 11 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ generic operator\(\) instantiated for int: SUCCESS$
+^\[main\.assertion\.2\] line \d+ generic operator\(\) instantiated for long: SUCCESS$
+^\[main\.assertion\.3\] line \d+ generic by-copy capture snapshots at capture: SUCCESS$
+^\[main\.assertion\.4\] line \d+ first generic closure has its own capture: SUCCESS$
+^\[main\.assertion\.5\] line \d+ second generic closure is independent: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+[expr.prim.lambda.closure]: a generic lambda's operator() is a member function
+template (each `auto` parameter is an invented template type parameter,
+instantiated per call).  Lambda rework Phase F lowers a generic lambda to a
+closure with such a template operator(), so its captures are real closure
+members: a by-copy capture is a capture-time snapshot and distinct closures from
+a factory have independent state.
