@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp20 --unwind 4 --object-bits 11 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ by-ref capture observes the live entity: SUCCESS$
+^\[main\.assertion\.2\] line \d+ by-ref capture modifies the referenced entity: SUCCESS$
+^\[main\.assertion\.3\] line \d+ mixed by-copy snapshot and by-reference live: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+[expr.prim.lambda.capture]: an entity captured by reference is captured as a
+reference member of the closure that denotes the entity.  Lambda rework Phase C
+lowers an explicit-by-reference capture to a reference member bound to the
+entity at capture time, so the closure observes the live entity and can modify
+it through the reference (also in a const/non-mutable lambda).  Mixed by-copy
+(snapshot) and by-reference (live) captures are exercised.
