@@ -1,7 +1,7 @@
 # C++ Lambda / Closure Support Rework
 
-Status: scoping / design.  Phase A (captureless closure class) is implemented;
-the remaining phases are scoped below.
+Status: scoping / design.  Phases A (captureless closure class) and B (by-copy
+captures) are implemented; the remaining phases are scoped below.
 
 Companion tests: `regression/cbmc-cpp/cpp11_lambda_closure_in_std_function`
 (CORE), `cpp11_lambda_captureless_closure` (CORE), and the capturing-lambda
@@ -145,9 +145,18 @@ green.
     captureless lambda.  Flipped `cpp11_lambda_closure_in_std_function`; added
     `cpp11_lambda_captureless_closure`.  C++23 deducing-this (explicit object
     parameter) lambdas keep the function-pointer lowering for now.
-  * **Phase B — by-copy captures as members.**  Capture members initialised
-    from the entity at capture time; body odr-uses rewritten to members.  Fixes
-    `byval_snapshot`, `factory` (per-instance storage), and capture-default `=`.
+  * **Phase B — by-copy captures as members.**  DONE (explicit by-copy
+    captures).  A data member per by-copy capture, named after the entity (so
+    body odr-uses resolve by member lookup), direct-initialised from the entity
+    at the capture point; operator() return type deduced freshly.  Fixes
+    `byval_snapshot` and `factory`/per-instance (flipped
+    `cpp11_lambda_capture_by_value_snapshot`,
+    `cpp11_lambda_capture_per_instance` to CORE).  The closure type is memoised
+    per lambda source location (auto return type deduction type-checks a lambda
+    more than once).  `mutable` is now recorded by the parser.  Still on the
+    function-pointer lowering: capture-defaults (`[=]`/`[&]`), by-reference
+    captures, `mutable`, and lambdas whose body contains a nested lambda
+    (closure-typed return).
   * **Phase C — by-reference captures.**  Reference/pointer members; fixes
     `[&]`/`[&x]` to observe the referenced entity (already coincidentally OK,
     but make it principled and instance-correct).
