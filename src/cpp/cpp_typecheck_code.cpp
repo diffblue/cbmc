@@ -21,6 +21,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/string_constant.h>
 #include <util/symbol_table_base.h>
 
+#include <ansi-c/anonymous_member.h>
+
 #include "cpp_convert_type.h"
 #include "cpp_declarator_converter.h"
 #include "cpp_exception_id.h"
@@ -1384,6 +1386,65 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
   cpp_typecheck_fargst fargs;
   fargs.in_use = true;
   fargs.operands = code.operands();
+
+  // [class.union.anon]: the members of an anonymous union (or anonymous
+  // struct) are members of the enclosing class, so a constructor
+  // member-initializer may name such a member directly -- e.g. std::optional
+  // initialising the payload of its storage union.  The member is not a scope
+  // entry of the enclosing class (only reachable through the unnamed
+  // subobject), so the `resolve` below would not find it.  Detect this case
+  // and build the initialization through the anonymous subobject via
+  // `get_component_rec`.
+  if(member.is_simple_name())
+  {
+    const exprt &this_e = cpp_scopes.current_scope().this_expr;
+    if(this_e.is_not_nil() && this_e.type().id() == ID_pointer)
+    {
+      const typet &class_tag = to_pointer_type(this_e.type()).base_type();
+      const irep_idt base_name = member.get_base_name();
+      if(class_tag.id() == ID_struct_tag || class_tag.id() == ID_union_tag)
+      {
+        const namespacet ns(symbol_table);
+        const auto &class_type =
+          ns.follow_tag(to_struct_or_union_tag_type(class_tag));
+        const auto &comps = class_type.components();
+        const bool is_direct = std::any_of(
+          comps.begin(),
+          comps.end(),
+          [&](const struct_union_typet::componentt &c)
+          { return c.get_base_name() == base_name; });
+        if(!is_direct && has_component_rec(class_tag, base_name, ns))
+        {
+          exprt deref{ID_dereference, class_tag};
+          deref.copy_to_operands(this_e);
+          deref.set(ID_C_lvalue, true);
+          deref.add_source_location() = code.source_location();
+          exprt target = get_component_rec(deref, base_name, ns);
+          target.set(ID_C_lvalue, true);
+
+          exprt::operandst wrapped_ops;
+          wrapped_ops.reserve(code.operands().size());
+          for(const auto &op : code.operands())
+            wrapped_ops.push_back(
+              op.get_bool(ID_C_array_ini) ? op : already_typechecked_exprt{op});
+          already_typechecked_exprt::make_already_typechecked(target);
+
+          auto call =
+            cpp_constructor(code.source_location(), target, wrapped_ops);
+          if(call.has_value())
+            code.swap(call.value());
+          else
+          {
+            // value-initialisation with no constructor call (POD member)
+            codet skip{ID_skip};
+            skip.add_source_location() = code.source_location();
+            code.swap(skip);
+          }
+          return;
+        }
+      }
+    }
+  }
 
   // Access to the base-class constructor is judged from the point of use
   // ([class.base.init], [class.access.base]): the derived class whose
