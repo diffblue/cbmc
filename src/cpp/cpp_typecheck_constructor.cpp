@@ -337,7 +337,9 @@ void cpp_typecheckt::default_assignop(
   std::string arg_name("ref");
 
   cpctor.add(ID_storage_spec).id(ID_cpp_storage_spec);
-  cpctor.type().id(ID_struct_tag);
+  // operator= returns a reference to the class; for a union the class type is
+  // a union_tag, not a struct_tag ([class.union]).
+  cpctor.type().id(symbol.type.id() == ID_union ? ID_union_tag : ID_struct_tag);
   cpctor.type().add(ID_identifier).id(symbol.name);
   cpctor.operands().push_back(exprt(ID_cpp_declarator));
   cpctor.add_source_location()=source_location;
@@ -407,17 +409,11 @@ void cpp_typecheckt::default_assignop_value(
   // [class.copy.assign]: the implicit copy-assignment operator of a union
   // copies the object representation.  A union has no bases and member-by-member
   // copy is not meaningful, so emit a single whole-object copy `*this = ref`
-  // and the return statement.  The dereferenced `this` and the parameter are
-  // typed during type-checking of the body (no explicit type name, which need
-  // not resolve in the lazily type-checked operator() body scope).
+  // via copy_parent (a frontend assignment, not an `operator=` call, which
+  // would recurse) reusing the union's own type, then return *this.
   if(symbol.type.id() == ID_union)
   {
-    side_effect_expr_assignt assign(
-      dereference_exprt(exprt("cpp-this"), uninitialized_typet{}),
-      cpp_namet(arg_name, source_location).as_expr(),
-      typet{},
-      source_location);
-    block.add(code_expressiont{std::move(assign)});
+    copy_parent(source_location, symbol.base_name, arg_name, block);
     block.add(code_returnt(
       dereference_exprt(exprt("cpp-this"), uninitialized_typet())));
     declarator.value() = std::move(block);
