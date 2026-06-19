@@ -1,0 +1,21 @@
+KNOWNBUG
+main.cpp
+--cpp20 --object-bits 11 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ direct construction via union constructor: SUCCESS$
+^\[main\.assertion\.2\] line \d+ wrapper engaged: SUCCESS$
+^\[main\.assertion\.3\] line \d+ union member constructed via union constructor: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+KNOWNBUG: [class.union]/2 -- a union may have a user-defined constructor.  CBMC
+raises "invalid implicit conversion from 'signed int' to 'union U'" instead of
+calling the union's constructor U(int) (even for direct construction `U u(5)`),
+so a union is effectively treated as POD with no user constructors.  This is the
+storage shape of std::optional/std::variant (a union with a constructor that
+initialises one member), and is why `std::optional<int> o = 5; o.value()` fails.
+A companion bug -- anonymous-union member initialization in a constructor
+init-list -- is fixed (see cpp11_anonymous_union_member_init); this one (union
+*constructors*) is still open.
