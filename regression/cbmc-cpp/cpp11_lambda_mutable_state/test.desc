@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20 --object-bits 11 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ mutable lambda keeps per-object capture state: SUCCESS$
@@ -8,8 +8,8 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-KNOWNBUG (unsound): [expr.prim.lambda.closure] -- a mutable lambda's by-copy
-captures are mutable non-static data members of the closure object, so
-modifications persist across calls of the same closure.  CBMC has no per-object
-closure state, so the mutable counter does not persist.  See
-doc/architectural/cpp-lambda-closure-support.md.
+[expr.prim.lambda.closure]: a mutable lambda's operator() is non-const and its
+by-copy captures are mutable non-static data members, so modifications persist
+in the closure object across calls.  Lambda rework Phase D lowers a mutable
+lambda to a closure whose operator() is non-const, so the captured counter
+persists per closure object.
