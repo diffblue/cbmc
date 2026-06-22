@@ -4261,6 +4261,17 @@ skip_pack_removal_ft:
     const symbolt &method_sym =
       lookup(to_struct_union_type(symb.type).components().back().get_name());
 
+    // Condition-3 detection: a same-signature non-template overload occupying
+    // the unsuffixed name that this suffixed member function template
+    // specialization shadows.  Checked here -- after typecheck_compound_-
+    // declarator, with the enclosing class fully elaborated -- so the overload
+    // (if any) is reliably present, unlike at the earlier naming point.
+    const irep_idt unsuffixed_name =
+      to_struct_union_type(symb.type).components().back().get(
+        "#unsuffixed_name");
+    const bool is_cond3 =
+      !unsuffixed_name.empty() && symbol_table.has_symbol(unsuffixed_name);
+
     // The method was added to deferred_typechecking by
     // typecheck_compound_declarator (because the parent scope is a template
     // scope). Since we are actually instantiating this method, move it
@@ -4282,13 +4293,17 @@ skip_pack_removal_ft:
       // as a template argument `S<TC::f<int>()>`, or in the SFINAE
       // constraints of std::tuple's constructors), which happens before
       // the deferred method-body pass (typecheck_method_bodies) runs.
+      // A condition-3 specialization (one shadowing a same-signature
+      // non-template overload) is also converted eagerly so we can tell
+      // whether its definition survives instantiation and decide between a
+      // distinct symbol and the overload fallback below.
       // Type-check its body eagerly now, using the function template map
       // currently in effect, mirroring the eager conversion of free
       // function template specializations (convert_non_template_declaration
       // below).  On failure (e.g. an unused, ill-formed specialization in a
       // SFINAE context) restore the error count and fall back to the normal
       // deferred path so that overload resolution can proceed.
-      if(new_decl.storage_spec().is_constexpr())
+      if(new_decl.storage_spec().is_constexpr() || is_cond3)
       {
         const std::size_t errors_before =
           get_message_handler().get_message_count(messaget::M_ERROR);
@@ -4307,6 +4322,30 @@ skip_pack_removal_ft:
       }
       else
         add_method_body(&ws);
+    }
+
+    // [temp.spec]/4 condition-3 fallback: a member function template
+    // specialization that shadows a same-signature non-template overload and
+    // whose own definition did not survive instantiation (no body -- e.g.
+    // std::_Any_data::_M_access<T>, whose reinterpret-cast body is dropped)
+    // cannot be a usable distinct entity.  Resolve calls to the non-template
+    // overload instead, reproducing the same-signature merge that makes such
+    // accessors work; the bodyless suffixed symbol is left unreferenced and
+    // removed during clean-up.  This is checked outside the
+    // deferred_typechecking branch above because a specialization may be
+    // instantiated more than once and the first (call-binding) request can be
+    // the one that is not pending deferred type-checking.  A specialization
+    // whose body *did* survive (e.g. a value-dependent `f<int>()` alongside a
+    // non-template `f()`) keeps its distinct symbol.
+    if(is_cond3)
+    {
+      const symbolt *ms = symbol_table.lookup(method_sym.name);
+      if(ms != nullptr && ms->value.is_nil())
+      {
+        const symbolt *overload_sym = symbol_table.lookup(unsuffixed_name);
+        if(overload_sym != nullptr)
+          return *overload_sym;
+      }
     }
 
     return method_sym;

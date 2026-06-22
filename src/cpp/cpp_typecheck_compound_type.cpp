@@ -2592,22 +2592,18 @@ void cpp_typecheckt::typecheck_member_function(
   // the class/type naming path -- so that distinct specializations such
   // as TC::f<int> and TC::f<long> get distinct symbols rather than
   // colliding on a single unsuffixed TC::f (unsound when their values
-  // differ, e.g. sizeof(U) or std::get<N>).  Exclusions:
+  // differ, e.g. sizeof(U) or std::get<N>).  Two exclusions:
   //   * Constructors/destructors: their template parameters are deduced
   //     from the parameter types, so the signature already distinguishes
   //     specializations.
   //   * Instances without a body (`value` nil): nothing to give a
   //     distinct symbol.
-  //   * Instances whose unsuffixed name already names another symbol:
-  //     that is a non-template overload of the same signature (e.g.
-  //     std::_Any_data's `_M_access()` alongside the accessor template
-  //     `_M_access<T>()`).  Such a member function template's own
-  //     definition may not survive instantiation in CBMC; it works only
-  //     by merging with -- and reusing the body of -- that non-template
-  //     overload, which the existing same-signature merge in this
-  //     function provides.  Keep its unsuffixed name so that merge still
-  //     happens; giving it a distinct (then bodyless) symbol would make
-  //     calls return nondet.
+  // A same-signature non-template overload occupying the unsuffixed name
+  // (condition 3, e.g. std::_Any_data's `_M_access()` alongside the
+  // accessor template `_M_access<T>()`) is handled by instantiate_template:
+  // the instance is suffixed here, but if its definition does not survive
+  // instantiation, instantiate_template falls back to that non-template
+  // overload.  The overload name is recorded below for that fallback.
   const bool is_ctor_or_dtor =
     component.type().id() == ID_code &&
     (to_code_type(component.type()).return_type().id() == ID_constructor ||
@@ -2617,7 +2613,14 @@ void cpp_typecheckt::typecheck_member_function(
                                  id2string(f_id);
   const bool suffix_instance =
     component.get_bool("#member_fn_template_instance") && !is_ctor_or_dtor &&
-    value.is_not_nil() && !symbol_table.has_symbol(unsuffixed_id);
+    value.is_not_nil();
+  // Record the unsuffixed name (signature without the template-argument
+  // suffix) so instantiate_template can detect condition 3 -- a same-signature
+  // non-template overload occupying that name -- reliably, i.e. after the
+  // enclosing class (and thus that overload) has been fully elaborated.  The
+  // symbol-table state here, mid-instantiation, is not a reliable indicator.
+  if(suffix_instance)
+    component.set("#unsuffixed_name", unsuffixed_id);
   const irep_idt instance_suffix =
     suffix_instance ? cpp_scopes.current_scope().suffix : irep_idt();
   const irep_idt identifier = cpp_scopes.current_scope().prefix +
