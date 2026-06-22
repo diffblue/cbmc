@@ -4955,8 +4955,65 @@ void cpp_typecheck_resolvet::guess_template_args(
 
       // Match each template arg from the cpp_name against the
       // corresponding instantiation arg
-      for(std::size_t i = 0; i < targs.size() && i < inst_arguments.size(); i++)
+      for(std::size_t i = 0; i < targs.size(); i++)
       {
+        // [temp.deduct.type] / [temp.variadic]: a pack-expansion argument
+        // (e.g. the `Types...` in `mytuple<Types...>`) matches the remaining
+        // template arguments of the instantiation, deducing the parameter
+        // pack.  Detect it and bind the whole pack, then stop (it consumes the
+        // rest).  Without this a partial specialization such as
+        // `tuple_size<tuple<Types...>>` never matches a concrete instantiation.
+        const irept &targ_node = targs[i];
+        const irept &targ_t =
+          targ_node.id() == ID_ambiguous ? targ_node.find(ID_type) : targ_node;
+        const bool is_pack =
+          targ_node.get_bool(ID_ellipsis) || targ_t.get_bool(ID_ellipsis);
+
+        if(is_pack)
+        {
+          // Resolve the pack parameter's identifier (the bare cpp_name being
+          // expanded, e.g. `Types`).
+          irep_idt pack_id;
+          if(targ_t.id() == ID_cpp_name)
+          {
+            const cpp_namet &pn =
+              to_cpp_name(static_cast<const typet &>(targ_t));
+            if(!pn.is_qualified() && !pn.has_template_args())
+            {
+              const auto ids = cpp_typecheck.cpp_scopes.current_scope().lookup(
+                pn.get_base_name(), cpp_scopet::RECURSIVE);
+              for(const auto &id_ptr : ids)
+                if(id_ptr->id_class == cpp_idt::id_classt::TEMPLATE_PARAMETER)
+                  pack_id = id_ptr->identifier;
+            }
+          }
+
+          if(!pack_id.empty())
+          {
+            std::vector<typet> pack_elems;
+            for(std::size_t j = i; j < inst_arguments.size(); j++)
+              if(inst_arguments[j].id() == ID_type)
+                pack_elems.push_back(inst_arguments[j].type());
+
+            cpp_typecheck.template_map.pack_size_map[pack_id] =
+              pack_elems.size();
+            if(!pack_elems.empty())
+            {
+              cpp_typecheck.template_map.pack_args_map[pack_id] = pack_elems;
+              // Keep the pack parameter resolvable as a single type (the
+              // first element) outside a pack expansion; build_template_args
+              // emits the full pack.
+              cpp_typecheck.template_map.type_map[pack_id] = pack_elems.front();
+            }
+            // A zero-length pack leaves the parameter ID_unassigned; the
+            // caller encodes it as a zero-length expansion.
+          }
+          break;
+        }
+
+        if(i >= inst_arguments.size())
+          break;
+
         if(inst_arguments[i].id() == ID_type)
         {
           // The targ might be an "ambiguous" node with a type sub
