@@ -1,0 +1,23 @@
+CORE
+main.cpp
+--cpp20 --object-bits 11 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ zipped two-pack expansion folds: SUCCESS$
+^\[main\.assertion\.2\] line \d+ zipped two-pack expansion folds \(false\): SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+[temp.variadic]/5 + [expr.const]: a constexpr member function template of a
+class template instantiation may expand the enclosing class's parameter pack
+and its own pack simultaneously in one (zipped) pack expansion, e.g.
+`And<ge<Ts, Us>...>::value` -- the shape of libstdc++'s tuple constructor
+constraints `__and_<is_constructible<_Types, _UTypes>...>::value`.  CBMC bound
+only the member's own pack while type-checking such a body, leaving the zipped
+expansion unexpanded so the constexpr call could not be folded.  The class
+template arguments are now brought into the active template map when the
+constexpr member function template definition is instantiated.  Assertions 1-2
+prove the zipped expansion folds to the correct value; assertion 3 (a wrong
+value) must FAIL, proving non-vacuity.
