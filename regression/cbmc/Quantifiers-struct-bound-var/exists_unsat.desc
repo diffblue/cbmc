@@ -1,0 +1,13 @@
+CORE
+exists_unsat.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+Discriminating companion to exists.c on the exists/assumption path: the
+existential quantifier is unsatisfiable -- no struct point has p.x < p.y and
+p.y < p.x -- so the assumption blocks all paths and the assertion is vacuously
+unreachable. A dropped or mis-encoded bound variable would make the assertion
+reachable and fail.

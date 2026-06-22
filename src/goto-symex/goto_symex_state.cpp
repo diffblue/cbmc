@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_iterator.h>
 #include <util/expr_util.h>
 #include <util/invariant.h>
+#include <util/mathematical_expr.h>
 #include <util/std_expr.h>
 
 #include <analyses/dirty.h>
@@ -249,6 +250,31 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
   else
   {
     rename<level>(expr.type(), irep_idt(), ns);
+
+    // For quantifiers, rename the bound variables individually via the symbol
+    // path, which renames their L2 indices but does not apply field
+    // sensitivity. Renaming the whole binding (operand 0) would apply field
+    // sensitivity to it and decompose struct- or array-typed bound-variable
+    // symbols into non-symbol expressions, violating the invariant that
+    // quantifier bound variables are symbols. The body is renamed normally
+    // (with field sensitivity) so that references to program variables remain
+    // connected to their SSA values.
+    //
+    // The loop handles an arbitrary number of bound variables, but downstream
+    // rewrite_quantifiers (symex_main.cpp) only supports a single one
+    // (quant_expr.symbol() asserts variables().size() == 1), so in practice
+    // this is single-iteration. The renamed bound variable stays a symbol (the
+    // symbol path returns an ssa_exprt, which is a symbol_exprt).
+    if(expr.id() == ID_forall || expr.id() == ID_exists)
+    {
+      auto &quantifier = to_quantifier_expr(expr);
+      for(auto &bound_variable : quantifier.variables())
+        bound_variable =
+          to_symbol_expr(rename<level>(std::move(bound_variable), ns).get());
+      quantifier.where() =
+        rename<level>(std::move(quantifier.where()), ns).get();
+      return renamedt<exprt, level>{std::move(expr)};
+    }
 
     // do this recursively
     Forall_operands(it, expr)
