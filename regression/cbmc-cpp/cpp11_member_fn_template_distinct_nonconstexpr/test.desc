@@ -1,0 +1,24 @@
+CORE
+main.cpp
+--cpp20 --object-bits 11 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ sz<char> == 1: SUCCESS$
+^\[main\.assertion\.2\] line \d+ sz<int> distinct entity: SUCCESS$
+^\[main\.assertion\.3\] line \d+ sz<char\[8\]> distinct entity: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG: sz<int>==1 only under collision \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+[temp.spec]/4 + [temp.inst]/2: each specialization of a member function
+template is a distinct entity, including non-constexpr ones.  When the template
+parameters are not reflected in the parameter types (e.g. `template<class U>
+static unsigned sz()`), the specializations share a function signature; CBMC
+used to name them all with the same unsuffixed member symbol, so sz<char>,
+sz<int> and sz<char[8]> collided on one symbol and shared a body.  A member
+function template specialization with a body and no same-signature non-template
+overload now gets a distinct symbol encoding its template arguments.  Assertions
+1-3 prove the specializations are independent with correct values at run time;
+assertion 4 (which held only under the unsound collision) must now FAIL, proving
+non-vacuity.
