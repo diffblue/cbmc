@@ -180,6 +180,13 @@ protected:
 
   void bounds_check(const exprt &, const guardt &);
   void bounds_check_index(const index_exprt &, const guardt &);
+  /// Adds a `<name> lower bound` array-bounds property asserting that
+  /// \p offset_or_index is non-negative.
+  void add_array_lower_bound_check(
+    const exprt &offset_or_index,
+    const index_exprt &expr,
+    const std::string &name,
+    const guardt &guard);
   void bounds_check_bit_count(const unary_exprt &, const guardt &);
   void div_by_zero_check(const div_exprt &, const guardt &);
   void float_div_by_zero_check(const div_exprt &, const guardt &);
@@ -1581,6 +1588,42 @@ void goto_check_ct::bounds_check(const exprt &expr, const guardt &guard)
   }
 }
 
+/// \return true if an array index needs an explicit lower-bound (>= 0) check,
+/// i.e. it is not of an unsigned or natural type, not a cast from an unsigned
+/// type, and not a statically non-negative constant.  A natural index is
+/// non-negative by construction; it never arises for byte-sized arrays, so
+/// excluding it here is also correct for that path.
+static bool array_index_needs_lower_bound_check(const exprt &index)
+{
+  if(index.type().id() == ID_unsignedbv || index.type().id() == ID_natural)
+    return false;
+  if(
+    index.id() == ID_typecast &&
+    to_typecast_expr(index).op().type().id() == ID_unsignedbv)
+  {
+    return false;
+  }
+  const auto i = numeric_cast<mp_integer>(index);
+  return !i.has_value() || *i < 0;
+}
+
+void goto_check_ct::add_array_lower_bound_check(
+  const exprt &offset_or_index,
+  const index_exprt &expr,
+  const std::string &name,
+  const guardt &guard)
+{
+  exprt zero = from_integer(0, offset_or_index.type());
+  add_guarded_property(
+    binary_relation_exprt{offset_or_index, ID_ge, std::move(zero)},
+    name + " lower bound",
+    "array bounds",
+    true, // fatal
+    expr.find_source_location(),
+    expr,
+    guard);
+}
+
 void goto_check_ct::bounds_check_index(
   const index_exprt &expr,
   const guardt &guard)
@@ -1605,10 +1648,10 @@ void goto_check_ct::bounds_check_index(
   // resulting assertions stay in the integer domain and can be handled by SMT
   // solvers.
   std::optional<object_descriptor_exprt> ode;
-  // effective_index is only used in the non-byte-sized path; it strips
-  // bitvector casts from integer/natural types to keep assertions in the
-  // integer domain.
-  exprt effective_index = index;
+  // effective_index is only set (and used) in the non-byte-sized path; it
+  // strips bitvector casts from integer/natural types to keep the assertions
+  // in the integer domain.
+  std::optional<exprt> effective_index;
   if(!size_of_expr(expr.type(), ns).has_value())
   {
     // Arrays with non-byte-sized element types arise from internal modeling
@@ -1629,97 +1672,43 @@ void goto_check_ct::bounds_check_index(
       root->id() != ID_dereference,
       "arrays with non-byte-sized element types should not be accessed via "
       "pointer dereference");
+
+    // strip a bitvector cast from an integer/natural type so the assertion
+    // stays in the integer domain
+    exprt stripped = index;
     if(
-      effective_index.id() == ID_typecast &&
-      (to_typecast_expr(effective_index).op().type().id() == ID_integer ||
-       to_typecast_expr(effective_index).op().type().id() == ID_natural))
+      stripped.id() == ID_typecast &&
+      (to_typecast_expr(stripped).op().type().id() == ID_integer ||
+       to_typecast_expr(stripped).op().type().id() == ID_natural))
     {
-      effective_index = to_typecast_expr(effective_index).op();
+      stripped = to_typecast_expr(stripped).op();
     }
+    effective_index = std::move(stripped);
 
-    if(
-      effective_index.type().id() != ID_unsignedbv &&
-      effective_index.type().id() != ID_natural)
-    {
-      // we undo typecasts to signedbv
-      if(
-        effective_index.id() == ID_typecast &&
-        to_typecast_expr(effective_index).op().type().id() == ID_unsignedbv)
-      {
-        // ok
-      }
-      else
-      {
-        const auto i = numeric_cast<mp_integer>(effective_index);
-
-        if(!i.has_value() || *i < 0)
-        {
-          exprt zero = from_integer(0, effective_index.type());
-
-          binary_relation_exprt inequality(
-            effective_index, ID_ge, std::move(zero));
-
-          add_guarded_property(
-            inequality,
-            name + " lower bound",
-            "array bounds",
-            true, // fatal
-            expr.find_source_location(),
-            expr,
-            guard);
-        }
-      }
-    }
+    if(array_index_needs_lower_bound_check(*effective_index))
+      add_array_lower_bound_check(*effective_index, expr, name, guard);
   }
   else
   {
     ode.emplace();
     ode->build(expr, ns);
 
-    if(index.type().id() != ID_unsignedbv)
+    if(array_index_needs_lower_bound_check(index))
     {
-      // we undo typecasts to signedbv
-      if(
-        index.id() == ID_typecast &&
-        to_typecast_expr(index).op().type().id() == ID_unsignedbv)
+      exprt effective_offset = ode->offset();
+
+      if(ode->root_object().id() == ID_dereference)
       {
-        // ok
+        exprt p_offset =
+          pointer_offset(to_dereference_expr(ode->root_object()).pointer());
+
+        effective_offset = plus_exprt{
+          p_offset,
+          typecast_exprt::conditional_cast(effective_offset, p_offset.type())};
       }
-      else
-      {
-        const auto i = numeric_cast<mp_integer>(index);
 
-        if(!i.has_value() || *i < 0)
-        {
-          exprt effective_offset = ode->offset();
-
-          if(ode->root_object().id() == ID_dereference)
-          {
-            exprt p_offset =
-              pointer_offset(to_dereference_expr(ode->root_object()).pointer());
-
-            effective_offset = plus_exprt{
-              p_offset,
-              typecast_exprt::conditional_cast(
-                effective_offset, p_offset.type())};
-          }
-
-          exprt zero = from_integer(0, effective_offset.type());
-
-          // the final offset must not be negative
-          binary_relation_exprt inequality(
-            effective_offset, ID_ge, std::move(zero));
-
-          add_guarded_property(
-            inequality,
-            name + " lower bound",
-            "array bounds",
-            true, // fatal
-            expr.find_source_location(),
-            expr,
-            guard);
-        }
-      }
+      // the final offset must not be negative
+      add_array_lower_bound_check(effective_offset, expr, name, guard);
     }
   }
 
@@ -1806,9 +1795,9 @@ void goto_check_ct::bounds_check_index(
     // casts stripped) and cast the size to match
     PRECONDITION(size.is_not_nil());
     binary_relation_exprt inequality{
-      effective_index,
+      *effective_index,
       ID_lt,
-      typecast_exprt::conditional_cast(size, effective_index.type())};
+      typecast_exprt::conditional_cast(size, effective_index->type())};
 
     add_guarded_property(
       inequality,
