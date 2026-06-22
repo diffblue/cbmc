@@ -162,6 +162,16 @@ void template_mapt::apply(typet &type) const
   {
     apply(to_pointer_type(type).base_type());
   }
+  else if(type.id() == ID_frontend_pointer)
+  {
+    // A pointer/reference written in source is an `ID_frontend_pointer`
+    // (turned into `ID_pointer` only during type-checking) whose pointee is
+    // its `subtype`.  Recurse into it so that template parameters appearing
+    // in a pointer/reference pattern -- e.g. the `Ts` in a pack expansion
+    // `Ts&...` or `const Ts&...`, the shape of std::tuple's
+    // `const _Elements&...` constructor arguments -- are substituted.
+    apply(to_type_with_subtype(type).subtype());
+  }
   else if(type.id()==ID_struct ||
           type.id()==ID_union)
   {
