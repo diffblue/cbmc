@@ -1,23 +1,23 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20 --object-bits 11 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ constexpr member fn template as constant: SUCCESS$
-^VERIFICATION SUCCESSFUL$
-^EXIT=0$
+^\[main\.assertion\.2\] line \d+ sz<char> == 1: SUCCESS$
+^\[main\.assertion\.3\] line \d+ sz<int> distinct: SUCCESS$
+^\[main\.assertion\.4\] line \d+ runtime: distinct bodies: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG sz<int>==1 \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
 --
-KNOWNBUG: [expr.const] / [temp.inst] -- a call to a constexpr static member
-function *template* with explicit template arguments (TC::ok<int>()) must be a
-constant expression.  CBMC folds a plain constexpr function call but resolves a
-member-function-template call to the generic (un-instantiated) template, whose
-body still references the template parameter; the constexpr mini-interpreter
-(try_evaluate_constexpr) then cannot fold it, so it is rejected with "expected
-constant expression, but got 'ok()'".  This is the remaining blocker for
-std::get<i> on a std::tuple: libstdc++'s tuple constructors are constrained by
-such constexpr static member function templates
-(_TupleConstraints::__is_explicitly_constructible<...>() etc.) in their enable_if
-conditions, so the tuple cannot be constructed and std::get is silently dropped.
-Flip to CORE once constexpr member-function-template calls are instantiated and
-evaluated as constant expressions.
+[temp.inst]/5 + [expr.const]: a call to a constexpr static member function
+template with explicit template arguments must be usable as a constant
+expression, which requires implicitly instantiating the specialization's
+definition.  CBMC previously left the member function template uninstantiated
+(its body still referenced the template parameter), so the call could not be
+folded; distinct specializations also collided on a single unsuffixed member
+symbol (unsound).  Assertions 1-4 prove the call folds and that distinct
+specializations are independent entities with correct values; assertion 5 (a
+wrong value) must FAIL, proving non-vacuity.
