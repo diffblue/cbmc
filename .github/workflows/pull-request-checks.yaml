@@ -844,11 +844,22 @@ jobs:
               exit 1
             }
           }
-          choco install winflexbison3
-          if($LastExitCode -ne 0)
+          if (-not (Get-Command win_flex -ErrorAction SilentlyContinue))
           {
-            Write-Output "::error ::Dependency installation via Chocolatey failed."
-            exit $LastExitCode
+            # Only contact the Chocolatey servers when the package is not
+            # already present (restored from the cache above or pre-installed on
+            # the runner).  This lets the step succeed from cache when the
+            # Chocolatey infrastructure is unavailable.
+            choco install -y winflexbison3
+            if($LastExitCode -ne 0)
+            {
+              Write-Output "::error ::Dependency installation via Chocolatey failed."
+              exit $LastExitCode
+            }
+          }
+          else
+          {
+            Write-Output "winflexbison3 restored from cache; skipping Chocolatey install."
           }
           Require-Tool win_flex
           Require-Tool win_bison
@@ -933,11 +944,31 @@ jobs:
               exit 1
             }
           }
-          choco install -y winflexbison3 strawberryperl wget
-          if($LastExitCode -ne 0)
+          # Only contact the Chocolatey servers for packages that are not
+          # already present (restored from the cache above or pre-installed on
+          # the runner -- which ships Strawberry Perl).  This lets the step
+          # succeed from cache when the Chocolatey infrastructure is unavailable.
+          #
+          # `perl` is only used to run regression's test.pl, so any Perl
+          # interpreter already on PATH is sufficient; we therefore install
+          # strawberryperl only when no perl at all is found (strawberryperl,
+          # unlike winflexbison3/wget, is intentionally not cached).
+          $toInstall = @()
+          if (-not (Get-Command win_flex -ErrorAction SilentlyContinue)) { $toInstall += 'winflexbison3' }
+          if (-not (Get-Command perl     -ErrorAction SilentlyContinue)) { $toInstall += 'strawberryperl' }
+          if (-not (Get-Command wget.exe -ErrorAction SilentlyContinue)) { $toInstall += 'wget' }
+          if ($toInstall.Count -gt 0)
           {
-            Write-Output "::error ::Dependency installation via Chocolatey failed."
-            exit $LastExitCode
+            choco install -y $toInstall
+            if($LastExitCode -ne 0)
+            {
+              Write-Output "::error ::Dependency installation via Chocolatey failed."
+              exit $LastExitCode
+            }
+          }
+          else
+          {
+            Write-Output "All Chocolatey dependencies already present; skipping install."
           }
           Require-Tool win_flex
           Require-Tool win_bison
@@ -1038,11 +1069,22 @@ jobs:
               exit 1
             }
           }
-          choco install winflexbison3
-          if($LastExitCode -ne 0)
+          if (-not (Get-Command win_flex -ErrorAction SilentlyContinue))
           {
-            Write-Output "::error ::Dependency installation via Chocolatey failed."
-            exit $LastExitCode
+            # Only contact the Chocolatey servers when the package is not
+            # already present (restored from the cache above or pre-installed on
+            # the runner).  This lets the step succeed from cache when the
+            # Chocolatey infrastructure is unavailable.
+            choco install -y winflexbison3
+            if($LastExitCode -ne 0)
+            {
+              Write-Output "::error ::Dependency installation via Chocolatey failed."
+              exit $LastExitCode
+            }
+          }
+          else
+          {
+            Write-Output "winflexbison3 restored from cache; skipping Chocolatey install."
           }
           Require-Tool win_flex
           Require-Tool win_bison

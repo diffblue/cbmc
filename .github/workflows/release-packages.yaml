@@ -281,11 +281,22 @@ jobs:
               exit 1
             }
           }
-          choco install winflexbison3
-          if($LastExitCode -ne 0)
+          if (-not (Get-Command win_flex -ErrorAction SilentlyContinue))
           {
-            Write-Output "::error ::Dependency installation via Chocolatey failed."
-            exit $LastExitCode
+            # Only contact the Chocolatey servers when the package is not
+            # already present (restored from the cache above or pre-installed on
+            # the runner).  This lets the step succeed from cache when the
+            # Chocolatey infrastructure is unavailable.
+            choco install -y winflexbison3
+            if($LastExitCode -ne 0)
+            {
+              Write-Output "::error ::Dependency installation via Chocolatey failed."
+              exit $LastExitCode
+            }
+          }
+          else
+          {
+            Write-Output "winflexbison3 restored from cache; skipping Chocolatey install."
           }
           Require-Tool win_flex
           Require-Tool win_bison
