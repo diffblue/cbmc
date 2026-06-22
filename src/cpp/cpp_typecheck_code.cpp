@@ -900,6 +900,50 @@ void cpp_typecheckt::typecheck_code(codet &code)
         get_message_handler().set_verbosity(saved_verbosity);
       }
 
+      // Eligibility probe: the get-protocol is only usable if get<0>(e) itself
+      // resolves.  Some library types have a tuple_size specialization yet
+      // their get<i> cannot be evaluated here (e.g. std::tuple's heavily
+      // constrained accessors); for those, fall back to the data-member
+      // decomposition below rather than silently dropping the bindings.
+      if(has_tuple_size && ts_value > 0)
+      {
+        const std::size_t saved_errors =
+          get_message_handler().get_message_count(messaget::M_ERROR);
+        const unsigned saved_verbosity = get_message_handler().get_verbosity();
+        get_message_handler().set_verbosity(0);
+        try
+        {
+          cpp_save_scopet save_scope(cpp_scopes);
+          exprt get_name{ID_cpp_name};
+          {
+            auto &sub = get_name.get_sub();
+            sub.push_back(irept{ID_name});
+            sub.back().set(ID_identifier, "get");
+            irept targs{ID_template_args};
+            targs.add(ID_arguments)
+              .get_sub()
+              .push_back(from_integer(0, size_type()));
+            sub.push_back(targs);
+            get_name.add_source_location() = loc;
+          }
+          exprt probe_arg = init;
+          side_effect_expr_function_callt probe_call{
+            get_name, {probe_arg}, uninitialized_typet{}, loc};
+          typecheck_expr(probe_call);
+          if(
+            probe_call.type().is_nil() || probe_call.type().id() == ID_empty ||
+            probe_call.type().id().empty())
+            has_tuple_size = false;
+        }
+        catch(...)
+        {
+          has_tuple_size = false;
+          get_message_handler().set_message_count(
+            messaget::M_ERROR, saved_errors);
+        }
+        get_message_handler().set_verbosity(saved_verbosity);
+      }
+
       if(has_tuple_size)
       {
         if(ts_value != binding_list.size())
@@ -915,15 +959,16 @@ void cpp_typecheckt::typecheck_code(codet &code)
           id2string(cpp_scopes.current_scope().prefix);
         const bool is_ref = code.get_bool(ID_C_reference);
 
-        // Hidden source object: a copy of the initialiser (auto [...]) or a
-        // reference to it (auto& [...]).
+        // __sb is a reference (pointer) to the source object -- the original
+        // lvalue or the materialised temporary.  We deliberately do not copy
+        // the whole object even for an `auto` (by-value) binding: copying it
+        // would invoke its copy constructor, which for some library types
+        // (e.g. std::tuple, whose constructors are heavily constrained) cannot
+        // be evaluated here.  Each `auto` binding is still an independent copy
+        // of get<i>(e), so the bindings are value-independent of the source.
         const std::string sb_id = scope_prefix + "__sb";
-        typet sb_type = init.type();
-        if(is_ref)
-        {
-          sb_type = pointer_type(init.type());
-          sb_type.set(ID_C_reference, true);
-        }
+        typet sb_type = pointer_type(init.type());
+        sb_type.set(ID_C_reference, true);
         {
           auxiliary_symbolt sym;
           sym.name = sb_id;
@@ -942,39 +987,16 @@ void cpp_typecheckt::typecheck_code(codet &code)
         block.add_source_location() = loc;
 
         symbol_exprt sb_expr{sb_id, sb_type};
-        if(is_ref)
         {
-          // auto& [...]: __sb is a reference (pointer) bound to the source.
           codet sb_assign{ID_assign};
           sb_assign.copy_to_operands(sb_expr);
           sb_assign.copy_to_operands(address_of_exprt{init});
           sb_assign.add_source_location() = loc;
           block.add(std::move(sb_assign));
         }
-        else
-        {
-          // auto [...]: __sb is a copy of the source.  Copy-construct it
-          // (invoking the copy constructor) so base subobjects of a class with
-          // base classes -- e.g. std::tuple's recursive storage -- are copied;
-          // a plain assignment would not.
-          exprt init_wrapped = already_typechecked_exprt{init};
-          auto cons = cpp_constructor(loc, sb_expr, {init_wrapped});
-          if(cons.has_value())
-            block.add(std::move(cons.value()));
-          else
-          {
-            codet sb_assign{ID_assign};
-            sb_assign.copy_to_operands(sb_expr);
-            sb_assign.copy_to_operands(init);
-            sb_assign.add_source_location() = loc;
-            block.add(std::move(sb_assign));
-          }
-        }
 
-        // The object passed to get<i> is __sb (by value) or *__sb (by ref).
-        exprt get_arg = sb_expr;
-        if(is_ref)
-          get_arg = dereference_exprt{sb_expr, init.type()};
+        // get<i> is applied to *__sb (the source object).
+        exprt get_arg = dereference_exprt{sb_expr, init.type()};
 
         for(std::size_t i = 0; i < binding_list.size(); ++i)
         {
