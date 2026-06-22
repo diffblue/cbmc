@@ -4222,22 +4222,17 @@ skip_pack_removal_ft:
       // specializations share one function signature and would collide
       // on a single unsuffixed member symbol -- unsound when their
       // values differ (e.g. `template<class U> static unsigned sz()`
-      // returning sizeof(U), or std::get<N>).  Mark *constexpr* member
-      // function template instances so typecheck_member_function encodes
-      // the instantiation suffix into the symbol name, giving each
-      // specialization a distinct symbol.  This is scoped to constexpr
-      // members because (a) those are exactly the value-dependent ones
-      // whose collision is unsound and that are folded as constant
-      // expressions, and (b) their definitions are instantiated eagerly
-      // just below, so each suffixed instance is guaranteed a
-      // type-checked body.  Non-constexpr member function templates keep
-      // their existing names: separating them would expose instances
-      // whose bodies CBMC cannot elaborate (e.g. std::_Any_data's
-      // reinterpret-cast accessor templates), which today work only
-      // because they collide with a non-template overload that has a
-      // body.
-      if(new_decl.storage_spec().is_constexpr())
-        new_decl.declarators()[0].set("#member_fn_template_instance", true);
+      // returning sizeof(U), or std::get<N>).  Mark the instance so
+      // typecheck_member_function encodes the instantiation suffix into
+      // its symbol name, giving each specialization a distinct symbol.
+      // The actual suffixing there is gated on the instance having a
+      // body: a member function template whose definition CBMC cannot
+      // carry into the instance (e.g. std::_Any_data's reinterpret-cast
+      // accessor templates _M_access<T>, whose body does not survive
+      // instantiation) must keep its current name so that it merges with
+      // -- and reuses the body of -- a non-template overload, which is
+      // how it works today.
+      new_decl.declarators()[0].set("#member_fn_template_instance", true);
       // [temp.inst]/2 + [temp.deduct]/8: substituting and type-
       // checking a compound member declaration during template
       // instantiation is a SFINAE immediate context — a failure
