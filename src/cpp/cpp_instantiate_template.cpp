@@ -4216,6 +4216,28 @@ skip_pack_removal_ft:
     // may fail when function template parameters are not in the
     // class template map.  Catch and return the template symbol.
     {
+      // [temp.spec]/4 + [temp.inst]/2: each specialization of a member
+      // function template is a distinct entity.  When the template
+      // parameters do not appear in the parameter types, distinct
+      // specializations share one function signature and would collide
+      // on a single unsuffixed member symbol -- unsound when their
+      // values differ (e.g. `template<class U> static unsigned sz()`
+      // returning sizeof(U), or std::get<N>).  Mark *constexpr* member
+      // function template instances so typecheck_member_function encodes
+      // the instantiation suffix into the symbol name, giving each
+      // specialization a distinct symbol.  This is scoped to constexpr
+      // members because (a) those are exactly the value-dependent ones
+      // whose collision is unsound and that are folded as constant
+      // expressions, and (b) their definitions are instantiated eagerly
+      // just below, so each suffixed instance is guaranteed a
+      // type-checked body.  Non-constexpr member function templates keep
+      // their existing names: separating them would expose instances
+      // whose bodies CBMC cannot elaborate (e.g. std::_Any_data's
+      // reinterpret-cast accessor templates), which today work only
+      // because they collide with a non-template overload that has a
+      // body.
+      if(new_decl.storage_spec().is_constexpr())
+        new_decl.declarators()[0].set("#member_fn_template_instance", true);
       // [temp.inst]/2 + [temp.deduct]/8: substituting and type-
       // checking a compound member declaration during template
       // instantiation is a SFINAE immediate context — a failure
