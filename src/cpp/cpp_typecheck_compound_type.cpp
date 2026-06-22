@@ -2585,25 +2585,41 @@ void cpp_typecheckt::typecheck_member_function(
   // [temp.spec]/4 + [temp.inst]/2: a member function template
   // specialization is a distinct entity for each set of template
   // arguments.  When instantiating one (marker set by
-  // instantiate_template -- only for constexpr member function
-  // templates), this runs in the function template's instantiation
-  // sub-scope, whose `suffix` encodes the template arguments (e.g.
-  // "<int>") while its `prefix` is only the enclosing class's prefix.
-  // Include that suffix in the symbol name -- mirroring the class/type
-  // naming path -- so that distinct specializations such as TC::f<int>
-  // and TC::f<long> get distinct symbols rather than colliding on a
-  // single unsuffixed TC::f (unsound when their values differ).
-  // Constructors and destructors are excluded: their template
-  // parameters are deduced from their parameter types, so the signature
-  // already distinguishes specializations.
+  // instantiate_template), this runs in the function template's
+  // instantiation sub-scope, whose `suffix` encodes the template
+  // arguments (e.g. "<int>") while its `prefix` is only the enclosing
+  // class's prefix.  Include that suffix in the symbol name -- mirroring
+  // the class/type naming path -- so that distinct specializations such
+  // as TC::f<int> and TC::f<long> get distinct symbols rather than
+  // colliding on a single unsuffixed TC::f (unsound when their values
+  // differ, e.g. sizeof(U) or std::get<N>).  Exclusions:
+  //   * Constructors/destructors: their template parameters are deduced
+  //     from the parameter types, so the signature already distinguishes
+  //     specializations.
+  //   * Instances without a body (`value` nil): nothing to give a
+  //     distinct symbol.
+  //   * Instances whose unsuffixed name already names another symbol:
+  //     that is a non-template overload of the same signature (e.g.
+  //     std::_Any_data's `_M_access()` alongside the accessor template
+  //     `_M_access<T>()`).  Such a member function template's own
+  //     definition may not survive instantiation in CBMC; it works only
+  //     by merging with -- and reusing the body of -- that non-template
+  //     overload, which the existing same-signature merge in this
+  //     function provides.  Keep its unsuffixed name so that merge still
+  //     happens; giving it a distinct (then bodyless) symbol would make
+  //     calls return nondet.
   const bool is_ctor_or_dtor =
     component.type().id() == ID_code &&
     (to_code_type(component.type()).return_type().id() == ID_constructor ||
      to_code_type(component.type()).return_type().id() == ID_destructor);
+  const irep_idt unsuffixed_id = cpp_scopes.current_scope().prefix +
+                                 id2string(component.get_base_name()) +
+                                 id2string(f_id);
+  const bool suffix_instance =
+    component.get_bool("#member_fn_template_instance") && !is_ctor_or_dtor &&
+    value.is_not_nil() && !symbol_table.has_symbol(unsuffixed_id);
   const irep_idt instance_suffix =
-    (component.get_bool("#member_fn_template_instance") && !is_ctor_or_dtor)
-      ? cpp_scopes.current_scope().suffix
-      : irep_idt();
+    suffix_instance ? cpp_scopes.current_scope().suffix : irep_idt();
   const irep_idt identifier = cpp_scopes.current_scope().prefix +
                               id2string(component.get_base_name()) +
                               id2string(instance_suffix) + id2string(f_id);
