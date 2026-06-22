@@ -4307,6 +4307,35 @@ skip_pack_removal_ft:
       {
         const std::size_t errors_before =
           get_message_handler().get_message_count(messaget::M_ERROR);
+        // [temp.variadic]/5: if this member function template belongs to a
+        // class template instantiation, its body may expand the *class*
+        // parameter pack alongside its own (e.g. the constexpr tuple-
+        // constructor constraints `__and_<is_constructible<_Types,
+        // _UTypes>...>::value`).  Bring the class's template arguments into
+        // the active template map -- as the deferred method-body pass does
+        // via add_method_body -- so that such a zipped multi-pack expansion
+        // resolves both packs; otherwise the class pack stays unbound, the
+        // expansion is left unexpanded, and the constexpr call cannot be
+        // folded.  build() merges, preserving this function's own pack.
+        cpp_saved_template_mapt saved_eager_map(template_map);
+        {
+          const irep_idt &member_class = ws.type.get(ID_C_member_name);
+          if(!member_class.empty())
+          {
+            const symbolt *class_sym = symbol_table.lookup(member_class);
+            if(
+              class_sym != nullptr &&
+              class_sym->type.find(ID_C_template).is_not_nil() &&
+              class_sym->type.find(ID_C_template_arguments).is_not_nil())
+            {
+              template_map.build(
+                static_cast<const template_typet &>(
+                  class_sym->type.find(ID_C_template)),
+                static_cast<const cpp_template_args_tct &>(
+                  class_sym->type.find(ID_C_template_arguments)));
+            }
+          }
+        }
         try
         {
           convert_function(ws);
