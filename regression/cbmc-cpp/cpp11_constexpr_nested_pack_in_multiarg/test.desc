@@ -1,0 +1,20 @@
+KNOWNBUG
+main.cpp
+--cpp20 --object-bits 11 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ nested pack expansion in multi-arg template-id folds: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+KNOWNBUG: [temp.variadic]/5 + [expr.const] -- when a constexpr member function
+template body forms an outer template-id with multiple arguments, one of which
+is a template-id containing a pack expansion (`And<bc<true>, And<ge<Ts,
+Us>...>>::value`), CBMC does not expand the nested pack (it is not at the top of
+the outer argument), so the constexpr call cannot be folded and the assertion is
+dropped (vacuous).  This is the remaining blocker for std::get on a std::tuple:
+libstdc++'s _TupleConstraints::__is_explicitly_constructible nests
+pack-expanding template-ids inside a multi-argument __and_.  A single zipped
+expansion already folds (cpp11_constexpr_zipped_pack_expansion); reclassify CORE
+once nested pack expansions in multi-argument template-ids are expanded too.
