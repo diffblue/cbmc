@@ -1,0 +1,24 @@
+CORE
+main.cpp
+--cpp20 --object-bits 11 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ f<char>\(\) == 1: SUCCESS$
+^\[main\.assertion\.2\] line \d+ f<int>\(\) distinct entity: SUCCESS$
+^\[main\.assertion\.3\] line \d+ non-template f\(\) == 0: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG: f<int>\(\)==0 only under collision \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+[temp.spec]/4 + [over.match]: a member function template and a non-template
+member function may share a signature (`unsigned f()` vs `template<class U>
+unsigned f()`).  `f<U>()` selects the template, `f()` the non-template; each
+specialization is a distinct entity.  CBMC named the template specializations
+with the same unsuffixed member symbol as the non-template overload, so
+f<char>(), f<int>() and f() collided on one symbol and shared the non-template's
+body (returning 0 -- unsound).  A value-dependent member function template
+specialization shadowing a same-signature non-template overload, whose own
+definition survives instantiation, now gets a distinct symbol.  Assertions 1-3
+prove the three entities are independent with correct values; assertion 4 (which
+held only under the unsound collision) must now FAIL, proving non-vacuity.
