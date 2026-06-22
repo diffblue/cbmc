@@ -1738,12 +1738,16 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
   // pack expansion UNEXPANDED.  Without expanding it here, the pack is later
   // resolved as its (scalar) type_map binding and collapses to a single
   // element.  Such an argument may be tagged either `ambiguous` (the parser's
-  // could-be-type-or-expression form) or `type` (already resolved to a type);
-  // both forms must be expanded.  A `type` pack-expansion argument carrying a
-  // multi-element class parameter pack -- the shape of `__and_<is_default_-
-  // constructible<_Types>...>::value` in std::tuple's constructor SFINAE --
-  // previously fell through unexpanded, so the constexpr trait could not be
-  // folded for tuples of two or more elements.
+  // could-be-type-or-expression form) or `type` (already resolved to a type),
+  // and its pattern type need not be a bare `cpp_name`: a pack expansion
+  // `const _Elements&...` (the shape of std::tuple's constructor arguments)
+  // arrives with the ellipsis on a pointer/reference (`frontend_pointer`) or
+  // cv-qualified pattern.  The actual packs are found by walking the whole
+  // pattern below, so the only gate here is the ellipsis: expand whenever the
+  // argument is a (top-level) pack expansion.  Previously requiring the
+  // pattern to be a bare `cpp_name` left such qualified patterns unexpanded,
+  // collapsing the pack to a single element so the surrounding constexpr trait
+  // could not be folded for two or more elements.
   if(
     !template_map.pack_args_map.empty() && !disable_template_arg_pack_expansion)
   {
@@ -1754,7 +1758,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       bool did_expand = false;
       if(
         (arg.id() == ID_ambiguous || arg.id() == ID_type) &&
-        arg.type().id() == ID_cpp_name && arg.type().get_bool(ID_ellipsis))
+        arg.type().get_bool(ID_ellipsis))
       {
         // Collect the parameter packs referenced anywhere in the pattern
         // (suffix match against the active packs).
