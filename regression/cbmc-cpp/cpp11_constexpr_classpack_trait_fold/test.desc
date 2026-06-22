@@ -1,0 +1,28 @@
+CORE
+main.cpp
+--cpp20 --object-bits 11 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ class-pack trait folds true: SUCCESS$
+^\[main\.assertion\.2\] line \d+ class-pack trait folds false: SUCCESS$
+^\[main\.assertion\.3\] line \d+ explicit-constructible shape folds true: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+[temp.variadic]/4-5 + [expr.const]: a constexpr function body that expands a
+class parameter pack into a trait -- `__and_<is_default_constructible<_Types>
+...>::value`, the shape of std::tuple's constructor SFINAE
+(_TupleConstraints::__is_explicitly_default_constructible /
+__is_explicitly_constructible) -- must fold.  CBMC expanded a pack-expansion
+template argument only when it arrived tagged `ambiguous`; an argument already
+resolved to `type` carrying a multi-element class pack fell through unexpanded
+and collapsed to a single element, so the trait stayed unresolved and the
+constexpr call could not be folded.  Single-element packs worked via the
+single-element type_map convenience, so only tuples of >= 2 elements were
+affected.  Fixed by expanding both `type` and `ambiguous` pack-expansion
+arguments.  Assertions 1-3 cover the default-constructible shape (true/false)
+and the explicit-constructible shape (multi-arg __and_ with nested
+__not_<__and_<...>>); assertion 4 (a wrong value) must FAIL, proving
+non-vacuity.
