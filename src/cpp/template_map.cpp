@@ -894,6 +894,14 @@ void template_mapt::apply(typet &type) const
 
 void template_mapt::apply(exprt &expr) const
 {
+  // A `sizeof...(Pack)` pack-size query must keep its pack name unsubstituted:
+  // it is resolved against pack_size_map later ([expr.sizeof]/5).  In
+  // particular, a single-element pack records a convenience type_map[Pack]
+  // entry; substituting it here would turn `sizeof...(Pack)` into
+  // `sizeof(<element type>)`.
+  if(expr.get_bool("#sizeof_pack"))
+    return;
+
   apply(expr.type());
 
   // Recursively apply to ALL named sub-nodes to handle deeply
