@@ -4997,9 +4997,12 @@ void cpp_typecheck_resolvet::guess_template_args(
 
             cpp_typecheck.template_map.pack_size_map[pack_id] =
               pack_elems.size();
+            // Record the pack arguments (possibly empty): an explicit empty
+            // entry lets a zero-length pack expansion in the matched pattern
+            // (e.g. primary<Types...> with Types = <>) expand to no arguments.
+            cpp_typecheck.template_map.pack_args_map[pack_id] = pack_elems;
             if(!pack_elems.empty())
             {
-              cpp_typecheck.template_map.pack_args_map[pack_id] = pack_elems;
               // Keep the pack parameter resolvable as a single type (the
               // first element) outside a pack expansion; build_template_args
               // emits the full pack.
