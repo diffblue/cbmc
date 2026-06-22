@@ -1,20 +1,26 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20 --object-bits 11 --no-unwinding-assertions
-^\[main\.assertion\.1\] line \d+ nested pack expansion in multi-arg template-id folds: SUCCESS$
-^VERIFICATION SUCCESSFUL$
-^EXIT=0$
+^\[main\.assertion\.1\] line \d+ nested pack expansion in multi-arg template-id folds \(true\): SUCCESS$
+^\[main\.assertion\.2\] line \d+ nested pack expansion in multi-arg template-id folds \(false\): SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
 --
-KNOWNBUG: [temp.variadic]/5 + [expr.const] -- when a constexpr member function
-template body forms an outer template-id with multiple arguments, one of which
-is a template-id containing a pack expansion (`And<bc<true>, And<ge<Ts,
-Us>...>>::value`), CBMC does not expand the nested pack (it is not at the top of
-the outer argument), so the constexpr call cannot be folded and the assertion is
-dropped (vacuous).  This is the remaining blocker for std::get on a std::tuple:
-libstdc++'s _TupleConstraints::__is_explicitly_constructible nests
-pack-expanding template-ids inside a multi-argument __and_.  A single zipped
-expansion already folds (cpp11_constexpr_zipped_pack_expansion); reclassify CORE
-once nested pack expansions in multi-argument template-ids are expanded too.
+[temp.variadic]/5 + [temp.deduct] + [expr.const]: a constexpr member function
+template body that forms an outer template-id with multiple arguments, one of
+which is a template-id containing a pack expansion (`And<bc<true>, And<ge<Ts,
+Us>...>>::value`), used to fail to fold.  This is the std::tuple constructor
+SFINAE shape (`__and_<__constructible<U...>, __not_<__convertible<U...>>>`).
+The root cause was the recursive variadic `And` (`And<B1, Bn...> : bc<B1::value
+&& And<Bn...>::value>`): during a nested instantiation the enclosing instance's
+pack binding `Bn` leaked into the deduction/build of the recursive `And<Bn...>`
+step, which then recursed onto itself and could not resolve `::value`.  Fixed by
+clearing a pack's recorded arguments when deduction resets the parameters and
+when a pack binds to zero elements.  See cpp11_constexpr_recursive_variadic_and
+for the minimal header-free reproduction.  Assertions 1-2 prove the nested
+expansion folds to the correct value (true and false); assertion 3 (a wrong
+value) must FAIL, proving non-vacuity.
