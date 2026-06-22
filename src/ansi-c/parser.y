@@ -184,7 +184,7 @@ int yyansi_cerror(const std::string &error);
 %token TOK_CW_VAR_ARG_TYPEOF "_var_arg_typeof"
 %token TOK_BUILTIN_VA_ARG "__builtin_va_arg"
 %token TOK_GCC_BUILTIN_TYPES_COMPATIBLE_P "__builtin_types_compatible_p"
-%token TOK_CLANG_BUILTIN_CONVERTVECTOR "__builtin_convertvector"
+%token TOK_GCC_BUILTIN_HAS_ATTRIBUTE "__builtin_has_attribute"%token TOK_CLANG_BUILTIN_CONVERTVECTOR "__builtin_convertvector"
 %token TOK_OFFSETOF    "__offsetof"
 %token TOK_ALIGNOF     "__alignof__"
 %token TOK_MSC_TRY     "__try"
@@ -447,6 +447,26 @@ gcc_builtin_expressions:
           subtypes.resize(2);
           subtypes[0].swap(parser_stack($3));
           subtypes[1].swap(parser_stack($5));
+        }
+        | TOK_GCC_BUILTIN_HAS_ATTRIBUTE '('
+           assignment_expression ',' identifier_or_typedef_name ')'
+        {
+          // __builtin_has_attribute(expr, attr): the second operand is a
+          // bare attribute name (e.g. nonstring).  CBMC does not track all
+          // GCC attributes, so we discard the name and yield a constant in
+          // the typecheck phase (see c_typecheck_expr).
+          $$=$1;
+          parser_stack($$).id(ID_gcc_builtin_has_attribute);
+          mto($$, $3);
+        }
+        | TOK_GCC_BUILTIN_HAS_ATTRIBUTE '('
+           assignment_expression ',' identifier_or_typedef_name '(' argument_expression_list ')' ')'
+        {
+          // attribute-with-arguments form, e.g. counted_by(n); arguments
+          // are discarded along with the name.
+          $$=$1;
+          parser_stack($$).id(ID_gcc_builtin_has_attribute);
+          mto($$, $3);
         }
         ;
 

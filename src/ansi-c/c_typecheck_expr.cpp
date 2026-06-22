@@ -261,6 +261,20 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     expr = make_boolean_expr(gcc_types_compatible_p(subtypes[0], subtypes[1]));
     expr.add_source_location()=source_location;
   }
+  else if(expr.id() == ID_gcc_builtin_has_attribute)
+  {
+    // __builtin_has_attribute(expr-or-type, attribute-name).  CBMC does
+    // not model the full set of GCC attributes, so we conservatively
+    // report that the operand does NOT carry the queried attribute.  This
+    // is the sound choice for the kernel's fortify-string _Static_asserts
+    // (which assert a buffer is a NUL-terminated C-string, i.e. NOT marked
+    // __nonstring); returning false keeps those assertions satisfied.  The
+    // first operand is unevaluated (a compile-time query), so it is simply
+    // discarded.
+    source_locationt source_location = expr.source_location();
+    expr = make_boolean_expr(false);
+    expr.add_source_location() = source_location;
+  }
   else if(expr.id()==ID_clang_builtin_convertvector)
   {
     // This has one operand and a type, and acts like a typecast
