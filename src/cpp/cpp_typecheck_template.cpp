@@ -1735,9 +1735,15 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
   // function-template body is type-checked during instantiation, a class
   // template-id such as `Tup<E...>` (or one nesting the pack, e.g.
   // `tuple<typename __decay_and_strip<E>::__type...>`) arrives here with the
-  // pack expansion UNEXPANDED -- a single `ambiguous` cpp_name argument with
-  // an ellipsis.  Without expanding it here, the pack is later resolved as
-  // its (scalar) type_map binding and collapses to a single element.
+  // pack expansion UNEXPANDED.  Without expanding it here, the pack is later
+  // resolved as its (scalar) type_map binding and collapses to a single
+  // element.  Such an argument may be tagged either `ambiguous` (the parser's
+  // could-be-type-or-expression form) or `type` (already resolved to a type);
+  // both forms must be expanded.  A `type` pack-expansion argument carrying a
+  // multi-element class parameter pack -- the shape of `__and_<is_default_-
+  // constructible<_Types>...>::value` in std::tuple's constructor SFINAE --
+  // previously fell through unexpanded, so the constexpr trait could not be
+  // folded for tuples of two or more elements.
   if(
     !template_map.pack_args_map.empty() && !disable_template_arg_pack_expansion)
   {
@@ -1747,8 +1753,8 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
     {
       bool did_expand = false;
       if(
-        arg.id() == ID_ambiguous && arg.type().id() == ID_cpp_name &&
-        arg.type().get_bool(ID_ellipsis))
+        (arg.id() == ID_ambiguous || arg.id() == ID_type) &&
+        arg.type().id() == ID_cpp_name && arg.type().get_bool(ID_ellipsis))
       {
         // Collect the parameter packs referenced anywhere in the pattern
         // (suffix match against the active packs).
