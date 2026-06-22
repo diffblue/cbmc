@@ -1252,6 +1252,22 @@ void template_mapt::build(
       if(pack_args_map[pack_id].size() == 1)
         type_map[pack_id] = pack_args_map[pack_id].front();
     }
+    else
+    {
+      // The pack binds to zero elements.  When a variadic template recurses
+      // with the SAME pack parameter name -- a variadic partial
+      // specialization whose base names the same template,
+      // `And<B1, Bn...> : bc<B1::value && And<Bn...>::value>` -- this
+      // (inner) instance's empty `Bn` shares its identifier with the
+      // enclosing instance's non-empty `Bn`, and `build` runs against the
+      // map inherited from that enclosing instantiation.  Since an empty
+      // pack records no `pack_args_map` entry, the enclosing `Bn = [X]`
+      // would otherwise survive and make `And<Bn...>` expand to the
+      // enclosing instance, recursing onto itself.  Erase any inherited
+      // binding so the empty pack expands to zero arguments ([temp.variadic]).
+      pack_args_map.erase(pack_id);
+      type_map.erase(pack_id);
+    }
   }
 }
 
@@ -1335,6 +1351,22 @@ void template_mapt::build_unassigned(
       tmp.add_source_location()=t.source_location();
       expr_map[t.get(ID_identifier)]=tmp;
     }
+
+    // [temp.deduct]/2: template argument deduction starts from a clean
+    // slate -- the parameters being deduced have no prior assignment.
+    // A parameter pack additionally records its element list/size in
+    // pack_args_map/pack_size_map; these must be cleared too.  Otherwise,
+    // when a variadic template recurses with the SAME pack parameter name
+    // -- a variadic partial specialization whose base names the same
+    // template, `And<B1, Bn...> : ... && And<Bn...>::value` -- the inner
+    // deduction would inherit the enclosing instance's pack arguments
+    // (`Bn = [X]`) instead of deducing an empty pack, so the recursive
+    // `And<Bn...>` would re-expand to the enclosing instance and recurse
+    // onto itself, failing to resolve.
+    const irep_idt &pid =
+      t.id() == ID_type ? t.type().get(ID_identifier) : t.get(ID_identifier);
+    pack_args_map.erase(pid);
+    pack_size_map.erase(pid);
   }
 }
 
