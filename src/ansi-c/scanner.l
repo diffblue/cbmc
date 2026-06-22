@@ -1031,6 +1031,17 @@ enable_or_disable ("enable"|"disable")
 
 "__extension__" { /* ignore */ }
 
+  /* x86 named-address-space (segment) qualifiers used by the kernel's
+     per-CPU accessors (arch/x86/include/asm/percpu.h) when the compiler
+     supports named address spaces (CONFIG_CC_HAS_NAMED_ADDRESS_SPACES).
+     They denote %fs/%gs segment-relative addressing, which is irrelevant
+     to functional verification, so we ignore the qualifier (the pointed-to
+     object is unchanged).  When the compiler lacks the feature these are
+     instead macros expanding to __attribute__((address_space(...))), which
+     the GCC_ATTRIBUTE states already discard. */
+"__seg_fs"      { /* ignore: segment address-space qualifier */ }
+"__seg_gs"      { /* ignore: segment address-space qualifier */ }
+
 "__restrict"    { loc(); return TOK_RESTRICT; }
 "__restrict__"  { loc(); return TOK_RESTRICT; }
 
