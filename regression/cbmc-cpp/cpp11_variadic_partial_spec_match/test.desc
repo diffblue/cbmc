@@ -1,0 +1,23 @@
+CORE
+main.cpp
+--cpp20 --object-bits 11 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ pack of 2 deduced: SUCCESS$
+^\[main\.assertion\.2\] line \d+ pack of 3 deduced: SUCCESS$
+^\[main\.assertion\.3\] line \d+ wrong value FAILs \(non-vacuous\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+[temp.spec.partial.match] / [temp.class.spec]: a class template partial
+specialization whose pattern is a template-id with a pack expansion
+(primary<Types...>) must match a concrete instantiation, deducing the pack.
+CBMC matched the nested template-id arguments positionally and never deduced the
+pack, so the partial specialization was never selected (the incomplete primary
+template was used and the member accesses were silently dropped).  This is the
+shape of std::tuple_size<std::tuple<Types...>> and many variadic traits.
+Assertions 1 and 2 prove the pack of 2 / 3 is deduced; assertion 3 (a wrong
+value) is expected to FAIL, proving the deduced value is genuinely checked
+(non-vacuous).  (A zero-length pack -- primary<> / std::tuple<> -- is a separate
+sub-case that does not yet resolve.)
