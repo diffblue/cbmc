@@ -549,6 +549,9 @@ void cpp_typecheckt::typecheck_compound_declarator(
   component.set_pretty_name(base_name);
   component.add_source_location() = cpp_name.source_location();
 
+  if(declarator.get_bool("#member_fn_template_instance"))
+    component.set("#member_fn_template_instance", true);
+
   if(cpp_name.is_operator())
   {
     component.set(ID_is_operator, true);
@@ -2579,9 +2582,31 @@ void cpp_typecheckt::typecheck_member_function(
 
   irep_idt f_id = function_identifier(component.type());
 
+  // [temp.spec]/4 + [temp.inst]/2: a member function template
+  // specialization is a distinct entity for each set of template
+  // arguments.  When instantiating one (marker set by
+  // instantiate_template -- only for constexpr member function
+  // templates), this runs in the function template's instantiation
+  // sub-scope, whose `suffix` encodes the template arguments (e.g.
+  // "<int>") while its `prefix` is only the enclosing class's prefix.
+  // Include that suffix in the symbol name -- mirroring the class/type
+  // naming path -- so that distinct specializations such as TC::f<int>
+  // and TC::f<long> get distinct symbols rather than colliding on a
+  // single unsuffixed TC::f (unsound when their values differ).
+  // Constructors and destructors are excluded: their template
+  // parameters are deduced from their parameter types, so the signature
+  // already distinguishes specializations.
+  const bool is_ctor_or_dtor =
+    component.type().id() == ID_code &&
+    (to_code_type(component.type()).return_type().id() == ID_constructor ||
+     to_code_type(component.type()).return_type().id() == ID_destructor);
+  const irep_idt instance_suffix =
+    (component.get_bool("#member_fn_template_instance") && !is_ctor_or_dtor)
+      ? cpp_scopes.current_scope().suffix
+      : irep_idt();
   const irep_idt identifier = cpp_scopes.current_scope().prefix +
                               id2string(component.get_base_name()) +
-                              id2string(f_id);
+                              id2string(instance_suffix) + id2string(f_id);
 
   component.set_name(identifier);
   component.set(ID_prefix, id2string(identifier) + "::");
