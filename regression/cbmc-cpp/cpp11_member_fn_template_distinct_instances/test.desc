@@ -1,0 +1,24 @@
+KNOWNBUG
+main.cpp
+--cpp20 --object-bits 11 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ sz<char> == 1: SUCCESS$
+^\[main\.assertion\.2\] line \d+ sz<int> == sizeof\(int\) \(distinct entity\): SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+KNOWNBUG: [temp.spec]/4 + [temp.inst]/2 -- each specialization of a member
+function template is a distinct entity.  When the template parameters are not
+reflected in the parameter types (e.g. `template<class U> static unsigned sz()`),
+CBMC names every specialization with the same unsuffixed member symbol (its
+signature omits the template arguments), so sz<char> and sz<int> collide on one
+symbol and share a single body; sz<int> therefore returns 1 (char's body) and
+assertion 2 currently FAILS (unsound).  Reclassify CORE once such member
+function template specializations get distinct symbols.  (A targeted fix that
+suffixes member-function-template instance names with the template arguments was
+prototyped but regressed std::function's type erasure, whose internal member
+function templates are instantiated with lambda/local-type arguments whose
+synthetic names get context-dependent suffixes; a robust fix needs a stable
+per-specialization mangling.)

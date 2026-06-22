@@ -2,10 +2,9 @@ CORE
 main.cpp
 --cpp20 --object-bits 11 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ constexpr member fn template as constant: SUCCESS$
-^\[main\.assertion\.2\] line \d+ sz<char> == 1: SUCCESS$
-^\[main\.assertion\.3\] line \d+ sz<int> distinct: SUCCESS$
-^\[main\.assertion\.4\] line \d+ runtime: distinct bodies: SUCCESS$
-^\[main\.assertion\.5\] line \d+ WRONG sz<int>==1 \(must FAIL\): FAILURE$
+^\[main\.assertion\.2\] line \d+ sz<int> folds to a constant: SUCCESS$
+^\[main\.assertion\.3\] line \d+ runtime constexpr member fn template: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG sz<int>==1 \(must FAIL\): FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
@@ -16,8 +15,8 @@ main.cpp
 template with explicit template arguments must be usable as a constant
 expression, which requires implicitly instantiating the specialization's
 definition.  CBMC previously left the member function template uninstantiated
-(its body still referenced the template parameter), so the call could not be
-folded; distinct specializations also collided on a single unsuffixed member
-symbol (unsound).  Assertions 1-4 prove the call folds and that distinct
-specializations are independent entities with correct values; assertion 5 (a
-wrong value) must FAIL, proving non-vacuity.
+at constant-evaluation time (its body is type-checked lazily for ordinary
+members), so the call could not be folded.  It now type-checks the constexpr
+specialization's definition eagerly.  Assertions 1-3 prove the call folds in a
+constant context and at run time; assertion 4 (a wrong value) must FAIL,
+proving non-vacuity.
