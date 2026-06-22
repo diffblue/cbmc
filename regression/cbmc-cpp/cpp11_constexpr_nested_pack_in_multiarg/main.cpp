@@ -1,19 +1,20 @@
-// [temp.variadic]/5 + [expr.const]: when a constexpr member function template
-// body forms an outer template-id with MULTIPLE arguments, one of which is
-// itself a template-id containing a pack expansion (e.g. `And<bc<true>,
-// And<ge<Ts, Us>...>>::value`, or libstdc++'s
-// `__and_<__constructible<U...>, __not_<__convertible<U...>>>::value`), CBMC
-// does not expand the nested pack: the pack expansion is not at the top of the
-// outer argument, so it is left unexpanded and the constexpr call cannot be
-// folded ("expected constant expression, but got 'ok()'").
+// [temp.variadic]/5 + [temp.deduct] + [expr.const]: a constexpr member function
+// template body forms an outer template-id with MULTIPLE arguments, one of which
+// is itself a template-id containing a pack expansion -- `And<bc<true>,
+// And<ge<Ts, Us>...>>::value`, the shape of libstdc++'s
+// `__and_<__constructible<U...>, __not_<__convertible<U...>>>::value`
+// (std::tuple's constructor SFINAE).
 //
-// KNOWNBUG: this is the remaining blocker for std::get on a std::tuple --
-// libstdc++'s tuple constructor SFINAE (_TupleConstraints::
-// __is_explicitly_constructible) nests pack-expanding template-ids inside a
-// multi-argument __and_.  A single zipped expansion already folds (see
-// cpp11_constexpr_zipped_pack_expansion); the nested case does not yet.
-// Reclassify CORE once nested pack expansions in multi-argument template-ids
-// are expanded.
+// This used to fail to fold ("expected constant expression").  The root cause
+// was NOT the nested pack expansion itself but the recursive variadic `And`:
+// `And<B1, Bn...> : bc<B1::value && And<Bn...>::value>` recurses by peeling one
+// element off `Bn` per level, and when this happened during a nested
+// instantiation CBMC left the enclosing instance's `Bn` binding in the template
+// map, so the recursive step inherited a stale pack and recursed onto itself.
+// See cpp11_constexpr_recursive_variadic_and for the minimal, header-free
+// reproduction.  Fixed by clearing a pack's recorded arguments when deduction
+// resets the parameters (build_unassigned) and when a pack binds to zero
+// elements during instantiation.
 
 template <bool V>
 struct bc
@@ -51,8 +52,18 @@ struct Sel
 
 int main()
 {
+  // ge<long,int> = sizeof(long) >= sizeof(int) = true; And<true> = true;
+  // And<bc<true>, And<true>> = true.
   __CPROVER_assert(
     Sel<Constraints<long>::ok<int>()>::v == 7,
-    "nested pack expansion in multi-arg template-id folds");
+    "nested pack expansion in multi-arg template-id folds (true)");
+  // ge<int,long> = sizeof(int) >= sizeof(long) = false; And<false> = false;
+  // And<bc<true>, And<false>> = false.
+  __CPROVER_assert(
+    Sel<Constraints<int>::ok<long>()>::v == 0,
+    "nested pack expansion in multi-arg template-id folds (false)");
+  // non-vacuity: a wrong value must FAIL.
+  __CPROVER_assert(
+    Sel<Constraints<long>::ok<int>()>::v == 0, "WRONG (must FAIL)");
   return 0;
 }
