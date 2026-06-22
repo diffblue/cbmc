@@ -171,6 +171,27 @@ void send_function_definition(
     &expression_identifiers,
   std::unordered_map<irep_idt, smt_identifier_termt> &identifier_table)
 {
+  // The same SSA identifier can be reached via two expressions that differ
+  // only in their (sort-equivalent) type irep -- e.g. an incomplete
+  // `extern T arr[]` whose array type is represented differently at
+  // different access sites.  Such expressions are distinct keys in
+  // expression_identifiers, so both reach this point, but they denote the
+  // same symbol and must be declared to the solver only once.  Map any
+  // later expression to the already-declared identifier.
+  const auto existing = identifier_table.find(symbol_identifier);
+  if(existing != identifier_table.end())
+  {
+    // The two type ireps are assumed to be sort-equivalent; check this so a
+    // violated assumption fails loudly here rather than as an opaque solver
+    // error downstream. smt_identifier_termt hides get_sort with a
+    // bit-vector-only overload, so compare via the smt_termt base.
+    INVARIANT(
+      static_cast<const smt_termt &>(existing->second).get_sort() ==
+        convert_type_to_smt_sort(expr.type()),
+      "expressions sharing an SSA identifier must have sort-equivalent types");
+    expression_identifiers.emplace(expr, existing->second);
+    return;
+  }
   const smt_declare_function_commandt function{
     smt_identifier_termt(
       symbol_identifier, convert_type_to_smt_sort(expr.type())),
