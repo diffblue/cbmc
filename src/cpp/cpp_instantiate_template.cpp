@@ -4256,7 +4256,40 @@ skip_pack_removal_ft:
       // arguments so method_bodies can restore the template_map.
       ws.type.add(irep_idt{"#fn_template_type"}) = template_type;
       ws.type.add(irep_idt{"#fn_template_args"}) = specialization_template_args;
-      add_method_body(&ws);
+
+      // [temp.inst]/5: a function template specialization is implicitly
+      // instantiated -- including its definition -- when referenced in a
+      // context that requires the definition to exist, such as a constant
+      // expression ([expr.const]).  A `constexpr` member function template
+      // specialization may be folded during the enclosing type-check (e.g.
+      // as a template argument `S<TC::f<int>()>`, or in the SFINAE
+      // constraints of std::tuple's constructors), which happens before
+      // the deferred method-body pass (typecheck_method_bodies) runs.
+      // Type-check its body eagerly now, using the function template map
+      // currently in effect, mirroring the eager conversion of free
+      // function template specializations (convert_non_template_declaration
+      // below).  On failure (e.g. an unused, ill-formed specialization in a
+      // SFINAE context) restore the error count and fall back to the normal
+      // deferred path so that overload resolution can proceed.
+      if(new_decl.storage_spec().is_constexpr())
+      {
+        const std::size_t errors_before =
+          get_message_handler().get_message_count(messaget::M_ERROR);
+        try
+        {
+          convert_function(ws);
+          // Prevent the deferred pass from converting it a second time.
+          methods_seen.insert(ws.name);
+        }
+        catch(...)
+        {
+          get_message_handler().set_message_count(
+            messaget::M_ERROR, errors_before);
+          add_method_body(&ws);
+        }
+      }
+      else
+        add_method_body(&ws);
     }
 
     return method_sym;
