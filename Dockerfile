@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM ubuntu:20.04 AS builder
+FROM ubuntu:24.04 AS builder
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NONINTERACTIVE_SEEN=true
 # Timezone data is needed during the installation of dependencies,
@@ -56,7 +56,7 @@ RUN --mount=type=cache,target=/ccache \
     ninja -C build -j2 && \
     ccache -s
 
-FROM ubuntu:20.04 AS runner
+FROM ubuntu:24.04 AS runner
 COPY --from=builder /tmp/cbmc/build/bin/* /usr/local/bin/
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
