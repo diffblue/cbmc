@@ -2561,13 +2561,28 @@ const symbolt &cpp_typecheckt::instantiate_template(
             {
               if(p.id() != ID_cpp_declaration)
                 return false;
+              // N5008 [temp.variadic]/7: only a *function parameter pack*
+              // -- a parameter declared with a top-level `...`, e.g.
+              // `_T... args` -- expands to an empty parameter list when the
+              // pack is empty and is therefore removed.  A parameter whose
+              // type merely *contains* the empty pack nested inside a
+              // template-argument pack expansion (e.g. `Base<_H, _T...>
+              // &__b`, or `tuple<_T...> t`) is a single parameter: the empty
+              // expansion collapses the argument list (to `Base<_H>` /
+              // `tuple<>`) but the parameter itself must be kept.  Removing
+              // it leaves the instantiated function with no parameter and an
+              // unbindable call (see
+              // regression/cbmc-cpp/cpp11_derived_to_base_pack_call_in_body).
+              // Detect a genuine parameter pack by the top-level ellipsis on
+              // the declarator/type only; do NOT remove on a mere nested
+              // occurrence of the pack name.
               for(const auto &d : p.get_sub())
                 if(
                   d.id() == ID_cpp_declarator &&
                   (d.find(ID_type).get_bool(ID_ellipsis) ||
-                   d.get_bool(ID_ellipsis) || refs_ep(d)))
+                   d.get_bool(ID_ellipsis)))
                   return true;
-              return refs_ep(p.find(ID_type));
+              return false;
             }),
           params.get_sub().end());
       }
@@ -2731,13 +2746,18 @@ skip_pack_removal:
             {
               if(p.id() != ID_cpp_declaration)
                 return false;
+              // N5008 [temp.variadic]/7: remove only a genuine *function
+              // parameter pack* (top-level `...`); keep a parameter whose
+              // type merely contains a nested empty pack expansion (its
+              // argument list collapses but the parameter remains).  See the
+              // matching predicate earlier in instantiate_template.
               for(const auto &d : p.get_sub())
                 if(
                   d.id() == ID_cpp_declarator &&
                   (d.find(ID_type).get_bool(ID_ellipsis) ||
-                   d.get_bool(ID_ellipsis) || refs_ep(d)))
+                   d.get_bool(ID_ellipsis)))
                   return true;
-              return refs_ep(p.find(ID_type));
+              return false;
             }),
           params.get_sub().end());
       }
@@ -5451,6 +5471,20 @@ skip_pack_removal_ft:
             {
               if(p.id() != ID_cpp_declaration)
                 return false;
+              // N5008 [temp.variadic]/7: only a *function parameter pack*
+              // -- a parameter declared with a top-level `...`, e.g.
+              // `_T... args` -- expands to an empty parameter list when the
+              // pack is empty and is therefore removed.  A parameter whose
+              // type merely *contains* the empty pack nested inside a
+              // template-argument pack expansion (e.g. `Base<_H, _T...>
+              // &__b`) is a single parameter: the empty expansion collapses
+              // the argument list to `Base<_H>`, but the parameter itself
+              // must be kept (removing it leaves the instantiated function
+              // with no parameter and an unbindable call -- see
+              // regression/cbmc-cpp/cpp11_derived_to_base_pack_call_in_body).
+              // Detect a genuine parameter pack by the top-level ellipsis on
+              // the declarator/type only; do NOT remove on a mere nested
+              // occurrence of the pack name.
               for(const auto &d : p.get_sub())
               {
                 if(
@@ -5458,17 +5492,7 @@ skip_pack_removal_ft:
                   (d.find(ID_type).get_bool(ID_ellipsis) ||
                    d.get_bool(ID_ellipsis)))
                   return true;
-                // Also check for empty pack parameter type
-                if(d.id() == ID_cpp_declarator)
-                {
-                  const auto &dtype = d.find(ID_type);
-                  if(has_ep(dtype))
-                    return true;
-                }
               }
-              // Check declaration type
-              if(has_ep(p.find(ID_type)))
-                return true;
               return false;
             }),
           params.get_sub().end());
@@ -5495,13 +5519,12 @@ skip_pack_removal_ft:
   // `cpp_declarator_convertert` -> `add_method_body`.  The deferred drain in
   // `typecheck_method_bodies` is CBMC's point-of-instantiation approximation,
   // so the body is converted there in a clean top-level context, not nested in
-  // the referencing body's conversion.  (Correction 2026-06-23: an earlier
-  // note here claimed the *definition* was converted inline -- it is not; the
-  // recurring "nested body conversion" degradation -- e.g. the dropped call in
-  // the `cpp11_derived_to_base_pack_call_in_body` KNOWNBUG -- arises during
-  // *call resolution* in a deferred body, not during definition instantiation.
-  // See doc/architectural/cpp-frontend-review-2026-06-23-instantiation-
-  // context.md.)
+  // the referencing body's conversion.  (The earlier
+  // `cpp11_derived_to_base_pack_call_in_body` defect was NOT here: it was the
+  // empty-trailing-pack parameter being dropped from `new_decl` above, fixed by
+  // restricting empty-pack parameter removal to genuine function parameter
+  // packs per [temp.variadic]/7.  See
+  // doc/architectural/cpp-frontend-review-2026-06-23-instantiation-context.md.)
   convert_non_template_declaration(new_decl);
 
   const symbolt &symb = lookup(new_decl.declarators()[0].get(ID_identifier));
