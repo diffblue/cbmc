@@ -5,19 +5,16 @@
 // called with a `Derived<int>` argument, whose base is `Base<int>`, so
 // `_Head = int` and `_Tail` is the empty pack.
 //
-// KNOWNBUG: when this derived-to-base deduction first instantiates the callee
-// (with an empty trailing pack `_Tail`) from *within a function body* (here
-// `wrapper`, type-checked on demand while converting `main`), CBMC builds a
-// malformed instance whose parameter list is dropped, so the call is never
-// emitted and the function returns a nondet value.  The same call works when
-// the callee is first instantiated by a direct (top-level) call, and a single-
-// parameter `Base<_Head>&` (no trailing pack) also works -- so the trigger is
-// the empty trailing pack in the parameter type during the nested-body
-// instantiation.
+// Regression: instantiating the callee with an empty trailing pack `_Tail`
+// used to drop the whole parameter `__b` (its type `Base<_Head, _Tail...>&`
+// references the empty pack `_Tail` nested in a template-argument expansion),
+// leaving `get_head<int>` with an empty parameter list and an unbindable call
+// (so the function returned a nondet value).  Per N5008 [temp.variadic]/7 the
+// empty expansion only collapses the argument list (`Base<_Head>`); the
+// parameter itself must be kept.  Now fixed in cpp_instantiate_template.cpp.
 //
-// `get_head(__d)` must return the base subobject's `v` (42).  Assertion 1 must
-// SUCCEED once fixed; assertion 2 (a wrong value) must FAIL, proving
-// non-vacuity.
+// `get_head(__d)` must return the base subobject's `v` (42).  Assertion 1
+// SUCCEEDs; assertion 2 (a wrong value) FAILs, proving non-vacuity.
 
 template <typename...>
 struct Base;
