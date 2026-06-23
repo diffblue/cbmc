@@ -19,7 +19,60 @@ level."**
 
 ---
 
-## 0. Correction (2026-06-23, same day)
+## 0. Resolution (2026-06-23, same day) — root cause found and fixed
+
+**The defect is fixed.**  The root cause is *neither* definition instantiation
+(the first draft's hypothesis, retracted in §0.1) *nor* a genuine
+`main`-specific call-binding exemption (the second hypothesis, also wrong — see
+below).  It is a **parameter-list corruption during instantiation**:
+
+> When a function template with a trailing template parameter pack is
+> instantiated with that pack **empty**, `instantiate_template`
+> (`cpp_instantiate_template.cpp`) removed *every* parameter whose type merely
+> **references the empty pack name anywhere** — including nested inside a
+> template-argument pack expansion such as `Base<_Head, _Tail...> &__b`.  So
+> `get_head<int>` was instantiated with an **empty parameter list**; the body's
+> `__b` was then "symbol is unknown", and the call `get_head(__d)` had no
+> parameter to bind to and was dropped (the function returned nondet).
+
+Per **N5008 [temp.variadic]/7** ("when N is zero, the instantiation of the
+expansion produces an empty list") only a *function parameter pack* — a
+parameter declared with a top-level `...`, e.g. `_Tail... args` — expands to an
+empty parameter list and is removed.  A parameter whose type merely *contains*
+the empty expansion nested in a template-id (`Base<_Head, _Tail...>`,
+`tuple<_Tail...>`) is a single parameter: the expansion collapses the argument
+list (to `Base<_Head>` / `tuple<>`) but the parameter itself must be kept.
+
+**Fix:** restrict the empty-pack parameter-removal predicate (three sites in
+`instantiate_template`: the general function-template block, the constructor
+block, and the local-pack block) to genuine function parameter packs (top-level
+ellipsis on the declarator), dropping the over-broad "references the pack name
+nested anywhere" (`refs_ep`/`has_ep`) test.  The nested empty expansion then
+collapses correctly via the existing `template_mapt::apply`, yielding
+`get_head<int>(Base<int>&)`.  Verified: the minimal repro
+`regression/cbmc-cpp/cpp11_derived_to_base_pack_call_in_body` flips KNOWNBUG →
+CORE and passes **non-vacuously** (a deliberately-wrong assertion FAILs); both
+the `cbmc-cpp` and `cbmc` regression suites remain green.
+
+### The "`main` exemption" was a vacuity artifact
+
+The second-draft analysis (§3–§5 below) claimed the dropped call occurred for
+every enclosing body *except* `main`'s.  That was an **unsound observation**:
+the call was *also* dropped in `main`, but because the dropped call
+`throw 0`-ed out of `main`'s own body conversion, the `catch(int)` /
+`had_template_instantiation` path in `convert_method_body`
+(`cpp_typecheck_method_bodies.cpp`) abandoned `main`'s body with `continue` —
+**silently deleting `main`'s own `__CPROVER_assert`**, so verification reported
+a *vacuous* SUCCESS.  Confirmed by replacing the assertion with a false one
+(`a == 999`): it still "passed" before the fix (assertion absent from
+`--show-properties`), and correctly FAILs after.  This is exactly the
+unsound-vacuous-pass failure mode; it is the reason the apparent `main`
+exemption was illusory.  The material below is retained for the record but is
+superseded by this section.
+
+---
+
+## 0.1. Correction (2026-06-23, same day)
 
 The first draft of this document (commit `dee203f711`) proposed that the root
 cause was function-template *definitions* being instantiated **inline** at the
