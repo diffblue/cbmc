@@ -4,20 +4,21 @@
 // empty.  `helper` returns `TI<0,int>::mh(t)`, which forwards to its sibling
 // base `HB<0,int>::mh` via a derived-to-base conversion.
 //
-// KNOWNBUG: when the callee is `constexpr` it is converted *eagerly* and inline
-// at the reference (so a constexpr value can be folded), rather than via the
-// deferred method-body queue used for ordinary function templates.  In that
-// nested/eager context the derived-to-base pack call is not built and the
-// callee's body is dropped, so `helper<0>(t)` returns a nondet reference.  The
-// non-constexpr form of this exact shape works (see
-// cpp11_empty_pack_base_derived_to_base and
-// cpp11_derived_to_base_pack_call_in_body); only the `constexpr` eager path is
-// affected.  This is the next libstdc++-tuple layer: `std::__get_helper` /
-// `_Tuple_impl::_M_head` are `constexpr`.
+// Regression: a `constexpr` callee is marked is_macro and used to be converted
+// *eagerly* and inline at the reference (so a constexpr value can be folded),
+// rather than via the deferred method-body queue used for ordinary function
+// templates.  In that nested/eager context the derived-to-base pack call was
+// not built and the callee's body (and its sub-instantiations such as
+// `TI::mh`) were dropped, so `helper<0>(t)` returned a nondet reference.  Per
+// N5008 [temp.point]/1 and [temp.inst]/5 a constexpr specialization is now
+// converted eagerly only when instantiated from a constant-expression context
+// (where its value must be folded now); reached for an ordinary run-time call
+// it is deferred to the clean method-body drain like any function, so the
+// derived-to-base pack call resolves.  std::__get_helper / _Tuple_impl::_M_head
+// are constexpr, so this is on the path to real std::get<0>.
 //
-// Desired once fixed: assertion 1 SUCCEEDs and assertion 2 (a wrong value)
-// FAILs, proving non-vacuity.  Currently the whole body is dropped and the
-// assertions vanish (a vacuous "VERIFICATION SUCCESSFUL").
+// Assertion 1 SUCCEEDs and assertion 2 (a wrong value) FAILs, proving
+// non-vacuity (the body and its assertions are not silently dropped).
 
 template <unsigned long, typename _H>
 struct HB
