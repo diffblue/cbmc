@@ -776,7 +776,24 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
         cpp_typecheck.add_method_body(new_symbol);
       }
       else if(new_symbol->is_macro)
-        cpp_typecheck.convert_function(*new_symbol);
+      {
+        // A `constexpr` function is marked is_macro.  Per N5008 [temp.point]/1
+        // and [temp.inst]/5, convert its definition eagerly *only* when this
+        // instantiation was reached from a constant-expression context (so the
+        // constant can be folded now -- e.g. a `constexpr` specialization used
+        // as an `enable_if` non-type argument, an array bound, or std::tuple's
+        // constructor SFINAE).  When reached for an ordinary run-time call the
+        // definition is deferred to the clean method-body drain, exactly like a
+        // non-constexpr function: the eager conversion would otherwise run
+        // nested in the referencing body's degraded context, where a
+        // [temp.deduct.call]/4.3 derived-to-base call whose callee has a
+        // trailing parameter pack fails to build (and poisons the callee's
+        // sub-instantiations), even though the deferred drain resolves it.
+        if(cpp_typecheck.instantiating_for_constant_eval)
+          cpp_typecheck.convert_function(*new_symbol);
+        else
+          cpp_typecheck.add_method_body(new_symbol);
+      }
       else if(declarator.type().id() != ID_template)
       {
         // If the function has auto return type, type-check immediately
