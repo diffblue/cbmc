@@ -1194,6 +1194,22 @@ void template_mapt::build(
   const std::size_t nparams = template_parameters.size();
   const std::size_t nargs = instance.size();
   const std::size_t non_pack = has_pack ? nparams - 1 : nparams;
+  // N5008 [temp.variadic]/5,8: a type parameter pack binds the run of
+  // arguments not consumed by the non-pack parameters; `sizeof...` is its
+  // element count (recorded below in pack_size_map/pack_args_map).
+  //
+  // CONFORMANCE NOTE (see doc/architectural/
+  // cpp-frontend-review-2026-06-23-deduction-conformance.md, Gap G1):
+  // `pack_count` is derived purely from the *number* of arguments supplied in
+  // `instance`.  This is faithful only if the caller has already applied
+  // [temp.arg.explicit]/4 Note 1 -- "a trailing template parameter pack not
+  // otherwise deduced will be deduced as an empty sequence".  If an explicitly
+  // but partially specialized function template (e.g. `__get_helper<0>` with a
+  // trailing, non-deduced `_Tail`) reaches here with a spurious extra trailing
+  // argument bled in from an enclosing instantiation, `pack_count` is
+  // over-counted and the pack is wrongly sized non-empty.  The trailing pack
+  // must be pinned to empty *before* this count is taken; build() cannot
+  // recover it here.
   const std::size_t pack_count =
     has_pack && nargs >= non_pack ? nargs - non_pack : 0;
   for(std::size_t p = 0; p < nparams; ++p)
@@ -1373,6 +1389,14 @@ void template_mapt::build_unassigned(
     // (`Bn = [X]`) instead of deducing an empty pack, so the recursive
     // `And<Bn...>` would re-expand to the enclosing instance and recurse
     // onto itself, failing to resolve.
+    //
+    // Erasing the pack maps here is also what gives a *trailing* pack its
+    // [temp.arg.explicit]/4 Note 1 default of an empty sequence -- but only
+    // IMPLICITLY: the pack stays empty solely because no later step supplies
+    // an argument for it.  That implicit default is defeated if argument
+    // assembly bleeds in a spurious trailing element (see Gap G1 in
+    // doc/architectural/cpp-frontend-review-2026-06-23-deduction-conformance.md
+    // and template_mapt::build's pack_count note).
     const irep_idt &pid =
       t.id() == ID_type ? t.type().get(ID_identifier) : t.get(ID_identifier);
     pack_args_map.erase(pid);
