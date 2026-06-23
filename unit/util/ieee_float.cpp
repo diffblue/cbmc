@@ -129,3 +129,88 @@ TEST_CASE("round_to_integral", "[unit][util][ieee_float]")
   REQUIRE(round_to_integral(from_double(0x1.0p+52), away) == 0x1.0p+52);
   REQUIRE(round_to_integral(from_double(dmax), away) == dmax);
 }
+
+TEST_CASE(
+  "ieee_float_valuet to_double / to_float round-trip",
+  "[core][util][ieee_float]")
+{
+  auto from_double = [](double d) -> ieee_float_valuet
+  {
+    ieee_float_valuet v;
+    v.from_double(d);
+    return v;
+  };
+  auto from_float = [](float f) -> ieee_float_valuet
+  {
+    ieee_float_valuet v;
+    v.from_float(f);
+    return v;
+  };
+
+  SECTION("to_double is a bit-exact reinterpretation")
+  {
+    REQUIRE(from_double(0.0).to_double() == 0.0);
+    REQUIRE(from_double(1.0).to_double() == 1.0);
+    REQUIRE(from_double(-2.5).to_double() == -2.5);
+    REQUIRE(from_double(3.14159).to_double() == 3.14159);
+    REQUIRE(
+      from_double(std::numeric_limits<double>::infinity()).to_double() ==
+      std::numeric_limits<double>::infinity());
+    REQUIRE(
+      from_double(std::numeric_limits<double>::max()).to_double() ==
+      std::numeric_limits<double>::max());
+  }
+
+  SECTION("to_float is a bit-exact reinterpretation")
+  {
+    REQUIRE(from_float(0.0f).to_float() == 0.0f);
+    REQUIRE(from_float(1.0f).to_float() == 1.0f);
+    REQUIRE(from_float(-2.5f).to_float() == -2.5f);
+    REQUIRE(
+      from_float(std::numeric_limits<float>::infinity()).to_float() ==
+      std::numeric_limits<float>::infinity());
+  }
+}
+
+TEST_CASE(
+  "ieee_float_valuet to_integer truncates towards zero",
+  "[core][util][ieee_float]")
+{
+  auto from_double = [](double d) -> ieee_float_valuet
+  {
+    ieee_float_valuet v;
+    v.from_double(d);
+    return v;
+  };
+
+  // to_integer always rounds towards zero (truncation), independent of any
+  // rounding mode -- this is the caveat that justifies it living on
+  // ieee_float_valuet rather than ieee_floatt.
+  SECTION("positive values truncate down")
+  {
+    REQUIRE(from_double(0.0).to_integer() == 0);
+    REQUIRE(from_double(0.9).to_integer() == 0);
+    REQUIRE(from_double(1.0).to_integer() == 1);
+    REQUIRE(from_double(3.9).to_integer() == 3);
+    REQUIRE(from_double(1e10).to_integer() == 10000000000);
+  }
+
+  SECTION("negative values truncate towards zero, not down")
+  {
+    REQUIRE(from_double(-0.0).to_integer() == 0);
+    REQUIRE(from_double(-0.9).to_integer() == 0);
+    REQUIRE(from_double(-1.0).to_integer() == -1);
+    // truncation towards zero gives -3, not -4 (which round-to-minus-infinity
+    // would give)
+    REQUIRE(from_double(-3.9).to_integer() == -3);
+    REQUIRE(from_double(-1e10).to_integer() == -10000000000);
+  }
+
+  SECTION("NaN and infinities map to zero")
+  {
+    const auto dp = ieee_float_spect::double_precision();
+    REQUIRE(ieee_float_valuet::NaN(dp).to_integer() == 0);
+    REQUIRE(ieee_float_valuet::plus_infinity(dp).to_integer() == 0);
+    REQUIRE(ieee_float_valuet::minus_infinity(dp).to_integer() == 0);
+  }
+}
