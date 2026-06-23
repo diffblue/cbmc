@@ -1,0 +1,26 @@
+KNOWNBUG
+main.cpp
+--cpp20 --object-bits 11
+^\[main\.assertion\.1\] line \d+ constexpr derived-to-base pack call: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [temp.deduct.call]/4.3 + [dcl.constexpr]: a constexpr function template
+with a derived-to-base pack parameter, called with a derived-class argument.
+
+KNOWNBUG: a constexpr callee is converted eagerly/inline at the reference (to
+permit constant folding) rather than via the deferred method-body queue.  In
+that nested eager context the derived-to-base pack call is not built and the
+callee body is dropped, so the call returns a nondet reference -- and because
+the throw unwinds the enclosing body, main's assertions are silently dropped
+(a vacuous "VERIFICATION SUCCESSFUL").  The non-constexpr form of this exact
+shape works (cpp11_empty_pack_base_derived_to_base,
+cpp11_derived_to_base_pack_call_in_body); only the constexpr eager path is
+affected.  This is the next libstdc++-tuple layer (std::__get_helper and
+_Tuple_impl::_M_head are constexpr).  Flip to CORE once the constexpr eager
+conversion builds the derived-to-base call; assertion 2 (a wrong value) must
+FAIL, proving non-vacuity.
