@@ -782,14 +782,18 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
         // instantiation was reached from a constant-expression context (so the
         // constant can be folded now -- e.g. a `constexpr` specialization used
         // as an `enable_if` non-type argument, an array bound, or std::tuple's
-        // constructor SFINAE).  When reached for an ordinary run-time call the
-        // definition is deferred to the clean method-body drain, exactly like a
-        // non-constexpr function: the eager conversion would otherwise run
+        // constructor SFINAE), or when it has a deduced (`auto`/`decltype(auto)`)
+        // return type that must be deduced before any call site (mirroring the
+        // non-macro branch below).  When reached for an ordinary run-time call
+        // it is otherwise deferred to the clean method-body drain, exactly like
+        // a non-constexpr function: the eager conversion would otherwise run
         // nested in the referencing body's degraded context, where a
         // [temp.deduct.call]/4.3 derived-to-base call whose callee has a
         // trailing parameter pack fails to build (and poisons the callee's
         // sub-instantiations), even though the deferred drain resolves it.
-        if(cpp_typecheck.instantiating_for_constant_eval)
+        if(
+          cpp_typecheck.instantiating_for_constant_eval ||
+          cpp_typecheck.has_auto(new_symbol->type))
           cpp_typecheck.convert_function(*new_symbol);
         else
           cpp_typecheck.add_method_body(new_symbol);
