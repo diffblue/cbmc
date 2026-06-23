@@ -1,0 +1,28 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ more-constrained overload must win: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [temp.constr.order]/1 + [over.match.best]/2.6: of two otherwise
+indistinguishable function-template overloads, the more-constrained is chosen.
+Cheap subsumes Cheap||Rare, so f<Cheap> must win for an int argument (g++
+returns 1).
+
+KNOWNBUG: CBMC selects the less-constrained f<CheapOrRare> and returns 2.
+
+Root cause (traced): the two overloads have identical signatures `f(T) -> int`,
+differing only in concept constraint, and their int instantiations collide on a
+single instance symbol f<signed_int>(signed_int); only one candidate reaches
+overload disambiguation, so constraint-subsumption ordering never runs.  Fixing
+this needs both (a) same-signature concept-constrained overloads forming a
+proper overload set (distinct instances) and (b) subsumption ordering
+([temp.constr.order]/1: normalise to atomic constraints, P subsumes Q iff every
+disjunctive clause of P meets every conjunctive clause of Q).  Flip to CORE once
+the more-constrained overload wins: assertion 1 SUCCESS, assertion 2 (a wrong
+value) FAILURE.
