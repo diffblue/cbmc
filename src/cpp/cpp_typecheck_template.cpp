@@ -2254,9 +2254,16 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       }
       else
       {
-        error().source_location=arg.source_location();
-        error() << "expected type, but got expression" << eom;
-        throw 0;
+        // [temp.arg]/2 + [temp.deduct]/8: a non-type argument supplied for a
+        // type parameter is a substitution failure.  While matching a
+        // candidate during overload resolution this removes only that
+        // candidate (silently); otherwise it is a hard error.
+        if(template_arg_candidate_matching == 0)
+        {
+          error().source_location = arg.source_location();
+          error() << "expected type, but got expression" << eom;
+        }
+        throw template_arg_kind_mismatch_exceptiont{};
       }
     }
     else // expression

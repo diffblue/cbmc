@@ -91,7 +91,28 @@ void cpp_typecheck_resolvet::apply_template_args(
   for(const auto &old_id : old_identifiers)
   {
     exprt e = old_id;
-    apply_template_args(e, template_args, fargs);
+
+    // [temp.arg]/2 + [temp.deduct]/8: applying the explicit template
+    // arguments to a candidate may find a kind mismatch -- a non-type
+    // argument supplied for a type parameter when an unrelated overload is
+    // matched (resolving the by-index `std::get<0>(tuple<...>)` also
+    // considers the by-type `std::get<T>(pair<...>)`, whose first parameter
+    // `T` is a type, so the literal `0` is "expected type, but got
+    // expression").  Such a failure removes only that candidate from the
+    // overload set; it must not abort resolution of the remaining (viable)
+    // candidates.  Mark the matching context so the mismatch is a silent
+    // `template_arg_kind_mismatch_exceptiont`, catch it, and skip the
+    // candidate.  Other failures propagate unchanged.
+    try
+    {
+      cpp_typecheckt::template_arg_candidate_matchingt matching_guard{
+        cpp_typecheck};
+      apply_template_args(e, template_args, fargs);
+    }
+    catch(const template_arg_kind_mismatch_exceptiont &)
+    {
+      continue;
+    }
 
     if(e.is_not_nil())
     {
