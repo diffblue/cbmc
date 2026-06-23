@@ -536,6 +536,10 @@ protected:
   }
   void typecheck_enum_body(symbolt &symbol);
   void typecheck_method_bodies();
+  /// Collapse zero-length pack expansions (N5008 [temp.variadic]/7) in
+  /// template-argument lists within an instantiated function-template body,
+  /// using the empty packs recorded in the current `template_map`.
+  void remove_empty_pack_expansion_args(exprt &body);
   void typecheck_contracts();
   void typecheck_compound_bases(struct_typet &type);
   void add_anonymous_members_to_scope(const symbolt &struct_union_symbol);
