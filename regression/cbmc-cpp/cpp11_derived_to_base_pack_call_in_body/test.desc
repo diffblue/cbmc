@@ -1,0 +1,25 @@
+KNOWNBUG
+main.cpp
+--cpp20 --object-bits 11
+^\[main\.assertion\.1\] line \d+ derived-to-base pack-parameter call in a function body: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [temp.deduct.call]/4.3: a function parameter that is a class template-id
+(`Base<_Head, _Tail...>&`) is deduced from the base class of a derived-class
+argument (`Derived<int>` -> `Base<int>`, so `_Head = int`, `_Tail` empty).
+
+KNOWNBUG: when this derived-to-base deduction first instantiates the callee
+(empty trailing pack `_Tail`) from within a function body that is type-checked
+on demand (here `wrapper`, reached while converting `main`), CBMC builds a
+malformed instance whose parameter list is dropped; the call is never emitted
+and the function returns a nondet value, so assertion 1 currently FAILS instead
+of SUCCEEDS.  The same call works when the callee is first instantiated by a
+direct top-level call, and a single-parameter `Base<_Head>&` (no trailing pack)
+also works -- so the trigger is the empty trailing pack in the parameter type
+during the nested-body instantiation.  Assertion 2 (a wrong value) must FAIL,
+proving non-vacuity; flip to CORE once the instance is built correctly.
