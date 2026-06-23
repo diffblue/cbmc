@@ -5487,23 +5487,21 @@ skip_pack_removal_ft:
     }
   }
 
-  // STANDARD GAP (N5008 [temp.point]/1, [temp.inst]/5): this converts the
-  // free function-template specialization's *definition* synchronously,
-  // inline, at the point `instantiate_template` was called.  Because that call
-  // is reached from `guess_function_template_args` while converting the
-  // *referencing* body, the definition is instantiated in a nested, degraded
-  // context (active error/elaboration suppression, partially-elaborated
-  // enclosing instances, the caller's scope/template_map) rather than at the
-  // enclosing namespace-scope point of instantiation.  Per [temp.point]/1 the
-  // definition's POI "immediately follows the namespace scope declaration or
-  // definition that refers to the specialization"; the correct model is the
-  // deferred drain in `typecheck_method_bodies` (used for member-function
-  // templates via `add_method_body`).  Converting here instead is the root of
-  // the nested-body-conversion degradation documented in
-  // doc/architectural/cpp-frontend-review-2026-06-23-instantiation-context.md
-  // (e.g. the dropped derived-to-base call in
-  // `cpp11_derived_to_base_pack_call_in_body`).  A reference needs only the
-  // *declaration* here ([temp.inst]/1); the *definition* should be queued.
+  // N5008 [temp.point]/1, [temp.inst]/1/5: convert the instantiated free
+  // function-template specialization.  This registers its *declaration* (the
+  // signature, which is all a reference and overload resolution need per
+  // [temp.inst]/1) and -- because the instance is a non-template, non-`auto`
+  // function -- DEFERS its *definition* (body) to the `method_bodies` queue via
+  // `cpp_declarator_convertert` -> `add_method_body`.  The deferred drain in
+  // `typecheck_method_bodies` is CBMC's point-of-instantiation approximation,
+  // so the body is converted there in a clean top-level context, not nested in
+  // the referencing body's conversion.  (Correction 2026-06-23: an earlier
+  // note here claimed the *definition* was converted inline -- it is not; the
+  // recurring "nested body conversion" degradation -- e.g. the dropped call in
+  // the `cpp11_derived_to_base_pack_call_in_body` KNOWNBUG -- arises during
+  // *call resolution* in a deferred body, not during definition instantiation.
+  // See doc/architectural/cpp-frontend-review-2026-06-23-instantiation-
+  // context.md.)
   convert_non_template_declaration(new_decl);
 
   const symbolt &symb = lookup(new_decl.declarators()[0].get(ID_identifier));

@@ -106,24 +106,30 @@ void cpp_typecheckt::remove_empty_pack_expansion_args(exprt &body)
 ///
 /// Standard mapping (N5008 [temp.point]/1, [temp.point]/8, [temp.inst]/5):
 /// this is CBMC's approximation of the *point of instantiation* model.  A
-/// referenced function-template (member) specialization needs only its
-/// *declaration* instantiated at the reference ([temp.inst]/1); its
-/// *definition* is instantiated at the POI that "immediately follows the
-/// namespace scope declaration or definition that refers to the
-/// specialization".  Running this drain *after* the namespace-scope `convert`
-/// loop (see `cpp_typecheckt::typecheck`), with `while(!method_bodies.empty())`
-/// so that bodies queued while converting another body are processed in a
-/// later iteration, gives those definitions a clean, top-level context --
-/// effectively a "POI at end of translation unit".
+/// referenced function-template specialization needs only its *declaration*
+/// instantiated at the reference ([temp.inst]/1); its *definition* is
+/// instantiated at the POI that "immediately follows the namespace scope
+/// declaration or definition that refers to the specialization".  Running this
+/// drain *after* the namespace-scope `convert` loop (see
+/// `cpp_typecheckt::typecheck`), with `while(!method_bodies.empty())` so that
+/// bodies queued while converting another body are processed in a later
+/// iteration, gives those definitions a clean, top-level context -- effectively
+/// a "POI at end of translation unit".  Both member-function-template *and*
+/// free-function-template specializations reach this queue (the latter via
+/// `convert_non_template_declaration` -> `cpp_declarator_convertert` ->
+/// `add_method_body` for non-`auto` bodies); the only definitions converted
+/// inline are `auto`-return and `constexpr` ones that must fold/deduce
+/// eagerly.
 ///
-/// KNOWN GAP (see doc/architectural/cpp-frontend-review-2026-06-23-
-/// instantiation-context.md): only *member*-function-template specializations
-/// reach this queue (via `add_method_body`).  Free and constexpr
-/// function-template specializations are instead converted *inline* at the
-/// reference (`cpp_instantiate_template.cpp` ~5476 / ~4363), i.e. nested in
-/// the referencing body's conversion, which violates [temp.point]/1 and is the
-/// root of the "nested-body-conversion degradation" cluster (e.g. the
-/// `cpp11_derived_to_base_pack_call_in_body` KNOWNBUG).
+/// OPEN ISSUE (see doc/architectural/cpp-frontend-review-2026-06-23-
+/// instantiation-context.md, "Correction"): definition *deferral* works.  The
+/// remaining "nested body conversion" degradation (e.g. the
+/// `cpp11_derived_to_base_pack_call_in_body` KNOWNBUG) is in *call resolution*
+/// performed while a body is being drained here: a derived-to-base
+/// ([temp.deduct.call]/4.3) call whose callee has a trailing parameter pack is
+/// dropped (the callee instance is left unbindable) for every enclosing body
+/// except `main`'s -- an as-yet-unexplained `main`-specific exemption that is
+/// the key clue for the real fix.
 void cpp_typecheckt::typecheck_method_bodies()
 {
   instantiation_stackt old_instantiation_stack;
