@@ -4336,6 +4336,28 @@ skip_pack_removal_ft:
             }
           }
         }
+        // N5008 [temp.variadic]/7: a member function template instantiated
+        // with an empty type pack (e.g. std::tuple's
+        // `__is_constructible<>()`) has zero-length pack expansions in its
+        // body.  Record the empty packs and collapse those expansions
+        // (`Tr<U...>` -> `Tr<>`) before the eager conversion, so the body's
+        // `cpp_name`s resolve here instead of being left un-typechecked and
+        // falling back to the deferred path (which cannot resolve them,
+        // making the constexpr body fold to a wrong value).
+        for(const auto &p : template_type.template_parameters())
+        {
+          if(!p.get_bool(ID_ellipsis))
+            continue;
+          const irep_idt pid = p.type().get(ID_identifier);
+          if(
+            !pid.empty() &&
+            template_map.type_map.find(pid) == template_map.type_map.end() &&
+            template_map.pack_args_map.find(pid) ==
+              template_map.pack_args_map.end())
+            template_map.pack_size_map[pid] = 0;
+        }
+        if(ws.value.is_not_nil())
+          remove_empty_pack_expansion_args(ws.value);
         try
         {
           convert_function(ws);
