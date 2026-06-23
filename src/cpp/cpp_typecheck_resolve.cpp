@@ -174,6 +174,17 @@ void cpp_typecheck_resolvet::guess_function_template_args(
         irep_idt cj = get_constraint(old_identifiers[j]);
         if(cj.empty())
           continue;
+        // CONFORMANCE NOTE (Gap G3, see doc/architectural/
+        // cpp-frontend-review-2026-06-23-deduction-conformance.md): N5008
+        // [temp.constr.order] (13.5.4) defines subsumption by normalising each
+        // constraint to a conjunction/disjunction of atomic constraints and
+        // testing implication.  The substring test below is a deliberate
+        // TEXTUAL APPROXIMATION of that: it treats candidate i as subsumed by j
+        // when j's constraint spelling contains i's.  It orders simple nested
+        // constraints but is neither sound (unrelated constraints sharing a
+        // substring are wrongly ordered) nor complete (subsuming constraints
+        // with different spellings are missed).  A faithful implementation
+        // requires atomic-constraint normalisation + implication.
         if(id2string(cj).find(id2string(ci)) != std::string::npos && ci != cj)
         {
           subsumed[i] = true;
