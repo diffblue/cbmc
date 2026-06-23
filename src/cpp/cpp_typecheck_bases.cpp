@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck_fargs.h"
 
 #include <algorithm>
+#include <functional>
 #include <set>
 
 void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
@@ -27,6 +28,72 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
   for(auto &base : bases_irep)
   {
     cpp_namet &name = static_cast<cpp_namet &>(base.add(ID_name));
+
+    // N5008 [temp.variadic]/7: a base-specifier template argument that is a
+    // pack expansion (`X...`) over a pack that is empty in this instantiation
+    // expands to an empty argument list.  An empty pack has no pack_args_map
+    // entry (only pack_size_map == 0), so the substitution machinery leaves
+    // such an argument as an unsubstituted `cpp_name`-with-ellipsis, which
+    // then fails to resolve and throws -- taking the whole base list down with
+    // it (so a sibling base like `Head_base` is also lost).  Drop these empty
+    // expansions here so e.g. `Empty<_Tail...>` with empty `_Tail` becomes
+    // `Empty<>`.  Guarded by a non-empty pack_size_map so the primary template
+    // definition (no instantiation context) is untouched.
+    if(!template_map.pack_size_map.empty())
+    {
+      const auto classify_pack_refs =
+        [&](const irept &arg, bool &refs_empty, bool &refs_nonempty)
+      {
+        std::function<void(const irept &)> walk = [&](const irept &n)
+        {
+          if(n.id() == ID_name)
+          {
+            const std::string nm = id2string(n.get(ID_identifier));
+            for(const auto &e : template_map.pack_size_map)
+            {
+              const std::string key = id2string(e.first);
+              const auto p = key.rfind("::");
+              const std::string suffix =
+                p != std::string::npos ? key.substr(p + 2) : key;
+              if(suffix == nm)
+              {
+                if(e.second == 0)
+                  refs_empty = true;
+                else
+                  refs_nonempty = true;
+              }
+            }
+          }
+          for(const auto &s : n.get_sub())
+            walk(s);
+          for(const auto &ns : n.get_named_sub())
+            walk(ns.second);
+        };
+        walk(arg);
+      };
+
+      for(auto &sub : name.get_sub())
+      {
+        if(sub.id() != ID_template_args)
+          continue;
+        irept::subt &args = sub.add(ID_arguments).get_sub();
+        args.erase(
+          std::remove_if(
+            args.begin(),
+            args.end(),
+            [&](const irept &arg)
+            {
+              const bool is_expansion = arg.get_bool(ID_ellipsis) ||
+                                        arg.find(ID_type).get_bool(ID_ellipsis);
+              if(!is_expansion)
+                return false;
+              bool refs_empty = false, refs_nonempty = false;
+              classify_pack_refs(arg, refs_empty, refs_nonempty);
+              return refs_empty && !refs_nonempty;
+            }),
+          args.end());
+      }
+    }
 
     // Apply template_map to substitute template parameters in the
     // base class template arguments (e.g., _Tp in integral_constant<bool,
