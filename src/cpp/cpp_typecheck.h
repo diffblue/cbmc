@@ -978,6 +978,16 @@ private:
   unsigned constant_expression_context = 0;
   friend class sfinae_contextt;
 
+  /// True while instantiating a template that was referenced from within a
+  /// constant-expression context (so its definition may have to be folded
+  /// now).  N5008 [temp.point]/1, [temp.inst]/5: a `constexpr` specialization
+  /// reached this way must be converted eagerly so the constant is foldable;
+  /// one reached for an ordinary run-time call can instead be deferred to the
+  /// clean method-body drain (where derived-to-base pack calls etc. resolve
+  /// correctly).  Set by `non_constant_expression_contextt` from the
+  /// suspended outer context; read by `cpp_declarator_convertert`.
+  bool instantiating_for_constant_eval = false;
+
   /// RAII guard marking a constant-expression context for its lifetime.
   class constant_expression_contextt
   {
@@ -1009,18 +1019,29 @@ private:
   public:
     explicit non_constant_expression_contextt(cpp_typecheckt &_cpp_typecheck)
       : cpp_typecheck(_cpp_typecheck),
-        saved(_cpp_typecheck.constant_expression_context)
+        saved(_cpp_typecheck.constant_expression_context),
+        saved_instantiating_for_constant_eval(
+          _cpp_typecheck.instantiating_for_constant_eval)
     {
+      // Whether the enclosing (now-suspended) context was constant-required
+      // tells `cpp_declarator_convertert` whether a `constexpr` specialization
+      // reached during this instantiation must be converted eagerly (foldable
+      // now) or may be deferred as an ordinary run-time definition.
+      cpp_typecheck.instantiating_for_constant_eval =
+        cpp_typecheck.constant_expression_context > 0;
       cpp_typecheck.constant_expression_context = 0;
     }
     ~non_constant_expression_contextt()
     {
       cpp_typecheck.constant_expression_context = saved;
+      cpp_typecheck.instantiating_for_constant_eval =
+        saved_instantiating_for_constant_eval;
     }
 
   private:
     cpp_typecheckt &cpp_typecheck;
     unsigned saved;
+    bool saved_instantiating_for_constant_eval;
   };
 
   /// Counter > 0 while applying explicit template arguments to a candidate
