@@ -180,10 +180,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a9d1eb45f6584f3ab993ab4acabae927a" id="r_a9d1eb45f6584f3ab993ab4acabae927a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classieee__float__valuet.html#a9d1eb45f6584f3ab993ab4acabae927a">from_float</a> (<a class="el" href="classait.html">float</a>)</td></tr>
 <tr class="separator:a9d1eb45f6584f3ab993ab4acabae927a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a042f068638fdcd08022c3c4f64cf0bfe" id="r_a042f068638fdcd08022c3c4f64cf0bfe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">double</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classieee__float__valuet.html#a042f068638fdcd08022c3c4f64cf0bfe">to_double</a> () <a class="el" href="classait.html">const</a></td></tr>
-<tr class="memdesc:a042f068638fdcd08022c3c4f64cf0bfe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Note that calling from_double -&gt; to_double can return different bit patterns for NaN.  <br /></td></tr>
+<tr class="memdesc:a042f068638fdcd08022c3c4f64cf0bfe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reinterpret this value as a native <code>double</code>.  <br /></td></tr>
 <tr class="separator:a042f068638fdcd08022c3c4f64cf0bfe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a14f9c6dccbb26bfd75d7d41da4338472" id="r_a14f9c6dccbb26bfd75d7d41da4338472"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">float</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classieee__float__valuet.html#a14f9c6dccbb26bfd75d7d41da4338472">to_float</a> () <a class="el" href="classait.html">const</a></td></tr>
-<tr class="memdesc:a14f9c6dccbb26bfd75d7d41da4338472"><td class="mdescLeft">&#160;</td><td class="mdescRight">Note that calling from_float -&gt; to_float can return different bit patterns for NaN.  <br /></td></tr>
+<tr class="memdesc:a14f9c6dccbb26bfd75d7d41da4338472"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reinterpret this value as a native <code>float</code>.  <br /></td></tr>
 <tr class="separator:a14f9c6dccbb26bfd75d7d41da4338472"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa9c20468c1af0ef46ad2f28964ac69be" id="r_aa9c20468c1af0ef46ad2f28964ac69be"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classieee__float__valuet.html#aa9c20468c1af0ef46ad2f28964ac69be">is_double</a> () <a class="el" href="classait.html">const</a></td></tr>
 <tr class="separator:aa9c20468c1af0ef46ad2f28964ac69be"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -196,6 +196,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a2b5ab491ae75f79e507a5e6dd317e091" id="r_a2b5ab491ae75f79e507a5e6dd317e091"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classieee__float__valuet.html#a2b5ab491ae75f79e507a5e6dd317e091">extract_base10</a> (<a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;<a class="el" href="classait.html">_exponent</a>, <a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a> &amp;<a class="el" href="classait.html">_fraction</a>) <a class="el" href="classait.html">const</a></td></tr>
 <tr class="separator:a2b5ab491ae75f79e507a5e6dd317e091"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab343255435fe2c38357b19f4283ed9b9" id="r_ab343255435fe2c38357b19f4283ed9b9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="smt__terms_8h.html#a68a9c335b3b75c987bf5d42b3cc8b0e0">mp_integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classieee__float__valuet.html#ab343255435fe2c38357b19f4283ed9b9">to_integer</a> () <a class="el" href="classait.html">const</a></td></tr>
+<tr class="memdesc:ab343255435fe2c38357b19f4283ed9b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert to an integer, always rounding towards zero (truncation), i.e.  <br /></td></tr>
 <tr class="separator:ab343255435fe2c38357b19f4283ed9b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8b406d5896b09aeaece0c8c921baed0a" id="r_a8b406d5896b09aeaece0c8c921baed0a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classieee__float__valuet.html#a8b406d5896b09aeaece0c8c921baed0a">print</a> (std::ostream &amp;out) <a class="el" href="classait.html">const</a></td></tr>
 <tr class="separator:a8b406d5896b09aeaece0c8c921baed0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -838,6 +839,7 @@ Protected Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>true iff this value is in IEEE 754 double (binary64) format </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="ieee__float_8cpp_source.html#l01361">1361</a> of file <a class="el" href="ieee__float_8cpp_source.html">ieee_float.cpp</a>.</p>
 
@@ -857,6 +859,7 @@ Protected Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>true iff this value is in IEEE 754 single (binary32) format </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="ieee__float_8cpp_source.html#l01366">1366</a> of file <a class="el" href="ieee__float_8cpp_source.html">ieee_float.cpp</a>.</p>
 
@@ -1578,7 +1581,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ieee__float_8h_source.html#l00285">285</a> of file <a class="el" href="ieee__float_8h_source.html">ieee_float.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ieee__float_8h_source.html#l00316">316</a> of file <a class="el" href="ieee__float_8h_source.html">ieee_float.h</a>.</p>
 
 </div>
 </div>
@@ -1597,7 +1600,10 @@ Protected Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Note that calling from_double -&gt; to_double can return different bit patterns for NaN. </p>
+<p>Reinterpret this value as a native <code>double</code>. </p>
+<p>Note that calling from_double -&gt; to_double can return different bit patterns for NaN.</p>
+<p>This is a bit-exact reinterpretation of the packed IEEE 754 representation, not a rounding conversion, and therefore does not depend on any rounding mode. </p><dl class="section pre"><dt>Precondition</dt><dd>the value is in IEEE 754 double (binary64) format, i.e. <a class="el" href="classieee__float__valuet.html#aa9c20468c1af0ef46ad2f28964ac69be">is_double</a> returns true. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the corresponding <code>double</code> </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="ieee__float_8cpp_source.html#l00490">490</a> of file <a class="el" href="ieee__float_8cpp_source.html">ieee_float.cpp</a>.</p>
 
@@ -1637,7 +1643,11 @@ Protected Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Note that calling from_float -&gt; to_float can return different bit patterns for NaN. </p>
+<p>Reinterpret this value as a native <code>float</code>. </p>
+<p>Note that calling from_float -&gt; to_float can return different bit patterns for NaN.</p>
+<p>This is a bit-exact reinterpretation of the packed IEEE 754 representation, not a rounding conversion, and therefore does not depend on any rounding mode. </p><dl class="section note"><dt>Note</dt><dd><a class="el" href="classieee__float__valuet.html#a9d1eb45f6584f3ab993ab4acabae927a">from_float()</a> followed by <a class="el" href="classieee__float__valuet.html#a14f9c6dccbb26bfd75d7d41da4338472" title="Reinterpret this value as a native float.">to_float()</a> may return a different bit pattern for NaN. </dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd>the value is in IEEE 754 single (binary32) format, i.e. <a class="el" href="classieee__float__valuet.html#a330547bd7d0d80644982687e5d3b0ad7">is_float</a> returns true. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the corresponding <code>float</code> </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="ieee__float_8cpp_source.html#l00525">525</a> of file <a class="el" href="ieee__float_8cpp_source.html">ieee_float.cpp</a>.</p>
 
@@ -1657,6 +1667,12 @@ Protected Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Convert to an integer, always rounding towards zero (truncation), i.e. </p>
+<p>modelling a C cast such as <code>(int)f</code>. NaN, infinities and zero map to 0.</p>
+<p>Because the rounding is fixed (truncation), this conversion does not depend on any rounding mode and so belongs on <a class="el" href="classieee__float__valuet.html">ieee_float_valuet</a> rather than <a class="el" href="classieee__floatt.html">ieee_floatt</a>. A rounding-mode-respecting float-to-integer conversion (the analogue of <code>lrint</code>) would instead belong on <a class="el" href="classieee__floatt.html">ieee_floatt</a>; see also <a class="el" href="classieee__floatt.html#af714d5fd822f349693bf012b0706ca33">ieee_floatt::round_to_integral</a>, which rounds to an integral <em>floating-point</em> value according to the configured rounding mode. </p><dl class="section return"><dt>Returns</dt><dd>the truncated integer value </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="ieee__float_8cpp_source.html#l01256">1256</a> of file <a class="el" href="ieee__float_8cpp_source.html">ieee_float.cpp</a>.</p>
 
 </div>
 </div>
@@ -1799,7 +1815,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ieee__float_8h_source.html#l00320">320</a> of file <a class="el" href="ieee__float_8h_source.html">ieee_float.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ieee__float_8h_source.html#l00351">351</a> of file <a class="el" href="ieee__float_8h_source.html">ieee_float.h</a>.</p>
 
 </div>
 </div>
@@ -1823,7 +1839,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ieee__float_8h_source.html#l00321">321</a> of file <a class="el" href="ieee__float_8h_source.html">ieee_float.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ieee__float_8h_source.html#l00352">352</a> of file <a class="el" href="ieee__float_8h_source.html">ieee_float.h</a>.</p>
 
 </div>
 </div>
@@ -1847,7 +1863,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ieee__float_8h_source.html#l00322">322</a> of file <a class="el" href="ieee__float_8h_source.html">ieee_float.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ieee__float_8h_source.html#l00353">353</a> of file <a class="el" href="ieee__float_8h_source.html">ieee_float.h</a>.</p>
 
 </div>
 </div>
@@ -1871,7 +1887,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ieee__float_8h_source.html#l00322">322</a> of file <a class="el" href="ieee__float_8h_source.html">ieee_float.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ieee__float_8h_source.html#l00353">353</a> of file <a class="el" href="ieee__float_8h_source.html">ieee_float.h</a>.</p>
 
 </div>
 </div>
@@ -1895,7 +1911,7 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ieee__float_8h_source.html#l00319">319</a> of file <a class="el" href="ieee__float_8h_source.html">ieee_float.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ieee__float_8h_source.html#l00350">350</a> of file <a class="el" href="ieee__float_8h_source.html">ieee_float.h</a>.</p>
 
 </div>
 </div>

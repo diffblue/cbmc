@@ -27,8 +27,5 @@ var classieee__floatt =
     [ "round_to_integral", "classieee__floatt.html#af714d5fd822f349693bf012b0706ca33", null ],
     [ "rounding_mode", "classieee__floatt.html#ad1d0abf3c510e28961a9d3c2b8daa90f", null ],
     [ "rounding_mode_expr", "classieee__floatt.html#a7350df2f7646e4ec69e4ac41ad566cfa", null ],
-    [ "to_double", "classieee__floatt.html#aa07f020daf365aeb306dbbd0657282a3", null ],
-    [ "to_float", "classieee__floatt.html#a2028f30cfafda60a9c4003154ca18caa", null ],
-    [ "to_integer", "classieee__floatt.html#a32c000898acbf78263bbfe3b01c36a22", null ],
     [ "_rounding_mode", "classieee__floatt.html#ab8e9bad54e69af48fd575a347a10582b", null ]
 ];

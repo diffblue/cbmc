@@ -1,8 +1,5 @@
 var NAVTREEINDEX114 =
 {
-"identifier_8h.html":[8,0,2,30,84],
-"identifier_8h.html#a4dad848390315c75eea999a0b3046e3c":[8,0,2,30,84,1],
-"identifier_8h_source.html":[8,0,2,30,84],
 "ieee__float_8cpp.html":[8,0,2,30,85],
 "ieee__float_8cpp_source.html":[8,0,2,30,85],
 "ieee__float_8h.html":[8,0,2,30,86],
@@ -249,5 +246,8 @@ var NAVTREEINDEX114 =
 "interval__union_8h_source.html":[8,0,2,30,95],
 "intrin_8c.html":[8,0,2,1,2,13],
 "intrin_8c.html#a00ff40f2f3ec18354aa541dd6aa95af8":[8,0,2,1,2,13,9],
-"intrin_8c.html#a09f6cd229f3fe6621e1238e66c43eee4":[8,0,2,1,2,13,29]
+"intrin_8c.html#a09f6cd229f3fe6621e1238e66c43eee4":[8,0,2,1,2,13,29],
+"intrin_8c.html#a0dec7c0ce4f36f801cd1f3df172ece5c":[8,0,2,1,2,13,23],
+"intrin_8c.html#a12afb08da1add31d43747418accdb2e4":[8,0,2,1,2,13,14],
+"intrin_8c.html#a16d7ba541e55c91993fc10d7ee9831fa":[8,0,2,1,2,13,19]
 };
