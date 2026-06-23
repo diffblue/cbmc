@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20 --object-bits 11
 ^\[main\.assertion\.1\] line \d+ constexpr derived-to-base pack call: SUCCESS$
@@ -9,18 +9,18 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-N5008 [temp.deduct.call]/4.3 + [dcl.constexpr]: a constexpr function template
-with a derived-to-base pack parameter, called with a derived-class argument.
+N5008 [temp.deduct.call]/4.3 + [dcl.constexpr] + [temp.point]/1 + [temp.inst]/5:
+a constexpr function template with a derived-to-base pack parameter, called with
+a derived-class argument.
 
-KNOWNBUG: a constexpr callee is converted eagerly/inline at the reference (to
-permit constant folding) rather than via the deferred method-body queue.  In
-that nested eager context the derived-to-base pack call is not built and the
-callee body is dropped, so the call returns a nondet reference -- and because
-the throw unwinds the enclosing body, main's assertions are silently dropped
-(a vacuous "VERIFICATION SUCCESSFUL").  The non-constexpr form of this exact
-shape works (cpp11_empty_pack_base_derived_to_base,
-cpp11_derived_to_base_pack_call_in_body); only the constexpr eager path is
-affected.  This is the next libstdc++-tuple layer (std::__get_helper and
-_Tuple_impl::_M_head are constexpr).  Flip to CORE once the constexpr eager
-conversion builds the derived-to-base call; assertion 2 (a wrong value) must
-FAIL, proving non-vacuity.
+Regression: a constexpr callee was converted eagerly/inline at the reference
+(to permit constant folding) even for an ordinary run-time call, and in that
+nested context the derived-to-base pack call was not built -- the callee body
+and its sub-instantiations were dropped, so the call returned a nondet
+reference (and the throw unwound the enclosing body, silently dropping main's
+assertions: a vacuous "VERIFICATION SUCCESSFUL").  Fixed by converting a
+constexpr specialization eagerly only when instantiated from a
+constant-expression context (folding required); reached for a run-time call it
+is deferred to the clean method-body drain like any function, so the
+derived-to-base pack call resolves.  Assertion 2 (a wrong value) FAILs, proving
+non-vacuity.
