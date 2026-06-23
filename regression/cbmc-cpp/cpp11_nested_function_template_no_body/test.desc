@@ -1,0 +1,33 @@
+KNOWNBUG
+main.cpp
+--cpp20 --object-bits 11
+^\[main\.assertion\.1\] line \d+ nested template helper body: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+no body for callee
+--
+N5008 [temp.inst]/4, [temp.point]/1: a cvise-reduced, header-free model of the
+libstdc++ std::get<0> chain (std::get -> std::__get_helper ->
+_Tuple_impl::_M_head).  Well-defined and returns 42 under a conforming compiler
+(verified with g++).
+
+KNOWNBUG: the called __get_helper<0> specialization is deferred to the
+method-body drain, but its body conversion throws and the body is dropped,
+leaving a bodyless function that returns a nondet reference ("no body for
+callee __get_helper<0>").
+
+Root cause (traced): __get_helper has a non-deduced trailing parameter pack
+_Tail that appears only in the body, so for __get_helper<0> it should be empty.
+But the call is resolved from within get<0>'s body, and deduction gives
+__get_helper<0> a spurious extra template argument bleeding from get<0>'s
+element pack, so _Tail is recorded with size 1 instead of 0.  Resolving the
+body qualifier _Tuple_impl<__i, int, _Tail...> then expands a phantom
+one-element _Tail... with no bound element type and throws; the deferred drain
+silently nil's the body.  (The "struct member must not be of code type" symex
+invariant seen when the body is not nil'd is a downstream symptom.)  Flip to
+CORE once __get_helper<0>'s _Tail is correctly empty: assertion 1 must SUCCEED
+and assertion 2 (a wrong value) must FAIL, proving non-vacuity.
