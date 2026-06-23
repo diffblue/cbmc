@@ -1,5 +1,6 @@
 var NAVTREEINDEX56 =
 {
+"classremove__exceptionst.html#aa6786b60163449560d94024f75c70b1b":[7,0,1016,12],
 "classremove__exceptionst.html#ab1b51eceb63664996b1af8be06262c07":[7,0,1016,10],
 "classremove__exceptionst.html#ab5548badee947b1496f11ec28aadc1c1":[7,0,1016,18],
 "classremove__exceptionst.html#ac855a2e94391c8fbec10dd198d5e1d73":[7,0,1016,19],
@@ -123,12 +124,12 @@ var NAVTREEINDEX56 =
 "classreplication__exprt.html#af7b233e7c592a3e935f38892cfa0436b":[7,0,1028,0],
 "classrequire__goto__statements_1_1no__decl__found__exceptiont.html":[6,0,6,0],
 "classrequire__goto__statements_1_1no__decl__found__exceptiont.html":[7,0,1,0],
-"classrequire__goto__statements_1_1no__decl__found__exceptiont.html#a767d3177baf716e70eaf79d39950ced5":[6,0,6,0,2],
 "classrequire__goto__statements_1_1no__decl__found__exceptiont.html#a767d3177baf716e70eaf79d39950ced5":[7,0,1,0,2],
-"classrequire__goto__statements_1_1no__decl__found__exceptiont.html#ac12959524eebd6ba47d12ac704e02dc1":[6,0,6,0,1],
+"classrequire__goto__statements_1_1no__decl__found__exceptiont.html#a767d3177baf716e70eaf79d39950ced5":[6,0,6,0,2],
 "classrequire__goto__statements_1_1no__decl__found__exceptiont.html#ac12959524eebd6ba47d12ac704e02dc1":[7,0,1,0,1],
-"classrequire__goto__statements_1_1no__decl__found__exceptiont.html#ad237205052e4ff0c9b5cc7fac680fc96":[6,0,6,0,0],
+"classrequire__goto__statements_1_1no__decl__found__exceptiont.html#ac12959524eebd6ba47d12ac704e02dc1":[6,0,6,0,1],
 "classrequire__goto__statements_1_1no__decl__found__exceptiont.html#ad237205052e4ff0c9b5cc7fac680fc96":[7,0,1,0,0],
+"classrequire__goto__statements_1_1no__decl__found__exceptiont.html#ad237205052e4ff0c9b5cc7fac680fc96":[6,0,6,0,0],
 "classresolution__prooft.html":[7,0,1029],
 "classresolution__prooft.html#a189484f5b3595583691607ddbc67a2b0":[7,0,1029,1],
 "classresolution__prooft.html#a212d64c628a1f6af67be5c510d4f4316":[7,0,1029,2],
@@ -248,6 +249,5 @@ var NAVTREEINDEX56 =
 "classrw__set__with__trackt.html#a12f7873bd49c830ef3cc2902cbc7183a":[7,0,1039,5],
 "classrw__set__with__trackt.html#a193c67dbe724bac57c27d10ed4fec801":[7,0,1039,0],
 "classrw__set__with__trackt.html#a398666008fe13b2177abf57a3ca715ce":[7,0,1039,4],
-"classrw__set__with__trackt.html#a8d3836e31adf6a687d8ac3bc79a34c83":[7,0,1039,6],
-"classrw__set__with__trackt.html#a99d4c20d275367004fb77c4ef43196b4":[7,0,1039,2]
+"classrw__set__with__trackt.html#a8d3836e31adf6a687d8ac3bc79a34c83":[7,0,1039,6]
 };

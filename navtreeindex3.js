@@ -1,5 +1,6 @@
 var NAVTREEINDEX3 =
 {
+"bitvector__types_8h.html#a41f8a86e0dc96cd82d1eba8f6d53f482":[8,0,2,30,13,12],
 "bitvector__types_8h.html#a5d4cb2532466d3a3d9ff46877cba08d5":[8,0,2,30,13,19],
 "bitvector__types_8h.html#a6b17190eb12013933456651ffc04e62d":[8,0,2,30,13,11],
 "bitvector__types_8h.html#a6bad119ad458f4eab79c5d88a84ede98":[8,0,2,30,13,22],
@@ -248,6 +249,5 @@ var NAVTREEINDEX3 =
 "bv__minimize_8h.html#a734b9f727882047908c7ea4345fec314":[8,0,2,27,1,61,2],
 "bv__minimize_8h_source.html":[8,0,2,27,1,61],
 "bv__pointers_8cpp.html":[8,0,2,27,1,62],
-"bv__pointers_8cpp.html#a410158ad7a2822d61069379e4e218be0":[8,0,2,27,1,62,2],
-"bv__pointers_8cpp.html#a65bea15d082c911ff7f01754ea1767d5":[8,0,2,27,1,62,3]
+"bv__pointers_8cpp.html#a410158ad7a2822d61069379e4e218be0":[8,0,2,27,1,62,2]
 };
