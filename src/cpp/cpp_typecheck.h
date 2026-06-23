@@ -41,6 +41,17 @@ bool cpp_typecheck(
   message_handlert &message_handler,
   const namespacet &ns);
 
+/// Thrown by `typecheck_template_args` when an explicit template argument has
+/// the wrong *kind* (a non-type argument supplied for a type parameter, or
+/// vice versa) while matching a candidate during overload resolution.  Per
+/// N5008 [temp.arg]/2 and [temp.deduct]/8 this is a deduction failure that
+/// removes only that candidate from the overload set, so the candidate loop in
+/// `apply_template_args` catches it and skips the candidate rather than
+/// treating it as a hard error.
+class template_arg_kind_mismatch_exceptiont
+{
+};
+
 class cpp_typecheckt:public c_typecheck_baset
 {
 public:
@@ -1010,6 +1021,37 @@ private:
   private:
     cpp_typecheckt &cpp_typecheck;
     unsigned saved;
+  };
+
+  /// Counter > 0 while applying explicit template arguments to a candidate
+  /// during overload resolution (`apply_template_args`).  In that context a
+  /// template-argument *kind* mismatch -- e.g. a non-type argument supplied
+  /// for a type parameter, as when resolving the by-index
+  /// `std::get<0>(tuple<...>)` also matches the by-type
+  /// `std::get<T>(pair<...>)` overload whose first parameter `T` is a type --
+  /// is a silent deduction failure that removes only that candidate from the
+  /// overload set ([temp.arg]/2, [temp.deduct]/8), not a user-visible error.
+  /// `typecheck_template_args` consults this to decide between throwing
+  /// `template_arg_kind_mismatch_exceptiont` (caught by the candidate loop,
+  /// which skips the candidate) and reporting a hard error.
+  unsigned template_arg_candidate_matching = 0;
+
+  /// RAII guard incrementing `template_arg_candidate_matching`.
+  class template_arg_candidate_matchingt
+  {
+  public:
+    explicit template_arg_candidate_matchingt(cpp_typecheckt &_cpp_typecheck)
+      : cpp_typecheck(_cpp_typecheck)
+    {
+      ++cpp_typecheck.template_arg_candidate_matching;
+    }
+    ~template_arg_candidate_matchingt()
+    {
+      --cpp_typecheck.template_arg_candidate_matching;
+    }
+
+  private:
+    cpp_typecheckt &cpp_typecheck;
   };
 
   /// Stack of currently-active target types for nested calls; pushed
