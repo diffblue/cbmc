@@ -20,6 +20,88 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_typecheck.h"
 
+/// Per N5008 [temp.variadic]/7: the instantiation of a pack expansion whose
+/// pack(s) expand to zero elements produces an empty list.  When a function
+/// (or member function) template is instantiated with an empty type pack, a
+/// pack expansion appearing as a template argument in the body -- e.g.
+/// `Tr<U...>` for an empty `U` -- must collapse to `Tr<>`.  Otherwise the
+/// argument keeps the (now unbound) pack reference, the surrounding `cpp_name`
+/// fails to resolve, and the expression is silently left un-typechecked (so a
+/// constexpr body folds to a wrong value).
+///
+/// This removes such zero-length pack-expansion *arguments* from every
+/// template-argument list in \p body.  An argument is removed only when its
+/// pack expansion is at its own level (it carries `ID_ellipsis`) and refers to
+/// an empty pack; an argument that merely *contains* an empty pack nested
+/// inside (e.g. `Outer<U...>`, whose ellipsis sits on the inner argument) is
+/// kept and recursed into so the inner expansion is collapsed in place.
+///
+/// Empty packs are those recorded with size zero in the current
+/// `template_map` (non-empty packs have already had their name substituted and
+/// their `...` removed by the caller).
+void cpp_typecheckt::remove_empty_pack_expansion_args(exprt &body)
+{
+  if(template_map.pack_size_map.empty())
+    return;
+
+  std::set<std::string> ep_names;
+  for(const auto &ps : template_map.pack_size_map)
+  {
+    if(ps.second != 0)
+      continue;
+    const std::string f = id2string(ps.first);
+    auto p = f.rfind("::");
+    ep_names.insert(p != std::string::npos ? f.substr(p + 2) : f);
+  }
+  if(ep_names.empty())
+    return;
+
+  // Does \p n reference (anywhere) one of the empty packs?
+  std::function<bool(const irept &)> refers_empty_pack =
+    [&](const irept &n) -> bool
+  {
+    if(n.id() == ID_template_parameter_symbol_type)
+    {
+      const std::string f = id2string(n.get(ID_identifier));
+      auto p = f.rfind("::");
+      if(ep_names.count(p != std::string::npos ? f.substr(p + 2) : f))
+        return true;
+    }
+    if(n.id() == ID_name && ep_names.count(id2string(n.get(ID_identifier))))
+      return true;
+    for(const auto &s : n.get_sub())
+      if(refers_empty_pack(s))
+        return true;
+    for(const auto &ns : n.get_named_sub())
+      if(refers_empty_pack(ns.second))
+        return true;
+    return false;
+  };
+
+  auto is_empty_pack_expansion = [&](const irept &a) -> bool
+  {
+    const bool is_expansion =
+      a.get_bool(ID_ellipsis) || a.find(ID_type).get_bool(ID_ellipsis);
+    return is_expansion && refers_empty_pack(a);
+  };
+
+  std::function<void(irept &)> strip = [&](irept &node)
+  {
+    if(node.id() == ID_template_args)
+    {
+      auto &args = node.add(ID_arguments).get_sub();
+      args.erase(
+        std::remove_if(args.begin(), args.end(), is_empty_pack_expansion),
+        args.end());
+    }
+    for(auto &s : node.get_sub())
+      strip(s);
+    for(auto &ns : node.get_named_sub())
+      strip(ns.second);
+  };
+  strip(static_cast<irept &>(body));
+}
+
 void cpp_typecheckt::typecheck_method_bodies()
 {
   instantiation_stackt old_instantiation_stack;
@@ -206,6 +288,11 @@ void cpp_typecheckt::typecheck_method_bodies()
         }
       }
     }
+
+    // Per [temp.variadic]/7: drop zero-length pack expansions from the
+    // template-argument lists in the body (e.g. `Tr<U...>` -> `Tr<>` for an
+    // empty `U`).
+    remove_empty_pack_expansion_args(body);
 
 #ifdef DEBUG
     std::cout << "convert_method_body: " << method_symbol.name << '\n';
