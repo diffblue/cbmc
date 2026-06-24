@@ -2848,6 +2848,18 @@ bool Parser::rOtherDeclaration(
     // type_name above is the name declarator, not the return type
     if(storage_spec.is_auto())
       type_name=trailing_return_type;
+    else if(trailing_return_type.is_not_nil())
+    {
+      // N5008 [temp.deduct.guide]: a deduction-guide is written as
+      //   template-name ( parameter-declaration-clause ) -> simple-template-id ;
+      // It parses like a constructor (its name is a class[-template] name) but,
+      // unlike a real constructor, carries a trailing return type naming the
+      // guided specialization.  Preserve that type as the declaration type and
+      // flag the declarator so the type checker registers a deduction guide
+      // rather than dropping the return type and treating it as a constructor.
+      type_name = trailing_return_type;
+      constructor_declarator.set("#is_deduction_guide", true);
+    }
     else
       type_name=typet(is_destructor?ID_destructor:ID_constructor);
 

@@ -32,6 +32,7 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
   const cpp_idt *template_id = nullptr;
   const auto id_set = cpp_scopes.current_scope().lookup(
     class_template_name.get_base_name(), cpp_scopet::RECURSIVE);
+
   for(const auto *id : id_set)
   {
     if(id->id_class == cpp_idt::id_classt::TEMPLATE)
@@ -63,6 +64,94 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
     exprt arg = a;
     typecheck_expr(arg);
     arg_types.push_back(arg.type());
+  }
+
+  // Explicit deduction guides ([temp.deduct.guide], [over.match.class.deduct]):
+  // a guide is one of the entries the class name resolves to whose declarator
+  // was flagged at parse time (its constructor-like declaration carried a
+  // trailing return type) and whose declaration type is the guided
+  // specialization `C<...>`.  For the first guide whose parameter count matches
+  // the argument count, deduce the guide's own template parameters from the
+  // argument types ([temp.deduct.type]) and instantiate the guide's return
+  // type, yielding the deduced specialization.  This honours guides that
+  // transform the arguments (`S(T) -> S<T*>`), add fixed arguments
+  // (`P(T) -> P<T, int>`) or ignore leading parameters (`V(int, T) -> V<T>`),
+  // none of which the positional fallback below can express.
+  for(const auto *gid : id_set)
+  {
+    if(gid->id_class != cpp_idt::id_classt::TEMPLATE)
+      continue;
+    const symbolt *gsym = symbol_table.lookup(gid->identifier);
+    if(gsym == nullptr || !gsym->type.get_bool(ID_is_template))
+      continue;
+    const cpp_declarationt &guide = to_cpp_declaration(gsym->type);
+    if(
+      guide.declarators().empty() ||
+      !guide.declarators().front().get_bool("#is_deduction_guide"))
+      continue;
+
+    // The guide's parameter types are the deduction patterns.
+    std::vector<typet> pattern_types;
+    for(const auto &p :
+        guide.declarators().front().type().find(ID_parameters).get_sub())
+    {
+      if(p.id() != ID_cpp_declaration)
+        continue;
+      const cpp_declarationt &pdecl =
+        to_cpp_declaration(static_cast<const exprt &>(p));
+      if(pdecl.declarators().empty())
+        pattern_types.push_back(pdecl.type());
+      else
+        pattern_types.push_back(
+          pdecl.declarators().front().merge_type(pdecl.type()));
+    }
+    if(pattern_types.size() != arg_types.size())
+      continue;
+
+    auto scope_it = cpp_scopes.id_map.find(gid->identifier);
+    if(scope_it == cpp_scopes.id_map.end() || scope_it->second == nullptr)
+      continue;
+
+    std::optional<typet> guided;
+    {
+      // Deduce in the guide's own template scope, with a saved template map
+      // so the caller's deduction state is left untouched.
+      cpp_save_scopet save_scope(cpp_scopes);
+      cpp_saved_template_mapt saved_map(template_map);
+      cpp_scopes.go_to(*scope_it->second);
+      template_map.build_unassigned(guide.template_type());
+
+      cpp_typecheck_resolvet resolver(*this);
+      bool deduced_ok = true;
+      try
+      {
+        for(std::size_t i = 0; i < pattern_types.size(); ++i)
+          resolver.guess_template_args(pattern_types[i], arg_types[i]);
+      }
+      catch(...)
+      {
+        deduced_ok = false;
+      }
+
+      if(
+        deduced_ok && !template_map.build_template_args(guide.template_type())
+                         .has_unassigned())
+      {
+        // Instantiate the guide's return type with the deduced parameters.
+        typet ret = guide.type();
+        try
+        {
+          typecheck_type(ret);
+          guided = ret;
+        }
+        catch(...)
+        {
+        }
+      }
+    }
+
+    if(guided.has_value() && guided->id() == ID_struct_tag)
+      return guided;
   }
 
   // [over.match.class.deduct]/1 copy deduction candidate: when the
