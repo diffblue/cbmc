@@ -228,6 +228,24 @@ scope-id assignment ([temp.res]); it has no failing regression test driving it
 the debug-build uniqueness invariant (below) to catch any remaining ambiguity as
 it is removed.
 
+### The `apply()` short-name site is the dominant V1 exposure (measured)
+
+A second suite-wide measurement instrumented the `apply()` short-name match
+(the main substitution path, `template_map.cpp` ~448):
+
+- **247166** matched substitutions; **66280 (27%) ambiguous** (`nhits>1`),
+  dominated by `_Tp` (2–3 candidates), `_Up`, `_Iterator`, `_Iter`, ...
+
+This is a far larger V1 exposure than `lookup_by_suffix`.  Crucially, **unlike
+`lookup_by_suffix`, the `apply()` reference is a bare short-name `cpp_name` with
+no scope id**, so the Increment-1 nearest-scope disambiguation cannot be applied
+here cheaply — these sites genuinely require the scoped-id prerequisite
+(Increment 2): the parameter references written in template bodies/types must
+carry their full scope-qualified identifier ([temp.res] two-phase), after which
+`apply()` can resolve by exact id and the 66280 ambiguities disappear by
+construction.  This makes Increment 2 (scope-id consistency) the linchpin of the
+whole V1 removal, not an optional follow-up.
+
 ## How to use this map
 
 Before changing any short-name match site, find its row/Violation above; a
