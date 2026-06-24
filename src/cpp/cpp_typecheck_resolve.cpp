@@ -1238,7 +1238,8 @@ exprt cpp_typecheck_resolvet::convert_template_parameter(
     if(pos != std::string::npos)
     {
       const std::string base = id_str.substr(pos + 2);
-      e = cpp_typecheck.template_map.lookup_by_suffix(base);
+      e = cpp_typecheck.template_map.lookup_by_suffix(
+        base, identifier.identifier);
     }
   }
 
@@ -2476,7 +2477,7 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
               auto p = id_str.rfind("::");
               if(p != std::string::npos)
                 e = cpp_typecheck.template_map.lookup_by_suffix(
-                  id_str.substr(p + 2));
+                  id_str.substr(p + 2), param_id.identifier);
             }
             if(
               e.id() == ID_type &&
@@ -3883,7 +3884,8 @@ exprt cpp_typecheck_resolvet::resolve(
         const std::string id_str = id2string(param_id.identifier);
         auto p = id_str.rfind("::");
         if(p != std::string::npos)
-          e = cpp_typecheck.template_map.lookup_by_suffix(id_str.substr(p + 2));
+          e = cpp_typecheck.template_map.lookup_by_suffix(
+            id_str.substr(p + 2), param_id.identifier);
       }
       if(
         e.id() == ID_type && e.type().id() == ID_template_parameter_symbol_type)
