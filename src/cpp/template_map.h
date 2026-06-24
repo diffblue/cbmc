@@ -66,20 +66,21 @@ public:
   exprt lookup_expr(const irep_idt &identifier) const;
 
   /// Look up a template parameter by its base name suffix (after the last
-  /// "::"). This handles the case where a template parameter was registered
-  /// under a different scope prefix (e.g., forward declaration vs definition).
+  /// "::").  This handles the case where a template parameter was registered
+  /// under a different scope prefix from the reference (e.g. a different
+  /// instantiation scope-number for the same parameter -- see Violation V1 in
+  /// doc/architectural/cpp-frontend-review-2026-06-24-template-map-scope.md).
   ///
-  /// CONFORMANCE WARNING (Violation V1, see doc/architectural/
-  /// cpp-frontend-review-2026-06-24-template-map-scope.md): matching a
-  /// parameter by short name violates N5008 [basic.scope.temp]/2, under which a
-  /// parameter's identity is its template's scope plus its name.  Two unrelated
-  /// templates may each have a parameter spelled the same (e.g. `_Tp`,
-  /// `_Tail`); this scan cannot tell them apart and, when two instantiations
-  /// are live (Violation V2), can return another instantiation's binding.  Do
-  /// not add new callers; resolve by exact scope-qualified identifier
-  /// (`lookup`) instead.  This is scheduled for removal by the structural
-  /// change described in the review.
-  exprt lookup_by_suffix(const std::string &suffix) const;
+  /// When several live bindings share the short name (an ambiguity that, per
+  /// N5008 [basic.scope.temp]/2, must be resolved to the nearest enclosing
+  /// scope rather than arbitrarily), \p reference_id -- the full
+  /// scope-qualified identifier of the reference being resolved -- is used to
+  /// prefer the candidate that shares the longest leading scope path with the
+  /// reference.  This is a step toward exact scope-identity resolution; do not
+  /// add new callers without passing the reference id.
+  exprt lookup_by_suffix(
+    const std::string &suffix,
+    const irep_idt &reference_id = irep_idt()) const;
 
   void print(std::ostream &out) const;
 

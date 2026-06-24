@@ -1056,31 +1056,106 @@ exprt template_mapt::lookup_expr(const irep_idt &identifier) const
   return static_cast<const exprt &>(get_nil_irep());
 }
 
-exprt template_mapt::lookup_by_suffix(const std::string &suffix) const
+// Number of matching leading "::"-separated components shared by two
+// scope-qualified identifiers.  Used to pick the nearest enclosing scope among
+// same-short-name template parameters (N5008 [basic.scope.temp]/2): a reference
+// resolves to the parameter of the nearest enclosing template scope, which the
+// longest shared leading scope path approximates.  Differing instantiation
+// scope-numbers in the trailing component stop the match, so this compares the
+// namespace/template path rather than the (often inconsistent) scope-number.
+static std::size_t
+common_scope_components(const std::string &a, const std::string &b)
+{
+  std::size_t n = 0, pa = 0, pb = 0;
+  while(true)
+  {
+    const auto na = a.find("::", pa);
+    const auto nb = b.find("::", pb);
+    const std::string ca =
+      a.substr(pa, na == std::string::npos ? std::string::npos : na - pa);
+    const std::string cb =
+      b.substr(pb, nb == std::string::npos ? std::string::npos : nb - pb);
+    if(ca != cb)
+      break;
+    ++n;
+    if(na == std::string::npos || nb == std::string::npos)
+      break;
+    pa = na + 2;
+    pb = nb + 2;
+  }
+  return n;
+}
+
+exprt template_mapt::lookup_by_suffix(
+  const std::string &suffix,
+  const irep_idt &reference_id) const
 {
   const std::string match = "::" + suffix;
+  const std::string ref = id2string(reference_id);
+
+  auto is_match = [&](const std::string &key)
+  {
+    return key.size() >= match.size() &&
+           key.compare(key.size() - match.size(), match.size(), match) == 0;
+  };
+
+  // Among all live bindings sharing the short name, prefer the one whose
+  // scope-qualified identifier shares the longest leading scope path with the
+  // reference ([basic.scope.temp]/2 nearest-enclosing-scope).  Type parameters
+  // take priority over non-type parameters on a tie (matching the historical
+  // type_map-first behaviour), and the first match wins on a further tie
+  // (deterministic).  When reference_id is empty this reduces to the previous
+  // first-match-by-map-order behaviour.
+  const typet *best_type = nullptr;
+  const exprt *best_expr = nullptr;
+  std::size_t best_score = 0;
+  bool have = false;
+
   for(const auto &entry : type_map)
   {
     const std::string key = id2string(entry.first);
-    if(
-      key.size() >= match.size() &&
-      key.compare(key.size() - match.size(), match.size(), match) == 0)
+    if(!is_match(key))
+      continue;
+    const std::size_t score =
+      ref.empty() ? 0 : common_scope_components(key, ref);
+    if(!have || score > best_score)
     {
-      exprt e(ID_type);
-      e.type() = entry.second;
-      return e;
+      have = true;
+      best_score = score;
+      best_type = &entry.second;
+      best_expr = nullptr;
     }
+    if(ref.empty())
+      break; // preserve first-match behaviour when not disambiguating
   }
   for(const auto &entry : expr_map)
   {
     const std::string key = id2string(entry.first);
-    if(
-      key.size() >= match.size() &&
-      key.compare(key.size() - match.size(), match.size(), match) == 0)
+    if(!is_match(key))
+      continue;
+    const std::size_t score =
+      ref.empty() ? 0 : common_scope_components(key, ref);
+    // Strict ">" keeps a type-parameter match ahead of an equally-scoped
+    // non-type match.
+    if(!have || score > best_score)
     {
-      return entry.second;
+      have = true;
+      best_score = score;
+      best_expr = &entry.second;
+      best_type = nullptr;
     }
+    if(ref.empty() && best_type == nullptr)
+      break;
   }
+
+  if(best_type != nullptr)
+  {
+    exprt e(ID_type);
+    e.type() = *best_type;
+    return e;
+  }
+  if(best_expr != nullptr)
+    return *best_expr;
   return static_cast<const exprt &>(get_nil_irep());
 }
 
