@@ -1,0 +1,10 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ leading parameter A bound to first argument: SUCCESS$
+^\[main\.assertion\.2\] line \d+ leading parameter B bound to second argument: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
