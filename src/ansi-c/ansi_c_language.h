@@ -20,15 +20,19 @@ Author: Daniel Kroening, kroening@kroening.com
 // clang-format off
 #define OPT_ANSI_C_LANGUAGE \
   "(max-nondet-tree-depth):" \
+  "(max-dynamic-object-instances):" \
   "(min-null-tree-depth):"
 
 #define HELP_ANSI_C_LANGUAGE \
   " {y--max-nondet-tree-depth} {uN} \t " \
   "limit size of nondet (e.g. input) object tree; at level {uN} pointers are " \
   "set to null\n" \
+  " {y--max-dynamic-object-instances} {uN} \t " \
+  "limit the number of objects allocated for each nondet (e.g. input) " \
+  "object tree; beyond {uN}, pointers are set to null (default: no limit)\n" \
   " {y--min-null-tree-depth} {uN} \t " \
   "minimum level at which a pointer can first be NULL in a recursively " \
-  "nondet initialized struct\n" \
+  "nondet initialized struct\n"
 // clang-format on
 
 class ansi_c_languaget:public languaget

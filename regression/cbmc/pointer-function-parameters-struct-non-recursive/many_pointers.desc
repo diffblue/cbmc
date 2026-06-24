@@ -1,0 +1,15 @@
+CORE thorough-smt-backend no-new-smt
+many_pointers.c
+--function f --object-bits 12
+^EXIT=10$
+^SIGNAL=0$
+^\[f.assertion.1\] line \d+ assertion 0: FAILURE$
+--
+^warning: ignoring
+reached the limit of
+--
+There is no limit on the number of objects allocated for nondet inputs unless
+--max-dynamic-object-instances is given, so the last pointer can be non-null.
+The 1001 objects make the formula too large for the SMT back-ends: the
+CPROVER SMT2 solver runs out of memory, and the incremental SMT2 back-end fails
+an invariant ("=" applied to terms of different sorts).
