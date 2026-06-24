@@ -44,6 +44,7 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
   if(template_id == nullptr)
     return {};
 
+
   // The template's type parameters, noting a trailing parameter pack.
   std::vector<bool> param_is_pack;
   {
@@ -175,9 +176,97 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
     }
   }
 
-  // Map arguments to template type parameters ([over.match.class.deduct],
-  // simplified to a single positional guide -- explicit deduction guides and
-  // full overload resolution are not modelled):
+  // Implicit deduction guides synthesised from the primary template's
+  // constructors ([over.match.class.deduct]/1.1, [temp.deduct.guide]): a
+  // constructor C(P0, P1, ...) yields a guide that deduces the class template
+  // parameters by matching the constructor parameter *patterns* against the
+  // arguments.  This is needed whenever a constructor parameter is not exactly
+  // a template parameter -- e.g. `Wrap(T *p)` must deduce `Wrap<int>` from an
+  // `int *` argument, where the positional fallback would wrongly pick
+  // `Wrap<int *>`.
+  std::vector<typet> deduced_types;
+  {
+    const symbolt *csym = symbol_table.lookup(template_id->identifier);
+    auto scope_it = cpp_scopes.id_map.find(template_id->identifier);
+    if(
+      csym != nullptr && csym->type.id() == ID_cpp_declaration &&
+      csym->type.get_bool(ID_is_template) &&
+      scope_it != cpp_scopes.id_map.end() && scope_it->second != nullptr)
+    {
+      const cpp_declarationt &cdecl = to_cpp_declaration(csym->type);
+      for(const auto &mem : cdecl.type().find(ID_body).get_sub())
+      {
+        if(!deduced_types.empty())
+          break;
+        if(mem.id() != ID_cpp_declaration)
+          continue;
+        const cpp_declarationt &mdecl =
+          to_cpp_declaration(static_cast<const exprt &>(mem));
+        if(mdecl.type().id() != ID_constructor || mdecl.declarators().empty())
+          continue;
+
+        // Constructor parameter patterns (in terms of the class parameters).
+        std::vector<typet> patterns;
+        for(const auto &p :
+            mdecl.declarators().front().type().find(ID_parameters).get_sub())
+        {
+          if(p.id() != ID_cpp_declaration)
+            continue;
+          const cpp_declarationt &pdecl =
+            to_cpp_declaration(static_cast<const exprt &>(p));
+          patterns.push_back(
+            pdecl.declarators().empty()
+              ? pdecl.type()
+              : pdecl.declarators().front().merge_type(pdecl.type()));
+        }
+        if(patterns.empty() || patterns.size() != arg_types.size())
+          continue;
+
+        cpp_save_scopet save_scope(cpp_scopes);
+        cpp_saved_template_mapt saved_map(template_map);
+        cpp_scopes.go_to(*scope_it->second);
+        template_map.build_unassigned(cdecl.template_type());
+
+        cpp_typecheck_resolvet resolver(*this);
+        bool deduced_ok = true;
+        try
+        {
+          for(std::size_t i = 0; i < patterns.size(); ++i)
+            resolver.guess_template_args(patterns[i], arg_types[i]);
+        }
+        catch(...)
+        {
+          deduced_ok = false;
+        }
+
+        if(deduced_ok)
+        {
+          const cpp_template_args_tct ta =
+            template_map.build_template_args(cdecl.template_type());
+          if(!ta.has_unassigned())
+          {
+            std::vector<typet> dt;
+            bool all_type_args = true;
+            for(const auto &a : ta.arguments())
+            {
+              if(a.id() == ID_type)
+                dt.push_back(a.type());
+              else
+              {
+                all_type_args = false;
+                break;
+              }
+            }
+            if(all_type_args && !dt.empty())
+              deduced_types = std::move(dt);
+          }
+        }
+      }
+    }
+  }
+
+  // Positional fallback ([over.match.class.deduct], simplified) when no
+  // constructor-pattern guide deduced the arguments:
   //  * a trailing parameter pack absorbs the remaining arguments, so the flat
   //    template-argument list is simply every argument type
   //    (`C<...Ts>{a, b}` -> `C<decltype(a), decltype(b)>`);
@@ -185,12 +274,14 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
   //    (`Pair<A, B>{a, b}` -> `Pair<decltype(a), decltype(b)>`); a single
   //    parameter shared by several aggregate members (`Agg<T>{x, y}`) is fixed
   //    by the first argument, the rest being members of that same type.
-  std::vector<typet> deduced_types;
-  if(has_pack)
-    deduced_types = arg_types;
-  else
-    for(std::size_t i = 0; i < n_type_params && i < arg_types.size(); ++i)
-      deduced_types.push_back(arg_types[i]);
+  if(deduced_types.empty())
+  {
+    if(has_pack)
+      deduced_types = arg_types;
+    else
+      for(std::size_t i = 0; i < n_type_params && i < arg_types.size(); ++i)
+        deduced_types.push_back(arg_types[i]);
+  }
 
   irept template_args(ID_template_args);
   irept &args_sub = template_args.add(ID_arguments);
