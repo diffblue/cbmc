@@ -1,0 +1,10 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ 16 >>= 2 yields 4 via POD operator>>=: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+not defined for types
+^CONVERSION ERROR$
