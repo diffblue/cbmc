@@ -2022,101 +2022,26 @@ void cpp_typecheckt::typecheck_decl(codet &code)
       const irept &init_args = declarator.find("init_args");
       const exprt &value =
         static_cast<const exprt &>(declarator.find(ID_value));
-      const irept *args_source = nullptr;
+      std::vector<exprt> ctad_args;
       if(init_args.get_sub().size() > 0)
-        args_source = &init_args;
+      {
+        for(const auto &a : init_args.get_sub())
+          ctad_args.push_back(static_cast<const exprt &>(a));
+      }
       else if(
         value.is_not_nil() && value.id() == ID_initializer_list &&
         !value.operands().empty())
       {
-        args_source = &value;
+        for(const auto &a : value.operands())
+          ctad_args.push_back(a);
       }
-      if(args_source != nullptr)
+      if(!ctad_args.empty())
       {
-        // Check if the name resolves to a class template without
-        // explicit template arguments (CTAD candidate).
-        const cpp_namet &cpp_name =
-          to_cpp_name(static_cast<const irept &>(type));
-        bool has_tmpl_args = false;
-        for(const auto &sub : cpp_name.get_sub())
+        if(
+          auto deduced = deduce_class_template_arguments(
+            to_cpp_name(static_cast<const irept &>(type)), ctad_args))
         {
-          if(sub.id() == ID_template_args)
-          {
-            has_tmpl_args = true;
-            break;
-          }
-        }
-        bool is_template = false;
-        if(!has_tmpl_args)
-        {
-          const auto id_set = cpp_scopes.current_scope().lookup(
-            cpp_name.get_base_name(), cpp_scopet::RECURSIVE);
-          for(const auto *id : id_set)
-          {
-            if(id->id_class == cpp_idt::id_classt::TEMPLATE)
-            {
-              is_template = true;
-              break;
-            }
-          }
-        }
-        if(is_template)
-        {
-          // Determine the number of template type parameters
-          std::size_t n_type_params = 0;
-          {
-            const auto id_set2 = cpp_scopes.current_scope().lookup(
-              cpp_name.get_base_name(), cpp_scopet::RECURSIVE);
-            for(const auto *id : id_set2)
-            {
-              if(id->id_class == cpp_idt::id_classt::TEMPLATE)
-              {
-                const auto &sym = lookup(id->identifier);
-                const auto &tmpl_type = static_cast<const template_typet &>(
-                  sym.type.find(ID_template_type));
-                for(const auto &p : tmpl_type.template_parameters())
-                {
-                  if(p.id() == ID_type)
-                    ++n_type_params;
-                }
-                break;
-              }
-            }
-          }
-
-          irept template_args(ID_template_args);
-          irept &args_sub = template_args.add(ID_arguments);
-          std::vector<typet> unique_types;
-          for(const auto &a : args_source->get_sub())
-          {
-            exprt arg = static_cast<const exprt &>(a);
-            typecheck_expr(arg);
-            bool already_seen = false;
-            for(const auto &t : unique_types)
-            {
-              if(t == arg.type())
-              {
-                already_seen = true;
-                break;
-              }
-            }
-            if(
-              !already_seen &&
-              (n_type_params == 0 || unique_types.size() < n_type_params))
-            {
-              unique_types.push_back(arg.type());
-            }
-          }
-          for(const auto &t : unique_types)
-          {
-            exprt type_arg(ID_type);
-            type_arg.type() = t;
-            args_sub.get_sub().push_back(type_arg);
-          }
-          cpp_namet new_name = cpp_name;
-          new_name.get_sub().push_back(template_args);
-          type = static_cast<typet &>(static_cast<irept &>(new_name));
-          typecheck_type(type);
+          type = *deduced;
           ctad_done = true;
         }
       }
