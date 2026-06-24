@@ -1,0 +1,23 @@
+CORE
+main.c
+--generate-function-body make_l1 --generate-function-body-options havoc --max-dynamic-object-instances 10
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+make_l1::malloc_site\$8
+--
+^warning: ignoring
+^\*\*\*\* WARNING: no body for function
+make_l1::malloc_site\$9
+--
+object_factory_parameterst::max_dynamic_object_instances caps havoc body
+generation for a function returning a pointer into a wide, deep,
+non-recursive struct hierarchy, which otherwise hangs and then OOMs.
+The hierarchy would allocate 341 dynamic objects uncapped; with the cap set
+to 10 only 10 allocation sites are emitted, so make_l1::malloc_site$8 is the
+last one present and make_l1::malloc_site$9 -- asserted absent above -- is
+the regression guard: without the cap it would be present and the test would
+fail.  Note the specific $8/$9 indices are implementation-dependent (they
+track the object factory's fresh-symbol numbering and allocation order); an
+unrelated change to that numbering could require updating them even though the
+cap still works.
