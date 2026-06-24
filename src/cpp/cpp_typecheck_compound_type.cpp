@@ -1215,8 +1215,14 @@ void cpp_typecheckt::typecheck_friend_declaration(
   {
     typet &ftype = declaration.type();
 
-    // must be struct or union
-    if(ftype.id() != ID_struct && ftype.id() != ID_union)
+    // must designate a class/union type.  N5008 [class.friend]/3: the type may
+    // be given either as an elaborated-type-specifier (`friend class B;`, which
+    // parses to ID_struct/ID_union) or as a simple-type-specifier naming an
+    // already-declared class (`friend B;`, which parses to an ID_cpp_name that
+    // typecheck_type below resolves to the class).
+    if(
+      ftype.id() != ID_struct && ftype.id() != ID_union &&
+      ftype.id() != ID_cpp_name)
     {
       error().source_location = declaration.type().source_location();
       error() << "unexpected friend" << eom;
