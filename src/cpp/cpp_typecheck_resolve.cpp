@@ -42,6 +42,7 @@ extern exprt try_evaluate_constexpr(
 
 #include <algorithm>
 #include <set>
+#include <string>
 
 /// \return true if any template parameter of \p template_type is a
 ///   variadic pack (an ellipsis parameter, [temp.variadic]).
@@ -123,6 +124,316 @@ void cpp_typecheck_resolvet::apply_template_args(
   }
 }
 
+namespace
+{
+// C++20 concept subsumption ([temp.constr.order]).  These helpers implement the
+// partial order on constraints that selects the more-constrained overload.
+//
+// N5008 [temp.constr.order]/1: a constraint P subsumes a constraint Q iff, for
+// every disjunctive clause Pi in the disjunctive normal form of P, Pi subsumes
+// every conjunctive clause Qj in the conjunctive normal form of Q; Pi subsumes
+// Qj iff they share an identical atomic constraint ([temp.constr.atomic]).
+// Example from the standard: A && B subsumes A; A subsumes A || B.
+//
+// A constraint is given as a concept name; its normal form is computed by
+// expanding the concept's constraint-expression, recursing through nested
+// concept references and the && / || (ID_and / ID_or) structure.  A concept
+// whose body is not itself a logical combination is one atomic constraint,
+// keyed by the concept name (so the same concept reached from two places is the
+// same atomic, per [temp.constr.atomic]); a raw non-concept atomic expression
+// is keyed by a canonical serialization (so it only matches the same text).
+using constraint_clauset = std::set<std::string>;
+using constraint_normalt = std::set<constraint_clauset>;
+
+std::string concept_atom_key(const irept &e)
+{
+  std::string s = id2string(e.id());
+  const irep_idt id = e.get(ID_identifier);
+  if(!id.empty())
+    s += "#" + id2string(id);
+  for(const auto &sub : e.get_sub())
+    s += "(" + concept_atom_key(sub) + ")";
+  return s;
+}
+
+// If e is a reference to a named concept (cpp_name with template-args), return
+// the concept name; otherwise the empty id.
+irep_idt concept_reference_name(const exprt &e)
+{
+  if(e.id() != ID_cpp_name)
+    return irep_idt();
+  bool has_template_args = false;
+  irep_idt name;
+  for(const auto &sub : e.get_sub())
+  {
+    if(sub.id() == ID_template_args)
+      has_template_args = true;
+    else if(sub.id() == ID_name)
+      name = sub.get(ID_identifier);
+  }
+  return has_template_args ? name : irep_idt();
+}
+
+// Look up a concept's constraint-expression body by its base name.
+exprt concept_constraint_body(
+  const symbol_table_baset &symbol_table,
+  const irep_idt &name)
+{
+  for(const auto &entry : symbol_table.symbols)
+  {
+    if(
+      id2string(entry.second.base_name) == id2string(name) &&
+      entry.second.type.get_bool(ID_is_template) &&
+      entry.second.type.id() == ID_cpp_declaration)
+    {
+      const cpp_declarationt &decl = to_cpp_declaration(entry.second.type);
+      if(
+        !decl.declarators().empty() &&
+        decl.declarators().front().value().is_not_nil())
+        return decl.declarators().front().value();
+    }
+  }
+  return nil_exprt();
+}
+
+// Combine two normal forms by pairwise clause union (cross product): used for
+// AND in DNF and for OR in CNF.
+constraint_normalt
+cross_product_union(const constraint_normalt &a, const constraint_normalt &b)
+{
+  constraint_normalt result;
+  for(const auto &ca : a)
+    for(const auto &cb : b)
+    {
+      constraint_clauset c = ca;
+      c.insert(cb.begin(), cb.end());
+      result.insert(c);
+    }
+  return result;
+}
+
+constraint_normalt set_union(constraint_normalt a, const constraint_normalt &b)
+{
+  a.insert(b.begin(), b.end());
+  return a;
+}
+
+constraint_normalt
+concept_normal(const symbol_table_baset &, const irep_idt &, bool dnf, int);
+
+// Normal form of a constraint expression.  dnf selects disjunctive (true) vs
+// conjunctive (false) normal form.
+constraint_normalt concept_normal_expr(
+  const symbol_table_baset &symbol_table,
+  const exprt &e,
+  bool dnf,
+  int depth)
+{
+  if(depth > 32)
+    return {{concept_atom_key(e)}};
+  if((e.id() == ID_and || e.id() == ID_or) && e.operands().size() >= 2)
+  {
+    constraint_normalt acc =
+      concept_normal_expr(symbol_table, e.operands().front(), dnf, depth + 1);
+    for(std::size_t i = 1; i < e.operands().size(); ++i)
+    {
+      const constraint_normalt rhs =
+        concept_normal_expr(symbol_table, e.operands()[i], dnf, depth + 1);
+      // In DNF, AND distributes (cross product) and OR unions; in CNF the
+      // roles swap.
+      const bool cross = dnf ? (e.id() == ID_and) : (e.id() == ID_or);
+      acc = cross ? cross_product_union(acc, rhs) : set_union(acc, rhs);
+    }
+    return acc;
+  }
+  const irep_idt cref = concept_reference_name(e);
+  if(!cref.empty())
+    return concept_normal(symbol_table, cref, dnf, depth + 1);
+  return {{concept_atom_key(e)}};
+}
+
+constraint_normalt concept_normal(
+  const symbol_table_baset &symbol_table,
+  const irep_idt &name,
+  bool dnf,
+  int depth)
+{
+  if(depth > 32)
+    return {{id2string(name)}};
+  const exprt body = concept_constraint_body(symbol_table, name);
+  // Decompose only when the body is itself a logical combination or a nested
+  // concept reference; otherwise the whole concept is one atomic constraint
+  // keyed by its name.
+  if(
+    body.is_not_nil() && (body.id() == ID_and || body.id() == ID_or ||
+                          !concept_reference_name(body).empty()))
+    return concept_normal_expr(symbol_table, body, dnf, depth + 1);
+  return {{id2string(name)}};
+}
+
+// N5008 [temp.constr.order]/1: does the constraint named p_name subsume the
+// constraint named q_name?
+bool constraint_subsumes(
+  const symbol_table_baset &symbol_table,
+  const irep_idt &p_name,
+  const irep_idt &q_name)
+{
+  if(p_name == q_name)
+    return true; // every constraint subsumes itself
+  const constraint_normalt dnf_p =
+    concept_normal(symbol_table, p_name, /*dnf=*/true, 0);
+  const constraint_normalt cnf_q =
+    concept_normal(symbol_table, q_name, /*dnf=*/false, 0);
+  for(const auto &pi : dnf_p)
+    for(const auto &qj : cnf_q)
+    {
+      bool shares_atomic = false;
+      for(const auto &atom : pi)
+        if(qj.count(atom) != 0)
+        {
+          shares_atomic = true;
+          break;
+        }
+      if(!shares_atomic)
+        return false;
+    }
+  return true;
+}
+
+// True iff p_name is STRICTLY more constrained than q_name: p subsumes q but
+// not vice versa.  Used to drop the less-constrained overload.
+bool constraint_strictly_subsumes(
+  const symbol_table_baset &symbol_table,
+  const irep_idt &p_name,
+  const irep_idt &q_name)
+{
+  if(p_name.empty() || q_name.empty() || p_name == q_name)
+    return false;
+  return constraint_subsumes(symbol_table, p_name, q_name) &&
+         !constraint_subsumes(symbol_table, q_name, p_name);
+}
+
+// Associated-constraint normal form of a (function) template declaration: the
+// conjunction of its per-parameter concept constraints (abbreviated
+// `template <Concept T>`) and its requires-clause.  An empty result denotes an
+// unconstrained declaration (the "true" constraint).
+constraint_normalt template_constraint_normal(
+  const symbol_table_baset &symbol_table,
+  const cpp_declarationt &decl,
+  bool dnf)
+{
+  std::vector<constraint_normalt> parts;
+  for(const auto &p : decl.template_type().template_parameters())
+  {
+    const irep_idt &cc = p.get("#C_concept_constraint");
+    if(!cc.empty())
+      parts.push_back(concept_normal(symbol_table, cc, dnf, 0));
+  }
+  const irept &req = decl.template_type().find(ID_C_requires_clause);
+  if(req.is_not_nil() && req.id() != ID_nil)
+    parts.push_back(concept_normal_expr(
+      symbol_table, static_cast<const exprt &>(req), dnf, 0));
+  if(parts.empty())
+    return {};
+  // A declaration's associated constraints are the conjunction of its
+  // constituents ([temp.constr.decl]).
+  constraint_normalt acc = parts.front();
+  for(std::size_t i = 1; i < parts.size(); ++i)
+    acc = dnf ? cross_product_union(acc, parts[i]) : set_union(acc, parts[i]);
+  return acc;
+}
+
+// normal_subsumes(DNF(P), CNF(Q)) per [temp.constr.order]/1, with the empty
+// normal form treated as the "true" constraint (subsumed by anything; subsumes
+// only "true").
+bool normal_subsumes(
+  const constraint_normalt &dnf_p,
+  const constraint_normalt &cnf_q)
+{
+  if(cnf_q.empty())
+    return true;
+  if(dnf_p.empty())
+    return false;
+  for(const auto &pi : dnf_p)
+    for(const auto &qj : cnf_q)
+    {
+      bool shares_atomic = false;
+      for(const auto &atom : pi)
+        if(qj.count(atom) != 0)
+        {
+          shares_atomic = true;
+          break;
+        }
+      if(!shares_atomic)
+        return false;
+    }
+  return true;
+}
+
+// True iff declaration p is STRICTLY more constrained than q ([temp.func.order]
+// + [temp.constr.order]): p's associated constraints subsume q's but not the
+// other way round.
+bool template_constraint_strictly_subsumes(
+  const symbol_table_baset &symbol_table,
+  const cpp_declarationt &p,
+  const cpp_declarationt &q)
+{
+  const bool p_subsumes_q = normal_subsumes(
+    template_constraint_normal(symbol_table, p, /*dnf=*/true),
+    template_constraint_normal(symbol_table, q, /*dnf=*/false));
+  const bool q_subsumes_p = normal_subsumes(
+    template_constraint_normal(symbol_table, q, /*dnf=*/true),
+    template_constraint_normal(symbol_table, p, /*dnf=*/false));
+  return p_subsumes_q && !q_subsumes_p;
+}
+
+// Does this (function) template declaration carry any associated constraint?
+bool template_is_constrained(const cpp_declarationt &decl)
+{
+  for(const auto &p : decl.template_type().template_parameters())
+    if(!p.get("#C_concept_constraint").empty())
+      return true;
+  const irept &req = decl.template_type().find(ID_C_requires_clause);
+  return req.is_not_nil() && req.id() != ID_nil;
+}
+
+// Historical constraint-name spelling of a template declaration, used only for
+// the substring fallback when normal-form subsumption is inconclusive.  Mirrors
+// the previous get_tmpl_concepts extraction.
+std::string constraint_name_string(const cpp_declarationt &decl)
+{
+  for(const auto &p : decl.template_type().template_parameters())
+  {
+    const irep_idt &cc = p.get("#C_concept_constraint");
+    if(!cc.empty())
+      return id2string(cc);
+  }
+  const irept &req = decl.template_type().find(ID_C_requires_clause);
+  if(req.is_not_nil() && req.id() != ID_nil)
+  {
+    std::string concepts;
+    std::function<void(const irept &)> visit = [&](const irept &node)
+    {
+      if(node.id() == ID_name)
+      {
+        const irep_idt &nm = node.get(ID_identifier);
+        if(!nm.empty())
+        {
+          if(!concepts.empty())
+            concepts += "&&";
+          concepts += id2string(nm);
+        }
+      }
+      for(const auto &sub : node.get_sub())
+        visit(sub);
+    };
+    visit(req);
+    return concepts;
+  }
+  return {};
+}
+} // namespace
+
 /// guess arguments of function templates
 void cpp_typecheck_resolvet::guess_function_template_args(
   resolve_identifierst &identifiers,
@@ -174,18 +485,22 @@ void cpp_typecheck_resolvet::guess_function_template_args(
         irep_idt cj = get_constraint(old_identifiers[j]);
         if(cj.empty())
           continue;
-        // CONFORMANCE NOTE (Gap G3, see doc/architectural/
-        // cpp-frontend-review-2026-06-23-deduction-conformance.md): N5008
-        // [temp.constr.order] (13.5.4) defines subsumption by normalising each
-        // constraint to a conjunction/disjunction of atomic constraints and
-        // testing implication.  The substring test below is a deliberate
-        // TEXTUAL APPROXIMATION of that: it treats candidate i as subsumed by j
-        // when j's constraint spelling contains i's.  It orders simple nested
-        // constraints but is neither sound (unrelated constraints sharing a
-        // substring are wrongly ordered) nor complete (subsuming constraints
-        // with different spellings are missed).  A faithful implementation
-        // requires atomic-constraint normalisation + implication.
-        if(id2string(cj).find(id2string(ci)) != std::string::npos && ci != cj)
+        // N5008 [temp.constr.order]/1: candidate i is the less-constrained one
+        // (and is removed) when some other candidate j is strictly more
+        // constrained.  Subsumption is computed on the normal forms of the
+        // constraints (constraint_subsumes).  When the normal-form comparison
+        // is inconclusive (e.g. a constraint we cannot fully decompose, such as
+        // some library ranges concepts), fall back to the historical
+        // name-substring heuristic -- but only when the correct comparison has
+        // NOT shown i to be the strictly more-constrained one, so we never drop
+        // the better candidate (the bug this fixes).
+        if(constraint_strictly_subsumes(cpp_typecheck.symbol_table, cj, ci))
+        {
+          subsumed[i] = true;
+        }
+        else if(
+          !constraint_strictly_subsumes(cpp_typecheck.symbol_table, ci, cj) &&
+          ci != cj && id2string(cj).find(id2string(ci)) != std::string::npos)
         {
           subsumed[i] = true;
         }
@@ -4063,97 +4378,85 @@ resolved_after_strip:
     new_identifiers = identifiers;
 
     // C++20 concept subsumption: before instantiation, filter out
-    // templates subsumed by more constrained ones.
+    // function-template candidates that are strictly less constrained than a
+    // sibling candidate (N5008 [temp.constr.order]/1 + [over.match.best]/2.6).
+    // Subsumption is computed on the normal forms of the associated constraints
+    // (template_constraint_strictly_subsumes), not by a textual comparison of
+    // constraint names; e.g. `Cheap` is preferred over `Cheap || Rare` because
+    // Cheap subsumes Cheap||Rare, even though the latter's name is longer.
     if(new_identifiers.size() > 1)
     {
-      auto get_tmpl_concepts = [&](const exprt &id) -> std::string
+      auto candidate_decl = [&](const exprt &id) -> const cpp_declarationt *
       {
-        irep_idt sym_id = id.get(ID_identifier);
+        const irep_idt sym_id = id.get(ID_identifier);
         if(sym_id.empty())
-          return {};
+          return nullptr;
         const auto *sym = cpp_typecheck.symbol_table.lookup(sym_id);
-        if(!sym || !sym->type.get_bool(ID_is_template))
-          return {};
-        const cpp_declarationt &decl = to_cpp_declaration(sym->type);
-        for(const auto &p : decl.template_type().template_parameters())
-        {
-          const irep_idt &cc = p.get("#C_concept_constraint");
-          if(!cc.empty())
-            return id2string(cc);
-        }
-        const auto &req_expr = decl.template_type().find(ID_C_requires_clause);
-        if(req_expr.is_not_nil() && req_expr.id() != ID_nil)
-        {
-          std::string concepts;
-          std::function<void(const irept &)> visit = [&](const irept &node)
-          {
-            if(node.id() == ID_name)
-            {
-              const irep_idt &nm = node.get(ID_identifier);
-              if(!nm.empty())
-              {
-                if(!concepts.empty())
-                  concepts += "&&";
-                concepts += id2string(nm);
-              }
-            }
-            for(const auto &sub : node.get_sub())
-              visit(sub);
-          };
-          visit(req_expr);
-          return concepts;
-        }
-        return {};
+        if(
+          sym == nullptr || !sym->type.get_bool(ID_is_template) ||
+          sym->type.id() != ID_cpp_declaration)
+          return nullptr;
+        return &to_cpp_declaration(sym->type);
       };
 
-      auto concept_subsumes =
-        [&](const std::string &cj, const std::string &ci) -> bool
-      {
-        if(cj == ci)
-          return false;
-        if(cj.find(ci) != std::string::npos)
-          return true;
-        // Look up concept template definition
-        for(const auto &entry : cpp_typecheck.symbol_table)
-        {
-          if(
-            id2string(entry.second.base_name) != cj ||
-            !entry.second.type.get_bool(ID_is_template))
-            continue;
-          bool found = false;
-          std::function<void(const irept &)> search = [&](const irept &node)
-          {
-            if(found)
-              return;
-            if(node.id() == ID_name && id2string(node.get(ID_identifier)) == ci)
-              found = true;
-            for(const auto &sub : node.get_sub())
-              search(sub);
-            for(const auto &named : node.get_named_sub())
-              search(named.second);
-          };
-          search(entry.second.type);
-          if(found)
-            return true;
-        }
-        return false;
-      };
-
-      std::vector<std::string> constraints;
+      std::vector<const cpp_declarationt *> decls;
+      std::vector<std::string> cstr;
+      decls.reserve(new_identifiers.size());
+      cstr.reserve(new_identifiers.size());
       for(const auto &id : new_identifiers)
-        constraints.push_back(get_tmpl_concepts(id));
+      {
+        const cpp_declarationt *d = candidate_decl(id);
+        // Only consider constrained templates, so an unconstrained or
+        // non-template candidate is never dropped here (it is ordered by the
+        // normal best-match/partial-ordering rules instead).
+        const bool constrained = d != nullptr && template_is_constrained(*d);
+        decls.push_back(constrained ? d : nullptr);
+        cstr.push_back(
+          constrained ? constraint_name_string(*d) : std::string{});
+      }
 
       std::vector<bool> subsumed(new_identifiers.size(), false);
-      for(std::size_t i = 0; i < constraints.size(); ++i)
+      for(std::size_t i = 0; i < decls.size(); ++i)
       {
-        if(constraints[i].empty())
+        if(decls[i] == nullptr || decls[i]->declarators().empty())
           continue;
-        for(std::size_t j = 0; j < constraints.size(); ++j)
+        for(std::size_t j = 0; j < decls.size(); ++j)
         {
-          if(i == j || constraints[j].empty())
+          if(i == j || decls[j] == nullptr || decls[j]->declarators().empty())
             continue;
-          if(concept_subsumes(constraints[j], constraints[i]))
+          // Constraint subsumption only breaks ties between candidates that
+          // are otherwise equivalent ([over.match.best]/2.6).  Restrict the
+          // drop to candidates with the SAME function signature (same
+          // parameter pattern and return type) -- precisely the same-signature
+          // overloads that would otherwise collide -- so we never eliminate a
+          // distinct-signature overload (e.g. a different std::span
+          // constructor) on constraints alone, before argument matching.
+          if(
+            decls[i]->declarators().front().type() !=
+              decls[j]->declarators().front().type() ||
+            decls[i]->type() != decls[j]->type())
+            continue;
+          // Primary: normal-form subsumption ([temp.constr.order]/1) -- drop i
+          // if j is strictly more constrained.
+          if(template_constraint_strictly_subsumes(
+               cpp_typecheck.symbol_table, *decls[j], *decls[i]))
+          {
             subsumed[i] = true;
+          }
+          // Fallback: when normal-form subsumption is inconclusive (a
+          // constraint we cannot fully decompose, e.g. some library ranges
+          // concepts), use the historical name-substring heuristic -- but only
+          // when the correct comparison has NOT shown i to be the strictly
+          // more-constrained candidate, so the better overload is never
+          // dropped (the bug this fixes, e.g. Cheap vs Cheap||Rare).
+          else if(
+            !template_constraint_strictly_subsumes(
+              cpp_typecheck.symbol_table, *decls[i], *decls[j]) &&
+            !cstr[i].empty() && !cstr[j].empty() && cstr[i] != cstr[j] &&
+            cstr[j].find(cstr[i]) != std::string::npos)
+          {
+            subsumed[i] = true;
+          }
         }
       }
 
