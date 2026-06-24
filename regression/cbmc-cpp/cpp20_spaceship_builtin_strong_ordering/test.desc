@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ 1 <=> 2 is less: SUCCESS$
+^\[main\.assertion\.2\] line \d+ 5 <=> 5 is equal: SUCCESS$
+^\[main\.assertion\.3\] line \d+ 9 <=> 4 greater: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+invalid implicit conversion
+--
+N5008 [expr.spaceship]/8: a built-in three-way comparison of integral operands
+yields std::strong_ordering (not int).  Previously CBMC lowered builtin a<=>b to
+an int, so binding the result to std::strong_ordering raised a CONVERSION ERROR.
