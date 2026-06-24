@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ auto deduced from bit-field holds its value: SUCCESS$
+^\[main\.assertion\.2\] line \d+ auto-from-bit-field variable is a full unsigned: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+unexpected expression
+--
+N5008 [class.bit]/[dcl.type.auto.deduct]: `auto` deduced from a bit-field read
+yields the underlying type, not a bit-field type.  Previously CBMC deduced the
+c_bit_field_typet (width lost) and reported "unexpected expression".
