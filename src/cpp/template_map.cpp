@@ -442,6 +442,17 @@ void template_mapt::apply(typet &type) const
           has_targs = true;
 
       // Try to match against type_map entries
+      //
+      // CONFORMANCE WARNING (Violation V1, see doc/architectural/
+      // cpp-frontend-review-2026-06-24-template-map-scope.md): this resolves a
+      // bare parameter reference by SHORT NAME (suffix after the last "::")
+      // across the whole flat map, violating N5008 [basic.scope.temp]/2
+      // (parameter identity is scope + name).  When an unrelated live
+      // instantiation has a same-named parameter, this can substitute the wrong
+      // binding -- the root of the recurring cross-template "pack bleed".  The
+      // `#tmpl_param_shadow` marker below and the shadow-removal loop in
+      // build() are patches around this; the structural fix is to resolve only
+      // by exact scope-qualified identifier.
       for(const auto &entry : type_map)
       {
         const std::string &key = id2string(entry.first);
