@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/ansi_c_language.h>
 #include <ansi-c/goto-conversion/goto_check_c.h>
 #include <goto-checker/bmc_util.h>
+#include <goto-checker/sarif_report.h>
 #include <goto-instrument/cover.h>
 #include <json/json_interface.h>
 #include <langapi/language.h>
@@ -50,6 +51,7 @@ class optionst;
   OPT_GOTO_CHECK \
   OPT_XML_INTERFACE \
   OPT_JSON_INTERFACE \
+  OPT_SARIF_RESULT \
   OPT_SOLVER \
   OPT_STRING_REFINEMENT_CBMC \
   OPT_SHOW_GOTO_FUNCTIONS \

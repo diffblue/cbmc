@@ -521,6 +521,28 @@ int cbmc_parse_optionst::doit()
   messaget::eval_verbosity(
     cmdline.get_value("verbosity"), messaget::M_STATUS, ui_message_handler);
 
+  // --sarif-result: open the output file before doing any work
+  sarif_outputt sarif_output{cmdline, "cbmc", ui_message_handler};
+  if(sarif_output.to_stdout())
+  {
+    // Writing SARIF to standard output cannot be combined with another
+    // stdout-based UI mode: the two would interleave into output that is
+    // neither valid SARIF nor valid JSON/XML.
+    if(ui_message_handler.get_ui() != ui_message_handlert::uit::PLAIN)
+    {
+      log.error() << "--sarif-result - cannot be combined with another "
+                     "stdout-based UI mode (--json-ui, --json-interface, "
+                     "--xml-ui, --xml-interface); write SARIF to a file instead"
+                  << messaget::eom;
+      return CPROVER_EXIT_USAGE_ERROR;
+    }
+    // only the SARIF log goes to standard output; warnings and errors go to
+    // standard error
+    ui_message_handler.set_verbosity(messaget::M_WARNING);
+  }
+  if(!sarif_output.open())
+    return CPROVER_EXIT_USAGE_ERROR;
+
   log_version_and_architecture("CBMC");
 
   //
@@ -794,6 +816,9 @@ int cbmc_parse_optionst::doit()
 
   const resultt result = (*verifier)();
   verifier->report();
+
+  if(!sarif_output.write(verifier->get_properties()))
+    return CPROVER_EXIT_INTERNAL_ERROR;
 
   return result_to_exit_code(result);
 }
@@ -1102,6 +1127,7 @@ void cbmc_parse_optionst::help()
     "User-interface options:\n"
     HELP_XML_INTERFACE
     HELP_JSON_INTERFACE
+    HELP_SARIF_RESULT
     HELP_GOTO_TRACE
     HELP_FLUSH
     " {y--verbosity} {u#} \t verbosity level (default 6)\n"
