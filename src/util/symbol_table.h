@@ -57,6 +57,7 @@ public:
       internal_symbol_base_map(std::move(other.internal_symbol_base_map)),
       internal_symbol_module_map(std::move(other.internal_symbol_module_map))
   {
+    suffix_hint_cache = std::move(other.suffix_hint_cache);
   }
 
   /// Move assignment operator.
@@ -65,6 +66,7 @@ public:
     internal_symbols = std::move(other.internal_symbols);
     internal_symbol_base_map = std::move(other.internal_symbol_base_map);
     internal_symbol_module_map = std::move(other.internal_symbol_module_map);
+    suffix_hint_cache = std::move(other.suffix_hint_cache);
     return *this;
   }
 
@@ -75,6 +77,7 @@ public:
     internal_symbols.swap(other.internal_symbols);
     internal_symbol_base_map.swap(other.internal_symbol_base_map);
     internal_symbol_module_map.swap(other.internal_symbol_module_map);
+    suffix_hint_cache.swap(other.suffix_hint_cache);
   }
 
 public:
@@ -102,6 +105,7 @@ public:
     internal_symbols.clear();
     internal_symbol_base_map.clear();
     internal_symbol_module_map.clear();
+    suffix_hint_cache.clear();
   }
 
   virtual iteratort begin() override
