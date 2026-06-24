@@ -303,6 +303,42 @@ architectural change guarded by a debug-build invariant asserting
 `lookup_by_suffix` is never reached — **not** as a speculative refactor.  It is
 deliberately left unimplemented here pending that decision.
 
+### Increment 2 attempt (2026-06-24): surface fix proven non-viable; root is V2
+
+The user authorised attempting Increment 2 (revert as a safety net).  Two
+surface strategies were tried empirically:
+
+1. **Disable the bridge** (unbound → throw, treated as dependent/SFINAE).  This
+   **breaks 10+ tests** — `cpp20_span_basic`, `cpp17_vector_*`,
+   `cpp23_optional_monadic`, optional construction, etc.  So the bridge is
+   **load-bearing for real instantiations**, not only dependent SFINAE
+   contexts.
+2. **Keep-dependent** (return the parameter's own
+   `template_parameter_symbol_typet`) would break the same set identically,
+   since those instantiations genuinely need the recovered binding.
+
+Instrumenting the load-bearing uses (span test) was decisive: the **same**
+use-site id `std::template::1335::_Tp` resolves to **many different** bound keys
+within one compilation — `std::template::{363,594,906,529,...}::_Tp`, 926 times.
+So a body's parameter reference is a **template-scope-relative id that is
+late-bound by name** to whichever instantiation map is active at the moment of
+resolution; it is **not** a fixable static "1335→N" renumbering.  The earlier
+dual-numbering hypothesis is therefore wrong, and so is the "unify allocation"
+framing above: the references are correct as written; what is missing is
+**per-instantiation parameter identity** so that, while template T is being
+instantiated, T's parameter references and T's bindings carry the *same*
+identity and exact lookup succeeds without a name bridge.
+
+**Conclusion.**  Removing/replacing the suffix bridge is not a localized change;
+it requires the **V2 per-instantiation isolation** rework (parameter identity
+tied to the active instantiation), a fundamental change to the frontend's
+instantiation machinery with high blast radius and **no driving correctness
+test** (Increment 1's nearest-scope rule already makes the residual ambiguity
+benign).  Increment 1 is the conforming improvement that was safely achievable;
+full bridge removal (Increment 2) is deferred as an explicit architectural
+project, to be driven by per-instantiation identity rather than by patching the
+resolution site.
+
 ## How to use this map
 
 Before changing any short-name match site, find its row/Violation above; a
