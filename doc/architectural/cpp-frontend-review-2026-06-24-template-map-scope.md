@@ -246,6 +246,63 @@ carry their full scope-qualified identifier ([temp.res] two-phase), after which
 construction.  This makes Increment 2 (scope-id consistency) the linchpin of the
 whole V1 removal, not an optional follow-up.
 
+### Increment 2 investigation (2026-06-24): root cause pinned; no driving correctness test
+
+Before attempting the deep scope-id-consistency rework, its premise was tested
+empirically (the methodology requires a driving failing test, ideally a
+KNOWNBUG to flip to CORE):
+
+1. **15+ hand-built shapes** exercising the V1/V2 ambiguity directly — nested
+   class templates with same-named params, member templates shadowing the
+   enclosing param, partial specialisations, template-template parameters,
+   alias templates, recursive non-type templates (`Fib`), recursive type
+   templates, two live instantiations of one template, sibling templates
+   instantiated inside a third's body. **All verify correctly.**
+2. The three currently-failing std features were diagnosed and are **not** V1:
+   `std::tie` and structured-bindings use the `get<>` write path (the separate
+   trailing-pack bug); `std::optional<int>` fails because the payload union
+   reads `_M_empty` instead of `_M_value` (a union-payload storage bug),
+   confirmed to **not** trip the suffix path at all.
+3. **Residual tied ambiguity after Increment 1** (instrumented over the whole
+   `cbmc-cpp` suite): only **111** calls, from **2** distinct std references
+   (`std::template::1335::_Tp`, `std::template::2680::_Tp`), tie across sibling
+   `std::template::{578,594,597,...}::_Tp` (all equidistant; the reference's
+   scope-number matches none).  The suite still passes — the first-among-ties
+   pick is benign.  The only tests that trip it (`cpp20_array_basic`,
+   `cpp20_libcxx_optional`) produce correct element type, size and value.
+
+**Conclusion:** the V1/V2 short-name ambiguity is real architecturally but
+**benign in every reachable, checkable case** — there is no wrong-result
+KNOWNBUG that Increment 2 would flip to CORE.
+
+**Root cause of the suffix reliance (pinned by tracing the failing exact
+lookup).**  Resolving `std::template::1335::_Tp`, the live map holds
+`std::template::476::_Tp` / `std::template::624::_Tp` (plus unrelated
+`_Iterator`/`_Nm`) but **no** key under `1335`.  The *same logical parameter*
+carries **two different scope-numbers**: the number under which its binding is
+*registered* in the map (476/624, from the template's recorded
+`template_parameters()` ids — `template_map.cpp` build() keys on
+`parameter.type().get(ID_identifier)`) and the number baked into the *body
+reference* (1335).  I.e. the template's parameter scope is allocated more than
+once (forward-declaration vs definition / primary vs partial-specialisation),
+so the body reference id can never equal the bound key, and the short-name
+bridge is taken on every such reference (the 47322 exact-lookup misses).
+
+**Implication for Increment 2.**  The conforming fix is to make a parameter's
+*use-site* identifier equal its *registered* identifier — i.e. unify the
+duplicate scope allocation so a template's parameters keep one identity from
+declaration through definition through instantiation ([temp.local]/[temp.res]).
+That is a change to template-parameter scope-number assignment in the
+parser/declaration-merge path, not to `template_map` itself; its only
+validatable success criterion is *"exact lookup succeeds for the 47322 cases →
+`lookup_by_suffix` becomes dead → remove it, both suites green"* (there is no
+KNOWNBUG→CORE flip available, the ambiguity being benign).  Given the high blast
+radius (290k+ currently-correct resolutions) and the absence of a correctness
+driver, this should be undertaken as an explicit, separately-scoped
+architectural change guarded by a debug-build invariant asserting
+`lookup_by_suffix` is never reached — **not** as a speculative refactor.  It is
+deliberately left unimplemented here pending that decision.
+
 ## How to use this map
 
 Before changing any short-name match site, find its row/Violation above; a
