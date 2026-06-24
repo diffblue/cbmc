@@ -47,13 +47,16 @@ claims and are authoritative:
   CBMC returns 2) shows the real defect is one level earlier: two
   concept-constrained overloads with otherwise-identical signatures collide on
   a single instance symbol, so only one candidate ever reaches disambiguation
-  and the subsumption *ordering* code never runs.  A correct fix needs both
-  (a) such overloads forming a proper overload set, and (b) real subsumption
-  ordering per [temp.constr.order]/1 (prescribed in G3 below).
+  and the subsumption *ordering* code never runs.  **Fixed** (commit on
+  2026-06-24): `resolve`'s pre-instantiation filter now orders constrained
+  overloads by real normal-form subsumption per [temp.constr.order]/1
+  (restricted to same-signature candidates, with a substring fallback where a
+  constraint cannot be fully decomposed), so the more-constrained overload is
+  selected before instantiation and the same-signature collision is avoided.
+  `cpp11_concept_more_constrained_overload` is now **CORE**.
 
 Net: the deduction subsystem is more conformant than the original single-repro
-review implied; the remaining concrete, reproducible defect is concept-overload
-set formation + ordering (G3').
+review implied; the concept-overload selection defect (G3') is now resolved.
 
 ## Conformance map
 
@@ -67,7 +70,7 @@ set formation + ordering (G3').
 | `[temp.variadic]`/5,8 (13.7.4) | A type parameter pack binds an element *list*; `sizeof...` yields the element count. | `template_mapt::build` pack block (`template_map.cpp` ~1220–1265): `pack_args_map`/`pack_size_map`, plus a `type_map` convenience entry for 1-element packs. | **IMPLEMENTED** |
 | `[temp.variadic]`/10 (13.7.4) | When `N == 0`, instantiating a pack expansion produces an empty list and does not change the enclosing construct. | Base-specifier arg lists: `cpp_typecheck_bases.cpp` (empty-pack base drop); and the `variadic_pack_empty` truncation in `guess_function_template_args`. | **IMPLEMENTED** (revised) — clean reproducers of an empty pack expansion in a body qualified-id verify correctly; see Re-investigation update (was provisionally G2). |
 | `[temp.arg.explicit]`/4, Note 1 (13.10.2) | A **trailing** template parameter pack **not otherwise deduced** is deduced as an **empty sequence**. | `guess_function_template_args` (`variadic_pack_empty` truncation) + `build_unassigned` clean slate. | **IMPLEMENTED** (revised) — clean reproducers verify correctly; not an independent defect.  See Re-investigation update (was provisionally G1). |
-| `[temp.constr.order]` (13.5.4) / `[temp.constr.*]` | Constraint subsumption determines the more-constrained candidate. | `guess_function_template_args` concept filter; overload set formation/instantiation. | **VIOLATED** (revised) — but the operative defect is concept-overload **set formation** (colliding instances), not the subsumption test alone.  See Gap G3' and `cpp11_concept_more_constrained_overload`. |
+| `[temp.constr.order]` (13.5.4) / `[temp.constr.*]` | Constraint subsumption determines the more-constrained candidate. | `resolve`/`guess_function_template_args` concept filters; normal-form subsumption helpers in `cpp_typecheck_resolve.cpp`. | **IMPLEMENTED** (2026-06-24) — real DNF/CNF subsumption replaces the substring heuristic; same-signature-restricted with substring fallback.  See Gap G3' and `cpp11_concept_more_constrained_overload` (CORE). |
 
 ## Gaps and deviations
 
@@ -147,10 +150,15 @@ same-named packs across distinct templates (the short-name suffix match cannot
 disambiguate `X::Pack` from `Y::Pack`); since the existing truncation already
 handles the clean cases, that extra collapse is unnecessary and was not added.
 
-### G3' — concept-overload selection: set formation + subsumption ordering (VIOLATED, reproducible)
+### G3' — concept-overload selection: set formation + subsumption ordering (RESOLVED 2026-06-24)
+
+> **Resolved.** Real normal-form subsumption now replaces the substring
+> heuristic in `resolve`'s pre-instantiation filter, and
+> `cpp11_concept_more_constrained_overload` is **CORE**.  The discussion below
+> records the diagnosis and the implemented design.
 
 Reproducer: `regression/cbmc-cpp/cpp11_concept_more_constrained_overload`
-(header-free; g++ returns 1, CBMC returns 2).
+(header-free; g++ returns 1, CBMC formerly returned 2).
 
 ```cpp
 template <typename T> concept Cheap = sizeof(T) >= 1;
@@ -192,11 +200,25 @@ Two related issues, in order of operative importance:
    `Cheap||Rare`; the converse fails on the `{Rare}` clause, so `Cheap` is
    strictly more constrained and `f<Cheap>` wins.
 
-   A prototype of this ordering (a `constraint_subsumes` helper plus a
-   subsumption pass in `disambiguate_functions`) was implemented and validated
-   in isolation, but **shelved** because issue (1) prevents both candidates from
-   reaching the ordering step; landing the ordering alone would be dead code.
-   Both halves are required to flip the KNOWNBUG to CORE.
+**Implemented design (commit 2026-06-24).** `resolve`'s pre-instantiation
+concept filter now uses normal-form subsumption (`constraint_subsumes` /
+`template_constraint_strictly_subsumes` in `cpp_typecheck_resolve.cpp`).  By
+narrowing to the more-constrained template *before* instantiation, issue (1) is
+avoided as a side effect: only the chosen overload is instantiated, so the
+same-signature instance collision never arises.  Two guards keep the change
+sound on real code:
+
+- the subsumption drop is applied only between candidates with the **same
+  function signature** (same parameter pattern and return type) — the
+  otherwise-equivalent, would-collide case — so distinct-signature overloads
+  (e.g. different `std::span` constructors) are never dropped on constraints
+  alone before argument matching;
+- when a constraint cannot be fully decomposed (e.g. some library ranges
+  concepts), the filter **falls back** to the historical name-substring
+  heuristic, but never drops a candidate the correct comparison has shown to be
+  the strictly more-constrained one.
+
+Both regression suites (`cbmc-cpp -X libcxx`, `cbmc`) pass with the change.
 
 ## Notes on sites that are already conformant
 
