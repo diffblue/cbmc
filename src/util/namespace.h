@@ -66,10 +66,24 @@ public:
   const c_enum_typet &follow_tag(const c_enum_tag_typet &) const;
   const struct_union_typet &follow_tag(const struct_or_union_tag_typet &) const;
 
-  /// Returns the minimal integer n such that there is no symbol (in any of the
-  /// symbol tables) whose name is of the form "An" where A is \p prefix.
-  /// The intended use case is finding the next available symbol name for a
-  /// sequence of auto-generated symbols.
+  /// Returns an integer n intended for naming the next symbol in a sequence of
+  /// auto-generated symbols of the form "An" where A is \p prefix.  With a
+  /// single symbol table (the common case) there is no symbol "An" in that
+  /// table.  With multiple tables the result is the maximum of each table's
+  /// `next_unused_suffix(prefix)`: each per-table value is unused in its own
+  /// table, and the maximum is unused in every table when the tables allocate
+  /// such suffixes monotonically from 0 (no gaps) -- which holds for
+  /// auto-generated symbols.  If the tables have differing gaps for the same
+  /// prefix the maximum is not guaranteed unused across all tables; this is a
+  /// pre-existing property of the max-based combination.
+  ///
+  /// \note The returned suffix is not guaranteed to be the smallest such
+  ///   value: the underlying `symbol_table_baset::next_unused_suffix` keeps a
+  ///   monotonically advancing per-prefix hint, so this is a stateful query
+  ///   that mutates that hint on each call rather than a pure minimum search.
+  ///   With multiple symbol tables every call advances the hint of *each*
+  ///   table even though only one symbol is ultimately allocated, which may
+  ///   leave gaps.
   virtual std::size_t
   smallest_unused_suffix(const std::string &prefix) const = 0;
 
