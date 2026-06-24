@@ -1159,6 +1159,33 @@ void cpp_typecheckt::typecheck_expr_sizeof(exprt &expr)
       {
         const irep_idt &base_name =
           cpp_name.get_sub().front().get(ID_identifier);
+
+        // N5008 [temp.variadic]/8 + [basic.scope.temp]/2: `sizeof...(P)`
+        // counts the elements of the pack P named in the *current* scope.
+        // Resolve P to its scope-qualified template-parameter identifier and
+        // read its size exactly, rather than matching the bare short name
+        // against pack_size_map below -- two unrelated templates may each have
+        // a pack spelled the same (e.g. several `_Types`), and a short-name
+        // match returns whichever sorts first, which can be a different
+        // template's pack of a different size and so mis-evaluate the query
+        // (e.g. yielding 0 for a one-element pack, turning a would-be-false
+        // `__i >= sizeof...(_Types)` SFINAE constraint true).
+        {
+          const auto id_set = cpp_scopes.current_scope().lookup(
+            base_name,
+            cpp_scopet::RECURSIVE,
+            cpp_idt::id_classt::TEMPLATE_PARAMETER);
+          for(const auto *id_ptr : id_set)
+          {
+            auto it = template_map.pack_size_map.find(id_ptr->identifier);
+            if(it != template_map.pack_size_map.end())
+            {
+              expr = from_integer(it->second, size_type());
+              return;
+            }
+          }
+        }
+
         // Look up pack size by suffix match
         for(const auto &entry : template_map.pack_size_map)
         {
