@@ -295,7 +295,8 @@ void cpp_typecheckt::default_cpctor(
 
     if(
       mem_c.get_bool(ID_from_base) || mem_c.get_bool(ID_is_type) ||
-      mem_c.get_bool(ID_is_static) || mem_c.type().id() == ID_code)
+      mem_c.get_bool(ID_is_static) || mem_c.get_is_padding() ||
+      mem_c.type().id() == ID_code)
     {
       continue;
     }
@@ -461,7 +462,7 @@ void cpp_typecheckt::default_assignop_value(
     if(
       c.get_bool(ID_from_base) || c.get_bool(ID_is_type) ||
       c.get_bool(ID_is_static) || c.get_bool(ID_is_vtptr) ||
-      c.type().id() == ID_code)
+      c.get_is_padding() || c.type().id() == ID_code)
     {
       continue;
     }
@@ -1001,7 +1002,7 @@ void cpp_typecheckt::full_member_initialization(
 
     if(
       c.get_bool(ID_from_base) || c.type().id() == ID_code ||
-      c.get_bool(ID_is_type) || c.get_bool(ID_is_static))
+      c.get_bool(ID_is_type) || c.get_bool(ID_is_static) || c.get_is_padding())
     {
       continue;
     }

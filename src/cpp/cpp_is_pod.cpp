@@ -47,6 +47,12 @@ bool cpp_typecheckt::cpp_is_pod(const typet &type) const
       if(c.get_bool(ID_is_type))
         continue;
 
+      // Padding inserted for ABI layout ([class.bit]/[basic.align]) is not a
+      // member ([class.mem]): it has no access specifier and must not affect
+      // the triviality/POD-ness of the class.
+      if(c.get_is_padding())
+        continue;
+
       if(c.get_base_name() == "operator=")
         return false;
 

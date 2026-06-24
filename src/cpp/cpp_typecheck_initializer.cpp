@@ -585,9 +585,13 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
         struct_exprt result({}, symbol.type);
         for(const auto &c : struct_type.components())
         {
+          // [class.bit]/1, [class.mem]: padding inserted for ABI layout is not
+          // a member; aggregate initialisation matches initialiser-clauses to
+          // members positionally, so a padding component must not consume one.
           if(
             c.get_bool(ID_from_base) || c.get_bool(ID_is_type) ||
-            c.get_bool(ID_is_static) || c.type().id() == ID_code)
+            c.get_bool(ID_is_static) || c.get_is_padding() ||
+            c.type().id() == ID_code)
           {
             continue;
           }
