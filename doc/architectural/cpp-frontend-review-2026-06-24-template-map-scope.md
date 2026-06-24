@@ -193,6 +193,41 @@ explicit/deduced argument the empty sequence on the instantiate path too (mirror
 the existing signature-side truncation, or represent the empty pack explicitly
 so `build` sizes it 0).
 
+## Migration progress
+
+### Increment 1 (2026-06-24): suite-wide suffix measurement + nearest-scope disambiguation — DONE (commit `b958b5fe73`)
+
+Measurement across the whole `cbmc-cpp` suite (instrumenting `lookup_by_suffix`):
+
+- **47322** calls (each after an exact scope-qualified `lookup` had already
+  failed) — the suffix fallback is heavily load-bearing.
+- **2326** of them are **ambiguous** (`nhits>1`): several live bindings share
+  the short name, e.g. `std::__detail::template::1805::_Tp` vs
+  `std::template::1837::_Tp`.  These are the latent Violation-V1 bleeds.
+- The reference ids that fail exact lookup are themselves scope-qualified (e.g.
+  `std::template::1335::_Tp`); they fail because the **same parameter is
+  registered under a different instantiation scope-number**.  So the root that
+  forces the fallback is a **scope-number inconsistency** between a parameter's
+  declaration id and its use-site id ([temp.res] two-phase / [temp.point]).
+
+Change made: `lookup_by_suffix` now takes the reference's full id and resolves
+ambiguity to the **nearest enclosing scope** ([basic.scope.temp]/2) — the
+candidate sharing the longest leading `::`-component path — instead of the
+arbitrary first map entry.  Both suites pass.  This makes the 2326 ambiguous
+cases conforming without removing the fallback.
+
+### Prerequisite for removing the fallback (Increment 2, not yet done)
+
+The 47322 exact-lookup failures must be eliminated first: a template
+parameter's identifier at its **use site** (in a body/type) must equal its
+identifier as **registered** in the map.  Today they differ by instantiation
+scope-number, so exact `lookup` misses and the suffix bridge is taken.  Closing
+this is the real V1 removal step and is a deeper change to template-parameter
+scope-id assignment ([temp.res]); it has no failing regression test driving it
+(the suite passes via the bridge), so it should be undertaken deliberately with
+the debug-build uniqueness invariant (below) to catch any remaining ambiguity as
+it is removed.
+
 ## How to use this map
 
 Before changing any short-name match site, find its row/Violation above; a
