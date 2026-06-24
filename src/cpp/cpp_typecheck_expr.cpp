@@ -2500,6 +2500,33 @@ bool cpp_typecheckt::has_viable_init_list_constructor(
 
 void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
 {
+  // C++17 class template argument deduction ([over.match.class.deduct]):
+  // `C{...}` / `C(...)` naming a class template written without a
+  // template-argument-list deduces the arguments from the initializer before
+  // construction.  Without this, the prvalue form (e.g. `auto x = Box{5}`)
+  // failed in typecheck_type below with "found no match for symbol 'Box'".
+  if(expr.type().id() == ID_cpp_name)
+  {
+    const cpp_namet &ctad_name =
+      to_cpp_name(static_cast<const irept &>(expr.type()));
+    std::vector<exprt> ctad_args;
+    if(
+      expr.operands().size() == 1 &&
+      expr.operands().front().id() == ID_initializer_list)
+    {
+      for(const auto &a : expr.operands().front().operands())
+        ctad_args.push_back(a);
+    }
+    else
+      ctad_args = expr.operands();
+
+    if(!ctad_args.empty())
+    {
+      if(auto deduced = deduce_class_template_arguments(ctad_name, ctad_args))
+        expr.type() = *deduced;
+    }
+  }
+
   typecheck_type(expr.type());
 
   if(cpp_is_pod(expr.type()))

@@ -18,6 +18,81 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck.h"
 #include "cpp_util.h"
 
+std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
+  const cpp_namet &class_template_name,
+  const std::vector<exprt> &args)
+{
+  // [dcl.type.class.deduct]: deduction only applies to a class-template-id
+  // written *without* a template-argument-list.
+  for(const auto &sub : class_template_name.get_sub())
+    if(sub.id() == ID_template_args)
+      return {};
+
+  // The name must denote a class template.
+  const cpp_idt *template_id = nullptr;
+  const auto id_set = cpp_scopes.current_scope().lookup(
+    class_template_name.get_base_name(), cpp_scopet::RECURSIVE);
+  for(const auto *id : id_set)
+  {
+    if(id->id_class == cpp_idt::id_classt::TEMPLATE)
+    {
+      template_id = id;
+      break;
+    }
+  }
+  if(template_id == nullptr)
+    return {};
+
+  // Count the template's type parameters (a trailing pack counts as one).
+  std::size_t n_type_params = 0;
+  {
+    const symbolt &sym = lookup(template_id->identifier);
+    const auto &tmpl_type =
+      static_cast<const template_typet &>(sym.type.find(ID_template_type));
+    for(const auto &p : tmpl_type.template_parameters())
+      if(p.id() == ID_type)
+        ++n_type_params;
+  }
+
+  // Heuristic deduction ([over.match.class.deduct] is not fully modelled):
+  // collect the distinct initializer-argument types, in order, up to the
+  // number of template type parameters, and use them as the deduced
+  // arguments.  This handles the common shapes `C<T>{t}`, `C<T>{t, t}`
+  // (members share a parameter) and `C<...Ts>{...}`.
+  std::vector<typet> deduced_types;
+  for(const auto &a : args)
+  {
+    exprt arg = a;
+    typecheck_expr(arg);
+    bool already_seen = false;
+    for(const auto &t : deduced_types)
+      if(t == arg.type())
+      {
+        already_seen = true;
+        break;
+      }
+    if(
+      !already_seen &&
+      (n_type_params == 0 || deduced_types.size() < n_type_params))
+      deduced_types.push_back(arg.type());
+  }
+
+  irept template_args(ID_template_args);
+  irept &args_sub = template_args.add(ID_arguments);
+  for(const auto &t : deduced_types)
+  {
+    exprt type_arg(ID_type);
+    type_arg.type() = t;
+    args_sub.get_sub().push_back(type_arg);
+  }
+
+  cpp_namet new_name = class_template_name;
+  new_name.get_sub().push_back(template_args);
+  typet result = static_cast<typet &>(static_cast<irept &>(new_name));
+  typecheck_type(result);
+  return result;
+}
+
 void cpp_typecheckt::convert(cpp_declarationt &declaration)
 {
   // see if the declaration is empty
