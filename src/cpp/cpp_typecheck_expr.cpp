@@ -203,6 +203,120 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   else if(operator_is_overloaded(expr))
   {
   }
+  else if(expr.id() == ID_spaceship && expr.operands().size() == 2)
+  {
+    // N5008 [expr.spaceship]/7-8: the built-in three-way comparison of two
+    // operands of arithmetic type yields a value of a comparison category
+    // type, NOT an int -- std::strong_ordering for integral operands and
+    // std::partial_ordering for floating-point operands.  (The plain int
+    // lowering in the C front-end is wrong for C++: `std::strong_ordering r =
+    // a <=> b;` then fails with "invalid implicit conversion from int".)  We
+    // lower to a conditional selecting the library's comparison-category
+    // constants, which is what the result is specified to equal.  When the
+    // <compare> header (hence the category type) is not available we fall back
+    // to the C int lowering, preserving the existing lenient behaviour.
+    const exprt &op0 = to_binary_expr(expr).op0();
+    const exprt &op1 = to_binary_expr(expr).op1();
+    const typet &t0 = op0.type();
+    const typet &t1 = op1.type();
+
+    auto is_arith = [](const typet &t)
+    {
+      return t.id() == ID_signedbv || t.id() == ID_unsignedbv ||
+             t.id() == ID_floatbv || t.id() == ID_fixedbv ||
+             t.id() == ID_bool || t.id() == ID_c_bool ||
+             t.id() == ID_c_enum_tag || t.id() == ID_c_enum;
+    };
+    const bool is_fp = t0.id() == ID_floatbv || t1.id() == ID_floatbv ||
+                       t0.id() == ID_fixedbv || t1.id() == ID_fixedbv;
+
+    // Resolve std::<category>::<member> to its (static const) object, quietly.
+    auto resolve_category_member =
+      [&](const char *category, const char *member) -> exprt
+    {
+      exprt name{ID_cpp_name};
+      auto &sub = name.get_sub();
+      sub.push_back(irept{ID_name});
+      sub.back().set(ID_identifier, "std");
+      sub.push_back(irept{"::"});
+      sub.push_back(irept{ID_name});
+      sub.back().set(ID_identifier, category);
+      sub.push_back(irept{"::"});
+      sub.push_back(irept{ID_name});
+      sub.back().set(ID_identifier, member);
+      name.add_source_location() = expr.source_location();
+
+      const std::size_t saved_errors =
+        get_message_handler().get_message_count(messaget::M_ERROR);
+      const unsigned saved_verbosity = get_message_handler().get_verbosity();
+      get_message_handler().set_verbosity(0);
+      exprt resolved = name;
+      try
+      {
+        cpp_save_scopet save_scope(cpp_scopes);
+        typecheck_expr(resolved);
+      }
+      catch(...)
+      {
+        resolved.make_nil();
+      }
+      get_message_handler().set_message_count(messaget::M_ERROR, saved_errors);
+      get_message_handler().set_verbosity(saved_verbosity);
+      return resolved;
+    };
+
+    bool lowered = false;
+    if(is_arith(t0) && is_arith(t1))
+    {
+      const char *category = is_fp ? "partial_ordering" : "strong_ordering";
+      exprt less = resolve_category_member(category, "less");
+      exprt greater = resolve_category_member(category, "greater");
+      exprt equalish =
+        resolve_category_member(category, is_fp ? "equivalent" : "equal");
+      exprt unordered =
+        is_fp ? resolve_category_member(category, "unordered") : nil_exprt();
+
+      if(
+        less.is_not_nil() && greater.is_not_nil() && equalish.is_not_nil() &&
+        (!is_fp || unordered.is_not_nil()))
+      {
+        const typet cat_type = less.type();
+        const source_locationt loc = expr.source_location();
+
+        binary_relation_exprt lt{op0, ID_lt, op1};
+        lt.type() = bool_typet();
+        lt.add_source_location() = loc;
+        binary_relation_exprt gt{op0, ID_gt, op1};
+        gt.type() = bool_typet();
+        gt.add_source_location() = loc;
+
+        if(!is_fp)
+        {
+          // a < b ? less : (a > b ? greater : equal)
+          if_exprt inner{gt, greater, equalish, cat_type};
+          if_exprt outer{lt, less, inner, cat_type};
+          outer.add_source_location() = loc;
+          expr.swap(outer);
+        }
+        else
+        {
+          // a < b ? less : (a > b ? greater : (a == b ? equivalent : unordered))
+          binary_relation_exprt eq{op0, ID_equal, op1};
+          eq.type() = bool_typet();
+          eq.add_source_location() = loc;
+          if_exprt i3{eq, equalish, unordered, cat_type};
+          if_exprt i2{gt, greater, i3, cat_type};
+          if_exprt outer{lt, less, i2, cat_type};
+          outer.add_source_location() = loc;
+          expr.swap(outer);
+        }
+        lowered = true;
+      }
+    }
+
+    if(!lowered)
+      c_typecheck_baset::typecheck_expr_main(expr);
+  }
   else if(expr.id() == "explicit-typecast")
     typecheck_expr_explicit_typecast(expr);
   else if(expr.id() == ID_typecast && expr.type().id() == ID_cpp_name)
