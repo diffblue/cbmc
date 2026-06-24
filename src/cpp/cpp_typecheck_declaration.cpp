@@ -43,39 +43,44 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
   if(template_id == nullptr)
     return {};
 
-  // Count the template's type parameters (a trailing pack counts as one).
-  std::size_t n_type_params = 0;
+  // The template's type parameters, noting a trailing parameter pack.
+  std::vector<bool> param_is_pack;
   {
     const symbolt &sym = lookup(template_id->identifier);
     const auto &tmpl_type =
       static_cast<const template_typet &>(sym.type.find(ID_template_type));
     for(const auto &p : tmpl_type.template_parameters())
       if(p.id() == ID_type)
-        ++n_type_params;
+        param_is_pack.push_back(p.get_bool(ID_ellipsis));
   }
+  const std::size_t n_type_params = param_is_pack.size();
+  const bool has_pack = n_type_params != 0 && param_is_pack.back();
 
-  // Heuristic deduction ([over.match.class.deduct] is not fully modelled):
-  // collect the distinct initializer-argument types, in order, up to the
-  // number of template type parameters, and use them as the deduced
-  // arguments.  This handles the common shapes `C<T>{t}`, `C<T>{t, t}`
-  // (members share a parameter) and `C<...Ts>{...}`.
-  std::vector<typet> deduced_types;
+  // Type-check the initializer arguments to obtain their types.
+  std::vector<typet> arg_types;
   for(const auto &a : args)
   {
     exprt arg = a;
     typecheck_expr(arg);
-    bool already_seen = false;
-    for(const auto &t : deduced_types)
-      if(t == arg.type())
-      {
-        already_seen = true;
-        break;
-      }
-    if(
-      !already_seen &&
-      (n_type_params == 0 || deduced_types.size() < n_type_params))
-      deduced_types.push_back(arg.type());
+    arg_types.push_back(arg.type());
   }
+
+  // Map arguments to template type parameters ([over.match.class.deduct],
+  // simplified to a single positional guide -- explicit deduction guides and
+  // full overload resolution are not modelled):
+  //  * a trailing parameter pack absorbs the remaining arguments, so the flat
+  //    template-argument list is simply every argument type
+  //    (`C<...Ts>{a, b}` -> `C<decltype(a), decltype(b)>`);
+  //  * otherwise each type parameter takes one argument positionally
+  //    (`Pair<A, B>{a, b}` -> `Pair<decltype(a), decltype(b)>`); a single
+  //    parameter shared by several aggregate members (`Agg<T>{x, y}`) is fixed
+  //    by the first argument, the rest being members of that same type.
+  std::vector<typet> deduced_types;
+  if(has_pack)
+    deduced_types = arg_types;
+  else
+    for(std::size_t i = 0; i < n_type_params && i < arg_types.size(); ++i)
+      deduced_types.push_back(arg_types[i]);
 
   irept template_args(ID_template_args);
   irept &args_sub = template_args.add(ID_arguments);
@@ -367,104 +372,31 @@ void cpp_typecheckt::convert_non_template_declaration(
           const auto &declarator = declaration.declarators().front();
           const irept &init_args = declarator.find("init_args");
           const exprt &init = declarator.value();
-          if(init_args.get_sub().size() > 0 || init.is_not_nil())
+          std::vector<exprt> ctad_args;
+          if(init_args.get_sub().size() > 0)
           {
-            const cpp_namet &cpp_name =
-              to_cpp_name(static_cast<const irept &>(declaration_type));
-            bool has_tmpl_args = false;
-            for(const auto &sub : cpp_name.get_sub())
+            for(const auto &a : init_args.get_sub())
+              ctad_args.push_back(static_cast<const exprt &>(a));
+          }
+          else if(
+            init.is_not_nil() && init.id() == ID_initializer_list &&
+            !init.operands().empty())
+          {
+            for(const auto &a : init.operands())
+              ctad_args.push_back(a);
+          }
+          else if(init.is_not_nil())
+          {
+            ctad_args.push_back(init);
+          }
+          if(!ctad_args.empty())
+          {
+            if(
+              auto deduced = deduce_class_template_arguments(
+                to_cpp_name(static_cast<const irept &>(declaration_type)),
+                ctad_args))
             {
-              if(sub.id() == ID_template_args)
-              {
-                has_tmpl_args = true;
-                break;
-              }
-            }
-            bool is_template = false;
-            const cpp_idt *template_id = nullptr;
-            if(!has_tmpl_args)
-            {
-              const auto id_set = cpp_scopes.current_scope().lookup(
-                cpp_name.get_base_name(), cpp_scopet::RECURSIVE);
-              for(const auto *id : id_set)
-              {
-                if(id->id_class == cpp_idt::id_classt::TEMPLATE)
-                {
-                  is_template = true;
-                  template_id = id;
-                  break;
-                }
-              }
-            }
-            if(is_template)
-            {
-              // Determine the number of template type parameters
-              std::size_t n_type_params = 0;
-              if(template_id != nullptr)
-              {
-                const auto &sym = lookup(template_id->identifier);
-                const auto &tmpl_type = static_cast<const template_typet &>(
-                  sym.type.find(ID_template_type));
-                for(const auto &p : tmpl_type.template_parameters())
-                {
-                  if(p.id() == ID_type)
-                    ++n_type_params;
-                }
-              }
-
-              irept template_args(ID_template_args);
-              irept &args_sub = template_args.add(ID_arguments);
-
-              // Collect unique argument types, limited to the number of
-              // template type parameters.
-              std::vector<typet> unique_types;
-              auto collect_type = [&](const exprt &a)
-              {
-                exprt arg = a;
-                typecheck_expr(arg);
-                bool already_seen = false;
-                for(const auto &t : unique_types)
-                {
-                  if(t == arg.type())
-                  {
-                    already_seen = true;
-                    break;
-                  }
-                }
-                if(
-                  !already_seen &&
-                  (n_type_params == 0 || unique_types.size() < n_type_params))
-                {
-                  unique_types.push_back(arg.type());
-                }
-              };
-              if(init_args.get_sub().size() > 0)
-              {
-                for(const auto &a : init_args.get_sub())
-                  collect_type(static_cast<const exprt &>(a));
-              }
-              else if(
-                init.is_not_nil() && init.id() == ID_initializer_list &&
-                !init.operands().empty())
-              {
-                for(const auto &a : init.operands())
-                  collect_type(a);
-              }
-              else if(init.is_not_nil())
-              {
-                collect_type(init);
-              }
-              for(const auto &t : unique_types)
-              {
-                exprt type_arg(ID_type);
-                type_arg.type() = t;
-                args_sub.get_sub().push_back(type_arg);
-              }
-              cpp_namet new_name = cpp_name;
-              new_name.get_sub().push_back(template_args);
-              declaration_type =
-                static_cast<typet &>(static_cast<irept &>(new_name));
-              typecheck_type(declaration_type);
+              declaration_type = *deduced;
               ctad_done = true;
             }
           }
