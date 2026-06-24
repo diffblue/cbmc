@@ -638,6 +638,15 @@ protected:
   void typecheck_expr_binary_arithmetic(exprt &) override;
   void typecheck_expr_explicit_typecast(exprt &);
   void typecheck_expr_explicit_constructor_call(exprt &);
+
+  /// C++17 class template argument deduction ([over.match.class.deduct]).
+  /// If \p class_template_name is written without template arguments and names
+  /// a class template, deduce the template arguments from the (not necessarily
+  /// type-checked) initializer expressions \p args and return the resulting
+  /// type-checked class type (e.g. `Box<int>`); otherwise return {}.
+  std::optional<typet> deduce_class_template_arguments(
+    const cpp_namet &class_template_name,
+    const std::vector<exprt> &args);
   void typecheck_expr_address_of(exprt &) override;
   /// Phase 1B target-typet overload of \ref typecheck_expr_address_of;
   /// the target is currently discarded.  Phase 2 of the target-type-
