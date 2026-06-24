@@ -146,15 +146,52 @@ can be deleted.
 
 ### Why this fixes the recurring bug
 
-The tuple-write KNOWNBUG is V1+V2: with the enclosing `get<0>` instantiation
-live (its `_Elements={int}` in the shared map), assembling `__get_helper<0>`'s
-arguments routes that element into `__get_helper`'s trailing pack `_Tail`.
-Scope-exact, per-frame resolution makes `get`'s `_Elements` simply unreachable
-while binding `__get_helper`'s parameters, so `_Tail` stays the empty sequence
-([temp.arg.explicit]/4) and `__get_helper<0>`'s parameter is the partial
-specialization `_Tuple_impl<0,int>` (which carries the `_Head_base` base), so the
-inherited `_M_head` call resolves and `get<0>` gets a body that aliases the
-member.
+The tuple-write KNOWNBUG is *related* to V1/V2 (a trailing pack acquiring an
+element it should not have), but **migration step 1's measurement corrected the
+mechanism** — see the next section.
+
+## Migration step 1 result (2026-06-24): measure suffix reliance
+
+Step 1 (measure how often short-name resolution actually fires, before removing
+it) was executed on the flagship reproducer
+`cpp11_tuple_get_write_reference`.  Result, with instrumentation on the V1
+sites:
+
+- **`lookup_by_suffix` is never called** during the reproducer.
+- The bleed does **not** flow through a short-name/suffix resolution at all.
+
+Tracing the actual mechanism (gdb backtrace + per-stage instrumentation):
+
+1. In `get<0>`'s body the call `__get_helper<__i>(__t)` has **one** explicit
+   template argument (`<__i>`).
+2. `typecheck_template_args` turns it into **two** arguments
+   `[__i=0, _Tail=unassigned]` — it materialises the trailing parameter pack as
+   a single **unassigned placeholder** rather than the **empty sequence**
+   required by [temp.arg.explicit]/4 Note 1.
+3. Across the defer/finalise path for this (variadic) function template
+   (`guess_function_template_args` eagerly instantiates variadic templates,
+   unlike the deferred non-variadic path), that placeholder is finalised to
+   `int`, so `template_mapt::build` receives `[0,int]`, computes
+   `pack_count = nargs - non_pack = 1`, and sizes `_Tail = {int}`.
+4. `__get_helper<0>`'s parameter therefore becomes the **primary**
+   `_Tuple_impl<0,int,int>` (no `_Head_base` base) instead of the partial
+   specialization `_Tuple_impl<0,int>`, so the inherited `_M_head`
+   derived-to-base call fails and `get<0>` is left bodyless.
+
+**Conclusion / scope correction.**  The scope-identity migration (V1/V2) is a
+genuine and worthwhile conformance fix — the documented `_Tp leaking` bleeds DO
+flow through short-name resolution — but it would **not** by itself fix the
+tuple-write bug, whose root is a distinct **[temp.arg.explicit]/4 violation**: a
+trailing parameter pack that is neither explicitly specified nor deduced must be
+the empty sequence, and the representation of "empty trailing pack" is lost
+between `typecheck_template_args` and the variadic instantiate/finalise path
+(the `variadic_pack_empty` truncation at `cpp_typecheck_resolve.cpp` ~6260 fixes
+this for the *signature* path but not for the arguments passed to
+`instantiate_template`).  This is a separate, narrower fix than the migration
+and should be scoped as its own task: make a trailing pack with no
+explicit/deduced argument the empty sequence on the instantiate path too (mirror
+the existing signature-side truncation, or represent the empty pack explicitly
+so `build` sizes it 0).
 
 ## How to use this map
 
