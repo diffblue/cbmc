@@ -43,6 +43,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-checker/multi_path_symex_checker.h>
 #include <goto-checker/multi_path_symex_only_checker.h>
 #include <goto-checker/properties.h>
+#include <goto-checker/sarif_report.h>
 #include <goto-checker/single_loop_incremental_symex_checker.h>
 #include <goto-checker/single_path_symex_checker.h>
 #include <goto-checker/single_path_symex_only_checker.h>
@@ -503,6 +504,21 @@ int cbmc_parse_optionst::doit()
 
   log_version_and_architecture("CBMC");
 
+  // Writing SARIF to standard output cannot be combined with another
+  // stdout-based UI mode: the two would interleave into output that is neither
+  // valid SARIF nor valid JSON/XML.
+  if(
+    cmdline.isset("sarif-result") && cmdline.get_value("sarif-result") == "-" &&
+    (cmdline.isset("json-ui") || cmdline.isset("json-interface") ||
+     cmdline.isset("xml-ui") || cmdline.isset("xml-interface")))
+  {
+    log.error() << "--sarif-result - cannot be combined with another "
+                   "stdout-based UI mode (--json-ui, --json-interface, "
+                   "--xml-ui, --xml-interface); write SARIF to a file instead"
+                << messaget::eom;
+    return CPROVER_EXIT_USAGE_ERROR;
+  }
+
   //
   // Unwinding of transition systems is done by hw-cbmc.
   //
@@ -774,6 +790,26 @@ int cbmc_parse_optionst::doit()
 
   const resultt result = (*verifier)();
   verifier->report();
+
+  if(cmdline.isset("sarif-result"))
+  {
+    const auto &filename = cmdline.get_value("sarif-result");
+    if(filename == "-")
+    {
+      sarif_report(verifier->get_properties(), "cbmc", CBMC_VERSION, std::cout);
+    }
+    else
+    {
+      std::ofstream out(filename);
+      if(!out)
+      {
+        log.error() << "failed to open SARIF output file: " << filename
+                    << messaget::eom;
+        return CPROVER_EXIT_INTERNAL_ERROR;
+      }
+      sarif_report(verifier->get_properties(), "cbmc", CBMC_VERSION, out);
+    }
+  }
 
   return result_to_exit_code(result);
 }
@@ -1071,6 +1107,7 @@ void cbmc_parse_optionst::help()
     "User-interface options:\n"
     HELP_XML_INTERFACE
     HELP_JSON_INTERFACE
+    HELP_SARIF_RESULT
     HELP_GOTO_TRACE
     HELP_FLUSH
     " {y--verbosity} {u#} \t verbosity level (default 6)\n"

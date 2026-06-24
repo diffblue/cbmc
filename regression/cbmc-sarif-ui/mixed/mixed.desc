@@ -1,0 +1,17 @@
+CORE
+mixed.c
+--sarif-result -
+activate-multi-line-match
+^EXIT=10$
+^SIGNAL=0$
+"ruleId": "main\.assertion\.1"
+"ruleId": "main\.assertion\.2"
+"kind": "fail"
+"level": "error"
+"kind": "pass"
+"level": "none"
+"text": "assertion x >= 0 \(FAILURE\)"
+"text": "assertion y == 1 \(SUCCESS\)"
+--
+--
+Checks that --sarif-result - correctly reports mixed pass/fail with error and note levels.

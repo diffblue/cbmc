@@ -36,6 +36,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-checker/all_properties_verifier.h>
 #include <goto-checker/all_properties_verifier_with_fault_localization.h>
 #include <goto-checker/all_properties_verifier_with_trace_storage.h>
+#include <goto-checker/sarif_report.h>
 #include <goto-checker/stop_on_fail_verifier.h>
 #include <goto-checker/stop_on_fail_verifier_with_fault_localization.h>
 #include <goto-instrument/full_slicer.h>
@@ -60,6 +61,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <pointer-analysis/add_failed_symbols.h>
 
 #include <cstdlib> // exit()
+#include <fstream>
 #include <iostream>
 #include <memory>
 
@@ -394,6 +396,21 @@ int jbmc_parse_optionst::doit()
 
   log_version_and_architecture("JBMC");
 
+  // Writing SARIF to standard output cannot be combined with another
+  // stdout-based UI mode: the two would interleave into output that is neither
+  // valid SARIF nor valid JSON/XML.
+  if(
+    cmdline.isset("sarif-result") && cmdline.get_value("sarif-result") == "-" &&
+    (cmdline.isset("json-ui") || cmdline.isset("json-interface") ||
+     cmdline.isset("xml-ui") || cmdline.isset("xml-interface")))
+  {
+    log.error() << "--sarif-result - cannot be combined with another "
+                   "stdout-based UI mode (--json-ui, --json-interface, "
+                   "--xml-ui, --xml-interface); write SARIF to a file instead"
+                << messaget::eom;
+    return CPROVER_EXIT_USAGE_ERROR;
+  }
+
   // output the options
   switch(ui_message_handler.get_ui())
   {
@@ -590,6 +607,27 @@ int jbmc_parse_optionst::doit()
 
   const resultt result = (*verifier)();
   verifier->report();
+
+  if(cmdline.isset("sarif-result"))
+  {
+    const auto &filename = cmdline.get_value("sarif-result");
+    if(filename == "-")
+    {
+      sarif_report(verifier->get_properties(), "jbmc", CBMC_VERSION, std::cout);
+    }
+    else
+    {
+      std::ofstream out(filename);
+      if(!out)
+      {
+        log.error() << "failed to open SARIF output file: " << filename
+                    << messaget::eom;
+        return CPROVER_EXIT_INTERNAL_ERROR;
+      }
+      sarif_report(verifier->get_properties(), "jbmc", CBMC_VERSION, out);
+    }
+  }
+
   return result_to_exit_code(result);
 }
 
@@ -1048,6 +1086,7 @@ void jbmc_parse_optionst::help()
     " {y--version} \t show version and exit\n"
     HELP_XML_INTERFACE
     HELP_JSON_INTERFACE
+    HELP_SARIF_RESULT
     HELP_VALIDATE
     HELP_GOTO_TRACE
     HELP_FLUSH
