@@ -1,0 +1,30 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ tuple get write/read: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+found no match for symbol
+no body for callee
+--
+N5008 [temp.deduct.call]/4.3 + [over.match.funcs]: header-free, cvise-reduced
+model of the libstdc++ std::get<0> write path (std::get -> std::__get_helper ->
+_Tuple_impl::_M_head, with _M_head inherited from _Head_base).  Well-defined and
+returns 42 under a conforming compiler (verified with g++).
+
+KNOWNBUG: CBMC drops get<0>'s constexpr body, so std::get<0>(t) returns a nondet
+(NULL) reference and the write is lost.  Traced: converting get<0>'s deferred
+body instantiates __get_helper<0>, whose body resolves the inherited static call
+_Tuple_impl<0,int>::_M_head(__t) by a derived-to-base conversion of the by-value
+argument.  That resolution fails ("found no match for symbol '_M_head'") ONLY
+when the sibling SFINAE overload __get_helper(tuple<_Types...>) is also present
+(removing it makes the program verify) -- the SFINAE overload's failed deduction
+perturbs the resolver so the derived-to-base _M_head call no longer matches; the
+thrown failure is swallowed by the drain, leaving get<0> bodyless.
+
+Flip to CORE once get<0>'s body converts: assertion 1 (write took effect)
+SUCCESS, assertion 2 (wrong value) FAILURE.
