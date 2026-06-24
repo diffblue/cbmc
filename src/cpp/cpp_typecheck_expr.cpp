@@ -5451,7 +5451,22 @@ void cpp_typecheckt::typecheck_side_effect_assignment(side_effect_exprt &expr)
   if(is_reference(type0))
     type0 = to_reference_type(type0).base_type();
 
-  if(cpp_is_pod(type0))
+  const irep_idt statement = expr.get(ID_statement);
+
+  // N5008 [expr.ass]/2-7: there is no built-in compound assignment for class
+  // types; `a @= b` on a class type is rewritten to a call to the overloaded
+  // operator@= even when the class is POD (having a user-defined operator does
+  // not make the class non-POD).  Only a plain `=` of a POD class uses the
+  // implicit copy/move assignment below.  Without this, a POD class with a
+  // user-defined compound-assignment operator took the C built-in path and was
+  // rejected with e.g. "assignment 'assign_shr' not defined for types ...".
+  const bool is_class_type = type0.id() == ID_struct_tag ||
+                             type0.id() == ID_union_tag ||
+                             type0.id() == ID_struct || type0.id() == ID_union;
+  const bool needs_overloaded_operator =
+    is_class_type && statement != ID_assign;
+
+  if(cpp_is_pod(type0) && !needs_overloaded_operator)
   {
     // for structs we use the 'implicit assignment operator',
     // and therefore, it is allowed to assign to a rvalue struct.
@@ -5470,8 +5485,6 @@ void cpp_typecheckt::typecheck_side_effect_assignment(side_effect_exprt &expr)
   // Turn into an operator call
 
   std::string strop = "operator";
-
-  const irep_idt statement = expr.get(ID_statement);
 
   if(statement == ID_assign)
     strop += "=";
