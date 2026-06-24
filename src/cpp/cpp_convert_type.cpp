@@ -357,6 +357,20 @@ void cpp_convert_auto(
   const typet &src,
   message_handlert &message_handler)
 {
+  // N5008 [class.bit] + [dcl.type.auto.deduct]: a bit-field has no distinct
+  // type of its own -- reading one yields a prvalue of its underlying type, and
+  // no object (hence no `auto`/`decltype(auto)` variable) can have bit-field
+  // type.  Deduce from the underlying type rather than the c_bit_field_typet,
+  // whose width is meaningless on a stand-alone object and is dropped when the
+  // deduced type is later re-typechecked (which otherwise trips "unexpected
+  // expression" on the empty bit-field width).
+  if(src.id() == ID_c_bit_field)
+  {
+    cpp_convert_auto(
+      dest, to_c_bit_field_type(src).underlying_type(), message_handler);
+    return;
+  }
+
   if(dest.id() != ID_merged_type && dest.has_subtype())
   {
     // [temp.deduct]: the declared type is the deduction pattern P and
