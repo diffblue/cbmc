@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ friend B \(no keyword\) may write A's private: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+is not accessible
+--
+N5008 [class.friend]/3: a friend declaration naming a class via a
+simple-type-specifier (`friend B;`, no class/struct keyword) befriends that
+class.  Previously CBMC's parser dropped this form, denying the friend access to
+private members.
