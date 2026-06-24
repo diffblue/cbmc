@@ -2,25 +2,15 @@
 // overloads are otherwise indistinguishable, the more-constrained one is
 // chosen.  Cheap subsumes Cheap||Rare (a constraint subsumes a disjunction
 // containing it), so f<Cheap> is more constrained than f<CheapOrRare> and must
-// be selected for an int argument, returning 1.  A conforming compiler (g++)
-// selects f<Cheap> and returns 1.
+// be selected for an int argument, returning 1 (matching g++).
 //
-// KNOWNBUG: CBMC selects the LESS-constrained f<CheapOrRare> and returns 2.
-//
-// Root cause (traced): the two overloads have otherwise-identical signatures
-// `f(T) -> int`, differing only in their concept constraint.  Their
-// instantiations for `int` collide on a single instance symbol
-// `f<signed_int>(signed_int)`, so only one candidate ever reaches overload
-// disambiguation (instrumentation shows a single candidate, not two).  The
-// constraint-subsumption ordering ([temp.constr.order]/1: decompose to atomic
-// constraints, P subsumes Q iff every DNF clause of P meets every CNF clause of
-// Q) therefore never runs.  Fixing this requires BOTH (a) concept-constrained
-// overloads with the same signature forming a proper overload set (distinct
-// instances), and (b) constraint-subsumption ordering to pick the
-// more-constrained candidate.
-//
-// Flip to CORE once the more-constrained overload wins: assertion 1 must
-// SUCCEED and assertion 2 (a wrong value) must FAIL, proving non-vacuity.
+// This is selected by the pre-instantiation concept-subsumption filter in
+// cpp_typecheck_resolvet::resolve, which now compares the normal forms of the
+// associated constraints ([temp.constr.order]/1: decompose to atomic
+// constraints; P subsumes Q iff every DNF clause of P meets every CNF clause of
+// Q) instead of a textual comparison of constraint names.  Filtering to the
+// more-constrained template before instantiation also avoids the otherwise
+// colliding instance symbols of the two same-signature overloads.
 template <typename T>
 concept Cheap = sizeof(T) >= 1;
 template <typename T>
