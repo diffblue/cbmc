@@ -65,6 +65,27 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
     arg_types.push_back(arg.type());
   }
 
+  // [over.match.class.deduct]/1 copy deduction candidate: when the
+  // initializer is a single object whose type is (a reference to, possibly
+  // cv-qualified) a specialization of this same class template, deduction
+  // selects that very specialization -- `Box c{b}` with `b` of type
+  // `Box<int>` is `Box<int>`, not `Box<Box<int>>`.
+  if(arg_types.size() == 1)
+  {
+    typet at = arg_types.front();
+    if(is_reference(at))
+      at = to_reference_type(at).base_type();
+    if(at.id() == ID_struct_tag)
+    {
+      const symbolt &arg_class = lookup(to_struct_tag_type(at));
+      if(arg_class.base_name == class_template_name.get_base_name())
+      {
+        at.remove(ID_C_constant);
+        return at;
+      }
+    }
+  }
+
   // Map arguments to template type parameters ([over.match.class.deduct],
   // simplified to a single positional guide -- explicit deduction guides and
   // full overload resolution are not modelled):
