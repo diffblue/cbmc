@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/symbol_table_base.h>
 
 #include <ansi-c/c_qualifiers.h>
+#include <ansi-c/padding.h>
 
 #include "cpp_convert_type.h"
 #include "cpp_declarator_converter.h"
@@ -2398,6 +2399,56 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
 
   // clean up!
   symbol.type.remove(ID_body);
+
+  // N5008 [class.bit]/1, [basic.align]/1: a bit-field is packed into and
+  // padded to a whole allocation unit, and the enclosing object is padded up
+  // to its alignment.  The C front-end realises this via add_padding(); the
+  // C++ front-end historically did not, so a bit-field-only struct (e.g.
+  // libstdc++'s `__max_size_type`, `struct { unsigned _M_msb : 1; ... }`) had
+  // object size 0 -- a valid bit-field read through a pointer/reference then
+  // tripped a spurious "pointer outside object bounds".
+  //
+  // We apply the layout once the component list is final, restricted to a
+  // struct that actually *contains a bit-field*.  Other structs are left at
+  // their previous layout on purpose: the rest of the tool models them
+  // self-consistently without ABI alignment padding, and inserting it would
+  // change sizes that pointer reasoning elsewhere relies on.  The bit-field
+  // case is different -- size 0 is an outright bug.  Further restricted to:
+  //  * an actual struct (unions are laid out by their own add_padding overload,
+  //    deferred);
+  //  * with no base classes (base-subobject layout is an ABI subtlety the
+  //    flattened from_base components do not model);
+  //  * not already padded (idempotent across any re-entry); and
+  //  * whose data members all have a known size (a dependent template member
+  //    has none -- and each instantiation re-typechecks the body from the
+  //    parse tree, so the concrete instance is padded in its own right).
+  // The inserted components are marked is_padding(); every site that treats
+  // components as user-visible data members skips them.
+  if(symbol.type.id() == ID_struct)
+  {
+    struct_typet &struct_type = to_struct_type(symbol.type);
+    if(struct_type.bases().empty())
+    {
+      const namespacet ns(symbol_table);
+      bool already_padded = false;
+      bool all_sizes_known = true;
+      bool has_bit_field = false;
+      for(const auto &c : struct_type.components())
+      {
+        if(c.get_is_padding())
+          already_padded = true;
+        else if(c.type().id() == ID_c_bit_field)
+          has_bit_field = true;
+        else if(
+          c.type().id() != ID_code && !c.get_bool(ID_is_static) &&
+          !c.get_bool(ID_is_type) &&
+          !pointer_offset_bits(c.type(), ns).has_value())
+          all_sizes_known = false;
+      }
+      if(has_bit_field && !already_padded && all_sizes_known)
+        add_padding(struct_type, ns);
+    }
+  }
 
   // Process deferred static member initializers now that all
   // members are declared.
