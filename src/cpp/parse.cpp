@@ -2859,17 +2859,15 @@ bool Parser::rOtherDeclaration(
     std::cout << std::string(__indent, ' ') << "Parser::rOtherDeclaration 8\n";
 #endif
 
-    // FRIEND name ';'
-    // if(Ptree::Length(member_spec)==1 && member_spec->Car()->What()==FRIEND)
-    {
-      cpp_tokent tk;
-      lex.get_token(tk);
-      // statement=new PtreeDeclaration(head, Ptree::List(type_name,
-      //                                                   new Leaf(tk)));
-      return true;
-    }
-    // else
-    //  return false;
+    // friend simple-type-specifier ';'  (e.g. `friend B;`), N5008
+    // [class.friend]/3: a friend declaration whose type-specifier designates a
+    // class type declares that class as a friend.  Fall through to the common
+    // tail (below) so the named type is swapped into declaration.type() and the
+    // member-specifier (friend) is recorded, exactly as for the elaborated form
+    // `friend class B;`.  Previously this branch consumed the ';' and returned
+    // without populating the declaration, so the friendship was silently
+    // dropped and the befriended class was wrongly denied access to private
+    // members.  The trailing ';' is consumed by the common tail.
   }
   else
   {
