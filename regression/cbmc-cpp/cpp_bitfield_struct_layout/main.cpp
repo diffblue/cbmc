@@ -1,11 +1,12 @@
-// N5008 [class.bit] + [class.mem]: a class with bit-fields is laid out with the
-// bit-fields packed into and padded out to whole allocation units, so it has
-// its ABI size and any member read is in bounds.
+// N5008 [class.bit]/1 + [basic.align]/1: a class with bit-fields is laid out
+// with the bit-fields packed into and padded out to whole allocation units, so
+// it has its ABI size and any member read is in bounds.
 //
-// KNOWNBUG: the C++ front-end did not apply the bit-field padding pass, so a
+// Regression: the C++ front-end did not apply the bit-field padding pass, so a
 // bit-field-only struct had object size 0; reading a bit-field member through a
 // pointer/reference tripped a spurious "pointer outside object bounds" check
-// (and sizeof was wrong).
+// (and sizeof was wrong).  The front-end now runs add_padding() on structs
+// containing a bit-field, matching the C front-end.
 struct M
 {
   unsigned b : 3;
