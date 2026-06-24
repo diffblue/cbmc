@@ -68,6 +68,17 @@ public:
   /// Look up a template parameter by its base name suffix (after the last
   /// "::"). This handles the case where a template parameter was registered
   /// under a different scope prefix (e.g., forward declaration vs definition).
+  ///
+  /// CONFORMANCE WARNING (Violation V1, see doc/architectural/
+  /// cpp-frontend-review-2026-06-24-template-map-scope.md): matching a
+  /// parameter by short name violates N5008 [basic.scope.temp]/2, under which a
+  /// parameter's identity is its template's scope plus its name.  Two unrelated
+  /// templates may each have a parameter spelled the same (e.g. `_Tp`,
+  /// `_Tail`); this scan cannot tell them apart and, when two instantiations
+  /// are live (Violation V2), can return another instantiation's binding.  Do
+  /// not add new callers; resolve by exact scope-qualified identifier
+  /// (`lookup`) instead.  This is scheduled for removal by the structural
+  /// change described in the review.
   exprt lookup_by_suffix(const std::string &suffix) const;
 
   void print(std::ostream &out) const;
@@ -98,6 +109,15 @@ public:
 class cpp_saved_template_mapt
 {
 public:
+  // CONFORMANCE NOTE (Violation V2, see doc/architectural/
+  // cpp-frontend-review-2026-06-24-template-map-scope.md): this saves and
+  // restores the WHOLE flat template_map by copy, so while an inner
+  // instantiation runs the outer instantiation's parameter bindings remain
+  // present in the same maps.  Combined with the short-name resolution
+  // (Violation V1) this lets one instantiation reach another's bindings,
+  // contrary to N5008 [temp.point]/1 (each specialization is instantiated in a
+  // definite context, not the union of all live bindings).  The scoped
+  // structural change replaces this with a per-instantiation frame stack.
   explicit cpp_saved_template_mapt(template_mapt &map):
     old_map(map), map(map)
   {
