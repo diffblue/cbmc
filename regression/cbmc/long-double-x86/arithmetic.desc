@@ -1,5 +1,5 @@
 CORE
-main.i
+arithmetic.i
 --arch x86_64 --os linux --floatbv
 ^EXIT=0$
 ^SIGNAL=0$
@@ -11,7 +11,7 @@ Pure FP arithmetic on x86 80-bit extended `long double` -- no byte-level
 access, no FP<->bv boundary.  Runs under all four back-ends (SAT,
 --z3, --cprover-smt2, --incremental-smt2-solver), demonstrating that
 long-double FP arithmetic is precise across the board.  Byte-layout
-testing is in the long-double-{x86-bytes,i386-bytes,signbit-x86,...}
+testing is in the x86-bytes, i386-bytes, signbit (etc.)
 tests, which are restricted to back-ends that support the FP<->bv
 boundary.
 

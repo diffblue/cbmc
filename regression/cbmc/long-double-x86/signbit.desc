@@ -1,5 +1,5 @@
 CORE no-new-smt
-main.i
+signbit.i
 --arch x86_64 --os linux --floatbv --no-simplify
 ^EXIT=0$
 ^SIGNAL=0$

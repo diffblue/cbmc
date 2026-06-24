@@ -1,5 +1,5 @@
 CORE no-new-smt
-main.i
+roundtrip.i
 --arch x86_64 --os linux --floatbv
 ^EXIT=0$
 ^SIGNAL=0$

@@ -1,5 +1,5 @@
 CORE no-new-smt
-main.i
+int-cast.i
 --arch x86_64 --floatbv
 ^EXIT=0$
 ^SIGNAL=0$

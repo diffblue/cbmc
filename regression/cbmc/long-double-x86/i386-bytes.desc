@@ -1,5 +1,5 @@
 CORE
-main.i
+i386-bytes.i
 --i386-linux --floatbv
 ^EXIT=0$
 ^SIGNAL=0$
