@@ -1,8 +1,8 @@
 var NAVTREEINDEX82 =
 {
 "functions_t.html":[7,2,0,20],
-"functions_type.html":[7,2,3,0],
 "functions_type.html":[7,2,3],
+"functions_type.html":[7,2,3,0],
 "functions_type_b.html":[7,2,3,1],
 "functions_type_c.html":[7,2,3,2],
 "functions_type_d.html":[7,2,3,3],

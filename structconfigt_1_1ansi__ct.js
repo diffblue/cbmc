@@ -79,6 +79,7 @@ var structconfigt_1_1ansi__ct =
     [ "string_to_os", "structconfigt_1_1ansi__ct.html#a8d8b2a678761a223387786fc370f7c5b", null ],
     [ "__float128_is_keyword", "structconfigt_1_1ansi__ct.html#a7a2c5fd83cc26b324ae7b76e6eb40fee", null ],
     [ "alignment", "structconfigt_1_1ansi__ct.html#abee3d3d223361202f82dd400bc393aca", null ],
+    [ "allow_anonymous_struct_embedding", "structconfigt_1_1ansi__ct.html#aa583d153c3ccd5ca495199f1772ab794", null ],
     [ "arch", "structconfigt_1_1ansi__ct.html#a6bc9c3ac2fc058af96d8c7dedf8deec2", null ],
     [ "bf16_type", "structconfigt_1_1ansi__ct.html#a3c4101388cc403921d3179527ede3d99", null ],
     [ "bool_width", "structconfigt_1_1ansi__ct.html#ac2ca3220900b00e73ae84111ec8de87a", null ],

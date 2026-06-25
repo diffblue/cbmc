@@ -119,7 +119,8 @@ Important Notes</h3>
 <div class="fragment"><div class="line">for i in `find . -name Makefile`; do</div>
 <div class="line">  sed -e &#39;s/^\&zwj;(\s*CC[ \t]*=\&zwj;)\&zwj;(.*$\&zwj;)/\1goto-cc/g&#39; -i $i</div>
 <div class="line">done</div>
-</div><!-- fragment --><p>Here are additional examples on how to use goto-cc:</p>
+</div><!-- fragment --><p>goto-cc honours the <code>-fms-extensions</code> flag: when given, it accepts an anonymous member that is a <em>tagged</em> struct or union (a Microsoft/GCC extension used, for instance, throughout the Linux kernel), injecting that member’s fields into the enclosing struct and accounting for its size. Without the flag such a member is ignored, matching the default gcc and Clang behaviour.</p>
+<p>Here are additional examples on how to use goto-cc:</p>
 <ul>
 <li>man_goto-cc-linux “Linux Kernel”</li>
 <li>man_goto-cc-apache “Apache HTTPD”</li>
@@ -165,7 +166,7 @@ Architectural Settings</h2>
 <div class="line">  printf(<span class="stringliteral">&quot;Bytes of i: %d, %d, %d, %d\n&quot;</span>, p[0], p[1], p[2], p[3]);</div>
 <div class="line">  assert(0);</div>
 <div class="line">}</div>
-</div><!-- fragment --><p>Last modified: 2026-06-25 08:47:17 +0200 </p>
+</div><!-- fragment --><p>Last modified: 2026-06-25 08:48:23 +0200 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->
