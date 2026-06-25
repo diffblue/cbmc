@@ -53,6 +53,28 @@ macro(add_test_pl_tests cmdline)
     add_test_pl_profile("${TEST_DIR_NAME}" "${cmdline}" -K KNOWNBUG ${ARGN})
 endmacro(add_test_pl_tests)
 
+# Like add_test_pl_tests, but split the CORE profile into <shard_count>
+# parallel shards (see add_sharded_test_pl_profile) so a long-running CORE
+# suite runs as several parallel ctest entries instead of one indivisible test
+# -- e.g. to keep the slowest suites from dominating the macOS runners'
+# wall-clock or approaching the per-test timeout. THOROUGH/FUTURE/KNOWNBUG
+# remain single tests. <log_suffix> names the per-shard CORE logs and each CORE
+# shard is given <timeout>. Any extra arguments (e.g. -X exclusions) are
+# forwarded to every profile.
+macro(add_sharded_test_pl_tests cmdline log_suffix shard_count timeout)
+    get_filename_component(TEST_DIR_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+    message(STATUS "Adding sharded tests in directory: ${TEST_DIR_NAME}")
+    # Build the CORE flags as a list so an empty ARGN collapses to just -C (no
+    # spurious empty argument reaching test.pl).
+    set(_core_flags "-C" ${ARGN})
+    add_sharded_test_pl_profile(
+        "${TEST_DIR_NAME}" "${cmdline}" "${_core_flags}" "CORE"
+        "${log_suffix}" ${shard_count} ${timeout})
+    add_test_pl_profile("${TEST_DIR_NAME}" "${cmdline}" -T THOROUGH ${ARGN})
+    add_test_pl_profile("${TEST_DIR_NAME}" "${cmdline}" -F FUTURE ${ARGN})
+    add_test_pl_profile("${TEST_DIR_NAME}" "${cmdline}" -K KNOWNBUG ${ARGN})
+endmacro(add_sharded_test_pl_tests)
+
 # For the best possible utilisation of multiple cores when
 # running tests in parallel, it is important that these directories are
 # listed with decreasing runtimes (i.e. longest running at the top)
