@@ -207,6 +207,24 @@ void cpp_typecheckt::typecheck()
 
   do_not_typechecked();
 
+  // do_not_typechecked() elaborates implicitly-defined / explicitly-defaulted
+  // special members (e.g. copy constructors) that were not odr-used until now.
+  // Their memberwise base/member initializers odr-use the corresponding
+  // base/member constructors ([class.copy.ctor]/14), which may themselves
+  // still be deferred template-instance bodies.  Those odr-uses are recorded
+  // in odr_used_by_member_initializer; re-run the deferred-body drain (which
+  // honours that set) to elaborate them, and re-run do_not_typechecked() in
+  // case the freshly elaborated bodies odr-use further implicit members.
+  // Iterate to a fixpoint ([temp.inst]/4).
+  while(!deferred_method_bodies.empty())
+  {
+    const std::size_t before = deferred_method_bodies.size();
+    typecheck_method_bodies();
+    do_not_typechecked();
+    if(deferred_method_bodies.size() == before)
+      break;
+  }
+
   provide_stdlib_bodies();
 
   clean_up();

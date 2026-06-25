@@ -497,6 +497,19 @@ void cpp_typecheckt::typecheck_method_bodies()
       bool required = referenced.count(d.first) != 0;
       if(!required)
       {
+        // Odr-used as a constructor member-initializer target.  A synthesized
+        // (implicitly-defined or explicitly-defaulted) constructor lowers its
+        // base/member subobject initializer to a class-name constructor call
+        // that is resolved to the concrete overload only during goto
+        // conversion, so the callee is not visible to the symbol-reference
+        // scan above.  typecheck_member_initializer records the resolved
+        // callee, so honour that here ([temp.inst]/4: an odr-used implicitly-
+        // instantiated member must be instantiated).
+        if(odr_used_by_member_initializer.count(d.first) != 0)
+          required = true;
+      }
+      if(!required)
+      {
         // A deferred destructor of a constructed class is potentially
         // invoked and must be instantiated ([class.dtor]/12, [temp.inst]/4).
         const symbolt *ds = symbol_table.lookup(d.first);
