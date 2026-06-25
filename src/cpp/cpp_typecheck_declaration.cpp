@@ -28,14 +28,28 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
     if(sub.id() == ID_template_args)
       return {};
 
-  // The name must denote a class template.
+  // The name must denote a class template.  A class that is itself not a
+  // template but has a constructor template (e.g. libstdc++'s
+  // `__max_size_type`, with `template<class T> __max_size_type(T)`) also has a
+  // TEMPLATE-classed scope entry, but that entry is a *function* template; it
+  // does not make `C{...}` a class-template-argument-deduction context
+  // ([dcl.type.class.deduct] applies only to a class template).  Require the
+  // entry to denote an actual class template, so an ordinary construction of
+  // such a class (notably `C{...}` written inside C's own members, where the
+  // injected-class-name makes the constructor template visible under the bare
+  // name) falls through to a normal constructor call instead.
   const cpp_idt *template_id = nullptr;
   const auto id_set = cpp_scopes.current_scope().lookup(
     class_template_name.get_base_name(), cpp_scopet::RECURSIVE);
 
   for(const auto *id : id_set)
   {
-    if(id->id_class == cpp_idt::id_classt::TEMPLATE)
+    if(id->id_class != cpp_idt::id_classt::TEMPLATE)
+      continue;
+    const symbolt *id_sym = symbol_table.lookup(id->identifier);
+    if(
+      id_sym != nullptr && id_sym->type.id() == ID_cpp_declaration &&
+      to_cpp_declaration(id_sym->type).is_class_template())
     {
       template_id = id;
       break;
