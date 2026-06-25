@@ -2381,15 +2381,26 @@ bool cpp_typecheckt::reference_related(
 bool cpp_typecheckt::reference_compatible(
   const exprt &expr,
   const reference_typet &reference_type,
-  unsigned &rank) const
+  unsigned &rank,
+  unsigned *cv_distance) const
 {
   PRECONDITION(!is_reference(expr.type()));
 
   if(!reference_related(expr, reference_type))
     return false;
 
-  if(expr.type() != reference_type.base_type())
-    rank += 3;
+  // N5008 [dcl.init.ref]/[over.ics.ref]: binding a reference to a
+  // reference-compatible object is the identity conversion; only a
+  // derived-to-base reference binding is a (worse-ranked) Conversion.  A
+  // difference in top-level cv-qualification alone (e.g. binding a non-const
+  // `X` lvalue to `const X&`) is *not* a genuine type difference.  Detect a
+  // real derived-to-base difference by comparing the base types with their
+  // top-level cv-qualifiers removed.
+  typet from_unqualified = expr.type();
+  typet to_unqualified = reference_type.base_type();
+  c_qualifierst{}.write(from_unqualified);
+  c_qualifierst{}.write(to_unqualified);
+  const bool genuine_type_difference = from_unqualified != to_unqualified;
 
   c_qualifierst qual_from;
   qual_from.read(expr.type());
@@ -2397,8 +2408,32 @@ bool cpp_typecheckt::reference_compatible(
   c_qualifierst qual_to;
   qual_to.read(reference_type.base_type());
 
-  if(qual_from != qual_to)
-    rank += 1;
+  const bool cv_difference = qual_from != qual_to;
+
+  if(cv_distance != nullptr)
+  {
+    // Argument-matching path: keep the identity-rank cv-qualification
+    // difference out of the primary conversion rank and report it separately
+    // as a tie-breaker.  Per [over.ics.rank]/3.2.6 the cv-qualification of a
+    // reference binding is only a tie-breaker *between reference bindings*,
+    // ranked below the non-template preference ([over.match.best]/2.4);
+    // folding it into the primary rank would let a by-value match by a
+    // *template* specialization wrongly beat a reference binding by the
+    // (non-template) copy/move special member.
+    if(genuine_type_difference)
+      rank += 3;
+    if(cv_difference)
+      *cv_distance += 1;
+  }
+  else
+  {
+    // Legacy path (non-argument-matching callers, e.g. return-value and
+    // initialization checks): preserve the existing combined ranking.
+    if(expr.type() != reference_type.base_type())
+      rank += 3;
+    if(cv_difference)
+      rank += 1;
+  }
 
   if(qual_from.is_subset_of(qual_to))
     return true;
@@ -2444,7 +2479,8 @@ bool cpp_typecheckt::reference_binding(
   exprt expr,
   const reference_typet &reference_type,
   exprt &new_expr,
-  unsigned &rank)
+  unsigned &rank,
+  unsigned *cv_distance)
 {
   PRECONDITION(!is_reference(expr.type()));
 
@@ -2534,7 +2570,7 @@ bool cpp_typecheckt::reference_binding(
     reference_type.base_type().get_bool(ID_C_constant) ||
     is_rvalue_reference(reference_type))
   {
-    if(reference_compatible(expr, reference_type, rank))
+    if(reference_compatible(expr, reference_type, rank, cv_distance))
     {
       if(!expr.get_bool(ID_C_lvalue))
       {
@@ -2762,7 +2798,8 @@ bool cpp_typecheckt::implicit_conversion_sequence(
   const exprt &expr,
   const typet &type,
   exprt &new_expr,
-  unsigned &rank)
+  unsigned &rank,
+  unsigned *cv_distance)
 {
   unsigned backup_rank = rank;
 
@@ -2771,7 +2808,8 @@ bool cpp_typecheckt::implicit_conversion_sequence(
 
   if(is_reference(type))
   {
-    if(!reference_binding(e, to_reference_type(type), new_expr, rank))
+    if(!reference_binding(
+         e, to_reference_type(type), new_expr, rank, cv_distance))
       return false;
 
 #if 0

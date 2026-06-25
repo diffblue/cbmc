@@ -136,7 +136,8 @@ protected:
   bool disambiguate_functions(
     const exprt &expr,
     unsigned &args_distance,
-    const cpp_typecheck_fargst &fargs);
+    const cpp_typecheck_fargst &fargs,
+    unsigned *cv_distance = nullptr);
 
   void resolve_argument(
     exprt &argument,
