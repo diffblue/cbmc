@@ -1,6 +1,7 @@
-CORE gcc-only broken-test-c++-front-end
+CORE
 main.c
 
+^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
