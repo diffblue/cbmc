@@ -524,6 +524,36 @@ void cpp_typecheck_resolvet::guess_function_template_args(
 
   for(const auto &old_id : old_identifiers)
   {
+    // N5008 [temp.deduct.guide]/1: deduction guides are not found by name
+    // lookup and are not functions; they are used only when forming the set of
+    // implied class-template-argument-deduction candidates
+    // ([over.match.class.deduct]), never in ordinary overload resolution.  A
+    // guide parses like a constructor of the class-template name, so a guide
+    // such as `tuple(U...) -> tuple<>` shares the name `tuple` and would
+    // otherwise be picked up here and (mis-)instantiated as a regular function
+    // template.  Class template argument deduction has its own, separate guide
+    // handling (deduce_class_template_arguments), so skip guides here.
+    {
+      const irep_idt cand_id = old_id.id() == ID_symbol
+                                 ? to_symbol_expr(old_id).get_identifier()
+                                 : old_id.get(ID_identifier);
+      if(!cand_id.empty())
+      {
+        const symbolt *cand_sym = cpp_typecheck.symbol_table.lookup(cand_id);
+        if(cand_sym != nullptr && cand_sym->type.id() == ID_cpp_declaration)
+        {
+          const cpp_declarationt &cand_decl =
+            to_cpp_declaration(cand_sym->type);
+          if(
+            !cand_decl.declarators().empty() &&
+            cand_decl.declarators().front().get_bool("#is_deduction_guide"))
+          {
+            continue;
+          }
+        }
+      }
+    }
+
     // [temp.deduct]/3 and [temp.deduct]/8: a substitution failure
     // while deducing this candidate is a SFINAE failure — discard
     // the candidate and continue with the next one.  The
