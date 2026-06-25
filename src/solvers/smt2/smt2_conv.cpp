@@ -1155,6 +1155,27 @@ std::string smt2_convt::type2id(const typet &type) const
   {
     return "A" + type2id(to_array_type(type).element_type());
   }
+  else if(type.id() == ID_integer)
+  {
+    return "Int";
+  }
+  else if(type.id() == ID_real)
+  {
+    return "Real";
+  }
+  else if(type.id() == ID_string)
+  {
+    return "String";
+  }
+  else if(type.id() == ID_mathematical_function)
+  {
+    std::string result = "MF";
+    const auto &mf = to_mathematical_function_type(type);
+    for(const auto &d : mf.domain())
+      result += "_" + type2id(d);
+    result += "_" + type2id(mf.codomain());
+    return result;
+  }
   else
   {
     UNREACHABLE;
@@ -3576,7 +3597,16 @@ void smt2_convt::flatten_array(const exprt &expr)
 {
   const array_typet &array_type = to_array_type(expr.type());
   const auto &size_expr = array_type.size();
-  PRECONDITION(size_expr.is_constant());
+  // Flattening an array to a bit-vector requires a concrete size. Arrays of
+  // unknown or non-constant size (e.g. those indexed by a mathematical
+  // integer) can only be encoded with the SMT-LIB array theory, not
+  // bit-blasted; report that clearly rather than aborting an invariant.
+  if(!size_expr.is_constant())
+  {
+    throw unsupported_operation_exceptiont(
+      "cannot flatten an array of non-constant size to a bit-vector; such an "
+      "array can only be encoded with the SMT-LIB array theory");
+  }
 
   mp_integer size = numeric_cast_v<mp_integer>(to_constant_expr(size_expr));
   CHECK_RETURN_WITH_DIAGNOSTICS(size != 0, "can't convert zero-sized array");
@@ -3827,6 +3857,28 @@ void smt2_convt::convert_mod(const mod_exprt &expr)
     else
       out << "(bvsrem ";
 
+    convert_expr(expr.op0());
+    out << " ";
+    convert_expr(expr.op1());
+    out << ")";
+  }
+  else if(expr.type().id() == ID_integer)
+  {
+    // Mathematical integers (mp_integer) truncate toward zero, so the
+    // remainder takes the sign of the dividend; SMT-LIB mod is always
+    // non-negative. Take the remainder of the magnitudes and re-apply the
+    // dividend's sign.
+    out << "(let ((?ma ";
+    convert_expr(expr.op0());
+    out << ") (?mb ";
+    convert_expr(expr.op1());
+    out << ")) (let ((?mr (mod (ite (< ?ma 0) (- ?ma) ?ma)";
+    out << " (ite (< ?mb 0) (- ?mb) ?mb)))) (ite (< ?ma 0) (- ?mr) ?mr)))";
+  }
+  else if(expr.type().id() == ID_natural)
+  {
+    // Naturals are non-negative, so SMT-LIB mod already matches mp_integer.
+    out << "(mod ";
     convert_expr(expr.op0());
     out << " ";
     convert_expr(expr.op1());
@@ -4368,11 +4420,32 @@ void smt2_convt::convert_div(const div_exprt &expr)
     expr.type().id() == ID_rational || expr.type().id() == ID_integer ||
     expr.type().id() == ID_natural || expr.type().id() == ID_real)
   {
-    out << "(/ ";
-    convert_expr(expr.op0());
-    out << " ";
-    convert_expr(expr.op1());
-    out << ")";
+    if(expr.type().id() == ID_integer)
+    {
+      // Mathematical integers (mp_integer) truncate division toward zero,
+      // whereas SMT-LIB div floors. Encode truncation: divide the magnitudes
+      // and make the quotient negative iff the operands have opposite signs.
+      out << "(let ((?da ";
+      convert_expr(expr.op0());
+      out << ") (?db ";
+      convert_expr(expr.op1());
+      out << ")) (let ((?dq (div (ite (< ?da 0) (- ?da) ?da)";
+      out << " (ite (< ?db 0) (- ?db) ?db))))";
+      out << " (ite (= (< ?da 0) (< ?db 0)) ?dq (- ?dq))))";
+    }
+    else
+    {
+      // Naturals are non-negative (SMT-LIB div already truncates); rationals
+      // and reals use real division.
+      if(expr.type().id() == ID_natural)
+        out << "(div ";
+      else
+        out << "(/ ";
+      convert_expr(expr.op0());
+      out << " ";
+      convert_expr(expr.op1());
+      out << ")";
+    }
   }
   else
     UNEXPECTEDCASE("unsupported type for /: "+expr.type().id_string());
@@ -6037,8 +6110,7 @@ void smt2_convt::convert_type(const typet &type)
 {
   if(type.id()==ID_array)
   {
-    const array_typet &array_type=to_array_type(type);
-    CHECK_RETURN(array_type.size().is_not_nil());
+    const array_typet &array_type = to_array_type(type);
 
     // we always use array theory for top-level arrays
     const typet &subtype = array_type.element_type();
