@@ -6966,6 +6966,45 @@ bool cpp_typecheck_resolvet::disambiguate_functions(
 
   const code_typet &type = to_code_type(expr.type());
 
+  // N5008 [class.copy.ctor]/2: a constructor for class X is ill-formed if its
+  // first parameter is of type (optionally cv-qualified) X (passed by value)
+  // and there are no other parameters or all other parameters have default
+  // arguments.  Such a signature is never a usable constructor, yet it can be
+  // produced by deducing a constructor template (e.g. `template<class T> X(T)`
+  // with T deduced as X, giving a by-value `X(X)`).  Were it selected, copy-
+  // initialising its by-value parameter would recursively construct another X
+  // without bound (cf. [over.best.ics]/4 Note 2).  Exclude it from the
+  // candidate set so the (non-template) copy/move constructor is used instead.
+  if(type.return_type().id() == ID_constructor)
+  {
+    const code_typet::parameterst &ctor_params = type.parameters();
+    if(
+      ctor_params.size() >= 2 && ctor_params.front().get_this() &&
+      ctor_params[0].type().id() == ID_pointer)
+    {
+      const typet &class_type =
+        to_pointer_type(ctor_params[0].type()).base_type();
+      const typet &p1 = ctor_params[1].type();
+      if(
+        p1.id() == ID_struct_tag && class_type.id() == ID_struct_tag &&
+        to_struct_tag_type(p1).get_identifier() ==
+          to_struct_tag_type(class_type).get_identifier())
+      {
+        bool rest_defaulted = true;
+        for(std::size_t i = 2; i < ctor_params.size(); ++i)
+        {
+          if(!ctor_params[i].has_default_value())
+          {
+            rest_defaulted = false;
+            break;
+          }
+        }
+        if(rest_defaulted)
+          return false;
+      }
+    }
+  }
+
   if(expr.id() == ID_member || type.return_type().id() == ID_constructor)
   {
     // if it's a member, but does not have an object yet,
