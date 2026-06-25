@@ -480,6 +480,18 @@ protected:
   // Deferred method bodies for lazy template elaboration.
   std::map<irep_idt, method_bodyt> deferred_method_bodies;
 
+  /// Constructors (and other member functions) that are odr-used as the target
+  /// of a constructor member-initializer.  A synthesized constructor's base- or
+  /// member-subobject initializer is lowered to a class-name constructor call
+  /// that is only resolved to the concrete overload during goto conversion, so
+  /// the resolved callee does not appear as a symbol reference in the stored
+  /// body and the deferred-body drain's reference scan cannot see it.  We
+  /// record such callees here (at the point of resolution in
+  /// typecheck_member_initializer) so the drain still elaborates them
+  /// ([temp.inst]/4: an implicitly-instantiated member that is odr-used must be
+  /// instantiated).
+  std::set<irep_idt> odr_used_by_member_initializer;
+
   void add_method_body(symbolt *_method_symbol);
 
   /// Static member symbols whose initializers are deferred until

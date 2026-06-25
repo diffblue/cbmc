@@ -1762,6 +1762,13 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
     {
       symbolt &callee = symbol_table.get_writeable_ref(
         to_symbol_expr(symbol_expr).get_identifier());
+      // Record the odr-use: this base/member constructor is invoked by the
+      // initializer.  The call is lowered to an unresolved class-name
+      // constructor call (resolved only at goto-conversion), so the
+      // deferred-body drain's symbol-reference scan would otherwise miss it
+      // and leave an explicitly-defaulted / implicitly-defined base
+      // constructor uninstantiated ([temp.inst]/4).
+      odr_used_by_member_initializer.insert(callee.name);
       if(callee.value.id() == ID_cpp_not_typechecked)
         callee.value.set(ID_is_used, true);
       if(callee.value.is_not_nil() && deferred_typechecking.count(callee.name))
