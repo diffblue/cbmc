@@ -330,9 +330,12 @@ static bool brace_init_to_init_list_is_viable(
 bool cpp_typecheck_fargst::match(
   const code_typet &code_type,
   unsigned &distance,
-  cpp_typecheckt &cpp_typecheck) const
+  cpp_typecheckt &cpp_typecheck,
+  unsigned *cv_distance) const
 {
   distance = 0;
+  if(cv_distance != nullptr)
+    *cv_distance = 0;
 
   exprt::operandst ops = operands;
   const code_typet::parameterst &parameters = code_type.parameters();
@@ -418,7 +421,7 @@ bool cpp_typecheck_fargst::match(
 
     // can we do the standard conversion sequence?
     if(cpp_typecheck.implicit_conversion_sequence(
-         operand, type, new_expr, rank))
+         operand, type, new_expr, rank, cv_distance))
     {
       // ok
       distance += rank;
@@ -430,7 +433,7 @@ bool cpp_typecheck_fargst::match(
       operand.id() == ID_initializer_list && cpp_typecheck.cpp_is_pod(type) &&
       operand.operands().size() == 1 &&
       cpp_typecheck.implicit_conversion_sequence(
-        to_unary_expr(operand).op(), type, new_expr, rank))
+        to_unary_expr(operand).op(), type, new_expr, rank, cv_distance))
     {
       distance += rank;
     }

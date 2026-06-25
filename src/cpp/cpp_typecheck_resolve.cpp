@@ -1050,6 +1050,19 @@ void cpp_typecheck_resolvet::guess_function_template_args(
         non_templates.push_back(old_id);
       }
     }
+    else if(!old_id.type().get_bool(ID_is_template))
+    {
+      // N5008 [over.match.funcs] + [over.match.best]/2.4: a non-template
+      // candidate must participate in overload resolution alongside
+      // function-template specializations.  An implicitly-declared
+      // copy/move assignment operator (and similar non-static members) is
+      // represented here as a member expression rather than a symbol, so the
+      // `ID_symbol` branch above would silently drop it -- leaving only a
+      // converting `operator=` template and wrongly selecting it for a
+      // same-type assignment `x = y`.  Collect such non-template candidates
+      // too so they are disambiguated against the template specializations.
+      non_templates.push_back(old_id);
+    }
   }
 
   // Only include non-template identifiers when there are also template
@@ -1591,8 +1604,15 @@ void cpp_typecheck_resolvet::exact_match_functions(
   for(const auto &old_id : old_identifiers)
   {
     unsigned distance;
-    if(disambiguate_functions(old_id, distance, fargs))
-      if(distance <= 0)
+    unsigned cv_distance = 0;
+    if(disambiguate_functions(old_id, distance, fargs, &cv_distance))
+      // A reference binding differing from the argument only in top-level
+      // cv-qualification is an identity conversion ([over.ics.ref]); its
+      // cv tie-breaker ([over.ics.rank]/3.2.6) is reported separately in
+      // `cv_distance`.  A precise match still requires it to be zero, so e.g.
+      // `f() const` is not a precise match for a non-const object (preserving
+      // const/non-const member-function overload selection).
+      if(distance + cv_distance <= 0)
         identifiers.push_back(old_id);
   }
 }
@@ -1610,8 +1630,9 @@ void cpp_typecheck_resolvet::disambiguate_functions(
   for(const auto &old_id : old_identifiers)
   {
     unsigned args_distance;
+    unsigned cv_distance = 0;
 
-    if(disambiguate_functions(old_id, args_distance, fargs))
+    if(disambiguate_functions(old_id, args_distance, fargs, &cv_distance))
     {
       std::size_t template_distance = 0;
 
@@ -1638,9 +1659,17 @@ void cpp_typecheck_resolvet::disambiguate_functions(
       // match, args_distance 0, but template_distance >= 1) — violating
       // [over.best.ics] (an implicit conversion sequence contains at
       // most one user-defined conversion).
+      // `cv_distance` is the lowest-order key: per [over.ics.rank]/3.2.6 the
+      // top-level cv-qualification of a *reference* binding is a tie-breaker
+      // applied only between reference bindings, ranked below the non-template
+      // preference ([over.match.best]/2.4).  Folding it into `args_distance`
+      // would let a by-value match by a constructor/operator *template* beat a
+      // reference binding by the (non-template) copy/move special member --
+      // e.g. selecting `operator=(_Up)` over the copy assignment for `x = y`
+      // with `x`, `y` of the same class.
       std::size_t total_distance =
         // NOLINTNEXTLINE(whitespace/operators)
-        1000000 * args_distance + template_distance;
+        1000000000ULL * args_distance + 1000 * template_distance + cv_distance;
 
       distance_map.insert({total_distance, old_id});
     }
@@ -6980,9 +7009,12 @@ void cpp_typecheck_resolvet::apply_template_args(
 bool cpp_typecheck_resolvet::disambiguate_functions(
   const exprt &expr,
   unsigned &args_distance,
-  const cpp_typecheck_fargst &fargs)
+  const cpp_typecheck_fargst &fargs,
+  unsigned *cv_distance)
 {
   args_distance = 0;
+  if(cv_distance != nullptr)
+    *cv_distance = 0;
 
   if(!fargs.in_use)
     return true;
@@ -7057,7 +7089,8 @@ bool cpp_typecheck_resolvet::disambiguate_functions(
 
           cpp_typecheck_fargst new_fargs(fargs);
           new_fargs.add_object(object);
-          return new_fargs.match(type, args_distance, cpp_typecheck);
+          return new_fargs.match(
+            type, args_distance, cpp_typecheck, cv_distance);
         }
         else
         {
@@ -7065,20 +7098,21 @@ bool cpp_typecheck_resolvet::disambiguate_functions(
             expr.type().get_bool(ID_C_is_operator) &&
             fargs.operands.size() == parameters.size())
           {
-            return fargs.match(type, args_distance, cpp_typecheck);
+            return fargs.match(type, args_distance, cpp_typecheck, cv_distance);
           }
 
           cpp_typecheck_fargst new_fargs(fargs);
           new_fargs.add_object(to_member_expr(expr).compound());
 
-          return new_fargs.match(type, args_distance, cpp_typecheck);
+          return new_fargs.match(
+            type, args_distance, cpp_typecheck, cv_distance);
         }
       }
       else
       {
         // Template function instance without this parameter yet;
         // match directly against the parameters.
-        return fargs.match(type, args_distance, cpp_typecheck);
+        return fargs.match(type, args_distance, cpp_typecheck, cv_distance);
       }
     }
   }
@@ -7089,7 +7123,7 @@ bool cpp_typecheck_resolvet::disambiguate_functions(
     // already includes the object and the type already includes 'this'.
     if(!type.parameters().empty() && type.parameters().front().get_this())
     {
-      return fargs.match(type, args_distance, cpp_typecheck);
+      return fargs.match(type, args_distance, cpp_typecheck, cv_distance);
     }
 
     // For template function instances (pre-instantiation), the function
@@ -7099,7 +7133,7 @@ bool cpp_typecheck_resolvet::disambiguate_functions(
     cpp_typecheck_fargst new_fargs(fargs);
     new_fargs.remove_object();
 
-    if(new_fargs.match(type, args_distance, cpp_typecheck))
+    if(new_fargs.match(type, args_distance, cpp_typecheck, cv_distance))
       return true;
 
     if(expr.id() == ID_template_function_instance)
@@ -7125,10 +7159,10 @@ bool cpp_typecheck_resolvet::disambiguate_functions(
 
     cpp_typecheck_fargst new_fargs(fargs);
     new_fargs.add_object(object);
-    return new_fargs.match(type, args_distance, cpp_typecheck);
+    return new_fargs.match(type, args_distance, cpp_typecheck, cv_distance);
   }
 
-  return fargs.match(type, args_distance, cpp_typecheck);
+  return fargs.match(type, args_distance, cpp_typecheck, cv_distance);
 }
 
 void cpp_typecheck_resolvet::filter_for_named_scopes(
