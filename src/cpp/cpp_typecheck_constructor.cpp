@@ -243,13 +243,30 @@ void cpp_typecheckt::default_cpctor(
     {
       irep_idt ctor_name=parsymb.base_name;
 
-      // Call the parent default copy constructor
+      // Call the parent copy constructor.  N5008 [class.copy.ctor]/14: each
+      // base subobject is copied using its own copy constructor, applied to
+      // the corresponding base subobject of the source.  Slice the source
+      // parameter to a `const Base&` (rather than passing the whole derived
+      // object) so overload resolution sees the base type: passing the derived
+      // object would let a converting/forwarding constructor template in the
+      // base (e.g. `Base(U&&)`) deduce `U` as the derived type and match more
+      // closely than the base copy constructor, selecting an unintended
+      // constructor ([over.match.best], [temp.deduct]).
       const cpp_namet cppname(ctor_name, source_location);
+
+      exprt base_ref(
+        "explicit-typecast",
+        pointer_type(cpp_namet(parsymb.base_name, source_location).as_type()));
+      base_ref.type().set(ID_C_reference, true);
+      to_pointer_type(base_ref.type()).base_type().set(ID_C_constant, true);
+      base_ref.get_sub().push_back(
+        cpp_namet(param_identifier, source_location));
+      base_ref.add_source_location() = source_location;
 
       codet mem_init(ID_member_initializer);
       mem_init.add_source_location()=source_location;
       mem_init.set(ID_member, cppname);
-      mem_init.copy_to_operands(cpp_parameter.as_expr());
+      mem_init.add_to_operands(std::move(base_ref));
       initializers.move_to_sub(mem_init);
     }
   }
