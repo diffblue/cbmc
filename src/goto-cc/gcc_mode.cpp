@@ -579,6 +579,15 @@ int gcc_modet::doit()
     config.ansi_c.wchar_t_is_unsigned=true;
   }
 
+  // -fms-extensions enables MS/GCC extensions such as anonymous members
+  // that are a *tagged* struct/union type (used throughout the Linux
+  // kernel, e.g. struct __filename_head embedded in struct filename).
+  // Only anonymous struct/union embedding is implemented here.
+  // Note: goto_cc_cmdlinet stores long options without the leading '-',
+  // so we query "fms-extensions" (cf. the "fshort-double" check below).
+  if(cmdline.isset("fms-extensions"))
+    config.ansi_c.allow_anonymous_struct_embedding = true;
+
   // -fsingle-precision-constant makes floating-point constants "float"
   // instead of double
   if(cmdline.isset("-fsingle-precision-constant"))
