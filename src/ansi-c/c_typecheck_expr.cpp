@@ -4761,6 +4761,10 @@ protected:
     {
       return is_constant_address_of(to_address_of_expr(e).object());
     }
+    // For these expressions constancy is exactly the constancy of all
+    // operands, so recurse below.  This covers the aggregates
+    // (ID_struct/ID_union/ID_array) and, likewise, a compound literal, whose
+    // constancy is that of its single initializer operand.
     else if(
       e.id() == ID_typecast || e.id() == ID_array_of || e.id() == ID_plus ||
       e.id() == ID_mult || e.id() == ID_array || e.id() == ID_with ||
@@ -4769,7 +4773,8 @@ protected:
       e.id() == ID_le || e.id() == ID_gt || e.id() == ID_ge ||
       e.id() == ID_if || e.id() == ID_not || e.id() == ID_and ||
       e.id() == ID_or || e.id() == ID_bitnot || e.id() == ID_bitand ||
-      e.id() == ID_bitor || e.id() == ID_bitxor || e.id() == ID_vector)
+      e.id() == ID_bitor || e.id() == ID_bitxor || e.id() == ID_vector ||
+      e.id() == ID_compound_literal)
     {
       return std::all_of(
         e.operands().begin(), e.operands().end(), [this](const exprt &op) {
