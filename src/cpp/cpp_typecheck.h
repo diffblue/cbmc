@@ -880,16 +880,22 @@ public:
   bool reference_compatible(
     const exprt &expr,
     const reference_typet &type,
-    unsigned &rank) const;
+    unsigned &rank,
+    unsigned *cv_distance = nullptr) const;
 
   bool reference_binding(
     exprt expr,
     const reference_typet &type,
     exprt &new_expr,
-    unsigned &rank);
+    unsigned &rank,
+    unsigned *cv_distance = nullptr);
 
   bool implicit_conversion_sequence(
-    const exprt &expr, const typet &type, exprt &new_expr, unsigned &rank);
+    const exprt &expr,
+    const typet &type,
+    exprt &new_expr,
+    unsigned &rank,
+    unsigned *cv_distance = nullptr);
 
   bool implicit_conversion_sequence(
     const exprt &expr, const typet &type, unsigned &rank);

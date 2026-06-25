@@ -73,7 +73,8 @@ public:
   bool match(
     const code_typet &code_type,
     unsigned &distance,
-    cpp_typecheckt &cpp_typecheck) const;
+    cpp_typecheckt &cpp_typecheck,
+    unsigned *cv_distance = nullptr) const;
 
   void add_object(const exprt &expr)
   {
