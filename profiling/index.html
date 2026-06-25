@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<title>CBMC Profiling — develop</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 900px; margin: 2em auto; padding: 0 1em; }
+  h1 { border-bottom: 2px solid #333; padding-bottom: 0.3em; }
+  a { color: #0366d6; }
+  .meta { color: #666; font-size: 0.9em; }
+  ul { line-height: 1.8; }
+  pre { background: #f6f8fa; padding: 1em; overflow-x: auto; font-size: 0.85em; }
+</style>
+</head><body>
+<h1>CBMC Profiling — develop</h1>
+<p class='meta'>Commit: <code>02c27692</code> — 2026-06-25 21:22 UTC</p>
+<h2>Flamegraphs</h2><p>Click to open interactive SVG (searchable, zoomable):</p><ul>
+<li><a href="aggregated.svg">aggregated</a></li>
+<li><a href="array_ops.svg">array_ops</a></li>
+<li><a href="linked_list.svg">linked_list</a></li>
+<li><a href="structs.svg">structs</a></li>
+</ul>
+<h2>Summary</h2><pre>
+========================================================================
+CBMC PROFILING SUMMARY
+========================================================================
+
+--- CBMC Internal Timings ---
+
+Benchmark                 Symex    Convert     Solver      Total      Steps   ±Total
+---------------------------------------------------------------------------------
+linked_list              0.151s     0.105s     0.004s       1.0s       4433 ±0.00s
+array_ops                2.239s     0.110s     0.000s       3.0s      16448 ±0.01s
+structs                  0.022s     0.000s     0.000s       1.0s        312 ±0.00s
+
+--- Aggregated Top Functions (by samples) ---
+
+     %  Samples  Module                         Symbol
+------------------------------------------------------------------------
+ 12.8%      230  libc.so.6                      malloc
+ 10.9%      196  cbmc                           sharing_treet<irept, forward_list_as_mapt<dstringt, irept> >::remove_ref(tree_nodet<irept, forward_list_as_mapt<dstringt, irept>, true>*)
+  8.4%      151  cbmc                           irept::find(dstringt const&) const
+  7.2%      129  libc.so.6                      cfree
+  7.0%      126  cbmc                           irept::get(dstringt const&) const
+  5.0%       90  cbmc                           sharing_treet<irept, forward_list_as_mapt<dstringt, irept> >::detach()
+  4.5%       81  cbmc                           irept::operator==(irept const&) const
+  3.8%       68  libstdc++.so.6.0.33            std::basic_streambuf<char, std::char_traits<char> >::xsputn(char const*, long)
+  3.8%       68  libstdc++.so.6.0.33            std::basic_ostream<char, std::char_traits<char> >& std::__ostream_insert<char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*, long)
+  2.6%       46  cbmc                           std::_Hashtable<std::basic_string_view<char, std::char_traits<char> >, std::pair<std::basic_string_view<char, std::char_traits<char> > const, unsigned int>, std::allocator<std::pair<std::basic_string_view<char, std::char_traits<char> > const, unsigned int> >, std::__detail::_Select1st, std::equal_to<std::basic_string_view<char, std::char_traits<char> > >, string_view_hasht, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, false, true> >::_M_find_before_node(unsigned long, std::basic_string_view<char, std::char_traits<char> > const&, unsigned long) const [clone .isra.0]
+  2.5%       45  libc.so.6                      0x00000000000ab678
+  2.2%       40  cbmc                           irept::add(dstringt const&, irept)
+  2.2%       39  cbmc                           hash_string(std::basic_string_view<char, std::char_traits<char> >)
+  2.1%       37  libstdc++.so.6.0.33            std::ostream::sentry::sentry(std::ostream&)
+  1.8%       33  libstdc++.so.6.0.33            std::basic_ios<char, std::char_traits<char> >::_M_cache_locale(std::locale const&)
+  1.7%       30  libc.so.6                      0x00000000000ab1fc
+  1.5%       27  libstdc++.so.6.0.33            operator new(unsigned long)
+  1.4%       26  cbmc                           merge_irept::merged(irept const&)
+  1.2%       22  cbmc                           irept::add(dstringt const&)
+  1.2%       21  cbmc                           constant_exprt::check(exprt const&, validation_modet)
+  1.1%       20  libc.so.6                      0x00000000000ab1c5
+  1.1%       20  libstdc++.so.6.0.33            std::ostream::put(char)
+  0.9%       17  cbmc                           build_identifier(exprt const&, dstringt const&, dstringt const&, dstringt const&)
+  0.9%       17  cbmc                           dstringt::operator<<(std::ostream&) const
+  0.9%       17  cbmc                           std::_Hashtable<std::basic_string_view<char, std::char_traits<char> >, std::pair<std::basic_string_view<char, std::char_traits<char> > const, unsigned int>, std::allocator<std::pair<std::basic_string_view<char, std::char_traits<char> > const, unsigned int> >, std::__detail::_Select1st, std::equal_to<std::basic_string_view<char, std::char_traits<char> > >, string_view_hasht, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, false, true> >::find(std::basic_string_view<char, std::char_traits<char> > const&)
+
+--- Sample Distribution ---
+  CBMC code:         997 (55.3%)
+  Libraries:         805 (44.7%)
+  Total:            1802
+
+--- Output Files ---
+  linked_list/flamegraph.svg
+  linked_list/perf-report.txt
+  array_ops/flamegraph.svg
+  array_ops/perf-report.txt
+  structs/flamegraph.svg
+  structs/perf-report.txt
+  aggregated.svg
+  summary.txt
+
+Results directory: profile-results
+========================================================================
+
+========================================================================
+ACTIONABLE HOTSPOT ANALYSIS
+========================================================================
+
+For each hotspot: callers are extracted from perf call stacks.
+Open the per-benchmark flamegraph SVGs for interactive exploration.
+
+────────────────────────────────────────────────────────────────────────
+  sharing_treet<...> >::remove_ref(tree_nodet<...>, true>*)
+  10.9% of total samples (196 samples)
+  Benchmarks: array_ops=173, linked_list=18, structs=5
+  Direct callers (from perf call stacks):
+     47.2%  sharing_treet<...> >::remove_ref
+     12.5%  simplify_exprt::simplify
+      5.1%  renamedt<exprt, 
+      2.8%  field_sensitivityt::get_fields
+      2.1%  renamedt<ssa_exprt, 
+  Top call paths (nearest CBMC caller → hotspot):
+     47.2%  sharing_treet<...> >::remove_ref
+     12.5%  simplify_exprt::simplify
+      5.1%  renamedt<exprt, 
+      2.8%  field_sensitivityt::get_fields
+
+────────────────────────────────────────────────────────────────────────
+  irept::find(dstringt const&) const
+  8.4% of total samples (151 samples)
+  Benchmarks: array_ops=140, structs=6, linked_list=5
+  Direct callers (from perf call stacks):
+     23.8%  constant_exprt::check
+     15.2%  field_sensitivityt::get_fields
+     12.6%  simplify_exprt::simplify_node_preorder
+      5.3%  boolbvt::boolbv_set_equality_to_true
+      4.6%  index_exprt::index_exprt
+  Top call paths (nearest CBMC caller → hotspot):
+     23.8%  constant_exprt::check
+     15.2%  field_sensitivityt::get_fields
+     12.6%  simplify_exprt::simplify_node_preorder
+      5.3%  boolbvt::boolbv_set_equality_to_true
+
+────────────────────────────────────────────────────────────────────────
+  irept::get(dstringt const&) const
+  7.0% of total samples (126 samples)
+  Benchmarks: array_ops=115, linked_list=11
+  Direct callers (from perf call stacks):
+     37.5%  simplify_exprt::simplify_typecast
+     31.2%  to_integer
+     25.0%  from_integer
+      6.2%  pointer_offset_bits
+  Top call paths (nearest CBMC caller → hotspot):
+     37.5%  simplify_exprt::simplify_typecast
+     31.2%  to_integer
+     25.0%  from_integer
+      6.2%  pointer_offset_bits
+
+────────────────────────────────────────────────────────────────────────
+  sharing_treet<...> >::detach()
+  5.0% of total samples (90 samples)
+  Benchmarks: array_ops=81, linked_list=8, structs=1
+  Direct callers (from perf call stacks):
+     54.1%  irept::add
+     19.5%  irept::remove
+      4.3%  merge_irept::merged
+      4.3%  irept::set
+      3.9%  field_sensitivityt::apply
+  Top call paths (nearest CBMC caller → hotspot):
+     54.1%  irept::add
+     19.5%  irept::remove
+      4.3%  merge_irept::merged
+      4.3%  irept::set
+
+────────────────────────────────────────────────────────────────────────
+  irept::operator==(irept const&) const
+  4.5% of total samples (81 samples)
+  Benchmarks: array_ops=42, linked_list=39
+  Direct callers (from perf call stacks):
+     58.2%  irept::operator==
+     31.4%  merge_irept::merged
+      2.1%  simplify_exprt::simplify_typecast
+      1.5%  simplify_exprt::simplify_rec
+      1.5%  symex_bmct::symex_step
+  Top call paths (nearest CBMC caller → hotspot):
+     58.2%  irept::operator==
+     31.4%  merge_irept::merged
+      2.1%  simplify_exprt::simplify_typecast
+      1.5%  simplify_exprt::simplify_rec
+
+────────────────────────────────────────────────────────────────────────
+  std::_Hashtable<...> >, std::pair<std::basic_string_view<char, std::char_traits<char> > const, unsigned int>, std::allocator<std::pair<std::basic_string_view<char, std::char_traits<char> > const, unsigned int> >, std::__detail::_Select1st, std::equal_to<std::basic_string_view<char, std::char_traits<char> > >, string_view_hasht, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, false, true> >::_M_find_before_node(unsigned long, std::basic_string_view<char, std::char_traits<char> > const&, unsigned long) const
+  2.6% of total samples (46 samples)
+  Benchmarks: array_ops=45, structs=1
+  Direct callers (from perf call stacks):
+    100.0%  std::_Hashtable<...> >, std::pair<std::basic_string_view<char,...
+  Top call paths (nearest CBMC caller → hotspot):
+    100.0%  string_containert::get
+           → std::_Hashtable<...> >, std::pair<std::basic_string_...
+
+────────────────────────────────────────────────────────────────────────
+  irept::add(dstringt const&, irept)
+  2.2% of total samples (40 samples)
+  Direct callers (from perf call stacks):
+     29.8%  renamedt<exprt, 
+     14.9%  update_identifier
+     10.7%  irept::set
+      6.5%  renamedt<ssa_exprt, 
+      4.7%  ssa_exprt::set_expression
+  Top call paths (nearest CBMC caller → hotspot):
+     29.8%  renamedt<exprt, 
+     14.9%  update_identifier
+     10.7%  irept::set
+      6.5%  renamedt<ssa_exprt, 
+
+────────────────────────────────────────────────────────────────────────
+  hash_string(std::basic_string_view<char, std::char_traits<char> >)
+  2.2% of total samples (39 samples)
+  Direct callers (from perf call stacks):
+    100.0%  std::_Hashtable<...> >, std::pair<std::basic_string_view<char,...
+  Top call paths (nearest CBMC caller → hotspot):
+    100.0%  string_containert::get
+           → std::_Hashtable<...> >, std::pair<std::basic_string_...
+
+────────────────────────────────────────────────────────────────────────
+DRILL-DOWN COMMANDS
+
+To investigate a specific function's callers in detail:
+  perf report -i profile-results/<benchmark>/perf.data \
+    --stdio --no-children --symbol-filter='<function>' \
+    -g caller,folded,0.5
+
+To get an interactive TUI for any benchmark:
+  perf report -i profile-results/<benchmark>/perf.data -g caller
+
+SYMEX-DOMINATED: array_ops
+  Symex takes >50% of wall time. Start with the flamegraph for
+  these benchmarks and look at goto_symext:: call subtrees.
+  Source: src/goto-symex/
+
+</pre>
+<p><a href="https://github.com/diffblue/cbmc">← Back to repository</a></p>
+</body></html>
