@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ head0 == a: SUCCESS$
+^\[main\.assertion\.2\] line \d+ head1 == b: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+By-reference variadic constructor parameter-pack expansion for an empty
+recursion-base pack, mirroring the libstdc plus plus _Tuple_impl recursive
+constructor that takes head and tail by const reference.  The empty trailing
+pack expands the by-reference parameter pack to no parameters and collapses the
+empty-pack base initializer, so construction succeeds.
