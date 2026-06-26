@@ -7341,24 +7341,46 @@ void cpp_typecheck_resolvet::filter_for_named_scopes(
           cpp_typecheck.symbol_table.lookup(parent.identifier);
         if(class_sym != nullptr && class_sym->type.id() == ID_struct)
         {
+          // N5008 [class.member.lookup]/[basic.scope.hiding]: a member
+          // declared in the class itself hides an inherited member of the
+          // same name.  The flattened component list may hold both this
+          // class's own member typedef (the one the looked-up id denotes,
+          // whose component name equals id.identifier and which is not
+          // from_base) and same-named inherited (from_base) typedefs from
+          // different base classes that resolve to unrelated types.  Pick the
+          // class's own member -- preferring an exact component-name match for
+          // the looked-up id, then any non-from_base member -- so a qualified
+          // name (e.g. a recursively-defined `typedef ... _Base`) resolves to
+          // the derived class's typedef rather than a base's.
+          const struct_typet::componentt *chosen = nullptr;
           for(const auto &comp : to_struct_type(class_sym->type).components())
           {
-            if(
-              comp.get_base_name() == id.base_name && comp.get_bool(ID_is_type))
+            if(!(comp.get_base_name() == id.base_name &&
+                 comp.get_bool(ID_is_type)))
+              continue;
+            if(comp.get_name() == id.identifier)
             {
-              typet t = comp.type();
-              if(t.id() == ID_struct_tag)
-              {
-                const irep_idt &tag_id = to_struct_tag_type(t).get_identifier();
-                auto it = cpp_typecheck.cpp_scopes.id_map.find(tag_id);
-                if(it != cpp_typecheck.cpp_scopes.id_map.end())
-                {
-                  cpp_idt &class_id = *it->second;
-                  if(class_id.is_scope)
-                    new_set.insert(&class_id);
-                }
-              }
+              chosen = &comp;
               break;
+            }
+            if(
+              chosen == nullptr ||
+              (chosen->get_bool(ID_from_base) && !comp.get_bool(ID_from_base)))
+              chosen = &comp;
+          }
+          if(chosen != nullptr)
+          {
+            const typet &t = chosen->type();
+            if(t.id() == ID_struct_tag)
+            {
+              const irep_idt &tag_id = to_struct_tag_type(t).get_identifier();
+              auto it = cpp_typecheck.cpp_scopes.id_map.find(tag_id);
+              if(it != cpp_typecheck.cpp_scopes.id_map.end())
+              {
+                cpp_idt &class_id = *it->second;
+                if(class_id.is_scope)
+                  new_set.insert(&class_id);
+              }
             }
           }
         }
