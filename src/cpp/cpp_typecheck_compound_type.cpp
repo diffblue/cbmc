@@ -3350,7 +3350,6 @@ void cpp_typecheckt::make_ptr_typecast(
     // component.
     bool needs_offset = false;
     const struct_typet *current = derived;
-    irep_idt offset_base_name;
     while(current->get(ID_name) != base_name)
     {
       const auto &bases = current->bases();
@@ -3381,7 +3380,6 @@ void cpp_typecheckt::make_ptr_typecast(
 
         if(nth_base.get(ID_name) == base_name || nth_base_set.count(base_name))
         {
-          offset_base_name = nth_base.get(ID_name);
           needs_offset = true;
           break;
         }
@@ -3391,37 +3389,66 @@ void cpp_typecheckt::make_ptr_typecast(
 
     if(needs_offset)
     {
-      // Find the first component of the non-first base in derived.
-      const std::string bn = id2string(offset_base_name);
-      std::string base_prefix;
-      if(bn.size() > 4 && bn.substr(0, 4) == "tag-")
-        base_prefix = bn.substr(4) + "::";
-      else
-        base_prefix = bn + "::";
-      const std::string tag_prefix = bn + "::";
+      // The target base subobject begins at the offset of its first data
+      // member.  In CBMC's flattened struct layout an inherited member is
+      // named "<defining-class>::<member>", where <defining-class> is the
+      // class that actually declares the member -- any class in the target
+      // base's own inheritance subtree, not necessarily the base itself
+      // (e.g. for the base `_Tuple_impl<1, int>` the member is declared by its
+      // own base `_Head_base<1, int>`).  Match a component by whether its
+      // declaring class is in that subtree.  Method/code and static
+      // components carry no per-object storage and must be ignored
+      // (member_offset is meaningless for them -- a destructor component
+      // otherwise yielded a bogus past-the-end offset).  Per
+      // [intro.object]/[class.derived] a non-virtual base subobject occupies a
+      // contiguous region, so its lowest-offset data member marks its start.
+      std::set<irep_idt> base_subtree;
+      base_subtree.insert(base->get(ID_name));
+      get_bases(*base, base_subtree);
 
+      std::set<std::string> subtree_names;
+      for(const auto &n : base_subtree)
+      {
+        std::string ns = id2string(n);
+        if(ns.compare(0, 4, "tag-") == 0)
+          ns = ns.substr(4);
+        subtree_names.insert(ns);
+      }
+
+      bool found = false;
+      mp_integer best = 0;
       for(const auto &comp : derived->components())
       {
+        if(comp.type().id() == ID_code || comp.get_bool(ID_is_static))
+          continue;
         const std::string cn = id2string(comp.get_name());
-        if(
-          (cn.size() > base_prefix.size() &&
-           cn.compare(0, base_prefix.size(), base_prefix) == 0) ||
-          (cn.size() > tag_prefix.size() &&
-           cn.compare(0, tag_prefix.size(), tag_prefix) == 0))
+        const auto pos = cn.find("::");
+        if(pos == std::string::npos)
+          continue;
+        // The declaring-class prefix may be a tag name ("tag-B8::@vtable_..")
+        // or a plain name ("HeadBase<1,int>::h"); normalize before lookup.
+        std::string defining = cn.substr(0, pos);
+        if(defining.compare(0, 4, "tag-") == 0)
+          defining = defining.substr(4);
+        if(subtree_names.find(defining) == subtree_names.end())
+          continue;
+        const auto offset = member_offset(*derived, comp.get_name(), *this);
+        if(offset.has_value() && (!found || *offset < best))
         {
-          auto offset = member_offset(*derived, comp.get_name(), *this);
-          if(offset.has_value() && *offset != 0)
-          {
-            exprt char_ptr =
-              typecast_exprt(expr, pointer_type(unsigned_char_type()));
-            exprt offset_expr =
-              from_integer(is_upcast ? *offset : -*offset, pointer_diff_type());
-            exprt adjusted = plus_exprt(char_ptr, offset_expr);
-            expr = typecast_exprt(adjusted, dest_type);
-            return;
-          }
-          break;
+          best = *offset;
+          found = true;
         }
+      }
+
+      if(found && best != 0)
+      {
+        exprt char_ptr =
+          typecast_exprt(expr, pointer_type(unsigned_char_type()));
+        exprt offset_expr =
+          from_integer(is_upcast ? best : -best, pointer_diff_type());
+        exprt adjusted = plus_exprt(char_ptr, offset_expr);
+        expr = typecast_exprt(adjusted, dest_type);
+        return;
       }
     }
   }
