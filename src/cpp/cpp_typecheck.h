@@ -575,6 +575,11 @@ protected:
   void remove_empty_pack_expansion_args(exprt &body);
   void typecheck_contracts();
   void typecheck_compound_bases(struct_typet &type);
+  /// N5008 [temp.variadic]/7: drop template arguments of \p name that are pack
+  /// expansions over a parameter pack empty in the current instantiation (per
+  /// template_map.pack_size_map), e.g. rewrite `X<_Tail...>` to `X<>`.  No-op
+  /// when no instantiation is in progress (empty pack_size_map).
+  void drop_empty_pack_template_args(irept &name);
   void add_anonymous_members_to_scope(const symbolt &struct_union_symbol);
 
   void move_member_initializers(
