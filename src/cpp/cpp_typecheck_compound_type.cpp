@@ -398,6 +398,34 @@ void cpp_typecheckt::typecheck_compound_declarator(
     }
     suppress_elaborate = old_suppress;
 
+    // N5008 [temp.variadic]/7: a function/constructor parameter that is a pack
+    // expansion over a pack empty in this instantiation contributes no
+    // parameters.  Such a parameter resolves to the empty_typet zero-length
+    // sentinel (see convert_template_parameter); drop it -- e.g. the trailing
+    // `_Tail... __tail` of `_Tuple_impl(_Head, _Tail...)` in the recursion
+    // base.  Only unwrap *references* (`const _Tail&...`); a legitimate `void*`
+    // must not be unwrapped and dropped.
+    if(is_function_member && final_type.id() == ID_code)
+    {
+      auto &params = to_code_type(final_type).parameters();
+      const auto is_empty_pack_param = [](const typet &t)
+      {
+        const typet *u = &t;
+        while(
+          (u->id() == ID_pointer || u->id() == ID_frontend_pointer) &&
+          (u->get_bool(ID_C_reference) || u->get_bool(ID_C_rvalue_reference)))
+          u = &to_type_with_subtype(*u).subtype();
+        return u->id() == ID_empty;
+      };
+      params.erase(
+        std::remove_if(
+          params.begin(),
+          params.end(),
+          [&](const code_typet::parametert &p)
+          { return is_empty_pack_param(p.type()); }),
+        params.end());
+    }
+
     // A finalised function type must not retain an unconverted
     // `frontend_pointer` parameter.  This can happen for a member of a
     // template class instantiation whose parameter type came from a

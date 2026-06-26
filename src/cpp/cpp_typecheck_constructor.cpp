@@ -546,6 +546,10 @@ void cpp_typecheckt::check_member_initializers(
     {
       // it has to be a parent constructor
       typet member_type=(typet&) initializer.find(ID_member);
+      // N5008 [temp.variadic]/7: drop an empty pack expansion from the base-id
+      // before resolving (e.g. `_Tuple_impl<I+1, _Tail...>` with empty
+      // `_Tail`); the unsubstituted pack reference would otherwise throw.
+      drop_empty_pack_template_args(member_type);
       typecheck_type(member_type);
 
       // check for a direct parent
@@ -743,6 +747,17 @@ void cpp_typecheckt::full_member_initialization(
 
   PRECONDITION(initializers.id() == ID_member_initializers);
 
+  // N5008 [temp.variadic]/7: normalise each member-initializer's base-id by
+  // dropping pack-expansion arguments over empty packs (e.g.
+  // `_Tuple_impl<I+1, _Tail...>` -> `_Tuple_impl<I+1>`), in place so the
+  // base-id stays clean when later moved into the final list and type-checked.
+  for(auto &initializer : initializers.get_sub())
+  {
+    irept &member = initializer.add(ID_member);
+    if(member.is_not_nil())
+      drop_empty_pack_template_args(member);
+  }
+
   // Per [temp.variadic]/7: remove empty pack expansion
   // expressions from member initializer arguments.
   if(!template_map.pack_size_map.empty())
@@ -932,6 +947,7 @@ void cpp_typecheckt::full_member_initialization(
           }
         }
 
+        drop_empty_pack_template_args(member_type);
         typecheck_type(member_type);
 
         if(member_type.id() != ID_struct_tag)

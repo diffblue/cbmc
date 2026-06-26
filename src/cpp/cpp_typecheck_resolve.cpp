@@ -1349,6 +1349,25 @@ exprt cpp_typecheck_resolvet::convert_template_parameter(
 
   if(e.is_nil() || (e.id() == ID_type && e.type().is_nil()))
   {
+    // N5008 [temp.variadic]/7 + [temp.arg.explicit]/4: a parameter pack that is
+    // empty in this instantiation expands to zero elements.  A scalar reference
+    // to such a pack's pattern (e.g. the element type of a constructor
+    // parameter pack `_Tail... __tail` whose `_Tail` is empty here) reaches
+    // this lookup with pack_size_map == 0 and no pack_args_map entry.  Return
+    // the empty_typet zero-length-pack sentinel (recognised downstream) instead
+    // of throwing, so the surrounding parameter/argument is dropped rather than
+    // aborting the whole specialization.
+    const auto ps_it =
+      cpp_typecheck.template_map.pack_size_map.find(identifier.identifier);
+    if(
+      ps_it != cpp_typecheck.template_map.pack_size_map.end() &&
+      ps_it->second == 0)
+    {
+      exprt empty_pack{ID_type};
+      empty_pack.type() = empty_typet{};
+      empty_pack.add_source_location() = source_location;
+      return empty_pack;
+    }
     // Don't print an error message — the caller may catch the exception
     // (e.g., during SFINAE or template argument deduction).
     throw 0;
