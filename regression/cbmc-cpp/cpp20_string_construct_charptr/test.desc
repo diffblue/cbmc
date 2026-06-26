@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^VERIFICATION SUCCESSFUL$
@@ -11,16 +11,9 @@ main.cpp
 --
 std::string s("ab") -- construction from a string literal.
 
-FRONT-END CONFORMANCE established: with the member-typedef conformance fix
-([temp.inst]/1-2, [dcl.typedef], [class.prop]), basic_string<char> is no longer
-truncated at its const_reverse_iterator member typedef, so it keeps its
-constructors, is not misclassified as a POD, and the (const char*) constructor
-is selected.  This reaches Bounded Model Checking with NO CONVERSION ERROR (the
-forbidden patterns above guard that conformance).
-
-Remains KNOWNBUG only because BMC of the fully-elaborated libstdc++ basic_string
-exhausts resources before VERIFICATION SUCCESSFUL -- a second-tier
-verification-PERFORMANCE item (symex on real libstdc++ containers), not a
-conformance gap.  Reclassify to CORE once std::string construction is
-BMC-tractable.
+With the member-typedef conformance fix ([temp.inst]/1-2, [dcl.typedef],
+[class.prop]) basic_string<char> is no longer truncated at its
+const_reverse_iterator member typedef, so it keeps its constructors, is not
+misclassified as a POD, and the (const char*) constructor is selected; BMC of
+the elaborated basic_string now completes with VERIFICATION SUCCESSFUL.
 See doc/architectural/cpp-class-template-instantiation-plan.md.
