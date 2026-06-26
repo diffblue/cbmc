@@ -69,6 +69,23 @@ protected:
   source_locationt source_location;
   cpp_scopet *original_scope;
 
+  /// Pack parameters whose elements were deduced via the derived-to-base
+  /// rule ([temp.deduct.call]/4.3): the function parameter is a class
+  /// template-id `C<..., P...>` and the call argument is of a class type
+  /// *derived* from a specialization of `C`, so the pack `P` is deduced from
+  /// the base-class subobject.  In that case build_template_args emits a
+  /// single placeholder for `P` and the deduced elements must be expanded to
+  /// the full arity (see the expansion in guess_function_template_args);
+  /// directly-deduced packs (where the argument is the template itself, not a
+  /// derived class) are already handled by the existing machinery and must
+  /// not be re-expanded here.  Keyed by the pack parameter's identifier.
+  std::set<irep_idt> derived_to_base_deduced_packs;
+
+  /// True while re-deducing against a base-class subobject inside the
+  /// derived-to-base branch of guess_template_args, so the pack-matching code
+  /// records the deduced pack(s) in \ref derived_to_base_deduced_packs.
+  bool deducing_against_base = false;
+
   typedef std::vector<exprt> resolve_identifierst;
 
   void convert_identifiers(
