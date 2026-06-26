@@ -6372,14 +6372,21 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
       const irep_idt pack_id = params[i].type().get(ID_identifier);
       if(pack_id.empty())
         continue;
-      // Only expand packs that were deduced via the derived-to-base rule
-      // ([temp.deduct.call]/4.3).  A pack deduced directly (the argument is a
-      // specialization of the same class template, not a derived class) is
-      // already handled by the existing instantiation machinery; re-expanding
-      // it here would disturb those (e.g. constexpr-foldable std::get) cases.
+      // Expand packs deduced via the derived-to-base rule
+      // ([temp.deduct.call]/4.3), and -- while draining the deferred
+      // method-body queue (instantiating_deferred_body) -- also directly
+      // deduced packs.  A directly-deduced pack in an eagerly-converted body
+      // (e.g. a call in main that the constexpr evaluator folds) is left to
+      // the existing machinery: expanding it there would materialise a runtime
+      // instance and suppress the constant-folding the call relies on.  When
+      // the call is instead resolved during the method-body drain it is a real
+      // (non-constant-evaluated) call whose instance must have the deduced
+      // arity, so the single placeholder build_template_args emitted is
+      // expanded here ([temp.variadic]).
       if(
         derived_to_base_deduced_packs.find(pack_id) ==
-        derived_to_base_deduced_packs.end())
+          derived_to_base_deduced_packs.end() &&
+        !cpp_typecheck.instantiating_deferred_body)
         continue;
       const auto pa_it = cpp_typecheck.template_map.pack_args_map.find(pack_id);
       if(pa_it == cpp_typecheck.template_map.pack_args_map.end())
