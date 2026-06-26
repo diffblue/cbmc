@@ -1172,7 +1172,38 @@ void cpp_typecheck_resolvet::guess_function_template_args(
             ? template_args.arguments().size() - non_pack_count
             : 0;
 
-        if(pack_size > 1)
+        // N5008 [temp.variadic]/4-5: only a genuine *function parameter pack*
+        // -- a function parameter declared with a top-level `...`, e.g.
+        // `_U... args` -- expands into N function parameters.  A parameter
+        // whose type merely *contains* the pack nested inside a template-
+        // argument expansion (e.g. `Base<0, _U...>`, deduced via the
+        // derived-to-base rule [temp.deduct.call]/4.3) is a *single*
+        // parameter whose type-internal pack instantiate_template already
+        // expanded inside the template-argument list (to `Base<0, int, int>`);
+        // duplicating it here would create a spurious extra parameter and
+        // leave the instantiated function with an unbindable call.  Detect a
+        // genuine function parameter pack by the top-level ellipsis on the
+        // declarator/type only -- mirroring the empty-pack guard in
+        // cpp_instantiate_template.cpp.
+        bool has_function_param_pack = false;
+        if(!tmpl_decl.declarators().empty())
+        {
+          const irept &fparams =
+            tmpl_decl.declarators().front().type().find(ID_parameters);
+          for(const auto &p : fparams.get_sub())
+          {
+            if(p.id() != ID_cpp_declaration)
+              continue;
+            for(const auto &d : p.get_sub())
+              if(
+                d.id() == ID_cpp_declarator &&
+                (d.find(ID_type).get_bool(ID_ellipsis) ||
+                 d.get_bool(ID_ellipsis)))
+                has_function_param_pack = true;
+          }
+        }
+
+        if(pack_size > 1 && has_function_param_pack)
         {
           auto &params = to_code_type(inst_type).parameters();
           // Find the pack parameter (last one that was the pack)
@@ -5324,7 +5355,13 @@ void cpp_typecheck_resolvet::guess_template_args(
               // Found a base class that is an instantiation of the
               // template we're deducing against.  Retry deduction
               // against this base.
+              // [temp.deduct.call]/4.3: this is the derived-to-base case;
+              // mark it so the pack-matching code records any pack it deduces
+              // as requiring full-arity expansion in build_template_args.
+              const bool saved_dab = deducing_against_base;
+              deducing_against_base = true;
               guess_template_args(template_type, base_type);
+              deducing_against_base = saved_dab;
               found_base = true;
               break;
             }
@@ -5393,6 +5430,12 @@ void cpp_typecheck_resolvet::guess_template_args(
 
             cpp_typecheck.template_map.pack_size_map[pack_id] =
               pack_elems.size();
+            // [temp.deduct.call]/4.3: if this pack was deduced from a
+            // base-class subobject of a derived-class argument, record it so
+            // build_template_args' single placeholder is later expanded to
+            // the full deduced arity.
+            if(deducing_against_base)
+              derived_to_base_deduced_packs.insert(pack_id);
             // Record the pack arguments (possibly empty): an explicit empty
             // entry lets a zero-length pack expansion in the matched pattern
             // (e.g. primary<Types...> with Types = <>) expand to no arguments.
@@ -5781,6 +5824,11 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   const exprt &expr,
   const cpp_typecheck_fargst &fargs)
 {
+  // Each resolution starts with no derived-to-base-deduced packs recorded;
+  // the set is populated by guess_template_args during this call and consumed
+  // by the type-internal-pack expansion below.
+  derived_to_base_deduced_packs.clear();
+
   const typet &tmp =
     expr.type().id() == ID_struct_tag
       ? static_cast<const typet &>(
@@ -6265,6 +6313,61 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   cpp_template_args_tct template_args =
     cpp_typecheck.template_map.build_template_args(
       cpp_declaration.template_type());
+
+  // [temp.deduct.call]/4.3: when P has the form of a simple-template-id and
+  // the argument A is a class derived from a specialization of that template,
+  // the template arguments are deduced from the base-class subobject of A
+  // (see [temp.deduct.call] Example 5: deducing `T...` in `f(const X<T...>&)`
+  // from `struct D : X<int>` yields `f<int>`).  When such a deduced pack is a
+  // template parameter pack appearing inside a parameter *type* (the `U...`
+  // in `Base<0, U...>`, as opposed to a function parameter pack `U... args`),
+  // guess_template_args records the full set of deduced elements in
+  // pack_args_map, but build_template_args above emits only a single
+  // placeholder argument for the pack (it looks up the scalar type_map
+  // binding).  Expand that placeholder to the full set of deduced elements so
+  // the instantiated specialization has the correct arity.  Without this, e.g.
+  // packsize(Der<int,int>) deducing `U = <int, int>` is instantiated as the
+  // 1-element packsize<int> whose body wrongly evaluates sizeof...(U) to 1.
+  // The function-parameter-pack case (has_non_empty_pack) is handled
+  // separately by the block below using pack_deduced_types, so this is
+  // confined to the disjoint type-internal-pack case.
+  if(!has_non_empty_pack)
+  {
+    const auto &params = cpp_declaration.template_type().template_parameters();
+    auto &args = template_args.arguments();
+    for(std::size_t i = 0; i < params.size() && i < args.size(); ++i)
+    {
+      if(!(params[i].get_bool(ID_ellipsis) && params[i].id() == ID_type))
+        continue;
+      const irep_idt pack_id = params[i].type().get(ID_identifier);
+      if(pack_id.empty())
+        continue;
+      // Only expand packs that were deduced via the derived-to-base rule
+      // ([temp.deduct.call]/4.3).  A pack deduced directly (the argument is a
+      // specialization of the same class template, not a derived class) is
+      // already handled by the existing instantiation machinery; re-expanding
+      // it here would disturb those (e.g. constexpr-foldable std::get) cases.
+      if(
+        derived_to_base_deduced_packs.find(pack_id) ==
+        derived_to_base_deduced_packs.end())
+        continue;
+      const auto pa_it = cpp_typecheck.template_map.pack_args_map.find(pack_id);
+      if(pa_it == cpp_typecheck.template_map.pack_args_map.end())
+        continue;
+      const std::vector<typet> &elems = pa_it->second;
+      if(elems.size() <= 1)
+        continue;
+      args[i] = exprt(ID_type);
+      args[i].type() = elems[0];
+      for(std::size_t j = 1; j < elems.size(); ++j)
+      {
+        exprt arg(ID_type);
+        arg.type() = elems[j];
+        args.insert(args.begin() + i + j, arg);
+      }
+      break;
+    }
+  }
 
   // For non-empty variadic packs, expand the single deduced pack type
   // to N copies in the template args so that template instantiation
