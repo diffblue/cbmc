@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ head0 == a: SUCCESS$
@@ -10,10 +10,8 @@ main.cpp
 --
 ^CONVERSION ERROR$
 A variadic constructor whose trailing parameter pack is empty in the recursion
-base must expand the pack to zero parameters and initialize each subobject,
+base expands the pack to zero parameters and initializes each subobject,
 mirroring the libstdc plus plus _Tuple_impl recursive constructor for a
-two-element tuple.  The recursion base TImpl with an empty Tail currently
-leaves a spurious void parameter and an unresolved empty-pack base initializer,
-so construction fails and even head0 is not initialized.  Flip to CORE once
-variadic constructor parameter-pack expansion handles the empty recursion-base
-pack.
+two-element tuple.  The recursion base TImpl with an empty Tail expands the
+constructor parameter pack to no parameters and collapses the empty-pack base
+initializer, so construction succeeds and the head subobjects are initialized.

@@ -5,13 +5,11 @@
 //   _Tuple_impl(_Head h, _Tail... t) : _Inherited(t...), _Base(h) { }
 // for a two-element tuple.
 //
-// KNOWN BUG: instantiating the recursion base TImpl<1,int> (whose own Tail is
-// empty) leaves the constructor parameter pack `Tail... tail` as a spurious
-// void parameter and the empty-pack base-initializer unresolved, so the whole
-// specialization -- and the derived TImpl<0,int,int> -- fail to construct;
-// even head0 is not initialized.  The desired behaviour below therefore does
-// not yet hold.  Flip to CORE once variadic constructor parameter-pack
-// expansion handles the empty recursion-base pack.
+// When the recursion base TImpl<1,int> (whose own Tail is empty) is
+// instantiated, the constructor parameter pack `Tail... tail` expands to zero
+// parameters and the empty-pack base-initializer `TImpl<2, Tail...>(tail...)`
+// collapses to `TImpl<2>()`, so the whole specialization -- and the derived
+// TImpl<0,int,int> -- construct correctly.
 //
 // Non-vacuous: operands are nondet so the passing assertions are not folded,
 // and assertion 3 is a deliberately wrong claim that must FAIL.
