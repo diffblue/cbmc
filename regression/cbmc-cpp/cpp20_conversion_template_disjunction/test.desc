@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ disjunction-constrained conversion operator: SUCCESS$
@@ -10,17 +10,11 @@ main.cpp
 ^.*is unknown.*$
 --
 [temp.constr.op]/[temp.deduct]/5: a conversion-function template whose
-requires-clause is a *disjunction* (integral<T> || floating_point<T>) must be
-removed from the candidate set when the whole constraint is unsatisfied with the
-deduced arguments.
+requires-clause is a disjunction (integral<T> or floating_point<T>) is removed
+from the candidate set when the whole constraint is unsatisfied with the deduced
+arguments -- for a class destination both disjuncts are false.
 
-KNOWNBUG: the conversion-template constraint check folds only a single atomic
-constraint (via typecheck_expr); it does not evaluate the boolean structure of a
-disjunction/conjunction, so or(false, false) is not recognised as unsatisfied
-and the non-viable candidate survives, producing a spurious
-"operator <class> is unknown".
-
-Minimal model of libstdc++'s __max_size_type / __max_diff_type conversion
-operators (constraint integral<_Tp> || __is_int128<_Tp>), reached when
-elaborating __normal_iterator's C++20 iterator_concept member.  Reclassify CORE
-once constraint-satisfaction evaluation handles the boolean operators.
+The constraint check now evaluates the boolean structure, so the non-viable
+candidate for the mutually-recursive class destination is correctly rejected
+(no spurious operator-to-class instantiation).  Minimal model of libstdc++'s
+__max_size_type / __max_diff_type conversion operators.
