@@ -1319,6 +1319,36 @@ exprt cpp_typecheck_resolvet::convert_template_parameter(
 
   if(e.is_nil() || (e.id() == ID_type && e.type().is_nil()))
   {
+    // N5008 [temp.variadic]/5,7: the identifier may name a template parameter
+    // *pack* that was bound (in template_map.pack_args_map) to two or more
+    // elements.  build() deliberately does not record a scalar type_map entry
+    // for a multi-element type pack (that would collapse pack expansions and
+    // sizeof... -- which are resolved separately via pack_args_map /
+    // pack_size_map by template_mapt::apply).  But a *scalar* reference to the
+    // pack's pattern (e.g. the parameter type of a function parameter pack
+    // `U... args`, resolved before the parameter list is expanded into one
+    // parameter per element) still reaches this lookup; for a single-element
+    // pack a convenience type_map entry makes it succeed, so for consistency
+    // resolve a multi-element pack here to its first element (the pattern's
+    // representative type).  The actual per-element expansion of the parameter
+    // list happens afterwards in guess_function_template_args.  Without this,
+    // instantiating a function parameter pack of two or more (non-class)
+    // elements threw, dropping the enclosing function body.
+    const auto pa_it =
+      cpp_typecheck.template_map.pack_args_map.find(identifier.identifier);
+    if(
+      pa_it != cpp_typecheck.template_map.pack_args_map.end() &&
+      !pa_it->second.empty())
+    {
+      exprt pack_front{ID_type};
+      pack_front.type() = pa_it->second.front();
+      pack_front.add_source_location() = source_location;
+      return pack_front;
+    }
+  }
+
+  if(e.is_nil() || (e.id() == ID_type && e.type().is_nil()))
+  {
     // Don't print an error message — the caller may catch the exception
     // (e.g., during SFINAE or template argument deduction).
     throw 0;
