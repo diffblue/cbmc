@@ -1,0 +1,10 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ derived-to-base pack deduced with arity 2: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
