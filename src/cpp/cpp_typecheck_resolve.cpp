@@ -4052,8 +4052,7 @@ exprt cpp_typecheck_resolvet::resolve(
   // case the user has explicitly requested the base-class member.
   if(!qualified && id_set.size() >= 2)
   {
-    auto is_base_of =
-      [&](const irep_idt &base, const irep_idt &derived) -> bool
+    auto is_base_of = [&](const irep_idt &base, const irep_idt &derived) -> bool
     {
       if(base.empty() || derived.empty() || base == derived)
         return false;
@@ -5416,6 +5415,94 @@ void cpp_typecheck_resolvet::guess_template_args(
       const auto &inst_arguments =
         static_cast<const cpp_template_args_tct &>(inst_args).arguments();
 
+      // N5008 [temp.deduct.call]/4.3 (same template family): P (template_type)
+      // and A (desired_type) may name the same class template, yet a non-type
+      // template parameter of P that is already fixed -- e.g. an explicitly
+      // specified index, as in libstdc++'s
+      // `__get_helper<__i>(_Tuple_impl<__i, _Head, _Tail...>&)` called on a
+      // `_Tuple_impl<0, ...>` argument -- can differ from A's corresponding
+      // argument.  A is then not itself a specialization of P, but may be
+      // DERIVED from one (its base subobject).  Detect a fixed non-type
+      // parameter whose bound value differs from A's argument and, if A has a
+      // base that is a specialization of the same template, retry deduction
+      // against that base (the recursion descends to deeper bases as needed).
+      {
+        bool fixed_mismatch = false;
+        for(std::size_t i = 0; i < targs.size() && i < inst_arguments.size();
+            ++i)
+        {
+          const irept &tn = targs[i];
+          const irept &tt = tn.id() == ID_ambiguous ? tn.find(ID_type) : tn;
+          if(tn.get_bool(ID_ellipsis) || tt.get_bool(ID_ellipsis))
+            break; // a pack absorbs the remaining arguments
+          if(inst_arguments[i].id() != ID_constant)
+            continue; // only fixed non-type (constant) arguments here
+          std::function<bool(const irept &)> refs_fixed_neq =
+            [&](const irept &n) -> bool
+          {
+            if(n.id() == ID_name && !n.get(ID_identifier).empty())
+            {
+              const auto ids = cpp_typecheck.cpp_scopes.current_scope().lookup(
+                n.get(ID_identifier), cpp_scopet::RECURSIVE);
+              for(const auto *p : ids)
+              {
+                if(p->id_class != cpp_idt::id_classt::TEMPLATE_PARAMETER)
+                  continue;
+                const auto eit =
+                  cpp_typecheck.template_map.expr_map.find(p->identifier);
+                if(
+                  eit != cpp_typecheck.template_map.expr_map.end() &&
+                  eit->second.id() == ID_constant &&
+                  eit->second.get(ID_value) != inst_arguments[i].get(ID_value))
+                  return true;
+              }
+            }
+            for(const auto &sub : n.get_sub())
+              if(refs_fixed_neq(sub))
+                return true;
+            for(const auto &ns : n.get_named_sub())
+              if(refs_fixed_neq(ns.second))
+                return true;
+            return false;
+          };
+          if(refs_fixed_neq(tn))
+          {
+            fixed_mismatch = true;
+            break;
+          }
+        }
+        if(fixed_mismatch)
+        {
+          const irep_idt tmpl_bn = cpp_name.get_base_name();
+          const irept &fm_bases = desired_sym->type.find(ID_bases);
+          for(const auto &base : fm_bases.get_sub())
+          {
+            const typet &base_type =
+              static_cast<const typet &>(base.find(ID_type));
+            if(
+              base_type.id() != ID_struct_tag && base_type.id() != ID_union_tag)
+              continue;
+            const irep_idt base_id =
+              base_type.id() == ID_struct_tag
+                ? to_struct_tag_type(base_type).get_identifier()
+                : to_union_tag_type(base_type).get_identifier();
+            const symbolt *base_sym =
+              cpp_typecheck.symbol_table.lookup(base_id);
+            if(base_sym == nullptr || base_sym->base_name != tmpl_bn)
+              continue;
+            const bool saved_dab = deducing_against_base;
+            deducing_against_base = true;
+            guess_template_args(template_type, base_type);
+            deducing_against_base = saved_dab;
+            return; // dispatched to the base subobject
+          }
+          // No base is a specialization of the same template: A is genuinely
+          // not (derived from) a specialization of P.
+          mark_targs_conflicting();
+          return;
+        }
+      }
+
       // Match each template arg from the cpp_name against the
       // corresponding instantiation arg
       for(std::size_t i = 0; i < targs.size(); i++)
@@ -5453,9 +5540,16 @@ void cpp_typecheck_resolvet::guess_template_args(
 
           if(!pack_id.empty())
           {
+            // [temp.variadic]/7: skip the empty_typet zero-length-pack
+            // sentinel (used in a class instance's recorded template
+            // arguments to mark a trailing pack that matched no elements,
+            // e.g. the empty `_Tail` of `_Tuple_impl<1, int>`).  Counting it
+            // as a real element would deduce a one-element pack `<void>`.
             std::vector<typet> pack_elems;
             for(std::size_t j = i; j < inst_arguments.size(); j++)
-              if(inst_arguments[j].id() == ID_type)
+              if(
+                inst_arguments[j].id() == ID_type &&
+                inst_arguments[j].type().id() != ID_empty)
                 pack_elems.push_back(inst_arguments[j].type());
 
             cpp_typecheck.template_map.pack_size_map[pack_id] =
@@ -7110,8 +7204,7 @@ void cpp_typecheck_resolvet::apply_template_args(
           // non-member path lets the caller surface the right
           // diagnostic at the use site.
           if(
-            type_symb.type.id() != ID_struct &&
-            type_symb.type.id() != ID_union)
+            type_symb.type.id() != ID_struct && type_symb.type.id() != ID_union)
           {
             return;
           }
