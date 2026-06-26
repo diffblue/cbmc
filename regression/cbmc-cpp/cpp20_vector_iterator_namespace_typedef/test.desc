@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^VERIFICATION SUCCESSFUL$
@@ -8,14 +8,8 @@ main.cpp
 ^CONVERSION ERROR$
 ^.*is unknown.*$
 --
-Namespace-scope typedef of a qualified member type of a class-template instance
-(`typedef std::vector<int>::iterator iter_t;`).  N5008 [temp.inst]/2,
-[basic.lookup.qual], [temp.point].  Naming the member instantiates vector<int>,
-which at C++20 elaborates its reverse_iterator member and the iterator-concept /
-std::ranges::swap CPO chain for __normal_iterator; in the namespace-scope
-qualified-name resolution context that evaluation raises an uncontained failure
-that aborts resolution (the typedef is never created), while the same use inside
-a function body and a namespace-scope vector<int> variable both succeed.  Same
-family as std::string s("ab") (the concept chain truncates basic_string).
-Reclassify to CORE when fixed.
-See doc/architectural/cpp-class-template-instantiation-plan.md.
+C++20 std::vector iterator namespace-qualified typedef elaboration.
+
+The iterator member typedefs and the __normal_iterator C++20 iterator-concept
+member now elaborate without a CONVERSION ERROR or unresolved name, and BMC of
+the construct completes with VERIFICATION SUCCESSFUL.
