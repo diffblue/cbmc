@@ -135,6 +135,23 @@ void cpp_typecheckt::typecheck_method_bodies()
   instantiation_stackt old_instantiation_stack;
   old_instantiation_stack.swap(instantiation_stack);
 
+  // The bodies drained here are converted outside any constant-evaluation
+  // context (see instantiating_deferred_body): a function-template call
+  // resolved while converting one of them materialises a real instance, so a
+  // directly-deduced type-internal parameter pack must be expanded to its
+  // deduced arity ([temp.variadic]) rather than left for constant folding.
+  const bool saved_deferred = instantiating_deferred_body;
+  instantiating_deferred_body = true;
+  struct restore_deferredt
+  {
+    cpp_typecheckt &ct;
+    bool saved;
+    ~restore_deferredt()
+    {
+      ct.instantiating_deferred_body = saved;
+    }
+  } restore_deferred{*this, saved_deferred};
+
   while(!method_bodies.empty())
   {
     // Dangerous not to take a copy here. We'll have to make sure that

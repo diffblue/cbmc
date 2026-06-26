@@ -517,6 +517,16 @@ protected:
   /// set suppress_elaborate=true.
   bool force_elaborate = false;
 
+  /// True while draining the deferred method-body queue
+  /// (typecheck_method_bodies): the function bodies converted here are not in
+  /// a constant-evaluation context (unlike a call in `main` that the constexpr
+  /// evaluator folds), so a function-template call resolved here materialises a
+  /// real instance whose parameter pack must be expanded to the deduced arity
+  /// ([temp.variadic]).  Used to enable type-internal pack expansion for
+  /// directly-deduced packs without disturbing the constant-folding of the
+  /// same call shape in an eagerly-converted (e.g. main) body.
+  bool instantiating_deferred_body = false;
+
   bool builtin_factory(const irep_idt &) override;
 
   // types
