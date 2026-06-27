@@ -893,13 +893,8 @@ void goto_check_ct::integer_overflow_check(
     {
       const auto &div_expr = to_div_expr(expr);
 
-      equal_exprt int_min_eq(
-        div_expr.dividend(), to_signedbv_type(type).smallest_expr());
-
-      equal_exprt minus_one_eq(div_expr.divisor(), from_integer(-1, type));
-
       add_guarded_property(
-        not_exprt(and_exprt(int_min_eq, minus_one_eq)),
+        not_exprt(div_overflow_exprt{div_expr.dividend(), div_expr.divisor()}),
         "arithmetic overflow on signed division",
         "overflow",
         false, // fatal
