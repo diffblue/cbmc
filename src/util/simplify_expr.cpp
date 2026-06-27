@@ -2631,6 +2631,12 @@ simplify_exprt::simplify_overflow_binary(const binary_overflow_exprt &expr)
     no_overflow_result = *op0_value * *op1_value;
   else if(can_cast_expr<shl_overflow_exprt>(expr))
     no_overflow_result = *op0_value << *op1_value;
+  else if(can_cast_expr<div_overflow_exprt>(expr))
+  {
+    if(*op1_value == 0)
+      return unchanged(expr);
+    no_overflow_result = *op0_value / *op1_value;
+  }
   else
     UNREACHABLE;
 
