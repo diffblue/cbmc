@@ -179,8 +179,9 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
   }
   else if(type_id==ID_pointer)
   {
-    cache_entry =
-      defined_entryt{type_checked_cast<pointer_typet>(type).get_width()};
+    cache_entry = defined_entryt{
+      type_checked_cast<pointer_typet>(type).get_width() *
+      pointer_width_multiplier};
   }
   else if(type_id==ID_struct_tag)
   {

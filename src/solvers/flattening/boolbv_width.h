@@ -21,6 +21,19 @@ public:
   explicit boolbv_widtht(const namespacet &_ns);
   virtual ~boolbv_widtht() = default;
 
+  /// Set a multiplier for pointer widths (e.g., 3 for wide encoding).
+  /// Must be called before any width queries. Clears the cache.
+  void set_pointer_width_multiplier(std::size_t m)
+  {
+    pointer_width_multiplier = m;
+    cache.clear();
+  }
+
+  std::size_t get_pointer_width_multiplier() const
+  {
+    return pointer_width_multiplier;
+  }
+
   virtual std::size_t operator()(const typet &type) const
   {
     const auto &entry_opt = get_entry(type);
@@ -46,6 +59,7 @@ public:
 
 protected:
   const namespacet &ns;
+  std::size_t pointer_width_multiplier = 1;
 
   struct defined_entryt
   {
