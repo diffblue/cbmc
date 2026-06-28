@@ -1,0 +1,18 @@
+CORE no-new-smt broken-smt-backend paths-lifo-expected-failure wide-pointer-encoding
+main.c
+--wide-pointer-encoding --no-malloc-may-fail
+^\[main.assertion.3\] line 21 always false for different objects: SUCCESS$
+^\[main.assertion.5\] line 28 assertion __CPROVER_POINTER_OBJECT\(p\) == __CPROVER_POINTER_OBJECT\(p1\): FAILURE$
+^\*\* 11 of 59 failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Wide pointer encoding with address-based relational comparison: two
+distinct live allocations are strictly ordered, so the cross-object
+comparison p1 < p2 is provable (assertion.3 SUCCESS, vs FAILURE with the
+default encoding). Relational comparison uses flat addresses, so
+assuming p < p1+1 does not imply same_object(p, p1) (assertion.5
+FAILURE).
