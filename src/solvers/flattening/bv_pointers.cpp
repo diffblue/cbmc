@@ -277,6 +277,18 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
       const bvt &bv0=convert_bv(operands[0]);
       const bvt &bv1=convert_bv(operands[1]);
 
+      if(wide_pointer_encoding)
+      {
+        // Compare by flat address — this is well-defined even
+        // for pointers to distinct objects.
+        const pointer_typet &type0 = to_pointer_type(operands[0].type());
+        const pointer_typet &type1 = to_pointer_type(operands[1].type());
+        bvt addr0 = address_literals(bv0, type0);
+        bvt addr1 = address_literals(bv1, type1);
+        return bv_utils.rel(
+          addr0, expr.id(), addr1, bv_utilst::representationt::UNSIGNED);
+      }
+
       const pointer_typet &type0 = to_pointer_type(operands[0].type());
       bvt offset_bv0 = offset_literals(bv0, type0);
 
