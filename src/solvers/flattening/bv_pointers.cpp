@@ -1740,9 +1740,14 @@ void bv_pointerst::finish_eager_conversion()
   {
     const std::size_t addr_width = config.ansi_c.pointer_width;
 
-    // NULL base address = 0, when the null pointer is represented as zero
-    // (config.ansi_c.NULL_is_zero). Otherwise the null object is laid out
-    // like any other object.
+    // The null pointer is object 0 in the object/offset encoding on every
+    // platform; that choice says nothing about its integer value. Its integer
+    // address is a separate component here -- decoupling the address from the
+    // object/offset encoding is the whole point of the wide encoding -- so we
+    // pin that address to 0 only when the platform represents the null pointer
+    // as zero (config.ansi_c.NULL_is_zero). Otherwise the null object is laid
+    // out like any other object and gets a (possibly non-zero) symbolic
+    // address.
     if(config.ansi_c.NULL_is_zero)
     {
       bvt null_base =
