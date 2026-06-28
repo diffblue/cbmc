@@ -2498,6 +2498,103 @@ const symbolt &cpp_typecheckt::instantiate_template(
   // mapping from template parameters to values/types
   template_map.build(template_type, specialization_template_args);
 
+  // N5008 [temp.variadic]/5: when the template ends in a parameter pack, bind
+  // that pack to its full deduced element sequence taken from
+  // full_template_args.  build() above is driven by
+  // specialization_template_args, which for a trailing-pack partial
+  // specialization carries the pack collapsed to a single scalar element
+  // (build_template_args emits one argument per parameter); left uncorrected
+  // that makes a base-specifier or member pack expansion `Pack...` in the
+  // instantiated body expand to the first element only (e.g. a recursive base
+  // `Rec<I+1, T...>` would instantiate `Rec<1, int>` instead of
+  // `Rec<1, int, int>`).  The partial specialization's argument pattern is
+  // positionally aligned with full_template_args (its leading parameters map
+  // to the leading arguments and the trailing pack to the rest), so recover
+  // the full pack from the trailing arguments.  Only act when this yields more
+  // elements than build() recorded, so single-element and empty packs -- and
+  // the established free-function expander below -- are undisturbed.
+  //
+  // Restricted to partial-specialization instantiations: only there does
+  // specialization_template_args arrive from build_template_args with the pack
+  // collapsed.  A primary template is instantiated directly from its full
+  // argument list, so build() already binds its pack correctly and this
+  // correction must not perturb it.
+  if(
+    !template_symbol.type.get(ID_specialization_of).empty() &&
+    !template_type.template_parameters().empty())
+  {
+    const auto &last_param = template_type.template_parameters().back();
+    // Positional recovery from full_template_args is only valid when the
+    // specialization's written argument list is the *identity* pattern
+    // `<p0, p1, ..., pk, Pack...>` -- each leading argument a bare parameter
+    // name and the last a bare pack -- so that argument j corresponds to the
+    // j-th template parameter.  A specialization with a constructed or nested
+    // pattern (e.g. `tuple_size<tuple<T...>>`, where the pack is nested inside
+    // a template-id) is NOT positionally aligned; recovering a pack from the
+    // top-level arguments there would bind the wrong types and trigger runaway
+    // instantiation.  Detect the identity shape and bail out otherwise.
+    bool identity_trailing_pack = last_param.get_bool(ID_ellipsis);
+    if(identity_trailing_pack)
+    {
+      const cpp_declarationt &decl = to_cpp_declaration(template_symbol.type);
+      const auto &psa = decl.partial_specialization_args().arguments();
+      const auto &params = template_type.template_parameters();
+      if(psa.size() != params.size())
+        identity_trailing_pack = false;
+      for(std::size_t k = 0; identity_trailing_pack && k < psa.size(); ++k)
+      {
+        const irept *a = &static_cast<const irept &>(psa[k]);
+        if(a->id() == ID_ambiguous || a->id() == ID_type)
+          a = &a->find(ID_type);
+        // A bare parameter reference is a cpp_name with no template-argument
+        // list.
+        if(a->id() != ID_cpp_name)
+          identity_trailing_pack = false;
+        else
+          for(const auto &sub : a->get_sub())
+            if(sub.id() == ID_template_args)
+            {
+              identity_trailing_pack = false;
+              break;
+            }
+      }
+    }
+    if(identity_trailing_pack)
+    {
+      const irep_idt pack_id = last_param.id() == ID_type
+                                 ? last_param.type().get(ID_identifier)
+                                 : last_param.get(ID_identifier);
+      const std::size_t non_pack =
+        template_type.template_parameters().size() - 1;
+      if(!pack_id.empty() && full_template_args.arguments().size() >= non_pack)
+      {
+        std::vector<typet> pack_elems;
+        for(std::size_t j = non_pack; j < full_template_args.arguments().size();
+            ++j)
+        {
+          const auto &a = full_template_args.arguments()[j];
+          if(a.id() == ID_type && a.type().id() != ID_empty)
+            pack_elems.push_back(a.type());
+        }
+        auto pa_it = template_map.pack_args_map.find(pack_id);
+        const std::size_t have =
+          pa_it == template_map.pack_args_map.end() ? 0 : pa_it->second.size();
+        if(pack_elems.size() > have)
+        {
+          template_map.pack_args_map[pack_id] = pack_elems;
+          template_map.pack_size_map[pack_id] = pack_elems.size();
+          // A parameter pack may only appear in a pack-expansion context, so
+          // it must not retain a scalar type_map binding: build() recorded the
+          // pack's single collapsed element as type_map[pack_id], which would
+          // shadow the pack and make a base-specifier / member expansion
+          // `pack...` resolve to that one element.  Erase it so the expansion
+          // is driven by pack_args_map and yields all elements.
+          template_map.type_map.erase(pack_id);
+        }
+      }
+    }
+  }
+
   // Per [temp.variadic]/7: for constructor templates with variadic packs,
   // remove empty pack parameters and substitute non-empty pack names.
   if(!template_map.pack_size_map.empty() && !new_decl.declarators().empty())
