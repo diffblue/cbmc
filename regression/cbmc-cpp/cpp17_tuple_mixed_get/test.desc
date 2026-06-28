@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17 --unwind 6 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ tuple get<0> reads the int element: SUCCESS$
+^\[main\.assertion\.2\] line \d+ tuple get<1> reads the double element: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+std::get on a directly-constructed two-element std::tuple<int,double>.  The
+second element's _Head_base is a non-first base whose byte offset depends on
+the differently-sized first element, so std::get<1> requires the data-only
+base-subobject offset to read the correct subobject.  Non-vacuous: the int
+operand is nondet and the last assertion is a deliberately wrong claim.
