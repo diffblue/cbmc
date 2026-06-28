@@ -200,6 +200,93 @@ void cpp_typecheckt::typecheck_method_bodies()
           method_symbol.type.find(irep_idt{"#fn_template_args"})));
     }
 
+    // N5008 [temp.variadic]/5: expand the body / member-initializer uses of a
+    // function parameter pack that typecheck_compound_declarator replicated
+    // into N parameters `base$0..base$N-1`.  Each pack-expansion use `pat...`
+    // (a list element carrying ID_ellipsis that mentions the pack `base`) is
+    // replaced by N copies of `pat`, the k-th with `base` renamed to `base$k`
+    // and the ellipsis removed.  This must run before the single-element
+    // substitution below, which strips ID_ellipsis unconditionally.  Acts only
+    // when a multi-element expansion was recorded, so single-element/empty
+    // bodies are untouched.
+    {
+      const irept &eprec =
+        method_symbol.type.find(irep_idt{"#expanded_param_packs"});
+      if(eprec.is_not_nil() && !eprec.get_sub().empty())
+      {
+        std::map<irep_idt, std::size_t> pack_counts;
+        for(const auto &e : eprec.get_sub())
+          pack_counts[e.id()] = e.get_size_t(ID_size);
+
+        // The recorded pack base (if any) that a pack-expansion pattern node
+        // mentions.
+        std::function<irep_idt(const irept &)> ref_base =
+          [&](const irept &n) -> irep_idt
+        {
+          if(n.id() == ID_name && pack_counts.count(n.get(ID_identifier)))
+            return n.get(ID_identifier);
+          for(const auto &s : n.get_sub())
+            if(irep_idt r = ref_base(s); !r.empty())
+              return r;
+          for(const auto &ns : n.get_named_sub())
+            if(irep_idt r = ref_base(ns.second); !r.empty())
+              return r;
+          return irep_idt{};
+        };
+
+        std::function<void(irept &, const irep_idt &, const irep_idt &)>
+          rename = [&](irept &n, const irep_idt &base, const irep_idt &repl)
+        {
+          if(n.id() == ID_name && n.get(ID_identifier) == base)
+            n.set(ID_identifier, repl);
+          for(auto &s : n.get_sub())
+            rename(s, base, repl);
+          for(auto &ns : n.get_named_sub())
+            rename(ns.second, base, repl);
+        };
+
+        std::function<void(irept &)> expand = [&](irept &node)
+        {
+          const bool is_arg_list = node.id() == ID_arguments;
+          irept::subt &sub = node.get_sub();
+          irept::subt newsub;
+          for(auto &child : sub)
+          {
+            // A pack-expansion use is detected either by a preserved
+            // ID_ellipsis marker on the pattern (brace-init / member-init
+            // contexts) or, in a function-call argument list -- where the
+            // parser drops the `...` -- by a reference to the pack base name
+            // (a parameter pack may only legally appear in a pack expansion,
+            // so any use of the base name is one).
+            irep_idt base;
+            if(child.get_bool(ID_ellipsis) || is_arg_list)
+              base = ref_base(child);
+            if(!base.empty())
+            {
+              const std::size_t n = pack_counts[base];
+              for(std::size_t k = 0; k < n; ++k)
+              {
+                irept copy = child;
+                copy.remove(ID_ellipsis);
+                rename(copy, base, id2string(base) + "$" + std::to_string(k));
+                expand(copy);
+                newsub.push_back(copy);
+              }
+            }
+            else
+            {
+              expand(child);
+              newsub.push_back(child);
+            }
+          }
+          sub.swap(newsub);
+          for(auto &ns : node.get_named_sub())
+            expand(ns.second);
+        };
+        expand(static_cast<irept &>(body));
+      }
+    }
+
     // Per [temp.variadic]/7: substitute non-empty pack parameter
     // names in the body with their actual types.
     if(!template_map.pack_args_map.empty())
