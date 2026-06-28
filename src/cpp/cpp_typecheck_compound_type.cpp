@@ -392,7 +392,8 @@ void cpp_typecheckt::typecheck_compound_declarator(
   // only for N>=2 so the established single-element/empty paths are untouched.
   if(
     (final_type.id() == ID_code || final_type.id() == ID_function_type) &&
-    !template_map.pack_args_map.empty())
+    (!template_map.pack_args_map.empty() ||
+     !template_map.pack_size_map.empty()))
   {
     std::map<std::string, const std::vector<typet> *> pack_by_short;
     for(const auto &pa : template_map.pack_args_map)
@@ -401,6 +402,20 @@ void cpp_typecheckt::typecheck_compound_declarator(
       auto p = full.rfind("::");
       pack_by_short[p != std::string::npos ? full.substr(p + 2) : full] =
         &pa.second;
+    }
+    // Short names of packs that are empty in this instantiation (N == 0).
+    // These are recorded in pack_size_map with value 0 and -- being empty --
+    // have no pack_args_map entry, so they must be recognised separately.
+    std::set<std::string> empty_pack_shorts;
+    for(const auto &ps : template_map.pack_size_map)
+    {
+      if(ps.second != 0)
+        continue;
+      const std::string full = id2string(ps.first);
+      auto p = full.rfind("::");
+      const std::string sn = p != std::string::npos ? full.substr(p + 2) : full;
+      if(!pack_by_short.count(sn))
+        empty_pack_shorts.insert(sn);
     }
 
     // Return the element types of a pack referenced (by short name) anywhere
@@ -423,6 +438,24 @@ void cpp_typecheckt::typecheck_compound_declarator(
       return nullptr;
     };
 
+    // Return the short name of an empty pack referenced within a parameter
+    // node, or empty if none.
+    std::function<irep_idt(const irept &)> referenced_empty_pack =
+      [&](const irept &n) -> irep_idt
+    {
+      if(
+        n.id() == ID_name &&
+        empty_pack_shorts.count(id2string(n.get(ID_identifier))))
+        return n.get(ID_identifier);
+      for(const auto &s : n.get_sub())
+        if(irep_idt r = referenced_empty_pack(s); !r.empty())
+          return r;
+      for(const auto &ns : n.get_named_sub())
+        if(irep_idt r = referenced_empty_pack(ns.second); !r.empty())
+          return r;
+      return irep_idt{};
+    };
+
     irept::subt &params = final_type.add(ID_parameters).get_sub();
     irept::subt new_params;
     irept expanded_record(ID_tuple);
@@ -443,6 +476,38 @@ void cpp_typecheckt::typecheck_compound_declarator(
            d.declarators().front().get_bool(ID_ellipsis)))
           is_pack = true;
       }
+
+      // N5008 [temp.variadic]/16: an empty pack expansion produces an empty
+      // list.  A function parameter pack that is empty in this instantiation
+      // contributes no parameter (dropped by the empty-pack handling after
+      // typecheck_type); record its base name so the member-initializer
+      // expansion below removes any use written by the parameter name
+      // (`_Inherited(t...)` -> `_Inherited()`).  The legacy empty-pack
+      // member-initializer removal only matches the pack *type* name, so a
+      // use written purely by the parameter name would otherwise survive and
+      // fail to resolve.
+      if(is_pack && referenced_pack(param) == nullptr)
+      {
+        const irep_idt empty_short = referenced_empty_pack(param);
+        if(!empty_short.empty())
+        {
+          irep_idt base_name;
+          auto &d0 = to_cpp_declaration(param).declarators().front();
+          for(const auto &sub : d0.name().get_sub())
+            if(sub.id() == ID_name)
+            {
+              base_name = sub.get(ID_identifier);
+              break;
+            }
+          if(!base_name.empty())
+          {
+            irept entry(base_name);
+            entry.set_size_t(ID_size, 0);
+            expanded_record.get_sub().push_back(entry);
+          }
+        }
+      }
+
       const std::vector<typet> *elems =
         is_pack ? referenced_pack(param) : nullptr;
       if(elems == nullptr || elems->size() < 2)
