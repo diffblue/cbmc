@@ -1,6 +1,6 @@
-CORE no-wide-pointer-encoding
+CORE wide-pointer-encoding
 main.i
---32
+--wide-pointer-encoding --32 --little-endian
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
