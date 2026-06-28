@@ -1,0 +1,17 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ third element forwarded: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+A variadic constructor whose trailing parameter pack has two or more elements
+must expand to one parameter per element and expand the pack in the
+member-initializer arguments.  The single-element case works by substitution,
+but the multi-element case is not expanded, so construction of a three-element
+TImpl silently fails and main is truncated.  Flip to CORE once multi-element
+parameter-pack expansion is implemented.
