@@ -3333,9 +3333,36 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
       cpp_declaration.template_type());
 
     // iterate over template instance
-    if(
-      full_template_args_tc.arguments().size() !=
-      partial_specialization_args.arguments().size())
+    //
+    // [temp.spec.partial.match], [temp.deduct.type]: a partial specialization
+    // may end in a template parameter pack (`C<..., T...>`) that matches the
+    // trailing sequence of the instantiation's arguments.  Such a pack is one
+    // written argument but binds zero or more actual arguments, so the arity
+    // check must admit an instantiation with at least the number of non-pack
+    // arguments, and the deduction below must bind the pack to the rest.
+    const std::size_t n_partial =
+      partial_specialization_args.arguments().size();
+    const std::size_t n_full = full_template_args_tc.arguments().size();
+    // The written argument may be wrapped in an `ambiguous` node whose `type`
+    // sub holds the actual pattern (a `cpp_name` carrying the pack `...`); look
+    // through it, mirroring guess_template_args.
+    const auto pattern_of = [](const exprt &arg) -> const irept &
+    {
+      if(arg.id() == ID_ambiguous)
+        return arg.find(ID_type);
+      if(arg.id() == ID_type)
+        return arg.type();
+      return arg;
+    };
+    bool partial_trailing_pack = false;
+    if(n_partial > 0)
+    {
+      const exprt &last = partial_specialization_args.arguments().back();
+      partial_trailing_pack =
+        last.get_bool(ID_ellipsis) || pattern_of(last).get_bool(ID_ellipsis);
+    }
+
+    if(partial_trailing_pack ? (n_full + 1 < n_partial) : (n_full != n_partial))
     {
       continue;
     }
@@ -3357,8 +3384,50 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
     // enter the scope of the template
     cpp_typecheck.cpp_scopes.go_to(*template_scope);
 
-    for(std::size_t i = 0; i < full_template_args_tc.arguments().size(); i++)
+    for(std::size_t i = 0; i < n_partial; i++)
     {
+      const auto &parg = partial_specialization_args.arguments()[i];
+      const irept &parg_pat = pattern_of(parg);
+      const bool is_pack =
+        parg.get_bool(ID_ellipsis) || parg_pat.get_bool(ID_ellipsis);
+      if(is_pack)
+      {
+        // Bind the trailing parameter pack to the remaining instantiation
+        // arguments ([temp.variadic]), mirroring the template-id pack
+        // deduction in guess_template_args: record its element types and
+        // count so build_template_args / typecheck_template_args expand it to
+        // the deduced arity.
+        const typet &parg_t = static_cast<const typet &>(parg_pat);
+        irep_idt pack_id;
+        if(parg_t.id() == ID_cpp_name)
+        {
+          const cpp_namet &pn = to_cpp_name(parg_t);
+          if(!pn.is_qualified() && !pn.has_template_args())
+          {
+            const auto ids = cpp_typecheck.cpp_scopes.current_scope().lookup(
+              pn.get_base_name(), cpp_scopet::RECURSIVE);
+            for(const auto &id_ptr : ids)
+              if(id_ptr->id_class == cpp_idt::id_classt::TEMPLATE_PARAMETER)
+                pack_id = id_ptr->identifier;
+          }
+        }
+        if(!pack_id.empty())
+        {
+          std::vector<typet> pack_elems;
+          for(std::size_t j = i; j < n_full; j++)
+            if(
+              full_template_args_tc.arguments()[j].id() == ID_type &&
+              full_template_args_tc.arguments()[j].type().id() != ID_empty)
+              pack_elems.push_back(full_template_args_tc.arguments()[j].type());
+          cpp_typecheck.template_map.pack_size_map[pack_id] = pack_elems.size();
+          cpp_typecheck.template_map.pack_args_map[pack_id] = pack_elems;
+          if(!pack_elems.empty())
+            cpp_typecheck.template_map.type_map[pack_id] = pack_elems.front();
+        }
+        break;
+      }
+      if(i >= n_full)
+        break;
       if(full_template_args_tc.arguments()[i].id() == ID_type)
         guess_template_args(
           partial_specialization_args.arguments()[i].type(),
@@ -3397,7 +3466,13 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
         try
         {
           sfinae_contextt sfinae_guard{cpp_typecheck};
-          cpp_typecheck.disable_template_arg_pack_expansion = true;
+          // For a trailing-pack partial spec the written argument list ends in
+          // `T...`, which must be expanded to the deduced pack elements so the
+          // completed list can be compared for equality against the
+          // instantiation's arguments; keep pack expansion enabled in that
+          // case.  Otherwise disable it (the established SFINAE behaviour).
+          cpp_typecheck.disable_template_arg_pack_expansion =
+            !partial_trailing_pack;
           partial_specialization_args_tc =
             cpp_typecheck.typecheck_template_args(
               source_location,
