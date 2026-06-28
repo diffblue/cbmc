@@ -8,6 +8,7 @@
 #include <util/bitvector_types.h>
 #include <util/c_types.h>
 #include <util/ieee_float.h>
+#include <util/mathematical_expr.h>
 #include <util/mathematical_types.h>
 #include <util/message.h>
 #include <util/namespace.h>
@@ -198,4 +199,69 @@ TEST_CASE(
   conv.set_to(equal_exprt{typecast_exprt{u_expr, u64}, expected}, true);
 
   REQUIRE(out.str().find("(_ bv4607182418800017408 64)") != std::string::npos);
+}
+
+/// Helper: full SMT2 emitted by converting (handling) a Boolean expression
+static std::string convert_handle(const exprt &expr, smt2_convt::solvert solver)
+{
+  symbol_tablet symbol_table;
+  namespacet ns(symbol_table);
+  std::ostringstream out;
+  smt2_convt conv(ns, "test", "", "QF_BV", solver, out);
+  conv.handle(expr);
+  return out.str();
+}
+
+TEST_CASE("smt2_convt quantifier definition encoding", "[core][solvers][smt2]")
+{
+  // A Boolean handle whose definition contains a quantifier cannot be emitted
+  // as a `define-fun` (Z3 rejects `get-value` on such a symbol), so it is
+  // declared and constrained separately.
+  const unsignedbv_typet bv8{8};
+  const symbol_exprt i{"i", bv8};
+  const exists_exprt quantified{i, equal_exprt{i, from_integer(0, bv8)}};
+  const std::string quant = "(exists ((i (_ BitVec 8))) (= i (_ bv0 8)))";
+
+  GIVEN("a quantified Boolean expression and the Z3 solver")
+  {
+    const std::string out = convert_handle(quantified, smt2_convt::solvert::Z3);
+    INFO("SMT2 output:\n" << out);
+
+    THEN("it is declared and constrained by a let-bound equivalence")
+    {
+      // A single `(assert (= B0 <quantifier>))` would be undone by Z3's
+      // solve_eqs preprocessor (Z3Prover/z3#7743), so the equivalence is
+      // emitted as two implications. A let-binding shares the quantified
+      // expression so that it is written only once.
+      const std::string declare = "(declare-fun B0 () Bool)";
+      const std::string assertion =
+        "(assert (let ((?def " + quant + ")) (and (=> B0 ?def) (=> ?def B0))))";
+
+      REQUIRE(out.find(declare) != std::string::npos);
+      REQUIRE(out.find(assertion) != std::string::npos);
+      // the quantified expression is emitted exactly once
+      REQUIRE(out.find(quant) == out.rfind(quant));
+      // no plain equality definition
+      REQUIRE(out.find("(assert (= B0 ") == std::string::npos);
+    }
+  }
+
+  GIVEN("a quantified Boolean expression and a generic solver")
+  {
+    const std::string out =
+      convert_handle(quantified, smt2_convt::solvert::GENERIC);
+    INFO("SMT2 output:\n" << out);
+
+    THEN("it is declared and constrained by a single equality")
+    {
+      // The Z3-specific solve_eqs workaround is not applied to other solvers.
+      const std::string declare = "(declare-fun B0 () Bool)";
+      const std::string equality = "(assert (= B0 " + quant + "))";
+
+      REQUIRE(out.find(declare) != std::string::npos);
+      REQUIRE(out.find(equality) != std::string::npos);
+      // no implication-based workaround
+      REQUIRE(out.find("(assert (=> ") == std::string::npos);
+    }
+  }
 }
