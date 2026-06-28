@@ -37,6 +37,8 @@ protected:
   std::vector<exprt> get_value_set(const exprt &expr) const override;
 
   const symbolt *get_or_create_failed_symbol(const exprt &expr) override;
+
+  exprt get_renamed_symbol(const exprt &expr) const override;
 };
 
 #endif // CPROVER_GOTO_SYMEX_SYMEX_DEREFERENCE_STATE_H

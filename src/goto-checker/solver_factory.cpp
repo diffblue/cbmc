@@ -361,6 +361,12 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
   auto bv_pointers = std::make_unique<bv_pointerst>(
     ns, *sat_solver, message_handler, get_array_constraints);
 
+  if(options.get_bool_option("wide-pointer-encoding"))
+  {
+    bv_pointers->wide_pointer_encoding = true;
+    bv_pointers->set_pointer_width_multiplier(3);
+  }
+
   if(options.get_option("arrays-uf") == "never")
     bv_pointers->unbounded_array = bv_pointerst::unbounded_arrayt::U_NONE;
   else if(options.get_option("arrays-uf") == "always")
@@ -802,5 +808,10 @@ void parse_solver_options(const cmdlinet &cmdline, optionst &options)
   {
     options.set_option(
       "max-node-refinement", cmdline.get_value("max-node-refinement"));
+  }
+
+  if(cmdline.isset("wide-pointer-encoding"))
+  {
+    options.set_option("wide-pointer-encoding", true);
   }
 }

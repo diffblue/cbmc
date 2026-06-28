@@ -1,0 +1,11 @@
+KNOWNBUG thorough-paths no-new-smt wide-pointer-encoding
+test.c
+--wide-pointer-encoding --no-simplify --unwind 300 --object-bits 8
+^EXIT=6$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Wide pointer encoding: the object-bits limitation is removed
+(full 64-bit object width), so the "too many addressed objects"
+error is never triggered. This test is not applicable.

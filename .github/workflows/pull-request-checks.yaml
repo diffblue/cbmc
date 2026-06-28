@@ -75,6 +75,7 @@ jobs:
           make -C regression test-parallel JOBS=${{env.linux-vcpus}} LIBS="$PWD/riss.git/release/lib/libriss-coprocessor.a -lpthread" IPASIR=$PWD/riss.git/riss
           make -C regression/cbmc test-paths-lifo
           make -C regression/cbmc test-cprover-smt2
+          make -C regression/cbmc test-wide-pointer-encoding
           make -C jbmc/regression test-parallel JOBS=${{env.linux-vcpus}}
       - name: Check cleanup
         run: |
@@ -161,6 +162,7 @@ jobs:
           make -C regression test-parallel JOBS=${{env.linux-vcpus}}
           make -C regression/cbmc test-paths-lifo
           make -C regression/cbmc test-cprover-smt2
+          make -C regression/cbmc test-wide-pointer-encoding
           make -C jbmc/regression test-parallel JOBS=${{env.linux-vcpus}}
 
       - name: Save ccache
@@ -369,6 +371,7 @@ jobs:
           make -C regression test-parallel JOBS=${{env.linux-vcpus}}
           make -C regression/cbmc test-paths-lifo
           make -C regression/cbmc test-cprover-smt2
+          make -C regression/cbmc test-wide-pointer-encoding
           make -C jbmc/regression test-parallel JOBS=${{env.linux-vcpus}}
 
       - name: Save ccache

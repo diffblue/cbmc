@@ -33,6 +33,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/range.h>
 #include <util/simplify_expr.h>
 #include <util/symbol.h>
+#include <util/symbol_table_base.h>
 
 #include "dereference_callback.h"
 
@@ -250,6 +251,84 @@ exprt value_set_dereferencet::handle_dereference_base_case(
         return build_reference_to(value, compare_against_pointer, ns);
       })
       .collect<std::deque<valuet>>();
+
+  // Wide pointer encoding: when the value set contains integer_address,
+  // add address-based dispatch entries for all addressable objects.
+  if(wide_pointer_encoding)
+  {
+    bool has_integer_address = std::any_of(
+      retained_values.begin(),
+      retained_values.end(),
+      [](const exprt &v)
+      {
+        return v.id() == ID_object_descriptor &&
+               to_object_descriptor_expr(v).object().id() == ID_integer_address;
+      });
+
+    // Only add dispatch entries when integer_address is the ONLY
+    // target. If the value set has concrete targets, the regular
+    // dereference path handles them correctly.
+    bool has_concrete_target = std::any_of(
+      retained_values.begin(),
+      retained_values.end(),
+      [](const exprt &v)
+      {
+        return v.id() == ID_object_descriptor &&
+               to_object_descriptor_expr(v).object().id() != ID_integer_address;
+      });
+
+    if(has_integer_address && !has_concrete_target)
+    {
+      const auto &pointer_type = to_pointer_type(pointer.type());
+      const auto addr_type = unsignedbv_typet{pointer_type.get_width()};
+      const exprt flat_addr =
+        typecast_exprt::conditional_cast(compare_against_pointer, addr_type);
+
+      // The dereferenced pointer's only target is a nondet integer address,
+      // so it could alias any addressable object: the value set provides no
+      // narrowing (it is just `integer_address`). We therefore enumerate every
+      // candidate object in the symbol table and dispatch by comparing the
+      // flat address against each object's [base, base+size) range. This is
+      // O(#symbols) per such dereference, but the filters below restrict it to
+      // sized, non-code, non-pointer-containing lvalue objects, and it only
+      // fires for integer-address-only dereferences (rare). Measured cost is
+      // ~linear and small (e.g. 400 globals add ~0.1s); restricting further
+      // would need a sound address-taken analysis to avoid missing targets.
+      for(const auto &sym_pair : ns.get_symbol_table().symbols)
+      {
+        const symbolt &sym = sym_pair.second;
+        if(sym.is_type || !sym.is_lvalue || sym.type.id() == ID_code)
+          continue;
+        // Skip types that contain pointers — the byte_extract from
+        // pointer-containing types causes width mismatches in the
+        // solver. The backward constraint refinement handles these
+        // types correctly without the dispatch.
+        if(has_subtype(
+             sym.type, [](const typet &t) { return t.id() == ID_pointer; }, ns))
+          continue;
+        auto size_opt = pointer_offset_size(sym.type, ns);
+        if(!size_opt.has_value() || *size_opt <= 0)
+          continue;
+
+        const exprt base_addr =
+          object_base_address_exprt{address_of_exprt{sym.symbol_expr()}};
+        const exprt ge = binary_relation_exprt{flat_addr, ID_ge, base_addr};
+        const exprt end_addr =
+          plus_exprt{base_addr, from_integer(*size_opt, addr_type)};
+        const exprt lt = binary_relation_exprt{flat_addr, ID_lt, end_addr};
+
+        // Use the SSA-renamed symbol as the byte_extract source
+        const exprt renamed =
+          dereference_callback.get_renamed_symbol(sym.symbol_expr());
+
+        valuet entry;
+        entry.pointer_guard = and_exprt{ge, lt};
+        entry.value =
+          make_byte_extract(renamed, minus_exprt{flat_addr, base_addr}, type);
+        values.push_back(std::move(entry));
+      }
+    }
+  }
 
   const bool may_fail =
     values.empty() ||

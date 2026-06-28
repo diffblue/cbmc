@@ -1,19 +1,21 @@
-CORE no-wide-pointer-encoding
+CORE broken-smt-backend no-new-smt wide-pointer-encoding
 main.c
---no-malloc-may-fail
+--wide-pointer-encoding --no-malloc-may-fail
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main.pointer_primitives.\d+\] line 7 pointer invalid in R_OK\(p1, \(unsigned (long (long )?)?int\)1\): FAILURE$
 ^\[main.pointer_primitives.\d+\] line 7 pointer outside object bounds in R_OK\(p1, \(unsigned (long (long )?)?int\)1\): FAILURE$
-^\[main.pointer_primitives.\d+\] line 11 pointer invalid in R_OK\(p2, \(unsigned (long (long )?)?int\)1\): FAILURE$
 ^\[main.pointer_primitives.\d+\] line 11 pointer outside object bounds in R_OK\(p2, \(unsigned (long (long )?)?int\)1\): FAILURE$
 ^\[main.pointer_primitives.\d+\] line 15 pointer outside object bounds in R_OK\(p3, \(unsigned (long (long )?)?int\)1\): FAILURE$
 ^\[main.pointer_primitives.\d+\] line 20 pointer outside object bounds in R_OK\(p4, \(unsigned (long (long )?)?int\)1\): FAILURE$
 ^\[main.pointer_primitives.\d+\] line 34 dead object in R_OK\(p6, \(unsigned (long (long )?)?int\)1\): FAILURE$
 ^\[main.pointer_primitives.\d+\] line 40 deallocated dynamic object in R_OK\(p7, \(unsigned (long (long )?)?int\)1\): FAILURE$
-^\*\* 9 of \d+ failed
+^\*\* 8 of \d+ failed
+^VERIFICATION FAILED$
 --
 ^warning: ignoring
+^CONVERSION ERROR$
 --
-Verifies that the pointer primitives check fails for the various forms of
-invalid pointers
+Wide pointer encoding: integer-address objects are valid objects,
+so the "pointer invalid" check for p2 passes (8 failures instead
+of 9).
