@@ -485,7 +485,77 @@ void cpp_typecheckt::typecheck_compound_declarator(
     }
     params.swap(new_params);
     if(!expanded_record.get_sub().empty())
+    {
+      // Expand pack-expansion uses in the constructor's member-initializer
+      // argument lists to the replicated parameter names, e.g.
+      // `_Inherited(t...)` -> `_Inherited(t$0, t$1)`.  The parser drops the
+      // `...` on these arguments (as it does on call arguments), and a
+      // parameter pack may only appear in a pack expansion, so any argument
+      // that references a replicated pack's base name is one and is replaced by
+      // one copy per element.  This must happen before check_member_initializers
+      // converts the initializer list below; the method-body drain handles the
+      // ordinary body but the initializer list is converted here.
+      std::map<irep_idt, std::size_t> pack_counts;
+      for(const auto &e : expanded_record.get_sub())
+        pack_counts[e.id()] = e.get_size_t(ID_size);
+
+      std::function<irep_idt(const irept &)> mi_ref_base =
+        [&](const irept &n) -> irep_idt
+      {
+        if(n.id() == ID_name && pack_counts.count(n.get(ID_identifier)))
+          return n.get(ID_identifier);
+        for(const auto &s : n.get_sub())
+          if(irep_idt r = mi_ref_base(s); !r.empty())
+            return r;
+        for(const auto &ns : n.get_named_sub())
+          if(irep_idt r = mi_ref_base(ns.second); !r.empty())
+            return r;
+        return irep_idt{};
+      };
+      std::function<void(irept &, const irep_idt &, const irep_idt &)>
+        mi_rename = [&](irept &n, const irep_idt &base, const irep_idt &repl)
+      {
+        if(n.id() == ID_name && n.get(ID_identifier) == base)
+          n.set(ID_identifier, repl);
+        for(auto &s : n.get_sub())
+          mi_rename(s, base, repl);
+        for(auto &ns : n.get_named_sub())
+          mi_rename(ns.second, base, repl);
+      };
+
+      irept &inits = declarator.member_initializers();
+      if(inits.is_not_nil())
+      {
+        for(auto &init : inits.get_sub())
+        {
+          // The member-initializer's operands (get_sub) are its argument
+          // list; the initialised base/member name is in a named sub.
+          irept::subt &args = init.get_sub();
+          irept::subt new_args;
+          for(auto &arg : args)
+          {
+            const irep_idt base = mi_ref_base(arg);
+            if(!base.empty())
+            {
+              const std::size_t n = pack_counts[base];
+              for(std::size_t k = 0; k < n; ++k)
+              {
+                irept copy = arg;
+                copy.remove(ID_ellipsis);
+                mi_rename(
+                  copy, base, id2string(base) + "$" + std::to_string(k));
+                new_args.push_back(copy);
+              }
+            }
+            else
+              new_args.push_back(arg);
+          }
+          args.swap(new_args);
+        }
+      }
+
       final_type.add(irep_idt{"#expanded_param_packs"}).swap(expanded_record);
+    }
   }
 
   {
