@@ -1,0 +1,11 @@
+KNOWNBUG pointer-encoding-via-maps
+main.c
+--no-standard-checks
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Map-based pointer encoding does not correctly handle memory-mapped
+I/O pointer dispatch, causing assertion failures for reads from
+fixed addresses.

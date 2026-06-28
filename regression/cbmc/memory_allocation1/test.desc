@@ -1,4 +1,4 @@
-CORE broken-smt-backend
+CORE broken-smt-backend no-pointer-encoding-via-maps
 main.c
 
 ^EXIT=10$

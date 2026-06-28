@@ -1,4 +1,4 @@
-CORE no-new-smt
+CORE no-new-smt no-pointer-encoding-via-maps
 main.c
 --string-abstraction
 ^EXIT=0$

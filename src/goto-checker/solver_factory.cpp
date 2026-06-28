@@ -21,6 +21,7 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <goto-symex/solver_hardness.h>
 #include <solvers/flattening/bv_dimacs.h>
+#include <solvers/flattening/bv_pointers_wide.h>
 #include <solvers/prop/prop.h>
 #include <solvers/prop/solver_resource_limits.h>
 #include <solvers/refinement/bv_refinement.h>
@@ -211,7 +212,8 @@ get_sat_solver(message_handlert &message_handler, const optionst &options)
 {
   const bool no_simplifier = options.get_bool_option("beautify") ||
                              !options.get_bool_option("sat-preprocessor") ||
-                             options.get_bool_option("refine-strings");
+                             options.get_bool_option("refine-strings") ||
+                             options.get_bool_option("refine-arrays");
 
   if(options.is_set("sat-solver"))
   {
@@ -358,18 +360,28 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
 
   bool get_array_constraints =
     options.get_bool_option("show-array-constraints");
-  auto bv_pointers = std::make_unique<bv_pointerst>(
-    ns, *sat_solver, message_handler, get_array_constraints);
+
+  std::unique_ptr<boolbvt> bv_pointers;
+  if(options.get_bool_option("pointer-encoding-via-maps"))
+  {
+    bv_pointers = std::make_unique<bv_pointers_widet>(
+      ns, *sat_solver, message_handler, get_array_constraints);
+  }
+  else
+  {
+    bv_pointers = std::make_unique<bv_pointerst>(
+      ns, *sat_solver, message_handler, get_array_constraints);
+  }
 
   if(options.get_option("arrays-uf") == "never")
-    bv_pointers->unbounded_array = bv_pointerst::unbounded_arrayt::U_NONE;
+    bv_pointers->unbounded_array = boolbvt::unbounded_arrayt::U_NONE;
   else if(options.get_option("arrays-uf") == "always")
-    bv_pointers->unbounded_array = bv_pointerst::unbounded_arrayt::U_ALL;
+    bv_pointers->unbounded_array = boolbvt::unbounded_arrayt::U_ALL;
 
   set_decision_procedure_time_limit(*bv_pointers);
 
-  std::unique_ptr<boolbvt> boolbv = std::move(bv_pointers);
-  return std::make_unique<solvert>(std::move(boolbv), std::move(sat_solver));
+  return std::make_unique<solvert>(
+    std::move(bv_pointers), std::move(sat_solver));
 }
 
 std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_dimacs()
@@ -407,8 +419,16 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_external_sat()
   auto prop =
     std::make_unique<external_satt>(message_handler, external_sat_solver);
 
-  std::unique_ptr<boolbvt> bv_pointers =
-    std::make_unique<bv_pointerst>(ns, *prop, message_handler);
+  std::unique_ptr<boolbvt> bv_pointers;
+  if(options.get_bool_option("pointer-encoding-via-maps"))
+  {
+    bv_pointers =
+      std::make_unique<bv_pointers_widet>(ns, *prop, message_handler);
+  }
+  else
+  {
+    bv_pointers = std::make_unique<bv_pointerst>(ns, *prop, message_handler);
+  }
 
   return std::make_unique<solvert>(std::move(bv_pointers), std::move(prop));
 }
@@ -417,7 +437,7 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_bv_refinement()
 {
   std::unique_ptr<propt> prop = get_sat_solver(message_handler, options);
 
-  bv_refinementt::infot info;
+  bv_refinement_infot info;
   info.ns = &ns;
   info.prop = prop.get();
   info.output_xml = output_xml_in_refinement;
@@ -431,8 +451,16 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_bv_refinement()
   info.refine_arithmetic = options.get_bool_option("refine-arithmetic");
   info.message_handler = &message_handler;
 
-  std::unique_ptr<boolbvt> decision_procedure =
-    std::make_unique<bv_refinementt>(info);
+  std::unique_ptr<boolbvt> decision_procedure;
+  if(options.get_bool_option("pointer-encoding-via-maps"))
+  {
+    decision_procedure =
+      std::make_unique<bv_refinementt<bv_pointers_widet>>(info);
+  }
+  else
+  {
+    decision_procedure = std::make_unique<bv_refinementt<>>(info);
+  }
   set_decision_procedure_time_limit(*decision_procedure);
   return std::make_unique<solvert>(
     std::move(decision_procedure), std::move(prop));
@@ -803,4 +831,7 @@ void parse_solver_options(const cmdlinet &cmdline, optionst &options)
     options.set_option(
       "max-node-refinement", cmdline.get_value("max-node-refinement"));
   }
+
+  if(cmdline.isset("pointer-encoding-via-maps"))
+    options.set_option("pointer-encoding-via-maps", true);
 }

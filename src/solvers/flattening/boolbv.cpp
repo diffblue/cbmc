@@ -512,7 +512,47 @@ bool boolbvt::boolbv_set_equality_to_true(const equal_exprt &expr)
   {
     // see if it is an unbounded array
     if(is_unbounded_array(type))
+    {
+      // For arrays with a known finite size that fit within the
+      // flattening limit, connect the symbol's map literals to the
+      // element-wise bitvectors. This is needed when the array appears
+      // inside a struct that is an element of another array: the
+      // struct's bitvector uses the map literals, but the array theory
+      // constrains element-wise free variables. Without this
+      // connection, the map literals remain unconstrained.
+      const auto &array_type = to_array_type(type);
+      const auto size = numeric_cast<mp_integer>(array_type.size());
+      const auto elem_width_opt =
+        bv_width.get_width_opt(array_type.element_type());
+      if(
+        size.has_value() && *size > 0 && *size <= MAX_FLATTENED_ARRAY_SIZE &&
+        elem_width_opt.has_value() && *elem_width_opt > 0)
+      {
+        const irep_idt &identifier =
+          to_symbol_expr(expr.lhs()).get_identifier();
+        const std::size_t elem_width = *elem_width_opt;
+
+        bvt bv;
+        bv.reserve(
+          numeric_cast_v<std::size_t>(*size) * elem_width);
+
+        for(mp_integer i = 0; i < *size; ++i)
+        {
+          index_exprt idx(
+            expr.lhs(), from_integer(i, array_type.index_type()));
+          const bvt &elem_bv = convert_bv(idx, elem_width);
+          bv.insert(bv.end(), elem_bv.begin(), elem_bv.end());
+        }
+
+        map.set_literals(identifier, type, bv);
+
+        if(freeze_all)
+          set_frozen(bv);
+      }
+
+      // still let the array theory handle the equality
       return true;
+    }
 
     const bvt &bv1=convert_bv(expr.rhs());
 

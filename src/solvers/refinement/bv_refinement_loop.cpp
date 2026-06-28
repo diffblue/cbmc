@@ -10,24 +10,28 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/xml.h>
 
-bv_refinementt::bv_refinementt(const infot &info)
-  : bv_pointerst(*info.ns, *info.prop, *info.message_handler),
+template <typename bv_pointers_baset>
+bv_refinementt<bv_pointers_baset>::bv_refinementt(const infot &info)
+  : bv_pointers_baset(*info.ns, *info.prop, *info.message_handler),
     progress(false),
     config_(info)
 {
   // check features we need
-  PRECONDITION(prop.has_assumptions());
-  PRECONDITION(prop.has_set_to());
-  PRECONDITION(prop.has_is_in_conflict());
+  PRECONDITION(this->prop.has_assumptions());
+  PRECONDITION(this->prop.has_set_to());
+  PRECONDITION(this->prop.has_is_in_conflict());
 }
 
-decision_proceduret::resultt bv_refinementt::dec_solve(const exprt &assumption)
+template <typename bv_pointers_baset>
+decision_proceduret::resultt
+bv_refinementt<bv_pointers_baset>::dec_solve(const exprt &assumption)
 {
   // do the usual post-processing
-  log.progress() << "BV-Refinement: post-processing" << messaget::eom;
-  finish_eager_conversion();
+  this->log.progress() << "BV-Refinement: post-processing" << messaget::eom;
+  this->finish_eager_conversion();
 
-  log.debug() << "Solving with " << prop.solver_text() << messaget::eom;
+  this->log.debug() << "Solving with " << this->prop.solver_text()
+                    << messaget::eom;
 
   unsigned iteration=0;
 
@@ -36,14 +40,15 @@ decision_proceduret::resultt bv_refinementt::dec_solve(const exprt &assumption)
   {
     iteration++;
 
-    log.progress() << "BV-Refinement: iteration " << iteration << messaget::eom;
+    this->log.progress() << "BV-Refinement: iteration " << iteration
+                         << messaget::eom;
 
     // output the very same information in a structured fashion
     if(config_.output_xml)
     {
       xmlt xml("refinement-iteration");
       xml.data=std::to_string(iteration);
-      log.status() << xml << '\n';
+      this->log.status() << xml << '\n';
     }
 
     switch(prop_solve())
@@ -52,28 +57,31 @@ decision_proceduret::resultt bv_refinementt::dec_solve(const exprt &assumption)
       check_SAT();
       if(!progress)
       {
-        log.status() << "BV-Refinement: got SAT, and it simulates => SAT"
-                     << messaget::eom;
-        log.statistics() << "Total iterations: " << iteration << messaget::eom;
+        this->log.status() << "BV-Refinement: got SAT, and it simulates => SAT"
+                           << messaget::eom;
+        this->log.statistics()
+          << "Total iterations: " << iteration << messaget::eom;
         return resultt::D_SATISFIABLE;
       }
       else
-        log.progress() << "BV-Refinement: got SAT, and it is spurious, refining"
-                       << messaget::eom;
+        this->log.progress()
+          << "BV-Refinement: got SAT, and it is spurious, refining"
+          << messaget::eom;
       break;
 
     case resultt::D_UNSATISFIABLE:
       check_UNSAT();
       if(!progress)
       {
-        log.status()
+        this->log.status()
           << "BV-Refinement: got UNSAT, and the proof passes => UNSAT"
           << messaget::eom;
-        log.statistics() << "Total iterations: " << iteration << messaget::eom;
+        this->log.statistics()
+          << "Total iterations: " << iteration << messaget::eom;
         return resultt::D_UNSATISFIABLE;
       }
       else
-        log.progress()
+        this->log.progress()
           << "BV-Refinement: got UNSAT, and the proof fails, refining"
           << messaget::eom;
       break;
@@ -84,7 +92,8 @@ decision_proceduret::resultt bv_refinementt::dec_solve(const exprt &assumption)
   }
 }
 
-decision_proceduret::resultt bv_refinementt::prop_solve()
+template <typename bv_pointers_baset>
+decision_proceduret::resultt bv_refinementt<bv_pointers_baset>::prop_solve()
 {
   // this puts the underapproximations into effect
   std::vector<exprt> assumptions;
@@ -101,9 +110,9 @@ decision_proceduret::resultt bv_refinementt::prop_solve()
       approximation.under_assumptions.end());
   }
 
-  push(assumptions);
-  propt::resultt result = prop.prop_solve(assumption_stack);
-  pop();
+  this->push(assumptions);
+  propt::resultt result = this->prop.prop_solve(this->assumption_stack);
+  this->pop();
 
   // clang-format off
   switch(result)
@@ -117,7 +126,8 @@ decision_proceduret::resultt bv_refinementt::prop_solve()
   UNREACHABLE;
 }
 
-void bv_refinementt::check_SAT()
+template <typename bv_pointers_baset>
+void bv_refinementt<bv_pointers_baset>::check_SAT()
 {
   progress=false;
 
@@ -131,10 +141,17 @@ void bv_refinementt::check_SAT()
     check_SAT(approximation);
 }
 
-void bv_refinementt::check_UNSAT()
+template <typename bv_pointers_baset>
+void bv_refinementt<bv_pointers_baset>::check_UNSAT()
 {
   progress=false;
 
   for(approximationt &approximation : this->approximations)
     check_UNSAT(approximation);
 }
+
+// Explicit instantiations
+#include <solvers/flattening/bv_pointers_wide.h>
+
+template class bv_refinementt<bv_pointerst>;
+template class bv_refinementt<bv_pointers_widet>;

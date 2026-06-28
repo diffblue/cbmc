@@ -1,0 +1,13 @@
+CORE
+main.c
+--arrays-uf-always --no-standard-checks
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+With --arrays-uf-always, indexing an array of structs that contain array members
+through a nondeterministic index must produce correct results. The bitvector
+solver handles member expressions with non-symbol struct operands (e.g.,
+member(index(outer_array, i), field)) directly, bypassing the array theory.

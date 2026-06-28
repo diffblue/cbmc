@@ -1,0 +1,12 @@
+KNOWNBUG no-new-smt pointer-encoding-via-maps
+main.c
+--string-abstraction
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Map-based pointer encoding produces VERIFICATION ERROR with
+string abstraction. The string abstraction pass creates pointer
+expressions that the map encoding does not handle correctly.

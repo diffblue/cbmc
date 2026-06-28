@@ -137,6 +137,7 @@ SRC = $(BOOLEFORCE_SRC) \
       flattening/bv_dimacs.cpp \
       flattening/bv_minimize.cpp \
       flattening/bv_pointers.cpp \
+      flattening/bv_pointers_wide.cpp \
       flattening/bv_utils.cpp \
       flattening/c_bit_field_replacement_type.cpp \
       flattening/equality.cpp \
