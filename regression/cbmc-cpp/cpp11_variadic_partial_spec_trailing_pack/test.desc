@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ recursion reached depth 2: SUCCESS$
@@ -8,11 +8,3 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
---
-A class template partial specialization whose last argument is a pack
-expansion T... must match an instantiation with at least as many arguments as
-the specialization has non-pack parameters, binding the trailing arguments to
-the pack.  Currently the matcher requires an exact count, so for two or more
-trailing-pack elements the recursive partial spec is skipped, the primary is
-selected, the recursion stops and main is truncated.  Flip to CORE once
-trailing-pack partial-spec matching is implemented.
