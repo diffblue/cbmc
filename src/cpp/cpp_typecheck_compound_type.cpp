@@ -379,6 +379,115 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
   typet final_type = declarator.merge_type(declaration.type());
 
+  // N5008 [temp.variadic]/5: a function/constructor parameter that is a pack
+  // expansion `Pattern...` over a pack of length N is instantiated as N
+  // parameters, one per pack element (the i-th replacing the pack with its
+  // i-th element).  For a class-member function the parameter list is finalised
+  // here; the single-element shortcut (the pack name substituted by its one
+  // element) covers N==1 and the empty-pack drop after typecheck_type covers
+  // N==0, but N>=2 needs genuine replication.  Mirror the free-function
+  // expander in instantiate_template: replace the pack-expansion parameter with
+  // one parameter per element, named `base$k`, so the body/member-initializer
+  // expansion in typecheck_method_bodies can refer to them by that name.  Act
+  // only for N>=2 so the established single-element/empty paths are untouched.
+  if(
+    (final_type.id() == ID_code || final_type.id() == ID_function_type) &&
+    !template_map.pack_args_map.empty())
+  {
+    std::map<std::string, const std::vector<typet> *> pack_by_short;
+    for(const auto &pa : template_map.pack_args_map)
+    {
+      const std::string full = id2string(pa.first);
+      auto p = full.rfind("::");
+      pack_by_short[p != std::string::npos ? full.substr(p + 2) : full] =
+        &pa.second;
+    }
+
+    // Return the element types of a pack referenced (by short name) anywhere
+    // within a parameter node, or nullptr if none is referenced.
+    std::function<const std::vector<typet> *(const irept &)> referenced_pack =
+      [&](const irept &n) -> const std::vector<typet> *
+    {
+      if(n.id() == ID_name)
+      {
+        auto it = pack_by_short.find(id2string(n.get(ID_identifier)));
+        if(it != pack_by_short.end())
+          return it->second;
+      }
+      for(const auto &s : n.get_sub())
+        if(const auto *r = referenced_pack(s))
+          return r;
+      for(const auto &ns : n.get_named_sub())
+        if(const auto *r = referenced_pack(ns.second))
+          return r;
+      return nullptr;
+    };
+
+    irept::subt &params = final_type.add(ID_parameters).get_sub();
+    irept::subt new_params;
+    irept expanded_record(ID_tuple);
+    for(auto &param : params)
+    {
+      // Only a genuine *function parameter pack* -- a top-level `...` on the
+      // declarator, e.g. `_Tail... t` / `const _Tail&... t` -- is replicated.
+      // A parameter whose type merely *contains* the pack nested inside a
+      // template-argument list (e.g. `Base<_T...> &b`) is a single parameter
+      // ([temp.variadic]/7) and must be left alone.
+      bool is_pack = false;
+      if(param.id() == ID_cpp_declaration)
+      {
+        const auto &d = to_cpp_declaration(param);
+        if(
+          !d.declarators().empty() &&
+          (d.declarators().front().type().get_bool(ID_ellipsis) ||
+           d.declarators().front().get_bool(ID_ellipsis)))
+          is_pack = true;
+      }
+      const std::vector<typet> *elems =
+        is_pack ? referenced_pack(param) : nullptr;
+      if(elems == nullptr || elems->size() < 2)
+      {
+        new_params.push_back(param);
+        continue;
+      }
+
+      auto &d0 = to_cpp_declaration(param).declarators().front();
+      irep_idt base_name;
+      for(const auto &sub : d0.name().get_sub())
+        if(sub.id() == ID_name)
+        {
+          base_name = sub.get(ID_identifier);
+          break;
+        }
+      for(std::size_t k = 0; k < elems->size(); ++k)
+      {
+        irept copy = param;
+        auto &dc = to_cpp_declaration(copy);
+        dc.type() = (*elems)[k];
+        auto &decl = dc.declarators().front();
+        decl.type().remove(ID_ellipsis);
+        decl.remove(ID_ellipsis);
+        const std::string nm = id2string(base_name) + "$" + std::to_string(k);
+        for(auto &sub : decl.name().get_sub())
+          if(sub.id() == ID_name)
+          {
+            sub.set(ID_identifier, nm);
+            break;
+          }
+        new_params.push_back(copy);
+      }
+      // Record the expansion (base name -> count) so typecheck_method_bodies
+      // can expand the matching pack-expansion uses in this function's body /
+      // member-initializer list to the same `base$k` names.
+      irept entry(base_name);
+      entry.set_size_t(ID_size, elems->size());
+      expanded_record.get_sub().push_back(entry);
+    }
+    params.swap(new_params);
+    if(!expanded_record.get_sub().empty())
+      final_type.add(irep_idt{"#expanded_param_packs"}).swap(expanded_record);
+  }
+
   {
     bool is_function_member =
       final_type.id() == ID_code || final_type.id() == ID_function_type;
