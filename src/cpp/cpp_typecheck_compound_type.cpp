@@ -3417,63 +3417,76 @@ void cpp_typecheckt::make_ptr_typecast(
 
     if(needs_offset)
     {
-      // The target base subobject begins at the offset of its first data
-      // member.  In CBMC's flattened struct layout an inherited member is
-      // named "<defining-class>::<member>", where <defining-class> is the
-      // class that actually declares the member -- any class in the target
-      // base's own inheritance subtree, not necessarily the base itself
-      // (e.g. for the base `_Tuple_impl<1, int>` the member is declared by its
-      // own base `_Head_base<1, int>`).  Match a component by whether its
-      // declaring class is in that subtree.  Method/code and static
-      // components carry no per-object storage and must be ignored
-      // (member_offset is meaningless for them -- a destructor component
-      // otherwise yielded a bogus past-the-end offset).  Per
-      // [intro.object]/[class.derived] a non-virtual base subobject occupies a
-      // contiguous region, so its lowest-offset data member marks its start.
-      std::set<irep_idt> base_subtree;
-      base_subtree.insert(base->get(ID_name));
-      get_bases(*base, base_subtree);
-
-      std::set<std::string> subtree_names;
-      for(const auto &n : base_subtree)
+      // N5008 [intro.object]/[class.derived]: a non-virtual base subobject
+      // occupies a contiguous region of the derived object; its byte offset is
+      // the offset of its lowest-addressed data member.  add_base_components
+      // flattens a base's data members into the derived class preserving their
+      // (fully-qualified) names, so the base's members appear in `derived`
+      // under exactly the names they carry in `base`.  Identify them by exact
+      // component name (robust to namespaces / nested hierarchies) and take the
+      // minimum offset.
+      //
+      // The offset must be computed over the DATA-ONLY layout that
+      // goto-conversion/symex uses: member typedefs (ID_is_type), member
+      // functions (ID_code) and static members carry no per-object storage.
+      // member_offset() sums pointer_offset_bits over *all* preceding
+      // components and so over-counts the many member typedefs of library
+      // classes (e.g. std::vector's _Vector_impl, whose data pointers would
+      // appear at offset 104+ instead of 0), which does not match the actual
+      // object layout.  Sum only the storage-bearing components instead.
+      const namespacet ns(symbol_table);
+      const auto data_offset_bits =
+        [&](const irep_idt &member) -> std::optional<mp_integer>
       {
-        std::string ns = id2string(n);
-        if(ns.compare(0, 4, "tag-") == 0)
-          ns = ns.substr(4);
-        subtree_names.insert(ns);
+        mp_integer off = 0;
+        for(const auto &c : derived->components())
+        {
+          if(c.get_name() == member)
+            return off;
+          if(
+            c.type().id() == ID_code || c.get_bool(ID_is_type) ||
+            c.get_bool(ID_is_static))
+            continue;
+          const auto bits = pointer_offset_bits(c.type(), ns);
+          if(!bits.has_value())
+            return {};
+          off += *bits;
+        }
+        return {};
+      };
+
+      std::set<irep_idt> base_member_names;
+      for(const auto &c : base->components())
+      {
+        if(
+          c.type().id() == ID_code || c.get_bool(ID_is_type) ||
+          c.get_bool(ID_is_static))
+          continue;
+        base_member_names.insert(c.get_name());
       }
 
       bool found = false;
       mp_integer best = 0;
       for(const auto &comp : derived->components())
       {
-        if(comp.type().id() == ID_code || comp.get_bool(ID_is_static))
+        if(base_member_names.find(comp.get_name()) == base_member_names.end())
           continue;
-        const std::string cn = id2string(comp.get_name());
-        const auto pos = cn.find("::");
-        if(pos == std::string::npos)
-          continue;
-        // The declaring-class prefix may be a tag name ("tag-B8::@vtable_..")
-        // or a plain name ("HeadBase<1,int>::h"); normalize before lookup.
-        std::string defining = cn.substr(0, pos);
-        if(defining.compare(0, 4, "tag-") == 0)
-          defining = defining.substr(4);
-        if(subtree_names.find(defining) == subtree_names.end())
-          continue;
-        const auto offset = member_offset(*derived, comp.get_name(), *this);
-        if(offset.has_value() && (!found || *offset < best))
+        const auto off_bits = data_offset_bits(comp.get_name());
+        if(off_bits.has_value() && (!found || *off_bits < best))
         {
-          best = *offset;
+          best = *off_bits;
           found = true;
         }
       }
 
       if(found && best != 0)
       {
+        // bits -> bytes
+        const mp_integer best_bytes = best / 8;
         exprt char_ptr =
           typecast_exprt(expr, pointer_type(unsigned_char_type()));
-        exprt offset_expr =
-          from_integer(is_upcast ? best : -best, pointer_diff_type());
+        exprt offset_expr = from_integer(
+          is_upcast ? best_bytes : -best_bytes, pointer_diff_type());
         exprt adjusted = plus_exprt(char_ptr, offset_expr);
         expr = typecast_exprt(adjusted, dest_type);
         return;
