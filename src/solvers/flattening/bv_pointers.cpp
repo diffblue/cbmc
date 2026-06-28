@@ -1761,9 +1761,24 @@ void bv_pointerst::finish_eager_conversion()
       bvt base_next =
         get_object_base_address(obj_infos[i + 1].number, addr_width);
 
-      prop.l_set_to_true(bv_utils.rel(
-        end_i, ID_le, base_next, bv_utilst::representationt::UNSIGNED));
+      if(
+        config.bv_encoding.malloc_may_alias && obj_infos[i].is_dynamic &&
+        obj_infos[i + 1].is_dynamic &&
+        obj_infos[i].size == obj_infos[i + 1].size)
+      {
+        // Allow address reuse: same base OR non-overlapping
+        prop.l_set_to_true(prop.lor(
+          bv_utils.equal(base_next, base_i),
+          bv_utils.rel(
+            end_i, ID_le, base_next, bv_utilst::representationt::UNSIGNED)));
+      }
+      else
+      {
+        prop.l_set_to_true(bv_utils.rel(
+          end_i, ID_le, base_next, bv_utilst::representationt::UNSIGNED));
+      }
     }
+
   }
   // Freeze variables created during finish_eager_conversion
   // (non-overlapping constraints, deferred I2P forward constraints)

@@ -12,6 +12,7 @@ Author: Daniel Kroening, Peter Schrammel
 #include "solver_factory.h"
 
 #include <util/cmdline.h>
+#include <util/config.h>
 #include <util/exception_utils.h>
 #include <util/exit_codes.h>
 #include <util/message.h>
@@ -820,5 +821,11 @@ void parse_solver_options(const cmdlinet &cmdline, optionst &options)
   if(cmdline.isset("wide-pointer-encoding"))
   {
     options.set_option("wide-pointer-encoding", true);
+    // Wide pointer encoding models address reuse after free, so dynamic
+    // objects may share an address. Set this here (during option processing,
+    // before symex) rather than in the solver factory, as the simplifier
+    // reads it during symex (see goto_symex_can_forward_propagate /
+    // simplify_expr_with_value_set).
+    config.bv_encoding.malloc_may_alias = true;
   }
 }
