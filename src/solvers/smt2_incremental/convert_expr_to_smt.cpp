@@ -1385,15 +1385,17 @@ static smt_termt convert_expr_to_smt(
   // Overflow on signed division: INT_MIN / -1.
   // Unsigned division never overflows.
   const auto &operand_type = div_overflow.lhs().type();
-  if(const auto signed_type = type_try_dynamic_cast<signedbv_typet>(operand_type))
+  if(
+    const auto signed_type =
+      type_try_dynamic_cast<signedbv_typet>(operand_type))
   {
     const std::size_t width = signed_type->get_width();
     const smt_termt &dividend = converted.at(div_overflow.lhs());
     const smt_termt &divisor = converted.at(div_overflow.rhs());
     const smt_termt int_min =
       smt_bit_vector_constant_termt{power(2, width - 1), width};
-    const smt_termt minus_one = smt_bit_vector_theoryt::negate(
-      smt_bit_vector_constant_termt{1, width});
+    const smt_termt minus_one =
+      smt_bit_vector_theoryt::negate(smt_bit_vector_constant_termt{1, width});
     return smt_core_theoryt::make_and(
       smt_core_theoryt::equal(dividend, int_min),
       smt_core_theoryt::equal(divisor, minus_one));
