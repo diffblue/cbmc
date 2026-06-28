@@ -79,3 +79,11 @@ symex_dereference_statet::get_value_set(const exprt &expr) const
 {
   return state.value_set.get_value_set(expr, ns);
 }
+
+exprt symex_dereference_statet::get_renamed_symbol(const exprt &expr) const
+{
+  // Use L1 renaming to get the SSA symbol without constant propagation.
+  // L2 renaming would substitute the symbol with its current value,
+  // which causes width mismatches in byte_extract.
+  return state.rename<L1>(expr, ns).get();
+}

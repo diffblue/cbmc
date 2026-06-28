@@ -359,7 +359,11 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
   bool get_array_constraints =
     options.get_bool_option("show-array-constraints");
   auto bv_pointers = std::make_unique<bv_pointerst>(
-    ns, *sat_solver, message_handler, get_array_constraints);
+    ns,
+    *sat_solver,
+    message_handler,
+    get_array_constraints,
+    options.get_bool_option("wide-pointer-encoding"));
 
   if(options.get_option("arrays-uf") == "never")
     bv_pointers->unbounded_array = bv_pointerst::unbounded_arrayt::U_NONE;
@@ -430,9 +434,10 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_bv_refinement()
   info.refine_arrays = options.get_bool_option("refine-arrays");
   info.refine_arithmetic = options.get_bool_option("refine-arithmetic");
   info.message_handler = &message_handler;
+  info.wide_pointer_encoding = options.get_bool_option("wide-pointer-encoding");
 
-  std::unique_ptr<boolbvt> decision_procedure =
-    std::make_unique<bv_refinementt>(info);
+  auto bv_refinement = std::make_unique<bv_refinementt>(info);
+  std::unique_ptr<boolbvt> decision_procedure = std::move(bv_refinement);
   set_decision_procedure_time_limit(*decision_procedure);
   return std::make_unique<solvert>(
     std::move(decision_procedure), std::move(prop));
@@ -456,9 +461,10 @@ solver_factoryt::get_string_refinement()
   info.refine_arrays = options.get_bool_option("refine-arrays");
   info.refine_arithmetic = options.get_bool_option("refine-arithmetic");
   info.message_handler = &message_handler;
+  info.wide_pointer_encoding = options.get_bool_option("wide-pointer-encoding");
 
-  std::unique_ptr<boolbvt> decision_procedure =
-    std::make_unique<string_refinementt>(info);
+  auto string_refinement = std::make_unique<string_refinementt>(info);
+  std::unique_ptr<boolbvt> decision_procedure = std::move(string_refinement);
   set_decision_procedure_time_limit(*decision_procedure);
   return std::make_unique<solvert>(
     std::move(decision_procedure), std::move(prop));
@@ -802,5 +808,10 @@ void parse_solver_options(const cmdlinet &cmdline, optionst &options)
   {
     options.set_option(
       "max-node-refinement", cmdline.get_value("max-node-refinement"));
+  }
+
+  if(cmdline.isset("wide-pointer-encoding"))
+  {
+    options.set_option("wide-pointer-encoding", true);
   }
 }

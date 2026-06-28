@@ -61,6 +61,11 @@ struct symex_configt final
   ///   Used in goto_symext::dereference_rec
   bool cache_dereferences;
 
+  /// \brief Whether the wide pointer encoding is enabled.
+  /// When true, integer-to-pointer dereferences use address-based
+  /// dispatch over known objects instead of __CPROVER_memory.
+  bool wide_pointer_encoding;
+
   /// \brief Construct a symex_configt using options specified in an
   /// \ref optionst
   explicit symex_configt(const optionst &options);
