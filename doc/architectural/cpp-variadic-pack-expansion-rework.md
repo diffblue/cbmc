@@ -78,6 +78,49 @@ behaviour was measured with header-free probes (see regression tests):
   `pack_size_map` populated (`cpp_typecheck_method_bodies.cpp`), but a static
   data member initializer is elaborated on a different path that lacks it.
 
+### Member-function and constructor contexts (measured 2026-06-28)
+
+A second, orthogonal axis of the same gap concerns *where the function lives*.
+Multi-element function parameter packs (`A... a` with `N >= 2`) are expanded to
+one `a$k` parameter per element **only for free function templates**, by a
+self-contained expander in `instantiate_template`
+(`src/cpp/cpp_instantiate_template.cpp`, ~l.4960-5260): it detects the trailing
+pack parameter, builds `pack_var$0..$N-1` parameters from `full_template_args`,
+replaces the pack parameter, and rewrites pack references in the body
+(fold-expressions, function-call argument lists, lambda init-captures). Measured
+behaviour:
+
+| Function context | Probe | Status |
+|---|---|---|
+| Free function template, value pack in a call, N=3 | `call3(a...) -> g3(a...)` | ✅ works (params `a$0,a$1,a$2`) |
+| Free function template, fold-expression, N>=2 | `(a + ... + 0)` | ❌ no body (fold is a stated non-goal) |
+| **Member** function template, value pack in a call, N>=2 | `S::f(a...) -> g3(a...)` | ❌ vacuous (body truncated) |
+| **Constructor** with a class-template pack, N>=2 | `TImpl(const Head&, const Tail&... t)` | ❌ signature collapses to one parameter; construction silently fails (see `cpp11_variadic_ctor_pack_multi`) |
+
+Root causes (instrumented):
+
+* The `instantiate_template` expander is reached for free function templates
+  only. A member function template and a class-template-pack constructor reach
+  it for *neither* (probe at the expander's entry never fires for them); they
+  are elaborated on the class-member paths below.
+* A class-member function/constructor signature is finalised in
+  `typecheck_compound_declarator` (`src/cpp/cpp_typecheck_compound_type.cpp`).
+  `pack_args_map` *is* populated there (e.g. `A -> {int,int}`), but
+  `typecheck_type(final_type)` **collapses** the pack-expansion parameter
+  `const A&... a` to a *single* resolved parameter (the single-element shortcut),
+  rather than to `N` parameters.
+* The member-function **body** is drained later in
+  `cpp_typecheck_method_bodies` (`src/cpp/cpp_typecheck_method_bodies.cpp`),
+  whose pack handling is **single-element only**: it maps the pack name to
+  `pack_args_map[...].front()` (and only when that element is a `struct_tag`)
+  and strips `ID_ellipsis`. There is no multi-element body expansion and no
+  member-initializer-argument expansion (`_Inherited(t...)`).
+
+Consequently no single-site change makes a multi-element member case verify:
+the signature and the body must *both* expand to `N`, consistently named, and
+member-initializer / brace-init-list pack expansions must be added. This is the
+function-template expander generalised to the member contexts — see Phase 6.
+
 ### The motivating chain (`std::erase_if`)
 
 `std::erase_if(v, pred)` -> `std::__remove_if(..., __ops::__pred_iter(std::ref(pred)))`.
@@ -175,8 +218,27 @@ Each phase is independently buildable and gated on **both** `regression/cbmc-cpp
   template's dependent return type elaborated during *nested* instantiation sees
   the pack. Re-check `std::__invoke`/`std::ref`; flip `cpp20_vector_erase_if`
   (and the companion `cpp20_member_overload_converting_ctor` stays CORE).
+* **Phase 6 — member-function & constructor contexts.** Generalise the
+  free-function multi-element expander (`instantiate_template` ~l.4960-5260) to
+  the member paths so a class-member function/constructor whose signature
+  mentions a pack of length `N` expands to `N` consistently-named (`a$k`)
+  parameters, and the corresponding body / member-initializer / brace-init-list
+  pack expansions (`f(a...)`, `_Inherited(t...)`, `{a...}`) expand to `N`.
+  Concretely: (a) replace the single-parameter collapse in
+  `typecheck_compound_declarator` with `N`-parameter replication driven by
+  `pack_args_map` (built from the already-resolved element types, wrapping each
+  in the parameter's reference/cv structure); (b) replace the single-element
+  substitution in `cpp_typecheck_method_bodies` with `expand_pack`-driven
+  multi-element expansion at every [temp.variadic]/4 context reachable from a
+  member body, including member-initializer argument lists. Flip
+  `cpp11_variadic_ctor_pack_multi`; this also unblocks 3+-element direct
+  `std::tuple` construction (`get<2>` and beyond) and the multi-element half of
+  `cpp11_variadic_pack_expansion`. Depends on Phase 0 (canonical pack record +
+  `expand_pack`). Highest regression risk of the phases — gate strictly on both
+  suites, re-running any failure alone to rule out parallel-load flakes.
 
-Phases 1–4 are largely independent; Phase 5 depends on 0+2+3.
+Phases 1–4 are largely independent; Phase 5 depends on 0+2+3; Phase 6 depends
+on 0 and shares the `expand_pack` primitive.
 
 ---
 
@@ -188,6 +250,8 @@ Header-free, minimal, one gap per test (already committed):
   `cpp11_variadic_sizeof_static_init`, `cpp11_decltype_pack_in_class_template`.
 * CORE guard: `cpp11_variadic_pack_expansion_works` (must never regress).
 * End-to-end KNOWNBUG: `cpp20_vector_erase_if` (flips at Phase 5).
+* Phase 6 (member/constructor) KNOWNBUG: `cpp11_variadic_ctor_pack_multi`
+  (header-free, non-vacuous; mirrors libstdc++'s `_Tuple_impl` recursion step).
 
 Each phase's PR flips exactly the tests it fixes from KNOWNBUG to CORE and adds
 any newly-discovered edge cases as KNOWNBUG first.
