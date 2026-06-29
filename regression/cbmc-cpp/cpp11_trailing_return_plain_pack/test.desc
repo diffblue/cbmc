@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ plain value-pack decltype resolves: SUCCESS$
@@ -11,7 +11,7 @@ main.cpp
 --
 A variadic function template whose trailing-return decltype contains a plain
 by-value value-pack expansion f(a...) -- with no type parameter pack reference
-in the pattern -- is not expanded, so decltype(invk(...)) silently fails
-vacuously.  The forwarding-cast form static_cast<Args&&>(a)... is handled
-because it references the type pack Args.  Flip to CORE once a bare value
-parameter pack is expanded in a trailing-return decltype.
+in the pattern -- is expanded by replicating the pattern to the common deduced
+pack length, so decltype(invk(...)) resolves to the call result type.  The
+forwarding-cast form static_cast<Args&&>(a)... is handled separately via the
+type pack Args (cpp11_trailing_return_fwd_pack).  N5008 [temp.variadic]/4,5.

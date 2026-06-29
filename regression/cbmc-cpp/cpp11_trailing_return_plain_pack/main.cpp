@@ -6,16 +6,15 @@
 // parameter pack `a...` in the return-type `decltype` and resolve to the
 // call's result type.
 //
-// KNOWN BUG: the forwarding-cast form `static_cast<Args&&>(a)...` is handled
+// Now handled: the forwarding-cast form `static_cast<Args&&>(a)...` is expanded
 // (see cpp11_trailing_return_fwd_pack) because its pattern references the TYPE
-// parameter pack `Args`, which expand_call_argument_packs expands; but the
-// plain `a...` pattern references only the VALUE parameter pack `a` (no type
-// pack), so it is not expanded and `decltype(invk(...))` silently fails (the
-// proof passes vacuously -- unsound).  A single-element pack works.
+// parameter pack `Args`; the plain `a...` pattern references only the VALUE
+// parameter pack `a` (no type pack), and is expanded by replicating the pattern
+// to the common deduced pack length ([temp.variadic]/5) -- each copy referring
+// to the single in-scope value parameter, whose deduced element type fixes the
+// call-argument type.
 //
-// Header-free and non-vacuous (assertion 2 must FAIL).  Flip to CORE once a
-// value parameter pack with no type-pack reference is expanded in a
-// trailing-return decltype.
+// Header-free and non-vacuous (assertion 2 must FAIL).
 
 extern "C" void __CPROVER_assert(int, const char *);
 
