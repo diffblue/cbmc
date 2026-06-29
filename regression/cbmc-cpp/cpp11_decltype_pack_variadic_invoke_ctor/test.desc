@@ -1,0 +1,18 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ variadic-invoke two-arg-pack constructor: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+The remaining libstdc++ std::function layer: a converting constructor
+constrained through __invoke_result, which routes the call-argument pack
+through the variadic helper std::__invoke (modelled by invoke_fn here).
+Deducing that variadic function template's pack from a two-or-more-argument
+call in an unevaluated operand during constructor SFINAE is not yet performed,
+so the construction fails ("found no match") and the proof passes vacuously.
+Flip to CORE once that nested function-template pack deduction is implemented.
