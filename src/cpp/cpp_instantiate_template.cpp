@@ -2519,6 +2519,14 @@ const symbolt &cpp_typecheckt::instantiate_template(
   // collapsed.  A primary template is instantiated directly from its full
   // argument list, so build() already binds its pack correctly and this
   // correction must not perturb it.
+  //
+  // When the identity trailing-pack shape is detected, the instance's recorded
+  // template arguments (ID_C_template_arguments) must likewise be the full,
+  // expanded list rather than the pack-collapsed specialization_template_args,
+  // so that argument-deduction *against this instance* (e.g. libstdc++'s
+  // `std::get`/`__get_helper` deducing `_Head, _Tail...` from a `_Tuple_impl`
+  // argument) sees the whole pack.
+  bool record_full_template_args = false;
   if(
     !template_symbol.type.get(ID_specialization_of).empty() &&
     !template_type.template_parameters().empty())
@@ -2561,6 +2569,10 @@ const symbolt &cpp_typecheckt::instantiate_template(
     }
     if(identity_trailing_pack)
     {
+      // The full argument list is positionally aligned with this
+      // specialization's parameters; record it (below) instead of the
+      // pack-collapsed specialization_template_args.
+      record_full_template_args = true;
       const irep_idt pack_id = last_param.id() == ID_type
                                  ? last_param.type().get(ID_identifier)
                                  : last_param.get(ID_identifier);
@@ -3982,7 +3994,10 @@ skip_pack_removal_ft:
     // add template arguments to type in order to retrieve template map when
     // typechecking function body
     new_symb.type.set(ID_C_template, template_type);
-    new_symb.type.set(ID_C_template_arguments, specialization_template_args);
+    new_symb.type.set(
+      ID_C_template_arguments,
+      record_full_template_args ? full_template_args
+                                : specialization_template_args);
 
 #ifdef DEBUG
     std::cout << "instance symbol: " << new_symb.name << "\n\n";
