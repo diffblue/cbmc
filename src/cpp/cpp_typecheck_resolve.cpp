@@ -6973,6 +6973,37 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
       }
     }
   }
+  else
+  {
+    // N5008 [temp.deduct.call], [temp.arg.explicit]/4 (Note 1): a trailing
+    // function parameter pack supplied no arguments is deduced as an empty
+    // pack.  The deduction loop above stops when the argument list is
+    // exhausted, before reaching the pack, so the pack keeps only its
+    // build_unassigned placeholder (an ID_unassigned type_map entry) and is
+    // recorded nowhere as empty.  Record it with size 0 -- treating the
+    // unassigned placeholder as unbound -- so that a pack expansion
+    // referencing it in the (trailing-return) decltype, e.g. `f(a...)`,
+    // collapses to zero arguments ([temp.variadic]/5,7) instead of leaving a
+    // dangling `...` over a parameter that no longer exists.
+    for(const auto &param :
+        cpp_declaration.template_type().template_parameters())
+    {
+      if(param.get_bool(ID_ellipsis) && param.id() == ID_type)
+      {
+        const irep_idt pack_id = param.type().get(ID_identifier);
+        const auto tm_it = cpp_typecheck.template_map.type_map.find(pack_id);
+        const bool bound = tm_it != cpp_typecheck.template_map.type_map.end() &&
+                           tm_it->second.id() != ID_unassigned &&
+                           tm_it->second.id() != ID_nil;
+        if(
+          !pack_id.empty() && !bound &&
+          cpp_typecheck.template_map.pack_args_map.find(pack_id) ==
+            cpp_typecheck.template_map.pack_args_map.end())
+          cpp_typecheck.template_map.pack_size_map[pack_id] = 0;
+        break;
+      }
+    }
+  }
 
   // Type-check the function type in a SFINAE context: suppress error
   // count so that substitution failures (e.g., enable_if with false
