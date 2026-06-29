@@ -251,6 +251,43 @@ return type fails to resolve (KNOWNBUG `cpp11_trailing_return_fwd_pack`); then
 (4) re-evaluating the nested constraint during the constructor SFINAE
 (`cpp11_decltype_pack_variadic_invoke_ctor`).
 
+#### Update 2026-06-29 (cont.) — trailing-return decltype: diagnosis
+
+Investigated layer (3).  The variadic helper's trailing-return `decltype`
+elaboration happens during **deduction** (`guess_function_template_args`,
+`cpp_typecheck_resolve.cpp`): `invk` is never instantiated because the call's
+candidate is dropped when `typecheck_type(function_type)` throws (the function
+type carries the trailing-return `decltype`).  Probing showed two facts:
+
+* The N copies of the value parameter pack are inserted into the deduced
+  function type **without distinct names** (all keep the pack name `a`), and the
+  trailing-return `decltype(f(a...))` keeps the bare pack reference `a` (with its
+  `...` marker).  Putting the params in scope then yields a single `a`, and the
+  `a...` expansion over a non-pack fails -> the candidate is rejected.
+* A prototype fix (rename the expanded params to `a$i`; expand the
+  return-`decltype`'s value-pack call argument in lockstep, value pack `a -> a$i`
+  and type pack `Args -> ` the i-th deduced type) makes the return type expand
+  correctly at the AST level (`decltype(f(static_cast<E0&&>(a$0), static_cast<E1&&>(a$1)))`),
+  and the expanded args then resolve.  But a further sub-issue remains: resolving
+  the call `f(a$0, a$1)` inside the deduction-time `decltype` reports "found no
+  match for operator()" (operator() resolution on the parameter callee in the
+  SFINAE return-type context).  So layer (3) is itself a multi-fix sub-project
+  (param renaming + value-pack return-`decltype` expansion + operator()
+  resolution in the deduction `decltype`), still open.
+
+**Orthogonality note:** the *real* libstdc++ `std::__invoke` does NOT use a
+value-pack `decltype(...forward(args)...)` return; it uses the **type-pack
+trait** return `__invoke_result_t<_Callable, _Args...>`.  A faithful model of
+that shape -- `typename ir<F&, A...>::type myinvoke(F&& f, A&&... a)` with
+`ir<F,A...>::type = decltype(declval<F>()(declval<A>()...))` -- already
+resolves correctly (`apply` expands the type-pack trait).  So this
+value-pack-trailing-return layer is a genuine standalone feature gap but is NOT
+the blocker for real multi-argument `std::function`: `mf.cpp` and the
+`make_bvrep` files still fail at `std_function.h:435` for a different, as-yet
+unpinned reason in libstdc++'s `_Callable`/`__invoke_result` machinery, which
+should be re-diagnosed directly rather than via synthetic `std::__invoke`
+models.
+
 ### The motivating chain (`std::erase_if`)
 
 `std::erase_if(v, pred)` -> `std::__remove_if(..., __ops::__pred_iter(std::ref(pred)))`.
