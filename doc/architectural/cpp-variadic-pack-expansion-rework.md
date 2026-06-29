@@ -587,16 +587,26 @@ any of them.
      - **2b. const/non-const member-function-template overload (KNOWNBUG).**
        With the target now a function pointer, `_M_create` next selects the
        *const* `_Any_data::_M_access` overload for a non-const object, because
-       const/non-const member-function-*template* overload resolution does not
+       const/non-const member-function-*template* overload resolution did not
        rank the implicit object parameter's cv-qualification (the non-template
-       case is correct).  The const overload returns `const T&`, so
-       `__dest._M_access<_Functor*>() = ...` is "not an lvalue".  Isolated
-       header-free by `cpp11_member_template_const_overload` (KNOWNBUG).
+       case was correct).  The const overload returns `const T&`, so
+       `__dest._M_access<_Functor*>() = ...` was "not an lvalue".  FIXED, CORE
+       (`cpp11_member_template_const_overload`): the deduced function type of an
+       uninstantiated `template_function_instance` carries no `this` parameter,
+       so the const member-qualifier is recovered from the candidate template's
+       `ID_method_qualifier` and added to the cv distance
+       (`member_template_const_penalty`).  No regressions.
+     - **2c. `_M_manager` body (open).** With 2a and 2b fixed, single-argument
+       `std::function` construction proceeds past `_M_create` to
+       `_Function_base::_Base_manager::_M_manager` (the clone/destroy/type_info
+       dispatcher), whose body is *silently* left nil ("no body", no type-check
+       diagnostic; not the `typeid` itself, which converts fine in isolation).
+       Not yet root-caused; the next sub-layer.
      `cpp17_functional_basic` (`std::function<int(int,int)> f = add;`) still
      passes only *vacuously* (layer 1 blocks multi-arg construction before these
-     are reached); landing layer 1 needs 2b (and any further `_M_create`
+     are reached); landing layer 1 needs 2c (and any further `_M_manager`
      layers) fixed so as not to regress it.
-  The dog-food `make_bvrep` files remain blocked on layer 2.
+  The dog-food `make_bvrep` files remain blocked on layer 2 (2c and layer 1).
 
 Net: the trailing-return decltype is fully handled across pack shapes -- a
 type-pack nested inside a reference, a value-pack with no type-pack reference,
