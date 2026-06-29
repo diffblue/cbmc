@@ -3693,6 +3693,25 @@ bool cpp_typecheckt::cast_away_constness(const typet &t1, const typet &t2) const
     return q_from.is_constant && !q_to.is_constant;
   }
 
+  // Symmetric case: casting FROM a (cv) void* to a pointer to some other
+  // type.  N5008 [expr.static.cast]/13 + [conv.qual]: a prvalue of type
+  // "pointer to cv1 void" converts to "pointer to cv2 T" when cv2 is at least
+  // as cv-qualified as cv1, i.e. it casts away constness only if the source
+  // pointee is const and the target pointee is not.  Only the top-level cv of
+  // each pointee matters; the generic subtype-chain comparison below mis-ranks
+  // this when the chains have different depths -- e.g. `const void*` (depth 2)
+  // to `const FP*` where `FP` is a function pointer (depth 3) -- and would
+  // wrongly reject the (valid) cast, which surfaces in libstdc++'s
+  // std::function `_M_get_pointer` (`__source._M_access<_Functor*>()`).
+  if(to_pointer_type(t1).base_type().id() == ID_empty)
+  {
+    c_qualifierst q_from;
+    q_from.read(to_pointer_type(t1).base_type());
+    c_qualifierst q_to;
+    q_to.read(to_pointer_type(t2).base_type());
+    return q_from.is_constant && !q_to.is_constant;
+  }
+
   typet nt1 = t1;
   typet nt2 = t2;
 
