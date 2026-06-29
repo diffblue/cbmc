@@ -550,18 +550,44 @@ any of them.
   zero arguments.  Applies to both the plain and forwarding-cast forms; verified
   for free and member function templates and that `sizeof...` stays correct.
 
-* **Real multi-argument `std::function` (`std_function.h:435`) — still fails.**
-  The synthetic chain above is fixed, but the real libstdc++ converting
-  constructor uses more machinery (`_Callable` = `__is_invocable_r<R, F&, A...>`
-  and the `__invoke_result`/`__invoke` family), and still reports "found no
-  match for symbol 'function'". A separate, deeper layer; the dog-food
-  `make_bvrep` files remain blocked on it.
+* **Real multi-argument `std::function` (`std_function.h:435`) — root
+  diagnosed; two distinct layers remain.** The `_Callable` =
+  `__is_invocable_r<R, F&, A...>` constraint ("found no match for symbol
+  'function'") was traced to two layers:
+  1. **Partial-spec pack deduction (root, fix identified).** libstdc++'s
+     `__result_of_impl<false, false, _Functor, _ArgTypes...>` (the base of
+     `__invoke_result`) places a parameter pack *after* fixed (non-deduced)
+     arguments.  When selected via the partial-specialization disambiguation
+     path (`disambiguate_template_classes`, as a dependent base class), the
+     deduced pack is collapsed to a single element -- `build_template_args`
+     returns the scalar `type_map` convenience binding and, unlike
+     `elaborate_class_template`, this path does not expand it into positional
+     arguments -- so `__invoke_result` is mis-sized and the constraint fails to
+     elaborate.  Isolated header-free by `cpp11_partial_spec_pack_after_fixed`
+     (KNOWNBUG).  A targeted fix (expand the deduced pack in
+     `disambiguate_template_classes`, mirroring `elaborate_class_template`)
+     makes that test and the synthetic `__invoke_result` models pass.
+  2. **`std::function` body propagation (pre-existing, blocks landing layer 1).**
+     With layer 1 fixed, multi-argument `std::function` construction proceeds far
+     enough to hit a pre-existing blocker that *also* affects single-argument
+     `std::function`: the `_Base_manager::_M_create` / `_Function_handler::
+     _M_manager` member-function-template bodies are converted successfully
+     during the deferred method-body drain (`KM_CONV_OK`) but do not reach the
+     goto model ("no body for callee ... _M_create"), so construction asserts.
+     `cpp17_functional_basic` (`std::function<int(int,int)> f = add;`) currently
+     passes only *vacuously* -- the multi-arg constraint failure (layer 1) blocks
+     construction before this blocker is reached.  Landing layer 1 without layer
+     2 therefore regresses `cpp17_functional_basic`, so layer 1 is held until
+     layer 2 (body propagation to the goto model) is fixed.
+  The dog-food `make_bvrep` files remain blocked on layer 2.
 
 Net: the trailing-return decltype is fully handled across pack shapes -- a
 type-pack nested inside a reference, a value-pack with no type-pack reference,
 and an empty (N == 0) deduced pack -- via the shared `expand_call_argument_packs`
 plus the empty-pack recording in deduction (so the result both elaborates in
 deduction and propagates through instantiation).  The unified `expand_pack`
-primitive remains a worthwhile *consolidation*.  The main remaining pack gap is
-the real libstdc++ `std::function` `_Callable`/`__is_invocable_r` machinery
-(`std_function.h:435`), on which the `make_bvrep` dog-food files are blocked.
+primitive remains a worthwhile *consolidation*.  The remaining `std::function`
+work is the two layers above: (1) partial-spec pack deduction in the
+disambiguation path (fix identified, gated), and (2) `std::function` internal
+member-template body propagation to the goto model (the actual `make_bvrep`
+blocker).
