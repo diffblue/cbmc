@@ -1,0 +1,31 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ member-template deduction from const funptr arg: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^.*no body for callee.*$
+--
+N5008 [temp.deduct.call]/3: for a forwarding reference Fn&& and an lvalue
+argument of type `const FP` (a const function pointer), Fn is deduced as
+`const FP&`, so the deduced parameter `const FP&` binds a const function-pointer
+lvalue.  CBMC drops the const while building the deduced reference parameter
+(it becomes `FP&`), so the const argument no longer binds, the sole (template)
+candidate is discarded during overload resolution, and -- because this happens
+during the elaboration of an instantiated member body -- the call resolution
+silently fails (via the "all candidates are templates" SFINAE-tolerance path in
+cpp_typecheck_resolvet::resolve) and the enclosing member Mgr<FP>::clone is left
+with no body.
+
+This is the shape of libstdc++ std::function's
+_Function_base::_Base_manager<F>::_M_manager __clone_functor case, which calls
+_M_init_functor(__dest, *const_cast<const _Functor*>(...)) with _Functor a
+function pointer; the silently-discarded body is why a single
+`std::function<int(int)> f = &fn;` reports _M_manager as no-body.
+
+KNOWNBUG until the deduced const-qualified function-pointer reference parameter
+is built with its const preserved; flip to CORE once it verifies.
