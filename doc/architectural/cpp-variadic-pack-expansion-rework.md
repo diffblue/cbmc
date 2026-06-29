@@ -227,20 +227,29 @@ sub-gaps:
    ([expr.call], [over.call.object]). Non-pack forwarding-reference arguments
    (`f(static_cast<A&&>(a))`, single or several) also work.
 
-2. **Forwarding-reference parameter-pack expansion** — STILL OPEN (KNOWNBUG
+2. **Forwarding-reference parameter-pack expansion** — FIXED (commit "expand
+   forwarding-reference parameter-pack call patterns"; CORE
    `cpp11_forwarding_ref_pack_expansion`). The body pack expander
-   (`cpp_instantiate_template`) expands a *bare* value-pack call argument
+   (`cpp_instantiate_template`) expanded a *bare* value-pack call argument
    `f(a...)` into `f(a$0, a$1)` but not a *pattern* argument that merely
-   contains the pack, `f(static_cast<A&&>(a)...)`: the type pack `A` is not
-   substituted in lockstep with the value pack `a`, so the forwarded arguments
-   carry the wrong type/value and the call computes the wrong result. A
-   by-value pack `f(a...)` works. This is the body of variadic `std::__invoke`.
+   contains the pack, `f(static_cast<A&&>(a)...)`: the value pack `a` was left
+   referencing a removed parameter ("symbol 'a' is unknown") and the type pack
+   `A` was not substituted. The expander now expands such a pattern argument
+   into one argument per element, substituting in lockstep the value pack
+   (`a -> a$k`) and the type pack (`A -> ` the k-th deduced element type;
+   replacing the `cpp_name A` inside `A&&` performs [dcl.ref] reference
+   collapsing). The empty-pack strip path drops a pattern argument too, so
+   `f(static_cast<A&&>(a)...)` with an empty pack becomes `f()`. Verified for
+   N = 0..3, lvalue and rvalue.
 
-So the remaining chain for a real multi-argument `std::function` is: (2)
-forwarding-reference parameter-pack *pattern* expansion (substitute the type
-pack in lockstep), then the variadic helper's trailing-return `decltype`
-expansion, then re-evaluating the nested constraint during the constructor
-SFINAE (`cpp11_decltype_pack_variadic_invoke_ctor`).
+So the remaining chain for a real multi-argument `std::function` is: (3) the
+variadic helper's **trailing-return `decltype`** expansion — a
+declaration-only `auto invk(F&&, Args&&...) -> decltype(static_cast<F&&>(f)
+(static_cast<Args&&>(a)...))` (the declaration of `std::__invoke`) does not
+expand the forwarding-reference pack in its *return type* for `N >= 2`, so the
+return type fails to resolve (KNOWNBUG `cpp11_trailing_return_fwd_pack`); then
+(4) re-evaluating the nested constraint during the constructor SFINAE
+(`cpp11_decltype_pack_variadic_invoke_ctor`).
 
 ### The motivating chain (`std::erase_if`)
 
