@@ -264,8 +264,45 @@ void template_mapt::expand_call_argument_packs(irept &n) const
 
       if(elems == nullptr)
       {
-        // Not a recognised type pack (e.g. a value parameter pack): leave it
-        // untouched so existing value-pack handling is unaffected.
+        // N5008 [temp.variadic]/4,5: the argument carries `...` (so it is a
+        // pack expansion) but its pattern references no *type* parameter pack
+        // -- it is a *value* parameter pack expansion, e.g. `f(a...)` whose
+        // `a` is a function parameter pack (the shape of a by-value variadic
+        // forwarding helper's trailing-return `decltype(f(a...))`).  There is
+        // no type to substitute; the expansion is N copies of the pattern,
+        // each referencing the single in-scope value parameter (whose deduced
+        // element type fixes the call-argument's type), where N is the common
+        // length of the packs in the expansion ([temp.variadic]/5).  Use the
+        // unique non-zero deduced pack size; if every deduced pack is empty the
+        // expansion is empty (drop the argument); if the size is ambiguous
+        // (several distinct non-zero sizes) leave the argument untouched.
+        std::set<std::size_t> sizes;
+        bool any_pack = false;
+        for(const auto &ps : pack_size_map)
+        {
+          any_pack = true;
+          if(ps.second != 0)
+            sizes.insert(ps.second);
+        }
+        if(any_pack && sizes.empty())
+        {
+          changed = true;
+          continue; // zero-length value-pack expansion: drop the argument
+        }
+        if(sizes.size() == 1)
+        {
+          changed = true;
+          const std::size_t n = *sizes.begin();
+          for(std::size_t i = 0; i < n; ++i)
+          {
+            irept copy = arg;
+            copy.remove(ID_ellipsis);
+            new_args.push_back(copy);
+          }
+          continue;
+        }
+        // Size unknown or ambiguous: leave untouched so existing handling is
+        // unaffected.
         new_args.push_back(arg);
         continue;
       }
