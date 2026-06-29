@@ -121,6 +121,55 @@ the signature and the body must *both* expand to `N`, consistently named, and
 member-initializer / brace-init-list pack expansions must be added. This is the
 function-template expander generalised to the member contexts — see Phase 6.
 
+### Multi-argument `std::function` (measured 2026-06-29)
+
+Constructing **any multi-argument** `std::function<R(A,B,...)>` from a callable
+fails (`std_function.h:435` "found no match for symbol 'function'") and the
+proof then passes **vacuously** (unsound); a single-argument
+`std::function<R(A)>` works. This is the blocker behind the dog-food
+`make_bvrep` failures (`arith_tools.cpp`, `bitvector_expr.cpp`,
+`bitvector_types.cpp`), which pass a lambda capturing a
+`std::function<bool(bool,bool)>`.
+
+Reduced header-free (`regression/cbmc-cpp/cpp11_decltype_pack_sfinae_ctor`):
+
+```cpp
+template <class R, class... A> struct Fn<R(A...)> {
+  template <class F, class = decltype(declval<F &>()(declval<A>()...))>
+  Fn(F);                         // converting ctor, SFINAE on a decltype
+};                               // that expands the class pack A
+Fn<bool(bool, bool)> g = lambda; // N>=2: "found no match"; N==1: works
+```
+
+This is libstdc++'s `std::function<R(A...)>` converting constructor, whose
+viability is constrained by `_Callable<F> = __is_invocable_r<R, F&, A...>`
+(a `decltype` over the class parameter pack `A`). Measured axis:
+
+| Member context, default-arg `decltype(f(declval<A>()...))` | N | Status |
+|---|---|---|
+| Free function template (explicit class args) | 2 | ✅ works |
+| Static member fn template | 2 | ✅ works |
+| Non-static member fn template (called on object) | 2 | ✅ works |
+| **Converting constructor template** | 2 | ❌ "found no match" → vacuous |
+| Converting constructor template | 1 | ✅ works |
+
+So this axis is **constructor-specific**: ordinary member functions deduce and
+evaluate the default-argument `decltype` per call
+(`template_function_instance`, `cpp_typecheck_resolve.cpp` ~l.6674, which
+handles the multi-element pack correctly), but the constructor reaches a
+different path. The class pack `A` inside the constructor's
+default-template-argument `decltype` is never expanded for `N >= 2`: the
+class-pack member expander in `template_map::apply`
+(`src/cpp/template_map.cpp` ~l.363) deliberately `continue`s past
+`ID_constructor`/`ID_destructor` and past template members, and no other site
+expands the pack inside a constructor's default-template-argument `decltype`
+operand. Grounded in N5008 [temp.variadic]/5 (pack expansion of `declval<A>()...`),
+[temp.deduct]/8 and [over.ics.user] (SFINAE on the constructor's `decltype`
+operand selecting the user-defined conversion). Tracked by KNOWNBUG
+`cpp11_decltype_pack_sfinae_ctor`; flip to CORE once the constructor path
+expands the class pack in its default-template-argument `decltype`. Belongs with
+Phase 6 (member/constructor contexts).
+
 ### The motivating chain (`std::erase_if`)
 
 `std::erase_if(v, pred)` -> `std::__remove_if(..., __ops::__pred_iter(std::ref(pred)))`.
