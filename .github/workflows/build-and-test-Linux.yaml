@@ -26,7 +26,7 @@ jobs:
 
       - name: Restore ccache
         id: restore-ccache
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         with:
           path: .ccache
           key: ${{ runner.os }}-24.04-make-clang-${{ github.ref }}-${{ github.sha }}-KERNEL
@@ -55,7 +55,7 @@ jobs:
           path: CPROVER/faultyInput/*
       - name: Save ccache
         if: always()
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@v6
         with:
           path: .ccache
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}

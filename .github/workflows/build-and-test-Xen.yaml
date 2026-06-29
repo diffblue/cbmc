@@ -25,7 +25,7 @@ jobs:
 
       - name: Restore ccache
         id: restore-ccache
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         with:
           path: .ccache
           key: ${{ runner.os }}-24.04-make-clang-${{ github.ref }}-${{ github.sha }}-XEN
@@ -70,7 +70,7 @@ jobs:
         run:  $(pwd)/src/cbmc/cbmc --list-goto-functions xen_4_13/xen/xen-syms | grep "arch"
       - name: Save ccache
         if: always()
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@v6
         with:
           path: .ccache
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}

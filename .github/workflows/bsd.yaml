@@ -15,7 +15,7 @@ jobs:
           submodules: recursive
       - name: Restore ccache
         id: restore-ccache
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         with:
           path: .ccache
           key: freebsd-15.0-gmake-${{ github.ref }}-${{ github.sha }}-PR
@@ -73,7 +73,7 @@ jobs:
 
       - name: Save ccache
         if: always()
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@v6
         with:
           path: .ccache
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
@@ -86,7 +86,7 @@ jobs:
           submodules: recursive
       - name: Restore ccache
         id: restore-ccache
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         with:
           path: .ccache
           key: openbsd-7.7-gmake-${{ github.ref }}-${{ github.sha }}-PR
@@ -141,7 +141,7 @@ jobs:
 
       - name: Save ccache
         if: always()
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@v6
         with:
           path: .ccache
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
@@ -154,7 +154,7 @@ jobs:
           submodules: recursive
       - name: Restore ccache
         id: restore-ccache
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         with:
           path: .ccache
           key: netbsd-10.1-gmake-${{ github.ref }}-${{ github.sha }}-PR
@@ -212,7 +212,7 @@ jobs:
 
       - name: Save ccache
         if: always()
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@v6
         with:
           path: .ccache
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
