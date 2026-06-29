@@ -1,0 +1,18 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ trailing-return decltype resolves: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+A variadic function template whose trailing-return decltype contains a
+forwarding-reference pack expansion (static_cast<Args&&>(a)..., the declaration
+of variadic std::__invoke) does not expand the pack in the return type for a
+two-or-more-element pack, so the return type fails to resolve and a
+decltype(invk(...)) type silently fails (vacuous proof).  Flip to CORE once
+trailing-return decltype forwarding-reference pack expansion is implemented.
+This is the next layer for multi-argument std::function (make_bvrep).
