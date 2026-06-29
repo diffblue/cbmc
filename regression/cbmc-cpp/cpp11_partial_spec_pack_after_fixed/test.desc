@@ -1,0 +1,27 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ deduced pack arity through partial-spec base: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+A class template partial specialization whose parameter pack follows fixed
+(non-deduced) template arguments, selected via the partial-specialization
+disambiguation path (as a dependent base class), must deduce the pack to all
+trailing arguments rather than collapsing it to one element.  This is the shape
+of libstdc++'s __result_of_impl<false,false,_Functor,_ArgTypes...> behind
+multi-argument std::function.  N5008 [temp.spec.partial.match], [temp.variadic]/5.
+
+A targeted fix exists (expand the deduced pack into positional arguments in
+disambiguate_template_classes, mirroring elaborate_class_template), and it makes
+this test and the synthetic __invoke_result models pass.  It is NOT yet landed
+because it unblocks multi-argument std::function construction far enough to hit
+a separate, pre-existing blocker -- the std::function _Base_manager::_M_create /
+_Function_handler::_M_manager member-function-template bodies are converted but
+do not reach the goto model ("no body"), which also affects single-argument
+std::function and currently makes cpp17_functional_basic pass only vacuously.
+Land this fix together with that body-propagation fix.
