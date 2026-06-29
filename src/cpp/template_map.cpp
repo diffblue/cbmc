@@ -19,8 +19,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_template_parameter.h"
 #include "cpp_template_type.h"
 
+#include <functional>
 #include <ostream>
 #include <set>
+#include <string>
 
 const std::vector<typet> *
 template_mapt::function_parameter_pack(const typet &param_type) const
@@ -118,8 +120,154 @@ void template_mapt::expand_parameter_packs(typet &function_type) const
   parameters.swap(new_parameters);
 }
 
+/// Substitute, in place, every reference to the type parameter pack named
+/// \p base (matched by short-name suffix) appearing as a type template
+/// argument inside \p n with the concrete element type \p elem ([temp.variadic]
+/// /5): in the k-th expanded copy of a pack expansion the pack reference
+/// becomes the k-th deduced element type.
+static void
+replace_type_pack_ref(irept &n, const std::string &base, const typet &elem)
+{
+  const irept &t = n.find(ID_type);
+  if(
+    t.id() == ID_cpp_name && t.get_sub().size() == 1 &&
+    t.get_sub().front().id() == ID_name)
+  {
+    const std::string nm = id2string(t.get_sub().front().get(ID_identifier));
+    const auto p = nm.rfind("::");
+    const std::string suf = p != std::string::npos ? nm.substr(p + 2) : nm;
+    if(suf == base)
+      static_cast<irept &>(n.add(ID_type)) = elem;
+  }
+  for(auto &s : n.get_sub())
+    replace_type_pack_ref(s, base, elem);
+  for(auto &ns : n.get_named_sub())
+    replace_type_pack_ref(ns.second, base, elem);
+}
+
+void template_mapt::expand_call_argument_packs(irept &n) const
+{
+  for(auto &s : n.get_sub())
+    expand_call_argument_packs(s);
+  for(auto &ns : n.get_named_sub())
+    expand_call_argument_packs(ns.second);
+
+  if(!(n.id() == ID_side_effect && n.get(ID_statement) == ID_function_call))
+    return;
+
+  for(auto &child : n.get_sub())
+  {
+    if(child.id() != ID_arguments)
+      continue;
+
+    bool changed = false;
+    irept::subt new_args;
+    for(auto &arg : child.get_sub())
+    {
+      if(!arg.get_bool(ID_ellipsis))
+      {
+        new_args.push_back(arg);
+        continue;
+      }
+
+      // Locate the type parameter pack referenced inside this argument: a
+      // type template argument that is a bare cpp_name whose short name
+      // matches a deduced pack.
+      const std::vector<typet> *elems = nullptr;
+      std::string base;
+      bool empty_pack = false;
+      std::function<void(const irept &)> find = [&](const irept &m)
+      {
+        if(elems != nullptr || empty_pack)
+          return;
+        const irept &t = m.find(ID_type);
+        if(
+          t.id() == ID_cpp_name && t.get_sub().size() == 1 &&
+          t.get_sub().front().id() == ID_name)
+        {
+          const std::string nm =
+            id2string(t.get_sub().front().get(ID_identifier));
+          const auto p = nm.rfind("::");
+          const std::string suf =
+            p != std::string::npos ? nm.substr(p + 2) : nm;
+          for(const auto &pe : pack_args_map)
+          {
+            const std::string key = id2string(pe.first);
+            const auto q = key.rfind("::");
+            const std::string ksuf =
+              q != std::string::npos ? key.substr(q + 2) : key;
+            if(ksuf == suf)
+            {
+              elems = &pe.second;
+              base = suf;
+              return;
+            }
+          }
+          for(const auto &ps : pack_size_map)
+          {
+            if(ps.second != 0)
+              continue;
+            const std::string key = id2string(ps.first);
+            const auto q = key.rfind("::");
+            const std::string ksuf =
+              q != std::string::npos ? key.substr(q + 2) : key;
+            if(ksuf == suf)
+            {
+              empty_pack = true;
+              base = suf;
+              return;
+            }
+          }
+        }
+        for(const auto &s : m.get_sub())
+          find(s);
+        for(const auto &nss : m.get_named_sub())
+          find(nss.second);
+      };
+      find(arg);
+
+      if(empty_pack)
+      {
+        changed = true;
+        continue; // zero-length expansion: drop the argument
+      }
+
+      if(elems == nullptr)
+      {
+        // Not a recognised type pack (e.g. a value parameter pack): leave it
+        // untouched so existing value-pack handling is unaffected.
+        new_args.push_back(arg);
+        continue;
+      }
+
+      changed = true;
+      for(const typet &elem : *elems)
+      {
+        irept copy = arg;
+        copy.remove(ID_ellipsis);
+        replace_type_pack_ref(copy, base, elem);
+        new_args.push_back(copy);
+      }
+    }
+    if(changed)
+      child.get_sub() = new_args;
+    break;
+  }
+}
+
 void template_mapt::apply(typet &type) const
 {
+  // N5008 [temp.variadic]/5: a `decltype` operand may contain a function-call
+  // argument pack expansion (e.g. `decltype(declval<F>()(declval<A>()...))`,
+  // the shape of libstdc++'s `__invoke_result`).  Expand it here -- before the
+  // substitution recursion below -- so the operand becomes a concrete call
+  // (`...(declval<E0>(), declval<E1>())`) that elaborates; otherwise the bare
+  // pack reference is rejected and e.g. multi-argument std::function fails to
+  // construct.  Restricted to decltype operands to leave all other contexts
+  // untouched.
+  if(type.id() == ID_decltype)
+    expand_call_argument_packs(type);
+
   if(type.id()==ID_array)
   {
     // C++26 pack indexing: Ts...[N] is parsed as array[N](Ts).
