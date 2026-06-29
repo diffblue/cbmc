@@ -275,6 +275,35 @@ type carries the trailing-return `decltype`).  Probing showed two facts:
   (param renaming + value-pack return-`decltype` expansion + operator()
   resolution in the deduction `decltype`), still open.
 
+#### Update 2026-06-29 (cont.) — conformance verdict + deeper diagnosis
+
+**Conformance:** confirmed non-conformant (and unsound).  The construct is
+well-formed standard C++ -- both GCC 13 and Clang accept it with
+`-pedantic-errors` -- and matches N5008 [temp.variadic]/6 Example 5 (a
+function-call argument list whose pattern contains the pack, `f(&rest ...)`) in
+a trailing-return-type `decltype` ([dcl.fct], [temp.deduct.call]).  CBMC
+silently drops the candidate and reports `VERIFICATION SUCCESSFUL` on a program
+whose deliberately-wrong property must FAIL -- an unsoundness, the most serious
+kind of non-conformance.  So it must be fixed regardless of `std::function`.
+
+**Deeper diagnosis (second prototype):** with the param renaming + return-
+`decltype` value-pack expansion applied in BOTH `guess_function_template_args`
+and `instantiate_template`, the return `decltype` expands correctly end-to-end
+at the AST level (`decltype(f(static_cast<c_bool&&>(a$0), static_cast<c_bool&&>(a$1)))`,
+verified just before `convert_non_template_declaration`, return type resolved to
+`bool`), and guess no longer throws.  But the construct STILL verifies vacuously:
+the call `invk(...)` does not resolve at the call site -- the resolved `bool`
+return type is not propagated from the (internally-succeeding) deduction /
+instantiation to the call expression's type, and a residual `a` resolution
+(during instantiation, `inst_depth=1`) is still triggered.  So layer (3) is a
+genuine multi-site change spanning deduction, instantiation, AND return-type
+propagation to the call expression -- i.e. it is the function-template pack
+expander generalised across all three, which is the unified Phase-6 rework
+rather than another ad-hoc per-site patch.  Both prototypes were reverted (they
+got the expansion working but did not make the construct verify and touch the
+hot deduction/instantiation paths).  KNOWNBUG `cpp11_trailing_return_fwd_pack`
+remains the tracker.
+
 **Orthogonality note:** the *real* libstdc++ `std::__invoke` does NOT use a
 value-pack `decltype(...forward(args)...)` return; it uses the **type-pack
 trait** return `__invoke_result_t<_Callable, _Args...>`.  A faithful model of
