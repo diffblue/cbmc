@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ forwarding-reference pack forwards correctly: SUCCESS$
@@ -10,9 +10,6 @@ main.cpp
 ^CONVERSION ERROR$
 --
 Expanding a forwarding-reference parameter pack `A&&... a` in a call-argument
-pattern `f(static_cast<A&&>(a)...)` does not substitute the type pack A in
-lockstep, so the forwarded arguments are wrong and the call computes the wrong
-result (assertion 1 currently FAILS).  Flip to CORE once forwarding-reference
-parameter-pack pattern expansion is implemented.  This is the body of the
-variadic std::__invoke and the remaining blocker for multi-argument
-std::function.
+pattern `f(static_cast<A&&>(a)...)` now substitutes the type pack A in lockstep
+with the value pack a (the k-th deduced element type), so perfect forwarding of
+a pack -- the body of the variadic std::__invoke -- forwards correctly.
