@@ -599,7 +599,21 @@ void cpp_typecheckt::typecheck_compound_declarator(
           irept::subt new_args;
           for(auto &arg : args)
           {
-            const irep_idt base = mi_ref_base(arg);
+            // Expand only an argument that is *itself* a pack expansion: one
+            // carrying an explicit `...` (ID_ellipsis) or a bare reference to
+            // the pack (a cpp_name whose base name is the pack -- the parser
+            // may drop the `...` on these).  An argument that merely *contains*
+            // the pack nested inside a larger expression -- e.g.
+            // `fsum(rest...)` as the initializer expression of `sum(fsum(rest
+            // ...))` -- is a single argument whose pack expansion sits on the
+            // inner call's argument; it is expanded at that inner level by
+            // typecheck_method_bodies when the body is drained.  Expanding it
+            // here would wrongly duplicate the whole initializer expression
+            // (`sum(fsum(rest$0), fsum(rest$1))`).
+            const irep_idt base =
+              (arg.get_bool(ID_ellipsis) || arg.id() == ID_cpp_name)
+                ? mi_ref_base(arg)
+                : irep_idt{};
             if(!base.empty())
             {
               const std::size_t n = pack_counts[base];
