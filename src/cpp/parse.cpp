@@ -6477,7 +6477,15 @@ bool Parser::rFunctionArguments(exprt &args)
        (lex.LookAhead(1)==')' || lex.LookAhead(1)==','))
     {
       lex.get_token(tk);
-      // TODO
+      // N5008 [temp.variadic]/5: a pack expansion in a function-call
+      // argument list (`pattern...`).  Mark the just-parsed argument as a
+      // pack expansion so that template substitution expands it into one
+      // argument per pack element.  (Previously the ellipsis was silently
+      // discarded, which is harmless for a value parameter pack -- recovered
+      // by name during body expansion -- but loses a type-pack expression
+      // such as `declval<A>()...` used in a `decltype`.)
+      if(!args.operands().empty())
+        args.operands().back().set(ID_ellipsis, true);
 
       if(lex.LookAhead(0)==')')
         return true;

@@ -53,6 +53,20 @@ public:
   /// substitution path is unaffected.
   void expand_parameter_packs(typet &function_type) const;
 
+  /// N5008 [temp.variadic]/5: expand pack expansions that appear as
+  /// function-call arguments anywhere inside \p n (e.g. the `declval<A>()...`
+  /// in `decltype(declval<F>()(declval<A>()...))`, the shape of
+  /// libstdc++'s `__invoke_result` used to constrain
+  /// `std::function<R(A...)>`'s converting constructor).  The parser marks
+  /// such an argument with ID_ellipsis; each is replaced by one argument per
+  /// deduced element of the referenced type parameter pack (substituting the
+  /// element type for the pack reference), or by zero arguments for an empty
+  /// pack.  Arguments that do not reference a deduced type pack are left
+  /// untouched, so value parameter packs are unaffected.  Invoked from
+  /// apply() so the expansion happens in every substitution/instantiation
+  /// context, including nested trait instantiations.
+  void expand_call_argument_packs(irept &n) const;
+
   void swap(template_mapt &template_map)
   {
     type_map.swap(template_map.type_map);
