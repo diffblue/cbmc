@@ -504,19 +504,44 @@ any of them.
   function-call-expression member initializers" (src) + the CORE flip. Both
   suites green.
 
-* **`cpp11_trailing_return_fwd_pack` — still KNOWNBUG; not an expansion gap.**
-  The pack expansion in the trailing-return `decltype` already works at the AST
-  level in both `guess_function_template_args` and `instantiate_template` (see
-  §"trailing-return decltype" above); the residual failure is that the resolved
-  return type does not *propagate* to the call expression's type, so
-  `decltype(invk(...))` stays unresolved. The fix lives in deduction/
-  instantiation return-type propagation, not in a pack expander.
+* **`cpp11_trailing_return_fwd_pack` — FIXED, now CORE.** The trailing-return
+  `decltype(static_cast<F&&>(f)(static_cast<Args&&>(a)...))` (the declaration of
+  libstdc++'s variadic `std::__invoke`) failed because the type parameter pack
+  `Args` of the pack-expansion call argument sits *inside the reference type*
+  `Args&&`, and `expand_call_argument_packs` (run from `template_mapt::apply` on
+  decltype operands) located/substituted the pack only via a node's `ID_type`,
+  so it never fired: the bare `...`/`Args` survived, `typecheck_type` rejected
+  the well-formed return type, the candidate was dropped, and
+  `decltype(invk(...))` silently failed. Fixed by making both the detection
+  (`find`) and the substitution (`replace_type_pack_ref`) also handle a type
+  parameter pack appearing as a *bare cpp_name sub-node* (not only as a node's
+  `ID_type`); substituting the element type for the `cpp_name` inside `Args&&`
+  yields `elem&&` ([dcl.ref] reference collapsing). Because `apply` runs in both
+  deduction and instantiation, the deduced return type now both elaborates and
+  *propagates* to the call expression — so this was an expander-reach gap, not a
+  separate propagation gap as previously thought. Grounded in N5008
+  [temp.variadic]/5,6, [dcl.fct]/2. Both suites green.
 
-* **`cpp11_decltype_pack_variadic_invoke_ctor` — still KNOWNBUG.** Builds on the
-  trailing-return propagation above plus constructor-SFINAE re-evaluation of the
-  nested constraint; blocked on the same propagation gap.
+* **`cpp11_decltype_pack_variadic_invoke_ctor` — FIXED, now CORE.** The same
+  enhancement makes the nested `invoke_result<F,A...>::type =
+  decltype(invoke_fn(declval<F>(), declval<A>()...))` trait elaborate during the
+  constructor's SFINAE, so the synthetic multi-argument-`std::function` chain
+  verifies non-vacuously.
 
-Net: the unified `expand_pack` primitive remains a worthwhile *consolidation*
-(it would replace several copied collect-and-expand loops), but the user-visible
-remaining work is the trailing-return **return-type propagation** path, which is
-orthogonal to the expander.
+* **`cpp11_trailing_return_plain_pack` — new KNOWNBUG.** The still-open variant:
+  a plain by-value `f(a...)` trailing-return decltype whose pattern references
+  only the *value* parameter pack `a` (no type pack), so `find` matches nothing
+  and it is not expanded.
+
+* **Real multi-argument `std::function` (`std_function.h:435`) — still fails.**
+  The synthetic chain above is fixed, but the real libstdc++ converting
+  constructor uses more machinery (`_Callable` = `__is_invocable_r<R, F&, A...>`
+  and the `__invoke_result`/`__invoke` family), and still reports "found no
+  match for symbol 'function'". A separate, deeper layer; the dog-food
+  `make_bvrep` files remain blocked on it.
+
+Net: the trailing-return decltype propagation is resolved by reaching the
+type-pack inside a reference in the shared `expand_call_argument_packs`. The
+unified `expand_pack` primitive remains a worthwhile *consolidation*. Remaining
+pack gaps: the plain value-pack trailing-return decltype, and the real
+libstdc++ `std::function` `_Callable` machinery.
