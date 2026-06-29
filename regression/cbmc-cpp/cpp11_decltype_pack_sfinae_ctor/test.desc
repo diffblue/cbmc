@@ -1,0 +1,17 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ two-arg-pack SFINAE constructor selected: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+A converting constructor SFINAE-constrained by a decltype that expands a
+two-or-more-element pack (declval<A>()...) is dropped, so overload resolution
+reports "found no match" and construction fails (vacuous proof).  This is the
+reduction of multi-argument std::function construction and of the make_bvrep
+dog-food failure.  Flip to CORE once multi-element pack expansion in a
+decltype/unevaluated SFINAE operand is implemented.
