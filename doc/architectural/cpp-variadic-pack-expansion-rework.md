@@ -567,19 +567,45 @@ any of them.
      (KNOWNBUG).  A targeted fix (expand the deduced pack in
      `disambiguate_template_classes`, mirroring `elaborate_class_template`)
      makes that test and the synthetic `__invoke_result` models pass.
-  2. **`std::function` body propagation (pre-existing, blocks landing layer 1).**
-     With layer 1 fixed, multi-argument `std::function` construction proceeds far
+  2. **`std::function` body conversion (decomposed; one root fixed).** With
+     layer 1 fixed, multi-argument `std::function` construction proceeds far
      enough to hit a pre-existing blocker that *also* affects single-argument
-     `std::function`: the `_Base_manager::_M_create` / `_Function_handler::
-     _M_manager` member-function-template bodies are converted successfully
-     during the deferred method-body drain (`KM_CONV_OK`) but do not reach the
-     goto model ("no body for callee ... _M_create"), so construction asserts.
-     `cpp17_functional_basic` (`std::function<int(int,int)> f = add;`) currently
-     passes only *vacuously* -- the multi-arg constraint failure (layer 1) blocks
-     construction before this blocker is reached.  Landing layer 1 without layer
-     2 therefore regresses `cpp17_functional_basic`, so layer 1 is held until
-     layer 2 (body propagation to the goto model) is fixed.
+     `std::function`: the `_Base_manager::_M_create` body fails to convert (so
+     the member is left "no body" and construction asserts).  Investigating the
+     `_M_create` body conversion (`__dest._M_access<_Functor*>() = new
+     _Functor(...)`) decomposed this into sub-roots:
+     - **2a. cv-qualifiers on a function type (FIXED, CORE).** `_M_create`'s
+       first failure was `invalid conversion 'int(*)(int)' to 'int(int)'`: the
+       decayed target `_Functor` was a function *type* not a function *pointer*,
+       because `std::decay` missed function-to-pointer decay, because
+       `std::is_function<F>` (= `!is_const<const F>`) was false, because a
+       cv-qualifier applied to a function-typed template parameter via
+       substitution was wrongly written onto the function type.  N5008
+       [dcl.fct]/7 says such cv-qualifiers are ignored.  Fixed in
+       `typecheck_type` (drop top-level cv when the resolved type is a function
+       type); CORE test `cpp11_cv_qualified_function_type`.  No regressions.
+     - **2b. const/non-const member-function-template overload (KNOWNBUG).**
+       With the target now a function pointer, `_M_create` next selects the
+       *const* `_Any_data::_M_access` overload for a non-const object, because
+       const/non-const member-function-*template* overload resolution does not
+       rank the implicit object parameter's cv-qualification (the non-template
+       case is correct).  The const overload returns `const T&`, so
+       `__dest._M_access<_Functor*>() = ...` is "not an lvalue".  Isolated
+       header-free by `cpp11_member_template_const_overload` (KNOWNBUG).
+     `cpp17_functional_basic` (`std::function<int(int,int)> f = add;`) still
+     passes only *vacuously* (layer 1 blocks multi-arg construction before these
+     are reached); landing layer 1 needs 2b (and any further `_M_create`
+     layers) fixed so as not to regress it.
   The dog-food `make_bvrep` files remain blocked on layer 2.
+
+Net: the trailing-return decltype is fully handled across pack shapes -- a
+type-pack nested inside a reference, a value-pack with no type-pack reference,
+and an empty (N == 0) deduced pack -- via the shared `expand_call_argument_packs`
+plus the empty-pack recording in deduction (so the result both elaborates in
+deduction and propagates through instantiation).  The unified `expand_pack`
+primitive remains a worthwhile *consolidation*.  The remaining `std::function`
+work is the two layers above: (1) partial-spec pack deduction in the
+disambiguation path (fix identified, gated), and (2) `std::function` internal
 
 Net: the trailing-return decltype is fully handled across pack shapes -- a
 type-pack nested inside a reference, a value-pack with no type-pack reference,
