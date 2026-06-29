@@ -12,15 +12,14 @@
 // on a non-const _Any_data, which must select the non-const _M_access (an
 // lvalue) so the assignment is well-formed.
 //
-// KNOWN BUG: for a non-const object, overload resolution between a const and a
-// non-const member function TEMPLATE selects the const one (the non-template
-// case is handled correctly).  The const overload returns `const T&`, so the
-// assignment LHS is not a modifiable lvalue ("not an lvalue"), the _M_create
-// body fails to convert, and the std::function member is left body-less.
+// Now handled: for a non-const object, overload resolution between a const and
+// a non-const member function TEMPLATE selects the non-const one.  The deduced
+// function type of an uninstantiated template_function_instance carries no
+// `this` parameter, so the const member-qualifier is recovered from the
+// candidate template's ID_method_qualifier and added to the cv distance (a
+// const member function called on a non-const object ranks worse).
 //
-// Header-free and non-vacuous (assertion 2 must FAIL).  Flip to CORE once
-// const/non-const member-function-template overload resolution ranks the
-// implicit object parameter's cv-qualification.
+// Header-free and non-vacuous (assertion 2 must FAIL).
 
 extern "C" void __CPROVER_assert(int, const char *);
 
