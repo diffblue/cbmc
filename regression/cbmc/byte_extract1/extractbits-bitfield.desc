@@ -1,0 +1,11 @@
+CORE paths-lifo-expected-failure
+extractbits-bitfield.c
+
+^EXIT=10$
+^SIGNAL=0$
+--
+Invariant check failed
+--
+This example previously failed the DATA_INVARIANT "index+width-1 of extractbits
+must be within the bitvector" when unpacking a non-byte-aligned bitfield into
+bytes (see issue #8581).
