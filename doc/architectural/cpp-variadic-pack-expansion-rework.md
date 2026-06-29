@@ -610,17 +610,102 @@ any of them.
          cast ([expr.static.cast]/13) was rejected / produced a type-mismatched
          result.  Fixed by the symmetric void*-source case in
          `cast_away_constness`; CORE `cpp11_static_cast_void_to_const_funptr`.
-       - **2c-ii. system-header body guard null-handler fragility (open).**
-         With 2c-i fixed, `_M_manager`'s body converts cleanly when the
-         system-header guard is *disabled*, but is still left nil when it is
-         active: `convert_function` wraps a system-header body in an
-         `sfinae_contextt` (null message handler), which -- as
-         `typecheck_method_bodies` already documents and avoids by using error-
-         count save/restore -- changes error-count-dependent behaviour and makes
-         a nested instantiation spuriously fail.  Aligning `convert_function`'s
-         guard with the count-save/restore approach is the next step, but it is
-         a broad change to system-header diagnostic suppression (regression
-         risk), so deferred.
+       - **2c-ii. `_M_manager` body silently niled under system-header
+         attribution (open; earlier null-handler diagnosis DISPROVEN).**
+         `_M_manager`'s body conversion throws a *silent* `throw 0` (no
+         diagnostic is emitted, `had_template_instantiation` is set, so a nested
+         instantiation is involved); `convert_function`'s `catch(int)` for
+         system-header bodies then nils it -> "no body for callee" at goto
+         conversion.  Findings from instrumentation + cvise this session:
+         * The earlier hypothesis -- that `convert_function`'s `sfinae_contextt`
+           system-header guard (a null message handler) makes a nested
+           instantiation spuriously fail via error-count desync -- is **wrong**.
+           Disabling the null-handler swap globally (every `sfinae_contextt`)
+           leaves `_M_manager` no-body; replacing the guard with
+           `typecheck_method_bodies`-style error-count save/restore (real handler
+           kept throughout) *also* leaves it no-body.  So the throw is NOT caused
+           by the message handler.
+         * The throw is **system-header-attribution dependent**: preprocessing
+           with `#line` markers (bodies attributed to `/usr/include/...`,
+           `is_system_header_body == true`) reproduces the no-body; stripping all
+           markers (`is_system_header_body == false` everywhere) makes the same
+           code convert and verify.  So a `/usr/include` source-location gate
+           (one of `convert_function:703`, `cpp_typecheck.cpp:117` top-level
+           item `sfinae_contextt`+`catch(...)`, `cpp_typecheck_template.cpp:764`
+           "class template not found" silent `return`, or
+           `cpp_typecheck_method_bodies.cpp:596`) is what flips behaviour --
+           plausibly a *swallowed* partial conversion of a system-header item
+           leaving state in which `_M_manager`'s body later throws, whereas the
+           un-suppressed path converts fully.  Which gate, and why suppression
+           makes a success into a failure, is not yet pinned.
+         * The failure is NOT reproducible with header-free hand-models: the full
+           `_M_manager` switch body (typeid / `_M_access<const TI*>` /
+           `_M_access<F*>` / placement-new clone / pseudo-dtor destroy),
+           real `typeid(int(*)(int))`, and the individual casts all convert and
+           verify in isolation and combined.  It is a deep interaction in the
+           real `std::function` instantiation context.
+         * cvise on the preprocessed source does NOT isolate it: "no body for
+           callee" is produced identically whether a method was never defined or
+           had a definition that failed to convert (its symbol value is nil
+           either way), and is not distinguishable via CBMC output or even
+           g++ link (cvise reaches the trivial case via an indirect call through
+           an uninitialised function-pointer member).  cvise instead converges on
+           tangential system-header-attribution quirks.
+         NEXT: bisect the `#line` markers on the preprocessed `sf.cpp` to find
+         the minimal set whose presence triggers the throw (identifying the
+         responsible system-header item / gate); and/or capture the exact origin
+         of the silent `throw 0` (instrument the bare `throw 0` sites that fire
+         while a flag set around `_M_manager`'s `typecheck_code` is active).
+
+         Marker-bisection results (this session) narrow it to **cumulative
+         system-header suppression of *other* headers**, not `_M_manager`'s own
+         gate:
+         * De-systemising every header *except* `std_function.h` (rewriting its
+           `#line` markers off `/usr/include`) makes the same `_M_manager` body
+           convert and verify.  So `convert_function`'s own system-header guard
+           (`:703`) is NOT the trigger.
+         * The trigger is a *set* of other headers (binary search is
+           non-monotone: no single header reproduces it with `std_function.h`
+           alone), i.e. the cumulative effect of suppressing many `namespace std`
+           items.
+         * It is NOT the item-level `sfinae_contextt` (the null/constant-expr
+           guard): removing it from both the top-level path (`cpp_typecheck.cpp`
+           `:117`) and the namespace path (`cpp_typecheck_namespace.cpp` `:123`,
+           which is where `namespace std` items actually go) while keeping the
+           surrounding `catch(...)` leaves the bug.  Each individual effect of
+           `sfinae_contextt` was ruled out separately: disabling the null-handler
+           swap in *every* `sfinae_contextt` (KSF) leaves it, and *not* zeroing
+           `constant_expression_context` (KCE) leaves it.
+         * No system-header item is actually thrown/swallowed: instrumenting the
+           `catch(...)` of both the top-level and namespace system-header paths
+           shows ZERO swallowed items for `sf.cpp`.  So it is NOT a
+           partial-convert-then-swallow; every header item converts without
+           throwing.  The only throw is `_M_manager`'s own body during
+           instantiation (triggered from user `main`, not a system path).
+         * Net: under `is_system` attribution the *other* headers' definitions
+           are converted to a silently *different* (and `_M_manager`-incompatible)
+           result -- without any error or swallow -- via some remaining file-path
+           gate that is NOT `sfinae_contextt`.  Both "not-found" gates are
+           excluded: `cpp_typecheck_template.cpp:764` (class template not found)
+           and `cpp_typecheck_using.cpp:135` (using-declaration not found) fire
+           only when a name is genuinely absent, which would *error* in the
+           de-systemised run -- but that run verifies, so the names are found in
+           both attributions and neither gate fires.  The file-path branch of
+           `cpp_typecheck_method_bodies.cpp:596` is ALSO excluded (forcing its
+           non-system code path under full `/usr/include` attribution leaves the
+           bug).  So *every* explicit `is_system`/`/usr/include` gate in the
+           front-end has been ruled out -- yet de-systemising the headers fixes
+           it.  The responsible difference is therefore keyed on source location
+           more subtly than any single guard (e.g. conversion order, lazy-vs-eager
+           body draining, or symbol provenance), not an explicit suppression
+           gate.
+           NEXT (empirical, gate-agnostic): dump and diff the converted symbol
+           table (`--show-symbol-table`) between the system run and the
+           de-systemised run for a minimal failing header set, and find the first
+           symbol whose converted type/value differs; that difference is the
+           proximate cause of `_M_manager`'s body throw.  cvise cannot help here
+           (the no-body signal is output-identical to a trivially-undefined
+           method).
      `cpp17_functional_basic` (`std::function<int(int,int)> f = add;`) still
      passes only *vacuously* (layer 1 blocks multi-arg construction before these
      are reached); landing layer 1 needs 2c-ii (and any further layers) fixed so
