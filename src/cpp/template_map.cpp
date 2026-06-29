@@ -121,28 +121,45 @@ void template_mapt::expand_parameter_packs(typet &function_type) const
 }
 
 /// Substitute, in place, every reference to the type parameter pack named
-/// \p base (matched by short-name suffix) appearing as a type template
-/// argument inside \p n with the concrete element type \p elem ([temp.variadic]
-/// /5): in the k-th expanded copy of a pack expansion the pack reference
-/// becomes the k-th deduced element type.
+/// \p base (matched by short-name suffix) appearing inside \p n with the
+/// concrete element type \p elem ([temp.variadic]/5): in the k-th expanded
+/// copy of a pack expansion the pack reference becomes the k-th deduced
+/// element type.  The pack reference is replaced both when it is a node's
+/// `ID_type` (a type template argument) and when it is a bare `cpp_name`
+/// sub-node -- the latter so a pack nested inside a reference type, e.g. the
+/// `Args` in `static_cast<Args&&>(a)` (the forwarding cast of libstdc++'s
+/// variadic `std::__invoke`), is substituted (yielding `elem&&`, performing
+/// [dcl.ref] reference collapsing).
 static void
 replace_type_pack_ref(irept &n, const std::string &base, const typet &elem)
 {
-  const irept &t = n.find(ID_type);
-  if(
-    t.id() == ID_cpp_name && t.get_sub().size() == 1 &&
-    t.get_sub().front().id() == ID_name)
+  const auto is_pack_ref = [&base](const irept &t) -> bool
   {
+    if(
+      t.id() != ID_cpp_name || t.get_sub().size() != 1 ||
+      t.get_sub().front().id() != ID_name)
+      return false;
     const std::string nm = id2string(t.get_sub().front().get(ID_identifier));
     const auto p = nm.rfind("::");
-    const std::string suf = p != std::string::npos ? nm.substr(p + 2) : nm;
-    if(suf == base)
-      static_cast<irept &>(n.add(ID_type)) = elem;
-  }
+    return (p != std::string::npos ? nm.substr(p + 2) : nm) == base;
+  };
+
+  if(is_pack_ref(n.find(ID_type)))
+    static_cast<irept &>(n.add(ID_type)) = elem;
   for(auto &s : n.get_sub())
-    replace_type_pack_ref(s, base, elem);
+  {
+    if(is_pack_ref(s))
+      s = elem;
+    else
+      replace_type_pack_ref(s, base, elem);
+  }
   for(auto &ns : n.get_named_sub())
-    replace_type_pack_ref(ns.second, base, elem);
+  {
+    if(is_pack_ref(ns.second))
+      ns.second = elem;
+    else
+      replace_type_pack_ref(ns.second, base, elem);
+  }
 }
 
 void template_mapt::expand_call_argument_packs(irept &n) const
@@ -176,49 +193,62 @@ void template_mapt::expand_call_argument_packs(irept &n) const
       const std::vector<typet> *elems = nullptr;
       std::string base;
       bool empty_pack = false;
+      // Match a candidate node \p t that is a bare cpp_name (single name
+      // component) against the deduced packs by short name.  Records the
+      // element list (non-empty pack) or the empty-pack flag and returns
+      // whether it matched.
+      auto match_pack = [&](const irept &t) -> bool
+      {
+        if(
+          t.id() != ID_cpp_name || t.get_sub().size() != 1 ||
+          t.get_sub().front().id() != ID_name)
+          return false;
+        const std::string nm =
+          id2string(t.get_sub().front().get(ID_identifier));
+        const auto p = nm.rfind("::");
+        const std::string suf = p != std::string::npos ? nm.substr(p + 2) : nm;
+        for(const auto &pe : pack_args_map)
+        {
+          const std::string key = id2string(pe.first);
+          const auto q = key.rfind("::");
+          const std::string ksuf =
+            q != std::string::npos ? key.substr(q + 2) : key;
+          if(ksuf == suf)
+          {
+            elems = &pe.second;
+            base = suf;
+            return true;
+          }
+        }
+        for(const auto &ps : pack_size_map)
+        {
+          if(ps.second != 0)
+            continue;
+          const std::string key = id2string(ps.first);
+          const auto q = key.rfind("::");
+          const std::string ksuf =
+            q != std::string::npos ? key.substr(q + 2) : key;
+          if(ksuf == suf)
+          {
+            empty_pack = true;
+            base = suf;
+            return true;
+          }
+        }
+        return false;
+      };
       std::function<void(const irept &)> find = [&](const irept &m)
       {
         if(elems != nullptr || empty_pack)
           return;
-        const irept &t = m.find(ID_type);
-        if(
-          t.id() == ID_cpp_name && t.get_sub().size() == 1 &&
-          t.get_sub().front().id() == ID_name)
-        {
-          const std::string nm =
-            id2string(t.get_sub().front().get(ID_identifier));
-          const auto p = nm.rfind("::");
-          const std::string suf =
-            p != std::string::npos ? nm.substr(p + 2) : nm;
-          for(const auto &pe : pack_args_map)
-          {
-            const std::string key = id2string(pe.first);
-            const auto q = key.rfind("::");
-            const std::string ksuf =
-              q != std::string::npos ? key.substr(q + 2) : key;
-            if(ksuf == suf)
-            {
-              elems = &pe.second;
-              base = suf;
-              return;
-            }
-          }
-          for(const auto &ps : pack_size_map)
-          {
-            if(ps.second != 0)
-              continue;
-            const std::string key = id2string(ps.first);
-            const auto q = key.rfind("::");
-            const std::string ksuf =
-              q != std::string::npos ? key.substr(q + 2) : key;
-            if(ksuf == suf)
-            {
-              empty_pack = true;
-              base = suf;
-              return;
-            }
-          }
-        }
+        // The pack may be the argument's own type (e.g. `declval<A>()`, whose
+        // `A` is the node's ID_type) or a bare cpp_name nested anywhere in the
+        // argument -- e.g. the `Args` inside the reference type of
+        // `static_cast<Args&&>(a)` (libstdc++'s variadic `std::__invoke`
+        // forwarding cast), which is not surfaced by ID_type because it sits
+        // inside the reference.  Check both.  [temp.variadic]/5,6.
+        if(match_pack(m.find(ID_type)) || match_pack(m))
+          return;
         for(const auto &s : m.get_sub())
           find(s);
         for(const auto &nss : m.get_named_sub())
