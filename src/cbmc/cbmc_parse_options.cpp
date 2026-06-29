@@ -405,6 +405,19 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("refine-strings"))
   {
+    // The refined-string solver is a SAT (bit-vector refinement) procedure and
+    // cannot run on an SMT2 back-end. The SMT2 back-end instead lowers string
+    // operations to the SMT-LIB theory of strings directly. Reject the
+    // contradictory combination rather than silently ignoring one of them.
+    if(cmdline.isset("smt2") || cmdline.isset("incremental-smt2-solver"))
+    {
+      log.error() << "--refine-strings is not supported with an SMT2 back-end; "
+                     "the SMT2 back-end handles strings via the SMT-LIB theory "
+                     "of strings"
+                  << messaget::eom;
+      exit(CPROVER_EXIT_USAGE_ERROR);
+    }
+
     options.set_option("refine-strings", true);
     options.set_option("string-printable", cmdline.isset("string-printable"));
   }
