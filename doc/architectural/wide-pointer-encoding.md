@@ -5,7 +5,8 @@
 The `--wide-pointer-encoding` option extends CBMC's pointer bitvector
 representation to include a flat integer address alongside the standard
 object/offset encoding. This enables precise modeling of pointer-to-integer
-casts, integer-to-pointer casts, and pointer comparison.
+casts, integer-to-pointer casts, pointer comparison, and address reuse
+after free.
 
 ## Pointer Layout
 
@@ -40,9 +41,11 @@ retained deliberately, for two reasons:
   pointer checks, and the value-set machinery all index memory by object
   and offset. Recovering `(object, offset)` from the address alone would
   require inverting `object_base_address[i] + f`, which depends on the
-  base addresses of *all* objects and is only fully determined once
-  `finish_eager_conversion` has run. Carrying object/offset explicitly
-  lets the existing dereference logic run unchanged.
+  base addresses of *all* objects (only fully known once
+  `finish_eager_conversion` has run) and is not even a function under
+  address reuse: with `malloc_may_alias` two distinct objects may share
+  an address, so the inverse is ambiguous. Carrying object/offset
+  explicitly lets the existing dereference logic run unchanged.
 - Integer-to-pointer reconstruction deliberately assigns *fresh*
   object/offset variables for a given flat address and resolves the
   choice by refinement (see below). The explicit object/offset bits are
@@ -98,6 +101,20 @@ assert(*p == expected);  // Standard: FAILURE (wrong). Wide: SUCCESS (correct).
 The wide encoding adds address-based dereference dispatch: when a
 pointer comes from an integer-to-pointer cast, the dereference reads
 from the object whose address range contains the pointer's flat address.
+
+### Issue #2117: Address reuse after free
+
+```c
+int *x = malloc(sizeof(int));
+free(x);
+int *y = malloc(sizeof(int));
+if(x == y) assert(0);  // Standard: unreachable. Wide: reachable.
+```
+
+The wide encoding allows `malloc` to return the same address after
+`free` by relaxing the non-overlapping constraint for dynamic objects
+and preventing the simplifier from assuming different dynamic objects
+have different addresses.
 
 ## Technical Details
 
