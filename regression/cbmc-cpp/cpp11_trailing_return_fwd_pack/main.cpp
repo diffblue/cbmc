@@ -7,20 +7,20 @@
 // instantiated/deduced with a two-or-more-element pack, expand the pack in the
 // return-type `decltype` and resolve to the call's result type.
 //
-// KNOWN BUG: the call-argument pack `static_cast<Args&&>(a)...` is expanded for
-// a function *body* (see cpp11_forwarding_ref_pack_expansion) but not for a
-// trailing-return `decltype` on a declaration-only function template, so the
-// return type fails to resolve, the call `invk(...)` has no usable type, and a
-// `decltype(invk(...))` type silently fails (the proof passes vacuously --
-// unsound).  A single-element pack works.
+// Now handled: the call-argument pack `static_cast<Args&&>(a)...` is expanded
+// in the trailing-return `decltype` of a declaration-only function template by
+// expand_call_argument_packs (apply), which detects the type parameter pack
+// even when it is nested inside a reference type (`Args&&`) and substitutes the
+// i-th deduced element type per copy (reference-collapsing).  The deduced
+// return type then resolves to the call's result type and propagates to the
+// call expression.
 //
-// This is the next layer for multi-argument std::function: __invoke_result is
+// This is the layer multi-argument std::function needs: __invoke_result is
 // `decltype(std::__invoke(declval<F>(), declval<Args>()...))`, and std::__invoke
-// is exactly this declaration-only variadic forwarding helper.
+// is exactly this declaration-only variadic forwarding helper (see
+// cpp11_decltype_pack_variadic_invoke_ctor).
 //
-// Header-free and non-vacuous (assertion 2 must FAIL).  Flip to CORE once
-// trailing-return `decltype` forwarding-reference pack expansion is
-// implemented.
+// Header-free and non-vacuous (assertion 2 must FAIL).
 
 extern "C" void __CPROVER_assert(int, const char *);
 
