@@ -5,16 +5,14 @@
 // expansion in a function-call expression (`sum_of(rest...)`) must expand
 // likewise.
 //
-// KNOWN BUG (two gaps, both distinct from the base-mem-init pattern fixed by
-// cpp11_variadic_ctor_pack):
+// This exercises two pack-expansion contexts:
 //   (1) the empty pack in the function-call-expression initializer
-//       `sum(sum_of(rest...))` is not collapsed -- the constructor body fails
-//       to type-check and is left bodyless, so `value`/`sum` are not stored;
-//   (2) a non-empty pack of two or more elements (`X<int,int,int>`) is not
-//       expanded to one parameter/argument per element.
-// The desired behaviour below therefore does not yet hold.  Flip to CORE once
-// function-call-expression empty-pack collapse and multi-element pack
-// expansion are implemented.
+//       `sum(sum_of(rest...))` collapses to `sum(sum_of())`;
+//   (2) a non-empty pack of two or more elements (`X<int,int,int>`) expands to
+//       one parameter/argument per element, and the inner call-argument pack
+//       in the function-call-expression initializer expands at its own level
+//       (`sum(sum_of(rest$0, rest$1))`), so the recursive member function
+//       template `sum_of` resolves.
 //
 // Non-vacuous: operands are nondet so the passing assertions are not folded,
 // and the last assertion is a deliberately wrong claim that must FAIL.
