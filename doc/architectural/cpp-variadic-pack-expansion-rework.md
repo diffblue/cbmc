@@ -466,3 +466,57 @@ any newly-discovered edge cases as KNOWNBUG first.
 * **Non-goals (initially):** fold-expressions beyond what libstdc++ needs,
   pack indexing `T...[N]` (C++26, already partially handled), and
   lambda-init-capture packs. Add as separate KNOWNBUG tests if encountered.
+
+
+---
+
+## 7. Status update 2026-06-29 — member/constructor body expansion landed; remaining KNOWNBUGs are not expander gaps
+
+Measured the three then-remaining KNOWNBUGs and found that, after the earlier
+phases landed, they are **not** missing-`expand_pack`-primitive gaps but three
+distinct deeper bugs. A single consolidated `expand_pack` primitive (section
+3.2) would tidy the working duplicated logic but would not, on its own, flip
+any of them.
+
+* **`cpp11_variadic_pack_expansion` — FIXED, now CORE.** Two sub-bugs, both in
+  *where* a function/member body's pack expansion happens, not in the
+  expansion logic:
+  1. A *free* function template's body value pack is expanded (in
+     `instantiate_template` / by the call resolver), but a *member* function
+     template's body is drained later in `typecheck_method_bodies`, which only
+     expanded a *class* pack recorded in `#expanded_param_packs`. Its own
+     deduced value pack was left unexpanded, so a recursive member call
+     `sum_of(ts...)` kept its `...` and failed ("symbol 'ts' is unknown").
+     Fixed by expanding the own value pack there, driven by the *instantiated
+     function's actual parameters* (single param `S` ⇒ strip `...`; replicated
+     `S$0..S$k` ⇒ expand; no matching param ⇒ empty-pack drop). The measured
+     contrast that localised this: a member body calling a *free* variadic
+     callee `g(ts...)` already worked; only a member/self callee failed.
+  2. The constructor *function-call-expression* member initializer
+     `sum(sum_of(rest...))` was expanded at the wrong level: the nested-search
+     `mi_ref_base` (and the analogous `#expanded_param_packs` `is_arg_list`
+     heuristic) treated the whole `sum_of(rest...)` initializer expression as a
+     pack pattern, duplicating it to `sum(sum_of(rest$0), sum_of(rest$1))`.
+     Restricted both to a *bare cpp_name* / explicit-`...` argument, so a
+     nested expansion is expanded at its own inner level
+     (`sum(sum_of(rest$0, rest$1))`). Grounded in N5008 [temp.variadic]/5,7.
+  Commits: "expand value parameter packs in member-function-template bodies and
+  function-call-expression member initializers" (src) + the CORE flip. Both
+  suites green.
+
+* **`cpp11_trailing_return_fwd_pack` — still KNOWNBUG; not an expansion gap.**
+  The pack expansion in the trailing-return `decltype` already works at the AST
+  level in both `guess_function_template_args` and `instantiate_template` (see
+  §"trailing-return decltype" above); the residual failure is that the resolved
+  return type does not *propagate* to the call expression's type, so
+  `decltype(invk(...))` stays unresolved. The fix lives in deduction/
+  instantiation return-type propagation, not in a pack expander.
+
+* **`cpp11_decltype_pack_variadic_invoke_ctor` — still KNOWNBUG.** Builds on the
+  trailing-return propagation above plus constructor-SFINAE re-evaluation of the
+  nested constraint; blocked on the same propagation gap.
+
+Net: the unified `expand_pack` primitive remains a worthwhile *consolidation*
+(it would replace several copied collect-and-expand loops), but the user-visible
+remaining work is the trailing-return **return-type propagation** path, which is
+orthogonal to the expander.
