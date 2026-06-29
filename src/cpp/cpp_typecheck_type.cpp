@@ -134,6 +134,25 @@ void cpp_typecheckt::typecheck_type(typet &type)
       type.add_source_location() = symbol_expr.source_location();
     }
 
+    // N5008 [dcl.fct]/7: "The effect of a cv-qualifier-seq in a function
+    // declarator is not the same as adding cv-qualification on top of the
+    // function type.  In the latter case, the cv-qualifiers are ignored."
+    // There are no cv-qualified function types.  When a cv-qualified template
+    // parameter (`const T`) is substituted with a function type -- e.g.
+    // `is_const<const _Tp>` with `_Tp` a function type, as used by libstdc++'s
+    // `is_function<_Tp> = !is_const<const _Tp>` -- the const must be dropped
+    // rather than written onto the function type; otherwise `is_const` is
+    // wrongly true, `is_function` wrongly false, `decay` of a function type
+    // misses function-to-pointer decay, and std::function's decayed `_Functor`
+    // becomes a function type, breaking construction.
+    if(type.id() == ID_code)
+    {
+      qualifiers.is_constant = false;
+      qualifiers.is_volatile = false;
+      type.remove(ID_C_constant);
+      type.remove(ID_C_volatile);
+    }
+
     qualifiers.write(type);
   }
   else if(type.id()==ID_struct ||
