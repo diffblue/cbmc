@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ empty-pack decltype resolves: SUCCESS$
@@ -10,8 +10,9 @@ main.cpp
 ^CONVERSION ERROR$
 --
 A variadic forwarding helper whose trailing-return decltype contains a pack
-expansion f(a...), deduced with an EMPTY pack, should collapse to f() and
-resolve.  An empty deduced parameter pack is not recorded during deduction, so
-the trailing-return pack expansion is not collapsed and decltype(invk(...))
-fails vacuously.  Affects both the plain and forwarding-cast forms.  Flip to
-CORE once an empty deduced pack is recorded.  N5008 [temp.variadic]/5,7.
+expansion f(a...), deduced with an EMPTY pack, collapses to f() and resolves.
+An empty deduced parameter pack (recorded nowhere by deduction because the
+argument list is exhausted before the pack) is now recorded with size 0, so the
+trailing-return pack expansion collapses to zero arguments.  Applies to both the
+plain and forwarding-cast forms.  N5008 [temp.variadic]/5,7,
+[temp.arg.explicit]/4.
