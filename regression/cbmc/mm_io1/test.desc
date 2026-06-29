@@ -8,4 +8,10 @@ main.c
 --
 ^warning: ignoring
 --
-Broken under --wide-pointer-encoding: memory-mapped I/O dispatch not yet supported. Needs further work.
+Partially broken under --wide-pointer-encoding. Reads of device addresses
+are now routed to the handler (is_integer_address recognises the integer
+address; see regression test mm_io2). The write `p[0]=2` to the device
+address, however, can corrupt a real object the solver places at that flat
+address, because the wide encoding deliberately lets integer addresses
+alias real objects (issue #8200) and has no notion yet of valid
+integer-address regions. Full support awaits issue #6747's --mmio-region.

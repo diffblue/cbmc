@@ -209,6 +209,31 @@ reconstruction by:
 - adding a validity clause requiring `obj` to equal *some* known object (the
   disjunction of all `obj == i`).
 
+#### Dereferencing an integer-derived pointer
+
+Reconstruction recovers a *pointer value*; actually dereferencing one (`*p`
+where `p` came from an integer) is handled earlier, in goto-symex, by
+`value_set_dereferencet`. For an integer-to-pointer cast the points-to
+analysis cannot name a target, so the pointer's value set is just the
+abstract `integer_address` object. The standard encoding turns such a
+dereference into an access to the single global memory array
+`__CPROVER_memory`. The wide encoding instead dispatches over the *known*
+objects: when `integer_address` is the only value-set entry, it enumerates
+the addressable symbols and, for each, emits a guarded read
+
+```
+base <= addr < base + size   ?   byte_extract(object, addr - base)
+```
+
+so the flat address selects the object whose `[base, base + size)` range
+contains it. Only sized, non-`code`, non-pointer-containing lvalue objects
+are considered -- pointer-containing objects are left to the
+backward-constraint refinement, which avoids `byte_extract` width mismatches
+-- and the `byte_extract` source is the L1-renamed SSA symbol so that
+constant propagation does not corrupt its width. The scan is `O(#symbols)`
+per such dereference, but only fires for integer-address-only dereferences
+and is cheap in practice (a few hundred globals add roughly 0.1s).
+
 ### Byte Operations
 
 Byte-extract and byte-update on pointer types operate on the platform-width
@@ -259,6 +284,26 @@ The wide encoding creates 3× wider pointer bitvectors, increasing
 the SAT formula size. Typical overhead is 1.5× on the regression
 suite. Programs with many integer-to-pointer casts may be slower
 due to the backward constraint refinement.
+
+## Limitations
+
+### Memory-mapped I/O
+
+Memory-mapped I/O is *partially* supported. The `__CPROVER_mm_io_r` /
+`__CPROVER_mm_io_w` hooks intercept accesses whose pointer satisfies
+`is_integer_address` (e.g. a device register at `0x10`). The wide encoding
+recognises such pointers -- a constant integer address has a dedicated
+integer-address object -- so device **reads** are correctly routed to the
+handler (see `regression/cbmc/mm_io2`).
+
+Device **writes** are not yet sound, however. A write to a device address
+is still applied to memory after the handler call, and because the wide
+encoding deliberately lets an integer address alias a real object (issue
+#8200) the solver may place a real object at the device address and have the
+write corrupt it. Keeping device addresses disjoint from real objects
+requires a notion of valid integer-address regions, which is the subject of
+issue #6747's `--mmio-region` option. Until then `regression/cbmc/mm_io1`
+(which writes to a device register) remains tagged `no-wide-pointer-encoding`.
 
 ## Command-Line Options
 

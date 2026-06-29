@@ -2028,6 +2028,13 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     convert_is_dynamic_object(to_unary_expr(expr));
   }
+  else if(expr.id() == ID_is_integer_address)
+  {
+    // The SMT backend does not use the wide pointer encoding's dedicated
+    // integer-address objects, so lower to the standard same_object-based
+    // definition (which it can encode directly).
+    convert_expr(integer_address(to_unary_expr(expr).op()));
+  }
   else if(expr.id() == ID_is_invalid_pointer)
   {
     const auto &op = to_unary_expr(expr).op();

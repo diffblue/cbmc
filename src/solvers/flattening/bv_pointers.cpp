@@ -290,6 +290,38 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
       return l;
     }
   }
+  else if(expr.id() == ID_is_integer_address)
+  {
+    if(operands.size() == 1 && operands[0].type().id() == ID_pointer)
+    {
+      // Under the standard encoding an integer address is the NULL object's
+      // id with a non-zero offset, so the same_object-based expansion works.
+      if(!wide_pointer_encoding)
+        return convert(integer_address(operands[0]));
+
+      // Under the wide encoding integer addresses have their own dedicated
+      // objects (see convert_pointer_type); recognise the pointer as an
+      // integer address iff its object is one of them. convert_bv first so
+      // that a constant integer-address operand has been registered.
+      const bvt &bv = convert_bv(operands[0]);
+      const pointer_typet &type = to_pointer_type(operands[0].type());
+      const bvt object_bv = object_literals(bv, type);
+      const std::size_t object_bits = get_object_width(type);
+
+      bvt matches;
+      matches.reserve(integer_address_objects.size());
+      for(const auto &obj : integer_address_objects)
+      {
+        const bvt obj_bv = bv_utils.build_constant(obj, object_bits);
+        bvt eq;
+        eq.reserve(object_bits);
+        for(std::size_t i = 0; i < object_bits; ++i)
+          eq.push_back(prop.lequal(object_bv[i], obj_bv[i]));
+        matches.push_back(prop.land(eq));
+      }
+      return matches.empty() ? const_literal(false) : prop.lor(matches);
+    }
+  }
   else if(expr.id()==ID_lt || expr.id()==ID_le ||
           expr.id()==ID_gt || expr.id()==ID_ge)
   {
