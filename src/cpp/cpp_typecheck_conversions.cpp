@@ -1910,7 +1910,15 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
           sfinae_contextt sfinae_guard{*this};
           exprt tmp_expr;
           exprt::operandst ops;
-          ops.push_back(expr);
+          // Wrap the source as already-typechecked: cpp_constructor's
+          // argument-typecheck step (typecheck_expr) would otherwise
+          // re-traverse a struct-typed prvalue source -- e.g. a lambda
+          // closure passed as a `side_effect` -- and abort with
+          // "unexpected expression: struct" in
+          // c_typecheck_baset::typecheck_expr_main, spuriously dropping a
+          // valid user-defined conversion through a converting-constructor
+          // template (the same guard used for the initializer_list path).
+          ops.push_back(already_typechecked_exprt{expr});
           new_temporary(expr.source_location(), to, ops, tmp_expr);
           in_template_conversion = false;
           // [class.conv.ctor]/2 + [over.match.copy]: only
