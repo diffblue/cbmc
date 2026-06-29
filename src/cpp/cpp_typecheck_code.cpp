@@ -1580,6 +1580,70 @@ void cpp_typecheckt::check_default_constructor_access(
 
 void cpp_typecheckt::typecheck_member_initializer(codet &code)
 {
+  // [class.base.init], N5008 [temp.variadic]: a mem-initializer-id that is a
+  // template-id (e.g. `_Tuple_impl<I+1, _Tail...>`) denotes a base class.  Its
+  // non-type arguments (such as `I+1`) must be evaluated and its type packs
+  // expanded -- exactly as the corresponding base-specifier, or a typedef of
+  // the same id, is.  Resolving the syntactic template-id directly below (with
+  // `I` still an unsubstituted name, so `I+1` unfolded) mis-binds to the
+  // enclosing specialization or fails to bind, leaving the initializer
+  // unconverted (it then reaches symbolic execution as a raw member_initializer
+  // and aborts).  In this instantiated context the id type-checks to the
+  // concrete base subobject type, so resolve it as a type and rewrite the
+  // initializer to the base's unqualified name plus #base_type, mirroring an
+  // implicit base initializer; the resolve below then scopes to that base.
+  {
+    const cpp_namet &member0 = to_cpp_name(code.find(ID_member));
+    if(member0.has_template_args() && code.find("#base_type").is_nil())
+    {
+      const source_locationt member_loc = member0.source_location();
+      const irep_idt member_base_name = member0.get_base_name();
+      // Find the enclosing class's direct base whose name matches the
+      // mem-initializer-id.  The base subobject's concrete type (with its
+      // parameter pack already fully expanded in the base-specifier list) is
+      // the authoritative type to initialise -- re-type-checking the syntactic
+      // template-id here would instead bind the pack to a single element (the
+      // pack is collapsed in the constructor body's template map), yielding the
+      // wrong base and an arity mismatch.
+      const exprt &this_e = cpp_scopes.current_scope().this_expr;
+      typet base_type;
+      base_type.make_nil();
+      std::size_t n_matches = 0;
+      if(this_e.is_not_nil() && this_e.type().id() == ID_pointer)
+      {
+        const typet &class_tag = to_pointer_type(this_e.type()).base_type();
+        if(class_tag.id() == ID_struct_tag)
+        {
+          const namespacet ns(symbol_table);
+          const auto &class_type = ns.follow_tag(to_struct_tag_type(class_tag));
+          for(const auto &b : class_type.bases())
+          {
+            if(b.type().id() != ID_struct_tag)
+              continue;
+            const symbolt *bsym = symbol_table.lookup(
+              to_struct_tag_type(b.type()).get_identifier());
+            if(bsym != nullptr && bsym->base_name == member_base_name)
+            {
+              base_type = b.type();
+              ++n_matches;
+            }
+          }
+        }
+      }
+      // Only rewrite when the base is unambiguous by name.  If a class derives
+      // from two specializations of the same template, the explicit template
+      // arguments disambiguate and must be resolved the normal way.
+      if(n_matches == 1 && base_type.id() == ID_struct_tag)
+      {
+        const symbolt &base_symbol =
+          lookup(to_struct_tag_type(base_type).get_identifier());
+        cpp_namet base_cppname(base_symbol.base_name, member_loc);
+        code.add("#base_type") = base_type;
+        code.add(ID_member) = base_cppname;
+      }
+    }
+  }
+
   const cpp_namet &member = to_cpp_name(code.find(ID_member));
 
   // Let's first typecheck the operands.
@@ -1591,6 +1655,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
       it->set(ID_C_array_ini, true);
   }
 
+  // re-read the member: it may have been rewritten just above
   // The initializer may be a data member (non-type)
   // or a parent class (type).
   // We ask for VAR only, as we get the parent classes via their
