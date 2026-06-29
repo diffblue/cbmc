@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ static_cast void\* -> const function-pointer\*: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [expr.static.cast]/13, [conv.qual]: static_cast from a (cv) void* to a
+pointer-to-T is valid when the target is at least as cv-qualified.  This must
+hold when T is a function pointer (const void* -> const FP*).
+cast_away_constness now special-cases a void* source symmetrically to a void*
+target, so the (valid) cast is accepted.  Underlies std::function's
+_Base_manager::_M_get_pointer.
