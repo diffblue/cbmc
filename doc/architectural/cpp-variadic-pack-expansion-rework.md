@@ -538,12 +538,17 @@ any of them.
   call-argument's type.  N is the unique non-zero deduced pack size; all-empty
   ⇒ drop, ambiguous ⇒ untouched.  Verified N = 1..3, plain and cast forms.
 
-* **`cpp11_trailing_return_empty_pack` — new KNOWNBUG (N == 0).** An *empty*
-  deduced parameter pack is recorded nowhere during deduction (the argument list
-  is exhausted before the trailing pack is reached), so `f(a...)` deduced with
-  zero pack arguments is not collapsed to `f()` and the return type fails to
-  resolve.  This empty-pack edge affects *both* the plain and forwarding-cast
-  forms and lives in the empty-pack deduction path, not the expander.
+* **`cpp11_trailing_return_empty_pack` — FIXED, now CORE (N == 0).** An *empty*
+  deduced parameter pack was recorded nowhere during deduction (the argument
+  list is exhausted before the trailing pack is reached; the pack kept only its
+  `build_unassigned` placeholder), so `f(a...)` deduced with zero pack arguments
+  was not collapsed to `f()` and the return type failed to resolve.
+  `guess_function_template_args` now records such an unbound trailing pack with
+  `pack_size_map` size 0 (treating the `ID_unassigned` placeholder as unbound,
+  per [temp.deduct.call], [temp.arg.explicit]/4 Note 1), so
+  `expand_call_argument_packs` collapses the trailing-return pack expansion to
+  zero arguments.  Applies to both the plain and forwarding-cast forms; verified
+  for free and member function templates and that `sizeof...` stays correct.
 
 * **Real multi-argument `std::function` (`std_function.h:435`) — still fails.**
   The synthetic chain above is fixed, but the real libstdc++ converting
@@ -552,10 +557,11 @@ any of them.
   match for symbol 'function'". A separate, deeper layer; the dog-food
   `make_bvrep` files remain blocked on it.
 
-Net: the trailing-return decltype propagation is resolved by reaching the
-type-pack inside a reference, and a value-pack expansion with no type-pack
-reference, in the shared `expand_call_argument_packs` (so the result both
-elaborates in deduction and propagates through instantiation).  The unified
-`expand_pack` primitive remains a worthwhile *consolidation*.  Remaining pack
-gaps: the empty deduced pack (N == 0) in a trailing-return decltype, and the
-real libstdc++ `std::function` `_Callable` machinery.
+Net: the trailing-return decltype is fully handled across pack shapes -- a
+type-pack nested inside a reference, a value-pack with no type-pack reference,
+and an empty (N == 0) deduced pack -- via the shared `expand_call_argument_packs`
+plus the empty-pack recording in deduction (so the result both elaborates in
+deduction and propagates through instantiation).  The unified `expand_pack`
+primitive remains a worthwhile *consolidation*.  The main remaining pack gap is
+the real libstdc++ `std::function` `_Callable`/`__is_invocable_r` machinery
+(`std_function.h:435`), on which the `make_bvrep` dog-food files are blocked.
