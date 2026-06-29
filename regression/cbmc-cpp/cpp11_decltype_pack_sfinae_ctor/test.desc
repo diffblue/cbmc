@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ two-arg-pack SFINAE constructor selected: SUCCESS$
@@ -10,8 +10,10 @@ main.cpp
 ^CONVERSION ERROR$
 --
 A converting constructor SFINAE-constrained by a decltype that expands a
-two-or-more-element pack (declval<A>()...) is dropped, so overload resolution
-reports "found no match" and construction fails (vacuous proof).  This is the
-reduction of multi-argument std::function construction and of the make_bvrep
-dog-food failure.  Flip to CORE once multi-element pack expansion in a
-decltype/unevaluated SFINAE operand is implemented.
+two-or-more-element pack (declval<A>()...) must be considered: the parser now
+preserves the pack-expansion ellipsis on a function-call argument
+([temp.variadic]/5) and template_mapt::apply expands it into one argument per
+deduced element before the decltype operand is type-checked.  Previously the
+ellipsis was discarded, the bare pack reference was rejected, overload
+resolution reported "found no match", and construction failed silently (a
+vacuous proof).
