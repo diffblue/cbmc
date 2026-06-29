@@ -255,11 +255,22 @@ void cpp_typecheckt::typecheck_method_bodies()
             // A pack-expansion use is detected either by a preserved
             // ID_ellipsis marker on the pattern (brace-init / member-init
             // contexts) or, in a function-call argument list -- where the
-            // parser drops the `...` -- by a reference to the pack base name
-            // (a parameter pack may only legally appear in a pack expansion,
-            // so any use of the base name is one).
+            // parser may drop the `...` -- by a *bare* reference to the pack
+            // base name (a parameter pack may only legally appear in a pack
+            // expansion, so a bare use of the base name is one).  The
+            // bare-cpp_name restriction is essential: an argument that merely
+            // *contains* the pack nested inside a larger expression -- e.g.
+            // `fsum(rest...)` as the initializer expression of a member
+            // initializer `sum(fsum(rest...))` -- is a *single* argument whose
+            // own pack expansion sits on the inner call's argument (and carries
+            // its own ID_ellipsis); expanding the outer argument per element
+            // here would wrongly turn `sum(fsum(rest...))` into
+            // `sum(fsum(rest$0), fsum(rest$1))`.  Such nested expansions are
+            // reached by the recursion below and expanded at their own level.
             irep_idt base;
-            if(child.get_bool(ID_ellipsis) || is_arg_list)
+            if(
+              child.get_bool(ID_ellipsis) ||
+              (is_arg_list && child.id() == ID_cpp_name))
               base = ref_base(child);
             if(!base.empty())
             {
@@ -418,6 +429,146 @@ void cpp_typecheckt::typecheck_method_bodies()
               subs.end());
           }
         }
+      }
+    }
+
+    // N5008 [temp.variadic]/5,7: expand the body uses of a *function
+    // template's own* value parameter pack (e.g. the `ts` in
+    // `template<class T, class... Ts> R f(T t, Ts... ts) { g(ts...); }`).
+    // Unlike a class parameter pack -- whose body uses are expanded by the
+    // `#expanded_param_packs` block above using the names that
+    // typecheck_compound_declarator replicated -- a function template's own
+    // pack is deduced per call and its body is drained here; for a member
+    // function template that body is *not* otherwise expanded (a free function
+    // template's body is expanded in instantiate_template / by the call
+    // resolver), so a pack-expansion call argument such as `g(ts...)` keeps
+    // its `...` and fails to resolve ("symbol 'ts' is unknown").
+    //
+    // Drive the expansion from the *instantiated function's actual
+    // parameters*, which are authoritative:
+    //   * a call argument carrying ID_ellipsis whose referenced name `S`
+    //     matches a single parameter `S` is a single-element pack -> strip the
+    //     ellipsis (`g(ts...)` -> `g(ts)`);
+    //   * one whose referenced name matches replicated parameters `S$0..S$k`
+    //     (N >= 2) expands to one argument per parameter, `S` renamed to `S$i`;
+    //   * one whose referenced name matches *no* parameter is a pack that was
+    //     deduced empty (N == 0) -> drop the argument ([temp.variadic]/7).
+    // Acts only on function-template instances (a `#fn_template_type` whose
+    // trailing template parameter is a pack), and only on arguments that still
+    // carry `...` (class-pack and struct_tag uses had theirs removed above),
+    // so other contexts are unaffected.
+    {
+      const irept &fnt = method_symbol.type.find(irep_idt{"#fn_template_type"});
+      bool own_pack = false;
+      if(fnt.is_not_nil())
+      {
+        const auto &tps =
+          static_cast<const template_typet &>(fnt).template_parameters();
+        if(!tps.empty() && tps.back().get_bool(ID_ellipsis))
+          own_pack = true;
+      }
+      if(own_pack && method_symbol.type.id() == ID_code)
+      {
+        // Group the current parameters by short name: an exact name maps to
+        // itself; a replicated `stem$idx` name is collected under `stem`.
+        const auto short_name = [](const irep_idt &id) -> std::string
+        {
+          const std::string s = id2string(id);
+          const auto p = s.rfind("::");
+          return p != std::string::npos ? s.substr(p + 2) : s;
+        };
+        std::set<std::string> exact_params;
+        std::map<std::string, std::map<std::size_t, std::string>> indexed;
+        for(const auto &prm : to_code_type(method_symbol.type).parameters())
+        {
+          const std::string pn = short_name(prm.get_identifier());
+          const auto dollar = pn.rfind('$');
+          if(
+            dollar != std::string::npos && dollar + 1 < pn.size() &&
+            pn.find_first_not_of("0123456789", dollar + 1) == std::string::npos)
+            indexed[pn.substr(0, dollar)][std::stoul(pn.substr(dollar + 1))] =
+              pn;
+          else
+            exact_params.insert(pn);
+        }
+
+        // Rename every short name `from` to `to` within a node.
+        std::function<void(irept &, const std::string &, const irep_idt &)>
+          rename = [&](irept &n, const std::string &from, const irep_idt &to)
+        {
+          if(n.id() == ID_name && short_name(n.get(ID_identifier)) == from)
+            n.set(ID_identifier, to);
+          for(auto &s : n.get_sub())
+            rename(s, from, to);
+          for(auto &ns : n.get_named_sub())
+            rename(ns.second, from, to);
+        };
+
+        // The pack stem a pattern references: the first short name (matching
+        // an exact or replicated parameter) found anywhere in the argument.
+        std::function<std::string(const irept &)> referenced_stem =
+          [&](const irept &n) -> std::string
+        {
+          if(n.id() == ID_name)
+          {
+            const std::string s = short_name(n.get(ID_identifier));
+            if(exact_params.count(s) || indexed.count(s))
+              return s;
+          }
+          for(const auto &s : n.get_sub())
+            if(std::string r = referenced_stem(s); !r.empty())
+              return r;
+          for(const auto &ns : n.get_named_sub())
+            if(std::string r = referenced_stem(ns.second); !r.empty())
+              return r;
+          return std::string{};
+        };
+
+        std::function<void(irept &)> expand_own = [&](irept &node)
+        {
+          if(node.id() == ID_arguments)
+          {
+            irept::subt &args = node.get_sub();
+            irept::subt out;
+            for(auto &arg : args)
+            {
+              if(!arg.get_bool(ID_ellipsis))
+              {
+                expand_own(arg);
+                out.push_back(arg);
+                continue;
+              }
+              const std::string stem = referenced_stem(arg);
+              if(stem.empty())
+                continue; // empty pack: drop ([temp.variadic]/7)
+              if(indexed.count(stem))
+              {
+                for(const auto &kv : indexed.at(stem))
+                {
+                  irept copy = arg;
+                  copy.remove(ID_ellipsis);
+                  rename(copy, stem, kv.second);
+                  expand_own(copy);
+                  out.push_back(copy);
+                }
+              }
+              else
+              {
+                // single-element pack: strip the ellipsis, keep the name
+                arg.remove(ID_ellipsis);
+                expand_own(arg);
+                out.push_back(arg);
+              }
+            }
+            args.swap(out);
+          }
+          else
+            for(auto &s : node.get_sub())
+              expand_own(s);
+          for(auto &ns : node.get_named_sub())
+            expand_own(ns.second);
+        };
+        expand_own(static_cast<irept &>(body));
       }
     }
 
