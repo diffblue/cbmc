@@ -170,6 +170,47 @@ operand selecting the user-defined conversion). Tracked by KNOWNBUG
 expands the class pack in its default-template-argument `decltype`. Belongs with
 Phase 6 (member/constructor contexts).
 
+#### Update 2026-06-29 — partial fix landed
+
+Probing showed the constructor *does* reach `template_function_instance` and
+its default-argument SFINAE evaluator (`cpp_typecheck_resolve.cpp`); the operand
+`decltype(declval<F&>()(declval<A>()...))` arrives with the pack-expansion
+**ellipsis discarded** — `rFunctionArguments` (`parse.cpp`) parsed `...` after a
+function-call argument and dropped it (a `// TODO`). A value parameter pack
+survives this (it is recovered by name during body expansion) but a type-pack
+expression in a `decltype` has no such fallback, so `declval<A>()` was left as a
+bare pack reference and rejected.
+
+Fixed in two parts (commit: "expand function-call argument packs in decltype
+operands"):
+
+* `rFunctionArguments` now records the ellipsis as `ID_ellipsis` on the
+  argument ([temp.variadic]/5).
+* `template_mapt::apply`, when substituting into a `decltype` operand, expands
+  each `ID_ellipsis`-marked call argument into one argument per deduced element
+  of the referenced type pack (zero for an empty pack); arguments not
+  referencing a deduced type pack are untouched, so value packs and other
+  contexts are unaffected. The constructor default-argument site substitutes
+  before type-checking when such a pack is present.
+
+This resolves the **direct** form and the **nested-trait** form (the libstdc++
+`__invoke_result<F,A...>::type = decltype(declval<F>()(declval<A>()...))`
+shape): `cpp11_decltype_pack_sfinae_ctor` and
+`cpp11_decltype_pack_nested_trait_ctor` are CORE and verify non-vacuously. Both
+regression suites pass with no regressions.
+
+**Still open** (KNOWNBUG `cpp11_decltype_pack_variadic_invoke_ctor`): real
+libstdc++ routes the invocability check through the *variadic helper*
+`std::__invoke`, i.e.
+`__invoke_result<F,A...>::type = decltype(std::__invoke(declval<F>(), declval<A>()...))`.
+After the call-argument pack is expanded, the resulting call is to a **variadic
+function template** whose own pack must be deduced from the two-or-more expanded
+arguments, and whose trailing-return `decltype(f(args...))` must then be
+expanded — all inside an unevaluated operand during constructor SFINAE. That
+nested function-template pack deduction is not yet performed for `N >= 2`, so a
+real multi-argument `std::function` (and the `make_bvrep` dog-food files) still
+fail. This is the next Phase-6 step.
+
 ### The motivating chain (`std::erase_if`)
 
 `std::erase_if(v, pred)` -> `std::__remove_if(..., __ops::__pred_iter(std::ref(pred)))`.
