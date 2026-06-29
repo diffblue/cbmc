@@ -6025,6 +6025,28 @@ void cpp_typecheck_resolvet::deduce_function_parameter_pack(
   // caller's empty-pack handling encodes it as a zero-length expansion.
 }
 
+/// True if \p n contains a function-call argument marked as a pack expansion
+/// (ID_ellipsis), so the default-argument operand must be expanded (by the
+/// template map's apply()) before it is type-checked ([temp.variadic]/5).
+static bool contains_call_argument_pack(const irept &n)
+{
+  if(n.id() == ID_side_effect && n.get(ID_statement) == ID_function_call)
+  {
+    for(const auto &child : n.get_sub())
+      if(child.id() == ID_arguments)
+        for(const auto &a : child.get_sub())
+          if(a.get_bool(ID_ellipsis))
+            return true;
+  }
+  for(const auto &s : n.get_sub())
+    if(contains_call_argument_pack(s))
+      return true;
+  for(const auto &ns : n.get_named_sub())
+    if(contains_call_argument_pack(ns.second))
+      return true;
+  return false;
+}
+
 /// Deduce template arguments for a function template from a function call.
 ///
 /// Implements [temp.deduct.call]: for each function template parameter type P
@@ -6687,8 +6709,33 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
               cpp_typecheck.cpp_scopes.id_map[template_symbol.name];
             if(tscope != nullptr)
               cpp_typecheck.cpp_scopes.go_to(*tscope);
-            cpp_typecheck.typecheck_type(default_type);
-            cpp_typecheck.template_map.apply(default_type);
+            // N5008 [temp.variadic]/5: if the default argument's operand
+            // contains a function-call argument pack expansion over the
+            // enclosing class parameter pack (e.g. a constructor's
+            // `decltype(declval<F&>()(declval<A>()...))` SFINAE constraint),
+            // expand it into one argument per deduced element and substitute
+            // the deduced template arguments BEFORE type-checking the
+            // operand.  Otherwise the bare pack reference is rejected (only
+            // the single-element convenience binding works), so e.g. a
+            // multi-argument std::function fails to construct.  The plain
+            // (no-pack) path keeps the original typecheck-then-apply order.
+            if(contains_call_argument_pack(default_type))
+            {
+              // The default argument's operand contains a function-call
+              // argument pack expansion over the enclosing class parameter
+              // pack.  apply() expands it (and substitutes the deduced
+              // arguments); run it BEFORE type-checking so the operand is
+              // concrete -- otherwise the bare pack reference is rejected and
+              // a necessary user-defined conversion is silently dropped (e.g.
+              // a multi-argument std::function fails to construct).
+              cpp_typecheck.template_map.apply(default_type);
+              cpp_typecheck.typecheck_type(default_type);
+            }
+            else
+            {
+              cpp_typecheck.typecheck_type(default_type);
+              cpp_typecheck.template_map.apply(default_type);
+            }
             args[i] = exprt(ID_type);
             args[i].type() = default_type;
             cpp_typecheck.template_map.set(param, args[i]);
