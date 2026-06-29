@@ -1668,6 +1668,44 @@ void cpp_typecheck_resolvet::filter(
   }
 }
 
+/// N5008 [over.match.funcs]/5, [over.ics.ref]: for a call on a non-const
+/// object, a const member function's implicit object parameter binding adds a
+/// cv-qualification and ranks worse than a non-const member function's.  For a
+/// member function *template* candidate that is still a
+/// `template_function_instance` (the `this` parameter, with its const member
+/// qualifier, is added only when the template is instantiated), the deduced
+/// function type carries no `this` parameter, so `disambiguate_functions`
+/// cannot see the const member-qualifier and ranks the const and non-const
+/// overloads equally -- letting the const overload be (mis)selected for a
+/// non-const object.  Recover the qualifier from the candidate template's
+/// declarator (`ID_method_qualifier`) and return the cv penalty that the
+/// instantiated overload would have received: 1 for a const member function
+/// called on a non-const object, 0 otherwise.
+unsigned cpp_typecheck_resolvet::member_template_const_penalty(
+  const exprt &cand,
+  const cpp_typecheck_fargst &fargs)
+{
+  if(
+    cand.id() != ID_template_function_instance || !fargs.has_object ||
+    fargs.operands.empty())
+    return 0;
+  const irep_idt tmpl = cand.type().get(ID_C_template);
+  if(tmpl.empty())
+    return 0;
+  const symbolt *tsym = cpp_typecheck.symbol_table.lookup(tmpl);
+  if(tsym == nullptr || tsym->type.id() != ID_cpp_declaration)
+    return 0;
+  const cpp_declarationt &decl = to_cpp_declaration(tsym->type);
+  if(decl.declarators().empty())
+    return 0;
+  const typet &mq = static_cast<const typet &>(
+    decl.declarators().front().find(ID_method_qualifier));
+  const bool member_const = cpp_typecheck.has_const(mq);
+  const bool object_const =
+    fargs.operands.front().type().get_bool(ID_C_constant);
+  return (member_const && !object_const) ? 1 : 0;
+}
+
 void cpp_typecheck_resolvet::exact_match_functions(
   resolve_identifierst &identifiers,
   const cpp_typecheck_fargst &fargs)
@@ -1686,6 +1724,8 @@ void cpp_typecheck_resolvet::exact_match_functions(
     unsigned distance;
     unsigned cv_distance = 0;
     if(disambiguate_functions(old_id, distance, fargs, &cv_distance))
+    {
+      cv_distance += member_template_const_penalty(old_id, fargs);
       // A reference binding differing from the argument only in top-level
       // cv-qualification is an identity conversion ([over.ics.ref]); its
       // cv tie-breaker ([over.ics.rank]/3.2.6) is reported separately in
@@ -1694,6 +1734,7 @@ void cpp_typecheck_resolvet::exact_match_functions(
       // const/non-const member-function overload selection).
       if(distance + cv_distance <= 0)
         identifiers.push_back(old_id);
+    }
   }
 }
 
@@ -1714,6 +1755,7 @@ void cpp_typecheck_resolvet::disambiguate_functions(
 
     if(disambiguate_functions(old_id, args_distance, fargs, &cv_distance))
     {
+      cv_distance += member_template_const_penalty(old_id, fargs);
       std::size_t template_distance = 0;
 
       if(!old_id.type().get(ID_C_template).empty())

@@ -108,6 +108,15 @@ protected:
     resolve_identifierst &identifiers,
     const cpp_typecheck_fargst &fargs);
 
+  /// N5008 [over.match.funcs]/5: cv penalty (0 or 1) for selecting a const
+  /// member function *template* candidate when called on a non-const object,
+  /// recovered from the candidate template's ID_method_qualifier (the deduced
+  /// function type of an uninstantiated template_function_instance carries no
+  /// `this` parameter, so disambiguate_functions cannot rank it).
+  unsigned member_template_const_penalty(
+    const exprt &cand,
+    const cpp_typecheck_fargst &fargs);
+
   void filter(
     resolve_identifierst &identifiers,
     const wantt want);
