@@ -26,7 +26,7 @@ jobs:
           version: ${{ env.cvc5-version }}
       - name: Restore ccache
         id: restore-ccache
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         with:
           path: .ccache
           key: ${{ runner.os }}-24.04-Release-${{ github.ref }}-${{ github.sha }}-RELEASEPKG
@@ -73,7 +73,7 @@ jobs:
 
       - name: Save ccache
         if: always()
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@v6
         with:
           path: .ccache
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
@@ -97,7 +97,7 @@ jobs:
           version: ${{ env.cvc5-version }}
       - name: Restore ccache
         id: restore-ccache
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         with:
           path: .ccache
           key: ${{ runner.os }}-24.04-Arm-Release-${{ github.ref }}-${{ github.sha }}-RELEASEPKG
@@ -144,7 +144,7 @@ jobs:
 
       - name: Save ccache
         if: always()
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@v6
         with:
           path: .ccache
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
@@ -168,7 +168,7 @@ jobs:
           version: ${{ env.cvc5-version }}
       - name: Restore ccache
         id: restore-ccache
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         with:
           path: .ccache
           key: ${{ runner.os }}-22.04-Release-${{ github.ref }}-${{ github.sha }}-RELEASEPKG
@@ -215,7 +215,7 @@ jobs:
 
       - name: Save ccache
         if: always()
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@v6
         with:
           path: .ccache
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
@@ -265,7 +265,7 @@ jobs:
         id: cache-key
         run: echo "month=$(Get-Date -Format 'yyyy-MM')" >> $env:GITHUB_OUTPUT
       - name: Cache Chocolatey packages
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: |
             C:\ProgramData\chocolatey\lib\winflexbison3
@@ -308,7 +308,7 @@ jobs:
           echo "$(Split-Path -Path $(Get-ChildItem -Path "${env:ProgramFiles(x86)}\Windows Kits\10\App Certification Kit\signtool.exe"))" >> $env:GITHUB_PATH
       - name: Restore ccache
         id: restore-ccache
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         with:
           path: .ccache
           key: ${{ runner.os }}-msbuild-${{ github.ref }}-${{ github.sha }}-RELEASEPKG
@@ -378,7 +378,7 @@ jobs:
 
       - name: Save ccache
         if: always()
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@v6
         with:
           path: .ccache
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}

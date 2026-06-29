@@ -34,7 +34,7 @@ jobs:
         run: cargo --version
       - name: Restore ccache
         id: restore-ccache
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         with:
           path: .ccache
           key: ${{ runner.os }}-22.04-cmake-clang-${{ github.ref }}-${{ github.sha }}-PR
@@ -71,7 +71,7 @@ jobs:
 
       - name: Save ccache
         if: always()
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@v6
         with:
           path: .ccache
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
@@ -87,7 +87,7 @@ jobs:
         run: cargo --version
       - name: Restore ccache
         id: restore-ccache
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         with:
           path: .ccache
           key: ${{ runner.os }}-Release-Minisat-${{ github.ref }}-${{ github.sha }}-PR-Rust-API
@@ -117,7 +117,7 @@ jobs:
           CBMC_INCLUDE_DIR=../../${{env.default_include_dir}} CBMC_LIB_DIR=../../${{env.default_build_dir}}/lib CBMC_VERSION=$VERSION cargo test -- --test-threads=1
       - name: Save ccache
         if: always()
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@v6
         with:
           path: .ccache
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
