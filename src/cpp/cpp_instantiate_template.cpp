@@ -5034,17 +5034,31 @@ skip_pack_removal_ft:
                   arg_sub.end(),
                   [&pack_var_name](const irept &a)
                   {
-                    if(a.id() == ID_cpp_name)
+                    // N5008 [temp.variadic]/5: an empty pack expansion yields
+                    // zero arguments.  Drop both a bare value-pack argument
+                    // (`a`) and a pattern argument that is a pack expansion
+                    // referencing the pack (e.g. `static_cast<A&&>(a)...`,
+                    // marked with ID_ellipsis), so `f(static_cast<A&&>(a)...)`
+                    // with an empty pack becomes `f()`.
+                    std::function<bool(const irept &)> refs_pack =
+                      [&](const irept &n) -> bool
                     {
-                      for(const auto &s : a.get_sub())
-                      {
-                        if(
-                          s.id() == ID_name &&
-                          s.get(ID_identifier) == pack_var_name)
+                      if(n.id() == ID_cpp_name)
+                        for(const auto &s : n.get_sub())
+                          if(
+                            s.id() == ID_name &&
+                            s.get(ID_identifier) == pack_var_name)
+                            return true;
+                      for(const auto &s : n.get_sub())
+                        if(refs_pack(s))
                           return true;
-                      }
-                    }
-                    return false;
+                      for(const auto &ns : n.get_named_sub())
+                        if(refs_pack(ns.second))
+                          return true;
+                      return false;
+                    };
+                    const bool bare = a.id() == ID_cpp_name && refs_pack(a);
+                    return bare || (a.get_bool(ID_ellipsis) && refs_pack(a));
                   }),
                 arg_sub.end());
               break;
@@ -5133,6 +5147,26 @@ skip_pack_removal_ft:
         auto &d = static_cast<cpp_declarationt &>(pack_param_template);
         d.declarators().front().type().remove(ID_ellipsis);
       }
+
+      // N5008 [temp.variadic]/5, [dcl.ref]: the name of the type parameter
+      // pack (e.g. `A` in `A&&... a`) and the deduced element type for each
+      // expansion, so a forwarding-reference pack pattern in the body such as
+      // `f(static_cast<A&&>(a)...)` can substitute the k-th deduced type for
+      // `A` in lockstep with `a -> a$k`.
+      irep_idt type_pack_name;
+      {
+        const typet &bt =
+          static_cast<const cpp_declarationt &>(pack_param_template).type();
+        if(
+          bt.id() == ID_cpp_name && bt.get_sub().size() == 1 &&
+          bt.get_sub().front().id() == ID_name)
+          type_pack_name = bt.get_sub().front().get(ID_identifier);
+      }
+      std::vector<typet> pack_elem_types;
+      for(std::size_t k = 0; k < pack_sz; ++k)
+        pack_elem_types.push_back(
+          pack_arguments[k].id() == ID_type ? pack_arguments[k].type()
+                                            : typet{});
 
       std::vector<irep_idt> expanded_names;
       std::vector<irept> expanded_params;
@@ -5236,12 +5270,53 @@ skip_pack_removal_ft:
         };
 
         std::function<void(irept &)> expand_pack;
+        // N5008 [temp.variadic]/5, [dcl.ref]: substitute the type parameter
+        // pack name with a concrete element type wherever it appears as a type
+        // `cpp_name` in a pattern (e.g. the `A` in `static_cast<A&&>(...)`),
+        // used in lockstep with substitute_pack for a forwarding-reference
+        // pack pattern.  Replacing the `cpp_name A` inside the reference node
+        // `A&&` with the deduced element type performs reference collapsing
+        // (e.g. `int` -> `int&&`, `int&` -> `int&`).
+        std::function<void(irept &, const typet &)> subst_type_pack;
+        subst_type_pack =
+          [&type_pack_name, &subst_type_pack](irept &n, const typet &elem)
+        {
+          auto matches = [&type_pack_name](const irept &m) -> bool
+          {
+            if(
+              m.id() != ID_cpp_name || m.get_sub().size() != 1 ||
+              m.get_sub().front().id() != ID_name)
+              return false;
+            const std::string nm =
+              id2string(m.get_sub().front().get(ID_identifier));
+            const auto p = nm.rfind("::");
+            return (p != std::string::npos ? nm.substr(p + 2) : nm) ==
+                   id2string(type_pack_name);
+          };
+          for(auto &s : n.get_sub())
+          {
+            if(matches(s))
+              s = elem;
+            else
+              subst_type_pack(s, elem);
+          }
+          for(auto &ns : n.get_named_sub())
+          {
+            if(matches(ns.second))
+              ns.second = elem;
+            else
+              subst_type_pack(ns.second, elem);
+          }
+        };
         expand_pack = [&expanded_names,
                        &expand_pack,
                        &is_pack_name,
                        &contains_pack_name,
                        &substitute_pack,
-                       &make_name](irept &node)
+                       &make_name,
+                       &type_pack_name,
+                       &pack_elem_types,
+                       &subst_type_pack](irept &node)
         {
           // Expand fold expressions
           if(
@@ -5335,6 +5410,26 @@ skip_pack_removal_ft:
                   // Expand into individual arguments
                   for(const auto &ename : expanded_names)
                     new_args.push_back(make_name(a, ename));
+                }
+                else if(a.get_bool(ID_ellipsis) && contains_pack_name(a))
+                {
+                  // N5008 [temp.variadic]/5: a pack-expansion call argument
+                  // whose pattern CONTAINS (but is not exactly) the value pack
+                  // -- e.g. a perfect-forwarding `static_cast<A&&>(a)...` (the
+                  // body of variadic std::__invoke) -- expands to one argument
+                  // per element.  In the k-th copy substitute the value pack
+                  // `a -> a$k` and, in lockstep, the type pack `A -> ` the k-th
+                  // deduced element type ([dcl.ref] reference collapsing).
+                  for(std::size_t k = 0; k < expanded_names.size(); ++k)
+                  {
+                    irept copy = substitute_pack(a, expanded_names[k]);
+                    copy.remove(ID_ellipsis);
+                    if(
+                      !type_pack_name.empty() && k < pack_elem_types.size() &&
+                      pack_elem_types[k].is_not_nil())
+                      subst_type_pack(copy, pack_elem_types[k]);
+                    new_args.push_back(copy);
+                  }
                 }
                 else
                 {
