@@ -599,14 +599,33 @@ any of them.
      - **2c. `_M_manager` body (open).** With 2a and 2b fixed, single-argument
        `std::function` construction proceeds past `_M_create` to
        `_Function_base::_Base_manager::_M_manager` (the clone/destroy/type_info
-       dispatcher), whose body is *silently* left nil ("no body", no type-check
-       diagnostic; not the `typeid` itself, which converts fine in isolation).
-       Not yet root-caused; the next sub-layer.
+       dispatcher), whose body is *silently* left nil ("no body").  Decomposed:
+       - **2c-i. static_cast void* -> pointer-to-(const) function pointer
+         (FIXED, CORE).** The deepest error was
+         `invalid implicit conversion from 'const void *' to '__decay_t<FP> *'`
+         inside `_M_get_pointer` (`__source._M_access<_Functor*>()`):
+         `cast_away_constness` special-cased only a void* *target*, so a void*
+         *source* cast to `const FP*` (FP a function pointer, a deeper
+         subtype-chain) was mis-ranked as casting away constness and the valid
+         cast ([expr.static.cast]/13) was rejected / produced a type-mismatched
+         result.  Fixed by the symmetric void*-source case in
+         `cast_away_constness`; CORE `cpp11_static_cast_void_to_const_funptr`.
+       - **2c-ii. system-header body guard null-handler fragility (open).**
+         With 2c-i fixed, `_M_manager`'s body converts cleanly when the
+         system-header guard is *disabled*, but is still left nil when it is
+         active: `convert_function` wraps a system-header body in an
+         `sfinae_contextt` (null message handler), which -- as
+         `typecheck_method_bodies` already documents and avoids by using error-
+         count save/restore -- changes error-count-dependent behaviour and makes
+         a nested instantiation spuriously fail.  Aligning `convert_function`'s
+         guard with the count-save/restore approach is the next step, but it is
+         a broad change to system-header diagnostic suppression (regression
+         risk), so deferred.
      `cpp17_functional_basic` (`std::function<int(int,int)> f = add;`) still
      passes only *vacuously* (layer 1 blocks multi-arg construction before these
-     are reached); landing layer 1 needs 2c (and any further `_M_manager`
-     layers) fixed so as not to regress it.
-  The dog-food `make_bvrep` files remain blocked on layer 2 (2c and layer 1).
+     are reached); landing layer 1 needs 2c-ii (and any further layers) fixed so
+     as not to regress it.
+  The dog-food `make_bvrep` files remain blocked on layer 2 (2c-ii and layer 1).
 
 Net: the trailing-return decltype is fully handled across pack shapes -- a
 type-pack nested inside a reference, a value-pack with no type-pack reference,
