@@ -367,6 +367,9 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
     bv_pointers->set_wide_pointer_encoding(true);
   }
 
+  if(options.get_bool_option("model-stack-layout"))
+    bv_pointers->model_stack_layout = true;
+
   if(options.get_option("arrays-uf") == "never")
     bv_pointers->unbounded_array = bv_pointerst::unbounded_arrayt::U_NONE;
   else if(options.get_option("arrays-uf") == "always")
@@ -827,5 +830,15 @@ void parse_solver_options(const cmdlinet &cmdline, optionst &options)
     // reads it during symex (see goto_symex_can_forward_propagate /
     // simplify_expr_with_value_set).
     config.bv_encoding.malloc_may_alias = true;
+  }
+  if(cmdline.isset("model-stack-layout"))
+  {
+    if(!cmdline.isset("wide-pointer-encoding"))
+    {
+      throw invalid_command_line_argument_exceptiont(
+        "--model-stack-layout requires --wide-pointer-encoding",
+        "--model-stack-layout");
+    }
+    options.set_option("model-stack-layout", true);
   }
 }

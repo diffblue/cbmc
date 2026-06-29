@@ -623,6 +623,7 @@ void configt::ansi_ct::set_arch_spec_hppa()
   endianness=endiannesst::IS_BIG_ENDIAN;
   char_is_unsigned=false;
   NULL_is_zero=true;
+  stack_grows_downward = false; // PA-RISC stack grows upward
 
   switch(mode)
   {

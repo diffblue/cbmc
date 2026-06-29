@@ -1779,6 +1779,85 @@ void bv_pointerst::finish_eager_conversion()
       }
     }
 
+    // Stack layout: place stack variables adjacently
+    if(model_stack_layout)
+    {
+      // Collect stack objects (function-scoped, non-dynamic)
+      struct stack_objt
+      {
+        mp_integer number;
+        mp_integer size;
+        irep_idt function;
+        std::size_t index; // declaration order
+      };
+      std::vector<stack_objt> stack_objs;
+
+      std::size_t number = 0;
+      for(auto it = objects.cbegin(); it != objects.cend(); ++it, ++number)
+      {
+        if(object_base_address.find(number) == object_base_address.end())
+          continue;
+        if(integer_address_objects.count(number))
+          continue;
+        const exprt &obj = *it;
+        if(obj.id() != ID_symbol)
+          continue;
+        const irep_idt &id = to_symbol_expr(obj).get_identifier();
+        // Stack objects have "::" in their name (function-scoped)
+        const std::string id_str = id2string(id);
+        auto last_sep = id_str.rfind("::");
+        if(last_sep == std::string::npos || last_sep == 0)
+          continue;
+        // Extract function name
+        auto func_end = id_str.rfind("::", last_sep - 1);
+        irep_idt func = func_end != std::string::npos
+                          ? irep_idt(id_str.substr(0, func_end))
+                          : irep_idt(id_str.substr(0, last_sep));
+
+        auto sz_opt = pointer_offset_size(obj.type(), ns);
+        mp_integer sz =
+          (sz_opt.has_value() && *sz_opt > 0) ? *sz_opt : mp_integer{1};
+        stack_objs.push_back({mp_integer(number), sz, func, stack_objs.size()});
+      }
+
+      // Group by function and add adjacency constraints
+      // (downward growth: later declarations get lower addresses)
+      std::map<irep_idt, std::vector<std::size_t>> by_function;
+      for(std::size_t i = 0; i < stack_objs.size(); ++i)
+        by_function[stack_objs[i].function].push_back(i);
+
+      for(const auto &[func, indices] : by_function)
+      {
+        if(indices.size() < 2)
+          continue;
+        // Adjacent placement: base[i+1] = base[i] + size[i]
+        for(std::size_t j = 0; j + 1 < indices.size(); ++j)
+        {
+          const auto &cur = stack_objs[indices[j]];
+          const auto &next = stack_objs[indices[j + 1]];
+          bvt base_cur = get_object_base_address(cur.number, addr_width);
+          bvt base_next = get_object_base_address(next.number, addr_width);
+
+          if(config.ansi_c.stack_grows_downward)
+          {
+            // Downward growth: base[cur] = base[next] + size[next]
+            // (earlier declarations get higher addresses)
+            bvt end_next = bv_utils.add(
+              base_next, bv_utils.build_constant(next.size, addr_width));
+            for(std::size_t k = 0; k < addr_width; ++k)
+              prop.set_equal(base_cur[k], end_next[k]);
+          }
+          else
+          {
+            // Upward growth: base[next] = base[cur] + size[cur]
+            bvt end_cur = bv_utils.add(
+              base_cur, bv_utils.build_constant(cur.size, addr_width));
+            for(std::size_t k = 0; k < addr_width; ++k)
+              prop.set_equal(base_next[k], end_cur[k]);
+          }
+        }
+      }
+    }
   }
   // Freeze variables created during finish_eager_conversion
   // (non-overlapping constraints, deferred I2P forward constraints)

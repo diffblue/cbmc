@@ -172,6 +172,7 @@ void run_property_decider(
   "(show-points-to-sets)"                                                      \
   "(slice-formula)"                                                            \
   "(wide-pointer-encoding)"                                                    \
+  "(model-stack-layout)"                                                       \
   "(unwinding-assertions)"                                                     \
   "(no-unwinding-assertions)"                                                  \
   "(no-self-loops-to-assumptions)"                                             \
@@ -236,6 +237,9 @@ void run_property_decider(
   " {y--symex-cache-dereferences} \t enable caching of repeated "              \
   "dereferences\n"                                                             \
   " {y--wide-pointer-encoding} \t use flat addresses for pointer "             \
-  "comparison and integer-to-pointer casts\n"
+  "comparison and integer-to-pointer casts\n"                                  \
+  " {y--model-stack-layout} \t place stack variables adjacently with "         \
+  "architecture-appropriate growth direction (requires "                       \
+  "{y--wide-pointer-encoding})\n"
 
 #endif // CPROVER_GOTO_CHECKER_BMC_UTIL_H

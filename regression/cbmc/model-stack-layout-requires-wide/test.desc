@@ -1,0 +1,12 @@
+CORE no-wide-pointer-encoding
+main.c
+--model-stack-layout
+^EXIT=1$
+^SIGNAL=0$
+^.*--model-stack-layout requires --wide-pointer-encoding.*$
+--
+^VERIFICATION
+--
+--model-stack-layout is only meaningful together with --wide-pointer-encoding
+(the stack-layout encoding is gated on wide pointers). Passing it alone must be
+rejected with a usage error rather than silently doing nothing.

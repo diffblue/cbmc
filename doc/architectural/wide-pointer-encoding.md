@@ -116,6 +116,23 @@ The wide encoding allows `malloc` to return the same address after
 and preventing the simplifier from assuming different dynamic objects
 have different addresses.
 
+## Additional Features
+
+### Stack Layout Modeling (`--model-stack-layout`)
+
+When combined with `--wide-pointer-encoding`, this option places stack
+variables adjacently with architecture-appropriate growth direction
+(downward for x86/ARM, upward for HPPA):
+
+```c
+int a, b, c;
+assert(&a > &b);              // Stack growth direction
+assert(&a - &b == sizeof(b)); // Adjacent placement
+char *p = (char *)&a;
+p[sizeof(a)] = 42;
+assert(*(char *)&b == 42);    // Buffer overflow modeling
+```
+
 ## Technical Details
 
 ### Pointer Equality and Comparison
@@ -162,3 +179,6 @@ due to the backward constraint refinement.
 ## Command-Line Options
 
 - `--wide-pointer-encoding`: Enable the wide pointer encoding.
+- `--model-stack-layout`: Place stack variables adjacently with
+  architecture-appropriate growth direction (requires
+  `--wide-pointer-encoding`).

@@ -39,6 +39,16 @@ public:
   endianness_mapt
   endianness_map(const typet &, bool little_endian) const override;
 
+  /// Enable wide pointer encoding that includes a flat integer
+  /// address alongside the object/offset.  This fixes pointer-to-
+  /// integer casts, integer-to-pointer casts, and byte-level
+  /// operations on pointer-containing types.
+  bool wide_pointer_encoding = false;
+
+  /// Model stack layout: place stack variables adjacently in
+  /// declaration order with downward growth direction.
+  bool model_stack_layout = false;
+
   /// Enable (or disable) the wide pointer encoding that includes a flat
   /// integer address alongside the object/offset.  This fixes pointer-to-
   /// integer casts, integer-to-pointer casts, and byte-level operations on
