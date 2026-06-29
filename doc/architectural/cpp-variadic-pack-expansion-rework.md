@@ -211,6 +211,37 @@ nested function-template pack deduction is not yet performed for `N >= 2`, so a
 real multi-argument `std::function` (and the `make_bvrep` dog-food files) still
 fail. This is the next Phase-6 step.
 
+#### Update 2026-06-29 (cont.) — forwarding-reference callee fixed; two layers left
+
+Reducing the variadic `std::__invoke` chain `invk(F&& f, Args&&... a) ->
+decltype(static_cast<F&&>(f)(static_cast<Args&&>(a)...))` peeled off two further
+sub-gaps:
+
+1. **Calling through a reference-typed callee** — FIXED (commit "invoke
+   operator() through a reference-typed callee"; CORE
+   `cpp11_forwarding_ref_callee_call`). `static_cast<F&&>(f)()` /
+   `std::forward<F>(f)()` (the callee form of `std::__invoke`) was modelled as a
+   pointer and mistaken for a function pointer ("expecting code as argument"),
+   returning nondet. A reference-typed callee is now implicitly dereferenced
+   before the call type-dispatch so a class type routes to `operator()`
+   ([expr.call], [over.call.object]). Non-pack forwarding-reference arguments
+   (`f(static_cast<A&&>(a))`, single or several) also work.
+
+2. **Forwarding-reference parameter-pack expansion** — STILL OPEN (KNOWNBUG
+   `cpp11_forwarding_ref_pack_expansion`). The body pack expander
+   (`cpp_instantiate_template`) expands a *bare* value-pack call argument
+   `f(a...)` into `f(a$0, a$1)` but not a *pattern* argument that merely
+   contains the pack, `f(static_cast<A&&>(a)...)`: the type pack `A` is not
+   substituted in lockstep with the value pack `a`, so the forwarded arguments
+   carry the wrong type/value and the call computes the wrong result. A
+   by-value pack `f(a...)` works. This is the body of variadic `std::__invoke`.
+
+So the remaining chain for a real multi-argument `std::function` is: (2)
+forwarding-reference parameter-pack *pattern* expansion (substitute the type
+pack in lockstep), then the variadic helper's trailing-return `decltype`
+expansion, then re-evaluating the nested constraint during the constructor
+SFINAE (`cpp11_decltype_pack_variadic_invoke_ctor`).
+
 ### The motivating chain (`std::erase_if`)
 
 `std::erase_if(v, pred)` -> `std::__remove_if(..., __ops::__pred_iter(std::ref(pred)))`.
