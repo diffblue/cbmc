@@ -3790,6 +3790,18 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 
   // look at type of function
 
+  // N5008 [expr.call]/1, [over.call.object]: when the postfix-expression
+  // denoting the callee is a reference (e.g. the result of
+  // `static_cast<F&&>(f)` / `std::forward<F>(f)`, modelled here as a pointer
+  // carrying the reference flag), it is bound to its referand; the call is on
+  // the referand object.  Dereference it to that lvalue so a class type with
+  // an `operator()` routes to the operator() resolution below instead of being
+  // mistaken for a function pointer (which derefs once and then reports
+  // "expecting code as argument").  A plain reference *parameter* already
+  // yields a referand lvalue, so this only affects reference-typed callee
+  // expressions; non-reference function pointers are unaffected.
+  add_implicit_dereference(expr.function());
+
   if(expr.function().type().id() == ID_pointer)
   {
     if(expr.function().type().find(ID_to_member).is_not_nil())
