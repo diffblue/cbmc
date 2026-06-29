@@ -1,0 +1,17 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ plain value-pack decltype resolves: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+A variadic function template whose trailing-return decltype contains a plain
+by-value value-pack expansion f(a...) -- with no type parameter pack reference
+in the pattern -- is not expanded, so decltype(invk(...)) silently fails
+vacuously.  The forwarding-cast form static_cast<Args&&>(a)... is handled
+because it references the type pack Args.  Flip to CORE once a bare value
+parameter pack is expanded in a trailing-return decltype.

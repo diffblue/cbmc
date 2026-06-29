@@ -17,13 +17,14 @@
 // no match", and the construction passes vacuously (unsound).  A single-element
 // pack works.
 //
-// This is the precise remaining blocker for constructing a multi-argument
+// This was the precise remaining blocker for constructing a multi-argument
 // std::function (and hence for the dog-food make_bvrep failures).
 //
-// KNOWNBUG; flip to CORE once a variadic function template's parameter pack is
-// deduced from a two-or-more-argument call appearing in an unevaluated operand
-// during constructor SFINAE.  Header-free and non-vacuous (assertion 2 must
-// FAIL).
+// Now handled: the variadic helper's trailing-return decltype expands its
+// forwarding-reference pack (expand_call_argument_packs now detects the type
+// pack nested inside `Args&&`), so the nested invoke_result trait elaborates
+// and the constructor's SFINAE constraint is satisfied.  Header-free and
+// non-vacuous (assertion 2 must FAIL).
 
 extern "C" void __CPROVER_assert(int, const char *);
 
