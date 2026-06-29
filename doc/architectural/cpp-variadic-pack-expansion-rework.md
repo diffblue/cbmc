@@ -528,10 +528,22 @@ any of them.
   constructor's SFINAE, so the synthetic multi-argument-`std::function` chain
   verifies non-vacuously.
 
-* **`cpp11_trailing_return_plain_pack` — new KNOWNBUG.** The still-open variant:
-  a plain by-value `f(a...)` trailing-return decltype whose pattern references
-  only the *value* parameter pack `a` (no type pack), so `find` matches nothing
-  and it is not expanded.
+* **`cpp11_trailing_return_plain_pack` — FIXED, now CORE.** The plain by-value
+  `f(a...)` trailing-return decltype, whose pattern references only the *value*
+  parameter pack `a` (no type pack), is now expanded too:
+  `expand_call_argument_packs`, when a `...`-marked call argument matches no
+  type pack, treats it as a value-pack expansion and replicates the pattern to
+  the common deduced pack length ([temp.variadic]/4,5) -- each copy referring
+  to the single in-scope value parameter, whose deduced element type fixes the
+  call-argument's type.  N is the unique non-zero deduced pack size; all-empty
+  ⇒ drop, ambiguous ⇒ untouched.  Verified N = 1..3, plain and cast forms.
+
+* **`cpp11_trailing_return_empty_pack` — new KNOWNBUG (N == 0).** An *empty*
+  deduced parameter pack is recorded nowhere during deduction (the argument list
+  is exhausted before the trailing pack is reached), so `f(a...)` deduced with
+  zero pack arguments is not collapsed to `f()` and the return type fails to
+  resolve.  This empty-pack edge affects *both* the plain and forwarding-cast
+  forms and lives in the empty-pack deduction path, not the expander.
 
 * **Real multi-argument `std::function` (`std_function.h:435`) — still fails.**
   The synthetic chain above is fixed, but the real libstdc++ converting
@@ -541,7 +553,9 @@ any of them.
   `make_bvrep` files remain blocked on it.
 
 Net: the trailing-return decltype propagation is resolved by reaching the
-type-pack inside a reference in the shared `expand_call_argument_packs`. The
-unified `expand_pack` primitive remains a worthwhile *consolidation*. Remaining
-pack gaps: the plain value-pack trailing-return decltype, and the real
-libstdc++ `std::function` `_Callable` machinery.
+type-pack inside a reference, and a value-pack expansion with no type-pack
+reference, in the shared `expand_call_argument_packs` (so the result both
+elaborates in deduction and propagates through instantiation).  The unified
+`expand_pack` primitive remains a worthwhile *consolidation*.  Remaining pack
+gaps: the empty deduced pack (N == 0) in a trailing-return decltype, and the
+real libstdc++ `std::function` `_Callable` machinery.
