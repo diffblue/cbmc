@@ -682,30 +682,59 @@ any of them.
            partial-convert-then-swallow; every header item converts without
            throwing.  The only throw is `_M_manager`'s own body during
            instantiation (triggered from user `main`, not a system path).
-         * Net: under `is_system` attribution the *other* headers' definitions
-           are converted to a silently *different* (and `_M_manager`-incompatible)
-           result -- without any error or swallow -- via some remaining file-path
-           gate that is NOT `sfinae_contextt`.  Both "not-found" gates are
-           excluded: `cpp_typecheck_template.cpp:764` (class template not found)
-           and `cpp_typecheck_using.cpp:135` (using-declaration not found) fire
-           only when a name is genuinely absent, which would *error* in the
-           de-systemised run -- but that run verifies, so the names are found in
-           both attributions and neither gate fires.  The file-path branch of
-           `cpp_typecheck_method_bodies.cpp:596` is ALSO excluded (forcing its
-           non-system code path under full `/usr/include` attribution leaves the
-           bug).  So *every* explicit `is_system`/`/usr/include` gate in the
-           front-end has been ruled out -- yet de-systemising the headers fixes
-           it.  The responsible difference is therefore keyed on source location
-           more subtly than any single guard (e.g. conversion order, lazy-vs-eager
-           body draining, or symbol provenance), not an explicit suppression
-           gate.
-           NEXT (empirical, gate-agnostic): dump and diff the converted symbol
-           table (`--show-symbol-table`) between the system run and the
-           de-systemised run for a minimal failing header set, and find the first
-           symbol whose converted type/value differs; that difference is the
-           proximate cause of `_M_manager`'s body throw.  cvise cannot help here
-           (the no-body signal is output-identical to a trivially-undefined
-           method).
+         * RESOLVED (this session) via the symbol-table-diff next step: the
+           location dependence was a *red herring at the surface*.  Diffing the
+           system vs de-systemised runs (ddmin reduced the triggering system set
+           to a single header, `bits/hashtable_policy.h`, alongside
+           `std_function.h`) showed that de-systemising does NOT make
+           `_M_manager` convert -- it makes `std::function` take a path that
+           never instantiates `_M_manager` at all (B's "success" is degenerate).
+           The real bug is independent of attribution: **`_M_manager`'s body
+           throws whenever it is actually instantiated.**  gdb (`catch throw if
+           g_mmgr==1`) caught the throw at `cpp_typecheck_resolvet::resolve`,
+           inside a switch-case function call; instrumenting the throw sites
+           pinned it to the `if(all_templates) throw 0;` heuristic in `resolve`
+           (the silent "every remaining candidate is a function template ->
+           treat as SFINAE" path -- hence no diagnostic).  The failing call is
+           the `__clone_functor` case's `_M_init_functor(__dest,
+           *const_cast<const _Functor*>(_M_get_pointer(__source)))`.
+
+         ROOT CAUSE (precise, this session): deducing a function template
+         parameter from a **`const`-qualified function-pointer argument** loses
+         the `const` while building the deduced *reference* parameter.
+         `_M_init_functor` is `template<class _Fn> void(_Any_data&, _Fn&&)`;
+         the argument is a `const _Functor` lvalue (`_Functor` a function
+         pointer), so per N5008 [temp.deduct.call]/3 `_Fn` deduces to
+         `const _Functor&` and the parameter is `const _Functor&`.  The const is
+         present immediately after deduction/substitution but is dropped during
+         `typecheck_type` of the deduced reference parameter (verified:
+         `#constant` count 1 pre-`typecheck_type`, 0 post), so the parameter
+         becomes `_Functor&` (a non-const lvalue reference).  A `const`-pointer
+         argument cannot bind a non-const lvalue reference, so the sole
+         (template) candidate is rejected by overload resolution; during the
+         elaboration of an instantiated member body the `all_templates`
+         heuristic then silently throws, niling the enclosing body
+         (`_M_manager`).  Confirmed minimal trigger matrix: const + (substituted
+         class-template-parameter) pointer is required (non-const works; a
+         non-pointer `const int` works; a *concrete* `const FP` works -- only the
+         deduced/substituted const-pointer-reference parameter loses the const).
+         The loss is NOT the reference-collapse step (skipping it does not help)
+         -- it is deeper inside `typecheck_type`/`cpp_convert` of the deduced
+         const-pointer reference; the exact line is not yet pinned.
+
+         TEST: committed minimal **header-free, non-vacuous** KNOWNBUG
+         `regression/cbmc-cpp/cpp11_deduce_const_funptr_member_template` (a
+         class-template member calling a function template with a const
+         function-pointer argument -> "no body for callee").  Flip to CORE once
+         the deduced const-qualified function-pointer reference parameter keeps
+         its const.
+
+         NEXT: pin the `typecheck_type`/`cpp_convert` line that drops the
+         `#constant` on the (function-)pointer base of a deduced reference
+         parameter and preserve it ([dcl.ref], [temp.deduct.call]/3); then the
+         instantiation-context overload resolution accepts the candidate and the
+         body is no longer niled.  Re-run `sf.cpp` to confirm `_M_manager`
+         converts, then continue the `std::function` chain.
      `cpp17_functional_basic` (`std::function<int(int,int)> f = add;`) still
      passes only *vacuously* (layer 1 blocks multi-arg construction before these
      are reached); landing layer 1 needs 2c-ii (and any further layers) fixed so
