@@ -294,9 +294,16 @@ exprt value_set_dereferencet::handle_dereference_base_case(
       // fires for integer-address-only dereferences (rare). Measured cost is
       // ~linear and small (e.g. 400 globals add ~0.1s); restricting further
       // would need a sound address-taken analysis to avoid missing targets.
-      for(const auto &sym_pair : ns.get_symbol_table().symbols)
+      // The symbol table is a std::unordered_map, whose iteration order is
+      // platform-dependent. Feeding the dispatch constraints to the SAT solver
+      // in different orders can change solving time by orders of magnitude
+      // (observed as a CI timeout on aarch64 while x86_64 solved the same query
+      // in a second). Iterate in the symbol table's deterministic,
+      // content-sorted name order instead.
+      for(const auto &candidate_name :
+          ns.get_symbol_table().sorted_symbol_names())
       {
-        const symbolt &sym = sym_pair.second;
+        const symbolt &sym = ns.lookup(candidate_name);
         if(sym.is_type || !sym.is_lvalue || sym.type.id() == ID_code)
           continue;
         // Skip types that contain pointers — the byte_extract from
