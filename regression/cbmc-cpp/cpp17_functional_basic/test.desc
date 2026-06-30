@@ -10,15 +10,15 @@ main.cpp
 ^CONVERSION ERROR$
 --
 Multi-argument std::function construction and call in C++17 mode.  Layer-1
-partial-spec pack deduction (cpp11_partial_spec_pack_after_fixed) and the member
+partial-spec pack deduction (cpp11_partial_spec_pack_after_fixed), the member
 function-pointer pack-arity collapse (cpp11_variadic_pack_in_member_funptr_type)
-are both fixed, so the converting constructor now resolves and wires up
-_M_invoker / _M_manager with the correct arity.  The remaining gap is the body
-pack-expansion use: the operator() body
-`_M_invoker(_M_functor, std::forward<_ArgTypes>(__args)...)` expands the
-parameter pack to a single argument (see
-cpp11_variadic_pack_in_method_body_call), so the multi-argument call is rejected
-/ mis-evaluated.  Single-argument std::function invokes correctly and soundly
-(N5008 [func.wrap.func], [temp.variadic]/5).  Previously this test passed only
-VACUOUSLY.  Flip to CORE once the body pack-expansion uses the full deduced
-arity.
+and the method-body pack-expansion use (cpp11_variadic_pack_in_method_body_call)
+are all fixed, so the converting constructor resolves, wires up _M_invoker /
+_M_manager with the correct arity, and operator() forwards both arguments
+correctly.  The remaining gap is deeper in the dispatch chain
+(_Function_handler::_M_invoke -> std::__invoke_r -> __invoke_impl): the
+invocation yields a wrong result (returns 1 instead of 5 for add(2,3)) although
+the operator()-level argument forwarding is correct.  Single-argument
+std::function invokes correctly and soundly (N5008 [func.wrap.func],
+[temp.variadic]/5).  Previously this test passed only VACUOUSLY.  Flip to CORE
+once the multi-argument invoke/__invoke_r dispatch returns the correct result.
