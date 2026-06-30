@@ -528,7 +528,30 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
 
     if(expr.id() == "__is_same")
     {
-      if(t1 == t2)
+      // N5008 [meta.rel]/2: is_same<T, U> is true iff T and U denote the same
+      // type, INCLUDING cv-qualifiers at every level.  irept::operator==
+      // compares the type structure but ignores the cv-qualifier comments
+      // (#constant / #volatile / #restricted), so `const int` and `int` would
+      // wrongly compare equal.  Require an exact structural match AND matching
+      // cv-qualifiers at each level (recursing through single-subtype types
+      // such as pointers, references and arrays).
+      std::function<bool(const typet &, const typet &)> same_including_cv =
+        [&](const typet &a, const typet &b) -> bool
+      {
+        if(a != b)
+          return false;
+        if(
+          a.get_bool(ID_C_constant) != b.get_bool(ID_C_constant) ||
+          a.get_bool(ID_C_volatile) != b.get_bool(ID_C_volatile) ||
+          a.get_bool(ID_C_restricted) != b.get_bool(ID_C_restricted))
+          return false;
+        if(a.has_subtype())
+          return same_including_cv(
+            to_type_with_subtype(a).subtype(),
+            to_type_with_subtype(b).subtype());
+        return true;
+      };
+      if(same_including_cv(t1, t2))
         expr = true_exprt();
       else
         expr = false_exprt();

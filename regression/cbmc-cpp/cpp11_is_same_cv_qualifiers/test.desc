@@ -1,0 +1,22 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ const int != int: SUCCESS$
+^\[main\.assertion\.2\] line \d+ int != const int: SUCCESS$
+^\[main\.assertion\.3\] line \d+ volatile int != int: SUCCESS$
+^\[main\.assertion\.4\] line \d+ const int\* != int\* \(nested cv\): SUCCESS$
+^\[main\.assertion\.5\] line \d+ int == int: SUCCESS$
+^\[main\.assertion\.6\] line \d+ const int == const int: SUCCESS$
+^\[main\.assertion\.7\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [meta.rel]/2: is_same<T,U> is true iff T and U are the same type
+including cv-qualifiers.  CBMC's __is_same compared types with
+irept::operator==, which ignores cv-qualifier comments (#constant/#volatile),
+wrongly reporting `const int` and `int` (and any cv-differing pair, at any
+nesting level) as the same type.  Fixed by comparing cv-qualifiers explicitly
+at every level.  Non-vacuous: assertion 7 must FAIL.
