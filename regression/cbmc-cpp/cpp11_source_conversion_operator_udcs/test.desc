@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ T is_constructible from S via operator T\(\): SUCCESS$
@@ -11,10 +11,11 @@ main.cpp
 ^CONVERSION ERROR$
 --
 N5008 [over.match.copy]/1: converting to class type T from class type S
-considers both T's converting constructors AND S's conversion functions.  CBMC's
-implicit_conversion_sequence / user_defined_conversion_sequence only enumerates
-the target's constructors and ignores the source's conversion operators, so
-is_constructible<T,S> and is_convertible<S,T> are wrongly false when only
-S::operator T() realises the conversion (g++/clang++ agree both are true).
-Header-free.  Flip to CORE once user_defined_conversion_sequence also considers
-the source type's conversion functions.
+considers both T's converting constructors AND S's conversion functions.  The
+trait path synthesises a declval<S>() operand (a class prvalue); binding it to a
+source-side conversion function's `const S&` implicit object parameter failed
+because reference_binding required the `this` receiver to be an lvalue or a
+recognised temporary.  Per [class.mfct.non-static]/1-2, [over.match.funcs]/5 and
+[class.temporary]/3 a class prvalue may be a member-call receiver via temporary
+materialization; the synthetic source is now flagged so reference_binding
+materializes it.  Non-vacuous: assertion 3 must FAIL.
