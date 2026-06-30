@@ -128,6 +128,12 @@ protected:
   {
     bvt obj_bv, off_bv, addr_bv;
     std::size_t objects_at_creation;
+    /// Mirrors reconstruct_pointer_from_address's force_base_for_all_objects:
+    /// if true, forward constraints relate the reconstructed pointer to every
+    /// object (forcing a base address); if false, only to objects that already
+    /// have a base address. The deferred-forward loop in
+    /// finish_eager_conversion applies the same gate as the eager loop.
+    bool force_base_for_all_objects;
     bool needs_backward_constraints;
     /// Cache of the per-object equality literals `obj_bv == object number`,
     /// indexed by object number. The same literal is needed by the forward,

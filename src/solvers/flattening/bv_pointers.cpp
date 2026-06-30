@@ -636,7 +636,14 @@ bvt bv_pointerst::reconstruct_pointer_from_address(
 
   // Create the pending entry up front so the per-object equality literals
   // built below are cached on it and reused by finish_eager_conversion.
-  pending_i2p.push_back({obj_bv, off_bv, addr_bv, objects.size(), true, {}});
+  pending_i2p.push_back(
+    {obj_bv,
+     off_bv,
+     addr_bv,
+     objects.size(),
+     force_base_for_all_objects,
+     true,
+     {}});
   pending_i2pt &pending = pending_i2p.back();
 
   std::size_t number = 0;
@@ -1100,20 +1107,15 @@ bvt bv_pointerst::convert_byte_update(const byte_update_exprt &expr)
     return object_offset_encoding(obj, off, new_addr);
   }
 
-  // Value is a pointer: write only the address
+  // Value is a pointer: write only its flat address. Lower to a byte_update
+  // whose value is the address as an unsigned integer; the typecast of the
+  // pointer value to unsignedbv yields the address component, which
+  // SUB::convert_byte_update then converts and writes.
   if(expr.value().type().id() == ID_pointer)
   {
     const auto &ptr_type = to_pointer_type(expr.value().type());
     const std::size_t platform_width = ptr_type.get_width();
 
-    // Extract the address component from the pointer value
-    const bvt &value_bv = convert_bv(expr.value());
-    bvt addr_bv = address_literals(value_bv, ptr_type);
-
-    // Create a byte_update that writes the address as an unsigned integer
-    // We need to create a fresh symbol for the address value
-    // and use it in a byte_update with the integer type.
-    // Simpler: lower to byte_update with the address as a typecast.
     const typecast_exprt addr_as_int(
       expr.value(), unsignedbv_typet{platform_width});
     byte_update_exprt int_update{
@@ -1748,8 +1750,14 @@ void bv_pointerst::finish_eager_conversion()
         literalt is_this = i2p_object_eq(p, number);
         valid_obj_lits.push_back(is_this);
 
-        // Forward constraints for objects added after the I2P
-        if(number >= p.objects_at_creation)
+        // Forward constraints for objects added after the I2P. Apply the same
+        // gate as the eager loop in reconstruct_pointer_from_address: relate to
+        // a late object only if forcing all objects, or if it already has a
+        // base address.
+        if(
+          number >= p.objects_at_creation &&
+          (p.force_base_for_all_objects ||
+           object_base_address.find(number) != object_base_address.end()))
         {
           bvt base = get_object_base_address(number, addr_bits);
           bvt off_ext = bv_utils.zero_extension(p.off_bv, addr_bits);
