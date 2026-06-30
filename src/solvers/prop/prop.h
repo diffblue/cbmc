@@ -116,6 +116,13 @@ public:
   // an incremental solver may remove any variables that aren't frozen
   virtual void set_frozen(literalt) { }
 
+  // An incremental simplifying solver may limit simplification to the first
+  // solve call: re-running variable elimination before every incremental solve
+  // can otherwise make a later solve blow up. No-op unless overridden.
+  virtual void set_limit_incremental_simplification()
+  {
+  }
+
   // Resource limits:
   virtual void set_time_limit_seconds(uint32_t)
   {
