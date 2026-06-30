@@ -375,6 +375,19 @@ void template_mapt::apply(typet &type) const
   }
   else if(type.id()==ID_pointer)
   {
+    // N5008 [temp.variadic]/5: a pointer-to-function data member whose pointee
+    // type contains a pack expansion of the enclosing class parameter pack --
+    // e.g. the `_Res(*)(const _Any_data&, _ArgTypes&&...)` invoker pointer in
+    // libstdc++'s `function<_Res(_ArgTypes...)>` -- must have that pack
+    // expanded into one parameter per deduced element BEFORE the parameters
+    // are substituted below; otherwise the substitution replaces the pack with
+    // a single (scalar) element and the pointer type is collapsed to one
+    // parameter (so e.g. assigning the correctly-arity'd
+    // `&_Function_handler<_Res(A...), F>::_M_invoke` to it fails).
+    // `expand_parameter_packs` is a no-op unless the pointee is a function type
+    // with a parameter that names a pack recorded in `pack_args_map` (the class
+    // pack), so method types and non-function pointees are untouched.
+    expand_parameter_packs(to_pointer_type(type).base_type());
     apply(to_pointer_type(type).base_type());
   }
   else if(type.id() == ID_frontend_pointer)
@@ -385,6 +398,11 @@ void template_mapt::apply(typet &type) const
     // in a pointer/reference pattern -- e.g. the `Ts` in a pack expansion
     // `Ts&...` or `const Ts&...`, the shape of std::tuple's
     // `const _Elements&...` constructor arguments -- are substituted.
+    // As in the ID_pointer branch above, first expand an enclosing-class
+    // parameter pack in a (pre-conversion) function-pointer pointee's
+    // parameter list ([temp.variadic]/5), so a function-pointer data member is
+    // not collapsed to a single parameter.
+    expand_parameter_packs(to_type_with_subtype(type).subtype());
     apply(to_type_with_subtype(type).subtype());
   }
   else if(type.id()==ID_struct ||
