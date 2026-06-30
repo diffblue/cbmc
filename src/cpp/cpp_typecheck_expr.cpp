@@ -4851,6 +4851,17 @@ void cpp_typecheckt::typecheck_function_call_arguments(
   exprt::operandst::iterator arg_it = expr.arguments().begin();
   for(const auto &parameter : parameters)
   {
+    // Stop once the supplied arguments are exhausted.  A well-formed call has
+    // at least as many arguments as non-defaulted parameters (defaults were
+    // filled in above), but an ill-formed call synthesized during template
+    // instantiation -- e.g. a variadic pack-expansion use that was expanded to
+    // too few arguments -- can leave fewer arguments than parameters here.
+    // Dereferencing `arg_it` past `end()` is undefined behaviour (it corrupted
+    // the shared-irep tree and crashed); break instead and let the arity
+    // mismatch be diagnosed by the base type-checker below.
+    if(arg_it == expr.arguments().end())
+      break;
+
     if(parameter.get_bool(ID_C_call_by_value))
     {
       DATA_INVARIANT(is_reference(parameter.type()), "reference expected");
