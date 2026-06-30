@@ -1,0 +1,22 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ body pack-expansion call expanded to full arity: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [temp.variadic]/5: a pack-expansion use of a function parameter pack in a
+function body (here `fp(a...)`, with `a` the parameter pack of `go(A... a)` and
+`A` the enclosing class template parameter pack) must expand to one argument per
+deduced element.  CBMC expands it to a single argument, so the call is rejected
+("wrong number of function arguments: expected 2, but got 1").  This is the
+libstdc++ function<_Res(_ArgTypes...)>::operator() body shape
+`_M_invoker(_M_functor, std::forward<_ArgTypes>(__args)...)` and is the
+remaining blocker for multi-argument std::function invocation (the member
+function-pointer type collapse, cpp11_variadic_pack_in_member_funptr_type, is
+already fixed).  Flip to CORE once the body pack-expansion uses the full pack
+arity.
