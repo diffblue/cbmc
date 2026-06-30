@@ -1,0 +1,22 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ Op<WithFoo> valid -> detected: SUCCESS$
+^\[main\.assertion\.2\] line \d+ Op<NoFoo> invalid -> not detected: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^PARSING ERROR$
+--
+N5008 [temp.arg.template], [temp.class.spec.match], [temp.deduct]: the detection
+idiom's partial specialization has<Op, Arg, void_t<Op<Arg>>> must be selected
+when Op<Arg> is valid.  CBMC deduced Op -> foo_t but, resolving the written
+template-template-parameter argument, relied on id_map.find(deduced-template-id)
+(which can fail) and then a global-name fallback that re-selected the
+template-template-parameter itself, leaving the argument unsubstituted so the
+specialization did not match (has<foo_t, WithFoo>::value wrongly false).  Fixed
+by wiring the argument directly from its deduced template_map binding.
+Non-vacuous: assertion 3 must FAIL.
