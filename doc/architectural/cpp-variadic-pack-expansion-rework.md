@@ -763,16 +763,37 @@ any of them.
      'function'") and even a deliberately wrong assertion held.  With layer 1
      fixed the constructor resolves; single-argument `std::function` invokes
      correctly and soundly, but the multi-argument path hits **layer 3**.
-  - **Layer 3 (NEXT): multi-argument `_Function_handler<R(A...), F>` handler
-     wiring.** Multi-argument construction now runs but does not assign the
-     handler pointers `_M_invoker` / `_M_manager`, so `operator()` dereferences a
-     null `_M_invoker` (line 591) and the destructor's `_M_manager` deref fails.
-     It is NOT a "no body" (the bodies convert); the pointers are simply never
-     wired up for the `R(A...)` pack shape (single-arg works, so it is
-     pack-specific).  Captured by the two non-vacuous KNOWNBUGs above.
-  The dog-food `make_bvrep` files remain blocked on layer 3 (multi-arg
-  `std::function` handler wiring); single-arg `std::function` construction *and
-  invocation* are now sound (layers 1, 2a/2b/2c-i/2c-ii fixed).
+  - **Layer 3: multi-argument `_Function_handler<R(A...), F>` handler wiring.**
+     Decomposed into two sub-roots:
+     - **3a. pack expansion in a member function-pointer type (FIXED, CORE).**
+       The `_M_invoker` data member of `function<_Res(_ArgTypes...)>` has type
+       `_Res(*)(const _Any_data&, _ArgTypes&&...)`.  `template_mapt::apply`
+       recursed into the pointer's pointee but did not expand the class pack
+       `_ArgTypes&&...` in its parameter list before substituting, collapsing a
+       multi-argument signature's invoker pointer to one parameter; the
+       correctly-arity'd `&_Function_handler<_Res(A...),F>::_M_invoke` then could
+       not be assigned, so the converting constructor body silently failed to
+       elaborate (no body).  Fixed in `apply` (expand_parameter_packs on a
+       (frontend_)pointer pointee before substituting), N5008 [temp.variadic]/5.
+       CORE `cpp11_variadic_pack_in_member_funptr_type`.
+     - **3b. pack-expansion use of a parameter pack in a method body (KNOWNBUG,
+       NEXT).** With 3a fixed the converting constructor wires up the invoker
+       with the correct arity, but the `operator()` body
+       `_M_invoker(_M_functor, std::forward<_ArgTypes>(__args)...)` expands the
+       pack to a single argument.  Root: for a member of a partial-spec class
+       `C<R(A...)>`, the parameter pack is expanded during instantiation by
+       `template_mapt` (struct-body `expand_parameter_packs`), which -- unlike
+       the in-class `compound_type` path -- neither renames the replicated
+       parameters to `base$k` nor records `#expanded_param_packs`, so the
+       method-body drain in `cpp_typecheck_method_bodies` has nothing to drive
+       the body-use expansion.  KNOWNBUG `cpp11_variadic_pack_in_method_body_call`
+       (header-free, non-vacuous).  Fix direction: have the `template_mapt`
+       expansion follow the `base$k` rename + `#expanded_param_packs` recording
+       convention (or have the method-body drain derive the counts from the
+       deduced class pack).
+  The dog-food `make_bvrep` files remain blocked on layer 3b (multi-arg
+  `std::function` body pack expansion); single-arg `std::function` construction
+  *and invocation* are now sound (layers 1, 2a/2b/2c-i/2c-ii, 3a fixed).
 
 Net: the trailing-return decltype is fully handled across pack shapes -- a
 type-pack nested inside a reference, a value-pack with no type-pack reference,
