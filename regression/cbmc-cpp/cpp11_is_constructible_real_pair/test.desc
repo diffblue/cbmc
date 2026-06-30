@@ -1,0 +1,27 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ pair<const int,int> is_constructible from pair<int,int>&&: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [meta.unary.prop], [temp.deduct.call]/4, [temp.deduct.type]:
+is_constructible<pair<const int,int>, pair<int,int>&&> is true (g++/clang++
+agree) -- the converting constructor template pair(pair<U1,U2>&&) deduces
+U1=U2=int and binds the rvalue.  CBMC reports false: deducing the constructor
+template's parameters from the argument deduces U1=int but leaves U2 unassigned,
+so the enable_if non-type parameter's condition (which mentions U2) cannot be
+substituted, typecheck_type of the parameter type throws, and the candidate is
+dropped ("found no match for symbol 'pair'").  user_defined_conversion_sequence
+correctly delegates the template converting constructor to new_temporary; the
+defect is in the constructor-template argument deduction.  Root of std::map /
+std::unordered_map insert(_Pair&&) overload selection for a convertible pair
+(dog-food: expr.cpp, expr_util.cpp, pointer_predicates.cpp,
+irep_serialization.cpp).  Reproduces only with libstdc++'s full pair machinery
+(minimal hand-written converting ctors deduce both parameters), hence the header
+dependency.  Flip to CORE once deduction assigns every constructor template
+parameter for this source.
