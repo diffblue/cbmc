@@ -1186,6 +1186,19 @@ void cpp_typecheck_resolvet::guess_function_template_args(
         // declarator/type only -- mirroring the empty-pack guard in
         // cpp_instantiate_template.cpp.
         bool has_function_param_pack = false;
+        // N5008 [temp.variadic]/4: a *function* parameter pack expands to one
+        // function parameter per deduced element; the positioning of that
+        // expansion is determined by the FUNCTION parameter list, not the
+        // template parameter list.  `non_pack_count` above counts non-pack
+        // TEMPLATE parameters (used only to size the pack), which can exceed
+        // the number of non-pack function parameters when a template parameter
+        // is not a function parameter -- e.g. an explicit leading return-type
+        // parameter `R` in `template<class R, class F, class... A> R f(F, A&&...)`
+        // called as `f<int>(...)`.  Using the template count to position the
+        // expansion then inserts one parameter too many.  Count the non-pack
+        // function parameters (and the pack's position among them) directly.
+        std::size_t func_non_pack_count = 0;
+        std::size_t func_params_before_pack = 0;
         if(!tmpl_decl.declarators().empty())
         {
           const irept &fparams =
@@ -1194,22 +1207,30 @@ void cpp_typecheck_resolvet::guess_function_template_args(
           {
             if(p.id() != ID_cpp_declaration)
               continue;
+            bool this_is_pack = false;
             for(const auto &d : p.get_sub())
               if(
                 d.id() == ID_cpp_declarator &&
                 (d.find(ID_type).get_bool(ID_ellipsis) ||
                  d.get_bool(ID_ellipsis)))
-                has_function_param_pack = true;
+                this_is_pack = true;
+            if(this_is_pack)
+              has_function_param_pack = true;
+            else
+            {
+              ++func_non_pack_count;
+              if(!has_function_param_pack)
+                ++func_params_before_pack;
+            }
           }
         }
 
         if(pack_size > 1 && has_function_param_pack)
         {
           auto &params = to_code_type(inst_type).parameters();
-          // Find the pack parameter (last one that was the pack)
-          // and duplicate it to match the pack size.
-          // The pack parameter is at position non_pack_count in the
-          // function parameters (after 'this' if present).
+          // Find the function parameter pack and duplicate it to match the
+          // pack size.  The pack sits after the non-pack function parameters
+          // that precede it (and after 'this' for member functions).
           std::size_t param_offset = 0;
           if(!params.empty() && params.front().get_this())
             param_offset = 1;
@@ -1217,12 +1238,12 @@ void cpp_typecheck_resolvet::guess_function_template_args(
           // Only expand if the parameter count doesn't already match
           // (instantiate_template may have already expanded the pack).
           std::size_t expected_params =
-            non_pack_count + pack_size + param_offset;
+            func_non_pack_count + pack_size + param_offset;
           if(
             params.size() < expected_params &&
-            non_pack_count + param_offset < params.size())
+            func_params_before_pack + param_offset < params.size())
           {
-            std::size_t pack_idx = non_pack_count + param_offset;
+            std::size_t pack_idx = func_params_before_pack + param_offset;
             code_typet::parametert pack_param = params[pack_idx];
             for(std::size_t i = 1; i < pack_size; ++i)
               params.insert(params.begin() + pack_idx + i, pack_param);
