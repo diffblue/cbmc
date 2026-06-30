@@ -775,7 +775,12 @@ any of them.
        not be assigned, so the converting constructor body silently failed to
        elaborate (no body).  Fixed in `apply` (expand_parameter_packs on a
        (frontend_)pointer pointee before substituting), N5008 [temp.variadic]/5.
-       CORE `cpp11_variadic_pack_in_member_funptr_type`.
+       CORE `cpp11_variadic_pack_in_member_funptr_type`.  (Letting the
+       multi-argument invoker call proceed also surfaced a latent robustness bug
+       -- `typecheck_function_call_arguments` dereferenced its argument iterator
+       past `end()` when a synthesized call had fewer arguments than parameters,
+       corrupting the shared-irep tree and segfaulting in `--cpp11`; now guarded
+       so the arity mismatch is diagnosed instead of crashing.)
      - **3b. pack-expansion use of a parameter pack in a method body (KNOWNBUG,
        NEXT).** With 3a fixed the converting constructor wires up the invoker
        with the correct arity, but the `operator()` body
