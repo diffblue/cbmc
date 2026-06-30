@@ -4,42 +4,29 @@
 // convertible to pair<const int,int>, so the trait is TRUE (g++ and clang++
 // agree).
 //
-// KNOWN BUG: CBMC reports it FALSE.  Root cause (verified by tracing the
-// front-end), N5008 [temp.deduct.call] + [temp.arg]:
+// This was a KNOWN BUG (CBMC reported FALSE) and is now fixed.  Root cause
+// (N5008 [meta.rel]/2): libstdc++'s C++17 converting move constructor
+//   template<class _U1, class _U2, typename __enable_if_t<
+//     _PCCFP<_U1,_U2>::template _MoveConstructiblePair<_U1,_U2>() && ...,
+//     bool> = true> pair(pair<_U1,_U2>&&);
+// is constrained via
+//   _PCCFP<_U1,_U2> = conditional<!is_same<_T1,_U1> || !is_same<_T2,_U2>,
+//                                 _PCC<true,_T1,_T2>, _PCC<false,_T1,_T2>>::type
+// For pair<const int,int> from pair<int,int>, !is_same<const int,int> is true,
+// so _PCCFP selects _PCC<true,...> whose _MoveConstructiblePair() is true ->
+// the constructor is viable.  CBMC's __is_same ignored cv-qualifiers
+// (irept::operator== treats #constant/#volatile as comments), so
+// is_same<const int,int> was wrongly TRUE, _PCCFP selected _PCC<false,...>,
+// _MoveConstructiblePair() was false, the enable_if was ill-formed, and the
+// constructor was dropped ("found no match for symbol 'pair'") -> trait false.
+// Fixed by making __is_same compare cv-qualifiers (see
+// regression/cbmc-cpp/cpp11_is_same_cv_qualifiers).
 //
-//   * __is_constructible delegates (correctly, [over.match.copy]) to
-//     constructing pair<const int,int> from pair<int,int>&&.
-//   * libstdc++'s C++17 converting move constructor (stl_pair.h:708) is
-//       template<class _U1, class _U2, typename __enable_if_t<
-//         _PCCFP<_U1,_U2>::template _MoveConstructiblePair<_U1,_U2>()
-//         && _PCCFP<_U1,_U2>::template _ImplicitlyMoveConvertiblePair<_U1,_U2>(),
-//         bool> = true>
-//       pair(pair<_U1,_U2>&&);
-//   * Constructor-template argument deduction CORRECTLY binds _U1=int, _U2=int
-//     (the template_map holds `...::651::_U1 -> int` and `...::651::_U2 -> int`).
-//   * BUT template_mapt::apply fails to substitute those bound _U1/_U2
-//     references where they are nested inside the `ambiguous` condition
-//     expression of the __enable_if_t<...> non-type parameter type.  They
-//     survive as bare cpp_names, so typecheck_type of the parameter type throws
-//     and the candidate is dropped ("found no match for symbol 'pair'") -> the
-//     trait is false.
-//   * A hand-written pair whose enable_if is spelled `enable_if<...>::type`
-//     reproduces neither (apply substitutes there); the gap is specific to the
-//     __enable_if_t alias wrapping a member-function-template constraint
-//     expression, hence the header dependency.
-//
-// user_defined_conversion_sequence is NOT the culprit: it correctly delegates
-// the template converting constructor to new_temporary.  The defect is the
-// substitution gap in template_mapt::apply.
-//
-// This is the root of std::map / std::unordered_map insert failing for a
+// This was the root of std::map / std::unordered_map insert failing for a
 // convertible pair (the constrained `insert(_Pair&&)` overload's
-// is_constructible<value_type,_Pair&&> guard) -- src/util/expr.cpp,
-// expr_util.cpp, pointer_predicates.cpp, irep_serialization.cpp.
+// is_constructible<value_type,_Pair&&> guard).
 //
-// Non-vacuous (assertion 2 must FAIL).  Flip to CORE once template_mapt::apply
-// substitutes deduced parameters inside an enable_if non-type-parameter's
-// condition expression.
+// Non-vacuous (assertion 2 must FAIL).
 
 #include <utility>
 #include <type_traits>
