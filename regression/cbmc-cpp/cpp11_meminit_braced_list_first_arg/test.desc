@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ braced-init-list as first mem-initializer argument: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^PARSING ERROR$
+^CONVERSION ERROR$
+--
+N5008 [class.base.init]/3, [dcl.init.list]: a mem-initializer argument list may
+have a braced-init-list element.  CBMC's parser rejected a leading braced-init-
+list argument followed by more arguments in a mem-initializer ( `m({a,b}, t)` );
+rMemberInit's `( {` special case parsed only a single braced-init-list and then
+required `)`.  Fixed by parsing the full argument list via rFunctionArguments
+(which accepts braced-init-list elements).  Unblocks refined_string_exprt's
+`: struct_exprt({_length, _content}, type)` (src/util/string_expr.h).
